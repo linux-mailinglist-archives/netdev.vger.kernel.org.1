@@ -1,116 +1,122 @@
-Return-Path: <netdev+bounces-70766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C47F98504F7
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 16:40:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A73B785050E
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 17:14:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65F9E1F230B9
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 15:40:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46A131F22082
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 16:14:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DDD15BAE3;
-	Sat, 10 Feb 2024 15:40:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f6T7GiZT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF1BA5C03D;
+	Sat, 10 Feb 2024 16:13:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A90A5381A;
-	Sat, 10 Feb 2024 15:40:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2BCB5BACE;
+	Sat, 10 Feb 2024 16:13:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707579632; cv=none; b=CHoKc1ihGXnW1t27LoWFjt9tkF7OiPNJ4U5nCHCAjUg+T/cHtvkMAk/OOvKc3iEPpukQ87UaIBVehCQw6o5Uzjqk/ZOeNdvRXB/kJ6j1IfD8MF0DD1O6HOb/IlkM8lH0S/4RpjRXic2wCFi6P1yzuA/bm9Hcq5yuOvBRWosEf9w=
+	t=1707581639; cv=none; b=WH0kS78eg120ByznZMJHWpvIogUh1jSa5sKg50WnaXwE6njAM0dq71GOlDyNnXXYoHZWCSwQsXFda12n1o4DhlTPoBRSP85NIrqjcY/oBWtLbCo/OdDo8jbbwCdKnMYYhbYI6Ya0I3XoKJ+Zkgko61i/owBGw3gfh80KCSqXysI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707579632; c=relaxed/simple;
-	bh=o90dBGsaOc4h8XZXjOy2Vf5kYvkiA8PHxCs2WzXIIkE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=XgcXOW00RADCfs5lRzqMm2plwTZnB7M94Orrbd1OGVJDa3ZZYkj2udTVsOk0BYP/R/39v11A30I0hRxN7toXjNJO6g9cECi6QEPU3wEkNGXc9ByoVKZ8bqHxvtZXiB7sCOrRgxJhWUvQWhd0lGpNICaOxwzH07DD9e697jOojp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f6T7GiZT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 59049C43390;
-	Sat, 10 Feb 2024 15:40:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707579631;
-	bh=o90dBGsaOc4h8XZXjOy2Vf5kYvkiA8PHxCs2WzXIIkE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=f6T7GiZTni50nnfBV1omFsyGeirpUSqU6elXu7ewt73RCq5+HOh7VkVrdRvFRHFXO
-	 jv/YxV4p119HjSnoK6JdqiqM2se0/BLhlu/K6z+glLLEJHnfWWuLzXOCPJtgBp/o2w
-	 tF2MawnXCGeor1yXB1IzOu3WSKSRwVk8/7LP3QkA+fzNPGE36vA+3s9beLRJ4tLU/t
-	 hJWl5aUoOkdvlFUIOG6/b0OwmVA+2dAlMGRMOtyyLdohaX6m0UxwcH3fzhK7W2dUtr
-	 9V/FXrJt4dFSdAnF9jCaKjiMQpdnnvGvSyxX9opVSY8ubbVEM1jzm2Is+qPH/0Abcf
-	 Ex1Gz38JgLzDA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3E5E6E2F2F0;
-	Sat, 10 Feb 2024 15:40:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1707581639; c=relaxed/simple;
+	bh=H6Hhjvlkn9g8G+fKq+VyNjoVCBshVGKlkBtGvWh5LWI=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=qqk6d6tIXKF/fNwK9DPiK58b2lLPd0VdCpwe2d+sFD4KiqQFmzmE1L9RVhmvRzSeQK0v8LaayiWap0vdFvhRQs0ilKw8/YwBUJc9qRJ2GgzZzbrR0PiQOAPUQBHcBbhL7rcAZI3N65p71L0belW/5dp4GJ4ur8yPVd5UK5E40KQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (31.173.86.126) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sat, 10 Feb
+ 2024 19:13:44 +0300
+Subject: Re: [RFC PATCH net-next v2 1/7] net: ravb: Simplify poll & receive
+ functions
+To: Paul Barker <paul.barker.ct@bp.renesas.com>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, Wolfram Sang
+	<wsa+renesas@sang-engineering.com>, <netdev@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20240206091909.3191-1-paul.barker.ct@bp.renesas.com>
+ <20240206091909.3191-2-paul.barker.ct@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <4292c23b-3781-91b1-f873-fb2b61f81119@omp.ru>
+Date: Sat, 10 Feb 2024 19:13:43 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next PATCH v7 00/10] net: phy: Introduce PHY Package concept
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170757963125.14284.2496460448206023966.git-patchwork-notify@kernel.org>
-Date: Sat, 10 Feb 2024 15:40:31 +0000
-References: <20240206173115.7654-1-ansuelsmth@gmail.com>
-In-Reply-To: <20240206173115.7654-1-ansuelsmth@gmail.com>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
- conor+dt@kernel.org, andersson@kernel.org, konrad.dybcio@linaro.org,
- andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
- robert.marko@sartura.hr, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org
+In-Reply-To: <20240206091909.3191-2-paul.barker.ct@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch02.omp.ru (10.188.4.13) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 02/10/2024 15:56:58
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 183344 [Feb 10 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.86.126 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.86.126 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.86.126
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 02/10/2024 16:03:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 2/10/2024 2:13:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Hello:
+On 2/6/24 12:19 PM, Paul Barker wrote:
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Tue,  6 Feb 2024 18:31:03 +0100 you wrote:
-> Idea of this big series is to introduce the concept of PHY package in DT
-> and give PHY drivers a way to derive the base address from DT.
+> We don't need to pass the work budget to ravb_rx() by reference, it's
+> cleaner to pass this by value and return the amount of work done. This
+> allows us to simplify the ravb_poll() function and use the common
+> `work_done` variable name seen in other network drivers for consistency
+> and ease of understanding.
 > 
-> The concept of PHY package is nothing new and is already a thing in the
-> kernel with the API phy_package_join/leave/read/write.
+> In ravb_rx_gbeth() & ravb_rx_rcar(), we can also drop the confusingly
+> named `boguscnt` variable and use a for loop to iterate through
+> descriptors.
 > 
-> What is currently lacking is describing this in DT and better reference
-> a base address to calculate offset from.
+> This is a pure refactor and should not affect behaviour.
 > 
-> [...]
+> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
 
-Here is the summary with links:
-  - [net-next,v7,01/10] dt-bindings: net: document ethernet PHY package nodes
-    https://git.kernel.org/netdev/net-next/c/8453c88c7a15
-  - [net-next,v7,02/10] net: phy: add support for scanning PHY in PHY packages nodes
-    https://git.kernel.org/netdev/net-next/c/385ef48f4686
-  - [net-next,v7,03/10] net: phy: add devm/of_phy_package_join helper
-    https://git.kernel.org/netdev/net-next/c/471e8fd3afce
-  - [net-next,v7,04/10] net: phy: qcom: move more function to shared library
-    https://git.kernel.org/netdev/net-next/c/737eb75a815f
-  - [net-next,v7,05/10] dt-bindings: net: Document Qcom QCA807x PHY package
-    https://git.kernel.org/netdev/net-next/c/dd87eaa13787
-  - [net-next,v7,06/10] net: phy: provide whether link has changed in c37_read_status
-    https://git.kernel.org/netdev/net-next/c/9b1d5e055508
-  - [net-next,v7,07/10] net: phy: qcom: add support for QCA807x PHY Family
-    https://git.kernel.org/netdev/net-next/c/d1cb613efbd3
-  - [net-next,v7,08/10] net: phy: qcom: move common qca808x LED define to shared header
-    https://git.kernel.org/netdev/net-next/c/ee9d9807bee0
-  - [net-next,v7,09/10] net: phy: qcom: generalize some qca808x LED functions
-    https://git.kernel.org/netdev/net-next/c/47b930d0dd43
-  - [net-next,v7,10/10] net: phy: qca807x: add support for configurable LED
-    https://git.kernel.org/netdev/net-next/c/f508a226b517
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+[...]
 
-
+MBR, Sergey
 
