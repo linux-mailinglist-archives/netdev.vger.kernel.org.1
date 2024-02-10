@@ -1,168 +1,89 @@
-Return-Path: <netdev+bounces-70696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AF73850101
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 01:13:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68D36850104
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 01:17:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5519D1C245DC
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 00:13:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E84D9B2653C
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 00:17:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12FFB184;
-	Sat, 10 Feb 2024 00:13:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="zIXg2b2U"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EF0337A;
+	Sat, 10 Feb 2024 00:17:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2042.outbound.protection.outlook.com [40.107.212.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03C8D163
-	for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 00:13:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707524008; cv=fail; b=BSE/3YB3BJkBPFHPcu2KSupuTNdMF3MlYCl2MyymaDs0/s5y2BMUuw5lnRVtMZNznynXjdBb/5mLG6JrSMxMfh4BPYuC0/FHaNZrO31s1S9dr0fYcu6y8a7X9fbFXqltc4h6aQhd5sHEwAgHN4GTe1yR2Yp2wK14rW5vJcQaITE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707524008; c=relaxed/simple;
-	bh=vi6roGYKjWTJsgTQ8bZyfRaOOYNGx3xl5FN8A00LDOU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=iFUzNv8/7FypogedPSSUa2XBMzeXymGlnHMnvyCn/gq1Vq8dxsc+Y5wBu6PmDIROMx0vppiaeSpX5E3qbxe5wNVzqE/AvzyjbeOb34Vb7dfJF1145JwOP4ftoohZFTx9bGPsWEqK7g4G1Mmta+r2BNjSaX8QxiE0M4BLKs/AS8Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=zIXg2b2U; arc=fail smtp.client-ip=40.107.212.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CTBltkIJ3oiChxi0pVbVmgM7bFNHXFsrZErgsX97JJE2CirkbKLjIwiUIXJiLxChVs/XZUqSBr+GbjgMRSCyijaamWhzx0D3WeDKk2g9mVENAMSwxDnKE7HC2vEtNn0tdEtKkNDi4CNgVUsh3eTQUrcheRG4CPaHWmNdKbRcC8EwLAFzoEs6O+5C3FGUTogJq4sdKc666BFHGio85+Xt1cD4n7DBBDgZr19sEN83qlmWY1BjE8wHlIp1dEZdb0JDlk1Ssoe8zOzJGpZt6wk1aNSRqRP7CPekk6jrlirIBEEPZ+xmVbdjOCJwRqIj7EtQgc1JeRRckyZRvUIkShtK8g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=d2poCc+dK9V+NWj6TQHi3ulOz6tBNeMXfaLZZ3beLL4=;
- b=jW3CBHG6Dp+PysInRSrxmRZ6J7FMPxp/ZEYBwdHeLTBQO/w7aoQ9AKxXxQ29f2V9YLwlW6r4+2dPLdNJZDR5ps4KYPWtEvkGGuk8Y9WJuQTFrBjVs1X0GmYeCm0yEjQHfEjHjf1mseMYxhUCMRUij3ZFkAlkDlbKNUf3xzwGfz19DDBiaFj4icRgL4wmZFpEhbC2f8pWddKTZ1008uQ8SXSTl173EhWtnmziyaAzI9tJ+lmCjudVMqbDCPWxF6Sw2EOLV02FxRyoVGyLHOaG9BMcWncX0RIAObA2rfWgVJxEU9FpwSGdf3WyWLRReeySc0swEghPjnxcCXaNG2Hm0g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=d2poCc+dK9V+NWj6TQHi3ulOz6tBNeMXfaLZZ3beLL4=;
- b=zIXg2b2U6qa4F6z1WrS0GAsRF3moH7t4pqpOiEtWq+1uApn5hGhX44Lw8QEV4hZkOnszTj36CRScf/wOfXriSkjbhdCPqV5/bLkcoIGkScrmEx8B3cGlW6+YURgbSjU9N0casEdFvgRpwHagO9zS+Tuki15uVNLDIpZOcApT+UY=
-Received: from MN2PR18CA0021.namprd18.prod.outlook.com (2603:10b6:208:23c::26)
- by DS7PR12MB8322.namprd12.prod.outlook.com (2603:10b6:8:ed::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.15; Sat, 10 Feb
- 2024 00:13:23 +0000
-Received: from MN1PEPF0000ECD9.namprd02.prod.outlook.com
- (2603:10b6:208:23c:cafe::70) by MN2PR18CA0021.outlook.office365.com
- (2603:10b6:208:23c::26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.38 via Frontend
- Transport; Sat, 10 Feb 2024 00:13:23 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- MN1PEPF0000ECD9.mail.protection.outlook.com (10.167.242.138) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7249.19 via Frontend Transport; Sat, 10 Feb 2024 00:13:22 +0000
-Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Fri, 9 Feb
- 2024 18:13:21 -0600
-From: Shannon Nelson <shannon.nelson@amd.com>
-To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<edumazet@google.com>, <pabeni@redhat.com>
-CC: <brett.creeley@amd.com>, <drivers@pensando.io>, Shannon Nelson
-	<shannon.nelson@amd.com>
-Subject: [PATCH v2 net] ionic: minimal work with 0 budget
-Date: Fri, 9 Feb 2024 16:13:07 -0800
-Message-ID: <20240210001307.48450-1-shannon.nelson@amd.com>
-X-Mailer: git-send-email 2.17.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80E80163
+	for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 00:17:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707524226; cv=none; b=jnA7AYLYQ4904aaKoYTaXnb+Q7PvYl8SjRkfZmRwU4wU7ZF8K7y6nz/Sme0nktz+9VA/E7Xq8VOzTMZGAtvgeuJEcqjkAHH0Y7R6QkP8YIAd3ljduBSTZrdZPd8L82DwFiQb8WLc6f/t+925nd2PHRAmXVIQFoArneeU2D81WFs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707524226; c=relaxed/simple;
+	bh=4ge+/WmzvR0J9ejhrGXr1W+09OnA2O5Y9YuwoewWnzY=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=DKJZv6ZQ4Hp3wQbaijL2LKZ6t7n+8SfpMCjjkZg3d35RPHyB4EQAJTqFT4fNX0NjLT/dnhcgolR7fPO3hHxwvyNBw4uP0OmfzHqsL6IJB/au38lMoQMaq2o5uxC15M6sO/PDkKuQFwEqcv6brlGJ300XRSDO4eQLMoP6B/xEHms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-363d6348a07so11855175ab.3
+        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 16:17:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707524223; x=1708129023;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rH7XWE+1Uesz6zBrfYb5Ze0RvaWDz5N+5wCoQa9ttkk=;
+        b=d7TeAtEHuruXvd0HfrQ7jj0/J6CIIb9mJRkq3aEAUr+NvXRCa2dV22/z34yyhUp6JO
+         2UXhE3yF6ej1o8Lfy4L2tGafo5iWcQw+l0f+j9E0Co0coukV/rnWZIZ8cl4epmp8Fuql
+         ivYP3K9C3e1AKAYYHna1sJuHbYixHw3694b44F62JBOvNwQ2tBZJhkAUL5KZ6FIOLqHy
+         TkqMIJeYnKZSSKqjv/+XCUesmzHRXlDI0BzdxbGEudk1pFbki3WRU2jTaViqTKlsOoCJ
+         GrzL4QmW+f/3n/f6sHw9dMeuQLO4Pxd51vYT08TQzejvxdcdEvfWTKaRQKuRC5ErSMu+
+         4qXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW9v5DAf5KhU//zLfuaIJTHb68Ch5PXYEZy6AaRqyp8rFuiEr2SXgEaIDYRsbuUXQfz/oEPmd3d9xvJJL4/ZWoM9ESSkRRU
+X-Gm-Message-State: AOJu0YwBmkvqn/WPUXv5WRVOv0nnjpDkCSTu19sHNGfxt0tJlfpqcxpI
+	EXJ+fUbIHnC2sXBqBSYrQglvgIC/dMBUdtC14SlooLD4PwvSlmBnM21A+qUe4eMBodDQwVDEPhB
+	vd6QW+Ro2hX8+8Z/sMsivVUGkACShuWHBedRdkX1ow7fAgoWw2eWDuvU=
+X-Google-Smtp-Source: AGHT+IHaSCpSBmrGWfp4RAWRiVgNaUBDrl+UwAAOt5yahbYipkZfIVgzW/xl8ZNcd1Dq2szhLGEgZjca74TYQxXTUaIL35YpvPpK
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECD9:EE_|DS7PR12MB8322:EE_
-X-MS-Office365-Filtering-Correlation-Id: 42c66380-f793-4d41-d345-08dc29cd1813
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	mjkMWaL+F/+F8u11qj7euiYbMJmyrhJWj+Qi71ALWOzDlcbpLcD3yZVxUz3UujLa2sg+5yeRdY+y6sRnhiUC/+sSXOe9Fiipe5FBRbAJz+Fk0297Rz+KciLTieLgb4PAwF2SfAGkCd5626JoSzX8UV3pJ2DAqSfeUkdLnXSOthy1sRc4tEDgY02JPaWDDBbJcC1oiHz2LemeeAPTtn44t0GLLlqHf5LvZmhRNTARxQD0LdUR3bT/izE0K2ts7diriNXCcqi4ry6bOaEweQfpDblMq3HId8g+E+ufFweYC+kNR3zIiaNqErjV97lqW3eUETDL2tWxL4DJb5gGixqanwGDFVqDfucpQf8Xx3IJEcAXgFT0CRJ9s34LAMY9QUvJUJX6ADU+eDemhMrAILnrtDYC+1LdZIVPAIY/VUafTgOMjkSpLIRC7FlL5x7W6X0ar/2kZnj2+YmWNrxrWPLa70naJM8xzlxJPRZyx+LfPv2jhPN2HpKk+SNYoUF4edIHWZTgJ54CIC44sBLr5QVX7pZKdQ4Bm91wHzydnb9F3hSTQ0H6WWYpw1apA2F8of6w8e4uxirI9FuHWeEe2ZZ9lA==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(346002)(376002)(136003)(39860400002)(230922051799003)(186009)(451199024)(1800799012)(64100799003)(82310400011)(46966006)(40470700004)(36840700001)(478600001)(6666004)(1076003)(36756003)(81166007)(82740400003)(41300700001)(2616005)(26005)(356005)(16526019)(426003)(83380400001)(86362001)(336012)(4326008)(8676002)(8936002)(2906002)(44832011)(966005)(5660300002)(70206006)(316002)(110136005)(70586007)(54906003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Feb 2024 00:13:22.8285
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 42c66380-f793-4d41-d345-08dc29cd1813
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MN1PEPF0000ECD9.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8322
+X-Received: by 2002:a05:6e02:1bc7:b0:363:e134:a158 with SMTP id
+ x7-20020a056e021bc700b00363e134a158mr36517ilv.5.1707524223738; Fri, 09 Feb
+ 2024 16:17:03 -0800 (PST)
+Date: Fri, 09 Feb 2024 16:17:03 -0800
+In-Reply-To: <20240209204745.89949-1-kuniyu@amazon.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000cd2b640610fbf6f1@google.com>
+Subject: Re: [syzbot] [net?] INFO: task hung in unix_dgram_sendmsg
+From: syzbot <syzbot+4fa4a2d1f5a5ee06f006@syzkaller.appspotmail.com>
+To: asml.silence@gmail.com, axboe@kernel.dk, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, kuniyu@amazon.com, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-We should be doing as little as possible besides freeing Tx
-space when our napi routines are called with budget of 0, so
-jump out before doing anything besides Tx cleaning.
+Hello,
 
-See commit afbed3f74830 ("net/mlx5e: do as little as possible in napi poll when budget is 0")
-for more info.
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-Fixes: fe8c30b50835 ("ionic: separate interrupt for Tx and Rx")
-Reviewed-by: Brett Creeley <brett.creeley@amd.com>
-Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
----
+Reported-and-tested-by: syzbot+4fa4a2d1f5a5ee06f006@syzkaller.appspotmail.com
 
-v2: separated this out from a net-next patchset
-    https://lore.kernel.org/netdev/20240208005725.65134-1-shannon.nelson@amd.com/
+Tested on:
 
- drivers/net/ethernet/pensando/ionic/ionic_txrx.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+commit:         1279f9d9 af_unix: Call kfree_skb() for dead unix_(sk)-..
+git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+console output: https://syzkaller.appspot.com/x/log.txt?x=15c46df4180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=878fbcf532b1a170
+dashboard link: https://syzkaller.appspot.com/bug?extid=4fa4a2d1f5a5ee06f006
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=16376320180000
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-index 54cd96b035d6..6f4776759863 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-@@ -579,6 +579,9 @@ int ionic_tx_napi(struct napi_struct *napi, int budget)
- 	work_done = ionic_cq_service(cq, budget,
- 				     ionic_tx_service, NULL, NULL);
- 
-+	if (unlikely(!budget))
-+		return budget;
-+
- 	if (work_done < budget && napi_complete_done(napi, work_done)) {
- 		ionic_dim_update(qcq, IONIC_LIF_F_TX_DIM_INTR);
- 		flags |= IONIC_INTR_CRED_UNMASK;
-@@ -607,6 +610,9 @@ int ionic_rx_napi(struct napi_struct *napi, int budget)
- 	u32 work_done = 0;
- 	u32 flags = 0;
- 
-+	if (unlikely(!budget))
-+		return budget;
-+
- 	lif = cq->bound_q->lif;
- 	idev = &lif->ionic->idev;
- 
-@@ -656,6 +662,9 @@ int ionic_txrx_napi(struct napi_struct *napi, int budget)
- 	tx_work_done = ionic_cq_service(txcq, IONIC_TX_BUDGET_DEFAULT,
- 					ionic_tx_service, NULL, NULL);
- 
-+	if (unlikely(!budget))
-+		return budget;
-+
- 	rx_work_done = ionic_cq_service(rxcq, budget,
- 					ionic_rx_service, NULL, NULL);
- 
--- 
-2.17.1
-
+Note: testing is done by a robot and is best-effort only.
 
