@@ -1,51 +1,93 @@
-Return-Path: <netdev+bounces-70741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4CC385037D
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 09:16:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F23B850388
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 09:37:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 858CF1F22AA8
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 08:16:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BF951C21FCF
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 08:37:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 836DA2B9D0;
-	Sat, 10 Feb 2024 08:16:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7381D1400D;
+	Sat, 10 Feb 2024 08:37:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="POqeQ+sq"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="xtmywsua";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="7hPgaN+q";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="xtmywsua";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="7hPgaN+q"
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CBD68493
-	for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 08:16:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1207282E1
+	for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 08:37:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707553012; cv=none; b=aJFrdNrdvf2m8Zuv15QAE3qdpPcu1oZusmeuVovuQrAXdrqwVVZ252EpqVDxVk4BJabYurZsumB0D5SlsT4KsZcgUKXZHribZ/Uzag4/X0w4x4JiqYvFzAPNP7N8GXO+CefSIjkttebIt1K2UHvplGdt4eJgti2Pj96erMLyhDw=
+	t=1707554268; cv=none; b=thFguxMZgU+fh+FOUBXlJNMJTxL7K41VGm9z8CkX0rfiz6eC8DJB/LBsnCEszvdZ+UMFwwbj4bJXZ+3X6obCQLhieDNrf72wLo7xlfNdnkX85zA+KCsTJm+DxwkLWpotI8lp+goVRQo/AKKRsmgpvtFO/dm9m8ksGkOgSv+YeAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707553012; c=relaxed/simple;
-	bh=0VvGaetJgoPXEpidzq+/jbv0Tq/b+b5HFJ1+nBQely4=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=Wj+xYBXjtmz4648jCuEOY5DK0gyWRuxov/yYzWA3kS3KPgT5GTMJIHVu1ob6EP31mtjzJuFZ2qfsc8ulqU33oNPq0MC+ONYxz6YtZjudEIubXNa/WMdTGQnz366mcChE9Ls9Xa1fOjlcrWLfyXEIrDCj7KiXwrRStubW3SZMovg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=POqeQ+sq; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-	:Subject:From:To:MIME-Version:Date:Message-ID:Sender:Reply-To:Cc:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=59E14zXjQOPO7+iA8THFZbOksLal0bm23IEI0vy/ywY=; b=POqeQ+sq7SdHzdeYt6lFVuA6DP
-	QqYJRrT+ytb8OclMpb1iyWcB2znpqLAy2qpAfekhdeKYaPR3ymI0hiY9l3ZBzfGGOotgqtWk49sd5
-	lbyN/lkVwm0N9EgKQRygiuUYT3arlm7f02LVNVNXkA6w9DTYxTN1cO0jaHDUsLj3si0RM4Rb9W71z
-	XJIIJPEIp2MGJYoqCScc+PDi9EJPRIX6anPMCtenORd8exjye8nYu/rgtsTlKrhfpESvNaTW4ddLJ
-	QwAAKnegXiJvaB00AoAKhKSCrckxMIjY2oRRbXQqw6sOu3HD5mILkZRo2VRarlhhnWACKy5BdRNU9
-	MWPUZ6ew==;
-Received: from fpd2fa7e2a.ap.nuro.jp ([210.250.126.42] helo=[192.168.1.6])
-	by desiato.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rYiWe-0000000EHkF-3LtS;
-	Sat, 10 Feb 2024 08:16:18 +0000
-Message-ID: <4a6ab7b8-0dcc-43b8-a647-9be2a767b06d@infradead.org>
-Date: Sat, 10 Feb 2024 17:15:44 +0900
+	s=arc-20240116; t=1707554268; c=relaxed/simple;
+	bh=ZBHg9W6jJyaNyigThMUmhDFHXmfi1wzBYja5y+axqvc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EwyiukRAJ2oX/F19U4rcPgKPUx8O3Tz7Klud9QFYz/kPBpwx6BqUWJJSxV9OPgT/6pGzikjYytbkiGR4xKm2m5vHpq8jirOzY6zNCJRDXiXg4Jm/ujPGrNuUJDClq3mBx7bhkGUYoL2FWmglSEBg2gJkLEkLc91KbRNnDHz/88k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=xtmywsua; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=7hPgaN+q; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=xtmywsua; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=7hPgaN+q; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id B4D2822246;
+	Sat, 10 Feb 2024 08:37:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1707554264; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bNfvD7L1p68k2+3URSO437/oxj+erv4om1J6U6p0Xjs=;
+	b=xtmywsuaoVV2ShB1TWDHZ0FVDUUPo3V3QU3qFMjSLj8+r09fy9dma6Q9SLpPh/eIyMduaw
+	eo73ThwuF4TwXYfIHKlM8Dpc4nfcECITgtCq9xiJrlP1y5thmcCkC82+i03+S+ECEccMdB
+	tA+qzDQHK9qLKIiQVqiFjgXvmQkAkG4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1707554264;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bNfvD7L1p68k2+3URSO437/oxj+erv4om1J6U6p0Xjs=;
+	b=7hPgaN+qOX0bTfJGBAkC45Dqdg0uL2bJw8L6Otj5FwuyMeGqxYphrbJCogK7Sbk6COLAg2
+	O1LuHDwY0SsUybDQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1707554264; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bNfvD7L1p68k2+3URSO437/oxj+erv4om1J6U6p0Xjs=;
+	b=xtmywsuaoVV2ShB1TWDHZ0FVDUUPo3V3QU3qFMjSLj8+r09fy9dma6Q9SLpPh/eIyMduaw
+	eo73ThwuF4TwXYfIHKlM8Dpc4nfcECITgtCq9xiJrlP1y5thmcCkC82+i03+S+ECEccMdB
+	tA+qzDQHK9qLKIiQVqiFjgXvmQkAkG4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1707554264;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bNfvD7L1p68k2+3URSO437/oxj+erv4om1J6U6p0Xjs=;
+	b=7hPgaN+qOX0bTfJGBAkC45Dqdg0uL2bJw8L6Otj5FwuyMeGqxYphrbJCogK7Sbk6COLAg2
+	O1LuHDwY0SsUybDQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 69E4B13867;
+	Sat, 10 Feb 2024 08:37:44 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id B05YFtg1x2XOdwAAD6G6ig
+	(envelope-from <dkirjanov@suse.de>); Sat, 10 Feb 2024 08:37:44 +0000
+Message-ID: <5e070719-260e-4219-a972-82db360ac847@suse.de>
+Date: Sat, 10 Feb 2024 11:37:43 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,99 +95,63 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2 1/2] lib: utils: introduce scnprintf
 Content-Language: en-US
-To: sambat goson <sombat3960@gmail.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: Geoff Levand <geoff@infradead.org>
-Subject: [PATCH v4 net] ps3/gelic: Fix SKB allocation
+To: Stephen Hemminger <stephen@networkplumber.org>,
+ Denis Kirjanov <kirjanov@gmail.com>
+Cc: dsahern@kernel.org, netdev@vger.kernel.org
+References: <20240209093619.2553-1-dkirjanov@suse.de>
+ <20240209083330.391a773e@hermes.local>
+From: Denis Kirjanov <dkirjanov@suse.de>
+In-Reply-To: <20240209083330.391a773e@hermes.local>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+Authentication-Results: smtp-out1.suse.de;
+	none
+X-Spam-Level: 
+X-Spam-Score: -1.29
+X-Spamd-Result: default: False [-1.29 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 XM_UA_NO_VERSION(0.01)[];
+	 FROM_HAS_DN(0.00)[];
+	 RCPT_COUNT_THREE(0.00)[4];
+	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 MIME_GOOD(-0.10)[text/plain];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 TO_DN_SOME(0.00)[];
+	 BAYES_HAM(-0.00)[34.45%];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 NEURAL_HAM_SHORT(-0.20)[-0.997];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email];
+	 FREEMAIL_TO(0.00)[networkplumber.org,gmail.com];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 RCVD_TLS_ALL(0.00)[];
+	 MID_RHS_MATCH_FROM(0.00)[]
+X-Spam-Flag: NO
 
-Commit 3ce4f9c3fbb3 ("net/ps3_gelic_net: Add gelic_descr structures") of
-6.8-rc1 did not allocate a network SKB for the gelic_descr, resulting in a
-kernel panic when the SKB variable (struct gelic_descr.skb) was accessed.
 
-This fix changes the way the napi buffer and corresponding SKB are
-allocated and managed.
 
-Reported-by: sambat goson <sombat3960@gmail.com>
-Fixes: 3ce4f9c3fbb3 ("net/ps3_gelic_net: Add gelic_descr structures")
-Signed-off-by: Geoff Levand <geoff@infradead.org>
+On 2/9/24 19:33, Stephen Hemminger wrote:
+> On Fri,  9 Feb 2024 04:36:18 -0500
+> Denis Kirjanov <kirjanov@gmail.com> wrote:
+> 
+>> The function is similar to the standard snprintf but
+>> returns the number of characters actually written to @buf
+>> argument excluding the trailing '\0'
+>>
+>> Signed-off-by: Denis Kirjanov <dkirjanov@suse.de>
+>> ---
+> 
+> I don't understand, why not use snprintf in ifstat?
+> None of the cases in patch 2 care about the return value length.
+Hi Stephen,
 
-diff --git a/drivers/net/ethernet/toshiba/ps3_gelic_net.c b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
-index d5b75af163d3..a09b534efa32 100644
---- a/drivers/net/ethernet/toshiba/ps3_gelic_net.c
-+++ b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
-@@ -375,20 +375,14 @@ static int gelic_card_init_chain(struct gelic_card *card,
- static int gelic_descr_prepare_rx(struct gelic_card *card,
- 				  struct gelic_descr *descr)
- {
--	static const unsigned int rx_skb_size =
--		ALIGN(GELIC_NET_MAX_FRAME, GELIC_NET_RXBUF_ALIGN) +
--		GELIC_NET_RXBUF_ALIGN - 1;
-+	static const unsigned int napi_buff_size =
-+		round_up(GELIC_NET_MAX_FRAME, GELIC_NET_RXBUF_ALIGN);
- 	dma_addr_t cpu_addr;
--	int offset;
-+	void *napi_buff;
- 
- 	if (gelic_descr_get_status(descr) !=  GELIC_DESCR_DMA_NOT_IN_USE)
- 		dev_info(ctodev(card), "%s: ERROR status\n", __func__);
- 
--	descr->skb = netdev_alloc_skb(*card->netdev, rx_skb_size);
--	if (!descr->skb) {
--		descr->hw_regs.payload.dev_addr = 0; /* tell DMAC don't touch memory */
--		return -ENOMEM;
--	}
- 	descr->hw_regs.dmac_cmd_status = 0;
- 	descr->hw_regs.result_size = 0;
- 	descr->hw_regs.valid_size = 0;
-@@ -397,24 +391,32 @@ static int gelic_descr_prepare_rx(struct gelic_card *card,
- 	descr->hw_regs.payload.size = 0;
- 	descr->skb = NULL;
- 
--	offset = ((unsigned long)descr->skb->data) &
--		(GELIC_NET_RXBUF_ALIGN - 1);
--	if (offset)
--		skb_reserve(descr->skb, GELIC_NET_RXBUF_ALIGN - offset);
--	/* io-mmu-map the skb */
--	cpu_addr = dma_map_single(ctodev(card), descr->skb->data,
--				  GELIC_NET_MAX_FRAME, DMA_FROM_DEVICE);
--	descr->hw_regs.payload.dev_addr = cpu_to_be32(cpu_addr);
-+	napi_buff = napi_alloc_frag_align(napi_buff_size,
-+					  GELIC_NET_RXBUF_ALIGN);
-+
-+	if (unlikely(!napi_buff))
-+		return -ENOMEM;
-+
-+	descr->skb = napi_build_skb(napi_buff, napi_buff_size);
-+
-+	if (unlikely(!descr->skb)) {
-+		skb_free_frag(napi_buff);
-+		return -ENOMEM;
-+	}
-+
-+	cpu_addr = dma_map_single(ctodev(card), napi_buff, napi_buff_size,
-+				  DMA_FROM_DEVICE);
-+
- 	if (dma_mapping_error(ctodev(card), cpu_addr)) {
--		dev_kfree_skb_any(descr->skb);
-+		skb_free_frag(napi_buff);
- 		descr->skb = NULL;
--		dev_info(ctodev(card),
--			 "%s:Could not iommu-map rx buffer\n", __func__);
-+		dev_err_once(ctodev(card), "%s:Could not iommu-map rx buffer\n",
-+			     __func__);
- 		gelic_descr_set_status(descr, GELIC_DESCR_DMA_NOT_IN_USE);
- 		return -ENOMEM;
- 	}
- 
--	descr->hw_regs.payload.size = cpu_to_be32(GELIC_NET_MAX_FRAME);
-+	descr->hw_regs.payload.size = cpu_to_be32(napi_buff_size);
- 	descr->hw_regs.payload.dev_addr = cpu_to_be32(cpu_addr);
- 
- 	gelic_descr_set_status(descr, GELIC_DESCR_DMA_CARDOWNED);
+My intention is just use one safe version of the string formatting function.
+I'm going to convert other places as well.
+
 
