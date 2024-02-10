@@ -1,93 +1,61 @@
-Return-Path: <netdev+bounces-70742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F23B850388
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 09:37:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58DB685038C
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 09:48:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BF951C21FCF
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 08:37:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D02BB23B00
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 08:48:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7381D1400D;
-	Sat, 10 Feb 2024 08:37:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A7F02E3E3;
+	Sat, 10 Feb 2024 08:48:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="xtmywsua";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="7hPgaN+q";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="xtmywsua";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="7hPgaN+q"
+	dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b="UWDvjfmG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-of-o54.zoho.com (sender4-of-o54.zoho.com [136.143.188.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1207282E1
-	for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 08:37:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707554268; cv=none; b=thFguxMZgU+fh+FOUBXlJNMJTxL7K41VGm9z8CkX0rfiz6eC8DJB/LBsnCEszvdZ+UMFwwbj4bJXZ+3X6obCQLhieDNrf72wLo7xlfNdnkX85zA+KCsTJm+DxwkLWpotI8lp+goVRQo/AKKRsmgpvtFO/dm9m8ksGkOgSv+YeAE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707554268; c=relaxed/simple;
-	bh=ZBHg9W6jJyaNyigThMUmhDFHXmfi1wzBYja5y+axqvc=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B95C628DA4
+	for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 08:48:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707554912; cv=pass; b=i6fGS6VsjZS7u4F1R44nB42T+XdFPd10qMwFEqfDGDekl89nhKgnNNeQFNjNrVTuoUbEqA3EbnO1QOyyd9TyJOZUM4tloL436TJWI+e+JMeLImlIrVilOilmr53crFlRQto4GIIi1iA6hG5WMIMzo7FIHk0mHVzfbnM8OIlb7gc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707554912; c=relaxed/simple;
+	bh=sSPXNwE5vTLSN5n6ZcnolmzrMMV7FnNR2dLXEMv6gg4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EwyiukRAJ2oX/F19U4rcPgKPUx8O3Tz7Klud9QFYz/kPBpwx6BqUWJJSxV9OPgT/6pGzikjYytbkiGR4xKm2m5vHpq8jirOzY6zNCJRDXiXg4Jm/ujPGrNuUJDClq3mBx7bhkGUYoL2FWmglSEBg2gJkLEkLc91KbRNnDHz/88k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=xtmywsua; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=7hPgaN+q; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=xtmywsua; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=7hPgaN+q; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id B4D2822246;
-	Sat, 10 Feb 2024 08:37:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1707554264; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bNfvD7L1p68k2+3URSO437/oxj+erv4om1J6U6p0Xjs=;
-	b=xtmywsuaoVV2ShB1TWDHZ0FVDUUPo3V3QU3qFMjSLj8+r09fy9dma6Q9SLpPh/eIyMduaw
-	eo73ThwuF4TwXYfIHKlM8Dpc4nfcECITgtCq9xiJrlP1y5thmcCkC82+i03+S+ECEccMdB
-	tA+qzDQHK9qLKIiQVqiFjgXvmQkAkG4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1707554264;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bNfvD7L1p68k2+3URSO437/oxj+erv4om1J6U6p0Xjs=;
-	b=7hPgaN+qOX0bTfJGBAkC45Dqdg0uL2bJw8L6Otj5FwuyMeGqxYphrbJCogK7Sbk6COLAg2
-	O1LuHDwY0SsUybDQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1707554264; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bNfvD7L1p68k2+3URSO437/oxj+erv4om1J6U6p0Xjs=;
-	b=xtmywsuaoVV2ShB1TWDHZ0FVDUUPo3V3QU3qFMjSLj8+r09fy9dma6Q9SLpPh/eIyMduaw
-	eo73ThwuF4TwXYfIHKlM8Dpc4nfcECITgtCq9xiJrlP1y5thmcCkC82+i03+S+ECEccMdB
-	tA+qzDQHK9qLKIiQVqiFjgXvmQkAkG4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1707554264;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bNfvD7L1p68k2+3URSO437/oxj+erv4om1J6U6p0Xjs=;
-	b=7hPgaN+qOX0bTfJGBAkC45Dqdg0uL2bJw8L6Otj5FwuyMeGqxYphrbJCogK7Sbk6COLAg2
-	O1LuHDwY0SsUybDQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 69E4B13867;
-	Sat, 10 Feb 2024 08:37:44 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id B05YFtg1x2XOdwAAD6G6ig
-	(envelope-from <dkirjanov@suse.de>); Sat, 10 Feb 2024 08:37:44 +0000
-Message-ID: <5e070719-260e-4219-a972-82db360ac847@suse.de>
-Date: Sat, 10 Feb 2024 11:37:43 +0300
+	 In-Reply-To:Content-Type; b=EoOdevRTLT4SiElOjknRdYvBd/gW0R7dIVawBpshXHPuiLB2PtxYtdhe8ZyHgM6QlccE9hDn5XOG4pGHXqz7j7yvjp5kHZQ9jSiq0dm5Jd8Q0DZdDf7vThKDb7lZuyIk+6LHnNemW9nM4JxN8GXF9thx3z/JmeEBvKi1qto0NY8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net; spf=pass smtp.mailfrom=machnikowski.net; dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b=UWDvjfmG; arc=pass smtp.client-ip=136.143.188.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=machnikowski.net
+ARC-Seal: i=1; a=rsa-sha256; t=1707554897; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=i6W0MmvanaC2Jyh+325xlBwyu5R+amv7n2gNlFh7gP1tu9vdKhwvOQop8/2jzswBkoBW9sjs/U/u2mDVRFCt95exioz733mD12UnwUSnwKDZBn13G94l+Y6Czng1PBXKgoGbFXmORXG3Mv7yNAvcdzoDfBuIqH5UrgPChMA2Rh4=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1707554897; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=vFQ6lKj6Y4ynk5FepbItJh5TgyG0vklA30HtEpS9sIE=; 
+	b=TYDbUrKpv/QAAaojl41OrO2uNy4HPIIf40/QqwoZZQGSXlrmdWsVRWp/7h6DHkYBZLf/rPiYMpJZ27lG4P2ZrZKKUOlEsj9T3smpaIt/9Yg8mdtQNr0OiVVrU0ZrI3wpALoks0IFoHwm5W5hRnNnmVXv+Vvv3I/IQbQFLUmPu+Q=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=machnikowski.net;
+	spf=pass  smtp.mailfrom=maciek@machnikowski.net;
+	dmarc=pass header.from=<maciek@machnikowski.net>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1707554897;
+	s=zoho; d=machnikowski.net; i=maciek@machnikowski.net;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=vFQ6lKj6Y4ynk5FepbItJh5TgyG0vklA30HtEpS9sIE=;
+	b=UWDvjfmG8ZumH1l3ZnKfrHAkMj/cR8eG4AQoCJa6p/H/Eyf3DpYrmMiymrB2eoI9
+	DtQoLJ/OCRNxmDhGTyW3ScA5PdHkODkh+CDzCPyMAAlb8zvzIGHB7f2X0RSHNq4rCqy
+	dc5IzcYIKAAdwGe8AwGq4epiZJ/M4Taa5oXxI21xTo1dSzOO0C3R0x/rFVtzLsydIGn
+	dWeiDdVpbX2hdF3zF8kc7GupKNLJlpOaQ2JYLezmqElALAhBB4hV9+mJ8e0kx7FvhsN
+	rp6g8PmXchDqIWD8/LnakQ1qLRHLjU0oUdzbim9mKtHYNbqvTnWS3f+bwjMQTpxPjYS
+	mJveMkw8kA==
+Received: from [192.168.1.225] (83.8.237.114.ipv4.supernova.orange.pl [83.8.237.114]) by mx.zohomail.com
+	with SMTPS id 1707554892566167.19528057587877; Sat, 10 Feb 2024 00:48:12 -0800 (PST)
+Message-ID: <01747e34-c655-4dbf-bda9-544f4e3f8ebd@machnikowski.net>
+Date: Sat, 10 Feb 2024 09:48:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,63 +63,84 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2 1/2] lib: utils: introduce scnprintf
+Subject: Re: [PATCH net-next v9 3/3] netdevsim: add selftest for forwarding
+ skb between connected ports
+To: David Wei <dw@davidwei.uk>, Jakub Kicinski <kuba@kernel.org>,
+ Jiri Pirko <jiri@resnulli.us>, Sabrina Dubroca <sd@queasysnail.net>,
+ netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+References: <20240210003240.847392-1-dw@davidwei.uk>
+ <20240210003240.847392-4-dw@davidwei.uk>
 Content-Language: en-US
-To: Stephen Hemminger <stephen@networkplumber.org>,
- Denis Kirjanov <kirjanov@gmail.com>
-Cc: dsahern@kernel.org, netdev@vger.kernel.org
-References: <20240209093619.2553-1-dkirjanov@suse.de>
- <20240209083330.391a773e@hermes.local>
-From: Denis Kirjanov <dkirjanov@suse.de>
-In-Reply-To: <20240209083330.391a773e@hermes.local>
+From: Maciek Machnikowski <maciek@machnikowski.net>
+In-Reply-To: <20240210003240.847392-4-dw@davidwei.uk>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Authentication-Results: smtp-out1.suse.de;
-	none
-X-Spam-Level: 
-X-Spam-Score: -1.29
-X-Spamd-Result: default: False [-1.29 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 XM_UA_NO_VERSION(0.01)[];
-	 FROM_HAS_DN(0.00)[];
-	 RCPT_COUNT_THREE(0.00)[4];
-	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 TO_DN_SOME(0.00)[];
-	 BAYES_HAM(-0.00)[34.45%];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 NEURAL_HAM_SHORT(-0.20)[-0.997];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email];
-	 FREEMAIL_TO(0.00)[networkplumber.org,gmail.com];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 RCVD_TLS_ALL(0.00)[];
-	 MID_RHS_MATCH_FROM(0.00)[]
-X-Spam-Flag: NO
+X-ZohoMailClient: External
 
 
+On 10/02/2024 01:32, David Wei wrote:
+> +###
+> +### Code start
+> +###
+> +
+> +modprobe netdevsim
+> +
+> +# linking
+> +
+> +echo $NSIM_DEV_1_ID > $NSIM_DEV_SYS_NEW
+> +echo $NSIM_DEV_2_ID > $NSIM_DEV_SYS_NEW
+> +
+> +setup_ns
+> +
+> +NSIM_DEV_1_FD=$((RANDOM % 1024))
+> +exec {NSIM_DEV_1_FD}</var/run/netns/nssv
+> +NSIM_DEV_1_IFIDX=$(ip netns exec nssv cat /sys/class/net/$NSIM_DEV_1_NAME/ifindex)
+> +
+> +NSIM_DEV_2_FD=$((RANDOM % 1024))
+> +exec {NSIM_DEV_2_FD}</var/run/netns/nscl
+> +NSIM_DEV_2_IFIDX=$(ip netns exec nscl cat /sys/class/net/$NSIM_DEV_2_NAME/ifindex)
+> +
+> +echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX $NSIM_DEV_2_FD:2000" > $NSIM_DEV_SYS_LINK 2>/dev/null
+> +if [ $? -eq 0 ]; then
+> +	echo "linking with non-existent netdevsim should fail"
+> +	exit 1
+> +fi
+> +
+> +echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX 2000:$NSIM_DEV_2_IFIDX" > $NSIM_DEV_SYS_LINK 2>/dev/null
+> +if [ $? -eq 0 ]; then
+> +	echo "linking with non-existent netnsid should fail"
+> +	exit 1
+> +fi
+> +
+> +echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX $NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX" > $NSIM_DEV_SYS_LINK 2>/dev/null
+> +if [ $? -eq 0 ]; then
+> +	echo "linking with self should fail"
+> +	exit 1
+> +fi
+> +
+> +echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX $NSIM_DEV_2_FD:$NSIM_DEV_2_IFIDX" > $NSIM_DEV_SYS_LINK
+> +if [ $? -ne 0 ]; then
+> +	echo "linking netdevsim1 with netdevsim2 should succeed"
+> +	exit 1
+> +fi
+> +
+> +# argument error checking
+> +
+> +echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX $NSIM_DEV_2_FD:a" > $NSIM_DEV_SYS_LINK 2>/dev/null
+> +if [ $? -eq 0 ]; then
+> +	echo "invalid arg should fail"
+> +	exit 1
+> +fi
+> +
+> +# send/recv packets
+> +
+> +socat_check || exit 4
 
-On 2/9/24 19:33, Stephen Hemminger wrote:
-> On Fri,  9 Feb 2024 04:36:18 -0500
-> Denis Kirjanov <kirjanov@gmail.com> wrote:
-> 
->> The function is similar to the standard snprintf but
->> returns the number of characters actually written to @buf
->> argument excluding the trailing '\0'
->>
->> Signed-off-by: Denis Kirjanov <dkirjanov@suse.de>
->> ---
-> 
-> I don't understand, why not use snprintf in ifstat?
-> None of the cases in patch 2 care about the return value length.
-Hi Stephen,
+This check will cause the script to exit without cleaning up the devices
+and namespaces. Move it to the top, or cleanup on error
 
-My intention is just use one safe version of the string formatting function.
-I'm going to convert other places as well.
-
+Thanks,
+Maciek
 
