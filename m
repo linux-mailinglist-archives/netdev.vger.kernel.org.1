@@ -1,136 +1,74 @@
-Return-Path: <netdev+bounces-70732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D25C2850298
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 06:01:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8465C8502B1
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 06:54:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2025F28A07B
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 05:01:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 396281F25259
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 05:54:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 349606121;
-	Sat, 10 Feb 2024 05:01:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A0C15697;
+	Sat, 10 Feb 2024 05:54:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oJWiDHWM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B/Shc34O"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A3AB63B3;
-	Sat, 10 Feb 2024 05:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13804134C2
+	for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 05:54:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707541296; cv=none; b=KrgqQpZR4JQ9iP/Me5kGufKb9sDlFUvqLEaVFYfruR2yHLW/eEKUrDD0aF5Y666m+whaxTdD7pmOI4HoI1K3WfQGgV4oJ4K8ymR5glnfMxyvbISmr5PYMMwUO2TLW3YcbIM626b2tsKAXHpAcVuC9R/SZXWRE8Kf892agV4ubpE=
+	t=1707544445; cv=none; b=oq4l7QJ7msQbyWedUvwRRi+paa2NtIYwiXlutdXjKm/4OZK8Jbb+fONEud0GzqhDz5YtHg0JHuZshw14u2DqCgnIKaI6gAoMxg14ZtrPq3I/wWPHW2PUWso4oW6ocuCV7Lgy8vJL2fYNH7XNOTGeN3hkZYVMGhhocqA63ha44NE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707541296; c=relaxed/simple;
-	bh=yW4SvVrA+uehcZQFBiIcKyOq0EVCxgF6A4J8ysbpmiA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fmjGr4OKN831LZiDEdFu6wmaQYHwxEX8+MXPuMW/HB3VjXRBkxjk0w4FFEzYiXYvXkrS/4aJkak6krkcL2VvFlJdJw0277lJSoYVOZDX82UIY38u1Wz3STp9ekN+JYRAGyVJM3z1HZkq7ML5c/o4zwGLcFtRD+J9DkXKnrQhdI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oJWiDHWM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE721C433F1;
-	Sat, 10 Feb 2024 05:01:34 +0000 (UTC)
+	s=arc-20240116; t=1707544445; c=relaxed/simple;
+	bh=5AXD5RoerGOSmlC3sREPcVONRY9Meaz7C3/6rjQdkb0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GXkelBw9ic6LVQxKBpWw2sZ8S422lbQ+BTvVvljoLkcEYwYyLVatw4cYKz9pbjymETWO5lvxp57xc7mSvvoXmXnmFRfbr7THXpTruY1w0yzgILLrJmaYBSPFG6iVXOU+9smPtBqYZOqj/Z0oYfFWVEOpqPaegBRTppu59XvQY5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B/Shc34O; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E573C433F1;
+	Sat, 10 Feb 2024 05:54:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707541295;
-	bh=yW4SvVrA+uehcZQFBiIcKyOq0EVCxgF6A4J8ysbpmiA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=oJWiDHWMZ0LfZy1Zfi2dBv4UYV01xbt7wXuSND3b8/ImOt3cxgcVeqomVQTtFn5UB
-	 p8pI2WeLidOtXtg2LKs4P7KZoJ24uxYZWt4tt1hA8RMad4j9qxKnlKY+JpW/frjvb1
-	 tZPA9WaN2pu/Lb8TgiKQbXEwU0s1DxqhaF5NzJwScFJ2+IwNICWPXikpwLRAuzRuWs
-	 IKwmdCUh7eJjb/6ADqlrUUjkL7pzAimfTQMLIObX4NTgAJwGOm8NunT+1pSvNjitoJ
-	 HQswCLOwClV7Bgp21pg8870MRvQcXuyxgVB1NMFdqQJXGg8G7LJTZZ3AExjh8VM40d
-	 bmwVOgMefYDQQ==
-Message-ID: <df5d7538-52c6-465c-b250-13532b90c6ae@kernel.org>
-Date: Fri, 9 Feb 2024 22:01:33 -0700
+	s=k20201202; t=1707544444;
+	bh=5AXD5RoerGOSmlC3sREPcVONRY9Meaz7C3/6rjQdkb0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=B/Shc34OMZLgoZaGm91SiJsFmyGUlLTfbevBAVR+F8AsyEnQsmPkXxkigaNCS+RAW
+	 ELYc9vjHK600Xk7KOnebxh9zrJge7J0RLof8eqpMJbGi//jHScHxWZb85iFCH53dte
+	 guCtFpGUmPRioPsQtZGrmYI7GXltjWnyQIBzZ2OpR6vrGPpxcYoOMsGryE2/LJK4IN
+	 jyzeW5KAcj1BPZ8UYJwhAaVpsvw5JEZ3/fF0cjyk3o8brs77soqiFtEc2MLIDj9P4g
+	 eiiyRIpU8fuP+7Ns2GEeJ6FrrtdyYfo8Dw46a4B5pBxWuASoloxBhiLMLVpgkmwact
+	 VcS51WlYIM2Hw==
+Date: Fri, 9 Feb 2024 21:54:03 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, Saeed Mahameed
+ <saeedm@nvidia.com>, netdev@vger.kernel.org, Tariq Toukan
+ <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, Leon Romanovsky
+ <leonro@nvidia.com>
+Subject: Re: [pull request][net-next V2 00/15] mlx5 socket direct
+Message-ID: <20240209215403.04cf8f1b@kernel.org>
+In-Reply-To: <20240208035352.387423-1-saeed@kernel.org>
+References: <20240208035352.387423-1-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Leon Romanovsky <leonro@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>,
- Jiri Pirko <jiri@nvidia.com>, Leonid Bloch <lbloch@nvidia.com>,
- Itay Avraham <itayavr@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Aron Silverton <aron.silverton@oracle.com>,
- Christoph Hellwig <hch@infradead.org>, andrew.gospodarek@broadcom.com,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <20240207072435.14182-1-saeed@kernel.org>
- <20240207070342.21ad3e51@kernel.org> <ZcRgp76yWcDfEbMy@x130>
- <20240208181555.22d35b61@kernel.org>
- <2bdc5510-801a-4601-87a3-56eb941d661a@kernel.org>
- <20240209145828.30e1d000@kernel.org>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240209145828.30e1d000@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 2/9/24 3:58 PM, Jakub Kicinski wrote:
-> On Fri, 9 Feb 2024 15:42:16 -0700 David Ahern wrote:
->> On 2/8/24 7:15 PM, Jakub Kicinski wrote:
->>>> I was in the room and I am in support of David's idea, I like it a lot,
->>>> but I don't believe we have any concrete proposal, and we don't have any
->>>> use case for it in netdev for now, our use case for this is currently RDMA
->>>> and HPC specific.
->>>>
->>>> Also siimilar to devlink we will be the first to jump in and implement
->>>> the new API once defined, but this doesn't mean I need to throw away the  
->>>
->>> I'm not asking to throw it away. The question is only whether you get
->>> to push it upstream and skirt subsystem rules by posting a "misc" driver
->>> without even CCing the maintainers on v1 :|  
->>
->> Can you define what you mean by 'skirt subsystem rules'? That's a new
->> one to me.
-> 
-> I mean that Saeed is well aware that direct FW <> user space interfaces
-> are not allowed in netdev, so he posted this "misc" driver without
-> CCing us, knowing we'd nack it.
+On Wed,  7 Feb 2024 19:53:37 -0800 Saeed Mahameed wrote:
+> This series adds support for combining multiple devices (PFs) of the
+> same port under one netdev instance. Passing traffic through different
+> devices belonging to different NUMA sockets saves cross-numa traffic and
+> allows apps running on the same netdev from different numas to still
+> feel a sense of proximity to the device and acheive improved
+> performance.
 
-The argument you are making here is that if a device has an ethernet
-port, all patches must flow through netdev. Or am I misunderstanding?
-
-There are a lot of devices that toggle between IB and ethernet with only
-one (ignore roce here) active at a moment. MLX5 (like many) is split
-between drivers/net and drivers/infinband. If the debugging capabilities
-went through drivers/infiniband would you have the same stance?
-
-Maybe my bigger question is should drivers that can do different
-physical layers, or can operate without a netdev, should they be split
-into different drivers? drivers/misc for the PCI interface, drivers/net
-for ethernet interfaces and its APIs and drivers/infiniband for IB and
-its APIs? Generic capabilities like this debugging interface belong to
-the PCI device since it is generic to the device hence drivers/misc.
-
-> 
-> Maybe the baseline question is whether major subsystems are allowed to
-> set their own rules. I think they should as historically we have a very
-> broad range of, eh, openness in different fields. Networking is pretty
-> open because of the necessary interoperability.
-
-Interoperability applies solely to networking protocols, not how a
-device is designed and certainly not to how it can be debugged. There is
-a clear difference between standard networking protocols (packets on a
-wire and its headers) and device designs.
-
-> 
->> BTW, there is already a broadcom driver under drivers/misc that seems to
->> have a lot of overlap capability wise to this driver. Perhaps a Broadcom
->> person could chime in.
-> 
-> I'm not aware. Or do you mean bcm-vk? That's a video encoder.
-
-If that specific piece of S/W is a video encoder, why isn't it under
-drivers/video? Scanning the code it seems to me to fall under the open
-channel between userspace and F/W which is a common paradigm. But I do
-not want this to distract from this patch set; really I was just
-browsing existing drivers for any overlap.
-
-
+s/acheive/acheive/ throughout
 
