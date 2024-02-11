@@ -1,92 +1,174 @@
-Return-Path: <netdev+bounces-70812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F5E88508B9
-	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 12:03:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E44178508E7
+	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 13:13:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 741291C212D8
-	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 11:03:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 429701F23832
+	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 12:13:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C83F5A110;
-	Sun, 11 Feb 2024 11:03:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 399905A79B;
+	Sun, 11 Feb 2024 12:13:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="cozt0i8r"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AEczxG6T"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0EE39AFA;
-	Sun, 11 Feb 2024 11:03:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF41A5A119;
+	Sun, 11 Feb 2024 12:13:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707649405; cv=none; b=SieJ23GdoXN9uvQKpUCIy4R1thtSmMKO9rnMSR4ART4M8xdApae8n+ssoOiJr64+Vj52rXw5xXxr9x8Ms+idov1+p7yrm3ktGdE4m+i5ganiqkE89KnGXjN5v1dshhCwE6pY3auY2vOexDgnnUrXZn8Scn+17l4rnV8V/Rckekg=
+	t=1707653614; cv=none; b=JVwE39wo82HBmTg24ozEFUfOeuHkKWvlVodbyhEJg5J24AX6MCEjENVa9rsXkfLosbt4h1smAcd3885i1WAXRZRPHdH4vUCd5Wt+tvSgtBHqAAOGnF4EH3MRi4UWTJCHv808SOVgA41L1rVTqqzeIE8W8I2Mif+fvedLMv54FxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707649405; c=relaxed/simple;
-	bh=FDdtAun0HW0ZCG+7jGqPTp9NYni7KLx7GZ2BuE1pnyg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KcT4A5GeNyzN89f350DOE5mDrhqweO2Muf7zAGhtC6znGe/rcIjqPKcQF1Bsa35kJJ9ycKGF3ZaH80e57CaI9739AI95xVokYNCzxlThSG3+xEuQaABj+dN6MSshTO/oOuvk4yKqyDlsTocHwRbAIy4pQw9H1xC1ofFBBG7PfNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=cozt0i8r; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 588E6C433C7;
-	Sun, 11 Feb 2024 11:03:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1707649404;
-	bh=FDdtAun0HW0ZCG+7jGqPTp9NYni7KLx7GZ2BuE1pnyg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cozt0i8rdiBzTyfc2xuxTGSKFdLM5CAqsJ0pdhjVwqF1jfVelDbSUjbQvBOnaR0TQ
-	 gMqYno4f2v4F6nzEn8W/URuXQaE3hV/XRAj2oJtRQG6ARHAKv3xFi08YOvQ34vzf67
-	 SfaZbt/zuR3dg3jM5iRZuq5yfPTWl+Fpd3//KeEw=
-Date: Sun, 11 Feb 2024 11:03:21 +0000
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: David Ahern <dsahern@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Saeed Mahameed <saeed@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>, Leon Romanovsky <leonro@nvidia.com>,
-	Jason Gunthorpe <jgg@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
-	Leonid Bloch <lbloch@nvidia.com>, Itay Avraham <itayavr@nvidia.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Aron Silverton <aron.silverton@oracle.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	andrew.gospodarek@broadcom.com, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
-Message-ID: <2024021139-feast-subtitle-f6e3@gregkh>
-References: <20240207072435.14182-1-saeed@kernel.org>
- <20240207070342.21ad3e51@kernel.org>
- <ZcRgp76yWcDfEbMy@x130>
- <20240208181555.22d35b61@kernel.org>
- <2bdc5510-801a-4601-87a3-56eb941d661a@kernel.org>
- <20240209145828.30e1d000@kernel.org>
- <df5d7538-52c6-465c-b250-13532b90c6ae@kernel.org>
+	s=arc-20240116; t=1707653614; c=relaxed/simple;
+	bh=2Q4h2e6REYa6u2p6nmSd8judJZa1t1SDfeAWRb9SNEQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qlYhFWfps/7voGmMJb9YEN5tj/WW0Y+cZNWMjIqdTypsY1fvM+cgVuyH/yZpQ7qQgI+vUealeNnBGAR527s5T2RuMY12XZIBHuAEh4xQC4VXRJF05gH/t0VdAwAbrzNwSI1Q8/+dblqqCesN2etniiQwLToSakBhB3bYCRLrLxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AEczxG6T; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2cf1fd1cc5bso27879611fa.3;
+        Sun, 11 Feb 2024 04:13:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707653610; x=1708258410; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A52z+b5xLVfFrcr9zzGunwskn67khLGyF+jqlb6jF9g=;
+        b=AEczxG6TieYMlDCr+yoy+jIrSeIUt+zeBHDapln8iR7Fp788YPUDS2qHIYNB8A/cPJ
+         3SVjAQS5TWt8bm6B1JtV4GuJjUGDtC0u5i/Qi98p5KPZ0U0/Oagugqg+ggvvkllC4uIJ
+         vNw9XvzK7BeGvlmS0GeyPVO5Gk+h5eCQNPXoj7dxf59iHduOlM46FkPWfeEyNRWo2k0P
+         +9dDrkZwRzQ0EXgIYNNBciBtXY/bsqGmzUR1/El/0Waot7bFECbr/oiM03hIOPoWxwDa
+         8G2gqxJVJYdr4zUEdmS/U3OPga2yjlMBSV4tV7WR1u+L2IrUZUfwhkQFRTaDgQTLYE1E
+         T0ag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707653610; x=1708258410;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=A52z+b5xLVfFrcr9zzGunwskn67khLGyF+jqlb6jF9g=;
+        b=BLXuH8p6ptGap79BMukPXzo8lHc4saIAwVpszLNkhAzM6MIXmRhrGWFuq9FjU/n0zW
+         mqixRRZLL56yuthNzvXpcoGTQGefIAELU5jRlydwiPUx8eTEfshoOKYOy5GU6VeWvRFJ
+         NBKioW4BTg64FaywEbOCwSD7n+BgJCiNUNRJY3BjzJToMfCHcHjwh6ZNW+q6ky39oWbp
+         XfpV2wSKAxDoF8oqJc8APqpIQ6Gsadrzu+CkvpbHmrLoSd1mqt630PtJ+6FIQqKUqF61
+         xfpsTAWzgXmQ+65CT8Zyk3bnckcPNhGf5HUxAkqaCbxKAi7ucArPGEX1QDvzKjpDZgvo
+         mq7w==
+X-Gm-Message-State: AOJu0Yy+Te/adRn2UpL6LM+XEcZySyKm/ZZzNsORvnQNaRHqwm8td/NH
+	vcRVWVbaPnZI1kLgtJQgvqT10FaBst5iPryfX8pJJI70LZD2r3FVG0kY/iqXgbZGE8CqQFKGKac
+	6j9CX6DngFdt9+c8gN78IPtWQKz4=
+X-Google-Smtp-Source: AGHT+IGiwnKe5q7KLP+AlWFxNVgxl2iOvO+p25ePLokWJbPS9AJUKjMi8nZf3HSnqSP7DLBNG9ZHT6EA4ZHsrR9YWdo=
+X-Received: by 2002:a05:651c:1a0f:b0:2d0:ec9c:d7d0 with SMTP id
+ by15-20020a05651c1a0f00b002d0ec9cd7d0mr2137111ljb.46.1707653609611; Sun, 11
+ Feb 2024 04:13:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <df5d7538-52c6-465c-b250-13532b90c6ae@kernel.org>
+References: <CADT+UeAfCTd8c+dHn3mgT=g6Boip=oRPdkODMN_j2KaROcT0AQ@mail.gmail.com>
+ <5600b643-0d07-5583-4858-a521676476a5@gmail.com>
+In-Reply-To: <5600b643-0d07-5583-4858-a521676476a5@gmail.com>
+From: Biju Das <biju.das.au@gmail.com>
+Date: Sun, 11 Feb 2024 12:13:18 +0000
+Message-ID: <CADT+UeBXkHTGdqpMqXPbXj3Dguci1tEJTUYr5xRkT0+G-6hzgg@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 4/5] net: ravb: Do not apply RX checksum
+ settings to hardware if the interface is down
+To: Sergei Shtylyov <sergei.shtylyov@gmail.com>
+Cc: Sergey Shtylyov <s.shtylyov@omp.ru>, Biju Das <biju.das.jz@bp.renesas.com>, 
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>, claudiu.beznea@tuxon.dev, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org, 
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
+	Paolo Abeni <pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 09, 2024 at 10:01:33PM -0700, David Ahern wrote:
-> >> BTW, there is already a broadcom driver under drivers/misc that seems to
-> >> have a lot of overlap capability wise to this driver. Perhaps a Broadcom
-> >> person could chime in.
-> > 
-> > I'm not aware. Or do you mean bcm-vk? That's a video encoder.
-> 
-> If that specific piece of S/W is a video encoder, why isn't it under
-> drivers/video? Scanning the code it seems to me to fall under the open
-> channel between userspace and F/W which is a common paradigm. But I do
-> not want this to distract from this patch set; really I was just
-> browsing existing drivers for any overlap.
+Hi Sergey,
 
-It is an "offload-engine" type of thing that was added before we had the
-specific subsystem for it.  It should be moved to drivers/accel/ one of
-these days, want to volunteer to help out with that?  :)
+On Sun, Feb 11, 2024 at 9:40=E2=80=AFAM Sergei Shtylyov
+<sergei.shtylyov@gmail.com> wrote:
+>
+> On 2/11/24 11:56 AM, Biju Das wrote:
+>
+> >>>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> >>>>
+> >>>> Do not apply the RX checksum settings to hardware if the interface i=
+s
+> >>>> down.
+> >>>> In case runtime PM is enabled, and while the interface is down, the =
+IP
+> >>>> will be in reset mode (as for some platforms disabling the clocks wi=
+ll
+> >>>> switch the IP to reset mode, which will lead to losing register
+> >>>> contents) and applying settings in reset mode is not an option.
+> >>>> Instead, cache the RX checksum settings and apply them in ravb_open(=
+)
+> >>>> through ravb_emac_init().
+> >>>> This has been solved by introducing pm_runtime_active() check. The
+> >>>> device runtime PM usage counter has been incremented to avoid
+> >>>> disabling the device clocks while the check is in progress (if any).
+> >>>>
+> >>>> Commit prepares for the addition of runtime PM.
+> >>>>
+> >>>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> >>>
+> >>> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+> >>
+> >> This will do the same job, without code duplication right?
+> >>
+> >>> static int ravb_set_features(struct net_device *ndev,
+> >>>     netdev_features_t features)
+> >>> {
+> >>> struct ravb_private *priv =3D netdev_priv(ndev);
+> >>> struct device *dev =3D &priv->pdev->dev;
+> >>> const struct ravb_hw_info *info =3D priv->info;
+> >>>
+> >>> pm_runtime_get_noresume(dev);
+> >>> if (!pm_runtime_active(dev)) {
+> >>> pm_runtime_put_noidle(dev);
+> >>> ndev->features =3D features;
+> >>> return 0;
+> >>> }
+> >>>
+> >>> return info->set_feature(ndev, features);
+> >
+> >> We now leak the device reference by not calling pm_runtime_put_noidle(=
+)
+> >> after this statement...
+> >
+> > Oops. So this leak  can be fixed like [1]
+> >
+> >>  The approach seems sane though -- Claudiu, please consider following =
+it.
+> >
+> > [1]
+> > static int ravb_set_features(struct net_device *ndev,
+> >     netdev_features_t features)
+> > {
+> > struct ravb_private *priv =3D netdev_priv(ndev);
+> > const struct ravb_hw_info *info =3D priv->info;
+> > struct device *dev =3D &priv->pdev->dev;
+> > bool pm_active;
+> >
+> > pm_runtime_get_noresume(dev);
+> > pm_active =3D pm_runtime_active(dev);
+> > pm_runtime_put_noidle(dev);
+>
+>    There is no point dropping the RPM reference before we access
+> the regs...
 
-thanks,
+I don't think there is an issue in accessing register by the usage of
+below API's
 
-greg k-h
+pm_runtime_get_noresume:--- Bump up runtime PM usage counter of a device.
+pm_runtime_active:--- Check whether or not a device is runtime-active.
+pm_runtime_put_noidle:--Drop runtime PM usage counter of a device.
+
+Cheers,
+Biju
 
