@@ -1,96 +1,101 @@
-Return-Path: <netdev+bounces-70822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1092F850A56
-	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 17:36:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 092CA850A65
+	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 17:59:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D8A11C219E7
-	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 16:36:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09FCE1C208B8
+	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 16:59:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36F1E33CD0;
-	Sun, 11 Feb 2024 16:36:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8D225C600;
+	Sun, 11 Feb 2024 16:59:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GXE/ixzo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z5DwrBVs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 090F11DFEF;
-	Sun, 11 Feb 2024 16:36:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1C2E5B681;
+	Sun, 11 Feb 2024 16:59:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707669383; cv=none; b=ZGYbhZgOm85jHg6ndafWWKu3NHzk1ye1bFuYW+MYxbOwJCmuszXuMgaqycaymIgmv5kFsamDKp+jZSRasHV+aXTAEQkyH6VxFf5IDPHcrt7w7URIZqBv0kStfu2EYto/O5gnlqaQAvLo7DLbk3g1LLt/3LCYhkj/2JVm7bluC08=
+	t=1707670761; cv=none; b=ttsIPKvh2wq9Z6hAyjBAKEBRIPrzpnYN87dU6Zgy+LTcczXO5A06886Mjppfj1JQHUCnOSGqF4EbDiC7PgAwIm34/i5D+rJpnHW1mMm2aFFv/XtoIbxGqv+w7lgoK9sAZXQEQg9hGDLGi3z2eZcj7MQZ1hWjffVjiEPGml5WXTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707669383; c=relaxed/simple;
-	bh=BVT7c5MMwoanGGQVtjw+M5JfeoluaC7HDWDxAzZAEyg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LgpNv2R3YOhfp6lZbdXYwNr8CssqAMj2g0SNjzfGF6nQA3qTF5kgc67FQ1wO3kkFWaFGBax2vDHVrGEzZKHGTY1WJkY/MU++HAZMA9E3J6o+D0XxGcmmP0AjoW6MocfGMBHgHU1/Ze0KLA9lkBBuamiVaBr+oXhnGKlSfVQ7uGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GXE/ixzo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E63DC433C7;
-	Sun, 11 Feb 2024 16:36:22 +0000 (UTC)
+	s=arc-20240116; t=1707670761; c=relaxed/simple;
+	bh=tWajLxkLpjlSl0BwK5EiC3LNBNa+4WaPAw7y0wd1l8w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Xa+HKTxgMz1yQfSotdalOfebt+O/+FJDl6vksJR2OcAidzd2UfPT09OlC0xMgmSH8DALpGN22r9W+5RDL1xIP8OYqc5eutGvmrlorm5vLZGuv2Y/TK8xo+oMbjumBsDZPxJ0wpFj1FVep6G+CezishEAR3kwezMoLKk9QJ/M3ok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z5DwrBVs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBF56C433C7;
+	Sun, 11 Feb 2024 16:59:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707669382;
-	bh=BVT7c5MMwoanGGQVtjw+M5JfeoluaC7HDWDxAzZAEyg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GXE/ixzolu0k8wKk/Vk6a7Fel7WWw+xxHDcbCPywbSyyo83tTRz477KXJUWMxpXvf
-	 Tr1MXoK+sD403mAy4u2WLgduc5yUbSq8mXGAZ41zGRqxZlklydfPn2uirTjb+A38cv
-	 4kxcPMlLJ1dGLJxIa2DAPO3EmgFPIH4m9QZ4ZV/JqOGEc8MY4SMxuwl66j6r7DLiE4
-	 PODM2fF5Rfh2eDLFzzxVxsV6EwDQslfZxBRq3+kY+e8GuWHKr4qd3ccjm2g+mjIALS
-	 pMFPyjIkh/eo+Ylq6zScv089vlj50F4L/BZg2Nh6IIqO46IqsbixZ0qFymqZSmNbrG
-	 AZwBVKL2aUKEw==
-Date: Sun, 11 Feb 2024 11:36:20 -0500
-From: Sasha Levin <sashal@kernel.org>
-To: Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: stable@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>,
-	Jakub Kicinski <kuba@kernel.org>, Doug Berger <opendmb@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	"open list:BROADCOM GENET ETHERNET DRIVER" <bcm-kernel-feedback-list@broadcom.com>,
-	"open list:BROADCOM GENET ETHERNET DRIVER" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH stable 5.15 v2] net: bcmgenet: Fix EEE implementation
-Message-ID: <Zcj3hF6uywZcTPX4@sashalap>
-References: <20240208190605.3341379-1-florian.fainelli@broadcom.com>
- <20240208190605.3341379-2-florian.fainelli@broadcom.com>
+	s=k20201202; t=1707670760;
+	bh=tWajLxkLpjlSl0BwK5EiC3LNBNa+4WaPAw7y0wd1l8w=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Z5DwrBVs3ODUEJKweEzi7KzXcsU35NBQLN0UghwPoCdrHsExChYroeRjHKewaDXH1
+	 CB2uai1YKRocCvrTWl1v2jCLqUWxV4jyBrw6FIiZzo0t7/Zpmw5fUvRIePArMxNDY7
+	 8LSOHgk6AuJUpZ7xjZwwPYFfhFCEhk6s0Pk9r43lEZiOGLTzX7MrSJzp9HCAPN1XtK
+	 3Ig3uuWlVtjMxj5fAf8OBmfVkCpol/61qWFW89q99xzvRTkWmvtH+jjbwEvA8REOoP
+	 hAOwGvlENifvnrn3qv8wSI7m5i1hItU3jPyWWHMe8M83foYcSfrsaPUdgmm/IWynJq
+	 dkFQrVGF1TlaQ==
+Message-ID: <2880b448-2431-44be-94ba-32eb46526c66@kernel.org>
+Date: Sun, 11 Feb 2024 09:59:18 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20240208190605.3341379-2-florian.fainelli@broadcom.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Saeed Mahameed <saeed@kernel.org>,
+ Arnd Bergmann <arnd@arndb.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+ Leonid Bloch <lbloch@nvidia.com>, Itay Avraham <itayavr@nvidia.com>,
+ Saeed Mahameed <saeedm@nvidia.com>,
+ Aron Silverton <aron.silverton@oracle.com>,
+ Christoph Hellwig <hch@infradead.org>, andrew.gospodarek@broadcom.com,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20240207072435.14182-1-saeed@kernel.org>
+ <20240207070342.21ad3e51@kernel.org> <ZcRgp76yWcDfEbMy@x130>
+ <20240208181555.22d35b61@kernel.org>
+ <2bdc5510-801a-4601-87a3-56eb941d661a@kernel.org>
+ <20240210010129.GA1010957@nvidia.com>
+Content-Language: en-US
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240210010129.GA1010957@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 08, 2024 at 11:06:05AM -0800, Florian Fainelli wrote:
->[ Upstream commit a9f31047baca57d47440c879cf259b86f900260c ]
->
->We had a number of short comings:
->
->- EEE must be re-evaluated whenever the state machine detects a link
->  change as wight be switching from a link partner with EEE
->  enabled/disabled
->
->- tx_lpi_enabled controls whether EEE should be enabled/disabled for the
->  transmit path, which applies to the TBUF block
->
->- We do not need to forcibly enable EEE upon system resume, as the PHY
->  state machine will trigger a link event that will do that, too
->
->Fixes: 6ef398ea60d9 ("net: bcmgenet: add EEE support")
->Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
->Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
->Link: https://lore.kernel.org/r/20230606214348.2408018-1-florian.fainelli@broadcom.com
->Signed-off-by: Jakub Kicinski <kuba@kernel.org>
->Signed-off-by: Sasha Levin <sashal@kernel.org>
->Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
+On 2/9/24 6:01 PM, Jason Gunthorpe wrote:
+> On Fri, Feb 09, 2024 at 03:42:16PM -0700, David Ahern wrote:
+>> On 2/8/24 7:15 PM, Jakub Kicinski wrote:
+>>>>> Ah yes, the high frequency counters. Something that is definitely
+>>>>> impossible to implement in a generic way. You were literally in the
+>>>>> room at netconf when David Ahern described his proposal for this.
+>>
+>> The key point of that proposal is host memory mapped to userspace where
+>> H/W counters land (either via direct DMA by a H/W push or a
+>> kthread/timer pulling in updates). That is similar to what is proposed here.
+> 
+> The counter experiment that inspired Saeed to write about it here was
+> done using mlx5ctl interfaces and some other POC stuff on an RDMA
+> network monitoring RDMA workloads, inspecting RDMA objects.
+> 
+> So if your proposal also considers how to select RDMA object counters,
+> control the detailed sampling hardware with RDMA stuff, and works
+> on a netdev-free InfiniBand network, then it might be interesting.
 
-It doesn't look like this one applies to 5.15...
+Response at netconf in September was mixed. As I recall Jakub for
+example was shaking his head at 'yet another stats proposal', but since
+he has referenced it a couple of times now maybe it is worth moving
+beyond slides to a POC. The uapi discussed was netlink (genl) based;
+driver hooks were not discussed. Perhaps I can get a working POC for
+both stacks by netdevconf in July.
 
--- 
-Thanks,
-Sasha
 
