@@ -1,184 +1,131 @@
-Return-Path: <netdev+bounces-70829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F3E3850AC4
-	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 19:10:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 110AE850AC8
+	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 19:17:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99E8E1C2039C
-	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 18:10:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 70BAF1F21ADE
+	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 18:17:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3A495CDF2;
-	Sun, 11 Feb 2024 18:10:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 159E25CDF5;
+	Sun, 11 Feb 2024 18:17:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="mgFqiFTm";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="C9IbAMoL";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="mgFqiFTm";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="C9IbAMoL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P6dZTeFz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDAED5C91E
-	for <netdev@vger.kernel.org>; Sun, 11 Feb 2024 18:10:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F4041E488;
+	Sun, 11 Feb 2024 18:17:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707675005; cv=none; b=od3nZLouC4o7qOsWRN8bHT9QxIv40y74/Ahk9zLfT2Cb2QOjnWU0f4nEzO54a+MN7zEuXZZzVXFecH53dOIUPceVNCD87BXKJVniDS07VOtisaK8yIDrfYvI7YoWsUGGZUapcZzvXjFXiwQaNDEmYj/QkAu1/Gu7TyfbXWoRCoI=
+	t=1707675459; cv=none; b=tqC8BfgXArqCuPhmCF2Kpga5DWszAIPasCIelqsLDFvoNdaGGnAtIc1ie6zPg/gxeQ9JKy1oxhGQfgqNhEBRAxOyhUwa6e7k+z2QnTbO4wDLMM2EuZ3AHqsnbNz8yGqL9A/4bFgUExJ547Q9BxJpuA6t6E4wb6cV/Fsm+Y2HqX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707675005; c=relaxed/simple;
-	bh=m/BmaoTtn7HsfkahkZm1WJwP6YR7KPTq2eSIa0xEhFs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Vx2SCswE9NZVFwjCwSzT5XJezOt9ydSej8lFNoi+O5TECDoKZBHQz6eyVg5P/hf6kyHt0l0tg2Y+6lJcn4Jm4+mEUaMlWBbxTefkK8qd7K5h/xp2G4CCXNFnD+xpnju8yOa8PFfXoq8jwcq0yz17xtAJadF3ZVHNvWuvhbl8xaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=mgFqiFTm; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=C9IbAMoL; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=mgFqiFTm; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=C9IbAMoL; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 02C191FB8B;
-	Sun, 11 Feb 2024 18:10:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1707675002; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kWV9K9mRgg002CAL69aLb/ELpKx+STPaEguUHWY0sMI=;
-	b=mgFqiFTmrf9+klTdTBmnjMlSqJGNh7hJvN1LWO+nVlQjyV6TAoclho/NbZmjEOUksjUZcd
-	MOdXwCqWEy/zqMwDB7o67QGhfQZeGa24kvc0WxU5lVbqFwLYot58hDrYW48FztkgrfTBoT
-	SscFMwI+hfTTSaLWA8VvKC2Ia70rxAQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1707675002;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kWV9K9mRgg002CAL69aLb/ELpKx+STPaEguUHWY0sMI=;
-	b=C9IbAMoLHUW+ylxkmxtJ2hZWBrb6UxZeRm2xRoQqC55aWi7Fv/plfsxYfHBK2OIrF9Tv5Q
-	6D8IqSUoioh8U4AA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1707675002; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kWV9K9mRgg002CAL69aLb/ELpKx+STPaEguUHWY0sMI=;
-	b=mgFqiFTmrf9+klTdTBmnjMlSqJGNh7hJvN1LWO+nVlQjyV6TAoclho/NbZmjEOUksjUZcd
-	MOdXwCqWEy/zqMwDB7o67QGhfQZeGa24kvc0WxU5lVbqFwLYot58hDrYW48FztkgrfTBoT
-	SscFMwI+hfTTSaLWA8VvKC2Ia70rxAQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1707675002;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kWV9K9mRgg002CAL69aLb/ELpKx+STPaEguUHWY0sMI=;
-	b=C9IbAMoLHUW+ylxkmxtJ2hZWBrb6UxZeRm2xRoQqC55aWi7Fv/plfsxYfHBK2OIrF9Tv5Q
-	6D8IqSUoioh8U4AA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B380D13A38;
-	Sun, 11 Feb 2024 18:10:01 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id qvV2KHkNyWVUMAAAD6G6ig
-	(envelope-from <dkirjanov@suse.de>); Sun, 11 Feb 2024 18:10:01 +0000
-Message-ID: <1de98d9d-7a7c-4e84-85b8-f28055210ee2@suse.de>
-Date: Sun, 11 Feb 2024 21:10:00 +0300
+	s=arc-20240116; t=1707675459; c=relaxed/simple;
+	bh=io3+Hed8JnnC4i7HX4lVCBexNVH3DyfS4NoC4XK9xpM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MTb5F7Y/1tTg3ocZlTAwrbtk4wPAnqQ3IC8eRDuEgBvuraXWAZkkchTNGjs8EgFepwj9iiHt+jp8iCUYnxY3tQwwQUjKddYm309IP7/8WoB87R3GDhgsubkMao6bSOaymmhacHQz/qHs4fXAKAieSxRNT8rmzb6/qi+CiTr1gd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P6dZTeFz; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a383016f428so269976766b.2;
+        Sun, 11 Feb 2024 10:17:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707675455; x=1708280255; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wRlkryYzMpYNr8EiU9J50+QP+nynNhNlhOvQquw1dL0=;
+        b=P6dZTeFzGt+sMI9p+O6q7d8ZrAZ3q3tFbaFTynO7jkrHi8sTIPCRhFhCPkrh+CEom0
+         +jiq2u7+wzOJ9iUkJaQqd8WHFCBIzsoKm5iqafEzJpGB3A8qth5Emp2p1bZibT1TJcbD
+         /YJDeuk6pn4J79QlpapPjz2VBFzcqBmnaTrSk8ELojq/8pgZFoviaYOgPkg+oaJlp9Yb
+         lInPg/rDzsA/vZ0KcKm8ypFpFj9x6rjes3nQLUs6270bsMsnFTFlU6KZc3+t0ETh1WYP
+         79n3ZFRzUffKbSeecxAeJNgqqSMR5eTGTft4shWk4HQ2j6fPbNdnkj5OUPWshKjoKOlT
+         x1lQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707675455; x=1708280255;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wRlkryYzMpYNr8EiU9J50+QP+nynNhNlhOvQquw1dL0=;
+        b=rpMQL+UeT7oZusaQvzaHOB5HRB0wyOycFKnn5V2dkchlaKipIANhZCbD9Q9bySmlrZ
+         3F6Hc9hDEJccl9QyHc1Bm3YXBA/kBCaeWrvU1LPQA2DVmHxkQdB7+d7h7gM5f9yWDgTZ
+         90ZclY78zkA4ypyeIlfkkviqMdG279f0WXvkSt4P21V0Bp57dcgCqHeHz8WKSPucnp1V
+         W5BmgZdneZ1hI2oLkAxgiauR9UTsT5/q6CHOVrMPaPqCjbVjQMBhfVXuicukPwlbz0jH
+         1zI98fmKv+H/CA5COswIAHBLGm78710ASj21uaQYUpc4DrP3v2dX2rbnyMV9tykDvvHg
+         hCLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU5bMuFfCYi/j+yS3+aIEL5z5sOFT4f/sII7jmQ9K0U/q/V1Xlq6pNDE3dub0qhA1+ZG6ebzNMhgsA3smAqV+ag2Iqc8LiqozR6t0+iCos7Nh1Pnf2E6Q0Av8kwiop6awn5wFW7
+X-Gm-Message-State: AOJu0Ywrzwh6EVnb3fhQuaPIlzRtxUDidvMfcCNCaxRSZ5aZsoY9jSuY
+	Jnq0907gei9p1xcQJKoTrOd/Uap3qrXLkqN5UFlm0nSNxIkA4lSaqcw39Vjo7a4=
+X-Google-Smtp-Source: AGHT+IFhvzIdDIU9NI22aPCKrR1T8TqA4e5Qm7JyUEIBkXaoV6ec/doDEFG0EufEn8PQqlUXOl0syg==
+X-Received: by 2002:a17:906:af10:b0:a37:b91c:8a4e with SMTP id lx16-20020a170906af1000b00a37b91c8a4emr3968636ejb.60.1707675455330;
+        Sun, 11 Feb 2024 10:17:35 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCV4poW54j57mNFwT+6WKg8BUMcfLGB9lydg99gKlKbj3k4C0FvA920rzecg8k2+dW3+h+ESmVRRkEd2jR/r/B/fddQdOVzke/DUr7/gP7juDcF4gq83AoSe0r3pSWpQZ20P7K1sYXNaGIssN1cK5l1j0DwitlsBK8OcqueRegZxfyIc04ucqyWxmH1IMvm2xZm/5RVh3EzDmYdddNecafwRSMULeVaL2TxE8MVW6F2wwe4nAC6kbzLS432guBmWRXReDmcQy/SYM2G9xeV8lE2qrlalBYKam6HLIKzdO07rXcp0hh0Gx/t5JQsxzhzMQYGIz+jd0ImJrx3QtI5MwWnmjY0KgZyoAW029rQocLWjLxM=
+Received: from fedora.. (cpe-109-60-82-27.zg3.cable.xnet.hr. [109.60.82.27])
+        by smtp.googlemail.com with ESMTPSA id cx3-20020a170907168300b00a3c488d79b1sm1571670ejd.223.2024.02.11.10.17.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 11 Feb 2024 10:17:34 -0800 (PST)
+From: Robert Marko <robimarko@gmail.com>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	ansuelsmth@gmail.com,
+	rmk+kernel@armlinux.org.uk,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Robert Marko <robimarko@gmail.com>
+Subject: [PATCH net-next] net: phy: aquantia: clear PMD Global Transmit Disable bit during init
+Date: Sun, 11 Feb 2024 19:16:41 +0100
+Message-ID: <20240211181732.646311-1-robimarko@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 iproute2] ifstat: convert sprintf to snprintf
-Content-Language: en-US
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: Denis Kirjanov <kirjanov@gmail.com>, netdev@vger.kernel.org
-References: <20240202093527.38376-1-dkirjanov@suse.de>
- <20240210123303.4737392e@hermes.local>
- <331c1b3b-4dbe-48e7-9e75-0536528a8868@suse.de>
- <20240211091802.21885973@hermes.local>
-From: Denis Kirjanov <dkirjanov@suse.de>
-In-Reply-To: <20240211091802.21885973@hermes.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Level: 
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=mgFqiFTm;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=C9IbAMoL
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-3.50 / 50.00];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 XM_UA_NO_VERSION(0.01)[];
-	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	 TO_DN_SOME(0.00)[];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_TRACE(0.00)[suse.de:+];
-	 MX_GOOD(-0.01)[];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 BAYES_HAM(-0.00)[34.38%];
-	 MID_RHS_MATCH_FROM(0.00)[];
-	 ARC_NA(0.00)[];
-	 R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 FROM_HAS_DN(0.00)[];
-	 RCPT_COUNT_THREE(0.00)[3];
-	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 DWL_DNSWL_MED(-2.00)[suse.de:dkim];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:email];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org];
-	 RCVD_TLS_ALL(0.00)[]
-X-Spam-Score: -3.50
-X-Rspamd-Queue-Id: 02C191FB8B
-X-Spam-Flag: NO
+Content-Transfer-Encoding: 8bit
 
+PMD Global Transmit Disable bit should be cleared for normal operation.
+This should be HW default, however I found that on Asus RT-AX89X that uses
+AQR113C PHY and firmware 5.4 this bit is set by default.
 
+With this bit set the AQR cannot achieve a link with its link-partner and
+it took me multiple hours of digging through the vendor GPL source to find
+this out, so lets always clear this bit during .config_init() to avoid a
+situation like this in the future.
 
-On 2/11/24 20:18, Stephen Hemminger wrote:
-> On Sun, 11 Feb 2024 11:39:13 +0300
-> Denis Kirjanov <dkirjanov@suse.de> wrote:
-> 
->> On 2/10/24 23:33, Stephen Hemminger wrote:
->>> On Fri,  2 Feb 2024 04:35:27 -0500
->>> Denis Kirjanov <kirjanov@gmail.com> wrote:
->>>   
->>>> Use snprintf to print only valid data
->>>>
->>>> v2: adjust formatting
->>>>
->>>> Signed-off-by: Denis Kirjanov <dkirjanov@suse.de>
->>>> ---  
->>>
->>> Tried this but compile failed
->>>
->>> ifstat.c:896:2: warning: 'snprintf' size argument is too large; destination buffer has size 107, but size argument is 108 [-Wfortify-source]
->>>         snprintf(sun.sun_path + 1, sizeof(sun.sun_path), "ifstat%d", getuid());  
->>
->> Right, this is addressed in the patch with scnprintf
->>  
-> 
-> But I see no need to convert to scnprintf(). Scnprintf is about the return value
-> and almost nowhere in iproute2 uses the return value and those that to look at the
-> return value are checking for beyond buffer. Plus if you convert to scnprintf you
-> lose lots of the fortify and other analyzer checking.
+Signed-off-by: Robert Marko <robimarko@gmail.com>
+---
+ drivers/net/phy/aquantia/aquantia_main.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-the last line makes sense.
-
-> 
-> Bottom line scnprintf() makes sense in kernel but not iproute2.
-
-I'll push the next version of a patch with snprintf then.
-Thanks!
+diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/aquantia/aquantia_main.c
+index 97a2fafa15ca..e1f092cbfdce 100644
+--- a/drivers/net/phy/aquantia/aquantia_main.c
++++ b/drivers/net/phy/aquantia/aquantia_main.c
+@@ -727,6 +727,15 @@ static int aqr113c_config_init(struct phy_device *phydev)
+ 	if (ret < 0)
+ 		return ret;
+ 
++	ret = phy_clear_bits_mmd(phydev, MDIO_MMD_PMAPMD, MDIO_PMA_TXDIS,
++				 MDIO_PMD_TXDIS_GLOBAL);
++	if (ret)
++		return ret;
++
++	ret = aqr107_wait_processor_intensive_op(phydev);
++	if (ret)
++		return ret;
++
+ 	return aqr107_fill_interface_modes(phydev);
+ }
+ 
+-- 
+2.43.0
 
 
