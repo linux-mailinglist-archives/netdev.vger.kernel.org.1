@@ -1,312 +1,154 @@
-Return-Path: <netdev+bounces-70831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 511DD850AD1
-	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 19:29:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFC3F850AD5
+	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 19:37:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90B15B209FB
-	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 18:29:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A21641F222E6
+	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 18:37:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 113E95CDF6;
-	Sun, 11 Feb 2024 18:29:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBEA8E541;
+	Sun, 11 Feb 2024 18:36:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="QJzAgZWe"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="lPPvS8/S"
 X-Original-To: netdev@vger.kernel.org
-Received: from out2-smtp.messagingengine.com (out2-smtp.messagingengine.com [66.111.4.26])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB3265D471
-	for <netdev@vger.kernel.org>; Sun, 11 Feb 2024 18:29:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.111.4.26
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 233A31E4B8;
+	Sun, 11 Feb 2024 18:36:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707676161; cv=none; b=ro6lwIdkq2YuacD1BJLzcQo7hzo8Wx2Oqzkc1/LroJDzu3M8eE08TN/llfaRPoTOLebGwQCQW8AZjYP+qWEbiOJMDIw4u4rNUJLHaHO9Ekhlub/z+B/VttZkBDL2iAANe9BpxYraf4f8POklPfKQEQ3C2yASjYiLQba62+gOcEM=
+	t=1707676617; cv=none; b=onQJ4Elb9XuS0Dl4mBkMkSFyHCSnddEH5CYjxh59U61exQyzsT6hLKXuVxw2ksyCVb9n82ijoxAd4zqOz+YaoKO9VnaZhqKdFTaSEGLarjpgA56ygKAfhhF/ncXHeVA6ur5Moruj/Wj9k0sg90R9UbCqVT61CTGTNXs1HFRXgLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707676161; c=relaxed/simple;
-	bh=y5aM9W41dpBCL4D7DJSScJRxIujH/vHwPjGAI9FjPfc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=twnpygMrn509DGo+AG7qa6GdGG1xzyRuY/7f/eQBJkBe79pe3WmnGP8UqepMWorTHCGrzlGXIeHwZBu4uN0EDy53IKqC+myXSJkFdqIgf9y3RM0AkyxWE5efqCkCc+2Q7K+qCQkT0x8h/YQ32S6I36qYD84l50bZ2GkCvhuDfIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=QJzAgZWe; arc=none smtp.client-ip=66.111.4.26
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from compute7.internal (compute7.nyi.internal [10.202.2.48])
-	by mailout.nyi.internal (Postfix) with ESMTP id C7E915C0079;
-	Sun, 11 Feb 2024 13:29:17 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute7.internal (MEProxy); Sun, 11 Feb 2024 13:29:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1707676157; x=
-	1707762557; bh=3MBL4pdWRzAekiY4RB9EojjlxmdLdn51lKxlR/Yh1wY=; b=Q
-	JzAgZWeXXe3X0gniOFyi78OyAHKiMu8cP+3ul+vNRHG1KRPckP+EYRdCeEVuQ7G5
-	cNbjH5hcshU/Dgfz5wjgbunkGfNXk24lD1VQMh9QPw7cCVHKh3aDNPyAsx8LYDxS
-	eWpEifPggABZl4FmZ2s0SRUIMH7Y/nMx6WN1Km3xW3/G8d0Vwo6fMnBp0DdcZttb
-	EOsnG1fvnIbeXHTEfzmCO6qip2Ec7gQUyM9/8i//dvVqi4xEOmxOg2YjYG/bP3fc
-	poHrmamRfPtKnC2guKCbRDjxl4IzULzNbHmqG6jG6CI9O/Vq1la6jDByZF7cXGVO
-	mrhqG0yZAO0ihH5z5O5wQ==
-X-ME-Sender: <xms:_RHJZW8SwPNQVs1KcqJA04UxJet3IS0mVif-dWinrAm9Syq_GOqQzg>
-    <xme:_RHJZWuvoeGHbxiETR97m9OaPBVpbJiZUDEa2m4Q_yVrQGVzMKMGF-o1OyhZy5VeP
-    o7CQkueVY57fXk>
-X-ME-Received: <xmr:_RHJZcAqds3pMCw3-p62w90fI0vxphyb9WFaM1srC80PTP8bAEZsZWT0EUkw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledruddugdduudeiucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefkugho
-    ucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrg
-    htthgvrhhnpeekgefggefhuedvgeettdegvdeuvdfhudejvddvjeetledvuedtheehleel
-    hffhudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    hiughoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:_RHJZecfnNMmf3KThJZXVvFyyZtVIOHaLE37_vZxFGn9b98oerPPcA>
-    <xmx:_RHJZbPjWlWA_Jxvd3SooQPQRlDRTF3O2OBCvHvbFXjFpOHwnUScQw>
-    <xmx:_RHJZYlhMKTdneuUl7ToWFM3YDaT2F36-EDAwlQ2iA2DyTP9RmGPvA>
-    <xmx:_RHJZUoPRkyaq8985OZgQpVxiRQvQTFg3MdMiNnnUYI7gkSlJuUreg>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 11 Feb 2024 13:29:16 -0500 (EST)
-Date: Sun, 11 Feb 2024 20:29:13 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next 2/2] rtnetlink: use xarray iterator to implement
- rtnl_dump_ifinfo()
-Message-ID: <ZckR-XOsULLI9EHc@shredder>
-References: <20240209145615.3708207-1-edumazet@google.com>
- <20240209145615.3708207-3-edumazet@google.com>
- <20240209142441.6c56435b@kernel.org>
- <CANn89iKMEWTMkUaBvY1DqPwff0p5yFEG4nNDqZrtQBO3y8FFwA@mail.gmail.com>
+	s=arc-20240116; t=1707676617; c=relaxed/simple;
+	bh=Lcg4lM2G9CuHTtys1fNCLBmGy/ahJXg/HXxHponNmOY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=h3atM5WAcceiW6dUk+QrUaC57mL98LfnPICPR0UEL+Lp9wzC8Dvm3d+oBHMBJfxx9tu8YrgiXIRSh54XsQA5X7emB/z1VtsuFvNF8h9yHByuhm48nkAfSP4Oxl0yBJ8RfuKqZMotQdELTgFwaOHVZYw74fdZ6ETZ+Fg1uKwa9R0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=lPPvS8/S; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41BIaame031602;
+	Sun, 11 Feb 2024 10:36:36 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version:content-type; s=
+	pfpt0220; bh=HccO4k69S/Dtb9/3alJXStUYrXhVB7/VvqULt2kxnNU=; b=lPP
+	vS8/S60dxIssMcjZC6DXFKSN/LPDKqyeg6sCeXO45dv+gnzOzYzOdJ5d0JQ2spDF
+	y4eTztH77AWwPYzeLnJRNRB13q7ZRnIx/zGnYawKGngNYkpHoc53RSa4JT8Yk5fw
+	PxUFTNQzKSOvOQPYoUNPWi6XgDZxJfSDY7FEtFL18wr3ZDAUVWpQ/OZ+4/e9yd4s
+	5vRqu1M/Do1FwX8Cx4fsFCYYJbT226SrSkfGPEIMXjZ1/DXOD868B0Dqu6qGvZh7
+	g6hZguJls5yR3d8dYWcAp5Rm1pYhOZsyF5cdQvsx6cZNTqG2NPfmBTVsiwskQmzt
+	qUiqEIpg+s+sNMzUstw==
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3w67cpats0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Sun, 11 Feb 2024 10:36:35 -0800 (PST)
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sun, 11 Feb
+ 2024 10:36:34 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Sun, 11 Feb 2024 10:36:34 -0800
+Received: from hyd1358.marvell.com (unknown [10.29.37.11])
+	by maili.marvell.com (Postfix) with ESMTP id 58F023F7040;
+	Sun, 11 Feb 2024 10:36:30 -0800 (PST)
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <sgoutham@marvell.com>, <lcherian@marvell.com>,
+        <gakula@marvell.com>, <hkelam@marvell.com>, <naveenm@marvell.com>,
+        <horms@kernel.org>, Subbaraya Sundeep <sbhatta@marvell.com>
+Subject: [PATCH 1/2] octeontx2-af: Remove the PF_FUNC validation for NPC transmit rules
+Date: Mon, 12 Feb 2024 00:06:27 +0530
+Message-ID: <1707676587-12711-1-git-send-email-sbhatta@marvell.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iKMEWTMkUaBvY1DqPwff0p5yFEG4nNDqZrtQBO3y8FFwA@mail.gmail.com>
+Content-Type: text/plain
+X-Proofpoint-GUID: yyM0X6rDBn0AxhXiNKuwrT07gzWjv0F8
+X-Proofpoint-ORIG-GUID: yyM0X6rDBn0AxhXiNKuwrT07gzWjv0F8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-11_17,2024-02-08_01,2023-05-22_02
 
-On Sat, Feb 10, 2024 at 12:23:30PM +0100, Eric Dumazet wrote:
-> On Fri, Feb 9, 2024 at 11:24 PM Jakub Kicinski <kuba@kernel.org> wrote:
-> >
-> > On Fri,  9 Feb 2024 14:56:15 +0000 Eric Dumazet wrote:
-> > > +     unsigned long ifindex = cb->args[0];
-> >
-> > [snip]
-> >
-> > > +     for_each_netdev_dump(tgt_net, dev, ifindex) {
-> > > +             if (link_dump_filtered(dev, master_idx, kind_ops))
-> > > +                     continue;
-> > > +             err = rtnl_fill_ifinfo(skb, dev, net, RTM_NEWLINK,
-> > > +                                    NETLINK_CB(cb->skb).portid,
-> > > +                                    nlh->nlmsg_seq, 0, flags,
-> > > +                                    ext_filter_mask, 0, NULL, 0,
-> > > +                                    netnsid, GFP_KERNEL);
-> > > +
-> > > +             if (err < 0)
-> > > +                     break;
-> > > +             cb->args[0] = ifindex + 1;
-> >
-> > Perhaps we can cast the context buffer onto something typed and use
-> > it directly? I think it's a tiny bit less error prone:
-> >
-> >         struct {
-> >                 unsigned long ifindex;
-> >         } *ctx = (void *)cb->ctx;
-> >
-> > Then we can:
-> >
-> >         for_each_netdev_dump(tgt_net, dev, ctx->ifindex)
-> >                                            ^^^^^^^^^^^^
-> >
-> > and not need to worry about saving the ifindex back to cb before
-> > exiting.
-> 
-> Hi Jakub
-> 
-> I tried something like that (adding a common structure for future
-> conversions), but this was not working properly.
-> 
-> Unfortunately we only can save the ifindex back to cb->XXXX only after
->  rtnl_fill_ifinfo() was a success.
-> 
-> For instance, after applying the following diff to my patch, we have a
-> bug, because iip link loops on the last device.
-> 
-> We need to set cb->args[0] to  last_dev->ifindex + 1 to end the dump.
+NPC transmit side mcam rules can use the pcifunc of transmitting
+device for mcam lookup. The commit 18603683d766 ("octeontx2-af: Remove
+channel verification while installing MCAM rules") removed the receive
+side channel verification to save hardware MCAM filters while switching
+packets across interfaces but missed removing transmit side checks.
+This patch removes transmit side rules validation.
 
-I was looking into that in the past because of another rtnetlink dump
-handler. See merge commit f8d3e0dc4b3a ("Merge branch
-'nexthop-nexthop-dump-fixes'") and commit 913f60cacda7 ("nexthop: Fix
-infinite nexthop dump when using maximum nexthop ID").
+Fixes: 18603683d766 ("octeontx2-af: Remove channel verification while installing MCAM rules")
+Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+---
+ .../net/ethernet/marvell/octeontx2/af/rvu_npc.c    | 32 ----------------------
+ 1 file changed, 32 deletions(-)
 
-Basically, rtnetlink dump handlers always return a positive value if
-some entries were filled in the skb to signal that more information
-needs to be dumped, even if the dump is complete. I suspect this was
-done to ensure that appending the NLMSG_DONE message will not fail, but
-Jason fixed it in 2017 in commit 0642840b8bb0 ("af_netlink: ensure that
-NLMSG_DONE never fails in dumps").
-
-You can see that the dump is split across two buffers with only a single
-netdev configured:
-
-# strace -e sendto,recvmsg ip l
-sendto(3, [{nlmsg_len=40, nlmsg_type=0x12 /* NLMSG_??? */, nlmsg_flags=NLM_F_REQUEST|0x300, nlmsg_seq=1707673609, nlmsg_pid=0}, "\x11\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08\x00\x1d\x00\x01\x00\x00\x00"], 40, 0, NULL, 0) = 40
-recvmsg(3, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=12, msg_iov=[{iov_base=NULL, iov_len=0}], msg_iovlen=1, msg_controllen=0, msg_flags=MSG_TRUNC}, MSG_PEEK|MSG_TRUNC) = 764
-recvmsg(3, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=12, msg_iov=[{iov_base=[{nlmsg_len=764, nlmsg_type=0x10 /* NLMSG_??? */, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1707673609, nlmsg_pid=565}, "\x00\x00\x04\x03\x01\x00\x00\x00\x49\x00\x01\x00\x00\x00\x00\x00\x07\x00\x03\x00\x6c\x6f\x00\x00\x08\x00\x0d\x00\xe8\x03\x00\x00"...], iov_len=32768}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, 0) = 764
-recvmsg(3, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=12, msg_iov=[{iov_base=NULL, iov_len=0}], msg_iovlen=1, msg_controllen=0, msg_flags=MSG_TRUNC}, MSG_PEEK|MSG_TRUNC) = 20
-recvmsg(3, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=12, msg_iov=[{iov_base=[{nlmsg_len=20, nlmsg_type=NLMSG_DONE, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1707673609, nlmsg_pid=565}, 0], iov_len=32768}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, 0) = 20
-1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-+++ exited with 0 +++
-
-The fake sentinel ('last_dev->ifindex + 1') is needed so that in the
-second invocation of the dump handler it will not fill anything and then
-return zero to signal that the dump is complete.
-
-The following diff avoids this inefficiency and returns zero when the
-dump is complete:
-
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index 31f433950c8d..4efd571a6a3f 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -2267,17 +2267,15 @@ static int rtnl_dump_ifinfo(struct sk_buff *skb, struct netlink_callback *cb)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+index 8cfd74a..e5d6156 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+@@ -61,28 +61,6 @@ int rvu_npc_get_tx_nibble_cfg(struct rvu *rvu, u64 nibble_ena)
+ 	return 0;
+ }
  
-                        if (err < 0) {
-                                if (likely(skb->len))
--                                       goto out;
+-static int npc_mcam_verify_pf_func(struct rvu *rvu,
+-				   struct mcam_entry *entry_data, u8 intf,
+-				   u16 pcifunc)
+-{
+-	u16 pf_func, pf_func_mask;
 -
--                               goto out_err;
-+                                       err = skb->len;
-+                               goto out;
-                        }
- cont:
-                        idx++;
-                }
-        }
-+
- out:
--       err = skb->len;
--out_err:
-        cb->args[1] = idx;
-        cb->args[0] = h;
-        cb->seq = tgt_net->dev_base_seq;
-
-You can see that both messages (RTM_NEWLINK and NLMSG_DONE) are dumped
-in a single buffer with this patch:
-
-# strace -e sendto,recvmsg ip l
-sendto(3, [{nlmsg_len=40, nlmsg_type=0x12 /* NLMSG_??? */, nlmsg_flags=NLM_F_REQUEST|0x300, nlmsg_seq=1707674313, nlmsg_pid=0}, "\x11\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08\x00\x1d\x00\x01\x00\x00\x00"], 40, 0, NULL, 0) = 40
-recvmsg(3, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=12, msg_iov=[{iov_base=NULL, iov_len=0}], msg_iovlen=1, msg_controllen=0, msg_flags=MSG_TRUNC}, MSG_PEEK|MSG_TRUNC) = 784
-recvmsg(3, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=12, msg_iov=[{iov_base=[[{nlmsg_len=764, nlmsg_type=0x10 /* NLMSG_??? */, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1707674313, nlmsg_pid=570}, "\x00\x00\x04\x03\x01\x00\x00\x00\x49\x00\x01\x00\x00\x00\x00\x00\x07\x00\x03\x00\x6c\x6f\x00\x00\x08\x00\x0d\x00\xe8\x03\x00\x00"...], [{nlmsg_len=20, nlmsg_type=NLMSG_DONE, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1707674313, nlmsg_pid=570}, 0]], iov_len=32768}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, 0) = 784
-1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-+++ exited with 0 +++
-
-And then it's possible to apply your patch with Jakub's suggestion:
-
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index 4efd571a6a3f..dba13b31c58b 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -2188,25 +2188,22 @@ static int rtnl_valid_dump_ifinfo_req(const struct nlmsghdr *nlh,
- 
- static int rtnl_dump_ifinfo(struct sk_buff *skb, struct netlink_callback *cb)
+-	if (is_npc_intf_rx(intf))
+-		return 0;
+-
+-	pf_func_mask = (entry_data->kw_mask[0] >> 32) &
+-		NPC_KEX_PF_FUNC_MASK;
+-	pf_func = (entry_data->kw[0] >> 32) & NPC_KEX_PF_FUNC_MASK;
+-
+-	pf_func = be16_to_cpu((__force __be16)pf_func);
+-	if (pf_func_mask != NPC_KEX_PF_FUNC_MASK ||
+-	    ((pf_func & ~RVU_PFVF_FUNC_MASK) !=
+-	     (pcifunc & ~RVU_PFVF_FUNC_MASK)))
+-		return -EINVAL;
+-
+-	return 0;
+-}
+-
+ void rvu_npc_set_pkind(struct rvu *rvu, int pkind, struct rvu_pfvf *pfvf)
  {
-+       const struct rtnl_link_ops *kind_ops = NULL;
-        struct netlink_ext_ack *extack = cb->extack;
-        const struct nlmsghdr *nlh = cb->nlh;
-        struct net *net = sock_net(skb->sk);
--       struct net *tgt_net = net;
--       int h, s_h;
--       int idx = 0, s_idx;
--       struct net_device *dev;
--       struct hlist_head *head;
-+       unsigned int flags = NLM_F_MULTI;
-        struct nlattr *tb[IFLA_MAX+1];
-+       struct {
-+               unsigned long ifindex;
-+       } *ctx = (void *)cb->ctx;
-+       struct net *tgt_net = net;
-        u32 ext_filter_mask = 0;
--       const struct rtnl_link_ops *kind_ops = NULL;
--       unsigned int flags = NLM_F_MULTI;
-+       struct net_device *dev;
-        int master_idx = 0;
-        int netnsid = -1;
-        int err, i;
+ 	int blkaddr;
+@@ -2851,12 +2829,6 @@ int rvu_mbox_handler_npc_mcam_write_entry(struct rvu *rvu,
+ 	else
+ 		nix_intf = pfvf->nix_rx_intf;
  
--       s_h = cb->args[0];
--       s_idx = cb->args[1];
+-	if (!is_pffunc_af(pcifunc) &&
+-	    npc_mcam_verify_pf_func(rvu, &req->entry_data, req->intf, pcifunc)) {
+-		rc = NPC_MCAM_INVALID_REQ;
+-		goto exit;
+-	}
 -
-        err = rtnl_valid_dump_ifinfo_req(nlh, cb->strict_check, tb, extack);
-        if (err < 0) {
-                if (cb->strict_check)
-@@ -2250,34 +2247,22 @@ static int rtnl_dump_ifinfo(struct sk_buff *skb, struct netlink_callback *cb)
-                flags |= NLM_F_DUMP_FILTERED;
+ 	/* For AF installed rules, the nix_intf should be set to target NIX */
+ 	if (is_pffunc_af(req->hdr.pcifunc))
+ 		nix_intf = req->intf;
+@@ -3208,10 +3180,6 @@ int rvu_mbox_handler_npc_mcam_alloc_and_write_entry(struct rvu *rvu,
+ 	if (!is_npc_interface_valid(rvu, req->intf))
+ 		return NPC_MCAM_INVALID_REQ;
  
- walk_entries:
--       for (h = s_h; h < NETDEV_HASHENTRIES; h++, s_idx = 0) {
--               idx = 0;
--               head = &tgt_net->dev_index_head[h];
--               hlist_for_each_entry(dev, head, index_hlist) {
--                       if (link_dump_filtered(dev, master_idx, kind_ops))
--                               goto cont;
--                       if (idx < s_idx)
--                               goto cont;
--                       err = rtnl_fill_ifinfo(skb, dev, net,
--                                              RTM_NEWLINK,
--                                              NETLINK_CB(cb->skb).portid,
--                                              nlh->nlmsg_seq, 0, flags,
--                                              ext_filter_mask, 0, NULL, 0,
--                                              netnsid, GFP_KERNEL);
+-	if (npc_mcam_verify_pf_func(rvu, &req->entry_data, req->intf,
+-				    req->hdr.pcifunc))
+-		return NPC_MCAM_INVALID_REQ;
 -
--                       if (err < 0) {
--                               if (likely(skb->len))
--                                       err = skb->len;
--                               goto out;
--                       }
--cont:
--                       idx++;
-+       err = 0;
-+       for_each_netdev_dump(tgt_net, dev, ctx->ifindex) {
-+               if (link_dump_filtered(dev, master_idx, kind_ops))
-+                       continue;
-+               err = rtnl_fill_ifinfo(skb, dev, net, RTM_NEWLINK,
-+                                      NETLINK_CB(cb->skb).portid,
-+                                      nlh->nlmsg_seq, 0, flags,
-+                                      ext_filter_mask, 0, NULL, 0,
-+                                      netnsid, GFP_KERNEL);
-+
-+               if (err < 0) {
-+                       if (likely(skb->len))
-+                               err = skb->len;
-+                       break;
-                }
-        }
--
--out:
--       cb->args[1] = idx;
--       cb->args[0] = h;
-        cb->seq = tgt_net->dev_base_seq;
-        nl_dump_check_consistent(cb, nlmsg_hdr(skb));
-        if (netnsid >= 0)
+ 	/* Try to allocate a MCAM entry */
+ 	entry_req.hdr.pcifunc = req->hdr.pcifunc;
+ 	entry_req.contig = true;
+-- 
+2.7.4
 
-And it will not hang:
-
-# strace -e sendto,recvmsg ip l
-sendto(3, [{nlmsg_len=40, nlmsg_type=0x12 /* NLMSG_??? */, nlmsg_flags=NLM_F_REQUEST|0x300, nlmsg_seq=1707675119, nlmsg_pid=0}, "\x11\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08\x00\x1d\x00\x01\x00\x00\x00"], 40, 0, NULL, 0) = 40
-recvmsg(3, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=12, msg_iov=[{iov_base=NULL, iov_len=0}], msg_iovlen=1, msg_controllen=0, msg_flags=MSG_TRUNC}, MSG_PEEK|MSG_TRUNC) = 784
-recvmsg(3, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=12, msg_iov=[{iov_base=[[{nlmsg_len=764, nlmsg_type=0x10 /* NLMSG_??? */, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1707675119, nlmsg_pid=564}, "\x00\x00\x04\x03\x01\x00\x00\x00\x49\x00\x01\x00\x00\x00\x00\x00\x07\x00\x03\x00\x6c\x6f\x00\x00\x08\x00\x0d\x00\xe8\x03\x00\x00"...], [{nlmsg_len=20, nlmsg_type=NLMSG_DONE, nlmsg_flags=NLM_F_MULTI, nlmsg_seq=1707675119, nlmsg_pid=564}, 0]], iov_len=32768}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, 0) = 784
-1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-+++ exited with 0 +++
 
