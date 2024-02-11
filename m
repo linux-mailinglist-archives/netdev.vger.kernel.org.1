@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-70801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D790D850792
-	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 02:38:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EC9C8507E7
+	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 07:12:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 72A311F23704
-	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 01:38:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0CDD285422
+	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 06:12:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C66DB15B3;
-	Sun, 11 Feb 2024 01:38:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92415168B8;
+	Sun, 11 Feb 2024 06:11:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hrntknr.net header.i=@hrntknr.net header.b="nq903s3B";
-	dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b="JVYJlL6S"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dOVQIbsf"
 X-Original-To: netdev@vger.kernel.org
-Received: from e234-3.smtp-out.ap-northeast-1.amazonses.com (e234-3.smtp-out.ap-northeast-1.amazonses.com [23.251.234.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E226415BE
-	for <netdev@vger.kernel.org>; Sun, 11 Feb 2024 01:38:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.251.234.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7F9C1427B;
+	Sun, 11 Feb 2024 06:11:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707615531; cv=none; b=V3HGVFno/wuGQ0W/LoUIN8XVY6HIX+Nx6jUqYDvI4AMW7iBmO/Usd7Y6GqQ9/tEK8Gg1JrzXXYJVL8ubo9QQgEiUpNLb1UDaCN4Iqc1BKARu2KJU7PQcHWMJgkdFGeblAjJKtfrUXIBvRgflTNojRFUwCXRLAdK7sgOtJAHRy+I=
+	t=1707631916; cv=none; b=ch6Qbv9Eo2tkPcavvaaral7DvI97nWJaD4+evKto6Okt2bNQOYW301Kq0yCSZ0OHzLni/DvDUdVfhQx0DMmElzJ5ytXm/AUNyArfYblmItd/dZ5gEHRW5ALTt/4LtKCqxl5dIOt+okSfr7eyOFI0EGwy9V6CaM+tmlaGTFa8X7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707615531; c=relaxed/simple;
-	bh=I5guIR8VcrkzT9xLSP4mWAmUGulq2K/WIqt+tT/uhDg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XyrOQsx9i7QSzt95TROG6UDVuxXyHjPMLwnTNj3g7oGY9/AgvC4sPchASbLQOMEHtTt3c9tE08Fkhdpk2cJveg4thLUeUYLkaaehbwDzGMH5iF08YVSOaurcAyWQ2O9Hl0oFIOAWAa+Cblj+tpp1EglL+u67skZxyFkNZSw75GM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hrntknr.net; spf=pass smtp.mailfrom=ap-northeast-1.amazonses.com; dkim=pass (2048-bit key) header.d=hrntknr.net header.i=@hrntknr.net header.b=nq903s3B; dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b=JVYJlL6S; arc=none smtp.client-ip=23.251.234.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hrntknr.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ap-northeast-1.amazonses.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-	s=otpfqkfjftndw3gmuo745xikcugpdsgy; d=hrntknr.net; t=1707615528;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=I5guIR8VcrkzT9xLSP4mWAmUGulq2K/WIqt+tT/uhDg=;
-	b=nq903s3BWYR+htUf21O7PNRR7xreuhOpBFlurG7N6NgNs82K4btBe2AeYzaUonkI
-	SSWTtwiLsQJK7jwGixwgyBPQ/PaKzX52c2gXIAyvOPe05MUtfWj8gD+ET8MVgNttQUh
-	LBa7qCbEeOdMA0e//CCT2VVt8CPL3q4quGHmDTJNWhBXceZRG55iTKx6Ie71jyNMhUZ
-	Zw5bVbyC53oCdW9UR69CcRPBUlD3dFSqp/tdTpY6rN1w47F19sWNFdPOPZvXThydP6A
-	lGcdmFbTyqZ9gP5TJD6qsSaAPU1JuR4jHOzKBVoQNwITbxO9eV6VlHl8Gb44pE63NQ2
-	DV1rS9xVBQ==
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-	s=zh4gjftm6etwoq6afzugpky45synznly; d=amazonses.com; t=1707615528;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Feedback-ID;
-	bh=I5guIR8VcrkzT9xLSP4mWAmUGulq2K/WIqt+tT/uhDg=;
-	b=JVYJlL6SU4+LdNbuIK5RDiRkRFv3qse01GQ/XwmxIpBo2LqRvVudbhcnIGHrOrGJ
-	XA0jXczMyHbCVXfS6UQLAl/DLP98YfjSHEKy4P58AnQ+cHU/FpEINxphGNHwDCED8ic
-	GW57nuBV9iocXFPaN8Sl13mjvdKmaRBvIqoLabqc=
-From: Takanori Hirano <me@hrntknr.net>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org, Takanori Hirano <me@hrntknr.net>
-Subject: [PATCH v2] tc: Change of json format in tc-fw
-Date: Sun, 11 Feb 2024 01:38:48 +0000
-Message-ID: <0106018d95d12587-2a5518e8-5e89-4d5c-b7d5-93455429cb1d-000000@ap-northeast-1.amazonses.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240210092107.53598a13@hermes.local>
-References: <20240210092107.53598a13@hermes.local>
+	s=arc-20240116; t=1707631916; c=relaxed/simple;
+	bh=uiHv33UvQzWWqzhY4G02ngJ3pu97xmmsLDicdgZbIVs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SlTqgN8T/3yFitsA6ns22mGGoxkqMHox1HKS0gswcbR2MFgKLpBYbruJA9VCX0h56cIVv2nZQI+3E9pqHCqvGEFy7z06JxLWSUJ8JsXggKKz/Sk3KuOdp4VWjnNIfO15AtQC5mZ9bBF/Opg6bkoAQxlR168+HG+A6mDwD13GEFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=dOVQIbsf; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=uDkJxhoZtG6KpR3Q/PoQfQNM2zj8tnJOgXtpsXtp2n8=; b=dOVQIbsfuKhD008h30Ze3q7kk4
+	VHdw8OQANyWUb27RDNMHu97gGYfQTLO0fh8/nU1mTCzJ5Rvkw9rWCsHQ102DC5Grw7RNCxEBokCNp
+	BVkGxz86Jk1lmUWm+zmJjORHQjhZ2ygjxgKaVPXoap98ciF6nsyg726Ns6K5B21v2RIegcC03htOY
+	EDDOxp2ItkamD2IjbBvouevULExDuLIEUmPtJAm1rLcXKRBXoD/RK0SfNtn52ogzeQ59SH1UPRp7/
+	8aDWg+NgKLOWus5NE+Kp2yCuK5uk67WUYZi4WhpLotKzh2VBKVmGdaRnuVXqNR9U3ZStvpvoZCOP8
+	WBrJ7fjQ==;
+Received: from [50.53.50.0] (helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rZ34D-00000002OlB-1uSn;
+	Sun, 11 Feb 2024 06:11:53 +0000
+From: Randy Dunlap <rdunlap@infradead.org>
+To: linux-kernel@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>,
+	Roger Quadros <rogerq@ti.com>,
+	Md Danish Anwar <danishanwar@ti.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH] net: ti: icssg-prueth: add dependency for PTP
+Date: Sat, 10 Feb 2024 22:11:52 -0800
+Message-ID: <20240211061152.14696-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,58 +65,52 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Feedback-ID: 1.ap-northeast-1.rx1zlehJXIhTBJXf7/H1gLdwyBf0eKXp6+AKci1nnIg=:AmazonSES
-X-SES-Outgoing: 2024.02.11-23.251.234.3
 
-In the case of a process such as mapping a json to a structure,
-it can be difficult if the keys have the same name but different types.
-Since handle is used in hex string, change it to fw.
+When CONFIG_PTP_1588_CLOCK=m and CONFIG_TI_ICSSG_PRUETH=y, there are
+kconfig dependency warnings and build errors referencing PTP functions.
 
-Signed-off-by: Takanori Hirano <me@hrntknr.net>
+Fix these by making TI_ICSSG_PRUETH depend on PTP_1588_CLOCK_OPTIONAL.
+
+Fixes these build errors and warnings:
+
+WARNING: unmet direct dependencies detected for TI_ICSS_IEP
+  Depends on [m]: NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_TI [=y] && PTP_1588_CLOCK_OPTIONAL [=m] && TI_PRUSS [=y]
+  Selected by [y]:
+  - TI_ICSSG_PRUETH [=y] && NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_TI [=y] && PRU_REMOTEPROC [=y] && ARCH_K3 [=y] && OF [=y] && TI_K3_UDMA_GLUE_LAYER [=y]
+
+aarch64-linux-ld: drivers/net/ethernet/ti/icssg/icss_iep.o: in function `icss_iep_get_ptp_clock_idx':
+icss_iep.c:(.text+0x1d4): undefined reference to `ptp_clock_index'
+aarch64-linux-ld: drivers/net/ethernet/ti/icssg/icss_iep.o: in function `icss_iep_exit':
+icss_iep.c:(.text+0xde8): undefined reference to `ptp_clock_unregister'
+aarch64-linux-ld: drivers/net/ethernet/ti/icssg/icss_iep.o: in function `icss_iep_init':
+icss_iep.c:(.text+0x176c): undefined reference to `ptp_clock_register'
+
+Fixes: 186734c15886 ("net: ti: icssg-prueth: add packet timestamping and ptp support")
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Roger Quadros <rogerq@ti.com>
+Cc: Md Danish Anwar <danishanwar@ti.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org
+Reviewed-by: MD Danish Anwar <danishanwar@ti.com>
 ---
-Changes in v2:
- - Modified to use print_nl.
- - Modified to use print_0xhex from print_hex.
----
- tc/f_fw.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+v2: removed Rev-by: from Roger Quadros (patch has changed)
+    added Rev-by: from MD Danish Anwar
 
-diff --git a/tc/f_fw.c b/tc/f_fw.c
-index fe99cd42..5e72e526 100644
---- a/tc/f_fw.c
-+++ b/tc/f_fw.c
-@@ -124,16 +124,16 @@ static int fw_print_opt(struct filter_util *qu, FILE *f, struct rtattr *opt, __u
- 	if (handle || tb[TCA_FW_MASK]) {
- 		__u32 mark = 0, mask = 0;
- 
--		open_json_object("handle");
-+		open_json_object("fw");
- 		if (handle)
- 			mark = handle;
- 		if (tb[TCA_FW_MASK] &&
- 		    (mask = rta_getattr_u32(tb[TCA_FW_MASK])) != 0xFFFFFFFF) {
--			print_hex(PRINT_ANY, "mark", "handle 0x%x", mark);
--			print_hex(PRINT_ANY, "mask", "/0x%x ", mask);
-+			print_0xhex(PRINT_ANY, "mark", "handle 0x%x", mark);
-+			print_0xhex(PRINT_ANY, "mask", "/0x%x ", mask);
- 		} else {
--			print_hex(PRINT_ANY, "mark", "handle 0x%x ", mark);
--			print_hex(PRINT_JSON, "mask", NULL, 0xFFFFFFFF);
-+			print_0xhex(PRINT_ANY, "mark", "handle 0x%x ", mark);
-+			print_0xhex(PRINT_JSON, "mask", NULL, 0xFFFFFFFF);
- 		}
- 		close_json_object();
- 	}
-@@ -155,7 +155,7 @@ static int fw_print_opt(struct filter_util *qu, FILE *f, struct rtattr *opt, __u
- 	}
- 
- 	if (tb[TCA_FW_ACT]) {
--		print_string(PRINT_FP, NULL, "\n", "");
-+		print_nl();
- 		tc_print_action(f, tb[TCA_FW_ACT], 0);
- 	}
- 	return 0;
--- 
-2.34.1
+ drivers/net/ethernet/ti/Kconfig |    1 +
+ 1 file changed, 1 insertion(+)
 
+diff -- a/drivers/net/ethernet/ti/Kconfig b/drivers/net/ethernet/ti/Kconfig
+--- a/drivers/net/ethernet/ti/Kconfig
++++ b/drivers/net/ethernet/ti/Kconfig
+@@ -189,6 +189,7 @@ config TI_ICSSG_PRUETH
+ 	select TI_K3_CPPI_DESC_POOL
+ 	depends on PRU_REMOTEPROC
+ 	depends on ARCH_K3 && OF && TI_K3_UDMA_GLUE_LAYER
++	depends on PTP_1588_CLOCK_OPTIONAL
+ 	help
+ 	  Support dual Gigabit Ethernet ports over the ICSSG PRU Subsystem.
+ 	  This subsystem is available starting with the AM65 platform.
 
