@@ -1,156 +1,108 @@
-Return-Path: <netdev+bounces-70834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A938B850AF4
-	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 20:01:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35146850AF7
+	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 20:03:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DB162830BA
-	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 19:01:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F9C11C20D5A
+	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 19:03:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14D555C614;
-	Sun, 11 Feb 2024 19:01:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E7AC5C614;
+	Sun, 11 Feb 2024 19:03:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="BkD+fH+r"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cmLN/F6Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3824FC19;
-	Sun, 11 Feb 2024 19:01:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECB265B5AD
+	for <netdev@vger.kernel.org>; Sun, 11 Feb 2024 19:03:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707678073; cv=none; b=lXvQodI1VC6BdQvUvpwuK2BpO5Eik4BB02cjt4CL00NfpzK304RW85/lMzDiP1d/ivh4Ws/lzaYlBtY4YIkugJKSvZoW+bandY32ogqyE9JGiGqUva9T/O7rBS8OoJwWu+6hk9lhVA+5i20Avp20eZSH5oGw58Yp/EGoXefMCvo=
+	t=1707678201; cv=none; b=nXrIeHIkYJ9QpEttkw7MRSQxHRmPGmnuA5bSQDteLjDj36c1Ak8tZK1c0dZkOxtbfkr5YAyCycZ4+QH7ssZMpJMIi8VEU8DHOH7MbJyEdFi6v3M1vObq5RjzO0TfyUicP9la4jEUSj5xKLO8bUpO/u8+OKXQpaAj/g7J9GbHDb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707678073; c=relaxed/simple;
-	bh=iXqgltiNWMeREVG2IgdwnDtKL7c9qYrYyK47aZwyx/A=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kj0h2WmDdPkvQB4aLGZLcuI0cTtp8PnDfYdg8bZoXzT3KgnWtsh5OUd0wsOtqTgZNK3/2jyarqmGMvIp1Gz9lsg9VL337fm5abzczCuK74kSVSTcHGi/zim9xT3CBdZLZ1ydSo8HOxQbubjg66jRT5SeJmJOhMR/gw7plZrKWN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=BkD+fH+r; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41BHHFW8001164;
-	Sun, 11 Feb 2024 11:00:51 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	from:to:cc:subject:date:message-id:mime-version:content-type; s=
-	pfpt0220; bh=VvbYldxYnXsS96SYiXwHOhAk8nowSqwq/5cF6ZdNFVE=; b=BkD
-	+fH+riPTEveS5/MIPUfCTGyoLaQVqanKSqongD6EK2RcyCvUHNh4G0Gt5prabwvG
-	5WfpvZY9hFyMaeQ5B0N5FDKFFWx6DagLvg0BZJ1x3+QH5CJj/Y6rmzxXN1Y7Bgx8
-	33g+A3KyNYUqIC5xLQNgCQbTGnjHq8jMO2isks36jLY0Ekta2PPo1wSYcbxQNy6L
-	unE8hfGx6rv9wPCdwQT6yQ7SGH9w4T9IE9tatb1L2vwwWZ/MQONGk8vld1RN2eZl
-	Xqr/GcIxIhXnfywetPECmg7Ra8CfiHebMHqAYqj1n3qHd5fkAhT9eelMP7x7s2v8
-	8ABQiTG4cq2tj3kD/Lw==
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3w69hkaf5s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Sun, 11 Feb 2024 11:00:50 -0800 (PST)
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sun, 11 Feb
- 2024 11:00:44 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Sun, 11 Feb 2024 11:00:44 -0800
-Received: from hyd1358.marvell.com (unknown [10.29.37.11])
-	by maili.marvell.com (Postfix) with ESMTP id 27F9B3F7040;
-	Sun, 11 Feb 2024 11:00:40 -0800 (PST)
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <sgoutham@marvell.com>, <lcherian@marvell.com>,
-        <gakula@marvell.com>, <hkelam@marvell.com>, <naveenm@marvell.com>,
-        <horms@kernel.org>, Subbaraya Sundeep <sbhatta@marvell.com>
-Subject: [PATCH net] octeontx2-af: Remove the PF_FUNC validation for NPC transmit rules
-Date: Mon, 12 Feb 2024 00:30:38 +0530
-Message-ID: <1707678038-13062-1-git-send-email-sbhatta@marvell.com>
-X-Mailer: git-send-email 2.7.4
+	s=arc-20240116; t=1707678201; c=relaxed/simple;
+	bh=H7fOyObAV3smH0AvGX6lakb6QfWZruk0B1+49U9ZHvE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fbj3nSMakyeU7EZDl5Yut4J9BfYjD/7PkxklSG2S3THcKM0Y/HyKe2qVCQAWEA/H40Bb06M5zvQYystBFBq6DJa2duUjUiUSbvkC8bj30Xlc55N6gd6W9CtrlkOtlOLIQJKuFBNSI+FWN0gcXcR/+/yucNxgmh7D5pPdw1zHd6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cmLN/F6Z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C9D3C433C7;
+	Sun, 11 Feb 2024 19:03:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707678200;
+	bh=H7fOyObAV3smH0AvGX6lakb6QfWZruk0B1+49U9ZHvE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=cmLN/F6ZoGrNumK32v0Qkhldt4E8BJQTIQzVVDlB/QJTvzIN9MUzCM19LRQsqwICd
+	 A8wDKZMXL1wnf3Tbb98HT0Bx/MH/fk6V5Dm0aVbvHMO+frT0FaEDJLKS48DEQh5LXq
+	 Sigd95+Iz+K2yWHbQySb9hNlquc9L6cL2DtWi2l0CSs/DGfUmIxqAnpfoK9OJQFEof
+	 oitUbZxwyRLl3IdLwPtVM2sFR9akM+nKSN1oqxMQrOEjm/1RB8+whfqYWrSvO1e6uF
+	 I8FWb55AYmhK/kRz/mxAGZNKBQaYc7JlAUMK6oWs3pKtRHX8bRpv1ojjrwH7/ASNjH
+	 HqoscNJgOD1yw==
+Message-ID: <5d12353d-8c1b-4dcb-a908-5ccb8081970b@kernel.org>
+Date: Sun, 11 Feb 2024 12:03:19 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: lOadyMm9hJ2FjQXRiqGWZMf2HnLd85ui
-X-Proofpoint-GUID: lOadyMm9hJ2FjQXRiqGWZMf2HnLd85ui
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-11_17,2024-02-08_01,2023-05-22_02
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] ipv4: Set the routing scope properly in
+ ip_route_output_ports().
+Content-Language: en-US
+To: Guillaume Nault <gnault@redhat.com>, David Miller <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, James Chapman <jchapman@katalix.com>,
+ Taehee Yoo <ap420073@gmail.com>
+References: <dacfd2ab40685e20959ab7b53c427595ba229e7d.1707496938.git.gnault@redhat.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <dacfd2ab40685e20959ab7b53c427595ba229e7d.1707496938.git.gnault@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-NPC transmit side mcam rules can use the pcifunc (in packet metadata
-added by hardware) of transmitting device for mcam lookup similar to
-the channel of receiving device at receive side.
-The commit 18603683d766 ("octeontx2-af: Remove channel verification
-while installing MCAM rules") removed the receive side channel
-verification to save hardware MCAM filters while switching packets
-across interfaces but missed removing transmit side checks.
-This patch removes transmit side rules validation.
+On 2/9/24 9:43 AM, Guillaume Nault wrote:
+> Set scope automatically in ip_route_output_ports() (using the socket
+> SOCK_LOCALROUTE flag). This way, callers don't have to overload the
+> tos with the RTO_ONLINK flag, like RT_CONN_FLAGS() does.
+> 
+> For callers that don't pass a struct sock, this doesn't change anything
+> as the scope is still set to RT_SCOPE_UNIVERSE when sk is NULL.
+> 
+> Callers that passed a struct sock and used RT_CONN_FLAGS(sk) or
+> RT_CONN_FLAGS_TOS(sk, tos) for the tos are modified to use
+> ip_sock_tos(sk) and RT_TOS(tos) respectively, as overloading tos with
+> the RTO_ONLINK flag now becomes unnecessary.
+> 
+> In drivers/net/amt.c, all ip_route_output_ports() calls use a 0 tos
+> parameter, ignoring the SOCK_LOCALROUTE flag of the socket. But the sk
+> parameter is a kernel socket, which doesn't have any configuration path
+> for setting SOCK_LOCALROUTE anyway. Therefore, ip_route_output_ports()
+> will continue to initialise scope with RT_SCOPE_UNIVERSE and amt.c
+> doesn't need to be modified.
+> 
+> Also, remove RT_CONN_FLAGS() and RT_CONN_FLAGS_TOS() from route.h as
+> these macros are now unused.
+> 
+> The objective is to eventually remove RTO_ONLINK entirely to allow
+> converting ->flowi4_tos to dscp_t. This will ensure proper isolation
+> between the DSCP and ECN bits, thus minimising the risk of introducing
+> bugs where TOS values interfere with ECN.
+> 
+> Signed-off-by: Guillaume Nault <gnault@redhat.com>
+> ---
+>  include/net/route.h             | 7 ++-----
+>  net/ipv4/af_inet.c              | 2 +-
+>  net/ipv4/datagram.c             | 2 +-
+>  net/ipv4/inet_connection_sock.c | 2 +-
+>  net/ipv4/ip_output.c            | 2 +-
+>  net/l2tp/l2tp_ip.c              | 2 +-
+>  6 files changed, 7 insertions(+), 10 deletions(-)
+> 
 
-Fixes: 18603683d766 ("octeontx2-af: Remove channel verification while installing MCAM rules")
-Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
----
- .../net/ethernet/marvell/octeontx2/af/rvu_npc.c    | 32 ----------------------
- 1 file changed, 32 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-index 8cfd74a..e5d6156 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-@@ -61,28 +61,6 @@ int rvu_npc_get_tx_nibble_cfg(struct rvu *rvu, u64 nibble_ena)
- 	return 0;
- }
- 
--static int npc_mcam_verify_pf_func(struct rvu *rvu,
--				   struct mcam_entry *entry_data, u8 intf,
--				   u16 pcifunc)
--{
--	u16 pf_func, pf_func_mask;
--
--	if (is_npc_intf_rx(intf))
--		return 0;
--
--	pf_func_mask = (entry_data->kw_mask[0] >> 32) &
--		NPC_KEX_PF_FUNC_MASK;
--	pf_func = (entry_data->kw[0] >> 32) & NPC_KEX_PF_FUNC_MASK;
--
--	pf_func = be16_to_cpu((__force __be16)pf_func);
--	if (pf_func_mask != NPC_KEX_PF_FUNC_MASK ||
--	    ((pf_func & ~RVU_PFVF_FUNC_MASK) !=
--	     (pcifunc & ~RVU_PFVF_FUNC_MASK)))
--		return -EINVAL;
--
--	return 0;
--}
--
- void rvu_npc_set_pkind(struct rvu *rvu, int pkind, struct rvu_pfvf *pfvf)
- {
- 	int blkaddr;
-@@ -2851,12 +2829,6 @@ int rvu_mbox_handler_npc_mcam_write_entry(struct rvu *rvu,
- 	else
- 		nix_intf = pfvf->nix_rx_intf;
- 
--	if (!is_pffunc_af(pcifunc) &&
--	    npc_mcam_verify_pf_func(rvu, &req->entry_data, req->intf, pcifunc)) {
--		rc = NPC_MCAM_INVALID_REQ;
--		goto exit;
--	}
--
- 	/* For AF installed rules, the nix_intf should be set to target NIX */
- 	if (is_pffunc_af(req->hdr.pcifunc))
- 		nix_intf = req->intf;
-@@ -3208,10 +3180,6 @@ int rvu_mbox_handler_npc_mcam_alloc_and_write_entry(struct rvu *rvu,
- 	if (!is_npc_interface_valid(rvu, req->intf))
- 		return NPC_MCAM_INVALID_REQ;
- 
--	if (npc_mcam_verify_pf_func(rvu, &req->entry_data, req->intf,
--				    req->hdr.pcifunc))
--		return NPC_MCAM_INVALID_REQ;
--
- 	/* Try to allocate a MCAM entry */
- 	entry_req.hdr.pcifunc = req->hdr.pcifunc;
- 	entry_req.contig = true;
--- 
-2.7.4
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
 
