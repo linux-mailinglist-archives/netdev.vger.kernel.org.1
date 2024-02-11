@@ -1,95 +1,92 @@
-Return-Path: <netdev+bounces-70811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A911F85087B
-	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 10:55:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F5E88508B9
+	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 12:03:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 640BF2825DF
-	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 09:55:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 741291C212D8
+	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 11:03:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3FA259B4A;
-	Sun, 11 Feb 2024 09:55:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C83F5A110;
+	Sun, 11 Feb 2024 11:03:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="cozt0i8r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33E9F5917B
-	for <netdev@vger.kernel.org>; Sun, 11 Feb 2024 09:55:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0EE39AFA;
+	Sun, 11 Feb 2024 11:03:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707645307; cv=none; b=tcNn3/dMOxH+XxCLgYVHt5FQAvR00AambuwraLgid3Zgyds8ldZfim50QjpJDQb+T12t5C0E6kbria7Vl9fVKt3Rb+Y6Fp5QB37Kr8JdIZdsk8jnTQUikyEboGv1IJD9S4rIk5uuK4JDpGsbqoks+kY4yt9tgXpXonlPal6tFpg=
+	t=1707649405; cv=none; b=SieJ23GdoXN9uvQKpUCIy4R1thtSmMKO9rnMSR4ART4M8xdApae8n+ssoOiJr64+Vj52rXw5xXxr9x8Ms+idov1+p7yrm3ktGdE4m+i5ganiqkE89KnGXjN5v1dshhCwE6pY3auY2vOexDgnnUrXZn8Scn+17l4rnV8V/Rckekg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707645307; c=relaxed/simple;
-	bh=FamyLudsSv714I4GPKAWQ7S6nKsf1K3Kuh25o0PUvSI=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=MZPjNBsvOa+3qibDoYqMhhZYIpTJEx7zJOlaUGAdwp32x8Fix78ZGgkxmTt4WenNzSMYtV8S1cOkAjv7k9EZ/TsmVd6mZrI+2QdEb7U8g5bBAUxGaPMF2S0q6Kmar06QEI7L+bhNkIBz3y34ZZGosjjpmxinDcZLj88Nt8OLA/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7bf863c324dso213379139f.0
-        for <netdev@vger.kernel.org>; Sun, 11 Feb 2024 01:55:06 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707645305; x=1708250105;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0XuWyRbY4wXt2Mt6STUVYn8j1a+Yq6fdJoZ0a9NfJrs=;
-        b=v1nyXyXC8Kc12oCCq2xlsVMlcZMUu7XYFkTAyCohs9e0NTKxa1cFbla48IcEg07h64
-         7Q/BiYmvl6TXEOC/tVIbdeXHXFCjteeMjD3AhMsc74vsTNIcmiu37yzGF3PjS2DRWwHf
-         motiROdoR/jlXsNMDVIBmma3LRrCAo0z2dVG35d/Lo4JLIeTE23T/45L8pPUckhm2Phs
-         Bg5jJTb+Ta8TwaTP7IMQmcuEF6FLyOiD/UNg8svn/B1ue1nP2AQ+Azt7kKy0RC4d1u7v
-         3Yz0vu7InmxQB7QdH11JFlAY0orqeJUpjbuL9LU3AuQSxENwaW4qTR/c3mzrYgLFh9RC
-         ji0A==
-X-Gm-Message-State: AOJu0YxJwcoKJuyPXemVvd2eHTLyYn6S3AL/hJ93NLe1kAhHeyFJ271c
-	rmNyYwrHvrdzjrZQ9yZeyvfpDEpTok0w0dTQa5Uwelx2TLYtg/6smx4QQMqLN1Wf2mTPGXsulb/
-	BSQA4P6Ue4jCD6nk7r4en8kiKNfkNm0x8mBVSzYq+X74zVXgPUQhD7wk=
-X-Google-Smtp-Source: AGHT+IG3YZniosI/CpDU94Ng7pPafv+1B9bQ4XnJzYI/F435oR3FLGTsEkP6RQryGxVbCbrAEGkfujP1a2FR0BA29P31HNaNZa0p
+	s=arc-20240116; t=1707649405; c=relaxed/simple;
+	bh=FDdtAun0HW0ZCG+7jGqPTp9NYni7KLx7GZ2BuE1pnyg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KcT4A5GeNyzN89f350DOE5mDrhqweO2Muf7zAGhtC6znGe/rcIjqPKcQF1Bsa35kJJ9ycKGF3ZaH80e57CaI9739AI95xVokYNCzxlThSG3+xEuQaABj+dN6MSshTO/oOuvk4yKqyDlsTocHwRbAIy4pQw9H1xC1ofFBBG7PfNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=cozt0i8r; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 588E6C433C7;
+	Sun, 11 Feb 2024 11:03:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1707649404;
+	bh=FDdtAun0HW0ZCG+7jGqPTp9NYni7KLx7GZ2BuE1pnyg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cozt0i8rdiBzTyfc2xuxTGSKFdLM5CAqsJ0pdhjVwqF1jfVelDbSUjbQvBOnaR0TQ
+	 gMqYno4f2v4F6nzEn8W/URuXQaE3hV/XRAj2oJtRQG6ARHAKv3xFi08YOvQ34vzf67
+	 SfaZbt/zuR3dg3jM5iRZuq5yfPTWl+Fpd3//KeEw=
+Date: Sun, 11 Feb 2024 11:03:21 +0000
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: David Ahern <dsahern@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Saeed Mahameed <saeed@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>, Leon Romanovsky <leonro@nvidia.com>,
+	Jason Gunthorpe <jgg@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+	Leonid Bloch <lbloch@nvidia.com>, Itay Avraham <itayavr@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Aron Silverton <aron.silverton@oracle.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	andrew.gospodarek@broadcom.com, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
+Message-ID: <2024021139-feast-subtitle-f6e3@gregkh>
+References: <20240207072435.14182-1-saeed@kernel.org>
+ <20240207070342.21ad3e51@kernel.org>
+ <ZcRgp76yWcDfEbMy@x130>
+ <20240208181555.22d35b61@kernel.org>
+ <2bdc5510-801a-4601-87a3-56eb941d661a@kernel.org>
+ <20240209145828.30e1d000@kernel.org>
+ <df5d7538-52c6-465c-b250-13532b90c6ae@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:20ee:b0:363:8b04:6df7 with SMTP id
- q14-20020a056e0220ee00b003638b046df7mr338025ilv.0.1707645305395; Sun, 11 Feb
- 2024 01:55:05 -0800 (PST)
-Date: Sun, 11 Feb 2024 01:55:05 -0800
-In-Reply-To: <000000000000a135c0060a2260b3@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000d4a29506111827e7@google.com>
-Subject: Re: [syzbot] [bluetooth?] KASAN: null-ptr-deref Read in ida_free (4)
-From: syzbot <syzbot+51baee846ddab52d5230@syzkaller.appspotmail.com>
-To: akpm@linux-foundation.org, davem@davemloft.net, dvyukov@google.com, 
-	edumazet@google.com, johan.hedberg@gmail.com, kuba@kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, luiz.von.dentz@intel.com, 
-	marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, torvalds@linux-foundation.org, 
-	william.xuanziyang@huawei.com, willy@infradead.org, wzhmmmmm@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <df5d7538-52c6-465c-b250-13532b90c6ae@kernel.org>
 
-syzbot suspects this issue was fixed by commit:
+On Fri, Feb 09, 2024 at 10:01:33PM -0700, David Ahern wrote:
+> >> BTW, there is already a broadcom driver under drivers/misc that seems to
+> >> have a lot of overlap capability wise to this driver. Perhaps a Broadcom
+> >> person could chime in.
+> > 
+> > I'm not aware. Or do you mean bcm-vk? That's a video encoder.
+> 
+> If that specific piece of S/W is a video encoder, why isn't it under
+> drivers/video? Scanning the code it seems to me to fall under the open
+> channel between userspace and F/W which is a common paradigm. But I do
+> not want this to distract from this patch set; really I was just
+> browsing existing drivers for any overlap.
 
-commit af73483f4e8b6f5c68c9aa63257bdd929a9c194a
-Author: Matthew Wilcox (Oracle) <willy@infradead.org>
-Date:   Thu Dec 21 16:53:57 2023 +0000
+It is an "offload-engine" type of thing that was added before we had the
+specific subsystem for it.  It should be moved to drivers/accel/ one of
+these days, want to volunteer to help out with that?  :)
 
-    ida: Fix crash in ida_free when the bitmap is empty
+thanks,
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12fc6ba2180000
-start commit:   b46ae77f6787 Merge tag 'xfs-6.7-fixes-3' of git://git.kern..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6ae1a4ee971a7305
-dashboard link: https://syzkaller.appspot.com/bug?extid=51baee846ddab52d5230
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=127837cce80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12779dc8e80000
-
-If the result looks correct, please mark the issue as fixed by replying with:
-
-#syz fix: ida: Fix crash in ida_free when the bitmap is empty
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+greg k-h
 
