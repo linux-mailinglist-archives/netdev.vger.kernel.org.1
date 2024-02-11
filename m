@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-70838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6037850B11
-	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 20:25:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B232850B21
+	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 20:26:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C9561F22967
-	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 19:25:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F1AA1C22311
+	for <lists+netdev@lfdr.de>; Sun, 11 Feb 2024 19:26:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C12C5D734;
-	Sun, 11 Feb 2024 19:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 844E55D904;
+	Sun, 11 Feb 2024 19:26:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="acOa8Nna"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="RHuZuZSm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 508901E488
-	for <netdev@vger.kernel.org>; Sun, 11 Feb 2024 19:25:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B93AF5D498
+	for <netdev@vger.kernel.org>; Sun, 11 Feb 2024 19:26:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707679531; cv=none; b=U7vsm2JD0WUvKTPKaJXJzQT4AaUjNgpkgPCkmvHk1+T6jb+M/8oenqUU8/wmmk5DERrpC4+IWJMPEgPH9+CW/82ASjL2gG+zwmk3c0VECqcttFcFoR7k3ywQONEYvZ2JeS2NCJe1i8Hivv7VpLHY7Zlx4c+4mD4qoFm16g0d7a4=
+	t=1707679608; cv=none; b=ELJjc5h3UI3jzBpNk7+cet0AZG1ijRHxb9cDfkafCSHqG92WrhZGO1pZJ8+VupwgIxo1ZREc7x8gLje11L1FsBwn6N9srf8IrW0r0SbtRt5YeF7fk2w2fPkw2HT7l+8Jid8cyVCCiTppjJC8/EG5zXFdaMQsa4mLetet8qAyPEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707679531; c=relaxed/simple;
-	bh=Sle139DoIp67za/oY2m2u3daxm2z10McDw/mz8+LmjQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ore+3aDO9tOpOk10r2p3YC8Oge2KRMKna4JWFc6qt2/Wdw+1PEUBd5KIkI4KIXkMt5WaYLhXps3MPkp9FroJ109B56hPgKQo258wCnKmMXhup1KK3PJ0cVl1oRVgXxM4uHFqXGMQReEZPMvTueN+CUgZF0oNq6jlkO7KEF6TQqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=acOa8Nna; arc=none smtp.client-ip=209.85.167.170
+	s=arc-20240116; t=1707679608; c=relaxed/simple;
+	bh=wosQsfega7N12rfYAg+zOLVfClHl8s9tP2vFwpJu7h0=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=PQsD23HUfGQ1uzIEsfkTGSelt2vVDR87ANkKnHgC8ItEtFBUq8Fmde4/ryZkr8ea+PCZMUBV5MglOv10ZujZKLt4jtHp2BxvFdnYr2EpvAIUZdbYg3R8bzsc27TN6v2HcatSOIXKsiiESfXinyuc7Z02YLC8fjPQw7h/WyIsPu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=RHuZuZSm; arc=none smtp.client-ip=209.85.222.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3be9e11ee59so1362524b6e.1
-        for <netdev@vger.kernel.org>; Sun, 11 Feb 2024 11:25:30 -0800 (PST)
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-785bdb57dfaso156388285a.1
+        for <netdev@vger.kernel.org>; Sun, 11 Feb 2024 11:26:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1707679529; x=1708284329; darn=vger.kernel.org;
-        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
+        d=broadcom.com; s=google; t=1707679604; x=1708284404; darn=vger.kernel.org;
+        h=in-reply-to:autocrypt:references:cc:to:from:subject:user-agent
          :mime-version:date:message-id:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=MWG0l3B0C8P5gsXTFnGHhEeVUgNv1AbFYN0thRIajzQ=;
-        b=acOa8Nnag5sxA9rBhZy+CQF11zuMxYDQhWNShCs63M0C4hWKDtB2JSR2HTuvlcsmtR
-         ++Sppk3GbjAiP5h1QdwGqbHQ5b+bbWn68k1vAk2jFIPdNtkMd4wDaGA4pWYdOjOVCUvT
-         Uvz4f6PVqwi/DQ1ReXmEB2o6A+HB2+F+ecf2Q=
+        bh=vdS6+8KjGVBOVyNLxN9h8e5zhSqPDRbwoBU4wPL+1AY=;
+        b=RHuZuZSmcTb9dl3+/lhgkyXWydwioEXwFGfC230Bc2r0SZlEfU4FzhG4S7fIYkln/b
+         5xIpWD9bNg0IewxK2vy5QBS/FeQc9Zqm2Gexm0GEu9ZLKJ4L/PftHZka3nC6DxJSJxPS
+         cHhWZ53Ct+FTTYWW72ovYIrZ9cgzZNB/3iZ8Y=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707679529; x=1708284329;
-        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
+        d=1e100.net; s=20230601; t=1707679604; x=1708284404;
+        h=in-reply-to:autocrypt:references:cc:to:from:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=MWG0l3B0C8P5gsXTFnGHhEeVUgNv1AbFYN0thRIajzQ=;
-        b=rgg1x3nqxpMM6ZmcrErrkT2KZYKRjSoATBSuabp1xSWFT+RWw59UhIrEoP8nthLSKx
-         70Ko58VwMDD1h9TySFkausp3mbVxogFq+7bQV3lR+NB7AisYXOKvfvQFaZmfTSQKSwra
-         eUzTBC30WR45cIMu9uHDyRti3QVrmwOjDnAhxNfB3y1Ea1Pu6Jc83G6oOnalHNw7RJQK
-         VDYgwvLkl2Q189fYF7rWRhxYJtEpJ373Te16uy3aQRK6+cDKmlKtHbaWPM8jSALuTZBu
-         kLTNIm1yeu/VnmiNzxg3Tk5ib4JPzHlVMrZHzOaWEPSgYbFjbc8YR10ww/4uyMV2kJmD
-         bEJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUvIv7LordV4t4d/0IRiEgMcNqSSClME9MV8NEH3xw+wtMv1gUP3tD3vnDn6HwI5VUEzVpY3WZjI3my49+JTCUgwH8AJkcU
-X-Gm-Message-State: AOJu0Yyyx5GeM433PlB+GMYEcioRY6HIvLtZY05dhxCcF3PF/m5gZ603
-	VNQr2rdhkEhWHJ1HVHWIY/UgUf1+zuzHRxsF4zdIA0h8ZGcTKyjtGWjILRzslQ==
-X-Google-Smtp-Source: AGHT+IHr8pWLR3UH/W2wJrHqIINUO01cBokXk9ab9OONwNPPTmzgEDzRQPqE3CzIsgnWkDarq3PRqA==
-X-Received: by 2002:a05:6808:22a4:b0:3c0:2b4e:3a52 with SMTP id bo36-20020a05680822a400b003c02b4e3a52mr5470730oib.27.1707679529404;
-        Sun, 11 Feb 2024 11:25:29 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXGSKUaPgVzRL5Dn1yggV0ATMlSujZyArmD9FtbBhvaRXsHZ13K77EFu4XiDUjuZUpeJyV/+dHptg7CwrIPY7YPMLPQ+cprBQueXVmm9xsMDYLUXqqxCTze0eDIr8n5KUnJVDa26t8GmX9uvlV+cyuwqskY8cek7gWXveY0wq0tFh8wG5hOAKqvZ0v+TE9GFuQbPJHG8Fd5qXpgdFWyqRlKBDl+og0aopcjJwhQ1YHRDZJEiF4LOM1uLLBvhS+C8IZ5lHtfEjSf8R8ICcg21/RcPPEt7L4fUY02q2s2TRbOuDnP72M9VrNXjJsl6PeJ+CT+36IdyxsRwCauMytWNxIkzgzBfwYx3aSWwma+axgXp0auO+rpU19F9BAAebvMirN0LHMF5OsOB92AFOt49X5d5LUpikADtif3PZLzo2suBddJYhM90zZ45yyaplPieySVO6QH7smj69D0778JDJ5m/GsnN7LADv+hyw==
+        bh=vdS6+8KjGVBOVyNLxN9h8e5zhSqPDRbwoBU4wPL+1AY=;
+        b=jHhJukeWgEaOQpptVt6zFJYd5V60UQKRVT/TpR+uXC0YwyjaarKo0ka06p2gOVSTIZ
+         7/N11PCCWbXKB6oyM+ZuHOghZUTzt6HNscLia9FZVJodmw+TLlBca920bqazntQi5eRz
+         Bn+MGduhBNSrivfzR2G/q1rfIoZ+hR5l1Ayqmm9wcsGNrK0fxgAX49f4zkOKyI53h3B7
+         ywdwWBJhZ9PihQMddW8fIcz4lqjbE0DC1R9uVj3+orGGy7/55xZEMqwrrmaIVAF2yxRo
+         lU/Otvq+HtDpmfdfi7EQi/mJD7BaVXdcbpshF4JPB00LKcKf/U7tr9E+I3IoonV40yEC
+         CFfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXJHssuQH+z07k/vKV10tFVI9oN3++jj6IWJRjEFNITLYiSG+Vce2Xf93fO9CCHmIzfiLxsZ8+WeftIGJtuTVG19fm7DC24
+X-Gm-Message-State: AOJu0Yxy9oI3UOvhScCbYNP0HWI5e6RJbcypvS9KwzOjhj1OWOcrcZRf
+	7JR3k3ooPqaq7KAFJ8esSsfIEVE1meINsS8IqoIt3/1mhiLTIp1rIp+OKnevtQ==
+X-Google-Smtp-Source: AGHT+IFNMvA0nHuPdDSf1IfMy1vWE6SDKicE52sgcSGR25bj6Tfu48NHFCHqBW/MCrWhnmSmbK0YFA==
+X-Received: by 2002:a05:620a:229:b0:785:bf01:b90b with SMTP id u9-20020a05620a022900b00785bf01b90bmr9304235qkm.2.1707679604635;
+        Sun, 11 Feb 2024 11:26:44 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXLAS4icWzdcWlYzftqY3A+AQ8ONzfCyPop4pMynuKo8ofT6RSHwAbO9fKyb7/lu+Tq2J5xmGN42q+HQNgyPR8Aqa5sIZS4tZki5QhcukcDJndfnhpS/cU2IBbeTqLmCPrm0/3Nai7CEFMvpcGC/d0DP6Km+OBkrotMGOJ+bUYxZgG1Bb4CV6fB5p9lJTAqxoAREwJHF7U53P++gtndW2opCNexgeQUzEbUwLoguQP2MbN804pNgvWyDawqzeITseZGUjhlwNwmHfIkU+14k7gwaLCqhtltvGQp+y7PRsPEjbO2t0zBj7XN6QUefYkArYJi8dpJt6MeCZXYCtBdie1tWl090C1RHBcspt/4LyL4nlsRjekRYxhrgBJb8TC9MGsYlqq6+B22/XwTI+C0OK1q+HRpzbUeifaek+Qvkey0l/QiTYrEsKMN4fyRtGtj1vcxL0XtXerPYSIQxIbu7GKokv3aK1aAvBdrbA==
 Received: from [192.168.178.137] (f215227.upc-f.chello.nl. [80.56.215.227])
-        by smtp.gmail.com with ESMTPSA id o2-20020a05620a110200b00785d6b12faesm186584qkk.98.2024.02.11.11.25.25
+        by smtp.gmail.com with ESMTPSA id o2-20020a05620a110200b00785d6b12faesm186584qkk.98.2024.02.11.11.26.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 11 Feb 2024 11:25:28 -0800 (PST)
-Message-ID: <60a0a753-47ba-4f80-b93e-2878f214bc3c@broadcom.com>
-Date: Sun, 11 Feb 2024 20:25:21 +0100
+        Sun, 11 Feb 2024 11:26:44 -0800 (PST)
+Message-ID: <6afd3242-a691-4ad5-a849-ab1d02baa6d0@broadcom.com>
+Date: Sun, 11 Feb 2024 20:26:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,6 +75,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] brcmfmac: Remove unnecessary NULL-check.
+From: Arend van Spriel <arend.vanspriel@broadcom.com>
 To: Daniil Dulov <d.dulov@aladdin.ru>, Kalle Valo <kvalo@codeaurora.org>
 Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
  <kuba@kernel.org>, Pieter-Paul Giesberts <pieterpg@broadcom.com>,
@@ -84,7 +85,7 @@ Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
  SHA-cyfmac-dev-list@infineon.com, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
 References: <20240211150516.3475-1-d.dulov@aladdin.ru>
-From: Arend van Spriel <arend.vanspriel@broadcom.com>
+ <60a0a753-47ba-4f80-b93e-2878f214bc3c@broadcom.com>
 Autocrypt: addr=arend.vanspriel@broadcom.com; keydata=
  xsFNBGP96SABEACfErEjSRi7TA1ttHYaUM3GuirbgqrNvQ41UJs1ag1T0TeyINqG+s6aFuO8
  evRHRnyAqTjMQoo4tkfy21XQX/OsBlgvMeNzfs6jnVwlCVrhqPkX5g5GaXJnO3c4AvXHyWik
@@ -128,50 +129,55 @@ Autocrypt: addr=arend.vanspriel@broadcom.com; keydata=
  NKowQLrlMBGXT4NnRNV0+yHmusXPOPIqQCKEtbWSx9s2slQxmXukPYvLnuRJqkPkvrTgjn5d
  eSE0Dkhni4292/Nn/TnZf5mxCNWH1p3dz/vrT6EIYk2GSJgCLoTkCcqaM6+5E4IwgYOq3UYu
  AAgeEbPV1QeTVAPrntrLb0t0U5vdwG7Xl40baV9OydTv7ghjYZU349w1d5mdxg==
-In-Reply-To: <20240211150516.3475-1-d.dulov@aladdin.ru>
+In-Reply-To: <60a0a753-47ba-4f80-b93e-2878f214bc3c@broadcom.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000c14bde0611201f0f"
+	boundary="0000000000003dbe5f06112024f2"
 
---000000000000c14bde0611201f0f
+--0000000000003dbe5f06112024f2
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 2/11/2024 4:05 PM, Daniil Dulov wrote:
-> In this case req will never be NULL, so remove unnecessary check.
+On 2/11/2024 8:25 PM, Arend van Spriel wrote:
+> On 2/11/2024 4:05 PM, Daniil Dulov wrote:
+>> In this case req will never be NULL, so remove unnecessary check.
+>>
+>> Found by Linux Verification Center (linuxtesting.org) with SVACE.
 > 
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
-
-Looks good to me, but when do we call things a "fix" and when is 
-"improvement" more appropriate.
-
-> Fixes: 71bb244ba2fd ("brcm80211: fmac: add USB support for bcm43235/6/8 chipsets")
-Reviewed-by: Arend van Spriel <arend.vanspriel@broadcom.com>
-> Signed-off-by: Daniil Dulov <d.dulov@aladdin.ru>
-> ---
->   drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c | 3 +--
->   1 file changed, 1 insertion(+), 2 deletions(-)
+> Looks good to me, but when do we call things a "fix" and when is 
+> "improvement" more appropriate.
 > 
-> diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c
-> index 9fb68c2dc7e3..38e4e4f32a39 100644
-> --- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c
-> +++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c
-> @@ -455,8 +455,7 @@ brcmf_usbdev_qinit(struct list_head *q, int qsize)
->   	brcmf_err("fail!\n");
->   	while (!list_empty(q)) {
->   		req = list_entry(q->next, struct brcmf_usbreq, list);
-> -		if (req)
-> -			usb_free_urb(req->urb);
-> +		usb_free_urb(req->urb);
->   		list_del(q->next);
->   	}
+>> Fixes: 71bb244ba2fd ("brcm80211: fmac: add USB support for 
+>> bcm43235/6/8 chipsets")
+> Reviewed-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+>> Signed-off-by: Daniil Dulov <d.dulov@aladdin.ru>
+>> ---
+>>   drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c | 3 +--
+>>   1 file changed, 1 insertion(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c 
+>> b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c
+>> index 9fb68c2dc7e3..38e4e4f32a39 100644
+>> --- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c
+>> +++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c
+>> @@ -455,8 +455,7 @@ brcmf_usbdev_qinit(struct list_head *q, int qsize)
+>>       brcmf_err("fail!\n");
+>>       while (!list_empty(q)) {
+>>           req = list_entry(q->next, struct brcmf_usbreq, list);
+>> -        if (req)
+>> -            usb_free_urb(req->urb);
+>> +        usb_free_urb(req->urb);
+>>           list_del(q->next);
+>>       }
+> 
+> Ay you are already touching this code you could consider using 
+> list_for_each_entry_safe().
 
-Ay you are already touching this code you could consider using 
-list_for_each_entry_safe().
+That "Ay you are ..." should be "As you are ...".
 
->   	kfree(reqs);
+>>       kfree(reqs);
 
---000000000000c14bde0611201f0f
+--0000000000003dbe5f06112024f2
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -242,15 +248,15 @@ BtkeSGJx/8dy0h8YmRn+adOrxKXHxhSL8BNn8wsmIZyYWe6fRcBtO3Ks2DOLyHCdkoFlN8x9VUQF
 N2ulEgqCbRKkx+qNirW86eF138lr1gRxzclu/38ko//MmkAYR/+hP3WnBll7zbpIt0jc9wyFkSqH
 p8a1MYICbTCCAmkCAQEwazBbMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1z
 YTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMgUGVyc29uYWxTaWduIDIgQ0EgMjAyMAIMTv1t
-bpIzNUky46LXMA0GCWCGSAFlAwQCAQUAoIHUMC8GCSqGSIb3DQEJBDEiBCAcbAtqOGmy2w0WTDbl
-5HHFym1Bd/smyAEa8na3PU6a5TAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJ
-BTEPFw0yNDAyMTExOTI1MjlaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZIAWUDBAEqMAsGCWCGSAFl
+bpIzNUky46LXMA0GCWCGSAFlAwQCAQUAoIHUMC8GCSqGSIb3DQEJBDEiBCBtWF2Ev2yIh/8UdPyz
+iLAejzoOnNRQzIq/Mfe/6hiuUDAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJ
+BTEPFw0yNDAyMTExOTI2NDRaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZIAWUDBAEqMAsGCWCGSAFl
 AwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEKMAsGCSqGSIb3DQEBBzAL
-BglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEA0ruT1o6890KlsvB4vU4NhiGzvLuoQiELKZbn
-SlqiW5hVd4fJDkn9d20TzdeKhn+PfnqlmdhkKKnQBVJbSzlIpBDxHQR8r1LRKOkulPo22wxOxJXZ
-JEC/6HF5di9LXLIYKFJ8leLacVGqSvi1X8qkrbr72jDqi20pDHBxPr9V8XKWu8gYKKuf9kXRx28z
-YO+hzTHEZ6CuBpbTfETnDzjp3wxEBYtoOp71XoDWcTuT8PcIERkMvyoFE4ohXR9zsyoiKpD5cWjY
-d2/rS77HewnlsftQuqiyamS/uix/2xVuI8GuQT71/iuK10Zcpr/RPxnhqV96+SQeImsqo9sdKril
-9A==
---000000000000c14bde0611201f0f--
+BglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEAVW+wafC2/AO+lSc0XrDaEUi1tncSmlWlz43/
+u/SzIgJpjFimBiYFiWz3775F4lJW+c3gafddFgCu4HYfbV0Jh1jHK+8Zfc5V2zg0GPxk709ltiDS
+zQ7zDGFrpc2SNH6mq/qiswaqZHXPD41ya6dQ6Ybk0HRa+S92wYqc9p48Nk2X4pL8bigO0DufEutA
+L3T3W6agGJrAdvcB6IWNzLMftgfrkl31gR8jNnJjfGWYP/xNPYDt20jSF6QRtYhBk+B9GmAX/qN/
+O4ejLUatg38/0Txfm0i8fCwJPHTTIZkpdMJew0LHz5xoKkfwzmFvKPJp196XyspzM3UWvYa0KxMb
+2g==
+--0000000000003dbe5f06112024f2--
 
