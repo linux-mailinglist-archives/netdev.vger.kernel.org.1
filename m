@@ -1,149 +1,146 @@
-Return-Path: <netdev+bounces-71005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A88758518B1
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 17:10:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF92B8518C6
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 17:16:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BB9F1C21251
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 16:10:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A65A1F2157A
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 16:16:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B1D33D0B4;
-	Mon, 12 Feb 2024 16:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E3F93D0C1;
+	Mon, 12 Feb 2024 16:16:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="JH6CtQId"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YdyawAx8"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2064.outbound.protection.outlook.com [40.107.94.64])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928473D0B3
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 16:10:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.64
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707754225; cv=fail; b=mT4Ej3wsG+a3SvIbaMK4NcQA2Mjkx1IXrKN+ZtO3O0SKMhrAQis1AFFTUBYTUeN0Z6cKnt/K4vRjU1VG55Wh7Bblba+U/D/L7hh+1ZzOqU8DgVOs+fzpRjrSHrcdm4LCRK26mWNM4M8WepNPYk8ZtBo+O0aXE6oE/vXSDaKfXLQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707754225; c=relaxed/simple;
-	bh=7C7VFfzZn/yxIBmjy1OSLH2q+IDwRJIQA53XBC5fRfE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=iTyrUvXGvLWhEZ4RWa066lKB9QS3yifjG6qpx9LQwHO0ztDeOOUk1bpiiO+JnVVXtE9w0WUMjDYSz+7jeVPAqY471DZYRUn+fEmZul5xy3TLll1dFljduiH0uxSsa0PxJMj9h2r7kadef7yfqjNyFzcfCf5DMvCLo4wMJGwRHWw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=JH6CtQId; arc=fail smtp.client-ip=40.107.94.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Hzstk0S8hpxF04Lh0opCDzqQGZwtq/wJ2Oydatwl0gFrygMguy23ZsuK0NO8cLn42Cr1G3scSduGFU3KXcKpW11QZ5yvGoFZnHM5PS1j4uBfJRhhUxPhQIJmUpxc3OSVmBduEC5EGmZ7hvgX98vq3ZcBWVCAixlte5UV+eRQWUmvRQd3bINPvcUFUItqxSA41fcOhXvVILxJ8oPdS//XnhBXSoFFabIHhmTKBqmp3JxU9fCx06rSixhBXoN5xy7ipjfhTu/MaRwiCJlNcz2eSFhHVKMlw+wDBcK80pvV/sDZxdbVsccVysxFxQ+maMd8ALtOLmy6l3Xx/0wGiKxOoQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1V+NmJ8G2KpqlElwt9bsvKjnk2MlrNvdnqgBViQLlg0=;
- b=hd4MOy+cklx+HZ/6XwUbhyba3Q8ppsJbBa/+pxGohn9Yo38epELIbc6+W4mQRbU/N0b87c+kFrnuwxVYDRmOK5BDO6qnz+c7HI9FSSomq3N/h/RcnKKzBZQsdt0nk1b3yybc5uP1Y8xmyuIZzP2+cpRe5GMM476doLKKUHKHEk21mQAO4lhiDEwbX6iaeP+ZZFrWiwoEddEtkvGbTIl/J0VkgTxOnoM+vdnp0IAAYbboGAKslFDKOclIXnHicMJsZrTkVzPLDt2D5jp1TolHvpU5zzTKI8jt/tXdTfc0RFXWA38gioTNFj6l3S9Eehp59KvJZVNITBoY/vRSzSnapg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1V+NmJ8G2KpqlElwt9bsvKjnk2MlrNvdnqgBViQLlg0=;
- b=JH6CtQIdFgDCYZOI9S6KGQq9zKMkPWqc5Tyw4JHUCFaaJDbBlosENnHKKzy00H36aVrtMhcHrYK5hgoTczhEm9pbPfn0yWmXugbRjon7AgNlQkI1/gxmDT5DQGH5VKcwwsH6YouyXmBfvCDAcDxIxmNZgySeVZZzBfOk10Fu4IvKFHytzwb2yG4dYcLAlnKFGDFMIaLcjUkyemsBojyju4brPXM+UBVtFVN5k2v86fbSenD3VOEyukEeFor4V1ov5elYd7ayrqmRRbCXL5wtpLozBmu+Fq6ujto3rd/8mo8fodjIdrJj8p7J6m/MLSI9MlyK1TYbEF/O7aSSIeqNIQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com (2603:10b6:930:24::22)
- by PH7PR12MB5654.namprd12.prod.outlook.com (2603:10b6:510:137::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.25; Mon, 12 Feb
- 2024 16:10:20 +0000
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::d2ef:be54:ae98:9b8a]) by CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::d2ef:be54:ae98:9b8a%7]) with mapi id 15.20.7292.012; Mon, 12 Feb 2024
- 16:10:20 +0000
-Date: Mon, 12 Feb 2024 18:10:16 +0200
-From: Ido Schimmel <idosch@nvidia.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com
-Subject: Re: [PATCH v2 net-next 2/2] rtnetlink: use xarray iterator to
- implement rtnl_dump_ifinfo()
-Message-ID: <ZcpC6Gk9fmJrv80V@shredder>
-References: <20240211214404.1882191-1-edumazet@google.com>
- <20240211214404.1882191-3-edumazet@google.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240211214404.1882191-3-edumazet@google.com>
-X-ClientProxiedBy: LO2P265CA0423.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:a0::27) To CY5PR12MB6179.namprd12.prod.outlook.com
- (2603:10b6:930:24::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15C613D0B6;
+	Mon, 12 Feb 2024 16:16:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707754591; cv=none; b=UxrZbF8xdLcp/3efcZc9Hpyuoe/FBNH0AfoVMD2rAMl7bD+DRdusNABTFqDxL7uuEGRVD7jmbNUISb8T6oG98VRwdhvLDZyEThFIHHyHz+GrwUykS3Jl3LXDEZaLGwozmEeyFF8Ci7qTwIN9dv5LoVhKPG22xIkmMqIyvg+j2TA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707754591; c=relaxed/simple;
+	bh=w8bJqm2zLHqXeQjNSSGkAO8dL3idyJusrSEDubesOA0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=EzHUGVS6z7a/oaLYRKXSKuwmol/7fxBSKrATHla4z6/z1QmC6ncCosMK+O177JXKWgsgmWgrGN4NYT+P0WHJLowJ2ILwzeNhNskC0sf/shHXEL3EpjkdHJdsJUKCc4Yrp/Q1CUFAB/VSD20116OO0+TmhedihnKYIC+wg8gOKco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YdyawAx8; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707754590; x=1739290590;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=w8bJqm2zLHqXeQjNSSGkAO8dL3idyJusrSEDubesOA0=;
+  b=YdyawAx8wE/IlnWympBBgxIYEDTFnQPu9oL4DDacg+5dvMZm6w1d1ePX
+   3SsTa27um+w9ucFg4F85rV2L29olTEWL590zK6EDGKCv/pRVWFkFTFtkG
+   cBReZzljgEanHjmn806mqexb5fMJSUjmW0ot8JOFyZAUOdlAEMAklmUMw
+   oVCGEL8VdWgNfgpwdxdNY3p6cayv/Nd/rIYeVmakTPtPduF4wlpeh675J
+   rdKLj/w1RZuiWjdcDiNyX3g2uv2g07QYqN1U8HDOJdlcaL1KYJGN53tlq
+   /Z/zVnagWlJM+EwzG+oASLjwxxnEqkBFqLeYskF/miJlWa4FMB0RLug+i
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="5551549"
+X-IronPort-AV: E=Sophos;i="6.06,264,1705392000"; 
+   d="scan'208";a="5551549"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 08:16:29 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,264,1705392000"; 
+   d="scan'208";a="33417890"
+Received: from sgruszka-mobl.ger.corp.intel.com (HELO localhost) ([10.252.44.2])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 08:16:25 -0800
+From: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
+To: linux-pm@vger.kernel.org
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>,
+	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+	Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Florian Westphal <fw@strlen.de>,
+	netdev@vger.kernel.org
+Subject: [PATCH v4 0/3] thermal/netlink/intel_hfi: Enable HFI feature only when required
+Date: Mon, 12 Feb 2024 17:16:12 +0100
+Message-Id: <20240212161615.161935-1-stanislaw.gruszka@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR12MB6179:EE_|PH7PR12MB5654:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9680efd8-f600-47bf-b7cd-08dc2be51c8c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	3JTGS6PFc/BCpNx0dRysUizlTDum3y8JGL3Ufh0v3E4XXGQkrFTwlohI9Cym8NzPdLOy0sldM3WZSNpBHp9ht2eEEP73ELITuP1nDON7SsrhRF8Awbf87mPYlnzr6/dq2a+TLf1jTwzxW7raJEeRr0NLwYApcffq7udU9L7She1nZ1WNlnsusApcTKgJtJe9+StXA1fQyMwaz0kaXArTeP6Kdo5jFzBUKFHDyRYkti4k1w+89BFE2GJBG8Et/E8Jhj4ruec8fhJV1UwMAf50WJe/1Y7VKTOa5BfZRwo53rDdRemXKnJskKQ9UVE7j7DQUi02/h0DP95aEQMDY4rnNrHMZGG+KNs26W3zpe4rnJ7sPGKqMVnu+qx1A1y9nCzpB7XJz7lDjxmSPAnmlSvE5QNQUVPnNGusaRgbZqoF6DTSl8FGPaYtP/W3YNTvscm4slohPdiQQhxCp+HW3KaEOogZ17qh3Dyaz0tJqzGr4bFrl1FlgmtmSnPhQl+Gu2KQPtGc+EzCRvP72OVKocd6UCEpwLUHFGtE9qx1JqCfEwQB5jPpjMMwKkEKEIVzr0HyVsi+L2s8ASL5/jsxenb9M1DQoqZ38ZhysVID4tj50z26FCjgaQOvdc6OagW/deXeBvkjiVyiW2F8vVYfzdi2Pw==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(346002)(366004)(136003)(396003)(39860400002)(376002)(230922051799003)(1800799012)(451199024)(186009)(64100799003)(33716001)(86362001)(5660300002)(6916009)(66476007)(66946007)(66556008)(8676002)(8936002)(4326008)(4744005)(478600001)(6512007)(966005)(6486002)(6506007)(2906002)(83380400001)(26005)(41300700001)(38100700002)(6666004)(316002)(9686003)(54906003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?1M/Lp1wQkIVW+McAREQdAG2jjpsCFd5zx1FvtPU96kZrJtDXQvQr6E4zfLtw?=
- =?us-ascii?Q?LlB3UbvFKG2EoGUR0IpOPckgynyPSEO5E73rS+Tit7diU/XSHT/I0kMsEHQ9?=
- =?us-ascii?Q?GmuhfcHCjgaVFHPqtCdCKKtLlN3dt8CSLsQ3lhoa7Yw9zDK+Tq57Y2ledyAZ?=
- =?us-ascii?Q?MRoejVqvZmXVxNozDH8ITb4j8m1S5H8jkndl+r7kY8KPbo/E2LzWW74XdB2e?=
- =?us-ascii?Q?tH1KBkjnOMC3NUOXTx0xrw0uoG1pTi3Bfg8HJZGjzWo396VaVSZjUKDZU5Pr?=
- =?us-ascii?Q?XEIp/q0ZL3akOLoBZHv8m5XcbeRGJqywmhURJ0HOmlkayowfyD/GtNIWwY2l?=
- =?us-ascii?Q?ewQBlAd0BE3j9p9yTZSfLO4plQnFxjEMe56iQNN/4V3pO1fb3JQvXY/Tu4CA?=
- =?us-ascii?Q?ZcQvgtU6XZm9TNW2FTRlm1nCCy99P86kvlxLICWZVQn7Ys+8RqqfXjsTbAAn?=
- =?us-ascii?Q?XYGlLQ95OcKeQ/dGJfOnZq7IA70igLmlfmaEIxkNrUfFOSJzyYMZzlJZweNv?=
- =?us-ascii?Q?/HyqvGNvrFfDXE0byazpgU5dptFpdnB3gV2JpsOZozGaQvsWX8y0DqXQRVzS?=
- =?us-ascii?Q?ohX7+bBU7p2LE81qfo/bafCvmMqjA+KvuW2MUHAUGYrO79qK/eb/yxxg0j0z?=
- =?us-ascii?Q?JjNAYXgeQ9QCVwVqe8E8+pU3AlSqoQ/1N/mYOXKxEjKQndBX4EZyoNl7JV11?=
- =?us-ascii?Q?wrklmPRQ96cEKPkDbLzCYNfrpWbYpfH/jSymLbeCYXErbaUDK4E/LqfpHFBx?=
- =?us-ascii?Q?p4OJM2rT0rrYigr6XaNKZm76wXhmvbWI1YxQG5HkgZINWToc1NPrKI9AYTz+?=
- =?us-ascii?Q?fSues34/YdwQmKZ1UiUic2RX20QptaQIRvuxhI960fy/ps5knj3xsPgDj8aR?=
- =?us-ascii?Q?RAafS3CLXp3CPuHFgJ7nA4gtIuYm4vB8gy1YCqjJCg03j63NYQNnoSC2TiPm?=
- =?us-ascii?Q?9e7zCuBVYVJO1sfvd6t87zdeeTUAzqYtfq+/SRlqJClzEFeaIpl9kE+Iskrt?=
- =?us-ascii?Q?/mjX/d58DdUh3ujxbNeNIfIEwj0NgusB9tkRQSY8mqio+BjOnqX/DTAfg43M?=
- =?us-ascii?Q?3S6/NsbutbDocE5n5wywTvg4Pbicj9mRmhpix6xCl5YS1y4sDPLaQM3bwtQK?=
- =?us-ascii?Q?QEGUXcJ1GT9ZS2UcK1q5gsAGJCoeWTFkmYw2pGuyov5Z0pNNzgiBf1WILa8y?=
- =?us-ascii?Q?OX2sStsWNIwresx6M9XXrmS1kCBsjvSOAyMyDL18+7M7TngOZlwqNIh+yuzH?=
- =?us-ascii?Q?NlTXn5FG8gqyBLT+BZQa6b1oR0hslK36w6iGIu9XFW1rlazSoNF4ZGrRm1dh?=
- =?us-ascii?Q?zMmfYMy8njptkEQZygWFZosp/xKpab6lqqNbBkNa0zBa37QFheq+x2D/rBx2?=
- =?us-ascii?Q?b5GQD+xCE/PXw3U2qb/DBAlXZGXcqBnFix3JAH7ZOv9yBvp1qBW6axwz07wT?=
- =?us-ascii?Q?7IUEEoy4TD5ZFFcaUh1MuVjMJM3refV6KHVPqF/22vlmxstd85NAVNac96bS?=
- =?us-ascii?Q?Cb3KNHA7StMZ6A8oIImbVHS8ckjeDqGE1jbOP0web7b4THIDZeLsQHxez6cA?=
- =?us-ascii?Q?ivKY1JzhazZoV9G9+NdKq2S+yuYab0jfvOC1Ky6y?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9680efd8-f600-47bf-b7cd-08dc2be51c8c
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6179.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Feb 2024 16:10:20.7446
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ld8+3kRI/L+tG6Hmz8ngZCZjRYHFkMsoSFnKR0SJaQaOeR9WXB/kcKGWmMC0wNYbJvcAzTsCcxTB2xc/ePUN5g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5654
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sun, Feb 11, 2024 at 09:44:04PM +0000, Eric Dumazet wrote:
-> Adopt net->dev_by_index as I did in commit 0e0939c0adf9
-> ("net-procfs: use xarray iterator to implement /proc/net/dev")
-> 
-> This makes sure an existing device is always visible in the dump,
-> regardless of concurrent insertions/deletions.
-> 
-> v2: added suggestions from Jakub Kicinski and Ido Schimmel,
->     thanks for the help !
-> 
-> Link: https://lore.kernel.org/all/20240209142441.6c56435b@kernel.org/
-> Link: https://lore.kernel.org/all/ZckR-XOsULLI9EHc@shredder/
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+The patchset introduces a new genetlink family bind/unbind callbacks
+and thermal/netlink notifications, which allow drivers to send netlink
+multicast events based on the presence of actual user-space consumers.
+This functionality optimizes resource usage by allowing disabling
+of features when not needed.
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Then implement the notification mechanism in the intel_hif driver,
+it is utilized to disable the Hardware Feedback Interface (HFI)
+dynamically. By implementing a thermal genl notify callback, the driver
+can now enable or disable the HFI based on actual demand, particularly
+when user-space applications like intel-speed-select or Intel Low Power
+daemon utilize events related to performance and energy efficiency
+capabilities.
+
+On machines where Intel HFI is present, but there are no user-space
+components installed, we can save tons of CPU cycles.
+
+Changes v3 -> v4:
+
+- Add 'static inline' in patch2
+
+Changes v2 -> v3:
+
+- Fix unused variable compilation warning
+- Add missed Suggested by tag to patch2
+ 
+Changes v1 -> v2:
+
+- Rewrite using netlink_bind/netlink_unbind callbacks.
+
+- Minor changelog tweaks.
+
+- Add missing check in intel hfi syscore resume (had it on my testing,
+but somehow missed in post).
+
+- Do not use netlink_has_listeners() any longer, use custom counter instead.
+To keep using netlink_has_listners() would be required to rearrange 
+netlink_setsockopt() and possibly netlink_bind() functions, to call 
+nlk->netlink_bind() after listeners are updated. So I decided to custom
+counter. This have potential issue as thermal netlink registers before
+intel_hif, so theoretically intel_hif can miss events. But since both
+are required to be kernel build-in (if CONFIG_INTEL_HFI_THERMAL is
+configured), they start before any user-space.
+
+v1: https://lore.kernel.org/linux-pm/20240131120535.933424-1-stanislaw.gruszka@linux.intel.com//
+v2: https://lore.kernel.org/linux-pm/20240206133605.1518373-1-stanislaw.gruszka@linux.intel.com/
+v3: https://lore.kernel.org/linux-pm/20240209120625.1775017-1-stanislaw.gruszka@linux.intel.com/
+
+Stanislaw Gruszka (3):
+  genetlink: Add per family bind/unbind callbacks
+  thermal: netlink: Add genetlink bind/unbind notifications
+  thermal: intel: hfi: Enable interface only when required
+
+ drivers/thermal/intel/intel_hfi.c | 95 +++++++++++++++++++++++++++----
+ drivers/thermal/thermal_netlink.c | 40 +++++++++++--
+ drivers/thermal/thermal_netlink.h | 26 +++++++++
+ include/net/genetlink.h           |  4 ++
+ net/netlink/genetlink.c           | 30 ++++++++++
+ 5 files changed, 180 insertions(+), 15 deletions(-)
+
+-- 
+2.34.1
+
 
