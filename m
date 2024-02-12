@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-71081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 584BA851F3F
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 22:12:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A46C4851F40
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 22:12:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B2B23B20DE0
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 21:12:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C191A1C21E13
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 21:12:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF3254CB46;
-	Mon, 12 Feb 2024 21:12:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC3274CDEB;
+	Mon, 12 Feb 2024 21:12:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MMynDJkV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Nte+dJVF"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53FA14C615
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 21:12:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0D0D4C622
+	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 21:12:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.88
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707772332; cv=none; b=RD0ikrMlFHvB7DgEkzlXvlKhpI2eR4DqCzjhqBCNLPMeIqlTHLdECrFp3WSUHerXFs8WEkEnWzRhWBNC9i9CsCxc5gRbJo15QDfVyfK8oFgQSWb7m+L2tTYDeub7O/TDNucbNB6rnailjPKmAUT7EPVittXBQ+ifxH4x8uQlx6U=
+	t=1707772333; cv=none; b=WIpTLkb0TAkSNBT/aPu7TkCLG93ne8DBJ/v15093TcuONENIIvTS2Q2tWGuThFCy+kuYcxHLNjfgtd2kTf+C7VHak3yiY6xHN6Ru0vrI5rvi7TfU3oo2tsGth7P61yiyF4xX0OU+uRq80P/xpzERe25/7CI30NYuvgfy+NOKHYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707772332; c=relaxed/simple;
-	bh=JbIpaTuIX1/cu9KcpuComWJuoOVQqnBKBf2ryjECVyA=;
+	s=arc-20240116; t=1707772333; c=relaxed/simple;
+	bh=Xht4Khms1kt3D+hw2e0/BEXuWnJQaVHGQ43X/fKioD0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p3CHAdX3ADoo7qRrnkw4UCFQGiJ0wCglOIwgKK5MrxvHuEmVwbQhxwIGKirCxt0VCbpqrEfpnlN0ApllRrgJS3J0R5Ik2+2V5H/k3jOpcYHs8oI6IuoYJN+XjJuDZOaxgbYQxNJACQ/dpeH0CAbZ4er+eOh6klP78ERikQJAujU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MMynDJkV; arc=none smtp.client-ip=192.55.52.88
+	 MIME-Version; b=Qr3mnlS4e5c8Yqj2kBdlUPuDzwHdQO61p2iW2MBk7TXf0x0hgioFu+bSVPvo6sa9CrmFqaOr5SUZz6Xo4lWWaQJ5+eViPcEYjwXP/Tffwz9Ln7LjtYLWL9mphpnSH0kCtUJxV9fE1saEcWaO+oQk4lcaEQJntRV1TGc5lnggEV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Nte+dJVF; arc=none smtp.client-ip=192.55.52.88
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707772330; x=1739308330;
+  t=1707772331; x=1739308331;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=JbIpaTuIX1/cu9KcpuComWJuoOVQqnBKBf2ryjECVyA=;
-  b=MMynDJkVZZ9AEqTosZso9uqxp2xnAykPLHCTeq4hdw5XYqlKOWHbeOwa
-   p9Km45SRLiOfUnH9+zdYXg4FcJpebo3MQJk+C2hibNdelbiRnmadlgz8s
-   jmDhvOto7Ecx2mEpPmI5eRoeVViVuYfKJjn5iBrH8W6+XP5/v5Oi1czsa
-   doY1A5f1OI1KUsG/RCD5uXy7RwtrOEUFi34rz+7nygSgxAE0e8XA5Y+WS
-   rrSjB53DPtPPj1fNDdETrK2H5TjuAvnr7XdPprKevfuNSPKxFCtTZjakz
-   aPr0wYcaoBtodnPYM8rXhH19BdmBimbpkjftNIn5Jxmufdgq4jUz0hhcq
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="436910907"
+  bh=Xht4Khms1kt3D+hw2e0/BEXuWnJQaVHGQ43X/fKioD0=;
+  b=Nte+dJVFjCx80jlvL4F7pMc235rnTSr+djW+YNklmNnruhr4+QE/WlTU
+   Xj4Ww0VkKt4YqFKv5P9JY/Brof/jX6bEsW7V9iMVagA+XrFEpOjSJBunu
+   3AbErnRLgxPQtOZ+023gDYeMcmGUgb38FolAbGw8Hl44nJqo8TUHJganS
+   3LqXvF3Q4G8CRd4c0qVEeeHAFxxi9NaTCQ/riY44ss60ufK2xhzsYnkcd
+   51ekQKdRd7hrh9SIxCFrljRtZL+Gm3cMEOzozIxl1wkCpUePdWq/tkopw
+   V2ft190QrRux8tP4+MMGkV1eic5LfEkmhV6dhYQXeJelcoIxYK9lMPpQ5
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="436910913"
 X-IronPort-AV: E=Sophos;i="6.06,155,1705392000"; 
-   d="scan'208";a="436910907"
+   d="scan'208";a="436910913"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
   by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 13:12:08 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,155,1705392000"; 
-   d="scan'208";a="7335611"
+   d="scan'208";a="7335614"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa005.jf.intel.com with ESMTP; 12 Feb 2024 13:12:07 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -62,13 +62,12 @@ To: davem@davemloft.net,
 	netdev@vger.kernel.org
 Cc: Grzegorz Nitka <grzegorz.nitka@intel.com>,
 	anthony.l.nguyen@intel.com,
-	Jan Glaza <jan.glaza@intel.com>,
-	Michal Michalik <michal.michalik@intel.com>,
+	Anirudh Venkataramanan <anirudh.venkataramanan@intel.com>,
 	Simon Horman <horms@kernel.org>,
 	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: [PATCH net-next 1/5] ice: introduce new E825C devices family
-Date: Mon, 12 Feb 2024 13:11:55 -0800
-Message-ID: <20240212211202.1051990-2-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 2/5] ice: Add helper function ice_is_generic_mac
+Date: Mon, 12 Feb 2024 13:11:56 -0800
+Message-ID: <20240212211202.1051990-3-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20240212211202.1051990-1-anthony.l.nguyen@intel.com>
 References: <20240212211202.1051990-1-anthony.l.nguyen@intel.com>
@@ -82,107 +81,123 @@ Content-Transfer-Encoding: 8bit
 
 From: Grzegorz Nitka <grzegorz.nitka@intel.com>
 
-Introduce new Intel Ethernet E825C family devices.
-Add new PCI device IDs which are going to be supported by the
-driver:
-- 579C: Intel(R) Ethernet Connection E825-C for backplane
-- 579D: Intel(R) Ethernet Connection E825-C for QSFP
-- 579E: Intel(R) Ethernet Connection E825-C for SFP
-- 579F: Intel(R) Ethernet Connection E825-C for SGMII
+E800 series devices have a couple of quirks:
+1. Sideband control queues are not supported
+2. The registers that the driver needs to program for the "Precision
+   Time Protocol (PTP)" feature are different for E800 series devices
+   compared to other devices supported by this driver.
 
-Add helper function ice_is_e825c() to verify if the running device
-belongs to E825C family.
+Both these require conditional logic based on the underlying device we
+are dealing with.
 
-Co-developed-by: Jan Glaza <jan.glaza@intel.com>
-Signed-off-by: Jan Glaza <jan.glaza@intel.com>
-Co-developed-by: Michal Michalik <michal.michalik@intel.com>
-Signed-off-by: Michal Michalik <michal.michalik@intel.com>
+The function ice_is_sbq_supported added by commit 8f5ee3c477a8
+("ice: add support for sideband messages") addresses (1).
+The same function can be used to address (2) as well
+but this just looks weird readability wise in cases that have nothing
+to do with sideband control queues:
+
+	if (ice_is_sbq_supported(hw))
+		/* program register A */
+	else
+		/* program register B */
+
+For these cases, the function ice_is_generic_mac introduced by this
+patch communicates the idea/intention better. Also rework
+ice_is_sbq_supported to use this new function.
+As side-band queue is supported for E825C devices, it's mac_type is
+considered as generic mac_type.
+
+Co-developed-by: Anirudh Venkataramanan <anirudh.venkataramanan@intel.com>
+Signed-off-by: Anirudh Venkataramanan <anirudh.venkataramanan@intel.com>
 Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_common.c | 19 +++++++++++++++++++
- drivers/net/ethernet/intel/ice/ice_common.h |  1 +
- drivers/net/ethernet/intel/ice/ice_devids.h |  8 ++++++++
- drivers/net/ethernet/intel/ice/ice_main.c   |  4 ++++
- 4 files changed, 32 insertions(+)
+ drivers/net/ethernet/intel/ice/ice_common.c   | 12 ++++++++++++
+ drivers/net/ethernet/intel/ice/ice_common.h   |  1 +
+ drivers/net/ethernet/intel/ice/ice_controlq.c |  2 +-
+ drivers/net/ethernet/intel/ice/ice_main.c     |  6 ++++--
+ drivers/net/ethernet/intel/ice/ice_type.h     |  1 +
+ 5 files changed, 19 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 10c32cd80fff..cc8c9f2b72f5 100644
+index cc8c9f2b72f5..a7e6e5c1d06e 100644
 --- a/drivers/net/ethernet/intel/ice/ice_common.c
 +++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -240,6 +240,25 @@ bool ice_is_e823(struct ice_hw *hw)
- 	}
+@@ -169,6 +169,18 @@ static int ice_set_mac_type(struct ice_hw *hw)
+ 	return 0;
  }
  
 +/**
-+ * ice_is_e825c - Check if a device is E825C family device
++ * ice_is_generic_mac - check if device's mac_type is generic
 + * @hw: pointer to the hardware structure
 + *
-+ * Return: true if the device is E825-C based, false if not.
++ * Return: true if mac_type is generic (with SBQ support), false if not
 + */
-+bool ice_is_e825c(struct ice_hw *hw)
++bool ice_is_generic_mac(struct ice_hw *hw)
 +{
-+	switch (hw->device_id) {
-+	case ICE_DEV_ID_E825C_BACKPLANE:
-+	case ICE_DEV_ID_E825C_QSFP:
-+	case ICE_DEV_ID_E825C_SFP:
-+	case ICE_DEV_ID_E825C_SGMII:
-+		return true;
-+	default:
-+		return false;
-+	}
++	return (hw->mac_type == ICE_MAC_GENERIC ||
++		hw->mac_type == ICE_MAC_GENERIC_3K_E825);
 +}
 +
  /**
-  * ice_clear_pf_cfg - Clear PF configuration
+  * ice_is_e810
   * @hw: pointer to the hardware structure
 diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
-index 3e933f75e948..42d45a73359c 100644
+index 42d45a73359c..32fd10de620c 100644
 --- a/drivers/net/ethernet/intel/ice/ice_common.h
 +++ b/drivers/net/ethernet/intel/ice/ice_common.h
-@@ -251,6 +251,7 @@ ice_stat_update32(struct ice_hw *hw, u32 reg, bool prev_stat_loaded,
- 		  u64 *prev_stat, u64 *cur_stat);
- bool ice_is_e810t(struct ice_hw *hw);
- bool ice_is_e823(struct ice_hw *hw);
-+bool ice_is_e825c(struct ice_hw *hw);
+@@ -112,6 +112,7 @@ ice_update_phy_type(u64 *phy_type_low, u64 *phy_type_high,
  int
- ice_sched_query_elem(struct ice_hw *hw, u32 node_teid,
- 		     struct ice_aqc_txsched_elem_data *buf);
-diff --git a/drivers/net/ethernet/intel/ice/ice_devids.h b/drivers/net/ethernet/intel/ice/ice_devids.h
-index a2d384dbfc76..9dfae9bce758 100644
---- a/drivers/net/ethernet/intel/ice/ice_devids.h
-+++ b/drivers/net/ethernet/intel/ice/ice_devids.h
-@@ -71,5 +71,13 @@
- #define ICE_DEV_ID_E822L_10G_BASE_T	0x1899
- /* Intel(R) Ethernet Connection E822-L 1GbE */
- #define ICE_DEV_ID_E822L_SGMII		0x189A
-+/* Intel(R) Ethernet Connection E825-C for backplane */
-+#define ICE_DEV_ID_E825C_BACKPLANE	0x579c
-+/* Intel(R) Ethernet Connection E825-C for QSFP */
-+#define ICE_DEV_ID_E825C_QSFP		0x579d
-+/* Intel(R) Ethernet Connection E825-C for SFP */
-+#define ICE_DEV_ID_E825C_SFP		0x579e
-+/* Intel(R) Ethernet Connection E825-C 1GbE */
-+#define ICE_DEV_ID_E825C_SGMII		0x579f
+ ice_aq_manage_mac_write(struct ice_hw *hw, const u8 *mac_addr, u8 flags,
+ 			struct ice_sq_cd *cd);
++bool ice_is_generic_mac(struct ice_hw *hw);
+ bool ice_is_e810(struct ice_hw *hw);
+ int ice_clear_pf_cfg(struct ice_hw *hw);
+ int
+diff --git a/drivers/net/ethernet/intel/ice/ice_controlq.c b/drivers/net/ethernet/intel/ice/ice_controlq.c
+index e7d2474c431c..ffe660f34992 100644
+--- a/drivers/net/ethernet/intel/ice/ice_controlq.c
++++ b/drivers/net/ethernet/intel/ice/ice_controlq.c
+@@ -666,7 +666,7 @@ bool ice_is_sbq_supported(struct ice_hw *hw)
+ 	/* The device sideband queue is only supported on devices with the
+ 	 * generic MAC type.
+ 	 */
+-	return hw->mac_type == ICE_MAC_GENERIC;
++	return ice_is_generic_mac(hw);
+ }
  
- #endif /* _ICE_DEVIDS_H_ */
+ /**
 diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 2b7960824bc3..b3c24e40ccb6 100644
+index b3c24e40ccb6..1fa3f40743f5 100644
 --- a/drivers/net/ethernet/intel/ice/ice_main.c
 +++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -5752,6 +5752,10 @@ static const struct pci_device_id ice_pci_tbl[] = {
- 	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E823L_1GBE) },
- 	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E823L_QSFP) },
- 	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E822_SI_DFLT) },
-+	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E825C_BACKPLANE), },
-+	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E825C_QSFP), },
-+	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E825C_SFP), },
-+	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E825C_SGMII), },
- 	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E830_BACKPLANE) },
- 	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E830_QSFP56) },
- 	{ PCI_VDEVICE(INTEL, ICE_DEV_ID_E830_SFP) },
+@@ -1649,8 +1649,10 @@ static void ice_clean_sbq_subtask(struct ice_pf *pf)
+ {
+ 	struct ice_hw *hw = &pf->hw;
+ 
+-	/* Nothing to do here if sideband queue is not supported */
+-	if (!ice_is_sbq_supported(hw)) {
++	/* if mac_type is not generic, sideband is not supported
++	 * and there's nothing to do here
++	 */
++	if (!ice_is_generic_mac(hw)) {
+ 		clear_bit(ICE_SIDEBANDQ_EVENT_PENDING, pf->state);
+ 		return;
+ 	}
+diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
+index a508e917ce5f..9ff92dba5823 100644
+--- a/drivers/net/ethernet/intel/ice/ice_type.h
++++ b/drivers/net/ethernet/intel/ice/ice_type.h
+@@ -132,6 +132,7 @@ enum ice_mac_type {
+ 	ICE_MAC_E810,
+ 	ICE_MAC_E830,
+ 	ICE_MAC_GENERIC,
++	ICE_MAC_GENERIC_3K_E825,
+ };
+ 
+ /* Media Types */
 -- 
 2.41.0
 
