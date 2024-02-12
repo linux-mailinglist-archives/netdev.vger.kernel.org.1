@@ -1,129 +1,128 @@
-Return-Path: <netdev+bounces-70975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96C838516EB
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 15:20:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FC2D85170A
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 15:30:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C64651C22407
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 14:20:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F377F281422
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 14:30:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 634403B782;
-	Mon, 12 Feb 2024 14:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E21AB1426C;
+	Mon, 12 Feb 2024 14:30:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="HCqZorbz"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="r9U9a1Pw"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B00FF3B191;
-	Mon, 12 Feb 2024 14:20:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F20B12E52
+	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 14:30:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707747636; cv=none; b=LHYX9sWedxnNuSYRjqCbYz5R32337bMs7wxjZlndC6btn9JfTrmSf9a1c5KsZEcQflV5pUI6XXDO2XqAq8cdDem/yhjiUejaCXZwxt6oP5cWoN4CPWTfPe236UsJ82L60RYZPQgPRB3GCPX80exV/6K9fZ26hYr9JMXBhVk/f2A=
+	t=1707748250; cv=none; b=qOtyuc1eOzHXNYdQAAB0ow8M+YXtLDf3FJUBoZ17/okKwrw/hakLpOaos1YpQsl0E5Uz3A81p60KDmhq5o49nDMiGHmJd2YE6eS2QEf5m5tV1sEwylTNGngytOnqLG07at43f6gTaS11GoE4oWZetZDW9VRScunc/fiMmqDc82g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707747636; c=relaxed/simple;
-	bh=HOOFzuqzT3fIYr/DIX8rmV3hi9Jkc6ezbSFq2yKsCNk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VG/CRTE13qnovFd4WS8gcTLAkNk+wisACYnOjX+Tp3GU7I+lFd5haHZyw9R9nl4jBephavrdxxF7lr+VUEB2r0veYSBKCbJyXsKb0Ip/hBPvPB+bsel497+bLDflX26rpB29jvQYKyjQah8QH8VuXk//jBnndPeCikhTGVbMQSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=HCqZorbz; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 0A14A240004;
-	Mon, 12 Feb 2024 14:20:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1707747626;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7rZfjdEu2RYZ/9BtHHNLkIKbP50Gk/4PTrBnkkv9ErI=;
-	b=HCqZorbzy0esT9Eqv/sS9A2HZ4FrwPc/w9nx9jaj7DuOm8mxgj0PaRgWzh3jdZ9NbCOENL
-	63gi1eZ8V05xzYU+5d4HG8vIdGBid9lAJaH/XrJq6obsJSREHR+qvy/iqMsZAZvHZ1pQB6
-	yBcCy1YzjUqElDP4fDnwpM8RIknbl5fJ7KxsqeXwhl2iUHLx3OIXOS+lF46ITJQHzcaIAN
-	q7/oWSa5EItG6QLW4IUMlLgNQywuaw/+4aPDawbHlvep8ZtTaO14bs+nLGsIQszn0JBk/7
-	+Hljz66sK0u46tlT3ZmnMEOnVaB6/aBbX7tQ8MJ0KONxqtfUdGAiNbu3O6v9XA==
-Date: Mon, 12 Feb 2024 15:20:22 +0100
-From: Herve Codina <herve.codina@bootlin.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Yury Norov
- <yury.norov@gmail.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew@lunn.ch>, Mark Brown
- <broonie@kernel.org>, Christophe Leroy <christophe.leroy@csgroup.eu>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v3 RESEND 3/6] bitmap: Make bitmap_onto() available to
- users
-Message-ID: <20240212152022.75b10268@bootlin.com>
-In-Reply-To: <ZcokwpMb6SFWhLBB@smile.fi.intel.com>
-References: <20240212075646.19114-1-herve.codina@bootlin.com>
-	<20240212075646.19114-4-herve.codina@bootlin.com>
-	<ZcoOpPb9HfXOYmAr@smile.fi.intel.com>
-	<20240212143753.620ddd6e@bootlin.com>
-	<ZcokwpMb6SFWhLBB@smile.fi.intel.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1707748250; c=relaxed/simple;
+	bh=p9vOfnePUV1vkqui1jKfajElpdn9UJuYx8Lvstoz6CI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=W6OnI8AZ1/meanaOmAaHh2cYOX2S8l1KwLsRzdi+xA6SCmu+N4fHR9YIlqygt6hMUg4y5EgQefyLu4H2i3c7bOVirx77ZORE5dlFKWTKE492EjgOvaWa2+klV3sDzRzfGFXiOuSHI+Yd7evIIC+wtLlPR73W4gcqNFggqxdxvk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=r9U9a1Pw; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-60777bcfed2so1558847b3.1
+        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 06:30:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1707748248; x=1708353048; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nHfkimgnQqa9pmxY7xUwBKCcRRo2tt3mrL+Jov7rDrk=;
+        b=r9U9a1Pw73I69igyrW9NlH78GGf5gDZmZKKgnw6XWrNLiiMNqaSQNDy2QC3h5P4Uxb
+         VXqfE21VeNRMcrQHYMqOX5RWlU+3x/z7FJcnusOiRxIu7Bfu/mC4iaNWEqhWgI1Phgzn
+         jDFGH0Spl0dfM6R5TN8d24wMLyotgqvfYhJHUqSCk3flNzMrKKA/qyuJGC7YfGcUAqbT
+         l29o75QeuEFg7vPZ/amcg+3Pa0gVnoYAcQcCJfpQqclhv0qbTTwTgLHvtdE4UGY2yKcu
+         +iW/SXgG2Eu9eLRRX8mWus1wVk84QVuMClHzK6tKVUKyuIDflG5WZp18Z7LXHa69UZ5n
+         WCtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707748248; x=1708353048;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nHfkimgnQqa9pmxY7xUwBKCcRRo2tt3mrL+Jov7rDrk=;
+        b=KkDiWLen6A1wC2/kJihy7dA6ffGMYvFaM6YUD/P4sgA9UWj/GHhUlZyeCEL+oGub+S
+         BoS32JBG+BI3chqFBxcX5k/ahRidTHBBXhe95E8NjcquMW+LTjE0IuJekjfr+XYhNTCD
+         pxD0qdY93/APSqizdLm/k/x1+mPeRXG2kvXh+Mc5KgZN0al0T7YePgl87hcrYHICfKY1
+         jCPsC2lHlrEYGoKwg2pkHdaSZxxdWNJAdkKmb1k24sVD47xeav6XTuBvKzIiAFpvRZna
+         V3ju7KHArMt1UZcRXF2StyQVa9nv53WPs8m2b7+53A0LKWHMiDRkr3h/ahsjQO9QVPLm
+         dXtw==
+X-Gm-Message-State: AOJu0YwuNLeWA5xUsGQg1BeuJe8uGydRkjoeYPSkCQXj5uBUd3shE2HL
+	hQhHVlREB6JP19Ft5xP/sJsN1V+7l+vNX+5zA/L3VPsFhbxLC9TMxWjnRKcRzkVIMzYLOxexGXp
+	WkRRk7IpjIq8g0LQzcPrtBMthC5OGyKkckIVF
+X-Google-Smtp-Source: AGHT+IGgkXOeWFRC0kD8AvUJh5gqRcJZ7vXLyuTDLZrRPmueX7K9FwVydl54BFjd7DYsYX8pFLa/WxHERXEmf4eoHgk=
+X-Received: by 2002:a0d:dc07:0:b0:604:92e0:c76f with SMTP id
+ f7-20020a0ddc07000000b0060492e0c76fmr6197823ywe.30.1707748248046; Mon, 12 Feb
+ 2024 06:30:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+References: <20240122194801.152658-1-jhs@mojatatu.com> <20240122194801.152658-9-jhs@mojatatu.com>
+ <CALnP8ZZAjsnp=_NhqV6XZ5EaAO-ZKOc=18aHXnRGJvvZQ_0ePg@mail.gmail.com>
+In-Reply-To: <CALnP8ZZAjsnp=_NhqV6XZ5EaAO-ZKOc=18aHXnRGJvvZQ_0ePg@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 12 Feb 2024 09:30:36 -0500
+Message-ID: <CAM0EoM=CKAGm=qi0pxAvJBOR0aQyHDR4OkBsfyg+DcaQqOUD6g@mail.gmail.com>
+Subject: Re: [PATCH v10 net-next 08/15] p4tc: add template pipeline create,
+ get, update, delete
+To: Marcelo Ricardo Leitner <mleitner@redhat.com>
+Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
+	namrata.limaye@intel.com, tom@sipanda.io, Mahesh.Shirshyad@amd.com, 
+	tomasz.osinski@intel.com, jiri@resnulli.us, xiyou.wangcong@gmail.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	vladbu@nvidia.com, horms@kernel.org, khalidm@nvidia.com, toke@redhat.com, 
+	mattyk@nvidia.com, daniel@iogearbox.net, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 12 Feb 2024 16:01:38 +0200
-Andy Shevchenko <andriy.shevchenko@linux.intel.com> wrote:
+On Fri, Feb 9, 2024 at 3:44=E2=80=AFPM Marcelo Ricardo Leitner
+<mleitner@redhat.com> wrote:
+>
+> On Mon, Jan 22, 2024 at 02:47:54PM -0500, Jamal Hadi Salim wrote:
+> > @@ -39,6 +55,27 @@ struct p4tc_template_ops {
+> >  struct p4tc_template_common {
+> >       char                     name[P4TC_TMPL_NAMSZ];
+> >       struct p4tc_template_ops *ops;
+> > +     u32                      p_id;
+> > +     u32                      PAD0;
+>
+> Perhaps __pad0 is more common. But, is it really needed?
+>
 
-> On Mon, Feb 12, 2024 at 02:37:53PM +0100, Herve Codina wrote:
-> > On Mon, 12 Feb 2024 14:27:16 +0200
-> > Andy Shevchenko <andriy.shevchenko@linux.intel.com> wrote:  
-> > > On Mon, Feb 12, 2024 at 08:56:31AM +0100, Herve Codina wrote:  
-> > > > Currently the bitmap_onto() is available only for CONFIG_NUMA=y case,
-> > > > while some users may benefit out of it and being independent to NUMA
-> > > > code.
-> > > > 
-> > > > Make it available to users by moving out of ifdeffery and exporting for
-> > > > modules.    
-> > > 
-> > > Wondering if you are trying to have something like
-> > > https://lore.kernel.org/lkml/20230926052007.3917389-1-andriy.shevchenko@linux.intel.com/  
-> > 
-> > Yes, it looks like.
-> > Can you confirm that your bitmap_scatter() do the same operations as the
-> > existing bitmap_onto() ?  
-> 
-> I have test cases to be 100% sure, but on the first glance, yes it does with
-> the adjustment to the atomicity of the operations (which I do not understand
-> why be atomic in the original bitmap_onto() implementation).
-> 
-> This actually gives a question if we should use your approach or mine.
-> At least the help of bitmap_onto() is kinda hard to understand.
+$ pahole -C p4tc_template_common net/sched/p4tc/p4tc_tmpl_api.o
+struct p4tc_template_common {
+        char                       name[32];             /*     0    32 */
+        struct p4tc_template_ops * ops;                  /*    32     8 */
+        u32                        p_id;                 /*    40     4 */
+        u32                        PAD0;                 /*    44     4 */
 
-Agree, the bitmap_onto() code is simpler to understand than its help.
+        /* size: 48, cachelines: 1, members: 4 */
+        /* last cacheline: 48 bytes */
+};
 
-I introduced bitmap_off() to be the "reverse" bitmap_onto() operations
-and I preferred to avoid duplicating function that do the same things.
+Looks good for 64b alignment. We can change the name.
 
-On my side, I initially didn't use the bitmap_*() functions and did the the
-bits manipulation by hand.
-During the review, it was suggested to use the bitmap_*() family and I followed
-this suggestion. I did tests to be sure that bitmap_onto() and bitmap_off() did
-exactly the same things as my previous code did.
+> > +};
+>
+> Only nit.
+>
+> Reviewed-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
 
-> 
-> > If so, your bitmap_gather() will match my bitmap_off() (patch 4 in this
-> > series).  
-> 
-> Yes.
-> 
+Thanks for this and all the other reviews. Much appreciated!
 
-Regards,
-Hervé
-
+cheers,
+jamal
 
