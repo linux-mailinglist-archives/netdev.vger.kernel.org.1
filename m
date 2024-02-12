@@ -1,139 +1,143 @@
-Return-Path: <netdev+bounces-70962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8689E8513BE
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 13:45:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5169A85151A
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 14:29:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 251831F22196
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 12:45:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 062321F22028
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 13:29:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73E3539FEB;
-	Mon, 12 Feb 2024 12:45:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F37C3A8C5;
+	Mon, 12 Feb 2024 13:15:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z97Mzfsb"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="LlrD02oU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9281A39FDD;
-	Mon, 12 Feb 2024 12:45:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ED943BB27;
+	Mon, 12 Feb 2024 13:15:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707741934; cv=none; b=lh9u3sbyYOhP/r6tVMM2sXsgDtxFdLqcT4F8iCMNoijaGTzE18MN0l94T5hTLtTLm6hlkXRyonjNU9upTJZS6FlYDdNlchzaXF1p3nkLwufJdSe+R8HSX1s2h9TOC3OOOm71Xgweh3oYmK7dcySBbo1kY0KDrCsck3sKWPJeMXQ=
+	t=1707743739; cv=none; b=Rrso4MrNFV97VhHJVpJXTfvKx2doUqNX5p90hpFDT6HsDVOycqm3Jq/dEa6CiGKQtwb/PGb4/fMOWs0g60lORCDZ69oWtUPAWxSI33tvF+suTLb1mgTjTHnARYbtW6XW9e+UrOsRPhOLZwFbMFXBniBbhewvR0wykYcdUGea/Ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707741934; c=relaxed/simple;
-	bh=R7lGqW1nRrkleiW4qjej3N1+KwbZp8lN1euPATaAfwY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AkzPKF+itUnQ+WqM3p6JyS40h6esgda17FKqM0+caxavFfcpTpGkJrNnjBHVwtb+d20Q1PAjfjk6cm7jKRCTRM1I68hiohkgONWjvsfacBnHZIAlMQ+MlIvGgY0GioIlHL6LU8Eg/gmQ3lh8ftNlfya4dye/ZGJ1/cy9L6XbdBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z97Mzfsb; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2d0a0e40672so27578481fa.0;
-        Mon, 12 Feb 2024 04:45:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707741930; x=1708346730; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=/Zrg9lawr/yZkm6/WrtjsywNEEEuh2zE0RbUtlneaNE=;
-        b=Z97MzfsbWYqxiVawUbq52ea6cVIjsTWAqg1sgEVkC8ihw0Zetqq7FCRSotFW2FjAdc
-         Pe5xsR/vYd1fLARdrz2jpL3Urx2rvBPL0l24TVU/5JEmAGh9BY6Ag2jymSLrOSoPLJCj
-         5r3tk7aSkZjdyTwHnKz9fN4CTWbiWMRmKUAHNKRKqRtifsRSxj/SF8JOO5qCWp3N0wVA
-         o1l+yPmP+VUYmUeT2rIXxYdAB2oie7XNkemtN8kbl3zclEqi+x/APYsDfZssnx6LM7aC
-         XWOHbktopLDftOrd5W2yMsXOePuC3PoVLhV1A4WW2dnPr2lr9FMIFpDWgH7zrBc+hBQN
-         0v9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707741930; x=1708346730;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/Zrg9lawr/yZkm6/WrtjsywNEEEuh2zE0RbUtlneaNE=;
-        b=w9/XrcI5M+XQBucJkMzmmzfxmifqN/CKCuJgGTx3j/W3Iuu2qLRCDbvzys74eyhd76
-         UQpDz9AyQ7zOX8Yh9r0JCAiFvzwd/Isrk/U0piqHLfA6pABzWcpQA9cB/89yhsOEbMGB
-         o484jhEck4WrbzTLCPUOnZoRaFRst5kfpKc0mBDx8LrzOVfdjWurd8vCjUAYvOsWjomy
-         4PfEizNkBqKn25CsRLzChq3rcJm34B40TO13Sk66qPrlCx6sFrixx7DXFnY6cmJTn4nI
-         eOMp9sHn5SbqYOs+9eCRndieOSNW6ZsQP9CcouM2wIkJzFPCJRjEvbTVho4neFKTzy4Y
-         3wcA==
-X-Gm-Message-State: AOJu0YxDEmGpFT49y+E+ACsMmhgKJZJXiApZ9SgE3wFfm0ZWlMZzzcD4
-	cUT12fFwJH39I1kQNk879GnCGknN22JAjNA5bHHfbTQHZwrzcoe+Ac0oSUP0itD5tSVYDta4VdO
-	f/N1FEV6l9B34O2HmwNVVjFn7L7M=
-X-Google-Smtp-Source: AGHT+IEY3KujpPrwM/jn+Ez7992r5LMWGVQ7to0lh415/BYwip6pQ0nVZ1GyESCLTdzpJiqzB4CemULetGxh5/joSps=
-X-Received: by 2002:a2e:86d7:0:b0:2d0:82f0:ba3b with SMTP id
- n23-20020a2e86d7000000b002d082f0ba3bmr2562140ljj.5.1707741930296; Mon, 12 Feb
- 2024 04:45:30 -0800 (PST)
+	s=arc-20240116; t=1707743739; c=relaxed/simple;
+	bh=GPWCbl61yUJim2BdrG5iAXC+5aBMPzF/H0YW07AjBDs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hVC0GPMA/NmQFe7Q+33o8mD9TKVVRbKhXKn9+lS0uDsEBUuMg/P08wURa6Tz8KtUbIDsmHXe5Ep7Z7m1ZChfPEJ/vPSq1V9DHHPEln3bZtzMUQ4QrrC/200/7ohVKJZVk7EUUfLlndnlovTeArYu1AyZB8CRPLV3PPQXG4LzJhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=LlrD02oU; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41C206BR031621;
+	Mon, 12 Feb 2024 05:15:30 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version:content-type; s=
+	pfpt0220; bh=Kde01VhYq2kfON92ENyLX1k9vjKrWScuB/POulMsTNE=; b=Llr
+	D02oU/bHmATJ99708RnvGyE7J4lnclaVHM8zLwfXh9VeEsntet1CaSkE7pufqzho
+	wTM4lv0oxM4oeo4dbNAtVrKVCddSUehWsvjQdnFXBksZD3x5+TEs0pJP4l1FoH2D
+	2sbvgXigr4fPzhKkgL86leXvDd+TZgHyzhGOkdw9joFGeYiXod6km9akAX5MHgE5
+	lYK49YMiEwZDLau8DdqWIr5h2g97f5Xjrr4n+rsFU6zoimzdWi7CLAJeXj761xj8
+	a2/drfrm5a9tdcba38bCqyjZayetqnv77sd0pQytyaGZU2v7aKbXCFmMq6QXYWM4
+	86ookg/PBwyx6Kvzksw==
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3w69hkc63a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Mon, 12 Feb 2024 05:15:30 -0800 (PST)
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 12 Feb
+ 2024 05:15:28 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Mon, 12 Feb 2024 05:15:28 -0800
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id 760A33F7076;
+	Mon, 12 Feb 2024 05:15:24 -0800 (PST)
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <sgoutham@marvell.com>,
+        <gakula@marvell.com>, <jerinj@marvell.com>, <lcherian@marvell.com>,
+        <sbhatta@marvell.com>, <hkelam@marvell.com>, <naveenm@marvell.com>,
+        <edumazet@google.com>, <pabeni@redhat.com>
+Subject: [net-next] Octeontx2-af: Fetch MAC channel info from firmware
+Date: Mon, 12 Feb 2024 18:45:23 +0530
+Message-ID: <20240212131523.4522-1-hkelam@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240209-realtek_reverse-v6-0-0662f8cbc7b5@gmail.com> <170773502690.28134.16915655104997076968.git-patchwork-notify@kernel.org>
-In-Reply-To: <170773502690.28134.16915655104997076968.git-patchwork-notify@kernel.org>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Mon, 12 Feb 2024 09:45:19 -0300
-Message-ID: <CAJq09z44FnZknHAdmbxXf1F_H2QZW9SysqLLkErdzK70S1k1EQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 00/11] net: dsa: realtek: variants to drivers,
- interfaces to a common module
-To: patchwork-bot+netdevbpf@kernel.org
-Cc: linus.walleij@linaro.org, alsi@bang-olufsen.dk, andrew@lunn.ch, 
-	f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	linux@armlinux.org.uk, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	florian.fainelli@broadcom.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: eK33_tzHHwuto8Przv8s5HAc7Ffr2zf5
+X-Proofpoint-GUID: eK33_tzHHwuto8Przv8s5HAc7Ffr2zf5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-12_09,2024-02-12_03,2023-05-22_02
 
-> Hello:
->
-> This series was applied to netdev/net-next.git (main)
-> by David S. Miller <davem@davemloft.net>:
->
-> On Fri, 09 Feb 2024 02:03:36 -0300 you wrote:
-> > The current driver consists of two interface modules (SMI and MDIO) and
-> > two family/variant modules (RTL8365MB and RTL8366RB). The SMI and MDIO
-> > modules serve as the platform and MDIO drivers, respectively, calling
-> > functions from the variant modules. In this setup, one interface module
-> > can be loaded independently of the other, but both variants must be
-> > loaded (if not disabled at build time) for any type of interface. This
-> > approach doesn't scale well, especially with the addition of more switch
-> > variants (e.g., RTL8366B), leading to loaded but unused modules.
-> > Additionally, this also seems upside down, as the specific driver code
-> > normally depends on the more generic functions and not the other way
-> > around.
-> >
-> > [...]
->
-> Here is the summary with links:
->   - [net-next,v6,01/11] net: dsa: realtek: drop cleanup from realtek_ops
->     https://git.kernel.org/netdev/net-next/c/33f4336cbd32
->   - [net-next,v6,02/11] net: dsa: realtek: introduce REALTEK_DSA namespace
->     https://git.kernel.org/netdev/net-next/c/ded3813b44fe
->   - [net-next,v6,03/11] net: dsa: realtek: convert variants into real drivers
->     https://git.kernel.org/netdev/net-next/c/bce254b839ab
->   - [net-next,v6,04/11] net: dsa: realtek: keep variant reference in realtek_priv
->     https://git.kernel.org/netdev/net-next/c/4667a1db2f55
->   - [net-next,v6,05/11] net: dsa: realtek: common rtl83xx module
->     https://git.kernel.org/netdev/net-next/c/8be040ecd94c
->   - [net-next,v6,06/11] net: dsa: realtek: merge rtl83xx and
- interface modules into realtek_dsa
->     https://git.kernel.org/netdev/net-next/c/98b75c1c149c
->   - [net-next,v6,07/11] net: dsa: realtek: get internal MDIO node by name
->     https://git.kernel.org/netdev/net-next/c/8685c98d45c5
->   - [net-next,v6,08/11] net: dsa: realtek: clean user_mii_bus setup
->     https://git.kernel.org/netdev/net-next/c/68c66d8d8a19
->   - [net-next,v6,09/11] net: dsa: realtek: migrate user_mii_bus setup to realtek_dsa
->     https://git.kernel.org/netdev/net-next/c/b4bd77971f3c
->   - [net-next,v6,10/11] net: dsa: realtek: use the same mii bus driver for both interfaces
->     https://git.kernel.org/netdev/net-next/c/bba140a566ed
->   - [net-next,v6,11/11] net: dsa: realtek: embed dsa_switch into realtek_priv
->     https://git.kernel.org/netdev/net-next/c/9fc469b2943d
->
-> You are awesome, thank you!
+Packet ingress and egress MAC/serdes channel numbers are configurable
+on CN10K series of silicons. These channel numbers inturn used while
+installing MCAM rules to match ingress/egress port. Fetch these channel
+numbers from firmware at driver init time.
 
-Thank you all involved, especially Vladmir who invested quite some time on this.
+Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
+Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.h     | 10 +++++++++-
+ drivers/net/ethernet/marvell/octeontx2/af/rvu_sdp.c |  8 ++++++++
+ 2 files changed, 17 insertions(+), 1 deletion(-)
 
-Regards,
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+index a1d5fc65b92d..de8eba902276 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+@@ -443,6 +443,13 @@ struct mbox_wq_info {
+ 	struct workqueue_struct *mbox_wq;
+ };
+ 
++struct channel_fwdata {
++	struct sdp_node_info info;
++	u8 valid;
++#define RVU_CHANL_INFO_RESERVED	379
++	u8 reserved[RVU_CHANL_INFO_RESERVED];
++};
++
+ struct rvu_fwdata {
+ #define RVU_FWDATA_HEADER_MAGIC	0xCFDA	/* Custom Firmware Data*/
+ #define RVU_FWDATA_VERSION	0x0001
+@@ -461,7 +468,8 @@ struct rvu_fwdata {
+ 	u64 msixtr_base;
+ 	u32 ptp_ext_clk_rate;
+ 	u32 ptp_ext_tstamp;
+-#define FWDATA_RESERVED_MEM 1022
++	struct channel_fwdata channel_data;
++#define FWDATA_RESERVED_MEM 1014
+ 	u64 reserved[FWDATA_RESERVED_MEM];
+ #define CGX_MAX         9
+ #define CGX_LMACS_MAX   4
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_sdp.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_sdp.c
+index 1edfda0ae3e8..38cfe148f4b7 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_sdp.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_sdp.c
+@@ -56,6 +56,14 @@ int rvu_sdp_init(struct rvu *rvu)
+ 	struct rvu_pfvf *pfvf;
+ 	u32 i = 0;
+ 
++	if (rvu->fwdata->channel_data.valid) {
++		sdp_pf_num[0] = 0;
++		pfvf = &rvu->pf[sdp_pf_num[0]];
++		pfvf->sdp_info = &rvu->fwdata->channel_data.info;
++
++		return 0;
++	}
++
+ 	while ((i < MAX_SDP) && (pdev = pci_get_device(PCI_VENDOR_ID_CAVIUM,
+ 						       PCI_DEVID_OTX2_SDP_PF,
+ 						       pdev)) != NULL) {
+-- 
+2.17.1
 
-Luiz
 
