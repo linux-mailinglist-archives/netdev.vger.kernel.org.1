@@ -1,130 +1,192 @@
-Return-Path: <netdev+bounces-70964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7D2F851548
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 14:34:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F28B85156A
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 14:38:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9443C282E1A
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 13:34:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 548C41C2220B
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 13:38:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D78903F9E8;
-	Mon, 12 Feb 2024 13:23:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3EAF4CB35;
+	Mon, 12 Feb 2024 13:28:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gtwvT075"
+	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="K4zSzSVH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B5FF3EA6C
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 13:23:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38DDA3BB36;
+	Mon, 12 Feb 2024 13:28:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.73.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707744229; cv=none; b=rkY55jvwNFj/yKQ3g62G0sL8TCQYrPbAD62/xiTqIbNODSQCg5y2NFk2aASpr9lozTEs5Oz20i0HyddgKjpr8rUIeJtd7hefDhvByu0od1WFgg3AdpNYhE+nP6R0JmcRYtGTYxn3QbtSHZxpA++kUlkoD2iLqIhFZJQjvHsa88o=
+	t=1707744520; cv=none; b=r6XwbcGgRU1xXLRiguH7W9ZUe7AnJOUXFaoV0tVxBFxk3Crax7SQ09tY/Z68fOr3OzjVFnwKr9rhFxBa2TXjcSxUtHxQ5WY1VlWl5Bw1iKxz0Kr2PmjZzt7G4aOPhNjotd3dpzhBQPf/K2d3Tit3vgO/oqdEl7PBZNfoP9m3utE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707744229; c=relaxed/simple;
-	bh=ydSEgrw3vWH0wzxU4QWRY90lfDyvLwBVFaRZ31MUPio=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SXrzNVGi+9ES7i2tfH9NUMHZ4l+QphK6CEjlMscEMa8mCTY5MRgABj58VujNtSF0323aCM+MNmamg9bQHYMv1ZwTnbz3ZVmr34AxxZP/UbokV4asW/BD19GiSPlSB3qURV7b7xTu6vMoEhE5enj+S4VxBym8DiOLgaXl88xnRhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gtwvT075; arc=none smtp.client-ip=209.85.219.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-dc6d9a8815fso3167317276.3
-        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 05:23:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1707744227; x=1708349027; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=I/A7r9NP/0VziEIfxN1XbFV9hH5pFIDQbUZtjpYFKSQ=;
-        b=gtwvT075RsSFOrYLxrG8VHIo/BUCxR3Dz8B/3A+qZ3YZPe/FXIPXXy3b8AW3ekaXka
-         SBaN8TX0PMCqLPsg0VANzW94hR62fwOBFCFbrXsu/dN5w1yAFVAvwNFs9OGi4ZPhUT8T
-         0K79rQJjUkqcEL0NpyK878kUs/sGLusRYbr8C3DwNDXrxjXS/d9JMd+QExUVWSCW1XnF
-         hoFpPlhOhj5nUantFzwhTWaOILdgZACL4GK9vLJ7TOdBY4VWBtWq2/FSA4hkFkxIYM3n
-         u/ruC8Y9i+ymtH2wemeV3K1XK6nfivYZzUxIER03Xjphl4sbbinyOZCpnCDAP5wo77D6
-         TZoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707744227; x=1708349027;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=I/A7r9NP/0VziEIfxN1XbFV9hH5pFIDQbUZtjpYFKSQ=;
-        b=vMjZEjhw+4pCUF+cYRXNjdnZidFKH3pcblL1qH4LRemB5kXS3+u+3cGM1ElGAVrRu7
-         wgL/d8W5XtsCTKEq5yX2P+tnJfIQz8MywHueNq6JVBxZd+dtYmP6krw0m5Mv0bbmr9+l
-         srDOU5tyo9WxEQ6mKldgoBAkdq6QJxn8lbJw2oF4d3un75VAQCEW07VL2wygz8Wvv4TB
-         lKIwZue4mCFeGC8EtqHIP/fqMpgfXpV6hone8uzuMmmm/kAzhhQt+lpvmwS/yUIXhcXh
-         TZ3KagHEX97hwxpTt33wplAj9P1yCH/Snih6Pyam20olfNr0ckoVa8uYchRMGvlSlkM+
-         qBAw==
-X-Forwarded-Encrypted: i=1; AJvYcCVbxSzBomQE96Fcz2iHEu+VLXTZGngzoQIA92SkIjItZKpa8/C/hwu3Dzt/8Qv6r42jqhgq4psJSaT8XDSY6Y9zbnaW2Iw8
-X-Gm-Message-State: AOJu0YyqLT/oVbkFvepus+h4mOAA5mrCKNz4bfN+dP/zM0UD4ajutVQm
-	ZPcaLOpLmaK0ylxRUgzVIMCN95wsfsvxepzbDQ47s0vwx5T9LiAcXo/8rzb0vSgknDytdWP+KyC
-	ib4OipTqxWasXI9B1jFfYp6e8Pz65HY3xzmawjg==
-X-Google-Smtp-Source: AGHT+IFaHXNER64YVI2EmDGuarm5+vqB/KmhTYs8V+V8KJWqxbKjhPCsz8Bj5huKgdacRxl9V59XYT2x99P6pR1T7vY=
-X-Received: by 2002:a05:6902:2489:b0:dc6:421a:3024 with SMTP id
- ds9-20020a056902248900b00dc6421a3024mr6213196ybb.43.1707744225689; Mon, 12
- Feb 2024 05:23:45 -0800 (PST)
+	s=arc-20240116; t=1707744520; c=relaxed/simple;
+	bh=sdo9XeK1t9pbnNljkWcZmwpAYhS38/PhYZdioW+22pg=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MY3JqnDB49KtuP0IZyOXoPZyL6kWSUb/QWcWv3BDaS8MU47F2nsffdRvRSdcj+6Qoblte0j2WaJ+/ABGrXBSJU+HMvwgdXCM1JTrloq8uZ3fDdIkHwPiQ9wiAELcnK2dnzTxO6FKCaksk4waX+v4KlWuh4EhlAxy5obsDG48OUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=K4zSzSVH; arc=none smtp.client-ip=213.160.73.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
+	s=20121; t=1707744514;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PGnywWK+VuepasyvyymY1bcMLIpjuocEbTBNl63teHs=;
+	b=K4zSzSVHDMZqVNAl49y59tHLSIQFnx/1oqewsLZuK2PQ8ar9p4T5qNPzz9rmiRNpGlcAnG
+	hr5xel56BVLHq6jCJ88Po+dEFExez83fezt7AmEhUjqq9RmCqEzS+ogcf071swhvjHndTM
+	2SWRUoH2Dt87gsG5oe3QAIgXJI8sdXA=
+From: Sven Eckelmann <sven@narfation.org>
+To: a@unstable.cc, b.a.t.m.a.n@lists.open-mesh.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ mareklindner@neomailbox.ch, netdev@vger.kernel.org, pabeni@redhat.com,
+ sw@simonwunderlich.de, syzkaller-bugs@googlegroups.com,
+ syzbot <syzbot+a6a4b5bb3da165594cff@syzkaller.appspotmail.com>
+Subject: Re: [syzbot] [batman?] BUG: soft lockup in sys_sendmsg
+Date: Mon, 12 Feb 2024 14:28:32 +0100
+Message-ID: <3281463.44csPzL39Z@ripper>
+In-Reply-To: <000000000000ae28ce06112cb52e@google.com>
+References: <000000000000ae28ce06112cb52e@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240130-wcn3990-firmware-path-v1-0-826b93202964@linaro.org>
- <20240130-wcn3990-firmware-path-v1-2-826b93202964@linaro.org> <03d5d556-9477-4f2e-a737-c2f6a96d97a4@linaro.org>
-In-Reply-To: <03d5d556-9477-4f2e-a737-c2f6a96d97a4@linaro.org>
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Date: Mon, 12 Feb 2024 15:23:35 +0200
-Message-ID: <CAA8EJpratQH5fS9mS8mnK=c9FwHn8n8g5dj+weoyzrobVMOvBQ@mail.gmail.com>
-Subject: Re: [PATCH RFC 2/4] wifi: ath10k: support board-specific firmware overrides
-To: Konrad Dybcio <konrad.dybcio@linaro.org>
-Cc: Kalle Valo <kvalo@kernel.org>, Jeff Johnson <quic_jjohnson@quicinc.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, ath10k@lists.infradead.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="nextPart8334104.T7Z3S40VBb";
+ micalg="pgp-sha512"; protocol="application/pgp-signature"
 
-On Mon, 12 Feb 2024 at 13:12, Konrad Dybcio <konrad.dybcio@linaro.org> wrote:
->
-> On 30.01.2024 17:38, Dmitry Baryshkov wrote:
-> > Different Qualcomm platforms using WCN3990 WiFI chip use SoC-specific
-> > firmware versions with different features. For example firmware for
-> > SDM845 doesn't use single-chan-info-per-channel feature, while firmware
-> > for QRB2210 / QRB4210 requires that feature. Allow board DT files to
-> > override the subdir of the fw dir used to lookup the firmware-N.bin file
-> > decribing corresponding WiFi firmware.
-> >
-> > Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-> > ---
-> >  drivers/net/wireless/ath/ath10k/core.c | 11 ++++++++++-
-> >  drivers/net/wireless/ath/ath10k/core.h |  2 ++
-> >  drivers/net/wireless/ath/ath10k/snoc.c |  3 +++
-> >  3 files changed, 15 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/net/wireless/ath/ath10k/core.c b/drivers/net/wireless/ath/ath10k/core.c
-> > index 0032f8aa892f..ef7ce8b3f8fb 100644
-> > --- a/drivers/net/wireless/ath/ath10k/core.c
-> > +++ b/drivers/net/wireless/ath/ath10k/core.c
-> > @@ -942,11 +942,20 @@ static const struct firmware *ath10k_fetch_fw_file(struct ath10k *ar,
-> >       if (dir == NULL)
-> >               dir = ".";
-> >
-> > +     if (ar->board_name) {
-> > +             snprintf(filename, sizeof(filename), "%s/%s/%s",
-> > +                      dir, ar->board_name, file);
-> > +             ret = firmware_request_nowarn(&fw, filename, ar->dev);
-> > +             ath10k_dbg(ar, ATH10K_DBG_BOOT, "boot fw request '%s': %d\n",
-> > +                        filename, ret);
->
-> Perhaps it'd be useful to move to a more noisy loglevel
+--nextPart8334104.T7Z3S40VBb
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"; protected-headers="v1"
+From: Sven Eckelmann <sven@narfation.org>
+Subject: Re: [syzbot] [batman?] BUG: soft lockup in sys_sendmsg
+Date: Mon, 12 Feb 2024 14:28:32 +0100
+Message-ID: <3281463.44csPzL39Z@ripper>
+In-Reply-To: <000000000000ae28ce06112cb52e@google.com>
+References: <000000000000ae28ce06112cb52e@google.com>
+MIME-Version: 1.0
 
-No, these are details. If the firmware is in place, it is loaded properly.
+On Monday, 12 February 2024 11:26:24 CET syzbot wrote:
+> syzbot found the following issue on:
+> 
+> HEAD commit:    41bccc98fb79 Linux 6.8-rc2
+> git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+> console output: https://syzkaller.appspot.com/x/log.txt?x=14200118180000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=451a1e62b11ea4a6
+> dashboard link: https://syzkaller.appspot.com/bug?extid=a6a4b5bb3da165594cff
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> userspace arch: arm64
+> 
+> Unfortunately, I don't have any reproducer for this issue yet.
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/0772069e29cf/disk-41bccc98.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/659d3f0755b7/vmlinux-41bccc98.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/7780a45c3e51/Image-41bccc98.gz.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+a6a4b5bb3da165594cff@syzkaller.appspotmail.com
+> 
 
+#syz test
 
+From 5984ace8f8df7cf8d6f98ded0eebe7d962028992 Mon Sep 17 00:00:00 2001
+From: Sven Eckelmann <sven@narfation.org>
+Date: Mon, 12 Feb 2024 13:10:33 +0100
+Subject: [PATCH] batman-adv: Avoid infinite loop trying to resize local TT
+
+If the MTU of one of an attached interface becomes too small to transmit
+the local translation table then it must be resized to fit inside all
+fragments (when enabled) or a single packet.
+
+But if the MTU becomes too low to transmit even the header + the VLAN
+specific part then the resizing of the local TT will never succeed. This
+can for example happen when the usable space is 110 bytes and 11 VLANs are
+on top of batman-adv. In this case, at least 116 byte would be needed.
+There will just be an endless spam of
+
+   batman_adv: batadv0: Forced to purge local tt entries to fit new maximum fragment MTU (110)
+
+in the log but the function will never finish. Problem here is that the
+timeout will be halved in each step and will then stagnate at 0 and
+therefore never be able to reduce the table even more.
+
+There are other scenarios possible with a similar result. The number of
+BATADV_TT_CLIENT_NOPURGE entries in the local TT can for example be too
+high to fit inside a packet. Such a scenario can therefore happen also with
+only a single VLAN + 7 non-purgable addresses - requiring at least 120
+bytes.
+
+While this should be handled proactively when:
+
+* interface with too low MTU is added
+* VLAN is added
+* non-purgeable local mac is added
+* MTU of an attached interface is reduced
+* fragmentation setting gets disabled (which most likely requires dropping
+  attached interfaces)
+
+not all of these scenarios can be prevented because batman-adv is only
+consuming events without the the possibility to prevent these actions
+(non-purgable MAC address added, MTU of an attached interface is reduced).
+It is therefore necessary to also make sure that the code is able to handle
+also the situations when there were already incompatible system
+configurations present.
+
+Cc: stable@vger.kernel.org
+Fixes: a19d3d85e1b8 ("batman-adv: limit local translation table max size")
+Reported-by: syzbot+a6a4b5bb3da165594cff@syzkaller.appspotmail.com
+Signed-off-by: Sven Eckelmann <sven@narfation.org>
+---
+ net/batman-adv/translation-table.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/batman-adv/translation-table.c b/net/batman-adv/translation-table.c
+index b95c36765d04..2243cec18ecc 100644
+--- a/net/batman-adv/translation-table.c
++++ b/net/batman-adv/translation-table.c
+@@ -3948,7 +3948,7 @@ void batadv_tt_local_resize_to_mtu(struct net_device *soft_iface)
+ 
+ 	spin_lock_bh(&bat_priv->tt.commit_lock);
+ 
+-	while (true) {
++	while (timeout) {
+ 		table_size = batadv_tt_local_table_transmit_size(bat_priv);
+ 		if (packet_size_max >= table_size)
+ 			break;
 -- 
-With best wishes
-Dmitry
+2.39.2
+
+
+--nextPart8334104.T7Z3S40VBb
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEF10rh2Elc9zjMuACXYcKB8Eme0YFAmXKHQAACgkQXYcKB8Em
+e0ZN1hAAm4AZPTLa+Uy9iVugO8Yew0bm/73u6VXYtlop/Cj88PdsTAvJtgTO1lXw
+Cc23VMSQmgXGVn0kRolo8QnDRDtc4w+icm6LVMJmqHn9YKXiUutDrVjytMUhOglu
+X1iR7iRB4deA36lvm2hS4EQEzJQO+u4qwa1BQnUEg/G2X+p5dgYJKwejoLVrklw+
+ydyxP31lGadzr7FbqZXMRPxcMcMDmAbp4FkhHBfmb9F1UYXJMWpK8efzJlGlyaCb
+kf9Mv7LLUVhXfQmJR9Co27CouKQtI5lMBKBcJglvnFAQ0KqTf0CPn7C0D17V0slN
+6kCwS4+oPqcK/PoTyA6DrszeSpbkmiRel+vtxsQItI90t4D8BIlCPVpA/F3WZIT0
+kERxR0byXoWHLQhkVQr/vs2rBxbCZU6v7PZOrEbTg1W7cfEslXrv9jSyFD51tFNi
+FpH8h5gQJ7Qujcl63MprFvfreKH8JxXHe42yaAxV9h2AmDDzdaPzu3W2uyHDPU2L
+K2VksYSFkoE8H/KHW3UAk2H6eZ30fEBQInYxaE/X/cpZ4ecA7VRXD5cEUlbtMRA8
+fgwPbhebbj2av7TnLrOHf64sngV1sSd7FMfcAIuMeWu29ALH8z0GpIODrseUIRZF
+j3dNrQgQ1viz370WF2AftqaEBEp2+cEpzVoG1MRXbHx+ag2NjaU=
+=1+AJ
+-----END PGP SIGNATURE-----
+
+--nextPart8334104.T7Z3S40VBb--
+
+
+
 
