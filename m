@@ -1,106 +1,110 @@
-Return-Path: <netdev+bounces-71067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 334FC851DD9
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 20:25:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 72213851E1F
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 20:48:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE3012833D1
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 19:25:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DE0628516C
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 19:48:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1A2E4652D;
-	Mon, 12 Feb 2024 19:25:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B00A447A5C;
+	Mon, 12 Feb 2024 19:48:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DDz21uGS"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UsWPT/Zm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C334C99;
-	Mon, 12 Feb 2024 19:25:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9586247773;
+	Mon, 12 Feb 2024 19:48:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707765936; cv=none; b=kDeNZDn8ONmKBh8HvI6cQ42T09pUqFZ3ny0274fPeqoQoV0nKJDN/yCEdwq4v5AGCCdMfGc1WKLRfSn4xrrv6JMU0v4ZOAIV/UiR3j8uUlHZwsPy26pTHURq4P1krmajjYK+gIN6x+8zlyraeS+dBb7WrF3K6TKJ43wSBi3ngrg=
+	t=1707767304; cv=none; b=lP6llfSYBOYnQotVZOifgChRZOrUwQZojoC1Gg2T0Gb02j/D+8XjOpBtlve90Tkzik2eGoigZBOQAyn2vm6c+5Z3zeQnFw2zAkEEiNAjcDja91cVwBFBYF43nAG7IVyF+fu0pSp64aKUusl/ZnUhzBkNS5/S8NfX6gccU1Nldok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707765936; c=relaxed/simple;
-	bh=Ifv2UA2u9qLCFJ4rYKTsSh9pWHc5yMrYJGUYt3+kTfw=;
+	s=arc-20240116; t=1707767304; c=relaxed/simple;
+	bh=0ft2MpYjrV64jvQOY3huDzIg33+d3RYVhImM7BX3V5s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BMUfdvEM3HeqAWEdnj6PuJOt2NTvMnXYFsgU3wZcqAVodR6Cn0MG21UU5kQXynHL5/vnKJ8IFB4y6mSLwVGgr+Em9DV37/09gP7UQwebHBnjzPBv0WC5XboW1USZDGL16ZAW3WizcXE+SScEw93C/jyayzG+5NljK+JPyo85ifU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DDz21uGS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED4BBC433F1;
-	Mon, 12 Feb 2024 19:25:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707765935;
-	bh=Ifv2UA2u9qLCFJ4rYKTsSh9pWHc5yMrYJGUYt3+kTfw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DDz21uGSAJMsQojY4zNQHDBmeYROAhZY2Q9+i8DvurpVDKPCPiQH8JgCnOz06s6pu
-	 yTukdG6zcfgyiwVAXwT5vq2GAnja4b/MVJhJbuZyN7vX1ySzrroxziB5z7srBW0XXR
-	 NOeNhp3DWj8UkwYpi0dyJWDMIvfxjmETxA+WybtyGGaaj4R5y8Eq9+XYAU8BQRh63Q
-	 Gz3dvUbyLJDjlDf82kgKzO0rDpjjdbWVR0HnuGPRKkFeyfdRV4QTOZA5LL9rcav7/b
-	 TXcHeagtkBslcE9CfWYUohb+85o/yr1Y2JofkwQ71QvswEoHkQwoUj2DyKpZN2ufZ/
-	 yzFDs6lewfJ5A==
-Date: Mon, 12 Feb 2024 19:25:30 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] dt-bindings: net: qca,ar9331: convert to DT schema
-Message-ID: <20240212-macaw-dispense-e073f5d73fe3@spud>
-References: <20240212182911.233819-1-krzysztof.kozlowski@linaro.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=nyV3tsD4SCI3byCNqQEBb/yhX/vfL2awTxxJT/ZfM61V6iRoezzoWH+2lTUdLP0FAMTxxDXV6DvIn2ExRftT4l0w4zyARfOox1ZY5V62+dHbrM8+vaTeoKlXk4zosrdB7q9rC770g73yBYv/4Aot0+ljJhJLC0eWOFovVVAYEAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UsWPT/Zm; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=fVTHkRWd/tAUl4w7Ho74/SJnoO1GvKi18/DDs+kPOJQ=; b=UsWPT/Zmyw6Uk9UYdkA4FQJsi0
+	CP4i0Pi2t44a3Xy+SjFAbhLzA7w68xNircdiTCODBXYvNC7obCnDevGXTSCztIeVLgpK2Y1+mhw2H
+	mcSIPYPZhKPhExmAHpNH3Ic7AY+lADuGyzO/VcosFlx2CsZWb/g7SwG19liGTW2tgl9I=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rZcHo-007bYQ-Ma; Mon, 12 Feb 2024 20:48:16 +0100
+Date: Mon, 12 Feb 2024 20:48:16 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Robert Marko <robimarko@gmail.com>
+Cc: andersson@kernel.org, konrad.dybcio@linaro.org, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, ansuelsmth@gmail.com,
+	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: phy: qca807x: move interface mode check to
+ .config_init_once
+Message-ID: <7c5dd47c-26b9-4a12-af93-6139ae85e864@lunn.ch>
+References: <20240212115043.1725918-1-robimarko@gmail.com>
+ <c97d10fa-39c5-4e5e-93ce-1610635cb4d4@lunn.ch>
+ <CAOX2RU6OwiymM_O_62VETgkBNUQP1TuOKJmm0D1ZUXBA7ZPJNA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="fcUA6sBRBV6Rzmja"
-Content-Disposition: inline
-In-Reply-To: <20240212182911.233819-1-krzysztof.kozlowski@linaro.org>
-
-
---fcUA6sBRBV6Rzmja
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <CAOX2RU6OwiymM_O_62VETgkBNUQP1TuOKJmm0D1ZUXBA7ZPJNA@mail.gmail.com>
 
-On Mon, Feb 12, 2024 at 07:29:11PM +0100, Krzysztof Kozlowski wrote:
-> diff --git a/Documentation/devicetree/bindings/net/dsa/qca,ar9331.yaml b/Documentation/devicetree/bindings/net/dsa/qca,ar9331.yaml
-> new file mode 100644
-> index 000000000000..fd9ddc59d38c
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/dsa/qca,ar9331.yaml
-> @@ -0,0 +1,161 @@
-> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+On Mon, Feb 12, 2024 at 07:09:04PM +0100, Robert Marko wrote:
+> On Mon, 12 Feb 2024 at 15:51, Andrew Lunn <andrew@lunn.ch> wrote:
+> >
+> > On Mon, Feb 12, 2024 at 12:49:34PM +0100, Robert Marko wrote:
+> > > Currently, we are checking whether the PHY package mode matches the
+> > > individual PHY interface modes at PHY package probe time, but at that time
+> > > we only know the PHY package mode and not the individual PHY interface
+> > > modes as of_get_phy_mode() that populates it will only get called once the
+> > > netdev to which PHY-s are attached to is being probed and thus this check
+> > > will always fail and return -EINVAL.
+> > >
+> > > So, lets move this check to .config_init_once as at that point individual
+> > > PHY interface modes should be populated.
+> >
+> > Just for my own understanding, not directly about this patch...
+> >
+> > priv->package_mode is about PSGMII vs QSGMII for one of the SERDES
+> > interfaces? We expect the individual PHYs sharing that interface to
+> > also indicate PSGMII or QSGMII?
+> 
+> Yes, that is the idea, all of the individual PHY-s in the package
+> should be indicating
+> the same PHY interface mode.
+> 
+> >
+> > But what about the other SERDES, which can be connected to an SFP
+> > cage. You would normally set that to SGMII, or 1000BaseX. When an SFP
+> > module is inserted, the correct interface mode is then determined from
+> > the contests of the EEPROM and the PCS needs to be reconfigured. So
+> > i'm just wondering how this check works in this situation?
+> 
+> I just went to retest SFP support and it works as intended, as soon as the SFP
+> is inserted, PHY will get reconfigured to "combo" mode so that fifth PHY can
+> support both fiber (100Base-FX or 1000Base-X) or regular copper connections.
+> 
+> So, the check will not interfere with SFP support.
 
-I don't recall whether or not Pengutronix are on the carte blache list
-for relicensing bindings under the dual license.
+So for the port with the SFP you also have phy-mode of PSGMII or
+QSGMII? That then gets changed when the SFP is hot plugged?
 
-Otherwise,
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-
-Cheers,
-Conor.
-
---fcUA6sBRBV6Rzmja
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZcpwqgAKCRB4tDGHoIJi
-0rZBAQCnmSlsUkNKiF1EbeNrwFSMFHCiK7573SU7slOuioXr7QEAqjY2doilVGlZ
-gmamZT+SKO2X7u2G8Nyht4qPQsVNLQ8=
-=4FTj
------END PGP SIGNATURE-----
-
---fcUA6sBRBV6Rzmja--
+	Andrew
 
