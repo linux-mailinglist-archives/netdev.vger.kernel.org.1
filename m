@@ -1,144 +1,112 @@
-Return-Path: <netdev+bounces-71079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 570F4851EF8
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 21:57:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55BCE851F3C
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 22:12:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 899B71C21DBD
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 20:57:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF4B5B20E75
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 21:12:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8362D482EB;
-	Mon, 12 Feb 2024 20:57:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17A5C4B5CD;
+	Mon, 12 Feb 2024 21:12:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="QUPIWdUl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="W2qjlo/H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90474CDE0;
-	Mon, 12 Feb 2024 20:57:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5286C4C601
+	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 21:12:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.88
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707771425; cv=none; b=DMQe3gUCK07O4OIEtDPjc0qhy54JRXE9E1Cfe2jfdOUKFbBHjFceiyBneAgMXXc4F0YW2YjvibO10OwhJjIHSl+YnSIGzjztPYxV7cAWFoscg6iSUB+jM0EYdVaVqTkDrr2QadJEOVE2dFHSGU1oB3ccf2EZhwdp1XjdrMTBSHQ=
+	t=1707772331; cv=none; b=HVfiyQ/ugqLwNTQhfWqDFwxwYIwxeXkt2kMWRstOYjmt6QAeNB3i8uiQidRZUewEvOTIw1QiVy1YUpjJQwiyZ8BOxCTlbtYTw91uiRFQQ/KmXeBp2K8kEbVLqR3w61Jxj1w3RHgrCxQYCGTbk5WG2afrbsWTchYnE7SLcwSY1Io=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707771425; c=relaxed/simple;
-	bh=W5I8hgPwwBAyzQHQfZk2G35oMt4b5jINXtjFVACOhvs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=YUqUrLDC7CIWvAsfe1yka13eLiFNfmZskRCk354TmmD4LhK+qVwiGDxNrRGH+KeB7h78m2M3yCaBvQM7OfJEXiQ00YKCwfDz3LdtcH6KSDJVaVzDWDA2Ymm0HG7mkf/dnxho+QkHSOsZ/g+BSB+YOjeny2BIJLPEooYEYJbtDIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=QUPIWdUl; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41CKNJQD006780;
-	Mon, 12 Feb 2024 20:56:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=OPbrlq1m98uTfCMnFJ6G1tzc5WlIlN1tivo58zQxrRY=; b=QU
-	PIWdUlo/uBqS7JVV3AGQO8/TsAlVn/O58VEoVHUjuA6fD+yLfT57yFWdxQv0Ebmb
-	Q9F8EYWemmfXPZd1QKhV3oJzgJxCtzCHDsZMRMUxyD6SIrJLxLae51d12uMMBc93
-	CopubSGDTgjVZrr6UR8nYI8G9WpQF+XLAaEN67grSswiDZX1uq0MKpRkJUi9NHH/
-	JigG3JSSj8lSY1zbJZfFrdU6v8BXbBjpzzu51AwNYrH/kRfnjryul3ZjFzpgvws1
-	AxKowcJP1YDJmo/QAmf57EBwmB8AMzLhezuWtUYkE8cRjwItwTRDxyMjEYmwdawv
-	Vk/BEJ/k2xYyk6mvBoEg==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3w7tanr1pm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 12 Feb 2024 20:56:53 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41CKuqQ9020216
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 12 Feb 2024 20:56:52 GMT
-Received: from [10.227.110.203] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Mon, 12 Feb
- 2024 12:56:51 -0800
-Message-ID: <08c312f4-f3d3-4980-b998-b28026b5180f@quicinc.com>
-Date: Mon, 12 Feb 2024 12:56:51 -0800
+	s=arc-20240116; t=1707772331; c=relaxed/simple;
+	bh=le4doQl7XUShkIH93blc8YeYAX2UsO2mp/sk0RcAZjA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u0ZyDt4nqlEigdKbD+bkmA0Mxq9tyciiJgyVwcG63JREX332fMnMtphVurbCgcD/aZP7L/i/wPYDa3ieFXAVwXSpgO6fJNdoxdKQSnpMCd8uVcqBC8NhUl27yZcNdiZW2n65JCcHShkKRtq5KXF+yaemHiXckTfOyqCXdBzmiEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=W2qjlo/H; arc=none smtp.client-ip=192.55.52.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707772329; x=1739308329;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=le4doQl7XUShkIH93blc8YeYAX2UsO2mp/sk0RcAZjA=;
+  b=W2qjlo/HMeH4vH6vPI5qx8aVopIKMHDf5QmypH2WRToP6OTFxauvuswx
+   w3c8OeIUsis2BR5zc5ALt8xL+L/DPweswS9zt1Wjcc1UCQoqrVZN6VEh0
+   gDBgsXQNvODlCuInDq0YwHflnAPhvbXt45vZmLtdiBhlBRyBKS5Lm+m5F
+   3U42C0ylnxAT6Jzu/quz9mKrQ+63DyACcsHLFJnKW6QuCH/6UbF/xLa8K
+   3JBl8Tl7Xv2Xvzblv0Oi53qBHNyJTd/bOjP0vyhZ6z4slnVwzgGEVkKWM
+   OGs/8C1iU+Td+H714sMQIAQZfkMKowMv9xQohOjC0PgbFZ4dIq4bjYYXL
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="436910901"
+X-IronPort-AV: E=Sophos;i="6.06,155,1705392000"; 
+   d="scan'208";a="436910901"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 13:12:07 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,155,1705392000"; 
+   d="scan'208";a="7335608"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa005.jf.intel.com with ESMTP; 12 Feb 2024 13:12:07 -0800
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 0/5][pull request] Intel Wired LAN Driver Updates 2024-02-12 (ice)
+Date: Mon, 12 Feb 2024 13:11:54 -0800
+Message-ID: <20240212211202.1051990-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 0/4] wifi: ath10k: support board-specific firmware
- overrides
-Content-Language: en-US
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-        Kalle Valo
-	<kvalo@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio
-	<konrad.dybcio@linaro.org>
-CC: <ath10k@lists.infradead.org>, <linux-wireless@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>
-References: <20240130-wcn3990-firmware-path-v1-0-826b93202964@linaro.org>
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-In-Reply-To: <20240130-wcn3990-firmware-path-v1-0-826b93202964@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: g4-fB0Y-JmWvy8lcJl8LgKG4GzMQwrSp
-X-Proofpoint-ORIG-GUID: g4-fB0Y-JmWvy8lcJl8LgKG4GzMQwrSp
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-12_16,2024-02-12_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
- clxscore=1015 lowpriorityscore=0 spamscore=0 impostorscore=0
- mlxlogscore=925 bulkscore=0 priorityscore=1501 suspectscore=0 adultscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2401310000 definitions=main-2402120162
+Content-Transfer-Encoding: 8bit
 
-On 1/30/2024 8:38 AM, Dmitry Baryshkov wrote:
-> On WCN3990 platforms actual firmware, wlanmdsp.mbn, is sideloaded to the
-> modem DSP via the TQFTPserv. These MBN files are signed by the device
-> vendor, can only be used with the particular SoC or device.
-> 
-> Unfortunately different firmware versions come with different features.
-> For example firmware for SDM845 doesn't use single-chan-info-per-channel
-> feature, while firmware for QRB2210 / QRB4210 requires that feature.
-> 
-> Allow board DT files to override the subdir of the fw dir used to lookup
-> the firmware-N.bin file decribing corresponding WiFi firmware.
-> For example, adding firmware-name = "qrb4210" property will make the
-> driver look for the firmware-N.bin first in ath10k/WCN3990/hw1.0/qrb4210
-> directory and then fallback to the default ath10k/WCN3990/hw1.0 dir.
-> 
-> Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-> ---
-> Dmitry Baryshkov (4):
->       dt-bindings: net: wireless: ath10k: describe firmware-name property
->       wifi: ath10k: support board-specific firmware overrides
->       arm64: dts: qcom: qrb2210-rb1: add firmware-name qualifier to WiFi node
->       arm64: dts: qcom: qrb4210-rb1: add firmware-name qualifier to WiFi node
-> 
->  .../devicetree/bindings/net/wireless/qcom,ath10k.yaml         |  6 ++++++
->  arch/arm64/boot/dts/qcom/qrb2210-rb1.dts                      |  1 +
->  arch/arm64/boot/dts/qcom/qrb4210-rb2.dts                      |  1 +
->  drivers/net/wireless/ath/ath10k/core.c                        | 11 ++++++++++-
->  drivers/net/wireless/ath/ath10k/core.h                        |  2 ++
->  drivers/net/wireless/ath/ath10k/snoc.c                        |  3 +++
->  6 files changed, 23 insertions(+), 1 deletion(-)
-> ---
-> base-commit: 596764183be8ebb13352b281a442a1f1151c9b06
-> change-id: 20240130-wcn3990-firmware-path-7a05a0cf8107
-> 
-> Best regards,
-This series looks OK to me, but would like Kalle to review as well
+This series contains updates to ice driver only.
+
+Grzegorz adds support for E825-C devices.
+
+Wojciech reworks devlink reload to fulfill expected conditions (remove
+and readd).
+
+The following are changes since commit 0f37666d87d2dea42ec21776c3d562b7cbd71612:
+  Merge branch 'net-avoid-slow-rcu'
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 100GbE
+
+Grzegorz Nitka (3):
+  ice: introduce new E825C devices family
+  ice: Add helper function ice_is_generic_mac
+  ice: add support for 3k signing DDP sections for E825C
+
+Wojciech Drewek (2):
+  ice: Remove and readd netdev during devlink reload
+  ice: Fix debugfs with devlink reload
+
+ drivers/net/ethernet/intel/ice/ice.h          |   3 +
+ drivers/net/ethernet/intel/ice/ice_common.c   |  37 ++++
+ drivers/net/ethernet/intel/ice/ice_common.h   |   2 +
+ drivers/net/ethernet/intel/ice/ice_controlq.c |   2 +-
+ drivers/net/ethernet/intel/ice/ice_ddp.c      |   4 +
+ drivers/net/ethernet/intel/ice/ice_debugfs.c  |  10 +
+ drivers/net/ethernet/intel/ice/ice_devids.h   |   8 +
+ drivers/net/ethernet/intel/ice/ice_devlink.c  |  68 +++++-
+ drivers/net/ethernet/intel/ice/ice_fwlog.c    |   2 +
+ drivers/net/ethernet/intel/ice/ice_main.c     | 199 ++++++------------
+ drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+ 11 files changed, 200 insertions(+), 136 deletions(-)
+
+-- 
+2.41.0
+
 
