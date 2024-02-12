@@ -1,89 +1,91 @@
-Return-Path: <netdev+bounces-70983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87D9985177B
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 16:02:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CD008517AE
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 16:11:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 444AA1F210E5
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 15:02:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFC601C21ACA
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 15:11:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFF7A3B794;
-	Mon, 12 Feb 2024 15:02:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7DE53C46E;
+	Mon, 12 Feb 2024 15:11:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r2TCOHAh"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="NslzxFXW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC7963CF40
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 15:02:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 294E43BB47;
+	Mon, 12 Feb 2024 15:11:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707750135; cv=none; b=ZCEuLtrvjQ13gkZFQe+BsxQo67Ur4MnpFFm597ifZ+IjcoeBvkIsKMMyLIDL+djYTvDh/Wj+BjX0ZU7fGxecMcZJrdBzNBlUSa4e6Yx1F1kNmreJMEXZ/yqi/VbA920xgwZKmj+AP5jHQqf28fXkzjZJl+KIG0NFWl4XJNSqPOo=
+	t=1707750687; cv=none; b=nNki16YOWys2BY1lRuZlGn+Lfe7UgdJcUCn12/kV45h5s+RVxzK8l/AX4d4RzQXJWxhe+x0gGLV4O444xAyPh1QNHyE3Pi29gSyZCr4z4uMkkNW1V6UQYvf32yLa8DQz3mr7dHMhQUpqPkHdyxxF9wO382Vyu1OO1AhiEQnlnvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707750135; c=relaxed/simple;
-	bh=ioIAfMxeMXCPkn6xMdt9uZcKoqspLYKHVP1IESePhSA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gwFEiTUYv4hWLYPf2n2LmB7s4WJI+Z6EqqlnSkrEsMKVQj8K0ePZ7gHwm1fZFiWSoNDoqt1xg58uS1LnwDxPguU61Eq8NxlMEXvYTVmwAl8lYgcWEpcG2pZXIQsqab0eWqFFxKLOTwh/XwJFmHiU1cdsKEtRbMuVQeKmdXKH3wc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r2TCOHAh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA5C3C433F1;
-	Mon, 12 Feb 2024 15:02:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707750135;
-	bh=ioIAfMxeMXCPkn6xMdt9uZcKoqspLYKHVP1IESePhSA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=r2TCOHAh6OpC4XVzu4h5N0JyViOrWBQC+ykG03+S1PMOWGyds7rkH1wbOX/O/4ROp
-	 4G1uVjokwe7zXkSZlCy8+FTb1v8pvRPzpDzZValjc2ht4bNBMFAHpjq9j4hKiVKvBf
-	 l43MMJ+P78nLTzaamXSA0M7QMRVg/PwyoLUoONjOejsOHXXJrxgPzbD6rRJXIRQVYQ
-	 BcvxVAE5ehW87M8+5D1o8No/H5Dz74b2nT46AvoidXypACZQ0azF/EIRy+dCQULa1t
-	 cDheyLvtXkMi7z7Joy727k4Ecf0mIlBk6luYN876xArnXvXtb+5wNbNJAmBQaA7YPo
-	 gCg2xiPiz1gFQ==
-Date: Mon, 12 Feb 2024 07:02:13 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Davide Caratti <dcaratti@redhat.com>, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, shmulik.ladkani@gmail.com
-Subject: Re: [PATCH net] net/sched: act_mirred: use the backlog for mirred
- ingress
-Message-ID: <20240212070213.504d6930@kernel.org>
-In-Reply-To: <CAM0EoM=kcqwC1fYhHcPoLgNMrM_7tnjucNvri8f4U7ymaRXmEQ@mail.gmail.com>
-References: <20240209235413.3717039-1-kuba@kernel.org>
-	<CAM0EoM=kcqwC1fYhHcPoLgNMrM_7tnjucNvri8f4U7ymaRXmEQ@mail.gmail.com>
+	s=arc-20240116; t=1707750687; c=relaxed/simple;
+	bh=Z6PbrS/54nr3uTDQ/r5+bbWElRXdrXgp6MGlAFsN3TE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nqq5tH8bFURoASiy9XT3MQxCAR/Cn1PvWmMV/+hRcfdCSTAWMSzOgyuYqE1LY5U9UGUHnFwXI3Gz/lY3UAkc9zweZ/ReQd4fs3n4huFwNPlda9UrzibdKzRXU9IxDas4xgQ/wcSdVjzykzJypEd+B9/Dilsb7kYWwTms+4CDCwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=NslzxFXW; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ss2Gdsb9s4ZaDWMsTt+eMw+ubVBWFoCUmo1ODydN/mM=; b=NslzxFXW4ui1gaNavsjs4QcwMT
+	ef+/bfTQUiNfNdWJNJfyzZZ9IJmo9X7HOu/t0+uEK8HM4UOVzMZ6rYnJECu+Y4U3KgMfXlIfNVBI8
+	MjkEebpguYjvxTgUqs38DyyeCaYsysHpkwp3CFhEMszREnHc3AyX+A4zGSeZqlq4cKJ0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rZXQl-007a9N-Lw; Mon, 12 Feb 2024 15:37:11 +0100
+Date: Mon, 12 Feb 2024 15:37:11 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: POPESCU Catalin <catalin.popescu@leica-geosystems.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"robh+dt@kernel.org" <robh+dt@kernel.org>,
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"afd@ti.com" <afd@ti.com>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	GEO-CHHER-bsp-development <bsp-development.geo@leica-geosystems.com>,
+	"m.felsch@pengutronix.de" <m.felsch@pengutronix.de>
+Subject: Re: [PATCH v4 2/2] net: phy: dp83826: support TX data voltage tuning
+Message-ID: <10ed19e3-01a9-4fcb-819f-686c6d0bf772@lunn.ch>
+References: <20240212074649.806812-1-catalin.popescu@leica-geosystems.com>
+ <20240212074649.806812-2-catalin.popescu@leica-geosystems.com>
+ <186cf83c-b7a7-4d28-a8b1-85dde032287b@leica-geosystems.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <186cf83c-b7a7-4d28-a8b1-85dde032287b@leica-geosystems.com>
 
-On Mon, 12 Feb 2024 09:51:20 -0500 Jamal Hadi Salim wrote:
-> > The test Davide added in commit ca22da2fbd69 ("act_mirred: use the backlog
-> > for nested calls to mirred ingress") hangs our testing VMs every 10 or so
-> > runs, with the familiar tcp_v4_rcv -> tcp_v4_rcv deadlock reported by
-> > lockdep.
-> >
-> > In the past there was a concern that the backlog indirection will
-> > lead to loss of error reporting / less accurate stats. But the current
-> > workaround does not seem to address the issue.
-> 
-> Let us run some basic tests on this first - it's a hairy spot. 
+On Mon, Feb 12, 2024 at 02:15:47PM +0000, POPESCU Catalin wrote:
+> I just figured out that I forgot to disable WOL in the callback config_init.
+> It looks the PHY driver should explicitly disable WOL feature at init, 
+> and leave it to ethtool to be enabled.
+> I will provide a v5 ASAP to fix that.
 
-Thanks!
+WoL is a bit murky. On x86, it can be the BIOS which configures WoL,
+behind the back of Linux. That is not something i would actually
+recommend, so disabling it at boot does make sense. But consider
+suspend and resume. If the PHY is used for WoL, the WoL settings
+should be kept through suspend/resume. So you need to be careful where
+you disable it, so its only disables on boot, not resume.
 
-> Also, IIRC Cong had some reservations about this in the past. Can't
-> remember what they were.
-
-He was worried that the overlimits stats are no longer counted when we
-decouple (and Davide's selftest actually checks for that so I had to
-modify it).
-
-I'm not married to the solution in any way but bugs much less serious
-get three letter acronyms, we can't pretend this one doesn't exist.
+    Andrew
 
