@@ -1,433 +1,273 @@
-Return-Path: <netdev+bounces-70926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78CAC851132
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 11:39:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CC5A851140
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 11:42:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31524283DE8
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 10:39:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61B8C1C222E5
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 10:42:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C426249FF;
-	Mon, 12 Feb 2024 10:39:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7376317C66;
+	Mon, 12 Feb 2024 10:41:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=its-lehmann.de header.i=@its-lehmann.de header.b="NpTB70CF";
-	dkim=permerror (0-bit key) header.d=its-lehmann.de header.i=@its-lehmann.de header.b="+GA8a3kK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sDhq388a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mo4-p00-ob.smtp.rzone.de (mo4-p00-ob.smtp.rzone.de [85.215.255.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E800138DDB;
-	Mon, 12 Feb 2024 10:39:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.20
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707734369; cv=pass; b=i47KH8TclDqb4hxI54leYe8yVBy4Qnl/viSf9/evSNmM5s10mwh0xIECBY/wVO1Prxb/aCdVjwOEdPgUky0yBAJGhRqL2Zq6JJgdisIfhZ0Woo8RF0yM7x/wy2j6dmuG10ei2cr4cYEKd0hxNEEqYz+t8XV5Rk9xtiwU6zskcII=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707734369; c=relaxed/simple;
-	bh=bReXgtKvy2OlPv8k4WKzzvIYPU48aSBjYEM9fOnfXog=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Cc:Content-Type; b=e8qBTbZBlfb6U828FQ2NkZpb0igwzw2D5nLE+tbi775yl1uKjh3SR5fkMzfWZVoXUYyF2GMHk1mBoZHXm6uPdvlQY75ZnObsPPLTExjd+LAvwAfngbbcljZf0AM3z/NSf40y3E1GJaUs/gp84D/wYmw8NsbRHqMoP67a7Ka0pns=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=its-lehmann.de; spf=pass smtp.mailfrom=its-lehmann.de; dkim=pass (2048-bit key) header.d=its-lehmann.de header.i=@its-lehmann.de header.b=NpTB70CF; dkim=permerror (0-bit key) header.d=its-lehmann.de header.i=@its-lehmann.de header.b=+GA8a3kK; arc=pass smtp.client-ip=85.215.255.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=its-lehmann.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=its-lehmann.de
-ARC-Seal: i=1; a=rsa-sha256; t=1707734357; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=m5eZnhntQHNbK06JstiYWoWvScHDHDm//5u38XpjOBPvYwiiuwZAf7pMS6Cb9+4kaz
-    /Af02T1/xFeaDTLQqxGPozndEfdPTKrPfmSZ02wYdnQOSa++/Psp8crd/0xSHpUedN6h
-    j5AlVmq1nFPtpKJZu5aCOc8RL75PGhTD5d5iG/dv/HYtT62IVrvQ2xlG/Nv0MTtaKjq8
-    Mvy091QK4YgAqpL+mAoTN4Zqd8WnNyTqd50F/Ocxayte/qIStMhRQFWa8BPUPjhec2fT
-    w2JC2dp6UW4QlVed2s8NdWscMejVgYoBCfT57DfrByDdnL9IBBnqbr57BEaAt+OM8Wjb
-    zbvQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1707734357;
-    s=strato-dkim-0002; d=strato.com;
-    h=Cc:Subject:From:To:Date:Message-ID:Cc:Date:From:Subject:Sender;
-    bh=xACXGF6Z+9P/Qki7uUq3QoBxp1WTvXaGNvgOL1LRs9c=;
-    b=PjBRq43ed1Eqzw/ZEEjjLN9wh6EtJypL1+8Tg3QX9jI60vM1FfK6IZcIIvh2bvgWr1
-    uMclDVQG5fP5K+SPY+X9LHRRFqB4otWOwqp4LQ6iEDTIxmihLk2ph8fiadBXWcx0cM5E
-    1Q0HaNgfmynKPfB8GehOtr4zS0nKjvT9f1BcbnSoqcyCx8EGPPExxobLH8TFeJWk3tbq
-    eBaHKnV2xeF7NQPLR9kuJdtYgZ9Z7ePGkLjk3NV6/ELa//RfWWcerfJd2J7ws+2jy6mu
-    FEE5Cfo7TAAAHw/d/fFXpJLMNhCZh72ujVrELhH9SR90o8JfTHVYk3hjE0eNd/ViZOBc
-    Xozg==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo00
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1707734357;
-    s=strato-dkim-0002; d=its-lehmann.de;
-    h=Cc:Subject:From:To:Date:Message-ID:Cc:Date:From:Subject:Sender;
-    bh=xACXGF6Z+9P/Qki7uUq3QoBxp1WTvXaGNvgOL1LRs9c=;
-    b=NpTB70CFrrAHwKeTH+P6h58+IUb8b260PQ0pIFXjqz3ALkeLYrcN9R1jlIDDPN9yY5
-    mhgc5eiJKH27gn/4R/zy/XnvKGqoO6o9zpkUnEkLR9YMgBAX+GUJ7g3nx3EvDBE8/vtP
-    d+rxEyWeKUkQp2uElSgP7NPf1ALElibh850yFtieEl+jENYpsLm9+hdP0tK1NVhFYMHT
-    Ws53BBB+efwz5OCNldGDF0KVqhwVI8imH7CDZpdM2aSr6KkCMN363M1kT7dtOCIBz7fs
-    AP//7xYt8C9AhCVTKeESdC9jX5YcmTUT5hfhcfT9z7hxSTkeiEZX3hKcEe7Yh2qL2ZTy
-    uFEA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1707734357;
-    s=strato-dkim-0003; d=its-lehmann.de;
-    h=Cc:Subject:From:To:Date:Message-ID:Cc:Date:From:Subject:Sender;
-    bh=xACXGF6Z+9P/Qki7uUq3QoBxp1WTvXaGNvgOL1LRs9c=;
-    b=+GA8a3kKeG7IbisS6UOFgRVt0D2LrJSOtrNbBnILwL3Z3L0/+uxLTJTxWRBHugpP//
-    +9ngFjzLHOriqCizbOCw==
-X-RZG-AUTH: ":O2kGeEG7b/pS1EStWDK/jCLPExyYkt/SDqe5Kvd1cpbwFslnfw5yO5h7fecBcqtpZg9l/KmVSxtGXaxS"
-Received: from elf.os.its-lehmann.de
-    by smtp.strato.de (RZmta 49.11.2 AUTH)
-    with ESMTPSA id 0490fc01CAdGeVZ
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Mon, 12 Feb 2024 11:39:16 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by elf.os.its-lehmann.de (Postfix) with ESMTP id 6482A2400B90F;
-	Mon, 12 Feb 2024 11:39:14 +0100 (CET)
-X-Virus-Scanned: Debian amavisd-new at its-lehmann.de
-Received: from elf.os.its-lehmann.de ([127.0.0.1])
-	by localhost (elf.os.its-lehmann.de [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IUQBYmquLI16; Mon, 12 Feb 2024 11:39:10 +0100 (CET)
-Received: from [IPV6:2001:470:9942:0:3d4b:c56c:4d0f:255a] (unknown [IPv6:2001:470:9942:0:3d4b:c56c:4d0f:255a])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: al@its-lehmann.de)
-	by elf.os.its-lehmann.de (Postfix) with ESMTPSA id 708D52400B90D;
-	Mon, 12 Feb 2024 11:39:10 +0100 (CET)
-Message-ID: <3179622f-7090-4a57-98ba-9042809a0d2a@its-lehmann.de>
-Date: Mon, 12 Feb 2024 11:39:08 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E1B72BAE9
+	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 10:41:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707734517; cv=none; b=GgT5GRFQ/bN0iYlLz/5hNtYsOC0JkEgcMBtbEuDKCqXaxH4MvPySd6XtmokIbXhpwND3fYdp1dpZS7zqZ+9YWW83WAPMo0lHZCTkfyLutrYxU4KYeBHq/IRyoBNMf3H2Qw8AHjERmFWVTyftrVwdfRcejlpIzMmLyaz6QzduaXc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707734517; c=relaxed/simple;
+	bh=sb+BUbpAKNdAjV5BfvBUmozIG93UDVkuI+FFaQoAjp4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Yz0cUezlsL4QLd9D+UwPwqd1NNIKGznHWUE4D6riTwkxJ5VA+hU0LpJX3jcbqfQDHThtRRImmJvWy7i8OPxxsN/E40v9GIYxACFH/lKtrNq39NGs5ZyueR1o+8vDPMrosOX/e9T8zfWBZb2bTYSLq7bLaun/M4jRVZPP9rUy/6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sDhq388a; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-56154f4c9c8so17856a12.0
+        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 02:41:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1707734513; x=1708339313; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F+78diOCZPHLp3izRsQEIMDqxF/GnwBM3MnY4r3LURs=;
+        b=sDhq388atdZxf+oHowYc5CIfyYTejfg8Vw3CfjvvvwIMgqPZcDYKBdcVFkSM/wvvRC
+         vxyOYA1UJTEthQdjnl3WDkcGdrkXv4pb3+MTsWjEaqkUhefE05p/KGasysKZRumLR91P
+         B0v15tbKkOxftmqLejyrIdf3k+60RdKiLjAse907RhJ6XGXCDipOAGHj43n2181EMRGH
+         9WKHuug673a9dLKP2v1WTmx3QfGrbeMA/s3zO8CmaKbmG3LxSEcg1PrP/p3j3cBqrM9u
+         MboFuozwMgJ0yPWzngYoCxovPe2QJrfTZT+Xpv1Q86Buk4WdXOfS8w+5zjIv/hOip+hA
+         lG6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707734513; x=1708339313;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=F+78diOCZPHLp3izRsQEIMDqxF/GnwBM3MnY4r3LURs=;
+        b=w2VivNAWKPoaiutu1X30t51My+9ptTLbTvlObiF2aNfkDYC2OLMGIWwiTpQjo7+wNB
+         3sA0OON2ZGpeD1pJiXuy3f1Ey7eNfCS5vDJsgsFmIOAD77fsMxZjxa3jnJ7741/Oa9FZ
+         WjFxpZIpeDKJJQQBJKv3AbKgRJGfvjDx5cTsF5vKzybKrRqv2IDhdS5uZdBGQCZ4DIwj
+         Q/uAkWj83cVDOyhUWULfjjwQpx3bpzd4I5ivWraMXCjyvo22uTJyDhnFq7PWRDQ8vT08
+         +B4v1h0bhoXHKvh6eBxZslWC58X/k2oSBGtcEqsxCIwm8VMfRhWNY43b7aphZ0Aw4Vug
+         K9Gg==
+X-Gm-Message-State: AOJu0Yz92ZQT/D/u5KPvOpDd0oA169j1krrohseq8E0enWNsogXbR/Ly
+	AWoXqPSh8W9VpxXdH5QFGuHynNrPA3kIeHW4rn3X58C/blkdejImPssVqVB54Kf+t7nIC5yNZZN
+	4O2f6w5fKGKCsGQfAvNppcs8+azq7dkgPbQZYbuSMkXvVak5+K3bJ
+X-Google-Smtp-Source: AGHT+IFJ2TR8vLIjcwFGIqV1t5PL/WV6+3mRWSzVhvtQmnWz17FztMyRhFL7k6YnS0/tmXT1yBl4qprTazklTi+mZmY=
+X-Received: by 2002:a50:8a93:0:b0:55f:8851:d03b with SMTP id
+ j19-20020a508a93000000b0055f8851d03bmr195865edj.5.1707734513245; Mon, 12 Feb
+ 2024 02:41:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: netdev@vger.kernel.org
-Content-Language: en-US
-From: Arno Lehmann <al@its-lehmann.de>
-Subject: intel i225 NIC loses PCIe link, network becomes unusable)
-Organization: IT-Service Lehmann
-Cc: linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <000000000000ae28ce06112cb52e@google.com>
+In-Reply-To: <000000000000ae28ce06112cb52e@google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 12 Feb 2024 11:41:38 +0100
+Message-ID: <CANn89iKPYAY226+kV9D0jUn6Kfjq1gQJBAjSRxxFgQJK-QbLwA@mail.gmail.com>
+Subject: Re: [syzbot] [batman?] BUG: soft lockup in sys_sendmsg
+To: syzbot <syzbot+a6a4b5bb3da165594cff@syzkaller.appspotmail.com>
+Cc: a@unstable.cc, b.a.t.m.a.n@lists.open-mesh.org, davem@davemloft.net, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, mareklindner@neomailbox.ch, 
+	netdev@vger.kernel.org, pabeni@redhat.com, sven@narfation.org, 
+	sw@simonwunderlich.de, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello everybody,
+On Mon, Feb 12, 2024 at 11:26=E2=80=AFAM syzbot
+<syzbot+a6a4b5bb3da165594cff@syzkaller.appspotmail.com> wrote:
+>
+> Hello,
+>
+> syzbot found the following issue on:
+>
+> HEAD commit:    41bccc98fb79 Linux 6.8-rc2
+> git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux=
+.git for-kernelci
+> console output: https://syzkaller.appspot.com/x/log.txt?x=3D1420011818000=
+0
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=3D451a1e62b11ea=
+4a6
+> dashboard link: https://syzkaller.appspot.com/bug?extid=3Da6a4b5bb3da1655=
+94cff
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Deb=
+ian) 2.40
+> userspace arch: arm64
+>
+> Unfortunately, I don't have any reproducer for this issue yet.
+>
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/0772069e29cf/dis=
+k-41bccc98.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/659d3f0755b7/vmlinu=
+x-41bccc98.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/7780a45c3e51/I=
+mage-41bccc98.gz.xz
+>
+> IMPORTANT: if you fix the issue, please add the following tag to the comm=
+it:
+> Reported-by: syzbot+a6a4b5bb3da165594cff@syzkaller.appspotmail.com
+>
+> watchdog: BUG: soft lockup - CPU#1 stuck for 22s! [syz-executor.0:28718]
+> Modules linked in:
+> irq event stamp: 45929391
+> hardirqs last  enabled at (45929390): [<ffff8000801d9dc8>] __local_bh_ena=
+ble_ip+0x224/0x44c kernel/softirq.c:386
+> hardirqs last disabled at (45929391): [<ffff80008ad57108>] __el1_irq arch=
+/arm64/kernel/entry-common.c:499 [inline]
+> hardirqs last disabled at (45929391): [<ffff80008ad57108>] el1_interrupt+=
+0x24/0x68 arch/arm64/kernel/entry-common.c:517
+> softirqs last  enabled at (2040): [<ffff80008002189c>] softirq_handle_end=
+ kernel/softirq.c:399 [inline]
+> softirqs last  enabled at (2040): [<ffff80008002189c>] __do_softirq+0xac8=
+/0xce4 kernel/softirq.c:582
+> softirqs last disabled at (2052): [<ffff80008aacbc40>] spin_lock_bh inclu=
+de/linux/spinlock.h:356 [inline]
+> softirqs last disabled at (2052): [<ffff80008aacbc40>] batadv_tt_local_re=
+size_to_mtu+0x60/0x154 net/batman-adv/translation-table.c:3949
+> CPU: 1 PID: 28718 Comm: syz-executor.0 Not tainted 6.8.0-rc2-syzkaller-g4=
+1bccc98fb79 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
+oogle 11/17/2023
+> pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=3D--)
+> pc : should_resched arch/arm64/include/asm/preempt.h:79 [inline]
+> pc : __local_bh_enable_ip+0x228/0x44c kernel/softirq.c:388
+> lr : __local_bh_enable_ip+0x224/0x44c kernel/softirq.c:386
+> sp : ffff80009a0670b0
+> x29: ffff80009a0670c0 x28: ffff70001340ce60 x27: ffff80009a0673d0
+> x26: ffff00011e860290 x25: ffff0000d08a9f08 x24: 0000000000000001
+> x23: 1fffe00023d4d3c1 x22: dfff800000000000 x21: ffff80008aacbf98
+> x20: 0000000000000202 x19: ffff00011ea69e08 x18: ffff80009a066800
+> x17: 77656e2074696620 x16: ffff80008031ffc8 x15: 0000000000000001
+> x14: 1fffe0001ba5a290 x13: 0000000000000000 x12: 0000000000000003
+> x11: 0000000000040000 x10: 0000000000000003 x9 : 0000000000000000
+> x8 : 0000000002bcd3ae x7 : ffff80008aacbe30 x6 : 0000000000000000
+> x5 : 0000000000000000 x4 : 0000000000000001 x3 : 0000000000000000
+> x2 : 0000000000000002 x1 : ffff80008aecd7e0 x0 : ffff80012545c000
+> Call trace:
+>  __daif_local_irq_enable arch/arm64/include/asm/irqflags.h:27 [inline]
+>  arch_local_irq_enable arch/arm64/include/asm/irqflags.h:49 [inline]
+>  __local_bh_enable_ip+0x228/0x44c kernel/softirq.c:386
+>  __raw_spin_unlock_bh include/linux/spinlock_api_smp.h:167 [inline]
+>  _raw_spin_unlock_bh+0x3c/0x4c kernel/locking/spinlock.c:210
+>  spin_unlock_bh include/linux/spinlock.h:396 [inline]
+>  batadv_tt_local_purge+0x264/0x2e8 net/batman-adv/translation-table.c:135=
+6
+>  batadv_tt_local_resize_to_mtu+0xa0/0x154 net/batman-adv/translation-tabl=
+e.c:3956
+>  batadv_update_min_mtu+0x74/0xa4 net/batman-adv/hard-interface.c:651
+>  batadv_netlink_set_mesh+0x50c/0x1078 net/batman-adv/netlink.c:500
+>  genl_family_rcv_msg_doit net/netlink/genetlink.c:1113 [inline]
+>  genl_family_rcv_msg net/netlink/genetlink.c:1193 [inline]
+>  genl_rcv_msg+0x874/0xb6c net/netlink/genetlink.c:1208
+>  netlink_rcv_skb+0x214/0x3c4 net/netlink/af_netlink.c:2543
+>  genl_rcv+0x38/0x50 net/netlink/genetlink.c:1217
+>  netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
+>  netlink_unicast+0x65c/0x898 net/netlink/af_netlink.c:1367
+>  netlink_sendmsg+0x83c/0xb20 net/netlink/af_netlink.c:1908
+>  sock_sendmsg_nosec net/socket.c:730 [inline]
+>  __sock_sendmsg net/socket.c:745 [inline]
+>  ____sys_sendmsg+0x56c/0x840 net/socket.c:2584
+>  ___sys_sendmsg net/socket.c:2638 [inline]
+>  __sys_sendmsg+0x26c/0x33c net/socket.c:2667
+>  __do_sys_sendmsg net/socket.c:2676 [inline]
+>  __se_sys_sendmsg net/socket.c:2674 [inline]
+>  __arm64_sys_sendmsg+0x80/0x94 net/socket.c:2674
+>  __invoke_syscall arch/arm64/kernel/syscall.c:37 [inline]
+>  invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:51
+>  el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:136
+>  do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:155
+>  el0_svc+0x54/0x158 arch/arm64/kernel/entry-common.c:678
+>  el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:696
+>  el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
+> Sending NMI from CPU 1 to CPUs 0:
+> NMI backtrace for cpu 0
+> CPU: 0 PID: 0 Comm: swapper/0 Not tainted 6.8.0-rc2-syzkaller-g41bccc98fb=
+79 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
+oogle 11/17/2023
+> pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=3D--)
+> pc : arch_local_irq_enable+0x8/0xc arch/arm64/include/asm/irqflags.h:51
+> lr : default_idle_call+0xf8/0x128 kernel/sched/idle.c:103
+> sp : ffff80008ebe7cd0
+> x29: ffff80008ebe7cd0 x28: dfff800000000000 x27: 1ffff00011d7cfa8
+> x26: ffff80008ec6d000 x25: 0000000000000000 x24: 0000000000000001
+> x23: 1ffff00011d8da74 x22: ffff80008ec6d3a0 x21: 0000000000000000
+> x20: ffff80008ec94e00 x19: ffff8000802cff08 x18: 1fffe000367ff796
+> x17: ffff80008ec6d000 x16: ffff8000802cf7cc x15: 0000000000000001
+> x14: 1fffe00036801310 x13: 0000000000000000 x12: 0000000000000003
+> x11: 0000000000000001 x10: 0000000000000003 x9 : 0000000000000000
+> x8 : 0000000000bf0413 x7 : ffff800080461668 x6 : 0000000000000000
+> x5 : 0000000000000001 x4 : 0000000000000001 x3 : ffff80008ad5af48
+> x2 : 0000000000000000 x1 : ffff80008aecd7e0 x0 : ffff80012543a000
+> Call trace:
+>  __daif_local_irq_enable arch/arm64/include/asm/irqflags.h:27 [inline]
+>  arch_local_irq_enable+0x8/0xc arch/arm64/include/asm/irqflags.h:49
+>  cpuidle_idle_call kernel/sched/idle.c:170 [inline]
+>  do_idle+0x1f0/0x4e8 kernel/sched/idle.c:312
+>  cpu_startup_entry+0x5c/0x74 kernel/sched/idle.c:410
+>  rest_init+0x2dc/0x2f4 init/main.c:730
+>  start_kernel+0x0/0x4e8 init/main.c:827
+>  start_kernel+0x3e8/0x4e8 init/main.c:1072
+>  __primary_switched+0xb4/0xbc arch/arm64/kernel/head.S:523
+>
+>
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+>
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+>
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+>
+> If you want to overwrite report's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+>
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
+>
+> If you want to undo deduplication, reply with:
+> #syz undup
 
-I'm struggling with the problem named in the subject.
+This patch [1] looks suspicious
 
-Originally reported to the debian bug tracker; you'll find the history 
-here: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1060706
+I think batman-adv should reject too small MTU values.
 
-Infrequently, and apparently randomly, I have the situation that the 
-PCIe link for the NIC is lost. Obviously, the network then becomes 
-unusable. rmmod / modprobe'ing the igc module does not resolve this 
-problem, a reboot is necessary.
+[1]
 
-I noticed this initially when installing the system last year, did a bit 
-of a search, found that the kernel option 'pcie_aspm=off' was supposed 
-to be useful, set that, and have that enabled ever since.
+commit d8e42a2b0addf238be8b3b37dcd9795a5c1be459
+Author: Sven Eckelmann <sven@narfation.org>
+Date:   Wed Jul 19 10:01:15 2023 +0200
 
-The problem persists.
+    batman-adv: Don't increase MTU when set by user
 
-Most recent case is this one:
+    If the user set an MTU value, it usually means that there are special
+    requirements for the MTU. But if an interface gots activated, the MTU w=
+as
+    always recalculated and then the user set value was overwritten.
 
-[So Feb 11 15:47:18 2024] igc 0000:0b:00.0 eno1: NIC Link is Down
-[So Feb 11 15:47:21 2024] igc 0000:0b:00.0 eno1: NIC Link is Up 1000 
-Mbps Full Duplex, Flow Control: RX
-[So Feb 11 16:52:01 2024] igc 0000:0b:00.0 eno1: NIC Link is Down
-[So Feb 11 16:52:05 2024] igc 0000:0b:00.0 eno1: NIC Link is Up 1000 
-Mbps Full Duplex, Flow Control: RX
+    The only reason why this user set value has to be overwritten, is when =
+the
+    MTU has to be decreased because batman-adv is not able to transfer pack=
+ets
+    with the user specified size.
 
-(I have no idea if the above to events have any relevance.)
-
-[So Feb 11 18:47:59 2024] igc 0000:0b:00.0 eno1: PCIe link lost, device 
-now detached
-[So Feb 11 18:47:59 2024] ------------[ cut here ]------------
-[So Feb 11 18:47:59 2024] igc: Failed to read reg 0xc030!
-[So Feb 11 18:47:59 2024] WARNING: CPU: 20 PID: 136256 at 
-drivers/net/ethernet/intel/igc/igc_main.c:6583 igc_rd32+0x8d/0xa0 [igc]
-[So Feb 11 18:47:59 2024] Modules linked in: rfcomm cpufreq_userspace 
-cpufreq_powersave cpufreq_ondemand cpufreq_conservative nfsv3 nfs_acl 
-rpcsec_gss_krb5 auth_rpcgss nfsv4 dns_resolver nfs lockd grace fscache 
-netfs overlay qrtr cmac algif_hash algif_skcipher af_alg bnep sunrpc 
-binfmt_misc nls_ascii nls_cp437 vfat fat ext4 mbcache jbd2 
-intel_rapl_msr intel_rapl_common btusb btrtl btbcm btintel btmtk 
-bluetooth mt7921e snd_hda_codec_hdmi mt7921_common mt76_connac_lib 
-edac_mce_amd snd_hda_intel mt76 snd_intel_dspcfg kvm_amd 
-snd_intel_sdw_acpi sha3_generic mac80211 jitterentropy_rng snd_usb_audio 
-uvcvideo snd_hda_codec drbg libarc4 videobuf2_vmalloc snd_usbmidi_lib 
-asus_nb_wmi eeepc_wmi kvm uvc videobuf2_memops snd_rawmidi ansi_cprng 
-snd_hda_core asus_wmi videobuf2_v4l2 snd_seq_device snd_hwdep 
-ecdh_generic irqbypass battery ecc ledtrig_audio videodev snd_pcm 
-sparse_keymap cfg80211 crc16 rapl snd_timer videobuf2_common 
-platform_profile wmi_bmof sp5100_tco pcspkr snd ccp mc watchdog k10temp 
-soundcore rfkill joydev sg evdev msr
-[So Feb 11 18:47:59 2024]  parport_pc ppdev lp parport fuse loop 
-efi_pstore configfs efivarfs ip_tables x_tables autofs4 xfs libcrc32c 
-crc32c_generic sd_mod dm_crypt dm_mod uas usb_storage hid_generic amdgpu 
-amdxcp drm_buddy gpu_sched usbhid i2c_algo_bit drm_suballoc_helper hid 
-drm_display_helper sr_mod cdrom cec rc_core crc32_pclmul drm_ttm_helper 
-crc32c_intel ghash_clmulni_intel ttm ahci sha512_ssse3 sha512_generic 
-libahci nvme xhci_pci drm_kms_helper libata xhci_hcd nvme_core drm 
-aesni_intel t10_pi usbcore scsi_mod crypto_simd crc64_rocksoft_generic 
-igc cryptd crc64_rocksoft crc_t10dif crct10dif_generic i2c_piix4 
-crct10dif_pclmul crc64 crct10dif_common scsi_common usb_common video wmi 
-gpio_amdpt gpio_generic button
-[So Feb 11 18:47:59 2024] CPU: 20 PID: 136256 Comm: kworker/20:0 Not 
-tainted 6.5.0-0.deb12.4-amd64 #1  Debian 6.5.10-1~bpo12+1
-[So Feb 11 18:47:59 2024] Hardware name: ASUS System Product Name/ROG 
-STRIX X670E-A GAMING WIFI, BIOS 1904 01/29/2024
-[So Feb 11 18:47:59 2024] Workqueue: events igc_watchdog_task [igc]
-[So Feb 11 18:47:59 2024] RIP: 0010:igc_rd32+0x8d/0xa0 [igc]
-[So Feb 11 18:47:59 2024] Code: 48 c7 c6 10 76 36 c0 e8 81 6a c1 d5 48 
-8b bb 28 ff ff ff e8 05 d2 97 d5 84 c0 74 bc 89 ee 48 c7 c7 38 76 36 c0 
-e8 c3 ee 36 d5 <0f> 0b eb aa b8 ff ff ff ff e9 15 cf e7 d5 0f 1f 44 00 
-00 90 90 90
-[So Feb 11 18:47:59 2024] RSP: 0018:ffffa203cfe8fdd8 EFLAGS: 00010282
-[So Feb 11 18:47:59 2024] RAX: 0000000000000000 RBX: ffff961b5c75ccb8 
-RCX: 0000000000000027
-[So Feb 11 18:47:59 2024] RDX: ffff962a5e7213c8 RSI: 0000000000000001 
-RDI: ffff962a5e7213c0
-[So Feb 11 18:47:59 2024] RBP: 000000000000c030 R08: 0000000000000000 
-R09: ffffa203cfe8fc68
-[So Feb 11 18:47:59 2024] R10: 0000000000000003 R11: ffff962a9de3ac28 
-R12: ffff961b5c75c000
-[So Feb 11 18:47:59 2024] R13: 0000000000000000 R14: ffff961b54c92d40 
-R15: 000000000000c030
-[So Feb 11 18:47:59 2024] FS:  0000000000000000(0000) 
-GS:ffff962a5e700000(0000) knlGS:0000000000000000
-[So Feb 11 18:47:59 2024] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[So Feb 11 18:47:59 2024] CR2: 00007fb76de93000 CR3: 00000001153d0000 
-CR4: 0000000000750ee0
-[So Feb 11 18:47:59 2024] PKRU: 55555554
-[So Feb 11 18:47:59 2024] Call Trace:
-[So Feb 11 18:47:59 2024]  <TASK>
-[So Feb 11 18:47:59 2024]  ? igc_rd32+0x8d/0xa0 [igc]
-[So Feb 11 18:47:59 2024]  ? __warn+0x81/0x130
-[So Feb 11 18:47:59 2024]  ? igc_rd32+0x8d/0xa0 [igc]
-[So Feb 11 18:47:59 2024]  ? report_bug+0x171/0x1a0
-[So Feb 11 18:47:59 2024]  ? srso_alias_return_thunk+0x5/0x7f
-[So Feb 11 18:47:59 2024]  ? prb_read_valid+0x1b/0x30
-[So Feb 11 18:47:59 2024]  ? handle_bug+0x41/0x70
-[So Feb 11 18:47:59 2024]  ? exc_invalid_op+0x17/0x70
-[So Feb 11 18:47:59 2024]  ? asm_exc_invalid_op+0x1a/0x20
-[So Feb 11 18:47:59 2024]  ? igc_rd32+0x8d/0xa0 [igc]
-[So Feb 11 18:47:59 2024]  ? igc_rd32+0x8d/0xa0 [igc]
-[So Feb 11 18:47:59 2024]  igc_update_stats+0x8a/0x6d0 [igc]
-[So Feb 11 18:47:59 2024]  igc_watchdog_task+0x9d/0x4a0 [igc]
-[So Feb 11 18:47:59 2024]  process_one_work+0x1df/0x3e0
-[So Feb 11 18:47:59 2024]  worker_thread+0x51/0x390
-[So Feb 11 18:47:59 2024]  ? __pfx_worker_thread+0x10/0x10
-[So Feb 11 18:47:59 2024]  kthread+0xe5/0x120
-[So Feb 11 18:47:59 2024]  ? __pfx_kthread+0x10/0x10
-[So Feb 11 18:47:59 2024]  ret_from_fork+0x31/0x50
-[So Feb 11 18:47:59 2024]  ? __pfx_kthread+0x10/0x10
-[So Feb 11 18:47:59 2024]  ret_from_fork_asm+0x1b/0x30
-[So Feb 11 18:47:59 2024]  </TASK>
-[So Feb 11 18:47:59 2024] ---[ end trace 0000000000000000 ]---
-
-
-With the guidance from the friendly folks at the debian bug tracker, we 
-could find that this happens with many kernel versions, as can be 
-derived from the following (condensed list below):
-
-# journalctl  --grep '(Linux version|PCIe link lost)' --quiet | cat
-Aug 30 18:16:18 Zwerg kernel: Linux version 6.1.0-11-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Debian 
-6.1.38-4 (2023-08-08)
-Sep 20 14:21:17 Zwerg kernel: igc 0000:0a:00.0 eno1: PCIe link lost, 
-device now detached
-Sep 20 19:47:06 Zwerg kernel: Linux version 6.1.0-11-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Debian 
-6.1.38-4 (2023-08-08)
-Okt 04 17:16:08 Zwerg kernel: Linux version 6.1.0-12-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Debian 
-6.1.52-1 (2023-09-07)
-Okt 06 05:44:20 Zwerg kernel: igc 0000:0a:00.0 eno1: PCIe link lost, 
-device now detached
-Okt 07 16:39:10 Zwerg kernel: igc 0000:0a:00.0 (unnamed net_device) 
-(uninitialized): PCIe link lost, device now detached
-Okt 07 16:43:41 Zwerg kernel: Linux version 6.1.0-12-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Debian 
-6.1.52-1 (2023-09-07)
-Okt 23 18:23:54 Zwerg kernel: Linux version 6.1.0-12-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Debian 
-6.1.52-1 (2023-09-07)
-Okt 23 18:31:25 Zwerg kernel: igc 0000:0a:00.0 eno1: PCIe link lost, 
-device now detached
-Okt 23 18:48:58 Zwerg kernel: Linux version 6.1.0-13-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Debian 
-6.1.55-1 (2023-09-29)
-Okt 30 11:16:06 Zwerg kernel: igc 0000:0a:00.0 eno1: PCIe link lost, 
-device now detached
-Okt 31 13:50:06 Zwerg kernel: igc 0000:0a:00.0 (unnamed net_device) 
-(uninitialized): PCIe link lost, device now detached
-Okt 31 13:52:01 Zwerg kernel: Linux version 6.1.0-13-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Debian 
-6.1.55-1 (2023-09-29)
-Nov 22 18:59:11 Zwerg kernel: igc 0000:0a:00.0 eno1: PCIe link lost, 
-device now detached
-Nov 23 12:18:19 Zwerg kernel: Linux version 6.1.0-13-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Debian 
-6.1.55-1 (2023-09-29)
-Nov 23 15:45:49 Zwerg kernel: igc 0000:0a:00.0 eno1: PCIe link lost, 
-device now detached
-Nov 23 15:52:51 Zwerg kernel: Linux version 6.1.0-13-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Debian 
-6.1.55-1 (2023-09-29)
-Dez 06 19:06:18 Zwerg kernel: Linux version 6.1.0-13-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Debian 
-6.1.55-1 (2023-09-29)
-Dez 09 15:12:13 Zwerg kernel: Linux version 6.1.0-14-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Debian 
-6.1.64-1 (2023-11-30)
-Dez 19 07:33:02 Zwerg kernel: igc 0000:0a:00.0 eno1: PCIe link lost, 
-device now detached
-Dez 20 10:29:21 Zwerg kernel: Linux version 6.1.0-15-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Debian 
-6.1.66-1 (2023-12-09)
-Jan 01 09:57:40 Zwerg kernel: igc 0000:0a:00.0 eno1: PCIe link lost, 
-device now detached
-Jan 02 13:41:33 Zwerg kernel: Linux version 6.1.0-15-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Debian 
-6.1.66-1 (2023-12-09)
-Jan 10 16:15:20 Zwerg kernel: igc 0000:0a:00.0 eno1: PCIe link lost, 
-device now detached
-Jan 13 11:02:41 Zwerg kernel: Linux version 6.1.0-17-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Debian 
-6.1.69-1 (2023-12-30)
-Jan 13 11:16:31 Zwerg kernel: igc 0000:0a:00.0 eno1: PCIe link lost, 
-device now detached
-Jan 13 11:18:13 Zwerg kernel: Linux version 6.1.0-17-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Debian 
-6.1.69-1 (2023-12-30)
-Jan 19 14:25:08 Zwerg kernel: Linux version 6.1.0-1-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-13) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.39.90.20221231) #1 SMP PREEMPT_DYNAMIC 
-Debian 6.1.4-1 (2023-01-07)
-Jan 27 09:41:16 Zwerg kernel: Linux version 6.1.0-17-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Debian 
-6.1.69-1 (2023-12-30)
-Jan 27 09:44:53 Zwerg kernel: igc 0000:0a:00.0 eno1: PCIe link lost, 
-device now detached
-Jan 27 09:48:05 Zwerg kernel: igc 0000:0a:00.0 (unnamed net_device) 
-(uninitialized): PCIe link lost, device now detached
-Jan 27 09:52:16 Zwerg kernel: igc 0000:0a:00.0 (unnamed net_device) 
-(uninitialized): PCIe link lost, device now detached
-Jan 27 09:58:46 Zwerg kernel: Linux version 6.1.0-1-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-13) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.39.90.20221231) #1 SMP PREEMPT_DYNAMIC 
-Debian 6.1.4-1 (2023-01-07)
-Feb 01 04:19:17 Zwerg kernel: igc 0000:0a:00.0 eno1: PCIe link lost, 
-device now detached
-Feb 01 14:43:03 Zwerg kernel: igc 0000:0a:00.0 (unnamed net_device) 
-(uninitialized): PCIe link lost, device now detached
-Feb 01 14:50:04 Zwerg kernel: Linux version 6.1.0-17-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Debian 
-6.1.69-1 (2023-12-30)
-Feb 01 15:28:42 Zwerg kernel: Linux version 6.5.0-0.deb12.4-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Debian 
-6.5.10-1~bpo12+1 (2023-11-23)
-Feb 08 18:26:31 Zwerg kernel: Linux version 6.5.0-0.deb12.4-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Debian 
-6.5.10-1~bpo12+1 (2023-11-23)
-Feb 08 18:33:38 Zwerg kernel: igc 0000:0a:00.0 eno1: PCIe link lost, 
-device now detached
-Feb 08 18:58:25 Zwerg kernel: Linux version 6.5.0-0.deb12.4-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Debian 
-6.5.10-1~bpo12+1 (2023-11-23)
-Feb 08 19:00:32 Zwerg kernel: igc 0000:0b:00.0 eno1: PCIe link lost, 
-device now detached
-Feb 08 19:02:38 Zwerg kernel: igc 0000:0b:00.0 (unnamed net_device) 
-(uninitialized): PCIe link lost, device now detached
-Feb 08 19:05:30 Zwerg kernel: Linux version 6.5.0-0.deb12.4-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Debian 
-6.5.10-1~bpo12+1 (2023-11-23)
-Feb 09 13:25:08 Zwerg kernel: igc 0000:0b:00.0 eno1: PCIe link lost, 
-device now detached
-Feb 09 13:27:17 Zwerg kernel: igc 0000:0b:00.0 (unnamed net_device) 
-(uninitialized): PCIe link lost, device now detached
-Feb 09 13:30:42 Zwerg kernel: Linux version 6.5.0-0.deb12.4-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Debian 
-6.5.10-1~bpo12+1 (2023-11-23)
-Feb 11 18:47:57 Zwerg kernel: igc 0000:0b:00.0 eno1: PCIe link lost, 
-device now detached
-Feb 12 10:55:30 Zwerg kernel: Linux version 6.1.0-17-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_DYNAMIC Debian 
-6.1.69-1 (2023-12-30)
-
-The kernel version I used were
-
-Debian 6.1.4-1 (2023-01-07)
-Debian 6.1.38-4 (2023-08-08)
-Debian 6.1.52-1 (2023-09-07)
-Debian 6.1.55-1 (2023-09-29)
-Debian 6.1.64-1 (2023-11-30)
-Debian 6.1.66-1 (2023-12-09)
-Debian 6.1.69-1 (2023-12-30)
-Debian 6.5.10-1~bpo12+1 (2023-11-23)
-
-
-At this point, it looks like at least one person with a bit of insight 
-is convinced this is an upstream issue.
-
-Of course I'll try to provide whatever information else may be needed.
-
-Most importantly, I think, is the hardware surrounding the NIC:
-This is an ASUSTeK COMPUTER INC. ROG STRIX X670E-A GAMING WIFI, i.e. AMD 
-X670 chipset with fershly updated BIOS: 1904 01/29/2024. CPU is an AMD 
-Ryzen 9 7900X.
-
-I have not set any particular overclocking or performance options, just 
-tried to have all firmware settings on "conservative".
-
-
-Mass storage is a Western Digital SN850X NVMe device.
-
-I have experienced two cases where the storage device apparently 
-"vanished" from the PCIe bus, which resulted in a flood of journald 
-messages that it could not log anything to persistent storage. I have 
-never seen the first few lines of thos occurences, and obviously, I have 
-no logs.
-
-I did notice, however, that the system still responded to pings on the 
-network.
-
-All of this seems to indicate that this might be related to PCIe power 
-management. I suspect that my gut feeling is not the best starting point 
-to decide how to proceed here.
-
-So, if you any way to improve this situation and make the system 
-reliably usable, I'm willing to help in any way I can, but you'll have 
-to tell me what to do!
-
-Cheers,
-
-Arno
-
--- 
-Arno Lehmann
-
-IT-Service Lehmann
-Sandstr. 6, 49080 Osnabrück
+    Fixes: c6c8fea29769 ("net: Add batman-adv meshing protocol")
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Sven Eckelmann <sven@narfation.org>
+    Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
 
