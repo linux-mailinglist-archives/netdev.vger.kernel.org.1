@@ -1,119 +1,107 @@
-Return-Path: <netdev+bounces-70953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB43285130B
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 13:09:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A365851353
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 13:16:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A4D61C21D34
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 12:09:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FB1D1F242D0
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 12:16:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A620439AF1;
-	Mon, 12 Feb 2024 12:03:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9156D39AE1;
+	Mon, 12 Feb 2024 12:14:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="XvyyAnaM";
+	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="shfULbcj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from nautica.notk.org (nautica.notk.org [91.121.71.147])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12D053D964;
-	Mon, 12 Feb 2024 12:03:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E886A39FDB
+	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 12:14:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.121.71.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707739402; cv=none; b=cCR1OW/rJs0JBmc8wzVUIOHKQH14P1xyGp0LurSweP4lmj0Hj85idnXMrg63klJAOasvPJRSmI4gZRDrWlyGSrbGj1LPOrNE0vxIYD4e0H6IvaD61puHaVti8TiSVqeBtSEsVt6P03eC6gGwQ0m6xSA9kgPN9uIIeqm+NtaQCA8=
+	t=1707740069; cv=none; b=ZEXhKSXjtCjMQc1Ytqdkt67yfaSlbLuLGsV/g6fdK4Ql0lm1MO+MEL3bWFLLd5GwiUKJUIU6/W8QKON0A558Ary9H1XFNaim7M+WtKt8s+4U5uxho8egAjkNaSDJ6PawSRK5sPAL5+2IDpeAy8Td6DHgNF2JmcYzFgLiSSaqh3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707739402; c=relaxed/simple;
-	bh=rfED2IXGqOBD+K1HnRdLQdhtHs14ZMAFcdInDfpTlXw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gEmRuP4jJlvPE7P4cAM3fNZa+Jf6j+QNFL3nA0BM4h/VHA77MRZcw0+XQlzQaoLOKBidx10aXiIoLu8D89OBNFBO/Ky56O1HuEva7v0qq60nApgiK+jEHTQTl5awQ9Y0D6SwtVAWBs0D/TXAcSAJDRf+oOq873KIo8aBLvq8ZVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-218e7bb0034so752005fac.0;
-        Mon, 12 Feb 2024 04:03:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707739400; x=1708344200;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UOYodCfh0GuqCNxZvnHyKyee8GZYuYBo58cLH6hYt/c=;
-        b=j8dsYKWC5SmOnPXgIteRWMuXUiK3Oa69EZdy3xxr+CaRv7HrsuU/+P2GL3a8Oq/4Pi
-         a1xxvCs0HceZQE9mENQPwOFLRC6YnVJ1lo8GbjZ8BukPzna5kN0Ms+SLBSNZ+5JXsLc8
-         O1TwyA3rEvSUFzfgmf7nBzxK6RFquIOZNra/0DREkdZRzm4j7STjUfNguxU+SMvEhls6
-         jwgt+Nal+8E1vazXC7Nosm8YSDbGNzO2OdnkrMQmgpfghcTdrPleSaoXGDNXQ3VXk2OK
-         SMW0rOdNeifn72DwxLxWFqacA6ptVy4uLW7LOzGaAj44yGAtnRN1IJhXR41Bbi8XU3sB
-         yzfw==
-X-Forwarded-Encrypted: i=1; AJvYcCXd9I5Wzwk+78IewwEkzmnfmWdoV9VEpUlH6FYMllkeI26FsVR+2qExolBhZ4WcX+sjQg2jvUro7QfcOWi2XfkOEnvoBNOuKnrmHACspPgLPWQbns+v1kN5GcTKbu0BtkFD46ABQXdRPShhukW+PPMAV33jGJptkcIh/G+XtxUZnaR57M+CH7eVEdvQbOBGEFPDxhFSSK58WK4M5OtiOw==
-X-Gm-Message-State: AOJu0YzKY1mQHkZwqDppSficfX9XqaCNdfHVh4KqMsb1n2ggp4b/L0EP
-	BGMAMZQ4pW0frPXlwMktMcVzw/Rade+u+IrGFbxp3k4jsMpBrgR3GTWx1CNVdov+pXSACxDf0Ie
-	O2Kj5v2k4bO8OgSkIUwpkGt4//xI=
-X-Google-Smtp-Source: AGHT+IFwlMsnEvSMtcwsucXokcWRI/75RN6SqVnxJGnEBRUDfA73uBY+jzDu02IY306Xvo9uMMkaNiqNntOeaLxWXAg=
-X-Received: by 2002:a4a:a6cd:0:b0:59c:d8cd:ecee with SMTP id
- i13-20020a4aa6cd000000b0059cd8cdeceemr5262334oom.1.1707739399881; Mon, 12 Feb
- 2024 04:03:19 -0800 (PST)
+	s=arc-20240116; t=1707740069; c=relaxed/simple;
+	bh=Pn5zogiyPRiHjXIT/y50rDh7mRTjVLMfDrtm3VkFkpY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z0BCqhCJxfq9H7aEFGjOjhOzfC2XcpS1dLFRsW9L5Z2lyD2qxqUDYZRdTUehudmRHAca62oFpgvRBxX+jz3SZdqp5LjUK1K+IdDNQYb/8g5tFmP2qrrrQSLjgUyC5W4qRGSnFQLmeMFfpDqMl8DA2pCYj+TlrJ6F4Q1+Kk7NXPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org; spf=pass smtp.mailfrom=codewreck.org; dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b=XvyyAnaM; dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b=shfULbcj; arc=none smtp.client-ip=91.121.71.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
+Received: by nautica.notk.org (Postfix, from userid 108)
+	id E6AF6C01C; Mon, 12 Feb 2024 13:14:23 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
+	t=1707740063; bh=J9uKAK0vRpnU3LG0TXjxtthvlxNYsEtRU9Q3s7bTbsw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XvyyAnaMHUndfRz1pI+Bi/IiWfQ+zUWHXJKrXDzG+QcU1iO12ZF1Khghu38iz0JOS
+	 U7/GCnMo3g5rre89JR7OByJ4Hru+Fgi573evk/1vGRS5AQlAspQlXqC7RIcvOM44OQ
+	 R/6GiQy3JLreve6O2Z0UtmIlzHuRsjQWgHmzvUhDknVvkaKFY7xNoXZzvZ5ftcp7Ur
+	 jdoeB2EusIDS6uB+bzb3Cqyew9I8Rq6nabXwUieUwmOgfTGE+RGtA8qPiKZlYDceZY
+	 sBqrCla4Pstj4nSSK4gH2UhQLq/6/4mFGf59DHVt+jGCcr7UVO0gygLHKM6Yjn+N6K
+	 HNgL7ZdAqrpEg==
+X-Spam-Level: 
+Received: from gaia.codewreck.org (localhost [127.0.0.1])
+	by nautica.notk.org (Postfix) with ESMTPS id 07381C009;
+	Mon, 12 Feb 2024 13:14:10 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
+	t=1707740054; bh=J9uKAK0vRpnU3LG0TXjxtthvlxNYsEtRU9Q3s7bTbsw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=shfULbcjjvJc+CGzQIdeNTsxa7oxRkdaseyz3xhkO62eYAIfrFlf9DLahaMpyEW8L
+	 RhYMngabxuVP8bkLcrhQgPDZljuiyzZ874JqdntsjVd+yGzSoK7A2zCT367kWy8FIz
+	 f9O9Pm+xN2+eEo6lJgNIYsCAbDqQ35POt1UWLo0IZ17inFPVT5bedo8L5zC7kgOvXk
+	 QbJZmbYEtS7qN7GVuBzaE8oLzFJpEfsxMRdNn61rdjimAYueflX9EVNSbnTU67f/oA
+	 APM5OD03bYqJ15PWwSenhSvd0myshJBUxm/p9OpsQhMJvIgVaXsUOplZmhp+uSQpf1
+	 GSmFCgk2zY2/A==
+Received: from localhost (gaia.codewreck.org [local])
+	by gaia.codewreck.org (OpenSMTPD) with ESMTPA id 3ceb6d61;
+	Mon, 12 Feb 2024 12:14:04 +0000 (UTC)
+Date: Mon, 12 Feb 2024 21:13:49 +0900
+From: Dominique Martinet <asmadeus@codewreck.org>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: netdev@vger.kernel.org, Eric Van Hensbergen <ericvh@gmail.com>,
+	Latchesar Ionkov <lucho@ionkov.net>, v9fs@lists.linux.dev,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH v2] 9p/trans_fd: remove Excess kernel-doc comment
+Message-ID: <ZcoLfSBNtfgmeKaI@codewreck.org>
+References: <20240212043341.4631-1-rdunlap@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <3232442.5fSG56mABF@kreacher> <3757041.MHq7AAxBmi@kreacher>
- <ZcY7jyyFJq1yfOCj@linux.intel.com> <CAJZ5v0gZ1tpNmdkvRLA6-ydnhKPKgsM_FCwrW+q1=5ZiD=vbWA@mail.gmail.com>
- <35d4ae8f4c5157e3d0da39295a5b15eced367ab6.camel@sipsolutions.net>
-In-Reply-To: <35d4ae8f4c5157e3d0da39295a5b15eced367ab6.camel@sipsolutions.net>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Mon, 12 Feb 2024 13:03:08 +0100
-Message-ID: <CAJZ5v0jJzGR1LSDaXDCAeysCerT7A_OOyMKqJpLbxEBR4_HyqQ@mail.gmail.com>
-Subject: Re: [PATCH v1 6/9] iwlwifi: mvm: Set THERMAL_TRIP_WRITABLE_TEMP directly
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>, "Rafael J. Wysocki" <rjw@rjwysocki.net>, 
-	Linux PM <linux-pm@vger.kernel.org>, 
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>, Lukasz Luba <lukasz.luba@arm.com>, 
-	LKML <linux-kernel@vger.kernel.org>, Daniel Lezcano <daniel.lezcano@linaro.org>, 
-	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, Zhang Rui <rui.zhang@intel.com>, 
-	netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, 
-	linux-wireless@vger.kernel.org, Shawn Guo <shawnguo@kernel.org>, 
-	Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
-	Manaf Meethalavalappu Pallikunhi <quic_manafm@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240212043341.4631-1-rdunlap@infradead.org>
 
-On Mon, Feb 12, 2024 at 11:31=E2=80=AFAM Johannes Berg
-<johannes@sipsolutions.net> wrote:
->
-> On Fri, 2024-02-09 at 17:15 +0100, Rafael J. Wysocki wrote:
-> > > >       for (i =3D 0 ; i < IWL_MAX_DTS_TRIPS; i++) {
-> > > >               mvm->tz_device.trips[i].temperature =3D THERMAL_TEMP_=
-INVALID;
-> > > >               mvm->tz_device.trips[i].type =3D THERMAL_TRIP_PASSIVE=
-;
-> > > > +             mvm->tz_device.trips[i].type =3D THERMAL_TRIP_WRITABL=
-E_TEMP;
-> > >
-> > >                 mvm->tz_device.trips[i].flags =3D THERMAL_TRIP_WRITAB=
-LE_TEMP;
-> > >
-> > > Consider using diffrent prefix for constants to diffrenciate flags an=
-d types.
-> >
-> > Well, I can use THERMAL_TRIP_FLAG_RW_TEMP or similar, but is it really
-> > so confusing?
-> >
-> > I'm wondering what others think.
-> >
->
-> I'd tend to agree with Stanislaw. I did (eventually) notice the double
-> assignment to .type above, but had that not been visible in the context,
-> or you'd have removed the first one by accident, I'd really not have
-> thought about it twice.
->
-> The bug also makes it look like you even confused yourself ;-)
+Randy Dunlap wrote on Sun, Feb 11, 2024 at 08:33:41PM -0800:
+> Remove the "@req" kernel-doc description since there is not 'req'
+> member in the struct p9_conn.
+> 
+> Fixes one kernel-doc warning:
+> trans_fd.c:133: warning: Excess struct member 'req' description in 'p9_conn'
+> 
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
 
-No, that's just a mistake.
+Sorry for the lack of reply, I intended to take the patch when the next
+""real"" patch comes in but it doesn't look like we'll get much activity
+this cycle so I've just queued it up to -next.
 
-> So having a clearer indication that it's a flag would make sense, I'd say=
-.
+Thanks!
 
-Sure, thanks!
+FWIW, I contemplated adding
+Fixes: 6d35190f3953 ("9p: Rename req to rreq in trans_fd")
+but that's basically been forever so I don't think anyone will care
+about backports -- and I'm both surprised and ashamed I didn't see this
+W=1 warning earlier, I thought I regularly build with that...
+
+-- 
+Dominique
 
