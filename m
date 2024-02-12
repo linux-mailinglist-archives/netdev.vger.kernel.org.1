@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-71058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D2BB851D30
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 19:48:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 46C19851D68
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 19:57:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E639E284A1D
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 18:48:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3B95284071
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 18:57:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAF6D4653C;
-	Mon, 12 Feb 2024 18:44:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1213B3E49C;
+	Mon, 12 Feb 2024 18:57:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ER6pi4DB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HcrUjt+n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B920D45C12
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 18:44:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD0E45973
+	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 18:57:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707763453; cv=none; b=kL8pfg+r6AJsZZ+J5SIKQ3271jwRHOSvBL9crOLxjsKRCffSS1vyMPaRWJcY4YhlYiopB0b5zLID3FoxTPgvS8SRj15o08+Q6jE5sEidnehXn6kVfXDAYBFNLygurUDOSfqmsLht2py8/opIRMziGZx/UqZXqi4He+vIwTGFpik=
+	t=1707764231; cv=none; b=L0xIdhbu3iFrSLoSG9Mfpv3jjifJPxvZDCqt3N1lT8l+CoF6n/JDAuvUaYbJcZradNURQbh8IvBuTz1OtAE1fTu6oHigfcq9QO4LWFNAZ4zjm6ZOWMDHB+wtHSIOsEjKzCWuRSJGsMKNVi/Wodwx+Y9h9uHXXz0uoDSZgSerBjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707763453; c=relaxed/simple;
-	bh=7gy1/MhwfQslp6t9BgtTWqR9LBBJdksqBhpRcUNBrjk=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=fHBoHArR1VjKfj9m3PSxwqp2GO8anyhF8MYQMyCLKMwefLutZ2zCIA59CpmrGRTVaRj9dpQYJDhGp6HOASnZNw/GjdiHS1QFW5wQ3KHgGRvEfc9DoayrrKCvxPYvGErzqnwCAt/K19XlX/Tdap9t9fyM+pXdsfHclxauJTpR6b8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ER6pi4DB; arc=none smtp.client-ip=209.85.208.178
+	s=arc-20240116; t=1707764231; c=relaxed/simple;
+	bh=Zv/o+j2rMEm7TxrJziuabT8VapZOPKb8f8kno8CkC6o=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=UsqJpTvyaT8+rQAVk5gUe9HxGsOx5Htdi4bRswdDwDZhdREh8rdgIz0MC4I5nZ01r3TSLQh0uAu6s4egof0eOtEpeL4W5vHd7q6tAhtaRcuExdBgKJ/xjWiAWTUkU+XyVpAq3TShwDVe2sRz0AGmUeFj1lY9+AzODNqVsVpnJf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HcrUjt+n; arc=none smtp.client-ip=209.85.208.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2d0d799b55cso44067451fa.0
-        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 10:44:11 -0800 (PST)
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-55a035669d5so5239631a12.2
+        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 10:57:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707763450; x=1708368250; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1707764227; x=1708369027; darn=vger.kernel.org;
         h=content-transfer-encoding:autocrypt:subject:from:cc:to
          :content-language:user-agent:mime-version:date:message-id:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=eMgiCrKmuo3+lVfc6UxIcaBTOwNRJdVSWOt7YipESio=;
-        b=ER6pi4DBODQKRUz7O03kBaPwHsBHUSF+KWx4k2haDlVT4p+NOlO1FKfPeMeWGrjHxz
-         BylGGdCzMhHawtzYJqxVfHsqr53WM17f97LjWcEGePgW5/NYlM8gLbPlkruXZdc1nHPe
-         tt0qsTwwk/TTFLrjcyuebhw4KQvaKypSTYHEkS8/FtIFe2o0WUMVVvF5kjZ3Hm3ExCBs
-         ujhiK99en59oA2lMOiY2Hn/S+7cWl3MGXMLdjU6vm4s5IUSgR55yXv4OxaeVfUtI0ge/
-         WzB8jkxpx+pdAl8tRjPf2ggONIe1KEBSTYwc93hd6ywLD6N7WG5KUvnYLsQUCQcEHQ6Z
-         GEGg==
+        bh=5Z+4CmvonEkAdLD4jGgqFoHPK5DNX3X8m4mK30v8ZgA=;
+        b=HcrUjt+nPVe/CaIrQeSt7dziyJX0l6I2NhA4/WZVdXi3xACCGCjtn5yhtx8grMtxVl
+         7YxlFYUiRpHNUQ5hq24juCx5NfNu9Ufx2Sy1/yqNbwGSjS3Z+pG1rL4YRXNP7hUJ+IyW
+         HASjfeY1MnuX1odPxcciClyeyeQfRbWq9lkBNOAurs8NhyHL1vfxMH8Z33LEtecyhW8P
+         O9lcjuf4uTQ/D6rb2hVrEB0LbSwGfEI/DytGZNHHOyahxFKoN0fVyRxAGuSMzS2e7LnW
+         1/gTyBJgYQIqlzVou9ovSImFltPHFzPxAqqJ4/2ZM/P1YgZSs382IeIZSZB3keXvAxby
+         /vwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707763450; x=1708368250;
+        d=1e100.net; s=20230601; t=1707764227; x=1708369027;
         h=content-transfer-encoding:autocrypt:subject:from:cc:to
          :content-language:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eMgiCrKmuo3+lVfc6UxIcaBTOwNRJdVSWOt7YipESio=;
-        b=Y7KNCDl7RAlDlbA9+MBsgRjszYyOyBSEjlAYvZLbabe01EUFw2EG1a0okDx4v4t29I
-         jLX5f+b/uIBjCDmrmfMouoMvLW0rnt9ywbo9ysSFvYDcvq8J0Vak8Jvx+9YWuANLxH4C
-         ka8OU6JNwZEhvy8o6MPV0VdCIwh84FW7PrZY9369/HRZ8n7yEo+V2jHHeUppgE/qWumo
-         vv3OIdHZzDcHzYGU813f7CPxbX/x90L3E2S5modKPtVtsOnh2C2rztWqTzmEHnPY2wvn
-         lMaqolkdbaJWmfzwI7daEYs8/2WCgXOWdTAnYjPwp95JicpXV9kOqRC0OpBClxtfxJ5u
-         bPfw==
-X-Gm-Message-State: AOJu0Yy6kAfkIDXm2krzT5MovijnYdy3pRs5ybbzBgDAVjRCcbQKjyeD
-	KdAPmXGnh5POehRlnWFdRVEcziu/DdF5vD/PKNxlCLwYR8UynpCi
-X-Google-Smtp-Source: AGHT+IHfP9kZXKPH2A96rjKqmH7+5MRrfP+hzJzVZfT5whA5tT2YjJY2n+Tsq+wVPeHPs7z0xEJlUg==
-X-Received: by 2002:a05:651c:2006:b0:2d0:69b1:b44b with SMTP id s6-20020a05651c200600b002d069b1b44bmr4483780ljo.19.1707763449472;
-        Mon, 12 Feb 2024 10:44:09 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVD2Ff6yQ+gJrxTqj0500z6pM15kuDhC7/ggaJi6rugC3yj9jZCP7pb5qS83SipGYEMwSYjHDPaGF/XESV+92dZmTsF+wXhY+fMiNT6UZgIT5JhXjM47BYreUTLkBNZmWtL5hbo3qxP3nbSEllsB++gsjlrjY7MtRgneRDl
+        bh=5Z+4CmvonEkAdLD4jGgqFoHPK5DNX3X8m4mK30v8ZgA=;
+        b=f27prrLL2jIKIKawqOUzIx0MOAV3l1VFra7t9MAiVAe/ua0HHrLUb6CW3IVJk1LqY1
+         yhrTEa76QBUmtifzbccFjdEIbwb6stSOEWRSYX8wM+vMhjjHQGBV/zLKgdRznvK1TdDq
+         fQezwTIdhlqpkXklcdYNRjQk2xLGDbMTjSBGGpXWScgIXfaXxoVsIszN7uXQwb0JEuPU
+         yG8e4NI5AG/9iW3kJsEYXAHo0x2/8KI7cSFe6sacAf9I8jbvLHh37J2NmoobFVKM5sh6
+         hd5Ws6CcUlBKSrQn5WSNj7o4HQLNssFCQuFb+nV5hMt1YOv+EjRpC52xGufwaDYZnB6v
+         Hb3w==
+X-Gm-Message-State: AOJu0Yw8KSZkib/gS9dhWuYxGhD2EmTaDpmNxSn8sLT3koXH3wTh8DUY
+	hRXxvXpqg14ozFzL6gknHfI8VponwKy+MNJ5EC4cpZoGvyQX+FGM
+X-Google-Smtp-Source: AGHT+IGfL5Bdp5XhXXMrwj4zjfnWd6YD+1abgBeE6WCSQZNQLDeTVA+Epbyk2p/8aZUd3mquYI7HQQ==
+X-Received: by 2002:a05:6402:61a:b0:561:b9a3:f589 with SMTP id n26-20020a056402061a00b00561b9a3f589mr2116282edv.4.1707764227336;
+        Mon, 12 Feb 2024 10:57:07 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCV3Yrk5y+BTAqwopbDbEYN+qaSpI3J37p6Y4cZD1wLbfy7/ARrOsNl2uSScDdJ6oVy0w0o8k8Qf97RE6RWU/A2mKoa/Xf8lH+MXBRJsPRzYqhMcPCNWuwDcB705dIg0FO2Y/PvD8Txi4H+sv8KzW9TaGfKQOqY6aQoVgNab
 Received: from ?IPV6:2a01:c22:778f:2300:f4de:66ea:cd50:b2c7? (dynamic-2a01-0c22-778f-2300-f4de-66ea-cd50-b2c7.c22.pool.telefonica.de. [2a01:c22:778f:2300:f4de:66ea:cd50:b2c7])
-        by smtp.googlemail.com with ESMTPSA id ec13-20020a0564020d4d00b00561ca6046b3sm761125edb.31.2024.02.12.10.44.08
+        by smtp.googlemail.com with ESMTPSA id t22-20020a50d716000000b0055fe55441cbsm3154227edi.40.2024.02.12.10.57.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Feb 2024 10:44:09 -0800 (PST)
-Message-ID: <f982602c-9de3-4ca6-85a3-2c1d118dcb15@gmail.com>
-Date: Mon, 12 Feb 2024 19:44:11 +0100
+        Mon, 12 Feb 2024 10:57:07 -0800 (PST)
+Message-ID: <89a5fef5-a4b7-4d5d-9c35-764248be5a19@gmail.com>
+Date: Mon, 12 Feb 2024 19:57:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,11 +77,11 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Content-Language: en-US
 To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
  David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
 Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
 From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] r8169: add LED support for RTL8125/RTL8126
+Subject: [PATCH net-next 0/3] r8169: extend EEE tx idle timer support
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
  xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
  sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
@@ -128,249 +128,18 @@ Autocrypt: addr=hkallweit1@gmail.com; keydata=
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-This adds LED support for RTL8125/RTL8126.
+This series extends EEE tx idle timer support, and exposes the timer
+value to userspace.
 
-Note: Due to missing datasheets changing the 5Gbps link mode isn't
-supported for RTL8126.
+Heiner Kallweit (3):
+  r8169: add generic rtl_set_eee_txidle_timer function
+  r8169: support setting the EEE tx idle timer on RTL8168h
+  r8169: add support for returning tx_lpi_timer in ethtool get_eee
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/ethernet/realtek/r8169.h      |   3 +
- drivers/net/ethernet/realtek/r8169_leds.c | 106 ++++++++++++++++++++++
- drivers/net/ethernet/realtek/r8169_main.c |  61 ++++++++++++-
- 3 files changed, 166 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/realtek/r8169_main.c | 61 +++++++++++++++++------
+ 1 file changed, 46 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/net/ethernet/realtek/r8169.h b/drivers/net/ethernet/realtek/r8169.h
-index c921456ed..4c0430521 100644
---- a/drivers/net/ethernet/realtek/r8169.h
-+++ b/drivers/net/ethernet/realtek/r8169.h
-@@ -85,3 +85,6 @@ void r8169_get_led_name(struct rtl8169_private *tp, int idx,
- int rtl8168_get_led_mode(struct rtl8169_private *tp);
- int rtl8168_led_mod_ctrl(struct rtl8169_private *tp, u16 mask, u16 val);
- void rtl8168_init_leds(struct net_device *ndev);
-+int rtl8125_get_led_mode(struct rtl8169_private *tp, int index);
-+int rtl8125_set_led_mode(struct rtl8169_private *tp, int index, u16 mode);
-+void rtl8125_init_leds(struct net_device *ndev);
-diff --git a/drivers/net/ethernet/realtek/r8169_leds.c b/drivers/net/ethernet/realtek/r8169_leds.c
-index 78078eca3..7c5dc9d0d 100644
---- a/drivers/net/ethernet/realtek/r8169_leds.c
-+++ b/drivers/net/ethernet/realtek/r8169_leds.c
-@@ -18,7 +18,14 @@
- #define RTL8168_LED_CTRL_LINK_100	BIT(1)
- #define RTL8168_LED_CTRL_LINK_10	BIT(0)
- 
-+#define RTL8125_LED_CTRL_ACT		BIT(9)
-+#define RTL8125_LED_CTRL_LINK_2500	BIT(5)
-+#define RTL8125_LED_CTRL_LINK_1000	BIT(3)
-+#define RTL8125_LED_CTRL_LINK_100	BIT(1)
-+#define RTL8125_LED_CTRL_LINK_10	BIT(0)
-+
- #define RTL8168_NUM_LEDS		3
-+#define RTL8125_NUM_LEDS		4
- 
- struct r8169_led_classdev {
- 	struct led_classdev led;
-@@ -156,3 +163,102 @@ void rtl8168_init_leds(struct net_device *ndev)
- 	for (i = 0; i < RTL8168_NUM_LEDS; i++)
- 		rtl8168_setup_ldev(leds + i, ndev, i);
- }
-+
-+static int rtl8125_led_hw_control_is_supported(struct led_classdev *led_cdev,
-+					       unsigned long flags)
-+{
-+	struct r8169_led_classdev *ldev = lcdev_to_r8169_ldev(led_cdev);
-+	struct rtl8169_private *tp = netdev_priv(ldev->ndev);
-+
-+	if (!r8169_trigger_mode_is_valid(flags)) {
-+		/* Switch LED off to indicate that mode isn't supported */
-+		rtl8125_set_led_mode(tp, ldev->index, 0);
-+		return -EOPNOTSUPP;
-+	}
-+
-+	return 0;
-+}
-+
-+static int rtl8125_led_hw_control_set(struct led_classdev *led_cdev,
-+				      unsigned long flags)
-+{
-+	struct r8169_led_classdev *ldev = lcdev_to_r8169_ldev(led_cdev);
-+	struct rtl8169_private *tp = netdev_priv(ldev->ndev);
-+	u16 mode = 0;
-+
-+	if (flags & BIT(TRIGGER_NETDEV_LINK_10))
-+		mode |= RTL8125_LED_CTRL_LINK_10;
-+	if (flags & BIT(TRIGGER_NETDEV_LINK_100))
-+		mode |= RTL8125_LED_CTRL_LINK_100;
-+	if (flags & BIT(TRIGGER_NETDEV_LINK_1000))
-+		mode |= RTL8125_LED_CTRL_LINK_1000;
-+	if (flags & BIT(TRIGGER_NETDEV_LINK_2500))
-+		mode |= RTL8125_LED_CTRL_LINK_2500;
-+	if (flags & (BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX)))
-+		mode |= RTL8125_LED_CTRL_ACT;
-+
-+	return rtl8125_set_led_mode(tp, ldev->index, mode);
-+}
-+
-+static int rtl8125_led_hw_control_get(struct led_classdev *led_cdev,
-+				      unsigned long *flags)
-+{
-+	struct r8169_led_classdev *ldev = lcdev_to_r8169_ldev(led_cdev);
-+	struct rtl8169_private *tp = netdev_priv(ldev->ndev);
-+	int mode;
-+
-+	mode = rtl8125_get_led_mode(tp, ldev->index);
-+	if (mode < 0)
-+		return mode;
-+
-+	if (mode & RTL8125_LED_CTRL_LINK_10)
-+		*flags |= BIT(TRIGGER_NETDEV_LINK_10);
-+	if (mode & RTL8125_LED_CTRL_LINK_100)
-+		*flags |= BIT(TRIGGER_NETDEV_LINK_100);
-+	if (mode & RTL8125_LED_CTRL_LINK_1000)
-+		*flags |= BIT(TRIGGER_NETDEV_LINK_1000);
-+	if (mode & RTL8125_LED_CTRL_LINK_2500)
-+		*flags |= BIT(TRIGGER_NETDEV_LINK_2500);
-+	if (mode & RTL8125_LED_CTRL_ACT)
-+		*flags |= BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX);
-+
-+	return 0;
-+}
-+
-+static void rtl8125_setup_led_ldev(struct r8169_led_classdev *ldev,
-+				   struct net_device *ndev, int index)
-+{
-+	struct rtl8169_private *tp = netdev_priv(ndev);
-+	struct led_classdev *led_cdev = &ldev->led;
-+	char led_name[LED_MAX_NAME_SIZE];
-+
-+	ldev->ndev = ndev;
-+	ldev->index = index;
-+
-+	r8169_get_led_name(tp, index, led_name, LED_MAX_NAME_SIZE);
-+	led_cdev->name = led_name;
-+	led_cdev->hw_control_trigger = "netdev";
-+	led_cdev->flags |= LED_RETAIN_AT_SHUTDOWN;
-+	led_cdev->hw_control_is_supported = rtl8125_led_hw_control_is_supported;
-+	led_cdev->hw_control_set = rtl8125_led_hw_control_set;
-+	led_cdev->hw_control_get = rtl8125_led_hw_control_get;
-+	led_cdev->hw_control_get_device = r8169_led_hw_control_get_device;
-+
-+	/* ignore errors */
-+	devm_led_classdev_register(&ndev->dev, led_cdev);
-+}
-+
-+void rtl8125_init_leds(struct net_device *ndev)
-+{
-+	/* bind resource mgmt to netdev */
-+	struct device *dev = &ndev->dev;
-+	struct r8169_led_classdev *leds;
-+	int i;
-+
-+	leds = devm_kcalloc(dev, RTL8125_NUM_LEDS, sizeof(*leds), GFP_KERNEL);
-+	if (!leds)
-+		return;
-+
-+	for (i = 0; i < RTL8125_NUM_LEDS; i++)
-+		rtl8125_setup_led_ldev(leds + i, ndev, i);
-+}
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index b43db3c49..9fdc9b0f3 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -330,17 +330,23 @@ enum rtl8168_registers {
- };
- 
- enum rtl8125_registers {
-+	LEDSEL0			= 0x18,
- 	INT_CFG0_8125		= 0x34,
- #define INT_CFG0_ENABLE_8125		BIT(0)
- #define INT_CFG0_CLKREQEN		BIT(3)
- 	IntrMask_8125		= 0x38,
- 	IntrStatus_8125		= 0x3c,
- 	INT_CFG1_8125		= 0x7a,
-+	LEDSEL2			= 0x84,
-+	LEDSEL1			= 0x86,
- 	TxPoll_8125		= 0x90,
-+	LEDSEL3			= 0x96,
- 	MAC0_BKP		= 0x19e0,
- 	EEE_TXIDLE_TIMER_8125	= 0x6048,
- };
- 
-+#define LEDSEL_MASK_8125	0x23f
-+
- #define RX_VLAN_INNER_8125	BIT(22)
- #define RX_VLAN_OUTER_8125	BIT(23)
- #define RX_VLAN_8125		(RX_VLAN_INNER_8125 | RX_VLAN_OUTER_8125)
-@@ -830,6 +836,51 @@ int rtl8168_get_led_mode(struct rtl8169_private *tp)
- 	return ret;
- }
- 
-+static int rtl8125_get_led_reg(int index)
-+{
-+	static const int led_regs[] = { LEDSEL0, LEDSEL1, LEDSEL2, LEDSEL3 };
-+
-+	return led_regs[index];
-+}
-+
-+int rtl8125_set_led_mode(struct rtl8169_private *tp, int index, u16 mode)
-+{
-+	int reg = rtl8125_get_led_reg(index);
-+	struct device *dev = tp_to_dev(tp);
-+	int ret;
-+	u16 val;
-+
-+	ret = pm_runtime_resume_and_get(dev);
-+	if (ret < 0)
-+		return ret;
-+
-+	mutex_lock(&tp->led_lock);
-+	val = RTL_R16(tp, reg) & ~LEDSEL_MASK_8125;
-+	RTL_W16(tp, reg, val | mode);
-+	mutex_unlock(&tp->led_lock);
-+
-+	pm_runtime_put_sync(dev);
-+
-+	return 0;
-+}
-+
-+int rtl8125_get_led_mode(struct rtl8169_private *tp, int index)
-+{
-+	int reg = rtl8125_get_led_reg(index);
-+	struct device *dev = tp_to_dev(tp);
-+	int ret;
-+
-+	ret = pm_runtime_resume_and_get(dev);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = RTL_R16(tp, reg);
-+
-+	pm_runtime_put_sync(dev);
-+
-+	return ret;
-+}
-+
- void r8169_get_led_name(struct rtl8169_private *tp, int idx,
- 			char *buf, int buf_len)
- {
-@@ -5388,10 +5439,12 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	if (rc)
- 		return rc;
- 
--	if (IS_ENABLED(CONFIG_R8169_LEDS) &&
--	    tp->mac_version > RTL_GIGA_MAC_VER_06 &&
--	    tp->mac_version < RTL_GIGA_MAC_VER_61)
--		rtl8168_init_leds(dev);
-+	if (IS_ENABLED(CONFIG_R8169_LEDS)) {
-+		if (rtl_is_8125(tp))
-+			rtl8125_init_leds(dev);
-+		else if (tp->mac_version > RTL_GIGA_MAC_VER_06)
-+			rtl8168_init_leds(dev);
-+	}
- 
- 	netdev_info(dev, "%s, %pM, XID %03x, IRQ %d\n",
- 		    rtl_chip_infos[chipset].name, dev->dev_addr, xid, tp->irq);
 -- 
-2.43.0
+2.43.1
 
 
