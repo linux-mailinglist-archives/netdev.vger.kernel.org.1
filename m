@@ -1,135 +1,126 @@
-Return-Path: <netdev+bounces-71072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8854851EC9
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 21:40:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36C02851ED8
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 21:47:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35852B21B78
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 20:40:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E676F2834FF
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 20:47:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81FA33A8FE;
-	Mon, 12 Feb 2024 20:40:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1AD347A67;
+	Mon, 12 Feb 2024 20:47:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="UI2uYxRX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E735E1EB3D;
-	Mon, 12 Feb 2024 20:40:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27F791EA78
+	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 20:47:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707770416; cv=none; b=iJGZdyJF8UIL8i9sFQ83dEHeYzY9jHq1j/MngqUIcMbUZ1oVuLeq8YDp2NAIojVdt1WTutdhdIQC15q3LgLbgXCizbpcbZKlq0IpMb8Q0RvPluFk9kZqbDLUGcwCBLa0lYBJRLkdTLvdOxwHw4dnHbJSC3YIhVbu2uyWy7fztC4=
+	t=1707770862; cv=none; b=PD9G/3dKRpBR6TcIdcJJIU9MDOcpT3q+G7xwiEHQZwmKNU0cqGNSB4E+O2ZG6jUlXYzKugZ/saW+nPHsGY9mUS6ThQo9hlRgUJte/CdXDB/slm5gpnCYMr7FXjxVOUhdE3aRnBmsLorRHipjyHgRltPvow6Ec4vUg65jWBVkH5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707770416; c=relaxed/simple;
-	bh=ts416wrAK6dKQgFPcsXRwARoY2LTcVFjNPySoHIIVHY=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=NHI1mU5SoGVV9y4U9q0F4XQ0iY7UvnAo0w8UnqzZUraVWvIAG5kdajRNkaQhuPNb0ck+PEeVNNaCDGObXOzMxt9JA+HA3ywdQHGVhcqlUMCzpYhwnJFJhFsMbhMgHC5DcSbpnqEHC1/y0A2T7xWjQNIdZFNgkXp6xBiPpnk4Qp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (178.176.73.92) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 12 Feb
- 2024 23:40:04 +0300
-Subject: Re: [RFC PATCH net-next v2 6/7] net: ravb: Enable SW IRQ Coalescing
- for GbEth
-To: Paul Barker <paul.barker.ct@bp.renesas.com>, "David S . Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, Wolfram Sang
-	<wsa+renesas@sang-engineering.com>, <netdev@vger.kernel.org>,
-	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240206091909.3191-1-paul.barker.ct@bp.renesas.com>
- <20240206091909.3191-7-paul.barker.ct@bp.renesas.com>
- <2251fe66-11b7-2f30-c905-7bc1b9a57dab@omp.ru>
- <895bdec7-05d6-4435-8be1-fe8ca716cbcb@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <7c28bbea-0b3f-ee62-05c8-e6f1bc738b0b@omp.ru>
-Date: Mon, 12 Feb 2024 23:40:04 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1707770862; c=relaxed/simple;
+	bh=R1DEde+b9JaKYDSbMt3g46Ez62dW2i+6rLXKkTY3CM8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=c5fnCuFDKwqPl3CEAnWWG4h1nVtbFQVJ1cKDX/y7nnmkq+P5dpAwDRMRFIfSWpuBD+xU6p9ROiqQMzcwQvxPa88IQH7y3gb6TKJSThqkMCyxmXN5LKAOiLjuo4J+8uzd1bhxxMwOizndmiOeGeI3OlsdVIC3ADqBSvrkQdnHfd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=UI2uYxRX; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.vnet.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41CKat7O017597;
+	Mon, 12 Feb 2024 20:47:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=viv61tL2Z4cLZRXxnXH9vw9uRuzWXWiMbb3ngXK3Qkk=;
+ b=UI2uYxRXccrRQ/lS7D6g1MxoAlPl30ZY9HdRyCOZdgDW+TAn3fTSX5lQkaH7s+orA3gD
+ flIIVtS4g5p+Z4fy4gmom3ayKDJ2GuIWXcpBYBdFnZHn7ORaEZOwDdDjq2ycaUEWsmx5
+ AZgQNgPvCL2WR36ZP8zYqNitvVd5xmXgRhOWlaQjlkEn5WRx1onv1c7SA3IA8UPa1eVy
+ L7H+bW0kGFaR6RtszLoglOEGX+uznJTOT6f7Daxw2bXiFpqe1iFblwi7RPxI0IA8WhAv
+ 0BWvO5CwCq00HBtf46Gse1RNirdnTUNCUxPR9HQpuX6lkwSigQBL1KmT5KcDYCcLh28s ww== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w7th583t1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 12 Feb 2024 20:47:35 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41CKjOIX005708;
+	Mon, 12 Feb 2024 20:47:35 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w7th583sm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 12 Feb 2024 20:47:34 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41CJf5uP016184;
+	Mon, 12 Feb 2024 20:47:33 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3w6mymayr9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 12 Feb 2024 20:47:33 +0000
+Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
+	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41CKlSjW6881794
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 12 Feb 2024 20:47:31 GMT
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D549A5805C;
+	Mon, 12 Feb 2024 20:47:28 +0000 (GMT)
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 32B9358051;
+	Mon, 12 Feb 2024 20:47:27 +0000 (GMT)
+Received: from [9.67.31.65] (unknown [9.67.31.65])
+	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 12 Feb 2024 20:47:27 +0000 (GMT)
+Message-ID: <0df4d341-ed70-4db1-af7b-b2a585316819@linux.vnet.ibm.com>
+Date: Mon, 12 Feb 2024 14:47:26 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <895bdec7-05d6-4435-8be1-fe8ca716cbcb@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 1/2] net/bnx2x: Prevent access to a freed page in
+ page_pool
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, aelior@marvell.com, davem@davemloft.net,
+        manishc@marvell.com, pabeni@redhat.com, skalluru@marvell.com,
+        simon.horman@corigine.com, edumazet@google.com,
+        VENKATA.SAI.DUGGI@ibm.com, drc@linux.vnet.ibm.com, abdhalee@in.ibm.com
+References: <cover.1707414045.git.thinhtr@linux.vnet.ibm.com>
+ <90238577e00a7a996767b84769b5e03ef840b13a.1707414045.git.thinhtr@linux.vnet.ibm.com>
+ <056b4e86-a894-4a4b-a8dd-81f440118106@linux.vnet.ibm.com>
+ <20240208172936.7a8b7fb8@kernel.org>
 Content-Language: en-US
+From: Thinh Tran <thinhtr@linux.vnet.ibm.com>
+In-Reply-To: <20240208172936.7a8b7fb8@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 02/12/2024 20:22:58
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 183376 [Feb 12 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.73.92 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;178.176.73.92:7.4.1,7.7.3;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1
-X-KSE-AntiSpam-Info: {cloud_iprep_silent}
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.73.92
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 02/12/2024 20:28:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 2/12/2024 6:23:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: TFYCkAsbnfl9wi2WJ5-dMbZDvECTHtTp
+X-Proofpoint-ORIG-GUID: OMezVqEX4w4Gxy_WHiL0vQBX5j6JoFmE
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-12_16,2024-02-12_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 lowpriorityscore=0 suspectscore=0 phishscore=0 adultscore=0
+ mlxlogscore=621 clxscore=1015 malwarescore=0 mlxscore=0 impostorscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2402120161
 
-On 2/12/24 2:45 PM, Paul Barker wrote:
-[...]
->>> diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/ethernet/renesas/ravb.h
->>> index 55a7a08aabef..ca7a66759e35 100644
->>> --- a/drivers/net/ethernet/renesas/ravb.h
->>> +++ b/drivers/net/ethernet/renesas/ravb.h
->>> @@ -1078,6 +1078,7 @@ struct ravb_hw_info {
->>>  	unsigned nc_queues:1;		/* AVB-DMAC has RX and TX NC queues */
->>>  	unsigned magic_pkt:1;		/* E-MAC supports magic packet detection */
->>>  	unsigned half_duplex:1;		/* E-MAC supports half duplex mode */
->>> +	unsigned needs_irq_coalesce:1;	/* Requires SW IRQ Coalescing to achieve best performance */
->>
->>    Is this really a hardware feature?
+
+
+On 2/8/2024 7:29 PM, Jakub Kicinski wrote:
+> On Thu, 8 Feb 2024 13:18:14 -0600 Thinh Tran wrote:
+>> Fixes: 4cace675d687 ("bnx2x: Alloc 4k fragment for each rx ring buffer
+>> element")
 > 
-> It's more like a requirement to get the best out of this hardware and the Linux networking stack.
-> 
-> I considered checking the compatible string in the probe function but I decided that storing a configuration bit in the HW info struct was cleaner.
+> The Fixes tag should be on one line, without wrapping.
+> Please post a v9 with the tag included, as a new thread.
+> Don't use --in-reply-to on netdev (sorry for so many rules..)
 
-   Yes, but you added the new bit under the "hardware features" commet. :-)
-
->>    Also, s/Requires SW/Needs software/ and s/to achieve best performance//,
->> please...
-> 
-> Will do.
-
-   The comment is too long, I think. :-)
-
-[...]
-
-> Thanks for the review,
-> Paul
-
-MBR, Sergey
+Will do. Thank you.
 
