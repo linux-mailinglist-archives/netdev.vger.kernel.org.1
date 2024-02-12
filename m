@@ -1,380 +1,327 @@
-Return-Path: <netdev+bounces-70973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 851798516B7
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 15:13:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAE0E8516D3
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 15:16:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E27731F22093
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 14:13:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C4C81C212BE
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 14:16:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7A553F9F6;
-	Mon, 12 Feb 2024 14:07:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE5493A1CA;
+	Mon, 12 Feb 2024 14:15:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DzyXlpUz"
+	dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b="nJAaqo3n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2077.outbound.protection.outlook.com [40.107.8.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A13A13F9E9
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 14:07:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707746829; cv=none; b=TcnT21akwVnhaHeVvnMLz6a+sE6ilIe1uC1Wne8XnoQJ+nMkBRyx5YQ30q+jC40AlzP6L6csPpUeTmpxTwM1mJUkC1i1U2chWVhWAibiQt9obaVCGeSqFeaOKWbydITzvRHJ7aXIbLtdGEvwYj/+D5ARUZLfXX3V6dbGrsxv35c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707746829; c=relaxed/simple;
-	bh=PmqD2CxkEEk8hxoH8Roo1HK6nC/oKDr4G97CCwA3L60=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RzCy8Usa865BOvc/PDBcSuV9QRyKGavIJpoYRpTh5f1LxD990X/0lKSngjiIFfYKOZzTJhls1QLXdFWPqs3E4g360rsb2+PlIpM2GR7pD43RChR1WypVoUtdpF2PewTh++D0u9f4ZmcxDzybLEO+A5B4oEJ/LZfgiGIIEvQR6vE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DzyXlpUz; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc74645bfa8so4576931276.1
-        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 06:07:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707746826; x=1708351626; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yOF9bLl+u0Gx7rcjI1F4R0x2pfMuVqP3JcksKW49vSU=;
-        b=DzyXlpUzfa3FS8nfypBUHwpoNHjKI/Ba4JAuXS171+i6avJKHEAdDn85ERSR6B/Q5X
-         qlCAX33UQKeITgGAGhoLh46eWl9a1wNqchkFgfXuv7iclocwn1GuS4D6w5N8KkmWsAXZ
-         q77+bviwB/gElga/QFfkct8pdiILOGNJBNUVV7xAlL1bn7H6RQhq2s9uRLzmCkeB9yhE
-         4ohF5gUcfN4dce3YifIxwIih3AdnhSSfzUf9gSCTL4IqWOQ+NRn0two428TIXnc8UC//
-         /S8B7pKdlz2hD0nb7A2zo8orxi+ixuj7JDuXLvMLtuBMeGNEA0B8Kl8QAGfxCt0R7qOS
-         dHHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707746826; x=1708351626;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yOF9bLl+u0Gx7rcjI1F4R0x2pfMuVqP3JcksKW49vSU=;
-        b=B0mJkK/IRMEMf+wZUrkNod36K0NX59RV2DLcSpdcIwKCfZX4BNfuEg3g1rdKiEQsrr
-         5sUKROv/RATeyUs3/kZUUcrv4LYpUYOxC3FYfnb2qSMO9mwsQ7c5eDnKLrrbDi2ZT6cd
-         ZAN+I77WPyN+6cAmtXJcOIk/r3ZvfW25qRUNGaETYTn/XXrBqX3KgP9P6JIRIDdN4yD7
-         mcTYigRVfnrZYeG//bL3FGJvuQU8IQZfXlr7Q3o7cT4VaN4FgoTfnSOom3iq89FgmYS7
-         fz2HIBRZN3XOuCFRMQ35ZIXuawaWhGzjQnzvLswpZfT3DgViR8KCkRgvsFqakzFbYs5G
-         FoyA==
-X-Gm-Message-State: AOJu0YxcQKeDDnPJt7V1hnlOpx3Xl+FUbqBJLc9lk8jRXoQv2Yg88Cvg
-	UDxa4Or9un+MRHttIb7kvp2HrFI6XG/tasQMnVKHlRFhVr2kpn8Uk+gZOGs9ssdWVNluo1mmTjI
-	IsKGS+y+oag==
-X-Google-Smtp-Source: AGHT+IF/6SxelbZT+zpxYNGM2o8R+08akDZ0/8HxoQ0N6Bj23ZBqBD0D1Cs1GmCzdzCvMw8gLuHvuditpuAcog==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:124a:b0:dbe:d0a9:2be8 with SMTP
- id t10-20020a056902124a00b00dbed0a92be8mr246205ybu.0.1707746826613; Mon, 12
- Feb 2024 06:07:06 -0800 (PST)
-Date: Mon, 12 Feb 2024 14:07:00 +0000
-In-Reply-To: <20240212140700.2795436-1-edumazet@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E8D23A8DC;
+	Mon, 12 Feb 2024 14:15:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.8.77
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707747354; cv=fail; b=CwKGaRGkioLDaFJo7Z2hRPGkQ1F0BYjFXVGHt6/s9fjdcWPbwDPbQQM9j5Fn4lbdIjjVpDya+3AXGlsvQoW+7lzoo32fVSuahAHHuiTXeS/ISsbjNBq2kVIVQ22Hd6BV3JurLHSqO+mGWuEewUGi/L9OqxY2yPXZsqVG6soeeVk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707747354; c=relaxed/simple;
+	bh=dHRsz3+tgqGKCYXmiEjYr/Gr49hRNR/N77ymd5++PD8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Q8aulkMxN3DJ/dsm5ZHQbK/otvjfSddSH/2hZjuUunFvGoBFmwBf1CXohN7tPfR1z8EPY7x8HAzbEgNxxikakVS/cUbHhSUyUQVIssQlgjknT++DsxUoonZGuy1gefT3FJMbMsQ8SiXisR9/2rfEtzs+3cI9HRhRit0UcivJAuo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com; spf=fail smtp.mailfrom=leica-geosystems.com; dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b=nJAaqo3n; arc=fail smtp.client-ip=40.107.8.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=leica-geosystems.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PQnMIp0iQIRtEzPHR7AUyjnwgQhz+wwElruM/qZ0OaB8eLVJLb9eYoXNz8tHfo9E9UVrJ5UzAaDFPUTl52F25dEGxI2qx9SnLQC4PuIuhxqte9zTRsFihYHXjAvWP038AmWKg3dwitQWVAgyMebMbGEO9r7kF0RL3ZRzqJha1J9elqylJ5NvWdSBQcjAGT+k/xIPTXFZ7Yo5B33JhqHC2M8LaU4zJalKyNRHMEy9RukzDArB7MYrML27bhsoCqj7dkA+Sw564lW8U4Zd4wjwzL5E5WwaflHPt/i21SVjNse501S2yhXRJ35aBNXIINn+y3QYeKLn8kG4YO8z/s4U/g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dHRsz3+tgqGKCYXmiEjYr/Gr49hRNR/N77ymd5++PD8=;
+ b=QchZHFuGLjvs7GnEUTzg6sGJqYppXVnkwTiobinKhDbx0EZuL/pc5Zje9Kn+6vbQrMLAt8rqy3TTgXTyII3BgG8hFOdqZcyhX4BpCIfDF3O4Qv0y49c25srtwDE7m6lLAbCIZmEHOCkFzZB4GUcUxh6kgdfQLER/hhiV7wx5wgDGLPeSqNZqjNW+xbL7KYOsOly6m4hwPgyFDjgCexe022bbS02lWnSvGm9gReRzoXZx0FBO0YEpJVRGE3CjEwv+Z74YI4IfQZX1lF7iifGsUpV+e0RugGDvHD/lxjt1HOIdpaXzBc9HAm9VmA4DesB5rfGL8YPX1pm2S+hr1prU0w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=leica-geosystems.com; dmarc=pass action=none
+ header.from=leica-geosystems.com; dkim=pass header.d=leica-geosystems.com;
+ arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=leica-geosystems.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dHRsz3+tgqGKCYXmiEjYr/Gr49hRNR/N77ymd5++PD8=;
+ b=nJAaqo3nogP3luXl4rpx9jXuoj2ayXvj0glY7g+dEv+3JpGCXrERPC+29GMzcffiyRq9Zn6AA5g90gcKDwWaUgtczwgV/7GL1oenxAEL09nMw5WUCb3yfWr0GLhy7LAtpbjxOhBJ5Oty+7aK7WYsla0L33EEL/4Eo99wfUC8voc=
+Received: from VI1PR06MB4718.eurprd06.prod.outlook.com (2603:10a6:803:9d::17)
+ by PAXPR06MB7981.eurprd06.prod.outlook.com (2603:10a6:102:1ae::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.32; Mon, 12 Feb
+ 2024 14:15:48 +0000
+Received: from VI1PR06MB4718.eurprd06.prod.outlook.com
+ ([fe80::739a:c38:b3d9:44ae]) by VI1PR06MB4718.eurprd06.prod.outlook.com
+ ([fe80::739a:c38:b3d9:44ae%5]) with mapi id 15.20.7270.025; Mon, 12 Feb 2024
+ 14:15:47 +0000
+From: POPESCU Catalin <catalin.popescu@leica-geosystems.com>
+To: "davem@davemloft.net" <davem@davemloft.net>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"robh+dt@kernel.org" <robh+dt@kernel.org>,
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>, "afd@ti.com" <afd@ti.com>,
+	"andrew@lunn.ch" <andrew@lunn.ch>, "hkallweit1@gmail.com"
+	<hkallweit1@gmail.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	GEO-CHHER-bsp-development <bsp-development.geo@leica-geosystems.com>,
+	"m.felsch@pengutronix.de" <m.felsch@pengutronix.de>
+Subject: Re: [PATCH v4 2/2] net: phy: dp83826: support TX data voltage tuning
+Thread-Topic: [PATCH v4 2/2] net: phy: dp83826: support TX data voltage tuning
+Thread-Index: AQHaXYemZiwmM1zt5EyvIyDjdhgdRLEGwOKA
+Date: Mon, 12 Feb 2024 14:15:47 +0000
+Message-ID: <186cf83c-b7a7-4d28-a8b1-85dde032287b@leica-geosystems.com>
+References: <20240212074649.806812-1-catalin.popescu@leica-geosystems.com>
+ <20240212074649.806812-2-catalin.popescu@leica-geosystems.com>
+In-Reply-To: <20240212074649.806812-2-catalin.popescu@leica-geosystems.com>
+Accept-Language: en-CH, en-US
+Content-Language: aa
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=leica-geosystems.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: VI1PR06MB4718:EE_|PAXPR06MB7981:EE_
+x-ms-office365-filtering-correlation-id: 2d45f5db-3e82-4fa6-8ccf-08dc2bd51bff
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ G6sk7lvq3k0xthxgY8nvZ13yni4u4yMX25h11igzuLaQMIsE643y4ctFArp4IWjv8uNlw2/RzftE2wwcwaP1t908CLy3+88/5jxdjF3Uv0y84aAmP2eRhS3sVzSXtKhqkInpac+lKM3XdbMIIHf1AcFREw6Kp844knuYXAtzha4QYiRrTqDCE6gD9tL/ZhyRoDHKVm+WyPa54oAKnnJ0Nx06g5M3Fpk9Bx+CD81VqWpkU7lpD3KHUO6HHNNW1TJVA2pLg9W8YeIVe0TXCq8Vcijc3Rn3/ve6bll608JJbCypSmcGD4Sw8maI48JekKDxzqIMO0l4n4/k7HaDGwjyO+a8YfdA5RtdUDezhMQF3T1xhZ4bymuxhcVTprUHuC9wxeP2yo/QVHasQ73wdn+5yU+rEEtsJeUwn9rNgeh9ggxrgXfKmT0K/VHFRmWysH70S4+B8ZkR76Y7HRx69sOg20ruaJQVlrP0134BEfvBJyUJnio1AF7PiHY+5zPGuJfl6oCyU18wvXwE3Pp2KvDkPOMUDhW+bD0Q01V2LViTtAJCHAj2bjCuhpMxtfpaD+FpjSA7wRG300/JQE8Gw6N7AP5rA5j8utDJ/8L9JvXe4mqyfkcijP42LqHehHQidoeNdJ4/HGg+m4sle7cob4CGfw==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR06MB4718.eurprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(136003)(376002)(346002)(366004)(396003)(230922051799003)(1800799012)(186009)(64100799003)(451199024)(8676002)(4326008)(8936002)(5660300002)(7416002)(2906002)(66899024)(83380400001)(66446008)(36756003)(2616005)(921011)(26005)(122000001)(38100700002)(31696002)(86362001)(6506007)(54906003)(38070700009)(110136005)(64756008)(66476007)(66946007)(71200400001)(76116006)(66556008)(316002)(53546011)(91956017)(6486002)(6512007)(478600001)(31686004)(41300700001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?WG1oYlNiMEZDdWl1c3NzRVE0bGdzYU5oVTI4alB0dS9qWXpmcnIyREZJZkRq?=
+ =?utf-8?B?M3g4Rkt4QytacVJpREdPdVFzOHFxSkdrSmZqVHNldUM3T042cHBFMzdXaXhH?=
+ =?utf-8?B?TmhqMW9QQnR3ZlNsbVhWekM4ZTZ2cEFFN2s3TStEYm5LL2hsUTA0Uk5uRExt?=
+ =?utf-8?B?c0E0NjRVZVFjd1hnSms3eER3RTVTYjdQYnFIQ05YZVdjc0g0WmZMUzVpaEJw?=
+ =?utf-8?B?YkNDb2lkemFrUVArdWpYN0ZiY3dUaTBROTc5ajBHRitKZVBZbnVnN2M1c1Nz?=
+ =?utf-8?B?YWRldTdQUFNROGpPUDR0Z1B2Q1FOUlhUVEtpc1ZSYnk1L0h6R3dqNjl1bkdy?=
+ =?utf-8?B?Vkx3cVNYcWlEcTJ0QmhRZlcyL3F0TzE3Y0VpMW9BR1JxT1hVVEZ2ekgxQ2xo?=
+ =?utf-8?B?cU0zU3NMNitGUzQvUnRkOHhEVmpqcTBmOThMZk1BNUhNK0JQKzNaN1hPVVZN?=
+ =?utf-8?B?Y1JBeE1qQXhNV1JqNVByNGNoRVJWaFk1SjQ0by9FVDYzRGhOTWJkZFk3Z3JE?=
+ =?utf-8?B?enNBRkIxOE9nV045T1dPQ0J4ZGF5OG1wREk4UllHaWFEQXJVaWtoQUg5UlRL?=
+ =?utf-8?B?TXAyZ0Zjc3ZKWVc1Y0hZRHR3TFNPVTB6R2Zzb0luOVJXRFZsZFUzVFdMVE82?=
+ =?utf-8?B?STZNMGxzTTVKZWpxTmNFZUl3YTZiZGZTeXVwZlRkQlNOY3N3SVZDK05FZ0tu?=
+ =?utf-8?B?WkVLalUrc0ZjcHlpVFZqY2VmYVN4L3gzRElCeWpqcUJOcXlyVFdyQVpDWFpO?=
+ =?utf-8?B?YVJ1SE1LakNKSjJrN3FocEVJMzlnNW1YTGpXM0lxWEkzTCt3YW01aGpkeUhW?=
+ =?utf-8?B?NVBrN3BFZzdGcitTODA0TzZIdGQ5cUxEMEVyN25KRXdYMFBFVXlkdklnL2cx?=
+ =?utf-8?B?VzArcVIxcG5kU0FHQnE4dk5ILzFxNGJEdk5vUGdHVkpUOFoySUhlcWl6aGx5?=
+ =?utf-8?B?YlBKZ2FvdUhmZEQva1lSQTBVdjlnVTlOUUFpUlBqa1l6ajJvQXhCZmdpWWtH?=
+ =?utf-8?B?L3RYNE1nOXh1aFFQaURSR2V4ekRHRnR5Q2FQMk11WXhLQ3lBMzlyVEVCUVBO?=
+ =?utf-8?B?TGplL3dLYVl5eVlsbWhTWGU4anNhTFFZSi96VWkxOXR0S2swdS9WalNWNVdo?=
+ =?utf-8?B?N1MxR0F5ek9HSEFSaVFYa09YSEJJOE8zRHNOZUI4a0Mydk5kSUErQ2tnaVFC?=
+ =?utf-8?B?ZVlEWEtueGpXQ2taNDlhY2w5eWZmZmdJY3k1cDE5MUUyZ3JQVjR3TDRvM3lo?=
+ =?utf-8?B?M0VqLzJZVVFuOWZJUzZjaWN4WWxvQlcvcitWTUlSYkZRSWxDZHE4UjRRa2Fu?=
+ =?utf-8?B?bWZHcm13UFdFNS9makhERTh0dFJkSjQvN0h2aWR4TDIzSEl6QlpGYnU0OC92?=
+ =?utf-8?B?c05CSnM2TExqekVjTU1XT3IxcHJhZFY4czA5aTFjWk9PUElRM1IrSmFQYmU5?=
+ =?utf-8?B?OFRuQ2JpMXNlTDJvck9BMEJGWUVBNU04Y0cxUG9GU3lmVkJPOVc5aHVKalZa?=
+ =?utf-8?B?eloxMnEva3NFTXI5SVhpRUVUQVdxcGNhSUlQZHkwbnBOSjJYMUlHM0VFY3dx?=
+ =?utf-8?B?TFRsblA3Z0JvWkdrcy9RNVJha2UzcmNSV3hLbEFVWWN5SHY5NzVkSFlMT1Jl?=
+ =?utf-8?B?QzhLbHRtUW9oU2puNFFLekZJWnRYdElQRE1hOWw3UXZOVnMwK09CSE1zV0o2?=
+ =?utf-8?B?NEp5TEFPU2dxRExCbXZPTFBuT01rVlU4cUZtdG5hN2l3UzkyL3Q4bkpUa1l4?=
+ =?utf-8?B?SU9yemhkR0FFMjVQeWczS09FQUN0aVh0OHJnTkJIVDQxTVpockQ5NUFsSlRz?=
+ =?utf-8?B?UDY4RVNOV3ZkOEtBampvUTdDb2N0aVNmRC9SRGlQakZ3VmxOQ1VLWnQvZDVC?=
+ =?utf-8?B?OExJRlVBWHpzV1ZuM2dYSEMzeUlobEdEN3NVOGN3L2dwN3BPRkN4cFZQZzUy?=
+ =?utf-8?B?dWhYUHRpMzQwTjRTNWE3bkpsNGhrcE16R3Z4ZmhBNEpUOHhCdzRRTXppay8v?=
+ =?utf-8?B?MHhFUDRKNVFSblc2TUsrL1l5WStxNnB1MlkzRnloV1MwdTFVeTQzLzdPRmxC?=
+ =?utf-8?B?dFA2a1g1bHRoaVlJWnZ1amYwZDNtcys2Z1NOZUlyWEhZbzA2QlVuOVAwY1Bw?=
+ =?utf-8?B?SXJHdmprdmhmekVIMVdzbTJkNlZzNVkvL3JudmQ1aEtpeDRLUDdOb3pqVWVz?=
+ =?utf-8?B?NUE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <CC30A0C35BD6674CACEFE69110141CF9@eurprd06.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240212140700.2795436-1-edumazet@google.com>
-X-Mailer: git-send-email 2.43.0.687.g38aa6559b0-goog
-Message-ID: <20240212140700.2795436-4-edumazet@google.com>
-Subject: [PATCH net-next 3/3] net: add netdev_lockdep_set_classes() to virtual drivers
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-OriginatorOrg: leica-geosystems.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR06MB4718.eurprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2d45f5db-3e82-4fa6-8ccf-08dc2bd51bff
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Feb 2024 14:15:47.7132
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 1b16ab3e-b8f6-4fe3-9f3e-2db7fe549f6a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: X8fY6KFCwzaMXFAQvRlgPM7AjawlRiGf6YltwpDuP4had79K1/H2chzDJIrWslHE+1GUxW753ptUYWs3jxA6CNZ9Avlqasd03oSKTuOxeE2VWnPuV0ieB+K6iJngwJGk
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR06MB7981
 
-Based on a syzbot report, it appears many virtual
-drivers do not yet use netdev_lockdep_set_classes(),
-triggerring lockdep false positives.
-
-WARNING: possible recursive locking detected
-6.8.0-rc4-next-20240212-syzkaller #0 Not tainted
-
-syz-executor.0/19016 is trying to acquire lock:
- ffff8880162cb298 (_xmit_ETHER#2){+.-.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
- ffff8880162cb298 (_xmit_ETHER#2){+.-.}-{2:2}, at: __netif_tx_lock include/linux/netdevice.h:4452 [inline]
- ffff8880162cb298 (_xmit_ETHER#2){+.-.}-{2:2}, at: sch_direct_xmit+0x1c4/0x5f0 net/sched/sch_generic.c:340
-
-but task is already holding lock:
- ffff8880223db4d8 (_xmit_ETHER#2){+.-.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
- ffff8880223db4d8 (_xmit_ETHER#2){+.-.}-{2:2}, at: __netif_tx_lock include/linux/netdevice.h:4452 [inline]
- ffff8880223db4d8 (_xmit_ETHER#2){+.-.}-{2:2}, at: sch_direct_xmit+0x1c4/0x5f0 net/sched/sch_generic.c:340
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-  lock(_xmit_ETHER#2);
-  lock(_xmit_ETHER#2);
-
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-9 locks held by syz-executor.0/19016:
-  #0: ffffffff8f385208 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
-  #0: ffffffff8f385208 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x82c/0x1040 net/core/rtnetlink.c:6603
-  #1: ffffc90000a08c00 ((&in_dev->mr_ifc_timer)){+.-.}-{0:0}, at: call_timer_fn+0xc0/0x600 kernel/time/timer.c:1697
-  #2: ffffffff8e131520 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
-  #2: ffffffff8e131520 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
-  #2: ffffffff8e131520 (rcu_read_lock){....}-{1:2}, at: ip_finish_output2+0x45f/0x1360 net/ipv4/ip_output.c:228
-  #3: ffffffff8e131580 (rcu_read_lock_bh){....}-{1:2}, at: local_bh_disable include/linux/bottom_half.h:20 [inline]
-  #3: ffffffff8e131580 (rcu_read_lock_bh){....}-{1:2}, at: rcu_read_lock_bh include/linux/rcupdate.h:802 [inline]
-  #3: ffffffff8e131580 (rcu_read_lock_bh){....}-{1:2}, at: __dev_queue_xmit+0x2c4/0x3b10 net/core/dev.c:4284
-  #4: ffff8880416e3258 (dev->qdisc_tx_busylock ?: &qdisc_tx_busylock){+...}-{2:2}, at: spin_trylock include/linux/spinlock.h:361 [inline]
-  #4: ffff8880416e3258 (dev->qdisc_tx_busylock ?: &qdisc_tx_busylock){+...}-{2:2}, at: qdisc_run_begin include/net/sch_generic.h:195 [inline]
-  #4: ffff8880416e3258 (dev->qdisc_tx_busylock ?: &qdisc_tx_busylock){+...}-{2:2}, at: __dev_xmit_skb net/core/dev.c:3771 [inline]
-  #4: ffff8880416e3258 (dev->qdisc_tx_busylock ?: &qdisc_tx_busylock){+...}-{2:2}, at: __dev_queue_xmit+0x1262/0x3b10 net/core/dev.c:4325
-  #5: ffff8880223db4d8 (_xmit_ETHER#2){+.-.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
-  #5: ffff8880223db4d8 (_xmit_ETHER#2){+.-.}-{2:2}, at: __netif_tx_lock include/linux/netdevice.h:4452 [inline]
-  #5: ffff8880223db4d8 (_xmit_ETHER#2){+.-.}-{2:2}, at: sch_direct_xmit+0x1c4/0x5f0 net/sched/sch_generic.c:340
-  #6: ffffffff8e131520 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
-  #6: ffffffff8e131520 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
-  #6: ffffffff8e131520 (rcu_read_lock){....}-{1:2}, at: ip_finish_output2+0x45f/0x1360 net/ipv4/ip_output.c:228
-  #7: ffffffff8e131580 (rcu_read_lock_bh){....}-{1:2}, at: local_bh_disable include/linux/bottom_half.h:20 [inline]
-  #7: ffffffff8e131580 (rcu_read_lock_bh){....}-{1:2}, at: rcu_read_lock_bh include/linux/rcupdate.h:802 [inline]
-  #7: ffffffff8e131580 (rcu_read_lock_bh){....}-{1:2}, at: __dev_queue_xmit+0x2c4/0x3b10 net/core/dev.c:4284
-  #8: ffff888014d9d258 (dev->qdisc_tx_busylock ?: &qdisc_tx_busylock){+...}-{2:2}, at: spin_trylock include/linux/spinlock.h:361 [inline]
-  #8: ffff888014d9d258 (dev->qdisc_tx_busylock ?: &qdisc_tx_busylock){+...}-{2:2}, at: qdisc_run_begin include/net/sch_generic.h:195 [inline]
-  #8: ffff888014d9d258 (dev->qdisc_tx_busylock ?: &qdisc_tx_busylock){+...}-{2:2}, at: __dev_xmit_skb net/core/dev.c:3771 [inline]
-  #8: ffff888014d9d258 (dev->qdisc_tx_busylock ?: &qdisc_tx_busylock){+...}-{2:2}, at: __dev_queue_xmit+0x1262/0x3b10 net/core/dev.c:4325
-
-stack backtrace:
-CPU: 1 PID: 19016 Comm: syz-executor.0 Not tainted 6.8.0-rc4-next-20240212-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
-Call Trace:
- <IRQ>
-  __dump_stack lib/dump_stack.c:88 [inline]
-  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
-  check_deadlock kernel/locking/lockdep.c:3062 [inline]
-  validate_chain+0x15c1/0x58e0 kernel/locking/lockdep.c:3856
-  __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
-  lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
-  __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
-  _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
-  spin_lock include/linux/spinlock.h:351 [inline]
-  __netif_tx_lock include/linux/netdevice.h:4452 [inline]
-  sch_direct_xmit+0x1c4/0x5f0 net/sched/sch_generic.c:340
-  __dev_xmit_skb net/core/dev.c:3784 [inline]
-  __dev_queue_xmit+0x1912/0x3b10 net/core/dev.c:4325
-  neigh_output include/net/neighbour.h:542 [inline]
-  ip_finish_output2+0xe66/0x1360 net/ipv4/ip_output.c:235
-  iptunnel_xmit+0x540/0x9b0 net/ipv4/ip_tunnel_core.c:82
-  ip_tunnel_xmit+0x20ee/0x2960 net/ipv4/ip_tunnel.c:831
-  erspan_xmit+0x9de/0x1460 net/ipv4/ip_gre.c:720
-  __netdev_start_xmit include/linux/netdevice.h:4989 [inline]
-  netdev_start_xmit include/linux/netdevice.h:5003 [inline]
-  xmit_one net/core/dev.c:3555 [inline]
-  dev_hard_start_xmit+0x242/0x770 net/core/dev.c:3571
-  sch_direct_xmit+0x2b6/0x5f0 net/sched/sch_generic.c:342
-  __dev_xmit_skb net/core/dev.c:3784 [inline]
-  __dev_queue_xmit+0x1912/0x3b10 net/core/dev.c:4325
-  neigh_output include/net/neighbour.h:542 [inline]
-  ip_finish_output2+0xe66/0x1360 net/ipv4/ip_output.c:235
-  igmpv3_send_cr net/ipv4/igmp.c:723 [inline]
-  igmp_ifc_timer_expire+0xb71/0xd90 net/ipv4/igmp.c:813
-  call_timer_fn+0x17e/0x600 kernel/time/timer.c:1700
-  expire_timers kernel/time/timer.c:1751 [inline]
-  __run_timers+0x621/0x830 kernel/time/timer.c:2038
-  run_timer_softirq+0x67/0xf0 kernel/time/timer.c:2051
-  __do_softirq+0x2bc/0x943 kernel/softirq.c:554
-  invoke_softirq kernel/softirq.c:428 [inline]
-  __irq_exit_rcu+0xf2/0x1c0 kernel/softirq.c:633
-  irq_exit_rcu+0x9/0x30 kernel/softirq.c:645
-  instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1076 [inline]
-  sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1076
- </IRQ>
- <TASK>
-  asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
- RIP: 0010:resched_offsets_ok kernel/sched/core.c:10127 [inline]
- RIP: 0010:__might_resched+0x16f/0x780 kernel/sched/core.c:10142
-Code: 00 4c 89 e8 48 c1 e8 03 48 ba 00 00 00 00 00 fc ff df 48 89 44 24 38 0f b6 04 10 84 c0 0f 85 87 04 00 00 41 8b 45 00 c1 e0 08 <01> d8 44 39 e0 0f 85 d6 00 00 00 44 89 64 24 1c 48 8d bc 24 a0 00
-RSP: 0018:ffffc9000ee069e0 EFLAGS: 00000246
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff8880296a9e00
-RDX: dffffc0000000000 RSI: ffff8880296a9e00 RDI: ffffffff8bfe8fa0
-RBP: ffffc9000ee06b00 R08: ffffffff82326877 R09: 1ffff11002b5ad1b
-R10: dffffc0000000000 R11: ffffed1002b5ad1c R12: 0000000000000000
-R13: ffff8880296aa23c R14: 000000000000062a R15: 1ffff92001dc0d44
-  down_write+0x19/0x50 kernel/locking/rwsem.c:1578
-  kernfs_activate fs/kernfs/dir.c:1403 [inline]
-  kernfs_add_one+0x4af/0x8b0 fs/kernfs/dir.c:819
-  __kernfs_create_file+0x22e/0x2e0 fs/kernfs/file.c:1056
-  sysfs_add_file_mode_ns+0x24a/0x310 fs/sysfs/file.c:307
-  create_files fs/sysfs/group.c:64 [inline]
-  internal_create_group+0x4f4/0xf20 fs/sysfs/group.c:152
-  internal_create_groups fs/sysfs/group.c:192 [inline]
-  sysfs_create_groups+0x56/0x120 fs/sysfs/group.c:218
-  create_dir lib/kobject.c:78 [inline]
-  kobject_add_internal+0x472/0x8d0 lib/kobject.c:240
-  kobject_add_varg lib/kobject.c:374 [inline]
-  kobject_init_and_add+0x124/0x190 lib/kobject.c:457
-  netdev_queue_add_kobject net/core/net-sysfs.c:1706 [inline]
-  netdev_queue_update_kobjects+0x1f3/0x480 net/core/net-sysfs.c:1758
-  register_queue_kobjects net/core/net-sysfs.c:1819 [inline]
-  netdev_register_kobject+0x265/0x310 net/core/net-sysfs.c:2059
-  register_netdevice+0x1191/0x19c0 net/core/dev.c:10298
-  bond_newlink+0x3b/0x90 drivers/net/bonding/bond_netlink.c:576
-  rtnl_newlink_create net/core/rtnetlink.c:3506 [inline]
-  __rtnl_newlink net/core/rtnetlink.c:3726 [inline]
-  rtnl_newlink+0x158f/0x20a0 net/core/rtnetlink.c:3739
-  rtnetlink_rcv_msg+0x885/0x1040 net/core/rtnetlink.c:6606
-  netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2543
-  netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
-  netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1367
-  netlink_sendmsg+0xa3c/0xd70 net/netlink/af_netlink.c:1908
-  sock_sendmsg_nosec net/socket.c:730 [inline]
-  __sock_sendmsg+0x221/0x270 net/socket.c:745
-  __sys_sendto+0x3a4/0x4f0 net/socket.c:2191
-  __do_sys_sendto net/socket.c:2203 [inline]
-  __se_sys_sendto net/socket.c:2199 [inline]
-  __x64_sys_sendto+0xde/0x100 net/socket.c:2199
- do_syscall_64+0xfb/0x240
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
-RIP: 0033:0x7fc3fa87fa9c
-
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- drivers/net/dummy.c            | 1 +
- drivers/net/geneve.c           | 1 +
- drivers/net/loopback.c         | 1 +
- drivers/net/veth.c             | 1 +
- drivers/net/vxlan/vxlan_core.c | 1 +
- net/ipv4/ip_tunnel.c           | 1 +
- net/ipv6/ip6_gre.c             | 2 ++
- net/ipv6/ip6_tunnel.c          | 1 +
- net/ipv6/ip6_vti.c             | 1 +
- net/ipv6/sit.c                 | 1 +
- 10 files changed, 11 insertions(+)
-
-diff --git a/drivers/net/dummy.c b/drivers/net/dummy.c
-index 768454aa36d6c9fa68468d8ddf721c7bbee185be..946bba0701a4ff766f3e0d604977538419b147aa 100644
---- a/drivers/net/dummy.c
-+++ b/drivers/net/dummy.c
-@@ -71,6 +71,7 @@ static int dummy_dev_init(struct net_device *dev)
- 	if (!dev->lstats)
- 		return -ENOMEM;
- 
-+	netdev_lockdep_set_classes(dev);
- 	return 0;
- }
- 
-diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
-index 23e97c2e4f6fcb90a8bbb117d7520397f560f15f..256602a723568522bb2d64e4b9e770e2abeb20ac 100644
---- a/drivers/net/geneve.c
-+++ b/drivers/net/geneve.c
-@@ -335,6 +335,7 @@ static int geneve_init(struct net_device *dev)
- 		gro_cells_destroy(&geneve->gro_cells);
- 		return err;
- 	}
-+	netdev_lockdep_set_classes(dev);
- 	return 0;
- }
- 
-diff --git a/drivers/net/loopback.c b/drivers/net/loopback.c
-index f6d53e63ef4ecc779634ef9819945632697a5644..f6eab66c26608125292b9d91996195c817981e89 100644
---- a/drivers/net/loopback.c
-+++ b/drivers/net/loopback.c
-@@ -144,6 +144,7 @@ static int loopback_dev_init(struct net_device *dev)
- 	dev->lstats = netdev_alloc_pcpu_stats(struct pcpu_lstats);
- 	if (!dev->lstats)
- 		return -ENOMEM;
-+	netdev_lockdep_set_classes(dev);
- 	return 0;
- }
- 
-diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-index 578e36ea1589c11f1ca26b6e05a84b455d22999e..de1f1383778295874a7fb641103d940bba8881f0 100644
---- a/drivers/net/veth.c
-+++ b/drivers/net/veth.c
-@@ -1499,6 +1499,7 @@ static void veth_free_queues(struct net_device *dev)
- 
- static int veth_dev_init(struct net_device *dev)
- {
-+	netdev_lockdep_set_classes(dev);
- 	return veth_alloc_queues(dev);
- }
- 
-diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index 11707647afb9831ee430cdc13e705431b66af6c2..705a6fd6ab6c32e61f8f71b6b4f57094f7e5f642 100644
---- a/drivers/net/vxlan/vxlan_core.c
-+++ b/drivers/net/vxlan/vxlan_core.c
-@@ -2855,6 +2855,7 @@ static int vxlan_init(struct net_device *dev)
- 	if (err)
- 		goto err_gro_cells_destroy;
- 
-+	netdev_lockdep_set_classes(dev);
- 	return 0;
- 
- err_gro_cells_destroy:
-diff --git a/net/ipv4/ip_tunnel.c b/net/ipv4/ip_tunnel.c
-index 00da0b80320fb514bca58de7cd13894ab49a2ca6..58de780ab0e2b47f73ee7704ce4937d06530ac33 100644
---- a/net/ipv4/ip_tunnel.c
-+++ b/net/ipv4/ip_tunnel.c
-@@ -1269,6 +1269,7 @@ int ip_tunnel_init(struct net_device *dev)
- 
- 	if (tunnel->collect_md)
- 		netif_keep_dst(dev);
-+	netdev_lockdep_set_classes(dev);
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(ip_tunnel_init);
-diff --git a/net/ipv6/ip6_gre.c b/net/ipv6/ip6_gre.c
-index 428f03e9da45ac323aa357b5a9d299fb7f3d3a5b..5e97e0aa8e07d0bb12615734b78d7ecb8700b5df 100644
---- a/net/ipv6/ip6_gre.c
-+++ b/net/ipv6/ip6_gre.c
-@@ -1511,6 +1511,7 @@ static int ip6gre_tunnel_init_common(struct net_device *dev)
- 	ip6gre_tnl_init_features(dev);
- 
- 	netdev_hold(dev, &tunnel->dev_tracker, GFP_KERNEL);
-+	netdev_lockdep_set_classes(dev);
- 	return 0;
- 
- cleanup_dst_cache_init:
-@@ -1901,6 +1902,7 @@ static int ip6erspan_tap_init(struct net_device *dev)
- 	ip6erspan_tnl_link_config(tunnel, 1);
- 
- 	netdev_hold(dev, &tunnel->dev_tracker, GFP_KERNEL);
-+	netdev_lockdep_set_classes(dev);
- 	return 0;
- 
- cleanup_dst_cache_init:
-diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
-index bfb0a6c601c119cc38901998c47d0c98be047d90..44406c28445dc457fb47a7cdec295778eb30b31f 100644
---- a/net/ipv6/ip6_tunnel.c
-+++ b/net/ipv6/ip6_tunnel.c
-@@ -1898,6 +1898,7 @@ ip6_tnl_dev_init_gen(struct net_device *dev)
- 	dev->max_mtu = IP6_MAX_MTU - dev->hard_header_len;
- 
- 	netdev_hold(dev, &t->dev_tracker, GFP_KERNEL);
-+	netdev_lockdep_set_classes(dev);
- 	return 0;
- 
- destroy_dst:
-diff --git a/net/ipv6/ip6_vti.c b/net/ipv6/ip6_vti.c
-index cfe1b1ad4d85d303597784d5eeb3077383978d95..7f4f976aa24a96ad1e381dab0f28cb4a94ef6f16 100644
---- a/net/ipv6/ip6_vti.c
-+++ b/net/ipv6/ip6_vti.c
-@@ -935,6 +935,7 @@ static inline int vti6_dev_init_gen(struct net_device *dev)
- 	if (!dev->tstats)
- 		return -ENOMEM;
- 	netdev_hold(dev, &t->dev_tracker, GFP_KERNEL);
-+	netdev_lockdep_set_classes(dev);
- 	return 0;
- }
- 
-diff --git a/net/ipv6/sit.c b/net/ipv6/sit.c
-index 61b2b71fa8bedea6d185348ff781356652434b33..b2da1f1b5fec4d784268cb04c78ddff87d1ca576 100644
---- a/net/ipv6/sit.c
-+++ b/net/ipv6/sit.c
-@@ -1460,6 +1460,7 @@ static int ipip6_tunnel_init(struct net_device *dev)
- 		return err;
- 	}
- 	netdev_hold(dev, &tunnel->dev_tracker, GFP_KERNEL);
-+	netdev_lockdep_set_classes(dev);
- 	return 0;
- }
- 
--- 
-2.43.0.687.g38aa6559b0-goog
-
+SSBqdXN0IGZpZ3VyZWQgb3V0IHRoYXQgSSBmb3Jnb3QgdG8gZGlzYWJsZSBXT0wgaW4gdGhlIGNh
+bGxiYWNrIGNvbmZpZ19pbml0Lg0KSXQgbG9va3MgdGhlIFBIWSBkcml2ZXIgc2hvdWxkIGV4cGxp
+Y2l0bHkgZGlzYWJsZSBXT0wgZmVhdHVyZSBhdCBpbml0LCANCmFuZCBsZWF2ZSBpdCB0byBldGh0
+b29sIHRvIGJlIGVuYWJsZWQuDQpJIHdpbGwgcHJvdmlkZSBhIHY1IEFTQVAgdG8gZml4IHRoYXQu
+DQoNCk9uIDEyLjAyLjI0IDA4OjQ2LCBDYXRhbGluIFBvcGVzY3Ugd3JvdGU6DQo+IERQODM4MjYg
+b2ZmZXJzIHRoZSBwb3NzaWJpbGl0eSB0byB0dW5lIHRoZSB2b2x0YWdlIG9mIGxvZ2ljYWwNCj4g
+bGV2ZWxzIG9mIHRoZSBNTFQtMyBlbmNvZGVkIFRYIGRhdGEuIFRoaXMgaXMgdXNlZnVsIHdoZW4g
+dGhlcmUNCj4gaXMgYSB2b2x0YWdlIGRyb3AgaW4gYmV0d2VlbiB0aGUgUEhZIGFuZCB0aGUgY29u
+bmVjdG9yIGFuZCB3ZQ0KPiB3YW50IHRvIGluY3JlYXNlIHRoZSB2b2x0YWdlIGxldmVscyB0byBj
+b21wZW5zYXRlIGZvciB0aGF0IGRyb3AuDQo+DQo+IFByaW9yIHRvIFBIWSBjb25maWd1cmF0aW9u
+LCB0aGUgZHJpdmVyIFNXIHJlc2V0cyB0aGUgUEhZIHdoaWNoIGhhcw0KPiB0aGUgc2FtZSBlZmZl
+Y3QgYXMgdGhlIEhXIHJlc2V0IHBpbiBhY2NvcmRpbmcgdG8gdGhlIGRhdGFzaGVldC4NCj4gSGVu
+Y2UsIHRoZXJlJ3Mgbm8gbmVlZCB0byBmb3JjZSB1cGRhdGUgdGhlIFZPRF9DRkcgcmVnaXN0ZXJz
+IHRvIG1ha2UNCj4gc3VyZSB0aGV5IGhvbGQgdGhlaXIgcmVzZXQgdmFsdWVzLiBWT0RfQ0ZHIHJl
+Z2lzdGVycyBuZWVkIHRvIGJlDQo+IHVwZGF0ZWQgb25seSBpZiB0aGUgRFQgaGFzIGJlZW4gY29u
+ZmlndXJlZCB3aXRoIHZhbHVlcyBvdGhlciB0aGFuDQo+IHRoZSByZXNldCBvbmVzLg0KPg0KPiBT
+aWduZWQtb2ZmLWJ5OiBDYXRhbGluIFBvcGVzY3UgPGNhdGFsaW4ucG9wZXNjdUBsZWljYS1nZW9z
+eXN0ZW1zLmNvbT4NCj4gLS0tDQo+IENoYW5nZXMgaW4gdjI6DQo+ICAgLSByZW1vdmUgcmF3IHZh
+bHVlcyBtYXBwaW5nIHRhYmxlcyBkcDgzODI2X2NmZ19kYWNfbWludXNfcmF3Lw0KPiAgICAgZHA4
+MzgyNl9jZmdfZGFjX3BsdXNfcmF3IGFuZCByZXBsYWNlIHRoZW0gd2l0aCBmdW5jdGlvbnMNCj4g
+ICAgIGRwODM4MjZfdG9fZGFjX21pbnVzX29uZV9yZWd2YWwvZHA4MzgyNl90b19kYWNfcGx1c19v
+bmVfcmVndmFsDQo+ICAgLSBpbmNyZWFzZSByZWFkYWJpbGl0eSBvZiBmdW5jdGlvbiBkcDgzODI2
+X2NvbmZpZ19pbml0DQo+ICAgLSBjaGFuZ2UgcmV0dXJuIHZhbHVlIG9mIGZ1bmN0aW9uIGRwODM4
+MjZfb2ZfaW5pdCBmcm9tIGludCB0byB2b2lkDQo+ICAgICBzaW5jZSBpdCBuZXZlciByZXR1cm5z
+IGFueSBlcnJvcg0KPg0KPiBDaGFuZ2VzIGluIHYzOg0KPiAgIC0gcmVuYW1lIERUIHByb3BlcnRp
+ZXMgdG8gIi1icCINCj4gICAtIHJlbmFtZSBEUDgzODI2X0NGR19EQUNfTVBFUkNFTlRfREVGQVVM
+VC9EUDgzODI2X0NGR19EQUNfTVBFUkNFTlRfUEVSX1NURVANCj4gICAgIHRvIERQODM4MjZfQ0ZH
+X0RBQ19QRVJDRU5UX0RFRkFVTFQvRFA4MzgyNl9DRkdfREFDX1BFUkNFTlRfUEVSX1NURVAgYW5k
+DQo+ICAgICB1cGRhdGUgdGhlaXIgdmFsdWVzIHRvIHJlZmxlY3QgdGhlIG5ldyB1bml0ICJiYXNp
+cyBwb2ludCINCj4gICAtIHVwZGF0ZSBjb21taXQgbWVzc2FnZSB3aXRoIGV4cGxhbmF0aW9uIGFi
+b3V0IHRoZSByZWdpc3RlcnMgcmVzZXQNCj4gICAgIHZhbHVlcw0KPg0KPiBDaGFuZ2VzIGluIHY0
+Og0KPiAgIC0gdXBkYXRlIGNvbW1pdCBtZXNzYWdlIHRvIGJlIG1vcmUgbWVhbmluZ2Z1bA0KPiAt
+LS0NCj4gICBkcml2ZXJzL25ldC9waHkvZHA4MzgyMi5jIHwgMTMwICsrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKy0tDQo+ICAgMSBmaWxlIGNoYW5nZWQsIDEyNiBpbnNlcnRpb25z
+KCspLCA0IGRlbGV0aW9ucygtKQ0KPg0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9uZXQvcGh5L2Rw
+ODM4MjIuYyBiL2RyaXZlcnMvbmV0L3BoeS9kcDgzODIyLmMNCj4gaW5kZXggYjdjYjcxODE3Nzgw
+Li4zMGYyNjE2YWIxYzIgMTAwNjQ0DQo+IC0tLSBhL2RyaXZlcnMvbmV0L3BoeS9kcDgzODIyLmMN
+Cj4gKysrIGIvZHJpdmVycy9uZXQvcGh5L2RwODM4MjIuYw0KPiBAQCAtMTIsNiArMTIsNyBAQA0K
+PiAgICNpbmNsdWRlIDxsaW51eC9vZi5oPg0KPiAgICNpbmNsdWRlIDxsaW51eC9waHkuaD4NCj4g
+ICAjaW5jbHVkZSA8bGludXgvbmV0ZGV2aWNlLmg+DQo+ICsjaW5jbHVkZSA8bGludXgvYml0Zmll
+bGQuaD4NCj4gICANCj4gICAjZGVmaW5lIERQODM4MjJfUEhZX0lECSAgICAgICAgMHgyMDAwYTI0
+MA0KPiAgICNkZWZpbmUgRFA4MzgyNVNfUEhZX0lECQkweDIwMDBhMTQwDQo+IEBAIC0zNCw2ICsz
+NSwxMCBAQA0KPiAgICNkZWZpbmUgTUlJX0RQODM4MjJfR0VOQ0ZHCTB4NDY1DQo+ICAgI2RlZmlu
+ZSBNSUlfRFA4MzgyMl9TT1IxCTB4NDY3DQo+ICAgDQo+ICsvKiBEUDgzODI2IHNwZWNpZmljIHJl
+Z2lzdGVycyAqLw0KPiArI2RlZmluZSBNSUlfRFA4MzgyNl9WT0RfQ0ZHMQkweDMwYg0KPiArI2Rl
+ZmluZSBNSUlfRFA4MzgyNl9WT0RfQ0ZHMgkweDMwYw0KPiArDQo+ICAgLyogR0VOQ0ZHICovDQo+
+ICAgI2RlZmluZSBEUDgzODIyX1NJR19ERVRfTE9XCUJJVCgwKQ0KPiAgIA0KPiBAQCAtMTEwLDYg
+KzExNSwxOSBAQA0KPiAgICNkZWZpbmUgRFA4MzgyMl9SWF9FUl9TVFJfTUFTSwlHRU5NQVNLKDks
+IDgpDQo+ICAgI2RlZmluZSBEUDgzODIyX1JYX0VSX1NISUZUCTgNCj4gICANCj4gKy8qIERQODM4
+MjY6IFZPRF9DRkcxICYgVk9EX0NGRzIgKi8NCj4gKyNkZWZpbmUgRFA4MzgyNl9WT0RfQ0ZHMV9N
+SU5VU19NRElYX01BU0sJR0VOTUFTSygxMywgMTIpDQo+ICsjZGVmaW5lIERQODM4MjZfVk9EX0NG
+RzFfTUlOVVNfTURJX01BU0sJCUdFTk1BU0soMTEsIDYpDQo+ICsjZGVmaW5lIERQODM4MjZfVk9E
+X0NGRzJfTUlOVVNfTURJWF9NQVNLCUdFTk1BU0soMTUsIDEyKQ0KPiArI2RlZmluZSBEUDgzODI2
+X1ZPRF9DRkcyX1BMVVNfTURJWF9NQVNLCQlHRU5NQVNLKDExLCA2KQ0KPiArI2RlZmluZSBEUDgz
+ODI2X1ZPRF9DRkcyX1BMVVNfTURJX01BU0sJCUdFTk1BU0soNSwgMCkNCj4gKyNkZWZpbmUgRFA4
+MzgyNl9DRkdfREFDX01JTlVTX01ESVhfNV9UT180CUdFTk1BU0soNSwgNCkNCj4gKyNkZWZpbmUg
+RFA4MzgyNl9DRkdfREFDX01JTlVTX01ESVhfM19UT18wCUdFTk1BU0soMywgMCkNCj4gKyNkZWZp
+bmUgRFA4MzgyNl9DRkdfREFDX1BFUkNFTlRfUEVSX1NURVAJNjI1DQo+ICsjZGVmaW5lIERQODM4
+MjZfQ0ZHX0RBQ19QRVJDRU5UX0RFRkFVTFQJCTEwMDAwDQo+ICsjZGVmaW5lIERQODM4MjZfQ0ZH
+X0RBQ19NSU5VU19ERUZBVUxUCQkweDMwDQo+ICsjZGVmaW5lIERQODM4MjZfQ0ZHX0RBQ19QTFVT
+X0RFRkFVTFQJCTB4MTANCj4gKw0KPiAgICNkZWZpbmUgTUlJX0RQODM4MjJfRklCRVJfQURWRVJU
+SVNFICAgIChBRFZFUlRJU0VEX1RQIHwgQURWRVJUSVNFRF9NSUkgfCBcDQo+ICAgCQkJCQlBRFZF
+UlRJU0VEX0ZJQlJFIHwgXA0KPiAgIAkJCQkJQURWRVJUSVNFRF9QYXVzZSB8IEFEVkVSVElTRURf
+QXN5bV9QYXVzZSkNCj4gQEAgLTExOCw2ICsxMzYsOCBAQCBzdHJ1Y3QgZHA4MzgyMl9wcml2YXRl
+IHsNCj4gICAJYm9vbCBmeF9zaWduYWxfZGV0X2xvdzsNCj4gICAJaW50IGZ4X2VuYWJsZWQ7DQo+
+ICAgCXUxNiBmeF9zZF9lbmFibGU7DQo+ICsJdTggY2ZnX2RhY19taW51czsNCj4gKwl1OCBjZmdf
+ZGFjX3BsdXM7DQo+ICAgfTsNCj4gICANCj4gICBzdGF0aWMgaW50IGRwODM4MjJfc2V0X3dvbChz
+dHJ1Y3QgcGh5X2RldmljZSAqcGh5ZGV2LA0KPiBAQCAtMjMzLDcgKzI1Myw3IEBAIHN0YXRpYyBp
+bnQgZHA4MzgyMl9jb25maWdfaW50cihzdHJ1Y3QgcGh5X2RldmljZSAqcGh5ZGV2KQ0KPiAgIAkJ
+CQlEUDgzODIyX0VORVJHWV9ERVRfSU5UX0VOIHwNCj4gICAJCQkJRFA4MzgyMl9MSU5LX1FVQUxf
+SU5UX0VOKTsNCj4gICANCj4gLQkJLyogUHJpdmF0ZSBkYXRhIHBvaW50ZXIgaXMgTlVMTCBvbiBE
+UDgzODI1LzI2ICovDQo+ICsJCS8qIFByaXZhdGUgZGF0YSBwb2ludGVyIGlzIE5VTEwgb24gRFA4
+MzgyNSAqLw0KPiAgIAkJaWYgKCFkcDgzODIyIHx8ICFkcDgzODIyLT5meF9lbmFibGVkKQ0KPiAg
+IAkJCW1pc3Jfc3RhdHVzIHw9IERQODM4MjJfQU5FR19DT01QTEVURV9JTlRfRU4gfA0KPiAgIAkJ
+CQkgICAgICAgRFA4MzgyMl9EVVBfTU9ERV9DSEFOR0VfSU5UX0VOIHwNCj4gQEAgLTI1NCw3ICsy
+NzQsNyBAQCBzdGF0aWMgaW50IGRwODM4MjJfY29uZmlnX2ludHIoc3RydWN0IHBoeV9kZXZpY2Ug
+KnBoeWRldikNCj4gICAJCQkJRFA4MzgyMl9QQUdFX1JYX0lOVF9FTiB8DQo+ICAgCQkJCURQODM4
+MjJfRUVFX0VSUk9SX0NIQU5HRV9JTlRfRU4pOw0KPiAgIA0KPiAtCQkvKiBQcml2YXRlIGRhdGEg
+cG9pbnRlciBpcyBOVUxMIG9uIERQODM4MjUvMjYgKi8NCj4gKwkJLyogUHJpdmF0ZSBkYXRhIHBv
+aW50ZXIgaXMgTlVMTCBvbiBEUDgzODI1ICovDQo+ICAgCQlpZiAoIWRwODM4MjIgfHwgIWRwODM4
+MjItPmZ4X2VuYWJsZWQpDQo+ICAgCQkJbWlzcl9zdGF0dXMgfD0gRFA4MzgyMl9BTkVHX0VSUl9J
+TlRfRU4gfA0KPiAgIAkJCQkgICAgICAgRFA4MzgyMl9XT0xfUEtUX0lOVF9FTjsNCj4gQEAgLTQ3
+NCw2ICs0OTQsNDMgQEAgc3RhdGljIGludCBkcDgzODIyX2NvbmZpZ19pbml0KHN0cnVjdCBwaHlf
+ZGV2aWNlICpwaHlkZXYpDQo+ICAgCXJldHVybiBkcDgzODJ4X2Rpc2FibGVfd29sKHBoeWRldik7
+DQo+ICAgfQ0KPiAgIA0KPiArc3RhdGljIGludCBkcDgzODI2X2NvbmZpZ19pbml0KHN0cnVjdCBw
+aHlfZGV2aWNlICpwaHlkZXYpDQo+ICt7DQo+ICsJc3RydWN0IGRwODM4MjJfcHJpdmF0ZSAqZHA4
+MzgyMiA9IHBoeWRldi0+cHJpdjsNCj4gKwl1MTYgdmFsLCBtYXNrOw0KPiArCWludCByZXQ7DQo+
+ICsNCj4gKwlpZiAoZHA4MzgyMi0+Y2ZnX2RhY19taW51cyAhPSBEUDgzODI2X0NGR19EQUNfTUlO
+VVNfREVGQVVMVCkgew0KPiArCQl2YWwgPSBGSUVMRF9QUkVQKERQODM4MjZfVk9EX0NGRzFfTUlO
+VVNfTURJX01BU0ssIGRwODM4MjItPmNmZ19kYWNfbWludXMpIHwNCj4gKwkJICAgICAgRklFTERf
+UFJFUChEUDgzODI2X1ZPRF9DRkcxX01JTlVTX01ESVhfTUFTSywNCj4gKwkJCQkgRklFTERfR0VU
+KERQODM4MjZfQ0ZHX0RBQ19NSU5VU19NRElYXzVfVE9fNCwNCj4gKwkJCQkJICAgZHA4MzgyMi0+
+Y2ZnX2RhY19taW51cykpOw0KPiArCQltYXNrID0gRFA4MzgyNl9WT0RfQ0ZHMV9NSU5VU19NRElY
+X01BU0sgfCBEUDgzODI2X1ZPRF9DRkcxX01JTlVTX01ESV9NQVNLOw0KPiArCQlyZXQgPSBwaHlf
+bW9kaWZ5X21tZChwaHlkZXYsIERQODM4MjJfREVWQUREUiwgTUlJX0RQODM4MjZfVk9EX0NGRzEs
+IG1hc2ssIHZhbCk7DQo+ICsJCWlmIChyZXQpDQo+ICsJCQlyZXR1cm4gcmV0Ow0KPiArDQo+ICsJ
+CXZhbCA9IEZJRUxEX1BSRVAoRFA4MzgyNl9WT0RfQ0ZHMl9NSU5VU19NRElYX01BU0ssDQo+ICsJ
+CQkJIEZJRUxEX0dFVChEUDgzODI2X0NGR19EQUNfTUlOVVNfTURJWF8zX1RPXzAsDQo+ICsJCQkJ
+CSAgIGRwODM4MjItPmNmZ19kYWNfbWludXMpKTsNCj4gKwkJbWFzayA9IERQODM4MjZfVk9EX0NG
+RzJfTUlOVVNfTURJWF9NQVNLOw0KPiArCQlyZXQgPSBwaHlfbW9kaWZ5X21tZChwaHlkZXYsIERQ
+ODM4MjJfREVWQUREUiwgTUlJX0RQODM4MjZfVk9EX0NGRzIsIG1hc2ssIHZhbCk7DQo+ICsJCWlm
+IChyZXQpDQo+ICsJCQlyZXR1cm4gcmV0Ow0KPiArCX0NCj4gKw0KPiArCWlmIChkcDgzODIyLT5j
+ZmdfZGFjX3BsdXMgIT0gRFA4MzgyNl9DRkdfREFDX1BMVVNfREVGQVVMVCkgew0KPiArCQl2YWwg
+PSBGSUVMRF9QUkVQKERQODM4MjZfVk9EX0NGRzJfUExVU19NRElYX01BU0ssIGRwODM4MjItPmNm
+Z19kYWNfcGx1cykgfA0KPiArCQkgICAgICBGSUVMRF9QUkVQKERQODM4MjZfVk9EX0NGRzJfUExV
+U19NRElfTUFTSywgZHA4MzgyMi0+Y2ZnX2RhY19wbHVzKTsNCj4gKwkJbWFzayA9IERQODM4MjZf
+Vk9EX0NGRzJfUExVU19NRElYX01BU0sgfCBEUDgzODI2X1ZPRF9DRkcyX1BMVVNfTURJX01BU0s7
+DQo+ICsJCXJldCA9IHBoeV9tb2RpZnlfbW1kKHBoeWRldiwgRFA4MzgyMl9ERVZBRERSLCBNSUlf
+RFA4MzgyNl9WT0RfQ0ZHMiwgbWFzaywgdmFsKTsNCj4gKwkJaWYgKHJldCkNCj4gKwkJCXJldHVy
+biByZXQ7DQo+ICsJfQ0KPiArDQo+ICsJcmV0dXJuIDA7DQo+ICt9DQo+ICsNCj4gICBzdGF0aWMg
+aW50IGRwODM4MnhfY29uZmlnX2luaXQoc3RydWN0IHBoeV9kZXZpY2UgKnBoeWRldikNCj4gICB7
+DQo+ICAgCXJldHVybiBkcDgzODJ4X2Rpc2FibGVfd29sKHBoeWRldik7DQo+IEBAIC01MDksMTEg
+KzU2Niw0NCBAQCBzdGF0aWMgaW50IGRwODM4MjJfb2ZfaW5pdChzdHJ1Y3QgcGh5X2RldmljZSAq
+cGh5ZGV2KQ0KPiAgIA0KPiAgIAlyZXR1cm4gMDsNCj4gICB9DQo+ICsNCj4gK3N0YXRpYyBpbnQg
+ZHA4MzgyNl90b19kYWNfbWludXNfb25lX3JlZ3ZhbChpbnQgcGVyY2VudCkNCj4gK3sNCj4gKwlp
+bnQgdG1wID0gRFA4MzgyNl9DRkdfREFDX1BFUkNFTlRfREVGQVVMVCAtIHBlcmNlbnQ7DQo+ICsN
+Cj4gKwlyZXR1cm4gdG1wIC8gRFA4MzgyNl9DRkdfREFDX1BFUkNFTlRfUEVSX1NURVA7DQo+ICt9
+DQo+ICsNCj4gK3N0YXRpYyBpbnQgZHA4MzgyNl90b19kYWNfcGx1c19vbmVfcmVndmFsKGludCBw
+ZXJjZW50KQ0KPiArew0KPiArCWludCB0bXAgPSBwZXJjZW50IC0gRFA4MzgyNl9DRkdfREFDX1BF
+UkNFTlRfREVGQVVMVDsNCj4gKw0KPiArCXJldHVybiB0bXAgLyBEUDgzODI2X0NGR19EQUNfUEVS
+Q0VOVF9QRVJfU1RFUDsNCj4gK30NCj4gKw0KPiArc3RhdGljIHZvaWQgZHA4MzgyNl9vZl9pbml0
+KHN0cnVjdCBwaHlfZGV2aWNlICpwaHlkZXYpDQo+ICt7DQo+ICsJc3RydWN0IGRwODM4MjJfcHJp
+dmF0ZSAqZHA4MzgyMiA9IHBoeWRldi0+cHJpdjsNCj4gKwlzdHJ1Y3QgZGV2aWNlICpkZXYgPSAm
+cGh5ZGV2LT5tZGlvLmRldjsNCj4gKwl1MzIgdmFsOw0KPiArDQo+ICsJZHA4MzgyMi0+Y2ZnX2Rh
+Y19taW51cyA9IERQODM4MjZfQ0ZHX0RBQ19NSU5VU19ERUZBVUxUOw0KPiArCWlmICghZGV2aWNl
+X3Byb3BlcnR5X3JlYWRfdTMyKGRldiwgInRpLGNmZy1kYWMtbWludXMtb25lLWJwIiwgJnZhbCkp
+DQo+ICsJCWRwODM4MjItPmNmZ19kYWNfbWludXMgKz0gZHA4MzgyNl90b19kYWNfbWludXNfb25l
+X3JlZ3ZhbCh2YWwpOw0KPiArDQo+ICsJZHA4MzgyMi0+Y2ZnX2RhY19wbHVzID0gRFA4MzgyNl9D
+RkdfREFDX1BMVVNfREVGQVVMVDsNCj4gKwlpZiAoIWRldmljZV9wcm9wZXJ0eV9yZWFkX3UzMihk
+ZXYsICJ0aSxjZmctZGFjLXBsdXMtb25lLWJwIiwgJnZhbCkpDQo+ICsJCWRwODM4MjItPmNmZ19k
+YWNfcGx1cyArPSBkcDgzODI2X3RvX2RhY19wbHVzX29uZV9yZWd2YWwodmFsKTsNCj4gK30NCj4g
+ICAjZWxzZQ0KPiAgIHN0YXRpYyBpbnQgZHA4MzgyMl9vZl9pbml0KHN0cnVjdCBwaHlfZGV2aWNl
+ICpwaHlkZXYpDQo+ICAgew0KPiAgIAlyZXR1cm4gMDsNCj4gICB9DQo+ICsNCj4gK3N0YXRpYyB2
+b2lkIGRwODM4MjZfb2ZfaW5pdChzdHJ1Y3QgcGh5X2RldmljZSAqcGh5ZGV2KQ0KPiArew0KPiAr
+fQ0KPiAgICNlbmRpZiAvKiBDT05GSUdfT0ZfTURJTyAqLw0KPiAgIA0KPiAgIHN0YXRpYyBpbnQg
+ZHA4MzgyMl9yZWFkX3N0cmFwcyhzdHJ1Y3QgcGh5X2RldmljZSAqcGh5ZGV2KQ0KPiBAQCAtNTY3
+LDYgKzY1NywyMiBAQCBzdGF0aWMgaW50IGRwODM4MjJfcHJvYmUoc3RydWN0IHBoeV9kZXZpY2Ug
+KnBoeWRldikNCj4gICAJcmV0dXJuIDA7DQo+ICAgfQ0KPiAgIA0KPiArc3RhdGljIGludCBkcDgz
+ODI2X3Byb2JlKHN0cnVjdCBwaHlfZGV2aWNlICpwaHlkZXYpDQo+ICt7DQo+ICsJc3RydWN0IGRw
+ODM4MjJfcHJpdmF0ZSAqZHA4MzgyMjsNCj4gKw0KPiArCWRwODM4MjIgPSBkZXZtX2t6YWxsb2Mo
+JnBoeWRldi0+bWRpby5kZXYsIHNpemVvZigqZHA4MzgyMiksDQo+ICsJCQkgICAgICAgR0ZQX0tF
+Uk5FTCk7DQo+ICsJaWYgKCFkcDgzODIyKQ0KPiArCQlyZXR1cm4gLUVOT01FTTsNCj4gKw0KPiAr
+CXBoeWRldi0+cHJpdiA9IGRwODM4MjI7DQo+ICsNCj4gKwlkcDgzODI2X29mX2luaXQocGh5ZGV2
+KTsNCj4gKw0KPiArCXJldHVybiAwOw0KPiArfQ0KPiArDQo+ICAgc3RhdGljIGludCBkcDgzODIy
+X3N1c3BlbmQoc3RydWN0IHBoeV9kZXZpY2UgKnBoeWRldikNCj4gICB7DQo+ICAgCWludCB2YWx1
+ZTsNCj4gQEAgLTYxMCw2ICs3MTYsMjIgQEAgc3RhdGljIGludCBkcDgzODIyX3Jlc3VtZShzdHJ1
+Y3QgcGh5X2RldmljZSAqcGh5ZGV2KQ0KPiAgIAkJLnJlc3VtZSA9IGRwODM4MjJfcmVzdW1lLAkJ
+CVwNCj4gICAJfQ0KPiAgIA0KPiArI2RlZmluZSBEUDgzODI2X1BIWV9EUklWRVIoX2lkLCBfbmFt
+ZSkJCQkJXA0KPiArCXsJCQkJCQkJXA0KPiArCQlQSFlfSURfTUFUQ0hfTU9ERUwoX2lkKSwJCQlc
+DQo+ICsJCS5uYW1lCQk9IChfbmFtZSksCQkJXA0KPiArCQkvKiBQSFlfQkFTSUNfRkVBVFVSRVMg
+Ki8JCQlcDQo+ICsJCS5wcm9iZSAgICAgICAgICA9IGRwODM4MjZfcHJvYmUsCQlcDQo+ICsJCS5z
+b2Z0X3Jlc2V0CT0gZHA4MzgyMl9waHlfcmVzZXQsCQlcDQo+ICsJCS5jb25maWdfaW5pdAk9IGRw
+ODM4MjZfY29uZmlnX2luaXQsCQlcDQo+ICsJCS5nZXRfd29sID0gZHA4MzgyMl9nZXRfd29sLAkJ
+CVwNCj4gKwkJLnNldF93b2wgPSBkcDgzODIyX3NldF93b2wsCQkJXA0KPiArCQkuY29uZmlnX2lu
+dHIgPSBkcDgzODIyX2NvbmZpZ19pbnRyLAkJXA0KPiArCQkuaGFuZGxlX2ludGVycnVwdCA9IGRw
+ODM4MjJfaGFuZGxlX2ludGVycnVwdCwJXA0KPiArCQkuc3VzcGVuZCA9IGRwODM4MjJfc3VzcGVu
+ZCwJCQlcDQo+ICsJCS5yZXN1bWUgPSBkcDgzODIyX3Jlc3VtZSwJCQlcDQo+ICsJfQ0KPiArDQo+
+ICAgI2RlZmluZSBEUDgzODJYX1BIWV9EUklWRVIoX2lkLCBfbmFtZSkJCQkJXA0KPiAgIAl7CQkJ
+CQkJCVwNCj4gICAJCVBIWV9JRF9NQVRDSF9NT0RFTChfaWQpLAkJCVwNCj4gQEAgLTYyOCw4ICs3
+NTAsOCBAQCBzdGF0aWMgaW50IGRwODM4MjJfcmVzdW1lKHN0cnVjdCBwaHlfZGV2aWNlICpwaHlk
+ZXYpDQo+ICAgc3RhdGljIHN0cnVjdCBwaHlfZHJpdmVyIGRwODM4MjJfZHJpdmVyW10gPSB7DQo+
+ICAgCURQODM4MjJfUEhZX0RSSVZFUihEUDgzODIyX1BIWV9JRCwgIlRJIERQODM4MjIiKSwNCj4g
+ICAJRFA4MzgyWF9QSFlfRFJJVkVSKERQODM4MjVJX1BIWV9JRCwgIlRJIERQODM4MjVJIiksDQo+
+IC0JRFA4MzgyWF9QSFlfRFJJVkVSKERQODM4MjZDX1BIWV9JRCwgIlRJIERQODM4MjZDIiksDQo+
+IC0JRFA4MzgyWF9QSFlfRFJJVkVSKERQODM4MjZOQ19QSFlfSUQsICJUSSBEUDgzODI2TkMiKSwN
+Cj4gKwlEUDgzODI2X1BIWV9EUklWRVIoRFA4MzgyNkNfUEhZX0lELCAiVEkgRFA4MzgyNkMiKSwN
+Cj4gKwlEUDgzODI2X1BIWV9EUklWRVIoRFA4MzgyNk5DX1BIWV9JRCwgIlRJIERQODM4MjZOQyIp
+LA0KPiAgIAlEUDgzODJYX1BIWV9EUklWRVIoRFA4MzgyNVNfUEhZX0lELCAiVEkgRFA4MzgyNVMi
+KSwNCj4gICAJRFA4MzgyWF9QSFlfRFJJVkVSKERQODM4MjVDTV9QSFlfSUQsICJUSSBEUDgzODI1
+TSIpLA0KPiAgIAlEUDgzODJYX1BIWV9EUklWRVIoRFA4MzgyNUNTX1BIWV9JRCwgIlRJIERQODM4
+MjVDUyIpLA0KDQoNCg==
 
