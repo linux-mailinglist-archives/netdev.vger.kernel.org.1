@@ -1,126 +1,151 @@
-Return-Path: <netdev+bounces-71011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B0B18518DC
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 17:20:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1124F8519B3
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 17:41:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 401CE1F21CD4
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 16:20:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2E7F285B4E
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 16:41:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D540E3D0D1;
-	Mon, 12 Feb 2024 16:19:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A64773D3BC;
+	Mon, 12 Feb 2024 16:34:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kZZGasnA"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="Ck6lAKQI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2180B3D387
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 16:19:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3324947A40
+	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 16:34:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707754792; cv=none; b=oHTMnRLKN+em4Qmfqhh7uPGeDfoNpLli7HJLeNPXE2T0gqRaEV2Dz9apq0TMR350A3vV6UDPSKwAaPSrvpV1d8/TAwkKL0uo2X/UUQWAo3GIdbvLfn4PqqvTGbLQcEWPRYerFaRSxsILp1putqI9JA0+TiWTxEnQBBgneVX4qdQ=
+	t=1707755657; cv=none; b=nM9P/v1MoAo6jbR24uWrH2meCe8bfq67IjiCf/Yz++UiVHqTwC2V1Qzroi21FvwhDh+poceEgc914tkmuIaZ+KdxG0OYOHuowPAblv8QOCzfAX0mLFmo/sxXfONmoSucYd9/KfH4+HPS57fz1Muaop363Phxa0kEAhT8UEpaM/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707754792; c=relaxed/simple;
-	bh=XoUz+JKRRyLBDRgZff9NiMYOcittU3kWQe3W6ehgHx8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fP5U7eCv5EC/WNZOgBcxxePu+s2t4YkIuRBNClO/EQuoziQJqvGbQ5/YfrYq1DPI+Ul1UG0Rm6WEWbEaA1UkR8eD9zwUWl2vI9+VBxfeSc/jUaSW8uzMOgm64q5PSdmTI4qiwbq+ODELIkdUDLg4/6dnR1aYnZd2nGA+F+LijMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kZZGasnA; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-56101dee221so13892a12.1
-        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 08:19:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707754789; x=1708359589; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AHOo/eJwLxH5gqaZ8Efiem03bhq9rE//mMgm98xwZ0M=;
-        b=kZZGasnAbeAWv0GkmdckuGHq2mJKEvbibwyRmU3Sb2TwFDA0/E0StS+k6vICV/M0MG
-         /RRwrEg5lJBzaDGnfnUu9Ml9Vijnv6yhRfJ4e6xJVq3XmXAY0+aXthei6/AlgZ3MH+4b
-         76wC2F0SaXPG1Jri7+OUENDRlYwg0JLEt3LRoFL3v6nyV0qpOQmronMPaagq/Om9pbWx
-         /zupa6p4Ge8vBriYBgNSC+C7lNWKCsLsPvpFKZQfwXk4/Y8g78Djia2YtHHIg9y5k/DX
-         3Z/G0H7T/MDbt9Wk9r3f4s2j4ROKTx9L+YYwT5bCN/2CDcaC5eW4jFVLDZ2W6YjQYnNv
-         3m/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707754789; x=1708359589;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AHOo/eJwLxH5gqaZ8Efiem03bhq9rE//mMgm98xwZ0M=;
-        b=wcewL/gE1Y/eQvHucND8/0hjH6DKF4fefEAWzReFum9LYQcLY9vJZR9UdgmnN2gOXZ
-         4ooGJKNcyUYgnMCegrQRq/dR8Bh38oV80lymI4UqFVJ44ryI+HNXJ/DYG+tuBmhYxQLp
-         AdTfcYsUgP+W2jB4vw3okCTV/3lczJ7FIBxfrbLDsdnOxEi074hnjHFmP8k7RBjn1Cs8
-         Phr98H12O2nqzwyX1BE3DbmHYKX987mRnpntS7xWSEUSTJP5NE6YuYCNeobZGtJUsmV+
-         5JgqXL+dTopxnQzliePT0uQAkb7CXY8FskUy8LwfE80glvvCdgwACbE3TDy+Cb5lqY/D
-         3FSQ==
-X-Gm-Message-State: AOJu0YyyOyy5dh26du2RTP05HVZvO2t6EG2+/edvwddUtF8iZmwGFJB3
-	HEFv03GBOxRYkF10KBekeoGZcIipclKRuuLXmWwNtcoaqiuVZ+gW4Fk4M8KFigsTxhjzx0rWyQ/
-	7tnl+FMxsT+HC0HvBL1FRdSxeE66Zyfz3lxDY
-X-Google-Smtp-Source: AGHT+IFCRIRy84fDApqf2UdgmngwajlGLdvGMKaatN1SzMnDKVtC1bFmAf9BjuMw6aVrq4xcPiL+uSeAAaMxs/hGdL0=
-X-Received: by 2002:a50:9fc7:0:b0:561:a93:49af with SMTP id
- c65-20020a509fc7000000b005610a9349afmr257869edf.7.1707754789130; Mon, 12 Feb
- 2024 08:19:49 -0800 (PST)
+	s=arc-20240116; t=1707755657; c=relaxed/simple;
+	bh=BxbxiX5Z4B4emBlTWSv1BLfOn/Bm4gDoRaY6VTeOBD8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=u9pB4xA4S+TOYSGFoh84dTNsO7/4LeH/Vq+Q87cWX6W0x0Q2aKs6FhkCzMhTdXVtFBmp78nEsch30obGFpWLEf7gnpR0sZnkEjYO6P1MotFChJ3ohUGJEn6L/caCHXm0QJVjzA1FMRKJDp043zsXKzwjWmb9mwo6sFI69/R2crk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=Ck6lAKQI; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id BB0C6A09B8;
+	Mon, 12 Feb 2024 17:34:10 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=mail; bh=YBxjNHb5d/ogrH521rU/
+	ba9e0xlX1ujGUZuTGdC5Y70=; b=Ck6lAKQIadQ/gAYyi06DwCvtu7coM8DHk/kx
+	xviRJdXU+XE4y3aou8rH24QUYWn5YGA37Fz09hNYNTSEMrWJY7lopnVoSnes2bOv
+	uawQM2tfs/4m0EKSbeFj34SrUpmYpZe7BbOk5MvOib9DQNwSkGEsRCYHM5WSKPGq
+	cSleyJuYG3/BSlHVpn14O+//13MJnR2vRgraUs+JeBKo404vjNe/WF5AP8GbXIyi
+	MX0IF23o8a043oAqdXrdAXJFSWDuMewxbgFCb6Zapd88PXurVeV5k6NTv9QJquV9
+	DreR+6gLbWsQCK8+K09P20xA+xTDr0dNlGmBdAMn0sm+UyvGEJE/ICqSGfF8x750
+	fdaaAw8R4pHkxxrE7Xqp7XY6ysAmqtbthDNaaxeEQZYC380PWSQcz6I6fazZ8qEi
+	TkJN8pZRKEMk+2w0iDo4TXXEjmjKLgC+tBRszONT+cA3YmGQS5slj51148nri0pz
+	ICvKwT/ih7sUWMAbPPRhExJ+jJhLEMDlMdUxT1uD4IE8ejTa7lX5QDnrfQut7dmj
+	14Uamwp4O7Ycx8FHmnbW95UCCCBd+H18Vgacowhxbtwus9/voNNRHibj6wGa1QzP
+	8YzcRsPSJ1rY1gCFiTXzKHM7TaYygUlVmGc2cAWDrC//hjpZX0wBfM1khbz5yCTb
+	btjYyuQ=
+Message-ID: <5a14a872-4d53-4804-b1ec-c60fcf438e09@prolan.hu>
+Date: Mon, 12 Feb 2024 17:34:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240212092827.75378-1-kerneljasonxing@gmail.com>
- <20240212092827.75378-4-kerneljasonxing@gmail.com> <CANn89iKmG=PbXpCfOotWJ3_890Zm-PKYKA5nB2dFhdvdd6YfEQ@mail.gmail.com>
- <CAL+tcoDFGt47_V8R7FkDN8OD-mj8pY41XysoGY7dpddo08WHMw@mail.gmail.com>
-In-Reply-To: <CAL+tcoDFGt47_V8R7FkDN8OD-mj8pY41XysoGY7dpddo08WHMw@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 12 Feb 2024 17:19:37 +0100
-Message-ID: <CANn89iKEb_1kCPHjRDErmusqjGzK9w3h_tDYBxS+r-0nNHzhyg@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 3/6] tcp: add dropreasons in tcp_rcv_state_process()
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	dsahern@kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] net: fec: Refactor: #define magic constants
+To: Andrew Lunn <andrew@lunn.ch>
+CC: <netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang
+	<shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, NXP Linux Team
+	<linux-imx@nxp.com>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+	<pabeni@redhat.com>, Francesco Dolcini <francesco.dolcini@toradex.com>, "Marc
+ Kleine-Budde" <mkl@pengutronix.de>
+References: <20240209091100.5341-1-csokas.bence@prolan.hu>
+ <2f855efe-e16f-4fcb-8992-b9f287d4bc22@lunn.ch>
+ <a7b8df0b-fc24-441e-b735-7bf319608e99@prolan.hu>
+ <cfc31be3-935d-432f-aa7a-38976c7ca954@lunn.ch>
+ <41e96e5e-2184-4ac0-886f-2da18b726783@prolan.hu>
+ <2880cd18-a0a8-473e-b21a-0dba043302ea@lunn.ch>
+Content-Language: en-US
+From: =?UTF-8?B?Q3PDs2vDoXMgQmVuY2U=?= <csokas.bence@prolan.hu>
+In-Reply-To: <2880cd18-a0a8-473e-b21a-0dba043302ea@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: ATLAS.intranet.prolan.hu (10.254.0.229) To
+ sinope.intranet.prolan.hu (10.254.0.237)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A29916D3B55617C60
 
-On Mon, Feb 12, 2024 at 4:53=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> Hello Eric,
->
-> On Mon, Feb 12, 2024 at 11:33=E2=80=AFPM Eric Dumazet <edumazet@google.co=
-m> wrote:
-> >
-> > On Mon, Feb 12, 2024 at 10:29=E2=80=AFAM Jason Xing <kerneljasonxing@gm=
-ail.com> wrote:
-> > >
-> > > From: Jason Xing <kernelxing@tencent.com>
-> >
-> >
-> > >                         if (!acceptable)
-> > > -                               return 1;
-> > > +                               /* This reason isn't clear. We can re=
-fine it in the future */
-> > > +                               return SKB_DROP_REASON_TCP_CONNREQNOT=
-ACCEPTABLE;
-> >
-> > tcp_conn_request() might return 0 when a syncookie has been generated.
-> >
-> > Technically speaking, the incoming SYN was not dropped :)
-> >
-> > I think you need to have a patch to change tcp_conn_request() and its
-> > friends to return a 'refined' drop_reason
-> > to avoid future questions / patches.
->
-> Thanks for your advice.
->
-> Sure. That's on my to-do list since Kuniyuki pointed out[1] this
-> before. I will get it started as soon as the current two patchsets are
-> reviewed. For now, I think, what I wrote doesn't change the old
-> behaviour, right ?
->
+2024. 02. 12. 17:03 keltezéssel, Andrew Lunn írta:
+> On Mon, Feb 12, 2024 at 04:11:10PM +0100, Csókás Bence wrote:
+>>
+>>
+>> 2024. 02. 12. 16:04 keltezéssel, Andrew Lunn írta:
+>>> On Mon, Feb 12, 2024 at 03:49:42PM +0100, Csókás Bence wrote:
+>>>> Hi!
+>>>>
+>>>> 2024. 02. 09. 14:53 keltezéssel, Andrew Lunn írta:
+>>>>>> @@ -1181,7 +1194,7 @@ fec_restart(struct net_device *ndev)
+>>>>>>     	if ((fep->pause_flag & FEC_PAUSE_FLAG_ENABLE) ||
+>>>>>>     	    ((fep->pause_flag & FEC_PAUSE_FLAG_AUTONEG) &&
+>>>>>>     	     ndev->phydev && ndev->phydev->pause)) {
+>>>>>> -		rcntl |= FEC_ENET_FCE;
+>>>>>> +		rcntl |= FEC_RCR_FLOWCTL;
+>>>>>
+>>>>> This immediately stood out to me while looking at the diff. Its not
+>>>>> obvious why this is correct. Looking back, i see you removed
+>>>>> FEC_ENET_FCE, not renamed it.
+>>>>
+>>>> What do you mean? I replaced FEC_ENET_FCE with FEC_RCR_FLOWCTL, to make it
+>>>> obvious that it represents a bit in RCR (or `rcntl` as it is called on this
+>>>> line). How is that not "renaming" it?
+>>>
+>>> Going from FEC_NET_ to FEC_RCR_ in itself makes me ask questions. Was
+>>> it wrong before? Is this actually a fix? Is it correct now, or is this
+>>> a cut/paste typo? Looking at the rest of the patch there is no obvious
+>>> answer. As i said, you deleted FEC_ENET_FCE, but there is no
+>>> explanation why.
+>>
+>> The name `FEC_ENET_FCE` does not tell us that this is the FCE (Flow Control
+>> Enable) bit (1 << 5) of the RCR (Receive Control Register). I added
+>> FEC_RCR_* macros for all RCR bits, and I named BIT(5) FEC_RCR_FLOWCTL, a
+>> much more descriptive name (in my opinion, at least).
+> 
+> Some form of that would be good in the commit message. It explains the
+> 'Why?' of the change.
 
-Lets not add a drop_reason that will soon be obsolete.
+Ok. I split that change into a separate patch with a quick summary of 
+this, in v4 of this patch. Hopefully it is more clear now.
+
+>> So, a separate patch just for removing FEC_ENET_FCE and replacing all usages
+>> with FEC_RCR_FLOWCTL? And the rest can stay as-is?
+> 
+> A few others made review comments as well. It could be addressing
+> those comments also requires more small patches. Sometimes you can
+> avoid review comments by thinking, what are reviewers going to ask,
+> and putting the answer to those questions in the commit message. This
+> might all seam like a lot of hassle now, but it will help getting your
+> future patchsets merged if you follow this advice.
+> 
+>        Andrew
+
+I believe I addressed all other comments already, but do enlighten me if 
+that is not the case:
+* removed the "fix FEC_ECR_EN1588 being cleared on link-down" half of 
+the patch (v2) - your feedback
+* removed `u32 ecntl` from `fec_stop()` (v3) - requested by Marc
+* added net-next subject-prefix (v3) - suggested by Denis
+* factored out the removal of FEC_ENET_FCE (v4) - your feedback
+
+Did I miss something?
+
+Bence
+
 
