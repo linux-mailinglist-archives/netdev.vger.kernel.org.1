@@ -1,108 +1,82 @@
-Return-Path: <netdev+bounces-70967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70968-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B805585159D
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 14:45:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88D8D85166C
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 15:05:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70DFF287679
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 13:45:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44F0828861D
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 14:05:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 787863FE58;
-	Mon, 12 Feb 2024 13:38:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 385483BB43;
+	Mon, 12 Feb 2024 13:56:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ie6b3+Dg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E6wwG8Si"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2501848E;
-	Mon, 12 Feb 2024 13:38:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 065093FB1B;
+	Mon, 12 Feb 2024 13:56:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707745086; cv=none; b=cvAp4QTkYnouKaWRXKb/UmgeZ20YmrSaJlSiruDngr8HKfsyf8i5WFRg3IQM8+TlzszJBU0DNO+A5jEcWqoZjxyEJusGKkk1doDA3y+NcYHL8oSG5umdB1OK6PTYRzzBkJ2SA2iZxnJmUxy9gIzONDlfUQyw3pVQLV0w9tz4dxg=
+	t=1707746201; cv=none; b=E8BiIv0TjWpnqHb+aoWtMcY/bhRqdX8+J5McK9fMqTc0izF7B33h2Pz59DpgZvyxQFST36Lr5Yo8pQF5d8W2Vn2B0EwA8Rb/p7XVkhHCusUWYR9vyRfJgbERWmRP2Yno1dGMN/RmWeQYB0mW4onE/3OcnhxVQ7E5MH4IeyUNDZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707745086; c=relaxed/simple;
-	bh=lPAGNQ9qyBXFTL/v/7+iOjDr1xFtXIIoVf3l+u9WEdk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=M3cvPROwWC4TKi2DKPa+l+lyuNrCRDxWkVkA0/YdEgYUEDmWZWNEKhiTUKNp09zcB6eJI++F8nrEy2hc07E6Qr3oCUToUllujY7eOztp8/NFsjjXLJJz9RswqrvMWr2KvGLYvZ6WYqydUoS+RxiTV879hzjNr8HPNjdT4WMG73U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ie6b3+Dg; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 481B41BF206;
-	Mon, 12 Feb 2024 13:37:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1707745076;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z7rOVuLO0xilSDJ3N64aVRj6PnVPEco4AT9htw6H2H4=;
-	b=ie6b3+Dgxjr4F12aR7ja00IGv0kDHrgLsQfBeM4e67NBLH5C7IMRKZgVpnnOexMji6OOXm
-	YFOjZoH+AQnY9lFkGeIKeR244NpvpPsUchrtXSmUnev77+bqCNmWQ/Y7QpV2zwuTlhOhJq
-	znASmRBLlLlIlj8Vu34bvXPlOhI9sPJlm+8fAjkhjNijvebyiJSJmvsicnWq7mCUKnmDvU
-	0yEDZ0+wk/qOPBcxUl3sbnGmw8k6o7WjETQeI/Vvy1VXz/9szFs7UaBDdTcPbsRJJt/t4E
-	s2lm9xx4yoXjyh8H0nmscBy17KOVTso2Ebadt7atZAarYpr2naLuRahLuo4spA==
-Date: Mon, 12 Feb 2024 14:37:53 +0100
-From: Herve Codina <herve.codina@bootlin.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Yury Norov
- <yury.norov@gmail.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew@lunn.ch>, Mark Brown
- <broonie@kernel.org>, Christophe Leroy <christophe.leroy@csgroup.eu>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v3 RESEND 3/6] bitmap: Make bitmap_onto() available to
- users
-Message-ID: <20240212143753.620ddd6e@bootlin.com>
-In-Reply-To: <ZcoOpPb9HfXOYmAr@smile.fi.intel.com>
-References: <20240212075646.19114-1-herve.codina@bootlin.com>
-	<20240212075646.19114-4-herve.codina@bootlin.com>
-	<ZcoOpPb9HfXOYmAr@smile.fi.intel.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1707746201; c=relaxed/simple;
+	bh=37nz859ShgHqVR08pnQOMTOWyjYey3mzmwOK5xjZt6A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rL6rK4Q62tqyM612A4P025KNIsScaKtnpgdlfOf0+Zc60XBYHpZ7O4NJKXI8MqcNcTGJ6VQrQugx/j28z89X+pdDhmIoypMepehCTDYC5KSW1x8ioO7VQlP6FP9dTqhh+Zl5de1tp3aDjKXOYv+uSeXeh+nwqiIUSkV0+tWBLLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E6wwG8Si; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E80BC43141;
+	Mon, 12 Feb 2024 13:56:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707746200;
+	bh=37nz859ShgHqVR08pnQOMTOWyjYey3mzmwOK5xjZt6A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=E6wwG8SiO9KEsmYxyKA+RtvSFKaj8uzvlrDgEXud/C7+BzkFDle8rcHVvxj4UOLJM
+	 r16Z/8UyPRuihprgrjzo3fDDSq3W8mulu1HG+ohgcnKRPzz+rZ03d84ExbBT41gOLP
+	 E6mpuIaaMZz+7ebZBp9qEYu55bR/zl0XDrNNRpBwvVzPAHEQUhkt6JizQw+g+yA33q
+	 bxicgBJv7jCedZ92mLSpeX6WcCPulINec6tzbiDwFSqgJ43ByVo13Cp3/GYoLwj/E7
+	 RImIi4a+Jq4kdLxXgc/R2EbIVyHlLk38qQ2DFZm5e3tgdmYJp43KkfKUMuGJ+kTry4
+	 Ghk36Q5S+SZ7g==
+Date: Mon, 12 Feb 2024 07:56:38 -0600
+From: Rob Herring <robh@kernel.org>
+To: "Peng Fan (OSS)" <peng.fan@oss.nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, conor+dt@kernel.org,
+	Peng Fan <peng.fan@nxp.com>, kuba@kernel.org, wg@grandegger.com,
+	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	pabeni@redhat.com, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, mkl@pengutronix.de
+Subject: Re: [PATCH] dt-bindings: can: fsl,flexcan: add i.MX95 compatible
+ string
+Message-ID: <170774608242.61707.8589020918845229336.robh@kernel.org>
+References: <20240122091738.2078746-1-peng.fan@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240122091738.2078746-1-peng.fan@oss.nxp.com>
 
-Hi Andy,
 
-On Mon, 12 Feb 2024 14:27:16 +0200
-Andy Shevchenko <andriy.shevchenko@linux.intel.com> wrote:
-
-> On Mon, Feb 12, 2024 at 08:56:31AM +0100, Herve Codina wrote:
-> > Currently the bitmap_onto() is available only for CONFIG_NUMA=y case,
-> > while some users may benefit out of it and being independent to NUMA
-> > code.
-> > 
-> > Make it available to users by moving out of ifdeffery and exporting for
-> > modules.  
+On Mon, 22 Jan 2024 17:17:38 +0800, Peng Fan (OSS) wrote:
+> From: Peng Fan <peng.fan@nxp.com>
 > 
-> Wondering if you are trying to have something like
-> https://lore.kernel.org/lkml/20230926052007.3917389-1-andriy.shevchenko@linux.intel.com/
+> Add i.MX95 flexcan which is compatible i.MX93 flexcan
+> 
+> Signed-off-by: Peng Fan <peng.fan@nxp.com>
+> ---
+>  Documentation/devicetree/bindings/net/can/fsl,flexcan.yaml | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
 
-Yes, it looks like.
-Can you confirm that your bitmap_scatter() do the same operations as the
-existing bitmap_onto() ?
+It seems this isn't getting applied to CAN tree, so I applied it.
 
-If so, your bitmap_gather() will match my bitmap_off() (patch 4 in this series).
-
-Thanks,
-Hervé
-
--- 
-Hervé Codina, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+Rob
 
