@@ -1,76 +1,59 @@
-Return-Path: <netdev+bounces-70954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A365851353
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 13:16:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60E54851356
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 13:16:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FB1D1F242D0
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 12:16:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DD6E6B224FA
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 12:16:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9156D39AE1;
-	Mon, 12 Feb 2024 12:14:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="XvyyAnaM";
-	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="shfULbcj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A150739AE3;
+	Mon, 12 Feb 2024 12:15:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from nautica.notk.org (nautica.notk.org [91.121.71.147])
+Received: from torres.zugschlus.de (torres.zugschlus.de [85.214.160.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E886A39FDB
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 12:14:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.121.71.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62BC0882D
+	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 12:15:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.160.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707740069; cv=none; b=ZEXhKSXjtCjMQc1Ytqdkt67yfaSlbLuLGsV/g6fdK4Ql0lm1MO+MEL3bWFLLd5GwiUKJUIU6/W8QKON0A558Ary9H1XFNaim7M+WtKt8s+4U5uxho8egAjkNaSDJ6PawSRK5sPAL5+2IDpeAy8Td6DHgNF2JmcYzFgLiSSaqh3g=
+	t=1707740134; cv=none; b=Ccv8vR05T8G4zOVxqeMWF8/LbM3NQ7S33C2kEC9RAFJfPPPbU1kGmJahTjBT6NtkxFdQQLtftuWr1GqjPzgeMJnRq04nMGHDjZr9wjY6dtjTbbk+MrSRl5uvekK/VpktP2TDPAppTDkGSiA9WxI9Ayuj6wkFFDTnHrpMxtjooGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707740069; c=relaxed/simple;
-	bh=Pn5zogiyPRiHjXIT/y50rDh7mRTjVLMfDrtm3VkFkpY=;
+	s=arc-20240116; t=1707740134; c=relaxed/simple;
+	bh=Oo6weIIuhCpZHEQ+hPT/fvEXd7+5quKaT7d6G9U5nLQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z0BCqhCJxfq9H7aEFGjOjhOzfC2XcpS1dLFRsW9L5Z2lyD2qxqUDYZRdTUehudmRHAca62oFpgvRBxX+jz3SZdqp5LjUK1K+IdDNQYb/8g5tFmP2qrrrQSLjgUyC5W4qRGSnFQLmeMFfpDqMl8DA2pCYj+TlrJ6F4Q1+Kk7NXPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org; spf=pass smtp.mailfrom=codewreck.org; dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b=XvyyAnaM; dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b=shfULbcj; arc=none smtp.client-ip=91.121.71.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
-Received: by nautica.notk.org (Postfix, from userid 108)
-	id E6AF6C01C; Mon, 12 Feb 2024 13:14:23 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
-	t=1707740063; bh=J9uKAK0vRpnU3LG0TXjxtthvlxNYsEtRU9Q3s7bTbsw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XvyyAnaMHUndfRz1pI+Bi/IiWfQ+zUWHXJKrXDzG+QcU1iO12ZF1Khghu38iz0JOS
-	 U7/GCnMo3g5rre89JR7OByJ4Hru+Fgi573evk/1vGRS5AQlAspQlXqC7RIcvOM44OQ
-	 R/6GiQy3JLreve6O2Z0UtmIlzHuRsjQWgHmzvUhDknVvkaKFY7xNoXZzvZ5ftcp7Ur
-	 jdoeB2EusIDS6uB+bzb3Cqyew9I8Rq6nabXwUieUwmOgfTGE+RGtA8qPiKZlYDceZY
-	 sBqrCla4Pstj4nSSK4gH2UhQLq/6/4mFGf59DHVt+jGCcr7UVO0gygLHKM6Yjn+N6K
-	 HNgL7ZdAqrpEg==
-X-Spam-Level: 
-Received: from gaia.codewreck.org (localhost [127.0.0.1])
-	by nautica.notk.org (Postfix) with ESMTPS id 07381C009;
-	Mon, 12 Feb 2024 13:14:10 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
-	t=1707740054; bh=J9uKAK0vRpnU3LG0TXjxtthvlxNYsEtRU9Q3s7bTbsw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=shfULbcjjvJc+CGzQIdeNTsxa7oxRkdaseyz3xhkO62eYAIfrFlf9DLahaMpyEW8L
-	 RhYMngabxuVP8bkLcrhQgPDZljuiyzZ874JqdntsjVd+yGzSoK7A2zCT367kWy8FIz
-	 f9O9Pm+xN2+eEo6lJgNIYsCAbDqQ35POt1UWLo0IZ17inFPVT5bedo8L5zC7kgOvXk
-	 QbJZmbYEtS7qN7GVuBzaE8oLzFJpEfsxMRdNn61rdjimAYueflX9EVNSbnTU67f/oA
-	 APM5OD03bYqJ15PWwSenhSvd0myshJBUxm/p9OpsQhMJvIgVaXsUOplZmhp+uSQpf1
-	 GSmFCgk2zY2/A==
-Received: from localhost (gaia.codewreck.org [local])
-	by gaia.codewreck.org (OpenSMTPD) with ESMTPA id 3ceb6d61;
-	Mon, 12 Feb 2024 12:14:04 +0000 (UTC)
-Date: Mon, 12 Feb 2024 21:13:49 +0900
-From: Dominique Martinet <asmadeus@codewreck.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: netdev@vger.kernel.org, Eric Van Hensbergen <ericvh@gmail.com>,
-	Latchesar Ionkov <lucho@ionkov.net>, v9fs@lists.linux.dev,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH v2] 9p/trans_fd: remove Excess kernel-doc comment
-Message-ID: <ZcoLfSBNtfgmeKaI@codewreck.org>
-References: <20240212043341.4631-1-rdunlap@infradead.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=VYQPgfxA3BHRDiuAIBcZ1/eySFJsJnzz72PMIodFKCAL3VQ1BLboesRGJBEsuI6xmwfmReny4G3CVecSgcrM/Jt5Da1q6WGDUAFis8opAHUtobA5vjmhN4abYDCFyfz1illLRRxOxHJ5OMo0ZW8whutKuEbLY836Usa81f3ZB2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zugschlus.de; spf=none smtp.mailfrom=zugschlus.de; arc=none smtp.client-ip=85.214.160.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zugschlus.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=zugschlus.de
+Received: from mh by torres.zugschlus.de with local (Exim 4.96)
+	(envelope-from <mh+netdev@zugschlus.de>)
+	id 1rZVDM-005Euh-2O;
+	Mon, 12 Feb 2024 13:15:12 +0100
+Date: Mon, 12 Feb 2024 13:15:12 +0100
+From: Marc Haber <mh+netdev@zugschlus.de>
+To: Petr =?utf-8?B?VGVzYcWZw61r?= <petr@tesarici.cz>
+Cc: Florian Fainelli <f.fainelli@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	alexandre.torgue@foss.st.com, Jose Abreu <joabreu@synopsys.com>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Jisheng Zhang <jszhang@kernel.org>, netdev@vger.kernel.org
+Subject: Re: stmmac on Banana PI CPU stalls since Linux 6.6
+Message-ID: <ZcoL0MseDC69s2_P@torres.zugschlus.de>
+References: <8efb36c2-a696-4de7-b3d7-2238d4ab5ebb@lunn.ch>
+ <ZbKiBKj7Ljkx6NCO@torres.zugschlus.de>
+ <229642a6-3bbb-4ec8-9240-7b8e3dc57345@lunn.ch>
+ <99682651-06b4-4c69-b693-a0a06947b2ca@gmail.com>
+ <20240126085122.21e0a8a2@meshulam.tesarici.cz>
+ <ZbOPXAFfWujlk20q@torres.zugschlus.de>
+ <20240126121028.2463aa68@meshulam.tesarici.cz>
+ <ZcFBL6tCPMtmcc7c@torres.zugschlus.de>
+ <0ba9eb60-9634-4378-8cbb-aea40b947142@gmail.com>
+ <20240206092351.59b10030@meshulam.tesarici.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,29 +62,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240212043341.4631-1-rdunlap@infradead.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240206092351.59b10030@meshulam.tesarici.cz>
+User-Agent: Mutt/2.2.12 (2023-09-09)
 
-Randy Dunlap wrote on Sun, Feb 11, 2024 at 08:33:41PM -0800:
-> Remove the "@req" kernel-doc description since there is not 'req'
-> member in the struct p9_conn.
+On Tue, Feb 06, 2024 at 09:23:51AM +0100, Petr Tesařík wrote:
+> On Mon, 5 Feb 2024 13:50:35 -0800
+> Florian Fainelli <f.fainelli@gmail.com> wrote:
 > 
-> Fixes one kernel-doc warning:
-> trans_fd.c:133: warning: Excess struct member 'req' description in 'p9_conn'
+> > On 2/5/24 12:12, Marc Haber wrote:
+> > > On Fri, Jan 26, 2024 at 12:10:28PM +0100, Petr Tesařík wrote:  
+> > >> Then you may want to start by verifying that it is indeed the same
+> > >> issue. Try the linked patch.  
+> > > 
+> > > The linked patch seemed to help for 6.7.2, the test machine ran for five
+> > > days without problems. After going to unpatched 6.7.2, the issue was
+> > > back in six hours.  
+> > 
+> > Do you mind responding to Petr's patch with a Tested-by? Thanks!
 > 
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> I believe Marc tested my first attempt at a solution (the one with
+> spinlocks), not the latest incarnation. FWIW I have tested a similar
+> scenario, with similar results.
 
-Sorry for the lack of reply, I intended to take the patch when the next
-""real"" patch comes in but it doesn't look like we'll get much activity
-this cycle so I've just queued it up to -next.
+Where is the latest patch? I can give it a try.
 
-Thanks!
+Sorry for not responding any earlier, February 10 is an important tax
+due date in Germany.
 
-FWIW, I contemplated adding
-Fixes: 6d35190f3953 ("9p: Rename req to rreq in trans_fd")
-but that's basically been forever so I don't think anyone will care
-about backports -- and I'm both surprised and ashamed I didn't see this
-W=1 warning earlier, I thought I regularly build with that...
+Greetings
+Marc
 
 -- 
-Dominique
+-----------------------------------------------------------------------------
+Marc Haber         | "I don't trust Computers. They | Mailadresse im Header
+Leimen, Germany    |  lose things."    Winona Ryder | Fon: *49 6224 1600402
+Nordisch by Nature |  How to make an American Quilt | Fax: *49 6224 1600421
 
