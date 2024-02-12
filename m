@@ -1,142 +1,88 @@
-Return-Path: <netdev+bounces-70867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F7D9850DF8
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 08:24:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90C4A850DFE
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 08:27:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81D001C20359
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 07:24:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C39DE1C2137C
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 07:27:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73A006FCA;
-	Mon, 12 Feb 2024 07:24:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69CE36FD8;
+	Mon, 12 Feb 2024 07:27:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BW3A3yqp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KopBSSTH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB0D7462
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 07:24:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D2A17462;
+	Mon, 12 Feb 2024 07:27:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707722695; cv=none; b=FMDvJM8rZj8vfqAeLmrBwePPS/kAhJHQ7x4NgYdxR2VTLvRC8RbLMiTCey6QW1xO1G6hiUV+YptJZFQVO9JGm9p/abb+YD87DNTHJLUXaPYA4wXUPaqxuevMsjWNuAFW3qnnqiYmoy6exlU3G5O7nik3XSnoMysTYCtk5JzqbbE=
+	t=1707722866; cv=none; b=nnZeLS2EvUcE6tNgV1ul2rZKa+yi+VDPDhcp6gpI13PX5FXDLo6+ARKOMTNQZM7zXzJwSSAGBWW4OR92wA4wcz9FVTvStt3xPcfKov7+7cMckZE0VPvjNGlk9hk4834bUzqoDebaWcNWyur2MBoN8TOeUJXGySCd5ENUsaxfL+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707722695; c=relaxed/simple;
-	bh=7aNyuTB21OsLfcmUPrfCOX6NZq6zlmFvfFTNbiOqESo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A2bEsol/J/Nx5739o/hkaVyLeR/B1fxz5/4IboqNlsvRyhOq8y89tVObR7YH9e+BSJOFiAJ+5860kKQ+CMVzYOOAeI7qihvc+OQd3pmQJUMkaQljVLzS6GIzdIAfpRBFppoZPZlo2McC3P9jq3+NpUbcWpDTYNaIXs+q4QncZck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BW3A3yqp; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1d93ddd76adso19991765ad.2
-        for <netdev@vger.kernel.org>; Sun, 11 Feb 2024 23:24:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707722693; x=1708327493; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gfl0wj6/Cn4bCVEaM5s1TdWJKaiuhl55mCd1HFuG/5I=;
-        b=BW3A3yqp4gFUIWCGtVBEQ9cOBMpelA0RYCrU4NRYCaMMdDGhP+MQcdfmvbEM63zTD5
-         EkKAcnOw067HFQQ27HNTGUnAKPKbFRPr/jTvkaJ2gJMx3a2/WgRMT4qG0jWQMb4SUQ5M
-         hpaEsbCMCu6G42isYt/Ho7RKoVXSK9rm20ZEM1d7NahGMI0Bju5jb6DbXFr/LZRu8KXE
-         +mMGNSPR/2szPeYQsnA1ljxoSlr6FhAHCy+8cVO9pTyKVwxaUXIFEDwHvoyvt76uvuIZ
-         dO1RhooHZe2KDWaaTlUPHXT5vR9cPtLY3IFLygYVCnYFfDZMUfCfDpe/oTfPFLTrMa5t
-         noMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707722693; x=1708327493;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gfl0wj6/Cn4bCVEaM5s1TdWJKaiuhl55mCd1HFuG/5I=;
-        b=CXfBsWDqEeEQ2rMQHug7TqfZYdCe+ykbEaS0JtkzGMW2MzrP9nvEbSZl+1qrwm3RyT
-         b2BkxM8kBXEbjPueC3ZTVMPOMsFTgbIcPGtQQ0Z6SqXxJfoahTLwKR38lBaRwApdhnxF
-         6XTK3jyDRSHDL6lrm0XDHXC604TxXSLPcBrTI3/qhptrYYQRGJ2lEIlAjplRj7uJ9pn+
-         FNkzuvZomY3XgL4WmEmumggdfYUe+YKq/ltVzOMtllXX7pTlOd3PxIHznrPrZ9hDXV8i
-         Z198kqYTLbD58tdrLLpy9Nyz1Gjm9rFWnhtl0IpuiwJKzlQKFXqJxNueNzH7PQsENyfG
-         2sag==
-X-Gm-Message-State: AOJu0YyMwv0Cm65Q6B587Y4agf6YI6VZU+Cxth96zUd2i/k6dFbjLS32
-	Uy8RHLn1kydaq+DaAsigEyVqvUGIuke5P+YkkJ6hF0KDN0VTvZQ4hwfMxXhynF4oJQ==
-X-Google-Smtp-Source: AGHT+IEvUhL9T4g0Zrmwi6O9XqmcSQg5JN1hxAFi3ttaXREIGehRUQBLuUU3YUW/OoXcF2aIAv5UKQ==
-X-Received: by 2002:a17:902:e84f:b0:1d9:bf01:165d with SMTP id t15-20020a170902e84f00b001d9bf01165dmr6995108plg.10.1707722693210;
-        Sun, 11 Feb 2024 23:24:53 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWEuT52j1LOuevFWodKn919y7ZSGNR/5i/aBmwRxE3LmmOk/6FKnkLsOBJlEn+6es4fUQn7Pq+p1Y0KuPjzYXdt
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id y6-20020a170902ed4600b001da1efbd306sm3209948plb.61.2024.02.11.23.24.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 Feb 2024 23:24:52 -0800 (PST)
-Date: Mon, 12 Feb 2024 15:24:49 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com
-Subject: Re: [PATCH iproute2] tc: u32: check return value from snprintf
-Message-ID: <ZcnHwRCr6s3T8VXt@Laptop-X1>
-References: <20240211010441.8262-1-stephen@networkplumber.org>
+	s=arc-20240116; t=1707722866; c=relaxed/simple;
+	bh=3aMNHjlxc62FQVzZmnlMVcwgj0/VFMqeJ+TcZxLjSvg=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=KCE92KVxTdOGTaaQXpDg7OavAZP+kKXH2v/MX+AzjwLM5no3rSjXFE/8BG2niawExchlYhqJDWi5/eFkRQEskxI1A/kv7FjXsy635uLvHHbeerIoj/r31c6wlZAyk3DqolxCkhbTICp50ykM+Cs4L3AzsfQ3ndzqZ0nzbetDRac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KopBSSTH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DA29C433C7;
+	Mon, 12 Feb 2024 07:27:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707722866;
+	bh=3aMNHjlxc62FQVzZmnlMVcwgj0/VFMqeJ+TcZxLjSvg=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=KopBSSTHwl+GzzLjkSwYTO4SSaQrRYAiQlFhe89mRxjKAtD/795s06xVdAlyL1pP1
+	 0w4j/4VWKKOFvUyBXFd5J2V2Yc1Yj0sVe8sHz/1hzS7SXTQakmxitPZvoNdjaC22fP
+	 LXMf+GV0xzPDCHElMqYeYdvzU7Y6Ts73zCG5POs1mNkeW9bYy80dOBkrmKlIIE6fqQ
+	 gVLZxzexqxljf3FpYT11IE4v13n3zF4uqFvFg8ot4fC7YlZ+5XAk9CIqOwLelc+VVB
+	 Xf7T/vaakDcexuUHR6QoxwgNRe5vqch3rlkMR49kiqI/TtWkFi3eog+ZHAH4zOu67Y
+	 4I2dUEbqhnz5g==
+From: Kalle Valo <kvalo@kernel.org>
+To: Arend van Spriel <arend.vanspriel@broadcom.com>
+Cc: Daniil Dulov <d.dulov@aladdin.ru>,  "David S. Miller"
+ <davem@davemloft.net>,  Jakub Kicinski <kuba@kernel.org>,  Pieter-Paul
+ Giesberts <pieterpg@broadcom.com>,  "Franky (Zhenhui) Lin"
+ <frankyl@broadcom.com>,  "John W. Linville" <linville@tuxdriver.com>,  Kan
+ Yan <kanyan@broadcom.com>,  linux-wireless@vger.kernel.org,
+  brcm80211-dev-list.pdl@broadcom.com,  SHA-cyfmac-dev-list@infineon.com,
+  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org,
+  lvc-project@linuxtesting.org
+Subject: Re: [PATCH] brcmfmac: Remove unnecessary NULL-check.
+References: <20240211150516.3475-1-d.dulov@aladdin.ru>
+	<60a0a753-47ba-4f80-b93e-2878f214bc3c@broadcom.com>
+Date: Mon, 12 Feb 2024 09:27:41 +0200
+In-Reply-To: <60a0a753-47ba-4f80-b93e-2878f214bc3c@broadcom.com> (Arend van
+	Spriel's message of "Sun, 11 Feb 2024 20:25:21 +0100")
+Message-ID: <87il2uf8gi.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240211010441.8262-1-stephen@networkplumber.org>
+Content-Type: text/plain
 
-On Sat, Feb 10, 2024 at 05:04:23PM -0800, Stephen Hemminger wrote:
-> Add assertion to check for case of snprintf failing (bad format?)
-> or buffer getting full.
-> 
-> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+Arend van Spriel <arend.vanspriel@broadcom.com> writes:
 
-Hi Stephen,
+> On 2/11/2024 4:05 PM, Daniil Dulov wrote:
+>> In this case req will never be NULL, so remove unnecessary check.
+>> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+>
+> Looks good to me, but when do we call things a "fix" and when is
+> "improvement" more appropriate.
+>
+>> Fixes: 71bb244ba2fd ("brcm80211: fmac: add USB support for bcm43235/6/8 chipsets")
+> Reviewed-by: Arend van Spriel <arend.vanspriel@broadcom.com>
 
-Is there a bug report or something else that we only do the assertion
-for tc/f_u32.c?
+Yeah, this is not a fix and the Fixes tag should be removed.
 
-Thanks
-Hangbin
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
 
-> ---
->  tc/f_u32.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/tc/f_u32.c b/tc/f_u32.c
-> index 913ec1de435d..8a2413103906 100644
-> --- a/tc/f_u32.c
-> +++ b/tc/f_u32.c
-> @@ -7,6 +7,7 @@
->   *
->   */
->  
-> +#include <assert.h>
->  #include <stdio.h>
->  #include <stdlib.h>
->  #include <unistd.h>
-> @@ -87,6 +88,7 @@ static char *sprint_u32_handle(__u32 handle, char *buf)
->  	if (htid) {
->  		int l = snprintf(b, bsize, "%x:", htid>>20);
->  
-> +		assert(l > 0 && l < bsize);
->  		bsize -= l;
->  		b += l;
->  	}
-> @@ -94,12 +96,14 @@ static char *sprint_u32_handle(__u32 handle, char *buf)
->  		if (hash) {
->  			int l = snprintf(b, bsize, "%x", hash);
->  
-> +			assert(l > 0 && l < bsize);
->  			bsize -= l;
->  			b += l;
->  		}
->  		if (nodeid) {
->  			int l = snprintf(b, bsize, ":%x", nodeid);
->  
-> +			assert(l > 0 && l < bsize);
->  			bsize -= l;
->  			b += l;
->  		}
-> -- 
-> 2.43.0
-> 
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
