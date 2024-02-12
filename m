@@ -1,109 +1,126 @@
-Return-Path: <netdev+bounces-71010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 249908518D1
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 17:19:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B0B18518DC
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 17:20:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0F39280E9F
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 16:19:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 401CE1F21CD4
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 16:20:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 512313D0D2;
-	Mon, 12 Feb 2024 16:19:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D540E3D0D1;
+	Mon, 12 Feb 2024 16:19:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V2cAYOLm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kZZGasnA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C85FF3D0C6
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 16:19:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2180B3D387
+	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 16:19:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707754764; cv=none; b=gjbLW/y0Ug+rG502v83dkx9QJ1ND7vLj5EVwIHjv/c0ialFw0RBizpBS/1SZf44apHCjR+MVWESb7/NY9u8OUtvPpMaBlHifm5eDE+OBtLA6+Buo/XTqvaixn2CNeKaykfWr57GNsfd6M797KvhzthjQ8/TsNvj285lT8eQehWI=
+	t=1707754792; cv=none; b=oHTMnRLKN+em4Qmfqhh7uPGeDfoNpLli7HJLeNPXE2T0gqRaEV2Dz9apq0TMR350A3vV6UDPSKwAaPSrvpV1d8/TAwkKL0uo2X/UUQWAo3GIdbvLfn4PqqvTGbLQcEWPRYerFaRSxsILp1putqI9JA0+TiWTxEnQBBgneVX4qdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707754764; c=relaxed/simple;
-	bh=U64gvLlDfOMzVcYEIsGaggJTU9iembPXFRSVhO1RPkU=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Iklr89Xwj54MWtZEUPhIqTmFva4LJ/oDlYocelVw+px+YRFAeR86q85zH6NoiJFey5W/K/xroXcIAiqfsDDl0GulX2aek2cdOUqKjGtTYWCTigClPAIO+gfTjTGA+ZklWyK7mu0j+LglJk9eiYjY/R+KKujNePX+Z2Vh1j/6rXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V2cAYOLm; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-42ce63b1d30so3495111cf.3
-        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 08:19:22 -0800 (PST)
+	s=arc-20240116; t=1707754792; c=relaxed/simple;
+	bh=XoUz+JKRRyLBDRgZff9NiMYOcittU3kWQe3W6ehgHx8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fP5U7eCv5EC/WNZOgBcxxePu+s2t4YkIuRBNClO/EQuoziQJqvGbQ5/YfrYq1DPI+Ul1UG0Rm6WEWbEaA1UkR8eD9zwUWl2vI9+VBxfeSc/jUaSW8uzMOgm64q5PSdmTI4qiwbq+ODELIkdUDLg4/6dnR1aYnZd2nGA+F+LijMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kZZGasnA; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-56101dee221so13892a12.1
+        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 08:19:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707754762; x=1708359562; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1707754789; x=1708359589; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QXLjTuP8gjSgEaNbQyPphVppBWGE/fLPXeF8p66gJqk=;
-        b=V2cAYOLm/03M0OXsM+RIQPy5r+ITsAuPKN01Zm9jAYQB2iOh7glAsNhCNIfpS3EE76
-         dNvBwVh65BSeI/sSV/PVv+UhjOd0aM5EA057Uzd6PEchFJ+gbMU8ea+u0DPk61S+Dp/w
-         G02oRycQVTliFyktmVE6/7PJOUzpfEhdXvzHKgkcnJVAwgBaMPofJWPGjKCc5WCTzNzs
-         Rv3vy6Ke6osD9iNNSftABaD+BhqF2l1WinKtgomOmJlRznfkyap7pngoNiXBqPMpbIO7
-         EMjlUwQxVMYbqqwzf7Na28puEDDWUkmTg0uk+BNy5dMlIhQyEIDRqmAz9fvEx7q2AdK9
-         vYSQ==
+        bh=AHOo/eJwLxH5gqaZ8Efiem03bhq9rE//mMgm98xwZ0M=;
+        b=kZZGasnAbeAWv0GkmdckuGHq2mJKEvbibwyRmU3Sb2TwFDA0/E0StS+k6vICV/M0MG
+         /RRwrEg5lJBzaDGnfnUu9Ml9Vijnv6yhRfJ4e6xJVq3XmXAY0+aXthei6/AlgZ3MH+4b
+         76wC2F0SaXPG1Jri7+OUENDRlYwg0JLEt3LRoFL3v6nyV0qpOQmronMPaagq/Om9pbWx
+         /zupa6p4Ge8vBriYBgNSC+C7lNWKCsLsPvpFKZQfwXk4/Y8g78Djia2YtHHIg9y5k/DX
+         3Z/G0H7T/MDbt9Wk9r3f4s2j4ROKTx9L+YYwT5bCN/2CDcaC5eW4jFVLDZ2W6YjQYnNv
+         3m/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707754762; x=1708359562;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=QXLjTuP8gjSgEaNbQyPphVppBWGE/fLPXeF8p66gJqk=;
-        b=M9J69sm6J99D7PUb3RfpaM+/7JSxd1V5QFx6pu46c52PUYJC7lgZWscaMmLreJwGGY
-         BFzmlDvdnmF6R0dn6bwVbPP2Mj2I0RnzFiR0GhLEMwwtEWSKum56pEidwT+C+7NoX8BE
-         oOUV3QJSrLuuq3X4vIV86sJGjCHSb9gjvxO4ETc9BlOvrnLmrs05qnTFBdp3QhazNr1b
-         uzfXEjRLrnMilxPYsoIpyqev4A8ATGXhvBYIaBvTYU0VrXYNyfLWdZ4pO+jDtzCLDZvn
-         a8g7E23BsPxe5v1RPFUASJ1EzyVrsDWRf5eX2NdYtdMhlRlAJwkCwc+xB7J5r2t8Icp9
-         kA+w==
-X-Gm-Message-State: AOJu0Yylg/jeHnNpsDBgVRql7jK9QBt8DtzXJeCOr3rReKIpprjgacss
-	Mu/JUfGK1aEL7gt6BKX/ESo/VSWYfmkdQBqq/siY6wiUIe84p6WC
-X-Google-Smtp-Source: AGHT+IFvLXmELFaFUm1L3lUcOpmPNHefauVsxH86uPZfps/2BN2OiiGw223kL2oaDG6taQhhYr80yQ==
-X-Received: by 2002:ac8:5a55:0:b0:42c:7586:71f8 with SMTP id o21-20020ac85a55000000b0042c758671f8mr4272139qta.31.1707754761792;
-        Mon, 12 Feb 2024 08:19:21 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUhj9NV/BW5Q38jIj6lx8hMgehGmLU9t6Iq5mRXhXl69mR1ELJmhB8P2WmN2rQYksLe48mw8Y0o2sAp8niE0CZyC+UmsGJKWkXOt40dfa+asgohuSei8ePqAsmqtfbr/lS72ieFfNviD1k4bmkkHYDF9pkwRJL3Rbp3UqrPzz7vqL+kiQAg0gUlP9nnpL9w5JZzRaF0Zi2K83OD57FbAgAd4RbVmBZs0HH9ZkTBIrlWM3KnMFc95gXv8TtChRVdZ/RNsyKF6mnoh9y3aE8JFxADiA==
-Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
-        by smtp.gmail.com with ESMTPSA id ke20-20020a05622a289400b0042c6ae89193sm270136qtb.93.2024.02.12.08.19.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Feb 2024 08:19:21 -0800 (PST)
-Date: Mon, 12 Feb 2024 11:19:21 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Vadim Fedorenko <vadfed@meta.com>, 
- Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Andy Lutomirski <luto@amacapital.net>
-Cc: Vadim Fedorenko <vadfed@meta.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- "David S . Miller" <davem@davemloft.net>, 
- Willem de Bruijn <willemb@google.com>, 
- netdev@vger.kernel.org
-Message-ID: <65ca450938c4a_1a1761294e3@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240212001340.1719944-1-vadfed@meta.com>
-References: <20240212001340.1719944-1-vadfed@meta.com>
-Subject: Re: [PATCH net v2] net-timestamp: make sk_tskey more predictable in
- error path
+        d=1e100.net; s=20230601; t=1707754789; x=1708359589;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AHOo/eJwLxH5gqaZ8Efiem03bhq9rE//mMgm98xwZ0M=;
+        b=wcewL/gE1Y/eQvHucND8/0hjH6DKF4fefEAWzReFum9LYQcLY9vJZR9UdgmnN2gOXZ
+         4ooGJKNcyUYgnMCegrQRq/dR8Bh38oV80lymI4UqFVJ44ryI+HNXJ/DYG+tuBmhYxQLp
+         AdTfcYsUgP+W2jB4vw3okCTV/3lczJ7FIBxfrbLDsdnOxEi074hnjHFmP8k7RBjn1Cs8
+         Phr98H12O2nqzwyX1BE3DbmHYKX987mRnpntS7xWSEUSTJP5NE6YuYCNeobZGtJUsmV+
+         5JgqXL+dTopxnQzliePT0uQAkb7CXY8FskUy8LwfE80glvvCdgwACbE3TDy+Cb5lqY/D
+         3FSQ==
+X-Gm-Message-State: AOJu0YyyOyy5dh26du2RTP05HVZvO2t6EG2+/edvwddUtF8iZmwGFJB3
+	HEFv03GBOxRYkF10KBekeoGZcIipclKRuuLXmWwNtcoaqiuVZ+gW4Fk4M8KFigsTxhjzx0rWyQ/
+	7tnl+FMxsT+HC0HvBL1FRdSxeE66Zyfz3lxDY
+X-Google-Smtp-Source: AGHT+IFCRIRy84fDApqf2UdgmngwajlGLdvGMKaatN1SzMnDKVtC1bFmAf9BjuMw6aVrq4xcPiL+uSeAAaMxs/hGdL0=
+X-Received: by 2002:a50:9fc7:0:b0:561:a93:49af with SMTP id
+ c65-20020a509fc7000000b005610a9349afmr257869edf.7.1707754789130; Mon, 12 Feb
+ 2024 08:19:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20240212092827.75378-1-kerneljasonxing@gmail.com>
+ <20240212092827.75378-4-kerneljasonxing@gmail.com> <CANn89iKmG=PbXpCfOotWJ3_890Zm-PKYKA5nB2dFhdvdd6YfEQ@mail.gmail.com>
+ <CAL+tcoDFGt47_V8R7FkDN8OD-mj8pY41XysoGY7dpddo08WHMw@mail.gmail.com>
+In-Reply-To: <CAL+tcoDFGt47_V8R7FkDN8OD-mj8pY41XysoGY7dpddo08WHMw@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 12 Feb 2024 17:19:37 +0100
+Message-ID: <CANn89iKEb_1kCPHjRDErmusqjGzK9w3h_tDYBxS+r-0nNHzhyg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 3/6] tcp: add dropreasons in tcp_rcv_state_process()
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	dsahern@kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Vadim Fedorenko wrote:
-> When SOF_TIMESTAMPING_OPT_ID is used to ambiguate timestamped datagrams,
-> the sk_tskey can become unpredictable in case of any error happened
-> during sendmsg(). Move increment later in the code and make decrement of
-> sk_tskey in error path. This solution is still racy in case of multiple
-> threads doing snedmsg() over the very same socket in parallel, but still
-> makes error path much more predictable.
-> 
-> Fixes: 09c2d251b707 ("net-timestamp: add key to disambiguate concurrent datagrams")
-> Reported-by: Andy Lutomirski <luto@amacapital.net>
-> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+On Mon, Feb 12, 2024 at 4:53=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
+>
+> Hello Eric,
+>
+> On Mon, Feb 12, 2024 at 11:33=E2=80=AFPM Eric Dumazet <edumazet@google.co=
+m> wrote:
+> >
+> > On Mon, Feb 12, 2024 at 10:29=E2=80=AFAM Jason Xing <kerneljasonxing@gm=
+ail.com> wrote:
+> > >
+> > > From: Jason Xing <kernelxing@tencent.com>
+> >
+> >
+> > >                         if (!acceptable)
+> > > -                               return 1;
+> > > +                               /* This reason isn't clear. We can re=
+fine it in the future */
+> > > +                               return SKB_DROP_REASON_TCP_CONNREQNOT=
+ACCEPTABLE;
+> >
+> > tcp_conn_request() might return 0 when a syncookie has been generated.
+> >
+> > Technically speaking, the incoming SYN was not dropped :)
+> >
+> > I think you need to have a patch to change tcp_conn_request() and its
+> > friends to return a 'refined' drop_reason
+> > to avoid future questions / patches.
+>
+> Thanks for your advice.
+>
+> Sure. That's on my to-do list since Kuniyuki pointed out[1] this
+> before. I will get it started as soon as the current two patchsets are
+> reviewed. For now, I think, what I wrote doesn't change the old
+> behaviour, right ?
+>
 
-What is the difference with v1?
+Lets not add a drop_reason that will soon be obsolete.
 
