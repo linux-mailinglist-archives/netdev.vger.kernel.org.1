@@ -1,97 +1,128 @@
-Return-Path: <netdev+bounces-70979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19C15851739
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 15:43:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5439585171F
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 15:36:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C5D81C213E8
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 14:43:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11BA5283766
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 14:36:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7A2739FF8;
-	Mon, 12 Feb 2024 14:42:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6CEB3B290;
+	Mon, 12 Feb 2024 14:36:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="RI2qJGKY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KZ5gJbiN"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward205c.mail.yandex.net (forward205c.mail.yandex.net [178.154.239.216])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 198E83C07B
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 14:42:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B8863B189;
+	Mon, 12 Feb 2024 14:36:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707748979; cv=none; b=XeQiL2uIf7xyLbRzH+iGbzFFTKpyv7JJyL/2cQsYuAg6lm9FpKwPUB2onOJGdH9BzcZ53VmhalGG0rHLYxe5BqRMoBCPc13nf1INmAnzoH848cYyO0KjaqJ3nmwDteXwLm6EoOzT0yY3SfBARPnKn46iGr0Hk7LixX91S66HsXc=
+	t=1707748608; cv=none; b=l/FVk7tddrudmqnTpLxM7wjl1fr85rfZA2tu4ttrlsTSDBI6CXMz4D8hBuD2mfJkuP8baY/RGM+K1PMGufnt9UzSeIAtxkOMnuKEmWtaoFcJRyS35aHdmzyzEPeJp8q8NpU23FftFtqVPnDazO5MxMhx03MNWoZzJwg1sGNbLSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707748979; c=relaxed/simple;
-	bh=+lZciFymIFJwD/jU7Qojsl0yl5ukkvb8Exw+rSCLWAM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XPzEteLXdCAB5I2Tz6bKXUxr+FWAZKgoe9KxzfNIRQouL/i/lUbAfGG16rr1n+y3QXEBWBqZqgV6vrLGaYjU0dcXD5a6+OM+oRBJ8rf5dADQylQdx5VDxRCAeaeL/MAApIv0EH2KH6W2CkNhBT/NsbEEvcfABIveCSvcDsu3B7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=RI2qJGKY; arc=none smtp.client-ip=178.154.239.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from forward103b.mail.yandex.net (forward103b.mail.yandex.net [IPv6:2a02:6b8:c02:900:1:45:d181:d103])
-	by forward205c.mail.yandex.net (Yandex) with ESMTPS id D37B763FD5
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 17:35:16 +0300 (MSK)
-Received: from mail-nwsmtp-smtp-production-main-36.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-36.sas.yp-c.yandex.net [IPv6:2a02:6b8:c08:edad:0:640:6050:0])
-	by forward103b.mail.yandex.net (Yandex) with ESMTPS id 6A525608F4;
-	Mon, 12 Feb 2024 17:35:08 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-36.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id 6Zn1e7RxTKo0-XevZilbG;
-	Mon, 12 Feb 2024 17:35:07 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1707748507; bh=KutVQaZZTcGNOKFqN5L9OMGEn+KX5O52pWznSbShxpA=;
-	h=Message-ID:Date:Cc:Subject:To:From;
-	b=RI2qJGKYeKBQtxrtGxO+TuFQVhrqD3MJCh69K2Pz30cZogM1gSs+4eDGtCGFE0wMW
-	 hs77pV5hEt0gvAxK0LBGOQ6o6i0NIPkOFZxQgeu2fuEIsfNbObSNv9MpjlzVDomNNk
-	 VRA+0jl5J+JmTRakd89Isa5sgLYCSeodJaNq45KY=
-Authentication-Results: mail-nwsmtp-smtp-production-main-36.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-From: Dmitry Antipov <dmantipov@yandex.ru>
-To: Ursula Braun <ubraun@linux.ibm.com>
-Cc: Karsten Graul <kgraul@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	netdev@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	Dmitry Antipov <dmantipov@yandex.ru>
-Subject: [PATCH] net: smc: fix spurious error message from __sock_release()
-Date: Mon, 12 Feb 2024 17:34:02 +0300
-Message-ID: <20240212143402.23181-1-dmantipov@yandex.ru>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1707748608; c=relaxed/simple;
+	bh=NgxONl1Mo80zC/wVZflOnNJ1Dx1W2G8WQMUGFtld7AY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pz8yI/uUBSp8cgj40CIJgTMpUD1oD5KdvHG0rANKjRaGkwnXo2CH1TmgfPzU3SR5TfWB/Qf7QYyQxk9YfEjweggC/tO9UzIgxcAVL8qQMjlK81E/NyhJMLJXHqPfO1TR2ylmd2S3H4Kc5dD+LDAxk69Y8qWTFjhHIuCGpTdoYxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KZ5gJbiN; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707748608; x=1739284608;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=NgxONl1Mo80zC/wVZflOnNJ1Dx1W2G8WQMUGFtld7AY=;
+  b=KZ5gJbiNIJw9MVZtjRiPdhkCUMZuPef31cWMTVwfE7qEKaJZ6giNBIxi
+   NyfEkyHuzp2wg9JEiF2lUWYvbsw6148Ttfj5JsXdSyaL5yXc+HhpVXk6y
+   iOcvOAsAD17IG+dINIxwxC1wWB3pqgO2InxS1NoHqrap66Wi8DnVAw4RG
+   KvlltSbK3GcnElf/pQ9FWYhO3560iHFru3DkZFxp/TuLq5GMDx477TMcW
+   IUIaxr2RED+ROfirWOrVHwHJrCqBkuJ6USQvH02BvTOtvbe6CQo0fm9Y7
+   YdxSrs5BmxnqwKO+hpJzDPGZN5CzVc7KIJGJXueHZscUAnPuUKb70fwCX
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="12815641"
+X-IronPort-AV: E=Sophos;i="6.06,264,1705392000"; 
+   d="scan'208";a="12815641"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 06:36:47 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="911498069"
+X-IronPort-AV: E=Sophos;i="6.06,264,1705392000"; 
+   d="scan'208";a="911498069"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by fmsmga002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 06:36:40 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.97)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1rZXQD-00000003vJa-11bE;
+	Mon, 12 Feb 2024 16:36:37 +0200
+Date: Mon, 12 Feb 2024 16:36:36 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew@lunn.ch>,
+	Mark Brown <broonie@kernel.org>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v3 RESEND 3/6] bitmap: Make bitmap_onto() available to
+ users
+Message-ID: <Zcos9F3ZCX5c936p@smile.fi.intel.com>
+References: <20240212075646.19114-1-herve.codina@bootlin.com>
+ <20240212075646.19114-4-herve.codina@bootlin.com>
+ <ZcoOpPb9HfXOYmAr@smile.fi.intel.com>
+ <20240212143753.620ddd6e@bootlin.com>
+ <ZcokwpMb6SFWhLBB@smile.fi.intel.com>
+ <20240212152022.75b10268@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240212152022.75b10268@bootlin.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-Commit 67f562e3e147 ("net/smc: transfer fasync_list in case of fallback")
-leaves the socket's fasync list pointer within a container socket as well.
-When the latter is destroyed, '__sock_release()' warns about its non-empty
-fasync list, which is a dangling pointer to previously freed fasync list
-of an underlying TCP socket. Fix this spurious warning by nullifying
-fasync list of a container socket.
+On Mon, Feb 12, 2024 at 03:20:22PM +0100, Herve Codina wrote:
+> On Mon, 12 Feb 2024 16:01:38 +0200
+> Andy Shevchenko <andriy.shevchenko@linux.intel.com> wrote:
 
-Fixes: 67f562e3e147 ("net/smc: transfer fasync_list in case of fallback")
-Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
----
- net/smc/af_smc.c | 1 +
- 1 file changed, 1 insertion(+)
+...
 
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index a2cb30af46cb..0f53a5c6fd9d 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -924,6 +924,7 @@ static int smc_switch_to_fallback(struct smc_sock *smc, int reason_code)
- 		smc->clcsock->file->private_data = smc->clcsock;
- 		smc->clcsock->wq.fasync_list =
- 			smc->sk.sk_socket->wq.fasync_list;
-+		smc->sk.sk_socket->wq.fasync_list = NULL;
- 
- 		/* There might be some wait entries remaining
- 		 * in smc sk->sk_wq and they should be woken up
+> Agree, the bitmap_onto() code is simpler to understand than its help.
+> 
+> I introduced bitmap_off() to be the "reverse" bitmap_onto() operations
+> and I preferred to avoid duplicating function that do the same things.
+> 
+> On my side, I initially didn't use the bitmap_*() functions and did the the
+> bits manipulation by hand.
+> During the review, it was suggested to use the bitmap_*() family and I followed
+> this suggestion.
+
+I also would go this way, the problems I see with the current implementation are:
+- being related to NUMA (and as Rasmus once pointed out better to be there);
+- unclear naming, esp. proposed bitmap_off();
+- the quite hard to understand help text
+- atomicity when it's not needed (AFAICT).
+
+> I did tests to be sure that bitmap_onto() and bitmap_off() did
+> exactly the same things as my previous code did.
+
+Yuri, what do you think about all this?
+
 -- 
-2.43.0
+With Best Regards,
+Andy Shevchenko
+
 
 
