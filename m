@@ -1,215 +1,222 @@
-Return-Path: <netdev+bounces-71039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA316851C82
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 19:10:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C01BE851C85
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 19:12:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE6B6B22553
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 18:10:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CE37281D85
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 18:12:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42E7F3FB0A;
-	Mon, 12 Feb 2024 18:10:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79CA53F9FD;
+	Mon, 12 Feb 2024 18:11:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b="Z7nVv785"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AsKyH9VW"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-of-o54.zoho.com (sender4-of-o54.zoho.com [136.143.188.54])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60B4F3F9FC
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 18:10:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 256413FE47
+	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 18:11:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.15
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707761435; cv=pass; b=iTl9UACrJIaTvHOFEAok4/n1GXI1sr0P7/N5JZdSoU6I1zYcRXf1eumbbMrV7/xzQUDAWy/o9CoxgCfD0cKbANz468lkzX8sqkFEdN3nhopFWFanoUnPqa+xdGJVCIj0OvGCR38WrwSzc9Sfkir+btItf83Vloljb31/EuduXbI=
+	t=1707761515; cv=fail; b=pT7i6bR1VRTn3I79yz03hZnRwPk0XtbZCAEVlCaHAlAZmrqTFM0cw/SSm+LEj/EFRhiyXjaYy+NE+fqZS02mEpe1XcUghi1+Ny/B4QzyU+1YR70q18D7/Gu/6D1XuoCGc9oOMFBAC9alD9QM3sXirqmEcaNtdwLDR5We59IzRuQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707761435; c=relaxed/simple;
-	bh=eoSyGqY4Pc06EVbqy7l2SwO2kFjHxJQWevn/2ELreuo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RKlfdKil1MaIefDTSED6xrXxo0aiswLTPKwmuZMSBQMcSA9vsPXOvRc3iqJb9b/TYvgWQlGYztH/thlDWYKbLs/3ejG2fV9HWFK5Xgdab6oKH/x2OX7hARGpcCT30XOSqzXt2nSnLmP4lPWflUBu7hVvYv+t7kQznvbm4Iehz4I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net; spf=pass smtp.mailfrom=machnikowski.net; dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b=Z7nVv785; arc=pass smtp.client-ip=136.143.188.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=machnikowski.net
-ARC-Seal: i=1; a=rsa-sha256; t=1707761423; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=EFol9vFBQpYnZUMKqNthurSdVJnh/90S7S/wc18YaK9t73X9mLLwWjTjXiYZoxztp9FoCIZHBzh5UsWI9U83Fd3nUGJaYNle2U4qyiseeaEHJz4JXG2wfyujd3R2rJ5NRZE5qPJz+Gs4z57qFt+ZzZgQHsXB6R15xxgafvRIle8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1707761423; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=m58EKD1Do3uog5Yl+J6atwpYT+yTzJWlppNw+dIzYlc=; 
-	b=SM2fEP5iviKhRqEHcfeamwNa+rFzuBLVJHK30xffROJWkS5YCpgV1rzBoDHP6Fi8B0TrGNfJMSakRUJCXHt03zQBp6dzkOsnV023CRJ/IxgGlCUnh8d/y/oQIHvPxN814MVEkoaWZDfnrtWpmb7IaJ05d3zObpbW6AHu3KCJH8I=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=machnikowski.net;
-	spf=pass  smtp.mailfrom=maciek@machnikowski.net;
-	dmarc=pass header.from=<maciek@machnikowski.net>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1707761423;
-	s=zoho; d=machnikowski.net; i=maciek@machnikowski.net;
-	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=m58EKD1Do3uog5Yl+J6atwpYT+yTzJWlppNw+dIzYlc=;
-	b=Z7nVv785Drns5bfUpHAEf6AouCzwPwMcJ8LZ092EVRHfPCA5OdmaeugD61a0MDir
-	smzMHWrHe2+Q6CILz1/l8CDMDLxx0nUguR9emZkqgWRh2qvpyd8TYVvA7Z12ny8hxHH
-	8qJZlRCX68b5vGRS5YxfbV1q2658QCpRws5nQlmTr+p4zNsW8fY5FmJOO5Zhjcnhsh5
-	u8UEiFJOzmVunWKI/ytLkk+ByVLvYC35OKGctrE0N41AYRocOHC9mRT2Bqu5he3R/PD
-	dI66Pr9KtkqUSCEjLZMIJZ9plTWAn5OQ3jzN5KZSJTCg9Vuo7aJhNyZSGrL42OtyIIe
-	tpKrAvi5Xw==
-Received: from [192.168.1.225] (83.8.1.13.ipv4.supernova.orange.pl [83.8.1.13]) by mx.zohomail.com
-	with SMTPS id 1707761420026395.2743753411678; Mon, 12 Feb 2024 10:10:20 -0800 (PST)
-Message-ID: <49aece93-d9a8-4cd8-be79-2160f375e5af@machnikowski.net>
-Date: Mon, 12 Feb 2024 19:10:16 +0100
+	s=arc-20240116; t=1707761515; c=relaxed/simple;
+	bh=X9Cwu1c/kvprNj0MOJ86baXNEV7IneFwUujimHudPQ8=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=qNPScqso/vDeEM7VLHnFGzchiSlLyxKzP0tV0Y5kyCcEn7ZZpJbhSoWcyxzsiL/He3hhihTl4AuNaPhfoTBAOTdunvwebjGa4Fnmfnr6KVAMKvyhdwOi5YluZ/E6rkfrrP5fUf9iiQt33Kfj6ALb++Qb4RKZkLXXHQrp37EFDsY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AsKyH9VW; arc=fail smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707761513; x=1739297513;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=X9Cwu1c/kvprNj0MOJ86baXNEV7IneFwUujimHudPQ8=;
+  b=AsKyH9VW2ggEag7Cyl4Huo6AOsph+2oh7SqUVrswy8eUPrQNbb6mwKu7
+   616iX734/K1MCAUq84MttvqVLlP8L8LjVJEwCkPJiF6Gyjt8p++IgNmKH
+   FGYE1ooREtkewnizI4yHIrvAJ/9oLlGMNOpuQsbDtixoxY3LkWf/rvwCB
+   FPR22dHiG3QX+ZUC2A2zvXZCUPHwdWQU4PNP36dP2rMElK9iRUs/4jQ/M
+   epnXSYX8kwzxWhE25wZdc8Bb+pzKKMyqFGRK9g8gXyiaQ0yP9Q1n3NoNe
+   j8myejBBcz67FnwdI2tf8IByasweso+6Muwv1fNLNzE3QaWOJ9AkNBFlV
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="5585513"
+X-IronPort-AV: E=Sophos;i="6.06,155,1705392000"; 
+   d="scan'208";a="5585513"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 10:11:53 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,155,1705392000"; 
+   d="scan'208";a="33452866"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Feb 2024 10:11:52 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 12 Feb 2024 10:11:51 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 12 Feb 2024 10:11:51 -0800
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.169)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 12 Feb 2024 10:11:51 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=I1t3L+DCuLry9DcSWEHHGgMc53HAFHhAkg5bgCRIJAqodz2u+TIXJlGVvpnqZewZB3bQqq69F1rms6q02eSZWGzbwKAAUchKwZKvw2zgQ3pMFHYDPQpSFOV7UYpjfsb1TykdweaHS7ou9mzOP4Ai5LZDY6e1G9FvfCsAXx81PpGCsjdOk39MMc+ze6FJsmvGG7DNrd/AzIt7ZV2j5jm1cotRl1yq7HgVTEowSJpWYQi+uI5qd3ujuFCgXF/WG9Pr+TgUicIfrejBOsmwLsRBp8568zLd7c2rTzuBK6ecylPQnxA2OM3VUkwI84kGXAFjSgxGaWpxC+otO/LzxSYJEA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dqf0EAy2iIJK8OLlrnY3zQsE2YgdgxTrm28f78IQS+s=;
+ b=D9cIqDYx3Q7DIbwILJBjElDBOCR6pC6LEk2tQpaEGrTRIr2McgpGMgFSHEv2lYnWTMqOJC/Ha4kUZqdAYbcawd73Xz5yEIOT06gn5vu7YF6ehL58DWvBL+xF69fOkrch9NnWTH+MYfPheWHG9JMjR9NGXMXYQQUe3xf9VwYprM6/22/lBkNZFdgxHQIlWETmOb1tvH1iZonxbiHONOwvDJAe46MEDwecaFUK9mbrn6+B5e0cmQcdt6V0YpxPddG4XPrFHdOE9RtxSXxbzX1Rk9RTTRyVMqRYDphFiZNAYD9wGYCBFGixs7b5PYWm73YyM/QiUOL7cELcNVGSmKvcfw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
+ by SJ0PR11MB5053.namprd11.prod.outlook.com (2603:10b6:a03:2af::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.35; Mon, 12 Feb
+ 2024 18:11:47 +0000
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::c164:13f3:4e42:5c83]) by BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::c164:13f3:4e42:5c83%7]) with mapi id 15.20.7270.033; Mon, 12 Feb 2024
+ 18:11:47 +0000
+Message-ID: <18049617-7098-fee3-5457-7af2e267b0d0@intel.com>
+Date: Mon, 12 Feb 2024 10:11:44 -0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH net] i40e: Do not allow untrusted VF to remove
+ administratively set MAC
+To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <netdev@vger.kernel.org>
+CC: Ivan Vecera <ivecera@redhat.com>, Simon Horman <horms@kernel.org>, "Rafal
+ Romanowski" <rafal.romanowski@intel.com>
+References: <20240208180335.1844996-1-anthony.l.nguyen@intel.com>
+Content-Language: en-US
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+In-Reply-To: <20240208180335.1844996-1-anthony.l.nguyen@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4P222CA0023.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:303:114::28) To BL3PR11MB6435.namprd11.prod.outlook.com
+ (2603:10b6:208:3bb::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 2/3] netdevsim: forward skbs from one
- connected port to another
-To: David Wei <dw@davidwei.uk>, Jakub Kicinski <kuba@kernel.org>,
- Jiri Pirko <jiri@resnulli.us>, Sabrina Dubroca <sd@queasysnail.net>,
- netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-References: <20240210003240.847392-1-dw@davidwei.uk>
- <20240210003240.847392-3-dw@davidwei.uk>
- <420b3c0a-6321-494b-9181-ff7dd4e1849c@machnikowski.net>
- <5d23bdfe-df0f-4048-b2d1-c0e025fd3efd@davidwei.uk>
-Content-Language: en-US
-From: Maciek Machnikowski <maciek@machnikowski.net>
-In-Reply-To: <5d23bdfe-df0f-4048-b2d1-c0e025fd3efd@davidwei.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ZohoMailClient: External
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL3PR11MB6435:EE_|SJ0PR11MB5053:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6c8bc5a9-8cd0-4242-e821-08dc2bf613c7
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: lId5k1oPRnjRn62Vctu+O5LUTdi1O1UsiYqsMy3V01uv485E8pTN8aa7F230acCsFqsfQLfFFK3hrYhfjlHw72CkXnnnHhFLqZUeJt4msknntoTouROKvc1sOSocJmk/6tkiXHuRAy1Hyj+vXE2Lwr+f8sS6saSAM3Vz/6A3pQwxOB5R6lQ1oycRvGSBY/aLCIw4mcFoxQ83uKBFH5lG1ORHJUiGTOxDpKW6bSeKZPe4xLBomW/45wcIdgsh6udNENF2Q0tA4tgAae7qU9/jLu3WxcFeyDMVSwk1Aqdxdq+PufBm8G286ShvrgCC4wMToixS/amz/nUKXnSt4EhJWU0q91bRPIMJ+gk8zl6heeQiTFHma6MEQpEa6AiFFRMFy6WMCeAwghdZiWrCHXkwOgfmVRMuzkV7aNsot9JICuRaxJ43wUFG2ZdQvlLTHFqfCTUpTTc0tYrUPPumFezoscxA9PYbEr82Q/yzfMasOBzpXAjWLtLcKYGqDwktkDc+/VgLZCZa36YeYUiuAmLPV5Yad8hCiwgjQF5qkwBopPE=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(39860400002)(376002)(366004)(396003)(346002)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(31686004)(478600001)(6512007)(6486002)(966005)(41300700001)(8676002)(8936002)(4326008)(5660300002)(2906002)(6506007)(54906003)(53546011)(6666004)(66946007)(316002)(66556008)(66476007)(2616005)(83380400001)(31696002)(82960400001)(86362001)(107886003)(26005)(36756003)(38100700002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?enB5WGFJNTlCNDUzNThmZS9VNWlsdXdKeE8wTmpTNlIzeitERjRFUFk2SSto?=
+ =?utf-8?B?eUN0aWQxK1FTNDk0KzE2VERZTVhjRkVhUExOaW11dnJEZWIxZjBXMkRxRHFn?=
+ =?utf-8?B?YTJvMUZVUGFMeXMzcjNlM2xYN3AyZDZLdHFEaUQ3SllPTUZ5WXVPS2tkZXl4?=
+ =?utf-8?B?RjdQOFJiOTIvdW80R0Z1dHFwUmttRFA4cmMvaldza0hDQVNXdTQranZ4Q2Zj?=
+ =?utf-8?B?Z0VoYXJOSjdtRjhaOHAyWG5BYVdteUtlbEtlY3ZybHI3aGV3Z2NWSWVJMXFh?=
+ =?utf-8?B?TzI2M09ibkwvL3ptNXBiMGNaMVA1OHBpZkV0QlpCbXdrZ1FoRUNzSW5CMkpV?=
+ =?utf-8?B?ekFUcDN0dVUvcXUvZThxOGRXdHhQUXgwUUVVZ0dERzdxR1lpK1VrSjFtbTdT?=
+ =?utf-8?B?ZFlycHp6cnFmODY3NjZIc3R0Um5YTjRsL3p4Y0U0dEhYNHc1U1VuSU0wQ2Q4?=
+ =?utf-8?B?VFhOQ1FzZzFGalRQaSt1WkQ0WENxYjFxTy9RN0orRWgrTXQwMldnN1JWSXpl?=
+ =?utf-8?B?cm1MVVlDZUJ1QWFIemRRTFo2Q0VncGs3UGNHRGZkQjk2OTJQQW9DdnJhQVZw?=
+ =?utf-8?B?dlVmQWlEeldZK25pb0o2MDJTWkU1V2l1VnRqNFRrSUVBRk14VnhvQ0l4cWxw?=
+ =?utf-8?B?ak9HbTVMT0o1bVZUTWhUT1V0RWdFRFlUTVBkdHArMU9JaG15K2NMalR2cnB0?=
+ =?utf-8?B?VnhGS1NVa0ZaUi9wS29rbXVmQmMydWxzUnVVSHBhUWt2cXZSM3BBc3ZBR1dP?=
+ =?utf-8?B?aUpUbG8vSCtET1VxRytBUzdOWnE4SVk4Y04rSjFQdldEZDhhM1ZmZVMyTUpq?=
+ =?utf-8?B?STQvcEtMa3NiRjV2ZWlTcWxrSzY1RlhHbU5mTEQ5SDBhRGRZMlR2K1ByMUtK?=
+ =?utf-8?B?S3BLYW9YZlQ4REpkWDJuRTNMYURSK25hc2ZsZVh6MXhZVWFlYkx6ZFQ2SGhP?=
+ =?utf-8?B?blRlTVFneTErWElFRkp2S3RTTTA5UGhHeUlaRTEvU1BUckIxV25palhRb2tt?=
+ =?utf-8?B?V0lOV3JFN1pEZGM3S0YvSHVNOUZIbzZIbjJzZjAxT2Q0cEpWRmZ5YU9yZ05Y?=
+ =?utf-8?B?ZUdWeUJRV0ErOTZtampHL0xiL2ZyWkxXc1FQQ1hoUXhOTnhiK1Ivd3plUFlT?=
+ =?utf-8?B?dERudFY4d2QxN3Buakk0SkVUSU1xT2szc2JLSHJmN2ljT04zSnlrVVExSDls?=
+ =?utf-8?B?cktsRnhJRnBBQVhvN0dWYjgwcE94eTJ1bCtZZ3VoK2dqcjdWdzdybFZLNkhs?=
+ =?utf-8?B?UDlIalRmZ3E0ZW5zYXF6VmRhb0FNUmZWQVZZMWJXSVJlYnRZd3c2azlGQVFn?=
+ =?utf-8?B?RFE3aE5SSzVDMnNxY1hYaGdmYW9pQmhhbmlIdStCYzhlVTAyV0ZrTFRYMDNT?=
+ =?utf-8?B?eFZBUHFpLzJVb1h1MFk5eGY5ay9NWTg3dk1SQjRxcmRoN05YTHRjYU4zNEVq?=
+ =?utf-8?B?eDYwNGxacng5azFlam0vL3BYbmgyVXM1Mzd0bnZEZkdMUC9GM3lRcVNJTXhB?=
+ =?utf-8?B?V3lpRXp3Z29TTGRVTXFZY3NRQlFBL2djLzZpcWc5OW0vRDcwVVB1TVZYNklC?=
+ =?utf-8?B?ZUZuSElQVkZXdlNLM2tidE5NL1Rmd1F4ZjYvL3NOZlB2Q29Ia0srMnFNbFlQ?=
+ =?utf-8?B?VFFhOWh2TzNibnkwRXNqT1VwckpjNzV2R01HY0dvcVJBaUJBMnIxM1lHdDNC?=
+ =?utf-8?B?eXF5djJHeGIwMmlMdm5RK0loMmN1Y2xKeW1VOUNiMG5Yc1NSRUhnZTB0cW1w?=
+ =?utf-8?B?MHd4U2NHb09sZzNoVmlVZ2JuQk5zSXhvYlp5cEl5N3pSWE94TWpJOUtpOE84?=
+ =?utf-8?B?amlhNTJUdW5iNjFIOHo2a1pPbUc1cXpUWG4zUEFDVE0wQU0zSVZLOWw4TWF4?=
+ =?utf-8?B?T1BTL1BwQVNzdDIyZDg5WGorUVh6bEgxM05vQlNiekFiTjR3RXV5WXBVbjN3?=
+ =?utf-8?B?WlorenArelFpRXp3S044dnEvaWlFL09nbnltQW5WYmxkL3gzOGo4M2oxN2VN?=
+ =?utf-8?B?T01yUnZ6dkhtTTh5ZSsvclY1N3lQZGQ0RnlQeTBnWnMwYzBjcytrQWtzVXp2?=
+ =?utf-8?B?d3pFMWlhVURMbjVzallORm1LbEhsWUZReHE0UFRta3JQK1ZUSWZqaTAyakJ2?=
+ =?utf-8?B?ckFtT2tVWjdXdFl0amtvNHM0bkFuZzNzbEVxVEp6VHFyOElIVVFTOC9ZcjVv?=
+ =?utf-8?B?eFE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6c8bc5a9-8cd0-4242-e821-08dc2bf613c7
+X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Feb 2024 18:11:47.5069
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MnKTBUPtflvecx9l9So+ULEW1iPscO7vXgISuA3jCPfzDSgtYoBQP2ZfiAxAl1BLDHuYHbWQaTzjaSX+xnADzYRIJmPMoOOQti6pBHQfux0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5053
+X-OriginatorOrg: intel.com
 
 
 
-On 12/02/2024 18:32, David Wei wrote:
-> On 2024-02-10 13:43, Maciek Machnikowski wrote:
->>
->>
->> On 10/02/2024 01:32, David Wei wrote:
->>> Forward skbs sent from one netdevsim port to its connected netdevsim
->>> port using dev_forward_skb, in a spirit similar to veth.
->>>
->>> Add a tx_dropped variable to struct netdevsim, tracking the number of
->>> skbs that could not be forwarded using dev_forward_skb().
->>>
->>> The xmit() function accessing the peer ptr is protected by an RCU read
->>> critical section. The rcu_read_lock() is functionally redundant as since
->>> v5.0 all softirqs are implicitly RCU read critical sections; but it is
->>> useful for human readers.
->>>
->>> If another CPU is concurrently in nsim_destroy(), then it will first set
->>> the peer ptr to NULL. This does not affect any existing readers that
->>> dereferenced a non-NULL peer. Then, in unregister_netdevice(), there is
->>> a synchronize_rcu() before the netdev is actually unregistered and
->>> freed. This ensures that any readers i.e. xmit() that got a non-NULL
->>> peer will complete before the netdev is freed.
->>>
->>> Any readers after the RCU_INIT_POINTER() but before synchronize_rcu()
->>> will dereference NULL, making it safe.
->>>
->>> The codepath to nsim_destroy() and nsim_create() takes both the newly
->>> added nsim_dev_list_lock and rtnl_lock. This makes it safe with
->>> concurrent calls to linking two netdevsims together.
->>>
->>> Signed-off-by: David Wei <dw@davidwei.uk>
->>> ---
->>>  drivers/net/netdevsim/netdev.c    | 28 +++++++++++++++++++++++-----
->>>  drivers/net/netdevsim/netdevsim.h |  1 +
->>>  2 files changed, 24 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
->>> index 9063f4f2971b..13d3e1536451 100644
->>> --- a/drivers/net/netdevsim/netdev.c
->>> +++ b/drivers/net/netdevsim/netdev.c
->>> @@ -29,19 +29,37 @@
->>>  static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
->>>  {
->>>  	struct netdevsim *ns = netdev_priv(dev);
->>> +	unsigned int len = skb->len;
->>> +	struct netdevsim *peer_ns;
->>> +	int ret = NETDEV_TX_OK;
->>>  
->>>  	if (!nsim_ipsec_tx(ns, skb))
->>>  		goto out;
->>>  
->>> +	rcu_read_lock();
->>> +	peer_ns = rcu_dereference(ns->peer);
->>> +	if (!peer_ns)
->>> +		goto out_stats;
->> Change ret to NET_XMIT_DROP to correctly count packets as dropped
+On 2/8/2024 10:03 AM, Tony Nguyen wrote:
+> From: Ivan Vecera <ivecera@redhat.com>
 > 
-> Linking and forwarding between two netdevsims is optional, so I don't
-> want to always return NET_XMIT_DROP.
-> OK - now I see that previously we calculated all packets as TX_OK and
-transmitted, so this is OK.
-
->>
->>> +
->>> +	skb_tx_timestamp(skb);
->>> +	if (unlikely(dev_forward_skb(peer_ns->netdev, skb) == NET_RX_DROP))
->>> +		ret = NET_XMIT_DROP;
->>> +
->>> +out_stats:
->>> +	rcu_read_unlock();
->>>  	u64_stats_update_begin(&ns->syncp);
->>> -	ns->tx_packets++;
->>> -	ns->tx_bytes += skb->len;
->>> +	if (ret == NET_XMIT_DROP) {
->>> +		ns->tx_dropped++;
->> add dev_kfree_skb(skb);
+> Currently when PF administratively sets VF's MAC address and the VF
+> is put down (VF tries to delete all MACs) then the MAC is removed
+> from MAC filters and primary VF MAC is zeroed.
 > 
-> dev_forward_skb() frees the skb if dropped already.
-But the dev_forward_skb() won't be called if there is no peer_ns. In
-this case we still need to call dev_kfree_skb().
+> Do not allow untrusted VF to remove primary MAC when it was set
+> administratively by PF.
 
+This is currently marked as "Not Applicable" [1]. Are there changes to 
+be done or, perhaps, it got mismarked? If the latter, I do have an i40e 
+pull request to send so I could also bundle this with that if it's more 
+convenient.
+
+Thanks,
+Tony
+
+> Reproducer:
+> 1) Create VF
+> 2) Set VF interface up
+> 3) Administratively set the VF's MAC
+> 4) Put VF interface down
 > 
->>
->> Thanks,
->> Maciek
->>
->>> +	} else {
->>> +		ns->tx_packets++;
->>> +		ns->tx_bytes += len;
->>> +	}
->>>  	u64_stats_update_end(&ns->syncp);
->>> +	return ret;
->>>  
->>>  out:
->>>  	dev_kfree_skb(skb);
->>> -
->>> -	return NETDEV_TX_OK;
->>> +	return ret;
->>>  }
->>>  
->>>  static void nsim_set_rx_mode(struct net_device *dev)
->>> @@ -70,6 +88,7 @@ nsim_get_stats64(struct net_device *dev, struct rtnl_link_stats64 *stats)
->>>  		start = u64_stats_fetch_begin(&ns->syncp);
->>>  		stats->tx_bytes = ns->tx_bytes;
->>>  		stats->tx_packets = ns->tx_packets;
->>> +		stats->tx_dropped = ns->tx_dropped;
->>>  	} while (u64_stats_fetch_retry(&ns->syncp, start));
->>>  }
->>>  
->>> @@ -302,7 +321,6 @@ static void nsim_setup(struct net_device *dev)
->>>  	eth_hw_addr_random(dev);
->>>  
->>>  	dev->tx_queue_len = 0;
->>> -	dev->flags |= IFF_NOARP;
->>>  	dev->flags &= ~IFF_MULTICAST;
->>>  	dev->priv_flags |= IFF_LIVE_ADDR_CHANGE |
->>>  			   IFF_NO_QUEUE;
->>> diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
->>> index c8b45b0d955e..553c4b9b4f63 100644
->>> --- a/drivers/net/netdevsim/netdevsim.h
->>> +++ b/drivers/net/netdevsim/netdevsim.h
->>> @@ -98,6 +98,7 @@ struct netdevsim {
->>>  
->>>  	u64 tx_packets;
->>>  	u64 tx_bytes;
->>> +	u64 tx_dropped;
->>>  	struct u64_stats_sync syncp;
->>>  
->>>  	struct nsim_bus_dev *nsim_bus_dev;
+> [root@host ~]# echo 1 > /sys/class/net/enp2s0f0/device/sriov_numvfs
+> [root@host ~]# ip link set enp2s0f0v0 up
+> [root@host ~]# ip link set enp2s0f0 vf 0 mac fe:6c:b5:da:c7:7d
+> [root@host ~]# ip link show enp2s0f0
+> 23: enp2s0f0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DEFAULT group default qlen 1000
+>      link/ether 3c:ec:ef:b7:dd:04 brd ff:ff:ff:ff:ff:ff
+>      vf 0     link/ether fe:6c:b5:da:c7:7d brd ff:ff:ff:ff:ff:ff, spoof checking on, link-state auto, trust off
+> [root@host ~]# ip link set enp2s0f0v0 down
+> [root@host ~]# ip link show enp2s0f0
+> 23: enp2s0f0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DEFAULT group default qlen 1000
+>      link/ether 3c:ec:ef:b7:dd:04 brd ff:ff:ff:ff:ff:ff
+>      vf 0     link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff, spoof checking on, link-state auto, trust off
+> 
+> Fixes: 700bbf6c1f9e ("i40e: allow VF to remove any MAC filter")
+> Fixes: ceb29474bbbc ("i40e: Add support for VF to specify its primary MAC address")
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
+> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+
+[1] 
+https://patchwork.kernel.org/project/netdevbpf/patch/20240208180335.1844996-1-anthony.l.nguyen@intel.com/
 
