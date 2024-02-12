@@ -1,110 +1,141 @@
-Return-Path: <netdev+bounces-71068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72213851E1F
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 20:48:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0491F851E3B
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 20:59:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DE0628516C
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 19:48:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 344871C21BF2
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 19:59:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B00A447A5C;
-	Mon, 12 Feb 2024 19:48:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3B1A47F57;
+	Mon, 12 Feb 2024 19:59:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UsWPT/Zm"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="nbYS1mTJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9586247773;
-	Mon, 12 Feb 2024 19:48:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A7647A6F;
+	Mon, 12 Feb 2024 19:59:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707767304; cv=none; b=lP6llfSYBOYnQotVZOifgChRZOrUwQZojoC1Gg2T0Gb02j/D+8XjOpBtlve90Tkzik2eGoigZBOQAyn2vm6c+5Z3zeQnFw2zAkEEiNAjcDja91cVwBFBYF43nAG7IVyF+fu0pSp64aKUusl/ZnUhzBkNS5/S8NfX6gccU1Nldok=
+	t=1707767944; cv=none; b=N7IDWVK/GZ8eSqcMI429H+Av+MtopuCiCE9Vs9430RMoFXz7Zk4wzPjRtBnaQQq/oefjjk5dAcbBNZmUHz7pkkQAHTznIii/m4Mxz4mvpdxGGgjm0h4Uowh23FShhxUYW7pnN56T6Ziz1+fLuxQRYJCmecDFV9+tL8Ybq+i0xK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707767304; c=relaxed/simple;
-	bh=0ft2MpYjrV64jvQOY3huDzIg33+d3RYVhImM7BX3V5s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nyV3tsD4SCI3byCNqQEBb/yhX/vfL2awTxxJT/ZfM61V6iRoezzoWH+2lTUdLP0FAMTxxDXV6DvIn2ExRftT4l0w4zyARfOox1ZY5V62+dHbrM8+vaTeoKlXk4zosrdB7q9rC770g73yBYv/4Aot0+ljJhJLC0eWOFovVVAYEAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UsWPT/Zm; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=fVTHkRWd/tAUl4w7Ho74/SJnoO1GvKi18/DDs+kPOJQ=; b=UsWPT/Zmyw6Uk9UYdkA4FQJsi0
-	CP4i0Pi2t44a3Xy+SjFAbhLzA7w68xNircdiTCODBXYvNC7obCnDevGXTSCztIeVLgpK2Y1+mhw2H
-	mcSIPYPZhKPhExmAHpNH3Ic7AY+lADuGyzO/VcosFlx2CsZWb/g7SwG19liGTW2tgl9I=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rZcHo-007bYQ-Ma; Mon, 12 Feb 2024 20:48:16 +0100
-Date: Mon, 12 Feb 2024 20:48:16 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Robert Marko <robimarko@gmail.com>
-Cc: andersson@kernel.org, konrad.dybcio@linaro.org, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, ansuelsmth@gmail.com,
-	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phy: qca807x: move interface mode check to
- .config_init_once
-Message-ID: <7c5dd47c-26b9-4a12-af93-6139ae85e864@lunn.ch>
-References: <20240212115043.1725918-1-robimarko@gmail.com>
- <c97d10fa-39c5-4e5e-93ce-1610635cb4d4@lunn.ch>
- <CAOX2RU6OwiymM_O_62VETgkBNUQP1TuOKJmm0D1ZUXBA7ZPJNA@mail.gmail.com>
+	s=arc-20240116; t=1707767944; c=relaxed/simple;
+	bh=LAd7kAB0YVu3prmd6cMGizOB97wDW8LoD6QWTyinZjM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=gOh2v1H1Wbhx4DsGSLyXfpBeQCslDg0taWRJEPakXQSaJCAmopGNz9MleLGo+lYScAuljiy9P8q1SeHKjYmvycdSXS5MofNjvhKY2tSJgpUjy6mMAEwX0w/YqGRaTTKzoUHRpvg5Wu8rOQ0xCOeCi2II6DpQjp0p7NjcUvrliHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=nbYS1mTJ; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=Lt5QOdxwmKP5wi+YgAc+nSKUxYGem+ulR+qGLgEENJ4=;
+	t=1707767941; x=1708977541; b=nbYS1mTJpuUZVVaAPrJ6hEoYhHw3wN+m5nsGwHEReM7zRvf
+	I2kTARgwoStJkCr0zHZLotlBFFQ19ziV8zrJqVedsd47KBJh96Ieynd9BP0rqDxxtv2Z5OGNTa7id
+	+8r+F7NgYdm8kO+QFASQXXmBs0glyZfcAEns13i4A3VQOl65YEHApnl2A5r0k8DMBN4TG2cfV1oJU
+	g6twKQvNYoUooqbO0ShIHFlWZV5NNHpJzBNt6w0sEv8Q6/wirt1e1FR2hWM1VXl5FGwmax4CrQzwD
+	pMx99UpuGJ1ksya4PmnbS64G4JM531Vz8wXBaMjnGXZxloe7En/LhAlOnshza1Eg==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1rZcS5-00000006Taf-0gjr;
+	Mon, 12 Feb 2024 20:58:53 +0100
+Message-ID: <2c38eaed47808a076b6986412f92bb955b0599c3.camel@sipsolutions.net>
+Subject: Re: [PATCH 1/1] wifi: nl80211: Add support for plumbing SAE groups
+ to driver
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Kalle Valo <kvalo@kernel.org>, Vinayak Yadawad
+	 <vinayak.yadawad@broadcom.com>
+Cc: linux-wireless@vger.kernel.org, jithu.jance@broadcom.com, Arend van
+ Spriel <arend.vanspriel@broadcom.com>, netdev@vger.kernel.org, Jakub
+ Kicinski <kuba@kernel.org>
+Date: Mon, 12 Feb 2024 20:58:51 +0100
+In-Reply-To: <87mss6f8jh.fsf@kernel.org>
+References: 
+	<309965e8ef4d220053ca7e6bd34393f892ea1bb8.1707486287.git.vinayak.yadawad@broadcom.com>
+	 <87mss6f8jh.fsf@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOX2RU6OwiymM_O_62VETgkBNUQP1TuOKJmm0D1ZUXBA7ZPJNA@mail.gmail.com>
+X-malware-bazaar: not-scanned
 
-On Mon, Feb 12, 2024 at 07:09:04PM +0100, Robert Marko wrote:
-> On Mon, 12 Feb 2024 at 15:51, Andrew Lunn <andrew@lunn.ch> wrote:
-> >
-> > On Mon, Feb 12, 2024 at 12:49:34PM +0100, Robert Marko wrote:
-> > > Currently, we are checking whether the PHY package mode matches the
-> > > individual PHY interface modes at PHY package probe time, but at that time
-> > > we only know the PHY package mode and not the individual PHY interface
-> > > modes as of_get_phy_mode() that populates it will only get called once the
-> > > netdev to which PHY-s are attached to is being probed and thus this check
-> > > will always fail and return -EINVAL.
-> > >
-> > > So, lets move this check to .config_init_once as at that point individual
-> > > PHY interface modes should be populated.
-> >
-> > Just for my own understanding, not directly about this patch...
-> >
-> > priv->package_mode is about PSGMII vs QSGMII for one of the SERDES
-> > interfaces? We expect the individual PHYs sharing that interface to
-> > also indicate PSGMII or QSGMII?
-> 
-> Yes, that is the idea, all of the individual PHY-s in the package
-> should be indicating
-> the same PHY interface mode.
-> 
-> >
-> > But what about the other SERDES, which can be connected to an SFP
-> > cage. You would normally set that to SGMII, or 1000BaseX. When an SFP
-> > module is inserted, the correct interface mode is then determined from
-> > the contests of the EEPROM and the PCS needs to be reconfigured. So
-> > i'm just wondering how this check works in this situation?
-> 
-> I just went to retest SFP support and it works as intended, as soon as the SFP
-> is inserted, PHY will get reconfigured to "combo" mode so that fifth PHY can
-> support both fiber (100Base-FX or 1000Base-X) or regular copper connections.
-> 
-> So, the check will not interfere with SFP support.
+On Mon, 2024-02-12 at 09:25 +0200, Kalle Valo wrote:
 
-So for the port with the SFP you also have phy-mode of PSGMII or
-QSGMII? That then gets changed when the SFP is hot plugged?
+> What driver is going to use these new crypto settings? Or is this for an
+> out-of-tree driver?
+>=20
 
-	Andrew
+I'm sure it's for an out-of-tree driver.
+
+This is the _entirety_ of "@broadcom"'s wireless contributions with
+"--since=3D2020" (somewhat arbitrarily chosen, though going a bit further
+back has some "real" work in brcmfmac), as far as I can tell:
+
+Arend Van Spriel (1):
+      cfg80211: adapt to new channelization of the 6GHz band
+
+Arend van Spriel (23):
+      cfg80211: add VHT rate entries for MCS-10 and MCS-11
+      brcmfmac: use different error value for invalid ram base address
+      brcmfmac: increase core revision column aligning core list
+      brcmfmac: add xtlv support to firmware interface layer
+      brcmfmac: support chipsets with different core enumeration space
+      wifi: cfg80211: fix memory leak in query_regdb_file()
+      wifi: brcmfmac: add function to unbind device to bus layer api
+      wifi: brcmfmac: add firmware vendor info in driver info
+      wifi: brcmfmac: add support for vendor-specific firmware api
+      wifi: brcmfmac: add support for Cypress firmware api
+      wifi: brcmfmac: add support Broadcom BCA firmware api
+      wifi: brcmfmac: add vendor name in revinfo debugfs file
+      wifi: brcmfmac: introduce BRCMFMAC exported symbols namespace
+      wifi: brcmfmac: avoid handling disabled channels for survey dump
+      wifi: brcmfmac: avoid NULL-deref in survey dump for 2G only device
+      wifi: brcmfmac: fix regression for Broadcom PCIe wifi devices
+      wifi: brcmfmac: change cfg80211_set_channel() name and signature
+      wifi: brcmfmac: export firmware interface functions
+      wifi: brcmfmac: add per-vendor feature detection callback
+      wifi: brcmfmac: move feature overrides before feature_disable
+      wifi: brcmfmac: avoid invalid list operation when vendor attach fails
+      wifi: brcmfmac: allow per-vendor event handling
+      wifi: brcmfmac: add linefeed at end of file
+
+Vinayak Yadawad (4):
+      wifi: cfg80211: Allow P2P client interface to indicate port authoriza=
+tion
+      cfg80211: Update Transition Disable policy during port authorization
+      wifi: cfg80211: Allow AP/P2PGO to indicate port authorization to peer=
+ STA/P2PClient
+      wifi: nl80211: Extend del pmksa support for SAE and OWE security
+
+
+So looks to me like Broadcom doesn't want its (real) drivers to work in
+upstream, so I guess we really ought to just stop accommodating for them
+in the wireless stack... This only works if we collaborate, and I've
+said this before: I can't maintain something well that I cannot see (and
+possibly change) the user(s) of.
+
+I guess if Broadcom's plans change they can start by submitting drivers
+that actually use the relevant infrastructure.
+
+And note that I've said this to Qualcomm before: I don't really want to
+and can't (well) maintain a lot of stuff in the tree that exists there
+solely to make out-of-tree drivers happy.
+
+And @Broadcom: we really _want_ you to contribute upstream. But that
+shouldn't be dumping APIs over the wall when you need them and letting
+us sort out everything else ...
+
+johannes
 
