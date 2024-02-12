@@ -1,188 +1,164 @@
-Return-Path: <netdev+bounces-71062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29D92851D7C
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 20:00:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D6A4851DAE
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 20:13:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DBDF1C20C15
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 19:00:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD0D31F22772
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 19:13:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6C444CB51;
-	Mon, 12 Feb 2024 18:59:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7895E45BEC;
+	Mon, 12 Feb 2024 19:13:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UIdd/Bgh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m/LzKzah"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDACD46435
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 18:59:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB4333D561;
+	Mon, 12 Feb 2024 19:13:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707764368; cv=none; b=vBwVdOJomxoP4CufRm9B/6f8tgicip6OIhCGCSC4RJmRoDzwo9CmlevDlMygJL3IUUI20gx+eg+2ic9vWAguUpmWpcXO3EUw4CA9/Ts88Thzh633CowqsYggmoO4gh/OzcDWDezoFBxKcS/sKMfYar5Jdfh5gLRymQ+FKPqJ26I=
+	t=1707765197; cv=none; b=IrkAl7rd9fBtMhPxVIXOukMpu85smL4AuTlCKECIvM3kYIRMQt6G7p24Aq10grRwwO9OdjeQaj1xi1Yc127NUJP7UzlDdfSALtx24EqY8xq7Ip8rs9MH1A9KPzz6UNlFHGS632qPEuhvWxUEv74Pe3AFkfuS2aYccdM1nFJR6ho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707764368; c=relaxed/simple;
-	bh=Gzte0gBOPb9SScq6zgQeVbMhK4C/TJpjN32sbCVg+0E=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=L6GrAhPclSREqzFky/UGETpmu+eHFDFuqXsi4ZqUxm8YH9JqNJ4JZF+/w3rfJ7iXcUFsSLxzD0NNbRIrkmS0ODSGk1oNQH0SEJR8R+FjcrPdM8BEoqwjdMcccIMPan/amuO2LQAp9dvlhz0PG878Fooh2QIwsI53IIRTCUR7wls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UIdd/Bgh; arc=none smtp.client-ip=209.85.208.48
+	s=arc-20240116; t=1707765197; c=relaxed/simple;
+	bh=sjKyP/Ui/aZeeBiNNFm9sGugbeL29/KNiXApbSxpSls=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gwkWxoyrDAxnDX0LJCnZOrGVIWFIh8ZOst7YN5P5pDTL/z19P6jwUXKhpNfffC7oW90As88bJrhGJ1FPkDTf3kwTGhvz9BJwzeMn2qcilgnDxDk/KwVDdLyY6hTicxXLc8taETokSO/aoy7qWE7z/PKBZRJ8DfBV0xiO9B8IbqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m/LzKzah; arc=none smtp.client-ip=209.85.128.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-561519f8698so3851280a12.0
-        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 10:59:26 -0800 (PST)
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-60495209415so34006847b3.3;
+        Mon, 12 Feb 2024 11:13:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707764365; x=1708369165; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
-         :from:content-language:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=YSFU4DcO2ScASR59/glpPIgjCBNfDzxYsxGXW3apdmM=;
-        b=UIdd/BghkakLmYLW1rMvx3L2LxfrQ9CJH/otlPrzSugFcTBDxwVqseiRfBU3NcVLOx
-         DtwcTeZx2iDU+oUkEAIeZID9IannoAkRHWhhofI38UeOTyuzFfafnJlkJdjRw6iwmUso
-         zfqtMLzI5ZSIdw7ls9jFfgKmgzDoxeILK+i0GOoXh3ysSXC4AHd0nCxLhKCoTNQ4U+mq
-         jtStoEZZU6pd/NWuPTgGYzktLBQHERfa1x273J9+c1y6O6/CRky5J8BVC3aT6qcAJRam
-         9lZX4g61IF/j7OjOiM4zekbVNsaegk3SCh53OArjrBquE4LUAaSyDH8dAX54nBbA+8P8
-         qATw==
+        d=gmail.com; s=20230601; t=1707765195; x=1708369995; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AZe21kBcPy6KSx7IZa4AcUw4sbKfAv+h51Ru4ZWOH8U=;
+        b=m/LzKzahzNPtvsskOUnw6Q6WE9WcjNpVp+drbk272zpjwnpz7d34oaYiTWSp6LI/wm
+         BFEQ5cP8GmRXedsxbXiKwBOYFdUvXBSMrDKWL5x/j7dADIItjkGJzT4rrFZ/o9EIdkup
+         vZmVFkR+kDMxvqotMueH/gkSVkbvjN+Zk7Ub6K5roe7bSnaCFk9DshrYn3Qa80HxxVkW
+         OUobN9mJ5/5qFLwZURDid5Oco6WoHOeuINM5SH5Q6OqEV8m9S71EYeN9/K+ZPDVMFTMp
+         3QO8xkAdwAY3hdfM2fhbtlS9FrSPy5V8Us3IpUsTAaj0sDVJVw4g493FDHzgOZcBKCtT
+         WEkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707764365; x=1708369165;
-        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
-         :from:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YSFU4DcO2ScASR59/glpPIgjCBNfDzxYsxGXW3apdmM=;
-        b=B9Asx5w+axs1cvhUE1ENNTcRIx/0zP0f31pIQJ8xqH0/uExACfCzrx43NasXJae+lB
-         0HrVIyT2F21L1DCJ30BuJWQablBuBDHUYrSbyaUxL6HEfHGIFqrKtkZ9sKmhFALayIXV
-         tgKClCnY3C3h1YqlSldlZNjnr5vd7qCahFYJi6GLHGqas0MwbImMHjny2apD2dpoT46w
-         WC/YvtSxniJPGLYrc0nxsKzjpFkQA1sl3lgPfIQa+UjquNeopq8Uxu/Bx2C4VI4+4KqI
-         ojnEIw6m+wcUY5n9LfdISNZoOMWRvZ+5xmOGhNGwoXpwgFqDn01sHhzgzpklToxyGQxu
-         7QNQ==
-X-Gm-Message-State: AOJu0Yx8tuDuHz5lxl/OKTdLJze4ZAKr2NBIDp3kQcDY9YaD9POhIOhD
-	bb1p6a1IG6+Vlww0GKO7oPaPT4uGXHHOI3+omtWULgH1c/rXq12C
-X-Google-Smtp-Source: AGHT+IErkD0uCc8ys+Blh3U2xhly19MCdGHtWZCOIJFW2NUropOvHMtNrfgRcP1cWHP8Gs1vm5S0Cg==
-X-Received: by 2002:aa7:c90b:0:b0:561:3dcd:3e09 with SMTP id b11-20020aa7c90b000000b005613dcd3e09mr6517913edt.31.1707764364750;
-        Mon, 12 Feb 2024 10:59:24 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCW+DUubHxQ1RXOXURqAcrFsvSduWt5NuXBOXwSihQE1BLDBxhXsXLBKvImGfIZ1Wll+82YvXXSIw80xrsFZaas/VX/hcZfCzMe6m80ib4vc/vPXcqgwESEp3r0M15UQzDTv2xluhH7PoNgi8rsQ4mk9eVxi9ddUo1e62SF+
-Received: from ?IPV6:2a01:c22:778f:2300:f4de:66ea:cd50:b2c7? (dynamic-2a01-0c22-778f-2300-f4de-66ea-cd50-b2c7.c22.pool.telefonica.de. [2a01:c22:778f:2300:f4de:66ea:cd50:b2c7])
-        by smtp.googlemail.com with ESMTPSA id t22-20020a50d716000000b0055fe55441cbsm3154227edi.40.2024.02.12.10.59.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Feb 2024 10:59:24 -0800 (PST)
-Message-ID: <4eee9c34-c5d6-4c96-9b05-455896dea59a@gmail.com>
-Date: Mon, 12 Feb 2024 19:59:26 +0100
+        d=1e100.net; s=20230601; t=1707765195; x=1708369995;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AZe21kBcPy6KSx7IZa4AcUw4sbKfAv+h51Ru4ZWOH8U=;
+        b=PIxmUAUo/nubOLfSOqhTh5Zn4xSBHRIxRrG5jqxvxDcY1O1PZDqTJJBuc6Z6b6BJkg
+         6GTP1kW6cT9yv4KjEuhTHYoWWUrFhXPuQzEUaQH/zh7voG8BZI/VFegMZu4HypwfEbrR
+         EdSfVnb8eGMPYddhFSShojBEywVFzNXdJJdT64JAVrfydpSGvnxt4u8g/JNfNMhyeMaJ
+         Dtx8BA3WEmpo/hEzJnV4VS8J6l/RJkFKJ07YZ7z29HsaoSp0jM9cxZV0ejycTVVz0qlV
+         RLWMf761+T7un8koV/Qw3sotNK1bLtInS7U25zopzEAdU99QkxGRVqDyooN2kTbBmC/c
+         XCBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVtq5XjL8eQiTsUAlIQb4Yto+31XP2hwrv+321tS75cScvVlj6iRbpMikinWSiRh9QbwrauzZkyPW9y7e+KikOmYXOiaPWq4R9sWdytQyBQPnOOVkV0J5n31i6VGK9l7+6KoKj9
+X-Gm-Message-State: AOJu0YyDLYd+tCQRkreI7FizKgBBV4CjFkFBIbrmrlP/bZRmnDb1ftLb
+	KYWcxg4B7lzTETZUJA1gmY0gl9Ro0baGcxxaiEvSlxOsC82LDSu+
+X-Google-Smtp-Source: AGHT+IFl6LJsfG6jRVqYDLExIYsaAihqzqU6vk5Hqvlokz2+AkO7Jtfo5penBfmuwtQEibPQUzwGHw==
+X-Received: by 2002:a81:c24d:0:b0:604:cd5c:a2f9 with SMTP id t13-20020a81c24d000000b00604cd5ca2f9mr5823219ywg.30.1707765194731;
+        Mon, 12 Feb 2024 11:13:14 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCU1ASV0QDP7aeAOV6u2nseazEB/qvenVbrU9hUHMbQ9Qqunpn7PAMBP/3/ftCW7daPRa72DOTHC3OcdaNfQxEOQe/wHYvmmFicrxtfHW/G7nY+bxYpp8WBFszjlI/Ql0F+acf+jKtlXEVOPcUiKc9g3Xa0JKA1A4B8cQxGj0dCXL3lOSPRFq8kthiwn3DUxAa67S16uGWggx8BnE+sAqBMpInVM9xAQahdaaXfYc0UOBw9IcIeGpuUnhpUoNBNl+u1IvAPfRryOyZc+pzg1Js2pyon0cXL9MfxyNM33FZbY1rT+FlII54J2d5XOzIJq3uTNYktlARuzWfNvOG5ZNTHLTFrn57o7xpvpmWACOnrkYcqeCbB+TVV5Qgig4VK1q6fxROrcX6HDefkykpAMNsUokffnWEDckH+WfaerJHFE9VEcGQDCPg7kViWm4lDDUxNuA9bDLz3xro9emsTI7XNLodcPnsQ=
+Received: from localhost ([2601:344:8301:57f0:85b5:dd54:cd99:b])
+        by smtp.gmail.com with ESMTPSA id y5-20020a818805000000b006040f198d3esm1279723ywf.142.2024.02.12.11.13.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Feb 2024 11:13:14 -0800 (PST)
+Date: Mon, 12 Feb 2024 11:13:13 -0800
+From: Yury Norov <yury.norov@gmail.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Herve Codina <herve.codina@bootlin.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew@lunn.ch>,
+	Mark Brown <broonie@kernel.org>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v3 RESEND 3/6] bitmap: Make bitmap_onto() available to
+ users
+Message-ID: <Zcptyd/AWrDD3EAL@yury-ThinkPad>
+References: <20240212075646.19114-1-herve.codina@bootlin.com>
+ <20240212075646.19114-4-herve.codina@bootlin.com>
+ <ZcoOpPb9HfXOYmAr@smile.fi.intel.com>
+ <20240212143753.620ddd6e@bootlin.com>
+ <ZcokwpMb6SFWhLBB@smile.fi.intel.com>
+ <20240212152022.75b10268@bootlin.com>
+ <Zcos9F3ZCX5c936p@smile.fi.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 3/3] r8169: add support for returning tx_lpi_timer in
- ethtool get_eee
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <89a5fef5-a4b7-4d5d-9c35-764248be5a19@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <89a5fef5-a4b7-4d5d-9c35-764248be5a19@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zcos9F3ZCX5c936p@smile.fi.intel.com>
 
-Add support for returning the tx_lpi_timer value to userspace.
-This is supported by few chip versions only: RTL8168h/RTL8125/RTL8126
+On Mon, Feb 12, 2024 at 04:36:36PM +0200, Andy Shevchenko wrote:
+> On Mon, Feb 12, 2024 at 03:20:22PM +0100, Herve Codina wrote:
+> > On Mon, 12 Feb 2024 16:01:38 +0200
+> > Andy Shevchenko <andriy.shevchenko@linux.intel.com> wrote:
+> 
+> ...
+> 
+> > Agree, the bitmap_onto() code is simpler to understand than its help.
+> > 
+> > I introduced bitmap_off() to be the "reverse" bitmap_onto() operations
+> > and I preferred to avoid duplicating function that do the same things.
+> > 
+> > On my side, I initially didn't use the bitmap_*() functions and did the the
+> > bits manipulation by hand.
+> > During the review, it was suggested to use the bitmap_*() family and I followed
+> > this suggestion.
+> 
+> I also would go this way, the problems I see with the current implementation are:
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/ethernet/realtek/r8169_main.c | 22 +++++++++++++++++++++-
- 1 file changed, 21 insertions(+), 1 deletion(-)
+Sure, opencoding and duplicating the functionality is always a bad
+idea.
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 5244f24a7..7d3f6d59b 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -2053,14 +2053,34 @@ static void rtl_set_eee_txidle_timer(struct rtl8169_private *tp)
- 	}
- }
- 
-+static unsigned int r8169_get_tx_lpi_timer_us(struct rtl8169_private *tp)
-+{
-+	unsigned int speed = tp->phydev->speed;
-+	unsigned int timer = tp->tx_lpi_timer;
-+
-+	if (!timer || speed == SPEED_UNKNOWN)
-+		return 0;
-+
-+	/* tx_lpi_timer value is in bytes */
-+	return DIV_ROUND_CLOSEST(timer * BITS_PER_BYTE, speed);
-+}
-+
- static int rtl8169_get_eee(struct net_device *dev, struct ethtool_keee *data)
- {
- 	struct rtl8169_private *tp = netdev_priv(dev);
-+	int ret;
- 
- 	if (!rtl_supports_eee(tp))
- 		return -EOPNOTSUPP;
- 
--	return phy_ethtool_get_eee(tp->phydev, data);
-+	ret = phy_ethtool_get_eee(tp->phydev, data);
-+	if (ret)
-+		return ret;
-+
-+	data->tx_lpi_timer = r8169_get_tx_lpi_timer_us(tp);
-+	data->tx_lpi_enabled = data->tx_lpi_timer ? data->eee_enabled : false;
-+
-+	return 0;
- }
- 
- static int rtl8169_set_eee(struct net_device *dev, struct ethtool_keee *data)
--- 
-2.43.1
+> - being related to NUMA (and as Rasmus once pointed out better to be there);
 
+It's 'related to NUMA' for the only reason - it's used by NUMA only.
+Nothing NUMA-specific in the function itself.
 
+Now that we've got a non-NUMA user, the bitmap_onto() is not related
+to NUMA anymore.
+
+> - unclear naming, esp. proposed bitmap_off();
+
+That's I agree. Scatter/gather from your last approach sound better.
+Do you plan to send a v2?
+
+> - the quite hard to understand help text
+
+Yes, we need a picture that would illustrate what actually happens
+
+> - atomicity when it's not needed (AFAICT).
+
+Agree. A series of atomic ops is not atomic. For example
+
+        if (test_bit(n, map))
+                set_bit(m, map);
+
+is not atomic as a whole. And this is what we do in bitmap_onto/off()
+in a loop. This must be fixed by using underscoded version.
+
+> > I did tests to be sure that bitmap_onto() and bitmap_off() did
+> > exactly the same things as my previous code did.
+> 
+> Yuri, what do you think about all this?
+
+I think your scatter/gather is better then this onto/off by naming and
+implementation. If you'll send a v2, and it would work for Herve, I'd
+prefer scatter/gather. But we can live with onto/off as well.
+
+Thanks,
+Yury
 
