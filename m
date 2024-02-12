@@ -1,159 +1,106 @@
-Return-Path: <netdev+bounces-71066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D521F851DCD
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 20:19:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 334FC851DD9
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 20:25:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 74EE21F228D4
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 19:19:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE3012833D1
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 19:25:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C05D647A40;
-	Mon, 12 Feb 2024 19:19:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1A2E4652D;
+	Mon, 12 Feb 2024 19:25:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="Z1aJ3qVf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DDz21uGS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDAE24644F
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 19:19:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C334C99;
+	Mon, 12 Feb 2024 19:25:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707765563; cv=none; b=LQWNgHHtY2CcvoH1dZO80B/qBridcfAR6UJg6eakslW9srU7GRZHcELBI86vL2+r02pxLH6GFm9RtwwUSqDJe1TPSAIGLmOC5AK0Llx9Q7qw6XVbYem1q58T8uolX97qjJzOHfXieal+8Y+4cPAcXTLYiFPKs3J+qp3y10PVecU=
+	t=1707765936; cv=none; b=kDeNZDn8ONmKBh8HvI6cQ42T09pUqFZ3ny0274fPeqoQoV0nKJDN/yCEdwq4v5AGCCdMfGc1WKLRfSn4xrrv6JMU0v4ZOAIV/UiR3j8uUlHZwsPy26pTHURq4P1krmajjYK+gIN6x+8zlyraeS+dBb7WrF3K6TKJ43wSBi3ngrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707765563; c=relaxed/simple;
-	bh=tREySGsYyctYQRNHowu6FpIzdFgRGgQKJzBJBe5SiUU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=fOrynkFGIoylt7XjGxH/OWIeM8TCWfz9MpuUgVNF0OpamYVtaCB4E4rwLeyZXhxBC9vO3TdIqgGOawozY7+C59zebBvsQwwbQdwMi6nlFa7lj3hVpFyzdUEobqK8cFnVZSqdum8aRYg/RKJ233290V82y1aKBpe+4ANoifoCVmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com; spf=pass smtp.mailfrom=waldekranz.com; dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b=Z1aJ3qVf; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-51182f8590bso2475813e87.0
-        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 11:19:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1707765560; x=1708370360; darn=vger.kernel.org;
-        h=content-transfer-encoding:organization:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Q+wtZVHBlRBdgOXll+bQOWRpw11A9TK3JHghIbdQJgo=;
-        b=Z1aJ3qVf6s8xMWEyO6nyf+/N8kzRvcDQ4dFH/TroYYIx9PB+BW+6aPGxRoFfFAYNDk
-         KhhNvkNdWaPGH2KDg4B7s79NPatOuLIRgtAluCQyF3hrK+1ADicXnvJIs2KragNwyl2A
-         SD5SVgoiq3KWiA2cAaQejUXY3rZZobw/JBkWEEgaXKLmk8XP1ZjuRZCcqEhPZ4/CiFid
-         pJbH++6T/icBGYu3LAduNyIKpYvLGNmFvUO7tk2z3NYXFFjj5WOlgEiFE+8Ak9vs8uaA
-         uuYBSdZcC1cjRrNEM/oGAjNd8thXAeu3uS+ooamZKA7Mxxtk1LZYpVuwcsfvtvxN15UZ
-         jWGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707765560; x=1708370360;
-        h=content-transfer-encoding:organization:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Q+wtZVHBlRBdgOXll+bQOWRpw11A9TK3JHghIbdQJgo=;
-        b=F8Tl0sWOvAg3a6ikBjM/sJ9/vAklslJcVCJEBhM58Tx98BicyK3PepbqOttvSZ2pb0
-         laT+voh2N7+R1tz99l+Ux+BD1pwkpWXqzYITJ5a1hrEc7jYk4gfXoNLNCxFmnsLMaf2t
-         EfbSVJIC+p+Js/gVyXgyfR0ebDE5z4V3ZYuQHjWZiBLUcD8rhbJb1Q2+sKJCbR1xZfB4
-         Qre8ws4iiGIAWD1UPA761Q99slL3WQ3YjgH+8Qm8h8gm0lIw30dbWwCumCdBWNUTLD5R
-         jxezjUGqr8bkdQ7bGz0ZPBquMbl4h+mavtUqFTBDGgfWmapGy1UeXV8JMce+eZiEUDUd
-         P4MA==
-X-Forwarded-Encrypted: i=1; AJvYcCWL+IEXS/J5sqgK81p8M1YqPeUSESxvp29MBN2Y69JI4+ZHi4+qOmbZ08ppzPCPUvHvOwiqcbXv0KDBV4/K0QKLNKnWdjZu
-X-Gm-Message-State: AOJu0Yx+9aWvRCtWYy9Soi5FV/RQJszeoJQrbf/plfIOpeeBeaIrwD+J
-	oovOZgyDH8paNlnpqhFTVQOXcucM7NrMZm/I8wtAj9mM+7K/JHR9+vr3u59OyiI=
-X-Google-Smtp-Source: AGHT+IHh37cBee4GYsqUQXihtNoQHNqa3Lb0NvrWTvxIs9dwteEUJ5PKbdM7u7qnHY1lOblxQ9WWoQ==
-X-Received: by 2002:a05:6512:3e0d:b0:511:8619:1f6 with SMTP id i13-20020a0565123e0d00b00511861901f6mr5500486lfv.13.1707765559832;
-        Mon, 12 Feb 2024 11:19:19 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCULdbvjfbNelR49/rsk2DnvfzQHPiwZl6N6eYbmMwuWCNYuOvsBLRVHPquPjiSGJHVDsowy01myFOmvNTvN3c97jGMOZyDn9J2G8KBF9/zcKlNYfTcJgEULaMYoPKsSwqlF7CPBDoX7S3aWqBFQaFsezLK4yRvq/Wza8hj1W5Lu4+O0TBqA3bG0lLMLY43dGpN8T8v0kIvk9+ZMUJd4jJAyVlFt5hHFDPx/y4TLvONG+Jyn2AxzSoal7RAUiPwTQDMkZPmInp0k4bi3HMP1S/Kj
-Received: from wkz-x13.addiva.ad (h-158-174-187-194.NA.cust.bahnhof.se. [158.174.187.194])
-        by smtp.gmail.com with ESMTPSA id n9-20020ac24909000000b0051157349af3sm974647lfi.47.2024.02.12.11.19.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Feb 2024 11:19:18 -0800 (PST)
-From: Tobias Waldekranz <tobias@waldekranz.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: olteanv@gmail.com,
-	atenart@kernel.org,
-	roopa@nvidia.com,
-	razor@blackwall.org,
-	bridge@lists.linux.dev,
-	netdev@vger.kernel.org,
-	jiri@resnulli.us,
-	ivecera@redhat.com
-Subject: [PATCH v4 net 2/2] net: bridge: switchdev: Ensure deferred event delivery on unoffload
-Date: Mon, 12 Feb 2024 20:18:44 +0100
-Message-Id: <20240212191844.1055186-3-tobias@waldekranz.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240212191844.1055186-1-tobias@waldekranz.com>
-References: <20240212191844.1055186-1-tobias@waldekranz.com>
+	s=arc-20240116; t=1707765936; c=relaxed/simple;
+	bh=Ifv2UA2u9qLCFJ4rYKTsSh9pWHc5yMrYJGUYt3+kTfw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BMUfdvEM3HeqAWEdnj6PuJOt2NTvMnXYFsgU3wZcqAVodR6Cn0MG21UU5kQXynHL5/vnKJ8IFB4y6mSLwVGgr+Em9DV37/09gP7UQwebHBnjzPBv0WC5XboW1USZDGL16ZAW3WizcXE+SScEw93C/jyayzG+5NljK+JPyo85ifU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DDz21uGS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED4BBC433F1;
+	Mon, 12 Feb 2024 19:25:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707765935;
+	bh=Ifv2UA2u9qLCFJ4rYKTsSh9pWHc5yMrYJGUYt3+kTfw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DDz21uGSAJMsQojY4zNQHDBmeYROAhZY2Q9+i8DvurpVDKPCPiQH8JgCnOz06s6pu
+	 yTukdG6zcfgyiwVAXwT5vq2GAnja4b/MVJhJbuZyN7vX1ySzrroxziB5z7srBW0XXR
+	 NOeNhp3DWj8UkwYpi0dyJWDMIvfxjmETxA+WybtyGGaaj4R5y8Eq9+XYAU8BQRh63Q
+	 Gz3dvUbyLJDjlDf82kgKzO0rDpjjdbWVR0HnuGPRKkFeyfdRV4QTOZA5LL9rcav7/b
+	 TXcHeagtkBslcE9CfWYUohb+85o/yr1Y2JofkwQ71QvswEoHkQwoUj2DyKpZN2ufZ/
+	 yzFDs6lewfJ5A==
+Date: Mon, 12 Feb 2024 19:25:30 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] dt-bindings: net: qca,ar9331: convert to DT schema
+Message-ID: <20240212-macaw-dispense-e073f5d73fe3@spud>
+References: <20240212182911.233819-1-krzysztof.kozlowski@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Addiva Elektronik
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="fcUA6sBRBV6Rzmja"
+Content-Disposition: inline
+In-Reply-To: <20240212182911.233819-1-krzysztof.kozlowski@linaro.org>
 
-When unoffloading a device, it is important to ensure that all
-relevant deferred events are delivered to it before it disassociates
-itself from the bridge.
 
-Before this change, this was true for the normal case when a device
-maps 1:1 to a net_bridge_port, i.e.
+--fcUA6sBRBV6Rzmja
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-   br0
-   /
-swp0
+On Mon, Feb 12, 2024 at 07:29:11PM +0100, Krzysztof Kozlowski wrote:
+> diff --git a/Documentation/devicetree/bindings/net/dsa/qca,ar9331.yaml b/Documentation/devicetree/bindings/net/dsa/qca,ar9331.yaml
+> new file mode 100644
+> index 000000000000..fd9ddc59d38c
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/dsa/qca,ar9331.yaml
+> @@ -0,0 +1,161 @@
+> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
 
-When swp0 leaves br0, the call to switchdev_deferred_process() in
-del_nbp() makes sure to process any outstanding events while the
-device is still associated with the bridge.
+I don't recall whether or not Pengutronix are on the carte blache list
+for relicensing bindings under the dual license.
 
-In the case when the association is indirect though, i.e. when the
-device is attached to the bridge via an intermediate device, like a
-LAG...
+Otherwise,
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
 
-    br0
-    /
-  lag0
-  /
-swp0
+Cheers,
+Conor.
 
-...then detaching swp0 from lag0 does not cause any net_bridge_port to
-be deleted, so there was no guarantee that all events had been
-processed before the device disassociated itself from the bridge.
+--fcUA6sBRBV6Rzmja
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Fix this by always synchronously processing all deferred events before
-signaling completion of unoffloading back to the driver.
+-----BEGIN PGP SIGNATURE-----
 
-Fixes: 4e51bf44a03a ("net: bridge: move the switchdev object replay helpers to "push" mode")
-Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
----
- net/bridge/br_switchdev.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZcpwqgAKCRB4tDGHoIJi
+0rZBAQCnmSlsUkNKiF1EbeNrwFSMFHCiK7573SU7slOuioXr7QEAqjY2doilVGlZ
+gmamZT+SKO2X7u2G8Nyht4qPQsVNLQ8=
+=4FTj
+-----END PGP SIGNATURE-----
 
-diff --git a/net/bridge/br_switchdev.c b/net/bridge/br_switchdev.c
-index 6a7cb01f121c..7b41ee8740cb 100644
---- a/net/bridge/br_switchdev.c
-+++ b/net/bridge/br_switchdev.c
-@@ -804,6 +804,16 @@ static void nbp_switchdev_unsync_objs(struct net_bridge_port *p,
- 	br_switchdev_mdb_replay(br_dev, dev, ctx, false, blocking_nb, NULL);
- 
- 	br_switchdev_vlan_replay(br_dev, ctx, false, blocking_nb, NULL);
-+
-+	/* Make sure that the device leaving this bridge has seen all
-+	 * relevant events before it is disassociated. In the normal
-+	 * case, when the device is directly attached to the bridge,
-+	 * this is covered by del_nbp(). If the association was indirect
-+	 * however, e.g. via a team or bond, and the device is leaving
-+	 * that intermediate device, then the bridge port remains in
-+	 * place.
-+	 */
-+	switchdev_deferred_process();
- }
- 
- /* Let the bridge know that this port is offloaded, so that it can assign a
--- 
-2.34.1
-
+--fcUA6sBRBV6Rzmja--
 
