@@ -1,141 +1,433 @@
-Return-Path: <netdev+bounces-71069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0491F851E3B
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 20:59:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D113851E3E
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 21:00:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 344871C21BF2
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 19:59:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 125541F239B4
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 20:00:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3B1A47F57;
-	Mon, 12 Feb 2024 19:59:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="nbYS1mTJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89CA347A7A;
+	Mon, 12 Feb 2024 20:00:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A7647A6F;
-	Mon, 12 Feb 2024 19:59:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D277A47774
+	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 20:00:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707767944; cv=none; b=N7IDWVK/GZ8eSqcMI429H+Av+MtopuCiCE9Vs9430RMoFXz7Zk4wzPjRtBnaQQq/oefjjk5dAcbBNZmUHz7pkkQAHTznIii/m4Mxz4mvpdxGGgjm0h4Uowh23FShhxUYW7pnN56T6Ziz1+fLuxQRYJCmecDFV9+tL8Ybq+i0xK8=
+	t=1707768021; cv=none; b=uc0pY8fue1RnlEB33ENjVoR6LQ3LhcFxH8ajh+5EkekniMWjf7cPpcynEaaQ/t5G6aj/JE8DuProtE3gOyruO7xxPbaULPCVGxXh44rioL5XbnOnCswLLlAz7J2lqLvj5Q/QvB13CSw1/GAxZ0NFjrd7HABlPia9nOEAJzGUf6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707767944; c=relaxed/simple;
-	bh=LAd7kAB0YVu3prmd6cMGizOB97wDW8LoD6QWTyinZjM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=gOh2v1H1Wbhx4DsGSLyXfpBeQCslDg0taWRJEPakXQSaJCAmopGNz9MleLGo+lYScAuljiy9P8q1SeHKjYmvycdSXS5MofNjvhKY2tSJgpUjy6mMAEwX0w/YqGRaTTKzoUHRpvg5Wu8rOQ0xCOeCi2II6DpQjp0p7NjcUvrliHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=nbYS1mTJ; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=Lt5QOdxwmKP5wi+YgAc+nSKUxYGem+ulR+qGLgEENJ4=;
-	t=1707767941; x=1708977541; b=nbYS1mTJpuUZVVaAPrJ6hEoYhHw3wN+m5nsGwHEReM7zRvf
-	I2kTARgwoStJkCr0zHZLotlBFFQ19ziV8zrJqVedsd47KBJh96Ieynd9BP0rqDxxtv2Z5OGNTa7id
-	+8r+F7NgYdm8kO+QFASQXXmBs0glyZfcAEns13i4A3VQOl65YEHApnl2A5r0k8DMBN4TG2cfV1oJU
-	g6twKQvNYoUooqbO0ShIHFlWZV5NNHpJzBNt6w0sEv8Q6/wirt1e1FR2hWM1VXl5FGwmax4CrQzwD
-	pMx99UpuGJ1ksya4PmnbS64G4JM531Vz8wXBaMjnGXZxloe7En/LhAlOnshza1Eg==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1rZcS5-00000006Taf-0gjr;
-	Mon, 12 Feb 2024 20:58:53 +0100
-Message-ID: <2c38eaed47808a076b6986412f92bb955b0599c3.camel@sipsolutions.net>
-Subject: Re: [PATCH 1/1] wifi: nl80211: Add support for plumbing SAE groups
- to driver
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Kalle Valo <kvalo@kernel.org>, Vinayak Yadawad
-	 <vinayak.yadawad@broadcom.com>
-Cc: linux-wireless@vger.kernel.org, jithu.jance@broadcom.com, Arend van
- Spriel <arend.vanspriel@broadcom.com>, netdev@vger.kernel.org, Jakub
- Kicinski <kuba@kernel.org>
-Date: Mon, 12 Feb 2024 20:58:51 +0100
-In-Reply-To: <87mss6f8jh.fsf@kernel.org>
-References: 
-	<309965e8ef4d220053ca7e6bd34393f892ea1bb8.1707486287.git.vinayak.yadawad@broadcom.com>
-	 <87mss6f8jh.fsf@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+	s=arc-20240116; t=1707768021; c=relaxed/simple;
+	bh=9r0Id5Y9RoU/xKvxd9uPoImX5rBlLcjKbbbOl+v6fnQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FsFQ5bsaD1Az3/WU90v/HindXHCxrWmWlwiLB9uKW0qHEzxPuwWAJS7hO72LBdRUAO05YkFlnSPJ7goOZcFKjeIXfH0lVKTbrCLKDTwXfpE0PVWr7d+FHw84awCZeZQT9rTiP1d741yg6tlL1tCmsovVpCnIQSOadPD2GD+J1hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rZcTE-00053s-4C; Mon, 12 Feb 2024 21:00:04 +0100
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rZcTC-000LdK-94; Mon, 12 Feb 2024 21:00:02 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rZcTC-005fbl-0Z;
+	Mon, 12 Feb 2024 21:00:02 +0100
+Date: Mon, 12 Feb 2024 21:00:02 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] dt-bindings: net: qca,ar9331: convert to DT schema
+Message-ID: <Zcp4wvmGX-CJvC5J@pengutronix.de>
+References: <20240212182911.233819-1-krzysztof.kozlowski@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240212182911.233819-1-krzysztof.kozlowski@linaro.org>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Mon, 2024-02-12 at 09:25 +0200, Kalle Valo wrote:
+On Mon, Feb 12, 2024 at 07:29:11PM +0100, Krzysztof Kozlowski wrote:
+> Convert the Qualcomm Atheros AR9331 built-in switch bindings to DT
+> schema.
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-> What driver is going to use these new crypto settings? Or is this for an
-> out-of-tree driver?
->=20
+Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
-I'm sure it's for an out-of-tree driver.
+Thank you!
 
-This is the _entirety_ of "@broadcom"'s wireless contributions with
-"--since=3D2020" (somewhat arbitrarily chosen, though going a bit further
-back has some "real" work in brcmfmac), as far as I can tell:
+> ---
+> 
+> DSA switch bindings still bring me headache...
+> 
+> Changes in v2:
+> 1. Narrow pattern for phy children to ethernet-phy@ or phy@ (MIPS DTS
+>    has the latter) - Conor.
+> ---
+>  .../devicetree/bindings/net/dsa/ar9331.txt    | 147 ----------------
+>  .../bindings/net/dsa/qca,ar9331.yaml          | 161 ++++++++++++++++++
+>  2 files changed, 161 insertions(+), 147 deletions(-)
+>  delete mode 100644 Documentation/devicetree/bindings/net/dsa/ar9331.txt
+>  create mode 100644 Documentation/devicetree/bindings/net/dsa/qca,ar9331.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/dsa/ar9331.txt b/Documentation/devicetree/bindings/net/dsa/ar9331.txt
+> deleted file mode 100644
+> index f824fdae0da2..000000000000
+> --- a/Documentation/devicetree/bindings/net/dsa/ar9331.txt
+> +++ /dev/null
+> @@ -1,147 +0,0 @@
+> -Atheros AR9331 built-in switch
+> -=============================
+> -
+> -It is a switch built-in to Atheros AR9331 WiSoC and addressable over internal
+> -MDIO bus. All PHYs are built-in as well.
+> -
+> -Required properties:
+> -
+> - - compatible: should be: "qca,ar9331-switch"
+> - - reg: Address on the MII bus for the switch.
+> - - resets : Must contain an entry for each entry in reset-names.
+> - - reset-names : Must include the following entries: "switch"
+> - - interrupt-parent: Phandle to the parent interrupt controller
+> - - interrupts: IRQ line for the switch
+> - - interrupt-controller: Indicates the switch is itself an interrupt
+> -   controller. This is used for the PHY interrupts.
+> - - #interrupt-cells: must be 1
+> - - mdio: Container of PHY and devices on the switches MDIO bus.
+> -
+> -See Documentation/devicetree/bindings/net/dsa/dsa.txt for a list of additional
+> -required and optional properties.
+> -Examples:
+> -
+> -eth0: ethernet@19000000 {
+> -	compatible = "qca,ar9330-eth";
+> -	reg = <0x19000000 0x200>;
+> -	interrupts = <4>;
+> -
+> -	resets = <&rst 9>, <&rst 22>;
+> -	reset-names = "mac", "mdio";
+> -	clocks = <&pll ATH79_CLK_AHB>, <&pll ATH79_CLK_AHB>;
+> -	clock-names = "eth", "mdio";
+> -
+> -	phy-mode = "mii";
+> -	phy-handle = <&phy_port4>;
+> -};
+> -
+> -eth1: ethernet@1a000000 {
+> -	compatible = "qca,ar9330-eth";
+> -	reg = <0x1a000000 0x200>;
+> -	interrupts = <5>;
+> -	resets = <&rst 13>, <&rst 23>;
+> -	reset-names = "mac", "mdio";
+> -	clocks = <&pll ATH79_CLK_AHB>, <&pll ATH79_CLK_AHB>;
+> -	clock-names = "eth", "mdio";
+> -
+> -	phy-mode = "gmii";
+> -
+> -	fixed-link {
+> -		speed = <1000>;
+> -		full-duplex;
+> -	};
+> -
+> -	mdio {
+> -		#address-cells = <1>;
+> -		#size-cells = <0>;
+> -
+> -		switch10: switch@10 {
+> -			#address-cells = <1>;
+> -			#size-cells = <0>;
+> -
+> -			compatible = "qca,ar9331-switch";
+> -			reg = <0x10>;
+> -			resets = <&rst 8>;
+> -			reset-names = "switch";
+> -
+> -			interrupt-parent = <&miscintc>;
+> -			interrupts = <12>;
+> -
+> -			interrupt-controller;
+> -			#interrupt-cells = <1>;
+> -
+> -			ports {
+> -				#address-cells = <1>;
+> -				#size-cells = <0>;
+> -
+> -				switch_port0: port@0 {
+> -					reg = <0x0>;
+> -					ethernet = <&eth1>;
+> -
+> -					phy-mode = "gmii";
+> -
+> -					fixed-link {
+> -						speed = <1000>;
+> -						full-duplex;
+> -					};
+> -				};
+> -
+> -				switch_port1: port@1 {
+> -					reg = <0x1>;
+> -					phy-handle = <&phy_port0>;
+> -					phy-mode = "internal";
+> -				};
+> -
+> -				switch_port2: port@2 {
+> -					reg = <0x2>;
+> -					phy-handle = <&phy_port1>;
+> -					phy-mode = "internal";
+> -				};
+> -
+> -				switch_port3: port@3 {
+> -					reg = <0x3>;
+> -					phy-handle = <&phy_port2>;
+> -					phy-mode = "internal";
+> -				};
+> -
+> -				switch_port4: port@4 {
+> -					reg = <0x4>;
+> -					phy-handle = <&phy_port3>;
+> -					phy-mode = "internal";
+> -				};
+> -			};
+> -
+> -			mdio {
+> -				#address-cells = <1>;
+> -				#size-cells = <0>;
+> -
+> -				interrupt-parent = <&switch10>;
+> -
+> -				phy_port0: phy@0 {
+> -					reg = <0x0>;
+> -					interrupts = <0>;
+> -				};
+> -
+> -				phy_port1: phy@1 {
+> -					reg = <0x1>;
+> -					interrupts = <0>;
+> -				};
+> -
+> -				phy_port2: phy@2 {
+> -					reg = <0x2>;
+> -					interrupts = <0>;
+> -				};
+> -
+> -				phy_port3: phy@3 {
+> -					reg = <0x3>;
+> -					interrupts = <0>;
+> -				};
+> -
+> -				phy_port4: phy@4 {
+> -					reg = <0x4>;
+> -					interrupts = <0>;
+> -				};
+> -			};
+> -		};
+> -	};
+> -};
+> diff --git a/Documentation/devicetree/bindings/net/dsa/qca,ar9331.yaml b/Documentation/devicetree/bindings/net/dsa/qca,ar9331.yaml
+> new file mode 100644
+> index 000000000000..fd9ddc59d38c
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/dsa/qca,ar9331.yaml
+> @@ -0,0 +1,161 @@
+> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/dsa/qca,ar9331.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Qualcomm Atheros AR9331 built-in switch
+> +
+> +maintainers:
+> +  - Oleksij Rempel <o.rempel@pengutronix.de>
+> +
+> +description:
+> +  Qualcomm Atheros AR9331 is a switch built-in to Atheros AR9331 WiSoC and
+> +  addressable over internal MDIO bus. All PHYs are built-in as well.
+> +
+> +properties:
+> +  compatible:
+> +    const: qca,ar9331-switch
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  interrupts:
+> +    maxItems: 1
+> +
+> +  interrupt-controller: true
+> +
+> +  '#interrupt-cells':
+> +    const: 1
+> +
+> +  mdio:
+> +    $ref: /schemas/net/mdio.yaml#
+> +    unevaluatedProperties: false
+> +    properties:
+> +      interrupt-parent: true
+> +
+> +    patternProperties:
+> +      '(ethernet-)?phy@[0-4]+$':
+> +        type: object
+> +        unevaluatedProperties: false
+> +
+> +        properties:
+> +          reg: true
+> +          interrupts:
+> +            maxItems: 1
+> +
+> +  resets:
+> +    maxItems: 1
+> +
+> +  reset-names:
+> +    items:
+> +      - const: switch
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - interrupts
+> +  - interrupt-controller
+> +  - '#interrupt-cells'
+> +  - mdio
+> +  - ports
+> +  - resets
+> +  - reset-names
+> +
+> +allOf:
+> +  - $ref: dsa.yaml#/$defs/ethernet-ports
+> +
+> +unevaluatedProperties: false
+> +
+> +examples:
+> +  - |
+> +    mdio {
+> +        #address-cells = <1>;
+> +        #size-cells = <0>;
+> +
+> +        switch10: switch@10 {
+> +            compatible = "qca,ar9331-switch";
+> +            reg = <0x10>;
+> +
+> +            interrupt-parent = <&miscintc>;
+> +            interrupts = <12>;
+> +            interrupt-controller;
+> +            #interrupt-cells = <1>;
+> +
+> +            resets = <&rst 8>;
+> +            reset-names = "switch";
+> +
+> +            ports {
+> +                #address-cells = <1>;
+> +                #size-cells = <0>;
+> +
+> +                port@0 {
+> +                    reg = <0x0>;
+> +                    ethernet = <&eth1>;
+> +
+> +                    phy-mode = "gmii";
+> +
+> +                    fixed-link {
+> +                        speed = <1000>;
+> +                        full-duplex;
+> +                    };
+> +                };
+> +
+> +                port@1 {
+> +                    reg = <0x1>;
+> +                    phy-handle = <&phy_port0>;
+> +                    phy-mode = "internal";
+> +                };
+> +
+> +                port@2 {
+> +                    reg = <0x2>;
+> +                    phy-handle = <&phy_port1>;
+> +                    phy-mode = "internal";
+> +                };
+> +
+> +                port@3 {
+> +                    reg = <0x3>;
+> +                    phy-handle = <&phy_port2>;
+> +                    phy-mode = "internal";
+> +                };
+> +
+> +                port@4 {
+> +                    reg = <0x4>;
+> +                    phy-handle = <&phy_port3>;
+> +                    phy-mode = "internal";
+> +                };
+> +            };
+> +
+> +            mdio {
+> +                #address-cells = <1>;
+> +                #size-cells = <0>;
+> +
+> +                interrupt-parent = <&switch10>;
+> +
+> +                phy_port0: ethernet-phy@0 {
+> +                    reg = <0x0>;
+> +                    interrupts = <0>;
+> +                };
+> +
+> +                phy_port1: ethernet-phy@1 {
+> +                    reg = <0x1>;
+> +                    interrupts = <0>;
+> +                };
+> +
+> +                phy_port2: ethernet-phy@2 {
+> +                    reg = <0x2>;
+> +                    interrupts = <0>;
+> +                };
+> +
+> +                phy_port3: ethernet-phy@3 {
+> +                    reg = <0x3>;
+> +                    interrupts = <0>;
+> +                };
+> +
+> +                phy_port4: ethernet-phy@4 {
+> +                    reg = <0x4>;
+> +                    interrupts = <0>;
+> +                };
+> +            };
+> +        };
+> +    };
+> -- 
+> 2.34.1
+> 
+> 
 
-Arend Van Spriel (1):
-      cfg80211: adapt to new channelization of the 6GHz band
-
-Arend van Spriel (23):
-      cfg80211: add VHT rate entries for MCS-10 and MCS-11
-      brcmfmac: use different error value for invalid ram base address
-      brcmfmac: increase core revision column aligning core list
-      brcmfmac: add xtlv support to firmware interface layer
-      brcmfmac: support chipsets with different core enumeration space
-      wifi: cfg80211: fix memory leak in query_regdb_file()
-      wifi: brcmfmac: add function to unbind device to bus layer api
-      wifi: brcmfmac: add firmware vendor info in driver info
-      wifi: brcmfmac: add support for vendor-specific firmware api
-      wifi: brcmfmac: add support for Cypress firmware api
-      wifi: brcmfmac: add support Broadcom BCA firmware api
-      wifi: brcmfmac: add vendor name in revinfo debugfs file
-      wifi: brcmfmac: introduce BRCMFMAC exported symbols namespace
-      wifi: brcmfmac: avoid handling disabled channels for survey dump
-      wifi: brcmfmac: avoid NULL-deref in survey dump for 2G only device
-      wifi: brcmfmac: fix regression for Broadcom PCIe wifi devices
-      wifi: brcmfmac: change cfg80211_set_channel() name and signature
-      wifi: brcmfmac: export firmware interface functions
-      wifi: brcmfmac: add per-vendor feature detection callback
-      wifi: brcmfmac: move feature overrides before feature_disable
-      wifi: brcmfmac: avoid invalid list operation when vendor attach fails
-      wifi: brcmfmac: allow per-vendor event handling
-      wifi: brcmfmac: add linefeed at end of file
-
-Vinayak Yadawad (4):
-      wifi: cfg80211: Allow P2P client interface to indicate port authoriza=
-tion
-      cfg80211: Update Transition Disable policy during port authorization
-      wifi: cfg80211: Allow AP/P2PGO to indicate port authorization to peer=
- STA/P2PClient
-      wifi: nl80211: Extend del pmksa support for SAE and OWE security
-
-
-So looks to me like Broadcom doesn't want its (real) drivers to work in
-upstream, so I guess we really ought to just stop accommodating for them
-in the wireless stack... This only works if we collaborate, and I've
-said this before: I can't maintain something well that I cannot see (and
-possibly change) the user(s) of.
-
-I guess if Broadcom's plans change they can start by submitting drivers
-that actually use the relevant infrastructure.
-
-And note that I've said this to Qualcomm before: I don't really want to
-and can't (well) maintain a lot of stuff in the tree that exists there
-solely to make out-of-tree drivers happy.
-
-And @Broadcom: we really _want_ you to contribute upstream. But that
-shouldn't be dumping APIs over the wall when you need them and letting
-us sort out everything else ...
-
-johannes
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
