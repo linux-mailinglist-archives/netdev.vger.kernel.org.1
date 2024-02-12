@@ -1,91 +1,89 @@
-Return-Path: <netdev+bounces-70982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1CDA85175A
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 15:52:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87D9985177B
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 16:02:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E56151C2179D
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 14:52:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 444AA1F210E5
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 15:02:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 052103B782;
-	Mon, 12 Feb 2024 14:52:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFF7A3B794;
+	Mon, 12 Feb 2024 15:02:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HhoKQms/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r2TCOHAh"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD0AB3BB34;
-	Mon, 12 Feb 2024 14:52:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC7963CF40
+	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 15:02:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707749522; cv=none; b=Ha+TiAyJeRDnb8aNrc1nSaJewFkqgxumKbSp6yujTu68fvgg4fgWRDXdhZmOHKOxsbxrycfpfpTPI3KIH3Sf9apeC2cqpB0tYo1zzAi0Q2sPHDh0DhC5guahpY+16EaYD/Wa4YmqT4LP9hGHD0ERwJyNlAQRcms84GWjzFB2QlM=
+	t=1707750135; cv=none; b=ZCEuLtrvjQ13gkZFQe+BsxQo67Ur4MnpFFm597ifZ+IjcoeBvkIsKMMyLIDL+djYTvDh/Wj+BjX0ZU7fGxecMcZJrdBzNBlUSa4e6Yx1F1kNmreJMEXZ/yqi/VbA920xgwZKmj+AP5jHQqf28fXkzjZJl+KIG0NFWl4XJNSqPOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707749522; c=relaxed/simple;
-	bh=CvO5h22bIICO9OVAqHSfrziFGOjtF4BmJIiYlm8gKqk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ix4wViamBw69YY+MbFyZMsNxD8rNArWxueM2Q1gM7+Veb6FMYGnKxXskZ07ufJXkWptDHJailcOs3iP9etSQBWXhIKbLOnHRMGxxUC4PeaL9sAJgp+XKpWPanZ0wpSB2GHJserMiccK9GQ+0lGANsgw+ACQOfcj2i3/NWimtIDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=HhoKQms/; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=8V/n6mYnmYAVnrBX94RlW3GjICZYM1XfZBGebC4iOsg=; b=HhoKQms/prSYZqTTcb2AcWxa8q
-	PExcu4ZShC/u3ut6nS1RttBsqvdv34EBXZ0FXqlQ5R4GmhpAgZXlRIO7nGWijaM59K/7cghvtcT+o
-	2KVPJO+4zqCLhXhBl0nUmcMAmNFiIo3wcxg164WHrTey7BzQoK6QcvKYzJWcwnigk0d4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rZXf4-007aEq-Tx; Mon, 12 Feb 2024 15:51:58 +0100
-Date: Mon, 12 Feb 2024 15:51:58 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Robert Marko <robimarko@gmail.com>
-Cc: andersson@kernel.org, konrad.dybcio@linaro.org, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, ansuelsmth@gmail.com,
-	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phy: qca807x: move interface mode check to
- .config_init_once
-Message-ID: <c97d10fa-39c5-4e5e-93ce-1610635cb4d4@lunn.ch>
-References: <20240212115043.1725918-1-robimarko@gmail.com>
+	s=arc-20240116; t=1707750135; c=relaxed/simple;
+	bh=ioIAfMxeMXCPkn6xMdt9uZcKoqspLYKHVP1IESePhSA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gwFEiTUYv4hWLYPf2n2LmB7s4WJI+Z6EqqlnSkrEsMKVQj8K0ePZ7gHwm1fZFiWSoNDoqt1xg58uS1LnwDxPguU61Eq8NxlMEXvYTVmwAl8lYgcWEpcG2pZXIQsqab0eWqFFxKLOTwh/XwJFmHiU1cdsKEtRbMuVQeKmdXKH3wc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r2TCOHAh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA5C3C433F1;
+	Mon, 12 Feb 2024 15:02:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707750135;
+	bh=ioIAfMxeMXCPkn6xMdt9uZcKoqspLYKHVP1IESePhSA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=r2TCOHAh6OpC4XVzu4h5N0JyViOrWBQC+ykG03+S1PMOWGyds7rkH1wbOX/O/4ROp
+	 4G1uVjokwe7zXkSZlCy8+FTb1v8pvRPzpDzZValjc2ht4bNBMFAHpjq9j4hKiVKvBf
+	 l43MMJ+P78nLTzaamXSA0M7QMRVg/PwyoLUoONjOejsOHXXJrxgPzbD6rRJXIRQVYQ
+	 BcvxVAE5ehW87M8+5D1o8No/H5Dz74b2nT46AvoidXypACZQ0azF/EIRy+dCQULa1t
+	 cDheyLvtXkMi7z7Joy727k4Ecf0mIlBk6luYN876xArnXvXtb+5wNbNJAmBQaA7YPo
+	 gCg2xiPiz1gFQ==
+Date: Mon, 12 Feb 2024 07:02:13 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+ Davide Caratti <dcaratti@redhat.com>, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, shmulik.ladkani@gmail.com
+Subject: Re: [PATCH net] net/sched: act_mirred: use the backlog for mirred
+ ingress
+Message-ID: <20240212070213.504d6930@kernel.org>
+In-Reply-To: <CAM0EoM=kcqwC1fYhHcPoLgNMrM_7tnjucNvri8f4U7ymaRXmEQ@mail.gmail.com>
+References: <20240209235413.3717039-1-kuba@kernel.org>
+	<CAM0EoM=kcqwC1fYhHcPoLgNMrM_7tnjucNvri8f4U7ymaRXmEQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240212115043.1725918-1-robimarko@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Feb 12, 2024 at 12:49:34PM +0100, Robert Marko wrote:
-> Currently, we are checking whether the PHY package mode matches the
-> individual PHY interface modes at PHY package probe time, but at that time
-> we only know the PHY package mode and not the individual PHY interface
-> modes as of_get_phy_mode() that populates it will only get called once the
-> netdev to which PHY-s are attached to is being probed and thus this check
-> will always fail and return -EINVAL.
+On Mon, 12 Feb 2024 09:51:20 -0500 Jamal Hadi Salim wrote:
+> > The test Davide added in commit ca22da2fbd69 ("act_mirred: use the backlog
+> > for nested calls to mirred ingress") hangs our testing VMs every 10 or so
+> > runs, with the familiar tcp_v4_rcv -> tcp_v4_rcv deadlock reported by
+> > lockdep.
+> >
+> > In the past there was a concern that the backlog indirection will
+> > lead to loss of error reporting / less accurate stats. But the current
+> > workaround does not seem to address the issue.
 > 
-> So, lets move this check to .config_init_once as at that point individual
-> PHY interface modes should be populated.
+> Let us run some basic tests on this first - it's a hairy spot. 
 
-Just for my own understanding, not directly about this patch...
+Thanks!
 
-priv->package_mode is about PSGMII vs QSGMII for one of the SERDES
-interfaces? We expect the individual PHYs sharing that interface to
-also indicate PSGMII or QSGMII?
+> Also, IIRC Cong had some reservations about this in the past. Can't
+> remember what they were.
 
-But what about the other SERDES, which can be connected to an SFP
-cage. You would normally set that to SGMII, or 1000BaseX. When an SFP
-module is inserted, the correct interface mode is then determined from
-the contests of the EEPROM and the PCS needs to be reconfigured. So
-i'm just wondering how this check works in this situation?
+He was worried that the overlimits stats are no longer counted when we
+decouple (and Davide's selftest actually checks for that so I had to
+modify it).
 
-    Andrew
+I'm not married to the solution in any way but bugs much less serious
+get three letter acronyms, we can't pretend this one doesn't exist.
 
