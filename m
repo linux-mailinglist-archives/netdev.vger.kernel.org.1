@@ -1,220 +1,219 @@
-Return-Path: <netdev+bounces-70994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFAFA85181D
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 16:33:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3386985183C
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 16:37:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34BA81F23636
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 15:33:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEFA82864B4
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 15:37:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DD9C3CF5D;
-	Mon, 12 Feb 2024 15:33:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 220E73C478;
+	Mon, 12 Feb 2024 15:37:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Co2aU8UO"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="Mk2oVwoI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 165C43C497;
-	Mon, 12 Feb 2024 15:33:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A946D3C684
+	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 15:37:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707752001; cv=none; b=S/BayAzGdPR3klvxlZiO1LUgqlCfOoEDK3A4Q5FWj9HKntQaI5WEP5wrcajsUD+iJGMdGLRYWNeiOebLF3LNR+QMpOCI7NhG4AAw4yyZ+2tOT2kn2EJ5inMYbyhypL4z7qI0ixQmTI+BNrt1TEtTI09PH0PE9jDWT98ZI88VEbA=
+	t=1707752269; cv=none; b=gVAx/HuNLuhN/oO4tIXCqBd0HlnTq1Ywc7sYYW+LqHlk7q3CnRgf/OaTk3hpfDglDwnzVR6PUxonDbSQH6rB9MXTGw7vLh3IZu0FwC8M9ny3Fxci1Qwnb57IG//5Nyw0eQ33EzxtTzBH/AD8j1Pq/3UwewgzZ9J2dUo2SaqbCuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707752001; c=relaxed/simple;
-	bh=GFsfkdOmJKsuZtWQAq7OhjxHg4IKHiDCDNVd+Gd58aw=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=MmRv28evJMFIXRjQdtHazGe3+puM5+3YvnVkl9fCoH/skTwqYCQ86cssWz3+SzaivKYcGElJhwYgM9XBfewGWXwDSbbf5wnCNfilgG3W8HgwIVomPFjg7leCuzwja53AP7K89FNPXItD6EjIsS9BRMsm2b2VPXa8qzx7eZd4tFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Co2aU8UO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CD66C433F1;
-	Mon, 12 Feb 2024 15:33:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707752000;
-	bh=GFsfkdOmJKsuZtWQAq7OhjxHg4IKHiDCDNVd+Gd58aw=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=Co2aU8UOdKL4W8SUaaEqV0BTVAuiZ9niMqI5QuXmkWRQqRD+bsuUp32djuJPfJQ7M
-	 J0AdS/WqPhUm+WDhNwj0PIl1NFZPSx4kaz74w8AVaBO2niEWSvmitVVz0AuwMwTUcd
-	 8MtOvRT2s7ojnBMUpDpCQjuzEzxH0//zOgasqtDHJDU6fjIDBJFEa6lJkzge7aVnIn
-	 65sRlXZGfvNWKRj6hhoF+/MvmClp/yoVXWTT6Lqc/PTFBqTwhuA4fpNCA+K8uTOths
-	 DH2aamg+A5g3aeMmWit1ZUc4X0oSEYy8EtlcvJyPFhdziLYkgWINAXOkx2oWF2pGNL
-	 vlKQQFPbdC2Dw==
-From: Mark Brown <broonie@kernel.org>
-To: =?utf-8?q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-Cc: kernel@pengutronix.de, Moritz Fischer <mdf@kernel.org>, 
- Wu Hao <hao.wu@intel.com>, Xu Yilun <yilun.xu@intel.com>, 
- Tom Rix <trix@redhat.com>, linux-fpga@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>, 
- Stefan Schmidt <stefan@datenfreihafen.org>, 
- Miquel Raynal <miquel.raynal@bootlin.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- linux-wpan@vger.kernel.org, netdev@vger.kernel.org, 
- Lars-Peter Clausen <lars@metafoo.de>, 
- Michael Hennerich <Michael.Hennerich@analog.com>, 
- Jonathan Cameron <jic23@kernel.org>, linux-iio@vger.kernel.org, 
- Dmitry Torokhov <dmitry.torokhov@gmail.com>, linux-input@vger.kernel.org, 
- Ulf Hansson <ulf.hansson@linaro.org>, Rayyan Ansari <rayyan@ansari.sh>, 
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
- Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
- Martin Tuma <martin.tuma@digiteqautomotive.com>, 
- Mauro Carvalho Chehab <mchehab@kernel.org>, linux-media@vger.kernel.org, 
- Sergey Kozlov <serjk@netup.ru>, Arnd Bergmann <arnd@arndb.de>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- Yang Yingliang <yangyingliang@huawei.com>, linux-mmc@vger.kernel.org, 
- Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>, 
- Rob Herring <robh@kernel.org>, Heiko Stuebner <heiko@sntech.de>, 
- Michal Simek <michal.simek@amd.com>, 
- Amit Kumar Mahapatra via Alsa-devel <alsa-devel@alsa-project.org>, 
- linux-mtd@lists.infradead.org, 
- Martin Blumenstingl <martin.blumenstingl@googlemail.com>, 
- Geert Uytterhoeven <geert+renesas@glider.be>, 
- =?utf-8?q?Pali_Roh=C3=A1r?= <pali@kernel.org>, 
- Simon Horman <horms@kernel.org>, Ronald Wahl <ronald.wahl@raritan.com>, 
- Benson Leung <bleung@chromium.org>, Tzung-Bi Shih <tzungbi@kernel.org>, 
- Guenter Roeck <groeck@chromium.org>, chrome-platform@lists.linux.dev, 
- Max Filippov <jcmvbkbc@gmail.com>, linux-spi@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, 
- Bjorn Andersson <andersson@kernel.org>, 
- Konrad Dybcio <konrad.dybcio@linaro.org>, linux-arm-msm@vger.kernel.org, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
- linux-mediatek@lists.infradead.org, Thomas Zimmermann <tzimmermann@suse.de>, 
- Javier Martinez Canillas <javierm@redhat.com>, 
- Amit Kumar Mahapatra <amit.kumar-mahapatra@amd.com>, 
- dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org, 
- linux-staging@lists.linux.dev, Viresh Kumar <vireshk@kernel.org>, 
- Rui Miguel Silva <rmfrfs@gmail.com>, Johan Hovold <johan@kernel.org>, 
- Alex Elder <elder@kernel.org>, greybus-dev@lists.linaro.org, 
- Peter Huewe <peterhuewe@gmx.de>, Jarkko Sakkinen <jarkko@kernel.org>, 
- Jason Gunthorpe <jgg@ziepe.ca>, linux-integrity@vger.kernel.org, 
- Herve Codina <herve.codina@bootlin.com>, 
- Alan Stern <stern@rowland.harvard.edu>, 
- Aaro Koskinen <aaro.koskinen@iki.fi>, 
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
- linux-usb@vger.kernel.org, Helge Deller <deller@gmx.de>, 
- Dario Binacchi <dario.binacchi@amarulasolutions.com>, 
- Kalle Valo <kvalo@kernel.org>, Dmitry Antipov <dmantipov@yandex.ru>, 
- libertas-dev@lists.infradead.org, linux-wireless@vger.kernel.org, 
- Jonathan Corbet <corbet@lwn.net>, James Clark <james.clark@arm.com>, 
- Bjorn Helgaas <bhelgaas@google.com>, linux-doc@vger.kernel.org
-In-Reply-To: <cover.1705944943.git.u.kleine-koenig@pengutronix.de>
-References: <cover.1705944943.git.u.kleine-koenig@pengutronix.de>
-Subject: Re: (subset) [PATCH v2 00/33] spi: get rid of some legacy macros
-Message-Id: <170775198078.46149.4700126128576800564.b4-ty@kernel.org>
-Date: Mon, 12 Feb 2024 15:33:00 +0000
+	s=arc-20240116; t=1707752269; c=relaxed/simple;
+	bh=pDZCdj3zfKTHocfo47Jemet0Xf+rAOXs9uZZ72GyjgA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DyRFNBbwqPJPkVllIVrcYSMXplZf2xJvfzpf1A8L2EEUm67kSyCJb+K2KIMds+ATfashRG9Bo2Q2cH/i64LbgjQsMRh0uE32vKaShG4k4+jfdSDA+4RDwSJBzz0vZKHj1CUqp3LHO/kHTkC1Ukw6VzUFBDIN8y6c4eAhxrVMJl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=Mk2oVwoI; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 2571FA048F;
+	Mon, 12 Feb 2024 16:37:43 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=mail; bh=qvMd+eWn/cHUBfh6YmtPteQfHMNXDeVZKWAv2YxLbuo=; b=
+	Mk2oVwoIjOjvujTxPaux2uYbVh2QDBF2HfS/BlOKAQ3gOCv/AVhuqIJYqDZmtu+q
+	S41jSS7OBbaGiRy3X3StnVqe13Jk0yu82I5TFU66mVVAAVtxtHP0dpBtXVkqwUuI
+	VVi3+uHaiTuciP6PIUGB88a2WNtdL3yoVhjeg2DflmgjHlQCtrERen/0So1ElbvY
+	P6TYSRYu7jzcbwgahD8huh32VdR0JFkZuwkmey5HYfyGiemkgtnsxr3R/gSk2KN6
+	HT2VaHBI6NCWtS4g9y8fa5DpDGCTb0D8pgcCGra/n6aa01POH+8Qgq28JN0Ln6f6
+	1MDrtxuzXLPfKrQu0yXaK0wMTDYoZ1DQgtjLxwVFP483gocujuvznufv0W6qaJrC
+	vFV9xVbRA2K2qJ6ZNbCh0ML0HzYl73JeLhI8IYRkwDdIiF9PRw36nHrrmF9fqUhI
+	uCerY4SZ+0kDxdq74yElKHM0/eEPzS3bOtXcmiWzU7OTUk+A2wG3D8C87pHp93u2
+	Ec5rhkQYkGdQe4czpq3cjq0zm9TZM630uCn293hx7fiqI5OsrthP55ujMBwzlMlF
+	yao10vjcU56DybbtAm4gvrYUzyRuniahcVXpBA53ssLnT3bwyViXxXGWJxLLq3Wq
+	oTbS/dK8WxSErkSnZ0iMFfJOH+FBjeGkWYTRgdiomH0=
+From: =?UTF-8?q?Cs=C3=B3k=C3=A1s=20Bence?= <csokas.bence@prolan.hu>
+To: <netdev@vger.kernel.org>
+CC: Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
+	<xiaoning.wang@nxp.com>, NXP Linux Team <linux-imx@nxp.com>, Eric Dumazet
+	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Francesco Dolcini
+	<francesco.dolcini@toradex.com>, Andrew Lunn <andrew@lunn.ch>, "Marc
+ Kleine-Budde" <mkl@pengutronix.de>, Denis Kirjanov <dkirjanov@suse.de>,
+	=?UTF-8?q?Cs=C3=B3k=C3=A1s=20Bence?= <csokas.bence@prolan.hu>
+Subject: [PATCH net-next v4 1/2] net: fec: Refactor: #define magic constants
+Date: Mon, 12 Feb 2024 16:37:17 +0100
+Message-ID: <20240212153717.10023-1-csokas.bence@prolan.hu>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.13-dev-a684c
+X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1707752262;VERSION=7967;MC=4227844205;ID=914895;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
+X-ESET-Antispam: OK
+X-EsetResult: clean, is OK
+X-EsetId: 37303A29CE703B55617C60
 
-On Mon, 22 Jan 2024 19:06:55 +0100, Uwe Kleine-König wrote:
-> this is v2 of this patch set.
-> 
-> Changes since (implicit) v1, sent with Message-Id:
-> cover.1705348269.git.u.kleine-koenig@pengutronix.de:
-> 
->  - Rebase to v6.8-rc1
->  - Fix a build failure on sh
->  - Added the tags received in (implicit) v1.
-> 
-> [...]
+Add defines for bits of ECR, RCR control registers, TX watermark etc.
 
-Applied to
+Signed-off-by: Csókás Bence <csokas.bence@prolan.hu>
+---
 
-   https://git.kernel.org/pub/scm/linux/kernel/git/broonie/spi.git for-next
+Notes:
+    Changes in v4:
+    * factored out the removal of FEC_ENET_FCE
+    
+    Changes in v3:
+    * remove `u32 ecntl` from `fec_stop()`
+    * found another ETHEREN in `fec_restart()`
 
-Thanks!
+ drivers/net/ethernet/freescale/fec_main.c | 46 +++++++++++++++--------
+ 1 file changed, 30 insertions(+), 16 deletions(-)
 
-[01/33] fpga: ice40-spi: Follow renaming of SPI "master" to "controller"
-        commit: 227ab73b89d66e3064b3c2bcb5fe382b1815763d
-[02/33] ieee802154: ca8210: Follow renaming of SPI "master" to "controller"
-        commit: 167b78446706bb4d19f7dd93ca320aed25ae1bbd
-[03/33] iio: adc: ad_sigma_delta: Follow renaming of SPI "master" to "controller"
-        commit: 2780e7b716a605781dbee753ef4983d775a65427
-[04/33] Input: pxspad - follow renaming of SPI "master" to "controller"
-        commit: a78acec53b8524593afeed7258a442adc3450818
-[05/33] Input: synaptics-rmi4 - follow renaming of SPI "master" to "controller"
-        commit: 1245633c61baf159fcc1303d7f0855f49831b9c1
-[06/33] media: mgb4: Follow renaming of SPI "master" to "controller"
-        commit: 2c2f93fbfba7186cc081e23120f169eac3b5b62a
-[07/33] media: netup_unidvb: Follow renaming of SPI "master" to "controller"
-        commit: cfa13a64bd631d8f04a1c385923706fcef9a63ed
-[08/33] media: usb/msi2500: Follow renaming of SPI "master" to "controller"
-        commit: dd868ae646d5770f80f90dc056d06eb2e6d39c62
-[09/33] media: v4l2-subdev: Follow renaming of SPI "master" to "controller"
-        commit: d920b3a672b7f79cd13b341234aebd49233f836c
-[10/33] misc: gehc-achc: Follow renaming of SPI "master" to "controller"
-        commit: 26dcf09ee5d9ceba2c627ae3ba174a229f25638f
-[11/33] mmc: mmc_spi: Follow renaming of SPI "master" to "controller"
-        commit: b0a6776e53403aa380411f2a43cdefb9f00ff50a
-[12/33] mtd: dataflash: Follow renaming of SPI "master" to "controller"
-        commit: 44ee998db9eef84bf005c39486566a67cb018354
-[14/33] net: ks8851: Follow renaming of SPI "master" to "controller"
-        commit: 1cc711a72ae7fd44e90839f0c8d3226664de55a2
-[15/33] net: vertexcom: mse102x: Follow renaming of SPI "master" to "controller"
-        commit: 7969b98b80c0332f940c547f84650a20aab33841
-[16/33] platform/chrome: cros_ec_spi: Follow renaming of SPI "master" to "controller"
-        commit: 85ad0ec049a771c4910c8aebb2d0bd9ce9311fd9
-[17/33] spi: bitbang: Follow renaming of SPI "master" to "controller"
-        commit: 2259233110d90059187c5ba75537eb93eba8417b
-[18/33] spi: cadence-quadspi: Don't emit error message on allocation error
-        commit: e71011dacc3413bed4118d2c42f10736ffcd762c
-[19/33] spi: cadence-quadspi: Follow renaming of SPI "master" to "controller"
-        commit: 28e59d8bf1ace0ddf05f989a48d6824d75731267
-[20/33] spi: cavium: Follow renaming of SPI "master" to "controller"
-        commit: 1747fbdedba8b6b3fd459895ed5d57e534549884
-[21/33] spi: geni-qcom: Follow renaming of SPI "master" to "controller"
-        commit: 14cea92338a0776c1615994150e738ac0f5fbb2c
-[22/33] spi: loopback-test: Follow renaming of SPI "master" to "controller"
-        commit: 2c2310c17fac13aa7e78756d7f3780c7891f9397
-[23/33] spi: slave-mt27xx: Follow renaming of SPI "master" to "controller"
-        commit: 8197b136bbbe64a7cab1020a4b067020e5977d98
-[24/33] spi: spidev: Follow renaming of SPI "master" to "controller"
-        commit: d934cd6f0e5d0052772612db4b07df60cb9da387
-[25/33] staging: fbtft: Follow renaming of SPI "master" to "controller"
-        commit: bbd25d7260eeeaef89f7371cbadcd33dd7f7bff9
-[26/33] staging: greybus: spi: Follow renaming of SPI "master" to "controller"
-        commit: ee3c668dda3d2783b0fff4091461356fe000e4d8
-[27/33] tpm_tis_spi: Follow renaming of SPI "master" to "controller"
-        commit: b6af14eacc8814b0986e20507df423cebe9fd859
-[28/33] usb: gadget: max3420_udc: Follow renaming of SPI "master" to "controller"
-        commit: 8c716f4a3d4fcbec976247e3443d36cbc24c0512
-[29/33] video: fbdev: mmp: Follow renaming of SPI "master" to "controller"
-        commit: b23031e730e72ec9067b7c38c25e776c5e27e116
-[30/33] wifi: libertas: Follow renaming of SPI "master" to "controller"
-        commit: 30060d57cee194d6b70283f2faf787e2fdc61b6e
-[31/33] spi: fsl-lib: Follow renaming of SPI "master" to "controller"
-        commit: 801185efa2402dce57828930e9684884fc8d62da
-[32/33] spi: Drop compat layer from renaming "master" to "controller"
-        commit: 620d269f29a569ba37419cc03cf1da2d55f6252a
-[33/33] Documentation: spi: Update documentation for renaming "master" to "controller"
-        commit: 76b31eb4c2da3ddb3195cc14f6aad24908adf524
+diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+index 63707e065141..52c674ecbebf 100644
+--- a/drivers/net/ethernet/freescale/fec_main.c
++++ b/drivers/net/ethernet/freescale/fec_main.c
+@@ -240,8 +240,8 @@ MODULE_PARM_DESC(macaddr, "FEC Ethernet MAC address");
+ #define PKT_MINBUF_SIZE		64
+ 
+ /* FEC receive acceleration */
+-#define FEC_RACC_IPDIS		(1 << 1)
+-#define FEC_RACC_PRODIS		(1 << 2)
++#define FEC_RACC_IPDIS		BIT(1)
++#define FEC_RACC_PRODIS		BIT(2)
+ #define FEC_RACC_SHIFT16	BIT(7)
+ #define FEC_RACC_OPTIONS	(FEC_RACC_IPDIS | FEC_RACC_PRODIS)
+ 
+@@ -273,8 +273,23 @@ MODULE_PARM_DESC(macaddr, "FEC Ethernet MAC address");
+ #define FEC_MMFR_TA		(2 << 16)
+ #define FEC_MMFR_DATA(v)	(v & 0xffff)
+ /* FEC ECR bits definition */
+-#define FEC_ECR_MAGICEN		(1 << 2)
+-#define FEC_ECR_SLEEP		(1 << 3)
++#define FEC_ECR_RESET           BIT(0)
++#define FEC_ECR_ETHEREN         BIT(1)
++#define FEC_ECR_MAGICEN         BIT(2)
++#define FEC_ECR_SLEEP           BIT(3)
++#define FEC_ECR_EN1588          BIT(4)
++#define FEC_ECR_BYTESWP         BIT(8)
++/* FEC RCR bits definition */
++#define FEC_RCR_LOOP            BIT(0)
++#define FEC_RCR_HALFDPX         BIT(1)
++#define FEC_RCR_MII             BIT(2)
++#define FEC_RCR_PROMISC         BIT(3)
++#define FEC_RCR_BC_REJ          BIT(4)
++#define FEC_RCR_FLOWCTL         BIT(5)
++#define FEC_RCR_RMII            BIT(8)
++#define FEC_RCR_10BASET         BIT(9)
++/* TX WMARK bits */
++#define FEC_TXWMRK_STRFWD       BIT(8)
+ 
+ #define FEC_MII_TIMEOUT		30000 /* us */
+ 
+@@ -1062,7 +1077,7 @@ fec_restart(struct net_device *ndev)
+ 	struct fec_enet_private *fep = netdev_priv(ndev);
+ 	u32 temp_mac[2];
+ 	u32 rcntl = OPT_FRAME_SIZE | 0x04;
+-	u32 ecntl = 0x2; /* ETHEREN */
++	u32 ecntl = FEC_ECR_ETHEREN;
+ 
+ 	/* Whack a reset.  We should wait for this.
+ 	 * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
+@@ -1137,18 +1152,18 @@ fec_restart(struct net_device *ndev)
+ 		    fep->phy_interface == PHY_INTERFACE_MODE_RGMII_TXID)
+ 			rcntl |= (1 << 6);
+ 		else if (fep->phy_interface == PHY_INTERFACE_MODE_RMII)
+-			rcntl |= (1 << 8);
++			rcntl |= FEC_RCR_RMII;
+ 		else
+-			rcntl &= ~(1 << 8);
++			rcntl &= ~FEC_RCR_RMII;
+ 
+ 		/* 1G, 100M or 10M */
+ 		if (ndev->phydev) {
+ 			if (ndev->phydev->speed == SPEED_1000)
+ 				ecntl |= (1 << 5);
+ 			else if (ndev->phydev->speed == SPEED_100)
+-				rcntl &= ~(1 << 9);
++				rcntl &= ~FEC_RCR_10BASET;
+ 			else
+-				rcntl |= (1 << 9);
++				rcntl |= FEC_RCR_10BASET;
+ 		}
+ 	} else {
+ #ifdef FEC_MIIGSK_ENR
+@@ -1207,13 +1222,13 @@ fec_restart(struct net_device *ndev)
+ 
+ 	if (fep->quirks & FEC_QUIRK_ENET_MAC) {
+ 		/* enable ENET endian swap */
+-		ecntl |= (1 << 8);
++		ecntl |= FEC_ECR_BYTESWP;
+ 		/* enable ENET store and forward mode */
+-		writel(1 << 8, fep->hwp + FEC_X_WMRK);
++		writel(FEC_TXWMRK_STRFWD, fep->hwp + FEC_X_WMRK);
+ 	}
+ 
+ 	if (fep->bufdesc_ex)
+-		ecntl |= (1 << 4);
++		ecntl |= FEC_ECR_EN1588;
+ 
+ 	if (fep->quirks & FEC_QUIRK_DELAYED_CLKS_SUPPORT &&
+ 	    fep->rgmii_txc_dly)
+@@ -1312,7 +1327,7 @@ static void
+ fec_stop(struct net_device *ndev)
+ {
+ 	struct fec_enet_private *fep = netdev_priv(ndev);
+-	u32 rmii_mode = readl(fep->hwp + FEC_R_CNTRL) & (1 << 8);
++	u32 rmii_mode = readl(fep->hwp + FEC_R_CNTRL) & FEC_RCR_RMII;
+ 	u32 val;
+ 
+ 	/* We cannot expect a graceful transmit stop without link !!! */
+@@ -1331,7 +1346,7 @@ fec_stop(struct net_device *ndev)
+ 		if (fep->quirks & FEC_QUIRK_HAS_MULTI_QUEUES) {
+ 			writel(0, fep->hwp + FEC_ECNTRL);
+ 		} else {
+-			writel(1, fep->hwp + FEC_ECNTRL);
++			writel(FEC_ECR_RESET, fep->hwp + FEC_ECNTRL);
+ 			udelay(10);
+ 		}
+ 	} else {
+@@ -1345,12 +1360,11 @@ fec_stop(struct net_device *ndev)
+ 	/* We have to keep ENET enabled to have MII interrupt stay working */
+ 	if (fep->quirks & FEC_QUIRK_ENET_MAC &&
+ 		!(fep->wol_flag & FEC_WOL_FLAG_SLEEP_ON)) {
+-		writel(2, fep->hwp + FEC_ECNTRL);
++		writel(FEC_ECR_ETHEREN, fep->hwp + FEC_ECNTRL);
+ 		writel(rmii_mode, fep->hwp + FEC_R_CNTRL);
+ 	}
+ }
+ 
+-
+ static void
+ fec_timeout(struct net_device *ndev, unsigned int txqueue)
+ {
+-- 
+2.25.1
 
-All being well this means that it will be integrated into the linux-next
-tree (usually sometime in the next 24 hours) and sent to Linus during
-the next merge window (or sooner if it is a bug fix), however if
-problems are discovered then the patch may be dropped or reverted.
-
-You may get further e-mails resulting from automated or manual testing
-and review of the tree, please engage with people reporting problems and
-send followup patches addressing any issues that are reported if needed.
-
-If any updates are required or you are submitting further changes they
-should be sent as incremental updates against current git, existing
-patches will not be replaced.
-
-Please add any relevant lists and maintainers to the CCs when replying
-to this mail.
-
-Thanks,
-Mark
 
 
