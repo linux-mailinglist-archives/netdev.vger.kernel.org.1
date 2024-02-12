@@ -1,104 +1,169 @@
-Return-Path: <netdev+bounces-71097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F1618521C2
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 23:50:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9EA585222F
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 00:01:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBA501F22EDA
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 22:50:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 50DA1B23A10
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 23:01:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C90BE4E1D2;
-	Mon, 12 Feb 2024 22:50:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13F294EB49;
+	Mon, 12 Feb 2024 23:01:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZOzWMZ22"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="4QVWVS5P";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="lDBRH2wk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 313794E1B5
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 22:50:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F00854EB32;
+	Mon, 12 Feb 2024 23:01:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707778216; cv=none; b=Y34xAYUUSy0FuzrPuUHL+xlt4W8+9c3q2KqPMLVQg5mEEDO8fYBhx6rst2csufVpadDDDX8PMqvOZj+YCYDRmcYyLj4aajAUpw7ylZns9m2NmX9yddsBuJoyLpf1IbEUO9u+YShNvhjmFWY60PFTKtB+t3PpBbP9ZHUtDF5kdps=
+	t=1707778868; cv=none; b=o6PJA588msDg6OI6Ara6sSvE468agwlocmzgr+VpcDzKcLTdBnNOdutriewrwP1LI0JU5LkVs132896hzQhg7iPgCOXxn/VcuaxKQIxgLb6Ggijs7A+IcgDIBAcTWZeLd4DXLVICw+EBA5u+1Zv/4ynr1wwdFJTpaEr9QxLUh2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707778216; c=relaxed/simple;
-	bh=qD8UKLBdZY2kK0F8HUsRnxW+15Z0FwvLOlUar5mXRSo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OavV80byx5Zh8siLL1leWHoRWjnkHRXKVzp9UwADAIK5S8Ualhy6SXNeHzIO+38HvZ3LCVH/7zujvwshBf7Jofwo+XEHVgBfzsuwTwce5IrewG0Y4rK0S2RvsnWOCjbmtrNKn2p2C8gUqdt0NCiunFJNAqZkGe5CoNMQDPQYX4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ZOzWMZ22; arc=none smtp.client-ip=209.85.219.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-dc6d9a8815fso3827075276.3
-        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 14:50:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1707778214; x=1708383014; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qD8UKLBdZY2kK0F8HUsRnxW+15Z0FwvLOlUar5mXRSo=;
-        b=ZOzWMZ224jishYKS0prK36mcZ+2pecA70S/XipHt2/d84xF79wlTXwY9wIJRyBQbbA
-         FJPYFjFKEaOdmV0qinyO2eMCifd7bO1fhM1Rt1dUZZEoZO5KxEeIViX+tRxFCNrz8wev
-         71WNSRWmKRSF9tix7eod0AouRxRf5A4CewjrS6cASro+EqmIIIbitF3CsSyR7iCmnksS
-         mZGK+TvGx3KtJBrLKZp7x/5z5SiqfbxskRL+ZxvGWT8uaXiv/vNU5zO7OxStKQV02i6+
-         vGLnAf8gpGHhbW3dabQLW/61XILr86w+NzOlwQ3R9HG6OD0vGhXdTb1JccKu2Kz3mFbY
-         7hsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707778214; x=1708383014;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qD8UKLBdZY2kK0F8HUsRnxW+15Z0FwvLOlUar5mXRSo=;
-        b=GFIalue1Vx5Cx7uWf7izVEU4RAoTND4U6VYcAfF5pHqb5t12SgFUvDwjqczcaQFsMV
-         W7B0Yij0qoy3F7MNR0wpKd3vRPwnAu/TBgjgzbCCuRNSSvPXhtVPk+MQEUknIRHq7gSG
-         U8njUUGzoN5uNIAStIqLBk1OmLN9s/1cobE5+AOdywycs7SjQOHuqk1R97hcBjAI1bEB
-         NAUFCQ9jzla0Z5bOsS8xTCyX8AUwdQUlrkauhagH3zxGiM8yvQgTHBwuS8AKjuFJQP8L
-         B5GxmZbk3Y//mpXpuolLc9rJw7E/zUtLMgmDlXEJBEJyGu1LFOVzZ9x/0oAosVGglI4/
-         Kb5A==
-X-Forwarded-Encrypted: i=1; AJvYcCXcO+tw2L5x+2SBJ7r/+b9E53/8IqI0PraI3UjuZ2VGNdq+9qJzPTVa9o7QqOwm3hVYIoI6OW2NkEpdb9PPG0Xy1c9M3hB8
-X-Gm-Message-State: AOJu0Yw32nhiiKyrwOKzNTvo/xqSIIkWJ9w/cQwc0yVNqS3wUtgEKW6L
-	aMwmmBJsLQrX646vyV0vO2dEd90wKuvKOUvDvrrIrk3bY8U9y7QJD47PY0VjDpOHJisEwDCQF7c
-	A8MkWOD/CQpzTM1+YYt+wyrj5N2hUCOMeAzelCA==
-X-Google-Smtp-Source: AGHT+IEdOLxPuhsAdrfItDyVRXigbzOFJkr6GtqwjG5kU8LZoYijo+TvjkKpY/ldTPbLMloC6vQ21/brrZj250gV9S4=
-X-Received: by 2002:a25:2688:0:b0:dcc:275e:7323 with SMTP id
- m130-20020a252688000000b00dcc275e7323mr1013341ybm.18.1707778214130; Mon, 12
- Feb 2024 14:50:14 -0800 (PST)
+	s=arc-20240116; t=1707778868; c=relaxed/simple;
+	bh=dz7Bo1p6nMIUN4HZJcwpOyE8WVu5se81Ug/mMhzK6uE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Pun6XKd8c4auOGiDLrse2MrM/Aet2P1MlkYKst7cnlqEnPbFpgA7fjTVrNHwDioDmINKC4cHFwJX3rRYgpC2+HI0XgeyvU5PqWrC9KMGr+47lXrDTN+KlrqruKN7RLwq4/A7s3cZdV16HRpyV5LcIgXGOL1GKM8v3IMNKebLpJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=4QVWVS5P; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=lDBRH2wk; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1707778863;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cJvi9CRczxtyvt+qDDAp8M1Cn+0bYcrQ7i1j7oLPeQ0=;
+	b=4QVWVS5P8I5fXGOVrY9yhMPnb2fr6bh5DstEwe9iyViUGasAAce0JhykHVrbma4jNBnd4Y
+	bJlwmkgZe1xx716rstpRBKVrqHN/THOe88UDz5+ffgYp4IH4rK8tfkb77ht+0E5QwPwMUW
+	WvvHYKa3dwoVgL4NvSbZkVOKuVKvDTN078CIHboWrZCFTNkYTuNe1plQ3/MK0URLcf6UL5
+	cJKUpVf6phI5gSlUkz5bez5sSyyf1pBVZGicPVXiup2weX1N5hu8bK+PngRyOPbYT0PhjM
+	zSxQ8bcSsh2pLO4nNovEs6pAdIZ8lh6aJpLK2kqSIIUTNiA46zrnwItg4/CTqw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1707778863;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cJvi9CRczxtyvt+qDDAp8M1Cn+0bYcrQ7i1j7oLPeQ0=;
+	b=lDBRH2wkcBL4ybc1JUik/fBkcxnxlfhNUH8/+IaAX1ZpWWS2Aj2u1jJ/vRqlhL2Olqe4/m
+	kSBbaC99OGfImqCQ==
+To: syzbot <syzbot+039399a9b96297ddedca@syzkaller.appspotmail.com>,
+ linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
+Subject: Re: [syzbot] [kernel?] BUG: unable to handle kernel NULL pointer
+ dereference in hrtimer_active
+In-Reply-To: <00000000000014671906112cb2ef@google.com>
+References: <00000000000014671906112cb2ef@google.com>
+Date: Tue, 13 Feb 2024 00:01:03 +0100
+Message-ID: <875xytjnio.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240212-realtek-fix_ext0-v1-1-f3d2536d191a@gmail.com>
-In-Reply-To: <20240212-realtek-fix_ext0-v1-1-f3d2536d191a@gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Mon, 12 Feb 2024 23:50:02 +0100
-Message-ID: <CACRpkdakahhg9AZRfGeM_FNwjgyXBAKuEEqsYOxqerR=OFpLbA@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: dsa: realtek: fix digital interface select
- macro for EXT0
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Mon, Feb 12, 2024 at 10:34=E2=80=AFPM Luiz Angelo Daros de Luca
-<luizluca@gmail.com> wrote:
 
-> While no supported devices currently utilize EXT0, the register reserves
-> the bits for an EXT0. EXT0 is utilized by devices from the generation
-> prior to rtl8365mb, such as those supported by the driver library
-> rtl8367b.
+Cc: +netdev
+
+On Mon, Feb 12 2024 at 02:25, syzbot wrote:
+> HEAD commit:    4a7bbe7519b6 Merge tag 'scsi-fixes' of git://git.kernel.or..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=10476de0180000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=264238120cdb2bda
+> dashboard link: https://syzkaller.appspot.com/bug?extid=039399a9b96297ddedca
+> compiler:       aarch64-linux-gnu-gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> userspace arch: arm64
 >
-> Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+> Unfortunately, I don't have any reproducer for this issue yet.
+>
+> Downloadable assets:
+> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/384ffdcca292/non_bootable_disk-4a7bbe75.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/ee3f97d1ed38/vmlinux-4a7bbe75.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/eb6f9f8f9f37/Image-4a7bbe75.gz.xz
+>
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+039399a9b96297ddedca@syzkaller.appspotmail.com
+>
+> infiniband syz0: set active
+> Unable to handle kernel NULL pointer dereference at virtual address 0000000000000010
+> CPU: 1 PID: 3665 Comm: syz-executor.0 Not tainted 6.8.0-rc3-syzkaller-00279-g4a7bbe7519b6 #0
+> pc : __seqprop_raw_spinlock_sequence include/linux/seqlock.h:226 [inline]
 
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+That's:
 
-Yours,
-Linus Walleij
+        seq = raw_read_seqcount_begin(&base->seq);
+
+where base == NULL. That can only happen when hrtimer_cancel() is
+invoked with a non-initialized timer.
+
+> pc : hrtimer_active+0x4/0x60 kernel/time/hrtimer.c:1614
+> lr : hrtimer_try_to_cancel+0x1c/0xf8 kernel/time/hrtimer.c:1331
+> sp : ffff800082c63300
+> x29: ffff800082c63300 x28: 0000000000000000 x27: 0000000000000000
+> x26: 0000000000000340 x25: 0000000000000000 x24: f3ff00001ab7e9e0
+> x23: 0000000000000000 x22: 000061100fc019e9 x21: 0000000000000009
+> x20: 0000000000000000 x19: fbff00001abf9920 x18: 0000000000000000
+> x17: 0000000000000000 x16: 0000000000000000 x15: ffff80008144d28c
+> x14: ffff80008144d20c x13: ffff80008144d28c x12: ffff80008144d20c
+> x11: ffff800080011558 x10: ffff800081907d14 x9 : ffff8000819078a4
+> x8 : ffff800082c63408 x7 : 0000000000000000 x6 : ffff800080026d20
+> x5 : f2ff000033f2c800 x4 : 000061100fc019e9 x3 : 0000000000000340
+> x2 : 0000000000000000 x1 : 000000000000000d x0 : fbff00001abf9920
+> Call trace:
+>  hrtimer_active+0x4/0x60 kernel/time/hrtimer.c:1613
+>  hrtimer_cancel+0x1c/0x38 kernel/time/hrtimer.c:1446
+>  napi_disable+0x5c/0x11c net/core/dev.c:6502
+>  veth_napi_del_range+0x64/0x1d8 drivers/net/veth.c:1109
+>  veth_napi_del drivers/net/veth.c:1129 [inline]
+>  veth_set_features+0x68/0x98 drivers/net/veth.c:1580
+>  __netdev_update_features+0x200/0x6ec net/core/dev.c:9872
+>  netdev_update_features+0x28/0x6c net/core/dev.c:9946
+>  veth_xdp_set drivers/net/veth.c:1681 [inline]
+>  veth_xdp+0x108/0x224 drivers/net/veth.c:1694
+>  dev_xdp_install+0x64/0xf8 net/core/dev.c:9243
+>  dev_xdp_attach+0x250/0x52c net/core/dev.c:9395
+>  dev_change_xdp_fd+0x16c/0x218 net/core/dev.c:9643
+>  do_setlink+0xdd0/0xf14 net/core/rtnetlink.c:3132
+>  rtnl_group_changelink net/core/rtnetlink.c:3452 [inline]
+>  __rtnl_newlink+0x460/0x898 net/core/rtnetlink.c:3711
+>  rtnl_newlink+0x50/0x7c net/core/rtnetlink.c:3748
+>  rtnetlink_rcv_msg+0x12c/0x380 net/core/rtnetlink.c:6615
+>  netlink_rcv_skb+0x5c/0x128 net/netlink/af_netlink.c:2543
+>  rtnetlink_rcv+0x18/0x24 net/core/rtnetlink.c:6633
+>  netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
+>  netlink_unicast+0x2f4/0x360 net/netlink/af_netlink.c:1367
+>  netlink_sendmsg+0x1a4/0x3e8 net/netlink/af_netlink.c:1908
+>  sock_sendmsg_nosec net/socket.c:730 [inline]
+>  __sock_sendmsg+0x54/0x60 net/socket.c:745
+>  ____sys_sendmsg+0x274/0x2ac net/socket.c:2584
+>  ___sys_sendmsg+0xac/0x100 net/socket.c:2638
+>  __sys_sendmsg+0x84/0xe0 net/socket.c:2667
+>  __do_sys_sendmsg net/socket.c:2676 [inline]
+>  __se_sys_sendmsg net/socket.c:2674 [inline]
+>  __arm64_sys_sendmsg+0x24/0x30 net/socket.c:2674
+
+So something in that syzbot test case manages to tear down a napi
+context which has not yet been fully initialized. While the rest of
+napi_disable() does not care much as long as neither NAPIF_STATE_SCHED
+nor NAPIF_STATE_NPSVC are set in napi->state, hrtimer_cancel() pretty
+much cares as demonstrated by the NULL pointer dereference.
+
+While it would be trivial to harden the hrtimer code for the case that a
+non-initialized hrtimer is canceled, I wonder whether this invocation of
+napi_disable() is harmless (aside of the hrtimer issue) or if there are
+some hidden subtle issues with that.
+
+Thanks,
+
+        tglx
+
+
 
