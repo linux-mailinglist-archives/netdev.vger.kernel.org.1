@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-71028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD568851B27
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 18:20:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C54EA851B88
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 18:32:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93FCB28BCE1
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 17:20:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3D51AB27E6F
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 17:32:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4439E3D579;
-	Mon, 12 Feb 2024 17:20:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FBDF3EA9F;
+	Mon, 12 Feb 2024 17:32:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="PF5f5+L7"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="TITkb7te"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2E493D3A5
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 17:20:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD863EA95
+	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 17:32:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707758407; cv=none; b=WjiUBVcwj7b/zRyUzsFOUSuTMqo6VfhtqBARVR3nM8GUYQpnrJ+5ncn/6Flm+zOGPZNHXe4y78KJ9sPfy2BN6SEjS/d8nLtvPanY7R1Mf+WF8eQXb7YEjpWELzwS08ro7klARlQcf1eYKJTk7+VBLXk18EBLpOnLYBdGkqit/7o=
+	t=1707759145; cv=none; b=W+eAdERTlR3fS8U0vGgJCIFtn1hW+wTIIXgoA5dUm7QhqgytSNt7gXR5vMPs5A9ooY2WXG/NLqsBAkIothk71a3nKJLb4KyQ+QOXhgaZtgdXv+T07+Qa/GaeFR3okRG7rjmONQwEIZk0Ts+277STK56ktRhZxvZnm4APDWRzduI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707758407; c=relaxed/simple;
-	bh=YdFt098wQSPGsFJktXbjbFUsM0swVB6ZC6nPxBUXtQE=;
+	s=arc-20240116; t=1707759145; c=relaxed/simple;
+	bh=uC1Wk7zPEs8uSKgL9/qfr2eyzXa6G4WpZGXH7cAQ2hI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=osaRuawSYv5rPIZ9T2htb4MhaBVZGp5AxAstUwcq3nWbIrIxBiRA+/D382zEZu3BKvyVu00V00YevAMNu2qbxZiczsY6rVvNUwLkcngaPxxXfszeBvgiN0kjW1KXogUhj8JhGw5RRtBL+iMsRMqC4S4Ufj6fh7qO4I+kaLG0WdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=PF5f5+L7; arc=none smtp.client-ip=209.85.210.177
+	 In-Reply-To:Content-Type; b=kXWB0knSgwaN+d8ziygAioDQavFPiMNg+bLcxWWqeCzoHx9kMZKlKiISJT57TUFxhuZQIJ3dDCeQUSl9QnLUiENZshlT6koHfmlUuAXLVnRs1s+wcAfed7knN8lxKzoQmanLwHPbzZnguhvImpsS+7bKjQ9avoln+StkgKo831U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=TITkb7te; arc=none smtp.client-ip=209.85.210.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-6e09493eb8eso1982374b3a.1
-        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 09:20:05 -0800 (PST)
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-6e0cd3bed29so616969b3a.1
+        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 09:32:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1707758405; x=1708363205; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1707759143; x=1708363943; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=JLh4tao3b4DJbo6bEnHxRXsOhivCEXqCBRXWYjsWl0g=;
-        b=PF5f5+L7ZKdzGB8LAkPk9guiDqUHS4mHcvLg3bqWDIC11o6d4csNRFez3uJQaEsf86
-         Tn3cPz3NKCoFCPpm9HvnLUemIdUaxm4XLSsdbOQyt3dDVyOWQKu24VXN3vs4h7cFaD0T
-         BaJLQV9vuuxgrmRlyBzicnlKw6j9t53gQZLhfUjoSrD9P8cymbmuOQtbN4TItb/HTKn/
-         mR5kthT2gNYBtaJ82KFJtq7QGUSKy21Z96O9TXo9+Zcl0cM5SAeFLp3itS2j3e8zLZuS
-         r2Ac7uGK62CzNGZq9a//qUC1utoGVd+OmLqK2iuAE1v4pgisD8paf5Y69M/qQjtzeQw5
-         NMFw==
+        bh=yv/6NJh1caKiW/cVBuDbEA0Hf25xWRQn1JJpEjjEvFA=;
+        b=TITkb7tegnB91EjMPmwbFpxMe7tepC5ZFFjshF54Q5mSmFm+tPhOaw6QBh0nhCisPT
+         1PX0/idDAYPFWaxvEOfAUHMmVrYgav19/Vdl+iVfAiPYaVROd47tn8WJzvPDreSP0W+e
+         NkdBcCKr7HU1naiPAO8/lzsrl/2BIBJ+bxPu88a3+193SyVfsp5mUSVvph8YAJJgV9pH
+         SGAdpFVtu3P05pD7J8ApOjY7as70ptzx5HJLoRUOEaKJIvRgAAHP1RKVQ7WJqhdGsWeQ
+         rRAy07veY9NHsEO6goqzoAGPu3m82laZsP5qbz0BzQ0E0ao4mXMb1il+uqlhoevqpqtN
+         Ww2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707758405; x=1708363205;
+        d=1e100.net; s=20230601; t=1707759143; x=1708363943;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JLh4tao3b4DJbo6bEnHxRXsOhivCEXqCBRXWYjsWl0g=;
-        b=bHvoSFXoAoWVmFXX6/LmaktlAsTKzKKhDoAHB3gfKtrZjdM12e5/yKOEG601V0rNBo
-         axif0R3BVQtsrdX7Cbm9suGb75sVSKgRAId2o16VdNYqOHJwhHXnbYsXw77VllvRClfa
-         LykJVKhIPBuPywVxE/gwDSqiimosQE7zIYlnrdNtlv+//PRsQvfDWAin+d4exmJPnDr3
-         345it94kTGpVxYEnMPhbZr63JV8TYXzRPkNT7LnNDUy3Ofbz+MhPdp23ukEQnDRHM6By
-         T499YLJGEVPGtqTRGmMvoedCjDPW/PMZ2e89cCWVr5oBQYE26rmpPhi2le6HoAoNHzlb
-         ZqmA==
-X-Gm-Message-State: AOJu0YzxBtou2XmFf/FJu7hgui1xg3oUyRar+RSa3eP8E5x18gkgu99F
-	B9fgGlc1iWPoyhztJb514iTohy4Rge4khL29GQ7woUySs7tcZzf54aBuDiwcgzE=
-X-Google-Smtp-Source: AGHT+IFopOOrVArfZbGSjD5LXE03huErax7BrFeC5z7KaSpE5DPu8ZS5vL5lnXX702s7kbMPze8hxQ==
-X-Received: by 2002:a05:6a20:94c9:b0:19e:cbe9:63b with SMTP id ht9-20020a056a2094c900b0019ecbe9063bmr169116pzb.3.1707758405017;
-        Mon, 12 Feb 2024 09:20:05 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWLFnMYOG9PaTEfbCro0JWCt8gZpF1YVqj79lXPa3E59TDQY5n5WW/uvzpAbhvZuMLqYQH9KEcgaEDa/fwnvwbvQrrghDwEtiPtOmiHDAnpWW1ck347KioHpVtKf96r1LfO3ByADp1lc5B9mifWPsJpUcfcTlkJ7KnqaUNqvGQuHPUv6Ti7Iq8TyvzeYRgsAmEbeTUtzuST4dfce6Yxb8vGLgiVaFE=
+        bh=yv/6NJh1caKiW/cVBuDbEA0Hf25xWRQn1JJpEjjEvFA=;
+        b=WpdkfCtlwMTHEygBDsI8BVwojsfBK72BlY2H8uDth2W3msXs/5sWo6HPQ71DsshkqC
+         h9u8XnFWcXr4crPz9hzDW+Ebk9sL+YsiJnDkdICyE3mbPKOd0hu3kIr+GKJ6CGqgal4L
+         lSWmL7POZFIoJAZH4YSof8K1RV55ICJ4M/K6rPD5dY9EEoxCmEGjtGAXb3mzW/SvGl/A
+         hPdQCwz74gUzfletgUWmnVlkiITAc4tGJLxsarfPKXudSj6x3NHXS3HYojv0tOZVfSFw
+         NOUDojVGWrJseM79bkSrfqGVrCg2IyjrkK6n9L1+sr33Qyxh9izYJtAdE3va4sNHbwXq
+         hnDQ==
+X-Gm-Message-State: AOJu0YxYy3qjGmGJ1DVjoY5YaD/DW+ONbYjU0F76PrJE03cRnMA1FADp
+	Z7KimaAwG1VSXxnOh6+2KBSvV7TaE07nr39sSCSVCMyyB4UTQPidIQCk7xx3d8E=
+X-Google-Smtp-Source: AGHT+IFc1kNRbUZnjT5DpnOe4WfeZGpcfqHJbMcjc4swbWn196+G2LPNqhEO5/KCG5h0gD50P2b3dg==
+X-Received: by 2002:a05:6a00:390c:b0:6e0:a30c:8c84 with SMTP id fh12-20020a056a00390c00b006e0a30c8c84mr6892728pfb.1.1707759142746;
+        Mon, 12 Feb 2024 09:32:22 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWkkStfeL3gSHtgoo6bptutK7slBG9wDf9aOsQv6Kz87QyoJpceOJtQr0f29eNittIFKtIiJi1fnjqLv+x0AH7hW0F0ggPtoFgaOrQZ7j70eAfzZbeNRZPk7KhURIQkDL3Ty7rXhn/6GPgR9B9UlSvY69206Ojzbd2T/PQMWneSA3V4aZUtlTXSu48fFRV71T02JNUrZV2nr+zgnWugQTiFkJv7rH8=
 Received: from ?IPV6:2a03:83e0:1256:2:c51:2090:e106:83fa? ([2620:10d:c090:500::6:ad38])
-        by smtp.gmail.com with ESMTPSA id t16-20020a056a00139000b006e096708e96sm6008549pfg.97.2024.02.12.09.20.03
+        by smtp.gmail.com with ESMTPSA id s67-20020a625e46000000b006dda103efe6sm3048403pfb.167.2024.02.12.09.32.21
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Feb 2024 09:20:04 -0800 (PST)
-Message-ID: <16d46687-999c-4e46-9a76-9895779018c6@davidwei.uk>
-Date: Mon, 12 Feb 2024 09:20:03 -0800
+        Mon, 12 Feb 2024 09:32:22 -0800 (PST)
+Message-ID: <5d23bdfe-df0f-4048-b2d1-c0e025fd3efd@davidwei.uk>
+Date: Mon, 12 Feb 2024 09:32:20 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,8 +76,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 3/3] netdevsim: add selftest for forwarding
- skb between connected ports
+Subject: Re: [PATCH net-next v9 2/3] netdevsim: forward skbs from one
+ connected port to another
 Content-Language: en-GB
 To: Maciek Machnikowski <maciek@machnikowski.net>,
  Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
@@ -85,90 +85,134 @@ To: Maciek Machnikowski <maciek@machnikowski.net>,
 Cc: "David S. Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
 References: <20240210003240.847392-1-dw@davidwei.uk>
- <20240210003240.847392-4-dw@davidwei.uk>
- <01747e34-c655-4dbf-bda9-544f4e3f8ebd@machnikowski.net>
- <b3fc2f7f-4bd4-4b87-a55b-4dd7d6072ee9@machnikowski.net>
+ <20240210003240.847392-3-dw@davidwei.uk>
+ <420b3c0a-6321-494b-9181-ff7dd4e1849c@machnikowski.net>
 From: David Wei <dw@davidwei.uk>
-In-Reply-To: <b3fc2f7f-4bd4-4b87-a55b-4dd7d6072ee9@machnikowski.net>
+In-Reply-To: <420b3c0a-6321-494b-9181-ff7dd4e1849c@machnikowski.net>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 2024-02-10 10:53, Maciek Machnikowski wrote:
+On 2024-02-10 13:43, Maciek Machnikowski wrote:
 > 
 > 
-> On 10/02/2024 09:48, Maciek Machnikowski wrote:
+> On 10/02/2024 01:32, David Wei wrote:
+>> Forward skbs sent from one netdevsim port to its connected netdevsim
+>> port using dev_forward_skb, in a spirit similar to veth.
 >>
->> On 10/02/2024 01:32, David Wei wrote:
->>> +###
->>> +### Code start
->>> +###
->>> +
->>> +modprobe netdevsim
->>> +
->>> +# linking
->>> +
->>> +echo $NSIM_DEV_1_ID > $NSIM_DEV_SYS_NEW
->>> +echo $NSIM_DEV_2_ID > $NSIM_DEV_SYS_NEW
->>> +
->>> +setup_ns
->>> +
->>> +NSIM_DEV_1_FD=$((RANDOM % 1024))
->>> +exec {NSIM_DEV_1_FD}</var/run/netns/nssv
->>> +NSIM_DEV_1_IFIDX=$(ip netns exec nssv cat /sys/class/net/$NSIM_DEV_1_NAME/ifindex)
->>> +
->>> +NSIM_DEV_2_FD=$((RANDOM % 1024))
->>> +exec {NSIM_DEV_2_FD}</var/run/netns/nscl
->>> +NSIM_DEV_2_IFIDX=$(ip netns exec nscl cat /sys/class/net/$NSIM_DEV_2_NAME/ifindex)
-> Can we change these to:
-> NSIM_DEV_1_FD=$((256+(RANDOM % 256)))
-> NSIM_DEV_2_FD=$((512+(RANDOM % 256)))
-> 
-> to prevent a 1/1024 chance of drawing the same indexes?
+>> Add a tx_dropped variable to struct netdevsim, tracking the number of
+>> skbs that could not be forwarded using dev_forward_skb().
+>>
+>> The xmit() function accessing the peer ptr is protected by an RCU read
+>> critical section. The rcu_read_lock() is functionally redundant as since
+>> v5.0 all softirqs are implicitly RCU read critical sections; but it is
+>> useful for human readers.
+>>
+>> If another CPU is concurrently in nsim_destroy(), then it will first set
+>> the peer ptr to NULL. This does not affect any existing readers that
+>> dereferenced a non-NULL peer. Then, in unregister_netdevice(), there is
+>> a synchronize_rcu() before the netdev is actually unregistered and
+>> freed. This ensures that any readers i.e. xmit() that got a non-NULL
+>> peer will complete before the netdev is freed.
+>>
+>> Any readers after the RCU_INIT_POINTER() but before synchronize_rcu()
+>> will dereference NULL, making it safe.
+>>
+>> The codepath to nsim_destroy() and nsim_create() takes both the newly
+>> added nsim_dev_list_lock and rtnl_lock. This makes it safe with
+>> concurrent calls to linking two netdevsims together.
+>>
+>> Signed-off-by: David Wei <dw@davidwei.uk>
+>> ---
+>>  drivers/net/netdevsim/netdev.c    | 28 +++++++++++++++++++++++-----
+>>  drivers/net/netdevsim/netdevsim.h |  1 +
+>>  2 files changed, 24 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+>> index 9063f4f2971b..13d3e1536451 100644
+>> --- a/drivers/net/netdevsim/netdev.c
+>> +++ b/drivers/net/netdevsim/netdev.c
+>> @@ -29,19 +29,37 @@
+>>  static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
+>>  {
+>>  	struct netdevsim *ns = netdev_priv(dev);
+>> +	unsigned int len = skb->len;
+>> +	struct netdevsim *peer_ns;
+>> +	int ret = NETDEV_TX_OK;
+>>  
+>>  	if (!nsim_ipsec_tx(ns, skb))
+>>  		goto out;
+>>  
+>> +	rcu_read_lock();
+>> +	peer_ns = rcu_dereference(ns->peer);
+>> +	if (!peer_ns)
+>> +		goto out_stats;
+> Change ret to NET_XMIT_DROP to correctly count packets as dropped
 
-Yes, that is a good idea, thank you.
+Linking and forwarding between two netdevsims is optional, so I don't
+want to always return NET_XMIT_DROP.
 
 > 
->>> +
->>> +echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX $NSIM_DEV_2_FD:2000" > $NSIM_DEV_SYS_LINK 2>/dev/null
->>> +if [ $? -eq 0 ]; then
->>> +	echo "linking with non-existent netdevsim should fail"
->>> +	exit 1
->>> +fi
->>> +
->>> +echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX 2000:$NSIM_DEV_2_IFIDX" > $NSIM_DEV_SYS_LINK 2>/dev/null
->>> +if [ $? -eq 0 ]; then
->>> +	echo "linking with non-existent netnsid should fail"
->>> +	exit 1
->>> +fi
->>> +
->>> +echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX $NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX" > $NSIM_DEV_SYS_LINK 2>/dev/null
->>> +if [ $? -eq 0 ]; then
->>> +	echo "linking with self should fail"
->>> +	exit 1
->>> +fi
->>> +
->>> +echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX $NSIM_DEV_2_FD:$NSIM_DEV_2_IFIDX" > $NSIM_DEV_SYS_LINK
->>> +if [ $? -ne 0 ]; then
->>> +	echo "linking netdevsim1 with netdevsim2 should succeed"
->>> +	exit 1
->>> +fi
->>> +
->>> +# argument error checking
->>> +
->>> +echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX $NSIM_DEV_2_FD:a" > $NSIM_DEV_SYS_LINK 2>/dev/null
->>> +if [ $? -eq 0 ]; then
->>> +	echo "invalid arg should fail"
->>> +	exit 1
->>> +fi
->>> +
->>> +# send/recv packets
->>> +
->>> +socat_check || exit 4
->>
->> This check will cause the script to exit without cleaning up the devices
->> and namespaces. Move it to the top, or cleanup on error
->>
->> Thanks,
->> Maciek
->>
+>> +
+>> +	skb_tx_timestamp(skb);
+>> +	if (unlikely(dev_forward_skb(peer_ns->netdev, skb) == NET_RX_DROP))
+>> +		ret = NET_XMIT_DROP;
+>> +
+>> +out_stats:
+>> +	rcu_read_unlock();
+>>  	u64_stats_update_begin(&ns->syncp);
+>> -	ns->tx_packets++;
+>> -	ns->tx_bytes += skb->len;
+>> +	if (ret == NET_XMIT_DROP) {
+>> +		ns->tx_dropped++;
+> add dev_kfree_skb(skb);
+
+dev_forward_skb() frees the skb if dropped already.
+
+> 
+> Thanks,
+> Maciek
+> 
+>> +	} else {
+>> +		ns->tx_packets++;
+>> +		ns->tx_bytes += len;
+>> +	}
+>>  	u64_stats_update_end(&ns->syncp);
+>> +	return ret;
+>>  
+>>  out:
+>>  	dev_kfree_skb(skb);
+>> -
+>> -	return NETDEV_TX_OK;
+>> +	return ret;
+>>  }
+>>  
+>>  static void nsim_set_rx_mode(struct net_device *dev)
+>> @@ -70,6 +88,7 @@ nsim_get_stats64(struct net_device *dev, struct rtnl_link_stats64 *stats)
+>>  		start = u64_stats_fetch_begin(&ns->syncp);
+>>  		stats->tx_bytes = ns->tx_bytes;
+>>  		stats->tx_packets = ns->tx_packets;
+>> +		stats->tx_dropped = ns->tx_dropped;
+>>  	} while (u64_stats_fetch_retry(&ns->syncp, start));
+>>  }
+>>  
+>> @@ -302,7 +321,6 @@ static void nsim_setup(struct net_device *dev)
+>>  	eth_hw_addr_random(dev);
+>>  
+>>  	dev->tx_queue_len = 0;
+>> -	dev->flags |= IFF_NOARP;
+>>  	dev->flags &= ~IFF_MULTICAST;
+>>  	dev->priv_flags |= IFF_LIVE_ADDR_CHANGE |
+>>  			   IFF_NO_QUEUE;
+>> diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
+>> index c8b45b0d955e..553c4b9b4f63 100644
+>> --- a/drivers/net/netdevsim/netdevsim.h
+>> +++ b/drivers/net/netdevsim/netdevsim.h
+>> @@ -98,6 +98,7 @@ struct netdevsim {
+>>  
+>>  	u64 tx_packets;
+>>  	u64 tx_bytes;
+>> +	u64 tx_dropped;
+>>  	struct u64_stats_sync syncp;
+>>  
+>>  	struct nsim_bus_dev *nsim_bus_dev;
 
