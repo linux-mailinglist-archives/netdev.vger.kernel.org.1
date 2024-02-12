@@ -1,145 +1,142 @@
-Return-Path: <netdev+bounces-70947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E5FB85128D
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 12:47:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65F0685129F
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 12:50:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A4B31F224E0
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 11:47:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98D711C22038
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 11:50:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BE3439AEC;
-	Mon, 12 Feb 2024 11:46:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EB9139876;
+	Mon, 12 Feb 2024 11:50:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hLkvrCYQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FTLBdJQ2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E2FA39860
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 11:46:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB84439AC5;
+	Mon, 12 Feb 2024 11:50:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707738412; cv=none; b=Zb/OEVQpFANvufc1DLjEXLyZwaS4KIT6UwvJKmDFE5BFc/NpkkGj5HcO0Ya02mVf6Hcfe7jlvwlvJMUk5NYmghaCiR8GUEtH81+f3QDnkJbOKKYZtH+zGv+oEqNXeROfeCZiYGuATPBVhMS/s1OFs66fS8F08aM6hVYCpWwx06o=
+	t=1707738650; cv=none; b=GkboYvZlip2J9bBuIdIPYqYkoD58BhbP1ohocMF2iqohR58U5cRCxXVZz6Lx69Dioq6QKI1gIbHqEIy8ZqVnG4rRnZbbH+B6C7vfYHD406TdFHJsPjxq5kpBhKyE/gPVY35AQB/YU48qXMyYYZ5C94qg1QTnKYPwVdpHq03V0hI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707738412; c=relaxed/simple;
-	bh=YZI0iWYIs4Bh/cvrE2Q1viIQKQR4G93YPr/aYKc/beU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Glxv4KtId8cWPjfzEfo3Xf4W1+/l7W3eXU+g5oFry30jZf3j0+tcJcBhyumNxkEgkxMIA4dog6c+D7rrRePA+kapaGZjep1FWUWMmZMC+p2nuGYC1L3bYvrtSQzbe/QbVYaGg+f6vH7Fe9tgR95siSkggO9VPqSezhWOQqwNKbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hLkvrCYQ; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-558f523c072so4716861a12.2
-        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 03:46:50 -0800 (PST)
+	s=arc-20240116; t=1707738650; c=relaxed/simple;
+	bh=/kq5w1POb6DWCXoFZuLee/5Hf4I/xNQaA8461i2aYSA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=V1bg31JkKIFkvKMqkdpc5g4l15MPJFBRTYTB7kHxunr0DhRYKCowTngf6db3UypbupvdKaJqggY0pJOmMcsSuENO0ku6cT2g7DpnYpB61t3YyJCdszHyadZL/XZ0Pb3mkjditRlweJUFytDUrue2PjLZzzaMX+0UCKoCIaW4JSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FTLBdJQ2; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-56003c97d98so3747899a12.3;
+        Mon, 12 Feb 2024 03:50:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1707738408; x=1708343208; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6igGhHE0Wmh8X+D47XGNFybq2+vq3ZSP8U8DuXuJZOc=;
-        b=hLkvrCYQfeMwRdjvmFwF7kO4qJYU7n/XYGYMGxOCMvRK/a79/z41s3KlKvXaK+UCc9
-         x3/dwSmUqwrEtCz8uUGuDY9EJGUxsQhQyUwnrnEwVHyVAfJcjx/Q1EpKj6jauiy24dKA
-         VLtl7KuAfa0VQPrXFJitrBe1BeyC7pU/cEBojFO6iQCkqm4tOYUjpK0/AJo7EN1nG2TD
-         xz4Z4AE78w/+9wi42RCYejqF5uhr4F5dZCP3ifq+02osWPeohTxj8FzSUEM7ZGN3Q/rW
-         k/E4MQHqKd0DPs4DfcYS8tA147XermheknVtkECbK2YyZBmBDIAtFz3DX6eVIULXuwAD
-         TxuA==
+        d=gmail.com; s=20230601; t=1707738647; x=1708343447; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=DI/JPUx6NGwjBeuZnuCsSQdfuZnc/sODY2AjTvUNJeU=;
+        b=FTLBdJQ283KTR3DsSkmPReJMxq+6GmAgDKfzHv58ydao6ChRYDucKmH57R5O6Cf06k
+         fYWex8vEV+Z01Up50kAa1sPXAB/lPo/N0C6GSDItfSqifeIbGq4Vf7U+sCE0FX2e4lJl
+         MZoFoH4U+DA1hhJJWwmqGdsbDKUxrI9FYkwEThX9MQBBVSces5AUDkboQDNL4Ljkst23
+         QOeL2szXyTTMW/O6lZgGSA2+yGVMY7XP7rzzQpk4S1ilCKyp7KXagtCVy5Rga16+4hEp
+         vDO3QvORc6Km/66mYvobUnezm4VOnUtC4hFEyzu6VdQjubpFWSdYr4Y5bihP9RxdO9XT
+         O2Ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707738408; x=1708343208;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6igGhHE0Wmh8X+D47XGNFybq2+vq3ZSP8U8DuXuJZOc=;
-        b=W9r33hwpyKyonio5PHJdpsjOuc67XbVI7r6T4reeDiTXuRpGYLQcx1/UjaEH0NikS+
-         hmNbAfDc7KiOLFAZmTqsWSbbxynR8H9Iknzq2FZkLnRHNyV9qqJSjeHs/2HtDSBZ55vs
-         YAewmH8jJDztKZtASehty/JOm1ieFXA9jrsMKrvwS7ewgWwFYovGeKxijGLXi5lTeCqG
-         00DjAtKDbHQ/dCS7ls3LNokwKbzW5YS7qd2riID60D2s/uEI/1GFnFNyMii/nO1aDXMb
-         5b11PfeyVt5v8c4c0JHR5nMhd+lgTVhoYBbJCBhzWuTahxs6wiSgVDUQQuv8Zbw+56oB
-         h5rw==
-X-Forwarded-Encrypted: i=1; AJvYcCWFUK3bhww2PK7rwTpjQsa8tThF79xrzt1vDeYQDXL/wpbLvrt7sqnnWixGiGouzpcxrlssqjZsrQ+9GrFbrkNN1ly/WRfe
-X-Gm-Message-State: AOJu0YwjH0+KYEoxaVTjMcGOm9xOQD9+osDKhmWYGC6k1irLf/HGtJbf
-	HMdLuSvjQ/8jGEpO/Jh2jRjJZQhTZG723VUlkeryA5tSYXEjjfCpqiqhnnPHsDM=
-X-Google-Smtp-Source: AGHT+IHtMO/k7BQoK4cFgFlk4EAZ+OtEN24JAjUYza+tSEgNVW+iUAxv4YEHSUvFdsrBYJxx0+EjlA==
-X-Received: by 2002:a17:906:46c3:b0:a37:2bb1:7517 with SMTP id k3-20020a17090646c300b00a372bb17517mr4477352ejs.45.1707738408616;
-        Mon, 12 Feb 2024 03:46:48 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXmdlD4KAro5iEc1Dr31HuIN4wk6LEz6e3kSziAz1hQ9NyQk1cdScqmB8JnycEV/4aRK2lP0ug8ho26cKPWBmAbgNK4TCs32ts4W+u7m3j+b0V1DJzCYhuv2XM96rBMFUy5fAo+Fj1Wnesw3KvBx0FXphgcajzpJBux4hJ0A38Pih44RzZWPZ/vPH+AGqIYQPSZ4/DV0ucix0Z8+SFYLbvfGbJbwo4kinntjvjW9m8sUnSKHT1lts7Li2WLXMLzpR6YNq3vtjTJrVNAlaqWcXHqIEqLgGmFYMp/FHOuo8SyL9uQY7Xo2O2wDfW8tz9cip5fiD19wmGWWQtV2CqmXwdwcpChYAydTZuSjz9j7xKgkl3OpodD/RCH3l74Ml8NoDQbVyDkZdXaNzssexbdh3+91cGzgm6Njw+eEEmY9xZGy1ILDPJ34WUd7QInVpo2D92LHfqYUo5kq1k2D/cDyoVLl7dp2ZSHOVGlBD/DVGDGxvJSk1+zEaGkqTW3sIpC
-Received: from [192.168.192.135] (037008245233.garwolin.vectranet.pl. [37.8.245.233])
-        by smtp.gmail.com with ESMTPSA id f17-20020a1709067f9100b00a3c89e226f7sm123069ejr.181.2024.02.12.03.46.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Feb 2024 03:46:48 -0800 (PST)
-Message-ID: <bfce2357-129d-4eab-ba7e-99f96f79ade1@linaro.org>
-Date: Mon, 12 Feb 2024 12:46:46 +0100
+        d=1e100.net; s=20230601; t=1707738647; x=1708343447;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DI/JPUx6NGwjBeuZnuCsSQdfuZnc/sODY2AjTvUNJeU=;
+        b=jTQa4tWLjcZoDd0Yz/33y5ONVqPBuIf0v92sRdSjEFYdFU8HaJZf6ODL+E2W9KdDYu
+         lcluKooKDN7RYOcLMMtGwJZpvzxx7qxuChWNfIN9w9XLXiWWVNlN6vt1DCjh6wfuhuV1
+         XrGJNFcNwQu7MQ1VfFN1bb/wDY48zKG7xMwf/XfCbEufnFFgshbkjthOkCTp+RciUJgJ
+         16Cg/XsFDgUmkLrkmVtCjlgQxYjwCD81yTAKcgzDbHktYlKO8+AmHGXAtxLqdMPutiTL
+         pJBw23Ua7rNLlp7u/8L+VRF6bBkWiGW+noN14ZIA5L4sjjYsWrmJ9n3iqazqHViS1tJq
+         qB5A==
+X-Gm-Message-State: AOJu0YxJ8chfxpTBZ6UKU76bh3BTZWi1MT4mjDhtShGrxXK7pIWK0Cfb
+	Qi+kvHK11jFshxqBoc2t5To2H0suvGXEIXPB7y+NEH12hvBrIrpoN/20mkq2bpI=
+X-Google-Smtp-Source: AGHT+IFcNWXSpVUAtM81ZjcoJhdC3f4B9acvTAZjJbOBfs2ULW0y91rwCOZxrk8rrBNqgASUjBtIxg==
+X-Received: by 2002:a17:906:2787:b0:a3c:c451:2115 with SMTP id j7-20020a170906278700b00a3cc4512115mr845655ejc.77.1707738646617;
+        Mon, 12 Feb 2024 03:50:46 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUvVnYjwl1kXCkY6Q5HCHxosLviHu0mbZd4UfAyKqv/n4THscQ62fBfKS0esaHexyd7rx/jI8u3C4ruKxWli4Q/3iGG+VrFG6IOMgbY4mNC7CJ4YU1vAf9baLjz74PpeNf7ph4jCRpOvOQhGSxDvv5HUOrQGEC6a57CzVLBjACv6guMqWBVuf2SGTE8KqtJBvSDLYKj0mO3Iozednaii92VE5UZmu7C9TwJh5tGJiaE5NwhylMcoOPqtcH41jRzk96pKfZJJr+uQOwmpOSxlFf4cnBrBXfHlUIzmHgX8enw4w0RDuGX0kkGbV8mBD5aBxRg2wAcwrNwvqNVys5J4KR3jlvydQfwBsGwUJAE/Pj8g3UjuGEe6Vf+ICImwdeN+RvHvE03uecQLUG9IFfP4Js3k0TKvz7SjprkDf5Q1D4=
+Received: from fedora.. (cpe-109-60-83-183.zg3.cable.xnet.hr. [109.60.83.183])
+        by smtp.googlemail.com with ESMTPSA id n7-20020a170906118700b00a3845a75eb7sm126534eja.189.2024.02.12.03.50.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Feb 2024 03:50:46 -0800 (PST)
+From: Robert Marko <robimarko@gmail.com>
+To: andersson@kernel.org,
+	konrad.dybcio@linaro.org,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	ansuelsmth@gmail.com,
+	linux-arm-msm@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Robert Marko <robimarko@gmail.com>
+Subject: [PATCH net-next] net: phy: qca807x: move interface mode check to .config_init_once
+Date: Mon, 12 Feb 2024 12:49:34 +0100
+Message-ID: <20240212115043.1725918-1-robimarko@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 4/4] arm64: dts: qcom: qrb4210-rb1: add firmware-name
- qualifier to WiFi node
-Content-Language: en-US
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
- Kalle Valo <kvalo@kernel.org>, Jeff Johnson <quic_jjohnson@quicinc.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>
-Cc: ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-msm@vger.kernel.org
-References: <20240130-wcn3990-firmware-path-v1-0-826b93202964@linaro.org>
- <20240130-wcn3990-firmware-path-v1-4-826b93202964@linaro.org>
-From: Konrad Dybcio <konrad.dybcio@linaro.org>
-Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
- 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
- izWDgYvmBE8=
-In-Reply-To: <20240130-wcn3990-firmware-path-v1-4-826b93202964@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 30.01.2024 17:38, Dmitry Baryshkov wrote:
-> Add firmware-name property to the WiFi device tree node to specify
-> board-specific lookup directory.
-> 
-> Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-> ---
+Currently, we are checking whether the PHY package mode matches the
+individual PHY interface modes at PHY package probe time, but at that time
+we only know the PHY package mode and not the individual PHY interface
+modes as of_get_phy_mode() that populates it will only get called once the
+netdev to which PHY-s are attached to is being probed and thus this check
+will always fail and return -EINVAL.
 
-Reviewed-by: Konrad Dybcio <konrad.dybcio@linaro.org>
+So, lets move this check to .config_init_once as at that point individual
+PHY interface modes should be populated.
 
-Konrad
+Fixes: d1cb613efbd3 ("net: phy: qcom: add support for QCA807x PHY Family")
+Signed-off-by: Robert Marko <robimarko@gmail.com>
+---
+ drivers/net/phy/qcom/qca807x.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/phy/qcom/qca807x.c b/drivers/net/phy/qcom/qca807x.c
+index 01815f947060..780c28e2e4aa 100644
+--- a/drivers/net/phy/qcom/qca807x.c
++++ b/drivers/net/phy/qcom/qca807x.c
+@@ -562,6 +562,11 @@ static int qca807x_phy_package_config_init_once(struct phy_device *phydev)
+ 	struct qca807x_shared_priv *priv = shared->priv;
+ 	int val, ret;
+ 
++	/* Make sure PHY follow PHY package mode if enforced */
++	if (priv->package_mode != PHY_INTERFACE_MODE_NA &&
++	    phydev->interface != priv->package_mode)
++		return -EINVAL;
++
+ 	phy_lock_mdio_bus(phydev);
+ 
+ 	/* Set correct PHY package mode */
+@@ -718,11 +723,6 @@ static int qca807x_probe(struct phy_device *phydev)
+ 	shared = phydev->shared;
+ 	shared_priv = shared->priv;
+ 
+-	/* Make sure PHY follow PHY package mode if enforced */
+-	if (shared_priv->package_mode != PHY_INTERFACE_MODE_NA &&
+-	    phydev->interface != shared_priv->package_mode)
+-		return -EINVAL;
+-
+ 	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
+ 	if (!priv)
+ 		return -ENOMEM;
+-- 
+2.43.0
+
 
