@@ -1,67 +1,66 @@
-Return-Path: <netdev+bounces-70847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF8CD850C74
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 01:14:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7C22850CC4
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 02:50:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B2EA1F21EF9
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 00:14:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E188288FF7
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 01:50:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F02A193;
-	Mon, 12 Feb 2024 00:14:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F0BF1841;
+	Mon, 12 Feb 2024 01:50:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="Vid30Fsn"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="EHE+okVh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from relay.smtp-ext.broadcom.com (unknown [192.19.166.231])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B54431FA2
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 00:14:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E494C5396;
+	Mon, 12 Feb 2024 01:50:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.166.231
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707696860; cv=none; b=Voe8CDntf+ks3S9jO8w+uWVa1MFIpux676bMnKB+XGiauCcOz+cnSyudJKdSU3TrvDarDbnzYAFMdweq32RdOw18gXHZKi0zZDKqv9NdTCiiXySrtElvlA0E9vvhNFihxEGRQQw9TW8d8cv04fJD6iiyOqlJMLqmJbvQDeZ9HcI=
+	t=1707702604; cv=none; b=oNb8ipIopPOBeqeR3V3BcBBbP68wfsjXPeXhHCdxUTlJJZ3+DGnK3ZE3KBMATaaNQP2MVJU5MKjzYzUNFvRL7EjAOuNZ0rY1n8Q2OZnEuDo/Rg0cncn/jihD2RDu4YQ01p5eFwM5G9qK82HkF8t6/jChql8P48w6VY+PRPlGSvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707696860; c=relaxed/simple;
-	bh=eLIsbCedowxgdSXIKSQfV7nbIVK1gCViK7g55DvvGuU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QIZgnU7dNYRR6AfCeyg1yHwaoxth4Ou407pz0c3p8+qTE9ibExhEBwTveDuDWQJbB9Brs1qI/vIV7BlSpCE1gzNzuIqEn1Mpk8pX3YZX2aT4VgRwfhZw2YaXseVK5I7QbAZuJ6uzao8gT0771ICbm8wItlLpRmeUSm7QUrEvgGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=Vid30Fsn; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
-	by m0089730.ppops.net (8.17.1.19/8.17.1.19) with ESMTP id 41BAXvGY024674;
-	Sun, 11 Feb 2024 16:13:53 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=s2048-2021-q4;
- bh=v3XUaLn04Rzdj34drqI45QHI0Vj31Iv2ZKt+SSxDH4o=;
- b=Vid30Fsn7qQ1brAVF2uwgM960xdTcYgjBoY+lP2jzKkGzHXNw0yGGxMowd2oclpRWyu0
- 3TzkXHYux527noZOrDe6jecJ/Ri/XQG2xfuySsMmWeMOk7Yx4fE+EHVgyJC61uop3/2r
- nD5/03z5XaDg4W8sdWND3Ugs8IEUFDvYbEG+fSbVKUEFHJBeXz1AE9F4BN95aIL4ckA8
- FP4rNQa6bl7ix9uw7YYEo8W8ebsloOpkXY93O1bDyN9i98s4pLIhqB0VHhPn2kAdmA6f
- KByKqcMUxSb1THvpUL3AA6RD4NIc4jyM69pth/PB388+8ZG39ixy0bBGk/gJnSZy0HbI pA== 
-Received: from mail.thefacebook.com ([163.114.132.120])
-	by m0089730.ppops.net (PPS) with ESMTPS id 3w65hfw9jc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Sun, 11 Feb 2024 16:13:53 -0800
-Received: from devvm4158.cln0.facebook.com (2620:10d:c085:108::8) by
- mail.thefacebook.com (2620:10d:c085:11d::8) with Microsoft SMTP Server id
- 15.1.2507.35; Sun, 11 Feb 2024 16:13:50 -0800
-From: Vadim Fedorenko <vadfed@meta.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-        Willem de Bruijn
-	<willemdebruijn.kernel@gmail.com>,
-        Andy Lutomirski <luto@amacapital.net>
-CC: Vadim Fedorenko <vadfed@meta.com>, Jakub Kicinski <kuba@kernel.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        Willem de Bruijn
-	<willemb@google.com>, <netdev@vger.kernel.org>
-Subject: [PATCH net v2] net-timestamp: make sk_tskey more predictable in error path
-Date: Sun, 11 Feb 2024 16:13:40 -0800
-Message-ID: <20240212001340.1719944-1-vadfed@meta.com>
-X-Mailer: git-send-email 2.39.3
+	s=arc-20240116; t=1707702604; c=relaxed/simple;
+	bh=nQMrCX2Nlpz0PywRuI79FOgJ46w8SfapQjiAlTEBxF0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dlSMsvbHl0tYBMF3uoSnrgZzk2SdOK3YD+IH7aexaK6+51jZv4++nKRnAwxa5rTeoZs1sTNGncNdcKs6HjjYt6C/sjn9okj55UlYMbkU65CS/L6nxM0SpaIThg+OVLARFMUH9mYIgq5vb9drrzJtvYUpiVehw2+u4WT5ipiAHsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=EHE+okVh; arc=none smtp.client-ip=192.19.166.231
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: from mail-lvn-it-01.lvn.broadcom.net (mail-lvn-it-01.lvn.broadcom.net [10.36.132.253])
+	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id CAABFC003C2E;
+	Sun, 11 Feb 2024 17:49:55 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com CAABFC003C2E
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
+	s=dkimrelay; t=1707702595;
+	bh=nQMrCX2Nlpz0PywRuI79FOgJ46w8SfapQjiAlTEBxF0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=EHE+okVh4xvSGKWjUqg2ziKCj2Yu1t0JZectVSsIkVuas46O23atr8K7jgfKZrw05
+	 UJUk7KPgyfQShk/V3mUKNlMrHicEtMAqAqKwFnYLhMsJxZSKp7+uaV0MRaejndGRof
+	 ZZ75eAvIzCngm7kxkMe/LhXJdgK/MwdLXctanj/s=
+Received: from stbirv-lnx-1.igp.broadcom.net (stbirv-lnx-1.igp.broadcom.net [10.67.48.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail-lvn-it-01.lvn.broadcom.net (Postfix) with ESMTPSA id 3F51C18041CAC4;
+	Sun, 11 Feb 2024 17:49:54 -0800 (PST)
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+To: stable@vger.kernel.org
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Doug Berger <opendmb@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	bcm-kernel-feedback-list@broadcom.com (open list:BROADCOM GENET ETHERNET DRIVER),
+	netdev@vger.kernel.org (open list:BROADCOM GENET ETHERNET DRIVER),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH stable 5.4 v3] net: bcmgenet: Fix EEE implementation
+Date: Sun, 11 Feb 2024 17:48:57 -0800
+Message-Id: <20240212014859.3860032-1-florian.fainelli@broadcom.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,121 +68,150 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: 22guu4yYPwqaFWnoI3Q-RMR_1ZeSOImB
-X-Proofpoint-ORIG-GUID: 22guu4yYPwqaFWnoI3Q-RMR_1ZeSOImB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-11_22,2024-02-08_01,2023-05-22_02
 
-When SOF_TIMESTAMPING_OPT_ID is used to ambiguate timestamped datagrams,
-the sk_tskey can become unpredictable in case of any error happened
-during sendmsg(). Move increment later in the code and make decrement of
-sk_tskey in error path. This solution is still racy in case of multiple
-threads doing snedmsg() over the very same socket in parallel, but still
-makes error path much more predictable.
+commit a9f31047baca57d47440c879cf259b86f900260c upstream
 
-Fixes: 09c2d251b707 ("net-timestamp: add key to disambiguate concurrent datagrams")
-Reported-by: Andy Lutomirski <luto@amacapital.net>
-Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+We had a number of short comings:
+
+- EEE must be re-evaluated whenever the state machine detects a link
+  change as wight be switching from a link partner with EEE
+  enabled/disabled
+
+- tx_lpi_enabled controls whether EEE should be enabled/disabled for the
+  transmit path, which applies to the TBUF block
+
+- We do not need to forcibly enable EEE upon system resume, as the PHY
+  state machine will trigger a link event that will do that, too
+
+Fixes: 6ef398ea60d9 ("net: bcmgenet: add EEE support")
+Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Link: https://lore.kernel.org/r/20230606214348.2408018-1-florian.fainelli@broadcom.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- net/ipv4/ip_output.c  | 14 +++++++++-----
- net/ipv6/ip6_output.c | 14 +++++++++-----
- 2 files changed, 18 insertions(+), 10 deletions(-)
+Changes in v2:
 
-diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-index 41537d18eecf..ac4995ed17c7 100644
---- a/net/ipv4/ip_output.c
-+++ b/net/ipv4/ip_output.c
-@@ -974,7 +974,7 @@ static int __ip_append_data(struct sock *sk,
- 	struct rtable *rt = (struct rtable *)cork->dst;
- 	unsigned int wmem_alloc_delta = 0;
- 	bool paged, extra_uref = false;
--	u32 tskey = 0;
-+	u32 tsflags, tskey = 0;
- 
- 	skb = skb_peek_tail(queue);
- 
-@@ -982,10 +982,6 @@ static int __ip_append_data(struct sock *sk,
- 	mtu = cork->gso_size ? IP_MAX_MTU : cork->fragsize;
- 	paged = !!cork->gso_size;
- 
--	if (cork->tx_flags & SKBTX_ANY_TSTAMP &&
--	    READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_OPT_ID)
--		tskey = atomic_inc_return(&sk->sk_tskey) - 1;
--
- 	hh_len = LL_RESERVED_SPACE(rt->dst.dev);
- 
- 	fragheaderlen = sizeof(struct iphdr) + (opt ? opt->optlen : 0);
-@@ -1052,6 +1048,11 @@ static int __ip_append_data(struct sock *sk,
- 
- 	cork->length += length;
- 
-+	tsflags = READ_ONCE(sk->sk_tsflags);
-+	if (cork->tx_flags & SKBTX_ANY_TSTAMP &&
-+	    tsflags & SOF_TIMESTAMPING_OPT_ID)
-+		tskey = atomic_inc_return(&sk->sk_tskey) - 1;
-+
- 	/* So, what's going on in the loop below?
- 	 *
- 	 * We use calculated fragment length to generate chained skb,
-@@ -1274,6 +1275,9 @@ static int __ip_append_data(struct sock *sk,
- 	cork->length -= length;
- 	IP_INC_STATS(sock_net(sk), IPSTATS_MIB_OUTDISCARDS);
- 	refcount_add(wmem_alloc_delta, &sk->sk_wmem_alloc);
-+	if (cork->tx_flags & SKBTX_ANY_TSTAMP &&
-+	    tsflags & SOF_TIMESTAMPING_OPT_ID)
-+		atomic_dec(&sk->sk_tskey);
- 	return err;
+- removed Changed-id
+
+ .../net/ethernet/broadcom/genet/bcmgenet.c    | 22 +++++++------------
+ .../net/ethernet/broadcom/genet/bcmgenet.h    |  3 +++
+ drivers/net/ethernet/broadcom/genet/bcmmii.c  |  6 +++++
+ 3 files changed, 17 insertions(+), 14 deletions(-)
+
+diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+index eeadeeec17ba..380bf7a328ba 100644
+--- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
++++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+@@ -1018,7 +1018,8 @@ static void bcmgenet_get_ethtool_stats(struct net_device *dev,
+ 	}
  }
  
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index a722a43dd668..42e423012c18 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -1422,7 +1422,7 @@ static int __ip6_append_data(struct sock *sk,
- 	int err;
- 	int offset = 0;
- 	bool zc = false;
--	u32 tskey = 0;
-+	u32 tsflags, tskey = 0;
- 	struct rt6_info *rt = (struct rt6_info *)cork->dst;
- 	struct ipv6_txoptions *opt = v6_cork->opt;
- 	int csummode = CHECKSUM_NONE;
-@@ -1440,10 +1440,6 @@ static int __ip6_append_data(struct sock *sk,
- 	mtu = cork->gso_size ? IP6_MAX_MTU : cork->fragsize;
- 	orig_mtu = mtu;
+-static void bcmgenet_eee_enable_set(struct net_device *dev, bool enable)
++void bcmgenet_eee_enable_set(struct net_device *dev, bool enable,
++			     bool tx_lpi_enabled)
+ {
+ 	struct bcmgenet_priv *priv = netdev_priv(dev);
+ 	u32 off = priv->hw_params->tbuf_offset + TBUF_ENERGY_CTRL;
+@@ -1038,7 +1039,7 @@ static void bcmgenet_eee_enable_set(struct net_device *dev, bool enable)
  
--	if (cork->tx_flags & SKBTX_ANY_TSTAMP &&
--	    READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_OPT_ID)
--		tskey = atomic_inc_return(&sk->sk_tskey) - 1;
+ 	/* Enable EEE and switch to a 27Mhz clock automatically */
+ 	reg = bcmgenet_readl(priv->base + off);
+-	if (enable)
++	if (tx_lpi_enabled)
+ 		reg |= TBUF_EEE_EN | TBUF_PM_EN;
+ 	else
+ 		reg &= ~(TBUF_EEE_EN | TBUF_PM_EN);
+@@ -1059,6 +1060,7 @@ static void bcmgenet_eee_enable_set(struct net_device *dev, bool enable)
+ 
+ 	priv->eee.eee_enabled = enable;
+ 	priv->eee.eee_active = enable;
++	priv->eee.tx_lpi_enabled = tx_lpi_enabled;
+ }
+ 
+ static int bcmgenet_get_eee(struct net_device *dev, struct ethtool_eee *e)
+@@ -1074,6 +1076,7 @@ static int bcmgenet_get_eee(struct net_device *dev, struct ethtool_eee *e)
+ 
+ 	e->eee_enabled = p->eee_enabled;
+ 	e->eee_active = p->eee_active;
++	e->tx_lpi_enabled = p->tx_lpi_enabled;
+ 	e->tx_lpi_timer = bcmgenet_umac_readl(priv, UMAC_EEE_LPI_TIMER);
+ 
+ 	return phy_ethtool_get_eee(dev->phydev, e);
+@@ -1083,7 +1086,6 @@ static int bcmgenet_set_eee(struct net_device *dev, struct ethtool_eee *e)
+ {
+ 	struct bcmgenet_priv *priv = netdev_priv(dev);
+ 	struct ethtool_eee *p = &priv->eee;
+-	int ret = 0;
+ 
+ 	if (GENET_IS_V1(priv))
+ 		return -EOPNOTSUPP;
+@@ -1094,16 +1096,11 @@ static int bcmgenet_set_eee(struct net_device *dev, struct ethtool_eee *e)
+ 	p->eee_enabled = e->eee_enabled;
+ 
+ 	if (!p->eee_enabled) {
+-		bcmgenet_eee_enable_set(dev, false);
++		bcmgenet_eee_enable_set(dev, false, false);
+ 	} else {
+-		ret = phy_init_eee(dev->phydev, 0);
+-		if (ret) {
+-			netif_err(priv, hw, dev, "EEE initialization failed\n");
+-			return ret;
+-		}
 -
- 	hh_len = LL_RESERVED_SPACE(rt->dst.dev);
- 
- 	fragheaderlen = sizeof(struct ipv6hdr) + rt->rt6i_nfheader_len +
-@@ -1538,6 +1534,11 @@ static int __ip6_append_data(struct sock *sk,
- 			flags &= ~MSG_SPLICE_PAGES;
++		p->eee_active = phy_init_eee(dev->phydev, false) >= 0;
+ 		bcmgenet_umac_writel(priv, e->tx_lpi_timer, UMAC_EEE_LPI_TIMER);
+-		bcmgenet_eee_enable_set(dev, true);
++		bcmgenet_eee_enable_set(dev, p->eee_active, e->tx_lpi_enabled);
  	}
  
-+	tsflags = READ_ONCE(sk->sk_tsflags);
-+	if (cork->tx_flags & SKBTX_ANY_TSTAMP &&
-+	    tsflags & SOF_TIMESTAMPING_OPT_ID)
-+		tskey = atomic_inc_return(&sk->sk_tskey) - 1;
-+
- 	/*
- 	 * Let's try using as much space as possible.
- 	 * Use MTU if total length of the message fits into the MTU.
-@@ -1794,6 +1795,9 @@ static int __ip6_append_data(struct sock *sk,
- 	cork->length -= length;
- 	IP6_INC_STATS(sock_net(sk), rt->rt6i_idev, IPSTATS_MIB_OUTDISCARDS);
- 	refcount_add(wmem_alloc_delta, &sk->sk_wmem_alloc);
-+	if (cork->tx_flags & SKBTX_ANY_TSTAMP &&
-+	    tsflags & SOF_TIMESTAMPING_OPT_ID)
-+		atomic_dec(&sk->sk_tskey);
- 	return err;
- }
+ 	return phy_ethtool_set_eee(dev->phydev, e);
+@@ -3688,9 +3685,6 @@ static int bcmgenet_resume(struct device *d)
+ 	if (!device_may_wakeup(d))
+ 		phy_resume(dev->phydev);
  
+-	if (priv->eee.eee_enabled)
+-		bcmgenet_eee_enable_set(dev, true);
+-
+ 	bcmgenet_netif_start(dev);
+ 
+ 	netif_device_attach(dev);
+diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.h b/drivers/net/ethernet/broadcom/genet/bcmgenet.h
+index 5b7c2f9241d0..29bf256d13f6 100644
+--- a/drivers/net/ethernet/broadcom/genet/bcmgenet.h
++++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.h
+@@ -736,4 +736,7 @@ int bcmgenet_wol_power_down_cfg(struct bcmgenet_priv *priv,
+ void bcmgenet_wol_power_up_cfg(struct bcmgenet_priv *priv,
+ 			       enum bcmgenet_power_mode mode);
+ 
++void bcmgenet_eee_enable_set(struct net_device *dev, bool enable,
++			     bool tx_lpi_enabled);
++
+ #endif /* __BCMGENET_H__ */
+diff --git a/drivers/net/ethernet/broadcom/genet/bcmmii.c b/drivers/net/ethernet/broadcom/genet/bcmmii.c
+index 2fbec2acb606..026f00ccaa0c 100644
+--- a/drivers/net/ethernet/broadcom/genet/bcmmii.c
++++ b/drivers/net/ethernet/broadcom/genet/bcmmii.c
+@@ -25,6 +25,7 @@
+ 
+ #include "bcmgenet.h"
+ 
++
+ /* setup netdev link state when PHY link status change and
+  * update UMAC and RGMII block when link up
+  */
+@@ -96,6 +97,11 @@ void bcmgenet_mii_setup(struct net_device *dev)
+ 			       CMD_RX_PAUSE_IGNORE | CMD_TX_PAUSE_IGNORE);
+ 		reg |= cmd_bits;
+ 		bcmgenet_umac_writel(priv, reg, UMAC_CMD);
++
++		priv->eee.eee_active = phy_init_eee(phydev, 0) >= 0;
++		bcmgenet_eee_enable_set(dev,
++					priv->eee.eee_enabled && priv->eee.eee_active,
++					priv->eee.tx_lpi_enabled);
+ 	} else {
+ 		/* done if nothing has changed */
+ 		if (!status_changed)
 -- 
-2.39.3
+2.34.1
 
 
