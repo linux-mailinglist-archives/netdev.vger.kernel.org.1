@@ -1,120 +1,435 @@
-Return-Path: <netdev+bounces-70930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCB4385118E
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 11:54:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AB1F85119B
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 11:55:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 929FE2810D7
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 10:54:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 81ACFB26131
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 10:55:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AB603B780;
-	Mon, 12 Feb 2024 10:50:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33B3A38FB6;
+	Mon, 12 Feb 2024 10:54:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BTWytZL9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.actia.se (mail.actia.se [212.181.117.226])
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D2B03B1AC;
-	Mon, 12 Feb 2024 10:50:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.181.117.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 452353984A
+	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 10:54:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707735044; cv=none; b=PfqNI8iAE+GK9Ag84U0TkYcC+ha4E6ib+631URnszKkwtQuohVxNaLBd4N5r2GO80nTVnbjJer9qdProfkS8n6sBYPNusZm4Jdqcco4Nwj5uDs4videK/Kb1iknD33zxQtFaP641VKagHswAoJJPpguC0ehIocH7Dz1vnLRi7Vc=
+	t=1707735293; cv=none; b=jbh9YFVAJ4kXGBybTAG/PVUOGgsN2RgypLMuqJHGbxdVn4bsTtYKpFYRaq3qniYHV154nXMg9huLVWLP1StrtXPb2Ahsf4wTvov4s1+r8JVM3KSN9Y1A+nSaV/JRjQbGhHwUthnD+HFtWgYY06BT9fvKo3aGcQnc/UHdUBtoLNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707735044; c=relaxed/simple;
-	bh=DslaFWZZuV/SwGQuQpMrEYo+M/OcOIqoqJTfsY93H9U=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=ORr5cz/Zey7vRqygcj/cbdB4SKMdcKMSZKn5xALxGbomL+oI5YLKtf+VokOxmTdFkxIfdo0PzSNL/WrmEvQG8pm4aIiGZVYSAQ5P/Lw7bb7LAhOTbNWyNbw34x+JI4p9wpnGx9kOBK9+AqkTHB7OKnm11ZYJa/dr7RY3YWs7B0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=actia.se; spf=pass smtp.mailfrom=actia.se; arc=none smtp.client-ip=212.181.117.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=actia.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=actia.se
-Received: from S036ANL.actianordic.se (10.12.31.117) by S036ANL.actianordic.se
- (10.12.31.117) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 12 Feb
- 2024 11:50:30 +0100
-Received: from S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69]) by
- S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69%4]) with mapi id
- 15.01.2507.035; Mon, 12 Feb 2024 11:50:30 +0100
-From: John Ernberg <john.ernberg@actia.se>
-To: Wei Fang <wei.fang@nxp.com>
-CC: Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
-	NXP Linux Team <linux-imx@nxp.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, John Ernberg <john.ernberg@actia.se>
-Subject: [PATCH net-next] net: fec: Always call fec_restart() in resume path
-Thread-Topic: [PATCH net-next] net: fec: Always call fec_restart() in resume
- path
-Thread-Index: AQHaXaFLRIYd45z3UU+7Sl3MRdVj/Q==
-Date: Mon, 12 Feb 2024 10:50:30 +0000
-Message-ID: <20240212105010.2258421-1-john.ernberg@actia.se>
-Accept-Language: en-US, sv-SE
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-mailer: git-send-email 2.43.0
-x-esetresult: clean, is OK
-x-esetid: 37303A2958D72955617D6A
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1707735293; c=relaxed/simple;
+	bh=JkGNB6EACZs7G0wca90SjCDRR1MMVvxtGzQZVSSTfnA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IGgszcXGxRC59ovSQqfnSlflXw7ZH0e3ANCl63K7ZCVH3ZpGF7fLFaAlgpq13fTnz5TA9Go1aE4zSOOBe8+QJD5nBpUJef8DHyRIfmB0oSFmGzui33S2P0zkUQHrLJ3HMZlfnasAftTObNVxwYO+s+J5qEnEIuUKoCW9sTllpTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=BTWytZL9; arc=none smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5116bf4dcf4so3606076e87.0
+        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 02:54:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1707735289; x=1708340089; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ku8IgqKXgZ1aGnd9uYNvU88mrbVJaBGhSivSTqvjkG4=;
+        b=BTWytZL9jm6F2+TS5DPFO/AbXTPbtMr2r5f1PKSYwA8QBJR3gK9lezWit4QJ3ATDIe
+         4Z+Rzur0CP4VghfftkIUN06Gxk1YMoyg9+kdvxA9/5C1EW6GuRma9FrJKAvFhmdN49pJ
+         4WdsV6zfqZhyX2zQck9zAmCS/ZBfYHEfRSs4QEvBL++iYKWvHtGg8RR1efdArgLFQpYH
+         wn017ZnPMqsnPD+zkGplR90ptl8WgdXZIc3p8j3wxof3EScNlLXmtkAhun607O8SEGCE
+         0Lok48hZepxFl8PNW5RUp57E50ajH/ho95UwKsfT+XVKMfMexck7kvTF+dF98Hfnm+qJ
+         /UYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707735289; x=1708340089;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ku8IgqKXgZ1aGnd9uYNvU88mrbVJaBGhSivSTqvjkG4=;
+        b=AaIVLBLpqJ4jlf46dyhmjU+x1HIbxymV9HvqPJJhC063kHZ6qy6xxZ7aqiC/6ng7u9
+         A2G8lCqr4UDdyiVz7R87Vgp/4PkbyIx5R/0zBDdD+25/ov5vShxHe1waeQakBpdmFuTR
+         tEyCqhC20NjaWhxUY/XCJbhmUrlyyUo5gJjFTZKao50730T/XWzAg74nNMwUw08RXNrA
+         Bx/xGBeTg49Y7dFE9AbuHiJYHzAgs/C8upBlF+yIr9ucB2gc7u+fCutn3fAqkJiqSNX2
+         f5EEBA4tzc8cLwqpJKKkJ34vmcN0m2HGDn2boZOf/5JRqyeXODYKUJBxketQkyiHXz6W
+         V++A==
+X-Forwarded-Encrypted: i=1; AJvYcCUFKPl7scGgz1Y/MOUDl0nWyIul2hMTCnNEAMGxj/e9IrBGyKKgXTwB1HBQddVbrRhCMEk7704L3sEhOhkVoE+mG7FohLZz
+X-Gm-Message-State: AOJu0Yx0qRJXd7rAanyHl6GO68G3ClS/UnrgqyI815fuCX71wmCT/z5E
+	IXv+rro3MdWa/7WU555003/J+3e+718wpJdnD0BgVfPbtA5cWZy5RPA27V2S998=
+X-Google-Smtp-Source: AGHT+IHsBDotn/x5BD/p+sM1GZBMREIr2F7mHACW9xeTtzvtTArG/x3WnIz7chqZs8i/kxyttofBBQ==
+X-Received: by 2002:ac2:48ae:0:b0:511:4e6a:12e7 with SMTP id u14-20020ac248ae000000b005114e6a12e7mr4069980lfg.58.1707735289337;
+        Mon, 12 Feb 2024 02:54:49 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXUuuWtapF0T9cozNGQIW32rnMy0ZE0ChapQXoo6k9hEeUmQFrGZtzDoVmADFxRBSSv7TKPzCfJ+KWfhX3gUX/B1U59ToS1llc6o6EfieZ+6YU1SspBUAhquTrJARdDo0qlcbKX8dJdRAF6565A1DbA6QB8vjdQ0z+kbXgdpbgOlVoyDpcdzHcq3bsnCwIP9zf0JbCorKy+3QM5Bvur0hegGkHnZI5UYhD6BNrrSjvprPvI9Yz5XaETCR2+oCrs518A3ROWDqehNSZuNa9Kvodvut9mmnsG8RX6o7nkaLINYEMBfie2PIqWsBS1nBhvyFHb8OJh2u32cOYUuB9gk+rhopDWrPNPxmNgLLRA+VxCDaJ6D9tMYFvmgmSSSZdCS5r+a3giOYgrPCtcFfa0nV14VJMObggr
+Received: from krzk-bin.. ([178.197.223.6])
+        by smtp.gmail.com with ESMTPSA id m27-20020a05600c3b1b00b00410794ddfc6sm8349380wms.35.2024.02.12.02.54.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Feb 2024 02:54:48 -0800 (PST)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH net-next] dt-bindings: net: qca,ar9331: convert to DT schema
+Date: Mon, 12 Feb 2024 11:54:45 +0100
+Message-Id: <20240212105445.45341-1-krzysztof.kozlowski@linaro.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-When trying to resume from suspend the following can be observed:
+Convert the Qualcomm Atheros AR9331 built-in switch bindings to DT
+schema.
 
-    fec 5b040000.ethernet eth0: MDIO read timeout
-    Microchip LAN87xx T1 5b040000.ethernet-1:04: PM: dpm_run_callback(): md=
-io_bus_phy_resume+0x0/0xc8 returns -110
-    Microchip LAN87xx T1 5b040000.ethernet-1:04: PM: failed to resume: erro=
-r -110
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-This is because the MAC is left powered down after resuming from suspend.
-
-The MAC is brought up in both probe and open, so leaving it off in resume
-from suspend is an imbalance.
-This imbalance combined with a LAN8700R that is permanently powered
-results in unusuable networking if the board would happen to suspend before
-the link is brought up, and the only way to get out of it would be a full
-power cycle.
-
-NOTE: With this change the PHY ends up taking different resume paths when
-the link has never been up compared to once the link has been up. Currently
-the resume process is identical and just happens at different times, so
-this *should* not have any unforseen consequences.
-
-Signed-off-by: John Ernberg <john.ernberg@actia.se>
 ---
 
-Tested on 6.1 kernel and forward ported. I discovered this when we
-upgraded from 5.10 to 6.1, but the resume path in the FEC driver has had
-this imbalance since at least 2009.
+DSA switch bindings still bring me headache...
+---
+ .../devicetree/bindings/net/dsa/ar9331.txt    | 147 ----------------
+ .../bindings/net/dsa/qca,ar9331.yaml          | 161 ++++++++++++++++++
+ 2 files changed, 161 insertions(+), 147 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/net/dsa/ar9331.txt
+ create mode 100644 Documentation/devicetree/bindings/net/dsa/qca,ar9331.yaml
 
-This is also why I target the -next tree, I can't identify a proper commit
-to blame with a Fixes. Let me know if this should be the net tree anyway.
+diff --git a/Documentation/devicetree/bindings/net/dsa/ar9331.txt b/Documentation/devicetree/bindings/net/dsa/ar9331.txt
+deleted file mode 100644
+index f824fdae0da2..000000000000
+--- a/Documentation/devicetree/bindings/net/dsa/ar9331.txt
++++ /dev/null
+@@ -1,147 +0,0 @@
+-Atheros AR9331 built-in switch
+-=============================
+-
+-It is a switch built-in to Atheros AR9331 WiSoC and addressable over internal
+-MDIO bus. All PHYs are built-in as well.
+-
+-Required properties:
+-
+- - compatible: should be: "qca,ar9331-switch"
+- - reg: Address on the MII bus for the switch.
+- - resets : Must contain an entry for each entry in reset-names.
+- - reset-names : Must include the following entries: "switch"
+- - interrupt-parent: Phandle to the parent interrupt controller
+- - interrupts: IRQ line for the switch
+- - interrupt-controller: Indicates the switch is itself an interrupt
+-   controller. This is used for the PHY interrupts.
+- - #interrupt-cells: must be 1
+- - mdio: Container of PHY and devices on the switches MDIO bus.
+-
+-See Documentation/devicetree/bindings/net/dsa/dsa.txt for a list of additional
+-required and optional properties.
+-Examples:
+-
+-eth0: ethernet@19000000 {
+-	compatible = "qca,ar9330-eth";
+-	reg = <0x19000000 0x200>;
+-	interrupts = <4>;
+-
+-	resets = <&rst 9>, <&rst 22>;
+-	reset-names = "mac", "mdio";
+-	clocks = <&pll ATH79_CLK_AHB>, <&pll ATH79_CLK_AHB>;
+-	clock-names = "eth", "mdio";
+-
+-	phy-mode = "mii";
+-	phy-handle = <&phy_port4>;
+-};
+-
+-eth1: ethernet@1a000000 {
+-	compatible = "qca,ar9330-eth";
+-	reg = <0x1a000000 0x200>;
+-	interrupts = <5>;
+-	resets = <&rst 13>, <&rst 23>;
+-	reset-names = "mac", "mdio";
+-	clocks = <&pll ATH79_CLK_AHB>, <&pll ATH79_CLK_AHB>;
+-	clock-names = "eth", "mdio";
+-
+-	phy-mode = "gmii";
+-
+-	fixed-link {
+-		speed = <1000>;
+-		full-duplex;
+-	};
+-
+-	mdio {
+-		#address-cells = <1>;
+-		#size-cells = <0>;
+-
+-		switch10: switch@10 {
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-
+-			compatible = "qca,ar9331-switch";
+-			reg = <0x10>;
+-			resets = <&rst 8>;
+-			reset-names = "switch";
+-
+-			interrupt-parent = <&miscintc>;
+-			interrupts = <12>;
+-
+-			interrupt-controller;
+-			#interrupt-cells = <1>;
+-
+-			ports {
+-				#address-cells = <1>;
+-				#size-cells = <0>;
+-
+-				switch_port0: port@0 {
+-					reg = <0x0>;
+-					ethernet = <&eth1>;
+-
+-					phy-mode = "gmii";
+-
+-					fixed-link {
+-						speed = <1000>;
+-						full-duplex;
+-					};
+-				};
+-
+-				switch_port1: port@1 {
+-					reg = <0x1>;
+-					phy-handle = <&phy_port0>;
+-					phy-mode = "internal";
+-				};
+-
+-				switch_port2: port@2 {
+-					reg = <0x2>;
+-					phy-handle = <&phy_port1>;
+-					phy-mode = "internal";
+-				};
+-
+-				switch_port3: port@3 {
+-					reg = <0x3>;
+-					phy-handle = <&phy_port2>;
+-					phy-mode = "internal";
+-				};
+-
+-				switch_port4: port@4 {
+-					reg = <0x4>;
+-					phy-handle = <&phy_port3>;
+-					phy-mode = "internal";
+-				};
+-			};
+-
+-			mdio {
+-				#address-cells = <1>;
+-				#size-cells = <0>;
+-
+-				interrupt-parent = <&switch10>;
+-
+-				phy_port0: phy@0 {
+-					reg = <0x0>;
+-					interrupts = <0>;
+-				};
+-
+-				phy_port1: phy@1 {
+-					reg = <0x1>;
+-					interrupts = <0>;
+-				};
+-
+-				phy_port2: phy@2 {
+-					reg = <0x2>;
+-					interrupts = <0>;
+-				};
+-
+-				phy_port3: phy@3 {
+-					reg = <0x3>;
+-					interrupts = <0>;
+-				};
+-
+-				phy_port4: phy@4 {
+-					reg = <0x4>;
+-					interrupts = <0>;
+-				};
+-			};
+-		};
+-	};
+-};
+diff --git a/Documentation/devicetree/bindings/net/dsa/qca,ar9331.yaml b/Documentation/devicetree/bindings/net/dsa/qca,ar9331.yaml
+new file mode 100644
+index 000000000000..5c4f789a75fb
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/dsa/qca,ar9331.yaml
+@@ -0,0 +1,161 @@
++# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/dsa/qca,ar9331.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Qualcomm Atheros AR9331 built-in switch
++
++maintainers:
++  - Oleksij Rempel <o.rempel@pengutronix.de>
++
++description:
++  Qualcomm Atheros AR9331 is a switch built-in to Atheros AR9331 WiSoC and
++  addressable over internal MDIO bus. All PHYs are built-in as well.
++
++properties:
++  compatible:
++    const: qca,ar9331-switch
++
++  reg:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 1
++
++  interrupt-controller: true
++
++  '#interrupt-cells':
++    const: 1
++
++  mdio:
++    $ref: /schemas/net/mdio.yaml#
++    unevaluatedProperties: false
++    properties:
++      interrupt-parent: true
++
++    patternProperties:
++      '@[0-9a-f]+$':
++        type: object
++        unevaluatedProperties: false
++
++        properties:
++          reg: true
++          interrupts:
++            maxItems: 1
++
++  resets:
++    maxItems: 1
++
++  reset-names:
++    items:
++      - const: switch
++
++required:
++  - compatible
++  - reg
++  - interrupts
++  - interrupt-controller
++  - '#interrupt-cells'
++  - mdio
++  - ports
++  - resets
++  - reset-names
++
++allOf:
++  - $ref: dsa.yaml#/$defs/ethernet-ports
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    mdio {
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        switch10: switch@10 {
++            compatible = "qca,ar9331-switch";
++            reg = <0x10>;
++
++            interrupt-parent = <&miscintc>;
++            interrupts = <12>;
++            interrupt-controller;
++            #interrupt-cells = <1>;
++
++            resets = <&rst 8>;
++            reset-names = "switch";
++
++            ports {
++                #address-cells = <1>;
++                #size-cells = <0>;
++
++                port@0 {
++                    reg = <0x0>;
++                    ethernet = <&eth1>;
++
++                    phy-mode = "gmii";
++
++                    fixed-link {
++                        speed = <1000>;
++                        full-duplex;
++                    };
++                };
++
++                port@1 {
++                    reg = <0x1>;
++                    phy-handle = <&phy_port0>;
++                    phy-mode = "internal";
++                };
++
++                port@2 {
++                    reg = <0x2>;
++                    phy-handle = <&phy_port1>;
++                    phy-mode = "internal";
++                };
++
++                port@3 {
++                    reg = <0x3>;
++                    phy-handle = <&phy_port2>;
++                    phy-mode = "internal";
++                };
++
++                port@4 {
++                    reg = <0x4>;
++                    phy-handle = <&phy_port3>;
++                    phy-mode = "internal";
++                };
++            };
++
++            mdio {
++                #address-cells = <1>;
++                #size-cells = <0>;
++
++                interrupt-parent = <&switch10>;
++
++                phy_port0: ethernet-phy@0 {
++                    reg = <0x0>;
++                    interrupts = <0>;
++                };
++
++                phy_port1: ethernet-phy@1 {
++                    reg = <0x1>;
++                    interrupts = <0>;
++                };
++
++                phy_port2: ethernet-phy@2 {
++                    reg = <0x2>;
++                    interrupts = <0>;
++                };
++
++                phy_port3: ethernet-phy@3 {
++                    reg = <0x3>;
++                    interrupts = <0>;
++                };
++
++                phy_port4: ethernet-phy@4 {
++                    reg = <0x4>;
++                    interrupts = <0>;
++                };
++            };
++        };
++    };
+-- 
+2.34.1
 
- drivers/net/ethernet/freescale/fec_main.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethern=
-et/freescale/fec_main.c
-index 42bdc01a304e..e6804c068d6b 100644
---- a/drivers/net/ethernet/freescale/fec_main.c
-+++ b/drivers/net/ethernet/freescale/fec_main.c
-@@ -4706,6 +4706,8 @@ static int __maybe_unused fec_resume(struct device *d=
-ev)
- 		napi_enable(&fep->napi);
- 		phy_init_hw(ndev->phydev);
- 		phy_start(ndev->phydev);
-+	} else {
-+		fec_restart(ndev);
- 	}
- 	rtnl_unlock();
-=20
---=20
-2.43.0
 
