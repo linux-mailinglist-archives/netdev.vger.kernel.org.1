@@ -1,175 +1,294 @@
-Return-Path: <netdev+bounces-71085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7CED851F43
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 22:12:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38A16851FB2
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 22:34:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 845471F22C6E
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 21:12:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4541283161
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 21:34:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 713CC4D5AB;
-	Mon, 12 Feb 2024 21:12:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A1B04CB4E;
+	Mon, 12 Feb 2024 21:34:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E8Mc0Wag"
+	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="0OYZVpUe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6244CE05
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 21:12:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.88
+Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 882504CE02;
+	Mon, 12 Feb 2024 21:34:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707772335; cv=none; b=sRgsTJexbeAt98S4Zar5jtYZilaEAYqmRJvnKe/NVVcVkUiCD9MvrtywfOhxdCCcX0ctiTNVs6WLewf3lcyhu6PANB6ZTsCQ4K05k/HADGzyUKb0cROrp+HGQkmQueUgoyjY6oGsUP4SNN+woj6gI3AQmgL8UJNmikVisqW5KLE=
+	t=1707773671; cv=none; b=Kn7OWWxQ98cmRElhUWwzpnURkYfCZOUhVfJ0OraL3gl+9jM2wWUxbvaxp4Wn/qH2h64QEjv6T+EfQ78PpAw+/kQlvqBven/2OG/15VQQeqwp4MdwT82hzkYYwlkc4m0JGDyA7o2Jy6QCvr+QHvhlXhUPUDFF7nzXv5W7X8tmcv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707772335; c=relaxed/simple;
-	bh=P99FzqZ/ob5v85YMcxUmNT1Jn4+zsF2d+HaI1BzMT98=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=crMn56yLkjqB99p/eT+QbpL9mYNo35tYI1xJ9K5LKBGIzswXhmc/PpS8Y4NBhR3xqN9lvVgyDFfd7OqenqpOsIk8Yy+81DYgQYGTGE68Rh97XFHtdODCBkYmB+AT1QKxrqBUt4vVdOT29vcEk4bNkUA516yINK3v3BuYpbaXVW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=E8Mc0Wag; arc=none smtp.client-ip=192.55.52.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707772333; x=1739308333;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=P99FzqZ/ob5v85YMcxUmNT1Jn4+zsF2d+HaI1BzMT98=;
-  b=E8Mc0WagTk/l2t/8Pn/CgOK/AUlWU/rnGoEp2EHGm4p9t9EMCSaweBMZ
-   t2KpmespYebIFtwAj+7YuTsSGT6/cmeOIKopHXaf1AIiQq3wFOBk/AXqo
-   kBHFdBy4eaP7f5djx2Ppyz7Hgv5OZmZLXChvf2aDY+w+UCa5I3B8K2Poq
-   JK39CZDaLBeiEOC0SCECnuag1tOqhDi5uS12LVQ0esB8/z/jHvXl4esuI
-   whxeQYor8cwxBgHQU5mZZOzbVRN444b+ldm7aqw5Y1tGQyfpvkfAGJM9H
-   ItbZ74ie0MWcVABQXaoccDIKqIpAUkZTtiKM3gX5v6Fknx0eWGffOV2QF
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="436910930"
-X-IronPort-AV: E=Sophos;i="6.06,155,1705392000"; 
-   d="scan'208";a="436910930"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 13:12:09 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,155,1705392000"; 
-   d="scan'208";a="7335626"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa005.jf.intel.com with ESMTP; 12 Feb 2024 13:12:08 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Wojciech Drewek <wojciech.drewek@intel.com>,
-	anthony.l.nguyen@intel.com,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>,
-	Brett Creeley <brett.creeley@amd.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next 5/5] ice: Fix debugfs with devlink reload
-Date: Mon, 12 Feb 2024 13:11:59 -0800
-Message-ID: <20240212211202.1051990-6-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20240212211202.1051990-1-anthony.l.nguyen@intel.com>
-References: <20240212211202.1051990-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1707773671; c=relaxed/simple;
+	bh=+qcu0DYPNoQipBt7EpDCR2pS5408YGljc/2HyDR4pFU=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jS2flfCEZD14g3trC0Xq/m5kssMXMno9BYNKfRb5K0t46D1KuFVj7nk95GEj0ID++zqKPQqq8u8JB5TXf8AXzPZLcHAHuvnTz47pf2QR+MDsS9pojAVJ5vVuDvvjG2livUgloN6aZt0K4xIE2Bwqa8W5wSWzMzIT/5YngSG7PK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=0OYZVpUe; arc=none smtp.client-ip=3.9.82.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
+Received: from localhost (unknown [IPv6:2a02:8012:909b:0:a903:359f:8aea:3bdc])
+	(Authenticated sender: tom)
+	by mail.katalix.com (Postfix) with ESMTPSA id 4C7B67D118;
+	Mon, 12 Feb 2024 21:25:33 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
+	t=1707773133; bh=+qcu0DYPNoQipBt7EpDCR2pS5408YGljc/2HyDR4pFU=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Disposition:In-Reply-To:From;
+	z=Date:=20Mon,=2012=20Feb=202024=2021:25:32=20+0000|From:=20Tom=20P
+	 arkin=20<tparkin@katalix.com>|To:=20Samuel=20Thibault=20<samuel.th
+	 ibault@ens-lyon.org>,=0D=0A=09James=20Chapman=20<jchapman@katalix.
+	 com>,=20edumazet@google.com,=0D=0A=09gnault@redhat.com,=20davem@da
+	 vemloft.net,=20kuba@kernel.org,=0D=0A=09pabeni@redhat.com,=20corbe
+	 t@lwn.net,=20netdev@vger.kernel.org,=0D=0A=09linux-doc@vger.kernel
+	 .org,=20linux-kernel@vger.kernel.org|Subject:=20Re:=20[PATCHv3]=20
+	 PPPoL2TP:=20Add=20more=20code=20snippets|Message-ID:=20<ZcqMzP1RQy
+	 e9o4eB@katalix.com>|References:=20<20240203223513.f2nfgaamgffz6dno
+	 @begin>|MIME-Version:=201.0|Content-Disposition:=20inline|In-Reply
+	 -To:=20<20240203223513.f2nfgaamgffz6dno@begin>;
+	b=0OYZVpUe9YP/RBA64d2L6QacwiRppeqvdukjETNhog6SriqbA1jeDj9rV48kT/wdt
+	 YeLNm/ijC9vkTkLxNW3FlhWevP7FTdkOs6USVYeR32pslQCrEGUBciUctrR5fkDqQy
+	 iNOb+161qhJsBqMnBayut8Pxjr1X7WQHqi7y1axCot7u3kD0h7fu+9vDKfcLH0WUsV
+	 lxVrMmn1GYEj93OyD9l7Q6dOUy78P9dhCN0LToDKrdEn0FLS5WWpqLGJsOGD8fVQCl
+	 lbuiipIR5v+9A1bVbWevCt5+WJqHFxDwj0aEcVqRmjd5tYZLX+h/ybXkXLt5PC6t/S
+	 d0ugTHrWtN1fg==
+Date: Mon, 12 Feb 2024 21:25:32 +0000
+From: Tom Parkin <tparkin@katalix.com>
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>,
+	James Chapman <jchapman@katalix.com>, edumazet@google.com,
+	gnault@redhat.com, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, corbet@lwn.net, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv3] PPPoL2TP: Add more code snippets
+Message-ID: <ZcqMzP1RQye9o4eB@katalix.com>
+References: <20240203223513.f2nfgaamgffz6dno@begin>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="TYbjNzr0z0MM3ovf"
+Content-Disposition: inline
+In-Reply-To: <20240203223513.f2nfgaamgffz6dno@begin>
 
-From: Wojciech Drewek <wojciech.drewek@intel.com>
 
-During devlink reload it is needed to remove debugfs entries
-correlated with only one PF. ice_debugfs_exit() removes all
-entries created by ice driver so we can't use it.
+--TYbjNzr0z0MM3ovf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Introduce ice_debugfs_pf_deinit() in order to release PF's
-debugfs entries. Move ice_debugfs_exit() call to ice_module_exit(),
-it makes more sense since ice_debugfs_init() is called in
-ice_module_init() and not in ice_probe().
+Thanks Samuel, comments inline below.
 
-Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
-Reviewed-by: Brett Creeley <brett.creeley@amd.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/ice/ice.h         |  1 +
- drivers/net/ethernet/intel/ice/ice_debugfs.c | 10 ++++++++++
- drivers/net/ethernet/intel/ice/ice_fwlog.c   |  2 ++
- drivers/net/ethernet/intel/ice/ice_main.c    |  3 +--
- 4 files changed, 14 insertions(+), 2 deletions(-)
+On  Sat, Feb 03, 2024 at 23:35:13 +0100, Samuel Thibault wrote:
+> The existing documentation was not telling that one has to create a PPP
+> channel and a PPP interface to get PPPoL2TP data offloading working.
+>=20
+> Also, tunnel switching was not mentioned, so that people were thinking
+> it was not supported, while it actually is.
+>=20
+> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+>=20
+> ---
+> Difference from v1:
+> - follow kernel coding style
+> - check for failures
+> - also mention netlink and ip for configuring the link
+> - fix bridging channels
+>=20
+> Difference from v2:
+> - fix text alignment
+>=20
+>  Documentation/networking/l2tp.rst |   99 +++++++++++++++++++++++++++++++=
++++++--
+>  1 file changed, 95 insertions(+), 4 deletions(-)
+>=20
+> --- a/Documentation/networking/l2tp.rst
+> +++ b/Documentation/networking/l2tp.rst
+> @@ -387,11 +387,16 @@ Sample userspace code:
+>    - Create session PPPoX data socket::
+> =20
+>          struct sockaddr_pppol2tp sax;
+> -        int fd;
+> +        int session_fd;
+> +        int ret;
+> =20
+>          /* Note, the tunnel socket must be bound already, else it
+>           * will not be ready
+>           */
+> +        session_fd =3D socket(AF_PPPOX, SOCK_DGRAM, PX_PROTO_OL2TP);
+> +        if (session_fd < 0)
+> +                return -errno;
+> +
+>          sax.sa_family =3D AF_PPPOX;
+>          sax.sa_protocol =3D PX_PROTO_OL2TP;
+>          sax.pppol2tp.fd =3D tunnel_fd;
+> @@ -406,11 +411,97 @@ Sample userspace code:
+>          /* session_fd is the fd of the session's PPPoL2TP socket.
+>           * tunnel_fd is the fd of the tunnel UDP / L2TPIP socket.
+>           */
+> -        fd =3D connect(session_fd, (struct sockaddr *)&sax, sizeof(sax));
+> -        if (fd < 0 ) {
+> +        ret =3D connect(session_fd, (struct sockaddr *)&sax, sizeof(sax)=
+);
+> +        if (ret < 0 ) {
+> +                close(session_fd);
+> +                return -errno;
+> +        }
+> +
+> +        return session_fd;
+> +
+> +L2TP control packets will still be available for read on `tunnel_fd`.
+> +
+> +  - Create PPP channel::
+> +
+> +        int chindx;
+> +        int ppp_chan_fd;
+> +
+> +        ret =3D ioctl(session_fd, PPPIOCGCHAN, &chindx);
+> +        if (ret < 0)
+> +                return -errno;
+> +
+> +        ppp_chan_fd =3D open("/dev/ppp", O_RDWR);
+> +        if (ppp_chan_fd < 0)
+> +                return -errno;
+> +
+> +        ret =3D ioctl(ppp_chan_fd, PPPIOCATTCHAN, &chindx);
+> +        if (ret < 0) {
+> +                close(ppp_chan_fd);
+> +                return -errno;
+> +        }
+> +
+> +        return ppp_chan_fd;
+> +
+> +LCP PPP frames will be available for read on `ppp_chan_fd`.
+> +
+> +  - Create PPP interface::
+> +
+> +        int ppp_if_fd;
+> +        int ifunit =3D -1;
+> +
+> +        ppp_if_fd =3D open("/dev/ppp", O_RDWR);
+> +        if (ppp_chan_fd < 0)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-index 118e84835720..365c03d1c462 100644
---- a/drivers/net/ethernet/intel/ice/ice.h
-+++ b/drivers/net/ethernet/intel/ice/ice.h
-@@ -896,6 +896,7 @@ static inline bool ice_is_adq_active(struct ice_pf *pf)
- }
- 
- void ice_debugfs_fwlog_init(struct ice_pf *pf);
-+void ice_debugfs_pf_deinit(struct ice_pf *pf);
- void ice_debugfs_init(void);
- void ice_debugfs_exit(void);
- void ice_pf_fwlog_update_module(struct ice_pf *pf, int log_level, int module);
-diff --git a/drivers/net/ethernet/intel/ice/ice_debugfs.c b/drivers/net/ethernet/intel/ice/ice_debugfs.c
-index 85aa31dd86b1..d252d98218d0 100644
---- a/drivers/net/ethernet/intel/ice/ice_debugfs.c
-+++ b/drivers/net/ethernet/intel/ice/ice_debugfs.c
-@@ -644,6 +644,16 @@ void ice_debugfs_fwlog_init(struct ice_pf *pf)
- 	kfree(fw_modules);
- }
- 
-+/**
-+ * ice_debugfs_pf_deinit - cleanup PF's debugfs
-+ * @pf: pointer to the PF struct
-+ */
-+void ice_debugfs_pf_deinit(struct ice_pf *pf)
-+{
-+	debugfs_remove_recursive(pf->ice_debugfs_pf);
-+	pf->ice_debugfs_pf = NULL;
-+}
-+
- /**
-  * ice_debugfs_init - create root directory for debugfs entries
-  */
-diff --git a/drivers/net/ethernet/intel/ice/ice_fwlog.c b/drivers/net/ethernet/intel/ice/ice_fwlog.c
-index 92b5dac481cd..4fd15387a7e5 100644
---- a/drivers/net/ethernet/intel/ice/ice_fwlog.c
-+++ b/drivers/net/ethernet/intel/ice/ice_fwlog.c
-@@ -188,6 +188,8 @@ void ice_fwlog_deinit(struct ice_hw *hw)
- 	if (hw->bus.func)
- 		return;
- 
-+	ice_debugfs_pf_deinit(hw->back);
-+
- 	/* make sure FW logging is disabled to not put the FW in a weird state
- 	 * for the next driver load
- 	 */
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 85a996ad2c1f..9c2c8637b4a7 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -5276,8 +5276,6 @@ static void ice_remove(struct pci_dev *pdev)
- 		msleep(100);
- 	}
- 
--	ice_debugfs_exit();
--
- 	if (test_bit(ICE_FLAG_SRIOV_ENA, pf->flags)) {
- 		set_bit(ICE_VF_RESETS_DISABLED, pf->state);
- 		ice_free_vfs(pf);
-@@ -5783,6 +5781,7 @@ module_init(ice_module_init);
- static void __exit ice_module_exit(void)
- {
- 	pci_unregister_driver(&ice_driver);
-+	ice_debugfs_exit();
- 	destroy_workqueue(ice_wq);
- 	destroy_workqueue(ice_lag_wq);
- 	pr_info("module unloaded\n");
--- 
-2.41.0
+I think this should be 'if (ppp_if_fd < 0)' ..?
 
+> +                return -errno;
+> +
+> +        ret =3D ioctl(ppp_if_fd, PPPIOCNEWUNIT, &ifunit);
+> +        if (ret < 0) {
+> +                close(ppp_if_fd);
+> +                return -errno;
+> +        }
+> +
+> +        ret =3D ioctl(ppp_chan_fd, PPPIOCCONNECT, ifunit);
+> +        if (ret < 0) {
+> +                close(ppp_if_fd);
+> +                return -errno;
+> +        }
+> +
+> +        return ppp_chan_fd;
+
+=2E..and this should be 'return ppp_if_fd'.
+
+> +
+> +IPCP/IPv6CP PPP frames will be available for read on `ppp_if_fd`.
+> +
+> +The ppp<ifunit> interface can then be configured as usual with netlink's
+> +RTM_NEWLINK, RTM_NEWADDR, RTM_NEWROUTE, or ioctl's SIOCSIFMTU, SIOCSIFAD=
+DR,
+> +SIOCSIFDSTADDR, SIOCSIFNETMASK, SIOCSIFFLAGS, or with the `ip` command.
+> +
+> +  - L2TP session bridging (also called L2TP tunnel switching or L2TP mul=
+tihop)
+> +    is supported by bridging the ppp channels of the two L2TP sessions t=
+o be
+> +    bridged::
+
+Since we're in L2TP-world here it is probably worth making it clear
+that this only applies to PPP pseudowire types.
+
+> +
+> +        int chindx1;
+> +        int chindx2;
+> +        int ppp_chan_fd;
+> +
+> +        ret =3D ioctl(session_fd1, PPPIOCGCHAN, &chindx1);
+> +        if (ret < 0)
+> +                return -errno;
+> +
+> +        ret =3D ioctl(session_fd2, PPPIOCGCHAN, &chind2x);
+
+Typo here I think: s/chind2x/chindx2/ ?
+
+> +        if (ret < 0)
+> +                return -errno;
+> +
+> +        ppp_chan_fd =3D open("/dev/ppp", O_RDWR);
+
+Missing a check on ppp_chan_fd -- we might as well check it since
+we're checking returns everywhere else.
+
+> +        ret =3D ioctl(ppp_chan_fd, PPPIOCATTCHAN, &chindx1);
+> +        if (ret < 0) {
+> +                close(ppp_chan_fd);
+>                  return -errno;
+>          }
+> -        return 0;
+> +
+> +        ret =3D ioctl(ppp_chan_fd, PPPIOCBRIDGECHAN, &chindx2);
+> +        close(ppp_chan_fd);
+> +        if (ret < 0)
+> +                return -errno;
+> +
+> +See more details for the PPP side in ppp_generic.rst.
+
+I think we need to be clear here in this example what session_fd1 and
+session_fd2 are, and how they have come to be, since they haven't been
+mentioned in the examples so far.
+
+I'm not sure whether it helps or not, but when we were working on l2tp-ktest
+initially we had tests for the bridge ioctl.  The tests bridged a PPPoE
+channel with a PPPoL2TP one (which was the original motivation for
+PPPIOCBRIDGECHAN).  The code is here:
+
+https://github.com/katalix/l2tp-ktest/blob/master/src/util.c#L592
+
+So in that codebase we have a pppoe fd and a pppol2tp fd, both of
+which have had been attached using PPPIOCATTCHAN.
+
+We then bridge those two channels using PPPIOCBRIDGECHAN.
+
+I think the bridging is a complex use-case for what is already quite
+an involved API (lots of file descriptors and indices to keep track
+of!).  So I think the code snippet needs to be as clear as we can make
+it.
+
+Thanks again for your work on the documentation.
+
+--=20
+Tom Parkin
+Katalix Systems Ltd
+https://katalix.com
+Catalysts for your Embedded Linux software development
+
+--TYbjNzr0z0MM3ovf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEsUkgyDzMwrj81nq0lIwGZQq6i9AFAmXKjMkACgkQlIwGZQq6
+i9BXwQgAoHqydyEGowgf3EVzDNRudUQUPc1Sk7KFUzOy21wjqyINwlRuoVVVd/W4
+L0W2k6uCVv+BusU/A4Erubug2kVtGx/xf+DoK2uHYw6Qlrqwy3qtSa48eyvCZBhc
+YPQhGqT4h9q7ijvW4ivndSpzzT2NHt3v56dWubs4UZd0PmW5gXjsqI73cOK/NjAs
+dod8Ia25mgMuf+Eop/EvwKJQIDTkwJ/vJ8+r1oQ/EZh/gCXolxv8InaDoFyW3B7m
+FPMZCqhF9e+MX7E9U8jrFerl5QMXsmAwz+lJGlmsD/HTABI+5PnwiiKNNGE5+jBN
+ISeAuB0igrd7Pg4q7J4dh3ghr8zW5Q==
+=udhW
+-----END PGP SIGNATURE-----
+
+--TYbjNzr0z0MM3ovf--
 
