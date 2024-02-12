@@ -1,117 +1,120 @@
-Return-Path: <netdev+bounces-70907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38202850FE4
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 10:45:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E2C6850FFE
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 10:51:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BBD01C210DB
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 09:45:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61ADA1C2195B
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 09:51:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 513F1179BF;
-	Mon, 12 Feb 2024 09:45:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD4D717BA5;
+	Mon, 12 Feb 2024 09:51:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=rasmusvillemoes.dk header.i=@rasmusvillemoes.dk header.b="KBoUIO/j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b+fmod6P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FF095680
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 09:45:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93FB9179AD;
+	Mon, 12 Feb 2024 09:51:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707731154; cv=none; b=h9hLHHgG3mYTLmobOjPUNEN7W2PW4/waGUERriWUOJAycnM93VPoknvZfZsVwFNQkRGbuLqKOFG20U8OHd0s/scpUQGRlPLySTbJ0Uf3gWgwHQlVDQreluovxGB0GClY+CRkHbbc8bFY03ysLr17so0HKwD5xiK19fI3ViLJw6M=
+	t=1707731503; cv=none; b=ToXn3NsRSL8eaC3fx2uEAFA0UJuO3j8j2l6PTX/yBxShV/pUlWtdFLIHpqKM53kg2kRVvmACcu9QPtYOzuhn5AhNPz/MvnOL1jRjz0Pd8M9q26w4bp3edvERcmuYJICQS1aoNj5ydepm/HhCdTG5rZ0VHs/i/4uAm9fsDydidSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707731154; c=relaxed/simple;
-	bh=ySzI4UqQbBVOuOIh+dhwbC+4pxWMgESHX4phVU8ddd4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=np2kT4z+i2cSV2UGC8PnSHbAhEBdyA/mMasvMYa6VW6QJLqkd+qiPgp6/Uq4rhm1/fNTFnJJoN+J6uevuJpHcVZ1EUdf3kuCGge+GP+x3djqvy4p4M9Z5pGZ149Vm0okzJtzLlJABefolNWB8+De/IotcOVc5ZMvZ0QGsFJwpJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rasmusvillemoes.dk; spf=pass smtp.mailfrom=rasmusvillemoes.dk; dkim=pass (1024-bit key) header.d=rasmusvillemoes.dk header.i=@rasmusvillemoes.dk header.b=KBoUIO/j; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rasmusvillemoes.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rasmusvillemoes.dk
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a2f79e79f0cso459001466b.2
-        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 01:45:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rasmusvillemoes.dk; s=google; t=1707731151; x=1708335951; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bV4cEl8eqJocUFlkfdXuhYFIA23ZZfBFtqghyorQNs8=;
-        b=KBoUIO/jx5jnW73D8Bs1uH4xWh+I5SrXkkgoni+2MJ6D4ZzUyVopckfIeyfzUAQYQ7
-         CASxQioh0sKMlOc5KWDwmNHaBB+sp/8X8FEOH8CFb0X1EempfdD66xZVXxzDWC1Oph1W
-         BoooGIriaYHYTS9w6sxo7g8769m+AwZiyx044=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707731151; x=1708335951;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bV4cEl8eqJocUFlkfdXuhYFIA23ZZfBFtqghyorQNs8=;
-        b=CFXICrtK39iF2H10hkAkkR5XTj4VO98JsJKYPzoekGaDbvFBLBSPjgJIav4hV/IGml
-         kUp+TY6/1CZgMdkZpw8j+PzOH4eepf1glb9y0+kfDfbz08Yspr5ghyhjSuWebZH3TYv9
-         zvTatGx12qZVDPqvrDGYTxezDwTP5El+4csf/VngSI55BxBCUZyLaUtVs/6FHYNAtQ3Y
-         93pRGZmQ6gWtBmnJllvC0zVCw/tcok2JfBIgEItG7AKKVpR9SloUZoP0EKEhg++qrD+I
-         vH731Zkl9vXpsC/EyCqbCxbXJJefI1t3vqbhJzaBAeJGayMhQHX99ChE31kzm76IgVb8
-         UNow==
-X-Forwarded-Encrypted: i=1; AJvYcCWuCvqNyuLtM/htvX7yGZZENJvbLr5ofWRKPnRkc3VmeYSpcQ3/BVkGaUxUp8GCSJc5Gt5/cEb3fRZcljkY3b7b5IKmsOJt
-X-Gm-Message-State: AOJu0Yww5eaS0O4WN5APGgxFkrTel77GoLVxgqd9yWreuuZpVwl0gGWb
-	TxinIdQ+1T1+D96X/iLpckBvQks8VDJYciq4c7LqM72ru9Z4114+NIxFIqK4uXc=
-X-Google-Smtp-Source: AGHT+IGg9tRYxHX2ne5RUejoxgjNLuWm7IJuXq+jQGsYUF/UDKsC1BWQYq73kligtx67FdufyYx4ZA==
-X-Received: by 2002:a17:906:110e:b0:a3c:23b4:e99 with SMTP id h14-20020a170906110e00b00a3c23b40e99mr4875586eja.75.1707731150654;
-        Mon, 12 Feb 2024 01:45:50 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCX8131LLFKVmnd//P84XQZ4TM3k291SAAr5rlr+aco+GyHhalP2yDZ1FrvesS0LRgsXOn09QwIfxlhScddCcjYvkngXXTOfhuspMdVUvXq5xufRSNAaU2icj3vLIenGmg44+sk3x86knnboiKUC6O+H+nQzsZ9o2vB+xvMst/X1kofo2PxdYqPXVcWpskkhFoV4nhgDvyNs01vFZNPvhPOGzypnBXDwHJIDG4jDEAGCT6TPBwTg/PfWxIFSUDxm3+tYS03x/DmDEmXkzpuwxRr/YKWqN5MT46T/a4toJ1kUubKmj/nKfAyZXhSXRITXqnExPhPvEz1WECP1l7fGf0ZqHYjwzEBDEb6QCjsIVV4oV3vlNnOqYzuzSWYkRDVR9SJoqkTXFNpVJHtGHArgforDW2IWOXc6J3OquXKzDc0buK0BnUT/l71jW5epBmJLOSXPjvnUTAUwmd9g5ORIxe5JaCTnhVY7
-Received: from [172.16.11.116] ([81.216.59.226])
-        by smtp.gmail.com with ESMTPSA id y7-20020a170906558700b00a3bbf725080sm30312ejp.55.2024.02.12.01.45.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Feb 2024 01:45:50 -0800 (PST)
-Message-ID: <4ed6af49-610f-4df4-ae06-22a85e052dbb@rasmusvillemoes.dk>
-Date: Mon, 12 Feb 2024 10:45:47 +0100
+	s=arc-20240116; t=1707731503; c=relaxed/simple;
+	bh=VKJRqZfLWsm+N7pdIsKPtIEQyQNhxJsDk3o8zVSC9fE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eDuYcBtfXAUJay2nmaYLfRvd5xYubbz3sIZmfBeHEvqjlqf67teTxgMtPL37+2Hf/eoFIs2bi83CCEmQg6o+gcTR8+w8vr55sOQqSmIxcsCqfcN4yI10gId8VRXEVMolQB2VD/I20gpemCm78pathMJfmjRvs6vX4sdgkvC5Cu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b+fmod6P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C06EC433C7;
+	Mon, 12 Feb 2024 09:51:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707731503;
+	bh=VKJRqZfLWsm+N7pdIsKPtIEQyQNhxJsDk3o8zVSC9fE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=b+fmod6PlGlu3Ew1zpSFEFj6Fng1Fx1+EIDaBVoUrp3VhG4iPQxMVJYcHhbwcsLAv
+	 XrmHKBovA12Q+WlaCHsGL7FvgBSO5CVrsnZNrSNAt1esCu6y6zfIBMJkj0PQi0hDxy
+	 HqsUwAMsgVQ2xWU1orgf8m/BhIvonssDbOdQusavYiUCMCiYqV3o0f++/aB6sE8qXC
+	 Y9+r4IcnBdgIFhj7grWLbMgA0GP9NxdcyksMFijPXk9ckVUXfO0zS3y997NYBsO9yH
+	 8j7NjcIMF5lYZcxJrQeNpR7yIqIYIq/Jdlij6iG8J8gO6ZOilrpgVDlxh6AlTu2ifD
+	 BfuYgxqDbd3bw==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: netdev@vger.kernel.org
+Cc: lorenzo.bianconi@redhat.com,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	bpf@vger.kernel.org,
+	toke@redhat.com,
+	willemdebruijn.kernel@gmail.com,
+	jasowang@redhat.com,
+	sdf@google.com,
+	hawk@kernel.org,
+	ilias.apalodimas@linaro.org,
+	linyunsheng@huawei.com
+Subject: [PATCH v9 net-next 0/4] add multi-buff support for xdp running in generic mode
+Date: Mon, 12 Feb 2024 10:50:53 +0100
+Message-ID: <cover.1707729884.git.lorenzo@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 RESEND 4/6] bitmap: Introduce bitmap_off()
-To: Herve Codina <herve.codina@bootlin.com>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Yury Norov <yury.norov@gmail.com>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew@lunn.ch>,
- Mark Brown <broonie@kernel.org>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-References: <20240212075646.19114-1-herve.codina@bootlin.com>
- <20240212075646.19114-5-herve.codina@bootlin.com>
-Content-Language: en-US, da
-From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-In-Reply-To: <20240212075646.19114-5-herve.codina@bootlin.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 12/02/2024 08.56, Herve Codina wrote:
-> The bitmap_onto() function translates one bitmap relative to another but
-> no function are present to perform the reverse translation.
-> 
-> Introduce bitmap_off() to fill this hole.
-> 
-> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> ---
->  include/linux/bitmap.h |  3 +++
->  lib/bitmap.c           | 42 ++++++++++++++++++++++++++++++++++++++++++
+Introduce multi-buffer support for xdp running in generic mode not always
+linearizing the skb in netif_receive_generic_xdp routine.
+Introduce generic percpu page_pools allocator.
 
-This patch, or the next in the series, should include a diffstat
-mentioning lib/test_bitmap.c. And please make sure that the tests
-exercise both expected use as well as corner cases, so that the actual
-expected behavior is documented in code and not just in prose (which may
-be ambiguous), and so that behavior-changing refactorings will not go
-unnoticed.
+Changes since v8:
+- fix veth regression introduce in veth.sh selftest
+Changes since v7:
+- fix sparse warnings
+Changes since v6:
+- remove patch 4/5 'net: page_pool: make stats available just for global pools'
+- rename netif_skb_segment_for_xdp() in
+  skb_cow_data_for_xdp()/skb_pp_cow_data()
+- rename net_page_pool_alloc() in net_page_pool_create()
+- rename page_pool percpu pointer in system_page_pool
+- set percpu page_pool memory size
+Changes since v5:
+- move percpu page_pool pointer out of softnet_data in a dedicated variable
+- make page_pool stats available just for global pools
+- rely on netif_skb_segment_for_xdp utility routine in veth driver
+Changes since v4:
+- fix compilation error if page_pools are not enabled
+Changes since v3:
+- introduce page_pool in softnet_data structure
+- rely on page_pools for xdp_generic code
+Changes since v2:
+- rely on napi_alloc_frag() and napi_build_skb() to build the new skb
+Changes since v1:
+- explicitly keep the skb segmented in netif_skb_check_for_generic_xdp() and
+  do not rely on pskb_expand_head()
 
-Rasmus
+Lorenzo Bianconi (4):
+  net: add generic percpu page_pool allocator
+  xdp: rely on skb pointer reference in do_xdp_generic and
+    netif_receive_generic_xdp
+  xdp: add multi-buff support for xdp running in generic mode
+  veth: rely on skb_pp_cow_data utility routine
+
+ drivers/net/tun.c             |   4 +-
+ drivers/net/veth.c            |  74 +------------------
+ include/linux/netdevice.h     |   2 +-
+ include/linux/skbuff.h        |   4 ++
+ include/net/page_pool/types.h |   3 +
+ net/core/dev.c                | 131 +++++++++++++++++++++++++++-------
+ net/core/page_pool.c          |  23 ++++--
+ net/core/skbuff.c             |  97 ++++++++++++++++++++++++-
+ 8 files changed, 231 insertions(+), 107 deletions(-)
+
+-- 
+2.43.0
 
 
