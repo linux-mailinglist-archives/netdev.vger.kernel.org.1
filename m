@@ -1,181 +1,439 @@
-Return-Path: <netdev+bounces-71055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A45FA851D1D
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 19:45:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90C71851CBA
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 19:29:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9D461C20282
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 18:45:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05BDB1F215F2
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 18:29:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C3F84D9E9;
-	Mon, 12 Feb 2024 18:42:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 471063FE2B;
+	Mon, 12 Feb 2024 18:29:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TUXrDHmC"
 X-Original-To: netdev@vger.kernel.org
-Received: from cloudserver094114.home.pl (cloudserver094114.home.pl [79.96.170.134])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8AA7481DA;
-	Mon, 12 Feb 2024 18:42:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.96.170.134
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A943740BE0
+	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 18:29:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707763358; cv=none; b=CRwUpA9+m+6qg/iB2zfH+v5fVElA/qSIAITaezlS5Wl9uSt8+peaWfdcXWEaltiw+VNHLS699zBHEidUaiBHVfb+hlyboc5xxX0chYravo8uD133Lc1VPJh3Buw4GT3wsRu8oDndWAXdMqgpRNQFpJ0egdo+YNVN4RlRC6zCZHY=
+	t=1707762558; cv=none; b=ny5wWoBA3xjDMqDjWc+TwdUbNPRXgulr6ibt6MF/5c1Ogaul20G+lI1cyAYy2ZbYXqpJHuKEIk2NYZ4AXmdfjWvEXoCTWHukfXeFJO47JLNGRxdqefYhYP2iky6CXit/pt8CU2flACd7rwp4jEE41cSlJVM7xYO5AQFDc2kb874=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707763358; c=relaxed/simple;
-	bh=ruCrcRG0ZxbpdLcx0rWNmfXeUOipHCx6oaOxdYBpTi8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FmNQfk/VYn2CjH4yL32389ZPx0exw9W8G+4kVDgrjOw4guBREOtN/jIM3j4Q2lvDOYt7Sr078yoEzXcD/y+C7UQBvdMGTLdRungEvrnj6iX8O27P0qdVrwsZYTOz+lv2eqSGoQq/KvbuoqvzFi4ekZ73HcMdqP5II+MJUSxtKV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rjwysocki.net; spf=pass smtp.mailfrom=rjwysocki.net; arc=none smtp.client-ip=79.96.170.134
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rjwysocki.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rjwysocki.net
-Received: from localhost (127.0.0.1) (HELO v370.home.net.pl)
- by /usr/run/smtp (/usr/run/postfix/private/idea_relay_lmtp) via UNIX with SMTP (IdeaSmtpServer 5.4.0)
- id f4cc19245f191df7; Mon, 12 Feb 2024 19:42:33 +0100
-Received: from kreacher.localnet (unknown [195.136.19.94])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by cloudserver094114.home.pl (Postfix) with ESMTPSA id 3CC00669CF2;
-	Mon, 12 Feb 2024 19:42:33 +0100 (CET)
-From: "Rafael J. Wysocki" <rjw@rjwysocki.net>
-To: Linux PM <linux-pm@vger.kernel.org>
-Cc: Lukasz Luba <lukasz.luba@arm.com>, LKML <linux-kernel@vger.kernel.org>,
- Daniel Lezcano <daniel.lezcano@linaro.org>,
- Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>,
- Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
- Zhang Rui <rui.zhang@intel.com>, netdev@vger.kernel.org,
- Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
- Miri Korenblit <miriam.rachel.korenblit@intel.com>,
- linux-wireless@vger.kernel.org, Shawn Guo <shawnguo@kernel.org>,
- Sascha Hauer <s.hauer@pengutronix.de>,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- Manaf Meethalavalappu Pallikunhi <quic_manafm@quicinc.com>
-Subject: [PATCH v2 1/9] thermal: Get rid of CONFIG_THERMAL_WRITABLE_TRIPS
-Date: Mon, 12 Feb 2024 19:26:25 +0100
-Message-ID: <4545870.LvFx2qVVIh@kreacher>
-In-Reply-To: <6017196.lOV4Wx5bFT@kreacher>
-References: <6017196.lOV4Wx5bFT@kreacher>
+	s=arc-20240116; t=1707762558; c=relaxed/simple;
+	bh=2oSQyyFtLgPUGqbrN+g4ldKCGIcpH9Wkq0dbCYNLPbA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sv+w0NkHeyaVnl0yAnDSxs7Clqtrgjy3+dbh19+GFLtovril0hqKTrrTXPecpaJuOGlG8hjExrqEC8y8dq1lGVOYg3m/ih6jBQ7NY/+ry0d1mxsXM6kjEkABYiNl/w9mAt6vPsbqc0HyUXeIQelh97lWUENuNldj6JCPSirBaAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=TUXrDHmC; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-410d57a533dso9162995e9.0
+        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 10:29:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1707762554; x=1708367354; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gKODUFCzXH1xAGWHJPaTGC50QYmXdJIdivv6eKgvZnk=;
+        b=TUXrDHmCzhgBbKT0Pmvz0QBYNQh/8wl1C9+dOaUPGnlPe1gsIV2Wwten1XY40lq+yd
+         NVgGO9lV3ys3XQZv8jCUyy8/AG14ox5wFmByEGen5Inoyn55EekJ7hnMbaDeKQLrYdk+
+         Raay5cJ7rRHT19TMdlV0g57uLU75joQ76sZFFH0xJN6agQl3PHO2pJPmWp91NsuOfrKy
+         jDpWycyNQe94Viw3OZUQTSmSHCeyAPwzWVJPAvcO/gZsqR91HCMaJtYbZIkUqR9/NkvZ
+         4vjXO6L10L7Dqsk5z5ohDkX7ni0xMys9XrpQqPUlua7jPugyT6vPirhYvsKPDsAkynQU
+         tNnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707762554; x=1708367354;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gKODUFCzXH1xAGWHJPaTGC50QYmXdJIdivv6eKgvZnk=;
+        b=J2a8Z6L9V4mWeFoeiT8qN+Lkp5CGWvbd/7t8PTAn6d8aRV+kOCurDzeshjr3n0M6+j
+         6Sxc1oVim/BquRrWnmTKjQwlTaBQufOlp65Pr73Oem8lXwvmQJ4aFeTY9H//YmF0pkdT
+         CJOCIPRn4DYQge+Kk46JHZ+5/NHx5nr3foYt1NtNNy6OuzFLtFAvabtp4HuoI9t6g8Lw
+         WLiHiqYER2onV97jAemyEcecHiz0OUu5xKajDmgiGHBF0OTw+CqR7PhkP90h6gCX1Ijb
+         aRYrwuST8kIWiuH0SyiFj5zzYdU3us2x+/0gDSgKmc3EsiC+ZfGQBixoVAAM8BvSK93n
+         zJKg==
+X-Forwarded-Encrypted: i=1; AJvYcCWedRmqc3wCXDqpEBOsuiHB2yc0YJBxwj1g9LQpIJfk99X0xaYgeI+cfZ5lZ/JFYv15ixq7sZkAI3dRHSFiOt1tK3lmJS0X
+X-Gm-Message-State: AOJu0Yx2an7xiH9q9man/esINPIiymuiwODK5EopCFayuS7VvXLIjIVD
+	lg2TostkpMm99Rh1e5SbNxH5lzkv8CSNZ4IgxAVQdIqrIAITEASHpa+ewJwQRaY=
+X-Google-Smtp-Source: AGHT+IGH2x7z4naCBsdzCmdXabnMaXlTApon5v6PZ5vGE7i+pfWbTlduPiqvFV2qfsxz0kJHSyRHsw==
+X-Received: by 2002:a05:600c:5489:b0:410:78fb:c1ef with SMTP id iv9-20020a05600c548900b0041078fbc1efmr6012650wmb.33.1707762553991;
+        Mon, 12 Feb 2024 10:29:13 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXp6FkjBNynrg8ReFDDny+o5EVQnDKfABedo8FJVRo+H7hun+D4Gy3kjYEaBRAAYcoXvHBwpja7Up2NqIbDJy3EAZQIV4HAeDSGBVrpGoTX2ZHT1Vqaly2uYYcTUxepBUXE2/eAnYxiQ3w6xsgoJJ8HcuuG+P0pApq7imxhvAZQpHIHBKxvde0DnP/q8l8PapmHny+FpQS3ClNXCPAWcuBRIVxBOMlo0TB0awTEFDYhcW22yBnQHTL40G0hMICR01JvyqZQuJFh75Xx8VrOXtpkAnDN6isHl4j0UsUupEdfPhfGXCKWEwX/oT9qo13VAByWxSlVuKziO7z0vrMAmXyc5CAk5JdnumvbXXEO30toy+emXFtjttaTxMxg3EyhWP5yiqqtHkbuWUmmWzOTKebBiUSiCU80
+Received: from krzk-bin.. ([178.197.223.6])
+        by smtp.gmail.com with ESMTPSA id i5-20020a05600c290500b0040ef95e1c78sm9337299wmd.3.2024.02.12.10.29.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Feb 2024 10:29:13 -0800 (PST)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH v2] dt-bindings: net: qca,ar9331: convert to DT schema
+Date: Mon, 12 Feb 2024 19:29:11 +0100
+Message-Id: <20240212182911.233819-1-krzysztof.kozlowski@linaro.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="UTF-8"
-X-CLIENT-IP: 195.136.19.94
-X-CLIENT-HOSTNAME: 195.136.19.94
-X-VADE-SPAMSTATE: clean
-X-VADE-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvledrudefgdduudegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecujffqoffgrffnpdggtffipffknecuuegrihhlohhuthemucduhedtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkfgjfhgggfgtsehtufertddttdejnecuhfhrohhmpedftfgrfhgrvghlucflrdcuhgihshhotghkihdfuceorhhjfiesrhhjfiihshhotghkihdrnhgvtheqnecuggftrfgrthhtvghrnhepvdffueeitdfgvddtudegueejtdffteetgeefkeffvdeftddttdeuhfegfedvjefhnecukfhppeduleehrddufeeirdduledrleegnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepudelhedrudefiedrudelrdelgedphhgvlhhopehkrhgvrggthhgvrhdrlhhotggrlhhnvghtpdhmrghilhhfrhhomhepfdftrghfrggvlhculfdrucghhihsohgtkhhifdcuoehrjhifsehrjhifhihsohgtkhhirdhnvghtqedpnhgspghrtghpthhtohepudeipdhrtghpthhtoheplhhinhhugidqphhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhukhgrshiirdhluhgsrgesrghrmhdrtghomhdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghnihgvlhdrlhgviigtrghnoheslhhinhgrrhhordhorhhgpdhrtghpthhtohepshht
- rghnihhslhgrfidrghhruhhsiihkrgeslhhinhhugidrihhnthgvlhdrtghomhdprhgtphhtthhopehsrhhinhhivhgrshdrphgrnhgurhhuvhgruggrsehlihhnuhigrdhinhhtvghlrdgtohhm
-X-DCC--Metrics: v370.home.net.pl 1024; Body=16 Fuz1=16 Fuz2=16
+Content-Transfer-Encoding: 8bit
 
-From: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Convert the Qualcomm Atheros AR9331 built-in switch bindings to DT
+schema.
 
-The only difference made by CONFIG_THERMAL_WRITABLE_TRIPS is whether or
-not the writable trips mask passed during thermal zone registration
-will take any effect, but whoever passes a non-zero writable trips mask
-to thermal_zone_device_register_with_trips() can be forgiven thinking
-that it will always work.
-
-Moreover, some thermal drivers expect user space to set trip temperature
-values, so they select CONFIG_THERMAL_WRITABLE_TRIPS, possibly overriding
-a manual choice to unset it and going against the design purportedly
-allowing system integrators to decide on the writability of trip points
-for the given kernel build.  It is also set in one platform's defconfig.
-
-Forthermore, CONFIG_THERMAL_WRITABLE_TRIPS only affects trip temperature,
-because trip hysteresis is writable as long as the thermal zone provides
-a callback to update it, regardless of the CONFIG_THERMAL_WRITABLE_TRIPS
-value.
-
-The above means that the symbol in question is used inconsistently and
-its purpose is at least moot, so remove it and always take the writable
-trip mask passed to thermal_zone_device_register_with_trips() into
-account.
-
-Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
----
-
-v1 -> v2: No changes
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 ---
- arch/arm/configs/imx_v6_v7_defconfig |    1 -
- drivers/thermal/Kconfig              |   11 -----------
- drivers/thermal/intel/Kconfig        |    2 --
- drivers/thermal/thermal_sysfs.c      |    3 +--
- 4 files changed, 1 insertion(+), 16 deletions(-)
 
-Index: linux-pm/drivers/thermal/Kconfig
-===================================================================
---- linux-pm.orig/drivers/thermal/Kconfig
-+++ linux-pm/drivers/thermal/Kconfig
-@@ -83,17 +83,6 @@ config THERMAL_OF
- 	  Say 'Y' here if you need to build thermal infrastructure
- 	  based on device tree.
- 
--config THERMAL_WRITABLE_TRIPS
--	bool "Enable writable trip points"
--	help
--	  This option allows the system integrator to choose whether
--	  trip temperatures can be changed from userspace. The
--	  writable trips need to be specified when setting up the
--	  thermal zone but the choice here takes precedence.
+DSA switch bindings still bring me headache...
+
+Changes in v2:
+1. Narrow pattern for phy children to ethernet-phy@ or phy@ (MIPS DTS
+   has the latter) - Conor.
+---
+ .../devicetree/bindings/net/dsa/ar9331.txt    | 147 ----------------
+ .../bindings/net/dsa/qca,ar9331.yaml          | 161 ++++++++++++++++++
+ 2 files changed, 161 insertions(+), 147 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/net/dsa/ar9331.txt
+ create mode 100644 Documentation/devicetree/bindings/net/dsa/qca,ar9331.yaml
+
+diff --git a/Documentation/devicetree/bindings/net/dsa/ar9331.txt b/Documentation/devicetree/bindings/net/dsa/ar9331.txt
+deleted file mode 100644
+index f824fdae0da2..000000000000
+--- a/Documentation/devicetree/bindings/net/dsa/ar9331.txt
++++ /dev/null
+@@ -1,147 +0,0 @@
+-Atheros AR9331 built-in switch
+-=============================
 -
--	  Say 'Y' here if you would like to allow userspace tools to
--	  change trip temperatures.
+-It is a switch built-in to Atheros AR9331 WiSoC and addressable over internal
+-MDIO bus. All PHYs are built-in as well.
 -
- choice
- 	prompt "Default Thermal governor"
- 	default THERMAL_DEFAULT_GOV_STEP_WISE
-Index: linux-pm/drivers/thermal/thermal_sysfs.c
-===================================================================
---- linux-pm.orig/drivers/thermal/thermal_sysfs.c
-+++ linux-pm/drivers/thermal/thermal_sysfs.c
-@@ -458,8 +458,7 @@ static int create_trip_attrs(struct ther
- 						tz->trip_temp_attrs[indx].name;
- 		tz->trip_temp_attrs[indx].attr.attr.mode = S_IRUGO;
- 		tz->trip_temp_attrs[indx].attr.show = trip_point_temp_show;
--		if (IS_ENABLED(CONFIG_THERMAL_WRITABLE_TRIPS) &&
--		    mask & (1 << indx)) {
-+		if (mask & (1 << indx)) {
- 			tz->trip_temp_attrs[indx].attr.attr.mode |= S_IWUSR;
- 			tz->trip_temp_attrs[indx].attr.store =
- 							trip_point_temp_store;
-Index: linux-pm/drivers/thermal/intel/Kconfig
-===================================================================
---- linux-pm.orig/drivers/thermal/intel/Kconfig
-+++ linux-pm/drivers/thermal/intel/Kconfig
-@@ -23,7 +23,6 @@ config X86_PKG_TEMP_THERMAL
- 	tristate "X86 package temperature thermal driver"
- 	depends on X86_THERMAL_VECTOR
- 	select THERMAL_GOV_USER_SPACE
--	select THERMAL_WRITABLE_TRIPS
- 	select INTEL_TCC
- 	default m
- 	help
-@@ -47,7 +46,6 @@ config INTEL_SOC_DTS_THERMAL
- 	tristate "Intel SoCs DTS thermal driver"
- 	depends on X86 && PCI && ACPI
- 	select INTEL_SOC_DTS_IOSF_CORE
--	select THERMAL_WRITABLE_TRIPS
- 	help
- 	  Enable this to register Intel SoCs (e.g. Bay Trail) platform digital
- 	  temperature sensor (DTS). These SoCs have two additional DTSs in
-Index: linux-pm/arch/arm/configs/imx_v6_v7_defconfig
-===================================================================
---- linux-pm.orig/arch/arm/configs/imx_v6_v7_defconfig
-+++ linux-pm/arch/arm/configs/imx_v6_v7_defconfig
-@@ -228,7 +228,6 @@ CONFIG_SENSORS_IIO_HWMON=y
- CONFIG_SENSORS_PWM_FAN=y
- CONFIG_SENSORS_SY7636A=y
- CONFIG_THERMAL_STATISTICS=y
--CONFIG_THERMAL_WRITABLE_TRIPS=y
- CONFIG_CPU_THERMAL=y
- CONFIG_IMX_THERMAL=y
- CONFIG_WATCHDOG=y
-
-
+-Required properties:
+-
+- - compatible: should be: "qca,ar9331-switch"
+- - reg: Address on the MII bus for the switch.
+- - resets : Must contain an entry for each entry in reset-names.
+- - reset-names : Must include the following entries: "switch"
+- - interrupt-parent: Phandle to the parent interrupt controller
+- - interrupts: IRQ line for the switch
+- - interrupt-controller: Indicates the switch is itself an interrupt
+-   controller. This is used for the PHY interrupts.
+- - #interrupt-cells: must be 1
+- - mdio: Container of PHY and devices on the switches MDIO bus.
+-
+-See Documentation/devicetree/bindings/net/dsa/dsa.txt for a list of additional
+-required and optional properties.
+-Examples:
+-
+-eth0: ethernet@19000000 {
+-	compatible = "qca,ar9330-eth";
+-	reg = <0x19000000 0x200>;
+-	interrupts = <4>;
+-
+-	resets = <&rst 9>, <&rst 22>;
+-	reset-names = "mac", "mdio";
+-	clocks = <&pll ATH79_CLK_AHB>, <&pll ATH79_CLK_AHB>;
+-	clock-names = "eth", "mdio";
+-
+-	phy-mode = "mii";
+-	phy-handle = <&phy_port4>;
+-};
+-
+-eth1: ethernet@1a000000 {
+-	compatible = "qca,ar9330-eth";
+-	reg = <0x1a000000 0x200>;
+-	interrupts = <5>;
+-	resets = <&rst 13>, <&rst 23>;
+-	reset-names = "mac", "mdio";
+-	clocks = <&pll ATH79_CLK_AHB>, <&pll ATH79_CLK_AHB>;
+-	clock-names = "eth", "mdio";
+-
+-	phy-mode = "gmii";
+-
+-	fixed-link {
+-		speed = <1000>;
+-		full-duplex;
+-	};
+-
+-	mdio {
+-		#address-cells = <1>;
+-		#size-cells = <0>;
+-
+-		switch10: switch@10 {
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-
+-			compatible = "qca,ar9331-switch";
+-			reg = <0x10>;
+-			resets = <&rst 8>;
+-			reset-names = "switch";
+-
+-			interrupt-parent = <&miscintc>;
+-			interrupts = <12>;
+-
+-			interrupt-controller;
+-			#interrupt-cells = <1>;
+-
+-			ports {
+-				#address-cells = <1>;
+-				#size-cells = <0>;
+-
+-				switch_port0: port@0 {
+-					reg = <0x0>;
+-					ethernet = <&eth1>;
+-
+-					phy-mode = "gmii";
+-
+-					fixed-link {
+-						speed = <1000>;
+-						full-duplex;
+-					};
+-				};
+-
+-				switch_port1: port@1 {
+-					reg = <0x1>;
+-					phy-handle = <&phy_port0>;
+-					phy-mode = "internal";
+-				};
+-
+-				switch_port2: port@2 {
+-					reg = <0x2>;
+-					phy-handle = <&phy_port1>;
+-					phy-mode = "internal";
+-				};
+-
+-				switch_port3: port@3 {
+-					reg = <0x3>;
+-					phy-handle = <&phy_port2>;
+-					phy-mode = "internal";
+-				};
+-
+-				switch_port4: port@4 {
+-					reg = <0x4>;
+-					phy-handle = <&phy_port3>;
+-					phy-mode = "internal";
+-				};
+-			};
+-
+-			mdio {
+-				#address-cells = <1>;
+-				#size-cells = <0>;
+-
+-				interrupt-parent = <&switch10>;
+-
+-				phy_port0: phy@0 {
+-					reg = <0x0>;
+-					interrupts = <0>;
+-				};
+-
+-				phy_port1: phy@1 {
+-					reg = <0x1>;
+-					interrupts = <0>;
+-				};
+-
+-				phy_port2: phy@2 {
+-					reg = <0x2>;
+-					interrupts = <0>;
+-				};
+-
+-				phy_port3: phy@3 {
+-					reg = <0x3>;
+-					interrupts = <0>;
+-				};
+-
+-				phy_port4: phy@4 {
+-					reg = <0x4>;
+-					interrupts = <0>;
+-				};
+-			};
+-		};
+-	};
+-};
+diff --git a/Documentation/devicetree/bindings/net/dsa/qca,ar9331.yaml b/Documentation/devicetree/bindings/net/dsa/qca,ar9331.yaml
+new file mode 100644
+index 000000000000..fd9ddc59d38c
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/dsa/qca,ar9331.yaml
+@@ -0,0 +1,161 @@
++# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/dsa/qca,ar9331.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Qualcomm Atheros AR9331 built-in switch
++
++maintainers:
++  - Oleksij Rempel <o.rempel@pengutronix.de>
++
++description:
++  Qualcomm Atheros AR9331 is a switch built-in to Atheros AR9331 WiSoC and
++  addressable over internal MDIO bus. All PHYs are built-in as well.
++
++properties:
++  compatible:
++    const: qca,ar9331-switch
++
++  reg:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 1
++
++  interrupt-controller: true
++
++  '#interrupt-cells':
++    const: 1
++
++  mdio:
++    $ref: /schemas/net/mdio.yaml#
++    unevaluatedProperties: false
++    properties:
++      interrupt-parent: true
++
++    patternProperties:
++      '(ethernet-)?phy@[0-4]+$':
++        type: object
++        unevaluatedProperties: false
++
++        properties:
++          reg: true
++          interrupts:
++            maxItems: 1
++
++  resets:
++    maxItems: 1
++
++  reset-names:
++    items:
++      - const: switch
++
++required:
++  - compatible
++  - reg
++  - interrupts
++  - interrupt-controller
++  - '#interrupt-cells'
++  - mdio
++  - ports
++  - resets
++  - reset-names
++
++allOf:
++  - $ref: dsa.yaml#/$defs/ethernet-ports
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    mdio {
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        switch10: switch@10 {
++            compatible = "qca,ar9331-switch";
++            reg = <0x10>;
++
++            interrupt-parent = <&miscintc>;
++            interrupts = <12>;
++            interrupt-controller;
++            #interrupt-cells = <1>;
++
++            resets = <&rst 8>;
++            reset-names = "switch";
++
++            ports {
++                #address-cells = <1>;
++                #size-cells = <0>;
++
++                port@0 {
++                    reg = <0x0>;
++                    ethernet = <&eth1>;
++
++                    phy-mode = "gmii";
++
++                    fixed-link {
++                        speed = <1000>;
++                        full-duplex;
++                    };
++                };
++
++                port@1 {
++                    reg = <0x1>;
++                    phy-handle = <&phy_port0>;
++                    phy-mode = "internal";
++                };
++
++                port@2 {
++                    reg = <0x2>;
++                    phy-handle = <&phy_port1>;
++                    phy-mode = "internal";
++                };
++
++                port@3 {
++                    reg = <0x3>;
++                    phy-handle = <&phy_port2>;
++                    phy-mode = "internal";
++                };
++
++                port@4 {
++                    reg = <0x4>;
++                    phy-handle = <&phy_port3>;
++                    phy-mode = "internal";
++                };
++            };
++
++            mdio {
++                #address-cells = <1>;
++                #size-cells = <0>;
++
++                interrupt-parent = <&switch10>;
++
++                phy_port0: ethernet-phy@0 {
++                    reg = <0x0>;
++                    interrupts = <0>;
++                };
++
++                phy_port1: ethernet-phy@1 {
++                    reg = <0x1>;
++                    interrupts = <0>;
++                };
++
++                phy_port2: ethernet-phy@2 {
++                    reg = <0x2>;
++                    interrupts = <0>;
++                };
++
++                phy_port3: ethernet-phy@3 {
++                    reg = <0x3>;
++                    interrupts = <0>;
++                };
++
++                phy_port4: ethernet-phy@4 {
++                    reg = <0x4>;
++                    interrupts = <0>;
++                };
++            };
++        };
++    };
+-- 
+2.34.1
 
 
