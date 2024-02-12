@@ -1,203 +1,131 @@
-Return-Path: <netdev+bounces-71086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B44A4851F87
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 22:26:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8C3E851FAF
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 22:34:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3B161C2229B
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 21:26:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 652FB285078
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 21:34:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99F144CB3D;
-	Mon, 12 Feb 2024 21:26:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1D804CB58;
+	Mon, 12 Feb 2024 21:33:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="skn/ADoZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E281C8832
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 21:26:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D17764D121;
+	Mon, 12 Feb 2024 21:33:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707773178; cv=none; b=doY3z0FTolp9Nu7f6vcTUrvtn0F65Z5yqdV0Jlx2uh11g33anYpDeA93PwsAhCpwdspQf7WWZoNflejfhJMoUVCOmH/L7TQOBPxi0KL2tJiVOL2cVo2gE3lDsK/bx9XTRIiYyBG4HPl6Uo193t5tlC3/njbRKzbjpzfeDxuq674=
+	t=1707773631; cv=none; b=LP77Uc8i07zrzBk2iWarom72ssI6s89MfhdWuhhU27cdhf7HXrM8k3t5lEeVixjfI0uY1Yi/zSVGOKuk1EYNPEodNZYC1bNoaq93S8d3Tb41myuXIe6vEIG8PqI6TEKxnZuOjLUnWXBzQm0dnL9KYSzNxkDl0kZN4yrUpIonZVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707773178; c=relaxed/simple;
-	bh=gdBrqYwMAIQdRKLaqdduNKTUrHZMgfta/ChCSoiv/JI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=OLm2P3MmObrY58PZKTDrPjFVD7ly81WqE+sH3bKD9QPkMKGrLCej0utCF2W6/u+DU+gVmMbwkirMmtu0lIh6qTod+SYHoNMME2+6Rjn5JftTC5M9NQuembJbqkx90zbT5O0gUlopJ7il9mWol8mIfaEYZbwOdSgPoi1tKBvMpyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-363befae30fso33648175ab.1
-        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 13:26:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707773176; x=1708377976;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Wagcq9COHb24z/xuskXRn8d6kbGmFHER+wSRaPPVz+w=;
-        b=bGQD2Hr19pdIBp3jrSyq9NN+tNUqL69uyfgRTK0UQqkbi2jxP8CzKYbkE3PifIX693
-         pgodwYEGmLwO8Ldp7RaKlGmNYQ2X4Sq+FXCaMhTcs5bqN2b0chy0Yo2maKYb3tbCAoGR
-         MdhfFkZAOiNdxj39Zo7lP4UtpbZU48WOAUN+E1rw3bORDYJeFCjkazEmblY/oufNUHOl
-         qpo89zenQhuJCSRwMw1fMWqyKMVj2sv+N+jIbDnHpUZuCwgwUK2gSPsg15+Z8O8iXY2s
-         IKptPkZcfR4uc4qaj09Rme9qZ9lCy5IN/1h7zhZuIFEAyHaq/X/gmlTwrN2reRpV23VQ
-         RAVg==
-X-Forwarded-Encrypted: i=1; AJvYcCVVHkL1dz6m0R3ePC+6cSgZ9KZ7T3flvZi2nz+It0bprzO80kew4GjQoEU9bkRAoDD0f68tJrixp3lDQJn/VjpJTKCU/FUA
-X-Gm-Message-State: AOJu0Yy0na6v+6HZBPWYUwZj9uz7i4wDcYqdYXUhMaxUD/b7Caa6/3KJ
-	vXdFkNnp4bNXc+4YRSfo8JmRLxJT+2inD6T6Efdm7/NgsZOcBKqvBaNML32xHuG+dnKO07nAUjH
-	jX+hTKaXxX+bmMoEpbZFp+LHCA2sni1LvTOWHX68YDp7C2wzeu6Kw2JM=
-X-Google-Smtp-Source: AGHT+IEQ6Yr7NUwr1aO5sIMrfITNumwjXzV8MO5Y/AwbsS6q1SAgcgqkhs5f5Cb/5wsoXRVEZPgBYlQuasVbw4LiOOqFFgIk1CeV
+	s=arc-20240116; t=1707773631; c=relaxed/simple;
+	bh=Bq/LpEnbaTHE5PaJja0JFnAUJzmhDupOXRcOwpXgHhw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lYuXyG6bP6fpqE2ry0PUtY3UV5pvFquI00ASEA0OJ8+7W2qMXa0pdmdpWCaQjZvOoXJ3cvBovf3n3CdRj/+BGSYSatk2XalK7KNcU97s92gK69ilGI6lsXTcYTwLhdQ7FG6zDDd480/3Dnf5ARcJ4POahFFKHJt5L/XGryaHNd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=skn/ADoZ; arc=none smtp.client-ip=3.9.82.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
+Received: from localhost (unknown [IPv6:2a02:8012:909b:0:a903:359f:8aea:3bdc])
+	(Authenticated sender: tom)
+	by mail.katalix.com (Postfix) with ESMTPSA id 96B377D9C9;
+	Mon, 12 Feb 2024 21:33:48 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
+	t=1707773628; bh=Bq/LpEnbaTHE5PaJja0JFnAUJzmhDupOXRcOwpXgHhw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Disposition:In-Reply-To:From;
+	z=Date:=20Mon,=2012=20Feb=202024=2021:33:48=20+0000|From:=20Tom=20P
+	 arkin=20<tparkin@katalix.com>|To:=20Jakub=20Kicinski=20<kuba@kerne
+	 l.org>|Cc:=20James=20Chapman=20<jchapman@katalix.com>,=0D=0A=09Sam
+	 uel=20Thibault=20<samuel.thibault@ens-lyon.org>,=20edumazet@google
+	 .com,=0D=0A=09gnault@redhat.com,=20davem@davemloft.net,=20pabeni@r
+	 edhat.com,=0D=0A=09corbet@lwn.net,=20netdev@vger.kernel.org,=20lin
+	 ux-doc@vger.kernel.org,=0D=0A=09linux-kernel@vger.kernel.org|Subje
+	 ct:=20Re:=20[PATCHv3]=20PPPoL2TP:=20Add=20more=20code=20snippets|M
+	 essage-ID:=20<ZcqOvDgXsG2W8t8l@katalix.com>|References:=20<2024020
+	 3223513.f2nfgaamgffz6dno@begin>=0D=0A=20<20240209082046.6a87f7f8@k
+	 ernel.org>|MIME-Version:=201.0|Content-Disposition:=20inline|In-Re
+	 ply-To:=20<20240209082046.6a87f7f8@kernel.org>;
+	b=skn/ADoZKlwuQsmd3YhintZw9Agr5SKneSj1rNClejPSfeLC5nqui2b3j/Muk4wpF
+	 zGiPZQdXbntvYN580mrWNmxNHhyfZQ5caI/3/hp8Y5LI1loMGgDpyXJss8vV0FCoNo
+	 KcWp1QqtRHydGUCPfyjTMaVIOyjdP6mPlI/LrdbNnIm0z4RgR4CzAmdV9W1Pemh6WL
+	 WjBjrqTeOf8tlobMoD+A1EEHFv4Zy3n0MDH58QBqYVtxWrEJdASu8o3nqB2wpzq8Sf
+	 Y7qJDjh03VSkYoZYrljieRV+Y4Kj6W3kUXz9q1RD6ii9S2dk5veVM1y7gIY0SQAuQb
+	 cBNhOVzIqqjRw==
+Date: Mon, 12 Feb 2024 21:33:48 +0000
+From: Tom Parkin <tparkin@katalix.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: James Chapman <jchapman@katalix.com>,
+	Samuel Thibault <samuel.thibault@ens-lyon.org>, edumazet@google.com,
+	gnault@redhat.com, davem@davemloft.net, pabeni@redhat.com,
+	corbet@lwn.net, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv3] PPPoL2TP: Add more code snippets
+Message-ID: <ZcqOvDgXsG2W8t8l@katalix.com>
+References: <20240203223513.f2nfgaamgffz6dno@begin>
+ <20240209082046.6a87f7f8@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:4904:b0:471:fe5:c48b with SMTP id
- cx4-20020a056638490400b004710fe5c48bmr88097jab.3.1707773176154; Mon, 12 Feb
- 2024 13:26:16 -0800 (PST)
-Date: Mon, 12 Feb 2024 13:26:16 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000085930e061135ed45@google.com>
-Subject: [syzbot] [wireguard?] KCSAN: data-race in wg_packet_receive /
- wg_packet_receive (7)
-From: syzbot <syzbot+fd07f3da9110f5f18b4f@syzkaller.appspotmail.com>
-To: Jason@zx2c4.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, wireguard@lists.zx2c4.com
-Content-Type: text/plain; charset="UTF-8"
-
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    a5b6244cf87c Merge tag 'block-6.8-2024-02-10' of git://git..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=126f51e0180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3cd0dc1b46a5bc5c
-dashboard link: https://syzkaller.appspot.com/bug?extid=fd07f3da9110f5f18b4f
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/c1a21353ecf6/disk-a5b6244c.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/675fe8a43c32/vmlinux-a5b6244c.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/1848dc711f3f/bzImage-a5b6244c.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+fd07f3da9110f5f18b4f@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KCSAN: data-race in wg_packet_receive / wg_packet_receive
-
-read to 0xffff88812bad5c08 of 4 bytes by interrupt on cpu 0:
- wg_cpumask_next_online drivers/net/wireguard/queueing.h:127 [inline]
- wg_queue_enqueue_per_device_and_peer drivers/net/wireguard/queueing.h:173 [inline]
- wg_packet_consume_data drivers/net/wireguard/receive.c:526 [inline]
- wg_packet_receive+0xc51/0x12c0 drivers/net/wireguard/receive.c:576
- wg_receive+0x4e/0x70 drivers/net/wireguard/socket.c:326
- udp_queue_rcv_one_skb+0xad0/0xb60 net/ipv4/udp.c:2113
- udp_queue_rcv_skb+0x20a/0x220 net/ipv4/udp.c:2191
- udp_unicast_rcv_skb+0x1c2/0x1f0 net/ipv4/udp.c:2351
- __udp4_lib_rcv+0xb93/0x1110 net/ipv4/udp.c:2427
- udp_rcv+0x4f/0x60 net/ipv4/udp.c:2609
- ip_protocol_deliver_rcu+0x356/0x6d0 net/ipv4/ip_input.c:205
- ip_local_deliver_finish+0x13c/0x1b0 net/ipv4/ip_input.c:233
- NF_HOOK include/linux/netfilter.h:314 [inline]
- ip_local_deliver+0xec/0x1c0 net/ipv4/ip_input.c:254
- dst_input include/net/dst.h:461 [inline]
- ip_rcv_finish net/ipv4/ip_input.c:449 [inline]
- NF_HOOK include/linux/netfilter.h:314 [inline]
- ip_rcv+0x18a/0x260 net/ipv4/ip_input.c:569
- __netif_receive_skb_one_core net/core/dev.c:5534 [inline]
- __netif_receive_skb+0x90/0x1b0 net/core/dev.c:5648
- process_backlog+0x21f/0x380 net/core/dev.c:5976
- __napi_poll+0x60/0x3c0 net/core/dev.c:6576
- napi_poll net/core/dev.c:6645 [inline]
- net_rx_action+0x32b/0x750 net/core/dev.c:6778
- __do_softirq+0xc4/0x27b kernel/softirq.c:553
- do_softirq+0x5e/0x90 kernel/softirq.c:454
- __local_bh_enable_ip+0x66/0x70 kernel/softirq.c:381
- __raw_read_unlock_bh include/linux/rwlock_api_smp.h:257 [inline]
- _raw_read_unlock_bh+0x1b/0x20 kernel/locking/spinlock.c:284
- wg_socket_send_skb_to_peer+0x109/0x130 drivers/net/wireguard/socket.c:184
- wg_packet_create_data_done drivers/net/wireguard/send.c:251 [inline]
- wg_packet_tx_worker+0x127/0x360 drivers/net/wireguard/send.c:276
- process_one_work kernel/workqueue.c:2633 [inline]
- process_scheduled_works+0x5b8/0xa40 kernel/workqueue.c:2706
- worker_thread+0x525/0x730 kernel/workqueue.c:2787
- kthread+0x1d7/0x210 kernel/kthread.c:388
- ret_from_fork+0x48/0x60 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
-
-write to 0xffff88812bad5c08 of 4 bytes by interrupt on cpu 1:
- wg_cpumask_next_online drivers/net/wireguard/queueing.h:130 [inline]
- wg_queue_enqueue_per_device_and_peer drivers/net/wireguard/queueing.h:173 [inline]
- wg_packet_consume_data drivers/net/wireguard/receive.c:526 [inline]
- wg_packet_receive+0xd3a/0x12c0 drivers/net/wireguard/receive.c:576
- wg_receive+0x4e/0x70 drivers/net/wireguard/socket.c:326
- udpv6_queue_rcv_one_skb+0xb37/0xbc0 net/ipv6/udp.c:716
- udpv6_queue_rcv_skb+0x20f/0x230 net/ipv6/udp.c:778
- udp6_unicast_rcv_skb+0x195/0x1b0 net/ipv6/udp.c:921
- __udp6_lib_rcv+0xa24/0xc80 net/ipv6/udp.c:1010
- udpv6_rcv+0x4f/0x60 net/ipv6/udp.c:1124
- ip6_protocol_deliver_rcu+0x92f/0xf30 net/ipv6/ip6_input.c:438
- ip6_input_finish net/ipv6/ip6_input.c:483 [inline]
- NF_HOOK include/linux/netfilter.h:314 [inline]
- ip6_input+0xbd/0x1b0 net/ipv6/ip6_input.c:492
- dst_input include/net/dst.h:461 [inline]
- ip6_rcv_finish+0x1d9/0x2d0 net/ipv6/ip6_input.c:79
- NF_HOOK include/linux/netfilter.h:314 [inline]
- ipv6_rcv+0x74/0x150 net/ipv6/ip6_input.c:310
- __netif_receive_skb_one_core net/core/dev.c:5534 [inline]
- __netif_receive_skb+0x90/0x1b0 net/core/dev.c:5648
- process_backlog+0x21f/0x380 net/core/dev.c:5976
- __napi_poll+0x60/0x3c0 net/core/dev.c:6576
- napi_poll net/core/dev.c:6645 [inline]
- net_rx_action+0x32b/0x750 net/core/dev.c:6778
- __do_softirq+0xc4/0x27b kernel/softirq.c:553
- do_softirq+0x5e/0x90 kernel/softirq.c:454
- __local_bh_enable_ip+0x66/0x70 kernel/softirq.c:381
- __raw_read_unlock_bh include/linux/rwlock_api_smp.h:257 [inline]
- _raw_read_unlock_bh+0x1b/0x20 kernel/locking/spinlock.c:284
- wg_socket_send_skb_to_peer+0x109/0x130 drivers/net/wireguard/socket.c:184
- wg_packet_create_data_done drivers/net/wireguard/send.c:251 [inline]
- wg_packet_tx_worker+0x127/0x360 drivers/net/wireguard/send.c:276
- process_one_work kernel/workqueue.c:2633 [inline]
- process_scheduled_works+0x5b8/0xa40 kernel/workqueue.c:2706
- worker_thread+0x525/0x730 kernel/workqueue.c:2787
- kthread+0x1d7/0x210 kernel/kthread.c:388
- ret_from_fork+0x48/0x60 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
-
-value changed: 0x00000000 -> 0x00000001
-
-Reported by Kernel Concurrency Sanitizer on:
-CPU: 1 PID: 5475 Comm: kworker/1:6 Not tainted 6.8.0-rc3-syzkaller-00293-ga5b6244cf87c #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
-Workqueue: wg-crypt-wg0 wg_packet_tx_worker
-==================================================================
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="DPH0nXQ1L/7W8EfL"
+Content-Disposition: inline
+In-Reply-To: <20240209082046.6a87f7f8@kernel.org>
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+--DPH0nXQ1L/7W8EfL
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+On  Fri, Feb 09, 2024 at 08:20:46 -0800, Jakub Kicinski wrote:
+> On Sat, 3 Feb 2024 23:35:13 +0100 Samuel Thibault wrote:
+> > The existing documentation was not telling that one has to create a PPP
+> > channel and a PPP interface to get PPPoL2TP data offloading working.
+> >=20
+> > Also, tunnel switching was not mentioned, so that people were thinking
+> > it was not supported, while it actually is.
+> >=20
+> > Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+>=20
+> James, Tom, looks good?
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Sorry for the silence -- I think for v2 we had some discussion of
+whether the PPPIOCBRIDGECHAN docs really belonged in l2tp.rst or not
+and I wasn't sure whether the same issue would be raised again.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+For me I'm happy enough having it mentioned in the l2tp documentation,
+so long as the example is clear and accurate.  I've responded to the
+patch now with a couple of suggestions on that front.
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+Thanks,
+Tom
+--=20
+Tom Parkin
+Katalix Systems Ltd
+https://katalix.com
+Catalysts for your Embedded Linux software development
 
-If you want to undo deduplication, reply with:
-#syz undup
+--DPH0nXQ1L/7W8EfL
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEsUkgyDzMwrj81nq0lIwGZQq6i9AFAmXKjrsACgkQlIwGZQq6
+i9Bo9gf+M2HejzgmlPv3lvUmunb+CR9btn3EyqFs8s+Nov178iSOPaLXpRJRavrt
+EQ8ktZIf3Umn3fnYE6fnClNK/iu1R/8Uzc3Rsy4TRYFDQPGGxJE9AUot2HAfSjne
+wVHz6YciXfCvNZJXjf8SEh8uyhpjXRK/PuESPjgkpH1lo2+4Ju+i336f0UtWPR06
+fcZ4ACeGcaHIE4dDKT3J8C1hSXFsy9AK0z758mT0ESDC2vtfkAxtzUgDcf/h8OVk
+giyl84hvIrNJK6aTLYXEv7HPZIdK58G281Jhi2VTwNFbeSoQafTQlQhsKxGL9bM3
+wo1wMJ8uPsbMEUAk2/a9tqtIZP2HGA==
+=/yw/
+-----END PGP SIGNATURE-----
+
+--DPH0nXQ1L/7W8EfL--
 
