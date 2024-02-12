@@ -1,169 +1,216 @@
-Return-Path: <netdev+bounces-71098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9EA585222F
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 00:01:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8462285224B
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 00:07:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 50DA1B23A10
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 23:01:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A9A32852A2
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 23:07:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13F294EB49;
-	Mon, 12 Feb 2024 23:01:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A739B4EB3D;
+	Mon, 12 Feb 2024 23:07:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="4QVWVS5P";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="lDBRH2wk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X+B4241+"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F00854EB32;
-	Mon, 12 Feb 2024 23:01:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707778868; cv=none; b=o6PJA588msDg6OI6Ara6sSvE468agwlocmzgr+VpcDzKcLTdBnNOdutriewrwP1LI0JU5LkVs132896hzQhg7iPgCOXxn/VcuaxKQIxgLb6Ggijs7A+IcgDIBAcTWZeLd4DXLVICw+EBA5u+1Zv/4ynr1wwdFJTpaEr9QxLUh2g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707778868; c=relaxed/simple;
-	bh=dz7Bo1p6nMIUN4HZJcwpOyE8WVu5se81Ug/mMhzK6uE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Pun6XKd8c4auOGiDLrse2MrM/Aet2P1MlkYKst7cnlqEnPbFpgA7fjTVrNHwDioDmINKC4cHFwJX3rRYgpC2+HI0XgeyvU5PqWrC9KMGr+47lXrDTN+KlrqruKN7RLwq4/A7s3cZdV16HRpyV5LcIgXGOL1GKM8v3IMNKebLpJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=4QVWVS5P; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=lDBRH2wk; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1707778863;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cJvi9CRczxtyvt+qDDAp8M1Cn+0bYcrQ7i1j7oLPeQ0=;
-	b=4QVWVS5P8I5fXGOVrY9yhMPnb2fr6bh5DstEwe9iyViUGasAAce0JhykHVrbma4jNBnd4Y
-	bJlwmkgZe1xx716rstpRBKVrqHN/THOe88UDz5+ffgYp4IH4rK8tfkb77ht+0E5QwPwMUW
-	WvvHYKa3dwoVgL4NvSbZkVOKuVKvDTN078CIHboWrZCFTNkYTuNe1plQ3/MK0URLcf6UL5
-	cJKUpVf6phI5gSlUkz5bez5sSyyf1pBVZGicPVXiup2weX1N5hu8bK+PngRyOPbYT0PhjM
-	zSxQ8bcSsh2pLO4nNovEs6pAdIZ8lh6aJpLK2kqSIIUTNiA46zrnwItg4/CTqw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1707778863;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cJvi9CRczxtyvt+qDDAp8M1Cn+0bYcrQ7i1j7oLPeQ0=;
-	b=lDBRH2wkcBL4ybc1JUik/fBkcxnxlfhNUH8/+IaAX1ZpWWS2Aj2u1jJ/vRqlhL2Olqe4/m
-	kSBbaC99OGfImqCQ==
-To: syzbot <syzbot+039399a9b96297ddedca@syzkaller.appspotmail.com>,
- linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
-Subject: Re: [syzbot] [kernel?] BUG: unable to handle kernel NULL pointer
- dereference in hrtimer_active
-In-Reply-To: <00000000000014671906112cb2ef@google.com>
-References: <00000000000014671906112cb2ef@google.com>
-Date: Tue, 13 Feb 2024 00:01:03 +0100
-Message-ID: <875xytjnio.ffs@tglx>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C45946444;
+	Mon, 12 Feb 2024 23:07:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707779251; cv=fail; b=TTQji/uttyG0+tiJqX+ocl11nk7PQ6nHdL+DjVdfD7xHSOPDe6Hc5zBxorcBt+NJqb+6JbAw725EJ9zJ597/itM0mgKR24CtNVCcRIk8pyCNleMiChg+KG2rRIamMavm51FpabQK65qMIVL8wJ1EsB2L9yU6iQAuIqUJm5tKVA4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707779251; c=relaxed/simple;
+	bh=0ONcZCPPW6T+uOP/2bmYbRjc5wluwsvBiyPOFBgzL5c=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Od91Hkhn7rS+G0yeXyNPe6p7U5rxIUxUlJrLoz1pbLB89punr5bNNCr9Zhn51NlbCUoZeMDSqZxUt953kVOrLH2+Kq0Rg8IK5Kw5YohdK/aey2OISa9VIKnnJZIeKeWhuVdwQbpp4neUWb/svV+W1RJXNwFz1RnCcub/sVmOtSw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=X+B4241+; arc=fail smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707779250; x=1739315250;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=0ONcZCPPW6T+uOP/2bmYbRjc5wluwsvBiyPOFBgzL5c=;
+  b=X+B4241+kFVmgMDcaGpgw7nW5F7YLwaU0tRdSN6of9Xfdb9avn+tcwxp
+   qzEDDe51cAedKt9CWEcmcjG1cOPC4jJH3MvqNF2sqbqYd45Bpbd9ohALe
+   ZyYgXAuspT+PnNNd3GAvuPVgFmgQy7xHcKCZX/22vSO7UCcdqOll3dlEA
+   wcoghkgRsFygHt0XZhEdUA6qbSmmDHdhK6k/HZpRfkBSBBR8b3KQmyARF
+   aX8xOcyQ5keeT1Sj+Mg+NL3flu0qgEGR1TvI0t5GyzyJdJP7dgcsEWsXy
+   nPHCSr1X4adM9nSLWoi/1f6+2+yqMC2B8kJHEY0VKrT+5oyLppz6XGk+S
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="12866642"
+X-IronPort-AV: E=Sophos;i="6.06,155,1705392000"; 
+   d="scan'208";a="12866642"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 15:07:27 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,155,1705392000"; 
+   d="scan'208";a="2675040"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Feb 2024 15:07:25 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 12 Feb 2024 15:07:24 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 12 Feb 2024 15:07:24 -0800
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 12 Feb 2024 15:07:24 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=a/viXKge8w8q4x65/xHucNWTUgqjg/Wk+uxLu3HNsLyD5Bf1CsK0FDRJ6dO6p8fvZcZY9a+C3zPDvP6D/vHTRguSFwwt9pKEHKw4fdPXQ5G2V58pVHTs5vFUrC7LooHHp7Gk/FcDrFf0rF/NnGfNVfx7IJ8G7WFwGVymXt2YhQhcVD89JprwF8zxvubAuQRhlilkUIAxxo7TarCagDzI2x9/KY3Zc8KEuiqlGIzpIau/cu4Hr9YoBGd/epKEvEr4txJVvFj2bQOp0/M6CUjYly4AP17wHtXwJs9NWRdQX7wJLO8pjJFW/JGS596uOdIER+dzG66cvlU4eRoxHadepA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1TC65/WtmnnqFMMpQBPJ5j4LcDxoUyDmwwjVNn80Qxg=;
+ b=laDcPkJsAHNs6yWJnd7izXlY+QtgoHMgWz7H39e0imFioPkqiD5b/3OokU6u2Rv7ZbEH/4lr/sOWtUjUZjCg8YfFuJOMIloH3QJRuRS18DFnZPz8y+h2jnyZOH/ZBlQuCL25FtsB4XlMMFgtjmtmiwtWWMOwpGkyfvuDncVHJA9riNjUEvFAOEnC3x6Qlggxma9W/n64lb+6W+qeO0QQ2ljuAg2eMWm9oDOhF7Fr0QKZsxTTtlarQ2Pynj//xmRBEMJKPF9bZ4R3WP0AaJB+k4VnKNqPJbwq6iw4zzCOENRwFGkh5dZAgR/gI8GNNWzpcq74chnb1TUsv6TbR613SA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by DM4PR11MB5245.namprd11.prod.outlook.com (2603:10b6:5:388::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.38; Mon, 12 Feb
+ 2024 23:07:18 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::4069:eb50:16b6:a80d]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::4069:eb50:16b6:a80d%4]) with mapi id 15.20.7270.033; Mon, 12 Feb 2024
+ 23:07:17 +0000
+Message-ID: <6cb65005-aa47-4924-803d-cc7c3758c756@intel.com>
+Date: Mon, 12 Feb 2024 15:07:15 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4 03/12] ice: Introduce VF
+ state ICE_VF_STATE_REPLAYING_VC for migration
+Content-Language: en-US
+To: Brett Creeley <bcreeley@amd.com>, Yahui Cao <yahui.cao@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>
+CC: <kevin.tian@intel.com>, <yishaih@nvidia.com>, <brett.creeley@amd.com>,
+	<kvm@vger.kernel.org>, <sridhar.samudrala@intel.com>, <edumazet@google.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <alex.williamson@redhat.com>,
+	<madhu.chittim@intel.com>, <jgg@nvidia.com>, <netdev@vger.kernel.org>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <davem@davemloft.net>
+References: <20231121025111.257597-1-yahui.cao@intel.com>
+ <20231121025111.257597-4-yahui.cao@intel.com>
+ <d1a5437e-a1ac-1fde-dfdf-9c1d8768b052@amd.com>
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <d1a5437e-a1ac-1fde-dfdf-9c1d8768b052@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0195.namprd03.prod.outlook.com
+ (2603:10b6:303:b8::20) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|DM4PR11MB5245:EE_
+X-MS-Office365-Filtering-Correlation-Id: 91c80a21-ed3e-4539-b387-08dc2c1f5be5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: AmKtO8BTTMop1e4sTeB0SW2bN1Y9DxVgOG6XiRfB2mYh3KlAbJHCUj/eUqnAV/MjyZcgm9B65baWDWy+2Wyz0dbBjdp4rYS4BO2EATB6KsjUnXMVyhAkJtMAP11t20bB2o/Xljyu7Ly1zDd3KKgZ7fexnUBXEHm9Vr0lSO2zynsfHPMJN332ywhdO6XteBFy3qto6ywsL8ns91CG3otjR6a3L6yt63B3nC1vDw5z4O6KQ2YG9L5kKNDPMGrHG+9kaIKhxVr+yu/0+xwrFhEkFzuQxHIRho39iuDkSChIkLIAY8E4GzP1IhBUh42mOYizOX5gc0veGn6HxgZRV0nbHmeVrwpbkWzW8/f8otQHzCGYO1bV1sD8+XII1Y+TO+zGWLIT1aIWtxVsSjbzeTiPbQ60OdULSRYkY1HDQJdmVTu1ghKSB0N07JzVEMDbS+obQSKYLZuOI9/gwp1NKK2inlRXp/Iz4aywr/GYu2gqbvNZoCE8VuWg1VDVzfwYQ7Q5a3BnfRgY6YAACDlsUIU37GeYvn1+8xsqWX9PRGNvyzxrG938tEQuKI+5LlnshQsB
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(39860400002)(376002)(136003)(346002)(230922051799003)(64100799003)(451199024)(1800799012)(186009)(7416002)(31686004)(2906002)(2616005)(53546011)(83380400001)(478600001)(66476007)(66556008)(5660300002)(6506007)(6486002)(6512007)(41300700001)(4326008)(8936002)(66946007)(26005)(8676002)(86362001)(36756003)(110136005)(316002)(38100700002)(31696002)(82960400001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NE9uTXJvZzZnalJxM01tS0tNRDVJN3Y3ZkVJRWpWZnJ3SUg5VXoyVkl4MkEw?=
+ =?utf-8?B?MzdOc2FHcVc0SXJqRVZkVkFaZmZrRFA5ZjdrVXpQdE1SNk5KeDBKaGFvZnd0?=
+ =?utf-8?B?YUR2dE5qYTJKL29OU3ZmU2NyYWEyY3N2QWZmMC9CVkcxdnJDd1NWcnFlR1Js?=
+ =?utf-8?B?UHFsZ2FUSkE2eWxCOGZRWWVBZmlDUFJteDk1L0hzN25CTUxWczRHbG8zUnov?=
+ =?utf-8?B?UWdzTG1WZEdZdlA3ZWNCVmxrRjJkMm1OSFRmalFwTGZKQnVkdmFvY3RiUzNk?=
+ =?utf-8?B?Y1paTTgvTjRyaFhhMGJ3NnFaSExwSEQyZG9mM3YvcWZkdU9kVEg1NWwzYkMv?=
+ =?utf-8?B?ZWVqNWZjQk1PRE4raGlXUmljaE45Z1FXc2NXK0dnb3VVcS9yT0VHNzg5MWdt?=
+ =?utf-8?B?Wmg2elg3WXJkQjhKVWh1K09BMUxBV1IyTzJuUExheTdXbDZlcFZPcGFRT29k?=
+ =?utf-8?B?Vk95V1N5UVdGQ3M5SUlZNThwUlE5c1JrcjZIYTBvYko3QUhYUU1DUGZPcVhO?=
+ =?utf-8?B?TlNaVklMSDNabk4vSWFQUGR6WktOUzRReEJacDM5RjRyN3JzaFVVOENvVnZ3?=
+ =?utf-8?B?ZE1xZGhKZXh5R2ZsWmZLSHdldzV2RzlrL3N0a1BKU1hySzllRVlzNTZVUlVG?=
+ =?utf-8?B?SkZkTUxyZlROZmF1L0gzZ2ExY0ZOem50blFLWHpBV1UwSXBtRkJqRXpKRllN?=
+ =?utf-8?B?Tklybk9IUjRhVWZjZG1qWFB1Q3lxd2xtQXAvNldrUHBWWmVTRDRML05hUy9h?=
+ =?utf-8?B?VEdDdWxSb3dsbkY3OGVKQVJmbGpNNFpzQkh4ZVI4Y3ZnS3FiaUkxZHZRRVdM?=
+ =?utf-8?B?MEYxYy8zMWJkR0pmUzdicEF1N0JrbWF5KzFGS1QwNzFvb2Zsc1FxSXBVQVha?=
+ =?utf-8?B?cDhXQi9ETnN6Sk83M0xrMzBVcm41d0ZhT3hVekZSN2ZFdE9mQjJFMGhPbnBX?=
+ =?utf-8?B?OWNpVnYzZGJ4NE5GTEFwb2dWK2lmWG5qYnBCRWk3azlhUytPd1NmMzlINmln?=
+ =?utf-8?B?d3hzMnQzcHovbEFjT0haTFdlR0JmcmpUeTFMWVRtRjJlNUhWQ1JNSW1xRUI3?=
+ =?utf-8?B?N1JETUI0Vnd5Yko0enUwNGh0ZWJicGZSSjUwMG51Mm1tUkZydzBnQjlTaVR5?=
+ =?utf-8?B?clE1T2EyYktZSGNsYyt1Y2RZRFJUS3ozS0wwZmJBc3pnZU42TS9mZ2NaanJX?=
+ =?utf-8?B?VUhuNmJEazFCa0dtZkI1VWx6R2wyajlBdXJqNHkzamsxcGpxYi9wMytHZm1o?=
+ =?utf-8?B?cTFRaklHcDBEMFl3djFhOExiZmp5NjdLamlGQ3pjYURFT3NCYUhSU3ZTSjg0?=
+ =?utf-8?B?NXJ5MUhvdU5KSjRSMFBRdlROcWJ6L2ZBMHNSSFdMSFJrRGk1UG5wQlhERyto?=
+ =?utf-8?B?SVdJMnU5UnFwK2duWVhvRURaZnBMTHQ2RmVKR0NySXZuNFA3aUo2eHFvZUhV?=
+ =?utf-8?B?S1pOSDJ2VSsrRzhVUy9JaCtrZTlrLytpYkluMlhsN0Y1NTM3UlUxUG9qZTdB?=
+ =?utf-8?B?UitTemc0WkpsTjJscG9CQVVOMSt2SC80b0UxakdFWmR1OFZ5TkhOd2VuWlJp?=
+ =?utf-8?B?d3R3WmprUXI3aW50OU51Q2FWK244ZWd2MXFETlBsTURHajVybzM3UGo3Nitq?=
+ =?utf-8?B?dEJPeW5Ub1hYaFdUQ0RPTVIyakVBOXIza0tTQVV6RkZHRzlkQzl2OVl0Sk5a?=
+ =?utf-8?B?OUZaL1lUTUpMa0gzMnhxamxYUnVNR09nK3V6azB4QVNabmh2TnpFMzBVMWxY?=
+ =?utf-8?B?YkZrS3BsakZ2d2xzRlJFV1d1UFR1SmNvcE5xam5pZVZhU2xaMlNLNUZuM09v?=
+ =?utf-8?B?NDllQmcxY043aVZKUVJTSTZGU2hIa3k2bkxhS3JYZ0EvQkp1WU9MSFg0OG5m?=
+ =?utf-8?B?TEViT3dVT3R5M3ZtYWI1bEJtOFdFbXZ0bDZRaEcrS2o0OXlTUzJjeFkwV1pi?=
+ =?utf-8?B?VnRNZ0NpV2toMm9hajk4QUFtc3VtbVpTVnhhQStKaWs0OCtnNnNBK1IxcjV6?=
+ =?utf-8?B?Nlh2RFY5NUxMQk9ab0RFdDJvYlNQczZHUmU2VHk4WVVGY2VGOS9qdWhLVzVC?=
+ =?utf-8?B?a1oybDRVd0o2ZndBT3lCenpqcjJycWtrNzUzTXpmblNYVVVxQmFPOERvNTkw?=
+ =?utf-8?B?K08vbURoWi80L3NoZitEc2NiZmhrTUJpeVZTR2dlcnRwcDl3RzE4amJaZTRh?=
+ =?utf-8?B?M0E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 91c80a21-ed3e-4539-b387-08dc2c1f5be5
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Feb 2024 23:07:17.8699
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7p8545TW+FvYJpGhHDH5/uAe1ySw5zpCv1jGYdcicR1HeVzPXALC+qliUvBd8+It7RjK0mx+zAItS0Jmuf+pc6h7JbOnsunXd4T8hw1eEy0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5245
+X-OriginatorOrg: intel.com
 
 
-Cc: +netdev
 
-On Mon, Feb 12 2024 at 02:25, syzbot wrote:
-> HEAD commit:    4a7bbe7519b6 Merge tag 'scsi-fixes' of git://git.kernel.or..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=10476de0180000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=264238120cdb2bda
-> dashboard link: https://syzkaller.appspot.com/bug?extid=039399a9b96297ddedca
-> compiler:       aarch64-linux-gnu-gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-> userspace arch: arm64
->
-> Unfortunately, I don't have any reproducer for this issue yet.
->
-> Downloadable assets:
-> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/384ffdcca292/non_bootable_disk-4a7bbe75.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/ee3f97d1ed38/vmlinux-4a7bbe75.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/eb6f9f8f9f37/Image-4a7bbe75.gz.xz
->
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+039399a9b96297ddedca@syzkaller.appspotmail.com
->
-> infiniband syz0: set active
-> Unable to handle kernel NULL pointer dereference at virtual address 0000000000000010
-> CPU: 1 PID: 3665 Comm: syz-executor.0 Not tainted 6.8.0-rc3-syzkaller-00279-g4a7bbe7519b6 #0
-> pc : __seqprop_raw_spinlock_sequence include/linux/seqlock.h:226 [inline]
+On 12/8/2023 2:28 PM, Brett Creeley wrote:
+>> -int
+>> -ice_vc_send_msg_to_vf(struct ice_vf *vf, u32 v_opcode,
+>> -                     enum virtchnl_status_code v_retval, u8 *msg, u16 msglen)
+>> +static int
+>> +ice_vc_send_response_to_vf(struct ice_vf *vf, u32 v_opcode,
+>> +                          enum virtchnl_status_code v_retval,
+>> +                          u8 *msg, u16 msglen)
+> 
+> Is all of this rework needed? It seems like it's just a name change with 
+> additional logic to check the REPLAYING state. IMHO the naming isn't 
+> really any cleaner.
+> 
+> Would it make more sense to just modify the current 
+> ice_vc_send_msg_to_vf() to handle the REPLAYING state? It seems like 
+> that would simplify this patch quite a bit.
+> 
+> Is there a reason for these changes in follow up patches that I missed?
+> 
+> Thanks,
+> 
+> Brett
 
-That's:
+I remember making the suggestion to switch from "ice_vc_send_msg_to_vf"
+to "ice_vc_send_response_to_vf" irrespective of the live migration.
 
-        seq = raw_read_seqcount_begin(&base->seq);
+I guess i could see it as just thrash, but it reads more clear ot me
+that the action is about sending a response to the VF vs the generic
+"send_msg_to_vf" which could be about any type of message whether its in
+response or not. But to some extend thats just bike shedding.
 
-where base == NULL. That can only happen when hrtimer_cancel() is
-invoked with a non-initialized timer.
-
-> pc : hrtimer_active+0x4/0x60 kernel/time/hrtimer.c:1614
-> lr : hrtimer_try_to_cancel+0x1c/0xf8 kernel/time/hrtimer.c:1331
-> sp : ffff800082c63300
-> x29: ffff800082c63300 x28: 0000000000000000 x27: 0000000000000000
-> x26: 0000000000000340 x25: 0000000000000000 x24: f3ff00001ab7e9e0
-> x23: 0000000000000000 x22: 000061100fc019e9 x21: 0000000000000009
-> x20: 0000000000000000 x19: fbff00001abf9920 x18: 0000000000000000
-> x17: 0000000000000000 x16: 0000000000000000 x15: ffff80008144d28c
-> x14: ffff80008144d20c x13: ffff80008144d28c x12: ffff80008144d20c
-> x11: ffff800080011558 x10: ffff800081907d14 x9 : ffff8000819078a4
-> x8 : ffff800082c63408 x7 : 0000000000000000 x6 : ffff800080026d20
-> x5 : f2ff000033f2c800 x4 : 000061100fc019e9 x3 : 0000000000000340
-> x2 : 0000000000000000 x1 : 000000000000000d x0 : fbff00001abf9920
-> Call trace:
->  hrtimer_active+0x4/0x60 kernel/time/hrtimer.c:1613
->  hrtimer_cancel+0x1c/0x38 kernel/time/hrtimer.c:1446
->  napi_disable+0x5c/0x11c net/core/dev.c:6502
->  veth_napi_del_range+0x64/0x1d8 drivers/net/veth.c:1109
->  veth_napi_del drivers/net/veth.c:1129 [inline]
->  veth_set_features+0x68/0x98 drivers/net/veth.c:1580
->  __netdev_update_features+0x200/0x6ec net/core/dev.c:9872
->  netdev_update_features+0x28/0x6c net/core/dev.c:9946
->  veth_xdp_set drivers/net/veth.c:1681 [inline]
->  veth_xdp+0x108/0x224 drivers/net/veth.c:1694
->  dev_xdp_install+0x64/0xf8 net/core/dev.c:9243
->  dev_xdp_attach+0x250/0x52c net/core/dev.c:9395
->  dev_change_xdp_fd+0x16c/0x218 net/core/dev.c:9643
->  do_setlink+0xdd0/0xf14 net/core/rtnetlink.c:3132
->  rtnl_group_changelink net/core/rtnetlink.c:3452 [inline]
->  __rtnl_newlink+0x460/0x898 net/core/rtnetlink.c:3711
->  rtnl_newlink+0x50/0x7c net/core/rtnetlink.c:3748
->  rtnetlink_rcv_msg+0x12c/0x380 net/core/rtnetlink.c:6615
->  netlink_rcv_skb+0x5c/0x128 net/netlink/af_netlink.c:2543
->  rtnetlink_rcv+0x18/0x24 net/core/rtnetlink.c:6633
->  netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
->  netlink_unicast+0x2f4/0x360 net/netlink/af_netlink.c:1367
->  netlink_sendmsg+0x1a4/0x3e8 net/netlink/af_netlink.c:1908
->  sock_sendmsg_nosec net/socket.c:730 [inline]
->  __sock_sendmsg+0x54/0x60 net/socket.c:745
->  ____sys_sendmsg+0x274/0x2ac net/socket.c:2584
->  ___sys_sendmsg+0xac/0x100 net/socket.c:2638
->  __sys_sendmsg+0x84/0xe0 net/socket.c:2667
->  __do_sys_sendmsg net/socket.c:2676 [inline]
->  __se_sys_sendmsg net/socket.c:2674 [inline]
->  __arm64_sys_sendmsg+0x24/0x30 net/socket.c:2674
-
-So something in that syzbot test case manages to tear down a napi
-context which has not yet been fully initialized. While the rest of
-napi_disable() does not care much as long as neither NAPIF_STATE_SCHED
-nor NAPIF_STATE_NPSVC are set in napi->state, hrtimer_cancel() pretty
-much cares as demonstrated by the NULL pointer dereference.
-
-While it would be trivial to harden the hrtimer code for the case that a
-non-initialized hrtimer is canceled, I wonder whether this invocation of
-napi_disable() is harmless (aside of the hrtimer issue) or if there are
-some hidden subtle issues with that.
+I'll drop this change in the next version regardless, because I'm going
+to move away from the virtchnl as the serialization format for the live
+migration data.
 
 Thanks,
-
-        tglx
-
-
+Jake
 
