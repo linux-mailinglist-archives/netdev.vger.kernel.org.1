@@ -1,143 +1,130 @@
-Return-Path: <netdev+bounces-70963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5169A85151A
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 14:29:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7D2F851548
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 14:34:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 062321F22028
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 13:29:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9443C282E1A
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 13:34:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F37C3A8C5;
-	Mon, 12 Feb 2024 13:15:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D78903F9E8;
+	Mon, 12 Feb 2024 13:23:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="LlrD02oU"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gtwvT075"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ED943BB27;
-	Mon, 12 Feb 2024 13:15:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B5FF3EA6C
+	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 13:23:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707743739; cv=none; b=Rrso4MrNFV97VhHJVpJXTfvKx2doUqNX5p90hpFDT6HsDVOycqm3Jq/dEa6CiGKQtwb/PGb4/fMOWs0g60lORCDZ69oWtUPAWxSI33tvF+suTLb1mgTjTHnARYbtW6XW9e+UrOsRPhOLZwFbMFXBniBbhewvR0wykYcdUGea/Ug=
+	t=1707744229; cv=none; b=rkY55jvwNFj/yKQ3g62G0sL8TCQYrPbAD62/xiTqIbNODSQCg5y2NFk2aASpr9lozTEs5Oz20i0HyddgKjpr8rUIeJtd7hefDhvByu0od1WFgg3AdpNYhE+nP6R0JmcRYtGTYxn3QbtSHZxpA++kUlkoD2iLqIhFZJQjvHsa88o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707743739; c=relaxed/simple;
-	bh=GPWCbl61yUJim2BdrG5iAXC+5aBMPzF/H0YW07AjBDs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hVC0GPMA/NmQFe7Q+33o8mD9TKVVRbKhXKn9+lS0uDsEBUuMg/P08wURa6Tz8KtUbIDsmHXe5Ep7Z7m1ZChfPEJ/vPSq1V9DHHPEln3bZtzMUQ4QrrC/200/7ohVKJZVk7EUUfLlndnlovTeArYu1AyZB8CRPLV3PPQXG4LzJhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=LlrD02oU; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41C206BR031621;
-	Mon, 12 Feb 2024 05:15:30 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	from:to:cc:subject:date:message-id:mime-version:content-type; s=
-	pfpt0220; bh=Kde01VhYq2kfON92ENyLX1k9vjKrWScuB/POulMsTNE=; b=Llr
-	D02oU/bHmATJ99708RnvGyE7J4lnclaVHM8zLwfXh9VeEsntet1CaSkE7pufqzho
-	wTM4lv0oxM4oeo4dbNAtVrKVCddSUehWsvjQdnFXBksZD3x5+TEs0pJP4l1FoH2D
-	2sbvgXigr4fPzhKkgL86leXvDd+TZgHyzhGOkdw9joFGeYiXod6km9akAX5MHgE5
-	lYK49YMiEwZDLau8DdqWIr5h2g97f5Xjrr4n+rsFU6zoimzdWi7CLAJeXj761xj8
-	a2/drfrm5a9tdcba38bCqyjZayetqnv77sd0pQytyaGZU2v7aKbXCFmMq6QXYWM4
-	86ookg/PBwyx6Kvzksw==
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3w69hkc63a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Mon, 12 Feb 2024 05:15:30 -0800 (PST)
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 12 Feb
- 2024 05:15:28 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Mon, 12 Feb 2024 05:15:28 -0800
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id 760A33F7076;
-	Mon, 12 Feb 2024 05:15:24 -0800 (PST)
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <sgoutham@marvell.com>,
-        <gakula@marvell.com>, <jerinj@marvell.com>, <lcherian@marvell.com>,
-        <sbhatta@marvell.com>, <hkelam@marvell.com>, <naveenm@marvell.com>,
-        <edumazet@google.com>, <pabeni@redhat.com>
-Subject: [net-next] Octeontx2-af: Fetch MAC channel info from firmware
-Date: Mon, 12 Feb 2024 18:45:23 +0530
-Message-ID: <20240212131523.4522-1-hkelam@marvell.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1707744229; c=relaxed/simple;
+	bh=ydSEgrw3vWH0wzxU4QWRY90lfDyvLwBVFaRZ31MUPio=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SXrzNVGi+9ES7i2tfH9NUMHZ4l+QphK6CEjlMscEMa8mCTY5MRgABj58VujNtSF0323aCM+MNmamg9bQHYMv1ZwTnbz3ZVmr34AxxZP/UbokV4asW/BD19GiSPlSB3qURV7b7xTu6vMoEhE5enj+S4VxBym8DiOLgaXl88xnRhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gtwvT075; arc=none smtp.client-ip=209.85.219.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-dc6d9a8815fso3167317276.3
+        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 05:23:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1707744227; x=1708349027; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=I/A7r9NP/0VziEIfxN1XbFV9hH5pFIDQbUZtjpYFKSQ=;
+        b=gtwvT075RsSFOrYLxrG8VHIo/BUCxR3Dz8B/3A+qZ3YZPe/FXIPXXy3b8AW3ekaXka
+         SBaN8TX0PMCqLPsg0VANzW94hR62fwOBFCFbrXsu/dN5w1yAFVAvwNFs9OGi4ZPhUT8T
+         0K79rQJjUkqcEL0NpyK878kUs/sGLusRYbr8C3DwNDXrxjXS/d9JMd+QExUVWSCW1XnF
+         hoFpPlhOhj5nUantFzwhTWaOILdgZACL4GK9vLJ7TOdBY4VWBtWq2/FSA4hkFkxIYM3n
+         u/ruC8Y9i+ymtH2wemeV3K1XK6nfivYZzUxIER03Xjphl4sbbinyOZCpnCDAP5wo77D6
+         TZoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707744227; x=1708349027;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=I/A7r9NP/0VziEIfxN1XbFV9hH5pFIDQbUZtjpYFKSQ=;
+        b=vMjZEjhw+4pCUF+cYRXNjdnZidFKH3pcblL1qH4LRemB5kXS3+u+3cGM1ElGAVrRu7
+         wgL/d8W5XtsCTKEq5yX2P+tnJfIQz8MywHueNq6JVBxZd+dtYmP6krw0m5Mv0bbmr9+l
+         srDOU5tyo9WxEQ6mKldgoBAkdq6QJxn8lbJw2oF4d3un75VAQCEW07VL2wygz8Wvv4TB
+         lKIwZue4mCFeGC8EtqHIP/fqMpgfXpV6hone8uzuMmmm/kAzhhQt+lpvmwS/yUIXhcXh
+         TZ3KagHEX97hwxpTt33wplAj9P1yCH/Snih6Pyam20olfNr0ckoVa8uYchRMGvlSlkM+
+         qBAw==
+X-Forwarded-Encrypted: i=1; AJvYcCVbxSzBomQE96Fcz2iHEu+VLXTZGngzoQIA92SkIjItZKpa8/C/hwu3Dzt/8Qv6r42jqhgq4psJSaT8XDSY6Y9zbnaW2Iw8
+X-Gm-Message-State: AOJu0YyqLT/oVbkFvepus+h4mOAA5mrCKNz4bfN+dP/zM0UD4ajutVQm
+	ZPcaLOpLmaK0ylxRUgzVIMCN95wsfsvxepzbDQ47s0vwx5T9LiAcXo/8rzb0vSgknDytdWP+KyC
+	ib4OipTqxWasXI9B1jFfYp6e8Pz65HY3xzmawjg==
+X-Google-Smtp-Source: AGHT+IFaHXNER64YVI2EmDGuarm5+vqB/KmhTYs8V+V8KJWqxbKjhPCsz8Bj5huKgdacRxl9V59XYT2x99P6pR1T7vY=
+X-Received: by 2002:a05:6902:2489:b0:dc6:421a:3024 with SMTP id
+ ds9-20020a056902248900b00dc6421a3024mr6213196ybb.43.1707744225689; Mon, 12
+ Feb 2024 05:23:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: eK33_tzHHwuto8Przv8s5HAc7Ffr2zf5
-X-Proofpoint-GUID: eK33_tzHHwuto8Przv8s5HAc7Ffr2zf5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-12_09,2024-02-12_03,2023-05-22_02
+References: <20240130-wcn3990-firmware-path-v1-0-826b93202964@linaro.org>
+ <20240130-wcn3990-firmware-path-v1-2-826b93202964@linaro.org> <03d5d556-9477-4f2e-a737-c2f6a96d97a4@linaro.org>
+In-Reply-To: <03d5d556-9477-4f2e-a737-c2f6a96d97a4@linaro.org>
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Mon, 12 Feb 2024 15:23:35 +0200
+Message-ID: <CAA8EJpratQH5fS9mS8mnK=c9FwHn8n8g5dj+weoyzrobVMOvBQ@mail.gmail.com>
+Subject: Re: [PATCH RFC 2/4] wifi: ath10k: support board-specific firmware overrides
+To: Konrad Dybcio <konrad.dybcio@linaro.org>
+Cc: Kalle Valo <kvalo@kernel.org>, Jeff Johnson <quic_jjohnson@quicinc.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, ath10k@lists.infradead.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Packet ingress and egress MAC/serdes channel numbers are configurable
-on CN10K series of silicons. These channel numbers inturn used while
-installing MCAM rules to match ingress/egress port. Fetch these channel
-numbers from firmware at driver init time.
+On Mon, 12 Feb 2024 at 13:12, Konrad Dybcio <konrad.dybcio@linaro.org> wrote:
+>
+> On 30.01.2024 17:38, Dmitry Baryshkov wrote:
+> > Different Qualcomm platforms using WCN3990 WiFI chip use SoC-specific
+> > firmware versions with different features. For example firmware for
+> > SDM845 doesn't use single-chan-info-per-channel feature, while firmware
+> > for QRB2210 / QRB4210 requires that feature. Allow board DT files to
+> > override the subdir of the fw dir used to lookup the firmware-N.bin file
+> > decribing corresponding WiFi firmware.
+> >
+> > Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+> > ---
+> >  drivers/net/wireless/ath/ath10k/core.c | 11 ++++++++++-
+> >  drivers/net/wireless/ath/ath10k/core.h |  2 ++
+> >  drivers/net/wireless/ath/ath10k/snoc.c |  3 +++
+> >  3 files changed, 15 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/net/wireless/ath/ath10k/core.c b/drivers/net/wireless/ath/ath10k/core.c
+> > index 0032f8aa892f..ef7ce8b3f8fb 100644
+> > --- a/drivers/net/wireless/ath/ath10k/core.c
+> > +++ b/drivers/net/wireless/ath/ath10k/core.c
+> > @@ -942,11 +942,20 @@ static const struct firmware *ath10k_fetch_fw_file(struct ath10k *ar,
+> >       if (dir == NULL)
+> >               dir = ".";
+> >
+> > +     if (ar->board_name) {
+> > +             snprintf(filename, sizeof(filename), "%s/%s/%s",
+> > +                      dir, ar->board_name, file);
+> > +             ret = firmware_request_nowarn(&fw, filename, ar->dev);
+> > +             ath10k_dbg(ar, ATH10K_DBG_BOOT, "boot fw request '%s': %d\n",
+> > +                        filename, ret);
+>
+> Perhaps it'd be useful to move to a more noisy loglevel
 
-Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
-Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/af/rvu.h     | 10 +++++++++-
- drivers/net/ethernet/marvell/octeontx2/af/rvu_sdp.c |  8 ++++++++
- 2 files changed, 17 insertions(+), 1 deletion(-)
+No, these are details. If the firmware is in place, it is loaded properly.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-index a1d5fc65b92d..de8eba902276 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-@@ -443,6 +443,13 @@ struct mbox_wq_info {
- 	struct workqueue_struct *mbox_wq;
- };
- 
-+struct channel_fwdata {
-+	struct sdp_node_info info;
-+	u8 valid;
-+#define RVU_CHANL_INFO_RESERVED	379
-+	u8 reserved[RVU_CHANL_INFO_RESERVED];
-+};
-+
- struct rvu_fwdata {
- #define RVU_FWDATA_HEADER_MAGIC	0xCFDA	/* Custom Firmware Data*/
- #define RVU_FWDATA_VERSION	0x0001
-@@ -461,7 +468,8 @@ struct rvu_fwdata {
- 	u64 msixtr_base;
- 	u32 ptp_ext_clk_rate;
- 	u32 ptp_ext_tstamp;
--#define FWDATA_RESERVED_MEM 1022
-+	struct channel_fwdata channel_data;
-+#define FWDATA_RESERVED_MEM 1014
- 	u64 reserved[FWDATA_RESERVED_MEM];
- #define CGX_MAX         9
- #define CGX_LMACS_MAX   4
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_sdp.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_sdp.c
-index 1edfda0ae3e8..38cfe148f4b7 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_sdp.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_sdp.c
-@@ -56,6 +56,14 @@ int rvu_sdp_init(struct rvu *rvu)
- 	struct rvu_pfvf *pfvf;
- 	u32 i = 0;
- 
-+	if (rvu->fwdata->channel_data.valid) {
-+		sdp_pf_num[0] = 0;
-+		pfvf = &rvu->pf[sdp_pf_num[0]];
-+		pfvf->sdp_info = &rvu->fwdata->channel_data.info;
-+
-+		return 0;
-+	}
-+
- 	while ((i < MAX_SDP) && (pdev = pci_get_device(PCI_VENDOR_ID_CAVIUM,
- 						       PCI_DEVID_OTX2_SDP_PF,
- 						       pdev)) != NULL) {
+
 -- 
-2.17.1
-
+With best wishes
+Dmitry
 
