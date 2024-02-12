@@ -1,439 +1,276 @@
-Return-Path: <netdev+bounces-71043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90C71851CBA
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 19:29:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1CB5851D19
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 19:44:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05BDB1F215F2
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 18:29:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A0341F23AA1
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 18:44:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 471063FE2B;
-	Mon, 12 Feb 2024 18:29:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TUXrDHmC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A98AB3FE44;
+	Mon, 12 Feb 2024 18:42:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cloudserver094114.home.pl (cloudserver094114.home.pl [79.96.170.134])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A943740BE0
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 18:29:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0661F46B80;
+	Mon, 12 Feb 2024 18:42:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.96.170.134
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707762558; cv=none; b=ny5wWoBA3xjDMqDjWc+TwdUbNPRXgulr6ibt6MF/5c1Ogaul20G+lI1cyAYy2ZbYXqpJHuKEIk2NYZ4AXmdfjWvEXoCTWHukfXeFJO47JLNGRxdqefYhYP2iky6CXit/pt8CU2flACd7rwp4jEE41cSlJVM7xYO5AQFDc2kb874=
+	t=1707763357; cv=none; b=mrHi8YdNn89XSnWRyblASvs42OdU7tFVxE3fOw+tdxCrkruveO4r96KtKk6Ig0m1WQlrkdxSLLmBxOkuXTCOwLzfIzAlIhPbfDAitsq8e8fs4zFwNksTYMuDKzeGOmdAHESYUlV8cBDs7lLruliBP0lWUaS3pCzGGk5mKY+nBxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707762558; c=relaxed/simple;
-	bh=2oSQyyFtLgPUGqbrN+g4ldKCGIcpH9Wkq0dbCYNLPbA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sv+w0NkHeyaVnl0yAnDSxs7Clqtrgjy3+dbh19+GFLtovril0hqKTrrTXPecpaJuOGlG8hjExrqEC8y8dq1lGVOYg3m/ih6jBQ7NY/+ry0d1mxsXM6kjEkABYiNl/w9mAt6vPsbqc0HyUXeIQelh97lWUENuNldj6JCPSirBaAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=TUXrDHmC; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-410d57a533dso9162995e9.0
-        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 10:29:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1707762554; x=1708367354; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gKODUFCzXH1xAGWHJPaTGC50QYmXdJIdivv6eKgvZnk=;
-        b=TUXrDHmCzhgBbKT0Pmvz0QBYNQh/8wl1C9+dOaUPGnlPe1gsIV2Wwten1XY40lq+yd
-         NVgGO9lV3ys3XQZv8jCUyy8/AG14ox5wFmByEGen5Inoyn55EekJ7hnMbaDeKQLrYdk+
-         Raay5cJ7rRHT19TMdlV0g57uLU75joQ76sZFFH0xJN6agQl3PHO2pJPmWp91NsuOfrKy
-         jDpWycyNQe94Viw3OZUQTSmSHCeyAPwzWVJPAvcO/gZsqR91HCMaJtYbZIkUqR9/NkvZ
-         4vjXO6L10L7Dqsk5z5ohDkX7ni0xMys9XrpQqPUlua7jPugyT6vPirhYvsKPDsAkynQU
-         tNnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707762554; x=1708367354;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gKODUFCzXH1xAGWHJPaTGC50QYmXdJIdivv6eKgvZnk=;
-        b=J2a8Z6L9V4mWeFoeiT8qN+Lkp5CGWvbd/7t8PTAn6d8aRV+kOCurDzeshjr3n0M6+j
-         6Sxc1oVim/BquRrWnmTKjQwlTaBQufOlp65Pr73Oem8lXwvmQJ4aFeTY9H//YmF0pkdT
-         CJOCIPRn4DYQge+Kk46JHZ+5/NHx5nr3foYt1NtNNy6OuzFLtFAvabtp4HuoI9t6g8Lw
-         WLiHiqYER2onV97jAemyEcecHiz0OUu5xKajDmgiGHBF0OTw+CqR7PhkP90h6gCX1Ijb
-         aRYrwuST8kIWiuH0SyiFj5zzYdU3us2x+/0gDSgKmc3EsiC+ZfGQBixoVAAM8BvSK93n
-         zJKg==
-X-Forwarded-Encrypted: i=1; AJvYcCWedRmqc3wCXDqpEBOsuiHB2yc0YJBxwj1g9LQpIJfk99X0xaYgeI+cfZ5lZ/JFYv15ixq7sZkAI3dRHSFiOt1tK3lmJS0X
-X-Gm-Message-State: AOJu0Yx2an7xiH9q9man/esINPIiymuiwODK5EopCFayuS7VvXLIjIVD
-	lg2TostkpMm99Rh1e5SbNxH5lzkv8CSNZ4IgxAVQdIqrIAITEASHpa+ewJwQRaY=
-X-Google-Smtp-Source: AGHT+IGH2x7z4naCBsdzCmdXabnMaXlTApon5v6PZ5vGE7i+pfWbTlduPiqvFV2qfsxz0kJHSyRHsw==
-X-Received: by 2002:a05:600c:5489:b0:410:78fb:c1ef with SMTP id iv9-20020a05600c548900b0041078fbc1efmr6012650wmb.33.1707762553991;
-        Mon, 12 Feb 2024 10:29:13 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXp6FkjBNynrg8ReFDDny+o5EVQnDKfABedo8FJVRo+H7hun+D4Gy3kjYEaBRAAYcoXvHBwpja7Up2NqIbDJy3EAZQIV4HAeDSGBVrpGoTX2ZHT1Vqaly2uYYcTUxepBUXE2/eAnYxiQ3w6xsgoJJ8HcuuG+P0pApq7imxhvAZQpHIHBKxvde0DnP/q8l8PapmHny+FpQS3ClNXCPAWcuBRIVxBOMlo0TB0awTEFDYhcW22yBnQHTL40G0hMICR01JvyqZQuJFh75Xx8VrOXtpkAnDN6isHl4j0UsUupEdfPhfGXCKWEwX/oT9qo13VAByWxSlVuKziO7z0vrMAmXyc5CAk5JdnumvbXXEO30toy+emXFtjttaTxMxg3EyhWP5yiqqtHkbuWUmmWzOTKebBiUSiCU80
-Received: from krzk-bin.. ([178.197.223.6])
-        by smtp.gmail.com with ESMTPSA id i5-20020a05600c290500b0040ef95e1c78sm9337299wmd.3.2024.02.12.10.29.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Feb 2024 10:29:13 -0800 (PST)
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH v2] dt-bindings: net: qca,ar9331: convert to DT schema
-Date: Mon, 12 Feb 2024 19:29:11 +0100
-Message-Id: <20240212182911.233819-1-krzysztof.kozlowski@linaro.org>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1707763357; c=relaxed/simple;
+	bh=wj2ycacNWn0hCZghvwjFNw/BDfk05TWUJ/+mzHxUew0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SMYutbaljkvUsnMYxH9wuOrVPihTOIAyNKJ5X3OFLhrQ0L1qtTCaV55lXIsyyClDnM9MCmeIBqgTSQXzplcxPK2tRCk5oZXiubK/lGpCehF0QJ8PbDHb4rpT3tfpkvwRqPZjnU9+9LJUkKRZmJSh2plcICZhUNYsohUhdhvyguM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rjwysocki.net; spf=pass smtp.mailfrom=rjwysocki.net; arc=none smtp.client-ip=79.96.170.134
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rjwysocki.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rjwysocki.net
+Received: from localhost (127.0.0.1) (HELO v370.home.net.pl)
+ by /usr/run/smtp (/usr/run/postfix/private/idea_relay_lmtp) via UNIX with SMTP (IdeaSmtpServer 5.4.0)
+ id 2db039505757ed15; Mon, 12 Feb 2024 19:42:33 +0100
+Received: from kreacher.localnet (unknown [195.136.19.94])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by cloudserver094114.home.pl (Postfix) with ESMTPSA id 6B485669CF2;
+	Mon, 12 Feb 2024 19:42:32 +0100 (CET)
+From: "Rafael J. Wysocki" <rjw@rjwysocki.net>
+To: Linux PM <linux-pm@vger.kernel.org>
+Cc: Lukasz Luba <lukasz.luba@arm.com>, LKML <linux-kernel@vger.kernel.org>,
+ Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>,
+ Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+ Zhang Rui <rui.zhang@intel.com>, netdev@vger.kernel.org,
+ Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+ Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+ linux-wireless@vger.kernel.org, Shawn Guo <shawnguo@kernel.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Manaf Meethalavalappu Pallikunhi <quic_manafm@quicinc.com>
+Subject: [PATCH v2 2/9] thermal: core: Add flags to struct thermal_trip
+Date: Mon, 12 Feb 2024 19:31:28 +0100
+Message-ID: <2173914.irdbgypaU6@kreacher>
+In-Reply-To: <6017196.lOV4Wx5bFT@kreacher>
+References: <6017196.lOV4Wx5bFT@kreacher>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="UTF-8"
+X-CLIENT-IP: 195.136.19.94
+X-CLIENT-HOSTNAME: 195.136.19.94
+X-VADE-SPAMSTATE: clean
+X-VADE-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvledrudefgdduudegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecujffqoffgrffnpdggtffipffknecuuegrihhlohhuthemucduhedtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkfgjfhgggfgtsehtufertddttdejnecuhfhrohhmpedftfgrfhgrvghlucflrdcuhgihshhotghkihdfuceorhhjfiesrhhjfiihshhotghkihdrnhgvtheqnecuggftrfgrthhtvghrnhepvdffueeitdfgvddtudegueejtdffteetgeefkeffvdeftddttdeuhfegfedvjefhnecukfhppeduleehrddufeeirdduledrleegnecuvehluhhsthgvrhfuihiivgepvdenucfrrghrrghmpehinhgvthepudelhedrudefiedrudelrdelgedphhgvlhhopehkrhgvrggthhgvrhdrlhhotggrlhhnvghtpdhmrghilhhfrhhomhepfdftrghfrggvlhculfdrucghhihsohgtkhhifdcuoehrjhifsehrjhifhihsohgtkhhirdhnvghtqedpnhgspghrtghpthhtohepudeipdhrtghpthhtoheplhhinhhugidqphhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhukhgrshiirdhluhgsrgesrghrmhdrtghomhdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghnihgvlhdrlhgviigtrghnoheslhhinhgrrhhordhorhhgpdhrtghpthhtohepshht
+ rghnihhslhgrfidrghhruhhsiihkrgeslhhinhhugidrihhnthgvlhdrtghomhdprhgtphhtthhopehsrhhinhhivhgrshdrphgrnhgurhhuvhgruggrsehlihhnuhigrdhinhhtvghlrdgtohhm
+X-DCC--Metrics: v370.home.net.pl 1024; Body=16 Fuz1=16 Fuz2=16
 
-Convert the Qualcomm Atheros AR9331 built-in switch bindings to DT
-schema.
+From: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In order to allow thermal zone creators to specify the writability of
+trip point temperature and hysteresis on a per-trip basis, add a flags
+field to struct thermal_trip and define flags to represent the desired
+trip properties.
 
+Also make thermal_zone_device_register_with_trips() set the
+THERMAL_TRIP_FLAG_RW_TEMP flag for all trips covered by the writable
+trips mask passed to it and modify the thermal sysfs code to look at
+the trip flags instead of using the writable trips mask directly or
+checking the presence of the .set_trip_hyst() zone callback.
+
+Additionally, make trip_point_temp_store() and trip_point_hyst_store()
+fail with an error code if the trip passed to one of them has
+THERMAL_TRIP_FLAG_RW_TEMP or THERMAL_TRIP_FLAG_RW_HYST,
+respectively, clear in its flags.
+
+No intentional functional impact.
+
+Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
 ---
 
-DSA switch bindings still bring me headache...
+v1 -> v2:
+   * Rename trip flags (Stanislaw).
 
-Changes in v2:
-1. Narrow pattern for phy children to ethernet-phy@ or phy@ (MIPS DTS
-   has the latter) - Conor.
 ---
- .../devicetree/bindings/net/dsa/ar9331.txt    | 147 ----------------
- .../bindings/net/dsa/qca,ar9331.yaml          | 161 ++++++++++++++++++
- 2 files changed, 161 insertions(+), 147 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/net/dsa/ar9331.txt
- create mode 100644 Documentation/devicetree/bindings/net/dsa/qca,ar9331.yaml
+ drivers/thermal/thermal_core.c  |   12 +++++++++++-
+ drivers/thermal/thermal_core.h  |    2 +-
+ drivers/thermal/thermal_sysfs.c |   28 +++++++++++++++++++---------
+ include/linux/thermal.h         |    7 +++++++
+ 4 files changed, 38 insertions(+), 11 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/dsa/ar9331.txt b/Documentation/devicetree/bindings/net/dsa/ar9331.txt
-deleted file mode 100644
-index f824fdae0da2..000000000000
---- a/Documentation/devicetree/bindings/net/dsa/ar9331.txt
-+++ /dev/null
-@@ -1,147 +0,0 @@
--Atheros AR9331 built-in switch
--=============================
--
--It is a switch built-in to Atheros AR9331 WiSoC and addressable over internal
--MDIO bus. All PHYs are built-in as well.
--
--Required properties:
--
-- - compatible: should be: "qca,ar9331-switch"
-- - reg: Address on the MII bus for the switch.
-- - resets : Must contain an entry for each entry in reset-names.
-- - reset-names : Must include the following entries: "switch"
-- - interrupt-parent: Phandle to the parent interrupt controller
-- - interrupts: IRQ line for the switch
-- - interrupt-controller: Indicates the switch is itself an interrupt
--   controller. This is used for the PHY interrupts.
-- - #interrupt-cells: must be 1
-- - mdio: Container of PHY and devices on the switches MDIO bus.
--
--See Documentation/devicetree/bindings/net/dsa/dsa.txt for a list of additional
--required and optional properties.
--Examples:
--
--eth0: ethernet@19000000 {
--	compatible = "qca,ar9330-eth";
--	reg = <0x19000000 0x200>;
--	interrupts = <4>;
--
--	resets = <&rst 9>, <&rst 22>;
--	reset-names = "mac", "mdio";
--	clocks = <&pll ATH79_CLK_AHB>, <&pll ATH79_CLK_AHB>;
--	clock-names = "eth", "mdio";
--
--	phy-mode = "mii";
--	phy-handle = <&phy_port4>;
--};
--
--eth1: ethernet@1a000000 {
--	compatible = "qca,ar9330-eth";
--	reg = <0x1a000000 0x200>;
--	interrupts = <5>;
--	resets = <&rst 13>, <&rst 23>;
--	reset-names = "mac", "mdio";
--	clocks = <&pll ATH79_CLK_AHB>, <&pll ATH79_CLK_AHB>;
--	clock-names = "eth", "mdio";
--
--	phy-mode = "gmii";
--
--	fixed-link {
--		speed = <1000>;
--		full-duplex;
--	};
--
--	mdio {
--		#address-cells = <1>;
--		#size-cells = <0>;
--
--		switch10: switch@10 {
--			#address-cells = <1>;
--			#size-cells = <0>;
--
--			compatible = "qca,ar9331-switch";
--			reg = <0x10>;
--			resets = <&rst 8>;
--			reset-names = "switch";
--
--			interrupt-parent = <&miscintc>;
--			interrupts = <12>;
--
--			interrupt-controller;
--			#interrupt-cells = <1>;
--
--			ports {
--				#address-cells = <1>;
--				#size-cells = <0>;
--
--				switch_port0: port@0 {
--					reg = <0x0>;
--					ethernet = <&eth1>;
--
--					phy-mode = "gmii";
--
--					fixed-link {
--						speed = <1000>;
--						full-duplex;
--					};
--				};
--
--				switch_port1: port@1 {
--					reg = <0x1>;
--					phy-handle = <&phy_port0>;
--					phy-mode = "internal";
--				};
--
--				switch_port2: port@2 {
--					reg = <0x2>;
--					phy-handle = <&phy_port1>;
--					phy-mode = "internal";
--				};
--
--				switch_port3: port@3 {
--					reg = <0x3>;
--					phy-handle = <&phy_port2>;
--					phy-mode = "internal";
--				};
--
--				switch_port4: port@4 {
--					reg = <0x4>;
--					phy-handle = <&phy_port3>;
--					phy-mode = "internal";
--				};
--			};
--
--			mdio {
--				#address-cells = <1>;
--				#size-cells = <0>;
--
--				interrupt-parent = <&switch10>;
--
--				phy_port0: phy@0 {
--					reg = <0x0>;
--					interrupts = <0>;
--				};
--
--				phy_port1: phy@1 {
--					reg = <0x1>;
--					interrupts = <0>;
--				};
--
--				phy_port2: phy@2 {
--					reg = <0x2>;
--					interrupts = <0>;
--				};
--
--				phy_port3: phy@3 {
--					reg = <0x3>;
--					interrupts = <0>;
--				};
--
--				phy_port4: phy@4 {
--					reg = <0x4>;
--					interrupts = <0>;
--				};
--			};
--		};
--	};
--};
-diff --git a/Documentation/devicetree/bindings/net/dsa/qca,ar9331.yaml b/Documentation/devicetree/bindings/net/dsa/qca,ar9331.yaml
-new file mode 100644
-index 000000000000..fd9ddc59d38c
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/dsa/qca,ar9331.yaml
-@@ -0,0 +1,161 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/dsa/qca,ar9331.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
+Index: linux-pm/include/linux/thermal.h
+===================================================================
+--- linux-pm.orig/include/linux/thermal.h
++++ linux-pm/include/linux/thermal.h
+@@ -64,15 +64,23 @@ enum thermal_notify_event {
+  * @threshold: trip crossing notification threshold miliCelsius
+  * @type: trip point type
+  * @priv: pointer to driver data associated with this trip
++ * @flags: flags representing binary properties of the trip
+  */
+ struct thermal_trip {
+ 	int temperature;
+ 	int hysteresis;
+ 	int threshold;
+ 	enum thermal_trip_type type;
++	u8 flags;
+ 	void *priv;
+ };
+ 
++#define THERMAL_TRIP_FLAG_RW_TEMP	BIT(0)
++#define THERMAL_TRIP_FLAG_RW_HYST	BIT(1)
 +
-+title: Qualcomm Atheros AR9331 built-in switch
++#define THERMAL_TRIP_FLAG_MASK_RW	(THERMAL_TRIP_FLAG_RW_TEMP | \
++					 THERMAL_TRIP_FLAG_RW_HYST)
 +
-+maintainers:
-+  - Oleksij Rempel <o.rempel@pengutronix.de>
+ struct thermal_zone_device_ops {
+ 	int (*bind) (struct thermal_zone_device *,
+ 		     struct thermal_cooling_device *);
+Index: linux-pm/drivers/thermal/thermal_core.c
+===================================================================
+--- linux-pm.orig/drivers/thermal/thermal_core.c
++++ linux-pm/drivers/thermal/thermal_core.c
+@@ -1356,13 +1356,23 @@ thermal_zone_device_register_with_trips(
+ 	tz->devdata = devdata;
+ 	tz->trips = trips;
+ 	tz->num_trips = num_trips;
++	if (num_trips > 0) {
++		struct thermal_trip *trip;
 +
-+description:
-+  Qualcomm Atheros AR9331 is a switch built-in to Atheros AR9331 WiSoC and
-+  addressable over internal MDIO bus. All PHYs are built-in as well.
++		for_each_trip(tz, trip) {
++			if (mask & 1)
++				trip->flags |= THERMAL_TRIP_FLAG_RW_TEMP;
 +
-+properties:
-+  compatible:
-+    const: qca,ar9331-switch
++			mask >>= 1;
++		}
++	}
+ 
+ 	thermal_set_delay_jiffies(&tz->passive_delay_jiffies, passive_delay);
+ 	thermal_set_delay_jiffies(&tz->polling_delay_jiffies, polling_delay);
+ 
+ 	/* sys I/F */
+ 	/* Add nodes that are always present via .groups */
+-	result = thermal_zone_create_device_groups(tz, mask);
++	result = thermal_zone_create_device_groups(tz);
+ 	if (result)
+ 		goto remove_id;
+ 
+Index: linux-pm/drivers/thermal/thermal_core.h
+===================================================================
+--- linux-pm.orig/drivers/thermal/thermal_core.h
++++ linux-pm/drivers/thermal/thermal_core.h
+@@ -131,7 +131,7 @@ void thermal_zone_trip_updated(struct th
+ int __thermal_zone_get_temp(struct thermal_zone_device *tz, int *temp);
+ 
+ /* sysfs I/F */
+-int thermal_zone_create_device_groups(struct thermal_zone_device *, int);
++int thermal_zone_create_device_groups(struct thermal_zone_device *tz);
+ void thermal_zone_destroy_device_groups(struct thermal_zone_device *);
+ void thermal_cooling_device_setup_sysfs(struct thermal_cooling_device *);
+ void thermal_cooling_device_destroy_sysfs(struct thermal_cooling_device *cdev);
+Index: linux-pm/drivers/thermal/thermal_sysfs.c
+===================================================================
+--- linux-pm.orig/drivers/thermal/thermal_sysfs.c
++++ linux-pm/drivers/thermal/thermal_sysfs.c
+@@ -122,6 +122,11 @@ trip_point_temp_store(struct device *dev
+ 
+ 	trip = &tz->trips[trip_id];
+ 
++	if (!(trip->flags & THERMAL_TRIP_FLAG_RW_TEMP)) {
++		ret = -EPERM;
++		goto unlock;
++	}
 +
-+  reg:
-+    maxItems: 1
+ 	if (temp != trip->temperature) {
+ 		if (tz->ops->set_trip_temp) {
+ 			ret = tz->ops->set_trip_temp(tz, trip_id, temp);
+@@ -173,6 +178,11 @@ trip_point_hyst_store(struct device *dev
+ 
+ 	trip = &tz->trips[trip_id];
+ 
++	if (!(trip->flags & THERMAL_TRIP_FLAG_RW_HYST)) {
++		ret = -EPERM;
++		goto unlock;
++	}
 +
-+  interrupts:
-+    maxItems: 1
+ 	if (hyst != trip->hysteresis) {
+ 		if (tz->ops->set_trip_hyst) {
+ 			ret = tz->ops->set_trip_hyst(tz, trip_id, hyst);
+@@ -392,17 +402,16 @@ static const struct attribute_group *the
+ /**
+  * create_trip_attrs() - create attributes for trip points
+  * @tz:		the thermal zone device
+- * @mask:	Writeable trip point bitmap.
+  *
+  * helper function to instantiate sysfs entries for every trip
+  * point and its properties of a struct thermal_zone_device.
+  *
+  * Return: 0 on success, the proper error value otherwise.
+  */
+-static int create_trip_attrs(struct thermal_zone_device *tz, int mask)
++static int create_trip_attrs(struct thermal_zone_device *tz)
+ {
++	const struct thermal_trip *trip;
+ 	struct attribute **attrs;
+-	int indx;
+ 
+ 	/* This function works only for zones with at least one trip */
+ 	if (tz->num_trips <= 0)
+@@ -437,7 +446,9 @@ static int create_trip_attrs(struct ther
+ 		return -ENOMEM;
+ 	}
+ 
+-	for (indx = 0; indx < tz->num_trips; indx++) {
++	for_each_trip(tz, trip) {
++		int indx = thermal_zone_trip_id(tz, trip);
 +
-+  interrupt-controller: true
-+
-+  '#interrupt-cells':
-+    const: 1
-+
-+  mdio:
-+    $ref: /schemas/net/mdio.yaml#
-+    unevaluatedProperties: false
-+    properties:
-+      interrupt-parent: true
-+
-+    patternProperties:
-+      '(ethernet-)?phy@[0-4]+$':
-+        type: object
-+        unevaluatedProperties: false
-+
-+        properties:
-+          reg: true
-+          interrupts:
-+            maxItems: 1
-+
-+  resets:
-+    maxItems: 1
-+
-+  reset-names:
-+    items:
-+      - const: switch
-+
-+required:
-+  - compatible
-+  - reg
-+  - interrupts
-+  - interrupt-controller
-+  - '#interrupt-cells'
-+  - mdio
-+  - ports
-+  - resets
-+  - reset-names
-+
-+allOf:
-+  - $ref: dsa.yaml#/$defs/ethernet-ports
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    mdio {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        switch10: switch@10 {
-+            compatible = "qca,ar9331-switch";
-+            reg = <0x10>;
-+
-+            interrupt-parent = <&miscintc>;
-+            interrupts = <12>;
-+            interrupt-controller;
-+            #interrupt-cells = <1>;
-+
-+            resets = <&rst 8>;
-+            reset-names = "switch";
-+
-+            ports {
-+                #address-cells = <1>;
-+                #size-cells = <0>;
-+
-+                port@0 {
-+                    reg = <0x0>;
-+                    ethernet = <&eth1>;
-+
-+                    phy-mode = "gmii";
-+
-+                    fixed-link {
-+                        speed = <1000>;
-+                        full-duplex;
-+                    };
-+                };
-+
-+                port@1 {
-+                    reg = <0x1>;
-+                    phy-handle = <&phy_port0>;
-+                    phy-mode = "internal";
-+                };
-+
-+                port@2 {
-+                    reg = <0x2>;
-+                    phy-handle = <&phy_port1>;
-+                    phy-mode = "internal";
-+                };
-+
-+                port@3 {
-+                    reg = <0x3>;
-+                    phy-handle = <&phy_port2>;
-+                    phy-mode = "internal";
-+                };
-+
-+                port@4 {
-+                    reg = <0x4>;
-+                    phy-handle = <&phy_port3>;
-+                    phy-mode = "internal";
-+                };
-+            };
-+
-+            mdio {
-+                #address-cells = <1>;
-+                #size-cells = <0>;
-+
-+                interrupt-parent = <&switch10>;
-+
-+                phy_port0: ethernet-phy@0 {
-+                    reg = <0x0>;
-+                    interrupts = <0>;
-+                };
-+
-+                phy_port1: ethernet-phy@1 {
-+                    reg = <0x1>;
-+                    interrupts = <0>;
-+                };
-+
-+                phy_port2: ethernet-phy@2 {
-+                    reg = <0x2>;
-+                    interrupts = <0>;
-+                };
-+
-+                phy_port3: ethernet-phy@3 {
-+                    reg = <0x3>;
-+                    interrupts = <0>;
-+                };
-+
-+                phy_port4: ethernet-phy@4 {
-+                    reg = <0x4>;
-+                    interrupts = <0>;
-+                };
-+            };
-+        };
-+    };
--- 
-2.34.1
+ 		/* create trip type attribute */
+ 		snprintf(tz->trip_type_attrs[indx].name, THERMAL_NAME_LENGTH,
+ 			 "trip_point_%d_type", indx);
+@@ -458,7 +469,7 @@ static int create_trip_attrs(struct ther
+ 						tz->trip_temp_attrs[indx].name;
+ 		tz->trip_temp_attrs[indx].attr.attr.mode = S_IRUGO;
+ 		tz->trip_temp_attrs[indx].attr.show = trip_point_temp_show;
+-		if (mask & (1 << indx)) {
++		if (trip->flags & THERMAL_TRIP_FLAG_RW_TEMP) {
+ 			tz->trip_temp_attrs[indx].attr.attr.mode |= S_IWUSR;
+ 			tz->trip_temp_attrs[indx].attr.store =
+ 							trip_point_temp_store;
+@@ -473,7 +484,7 @@ static int create_trip_attrs(struct ther
+ 					tz->trip_hyst_attrs[indx].name;
+ 		tz->trip_hyst_attrs[indx].attr.attr.mode = S_IRUGO;
+ 		tz->trip_hyst_attrs[indx].attr.show = trip_point_hyst_show;
+-		if (tz->ops->set_trip_hyst) {
++		if (trip->flags & THERMAL_TRIP_FLAG_RW_HYST) {
+ 			tz->trip_hyst_attrs[indx].attr.attr.mode |= S_IWUSR;
+ 			tz->trip_hyst_attrs[indx].attr.store =
+ 					trip_point_hyst_store;
+@@ -505,8 +516,7 @@ static void destroy_trip_attrs(struct th
+ 	kfree(tz->trips_attribute_group.attrs);
+ }
+ 
+-int thermal_zone_create_device_groups(struct thermal_zone_device *tz,
+-				      int mask)
++int thermal_zone_create_device_groups(struct thermal_zone_device *tz)
+ {
+ 	const struct attribute_group **groups;
+ 	int i, size, result;
+@@ -522,7 +532,7 @@ int thermal_zone_create_device_groups(st
+ 		groups[i] = thermal_zone_attribute_groups[i];
+ 
+ 	if (tz->num_trips) {
+-		result = create_trip_attrs(tz, mask);
++		result = create_trip_attrs(tz);
+ 		if (result) {
+ 			kfree(groups);
+ 
+
+
 
 
