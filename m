@@ -1,202 +1,123 @@
-Return-Path: <netdev+bounces-70889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CAAB850E8F
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 09:06:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 229EF850EA3
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 09:11:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FD431C20831
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 08:06:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B60B71F21021
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 08:11:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FEE95680;
-	Mon, 12 Feb 2024 08:06:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45B3F79E2;
+	Mon, 12 Feb 2024 08:11:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Jt3hjacQ"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="U3EgxE6I"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C62D129A1;
-	Mon, 12 Feb 2024 08:06:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A8D06FC9;
+	Mon, 12 Feb 2024 08:11:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707725166; cv=none; b=D1wGSbdmOWVAd4MMOwnIMKhmiCiZfKhMvgC8Ts3S2mK2pfe9IMVD2qB9lHAuDY5v15aCA/06YcdIMGbA/vDvNRg1gx+KCDSCAgg7ieDQSKATAR3QvdVsh8L7MVR54m1d5yR4crW7TSk2SXzfcueWJPOLnFkEb7nMYdwuK0c+Gxs=
+	t=1707725467; cv=none; b=gWX9rLQdBZIZBKA3yUNAjZ/A72GgCTnJDIq/zCbuHl4tcfGp1MaGOUE9A0NQfhqmYuj/4ap2wkjZCwhsEMSeUkBekhsNT1hvq34ovGDK65pTcUSJ/+pyMAyJX22qvciLm52R95bXBOmXQM7BrOeyP2dpVzC09E/aEGm8Zze0+Yo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707725166; c=relaxed/simple;
-	bh=MXlnHstQ8dWrcq8/+TKvFmLOSCZmOskhfgadNBRPm84=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=T8FvQz/rite55qZ3FcFw3MiuYZiDAkIUYjeNgHBcaACZTUKmiguEHFfYM0mgXu1W3217cQJf86k9ICBxtz70hIagUamU0qd4l3NnhejZvZ8/HZN/LNNvNSjoB5VsmyNvZVSnBEdmMUNav+/R3mE/lplZJ7FU+TuIOfTl9IKGa04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Jt3hjacQ; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 062CF20010;
-	Mon, 12 Feb 2024 08:05:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1707725156;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Q0QRewWjCuJMsfAyyoKBSLDpElE9+DussEhEANCwakk=;
-	b=Jt3hjacQydWR4679EGgJUyePIil+MwePHaqXSZ0xoBhk65AMmXR2Sn2OVQuzwqJG5nLFnB
-	VQXVCoWs8Cj0/c47c4PITla0uugUcF7pjL22OYJl5Ihr8wmWrERaU1fNiqiF/wpPc3EvUo
-	STvGcm8QtHUsRcaJDgxss0fPXvOBF+AGOWidLlvooMYkljIjrx7VKCmErWDYaIns7xsXgK
-	4PGC8Syl4gLLpKxQGmUVa1D8SuvrWvurW18TvWYDor9WdXHQryQJpwG8QvggIHo2Fm8o9M
-	swyAIcitTSSI6G3MOwSuu7078vXuspbYYKnOyuQPNGhHGaC1gGafDIkIa2vWWA==
-Date: Mon, 12 Feb 2024 09:05:53 +0100
-From: Herve Codina <herve.codina@bootlin.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Herve Codina
- <herve.codina@bootlin.com>, Yury Norov <yury.norov@gmail.com>, Andy
- Shevchenko <andriy.shevchenko@linux.intel.com>, Rasmus Villemoes
- <linux@rasmusvillemoes.dk>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew@lunn.ch>, Mark Brown
- <broonie@kernel.org>, Christophe Leroy <christophe.leroy@csgroup.eu>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v3 RESEND 0/6] Add support for QMC HDLC
-Message-ID: <20240212090553.00abacd6@bootlin.com>
-In-Reply-To: <20240212075646.19114-1-herve.codina@bootlin.com>
-References: <20240212075646.19114-1-herve.codina@bootlin.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1707725467; c=relaxed/simple;
+	bh=C9W/ZSoRVcS+jpTM839uXWcvK8NK8poAV8hVnEHO1dY=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y/ldCeP/H5qGmkbf3+gvLZgDfJ1R5hu+UrHVjp+zQQDPHKwnDkdcojq+7j6F2h8q9vXv9gOWm3ArHCIoSRKlYuul1BdvIgyQFxrMVi8RjV87Rf1UZPiyXaw/5fXz+qhpwcH2e669R47+Sbdhkb+ui7pLxZ71HLAsiZ319GknpAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=U3EgxE6I; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1707725461; x=1739261461;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=C9W/ZSoRVcS+jpTM839uXWcvK8NK8poAV8hVnEHO1dY=;
+  b=U3EgxE6IK/4wGbMmDiX93Uq2MVkuZLjRX1fpWmBRGCm4d3399E3/M4o8
+   WPl/W1FZeqL0x0MsnQVpAvAYAvyWRctIpC2kYIyLv3YnhUJWTckcVKZlH
+   IQgREykGNFpClShL0GBvrUoChRPEb+SW1kXJ2tn/3fEXX0lJH5GLhXA7d
+   NafQr8/k/YpN7gBaE6CEdFpdxzIc2OkOwo21SR7z01A49knFH7sF5JmD1
+   enwoVLPnyagfcvqm4ZE0i71XYbObl8jzI6dRqK+wdCjfVERcXwSqr/EXb
+   HktRvA0kan86s5jDk47cL50OtlLB8VNOTvSqWByLGC54SGiuCtrOjuXFS
+   Q==;
+X-CSE-ConnectionGUID: YCdb6VMSRbST71PnuIIhLw==
+X-CSE-MsgGUID: 0p19Xb9vQ9WyRUoPSQ9amQ==
+X-IronPort-AV: E=Sophos;i="6.05,262,1701154800"; 
+   d="scan'208";a="16103773"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Feb 2024 01:10:59 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 12 Feb 2024 01:10:39 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex01.mchp-main.com
+ (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Mon, 12 Feb 2024 01:10:39 -0700
+Date: Mon, 12 Feb 2024 09:10:38 +0100
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<UNGLinuxDriver@microchip.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Michal Swiatkowski
+	<michal.swiatkowski@linux.intel.com>
+Subject: Re: [PATCH net v2] lan966x: Fix crash when adding interface under a
+ lag
+Message-ID: <20240212081038.cbsb2exfmcxxntzq@DEN-DL-M31836.microchip.com>
+References: <20240206123054.3052966-1-horatiu.vultur@microchip.com>
+ <20240209135220.42e670d4@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <20240209135220.42e670d4@kernel.org>
 
-Hi all,
+The 02/09/2024 13:52, Jakub Kicinski wrote:
 
-I duplicated patches in this series :(
-My bad, I was mistaken in 'git format-patch'.
+Hi Jakub,
 
-Can you consider only the "[PATCH v3 RESEND n/6]: xxxxxx" in this review.
-The other patches ("RESEND PATCH v3") are the duplicated ones.
+> 
+> On Tue, 6 Feb 2024 13:30:54 +0100 Horatiu Vultur wrote:
+> >       for (lag = 0; lag < lan966x->num_phys_ports; ++lag) {
+> > -             struct net_device *bond = lan966x->ports[lag]->bond;
+> > +             struct lan966x_port *port = lan966x->ports[lag];
+> >               int num_active_ports = 0;
+> > +             struct net_device *bond;
+> >               unsigned long bond_mask;
+> >               u8 aggr_idx[16];
+> >
+> > -             if (!bond || (visited & BIT(lag)))
+> > +             if (!port || !port->bond || (visited & BIT(lag)))
+> >                       continue;
+> >
+> > +             bond = port->bond;
+> >               bond_mask = lan966x_lag_get_mask(lan966x, bond);
+> >
+> >               for_each_set_bit(p, &bond_mask, lan966x->num_phys_ports) {
+> >                       struct lan966x_port *port = lan966x->ports[p];
+> >
+> > +                     if (!port)
+> > +                             continue;
+> 
+> Why would lan966x_lag_get_mask() set a bit for a port that doesn't
+> exist? Earlier check makes sense. This one seems too defensive.
 
-If ok I will send a clean v4 series.
-Of course, if some modification are needed, I will also send a clean v4.
+You are right, the lan966x_lag_get_mask() will not set a bit for a port
+that doesn't exist[1]. Therefore this check is not needed.
 
-Let me know if a clean v4 is needed right now.
+[1] https://elixir.bootlin.com/linux/latest/source/drivers/net/ethernet/microchip/lan966x/lan966x_lag.c#L354
 
-Sorry for this mistake.
-Regards,
-Hervé
-
-On Mon, 12 Feb 2024 08:56:28 +0100
-Herve Codina <herve.codina@bootlin.com> wrote:
-
-> Hi,
-> 
-> Note: Resent this v3 series with missing maintainers added in CC.
-> 
-> This series introduces the QMC HDLC support.
-> 
-> Patches were previously sent as part of a full feature series and were
-> previously reviewed in that context:
-> "Add support for QMC HDLC, framer infrastructure and PEF2256 framer" [1]
-> 
-> In order to ease the merge, the full feature series has been split and
-> needed parts were merged in v6.8-rc1:
->  - "Prepare the PowerQUICC QMC and TSA for the HDLC QMC driver" [2]
->  - "Add support for framer infrastructure and PEF2256 framer" [3]
-> 
-> This series contains patches related to the QMC HDLC part (QMC HDLC
-> driver):
->  - Introduce the QMC HDLC driver (patches 1 and 2)
->  - Add timeslots change support in QMC HDLC (patch 3)
->  - Add framer support as a framer consumer in QMC HDLC (patch 4)
-> 
-> Compare to the original full feature series, a modification was done on
-> patch 3 in order to use a coherent prefix in the commit title.
-> 
-> I kept the patches unsquashed as they were previously sent and reviewed.
-> Of course, I can squash them if needed.
-> 
-> Compared to the previous iteration:
->   https://lore.kernel.org/linux-kernel/20240130084035.115086-1-herve.codina@bootlin.com/
-> this v3 series:
-> - Remove 'inline' function specifier from .c file.
-> - Fixed a bug introduced in the previous iteration.
-> - Remove one lock/unlock sequence in the QMC HDCL xmit path.
-> - Use bitmap_from_u64().
-> 
-> Best regards,
-> Hervé
-> 
-> [1]: https://lore.kernel.org/linux-kernel/20231115144007.478111-1-herve.codina@bootlin.com/
-> [2]: https://lore.kernel.org/linux-kernel/20231205152116.122512-1-herve.codina@bootlin.com/
-> [3]: https://lore.kernel.org/linux-kernel/20231128132534.258459-1-herve.codina@bootlin.com/
-> 
-> Changes v2 -> v3
->   - Patch 1
->     Remove 'inline' function specifier from .c file.
->     Fix a bug introduced when added WARN_ONCE(). The warn condition must
->     be desc->skb (descriptor used) instead of !desc->skb.
->     Remove a lock/unlock section locking the entire qmc_hdlc_xmit()
->     function.
-> 
->   - Patch 5
->     Use bitmap_from_u64() everywhere instead of bitmap_from_arr32() and
->     bitmap_from_arr64().
-> 
-> Changes v1 -> v2
->   - Patch 1
->     Use the same qmc_hdlc initialisation in qmc_hcld_recv_complete()
->     than the one present in qmc_hcld_xmit_complete().
->     Use WARN_ONCE()
-> 
->   - Patch 3 (new patch in v2)
->     Make bitmap_onto() available to users
-> 
->   - Patch 4 (new patch in v2)
->     Introduce bitmap_off()
-> 
->   - Patch 5 (patch 3 in v1)
->     Use bitmap_*() functions
-> 
->   - Patch 6 (patch 4 in v1)
->     No changes
-> 
-> Changes compare to the full feature series:
->   - Patch 3
->     Use 'net: wan: fsl_qmc_hdlc:' as commit title prefix
-> 
-> Patches extracted:
->   - Patch 1 : full feature series patch 7
->   - Patch 2 : full feature series patch 8
->   - Patch 3 : full feature series patch 20
->   - Patch 4 : full feature series patch 27
-> 
-> Herve Codina (6):
->   net: wan: Add support for QMC HDLC
->   MAINTAINERS: Add the Freescale QMC HDLC driver entry
->   bitmap: Make bitmap_onto() available to users
->   bitmap: Introduce bitmap_off()
->   net: wan: fsl_qmc_hdlc: Add runtime timeslots changes support
->   net: wan: fsl_qmc_hdlc: Add framer support
-> 
->  MAINTAINERS                    |   7 +
->  drivers/net/wan/Kconfig        |  12 +
->  drivers/net/wan/Makefile       |   1 +
->  drivers/net/wan/fsl_qmc_hdlc.c | 807 +++++++++++++++++++++++++++++++++
->  include/linux/bitmap.h         |   3 +
->  lib/bitmap.c                   |  45 +-
->  6 files changed, 874 insertions(+), 1 deletion(-)
->  create mode 100644 drivers/net/wan/fsl_qmc_hdlc.c
-> 
-
-
+> --
+> pw-bot: cr
 
 -- 
-Hervé Codina, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+/Horatiu
 
