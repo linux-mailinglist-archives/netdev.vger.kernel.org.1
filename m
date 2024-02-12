@@ -1,142 +1,171 @@
-Return-Path: <netdev+bounces-71089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4F50851FB5
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 22:35:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13DBB8520E5
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 23:06:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 700391F22CBD
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 21:35:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65DD9B24835
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 22:05:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A6FB4CB5C;
-	Mon, 12 Feb 2024 21:34:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27C464CE19;
+	Mon, 12 Feb 2024 22:05:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EKSdDu0p"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="e78XzDiY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 115C64CDE5;
-	Mon, 12 Feb 2024 21:34:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6090A487B0
+	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 22:05:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707773699; cv=none; b=TeJ228RY/RB1l/IYfeRwz7Xr9xe4pxXFx/kXBiUUGyZsyhHrmCo+Q8b059u+8cUAsnY6n+5aHESNBZYWoZL/CWtbJi2Ese65fg6z/4qfdci91Bo0QLQbzlURLsS+GQmae6qNREM+5qSNBu/vs0pTQyPZt7SZ6UVZpzYoXfU8X5Y=
+	t=1707775553; cv=none; b=ryIA7vC5VLlvqcSubCYkzivRYRoqyDFRr3Qcju8DhSopP7lfLYUyeUcVx0+UF5WHpykmi/Wx3lpU3Cc3yibM4gv3Xoh/2TupeUwdxJGs3hhwswYkHWs7ysxmcfGiNBz3KpQXmvEGmPOMnIv5ehZ+y9WFfcg3cxB3wrnIfzt2OXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707773699; c=relaxed/simple;
-	bh=MEChIYkvQHqxWqS/fjWdPqFHkAIj3ZLNWN4rsNfct7g=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=nnjwAZthRZ3ipTyVom6fWNRvup98//CZ3gBS4krVvL2PM3GGL+rmESFaghc+sc7P6JvCZ0TnLDz2mppWzSwI2ysDn+6vlWXUh3JKM9aKOGkDnzpfrrIp9WBST42gEpPJCa9fr1nbgZtGo7rwPfT7asfF2ceF1yPzdLbtP2U9Q64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EKSdDu0p; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1d99c5f6bfeso28170765ad.1;
-        Mon, 12 Feb 2024 13:34:57 -0800 (PST)
+	s=arc-20240116; t=1707775553; c=relaxed/simple;
+	bh=VJrp8Vvaog3yrnjcar07WPi5V9SYC05Ocpqg/YPGU3k=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uuxLeCQCgUpmT9XbDPYsQ8cWW5/RT91T9SwHfrJqX0UwvCSiZPeF+TSB/Du1UwtEqAZUV+rayK5qHXrol/jRDFNIWP9nDTNuIn8Mpli0hHb+czqt43dYaQJ5gnyDCfZNqXBd/jhTi8E9+8tqILYe9YsnecADYfgJTRddiT6GvIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=e78XzDiY; arc=none smtp.client-ip=209.85.210.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-6e2e58feaefso185881a34.2
+        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 14:05:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707773697; x=1708378497; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZlNDhKCKO6Zl/pUC+lksP8PSO2guoSsHXwPfuNxeEAk=;
-        b=EKSdDu0pvGj7E3Obwa/IjdVvtRvm1Airvo2CYPmBABfTQpPvrt2QB0IaAPRK796UDT
-         cncQ9ES+AyhXZNMRbhS4rzZhWUBqw4r02FQ26QZBN9dUS4QPv4L6LREdSpNNcbYDZXxv
-         shDtIbQxnqhZpx1QaoJAMmDWa3/Jp9iNUStiZMtSMAUY8NIzkDSk9pZkPSzBZh7DCFme
-         hFBu2/I5MsLFr3qhVkI/7gEaCDJtRM2WJRQUvS60AKcy0rOoOvqrmAHIix8GL+J3xFPC
-         Ku5G1wmTqFLOI19t2l/X4HCXmkioM7xKunLDQDMsMgqLw/hQdcpop1+7E6rAQcnlxgHc
-         ZCDg==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1707775550; x=1708380350; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Oog96IYEdiS4xj+niEFQh7UJcgvUbwDKzZvToX9Yy+M=;
+        b=e78XzDiYD/VIGf/ldPnVmnQLKG9i6L238mtLqc47Wg5khOuf30sa5a/vI0raEXlOu8
+         SQO+CF9KqNKiYEy63ZS/nIn22MjdAl83SBvHpuSqm7tfzTiQU+cBteVvKA+SOL8zOQQ/
+         UJm5wOi3UqllsPJ7r8h4ER1IpLHTlKyeFWXHDkMvp7v3l5mBU5u+hqOH3MT7H9ujgiNW
+         WGYqe2SaSdUbEArBz1lUzqn6yHMas9fG8O+njDLA71moOwV4NFrJ+JM4w7jDOjEH/4Mw
+         iuwuc4KkQvWt7nCGebvajlOcKg89NsE+TgbmbU4qbiSCYzU4XycOPcXxxtg0mW+xCpmm
+         34/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707773697; x=1708378497;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1707775550; x=1708380350;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ZlNDhKCKO6Zl/pUC+lksP8PSO2guoSsHXwPfuNxeEAk=;
-        b=lCtzw9RexPp/fvBHYDaDYOR8z0+J4k7qHSYLFtLhW8m8c2trnpYstrwFr3sqACpmxq
-         QupdzQyt+p/3rKEIIX1MYxjSrFzXqr2YE0HTs4GzUGyxbUyqCbViZaYuYxsEXL5SANf/
-         Ed265Ew70EU1/ocK+F0KNLKZryp4gEgMiJdgtsybZ39+4HZOrxsmVNtce2bJJmls3p/d
-         k/mdHURLmlA+hccDxQJSlaL7scOIJ9A3jdtQTwxBuaiilmDEr/CAh9SWR2zJbPXsJRCd
-         X5nStJ5cGShHUwBPY6+niZ4mYAXzXGAH+ASlh5zbV9OHsY0mmgpCJFJwpGWjpZ+/gDBt
-         1DlA==
-X-Forwarded-Encrypted: i=1; AJvYcCVpFoVjGuKfeYxeJQQiEnDYOqIAbH+E/pUZ4Fj7PFbNv2UG5yfLRUmN1kYi3+Jk+PdJmnQQO5pOsJ/Sb26jDrAUFn0lwSxd5lpLTsJz
-X-Gm-Message-State: AOJu0YzeCE4Rfuc7W77fwKLhCCz0MeVA5AYWA2Dqwm/j6OJQyPJu05vQ
-	V+Elon/SsW9IlVNLSU3dWFXbVD+S9yPVjqH/ojzu1Z3DvVi+3gLNwU/P5fkRMrc=
-X-Google-Smtp-Source: AGHT+IHwG8ZQ78DWxKJXaa4Y4H+scVFTspOdR2ITBiwAOR6QL2NZ98AKmOKV0dXKMEHndtdjhS4cog==
-X-Received: by 2002:a17:902:e74a:b0:1d9:39b4:2039 with SMTP id p10-20020a170902e74a00b001d939b42039mr821746plf.30.1707773697234;
-        Mon, 12 Feb 2024 13:34:57 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWqB0dGX0zbAujuGkYeJJU7kS/llOmthnOh3ugaq65OokgL85NZt+gqCzNrHjhq7Iq1ZQkPGd/+yeA0rVV0IGhBpL/wkHVEU9/7K+6pc/DCPMl7axF1h1rOgc6mR0rCDRev9JZ7rHQcfTKC3SVZeJQORjrUIOJ5f8GkklvR9KvaZWwJtWHykOr2AopfpNPUiVETKiOpVM8J4zhy4jVe9yarC4dDd50yda7vDX8PXei2gdKuNr5X+xpxSef3HVAxZxVfNA/oOF/0WyFQ2UNGvD7I1vfQkDq0yV0H4wAoLRYAwbcrJAylbaE+V1CLpKQDIDSs89aF16/ERjJP6hIU
-Received: from tresc054937.tre-sc.gov.br ([2804:c:204:200:2be:43ff:febc:c2fb])
-        by smtp.gmail.com with ESMTPSA id f14-20020a170902ce8e00b001d7252fef6bsm762956plg.299.2024.02.12.13.34.53
+        bh=Oog96IYEdiS4xj+niEFQh7UJcgvUbwDKzZvToX9Yy+M=;
+        b=qbJRJQ67cspXY6BG8/6NmvAXCV0t62eQ0VnWBGARYA9o3i5GcUTw5GsEGFCLnwQZ2R
+         lvpw+X9sUec5ipfcj8D84rnJHKm++UPm1Gh2MMTGltCA+8+LJNLzSKJn4m+AwhL46Us3
+         o68gjQevHGDCNST8VNFf1WJu7cvdv/H0fEOzkNodr/dv24E79uH4+7P/e6iKRu1LhzOM
+         oFxGPbSyTyBRqFyICAeKrOtqX1fYRLprRprLKcK5n8jZPraOpn3ArUwRfI4c7SZKXXzg
+         d/mRbe1GjVS8g6jnKDGWdh+qSpfK42P6PbHAAniP39tK5JgAcQmmNP1CO+eYBwxCTYJT
+         590g==
+X-Gm-Message-State: AOJu0Yyu5ZZpArPp+hnYRYKVrVM/4iQVvBI4NGPiZrlKf9DhU5e04xdI
+	pX/KZhFHKlh0Pj+XD8L7DMoXMQNCeCQ7lBippPsZ49djqarj1VrTYLEOXR9Ktrk=
+X-Google-Smtp-Source: AGHT+IHFsfrYZQpU3ITDOG7J6rn5D7QxYlUihyKZSwf4wAv5Dge71VxvMVTA0a7FuED/phPT1kuqBA==
+X-Received: by 2002:a05:6358:7596:b0:178:e2b3:98da with SMTP id x22-20020a056358759600b00178e2b398damr12834322rwf.28.1707775550335;
+        Mon, 12 Feb 2024 14:05:50 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCW8qqywRG3HKr8zDgSdRXl/jsOCY3IMiCq/AXf0Ed0oECvyY+PNp1ClZD0YHCOzWvsMOsKkzXOgZBYmo20eWRY+0Dx0xqumWG+tZbaW/EfQVaKAO7kTcMSS5PZH4NneU3Sg/b0Jv1Sp7CXtsxdxw+92hV6CG8ZtTRoHagbIzHImKYAr8My7/5wFNLPSL4/1jF+KzRZs
+Received: from localhost (fwdproxy-prn-016.fbsv.net. [2a03:2880:ff:10::face:b00c])
+        by smtp.gmail.com with ESMTPSA id s73-20020a63774c000000b005cd78f13608sm918663pgc.13.2024.02.12.14.05.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Feb 2024 13:34:56 -0800 (PST)
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Mon, 12 Feb 2024 18:34:33 -0300
-Subject: [PATCH net-next] net: dsa: realtek: fix digital interface select
- macro for EXT0
+        Mon, 12 Feb 2024 14:05:49 -0800 (PST)
+From: David Wei <dw@davidwei.uk>
+To: Jakub Kicinski <kuba@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next v10 0/3] netdevsim: link and forward skbs between ports
+Date: Mon, 12 Feb 2024 14:05:41 -0800
+Message-Id: <20240212220544.70546-1-dw@davidwei.uk>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240212-realtek-fix_ext0-v1-1-f3d2536d191a@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAOiOymUC/x2MUQqDQAwFryL5NrBGqaVXKSKhPtvQspbdpQiLd
- zf0c3jzplJGMmS6NZUSfpZtiw5d29DjpfEJtsWZJMgQpBNO0E/Bm1fbZ+wl8DUMqr2MouOF/PZ
- N8O2fvFNE4egaTcdxAi9GubJsAAAA
-To: Linus Walleij <linus.walleij@linaro.org>, 
- =?utf-8?q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
- Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
- Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Luiz Angelo Daros de Luca <luizluca@gmail.com>
-X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1468; i=luizluca@gmail.com;
- h=from:subject:message-id; bh=MEChIYkvQHqxWqS/fjWdPqFHkAIj3ZLNWN4rsNfct7g=;
- b=owEBbQGS/pANAwAIAbsR27rRBztWAcsmYgBlyo7znpm3TMVYV+rMp8H5VWOfgNuidW22MQpAi
- ZRKysK4idqJATMEAAEIAB0WIQQRByhHhc1bOhL6L/i7Edu60Qc7VgUCZcqO8wAKCRC7Edu60Qc7
- Vru+B/4gjK3xAOWMDgfjdQGY0I6pSnDf1ElWlwq2ppFwBs1+++JCKGj6gpyH4hXwWqU5+klLR/U
- rlUyz8sRFrcCbk2TZx+fMsZMlTpwZrTE/5rH1neV38lV+XuNs0SWYZBPLmvGw8IfhB51P48pHCG
- CMDBn7o2HLUAP5PUSah4BgVfQua9zvaCDrlec7RwG/Uy1+91/VwzBhxB1Ee8devv8HiD8iJNEHu
- XEn36Sr4KCo5nz/M166byb+wH9XiN52HrWibnN+jEoZ5kN4qyJL2DSAD1czp1RhE0lAwsvMp0xL
- KAhwlav3K8aQOI3AssJJaaoRHTCWZuluJ9PXlt+FsU0CBaTq
-X-Developer-Key: i=luizluca@gmail.com; a=openpgp;
- fpr=1107284785CD5B3A12FA2FF8BB11DBBAD1073B56
+Content-Transfer-Encoding: 8bit
 
-While no supported devices currently utilize EXT0, the register reserves
-the bits for an EXT0. EXT0 is utilized by devices from the generation
-prior to rtl8365mb, such as those supported by the driver library
-rtl8367b.
+This patchset adds the ability to link two netdevsim ports together and
+forward skbs between them, similar to veth. The goal is to use netdevsim
+for testing features e.g. zero copy Rx using io_uring.
 
-Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
----
- drivers/net/dsa/realtek/rtl8365mb.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/dsa/realtek/rtl8365mb.c b/drivers/net/dsa/realtek/rtl8365mb.c
-index be56373e9473..12665a8a3412 100644
---- a/drivers/net/dsa/realtek/rtl8365mb.c
-+++ b/drivers/net/dsa/realtek/rtl8365mb.c
-@@ -209,10 +209,10 @@
- #define RTL8365MB_EXT_PORT_MODE_100FX		13
- 
- /* External interface mode configuration registers 0~1 */
--#define RTL8365MB_DIGITAL_INTERFACE_SELECT_REG0		0x1305 /* EXT1 */
-+#define RTL8365MB_DIGITAL_INTERFACE_SELECT_REG0		0x1305 /* EXT0,EXT1 */
- #define RTL8365MB_DIGITAL_INTERFACE_SELECT_REG1		0x13C3 /* EXT2 */
- #define RTL8365MB_DIGITAL_INTERFACE_SELECT_REG(_extint) \
--		((_extint) == 1 ? RTL8365MB_DIGITAL_INTERFACE_SELECT_REG0 : \
-+		((_extint) <= 1 ? RTL8365MB_DIGITAL_INTERFACE_SELECT_REG0 : \
- 		 (_extint) == 2 ? RTL8365MB_DIGITAL_INTERFACE_SELECT_REG1 : \
- 		 0x0)
- #define   RTL8365MB_DIGITAL_INTERFACE_SELECT_MODE_MASK(_extint) \
+This feature was tested locally on QEMU, and a selftest is included.
 
 ---
-base-commit: 0f37666d87d2dea42ec21776c3d562b7cbd71612
-change-id: 20240212-realtek-fix_ext0-804aa3272a76
+v9->v10:
+- fix not freeing skb when not there is no peer
+- prevent possible id clashes in selftest
+- cleanup selftest on error paths
 
-Best regards,
+v8->v9:
+- switch to getting netns using fd rather than id
+- prevent linking a netdevsim to itself
+- update tests
+
+v7->v8:
+- fix not dereferencing RCU ptr using rcu_dereference()
+- remove unused variables in selftest
+
+v6->v7:
+- change link syntax to netnsid:ifidx
+- replace dev_get_by_index() with __dev_get_by_index()
+- check for NULL peer when linking
+- add a sysfs attribute for unlinking
+- only update Tx stats if not dropped
+- update selftest
+
+v5->v6:
+- reworked to link two netdevsims using sysfs attribute on the bus
+  device instead of debugfs due to deadlock possibility if a netdevsim
+  is removed during linking
+- removed unnecessary patch maintaining a list of probed nsim_devs
+- updated selftest
+
+v4->v5:
+- reduce nsim_dev_list_lock critical section
+- fixed missing mutex unlock during unwind ladder
+- rework nsim_dev_peer_write synchronization to take devlink lock as
+  well as rtnl_lock
+- return err msgs to user during linking if port doesn't exist or
+  linking to self
+- update tx stats outside of RCU lock
+
+v3->v4:
+- maintain a mutex protected list of probed nsim_devs instead of using
+  nsim_bus_dev
+- fixed synchronization issues by taking rtnl_lock
+- track tx_dropped skbs
+
+v2->v3:
+- take lock when traversing nsim_bus_dev_list
+- take device ref when getting a nsim_bus_dev
+- return 0 if nsim_dev_peer_read cannot find the port
+- address code formatting
+- do not hard code values in selftests
+- add Makefile for selftests
+
+v1->v2:
+- renamed debugfs file from "link" to "peer"
+- replaced strstep() with sscanf() for consistency
+- increased char[] buf sz to 22 for copying id + port from user
+- added err msg w/ expected fmt when linking as a hint to user
+- prevent linking port to itself
+- protect peer ptr using RCU
+
+David Wei (3):
+  netdevsim: allow two netdevsim ports to be connected
+  netdevsim: forward skbs from one connected port to another
+  netdevsim: add selftest for forwarding skb between connected ports
+
+ drivers/net/netdevsim/bus.c                   | 135 +++++++++++++++++
+ drivers/net/netdevsim/netdev.c                |  40 ++++-
+ drivers/net/netdevsim/netdevsim.h             |   3 +
+ .../selftests/drivers/net/netdevsim/Makefile  |   1 +
+ .../selftests/drivers/net/netdevsim/peer.sh   | 138 ++++++++++++++++++
+ 5 files changed, 312 insertions(+), 5 deletions(-)
+ create mode 100755 tools/testing/selftests/drivers/net/netdevsim/peer.sh
+
 -- 
-Luiz Angelo Daros de Luca <luizluca@gmail.com>
+2.39.3
 
 
