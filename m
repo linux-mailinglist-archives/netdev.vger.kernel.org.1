@@ -1,108 +1,101 @@
-Return-Path: <netdev+bounces-70960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EC63851387
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 13:27:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBD028513B3
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 13:44:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C3EC7B2330A
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 12:27:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8801B28104D
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 12:44:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A727339FCC;
-	Mon, 12 Feb 2024 12:27:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA0DA39FE4;
+	Mon, 12 Feb 2024 12:44:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IxIAX19Q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k4nWb9ck"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C513984D;
-	Mon, 12 Feb 2024 12:27:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1071C39AFE;
+	Mon, 12 Feb 2024 12:44:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707740846; cv=none; b=cqfOB9mbzmK1D9U6/9K48JOj5ZIikhBolfzr+6NS5YKbqpL/++EnT+xKr0EMtGlQiRC5d0VWF02DragAJYnYNWvEEnEjImoCYcWGWE9nEJgYFFzoegHtGrtg7azrkrujZIeFYfmSmp1TMUn2w71fiYMKrweq9yk/qSRfRRZVrCs=
+	t=1707741846; cv=none; b=Uh2C0D1+UKEGvmFrdg0JThKspcy66+EPQYMRgFCU6FvhZ5wQ0VHyQWz6IvnCnFXwWb7CVEIfWinv+VAdyaf8+yL/yfg5ra27XsnoOJfu343V7vuEVdmtZHn/KIxlrE7y8PehUOaQdYldpByOck8X2UFcMc2oZTcczaieccfvvwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707740846; c=relaxed/simple;
-	bh=hbdJFCCuPFgmNxY6Pc6OeFv4Zasw/ff5zsB4psb92tU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CW9s6NlCdE8eByEwMxFXSOHxbvjY8tkvdvkOnN39KXIz0tVwKLFArdU2ojE/hepaZbnARyKblEoB7V2K5QEMAhc1t95hl+Uj82lYQ5MQQ6gbcc2vVWAmbmQNfw/TN094qklpczo3dPMLki+8M1M5I5sBfZf63wZq6I52H/6tC5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IxIAX19Q; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707740845; x=1739276845;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=hbdJFCCuPFgmNxY6Pc6OeFv4Zasw/ff5zsB4psb92tU=;
-  b=IxIAX19Qq89sk8rqxYTiZbpKoIs5WACFrOfY0pfmBAyvTV6mNFOOdxCW
-   ZKMCtBw0V90K8Mzgt9ejsRK7YTbLOLrM/4gGdmZ1khvCfrdvbzZuNNeKS
-   x02VY6Fwp/AFNvNA7JmyYr/a5iw/aLo2Uw8fIpDusB0BWno33Xp8xeVNc
-   OGW8W9cuYUBGFNeZ7ZC3JlKrxLAanmlspbCiHS/kW4VG9WQerYRd1+eXl
-   sFeFZ99iluaNOkFAO6cyV8rES5jS8HPfgJeYH7LmFxCAIQuC1zYgOuSVs
-   ILFoCC/SaXMoW0OD5W9SWxsDlHRkin/LHzNZ7l2AN3d4IUnzm7F84EHLj
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10981"; a="1592171"
-X-IronPort-AV: E=Sophos;i="6.06,263,1705392000"; 
-   d="scan'208";a="1592171"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 04:27:23 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10981"; a="911468813"
-X-IronPort-AV: E=Sophos;i="6.06,263,1705392000"; 
-   d="scan'208";a="911468813"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmsmga002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 04:27:19 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.97)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1rZVP2-00000003tMs-1ItT;
-	Mon, 12 Feb 2024 14:27:16 +0200
-Date: Mon, 12 Feb 2024 14:27:16 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Yury Norov <yury.norov@gmail.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew@lunn.ch>,
-	Mark Brown <broonie@kernel.org>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v3 RESEND 3/6] bitmap: Make bitmap_onto() available to
- users
-Message-ID: <ZcoOpPb9HfXOYmAr@smile.fi.intel.com>
-References: <20240212075646.19114-1-herve.codina@bootlin.com>
- <20240212075646.19114-4-herve.codina@bootlin.com>
+	s=arc-20240116; t=1707741846; c=relaxed/simple;
+	bh=ruErS7MH3sscYYbtYh+Mjix6NN8rg0ANIaQIqBK3AoQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gQrKvbO4LWCc57Gd8GkrFZ3SK+wnrwFP9jG75iT1mAouJkiDkLYtgBYogXftmNPMgJqt5qW2cfsWwe9Dh6icp3XRrv6JJr0SDxGehuEU+0OC5guLugcjaiJBJBeCwndjhrR11kzTQriJb/c3bL4xR5qotIfs9nu1t7844Gc7q/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k4nWb9ck; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2d09d90fa11so42864361fa.3;
+        Mon, 12 Feb 2024 04:44:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707741843; x=1708346643; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ruErS7MH3sscYYbtYh+Mjix6NN8rg0ANIaQIqBK3AoQ=;
+        b=k4nWb9ckulGQw65RWq1kELq9Na7Lzw3nKZocfN0fDhy+Wv2KnmQfJuCsT8IkDov0Fs
+         kucr+tucfOmJ3dxIRY4WwY0JFGtAMxge5BrU9LbsFsPLxHWpFkgQBYT9vDfOnkMtYRym
+         xuWCjURRBpMPFLoRU05rkTQ1gxDRmOdirKkV83Mt68o+fmQkk5gsezg439cYBfm4GKNi
+         9ekK7nc5wXL2IrvOX/QBOiu5i2c6+ScRYOWyxdjmtpAPK+h/rmdexgMQRTWqBKhGhxmM
+         JG8Cr2ANAtCmqSbgYaCiYxwWWo/4MKf+GdtNoOYVZ3JK7I+9k8t638k/K9dWa9a+jyzQ
+         dRQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707741843; x=1708346643;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ruErS7MH3sscYYbtYh+Mjix6NN8rg0ANIaQIqBK3AoQ=;
+        b=ORcE1nn643s0L/w1XfMlg37yholgPuB6284jZXEw6Ccn32S8GqRuJLps5BJGLNt1ls
+         nUZpi37Xo0y3KQ+duw7CP+cJDOxxT1Qfdnug1rX/gB0+oOjf9NFcvtBYSjw6xds7JLJV
+         /KD4kC4vgpHlbYdCoW8KmiA03sobxorb65pCSOKHx975T/pl1DRSRBQ2nY5JYX+EASmr
+         2aPTOGjbPk0G+jPHOCOxzww3r9fZfxGnq7adUB5LDFdtQibTl5FenuCW0vnCKMp8DYTg
+         kypzJ7KQi546E9HIjtQae+h431LPtMH9EVRoG4RuKMcqm2LXa565TZrDPUAbArouN7tk
+         dfJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXWKLLYbIQxBaRi47SXDe15JS/M6LgePkz+Snjsq6Bt7r7LjMpTHsBCDDt0Cx7zU5mBb76Cp0UWqVI7GAgVEb2/4pgSU9/Fus8my9NpHbx2KgKhzlM+AMlOWZJw2sbZ6AEZ4G5t
+X-Gm-Message-State: AOJu0Ywl54PTvMDZgHyKX0F6nqBRZkPv0PC8fiZKxXs+Zg3Rwq7ayrgx
+	RQGTcRc6g5RU4ECwTUe0Ay/T+Jsh7hGAX+qzlQwSc6Kpy7p+Gf0Kzn5vujdBnGpjRmRIsEyIqWL
+	0pqWC66XFSB/uANqX3YZvxI1DyX0=
+X-Google-Smtp-Source: AGHT+IG2cr3CdhuVwGdq9xVHEiJ5L/PgJRmWJGqroCVmLpHIFMIMIRBURSGCKtvjTevp1PO+m84qN2XWnxzrI3qoKcY=
+X-Received: by 2002:a05:651c:198f:b0:2d0:f87f:d7f8 with SMTP id
+ bx15-20020a05651c198f00b002d0f87fd7f8mr2433272ljb.3.1707741842794; Mon, 12
+ Feb 2024 04:44:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240212075646.19114-4-herve.codina@bootlin.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+References: <20240209-realtek_reverse-v6-0-0662f8cbc7b5@gmail.com> <CACRpkdbw+mJsGb=6iu6f+mGoi+vouu6TPztaD5SyuG+n8Staew@mail.gmail.com>
+In-Reply-To: <CACRpkdbw+mJsGb=6iu6f+mGoi+vouu6TPztaD5SyuG+n8Staew@mail.gmail.com>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Mon, 12 Feb 2024 09:43:51 -0300
+Message-ID: <CAJq09z7OK4LyOfEhx4Rp=EdhNBDcdvQ6EFu+_gY0SN8dTmB1=Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 00/11] net: dsa: realtek: variants to drivers,
+ interfaces to a common module
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
+	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, 
+	Florian Fainelli <florian.fainelli@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Feb 12, 2024 at 08:56:31AM +0100, Herve Codina wrote:
-> Currently the bitmap_onto() is available only for CONFIG_NUMA=y case,
-> while some users may benefit out of it and being independent to NUMA
-> code.
-> 
-> Make it available to users by moving out of ifdeffery and exporting for
-> modules.
+> Tested on my RTL8366RB on a D-Link DIR-685 as well, works like a
+> charm:
 
-Wondering if you are trying to have something like
-https://lore.kernel.org/lkml/20230926052007.3917389-1-andriy.shevchenko@linux.intel.com/
+Thanks, Linus. An independent test is always welcome.
 
--- 
-With Best Regards,
-Andy Shevchenko
+> Tested-by: Linus Walleij <linus.walleij@linaro.org>
 
 
+Regards,
+
+Luiz
 
