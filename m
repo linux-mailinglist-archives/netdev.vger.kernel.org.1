@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-71060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B522851D69
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 19:57:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78E24851D73
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 19:58:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A04901C2243B
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 18:57:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F9F0285BE8
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 18:58:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDEA241233;
-	Mon, 12 Feb 2024 18:57:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E817345BE8;
+	Mon, 12 Feb 2024 18:58:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T7K7jIwb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dDMKsDrV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23DF13E49C
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 18:57:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C3AE3FE44
+	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 18:58:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707764267; cv=none; b=KtUgCD2mPlYFf32GTmWYVGHcJlLShWY2u46zflTA0s8ZyGngOK1dnUR29lOh5i5pMs12kr2B2ltVtXiZnMBmZ62RPxkJ9fPT4v2FcXJUVkbOWRsMPs0++wRrL7qQ6ah/L1qg1bazolOeHiQYaNxOUzlDZQ3j5sGZzDKZ0KfuOys=
+	t=1707764328; cv=none; b=ZvDt2y7gv6TsAfjYCWsJbasR88TvoBMCXWjni6wMxswJXZdlgkIJrTR1/kelfPZHrXBGQigZuwwqeR7T8bW9uVDFME9vv/vJepOCGNZ3m4g6Y/3nSgjOXUDTFpVeIsKzjEFS0Tbq1Knknm9PYyWRr3maGH14P+9i3mBgupX3d+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707764267; c=relaxed/simple;
-	bh=cu1hPeAT1zEsqTXjPt/EJ1C5x57YlzrR80rwumHOLmQ=;
+	s=arc-20240116; t=1707764328; c=relaxed/simple;
+	bh=UIsPhL0DhrlfpyGi2TLgwF2tQjVf+mUuI9EnG5Px+aY=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=B4lgLMQ/hkD0G1xEWAb7fAyT7LExS4rsyH7rQ1Zd/ADELqnAXQBC4bds1O7EQjXdKi/aOxWtlCK8LWZMMGMT8aOZpVSuk8AbAJiRYkqVXPvf5+s7ED3uxlnhzcuCukwP6TbFZE1nlTQh66gxdjuHh20bxhLVmq7HDnlMuhy9tMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T7K7jIwb; arc=none smtp.client-ip=209.85.208.42
+	 In-Reply-To:Content-Type; b=u/4OEJC38o0ewjb1VSSsTAZVqZQi68tIOVmWZQ45X8E26oBHFHoQ0mKv7zNvRWgHmThqzKTKHkXYdYePRa3AHFdrFLh+zABBrrXJfgA/maaz4zcuisFMIwIIsP8XblmMhwlX7Dsrhicj8UnB4iletsIFJVfp/oYECna7dJrjCR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dDMKsDrV; arc=none smtp.client-ip=209.85.208.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-55790581457so5496988a12.3
-        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 10:57:45 -0800 (PST)
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-55ff5f6a610so4234675a12.3
+        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 10:58:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707764264; x=1708369064; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1707764325; x=1708369125; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
          :from:content-language:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=8iSmzscqRq8GuXZBkLKRQI8F4GpQTBdOmygKQv9pLdA=;
-        b=T7K7jIwb4SlvWk2gIHhWPOraHzqLHEHKbC25fIBLEJxLeSlhGXb5rs0MWQrlVn3Tvc
-         pZBpoRIO1Djvuushu1LsiQG6wVCz5+R9cDMw15rSXFnjNxB+1PJCkjTxOYS7TQrMozUX
-         GmbbD/Xeovyo+RUpCHK836stGAP79EBri84rLwW+iuu/Z8UFpMbttopCavg0F6IS5mjM
-         dCwg89dmVc/+uqyjP2LJO3155Z+/Y9uzm3vWoJhvLH5UdiezUpPh8yKAZU7HK4suovl9
-         FgLLBw7wEr4YL1ZlD6lWcamWCJhrlHbiJy8sSGzd0nItUEagSwkpJ7dIjTSPqebA1Yt0
-         7WxA==
+        bh=oXcusfGnyVEixyPAP0j+52ZlFg5E2rkKoTXFbsuIV3Y=;
+        b=dDMKsDrVDAnhjioW4wu1unOZ0xnRw43+ULsKmPoI3Xp9pQBCG0MJmIMAF6aO4WP5vP
+         Zg5S3WuOxxSzl8t5ytBDTfqtZJZXWg5Kht8rximKpi45CMVtLAIMKJCp3xkKPe7mAb1X
+         1PYDlwDqlAidB32ZUwqigHeYBr2xINaKiYK235zr8o9EfCG7DHVi3E+kKHf3hs5jFPHB
+         b772F+UQrgprPC9ZLiVxtB7e6IMXoSI3o2BQkbzTOmyX2YKgrGmMD/tEPRWoNVuO5xbg
+         9cZU5eql4ymWNqBYZ5Zrf72P4F5JZkxtWwsC8/UVuPPnWH/Vw5cQPSXIhajo5D/V8BFu
+         utDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707764264; x=1708369064;
+        d=1e100.net; s=20230601; t=1707764325; x=1708369125;
         h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
          :from:content-language:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=8iSmzscqRq8GuXZBkLKRQI8F4GpQTBdOmygKQv9pLdA=;
-        b=w3AQ7tcabMkQvZQcPjtJh+PQKn7ndxlE+OC8A88CZZtsaXMpv28XjXXFY3MRzUSvZI
-         UY1vX2UbhcwJ8wYD15OpiPjJ6VIWk2ngcX8avyUEFB6iO44tGivazlkPmUrjtWI65yJP
-         bDjAE02ztG2Bn207OoZiIOj93BfjgKSRddMGGRataOtGgNJnKUSzZRbcxuSXYGwnSAbW
-         giwvTs8UxMVtCvKqDZldcr+usWtWitcdOwLGHW+T6mFk65pvaGZtz17tByAse8j26Kv/
-         a+Vb/Q2Kqd9/rj7AgYszvVDTGragUiE64vEOoMkgcFWQczSuizffjn7jrbe6AYs4viX2
-         G7pg==
-X-Gm-Message-State: AOJu0YzQtY2B56NKeUvR/zoI/FtOe98qxQLgcY/7Q9JvkEcJdd1CKKeA
-	eXgjIb8t3PXlxQCkKDtwiVZa00XV0Qvjm/jPr1gHt3G1sStF1+sC
-X-Google-Smtp-Source: AGHT+IF17phMcjyyRIsCL5W17ZXrG5RVXYo9iCRsd6vhm0dTXI3BMxxAzBeMdGo0SCDF++GkABv4Hg==
-X-Received: by 2002:aa7:d8da:0:b0:561:4238:e6d8 with SMTP id k26-20020aa7d8da000000b005614238e6d8mr4911024eds.3.1707764264312;
-        Mon, 12 Feb 2024 10:57:44 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVym6wNZIMHvX1j90C9Q4zBGTA6FG4dNkf3KMI1T5eYTxtqSuQ0nI7vTo2p5J86SyjXjo/KNyqDl+oifm1Og5Lg2r9aKN1fM2u1/BpuDGrk4h2UR0Vm2VEveik7y4aONVk6aiUKaH002HvT6t6uo7jI+LYmSfWuM17go01a
+        bh=oXcusfGnyVEixyPAP0j+52ZlFg5E2rkKoTXFbsuIV3Y=;
+        b=VEH/GlXEf0TMvdCY5DFLXK+1O3RU13xygGi0+OEbK66LTba0OjWXEaXQCJBHZlIHfh
+         ybrRjiE3dNZBNYqgZDXphzSOVMWBZRz/wlB4tymICZ8COv8sdeegT1wT8gPd1VAh0Ghl
+         uOZbCvPq1DxlTtz8t+72WKKfiruw8EJUvfY2JEk3D81rAQUVBj5Inno55Oo27YsA8a6M
+         l1Vg/PNdKmVovIvO0KJeZz61XYfirepuidLa0ucZdG+VqZIfrFyvGvs/ScE/8HoibYtJ
+         yG6RfgoxlBNGlZ6ZdvaYG2HJbVJxqc8SRVD/U9azOxVhxFdvqn65yA7SkCoag06Xkln3
+         bGrQ==
+X-Gm-Message-State: AOJu0YxZ0cZsiaYTvl7W9Rm5CIUJANu7myMFG0cJ0c64PG1NKAXLMHGk
+	WYUAJ8FBAwoSfLF2jovEbWXIfl7MSWzm5SrIlP1gBcqwTsbMIr3i
+X-Google-Smtp-Source: AGHT+IFIBf161JaDP9IHOe6Bk6pmjAO4HifujGFXAqs5yPN1uw8zdpjP+qWKEOYstjZipg4RcLqoZQ==
+X-Received: by 2002:a05:6402:b78:b0:561:d726:f71 with SMTP id cb24-20020a0564020b7800b00561d7260f71mr1033713edb.4.1707764325274;
+        Mon, 12 Feb 2024 10:58:45 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUjDVKfHljxskW6yCSNVKWgltR5oZLhmuNHCB3EllsQub/1eYxEb/NIM0uFMIPVr0bwE5XvYOeSgajdSv+IyPfrYU1seJIZ1vDQbvtnjsAokk3IK8KIxa9tk3T9ynfF1u9l9O3FoFZkRPqn11X7akqIBJRfa3EEFjAyXQMG
 Received: from ?IPV6:2a01:c22:778f:2300:f4de:66ea:cd50:b2c7? (dynamic-2a01-0c22-778f-2300-f4de-66ea-cd50-b2c7.c22.pool.telefonica.de. [2a01:c22:778f:2300:f4de:66ea:cd50:b2c7])
-        by smtp.googlemail.com with ESMTPSA id t22-20020a50d716000000b0055fe55441cbsm3154227edi.40.2024.02.12.10.57.43
+        by smtp.googlemail.com with ESMTPSA id t22-20020a50d716000000b0055fe55441cbsm3154227edi.40.2024.02.12.10.58.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Feb 2024 10:57:44 -0800 (PST)
-Message-ID: <39beed72-0dc4-4c45-8899-b72c43ab62a7@gmail.com>
-Date: Mon, 12 Feb 2024 19:57:46 +0100
+        Mon, 12 Feb 2024 10:58:44 -0800 (PST)
+Message-ID: <cfb69ec9-24c4-4aad-9909-fdae3088add4@gmail.com>
+Date: Mon, 12 Feb 2024 19:58:47 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,8 +77,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 1/3] r8169: add generic rtl_set_eee_txidle_timer
- function
+Subject: [PATCH net-next 2/3] r8169: support setting the EEE tx idle timer on
+ RTL8168h
 Content-Language: en-US
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
@@ -133,91 +133,29 @@ In-Reply-To: <89a5fef5-a4b7-4d5d-9c35-764248be5a19@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Add a generic setter for the EEE tx idle timer and use it with all
-RTL8125/RTL8126 chip versions, in line with the vendor driver.
-This prepares for adding EEE tx idle timer support for additional
-chip versions.
+Support setting the EEE tx idle timer also on RTL8168h.
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/ethernet/realtek/r8169_main.c | 34 +++++++++++++----------
- 1 file changed, 20 insertions(+), 14 deletions(-)
+ drivers/net/ethernet/realtek/r8169_main.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 79ec5bb97..f6ed74073 100644
+index f6ed74073..5244f24a7 100644
 --- a/drivers/net/ethernet/realtek/r8169_main.c
 +++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -619,6 +619,7 @@ struct rtl8169_private {
- 	struct page *Rx_databuff[NUM_RX_DESC];	/* Rx data buffers */
- 	struct ring_info tx_skb[NUM_TX_DESC];	/* Tx data buffers */
- 	u16 cp_cmd;
-+	u16 tx_lpi_timer;
- 	u32 irq_mask;
- 	int irq;
- 	struct clk *clk;
-@@ -2031,6 +2032,22 @@ static int rtl_set_coalesce(struct net_device *dev,
- 	return 0;
- }
+@@ -2037,6 +2037,11 @@ static void rtl_set_eee_txidle_timer(struct rtl8169_private *tp)
+ 	unsigned int timer_val = READ_ONCE(tp->dev->mtu) + ETH_HLEN + 0x20;
  
-+static void rtl_set_eee_txidle_timer(struct rtl8169_private *tp)
-+{
-+	unsigned int timer_val = READ_ONCE(tp->dev->mtu) + ETH_HLEN + 0x20;
-+
-+	switch (tp->mac_version) {
-+	case RTL_GIGA_MAC_VER_61:
-+	case RTL_GIGA_MAC_VER_63:
-+	case RTL_GIGA_MAC_VER_65:
+ 	switch (tp->mac_version) {
++	case RTL_GIGA_MAC_VER_46:
++	case RTL_GIGA_MAC_VER_48:
 +		tp->tx_lpi_timer = timer_val;
-+		RTL_W16(tp, EEE_TXIDLE_TIMER_8125, timer_val);
++		r8168_mac_ocp_write(tp, 0xe048, timer_val);
 +		break;
-+	default:
-+		break;
-+	}
-+}
-+
- static int rtl8169_get_eee(struct net_device *dev, struct ethtool_keee *data)
- {
- 	struct rtl8169_private *tp = netdev_priv(dev);
-@@ -2289,14 +2306,8 @@ static void rtl8125a_config_eee_mac(struct rtl8169_private *tp)
- 	r8168_mac_ocp_modify(tp, 0xeb62, 0, BIT(2) | BIT(1));
- }
- 
--static void rtl8125_set_eee_txidle_timer(struct rtl8169_private *tp)
--{
--	RTL_W16(tp, EEE_TXIDLE_TIMER_8125, tp->dev->mtu + ETH_HLEN + 0x20);
--}
--
- static void rtl8125b_config_eee_mac(struct rtl8169_private *tp)
- {
--	rtl8125_set_eee_txidle_timer(tp);
- 	r8168_mac_ocp_modify(tp, 0xe040, 0, BIT(1) | BIT(0));
- }
- 
-@@ -3829,6 +3840,8 @@ static void rtl_hw_start(struct  rtl8169_private *tp)
- 	rtl_hw_aspm_clkreq_enable(tp, false);
- 	RTL_W16(tp, CPlusCmd, tp->cp_cmd);
- 
-+	rtl_set_eee_txidle_timer(tp);
-+
- 	if (tp->mac_version <= RTL_GIGA_MAC_VER_06)
- 		rtl_hw_start_8169(tp);
- 	else if (rtl_is_8125(tp))
-@@ -3862,14 +3875,7 @@ static int rtl8169_change_mtu(struct net_device *dev, int new_mtu)
- 	dev->mtu = new_mtu;
- 	netdev_update_features(dev);
- 	rtl_jumbo_config(tp);
--
--	switch (tp->mac_version) {
--	case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_65:
--		rtl8125_set_eee_txidle_timer(tp);
--		break;
--	default:
--		break;
--	}
-+	rtl_set_eee_txidle_timer(tp);
- 
- 	return 0;
- }
+ 	case RTL_GIGA_MAC_VER_61:
+ 	case RTL_GIGA_MAC_VER_63:
+ 	case RTL_GIGA_MAC_VER_65:
 -- 
 2.43.1
 
