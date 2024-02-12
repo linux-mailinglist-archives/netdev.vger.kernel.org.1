@@ -1,224 +1,429 @@
-Return-Path: <netdev+bounces-71048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C275851CFF
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 19:41:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72A8E851D0B
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 19:43:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B07F1F23AA1
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 18:41:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD07DB26E8D
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 18:43:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B340B3FE2B;
-	Mon, 12 Feb 2024 18:41:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UfCBN/+d"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC79945BF9;
+	Mon, 12 Feb 2024 18:42:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cloudserver094114.home.pl (cloudserver094114.home.pl [79.96.170.134])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0568845979;
-	Mon, 12 Feb 2024 18:41:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B7173EA69;
+	Mon, 12 Feb 2024 18:42:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.96.170.134
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707763306; cv=none; b=OXjJ4p4u9QF7yobNHwDK3dhuW0Axu31fxtkIlkRH58BXkdYb2Z+BMicCsIz7DGClEMLupCb9PBxUR2Xh0lx3fRnaejFG2XfRWeyUBKoM7QUQP7J4xpKxNo4ZV2UPsU0a8+KlsgsxvdiOF9oLRkrDUq0KXWS9vTOhBjCSK/OtEXc=
+	t=1707763354; cv=none; b=XAgT33bDxt2F+G2pUDaFpNlV9RYjuGRsGOn4W50DE3z1Hsvj7gqF2Qq5n8v+QrB6zB4vWRys6MMsBMaCn80nbOcfB9zmAAZaMj5ifyxcOr67EMZnNCc1Paf7Azky2fqeHzti5e1Db/tQ2ReWyqN+dWt12Ykdjv/pJFNcVndhAJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707763306; c=relaxed/simple;
-	bh=IUZxD5O+i0w+2p0VZy6m7tm97ghxTlBg1TFydIYZFuk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AK2y4S9wDab6iw9GFJCbLDe8qajopqI2cmrq8o/V39n6zVK3N0H7uD0tsWlci2mbBWVbtOrh2cghvmXoCWzoF71mdNB4DqeSuTvYPwk+ztAD14sPUh8h5FHdK6vumSSL7RPVX/aDv6xVt6t/j5+Z1RrCuX2KhaoArVv9ZlqsClo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UfCBN/+d; arc=none smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-6047a616bfeso31048917b3.3;
-        Mon, 12 Feb 2024 10:41:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707763304; x=1708368104; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=q/xVSDZYaBQvoJYVHKQOA1UWqFuvlWGZY8Hn0s/4Hjc=;
-        b=UfCBN/+de6pGEVVX4UAw3pE6TvbXN8GflMIdAicfXcpLK1AjSY8fhgVTO/b/d5h/Ma
-         w1VvKspoh0u5BYOM2BrV4F2EZOzA1cU4DP0/J8KjFBE/xI9Coc6N+FUkDvIWlJfWnE2X
-         H3X0TfOPr7V3NS0EJNR2X9VHyhbFMf4eke3KydI+ntzle4TjHUzKCyx9gk3Cq3kTXmjr
-         mV8tUmO7AYPWi8boBoaz73wVkYzh3V/5KUeEgk5a2ZKDXCbblLFonfYRfOerBoVYQ8sp
-         OFNFiWzxmbGCk2Czhb3htOx5S0SmHArlUl2xBmiOch+QKzV/ghUlUTMZtp6ChPCmDFlN
-         VaYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707763304; x=1708368104;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q/xVSDZYaBQvoJYVHKQOA1UWqFuvlWGZY8Hn0s/4Hjc=;
-        b=oTg4FGR5hwYO00zlG1EEb1vkpoiKzRvLWD1eCLrrNuKGI086OAiG6HEBjSs5u+o1I7
-         /GK2wwYQbn/wgIShsqnpGcM2/AozvG4tTZcDDECDGl7ezB7AtCBV0lTAzr4S2fkPhg4m
-         jRpHyxGMnNHXFfFOko4CC/A8lQ5hyrSmmC6/X/C2BSr4A3+AqKhgIA/Pz4XyPlt2G5bl
-         ppOeTZQal5jYjLK6Vc9Fhs9Ul25fg2eB4JyhBuoa18hnIi7CDLq1QNz0tPN+PfUao/CY
-         5OQmdHUZeO06plML6uuQ/oTXmA/D3T4v0u0XDo5bK4F46rlIbqldxxw54N4YY4vkna0X
-         vjhw==
-X-Gm-Message-State: AOJu0YzxjWqSatvFviL2Ek7rlfnQ7/OcmppWQQK8IwCGH6Mb9Ae18baP
-	p7xLyLamee03nq+uXuZM5oA33VrdLC3x1GRYDsFwP0XMqmyZCOkk
-X-Google-Smtp-Source: AGHT+IE4kEey/v26XmyZnftxIjL7x0I737WxMrnoVxzH/S5xEtgVM/RkCDoIclSFu6yTe+ozzw+42A==
-X-Received: by 2002:a05:690c:2884:b0:607:776e:57ca with SMTP id ee4-20020a05690c288400b00607776e57camr1204447ywb.21.1707763303849;
-        Mon, 12 Feb 2024 10:41:43 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWUuuzxM51dvMxII/HjtZa/eTstnf+CqE9iMkwt0BDmoRYajZd5C8HSJs3J5N0LP5QFm/7vdiQDiqyHkXGN9k4vYDo69uiLSJ/cmK2+VlE3q1cTCLpG0Pz8fzZn2SxVpeNQ0r2au55xgFSQZH4hklwKs/L2yfpCPchxpsOP9GHzEAmoRaODFZSg825b9/JxA5ZdYKmBY5TlXZUVGq0DutlCcq+sAlfdqpawazDnL/ol/s0DSTeWNdugCAUI8bMCrNrWQa5rA14VcLQwm7gJEoZksNW7YuMPssrEsui2yljM9Xli4eyaInRLWcx+ff4HbcNCANRrxh8cTn9uwHW66lIcrKwaNpmMt7U1uRN9fi0So6QB4kDTC8E/WaNr0s9DMK9xnQNCMf7dRROGL739EOCXo5sk13dFZloOvefb01OTTuKWSvzG3t9gLzeeashNatnd18I1avbfL9hpUCOD6MsIhMVLsJHP2iIJF6yitA==
-Received: from localhost ([2601:344:8301:57f0:85b5:dd54:cd99:b])
-        by smtp.gmail.com with ESMTPSA id eo3-20020a05690c2c0300b0060764876b24sm411700ywb.123.2024.02.12.10.41.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Feb 2024 10:41:43 -0800 (PST)
-Date: Mon, 12 Feb 2024 10:41:42 -0800
-From: Yury Norov <yury.norov@gmail.com>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew@lunn.ch>,
-	Mark Brown <broonie@kernel.org>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v3 RESEND 4/6] bitmap: Introduce bitmap_off()
-Message-ID: <ZcpmZh8td8DNFzin@yury-ThinkPad>
-References: <20240212075646.19114-1-herve.codina@bootlin.com>
- <20240212075646.19114-5-herve.codina@bootlin.com>
- <ZcplW2mXObOZUtR7@yury-ThinkPad>
+	s=arc-20240116; t=1707763354; c=relaxed/simple;
+	bh=LBXPV0kk/xKvcPAc8EQBc6kk4J5lns1cln/E+8e/rD4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Gy29tfV9PbMDsHNMnO9B/v3NoseV2DnDMJezVXftS0NpyaNRItD/UVH1wIdlECBxhgudbIwIdU0IwlRwzl1zSCrG2VgViGEjug8IM0Z1dxdIgfcD9siHmF9TZqH9GdZhrsKkbfjxHEG2zR7bzrVn1pYL6TENf7BQtsDJ/An5pNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rjwysocki.net; spf=pass smtp.mailfrom=rjwysocki.net; arc=none smtp.client-ip=79.96.170.134
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rjwysocki.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rjwysocki.net
+Received: from localhost (127.0.0.1) (HELO v370.home.net.pl)
+ by /usr/run/smtp (/usr/run/postfix/private/idea_relay_lmtp) via UNIX with SMTP (IdeaSmtpServer 5.4.0)
+ id 7615cb272cbf5413; Mon, 12 Feb 2024 19:42:28 +0100
+Received: from kreacher.localnet (unknown [195.136.19.94])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by cloudserver094114.home.pl (Postfix) with ESMTPSA id D22CA669CF2;
+	Mon, 12 Feb 2024 19:42:27 +0100 (CET)
+From: "Rafael J. Wysocki" <rjw@rjwysocki.net>
+To: Linux PM <linux-pm@vger.kernel.org>
+Cc: Lukasz Luba <lukasz.luba@arm.com>, LKML <linux-kernel@vger.kernel.org>,
+ Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>,
+ Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+ Zhang Rui <rui.zhang@intel.com>, netdev@vger.kernel.org,
+ Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+ Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+ linux-wireless@vger.kernel.org, Shawn Guo <shawnguo@kernel.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Manaf Meethalavalappu Pallikunhi <quic_manafm@quicinc.com>
+Subject: [PATCH v2 9/9] thermal: core: Eliminate writable trip points masks
+Date: Mon, 12 Feb 2024 19:42:14 +0100
+Message-ID: <5913164.MhkbZ0Pkbq@kreacher>
+In-Reply-To: <6017196.lOV4Wx5bFT@kreacher>
+References: <6017196.lOV4Wx5bFT@kreacher>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZcplW2mXObOZUtR7@yury-ThinkPad>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="UTF-8"
+X-CLIENT-IP: 195.136.19.94
+X-CLIENT-HOSTNAME: 195.136.19.94
+X-VADE-SPAMSTATE: clean
+X-VADE-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvledrudefgdduudegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecujffqoffgrffnpdggtffipffknecuuegrihhlohhuthemucduhedtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkfgjfhgggfgtsehtufertddttdejnecuhfhrohhmpedftfgrfhgrvghlucflrdcuhgihshhotghkihdfuceorhhjfiesrhhjfiihshhotghkihdrnhgvtheqnecuggftrfgrthhtvghrnhepvdffueeitdfgvddtudegueejtdffteetgeefkeffvdeftddttdeuhfegfedvjefhnecukfhppeduleehrddufeeirdduledrleegnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepudelhedrudefiedrudelrdelgedphhgvlhhopehkrhgvrggthhgvrhdrlhhotggrlhhnvghtpdhmrghilhhfrhhomhepfdftrghfrggvlhculfdrucghhihsohgtkhhifdcuoehrjhifsehrjhifhihsohgtkhhirdhnvghtqedpnhgspghrtghpthhtohepudeipdhrtghpthhtoheplhhinhhugidqphhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhukhgrshiirdhluhgsrgesrghrmhdrtghomhdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghnihgvlhdrlhgviigtrghnoheslhhinhgrrhhordhorhhgpdhrtghpthhtohepshht
+ rghnihhslhgrfidrghhruhhsiihkrgeslhhinhhugidrihhnthgvlhdrtghomhdprhgtphhtthhopehsrhhinhhivhgrshdrphgrnhgurhhuvhgruggrsehlihhnuhigrdhinhhtvghlrdgtohhm
+X-DCC--Metrics: v370.home.net.pl 1024; Body=16 Fuz1=16 Fuz2=16
 
-On Mon, Feb 12, 2024 at 10:37:18AM -0800, Yury Norov wrote:
-> On Mon, Feb 12, 2024 at 08:56:32AM +0100, Herve Codina wrote:
-> > The bitmap_onto() function translates one bitmap relative to another but
-> > no function are present to perform the reverse translation.
-> > 
-> > Introduce bitmap_off() to fill this hole.
-> > 
-> > Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> > ---
-> >  include/linux/bitmap.h |  3 +++
-> >  lib/bitmap.c           | 42 ++++++++++++++++++++++++++++++++++++++++++
-> >  2 files changed, 45 insertions(+)
-> > 
-> > diff --git a/include/linux/bitmap.h b/include/linux/bitmap.h
-> > index 99451431e4d6..5ecfcbbc91f4 100644
-> > --- a/include/linux/bitmap.h
-> > +++ b/include/linux/bitmap.h
-> > @@ -65,6 +65,7 @@ struct device;
-> >   *  bitmap_remap(dst, src, old, new, nbits)     *dst = map(old, new)(src)
-> >   *  bitmap_bitremap(oldbit, old, new, nbits)    newbit = map(old, new)(oldbit)
-> >   *  bitmap_onto(dst, orig, relmap, nbits)       *dst = orig relative to relmap
-> > + *  bitmap_off(dst, orig, relmap, nbits)        *dst = bitmap_onto() reverse operation
-> >   *  bitmap_fold(dst, orig, sz, nbits)           dst bits = orig bits mod sz
-> >   *  bitmap_parse(buf, buflen, dst, nbits)       Parse bitmap dst from kernel buf
-> >   *  bitmap_parse_user(ubuf, ulen, dst, nbits)   Parse bitmap dst from user buf
-> > @@ -208,6 +209,8 @@ int bitmap_bitremap(int oldbit,
-> >  		const unsigned long *old, const unsigned long *new, int bits);
-> >  void bitmap_onto(unsigned long *dst, const unsigned long *orig,
-> >  		const unsigned long *relmap, unsigned int bits);
-> > +void bitmap_off(unsigned long *dst, const unsigned long *orig,
-> > +		const unsigned long *relmap, unsigned int bits);
-> >  void bitmap_fold(unsigned long *dst, const unsigned long *orig,
-> >  		unsigned int sz, unsigned int nbits);
-> >  
-> > diff --git a/lib/bitmap.c b/lib/bitmap.c
-> > index 2feccb5047dc..71343967335e 100644
-> > --- a/lib/bitmap.c
-> > +++ b/lib/bitmap.c
-> > @@ -682,6 +682,48 @@ void bitmap_onto(unsigned long *dst, const unsigned long *orig,
-> >  }
-> >  EXPORT_SYMBOL(bitmap_onto);
-> >  
-> > +/**
-> > + * bitmap_off - revert operation done by bitmap_onto()
-> 
-> This is definitely a bad name. I've no a better idea, but even
-> bitmap_onto_revert() would be better.
-> 
-> > + *     @dst: resulting translated bitmap
-> > + *     @orig: original untranslated bitmap
-> > + *     @relmap: bitmap relative to which translated
-> > + *     @bits: number of bits in each of these bitmaps
-> > + *
-> > + * Suppose onto computed using bitmap_onto(onto, src, relmap, n)
-> > + * The operation bitmap_off(result, onto, relmap, n) leads to a
-> > + * result equal or equivalent to src.
-> 
-> Agree with Rasmus. This should be well tested.
-> 
-> > + * The result can be 'equivalent' because bitmap_onto() and
-> > + * bitmap_off() are not bijective.
-> > + * The result and src values are equivalent in that sense that a
-> > + * call to bitmap_onto(onto, src, relmap, n) and a call to
-> > + * bitmap_onto(onto, result, relmap, n) will lead to the same onto
-> > + * value.
-> 
-> Did you mean "a call to bitmap_onto(onto, src, relmap, n) and a
-> call to bitmap_off(onto, result, relmap, n)"? 
-> 
-> I think the whole paragraph adds more confusion than explanations.
-> If a new function is supposed to revert the result of some other
-> function, I'd better focus on testing that it actually reverts as
-> advertised, and keep description as brief as possible.
-> 
-> > + * If either of @orig or @relmap is empty (no set bits), then @dst
-> > + * will be returned empty.
-> 
-> Is this an exception from the 'revert' policy? Doesn't look like that.
-> So, what for mentioning this specific case?
-> 
-> > + * All bits in @dst not set by the above rule are cleared.
-> 
-> The above rule is about empty @orig and @relmap, not about setting
-> bits. What did you mean here?
-> 
-> > + */
-> > +void bitmap_off(unsigned long *dst, const unsigned long *orig,
-> > +		const unsigned long *relmap, unsigned int bits)
-> > +{
-> > +	unsigned int n, m;      /* same meaning as in above comment */
-> 
-> In the above comment, n means the size of bitmaps, and m is not
-> mentioned at all.
-> 
-> > +	if (dst == orig)        /* following doesn't handle inplace mappings */
-> > +		return;
-> > +	bitmap_zero(dst, bits);
-> 
-> Can you add an empty line after 'return'.
-> 
-> > +	m = 0;
-> > +	for_each_set_bit(n, relmap, bits) {
-> > +		/* m == bitmap_pos_to_ord(relmap, n, bits) */
-> 
-> Don't think we need this comment here. If you want to underline that
-> m tracks bit order, can you just give it a more explanatory name. For
-> example, 'bit_order'.
-> 
-> > +		if (test_bit(n, orig))
-> > +			set_bit(m, dst);
-> > +		m++;
+From: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
 
-Forgot to mention - we need a __set_bit() and __test_bit(), because the
-whole function is not atomic. This applies to the bitmap_onto() as
-well. Can you please send a patch fixing it for bitmap_onto() in the
-next iteration?
+All of the thermal_zone_device_register_with_trips() callers pass zero
+writable trip points masks to it, so drop the mask argument from that
+function and update all of its callers accordingly.
 
-> > +	}
-> > +}
-> > +EXPORT_SYMBOL(bitmap_off);
-> > +
-> >  #ifdef CONFIG_NUMA
-> >  /**
-> >   * bitmap_fold - fold larger bitmap into smaller, modulo specified size
-> > -- 
-> > 2.43.0
+This also removes the artificial trip points per zone limit of 32,
+related to using writable trip points masks.
+
+No intentional functional impact.
+
+Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+---
+
+v1 -> v2: Rename trip flag (Stanislaw).
+
+---
+ drivers/acpi/thermal.c                                               |    2 
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_thermal.c                   |    2 
+ drivers/net/ethernet/mellanox/mlxsw/core_thermal.c                   |    3 -
+ drivers/net/wireless/intel/iwlwifi/mvm/tt.c                          |    1 
+ drivers/platform/x86/acerhdf.c                                       |    2 
+ drivers/thermal/da9062-thermal.c                                     |    2 
+ drivers/thermal/imx_thermal.c                                        |    2 
+ drivers/thermal/intel/int340x_thermal/int340x_thermal_zone.c         |    2 
+ drivers/thermal/intel/int340x_thermal/processor_thermal_device_pci.c |    2 
+ drivers/thermal/intel/intel_pch_thermal.c                            |    2 
+ drivers/thermal/intel/intel_quark_dts_thermal.c                      |    2 
+ drivers/thermal/intel/intel_soc_dts_iosf.c                           |    2 
+ drivers/thermal/intel/x86_pkg_temp_thermal.c                         |    2 
+ drivers/thermal/rcar_thermal.c                                       |    2 
+ drivers/thermal/st/st_thermal.c                                      |    2 
+ drivers/thermal/thermal_core.c                                       |   30 +---------
+ drivers/thermal/thermal_of.c                                         |    2 
+ include/linux/thermal.h                                              |    6 --
+ 18 files changed, 19 insertions(+), 49 deletions(-)
+
+Index: linux-pm/include/linux/thermal.h
+===================================================================
+--- linux-pm.orig/include/linux/thermal.h
++++ linux-pm/include/linux/thermal.h
+@@ -323,8 +323,7 @@ int thermal_zone_get_crit_temp(struct th
+ struct thermal_zone_device *thermal_zone_device_register_with_trips(
+ 					const char *type,
+ 					struct thermal_trip *trips,
+-					int num_trips, int mask,
+-					void *devdata,
++					int num_trips, void *devdata,
+ 					struct thermal_zone_device_ops *ops,
+ 					const struct thermal_zone_params *tzp,
+ 					int passive_delay, int polling_delay);
+@@ -383,8 +382,7 @@ void thermal_zone_device_critical(struct
+ static inline struct thermal_zone_device *thermal_zone_device_register_with_trips(
+ 					const char *type,
+ 					struct thermal_trip *trips,
+-					int num_trips, int mask,
+-					void *devdata,
++					int num_trips, void *devdata,
+ 					struct thermal_zone_device_ops *ops,
+ 					const struct thermal_zone_params *tzp,
+ 					int passive_delay, int polling_delay)
+Index: linux-pm/drivers/thermal/thermal_core.c
+===================================================================
+--- linux-pm.orig/drivers/thermal/thermal_core.c
++++ linux-pm/drivers/thermal/thermal_core.c
+@@ -1251,7 +1251,6 @@ EXPORT_SYMBOL_GPL(thermal_zone_get_crit_
+  * @type:	the thermal zone device type
+  * @trips:	a pointer to an array of thermal trips
+  * @num_trips:	the number of trip points the thermal zone support
+- * @mask:	a bit string indicating the writeablility of trip points
+  * @devdata:	private device data
+  * @ops:	standard thermal zone device callbacks
+  * @tzp:	thermal zone platform parameters
+@@ -1272,7 +1271,7 @@ EXPORT_SYMBOL_GPL(thermal_zone_get_crit_
+  * IS_ERR*() helpers.
+  */
+ struct thermal_zone_device *
+-thermal_zone_device_register_with_trips(const char *type, struct thermal_trip *trips, int num_trips, int mask,
++thermal_zone_device_register_with_trips(const char *type, struct thermal_trip *trips, int num_trips,
+ 					void *devdata, struct thermal_zone_device_ops *ops,
+ 					const struct thermal_zone_params *tzp, int passive_delay,
+ 					int polling_delay)
+@@ -1293,20 +1292,7 @@ thermal_zone_device_register_with_trips(
+ 		return ERR_PTR(-EINVAL);
+ 	}
+ 
+-	/*
+-	 * Max trip count can't exceed 31 as the "mask >> num_trips" condition.
+-	 * For example, shifting by 32 will result in compiler warning:
+-	 * warning: right shift count >= width of type [-Wshift-count- overflow]
+-	 *
+-	 * Also "mask >> num_trips" will always be true with 32 bit shift.
+-	 * E.g. mask = 0x80000000 for trip id 31 to be RW. Then
+-	 * mask >> 32 = 0x80000000
+-	 * This will result in failure for the below condition.
+-	 *
+-	 * Check will be true when the bit 31 of the mask is set.
+-	 * 32 bit shift will cause overflow of 4 byte integer.
+-	 */
+-	if (num_trips > (BITS_PER_TYPE(int) - 1) || num_trips < 0 || mask >> num_trips) {
++	if (num_trips < 0) {
+ 		pr_err("Incorrect number of thermal trips\n");
+ 		return ERR_PTR(-EINVAL);
+ 	}
+@@ -1356,16 +1342,6 @@ thermal_zone_device_register_with_trips(
+ 	tz->devdata = devdata;
+ 	tz->trips = trips;
+ 	tz->num_trips = num_trips;
+-	if (num_trips > 0) {
+-		struct thermal_trip *trip;
+-
+-		for_each_trip(tz, trip) {
+-			if (mask & 1)
+-				trip->flags |= THERMAL_TRIP_FLAG_RW_TEMP;
+-
+-			mask >>= 1;
+-		}
+-	}
+ 
+ 	thermal_set_delay_jiffies(&tz->passive_delay_jiffies, passive_delay);
+ 	thermal_set_delay_jiffies(&tz->polling_delay_jiffies, polling_delay);
+@@ -1450,7 +1426,7 @@ struct thermal_zone_device *thermal_trip
+ 					struct thermal_zone_device_ops *ops,
+ 					const struct thermal_zone_params *tzp)
+ {
+-	return thermal_zone_device_register_with_trips(type, NULL, 0, 0, devdata,
++	return thermal_zone_device_register_with_trips(type, NULL, 0, devdata,
+ 						       ops, tzp, 0, 0);
+ }
+ EXPORT_SYMBOL_GPL(thermal_tripless_zone_device_register);
+Index: linux-pm/drivers/acpi/thermal.c
+===================================================================
+--- linux-pm.orig/drivers/acpi/thermal.c
++++ linux-pm/drivers/acpi/thermal.c
+@@ -670,7 +670,7 @@ static int acpi_thermal_register_thermal
+ 	tz->thermal_zone = thermal_zone_device_register_with_trips("acpitz",
+ 								   tz->trip_table,
+ 								   trip_count,
+-								   0, tz,
++								   tz,
+ 								   &acpi_thermal_zone_ops,
+ 								   NULL,
+ 								   passive_delay,
+Index: linux-pm/drivers/thermal/intel/int340x_thermal/int340x_thermal_zone.c
+===================================================================
+--- linux-pm.orig/drivers/thermal/intel/int340x_thermal/int340x_thermal_zone.c
++++ linux-pm/drivers/thermal/intel/int340x_thermal/int340x_thermal_zone.c
+@@ -184,7 +184,7 @@ struct int34x_thermal_zone *int340x_ther
+ 	int34x_zone->zone = thermal_zone_device_register_with_trips(
+ 							acpi_device_bid(adev),
+ 							zone_trips, trip_cnt,
+-							0, int34x_zone,
++							int34x_zone,
+ 							int34x_zone->ops,
+ 							&int340x_thermal_params,
+ 							0, 0);
+Index: linux-pm/drivers/thermal/intel/int340x_thermal/processor_thermal_device_pci.c
+===================================================================
+--- linux-pm.orig/drivers/thermal/intel/int340x_thermal/processor_thermal_device_pci.c
++++ linux-pm/drivers/thermal/intel/int340x_thermal/processor_thermal_device_pci.c
+@@ -291,7 +291,7 @@ static int proc_thermal_pci_probe(struct
+ 	psv_trip.temperature = get_trip_temp(pci_info);
+ 
+ 	pci_info->tzone = thermal_zone_device_register_with_trips("TCPU_PCI", &psv_trip,
+-							1, 0, pci_info,
++							1, pci_info,
+ 							&tzone_ops,
+ 							&tzone_params, 0, 0);
+ 	if (IS_ERR(pci_info->tzone)) {
+Index: linux-pm/drivers/thermal/intel/intel_pch_thermal.c
+===================================================================
+--- linux-pm.orig/drivers/thermal/intel/intel_pch_thermal.c
++++ linux-pm/drivers/thermal/intel/intel_pch_thermal.c
+@@ -235,7 +235,7 @@ read_trips:
+ 
+ 	ptd->tzd = thermal_zone_device_register_with_trips(board_names[board_id],
+ 							   ptd->trips, nr_trips,
+-							   0, ptd, &tzd_ops,
++							   ptd, &tzd_ops,
+ 							   NULL, 0, 0);
+ 	if (IS_ERR(ptd->tzd)) {
+ 		dev_err(&pdev->dev, "Failed to register thermal zone %s\n",
+Index: linux-pm/drivers/thermal/intel/intel_quark_dts_thermal.c
+===================================================================
+--- linux-pm.orig/drivers/thermal/intel/intel_quark_dts_thermal.c
++++ linux-pm/drivers/thermal/intel/intel_quark_dts_thermal.c
+@@ -365,7 +365,7 @@ static struct soc_sensor_entry *alloc_so
+ 	aux_entry->tzone = thermal_zone_device_register_with_trips("quark_dts",
+ 								   trips,
+ 								   QRK_MAX_DTS_TRIPS,
+-								   0, aux_entry,
++								   aux_entry,
+ 								   &tzone_ops,
+ 								   NULL, 0, polling_delay);
+ 	if (IS_ERR(aux_entry->tzone)) {
+Index: linux-pm/drivers/thermal/intel/intel_soc_dts_iosf.c
+===================================================================
+--- linux-pm.orig/drivers/thermal/intel/intel_soc_dts_iosf.c
++++ linux-pm/drivers/thermal/intel/intel_soc_dts_iosf.c
+@@ -229,7 +229,7 @@ static int add_dts_thermal_zone(int id,
+ 	snprintf(name, sizeof(name), "soc_dts%d", id);
+ 	dts->tzone = thermal_zone_device_register_with_trips(name, dts->trips,
+ 							     SOC_MAX_DTS_TRIPS,
+-							     0, dts, &tzone_ops,
++							     dts, &tzone_ops,
+ 							     NULL, 0, 0);
+ 	if (IS_ERR(dts->tzone)) {
+ 		ret = PTR_ERR(dts->tzone);
+Index: linux-pm/drivers/thermal/intel/x86_pkg_temp_thermal.c
+===================================================================
+--- linux-pm.orig/drivers/thermal/intel/x86_pkg_temp_thermal.c
++++ linux-pm/drivers/thermal/intel/x86_pkg_temp_thermal.c
+@@ -346,7 +346,7 @@ static int pkg_temp_thermal_device_add(u
+ 	INIT_DELAYED_WORK(&zonedev->work, pkg_temp_thermal_threshold_work_fn);
+ 	zonedev->cpu = cpu;
+ 	zonedev->tzone = thermal_zone_device_register_with_trips("x86_pkg_temp",
+-			zonedev->trips, thres_count, 0,
++			zonedev->trips, thres_count,
+ 			zonedev, &tzone_ops, &pkg_temp_tz_params, 0, 0);
+ 	if (IS_ERR(zonedev->tzone)) {
+ 		err = PTR_ERR(zonedev->tzone);
+Index: linux-pm/drivers/thermal/thermal_of.c
+===================================================================
+--- linux-pm.orig/drivers/thermal/thermal_of.c
++++ linux-pm/drivers/thermal/thermal_of.c
+@@ -518,7 +518,7 @@ static struct thermal_zone_device *therm
+ 			of_ops->critical = thermal_zone_device_critical_reboot;
+ 
+ 	tz = thermal_zone_device_register_with_trips(np->name, trips, ntrips,
+-						     0, data, of_ops, &tzp,
++						     data, of_ops, &tzp,
+ 						     pdelay, delay);
+ 	if (IS_ERR(tz)) {
+ 		ret = PTR_ERR(tz);
+Index: linux-pm/drivers/net/ethernet/chelsio/cxgb4/cxgb4_thermal.c
+===================================================================
+--- linux-pm.orig/drivers/net/ethernet/chelsio/cxgb4/cxgb4_thermal.c
++++ linux-pm/drivers/net/ethernet/chelsio/cxgb4/cxgb4_thermal.c
+@@ -60,7 +60,7 @@ int cxgb4_thermal_init(struct adapter *a
+ 
+ 	snprintf(ch_tz_name, sizeof(ch_tz_name), "cxgb4_%s", adap->name);
+ 	ch_thermal->tzdev = thermal_zone_device_register_with_trips(ch_tz_name, &trip, num_trip,
+-								    0, adap,
++								    adap,
+ 								    &cxgb4_thermal_ops,
+ 								    NULL, 0, 0);
+ 	if (IS_ERR(ch_thermal->tzdev)) {
+Index: linux-pm/drivers/net/ethernet/mellanox/mlxsw/core_thermal.c
+===================================================================
+--- linux-pm.orig/drivers/net/ethernet/mellanox/mlxsw/core_thermal.c
++++ linux-pm/drivers/net/ethernet/mellanox/mlxsw/core_thermal.c
+@@ -423,7 +423,6 @@ mlxsw_thermal_module_tz_init(struct mlxs
+ 	module_tz->tzdev = thermal_zone_device_register_with_trips(tz_name,
+ 							module_tz->trips,
+ 							MLXSW_THERMAL_NUM_TRIPS,
+-							0,
+ 							module_tz,
+ 							&mlxsw_thermal_module_ops,
+ 							&mlxsw_thermal_params,
+@@ -551,7 +550,6 @@ mlxsw_thermal_gearbox_tz_init(struct mlx
+ 	gearbox_tz->tzdev = thermal_zone_device_register_with_trips(tz_name,
+ 						gearbox_tz->trips,
+ 						MLXSW_THERMAL_NUM_TRIPS,
+-						0,
+ 						gearbox_tz,
+ 						&mlxsw_thermal_gearbox_ops,
+ 						&mlxsw_thermal_params, 0,
+@@ -776,7 +774,6 @@ int mlxsw_thermal_init(struct mlxsw_core
+ 	thermal->tzdev = thermal_zone_device_register_with_trips("mlxsw",
+ 						      thermal->trips,
+ 						      MLXSW_THERMAL_NUM_TRIPS,
+-						      0,
+ 						      thermal,
+ 						      &mlxsw_thermal_ops,
+ 						      &mlxsw_thermal_params, 0,
+Index: linux-pm/drivers/platform/x86/acerhdf.c
+===================================================================
+--- linux-pm.orig/drivers/platform/x86/acerhdf.c
++++ linux-pm/drivers/platform/x86/acerhdf.c
+@@ -678,7 +678,7 @@ static int __init acerhdf_register_therm
+ 		return -EINVAL;
+ 
+ 	thz_dev = thermal_zone_device_register_with_trips("acerhdf", trips, ARRAY_SIZE(trips),
+-							  0, NULL, &acerhdf_dev_ops,
++							  NULL, &acerhdf_dev_ops,
+ 							  &acerhdf_zone_params, 0,
+ 							  (kernelmode) ? interval*1000 : 0);
+ 	if (IS_ERR(thz_dev))
+Index: linux-pm/drivers/net/wireless/intel/iwlwifi/mvm/tt.c
+===================================================================
+--- linux-pm.orig/drivers/net/wireless/intel/iwlwifi/mvm/tt.c
++++ linux-pm/drivers/net/wireless/intel/iwlwifi/mvm/tt.c
+@@ -694,7 +694,6 @@ static void iwl_mvm_thermal_zone_registe
+ 	mvm->tz_device.tzone = thermal_zone_device_register_with_trips(name,
+ 							mvm->tz_device.trips,
+ 							IWL_MAX_DTS_TRIPS,
+-							0,
+ 							mvm, &tzone_ops,
+ 							NULL, 0, 0);
+ 	if (IS_ERR(mvm->tz_device.tzone)) {
+Index: linux-pm/drivers/thermal/da9062-thermal.c
+===================================================================
+--- linux-pm.orig/drivers/thermal/da9062-thermal.c
++++ linux-pm/drivers/thermal/da9062-thermal.c
+@@ -197,7 +197,7 @@ static int da9062_thermal_probe(struct p
+ 	mutex_init(&thermal->lock);
+ 
+ 	thermal->zone = thermal_zone_device_register_with_trips(thermal->config->name,
+-								trips, ARRAY_SIZE(trips), 0, thermal,
++								trips, ARRAY_SIZE(trips), thermal,
+ 								&da9062_thermal_ops, NULL, pp_tmp,
+ 								0);
+ 	if (IS_ERR(thermal->zone)) {
+Index: linux-pm/drivers/thermal/imx_thermal.c
+===================================================================
+--- linux-pm.orig/drivers/thermal/imx_thermal.c
++++ linux-pm/drivers/thermal/imx_thermal.c
+@@ -700,7 +700,7 @@ static int imx_thermal_probe(struct plat
+ 	data->tz = thermal_zone_device_register_with_trips("imx_thermal_zone",
+ 							   trips,
+ 							   ARRAY_SIZE(trips),
+-							   0, data,
++							   data,
+ 							   &imx_tz_ops, NULL,
+ 							   IMX_PASSIVE_DELAY,
+ 							   IMX_POLLING_DELAY);
+Index: linux-pm/drivers/thermal/rcar_thermal.c
+===================================================================
+--- linux-pm.orig/drivers/thermal/rcar_thermal.c
++++ linux-pm/drivers/thermal/rcar_thermal.c
+@@ -489,7 +489,7 @@ static int rcar_thermal_probe(struct pla
+ 						&rcar_thermal_zone_ops);
+ 		} else {
+ 			priv->zone = thermal_zone_device_register_with_trips(
+-				"rcar_thermal", trips, ARRAY_SIZE(trips), 0, priv,
++				"rcar_thermal", trips, ARRAY_SIZE(trips), priv,
+ 						&rcar_thermal_zone_ops, NULL, 0,
+ 						idle);
+ 
+Index: linux-pm/drivers/thermal/st/st_thermal.c
+===================================================================
+--- linux-pm.orig/drivers/thermal/st/st_thermal.c
++++ linux-pm/drivers/thermal/st/st_thermal.c
+@@ -203,7 +203,7 @@ int st_thermal_register(struct platform_
+ 	trip.type = THERMAL_TRIP_CRITICAL;
+ 
+ 	sensor->thermal_dev =
+-		thermal_zone_device_register_with_trips(dev_name(dev), &trip, 1, 0, sensor,
++		thermal_zone_device_register_with_trips(dev_name(dev), &trip, 1, sensor,
+ 							&st_tz_ops, NULL, 0, polling_delay);
+ 	if (IS_ERR(sensor->thermal_dev)) {
+ 		dev_err(dev, "failed to register thermal zone device\n");
+
+
+
 
