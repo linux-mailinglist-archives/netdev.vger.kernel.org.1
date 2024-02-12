@@ -1,128 +1,97 @@
-Return-Path: <netdev+bounces-70976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FC2D85170A
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 15:30:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19C15851739
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 15:43:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F377F281422
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 14:30:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C5D81C213E8
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 14:43:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E21AB1426C;
-	Mon, 12 Feb 2024 14:30:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7A2739FF8;
+	Mon, 12 Feb 2024 14:42:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="r9U9a1Pw"
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="RI2qJGKY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from forward205c.mail.yandex.net (forward205c.mail.yandex.net [178.154.239.216])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F20B12E52
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 14:30:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 198E83C07B
+	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 14:42:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707748250; cv=none; b=qOtyuc1eOzHXNYdQAAB0ow8M+YXtLDf3FJUBoZ17/okKwrw/hakLpOaos1YpQsl0E5Uz3A81p60KDmhq5o49nDMiGHmJd2YE6eS2QEf5m5tV1sEwylTNGngytOnqLG07at43f6gTaS11GoE4oWZetZDW9VRScunc/fiMmqDc82g=
+	t=1707748979; cv=none; b=XeQiL2uIf7xyLbRzH+iGbzFFTKpyv7JJyL/2cQsYuAg6lm9FpKwPUB2onOJGdH9BzcZ53VmhalGG0rHLYxe5BqRMoBCPc13nf1INmAnzoH848cYyO0KjaqJ3nmwDteXwLm6EoOzT0yY3SfBARPnKn46iGr0Hk7LixX91S66HsXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707748250; c=relaxed/simple;
-	bh=p9vOfnePUV1vkqui1jKfajElpdn9UJuYx8Lvstoz6CI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W6OnI8AZ1/meanaOmAaHh2cYOX2S8l1KwLsRzdi+xA6SCmu+N4fHR9YIlqygt6hMUg4y5EgQefyLu4H2i3c7bOVirx77ZORE5dlFKWTKE492EjgOvaWa2+klV3sDzRzfGFXiOuSHI+Yd7evIIC+wtLlPR73W4gcqNFggqxdxvk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=r9U9a1Pw; arc=none smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-60777bcfed2so1558847b3.1
-        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 06:30:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1707748248; x=1708353048; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nHfkimgnQqa9pmxY7xUwBKCcRRo2tt3mrL+Jov7rDrk=;
-        b=r9U9a1Pw73I69igyrW9NlH78GGf5gDZmZKKgnw6XWrNLiiMNqaSQNDy2QC3h5P4Uxb
-         VXqfE21VeNRMcrQHYMqOX5RWlU+3x/z7FJcnusOiRxIu7Bfu/mC4iaNWEqhWgI1Phgzn
-         jDFGH0Spl0dfM6R5TN8d24wMLyotgqvfYhJHUqSCk3flNzMrKKA/qyuJGC7YfGcUAqbT
-         l29o75QeuEFg7vPZ/amcg+3Pa0gVnoYAcQcCJfpQqclhv0qbTTwTgLHvtdE4UGY2yKcu
-         +iW/SXgG2Eu9eLRRX8mWus1wVk84QVuMClHzK6tKVUKyuIDflG5WZp18Z7LXHa69UZ5n
-         WCtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707748248; x=1708353048;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nHfkimgnQqa9pmxY7xUwBKCcRRo2tt3mrL+Jov7rDrk=;
-        b=KkDiWLen6A1wC2/kJihy7dA6ffGMYvFaM6YUD/P4sgA9UWj/GHhUlZyeCEL+oGub+S
-         BoS32JBG+BI3chqFBxcX5k/ahRidTHBBXhe95E8NjcquMW+LTjE0IuJekjfr+XYhNTCD
-         pxD0qdY93/APSqizdLm/k/x1+mPeRXG2kvXh+Mc5KgZN0al0T7YePgl87hcrYHICfKY1
-         jCPsC2lHlrEYGoKwg2pkHdaSZxxdWNJAdkKmb1k24sVD47xeav6XTuBvKzIiAFpvRZna
-         V3ju7KHArMt1UZcRXF2StyQVa9nv53WPs8m2b7+53A0LKWHMiDRkr3h/ahsjQO9QVPLm
-         dXtw==
-X-Gm-Message-State: AOJu0YwuNLeWA5xUsGQg1BeuJe8uGydRkjoeYPSkCQXj5uBUd3shE2HL
-	hQhHVlREB6JP19Ft5xP/sJsN1V+7l+vNX+5zA/L3VPsFhbxLC9TMxWjnRKcRzkVIMzYLOxexGXp
-	WkRRk7IpjIq8g0LQzcPrtBMthC5OGyKkckIVF
-X-Google-Smtp-Source: AGHT+IGgkXOeWFRC0kD8AvUJh5gqRcJZ7vXLyuTDLZrRPmueX7K9FwVydl54BFjd7DYsYX8pFLa/WxHERXEmf4eoHgk=
-X-Received: by 2002:a0d:dc07:0:b0:604:92e0:c76f with SMTP id
- f7-20020a0ddc07000000b0060492e0c76fmr6197823ywe.30.1707748248046; Mon, 12 Feb
- 2024 06:30:48 -0800 (PST)
+	s=arc-20240116; t=1707748979; c=relaxed/simple;
+	bh=+lZciFymIFJwD/jU7Qojsl0yl5ukkvb8Exw+rSCLWAM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XPzEteLXdCAB5I2Tz6bKXUxr+FWAZKgoe9KxzfNIRQouL/i/lUbAfGG16rr1n+y3QXEBWBqZqgV6vrLGaYjU0dcXD5a6+OM+oRBJ8rf5dADQylQdx5VDxRCAeaeL/MAApIv0EH2KH6W2CkNhBT/NsbEEvcfABIveCSvcDsu3B7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=RI2qJGKY; arc=none smtp.client-ip=178.154.239.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from forward103b.mail.yandex.net (forward103b.mail.yandex.net [IPv6:2a02:6b8:c02:900:1:45:d181:d103])
+	by forward205c.mail.yandex.net (Yandex) with ESMTPS id D37B763FD5
+	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 17:35:16 +0300 (MSK)
+Received: from mail-nwsmtp-smtp-production-main-36.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-36.sas.yp-c.yandex.net [IPv6:2a02:6b8:c08:edad:0:640:6050:0])
+	by forward103b.mail.yandex.net (Yandex) with ESMTPS id 6A525608F4;
+	Mon, 12 Feb 2024 17:35:08 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-36.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id 6Zn1e7RxTKo0-XevZilbG;
+	Mon, 12 Feb 2024 17:35:07 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1707748507; bh=KutVQaZZTcGNOKFqN5L9OMGEn+KX5O52pWznSbShxpA=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=RI2qJGKYeKBQtxrtGxO+TuFQVhrqD3MJCh69K2Pz30cZogM1gSs+4eDGtCGFE0wMW
+	 hs77pV5hEt0gvAxK0LBGOQ6o6i0NIPkOFZxQgeu2fuEIsfNbObSNv9MpjlzVDomNNk
+	 VRA+0jl5J+JmTRakd89Isa5sgLYCSeodJaNq45KY=
+Authentication-Results: mail-nwsmtp-smtp-production-main-36.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+From: Dmitry Antipov <dmantipov@yandex.ru>
+To: Ursula Braun <ubraun@linux.ibm.com>
+Cc: Karsten Graul <kgraul@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	netdev@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	Dmitry Antipov <dmantipov@yandex.ru>
+Subject: [PATCH] net: smc: fix spurious error message from __sock_release()
+Date: Mon, 12 Feb 2024 17:34:02 +0300
+Message-ID: <20240212143402.23181-1-dmantipov@yandex.ru>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240122194801.152658-1-jhs@mojatatu.com> <20240122194801.152658-9-jhs@mojatatu.com>
- <CALnP8ZZAjsnp=_NhqV6XZ5EaAO-ZKOc=18aHXnRGJvvZQ_0ePg@mail.gmail.com>
-In-Reply-To: <CALnP8ZZAjsnp=_NhqV6XZ5EaAO-ZKOc=18aHXnRGJvvZQ_0ePg@mail.gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 12 Feb 2024 09:30:36 -0500
-Message-ID: <CAM0EoM=CKAGm=qi0pxAvJBOR0aQyHDR4OkBsfyg+DcaQqOUD6g@mail.gmail.com>
-Subject: Re: [PATCH v10 net-next 08/15] p4tc: add template pipeline create,
- get, update, delete
-To: Marcelo Ricardo Leitner <mleitner@redhat.com>
-Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
-	namrata.limaye@intel.com, tom@sipanda.io, Mahesh.Shirshyad@amd.com, 
-	tomasz.osinski@intel.com, jiri@resnulli.us, xiyou.wangcong@gmail.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	vladbu@nvidia.com, horms@kernel.org, khalidm@nvidia.com, toke@redhat.com, 
-	mattyk@nvidia.com, daniel@iogearbox.net, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Feb 9, 2024 at 3:44=E2=80=AFPM Marcelo Ricardo Leitner
-<mleitner@redhat.com> wrote:
->
-> On Mon, Jan 22, 2024 at 02:47:54PM -0500, Jamal Hadi Salim wrote:
-> > @@ -39,6 +55,27 @@ struct p4tc_template_ops {
-> >  struct p4tc_template_common {
-> >       char                     name[P4TC_TMPL_NAMSZ];
-> >       struct p4tc_template_ops *ops;
-> > +     u32                      p_id;
-> > +     u32                      PAD0;
->
-> Perhaps __pad0 is more common. But, is it really needed?
->
+Commit 67f562e3e147 ("net/smc: transfer fasync_list in case of fallback")
+leaves the socket's fasync list pointer within a container socket as well.
+When the latter is destroyed, '__sock_release()' warns about its non-empty
+fasync list, which is a dangling pointer to previously freed fasync list
+of an underlying TCP socket. Fix this spurious warning by nullifying
+fasync list of a container socket.
 
-$ pahole -C p4tc_template_common net/sched/p4tc/p4tc_tmpl_api.o
-struct p4tc_template_common {
-        char                       name[32];             /*     0    32 */
-        struct p4tc_template_ops * ops;                  /*    32     8 */
-        u32                        p_id;                 /*    40     4 */
-        u32                        PAD0;                 /*    44     4 */
+Fixes: 67f562e3e147 ("net/smc: transfer fasync_list in case of fallback")
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+---
+ net/smc/af_smc.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-        /* size: 48, cachelines: 1, members: 4 */
-        /* last cacheline: 48 bytes */
-};
+diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+index a2cb30af46cb..0f53a5c6fd9d 100644
+--- a/net/smc/af_smc.c
++++ b/net/smc/af_smc.c
+@@ -924,6 +924,7 @@ static int smc_switch_to_fallback(struct smc_sock *smc, int reason_code)
+ 		smc->clcsock->file->private_data = smc->clcsock;
+ 		smc->clcsock->wq.fasync_list =
+ 			smc->sk.sk_socket->wq.fasync_list;
++		smc->sk.sk_socket->wq.fasync_list = NULL;
+ 
+ 		/* There might be some wait entries remaining
+ 		 * in smc sk->sk_wq and they should be woken up
+-- 
+2.43.0
 
-Looks good for 64b alignment. We can change the name.
-
-> > +};
->
-> Only nit.
->
-> Reviewed-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-
-Thanks for this and all the other reviews. Much appreciated!
-
-cheers,
-jamal
 
