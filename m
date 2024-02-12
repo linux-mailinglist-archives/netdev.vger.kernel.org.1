@@ -1,50 +1,71 @@
-Return-Path: <netdev+bounces-70914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C001851057
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 11:10:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09DE285108D
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 11:19:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E996A281902
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 10:10:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D142B21348
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 10:19:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 105F217C67;
-	Mon, 12 Feb 2024 10:10:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7626B17C70;
+	Mon, 12 Feb 2024 10:19:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rUU9AkGB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CoiBh/5T"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0FD9101D0;
-	Mon, 12 Feb 2024 10:10:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB3417BB2
+	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 10:19:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707732625; cv=none; b=IznsSUJvdHl0Wj0Zfn4D+apaVzUrJwPGvvuegZp0S9dmaCal/YotTZ2X/9eKUY6sDpPKbNDy8HHeKxVXIq70h62GvS3rBuBHYvJZFf6lLe7EkrRyM0TE2hOHYNi84ZHCha9ddJ24O3wXU4AGA33f+TSgGkoiwdPomp2nUrndqwo=
+	t=1707733188; cv=none; b=ZDQD43bz1HUYBfPr4JB7FmRklEbHiTji/7rSybmqg6bOW6+TQjM7CGukmfwYvMlm7yeEbFUUychsPyKVxft2oIoRqsQvDalvE67HgMtzwobaEJqO07XmfKD9IW/o5x4XVMMtDCESXel2FfXehm/OtJiw+uY8iXI83cq/UKAp6W0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707732625; c=relaxed/simple;
-	bh=+6v5ZKHrDKX3JIrADGFs9Q2XsmdwVt8R3IOjr7ikhes=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=QZUGA7vSAEq9b6DTg1dk07N/t2IU0zkjR4MIlPbhrGlFJ3ns2J8ISxlWqiUtzSeWhdJCJmev/PKtPo0uEwm+p3YrWaHy7biG+B43gxYY9xpQc7TV9cBzuUDsqgPwx88lqLUytN5RdY3R8Jl7qopkGqbzE4sB8aWUmH3thuP/dK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rUU9AkGB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 27A8CC433C7;
-	Mon, 12 Feb 2024 10:10:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707732625;
-	bh=+6v5ZKHrDKX3JIrADGFs9Q2XsmdwVt8R3IOjr7ikhes=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=rUU9AkGBlmEzQJyHlAAQc6HTtP1Zs890669IaUjP9h3eVzqqQ20Oq4EDBkPW6ZX8z
-	 U95+JAr5HWBxKWwuqWAQ0TCVZCrRTRlRrdxAH2jbJ2JLJD0lk7v4xixFLF9c3YTTTV
-	 36g48etFx1okhbl5Cp3HNxUpEKWooJbmhwXcEUB3CAKZjAxdLrjN8mVctUC9JyA2Dp
-	 m2Gt4LFJHZIWA9oAeyt4LYvVCrjHXoY14N1xVIkCMXLnPUL/U5SVotIUTwxm5ZPrgI
-	 3oLBlOc0/GqDsz7GJZ3FFGgDgQg7hlsQNYNF/iuCDurAhxbGOvdcIhdLXj+PN0KDCo
-	 LCO/dDg5BGNQg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 04710D84BC3;
-	Mon, 12 Feb 2024 10:10:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1707733188; c=relaxed/simple;
+	bh=5pCj54oWQRHPCgb6LaLf+2sw8TGdf2eZvzUyr1NRpPo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jUT9vL96zjOEu00bZ1GOHbFI/bpul+KjmGPMmnOv1v3Dn+V6YfqL38erVeu5+GMUKomBKkRT8bFDBH2sdZGbOaNkqkhyJSBYS7Bk3mDTdFHuWlGWcLxXOXeo5ZcjKp1Lv4irG7QJX+gix2dfqfhP1cklaeqwORfOmYM/Y8fzUQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CoiBh/5T; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707733185;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=XrU62/kRoMgXoaI/c5t3+UcrfZGZuObpLx6wfPgtQh0=;
+	b=CoiBh/5TqUpVEQP0KEWOqM19C0xz3RvhGWQHf0Ago2+aBJS6SkkP8Ht/g84NIw8C9Kmitu
+	Es+TYO7c2O2sI9+xqoM3uGgI7RgOajA8vjImIzW+RHHUbagQnTkMTjigl2/X87qf4v+sFS
+	8d8SL8/wjAVTsEIr2mYeK4jjrxCVIxA=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-13-LxN9yIGIM8yX5uLGL6n17w-1; Mon, 12 Feb 2024 05:19:42 -0500
+X-MC-Unique: LxN9yIGIM8yX5uLGL6n17w-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D625B83FC39;
+	Mon, 12 Feb 2024 10:19:32 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.224.193])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D09914ABF10;
+	Mon, 12 Feb 2024 10:19:29 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
+	Lucas Karpinski <lkarpins@redhat.com>,
+	Florian Westphal <fw@strlen.de>,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net 0/2] selftests: net: more pmtu.sh fixes
+Date: Mon, 12 Feb 2024 11:19:22 +0100
+Message-ID: <cover.1707731086.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,60 +73,24 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/7] mptcp: locking cleanup & misc. fixes
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170773262501.4204.5549923375471395183.git-patchwork-notify@kernel.org>
-Date: Mon, 12 Feb 2024 10:10:25 +0000
-References: <20240208-upstream-net-20240202-locking-cleanup-misc-v1-0-f75cc5b97e5a@kernel.org>
-In-Reply-To: <20240208-upstream-net-20240202-locking-cleanup-misc-v1-0-f75cc5b97e5a@kernel.org>
-To: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- kishen.maloor@intel.com, fw@strlen.de, peter.krystad@linux.intel.com,
- dmytro@shytyi.net, benjamin.hesmans@tessares.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, cpaasch@apple.com, stable@vger.kernel.org,
- syzbot+c53d4d3ddb327e80bc51@syzkaller.appspotmail.com
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-Hello:
+The mentioned test is still flaky, unusally enough in 'fast'
+environments.
 
-This series was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+Patch 2/2 [try to] address the existing issues, while patch 1/2
+introduces more strict tests for the existing net helpers, to hopefully
+prevent future pain.
 
-On Thu, 08 Feb 2024 19:03:48 +0100 you wrote:
-> Patches 1-4 are fixes for issues found by Paolo while working on adding
-> TCP_NOTSENT_LOWAT support. The latter will need to track more states
-> under the msk data lock. Since the locking msk locking schema is already
-> quite complex, do a long awaited clean-up step by moving several
-> confusing lockless initialization under the relevant locks. Note that it
-> is unlikely a real race could happen even prior to such patches as the
-> MPTCP-level state machine implicitly ensures proper serialization of the
-> write accesses, even lacking explicit lock. But still, simplification is
-> welcome and this will help for the maintenance. This can be backported
-> up to v5.6.
-> 
-> [...]
+Paolo Abeni (2):
+  selftests: net: more strict check in net_helper
+  selftests: net: more pmtu.sh fixes
 
-Here is the summary with links:
-  - [net,1/7] mptcp: drop the push_pending field
-    https://git.kernel.org/netdev/net/c/bdd70eb68913
-  - [net,2/7] mptcp: fix rcv space initialization
-    https://git.kernel.org/netdev/net/c/013e3179dbd2
-  - [net,3/7] mptcp: fix more tx path fields initialization
-    https://git.kernel.org/netdev/net/c/3f83d8a77eee
-  - [net,4/7] mptcp: corner case locking for rx path fields initialization
-    https://git.kernel.org/netdev/net/c/e4a0fa47e816
-  - [net,5/7] mptcp: check addrs list in userspace_pm_get_local_id
-    https://git.kernel.org/netdev/net/c/f012d796a6de
-  - [net,6/7] mptcp: really cope with fastopen race
-    https://git.kernel.org/netdev/net/c/337cebbd850f
-  - [net,7/7] MAINTAINERS: update Geliang's email address
-    https://git.kernel.org/netdev/net/c/68990d006d42
+ tools/testing/selftests/net/net_helper.sh | 11 +++++++----
+ tools/testing/selftests/net/pmtu.sh       |  4 ++--
+ 2 files changed, 9 insertions(+), 6 deletions(-)
 
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
