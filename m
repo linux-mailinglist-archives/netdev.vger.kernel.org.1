@@ -1,219 +1,218 @@
-Return-Path: <netdev+bounces-71034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBD30851BDB
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 18:43:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C46AF851BF1
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 18:47:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40E3B1F23523
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 17:43:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C0EB282C11
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 17:47:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4480E3EA93;
-	Mon, 12 Feb 2024 17:43:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 773E43EA78;
+	Mon, 12 Feb 2024 17:47:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h17Ludle"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="LKRZMBUW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5145B3E49C
-	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 17:43:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707759806; cv=fail; b=E97hmy7IqyjEqmUBoJu4oS4mTdrEVNOaXh6Say9jQFEvECvn7KcxVgHuJANMYvnsegWIuHXZy3vAdNQh/swEqMrtkrAlV9ipwpr9QiIWgwp4/RBA62kGDibagWpwIi01J5Lf0aVuYbUm6Mx8d7L0/MOMtrTeCE285V1uJRHof90=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707759806; c=relaxed/simple;
-	bh=Wm1enbgXDEzGh4RCmGgrw6XiqjQ8YwU7ImGHH6hGdX4=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ZUYqBhuJeTG/r/LKN5Jm/ykutzgTZLoQlTkS/B0b5Ivgxhy5LPz6GXNMLPQBPrKOPq+AWRlIZUzhjyAw0jeg4Xv10c1Pfp2bNk1cJdLbgUipiEiA3gumaPg+89HXhC41wGyA1MDUGCLLvJlAAg7QT5Qbmhuwhw2cHQuz4/ljeBY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h17Ludle; arc=fail smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707759805; x=1739295805;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Wm1enbgXDEzGh4RCmGgrw6XiqjQ8YwU7ImGHH6hGdX4=;
-  b=h17LudleOj5ljT/pmTCTn9GIhEwM7uYV/BEKa+KzB1bWpWB9vZvalHd6
-   8uCQdkajzAV+xJTSqQq+1azGkQTkIOXfNgYt9gxlKyfAvNfVYtquqost3
-   Hng1UXt0V/ETz/sXjIQqcnt0q7mgJZ9kNl4Ans911Dh+AXWk6DVOZigky
-   iv3UBj63NGpBlQ+NaZrDBp3I/YH1rLGzorI0hcDqwu3K67Lg70CAFB48o
-   Adoj5+rirBmMUIjJO/z6d7PYNBn20kYsjFOO6NduQHw6envNprhOjbH0N
-   mSRUikS4Qe6cbn99thoPjybAqDPYWQQK3+kBZtKVMNPNeOXZoEt9VCPxr
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="1624915"
-X-IronPort-AV: E=Sophos;i="6.06,155,1705392000"; 
-   d="scan'208";a="1624915"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 09:43:24 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,155,1705392000"; 
-   d="scan'208";a="2991376"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Feb 2024 09:43:24 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 12 Feb 2024 09:43:23 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Mon, 12 Feb 2024 09:43:23 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 12 Feb 2024 09:43:23 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fCpEu97lAOmKV6Cyzw+yb3/RavMFo4zZfD9Dz8KdjSnnUN9Q4Q4CQ7mpZJgGmYkl0kix48JSiqqKTZ73JYGfxC/JhJcUhOV/TuRAhl0ETVd0qoaQ2mcZVeKgtyQG7G1IQ5otW3OF2fb+REGXwzwCKGINkdLf7j0wluJP6gobYCaITltcKMy5n+ItLhFGy16ASRWbxugF4hzPBVJwP9wkoWaHaqOtUljAkUYX2n4omUzPsl/hJBOwkX7cxwIcy0gXb5OXNq9Y6cjKho9F0lqpM+Y6Eri/a9PSs0542Tc/7lteZiFerqdzNQTR+cWBnwiVZAhemOAwIDb4lRZyzrxxIA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=K2E0rBkqPXXldoVQZgci7CQ700aj2UsJsBWbRjR+VV4=;
- b=JVXPasr9062lq7HjDbQePhmFTV5xB7gqRAhF92EhMY8a+ma1NF59MaNWvsenylj0LjFKe2z+LEKxbWj/Yeh42vnKLHnWsHCgxE0+6Sd/HgAL5ONcdiehYk5Fj0OCWqQyqALgLmYeHRRZJPOTdYRZgKOqO07WocLmfs8OjVacRCs1V5nwXjsQQZdwoAxc4j/D4Q2IxgWrZl1Fr/JzllcCASQt42V/wpQL9A8EWkqAasDaCBLNQLfOHH2Rwc596NG9eykvdEsg9fsowHs3rvtouRiDYMphXLrqZcmrupvbjHFIXsCOvGFOLp+Gfmfj8VyF2Ot1GS7CzVcaMzQptfJpqg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MW3PR11MB4538.namprd11.prod.outlook.com (2603:10b6:303:57::12)
- by DS0PR11MB8069.namprd11.prod.outlook.com (2603:10b6:8:12c::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.24; Mon, 12 Feb
- 2024 17:43:20 +0000
-Received: from MW3PR11MB4538.namprd11.prod.outlook.com
- ([fe80::d019:7cb9:3045:5082]) by MW3PR11MB4538.namprd11.prod.outlook.com
- ([fe80::d019:7cb9:3045:5082%4]) with mapi id 15.20.7270.033; Mon, 12 Feb 2024
- 17:43:20 +0000
-Message-ID: <0a7aa105-0b90-447d-5373-bf37b1a2cba4@intel.com>
-Date: Mon, 12 Feb 2024 09:43:19 -0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.15.1
-Subject: Re: [Intel-wired-lan] [PATCH 1/1 iwl-net] idpf: disable local BH when
- scheduling napi for marker packets
-To: Alexander Lobakin <aleksander.lobakin@intel.com>, Alan Brady
-	<alan.brady@intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, Przemek Kitszel
-	<przemyslaw.kitszel@intel.com>, <netdev@vger.kernel.org>, Jesse Brandeburg
-	<jesse.brandeburg@intel.com>
-References: <20240208004243.1762223-1-alan.brady@intel.com>
- <da0fff05-e9fc-46f6-96a4-5cc37556e7cd@intel.com>
-Content-Language: en-US
-From: "Tantilov, Emil S" <emil.s.tantilov@intel.com>
-In-Reply-To: <da0fff05-e9fc-46f6-96a4-5cc37556e7cd@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0183.namprd04.prod.outlook.com
- (2603:10b6:303:86::8) To MW3PR11MB4538.namprd11.prod.outlook.com
- (2603:10b6:303:57::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E3D53F9D8
+	for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 17:47:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707760046; cv=none; b=CSg2Lb9q6XzEOFuR37G/+9dF60W0g0YmnuS9OuhyTWbqN3JAAI62TE4iYiU2vGc2WfNusnGhu1w63hxw/n1dquxRVkcMvsViWokxMy6UcZtbjsRCYuu7A1Gw0NbrMEapYWecazCVltroLK/j+CvwYZM50nPsZvYBVhKwnuKhmck=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707760046; c=relaxed/simple;
+	bh=46yU4a7L4h8ek655E6b8Cytdl/t4fwnw3o7H73Bnn84=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MZvlRuOLo6cyLxC3jPFm0XXOouhZINPMoHgl1UhbKZ3+uiODt16eOMssbA+m49Vg4m32zmc3elIKZLPyNppFjH2x7ccZAMPOJchBSiRl4bKpkXtmtHc0/VDKqNlqp+42wQsCZ3gsni8qJ4x1QrlzljAA7pSbfGHdWiODGQBa6bg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=LKRZMBUW; arc=none smtp.client-ip=209.85.166.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-7bbdd28a52aso68886039f.1
+        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 09:47:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1707760042; x=1708364842; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2aJkuyZg/VkUjodqHytg8HlYFy9yBPrSCmPQ2Yp8LZ8=;
+        b=LKRZMBUWIaIwcCfM9dR6yyVdxDM571a+rVR0EAtMBuzs6FUOxb7tFG7muMDlN1D53S
+         l6Ll8r3bsmW3h785ewONsu8ETc6Zen2TmzS65dlH/FyWVKqppf2LFYyBR5GI2ucTG0NJ
+         smza92CGhsQjM02v5Vifulf0xXRjOq3GS/ORqtTfk/Neb0c6X3oL6KoIsYFYv8La1vwW
+         NnNALRKjQ3QCdJ8GaUqZ3d5ENWSPKDnl8sXOgaZO269h3rrQN3YPUgJo6kYP8Zj2We2g
+         Q1IRYmXIO+ETHmorNnANZYZf2f3uPRUZXA0IhOblYxsNF+cqjVwXiVBHRfj8diEzmq3N
+         BNMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707760042; x=1708364842;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2aJkuyZg/VkUjodqHytg8HlYFy9yBPrSCmPQ2Yp8LZ8=;
+        b=JGV5DKZQ1LtC573Gf/X9MtB/bzWDAoaORlBKOFHniikw5tNx7jv1jnMyyLDhXOU5b0
+         PUvKLcKiYIa5ZVIKY6dkza9lXssYJdSEzgXd04FaZaTGzIgpKupPMIWDsrBxYHLzj0+y
+         /p0dquH+4me0W2ysyVYrVtwfCGDSqpm1u5FzsEIuVmzD0HdiiWZHC/5UuTMqmqzJuyiz
+         eL/ngDENMMJVVo6z1/++Uok9+Peg+4q93evZz1Jjbn948hyMFOFWgq/xrY04aTsOsw5V
+         Wba1fzW/6w3Wuaob5rRXFOC57YiyHVjw9r++IltdOvdyQ42C0xED3NP4TLU/9SqD8syp
+         q6YA==
+X-Forwarded-Encrypted: i=1; AJvYcCUXpV5WJRihgwvckJ4TIEd83+ig8aQrYaEADnRbZsOAQfOQaeLlw9vaA6cioO19KwYJH983mCq90NiVYYtd3uF4f13ykwrc
+X-Gm-Message-State: AOJu0YzSREtzWm8E2ziqF2uWXOoPsjtebaJ6Am0c7FqoIA9bHnzOGxIP
+	/Kd8VDbaPDnVuHK7YnPRo4U7EvhW30hnwskq9cnwoRYBA4AwPSEpSZpMthrxOBU=
+X-Google-Smtp-Source: AGHT+IGzRQvdCCWlAh5S/oFloB7p6fUbu6qbWoc7fl58CSnhyOhP/hJc8q6i2zH8pg/iKM/U05kLrg==
+X-Received: by 2002:a05:6602:15c9:b0:7c4:5a72:3838 with SMTP id f9-20020a05660215c900b007c45a723838mr5521937iow.0.1707760042300;
+        Mon, 12 Feb 2024 09:47:22 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVrOFlasD1NVbVxNcBvVZ7U/H8xSTGuj2kpN0aniUSAtbbrlJszpZ1M3BJLIf7uqUv4UOk6fKLYYIUnWOYd/R7B7oivu7yjmQ50/CrEKv6M8rCETB9Mfhit2WBS8vB/wMDlru77TNbiCHKmhXvq7+UqLcjEpFUfoNiwMANorRRamnns68kGFBeypMa5thjWEbOV3t1j7cDfsPN8GHg9y1bNKn2P/Xzpoy+CK3I4fNRFrp8Ov1HNKJ5dUqkk7rAw
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id da2-20020a0566384a4200b00472c62c7d74sm1495863jab.149.2024.02.12.09.47.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 Feb 2024 09:47:21 -0800 (PST)
+Message-ID: <8eb7c0b3-afc7-4dca-b614-397514a1994b@kernel.dk>
+Date: Mon, 12 Feb 2024 10:47:20 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW3PR11MB4538:EE_|DS0PR11MB8069:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3739c38c-fa2c-4481-62e8-08dc2bf21a94
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: qXU1y1Es8+ubgKLMiZsO2yiTZRUbM8Uv9BeM7W1tOj8UPa64DZQvEM7ggl+KO3jSP/cB6nbi1vNnyXO0dm1iUMS8n6Qr4gCkcv+eYTFFpTp+D6Oz5iJ0Axiba9mXcT9wL+vYASRyI2ZipnEzW9Hpu1q+IxfVxN0DKnX7JnKHvIdnvKbXCfz30P0bY3C1PNaTxmZWyn5npEEqd51SzrLC6TTsi1Qxbl75dTkQY5/ESWnpf4qEFTJs+Oj/EMrth8YRJf7HC87If5ipCv2kQzZinwnYfP4Dkih4szfq++8eF1P47MAbmvKrWFMKc2AquvUXmujvzjxiloWvHotnK8UWrTgPDaO9eFedBI2gOO9zi1ohqPS07kAK9pbSXZi2Z28BA/kNttq/XOXfDjxKSIyNHJOcjdqZrFWnkYs+RGhOVqq4eDzr+Lt4LUdPQoo1DVSJrP/ILDEhdIFG6VUm9YsTMhw3+ZrXP7zyxjh+XHrtDXBbCo6rdXUEIlvhoViAV4nYzsScxdl5yjYKPaOoKFCIlWaQ58ua34oZWNiZL8h5UL2RvlQOd3kI2Pw4zIMqqolf
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR11MB4538.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(346002)(376002)(396003)(136003)(39860400002)(230922051799003)(186009)(1800799012)(451199024)(64100799003)(86362001)(31696002)(82960400001)(83380400001)(66556008)(6636002)(6506007)(2616005)(26005)(53546011)(6486002)(478600001)(66476007)(66946007)(38100700002)(6512007)(110136005)(107886003)(36756003)(316002)(54906003)(8936002)(8676002)(2906002)(4326008)(41300700001)(31686004)(5660300002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TWY1RjFtMUZVT2c0UmlMZTdnRUtONjByVkVtSnZaeUljWE9sUG5OM3RHUnZl?=
- =?utf-8?B?b3BwQVlrOFRiYXpRVHVGS2ZsZDFjYVp6YlZuRzNrYlNraS85VjlTcmxjZFhm?=
- =?utf-8?B?WXR0NVVDUkNrbEU2NVhxRnJibHZtWGNSeGgvdU1kY0p0cFEySWU4UzVPYW45?=
- =?utf-8?B?cU41akJBR1FYU0hsSWZ0Y0IvT0JFUE9TTjd6cUJuVzRZZzNtaHJTUERLNktP?=
- =?utf-8?B?WEdzWFlPZFFTa3VXb3NLM1FYRCtCOUJSVFdhTUgxVzMxZ21jVTltK0RQcGs4?=
- =?utf-8?B?ZUljeWtJK0NBV0JYVm1nNnpHNVBFaDE0c2JHSHZpdEU0RUNTTDJlT2VyNng4?=
- =?utf-8?B?ZjA4aWhpQ09qZ0FSeE1WVHRvV3pJbWpOM2V6blJtZEdoNlc3UlRBek16UjRh?=
- =?utf-8?B?VExOSGJXa0VoQzd1ai9STjAwN3BFYmQrcUpGczFsaTVjcFdHLzVpcWdsSWxq?=
- =?utf-8?B?endlZHhtdTJvZENOOE1JdFhhZUVzM1FMU3Z5d1hIa1JiTWRJTWFpTkcrdzdL?=
- =?utf-8?B?WVhRVDJHNGRIcWs5OTR6ZWJPdU95R09Sd3FONW50NE94QkdSZVZ2bGFWSml6?=
- =?utf-8?B?TWg5QVk4NTY1QTZvTW1sZDVlRnJQRG1IR0F1VzVUWlVhN1lBYlpCakVSeGFs?=
- =?utf-8?B?Y3RXRU42L0h5ekwwTnliTUszZWU3R3o3V09JVG95dWlrbm9xaGRQSWVYYUlI?=
- =?utf-8?B?TktxT3IzWnlJVEpLVnBoNjY3TGdiMlZlaHVweDBuTUtlVEltQy9DaVpFczFS?=
- =?utf-8?B?SThPY0YxMUpMWm1nbWVsZU1uWmRIUDZudWtSN3RidS9WMVZZNEhtNXUwNzhD?=
- =?utf-8?B?RyszamFGTDdUWC9MemdrcTM2NTcyYWl5VmJIZWptT0RGNm1ESHplc285RzEy?=
- =?utf-8?B?WmpLOTQzbVg4Y09WRFhSc1p4RjZzRDAyOGNiYkM4RFYzOUhVRHFWQWF4c2FQ?=
- =?utf-8?B?OTI4UElVUmRGQ09KU2J5dXNsL2tzdHZzMk5NOFI4WFY5TlMydGFSTVFvTUdi?=
- =?utf-8?B?T3Vjek43SWhOTWN0cUhSSEJqYjhiaThVOEVHZTdRNTRrM0RNUi8vREcrS3VE?=
- =?utf-8?B?T0tyVGtPWXI2ejBiUUlBT3F6MUpYTHlKdElvNkd2MlNBN1hHZDhOcVhrUisv?=
- =?utf-8?B?UHU2OWIyVTRFVE91QWN2NERUSUlQUVJselR2dEhhWGk5OGtXZFRjQ2wyOS9K?=
- =?utf-8?B?RnpqaThUbTBUMndQV1N3ckJma3pJeTdXMEszaWd6SHhEY1EzU1VLMDdzL3hC?=
- =?utf-8?B?OFIwQ0NoZHRmODJuRm5FVy80ZVhQdzBjTGluRU9FWThyeFo2R1Jjd0dJRVJ3?=
- =?utf-8?B?VXJNUGpPVjNzaXJ6WmFsa21WRDNub0Qyd25CaXVuOFJaMGxQOXZXVklkZFd4?=
- =?utf-8?B?T1Eyc1ZGemk1cEM3NUNsMGJ2d3NZVDR1cHptZXRsTVNrQ1YyUHp0cStBM2Vj?=
- =?utf-8?B?UTBQNVBpV1c0K01JL3dpYWdXUkY5N0xkMmpHYWtqN1VDOENuaGhSdXo3aFl4?=
- =?utf-8?B?dHdYLzV1ZnUwekFGWE9NSGd4SmlPUVpGRnNwaUt4elE0SU1xUS8zUEpUWkNI?=
- =?utf-8?B?aC9pbVJwSUdSd2RYSFNCQnJPVnVUazJqRnJSVDFtclB5bGJBb2xFWkx6VGdv?=
- =?utf-8?B?ejZGQnlER05QdkNDSW43R08waUdLYWt4UzhDZzl2alFYd0lmZjcybVZXSUwx?=
- =?utf-8?B?REtITDVXWTNRR1hraER3cnVOcDFzZUs5THBTUDhpVWhudURlYWlabW44VDFm?=
- =?utf-8?B?enhZV1VQSDU5NzdBUWs2UkdZd0RzaFBWSyt2R1dMdHdNLzB6RXFTWTJVZ1lH?=
- =?utf-8?B?SERaME5lblZNa3ZGT2s4dWEzYUd4b2JQRS9LYWUwQXVKK3BDYkluOWp2ZlBu?=
- =?utf-8?B?aiswOVRyZkV0a0h6cTBwZzJBYVZmbHJVdDdJUC9OUXpzOGtmNkxFcXVqVlFQ?=
- =?utf-8?B?OUZjQnkwY1Y3bkJnNloxTTlFTkhHQ1piRDI3Lzl5YUNDM3pIV0hrZDFoNm1n?=
- =?utf-8?B?NEhZUmdkTm5uaXNBbk4wc3dRZkVaWW5HUjhNa3JRejJmYmdkTURKMEpNaEVW?=
- =?utf-8?B?V01jL0M2WlpmdjBZYXdVMEFUUHY1N2lYdGtWZ0NrbzNxNHI1Skl3Y2tTTVY5?=
- =?utf-8?B?d0lMVU8wWVRuYWJDdC9XdFgzM0JxQUEzSXF6VGVKbVd6SmIxK2l0Y3E1QTEv?=
- =?utf-8?B?VGc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3739c38c-fa2c-4481-62e8-08dc2bf21a94
-X-MS-Exchange-CrossTenant-AuthSource: MW3PR11MB4538.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Feb 2024 17:43:20.9041
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2/NM5kccX1XEGFY8NUZYLUPfbztKPJ9oSkRD4PUe9NtHVbj3fxjX3xDKvION3QM7zir+tOXxAZc40rikTYZT3RSmA6avlqLJHvZpu2ou8i8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8069
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 net-next 2/3] af_unix: Remove io_uring code for GC.
+Content-Language: en-US
+To: Pengfei Xu <pengfei.xu@intel.com>, Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Pavel Begunkov <asml.silence@gmail.com>,
+ Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+References: <20240129190435.57228-1-kuniyu@amazon.com>
+ <20240129190435.57228-3-kuniyu@amazon.com>
+ <Zcl/vQnHoKhZ7m0+@xpf.sh.intel.com>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <Zcl/vQnHoKhZ7m0+@xpf.sh.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-
-
-On 2/12/2024 6:41 AM, Alexander Lobakin wrote:
-> From: Alan Brady <alan.brady@intel.com>
-> Date: Wed,  7 Feb 2024 16:42:43 -0800
+On 2/11/24 7:17 PM, Pengfei Xu wrote:
+> Hi,
 > 
->> From: Emil Tantilov <emil.s.tantilov@intel.com>
+> On 2024-01-29 at 11:04:34 -0800, Kuniyuki Iwashima wrote:
+>> Since commit 705318a99a13 ("io_uring/af_unix: disable sending
+>> io_uring over sockets"), io_uring's unix socket cannot be passed
+>> via SCM_RIGHTS, so it does not contribute to cyclic reference and
+>> no longer be candidate for garbage collection.
 >>
->> Fix softirq's not being handled during napi_schedule() call when
->> receiving marker packets for queue disable by disabling local bottom
->> half.
+>> Also, commit 6e5e6d274956 ("io_uring: drop any code related to
+>> SCM_RIGHTS") cleaned up SCM_RIGHTS code in io_uring.
 >>
->> The issue can be seen on ifdown:
->> NOHZ tick-stop error: Non-RCU local softirq work is pending, handler #08!!!
+>> Let's do it in AF_UNIX as well by reverting commit 0091bfc81741
+>> ("io_uring/af_unix: defer registered files gc to io_uring release")
+>> and commit 10369080454d ("net: reclaim skb->scm_io_uring bit").
 >>
->> Using ftrace to catch the failing scenario:
->> ifconfig   [003] d.... 22739.830624: softirq_raise: vec=3 [action=NET_RX]
->> <idle>-0   [003] ..s.. 22739.831357: softirq_entry: vec=3 [action=NET_RX]
+>> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+>> ---
+>>  include/net/af_unix.h |  1 -
+>>  net/unix/garbage.c    | 25 ++-----------------------
+>>  net/unix/scm.c        |  6 ------
+>>  3 files changed, 2 insertions(+), 30 deletions(-)
 >>
->> No interrupt and CPU is idle.
->>
->> After the patch, with BH locks:
+>> diff --git a/include/net/af_unix.h b/include/net/af_unix.h
+>> index f045bbd9017d..9e39b2ec4524 100644
+>> --- a/include/net/af_unix.h
+>> +++ b/include/net/af_unix.h
+>> @@ -20,7 +20,6 @@ static inline struct unix_sock *unix_get_socket(struct file *filp)
+>>  void unix_inflight(struct user_struct *user, struct file *fp);
+>>  void unix_notinflight(struct user_struct *user, struct file *fp);
+>>  void unix_destruct_scm(struct sk_buff *skb);
+>> -void io_uring_destruct_scm(struct sk_buff *skb);
+>>  void unix_gc(void);
+>>  void wait_for_unix_gc(struct scm_fp_list *fpl);
+>>  struct sock *unix_peer_get(struct sock *sk);
+>> diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+>> index af676bb8fb67..ce5b5f87b16e 100644
+>> --- a/net/unix/garbage.c
+>> +++ b/net/unix/garbage.c
+>> @@ -184,12 +184,10 @@ static bool gc_in_progress;
+>>  
+>>  static void __unix_gc(struct work_struct *work)
+>>  {
+>> -	struct sk_buff *next_skb, *skb;
+>> -	struct unix_sock *u;
+>> -	struct unix_sock *next;
+>>  	struct sk_buff_head hitlist;
+>> -	struct list_head cursor;
+>> +	struct unix_sock *u, *next;
+>>  	LIST_HEAD(not_cycle_list);
+>> +	struct list_head cursor;
+>>  
+>>  	spin_lock(&unix_gc_lock);
+>>  
+>> @@ -269,30 +267,11 @@ static void __unix_gc(struct work_struct *work)
+>>  
+>>  	spin_unlock(&unix_gc_lock);
+>>  
+>> -	/* We need io_uring to clean its registered files, ignore all io_uring
+>> -	 * originated skbs. It's fine as io_uring doesn't keep references to
+>> -	 * other io_uring instances and so killing all other files in the cycle
+>> -	 * will put all io_uring references forcing it to go through normal
+>> -	 * release.path eventually putting registered files.
+>> -	 */
+>> -	skb_queue_walk_safe(&hitlist, skb, next_skb) {
+>> -		if (skb->destructor == io_uring_destruct_scm) {
+>> -			__skb_unlink(skb, &hitlist);
+>> -			skb_queue_tail(&skb->sk->sk_receive_queue, skb);
+>> -		}
+>> -	}
+>> -
+>>  	/* Here we are. Hitlist is filled. Die. */
+>>  	__skb_queue_purge(&hitlist);
+>>  
+>>  	spin_lock(&unix_gc_lock);
+>>  
+>> -	/* There could be io_uring registered files, just push them back to
+>> -	 * the inflight list
+>> -	 */
+>> -	list_for_each_entry_safe(u, next, &gc_candidates, link)
+>> -		list_move_tail(&u->link, &gc_inflight_list);
+>> -
+>>  	/* All candidates should have been detached by now. */
+>>  	WARN_ON_ONCE(!list_empty(&gc_candidates));
+>>  
+>> diff --git a/net/unix/scm.c b/net/unix/scm.c
+>> index 505e56cf02a2..db65b0ab5947 100644
+>> --- a/net/unix/scm.c
+>> +++ b/net/unix/scm.c
+>> @@ -148,9 +148,3 @@ void unix_destruct_scm(struct sk_buff *skb)
+>>  	sock_wfree(skb);
+>>  }
+>>  EXPORT_SYMBOL(unix_destruct_scm);
+>> -
+>> -void io_uring_destruct_scm(struct sk_buff *skb)
+>> -{
+>> -	unix_destruct_scm(skb);
+>> -}
+>> -EXPORT_SYMBOL(io_uring_destruct_scm);
 > 
-> Minor: local_bh_{en,dis}able() are not "BH locks", it's BH
-> enabling/disabling. It doesn't lock/unlock anything.
-
-Good catch, we can change it to:
-"After the patch when disabling local BH before calling napi_schedule:"
-
+> Syzkaller found below issue.
+> There is WARNING in __unix_gc in v6.8-rc3_internal-devel_hourly-20240205-094544,
+> the kernel contains kernel-next patches.
 > 
->> ifconfig   [003] d.... 22993.928336: softirq_raise: vec=3 [action=NET_RX]
->> ifconfig   [003] ..s1. 22993.928337: softirq_entry: vec=3 [action=NET_RX]
->>
->> Fixes: c2d548cad150 ("idpf: add TX splitq napi poll support")
->> Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
->> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
->> Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
->> Signed-off-by: Alan Brady <alan.brady@intel.com>
-> 
-> Thanks,
-> Olek
+> Bisected and found first bad commit:
+> "
+> 11498715f266 af_unix: Remove io_uring code for GC.
+> "
+> It's the same patch as above.
 
-Thanks,
-Emil
+It should be fixed by:
+
+commit 1279f9d9dec2d7462823a18c29ad61359e0a007d
+Author: Kuniyuki Iwashima <kuniyu@amazon.com>
+Date:   Sat Feb 3 10:31:49 2024 -0800
+
+    af_unix: Call kfree_skb() for dead unix_(sk)->oob_skb in GC.
+
+which is in Linus's tree.
+
+-- 
+Jens Axboe
+
 
