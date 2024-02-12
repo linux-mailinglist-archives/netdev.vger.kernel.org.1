@@ -1,134 +1,139 @@
-Return-Path: <netdev+bounces-70891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3959D850EDF
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 09:28:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40930850EE4
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 09:33:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFC2E281ACE
-	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 08:27:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBED42826A7
+	for <lists+netdev@lfdr.de>; Mon, 12 Feb 2024 08:33:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16BB0DDB1;
-	Mon, 12 Feb 2024 08:27:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E609E12B97;
+	Mon, 12 Feb 2024 08:32:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="Ird1MYxG"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="jWu/Kfa2"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward205b.mail.yandex.net (forward205b.mail.yandex.net [178.154.239.152])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FC40FBF2;
-	Mon, 12 Feb 2024 08:27:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC87812B72;
+	Mon, 12 Feb 2024 08:32:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707726476; cv=none; b=u0o+rg1nP9UwAm9QBY7NB+S+pmZnBaUzy2fKuWhp5+bp3d6/FH5pXsT+PC71w76ZwJJ0uHiX9sAeDsbJmfDEHT8ienMn7D6SKAFW85/BueJCGufbJLu39+4fwK8QQn/X9/VOx8jQtLWu3X5JbRxJXYXqzZWClWYQ6k5edZqbXHQ=
+	t=1707726776; cv=none; b=OdQX5cIj7tJlGuIRDMcKXHgWXFKlEm72PvpzyEE+vGDhf6pQkWyPQrcgnGMLLbQdCaBSrlBAQaVHrLZBjNFLEO9cpfHQbmaPe8EEatmRJGYcDOX+WN9fHTQJ7gVDkE290dA3NOsk5/jVAQtQTk7WESAWNc6Po4BSNhNESxUSrVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707726476; c=relaxed/simple;
-	bh=k4703wUin1PPttsgsQ2jG9uAV9eE4pMC0XCyK22LGbE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SifQB7W4nNpDjb0oMZSHg+DfNuGZ+UzuPtPEE709sID74V8Gtp/zDC9+CM/X4OliTIR8gsOWNEEozLwkNtIlD6fCT82fLJKMInAlSazhXaZ6ZnhxCTvZOxv27xFXzry6byybLe8BZO4gvwh08Qnn21huuFQ4AEdKEZfVyV8PVZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=Ird1MYxG; arc=none smtp.client-ip=178.154.239.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from forward102b.mail.yandex.net (forward102b.mail.yandex.net [IPv6:2a02:6b8:c02:900:1:45:d181:d102])
-	by forward205b.mail.yandex.net (Yandex) with ESMTPS id C99566372C;
-	Mon, 12 Feb 2024 11:22:26 +0300 (MSK)
-Received: from mail-nwsmtp-smtp-production-main-78.myt.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-78.myt.yp-c.yandex.net [IPv6:2a02:6b8:c12:5202:0:640:875:0])
-	by forward102b.mail.yandex.net (Yandex) with ESMTPS id 7116C6090D;
-	Mon, 12 Feb 2024 11:22:18 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-78.myt.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id HMhq53ISpSw0-NHMO7lGI;
-	Mon, 12 Feb 2024 11:22:17 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1707726137; bh=0gCklyACyZxJmfC/AYBkjy6kkNqvIen51RuMEruSzXU=;
-	h=Message-ID:Date:In-Reply-To:Cc:Subject:References:To:From;
-	b=Ird1MYxGFVeIeRvSO9cp2jqm1oN0zgRikwzlKBkBkpoJsGOkx69EiPTito+e44HjN
-	 SNbfwcUC5xHyJxO0ClEbHFW1qV46bgEmmH1EeadiZ5ExOfA0pDlJYSEg/A5Yt9FvOf
-	 1bzq84veTcb4wTeEF97i2+OmY9zrhbyJdsew6Lj8=
-Authentication-Results: mail-nwsmtp-smtp-production-main-78.myt.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-From: Dmitry Antipov <dmantipov@yandex.ru>
+	s=arc-20240116; t=1707726776; c=relaxed/simple;
+	bh=qyTPvECMMD7PLdsPw5g/Hi+5zh4RU30ugtOCwlCVVbo=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qJ7Hfmi/fAZlyf+ao8dgf/YEbePz1Vcxszt5oLn8AjKyXxMTOGAcI0zBh/c9ilNQq2DrAa+O9fAxl0E3aEKEtTKWa6Gc0khc130qw94P1m1q8EofI+o5mgCKJaXgnYeuirg6EnOJVsCn7lLayXrGV4IMEeFOBuJYmOZA4d7Mg8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=jWu/Kfa2; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1707726775; x=1739262775;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=qyTPvECMMD7PLdsPw5g/Hi+5zh4RU30ugtOCwlCVVbo=;
+  b=jWu/Kfa2bzl4XCNFUUNYTjGCnTsaxoXT7zG/8LyYQdKSFqyKIzvQDMxz
+   vL+/0bfn+jFVuIt15fv8XbArIQxOxeTkdIdlRBWWXmAwqQR2Av8FZ6lgd
+   iIAsQ7/8IPbWy2+WTXgeUgsKyCUTIIoB82MurLmaXAjX8n0LcS3ltRbrQ
+   0WFSbxKuD5r4kKu7Ut8HfB3v4WBukg0E3QwhKOwkkd7ENpVWVttIPj0FD
+   ZrGmQ3oV7v0BPBUj/uBsUzixrNmtD/cUqWIR1TQP+meCl7AKHP+BK98rh
+   vkogiXilIE+/8jpi3qBFeuZ7ffglLgcijHovEzYwETO+qDXIYxGqy9SUl
+   A==;
+X-CSE-ConnectionGUID: PJUI358zS2+N2ZPOQUlDBQ==
+X-CSE-MsgGUID: xVXDTiaMRkeK5P1qOSM6sQ==
+X-IronPort-AV: E=Sophos;i="6.05,262,1701154800"; 
+   d="scan'208";a="16619492"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Feb 2024 01:32:54 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 12 Feb 2024 01:32:30 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex04.mchp-main.com
+ (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Mon, 12 Feb 2024 01:32:30 -0700
+Date: Mon, 12 Feb 2024 09:32:29 +0100
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: Xin Long <lucien.xin@gmail.com>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	linux-sctp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	Dmitry Antipov <dmantipov@yandex.ru>,
-	syzbot+8bb053b5d63595ab47db@syzkaller.appspotmail.com
-Subject: [PATCH] [v2] net: sctp: fix skb leak in sctp_inq_free()
-Date: Mon, 12 Feb 2024 11:22:02 +0300
-Message-ID: <20240212082202.17927-1-dmantipov@yandex.ru>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240209134703.63a9167b@kernel.org>
-References: <20240209134703.63a9167b@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<UNGLinuxDriver@microchip.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Michal Swiatkowski
+	<michal.swiatkowski@linux.intel.com>
+Subject: Re: [PATCH net v2] lan966x: Fix crash when adding interface under a
+ lag
+Message-ID: <20240212083229.tg3cabp4iee3p6tq@DEN-DL-M31836.microchip.com>
+References: <20240206123054.3052966-1-horatiu.vultur@microchip.com>
+ <20240209135220.42e670d4@kernel.org>
+ <20240212081038.cbsb2exfmcxxntzq@DEN-DL-M31836.microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <20240212081038.cbsb2exfmcxxntzq@DEN-DL-M31836.microchip.com>
 
-In case of GSO, 'chunk->skb' pointer may point to an entry from
-fraglist created in 'sctp_packet_gso_append()'. To avoid freeing
-random fraglist entry (and so undefined behavior and/or memory
-leak), introduce 'sctp_chunk_release()' helper to ensure that
-'chunk->skb' is set to 'chunk->head_skb' (i.e. fraglist head)
-before calling 'sctp_chunk_free()', and use the aforementioned
-helper in 'sctp_inq_pop()' as well.
+The 02/12/2024 09:10, Horatiu Vultur wrote:
+> The 02/09/2024 13:52, Jakub Kicinski wrote:
+> 
+> Hi Jakub,
+> 
+> > 
+> > On Tue, 6 Feb 2024 13:30:54 +0100 Horatiu Vultur wrote:
+> > >       for (lag = 0; lag < lan966x->num_phys_ports; ++lag) {
+> > > -             struct net_device *bond = lan966x->ports[lag]->bond;
+> > > +             struct lan966x_port *port = lan966x->ports[lag];
+> > >               int num_active_ports = 0;
+> > > +             struct net_device *bond;
+> > >               unsigned long bond_mask;
+> > >               u8 aggr_idx[16];
+> > >
+> > > -             if (!bond || (visited & BIT(lag)))
+> > > +             if (!port || !port->bond || (visited & BIT(lag)))
+> > >                       continue;
+> > >
+> > > +             bond = port->bond;
+> > >               bond_mask = lan966x_lag_get_mask(lan966x, bond);
+> > >
+> > >               for_each_set_bit(p, &bond_mask, lan966x->num_phys_ports) {
+> > >                       struct lan966x_port *port = lan966x->ports[p];
+> > >
+> > > +                     if (!port)
+> > > +                             continue;
+> > 
+> > Why would lan966x_lag_get_mask() set a bit for a port that doesn't
+> > exist? Earlier check makes sense. This one seems too defensive.
+> 
+> You are right, the lan966x_lag_get_mask() will not set a bit for a port
+> that doesn't exist[1]. Therefore this check is not needed.
+> 
+> [1] https://elixir.bootlin.com/linux/latest/source/drivers/net/ethernet/microchip/lan966x/lan966x_lag.c#L354
 
-Reported-by: syzbot+8bb053b5d63595ab47db@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?id=0d8351bbe54fd04a492c2daab0164138db008042
-Fixes: 90017accff61 ("sctp: Add GSO support")
-Suggested-by: Xin Long <lucien.xin@gmail.com>
-Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
----
-v2: factor the fix out to helper function (Jakub Kicinski)
----
- net/sctp/inqueue.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+While trying to rebase on net, the next version of this patch, I have seen that
+actually this version was accepted even though it was marked as "Changes
+Requested".
+The commit sha is: 15faa1f67ab405d47789d4702f587ec7df7ef03e
 
-diff --git a/net/sctp/inqueue.c b/net/sctp/inqueue.c
-index 7182c5a450fb..9ec172405ff4 100644
---- a/net/sctp/inqueue.c
-+++ b/net/sctp/inqueue.c
-@@ -38,6 +38,14 @@ void sctp_inq_init(struct sctp_inq *queue)
- 	INIT_WORK(&queue->immediate, NULL);
- }
- 
-+/* Properly release the chunk which is being worked on. */
-+static inline void sctp_chunk_release(struct sctp_chunk *chunk)
-+{
-+	if (chunk->head_skb)
-+		chunk->skb = chunk->head_skb;
-+	sctp_chunk_free(chunk);
-+}
-+
- /* Release the memory associated with an SCTP inqueue.  */
- void sctp_inq_free(struct sctp_inq *queue)
- {
-@@ -53,7 +61,7 @@ void sctp_inq_free(struct sctp_inq *queue)
- 	 * free it as well.
- 	 */
- 	if (queue->in_progress) {
--		sctp_chunk_free(queue->in_progress);
-+		sctp_chunk_release(queue->in_progress);
- 		queue->in_progress = NULL;
- 	}
- }
-@@ -130,9 +138,7 @@ struct sctp_chunk *sctp_inq_pop(struct sctp_inq *queue)
- 				goto new_skb;
- 			}
- 
--			if (chunk->head_skb)
--				chunk->skb = chunk->head_skb;
--			sctp_chunk_free(chunk);
-+			sctp_chunk_release(chunk);
- 			chunk = queue->in_progress = NULL;
- 		} else {
- 			/* Nothing to do. Next chunk in the packet, please. */
+How do you prefer to go forward from here?
+- do you want to revert this and then I will send a new version?
+- should I send a patch that just removes this unneeded check?
+- any other suggestion?
+
+> 
+> > --
+> > pw-bot: cr
+> 
+> -- 
+> /Horatiu
+
 -- 
-2.43.0
-
+/Horatiu
 
