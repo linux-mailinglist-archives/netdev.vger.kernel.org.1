@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-71182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0475852906
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 07:33:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37C84852907
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 07:33:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4BA31C233C3
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 06:33:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EFBA2843C2
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 06:33:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345C714010;
-	Tue, 13 Feb 2024 06:33:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F6FD17738;
+	Tue, 13 Feb 2024 06:33:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uY7uJagr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="P9Wk6z8l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73A8817738
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 06:33:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 060DF17758
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 06:33:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707805983; cv=none; b=UcwRvjvMWTFHGSBdEEqtB90MXdeAxkLY9bLG7ZjMJBBKCBy1yl8jA/gA4013Q7hFyyW5D31dgnwCSeE2dscu/P9gaLbpJu9nSmaln89XIqA4G1Udy8XXrszKXIXyKLPDdngqWv41x8jhdi1Y0o0kb3HYtnkOGTi90d42z272z5w=
+	t=1707805984; cv=none; b=QwSsO5EM+bAWtMLNNrWmffwqYxTJZ4dQdYai6fb3lzIfRZJ4RTe+vyCjCxXtEdlv5bOWlec5yrspiTOywkaQaVvJiwmGwIKjZkMUFrKkQP+k8pSmwow5/IcA8ajLxSNVI50SqAk/8LPC76IWjaRpBXHt4Ji6bXGyq3gLZwPxq30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707805983; c=relaxed/simple;
-	bh=29NazzhrGE6hldDXKEfZeTtJbn6TyiHxZa6TqeLkGCQ=;
+	s=arc-20240116; t=1707805984; c=relaxed/simple;
+	bh=agQBBe3gGEuUVQmqiN2/BV7cXJovu98w3yyooCl1rCM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lZwrdtzekziDkgSfyrEVM0yC2mVZjzx9vYR6WP4HAPszUYvRh1X5fdQ6UwCPeqfbKX5VTSgOnpXrj4knPBRkR7z76EEvDCuB3vOsOPC/09YNeV27pfnBHpTk/+wt0YxX4EevX+BX0A1bVAMn0pdh12lwdujc2XZN0ne0x4LDQlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uY7uJagr; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=PnPPVEwyh3FXJuq37d/T7eCvGzZnIQ/f+jIST6eDj1Z1jfq2oicnYf6d/m6cZuhCFASkEbO/gduAPdNXwgFLVwubWW8yoXq+6n9h+yf/QjZWXlUVAq3XcwEQyJIoH6+nQ5Ch7vTSW6m/3i1GtR8kIjsQTHN6AeSAnJTRXgCpUP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=P9Wk6z8l; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6077fa2fa9bso9566657b3.2
-        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 22:33:01 -0800 (PST)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc74645bfa8so963020276.1
+        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 22:33:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707805980; x=1708410780; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1707805982; x=1708410782; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vPy1zDswvQ5u8O4KAy1wp3PYWx/RjBzoiEF59UhpCs8=;
-        b=uY7uJagrwecJ0q2jz3+ujWvbdE+tHLvLiR1mCxorDo8Bljmc7MLdSqxRufZSSDYNfI
-         VU/k12oMMDReKyzpkQ5gMY8XEM3SD2uWkkl0WUX4Do5HeRnmpC1WyoQG2BDR70xaH9Jm
-         iuXshH7I1Opj2NZQm4ZInPrQu125ih5DsSUhA0JP1pKsqxSkw73M+542xUSkfC+FvPuF
-         ZehMOGC/98M+tDvkf8OJCBo7XuJ+eg52PEPoYECWiTIr7Vix5nOtppt0mjnBLYhXh5rk
-         qdela736a/er7ZwfnmgjdmKtbSGtE9MC9nafI0L/UoYKzuBZO7Y9pHpXd6dusKhoHhKg
-         QGpw==
+        bh=NHXOpWBVrruiE3l6dQqMCwanEDTCE2ZLCZC+dweAjwk=;
+        b=P9Wk6z8lWLg57Nxhi6xH0lJuOV6apyssNaZ6aHHGuC0W3/Dq8dvrsGL0xjHACn4ZuD
+         WBI+Ku3Grqdd4Jpb+ndIiSJXmv0S3VeEpUa+RNScY7QLaUYyyF1XkIvzLPMZuLXxbqI7
+         19ngLwLpoOqsg3hWuyR2hrlqxxC2TfDRYtMCcHTqeu+2N18ZXVx98rQlCvx85TEUW2qg
+         6ac9YArLavTIZ53nV4mRRzjehVFoaqMa3xIiQ8iAnBbzjtp/UmeqgYLJPlVvUohVueod
+         fEdY+iCYjAQoGWQF8F2B0Z6Qos31m8/eNl4bqgA8mLLYOInIjkdCEAB8cqOnJdM4+sx6
+         U4Zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707805980; x=1708410780;
+        d=1e100.net; s=20230601; t=1707805982; x=1708410782;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vPy1zDswvQ5u8O4KAy1wp3PYWx/RjBzoiEF59UhpCs8=;
-        b=mAJgLC/wgJIm+sFD58KNIrOCR7zGW2uo1VCUPd/rCXfRpOyeRuTw7hsZyycp7CjIaE
-         UmhunVhlPHfPKqADQnpSwNtVP6HRkK5ved94Bmo1kzkCSN3nurS2Fn7SJoY+7fzJHswn
-         5boX9PSPd/BYCg6CgWOLTLeG/C6DI6V/VmC+eJitK2v1J5UJtcpmgMyypb7SW/OMVjqF
-         6E0TrEXHLYm4HYyXslPetFWGQua0BBt9UR9zFoA4PpVZpoZLpd2Ayra79qNACqHUSM0g
-         sDB9awCn2JKyDwrRxSq2b3GqA10cjvjTOQpLNccGJVWcGBfFeGMTlgR4i749Fm6UBbiW
-         Lp9w==
-X-Gm-Message-State: AOJu0Yz/Ie7q0/PhQ85XMDY3WcjAwqfXW7eqMuR11w8OPyqBNTmMxbGd
-	PCS2Wu9ggpoM3Ti6XtFo6IsyNK7pEyGL03V/PqyPHY8zrPUL2WvYrcvD6Q7gOPOYASnMslKsAvY
-	9I2t3dELUBw==
-X-Google-Smtp-Source: AGHT+IFLvUj/T3D+v4OUbHXXYbR1dfLts2TL5Gr7WRffT1e4qSn9gDJbLldzubugF5EKdcfke2UMgRoZ4Wo17g==
+        bh=NHXOpWBVrruiE3l6dQqMCwanEDTCE2ZLCZC+dweAjwk=;
+        b=q8qYiFNxTwLwAxTrPUP0hyjdsZlqjigif++Vrio/rM9pZC44HEcX5WDmXGIdpihBOR
+         urx/cnWrY2bQS5AxI6Jr9STbTJvXfBn05MpxzPAW6O5dsfNLP562VBSihH4CYCJkOmq3
+         6IH2xqPJG/1wM6k/lh9tKtr4b37uxIeuUDIHhnVUQmggNhGAdAM6bxCZEwz0iX/uXMiG
+         dwcZuYcwKZvdebzGJ85uA2lMvZbBj0ukk2uwYatX56gw5xyX7IO+6jDZNgpFC9gSwv5k
+         3ALy5/zr5/0Nm7yukAf7GQSHT1xI8OHa+DXVHTuEQ2nsB0LhJrUNVBQk9mXe1PhJBFCY
+         z8HA==
+X-Gm-Message-State: AOJu0YwKqRy6HsLespdsrKHom8EuZXjl8skEUhQhG9dwD5YT/OE9eLui
+	28opnYr36Jx7ttLHBkOzcMlcx/gIr/O0jLOSA5E5tLpDFEQ41yf0bu1hoYhW7NS+BK5Ug4gDG+X
+	gMmqwuC0j4w==
+X-Google-Smtp-Source: AGHT+IHSIjDoqINqZN3QIGW1L7Y5FAncufS08WMI/kn63a+rvMzL3miYi+Jwgdvm/xqj1Hm5btpi4n7C3g7HyA==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a0d:dd47:0:b0:607:83bd:bea3 with SMTP id
- g68-20020a0ddd47000000b0060783bdbea3mr191094ywe.10.1707805980476; Mon, 12 Feb
- 2024 22:33:00 -0800 (PST)
-Date: Tue, 13 Feb 2024 06:32:39 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:124a:b0:dbe:d0a9:2be8 with SMTP
+ id t10-20020a056902124a00b00dbed0a92be8mr325735ybu.0.1707805982006; Mon, 12
+ Feb 2024 22:33:02 -0800 (PST)
+Date: Tue, 13 Feb 2024 06:32:40 +0000
 In-Reply-To: <20240213063245.3605305-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,9 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240213063245.3605305-1-edumazet@google.com>
 X-Mailer: git-send-email 2.43.0.687.g38aa6559b0-goog
-Message-ID: <20240213063245.3605305-8-edumazet@google.com>
-Subject: [PATCH v4 net-next 07/13] net-sysfs: convert dev->operstate reads to
- lockless ones
+Message-ID: <20240213063245.3605305-9-edumazet@google.com>
+Subject: [PATCH v4 net-next 08/13] net-sysfs: convert netstat_show() to RCU
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -83,146 +82,47 @@ Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-operstate_show() can omit dev_base_lock acquisition only
-to read dev->operstate.
+dev_get_stats() can be called from RCU, there is no need
+to acquire dev_base_lock.
 
-Annotate accesses to dev->operstate.
-
-Writers still acquire dev_base_lock for mutual exclusion.
+Change dev_isalive() comment to reflect we no longer use
+dev_base_lock from net/core/net-sysfs.c
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/bridge/br_netlink.c |  3 ++-
- net/core/link_watch.c   |  4 ++--
- net/core/net-sysfs.c    |  4 +---
- net/core/rtnetlink.c    |  4 ++--
- net/hsr/hsr_device.c    | 10 +++++-----
- net/ipv6/addrconf.c     |  2 +-
- 6 files changed, 13 insertions(+), 14 deletions(-)
+ net/core/net-sysfs.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/net/bridge/br_netlink.c b/net/bridge/br_netlink.c
-index 5ad4abfcb7ba3960bf69613ae7975180ae48854b..2cf4fc756263992eefe6a3580410766fea0c2c1f 100644
---- a/net/bridge/br_netlink.c
-+++ b/net/bridge/br_netlink.c
-@@ -455,7 +455,8 @@ static int br_fill_ifinfo(struct sk_buff *skb,
- 			  u32 filter_mask, const struct net_device *dev,
- 			  bool getlink)
- {
--	u8 operstate = netif_running(dev) ? dev->operstate : IF_OPER_DOWN;
-+	u8 operstate = netif_running(dev) ? READ_ONCE(dev->operstate) :
-+					    IF_OPER_DOWN;
- 	struct nlattr *af = NULL;
- 	struct net_bridge *br;
- 	struct ifinfomsg *hdr;
-diff --git a/net/core/link_watch.c b/net/core/link_watch.c
-index 429571c258da7720baf387fef81081a56a655ef5..1b93e054c9a3cfcdd5d1251a9982d88a071abbaa 100644
---- a/net/core/link_watch.c
-+++ b/net/core/link_watch.c
-@@ -67,7 +67,7 @@ static void rfc2863_policy(struct net_device *dev)
- {
- 	unsigned char operstate = default_operstate(dev);
- 
--	if (operstate == dev->operstate)
-+	if (operstate == READ_ONCE(dev->operstate))
- 		return;
- 
- 	write_lock(&dev_base_lock);
-@@ -87,7 +87,7 @@ static void rfc2863_policy(struct net_device *dev)
- 		break;
- 	}
- 
--	dev->operstate = operstate;
-+	WRITE_ONCE(dev->operstate, operstate);
- 
- 	write_unlock(&dev_base_lock);
- }
 diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-index 23ef2df549c3036a702f3be1dca1eda14ee5e76f..c5d164b8c6bfb53793f8422063c6281d6339b36e 100644
+index c5d164b8c6bfb53793f8422063c6281d6339b36e..946caefdd9599f631a73487e950305c978f8bc66 100644
 --- a/net/core/net-sysfs.c
 +++ b/net/core/net-sysfs.c
-@@ -325,11 +325,9 @@ static ssize_t operstate_show(struct device *dev,
- 	const struct net_device *netdev = to_net_dev(dev);
- 	unsigned char operstate;
+@@ -34,7 +34,7 @@ static const char fmt_dec[] = "%d\n";
+ static const char fmt_ulong[] = "%lu\n";
+ static const char fmt_u64[] = "%llu\n";
+ 
+-/* Caller holds RTNL, RCU or dev_base_lock */
++/* Caller holds RTNL or RCU */
+ static inline int dev_isalive(const struct net_device *dev)
+ {
+ 	return READ_ONCE(dev->reg_state) <= NETREG_REGISTERED;
+@@ -685,14 +685,14 @@ static ssize_t netstat_show(const struct device *d,
+ 	WARN_ON(offset > sizeof(struct rtnl_link_stats64) ||
+ 		offset % sizeof(u64) != 0);
  
 -	read_lock(&dev_base_lock);
--	operstate = netdev->operstate;
-+	operstate = READ_ONCE(netdev->operstate);
- 	if (!netif_running(netdev))
- 		operstate = IF_OPER_DOWN;
++	rcu_read_lock();
+ 	if (dev_isalive(dev)) {
+ 		struct rtnl_link_stats64 temp;
+ 		const struct rtnl_link_stats64 *stats = dev_get_stats(dev, &temp);
+ 
+ 		ret = sysfs_emit(buf, fmt_u64, *(u64 *)(((u8 *)stats) + offset));
+ 	}
 -	read_unlock(&dev_base_lock);
- 
- 	if (operstate >= ARRAY_SIZE(operstates))
- 		return -EINVAL; /* should not happen */
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index 8d95e0863534f80cecceb2dd4a7b2a16f7f4bca3..4e797326c88fe1e23ca66e82103176767fe5c32e 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -866,9 +866,9 @@ static void set_operstate(struct net_device *dev, unsigned char transition)
- 		break;
- 	}
- 
--	if (dev->operstate != operstate) {
-+	if (READ_ONCE(dev->operstate) != operstate) {
- 		write_lock(&dev_base_lock);
--		dev->operstate = operstate;
-+		WRITE_ONCE(dev->operstate, operstate);
- 		write_unlock(&dev_base_lock);
- 		netdev_state_change(dev);
- 	}
-diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
-index 9d71b66183daf94e19945d75cfb5c33df6ce346c..be0e43f46556e028e675147e63c6b787aa72e894 100644
---- a/net/hsr/hsr_device.c
-+++ b/net/hsr/hsr_device.c
-@@ -31,8 +31,8 @@ static bool is_slave_up(struct net_device *dev)
- static void __hsr_set_operstate(struct net_device *dev, int transition)
- {
- 	write_lock(&dev_base_lock);
--	if (dev->operstate != transition) {
--		dev->operstate = transition;
-+	if (READ_ONCE(dev->operstate) != transition) {
-+		WRITE_ONCE(dev->operstate, transition);
- 		write_unlock(&dev_base_lock);
- 		netdev_state_change(dev);
- 	} else {
-@@ -78,14 +78,14 @@ static void hsr_check_announce(struct net_device *hsr_dev,
- 
- 	hsr = netdev_priv(hsr_dev);
- 
--	if (hsr_dev->operstate == IF_OPER_UP && old_operstate != IF_OPER_UP) {
-+	if (READ_ONCE(hsr_dev->operstate) == IF_OPER_UP && old_operstate != IF_OPER_UP) {
- 		/* Went up */
- 		hsr->announce_count = 0;
- 		mod_timer(&hsr->announce_timer,
- 			  jiffies + msecs_to_jiffies(HSR_ANNOUNCE_INTERVAL));
- 	}
- 
--	if (hsr_dev->operstate != IF_OPER_UP && old_operstate == IF_OPER_UP)
-+	if (READ_ONCE(hsr_dev->operstate) != IF_OPER_UP && old_operstate == IF_OPER_UP)
- 		/* Went down */
- 		del_timer(&hsr->announce_timer);
++	rcu_read_unlock();
+ 	return ret;
  }
-@@ -100,7 +100,7 @@ void hsr_check_carrier_and_operstate(struct hsr_priv *hsr)
- 	/* netif_stacked_transfer_operstate() cannot be used here since
- 	 * it doesn't set IF_OPER_LOWERLAYERDOWN (?)
- 	 */
--	old_operstate = master->dev->operstate;
-+	old_operstate = READ_ONCE(master->dev->operstate);
- 	has_carrier = hsr_check_carrier(master);
- 	hsr_set_operstate(master, has_carrier);
- 	hsr_check_announce(master->dev, old_operstate);
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index ca1b719323c0badf7b62a33e17d7378ac84a7107..2c1ed642e3f45658611f5f43b60ef400f834f4e9 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -6025,7 +6025,7 @@ static int inet6_fill_ifinfo(struct sk_buff *skb, struct inet6_dev *idev,
- 	    (dev->ifindex != dev_get_iflink(dev) &&
- 	     nla_put_u32(skb, IFLA_LINK, dev_get_iflink(dev))) ||
- 	    nla_put_u8(skb, IFLA_OPERSTATE,
--		       netif_running(dev) ? dev->operstate : IF_OPER_DOWN))
-+		       netif_running(dev) ? READ_ONCE(dev->operstate) : IF_OPER_DOWN))
- 		goto nla_put_failure;
- 	protoinfo = nla_nest_start_noflag(skb, IFLA_PROTINFO);
- 	if (!protoinfo)
+ 
 -- 
 2.43.0.687.g38aa6559b0-goog
 
