@@ -1,182 +1,138 @@
-Return-Path: <netdev+bounces-71576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A09CF85402B
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 00:35:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBB10854041
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 00:42:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C04261C2250E
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 23:35:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FC3B1F2809F
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 23:42:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D864263108;
-	Tue, 13 Feb 2024 23:35:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6A8963402;
+	Tue, 13 Feb 2024 23:42:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="sK9Chtl7"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dHI12NHQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D642849C
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 23:34:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E57A633F9
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 23:42:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707867302; cv=none; b=hb5Ve3/1aVcv3H9FrJeIcQJEHW0iJ2AVwc5lNMDoaNnRKuhLfXs6vSQHh5E0GjtZJhsgc3HaEMX0Zp5lDF+vT9R4JtKIl0Qn4YR4uS51tn8zO5h/P+cCXN3OrCZjruQo55kWYaCnqBW4NKAuVwodEiJBfUeFhFQILvJTdCxBDLk=
+	t=1707867736; cv=none; b=qof1KnUOpTFv9epGTrWoTw55aELY7hpCnuVQYwdG2xe2XH34WCyHuxWKXUi9wyE5jhGLI0KZGWFkDXlx1DXLabEWFxbM/F/pNJDgqWzN6Rs9Ft46lXK+haiAHwlB3CuD43PYO88xYOu2ei3i5WxkIpuwrad+Fob2E2hw7SO/B/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707867302; c=relaxed/simple;
-	bh=junmgqXrmhqsNg+BKyZ0X1U7i9Jpuv3Bkp5wWGcyK0U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WBLbWMQOZORGK7s1W57rcN4dgZs7YvmCkG/+dbJW05paub+utK+6FSEIyThYHR6ZoQMVtDO1660QyIGBuWJBlbE0pkRS59guu1qp5EFw7ywIxPzmEhHAGcggDJRRRIZS00scDwGa06khZ8m8q0bdsVmRWHIf1kXE9MjiEvEYYxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au; spf=pass smtp.mailfrom=gandalf.ozlabs.org; dkim=pass (2048-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b=sK9Chtl7; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gandalf.ozlabs.org
+	s=arc-20240116; t=1707867736; c=relaxed/simple;
+	bh=hW38y6WJPmsQKEP/qFrXd2E/XyKsm+Fe0LPU3IywHpE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=g/CFxI7Bg6MEP/62sgIPmQSCWocQ1bpCR13N1n6+GAKG6fHDiS8qp+CrTm9Y9mDKZ76ZXO9aJtGMl5hlLx336ZTI1vWorvOjT5Gufxwg0mGOET9bS65UzGdoNYo5XoPizxr5KzPWuy4oRxKdn4Pj7HCzwyWRRH0jRPFvATqVRo8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=dHI12NHQ; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-296e8c8d218so3573764a91.3
+        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 15:42:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=gibson.dropbear.id.au; s=202312; t=1707867296;
-	bh=3/1iP3HNwb1vm+Hd3oAF3/M+8QwR+TUmgRrX+ZzY2AE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sK9Chtl7iFuSICOEniUcsJmNGMzxn0yXcczGF+m8St3hoclYHXOh1O6i3ECQEWH6/
-	 VvAVAHx9dT5Xw0IB6yTeK3qQJ09hIubqCUpCqjqVRbr071j1DsVD1GpXnRugHRIB6W
-	 aX1qGlcE4pnlsAEiOJOKJJf4W2EAcQW3eVsr5QABSsXpNyN3SUf9pqDfvq96s3u4F5
-	 J7juikRQg3OEIZ/fTYnQ3TokQzu3Ab86kIIXYuNGwN8YJ1J2JYpmwVusihA9ye6DyY
-	 mEC23E3h3RsqrDsMYj6EK6HKBYTKkzW712LPPdonFiGZajC0zKce99G1CdGM69i6Es
-	 9btJhSZWmOPHQ==
-Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
-	id 4TZHjr2TNnz4wcr; Wed, 14 Feb 2024 10:34:56 +1100 (AEDT)
-Date: Wed, 14 Feb 2024 10:34:50 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, kuba@kernel.org, passt-dev@passt.top,
-	sbrivio@redhat.com, lvivier@redhat.com, dgibson@redhat.com,
-	jmaloy@redhat.com, netdev@vger.kernel.org, davem@davemloft.net
-Subject: Re: [PATCH v3] tcp: add support for SO_PEEK_OFF
-Message-ID: <Zcv8mjlWE7F9Of93@zatzit>
-References: <20240209221233.3150253-1-jmaloy@redhat.com>
- <8d77d8a4e6a37e80aa46cd8df98de84714c384a5.camel@redhat.com>
- <CANn89iJW=nEzVjqxzPht20dUnfqxWGXMO2_EpKUV4JHawBRxfw@mail.gmail.com>
- <eaee3c892545e072095e7b296ddde598f1e966d9.camel@redhat.com>
- <CANn89iL=npDL0S+w-F-iE2kmQ2rnNSA7K9ic9s-4ByLkvHPHYg@mail.gmail.com>
- <20072ba530b34729589a3d527c420a766b49e205.camel@redhat.com>
- <CANn89iL2FvTVYv6ym58=4L-K-kSan6R4PEv488ztyX4HsNquug@mail.gmail.com>
+        d=chromium.org; s=google; t=1707867734; x=1708472534; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=w0mtIXHXlHD45+RwrtuutvVPykfnjMAD2MPuh04ZZ3s=;
+        b=dHI12NHQ5dgAHFBfowyiQtKNdHLqZd/wG1vOdk6njRdmkBp5lGO1RxOpRi9Swt6y+W
+         dzzUna8hGb5ESOxrHsebVb4zwRyRT2Zn3n2mItOWGqfH1oAGO/SIkbGqVvD5z23LFjYV
+         2KSVGM51OoMvtrRb26c5EecAkiKDcx3vTZ/Og=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707867734; x=1708472534;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=w0mtIXHXlHD45+RwrtuutvVPykfnjMAD2MPuh04ZZ3s=;
+        b=RJfpBStqFju77+P5vLS37hdvH6osIW5AxqRRC2BKsglCWdiabubEPpde+FTz9Sjge1
+         C9a7R5is+UUG24Ui3jBkDFm1bDfW/g/he5uFpQyT8KMquCZ0Y5wEsFmiw0jJ1mnfDUl7
+         UYCDyj7NuBaQrtjWoWmTNzYg2fBrcq1fPCZaOseLmcxdVDKoSMMIFk1jeVpyc4fhhVSG
+         L+pYtHBT68Eg2mC2WoG+o3JelDW5ewa7ke5R2RyDy4GfzEVcMX7W3ZceqdYJOwzWiV/b
+         +IP9I0oTkoprl9hAYjTb955ECozNd3ARH0yTW78dpChwbHuuin3KWMqLBtkQ1TIsdxQF
+         RECQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXSywguZm0Pr0Qw2/YjSthMbt+TWfpvvAqQibdOTmpfKsUh64tXCavwV6h3R9T2zWuU+HVDelsIF+WGzOo+dHlBeHLYCTvP
+X-Gm-Message-State: AOJu0YxSy9KyDgQ6t+fUbRsLKOD6YeiUV9Z5svQsUCpPEKRThzCI8hbE
+	BJNn/RT9qifw6qbGDIGFrCs+dGuOFkqrDvtZALrTTh5uyPDBPbFzDKgqIGvlXw==
+X-Google-Smtp-Source: AGHT+IHDJgqPv/xuU8lFld0zKdNYV8TeMbseDl3sf1xG7aS5xoPNoFvvAKYSASG5Iou256qbZKti8w==
+X-Received: by 2002:a17:90a:16cf:b0:298:b8e0:43d8 with SMTP id y15-20020a17090a16cf00b00298b8e043d8mr904976pje.27.1707867734338;
+        Tue, 13 Feb 2024 15:42:14 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVRaKZwxlf/vLGJiePIxgGvw+Rh+hGu6ddU0v9g5Xv63csNEKWIXEHNQFWqF83g7BtryViuHLdyX9GpftZ2jYcHge2r6MPIxZsoC5+4PLqHru+VjG6wsfRfIohT6O5MFCawb9bwDrtTWGlTx4M1nz6+6Q25Zy08Tio6b+3WoQUIZTwV578VHh67spTB96xOFgSn+FdY1Sr0McJtkJTsCv+1me0fxK4lrg40lWlk1Y1obC/7RiOUSNhwhxc+xyCas7WzKzFMqvisnw3Y/iKVYD5eNHNgAexuRE/CLWAGf1Usetwc3HEzuJ+zUtx7DeQXox8LlP57OX0QDlAJlvPTTEQzdbjWkgBEzn6f5x7zhHrG6ZGyW9ikxY4lHLMhhrgQaZ8in9hCooYWIYQIDM0GnnyVymtAnNtWA7ebpn5poU53f8yuRzQxTBQiVrbGCfNCgDAdZDxoVFrj7Gs2w+iuML0xF0HLkr+8HuulAmBBH0abPnv8ohzwxDlgpMswmyej
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id fs9-20020a17090af28900b00298c686c621sm80939pjb.56.2024.02.13.15.42.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Feb 2024 15:42:13 -0800 (PST)
+From: Kees Cook <keescook@chromium.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Kees Cook <keescook@chromium.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Keith Packard <keithp@keithp.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Alexey Dobriyan <adobriyan@gmail.com>,
+	Dmitry Antipov <dmantipov@yandex.ru>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	kernel test robot <lkp@intel.com>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH v2 0/2] stddef: Allow attributes to be used when creating flex arrays
+Date: Tue, 13 Feb 2024 15:42:09 -0800
+Message-Id: <20240213234023.it.219-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="lI5RsEVqDHCNRRnC"
-Content-Disposition: inline
-In-Reply-To: <CANn89iL2FvTVYv6ym58=4L-K-kSan6R4PEv488ztyX4HsNquug@mail.gmail.com>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=810; i=keescook@chromium.org;
+ h=from:subject:message-id; bh=hW38y6WJPmsQKEP/qFrXd2E/XyKsm+Fe0LPU3IywHpE=;
+ b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBly/5T6BEAiVA8ujTLHGCLG3BpSzMgWwdTvSXxf
+ E7rKurlcc2JAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZcv+UwAKCRCJcvTf3G3A
+ JqBqD/9mIQzk9MdkbeFAYfVd/iZ0m2dYUxas19LCSHaOrGZQI0szGULd0bqf13dJVpN2tvCFgmj
+ GCEuMWeucp8FI1zC6dhnBVakXkFa1ZKBl4XNDXuCJoAi7VbUxUJXfZHRiBuJ1Lcud8m7K4TMU+4
+ qI/M91c4TTVupB1sJeX4AWVCQx+6ASKMbc+OUa6JTKaRAruQIOgQTHKMKO9CP97AdFaz5ffz/V4
+ v+OzLD/klAGQgHjCsaklLQFPyTcH9kSoDH0cd2lZSN0f11rcNZwjvoBTbhq6LyH2orvO6iE8M96
+ eJB2MQReblKhqrfAUC3xclD1TTjJtIfCM4u+Wlndnf7QUCY9+GaBiDJSvfrHoHOIEboNUwHikNN
+ Z4oTgT/Swk93oWAY1ZKdLROZsSwl430zoc6+wim/hhog/jqgFyxFauzsLZV0XOjgxp6RG2VTFOX
+ pDYM/xs6WoYE1BgtdNq0GvzFBzFm/h07v7DwhFjX91nhz6LU2ydcyqCUHTCHVcFYHs99E7m7M9n
+ PrAjBAycwW8n3aqBVwGkYl/J4MnWnxjOE/xhEuDYjyXKP82yI5RPTjb+ivNXAJ8o7JUW7bRJKkx
+ AFHR/FWOYIth6aRlgFwNxfbDizVarYamv9scUJksPEj3CfUEDNsZboESdmhTDEVh4UdwTZ2XFye
+ TVR7dxwK 7sp99PA==
+X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
+Content-Transfer-Encoding: 8bit
 
+v2:
+ - don't add a new helper, just add __VA_ARGS__ (Rasmus)
+v1: https://lore.kernel.org/all/20240210011452.work.985-kees@kernel.org/
 
---lI5RsEVqDHCNRRnC
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-On Tue, Feb 13, 2024 at 04:49:01PM +0100, Eric Dumazet wrote:
-> On Tue, Feb 13, 2024 at 4:28=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> w=
-rote:
-> >
-> > On Tue, 2024-02-13 at 14:34 +0100, Eric Dumazet wrote:
-> > > On Tue, Feb 13, 2024 at 2:02=E2=80=AFPM Paolo Abeni <pabeni@redhat.co=
-m> wrote:
-> > > >
-> > > > On Tue, 2024-02-13 at 13:24 +0100, Eric Dumazet wrote:
-> > > > > On Tue, Feb 13, 2024 at 11:49=E2=80=AFAM Paolo Abeni <pabeni@redh=
-at.com> wrote:
-> > > > >
-> > > > > > > @@ -2508,7 +2508,10 @@ static int tcp_recvmsg_locked(struct s=
-ock *sk, struct msghdr *msg, size_t len,
-> > > > > > >               WRITE_ONCE(*seq, *seq + used);
-> > > > > > >               copied +=3D used;
-> > > > > > >               len -=3D used;
-> > > > > > > -
-> > > > > > > +             if (flags & MSG_PEEK)
-> > > > > > > +                     sk_peek_offset_fwd(sk, used);
-> > > > > > > +             else
-> > > > > > > +                     sk_peek_offset_bwd(sk, used);
-> > > > >
-> > > > > Yet another cache miss in TCP fast path...
-> > > > >
-> > > > > We need to move sk_peek_off in a better location before we accept=
- this patch.
-> > > > >
-> > > > > I always thought MSK_PEEK was very inefficient, I am surprised we
-> > > > > allow arbitrary loops in recvmsg().
-> > > >
-> > > > Let me double check I read the above correctly: are you concerned by
-> > > > the 'skb_queue_walk(&sk->sk_receive_queue, skb) {' loop that could
-> > > > touch a lot of skbs/cachelines before reaching the relevant skb?
-> > > >
-> > > > The end goal here is allowing an user-space application to read
-> > > > incrementally/sequentially the received data while leaving them in
-> > > > receive buffer.
-> > > >
-> > > > I don't see a better option than MSG_PEEK, am I missing something?
-> > >
-> > >
-> > > This sk_peek_offset protocol, needing  sk_peek_offset_bwd() in the non
-> > > MSG_PEEK case is very strange IMO.
-> > >
-> > > Ideally, we should read/write over sk_peek_offset only when MSG_PEEK
-> > > is used by the caller.
-> > >
-> > > That would only touch non fast paths.
-> > >
-> > > Since the API is mono-threaded anyway, the caller should not rely on
-> > > the fact that normal recvmsg() call
-> > > would 'consume' sk_peek_offset.
-> >
-> > Storing in sk_peek_seq the tcp next sequence number to be peeked should
-> > avoid changes in the non MSG_PEEK cases.
-> >
-> > AFAICS that would need a new get_peek_off() sock_op and a bit somewhere
-> > (in sk_flags?) to discriminate when sk_peek_seq is actually set. Would
-> > that be acceptable?
->=20
-> We could have a parallel SO_PEEK_OFFSET option, reusing the same socket f=
-ield.
->=20
-> The new semantic would be : Supported by TCP (so far), and tcp
-> recvmsg() only reads/writes this field when MSG_PEEK is used.
-> Applications would have to clear the values themselves.
+We're going to have more cases where we need to apply attributes
+(e.g. __counted_by) to struct members that have been declared with
+DECLARE_FLEX_ARRAY. Add an optional 3rd argument to allow for this and
+annotate one such user in linux/in.h.
 
-Those semantics would likely defeat the purpose of using SO_PEEK_OFF
-for our use case, since we'd need an additional setsockopt() for every
-non-PEEK recv() (which are all MSG_TRUNC in our case).
+I kept the acks/reviews since it's effectively the same...
 
-> BTW I see the man pages say SO_PEEK_OFF is "is currently supported
-> only for unix(7) sockets"
+-Kees
 
-Yes, this patch is explicitly aiming to change that.
+Kees Cook (2):
+  stddef: Allow attributes to be used when creating flex arrays
+  net/ipv4: Annotate imsf_slist_flex with __counted_by(imsf_numsrc)
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+ include/linux/stddef.h      |  6 +++---
+ include/uapi/linux/in.h     |  3 ++-
+ include/uapi/linux/stddef.h | 10 +++++-----
+ 3 files changed, 10 insertions(+), 9 deletions(-)
 
---lI5RsEVqDHCNRRnC
-Content-Type: application/pgp-signature; name="signature.asc"
+-- 
+2.34.1
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEO+dNsU4E3yXUXRK2zQJF27ox2GcFAmXL/HMACgkQzQJF27ox
-2GdsixAAoZ5PJR+8aM96Vzj7TC/TuVc4buPXC0Hx6Q7rEkbNOaWZJHTRziyzbO8x
-edfyHa+383wtNI3XkOyExm5HPS5X59Smc0WKvpukm1hv/JsWHhjf3dGuSoO+HKgy
-3D6mfuXfCz3rCTpJHqpkEvMk084771XzDE4KfSUdRVu3m3Bhl7HnAlhBS0PssOMr
-c2cHxmuzFASfk6lMO5jqRjZkgFN0o5LOL14/EoWLZBN/c2VkIh0Ie1FeyqsZQfa8
-GDS5StjkJKsmXWL4Wc0lVQHxorqIPjDDLsT/8IBDn7aYVqTzHKSo63WpklXKzNeh
-pcNWU9d7Jz6wcLlPVKAbzDrOcJhhg82oS+RQPGAxu2lH6r+h6rUV5TnOvAZf3mZj
-eWJjuJEO6uOpn4grP+4jQ49sDCOWTIPvkBqjGmQP8XjDadIzwerZ1w7+w+k4zSVd
-GD7OutqQP2UOpILXEEct6VVICm4GGzUbH8/fnqJlSh38fw/1PJjJiTrOg2SL2OoU
-yDZnFYi9xDhy60xd0vq8wSqNDxKwbEgNOF3RVgfF9UaDdOv70PqntOmMjG5UKB40
-S/nA2sQohEVgUoqizCW7H3oWtpzIgpeQ428BCNIfda8NwiKnQhGxnpu3j1miOngs
-8Hy7Q1zfPoeG68c6bke8PAcHHlZyzhjgSsO17yWD/iQVigLM6qE=
-=7qtX
------END PGP SIGNATURE-----
-
---lI5RsEVqDHCNRRnC--
 
