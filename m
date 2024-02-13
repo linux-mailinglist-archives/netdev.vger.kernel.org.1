@@ -1,87 +1,182 @@
-Return-Path: <netdev+bounces-71117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71119-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40054852555
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 02:12:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FC5F85255A
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 02:13:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E33091F24D7B
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:12:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04B0B1F24DF9
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:13:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09B0F3D6D;
-	Tue, 13 Feb 2024 00:27:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ABBRO/lf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA4D6522D;
+	Tue, 13 Feb 2024 00:29:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6DEB28F3;
-	Tue, 13 Feb 2024 00:27:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16C495660;
+	Tue, 13 Feb 2024 00:29:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707784038; cv=none; b=nsuRWA2bbRnTJrtziqBFTHkLZTUqzozophR+fR3MtqCEWfFthc8VQeWcb0/bws4NczCJFfcXtr46Auum6OOwDHgFT1OH4pGl17eobGoVkDZ/g2dc0aVEVW10zjJoEZvWZ6PookEVhwVjTEM0Uvkw68DfghrIwWfrDna++L4EhIY=
+	t=1707784177; cv=none; b=uGwhXtraNkZAObnAZNgi3c4/nD8R2Nt87ltFPtDjovGOCzSD3nqPxctN41IoXjgP3dbUeY6oDZ65tIl0ow9kq0Z2ZVBMNydErwjmq8FDizir7FMDFairS19vyMnh1MO3NHzsj8Guh/I6xiT2O0+J4CJsK2whjSX8f08NZEuH1Ic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707784038; c=relaxed/simple;
-	bh=xa2oLixYH54yKOS4wx6qyOKj3uS0moEuwKs5rzbxVJk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KFz7fJul5MqcJM6Cr2psHjN8lBpZyxc4zRpnDXrFoak39M4qnJnF4oQZp4XndTcwiVXQ4okuGH1VHn6flikz4EvTCoittFWcFeEScQR4o0pw3wN6U9wgPtKj8vO95JMeHYbTd1nRvD3lRtyxBDjRMP9EG3up79HYeQKya+W7iYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ABBRO/lf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DC05C433F1;
-	Tue, 13 Feb 2024 00:27:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707784038;
-	bh=xa2oLixYH54yKOS4wx6qyOKj3uS0moEuwKs5rzbxVJk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ABBRO/lf+/k9i2TOlc4qooYhDRcwXRi7Ka14CzL8TjCZtDzhKEUMNhFq75QCzFVGX
-	 l4c42f/jRbjPmLDblX2KoJ5ZJj51pTdm3+rK39DSckdfOq9Xf/kJ5B4FJ3AAX7Pjkd
-	 PRB9HXw7FcLjW2ozIoGRRO40Om/4saTN3TCbOg62JQpldimqRGSqWp7ayl//XJ0E0Y
-	 N7XePU+CtHkStu8zLvxCuQ925hD1cxoDm4GdKHwOeXMVZokl75icfdFb+JJ0ptBSNA
-	 BwmXL5ywJha3ezjx1TgD2HxOoUMhBvxs7UXXxgirNG/cIuQLLxjoXd071/3q5iCnj0
-	 tShUm13obv+Tw==
-Date: Mon, 12 Feb 2024 16:27:17 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Horatiu Vultur <horatiu.vultur@microchip.com>
-Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <UNGLinuxDriver@microchip.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, Michal Swiatkowski
- <michal.swiatkowski@linux.intel.com>
-Subject: Re: [PATCH net v2] lan966x: Fix crash when adding interface under a
- lag
-Message-ID: <20240212162717.2c8cb74e@kernel.org>
-In-Reply-To: <20240212083229.tg3cabp4iee3p6tq@DEN-DL-M31836.microchip.com>
-References: <20240206123054.3052966-1-horatiu.vultur@microchip.com>
-	<20240209135220.42e670d4@kernel.org>
-	<20240212081038.cbsb2exfmcxxntzq@DEN-DL-M31836.microchip.com>
-	<20240212083229.tg3cabp4iee3p6tq@DEN-DL-M31836.microchip.com>
+	s=arc-20240116; t=1707784177; c=relaxed/simple;
+	bh=DdLxDUXmiPLoqyv4u8dN4wHTSmvIBPFzXDc8ayrmZ4Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=W5laEbXhjoHstQccWCOob+g9Kx0bQHyRdnWL2d/1XtpnhyS+5T8ZaTNygIrAlcs8wKL1LrupHOr8q0dpNdGcAdq5BZD3rZdcxD8T/NiO1VgcOllphWuF5xcS+59/YLpOaGLj3f5jwDXMEykfwIpSKaxR0c9K4km/tA0SYGSi+qk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl; spf=pass smtp.mailfrom=v0yd.nl; arc=none smtp.client-ip=80.241.56.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v0yd.nl
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4TYhz92DX2z9sHY;
+	Tue, 13 Feb 2024 01:29:25 +0100 (CET)
+Message-ID: <bbd64fd9-395b-441e-be04-39440359b035@v0yd.nl>
+Date: Tue, 13 Feb 2024 01:29:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Write in
+ __hci_acl_create_connection_sync
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: syzbot <syzbot+3f0a39be7a2035700868@syzkaller.appspotmail.com>,
+ davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
+ kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, luiz.von.dentz@intel.com, marcel@holtmann.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+References: <0000000000007cea730610e083e8@google.com>
+ <216c95d9-db1f-487a-bf3d-17a496422485@v0yd.nl>
+ <CABBYNZKPaMLK5+HnsRWR9jwpdZWvbbai6p9XbePhMYdKSYUPPg@mail.gmail.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
+In-Reply-To: <CABBYNZKPaMLK5+HnsRWR9jwpdZWvbbai6p9XbePhMYdKSYUPPg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 4TYhz92DX2z9sHY
 
-On Mon, 12 Feb 2024 09:32:29 +0100 Horatiu Vultur wrote:
-> > You are right, the lan966x_lag_get_mask() will not set a bit for a port
-> > that doesn't exist[1]. Therefore this check is not needed.
-> > 
-> > [1] https://elixir.bootlin.com/linux/latest/source/drivers/net/ethernet/microchip/lan966x/lan966x_lag.c#L354  
-> 
-> While trying to rebase on net, the next version of this patch, I have seen that
-> actually this version was accepted even though it was marked as "Changes
-> Requested".
-> The commit sha is: 15faa1f67ab405d47789d4702f587ec7df7ef03e
-> 
-> How do you prefer to go forward from here?
-> - do you want to revert this and then I will send a new version?
-> - should I send a patch that just removes this unneeded check?
-> - any other suggestion?
+Hi Luiz,
 
-Sorry about that, I must have forgotten to reset the tree after viewing
-and didn't spot this between Brenos patches :S No big deal, let's leave
-it as is.
+On 09.02.24 14:36, Luiz Augusto von Dentz wrote:
+> Hi Jonas,
+> 
+> On Fri, Feb 9, 2024 at 7:37 AM Jonas Dreßler <verdre@v0yd.nl> wrote:
+>>
+>> Hi everyone!
+>>
+>> On 08.02.24 16:32, syzbot wrote:
+>>> syzbot has bisected this issue to:
+>>>
+>>> commit 456561ba8e495e9320c1f304bf1cd3d1043cbe7b
+>>> Author: Jonas Dreßler <verdre@v0yd.nl>
+>>> Date:   Tue Feb 6 11:08:13 2024 +0000
+>>>
+>>>       Bluetooth: hci_conn: Only do ACL connections sequentially
+>>>
+>>> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=154f8550180000
+>>> start commit:   b1d3a0e70c38 Add linux-next specific files for 20240208
+>>> git tree:       linux-next
+>>> final oops:     https://syzkaller.appspot.com/x/report.txt?x=174f8550180000
+>>> console output: https://syzkaller.appspot.com/x/log.txt?x=134f8550180000
+>>> kernel config:  https://syzkaller.appspot.com/x/.config?x=bb693ba195662a06
+>>> dashboard link: https://syzkaller.appspot.com/bug?extid=3f0a39be7a2035700868
+>>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11d95147e80000
+>>> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=107c2d8fe80000
+>>>
+>>> Reported-by: syzbot+3f0a39be7a2035700868@syzkaller.appspotmail.com
+>>> Fixes: 456561ba8e49 ("Bluetooth: hci_conn: Only do ACL connections sequentially")
+>>>
+>>> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+>>
+>> Hmm, looking at the backtraces, I think the issue that the introduction of the
+>> sequential connect has introduced another async case: In hci_connect_acl(), when
+>> we call hci_acl_create_connection_sync(), the conn state no longer immediately
+>> gets set to BT_CONNECT, but remains in BT_OPEN or BT_CLOSED until the hci_sync
+>> queue actually executes __hci_acl_create_connection_sync().
+> 
+> Need to double check but I think we do set BT_CONNECT in case of LE
+> when it is queued so which shall prevent it to be queued multiple
+> times.
+
+Nope, we set it only from within the hci_sync callback, see
+hci_connect_le_sync(). IMO that makes sense, because in
+hci_abort_conn_sync(), we send a  HCI_OP_CREATE_CONN_CANCEL in case
+of conn->state == BT_CONNECT, and this OP we wouldn't want to send
+while the command is still waiting in the queue.
+
+> 
+>> This means that now hci_connect_acl() is happy to do multiple
+>> hci_acl_create_connection_sync calls, and the hci_sync machinery will happily
+>> execute them right after each other. Then the newly introduced hci_abort_conn_sync()
+>> in __hci_acl_create_connection_sync() calls hci_conn_del() and frees the conn
+>> object, so the second time we enter __hci_acl_create_connection_sync(),
+>> things blow up.
+>>
+>> It looks to me like in theory the hci_connect_le_sync() logic is prone to a
+>> similar issue, but in practice that's prohibited because in hci_connect_le_sync()
+>> we lookup whether the conn object still exists and bail out if it doesn't.
+>>
+>> Even for LE though I think we can queue multiple hci_connect_le_sync() calls
+>> and those will happily send HCI_OP_LE_CREATE_CONN no matter what the connection
+>> state actually is?
+>>
+>> So assuming this analysis is correct, what do we do to fix this? It seems to me
+>> that
+>>
+>> 1) we want a BT_CONNECT_QUEUED state for connections, so that the state
+>> machine covers this additional stage that we have for ACL and LE connections now.
+> 
+> BT_CONNECT already indicates that connection procedure is in progress.
+
+I still think an additional state is necessary. Alternatively (and maybe
+a lot nicer than the extra state) would be to add some functions to hci_sync
+to check for and remove queued/ongoing commands, I'm thinking of a new
+
+bool hci_cmd_sync_has(struct hci_dev *hdev, hci_cmd_sync_work_func_t func, void *data);
+void hci_cmd_sync_cancel(struct hci_dev *hdev, hci_cmd_sync_work_func_t func, void *data);
+
+I think if we had those, in addition to not needing the additional state,
+we could also simplify the hci_abort_conn() code quite a bit and possibly
+get rid of the passing of connection handles to hci_connect_le_sync().
+
+I'll give that a try and propose a small patch tomorrow.
+
+Cheers,
+Jonas
+
+> 
+>> 2) the conn object can still disappear while the __hci_acl_create_connection_sync()
+>> is queued, so we need something like the "if conn doesn't exist anymore, bail out"
+>> check from hci_connect_le_sync() in __hci_acl_create_connection_sync(), too.
+> 
+> Btw, I'd probably clean up the connect function and create something
+> like hci_connect/hci_connect_sync which takes care of the details
+> internally like it was done to abort.
+> 
+>> That said, the current check in hci_connect_le_sync() that's using the connection
+>> handle to lookup the conn does not seem great, aren't these handles re-used
+>> after connections are torn down?
+> 
+> Well we could perhaps do a lookup by pointer to see if the connection
+> hasn't been removed in the meantime, that said to force a clash on the
+> handles it need to happen in between abort, which frees the handle,
+> and connect, anyway the real culprit here is that we should be able to
+> abort the cmd_sync callback like we do in LE:
+> 
+> https://github.com/bluez/bluetooth-next/blob/master/net/bluetooth/hci_conn.c#L2943
+> 
+> That way we stop the connect callback to run and don't have to worry
+> about handle re-use.
+> 
+>> Cheers,
+>> Jonas
+> 
+> 
+> 
 
