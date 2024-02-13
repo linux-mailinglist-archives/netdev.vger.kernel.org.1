@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-71484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1679853925
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 18:57:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5ECCE853942
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 19:00:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30A2B1C203B0
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 17:57:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 922841C22065
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 18:00:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71FC2605B8;
-	Tue, 13 Feb 2024 17:55:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ED7B60B84;
+	Tue, 13 Feb 2024 17:57:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="LpC68EKv"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="PEvAUkiq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D54FD6086C
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 17:55:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA8CF605CB
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 17:57:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707846925; cv=none; b=M3gLU+INfHF/AvA5wDUuXW5GfuNQPZc6FGLu2MgDG+61CJAtn9VwIm4GrIJhK0RfCGvZsZVa0q0uTPNSlVOe+C2QgLGyJa9IIaezGb7cYzri5lXjFSUbBxEKx2z62iEGik+zRJQhYCtwtZpVwTtUD0BEsfBh+4fvc2iiLjSA+vk=
+	t=1707847026; cv=none; b=FRiOXE5UlV93m5nuyq6B83NM/AQQuX7bWYZgj6Q41czG2XGIPleVUG9wBoWUwC5SpzMS/mQ9Kh84Ile9n5WJMAH52jhp4XAvF+qBKSm+id01cakLFx/eSA7+DzTkf6VZDgsftPEVIplUPEJQCIyoOAhSRQbnwg28IRHX88sYKn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707846925; c=relaxed/simple;
-	bh=9tA4PJNIdxfhRObvzKWYDSHnvWdGJLyxyrK7xpD4Q0Y=;
+	s=arc-20240116; t=1707847026; c=relaxed/simple;
+	bh=5S8T8V7DE2zdbZjbCxR1t2+r9jrp1nOpuzXvC06KeiI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QwazKNusL7rL4C9xphVaoFfJ8CZP1vD7YRUNwgVB2hjF/oN0rioICvoa4ATMNpNFwxXGkzYIL2QhbuuZy6vxpoVAxdneWZdrL5sUqpM4Ck+Rlt6Nb61WtRRIwwLAZujSWeZxeaKRNdpZitT4KlhHgAhI77qhkyCP34B5gpM+OnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=LpC68EKv; arc=none smtp.client-ip=209.85.210.46
+	 Content-Type:Content-Disposition:In-Reply-To; b=S4cLhsJ+QxS+57MKMGo+AUVkTPBZAMR0RMTf9+juie7E07JFx6TjkFMbqsUuuCHjKMeF67jHPMSA2G+8ATZeYvwdepDOTMz2QoxHno21iUKhmXFJyxgZ4myxNp+SGUbEFHPdQd+eUidaHwRjwHTstEO/Nmhgs8WL20XJOSXP9TA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=PEvAUkiq; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-6e2ed77e94dso890296a34.3
-        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 09:55:22 -0800 (PST)
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1d51ba18e1bso45411735ad.0
+        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 09:57:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1707846922; x=1708451722; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1707847024; x=1708451824; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gHH6DgRGJUK+K/3+G3CCr8FcJttt2bs3BQjcG1Lrj7I=;
-        b=LpC68EKvpNG3B+MXWAlZJkJSQSfOCnEgSQKbm1OLenEyOOi6uilOcCotZttGDqYIzo
-         XalLZCGsKa/vqu6pgUc7pFQ6V+qB0fXzf/iHnHVjdFGDNmuZQXLHDXId+yHhBrnmzygT
-         s1wdshr5pb+mDdfjc5tmcq9UDZu1534S2U3l0=
+        bh=NWUJEKGvkt1d8Oo4xr2/DShsZCrN4V06W6OJyQUPNW4=;
+        b=PEvAUkiq+3mzfAPZ74jMaNfWBj16l67+PUC3VsmreNvXYms9Va7fuLDQfBdHnv4RrR
+         rMSpXgeH2mr3E2j6UKQUmXFCAMBde367SPbBrpDbH2CFbIz0O9st/qN9zNXFWUF17Ssd
+         Tdxeie3tzCNgRtdgNjrmjUlRUr86qzrJPBUko=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707846922; x=1708451722;
+        d=1e100.net; s=20230601; t=1707847024; x=1708451824;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gHH6DgRGJUK+K/3+G3CCr8FcJttt2bs3BQjcG1Lrj7I=;
-        b=HEL7fka2NuvqRwvBnAaUxfAi3B8Hnw0KWlrQU6szldjD14fEIN7HARi0ONZH0yFrQ7
-         cGl462tICjxu3avhpuJiBj1+7Q4x5t7bcD8hZMmBiBlMhOW/UxKe0ewRziNBbmOWeiNJ
-         M8iFsprkhvz7RwSYoe3Ih/KUOzhFxcnYy73FpdkeyqLsApHAKeB0/0EPEWaGLzYBhlsU
-         9NE15DJReyYC9/FCvVyCLjyN12jLJyfRljvorefH1wg/bcZONwcC6Vi9qJqswl9pzWqi
-         d9CYVEv/oRmE/K8xNdlgOyYZr1kzTCWotiATvoCZyLFOTR36ptfv+ml/wOAgpVDF+cca
-         +sjA==
-X-Forwarded-Encrypted: i=1; AJvYcCWv1KVfnrXYhEixp8FtpeRpeFMtdXe2t6augU4c3RUk2WPpNotzUTjtSoeIAag0yh8w6FKOJNQQJ6mL0wvWjn59z8yVi4tQ
-X-Gm-Message-State: AOJu0YxW5e1cmxghR9uIoX0tH+Z2Wc/UkbWiU35i7Xp8jYiD3KUfczJE
-	0U10BeSPwPkqRk+h1iuYEYYDcLVeCYsa1cbyUmAztE8jxGrUp5PdoUgWzY9Bfg==
-X-Google-Smtp-Source: AGHT+IGYNxQGH8ux7gJ+l/xnGKzAZ18uVxeJixNqeVsBpC+UP5JSrjoZlL53WQFEfiii+ZAKwUM/sw==
-X-Received: by 2002:a05:6358:2811:b0:178:c51c:7af5 with SMTP id k17-20020a056358281100b00178c51c7af5mr12691366rwb.32.1707846921875;
-        Tue, 13 Feb 2024 09:55:21 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXWkmt3IPXDuEj0zOlfxz9ExS0oa+gkwlj43/jOtMEPQLoiRm1RxpOFHkrU67ii1euE+S+sAya0midSyK9CryTNj+Fv/cbP5L1TWpcqDVBPLNdtr97DrexutBhGU/EyIZp4C3YoIF3I5IyunsfhZaAJLovT5ei0/C2iR4xmNw==
+        bh=NWUJEKGvkt1d8Oo4xr2/DShsZCrN4V06W6OJyQUPNW4=;
+        b=o3SESMspF879HJLiQqQdNMbgzAy5OZYqUwe/DeBxWGW5ZsHdO+Q5ZQ63qSdUWHXCxc
+         CZyJlsbnC+C5ePdvwYW+Le1EvaAN1dcRqLGcl6EjIoHFoSlbeDaIq7SCwNolxmXZwspJ
+         l9QSvEFC2jWlcF8KUTetliBO3PpUZ/5UPK28J2a5dXJlUaLQKgzy09baJKzcxccLJFk+
+         Ia48cjQPSNrkpKQv0+Q1chJja710u8QaG5Gt3DBrFd/vCaWM0eB6SK7XU0gsQ6y7sxAh
+         AQw594uRqkdUKrJcjl+Apd918DU5mYePwRKArDD0pBcrG8DFt9060qs+iKTwv80sndjn
+         efdA==
+X-Forwarded-Encrypted: i=1; AJvYcCV8N7N9/aeybh6oOcpw0UIxPqYttvmPExV/nZeaykiqoUGU93LM2pzawmPBu0K1xPlHh+rzpBh66LwbBGBZA37Xo7kAwl0U
+X-Gm-Message-State: AOJu0YyYVl12ESr8RzyX4xowFuHVeUtchp/B1Udvm4A50cRKAMmv57k9
+	zE/5jq8MYHuQFTBTxb46gcrvB8iDMGr+s2s0SxdrW0Rcm1DF7G/i67desljefA==
+X-Google-Smtp-Source: AGHT+IHCmNopIbIorHA6sFJtdmV4BL2uLqMvrlhF23u+CGR+TuwKsSyn7Y1bX68Jw2tMYvY8XcpVzg==
+X-Received: by 2002:a17:903:2307:b0:1d9:dcd:c726 with SMTP id d7-20020a170903230700b001d90dcdc726mr335982plh.17.1707847024097;
+        Tue, 13 Feb 2024 09:57:04 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUuh8YxEWAzlZClNj6EBYXLJkXwmfSSc/Hpe3oiIDpYw8U4sp2liMIPLJvc5xQoRv5n2fnseI3BriDVPeq4+BBiT4FMqfiaTBO8aVf+DnKo7U7IEOdZ/WIC0ZVoUGoYfLynOCUem6qigqNngvPTLD2olppYHCBGCMmgtMYH7g==
 Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id j191-20020a638bc8000000b005cfbdf71baasm2693461pge.47.2024.02.13.09.55.21
+        by smtp.gmail.com with ESMTPSA id r22-20020a170902be1600b001d9773a1993sm2337673pls.213.2024.02.13.09.57.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Feb 2024 09:55:21 -0800 (PST)
-Date: Tue, 13 Feb 2024 09:55:20 -0800
+        Tue, 13 Feb 2024 09:57:03 -0800 (PST)
+Date: Tue, 13 Feb 2024 09:57:03 -0800
 From: Kees Cook <keescook@chromium.org>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: shuah@kernel.org, linux-kselftest@vger.kernel.org,
 	netdev@vger.kernel.org, jakub@cloudflare.com
-Subject: Re: [PATCH net-next 2/4] selftests: kselftest_harness: use KSFT_*
- exit codes
-Message-ID: <202402130955.8A2B2B1@keescook>
+Subject: Re: [PATCH net-next 3/4] selftests: kselftest_harness: support using
+ xfail
+Message-ID: <202402130956.E23884A5B@keescook>
 References: <20240213154416.422739-1-kuba@kernel.org>
- <20240213154416.422739-3-kuba@kernel.org>
+ <20240213154416.422739-4-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,15 +82,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240213154416.422739-3-kuba@kernel.org>
+In-Reply-To: <20240213154416.422739-4-kuba@kernel.org>
 
-On Tue, Feb 13, 2024 at 07:44:14AM -0800, Jakub Kicinski wrote:
-> Now that we no longer need low exit codes to communicate
-> assertion steps - use normal KSFT exit codes.
+On Tue, Feb 13, 2024 at 07:44:15AM -0800, Jakub Kicinski wrote:
+> Selftest summary includes XFAIL but there's no way to use
+> it from within the harness. Support it in a similar way to skip.
+> 
+> Currently tests report skip for things they expect to fail
+> e.g. when given combination of parameters is known to be unsupported.
+> This is confusing because in an ideal environment and fully featured
+> kernel no tests should be skipped.
 > 
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Yeah, good cleanup.
+This is great -- I've been wanting an XFAIL for a while for harness
+users but I didn't have the imagination to find a way to make it work.
+:)
 
 Acked-by: Kees Cook <keescook@chromium.org>
 
