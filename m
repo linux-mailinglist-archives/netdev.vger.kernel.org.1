@@ -1,58 +1,63 @@
-Return-Path: <netdev+bounces-71120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7865E852579
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 02:15:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0C88852583
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 02:16:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB45E1C2143B
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:15:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A50511F22296
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:16:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F0EE186A;
-	Tue, 13 Feb 2024 00:37:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E35879DF;
+	Tue, 13 Feb 2024 00:47:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cIHmZZfm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UrymaaAS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2914FB661
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 00:37:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3704414277;
+	Tue, 13 Feb 2024 00:47:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707784639; cv=none; b=FU4z+K+8K8yoeCLzFXNlWvmEn1Wq2+PXHbVNYQSYcsF9hFTkGqbGt1R5hfUa1at3UAJlrnM7OnV+YMuTvtzf/vVOADVM1t4F3OnFnN2Dt18DVIiaW6BH4O/e7Gs3BPA6ueZN+JsouKHbPWJU5KNBJUirgdcglWtXnMrTqIwdAm0=
+	t=1707785235; cv=none; b=Tm44Xoj9TnU0viyrKqBEiWC+9am9Ok0dVEVA7koQ/rJNmq61bc2JB6bNWLONRI2176MAmznN+r4QXhVcsUdO02AaMxJPfFpOtgkabc9e/U0HKF/Z2JxEETwt2BRl7ni5kklcGULZxxxbYkmyARilGl3r1rCn0A5+FUcSW07G3g8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707784639; c=relaxed/simple;
-	bh=pilzWz4l5aNY20vvQMytarjNrbfk3Dkm/eXnhujA4xE=;
+	s=arc-20240116; t=1707785235; c=relaxed/simple;
+	bh=SvBXqSXqx/IU2Uu/cVG0aL08ZmNuUmG+ampjAH8u2BE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=O39sI1QuRzAkg7gniBzb8RXm2uYpJOQayHY4nMmeOo4bPu66ijsX9fBauRToTx4Dykiw4I7FHrT2QfeTuBrreLWR7zpPkDF3Xk8FJuaM/YSYsvsXhYondXlXQZRnOcFqB/iW6PnC0P3f44JAYjSh+oruMB7lmILSPC4AvkyIJ44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cIHmZZfm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4ABB3C433C7;
-	Tue, 13 Feb 2024 00:37:18 +0000 (UTC)
+	 MIME-Version:Content-Type; b=LZ9cJ/rHuBzB6PthBR9bUh9Jx/AwHmyicBSWnE+TOWkoi0UjZE+mugEyIrnzR6IX241a/NAUvv6hwipMIQGWcmqrGY4w6nYQcrYmoFXbZKa4/1Pfw4xmomGwatXXUP3GdBNWRG7bIrKdDMO2WpGk3j9KMSv672rd8istQeWWhMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UrymaaAS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48378C433F1;
+	Tue, 13 Feb 2024 00:47:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707784638;
-	bh=pilzWz4l5aNY20vvQMytarjNrbfk3Dkm/eXnhujA4xE=;
+	s=k20201202; t=1707785234;
+	bh=SvBXqSXqx/IU2Uu/cVG0aL08ZmNuUmG+ampjAH8u2BE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cIHmZZfm1BwI1ZgjmdMe/UfWKBQ2fhAW76yPwCIF1t/Rdq4Tb0osZ3tPla1804xa6
-	 l3k4d/Hw7OOJwKt2ggxOMjjR+14yAgcYMesgjnqCSobX1fm9gSQ2BEVO8idxhCBq6M
-	 b/i6fUqrpMYwJIgijXP8Hhkfoeet/oNlfG3tcvSeI/0ZNst5YqWBLy2S3uS9j/rWZz
-	 GkgsWM3yPJJrTFFoQ2l+TaoJaqBz+HwRYJ/SkkrdXPwHtnt5vy5dHirIN5maEmJe43
-	 10a4plyG3z9o2zi38PXWArWZXM+s+QsFOrjb4HrcSd8RcwlilVqnyo4yNbWToQ/2hJ
-	 bJyMycQfpJ3Tw==
-Date: Mon, 12 Feb 2024 16:37:17 -0800
+	b=UrymaaAScNyBE/rX+yMWMZQtDF016sykuUMpBIgJFmeldtduekgY+PpoXXvep71Vr
+	 n34BVy0YPyBy2IuzNL/pg8lK7KiDhbPw4jHf+k1Kjt9p/rdQ5CSGPkhnTKlH27rr9r
+	 E/uecn6/N19jXLxxLzrRmi35ZQtSzM6TAXjANtpz8LR2g08fmAu+IBdIMvuTuifLjM
+	 UwVWsnWXa+Xbdwg8hIBTuKEHU1U+BBGSMQDuTmOmiIVA9xDX3Mc993BiTTzkOZByB8
+	 D2JOpEVzLbzXaPOjKPMN9613HmsGhrb/IOp6q7dEeXTpM1NM4pCxzewPhmg9WBKwq5
+	 vh8lAihme+N2w==
+Date: Mon, 12 Feb 2024 16:47:13 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: <davem@davemloft.net>, <pabeni@redhat.com>, <edumazet@google.com>,
- <netdev@vger.kernel.org>, Ivan Vecera <ivecera@redhat.com>, Simon Horman
- <horms@kernel.org>, "Rafal Romanowski" <rafal.romanowski@intel.com>
-Subject: Re: [PATCH net] i40e: Do not allow untrusted VF to remove
- administratively set MAC
-Message-ID: <20240212163717.14dc15f5@kernel.org>
-In-Reply-To: <18049617-7098-fee3-5457-7af2e267b0d0@intel.com>
-References: <20240208180335.1844996-1-anthony.l.nguyen@intel.com>
-	<18049617-7098-fee3-5457-7af2e267b0d0@intel.com>
+To: Subbaraya Sundeep Bhatta <sbhatta@marvell.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+ <edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>, Sunil
+ Kovvuri Goutham <sgoutham@marvell.com>, Linu Cherian
+ <lcherian@marvell.com>, Geethasowjanya Akula <gakula@marvell.com>,
+ Hariprasad Kelam <hkelam@marvell.com>, Naveen Mamindlapalli
+ <naveenm@marvell.com>, "horms@kernel.org" <horms@kernel.org>
+Subject: Re: [PATCH 1/2] octeontx2-af: Remove the PF_FUNC validation for NPC
+ transmit rules
+Message-ID: <20240212164713.1ebd7fef@kernel.org>
+In-Reply-To: <CO1PR18MB466623157B4EE9B2C04119E4A1492@CO1PR18MB4666.namprd18.prod.outlook.com>
+References: <1707676587-12711-1-git-send-email-sbhatta@marvell.com>
+	<CO1PR18MB466623157B4EE9B2C04119E4A1492@CO1PR18MB4666.namprd18.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,18 +67,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 12 Feb 2024 10:11:44 -0800 Tony Nguyen wrote:
-> > Currently when PF administratively sets VF's MAC address and the VF
-> > is put down (VF tries to delete all MACs) then the MAC is removed
-> > from MAC filters and primary VF MAC is zeroed.
-> > 
-> > Do not allow untrusted VF to remove primary MAC when it was set
-> > administratively by PF.  
-> 
-> This is currently marked as "Not Applicable" [1]. Are there changes to 
-> be done or, perhaps, it got mismarked? If the latter, I do have an i40e 
-> pull request to send so I could also bundle this with that if it's more 
-> convenient.
+On Sun, 11 Feb 2024 18:46:40 +0000 Subbaraya Sundeep Bhatta wrote:
+> Please ignore this patch. My bad this is single patch but sent as 1/2.
 
-I'm guessing mismarked.
+Thanks for the heads up, but please keep in mind that "obvious mistakes"
+are no excuse to ignore the 24h rule. 
+https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#tl-dr
+-- 
+pv-bot: 24h
 
