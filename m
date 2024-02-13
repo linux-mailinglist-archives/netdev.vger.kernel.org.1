@@ -1,115 +1,115 @@
-Return-Path: <netdev+bounces-71404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12C4F8532D2
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 15:18:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 420318532E8
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 15:21:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 464181C21957
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:18:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F16A5285E24
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:21:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37CC357336;
-	Tue, 13 Feb 2024 14:18:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18AD157868;
+	Tue, 13 Feb 2024 14:20:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AwJsMTSd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RIuUG1H5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF6056767;
-	Tue, 13 Feb 2024 14:18:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 069B556B6A
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 14:20:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707833898; cv=none; b=NGgHYKbcivtq3HEjnJckZBIPzp+WYtDlOCvtFxxQaqWpJydRpKwEqC6FKzmNJnm6eSm3NPW2MeIW7KDMpxq3gKztwCxxCsG73hhyGR6OJK/Cn868k50Byrb1rMm6BDbRxwD7wwUe5voziW57JDEiOtUxTGcwnl+tCRoh7bhjsF8=
+	t=1707834039; cv=none; b=Nx+WoMEija7wK5DMChAB/8/fuZrecbc8y9gzx+3+Uw3jRx50jhnhgWXcnmV3dh3zzYt8GxXfx8VN4Sb4C48n74mwm0oKuCPPOj0yrqnNWbKFN0gVFp1Yy/sWrruJkBafvqKIsAWjJbaY1Q9bmr8htFgd1I3poUnc2+JIk88OEWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707833898; c=relaxed/simple;
-	bh=1I+nakScsEDd+RcxVEQkaGNKg28+t0BKQ6XSa6ofqEg=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GxNRMXCN6Zr07rbNyw6vo64J2bio2msmgGjQDK0TMYqG7LI/QXFmXtEr6WHewpczMApH40I6jAel14w35NMn3TbuSiE7OJtvS63YeMyOzuFUJQIM8Q4n2/Zk/kjnQ2Yiyasug07q4ajmSXta+OUCy3g1/lajW5QhD24PtZ/IKMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AwJsMTSd; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3394b892691so2913453f8f.1;
-        Tue, 13 Feb 2024 06:18:15 -0800 (PST)
+	s=arc-20240116; t=1707834039; c=relaxed/simple;
+	bh=RsDazqaypNlM1vbQ7cw3xGL/WfYsa4pUy1w99TNFZ2I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=k4u/3JOn7fBZuFr3pFw5CO4DEdZ7qjWDA/3ZgVvujmHeykp6HdFTaVMawxvmlgOWtEGhw4kMGj3f/LaqJUXdL2YydzR2W0Koq39I8I3ZS0Zu7dsd6vAut5LVFzTn1YVA7s/k9p7nFg3a7dhP7ytS4RKufr4HUY6yxvAMyrUkQUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RIuUG1H5; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-56037115bb8so10298a12.0
+        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 06:20:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707833894; x=1708438694; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=4CwFixk8Sb3h3montNbLvFtH7zwP/nbPW/5Tg0FN3r8=;
-        b=AwJsMTSdk7cc0fUuqbptElygyedHcFsMO9+re79Z47e1tPKLQkBYwxWROvVYexbaZX
-         boQpKfGH6bupRZ7eAFH8f0dCSAoIHKJyOd7iMYp967t/QsgF+mXlIyxYdquAXuyWXAG2
-         vcRtL0gISF4xyej5Oc3lfy1qQmjggHlfS8NqxuQv8gVKKBqQrJwE/ghEDfQ/cUXgiMRa
-         i1IPFS3TqfVpfnn+sg76cecQdxcJ7KTFILtqTXma2RTbSWN/D2otx973KVUc3b8TS1TJ
-         otxgvUo/eIfzGTPwpUYoA+WWDSsnBbTy97+5gKX8RMxP4GjAhZ5LoTRM6BK1lHJlcfKR
-         20GA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707833894; x=1708438694;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1707834034; x=1708438834; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4CwFixk8Sb3h3montNbLvFtH7zwP/nbPW/5Tg0FN3r8=;
-        b=TSUxTa4993pIv75wL6+pKIru0g1tOBe4gGxgdB4yo+Qwui1dXvYpOJAvO0qm7KHjEm
-         cKqRMjmN/0KG8xl6hJT1J4oeiEvFSiTePYHeAUc5UBGC1SMQ1a+vcueJ4lvjz0utwVzh
-         dL5JdvoH9IVPxsQ/xJbyj972PiZ6aytuNzb8rzWiaFZ7KjamT12nyCa1Ae2w9nNJMYJW
-         iz7Ktdfc/QZmSuw2apQVxnEX6COaeCZqmekfS2CFLzCaPVXXAE8+iW/MLKeNC4eMhJwb
-         kK4tdjVJl+IDkOIwcl7PJb5B2VPJ63Nf4NBOVL3JnKB1aby1itSMCGeKtvaZBE/ZTj6E
-         rMPA==
-X-Forwarded-Encrypted: i=1; AJvYcCV69V8BikzsKNa5eblkt6sdGA6Il8RWk/aHpckrWQD6bxQR0ow47qxVv3I2ZdXNVhBuzU9UeOGnTY/2xaXoLIIzxgnnRc1Q7Aa7Bs37L8jvApDG+gF39ue+bK1fgZZqtEuTYH+p
-X-Gm-Message-State: AOJu0Yw/gEIn6X4uj+FxJz0IctPCDk/YyXEgwpwMR/ylhf4pwrY61892
-	3L9wkNTjymYDUN3y/5YNmm6xXMERsym3vMeiT6Tc3GOEEOwAsT+w
-X-Google-Smtp-Source: AGHT+IGbbm/CdV4aQ1hb87rKh17eWI7Kjy9aeM8iV3Gr2KLbguQCG1Vwwf01JIm0ZrVJIY2efu81Ng==
-X-Received: by 2002:a5d:4d09:0:b0:33b:6cf0:e33f with SMTP id z9-20020a5d4d09000000b0033b6cf0e33fmr2836120wrt.7.1707833893791;
-        Tue, 13 Feb 2024 06:18:13 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVrpfBk6Lfp2totQRT4XdY5gT+JaV2XNx555fuMg5W+MiP60nNR15gumsR6x4pOYvE2vT3QyaFeWsQklbi0CZMPms6Vg6rJdztgvtNuBLoiEwMi11e3ihmNkF8NPyYFYxmwUR/G5UUhxw+YP903ppeTJWilTfL7BRnW7xSeAwgJjFbPxr5o/VPAyAu5bZmr0OBSQDkqGGUAWsj9+pYiqJ2KfOsh1qOdbChrrJYlWqrR5iaY/cLwK8HtLBolXwUrURDHivPS+HtrpxJ5kZDWSMH7N5eYsPfkHFFAIez/lqpSouj/KoiWXOjAukGUyCdHwCk8TyaQsCtlUWm9
-Received: from Ansuel-XPS. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id y8-20020a5d4708000000b0033b507b0abdsm9642834wrq.32.2024.02.13.06.18.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Feb 2024 06:18:13 -0800 (PST)
-Message-ID: <65cb7a25.5d0a0220.de7b7.a1f3@mx.google.com>
-X-Google-Original-Message-ID: <Zct6IWLbp0mfDLUa@Ansuel-XPS.>
-Date: Tue, 13 Feb 2024 15:18:09 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Robert Marko <robimarko@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH] net: phy: aquantia: add AQR111 and AQR111B0 PHY
- ID
-References: <20240213133558.1836-1-ansuelsmth@gmail.com>
- <233cd45b-28d5-477d-a193-8273684953aa@lunn.ch>
+        bh=RsDazqaypNlM1vbQ7cw3xGL/WfYsa4pUy1w99TNFZ2I=;
+        b=RIuUG1H5oE8wClZQYjXgC5QowMpV94A9JYsmYWN4kWNFmmSRS28nOe1MKuJtAJoLbu
+         KLwjMXGjFt03xf7ZjwhZ3m5STpFGxXyHd0NedFvvscNU6ZEYHy0mIM4IKINKdZdbv9aU
+         i0CFSVxIuJZy48pXTWjR4rYe5EgNmjaRWdsTIZz1A66LOTPLcF+iN9b3XFzRffTEYL4G
+         9D+nqrQdRGwVi0NGQHdMblFw70SW69GqQMAP1KOPNGrg4BWMKWBtY3i95v4+6ITCjoz/
+         0OAO79W8+IhPjgg3AdyuP80Hl3Ucn+9tMxG+10BIyuHKhzEYZGujCdxo8t6LIE7R76Po
+         xFGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707834034; x=1708438834;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RsDazqaypNlM1vbQ7cw3xGL/WfYsa4pUy1w99TNFZ2I=;
+        b=MoeiNDezvVX5hMqwNmDzKvf9zo+r3oUAuJNExL2KDz/NeXBtYBOR/uSs3NbJPx+Vk9
+         wri9oAm1b86jj/kxVaNao+WSdLwi9ay/+BhBisoLWlh9xWLfTFmVH69SK6zW69fz+EYj
+         UBhu2AGjuMHYockMuOar2z3WBoAfJHC+ar1/IFsjjUtssdqC7tERLsOggPlpE6kviksM
+         Kq7n6iut0VuyORqI6uBBJ9mkGiDq0AgzmRMRjjjyIbq8Qp0QoezhcPNeHLxguJJhKEZ7
+         I+6QNCMCXZLTZeXRDN56qeUJCFVXqw0STvFqyvPyzDMt3RDWWSoMYnjUDF3Gx/Phd2Gy
+         gH4w==
+X-Gm-Message-State: AOJu0YyBrqIh9h/vd9xiTrnIYyuhpbjAV+XSeOCEysrIRtcryopnR03d
+	pODCjWuCSkKUAg4ftNsow9f5oxZVf/247FsyuhnhNPN0vi84bNVwdpaTH0fCZKiQph+IbLN1np4
+	g0iM2PdhTR5QwBaUwydnhndt+YQm57fM450pt
+X-Google-Smtp-Source: AGHT+IGd+fHnXdZUXuiTRh127548kPjpMRwL2YEVwt0Re+4ygmfQI1BFZaK4QzH6+ESAtIZvj26zk+SNJE7JoFUXV7c=
+X-Received: by 2002:a50:a414:0:b0:560:4895:6f38 with SMTP id
+ u20-20020a50a414000000b0056048956f38mr118965edb.1.1707834033864; Tue, 13 Feb
+ 2024 06:20:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <233cd45b-28d5-477d-a193-8273684953aa@lunn.ch>
+References: <20240210125054.71391-1-remi@remlab.net> <9c03284dedb5559de0b99fde04bc3e19b5027d6f.camel@redhat.com>
+ <B523FFF3-4D2E-4295-9D0F-374FF3359DF1@remlab.net>
+In-Reply-To: <B523FFF3-4D2E-4295-9D0F-374FF3359DF1@remlab.net>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 13 Feb 2024 15:20:19 +0100
+Message-ID: <CANn89i+g1mJK1E_DkVfugt5VVOsHvhivngmUMGW9apNZtF+eVA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] phonet: take correct lock to peek at the RX queue
+To: =?UTF-8?Q?R=C3=A9mi_Denis=2DCourmont?= <remi@remlab.net>
+Cc: Paolo Abeni <pabeni@redhat.com>, courmisch@gmail.com, davem@davemloft.net, 
+	kuba@kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 13, 2024 at 03:09:57PM +0100, Andrew Lunn wrote:
-> On Tue, Feb 13, 2024 at 02:35:51PM +0100, Christian Marangi wrote:
-> > Add Aquantia AQR111 and AQR111B0 PHY ID. These PHY advertise 10G speed
-> > but actually supports up to 5G speed, hence some manual fixup is needed.
-> 
-> Any chance this is a "golden screwdriver" situation? The chip really
-> can do 10G, but the firmware is supposed to limit it to 5G? This is
-> just a firmware "bug"?
+On Tue, Feb 13, 2024 at 1:55=E2=80=AFPM R=C3=A9mi Denis-Courmont <remi@reml=
+ab.net> wrote:
 >
+> Hi,
+>
+> Le 13 f=C3=A9vrier 2024 14:12:57 GMT+02:00, Paolo Abeni <pabeni@redhat.co=
+m> a =C3=A9crit :
+> >On Sat, 2024-02-10 at 14:50 +0200, R=C3=A9mi Denis-Courmont wrote:
+> >> From: R=C3=A9mi Denis-Courmont <courmisch@gmail.com>
+> >>
+> >> Reported-by: Luosili <rootlab@huawei.com>
+> >> Signed-off-by: R=C3=A9mi Denis-Courmont <courmisch@gmail.com>
+> >
+> >Looks good, but you need to add a non empty commit message.
+>
+> With all due respect, the headline is self-explanatory in my opinion. You=
+ can't compare this with the more involved second patch. Also the second pa=
+tch was *not* reported by Huawei Rootlab, but inferred by me and thus has n=
+o existing documentation - unlike this one.
+>
+> As for the bug ID, I don't know it (security list didn't pass it on to me=
+). Anyhow it seems that Eric Dumazet already either found it or filled it i=
+n, so I don't know what else you're asking for.
 
-From [1] the PHY can support up to 5G so yes it is a firmware bug. I can
-try searching for some regs to fix the wrong provision values if really
-needed.
+I do not think patchwork is able to add the "Fixes: " tag that I 'added'
 
-[1] https://www.marvell.com/content/dam/marvell/en/public-collateral/transceivers/marvell-phys-transceivers-aqrate-gen3-product-brief-2019-09.pdf
+And yes, I missed that the changelog was empty.
 
--- 
-	Ansuel
+Some words would be nice, even if the patch looks obvious to few of us.
 
