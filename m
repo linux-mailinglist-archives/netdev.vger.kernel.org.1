@@ -1,135 +1,263 @@
-Return-Path: <netdev+bounces-71459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5050A85355E
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 16:56:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3300E85356A
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 16:57:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8EF31F21612
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 15:56:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02C86B25811
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 15:57:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E68E5F476;
-	Tue, 13 Feb 2024 15:56:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C55D5F560;
+	Tue, 13 Feb 2024 15:57:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A7Yp4wZg"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="SsIPWU6J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 630E25FB9F;
-	Tue, 13 Feb 2024 15:56:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0DF5F54F;
+	Tue, 13 Feb 2024 15:57:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707839773; cv=none; b=AIc39+BfXPiiaLKsE04r41WSd6cmC1+PLOMbiJKFaqPc8S4eN+x9DSXBYdlzWq53mzppVC+kdj55N3KKNklO9VsK6B5HmC7fFRjsK6DGSN1gEDPDXLOsLBTqVi+Tqiph0sMM1SZ/1Pd+aFftfV0FhUGjHjIKdNOnd7XKTb9LUuE=
+	t=1707839847; cv=none; b=gOEqrOyrMUgF5IqMPbj2yWM2irr8hpcAn0Xt8q8HOUozxbnKgdr+WSmKHmKH4vUi9oKwu65XTwXgEXm9mB5DzNgcBEr7IJMwLWMscBr6JT+cN7YhvYXKCftULOPkl5LZpkme7HxSV6zcb9juawQ3zg6Rky/7IF+yONz9/jP/9RY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707839773; c=relaxed/simple;
-	bh=uL1C1DrPiTp18kKPAC/wiagnbgzzO+VcDLIioE0B69M=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gWO6E00eIxwbbYIk5r3U1xBdwGcRlMDdvI46jPJ41+lfZR81+aUWyutO3rPbWK56wsMXGjCL/JHFzXCB8g/D34wFCbAKc3UsQ69bNRgFHrSteQm+anOE6NSo7FwLKZJzcsAQf6tNDqfWCe/aqQB+t1EwikcfhBWEzHMckhrJf18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A7Yp4wZg; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2d107900457so12025381fa.1;
-        Tue, 13 Feb 2024 07:56:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707839769; x=1708444569; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ts7g4FdQ8KFT7BBMWJWC8kqPZD0iQK0XaVo73DXEYZk=;
-        b=A7Yp4wZgc9sKddneg7gC2wDEvbRWHZAbnbQhHzF92aBL3u1QwXTq8o1THkiSOOwtap
-         uyUM0IeLixk2T6jrMmcTqd53m/RNid05CDgZL2lBFYEggBAAikkHDX00GqCW23wJ7lrp
-         Iv7G6KGOy/ZCAXw+rO52FjCNjIE95gt39xbnTcjR/Kb3TfFe1QPMgOrKX3u9PxvwwxPC
-         y7BGHfBeniVCJq5GFP8AJJd6yaMCeoVIJkdpVMGFvposeE+ygn+a+zqLe0q+Ebzduluy
-         q3ONnBTjfS9KsqsjUW0kncGMMKQeaQnoYoliXLzjJEoRyfatEX2nGAUVEG6NKmxPSgFy
-         DE6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707839769; x=1708444569;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ts7g4FdQ8KFT7BBMWJWC8kqPZD0iQK0XaVo73DXEYZk=;
-        b=Qng9gbe8gi6FkomP44YAZlFCQNKJgUsR2BdIe2T3hhxkyOiS1zwdFeEpbRZvckSZpt
-         CpRl7kLAHesPIYmtzS4IOFyTxKBiHFCCcKRdUKcWrq6IqQk4NtDQiU+Rwh+o72/vLt3a
-         2JS87+OqC/VORfgo84SnyGVwzD+i3uEhmd30c7dMzUudg1f2mXq+XPhoLEQMsmLWXF3V
-         l+FWYed3R/ZZ8yZeXdSn+IVQDjq1sWdI6tjRthu8fwqI6azk4w091oREuYa/1tHvS9we
-         GJDEdxSBafU3sHyvXMwYkTvJBU+iZiBrHiM6y7/zkVn9B3osq2pC9Z3a/6FQWsWCXXM5
-         SZyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUwyU71VhIICk0N/U/ZMmNoz+Fa7Oc9c0hNt4qGB134nub+oVtJCgB5zcbRFy8LNoUXMvi0NuiUmeA9DycH/0rC342eaQ6MJCyCVdgBuRDOTEGBwoM7nMohA9g36d3JZN7Mz3Qn
-X-Gm-Message-State: AOJu0YxxszIRU7lmHMj7eQEPVKtE9r81nz5CiZltWO9P+pBSMkXlelB7
-	wTIVdUnQICiIdWIiRtCbaPrfU3tdCpvi4XGtN4pxaB/q7Hj4wKAF
-X-Google-Smtp-Source: AGHT+IGJ9s6tMtOjh+oGmHPpVkNbrMW3NsMxeKrk/tUAmXPMIAoLJ4l0wWELtTXsMNQWdvuSG7aFSw==
-X-Received: by 2002:a2e:b750:0:b0:2d0:bc40:2aa1 with SMTP id k16-20020a2eb750000000b002d0bc402aa1mr60517ljo.10.1707839769045;
-        Tue, 13 Feb 2024 07:56:09 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCX19csgBjvK5yA4KjZ1xdHBJYK+zmGRpQ3Zjp2A+W5c1CxRVZ1VugkJvkYm63GFoAAnrDx0jF8Sva0+Yf9/v/B3CWmTjivV1SyXqnU5RsaNKYxVq/bn4OVSFD2ezTjG7Bp8AIb19erKd7gxBu20C4LYdaNS4Wn3CTJ96D7FmhVZ0QM+8u9u38CRQ1xDo//Q0yoqwUTtP1F++SUGgaUwJIGM7G8dJZk+YYHp+uAqfMmQx+qdYbS7I+TfZmP5SXzo3Ogu43OhH3epFwH0pWqOY7ojKPNeoNXICNVpYgfq+nMr+kRc/Bo0R7Ea9mSXOdqMbNJan1HnBxuR/jCC
-Received: from Ansuel-XPS. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id l13-20020a056000022d00b0033b1b1da2adsm9910836wrz.99.2024.02.13.07.56.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Feb 2024 07:56:08 -0800 (PST)
-Message-ID: <65cb9118.050a0220.8421f.c47a@mx.google.com>
-X-Google-Original-Message-ID: <ZcuRFG5I-tsgbUJU@Ansuel-XPS.>
-Date: Tue, 13 Feb 2024 16:56:04 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Robert Marko <robimarko@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH] net: phy: aquantia: add AQR111 and AQR111B0 PHY
- ID
-References: <20240213133558.1836-1-ansuelsmth@gmail.com>
- <233cd45b-28d5-477d-a193-8273684953aa@lunn.ch>
- <65cb7a25.5d0a0220.de7b7.a1f3@mx.google.com>
- <a10c3b55-c6c3-4982-b294-d6e5b9383e31@lunn.ch>
- <65cb87a3.5d0a0220.69795.6a1d@mx.google.com>
- <12f27e82-6981-4a13-bdc0-77054bf964e9@lunn.ch>
+	s=arc-20240116; t=1707839847; c=relaxed/simple;
+	bh=L5HFUuCbgdypUHaFrX7NoMN/dywBS26HbXH/mWMDEAE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ovkInI81FjbDeNd5RJ6igGDJDDb5rZKBYSYxccUjzT20BuqT/vYh66FJDvtBo1ERM0P8wFdz/qMv89DRNt84o3RgqxfjpGkkIvMo1KM6cL85r0cqwVGqeBJqQHiTIOI/ft3KIC8WWYP42ojpeg1+r+pruqGlCr6e0jdr5PFFdrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=SsIPWU6J; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 840E2E000F;
+	Tue, 13 Feb 2024 15:57:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1707839836;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xLKrcUWgSnxDEmML8cy4ZQrlK1+oKtedl7yJAvMVDT8=;
+	b=SsIPWU6Jqssq5dl7/9GfrkUzaqLNd6eF8iA+CPIlTZScJjDBNxoIrN7AI9CwOm9WNbmkNv
+	NqkPZbN7Ch1SsE29IVokl/WydXoJC1DmUcN5yKwJZyT/GQtH5xDQZiWFX7lH3NgBCnO+BM
+	1oj5LuzMHiTrzHlvWnzLnU2l+Uz8Q1TgLx53qTxmOkNtgCeQggPu1xmYIACmUVVNansOM9
+	Bmq4ffcmc0z/v3xRCkOqx/zmqA1LKiZ8AqfNLj1dshh5OJLZuQZ6ttLScMHPScZWP6kny2
+	d6xT8s7ApSVVPxb2SS4jJo/L9khL/YSpjF+/VBYHGLGhxwQ1CR6wBq/Rp45K2A==
+Date: Tue, 13 Feb 2024 16:57:12 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Richard Cochran
+ <richardcochran@gmail.com>, <UNGLinuxDriver@microchip.com>,
+ <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <thomas.petazzoni@bootlin.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+Subject: Re: [PATCH net-next 2/3] net: lan966x: Allow using PCH extension
+ for PTP
+Message-ID: <20240213165712.27e0443a@device-28.home>
+In-Reply-To: <20240213103156.rl4kzwpmxn3haz7y@DEN-DL-M31836.microchip.com>
+References: <20240212173307.1124120-1-maxime.chevallier@bootlin.com>
+	<20240212173307.1124120-3-maxime.chevallier@bootlin.com>
+	<20240213103156.rl4kzwpmxn3haz7y@DEN-DL-M31836.microchip.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <12f27e82-6981-4a13-bdc0-77054bf964e9@lunn.ch>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Tue, Feb 13, 2024 at 04:46:47PM +0100, Andrew Lunn wrote:
-> > With the amount of things we are noticing on these PHY it can be
-> > anything from Marvell itself, from OEM messing up with the Provision to
-> > a buf in the FW itself...
+Hello Horatiu,
+
+On Tue, 13 Feb 2024 11:31:56 +0100
+Horatiu Vultur <horatiu.vultur@microchip.com> wrote:
+
+> The 02/12/2024 18:33, Maxime Chevallier wrote:
+> > [Some people who received this message don't often get email from maxime.chevallier@bootlin.com. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]  
 > 
-> Ideally, we want to get Marvell to release one universal firmware for
-> each PHY. Get the OEM out of the picture. This is something i said to
-> then Aquantia years ago, that provisioning is going to make driver
-> support a real problem. Seems like i predicted it correctly :-(
->
+> Hi Maxime,
+> 
+> I have tried your patches on pcb8291, which is a lan966x without PHYs
+> that support timestamping. And on this platform this patch breaks up the
+> things. Because it should just do the timestamping the MAC in that case,
+> but with this patch it doesn't get any time.
+> The same issue can be reproduced on pcb8280 and then disable PHY
+> timestamping, or change the lan8814 not to support HW timestamping.
+> 
+> Please see bellow the reason why.
 
-I can totally see them answer to this request with:
-OEM should just attach a SPI to the PHY if major modification are
-needed, making us (Marvell) releasing an universal firmware irrelevant
-since it should be handled internally by the Aquantia PHY.
+You are entirely correct and I apparently messed-up my series as these
+changes were implemented locally and somehow lost in the rebase. Indeed
+this codes doesn't work at all... I'll resend that, thanks a lot for
+the test and sorry !
 
-Reality is that on Router or more Consumer devices where OEM try to cut
-cost everywhere, FW are getting placed on NAND partition or even part of
-the OEM FW and then userspace tools are used to setup and load the
-Aquantia PHY FW.
+> 
+> > 
+> > +/* Enable or disable PCH timestamp transmission. This uses the USGMII PCH
+> > + * extensions to transmit the timestamps in the frame preamble.
+> > + */
+> > +static void lan966x_ptp_pch_configure(struct lan966x_port *port, bool *enable)
+> > +{
+> > +       struct phy_device *phydev = port->dev->phydev;
+> > +       int ret;
+> > +
+> > +       if (!phydev)
+> > +               *enable = false;
+> > +
+> > +       if (*enable) {
+> > +               /* If we cannot enable inband PCH mode, we fallback to classic
+> > +                * timestamping
+> > +                */
+> > +               if (phy_inband_ext_available(phydev, PHY_INBAND_EXT_PCH_TIMESTAMP)) {
+> > +                       ret = phy_inband_ext_enable(phydev, PHY_INBAND_EXT_PCH_TIMESTAMP);
+> > +                       if (ret)
+> > +                               *enable = false;
+> > +               } else {
+> > +                       *enable = false;
+> > +               }
+> > +       } else {
+> > +               phy_inband_ext_disable(phydev, PHY_INBAND_EXT_PCH_TIMESTAMP);
+> > +       }
+> > +
+> > +       lan_rmw(SYS_PCH_CFG_PCH_SUB_PORT_ID_SET(port->chip_port % 4) |
+> > +               SYS_PCH_CFG_PCH_TX_MODE_SET(*enable) |
+> > +               SYS_PCH_CFG_PCH_RX_MODE_SET(*enable),
+> > +               SYS_PCH_CFG_PCH_SUB_PORT_ID |
+> > +               SYS_PCH_CFG_PCH_TX_MODE |
+> > +               SYS_PCH_CFG_PCH_RX_MODE,
+> > +               port->lan966x, SYS_PCH_CFG(port->chip_port));
+> > +}
+> > +
+> >  int lan966x_ptp_hwtstamp_set(struct lan966x_port *port,
+> >                              struct kernel_hwtstamp_config *cfg,
+> >                              struct netlink_ext_ack *extack)
+> >  {
+> >         struct lan966x *lan966x = port->lan966x;
+> > +       bool timestamp_in_pch = false;
+> >         struct lan966x_phc *phc;
+> > 
+> >         switch (cfg->tx_type) {
+> > @@ -303,10 +339,18 @@ int lan966x_ptp_hwtstamp_set(struct lan966x_port *port,
+> >                 return -ERANGE;
+> >         }
+> > 
+> > +       if (cfg->source == HWTSTAMP_SOURCE_PHYLIB &&
+> > +           cfg->tx_type == HWTSTAMP_TX_ON &&
+> > +           port->config.portmode == PHY_INTERFACE_MODE_QUSGMII)
+> > +               timestamp_in_pch = true;
+> > +
+> > +       lan966x_ptp_pch_configure(port, &timestamp_in_pch);
+> > +
+> >         /* Commit back the result & save it */
+> >         mutex_lock(&lan966x->ptp_lock);
+> >         phc = &lan966x->phc[LAN966X_PHC_PORT];
+> >         phc->hwtstamp_config = *cfg;
+> > +       phc->pch = timestamp_in_pch;  
+> 
+> Here we figure out if pch is enabled or not. If the cfg->source is not
+> PHYLIB or the interface is not QUSGMII then timestamp_in_pch will stay
+> false.
+> 
+> >         mutex_unlock(&lan966x->ptp_lock);
+> > 
+> >         return 0;
+> > @@ -397,6 +441,7 @@ int lan966x_ptp_txtstamp_request(struct lan966x_port *port,
+> >         LAN966X_SKB_CB(skb)->jiffies = jiffies;
+> > 
+> >         lan966x->ptp_skbs++;
+> > +  
+> 
+> I think this is just a small style change. So maybe it shouldn't be in
+> here.
+> 
+> >         port->ts_id++;
+> >         if (port->ts_id == LAN966X_MAX_PTP_ID)
+> >                 port->ts_id = 0;
+> > @@ -500,6 +545,27 @@ irqreturn_t lan966x_ptp_irq_handler(int irq, void *args)
+> >                 /* Read RX timestamping to get the ID */
+> >                 id = lan_rd(lan966x, PTP_TWOSTEP_STAMP);
+> > 
+> > +               /* If PCH is enabled, there is a "feature" that also the MAC
+> > +                * will generate an interrupt for transmitted frames. This
+> > +                * interrupt should be ignored, so clear the allocated resources
+> > +                * and try to get the next timestamp. Maybe should clean the
+> > +                * resources on the TX side?
+> > +                */
+> > +               if (phy_inband_ext_enabled(port->dev->phydev,
+> > +                                          PHY_INBAND_EXT_PCH_TIMESTAMP)) {
+> > +                       spin_lock(&lan966x->ptp_ts_id_lock);
+> > +                       lan966x->ptp_skbs--;
+> > +                       spin_unlock(&lan966x->ptp_ts_id_lock);
+> > +
+> > +                       dev_kfree_skb_any(skb_match);
+> > +
+> > +                       lan_rmw(PTP_TWOSTEP_CTRL_NXT_SET(1),
+> > +                               PTP_TWOSTEP_CTRL_NXT,
+> > +                               lan966x, PTP_TWOSTEP_CTRL);
+> > +
+> > +                       continue;
+> > +               }
+> > +
+> >                 spin_lock_irqsave(&port->tx_skbs.lock, flags);
+> >                 skb_queue_walk_safe(&port->tx_skbs, skb, skb_tmp) {
+> >                         if (LAN966X_SKB_CB(skb)->ts_id != id)
+> > @@ -1088,19 +1154,27 @@ void lan966x_ptp_rxtstamp(struct lan966x *lan966x, struct sk_buff *skb,
+> >         struct timespec64 ts;
+> >         u64 full_ts_in_ns;
+> > 
+> > +       phc = &lan966x->phc[LAN966X_PHC_PORT];
+> > +
+> >         if (!lan966x->ptp ||
+> > -           !lan966x->ports[src_port]->ptp_rx_cmd)
+> > +           !lan966x->ports[src_port]->ptp_rx_cmd ||
+> > +           !phc->pch)  
+> 
+> And here because phc->pch is false, it would just return.
+> Meaning that it would never be able to get the time.
+> I presume that this check should not be modified.
 
-This cause the side effect of OEM building one Aquantia PHY FW and then
-fixing the Provision data at runtime making all the idea of Marvell to
-include these configuration values in the FW broken. (example OEM build
-one Aquantia PHY FW for all kind of PHY ID and then apply specific
-fixup to setup 10base-r or uxsgmii based on what is actually present on
-the board on the MAC side) (yes the PHY can support both and there is a
-way to tweak this... this is actually required on AQR112 and other
-version that we currently don't support, ideally it should be handled by
-the FW internally but reality is that we have case where the FW
-provision one mode and the other is actually present in the system)
+Dammit you are right and I had these modifications locally, but
+apparently I messed my rebase and lost that... 
 
--- 
-	Ansuel
+> 
+> >                 return;
+> > 
+> > -       phc = &lan966x->phc[LAN966X_PHC_PORT];
+> > -       lan966x_ptp_gettime64(&phc->info, &ts);
+> > -
+> > -       /* Drop the sub-ns precision */
+> > -       timestamp = timestamp >> 2;
+> > -       if (ts.tv_nsec < timestamp)
+> > -               ts.tv_sec--;
+> > -       ts.tv_nsec = timestamp;
+> > -       full_ts_in_ns = ktime_set(ts.tv_sec, ts.tv_nsec);
+> > +       if (phc->pch) {
+> > +               /* Drop the sub-ns precision */
+> > +               timestamp = timestamp >> 2;
+> > +               full_ts_in_ns = lower_32_bits(timestamp);
+> > +       } else {
+> > +               lan966x_ptp_gettime64(&phc->info, &ts);
+> > +
+> > +               /* Drop the sub-ns precision */
+> > +               timestamp = timestamp >> 2;
+> > +               if (ts.tv_nsec < timestamp)
+> > +                       ts.tv_sec--;
+> > +               ts.tv_nsec = timestamp;
+> > +               full_ts_in_ns = ktime_set(ts.tv_sec, ts.tv_nsec);
+> > +       }  
+>  
+> 
+
+
+Thanks for the review and analysis Horatiu, and sorry for this hiccup !
+
+Maxime
 
