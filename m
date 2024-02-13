@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-71129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D34BE8526D7
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 02:45:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D005E8526D8
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 02:45:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 113361C236AA
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:45:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C36F2850F7
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:45:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45A257A71F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F24F97A72D;
 	Tue, 13 Feb 2024 01:06:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lyx3EYFO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h8Ly2ete"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D2CF79DD9
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 01:06:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1BA7A705;
+	Tue, 13 Feb 2024 01:06:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.88
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707786368; cv=none; b=JwaFzDg4NtHFoJhw+oGAhKib16YQxLSZAAng51uoPft5wl2UUHm+rOx2ygjCrkcmGtPFB4fshaZR45f7v+YtdikNdnRjNrFg4ecPHoNj7wZCW2TW7cTqMOOy8PZGEJh3cGYhb+peqQi8qwbeyb58xd+YzFZJFExd8cFVwnsT1UM=
+	t=1707786368; cv=none; b=nsb2AuvEzvKGp5jXbxLQT0mTh9utAwQknuJetxKhV3ikbwl+JiuzX8KEwoe3UaZoHqVZp1FvrcDRsLqwQK6fjwdivp8ESGXCcPy8Ai9kz6vc/aG6QogAaAZhFrhL1dS+rd+tWVT1jmO7koFKUPPIvGK5gVp/lhVgm3z/myVdxJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707786368; c=relaxed/simple;
-	bh=QDV0x4hPyNKEPQU4r1OpQikVnBw7+qXDB41a8z+oNDc=;
+	bh=rpCO9f0Omg51h9cA+beqHpVMS/hZzt/qJ2gHgn/cQvo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DjR1W4cnQldyORDaEvPLd5Y6unRePhfTXD3Sf63Rj3INWamiLEzMOEhwOLmGWCaQXfMo3W+vhggjmNPomr9q+fQKvorNewPSHKjFPyZ6HHqAD8buUW2qKsGpPmNVloN4Ycs9liy48FfSGpQUUUlsyYOzKNyxtIGcc+MTtnutG4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lyx3EYFO; arc=none smtp.client-ip=192.55.52.88
+	 MIME-Version; b=GbIqj6STaBpJFntMO/s4ba1s70FiMDkMD29Ct/FK8HTPyGjNO8oooxKQVbnpvCPqH2+g2QqtzKnbtRHiQ+ElQz+rmqTOgeOVXcRwv0dmF5W61OZOm3Rvp6PHIezXfbaayG338B/3vIzd0JiDdocZVr+vSj/Z0pJcmLCT6DE+yZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h8Ly2ete; arc=none smtp.client-ip=192.55.52.88
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707786366; x=1739322366;
+  t=1707786367; x=1739322367;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=QDV0x4hPyNKEPQU4r1OpQikVnBw7+qXDB41a8z+oNDc=;
-  b=lyx3EYFOe81dRa6mRpB1SeoBi184KgWIty5+KQmE/2abQAUbo9YqQvOr
-   yKVSq/NQS0d6W9dHOzU1Vaoe90d1T2vkp3jfphksQYacLAncHnwqF8u82
-   7Txztm5i7epq9Ah+TF+j4YE/X1bZ2XW11GFxBKO2LawpN8yc2L21AS6ph
-   Hxe0V0krPgLFXoQS3B+p60MqclBkpWnidrmu1oN7N7d1Sv2fkXJTBUIOf
-   3Z/DBmvVAcJ+GvYPxg2iAjIghNxuPrkg0SzpDmP56QZBCU49QWwczxwXj
-   uaaZGxz0i8hDH4hO6cretMVZCt2C0GYhdni69GUM3guPP+ABYuo9XI1wg
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="436927663"
+  bh=rpCO9f0Omg51h9cA+beqHpVMS/hZzt/qJ2gHgn/cQvo=;
+  b=h8Ly2eteSJGtHueOos/faaOcs0AGryy6hhIV1IkUGD9Wmz1C+bd9eQiP
+   abM3prEWkaSPiJ0lCKOzKiOJUZvtgUp4biYCKJD27auLC+F6WUueQB95Y
+   TWzjcsRqbbJVdmbz9cp5Qrs9/xu95d8+mbkhj2PiB0u1o4uVLVFAt8Tqp
+   IsBnjZYDWd/0x+VI8U3oOyy2KA0+SXu8oBZsJDAWsCFxSHx9qVqX0gIZL
+   e+M41vyt+R3JmxPQrci1XhcBO1hoM2ccLpBl+Vds577o1kJD9KUJXUMQl
+   yank0wro82uqmAenG7iDmuH+nuX8uzyPL+SwQRP2bzWzCR+N3yFY5NdEy
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="436927664"
 X-IronPort-AV: E=Sophos;i="6.06,155,1705392000"; 
-   d="scan'208";a="436927663"
+   d="scan'208";a="436927664"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 17:05:43 -0800
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 17:05:44 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="911651338"
+X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="911651342"
 X-IronPort-AV: E=Sophos;i="6.06,155,1705392000"; 
-   d="scan'208";a="911651338"
+   d="scan'208";a="911651342"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by fmsmga002.fm.intel.com with ESMTP; 12 Feb 2024 17:05:43 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -63,12 +63,19 @@ To: davem@davemloft.net,
 	netdev@vger.kernel.org
 Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
 	anthony.l.nguyen@intel.com,
+	magnus.karlsson@intel.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	bpf@vger.kernel.org,
+	Seth Forshee <sforshee@kernel.org>,
 	Simon Horman <horms@kernel.org>,
 	Ivan Vecera <ivecera@redhat.com>,
 	Chandan Kumar Rout <chandanx.rout@intel.com>
-Subject: [PATCH net 3/4] i40e: avoid double calling i40e_pf_rxq_wait()
-Date: Mon, 12 Feb 2024 17:05:38 -0800
-Message-ID: <20240213010540.1085039-4-anthony.l.nguyen@intel.com>
+Subject: [PATCH net 4/4] i40e: take into account XDP Tx queues when stopping rings
+Date: Mon, 12 Feb 2024 17:05:39 -0800
+Message-ID: <20240213010540.1085039-5-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20240213010540.1085039-1-anthony.l.nguyen@intel.com>
 References: <20240213010540.1085039-1-anthony.l.nguyen@intel.com>
@@ -82,63 +89,63 @@ Content-Transfer-Encoding: 8bit
 
 From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 
-Currently, when interface is being brought down and
-i40e_vsi_stop_rings() is called, i40e_pf_rxq_wait() is called two times,
-which is wrong. To showcase this scenario, simplified call stack looks
-as follows:
+Seth reported that on his side XDP traffic can not survive a round of
+down/up against i40e interface. Dmesg output was telling us that we were
+not able to disable the very first XDP ring. That was due to the fact
+that in i40e_vsi_stop_rings() in a pre-work that is done before calling
+i40e_vsi_wait_queues_disabled(), XDP Tx queues were not taken into the
+account.
 
-i40e_vsi_stop_rings()
-	i40e_control wait rx_q()
-		i40e_control_rx_q()
-		i40e_pf_rxq_wait()
-	i40e_vsi_wait_queues_disabled()
-		i40e_pf_rxq_wait()  // redundant call
+To fix this, let us distinguish between Rx and Tx queue boundaries and
+take into the account XDP queues for Tx side.
 
-To fix this, let us s/i40e_control_wait_rx_q/i40e_control_rx_q within
-i40e_vsi_stop_rings().
-
+Reported-by: Seth Forshee <sforshee@kernel.org>
+Closes: https://lore.kernel.org/netdev/ZbkE7Ep1N1Ou17sA@do-x1extreme/
 Fixes: 65662a8dcdd0 ("i40e: Fix logic of disabling queues")
+Tested-by: Seth Forshee <sforshee@kernel.org>
 Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 Reviewed-by: Ivan Vecera <ivecera@redhat.com>
 Tested-by: Chandan Kumar Rout <chandanx.rout@intel.com> (A Contingent Worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/i40e/i40e_main.c | 12 +++---------
- 1 file changed, 3 insertions(+), 9 deletions(-)
+ drivers/net/ethernet/intel/i40e/i40e_main.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 7a416e923b36..06078c4d54e8 100644
+index 06078c4d54e8..54eb55464e31 100644
 --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
 +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -4926,7 +4926,7 @@ int i40e_vsi_start_rings(struct i40e_vsi *vsi)
+@@ -4926,21 +4926,23 @@ int i40e_vsi_start_rings(struct i40e_vsi *vsi)
  void i40e_vsi_stop_rings(struct i40e_vsi *vsi)
  {
  	struct i40e_pf *pf = vsi->back;
--	int pf_q, err, q_end;
-+	int pf_q, q_end;
+-	int pf_q, q_end;
++	u32 pf_q, tx_q_end, rx_q_end;
  
  	/* When port TX is suspended, don't wait */
  	if (test_bit(__I40E_PORT_SUSPENDED, vsi->back->state))
-@@ -4936,16 +4936,10 @@ void i40e_vsi_stop_rings(struct i40e_vsi *vsi)
- 	for (pf_q = vsi->base_queue; pf_q < q_end; pf_q++)
- 		i40e_pre_tx_queue_cfg(&pf->hw, (u32)pf_q, false);
+ 		return i40e_vsi_stop_rings_no_wait(vsi);
  
--	for (pf_q = vsi->base_queue; pf_q < q_end; pf_q++) {
--		err = i40e_control_wait_rx_q(pf, pf_q, false);
--		if (err)
--			dev_info(&pf->pdev->dev,
--				 "VSI seid %d Rx ring %d disable timeout\n",
--				 vsi->seid, pf_q);
--	}
-+	for (pf_q = vsi->base_queue; pf_q < q_end; pf_q++)
-+		i40e_control_rx_q(pf, pf_q, false);
+-	q_end = vsi->base_queue + vsi->num_queue_pairs;
+-	for (pf_q = vsi->base_queue; pf_q < q_end; pf_q++)
+-		i40e_pre_tx_queue_cfg(&pf->hw, (u32)pf_q, false);
++	tx_q_end = vsi->base_queue +
++		vsi->alloc_queue_pairs * (i40e_enabled_xdp_vsi(vsi) ? 2 : 1);
++	for (pf_q = vsi->base_queue; pf_q < tx_q_end; pf_q++)
++		i40e_pre_tx_queue_cfg(&pf->hw, pf_q, false);
+ 
+-	for (pf_q = vsi->base_queue; pf_q < q_end; pf_q++)
++	rx_q_end = vsi->base_queue + vsi->num_queue_pairs;
++	for (pf_q = vsi->base_queue; pf_q < rx_q_end; pf_q++)
+ 		i40e_control_rx_q(pf, pf_q, false);
  
  	msleep(I40E_DISABLE_TX_GAP_MSEC);
--	pf_q = vsi->base_queue;
- 	for (pf_q = vsi->base_queue; pf_q < q_end; pf_q++)
+-	for (pf_q = vsi->base_queue; pf_q < q_end; pf_q++)
++	for (pf_q = vsi->base_queue; pf_q < tx_q_end; pf_q++)
  		wr32(&pf->hw, I40E_QTX_ENA(pf_q), 0);
  
+ 	i40e_vsi_wait_queues_disabled(vsi);
 -- 
 2.41.0
 
