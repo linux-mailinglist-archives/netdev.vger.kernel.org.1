@@ -1,86 +1,89 @@
-Return-Path: <netdev+bounces-71580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF86A85405F
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 00:52:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5298F854093
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 01:00:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 894CE1F2A968
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 23:52:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CAA928C193
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 00:00:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E016633E0;
-	Tue, 13 Feb 2024 23:52:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51C9E63407;
+	Tue, 13 Feb 2024 23:59:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IEAGqcCb"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="see6h/R4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77BC16313A;
-	Tue, 13 Feb 2024 23:52:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24F076340C
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 23:59:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707868353; cv=none; b=RZhXWWatORf9gF7jUC0sjHrtGQ9DYtA50nUHY4qGyUenPdl7LJAvevF4CRCueC9+ER6vby4VSLdBtonsIamtqxAroOl9ePPm+ibbojR3Z4uVV1nw9LC9Pjs1oD0miNKmXazi9ZeVHlY+/k4mx+qpWhxyQjKXoRt7+GEPne2XvM0=
+	t=1707868775; cv=none; b=Q8g8yUVDGvIAytds/O68U13yZ2bdTpFgLxlNXugJp6iSIpQicQ5EO+rEYQEwQ8ePYt1nH7xDTgZvtwIY1IPB+mqMPNW25XE3Pmu4P2jdi8z5yd8kFbLi01Lfmvhk6pFhNLP9IfQiy4o7RvN6otaSUenrFhICHgBVVW6/gwY/kJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707868353; c=relaxed/simple;
-	bh=f9SkOanpk9cjbIEF9cgwCrbTjfeHhRN/JwWknwHbfoE=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=GsUdm8F1ijrYSxIjwX+gCOZ2fg/usfOSZYY20PEpavuP032E5vLz02QSB4sOYL4MlG2oov2wZcJwgRqXyMFlAUDOZwlTgEhr+cyVTRhnrVekCmd06GTW4khxjsQXA9HTWCuYj0kunAmREQGmk95CH11vf9lTke7EOb9dtbVZwCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IEAGqcCb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBB0DC433C7;
-	Tue, 13 Feb 2024 23:52:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707868353;
-	bh=f9SkOanpk9cjbIEF9cgwCrbTjfeHhRN/JwWknwHbfoE=;
-	h=Date:From:To:Cc:Subject:From;
-	b=IEAGqcCbe1uaHY/rXDR9LgRIEQRRtw7GKf0pWvhaMTddMNAlvTvmGtStrydIW5Mwu
-	 hHhC3qrnvfO8DMlwFB8GeoL1V03Rwu2OhjqdKzJ00IKRin7tgsvJKN6Dnds8/pETNn
-	 MbxtGrNtUmDlAXuoTu4LQGXCpF1nvi6YjlMNYecbmpLYathVoY9mXFPIFTXxQAHUBR
-	 qUokDMyzFfwd6MAmxsZG8gXVPyx02FjqGlcle+qcjRGsxuAMZYkMCMeYdYTH05OBMF
-	 ZZV4kv7I3/gddTjxbfhVjJkG5iaZ+Do61hDn7XnDYhqaYw9+LDUILFIGGlhCRNoGlE
-	 VLMvQFc7XpVPA==
-Date: Tue, 13 Feb 2024 17:52:31 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: "Wang, Qingshun" <qingshun.wang@linux.intel.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org
-Subject: ixgbe probe failure on Proxmox 8
-Message-ID: <20240213235231.GA1235066@bhelgaas>
+	s=arc-20240116; t=1707868775; c=relaxed/simple;
+	bh=fIHnT72RmFnCRVtHzUu1cU53ELE9zjXta/gN1RCqbuU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YKAPiKtZBi7G4vWaI9JNX9FL18BEpjw+WJHns28Veek01ad/oVOsJRt7UYgwe0O8cRVKh+Jl2CovMfU7+eXajdFiPLUfxNkNl9ua1CJgdrWswqeqxneAHxvUCA8loohlg4yHd/5oGsy+mi8cdu/9QTffJ3G4Zk/zh+QSYkldgjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=see6h/R4; arc=none smtp.client-ip=95.215.58.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <88f94f9b-450a-430a-bb1b-d7a9cc91ed23@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1707868771;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HE8wixMfvF9gR+MTIy9zbR8cItQUovLobuTz81UtOWw=;
+	b=see6h/R4n9/SEkbXMtyHoEsPKwQPhyHKLdSDcA/8QUUUe5sfViX1jZqTdY/3syhgbCR38J
+	OVRz2AUk2Zb0MVqI989x5gyWKKAFAO8DcZlCEno5KSJ65rGNlIOX23k7VZapggFHfH/xuH
+	B8uczkNf1MTPAaqB9eq6wf5h3W1TJpU=
+Date: Tue, 13 Feb 2024 15:59:22 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Subject: Re: [PATCH iproute2 v7 2/3] ss: pretty-print BPF socket-local storage
+Content-Language: en-US
+To: Quentin Deslandes <qde@naccy.de>, netdev@vger.kernel.org
+Cc: David Ahern <dsahern@gmail.com>, Martin KaFai Lau
+ <martin.lau@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>,
+ kernel-team@meta.com, Matthieu Baerts <matttbe@kernel.org>
+References: <20240212154331.19460-1-qde@naccy.de>
+ <20240212154331.19460-3-qde@naccy.de>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20240212154331.19460-3-qde@naccy.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Just a heads-up about an ixgbe probe failure seen with Proxmox 8.  I
-suspect this is a PCI core problem, probably not an ixgbe problem.
+On 2/12/24 7:43 AM, Quentin Deslandes wrote:
+> ss is able to print the map ID(s) for which a given socket has BPF
+> socket-local storage defined (using --bpf-maps or --bpf-map-id=). However,
+> the actual content of the map remains hidden.
+> 
+> This change aims to pretty-print the socket-local storage content following
+> the socket details, similar to what `bpftool map dump` would do. The exact
+> output format is inspired by drgn, while the BTF data processing is similar
+> to bpftool's.
+> 
+> ss will use libbpf's btf_dump__dump_type_data() to ease pretty-printing
+> of binary data. This requires out_bpf_sk_storage_print_fn() as a print
+> callback function used by btf_dump__dump_type_data(). vout() is also
+> introduced, which is similar to out() but accepts a va_list as
+> parameter.
+> 
+> ss' output remains unchanged unless --bpf-maps or --bpf-map-id= is used,
+> in which case each socket containing BPF local storage will be followed by
+> the content of the storage before the next socket's info is displayed.
 
-The ixgbe device logs an Advisory Non-Fatal Error and it seems like
-subsequent reads from the device return ~0:
+Acked-by: Martin KaFai Lau <martin.lau@kernel.org>
 
-  pcieport 0000:00:03.1: AER: Corrected error received: 0000:05:00.0
-  pci 0000:05:00.0: PCIe Bus Error: severity=Corrected, type=Transaction Layer, (Receiver ID)
-  pci 0000:05:00.0:   device [8086:1563] error status/mask=00002000/00000000
-  pci 0000:05:00.0:    [13] NonFatalErr
-
-  ixgbe 0000:05:00.0: enabling device (0000 -> 0002)
-  ixgbe 0000:05:00.0: Adapter removed
-
-The user report is at
-https://forum.proxmox.com/threads/proxmox-8-kernel-6-2-16-4-pve-ixgbe-driver-fails-to-load-due-to-pci-device-probing-failure.131203/post-633851. 
-
-I opened a bugzilla with complete dmesg log at
-https://bugzilla.kernel.org/show_bug.cgi?id=218491 with some
-speculation about what might have caused this, e.g., an ACS
-configuration error or something.  It's lame, I know, so this is just
-a shot in the dark.
-
-Bjorn
 
