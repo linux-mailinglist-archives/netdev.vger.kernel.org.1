@@ -1,72 +1,64 @@
-Return-Path: <netdev+bounces-71371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB19D8531D2
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:26:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AED58531D7
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:27:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A3DE28C973
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:26:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2AEECB24B0D
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:27:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E6A255C1B;
-	Tue, 13 Feb 2024 13:26:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1797555C19;
+	Tue, 13 Feb 2024 13:27:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="OpSulyfP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47B0B55794;
-	Tue, 13 Feb 2024 13:26:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7C5B200A9;
+	Tue, 13 Feb 2024 13:27:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707830774; cv=none; b=UL47pi05/OTwDEAneaaFi0wIgQZ/YJfNzbZStYa8+9o/Wa8atZ/RxufIEexhyzLF0SrSvhrCDaA/I1jje+g8snEBD5paAJst0yuFGpDx4ZrcUQd17giZwIkz9b5iQxHqnxHqK88FD8XIWOZ79hL3TRQ6I60LjSMKJoOkCCaVdxg=
+	t=1707830854; cv=none; b=tsR3/QQC3Gv08gIujkcdbRzE7j/POGgrb6joN3AWyRDYZdWvmWGF02JCUWF8cDJGtlDKK84vqlKjwo6r2LhJjFdBPshHm34gB4tlb0YV+tJ4rFY95ScPGhzzicAKBdM9E/RJvOnryiPY1T8iUkevPkip2ZFSdKZk4L8eRhOiLQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707830774; c=relaxed/simple;
-	bh=IMVwaUMIKgLbPZtYISG0lVDxsC9q5IHxqt3EbgePkN8=;
+	s=arc-20240116; t=1707830854; c=relaxed/simple;
+	bh=GVfwibTK2AcJ+JgDKTu6n0xOvxOoa1ffq21TFqsOxls=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GEesNIl5ii0biBkC3QQ4UonYq99LXvdQrnxMN+EyCRzyCXnJ2npRzzQ6bcyEsfG7Xw8vhBxxZ6sdOC88cFqUG7exe9tcbg+jFsE8qgqs9mLepsr4KME1F34XakTeZ0ADIYkVqr2taD561zQcgLtX7545nq/Ifolg4PDfSaWqxyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a2d7e2e7fe0so753929866b.1;
-        Tue, 13 Feb 2024 05:26:12 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707830770; x=1708435570;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aSWwrZ/GJcDdaONc7v+8jDSkrPt6bx1El6Fj3mB8kz8=;
-        b=dCf6WT1+T0tayAURl6c6H7uBetpxIw1iZb6RBjwHqyI44SpuZ8ac6dTQ943E8EBdKu
-         jpJDga5kJ5tYly/fujhbaGNeWXafa8MBlhXD+wM+9GrQgyqDdi9qV7KJPASZMH9CxirI
-         H/C4r7BwG2uQt5NzVsKfAmMyaKowpfrQ0kiZLM0GDViJtgrD/DkK6gdcwlO9yPUVqaFy
-         0wx8Ht6EZIycS0IygMUo5SA70v+v+YGh16xvaSXw0uBX3xrHMkNeTT3uIL+5BSnMZeWb
-         2Cgs4lNC6/UCLy/OCDB0JzNZ+yqK6d38286eGyQ6GJ80ZUFCgkpmRXvQx20DJCsCznmU
-         RZbg==
-X-Forwarded-Encrypted: i=1; AJvYcCUCcqngJq83T25Ekta9lj7z8avlRmRRewl1i8BoZrQbU2/94Vf3kYQLrNzY168jtSFlYRG4dtT2LzmbISxk5Np/d87cVZ/ezdIWzu0dDhuWweadqFKDjE0mc4wNeVSDynrYdUax
-X-Gm-Message-State: AOJu0Yxe7mhhkr3nrV1X4LLJxyF/GohQhzoJKfGwgnFGftBwG8YdJohj
-	3l5BW3q2us0m4qWBqo1305d/q/NYW6KfTOk8w9gHcik+/+gWEV8U
-X-Google-Smtp-Source: AGHT+IEhaCD72Kvg5eKMGqZBOIOG+pGQD2NizQ654e+yDwFTNOXFnygIBSBb/SwLw0XzCPTOBWRTjg==
-X-Received: by 2002:a17:906:f0d3:b0:a3c:8de7:3add with SMTP id dk19-20020a170906f0d300b00a3c8de73addmr1942016ejb.7.1707830770221;
-        Tue, 13 Feb 2024 05:26:10 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCX/pXam7dF5FDnLt+I4eAlfZhyMxRQWXbe24qBP1rAwnGBKFNkvO+UnstcqyFg9rVAmV8MEHuOI+4NBuR/EjFn+oX5L2gT0ceoBynKCKPsbpb4sKwWz7G7DQxW5AoNj7OS7fZpy5VZJE0LrJpfnaGlGOc86f65sfZ+QQxNpreMWDvuh+b15JLUXDmMiaIMXUL48ci1/obTwiyS6erqgqfdoEt1mCrMSC6oM8kecU3fchVlWXAzOIE3lkXmV3KNox2WAlaAR7e/La5Guvoo46zaV1T/SeACueUgT1TFf/bMbEw==
-Received: from gmail.com (fwdproxy-lla-119.fbsv.net. [2a03:2880:30ff:77::face:b00c])
-        by smtp.gmail.com with ESMTPSA id tb20-20020a1709078b9400b00a3cf436af4fsm824277ejc.3.2024.02.13.05.26.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Feb 2024 05:26:09 -0800 (PST)
-Date: Tue, 13 Feb 2024 05:26:07 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
-	edumazet@google.com, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, horms@kernel.org
-Subject: Re: [PATCH net 6/7] net: fill in MODULE_DESCRIPTION()s for
- mdio_devres
-Message-ID: <Zctt74KR4lZ8CeV0@gmail.com>
-References: <20240213112122.404045-1-leitao@debian.org>
- <20240213112122.404045-7-leitao@debian.org>
- <045f7cdb-7f99-4182-8c75-097be8a5a7d0@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pq3oJYNgsPepTVq9HbRv5atA1vatHoAJ8+aqLlq7olcbe5tC0it3Nt++crhARNnatFP9SOxlKg7WsSPyfTEs8kwurfPC9j1yGNtnNPFTOno13XMPLuNuwXezvDzDExxSsmMSlYv5xAHH8nkL7GRKqF74uEOY2mjxZ0ypmSL7CoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=OpSulyfP; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=9oaXODuupT5BC/MIB3MV43QgTWz6N6vq/Qj6YnkKRmE=; b=OpSulyfPq9UjTf6N3SEC812nKs
+	H0BUtTMy8+Acorj3pLGzP+l0Fk4VdjCfyXCtc04BJj07sBSyLsl2IeT46hElXqZKRI1pplcZcw9xq
+	fP55U4jGTOguMX+QfzWEehPe7PFcaUHmehzqdZeJx+wJ450sE25HMSJmrQVbZ7KQzhmQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rZsou-007gGZ-Uu; Tue, 13 Feb 2024 14:27:32 +0100
+Date: Tue, 13 Feb 2024 14:27:32 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Robert Marko <robimarko@gmail.com>, andersson@kernel.org,
+	konrad.dybcio@linaro.org, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux-arm-msm@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: phy: qca807x: move interface mode check to
+ .config_init_once
+Message-ID: <4210645b-4e03-4147-aa03-6fa55786f690@lunn.ch>
+References: <20240212115043.1725918-1-robimarko@gmail.com>
+ <c97d10fa-39c5-4e5e-93ce-1610635cb4d4@lunn.ch>
+ <CAOX2RU6OwiymM_O_62VETgkBNUQP1TuOKJmm0D1ZUXBA7ZPJNA@mail.gmail.com>
+ <7c5dd47c-26b9-4a12-af93-6139ae85e864@lunn.ch>
+ <CAOX2RU79o_5KRJZUJKA_++rrFXn66oLU0jOVHZnA1wHf2kA7RA@mail.gmail.com>
+ <65cb6864.5d0a0220.9cdaa.2449@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,31 +67,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <045f7cdb-7f99-4182-8c75-097be8a5a7d0@lunn.ch>
+In-Reply-To: <65cb6864.5d0a0220.9cdaa.2449@mx.google.com>
 
-On Tue, Feb 13, 2024 at 02:19:39PM +0100, Andrew Lunn wrote:
-> On Tue, Feb 13, 2024 at 03:21:21AM -0800, Breno Leitao wrote:
-> > W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
-> > Add descriptions to the PHY MDIO helpers.
-> > 
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > ---
-> >  drivers/net/phy/mdio_devres.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/drivers/net/phy/mdio_devres.c b/drivers/net/phy/mdio_devres.c
-> > index 69b829e6ab35..8921fa22bdbd 100644
-> > --- a/drivers/net/phy/mdio_devres.c
-> > +++ b/drivers/net/phy/mdio_devres.c
-> > @@ -131,4 +131,5 @@ int __devm_of_mdiobus_register(struct device *dev, struct mii_bus *mdio,
-> >  EXPORT_SYMBOL(__devm_of_mdiobus_register);
-> >  #endif /* CONFIG_OF_MDIO */
-> >  
-> > +MODULE_DESCRIPTION("Network PHY MDIO devres helpers");
+> > Yes, that is correct and when SFP is plugged in it will be reconfigured
+> > by the driver into combo mode as that port can actually be used for fiber and
+> > copper at the same time by changing the priority.
+> >
 > 
-> "Network MDIO bus devres helpers"
+> Hi Andrew, just to make sure this doesn't get confused.
 > 
-> There is nothing PHY related in here, its all mdio bus.
+> There is a HW limitation here and it's described in Documentation:
+> 
+> - In QSGMII mode the SFP Cage can't be connected or mounted physically
+>   as in this mode only 5 copper port can be connected, it would go
+>   against the HW design of the chip. In this configuration the first 4
+>   port are qsgmii and the 5th port is sgmii. (we enforce qsgmii on all
+>   ports out of simplicity to make sure we have a sane configuration in
+>   DT)
+> 
+> - In PSGMII mode the 5th port is always a combo port that can either be
+>   a copper port or a fiber port (with SFP cage). To set the 5th port to
+>   fiber mode, the mode has to be switched but the other 4 port are
+>   always copper.
+>   Also it's ok to set the initial PSGMII mode to 5 copper port as it
+>   will be changed as soon as a SFP cage is connected. (can't happen to
+>   have a device with both a copper port and a SFP cage connected to the
+>   5th port, it's one or the other. Again it would go against the HW
+>   design.
+> 
+> Hope it's clear now why the check was introduced and the HW limitation
+> of it as with the previous message one might think the 5th port is
+> totally separated and can go to his own mode (PSGMII or QSGMII)
 
-Thanks. I will update!
+Thanks for the explanation
+
+I'm more used to it being like:
+
+&eth2 {
+        /* ethernet@34000 */
+        bm,pool-long = <3>;
+        bm,pool-short = <1>;
+        buffer-manager = <&bm>;
+        managed = "in-band-status";
+        phys = <&comphy5 1>;
+        phy-mode = "sgmii";
+        sfp = <&sfp0>;
+        status = "okay";
+};
+
+Here phy-mode is set to one of the modes the SFP will use, either
+sgmii or 1000baseX. But i don't think it matters what value is used.
+
+      Andrew
 
