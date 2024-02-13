@@ -1,98 +1,105 @@
-Return-Path: <netdev+bounces-71156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 121ED8527B4
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 04:19:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 872548527B5
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 04:19:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7DC61F2325E
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 03:19:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25ADB1F235F8
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 03:19:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63875A92E;
-	Tue, 13 Feb 2024 03:17:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18311AD53;
+	Tue, 13 Feb 2024 03:18:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dw3CQuHz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UqFlV27b"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF6B812E48
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 03:17:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 893BAB647;
+	Tue, 13 Feb 2024 03:18:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707794273; cv=none; b=EtHgO+RKGDuBds/UvQIN4R+/EjkXKVpoPTmz6HXCCxuVKyEY/pqfuBpIw0BjKZpLawmyUfcYLXGmV5eH5KJbM/qYuyG1EX5ewdwWcQHJGBhoZqPGHSY5vbPRxLFtPfifHxUv7s33hQfPn7D1tmV44RxoGV5ojV80+oTtCAjsYTc=
+	t=1707794290; cv=none; b=ARTnbuQRc6+hKfGI+TCm/yMm/H+V/kQpA2M7NTO+whKj1XcBDS5cNBqID2e6UVkQNhd85idBk+lN59lBHIkmLqAADg/yxDmp+HjDriIU231Spg+9y5OUlxYputzBzeYXg0wsqkoO0GLKKcUEAyKofn+kj9I3Ci0bWJaB5VgwIz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707794273; c=relaxed/simple;
-	bh=7QnbyZv639A7+qtsKxlPKa2Tv7exBq//jqAxjNG5mMc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VBCZJwRehLH/3rnii7ESxcLpL1MHwZrsMIZzG4OEN6oPOFLCJHlnhxSqMcFoHRlKKJG/r6fnLUNVbCLfktWSURFP5hBqj+FSBn667x15Grb7Ibv93ioKB5Wzct2AZ6ywP9Bm7AP/C6vy+dor9BOJqP0ghU1aI6Ajap5sMaWRc1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dw3CQuHz; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707794270;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=sWJRAqDENff6rxpAFGcRw8+X7K0Hop6D3F2FzfpiRoo=;
-	b=dw3CQuHziPuS3cYgdQv6DIskumgCIEI2Fc0aZ8NVQki6EdPvpdJRi5ayfpbWCmnNI4hr85
-	mdCuaBpYQSO6TC/B6ZcsrJQI1USsfWfUVhhq1lUpqM0eWCsvQir/pmqQfHfWvjR1II++AM
-	yf2y786astyRf7aG9pXuoLOL/TPkoZM=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-26-r6pCNxRROpqPsvC2sqzx-w-1; Mon,
- 12 Feb 2024 22:17:47 -0500
-X-MC-Unique: r6pCNxRROpqPsvC2sqzx-w-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1A057383CCE3;
-	Tue, 13 Feb 2024 03:17:47 +0000 (UTC)
-Received: from fedora-x1.redhat.com (unknown [10.22.33.232])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id A15051C060AF;
-	Tue, 13 Feb 2024 03:17:46 +0000 (UTC)
-From: Kamal Heib <kheib@redhat.com>
-To: netdev@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: Shay Agroskin <shayagr@amazon.com>,
-	David Arinzon <darinzon@amazon.com>,
-	Kamal Heib <kheib@redhat.com>
-Subject: [PATCH net-next] net: ena: Remove redundant assignment
-Date: Mon, 12 Feb 2024 22:17:18 -0500
-Message-ID: <20240213031718.2270350-1-kheib@redhat.com>
+	s=arc-20240116; t=1707794290; c=relaxed/simple;
+	bh=fP0PaPIcWn8pLdYBqnWeRtv2zxUoAB49A4nEIgjq7R4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GWlv6tl3VQ+sdYdJYJMobw+CNy8CyV1llt4Y01w4vXfn4qKumE8ONYg1xPdUNeCX47MTp8mMF1AHNc6nvDlL3p6ZerPpYD64kNq/LWsH2tDCTMbsW17lH3Ovu5vchJjV2aKqXGFnl3r3tyY7OaJOdy6z5U7xtbQWvPH01+/c9F0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UqFlV27b; arc=none smtp.client-ip=209.85.210.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-6ddca59e336so2156011a34.0;
+        Mon, 12 Feb 2024 19:18:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707794287; x=1708399087; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=buWiuQLtEG0HusXViotHeqASAJmkJh5K8Fj/0Hr7F7E=;
+        b=UqFlV27bbwwFLi+6Phu0z0iq8hsuWMAn21ctkl+tuFuUPf6meBDHxwIVjItXPFKIVQ
+         4slIH/kgEq9kvIxcdnzm5nwJuJ47X0qcVNDbnCKrFiS1ToNEh0eyAJzjwzpk6QZFKL+f
+         ys7WgM5/8dGdKomDb+noOZOap7+F2kvXTlbnwoCgYBq64x08th/5+33XzVILdJfUmvp+
+         d/uiszOAFMGPcUpA3AXjs5wUMLtkMPyX0IVwDCu8A47VVAnJaOheHlm/IoJdEHukQBms
+         5tUD0ZdwBqdyz6QpmpmwgR6WUfSZalz/UipnA4FpZbm3iljSH7iCnhtZNM7uo+51a2vh
+         wqQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707794287; x=1708399087;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=buWiuQLtEG0HusXViotHeqASAJmkJh5K8Fj/0Hr7F7E=;
+        b=gjEurq28AoDcPbtpaDe29bJ0L5NCf8qdnQomNnHn+lhWF4bBojU4bLMZVKq6AYCHsO
+         YFOYYwOpGw0O0gZW8P79r4mik/MIo0VkxEM8JSmXjnXev11tDuonEuEYsmEVivsafUtL
+         GsItjynenWsS85VWh/5UzFVwZDuyskgCPrPQ+/XM9uFTrDW2Ikr7xU2NSzMgMVDnPdAB
+         V4xmIRG/go7qTCwqqkue0XxjRq5+fz2ccvIG8bsbkRHRjaWKCM0HYm7Eq5fVX2YX2jqx
+         8RxVCjJjoLzYFEws1BGLBvpN0k+meRd+pC1F4FuyUH+Dwrf56PYjmG65PsRLIKvKwOe0
+         oQEg==
+X-Forwarded-Encrypted: i=1; AJvYcCUmmkALdSdOnTGEst3q2QGlhhe7fPe3uRbRgvQCblcY5yqIRdqjscpR6olNKRZ7Gepl5snanNcrNnFuX+E17+n2fAASUANSTTv9dVuR1ZZMidEoqwBouoQAx7tlpPLKJ1kJ/n67
+X-Gm-Message-State: AOJu0YzdE7u4STQ26EAZob+M3cqMGavEEtjyi/EUxC9JyYru2LG+0Bf1
+	EtYd+DLOjiuW9EE2FHF8gwjQ2QP0aXyl4ZmKF69hchsoMSA4zzaYdvX/LNVa2FeJBI+Svi0j8WO
+	sxfKO6WFxMEWBu2jb7GlPIHD9Yao=
+X-Google-Smtp-Source: AGHT+IFsDCKIZ/Mghgl62IGADaTeYUyjJq1JBce3qr399uzR/EZBz9gmmVRMmPf+GgDbZZVP5nRV6vGMfv3k+Qg7pYA=
+X-Received: by 2002:a9d:6185:0:b0:6e2:e35b:549a with SMTP id
+ g5-20020a9d6185000000b006e2e35b549amr516005otk.8.1707794287613; Mon, 12 Feb
+ 2024 19:18:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+References: <20240208221802.131087-1-jmaxwell37@gmail.com> <135d4123-29f5-46dd-b06e-d5a66bd7f598@lunn.ch>
+In-Reply-To: <135d4123-29f5-46dd-b06e-d5a66bd7f598@lunn.ch>
+From: Jonathan Maxwell <jmaxwell37@gmail.com>
+Date: Tue, 13 Feb 2024 14:17:31 +1100
+Message-ID: <CAGHK07BT5z+iEGMG+vdBAi24B5UwE7nTh1ZfrbM5u092jEPAJg@mail.gmail.com>
+Subject: Re: [net-next v2] intel: make module parameters readable in sys filesystem
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-There is no point in initializing an ndo to NULL, therefor the
-assignment is redundant and can be removed.
+On Sat, Feb 10, 2024 at 4:19=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Fri, Feb 09, 2024 at 09:18:02AM +1100, Jon Maxwell wrote:
+> > v2: Remove the "debug" module parameter as per Andrew Lunns suggestion.
+> >     It's not really needed as ethtool msglvl can control that.
+>
+> It is normal to places comments like the above under the ---. In its
+> current place, it will be part of the commit message. Under the --- it
+> gets dropped when the patch is applied.
+>
 
-Signed-off-by: Kamal Heib <kheib@redhat.com>
----
- drivers/net/ethernet/amazon/ena/ena_netdev.c | 1 -
- 1 file changed, 1 deletion(-)
+Thanks Andrew I will resubmit tomorrow with that change.
 
-diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-index 1c0a7828d397..88d7e785e10f 100644
---- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
-+++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-@@ -2867,7 +2867,6 @@ static const struct net_device_ops ena_netdev_ops = {
- 	.ndo_get_stats64	= ena_get_stats64,
- 	.ndo_tx_timeout		= ena_tx_timeout,
- 	.ndo_change_mtu		= ena_change_mtu,
--	.ndo_set_mac_address	= NULL,
- 	.ndo_validate_addr	= eth_validate_addr,
- 	.ndo_bpf		= ena_xdp,
- 	.ndo_xdp_xmit		= ena_xdp_xmit,
--- 
-2.43.0
-
+>     Andrew
+>
+> ---
+> pw-bot: cr
 
