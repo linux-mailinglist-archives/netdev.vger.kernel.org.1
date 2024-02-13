@@ -1,287 +1,199 @@
-Return-Path: <netdev+bounces-71392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A745B853271
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:59:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3FE285328C
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 15:03:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DDC028213D
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:59:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 243441F2537B
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:03:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D747B56B68;
-	Tue, 13 Feb 2024 13:59:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F40635730D;
+	Tue, 13 Feb 2024 14:03:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gUMVj4CE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 365E056B65;
-	Tue, 13 Feb 2024 13:59:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1594756767;
+	Tue, 13 Feb 2024 14:03:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707832764; cv=none; b=swszHgJRoVdPONRRTJjQNYSgXaA24uu4vckKm4w4QMgzOstW6VE2a2D21dMWNvyLYMmy0Uxz73MVGy253Cfd6TWizxxankmDFQNDCPvLDVPdUgcak2nUn9GwdNY9MU/FgjHbpvVW5TKqrInt7UOvNUmPy2slcI9rLlKJc5398EU=
+	t=1707832988; cv=none; b=ka4XVNU7OySIBIXoN0iwQCJylGWMtWZVnj3AzxFhMzS/uiuJeAXje8SWkwnsj3Dz4zCE8Li1Bbcn42RQnB+ij7ews9cKVQGnKz4WK2oU2nqWYCQ5kYyGjn5P7moW6IYtbwO6wSFaDCQUU6O3iDIZ5ZssIKbmGVI08kN2J07JrOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707832764; c=relaxed/simple;
-	bh=AFH5mXgYpgm7k1VaeAmR7XOmcIr8m+gl7ANkYB0CJYI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Rnl9qpyMQ2TwTQbEO41h0UW4cbChSdQcuL39NjhFmJLHRx/Z58S6PjdjzN0QluQx4ZaqXVmb8rYaFlypf+5UTic8kLgeX/8h/Ce3cjystQr2b0TLyWLfyX7z3UE6+Rk22JVwgucbZl0mr8UxUSYWB1kUbG29PX7qdGTACQvW/IY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.161.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-59d29103089so119841eaf.0;
-        Tue, 13 Feb 2024 05:59:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707832762; x=1708437562;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LtLjlT9JbsjIzXWWX8LrQHq6rvO1Du63NHf/SHICIds=;
-        b=AjjcmVRuC33QCJZatlFaIxKuh6pq32iSMZQoHe0uRkWW/PyOIjGYWp0hQn/+U5xEAz
-         O5J5teSY+JsZybAale+CdUWjsNYhIVKAGmW6JxFim9n5tfiroqgIkDqFHifT2DYgkloU
-         t8eS2kXurz/D0pNsvTrZ3XQTD4qbiZsvt/VX8yAdzkff/KBT2FtpPi6/OkTkTy5D5ei8
-         NX7kAI5mLMhKf0rblIcQnNaf9TM9kUnUEGQUg92h/5do8l90Iq61KSAgH/Hf5jgXSdUH
-         KNjNBsAS3Ca8FzPIAD1sjhyPQ5GwBwWHhniSsCwXHQvgXBUPqhmu+Ilcyu1r5eZwtm16
-         bqRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXUy2WGG1FSnNmqbT7nyfHj+Zrc32w3ryRhrYLJVL/UyFWZSjD5HvLP1bJ9kwhRCAfIsVOO/pV7D/z0js09qqFiXNBfG2UZ
-X-Gm-Message-State: AOJu0YyR596b1es09iY8Q1lngExnCYDwkeKm73NZ0tcK/bN5oFA2gQJP
-	MoKQTkC2RKc/ZhQQSByXBgLVe9U3jOqMwhXiKRMTOOpus7l/xu/Iqj3+hxyl89I22o6mInbNjDT
-	UWD5vsWFMNFyJYDVK3lu9/mqL8Gk=
-X-Google-Smtp-Source: AGHT+IEr+CgFXjmG0D1cSHmU1Nn3AjLhgrwPgyZdSrNffcqbKHgcQaT4YBnNpwWH9K3/pSmIsPUk0rmW05Pv8Pgp7K0=
-X-Received: by 2002:a4a:ca0d:0:b0:599:e8ff:66d9 with SMTP id
- w13-20020a4aca0d000000b00599e8ff66d9mr7635483ooq.1.1707832762197; Tue, 13 Feb
- 2024 05:59:22 -0800 (PST)
+	s=arc-20240116; t=1707832988; c=relaxed/simple;
+	bh=l6xGtXUVd0pZcjRV1106mZieZPMPAOqCaQaJHGZfhNo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I6t62miL0iSwEQzuvjNRDk4P0pnieLCrMRg2eDEUX5HGDlL5eHPr9B/lu1sv/4S3jHj6V1ONpaxIoo+40+jNissXgQQzC0Ol/Qqmv2OTIhFRQdf/vuUphKB/WwOkkIn2Qkf4nptDtoAFExazB4z52FaSM5lopS+1q013TtVfWhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=gUMVj4CE; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=pXy28F4oZs8p0WURsI7cKbzl3wBcMbF+9piGOUored0=; b=gUMVj4CEgguPKwSCS923HiZVXN
+	j6g/h2QmDdOwAeQPhtAq5AkeNyms6snBVTuO1yP0w23t1ciTBKUhIycrEaNq/Bj8z4mB1H39Bwqhj
+	hWtyaONOdm7Q7s3TGSkqei2OWSjwmfzQPbzcBqCaSWN4RhNEK4RJc2Z/kaTFV+tK/b+8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rZtNF-007gUi-NX; Tue, 13 Feb 2024 15:03:01 +0100
+Date: Tue, 13 Feb 2024 15:03:01 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>
+Subject: Re: [PATCH net-next 1/3] net: phy: Add support for inband extensions
+Message-ID: <27644300-ff4f-4603-9338-bad4aa0e5610@lunn.ch>
+References: <20240212173307.1124120-1-maxime.chevallier@bootlin.com>
+ <20240212173307.1124120-2-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240212161615.161935-1-stanislaw.gruszka@linux.intel.com> <20240212161615.161935-4-stanislaw.gruszka@linux.intel.com>
-In-Reply-To: <20240212161615.161935-4-stanislaw.gruszka@linux.intel.com>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Tue, 13 Feb 2024 14:59:10 +0100
-Message-ID: <CAJZ5v0jr4Z=ffm9E+eR7p7rQwbCWEP=YHxNbR9VAEwb8-3e3GA@mail.gmail.com>
-Subject: Re: [PATCH v4 3/3] thermal: intel: hfi: Enable interface only when required
-To: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
-Cc: linux-pm@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, 
-	Ricardo Neri <ricardo.neri-calderon@linux.intel.com>, 
-	Daniel Lezcano <daniel.lezcano@linaro.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Johannes Berg <johannes@sipsolutions.net>, 
-	Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240212173307.1124120-2-maxime.chevallier@bootlin.com>
 
-On Mon, Feb 12, 2024 at 5:16=E2=80=AFPM Stanislaw Gruszka
-<stanislaw.gruszka@linux.intel.com> wrote:
->
-> Enable and disable hardware feedback interface (HFI) when user space
-> handler is present. For example, enable HFI, when intel-speed-select or
-> Intel Low Power daemon is running and subscribing to thermal netlink
-> events. When user space handlers exit or remove subscription for
-> thermal netlink events, disable HFI.
->
-> Summary of changes:
->
-> - Register a thermal genetlink notifier
->
-> - In the notifier, process THERMAL_NOTIFY_BIND and THERMAL_NOTIFY_UNBIND
-> reason codes to count number of thermal event group netlink multicast
-> clients. If thermal netlink group has any listener enable HFI on all
-> packages. If there are no listener disable HFI on all packages.
->
-> - When CPU is online, instead of blindly enabling HFI, check if
-> the thermal netlink group has any listener. This will make sure that
-> HFI is not enabled by default during boot time.
->
-> - Actual processing to enable/disable matches what is done in
-> suspend/resume callbacks. Create two functions hfi_do_enable()
-> and hfi_do_disable(), which can be called from  the netlink notifier
-> callback and suspend/resume callbacks.
->
-> Signed-off-by: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
-> ---
->  drivers/thermal/intel/intel_hfi.c | 95 +++++++++++++++++++++++++++----
->  1 file changed, 85 insertions(+), 10 deletions(-)
->
-> diff --git a/drivers/thermal/intel/intel_hfi.c b/drivers/thermal/intel/in=
-tel_hfi.c
-> index 3b04c6ec4fca..5e1e2b5269b7 100644
-> --- a/drivers/thermal/intel/intel_hfi.c
-> +++ b/drivers/thermal/intel/intel_hfi.c
-> @@ -159,6 +159,7 @@ struct hfi_cpu_info {
->  static DEFINE_PER_CPU(struct hfi_cpu_info, hfi_cpu_info) =3D { .index =
-=3D -1 };
->
->  static int max_hfi_instances;
-> +static int hfi_thermal_clients_num;
->  static struct hfi_instance *hfi_instances;
->
->  static struct hfi_features hfi_features;
-> @@ -477,8 +478,11 @@ void intel_hfi_online(unsigned int cpu)
->  enable:
->         cpumask_set_cpu(cpu, hfi_instance->cpus);
->
-> -       /* Enable this HFI instance if this is its first online CPU. */
-> -       if (cpumask_weight(hfi_instance->cpus) =3D=3D 1) {
-> +       /*
-> +        * Enable this HFI instance if this is its first online CPU and
-> +        * there are user-space clients of thermal events.
-> +        */
-> +       if (cpumask_weight(hfi_instance->cpus) =3D=3D 1 && hfi_thermal_cl=
-ients_num > 0) {
->                 hfi_set_hw_table(hfi_instance);
->                 hfi_enable();
->         }
-> @@ -573,28 +577,93 @@ static __init int hfi_parse_features(void)
->         return 0;
+> +Inband Extensions
+> +=================
+> +
+> +The USGMII Standard allows the possibility to re-use the full-length 7-bytes
+> +frame preamble to convey meaningful data. This is already partly used by modes
+> +like QSGMII, which passes the port number in the preamble.
+> +
+> +In USGMII, we have a standardized approach to allow the MAC and PHY to pass
+> +such data in the preamble, which looks like this :
+> +
+> +|  0   |  1   |  2  |  3  |  4  |  5  |  6  |  7  |  Frame data
+> +| SoP  |      |      Extension              | CRC |
+> +|     /        \_______________             |     |
+> +|    /                         \            |     |
+> +|   | type | subport | ext type |           |     |
+> +
+> +The preamble in that case uses the Packet Control Header (PCH) format, where
+> +the byte 1 is used as a control field with :
+> +
+> +type - 2 bits :
+> +        - 00 : Packet with PCH
+> +        - 01 : Packet without PCH
+> +        - 10 : Idle Packet, without data
+> +        - 11 : Reserved
+> +
+> +subport - 4 bits : The subport identifier. For QUSGMII, this field ranges from
+> +                   0 to 3, and for OUSGMII, it ranges from 0 to 7.
+> +
+> +ext type - 2 bits : Indicated the type of data conveyed in the extension
+> +        - 00 : Ignore extension
+> +        - 01 : 8 bits reserved + 32 timestamp
+> +        - 10 : Reserved
+> +        - 11 : Reserved
+
+Somewhat crystal ball...
+
+Those two reserved values could be used in the future to indicate
+other extensions. So we could have three in operation at once, but
+only one selected per frame.
+
+> +A PHY driver can register available modes with::
+> +
+> +  int phy_inband_ext_set_available(struct phy_device *phydev, enum phy_inband_ext ext);
+> +  int phy_inband_ext_set_unavailable(struct phy_device *phydev, enum phy_inband_ext ext);
+
+enum phy_inband_ext is just an well defined, but arbitrary number? 0
+is this time stamp value mode, 1 could be used MACSEC, 2 could be a
+QoS indicator when doing rate adaptation? 3 could be ....
+
+> +It's then up to the MAC driver to enable/disable the extension in the PHY as
+> +needed. This was designed to fit the timestamping configuration model, as it
+> +is the only mode supported so far.
+> +
+> +Enabling/Disabling an extension is done from the MAC driver through::
+> +
+> +  int phy_inband_ext_enable(struct phy_device *phydev, enum phy_inband_ext ext);
+
+So maybe this should return the 2 bit ext type value? The MAC can
+request QoS marking, and the PHY replies it expects the bits to be 3 ?
+
+I'm just trying to ensure we have an API which is extensible in the
+future to make use of those two reserved values.
+
+> diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+> index 3b9531143be1..4b6cf94f51d5 100644
+> --- a/drivers/net/phy/phy.c
+> +++ b/drivers/net/phy/phy.c
+> @@ -1760,3 +1760,89 @@ int phy_ethtool_nway_reset(struct net_device *ndev)
+>  	return ret;
 >  }
->
-> -static void hfi_do_enable(void)
-> +/*
-> + * HFI enable/disable run in non-concurrent manner on boot CPU in syscor=
-e
-> + * callbacks or under protection of hfi_instance_lock.
+>  EXPORT_SYMBOL(phy_ethtool_nway_reset);
+> +
+> +/**
+> + * PHY modes in the USXGMII family can have extensions, with data transmitted
+> + * in the frame preamble.
+> + * For now, only QUSGMII is supported, but other variants like USGMII and
+> + * OUSGMII can be added in the future.
 > + */
+> +static inline bool phy_interface_has_inband_ext(phy_interface_t interface)
 
-In the comment above I would say "If concurrency is not prevented by
-other means, the HFI enable/disable routines must be called under
-hfi_instance_lock." and I would retain the comments below (they don't
-hurt IMO).
+No inline functions in .c file please. Let the compiler decide.
 
-> +static void hfi_do_enable(void *ptr)
-
-I would call this hfi_enable_instance().
-
+> +bool phy_inband_ext_available(struct phy_device *phydev, enum phy_inband_ext ext)
 > +{
-> +       struct hfi_instance *hfi_instance =3D ptr;
+> +	return !!(phydev->inband_ext.available & ext);
 
-Why is this variable needed ro even useful?  prt can be passed
-directly to hfi_set_hw_table().
+should this be BIT(ext) ?
 
-> +
-> +       hfi_set_hw_table(hfi_instance);
-> +       hfi_enable();
 > +}
-> +
-> +static void hfi_do_disable(void *ptr)
+> +EXPORT_SYMBOL(phy_inband_ext_available);
 
-And I'd call this hfi_disable_instance().
+If you don't mind, i would prefer EXPORT_SYMBOL_GPL().
 
+> +static int phy_set_inband_ext(struct phy_device *phydev,
+> +			      enum phy_inband_ext ext,
+> +			      bool enable)
 > +{
-> +       hfi_disable();
-> +}
+> +	int ret;
 > +
-> +static void hfi_syscore_resume(void)
->  {
->         /* This code runs only on the boot CPU. */
->         struct hfi_cpu_info *info =3D &per_cpu(hfi_cpu_info, 0);
->         struct hfi_instance *hfi_instance =3D info->hfi_instance;
->
-> -       /* No locking needed. There is no concurrency with CPU online. */
-> -       hfi_set_hw_table(hfi_instance);
-> -       hfi_enable();
-> +       if (hfi_thermal_clients_num > 0)
-> +               hfi_do_enable(hfi_instance);
->  }
->
-> -static int hfi_do_disable(void)
-> +static int hfi_syscore_suspend(void)
->  {
-> -       /* No locking needed. There is no concurrency with CPU offline. *=
-/
->         hfi_disable();
->
->         return 0;
->  }
->
->  static struct syscore_ops hfi_pm_ops =3D {
-> -       .resume =3D hfi_do_enable,
-> -       .suspend =3D hfi_do_disable,
-> +       .resume =3D hfi_syscore_resume,
-> +       .suspend =3D hfi_syscore_suspend,
-> +};
+> +	if (!phy_interface_has_inband_ext(phydev->interface))
+> +		return -EOPNOTSUPP;
 > +
-> +static int hfi_thermal_notify(struct notifier_block *nb, unsigned long s=
-tate,
-> +                             void *_notify)
-> +{
-> +       struct thermal_genl_notify *notify =3D _notify;
-> +       struct hfi_instance *hfi_instance;
-> +       smp_call_func_t func;
-> +       unsigned int cpu;
-> +       int i;
-> +
-> +       if (notify->mcgrp !=3D THERMAL_GENL_EVENT_GROUP)
-> +               return NOTIFY_DONE;
-> +
-> +       if (state !=3D THERMAL_NOTIFY_BIND && state !=3D THERMAL_NOTIFY_U=
-NBIND)
-> +               return NOTIFY_DONE;
-> +
-> +       mutex_lock(&hfi_instance_lock);
-> +
-> +       switch (state) {
-> +       case THERMAL_NOTIFY_BIND:
-> +               hfi_thermal_clients_num++;
-> +               break;
-> +
-> +       case THERMAL_NOTIFY_UNBIND:
-> +               hfi_thermal_clients_num--;
-> +               break;
-> +       }
-> +
-> +       if (hfi_thermal_clients_num > 0)
-> +               func =3D hfi_do_enable;
-> +       else
-> +               func =3D hfi_do_disable;
-> +
-> +       for (i =3D 0; i < max_hfi_instances; i++) {
-> +               hfi_instance =3D &hfi_instances[i];
-> +               if (cpumask_empty(hfi_instance->cpus))
-> +                       continue;
-> +
-> +               cpu =3D cpumask_any(hfi_instance->cpus);
-> +               smp_call_function_single(cpu, func, hfi_instance, true);
-> +       }
-> +
-> +       mutex_unlock(&hfi_instance_lock);
+> +	if (!phydev->drv->set_inband_ext)
+> +		return -EOPNOTSUPP;
 
-So AFAICS, one instance can be enabled multiple times because of this.
-  I guess that's OK?  In any case, it would be kind of nice to leave a
-note regarding it somewhere here.
+That is a driver bug. It should not set phydev->inband_ext.available
+and then not have drv->set_inband_ext. So we should probably test this
+earlier. Maybe define that phydev->inband_ext.available has to be set
+during probe, and the core can validate this after probe and reject
+the device if it is inconsistent?
 
 > +
-> +       return NOTIFY_OK;
-> +}
+> +	mutex_lock(&phydev->lock);
+> +	ret = phydev->drv->set_inband_ext(phydev, ext, enable);
+> +	mutex_unlock(&phydev->lock);
+> +	if (ret)
+> +		return ret;
 > +
-> +static struct notifier_block hfi_thermal_nb =3D {
-> +       .notifier_call =3D hfi_thermal_notify,
->  };
->
->  void __init intel_hfi_init(void)
-> @@ -628,10 +697,16 @@ void __init intel_hfi_init(void)
->         if (!hfi_updates_wq)
->                 goto err_nomem;
->
-> +       if (thermal_genl_register_notifier(&hfi_thermal_nb))
-> +               goto err_nl_notif;
+> +	if (enable)
+> +		phydev->inband_ext.enabled |= BIT(ext);
+> +	else
+> +		phydev->inband_ext.enabled &= ~BIT(ext);
 
-Is it possible for any clients to be there before the notifier is
-registered?  If not, it would be good to add a comment about it.
+Should these be also protected by the mutex?
 
-> +
->         register_syscore_ops(&hfi_pm_ops);
->
->         return;
->
-> +err_nl_notif:
-> +       destroy_workqueue(hfi_updates_wq);
-> +
->  err_nomem:
->         for (j =3D 0; j < i; ++j) {
->                 hfi_instance =3D &hfi_instances[j];
-> --
+       Andrew
 
