@@ -1,231 +1,289 @@
-Return-Path: <netdev+bounces-71366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C503E853195
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:18:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83ED68531E0
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:28:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0271D1C228C4
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:18:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDE401F21E25
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:28:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66AE455764;
-	Tue, 13 Feb 2024 13:18:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D61555E6C;
+	Tue, 13 Feb 2024 13:28:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OCrEqiD8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XeAEiydN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5608655765
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 13:18:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=134.134.136.20
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707830293; cv=fail; b=p5AJBO2QfI80eJIIr+2JE9QpkkzyvZrrHiwo50onrexG1tLMgqN6uSkSH4ICTQZmv0qnOe8fsBISI/8U3mPlfJ5D/HyV1zVGrnJjDtCIL4V7diotAScw4vmPuuCKXH6CuecuDcJ/DxnDaa7pWeCXheXHKLRcBWK6ug1lKw6HliM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707830293; c=relaxed/simple;
-	bh=yWOixlbkwSjfz5X93rAoIY91CVuUil4ppqcg3qf2Js0=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=M6h1Kc6GJpr0BuaeY4JOG4dY8/ZXI3k1qpkMN5/byhGl58XCXAqGN7ym0PV4Ll5Odandwuk+5Eu8XBjOD/ic46FDQNFqv8ASjkua1cb9VH3T1nRmRODX8QEi1bwsg4ALJOJMiKhbFF95DESbVTezpvErT0ze4c9Wfrt0R2K3ktQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OCrEqiD8; arc=fail smtp.client-ip=134.134.136.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707830291; x=1739366291;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=yWOixlbkwSjfz5X93rAoIY91CVuUil4ppqcg3qf2Js0=;
-  b=OCrEqiD8uB4QWr1nuZi7fF8LZ2/tFoYjz8RjUGCoMOXwmDh3XIdIEB40
-   2+7qrs4B/P5i+7lUW/sHg/HB50zklYaUFUGGRIdhmG7LtQJ8PffLRolSP
-   6BIzqaqZWSMgUwkUjN6tWL/q8EsL1pYCHI1wWzvjw+SWBsKwuRm5JL0+R
-   y1WBIcfMoxERMKNIECkpBytVc6BVvdqVdQFsSb8tlaRks1nVouFO3H9Tx
-   aAowRKAOwRcdQOmuWSdkl65x1ZZcFYp7+sv4/WdKEvgZpNjebsqVtrt76
-   lAeyn3LrV2v2qfLpqW2v/zs2IO3PjtL9WJdNscigcHogNQ1FSPHh3VmG5
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="396269730"
-X-IronPort-AV: E=Sophos;i="6.06,157,1705392000"; 
-   d="scan'208";a="396269730"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2024 05:18:10 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,157,1705392000"; 
-   d="scan'208";a="2926056"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orviesa010.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Feb 2024 05:18:05 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 13 Feb 2024 05:18:01 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 13 Feb 2024 05:18:01 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 13 Feb 2024 05:18:00 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lb0Viy46+g/s1+XHqn7tYrNi68001ALWxfj30zQH7ZcN8XWah+o4igdaRpnOLEUyWu40/hMTBYyKMJYdjw7whH2jXQ3722fdfd2ntTtJJt8ntgmJNViqT2MeQ88T2l7htK+wo6F3wyTHOImp1bS9t7RgTD7nmEhytTgTgBLJlwCOrWGrRDN+nQ0jH573tM0vX6PXpXd391nDIy3HxmZZTQH1h6pcJXd5HE3ag9cJnQLDK3XcX47if7KQxW0jxZYv3WKL2n0BGlUagq6M7Myuazx56NeCXVYTDYmtVb9k07RA4RFofWPKI1KF0TO2bkjebFPyrP8ZC1XCLyvQS7IrPg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=W9/jePyS1soF27uDDWciMkcqevnxeWkcAZP0kgI9Snc=;
- b=ZcrZLxB572kHBeJy6avusgwHmeE5Mx2KEvvu/v86rMnS+yD59u/iKEiuw2a/V3nxmVsIp4Rk7SC/5UBunHuliNNpBXeg0D+SDZKrxIMz9Rzt23aQYvgQM5KdeGIUvddfv0+JELUJkVLQyLadie95iokoFjRefsBhDfwG8MVSf7Bkz2pzioVzbZ3XhMm7qvtLzmFsqNawz+sO2htZJPKOxbTkioANq8B90pOuXBSw3rmokVdjiHlQDzKeDLkoTCS0y833qDzRf6okgUym4a9iZJ2HXC5K4sLl1BPIf3zge4uU4hAUDZ2l01yf2fruSKKy7r5Y8JwbQVBpEbd3RfzBFA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by PH7PR11MB5981.namprd11.prod.outlook.com (2603:10b6:510:1e0::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.39; Tue, 13 Feb
- 2024 13:17:58 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::c806:4ac2:939:3f6]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::c806:4ac2:939:3f6%6]) with mapi id 15.20.7270.036; Tue, 13 Feb 2024
- 13:17:58 +0000
-Message-ID: <2e3001f8-a079-4d44-863f-979baca3b38c@intel.com>
-Date: Tue, 13 Feb 2024 14:16:47 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH 1/1 iwl-net] idpf: disable local BH when
- scheduling napi for marker packets
-Content-Language: en-US
-To: Alan Brady <alan.brady@intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, Przemek Kitszel
-	<przemyslaw.kitszel@intel.com>, <netdev@vger.kernel.org>, Emil Tantilov
-	<emil.s.tantilov@intel.com>, Jesse Brandeburg <jesse.brandeburg@intel.com>
-References: <20240208004243.1762223-1-alan.brady@intel.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-In-Reply-To: <20240208004243.1762223-1-alan.brady@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: WA1P291CA0012.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d0:19::9) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8347D5577C;
+	Tue, 13 Feb 2024 13:28:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707830892; cv=none; b=mM/pD+GVtpov7ewDQPkAFSOBxy7792hYN97dC2M5aRNk2T/ORpTMThquUsL7OoiiOCghW+oRQReqqKvuWsjAfMuGcaSNaUf7HXW8a+yxnGlfJMdtaeSxk7hmC1QNdKojR10UwmP2r2h+oh2I2+yJQXm1A5A/ftWG6vY55uQRK70=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707830892; c=relaxed/simple;
+	bh=xlX7eJpOuRW8XNNx2jYQwx1E+t05RQkVTbVXEFZi7HM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XpZMaOHMUTdF4Di8sh6o5wcGq5LtE+LeZwF6CsLLCpzazTtDQdGxbOd30WxnVYA7CLGWq9qXXlf+dQ7txvlVsP975Tc5dBMFeQJiWU4XGLNpHkxXZRrLEoyVhmhgJf9K1rZ/DEXroprvz5EQmNboQQQyvu5/rcjt/1XQZk/q47E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XeAEiydN; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a3ce9a33fd8so160682266b.1;
+        Tue, 13 Feb 2024 05:28:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707830889; x=1708435689; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bQyaqxJy1nfKXAe6J9hJAFrL9Ej9vgsdqL3dR2vxAQQ=;
+        b=XeAEiydNcvuNz64a1YEXOfwWpspb+GMESCBvgSEk5e+jGTRLbtskO5o87BsxN9Xhg8
+         Om/KB3jDg7MAH+WQ928D62xNHFSx9x7b4VpOPfTwLb6t5t+Jt8GgfVX4yVpZBkOt2+v+
+         1O3gUetYpyzcUemj00dkKsALcgpYlHxHkkblJ6vLMKtwCyedNyy6BeG1JJTph2F47r/F
+         7vWz6l685ylxJG0yYXnUyOLHgBJw9W5izi3xb2A84qTrUav3ihQQEf4HfK+3kwXA4ZG/
+         8Z6JIRDfFnTZMwkPaexazyUa+C7gziBjJHjgh68U5qeryqzstVZbkWObR8PwMKRdgMBr
+         y+gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707830889; x=1708435689;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bQyaqxJy1nfKXAe6J9hJAFrL9Ej9vgsdqL3dR2vxAQQ=;
+        b=fI/WWQcyjeCGxK9vBrrLGYLS/dLziqUFlsJpVvLF6G31mHQc3ZfH4YZDtyGA6YDtVJ
+         8okMIOs7ftlFL3AH/TE8bkXlICZLDvLcG/tcDHLV+hPuulxb/77JuA5NN5oXob2IehLx
+         jkJRWr1bUkDjES+EW4ftGB4f0yP3jNpXzIey4lJo8vB/L49TjaW7bt2iwnwuxLiy1obj
+         wJMJzr1jLwr+uF1hJD9W8WcMN9jqz+cWBiIeotprus9I0q78wJdfPy2F2azr1PY3N+yk
+         vIQ+1FTM1Os6dncrbCWbPpp5JnbvcmMc1b9vEeHsGyJ0x7zlQ9d4A76MdRNvUN0iKkRM
+         KH+w==
+X-Forwarded-Encrypted: i=1; AJvYcCU4+F6i1bn8O6BL8xpG2vB8jIv1SDrs2UrOkAhcJdRCBx9aUALCY9/O2xgC0R6iycR5FogOck1cgUcfBFpYKUwvs1LBUCAbFXpTFIZcQeMbZXWF1RyP+tyuIlr0bSP6rTxSr3dTcxTuY43JPNOAHHLGaZ5TkSvtMdcrXpHCFa9YRXSQJpFRUQoU+m2Sdw91bbNTOCcWGXAQLx7FGeqNPsHvv+24zquybe/a2lh2HdgeuGpPmeKebV6lPnylKD6VCVgXiBc9b9H1Cy1MUPGtLBT7YhS5zP8/9FH+KinPVoX97D9Sswnr+bzo0qXwEJnJOsrhiuXkZ0wWzD++VCx/C6r3VZ9zD9A1wFcrAMV79x+rm3RmNZpoBZcsb7Lz0QNqK9DkV130AXwISIkBq7llMmZBH0kMyqAq/Wu1pS9xcNfDrfr0LMvtwo4Qf9KJDTIXlB95YMDfMOeWTq3N+pQzg6cnUIzTh4jT3tdajMiZf7eqdDFxduN1i0n7A3ygb1yEsVQFr746dg==
+X-Gm-Message-State: AOJu0Yw+J7a9GBg0Wj4GS1cGd35BZzY26+ZrPf8myrKIYqkz2Wny0cc3
+	VzYb/4tKYrD2/haPqzYPoUUQ8VLxuvUO8zc+qTR9aO5x7fWhVXvF
+X-Google-Smtp-Source: AGHT+IGJ/LRBbhCkmFF1FZhsmU9LStqmNAiKYbjKV2sMZZSoc8TNitG6D+S4uiV/cNZktq7MOkKBjQ==
+X-Received: by 2002:a17:906:f0d3:b0:a3c:8de7:3add with SMTP id dk19-20020a170906f0d300b00a3c8de73addmr1945447ejb.7.1707830888465;
+        Tue, 13 Feb 2024 05:28:08 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUomhMmji3Wcaq3gX1zwDkRJbw3mKjIMJWfFoj6s2TsVLnWgjcOYJOwy3c8Az9k7RQK1HB6cNTgWD2ScWfiUSy8FcX6rFbkdbawkPLzON8gVmDpU+kJeCFpb7d+LReQJEELjYVUoPym0/FTFAlUHWHUZPOpyLsM6emJ1v8OMji316K3yxHWRMSm7r7hpRasJ982HDCLsQ9ab5h8qLQ2JU+qwp85MZ6CP6ta9OTV4OKm22dgiPHNiznAmnXhykiNpROyoNuzoAWkSG+dBzby2BmWPK5xfs8BnQ48ojyDkaQ+tTCO8IUDTPnNux+PgYFL5Sx6ZOe3S5pORnsEoQGgqZwhfZHEYYmzPjakVylDapH63YwYwQ2KvyfF6IyxlGc9UKOGrNYEYaIPQYMTLJSFKHwk/Eb7bQuOqK0iyxXXk2TScfdk6aEtzSqePvkwkIWpK9U6IQL8HAq5p8D611Rt42ZwlkFXWqJ25LWh7TAb+d4Se3ruWAsFmSPNTT3j7pcaSyESeKhr5v39SQJ38ZSUITKX4J44PdLb6+/MAODd2yaH7b9SocWnTy568eer7cmD8LIy6+s2IQ73YIcasUcE/8gSaM86qpEOzkOL7Wil4rult1Vkrjl1UTs159H5geSa1l8gt/4Az7/bQ7G5/dBMdA3/FhEa55iSbdY2y+fqleX47HlNDetQKBgTor2LtviAkBoc1+QWETlu/T1nMMg8dfkQbFOfpODQ6xWf5feG0iIytoqtb0hmvVMMVALbAK+dAgLeS/DG+s2wYDWPbHiKbPlPwIZ4wUWjgRZvwqZiXQp78cm94zJ8xnRo5gNE6Ybde2E9C8Xr+6FjUHQ12tyX5WMfwUlrLky7w7VYKdqlWMziNdHe8CKIaiznK9q+7z3re8Q0HetxXHAmDsTDKD9Nc9Kq7M1JvFmMOvZlxF3It+Dz3NGc1MM9DrC6rG7rPGtVD2sCVv
+ sOyC+cE8jaQoacp45ByqC6b7p1YKSNwYsZn8cMre1hgLZXeOqPGjWwY+j4c1ga/sCO1FyDke4xWD/J6xodIJn0StiN83aOyBW60vYQA5qB/vs/z7wUfSFw5Q4du/k5zLE+R1lQcOVM24zmm8ES7y6aU3XKMte9UdTFB0AhUpnYaqxOkf5TXdOWX31g0lswZJ/53RoaEvWuuyucoCgEZAet+Bpb8Zrh9rTfuTT0PqlkLU48/zQ4tUXcIY7QU8WRNQHvvLGVpP0fXpaIyNGq5G4a7z3XTWIOIkDYEIMN8uSWpjN/c/BUrEXK7RRXEeWM9ZtSg4Rrk2SHWOjL2zrjsvUgo9rQRHwqnScq7Xc2xLTNp9Da/yQTq+bzXKqdsIiRcL2WSS+m1l8BOe2Di/MQA5mqG5MW8eTAny2f2cU98QWVc9wavxZU92JImvu7a2BJe3m396dKesG8uzsHjvjDGbJYQ1kvLi5Ztl3lBqGfTxckzLOI8L1mJll9LjkdvVAxu3aUMijUpdPfDdogbm99UJ5b4O6v735vRHi/Z/CryHTevxeX8/eXMyl5R2maJxukqiUzisNtBrofJhQZ4goBQG+8Z2kFqNbMEKltY0WwRCmnyxU4Hsvyh/kUbqY5yDYhYXLP1+G+ukl33yxz6oT8Bc/i+WTIOkVMo2ykHe8nSS2bpwJMI32u/GXcx57lhXNLwPYkrgOrFaQBgz0ZPcx77kEYv3VlZ6uV88nUw/C8i2WNB+afV0Gsncui85+8FA==
+Received: from ?IPV6:2620:10d:c096:310::23d8? ([2620:10d:c092:600::1:a107])
+        by smtp.gmail.com with ESMTPSA id ss3-20020a170907c00300b00a3d1c0a3d5dsm221682ejc.63.2024.02.13.05.28.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Feb 2024 05:28:08 -0800 (PST)
+Message-ID: <3374356e-5f4b-4a6f-bb19-8cb7c56103bc@gmail.com>
+Date: Tue, 13 Feb 2024 13:18:26 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|PH7PR11MB5981:EE_
-X-MS-Office365-Filtering-Correlation-Id: d9a6a50d-ad28-441a-0efb-08dc2c963290
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: WythwNEQitdBSkCaIzmapXpOZRAWXuLPt/Evn3acZWBjUjuNBEZqHt1KBD2RVpffMOF4jee2vYSoHKdC16Lv42dB+W2DHZIqbm0Rr64idqEqg6b3Avy1AE1Exc5OO5topsnyxkfk6gPuB+VrElAPRZJbcE2NZgO5P/3+amHrpmUaxpX+ZdQmoLfj2/4EVa/yYabL7fLyx4MqRk/EPS/+7iaNs4/rK55A1aQPawpIeQBg7kMIDvRO58CwBvbizJsHUXrjZFq1yMK5Zdia+smmzzh3CkVoB0sgIpaeYCUMjwGgKFp9AJayhQUXsyT7GDub+LwknbTTW/sHIGfYYxmhDEiNPOFCjPpMEeqw9sf6T2rPUCE4aip+UlBfe1dUhRrKlAAaufe72Gc2jRId1R7k7slztwy2tvdxQdC505yZ1oGpOlOFAQbf31TEB21RBB2nXq+lGxe1EFPd2jrnyr5NFZDZ7xJrdrDmwRlgMhFzWnHL34Lx8exH0f6iQ/zGC1itO23D0eiBmRXHfp5E+Cii39Zed1YyJ60vOnjKB3bv+rfl2ZknwM5T+80ZXvMcJJ7Q
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(136003)(39860400002)(346002)(376002)(230922051799003)(1800799012)(186009)(64100799003)(451199024)(31686004)(4326008)(8676002)(2906002)(8936002)(41300700001)(5660300002)(6862004)(82960400001)(86362001)(83380400001)(31696002)(36756003)(2616005)(66556008)(6636002)(66476007)(6666004)(66946007)(38100700002)(316002)(6506007)(54906003)(6486002)(37006003)(478600001)(107886003)(6512007)(26005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dldaeXl3QWo1a1JWWG9LYUZoRGVlZ3kxMFVRS2FIb1JXcVlYRGl6ZkRzMlhi?=
- =?utf-8?B?K01pZHBxamtHdkV1bW02QmtlQ1NwMjJLenF6WDZWYkduc0RvZVVSQktzVnI4?=
- =?utf-8?B?ZWp2em9FSm13RjliRXA4N05vMHo2RUF6SnA1dlF5aVdVZnUzb3YrZXl1VnF5?=
- =?utf-8?B?VWNaTGtjOUxVT0dFems4N3crMldjTUd0VVBSajY1TzFVZ0Mza2dsdG5makNk?=
- =?utf-8?B?N1BkaVhhZWxJc3BSb2diQy9yUUMvTFYvdUs5OTYwS2Vlcm51WCt2WThuR0JC?=
- =?utf-8?B?WDZZaW1ENGYyalpVV0VNeisyZ1Jic3VkQ1cvRUM1dFBYVlg3a0h2elNkTG9K?=
- =?utf-8?B?bVJGNEkzK1VmakRxVXI3V0pvZTBzSHMwRVVWay9jS1ROUXRsV1VlNUVKSFBR?=
- =?utf-8?B?TUU2THkxZzc4SnpYb1hJTWRhYnNJODUvUElhL1Vsb1BudlM2NTdOQ0wwcDhq?=
- =?utf-8?B?QWVKa3V4a3llMUpwL0ZhQVJ5NlJScWVnNmNYNmhjdzZNZ1JyRVhCZDFjSldK?=
- =?utf-8?B?ZXExamRYeGJxZldrQWRtdzk3MWx4WlNoZHN0bXlSTG5jYzNuVGZGNVEzSEd4?=
- =?utf-8?B?ME5Uek1wdUFzWVhEcE53ZXZCeVdmSFo1dzVoQitMaG4ybzFIbmo0T0VIMEtX?=
- =?utf-8?B?YXlJZDd0KzQ1Tm5JYkM4a0FCL1dxSkJES0REMExyK3ZHRXhLSTAvSmc4T09M?=
- =?utf-8?B?anZUdk80ZlRNaFdDMitDSmVnMEZFVlB0Z1hmN2J6OUg4a3lFbmxyR1RQMzB6?=
- =?utf-8?B?MXpIWENMa3RGdlNMRTVGUWFkQjFxc084MWFGTkVkQWd2VUdmbitVbVY1V1FR?=
- =?utf-8?B?TkMwSXFFSWF0OVFJdlYzTFRhYmVsMFNSb0k5eUhCWit5SWhCUnpsbXBzZEpT?=
- =?utf-8?B?MW9XemE2K2E4S1pPUWJPOHVnN2NuYzhPVCtEcWQxdHVCeE9QdEswOXFuZjBh?=
- =?utf-8?B?Yjc2MVMrZHYxN3RTb3hOdkVqWTV6eHIwMUp1c3o5Z0NUcXNLYnBpcGtEdk1k?=
- =?utf-8?B?aE83Tnc3WEhOdG9yWmpTQ0U3TGpaSWM3cG1rZkpWd3dQYnVtVjhLTm5JY0ow?=
- =?utf-8?B?Y2Y0ODZZUlZlaVZ1R3Q0aWp4NlpnbFRqc0cxR2RFLzMzcTB5V2lobnJkbmw2?=
- =?utf-8?B?N3RGNVNha2JlYS9wTGQxTUw0Q1llZ0VCVnBDTlMzb2NWYlZVeVh2QjgyOVc3?=
- =?utf-8?B?ci9NZlNoTVlFS2tQWllDY1haeTd0WWFxMEtwQ3U0Yi9VMkpjWWxXUlRPc1VH?=
- =?utf-8?B?RXljc2NMNkRzUXExSTdBbEo5MHdTMmFEazlWNWo2QTczMldULzczTFhoSDlI?=
- =?utf-8?B?cWNPbVhONnhVTlc3VUQ1aC9zMFl5TXh2c1FMT2dSZ3RCREJEL2M5blpzWjA1?=
- =?utf-8?B?Vzd1cTh6VS9jUzYvR2c0bzRPbVY4ZTlWWU5BQ0NUL2RKc1M4dHlEQmhOdWRK?=
- =?utf-8?B?NHhJTXN3SWwzMzNOUGU4bHpiaWVVYVU4WE9XMmFFeVFXVVVXQy9jbkE4NnAr?=
- =?utf-8?B?YVFDMUIrbGEzQ01tWUJ0eXA3WnVKWTNYZGlJQ0d2Zkg3L2NjVmFSUFJUK1By?=
- =?utf-8?B?MEpSY0wvc1NyMlBjZ0NROVp5MEJDTE1qWTNrS3NQeXB2eHhWcTJmbnB1bi9w?=
- =?utf-8?B?YzNwNmYvYlhFSlFZY1h4K01mVVdzclQ5NDVtYzFsUHdvdDNCeFNoMmJKMlZj?=
- =?utf-8?B?d1dJdy9taGlad0RpQnlOWThvREJHUUVGQldYZmVZVGpzWVplbTZpaStrbExa?=
- =?utf-8?B?NmQ1TjF4NGpXT1UvVXQ2RjVGNVZlN2llVHgyTmQ4T3NzQUFnSDF1VDVMaldP?=
- =?utf-8?B?WjhZSFdnck9tUkdwNWlLNG5HTDlLcFVQemhNeWRTandqWUFCc00rWjgyMFM5?=
- =?utf-8?B?cC9CZ0FPSS92VVBtMW4vbmlPTlM2WHpqd002TTJud2VOL0loOUZSeUt4L3g0?=
- =?utf-8?B?T2wwZHNCMStzTlVlR3N5czVWZzFZc040clc2QXI5SkczQ0VYVFZ0Q3pKZlhj?=
- =?utf-8?B?R3Z4VXJwM2ZnOW5pMTgxU2ZZZHJwTjN4WitWcmt4UmZQc2tZa2lxSkZ5ZjRu?=
- =?utf-8?B?NUNTWVNEU1h1RGhkZVlWQ1V4ZkMvUFFPWUR0MjNGZHNLb25XVVVXQkhORmlP?=
- =?utf-8?B?THZFQnNsK1JUQ2J1UlRlKzRzUWVSTDk0TytFWTVjN3VxN1FQSWhTSTZ5cU95?=
- =?utf-8?B?Vnc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: d9a6a50d-ad28-441a-0efb-08dc2c963290
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Feb 2024 13:17:58.7207
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HRd9d0Ckidy00YVGS8FKeClHsI0JaOJ/XUsx82AcVTMvdpuf1F9ChQktvrIGB2E6BRE8HXev+7vvBcRQ9MlT7sHRtaTim76yQflw9TcTmYg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB5981
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next v5 07/14] page_pool: devmem support
+Content-Language: en-US
+To: Mina Almasry <almasrymina@google.com>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
+ <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ Helge Deller <deller@gmx.de>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>
+References: <20231218024024.3516870-1-almasrymina@google.com>
+ <20231218024024.3516870-8-almasrymina@google.com>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20231218024024.3516870-8-almasrymina@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Alan Brady <alan.brady@intel.com>
-Date: Wed,  7 Feb 2024 16:42:43 -0800
-
-> From: Emil Tantilov <emil.s.tantilov@intel.com>
+On 12/18/23 02:40, Mina Almasry wrote:
+> Convert netmem to be a union of struct page and struct netmem. Overload
+> the LSB of struct netmem* to indicate that it's a net_iov, otherwise
+> it's a page.
 > 
-> Fix softirq's not being handled during napi_schedule() call when
-> receiving marker packets for queue disable by disabling local bottom
-> half.
-
-BTW, how exactly does this help?
-
-__napi_schedule() already disables interrupts (local_irq_save()).
-napi_schedule_prep() only has READ_ONCE() and other atomic read/write
-helpers.
-
-It's always been safe to call napi_schedule() with enabled BH, so I
-don't really understand how this works.
-
+> Currently these entries in struct page are rented by the page_pool and
+> used exclusively by the net stack:
 > 
-> The issue can be seen on ifdown:
-> NOHZ tick-stop error: Non-RCU local softirq work is pending, handler #08!!!
+> struct {
+> 	unsigned long pp_magic;
+> 	struct page_pool *pp;
+> 	unsigned long _pp_mapping_pad;
+> 	unsigned long dma_addr;
+> 	atomic_long_t pp_ref_count;
+> };
 > 
-> Using ftrace to catch the failing scenario:
-> ifconfig   [003] d.... 22739.830624: softirq_raise: vec=3 [action=NET_RX]
-> <idle>-0   [003] ..s.. 22739.831357: softirq_entry: vec=3 [action=NET_RX]
+> Mirror these (and only these) entries into struct net_iov and implement
+> netmem helpers that can access these common fields regardless of
+> whether the underlying type is page or net_iov.
+> Implement checks for net_iov in netmem helpers which delegate to mm
+> APIs, to ensure net_iov are never passed to the mm stack.
 > 
-> No interrupt and CPU is idle.
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
 > 
-> After the patch, with BH locks:
-> ifconfig   [003] d.... 22993.928336: softirq_raise: vec=3 [action=NET_RX]
-> ifconfig   [003] ..s1. 22993.928337: softirq_entry: vec=3 [action=NET_RX]
-> 
-> Fixes: c2d548cad150 ("idpf: add TX splitq napi poll support")
-> Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
-> Signed-off-by: Alan Brady <alan.brady@intel.com>
 > ---
->  drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 2 ++
->  1 file changed, 2 insertions(+)
 > 
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-> index d0cdd63b3d5b..390977a76de2 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-> +++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-> @@ -2087,8 +2087,10 @@ int idpf_send_disable_queues_msg(struct idpf_vport *vport)
->  		set_bit(__IDPF_Q_POLL_MODE, vport->txqs[i]->flags);
->  
->  	/* schedule the napi to receive all the marker packets */
-> +	local_bh_disable();
->  	for (i = 0; i < vport->num_q_vectors; i++)
->  		napi_schedule(&vport->q_vectors[i].napi);
-> +	local_bh_enable();
->  
->  	return idpf_wait_for_marker_event(vport);
->  }
+> RFCv5:
+> - Use netmem instead of page* with LSB set.
+> - Use pp_ref_count for refcounting net_iov.
+> - Removed many of the custom checks for netmem.
+> 
+> v1:
+> - Disable fragmentation support for iov properly.
+> - fix napi_pp_put_page() path (Yunsheng).
+> - Use pp_frag_count for devmem refcounting.
+> 
+> ---
+>   include/net/netmem.h            | 145 ++++++++++++++++++++++++++++++--
+>   include/net/page_pool/helpers.h |  25 +++---
+>   net/core/page_pool.c            |  26 +++---
+>   net/core/skbuff.c               |   9 +-
+>   4 files changed, 164 insertions(+), 41 deletions(-)
+> 
+> diff --git a/include/net/netmem.h b/include/net/netmem.h
+> index 31f338f19da0..7557aecc0f78 100644
+> --- a/include/net/netmem.h
+> +++ b/include/net/netmem.h
+> @@ -12,11 +12,47 @@
+>   
+>   /* net_iov */
+>   
+> +DECLARE_STATIC_KEY_FALSE(page_pool_mem_providers);
+> +
+> +/*  We overload the LSB of the struct page pointer to indicate whether it's
+> + *  a page or net_iov.
+> + */
+> +#define NET_IOV 0x01UL
+> +
+>   struct net_iov {
+> +	unsigned long __unused_padding;
+> +	unsigned long pp_magic;
+> +	struct page_pool *pp;
+>   	struct dmabuf_genpool_chunk_owner *owner;
+>   	unsigned long dma_addr;
+> +	atomic_long_t pp_ref_count;
+>   };
 
-Thanks,
-Olek
+I wonder if it would be better to extract a common sub-struct
+used in struct page, struct_group_tagged can help to avoid
+touching old code:
+
+struct page {
+	unsigned long flags;
+	union {
+		...
+		struct_group_tagged(<struct_name>, ...,
+			/**
+			 * @pp_magic: magic value to avoid recycling non
+			 * page_pool allocated pages.
+			 */
+			unsigned long pp_magic;
+			struct page_pool *pp;
+			unsigned long _pp_mapping_pad;
+			unsigned long dma_addr;
+			atomic_long_t pp_ref_count;
+		);
+	};
+}
+
+struct net_iov {
+	unsigned long pad;
+	struct <struct_name> p;
+};
+
+
+A bit of a churn with the padding and nesting net_iov but looks
+sturdier. No duplication, and you can just check positions of the
+structure instead of per-field NET_IOV_ASSERT_OFFSET, which you
+have to not forget to update e.g. when adding a new field. Also,
+with the change __netmem_clear_lsb can return a pointer to that
+structure, casting struct net_iov when it's a page is a bit iffy.
+
+And the next question would be whether it'd be a good idea to encode
+iov vs page not by setting a bit but via one of the fields in the
+structure, maybe pp_magic.
+
+With that said I'm a bit concerned about the net_iov size. If each
+represents 4096 bytes and you're registering 10MB, then you need
+30 pages worth of memory just for the iov array. Makes kvmalloc
+a must even for relatively small sizes.
+
+And the final bit, I don't believe the overlay is necessary in
+this series. Optimisations are great, but this one is a bit more on
+the controversial side. Unless I missed something and it does make
+things easier, it might make sense to do it separately later.
+
+
+> +/* These fields in struct page are used by the page_pool and net stack:
+> + *
+> + *	struct {
+> + *		unsigned long pp_magic;
+> + *		struct page_pool *pp;
+> + *		unsigned long _pp_mapping_pad;
+> + *		unsigned long dma_addr;
+> + *		atomic_long_t pp_ref_count;
+> + *	};
+> + *
+> + * We mirror the page_pool fields here so the page_pool can access these fields
+> + * without worrying whether the underlying fields belong to a page or net_iov.
+> + *
+> + * The non-net stack fields of struct page are private to the mm stack and must
+> + * never be mirrored to net_iov.
+> + */
+> +#define NET_IOV_ASSERT_OFFSET(pg, iov)             \
+> +	static_assert(offsetof(struct page, pg) == \
+> +		      offsetof(struct net_iov, iov))
+> +NET_IOV_ASSERT_OFFSET(pp_magic, pp_magic);
+> +NET_IOV_ASSERT_OFFSET(pp, pp);
+> +NET_IOV_ASSERT_OFFSET(dma_addr, dma_addr);
+> +NET_IOV_ASSERT_OFFSET(pp_ref_count, pp_ref_count);
+> +#undef NET_IOV_ASSERT_OFFSET
+> +
+>   static inline struct dmabuf_genpool_chunk_owner *
+>   net_iov_owner(const struct net_iov *niov)
+>   {
+> @@ -47,19 +83,25 @@ net_iov_binding(const struct net_iov *niov)
+>   struct netmem {
+>   	union {
+>   		struct page page;
+> -
+> -		/* Stub to prevent compiler implicitly converting from page*
+> -		 * to netmem_t* and vice versa.
+> -		 *
+> -		 * Other memory type(s) net stack would like to support
+> -		 * can be added to this union.
+> -		 */
+> -		void *addr;
+> +		struct net_iov niov;
+>   	};
+>   };
+>   
+...
+
+-- 
+Pavel Begunkov
 
