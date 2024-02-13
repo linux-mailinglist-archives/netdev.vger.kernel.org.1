@@ -1,419 +1,198 @@
-Return-Path: <netdev+bounces-71420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78945853403
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 16:02:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 899EA853430
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 16:06:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E23171F2A36B
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 15:02:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40EB3286C88
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 15:06:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C045E60277;
-	Tue, 13 Feb 2024 14:59:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93B0758106;
+	Tue, 13 Feb 2024 15:04:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="NtTUW+qY";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="uHC7ouPt"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="n6bv22s6"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBD625F876;
-	Tue, 13 Feb 2024 14:59:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDFCA5DF18;
+	Tue, 13 Feb 2024 15:04:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707836382; cv=none; b=dU0a6jKsN7NiPMZbeg1YtcY0bAyABsvsffIZ1ropRIM3gkv/84/bkU4AITehyUOVjpVg7vVi1/SVsqDZ8nNEO767/Q0FINxblnzqwP7SdJE1B9CXfpkb/4A9UEvqAuZH2Xj8+1C+zPXgCJkiwvPhdw0FY01rMHl+jMnsDNxSKck=
+	t=1707836681; cv=none; b=FxFqZ40Bor90aS+NzzGLpWrwSQlqZaRQsl/TSLOcFHbEaZ25L3aNQH8bO2I6nnevG4FVzSvSXbZgMHLfsppBoqDpDoYOnXx3ZPET6FHvEFoJXY6bZ+WGH7+8uYPXv2L7lMszN8Rj7NdgsiW2dtVjSiOHe2UI+oOHhOrmkJVgxUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707836382; c=relaxed/simple;
-	bh=wjiwkF+i767m6mSZALI0ZQpRF080pIQxsoW8OMLvcFM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gsaTLdRZJs2z2DPHx1lOY+jP3KBWvvKTEQpwGnteG3IMN6q1LjuruACTg07UivFQEIdUdR7SwAnnMee7ny6mpfFPcENdYBQH4Hv7x6HK4CMe1y+Z4XJ0KkiF5UONUc3FSpm7Lqw2a0g2EaljMCdZWbkkcSf0FK+k/EjQjrNLy84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=NtTUW+qY; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=uHC7ouPt; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1707836378;
+	s=arc-20240116; t=1707836681; c=relaxed/simple;
+	bh=OZO9PxY7EJpy3qriHwydGP0GT1QPvBRdEFJw9EK2Apg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ApM79ZTm4D1+83SQB41kaPIB320wwtZeHJeYzxndUnkyuyUdJ6xzpIa+1RBPXlD10kRVV6iHiYo3eH1mWZqbKLLwrjCnj1WMSKFC91shsjO2dhnYVzrCBx/sYgPTzbQtG5ADNPy7WsQTaz+shwGRonv35EXM+ToLggAnv9YpSPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=n6bv22s6; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 0DF311BF204;
+	Tue, 13 Feb 2024 15:04:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1707836677;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LxJiYWx6lJWHWIj1ASGVWEOAkQaT3yBq0qvrAEz2ajw=;
-	b=NtTUW+qYOjYivPBUtaQNVlXIGt6qgRrs2bOiXMQKQDJTOL8NvCTNsv5cjmVITti0/k2qvt
-	hHvWRyco6ON8p7hdHdRNaLZatZWVgY/IZ/PcfWOUxqVABmJHhSd8V2JiIIhGhptDs2ndHY
-	g8/pT/fTB2njZ+USvF3b8CeKR9cht3j1sEJH6ACB7US1MRm3j1Pry6Vub2ykZwoxWLRskU
-	MxWsVug8A2B2VR0v3QHfVm+bi0I+shOvoSYtJKcqZSO3r6VblZg/G4f1fIdUi8+Qphpnqi
-	0WGpThbDmoaOP2KLqNBYbksPVqrHF/ioBCMTRyVvRNLGHwODRTxlXS6IQPtlMA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1707836378;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LxJiYWx6lJWHWIj1ASGVWEOAkQaT3yBq0qvrAEz2ajw=;
-	b=uHC7ouPtWT6+A4K2T/63OLuuin25fIWcbrIPNiEkHEpTT5zKYM4fzPqjFny36RuE3Fyp9c
-	46AdCN95JKtowUAQ==
-To: bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Hao Luo <haoluo@google.com>,
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=R1uKYiprcO54ajkzkmno8J7tplqI0DAVEd2mUYJA06g=;
+	b=n6bv22s6Xu2eqbUIqKfcs06JBkGHOyZI9vFFDQXtwIb1dFHUSBo2UNEbaP9qr26CSZqNdL
+	8YlTuKwjXuM0y1jchX/DrKHgQ2iB9PgskHXIqRFhmmaByPGkdN1egc2Wknhqg4jMLsBQef
+	EoVWklUFGblPKrgMCaLp2xkIbLIISB34EF/6IHkgv97t5TqUT6WIHqlYhXgW+V98SqDshV
+	LD/QHHGpBPj28U6evCL0yBvxFSPrNm50EnQm1LNaPWCeIbxtHB3RkwrMcRn1sYNfOM8zOd
+	HKwWiMZivkankZq087C07VcjpGnHZ1LXZwkk5O/yP+AEYSUC3SwAH/fBIMv7Vw==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eric Dumazet <edumazet@google.com>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Song Liu <song@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: [PATCH RFC net-next 2/2] net: Move per-CPU flush-lists to bpf_xdp_storage on PREEMPT_RT.
-Date: Tue, 13 Feb 2024 15:58:53 +0100
-Message-ID: <20240213145923.2552753-3-bigeasy@linutronix.de>
-In-Reply-To: <20240213145923.2552753-1-bigeasy@linutronix.de>
-References: <20240213145923.2552753-1-bigeasy@linutronix.de>
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
+	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	mwojtas@chromium.org
+Subject: [PATCH net-next v7 00/13] Introduce PHY listing and link_topology tracking
+Date: Tue, 13 Feb 2024 16:04:17 +0100
+Message-ID: <20240213150431.1796171-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-The per-CPU flush lists are accessed from within the NAPI callback
-(xdp_do_flush() for instance). They are subject to the same problem as stru=
-ct
-bpf_redirect_info.
+Hello everyone,
 
-Add the per-CPU lists cpu_map_flush_list, dev_map_flush_list and
-xskmap_map_flush_list to struct bpf_xdp_storage. Add wrappers for the
-access. Use it only on PREEMPT_RT, keep the per-CPU lists on
-non-PREEMPT_RT builds.
+This is V7 for the link topology addition, allowing to track all PHYs
+that are linked to netdevices.
 
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
- include/linux/filter.h | 34 ++++++++++++++++++++++++++++++++++
- kernel/bpf/cpumap.c    | 33 ++++++++++++++++++++++++++-------
- kernel/bpf/devmap.c    | 33 ++++++++++++++++++++++++++-------
- net/xdp/xsk.c          | 33 +++++++++++++++++++++++++++------
- 4 files changed, 113 insertions(+), 20 deletions(-)
+The main change in V7 is the protection of the main internal API
+entrypoints (link_topo_init/cleanup, link_topo_add/del_phy) by
+IS_REACHABLE(CONFIG_PHYLIB).
 
-diff --git a/include/linux/filter.h b/include/linux/filter.h
-index 97c9be9cabfd6..231ecdc431a00 100644
---- a/include/linux/filter.h
-+++ b/include/linux/filter.h
-@@ -725,6 +725,9 @@ static inline struct bpf_redirect_info *xdp_storage_get=
-_ri(void)
-=20
- struct bpf_xdp_storage {
- 	struct bpf_redirect_info ri;
-+	struct list_head cpu_map_flush_list;
-+	struct list_head dev_map_flush_list;
-+	struct list_head xskmap_map_flush_list;
- };
-=20
- static inline struct bpf_xdp_storage *xdp_storage_set(struct bpf_xdp_stora=
-ge *xdp_store)
-@@ -734,6 +737,9 @@ static inline struct bpf_xdp_storage *xdp_storage_set(s=
-truct bpf_xdp_storage *xd
- 	tsk =3D current;
- 	if (tsk->bpf_xdp_storage !=3D NULL)
- 		return NULL;
-+	INIT_LIST_HEAD(&xdp_store->cpu_map_flush_list);
-+	INIT_LIST_HEAD(&xdp_store->dev_map_flush_list);
-+	INIT_LIST_HEAD(&xdp_store->xskmap_map_flush_list);
- 	tsk->bpf_xdp_storage =3D xdp_store;
- 	return xdp_store;
- }
-@@ -764,6 +770,34 @@ static inline struct bpf_redirect_info *xdp_storage_ge=
-t_ri(void)
- 		return NULL;
- 	return &xdp_store->ri;
- }
-+
-+static inline struct list_head *xdp_storage_get_cpu_map_flush_list(void)
-+{
-+	struct bpf_xdp_storage *xdp_store =3D xdp_storage_get();
-+
-+	if (!xdp_store)
-+		return NULL;
-+	return &xdp_store->cpu_map_flush_list;
-+}
-+
-+static inline struct list_head *xdp_storage_get_dev_flush_list(void)
-+{
-+	struct bpf_xdp_storage *xdp_store =3D xdp_storage_get();
-+
-+	if (!xdp_store)
-+		return NULL;
-+	return &xdp_store->dev_map_flush_list;
-+}
-+
-+static inline struct list_head *xdp_storage_get_xskmap_flush_list(void)
-+{
-+	struct bpf_xdp_storage *xdp_store =3D xdp_storage_get();
-+
-+	if (!xdp_store)
-+		return NULL;
-+	return &xdp_store->xskmap_map_flush_list;
-+}
-+
- #endif
- DEFINE_FREE(xdp_storage_clear, struct bpf_xdp_storage *, if (_T) xdp_stora=
-ge_clear(_T));
-=20
-diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
-index c40ae831ab1a6..ec5be37399c82 100644
---- a/kernel/bpf/cpumap.c
-+++ b/kernel/bpf/cpumap.c
-@@ -78,8 +78,30 @@ struct bpf_cpu_map {
- 	struct bpf_cpu_map_entry __rcu **cpu_map;
- };
-=20
-+#ifndef CONFIG_PREEMPT_RT
- static DEFINE_PER_CPU(struct list_head, cpu_map_flush_list);
-=20
-+static struct list_head *xdp_storage_get_cpu_map_flush_list(void)
-+{
-+	return this_cpu_ptr(&cpu_map_flush_list);
-+}
-+
-+static void init_cpu_map_flush_list(void)
-+{
-+	int cpu;
-+
-+	for_each_possible_cpu(cpu)
-+		INIT_LIST_HEAD(&per_cpu(cpu_map_flush_list, cpu));
-+}
-+
-+#else
-+
-+static void init_cpu_map_flush_list(void)
-+{
-+}
-+
-+#endif
-+
- static struct bpf_map *cpu_map_alloc(union bpf_attr *attr)
- {
- 	u32 value_size =3D attr->value_size;
-@@ -703,7 +725,7 @@ static void bq_flush_to_queue(struct xdp_bulk_queue *bq)
-  */
- static void bq_enqueue(struct bpf_cpu_map_entry *rcpu, struct xdp_frame *x=
-dpf)
- {
--	struct list_head *flush_list =3D this_cpu_ptr(&cpu_map_flush_list);
-+	struct list_head *flush_list =3D xdp_storage_get_cpu_map_flush_list();
- 	struct xdp_bulk_queue *bq =3D this_cpu_ptr(rcpu->bulkq);
-=20
- 	if (unlikely(bq->count =3D=3D CPU_MAP_BULK_SIZE))
-@@ -755,7 +777,7 @@ int cpu_map_generic_redirect(struct bpf_cpu_map_entry *=
-rcpu,
-=20
- void __cpu_map_flush(void)
- {
--	struct list_head *flush_list =3D this_cpu_ptr(&cpu_map_flush_list);
-+	struct list_head *flush_list =3D xdp_storage_get_cpu_map_flush_list();
- 	struct xdp_bulk_queue *bq, *tmp;
-=20
- 	list_for_each_entry_safe(bq, tmp, flush_list, flush_node) {
-@@ -769,7 +791,7 @@ void __cpu_map_flush(void)
- #ifdef CONFIG_DEBUG_NET
- bool cpu_map_check_flush(void)
- {
--	if (list_empty(this_cpu_ptr(&cpu_map_flush_list)))
-+	if (list_empty(xdp_storage_get_cpu_map_flush_list()))
- 		return false;
- 	__cpu_map_flush();
- 	return true;
-@@ -778,10 +800,7 @@ bool cpu_map_check_flush(void)
-=20
- static int __init cpu_map_init(void)
- {
--	int cpu;
--
--	for_each_possible_cpu(cpu)
--		INIT_LIST_HEAD(&per_cpu(cpu_map_flush_list, cpu));
-+	init_cpu_map_flush_list();
- 	return 0;
- }
-=20
-diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
-index a936c704d4e77..c1af5d9d60381 100644
---- a/kernel/bpf/devmap.c
-+++ b/kernel/bpf/devmap.c
-@@ -83,7 +83,29 @@ struct bpf_dtab {
- 	u32 n_buckets;
- };
-=20
-+#ifndef CONFIG_PREEMPT_RT
- static DEFINE_PER_CPU(struct list_head, dev_flush_list);
-+
-+static struct list_head *xdp_storage_get_dev_flush_list(void)
-+{
-+	return this_cpu_ptr(&dev_flush_list);
-+}
-+
-+static void init_dev_flush_list(void)
-+{
-+	int cpu;
-+
-+	for_each_possible_cpu(cpu)
-+		INIT_LIST_HEAD(&per_cpu(dev_flush_list, cpu));
-+}
-+
-+#else
-+
-+static void init_dev_flush_list(void)
-+{
-+}
-+#endif
-+
- static DEFINE_SPINLOCK(dev_map_lock);
- static LIST_HEAD(dev_map_list);
-=20
-@@ -407,7 +429,7 @@ static void bq_xmit_all(struct xdp_dev_bulk_queue *bq, =
-u32 flags)
-  */
- void __dev_flush(void)
- {
--	struct list_head *flush_list =3D this_cpu_ptr(&dev_flush_list);
-+	struct list_head *flush_list =3D xdp_storage_get_dev_flush_list();
- 	struct xdp_dev_bulk_queue *bq, *tmp;
-=20
- 	list_for_each_entry_safe(bq, tmp, flush_list, flush_node) {
-@@ -421,7 +443,7 @@ void __dev_flush(void)
- #ifdef CONFIG_DEBUG_NET
- bool dev_check_flush(void)
- {
--	if (list_empty(this_cpu_ptr(&dev_flush_list)))
-+	if (list_empty(xdp_storage_get_dev_flush_list()))
- 		return false;
- 	__dev_flush();
- 	return true;
-@@ -452,7 +474,7 @@ static void *__dev_map_lookup_elem(struct bpf_map *map,=
- u32 key)
- static void bq_enqueue(struct net_device *dev, struct xdp_frame *xdpf,
- 		       struct net_device *dev_rx, struct bpf_prog *xdp_prog)
- {
--	struct list_head *flush_list =3D this_cpu_ptr(&dev_flush_list);
-+	struct list_head *flush_list =3D xdp_storage_get_dev_flush_list();
- 	struct xdp_dev_bulk_queue *bq =3D this_cpu_ptr(dev->xdp_bulkq);
-=20
- 	if (unlikely(bq->count =3D=3D DEV_MAP_BULK_SIZE))
-@@ -1155,15 +1177,12 @@ static struct notifier_block dev_map_notifier =3D {
-=20
- static int __init dev_map_init(void)
- {
--	int cpu;
--
- 	/* Assure tracepoint shadow struct _bpf_dtab_netdev is in sync */
- 	BUILD_BUG_ON(offsetof(struct bpf_dtab_netdev, dev) !=3D
- 		     offsetof(struct _bpf_dtab_netdev, dev));
- 	register_netdevice_notifier(&dev_map_notifier);
-=20
--	for_each_possible_cpu(cpu)
--		INIT_LIST_HEAD(&per_cpu(dev_flush_list, cpu));
-+	init_dev_flush_list();
- 	return 0;
- }
-=20
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index b78c0e095e221..3050739cfe1e0 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -35,8 +35,30 @@
- #define TX_BATCH_SIZE 32
- #define MAX_PER_SOCKET_BUDGET (TX_BATCH_SIZE)
-=20
-+#ifndef CONFIG_PREEMPT_RT
- static DEFINE_PER_CPU(struct list_head, xskmap_flush_list);
-=20
-+static struct list_head *xdp_storage_get_xskmap_flush_list(void)
-+{
-+	return this_cpu_ptr(&xskmap_flush_list);
-+}
-+
-+static void init_xskmap_flush_list(void)
-+{
-+	int cpu;
-+
-+	for_each_possible_cpu(cpu)
-+		INIT_LIST_HEAD(&per_cpu(xskmap_flush_list, cpu));
-+}
-+
-+#else
-+
-+static void init_xskmap_flush_list(void)
-+{
-+}
-+
-+#endif
-+
- void xsk_set_rx_need_wakeup(struct xsk_buff_pool *pool)
- {
- 	if (pool->cached_need_wakeup & XDP_WAKEUP_RX)
-@@ -372,7 +394,7 @@ static int xsk_rcv(struct xdp_sock *xs, struct xdp_buff=
- *xdp)
-=20
- int __xsk_map_redirect(struct xdp_sock *xs, struct xdp_buff *xdp)
- {
--	struct list_head *flush_list =3D this_cpu_ptr(&xskmap_flush_list);
-+	struct list_head *flush_list =3D xdp_storage_get_xskmap_flush_list();
- 	int err;
-=20
- 	err =3D xsk_rcv(xs, xdp);
-@@ -387,7 +409,7 @@ int __xsk_map_redirect(struct xdp_sock *xs, struct xdp_=
-buff *xdp)
-=20
- void __xsk_map_flush(void)
- {
--	struct list_head *flush_list =3D this_cpu_ptr(&xskmap_flush_list);
-+	struct list_head *flush_list =3D xdp_storage_get_xskmap_flush_list();
- 	struct xdp_sock *xs, *tmp;
-=20
- 	list_for_each_entry_safe(xs, tmp, flush_list, flush_node) {
-@@ -399,7 +421,7 @@ void __xsk_map_flush(void)
- #ifdef CONFIG_DEBUG_NET
- bool xsk_map_check_flush(void)
- {
--	if (list_empty(this_cpu_ptr(&xskmap_flush_list)))
-+	if (list_empty(xdp_storage_get_xskmap_flush_list()))
- 		return false;
- 	__xsk_map_flush();
- 	return true;
-@@ -1770,7 +1792,7 @@ static struct pernet_operations xsk_net_ops =3D {
-=20
- static int __init xsk_init(void)
- {
--	int err, cpu;
-+	int err;
-=20
- 	err =3D proto_register(&xsk_proto, 0 /* no slab */);
- 	if (err)
-@@ -1788,8 +1810,7 @@ static int __init xsk_init(void)
- 	if (err)
- 		goto out_pernet;
-=20
--	for_each_possible_cpu(cpu)
--		INIT_LIST_HEAD(&per_cpu(xskmap_flush_list, cpu));
-+	init_xskmap_flush_list();
- 	return 0;
-=20
- out_pernet:
---=20
+That's restrictive, but it looks difficult to do otherwise while still keep the
+data structure opaque and not add dependency clutter with PHYLIB.
+
+As you can tell, I'm unsure about this, so please don't hesitate to
+comment on that part :)
+
+The other changes are very minor, the only one is a call to netdev_put
+in the .done() netlink callback.
+
+As a remainder, here's what the PHY listings would look like :
+ - eth0 has a 88x3310 acting as media converter, and an SFP module with
+   an embedded 88e1111 PHY
+ - eth2 has a 88e1510 PHY
+
+# ethtool --show-phys *
+
+PHY for eth0:
+PHY index: 1
+Driver name: mv88x3310
+PHY device name: f212a600.mdio-mii:00
+Downstream SFP bus name: sfp-eth0
+PHY id: 0
+Upstream type: MAC
+
+PHY for eth0:
+PHY index: 2
+Driver name: Marvell 88E1111
+PHY device name: i2c:sfp-eth0:16
+PHY id: 21040322
+Upstream type: PHY
+Upstream PHY index: 1
+Upstream SFP name: sfp-eth0
+
+PHY for eth2:
+PHY index: 1
+Driver name: Marvell 88E1510
+PHY device name: f212a200.mdio-mii:00
+PHY id: 21040593
+Upstream type: MAC
+
+Ethtool patches : https://github.com/minimaxwell/ethtool/tree/link-topo-v6
+
+Link to V6: https://lore.kernel.org/netdev/20240126183851.2081418-1-maxime.chevallier@bootlin.com/
+Link to V5: https://lore.kernel.org/netdev/20231221180047.1924733-1-maxime.chevallier@bootlin.com/
+Link to V4: https://lore.kernel.org/netdev/20231215171237.1152563-1-maxime.chevallier@bootlin.com/
+Link to V3: https://lore.kernel.org/netdev/20231201163704.1306431-1-maxime.chevallier@bootlin.com/
+Link to V2: https://lore.kernel.org/netdev/20231117162323.626979-1-maxime.chevallier@bootlin.com/
+Link to V1: https://lore.kernel.org/netdev/20230907092407.647139-1-maxime.chevallier@bootlin.com/
+
+Maxime Chevallier (13):
+  net: phy: Introduce ethernet link topology representation
+  net: sfp: pass the phy_device when disconnecting an sfp module's PHY
+  net: phy: add helpers to handle sfp phy connect/disconnect
+  net: sfp: Add helper to return the SFP bus name
+  net: ethtool: Allow passing a phy index for some commands
+  netlink: specs: add phy-index as a header parameter
+  net: ethtool: Introduce a command to list PHYs on an interface
+  netlink: specs: add ethnl PHY_GET command set
+  net: ethtool: plca: Target the command to the requested PHY
+  net: ethtool: pse-pd: Target the command to the requested PHY
+  net: ethtool: cable-test: Target the command to the requested PHY
+  net: ethtool: strset: Allow querying phy stats by index
+  Documentation: networking: document phy_link_topology
+
+ Documentation/netlink/specs/ethtool.yaml      |  62 ++++
+ Documentation/networking/ethtool-netlink.rst  |  46 +++
+ Documentation/networking/index.rst            |   1 +
+ .../networking/phy-link-topology.rst          | 121 +++++++
+ MAINTAINERS                                   |   2 +
+ drivers/net/phy/Makefile                      |   2 +-
+ drivers/net/phy/at803x.c                      |   2 +
+ drivers/net/phy/marvell-88x2222.c             |   2 +
+ drivers/net/phy/marvell.c                     |   2 +
+ drivers/net/phy/marvell10g.c                  |   2 +
+ drivers/net/phy/phy_device.c                  |  55 ++++
+ drivers/net/phy/phy_link_topology.c           | 105 +++++++
+ drivers/net/phy/phylink.c                     |   3 +-
+ drivers/net/phy/sfp-bus.c                     |  15 +-
+ include/linux/netdevice.h                     |   4 +-
+ include/linux/phy.h                           |   6 +
+ include/linux/phy_link_topology.h             |  72 +++++
+ include/linux/phy_link_topology_core.h        |  25 ++
+ include/linux/sfp.h                           |   8 +-
+ include/uapi/linux/ethtool.h                  |  16 +
+ include/uapi/linux/ethtool_netlink.h          |  21 ++
+ net/core/dev.c                                |   9 +
+ net/ethtool/Makefile                          |   2 +-
+ net/ethtool/cabletest.c                       |  16 +-
+ net/ethtool/netlink.c                         |  53 +++-
+ net/ethtool/netlink.h                         |  10 +
+ net/ethtool/phy.c                             | 297 ++++++++++++++++++
+ net/ethtool/plca.c                            |  19 +-
+ net/ethtool/pse-pd.c                          |  13 +-
+ net/ethtool/strset.c                          |  17 +-
+ 30 files changed, 965 insertions(+), 43 deletions(-)
+ create mode 100644 Documentation/networking/phy-link-topology.rst
+ create mode 100644 drivers/net/phy/phy_link_topology.c
+ create mode 100644 include/linux/phy_link_topology.h
+ create mode 100644 include/linux/phy_link_topology_core.h
+ create mode 100644 net/ethtool/phy.c
+
+-- 
 2.43.0
 
 
