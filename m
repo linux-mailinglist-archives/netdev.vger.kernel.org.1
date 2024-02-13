@@ -1,85 +1,92 @@
-Return-Path: <netdev+bounces-71490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 330CF853966
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 19:05:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CC3E8539C1
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 19:20:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB8EF1F21AE2
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 18:05:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 416F3B21940
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 18:20:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ACCA604D0;
-	Tue, 13 Feb 2024 18:04:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C194A605C7;
+	Tue, 13 Feb 2024 18:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WYsy4lZu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lneCGLnX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C903605A3;
-	Tue, 13 Feb 2024 18:04:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97382605C2;
+	Tue, 13 Feb 2024 18:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707847499; cv=none; b=SMvMvcwjcjH/7NuLMj4ua6m1I4gse8l14Mx5QgVpTqjdDQHMoIrsU8Nm2NylLADPPXVtL74ThYSWGhPySwIOlbQ/AySl/6m9H+S2Xc5va1q4NKf7sM3qk+dTU8C67ybV3D7JFSVf2uR7XNACPKFUQzKhhKk7HMzlFYow4kVwSCs=
+	t=1707848428; cv=none; b=K+k5P5g2cHrwrre37Fpc/G6Q9Al9coYCP/oHIaFcfaLkHN8LHhzA9myB7UMiZ2cMWsbMUEFjdE7ibYXNQXiKwlYp8fO04kzKLRaguakUbAIoY2uZD7i9U3kqoDPQJ2UfxwySBM/+Do0F1I+rLmpGjI4BXHbPJIrCyQ4BibaaT+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707847499; c=relaxed/simple;
-	bh=QcYIDSiCp33r8BU8FmPB//SjKuQcfdO/ovF933HfSR0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=vFT0LS704obkYFhMysJF2ub1TOjiuh/RxatYagFnNBXF5VSZBEVpeA5hBXZKH5+Y0i7oSjVF6pN7aD2MK+E/MVWVvS41tW/aHO6SUiXwzFvXjkJZp572aMGJ9bZ3kPlTAXZAXiEQurH35lYLDepuB7NV+EI7IAknW8K8SuEnc7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WYsy4lZu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22B20C433C7;
-	Tue, 13 Feb 2024 18:04:58 +0000 (UTC)
+	s=arc-20240116; t=1707848428; c=relaxed/simple;
+	bh=D7VWw6OUR63KfFGyZ4wX5dRIQR0q/yLmEzyd5gojiDo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Uk34AA4DAVKLiPkbQSLHsW6YNefd0yAjjYM+IcgspXX5UkvcjcnKZuohM2SAQC7rFMgbRsSKGHqdhoB2MAXVjwLzGwuAYYL86WixcAqCQ8IVNZFuE/XQk2RXXO1JTBqI47rJ51Dh+pWbxjVgbi74zpdR1hZQJFO1EnRnFhadSuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lneCGLnX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1FE77C43390;
+	Tue, 13 Feb 2024 18:20:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707847498;
-	bh=QcYIDSiCp33r8BU8FmPB//SjKuQcfdO/ovF933HfSR0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WYsy4lZuf3g58s8VpVgwI7cVjG5uF7Qa2eo1nxCkDfnZr4/o36pygCwWDZejklHzi
-	 OeFJY9XVFDnZ0W4GVozJnViVjQ4C4CcztMhkG9KofurM4VHEoHYazoX00ogQBAbIYq
-	 0JXqo4DmZQiW/SrbWAP5vb8ZpAPTFUmEE3fS5nYR7qQN8KREaN1GxOUg23CMqHlXgq
-	 q5UEwjLwqdTaB/X7pn2O4W5RzcQCBxsmFE8bNGuNAJDoNlDLI5Cx+6KSpI4DO85roV
-	 gQVjDZA9BHOJAjzBDuP67j9xlhQdaTNMpBGFYJxxIQVq/nwbMFVP/AuEsaA0sXdTMS
-	 ig8OXTK0lRCXg==
-Date: Tue, 13 Feb 2024 10:04:57 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Breno Leitao <leitao@debian.org>, davem@davemloft.net,
- pabeni@redhat.com, Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Andrew Morton <akpm@linux-foundation.org>, weiwan@google.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, horms@kernel.org,
- Jonathan Corbet <corbet@lwn.net>, Randy Dunlap <rdunlap@infradead.org>,
- Bjorn Helgaas <bhelgaas@google.com>, Johannes Berg
- <johannes.berg@intel.com>, Thomas =?UTF-8?B?V2Vpw59zY2h1aA==?=
- <linux@weissschuh.net>, "open list:TRACING"
- <linux-trace-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v3] net: dqs: add NIC stall detector based on
- BQL
-Message-ID: <20240213100457.6648a8e0@kernel.org>
-In-Reply-To: <CANn89iLWWDjp71R7zttfTcEvZEdmcA1qo47oXkAX5DuciYvOtQ@mail.gmail.com>
-References: <20240202165315.2506384-1-leitao@debian.org>
-	<CANn89iLWWDjp71R7zttfTcEvZEdmcA1qo47oXkAX5DuciYvOtQ@mail.gmail.com>
+	s=k20201202; t=1707848428;
+	bh=D7VWw6OUR63KfFGyZ4wX5dRIQR0q/yLmEzyd5gojiDo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=lneCGLnX7lv/8OQ519hDCaAoMVrozakbFNDiwwXVWFnH8YEbT+5aIzS5uvyDStbv1
+	 ++BACJ+MiKuvJTaeg7VKmGVOYctdGvALajHjXTN8h68PM1+eiXx22zsy7RWxWVgRYi
+	 ohenwcydvpMi6jBkKbzz69J0gtrN16ngW5EQcyF6OSOw4/g2E9znLthiDpEOQaEn84
+	 +Wzwr5wP87oqU6my727f6xS920Pf6Np3ygOX80F41KfO3WhpRDJeLxvAzbV3HnlFBK
+	 VwLGmXhTWb5592a2cReh52dUroNJr5Fh6YlczojcN0Ky5gUOfxRTOqe1/SCTuzFwK9
+	 49PvbzHkW3vSw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 05B03D84BCF;
+	Tue, 13 Feb 2024 18:20:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3 net] selftests: net: cope with slow env in gro.sh test
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170784842801.32476.7295008627532134278.git-patchwork-notify@kernel.org>
+Date: Tue, 13 Feb 2024 18:20:28 +0000
+References: <97d3ba83f5a2bfeb36f6bc0fb76724eb3dafb608.1707729403.git.pabeni@redhat.com>
+In-Reply-To: <97d3ba83f5a2bfeb36f6bc0fb76724eb3dafb608.1707729403.git.pabeni@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, shuah@kernel.org, willemb@google.com, lixiaoyan@google.com,
+ linux-kselftest@vger.kernel.org
 
-On Tue, 13 Feb 2024 14:57:49 +0100 Eric Dumazet wrote:
-> Please note that adding other sysfs entries is expensive for workloads
-> creating/deleting netdev and netns often.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 12 Feb 2024 10:39:41 +0100 you wrote:
+> The gro self-tests sends the packets to be aggregated with
+> multiple write operations.
 > 
-> I _think_ we should find a way for not creating
-> /sys/class/net/<interface>/queues/tx-{Q}/byte_queue_limits  directory
-> and files
-> for non BQL enabled devices (like loopback !)
+> When running is slow environment, it's hard to guarantee that
+> the GRO engine will wait for the last packet in an intended
+> train.
+> 
+> [...]
 
-We should try, see if anyone screams. We could use IFF_NO_QUEUE, and
-NETIF_F_LLTX as a proxy for "device doesn't have a real queue so BQL 
-would be pointless"? Obviously better to annotate the drivers which
-do have BQL support, but there's >50 of them on a quick count..
+Here is the summary with links:
+  - [v3,net] selftests: net: cope with slow env in gro.sh test
+    https://git.kernel.org/netdev/net/c/e58779f47e5e
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
