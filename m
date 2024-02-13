@@ -1,92 +1,110 @@
-Return-Path: <netdev+bounces-71146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B028F852719
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 02:52:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30EB485271C
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 02:53:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E30711C25B00
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:52:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB4051F25E9F
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:53:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F9E46AD6;
-	Tue, 13 Feb 2024 01:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1EB2138C;
+	Tue, 13 Feb 2024 01:52:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QN6Z/BmZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eDPiwvym"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BC018BEB
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 01:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87B211C3D;
+	Tue, 13 Feb 2024 01:52:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707789031; cv=none; b=OK9J6cDLDMad2BwKeKNoJ1SqQLMHR1EzYS1SdOnEbq9L3PUb7NmRnk7sWGGs4CY7lgZHyUURAZttXbr6WwuFReCi7euV0qkZ3NUaXzXG33eodVwti08jWrmrsA5gw8Fh/mmI+Q7iBWIyEOOt4rLsGVunWAbYOddMHhW4U1SgL/E=
+	t=1707789151; cv=none; b=ecMl6ZPGg1BkfMbieriHuTdXroiZbcadTOE2anL8Lcvx2HaFn1URWdbGjgNFO0HWp89dgWoaAMIjakgnuZ29gHTRbD+0IgBFdelksqtsFcF1iUP2cDpw557f0ojsgObMUsGJ/5JOtNjoC9EC8GSF80yewdAtqsn+hqWN5pVsEeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707789031; c=relaxed/simple;
-	bh=ADJxMi1qkZlid1lD0Hf2IN7oWJpu2lN7kjfyyBbMPXQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=iXentOULE3TvW8pEeWXGjVz7euqlZHwtivqQS1fHYG70LKfgLZ2/vIJn7wQSBSO7CstmhjEP9N/ZHky4utpCu28dS9yOkIivrN5BRPchIpcL59drAXhkWoPJMOVfldGORE1iQklg0mHhdEJnP9VNqPYv89nz5bgfpUfVAiRC58s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QN6Z/BmZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 05994C433F1;
-	Tue, 13 Feb 2024 01:50:31 +0000 (UTC)
+	s=arc-20240116; t=1707789151; c=relaxed/simple;
+	bh=uGuxFzDBaFp/hIBEohjAhRGcb9tqim+2jqM2pnvtGo4=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=JhOoI0bw/0W11dX2k92OQ8fy0EEwLFld3zFpvcZ9bsjW/5bTDjnfCKxxuSw8B6Fd3cTgk18HLW3bkAT7+T1PivYQkfpbo16iFBnK1r6lOvfCdPoGYK/3WhKRMAd/kLPeR28Tqb/ZTj8pLDQJY2VfO9SSz28jH1jkS2DMuJYCMGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eDPiwvym; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D323C433C7;
+	Tue, 13 Feb 2024 01:52:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707789031;
-	bh=ADJxMi1qkZlid1lD0Hf2IN7oWJpu2lN7kjfyyBbMPXQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QN6Z/BmZDxDdyo/CpP14pd4aYoYpK1oZD0j+K85wvM+Qw4eKY2Jsvuw5wHOyWMNfx
-	 /+3uFTp/k7TtPcsR+x+eABhAt35ujr4ALYQeiQEzuBDrslh1JsmI12I5gbHATxVu7K
-	 dHmSkOfdZWA0X3im+X7ST8PMpZW9DlgK4OJ1YMh+c0F1/Wks1MDOszF65TXKcdd9hG
-	 h2xfX65qcpQpFNr+wKL+1ZvA6xYl6QS1EqbpHZJcbLHdltOhFWcHlX8Hajh0YRQY72
-	 MX8GcYywYL/l3lAbT2AxtGYD6DdYzHwHldrbwVCKj1lDFzvfiE4IVM64OoOm+VL/7B
-	 euRD3TEXOrTUA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DFD62D84BC6;
-	Tue, 13 Feb 2024 01:50:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1707789150;
+	bh=uGuxFzDBaFp/hIBEohjAhRGcb9tqim+2jqM2pnvtGo4=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=eDPiwvymo5oHUt2DUOS2kOtbJ7K+J1wO6uzNETAr+HveASj7TBWCLPo0vpkjnTmJ2
+	 ccMUkNfVO98UraNQfFx1ftopzdYwFMxx/abCEaVYYIF77JyaacAJ2zKN9TwbvVOBzh
+	 fT70pastL/AOnilQY1w23dIlUVOcZ/w2dKCH6kqT49wcft0yx4KjGMtg55DevYUUkX
+	 JL7slsqaAbdy7udDnSjT2JsnSFuUQ7+AlQFRF38x8dYrAnKxgk0KQqMDbGhmEumi9I
+	 +1DkZ9mdRyBrv/6M7AEq4PWO/v2/oURpP9l1WnjmnNjp6Q/v7j3hX7ADfiJFEwE6se
+	 /wbXLzukvQ/Sw==
+Date: Mon, 12 Feb 2024 17:52:28 -0800
+From: Kees Cook <kees@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>, Kees Cook <keescook@chromium.org>
+CC: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, linux-kernel@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Qian Cai <quic_qiancai@quicinc.com>,
+ mptcp@lists.linux.dev, netdev@vger.kernel.org,
+ Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH] configs/debug: add NET debug config
+User-Agent: K-9 Mail for Android
+In-Reply-To: <20240212170253.77a7be7c@kernel.org>
+References: <20240212-kconfig-debug-enable-net-v1-1-fb026de8174c@kernel.org> <202402121039.E14DF37@keescook> <20240212170253.77a7be7c@kernel.org>
+Message-ID: <952DDEA7-E788-4705-B85F-6B28AD6A707A@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] pds_core: no health-thread in VF path
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170778903090.20137.980567667578810208.git-patchwork-notify@kernel.org>
-Date: Tue, 13 Feb 2024 01:50:30 +0000
-References: <20240210002002.49483-1-shannon.nelson@amd.com>
-In-Reply-To: <20240210002002.49483-1-shannon.nelson@amd.com>
-To: Shannon Nelson <shannon.nelson@amd.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, brett.creeley@amd.com,
- drivers@pensando.io
-
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri, 9 Feb 2024 16:20:02 -0800 you wrote:
-> The VFs don't run the health thread, so don't try to
-> stop or restart the non-existent timer or work item.
-> 
-> Fixes: d9407ff11809 ("pds_core: Prevent health thread from running during reset/remove")
-> Reviewed-by: Brett Creeley <brett.creeley@amd.com>
-> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net] pds_core: no health-thread in VF path
-    https://git.kernel.org/netdev/net/c/3e36031cc054
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
 
+
+On February 12, 2024 5:02:53 PM PST, Jakub Kicinski <kuba@kernel=2Eorg> wr=
+ote:
+>On Mon, 12 Feb 2024 10:39:55 -0800 Kees Cook wrote:
+>> > Notes:
+>> >   - It looks like this debug=2Econfig doesn't have a specific maintai=
+ner=2E
+>> >     If this patch is not rejected, I don't know if this modification =
+can
+>> >     go through the net tree, or if it should be handled by Andrew=2E
+>> >     Probably the latter? I didn't add [net-next] in the subject for t=
+his
+>> >     reason=2E =20
+>>=20
+>> Adding these seem reasonable=2E I touched debug=2Econfig last, so I can=
+ take
+>> it via the kernel hardening tree if netdev doesn't want to take it=2E
+>
+>I'd prefer to have it in net-next sooner rather than later, because
+>when our CI hits an issue we can tell people:
+>
+>	make defconfig debug=2Econfig
+>	make
+>
+>otherwise I have to explain what options to twiddle with=2E And the
+>refcount options do catch bugs, I had to do this exact the explaining
+>last Friday :(
+>
+>So I'd offer these three options:
+> - we put it on a shared branch and both pull in
+> - you send to Linus within a week and we'll get it soon that way
+> - we take it to net-next directly
+>
+>What's your preference?
+
+Totally fine in net-next! Go for it=2E :)
+
+-Kees
+
+
+--=20
+Kees Cook
 
