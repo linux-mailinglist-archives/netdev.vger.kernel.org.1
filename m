@@ -1,76 +1,89 @@
-Return-Path: <netdev+bounces-71355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 822A08530FB
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:55:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9FDC8530FC
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:55:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2198B1F2875D
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 12:55:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32F51B21AB4
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 12:55:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADD564207D;
-	Tue, 13 Feb 2024 12:55:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WlbE29+s"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0ECA42078;
+	Tue, 13 Feb 2024 12:55:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from 8.mo560.mail-out.ovh.net (8.mo560.mail-out.ovh.net [188.165.52.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9CCA383AE
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 12:55:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39CB6383AE
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 12:55:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.165.52.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707828919; cv=none; b=hKpOYMkV5A6chICq52I+dQvqL286gQjTVxaf/G1+rUPWXovt6A/dihZOjZ06QcmbWucdqs7B+cT2y6/t4FS0YwCSEmJHYxmMiZo+rQit63+kU74Ox81ih0zb/3H6RvO/yyZ8QWwHEMigfczRqf5dWnjOg8ni2oYXDC0jKfLS5Ws=
+	t=1707828946; cv=none; b=clTt+ezVW8InRIOj6P+o3VNGL1uswCvHHgZwbsTOWbyvHZYP/uy446ZVqvTlQyWlF1/b3VEFcqKDbEWSsNQsAe1CfsvDUydG9/SLs62lHL39XzvJQytICrBJzXlyL0V0k0Sr5kZ4bHluh9wg0NYc3/l7ISCJnH3pzrB5cLmcVjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707828919; c=relaxed/simple;
-	bh=Wa9QqcwCvGFkqHp+sH92OyFxS+Qi3Usfh0kW8jKXKoo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BXHt/Za4q9BAmqHoy0ZHfGwoOrbowgGfk6jqwuAqGLaWlC4Muuhc+LrMOvXO2w2SwBvynMQ/TCNW6zPJhvASIJ6LGr5Ce5LO7Kudn2MBeXu8Tvi2xuTTqecQRMBJg1gj1/89A6JxHi3JNOoMhfBjYZ9E0KiNsiJWzh0kYLDwiGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WlbE29+s; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=oabz1KQIlGi+X/ThyAApBSuu4arkZ5fgxWZZDain5js=; b=WlbE29+sKhFQW9DwyQlJwN+FJh
-	QoEWUM+nMp478GCclKEKEei0qrXwe7nrCInqlYoBUnaz+ZjkAYuu1gvEKciROE4AzsyYOsa8SXVvH
-	V934S1hWy2DVM8jmo+cy1TO81A+9nG0wrCGlSWRaSozAS4FFb7GYoXUWQuaqNkFzkT0M=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rZsJk-007g1C-5x; Tue, 13 Feb 2024 13:55:20 +0100
-Date: Tue, 13 Feb 2024 13:55:20 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next 2/3] r8169: support setting the EEE tx idle
- timer on RTL8168h
-Message-ID: <dad2f680-2f76-4025-be68-ef4b8c535ee2@lunn.ch>
-References: <89a5fef5-a4b7-4d5d-9c35-764248be5a19@gmail.com>
- <cfb69ec9-24c4-4aad-9909-fdae3088add4@gmail.com>
+	s=arc-20240116; t=1707828946; c=relaxed/simple;
+	bh=0MITEjaq0HVHcr9lD/N/N/1MZkCXadxh54dHMWq8gUE=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=EdQZWe68lm86NbRYhab3EiUae8bxXAwUbfXY8lp7O2w+v66zp7o8of2JVudOjMlocAFDT864GukjqNtWsz248kKssQtee9KLD4d4wteCY3yZ1VZXHHbjgaNFfctQDhuMJu5ckw/0ioGkgNIEBGZ0J5uQMwgSDlT1bM0PvDOEYKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=remlab.net; spf=pass smtp.mailfrom=remlab.net; arc=none smtp.client-ip=188.165.52.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=remlab.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=remlab.net
+Received: from director9.ghost.mail-out.ovh.net (unknown [10.108.9.217])
+	by mo560.mail-out.ovh.net (Postfix) with ESMTP id 4TZ1XD1cDQz13Kb
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 12:55:40 +0000 (UTC)
+Received: from ghost-submission-6684bf9d7b-frr6m (unknown [10.110.168.145])
+	by director9.ghost.mail-out.ovh.net (Postfix) with ESMTPS id 5869D1FEC3;
+	Tue, 13 Feb 2024 12:55:39 +0000 (UTC)
+Received: from courmont.net ([37.59.142.106])
+	by ghost-submission-6684bf9d7b-frr6m with ESMTPSA
+	id 2674Dstmy2UDqQAAnbIfag
+	(envelope-from <remi@remlab.net>); Tue, 13 Feb 2024 12:55:39 +0000
+Authentication-Results:garm.ovh; auth=pass (GARM-106R006d847666b-07fc-4e31-8631-11f0760ee372,
+                    A20BB40909ED6AD0948787802399DD68533E41DF) smtp.auth=postmaster@courmont.net
+X-OVh-ClientIp:87.95.21.213
+Date: Tue, 13 Feb 2024 14:55:37 +0200
+From: =?ISO-8859-1?Q?R=E9mi_Denis-Courmont?= <remi@remlab.net>
+To: Paolo Abeni <pabeni@redhat.com>, courmisch@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org
+CC: netdev@vger.kernel.org
+Subject: Re: [PATCH 1/2] phonet: take correct lock to peek at the RX queue
+User-Agent: K-9 Mail for Android
+In-Reply-To: <9c03284dedb5559de0b99fde04bc3e19b5027d6f.camel@redhat.com>
+References: <20240210125054.71391-1-remi@remlab.net> <9c03284dedb5559de0b99fde04bc3e19b5027d6f.camel@redhat.com>
+Message-ID: <B523FFF3-4D2E-4295-9D0F-374FF3359DF1@remlab.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cfb69ec9-24c4-4aad-9909-fdae3088add4@gmail.com>
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Ovh-Tracer-Id: 7407295488023533943
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvledrudehgdeggecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefufggjfhfkgggtgfesthhqmhdttderjeenucfhrhhomheptformhhiucffvghnihhsqdevohhurhhmohhnthcuoehrvghmihesrhgvmhhlrggsrdhnvghtqeenucggtffrrghtthgvrhhnpedtheettdehgeefjeefteehteegvdevkeekjefhgfeggfeiveevfffflefgheeujeenucfkphepuddvjedrtddrtddruddpkeejrdelhedrvddurddvudefpdefjedrheelrddugedvrddutdeinecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepuddvjedrtddrtddruddpmhgrihhlfhhrohhmpeeorhgvmhhisehrvghmlhgrsgdrnhgvtheqpdhnsggprhgtphhtthhopedupdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdfovfetjfhoshhtpehmohehiedtpdhmohguvgepshhmthhpohhuth
 
-On Mon, Feb 12, 2024 at 07:58:47PM +0100, Heiner Kallweit wrote:
-> Support setting the EEE tx idle timer also on RTL8168h.
-> 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+Hi,
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Le 13 f=C3=A9vrier 2024 14:12:57 GMT+02:00, Paolo Abeni <pabeni@redhat=2Ec=
+om> a =C3=A9crit=C2=A0:
+>On Sat, 2024-02-10 at 14:50 +0200, R=C3=A9mi Denis-Courmont wrote:
+>> From: R=C3=A9mi Denis-Courmont <courmisch@gmail=2Ecom>
+>>=20
+>> Reported-by: Luosili <rootlab@huawei=2Ecom>
+>> Signed-off-by: R=C3=A9mi Denis-Courmont <courmisch@gmail=2Ecom>
+>
+>Looks good, but you need to add a non empty commit message=2E
 
-    Andrew
+With all due respect, the headline is self-explanatory in my opinion=2E Yo=
+u can't compare this with the more involved second patch=2E Also the second=
+ patch was *not* reported by Huawei Rootlab, but inferred by me and thus ha=
+s no existing documentation - unlike this one=2E
+
+As for the bug ID, I don't know it (security list didn't pass it on to me)=
+=2E Anyhow it seems that Eric Dumazet already either found it or filled it =
+in, so I don't know what else you're asking for=2E
 
