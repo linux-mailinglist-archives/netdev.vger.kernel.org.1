@@ -1,182 +1,136 @@
-Return-Path: <netdev+bounces-71439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8361A853483
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 16:24:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0A11853484
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 16:24:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 410A22832CE
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 15:24:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AC522828DC
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 15:24:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F079D5B672;
-	Tue, 13 Feb 2024 15:24:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ScGBcjpZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECFA25D91C;
+	Tue, 13 Feb 2024 15:24:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB8D43AC7
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 15:24:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D64C75D902;
+	Tue, 13 Feb 2024 15:24:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.54.195.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707837850; cv=none; b=Es29JO1L6XEMAwCXqIKZ3w6lwBhhDqSEkrNLBTSmFeyQmvFaC+GzTPZnddNNH7JbebnJ3KY5TuVradB+Iefsuq0alSvv6V11nR1WjON58dSkPXQZePZj7TEEl2ytF/71+2c2R4FqA9kRwhe+WvgMvsIM22/ZdaIiDxYzGGuzS1I=
+	t=1707837873; cv=none; b=jN1XVInVt+IDSuoqDkojjr4l8WqktzTV8rSdNCYPXhch5iZJWNB9uTHpS9rEYMEliHk4J7MFTXtK999EjSvb8l4Gsa96oFKQwALlXUVZs2QHeYvE8mOSZeFxFQNoUB7KY6EnD/xOsnSKrKU5t29QOXZdY/rD4gfdjYyE8IHQwZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707837850; c=relaxed/simple;
-	bh=ONwpmHR6+gxMJzkHqwX0Frsnxs5ZIrTy8QiQhHb1nXI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=n8BLsz6h0xqZK3VNVn8C19EP/vw9svtV8Huy59tN1M79dUB8JoSYMTcHHRC5bIiUoEiKNWaqo9FjAtJ7xaW6namN+0VChFjgILLGRUhSkTmFEje/Nf87+7GWvr1vDQjAWzv/dQqwd31X1NHe4pbjRi5RxioMEfp9aVN43uncOy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ScGBcjpZ; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-561f0f116ecso10671a12.0
-        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 07:24:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707837847; x=1708442647; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wxZ7wzZSQYNuh/hc/vyFuDQdpGaH4/Zr0ZsQMiC2xNM=;
-        b=ScGBcjpZhUixX1h/U1zGmVk6HDdVRPFf6XkfSKvZ77igMzD+QW536EWygGTD0GAFJ4
-         H1uOBu5ubXnbi925SND9DfKWFt3d7n9qlnVD0J8Qk/eZfxIZ0B2m15m29HCVOgVIObeK
-         u26jun0vUe6DrZCRq7O+mtBK99/iVcpW0znrx3ZYAIttuTfpy1IQv+FvYeI7aLHe9MNo
-         1IHkYYqJYWfilP59N/RNCLmve3h866AjnYCiDrYZfB84Z1njc8B+N2gpwJ9g/2WawPch
-         3kJcrCiyxYtOD6vDwuWv6CN7ce/J2XKI1ld/qO+7GyAYRMZqTJeZ575TrfNOGNozOnjo
-         Seag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707837847; x=1708442647;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wxZ7wzZSQYNuh/hc/vyFuDQdpGaH4/Zr0ZsQMiC2xNM=;
-        b=ceXbG5/dJ4IfFO/nOJ8Pj105Mrp8GkURrbteC95tTGL0nAS6GcV5SLTrkYEmCN2+6b
-         DQgOOJEkGeT+Ege18zEg+JUZu0NEEXPyzKSni/xphDM4fX2SkHfM/BMXmtBZ0DObaLRy
-         3BezWSdVx73KUly7gDXDyALjxISGguoUvgsBkXFBS8BI5RapynPoL6gTHgbNpZmHLJI9
-         O2pgbGf5uuuNWuyy2OFvo4GCGPm115sI5bJL6XGnZV04eph+NyenJ4+AGvvusgCm1kay
-         aoXeV1oaNTuD3JmyEetr9zIw/nft1WVbky3Js6YZOLSPwtXmZfvt3W2lGWVmREjNgztE
-         ho1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCV3BDSVH98FGQts0lIl5q2iJXm1/tYETiq8M2ZO16bPwnpIU62biohd73U2BJlEHQfz8VGQaqlTFNj+FuhpLD9SZ1q5JH88
-X-Gm-Message-State: AOJu0YxfF4kSJJ89TB3cRYeUdwJarUpg6PpmscgdvjBP7AgexGlnCD/k
-	cy3CgUPmDmqz3ZXNFAC1DDiG7nTH1FDs/X+fx9Z6F7w0e+F4R4YOtDKI4zXRwo+v2TalrzStbxS
-	qfh5nz+IprHmvNVmJyoN7AcPfr3Iu6uyRtRfl
-X-Google-Smtp-Source: AGHT+IH1WDq84v2EN4yAPmsbXZFreYoRIktU7ryvR4ENOJwg+lWWUAgDnRCJwK4hkUrfuFLggZG483NmhLWpzp1VKPg=
-X-Received: by 2002:a50:cd59:0:b0:560:e82e:2cc4 with SMTP id
- d25-20020a50cd59000000b00560e82e2cc4mr127803edj.3.1707837847148; Tue, 13 Feb
- 2024 07:24:07 -0800 (PST)
+	s=arc-20240116; t=1707837873; c=relaxed/simple;
+	bh=CwNvQx4cKxm4wTveQJa2fF9BF88LSILbE5saxxP+eqw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=F/iKuI7y2Tx+QDSFsr35EzvXa2uBbqET3fJGxfLlw26ZRPGh9ScS9JYaG6X++0e7BeerQmKcObFJa8O6ae4zwwXjEKERg8ULvVffvXLha3ddMxjiPWPT8rL0Vo/wyOQhyrlhLayGINkKUo5aDMjUEQMu5p1Ii1i9mU4In9298bU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru; spf=pass smtp.mailfrom=fintech.ru; arc=none smtp.client-ip=195.54.195.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fintech.ru
+Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
+ (195.54.195.169) with Microsoft SMTP Server (TLS) id 14.3.498.0; Tue, 13 Feb
+ 2024 18:24:20 +0300
+Received: from localhost (10.0.253.138) by Ex16-01.fintech.ru (10.0.10.18)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Tue, 13 Feb
+ 2024 18:24:20 +0300
+From: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+To: Alexander Aring <alex.aring@gmail.com>
+CC: Nikita Zhandarovich <n.zhandarovich@fintech.ru>, Stefan Schmidt
+	<stefan@datenfreihafen.org>, Miquel Raynal <miquel.raynal@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<linux-wpan@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <syzkaller-bugs@googlegroups.com>,
+	<syzbot+60a66d44892b66b56545@syzkaller.appspotmail.com>
+Subject: [PATCH wpan] mac802154: fix uninit-value issue in ieee802154_header_create()
+Date: Tue, 13 Feb 2024 07:24:14 -0800
+Message-ID: <20240213152414.3703-1-n.zhandarovich@fintech.ru>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240213134205.8705-1-kerneljasonxing@gmail.com> <20240213134205.8705-2-kerneljasonxing@gmail.com>
-In-Reply-To: <20240213134205.8705-2-kerneljasonxing@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 13 Feb 2024 16:23:53 +0100
-Message-ID: <CANn89i+iELpsoea6+C-08m6+=JkneEEM=nAj-28eNtcOCkwQjw@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 1/5] tcp: add dropreasons definitions and
- prepare for cookie check
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	dsahern@kernel.org, kuniyu@amazon.com, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: Ex16-02.fintech.ru (10.0.10.19) To Ex16-01.fintech.ru
+ (10.0.10.18)
 
-On Tue, Feb 13, 2024 at 2:42=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> From: Jason Xing <kernelxing@tencent.com>
->
-> Only add five drop reasons to detect the condition of skb dropped
-> in cookie check for later use.
->
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> --
-> v2
-> Link: https://lore.kernel.org/netdev/20240212172302.3f95e454@kernel.org/
-> 1. fix misspelled name in kdoc as Jakub said
-> ---
->  include/net/dropreason-core.h | 21 +++++++++++++++++++++
->  1 file changed, 21 insertions(+)
->
-> diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.=
-h
-> index 6d3a20163260..065caba42b0b 100644
-> --- a/include/net/dropreason-core.h
-> +++ b/include/net/dropreason-core.h
-> @@ -6,6 +6,7 @@
->  #define DEFINE_DROP_REASON(FN, FNe)    \
->         FN(NOT_SPECIFIED)               \
->         FN(NO_SOCKET)                   \
-> +       FN(NO_REQSK_ALLOC)              \
->         FN(PKT_TOO_SMALL)               \
->         FN(TCP_CSUM)                    \
->         FN(SOCKET_FILTER)               \
-> @@ -43,10 +44,12 @@
->         FN(TCP_FASTOPEN)                \
->         FN(TCP_OLD_ACK)                 \
->         FN(TCP_TOO_OLD_ACK)             \
-> +       FN(COOKIE_NOCHILD)              \
->         FN(TCP_ACK_UNSENT_DATA)         \
->         FN(TCP_OFO_QUEUE_PRUNE)         \
->         FN(TCP_OFO_DROP)                \
->         FN(IP_OUTNOROUTES)              \
-> +       FN(IP_ROUTEOUTPUTKEY)           \
->         FN(BPF_CGROUP_EGRESS)           \
->         FN(IPV6DISABLED)                \
->         FN(NEIGH_CREATEFAIL)            \
-> @@ -54,6 +57,7 @@
->         FN(NEIGH_QUEUEFULL)             \
->         FN(NEIGH_DEAD)                  \
->         FN(TC_EGRESS)                   \
-> +       FN(SECURITY_HOOK)               \
->         FN(QDISC_DROP)                  \
->         FN(CPU_BACKLOG)                 \
->         FN(XDP)                         \
-> @@ -71,6 +75,7 @@
->         FN(TAP_TXFILTER)                \
->         FN(ICMP_CSUM)                   \
->         FN(INVALID_PROTO)               \
-> +       FN(INVALID_DST)                 \
+Syzkaller with KMSAN reported [1] a problem with uninitialized value
+access in ieee802154_header_create().
 
-We already have  SKB_DROP_REASON_IP_OUTNOROUTES ?
+The issue arises from a weird combination of cb->secen == 1 and
+cb->secen_override == 0, while other required security parameters
+are not found enabled in mac802154_set_header_security().
 
->         FN(IP_INADDRERRORS)             \
->         FN(IP_INNOROUTES)               \
->         FN(PKT_TOO_BIG)                 \
-> @@ -107,6 +112,11 @@ enum skb_drop_reason {
->         SKB_DROP_REASON_NOT_SPECIFIED,
->         /** @SKB_DROP_REASON_NO_SOCKET: socket not found */
->         SKB_DROP_REASON_NO_SOCKET,
-> +       /**
-> +        * @SKB_DROP_REASON_NO_REQSK_ALLOC: request socket allocation fai=
-led
-> +        * probably because of no available memory for now
-> +        */
+Ideally such case is expected to be caught by starting check at the
+beginning of mac802154_set_header_security():
 
-We have SKB_DROP_REASON_NOMEM, I do not think we need to be very precise.
-REQSK are implementation details.
+	if (!params.enabled && cb->secen_override && cb->secen)
+		return -EINVAL;
 
-> +       SKB_DROP_REASON_NO_REQSK_ALLOC,
->         /** @SKB_DROP_REASON_PKT_TOO_SMALL: packet size is too small */
->         SKB_DROP_REASON_PKT_TOO_SMALL,
->         /** @SKB_DROP_REASON_TCP_CSUM: TCP checksum error */
-> @@ -243,6 +253,11 @@ enum skb_drop_reason {
->         SKB_DROP_REASON_TCP_OLD_ACK,
->         /** @SKB_DROP_REASON_TCP_TOO_OLD_ACK: TCP ACK is too old */
->         SKB_DROP_REASON_TCP_TOO_OLD_ACK,
-> +       /**
-> +        * @SKB_DROP_REASON_COOKIE_NOCHILD: no child socket in cookie mod=
-e
-> +        * reason could be the failure of child socket allocation
+However, since secen_override is zero, the function in question
+passes this check and returns with success early, without having
+set values to ieee802154_sechdr fields such as key_id_mode. This in
+turn leads to uninitialized access of such values in
+ieee802154_hdr_push_sechdr() and other places.
 
-This makes no sense to me. There are many reasons for this.
+Fix this problem by only checking for secen value and presence of
+security parameters (and ignoring secen_override). Exit early with
+error if necessary requirements are not met.
 
-Either the reason is deterministic, or just reuse a generic and
-existing drop_reason that can be augmented later.
+[1]
+BUG: KMSAN: uninit-value in ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:54 [inline]
+BUG: KMSAN: uninit-value in ieee802154_hdr_push+0x971/0xb90 net/ieee802154/header_ops.c:108
+ ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:54 [inline]
+ ieee802154_hdr_push+0x971/0xb90 net/ieee802154/header_ops.c:108
+ ieee802154_header_create+0x9c0/0xc00 net/mac802154/iface.c:396
+ wpan_dev_hard_header include/net/cfg802154.h:494 [inline]
+ dgram_sendmsg+0xd1d/0x1500 net/ieee802154/socket.c:677
+ ieee802154_sock_sendmsg+0x91/0xc0 net/ieee802154/socket.c:96
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
+ __sys_sendmsg net/socket.c:2667 [inline]
+ __do_sys_sendmsg net/socket.c:2676 [inline]
+ __se_sys_sendmsg net/socket.c:2674 [inline]
+ __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
-You are adding weak or duplicate drop_reasons, we already have them.
+Local variable hdr created at:
+ ieee802154_header_create+0x4e/0xc00 net/mac802154/iface.c:360
+ wpan_dev_hard_header include/net/cfg802154.h:494 [inline]
+ dgram_sendmsg+0xd1d/0x1500 net/ieee802154/socket.c:677
+
+Fixes: f30be4d53cad ("mac802154: integrate llsec with wpan devices")
+Reported-and-tested-by: syzbot+60a66d44892b66b56545@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=60a66d44892b66b56545
+Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+---
+P.S. Link to previous similar discussion:
+https://lore.kernel.org/all/tencent_1C04CA8D66ADC45608D89687B4020B2A8706@qq.com/
+P.P.S. This issue may affect stable versions, at least up to 6.1.
+
+ net/mac802154/iface.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+index c0e2da5072be..ad799d349625 100644
+--- a/net/mac802154/iface.c
++++ b/net/mac802154/iface.c
+@@ -328,7 +328,7 @@ static int mac802154_set_header_security(struct ieee802154_sub_if_data *sdata,
+ 
+ 	mac802154_llsec_get_params(&sdata->sec, &params);
+ 
+-	if (!params.enabled && cb->secen_override && cb->secen)
++	if (!params.enabled && cb->secen)
+ 		return -EINVAL;
+ 	if (!params.enabled ||
+ 	    (cb->secen_override && !cb->secen) ||
 
