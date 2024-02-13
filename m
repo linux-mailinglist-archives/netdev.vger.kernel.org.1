@@ -1,245 +1,171 @@
-Return-Path: <netdev+bounces-71499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97BEE8539F7
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 19:33:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 695DA853A03
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 19:39:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C77A1F244E6
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 18:33:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25700281BD6
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 18:39:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34D9211712;
-	Tue, 13 Feb 2024 18:33:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE0C4101F7;
+	Tue, 13 Feb 2024 18:39:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HJ7afJlT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GlDAINCd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D99F111A9
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 18:33:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3465910A05
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 18:39:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707849196; cv=none; b=BqX8QI9Vcb0E9r8QFnpgT9QhKj6F5Xc2c8YIP8uqUOpOLPoEaQhyA0qZ/dqsT0LvOb2L4KoqiWsxMK/gSSnvOdtZ2DIPZd7IirI6rwWsWyaPgfQ9yPGkm25L3Ow2tHXy8HMBZZcvaog7+xS6Mrm3DZRtS8nJQ6bEgcsdV6lZBxE=
+	t=1707849568; cv=none; b=cVG8Z7OBjfi2d+rYatfYnEJ2erAqfYOfVDrKgUmTE0V2BEZfNxx3ha5sF6NljWn+HT+lWNYm6lS9yjFPSPNeb3qTYIWba1hDk14j7K5QP7H31IRMA59OgE7qo6sb3P9irIFCpK5pApOnj3knnQocJZqggTUT8GK0TI42OZvf6pY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707849196; c=relaxed/simple;
-	bh=KztBA/abl2hjycWS33L2FBCLP0fmSNi2+MIEcIq87oE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=O6mG9WyppwTA0L0dC7FiPjU5s2CyPaJjFKPDd8TEYkIaR1lPClXR/uJLFikClNmDWTi0Nn5HIrd1fyX7Z1SlIZFYo8HKF7apF2+iradqM15GU+fewnYavRTsxgoz6ll3MMBeWFYhmC+hc7clYfFiPirr6ic0c5MiQTFdfAMKYDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HJ7afJlT; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.vnet.ibm.com
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41DHqtMD010782;
-	Tue, 13 Feb 2024 18:33:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=GSRLGIo7qsDj7J6VwFVttdc6Ip1pQnZOVRZ3QuoUkUM=;
- b=HJ7afJlT+UN2jhUGs3fWexU38r9XdDWP7nFO7+MEnRbaTA9DXdmAcJfTRTVkM3tOQknr
- Ee/4YAKZY1fiQfS+VGAd+BkWtQEvBYO1uaH2QJEe7oGE0ewxGeMHWR9Y4aTB7soflWdt
- 0ROlWH1Mql6ITFP/ppGrvWF3ufnjXhxR27r8Dpyr6QilVFn/H1bBRgyhEfQmk8FgFQTZ
- 1XP3r4U7H8QcHalPrZtJeh46UbqO4x9shbGIYDS5KSckrcam+rYx+7/hpGSE6rptyNF0
- 0utRgl8vQWKzqI0B5T6UVz2tOicFr1ZF0evG5PJPfpbbSP8aAHWTRXW5fMPHGCC2hg9q Rg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w8d7a17wk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 13 Feb 2024 18:33:07 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41DHrI8C012322;
-	Tue, 13 Feb 2024 18:33:07 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w8d7a17w4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 13 Feb 2024 18:33:07 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41DGOXln009741;
-	Tue, 13 Feb 2024 18:33:06 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3w6p62rnj6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 13 Feb 2024 18:33:06 +0000
-Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
-	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41DIX2Zh22545100
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 13 Feb 2024 18:33:04 GMT
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9218658060;
-	Tue, 13 Feb 2024 18:33:02 +0000 (GMT)
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 735145803F;
-	Tue, 13 Feb 2024 18:33:01 +0000 (GMT)
-Received: from linux.vnet.ibm.com (unknown [9.41.99.4])
-	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 13 Feb 2024 18:33:01 +0000 (GMT)
-From: Thinh Tran <thinhtr@linux.vnet.ibm.com>
-To: kuba@kernel.org
-Cc: netdev@vger.kernel.org, davem@davemloft.net, manishc@marvell.com,
-        pabeni@redhat.com, skalluru@marvell.com, simon.horman@corigine.com,
-        edumazet@google.com, VENKATA.SAI.DUGGI@ibm.com, drc@linux.vnet.ibm.com,
-        abdhalee@in.ibm.com, thinhtr@linux.vnet.ibm.com
-Subject: [PATCH v10 2/2] net/bnx2x: refactor common code to bnx2x_stop_nic()
-Date: Tue, 13 Feb 2024 12:32:46 -0600
-Message-Id: <14a696d7a05fa0f738281db459d1862a756ea15c.1707848297.git.thinhtr@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <cover.1707848297.git.thinhtr@linux.vnet.ibm.com>
-References: <cover.1707848297.git.thinhtr@linux.vnet.ibm.com>
+	s=arc-20240116; t=1707849568; c=relaxed/simple;
+	bh=vFyzzIkAIhLCHQjdoVYi/963h97yJoyQPJWJe+zB5AU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=mqA8cTYK7PWklgwdz2UDxMtn6UWTndebyXE7raXdMkzgP8e3eeX/37oFE10R/lj8+OzVBpGCqQ5wZxxpqHrvzt0ZgjOVoSz7sD7cONCF0nd+oFwacCtKBJO6lFIt6JNCS0rPLEtG4l7P3lbH+sbSXE0vP1PaWy/a0CGoD5mgKXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GlDAINCd; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707849564;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=Pc6zq8ipr/1RWW2wO3n3l4IMAdT1AegFnZYIl0+Lw/U=;
+	b=GlDAINCdkagZND7YFAgoWi3ewCBDpaAUyOvrIAIVhdUWhESEEiLxrXQ5ytc5v5GjA9ATRw
+	VZuCsYbNkbGQ/SMgC7LFuQj3WgISedE1tdx3p8YV7MdENPzaV54MUsGgDC/qX2vc4293IT
+	ki50PtglUrbR/dKu4QYfw016gEymm5I=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-625-pCJl3yHsPhmZduI_7tXYmA-1; Tue, 13 Feb 2024 13:39:23 -0500
+X-MC-Unique: pCJl3yHsPhmZduI_7tXYmA-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33cd063f475so162973f8f.0
+        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 10:39:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707849562; x=1708454362;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Pc6zq8ipr/1RWW2wO3n3l4IMAdT1AegFnZYIl0+Lw/U=;
+        b=GISQmCuwXfFSTHUYKGKql0lmkdKa8RU6BSByWqQ4d6RmOmcFTjGFKi0aftueSPikM7
+         urC48/01VSlh0+aZjItRXuGXa1pypJgjCijgw3KINNXgZ7j1ttXaE53K2WOgI/4MIbtr
+         7gdkbbA+bvbpEhbV71zG/tx7Lafy6bjuO2Bq4WSD9FruieX5Y6NafkF14xYE0ymK9GIh
+         Z+DLTZoOUpYLbr0cGiHvN5Hud0gk5MPl2uh7Ris2mP8jGaWYaJFNY+SB6m1o5lOIzUt5
+         o2EJnNeyRNqa4ZS3RyJOJ0m+n4EXqKX9RaADu9BDCmfRFkaIfixbHYBTc6YSEiGBtJ6M
+         s1Ng==
+X-Forwarded-Encrypted: i=1; AJvYcCWIs9MJvoDr1x6sHrVOKsma/P4yLQYBkkmSIRs6xUxUn82gePzCyYA27ysnaePnqwCBW+k7e7RpLHhwP1bYsdX3xUeXb/ug
+X-Gm-Message-State: AOJu0YwIxMpYOAvLHIaZe4YoC8kQzBdnNe9YqWyq2+kxhWax8pja8KRd
+	qLKpiInmCV3ZQxyknjo5yYXujRjp/VoDpSgZdoYO8zi6gWGAajmG9k/y++a0ZKeud4ORNnf5KOw
+	GIaHDVINGVFrzpEnbiaadY7w75Haa5O59Pw+nSUT6Kb/Z99cj6/QyEA==
+X-Received: by 2002:a05:600c:5127:b0:40f:c34a:b69 with SMTP id o39-20020a05600c512700b0040fc34a0b69mr363970wms.2.1707849561891;
+        Tue, 13 Feb 2024 10:39:21 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGPp2rSeOwCEAum0FsiP3dr4kFDpRL7nrpDnTLLbayjDluiqxfGjnOLfN3vAdgUdOGV18xFlQ==
+X-Received: by 2002:a05:600c:5127:b0:40f:c34a:b69 with SMTP id o39-20020a05600c512700b0040fc34a0b69mr363956wms.2.1707849561576;
+        Tue, 13 Feb 2024 10:39:21 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUaSDfJFM62i0FJ6mC6gzWo+nr5iUTLcSjCeH7cU/Crx3PwRWDd1s09Qr7U2nNUBbv242iRmlNcJMWnzj/qC/YmAlKwIdVCREID6prl62aSgKvZ+NzbtYAFkRMij2TNOxR55QtnVqH0iMAvEr/P1fz53x3cRqtzTkre6P2s//Ie76Mi9ZcK5jfkmEK0WYwATlZU9SEBOtISrMakJWj+dcTNXi3WwsoOnMP0c5IV/pf7FGiblDu69VsAt59Ps+YJ2g==
+Received: from gerbillo.redhat.com (146-241-230-54.dyn.eolo.it. [146.241.230.54])
+        by smtp.gmail.com with ESMTPSA id h16-20020a05600c351000b00410e6a6403esm5836378wmq.34.2024.02.13.10.39.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Feb 2024 10:39:21 -0800 (PST)
+Message-ID: <725a92b4813242549f2316e6682d3312b5e658d8.camel@redhat.com>
+Subject: Re: [PATCH v3] tcp: add support for SO_PEEK_OFF
+From: Paolo Abeni <pabeni@redhat.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: kuba@kernel.org, passt-dev@passt.top, sbrivio@redhat.com,
+ lvivier@redhat.com,  dgibson@redhat.com, jmaloy@redhat.com,
+ netdev@vger.kernel.org, davem@davemloft.net
+Date: Tue, 13 Feb 2024 19:39:19 +0100
+In-Reply-To: <CANn89iL2FvTVYv6ym58=4L-K-kSan6R4PEv488ztyX4HsNquug@mail.gmail.com>
+References: <20240209221233.3150253-1-jmaloy@redhat.com>
+	 <8d77d8a4e6a37e80aa46cd8df98de84714c384a5.camel@redhat.com>
+	 <CANn89iJW=nEzVjqxzPht20dUnfqxWGXMO2_EpKUV4JHawBRxfw@mail.gmail.com>
+	 <eaee3c892545e072095e7b296ddde598f1e966d9.camel@redhat.com>
+	 <CANn89iL=npDL0S+w-F-iE2kmQ2rnNSA7K9ic9s-4ByLkvHPHYg@mail.gmail.com>
+	 <20072ba530b34729589a3d527c420a766b49e205.camel@redhat.com>
+	 <CANn89iL2FvTVYv6ym58=4L-K-kSan6R4PEv488ztyX4HsNquug@mail.gmail.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 5CWvYkD9nwKkzLCqmpad3uXWxAyv2cjU
-X-Proofpoint-GUID: m7L5UlGsPvrzxaxK1kLj5RzPz3BGh69l
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-13_10,2024-02-12_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- lowpriorityscore=0 priorityscore=1501 clxscore=1015 malwarescore=0
- impostorscore=0 adultscore=0 suspectscore=0 mlxscore=0 mlxlogscore=922
- phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402130146
 
-Refactor common code which disables and releases HW interrupts, deletes
-NAPI objects, into a new bnx2x_stop_nic() function.
+On Tue, 2024-02-13 at 16:49 +0100, Eric Dumazet wrote:
+> On Tue, Feb 13, 2024 at 4:28=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> w=
+rote:
+> > On Tue, 2024-02-13 at 14:34 +0100, Eric Dumazet wrote:
+> > > This sk_peek_offset protocol, needing  sk_peek_offset_bwd() in the no=
+n
+> > > MSG_PEEK case is very strange IMO.
+> > >=20
+> > > Ideally, we should read/write over sk_peek_offset only when MSG_PEEK
+> > > is used by the caller.
+> > >=20
+> > > That would only touch non fast paths.
+> > >=20
+> > > Since the API is mono-threaded anyway, the caller should not rely on
+> > > the fact that normal recvmsg() call
+> > > would 'consume' sk_peek_offset.
+> >=20
+> > Storing in sk_peek_seq the tcp next sequence number to be peeked should
+> > avoid changes in the non MSG_PEEK cases.
+> >=20
+> > AFAICS that would need a new get_peek_off() sock_op and a bit somewhere
+> > (in sk_flags?) to discriminate when sk_peek_seq is actually set. Would
+> > that be acceptable?
+>=20
+> We could have a parallel SO_PEEK_OFFSET option, reusing the same socket f=
+ield.
+>=20
+> The new semantic would be : Supported by TCP (so far), and tcp
+> recvmsg() only reads/writes this field when MSG_PEEK is used.
+> Applications would have to clear the values themselves.
 
-Signed-off-by: Thinh Tran <thinhtr@linux.vnet.ibm.com>
+I feel like there is some misunderstanding, or at least I can't follow.
+Let me be more verbose, to try to clarify my reasoning.
 
----
- .../net/ethernet/broadcom/bnx2x/bnx2x_cmn.c   | 28 +++++++++++--------
- .../net/ethernet/broadcom/bnx2x/bnx2x_cmn.h   |  1 +
- .../net/ethernet/broadcom/bnx2x/bnx2x_main.c  | 25 +++--------------
- .../net/ethernet/broadcom/bnx2x/bnx2x_vfpf.c  | 12 ++------
- 4 files changed, 24 insertions(+), 42 deletions(-)
+Two consecutive recvmsg(MSG_PEEK) calls for TCP after SO_PEEK_OFF will
+return adjacent data. AFAICS this is the same semantic currently
+implemented by UDP and unix sockets.
 
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
-index e9c1e1bb5580..e34aff5fb782 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
-@@ -3097,17 +3097,8 @@ int bnx2x_nic_unload(struct bnx2x *bp, int unload_mode, bool keep_link)
- 		if (!CHIP_IS_E1x(bp))
- 			bnx2x_pf_disable(bp);
- 
--		if (!bp->nic_stopped) {
--			/* Disable HW interrupts, NAPI */
--			bnx2x_netif_stop(bp, 1);
--			/* Delete all NAPI objects */
--			bnx2x_del_all_napi(bp);
--			if (CNIC_LOADED(bp))
--				bnx2x_del_all_napi_cnic(bp);
--			/* Release IRQs */
--			bnx2x_free_irq(bp);
--			bp->nic_stopped = true;
--		}
-+		/* Disable HW interrupts, delete NAPIs, Release IRQs */
-+		bnx2x_stop_nic(bp, 1);
- 
- 		/* Report UNLOAD_DONE to MCP */
- 		bnx2x_send_unload_done(bp, false);
-@@ -5139,3 +5130,18 @@ void bnx2x_schedule_sp_rtnl(struct bnx2x *bp, enum sp_rtnl_flag flag,
- 	   flag);
- 	schedule_delayed_work(&bp->sp_rtnl_task, 0);
- }
-+
-+void bnx2x_stop_nic(struct bnx2x *bp, int disable_hw)
-+{
-+	if (!bp->nic_stopped) {
-+		/* Disable HW interrupts, NAPI */
-+		bnx2x_netif_stop(bp, disable_hw);
-+		/* Delete all NAPI objects */
-+		bnx2x_del_all_napi(bp);
-+		if (CNIC_LOADED(bp))
-+			bnx2x_del_all_napi_cnic(bp);
-+		/* Release IRQs */
-+		bnx2x_free_irq(bp);
-+		bp->nic_stopped = true;
-+	}
-+}
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h
-index 0bc1367fd649..a35a02299b33 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h
-@@ -553,6 +553,7 @@ void bnx2x_free_skbs(struct bnx2x *bp);
- void bnx2x_netif_stop(struct bnx2x *bp, int disable_hw);
- void bnx2x_netif_start(struct bnx2x *bp);
- int bnx2x_load_cnic(struct bnx2x *bp);
-+void bnx2x_stop_nic(struct bnx2x *bp, int disable_hw);
- 
- /**
-  * bnx2x_enable_msix - set msix configuration.
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-index 0d8e61c63c7c..ff75c883cffe 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-@@ -9474,18 +9474,8 @@ void bnx2x_chip_cleanup(struct bnx2x *bp, int unload_mode, bool keep_link)
- 		}
- 	}
- 
--	if (!bp->nic_stopped) {
--		/* Disable HW interrupts, NAPI */
--		bnx2x_netif_stop(bp, 1);
--		/* Delete all NAPI objects */
--		bnx2x_del_all_napi(bp);
--		if (CNIC_LOADED(bp))
--			bnx2x_del_all_napi_cnic(bp);
--
--		/* Release IRQs */
--		bnx2x_free_irq(bp);
--		bp->nic_stopped = true;
--	}
-+	/* Disable HW interrupts, delete NAPIs, Release IRQs */
-+	bnx2x_stop_nic(bp, 1);
- 
- 	/* Reset the chip, unless PCI function is offline. If we reach this
- 	 * point following a PCI error handling, it means device is really
-@@ -14241,16 +14231,9 @@ static pci_ers_result_t bnx2x_io_slot_reset(struct pci_dev *pdev)
- 		}
- 		bnx2x_drain_tx_queues(bp);
- 		bnx2x_send_unload_req(bp, UNLOAD_RECOVERY);
--		if (!bp->nic_stopped) {
--			bnx2x_netif_stop(bp, 1);
--			bnx2x_del_all_napi(bp);
- 
--			if (CNIC_LOADED(bp))
--				bnx2x_del_all_napi_cnic(bp);
--
--			bnx2x_free_irq(bp);
--			bp->nic_stopped = true;
--		}
-+		/* Disable HW interrupts, delete NAPIs, Release IRQs */
-+		bnx2x_stop_nic(bp, 1);
- 
- 		/* Report UNLOAD_DONE to MCP */
- 		bnx2x_send_unload_done(bp, true);
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_vfpf.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_vfpf.c
-index 8946a931e87e..e92e82423096 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_vfpf.c
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_vfpf.c
-@@ -529,16 +529,8 @@ void bnx2x_vfpf_close_vf(struct bnx2x *bp)
- 	bnx2x_vfpf_finalize(bp, &req->first_tlv);
- 
- free_irq:
--	if (!bp->nic_stopped) {
--		/* Disable HW interrupts, NAPI */
--		bnx2x_netif_stop(bp, 0);
--		/* Delete all NAPI objects */
--		bnx2x_del_all_napi(bp);
--
--		/* Release IRQs */
--		bnx2x_free_irq(bp);
--		bp->nic_stopped = true;
--	}
-+	/* Disable HW interrupts, delete NAPIs, Release IRQs */
-+	bnx2x_stop_nic(bp, 0);
- }
- 
- static void bnx2x_leading_vfq_init(struct bnx2x *bp, struct bnx2x_virtf *vf,
--- 
-2.25.1
+Currently 'sk_peek_off' maintains the next offset to be peeked into the
+current receive queue. To implement the above behaviour, tcp_recvmsg()
+has to update 'sk_peek_off' after MSG_PEEK, to move the offset to the
+next data, and after a plain read, to account for the data removed from
+the receive queue.
+
+I proposed to let introduce a tcp-specific set_peek_off doing something
+alike:
+
+	WRTIE_ONCE(sk->sk_peek_off, tcp_sk(sk)->copied_seq + val);
+
+so that the recvmsg will need to update sk_peek_off only for MSG_PEEK,
+while retaining the semantic described above.
+
+To keep the userspace interface unchanged that will need a paired
+tcp_get_peek_off(), so that getsockopt(SO_PEEK_OFF) could return to the
+user a plain offset. An additional bit flag will be needed to store the
+information "the user-space enabled peek with offset".
+
+I don't understand how a setsockopt(PEEK_OFFSET) variant would help
+avoiding touching sk->sk_peek_offset?
+
+Thanks!
+
+Paolo
 
 
