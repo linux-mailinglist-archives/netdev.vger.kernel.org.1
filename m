@@ -1,100 +1,102 @@
-Return-Path: <netdev+bounces-71565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BB6E853FAE
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 00:08:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9667853FB1
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 00:08:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35C741F25221
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 23:08:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42A291F25009
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 23:08:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F34F629E3;
-	Tue, 13 Feb 2024 23:07:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9352262A12;
+	Tue, 13 Feb 2024 23:08:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AuTXopDN"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pYFvfwwv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B65506281C
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 23:07:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D919164F
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 23:08:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707865670; cv=none; b=A8OHkCQ83Ovy5iSOJtNQdnE2GTjxdp53CA87MT2GstUWxGsaqfIrMctlXcw9JsflnbqPQnVMcOuBeX6uQFHmZYc1u6wcaGw1QoFe1E3JpNysgtsmJ+i6Th3QVejeTwe77Zk7mQPoVfiuN81VJQflcOwZUFoPMZxdU2b3Aa0kwDw=
+	t=1707865697; cv=none; b=igWXiStQeyIY8yWav7bBFXEB7+MjnvclVQUG3Y+0odRMVneiYLqiwsi5ZrvN4wIJr8TZ0L/HepboL7qbPtPhvUKxveeHB8Hl6cDtt0P3xQMlhFU5F2XiyaXDnPv/ulj47IpXVCHrX/oreFqWpvtAJjhqBYOsqduxSQ5ULJDS6qs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707865670; c=relaxed/simple;
-	bh=5r8mGWxqCI6vEgqZTBMkzo4gQvTRqNCArj72zBif0wU=;
+	s=arc-20240116; t=1707865697; c=relaxed/simple;
+	bh=UPKxpUZmpewL2oiDjDYBorf4uyD8cQRyNRxn1Fc4a+8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=X7J3tjBPhDBxJj2TbjK/yAgmv3BRqQAfWcNLALSor91IY2mG9AkgDG5bq4regCLA/AVbb2m5WY1GCXW5e2JH6Dlb9yn1xmOzA2CXYpdsErnxhi0ud0NWEsOLbRktzhkfzK2puCWHCHEqOXvTw1Uv/YIYhTcb7etlPDs83T/SrJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=AuTXopDN; arc=none smtp.client-ip=209.85.219.180
+	 To:Cc:Content-Type; b=BaydtBOSmI7Vr+X5qIGUxLwtx7kfjEu3/BQkBcZZ8ovIX0BVXV3HYSLWR0r7CUPlT19l4c/TZYWj8QlTly3X5472nsVenzVgEOOCEoK/0sCZojlOGPMNoAdthCp1liUZF8xla+FJZ+m9S7hbfa89DrnzFzmteH5/LDYu/LStJVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=pYFvfwwv; arc=none smtp.client-ip=209.85.219.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-dcc6fc978ddso236689276.0
-        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 15:07:48 -0800 (PST)
+Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-dcc86086c9fso1243842276.3
+        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 15:08:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1707865667; x=1708470467; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1707865695; x=1708470495; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5r8mGWxqCI6vEgqZTBMkzo4gQvTRqNCArj72zBif0wU=;
-        b=AuTXopDNGeir0vPOFVniMlL+Q3IgzlP4aI3edBaceQW/nNs/uf1Aphs3mW8BNRSa5e
-         0uq1pD1eOU04WZ8xeXHqw/XOWrifg5f02yzAvI7mqne0zlJLOxKfXCZUa/JR39MRpaaz
-         mYhhzylAU4FQgYgYRjlYbMDQeQ8yiqffqa12BKHQKaJlP3vgDq0tSg16vClgS4IK0MYD
-         p20ZVeD+cQQqALkg+CfO/Z0YKynf8YsJs4zuYrbcebPKEMmV8II2e28czbloIfGu/9Si
-         uyqDY6jmwA4wLqMkGByrKnCXtfeRYCJj8YCm63JdU+hqUmq/0EbUNLe7CnAKFPzDa5+X
-         F6Bw==
+        bh=UPKxpUZmpewL2oiDjDYBorf4uyD8cQRyNRxn1Fc4a+8=;
+        b=pYFvfwwvTNfuiAFviMHRdrQIH42+S6oSdoE+uEH8ZET+sRVwrnJBbmOfPTXWW86DiT
+         vLBi2x6E6gy5kM8J/1RelO4lKJRXibwxOFuTaQqdQsp7vl1pz89aJgcGzzg5c5BasHlT
+         LdyaR1s0Ujjfr3s8UpOZAgIwiRObuumNzVUxNZvCfw3TS712oBxNIYApbW1YTB2bSEf3
+         gX2YwVaiipfjmtzUfWNE5CwOp0L0GuOue2uViw8Z0P5ll9mK9o8CUngWk4uEGt6IA3RW
+         Q1LU9jaktXOLAftO+M+B4LhQfWUCImlP/qOrROKoP8wEUQZRg+/idWt2YnoEOog50cxh
+         PysQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707865667; x=1708470467;
+        d=1e100.net; s=20230601; t=1707865695; x=1708470495;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5r8mGWxqCI6vEgqZTBMkzo4gQvTRqNCArj72zBif0wU=;
-        b=Tj7IzdY+WSAmAbOrWoQB9vv/bMCDOxxcWR6gjbCJWIvGNDhcLxKkH2EERSc1VjegKl
-         tngpjDusYHWb1TJD5Uyoyx+wXUi2VWtoJ+NhVOqzuVsGq4QFXG2ppvBIfhbx2GKeo7A4
-         nqRwCJFpot8sGo15nYGeC6jwNgnEmZvS2Ou+EicKxiLqnBzcSDqmL6yw59zK2Y2bZgw0
-         RvsYW4X6s2SAI8PjUSodulDYoOsqeL8fr7AeB2gJbv/JhdMAhxKwo919npex6wp7SLlz
-         BMiH6XEjsG0BANpmt5WCEQUgccBSRoX/BIU6JxXHBX1rGXu1Vz3D9EL+zuNaEpdGYJ7y
-         r9wQ==
-X-Gm-Message-State: AOJu0YxG87CLc9Gdd4lrszeK2G4/4Pu2qomNkT36tLrqpoyG3Qgzs+KN
-	+gY0x0MYpX/eqm9ziKiLhZ0A/rvfC7b6FlWAACrgbFjjGbJm+qfCUgsiPsQVOpDOBr0o39zyvpZ
-	J6XTgNYaxd2kTPJ9UfitjyDxZnkLMclAu3qnfeg==
-X-Google-Smtp-Source: AGHT+IED3UnYNv3qZy3wS1gN4YzhWWLxmuPdKWXeZ+oYphZhStOOlt00/JsSZJX3g5VssxQqQbR1ikxzXAYLLUPneCU=
-X-Received: by 2002:a25:be54:0:b0:dc2:2d55:4179 with SMTP id
- d20-20020a25be54000000b00dc22d554179mr265190ybm.17.1707865667723; Tue, 13 Feb
- 2024 15:07:47 -0800 (PST)
+        bh=UPKxpUZmpewL2oiDjDYBorf4uyD8cQRyNRxn1Fc4a+8=;
+        b=U65CTigJa6MSnEeUjzguGftowXjB+oE4XfiP/3QgOe1KFJJ1qtBdM/jqREnTyeyifY
+         rhgj58toZzZ8TUgij1apZVyGVenwC5RMzhBHgmRlJ5wv2Gudplso2plihc3wQH9MKI8f
+         b4h6kdGFyd/5+THM9DfMtU8ivtB5BoRFncVoSH6ksl4HNlR8BXg72wuvvtCI8S1wIqfh
+         8wd9Bz+WgHBeoW/WsmWPFzJobid65o1FbwJB/qazt8Upt0SC35BIXFGD4oBMZ2rgLQsc
+         HUzVBQH6AIhnBe9SwGTF4f9nWkUocOkhqwemkv/HsURDw+23YKWJIdC5Bnadt53fJlCO
+         ArcA==
+X-Gm-Message-State: AOJu0YyaHpRgNyXPEixA7c48wIHdmrrSgRFOwekVNh/Ivj5zPl/IZS3/
+	rzPudyKM2ZCLG+JvX3qrEhukfGavqieXfMnGxdiR47ZZUi9go79QZ9LfwfachrMN5buhC6SWr6S
+	aD35nSFWLvVz/tHIPVQ5cgAV0jOLYjMerv+LxdA==
+X-Google-Smtp-Source: AGHT+IF+elx+hBn7SrCXxhMrRvIzsV8yx9LlnGhlnBcMFGcNffUiWOWuLtYWOP2QLloedfePv65ibJK4V2I/D2Ty+lQ=
+X-Received: by 2002:a25:8c86:0:b0:dcc:140a:a71f with SMTP id
+ m6-20020a258c86000000b00dcc140aa71fmr626531ybl.60.1707865694274; Tue, 13 Feb
+ 2024 15:08:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240213220331.239031-1-paweldembicki@gmail.com> <20240213220331.239031-4-paweldembicki@gmail.com>
-In-Reply-To: <20240213220331.239031-4-paweldembicki@gmail.com>
+References: <20240213220331.239031-1-paweldembicki@gmail.com> <20240213220331.239031-5-paweldembicki@gmail.com>
+In-Reply-To: <20240213220331.239031-5-paweldembicki@gmail.com>
 From: Linus Walleij <linus.walleij@linaro.org>
-Date: Wed, 14 Feb 2024 00:07:36 +0100
-Message-ID: <CACRpkdYxf-4PGyAcA3146_V==u3q9QYwiN25cRCt-wZrh9xocA@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 03/15] net: dsa: vsc73xx: use macros for rgmii recognition
+Date: Wed, 14 Feb 2024 00:08:03 +0100
+Message-ID: <CACRpkdZCbnDQ+JYaSyv2OKYC4zCb0iboAN1ma6DMuxyioVBvYg@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 04/15] net: dsa: vsc73xx: Add define for max
+ num of ports
 To: Pawel Dembicki <paweldembicki@gmail.com>
-Cc: netdev@vger.kernel.org, Russell King <linux@armlinux.org.uk>, 
-	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Florian Fainelli <f.fainelli@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
 	Claudiu Manoil <claudiu.manoil@nxp.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
-	UNGLinuxDriver@microchip.com, linux-kernel@vger.kernel.org
+	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Tue, Feb 13, 2024 at 11:05=E2=80=AFPM Pawel Dembicki <paweldembicki@gmai=
 l.com> wrote:
 
-> It's preparation for future use. At this moment, the RGMII port is used
-> only for a connection to the MAC interface, but in the future, someone
-> could connect a PHY to it. Using the "phy_interface_mode_is_rgmii" macro
-> allows for the proper recognition of all RGMII modes.
+> This patch introduces a new define: VSC73XX_MAX_NUM_PORTS, which can be
+> used in the future instead of a hardcoded value.
 >
-> Suggested-by: Russell King <linux@armlinux.org.uk>
+> Currently, the only hardcoded value is vsc->ds->num_ports. It is being
+> replaced with the new define.
+>
+> Suggested-by: Vladimir Oltean <olteanv@gmail.com>
 > Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
 
 Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
