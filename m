@@ -1,98 +1,101 @@
-Return-Path: <netdev+bounces-71462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB5238535C5
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 17:15:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8438A8535E9
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 17:23:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73CBA1F248EE
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 16:15:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8619E1C220EA
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 16:23:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAC305DF29;
-	Tue, 13 Feb 2024 16:15:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BF4B5F873;
+	Tue, 13 Feb 2024 16:23:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LmbNtoWM"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="KfxO08AT"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 448B55F840
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 16:15:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C805DF29;
+	Tue, 13 Feb 2024 16:23:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707840923; cv=none; b=k/lgiIE98eq+KQuvGKqEMw9+jYzOZ4I5q+bkyBfxJd+D6/Z3EpfzeaPHGATo+Pgt1uH3OELPYD4a/UCNL0+Azu3RGClytkwpmkLHRbE2X6tMPS+wc0IUVDpBPKT6rF78s1LX3BczxqFeJRbsd5eaNhKIGsX5I8Jvs43oorHR3Yg=
+	t=1707841388; cv=none; b=UvnHzZcfMXoQjVdm+CC+/WTxvTGa8cjF1RdtLTcGVYlHd0LYAmgtfuIDRLghXpq35a0ByLXqHyFrpuvm9KkvicAyScJYFom/JF0dIJisA55yiUnu+hlbC0+0CcAHwbvbR+O/jGv88YPwMF8iGtGapZ6aS77C48fhVviQdGLpzkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707840923; c=relaxed/simple;
-	bh=97SB8pqr6LD3Kh4WNx54N8OiBp0HHD44F7ZoUlu0efM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=q7Ravo6jBNQSpf7RFWw+bsExo5RauNn0fVdvoSrSRqy0E1HYyL1cuOFJqh6RNqt0Lrn2gPa24kUdwWUFmP56W/cRXg4Suev8nZM8xbOiZVo/uAEfkUbgOzURp31TLxvzpm41eOWj/E/wDiYe0nAtCeut76TSEa8yy57vP+Scv1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LmbNtoWM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707840921;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=x9aBx/puW5q0zP1GymR9YWTP+crwFcDPpAc0PIJBdQI=;
-	b=LmbNtoWMFyDrfP+npbwayHpAAOSVStSnC9R7OP5x3djXNITtWkRSodVDwRhx2qXAlaFXbe
-	EpGm+MGzPTY/ZZn4ATqiCBxXH0oV7B2lHzkwlStnPo9B7icHc/xYRbZisiJN5Gq76TeQbE
-	gdWrHqK0AA6cHXUhRdq4gIv8gJWp9tk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-467-_NWDzBX3M_uHIyIOZbUkkg-1; Tue, 13 Feb 2024 11:15:17 -0500
-X-MC-Unique: _NWDzBX3M_uHIyIOZbUkkg-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 220FA1005055;
-	Tue, 13 Feb 2024 16:15:17 +0000 (UTC)
-Received: from fedora-x1.redhat.com (unknown [10.22.33.232])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id A5F7F492C2D;
-	Tue, 13 Feb 2024 16:15:16 +0000 (UTC)
-From: Kamal Heib <kheib@redhat.com>
-To: netdev@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: Shay Agroskin <shayagr@amazon.com>,
-	David Arinzon <darinzon@amazon.com>,
-	Kamal Heib <kheib@redhat.com>
-Subject: [PATCH net-next] net: ena: Remove unlikely() from IS_ERR() condition
-Date: Tue, 13 Feb 2024 11:15:02 -0500
-Message-ID: <20240213161502.2297048-1-kheib@redhat.com>
+	s=arc-20240116; t=1707841388; c=relaxed/simple;
+	bh=bW37SueZhAPAkjInxJW7AsJifsXh4YgAmuBRJnvDcBI=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A33e5pHWrqxKUQAtHfQ3rrZuD5ziF59rpxtuI43XiwWBwdvw07Gp41t0op1ghukwK0QHaCyK5j5EJb2aqRrGDV/IlAdd38NwCmBNDDNmKf50OlYHe+t3K6J0/5nDw7IxysXVnNPajh57jORxYzF3wrNalBJNTPaOhmcCjcI2sII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=KfxO08AT; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1707841386; x=1739377386;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=bW37SueZhAPAkjInxJW7AsJifsXh4YgAmuBRJnvDcBI=;
+  b=KfxO08AT1DGDL+k/gf6PzXWoUGIRTUkJU5KNOgxTmnZTBi12aYnmq8WK
+   D6bczb8Z47XreiUlhabgm8vBPLze63eKbzL9Rl0nw0heo0UEeipIOcRYr
+   UhC99M9owUBINV6o0n9RwvB8mXMw0bC8kOCgts2yhj9Op/vdi0djAf+B8
+   dD+JT6sRfBImPFVWmfhOeNFJI8V3MPAkE5J69TbD+Gb2aDqzrQRxHPJYV
+   vWaM//L5B8fi5vLQm/9+V0lvnXLuzPMAkgirvvOka2dczXziMMg0nG8sG
+   w6jABJZuwGSLHfw3AlxbNtlFznl9+RKe4QvQBk0vH0kfYO5/OcUX7LjN1
+   w==;
+X-CSE-ConnectionGUID: GsRD6le2RpCGJQ3cWig+6g==
+X-CSE-MsgGUID: WRcbYWLxR+SSapVj+Y6nnA==
+X-IronPort-AV: E=Sophos;i="6.06,157,1705388400"; 
+   d="scan'208";a="183445267"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Feb 2024 09:23:04 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 13 Feb 2024 09:23:01 -0700
+Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex03.mchp-main.com
+ (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Tue, 13 Feb 2024 09:22:59 -0700
+Date: Tue, 13 Feb 2024 16:22:58 +0000
+From: Daniel Machon <daniel.machon@microchip.com>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <lars.povlsen@microchip.com>,
+	<Steen.Hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	<u.kleine-koenig@pengutronix.de>, <rmk+kernel@armlinux.org.uk>,
+	<vladimir.oltean@nxp.com>, <jacob.e.keller@intel.com>,
+	<yuehaibing@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: sparx5: Add spinlock for frame
+ transmission from CPU
+Message-ID: <20240213162258.ajicpzeevveajrz6@DEN-DL-M70577>
+References: <20240213121705.4070598-1-horatiu.vultur@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240213121705.4070598-1-horatiu.vultur@microchip.com>
 
-IS_ERR() is already using unlikely internally.
+> Both registers used when doing manual injection or fdma injection are
+> shared between all the net devices of the switch. It was noticed that
+> when having two process which each of them trying to inject frames on
+> different ethernet ports, that the HW started to behave strange, by
+> sending out more frames then expected. When doing fdma injection it is
+> required to set the frame in the DCB and then make sure that the next
+> pointer of the last DCB is invalid. But because there is no locks for
+> this, then easily this pointer between the DCB can be broken and then it
+> would create a loop of DCBs. And that means that the HW will
+> continuously transmit these frames in a loop. Until the SW will break
+> this loop.
+> Therefore to fix this issue, add a spin lock for when accessing the
+> registers for manual or fdma injection.
 
-Signed-off-by: Kamal Heib <kheib@redhat.com>
----
- drivers/net/ethernet/amazon/ena/ena_netdev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-index 03be2c008c4d..10e70d869cce 100644
---- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
-+++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-@@ -545,7 +545,7 @@ static int ena_alloc_rx_buffer(struct ena_ring *rx_ring,
- 
- 	/* We handle DMA here */
- 	page = ena_alloc_map_page(rx_ring, &dma);
--	if (unlikely(IS_ERR(page)))
-+	if (IS_ERR(page))
- 		return PTR_ERR(page);
- 
- 	netif_dbg(rx_ring->adapter, rx_status, rx_ring->netdev,
--- 
-2.43.0
+Reviewed-by: Daniel Machon <daniel.machon@microchip.com>
 
 
