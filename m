@@ -1,128 +1,120 @@
-Return-Path: <netdev+bounces-71350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3D3E8530DC
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:48:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D05408530EE
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:50:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B093A281C30
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 12:48:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E4651C230C5
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 12:50:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A73A8405D8;
-	Tue, 13 Feb 2024 12:48:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92739405D8;
+	Tue, 13 Feb 2024 12:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="SokMTIAY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t9I7BxEG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C9FD3D54D
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 12:48:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 691FF3FE47;
+	Tue, 13 Feb 2024 12:50:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707828513; cv=none; b=lPskhAVYi0+s1CvqZs2NApqukdqGFvEFndmbalL94g1wdO6KtPrh0fibhqLLBbQRfCvM86T86z/dbuPLCrcVljhi6qEmxG4VfMBaE68/DijoDI0q0P2n7rOAeOXxhzmk+fPjYkOmW0DeIJwyU+FiMcEh3lFZxQlw0GLG7Hxd6b8=
+	t=1707828634; cv=none; b=Dj93mBBSgtgmSOsXSgUmMjmVlpc2QE71MCwh3fKMAL2Is40dCM8vnewZpKhsifgBFSq693elFEG2gFwAvmUg9WtVon7n7iWOlAdfwDz0FKNtcERXOKZoOnDoL/8jCvb75QD/CVUybCnyT8q3bfdtDPLLUicv4YQYIJy7su98wmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707828513; c=relaxed/simple;
-	bh=OVKbyXJQFDYDCCsL63HkX198El9Zx1cnDLATPznODpo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oFBMOXex5QB0eWN/pHHhhbeVP2CCkhqL8NhQVgcMcoZPsUsipOyyJld8J2ksbgWQDWM6aGlhAZO2tOgWCFMVxLFso1zdsCoiX7sOLfKqYTOLsNQlBefAt3UYCXSld/MQRQJDvOMX76Nk/tclkcqrP+FCQmcISIWxv2lSxO/54rs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=SokMTIAY; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-411bfe83d11so3911855e9.0
-        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 04:48:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1707828509; x=1708433309; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QUWoCWYTZG96LeGW2I5Svh729PgyYJVN4VDPaXkoaYc=;
-        b=SokMTIAYSrusSqHoKx2qZbYg2FokZJxjwNfM0yuQ3wmTiyyDk6meolS/giQR7UVFML
-         ZeTLQ7hDbo5TmsKc7HaUit5y+26gbN6ctWxfjvKbrDwm1jZb4uef3AcXviOq0S9Rov1R
-         ayhTkIAHuCYySJtqcX5HEhgDSMuSNWHNs0llz0WHPDf7Bf5r7Ixlfezk+lmBev/MeLXj
-         aT0ecu1w7Rs4Nj2vkamxdCIzbiaSJxUPP39tkSbfocA+nTjXwl4WEmnB4pNp1oVtpOYk
-         Ou9J3FEtuxynvyKkSXIGQ/xCJc04/WTeLNub1d0jhUFEbOnwJwHOlM2zCpajNqunUZM1
-         1jLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707828509; x=1708433309;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QUWoCWYTZG96LeGW2I5Svh729PgyYJVN4VDPaXkoaYc=;
-        b=E39mPSTaKfBHauGo3mOYWvD0HWoPzMLGRoKKpN0qjlpRo3Juf7JtEjKNQ/N0Iz1EdV
-         yLNnrLNm+JG6u2iZILI4kdC4S7D1m+6gResW+X3Mov89oCigAJNc7+AnliKxgabmr29P
-         C1mr+lKOI134QUfVxlTiZChB0JZqsUK8D1fuDNPr2h/OHx0wHvkqgbqoGnI6ay0VUBtK
-         GVjiD42VN8nUvOLylHWQvb4XIMg1sXxTgSHu/7znBtuFKVqrvpa6yY3JwMgOspMrFIKz
-         i3RWej3AWLEYIJ49lXuTD3Y+4gi5vdUptb5g4QA2dns3a7bRnRWtLnh6j3WHiBl4j322
-         yp6A==
-X-Gm-Message-State: AOJu0YygKAcG0xStyVn2gFQOO6Dw98RbGqB6mDN6u5ivNHkAx7hRiimd
-	HDg3pw+mZLrevAH81+ozXmqJXkjfTo3kK1VT3o6CjJR/135TVSmbKSeeM/oHKTQ=
-X-Google-Smtp-Source: AGHT+IEG6zMMDgBfDbjQExu2oik6ONkv41vr28X+1JREqFdotpobj7c+rm569A9jlVKjt7LADMNgyA==
-X-Received: by 2002:a05:600c:470d:b0:40e:dbdf:9fb4 with SMTP id v13-20020a05600c470d00b0040edbdf9fb4mr8713030wmo.23.1707828508841;
-        Tue, 13 Feb 2024 04:48:28 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUFb08DhvqPTMElbd+VWJ5jyVDDEYkPSArk9WGE1wNTu2MxMwvaod2VTlYYQJn/ZNfVZqr+09shDGK1ERIbeaWlm7rvgWJfQ0oQCkTCFBUUcLHS/TWJsdTtXt04ydkGIfcBud/3wESDp19rkZpbPNe8kBPpHlSD8Gp+YW0cnOGpaR8n1Ur7Sc5XzvC2hGoYoaI3E34E/ZGwaK+ZINnwv7yDp/GHso5qQH21gfeaj/p+YBud4QRL3be9eH+Me0Os6CfVnO1LYc3OuKxXviUJnqD3QQMRvsJH5E05UgDIm0U6vtXBsEGVeFlRBDE5K8Yt04RucbJCtmUAoMZC5qXKyC71
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id bj8-20020a0560001e0800b0033b3ca3a255sm9496470wrb.19.2024.02.13.04.48.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Feb 2024 04:48:28 -0800 (PST)
-Date: Tue, 13 Feb 2024 13:48:25 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Breno Leitao <leitao@debian.org>, donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v5 06/13] doc/netlink/specs: Add sub-message
- type to rt_link family
-Message-ID: <ZctlGYoynt1nMJdb@nanopsycho>
-References: <20231215093720.18774-1-donald.hunter@gmail.com>
- <20231215093720.18774-7-donald.hunter@gmail.com>
+	s=arc-20240116; t=1707828634; c=relaxed/simple;
+	bh=OW5tEdpRIbVny8tlbkMpyNRX41FPqyqm6ItiVEchB+M=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=Nh/8eIo4zz22xyfNLcLiW+oYxUc3mKAVtpn+pmQev8nPYxqFMrLTz5MWtcOlv+RWcjSPx7/1QA992wdlC2uDINo+AoHdAyZzrwS7Cl2ETn6HCnkbzXSBmu7tZod4mhUTM6anbs3oSJS0xjaHe3MVq2iwIltc/O4K+qhhlbkLwog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t9I7BxEG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7716BC433C7;
+	Tue, 13 Feb 2024 12:50:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707828633;
+	bh=OW5tEdpRIbVny8tlbkMpyNRX41FPqyqm6ItiVEchB+M=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=t9I7BxEGsmQ7vLJ/W5RIFRgC+StvhiKFQNbEcMa05WA+svOVRgaUZYmmFmXqC9ZWm
+	 kb3HBKaJtWo05t8ThRY+jHG9eg6EkK2jSBImEGq3baFWVuve9IMuBiP0ml7YFt5oQS
+	 gXM0riEa3iA3o/yBWWhbgITk5t07G7lH36YaUbhJACrDtG4ye3Fm2axA8t1G3lu1lu
+	 19k8Xjwywlm0NsrWMfV6qk74xIX5tvd3iubbTN7lj6VK04rv4nJMM9N6rCs2j/xSwZ
+	 Byv6IavrruV9L5u4gPxJJKt91YQmmvyuIv93OWrF58tvSt7/gvOttxQAf3cBvxsaUp
+	 NoO4TkMTqUjRA==
+From: Kalle Valo <kvalo@kernel.org>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: Arend van Spriel <arend.vanspriel@broadcom.com>,  Vinayak Yadawad
+ <vinayak.yadawad@broadcom.com>,  linux-wireless@vger.kernel.org,
+  jithu.jance@broadcom.com,  netdev@vger.kernel.org,  Jakub Kicinski
+ <kuba@kernel.org>
+Subject: Re: [PATCH 1/1] wifi: nl80211: Add support for plumbing SAE groups
+ to driver
+References: <309965e8ef4d220053ca7e6bd34393f892ea1bb8.1707486287.git.vinayak.yadawad@broadcom.com>
+	<87mss6f8jh.fsf@kernel.org>
+	<2c38eaed47808a076b6986412f92bb955b0599c3.camel@sipsolutions.net>
+	<b4d44fb5-78e5-4408-a108-2c3d340b090e@broadcom.com>
+	<b00c3b53cd740e998163f84511ee05dc3051ce8b.camel@sipsolutions.net>
+	<df8f02b1-25b0-4dae-a935-cee9ba7f3dc4@broadcom.com>
+	<0cb1d7ef63ad1ea1ff4109d85a6bcdcaca16f1c8.camel@sipsolutions.net>
+	<6eaab8fa-f62e-4f78-9cbe-9b13e3d77ca7@broadcom.com>
+	<ca517fb19f78e3c507fd315e2f30e5efa4723eb8.camel@sipsolutions.net>
+Date: Tue, 13 Feb 2024 14:50:30 +0200
+In-Reply-To: <ca517fb19f78e3c507fd315e2f30e5efa4723eb8.camel@sipsolutions.net>
+	(Johannes Berg's message of "Tue, 13 Feb 2024 13:30:31 +0100")
+Message-ID: <87y1boedex.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231215093720.18774-7-donald.hunter@gmail.com>
+Content-Type: text/plain
 
-Fri, Dec 15, 2023 at 10:37:13AM CET, donald.hunter@gmail.com wrote:
+Johannes Berg <johannes@sipsolutions.net> writes:
 
-[...]
+> On Tue, 2024-02-13 at 13:19 +0100, Arend van Spriel wrote:
+>
+>> On 2/13/2024 12:45 PM, Johannes Berg wrote:
+>> > On Tue, 2024-02-13 at 12:13 +0100, Arend van Spriel wrote:
+>> > > 
+>> > > I recall the rule was that nl80211 API changes
+>> > > should also have at least one driver implementing it. Guess we let that
+>> > > slip a couple of times. I fully agree enforcing this.
+>> > 
+>> > Well, enforcing it strictly never really worked all that well in
+>> > practice, since you don't necessarily want to have a complex driver
+>> > implementation while hashing out the API, and the API fundamentally has
+>> > to come first.
+>> > 
+>> > So in a sense it comes down to trust, and that people will actually
+>> > follow up with implementations. And yeah, plans can change and you end
+>> > up not really supporting everything that was defined ... that's life, I
+>> > guess.
+>> > 
+>> > But the mode here seems to be that there's not even any _intent_ to do
+>> > that?
+>> > 
+>> > I guess we could hash out the API, review the patches, and then _not_
+>> > apply them until a driver is ready? So the first round of reviews would
+>> > still come with API only, but once that settles we don't actually merge
+>> > it immediately, unlike normally where we merge a patch we've reviewed?
+>> > And then if whoever did it lost interest, we already have a reviewed
+>> > version for anyone else who might need it?
+>> 
+>> Sounds like a plan. Maybe they can get a separate state in patchwork and 
+>> let them sit there for grabs.
+>
+> I guess I can leave them open as 'under review' or something? Not sure
+> we can add other states.
 
+I belong to the church of 'Clean Inbox' so I use 'Deferred' state for
+stuff I can't work on right now. Though I know a lot of people don't
+like it because deferred patches are not shown in the default patchwok
+view.
 
->+        name: mode
->+        type: flag
->+      -
->+        name: guard
->+        type: flag
->+      -
->+        name: protect
->+        type: flag
->+      -
->+        name: fast-leave
->+        type: flag
->+      -
->+        name: learning
->+        type: flag
->+      -
->+        name: unicast-flood
->+        type: flag
->+      -
->+        name: proxyarp
->+        type: flag
->+      -
->+        name: learning-sync
->+        type: flag
->+      -
->+        name: proxyarp-wifi
->+        type: flag
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
 
-Hi, these are not "flag". These are "u8".
-
-[...]
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
