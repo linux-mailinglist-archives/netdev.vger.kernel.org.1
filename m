@@ -1,63 +1,64 @@
-Return-Path: <netdev+bounces-71139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F1238526F5
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 02:49:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 482948526FE
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 02:50:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4C141F25BD8
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:49:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FDFF1C245CF
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:50:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFB0917560;
-	Tue, 13 Feb 2024 01:30:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86DF71AAD7;
+	Tue, 13 Feb 2024 01:35:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f7FzUXFT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T07/+ukb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A40E014010;
-	Tue, 13 Feb 2024 01:30:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5721E1B59E;
+	Tue, 13 Feb 2024 01:35:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707787817; cv=none; b=MPObzTuhoMHBSSEMdXxBB5fKVwe+kZePFaJSyWRk2K55qD/PAJfgxqjZhtVC1gyNGIm2A7U0KLGThf4sQxBZQgVSaO/lSM0TdtdAzlykAyaLFJEY5m8ydT9wLgVmr2S3LXAgkGatBfgzuMY7HXvEnI2QQef9B2Uo85sUN71R4JA=
+	t=1707788157; cv=none; b=VGv+pZecfWKUI2z8NRZ+VRIgtnbveW7kNu8a2VQ73+aulAt0zlQrtDD6AYxIBhQLsYhVmIWXj0jtJ3qaCXkET+emAQNb2GRpFqImvr9qokN13GQLtMz3rBsDWyTZaNs3d4ubt9TRhBPNZ6YmGxFnpNI6pmnjOUgDLHU9EhjRsA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707787817; c=relaxed/simple;
-	bh=JdTHedcxVO15s3B4sRid8zTpEzYkN8lo7pBe02dMOIA=;
+	s=arc-20240116; t=1707788157; c=relaxed/simple;
+	bh=aKWoMQBhztJhzWgzX1R5/kODWr7ReQymBJbcPq6O0LA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VN1gjarGfMZqMce9JUlciDxNyAJewLnhGbDmzinEDUkLgNiyz+jYEXekILmAYlbFnJV+fxdwBGVbcupAs4SqPN4/FG5oSj5/mOSVlgpGAjpiVzdWkKoxFVEt4dhBBJe84UC+l8PolTvbcYuduiltjO+wz8Ic30w51xnGOSmJDB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f7FzUXFT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 808CDC433C7;
-	Tue, 13 Feb 2024 01:30:16 +0000 (UTC)
+	 MIME-Version:Content-Type; b=fkz43uUP5r82lsziPvE2ZQnKz8xOsySPNzebQhNXPug/I8R7MHxnWV7zTo2J0o4PKfDUfJ39X5h7XrUF3dyc6h0QMvri2Kw3BjI8zZ+iLXy1wIhfRGBJA5STIS4n6tNGpcKt5SWpQAU+ikLjTGo4hwuwgWvfqbwx37JPULdQOJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T07/+ukb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52EB9C433F1;
+	Tue, 13 Feb 2024 01:35:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707787817;
-	bh=JdTHedcxVO15s3B4sRid8zTpEzYkN8lo7pBe02dMOIA=;
+	s=k20201202; t=1707788156;
+	bh=aKWoMQBhztJhzWgzX1R5/kODWr7ReQymBJbcPq6O0LA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=f7FzUXFTQaQH8sST/82MCPpBjozyaFswVdXgob1DuM96d49GvcQ8wdCMwWZLzkxgb
-	 UJgmMIkE6HmuBTiwWJJ6jbHzUIBgH/uaV2/oVNOH4xgI1gpyjHC1FKtodkkM88NPb5
-	 LyLBx4QyM/e4GbXQ9l/97+7UnUSKW79+3X60suDirIZ49zHBqCVf9kc5JZJbMEEuBU
-	 lj1FTyIPXxlSxynmRWq9W8yZkHNr8N0DDAMX7DKO/qDNJnO27yCwoSnhWfXInum8fD
-	 dpSzPJHVFS8eWxVFGFi/KxHI9rP3OGCCxyjAQig1Jl5af3KmOGPZSpKo/QKejms+s5
-	 N9fniz4acy2nQ==
-Date: Mon, 12 Feb 2024 17:30:15 -0800
+	b=T07/+ukbWJEp+zvZ0dmq4l5F94R6XpAQYYn+8+Xh8T6V13j5Jctwr3sRQLd5E6XAz
+	 KlRexcFuMREgNQ1Er7gTkagJdJh95kEFwKPHvTZUbNAsSikyAlumifKrGhKwQ42uCU
+	 q6grdcPlGlXoD5H18jndHgGkKyh8wysca++JR8TDRKxLGe7OJ391KS/113oF9HBtFi
+	 Rif10WyJwBAGrisT3Y1Gm0d4NsGwZP8QSCWEZqLhM7oO1TNho6J0htog/ZDTLnQZ3g
+	 gCDmivo+zMB+0/4TyKMiWIERFO477UmibH4sqsXzXifnedjhWHLwwPhVgh5Ffw1G/o
+	 Xq+pXz+Oabslg==
+Date: Mon, 12 Feb 2024 17:35:55 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Sneh Shah <quic_snehshah@quicinc.com>
-Cc: Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma
- <bhupesh.sharma@linaro.org>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- kernel@quicinc.com, Andrew Halaney <ahalaney@redhat.com>
-Subject: Re: [PATCH net-next v4] net: stmmac: dwmac-qcom-ethqos: Add support
- for 2.5G SGMII
-Message-ID: <20240212173015.0341f0ee@kernel.org>
-In-Reply-To: <20240208111714.11456-1-quic_snehshah@quicinc.com>
-References: <20240208111714.11456-1-quic_snehshah@quicinc.com>
+To: Kees Cook <keescook@chromium.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Gustavo A. R.
+ Silva" <gustavoars@kernel.org>, netdev@vger.kernel.org,
+ linux-hardening@vger.kernel.org, Rasmus Villemoes
+ <linux@rasmusvillemoes.dk>, Dan Williams <dan.j.williams@intel.com>, Keith
+ Packard <keithp@keithp.com>, Miguel Ojeda <ojeda@kernel.org>, Alexey
+ Dobriyan <adobriyan@gmail.com>, Dmitry Antipov <dmantipov@yandex.ru>,
+ Nathan Chancellor <nathan@kernel.org>, kernel test robot <lkp@intel.com>,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] net/ipv4: Annotate imsf_slist_flex with
+ __counted_by(imsf_numsrc)
+Message-ID: <20240212173555.576f1d59@kernel.org>
+In-Reply-To: <20240210011643.1706285-2-keescook@chromium.org>
+References: <20240210011452.work.985-kees@kernel.org>
+	<20240210011643.1706285-2-keescook@chromium.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,38 +68,9 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu,  8 Feb 2024 16:47:14 +0530 Sneh Shah wrote:
-> Serdes phy needs to operate at 2500 mode for 2.5G speed and 1000
-> mode for 1G/100M/10M speed.
-> Added changes to configure serdes phy and mac based on link speed.
-> Changing serdes phy speed involves multiple register writes for
-> serdes block. To avoid redundant write operations only update serdes
-> phy when new speed is different.
+On Fri,  9 Feb 2024 17:16:42 -0800 Kees Cook wrote:
+> The size of the imsf_slist_flex member is determined by imsf_numsrc, so
+> annotate it as such.
 
-Sounds like 2 separate changes in one patch, please split the
-optimization of not writing the registers multiple times and
-the 2.5G support.
-
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> index 31631e3f89d0..6bbdbb7bef44 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> @@ -106,6 +106,7 @@ struct qcom_ethqos {
->  	struct clk *link_clk;
->  	struct phy *serdes_phy;
->  	unsigned int speed;
-> +	int serdes_speed;
-
-Why signed if speed itself is unsigned?
-
->  	/* Enable and restart the Auto-Negotiation */
->  	if (ane)
->  		value |= GMAC_AN_CTRL_ANE | GMAC_AN_CTRL_RAN;
-> +	else
-> +		value &= ~GMAC_AN_CTRL_ANE;
-
-That looks unrelated. Either a separate patch or please explain in the
-commit msg why.
--- 
-pw-bot: cr
+Acked-by: Jakub Kicinski <kuba@kernel.org>
 
