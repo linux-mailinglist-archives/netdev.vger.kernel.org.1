@@ -1,152 +1,85 @@
-Return-Path: <netdev+bounces-71130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D005E8526D8
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 02:45:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C786B8526DA
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 02:45:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C36F2850F7
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:45:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 069971C247C5
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:45:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F24F97A72D;
-	Tue, 13 Feb 2024 01:06:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DA70286A2;
+	Tue, 13 Feb 2024 01:07:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h8Ly2ete"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lUPhreWH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1BA7A705;
-	Tue, 13 Feb 2024 01:06:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.88
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360007AE49;
+	Tue, 13 Feb 2024 01:07:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707786368; cv=none; b=nsb2AuvEzvKGp5jXbxLQT0mTh9utAwQknuJetxKhV3ikbwl+JiuzX8KEwoe3UaZoHqVZp1FvrcDRsLqwQK6fjwdivp8ESGXCcPy8Ai9kz6vc/aG6QogAaAZhFrhL1dS+rd+tWVT1jmO7koFKUPPIvGK5gVp/lhVgm3z/myVdxJ0=
+	t=1707786422; cv=none; b=l2pAkGcOOb19990X/FyLl8zDD+g0ESi5SfhO9giBgq3kXrIIEHvW7OYB0/deSDdMT32a12/dixspq7C7jibEdxuRnWOysRZCEEL2deKeuwBDgWtsvIxrNw7IYpaWPHeyMR6nWGqZwouudHQImwwXofHsYEbQZ53MHAbIJHw6S08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707786368; c=relaxed/simple;
-	bh=rpCO9f0Omg51h9cA+beqHpVMS/hZzt/qJ2gHgn/cQvo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GbIqj6STaBpJFntMO/s4ba1s70FiMDkMD29Ct/FK8HTPyGjNO8oooxKQVbnpvCPqH2+g2QqtzKnbtRHiQ+ElQz+rmqTOgeOVXcRwv0dmF5W61OZOm3Rvp6PHIezXfbaayG338B/3vIzd0JiDdocZVr+vSj/Z0pJcmLCT6DE+yZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h8Ly2ete; arc=none smtp.client-ip=192.55.52.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707786367; x=1739322367;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=rpCO9f0Omg51h9cA+beqHpVMS/hZzt/qJ2gHgn/cQvo=;
-  b=h8Ly2eteSJGtHueOos/faaOcs0AGryy6hhIV1IkUGD9Wmz1C+bd9eQiP
-   abM3prEWkaSPiJ0lCKOzKiOJUZvtgUp4biYCKJD27auLC+F6WUueQB95Y
-   TWzjcsRqbbJVdmbz9cp5Qrs9/xu95d8+mbkhj2PiB0u1o4uVLVFAt8Tqp
-   IsBnjZYDWd/0x+VI8U3oOyy2KA0+SXu8oBZsJDAWsCFxSHx9qVqX0gIZL
-   e+M41vyt+R3JmxPQrci1XhcBO1hoM2ccLpBl+Vds577o1kJD9KUJXUMQl
-   yank0wro82uqmAenG7iDmuH+nuX8uzyPL+SwQRP2bzWzCR+N3yFY5NdEy
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="436927664"
-X-IronPort-AV: E=Sophos;i="6.06,155,1705392000"; 
-   d="scan'208";a="436927664"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 17:05:44 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="911651342"
-X-IronPort-AV: E=Sophos;i="6.06,155,1705392000"; 
-   d="scan'208";a="911651342"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmsmga002.fm.intel.com with ESMTP; 12 Feb 2024 17:05:43 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	anthony.l.nguyen@intel.com,
-	magnus.karlsson@intel.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	bpf@vger.kernel.org,
-	Seth Forshee <sforshee@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Ivan Vecera <ivecera@redhat.com>,
-	Chandan Kumar Rout <chandanx.rout@intel.com>
-Subject: [PATCH net 4/4] i40e: take into account XDP Tx queues when stopping rings
-Date: Mon, 12 Feb 2024 17:05:39 -0800
-Message-ID: <20240213010540.1085039-5-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20240213010540.1085039-1-anthony.l.nguyen@intel.com>
-References: <20240213010540.1085039-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1707786422; c=relaxed/simple;
+	bh=yiRjXWW9vRy8oSt2OY9bdE1LF4uXuy72w5FirZcXiWQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=d3+D0zLKxoe8CDjySdtUley40Er/EXTfpHoFQ2iPSGk6mUR9/Fhb86GUHIESlVusocXfOdUszHElwX9dkvKIKHnvM4STub5OrP5Egp/mjF6i8D3BgPnDv3iARJ3823B4GNApbszIGUoy/NY43pBLlxZRg3HtPWHye0/wrzZDy5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lUPhreWH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 538FDC433F1;
+	Tue, 13 Feb 2024 01:07:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707786421;
+	bh=yiRjXWW9vRy8oSt2OY9bdE1LF4uXuy72w5FirZcXiWQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lUPhreWHveOFJzchwqyfcv++UOsX7plGbmLF+WVZf9oNBAqWh9YCNx+7dleUmWDcH
+	 UH3AIcmOxwP8nDKZ2PBbVutfPQ/ms3dQhMhSaH91uM+fWKsrqzTW2qsPv/E3F9mSEE
+	 Xsukyr6Zg5nfmmQ/25ML5WFZElcSuYcivNxys2ESwhjac+JZ4FBpKds60Y+MZl3SfR
+	 NG3Wqjr6XFKmQtGcA9GZEwDMjE6dU4Nq1zFjMy/i8cLgVrcEk5FXghgTNdFjY450Bs
+	 yB7KDndZv6c3XZ7SQukkSm1noEKw+NOEik0LsPhA1nJNyt11/4EmpZjv8Qti0ugKNu
+	 lNjUMQEmgYScQ==
+Date: Mon, 12 Feb 2024 17:07:00 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
+Cc: linux-pm@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>,
+ Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, Ricardo Neri
+ <ricardo.neri-calderon@linux.intel.com>, Daniel Lezcano
+ <daniel.lezcano@linaro.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko
+ <jiri@resnulli.us>, Johannes Berg <johannes@sipsolutions.net>, Florian
+ Westphal <fw@strlen.de>, netdev@vger.kernel.org
+Subject: Re: [PATCH v4 1/3] genetlink: Add per family bind/unbind callbacks
+Message-ID: <20240212170700.4eda9c03@kernel.org>
+In-Reply-To: <20240212161615.161935-2-stanislaw.gruszka@linux.intel.com>
+References: <20240212161615.161935-1-stanislaw.gruszka@linux.intel.com>
+	<20240212161615.161935-2-stanislaw.gruszka@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+On Mon, 12 Feb 2024 17:16:13 +0100 Stanislaw Gruszka wrote:
+> Add genetlink family bind()/unbind() callbacks when adding/removing
+> multicast group to/from netlink client socket via setsockopt() or
+> bind() syscall.
+> 
+> They can be used to track if consumers of netlink multicast messages
+> emerge or disappear. Thus, a client implementing callbacks, can now
+> send events only when there are active consumers, preventing unnecessary
+> work when none exist.
+> 
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
 
-Seth reported that on his side XDP traffic can not survive a round of
-down/up against i40e interface. Dmesg output was telling us that we were
-not able to disable the very first XDP ring. That was due to the fact
-that in i40e_vsi_stop_rings() in a pre-work that is done before calling
-i40e_vsi_wait_queues_disabled(), XDP Tx queues were not taken into the
-account.
-
-To fix this, let us distinguish between Rx and Tx queue boundaries and
-take into the account XDP queues for Tx side.
-
-Reported-by: Seth Forshee <sforshee@kernel.org>
-Closes: https://lore.kernel.org/netdev/ZbkE7Ep1N1Ou17sA@do-x1extreme/
-Fixes: 65662a8dcdd0 ("i40e: Fix logic of disabling queues")
-Tested-by: Seth Forshee <sforshee@kernel.org>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Reviewed-by: Ivan Vecera <ivecera@redhat.com>
-Tested-by: Chandan Kumar Rout <chandanx.rout@intel.com> (A Contingent Worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/i40e/i40e_main.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 06078c4d54e8..54eb55464e31 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -4926,21 +4926,23 @@ int i40e_vsi_start_rings(struct i40e_vsi *vsi)
- void i40e_vsi_stop_rings(struct i40e_vsi *vsi)
- {
- 	struct i40e_pf *pf = vsi->back;
--	int pf_q, q_end;
-+	u32 pf_q, tx_q_end, rx_q_end;
- 
- 	/* When port TX is suspended, don't wait */
- 	if (test_bit(__I40E_PORT_SUSPENDED, vsi->back->state))
- 		return i40e_vsi_stop_rings_no_wait(vsi);
- 
--	q_end = vsi->base_queue + vsi->num_queue_pairs;
--	for (pf_q = vsi->base_queue; pf_q < q_end; pf_q++)
--		i40e_pre_tx_queue_cfg(&pf->hw, (u32)pf_q, false);
-+	tx_q_end = vsi->base_queue +
-+		vsi->alloc_queue_pairs * (i40e_enabled_xdp_vsi(vsi) ? 2 : 1);
-+	for (pf_q = vsi->base_queue; pf_q < tx_q_end; pf_q++)
-+		i40e_pre_tx_queue_cfg(&pf->hw, pf_q, false);
- 
--	for (pf_q = vsi->base_queue; pf_q < q_end; pf_q++)
-+	rx_q_end = vsi->base_queue + vsi->num_queue_pairs;
-+	for (pf_q = vsi->base_queue; pf_q < rx_q_end; pf_q++)
- 		i40e_control_rx_q(pf, pf_q, false);
- 
- 	msleep(I40E_DISABLE_TX_GAP_MSEC);
--	for (pf_q = vsi->base_queue; pf_q < q_end; pf_q++)
-+	for (pf_q = vsi->base_queue; pf_q < tx_q_end; pf_q++)
- 		wr32(&pf->hw, I40E_QTX_ENA(pf_q), 0);
- 
- 	i40e_vsi_wait_queues_disabled(vsi);
--- 
-2.41.0
-
+LGTM! genetlink code is a bit hot lately, to avoid any conflicts can
+I put the first patch (or all of them) on a shared branch for both
+netdev and PM to pull in? Once the other two patches are reviewed,
+obviously.
 
