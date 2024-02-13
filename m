@@ -1,191 +1,201 @@
-Return-Path: <netdev+bounces-71210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66F6F8529D0
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 08:24:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 747008529D4
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 08:29:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B6C81C22393
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 07:24:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 994EF1C22767
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 07:29:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16B1917564;
-	Tue, 13 Feb 2024 07:23:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C46211756D;
+	Tue, 13 Feb 2024 07:29:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VsepFZzU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="od4RxfPD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B8C717995
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 07:23:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97DE617566;
+	Tue, 13 Feb 2024 07:29:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707809036; cv=none; b=khYGP/KUTB2GDnM2IgdDgOQjpgSaTMFHeobXVCfWtOLGVGLS0LhGeynwqFXjet01kIdvcT6xMuDNB7Rh/Q0Mea5H1J63kNYbVL4ZBl6eecgDdHXLhA5bB5Syq+83QEdl2c1+nbqEV5j5OZCIgZF3t5J8/GBgVwbANQCvFRV/uc0=
+	t=1707809359; cv=none; b=ZU1vKPPhi3emw4iG1C1/eSNM6f0RVZP7wOZuoStvFG2hyJrX42rmsoh2zkX7vinwzBqZfHLY+QtSYseXPof9rP3R7/WJgs5GcmKuGGT6vb6qD5w2jltfBLo5DVXvq1mZWhitL5zJjrLq5FjiwvsjJzaJ5npXCoN+xPUDm6jyTu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707809036; c=relaxed/simple;
-	bh=aB/Tl50P5lqWpAy1hYl1ouA6J/Ma41ODTxAJ/YnOLc8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=e0r4YMcMRnCPm4bA4z/mo7Isy4Eh042JOzEmYnA+5DkZdBJpTH9U9vCPuQrweIilU6w41VJC/k+udHw4Xc7UzlU/TTd8RkgrnW+OpLLH1kRFE8ZpJX7Msbr63H7Q7uvjNVQICZ2Erw7GJc+8WA/98ojZ0i8dADPlfvm1u8KdqnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VsepFZzU; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707809034; x=1739345034;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=aB/Tl50P5lqWpAy1hYl1ouA6J/Ma41ODTxAJ/YnOLc8=;
-  b=VsepFZzUe2xgCMg0PBeTl2Wh0iV8lHLe0m43AqvFKsXIDdK8SOkVVRsX
-   kU9V/G62PViuqo1ZYJQ5hi63kKCEn/vCqFVrrmjFm/bXNRmFgzEXvP9DA
-   dISnWOifyEMUtgl0c5qq2n8VUjNvBhL31TxPCNUm3aSg3RgF3YUnECMd+
-   nddNuzCXycHcbRm7OqLyX08EsDsQu/o6Jd8yqo7p8Q/slReDWgNoMoq+R
-   S3PJTVltVA+R7EYmk84HHw9DVhC4YIx4wE4gUqHTN7F24th1z9tR3gc1R
-   6fw7Cj+GCgGzyYkKlHpLAAEYuvO1WxmsLJgePpRh0maErx96J5yezKXJk
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="27248088"
-X-IronPort-AV: E=Sophos;i="6.06,156,1705392000"; 
-   d="scan'208";a="27248088"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 23:23:50 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,156,1705392000"; 
-   d="scan'208";a="7385552"
-Received: from wasp.igk.intel.com (HELO GK3153-DR2-R750-36946.localdomain.com) ([10.102.20.192])
-  by fmviesa003.fm.intel.com with ESMTP; 12 Feb 2024 23:23:47 -0800
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	jacob.e.keller@intel.com,
-	michal.kubiak@intel.com,
-	maciej.fijalkowski@intel.com,
-	sridhar.samudrala@intel.com,
-	przemyslaw.kitszel@intel.com,
-	wojciech.drewek@intel.com,
-	pio.raczynski@gmail.com,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Subject: [iwl-next v1 15/15] ice: move ice_devlink.[ch] to devlink folder
-Date: Tue, 13 Feb 2024 08:27:24 +0100
-Message-ID: <20240213072724.77275-16-michal.swiatkowski@linux.intel.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20240213072724.77275-1-michal.swiatkowski@linux.intel.com>
-References: <20240213072724.77275-1-michal.swiatkowski@linux.intel.com>
+	s=arc-20240116; t=1707809359; c=relaxed/simple;
+	bh=JDucEHydWXrSLUzuo2FD0MxyrhZzIoiGXp3GsPpCJRs=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=NoWQROs3yc/qISf0NDLyNT2RHQZHU2H2lIBctl7cCKuKSG2sfzGQu2sHjfIRwc8NyJqSiTIvjXS/3VsklliO/9Nx0iFCHJk9+ndlZMgfTH/MPneDKrrx+0cFCOwIFgR3qrqSLJ6QEVq8Bg65AEymVAIQIGqSDwMpNTDrK0PXu60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=od4RxfPD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1AE27C433F1;
+	Tue, 13 Feb 2024 07:29:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707809359;
+	bh=JDucEHydWXrSLUzuo2FD0MxyrhZzIoiGXp3GsPpCJRs=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=od4RxfPD9pFzMJie+sZrC/bwzACrs3e3hhPbZm2omcg6x0GgKb1hBxR5YHj9RbtbC
+	 y8ObjrPHUQum4uFG5AXC4S/4u9OuSIXemHjUu2KClHWBbGHUKRZ3euzOzQXCtIJ484
+	 jInraV0nel15LFgiTg57Zzw07JEfoG8BZF8gdjium6n33o0DFO8E+wDA46lKzexeDv
+	 n1GPXw0CcYJ+aINpgrFfshU88F56jGCUIOfFfgaRIxnE2JuXuX61y0kFTObMXcpBGw
+	 wuQlLlLmZUntIwD9M0Hg68yuBe9oCZZsLbSY1EJ3xv8oMxpX1jr7t6aKnJmpGu/Ekt
+	 4XMK0Yvg++d4Q==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0853AC48260;
+	Tue, 13 Feb 2024 07:29:19 +0000 (UTC)
+From: =?utf-8?b?QXLEsW7DpyDDnE5BTA==?= via B4 Relay
+ <devnull+arinc.unal.arinc9.com@kernel.org>
+Date: Tue, 13 Feb 2024 10:29:05 +0300
+Subject: [PATCH net-next v2] net: dsa: remove OF-based MDIO bus
+ registration from DSA core
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+Message-Id: <20240213-for-netnext-dsa-mdio-bus-v2-1-0ff6f4823a9e@arinc9.com>
+X-B4-Tracking: v=1; b=H4sIAEAay2UC/yWNzQ6CMBCEX4Xs2SWl5ad48j0MhwqLbCKtaYFgC
+ O9urbf5MvlmDgjkmQJcswM8bRzY2QjykkE/Gfsk5CEySCFLUSiBo/NoabG0LzgEg/PADh9rwFo
+ 2vSgbQVoriPrb08h7mr5DNPCnQBebicPi/Cd9bkXq//NSikqpUud1pVss0Hi2fb5a87ql2Oa9m
+ 6E7z/ML1dL4grgAAAA=
+To: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
+ Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: mithat.guner@xeront.com, erkin.bozoglu@xeront.com, 
+ Luiz Angelo Daros de Luca <luizluca@gmail.com>, 
+ =?utf-8?q?Alvin_=C5=A0ipraga?= <ALSI@bang-olufsen.dk>, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>
+X-Mailer: b4 0.12.4
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1707809354; l=4698;
+ i=arinc.unal@arinc9.com; s=arinc9-patatt; h=from:subject:message-id;
+ bh=FQVu4SdlGCbVhlJyCOryP4ivDPy0SI6ZNNcbaFbu7M0=;
+ b=FBdXqqaV0vEKXzhXwwhzwHIG9P6X2VZ1lJ3hEQcD0rAhBYuWM0nf8ZjiLytG+tTVXc8bbAHN7
+ u1G4tKR/i4YCZNhxGmuqgAgGAJVxHmYM814pW+T6NThhfNzT6DzChrp
+X-Developer-Key: i=arinc.unal@arinc9.com; a=ed25519;
+ pk=VmvgMWwm73yVIrlyJYvGtnXkQJy9CvbaeEqPQO9Z4kA=
+X-Endpoint-Received:
+ by B4 Relay for arinc.unal@arinc9.com/arinc9-patatt with auth_id=115
+X-Original-From: =?utf-8?b?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Reply-To: <arinc.unal@arinc9.com>
 
-Only moving whole files, fixing Makefile and bunch of includes.
+From: Arınç ÜNAL <arinc.unal@arinc9.com>
 
-Some changes to ice_devlink file was done even in representor part (Tx
-topology), so keep it as final patch to not mess up with rebasing.
+The code block under the "!ds->user_mii_bus && ds->ops->phy_read" check
+under dsa_switch_setup() populates ds->user_mii_bus. The use of
+ds->user_mii_bus is inappropriate when the MDIO bus of the switch is
+described on the device tree [1].
 
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+For this reason, use this code block only for switches [with MDIO bus]
+probed on platform_data, and OF which the switch MDIO bus isn't described
+on the device tree. Therefore, remove OF-based MDIO bus registration as
+it's useless for these cases.
+
+These subdrivers which control switches [with MDIO bus] probed on OF, will
+lose the ability to register the MDIO bus OF-based:
+
+drivers/net/dsa/b53/b53_common.c
+drivers/net/dsa/lan9303-core.c
+drivers/net/dsa/vitesse-vsc73xx-core.c
+
+These subdrivers let the DSA core driver register the bus:
+- ds->ops->phy_read() and ds->ops->phy_write() are present.
+- ds->user_mii_bus is not populated.
+
+The commit fe7324b93222 ("net: dsa: OF-ware slave_mii_bus") which brought
+OF-based MDIO bus registration on the DSA core driver is reasonably recent
+and, in this time frame, there have been no device trees in the Linux
+repository that started describing the MDIO bus, or dt-bindings defining
+the MDIO bus for the switches these subdrivers control. So I don't expect
+any devices to be affected.
+
+The logic we encourage is that all subdrivers should register the switch
+MDIO bus on their own [2]. And, for subdrivers which control switches [with
+MDIO bus] probed on OF, this logic must be followed to support all cases
+properly:
+
+No switch MDIO bus defined: Populate ds->user_mii_bus, register the MDIO
+bus, set the interrupts for PHYs if "interrupt-controller" is defined at
+the switch node. This case should only be covered for the switches which
+their dt-bindings documentation didn't document the MDIO bus from the
+start. This is to keep supporting the device trees that do not describe the
+MDIO bus on the device tree but the MDIO bus is being used nonetheless.
+
+Switch MDIO bus defined: Don't populate ds->user_mii_bus, register the MDIO
+bus, set the interrupts for PHYs if ["interrupt-controller" is defined at
+the switch node and "interrupts" is defined at the PHY nodes under the
+switch MDIO bus node].
+
+Switch MDIO bus defined but explicitly disabled: If the device tree says
+status = "disabled" for the MDIO bus, we shouldn't need an MDIO bus at all.
+Instead, just exit as early as possible and do not call any MDIO API.
+
+After all subdrivers that control switches with MDIO buses are made to
+register the MDIO buses on their own, we will be able to get rid of
+dsa_switch_ops :: phy_read() and :: phy_write(), and the code block for
+registering the MDIO bus on the DSA core driver.
+
+Link: https://lore.kernel.org/netdev/20231213120656.x46fyad6ls7sqyzv@skbuf/ [1]
+Link: https://lore.kernel.org/netdev/20240103184459.dcbh57wdnlox6w7d@skbuf/ [2]
+Suggested-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Acked-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
 ---
- drivers/net/ethernet/intel/ice/Makefile                    | 2 +-
- drivers/net/ethernet/intel/ice/{ => devlink}/ice_devlink.c | 0
- drivers/net/ethernet/intel/ice/{ => devlink}/ice_devlink.h | 0
- drivers/net/ethernet/intel/ice/ice_dcb_lib.c               | 2 +-
- drivers/net/ethernet/intel/ice/ice_eswitch.c               | 2 +-
- drivers/net/ethernet/intel/ice/ice_main.c                  | 2 +-
- drivers/net/ethernet/intel/ice/ice_repr.c                  | 2 +-
- drivers/net/ethernet/intel/ice/ice_sf_eth.c                | 2 +-
- 8 files changed, 6 insertions(+), 6 deletions(-)
- rename drivers/net/ethernet/intel/ice/{ => devlink}/ice_devlink.c (100%)
- rename drivers/net/ethernet/intel/ice/{ => devlink}/ice_devlink.h (100%)
+Changes in v2:
+- Remove mention to drivers/net/dsa/realtek/realtek-mdio.c as it now
+  registers the MDIO bus OF-based on its own, and now under
+  drivers/net/dsa/realtek/rtl83xx.c. I've waited until this happened
+  because if this patch was applied beforehand, there would be no way to
+  set IRQs on PHYs as the subdriver doesn't do that for the MDIO bus
+  registered non-OF-based.
+- Link to v1: https://lore.kernel.org/r/20240122053348.6589-1-arinc.unal@arinc9.com
+---
+ net/dsa/dsa.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/Makefile b/drivers/net/ethernet/intel/ice/Makefile
-index 6f350d8624d7..895cec763637 100644
---- a/drivers/net/ethernet/intel/ice/Makefile
-+++ b/drivers/net/ethernet/intel/ice/Makefile
-@@ -29,7 +29,7 @@ ice-y := ice_main.o	\
- 	 ice_flex_pipe.o \
- 	 ice_flow.o	\
- 	 ice_idc.o	\
--	 ice_devlink.o	\
-+	 devlink/ice_devlink.o	\
- 	 devlink/ice_devlink_port.o	\
- 	 ice_sf_eth.o	\
- 	 ice_sf_vsi_vlan_ops.o \
-diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/devlink/ice_devlink.c
-similarity index 100%
-rename from drivers/net/ethernet/intel/ice/ice_devlink.c
-rename to drivers/net/ethernet/intel/ice/devlink/ice_devlink.c
-diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.h b/drivers/net/ethernet/intel/ice/devlink/ice_devlink.h
-similarity index 100%
-rename from drivers/net/ethernet/intel/ice/ice_devlink.h
-rename to drivers/net/ethernet/intel/ice/devlink/ice_devlink.h
-diff --git a/drivers/net/ethernet/intel/ice/ice_dcb_lib.c b/drivers/net/ethernet/intel/ice/ice_dcb_lib.c
-index 63ce4920de4e..3f6661390151 100644
---- a/drivers/net/ethernet/intel/ice/ice_dcb_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_dcb_lib.c
-@@ -3,7 +3,7 @@
+diff --git a/net/dsa/dsa.c b/net/dsa/dsa.c
+index ac7be864e80d..09d2f5d4b3dd 100644
+--- a/net/dsa/dsa.c
++++ b/net/dsa/dsa.c
+@@ -15,7 +15,6 @@
+ #include <linux/slab.h>
+ #include <linux/rtnetlink.h>
+ #include <linux/of.h>
+-#include <linux/of_mdio.h>
+ #include <linux/of_net.h>
+ #include <net/dsa_stubs.h>
+ #include <net/sch_generic.h>
+@@ -626,7 +625,6 @@ static void dsa_switch_teardown_tag_protocol(struct dsa_switch *ds)
  
- #include "ice_dcb_lib.h"
- #include "ice_dcb_nl.h"
--#include "ice_devlink.h"
-+#include "devlink/ice_devlink.h"
+ static int dsa_switch_setup(struct dsa_switch *ds)
+ {
+-	struct device_node *dn;
+ 	int err;
  
- /**
-  * ice_dcb_get_ena_tc - return bitmap of enabled TCs
-diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-index 50985a3732c0..416728d0674f 100644
---- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
-+++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-@@ -7,7 +7,7 @@
- #include "ice_eswitch_br.h"
- #include "ice_fltr.h"
- #include "ice_repr.h"
--#include "ice_devlink.h"
-+#include "devlink/ice_devlink.h"
- #include "ice_tc_lib.h"
+ 	if (ds->setup)
+@@ -666,10 +664,7 @@ static int dsa_switch_setup(struct dsa_switch *ds)
  
- /**
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 7ff96da33e8d..5129bce8538a 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -13,7 +13,7 @@
- #include "ice_fltr.h"
- #include "ice_dcb_lib.h"
- #include "ice_dcb_nl.h"
--#include "ice_devlink.h"
-+#include "devlink/ice_devlink.h"
- #include "ice_hwmon.h"
- #include "devlink/ice_devlink_port.h"
- #include "ice_sf_eth.h"
-diff --git a/drivers/net/ethernet/intel/ice/ice_repr.c b/drivers/net/ethernet/intel/ice/ice_repr.c
-index fb0171afa43e..11ead0a0365d 100644
---- a/drivers/net/ethernet/intel/ice/ice_repr.c
-+++ b/drivers/net/ethernet/intel/ice/ice_repr.c
-@@ -3,7 +3,7 @@
+ 		dsa_user_mii_bus_init(ds);
  
- #include "ice.h"
- #include "ice_eswitch.h"
--#include "ice_devlink.h"
-+#include "devlink/ice_devlink.h"
- #include "devlink/ice_devlink_port.h"
- #include "ice_sriov.h"
- #include "ice_tc_lib.h"
-diff --git a/drivers/net/ethernet/intel/ice/ice_sf_eth.c b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
-index 3d30dfaed7d7..f00aabb68f0f 100644
---- a/drivers/net/ethernet/intel/ice/ice_sf_eth.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
-@@ -6,7 +6,7 @@
- #include "ice_txrx.h"
- #include "ice_fltr.h"
- #include "ice_sf_eth.h"
--#include "ice_devlink.h"
-+#include "devlink/ice_devlink.h"
- #include "devlink/ice_devlink_port.h"
- 
- static const struct net_device_ops ice_sf_netdev_ops = {
+-		dn = of_get_child_by_name(ds->dev->of_node, "mdio");
+-
+-		err = of_mdiobus_register(ds->user_mii_bus, dn);
+-		of_node_put(dn);
++		err = mdiobus_register(ds->user_mii_bus);
+ 		if (err < 0)
+ 			goto free_user_mii_bus;
+ 	}
+
+---
+base-commit: 4acf4e62cd572b0c806035046b3698f5585ab821
+change-id: 20240130-for-netnext-dsa-mdio-bus-627c0470e883
+
+Best regards,
 -- 
-2.42.0
+Arınç ÜNAL <arinc.unal@arinc9.com>
 
 
