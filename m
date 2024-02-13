@@ -1,183 +1,153 @@
-Return-Path: <netdev+bounces-71562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C96EB853EBD
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 23:31:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D944853F2C
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 23:52:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05A261C28030
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 22:31:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6D8E1F2AE86
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 22:52:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EB74433AB;
-	Tue, 13 Feb 2024 22:31:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47C37627EA;
+	Tue, 13 Feb 2024 22:52:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="LkQy69fs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CQ4/gT4j"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9609627EC;
-	Tue, 13 Feb 2024 22:31:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8709E61686;
+	Tue, 13 Feb 2024 22:52:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707863518; cv=none; b=Hb9LdLFv25hhwGqe3ZvPGWKQiweSOm3LG+GEX25oIX7BmeEs0Jz0Pve37wRLCsvyJg7ATFn6NQ3ER7twCTS1vnm2Qra0EdFh7b7n3YaTIHycrYDCZ5nIel8bRJn7H9NQSCIZB9RtKz0zIzcK+bAuWpCIZYqD6BVLpebSlxC8UKc=
+	t=1707864739; cv=none; b=pMyW3Psj2lbpB4tnotje4/Ji8MbaULX1LN36tWGe4+0rXN/4N8ffNRxAbtrmf8oKOOXsePyiQz525H8R9WH6N3e71xiPRWBsNpHPtFJgxj+onKaUz6T9SY11DlRiqP+cgpRP9AZYJ0UqPRHyuS+abf4O+Vhc6WKTSt9m+GvUyxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707863518; c=relaxed/simple;
-	bh=AjyFJoB2E5hmBxbkwSQYS3RBJ8kjXzZkJDGogqKHWkA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Fo7mwjFjzUnewEdeToTBzH00koXQuRVuye4N/R1QOpZvcEy8OJ9V/3pjxrV5t7Nkq/wnBxwaxExkzDBg7vQMYaUzSc7PUuLC+O0nxyiXUmaXZABhtuia7e0GENqTCUmglhdygDnf/l7SgV4k40Y8pBBzKZm+r3SZjBokCqC+8Hc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=LkQy69fs; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1707864739; c=relaxed/simple;
+	bh=fCE38Ot/LYirlQfCii8VT6ufFOtv+sHaVcCjpCxyguk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iIeTbfNx2THCF2MRQdi+2GeeyrfM9lyjont3sk7u/u4gPV+stGlr4dOdoO6+xD4HD1R58iQloTt4lVxo/1OOGNUelW+j5N5QaKWrvPgiH4o+ORxOJQ6GsfUt52LHaDZqOHqVVvuzTajFxkp9BuBJ+l+rjfOhdnaDTQENElq7Oqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CQ4/gT4j; arc=none smtp.client-ip=209.85.160.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-214def5da12so2970953fac.2;
+        Tue, 13 Feb 2024 14:52:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1707863516; x=1739399516;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=xASju9eOcReBWPS5XiOgqPyTtw+QoZR04RComZSbo04=;
-  b=LkQy69fs1jYhP477KyLFvEcnTA3qVobwW3xFS4xzjTQPWKk3U6veeQ4W
-   fRS+s6DbuTTT1v0Pn4nZS86Qk7wUW8XNxr+uMW2BzxcUcG7Tam4NPH6ll
-   1hGCGfSsajQS24/aOvoOr8gklaqlnZCnMwdun/DOded8ywEZqQVPPppRk
-   E=;
-X-IronPort-AV: E=Sophos;i="6.06,158,1705363200"; 
-   d="scan'208";a="65833263"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2024 22:31:54 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:35044]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.24.112:2525] with esmtp (Farcaster)
- id 5276ae52-4884-4071-a6ca-c88b58983b92; Tue, 13 Feb 2024 22:31:53 +0000 (UTC)
-X-Farcaster-Flow-ID: 5276ae52-4884-4071-a6ca-c88b58983b92
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Tue, 13 Feb 2024 22:31:53 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.20) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Tue, 13 Feb 2024 22:31:50 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, Mat Martineau
-	<martineau@kernel.org>, Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher
-	<jaka@linux.ibm.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, <mptcp@lists.linux.dev>,
-	<linux-s390@vger.kernel.org>
-Subject: [PATCH v1 net-next] net: Deprecate SO_DEBUG and reclaim SOCK_DBG bit.
-Date: Tue, 13 Feb 2024 14:31:35 -0800
-Message-ID: <20240213223135.85957-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+        d=gmail.com; s=20230601; t=1707864736; x=1708469536; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=beoO8TXO5tck0Ut41LsdcMam0jCDe/xp7+xH/ECCYWU=;
+        b=CQ4/gT4jGFqG4wZA0QQ1p++41N9By7/WeNgBKFij/wZ8cYgrCA9crv0aVvJ9vvTlnt
+         Ntkk/Uo6l4VXet2UYoUS/mMDu2PEFPkQQNKBwD5JwSPhcH6TCIldDhvim/Fojo1PDmK8
+         DnullwQBZyvWgXyJ2iae0VYSVhCeHQNS/5npLqn+HF12kEh2D+5Y+lMEOr3wx++bHwBm
+         Lxmj3nle2Kvcz1eDXQaJ4lhoP0ptYWNYDqodZXcOVho2Gn6oSv6deYADGZxTUOWKICHQ
+         4NXpUrSCBPUyJTyxRP49pe8AmPF0QfV3JwP6enIK2xuHTS3nvkQsh66yMYroNmxFydqu
+         xSqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707864736; x=1708469536;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :sender:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=beoO8TXO5tck0Ut41LsdcMam0jCDe/xp7+xH/ECCYWU=;
+        b=RFWeK/nWwIMCtrLHff+XVlFO6451IU+OhNkgFd1F2t3YoUBiP5mUK+FGTbWubmJebx
+         7Y77D8e48gGk6m5MkfW1Zi2fUCyPeKpvQ6j0ZCscWUJp5oVPjATtkhGNFYlbw9hl4tR1
+         J3LxQ3svh89KFfpoMNGDrpMdH3F89tzCeiVMOYJqYTboJ737iZdNfiEM1GDIc+lEzRRk
+         i3u7O4EITIx3rzSxessk4TuKfQwiDxnnSQdu87dJS8PUPOZBDiX8Eb0SRujqsrqvEdQQ
+         JEl7yRkoHbWKzKJNITLPns/Mqo82PFPiSRWWqrbHc59Ih49SYsEnrmnVN6T+4+WM71hn
+         t25g==
+X-Forwarded-Encrypted: i=1; AJvYcCUOEM2jxmplJ7NPbnmxmh9okt1rP35u5ggOiMvZyui8GryqLCN+D6bje3wJp2aUj6g8baMpJ1nbKwsuBrsxh6WUEtqGc60GFThqc0iOcBCn9mGzH3R089WoqgZLM0sisRkGe7YHfArJuksfDlawvtIBpe0EgqTriF5F3JIrCSwwg6w=
+X-Gm-Message-State: AOJu0Yyixtry6ugCeLE8yvbdBZtQTPZpCl5sSjqoUjxPbdHBgUzmp64U
+	RlUXTFGHZ0zgI08hsYQjcBuoIv8mQF9qFaimP4DUhOOOiULZ/Dds
+X-Google-Smtp-Source: AGHT+IE78SmSSSv6Toje+QMskhxjls3wSSVJ6lrSIu4ESOTx+no684RgHO/zw0EKoYEFN4Vm0m8d4Q==
+X-Received: by 2002:a05:6870:ce48:b0:218:a29f:1f5a with SMTP id xd8-20020a056870ce4800b00218a29f1f5amr727238oab.22.1707864736488;
+        Tue, 13 Feb 2024 14:52:16 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUZkGA74aU6XkBl7/gjQG8CeT1HvpD2fmwIf6BJaLUUpr/i+5PCglnQWDyvy+u1Txhporay+6u7UTAMKpya6R/q9PZp3TCytlBJ1l+H8UG4agKllFgmhV6anoA+cI1edvGSIoEUIgsIZ/gnQSVjngeBpUoBmizQjNzvUc0drXoj+vzTz0sxj3UhEm4pj4Jj6MZrzVfBTNL2CpZQTIGKwuODRzRLgjX3dAxXN+n08DGYm+Mx/vFMF3BFzSlOGmbxC3Lmv+4Krjf2im6/A4cX8eX/TC7H46VcsbwfvLisTR0I36GY3Oo9MZxadR5efgt33sGXptXR76sHnfbf0UluaS/HJpJ6eVE/+0s9kK7xJ5OO35k5HDEE4tpKGdHGbzFMkoVgwQ==
+Received: from ?IPV6:2600:1700:e321:62f0:329c:23ff:fee3:9d7c? ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id cb5-20020a056a02070500b005dbf22d6e1asm2561585pgb.56.2024.02.13.14.52.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Feb 2024 14:52:15 -0800 (PST)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Message-ID: <e278d411-6795-413b-84a9-08fc6ffb4a20@roeck-us.net>
+Date: Tue, 13 Feb 2024 14:52:14 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D042UWA001.ant.amazon.com (10.13.139.92) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 net-next 08/14] net: phy: marvell-88q2xxx: add support
+ for temperature sensor
+Content-Language: en-US
+To: Dimitri Fedrau <dima.fedrau@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jean Delvare <jdelvare@suse.com>, Stefan Eichenberger <eichest@gmail.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hwmon@vger.kernel.org
+References: <20240213213955.178762-1-dima.fedrau@gmail.com>
+ <20240213213955.178762-9-dima.fedrau@gmail.com>
+From: Guenter Roeck <linux@roeck-us.net>
+Autocrypt: addr=linux@roeck-us.net; keydata=
+ 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
+ mDW4+i+XlNFUPUYMrIKi9joBhu18ssf5i5Q=
+In-Reply-To: <20240213213955.178762-9-dima.fedrau@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Recently, commit 8e5443d2b866 ("net: remove SOCK_DEBUG leftovers")
-removed the last users of SOCK_DEBUG(), and commit b1dffcf0da22 ("net:
-remove SOCK_DEBUG macro") removed the macro.
+On 2/13/24 13:39, Dimitri Fedrau wrote:
+> Marvell 88q2xxx devices have an inbuilt temperature sensor. Add hwmon
+> support for this sensor.
+> 
+> Signed-off-by: Dimitri Fedrau <dima.fedrau@gmail.com>
 
-Now is the time to deprecate the oldest socket option.
+Reviewed-by: Guenter Roeck <linux@roeck-us.net>
 
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- include/net/sock.h  | 1 -
- net/core/sock.c     | 6 +++---
- net/mptcp/sockopt.c | 4 +---
- net/smc/af_smc.c    | 5 ++---
- 4 files changed, 6 insertions(+), 10 deletions(-)
-
-diff --git a/include/net/sock.h b/include/net/sock.h
-index a9d99a9c583f..e20d55a36f9c 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -909,7 +909,6 @@ enum sock_flags {
- 	SOCK_TIMESTAMP,
- 	SOCK_ZAPPED,
- 	SOCK_USE_WRITE_QUEUE, /* whether to call sk->sk_write_space in sock_wfree */
--	SOCK_DBG, /* %SO_DEBUG setting */
- 	SOCK_RCVTSTAMP, /* %SO_TIMESTAMP setting */
- 	SOCK_RCVTSTAMPNS, /* %SO_TIMESTAMPNS setting */
- 	SOCK_LOCALROUTE, /* route locally only, %SO_DONTROUTE setting */
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 88bf810394a5..0a58dc861908 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -1194,10 +1194,9 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
- 
- 	switch (optname) {
- 	case SO_DEBUG:
-+		/* deprecated, but kept for compatibility. */
- 		if (val && !sockopt_capable(CAP_NET_ADMIN))
- 			ret = -EACCES;
--		else
--			sock_valbool_flag(sk, SOCK_DBG, valbool);
- 		break;
- 	case SO_REUSEADDR:
- 		sk->sk_reuse = (valbool ? SK_CAN_REUSE : SK_NO_REUSE);
-@@ -1619,7 +1618,8 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
- 
- 	switch (optname) {
- 	case SO_DEBUG:
--		v.val = sock_flag(sk, SOCK_DBG);
-+		/* deprecated. */
-+		v.val = 0;
- 		break;
- 
- 	case SO_DONTROUTE:
-diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
-index da37e4541a5d..f6d90eef3d7c 100644
---- a/net/mptcp/sockopt.c
-+++ b/net/mptcp/sockopt.c
-@@ -81,7 +81,7 @@ static void mptcp_sol_socket_sync_intval(struct mptcp_sock *msk, int optname, in
- 
- 		switch (optname) {
- 		case SO_DEBUG:
--			sock_valbool_flag(ssk, SOCK_DBG, !!val);
-+			/* deprecated. */
- 			break;
- 		case SO_KEEPALIVE:
- 			if (ssk->sk_prot->keepalive)
-@@ -1458,8 +1458,6 @@ static void sync_socket_options(struct mptcp_sock *msk, struct sock *ssk)
- 		sk_dst_reset(ssk);
- 	}
- 
--	sock_valbool_flag(ssk, SOCK_DBG, sock_flag(sk, SOCK_DBG));
--
- 	if (inet_csk(sk)->icsk_ca_ops != inet_csk(ssk)->icsk_ca_ops)
- 		tcp_set_congestion_control(ssk, msk->ca_name, false, true);
- 	__tcp_sock_set_cork(ssk, !!msk->cork);
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index 66763c74ab76..062e16a2766a 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -445,7 +445,6 @@ static int smc_bind(struct socket *sock, struct sockaddr *uaddr,
- 			     (1UL << SOCK_LINGER) | \
- 			     (1UL << SOCK_BROADCAST) | \
- 			     (1UL << SOCK_TIMESTAMP) | \
--			     (1UL << SOCK_DBG) | \
- 			     (1UL << SOCK_RCVTSTAMP) | \
- 			     (1UL << SOCK_RCVTSTAMPNS) | \
- 			     (1UL << SOCK_LOCALROUTE) | \
-@@ -511,8 +510,8 @@ static void smc_copy_sock_settings_to_clc(struct smc_sock *smc)
- 
- #define SK_FLAGS_CLC_TO_SMC ((1UL << SOCK_URGINLINE) | \
- 			     (1UL << SOCK_KEEPOPEN) | \
--			     (1UL << SOCK_LINGER) | \
--			     (1UL << SOCK_DBG))
-+			     (1UL << SOCK_LINGER))
-+
- /* copy only settings and flags relevant for smc from clc to smc socket */
- static void smc_copy_sock_settings_to_smc(struct smc_sock *smc)
- {
--- 
-2.30.2
+Guenter
 
 
