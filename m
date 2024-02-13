@@ -1,152 +1,118 @@
-Return-Path: <netdev+bounces-71389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E465A85325E
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:54:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 488B585326C
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:58:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 69001B21E01
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:54:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1F421F24580
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:58:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF7FF56473;
-	Tue, 13 Feb 2024 13:53:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C22A356748;
+	Tue, 13 Feb 2024 13:58:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dTx2qmCs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D4+npAXG"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26A975788F
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 13:53:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B0865647F
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 13:58:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707832416; cv=none; b=gsTcuircjfUTq1xt8VUjpcvFakEhAl/kbe8HYFT676LrxIEsyfEbixukihfd/3K/xX25zpr7qAadBEjQmL9Ht9XzRLWfef0lvjpoSIn1+mPMHnBeyveD0z44S8uooqPBwBmeH0f5d+je/KA2snoYrGBNuMKxLSFd1ayW6Ikfg98=
+	t=1707832684; cv=none; b=SrW4wkkhHnoEuCrvULHhNnNPuyjWb45+RwK/EZ4n3GzeeMhi4ZZnpG82G9Z0IivyGuQl23Nuv5JZZ8Ml40NW2zGUTX4BSo8nTZzhStXtBqdEs/TE5oYC7TnK/uAsLNGKwHSABLwtmKFB5zxoFqnrLPBCROdQfuVGlMU4Z/wwaV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707832416; c=relaxed/simple;
-	bh=0CrljcqtVRzZTI/jVqVbhsiGLm3381fO4G1A1hbmfXM=;
+	s=arc-20240116; t=1707832684; c=relaxed/simple;
+	bh=PG0fnIj5fzPwDy7NKqOopv4gHng+od9OkxEHBqOwPyI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZtR68Dcu3KVla3tRRVXY7we1quWHQlQfYseDBsbWFCJx/fZc/RstzPUzGbs6NXRVLYtnhyljUpPHzYe92T/Czhb3csthSVoRVlrYPAkhHHuO6AthksYOzip2NXDa/P24UCh7w0zQ1eyDiGKm13b2dsMuouETNgFicclS2p21O0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dTx2qmCs; arc=none smtp.client-ip=209.85.208.42
+	 To:Cc:Content-Type; b=lkwYTALkAU31Wua9uoV7aVHwDe1Qaaricy3U+cspn5yNrSjWFCuPKCO/qe6INxc5VMoXMwROxf6XhKCFGVcd/r2aOp+JTufeiPazCAWUhQvZrUgyG1PCs7RNVnmKhahP0TIyhF/aLv2u2kvTgG3mD894agMfMfS3/SiZvdBeWOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D4+npAXG; arc=none smtp.client-ip=209.85.208.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-56037115bb8so9860a12.0
-        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 05:53:34 -0800 (PST)
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-56101dee221so8785a12.1
+        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 05:58:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707832413; x=1708437213; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1707832681; x=1708437481; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GrO+YnIFkgF9NlE+LQjUHlXp7lm2XiC2sB4ipd7NOWk=;
-        b=dTx2qmCsLSf0M1KI7amDvug6UH6AyHvThDt8C/UsnKRrcnJRq059Xpctg3OAZpISIq
-         qNCjry4MBeorVIN/LTWT8+oMwUyG9498oh8R/1A7SYKCs25hkf61XKLQLRuE7zvJMiV3
-         +v/689VTrWZQntD47ahp9yAL6rJiJkHy0usEXR/aySu3FglHnnj+oezY3J4ZuGjP/7OG
-         9a+RwSSbt8mehCLA5v8rPcx/GraT+fdGg4ZAhSDtLviWFC3CrM14bC5HLqXnph5OCAHH
-         XaFT5pxRCR7o+W6/iUxdGi9Z+9PrHoWOLxVl3GhssSNhLA4A2kOJYkdxU6oLfw07iHZB
-         7ZSA==
+        bh=pbE5lBYMsBbNOMJCkljKpvO5qoGNkQekNJoA2aNf4aY=;
+        b=D4+npAXG9fobh5Fw5uc+fz6WEtBM0rQM8CeL+RRR+5mgqTvfAnOyMjXp5tZ1FHvx5k
+         bWVQdrl9P4XU4U79BRYu4c9NB9YC9YAE4GUw+VW+XLv/FDtMUHc05ssfhjgA4iMKVh9t
+         TMoQk/x4fcY96MGb5WUTd7dTFNl6nuYndBYbe9TF+8GlIi2sdHNemuKuOgnP6j8/+67T
+         m2Oc+0pQBPDlBvXnbbBGjNfjkoh2xyHNNw4P20/UN7OrQch0AXLtZYfPKbeqjJibSUT8
+         otH1yjEKEphuPaxpHbyHLeHnVxunZLmDvs2et/fDp19fm/R/QAfoVuj43Tw0fizjjm+9
+         bFLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707832413; x=1708437213;
+        d=1e100.net; s=20230601; t=1707832681; x=1708437481;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GrO+YnIFkgF9NlE+LQjUHlXp7lm2XiC2sB4ipd7NOWk=;
-        b=qnMXThP4vANjUcDMX9tS9L54YdHFexmetZ6XRL29TY5R9m4CS11EwmCcyT1LMriAxv
-         eQG8pG7kC3nGvdcs/zD0El+yKR3q+35CGjEKwlMmDwj6diF2Ze64s3iTPiDG6wLg4a7c
-         +klfUGqy/NC1YTPniv2WVkb4RXnO9l1VOGwEaBiGPBWCA1OzCRUxZr4JlX1TaHrTAm3W
-         IFONdNEHub/ivhPsIUDtvFwNmNDtUW1inkvdRtfhUCV7fQGsBCPBXgapHgu4DgZfV+F5
-         lbGHQZXdG7M1NJfhVVtRY5nQ4fOSYkOt3zOa3qSHtPgbqJqjO5xcTGlr9Et3KpsXhFGw
-         uZ+Q==
-X-Gm-Message-State: AOJu0YxyJaX2Ox1++70WtuvEDWZnfffGi5ii23xtQEb6VcqXB/F5y1cR
-	BXqivDUzVGRNVJUl9WuBh0U5b8f+/ZNU6ucEiGLZuOUPL3t9eUwviBqVIkfai2m/gl/1XqumDWW
-	gwCYkda5h/xbqgvAwXcrrpjP5EAaFd/x1zwow
-X-Google-Smtp-Source: AGHT+IFKY3jo65VhnQiMfVWV0uM4XplODINoQHv6hAf3ndYpdQYiHvmdZHI0JKaxgxKpfmHxPRgqIfnyylqT/CQ2qec=
-X-Received: by 2002:a50:ab5c:0:b0:560:f37e:2d5d with SMTP id
- t28-20020a50ab5c000000b00560f37e2d5dmr114638edc.5.1707832413081; Tue, 13 Feb
- 2024 05:53:33 -0800 (PST)
+        bh=pbE5lBYMsBbNOMJCkljKpvO5qoGNkQekNJoA2aNf4aY=;
+        b=NvEu0ZEM5KgMy6um85HM0uNjSga5HUFTvS0gRlYzo8Is5h/RxxLgeRxzhI3//3Zrvs
+         gI/VtOyeZJDXujySxkJb7M1RJP+VKOzRIhfVinRIL1L9C7mCfTamE5KxKJyVmKawcCPw
+         6mJCWVQmlAZJvZrQc1aTze0gia0mJNfoVMEiSZfQFK4XT2Dom3B+b/ITcOVNEZ6P3g2a
+         5z5Ru79I+HpgEm29+6ivnPi9E/GGDEr413/+bywqtpXM7RdGfsfMu9sUjyaQ8BRCAwhR
+         lMC7sVEtLqldIUSv1GYxKKcKwjyf+DHhBQH7VuShQHI7/V0Zr/3CtMI0pRGDhbHOycSo
+         ZM9A==
+X-Forwarded-Encrypted: i=1; AJvYcCUBQaYIYef84bC5/XiSddHl6X/exdHdQEGKqqb2pIGJCPbBd9EFPdD2G0gRC1AqqzU7MNM4lHI7HZDyzqHQyISrn4yJX5l1
+X-Gm-Message-State: AOJu0YxoWbI7xzzZNurE03ka1a+Q8K87wuchLTLGQC0JM4gmwlYqxYe7
+	9ZFRXxY29dsU9eKfLnEn924+y1fVXK0G4qhJUCW9Tvau8DLTsyRDCNXmQXU230ZVpw7kKYwSjRp
+	Ia/QLvi9OaN3fYylnKC8QzsOn5R6b/5gYfdZR
+X-Google-Smtp-Source: AGHT+IGfb6Z8v6hajoJG9DaoOpHtyuo/KUVPZbwc7KekimKgbqmQ3fGjlKpw8V/ld9ImDFucTk16eL40tenMPfDdd+Q=
+X-Received: by 2002:a50:9b5e:0:b0:55f:8851:d03b with SMTP id
+ a30-20020a509b5e000000b0055f8851d03bmr120225edj.5.1707832681004; Tue, 13 Feb
+ 2024 05:58:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <7a01e4c7ddb84292cc284b6664c794b9a6e713a8.1707759574.git.asml.silence@gmail.com>
-In-Reply-To: <7a01e4c7ddb84292cc284b6664c794b9a6e713a8.1707759574.git.asml.silence@gmail.com>
+References: <20240202165315.2506384-1-leitao@debian.org>
+In-Reply-To: <20240202165315.2506384-1-leitao@debian.org>
 From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 13 Feb 2024 14:53:19 +0100
-Message-ID: <CANn89iJBQLv7JKq5OUYu7gv2y9nh4HOFmG_N7g1S1fVfbn=-uA@mail.gmail.com>
-Subject: Re: [PATCH v2] net: cache for same cpu skb_attempt_defer_free
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org, 
-	pabeni@redhat.com, kuba@kernel.org
+Date: Tue, 13 Feb 2024 14:57:49 +0100
+Message-ID: <CANn89iLWWDjp71R7zttfTcEvZEdmcA1qo47oXkAX5DuciYvOtQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3] net: dqs: add NIC stall detector based on BQL
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com, 
+	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	weiwan@google.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	horms@kernel.org, Jonathan Corbet <corbet@lwn.net>, Randy Dunlap <rdunlap@infradead.org>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Johannes Berg <johannes.berg@intel.com>, 
+	=?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>, 
+	"open list:TRACING" <linux-trace-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 13, 2024 at 2:42=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.=
-com> wrote:
+On Fri, Feb 2, 2024 at 5:55=E2=80=AFPM Breno Leitao <leitao@debian.org> wro=
+te:
 >
-> Optimise skb_attempt_defer_free() executed by the CPU the skb was
-> allocated on. Instead of __kfree_skb() -> kmem_cache_free() we can
-> disable softirqs and put the buffer into cpu local caches.
+> From: Jakub Kicinski <kuba@kernel.org>
 >
-> Trying it with a TCP CPU bound ping pong benchmark (i.e. netbench), it
-> showed a 1% throughput improvement (392.2 -> 396.4 Krps). Cross checking
-> with profiles, the total CPU share of skb_attempt_defer_free() dropped by
-> 0.6%. Note, I'd expect the win doubled with rx only benchmarks, as the
-> optimisation is for the receive path, but the test spends >55% of CPU
-> doing writes.
+> softnet_data->time_squeeze is sometimes used as a proxy for
+> host overload or indication of scheduling problems. In practice
+> this statistic is very noisy and has hard to grasp units -
+> e.g. is 10 squeezes a second to be expected, or high?
 >
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> ---
->
-> v2: remove in_hardirq()
->
->  net/core/skbuff.c | 16 +++++++++++++++-
->  1 file changed, 15 insertions(+), 1 deletion(-)
->
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index 9b790994da0c..f32f358ef1d8 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -6947,6 +6947,20 @@ void __skb_ext_put(struct skb_ext *ext)
->  EXPORT_SYMBOL(__skb_ext_put);
->  #endif /* CONFIG_SKB_EXTENSIONS */
->
-> +static void kfree_skb_napi_cache(struct sk_buff *skb)
-> +{
-> +       /* if SKB is a clone, don't handle this case */
-> +       if (skb->fclone !=3D SKB_FCLONE_UNAVAILABLE) {
-> +               __kfree_skb(skb);
-> +               return;
-> +       }
-> +
-> +       local_bh_disable();
-> +       skb_release_all(skb, SKB_DROP_REASON_NOT_SPECIFIED, false);
+> Delaying network (NAPI) processing leads to drops on NIC queues
+> but also RTT bloat, impacting pacing and CA decisions.
+> Stalls are a little hard to detect on the Rx side, because
+> there may simply have not been any packets received in given
+> period of time. Packet timestamps help a little bit, but
+> again we don't know if packets are stale because we're
+> not keeping up or because someone (*cough* cgroups)
+> disabled IRQs for a long time.
 
-I am trying to understand why we use false instead of true here ?
-Or if you prefer:
-local_bh_disable();
-__napi_kfree_skb(skb, SKB_DROP_REASON_NOT_SPECIFIED);
-local_bh_enable();
+Please note that adding other sysfs entries is expensive for workloads
+creating/deleting netdev and netns often.
 
-
-> +       napi_skb_cache_put(skb);
-> +       local_bh_enable();
-> +}
-> +
->  /**
->   * skb_attempt_defer_free - queue skb for remote freeing
->   * @skb: buffer
-> @@ -6965,7 +6979,7 @@ void skb_attempt_defer_free(struct sk_buff *skb)
->         if (WARN_ON_ONCE(cpu >=3D nr_cpu_ids) ||
->             !cpu_online(cpu) ||
->             cpu =3D=3D raw_smp_processor_id()) {
-> -nodefer:       __kfree_skb(skb);
-> +nodefer:       kfree_skb_napi_cache(skb);
->                 return;
->         }
->
-> --
-> 2.43.0
->
+I _think_ we should find a way for not creating
+/sys/class/net/<interface>/queues/tx-{Q}/byte_queue_limits  directory
+and files
+for non BQL enabled devices (like loopback !)
 
