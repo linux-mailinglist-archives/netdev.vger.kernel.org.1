@@ -1,91 +1,117 @@
-Return-Path: <netdev+bounces-71149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71150-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 893E585271E
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 02:53:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC94A852720
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 02:53:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25A961F25EB9
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:53:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B76A1C25BC5
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:53:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D8F11C3D;
-	Tue, 13 Feb 2024 01:52:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC04F4A2C;
+	Tue, 13 Feb 2024 01:52:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="CZ5kAB/H"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RjJ64ztY"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AC32CA47;
-	Tue, 13 Feb 2024 01:52:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C31F8813;
+	Tue, 13 Feb 2024 01:52:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707789172; cv=none; b=OKfMs6FDi3g1EROU9CBfl1+O2XUkpcNy6kYwPKqM/dACjZDH6Tkxd+5iSa8foSNrBx9LaQCIMcsWmFbkwbEu3jbv2H3ainT82BtgKJ95nNb2FbZYN8dnntQkrUdKkqj6ri1sjlH+fIdYgIGW+rQ0L41hGIHHAeKHxkIMfkWbfk0=
+	t=1707789176; cv=none; b=baMQkl/MJrtczDrF3KUIYtCC4R9UmD5A7Rm02FEjyVsPxIMjelUIo4Vex7yzyoEBw4Fa4jc3txfk0ismTL2lZg1OGXAwwCPgiiKLS8cArgEdWjQkYsMIx+aOwv3PPSCghKY2NdTkC8sYE8FjEh0GMkT1hhLndpNs4QWjsNIKaMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707789172; c=relaxed/simple;
-	bh=U6doxvDnuIY90hBori+eEiej6JWNkEdPedf5UFcbCP8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VeGT2o9RDZ7betrJIjaDERsZmEQwC4a3tzodWf7FCGvUOk8ikHDY8+FbLEkznhkzQ5t7LPFbo2AkRMZFT5Gk+kmIXXz4gBJyBE3E99YyU1NW3dc1wV+9rDtopWGFfGlH9O1u50uiuzJ2ZJX1Hlgewhlw1GIOY8VSDs1Mf9zdOZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=CZ5kAB/H; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=1SdYRn3CWEK3dxlZPaRQcNWKE6YBcI2fKjJGdbWOJRk=; b=CZ5kAB/Hf4UtFoX61xHTUDT0fJ
-	B9BqJ9om1X6C2Wq+KOHa/IsARGsafaYupQviQ+T6GZ0PvBg332qYLgT7SkL3yqGg+pNkzIA/MJRGY
-	bXhTHhBb1w0zNfMq1RMbb42QU7vdS6kX3z63JhttSAuMbclxMRNidgYFAZNGsssiQW+I=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rZhyc-007ckQ-DI; Tue, 13 Feb 2024 02:52:50 +0100
-Date: Tue, 13 Feb 2024 02:52:50 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Robert Marko <robimarko@gmail.com>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	ansuelsmth@gmail.com, rmk+kernel@armlinux.org.uk,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phy: aquantia: clear PMD Global Transmit
- Disable bit during init
-Message-ID: <bcccaab4-fffd-43ee-ac49-8fe8a92d65a1@lunn.ch>
-References: <20240211181732.646311-1-robimarko@gmail.com>
+	s=arc-20240116; t=1707789176; c=relaxed/simple;
+	bh=5e+FWLG2IXO35VEWTCysOoFyyPdiYVsPVIzewBHNQnU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=jSpV3YfZvPpjyvmzXa6ArLCW+EgGooi5bzuFEqv5e/ADm3sqyCaRJOvW0xOwTLPikeriUjIvtQRmGP6lhJmy7WoCYtxIC71dYijL7ipiPJ+rWps24cqdcPFqmbREyT7YzBameQrLL0CPCO0MhEzq14k7XJmWDr8eKrCyRg6RjHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RjJ64ztY; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707789175; x=1739325175;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=5e+FWLG2IXO35VEWTCysOoFyyPdiYVsPVIzewBHNQnU=;
+  b=RjJ64ztYCqUOOoPDug/UswDWzZM5VDnocirUEh/LJD0Y69ZdOepVhT0d
+   zhZC0KFqFImFi3OhmEG4q9R4TxMoN5N/wZtZjUTFcMUjrS+AVDCnbXfXn
+   TVIpBUVTJDufwmr5NFq1w3BK67SxChQvytu8XkuMsPAB/yTrzN6YNn6TW
+   OWaKA/PDoNo9c4a3R5ckStTbe7CQm6VGhwzjACUnHSEgalMkC4J4lQpRd
+   IA8jgI6qtJN9WiL+Gkr1pZ663V46oNi7c+85Q5H+z/UmnAOXggveMtd8C
+   BtZgRyj3O2pz2xBEYN1GIyhB0RZqFdeMGjhOd4sW6i2fOM4iiThrxM8L6
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="1939834"
+X-IronPort-AV: E=Sophos;i="6.06,155,1705392000"; 
+   d="scan'208";a="1939834"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 17:52:54 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,155,1705392000"; 
+   d="scan'208";a="33843360"
+Received: from spandruv-desk.jf.intel.com (HELO spandruv-desk.amr.corp.intel.com) ([10.54.75.14])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 17:52:54 -0800
+Message-ID: <22a264118ebe7194cf43a5d7e1d61417feff8534.camel@linux.intel.com>
+Subject: Re: [PATCH v4 1/3] genetlink: Add per family bind/unbind callbacks
+From: srinivas pandruvada <srinivas.pandruvada@linux.intel.com>
+To: Jakub Kicinski <kuba@kernel.org>, Stanislaw Gruszka
+	 <stanislaw.gruszka@linux.intel.com>
+Cc: linux-pm@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>, 
+ Ricardo Neri <ricardo.neri-calderon@linux.intel.com>, Daniel Lezcano
+ <daniel.lezcano@linaro.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,  Jiri Pirko
+ <jiri@resnulli.us>, Johannes Berg <johannes@sipsolutions.net>, Florian
+ Westphal <fw@strlen.de>,  netdev@vger.kernel.org
+Date: Mon, 12 Feb 2024 17:52:53 -0800
+In-Reply-To: <20240212170700.4eda9c03@kernel.org>
+References: <20240212161615.161935-1-stanislaw.gruszka@linux.intel.com>
+	 <20240212161615.161935-2-stanislaw.gruszka@linux.intel.com>
+	 <20240212170700.4eda9c03@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4 (3.44.4-3.fc36) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240211181732.646311-1-robimarko@gmail.com>
 
-On Sun, Feb 11, 2024 at 07:16:41PM +0100, Robert Marko wrote:
-> PMD Global Transmit Disable bit should be cleared for normal operation.
-> This should be HW default, however I found that on Asus RT-AX89X that uses
-> AQR113C PHY and firmware 5.4 this bit is set by default.
-> 
-> With this bit set the AQR cannot achieve a link with its link-partner and
-> it took me multiple hours of digging through the vendor GPL source to find
-> this out, so lets always clear this bit during .config_init() to avoid a
-> situation like this in the future.
+On Mon, 2024-02-12 at 17:07 -0800, Jakub Kicinski wrote:
+> On Mon, 12 Feb 2024 17:16:13 +0100 Stanislaw Gruszka wrote:
+> > Add genetlink family bind()/unbind() callbacks when adding/removing
+> > multicast group to/from netlink client socket via setsockopt() or
+> > bind() syscall.
+> >=20
+> > They can be used to track if consumers of netlink multicast
+> > messages
+> > emerge or disappear. Thus, a client implementing callbacks, can now
+> > send events only when there are active consumers, preventing
+> > unnecessary
+> > work when none exist.
+> >=20
+> > Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> > Signed-off-by: Stanislaw Gruszka
+> > <stanislaw.gruszka@linux.intel.com>
+>=20
+> LGTM! genetlink code is a bit hot lately, to avoid any conflicts can
+> I put the first patch (or all of them) on a shared branch for both
+> netdev and PM to pull in? Once the other two patches are reviewed,
+> obviously.
+>=20
+If netlink maintainers are happy with the 1/3, you can take 1/3. Once
+merged, the PM patches can go separately as they need 1/3.
 
-This all look sensible. My only question is, should we have core c45
-code doing this?
+Hi Daniel,
+Please look at 2/3 and also 3/3 if you can.
 
-[Goes and looks at 802.3]
+Thanks,
+Srinivas
 
-O.K, so the Marvell PHY firmware appears to be broken. The standard
-says it should have a default value of 0, i.e. the transmitter should
-be enabled by default. So this is just a workaround for broken
-behaviour.
 
-> Signed-off-by: Robert Marko <robimarko@gmail.com>
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-    Andrew
 
