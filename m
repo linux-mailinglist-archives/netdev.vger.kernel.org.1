@@ -1,68 +1,69 @@
-Return-Path: <netdev+bounces-71460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71461-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3300E85356A
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 16:57:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 811298535AB
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 17:08:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02C86B25811
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 15:57:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FF711C219C8
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 16:08:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C55D5F560;
-	Tue, 13 Feb 2024 15:57:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FAF05F848;
+	Tue, 13 Feb 2024 16:07:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="SsIPWU6J"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Bnx3owWj"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0DF5F54F;
-	Tue, 13 Feb 2024 15:57:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4838F5D914;
+	Tue, 13 Feb 2024 16:07:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707839847; cv=none; b=gOEqrOyrMUgF5IqMPbj2yWM2irr8hpcAn0Xt8q8HOUozxbnKgdr+WSmKHmKH4vUi9oKwu65XTwXgEXm9mB5DzNgcBEr7IJMwLWMscBr6JT+cN7YhvYXKCftULOPkl5LZpkme7HxSV6zcb9juawQ3zg6Rky/7IF+yONz9/jP/9RY=
+	t=1707840470; cv=none; b=XJVP0tphw9I/CRwZaMwe/D1OR+gNexPsDDeh3rEeZaGjrNax7xVMX5axmWmuQzqeH+iP5dJmTjUnUIWbt7paot+y6F9vP01xfP2eyUGoPqDlZwI6tsgK7B1m+1fUogirpYQko3CXu99QFUk8la8LM/Gum8eeyBBZLYYXLOvNYP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707839847; c=relaxed/simple;
-	bh=L5HFUuCbgdypUHaFrX7NoMN/dywBS26HbXH/mWMDEAE=;
+	s=arc-20240116; t=1707840470; c=relaxed/simple;
+	bh=Nq5NLWM8fquBBRNIIZ/z4DwyXucV/4AOy2bTNrl4gfM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ovkInI81FjbDeNd5RJ6igGDJDDb5rZKBYSYxccUjzT20BuqT/vYh66FJDvtBo1ERM0P8wFdz/qMv89DRNt84o3RgqxfjpGkkIvMo1KM6cL85r0cqwVGqeBJqQHiTIOI/ft3KIC8WWYP42ojpeg1+r+pruqGlCr6e0jdr5PFFdrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=SsIPWU6J; arc=none smtp.client-ip=217.70.183.196
+	 MIME-Version:Content-Type; b=FHN0i51MB+ke4/a71oJ1Te4Z1bknVCx7qWFtLv3oOe3Mo8JtxgesU7FGy+oOo5e8m1bbla/NssmTN9mKbNjf+uJGLA5304CugEI1ktCw/RyRBMichjFd9axyRNB3eynI17qmW/6U2Cfk2whwIiyueIQPrPJ6/GtL/eUeLLSA5Ho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Bnx3owWj; arc=none smtp.client-ip=217.70.183.198
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 840E2E000F;
-	Tue, 13 Feb 2024 15:57:13 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 93E41C000B;
+	Tue, 13 Feb 2024 16:07:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1707839836;
+	t=1707840464;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=xLKrcUWgSnxDEmML8cy4ZQrlK1+oKtedl7yJAvMVDT8=;
-	b=SsIPWU6Jqssq5dl7/9GfrkUzaqLNd6eF8iA+CPIlTZScJjDBNxoIrN7AI9CwOm9WNbmkNv
-	NqkPZbN7Ch1SsE29IVokl/WydXoJC1DmUcN5yKwJZyT/GQtH5xDQZiWFX7lH3NgBCnO+BM
-	1oj5LuzMHiTrzHlvWnzLnU2l+Uz8Q1TgLx53qTxmOkNtgCeQggPu1xmYIACmUVVNansOM9
-	Bmq4ffcmc0z/v3xRCkOqx/zmqA1LKiZ8AqfNLj1dshh5OJLZuQZ6ttLScMHPScZWP6kny2
-	d6xT8s7ApSVVPxb2SS4jJo/L9khL/YSpjF+/VBYHGLGhxwQ1CR6wBq/Rp45K2A==
-Date: Tue, 13 Feb 2024 16:57:12 +0100
+	bh=gVnzc7OAdrtUJbFDyTTibW0hk3NfWNlLDbaHw8ta+S8=;
+	b=Bnx3owWjNw2cJ0Jza4wUrQauMZ+sFCg4yoKBcAIBj/yJBtyZtWax7yKqIPwQRn12E6tuTa
+	tH9TbpLp08NNV0UZsDFx+XXBO5ROXyCuY31lNQ05P4vvnCwOvTzlp2nSiLGDDtjUdGusLD
+	0FY0RAGiwSQAqeGMfkpGHZRc7z9IRqb7uVt/pDGYx+ZlQFBILq3pS2unj+ofv6RnskuWnU
+	ROlzfe+uAx3ERoGD6S61ZsgbdKHWNKVoa5UBD4EtEGqTcSOi2Ue/mWaobcr5lgao6nV7h7
+	kDn67fD1vkhGVsK+yS5EMGgnHmOXUV5qX6k/VF5fFMEYeIlPu0Lk0nqvAgkcYg==
+Date: Tue, 13 Feb 2024 17:07:41 +0100
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Horatiu Vultur <horatiu.vultur@microchip.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, <davem@davemloft.net>, Eric Dumazet
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, davem@davemloft.net, Eric Dumazet
  <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Richard Cochran
- <richardcochran@gmail.com>, <UNGLinuxDriver@microchip.com>,
- <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <thomas.petazzoni@bootlin.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-Subject: Re: [PATCH net-next 2/3] net: lan966x: Allow using PCH extension
- for PTP
-Message-ID: <20240213165712.27e0443a@device-28.home>
-In-Reply-To: <20240213103156.rl4kzwpmxn3haz7y@DEN-DL-M31836.microchip.com>
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Horatiu Vultur
+ <horatiu.vultur@microchip.com>, Richard Cochran <richardcochran@gmail.com>,
+ UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, =?UTF-8?B?S8O2cnk=?= Maincent
+ <kory.maincent@bootlin.com>
+Subject: Re: [PATCH net-next 1/3] net: phy: Add support for inband
+ extensions
+Message-ID: <20240213170741.3ffa20e8@device-28.home>
+In-Reply-To: <27644300-ff4f-4603-9338-bad4aa0e5610@lunn.ch>
 References: <20240212173307.1124120-1-maxime.chevallier@bootlin.com>
-	<20240212173307.1124120-3-maxime.chevallier@bootlin.com>
-	<20240213103156.rl4kzwpmxn3haz7y@DEN-DL-M31836.microchip.com>
+	<20240212173307.1124120-2-maxime.chevallier@bootlin.com>
+	<27644300-ff4f-4603-9338-bad4aa0e5610@lunn.ch>
 Organization: Bootlin
 X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
@@ -75,189 +76,155 @@ Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hello Horatiu,
+Hello Andrew,
 
-On Tue, 13 Feb 2024 11:31:56 +0100
-Horatiu Vultur <horatiu.vultur@microchip.com> wrote:
+On Tue, 13 Feb 2024 15:03:01 +0100
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-> The 02/12/2024 18:33, Maxime Chevallier wrote:
-> > [Some people who received this message don't often get email from maxime.chevallier@bootlin.com. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]  
+> > +Inband Extensions
+> > +=================
+> > +
+> > +The USGMII Standard allows the possibility to re-use the full-length 7-bytes
+> > +frame preamble to convey meaningful data. This is already partly used by modes
+> > +like QSGMII, which passes the port number in the preamble.
+> > +
+> > +In USGMII, we have a standardized approach to allow the MAC and PHY to pass
+> > +such data in the preamble, which looks like this :
+> > +
+> > +|  0   |  1   |  2  |  3  |  4  |  5  |  6  |  7  |  Frame data
+> > +| SoP  |      |      Extension              | CRC |
+> > +|     /        \_______________             |     |
+> > +|    /                         \            |     |
+> > +|   | type | subport | ext type |           |     |
+> > +
+> > +The preamble in that case uses the Packet Control Header (PCH) format, where
+> > +the byte 1 is used as a control field with :
+> > +
+> > +type - 2 bits :
+> > +        - 00 : Packet with PCH
+> > +        - 01 : Packet without PCH
+> > +        - 10 : Idle Packet, without data
+> > +        - 11 : Reserved
+> > +
+> > +subport - 4 bits : The subport identifier. For QUSGMII, this field ranges from
+> > +                   0 to 3, and for OUSGMII, it ranges from 0 to 7.
+> > +
+> > +ext type - 2 bits : Indicated the type of data conveyed in the extension
+> > +        - 00 : Ignore extension
+> > +        - 01 : 8 bits reserved + 32 timestamp
+> > +        - 10 : Reserved
+> > +        - 11 : Reserved  
 > 
-> Hi Maxime,
+> Somewhat crystal ball...
 > 
-> I have tried your patches on pcb8291, which is a lan966x without PHYs
-> that support timestamping. And on this platform this patch breaks up the
-> things. Because it should just do the timestamping the MAC in that case,
-> but with this patch it doesn't get any time.
-> The same issue can be reproduced on pcb8280 and then disable PHY
-> timestamping, or change the lan8814 not to support HW timestamping.
+> Those two reserved values could be used in the future to indicate
+> other extensions. So we could have three in operation at once, but
+> only one selected per frame.
 > 
-> Please see bellow the reason why.
+> > +A PHY driver can register available modes with::
+> > +
+> > +  int phy_inband_ext_set_available(struct phy_device *phydev, enum phy_inband_ext ext);
+> > +  int phy_inband_ext_set_unavailable(struct phy_device *phydev, enum phy_inband_ext ext);  
+> 
+> enum phy_inband_ext is just an well defined, but arbitrary number? 0
+> is this time stamp value mode, 1 could be used MACSEC, 2 could be a
+> QoS indicator when doing rate adaptation? 3 could be ....
+> 
+> > +It's then up to the MAC driver to enable/disable the extension in the PHY as
+> > +needed. This was designed to fit the timestamping configuration model, as it
+> > +is the only mode supported so far.
+> > +
+> > +Enabling/Disabling an extension is done from the MAC driver through::
+> > +
+> > +  int phy_inband_ext_enable(struct phy_device *phydev, enum phy_inband_ext ext);  
+> 
+> So maybe this should return the 2 bit ext type value? The MAC can
+> request QoS marking, and the PHY replies it expects the bits to be 3 ?
+> 
+> I'm just trying to ensure we have an API which is extensible in the
+> future to make use of those two reserved values.
 
-You are entirely correct and I apparently messed-up my series as these
-changes were implemented locally and somehow lost in the rebase. Indeed
-this codes doesn't work at all... I'll resend that, thanks a lot for
-the test and sorry !
+You are right, that's a much better idea !
 
 > 
-> > 
-> > +/* Enable or disable PCH timestamp transmission. This uses the USGMII PCH
-> > + * extensions to transmit the timestamps in the frame preamble.
+> > diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+> > index 3b9531143be1..4b6cf94f51d5 100644
+> > --- a/drivers/net/phy/phy.c
+> > +++ b/drivers/net/phy/phy.c
+> > @@ -1760,3 +1760,89 @@ int phy_ethtool_nway_reset(struct net_device *ndev)
+> >  	return ret;
+> >  }
+> >  EXPORT_SYMBOL(phy_ethtool_nway_reset);
+> > +
+> > +/**
+> > + * PHY modes in the USXGMII family can have extensions, with data transmitted
+> > + * in the frame preamble.
+> > + * For now, only QUSGMII is supported, but other variants like USGMII and
+> > + * OUSGMII can be added in the future.
 > > + */
-> > +static void lan966x_ptp_pch_configure(struct lan966x_port *port, bool *enable)
+> > +static inline bool phy_interface_has_inband_ext(phy_interface_t interface)  
+> 
+> No inline functions in .c file please. Let the compiler decide.
+
+My bad this one slept through the cracks...
+
+> 
+> > +bool phy_inband_ext_available(struct phy_device *phydev, enum phy_inband_ext ext)
 > > +{
-> > +       struct phy_device *phydev = port->dev->phydev;
-> > +       int ret;
-> > +
-> > +       if (!phydev)
-> > +               *enable = false;
-> > +
-> > +       if (*enable) {
-> > +               /* If we cannot enable inband PCH mode, we fallback to classic
-> > +                * timestamping
-> > +                */
-> > +               if (phy_inband_ext_available(phydev, PHY_INBAND_EXT_PCH_TIMESTAMP)) {
-> > +                       ret = phy_inband_ext_enable(phydev, PHY_INBAND_EXT_PCH_TIMESTAMP);
-> > +                       if (ret)
-> > +                               *enable = false;
-> > +               } else {
-> > +                       *enable = false;
-> > +               }
-> > +       } else {
-> > +               phy_inband_ext_disable(phydev, PHY_INBAND_EXT_PCH_TIMESTAMP);
-> > +       }
-> > +
-> > +       lan_rmw(SYS_PCH_CFG_PCH_SUB_PORT_ID_SET(port->chip_port % 4) |
-> > +               SYS_PCH_CFG_PCH_TX_MODE_SET(*enable) |
-> > +               SYS_PCH_CFG_PCH_RX_MODE_SET(*enable),
-> > +               SYS_PCH_CFG_PCH_SUB_PORT_ID |
-> > +               SYS_PCH_CFG_PCH_TX_MODE |
-> > +               SYS_PCH_CFG_PCH_RX_MODE,
-> > +               port->lan966x, SYS_PCH_CFG(port->chip_port));
+> > +	return !!(phydev->inband_ext.available & ext);  
+> 
+> should this be BIT(ext) ?
+
+Correct indeed
+
+> 
 > > +}
-> > +
-> >  int lan966x_ptp_hwtstamp_set(struct lan966x_port *port,
-> >                              struct kernel_hwtstamp_config *cfg,
-> >                              struct netlink_ext_ack *extack)
-> >  {
-> >         struct lan966x *lan966x = port->lan966x;
-> > +       bool timestamp_in_pch = false;
-> >         struct lan966x_phc *phc;
-> > 
-> >         switch (cfg->tx_type) {
-> > @@ -303,10 +339,18 @@ int lan966x_ptp_hwtstamp_set(struct lan966x_port *port,
-> >                 return -ERANGE;
-> >         }
-> > 
-> > +       if (cfg->source == HWTSTAMP_SOURCE_PHYLIB &&
-> > +           cfg->tx_type == HWTSTAMP_TX_ON &&
-> > +           port->config.portmode == PHY_INTERFACE_MODE_QUSGMII)
-> > +               timestamp_in_pch = true;
-> > +
-> > +       lan966x_ptp_pch_configure(port, &timestamp_in_pch);
-> > +
-> >         /* Commit back the result & save it */
-> >         mutex_lock(&lan966x->ptp_lock);
-> >         phc = &lan966x->phc[LAN966X_PHC_PORT];
-> >         phc->hwtstamp_config = *cfg;
-> > +       phc->pch = timestamp_in_pch;  
+> > +EXPORT_SYMBOL(phy_inband_ext_available);  
 > 
-> Here we figure out if pch is enabled or not. If the cfg->source is not
-> PHYLIB or the interface is not QUSGMII then timestamp_in_pch will stay
-> false.
-> 
-> >         mutex_unlock(&lan966x->ptp_lock);
-> > 
-> >         return 0;
-> > @@ -397,6 +441,7 @@ int lan966x_ptp_txtstamp_request(struct lan966x_port *port,
-> >         LAN966X_SKB_CB(skb)->jiffies = jiffies;
-> > 
-> >         lan966x->ptp_skbs++;
-> > +  
-> 
-> I think this is just a small style change. So maybe it shouldn't be in
-> here.
-> 
-> >         port->ts_id++;
-> >         if (port->ts_id == LAN966X_MAX_PTP_ID)
-> >                 port->ts_id = 0;
-> > @@ -500,6 +545,27 @@ irqreturn_t lan966x_ptp_irq_handler(int irq, void *args)
-> >                 /* Read RX timestamping to get the ID */
-> >                 id = lan_rd(lan966x, PTP_TWOSTEP_STAMP);
-> > 
-> > +               /* If PCH is enabled, there is a "feature" that also the MAC
-> > +                * will generate an interrupt for transmitted frames. This
-> > +                * interrupt should be ignored, so clear the allocated resources
-> > +                * and try to get the next timestamp. Maybe should clean the
-> > +                * resources on the TX side?
-> > +                */
-> > +               if (phy_inband_ext_enabled(port->dev->phydev,
-> > +                                          PHY_INBAND_EXT_PCH_TIMESTAMP)) {
-> > +                       spin_lock(&lan966x->ptp_ts_id_lock);
-> > +                       lan966x->ptp_skbs--;
-> > +                       spin_unlock(&lan966x->ptp_ts_id_lock);
-> > +
-> > +                       dev_kfree_skb_any(skb_match);
-> > +
-> > +                       lan_rmw(PTP_TWOSTEP_CTRL_NXT_SET(1),
-> > +                               PTP_TWOSTEP_CTRL_NXT,
-> > +                               lan966x, PTP_TWOSTEP_CTRL);
-> > +
-> > +                       continue;
-> > +               }
-> > +
-> >                 spin_lock_irqsave(&port->tx_skbs.lock, flags);
-> >                 skb_queue_walk_safe(&port->tx_skbs, skb, skb_tmp) {
-> >                         if (LAN966X_SKB_CB(skb)->ts_id != id)
-> > @@ -1088,19 +1154,27 @@ void lan966x_ptp_rxtstamp(struct lan966x *lan966x, struct sk_buff *skb,
-> >         struct timespec64 ts;
-> >         u64 full_ts_in_ns;
-> > 
-> > +       phc = &lan966x->phc[LAN966X_PHC_PORT];
-> > +
-> >         if (!lan966x->ptp ||
-> > -           !lan966x->ports[src_port]->ptp_rx_cmd)
-> > +           !lan966x->ports[src_port]->ptp_rx_cmd ||
-> > +           !phc->pch)  
-> 
-> And here because phc->pch is false, it would just return.
-> Meaning that it would never be able to get the time.
-> I presume that this check should not be modified.
+> If you don't mind, i would prefer EXPORT_SYMBOL_GPL().
 
-Dammit you are right and I had these modifications locally, but
-apparently I messed my rebase and lost that... 
+I don't mind, I'll fix that
 
 > 
-> >                 return;
-> > 
-> > -       phc = &lan966x->phc[LAN966X_PHC_PORT];
-> > -       lan966x_ptp_gettime64(&phc->info, &ts);
-> > -
-> > -       /* Drop the sub-ns precision */
-> > -       timestamp = timestamp >> 2;
-> > -       if (ts.tv_nsec < timestamp)
-> > -               ts.tv_sec--;
-> > -       ts.tv_nsec = timestamp;
-> > -       full_ts_in_ns = ktime_set(ts.tv_sec, ts.tv_nsec);
-> > +       if (phc->pch) {
-> > +               /* Drop the sub-ns precision */
-> > +               timestamp = timestamp >> 2;
-> > +               full_ts_in_ns = lower_32_bits(timestamp);
-> > +       } else {
-> > +               lan966x_ptp_gettime64(&phc->info, &ts);
+> > +static int phy_set_inband_ext(struct phy_device *phydev,
+> > +			      enum phy_inband_ext ext,
+> > +			      bool enable)
+> > +{
+> > +	int ret;
 > > +
-> > +               /* Drop the sub-ns precision */
-> > +               timestamp = timestamp >> 2;
-> > +               if (ts.tv_nsec < timestamp)
-> > +                       ts.tv_sec--;
-> > +               ts.tv_nsec = timestamp;
-> > +               full_ts_in_ns = ktime_set(ts.tv_sec, ts.tv_nsec);
-> > +       }  
->  
+> > +	if (!phy_interface_has_inband_ext(phydev->interface))
+> > +		return -EOPNOTSUPP;
+> > +
+> > +	if (!phydev->drv->set_inband_ext)
+> > +		return -EOPNOTSUPP;  
 > 
+> That is a driver bug. It should not set phydev->inband_ext.available
+> and then not have drv->set_inband_ext. So we should probably test this
+> earlier. Maybe define that phydev->inband_ext.available has to be set
+> during probe, and the core can validate this after probe and reject
+> the device if it is inconsistent?
 
+Good point, I'll add that !
 
-Thanks for the review and analysis Horatiu, and sorry for this hiccup !
+> 
+> > +
+> > +	mutex_lock(&phydev->lock);
+> > +	ret = phydev->drv->set_inband_ext(phydev, ext, enable);
+> > +	mutex_unlock(&phydev->lock);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	if (enable)
+> > +		phydev->inband_ext.enabled |= BIT(ext);
+> > +	else
+> > +		phydev->inband_ext.enabled &= ~BIT(ext);  
+> 
+> Should these be also protected by the mutex?
+
+I think you are right, it would be better making sure we serialize
+accesses to these indeed.
+
+Thanks for the review,
 
 Maxime
 
