@@ -1,75 +1,112 @@
-Return-Path: <netdev+bounces-71482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85A6B85390C
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 18:54:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A520C853828
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 18:33:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2705FB27005
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 17:54:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60E472842F6
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 17:33:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03B7F604D0;
-	Tue, 13 Feb 2024 17:54:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F7C05FF15;
+	Tue, 13 Feb 2024 17:33:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ndlVir0a"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Jx06xnCv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay.smtp-ext.broadcom.com (unknown [192.19.166.228])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E90605A7;
-	Tue, 13 Feb 2024 17:54:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC8155FF0D;
+	Tue, 13 Feb 2024 17:33:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.166.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707846867; cv=none; b=kVemcT5BBl7WUNBAwYE7ANX4tEnA/khwHRX6rvLsoORnCV+upOPLiHCZjt+F10CbC8GYbUghnHU7Ro9wZk3OMIiJ8QmzK6wRXESm7IOWsa7IcaaqBKT4/qoHKGyvrAYrQCrdnULsOVSJ1g3lmBnqYNb/YgtjOJ+S/uEmAIqpr4k=
+	t=1707845629; cv=none; b=DEvsE6z4gMKWDIeykqB4A3NKdLU9reeW+i6ffvTCC3+4jIuUfqK1RBhXsbK88eElSVfPwS4aFR+ssoc1DJmd1IknOg32RUj3VuFoD2SL7K+TOWyjJXaZkSdVm2qnItnxO38LJe2jV+Ow0Y1v92gUO7+K2aRNMaRyQJm+++qJNBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707846867; c=relaxed/simple;
-	bh=vIvh25d6sb8bZomcyiOvXEW9/3+G1tT3pFcYGHQA4Pk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bVx7pOVpgrRB4bAE7gwB9Cbh11BJPTX6tdU3f024spRK5WQYC0s/wxtc0V3RhVZKwUC9oLvsGfLz6XAfhkbfTSvOkNnAs99jYefGEnnSOGwum8Q+m2xNytBha6IVWq5Wdq69nbTEUHzeuLkk5y8dlSOPaGQ4dLVog++CYfI9wMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=ndlVir0a; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C98AC433C7;
-	Tue, 13 Feb 2024 17:54:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1707846867;
-	bh=vIvh25d6sb8bZomcyiOvXEW9/3+G1tT3pFcYGHQA4Pk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ndlVir0aCLxAm2kfqAZPwwhVbzoMYg5LIearQI6q8AbKO8EM7HqAKfrTZV61AY8uh
-	 TBWcCdY0pebputz/uHv2VtyoH7Gi+iTsWR4TL6g0Fna7bbVmie2iG/dHlprlo2ZDm3
-	 byDYDuDbQhC6vDZVvZC2aQLbNAzfIuxGrv73/AnQ=
-Date: Tue, 13 Feb 2024 18:28:03 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: "Ricardo B. Marliere" <ricardo@marliere.net>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
+	s=arc-20240116; t=1707845629; c=relaxed/simple;
+	bh=+IbLm9MJxyBRjvcQtpRgNGFwNLxIam1/AeyzZaiIC90=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=shmEYdkuB5K7U2H7Zl0cfspH/NJo+2BK/oVev0SDMSCDD5NDH/c+jY0747GgKMRHnzG/D4MgY04ZE5UsiqI0dv9nMMk1tPfME6PluahCu/Xx3XQvGx7QQVbnt4faOClEQI6AursjjlxvPfc4hYRoccZku5qnfxac5KlENR4lYWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Jx06xnCv; arc=none smtp.client-ip=192.19.166.228
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: from mail-lvn-it-01.lvn.broadcom.net (mail-lvn-it-01.lvn.broadcom.net [10.36.132.253])
+	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id B2304C005FFD;
+	Tue, 13 Feb 2024 09:33:40 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com B2304C005FFD
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
+	s=dkimrelay; t=1707845620;
+	bh=+IbLm9MJxyBRjvcQtpRgNGFwNLxIam1/AeyzZaiIC90=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Jx06xnCviIukYYI6tAxq0wkYGV8+XYvrmVl6xhTtxo5gQRblaOUoPv/W3nhEP+d6f
+	 4GOrnwSuTNVxouVjncnL4KElJgw7SjgdWN6Vn4aeoMQCMzIHgFywLlOgwouYgAZkWL
+	 MbDZIB1PNsL7V6TckHto8HyD8WcISh2dElMASfGA=
+Received: from fainelli-desktop.igp.broadcom.net (fainelli-desktop.dhcp.broadcom.net [10.67.48.245])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail-lvn-it-01.lvn.broadcom.net (Postfix) with ESMTPSA id 2476618041CAC4;
+	Tue, 13 Feb 2024 09:33:39 -0800 (PST)
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+To: netdev@vger.kernel.org
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Justin Chen <justin.chen@broadcom.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: mdio_bus: make mdio_bus_type const
-Message-ID: <2024021359-afterglow-reentry-d0cc@gregkh>
-References: <20240213-bus_cleanup-mdio-v1-1-f9e799da7fda@marliere.net>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	bcm-kernel-feedback-list@broadcom.com (open list:BROADCOM ASP 2.0 ETHERNET DRIVER),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net] net: bcmasp: Handle RX buffer allocation failure
+Date: Tue, 13 Feb 2024 09:33:39 -0800
+Message-Id: <20240213173339.3438713-1-florian.fainelli@broadcom.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240213-bus_cleanup-mdio-v1-1-f9e799da7fda@marliere.net>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Feb 13, 2024 at 11:48:00AM -0300, Ricardo B. Marliere wrote:
-> Since commit d492cc2573a0 ("driver core: device.h: make struct
-> bus_type a const *"), the driver core can properly handle constant
-> struct bus_type, move the mdio_bus_type variable to be a constant
-> structure as well, placing it into read-only memory which can not be
-> modified at runtime.
-> 
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Suggested-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Signed-off-by: Ricardo B. Marliere <ricardo@marliere.net>
+The buffer_pg variable needs to hold an order-5 allocation (32 x
+PAGE_SIZE) which, under memory pressure may fail to be allocated. Deal
+with that error condition properly to avoid doing a NULL pointer
+de-reference in the subsequent call to dma_map_page().
 
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+In addition, the err_reclaim_tx error label in bcmasp_netif_init() needs
+to ensure that the TX NAPI object is properly deleted, otherwise
+unregister_netdev() will spin forever attempting to test and clear
+the NAPI_STATE_HASHED bit.
+
+Fixes: 490cb412007d ("net: bcmasp: Add support for ASP2.0 Ethernet controller")
+Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
+---
+ drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
+index 53e542881255..f59557b0cd51 100644
+--- a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
++++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
+@@ -684,6 +684,8 @@ static int bcmasp_init_rx(struct bcmasp_intf *intf)
+ 
+ 	intf->rx_buf_order = get_order(RING_BUFFER_SIZE);
+ 	buffer_pg = alloc_pages(GFP_KERNEL, intf->rx_buf_order);
++	if (!buffer_pg)
++		return -ENOMEM;
+ 
+ 	dma = dma_map_page(kdev, buffer_pg, 0, RING_BUFFER_SIZE,
+ 			   DMA_FROM_DEVICE);
+@@ -1092,6 +1094,7 @@ static int bcmasp_netif_init(struct net_device *dev, bool phy_connect)
+ 	return 0;
+ 
+ err_reclaim_tx:
++	netif_napi_del(&intf->tx_napi);
+ 	bcmasp_reclaim_free_all_tx(intf);
+ err_phy_disconnect:
+ 	if (phydev)
+-- 
+2.34.1
+
 
