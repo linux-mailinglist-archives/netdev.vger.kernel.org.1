@@ -1,216 +1,201 @@
-Return-Path: <netdev+bounces-71294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AE79852F27
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 12:26:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8352C852F6A
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 12:34:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6EF0E1F23127
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 11:26:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A74761C22B0E
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 11:34:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D171739FE1;
-	Tue, 13 Feb 2024 11:22:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA4C2374DB;
+	Tue, 13 Feb 2024 11:34:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2884353E1E;
-	Tue, 13 Feb 2024 11:22:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A5B936B17
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 11:34:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707823321; cv=none; b=KeggKJK6Yin4pXGgzzM/nUO0SHVYE5RhLaQZQJpWo8tI1pQ6Wcrj7kRBTgW03tBHi6WNiRckRsHxGBeKF3KbTsv5kpAB7r+XuTE8xFgXs3/2Ky2tqMstloMaYSOylC22JdjWWQPqDlgYgpUBnwyxIuW023uP3JOSsquhr4ICZEg=
+	t=1707824085; cv=none; b=TehLrXinrq+NRt28xJcL9CmrqrpUc8tecrhI8mZMwYocIFbu3r3zdJnh13taUy7EvmyG9ADLuRvaznESQ2PB9lnGZ43fOHTo9grkdpmXIQ+aBrz07yKUMoW36+2NlM2NBwgy+Lt3x/DWH7Nef58regn5GH7guth1WZ1uxu4caYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707823321; c=relaxed/simple;
-	bh=s6T/zSMMEHZIFTOkc0e0h1ky/C0Y56wV6iDS5Nk+ook=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=UitV3urVNykJNLn2Qrtnb3S5k6sgph0QxPQEVKsWbAcqJzyiEMbL31Q+yTVs0rP54vXBq3BJem/br5WA/1O/XlRHyMubDDG8qDshA0ALVkii/KPyhlGEKuEsmdhecQKvlECX0zRP0aZzusK3b5LR7rhbNJaRGj+uSpXxR07VSaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a38271c0bd5so528262766b.0;
-        Tue, 13 Feb 2024 03:21:59 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707823318; x=1708428118;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qF5tSCyO28Quew0M8TTq2zPTAoVa+RqiCLspA3/IxPI=;
-        b=U/5KVSO+d3vaUt7PJd8JziiRlXArj0DXbz/W28Iw66VE2sgdmlinzYDyF7/dBC8bhf
-         8SVxyAybWn7ePW7fJaq7YjAP/iPAzo40SnBL6SoRKDiug4kQJMtwsdA7WMMTVkNXgo5o
-         Kv5u2JVJVHEL4kjLs/hmV5X7V7xQ0Cd6d9vcaLOxu5cel/ohXow7rjMJcKgKA3jplnAV
-         OPfrnZBOFhiq1809nFwu2ZNKbsn6BG3CZszoHzzyjwqTKlnhYnQO1YPvvzCdp7gq+kss
-         Sgbss9O3AsmQQSzl4gA+ORLNdFqWIrQIIdcdr522Ct64xesWj4Vb2b6ONYVXCBWHJhvj
-         UBkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWb7sNh9zDjYlNH4fRByifdX9azqCiqB60Q6fIR3bzrWVyaLVK9K7H3zMCkvutZrlLDFVU8cC/vDiL7l8GeatcG+XfWjc4SpSZ3UJVV
-X-Gm-Message-State: AOJu0YzL1/GaQYCa/gQK1/tqSeBMG3LP0elBV4Z1IZM9e/67KHeTwdFg
-	lthXHaGL+XMSIylGrZxB/8+5wLqgRY6KjQe9qxj+nQvFLGIdMdAjmuDnoTmN
-X-Google-Smtp-Source: AGHT+IEvHALJxeyXK/tOIwb7oXhE3xreT25ZdIXweBKkiFCqFUOmFVDPs2F1tjxtyzKgN7X+sp6P6Q==
-X-Received: by 2002:a17:906:cec4:b0:a3c:e2ba:3820 with SMTP id si4-20020a170906cec400b00a3ce2ba3820mr1973376ejb.41.1707823318482;
-        Tue, 13 Feb 2024 03:21:58 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUW4uOf9PixhUed3X1XpcyMKUkKmzKYY7i+CbkDEHBVHOSJq+IfDkrUkVSOpi1NR0IU11belvfuKjN01SiS67E5sBsy+y8kh3efGvpx2MIpX1g02GgInBbjyPIVo0y+CgmvxpGo9Q2MJIOH43BiakiTf+5mOYFw/qEbKB95yl451mIAocil8NSIQfAB3aH1OZ5lYuXuf15SKtgrIsH+I+vfTIxtGZoXlhUlC+Dp4xYM79tN5Xj3CYg=
-Received: from localhost (fwdproxy-lla-113.fbsv.net. [2a03:2880:30ff:71::face:b00c])
-        by smtp.gmail.com with ESMTPSA id li14-20020a170907198e00b00a3c488d79b1sm1194580ejc.223.2024.02.13.03.21.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Feb 2024 03:21:58 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-To: kuba@kernel.org,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	Michael Grzeschik <m.grzeschik@pengutronix.de>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	horms@kernel.org
-Subject: [PATCH net 7/7] net: fill in MODULE_DESCRIPTION()s for missing arcnet
-Date: Tue, 13 Feb 2024 03:21:22 -0800
-Message-Id: <20240213112122.404045-8-leitao@debian.org>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20240213112122.404045-1-leitao@debian.org>
-References: <20240213112122.404045-1-leitao@debian.org>
+	s=arc-20240116; t=1707824085; c=relaxed/simple;
+	bh=VnOj+lN5A4LqeuCIOf0QipWgjppniZNEf+6vtJIg4HI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=h22j5Zfl71PgBYkph5mFz6GrPtEUoNwXSapnt3bjBUS9w+Tx35ILlkxgY1CJPnrahMge+4yc3WPgN2ldjVGI4E3lPSKseDS31XMDuIXHjPnppuOfoT4PSBS6j89BIh+laToWFvX2DyKxeVWQ9Fso1ULENouLWMW1v2/oG+WsIuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1rZr3g-00013y-PR
+	for netdev@vger.kernel.org; Tue, 13 Feb 2024 12:34:40 +0100
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1rZr3g-000TQ5-62
+	for netdev@vger.kernel.org; Tue, 13 Feb 2024 12:34:40 +0100
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id D094A28D63C
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 11:34:39 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id 9E5EB28D621;
+	Tue, 13 Feb 2024 11:34:38 +0000 (UTC)
+Received: from blackshift.org (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 3d7f212e;
+	Tue, 13 Feb 2024 11:34:38 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net-next 0/23] pull-request: can-next 2024-02-13
+Date: Tue, 13 Feb 2024 12:25:03 +0100
+Message-ID: <20240213113437.1884372-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf8
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
-Add descriptions to the ARC modules.
+Hello netdev-team,
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
+this is a pull request of 23 patches for net-next/master.
+
+The first patch is by Nicolas Maier and targets the CAN Broadcast
+Manager (bcm), it adds message flags to distinguish between own local
+and remote traffic.
+
+Oliver Hartkopp contributes a patch for the CAN ISOTP protocol that
+adds dynamic flow control parameters.
+
+Stefan Mätje's patch series add support for the esd PCIe/402 CAN
+interface family.
+
+Markus Schneider-Pargmann contributes 14 patches for the m_can to
+optimize for the SPI attached tcan4x5x controller.
+
+A patch by Vincent Mailhol replaces Wolfgang Grandegger by Vincent
+Mailhol as the CAN drivers Co-Maintainer.
+
+Jimmy Assarsson's patch add support for the Kvaser M.2 PCIe 4xCAN
+adapter.
+
+A patch by Daniil Dulov removed a redundant NULL check in the softing
+driver.
+
+Oliver Hartkopp contributes a patch to add CANXL virtual CAN network
+identifier support.
+
+A patch by myself removes Naga Sureshkumar Relli as the maintainer of
+the xilinx_can driver, as their email bounces.
+
+regards,
+Marc
+
 ---
- drivers/net/arcnet/arc-rawmode.c  | 1 +
- drivers/net/arcnet/arc-rimi.c     | 1 +
- drivers/net/arcnet/capmode.c      | 1 +
- drivers/net/arcnet/com20020-pci.c | 1 +
- drivers/net/arcnet/com20020.c     | 1 +
- drivers/net/arcnet/com20020_cs.c  | 1 +
- drivers/net/arcnet/com90io.c      | 1 +
- drivers/net/arcnet/com90xx.c      | 1 +
- drivers/net/arcnet/rfc1051.c      | 1 +
- drivers/net/arcnet/rfc1201.c      | 1 +
- 10 files changed, 10 insertions(+)
 
-diff --git a/drivers/net/arcnet/arc-rawmode.c b/drivers/net/arcnet/arc-rawmode.c
-index 8c651fdee039..57f1729066f2 100644
---- a/drivers/net/arcnet/arc-rawmode.c
-+++ b/drivers/net/arcnet/arc-rawmode.c
-@@ -186,4 +186,5 @@ static void __exit arcnet_raw_exit(void)
- module_init(arcnet_raw_init);
- module_exit(arcnet_raw_exit);
- 
-+MODULE_DESCRIPTION("ARCnet raw mode packet interface module");
- MODULE_LICENSE("GPL");
-diff --git a/drivers/net/arcnet/arc-rimi.c b/drivers/net/arcnet/arc-rimi.c
-index 8c3ccc7c83cd..53d10a04d1bd 100644
---- a/drivers/net/arcnet/arc-rimi.c
-+++ b/drivers/net/arcnet/arc-rimi.c
-@@ -312,6 +312,7 @@ module_param(node, int, 0);
- module_param(io, int, 0);
- module_param(irq, int, 0);
- module_param_string(device, device, sizeof(device), 0);
-+MODULE_DESCRIPTION("ARCnet COM90xx RIM I chipset driver");
- MODULE_LICENSE("GPL");
- 
- static struct net_device *my_dev;
-diff --git a/drivers/net/arcnet/capmode.c b/drivers/net/arcnet/capmode.c
-index c09b567845e1..7a0a79973769 100644
---- a/drivers/net/arcnet/capmode.c
-+++ b/drivers/net/arcnet/capmode.c
-@@ -265,4 +265,5 @@ static void __exit capmode_module_exit(void)
- module_init(capmode_module_init);
- module_exit(capmode_module_exit);
- 
-+MODULE_DESCRIPTION("ARCnet CAP mode packet interface module");
- MODULE_LICENSE("GPL");
-diff --git a/drivers/net/arcnet/com20020-pci.c b/drivers/net/arcnet/com20020-pci.c
-index 7b5c8bb02f11..c5e571ec94c9 100644
---- a/drivers/net/arcnet/com20020-pci.c
-+++ b/drivers/net/arcnet/com20020-pci.c
-@@ -61,6 +61,7 @@ module_param(timeout, int, 0);
- module_param(backplane, int, 0);
- module_param(clockp, int, 0);
- module_param(clockm, int, 0);
-+MODULE_DESCRIPTION("ARCnet COM20020 chipset PCI driver");
- MODULE_LICENSE("GPL");
- 
- static void led_tx_set(struct led_classdev *led_cdev,
-diff --git a/drivers/net/arcnet/com20020.c b/drivers/net/arcnet/com20020.c
-index 06e1651b594b..a0053e3992a3 100644
---- a/drivers/net/arcnet/com20020.c
-+++ b/drivers/net/arcnet/com20020.c
-@@ -399,6 +399,7 @@ EXPORT_SYMBOL(com20020_found);
- EXPORT_SYMBOL(com20020_netdev_ops);
- #endif
- 
-+MODULE_DESCRIPTION("ARCnet COM20020 chipset core driver");
- MODULE_LICENSE("GPL");
- 
- #ifdef MODULE
-diff --git a/drivers/net/arcnet/com20020_cs.c b/drivers/net/arcnet/com20020_cs.c
-index dc3253b318da..38b72eb2e89c 100644
---- a/drivers/net/arcnet/com20020_cs.c
-+++ b/drivers/net/arcnet/com20020_cs.c
-@@ -97,6 +97,7 @@ module_param(backplane, int, 0);
- module_param(clockp, int, 0);
- module_param(clockm, int, 0);
- 
-+MODULE_DESCRIPTION("ARCnet COM20020 chipset PCMCIA driver");
- MODULE_LICENSE("GPL");
- 
- /*====================================================================*/
-diff --git a/drivers/net/arcnet/com90io.c b/drivers/net/arcnet/com90io.c
-index 37b47749fc8b..3b463fbc6402 100644
---- a/drivers/net/arcnet/com90io.c
-+++ b/drivers/net/arcnet/com90io.c
-@@ -350,6 +350,7 @@ static char device[9];		/* use eg. device=arc1 to change name */
- module_param_hw(io, int, ioport, 0);
- module_param_hw(irq, int, irq, 0);
- module_param_string(device, device, sizeof(device), 0);
-+MODULE_DESCRIPTION("ARCnet COM90xx IO mapped chipset driver");
- MODULE_LICENSE("GPL");
- 
- #ifndef MODULE
-diff --git a/drivers/net/arcnet/com90xx.c b/drivers/net/arcnet/com90xx.c
-index f49dae194284..b3b287c16561 100644
---- a/drivers/net/arcnet/com90xx.c
-+++ b/drivers/net/arcnet/com90xx.c
-@@ -645,6 +645,7 @@ static void com90xx_copy_from_card(struct net_device *dev, int bufnum,
- 	TIME(dev, "memcpy_fromio", count, memcpy_fromio(buf, memaddr, count));
- }
- 
-+MODULE_DESCRIPTION("ARCnet COM90xx normal chipset driver");
- MODULE_LICENSE("GPL");
- 
- static int __init com90xx_init(void)
-diff --git a/drivers/net/arcnet/rfc1051.c b/drivers/net/arcnet/rfc1051.c
-index a7752a5b647f..46519ca63a0a 100644
---- a/drivers/net/arcnet/rfc1051.c
-+++ b/drivers/net/arcnet/rfc1051.c
-@@ -78,6 +78,7 @@ static void __exit arcnet_rfc1051_exit(void)
- module_init(arcnet_rfc1051_init);
- module_exit(arcnet_rfc1051_exit);
- 
-+MODULE_DESCRIPTION("ARCNet packet format (RFC 1051) module");
- MODULE_LICENSE("GPL");
- 
- /* Determine a packet's protocol ID.
-diff --git a/drivers/net/arcnet/rfc1201.c b/drivers/net/arcnet/rfc1201.c
-index a4c856282674..0edf35d971c5 100644
---- a/drivers/net/arcnet/rfc1201.c
-+++ b/drivers/net/arcnet/rfc1201.c
-@@ -35,6 +35,7 @@
- 
- #include "arcdevice.h"
- 
-+MODULE_DESCRIPTION("ARCNet packet format (RFC 1201) module");
- MODULE_LICENSE("GPL");
- 
- static __be16 type_trans(struct sk_buff *skb, struct net_device *dev);
--- 
-2.39.3
+The following changes since commit 970cb1ceda170a3e583a5f26afdbebdfe5bf5a80:
+
+  Merge branch 'phy-package' (2024-02-10 15:36:20 +0000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can-next.git tags/linux-can-next-for-6.9-20240213
+
+for you to fetch changes up to 73b8f5015889d4b5fbd885fa310ad8905fe50e4f:
+
+  MAINTAINERS: can: xilinx_can: remove Naga Sureshkumar Relli (2024-02-13 11:47:17 +0100)
+
+----------------------------------------------------------------
+linux-can-next-for-6.9-20240213
+
+----------------------------------------------------------------
+Daniil Dulov (1):
+      can: softing: remove redundant NULL check
+
+Jimmy Assarsson (1):
+      can: kvaser_pciefd: Add support for Kvaser M.2 PCIe 4xCAN
+
+Marc Kleine-Budde (4):
+      Merge patch series "can: esd: add support for esd GmbH PCIe/402 CAN interface"
+      Merge patch series "can: m_can: Optimizations for m_can/tcan part 2"
+      Merge patch "can network drivers maintainer"
+      MAINTAINERS: can: xilinx_can: remove Naga Sureshkumar Relli
+
+Markus Schneider-Pargmann (14):
+      can: m_can: Start/Cancel polling timer together with interrupts
+      can: m_can: Move hrtimer init to m_can_class_register
+      can: m_can: Write transmit header and data in one transaction
+      can: m_can: Implement receive coalescing
+      can: m_can: Implement transmit coalescing
+      can: m_can: Add rx coalescing ethtool support
+      can: m_can: Add tx coalescing ethtool support
+      can: m_can: Use u32 for putidx
+      can: m_can: Cache tx putidx
+      can: m_can: Use the workqueue as queue
+      can: m_can: Introduce a tx_fifo_in_flight counter
+      can: m_can: Use tx_fifo_in_flight for netif_queue control
+      can: m_can: Implement BQL
+      can: m_can: Implement transmit submission coalescing
+
+Nicolas Maier (1):
+      can: bcm: add recvmsg flags for own, local and remote traffic
+
+Oliver Hartkopp (2):
+      can: isotp: support dynamic flow control parameters
+      can: canxl: add virtual CAN network identifier support
+
+Stefan Mätje (2):
+      MAINTAINERS: add Stefan Mätje as maintainer for the esd electronics GmbH PCIe/402 CAN drivers
+      can: esd: add support for esd GmbH PCIe/402 CAN interface family
+
+Vincent Mailhol (1):
+      can: change can network drivers maintainer
+
+ Documentation/networking/can.rst       |  34 +-
+ MAINTAINERS                            |  10 +-
+ drivers/net/can/Kconfig                |   2 +
+ drivers/net/can/Makefile               |   1 +
+ drivers/net/can/esd/Kconfig            |  12 +
+ drivers/net/can/esd/Makefile           |   7 +
+ drivers/net/can/esd/esd_402_pci-core.c | 514 ++++++++++++++++++++++
+ drivers/net/can/esd/esdacc.c           | 764 +++++++++++++++++++++++++++++++++
+ drivers/net/can/esd/esdacc.h           | 356 +++++++++++++++
+ drivers/net/can/kvaser_pciefd.c        |  55 +++
+ drivers/net/can/m_can/m_can.c          | 551 +++++++++++++++++-------
+ drivers/net/can/m_can/m_can.h          |  34 +-
+ drivers/net/can/m_can/m_can_platform.c |   4 -
+ drivers/net/can/softing/softing_fw.c   |   2 +-
+ include/uapi/linux/can.h               |   9 +-
+ include/uapi/linux/can/isotp.h         |   1 +
+ include/uapi/linux/can/raw.h           |  16 +
+ net/can/af_can.c                       |   2 +
+ net/can/bcm.c                          |  69 ++-
+ net/can/isotp.c                        |   5 +-
+ net/can/raw.c                          |  93 +++-
+ 21 files changed, 2348 insertions(+), 193 deletions(-)
+ create mode 100644 drivers/net/can/esd/Kconfig
+ create mode 100644 drivers/net/can/esd/Makefile
+ create mode 100644 drivers/net/can/esd/esd_402_pci-core.c
+ create mode 100644 drivers/net/can/esd/esdacc.c
+ create mode 100644 drivers/net/can/esd/esdacc.h
 
 
