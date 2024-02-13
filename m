@@ -1,123 +1,121 @@
-Return-Path: <netdev+bounces-71332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2657F852FF9
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:00:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 248D3852FEB
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 12:54:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C90661F23D34
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 12:00:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D35E3281D10
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 11:54:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C43A7381D5;
-	Tue, 13 Feb 2024 12:00:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=online.de header.i=max.schulze@online.de header.b="ZXz0okeY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EBDA381B4;
+	Tue, 13 Feb 2024 11:54:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.75])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666CF374E0
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 12:00:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.75
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CABB364BE
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 11:54:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707825604; cv=none; b=Q4782C+ovAhcBuK2d+RkT4ltGNElcujLQB4wZx/VfYKci/Tm61Pqmo9bEaDNlcun2c+ridEetqyf3fNHtEP5l/ITwGFbgx5+lvUsRlVBHYsjOuFG3JH/ZHZh/07g1dgFsSXZkS+JqJ4W3VjPSWZdtcBnpniWDIAdVXCM7ev0b5A=
+	t=1707825271; cv=none; b=i1KBrHFnVj4gPZSrEYzendPuAghBKy85BlPrhfJpj7xh/Ki8lJbzcS++qV861kl6Ur0aLsKr7kb236jfQMIEad98XDeOmzOdOphUVSTh8grrYH9dtkVJ3r1t/VpbX793g4n73FQqK/ep0GhKMBDFPQz87HFV17KEbtwHVXqO5mA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707825604; c=relaxed/simple;
-	bh=NQBuGcQ0ujIKwl4wDJtgdCgL7Ra9xt2fUxyZ925hvsQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=V6oJGMMQtr8Xg261WdVO7pyXScLEJYcN9enAbwgoGx1GWEDsw8TpxHRaRsY+2tRqqhdiIG9XgW9zstNLv50JS0Lvq0zWXd5Xlb0rdfdLxp07tYtiJg3doZl2cjLg4+eZOC+bZY/2WFhrfg8m0ReZW3c2oczKA009BpdmIht3tzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=online.de; spf=pass smtp.mailfrom=online.de; dkim=pass (2048-bit key) header.d=online.de header.i=max.schulze@online.de header.b=ZXz0okeY; arc=none smtp.client-ip=217.72.192.75
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=online.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=online.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=online.de;
-	s=s42582890; t=1707825579; x=1708430379; i=max.schulze@online.de;
-	bh=NQBuGcQ0ujIKwl4wDJtgdCgL7Ra9xt2fUxyZ925hvsQ=;
-	h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:
-	 In-Reply-To;
-	b=ZXz0okeYCnhESc4YnzvrN+5kcXyQWWWXDw8EUBHXVhTWAA5sUpJWhBeTZoW9eJ5s
-	 IvQW836/lWKTMr+o/oWZURB/z+NbebQqTTxJNGEjyF5QKamMiPP4EPQAcAfwJX308
-	 Ou6+QcIEJj6lu5ax59KcmEV498toDxgcTPu/p0detdAePK/r5e1p8FEPSQo+OIZ4T
-	 zM2Qmi1mvlaqXZRYefXxPSW5ffUp+9q8DdY+EBr7mMhIvwtv4FNqfuO7fOAdYXeR3
-	 nIycQbtbfF4E7C1J76PKroQkEmBBVLlXsTWSemqpS8ocI9gFZ9DnaqzlDvr2OXhTA
-	 sHkSAK7dfVSRRaBqnA==
-X-UI-Sender-Class: 6003b46c-3fee-4677-9b8b-2b628d989298
-Received: from [192.168.151.38] ([84.160.48.104]) by mrelayeu.kundenserver.de
- (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis) id
- 1MLi4c-1rIBx63eqW-00Hf9d; Tue, 13 Feb 2024 12:54:04 +0100
-Message-ID: <71ec8c74-270e-41f6-b336-0198b16dd697@online.de>
-Date: Tue, 13 Feb 2024 12:54:03 +0100
+	s=arc-20240116; t=1707825271; c=relaxed/simple;
+	bh=Ni7xNNrORfQyk4//WfrA8+aD1m/BPMiC7sdc0udhltU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=t6MmRBvDrktCNSprfJYbycjUY/BGVZW2odRqlj+JUYcp8fQkUmDtTfSNV+ZxHY1eWwq/iC39ecdBgSysoW2+80b70T7Oyn9IJyMG9VR3cVjOnxmw9xVH3F/p65WPuLH+kjbN6JB041I/9zP+lmGFAixxd0z/TsYLDvsB9LsAi/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rZrMc-0004OR-HU; Tue, 13 Feb 2024 12:54:14 +0100
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rZrMa-000TeD-46; Tue, 13 Feb 2024 12:54:12 +0100
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rZrMa-001k76-0B;
+	Tue, 13 Feb 2024 12:54:12 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v1 1/1] igb: extend PTP timestamp adjustments to i211
+Date: Tue, 13 Feb 2024 12:54:10 +0100
+Message-Id: <20240213115410.415573-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net] tcp: allow again tcp_disconnect() when threads are
- waiting
-Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>, gregkh@linuxfoundation.org
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, tdeseyn@redhat.com
-References: <f3b95e47e3dbed840960548aebaa8d954372db41.1697008693.git.pabeni@redhat.com>
- <169724162482.10042.15716452478916528903.git-patchwork-notify@kernel.org>
-From: Max Schulze <max.schulze@online.de>
-In-Reply-To: <169724162482.10042.15716452478916528903.git-patchwork-notify@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:eFI3H+fDhz/sz1yFlbC8su2JdOEO42siWn/wc6r7fpHLxUX5Cxe
- JAenCTulpT6C2P2agj0VTBuWl7RDIaXN8hmIr872+RnFTNIVOgpo9gfITDcyf+L1XZYXUv2
- QB6hjIucW4tVX8jnAU/Bu7oaEpNkM7kplW6aqFO3fuiqFfVIgzyr4lZX0GOQcIhuFpjZfGT
- cFyhak4toa8xfI2izLokw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:jjvrlPBORVU=;xsTM0rObhZHVZD7L/EhNKBLsRdJ
- 2ku6sdHHhSQVyFR7bPuyumS1E1/6f1DIdc/WfKsaCB4655SNQjTc/pp0VM3JfpQB8BBNG/r4u
- h6sFTdfytJrNz0RWpfQSIh1ILxiTwOpZ6EeMms2z4pjNEvVIT0ExxCUSTMmwwGy0ZB7/CWDEg
- gF8stMGPELn3t0gv2zGLVHV/C2A9OG29vjlemiED7j/muCHJgOzWhC3W7+wyVrL5U95Hze4gl
- I+oMuJl3lXnkBuCLt/D08PF1fluUIgQhxuj9fTicFZsfHK63lG+gtrCpqQz103jtubfZVGpEY
- n7csV+xPkgYQ9tsfLw6wO1bjJZyKdH+b9DQEe6sV6rS/BHaFhPQeEoIoQSPsbQiclW9laU6DJ
- imI4XE7r2tnuRuuWg7u3KFr2RBmBxP1cLY1FOCV4SLV2eqV5uCGzf8/MFFdt1wj1g1umaSUnv
- u7u3e7AHCTKO09hLdjW5BDOXKlvQ9ACuYB7W3f7k5AkKWWgl40JMvn8aRXUFM9uY30LkQM5u6
- TsbQ+RJ2fAcwtt4gDPCnYB6lIPrFoVThdgVibYyFE7kOp858vVVnimrdNiw0WTOC9yw7fyDDj
- pJvU4a/kZG7e6bO/1yeiPwdbcw9V7AgutFEDkCeHFIUkvqvrVfbX4+h+kV+1esKLDYB6fxlZe
- zaIYfvt8rV7GCxCHE1N5eba5XHTSluwEGFAhOadWqfMtG2td4L/ktcv7H2G197Tcm8WAauCrp
- 7WRKqdftjTWARSoBZULItjNibNBEdpxcF+hg/5tOm/HQPOTkF0Us68=
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
+The i211 requires the same PTP timestamp adjustments as the i210,
+according to its datasheet. To ensure consistent timestamping across
+different platforms, this change extends the existing adjustments to
+include the i211.
 
+The adjustment result are tested and comparable for i210 and i211 based
+systems.
 
-Am 14.10.23 um 02:00 schrieb patchwork-bot+netdevbpf@kernel.org:
-> Hello:
->
-> This patch was applied to netdev/net.git (main)
-> by Jakub Kicinski <kuba@kernel.org>:
->
-> On Wed, 11 Oct 2023 09:20:55 +0200 you wrote:
->> As reported by Tom, .NET and applications build on top of it rely
->> on connect(AF_UNSPEC) to async cancel pending I/O operations on TCP
->> socket.
->>
->> The blamed commit below caused a regression, as such cancellation
->> can now fail.
->>
->> [...]
+Fixes: 3f544d2a4d5c ("igb: adjust PTP timestamps for Tx/Rx latency")
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+---
+ drivers/net/ethernet/intel/igb/igb_ptp.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/net/ethernet/intel/igb/igb_ptp.c b/drivers/net/ethernet/intel/igb/igb_ptp.c
+index 319c544b9f04..f94570556120 100644
+--- a/drivers/net/ethernet/intel/igb/igb_ptp.c
++++ b/drivers/net/ethernet/intel/igb/igb_ptp.c
+@@ -957,7 +957,7 @@ static void igb_ptp_tx_hwtstamp(struct igb_adapter *adapter)
+ 
+ 	igb_ptp_systim_to_hwtstamp(adapter, &shhwtstamps, regval);
+ 	/* adjust timestamp for the TX latency based on link speed */
+-	if (adapter->hw.mac.type == e1000_i210) {
++	if (hw->mac.type == e1000_i210 || hw->mac.type == e1000_i211) {
+ 		switch (adapter->link_speed) {
+ 		case SPEED_10:
+ 			adjust = IGB_I210_TX_LATENCY_10;
+@@ -1003,6 +1003,7 @@ int igb_ptp_rx_pktstamp(struct igb_q_vector *q_vector, void *va,
+ 			ktime_t *timestamp)
+ {
+ 	struct igb_adapter *adapter = q_vector->adapter;
++	struct e1000_hw *hw = &adapter->hw;
+ 	struct skb_shared_hwtstamps ts;
+ 	__le64 *regval = (__le64 *)va;
+ 	int adjust = 0;
+@@ -1022,7 +1023,7 @@ int igb_ptp_rx_pktstamp(struct igb_q_vector *q_vector, void *va,
+ 	igb_ptp_systim_to_hwtstamp(adapter, &ts, le64_to_cpu(regval[1]));
+ 
+ 	/* adjust timestamp for the RX latency based on link speed */
+-	if (adapter->hw.mac.type == e1000_i210) {
++	if (hw->mac.type == e1000_i210 || hw->mac.type == e1000_i211) {
+ 		switch (adapter->link_speed) {
+ 		case SPEED_10:
+ 			adjust = IGB_I210_RX_LATENCY_10;
+-- 
+2.39.2
 
-Hello authors, Gregkh,
-
-it looks to me like the breaking commit
-
-https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/ne=
-t/ipv4/tcp.c?h=3Dlinux-4.19.y&id=3D0377416ce1744c03584df3e9461d4b881356d60=
-8
-
-
-was applied to stable, but not the fix?
-
-
-https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/ne=
-t/ipv4/tcp.c?id=3D419ce133ab928ab5efd7b50b2ef36ddfd4eadbd2
-
-Could you consider applying the fix for 4.19 also?
 
