@@ -1,177 +1,192 @@
-Return-Path: <netdev+bounces-71374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07FAE8531F1
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:29:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63AF58531A8
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:21:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 728CBB22B6C
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:29:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A7812837DF
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:21:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C459A56467;
-	Tue, 13 Feb 2024 13:29:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E611D55C0A;
+	Tue, 13 Feb 2024 13:21:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ipLzlSDG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d9xuhffK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00E355577C;
-	Tue, 13 Feb 2024 13:29:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB26C5579B;
+	Tue, 13 Feb 2024 13:21:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707830968; cv=none; b=SnjbfHahzFzMvu8/Llxp678Rtk7+tLPOmpXRQL6s6Yms/HFaEwh5byHneUPJPdFzGvFlLkNHuUD+npXQdd/H/LGYjNJSWYfRWOXVyPXNdWATOKd3vcEc5M4zqTM/RRHs+CQUUbgIEksbrVNNnfbuanyc5crWbA0Cj2x7gvPY77k=
+	t=1707830501; cv=none; b=Bi3t8VVo1jncjZCrOhr/eL4wIeZgXbOA8w8ivQn3MNRDCdjEfcAz0yPlGhZNNCOgo8Rf05VN61zJEcYEKv/pEyKHyN0rMR6h33ND1YbGh+Nf5dIxB6I7mBu3u2WI6HsQu4hMK5KmOWx+ipWMPLrQN7F6t4FwiUywECz4AIn9hzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707830968; c=relaxed/simple;
-	bh=S2uYMqOrZ63NG8/je4DIvWdofi03vpAm3WmCTXF4nDs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fV8FeXq9YtgQm+5+WOppo0kc7Y7vEycIZRV/N8//vIJLOhEAxxMT4xDUNeyptIGKNwKj8KCHghvudQ65VhBLkVJqapXd/hJH7Ltcyju1zUkQpymMXs/qu0alD6tHzezp1fFKEZJKqqtsXBeq95AS/o3v6WcPa9CidUOoC0Dnss0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ipLzlSDG; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-562117d3dbfso195302a12.1;
-        Tue, 13 Feb 2024 05:29:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707830965; x=1708435765; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zFkfsfcQj3EYz0HghFi199sukal5EHX9cCiPBab+av8=;
-        b=ipLzlSDGzoX8Vz4cX5XnWHuff2FUxd5SOx+KD6+NH9mUOdjtAUGC6zP/R5Uu5Kj+E3
-         yWiRMuq2iesqpMj0QkOa3TLiiWUFvAcOEl1ePBnCuAmyK1HejNxS3I4gPKCHbJiMvHNl
-         r+K9ciFtxh023dq4lGX1BSBWkHxMPbGQ3TDCYWTV6r57Zs42KZPPclPmf6P7PCeTUw9x
-         IAl3Xdea0JO1ejGzjjXTURz7cnEAjASPnjuSxLgcTSBqwoug7ghomN9hIF3QvPQ18bw3
-         jNQ69RFAHOQXFhN60pFT/LUGBDBNvSdyo0X7D9PpWhFloy5eFHhD3CP9ZS2bRxiAR9e0
-         MjTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707830965; x=1708435765;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zFkfsfcQj3EYz0HghFi199sukal5EHX9cCiPBab+av8=;
-        b=cOSQNTx119krJSUpU5d+p+mlu2ywS34J6c5qHRRrVsuf4jL9MAguZjFcWPyTPd656D
-         8AQT2E1XjS4Q5+tcWfTPduXdxL3H/GsMOt3eRdt3EMiwIveqzn3lqSni025oDhHP3BUt
-         wq8xXUslzpzhOhORT5qzh4E9HAfILa0Xy2473shE2IwwTwoFJMife0Y3owPyFQY6pbyv
-         nJiJiMqmUvcSgcD3qtaEk76PN85E2tnytcU6h9KN7ULUcEYNffvMo0d38XH5kP5olAam
-         8jfW74zEl5oUZ/vGGWKOMSfAs20uatb2hIyEGLsNJh9zGPrimQWqUCIhyiXrhKmF+CXn
-         hf3g==
-X-Forwarded-Encrypted: i=1; AJvYcCWrKQnCUssqu3rwXPzrd1qkV8och7wpPTJqA7fZ/DQoJMao5/ujmeZZj6LH93YU7ZblqYJ5WMHB8zPrPBbZpuVrE+3EqX3inR+NFOpoJay7dB92BuphOYoJgQRa+YmnR3xV5TaJ81zJj4VwBwbdpak8I7lLyEYvhsenErFp056HCwtaTyf/CbIfEBQGQN3RVDY32ZN1NIaa5EfRQYUKLgn/DHlBvNEEwiAz4b/tuLxBL7M6NuYf3Z8bflw4uhhplBq5OXkLXH6QDnL5KTJlUrjafqQn26eRF+Ofws1W/4wjI0J4S4SJBmcPAF/wqU4yC170N5Z3ktYqUwbcaEPScZYcx8dNqtEChlX8UjGeQcblAwLP5ux1kc2Py/11XZd8AHbzNeWeitxoKCOsc0AEWRkC4iBoXscjW4EIsl/d+r0zCZB6nwuBNSSTYuXEJB7goal48MoEJz2Db21OPF3x37B0AdoONEU/igT5bmfbiQ2IFoTZuPf7+rKMkI72/ht/pF1ptajLww==
-X-Gm-Message-State: AOJu0YzpFLhHUEWn6Dq0By+sdHcAR5+4e6vZspZxP+XBg0hIBPtVZvZJ
-	Mdg+3Bg92Lu4T+yRjC4Z9jE0/9xvd8kmOXqni9tADxnke59+mcSY
-X-Google-Smtp-Source: AGHT+IGAaHK3Sc+4l2nceOylDioj03KTZYisiZzBNDf0QqrfnPjsS5gVAqMxT1CZy/sHMpkrQYQHTA==
-X-Received: by 2002:a17:907:9608:b0:a3c:d535:39b4 with SMTP id gb8-20020a170907960800b00a3cd53539b4mr2812254ejc.9.1707830964861;
-        Tue, 13 Feb 2024 05:29:24 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUAx0oFGv8fB8fAq7b4SaoJ1hkmfp3uRl+/+fWTscotDvrWHCHXLoRxfjmKebhxzaOp3oxyPgCcBy0wUW20nGfcHDfKvRtEVCBS5GMpx8HXIHoIIZMS6tP/VX099E08YFCUDuCULizMEnqQPd1i3pKNIDm55WsBNPz+QhIoaSX7ZFh72jKyCoa/amNFGhou++pfV+8YwZ2G+iSP9cnlYVHdylj+4X4J8yWRtWXX86jElRP8t/wE8pBpbYSrQOXQkKZC054KciMa6FURknOG0VlXdC0zp6ZuNvVs9CBiiFkRg+DpmEMQXqYWkhkv4yajMT0pumZHd9eBNJSCmXW+vX7/5Y7C+7qkpJXiJKz8j16QLsdpngzR8AXEYmkEC9mrljQ2qx2Uhf41HTaD45Ry/g8pZuMKJrnmXQ9XLrlDUHGHpVa5vMb/VpXYM0MX3wyEKSkBPn9WaxUHLCzuGEpSs4WQ18r7An+vsFd+e8kSbUhrIET4qj5kolbXe6g24ua4jN6md+Aek5+o8ZKZbFFueWGHcDlwIGrMxBopiiwcsibAijsP5b6ASTAPNQJbwSkKDd7Iv3h3GQ8E11aFoWyv5GC4lOpTFJVkrmvqK+P6SQqmsZhYG3SaaqodTQu0imQwcfkfN7B+ACpJ9uAKlKD3Dw0RgwAksL4zO+wWutuLiqMU4JAtWP153NOjVWQzg1bwYvvy52JSOLKxmdbbth1bOJOxn6FlT5/nbQVz51EHzTC6lw4ox1I2zht1n4/pXvC4xJMyQm5LTy5aX4s9LmAqDUthV9ozliVnKX1wcX2x81SYpQRV+q41d4NethsIuQTU2Ruz5p7bLd0LUUCo1w5qiRkNvVsYH13WxW6rA4YDENQs8F446oIN/ku79kaRptVl0Lva5vqnk3MUnZLnpMV70VqOX4zcmX35IyvdxW67Yf8MDXj8F/OCINzsJpFdiTmZlqjivJ
- m8Z42xDWPt1Ba9H9tb9tPjRDLBd4st4Hcyg2svskzdCdAkPcAa+7wE97qvwfc2NlGS594TjKcJNHcP8uWQHqRcG9MKdFvKUQi5K4Yx7/O+Z84C8r4t2DD596gEUR83otfc9AIEDhgTigpPbmG50ZfjCdk3F8yw6j8etrDcjqrYh4vc5ekJWbAZSIopGyRzXI4aAmCqPWw4sUmqZgbLlSSYbjpe9a32jEJQUWsYgoAPXKb9gebtHfRlySE/0SsQNhCBfZebL28mKl6U/8HhaTcio+qP0Qpf6LeAccr+QpnbqnPAc3XcEaGO0CXVFbb/7fUR/b9AUkPijwDgjwlScg+IVVymbuFOyTfBYxART1X01/ib6XlltUbAskeZwd1nCBIZlS8S3h+4EPpKwdC873ok2ZFaYD9UX9T2pxClQTPGV1cJOKWFYAp8VTG4gM0OMgK3l4ZxjvbO0GtCoZs4FytGj6Efn1+Vi+vml6fpoWKPbu3VcW78o+R8TwxB9cYuHOMWskd+chMBSWkNAEpn6dhBxYV88HAs3p+7Mv1ftWzYOmwrDOzTPf6msY+M+SJNyrsdRC4aujSEetlZVrwLxEq4aFRcEnCQMs5Oh0ocQ1HMGCXwsBeFb8mo/MLE+mDYnVmG1vI6VS58tk5B8xg/IfMMml78r0vQiu751j5ao+tWo75K1Ma4CXeIJy9XDr9mStFHCYpZ8Xk66GhkBASkiUu31WX3xD/AGf4EuM4NM6LTuj6OqdwTUuN2hpbg2hfsdEZeB5cchVr2/dNvrvI/ZWsi77TMoyxmlpZuBW+T4Hu9Yi3c+8dT
-Received: from ?IPV6:2620:10d:c096:310::23d8? ([2620:10d:c092:600::1:a107])
-        by smtp.gmail.com with ESMTPSA id ss3-20020a170907c00300b00a3d1c0a3d5dsm221682ejc.63.2024.02.13.05.29.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Feb 2024 05:29:24 -0800 (PST)
-Message-ID: <dd4a6633-36d0-4654-a5e1-2824de29c130@gmail.com>
-Date: Tue, 13 Feb 2024 13:19:43 +0000
+	s=arc-20240116; t=1707830501; c=relaxed/simple;
+	bh=a7SgM9dqyhqfQT8PrJFg33YJpwN0HjzTzvri4oG63X4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GowbVh62Bsbnjxssp61UUufKFN7qgxkQEcP8PGPN0dNql2Zcy/ecd+Sp49XgTTvLrx/ZdHxtbI+Vz2r9rNXfqKrVXn850Yxu+f1c/betMTOTLR5r+cLDUPdYOrCyTYJzfdGQz249v1Z6cGbDtJiwt0AWodNlvmvDHfb5U+K3rPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d9xuhffK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96567C433F1;
+	Tue, 13 Feb 2024 13:21:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707830501;
+	bh=a7SgM9dqyhqfQT8PrJFg33YJpwN0HjzTzvri4oG63X4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=d9xuhffKRBV1e3d5bIGmIYYckMGkAWTW6kAogG+CbrnBoiDnp+hsnW7J5uf/4pyiL
+	 OluB6+qqHShvmgk5A74ez6iDuQEObpnfOmxkF6oHZ0xl2Y1Fun66ONH4RDYsXr/1NG
+	 kI371xeJ/G5DRJw7LwcxQNuK8M/7IQmZCd/A1EdDnaKaGNP80SujJDsdSVgtKxam7U
+	 9K2V1FDAn1c5h8If66cUE32FANjI2JbDcN+S4LwxkgVD3GKJ94bRHxmCFey2vc5bNZ
+	 Aqd6rSSYSIi7Ej3t/K2x5aEDYALa2G3Pc5UgfQRyb2EXTLnv8WWvGjPgMliGCjqY9e
+	 S2cq8X1SiKtxg==
+Date: Tue, 13 Feb 2024 15:21:36 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: bmt@zurich.ibm.com
+Cc: syzbot <syzbot+e7c51d3be3a5ddfa0d7a@syzkaller.appspotmail.com>,
+	jgg@ziepe.ca, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [rdma?] WARNING: ODEBUG bug in siw_netdev_event
+Message-ID: <20240213132136.GC52640@unreal>
+References: <000000000000b18dd106112cb53c@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next v5 08/14] memory-provider: dmabuf devmem
- memory provider
-Content-Language: en-US
-To: Mina Almasry <almasrymina@google.com>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Richard Henderson <richard.henderson@linaro.org>,
- Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
- <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
- Helge Deller <deller@gmx.de>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>,
- Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>,
- Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>,
- Praveen Kaligineedi <pkaligineedi@google.com>,
- Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-References: <20231218024024.3516870-1-almasrymina@google.com>
- <20231218024024.3516870-9-almasrymina@google.com>
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20231218024024.3516870-9-almasrymina@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <000000000000b18dd106112cb53c@google.com>
 
-On 12/18/23 02:40, Mina Almasry wrote:
-> Implement a memory provider that allocates dmabuf devmem in the form of
-> net_iov.
-> 
-> The provider receives a reference to the struct netdev_dmabuf_binding
-> via the pool->mp_priv pointer. The driver needs to set this pointer for
-> the provider in the net_iov.
-> 
-> The provider obtains a reference on the netdev_dmabuf_binding which
-> guarantees the binding and the underlying mapping remains alive until
-> the provider is destroyed.
-> 
-> Usage of PP_FLAG_DMA_MAP is required for this memory provide such that
-> the page_pool can provide the driver with the dma-addrs of the devmem.
-> 
-> Support for PP_FLAG_DMA_SYNC_DEV is omitted for simplicity & p.order !=
-> 0.
-> 
-> Signed-off-by: Willem de Bruijn <willemb@google.com>
-> Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
-> 
+On Mon, Feb 12, 2024 at 02:26:24AM -0800, syzbot wrote:
+> Hello,
+>=20
+> syzbot found the following issue on:
+>=20
+> HEAD commit:    b1d3a0e70c38 Add linux-next specific files for 20240208
+> git tree:       linux-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=3D1325c020180000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dbb693ba195662=
+a06
+> dashboard link: https://syzkaller.appspot.com/bug?extid=3De7c51d3be3a5ddf=
+a0d7a
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Deb=
+ian) 2.40
+>=20
+> Unfortunately, I don't have any reproducer for this issue yet.
+>=20
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/176a6b395bbe/dis=
+k-b1d3a0e7.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/02d7d46f81bd/vmlinu=
+x-b1d3a0e7.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/18a5a5030e19/b=
+zImage-b1d3a0e7.xz
+>=20
+> IMPORTANT: if you fix the issue, please add the following tag to the comm=
+it:
+> Reported-by: syzbot+e7c51d3be3a5ddfa0d7a@syzkaller.appspotmail.com
+>=20
+> netlink: 'syz-executor.1': attribute type 27 has an invalid length.
+> netlink: 4 bytes leftover after parsing attributes in process `syz-execut=
+or.1'.
+> =1F: port 3(erspan0) entered disabled state
+> ------------[ cut here ]------------
+> ODEBUG: init active (active state 0) object: ffff88802de95128 object type=
+: work_struct hint: siw_netdev_down+0x0/0x1f0
+
+It means that you are trying to reinitalize work_struct. I'm not sure
+that SIW should listen to NETDEV_GOING_DOWN event.
+
+Thanks
+
+> WARNING: CPU: 1 PID: 16397 at lib/debugobjects.c:517 debug_print_object+0=
+x17a/0x1f0 lib/debugobjects.c:514
+> Modules linked in:
+> CPU: 1 PID: 16397 Comm: syz-executor.1 Not tainted 6.8.0-rc3-next-2024020=
+8-syzkaller #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
+oogle 01/25/2024
+> RIP: 0010:debug_print_object+0x17a/0x1f0 lib/debugobjects.c:514
+> Code: e8 1b e3 4d fd 4c 8b 0b 48 c7 c7 00 89 fe 8b 48 8b 74 24 08 48 89 e=
+a 44 89 e1 4d 89 f8 ff 34 24 e8 2b 97 ae fc 48 83 c4 08 90 <0f> 0b 90 90 ff=
+ 05 bc 2f dd 0a 48 83 c4 10 5b 41 5c 41 5d 41 5e 41
+> RSP: 0018:ffffc90014536758 EFLAGS: 00010282
+> RAX: 5f296badc3198f00 RBX: ffffffff8ba9e6a0 RCX: 0000000000040000
+> RDX: ffffc90004f8b000 RSI: 000000000003ffff RDI: 0000000000040000
+> RBP: ffffffff8bfe8a80 R08: ffffffff8157b862 R09: fffffbfff1bf95c4
+> R10: dffffc0000000000 R11: fffffbfff1bf95c4 R12: 0000000000000000
+> R13: ffffffff8bfe8998 R14: dffffc0000000000 R15: ffff88802de95128
+> FS:  00007fc00b12a6c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000=
+000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007fa1fd40f000 CR3: 000000003e1a6000 CR4: 00000000003506f0
+> DR0: 000000000000d8dd DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>  __debug_object_init+0x2a9/0x400 lib/debugobjects.c:653
+>  siw_device_goes_down drivers/infiniband/sw/siw/siw_main.c:395 [inline]
+>  siw_netdev_event+0x3bd/0x620 drivers/infiniband/sw/siw/siw_main.c:422
+>  notifier_call_chain+0x18f/0x3b0 kernel/notifier.c:93
+>  call_netdevice_notifiers_extack net/core/dev.c:2012 [inline]
+>  call_netdevice_notifiers net/core/dev.c:2026 [inline]
+>  __dev_close_many+0x146/0x300 net/core/dev.c:1512
+>  __dev_close net/core/dev.c:1550 [inline]
+>  __dev_change_flags+0x30e/0x6f0 net/core/dev.c:8683
+>  dev_change_flags+0x8b/0x1a0 net/core/dev.c:8757
+>  do_setlink+0xcb0/0x41c0 net/core/rtnetlink.c:2894
+>  rtnl_group_changelink net/core/rtnetlink.c:3443 [inline]
+>  __rtnl_newlink net/core/rtnetlink.c:3702 [inline]
+>  rtnl_newlink+0x1117/0x20a0 net/core/rtnetlink.c:3739
+>  rtnetlink_rcv_msg+0x885/0x1040 net/core/rtnetlink.c:6606
+>  netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2543
+>  netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
+>  netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1367
+>  netlink_sendmsg+0xa3c/0xd70 net/netlink/af_netlink.c:1908
+>  sock_sendmsg_nosec net/socket.c:730 [inline]
+>  __sock_sendmsg+0x221/0x270 net/socket.c:745
+>  ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
+>  ___sys_sendmsg net/socket.c:2638 [inline]
+>  __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
+>  do_syscall_64+0xfb/0x240
+>  entry_SYSCALL_64_after_hwframe+0x6d/0x75
+> RIP: 0033:0x7fc00a47dda9
+> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f=
+7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff=
+ ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007fc00b12a0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+> RAX: ffffffffffffffda RBX: 00007fc00a5ac1f0 RCX: 00007fc00a47dda9
+> RDX: 0000000000000000 RSI: 0000000020006440 RDI: 0000000000000005
+> RBP: 00007fc00a4ca47a R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+> R13: 000000000000006e R14: 00007fc00a5ac1f0 R15: 00007fff19fc38d8
+>  </TASK>
+>=20
+>=20
 > ---
-...
-> +
-> +static bool mp_dmabuf_devmem_release_page(struct page_pool *pool,
-> +					  struct netmem *netmem)
-> +{
-> +	WARN_ON_ONCE(!netmem_is_net_iov(netmem));
-> +
-> +	page_pool_clear_pp_info(netmem);
-> +
-> +	netdev_free_dmabuf(netmem_to_net_iov(netmem));
-> +
-> +	/* We don't want the page pool put_page()ing our net_iovs. */
-> +	return false;
-> +}
-> +
-> +const struct memory_provider_ops dmabuf_devmem_ops = {
-> +	.init			= mp_dmabuf_devmem_init,
-> +	.destroy		= mp_dmabuf_devmem_destroy,
-> +	.alloc_pages		= mp_dmabuf_devmem_alloc_pages,
-> +	.release_page		= mp_dmabuf_devmem_release_page,
-> +};
-> +EXPORT_SYMBOL(dmabuf_devmem_ops);
-
-It might make sense to move all these functions together with
-new code from core/dev.c into a new file
-
--- 
-Pavel Begunkov
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+>=20
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+>=20
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+>=20
+> If you want to overwrite report's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+>=20
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
+>=20
+> If you want to undo deduplication, reply with:
+> #syz undup
+>=20
 
