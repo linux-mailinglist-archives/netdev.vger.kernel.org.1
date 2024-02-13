@@ -1,97 +1,133 @@
-Return-Path: <netdev+bounces-71279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0036852E95
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 11:59:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5576852EA5
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 12:01:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F1811F23BC7
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 10:59:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13DB01C249B8
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 11:01:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FD5B2BD1C;
-	Tue, 13 Feb 2024 10:59:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ejTodT8k"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D95EC2BD1C;
+	Tue, 13 Feb 2024 11:00:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B99FE2BB1E
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 10:59:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657942C840
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 11:00:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707821989; cv=none; b=EbZAd9YWbmZBQFslY2GR/0UHlqnmzj3mwbSOg8er1DDLNaUb6j8v0jll4g4k+onwjsvXjNJAxMtgzAW6jkWXKt3t4vLxQjmVgwVscsWq86uUY2YmJoi6e6pFHj12xBth/TbDHUeUPvMONtBG7fuVRFTUcxga6kkbECYT1SytjeA=
+	t=1707822044; cv=none; b=C7N+pmAEDsyCbQIZOb1iMg87gSD5f2WEehpcjyb9kx28fagAGD9wl0BOImD3X9R+M8y4iFOLVHBas0WGKMWT5jBYrn7hyUvB8bZ2bdKNBJsRg+z1oo5zd2z/+fa4iYxTovk0XxlIu9hyCOonIkPx29ljrz1yr7u+H0cTujR34tU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707821989; c=relaxed/simple;
-	bh=FCh3rfThwSrcd/cICy2U1FJsOYlLOMBpdInVK8P04Sg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KCYTjoDT72GfmkwzXEX8R34q0Cd/NqDBZkIGexbStE25Wg7Tmaa2i/9uyDGkmKxFYPZy418eOBfG5Cq1x7eckzFAts4ng+eqgTF4QDpxp3yx4y60ze+WrN2Nn8Rb8Jrntjkku3lrIK91G8uvY/Qqhf//jbBiS7XLTNw6U/GSEPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ejTodT8k; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <e70cfd35-5114-40d4-b1b4-7a145cc4ce34@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1707821984;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VkyJRd3yFvvSirf8vuaIZWoKv5oqHAm5X0GnkkL2/8s=;
-	b=ejTodT8kdgMo4LG0gN6H92w2hN3mFLAa4f2ffEZnIkOE7col4MGP4PXqsTolGgDN0P2iTo
-	/IVve2dgCcfC68kfJgyYKm0dzLaeF4xdZctEqqvBiZIzcQ/l0bDlhPHyl8/g2de2X0LaLc
-	vkvjs4/mczrMbOqj09lU+Ingc3ASCG4=
-Date: Tue, 13 Feb 2024 10:59:40 +0000
+	s=arc-20240116; t=1707822044; c=relaxed/simple;
+	bh=+RNmFerRabSoDvfbT+rohW1J8Y7o+4ePKtvKyk/5nio=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b7ghKd5lceSlAFfpocRv6O1vIXn0IZpVrVKc661BtYIRXeU121ZxeYhZMcgadhu/k0WvGt4RuvgB780oCi8Rz9TUlXkicfs3kyKb3wLLdNKAb1G4CK0mnX7i/zjsb73b/lJ5RmZUiwSYfzFwJTGWGbBNKoLHk/5p7fRH8qKd7xY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1rZqWY-00066h-Hf; Tue, 13 Feb 2024 12:00:26 +0100
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1rZqWX-000Sxb-EA; Tue, 13 Feb 2024 12:00:25 +0100
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 03AAF28D5D3;
+	Tue, 13 Feb 2024 11:00:25 +0000 (UTC)
+Date: Tue, 13 Feb 2024 12:00:24 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Srinivas Goud <srinivas.goud@amd.com>
+Cc: wg@grandegger.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org, 
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, p.zabel@pengutronix.de, git@amd.com, 
+	michal.simek@xilinx.com, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RESEND v7 0/3] can: xilinx_can: Add ECC feature support
+Message-ID: <20240213-reactor-vertebrae-af419800fcdc-mkl@pengutronix.de>
+References: <1705059453-29099-1-git-send-email-srinivas.goud@amd.com>
+ <20240213-evasion-crevice-3faa375c1666-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net v2] net-timestamp: make sk_tskey more predictable in
- error path
-Content-Language: en-US
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Vadim Fedorenko <vadfed@meta.com>, Andy Lutomirski <luto@amacapital.net>
-Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller"
- <davem@davemloft.net>, Willem de Bruijn <willemb@google.com>,
- netdev@vger.kernel.org
-References: <20240212001340.1719944-1-vadfed@meta.com>
- <65ca450938c4a_1a1761294e3@willemb.c.googlers.com.notmuch>
- <567a7062-9b4a-42dd-a8da-e60f948a62f0@linux.dev>
- <65cad127de7c3_1b2b61294f6@willemb.c.googlers.com.notmuch>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <65cad127de7c3_1b2b61294f6@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="pcfdyjxuszkxzmew"
+Content-Disposition: inline
+In-Reply-To: <20240213-evasion-crevice-3faa375c1666-mkl@pengutronix.de>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 12/02/2024 21:17, Willem de Bruijn wrote:
-> Vadim Fedorenko wrote:
->> On 12/02/2024 11:19, Willem de Bruijn wrote:
->>> Vadim Fedorenko wrote:
->>>> When SOF_TIMESTAMPING_OPT_ID is used to ambiguate timestamped datagrams,
->>>> the sk_tskey can become unpredictable in case of any error happened
->>>> during sendmsg(). Move increment later in the code and make decrement of
->>>> sk_tskey in error path. This solution is still racy in case of multiple
->>>> threads doing snedmsg() over the very same socket in parallel, but still
->>>> makes error path much more predictable.
->>>>
->>>> Fixes: 09c2d251b707 ("net-timestamp: add key to disambiguate concurrent datagrams")
->>>> Reported-by: Andy Lutomirski <luto@amacapital.net>
->>>> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
->>>
->>> What is the difference with v1?
->>
->> Ah, sorry, was in a rush.
->>
->> v1 -> v2:
->>    - use local boolean variable instead of checking the same conditions
->> twice.
-> 
-> No, I meant that the code is exactly the same :)
 
-omg, missing commit changes... will send V3, sorry for the noise
+--pcfdyjxuszkxzmew
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On 13.02.2024 11:22:49, Marc Kleine-Budde wrote:
+> On 12.01.2024 17:07:30, Srinivas Goud wrote:
+> > Add ECC feature support to Tx and Rx FIFOs for Xilinx CAN Controller.
+> > ECC is an IP configuration option where counter registers are added in
+> > IP for 1bit/2bit ECC errors count and reset.
+> > Also driver reports 1bit/2bit ECC errors for FIFOs based on ECC error
+> > interrupts.
+> >=20
+> > Add xlnx,has-ecc optional property for Xilinx AXI CAN controller
+> > to support ECC if the ECC block is enabled in the HW.
+> >=20
+> > Add ethtool stats interface for getting all the ECC errors information.
+> >=20
+> > There is no public documentation for it available.
+>=20
+> Lately I was using ethtool based stats, too and figured out, there's no
+> need for a spinlock, you can use a struct u64_stats_sync,
+> u64_stats_update_begin(), u64_stats_update_end(), and
+> u64_stats_fetch_retry() instead. These are no-ops on 64 bit systems and
+> sequential locks on 32 bit systems.
+>=20
+> I'll send a v8.
+
+https://lore.kernel.org/all/20240213-xilinx_ecc-v8-0-8d75f8b80771@pengutron=
+ix.de/
+
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--pcfdyjxuszkxzmew
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmXLS8QACgkQKDiiPnot
+vG8czQf/aG7oFJxKdh1Q53rxG1f7aBqGyD1mOGPP8tUpbBujLHlZ8bTAF8KE9qTw
+4w2mFpYKOGhsRgTf1FD4mIWemqWnlaTESbQDu3r3n8x7iP46Chj6YH6hyrWJWpAW
+/wAc5jaMCjbkEBQmHRGJxDvZ1cedH/A2St+RpO8GeLvQCkq3qsNkNqI6JwEqc9ek
+bbSViga7DX6sokcg0zmhonSrgeKDBv7gf/ZBkWTeNjlFlsjpUXN8bAbRqlt/EqRw
+M3ckdj63rdRGTwrOCqHPVYtn/VwhdNvR3vafM8iFZI/9lG9EPeJ1A5Zu+jGIr7IO
+Z8UkkTzODpkD/G411piaTJ4I+h47ow==
+=DPr0
+-----END PGP SIGNATURE-----
+
+--pcfdyjxuszkxzmew--
 
