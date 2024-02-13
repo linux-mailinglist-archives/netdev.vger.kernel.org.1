@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-71132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A07778526DF
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 02:45:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FD4F8526E0
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 02:45:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5273B1F259A7
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:45:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BA311C25460
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:45:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28C9F28E3C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DE4429CE1;
 	Tue, 13 Feb 2024 01:10:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pAXRztj5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DvAaO7vA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECFB123BB;
-	Tue, 13 Feb 2024 01:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49A4529420
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 01:10:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707786626; cv=none; b=QXEt1grjWEQuHDIJ9M9TwwKI/QgQcil5BQV6TAaHAI+JmXiGQlnT5O3hqocG+lVi3KuFcPuYvIfFSgiCxB2PrIkE1f0hRzWjyPiyeTbtNVHsJF9b9o3NZou3jHCYNFUplDy0WlUUhmwMxwjs9G6Wpx4BE0XOTRtBYf/hZPj8ypI=
+	t=1707786626; cv=none; b=L21oU/WySjAUNtG+qvGKdJOFPy2r1GNsoVFUFjDvmd8ylMB2nV7DdiF2Oh4hI4BMl2CqHBr27AIVwegh7/SB170j5Av3IV7riwWzYY2o2X8DgBDWKIlK/9pVVyc0Z8gF/McJjRuEvcnaq9DwLHHMGSB02rWX2Iz6kAD5Rx8kVBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707786626; c=relaxed/simple;
-	bh=l2ZGGv/18ZoTqeFXJtdQeBC6J2Sob8IHyJGeCIkvq10=;
+	bh=1wCCXadTPW3dSbGF0xtHBmKSUzAqsuxfDYoGZ4nrwCI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nUatxaHqGeUkc+aOkGhSB3TwTBj5UVmp2TQRjyGKVqIu+x4srVCj/1+YIPgalRZikrY/2+h3r1FddbDaib40xQtsg1/XeB8eyWBbM+ru08ns7l5Sv6S1t634dZf5M4ro7eYr9OTw6T66R7MCV96q0NYJWCb+qXyEdQxRaFH4a90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pAXRztj5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B6D99C43399;
+	 In-Reply-To:To:Cc; b=G7wBnUwlEf0LHJyydVmezH3Df8puAzcHqZdCwDL4XzOr4TMvm4ZieogbOwC2gObzy8QsMyOBOhJhMOnHeYZz0gF6mUz0x6LzVsValDQm4NYj31evxGivq/m52xFtwdDTrKP6wR3zGQYH8jGvIec7W2UhAE8Ctu6+IX/tYPykVno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DvAaO7vA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B0DF9C43394;
 	Tue, 13 Feb 2024 01:10:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1707786625;
-	bh=l2ZGGv/18ZoTqeFXJtdQeBC6J2Sob8IHyJGeCIkvq10=;
+	bh=1wCCXadTPW3dSbGF0xtHBmKSUzAqsuxfDYoGZ4nrwCI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pAXRztj58dBFe4cZLYjifdmkayS9xynM3JtWJG0voC0AD4O67VB1gS1BgiQXWZ09U
-	 LiS7szWL3RlDeTGAD1YJqS1cEcXz/nSQCt6u8jC/eufbZb2QrjcIMzyxmWL5PgtBai
-	 drYhN5SszBaK40hJ4q2y0xho55uSgWno5pidAT4Ix6i6xE7wnA6/F66C0IZR6u0/NO
-	 PnIljJGxzQEh0PDKRnWiKsa2w8J2Wtf4VUtvS2LA3jWD+MGHG4SZBu5Y6de71jzUJO
-	 JMBe6N84ZvunzaJkbrMxlYFKEyUq1Pj32wGPHD4Zv43gLfOTFDrjHHsOQNil7itiN+
-	 mbocsIMXNPhaA==
+	b=DvAaO7vA6q4ltq5KqmeexmSfG66F/qETGi9/oaANwqrLAlqyiRxzWHrnrHlCCbUXL
+	 iBH5rxT916VpQjvRHmT3V/Q/rFccPhOlpwya7m89xK//vksC2TiiIpmg5fz+t29dkf
+	 VA8LBURrBNTzYQFB+t3upp7RLEWHP38Q3CLQ+EO7iwl7IhWxnDqEkRtCegIsVEVOn+
+	 D7Yoazx50DxQ9rjpkrHRXNkG8dwLq9mR/vO+kMx+lKdda3VlPYNrtzQ90PbG15wSdJ
+	 fn47I2HuL0ySabJJTvU28DqwTZIB5ifGSMixXklNP6o3+Ebrff5Bc3TyOZS58y57Tc
+	 uSYd8H7a18F8Q==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9F39DC4166E;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 974B2D84BC6;
 	Tue, 13 Feb 2024 01:10:25 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,41 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] selftests: net: ip_local_port_range: define IPPROTO_MPTCP
+Subject: Re: [PATCH net] i40e: Do not allow untrusted VF to remove
+ administratively set MAC
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170778662564.1111.991367114536257318.git-patchwork-notify@kernel.org>
+ <170778662561.1111.13664477407499666556.git-patchwork-notify@kernel.org>
 Date: Tue, 13 Feb 2024 01:10:25 +0000
-References: <20240209132512.254520-1-max@internet.ru>
-In-Reply-To: <20240209132512.254520-1-max@internet.ru>
-To: Maxim Galaganov <max@internet.ru>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, shuah@kernel.org, martineau@kernel.org,
- matttbe@kernel.org, lkft@linaro.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240208180335.1844996-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20240208180335.1844996-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, ivecera@redhat.com,
+ horms@kernel.org, rafal.romanowski@intel.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri,  9 Feb 2024 16:25:11 +0300 you wrote:
-> Older glibc's netinet/in.h may leave IPPROTO_MPTCP undefined when
-> building ip_local_port_range.c, that leads to "error: use of undeclared
-> identifier 'IPPROTO_MPTCP'".
+On Thu,  8 Feb 2024 10:03:33 -0800 you wrote:
+> From: Ivan Vecera <ivecera@redhat.com>
 > 
-> Define IPPROTO_MPTCP in such cases, just like in other MPTCP selftests.
+> Currently when PF administratively sets VF's MAC address and the VF
+> is put down (VF tries to delete all MACs) then the MAC is removed
+> from MAC filters and primary VF MAC is zeroed.
 > 
-> Fixes: 122db5e3634b ("selftests/net: add MPTCP coverage for IP_LOCAL_PORT_RANGE")
-> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> Closes: https://lore.kernel.org/netdev/CA+G9fYvGO5q4o_Td_kyQgYieXWKw6ktMa-Q0sBu6S-0y3w2aEQ@mail.gmail.com/
-> Signed-off-by: Maxim Galaganov <max@internet.ru>
+> Do not allow untrusted VF to remove primary MAC when it was set
+> administratively by PF.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] selftests: net: ip_local_port_range: define IPPROTO_MPTCP
-    https://git.kernel.org/netdev/net/c/c2b3ec36b422
+  - [net] i40e: Do not allow untrusted VF to remove administratively set MAC
+    https://git.kernel.org/netdev/net/c/73d9629e1c8c
 
 You are awesome, thank you!
 -- 
