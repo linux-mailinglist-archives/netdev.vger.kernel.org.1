@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-71197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 258C48529B8
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 08:23:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95D958529BC
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 08:23:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1C5A28245C
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 07:23:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2084E1F23CD0
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 07:23:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5739817596;
-	Tue, 13 Feb 2024 07:23:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53019175AC;
+	Tue, 13 Feb 2024 07:23:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FLlxA2Fw"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YgUoflYO"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 946E21756E
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 07:23:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DB501774C
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 07:23:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707808996; cv=none; b=OmobqU1Gjp5B148i4GLVvUweq0zENUMqk+yIRErSZG1cydgm9r8VsJYRwFjtFon3MGvzxdfc+L90H3oOY1QRkNjkOBaNJ37DHwvOYfeaBTrQVroYfDUF/gNR4mPkMk7zu8yBJtQkRR7F5WsEP3PuLXlQ2XjnlGBqbRiaznHTsGY=
+	t=1707808999; cv=none; b=HiwG2b1HT0gK1yAi+zcwUAKddm2YMfCYYz3XVS+ghq4fYZ7nlnwCcpC0qbOcwTLSnc+V9kdaEpwg3t936lIq1J2pvkw/fS1OyQ22ziTJ80sCCrMumceiffSH68zY/AW5IZuPIDi1dy5ptVTJKaIPv4lZQgmJk3zAnIeVdPuwAlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707808996; c=relaxed/simple;
-	bh=JFYZDTJEVQFGO5WZZUTAL6K3TKDxq2Ymm0HcwO6+qFw=;
+	s=arc-20240116; t=1707808999; c=relaxed/simple;
+	bh=FuuWI0Rx75drGyeFBtXL3ZGV/i870mvEkoffL+SClWs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Bhsi9n0VHxBhDpuPB7mlvdOJ3Z7ss8E8msLgJUZBoP5hjotlCD2tbDqRAi2Z9Ux0kMQGe5OtYaRxVZkGVFoFvNTIJLOsqqyRic5u1/Ejn3sV9G0oSakHOsi+OWtCovXM6mOulieam6E1or0ZGBXg0QdwL1rhLJZplp0rGX+yOng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FLlxA2Fw; arc=none smtp.client-ip=192.198.163.7
+	 MIME-Version; b=hUW98GWQXJ/JiACaBcajncZOCFL2AQh0wn+yicIBt2kAg0w1Of9jWXnUep388O0pPt3SlVNtI4MhP+KEb0xA9Zl2tUTkY9MK1WyPaX0cJhT7Q3rTV5PdUpMDIuOJTiXW9+XoBqHo4Lr4D5o1fc1FOrkHykSBiP6JwjBwgdzmxCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YgUoflYO; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707808994; x=1739344994;
+  t=1707808997; x=1739344997;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=JFYZDTJEVQFGO5WZZUTAL6K3TKDxq2Ymm0HcwO6+qFw=;
-  b=FLlxA2FwoLoJBLMg2P5I9bymZFj1h09eYND9ZMQa21vkVYJFbCow8/v6
-   zUbko+Eq+SjcpsWLWyHY71IxmtdP48Z3SJz4tcC6cr15gEFaMDC5x+pLD
-   TWwBm99xh7HO4RC35J+cKdSRxkc6G7rkCf+ifXSvVMgmzI0udkF5NQ4mD
-   0DToDcrjUoZ29uNmPf8QHdZcPZ0Yrshcy1anTZsryOw95IZ+mduVz3yjM
-   dHYWHbY9+OhlQbFD8CiYXDqJd9jXlITB4etnY0dA99PNS2aIo8+bAv0ST
-   /6GLmvpliK2RxKlLsUd8I/pE91DpChuOnzR4xxK5IMloWzc8eQyR32rnm
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="27247942"
+  bh=FuuWI0Rx75drGyeFBtXL3ZGV/i870mvEkoffL+SClWs=;
+  b=YgUoflYOpUMPZF7w087fABs1KN6weAKMI9mm0L2JiP7bqQb0APz5IShB
+   QoD9CwFY1SKUa2WiQp6gC4daTqhrup6VnbV2HswvnHUfrUdKSQpDgXsPL
+   kC9DH/gdy4KeoHOH3vkp7CY9L7r0pKyZQrOe1Ti0+UTb/MtTpcWAyx86t
+   b3TNfV1TSNgZlVcW/lYsJRQRODgeg0tctZ21odGzHB8z/ZI8gbHHIUJgp
+   +eikJCsakt1/MtR4sOJjcae3lTheI6bfcR9dhqq/JEVRr28Vxl+zDaRb7
+   5e0bltSH5SKxpggixx4OZMyDdAtCZxkNnVUE9buQwp8ciO67xu/7vc5IS
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="27247945"
 X-IronPort-AV: E=Sophos;i="6.06,156,1705392000"; 
-   d="scan'208";a="27247942"
+   d="scan'208";a="27247945"
 Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 23:23:14 -0800
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 23:23:17 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,156,1705392000"; 
-   d="scan'208";a="7385205"
+   d="scan'208";a="7385222"
 Received: from wasp.igk.intel.com (HELO GK3153-DR2-R750-36946.localdomain.com) ([10.102.20.192])
-  by fmviesa003.fm.intel.com with ESMTP; 12 Feb 2024 23:23:11 -0800
+  by fmviesa003.fm.intel.com with ESMTP; 12 Feb 2024 23:23:14 -0800
 From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
@@ -66,9 +66,9 @@ Cc: netdev@vger.kernel.org,
 	pio.raczynski@gmail.com,
 	Piotr Raczynski <piotr.raczynski@intel.com>,
 	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Subject: [iwl-next v1 02/15] ice: add new VSI type for subfunctions
-Date: Tue, 13 Feb 2024 08:27:11 +0100
-Message-ID: <20240213072724.77275-3-michal.swiatkowski@linux.intel.com>
+Subject: [iwl-next v1 03/15] ice: export ice ndo_ops functions
+Date: Tue, 13 Feb 2024 08:27:12 +0100
+Message-ID: <20240213072724.77275-4-michal.swiatkowski@linux.intel.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240213072724.77275-1-michal.swiatkowski@linux.intel.com>
 References: <20240213072724.77275-1-michal.swiatkowski@linux.intel.com>
@@ -82,217 +82,181 @@ Content-Transfer-Encoding: 8bit
 
 From: Piotr Raczynski <piotr.raczynski@intel.com>
 
-Add required plumbing for new VSI type dedicated to devlink subfunctions.
-Make sure that the vsi is properly configured and destroyed. Also allow
-loading XDP and AF_XDP sockets.
-
-The first implementation of devlink subfunctions supports only one Tx/Rx
-queue pair per given subfunction.
+Make some of the netdevice_ops functions visible from outside for
+another VSI type created netdev.
 
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
 Signed-off-by: Piotr Raczynski <piotr.raczynski@intel.com>
 Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_base.c    |  5 +++-
- drivers/net/ethernet/intel/ice/ice_dcb_lib.c |  1 +
- drivers/net/ethernet/intel/ice/ice_lib.c     | 25 ++++++++++++++++++--
- drivers/net/ethernet/intel/ice/ice_main.c    |  7 ++++--
- drivers/net/ethernet/intel/ice/ice_type.h    |  1 +
- drivers/net/ethernet/intel/ice/ice_xsk.c     |  2 +-
- 6 files changed, 35 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/intel/ice/ice.h      |  8 +++++
+ drivers/net/ethernet/intel/ice/ice_lib.c  | 22 ++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_lib.h  |  1 +
+ drivers/net/ethernet/intel/ice/ice_main.c | 37 ++++-------------------
+ 4 files changed, 37 insertions(+), 31 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
-index 79485c944c9d..8ca944d0fa51 100644
---- a/drivers/net/ethernet/intel/ice/ice_base.c
-+++ b/drivers/net/ethernet/intel/ice/ice_base.c
-@@ -331,6 +331,9 @@ ice_setup_tx_ctx(struct ice_tx_ring *ring, struct ice_tlan_ctx *tlan_ctx, u16 pf
- 		tlan_ctx->vmvf_num = hw->func_caps.vf_base_id + vsi->vf->vf_id;
- 		tlan_ctx->vmvf_type = ICE_TLAN_CTX_VMVF_TYPE_VF;
- 		break;
-+	case ICE_VSI_SF:
-+		tlan_ctx->vmvf_type = ICE_TLAN_CTX_VMVF_TYPE_VMQ;
-+		break;
- 	default:
- 		return;
- 	}
-@@ -527,7 +530,7 @@ static int ice_vsi_cfg_rxq(struct ice_rx_ring *ring)
+diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+index c4127d5f2be3..c40fc339a604 100644
+--- a/drivers/net/ethernet/intel/ice/ice.h
++++ b/drivers/net/ethernet/intel/ice/ice.h
+@@ -979,6 +979,14 @@ void ice_unload(struct ice_pf *pf);
+ void ice_adv_lnk_speed_maps_init(void);
+ int ice_init_dev(struct ice_pf *pf);
+ void ice_deinit_dev(struct ice_pf *pf);
++int ice_change_mtu(struct net_device *netdev, int new_mtu);
++void ice_tx_timeout(struct net_device *netdev, unsigned int txqueue);
++int ice_xdp(struct net_device *dev, struct netdev_bpf *xdp);
++void ice_set_netdev_features(struct net_device *netdev);
++int ice_vlan_rx_add_vid(struct net_device *netdev, __be16 proto, u16 vid);
++int ice_vlan_rx_kill_vid(struct net_device *netdev, __be16 proto, u16 vid);
++void ice_get_stats64(struct net_device *netdev,
++		     struct rtnl_link_stats64 *stats);
  
- 	ring->rx_buf_len = ring->vsi->rx_buf_len;
- 
--	if (ring->vsi->type == ICE_VSI_PF) {
-+	if (ring->vsi->type == ICE_VSI_PF || ring->vsi->type == ICE_VSI_SF) {
- 		if (!xdp_rxq_info_is_reg(&ring->xdp_rxq)) {
- 			err = __xdp_rxq_info_reg(&ring->xdp_rxq, ring->netdev,
- 						 ring->q_index,
-diff --git a/drivers/net/ethernet/intel/ice/ice_dcb_lib.c b/drivers/net/ethernet/intel/ice/ice_dcb_lib.c
-index ceb17c004d79..63ce4920de4e 100644
---- a/drivers/net/ethernet/intel/ice/ice_dcb_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_dcb_lib.c
-@@ -187,6 +187,7 @@ void ice_vsi_set_dcb_tc_cfg(struct ice_vsi *vsi)
- 		vsi->tc_cfg.numtc = ice_dcb_get_num_tc(cfg);
- 		break;
- 	case ICE_VSI_CHNL:
-+	case ICE_VSI_SF:
- 		vsi->tc_cfg.ena_tc = BIT(ice_get_first_droptc(vsi));
- 		vsi->tc_cfg.numtc = 1;
- 		break;
+ /**
+  * ice_set_rdma_cap - enable RDMA support
 diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index b2d7e3c0edcc..572d9b345f66 100644
+index 572d9b345f66..8706d0589caa 100644
 --- a/drivers/net/ethernet/intel/ice/ice_lib.c
 +++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -20,6 +20,8 @@ const char *ice_vsi_type_str(enum ice_vsi_type vsi_type)
- 		return "ICE_VSI_PF";
- 	case ICE_VSI_VF:
- 		return "ICE_VSI_VF";
-+	case ICE_VSI_SF:
-+		return "ICE_VSI_SF";
- 	case ICE_VSI_CTRL:
- 		return "ICE_VSI_CTRL";
- 	case ICE_VSI_CHNL:
-@@ -141,6 +143,7 @@ static void ice_vsi_set_num_desc(struct ice_vsi *vsi)
- {
- 	switch (vsi->type) {
- 	case ICE_VSI_PF:
-+	case ICE_VSI_SF:
- 	case ICE_VSI_CTRL:
- 	case ICE_VSI_LB:
- 		/* a user could change the values of num_[tr]x_desc using
-@@ -207,6 +210,12 @@ static void ice_vsi_set_num_qs(struct ice_vsi *vsi)
- 					   max_t(int, vsi->alloc_rxq,
- 						 vsi->alloc_txq));
- 		break;
-+	case ICE_VSI_SF:
-+		vsi->alloc_txq = 1;
-+		vsi->alloc_rxq = 1;
-+		vsi->num_q_vectors = 1;
-+		vsi->irq_dyn_alloc = true;
-+		break;
- 	case ICE_VSI_VF:
- 		if (vf->num_req_qs)
- 			vf->num_vf_qs = vf->num_req_qs;
-@@ -566,6 +575,7 @@ ice_vsi_alloc_def(struct ice_vsi *vsi, struct ice_channel *ch)
+@@ -2812,6 +2812,28 @@ void ice_vsi_set_napi_queues(struct ice_vsi *vsi, bool locked)
+ 		ice_q_vector_set_napi_queues(vsi->q_vectors[i], locked);
+ }
  
- 	switch (vsi->type) {
- 	case ICE_VSI_PF:
-+	case ICE_VSI_SF:
- 		/* Setup default MSIX irq handler for VSI */
- 		vsi->irq_handler = ice_msix_clean_rings;
- 		break;
-@@ -894,6 +904,11 @@ static void ice_vsi_set_rss_params(struct ice_vsi *vsi)
- 					      max_rss_size);
- 		vsi->rss_lut_type = ICE_LUT_PF;
- 		break;
-+	case ICE_VSI_SF:
-+		vsi->rss_table_size = ICE_LUT_VSI_SIZE;
-+		vsi->rss_size = min_t(u16, num_online_cpus(), max_rss_size);
-+		vsi->rss_lut_type = ICE_LUT_VSI;
-+		break;
- 	case ICE_VSI_VF:
- 		/* VF VSI will get a small RSS table.
- 		 * For VSI_LUT, LUT size should be set to 64 bytes.
-@@ -1141,6 +1156,7 @@ static void ice_set_rss_vsi_ctx(struct ice_vsi_ctx *ctxt, struct ice_vsi *vsi)
- 		lut_type = ICE_AQ_VSI_Q_OPT_RSS_LUT_PF;
- 		break;
- 	case ICE_VSI_VF:
-+	case ICE_VSI_SF:
- 		/* VF VSI will gets a small RSS table which is a VSI LUT type */
- 		lut_type = ICE_AQ_VSI_Q_OPT_RSS_LUT_VSI;
- 		break;
-@@ -1219,6 +1235,7 @@ static int ice_vsi_init(struct ice_vsi *vsi, u32 vsi_flags)
- 	case ICE_VSI_PF:
- 		ctxt->flags = ICE_AQ_VSI_TYPE_PF;
- 		break;
-+	case ICE_VSI_SF:
- 	case ICE_VSI_CHNL:
- 		ctxt->flags = ICE_AQ_VSI_TYPE_VMDQ2;
- 		break;
-@@ -2063,6 +2080,7 @@ static void ice_set_agg_vsi(struct ice_vsi *vsi)
- 	case ICE_VSI_CHNL:
- 	case ICE_VSI_LB:
- 	case ICE_VSI_PF:
-+	case ICE_VSI_SF:
- 		max_agg_nodes = ICE_MAX_PF_AGG_NODES;
- 		agg_node_id_start = ICE_PF_AGG_NODE_ID_START;
- 		agg_node_iter = &pf->pf_agg_node[0];
-@@ -2234,6 +2252,7 @@ ice_vsi_cfg_def(struct ice_vsi *vsi, struct ice_vsi_cfg_params *params)
++/**
++ * ice_napi_add - register NAPI handler for the VSI
++ * @vsi: VSI for which NAPI handler is to be registered
++ *
++ * This function is only called in the driver's load path. Registering the NAPI
++ * handler is done in ice_vsi_alloc_q_vector() for all other cases (i.e. resume,
++ * reset/rebuild, etc.)
++ */
++void ice_napi_add(struct ice_vsi *vsi)
++{
++	int v_idx;
++
++	if (!vsi->netdev)
++		return;
++
++	ice_for_each_q_vector(vsi, v_idx) {
++		netif_napi_add(vsi->netdev, &vsi->q_vectors[v_idx]->napi,
++			       ice_napi_poll);
++		ice_q_vector_set_napi_queues(vsi->q_vectors[v_idx], false);
++	}
++}
++
+ /**
+  * ice_vsi_release - Delete a VSI and free its resources
+  * @vsi: the VSI being removed
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.h b/drivers/net/ethernet/intel/ice/ice_lib.h
+index 0c77d581416a..aa3a85d31f95 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.h
++++ b/drivers/net/ethernet/intel/ice/ice_lib.h
+@@ -84,6 +84,7 @@ ice_vsi_setup(struct ice_pf *pf, struct ice_vsi_cfg_params *params);
+ void ice_q_vector_set_napi_queues(struct ice_q_vector *q_vector, bool locked);
  
- 	switch (vsi->type) {
- 	case ICE_VSI_CTRL:
-+	case ICE_VSI_SF:
- 	case ICE_VSI_PF:
- 		ret = ice_vsi_alloc_q_vectors(vsi);
- 		if (ret)
-@@ -2625,7 +2644,8 @@ int ice_ena_vsi(struct ice_vsi *vsi, bool locked)
+ void ice_vsi_set_napi_queues(struct ice_vsi *vsi, bool locked);
++void ice_napi_add(struct ice_vsi *vsi);
  
- 	clear_bit(ICE_VSI_NEEDS_RESTART, vsi->state);
+ int ice_vsi_release(struct ice_vsi *vsi);
  
--	if (vsi->netdev && vsi->type == ICE_VSI_PF) {
-+	if (vsi->netdev && (vsi->type == ICE_VSI_PF ||
-+			    vsi->type == ICE_VSI_SF)) {
- 		if (netif_running(vsi->netdev)) {
- 			if (!locked)
- 				rtnl_lock();
-@@ -2654,7 +2674,8 @@ void ice_dis_vsi(struct ice_vsi *vsi, bool locked)
- 
- 	set_bit(ICE_VSI_NEEDS_RESTART, vsi->state);
- 
--	if (vsi->type == ICE_VSI_PF && vsi->netdev) {
-+	if (vsi->netdev && (vsi->type == ICE_VSI_PF ||
-+			    vsi->type == ICE_VSI_SF)) {
- 		if (netif_running(vsi->netdev)) {
- 			if (!locked)
- 				rtnl_lock();
 diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index fbf1d56c50e9..ebab03b16596 100644
+index ebab03b16596..b0f6a11ae744 100644
 --- a/drivers/net/ethernet/intel/ice/ice_main.c
 +++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -2911,6 +2911,9 @@ int ice_vsi_determine_xdp_res(struct ice_vsi *vsi)
- 	if (avail < cpus / 2)
- 		return -ENOMEM;
- 
-+	if (vsi->type == ICE_VSI_SF)
-+		avail = vsi->alloc_txq;
-+
- 	vsi->num_xdp_txq = min_t(u16, avail, cpus);
- 
- 	if (vsi->num_xdp_txq < cpus)
-@@ -3026,8 +3029,8 @@ static int ice_xdp(struct net_device *dev, struct netdev_bpf *xdp)
+@@ -3024,7 +3024,7 @@ static int ice_xdp_safe_mode(struct net_device __always_unused *dev,
+  * @dev: netdevice
+  * @xdp: XDP command
+  */
+-static int ice_xdp(struct net_device *dev, struct netdev_bpf *xdp)
++int ice_xdp(struct net_device *dev, struct netdev_bpf *xdp)
+ {
  	struct ice_netdev_priv *np = netdev_priv(dev);
  	struct ice_vsi *vsi = np->vsi;
+@@ -3483,28 +3483,6 @@ static int ice_req_irq_msix_misc(struct ice_pf *pf)
+ 	return 0;
+ }
  
--	if (vsi->type != ICE_VSI_PF) {
--		NL_SET_ERR_MSG_MOD(xdp->extack, "XDP can be loaded only on PF VSI");
-+	if (vsi->type != ICE_VSI_PF && vsi->type != ICE_VSI_SF) {
-+		NL_SET_ERR_MSG_MOD(xdp->extack, "XDP can be loaded only on PF or SF VSI");
- 		return -EINVAL;
- 	}
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index 32386aecd6c5..636c30487cc8 100644
---- a/drivers/net/ethernet/intel/ice/ice_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -150,6 +150,7 @@ enum ice_vsi_type {
- 	ICE_VSI_CTRL = 3,	/* equates to ICE_VSI_PF with 1 queue pair */
- 	ICE_VSI_CHNL = 4,
- 	ICE_VSI_LB = 6,
-+	ICE_VSI_SF = 9,
- };
- 
- struct ice_link_status {
-diff --git a/drivers/net/ethernet/intel/ice/ice_xsk.c b/drivers/net/ethernet/intel/ice/ice_xsk.c
-index 8a051420fa19..fe1726526e4f 100644
---- a/drivers/net/ethernet/intel/ice/ice_xsk.c
-+++ b/drivers/net/ethernet/intel/ice/ice_xsk.c
-@@ -287,7 +287,7 @@ ice_xsk_pool_enable(struct ice_vsi *vsi, struct xsk_buff_pool *pool, u16 qid)
+-/**
+- * ice_napi_add - register NAPI handler for the VSI
+- * @vsi: VSI for which NAPI handler is to be registered
+- *
+- * This function is only called in the driver's load path. Registering the NAPI
+- * handler is done in ice_vsi_alloc_q_vector() for all other cases (i.e. resume,
+- * reset/rebuild, etc.)
+- */
+-static void ice_napi_add(struct ice_vsi *vsi)
+-{
+-	int v_idx;
+-
+-	if (!vsi->netdev)
+-		return;
+-
+-	ice_for_each_q_vector(vsi, v_idx) {
+-		netif_napi_add(vsi->netdev, &vsi->q_vectors[v_idx]->napi,
+-			       ice_napi_poll);
+-		ice_q_vector_set_napi_queues(vsi->q_vectors[v_idx], false);
+-	}
+-}
+-
+ /**
+  * ice_set_ops - set netdev and ethtools ops for the given netdev
+  * @vsi: the VSI associated with the new netdev
+@@ -3538,7 +3516,7 @@ static void ice_set_ops(struct ice_vsi *vsi)
+  * ice_set_netdev_features - set features for the given netdev
+  * @netdev: netdev instance
+  */
+-static void ice_set_netdev_features(struct net_device *netdev)
++void ice_set_netdev_features(struct net_device *netdev)
  {
- 	int err;
- 
--	if (vsi->type != ICE_VSI_PF)
-+	if (vsi->type != ICE_VSI_PF && vsi->type != ICE_VSI_SF)
- 		return -EINVAL;
- 
- 	if (qid >= vsi->netdev->real_num_rx_queues ||
+ 	struct ice_pf *pf = ice_netdev_to_pf(netdev);
+ 	bool is_dvm_ena = ice_is_dvm_ena(&pf->hw);
+@@ -3720,8 +3698,7 @@ ice_lb_vsi_setup(struct ice_pf *pf, struct ice_port_info *pi)
+  *
+  * net_device_ops implementation for adding VLAN IDs
+  */
+-static int
+-ice_vlan_rx_add_vid(struct net_device *netdev, __be16 proto, u16 vid)
++int ice_vlan_rx_add_vid(struct net_device *netdev, __be16 proto, u16 vid)
+ {
+ 	struct ice_netdev_priv *np = netdev_priv(netdev);
+ 	struct ice_vsi_vlan_ops *vlan_ops;
+@@ -3783,8 +3760,7 @@ ice_vlan_rx_add_vid(struct net_device *netdev, __be16 proto, u16 vid)
+  *
+  * net_device_ops implementation for removing VLAN IDs
+  */
+-static int
+-ice_vlan_rx_kill_vid(struct net_device *netdev, __be16 proto, u16 vid)
++int ice_vlan_rx_kill_vid(struct net_device *netdev, __be16 proto, u16 vid)
+ {
+ 	struct ice_netdev_priv *np = netdev_priv(netdev);
+ 	struct ice_vsi_vlan_ops *vlan_ops;
+@@ -6945,7 +6921,6 @@ void ice_update_pf_stats(struct ice_pf *pf)
+  * @netdev: network interface device structure
+  * @stats: main device statistics structure
+  */
+-static
+ void ice_get_stats64(struct net_device *netdev, struct rtnl_link_stats64 *stats)
+ {
+ 	struct ice_netdev_priv *np = netdev_priv(netdev);
+@@ -7574,7 +7549,7 @@ static void ice_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
+  *
+  * Returns 0 on success, negative on failure
+  */
+-static int ice_change_mtu(struct net_device *netdev, int new_mtu)
++int ice_change_mtu(struct net_device *netdev, int new_mtu)
+ {
+ 	struct ice_netdev_priv *np = netdev_priv(netdev);
+ 	struct ice_vsi *vsi = np->vsi;
+@@ -7999,7 +7974,7 @@ ice_bridge_setlink(struct net_device *dev, struct nlmsghdr *nlh,
+  * @netdev: network interface device structure
+  * @txqueue: Tx queue
+  */
+-static void ice_tx_timeout(struct net_device *netdev, unsigned int txqueue)
++void ice_tx_timeout(struct net_device *netdev, unsigned int txqueue)
+ {
+ 	struct ice_netdev_priv *np = netdev_priv(netdev);
+ 	struct ice_tx_ring *tx_ring = NULL;
 -- 
 2.42.0
 
