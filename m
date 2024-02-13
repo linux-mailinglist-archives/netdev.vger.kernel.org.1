@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-71218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67C208529E7
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 08:31:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D123B8529E9
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 08:32:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D21DE1F2191A
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 07:31:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40A191F2173A
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 07:32:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B58D41799D;
-	Tue, 13 Feb 2024 07:31:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6847917983;
+	Tue, 13 Feb 2024 07:31:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eukhh4ke"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="A4ZW744i"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B38E17597
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 07:31:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71D7D17980
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 07:31:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707809474; cv=none; b=BnL4RLzrrKvdTH+TiVQoHHbSvM+fSVr1lPAslbvhvOHgCn7gN5s6ktdNlhNSoRjwWhP8rPJzL9MzXw5A6iNhIaqYJ8Wo4B5LOksLkXUsQ0bx0O5UAh6CveouJ1X/OmNz2kQONvgQuo1SvIYwLNdgd1FfwD8sp/7NBEmGAWkpSJ0=
+	t=1707809476; cv=none; b=RkfUVK9jGHwjr5ODO29jRr9px5KDcElrIJQzm1FG3yl71num4F6XboVVw87twPA6AnUeH38pY/GBIEvsf4i1hNj4zNgCH6vFafPf/1StPmvud7vsFnF+uZtywzMeFBiLfLNvZw3g9RtoZncFEG16g4IcPjbCJsubQY16sXpWl3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707809474; c=relaxed/simple;
-	bh=B55FnDYJcMX8cNbhPyRe0wM4Q8ZKYaV4fzW56DmFzB0=;
+	s=arc-20240116; t=1707809476; c=relaxed/simple;
+	bh=TKJwU3tjYvlT1dx+55WnAejq7LCxQD1+z0q00/DYutU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Zp5db5lgkE7CxoJxHHOZbxztMOsmtEkIa2tos9ZAvNjM7Dnn4hC1HG3ufFC5FDE3AIiIqH8Bz1r54vKmlT+iO4Cs3B913safke7qL6GNZVICLm2nzRxP6NiCf6q+D32fY2ojduRP2bKG+inhRb8MVGSAcxPZ/KXmGXjuOaSW3FU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eukhh4ke; arc=none smtp.client-ip=198.175.65.10
+	 MIME-Version; b=QSw5/dp3+xyfX2MbapuGqmDkmKJ7S2B9eEiqr5HLj2sPIxOPffU+bARkeui3FEytaselRLrLJHWQqS25Gzu0uSDeeOLTeIDq9dvG7zV7odizp4W7VeKumrv4zntR92YFPkWxnlt22mpmr0Q3dnpx04Dv6/obvI8LZJqHJr/4Kxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=A4ZW744i; arc=none smtp.client-ip=198.175.65.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707809473; x=1739345473;
+  t=1707809474; x=1739345474;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=B55FnDYJcMX8cNbhPyRe0wM4Q8ZKYaV4fzW56DmFzB0=;
-  b=eukhh4ke4j+RIR3eQahQApUwyi6r8TcVZXNQc8GKhhujKcnTSISSrEjF
-   MyEGRcX5L9vVhK/42LarhtFTggsvffQpwOE7hoHvdNlUnoYfosjkZCt4l
-   TOEC3JJs+jspuXIwfY67yEy2zwuaTYuM5mi3yEcuAFH1pwPci62Y9E9Is
-   kp7XlbK4ATxK/0vPI0di66BnhnUK1Bm/SwvXsS9iWWn3pvlV2+jbqZTp0
-   u/IZbiHtzzmwCgv5WXKlKViHyGyzRNXL5qQZwuNf6eVhuPN38/XKIeUqK
-   mU68CkKfr0hMBCUPZJF9j6zPG352V6hfq0oPsMGn1pIwxdwf8lPnEGChk
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="19219909"
+  bh=TKJwU3tjYvlT1dx+55WnAejq7LCxQD1+z0q00/DYutU=;
+  b=A4ZW744iFJ9x5po+07hc1vFIGj6/UHlyhLJwSsRAkcTqbnWJmgzC6pVh
+   xn/6QMw8jiYBDL+fplL0DFvAx7ZW89efDxU9d8LwOt5t5FHtXVps0tHIF
+   p59UVot3a6GoTMAnlyCmy+Bog7WfDlmdIQ6kxiP3zhz41xVFn0HXQm9ap
+   yEBrXUXc/VzBSKjmK63R2gJiwAOud0Rxx0A1UkrCAfqgAHIO4y6YHu71j
+   w7tYSuN8XdszS80OPHGK6LVg5tj5ZIS9EEoYk+XVnUdcvbOtLEp4WQWR4
+   UdwsDMFUGKMxu+bMHctzgCtFxNjOuv5pQbrpjxwQ2QmT7NRIJU1RmYJfw
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="19219925"
 X-IronPort-AV: E=Sophos;i="6.06,156,1705392000"; 
-   d="scan'208";a="19219909"
+   d="scan'208";a="19219925"
 Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 23:31:11 -0800
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 23:31:14 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,156,1705392000"; 
-   d="scan'208";a="2797556"
+   d="scan'208";a="2797560"
 Received: from wasp.igk.intel.com (HELO GK3153-DR2-R750-36946.localdomain.com) ([10.102.20.192])
-  by orviesa009.jf.intel.com with ESMTP; 12 Feb 2024 23:31:08 -0800
+  by orviesa009.jf.intel.com with ESMTP; 12 Feb 2024 23:31:11 -0800
 From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
@@ -66,11 +66,10 @@ Cc: netdev@vger.kernel.org,
 	wojciech.drewek@intel.com,
 	nex.sw.ncis.nat.hpm.dev@intel.com,
 	przemyslaw.kitszel@intel.com,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Jan Sokolowski <jan.sokolowski@intel.com>
-Subject: [iwl-next v1 6/7] ice: enable_rdma devlink param
-Date: Tue, 13 Feb 2024 08:35:08 +0100
-Message-ID: <20240213073509.77622-7-michal.swiatkowski@linux.intel.com>
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Subject: [iwl-next v1 7/7] ice: simplify VF MSI-X managing
+Date: Tue, 13 Feb 2024 08:35:09 +0100
+Message-ID: <20240213073509.77622-8-michal.swiatkowski@linux.intel.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240213073509.77622-1-michal.swiatkowski@linux.intel.com>
 References: <20240213073509.77622-1-michal.swiatkowski@linux.intel.com>
@@ -82,146 +81,508 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Implement enable_rdma devlink parameter to allow user to turn RDMA
-feature on and off.
+After implementing pf->msix.max field, base vector for other use cases
+(like VFs) can be fixed. This simplify code when changing MSI-X amount
+on particular VF, because there is no need to move a base vector.
 
-It is useful when there is no enough interrupts and user doesn't need
-RDMA feature.
+A fixed base vector allows to reserve vectors from the beginning
+instead of from the end, which is also simpler in code.
 
-Reviewed-by: Jan Sokolowski <jan.sokolowski@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Store total and rest value in the same struct as max and min for PF.
+Move tracking vectors from ice_sriov.c to ice_irq.c as it can be also
+use for other none PF use cases (SIOV).
+
 Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_devlink.c | 32 ++++++++++++++++++--
- drivers/net/ethernet/intel/ice/ice_lib.c     |  8 ++++-
- drivers/net/ethernet/intel/ice/ice_main.c    | 18 +++++------
- 3 files changed, 45 insertions(+), 13 deletions(-)
+ drivers/net/ethernet/intel/ice/ice.h       |  10 +-
+ drivers/net/ethernet/intel/ice/ice_irq.c   |  79 +++++++----
+ drivers/net/ethernet/intel/ice/ice_irq.h   |  13 +-
+ drivers/net/ethernet/intel/ice/ice_sriov.c | 153 ++-------------------
+ 4 files changed, 80 insertions(+), 175 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/ice_devlink.c
-index b82ff9556a4b..4f048268db72 100644
---- a/drivers/net/ethernet/intel/ice/ice_devlink.c
-+++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
-@@ -1675,6 +1675,19 @@ ice_devlink_msix_min_pf_validate(struct devlink *devlink, u32 id,
- 	return 0;
+diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+index 1f4d31549528..89afab4fbe50 100644
+--- a/drivers/net/ethernet/intel/ice/ice.h
++++ b/drivers/net/ethernet/intel/ice/ice.h
+@@ -538,6 +538,8 @@ struct ice_pf_msix {
+ 	u16 cur;
+ 	u16 min;
+ 	u16 max;
++	u16 total;
++	u16 rest;
+ };
+ 
+ struct ice_pf {
+@@ -553,13 +555,7 @@ struct ice_pf {
+ 	/* OS reserved IRQ details */
+ 	struct msix_entry *msix_entries;
+ 	struct ice_irq_tracker irq_tracker;
+-	/* First MSIX vector used by SR-IOV VFs. Calculated by subtracting the
+-	 * number of MSIX vectors needed for all SR-IOV VFs from the number of
+-	 * MSIX vectors allowed on this PF.
+-	 */
+-	u16 sriov_base_vector;
+-	unsigned long *sriov_irq_bm;	/* bitmap to track irq usage */
+-	u16 sriov_irq_size;		/* size of the irq_bm bitmap */
++	struct ice_virt_irq_tracker virt_irq_tracker;
+ 
+ 	u16 ctrl_vsi_idx;		/* control VSI index in pf->vsi array */
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_irq.c b/drivers/net/ethernet/intel/ice/ice_irq.c
+index f95f6e5987b7..41ca3829adef 100644
+--- a/drivers/net/ethernet/intel/ice/ice_irq.c
++++ b/drivers/net/ethernet/intel/ice/ice_irq.c
+@@ -20,6 +20,19 @@ ice_init_irq_tracker(struct ice_pf *pf, unsigned int max_vectors,
+ 	xa_init_flags(&pf->irq_tracker.entries, XA_FLAGS_ALLOC);
  }
  
-+static int ice_devlink_enable_rdma_validate(struct devlink *devlink, u32 id,
-+					    union devlink_param_value val,
-+					    struct netlink_ext_ack *extack)
++static int
++ice_init_virt_irq_tracker(struct ice_pf *pf, u16 base, u16 num_entries)
 +{
-+	struct ice_pf *pf = devlink_priv(devlink);
-+	bool new_state = val.vbool;
++	pf->virt_irq_tracker.bm = bitmap_zalloc(num_entries, GFP_KERNEL);
++	if (!pf->virt_irq_tracker.bm)
++		return -ENOMEM;
 +
-+	if (new_state && !test_bit(ICE_FLAG_RDMA_ENA, pf->flags))
-+		return -EOPNOTSUPP;
++	pf->virt_irq_tracker.num_entries = num_entries;
++	pf->virt_irq_tracker.base = base;
 +
 +	return 0;
 +}
 +
- static const struct devlink_param ice_devlink_params[] = {
- 	DEVLINK_PARAM_GENERIC(ENABLE_ROCE, BIT(DEVLINK_PARAM_CMODE_RUNTIME),
- 			      ice_devlink_enable_roce_get,
-@@ -1700,6 +1713,8 @@ static const struct devlink_param ice_devlink_params[] = {
- 			      ice_devlink_msix_min_pf_get,
- 			      ice_devlink_msix_min_pf_set,
- 			      ice_devlink_msix_min_pf_validate),
-+	DEVLINK_PARAM_GENERIC(ENABLE_RDMA, BIT(DEVLINK_PARAM_CMODE_DRIVERINIT),
-+			      NULL, NULL, ice_devlink_enable_rdma_validate),
- };
- 
- static void ice_devlink_free(void *devlink_ptr)
-@@ -1776,9 +1791,22 @@ ice_devlink_set_switch_id(struct ice_pf *pf, struct netdev_phys_item_id *ppid)
- int ice_devlink_register_params(struct ice_pf *pf)
- {
- 	struct devlink *devlink = priv_to_devlink(pf);
-+	union devlink_param_value value;
-+	int err;
-+
-+	err = devlink_params_register(devlink, ice_devlink_params,
-+				      ARRAY_SIZE(ice_devlink_params));
-+	if (err)
-+		return err;
- 
--	return devlink_params_register(devlink, ice_devlink_params,
--				       ARRAY_SIZE(ice_devlink_params));
-+	devl_lock(devlink);
-+	value.vbool = test_bit(ICE_FLAG_RDMA_ENA, pf->flags);
-+	devl_param_driverinit_value_set(devlink,
-+					DEVLINK_PARAM_GENERIC_ID_ENABLE_RDMA,
-+					value);
-+	devl_unlock(devlink);
-+
-+	return 0;
+ /**
+  * ice_deinit_irq_tracker - free xarray tracker
+  * @pf: board private structure
+@@ -29,6 +42,11 @@ static void ice_deinit_irq_tracker(struct ice_pf *pf)
+ 	xa_destroy(&pf->irq_tracker.entries);
  }
  
- void ice_devlink_unregister_params(struct ice_pf *pf)
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index a30d2d2b51c1..4d5c3d699044 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -829,7 +829,13 @@ bool ice_is_safe_mode(struct ice_pf *pf)
-  */
- bool ice_is_rdma_ena(struct ice_pf *pf)
- {
--	return test_bit(ICE_FLAG_RDMA_ENA, pf->flags);
-+	union devlink_param_value value;
-+	int err;
++static void ice_deinit_virt_irq_tracker(struct ice_pf *pf)
++{
++	bitmap_free(pf->virt_irq_tracker.bm);
++}
 +
-+	err = devl_param_driverinit_value_get(priv_to_devlink(pf),
-+					      DEVLINK_PARAM_GENERIC_ID_ENABLE_RDMA,
-+					      &value);
-+	return err ? false : value.vbool;
+ /**
+  * ice_free_irq_res - free a block of resources
+  * @pf: board private structure
+@@ -93,6 +111,7 @@ void ice_clear_interrupt_scheme(struct ice_pf *pf)
+ {
+ 	pci_free_irq_vectors(pf->pdev);
+ 	ice_deinit_irq_tracker(pf);
++	ice_deinit_virt_irq_tracker(pf);
  }
  
  /**
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 824732f16112..4dd59d888ec7 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -5177,23 +5177,21 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
- 	if (err)
- 		goto err_init;
+@@ -105,10 +124,13 @@ int ice_init_interrupt_scheme(struct ice_pf *pf)
+ 	int vectors;
  
-+	err = ice_init_devlink(pf);
-+	if (err)
-+		goto err_init_devlink;
+ 	/* load default PF MSI-X range */
+-	if (!pf->msix.min)
++	if (!pf->msix.total) {
+ 		pf->msix.min = ICE_MIN_MSIX;
+-	if (!pf->msix.max)
+ 		pf->msix.max = total_vectors / 2;
++	}
 +
- 	devl_lock(priv_to_devlink(pf));
- 	err = ice_load(pf);
- 	devl_unlock(priv_to_devlink(pf));
- 	if (err)
- 		goto err_load;
++	pf->msix.total = total_vectors;
++	pf->msix.rest = total_vectors - pf->msix.max;
  
--	err = ice_init_devlink(pf);
--	if (err)
--		goto err_init_devlink;
+ 	if (pci_msix_can_alloc_dyn(pf->pdev))
+ 		vectors = pf->msix.min;
+@@ -122,7 +144,7 @@ int ice_init_interrupt_scheme(struct ice_pf *pf)
+ 
+ 	ice_init_irq_tracker(pf, pf->msix.max, vectors);
+ 
+-	return 0;
++	return ice_init_virt_irq_tracker(pf, pf->msix.max, pf->msix.rest);
+ }
+ 
+ /**
+@@ -149,7 +171,6 @@ int ice_init_interrupt_scheme(struct ice_pf *pf)
+  */
+ struct msi_map ice_alloc_irq(struct ice_pf *pf, bool dyn_allowed)
+ {
+-	int sriov_base_vector = pf->sriov_base_vector;
+ 	struct msi_map map = { .index = -ENOENT };
+ 	struct device *dev = ice_pf_to_dev(pf);
+ 	struct ice_irq_entry *entry;
+@@ -158,10 +179,6 @@ struct msi_map ice_alloc_irq(struct ice_pf *pf, bool dyn_allowed)
+ 	if (!entry)
+ 		return map;
+ 
+-	/* fail if we're about to violate SRIOV vectors space */
+-	if (sriov_base_vector && entry->index >= sriov_base_vector)
+-		goto exit_free_res;
 -
+ 	if (pci_msix_can_alloc_dyn(pf->pdev) && entry->dynamic) {
+ 		map = pci_msix_alloc_irq_at(pf->pdev, entry->index, NULL);
+ 		if (map.index < 0)
+@@ -209,26 +226,40 @@ void ice_free_irq(struct ice_pf *pf, struct msi_map map)
+ }
+ 
+ /**
+- * ice_get_max_used_msix_vector - Get the max used interrupt vector
+- * @pf: board private structure
++ * ice_virt_get_irqs - get irqs for SR-IOV usacase
++ * @pf: pointer to PF structure
++ * @needed: number of irqs to get
+  *
+- * Return index of maximum used interrupt vectors with respect to the
+- * beginning of the MSIX table. Take into account that some interrupts
+- * may have been dynamically allocated after MSIX was initially enabled.
++ * This returns the first MSI-X vector index in PF space that is used by this
++ * VF. This index is used when accessing PF relative registers such as
++ * GLINT_VECT2FUNC and GLINT_DYN_CTL.
++ * This will always be the OICR index in the AVF driver so any functionality
++ * using vf->first_vector_idx for queue configuration_id: id of VF which will
++ * use this irqs
+  */
+-int ice_get_max_used_msix_vector(struct ice_pf *pf)
++int ice_virt_get_irqs(struct ice_pf *pf, u16 needed)
+ {
+-	unsigned long start, index, max_idx;
+-	void *entry;
++	int res = bitmap_find_next_zero_area(pf->virt_irq_tracker.bm,
++					     pf->virt_irq_tracker.num_entries,
++					     0, needed, 0);
+ 
+-	/* Treat all preallocated interrupts as used */
+-	start = pf->irq_tracker.num_static;
+-	max_idx = start - 1;
++	if (res >= pf->virt_irq_tracker.num_entries)
++		return -ENOENT;
+ 
+-	xa_for_each_start(&pf->irq_tracker.entries, index, entry, start) {
+-		if (index > max_idx)
+-			max_idx = index;
+-	}
++	bitmap_set(pf->virt_irq_tracker.bm, res, needed);
+ 
+-	return max_idx;
++	/* conversion from number in bitmap to global irq index */
++	return res + pf->virt_irq_tracker.base;
++}
++
++/**
++ * ice_virt_free_irqs - free irqs used by the VF
++ * @pf: pointer to PF structure
++ * @index: first index to be free
++ * @irqs: number of irqs to free
++ */
++void ice_virt_free_irqs(struct ice_pf *pf, u16 index, u16 irqs)
++{
++	bitmap_clear(pf->virt_irq_tracker.bm, index - pf->virt_irq_tracker.base,
++		     irqs);
+ }
+diff --git a/drivers/net/ethernet/intel/ice/ice_irq.h b/drivers/net/ethernet/intel/ice/ice_irq.h
+index f35efc08575e..d5e0fdd9b535 100644
+--- a/drivers/net/ethernet/intel/ice/ice_irq.h
++++ b/drivers/net/ethernet/intel/ice/ice_irq.h
+@@ -15,11 +15,22 @@ struct ice_irq_tracker {
+ 	u16 num_static;	/* preallocated entries */
+ };
+ 
++struct ice_virt_irq_tracker {
++	unsigned long *bm;	/* bitmap to track irq usage */
++	u16 num_entries;
++	/* First MSIX vector used by SR-IOV VFs. Calculated by subtracting the
++	 * number of MSIX vectors needed for all SR-IOV VFs from the number of
++	 * MSIX vectors allowed on this PF.
++	 */
++	u16 base;
++};
++
+ int ice_init_interrupt_scheme(struct ice_pf *pf);
+ void ice_clear_interrupt_scheme(struct ice_pf *pf);
+ 
+ struct msi_map ice_alloc_irq(struct ice_pf *pf, bool dyn_only);
+ void ice_free_irq(struct ice_pf *pf, struct msi_map map);
+-int ice_get_max_used_msix_vector(struct ice_pf *pf);
+ 
++int ice_virt_get_irqs(struct ice_pf *pf, u16 needed);
++void ice_virt_free_irqs(struct ice_pf *pf, u16 index, u16 irqs);
+ #endif
+diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
+index 706b5ee8ec89..48e78379518c 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sriov.c
++++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
+@@ -122,27 +122,6 @@ static void ice_dis_vf_mappings(struct ice_vf *vf)
+ 		dev_err(dev, "Scattered mode for VF Rx queues is not yet implemented\n");
+ }
+ 
+-/**
+- * ice_sriov_free_msix_res - Reset/free any used MSIX resources
+- * @pf: pointer to the PF structure
+- *
+- * Since no MSIX entries are taken from the pf->irq_tracker then just clear
+- * the pf->sriov_base_vector.
+- *
+- * Returns 0 on success, and -EINVAL on error.
+- */
+-static int ice_sriov_free_msix_res(struct ice_pf *pf)
+-{
+-	if (!pf)
+-		return -EINVAL;
+-
+-	bitmap_free(pf->sriov_irq_bm);
+-	pf->sriov_irq_size = 0;
+-	pf->sriov_base_vector = 0;
+-
+-	return 0;
+-}
+-
+ /**
+  * ice_free_vfs - Free all VFs
+  * @pf: pointer to the PF structure
+@@ -177,6 +156,7 @@ void ice_free_vfs(struct ice_pf *pf)
+ 
+ 		ice_eswitch_detach(pf, vf);
+ 		ice_dis_vf_qs(vf);
++		ice_virt_free_irqs(pf, vf->first_vector_idx, vf->num_msix);
+ 
+ 		if (test_bit(ICE_VF_STATE_INIT, vf->vf_states)) {
+ 			/* disable VF qp mappings and set VF disable state */
+@@ -199,9 +179,6 @@ void ice_free_vfs(struct ice_pf *pf)
+ 		mutex_unlock(&vf->cfg_lock);
+ 	}
+ 
+-	if (ice_sriov_free_msix_res(pf))
+-		dev_err(dev, "Failed to free MSIX resources used by SR-IOV\n");
+-
+ 	vfs->num_qps_per = 0;
+ 	ice_free_vf_entries(pf);
+ 
+@@ -370,40 +347,6 @@ int ice_calc_vf_reg_idx(struct ice_vf *vf, struct ice_q_vector *q_vector)
+ 	return vf->first_vector_idx + q_vector->v_idx + 1;
+ }
+ 
+-/**
+- * ice_sriov_set_msix_res - Set any used MSIX resources
+- * @pf: pointer to PF structure
+- * @num_msix_needed: number of MSIX vectors needed for all SR-IOV VFs
+- *
+- * This function allows SR-IOV resources to be taken from the end of the PF's
+- * allowed HW MSIX vectors so that the irq_tracker will not be affected. We
+- * just set the pf->sriov_base_vector and return success.
+- *
+- * If there are not enough resources available, return an error. This should
+- * always be caught by ice_set_per_vf_res().
+- *
+- * Return 0 on success, and -EINVAL when there are not enough MSIX vectors
+- * in the PF's space available for SR-IOV.
+- */
+-static int ice_sriov_set_msix_res(struct ice_pf *pf, u16 num_msix_needed)
+-{
+-	u16 total_vectors = pf->hw.func_caps.common_cap.num_msix_vectors;
+-	int vectors_used = ice_get_max_used_msix_vector(pf);
+-	int sriov_base_vector;
+-
+-	sriov_base_vector = total_vectors - num_msix_needed;
+-
+-	/* make sure we only grab irq_tracker entries from the list end and
+-	 * that we have enough available MSIX vectors
+-	 */
+-	if (sriov_base_vector < vectors_used)
+-		return -EINVAL;
+-
+-	pf->sriov_base_vector = sriov_base_vector;
+-
+-	return 0;
+-}
+-
+ /**
+  * ice_set_per_vf_res - check if vectors and queues are available
+  * @pf: pointer to the PF structure
+@@ -428,11 +371,9 @@ static int ice_sriov_set_msix_res(struct ice_pf *pf, u16 num_msix_needed)
+  */
+ static int ice_set_per_vf_res(struct ice_pf *pf, u16 num_vfs)
+ {
+-	int vectors_used = ice_get_max_used_msix_vector(pf);
+ 	u16 num_msix_per_vf, num_txq, num_rxq, avail_qs;
+ 	int msix_avail_per_vf, msix_avail_for_sriov;
+ 	struct device *dev = ice_pf_to_dev(pf);
+-	int err;
+ 
+ 	lockdep_assert_held(&pf->vfs.table_lock);
+ 
+@@ -440,8 +381,7 @@ static int ice_set_per_vf_res(struct ice_pf *pf, u16 num_vfs)
+ 		return -EINVAL;
+ 
+ 	/* determine MSI-X resources per VF */
+-	msix_avail_for_sriov = pf->hw.func_caps.common_cap.num_msix_vectors -
+-		vectors_used;
++	msix_avail_for_sriov = pf->virt_irq_tracker.num_entries;
+ 	msix_avail_per_vf = msix_avail_for_sriov / num_vfs;
+ 	if (msix_avail_per_vf >= ICE_NUM_VF_MSIX_MED) {
+ 		num_msix_per_vf = ICE_NUM_VF_MSIX_MED;
+@@ -480,13 +420,6 @@ static int ice_set_per_vf_res(struct ice_pf *pf, u16 num_vfs)
+ 		return -ENOSPC;
+ 	}
+ 
+-	err = ice_sriov_set_msix_res(pf, num_msix_per_vf * num_vfs);
+-	if (err) {
+-		dev_err(dev, "Unable to set MSI-X resources for %d VFs, err %d\n",
+-			num_vfs, err);
+-		return err;
+-	}
+-
+ 	/* only allow equal Tx/Rx queue count (i.e. queue pairs) */
+ 	pf->vfs.num_qps_per = min_t(int, num_txq, num_rxq);
+ 	pf->vfs.num_msix_per = num_msix_per_vf;
+@@ -496,52 +429,6 @@ static int ice_set_per_vf_res(struct ice_pf *pf, u16 num_vfs)
  	return 0;
+ }
  
--err_init_devlink:
--	devl_lock(priv_to_devlink(pf));
--	ice_unload(pf);
--	devl_unlock(priv_to_devlink(pf));
- err_load:
-+	ice_deinit_devlink(pf);
-+err_init_devlink:
- 	ice_deinit(pf);
- err_init:
- 	pci_disable_device(pdev);
-@@ -5290,12 +5288,12 @@ static void ice_remove(struct pci_dev *pdev)
- 	if (!ice_is_safe_mode(pf))
- 		ice_remove_arfs(pf);
- 
--	ice_deinit_devlink(pf);
+-/**
+- * ice_sriov_get_irqs - get irqs for SR-IOV usacase
+- * @pf: pointer to PF structure
+- * @needed: number of irqs to get
+- *
+- * This returns the first MSI-X vector index in PF space that is used by this
+- * VF. This index is used when accessing PF relative registers such as
+- * GLINT_VECT2FUNC and GLINT_DYN_CTL.
+- * This will always be the OICR index in the AVF driver so any functionality
+- * using vf->first_vector_idx for queue configuration_id: id of VF which will
+- * use this irqs
+- *
+- * Only SRIOV specific vectors are tracked in sriov_irq_bm. SRIOV vectors are
+- * allocated from the end of global irq index. First bit in sriov_irq_bm means
+- * last irq index etc. It simplifies extension of SRIOV vectors.
+- * They will be always located from sriov_base_vector to the last irq
+- * index. While increasing/decreasing sriov_base_vector can be moved.
+- */
+-static int ice_sriov_get_irqs(struct ice_pf *pf, u16 needed)
+-{
+-	int res = bitmap_find_next_zero_area(pf->sriov_irq_bm,
+-					     pf->sriov_irq_size, 0, needed, 0);
+-	/* conversion from number in bitmap to global irq index */
+-	int index = pf->sriov_irq_size - res - needed;
 -
- 	devl_lock(priv_to_devlink(pf));
- 	ice_unload(pf);
- 	devl_unlock(priv_to_devlink(pf));
+-	if (res >= pf->sriov_irq_size || index < pf->sriov_base_vector)
+-		return -ENOENT;
+-
+-	bitmap_set(pf->sriov_irq_bm, res, needed);
+-	return index;
+-}
+-
+-/**
+- * ice_sriov_free_irqs - free irqs used by the VF
+- * @pf: pointer to PF structure
+- * @vf: pointer to VF structure
+- */
+-static void ice_sriov_free_irqs(struct ice_pf *pf, struct ice_vf *vf)
+-{
+-	/* Move back from first vector index to first index in bitmap */
+-	int bm_i = pf->sriov_irq_size - vf->first_vector_idx - vf->num_msix;
+-
+-	bitmap_clear(pf->sriov_irq_bm, bm_i, vf->num_msix);
+-	vf->first_vector_idx = 0;
+-}
+-
+ /**
+  * ice_init_vf_vsi_res - initialize/setup VF VSI resources
+  * @vf: VF to initialize/setup the VSI for
+@@ -555,7 +442,7 @@ static int ice_init_vf_vsi_res(struct ice_vf *vf)
+ 	struct ice_vsi *vsi;
+ 	int err;
  
-+	ice_deinit_devlink(pf);
-+
- 	ice_deinit(pf);
- 	ice_vsi_release_all(pf);
+-	vf->first_vector_idx = ice_sriov_get_irqs(pf, vf->num_msix);
++	vf->first_vector_idx = ice_virt_get_irqs(pf, vf->num_msix);
+ 	if (vf->first_vector_idx < 0)
+ 		return -ENOMEM;
+ 
+@@ -860,16 +747,10 @@ static int ice_create_vf_entries(struct ice_pf *pf, u16 num_vfs)
+  */
+ static int ice_ena_vfs(struct ice_pf *pf, u16 num_vfs)
+ {
+-	int total_vectors = pf->hw.func_caps.common_cap.num_msix_vectors;
+ 	struct device *dev = ice_pf_to_dev(pf);
+ 	struct ice_hw *hw = &pf->hw;
+ 	int ret;
+ 
+-	pf->sriov_irq_bm = bitmap_zalloc(total_vectors, GFP_KERNEL);
+-	if (!pf->sriov_irq_bm)
+-		return -ENOMEM;
+-	pf->sriov_irq_size = total_vectors;
+-
+ 	/* Disable global interrupt 0 so we don't try to handle the VFLR. */
+ 	wr32(hw, GLINT_DYN_CTL(pf->oicr_irq.index),
+ 	     ICE_ITR_NONE << GLINT_DYN_CTL_ITR_INDX_S);
+@@ -922,7 +803,6 @@ static int ice_ena_vfs(struct ice_pf *pf, u16 num_vfs)
+ 	/* rearm interrupts here */
+ 	ice_irq_dynamic_ena(hw, NULL, NULL);
+ 	clear_bit(ICE_OICR_INTR_DIS, pf->state);
+-	bitmap_free(pf->sriov_irq_bm);
+ 	return ret;
+ }
+ 
+@@ -996,16 +876,7 @@ u32 ice_sriov_get_vf_total_msix(struct pci_dev *pdev)
+ {
+ 	struct ice_pf *pf = pci_get_drvdata(pdev);
+ 
+-	return pf->sriov_irq_size - ice_get_max_used_msix_vector(pf);
+-}
+-
+-static int ice_sriov_move_base_vector(struct ice_pf *pf, int move)
+-{
+-	if (pf->sriov_base_vector - move < ice_get_max_used_msix_vector(pf))
+-		return -ENOMEM;
+-
+-	pf->sriov_base_vector -= move;
+-	return 0;
++	return pf->virt_irq_tracker.num_entries;
+ }
+ 
+ static void ice_sriov_remap_vectors(struct ice_pf *pf, u16 restricted_id)
+@@ -1024,7 +895,8 @@ static void ice_sriov_remap_vectors(struct ice_pf *pf, u16 restricted_id)
+ 			continue;
+ 
+ 		ice_dis_vf_mappings(tmp_vf);
+-		ice_sriov_free_irqs(pf, tmp_vf);
++		ice_virt_free_irqs(pf, tmp_vf->first_vector_idx,
++				   tmp_vf->num_msix);
+ 
+ 		vf_ids[to_remap] = tmp_vf->vf_id;
+ 		to_remap += 1;
+@@ -1036,7 +908,7 @@ static void ice_sriov_remap_vectors(struct ice_pf *pf, u16 restricted_id)
+ 			continue;
+ 
+ 		tmp_vf->first_vector_idx =
+-			ice_sriov_get_irqs(pf, tmp_vf->num_msix);
++			ice_virt_get_irqs(pf, tmp_vf->num_msix);
+ 		/* there is no need to rebuild VSI as we are only changing the
+ 		 * vector indexes not amount of MSI-X or queues
+ 		 */
+@@ -1102,20 +974,15 @@ int ice_sriov_set_msix_vec_count(struct pci_dev *vf_dev, int msix_vec_count)
+ 	prev_msix = vf->num_msix;
+ 	prev_queues = vf->num_vf_qs;
+ 
+-	if (ice_sriov_move_base_vector(pf, msix_vec_count - prev_msix)) {
+-		ice_put_vf(vf);
+-		return -ENOSPC;
+-	}
+-
+ 	ice_dis_vf_mappings(vf);
+-	ice_sriov_free_irqs(pf, vf);
++	ice_virt_free_irqs(pf, vf->first_vector_idx, vf->num_msix);
+ 
+ 	/* Remap all VFs beside the one is now configured */
+ 	ice_sriov_remap_vectors(pf, vf->vf_id);
+ 
+ 	vf->num_msix = msix_vec_count;
+ 	vf->num_vf_qs = queues;
+-	vf->first_vector_idx = ice_sriov_get_irqs(pf, vf->num_msix);
++	vf->first_vector_idx = ice_virt_get_irqs(pf, vf->num_msix);
+ 	if (vf->first_vector_idx < 0)
+ 		goto unroll;
+ 
+@@ -1141,7 +1008,7 @@ int ice_sriov_set_msix_vec_count(struct pci_dev *vf_dev, int msix_vec_count)
+ 
+ 	vf->num_msix = prev_msix;
+ 	vf->num_vf_qs = prev_queues;
+-	vf->first_vector_idx = ice_sriov_get_irqs(pf, vf->num_msix);
++	vf->first_vector_idx = ice_virt_get_irqs(pf, vf->num_msix);
+ 	if (vf->first_vector_idx < 0)
+ 		return -EINVAL;
  
 -- 
 2.42.0
