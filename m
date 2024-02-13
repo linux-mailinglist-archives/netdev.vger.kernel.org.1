@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-71147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71146-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 750B3852718
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B028F852719
 	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 02:52:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32289286B6E
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E30711C25B00
 	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:52:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F9B55CBD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F9E46AD6;
 	Tue, 13 Feb 2024 01:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JHCfPNvt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QN6Z/BmZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BC348BF3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BC018BEB
 	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 01:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707789031; cv=none; b=ZuCkRUIYZTMayVCNrq8UQwe3zFNbBHI0WXtYphQrQ3v0+d4yMC6DU4VqQxWwi1+AQI1SF0vLg4gs735VaiPvSNd/y9ohkejHrIea7Cid/L+L0Ex28LG3EAKLPzw62ZgNtb1gNX1WglGXpjmvfRWCBK91KLSylLCjn4azeReV5HU=
+	t=1707789031; cv=none; b=OK9J6cDLDMad2BwKeKNoJ1SqQLMHR1EzYS1SdOnEbq9L3PUb7NmRnk7sWGGs4CY7lgZHyUURAZttXbr6WwuFReCi7euV0qkZ3NUaXzXG33eodVwti08jWrmrsA5gw8Fh/mmI+Q7iBWIyEOOt4rLsGVunWAbYOddMHhW4U1SgL/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707789031; c=relaxed/simple;
-	bh=/j5y+0bmBl8y99U7EgG2hE07/3cEa7IUl711TOLaR2Y=;
+	bh=ADJxMi1qkZlid1lD0Hf2IN7oWJpu2lN7kjfyyBbMPXQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=a4l1trpx4ORt5+FieTGPGuf8xLcY0fwKYARD4Di8oSLVYnM3LXti3diEg8qN0CFrtWGrmaBrLADX2ywJ5MYI9PYfw52k48MonKpTrqPBmLjvzeTWpGYySk/ARkmJTq8AcBXEF+zgf4jYB+WCKFgzOTPlkinBhU9T0Pp9FpKqFtc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JHCfPNvt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0C5D5C43390;
+	 In-Reply-To:To:Cc; b=iXentOULE3TvW8pEeWXGjVz7euqlZHwtivqQS1fHYG70LKfgLZ2/vIJn7wQSBSO7CstmhjEP9N/ZHky4utpCu28dS9yOkIivrN5BRPchIpcL59drAXhkWoPJMOVfldGORE1iQklg0mHhdEJnP9VNqPYv89nz5bgfpUfVAiRC58s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QN6Z/BmZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 05994C433F1;
 	Tue, 13 Feb 2024 01:50:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1707789031;
-	bh=/j5y+0bmBl8y99U7EgG2hE07/3cEa7IUl711TOLaR2Y=;
+	bh=ADJxMi1qkZlid1lD0Hf2IN7oWJpu2lN7kjfyyBbMPXQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=JHCfPNvtQIwVaudAfLUs9vUEMit5pVtQF/FQdzUpFG63FjABAMrSPqwBdQh5hV++H
-	 q6Qrt6NXv3j0Uzfv3PMJexEHcZk850o0zt5dEpUxK9/OqoeczqGsTgrkF2sj6oQwip
-	 4/G2PEWFDFvN7x1L5j2Xq5Brciba83WoEIfd7TuMIEkz2+YG52sBzvt+HkjfjWAr84
-	 DaPoa8KCidrH03V1Dl7Yr9t/oDrqA5mdlXQeGzNySYVE7YWzT1VwwY1tl6DamQgCPS
-	 j7pbc06MqvAFOMcT2drZ2NRyzTUCx9FFPGUD0eNNGUrT6iETGOAge6glVPWHXZJvIt
-	 BKjj7NTSUD02g==
+	b=QN6Z/BmZDxDdyo/CpP14pd4aYoYpK1oZD0j+K85wvM+Qw4eKY2Jsvuw5wHOyWMNfx
+	 /+3uFTp/k7TtPcsR+x+eABhAt35ujr4ALYQeiQEzuBDrslh1JsmI12I5gbHATxVu7K
+	 dHmSkOfdZWA0X3im+X7ST8PMpZW9DlgK4OJ1YMh+c0F1/Wks1MDOszF65TXKcdd9hG
+	 h2xfX65qcpQpFNr+wKL+1ZvA6xYl6QS1EqbpHZJcbLHdltOhFWcHlX8Hajh0YRQY72
+	 MX8GcYywYL/l3lAbT2AxtGYD6DdYzHwHldrbwVCKj1lDFzvfiE4IVM64OoOm+VL/7B
+	 euRD3TEXOrTUA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E974CD84BC3;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DFD62D84BC6;
 	Tue, 13 Feb 2024 01:50:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,36 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: add rcu safety to rtnl_prop_list_size()
+Subject: Re: [PATCH net] pds_core: no health-thread in VF path
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170778903095.20137.8123169804494779564.git-patchwork-notify@kernel.org>
+ <170778903090.20137.980567667578810208.git-patchwork-notify@kernel.org>
 Date: Tue, 13 Feb 2024 01:50:30 +0000
-References: <20240209181248.96637-1-edumazet@google.com>
-In-Reply-To: <20240209181248.96637-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com, jiri@nvidia.com
+References: <20240210002002.49483-1-shannon.nelson@amd.com>
+In-Reply-To: <20240210002002.49483-1-shannon.nelson@amd.com>
+To: Shannon Nelson <shannon.nelson@amd.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, brett.creeley@amd.com,
+ drivers@pensando.io
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri,  9 Feb 2024 18:12:48 +0000 you wrote:
-> rtnl_prop_list_size() can be called while alternative names
-> are added or removed concurrently.
+On Fri, 9 Feb 2024 16:20:02 -0800 you wrote:
+> The VFs don't run the health thread, so don't try to
+> stop or restart the non-existent timer or work item.
 > 
-> if_nlmsg_size() / rtnl_calcit() can indeed be called
-> without RTNL held.
-> 
-> Use explicit RCU protection to avoid UAF.
+> Fixes: d9407ff11809 ("pds_core: Prevent health thread from running during reset/remove")
+> Reviewed-by: Brett Creeley <brett.creeley@amd.com>
+> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: add rcu safety to rtnl_prop_list_size()
-    https://git.kernel.org/netdev/net/c/9f30831390ed
+  - [net] pds_core: no health-thread in VF path
+    https://git.kernel.org/netdev/net/c/3e36031cc054
 
 You are awesome, thank you!
 -- 
