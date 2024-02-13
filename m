@@ -1,65 +1,80 @@
-Return-Path: <netdev+bounces-71163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E92CA85283F
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 06:37:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 84F35852875
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 07:00:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 863F8B23B41
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 05:37:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 257A9B256F6
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 06:00:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D80C11C83;
-	Tue, 13 Feb 2024 05:37:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="unaT+RSM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E211125D7;
+	Tue, 13 Feb 2024 05:57:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36CD1EEAA;
-	Tue, 13 Feb 2024 05:37:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE8E9249E6;
+	Tue, 13 Feb 2024 05:57:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707802658; cv=none; b=sItNIpLKsEhQ/rEJFh6sk8+INpMRphNaNrTrgnuOaAh5a/QeGjTmr1d5Au2tRQKdPhoPQX5ABozn9iKkM2GeVd1pyZ7VSyzhBoOwrST3Q3SfEiRTvJ0rHK07r2KwGzi9fNO7hAWOvLqSTtsrBZ3CODM2vefF9pNziajfsvcAzh4=
+	t=1707803834; cv=none; b=VnxyDjk6Y35wttsCcgqGIN3r5+CFzp/v5qeOK1ZArbPHsuXwkyUdlZTKEceZwS0SMWKhj3A5+/RlCTJKCVL72B1vI2fXkewmal31zMb9pn/w+9v7VrBZBOD87Z4/qequwVudwgxKOJfY6opqceXbmttJRx7CoKhBqNEtVZcpncQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707802658; c=relaxed/simple;
-	bh=bKgAGEsZ6pprC3GHA+4zGE96jtYyl01EEJO9mh0w+yc=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=UyDqJVWtrsjIVRFB9c3Ileo5aeRlTFaSHdZC5v2Le2VmBCfPexFmpkaE8VbRlCtppdLxRKJkPVsQYrAJdVopb5uqWpV1wTEq31Ia8s8U1TkpEjEgSSUXPrVcGGHMLYIpkRWNNWxK1VaB54eSUXSieR7fZdsISWq1Ag++OLp0jeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=unaT+RSM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 643BBC433C7;
-	Tue, 13 Feb 2024 05:37:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707802657;
-	bh=bKgAGEsZ6pprC3GHA+4zGE96jtYyl01EEJO9mh0w+yc=;
-	h=Date:From:To:Subject:From;
-	b=unaT+RSMW+JYvwl+uGLIjrv7hFRPb1Z4NE/mW5DgNd1ueNuuGp41k+ZLA6PwLoqc0
-	 rOPkEMK7FKNKr8zfI1MuulQ9s6ZsweVKbpyks4x9jTZTWIaCPgpNbFolU2wCp5gSI5
-	 KhqOX03rSVNSnE3Lba53qmBmaN2bj+XqQM7Q2VCdq32RLVAtSUt23Pzi0hCNUS9Dfg
-	 5gITTZRhCyOYdUtf47rPSAeGjqgPr8tpTQNgzeIqKBI39oOH9XVkSs56QKZfm87HDp
-	 IB52jobLRaiUbjGK4Yur53f68lG9FoE3wXHx6V49AO4b8NSN1oFlu+EtcHC0Aw/w1d
-	 XiejDcPcWap+Q==
-Date: Mon, 12 Feb 2024 21:37:36 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
-Subject: [ANN] netdev call - Feb 13th
-Message-ID: <20240212213736.07d3d651@kernel.org>
+	s=arc-20240116; t=1707803834; c=relaxed/simple;
+	bh=p/s/YHg/ofyuou1+HQj8mlBXfSUgw0Od8Z3nz/6sJrE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bRzuwwVwluY+9quH2h6dQ+lhw8zWKPowwY/dXNPlU4+1AddzvYqln7KhyE6UWkJlfQhc62SiRvXNXALlqJfIq7icsF5LgfLnQeVxBKGs59siZNAb1t6bsYy+M2VuITUU6ag41Vq+Nqvq0Z3O+yLsxIdfp1DSXNEaS2WhpeWM+70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 5EE32227A87; Tue, 13 Feb 2024 06:57:07 +0100 (CET)
+Date: Tue, 13 Feb 2024 06:57:07 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Alexander Duyck <alexanderduyck@fb.com>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, iommu@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/7] dma: compile-out DMA sync op calls
+ when not used
+Message-ID: <20240213055707.GB22451@lst.de>
+References: <20240205110426.764393-1-aleksander.lobakin@intel.com> <20240205110426.764393-2-aleksander.lobakin@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240205110426.764393-2-aleksander.lobakin@intel.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-Hi,
+> +void __dma_sync_single_for_cpu(struct device *dev, dma_addr_t addr,
+> +			       size_t size, enum dma_data_direction dir);
+> +void __dma_sync_single_for_device(struct device *dev, dma_addr_t addr,
+> +				  size_t size, enum dma_data_direction dir);
+> +void __dma_sync_sg_for_cpu(struct device *dev, struct scatterlist *sg,
+> +			   int nelems, enum dma_data_direction dir);
+> +void __dma_sync_sg_for_device(struct device *dev, struct scatterlist *sg,
+> +			      int nelems, enum dma_data_direction dir);
 
-The bi-weekly netdev call at https://bbb.lwn.net/b/jak-wkr-seg-hjn
-is scheduled tomorrow at 8:30 am (PT) / 5:30 pm (~EU).
+Please stick to the two-tab indentation for continuing prototypes.
+The version here is not only much harder to read, but also keeps blowing
+up the diffs for current and future changes.
 
-The CI is stabilizing, few updates to go over.
-
-Other topics welcome!
+Otherwise this looks good to me.
 
