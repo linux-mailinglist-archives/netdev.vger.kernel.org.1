@@ -1,260 +1,234 @@
-Return-Path: <netdev+bounces-71259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E6F3852D99
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 11:13:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 851E0852D9C
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 11:14:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 248C228BBC5
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 10:13:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A5F41F22070
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 10:14:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E06A4225DE;
-	Tue, 13 Feb 2024 10:13:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E7FD24211;
+	Tue, 13 Feb 2024 10:13:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=bp.renesas.com header.i=@bp.renesas.com header.b="SiOYq3o7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PmvKw1gj"
 X-Original-To: netdev@vger.kernel.org
-Received: from JPN01-OS0-obe.outbound.protection.outlook.com (mail-os0jpn01on2063.outbound.protection.outlook.com [40.107.113.63])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA3C0225D7;
-	Tue, 13 Feb 2024 10:13:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.113.63
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707819204; cv=fail; b=LI5L/Bg8+6PYwphE2r4s8pE6gZj4O8+hqYRvCFo9aCOeCDnJyFosqYFlyUczQs6+FWOo5jO4ELZy31Wym8NPkQoP8J1sogn0td+4Qrn0i7X8BiRbJFBuTJkfKFsuEDSDplMkTU29oUA11JRpDfenNiG4EgU0pjD29ZPU1WYw2z0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707819204; c=relaxed/simple;
-	bh=7vkiGZ4Ms/ty9sZA8U15Ca1tc262k7/XEqkt61Cd58U=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=chpL1xfwUnDVObI89SDdapAtSbXZmZM5qntpZMLNgWD9p3weT0OlMXL0g2T/WWSksDBekGZwj+yNV4hwEZjHAxe/cP8yGR8uCxy3XD9YX6lCR5aTiFWcq7jPFDPj7f7x1FB58PpH1zTnQrYFLCryAjSG10RrfWrFnDRt4dI1HlQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; dkim=pass (1024-bit key) header.d=bp.renesas.com header.i=@bp.renesas.com header.b=SiOYq3o7; arc=fail smtp.client-ip=40.107.113.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FjjZP9R5//9HKB/V4GrQhR5u4TbcNVC422+4yHK9JfzacDzLDZPVnWHuh+mUKFuDPzUn9l6D1WDVp/J0ZD9EYpTZBTmHoN4mT83eZWHpzHHbo9HZDlmtH0a1wm+KT+SC6VgzbSz1/ZehB0S/30FmbLLnNoJmNpIMp24/lNPqbjbHRrI77W50qBR8bDjCtqzajgfXGC3M0ck+IWJ5xhzN6SzqdfzZ/ymC3yoiphsM5S3Ru77xZVi5n2ShthBxtBwNu5z9FDsi9Md/pCIvMsZYjDUOAqQKdY+FSpetSkpouWfcUlbACuzlsE9uwNvvdJQoJxPbETeKj2VBMPSttzzK9Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MI1KmPNd7XUy5BN0sbaYmrl5Boh1Y6/TxKEuO4INW/A=;
- b=h3ksXZ5i8WKgHTGFa9uE1IVww0OJPrNZKQAy62yHL10O1H/ujst3tlA2bEsc6nkVSS+AsrlMICWPPv8WePUnqYq9f55es3aN6x9CNaAUU3x8w+0axXBIfVjPNvK8AJW9mN6AaBB6239z3YWqYVaOa4mLGDas9fG/p6R3WxR0ToB7Ujlxm13zVvCkMQ+40cfqWPCEA1hbHh8J5pKVC6F2xVKYnPUWu5h7bZ60d+2mxQxeHJ6UoVicSRDz83+uGUUb643+DqZN8LJRqpCEy52wM526u06PGJRUvKEKCXq4GaQanLg3RibpxjGboXQxAalFgn6Ux67EA6eJ6htOK4Q5Fw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=bp.renesas.com; dmarc=pass action=none
- header.from=bp.renesas.com; dkim=pass header.d=bp.renesas.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bp.renesas.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MI1KmPNd7XUy5BN0sbaYmrl5Boh1Y6/TxKEuO4INW/A=;
- b=SiOYq3o7pwIqBKbSIrpr4jhXDtla+7/OxFlJPhQi+P099xvFXBw8u+GHkfnvoo+y81STpeimlQ5wUIRBYwFkOzpQft9H85kXL0W9feDYBeEpqSi1PztXDYL6G/nN2ug0uNgeOpPjnDWbZywUsNyAlK/18cTYk9VgqwSx9SpRzBE=
-Received: from TYCPR01MB11269.jpnprd01.prod.outlook.com
- (2603:1096:400:3c0::10) by TYCPR01MB11988.jpnprd01.prod.outlook.com
- (2603:1096:400:37c::10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.36; Tue, 13 Feb
- 2024 10:13:17 +0000
-Received: from TYCPR01MB11269.jpnprd01.prod.outlook.com
- ([fe80::6719:535a:7217:9f0]) by TYCPR01MB11269.jpnprd01.prod.outlook.com
- ([fe80::6719:535a:7217:9f0%3]) with mapi id 15.20.7270.036; Tue, 13 Feb 2024
- 10:13:16 +0000
-From: Biju Das <biju.das.jz@bp.renesas.com>
-To: Claudiu.Beznea <claudiu.beznea@tuxon.dev>, "s.shtylyov@omp.ru"
-	<s.shtylyov@omp.ru>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Claudiu.Beznea
-	<claudiu.beznea@tuxon.dev>, Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Subject: RE: [PATCH net-next v3 5/6] net: ravb: Do not apply features to
- hardware if the interface is down
-Thread-Topic: [PATCH net-next v3 5/6] net: ravb: Do not apply features to
- hardware if the interface is down
-Thread-Index: AQHaXmDfj3p/d+D+vE6GR/WgPunNWLEICrVg
-Date: Tue, 13 Feb 2024 10:13:16 +0000
-Message-ID:
- <TYCPR01MB112698DE07AAA9C535776805D864F2@TYCPR01MB11269.jpnprd01.prod.outlook.com>
-References: <20240213094110.853155-1-claudiu.beznea.uj@bp.renesas.com>
- <20240213094110.853155-6-claudiu.beznea.uj@bp.renesas.com>
-In-Reply-To: <20240213094110.853155-6-claudiu.beznea.uj@bp.renesas.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=bp.renesas.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TYCPR01MB11269:EE_|TYCPR01MB11988:EE_
-x-ms-office365-filtering-correlation-id: 884b732c-909e-4e82-3126-08dc2c7c6570
-x-ld-processed: 53d82571-da19-47e4-9cb4-625a166a4a2a,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- BXP3HFkN500avWl2FWINBjdHZLlbosT7VlGg4QQ0RLVdb9jQThIdqQpaz+vAKgNoiGfZ7DSnL+6s0ejtwr6+KdU262uy4PtfmAC/wKNHr9CWGNnedqKkbLrX2GlPEWcj10p7/hm/raJf17P7TyeA4t2LfpMBPDx2CkJlFBBKKfr9ZaXMrSaPuqTHCLwrKEL1UnYlamTikG+L+GlQaqLhK7KIuaQ04p6OHtKVvtjx44sf6+EtgNlfL5QUiU8TdecamaHfGLfCHe/h9T85LG3S/pq0Q7/+zh7pyLb5wOOFb0ObQh6AyxjljJVfTIzoeFGwcyj991lY2k0K6HkuErd3jcA7uuQA/AJHQIcwhdL40ZjcmM+gho85zIAqsgK8GYAHgVJTNgxa2lRKiifMW8XNLbKAiinSbjVV3RfKg4rtCmST/F3mG0E9W+DOhR0t/IvtTUb4ATsh4goOab3s3NGqC75HMqT8F4lexP3Gx9FBkMI2GKxXDA6slwqcvKjD+k/tCIu3rYMiAweKDU4FJBK4wG59HD+uirubNG2EMkOArCR0CWhISiSTz/FK2yOulyQuIINiRDC0wcM0ksiDoDUi0wQnbfQ7GiHgONL8N4LV2jgB8CwfY8WWUi0HQkmRr7Ha
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYCPR01MB11269.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39860400002)(346002)(376002)(396003)(136003)(230922051799003)(1800799012)(451199024)(186009)(64100799003)(2906002)(5660300002)(55016003)(38100700002)(107886003)(41300700001)(26005)(122000001)(86362001)(71200400001)(66476007)(7696005)(55236004)(66556008)(66946007)(8936002)(64756008)(8676002)(110136005)(54906003)(6506007)(66446008)(316002)(53546011)(4326008)(76116006)(52536014)(9686003)(83380400001)(33656002)(38070700009)(478600001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?F6EkvkeoCR/NArjYagnS32QVW8sQnpfrnR7k/pV4ZNX6KyHcDVaB30rad+Nm?=
- =?us-ascii?Q?f3nCFaPql8+kgStrtU6WV/835AtGPLOHwgHzl6aDO6dFdrONBqHiTgBmFkqt?=
- =?us-ascii?Q?z1poW9NYGFDmiAdFDfWQJEOzGzMIFTFqzsei989HsKYs8NsruULSJpzJWEdD?=
- =?us-ascii?Q?hLUX/I9Hf8osFrjk138KhUITSWT1wvoUgwrcw12U4nQLSQT0DwdjpMCDgGPc?=
- =?us-ascii?Q?HxsVx0eAPIlXFmP56GB/6gjmMj9yhphyzVA9Iv0bkjOtH+YU9sFr9p+UJIXY?=
- =?us-ascii?Q?hRm1/am3zk3kDNXCwoBgYoxa573j02580nQSio1UoCWOPNbgHkUR1ghXFQdb?=
- =?us-ascii?Q?rCMcOjMBff9h0FlqW4ujknXN8VZaht6tmtxN9wan9UnLo4FiGdCHj8fcnX5n?=
- =?us-ascii?Q?wHCPXfuFvRXU8BXXMVniJkEGqUYBky4auP115H4qY0tWwJhz+vCPvUOk2ZR2?=
- =?us-ascii?Q?/EHggeCsUu2MyA0XwF3O05Bf4nNG3CkTaFmwuovg9K1ym5oH6+QM/FqigngP?=
- =?us-ascii?Q?HUEGSy7lpw7wUzOodYT7eTjS6xAF4QLJdw+1sf37sYPx+0RaI6EOMpO1+Dtl?=
- =?us-ascii?Q?Ea66N3p33b7HvmOzCGDLSD7ecnHd1BiBE5q5SOc3/GVB5sQRsoqIEexfLWbG?=
- =?us-ascii?Q?trQ0OdAcfDBEWXSqI0vOFvnnvnlxW+7+adaaWa1GhajL44FPNPXw7MaYo1Ff?=
- =?us-ascii?Q?+YdHyeFZmHL5kN2MorWbT7lNy1BdSlPTLUixQeJWaJ8aRyOakPOuicwXGECz?=
- =?us-ascii?Q?vqn5szoPareUbRBu3+ayVhl1en/5U5j3ape84ca+NrPJeIf2TANYkGMHJdEo?=
- =?us-ascii?Q?EmXXMT8bsgTpaClmK2pzO0jp2lMYEiHgZywRvwojK7QJYT94Vy67GzfKsCEQ?=
- =?us-ascii?Q?f8X9g1N51SwS8D2lUzjeilPPqI7Qw+48K+qxEc5aXU/fWY+9DJjasEMIAv6A?=
- =?us-ascii?Q?byQkEAiYj1F2mGeacAtTYwizmcPBEPD3pJeWoWU20h4l9meBJIxfIBnwAVPB?=
- =?us-ascii?Q?9zd6wyS7Liiu47nEHh3KnwPEjDr7nV/KwDDnv1bPs1mRG3vjk7zsnH4fGD/W?=
- =?us-ascii?Q?RXzDsxPJQtizDWWRS9GTGI+QaWDHPONOogDUXtcCVH8CrDnDJGAFEB+gOONV?=
- =?us-ascii?Q?kwvaxyy26p/qnMi+b6jPzbbz9tH6xSpZGCBcyPIY8qRHMplJiMljrus+/KWS?=
- =?us-ascii?Q?gVr57mM+qNR2eBfXthA5HCIb3TvVPTE3FXCqd2WQqAqc9oOhL7WC4CVVmFYC?=
- =?us-ascii?Q?tpEVBT1HgeR1HMJ59PM74mX/Y5XJXToCCFHLJTMV8cu9vHRPNqXjVuVlcmBU?=
- =?us-ascii?Q?kTDrdlMOx8bBvukBfq3E08xRX/K/al1OSiXG3r9iTgIivZkRsi/D7oRM2T+R?=
- =?us-ascii?Q?+43WUq2xINPWFNGDkUHpHmQxK6/uJlPa6inbMgjOZC1tOlbOj9k1fGzKDomY?=
- =?us-ascii?Q?ExIZmyiKpksKGYLFl35h07Lt5ww0HNk00a7cKhUAYC0EPE3tGWuLq9XMcsV4?=
- =?us-ascii?Q?fV7KWcUqdWSv408QsomFmtSgQXqm8sQgaDRtljt25qllBghWJaBX7zKBYbko?=
- =?us-ascii?Q?wX/noOMekak5sdgSPUsedRQ423x5QFrd/b8lCzIGjFl1JcEWhRaPdrSVn6rV?=
- =?us-ascii?Q?Sg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE26E2BB0E
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 10:13:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707819228; cv=none; b=IA9RiZBj3FDSlUfrzU9YgM3gSy6B5crCfDfvZRQgI9De7Tj7mB6kAgbWbDnEARRZNHLS1sRUw+EGteLvuLbIu1H8A80bwPie7yhBjhk/TUvR0m+NKxabAwnRB0/NvRfwWcfI3UM8qj8pXfgerWsD44dj/c71EkFyVincPj3OeIA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707819228; c=relaxed/simple;
+	bh=v/fFUdlreoGAMwezQEu4Ao8whLg7P/aH6MXbPoiKIno=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=DvOPh3LDixFcyfUkEGNdXxiJ846QyfZglUCaW5vrzTxkV29r9TB0X1jL0pFY8RB4sagG2tWjHqPzc+G2hSfTDu4jXK57VF6rkrcWfjNEKNpQHZgaq0ntPj2pswW0EOIQmUJwg1DHi4QIjUHjivK6Cyjh/5LkAFM4gw+S1sysg1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PmvKw1gj; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707819225;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=T9JNjK37kEShPSWsTbFmjnhKfVAIRZeocmsRj7z3d2o=;
+	b=PmvKw1gjA4bh6mIgUAIQdPQ2YSc7wYks5Bg7MDPWrs+l0weXOHj4RwALAw8u+ujQ/sbqFf
+	/rzrYJGTlMoQlZ/p4U0WRE/vrDTH8wKK5tjRUyp8YDfnKcnjkaUvMBTj02OR28JoLMW5FJ
+	nwt8CwOMftRv3k323ZBIU7MsGjMfuec=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-663-NnOQVEgdPKuSZrKNev8K0g-1; Tue, 13 Feb 2024 05:13:43 -0500
+X-MC-Unique: NnOQVEgdPKuSZrKNev8K0g-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-78130939196so239672485a.1
+        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 02:13:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707819223; x=1708424023;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=T9JNjK37kEShPSWsTbFmjnhKfVAIRZeocmsRj7z3d2o=;
+        b=LjxLEwYKZ/GWrnlWoq3O7rEb3EGtLjwjq5x7ye9eqTlsj4GOn1UY6069XHKq0YugXm
+         POCrE9KWG28KORhTILIZGYXp4pn5psOcyJlPW8asJWHU/ShakXzEdp1MHvtOs0s2Q3H5
+         ntcJhIvbu+evLXk5rKXqqJ7Zm1kgcz8D5M4YgibB+BRcwa+/Rvi1zbmhmryTJLmqsYwJ
+         h2KZCWnrKpkG/XbV1ecnyNDkJbx89k1zDe4XIG+Ff2yLj9nxIbU3Y5NoNl7UpPJWzXXW
+         FOcsEjxahZgZKsJJ6Jmkk6pmEdeaHO1JDc/dH8umWmsHWIm0kiYL+e/116TC0ueI/E/x
+         jMXg==
+X-Forwarded-Encrypted: i=1; AJvYcCXOrkYmzfAU5iLlqSAjKL0fb27DhJcMaooHq3Aldfw9bVuaqvtJCuangysMj11wbsqNQ1dQNZJeTJ/oKWHcxaR2V+S8Ubnh
+X-Gm-Message-State: AOJu0YyJ59+e1Ld2CSgh0vY66zLwc2C24cAz9KLGNUdwpUE1TMHxeoMy
+	kSs+4CLwnNiTPW4NwBtTQgAyRUhWMbJL+7yYGWAuqpvU0ZMYzlm9FgBtS34O66NoQxZvuJ1RH+N
+	Fx5nWCqudAPHmuvw5DTC/Jm/Qd2i7pVOySyWkNKOyrx+dNWX3h4SekA==
+X-Received: by 2002:a05:620a:26a2:b0:785:cb89:56e with SMTP id c34-20020a05620a26a200b00785cb89056emr9021022qkp.1.1707819222940;
+        Tue, 13 Feb 2024 02:13:42 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG2nHGTnYtIvzMYJCP7aD3ZfBOWw6PRl0KhmCmDmC03dTLKJXg4ImEXwotSMVeIT+Kn5ZQm4Q==
+X-Received: by 2002:a05:620a:26a2:b0:785:cb89:56e with SMTP id c34-20020a05620a26a200b00785cb89056emr9021006qkp.1.1707819222609;
+        Tue, 13 Feb 2024 02:13:42 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCU9O5fELLo5VHpM34ducb+lTNntK9qyTkFKeXiVakNFDKrs6DEIy3pd4yRY/CoSPwwLE3AX4MXU7GGgzUEBlU63HXF4rwQSm7ML7m3ZGvq7xJunRFchjN7c3SmWxyR690g8/ye3JZXBzvxpuNyhhNnLAgOtBaIwqeRNzzhTcEOzcntQAYthaapWl6k/OR8m5bCLjGV16ypSGotqg8zOFMUdgjKAsnqrfEgLoDZQl9UhhG3hYfhjvCeEgkc=
+Received: from gerbillo.redhat.com (146-241-230-54.dyn.eolo.it. [146.241.230.54])
+        by smtp.gmail.com with ESMTPSA id bm33-20020a05620a19a100b0078724351313sm6207qkb.36.2024.02.13.02.13.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Feb 2024 02:13:42 -0800 (PST)
+Message-ID: <13efb9e14d378cf6ed81650f52fce21ce6faafe1.camel@redhat.com>
+Subject: Re: [PATCH net-next 3/3] net: ipv6/addrconf: clamp preferred_lft to
+ the minimum required
+From: Paolo Abeni <pabeni@redhat.com>
+To: dsahern@kernel.org
+Cc: edumazet@google.com, kuba@kernel.org, jikos@kernel.org, Alex Henrie
+	 <alexhenrie24@gmail.com>, netdev@vger.kernel.org, dan@danm.net, 
+	bagasdotme@gmail.com, davem@davemloft.net
+Date: Tue, 13 Feb 2024 11:13:39 +0100
+In-Reply-To: <20240209061035.3757-3-alexhenrie24@gmail.com>
+References: <20240209061035.3757-1-alexhenrie24@gmail.com>
+	 <20240209061035.3757-3-alexhenrie24@gmail.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: bp.renesas.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TYCPR01MB11269.jpnprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 884b732c-909e-4e82-3126-08dc2c7c6570
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Feb 2024 10:13:16.8875
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: FnTeJHU0XKbV+CJy5flGoE6LTel0Gwp0JNsqfZrh3WqeGwDffsV9M0GUe/TDZP+e059XrX2Lrp8XGAR3rMKoB+2GI9of1F2uItDcKNnzdLA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYCPR01MB11988
 
-
-Hi Claudiu,
-
-> -----Original Message-----
-> From: Claudiu <claudiu.beznea@tuxon.dev>
-> Sent: Tuesday, February 13, 2024 9:41 AM
-> Subject: [PATCH net-next v3 5/6] net: ravb: Do not apply features to
-> hardware if the interface is down
+On Thu, 2024-02-08 at 23:10 -0700, Alex Henrie wrote:
+> If the preferred lifetime was less than the minimum required lifetime,
+> ipv6_create_tempaddr would error out without creating any new address.
+> On my machine and network, this error happened immediately with the
+> preferred lifetime set to 5 seconds or less, after a few minutes with
+> the preferred lifetime set to 6 seconds, and not at all with the
+> preferred lifetime set to 7 seconds. During my investigation, I found a
+> Stack Exchange post from another person who seems to have had the same
+> problem: They stopped getting new addresses if they lowered the
+> preferred lifetime below 3 seconds, and they didn't really know why.
 >=20
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> The preferred lifetime is a preference, not a hard requirement. The
+> kernel does not strictly forbid new connections on a deprecated address,
+> nor does it guarantee that the address will be disposed of the instant
+> its total valid lifetime expires. So rather than disable IPv6 privacy
+> extensions altogether if the minimum required lifetime swells above the
+> preferred lifetime, it is more in keeping with the user's intent to
+> increase the temporary address's lifetime to the minimum necessary for
+> the current network conditions.
 >=20
-> Do not apply features to hardware if the interface is down. In case
-> runtime PM is enabled, and while the interface is down, the IP will be in
-> reset mode (as for some platforms disabling the clocks will switch the IP
-> to reset mode, which will lead to losing register contents) and applying
-> settings in reset mode is not an option. Instead, cache the features and
-> apply them in ravb_open() through ravb_emac_init().
+> With these fixes, setting the preferred lifetime to 5 or 6 seconds "just
+> works" because the extra fraction of a second is practically
+> unnoticeable. It's even possible to reduce the time before deprecation
+> to 1 or 2 seconds by setting /proc/sys/net/ipv6/conf/*/regen_min_advance
+> and /proc/sys/net/ipv6/conf/*/dad_transmits to 0. I realize that that is
+> a pretty niche use case, but I know at least one person who would gladly
+> sacrifice performance and convenience to be sure that they are getting
+> the maximum possible level of privacy.
 >=20
-> To avoid accessing the hardware while the interface is down
-> pm_runtime_active() check was introduced. Along with it the device runtim=
-e
-> PM usage counter has been incremented to avoid disabling the device clock=
-s
-> while the check is in progress (if any).
->=20
-> Commit prepares for the addition of runtime PM.
->=20
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> Link: https://serverfault.com/a/1031168/310447
+> Signed-off-by: Alex Henrie <alexhenrie24@gmail.com>
 > ---
+>  net/ipv6/addrconf.c | 43 ++++++++++++++++++++++++++++++++++---------
+>  1 file changed, 34 insertions(+), 9 deletions(-)
 >=20
-> Changes in v3:
-> - updated patch title and description
-> - updated patch content due to patch 4/6
->=20
-> Changes in v2:
-> - fixed typo in patch description
-> - adjusted ravb_set_features_gbeth(); didn't collect the Sergey's Rb
->   tag due to this
->=20
-> Changes since [2]:
-> - use pm_runtime_get_noresume() and pm_runtime_active() and updated the
->   commit message to describe that
-> - fixed typos
-> - s/CSUM/checksum in patch title and description
->=20
-> Changes in v3 of [2]:
-> - this was patch 20/21 in v2
-> - fixed typos in patch description
-> - removed code from ravb_open()
-> - use ndev->flags & IFF_UP checks instead of netif_running()
->=20
-> Changes in v2 of [2]:
-> - none; this patch is new
->=20
->=20
->  drivers/net/ethernet/renesas/ravb_main.c | 16 ++++++++++++----
->  1 file changed, 12 insertions(+), 4 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/renesas/ravb_main.c
-> b/drivers/net/ethernet/renesas/ravb_main.c
-> index b3b91783bb7a..4dd0520dea90 100644
-> --- a/drivers/net/ethernet/renesas/ravb_main.c
-> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> @@ -2566,15 +2566,23 @@ static int ravb_set_features(struct net_device
-> *ndev,  {
->  	struct ravb_private *priv =3D netdev_priv(ndev);
->  	const struct ravb_hw_info *info =3D priv->info;
-> -	int ret;
-> +	struct device *dev =3D &priv->pdev->dev;
-> +	int ret =3D 0;
+> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+> index 0b78ffc101ef..8d3023e54822 100644
+> --- a/net/ipv6/addrconf.c
+> +++ b/net/ipv6/addrconf.c
+> @@ -1347,6 +1347,7 @@ static int ipv6_create_tempaddr(struct inet6_ifaddr=
+ *ifp, bool block)
+>  	unsigned long regen_advance;
+>  	unsigned long now =3D jiffies;
+>  	s32 cnf_temp_preferred_lft;
+> +	u32 if_public_preferred_lft;
+
+[only if a repost is needed for some other reason] please respect the
+reverse x-mas tree above.
+
+>  	struct inet6_ifaddr *ift;
+>  	struct ifa6_config cfg;
+>  	long max_desync_factor;
+> @@ -1401,11 +1402,13 @@ static int ipv6_create_tempaddr(struct inet6_ifad=
+dr *ifp, bool block)
+>  		}
+>  	}
+> =20
+> +	if_public_preferred_lft =3D ifp->prefered_lft;
 > +
-> +	pm_runtime_get_noresume(dev);
-> +
-> +	if (!pm_runtime_active(dev))
-> +		goto out_set_features;
+>  	memset(&cfg, 0, sizeof(cfg));
+>  	cfg.valid_lft =3D min_t(__u32, ifp->valid_lft,
+>  			      idev->cnf.temp_valid_lft + age);
+>  	cfg.preferred_lft =3D cnf_temp_preferred_lft + age - idev->desync_facto=
+r;
+> -	cfg.preferred_lft =3D min_t(__u32, ifp->prefered_lft, cfg.preferred_lft=
+);
+> +	cfg.preferred_lft =3D min_t(__u32, if_public_preferred_lft, cfg.preferr=
+ed_lft);
+>  	cfg.preferred_lft =3D min_t(__u32, cfg.valid_lft, cfg.preferred_lft);
+> =20
+>  	cfg.plen =3D ifp->prefix_len;
+> @@ -1414,19 +1417,41 @@ static int ipv6_create_tempaddr(struct inet6_ifad=
+dr *ifp, bool block)
+> =20
+>  	write_unlock_bh(&idev->lock);
+> =20
+> -	/* A temporary address is created only if this calculated Preferred
+> -	 * Lifetime is greater than REGEN_ADVANCE time units.  In particular,
+> -	 * an implementation must not create a temporary address with a zero
+> -	 * Preferred Lifetime.
+> +	/* From RFC 4941:
+> +	 *
+> +	 *     A temporary address is created only if this calculated Preferred
+> +	 *     Lifetime is greater than REGEN_ADVANCE time units.  In
+> +	 *     particular, an implementation must not create a temporary addres=
+s
+> +	 *     with a zero Preferred Lifetime.
+> +	 *
+> +	 *     ...
+> +	 *
+> +	 *     When creating a temporary address, the lifetime values MUST be
+> +	 *     derived from the corresponding prefix as follows:
+> +	 *
+> +	 *     ...
+> +	 *
+> +	 *     *  Its Preferred Lifetime is the lower of the Preferred Lifetime
+> +	 *        of the public address or TEMP_PREFERRED_LIFETIME -
+> +	 *        DESYNC_FACTOR.
+> +	 *
+> +	 * To comply with the RFC's requirements, clamp the preferred lifetime
+> +	 * to a minimum of regen_advance, unless that would exceed valid_lft or
+> +	 * ifp->prefered_lft.
+> +	 *
+>  	 * Use age calculation as in addrconf_verify to avoid unnecessary
+>  	 * temporary addresses being generated.
+>  	 */
+>  	age =3D (now - tmp_tstamp + ADDRCONF_TIMER_FUZZ_MINUS) / HZ;
+>  	if (cfg.preferred_lft <=3D regen_advance + age) {
+> -		in6_ifa_put(ifp);
+> -		in6_dev_put(idev);
+> -		ret =3D -1;
+> -		goto out;
+> +		cfg.preferred_lft =3D regen_advance + age + 1;
+> +		if (cfg.preferred_lft > cfg.valid_lft ||
+> +		    cfg.preferred_lft > if_public_preferred_lft) {
+> +			in6_ifa_put(ifp);
+> +			in6_dev_put(idev);
+> +			ret =3D -1;
+> +			goto out;
+> +		}
+>  	}
+> =20
+>  	cfg.ifa_flags =3D IFA_F_TEMPORARY;
 
-This can be simplified, which avoids 1 goto statement and
-Unnecessary ret initialization. I am leaving to you and Sergey.
+The above sounds reasonable to me, but I would appreciate a couple of
+additional eyeballs on it. @David, could you please have a look?
 
-	if (!pm_runtime_active(dev))
-		ret =3D 0;
-	else
-		ret =3D info->set_feature(ndev, features);
+Thanks,
 
-	pm_runtime_put_noidle(dev);
-	if (ret)
-		goto err;
-
-	ndev->features =3D features;
-
-err:
-	return ret;
-
-Cheers,
-Biju
-
->=20
->  	ret =3D info->set_feature(ndev, features);
->  	if (ret)
-> -		return ret;
-> +		goto out_rpm_put;
->=20
-> +out_set_features:
->  	ndev->features =3D features;
-> -
-> -	return 0;
-> +out_rpm_put:
-> +	pm_runtime_put_noidle(dev);
-> +	return ret;
->  }
->=20
->  static const struct net_device_ops ravb_netdev_ops =3D {
-> --
-> 2.39.2
+Paolo
 
 
