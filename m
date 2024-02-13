@@ -1,65 +1,64 @@
-Return-Path: <netdev+bounces-71111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6EE5852437
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:46:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83E98852478
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:53:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8325B1F23136
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 00:46:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 474A328596B
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 00:53:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD3FD64A87;
-	Tue, 13 Feb 2024 00:21:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CED387AE5E;
+	Tue, 13 Feb 2024 00:22:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VCBAK0E2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OAUcZlpU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81D7463CB4;
-	Tue, 13 Feb 2024 00:21:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FB077AE4C;
+	Tue, 13 Feb 2024 00:22:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707783716; cv=none; b=FiN3GURxvx+ErDcxbLOPwoqrnuC6lptN0JGI+9X9W0XpbULoJufPST3e7DxyrMIfAMEPR15dJnJwaeH/N1qW0zazF25GoxzW8Fve5a1dS8Un7ukQ4xOiN3SFdIxkiVvnGI+m0bB8Qg8P3OzJNG9C2aVBF2zmFfBCiVpgY+rakOw=
+	t=1707783772; cv=none; b=Al+0SDmYfDr/6ZcJidQR5VcyPcyFjK1TMuFBvY8aBxWWdSblqZ0LpPFOlwSy4dpJuOW2YdrRkDFfkjXo9wXvWtClYkKgEZOUqmx0feZg2JDlzeCMy2o0qRZ6y5T1ExjwWD6WTDbT8zDwkNeEQ0/mB3mdnjjjiHy6GXtwGw/LvR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707783716; c=relaxed/simple;
-	bh=k89xFbyGwJEbzgkK7f8r2lTSUKobgTo9d5zHFqwHJ7Q=;
+	s=arc-20240116; t=1707783772; c=relaxed/simple;
+	bh=YjKj5fdO5GCYBNAPM/rveeibmJo9xambdJjrbfrOhoo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=O/lMrZg9JhFryUt2SYLSQgJfwgRqJIdQgbSGAp1yV9Qw6m2WIsLF+3UO8XBF37/PtnJWJpQCNxUAxucMUIk/EG+E6CrHO218ShFmU3GwnNVmwfcxLRy2106MqEpiY+wRMUKdfFne0D5AZMMfGIXU7BMxo11ORDBDHL0whHOxVpk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VCBAK0E2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAF52C433C7;
-	Tue, 13 Feb 2024 00:21:54 +0000 (UTC)
+	 MIME-Version; b=E2MyJ82MPEjjYACb6KE2BbnoynfTAvCeSt1DyB04Kj04qne7UrvxrYWhUIhr3epJsK3dOJGiBUCMl9NrGWt34KloPzWH+NfRtPTIV18SjqctJ73iWvhyiDhb3paer9l1NMVzvGlQnJLMvjjzfa1QM81qDh0zGemosIGUFt5qK1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OAUcZlpU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CAA5C433A6;
+	Tue, 13 Feb 2024 00:22:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707783716;
-	bh=k89xFbyGwJEbzgkK7f8r2lTSUKobgTo9d5zHFqwHJ7Q=;
+	s=k20201202; t=1707783772;
+	bh=YjKj5fdO5GCYBNAPM/rveeibmJo9xambdJjrbfrOhoo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=VCBAK0E2uPibjCGm93cnhx9ce1rH5qOzHV0tHAyWABVkqbJTI3I3ldGn67qAIsy6U
-	 mSb0t89bn1f85XcGb1L1cj3fSlihg2FXdSTnQckQdamsqgwWMG+JFtjzKRi2R2RT+C
-	 6a9hSyjpb4phJWiORbnodXXxH40/n093cIv+edwoXUvahu6EX5jMFmjtTKe7k/UMAo
-	 pUh3+ySaCQfewQnozGUpVIxltk2/ysWH5JiSWXsg5JgCIKQT/var5cNZfrFtrOUj6e
-	 AP1scrGUiaeOfNlqgh84qgm+2Uyj6Mm+3GnRZTi993bIucWNHo88fWSLxSwYu9mJFQ
-	 Z3D4OC+kkjLAg==
+	b=OAUcZlpUrHXdu7fwCo+7xeORW361KD6Zf/2N3M49nH94+lKR5nzOJFkAB3oGS/oQu
+	 /9DY2q88fDjDVtWfDgJAKHlZ3rGCnRqRMLvKBKpkdaurmQQoFHAgqozS5Ur8/AJgmF
+	 XIduxZz2ifgeYkpwXOlS+vf+NlMdqgSIVALup8uTsF+nlHEnCb1AwXsCBzJsts57wz
+	 KoJCh/EOnPYroxupMYG45ryN3ZO7WgtoK3khPcZiZPpSzheksj7fixyoURIbUl+yo2
+	 m1MJyCdoOWquC5KVrEAzmb6i0fIO3vcrwBiy1oK1AwaVneV9K6Ot5q6JLrK+4PbdNz
+	 75GMdJQlJ1lzw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Xiubo Li <xiubli@redhat.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>,
+Cc: Johannes Berg <johannes.berg@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
+	johannes@sipsolutions.net,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	ceph-devel@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 41/51] libceph: fail sparse-read if the data length doesn't match
-Date: Mon, 12 Feb 2024 19:20:18 -0500
-Message-ID: <20240213002052.670571-41-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 13/28] wifi: mac80211: set station RX-NSS on reconfig
+Date: Mon, 12 Feb 2024 19:22:11 -0500
+Message-ID: <20240213002235.671934-13-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240213002052.670571-1-sashal@kernel.org>
-References: <20240213002052.670571-1-sashal@kernel.org>
+In-Reply-To: <20240213002235.671934-1-sashal@kernel.org>
+References: <20240213002235.671934-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,82 +67,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.16
+X-stable-base: Linux 6.1.77
 Content-Transfer-Encoding: 8bit
 
-From: Xiubo Li <xiubli@redhat.com>
+From: Johannes Berg <johannes.berg@intel.com>
 
-[ Upstream commit cd7d469c25704d414d71bf3644f163fb74e7996b ]
+[ Upstream commit dd6c064cfc3fc18d871107c6f5db8837e88572e4 ]
 
-Once this happens that means there have bugs.
+When a station is added/reconfigured by userspace, e.g. a TDLS
+peer or a SoftAP client STA, rx_nss is currently not always set,
+so that it might be left zero. Set it up properly.
 
-Signed-off-by: Xiubo Li <xiubli@redhat.com>
-Reviewed-by: Jeff Layton <jlayton@kernel.org>
-Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
+Link: https://msgid.link/20240129155354.98f148a3d654.I193a02155f557ea54dc9d0232da66cf96734119a@changeid
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- include/linux/ceph/osd_client.h |  3 ++-
- net/ceph/osd_client.c           | 18 +++++++++++++++---
- 2 files changed, 17 insertions(+), 4 deletions(-)
+ net/mac80211/cfg.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/include/linux/ceph/osd_client.h b/include/linux/ceph/osd_client.h
-index bf9823956758..f703fb8030de 100644
---- a/include/linux/ceph/osd_client.h
-+++ b/include/linux/ceph/osd_client.h
-@@ -45,6 +45,7 @@ enum ceph_sparse_read_state {
- 	CEPH_SPARSE_READ_HDR	= 0,
- 	CEPH_SPARSE_READ_EXTENTS,
- 	CEPH_SPARSE_READ_DATA_LEN,
-+	CEPH_SPARSE_READ_DATA_PRE,
- 	CEPH_SPARSE_READ_DATA,
- };
+diff --git a/net/mac80211/cfg.c b/net/mac80211/cfg.c
+index a2c4866080bd..6cf0b77839d1 100644
+--- a/net/mac80211/cfg.c
++++ b/net/mac80211/cfg.c
+@@ -1775,6 +1775,8 @@ static int sta_link_apply_parameters(struct ieee80211_local *local,
+ 					      sband->band);
+ 	}
  
-@@ -64,7 +65,7 @@ struct ceph_sparse_read {
- 	u64				sr_req_len;  /* orig request length */
- 	u64				sr_pos;      /* current pos in buffer */
- 	int				sr_index;    /* current extent index */
--	__le32				sr_datalen;  /* length of actual data */
-+	u32				sr_datalen;  /* length of actual data */
- 	u32				sr_count;    /* extent count in reply */
- 	int				sr_ext_len;  /* length of extent array */
- 	struct ceph_sparse_extent	*sr_extent;  /* extent array */
-diff --git a/net/ceph/osd_client.c b/net/ceph/osd_client.c
-index d3a759e052c8..a2abfda17a24 100644
---- a/net/ceph/osd_client.c
-+++ b/net/ceph/osd_client.c
-@@ -5859,8 +5859,8 @@ static int osd_sparse_read(struct ceph_connection *con,
- 	struct ceph_osd *o = con->private;
- 	struct ceph_sparse_read *sr = &o->o_sparse_read;
- 	u32 count = sr->sr_count;
--	u64 eoff, elen;
--	int ret;
-+	u64 eoff, elen, len = 0;
-+	int i, ret;
++	ieee80211_sta_set_rx_nss(link_sta);
++
+ 	return ret;
+ }
  
- 	switch (sr->sr_state) {
- 	case CEPH_SPARSE_READ_HDR:
-@@ -5912,8 +5912,20 @@ static int osd_sparse_read(struct ceph_connection *con,
- 		convert_extent_map(sr);
- 		ret = sizeof(sr->sr_datalen);
- 		*pbuf = (char *)&sr->sr_datalen;
--		sr->sr_state = CEPH_SPARSE_READ_DATA;
-+		sr->sr_state = CEPH_SPARSE_READ_DATA_PRE;
- 		break;
-+	case CEPH_SPARSE_READ_DATA_PRE:
-+		/* Convert sr_datalen to host-endian */
-+		sr->sr_datalen = le32_to_cpu((__force __le32)sr->sr_datalen);
-+		for (i = 0; i < count; i++)
-+			len += sr->sr_extent[i].len;
-+		if (sr->sr_datalen != len) {
-+			pr_warn_ratelimited("data len %u != extent len %llu\n",
-+					    sr->sr_datalen, len);
-+			return -EREMOTEIO;
-+		}
-+		sr->sr_state = CEPH_SPARSE_READ_DATA;
-+		fallthrough;
- 	case CEPH_SPARSE_READ_DATA:
- 		if (sr->sr_index >= count) {
- 			sr->sr_state = CEPH_SPARSE_READ_HDR;
 -- 
 2.43.0
 
