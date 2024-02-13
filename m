@@ -1,158 +1,262 @@
-Return-Path: <netdev+bounces-71385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF66F853227
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:43:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F7F3853229
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:43:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B621283ACF
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:43:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 947651C226B2
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:43:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90C3C57861;
-	Tue, 13 Feb 2024 13:42:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F83A56465;
+	Tue, 13 Feb 2024 13:43:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NuL4YeWv"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="IGa9OWvG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12E8256B65
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 13:42:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2908454FBB
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 13:43:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707831778; cv=none; b=QTkxLH18RKY1KWBZTGkJfGUfJlZ3nKonvFAtHx4I5T/Q5xYuEgzEsebkaeOSxLMxnMfaMiEXUC6vBz/1s75CaZUhh1QIAMGg7EpRYqZxmgdk1wtnlKQTniNSKwn9URwG43AS1DQpN9KFXkFRfRNuc+dZZp1Ac/4xxRpck+3bTQw=
+	t=1707831803; cv=none; b=XVAgTSxAgbQwFNWlMEK2gErKoi0MEz9PEzOXR9B0YI9d63jivZg8VbbY0WTguQlNo89VyKjr+iL9wPSeRdTZhwckYLWLwFK5fuStwgT7lw6lRl0QkUqHqc7Z9DcTkwIB7yzthnGueZEy551xjZMfEYemCpEAoSWB3rMg/pIjDXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707831778; c=relaxed/simple;
-	bh=tBBpCX1d2PEb9XWT8hX3Z997z59wdwOgyuiSWDYJPhI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=a8Exrnz6iD/rY2+iRbVdTs7/PTHCubDS5/Gvmve7YIGd6/Ztej01C3MfBiqJ2RJiFzALwm4bHpB5R/Shlogs+bD8nGsWN64uZYz6F70eB28lSfi6TofuBbGY9YMBXcnzEL9OA5c2OhMsAZDhyT+0Ibfvf3wNEqjUNchl+4U6wBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NuL4YeWv; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6e06c06c0f6so3078141b3a.0
-        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 05:42:56 -0800 (PST)
+	s=arc-20240116; t=1707831803; c=relaxed/simple;
+	bh=R6fse+2Nw5B1fG4eExlZ4EdtXZfzMDL4MD3Cv0+7TIo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ATxBo3tAP/vKvMelmlmnF3QzgZJcvPNEAqRKbrf3x92eQiKVGVpPnynblJpl+kge9eksamPtkLiv2wvEToKYaZUyEtIcouemQ9bd9JpBz31znf9KcuFWYVuKS61nlEz3W7AQr0DiUOr7wOqtP7+imJESQdzqo0Qik8ziDyu0Q7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=IGa9OWvG; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-558f523c072so6690291a12.2
+        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 05:43:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707831776; x=1708436576; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UcnR3wwRFZ0uVl2rER3U5hYQXkGCv0h0x2STc3oL9yU=;
-        b=NuL4YeWv9qvxZs/hgwD4UzPN4Y0iIse42zGQ3apqLwDwrtNeWPkgrWGp7BgAyfmBHW
-         GM5CUiQPSJn5opmz9oSuJMXbcv8qfMDhwP7/Wlx7TFWlUdqnb2piwfE8CiVKjnrMQEa6
-         S+hlx7dIehlJtXL1hb2xLTGXY4RcGyRsz34Qb6ZqqPtUE7i8NLLU/wo94V9wQJAsX3IJ
-         WPfwMcuZBJA9/T20+urVpRCpQmUTaQQMic5pZShFWNSTIP3ZypCKyAh4ICNyNFJrzM7/
-         dIbce+MIGYFonOE9z9eIcOmLnWbG2XCNrkCS2BIOqhl1xyu7vvn8uslKwTQDyKUZRPSu
-         wiHg==
+        d=broadcom.com; s=google; t=1707831799; x=1708436599; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=R6fse+2Nw5B1fG4eExlZ4EdtXZfzMDL4MD3Cv0+7TIo=;
+        b=IGa9OWvGvCv1IC2fjhMqVsdA4zYJ9QoisFBaecQ6zBE8XxSoVn4g7igWISTtnp1si3
+         m7ip8WehS6B+/cfzn79xKYVDyp7a3EOWz5xk7oMbYqcx6OfKgQBd4apX7ADOoc1WxJcy
+         j/aXbE0O+MX2ufVx7FdVzqXA0qNmIMvGAH6ig=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707831776; x=1708436576;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UcnR3wwRFZ0uVl2rER3U5hYQXkGCv0h0x2STc3oL9yU=;
-        b=LGKzcpcvKBJv+ghz8hZxdzDZkXgSuk4+to/Xn4eAQPR/lPrLAohZ3a8Rz1wHVYGhHf
-         EtoRevcm7XaS+6uISrRgUsIKTJodPROBmjqTsAlnKSiw3ZgVQpbK7nwR2OJRhvSNYCAb
-         0gX3DPCohqswDiFgi/F8UJmpHS05ZqJ/lgZ4zjTP6oIbStS3sBRX1ByG6BWvPnXdOl1W
-         VRx5M7apPjKpGSUTzz0Dfr6LZJkebvP3BIigNk/Jt0aGFKyWFRydA6EpYuUic4ajSgC1
-         1xkQWw6fxtz3oUMTf1LOGJrHTXUIbT9OOQqF0WS32xZNMjyFSpojCnU7CJIDq1wZWMQh
-         NMpw==
-X-Gm-Message-State: AOJu0YwNMmK2I4oLPl2Q1eY5PNvj2MGKy6N0+Oy8gVR0lNY07kvyo5ZG
-	qVkbSIAshYZRC4ocrhy38RKInkYGe2FSVRCfH2gpARPsvd5PtlPo
-X-Google-Smtp-Source: AGHT+IF7O3zLSQa0oaAcD7XybobgNwL90vUAT1P0QCfqroPWUs7uGP5n+kL5RP1ITbb5UpyWV4vBlg==
-X-Received: by 2002:a05:6a20:9585:b0:19e:5e0c:3bb8 with SMTP id iu5-20020a056a20958500b0019e5e0c3bb8mr4177752pzb.7.1707831776463;
-        Tue, 13 Feb 2024 05:42:56 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWoBvygFNmKUjykj1h+8lesQ2cYYpd9EqyG+BhFDka0+HCe5fvdhgIGTUxMdzc43qjfvQ0IOiIjynSiZMt0XPngAaFYVLAaev0kwEOeBiVsb7YFG8Nwk4yFpgKTpUUBFYNDqNrjes7enEjm50UFAbuCSxiIJDUVekZCKvhSpfut4uHIIm2rFFxUd5u9Vec4BBlzxhDJHtOpAPL3KDEiq1/dxbX7KiXs/LIViFGLm4hhFcqMx7r0qeH5ZRbPLZ5Ugtg6
-Received: from KERNELXING-MB0.tencent.com ([14.108.143.251])
-        by smtp.gmail.com with ESMTPSA id fa3-20020a056a002d0300b006e042e15589sm7323041pfb.133.2024.02.13.05.42.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Feb 2024 05:42:55 -0800 (PST)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	dsahern@kernel.org,
-	kuniyu@amazon.com
-Cc: netdev@vger.kernel.org,
-	kerneljasonxing@gmail.com,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next v4 5/5] tcp: use drop reasons in cookie check for ipv6
-Date: Tue, 13 Feb 2024 21:42:05 +0800
-Message-Id: <20240213134205.8705-6-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240213134205.8705-1-kerneljasonxing@gmail.com>
-References: <20240213134205.8705-1-kerneljasonxing@gmail.com>
+        d=1e100.net; s=20230601; t=1707831799; x=1708436599;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=R6fse+2Nw5B1fG4eExlZ4EdtXZfzMDL4MD3Cv0+7TIo=;
+        b=wcdZr5fnZAv9bu19TsO0V3rnDlRAqGP+4D5thDIeK4Lnv+9aqU6HO1nWLYTOZw/f2o
+         zW3oVxjFoLFxbpaEvpPBbV6I6VHgdX+e3Xj4zazx6GgJcdkQ9mdX0Up80Q33yxzBkife
+         tZHihXLCLVzBXXz3+Nk7vdDbfqshGGFhW0yZzUrIzQaM9dqot0AQvHMcv/ewKtBfzBUi
+         z/eS+HQ7dZ/SsD/qmV7XVAhBTxsUD2NLjeUyrUmABayhSsK7vMuMpOTrR9J/JtUvFsih
+         Ost/15STQKcSa6zPZSAH4neShbxujOPEsLUhRR1NllQOgOSNK0idXA2+Po6MRYFoNxCT
+         xJMw==
+X-Gm-Message-State: AOJu0YxvEVGnUwrnIrYnPHtcTmekGS+4SHmnC5KMeFEVfxjO2lrm1YMH
+	eUh1jCCVabJK2rWbwIZkygNqf6++ERCusz6hOKPmntWktua2oGTEHb1qGpIQAVzFCa+mXeSq+w0
+	Saig+633k4hPVV51fgHJtrpL5djKEgEKHdaZ3
+X-Google-Smtp-Source: AGHT+IGJqdxtPWbiGnbGbwaVFW3r22vEJpQbY/iIp3/h1EKqA6p7dNtQ/6brRWbzcwQ+DP0GBF8NYxqRmYhD5LDEXYg=
+X-Received: by 2002:a50:fb02:0:b0:562:1375:b2d2 with SMTP id
+ d2-20020a50fb02000000b005621375b2d2mr171491edq.37.1707831799337; Tue, 13 Feb
+ 2024 05:43:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <309965e8ef4d220053ca7e6bd34393f892ea1bb8.1707486287.git.vinayak.yadawad@broadcom.com>
+ <87mss6f8jh.fsf@kernel.org> <2c38eaed47808a076b6986412f92bb955b0599c3.camel@sipsolutions.net>
+ <b4d44fb5-78e5-4408-a108-2c3d340b090e@broadcom.com> <b00c3b53cd740e998163f84511ee05dc3051ce8b.camel@sipsolutions.net>
+ <df8f02b1-25b0-4dae-a935-cee9ba7f3dc4@broadcom.com> <0cb1d7ef63ad1ea1ff4109d85a6bcdcaca16f1c8.camel@sipsolutions.net>
+ <6eaab8fa-f62e-4f78-9cbe-9b13e3d77ca7@broadcom.com> <ca517fb19f78e3c507fd315e2f30e5efa4723eb8.camel@sipsolutions.net>
+ <87y1boedex.fsf@kernel.org>
+In-Reply-To: <87y1boedex.fsf@kernel.org>
+From: Jithu Jance <jithu.jance@broadcom.com>
+Date: Tue, 13 Feb 2024 19:13:05 +0530
+Message-ID: <CA+gyVQ0DWj1GLzf5z0qA=HV4e8swuTmW+c_1kw6LmpsaAhRXdg@mail.gmail.com>
+Subject: Re: [PATCH 1/1] wifi: nl80211: Add support for plumbing SAE groups to driver
+To: Kalle Valo <kvalo@kernel.org>
+Cc: Johannes Berg <johannes@sipsolutions.net>, 
+	Arend van Spriel <arend.vanspriel@broadcom.com>, 
+	Vinayak Yadawad <vinayak.yadawad@broadcom.com>, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000c19e61061143938e"
 
-From: Jason Xing <kernelxing@tencent.com>
+--000000000000c19e61061143938e
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Like what I did to ipv4 mode, refine this part: adding more drop
-reasons for better tracing.
+Hi Johannes, Kalle,
 
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
- net/ipv6/syncookies.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+>I'm sure it's for an out-of-tree driver.
+Yes, it's for an out of tree driver.
 
-diff --git a/net/ipv6/syncookies.c b/net/ipv6/syncookies.c
-index ea0d9954a29f..f5d7c91abe74 100644
---- a/net/ipv6/syncookies.c
-+++ b/net/ipv6/syncookies.c
-@@ -190,16 +190,20 @@ struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
- 		if (IS_ERR(req))
- 			goto out;
- 	}
--	if (!req)
-+	if (!req) {
-+		SKB_DR_SET(reason, NO_REQSK_ALLOC);
- 		goto out_drop;
-+	}
- 
- 	ireq = inet_rsk(req);
- 
- 	ireq->ir_v6_rmt_addr = ipv6_hdr(skb)->saddr;
- 	ireq->ir_v6_loc_addr = ipv6_hdr(skb)->daddr;
- 
--	if (security_inet_conn_request(sk, skb, req))
-+	if (security_inet_conn_request(sk, skb, req)) {
-+		SKB_DR_SET(reason, SECURITY_HOOK);
- 		goto out_free;
-+	}
- 
- 	if (ipv6_opt_accepted(sk, skb, &TCP_SKB_CB(skb)->header.h6) ||
- 	    np->rxopt.bits.rxinfo || np->rxopt.bits.rxoinfo ||
-@@ -236,8 +240,10 @@ struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
- 		security_req_classify_flow(req, flowi6_to_flowi_common(&fl6));
- 
- 		dst = ip6_dst_lookup_flow(net, sk, &fl6, final_p);
--		if (IS_ERR(dst))
-+		if (IS_ERR(dst)) {
-+			SKB_DR_SET(reason, INVALID_DST);
- 			goto out_free;
-+		}
- 	}
- 
- 	req->rsk_window_clamp = tp->window_clamp ? :dst_metric(dst, RTAX_WINDOW);
-@@ -257,8 +263,10 @@ struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
- 	ireq->ecn_ok &= cookie_ecn_ok(net, dst);
- 
- 	ret = tcp_get_cookie_sock(sk, skb, req, dst);
--	if (!ret)
-+	if (!ret) {
-+		SKB_DR_SET(reason, COOKIE_NOCHILD);
- 		goto out_drop;
-+	}
- out:
- 	return ret;
- out_free:
--- 
-2.37.3
+> I've said this before: I can't maintain something well that I cannot see =
+(and possibly change) the user(s) of.
+>I recall the rule was that nl80211 API changes should also have at least o=
+ne driver implementing it.
+Got your point. The recent efforts for patch submission was to align
+more with the nl80211/cfg80211 interface and remove vendor
+patches/interfaces.
+I wasn=E2=80=99t aware of this upstream requirement, but I do get your poin=
+t
+that the requirement is to have at least one driver that exercises
+these interfaces for code maintainability/understanding the why
+interface changes are needed.
 
+>A practical tip I can give to Broadcom is to remind that you have a great =
+engineer with upstream knowledge: Arend
+>And thenever you add a new feature to the stack, add support to brcm80211 =
+driver at the same time. This help Broadcom to get the feature you need to =
+upstream and the upstream community would have a better Broadcom driver.
+Thanks for the inputs. Let me sync up internally and get back.
+
+Thanks,
+
+
+On Tue, Feb 13, 2024 at 6:20=E2=80=AFPM Kalle Valo <kvalo@kernel.org> wrote=
+:
+>
+> Johannes Berg <johannes@sipsolutions.net> writes:
+>
+> > On Tue, 2024-02-13 at 13:19 +0100, Arend van Spriel wrote:
+> >
+> >> On 2/13/2024 12:45 PM, Johannes Berg wrote:
+> >> > On Tue, 2024-02-13 at 12:13 +0100, Arend van Spriel wrote:
+> >> > >
+> >> > > I recall the rule was that nl80211 API changes
+> >> > > should also have at least one driver implementing it. Guess we let=
+ that
+> >> > > slip a couple of times. I fully agree enforcing this.
+> >> >
+> >> > Well, enforcing it strictly never really worked all that well in
+> >> > practice, since you don't necessarily want to have a complex driver
+> >> > implementation while hashing out the API, and the API fundamentally =
+has
+> >> > to come first.
+> >> >
+> >> > So in a sense it comes down to trust, and that people will actually
+> >> > follow up with implementations. And yeah, plans can change and you e=
+nd
+> >> > up not really supporting everything that was defined ... that's life=
+, I
+> >> > guess.
+> >> >
+> >> > But the mode here seems to be that there's not even any _intent_ to =
+do
+> >> > that?
+> >> >
+> >> > I guess we could hash out the API, review the patches, and then _not=
+_
+> >> > apply them until a driver is ready? So the first round of reviews wo=
+uld
+> >> > still come with API only, but once that settles we don't actually me=
+rge
+> >> > it immediately, unlike normally where we merge a patch we've reviewe=
+d?
+> >> > And then if whoever did it lost interest, we already have a reviewed
+> >> > version for anyone else who might need it?
+> >>
+> >> Sounds like a plan. Maybe they can get a separate state in patchwork a=
+nd
+> >> let them sit there for grabs.
+> >
+> > I guess I can leave them open as 'under review' or something? Not sure
+> > we can add other states.
+>
+> I belong to the church of 'Clean Inbox' so I use 'Deferred' state for
+> stuff I can't work on right now. Though I know a lot of people don't
+> like it because deferred patches are not shown in the default patchwok
+> view.
+>
+> --
+> https://patchwork.kernel.org/project/linux-wireless/list/
+>
+> https://wireless.wiki.kernel.org/en/developers/documentation/submittingpa=
+tches
+
+--000000000000c19e61061143938e
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+mpwrn0/6Sf3DEFfysFSvrnhOv7DRZ1OuvLvE6won+W2My2cUk/GwsJigcfVOIeW+6k8HqYoeS5Gv
+DqYgzE2mJ/xRXZNMUqRea8CP9NUSkK5n5JKnGBMFAgMBAAGjggHZMIIB1TAOBgNVHQ8BAf8EBAMC
+BaAwgaMGCCsGAQUFBwEBBIGWMIGTME4GCCsGAQUFBzAChkJodHRwOi8vc2VjdXJlLmdsb2JhbHNp
+Z24uY29tL2NhY2VydC9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcnQwQQYIKwYBBQUHMAGG
+NWh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwME0G
+A1UdIARGMEQwQgYKKwYBBAGgMgEoCjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxz
+aWduLmNvbS9yZXBvc2l0b3J5LzAJBgNVHRMEAjAAMEkGA1UdHwRCMEAwPqA8oDqGOGh0dHA6Ly9j
+cmwuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3JsMCMGA1UdEQQc
+MBqBGGppdGh1LmphbmNlQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSME
+GDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUOaotQ254RGCyTOE3GmUYiOr6xQw
+DQYJKoZIhvcNAQELBQADggEBAJQEmVAg5gHetC6cEpTOOkvxmlpVDUvrqLSJdclgVyEj1rM+Qc4q
+VrkDMnRI9JpQ0XgPi+/oebdZ7NcqPnvkNyz1hU9T4i5KwG93YEvqKND02+TrR9TvNCqNhDV3v6qU
+8aXoDtJuqSlkH8em+nzdVbHwp/4M9XNfKY2IaItl3wPDs1Ti4D6OewXG+hSmcsvbclgSvZTJnIJI
+It9h7f+sXIxBghRNL631e4HsXTIi2U7EM1cnNupsDm6wZzg9O4bVtYexIi1fSy3xbOn+bxJOI4dM
+pgEAAsnH2RekyBDHAWHW7qp7P+AXkLoNrQlGqs3r8W2eNgrwcxLphpakQ29LvhMxggJtMIICaQIB
+ATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhH
+bG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwYVVavV2kh654UE6cwDQYJ
+YIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIM1wv73giWlxe2mIXomdqEWR4OYMFH4QUDAr
+cOE/htssMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDIxMzEz
+NDMxOVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFl
+AwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATAN
+BgkqhkiG9w0BAQEFAASCAQDLC+vaytKXgz0Yhy8bHgbcx91hO1F66B78PP/8drOYK+W7xdQ4QV89
+cM63rogLEqNnpwECyotGTgfZ71rYjdGfE2IruU1HFOk/U6GmiUj5mW/h+GaeCku0wA7D2vhetSCu
+aPUokPGKT5ZCV8OCHZAv9YchVR2AWsXqMY2H0KlGW3MyCDvFCQXML5ebxYyS6yyVo1hpFX+5gRG4
+w8EEzTXckzKeZzgzXICFELLAyCfJu1fSG1eo7xLXFthslnuxlOaV9V4Ro7umdlNakAgzdqdy2/0I
+b++ufThK69LG1TRBBcT8w/VZGFxwOz2bpQvb+0EquT3PVdGCyBbt4IC07RmB
+--000000000000c19e61061143938e--
 
