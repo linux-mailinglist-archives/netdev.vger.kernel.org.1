@@ -1,66 +1,73 @@
-Return-Path: <netdev+bounces-71475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A520C853828
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 18:33:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 101498538CD
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 18:41:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60E472842F6
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 17:33:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42CF61C26427
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 17:41:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F7C05FF15;
-	Tue, 13 Feb 2024 17:33:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 462CD57885;
+	Tue, 13 Feb 2024 17:41:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Jx06xnCv"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="kaxfCwbI"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.smtp-ext.broadcom.com (unknown [192.19.166.228])
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC8155FF0D;
-	Tue, 13 Feb 2024 17:33:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.166.228
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A1C2A93C
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 17:40:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707845629; cv=none; b=DEvsE6z4gMKWDIeykqB4A3NKdLU9reeW+i6ffvTCC3+4jIuUfqK1RBhXsbK88eElSVfPwS4aFR+ssoc1DJmd1IknOg32RUj3VuFoD2SL7K+TOWyjJXaZkSdVm2qnItnxO38LJe2jV+Ow0Y1v92gUO7+K2aRNMaRyQJm+++qJNBw=
+	t=1707846061; cv=none; b=ogSxIi5uK2TzZUIqGri7S71NHD9enMB3QdLx0m95jAWP4IOmH1FzYw24xcG98UrLEPv4bc9XWPKbj0zpaQiHnNxzTLTWw1122xQFUQIOkQYd7FKZabPlJWlEt0UZmDSwNKreyyUIYpU8bCLDW7Pz7G/khiPaKKis/XE/rY4lEls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707845629; c=relaxed/simple;
-	bh=+IbLm9MJxyBRjvcQtpRgNGFwNLxIam1/AeyzZaiIC90=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=shmEYdkuB5K7U2H7Zl0cfspH/NJo+2BK/oVev0SDMSCDD5NDH/c+jY0747GgKMRHnzG/D4MgY04ZE5UsiqI0dv9nMMk1tPfME6PluahCu/Xx3XQvGx7QQVbnt4faOClEQI6AursjjlxvPfc4hYRoccZku5qnfxac5KlENR4lYWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Jx06xnCv; arc=none smtp.client-ip=192.19.166.228
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: from mail-lvn-it-01.lvn.broadcom.net (mail-lvn-it-01.lvn.broadcom.net [10.36.132.253])
-	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id B2304C005FFD;
-	Tue, 13 Feb 2024 09:33:40 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com B2304C005FFD
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
-	s=dkimrelay; t=1707845620;
-	bh=+IbLm9MJxyBRjvcQtpRgNGFwNLxIam1/AeyzZaiIC90=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Jx06xnCviIukYYI6tAxq0wkYGV8+XYvrmVl6xhTtxo5gQRblaOUoPv/W3nhEP+d6f
-	 4GOrnwSuTNVxouVjncnL4KElJgw7SjgdWN6Vn4aeoMQCMzIHgFywLlOgwouYgAZkWL
-	 MbDZIB1PNsL7V6TckHto8HyD8WcISh2dElMASfGA=
-Received: from fainelli-desktop.igp.broadcom.net (fainelli-desktop.dhcp.broadcom.net [10.67.48.245])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mail-lvn-it-01.lvn.broadcom.net (Postfix) with ESMTPSA id 2476618041CAC4;
-	Tue, 13 Feb 2024 09:33:39 -0800 (PST)
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-To: netdev@vger.kernel.org
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Justin Chen <justin.chen@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	bcm-kernel-feedback-list@broadcom.com (open list:BROADCOM ASP 2.0 ETHERNET DRIVER),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net] net: bcmasp: Handle RX buffer allocation failure
-Date: Tue, 13 Feb 2024 09:33:39 -0800
-Message-Id: <20240213173339.3438713-1-florian.fainelli@broadcom.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1707846061; c=relaxed/simple;
+	bh=bE4DHn9CrhF0GvXHvOQyZdC6nRLXW+bZCyUQ2qy7VJs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HRBkJlnBEDfQd4TxGvzJMKedEtx0QmbM5kgQA4fb5fLZ/D0lWcOgHxIY7IHwovk5Npp9OcAbVfq4InTcLJ53ZG8EIxKdTx7q4c5Nu2zqMo7mhHP/nNWeOVd4+wAK/vhtOYH1HZavM542TTONL4A6VRLZ4zK1OKMIh3N1xgWpdUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=kaxfCwbI; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1707846057; x=1739382057;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=TPET38PIuqSsM4gploQuTD7Wq3pbC3F0wy7EppYWoMk=;
+  b=kaxfCwbI/Wj9yI47Q2KQ1AONqoAxPdBWXURTdv0H2Rdbpr5jMI1BU6Dc
+   VkH9fsRmcIgBfndZyH7OBXSRF/iwEhj4J7OY0nuRXO7mB68Od3Zx2GAOT
+   XJ0RvifEsFvakVIbiR11i9HR0dEML23umDSKP+QNQPhBfmLZxdRPs2TYb
+   k=;
+X-IronPort-AV: E=Sophos;i="6.06,157,1705363200"; 
+   d="scan'208";a="704035957"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2024 17:40:49 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:44012]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.5.203:2525] with esmtp (Farcaster)
+ id cd39f957-d7f7-4775-86aa-99109c99d973; Tue, 13 Feb 2024 17:40:48 +0000 (UTC)
+X-Farcaster-Flow-ID: cd39f957-d7f7-4775-86aa-99109c99d973
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Tue, 13 Feb 2024 17:40:43 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.101.20) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Tue, 13 Feb 2024 17:40:40 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kerneljasonxing@gmail.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kernelxing@tencent.com>, <kuba@kernel.org>, <kuniyu@amazon.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next] tcp: no need to use acceptable for conn_request
+Date: Tue, 13 Feb 2024 09:40:29 -0800
+Message-ID: <20240213174029.60042-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240213131205.4309-1-kerneljasonxing@gmail.com>
+References: <20240213131205.4309-1-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,45 +75,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D033UWA003.ant.amazon.com (10.13.139.42) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-The buffer_pg variable needs to hold an order-5 allocation (32 x
-PAGE_SIZE) which, under memory pressure may fail to be allocated. Deal
-with that error condition properly to avoid doing a NULL pointer
-de-reference in the subsequent call to dma_map_page().
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 13 Feb 2024 21:12:05 +0800
+> From: Jason Xing <kernelxing@tencent.com>
+> 
+> Since tcp_conn_request() always returns zero, there is no need to
+> keep the dead code. Remove it then.
+> 
+> Link: https://lore.kernel.org/netdev/CANn89iJwx9b2dUGUKFSV3PF=kN5o+kxz3A_fHZZsOS4AnXhBNw@mail.gmail.com/
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
 
-In addition, the err_reclaim_tx error label in bcmasp_netif_init() needs
-to ensure that the TX NAPI object is properly deleted, otherwise
-unregister_netdev() will spin forever attempting to test and clear
-the NAPI_STATE_HASHED bit.
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-Fixes: 490cb412007d ("net: bcmasp: Add support for ASP2.0 Ethernet controller")
-Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
----
- drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-index 53e542881255..f59557b0cd51 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-@@ -684,6 +684,8 @@ static int bcmasp_init_rx(struct bcmasp_intf *intf)
- 
- 	intf->rx_buf_order = get_order(RING_BUFFER_SIZE);
- 	buffer_pg = alloc_pages(GFP_KERNEL, intf->rx_buf_order);
-+	if (!buffer_pg)
-+		return -ENOMEM;
- 
- 	dma = dma_map_page(kdev, buffer_pg, 0, RING_BUFFER_SIZE,
- 			   DMA_FROM_DEVICE);
-@@ -1092,6 +1094,7 @@ static int bcmasp_netif_init(struct net_device *dev, bool phy_connect)
- 	return 0;
- 
- err_reclaim_tx:
-+	netif_napi_del(&intf->tx_napi);
- 	bcmasp_reclaim_free_all_tx(intf);
- err_phy_disconnect:
- 	if (phydev)
--- 
-2.34.1
-
+> ---
+>  net/ipv4/tcp_input.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+> 
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index 2d20edf652e6..b1c4462a0798 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+> @@ -6623,7 +6623,6 @@ int tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb)
+>  	const struct tcphdr *th = tcp_hdr(skb);
+>  	struct request_sock *req;
+>  	int queued = 0;
+> -	bool acceptable;
+>  	SKB_DR(reason);
+>  
+>  	switch (sk->sk_state) {
+> @@ -6649,12 +6648,10 @@ int tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb)
+>  			 */
+>  			rcu_read_lock();
+>  			local_bh_disable();
+> -			acceptable = icsk->icsk_af_ops->conn_request(sk, skb) >= 0;
+> +			icsk->icsk_af_ops->conn_request(sk, skb);
+>  			local_bh_enable();
+>  			rcu_read_unlock();
+>  
+> -			if (!acceptable)
+> -				return 1;
+>  			consume_skb(skb);
+>  			return 0;
+>  		}
+> -- 
+> 2.37.3
 
