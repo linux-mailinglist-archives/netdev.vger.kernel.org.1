@@ -1,115 +1,110 @@
-Return-Path: <netdev+bounces-71405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 420318532E8
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 15:21:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A1738532EA
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 15:21:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F16A5285E24
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:21:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 275AC280D7D
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:21:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18AD157868;
-	Tue, 13 Feb 2024 14:20:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5D995787C;
+	Tue, 13 Feb 2024 14:21:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RIuUG1H5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UNRHTFuW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 069B556B6A
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 14:20:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E65D58121;
+	Tue, 13 Feb 2024 14:21:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707834039; cv=none; b=Nx+WoMEija7wK5DMChAB/8/fuZrecbc8y9gzx+3+Uw3jRx50jhnhgWXcnmV3dh3zzYt8GxXfx8VN4Sb4C48n74mwm0oKuCPPOj0yrqnNWbKFN0gVFp1Yy/sWrruJkBafvqKIsAWjJbaY1Q9bmr8htFgd1I3poUnc2+JIk88OEWA=
+	t=1707834061; cv=none; b=gq+XHw/DSR0X5GQyxqVvjspy8ksn3o8hhZVHqmQzQzmEWfxvqXjbJ3ZHVDvMNtkXSqIc9szlqA42Yd/NbGO/04/C7nbsS+DfxJkK1gPPIN4gBgsELvD/BgHiDMjCxGjRXr6uIRwqHqtsgTVU4lY4/ANxJkdRhz2x3chi+9q1inw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707834039; c=relaxed/simple;
-	bh=RsDazqaypNlM1vbQ7cw3xGL/WfYsa4pUy1w99TNFZ2I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=k4u/3JOn7fBZuFr3pFw5CO4DEdZ7qjWDA/3ZgVvujmHeykp6HdFTaVMawxvmlgOWtEGhw4kMGj3f/LaqJUXdL2YydzR2W0Koq39I8I3ZS0Zu7dsd6vAut5LVFzTn1YVA7s/k9p7nFg3a7dhP7ytS4RKufr4HUY6yxvAMyrUkQUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RIuUG1H5; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-56037115bb8so10298a12.0
-        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 06:20:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707834034; x=1708438834; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RsDazqaypNlM1vbQ7cw3xGL/WfYsa4pUy1w99TNFZ2I=;
-        b=RIuUG1H5oE8wClZQYjXgC5QowMpV94A9JYsmYWN4kWNFmmSRS28nOe1MKuJtAJoLbu
-         KLwjMXGjFt03xf7ZjwhZ3m5STpFGxXyHd0NedFvvscNU6ZEYHy0mIM4IKINKdZdbv9aU
-         i0CFSVxIuJZy48pXTWjR4rYe5EgNmjaRWdsTIZz1A66LOTPLcF+iN9b3XFzRffTEYL4G
-         9D+nqrQdRGwVi0NGQHdMblFw70SW69GqQMAP1KOPNGrg4BWMKWBtY3i95v4+6ITCjoz/
-         0OAO79W8+IhPjgg3AdyuP80Hl3Ucn+9tMxG+10BIyuHKhzEYZGujCdxo8t6LIE7R76Po
-         xFGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707834034; x=1708438834;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RsDazqaypNlM1vbQ7cw3xGL/WfYsa4pUy1w99TNFZ2I=;
-        b=MoeiNDezvVX5hMqwNmDzKvf9zo+r3oUAuJNExL2KDz/NeXBtYBOR/uSs3NbJPx+Vk9
-         wri9oAm1b86jj/kxVaNao+WSdLwi9ay/+BhBisoLWlh9xWLfTFmVH69SK6zW69fz+EYj
-         UBhu2AGjuMHYockMuOar2z3WBoAfJHC+ar1/IFsjjUtssdqC7tERLsOggPlpE6kviksM
-         Kq7n6iut0VuyORqI6uBBJ9mkGiDq0AgzmRMRjjjyIbq8Qp0QoezhcPNeHLxguJJhKEZ7
-         I+6QNCMCXZLTZeXRDN56qeUJCFVXqw0STvFqyvPyzDMt3RDWWSoMYnjUDF3Gx/Phd2Gy
-         gH4w==
-X-Gm-Message-State: AOJu0YyBrqIh9h/vd9xiTrnIYyuhpbjAV+XSeOCEysrIRtcryopnR03d
-	pODCjWuCSkKUAg4ftNsow9f5oxZVf/247FsyuhnhNPN0vi84bNVwdpaTH0fCZKiQph+IbLN1np4
-	g0iM2PdhTR5QwBaUwydnhndt+YQm57fM450pt
-X-Google-Smtp-Source: AGHT+IGd+fHnXdZUXuiTRh127548kPjpMRwL2YEVwt0Re+4ygmfQI1BFZaK4QzH6+ESAtIZvj26zk+SNJE7JoFUXV7c=
-X-Received: by 2002:a50:a414:0:b0:560:4895:6f38 with SMTP id
- u20-20020a50a414000000b0056048956f38mr118965edb.1.1707834033864; Tue, 13 Feb
- 2024 06:20:33 -0800 (PST)
+	s=arc-20240116; t=1707834061; c=relaxed/simple;
+	bh=g/Vzu87lH2Q3mBnaJ/7cY2bunu60dk3+AfUkoZ1uVZ8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gQ1icyPqC8Mo4hu4A8MhJ3k20eUC6vcQiRm83kAT4q5LalmV/qKdTGpod4k9E2370a1DV4auUv8ZhkULnSCl0Mwsv83DR7iGwxwknj/5bgGT4GqMXZA08XpkayWkLWxsLg6wJUoNt408vMalKcBqEauPr1PSP0jVTY8MBYQc0Ak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UNRHTFuW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFE27C433C7;
+	Tue, 13 Feb 2024 14:21:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707834061;
+	bh=g/Vzu87lH2Q3mBnaJ/7cY2bunu60dk3+AfUkoZ1uVZ8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=UNRHTFuWlo6rhIMsaQ+gQuTvhY/kOUYmVeKQhfcezLmZjMGV3ET/WXZzqim5rdZgF
+	 0wTuWwmhR9iMf3BQiKrfVTFY/UL+wqOMehUFBBbBHMSrqRLVCPo6c0K/erXzX4wo5f
+	 346Jbs0uxvcAa3J9dQWHPZYNbwtP/enp9Jq7D4XydwNiV9wGcK8laS68DRmOuFpqFM
+	 Li0L9N7lK+AZQCKsdvfNeWekw5Eo99kKfMePPIikpr/8WXEM1QryXV24p21spj8x6P
+	 rMBoEycxONaZFK0uzuqbZWhX8w0I5nSTb01WS9s2svvt6b+qzbYpMtFQt7nd7VupLg
+	 31Y+K4V+JXbUA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net] selftests: tls: increase the wait in poll_partial_rec_async
+Date: Tue, 13 Feb 2024 06:20:55 -0800
+Message-ID: <20240213142055.395564-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240210125054.71391-1-remi@remlab.net> <9c03284dedb5559de0b99fde04bc3e19b5027d6f.camel@redhat.com>
- <B523FFF3-4D2E-4295-9D0F-374FF3359DF1@remlab.net>
-In-Reply-To: <B523FFF3-4D2E-4295-9D0F-374FF3359DF1@remlab.net>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 13 Feb 2024 15:20:19 +0100
-Message-ID: <CANn89i+g1mJK1E_DkVfugt5VVOsHvhivngmUMGW9apNZtF+eVA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] phonet: take correct lock to peek at the RX queue
-To: =?UTF-8?Q?R=C3=A9mi_Denis=2DCourmont?= <remi@remlab.net>
-Cc: Paolo Abeni <pabeni@redhat.com>, courmisch@gmail.com, davem@davemloft.net, 
-	kuba@kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Feb 13, 2024 at 1:55=E2=80=AFPM R=C3=A9mi Denis-Courmont <remi@reml=
-ab.net> wrote:
->
-> Hi,
->
-> Le 13 f=C3=A9vrier 2024 14:12:57 GMT+02:00, Paolo Abeni <pabeni@redhat.co=
-m> a =C3=A9crit :
-> >On Sat, 2024-02-10 at 14:50 +0200, R=C3=A9mi Denis-Courmont wrote:
-> >> From: R=C3=A9mi Denis-Courmont <courmisch@gmail.com>
-> >>
-> >> Reported-by: Luosili <rootlab@huawei.com>
-> >> Signed-off-by: R=C3=A9mi Denis-Courmont <courmisch@gmail.com>
-> >
-> >Looks good, but you need to add a non empty commit message.
->
-> With all due respect, the headline is self-explanatory in my opinion. You=
- can't compare this with the more involved second patch. Also the second pa=
-tch was *not* reported by Huawei Rootlab, but inferred by me and thus has n=
-o existing documentation - unlike this one.
->
-> As for the bug ID, I don't know it (security list didn't pass it on to me=
-). Anyhow it seems that Eric Dumazet already either found it or filled it i=
-n, so I don't know what else you're asking for.
+Test runners on debug kernels occasionally fail with:
 
-I do not think patchwork is able to add the "Fixes: " tag that I 'added'
+ # #  RUN           tls_err.13_aes_gcm.poll_partial_rec_async ...
+ # # tls.c:1883:poll_partial_rec_async:Expected poll(&pfd, 1, 5) (0) == 1 (1)
+ # # tls.c:1870:poll_partial_rec_async:Expected status (256) == 0 (0)
+ # # poll_partial_rec_async: Test failed at step #17
+ # #          FAIL  tls_err.13_aes_gcm.poll_partial_rec_async
+ # not ok 699 tls_err.13_aes_gcm.poll_partial_rec_async
+ # # FAILED: 698 / 699 tests passed.
 
-And yes, I missed that the changelog was empty.
+This points to the second poll() in the test which is expected
+to wait for the sender to send the rest of the data.
+Apparently under some conditions that doesn't happen within 5ms,
+bump the timeout to 20ms.
 
-Some words would be nice, even if the patch looks obvious to few of us.
+Fixes: 23fcb62bc19c ("selftests: tls: add tests for poll behavior")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: shuah@kernel.org
+CC: linux-kselftest@vger.kernel.org
+---
+ tools/testing/selftests/net/tls.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/net/tls.c b/tools/testing/selftests/net/tls.c
+index bc36c91c4480..49c84602707f 100644
+--- a/tools/testing/selftests/net/tls.c
++++ b/tools/testing/selftests/net/tls.c
+@@ -1874,13 +1874,13 @@ TEST_F(tls_err, poll_partial_rec_async)
+ 		/* Child should sleep in poll(), never get a wake */
+ 		pfd.fd = self->cfd2;
+ 		pfd.events = POLLIN;
+-		EXPECT_EQ(poll(&pfd, 1, 5), 0);
++		EXPECT_EQ(poll(&pfd, 1, 20), 0);
+ 
+ 		EXPECT_EQ(write(p[1], &token, 1), 1); /* Barrier #1 */
+ 
+ 		pfd.fd = self->cfd2;
+ 		pfd.events = POLLIN;
+-		EXPECT_EQ(poll(&pfd, 1, 5), 1);
++		EXPECT_EQ(poll(&pfd, 1, 20), 1);
+ 
+ 		exit(!_metadata->passed);
+ 	}
+-- 
+2.43.0
+
 
