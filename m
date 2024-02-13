@@ -1,133 +1,195 @@
-Return-Path: <netdev+bounces-71514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E07A3853BB8
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 20:59:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D4ED853BC6
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 21:02:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D34C2870E7
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 19:59:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB2901F249C2
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 20:02:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DAC56089E;
-	Tue, 13 Feb 2024 19:59:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2A0960898;
+	Tue, 13 Feb 2024 20:01:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WPBQthgA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE44760890;
-	Tue, 13 Feb 2024 19:59:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7143F608F1
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 20:01:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707854343; cv=none; b=UYRotvz/yI0Fmgm0mPjklud/xJKVQdn+DvmUQ6RTQr267EzjSmqQ2YcZZtsoHUGa+jhE64r87GjsXQgAEZu/S7bHIQuYEj6W4lS66E2iYVCMnOIdVDbYXI87xHOPH+7lIjoG+k55O167Vq8xtJKQYvW0wg9RFi/xg9V4ZxyFqrk=
+	t=1707854517; cv=none; b=D1R8/GVgWByxxSuiIFwa3DoCp+DJGT+1rUIaPQ3Y9TgoCGgZafKesyUjn4xf4HfUIRX67O8zwfCvma6S+RVNHhkhHjKtk1ZUD389CVRfX3p46IPmLNv3KxpjA7BnPq8+m0dNGVMl4fIMb8vccjmJ2Vo4Hd93XEEeWb2revKDalg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707854343; c=relaxed/simple;
-	bh=DXB5ws2bRTjgd+sTIuDEdb5sEpVZEtZ1ZKLhzHacgKg=;
-	h=Subject:From:To:CC:References:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=IKmvguIH4wvz2gdy3u+xyVxO/I8jOQpMJmOZS+jpULuGMVdjpJUPWqAz51J+1DnoZURd44smxBgB2Pt7prk1QlR2/IdOcphN2kSpPMOvgBnIiND7mmFqkuF8uhexYPRXzJilvcAO0LA4KUtndVr8UC8K6mzJGyCSvGqRvudadSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (178.176.75.253) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 13 Feb
- 2024 22:58:52 +0300
-Subject: Re: [PATCH net-next v3 4/6] net: ravb: Move the update of
- ndev->features to ravb_set_features()
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<biju.das.jz@bp.renesas.com>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>
-References: <20240213094110.853155-1-claudiu.beznea.uj@bp.renesas.com>
- <20240213094110.853155-5-claudiu.beznea.uj@bp.renesas.com>
- <9fd3591a-99ba-7f40-551a-94648392c325@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <5a972c48-f156-1f7d-3a46-08c464104d19@omp.ru>
-Date: Tue, 13 Feb 2024 22:58:52 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1707854517; c=relaxed/simple;
+	bh=V8RWr3buxdjWtLSDsasgQvCqzQOEr/31YvPitYMfD9M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=n2MFXETX5xNUt2shnP0/niMvwtN/kDNS/KeuxmzWs8cygIEZTB4OHXOYT3ekczMmDWh1RD2Y+fqnrTFWdO3mrLXRyRz5YWFXSstQ1SQ8dWGOsx/YRdsOk6ScNOZBZegZb5Zxf9lwqRmox51XDDljksZGfueK55V18zuvMgded1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WPBQthgA; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a3ce9a33fd8so15496366b.1
+        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 12:01:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1707854514; x=1708459314; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aeZw1WsdK0ILhztiGUDCvc9s83gleGWTx/2AVhzfBto=;
+        b=WPBQthgAOycku3bjtIr8wr5K9WkkXBqS3RMi2CMmfA/JK/iM2xslGlJ4FgFCrPGknW
+         s27Am8uuZudDluiIg6pUGym9f6z+KCTCa90ZgJqusRWjdacMKwKCCDriV5/Fr/Gfa/RR
+         p9Fsloiz3r2Zw4HDKdd29w4gxRuQk7zF+e710D4u+llV4yzIH4yZGpbzEOtJWpfpPBea
+         DsbZ6TVLmfih1YwjJK3K4v6b25pYn4z/2V5kJy1aaVF7eS2oJ4r37KDW1qIFGZylZbnI
+         A5HuiMxjEE/K39JjADBKHxu4AjRzKlKvGyKprrOtNYpyQxazACYo/Z3aSBckFB02Muna
+         K24w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707854514; x=1708459314;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aeZw1WsdK0ILhztiGUDCvc9s83gleGWTx/2AVhzfBto=;
+        b=RHnAARIbPGEMdt0z7vPfHWGcXjp1LTmJKnd1KVy+NVkdSrBV0B9eJ74R7wACdQpg/r
+         y+svexY/w9wwrsazVeASZYnuG+q1F/v8K+DUi+tfCPHjWKORM6Ga+3qpIxhQ2TIw+qa0
+         Smf5DoeSGAgLfFPiodM9QMoKtcZz8Nru/RMx52ObPU7d1I/e53JJQT6htY/HNq6m0Wra
+         9P7DB8tukNx3UEdrbBH4V5mVN7PF31XBmCd0fhBuBcoRFLwGmSbHRmgfKr1NnhRo2i1R
+         W6mfzJRU8pZzPPZIN3wo6JTMMDEziRve31muenDa374geYCAaPC/aslFmex+76Jv5594
+         JBjA==
+X-Forwarded-Encrypted: i=1; AJvYcCWhBlFWIJuNjW1hBPqd2YquwAVXbzPl6Lw8KLwJW0bmV80sM7Hd+xV2+EBmsNvtWHhr1C/Ylf53TZV+TRi4GbjjuU912SVl
+X-Gm-Message-State: AOJu0YxQ4ZmLWjNe0FcjE0KCiH+q3c38NpyskoNudS2IZ52QOK8hd/j+
+	FZruqdbkYSDljdXWumNWHpqX5U4wl4WsRt+rasgbo8Xor31SElz+XfgaXQy1r0SwusFi5p5OVKp
+	O0dScTuSOUOcVweov62QmZlhGh1ARcGoxsK0m
+X-Google-Smtp-Source: AGHT+IEoAl64de8zNKAQZ6ETW1N1MxR2kab9dSI7Hv2FnuBLL+jAe6glKg5e1u5UvR1ALTVOEk3lvhQA2UzDwTmO1zE=
+X-Received: by 2002:a17:906:6555:b0:a3c:e99f:be1d with SMTP id
+ u21-20020a170906655500b00a3ce99fbe1dmr3141450ejn.18.1707854513537; Tue, 13
+ Feb 2024 12:01:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <9fd3591a-99ba-7f40-551a-94648392c325@omp.ru>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 02/13/2024 19:45:49
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 183416 [Feb 13 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.75.253 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1;178.176.75.253:7.1.2
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.75.253
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 02/13/2024 19:51:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 2/13/2024 4:21:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+References: <20231218024024.3516870-1-almasrymina@google.com>
+ <20231218024024.3516870-6-almasrymina@google.com> <94ff0733-5987-4bf5-a53c-011e03aa6323@gmail.com>
+In-Reply-To: <94ff0733-5987-4bf5-a53c-011e03aa6323@gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 13 Feb 2024 12:01:38 -0800
+Message-ID: <CAHS8izOJMEtC1a26yJGMzV9jsX9TtE2xWXzWQ6qSi4ynXnr2Wg@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next v5 05/14] netdev: netdevice devmem allocator
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
+	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
+	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, 
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
+	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2/13/24 10:36 PM, Sergey Shtylyov wrote:
-[...]
+On Tue, Feb 13, 2024 at 5:24=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.=
+com> wrote:
+>
+> On 12/18/23 02:40, Mina Almasry wrote:
+> > Implement netdev devmem allocator. The allocator takes a given struct
+> > netdev_dmabuf_binding as input and allocates net_iov from that
+> > binding.
+> >
+> > The allocation simply delegates to the binding's genpool for the
+> > allocation logic and wraps the returned memory region in a net_iov
+> > struct.
+> >
+> > Signed-off-by: Willem de Bruijn <willemb@google.com>
+> > Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
+> > Signed-off-by: Mina Almasry <almasrymina@google.com>
+> >
+> > ---
+> >
+> > v1:
+> > - Rename devmem -> dmabuf (David).
+> >
+> > ---
+> >   include/net/devmem.h | 12 ++++++++++++
+> >   include/net/netmem.h | 26 ++++++++++++++++++++++++++
+> >   net/core/dev.c       | 38 ++++++++++++++++++++++++++++++++++++++
+> >   3 files changed, 76 insertions(+)
+> >
+> ...
+> > diff --git a/include/net/netmem.h b/include/net/netmem.h
+> > index 45eb42d9990b..7fce2efc8707 100644
+> > --- a/include/net/netmem.h
+> > +++ b/include/net/netmem.h
+> > @@ -14,8 +14,34 @@
+> >
+> >   struct net_iov {
+> >       struct dmabuf_genpool_chunk_owner *owner;
+> > +     unsigned long dma_addr;
+> >   };
+> >
+> > +static inline struct dmabuf_genpool_chunk_owner *
+> > +net_iov_owner(const struct net_iov *niov)
+> > +{
+> > +     return niov->owner;
+> > +}
+> > +
+> > +static inline unsigned int net_iov_idx(const struct net_iov *niov)
+> > +{
+> > +     return niov - net_iov_owner(niov)->niovs;
+> > +}
+> > +
+> > +static inline dma_addr_t net_iov_dma_addr(const struct net_iov *niov)
+> > +{
+> > +     struct dmabuf_genpool_chunk_owner *owner =3D net_iov_owner(niov);
+> > +
+> > +     return owner->base_dma_addr +
+> > +            ((dma_addr_t)net_iov_idx(niov) << PAGE_SHIFT);
+>
+> Looks like it should have been niov->dma_addr
+>
 
->> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->>
->> Commit c2da9408579d ("ravb: Add Rx checksum offload support for GbEth")
->> introduced support for setting GbEth features. With this the IP-specific
->> features update functions update the ndev->features individually.
->>
->> Next commits add runtime PM support for the ravb driver. The runtime PM
->> implementation will enable/disable the IP clocks on
->> the ravb_open()/ravb_close() functions. Accessing the IP registers with
->> clocks disabled blocks the system.
->>
->> The ravb_set_features() function could be executed when the Ethernet
->> interface is closed so we need to ensure we don't access IP registers while
->> the interface is down when runtime PM support will be in place.
->>
->> For these, move the update of ndev->features to ravb_set_features() and
->> make the IP-specific features set function return int. In this way we
->> update the ndev->features only when the IP-specific features set function
->> returns success and we can avoid code duplication when introducing
->> runtime PM registers protection.
->>
->> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> 
-> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+Yes, indeed. Thanks for catching.
 
-   Have to withdraw this... :-/
+> > +}
+> > +
+> > +static inline struct netdev_dmabuf_binding *
+> > +net_iov_binding(const struct net_iov *niov)
+> > +{
+> > +     return net_iov_owner(niov)->binding;
+> > +}
+> > +
+> >   /* netmem */
+> >
+> >   struct netmem {
+> ...
+>
+> --
+> Pavel Begunkov
 
-[...]
 
-MBR, Sergey
+
+--=20
+Thanks,
+Mina
 
