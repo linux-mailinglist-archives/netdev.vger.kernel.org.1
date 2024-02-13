@@ -1,165 +1,135 @@
-Return-Path: <netdev+bounces-71506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCF28853A49
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 19:54:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21FDD853A4F
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 19:55:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DDF11C21DEC
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 18:54:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C939A1F230DD
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 18:55:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 377AA10A1A;
-	Tue, 13 Feb 2024 18:54:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE6C210A29;
+	Tue, 13 Feb 2024 18:55:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D0Y27dxX"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="P+V0Ex2r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E75AF9CE;
-	Tue, 13 Feb 2024 18:54:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C781F92C
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 18:55:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707850447; cv=none; b=akRYKpgYNQ+t3qCmFw0M/oW/GlXGTjHmoN9Sg1BiYvGJyETVnVJyOUP58CueOxUyv934Viz3zDTF7v8d/8st9bZQ7a6cTK2WnH0RB1y87UhwRoP1iSwf81fNCEQ4j9lm8sqFgoikNbcqkP/RyQvCfhGqq6Uyj+IprqbRMEAZLXA=
+	t=1707850530; cv=none; b=X3NzLP/dB55SuOk5V57LVXRKulL3RaW+9A2IqZsu2OeQ/AYCxmOTP8CAc7SCmXvUV7q5h/08GASY/DPiMlRYSLxmHWqfLW7YS79bSAErO2uK8tzEu9yg7uG1ylwKT1yhTHcq2VOLmZfZf1bfSfC0/dq2d7Nph7vV+HtWXribQTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707850447; c=relaxed/simple;
-	bh=Pc0Uz7ZvGZAiMsnw79hmI3/pLFuibu1zlCY04CWwfqI=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XA1u1RFgOxa4/xIECtnWDwqxJEvtZzqhW/S2ey5SV6BMl/Ym5jwySev1bC8ChfdJ6P2DVx/8r+dvkhSbdaZEBo72et/ZMRkhqOtaqwhucGsPtIVGMhccuyhVDRixWup/x3qvN4ZN1Y00V2GjmBR6tlWQnIyPobgbaf6soCgI1YE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D0Y27dxX; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-33ce58eebe4so50213f8f.1;
-        Tue, 13 Feb 2024 10:54:05 -0800 (PST)
+	s=arc-20240116; t=1707850530; c=relaxed/simple;
+	bh=81ioBMQoFUAXfD3calqbogWeHqxzR5ypL2hOiBSpVRI=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=EcSi+Q0X0CvsVswagOjPwQ0NReTvCv1lt5Q4naJte1pTq/oPGhPSqRiePIp22oUPhdA8QN2Anv2ruMq+9U/bptUn28AnCIqmbXYHqfXm7D40oqMI7zz1blZ+hbnsLuOv5QF1Pd0s+cH2p+Tl45v5Nxi349H9Q0Gt6XpUz0b5iGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=P+V0Ex2r; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-339289fead2so3051231f8f.3
+        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 10:55:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707850444; x=1708455244; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=H+dGVs9NnswSaixQthi1rDV1QFJqXgmXn+44KoHCVtM=;
-        b=D0Y27dxXWvXX3BikwVOwIcARuIN1TSTnwELh2mVwOeIX4rYheZrPCstI5xymPl/ZeO
-         0GIQwn7B+DuN31W1wp5qKQmLF1Qe9ZcWKn7LAFtQBmoMLY9VYWhXx/1fGGMHi6Tn9Zxx
-         k1liOT5IOJZ+7dhjAFgYZrUtDrzC5sm+TEDIWVYPaRWRMLc4CvqvcJEWt8PPQxf/p0tZ
-         1CLiB0mbLZGaZp0khQnoVFKto6eXB2tmNEaIHlbapUd7/kZA73RCPxt5FN8SJMH7+Ld6
-         0GwCCx7y74bqHh/x1yvaEvhCE3F8BWMhVrx1ccWvHCnYOKkShor5NtY1kNWuRB3Atj4A
-         ZYzQ==
+        d=tuxon.dev; s=google; t=1707850527; x=1708455327; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pMhzu1S70tXsjq/n2IaXdigXH/qhRAWmzHR2uq8cwRE=;
+        b=P+V0Ex2r63IyKVy83Q1cz5G+SPepQWJ1IBN3Iyk5aKvkm9vKkCo/YkzGewVKOu8AB5
+         7Y2v0GOiFTRAWDOHbp0fzgiVTYPhAE37KkuO3pnQDsj+gcp7Km05nkbEAZ1WPk4Dwiyk
+         eXQ1yTHfuD3Y5GnwRayJTmCU9HxmbZWf/R672gScGpIdFgIyyrfccEVVG59vp/e5W1df
+         ky3qzpc7pze57l/lmuatJAOpTyw0CWkPEd+RyOIHfJfT0rifftLlh0btSJ50LCW+d4JA
+         Ade5FUh9AL/Og2N8zzI7/7CmKSCreHE9TwDA4PnUBQu5B0DzPkZMpANphUBnfylU+8tp
+         YAsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707850444; x=1708455244;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H+dGVs9NnswSaixQthi1rDV1QFJqXgmXn+44KoHCVtM=;
-        b=DKkPmR2aJOCmlQfw67HS9eXzZNWuyPr214bCiVQDFn41LuSlBPgE3ciGIqJgjyxQvJ
-         0cZWwqguwTTtC9y0VA8uFMzAVwzCH9nZ8Wl13Qpr4cDooIvb1Py+0Ia1yNtSA/zKWvOO
-         2MeWuB6CitOSJKs1px4yVMh9QlYTFkk/KVUPwP0g+nXAIvZQqCf2bMErRRSuyd2DeXFi
-         Sq5b8vpAB54Umq6FMmwNTDVAlq1B5tnd6QwTHPbG4hKpfr70q8uVkP1ZElrsbmhVS+2O
-         k66IUeclRG8zhGkNTPXgB0CiEWHitNt1+Zn90NxjbSn0P1Imb8GTj+mwSJzJQnU7fnPd
-         NC6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCV+eWbKKr2kKwreVhLD9l/8LkxUNwG5wQDGxNUxmZD/1yM69eP1jOWNEMplncBQOoa8GmGVNsGgUwiCPSKihBs+dznCCNr5lzx4VFXIfFSt7xskfB2EGf9KvibDFGM0QLeAzNsi
-X-Gm-Message-State: AOJu0Ywcq72a2iwj2p+ea1qxdRXlPjiWpXrSp2AqbbzZpypldrg60pgF
-	4kJAJIKKwfkbk00H4a1a7PGkDdUA/UBatdn16GJH+RJZVQl4Ba4q
-X-Google-Smtp-Source: AGHT+IGMMCWuXq1XZcrPQ1EiFcPPPej/HSXL6sjzEWIJaIXAfRFJTmfrTFNETJ/ER3qKIOvYbztQPw==
-X-Received: by 2002:a05:6000:1247:b0:33b:69ee:981c with SMTP id j7-20020a056000124700b0033b69ee981cmr106399wrx.39.1707850443569;
-        Tue, 13 Feb 2024 10:54:03 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXaY1x2sBPwRiKIg3cQcsoW7970/cAS7G9IV23i6AC0XlH0ShC4BuzWXNRGV2SUbDJMZ7+zOM8DbK4wUQpOqYqu0rIfVIu67xbcQSPNxFghgBg2GvLqjhT2UU9j4Qzavli/9cAgG/b1CqykNVI+4SHHzvub+9/Dl2180Ugp5t7TzyIMewBBJGAMlkVm+fZGlilCmH+nhZwnMIqMMKgL7G7LZw/hLA50e/urfo3oAH2QyayXQNnQ3oOUimTwUQXdApMBu4kAOBL6MwvFlX/70blHykazh/6A9b6sJX9T8cvDmLBf1sS6g8X6x2QfP9uXVOEkOCZ3/n6MhbTn
-Received: from Ansuel-XPS. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id v7-20020a05600c470700b0040fb44a9288sm12448929wmo.48.2024.02.13.10.54.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Feb 2024 10:54:03 -0800 (PST)
-Message-ID: <65cbbacb.050a0220.b81d1.eb5b@mx.google.com>
-X-Google-Original-Message-ID: <Zcu6xo67smLk3wy0@Ansuel-XPS.>
-Date: Tue, 13 Feb 2024 19:53:58 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Robert Marko <robimarko@gmail.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next RFC PATCH 0/2] net: phy: aquantia: fix system
- interface provision
-References: <20240213182415.17223-1-ansuelsmth@gmail.com>
- <ee00b11a-4679-4ba4-be42-10f15d5e9f65@lunn.ch>
+        d=1e100.net; s=20230601; t=1707850527; x=1708455327;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pMhzu1S70tXsjq/n2IaXdigXH/qhRAWmzHR2uq8cwRE=;
+        b=pbq4y4dMF1se1wSM71LToGRn3qcVQDnNodr/n4hFY9O8ykRHoM8wpzmchu/R9H+EZ6
+         FtpYkDutuIOoQq3L6OFQU3ZPVUCYTCeWHincwO0pqghdRocDKJ1Xh2NXDFBA62G7yPYY
+         pBkUatNXk2f3p9Z0OqCNwWIO53YcUb2NlQAXgWqg2zgBD0XlLGR/vVE7L4bCFqH+5YPL
+         9fJLmLU6X91Z20zZbTVbr11hdnQ6dEtEeriRVTYvd8J0KJeIFBeAXCW+iFXJoUNG4Ng6
+         S7nDIeeel3ygSNuBanM9PSf8PLPGnDNb6Q6FRH8RnOFcfFGoeTSNVOYsPgzFpDpO0V/H
+         fRdg==
+X-Gm-Message-State: AOJu0YyEY74GfUhvLqKfG10JuW+zLORV/y02nPI0y1a2P1pRjyZvulbC
+	oLuNOeOG4WoUezFQOIJZmQmzP2WCPjRQLe/xuu4hkakA4fqt2OorCE4kESwD/jo=
+X-Google-Smtp-Source: AGHT+IHFG/RqIE1RwioshOK/wI0T4+BUE1u2eq0hHtaw4GiuFnXb6C8GBu6DM2PWTQssET9fWT4VrQ==
+X-Received: by 2002:a5d:4eca:0:b0:33c:e30e:cdbf with SMTP id s10-20020a5d4eca000000b0033ce30ecdbfmr156391wrv.32.1707850526649;
+        Tue, 13 Feb 2024 10:55:26 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVbZFjo6U0l4qHSR2B3l08IWRcDmD7J0fP1JWVlRiF7e4jEIcgogqfuF8OLdiYCme/QnUASSv/ScThqp8Bwxe4eY8uWu1931lUCgvMXPTAqHESBRBS3kLnWsV6B/fmdzPBmH0TdsgnLs3e/WvENTd8U06dUB1xdI2CYDyCTO3GjDUmdJ+8RkRehQCORmuPZ0LHX0E6xq7rwkyVk1qaO19z5P7RQfnqQkF7UFp7aKT7JCDXGQCrkp8A7ayRy4ceSxhjsygicQ7iH4euN7cLleXpi6wOluKgG1CUoLhNR5gc+bgLdJnDwZm4DIn6Pdc6cDsXWwI800FYFSHHl4MZTaUK9ejBq2k601Enu0fP+
+Received: from [192.168.50.4] ([82.78.167.20])
+        by smtp.gmail.com with ESMTPSA id p31-20020a05600c1d9f00b00411a595d56bsm4292075wms.14.2024.02.13.10.55.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Feb 2024 10:55:26 -0800 (PST)
+Message-ID: <81ca7397-3f00-431d-aea4-c30c363a90e6@tuxon.dev>
+Date: Tue, 13 Feb 2024 20:55:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ee00b11a-4679-4ba4-be42-10f15d5e9f65@lunn.ch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 5/6] net: ravb: Do not apply features to
+ hardware if the interface is down
+Content-Language: en-US
+From: claudiu beznea <claudiu.beznea@tuxon.dev>
+To: Biju Das <biju.das.jz@bp.renesas.com>,
+ "s.shtylyov@omp.ru" <s.shtylyov@omp.ru>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+References: <20240213094110.853155-1-claudiu.beznea.uj@bp.renesas.com>
+ <20240213094110.853155-6-claudiu.beznea.uj@bp.renesas.com>
+ <TYCPR01MB112698DE07AAA9C535776805D864F2@TYCPR01MB11269.jpnprd01.prod.outlook.com>
+ <368ca0a8-a005-4371-a959-297fd4f58cb1@tuxon.dev>
+In-Reply-To: <368ca0a8-a005-4371-a959-297fd4f58cb1@tuxon.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Feb 13, 2024 at 07:46:45PM +0100, Andrew Lunn wrote:
-> On Tue, Feb 13, 2024 at 07:24:10PM +0100, Christian Marangi wrote:
-> > Posting this as RFC as I think this require some discussion on the topic.
-> > 
-> > There is currently a problem. OEM multiple time provision Aquantia FW
-> > with random and wrong data that may apply for one board but doesn't for
-> > another. And at the same time OEM use the same broken FW for multiple
-> > board and apply fixup at runtime.
-> > 
-> > This is the common case for AQR112 where downstream (uboot, OEM sdk,
-> > openwrt to have the port correctly working) hack patch are used to fixup
-> > broken system interface provision from the FW.
-> > 
-> > The downstream patch do one simple thing, they setup the SERDES startup
-> > rate (that the FW may wrongly not init) and overwrite the
-> > global system config for each rate to default values for the rwquested PHY
-> > interface.
-> > 
-> > Now setting the SERDES startup value is SAFE, and this can be implemented
-> > right away.
-> > 
-> > Overwriting the SERDES modes for each rate tho might pose some question
-> > on how this is correct or wrong.
-> > 
-> > Reality is that probably every user an Aquantia PHY in one way or another
-> > makes use of the SDK and have this patch in use making any kind of
-> > provision on the FW ignored, (since the default values are always applied
-> > at runtime) making the introduction of this change safe and restoring
-> > correct functionality of AQR112 in the case of a broken FW loaded.
-> 
-> This is part of the discussion i had with Aquantia about
-> provisioning. Basically, you cannot trust any register to contain a
-> known value, e.g the value the data sheet indicates the reset value
-> should be, or that the 802.3 standard says it should be.
-> 
-> So in effect, the driver needs to write every single register it
-> depends on.
->
 
-Well if that's the case then this RFC patch is a must. With a
-misconfigured System Interface configuration, the PHY can't comunicate
-with the MAC.
 
-> > This might be the safest change but again would not give us 100% idea that
-> > the thing provision by the FW are correct.
-> 
-> I would say, we have to assume provision is 100% wrong. Write every
-> single register with the needed value.
-> 
-> Is the provisioning information available? Can it be read from the
-> flash? Can it be dumped from firmware we have on disk? Dumping it for
-> a number of devices could give a list of register values which are
-> highly suspect, ones that OEMs typically mess with. We could start by
-> always setting those registers.
->
+On 13.02.2024 13:07, claudiu beznea wrote:
+>>> @@ -2566,15 +2566,23 @@ static int ravb_set_features(struct net_device
+>>> *ndev,  {
+>>>  	struct ravb_private *priv = netdev_priv(ndev);
+>>>  	const struct ravb_hw_info *info = priv->info;
+>>> -	int ret;
+>>> +	struct device *dev = &priv->pdev->dev;
+>>> +	int ret = 0;
+>>> +
+>>> +	pm_runtime_get_noresume(dev);
+>>> +
+>>> +	if (!pm_runtime_active(dev))
+>>> +		goto out_set_features;
+>> This can be simplified, which avoids 1 goto statement and
+>> Unnecessary ret initialization. I am leaving to you and Sergey.
+>>
+>> 	if (!pm_runtime_active(dev))
+>> 		ret = 0;
+>> 	else
+>> 		ret = info->set_feature(ndev, features);
+>>
+>> 	pm_runtime_put_noidle(dev);
+>> 	if (ret)
+>> 		goto err;
+>>
+>> 	ndev->features = features;
+>>
+>> err:
+>> 	return ret;
+>>
+> I find it a bit difficult to follow this way.
 
-We know where they are stored in the FW but it's not documented how the
-provision values are stored in the FW. (the format, how they are
-organized...) I can waste some time trying to reverse it and produce a
-tool to parse them if needed.
-
-Would love also some comments by Russell about this, there was a patch
-adding support for WoL where another user was messing with these regs
-and he was with the idea of being careful with overwriting the provision
-values.
-
--- 
-	Ansuel
+Looking again at it, your version seems better.
 
