@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-71395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED0D285329B
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 15:06:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 885DB85329C
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 15:06:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1ED3282039
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:06:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45FFE282046
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:06:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C99BE56762;
-	Tue, 13 Feb 2024 14:06:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A5685730A;
+	Tue, 13 Feb 2024 14:06:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lXVwt6IR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CfOSlXN3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 421C556766
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 14:06:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09BF356B65
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 14:06:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707833166; cv=none; b=SC5KGqJHTo5ftOIZr+5VCbjJ3vam4634wd+RbK7C4V/pk3emKM0H4NRAwkfICT1igP94hNI4JRs8a4rQ433y5Kw1GpSgHswtjPIoUOvYM0Ytf857taglVEbW7FesrKFrLfH64izdCyT48A9y9FVuVpYQFkbmZMlRplcmJRFhLho=
+	t=1707833171; cv=none; b=ABqvmBJMZzV1C2goALW08H3YOIwoPQpUCy5phlAXLu6wwN1nVJTZic5ZBOcCLgGw2zNhD6LB96mDWrwXFoKAZqootdVdgnAhPqR537GNyf0vzNL4VpYx0FB8JMbooasxgnx8xF9o1vDOtvcnOkymQskDNF5bY7eDECQsoRCuiLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707833166; c=relaxed/simple;
-	bh=pM03emsOdnkfRw0YpBGJfKaeWaExAlzFZjMO02xyVas=;
+	s=arc-20240116; t=1707833171; c=relaxed/simple;
+	bh=/N9m4JzzY4Og8houBpM4FYqjNvSreR2fN/mmtnP1Dgg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nSJl2CkLYiwOb04E7c8MpO0GwA9gL/EKYl/4nSreqh4VEOG5iZvQuSxkgKTFP8pAg69Gi7LbwQzzvjjUH7iqoSCU7Bqr9siIBtbZl2UHPJUtODJIzDhmyKoAjl1aO3BGwjLkgCEsLECNCDwCHOajpuxKOBIh8nWyEkHElQmNU/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lXVwt6IR; arc=none smtp.client-ip=209.85.166.171
+	 MIME-Version; b=UxVCSU/ni4FuTTi2HyeLa0UnmdNoepgfrcI9w3eNwwNPIYvEA3OgcU+ft0CndUUzKBF8K643RQxla8VH4A8wo8/zPUkVD6x4D+/8fxm29nN4q/wc2hPFYSX4aP6FhkUZ+pC8lAzh0LyHsPvcpY5p9d3iq6pKsvrtxQQ5Ztjg+gs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CfOSlXN3; arc=none smtp.client-ip=209.85.210.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-36423c819a3so588605ab.0
-        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 06:06:05 -0800 (PST)
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6e0507eb60cso2808312b3a.3
+        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 06:06:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707833164; x=1708437964; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1707833169; x=1708437969; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=N+qlEv3zkbEchZFcQWVopUaH0qwicWIrROaQiuqCVLg=;
-        b=lXVwt6IRaIczTIlxP0bi+ThOkqHzyqsJaw4BxACXySSl7L7rVzEkMb+HnyYJxgDLRA
-         iqpvV/jXbt1+GD1O191R2qfVTdVc7RXaTRPBj+CruFuhodTqdQM7GOvLxFbBsltNQ16U
-         hb1YLPO3njpAr96CSAi05jSWv5Pdk+Snvqqx8GRKzkrI10SRJ8TwtWExQXR57Q9TyQCA
-         Cf8rG0beTDJMDgY8xqcldBtoUK4kjWSwLTH8FXvE2C+hlQJWEqUYjjYg80uxOlVu2Q+f
-         7vI/f3+IXJPlbUq4Ncz2oMhaNvOdCddrkv6TiNhp0XDaBgTzqBlOfIcm8OT8+686dE/J
-         kIqw==
+        bh=D2kud7U1xCPuFRH3Fod0cdrqRbt0/6Sra3JlljoFMKc=;
+        b=CfOSlXN3fQG9Qzr5RGPMPEH4rOI0rIxaXOQ681J0GqdUGJfvIyZvR6z9ZUC2z4Lr5h
+         1r3M6hYgpbQjMg/EuA69nAtxqGcXMMiBIwrKzKHFtvqVLNPn1zxQTrcgjhN/CnpyRAb8
+         BzSxgDkFX1qu2FoMg9wy/SMp+QPRTYX7Hos2Oic0dxNBm1UF+IHQXVj+c6zKCT5Q6pYQ
+         uKGHSdYWAY5ibYex+dIET8YYK/gos+lNBGs5eFCw22UOHu13eWSc4iwxZP+/e8fA1Iuf
+         DOEa6JYF8l4krqVFzw+8smG+NOJagdu+KhyFgudrC8tLFSsqjpCbEu4iQsTNjrJiFUQ/
+         TOhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707833164; x=1708437964;
+        d=1e100.net; s=20230601; t=1707833169; x=1708437969;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=N+qlEv3zkbEchZFcQWVopUaH0qwicWIrROaQiuqCVLg=;
-        b=ny3OOBl2WOFu6cEEDAtfXXnmrF3K0gwwHe6bbS5wnkDbc1baUtVsK3H7xEBYZxLfPt
-         /tm7o8lxkQcufORqqP6UbeKiSTFAw5wSTS6yjeoFEmjRo9T9fWUyo57MqbcaIWzSzxYN
-         rnd962FgmK7qpkIWa/f8rq1yNCW0+BWV7mtao9EM1CDDl1ooFgmuLx6BsMBNOkFAsjYO
-         Zzp4JV3PMLqhLhTuV56Z56BN0vwhCXUHyjD+tB19Sh1FrBu+xt94oPtKrGM1m47fF1Hy
-         7KJjVHG1iLHi1/PQtepLB0HgR5KGlHCQ7xqSmI/uMzFbBLEZTnspqxuDnci5bW81cS/C
-         tVSg==
-X-Gm-Message-State: AOJu0YxG4pjVyhhbIdGZmSu3dnZFxawfBEBjB+XWthB5+xjLSwe/ProE
-	0mHpkgwAPyuZzP1sBib00ZAkQBiGCigpmOgnW2nlco8XajBMrCR5
-X-Google-Smtp-Source: AGHT+IEHRyLVMJYDmI98jn6B+r4bkGBdv01y5QoVcEfhfaXnlzs4vqwvMSX+NyuqBUHLAToVV1aA/A==
-X-Received: by 2002:a92:c902:0:b0:363:d7c9:8189 with SMTP id t2-20020a92c902000000b00363d7c98189mr9445370ilp.20.1707833164275;
-        Tue, 13 Feb 2024 06:06:04 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXqZ64rY4u1Rc4Y2tqxfVG9jh4+kl8+NQ64A28EwGgGQ+YkOIP+czldvL4fFyUmG9x/nmkB3Pyk4z0nsKi6PEQ8m4G0ud119ObZq41gwgCk4jkfFDFVSGpXgabx9mqPJJ5M7Rqy8UpcaxmqOLApn7qKaPB9Rozq+RQZAecVPb9xm1YIt3KJnJU0hamD/AyzbM4dPoj1WYbWn6r0fNgi9PXOCG6ZiPbNJGldo06TTPwPO+vXI6qht6iKW0RU1DYG9Pxh
+        bh=D2kud7U1xCPuFRH3Fod0cdrqRbt0/6Sra3JlljoFMKc=;
+        b=hyINbCKZMefUSljGpg+lHm5n8zu+TyBL2x7x5uYZAfopCgNYxVHVDdH/3bX8G1ijOI
+         Y39jU0oHQ0ew24fwiZUr1kxVOmn9EeF3Vtxs/rRLrBkc+x99uluKe9wfrVm1Oxv+/+DQ
+         8oZ0Z/K9fNZpCEF64MQ9txLj37HxEK2RjSjexZextbZH4Z5LSjkTIIY3aO6uMS9BohmO
+         n9TXgAgVCACaBKPNskGyRgZjdEsHPZ5R9V9bPCfTg30kUo7P0JfOfuVgjjMI4XXHFxxS
+         5HcfPlcHDrVmIEF9IG6g11eKbX/W/Nh8U3jwb63dOljVAzLriXx784++1c/47gM0nI0L
+         TuOQ==
+X-Gm-Message-State: AOJu0YzU0rEnoBELjhI/aUnjTKp1gwfXs89kfX4nXIYCIRkHfh1joOWo
+	nRb+4udj0JiyswHL/hb0xLE5hyuoIbOFUugoByivfeAGijaGmHeB
+X-Google-Smtp-Source: AGHT+IHbeVvDAG3c1ovPSiPqCT/0TAccEI5THq1lRg6JLGKChE8IR2K/DTBFl32lqdWuhPRIM6QiGw==
+X-Received: by 2002:a05:6a21:3489:b0:19e:b6c6:8f15 with SMTP id yo9-20020a056a21348900b0019eb6c68f15mr13395964pzb.25.1707833169161;
+        Tue, 13 Feb 2024 06:06:09 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVkL/H1kxaEM2kSwwfPhY55taliSFSN6K/gcP4eauR2TRPfI8hbP8cUToWFE56/kSRLEUIYIFDeL+VSOP0Vi7LWxj0vY0U4ON6mDy4cyzC/12GPIX8q1YCbr9vJEvAzgAFpQ2l0eShkRiVvwfQ4bw3VTKoDn2zk7bd8g/gwlqRKneY3U4hsTsLmtyEE1VIPp1vD5jqLDjNM5850tp4AEFr/YeFRBGhvx4EPbaWwZKtwb35l/h0rETQwt5mhTn+QFONm
 Received: from KERNELXING-MB0.tencent.com ([14.108.143.251])
-        by smtp.gmail.com with ESMTPSA id q19-20020a632a13000000b005dc8702f0a9sm1306247pgq.1.2024.02.13.06.06.00
+        by smtp.gmail.com with ESMTPSA id q19-20020a632a13000000b005dc8702f0a9sm1306247pgq.1.2024.02.13.06.06.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Feb 2024 06:06:03 -0800 (PST)
+        Tue, 13 Feb 2024 06:06:08 -0800 (PST)
 From: Jason Xing <kerneljasonxing@gmail.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -77,9 +77,9 @@ To: davem@davemloft.net,
 Cc: netdev@vger.kernel.org,
 	kerneljasonxing@gmail.com,
 	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next v4 1/6] tcp: introduce another three dropreasons in receive path
-Date: Tue, 13 Feb 2024 22:05:03 +0800
-Message-Id: <20240213140508.10878-2-kerneljasonxing@gmail.com>
+Subject: [PATCH net-next v4 2/6] tcp: add more specific possible drop reasons in tcp_rcv_synsent_state_process()
+Date: Tue, 13 Feb 2024 22:05:04 +0800
+Message-Id: <20240213140508.10878-3-kerneljasonxing@gmail.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20240213140508.10878-1-kerneljasonxing@gmail.com>
 References: <20240213140508.10878-1-kerneljasonxing@gmail.com>
@@ -93,67 +93,49 @@ Content-Transfer-Encoding: 8bit
 
 From: Jason Xing <kernelxing@tencent.com>
 
-Soon later patches can use these relatively more accurate
-reasons to recognise and find out the cause.
+This patch does two things:
+1) add two more new reasons
+2) only change the return value(1) to various drop reason values
+for the future use
+
+For now, we still cannot trace those two reasons. We'll implement the full
+function in the subsequent patch in this serie.
 
 Signed-off-by: Jason Xing <kernelxing@tencent.com>
 ---
- include/net/dropreason-core.h | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ net/ipv4/tcp_input.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-index 065caba42b0b..19ba900eae0e 100644
---- a/include/net/dropreason-core.h
-+++ b/include/net/dropreason-core.h
-@@ -31,6 +31,7 @@
- 	FN(TCP_AOFAILURE)		\
- 	FN(SOCKET_BACKLOG)		\
- 	FN(TCP_FLAGS)			\
-+	FN(TCP_ABORTONDATA)			\
- 	FN(TCP_ZEROWINDOW)		\
- 	FN(TCP_OLD_DATA)		\
- 	FN(TCP_OVERWINDOW)		\
-@@ -38,6 +39,7 @@
- 	FN(TCP_RFC7323_PAWS)		\
- 	FN(TCP_OLD_SEQUENCE)		\
- 	FN(TCP_INVALID_SEQUENCE)	\
-+	FN(TCP_INVALID_ACK_SEQUENCE)	\
- 	FN(TCP_RESET)			\
- 	FN(TCP_INVALID_SYN)		\
- 	FN(TCP_CLOSE)			\
-@@ -207,6 +209,11 @@ enum skb_drop_reason {
- 	SKB_DROP_REASON_SOCKET_BACKLOG,
- 	/** @SKB_DROP_REASON_TCP_FLAGS: TCP flags invalid */
- 	SKB_DROP_REASON_TCP_FLAGS,
-+	/**
-+	 * @SKB_DROP_REASON_TCP_ABORTONDATA: abort on data, corresponding to
-+	 * LINUX_MIB_TCPABORTONDATA
-+	 */
-+	SKB_DROP_REASON_TCP_ABORTONDATA,
- 	/**
- 	 * @SKB_DROP_REASON_TCP_ZEROWINDOW: TCP receive window size is zero,
- 	 * see LINUX_MIB_TCPZEROWINDOWDROP
-@@ -231,13 +238,19 @@ enum skb_drop_reason {
- 	SKB_DROP_REASON_TCP_OFOMERGE,
- 	/**
- 	 * @SKB_DROP_REASON_TCP_RFC7323_PAWS: PAWS check, corresponding to
--	 * LINUX_MIB_PAWSESTABREJECTED
-+	 * LINUX_MIB_PAWSESTABREJECTED, LINUX_MIB_PAWSACTIVEREJECTED
- 	 */
- 	SKB_DROP_REASON_TCP_RFC7323_PAWS,
- 	/** @SKB_DROP_REASON_TCP_OLD_SEQUENCE: Old SEQ field (duplicate packet) */
- 	SKB_DROP_REASON_TCP_OLD_SEQUENCE,
- 	/** @SKB_DROP_REASON_TCP_INVALID_SEQUENCE: Not acceptable SEQ field */
- 	SKB_DROP_REASON_TCP_INVALID_SEQUENCE,
-+	/**
-+	 * @SKB_DROP_REASON_TCP_INVALID_ACK_SEQUENCE: Not acceptable ACK SEQ
-+	 * field. because of ack sequence is not in the window between snd_una
-+	 * and snd_nxt
-+	 */
-+	SKB_DROP_REASON_TCP_INVALID_ACK_SEQUENCE,
- 	/** @SKB_DROP_REASON_TCP_RESET: Invalid RST packet */
- 	SKB_DROP_REASON_TCP_RESET,
- 	/**
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index b1c4462a0798..43194918ab45 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -6361,6 +6361,7 @@ static int tcp_rcv_synsent_state_process(struct sock *sk, struct sk_buff *skb,
+ 				inet_csk_reset_xmit_timer(sk,
+ 						ICSK_TIME_RETRANS,
+ 						TCP_TIMEOUT_MIN, TCP_RTO_MAX);
++			SKB_DR_SET(reason, TCP_INVALID_ACK_SEQUENCE);
+ 			goto reset_and_undo;
+ 		}
+ 
+@@ -6369,6 +6370,7 @@ static int tcp_rcv_synsent_state_process(struct sock *sk, struct sk_buff *skb,
+ 			     tcp_time_stamp_ts(tp))) {
+ 			NET_INC_STATS(sock_net(sk),
+ 					LINUX_MIB_PAWSACTIVEREJECTED);
++			SKB_DR_SET(reason, TCP_RFC7323_PAWS);
+ 			goto reset_and_undo;
+ 		}
+ 
+@@ -6572,7 +6574,8 @@ static int tcp_rcv_synsent_state_process(struct sock *sk, struct sk_buff *skb,
+ reset_and_undo:
+ 	tcp_clear_options(&tp->rx_opt);
+ 	tp->rx_opt.mss_clamp = saved_clamp;
+-	return 1;
++	/* we can reuse/return @reason to its caller to handle the exception */
++	return reason;
+ }
+ 
+ static void tcp_rcv_synrecv_state_fastopen(struct sock *sk)
 -- 
 2.37.3
 
