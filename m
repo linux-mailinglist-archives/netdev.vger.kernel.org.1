@@ -1,117 +1,81 @@
-Return-Path: <netdev+bounces-71150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC94A852720
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 02:53:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30892852733
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 02:58:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B76A1C25BC5
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:53:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 906A7287205
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:58:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC04F4A2C;
-	Tue, 13 Feb 2024 01:52:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F62F138C;
+	Tue, 13 Feb 2024 01:58:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RjJ64ztY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m0HkJaEJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C31F8813;
-	Tue, 13 Feb 2024 01:52:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFEB44683
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 01:58:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707789176; cv=none; b=baMQkl/MJrtczDrF3KUIYtCC4R9UmD5A7Rm02FEjyVsPxIMjelUIo4Vex7yzyoEBw4Fa4jc3txfk0ismTL2lZg1OGXAwwCPgiiKLS8cArgEdWjQkYsMIx+aOwv3PPSCghKY2NdTkC8sYE8FjEh0GMkT1hhLndpNs4QWjsNIKaMU=
+	t=1707789527; cv=none; b=Jp1kNflwIplVhhscrQ3TJfGfj6blUdZrZZRPxJ4Sziw4rmKHJBJTk5+vNXRaIMsrFyCrx0IJLKOnZZK2BHMXh2afqe+7PO9zxdQFVud/jk6pkwB2E6FspyxasNoicjVy05HEoS/WrFFbvzhZ1xYCbAcZxXKuvIkwl/k4hOUh/6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707789176; c=relaxed/simple;
-	bh=5e+FWLG2IXO35VEWTCysOoFyyPdiYVsPVIzewBHNQnU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=jSpV3YfZvPpjyvmzXa6ArLCW+EgGooi5bzuFEqv5e/ADm3sqyCaRJOvW0xOwTLPikeriUjIvtQRmGP6lhJmy7WoCYtxIC71dYijL7ipiPJ+rWps24cqdcPFqmbREyT7YzBameQrLL0CPCO0MhEzq14k7XJmWDr8eKrCyRg6RjHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RjJ64ztY; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707789175; x=1739325175;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=5e+FWLG2IXO35VEWTCysOoFyyPdiYVsPVIzewBHNQnU=;
-  b=RjJ64ztYCqUOOoPDug/UswDWzZM5VDnocirUEh/LJD0Y69ZdOepVhT0d
-   zhZC0KFqFImFi3OhmEG4q9R4TxMoN5N/wZtZjUTFcMUjrS+AVDCnbXfXn
-   TVIpBUVTJDufwmr5NFq1w3BK67SxChQvytu8XkuMsPAB/yTrzN6YNn6TW
-   OWaKA/PDoNo9c4a3R5ckStTbe7CQm6VGhwzjACUnHSEgalMkC4J4lQpRd
-   IA8jgI6qtJN9WiL+Gkr1pZ663V46oNi7c+85Q5H+z/UmnAOXggveMtd8C
-   BtZgRyj3O2pz2xBEYN1GIyhB0RZqFdeMGjhOd4sW6i2fOM4iiThrxM8L6
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="1939834"
-X-IronPort-AV: E=Sophos;i="6.06,155,1705392000"; 
-   d="scan'208";a="1939834"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 17:52:54 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,155,1705392000"; 
-   d="scan'208";a="33843360"
-Received: from spandruv-desk.jf.intel.com (HELO spandruv-desk.amr.corp.intel.com) ([10.54.75.14])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2024 17:52:54 -0800
-Message-ID: <22a264118ebe7194cf43a5d7e1d61417feff8534.camel@linux.intel.com>
-Subject: Re: [PATCH v4 1/3] genetlink: Add per family bind/unbind callbacks
-From: srinivas pandruvada <srinivas.pandruvada@linux.intel.com>
-To: Jakub Kicinski <kuba@kernel.org>, Stanislaw Gruszka
-	 <stanislaw.gruszka@linux.intel.com>
-Cc: linux-pm@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>, 
- Ricardo Neri <ricardo.neri-calderon@linux.intel.com>, Daniel Lezcano
- <daniel.lezcano@linaro.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,  Jiri Pirko
- <jiri@resnulli.us>, Johannes Berg <johannes@sipsolutions.net>, Florian
- Westphal <fw@strlen.de>,  netdev@vger.kernel.org
-Date: Mon, 12 Feb 2024 17:52:53 -0800
-In-Reply-To: <20240212170700.4eda9c03@kernel.org>
-References: <20240212161615.161935-1-stanislaw.gruszka@linux.intel.com>
-	 <20240212161615.161935-2-stanislaw.gruszka@linux.intel.com>
-	 <20240212170700.4eda9c03@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4 (3.44.4-3.fc36) 
+	s=arc-20240116; t=1707789527; c=relaxed/simple;
+	bh=lHSEcTgNBFqrw/oPJimRZXLMRiWb4zBsC7pQ4VfB1hU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Iy4KR3n1Ups3SiZNtth7/fAW7ojKA+rQpebM/wzhHYDMll18cxn3KvHdaRyaDvau9hUezhgSxDF5Sfh4aBRwhI6O1hi0nfHeC2fPE4deNcFNwUthB4EDWi3m+dCUOZ2D8vvgP5YLNNNxi2FT2iQpjHVBnHuyIg7gYaaH2xoKBoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m0HkJaEJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A7BAC433C7;
+	Tue, 13 Feb 2024 01:58:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707789526;
+	bh=lHSEcTgNBFqrw/oPJimRZXLMRiWb4zBsC7pQ4VfB1hU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=m0HkJaEJL3yolafUN+Q1SCJhsMu35yoGugukmDhbE88kv5tyCDWgAstmgeoRv3nyE
+	 XU/vzM2zeWPGCaAWZ52pipwbG5rkgprsrDX9YTzsLw4F4PkQWpJbmfU7a6nHnWHQgi
+	 qIOsGqJ300YXoWy/mkRd4jjkDmKCWGke8m0o/c+AP3leyG/VxsO045O8zoxDtK7xMf
+	 VkDpGEADlOOmAGY4wp0ss4FTmzxN9T7ID/XTWVR5FIshx2BI/5kVkmaZVIbm9a+CP6
+	 QEyzXtyC66qTNjIVhPPGHXZkmV27u4uxfRU1OdTvmQZT2gxLeZEBiR9qKMEVY47Bsy
+	 dwsYcp81TjvtQ==
+Date: Mon, 12 Feb 2024 17:58:45 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Subject: Re: [PATCH v3 net-next 06/13] net-sysfs: use dev_addr_sem to remove
+ races in address_show()
+Message-ID: <20240212175845.10f6680a@kernel.org>
+In-Reply-To: <20240209203428.307351-7-edumazet@google.com>
+References: <20240209203428.307351-1-edumazet@google.com>
+	<20240209203428.307351-7-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, 2024-02-12 at 17:07 -0800, Jakub Kicinski wrote:
-> On Mon, 12 Feb 2024 17:16:13 +0100 Stanislaw Gruszka wrote:
-> > Add genetlink family bind()/unbind() callbacks when adding/removing
-> > multicast group to/from netlink client socket via setsockopt() or
-> > bind() syscall.
-> >=20
-> > They can be used to track if consumers of netlink multicast
-> > messages
-> > emerge or disappear. Thus, a client implementing callbacks, can now
-> > send events only when there are active consumers, preventing
-> > unnecessary
-> > work when none exist.
-> >=20
-> > Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> > Signed-off-by: Stanislaw Gruszka
-> > <stanislaw.gruszka@linux.intel.com>
->=20
-> LGTM! genetlink code is a bit hot lately, to avoid any conflicts can
-> I put the first patch (or all of them) on a shared branch for both
-> netdev and PM to pull in? Once the other two patches are reviewed,
-> obviously.
->=20
-If netlink maintainers are happy with the 1/3, you can take 1/3. Once
-merged, the PM patches can go separately as they need 1/3.
+On Fri,  9 Feb 2024 20:34:21 +0000 Eric Dumazet wrote:
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 24fd24b0f2341f662b28ade45ed12a5e6d02852a..28569f195a449700b6403006f70257b8194b516a 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -4031,6 +4031,7 @@ int dev_set_mac_address(struct net_device *dev, struct sockaddr *sa,
+>  			struct netlink_ext_ack *extack);
+>  int dev_set_mac_address_user(struct net_device *dev, struct sockaddr *sa,
+>  			     struct netlink_ext_ack *extack);
+> +extern struct rw_semaphore dev_addr_sem;
 
-Hi Daniel,
-Please look at 2/3 and also 3/3 if you can.
+nit: this could potentially live in the net/core/dev.h header?
 
-Thanks,
-Srinivas
-
-
-
-
+I could not spot any real problems but the series seems to not apply 
+to net-next because of 4cd582ffa5a9a5d58e5bac9c5e55ca8eeabffddc
+-- 
+pw-bot: cr
 
