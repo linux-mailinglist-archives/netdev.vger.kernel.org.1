@@ -1,73 +1,58 @@
-Return-Path: <netdev+bounces-71352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC7B08530F1
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:51:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CE1B8530F7
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:52:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F2D0B2361E
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 12:51:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E8CC1C256C2
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 12:52:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B808C41764;
-	Tue, 13 Feb 2024 12:51:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B32C741C75;
+	Tue, 13 Feb 2024 12:52:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hvtyyZJ7"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="QZ5P2C4c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30550405D8;
-	Tue, 13 Feb 2024 12:51:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 942A241C76
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 12:52:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707828668; cv=none; b=iUL3l9ctyOzIn1pwTi+nfZlsY10RWdiYG8jHE8fD9+mwZQXZ6UTVmsrQgMtB7ZIUyWnMQiUuLKaTkag4Z31WuCr8K0cYJi5NTqDfe1/5wGfmWLDeEM98jyS05S75i1h8nojxqhdU36dPbQmHkpkHhAHpwuj/w7KKfa8oXqp8jmQ=
+	t=1707828765; cv=none; b=G7YwFU+9qzvxwv7Urg4KYSCaIyeJcNoOSHnMpxb9lu30XX7vdJMld0gXnIbMPHjkzkfcO+V43a/PD5o+TlF2dGbOd1sBBzZgYsVr3QNRzg5lHQnxZDhFw249tc4nDVXlDlcWOj1dca1eeJUXv6mCmEGa2yoAbl6AStyVH0I8CPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707828668; c=relaxed/simple;
-	bh=cgc6WEo6KiUkTPoF8lda8b4oPP94RffhPHS5Dx9J9go=;
+	s=arc-20240116; t=1707828765; c=relaxed/simple;
+	bh=789bRJX8DokWAv0peYnprYx4hSWKuz/n+fUAW4gKb3k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JZzyC82AIVBTTBMiXswI9JQEJwn8xf8pY0Mg7S/7Kxfvlq+tbDeRizmGOtCvWxQ6FmhtafcbYGFUL9vincsvDKzD+/Ecov3gHBnzMSIAujcXtwPMcyfM5oK+GIP2+94CI0zA1pCR4GnLGTtm1W7xZG7Wn6XPVv2jDPn/3bXWPn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hvtyyZJ7; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707828667; x=1739364667;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=cgc6WEo6KiUkTPoF8lda8b4oPP94RffhPHS5Dx9J9go=;
-  b=hvtyyZJ7kyyDGuQ2e9he86CgmHj59pL0nQ9DwQ5Dlm7iK8fwZSuDKLAK
-   EltcLMDJ3AkkaSzuAw2P9S5JYc77leigUYisFqTP9No5HIkLXCVXIjLSI
-   /Fdv7EgjTji/UhPNe4YfITWmVw+kAr4eKm77oG+5sjYAxgKnAEG6mAQe8
-   f0bfFn0AT3FzfarWjGYKWwxvIVhgAYh7EvCcvjdSqPaupeBo4Ieblm2qA
-   fB8ikb+xZmlKFhstEaasjzkG79LYdQx5mVzIDT9oWoziD/FOyfIr01PVx
-   LjHvO5YSzwiPW17cjvD/LfQlt2U3a9h5RUFQu1SgHeL601OqJELSHMru4
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="5650567"
-X-IronPort-AV: E=Sophos;i="6.06,157,1705392000"; 
-   d="scan'208";a="5650567"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2024 04:51:07 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,157,1705392000"; 
-   d="scan'208";a="2832183"
-Received: from unknown (HELO mev-dev) ([10.237.112.144])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2024 04:51:03 -0800
-Date: Tue, 13 Feb 2024 13:50:59 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Karthik Sundaravel <ksundara@redhat.com>
-Cc: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	pmenzel@molgen.mpg.de, jiri@resnulli.us, rjarry@redhat.com,
-	aharivel@redhat.com, vchundur@redhat.com, cfontain@redhat.com,
-	jacob.e.keller@intel.com
-Subject: Re: [PATCH v3] ice: Add get/set hw address for VFs using devlink
- commands
-Message-ID: <ZctlswYbV1RHU2ip@mev-dev>
-References: <20240209100912.82473-1-ksundara@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qDbk09JsvxEYmSuu0/csJp/ZFLPf77CEUvDRbJN0bUYzOa7Z7g7S+u9KbCjtYJtP66bMttmO+HaZvlIn/4Vs+xLw8C73dBBMZFcOumDbDwRpccMsboGl2dUgNtl6xgRiST2fhJgknrsDGeLuZIvo+8Vd8Lh903zUy4llLl/t+vU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=QZ5P2C4c; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=hZijp1YyePpg6z5mqK/wkZFbKI8gevcXQ6MAxDSQK3U=; b=QZ5P2C4cgkJcJCowE5NN39r0ud
+	CFWi3i/emfvxrM1kuafpJARp7Cw0P9avlEp0/EuYAWwUmqaSa3XU7IiPaGAYNx4mfDxm/xvLXw06Z
+	ETZkkJx9TA4zKxjId7uLT7yhLoSAX5Ubma5w9zndIAGoa58xxNZZcUZ8xLoxqaN2Jaes=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rZsHA-007fzJ-R8; Tue, 13 Feb 2024 13:52:40 +0100
+Date: Tue, 13 Feb 2024 13:52:40 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next] r8169: add LED support for RTL8125/RTL8126
+Message-ID: <9da28504-d84f-493a-9d8d-71cc11d3a168@lunn.ch>
+References: <f982602c-9de3-4ca6-85a3-2c1d118dcb15@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,131 +61,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240209100912.82473-1-ksundara@redhat.com>
+In-Reply-To: <f982602c-9de3-4ca6-85a3-2c1d118dcb15@gmail.com>
 
-On Fri, Feb 09, 2024 at 03:39:12PM +0530, Karthik Sundaravel wrote:
-> Changing the MAC address of the VFs are not available
-> via devlink. Add the function handlers to set and get
-> the HW address for the VFs.
+On Mon, Feb 12, 2024 at 07:44:11PM +0100, Heiner Kallweit wrote:
+> This adds LED support for RTL8125/RTL8126.
 > 
-> Signed-off-by: Karthik Sundaravel <ksundara@redhat.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice_devlink.c | 86 +++++++++++++++++++-
->  1 file changed, 85 insertions(+), 1 deletion(-)
+> Note: Due to missing datasheets changing the 5Gbps link mode isn't
+> supported for RTL8126.
 > 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/ice_devlink.c
-> index 80dc5445b50d..7ed61b10312c 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_devlink.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
-> @@ -1576,6 +1576,89 @@ void ice_devlink_destroy_pf_port(struct ice_pf *pf)
->  	devlink_port_unregister(&pf->devlink_port);
->  }
->  
-> +/**
-> + * ice_devlink_port_get_vf_mac_address - .port_fn_hw_addr_get devlink handler
-> + * @port: devlink port structure
-> + * @hw_addr: MAC address of the port
-> + * @hw_addr_len: length of MAC address
-> + * @extack: extended netdev ack structure
-> + *
-> + * Callback for the devlink .port_fn_hw_addr_get operation
-> + * Return: zero on success or an error code on failure.
-> + */
-> +
-> +static int ice_devlink_port_get_vf_mac_address(struct devlink_port *port,
-> +					       u8 *hw_addr, int *hw_addr_len,
-> +					       struct netlink_ext_ack *extack)
-> +{
-> +	struct devlink_port_attrs *attrs = &port->attrs;
-> +	struct devlink_port_pci_vf_attrs *pci_vf;
-> +	struct devlink *devlink = port->devlink;
-> +	struct ice_pf *pf;
-> +	struct ice_vf *vf;
-> +	int vf_id;
-> +
-> +	pf = devlink_priv(devlink);
-> +	if (attrs->flavour == DEVLINK_PORT_FLAVOUR_PCI_VF) {
-> +		pci_vf = &attrs->pci_vf;
-> +		vf_id = pci_vf->vf;
-> +	} else {
-> +		NL_SET_ERR_MSG_MOD(extack, "Unable to get the vf id");
-> +		return -EADDRNOTAVAIL;
-> +	}
-> +	vf = ice_get_vf_by_id(pf, vf_id);
-You need to call ice_put_vf(vf); when you finish with vf.
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 
-This way to get vf pointer is fine, I wonder if it can be done using
-container_of on port variable. Jake, what do you think?
-CC: Jacob Keller
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-> +	if (!vf) {
-> +		NL_SET_ERR_MSG_MOD(extack, "Unable to get the vf");
-> +		return -EINVAL;
-> +	}
-> +	ether_addr_copy(hw_addr, vf->dev_lan_addr);
-> +	*hw_addr_len = ETH_ALEN;
-> +	return 0;
-> +}
-> +
-> +/**
-> + * ice_devlink_port_set_vf_mac_address - .port_fn_hw_addr_set devlink handler
-> + * @port: devlink port structure
-> + * @hw_addr: MAC address of the port
-> + * @hw_addr_len: length of MAC address
-> + * @extack: extended netdev ack structure
-> + *
-> + * Callback for the devlink .port_fn_hw_addr_set operation
-> + * Return: zero on success or an error code on failure.
-> + */
-> +static int ice_devlink_port_set_vf_mac_address(struct devlink_port *port,
-> +					       const u8 *hw_addr,
-> +					       int hw_addr_len,
-> +					       struct netlink_ext_ack *extack)
-> +{
-> +	struct net_device *netdev = port->type_eth.netdev;
-Is it PF netdev?
-
-> +	struct devlink_port_attrs *attrs = &port->attrs;
-> +	struct devlink_port_pci_vf_attrs *pci_vf;
-> +	u8 mac[ETH_ALEN];
-> +	int vf_id;
-> +
-> +	if (attrs->flavour == DEVLINK_PORT_FLAVOUR_PCI_VF) {
-> +		pci_vf = &attrs->pci_vf;
-> +		vf_id = pci_vf->vf;
-> +	} else {
-> +		NL_SET_ERR_MSG_MOD(extack, "Unable to get the vf id");
-> +		return -EADDRNOTAVAIL;
-> +	}
-> +
-> +	if (!netdev) {
-> +		NL_SET_ERR_MSG_MOD(extack, "Unable to get the netdev");
-> +		return -EADDRNOTAVAIL;
-> +	}
-> +	ether_addr_copy(mac, hw_addr);
-> +
-> +	return ice_set_vf_mac(netdev, vf_id, mac);
-> +}
-> +
-> +static const struct devlink_port_ops ice_devlink_vf_port_ops = {
-> +	.port_fn_hw_addr_get = ice_devlink_port_get_vf_mac_address,
-> +	.port_fn_hw_addr_set = ice_devlink_port_set_vf_mac_address,
-> +};
-> +
->  /**
->   * ice_devlink_create_vf_port - Create a devlink port for this VF
->   * @vf: the VF to create a port for
-> @@ -1611,7 +1694,8 @@ int ice_devlink_create_vf_port(struct ice_vf *vf)
->  	devlink_port_attrs_set(devlink_port, &attrs);
->  	devlink = priv_to_devlink(pf);
->  
-> -	err = devlink_port_register(devlink, devlink_port, vsi->idx);
-> +	err = devlink_port_register_with_ops(devlink, devlink_port,
-> +					     vsi->idx, &ice_devlink_vf_port_ops);
->  	if (err) {
->  		dev_err(dev, "Failed to create devlink port for VF %d, error %d\n",
->  			vf->vf_id, err);
-> -- 
-> 2.39.3 (Apple Git-145)
-> 
+    Andrew
 
