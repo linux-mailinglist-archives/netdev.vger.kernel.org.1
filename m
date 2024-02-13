@@ -1,76 +1,92 @@
-Return-Path: <netdev+bounces-71140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 482948526FE
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 02:50:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C053852714
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 02:52:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FDFF1C245CF
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:50:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 147A1B2A90F
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:51:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86DF71AAD7;
-	Tue, 13 Feb 2024 01:35:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F157E1EF13;
+	Tue, 13 Feb 2024 01:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T07/+ukb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i+k2iObi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5721E1B59E;
-	Tue, 13 Feb 2024 01:35:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC3DB1D688
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 01:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707788157; cv=none; b=VGv+pZecfWKUI2z8NRZ+VRIgtnbveW7kNu8a2VQ73+aulAt0zlQrtDD6AYxIBhQLsYhVmIWXj0jtJ3qaCXkET+emAQNb2GRpFqImvr9qokN13GQLtMz3rBsDWyTZaNs3d4ubt9TRhBPNZ6YmGxFnpNI6pmnjOUgDLHU9EhjRsA4=
+	t=1707788426; cv=none; b=YZrWbNp2wEIq/KeAiNdoJH9hwQWbEML7ipW7LH+iyaki73a96Q4s+w5GI+V3+7OPTK3mVRoBLxxp8whSk2kPEExNf8WfD72XogK4QkQ442B79nbh7MIlYn+dRYYjBWdkswpnNhm15mW+xIahrwWm0G3vDwijNKluUo2FsNN8Nmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707788157; c=relaxed/simple;
-	bh=aKWoMQBhztJhzWgzX1R5/kODWr7ReQymBJbcPq6O0LA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fkz43uUP5r82lsziPvE2ZQnKz8xOsySPNzebQhNXPug/I8R7MHxnWV7zTo2J0o4PKfDUfJ39X5h7XrUF3dyc6h0QMvri2Kw3BjI8zZ+iLXy1wIhfRGBJA5STIS4n6tNGpcKt5SWpQAU+ikLjTGo4hwuwgWvfqbwx37JPULdQOJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T07/+ukb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52EB9C433F1;
-	Tue, 13 Feb 2024 01:35:56 +0000 (UTC)
+	s=arc-20240116; t=1707788426; c=relaxed/simple;
+	bh=gZm94rOcjc+53sifIr8KM4xgD9bobTD7mzi7BsORG6U=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=T/RPudv0Lwu4pDusPzZyrQa69ilcS6Z2PeFawOerm7yXWlkBi3tqxZbBGTRqEjdv0Y0vRR6CL5OvWlKAFg/p4ka6sEW49MqeirNfgAf7QEuQdi3svZgPHqu7zUGVFGgUihhmRBrVHvHkIZ1W9BsxrBYuLr0Vyh6kDPiey/KM12c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i+k2iObi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4135BC433F1;
+	Tue, 13 Feb 2024 01:40:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707788156;
-	bh=aKWoMQBhztJhzWgzX1R5/kODWr7ReQymBJbcPq6O0LA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=T07/+ukbWJEp+zvZ0dmq4l5F94R6XpAQYYn+8+Xh8T6V13j5Jctwr3sRQLd5E6XAz
-	 KlRexcFuMREgNQ1Er7gTkagJdJh95kEFwKPHvTZUbNAsSikyAlumifKrGhKwQ42uCU
-	 q6grdcPlGlXoD5H18jndHgGkKyh8wysca++JR8TDRKxLGe7OJ391KS/113oF9HBtFi
-	 Rif10WyJwBAGrisT3Y1Gm0d4NsGwZP8QSCWEZqLhM7oO1TNho6J0htog/ZDTLnQZ3g
-	 gCDmivo+zMB+0/4TyKMiWIERFO477UmibH4sqsXzXifnedjhWHLwwPhVgh5Ffw1G/o
-	 Xq+pXz+Oabslg==
-Date: Mon, 12 Feb 2024 17:35:55 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Gustavo A. R.
- Silva" <gustavoars@kernel.org>, netdev@vger.kernel.org,
- linux-hardening@vger.kernel.org, Rasmus Villemoes
- <linux@rasmusvillemoes.dk>, Dan Williams <dan.j.williams@intel.com>, Keith
- Packard <keithp@keithp.com>, Miguel Ojeda <ojeda@kernel.org>, Alexey
- Dobriyan <adobriyan@gmail.com>, Dmitry Antipov <dmantipov@yandex.ru>,
- Nathan Chancellor <nathan@kernel.org>, kernel test robot <lkp@intel.com>,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] net/ipv4: Annotate imsf_slist_flex with
- __counted_by(imsf_numsrc)
-Message-ID: <20240212173555.576f1d59@kernel.org>
-In-Reply-To: <20240210011643.1706285-2-keescook@chromium.org>
-References: <20240210011452.work.985-kees@kernel.org>
-	<20240210011643.1706285-2-keescook@chromium.org>
+	s=k20201202; t=1707788426;
+	bh=gZm94rOcjc+53sifIr8KM4xgD9bobTD7mzi7BsORG6U=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=i+k2iObiCuEdks1hIxO3FNiv/PNSB717nWiSOgOzO8TJcDwJ02imewG+Rcgo50TkT
+	 vPGYUJxtYBgMjR/4NzZsKsEOnu69kEriYLzjFTjXlTVD2tX0pM4rx+lgS64t+NkIr9
+	 pwfJHHCO1dXdMJzXMeBIm+BskdoqUh94JG64nhH5tuyg+g7WgQ7tz3Rg1Fy+CsbgSX
+	 ft2/MD8oSmEP0bPqG7Es7yL3zmVQjWWu/G524hWWPNlbxzTxpNSYtrI+30OzK+zV97
+	 W1JEdCZyqVICA/ZbB3wEhbclVzQNIMGYWL9OTif/o995q4NjgZRvsiuCzbz1BUXcOg
+	 NqW+1iWEeULrQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 21586D84BD0;
+	Tue, 13 Feb 2024 01:40:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net] ionic: minimal work with 0 budget
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170778842613.15795.13754153243973570855.git-patchwork-notify@kernel.org>
+Date: Tue, 13 Feb 2024 01:40:26 +0000
+References: <20240210001307.48450-1-shannon.nelson@amd.com>
+In-Reply-To: <20240210001307.48450-1-shannon.nelson@amd.com>
+To: Shannon Nelson <shannon.nelson@amd.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, brett.creeley@amd.com,
+ drivers@pensando.io
 
-On Fri,  9 Feb 2024 17:16:42 -0800 Kees Cook wrote:
-> The size of the imsf_slist_flex member is determined by imsf_numsrc, so
-> annotate it as such.
+Hello:
 
-Acked-by: Jakub Kicinski <kuba@kernel.org>
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri, 9 Feb 2024 16:13:07 -0800 you wrote:
+> We should be doing as little as possible besides freeing Tx
+> space when our napi routines are called with budget of 0, so
+> jump out before doing anything besides Tx cleaning.
+> 
+> See commit afbed3f74830 ("net/mlx5e: do as little as possible in napi poll when budget is 0")
+> for more info.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2,net] ionic: minimal work with 0 budget
+    https://git.kernel.org/netdev/net/c/2f74258d997c
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
