@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-71181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49F9B852905
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 07:33:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0475852906
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 07:33:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0714E2844EE
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 06:33:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4BA31C233C3
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 06:33:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE643134CD;
-	Tue, 13 Feb 2024 06:33:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345C714010;
+	Tue, 13 Feb 2024 06:33:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aaFa9JNI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uY7uJagr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45E0D17562
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 06:33:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73A8817738
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 06:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707805981; cv=none; b=bB6+N5sUQf4PGVnBBOlSiAT4gHNWaEiFo7INOjpwdRP464Cz7wyZCSjGlIJX8pvU4TsYIl8zNkJQV2FFQN0G+gGRsISDgI5aYjdK+a/tcf3TYzAyIphgtCA9Xe8UhbwU0ayUcOtK4xTghJcoH8DdbdF58zgJPKHkiZPMsO/l5uc=
+	t=1707805983; cv=none; b=UcwRvjvMWTFHGSBdEEqtB90MXdeAxkLY9bLG7ZjMJBBKCBy1yl8jA/gA4013Q7hFyyW5D31dgnwCSeE2dscu/P9gaLbpJu9nSmaln89XIqA4G1Udy8XXrszKXIXyKLPDdngqWv41x8jhdi1Y0o0kb3HYtnkOGTi90d42z272z5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707805981; c=relaxed/simple;
-	bh=2QEWSDrKcwOJ8yFatOKq0aJznOY1GszOklLPUK+O8BI=;
+	s=arc-20240116; t=1707805983; c=relaxed/simple;
+	bh=29NazzhrGE6hldDXKEfZeTtJbn6TyiHxZa6TqeLkGCQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SSLLhObU12MuUuJycRusYwoEGQ+PIIez2OTxT5rd+GSBVTDTHEM6PeGV/lzsDv02SYJ/arWCg9WG7cyM2XwfvHxblEpzqP57OFsB6nxiW1ZXtGK31GiCoaYhHIbxkx8ibuQO6d1UFjaQSv4IfD11ryoMPKZb8Ps/Ig4rOI8ttOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aaFa9JNI; arc=none smtp.client-ip=209.85.160.202
+	 To:Cc:Content-Type; b=lZwrdtzekziDkgSfyrEVM0yC2mVZjzx9vYR6WP4HAPszUYvRh1X5fdQ6UwCPeqfbKX5VTSgOnpXrj4knPBRkR7z76EEvDCuB3vOsOPC/09YNeV27pfnBHpTk/+wt0YxX4EevX+BX0A1bVAMn0pdh12lwdujc2XZN0ne0x4LDQlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uY7uJagr; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-42c6d28d780so45347861cf.1
-        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 22:32:59 -0800 (PST)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6077fa2fa9bso9566657b3.2
+        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 22:33:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707805979; x=1708410779; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1707805980; x=1708410780; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=i1KqXMYa2UosTmP1duRdQrY9TNrdN9X/3nB8QxfCRp4=;
-        b=aaFa9JNI8S/aiOLxjr0UYAQOeprYjxvbREHxn2TDCAjqQN/pE3EgD5Sa6son2xX8/i
-         uVIg+UGqlNlYJGmtSukbW+Z28zN+9i6oydOj24w/S5E3teCb3UrQOGWBX6UML4rEDaG7
-         9LMcMw3G1JyRmXq0GK6q2ImCxF/y30kfHPT1abtkQtJv1zdesx4wGesVQGeS9JX6nAyt
-         zbAop7mZhIN+9zBEGeczc69ml/g9xY3o968ADtxOiUoW/zF3Ey5MKbYr90tgOEvfrD2A
-         N/NcuAhF9iauMG276EaPvA77O6QXgZRfZXrtM+P8vZ3vAIdpqiDtVLOcRBUEmokMXrWj
-         I9zg==
+        bh=vPy1zDswvQ5u8O4KAy1wp3PYWx/RjBzoiEF59UhpCs8=;
+        b=uY7uJagrwecJ0q2jz3+ujWvbdE+tHLvLiR1mCxorDo8Bljmc7MLdSqxRufZSSDYNfI
+         VU/k12oMMDReKyzpkQ5gMY8XEM3SD2uWkkl0WUX4Do5HeRnmpC1WyoQG2BDR70xaH9Jm
+         iuXshH7I1Opj2NZQm4ZInPrQu125ih5DsSUhA0JP1pKsqxSkw73M+542xUSkfC+FvPuF
+         ZehMOGC/98M+tDvkf8OJCBo7XuJ+eg52PEPoYECWiTIr7Vix5nOtppt0mjnBLYhXh5rk
+         qdela736a/er7ZwfnmgjdmKtbSGtE9MC9nafI0L/UoYKzuBZO7Y9pHpXd6dusKhoHhKg
+         QGpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707805979; x=1708410779;
+        d=1e100.net; s=20230601; t=1707805980; x=1708410780;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=i1KqXMYa2UosTmP1duRdQrY9TNrdN9X/3nB8QxfCRp4=;
-        b=cb756w0I1o/sgxUY4CZ4E316Ds8Jf1duqgf54ALhZWWa0um+HO6JDscLqmCkpATMSd
-         Uj0Xnvoz1Njw5ESxMlgiIpzAyyoDUZxqF3yFzFJirY9XN97A1XlbJxUamhx9+j7oy3Y+
-         pBC7+nEJIE9xzhCD2MP56zdWNz0yoXf1NxVUZpSQXfJQULuffbcnvOPYhkB852C40Nx1
-         VNHADVcDxo8AUFNf4gihXf31JUxMVPcSBK5e43QPAyTyym8BvqrwUeXXcLb5hPNIM60r
-         xmDvI1xi4k8kwaCavAivX4il4cdZXv9oZvUkczT00tFElA1CKHN0nqzIokk6rYoq2wq8
-         XSGA==
-X-Gm-Message-State: AOJu0YwJAr3JKPDD4yzo53Hv9UnDZzQ6gVDJcvTeGojVZpy46vQowsbj
-	HYwhCyoQs6zekbVAwiFlZm5jHT43QQJE5yC80uN1EKCFaKD+Uvd+omQiv4pT4TAdM5f4VJUfih3
-	F6iLAXNxlRQ==
-X-Google-Smtp-Source: AGHT+IE8TY0Zc2tXrC+fGi18bIjGD19yDtMntMeLJ65mOCZCQFfCaYaY57/D3e2X3C5GRLhtN+ky44lpwKF5TA==
+        bh=vPy1zDswvQ5u8O4KAy1wp3PYWx/RjBzoiEF59UhpCs8=;
+        b=mAJgLC/wgJIm+sFD58KNIrOCR7zGW2uo1VCUPd/rCXfRpOyeRuTw7hsZyycp7CjIaE
+         UmhunVhlPHfPKqADQnpSwNtVP6HRkK5ved94Bmo1kzkCSN3nurS2Fn7SJoY+7fzJHswn
+         5boX9PSPd/BYCg6CgWOLTLeG/C6DI6V/VmC+eJitK2v1J5UJtcpmgMyypb7SW/OMVjqF
+         6E0TrEXHLYm4HYyXslPetFWGQua0BBt9UR9zFoA4PpVZpoZLpd2Ayra79qNACqHUSM0g
+         sDB9awCn2JKyDwrRxSq2b3GqA10cjvjTOQpLNccGJVWcGBfFeGMTlgR4i749Fm6UBbiW
+         Lp9w==
+X-Gm-Message-State: AOJu0Yz/Ie7q0/PhQ85XMDY3WcjAwqfXW7eqMuR11w8OPyqBNTmMxbGd
+	PCS2Wu9ggpoM3Ti6XtFo6IsyNK7pEyGL03V/PqyPHY8zrPUL2WvYrcvD6Q7gOPOYASnMslKsAvY
+	9I2t3dELUBw==
+X-Google-Smtp-Source: AGHT+IFLvUj/T3D+v4OUbHXXYbR1dfLts2TL5Gr7WRffT1e4qSn9gDJbLldzubugF5EKdcfke2UMgRoZ4Wo17g==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:ac8:5a15:0:b0:42c:5c99:2c9f with SMTP id
- n21-20020ac85a15000000b0042c5c992c9fmr38449qta.3.1707805979182; Mon, 12 Feb
- 2024 22:32:59 -0800 (PST)
-Date: Tue, 13 Feb 2024 06:32:38 +0000
+ (user=edumazet job=sendgmr) by 2002:a0d:dd47:0:b0:607:83bd:bea3 with SMTP id
+ g68-20020a0ddd47000000b0060783bdbea3mr191094ywe.10.1707805980476; Mon, 12 Feb
+ 2024 22:33:00 -0800 (PST)
+Date: Tue, 13 Feb 2024 06:32:39 +0000
 In-Reply-To: <20240213063245.3605305-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,9 +73,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240213063245.3605305-1-edumazet@google.com>
 X-Mailer: git-send-email 2.43.0.687.g38aa6559b0-goog
-Message-ID: <20240213063245.3605305-7-edumazet@google.com>
-Subject: [PATCH v4 net-next 06/13] net-sysfs: use dev_addr_sem to remove races
- in address_show()
+Message-ID: <20240213063245.3605305-8-edumazet@google.com>
+Subject: [PATCH v4 net-next 07/13] net-sysfs: convert dev->operstate reads to
+ lockless ones
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -83,83 +83,146 @@ Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Using dev_base_lock is not preventing from reading garbage.
+operstate_show() can omit dev_base_lock acquisition only
+to read dev->operstate.
 
-Use dev_addr_sem instead.
+Annotate accesses to dev->operstate.
 
-v4: place dev_addr_sem extern in net/core/dev.h (Jakub Kicinski)
- Link: https://lore.kernel.org/netdev/20240212175845.10f6680a@kernel.org/
+Writers still acquire dev_base_lock for mutual exclusion.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/core/dev.c       |  2 +-
- net/core/dev.h       |  3 +++
- net/core/net-sysfs.c | 10 +++++++---
- 3 files changed, 11 insertions(+), 4 deletions(-)
+ net/bridge/br_netlink.c |  3 ++-
+ net/core/link_watch.c   |  4 ++--
+ net/core/net-sysfs.c    |  4 +---
+ net/core/rtnetlink.c    |  4 ++--
+ net/hsr/hsr_device.c    | 10 +++++-----
+ net/ipv6/addrconf.c     |  2 +-
+ 6 files changed, 13 insertions(+), 14 deletions(-)
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index c08e8830ff976e74455157d3a3b8819e8424f93c..ddf2beae547726590b1f0bbad3d40c0556d815d2 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -8951,7 +8951,7 @@ int dev_set_mac_address(struct net_device *dev, struct sockaddr *sa,
+diff --git a/net/bridge/br_netlink.c b/net/bridge/br_netlink.c
+index 5ad4abfcb7ba3960bf69613ae7975180ae48854b..2cf4fc756263992eefe6a3580410766fea0c2c1f 100644
+--- a/net/bridge/br_netlink.c
++++ b/net/bridge/br_netlink.c
+@@ -455,7 +455,8 @@ static int br_fill_ifinfo(struct sk_buff *skb,
+ 			  u32 filter_mask, const struct net_device *dev,
+ 			  bool getlink)
+ {
+-	u8 operstate = netif_running(dev) ? dev->operstate : IF_OPER_DOWN;
++	u8 operstate = netif_running(dev) ? READ_ONCE(dev->operstate) :
++					    IF_OPER_DOWN;
+ 	struct nlattr *af = NULL;
+ 	struct net_bridge *br;
+ 	struct ifinfomsg *hdr;
+diff --git a/net/core/link_watch.c b/net/core/link_watch.c
+index 429571c258da7720baf387fef81081a56a655ef5..1b93e054c9a3cfcdd5d1251a9982d88a071abbaa 100644
+--- a/net/core/link_watch.c
++++ b/net/core/link_watch.c
+@@ -67,7 +67,7 @@ static void rfc2863_policy(struct net_device *dev)
+ {
+ 	unsigned char operstate = default_operstate(dev);
+ 
+-	if (operstate == dev->operstate)
++	if (operstate == READ_ONCE(dev->operstate))
+ 		return;
+ 
+ 	write_lock(&dev_base_lock);
+@@ -87,7 +87,7 @@ static void rfc2863_policy(struct net_device *dev)
+ 		break;
+ 	}
+ 
+-	dev->operstate = operstate;
++	WRITE_ONCE(dev->operstate, operstate);
+ 
+ 	write_unlock(&dev_base_lock);
  }
- EXPORT_SYMBOL(dev_set_mac_address);
- 
--static DECLARE_RWSEM(dev_addr_sem);
-+DECLARE_RWSEM(dev_addr_sem);
- 
- int dev_set_mac_address_user(struct net_device *dev, struct sockaddr *sa,
- 			     struct netlink_ext_ack *extack)
-diff --git a/net/core/dev.h b/net/core/dev.h
-index a43dfe3de50ee75ee0f4b290b385378ed4a6cfdc..45892267848d7a35a09aea95f04cfd9b72204d3c 100644
---- a/net/core/dev.h
-+++ b/net/core/dev.h
-@@ -3,6 +3,7 @@
- #define _NET_CORE_DEV_H
- 
- #include <linux/types.h>
-+#include <linux/rwsem.h>
- 
- struct net;
- struct net_device;
-@@ -46,6 +47,8 @@ extern int		weight_p;
- extern int		dev_weight_rx_bias;
- extern int		dev_weight_tx_bias;
- 
-+extern struct rw_semaphore dev_addr_sem;
-+
- /* rtnl helpers */
- extern struct list_head net_todo_list;
- void netdev_run_todo(void);
 diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-index 678e4be690821c5cdb933f5e91af2247ebecb830..23ef2df549c3036a702f3be1dca1eda14ee5e76f 100644
+index 23ef2df549c3036a702f3be1dca1eda14ee5e76f..c5d164b8c6bfb53793f8422063c6281d6339b36e 100644
 --- a/net/core/net-sysfs.c
 +++ b/net/core/net-sysfs.c
-@@ -142,17 +142,21 @@ static ssize_t name_assign_type_show(struct device *dev,
- }
- static DEVICE_ATTR_RO(name_assign_type);
- 
--/* use same locking rules as GIFHWADDR ioctl's */
-+/* use same locking rules as GIFHWADDR ioctl's (dev_get_mac_address()) */
- static ssize_t address_show(struct device *dev, struct device_attribute *attr,
- 			    char *buf)
- {
- 	struct net_device *ndev = to_net_dev(dev);
- 	ssize_t ret = -EINVAL;
+@@ -325,11 +325,9 @@ static ssize_t operstate_show(struct device *dev,
+ 	const struct net_device *netdev = to_net_dev(dev);
+ 	unsigned char operstate;
  
 -	read_lock(&dev_base_lock);
-+	down_read(&dev_addr_sem);
-+
-+	rcu_read_lock();
- 	if (dev_isalive(ndev))
- 		ret = sysfs_format_mac(buf, ndev->dev_addr, ndev->addr_len);
+-	operstate = netdev->operstate;
++	operstate = READ_ONCE(netdev->operstate);
+ 	if (!netif_running(netdev))
+ 		operstate = IF_OPER_DOWN;
 -	read_unlock(&dev_base_lock);
-+	rcu_read_unlock();
-+
-+	up_read(&dev_addr_sem);
- 	return ret;
+ 
+ 	if (operstate >= ARRAY_SIZE(operstates))
+ 		return -EINVAL; /* should not happen */
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index 8d95e0863534f80cecceb2dd4a7b2a16f7f4bca3..4e797326c88fe1e23ca66e82103176767fe5c32e 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -866,9 +866,9 @@ static void set_operstate(struct net_device *dev, unsigned char transition)
+ 		break;
+ 	}
+ 
+-	if (dev->operstate != operstate) {
++	if (READ_ONCE(dev->operstate) != operstate) {
+ 		write_lock(&dev_base_lock);
+-		dev->operstate = operstate;
++		WRITE_ONCE(dev->operstate, operstate);
+ 		write_unlock(&dev_base_lock);
+ 		netdev_state_change(dev);
+ 	}
+diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
+index 9d71b66183daf94e19945d75cfb5c33df6ce346c..be0e43f46556e028e675147e63c6b787aa72e894 100644
+--- a/net/hsr/hsr_device.c
++++ b/net/hsr/hsr_device.c
+@@ -31,8 +31,8 @@ static bool is_slave_up(struct net_device *dev)
+ static void __hsr_set_operstate(struct net_device *dev, int transition)
+ {
+ 	write_lock(&dev_base_lock);
+-	if (dev->operstate != transition) {
+-		dev->operstate = transition;
++	if (READ_ONCE(dev->operstate) != transition) {
++		WRITE_ONCE(dev->operstate, transition);
+ 		write_unlock(&dev_base_lock);
+ 		netdev_state_change(dev);
+ 	} else {
+@@ -78,14 +78,14 @@ static void hsr_check_announce(struct net_device *hsr_dev,
+ 
+ 	hsr = netdev_priv(hsr_dev);
+ 
+-	if (hsr_dev->operstate == IF_OPER_UP && old_operstate != IF_OPER_UP) {
++	if (READ_ONCE(hsr_dev->operstate) == IF_OPER_UP && old_operstate != IF_OPER_UP) {
+ 		/* Went up */
+ 		hsr->announce_count = 0;
+ 		mod_timer(&hsr->announce_timer,
+ 			  jiffies + msecs_to_jiffies(HSR_ANNOUNCE_INTERVAL));
+ 	}
+ 
+-	if (hsr_dev->operstate != IF_OPER_UP && old_operstate == IF_OPER_UP)
++	if (READ_ONCE(hsr_dev->operstate) != IF_OPER_UP && old_operstate == IF_OPER_UP)
+ 		/* Went down */
+ 		del_timer(&hsr->announce_timer);
  }
- static DEVICE_ATTR_RO(address);
+@@ -100,7 +100,7 @@ void hsr_check_carrier_and_operstate(struct hsr_priv *hsr)
+ 	/* netif_stacked_transfer_operstate() cannot be used here since
+ 	 * it doesn't set IF_OPER_LOWERLAYERDOWN (?)
+ 	 */
+-	old_operstate = master->dev->operstate;
++	old_operstate = READ_ONCE(master->dev->operstate);
+ 	has_carrier = hsr_check_carrier(master);
+ 	hsr_set_operstate(master, has_carrier);
+ 	hsr_check_announce(master->dev, old_operstate);
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index ca1b719323c0badf7b62a33e17d7378ac84a7107..2c1ed642e3f45658611f5f43b60ef400f834f4e9 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -6025,7 +6025,7 @@ static int inet6_fill_ifinfo(struct sk_buff *skb, struct inet6_dev *idev,
+ 	    (dev->ifindex != dev_get_iflink(dev) &&
+ 	     nla_put_u32(skb, IFLA_LINK, dev_get_iflink(dev))) ||
+ 	    nla_put_u8(skb, IFLA_OPERSTATE,
+-		       netif_running(dev) ? dev->operstate : IF_OPER_DOWN))
++		       netif_running(dev) ? READ_ONCE(dev->operstate) : IF_OPER_DOWN))
+ 		goto nla_put_failure;
+ 	protoinfo = nla_nest_start_noflag(skb, IFLA_PROTINFO);
+ 	if (!protoinfo)
 -- 
 2.43.0.687.g38aa6559b0-goog
 
