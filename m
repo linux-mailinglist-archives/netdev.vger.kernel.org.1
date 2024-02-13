@@ -1,167 +1,293 @@
-Return-Path: <netdev+bounces-71220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C91A8529F2
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 08:32:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3DAD8529FA
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 08:34:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 331B928364F
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 07:32:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 251331F2289C
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 07:34:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 704DC17983;
-	Tue, 13 Feb 2024 07:32:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38025175AC;
+	Tue, 13 Feb 2024 07:34:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vYW8JcDd"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nNFt9zCY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 370C21757B
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 07:32:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EF0717589
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 07:34:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707809555; cv=none; b=J3tCs/mLqETomaa4h4iKsc3Gg3OxY17+LhLP0/kb35BV7yJg35CkZe/pBb+aXfaPYNQATN7R0M8beCXPlQIPNOW8R4HQ+mFA2AZ2IuxKNJeI4mLnPyZakiEU/d5jK4mKXcPDxiIDjB98QJtHV/w3/uG1+GnAZoOINhCN4u1wbjM=
+	t=1707809680; cv=none; b=BD4eVaw9yqq408KUSd/rng9WpGP6jhUm+Q/78KwNH7m1xERaZDwpuW0lQKaaKfOn2vBqKVxDSZYDwijGb3Y23tIpvxa9AmvPoxTvnS6h1D6E9ej//7xXbuY5Jy9lktOQUgJWAWHOGXaCSvd2ODyQb4UqnFl6wdY/ozIJuRq8qFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707809555; c=relaxed/simple;
-	bh=egWUH1uiBpqU9NPw0kO+DB/TZsZdLAGY6A9byNiZEKE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GCi+dyYc/+OrqKCAmfQfXITvRka4mFkf1VPh9QdmP0FyL+l7YtIJs0o94eLCu0M6c6PCd3HlGQU20j9D9GHXOIf94vUSuWm7vM3ZvsbT/wXE4TqKNcIp+GBTVWb64qH0GnIDSxQBm+15NwP5LRThrV2Q2RW9uhWvsH7AsC7sT6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=vYW8JcDd; arc=none smtp.client-ip=209.85.128.48
+	s=arc-20240116; t=1707809680; c=relaxed/simple;
+	bh=XpRcvk2ycbfCby9sRCvRsXe1R+HhnScg1xpwkWpoTP0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MZn4vedMKxA2iN8EfhyTqOFJeL6Kiz2gsAeyayDsykoKXealxO2JDd0BWagKUg7us8+NHD8rBlw6X5lTkMjIJBo9Pzn37UuNSBOuLxTtXzQ7gQo4qwz/ratlxNaXWAg0Xj9Vb93naRQuPV7ve7UlDjaEez16i1HYXWw/+PXuBFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=nNFt9zCY; arc=none smtp.client-ip=209.85.167.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-41166710058so9247195e9.3
-        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 23:32:31 -0800 (PST)
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5112bd13a4fso5375018e87.0
+        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 23:34:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1707809550; x=1708414350; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=vW2m+VEGI/GL+PlpW04VatVIySi+IdTDX+rOzYR1mss=;
-        b=vYW8JcDdXfh7+IiS2CRo2jzeOiUb9IXdyv7tXq/8zbycca3X564TI4KTOB2HmukcPk
-         kvTyYqOjLe+/fhQrOLP+OA62+sXor//YMBQqkAIqg8ENQkQ8vvsV1pYsU+RXIDSKStwo
-         dhdMzh0N7I8Tt9TG0CakHMswva2cljt2d5A11AvKkk72pJLRcKKflbrxqaaBbZgDDIuJ
-         OZeDfXLt7go5iqEECxR9Zf3F/Xg9Zt0TfRWnAIpHFnzRXiXNonVNvVj24qaH8gIbSGPY
-         bjHiyY1h8LJOnKAU/W4I+Lnl9Ep4V7aAGCvIyiH4smNMhbbBp0aZFFE17ojNKEN3fQwK
-         FMGA==
+        d=linaro.org; s=google; t=1707809675; x=1708414475; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=oNmgCoKzExu2HFXlZ+cX7+uAKGh8najCR9nXU/0f0L4=;
+        b=nNFt9zCYLkXWSsedKQZmgudj44w/eyk+litdZJl+OqpNiBotXduxN42cVvGvYpJMAg
+         uxgPqYA8I0TXPNLR9J+ZK2rWk3I/NR+Ny2tawOS7tBvdnma2s1EbQSoD31Tea2TfH/aP
+         VDAdgEEW+KBsYBCBRJY9n9MXBsP/Zb2a8HIrKICT4jaYRUq4Q5B1GuhTi1Dfuy2MKRPU
+         a6EPVKUKcI1u6LtwYR9KriKLXO904Cb6Vyx48S/pZPaXPtJKMqPYuP/OtTlC/YSDpsUM
+         SIGCfK8KSsg/zwnwMK+inm00M8yTZkxk1o94FPoAM7/4vPyUBUnLOKlBxIn9AT6KrXhQ
+         mz4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707809550; x=1708414350;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vW2m+VEGI/GL+PlpW04VatVIySi+IdTDX+rOzYR1mss=;
-        b=HS96mT+lt+65gI2Qe1jGAbuNx6dw4muaSb+JK4c2Ma5buGG2LwKxGUAuz+njQNICBl
-         PMpoXxKgoJu8T00zqvmatZ4rngM77dFxmXPO5e8cdQ5Y+hAJL/3j2x6IFC9ZfQ5r9ZjN
-         4O3Wh6s1pOimZR6EL/hBJt+TdK/8hSQ+WjCnkxS3NVMTgSQrj/djSsXFEju6sZjGf0Cz
-         as0hFgLkKN/0B5jRaKtpcEZ01rIBvxD29l+c6FpT2vylEi58dM641QH8NndgwgIq8+iW
-         ylMTEpo9qCwBQP9WhFv4Kk6QNxa5zMwdG3A2FlQSALf5uocS0Q8qx325uidxsh37MKyA
-         TD9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXYvyScd20sYz8ENPBBlog1Vip5bFn3KC/O0WxwmUkE4z+uyfQ/F9o/fT1ESvQzRZC1Z2ljq1Ph6l/eti0dbvcCoC84+yCq
-X-Gm-Message-State: AOJu0YxuOH2Bb2xMzA8Stcs1Fi67AZanDvd7556y+v/eY6KySpQGAUI9
-	vfCOuRbXufI/2QHbWI34LeRZzTNJ078g4wNUpfgUIvci6dQ0wAquww/txW2S2M4=
-X-Google-Smtp-Source: AGHT+IGE9381K5a0/HVdWMFOMHxU49Odu6x/whCHfPJvBfO90qRN2uF+RlxvT1mQb5ZRWXTdeeMqPA==
-X-Received: by 2002:a05:600c:138f:b0:410:7f97:4825 with SMTP id u15-20020a05600c138f00b004107f974825mr7072279wmf.12.1707809550506;
-        Mon, 12 Feb 2024 23:32:30 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVWGf+BPnSl7ohKfJ5aEhYyMP2eiK/Ml8SPkj6SD0t6y5wMjvEN7YF2hzLnZtpKuFn2PsJAanYqZ1qRRNQUUt45a2cQbFmBBeX/HWiYr+z2xrNW5d9fcXNN6cCFx6QjGQxm5X11EkrqTP8M0sVVD3pwOBn9M0etasnfZQIbi4ASnMt+8wEMBY1plEHCvG+S+SI/7IU0FeSj09mhkAFMl8ZdtzwbiveQ+2qMIgt1CVViXiVxvo/LgGNCDjWYpw4o+xg+0cbyakOtrbz3Fx5ZnKs9auH0gbcqdXo1rhV5hlqj+DKFMw3cA4qDfd9qwdtaUQ4ZSv0oTaeSC5rXxcgBT9YAlkg2qniV30D4hFI1FenD4e4v39TL+yIIla6Yl1NgyN8QbvXO9lAcguGWlI7QGpRfBy0XuJvuI4X7IoQNdwJyOcMZ6uY=
-Received: from [192.168.1.20] ([178.197.223.6])
-        by smtp.gmail.com with ESMTPSA id k9-20020a05600c1c8900b00410d7e55e5asm4980204wms.3.2024.02.12.23.32.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Feb 2024 23:32:30 -0800 (PST)
-Message-ID: <ab453a46-84da-4ac7-82e0-41e2349abcf4@linaro.org>
-Date: Tue, 13 Feb 2024 08:32:28 +0100
+        d=1e100.net; s=20230601; t=1707809675; x=1708414475;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oNmgCoKzExu2HFXlZ+cX7+uAKGh8najCR9nXU/0f0L4=;
+        b=Nesb2H3rnh9mLy/bQUvTdnaf0B3Z2LVeyUn0Ed9cWgIpb9QtpxNA/YOxggKyAKaxbX
+         2XFmk1ePTWLxmkhfgG1ug+xA0oppew3JdN+VX0ku4KwwkLBG4iAQgi849jGP+oL5C/AD
+         bu3nWc0LYBI7JiCHHJCHrkyU6OrP4baWMmWydqqwI362xj9XtHN0sF1inHm1TtslGG4Y
+         VYVjlxlGf/hJWZTO43eTlAZeOSS+iF63oDqfj0FJSkyOlYu5hfiAJNcUn/Uura7JF2Vd
+         yo7qb5DgooR8B02TZRwPmjZwT55DEpjVv73ExxQCJfb0Q8cIL+fdfuFGJjNHN/NRSQLg
+         /4uQ==
+X-Gm-Message-State: AOJu0YwbSptftyW/mP2Y2z4ewEX61yRjLzpTA/XxsM/Bpo9YuvBT3ljS
+	SlL1CLwnncvlP0zyR7fIq8eKxntq4rwBA4QA8m3jqGPtc8u/a357ZY4Thuy/dC00oOe/KL9tHMu
+	Ju5IAU2/2VtFQEQ5iUhikaJrqp6BHIE++nhHevw==
+X-Google-Smtp-Source: AGHT+IHCUUkAT8ZAr9cA1XJrvOZJcRI1hNfxXWXDq9VC8ycMS4zFxRhmpMytgn8AuvAqf4USRRbcCmOx6Z9zJq7uATg=
+X-Received: by 2002:ac2:521c:0:b0:511:8f42:9ec with SMTP id
+ a28-20020ac2521c000000b005118f4209ecmr567836lfl.14.1707809675075; Mon, 12 Feb
+ 2024 23:34:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] dt-bindings: net: qca,ar9331: convert to DT schema
-To: Conor Dooley <conor@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Oleksij Rempel
- <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240212182911.233819-1-krzysztof.kozlowski@linaro.org>
- <20240212-macaw-dispense-e073f5d73fe3@spud>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240212-macaw-dispense-e073f5d73fe3@spud>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <cover.1707132752.git.lorenzo@kernel.org> <1b7af9f7bac0d144e3fd44dc62320763349e728b.1707132752.git.lorenzo@kernel.org>
+In-Reply-To: <1b7af9f7bac0d144e3fd44dc62320763349e728b.1707132752.git.lorenzo@kernel.org>
+From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Date: Tue, 13 Feb 2024 09:33:58 +0200
+Message-ID: <CAC_iWjJQ0H90xfD1Jq-DZTPC-GwOh+WMiC24=HnerEkqbF=FDA@mail.gmail.com>
+Subject: Re: [PATCH v8 net-next 1/4] net: add generic percpu page_pool allocator
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: netdev@vger.kernel.org, lorenzo.bianconi@redhat.com, davem@davemloft.net, 
+	kuba@kernel.org, edumazet@google.com, pabeni@redhat.com, bpf@vger.kernel.org, 
+	toke@redhat.com, willemdebruijn.kernel@gmail.com, jasowang@redhat.com, 
+	sdf@google.com, hawk@kernel.org, linyunsheng@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 12/02/2024 20:25, Conor Dooley wrote:
-> On Mon, Feb 12, 2024 at 07:29:11PM +0100, Krzysztof Kozlowski wrote:
->> diff --git a/Documentation/devicetree/bindings/net/dsa/qca,ar9331.yaml b/Documentation/devicetree/bindings/net/dsa/qca,ar9331.yaml
->> new file mode 100644
->> index 000000000000..fd9ddc59d38c
->> --- /dev/null
->> +++ b/Documentation/devicetree/bindings/net/dsa/qca,ar9331.yaml
->> @@ -0,0 +1,161 @@
->> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-> 
-> I don't recall whether or not Pengutronix are on the carte blache list
-> for relicensing bindings under the dual license.
-> 
-> Otherwise,
-> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-
-Only two sentences from description were copied, which do not carry
-substantial information, so we could argue that there is not much to
-copyright.
-
-Best regards,
-Krzysztof
-
+On Mon, 5 Feb 2024 at 13:35, Lorenzo Bianconi <lorenzo@kernel.org> wrote:
+>
+> Introduce generic percpu page_pools allocator.
+> Moreover add page_pool_create_percpu() and cpuid filed in page_pool struct
+> in order to recycle the page in the page_pool "hot" cache if
+> napi_pp_put_page() is running on the same cpu.
+> This is a preliminary patch to add xdp multi-buff support for xdp running
+> in generic mode.
+>
+> Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+> Reviewed-by: Toke Hoiland-Jorgensen <toke@redhat.com>
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> ---
+>  include/net/page_pool/types.h |  3 +++
+>  net/core/dev.c                | 45 +++++++++++++++++++++++++++++++++++
+>  net/core/page_pool.c          | 23 ++++++++++++++----
+>  net/core/skbuff.c             |  5 ++--
+>  4 files changed, 70 insertions(+), 6 deletions(-)
+>
+> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
+> index 76481c465375..3828396ae60c 100644
+> --- a/include/net/page_pool/types.h
+> +++ b/include/net/page_pool/types.h
+> @@ -128,6 +128,7 @@ struct page_pool_stats {
+>  struct page_pool {
+>         struct page_pool_params_fast p;
+>
+> +       int cpuid;
+>         bool has_init_callback;
+>
+>         long frag_users;
+> @@ -203,6 +204,8 @@ struct page *page_pool_alloc_pages(struct page_pool *pool, gfp_t gfp);
+>  struct page *page_pool_alloc_frag(struct page_pool *pool, unsigned int *offset,
+>                                   unsigned int size, gfp_t gfp);
+>  struct page_pool *page_pool_create(const struct page_pool_params *params);
+> +struct page_pool *page_pool_create_percpu(const struct page_pool_params *params,
+> +                                         int cpuid);
+>
+>  struct xdp_mem_info;
+>
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 27ba057d06c4..235421d313c3 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -153,6 +153,8 @@
+>  #include <linux/prandom.h>
+>  #include <linux/once_lite.h>
+>  #include <net/netdev_rx_queue.h>
+> +#include <net/page_pool/types.h>
+> +#include <net/page_pool/helpers.h>
+>
+>  #include "dev.h"
+>  #include "net-sysfs.h"
+> @@ -450,6 +452,12 @@ static RAW_NOTIFIER_HEAD(netdev_chain);
+>  DEFINE_PER_CPU_ALIGNED(struct softnet_data, softnet_data);
+>  EXPORT_PER_CPU_SYMBOL(softnet_data);
+>
+> +/* Page_pool has a lockless array/stack to alloc/recycle pages.
+> + * PP consumers must pay attention to run APIs in the appropriate context
+> + * (e.g. NAPI context).
+> + */
+> +static DEFINE_PER_CPU_ALIGNED(struct page_pool *, system_page_pool);
+> +
+>  #ifdef CONFIG_LOCKDEP
+>  /*
+>   * register_netdevice() inits txq->_xmit_lock and sets lockdep class
+> @@ -11697,6 +11705,27 @@ static void __init net_dev_struct_check(void)
+>   *
+>   */
+>
+> +/* We allocate 256 pages for each CPU if PAGE_SHIFT is 12 */
+> +#define SYSTEM_PERCPU_PAGE_POOL_SIZE   ((1 << 20) / PAGE_SIZE)
+> +
+> +static int net_page_pool_create(int cpuid)
+> +{
+> +#if IS_ENABLED(CONFIG_PAGE_POOL)
+> +       struct page_pool_params page_pool_params = {
+> +               .pool_size = SYSTEM_PERCPU_PAGE_POOL_SIZE,
+> +               .nid = NUMA_NO_NODE,
+> +       };
+> +       struct page_pool *pp_ptr;
+> +
+> +       pp_ptr = page_pool_create_percpu(&page_pool_params, cpuid);
+> +       if (IS_ERR(pp_ptr))
+> +               return -ENOMEM;
+> +
+> +       per_cpu(system_page_pool, cpuid) = pp_ptr;
+> +#endif
+> +       return 0;
+> +}
+> +
+>  /*
+>   *       This is called single threaded during boot, so no need
+>   *       to take the rtnl semaphore.
+> @@ -11749,6 +11778,9 @@ static int __init net_dev_init(void)
+>                 init_gro_hash(&sd->backlog);
+>                 sd->backlog.poll = process_backlog;
+>                 sd->backlog.weight = weight_p;
+> +
+> +               if (net_page_pool_create(i))
+> +                       goto out;
+>         }
+>
+>         dev_boot_phase = 0;
+> @@ -11776,6 +11808,19 @@ static int __init net_dev_init(void)
+>         WARN_ON(rc < 0);
+>         rc = 0;
+>  out:
+> +       if (rc < 0) {
+> +               for_each_possible_cpu(i) {
+> +                       struct page_pool *pp_ptr;
+> +
+> +                       pp_ptr = per_cpu(system_page_pool, i);
+> +                       if (!pp_ptr)
+> +                               continue;
+> +
+> +                       page_pool_destroy(pp_ptr);
+> +                       per_cpu(system_page_pool, i) = NULL;
+> +               }
+> +       }
+> +
+>         return rc;
+>  }
+>
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index 4933762e5a6b..89c835fcf094 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -171,13 +171,16 @@ static void page_pool_producer_unlock(struct page_pool *pool,
+>  }
+>
+>  static int page_pool_init(struct page_pool *pool,
+> -                         const struct page_pool_params *params)
+> +                         const struct page_pool_params *params,
+> +                         int cpuid)
+>  {
+>         unsigned int ring_qsize = 1024; /* Default */
+>
+>         memcpy(&pool->p, &params->fast, sizeof(pool->p));
+>         memcpy(&pool->slow, &params->slow, sizeof(pool->slow));
+>
+> +       pool->cpuid = cpuid;
+> +
+>         /* Validate only known flags were used */
+>         if (pool->p.flags & ~(PP_FLAG_ALL))
+>                 return -EINVAL;
+> @@ -253,10 +256,12 @@ static void page_pool_uninit(struct page_pool *pool)
+>  }
+>
+>  /**
+> - * page_pool_create() - create a page pool.
+> + * page_pool_create_percpu() - create a page pool for a given cpu.
+>   * @params: parameters, see struct page_pool_params
+> + * @cpuid: cpu identifier
+>   */
+> -struct page_pool *page_pool_create(const struct page_pool_params *params)
+> +struct page_pool *
+> +page_pool_create_percpu(const struct page_pool_params *params, int cpuid)
+>  {
+>         struct page_pool *pool;
+>         int err;
+> @@ -265,7 +270,7 @@ struct page_pool *page_pool_create(const struct page_pool_params *params)
+>         if (!pool)
+>                 return ERR_PTR(-ENOMEM);
+>
+> -       err = page_pool_init(pool, params);
+> +       err = page_pool_init(pool, params, cpuid);
+>         if (err < 0)
+>                 goto err_free;
+>
+> @@ -282,6 +287,16 @@ struct page_pool *page_pool_create(const struct page_pool_params *params)
+>         kfree(pool);
+>         return ERR_PTR(err);
+>  }
+> +EXPORT_SYMBOL(page_pool_create_percpu);
+> +
+> +/**
+> + * page_pool_create() - create a page pool
+> + * @params: parameters, see struct page_pool_params
+> + */
+> +struct page_pool *page_pool_create(const struct page_pool_params *params)
+> +{
+> +       return page_pool_create_percpu(params, -1);
+> +}
+>  EXPORT_SYMBOL(page_pool_create);
+>
+>  static void page_pool_return_page(struct page_pool *pool, struct page *page);
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index edbbef563d4d..9e5eb47b4025 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -923,9 +923,10 @@ bool napi_pp_put_page(struct page *page, bool napi_safe)
+>          */
+>         if (napi_safe || in_softirq()) {
+>                 const struct napi_struct *napi = READ_ONCE(pp->p.napi);
+> +               unsigned int cpuid = smp_processor_id();
+>
+> -               allow_direct = napi &&
+> -                       READ_ONCE(napi->list_owner) == smp_processor_id();
+> +               allow_direct = napi && READ_ONCE(napi->list_owner) == cpuid;
+> +               allow_direct |= (pp->cpuid == cpuid);
+>         }
+>
+>         /* Driver set this to memory recycling info. Reset it on recycle.
+> --
+> 2.43.0
+>
+Acked-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
 
