@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-71469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA7C1853765
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 18:25:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E944853869
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 18:37:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 574D0B27970
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 17:25:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0DA381F24CEF
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 17:37:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADC275FEFD;
-	Tue, 13 Feb 2024 17:24:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4FD8605B0;
+	Tue, 13 Feb 2024 17:36:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="oCKC+Qas"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Cgp87Fxm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80FC95FDD8;
-	Tue, 13 Feb 2024 17:24:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F7F604A0;
+	Tue, 13 Feb 2024 17:36:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707845092; cv=none; b=F5FcZTam/dUki2WYV+/TKCjRsj8EIbymOyyueUD/1ZmBG5OMxqyehtVttXk5QzvUIsSQ1DDrVtlDjdOMoT2UNqiayBolVQw9GS3gP7ogQbVJCxM88eqxlGU3q3jcNWIO75lpIoTpbZbNH0milwMWHYFIobk7hP8UcLSseUL4zyA=
+	t=1707845768; cv=none; b=BJdB9wV5NmKTjrlT4gW+Z9PwT0x/dFzO9IGzuZiPkm56VSNFksaafAL1PdkVYXroK2kKI1ld4CmYrNabf6cFs4gnsT0QOQURili0R0s7oW+YnZpFlmxQ/ojawxa+s8+N2nmGMJsLltGPaRK90UuLuEwJKpn0WSORSgVxWm0pc8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707845092; c=relaxed/simple;
-	bh=AEGq9F/uWwiLmYDtmOAKN1oZDSnAf46vP+JF6nBKhHw=;
+	s=arc-20240116; t=1707845768; c=relaxed/simple;
+	bh=cUPKiBcRvJBcdBUj9nTK8LQyDfZfU/66LO6u3F5ujQE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EqiV7YD4BFAFJtrqz+KfBTppV8ilEa5DZQPPZVhCaof6wpfTb0HQ5tDUudbxCeGvTipDE3YCS//7dK2r9fQ5StZHJPctBzdqvDqbE31zhlPXXPoR2W0LonYF83xXmHDRhkgWW1RutiAKIhSXpEYaHl49LurCLZqenwyfjwAvCKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=oCKC+Qas; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D647DC433C7;
-	Tue, 13 Feb 2024 17:24:51 +0000 (UTC)
+	 MIME-Version; b=AIjZDYpl5j1Xtts4dlJiMqDXwQ4qX4UdhPX2R2CiIvFaXuKiDOe05yDNxIZXisUddJP0BKL7ggpDsDiUBs2WbdTTDKoLXEF4RXlpNRP7JdjVDegBeuRNtiAa5k0YLwFpnCI07hdQddFJ5IyVuyy8cvmdheP3yBn1+TUmFUhYaPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Cgp87Fxm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10BA4C433F1;
+	Tue, 13 Feb 2024 17:36:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1707845092;
-	bh=AEGq9F/uWwiLmYDtmOAKN1oZDSnAf46vP+JF6nBKhHw=;
+	s=korg; t=1707845768;
+	bh=cUPKiBcRvJBcdBUj9nTK8LQyDfZfU/66LO6u3F5ujQE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=oCKC+QasxJw2PvF3KYszKa9ucObNK2evDMJsuIjhT5TwUhBeZmAuhOqLMF7TMHyXE
-	 ZSkv4guKMEINZwn0yTsYuGlRxwMX4dG9nKBUK54ZiuIwJvdzbfWtBUKi07nccAgjgV
-	 xOF/nmstZjqye0pOpZkSfkbr1BcXt7Bxe4pk8hV4=
+	b=Cgp87FxmwP6IBHrzzSlBB5F4gHnhIgttdIvIR9cvss74mxEC0101JighFJJbgykbX
+	 b5gxwEJn/mjgI3kEUtFbv9OutLc9TrE9FSlTKyRk5t2mdgRjVw/d1R5xNw2s8F7gQ8
+	 YGX2IKOy44JgpfmJr1fmFbvuc6qknuriz+U31yqQ=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -51,12 +51,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	linux-afs@lists.infradead.org,
 	netdev@vger.kernel.org,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.1 27/64] rxrpc: Fix response to PING RESPONSE ACKs to a dead call
+Subject: [PATCH 6.7 051/124] rxrpc: Fix response to PING RESPONSE ACKs to a dead call
 Date: Tue, 13 Feb 2024 18:21:13 +0100
-Message-ID: <20240213171845.609427939@linuxfoundation.org>
+Message-ID: <20240213171855.230288784@linuxfoundation.org>
 X-Mailer: git-send-email 2.43.1
-In-Reply-To: <20240213171844.702064831@linuxfoundation.org>
-References: <20240213171844.702064831@linuxfoundation.org>
+In-Reply-To: <20240213171853.722912593@linuxfoundation.org>
+References: <20240213171853.722912593@linuxfoundation.org>
 User-Agent: quilt/0.67
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -68,7 +68,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.1-stable review patch.  If anyone has any objections, please let me know.
+6.7-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -96,10 +96,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 8 insertions(+)
 
 diff --git a/net/rxrpc/conn_event.c b/net/rxrpc/conn_event.c
-index aab069701398..5d91ef562ff7 100644
+index ec5eae60ab0c..1f251d758cb9 100644
 --- a/net/rxrpc/conn_event.c
 +++ b/net/rxrpc/conn_event.c
-@@ -41,6 +41,14 @@ static void rxrpc_conn_retransmit_call(struct rxrpc_connection *conn,
+@@ -95,6 +95,14 @@ void rxrpc_conn_retransmit_call(struct rxrpc_connection *conn,
  
  	_enter("%d", conn->debug_id);
  
