@@ -1,79 +1,81 @@
-Return-Path: <netdev+bounces-71579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBB10854041
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 00:42:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8024785403F
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 00:42:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FC3B1F2809F
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 23:42:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA51C1F27284
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 23:42:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6A8963402;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3435763111;
 	Tue, 13 Feb 2024 23:42:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dHI12NHQ"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="anNxmPUW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E57A633F9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97DAD633ED
 	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 23:42:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707867736; cv=none; b=qof1KnUOpTFv9epGTrWoTw55aELY7hpCnuVQYwdG2xe2XH34WCyHuxWKXUi9wyE5jhGLI0KZGWFkDXlx1DXLabEWFxbM/F/pNJDgqWzN6Rs9Ft46lXK+haiAHwlB3CuD43PYO88xYOu2ei3i5WxkIpuwrad+Fob2E2hw7SO/B/E=
+	t=1707867736; cv=none; b=OPX2eqsFPnHxYwrNmXqL9H723JApAwxvrQAME66NO2EsNM7faQCdW2fnxYJkw0TeF5jDooYSVFEygqIHR/Il7UR20WJY6TPl3M3pnVJjuuvgKi/hhdTdCIXfKUv11Tsq1TT7ebcH6KucfX7HQ86SrDHGY9MLWQ9jPb2w4t8yH7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707867736; c=relaxed/simple;
-	bh=hW38y6WJPmsQKEP/qFrXd2E/XyKsm+Fe0LPU3IywHpE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=g/CFxI7Bg6MEP/62sgIPmQSCWocQ1bpCR13N1n6+GAKG6fHDiS8qp+CrTm9Y9mDKZ76ZXO9aJtGMl5hlLx336ZTI1vWorvOjT5Gufxwg0mGOET9bS65UzGdoNYo5XoPizxr5KzPWuy4oRxKdn4Pj7HCzwyWRRH0jRPFvATqVRo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=dHI12NHQ; arc=none smtp.client-ip=209.85.216.48
+	bh=Vl4fdN5cpGUJaEVd/d0wmt2xUmRLpJ113oXlwnbICno=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=jKAlUX/DE9/0adPkKFOK3TruM+bP3Xu5YGzno7Zg5RCxq8ZWcg+MZlmvrPsvwjNOnEfg5fnWMpu6YWuceJweGWag+7ojSK3M7/m19D2HS9OShGj+AUtb2sevjE0L1KzSRvj6UbWuAyE7BlRAWCuRr0sdyNwzyn+WBlZD7WTj2dQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=anNxmPUW; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-296e8c8d218so3573764a91.3
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1d746856d85so37278195ad.0
         for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 15:42:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google; t=1707867734; x=1708472534; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=w0mtIXHXlHD45+RwrtuutvVPykfnjMAD2MPuh04ZZ3s=;
-        b=dHI12NHQ5dgAHFBfowyiQtKNdHLqZd/wG1vOdk6njRdmkBp5lGO1RxOpRi9Swt6y+W
-         dzzUna8hGb5ESOxrHsebVb4zwRyRT2Zn3n2mItOWGqfH1oAGO/SIkbGqVvD5z23LFjYV
-         2KSVGM51OoMvtrRb26c5EecAkiKDcx3vTZ/Og=
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Kl2LWzzN8MyLhz/HbCD4r7+bt4+VkpQDGtXfFs0staE=;
+        b=anNxmPUWkU3k1Bjt6yqXzcrBgXBU/ObGoY2T/aIAOR1B9z16vYkTAlUFm+TwSigNp4
+         ztI/roP6UEbWOb3qZsZbu569DPRmQb5aFwUeNxmn7WGjpC6kl26r/6w/67dPVCtAwHSI
+         RTO0Hvnz5t5/RNg61LmRekTikwsUtFVu0NCAE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1707867734; x=1708472534;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=w0mtIXHXlHD45+RwrtuutvVPykfnjMAD2MPuh04ZZ3s=;
-        b=RJfpBStqFju77+P5vLS37hdvH6osIW5AxqRRC2BKsglCWdiabubEPpde+FTz9Sjge1
-         C9a7R5is+UUG24Ui3jBkDFm1bDfW/g/he5uFpQyT8KMquCZ0Y5wEsFmiw0jJ1mnfDUl7
-         UYCDyj7NuBaQrtjWoWmTNzYg2fBrcq1fPCZaOseLmcxdVDKoSMMIFk1jeVpyc4fhhVSG
-         L+pYtHBT68Eg2mC2WoG+o3JelDW5ewa7ke5R2RyDy4GfzEVcMX7W3ZceqdYJOwzWiV/b
-         +IP9I0oTkoprl9hAYjTb955ECozNd3ARH0yTW78dpChwbHuuin3KWMqLBtkQ1TIsdxQF
-         RECQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXSywguZm0Pr0Qw2/YjSthMbt+TWfpvvAqQibdOTmpfKsUh64tXCavwV6h3R9T2zWuU+HVDelsIF+WGzOo+dHlBeHLYCTvP
-X-Gm-Message-State: AOJu0YxSy9KyDgQ6t+fUbRsLKOD6YeiUV9Z5svQsUCpPEKRThzCI8hbE
-	BJNn/RT9qifw6qbGDIGFrCs+dGuOFkqrDvtZALrTTh5uyPDBPbFzDKgqIGvlXw==
-X-Google-Smtp-Source: AGHT+IHDJgqPv/xuU8lFld0zKdNYV8TeMbseDl3sf1xG7aS5xoPNoFvvAKYSASG5Iou256qbZKti8w==
-X-Received: by 2002:a17:90a:16cf:b0:298:b8e0:43d8 with SMTP id y15-20020a17090a16cf00b00298b8e043d8mr904976pje.27.1707867734338;
-        Tue, 13 Feb 2024 15:42:14 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVRaKZwxlf/vLGJiePIxgGvw+Rh+hGu6ddU0v9g5Xv63csNEKWIXEHNQFWqF83g7BtryViuHLdyX9GpftZ2jYcHge2r6MPIxZsoC5+4PLqHru+VjG6wsfRfIohT6O5MFCawb9bwDrtTWGlTx4M1nz6+6Q25Zy08Tio6b+3WoQUIZTwV578VHh67spTB96xOFgSn+FdY1Sr0McJtkJTsCv+1me0fxK4lrg40lWlk1Y1obC/7RiOUSNhwhxc+xyCas7WzKzFMqvisnw3Y/iKVYD5eNHNgAexuRE/CLWAGf1Usetwc3HEzuJ+zUtx7DeQXox8LlP57OX0QDlAJlvPTTEQzdbjWkgBEzn6f5x7zhHrG6ZGyW9ikxY4lHLMhhrgQaZ8in9hCooYWIYQIDM0GnnyVymtAnNtWA7ebpn5poU53f8yuRzQxTBQiVrbGCfNCgDAdZDxoVFrj7Gs2w+iuML0xF0HLkr+8HuulAmBBH0abPnv8ohzwxDlgpMswmyej
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Kl2LWzzN8MyLhz/HbCD4r7+bt4+VkpQDGtXfFs0staE=;
+        b=VD+BMvbCMNrJOK1atMvqlfBYebwB6D+lzBtYeV6MUzc0pudA6LdWZQOQicRu3Jjr8r
+         4HH0KLYuw/JyCYnGkFK9CrWxpMBZKPlJ1rGqkWVHoRtKuYMfAVJfQ/RS93nXjInII1sc
+         4Dtitu0Qg16g/lqarZVZwj7MgxSIffq+iahGDBXSzNfpqrFtL8l1Sl/Q53HOUBsKjfnr
+         h+9VCje/NdaIqO8SJCv09yHz7KwElUCOL/hqWhK3EryfUMOUsEYUdqJsZOYB+9YC1FV1
+         GXFG9hn/CKg0lY75ZZJzIIW+h+AfaTWl0P1h0QknMxljcHK1yYVIq9XG5aazEVHyShXK
+         +BGA==
+X-Forwarded-Encrypted: i=1; AJvYcCUtxNZEimqBWP6sX4FyJ5ag0HZhpV1s8tO9yibuDAVYlYRDS94zgKBf8Hi0ccyO82Um5CvJGNuqOm7n/0XkVywEKUyu2Ccg
+X-Gm-Message-State: AOJu0YxawzwYLRrtQkAlhJlmwElePoE/oVJjq3i6LCzX+ejpOhj6pIfo
+	FH2pdhb0rGn/bJWB71WR1dVtkHWptD97RCLMimdH3m20U02mL0TuRlPP3q8Qkw==
+X-Google-Smtp-Source: AGHT+IGtSgnWyCSH3qiLiPQZFC2sSoW0AvKsvDJfLvbHlsqg7pCLSM5fOCksbb3s9CdwRIlw+Fhesg==
+X-Received: by 2002:a17:902:bcc4:b0:1db:4213:41e8 with SMTP id o4-20020a170902bcc400b001db421341e8mr1065887pls.69.1707867733891;
+        Tue, 13 Feb 2024 15:42:13 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWz2viB/lB71RPgqINheT2b5dsUoRzdQFbqLreZCRsMJA1WJTSmCqzNAXQ8vLgFxvOITSdL2S4gjMc4StKNV/JfvxTXTTXrlo5SSaausKtQswwku7LybJtVCBL29himU7p5+kc08BeX+Ws+9mnpIIBnuU66RCW0Rp6mdgPvcP1ILo0SOqJXDhYYLpxVqYLq2wyrno0lCVhb/xijD9bMYp7EjFbnCazl0Zl1vNYijxJjmeJqYQ3Q4nevYmj3dT7wYeGjD038BIWd/Xb3aMJuzSuD3XoacGI29/SWgAgY/xggmiXqFSJLfx7VYz1n1qhh1M6aSWgB0SAwuGE/irr8fxB2j9Di/AnLTwC9zwV8F4rcp2VwvXkE3XK1Ut29nN18l8Q6T+YGpSSCNZHX1E0qfVvC6mobsbSFo7/HPP/fgsJIw+DSUGp+qucHlCLcTdwycYSQMws88W+NzCNCrkkaWUujD0WgNQxcwvRKki35FgBqofesb5nitL/dTtZv/jIQ
 Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id fs9-20020a17090af28900b00298c686c621sm80939pjb.56.2024.02.13.15.42.13
+        by smtp.gmail.com with ESMTPSA id w2-20020a170902d10200b001db5432449esm220101plw.18.2024.02.13.15.42.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 13 Feb 2024 15:42:13 -0800 (PST)
 From: Kees Cook <keescook@chromium.org>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: Kees Cook <keescook@chromium.org>,
-	"David S. Miller" <davem@davemloft.net>,
 	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
 	Dan Williams <dan.j.williams@intel.com>,
 	Keith Packard <keithp@keithp.com>,
 	Miguel Ojeda <ojeda@kernel.org>,
 	Alexey Dobriyan <adobriyan@gmail.com>,
 	Dmitry Antipov <dmantipov@yandex.ru>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	"Gustavo A . R . Silva" <gustavoars@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Nathan Chancellor <nathan@kernel.org>,
@@ -81,57 +83,108 @@ Cc: Kees Cook <keescook@chromium.org>,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-hardening@vger.kernel.org
-Subject: [PATCH v2 0/2] stddef: Allow attributes to be used when creating flex arrays
-Date: Tue, 13 Feb 2024 15:42:09 -0800
-Message-Id: <20240213234023.it.219-kees@kernel.org>
+Subject: [PATCH v2 1/2] stddef: Allow attributes to be used when creating flex arrays
+Date: Tue, 13 Feb 2024 15:42:10 -0800
+Message-Id: <20240213234212.3766256-1-keescook@chromium.org>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240213234023.it.219-kees@kernel.org>
+References: <20240213234023.it.219-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=810; i=keescook@chromium.org;
- h=from:subject:message-id; bh=hW38y6WJPmsQKEP/qFrXd2E/XyKsm+Fe0LPU3IywHpE=;
- b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBly/5T6BEAiVA8ujTLHGCLG3BpSzMgWwdTvSXxf
- E7rKurlcc2JAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZcv+UwAKCRCJcvTf3G3A
- JqBqD/9mIQzk9MdkbeFAYfVd/iZ0m2dYUxas19LCSHaOrGZQI0szGULd0bqf13dJVpN2tvCFgmj
- GCEuMWeucp8FI1zC6dhnBVakXkFa1ZKBl4XNDXuCJoAi7VbUxUJXfZHRiBuJ1Lcud8m7K4TMU+4
- qI/M91c4TTVupB1sJeX4AWVCQx+6ASKMbc+OUa6JTKaRAruQIOgQTHKMKO9CP97AdFaz5ffz/V4
- v+OzLD/klAGQgHjCsaklLQFPyTcH9kSoDH0cd2lZSN0f11rcNZwjvoBTbhq6LyH2orvO6iE8M96
- eJB2MQReblKhqrfAUC3xclD1TTjJtIfCM4u+Wlndnf7QUCY9+GaBiDJSvfrHoHOIEboNUwHikNN
- Z4oTgT/Swk93oWAY1ZKdLROZsSwl430zoc6+wim/hhog/jqgFyxFauzsLZV0XOjgxp6RG2VTFOX
- pDYM/xs6WoYE1BgtdNq0GvzFBzFm/h07v7DwhFjX91nhz6LU2ydcyqCUHTCHVcFYHs99E7m7M9n
- PrAjBAycwW8n3aqBVwGkYl/J4MnWnxjOE/xhEuDYjyXKP82yI5RPTjb+ivNXAJ8o7JUW7bRJKkx
- AFHR/FWOYIth6aRlgFwNxfbDizVarYamv9scUJksPEj3CfUEDNsZboESdmhTDEVh4UdwTZ2XFye
- TVR7dxwK 7sp99PA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2745; i=keescook@chromium.org;
+ h=from:subject; bh=Vl4fdN5cpGUJaEVd/d0wmt2xUmRLpJ113oXlwnbICno=;
+ b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBly/5TQc6E64Lzj29qmQN4Jwy7MrKuI/F1MJFh2
+ tmtoHAY6iKJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZcv+UwAKCRCJcvTf3G3A
+ JrCAD/9dUQyB4Kg2htW/OtV1/JApegYxWNiu0BRZxvGYS5pHECr/K3BxDugfXOko4/zESjBoXjf
+ oKne0LTCU+n6HuPlWp6zmQdUyux22FU/GI1RK+CAPWxrDo7Eoaak9k5mVZlkyE6LD8Ur6gpQnYQ
+ 5spQWCBBmJPZBxZEbArwX9oIAyueehEhaKnNnpuOwLwS2n3uItshYSU0dl7bHLiykxU9IhDOTS0
+ Addl13oIkvwVsAGt5fSXKor/Yl5ngDyBFQIImhm2IyFU2lGqVhjJLrEA5y86fHBxIwzpNQLn1BF
+ b3VUXrW7G/SWYh/zz8T2miyJkQd68mFy0Qg8LOYVe+dlxtCoaq/TCB0mL1aFBOsSces26kbUWGK
+ KydqjzrCcM0VZ7KlMxbCydJB6nQEEDt/PvalBi0LVIor3+9kPuOV1lzkMK0GBDM8ZdhG3GtbWxq
+ /yQA8FhQA8og1cCFordZak+S9xid/nf2DXzA1/pa8ZkwJyMfOMAKvz3pNgKLfFSER+p2CSY8+Hq
+ HWrc3oXSv5OmGw4mxX7QFe28Z89lG1Zx40NxOU7khlU4GWSK04QnxYjfxLwcF3HEHNhnBHuGjnw
+ 10bvJcrtCAtn7+5deAIUPhecENMUcoNsCrhff7IvMnLS45PKWWnb5SVt0DCqvUxFHcmG/wPnyPF PQc/zLP/3RX7jkg==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 
-v2:
- - don't add a new helper, just add __VA_ARGS__ (Rasmus)
-v1: https://lore.kernel.org/all/20240210011452.work.985-kees@kernel.org/
+With the coming support for the __counted_by struct member attribute,
+we will need a way to add such annotations to the places where
+DECLARE_FLEX_ARRAY() is used. Add an optional 3rd argument that can be
+used for including attributes in the flexible array definition.
 
-Hi,
-
-We're going to have more cases where we need to apply attributes
-(e.g. __counted_by) to struct members that have been declared with
-DECLARE_FLEX_ARRAY. Add an optional 3rd argument to allow for this and
-annotate one such user in linux/in.h.
-
-I kept the acks/reviews since it's effectively the same...
-
--Kees
-
-Kees Cook (2):
-  stddef: Allow attributes to be used when creating flex arrays
-  net/ipv4: Annotate imsf_slist_flex with __counted_by(imsf_numsrc)
-
+Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Cc: Dan Williams <dan.j.williams@intel.com>
+Cc: Keith Packard <keithp@keithp.com>
+Cc: Miguel Ojeda <ojeda@kernel.org>
+Cc: Alexey Dobriyan <adobriyan@gmail.com>
+Cc: Dmitry Antipov <dmantipov@yandex.ru>
+Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
  include/linux/stddef.h      |  6 +++---
- include/uapi/linux/in.h     |  3 ++-
  include/uapi/linux/stddef.h | 10 +++++-----
- 3 files changed, 10 insertions(+), 9 deletions(-)
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
+diff --git a/include/linux/stddef.h b/include/linux/stddef.h
+index 929d67710cc5..176bfe8c0bd7 100644
+--- a/include/linux/stddef.h
++++ b/include/linux/stddef.h
+@@ -82,15 +82,15 @@ enum {
+ 
+ /**
+  * DECLARE_FLEX_ARRAY() - Declare a flexible array usable in a union
+- *
+  * @TYPE: The type of each flexible array element
+  * @NAME: The name of the flexible array member
++ * @...: The list of member attributes to apply (optional)
+  *
+  * In order to have a flexible array member in a union or alone in a
+  * struct, it needs to be wrapped in an anonymous struct with at least 1
+  * named member, but that member can be empty.
+  */
+-#define DECLARE_FLEX_ARRAY(TYPE, NAME) \
+-	__DECLARE_FLEX_ARRAY(TYPE, NAME)
++#define DECLARE_FLEX_ARRAY(TYPE, NAME, ...) \
++	__DECLARE_FLEX_ARRAY(TYPE, NAME, __VA_ARGS__)
+ 
+ #endif
+diff --git a/include/uapi/linux/stddef.h b/include/uapi/linux/stddef.h
+index 2ec6f35cda32..028aeec3d7f1 100644
+--- a/include/uapi/linux/stddef.h
++++ b/include/uapi/linux/stddef.h
+@@ -31,23 +31,23 @@
+ 
+ #ifdef __cplusplus
+ /* sizeof(struct{}) is 1 in C++, not 0, can't use C version of the macro. */
+-#define __DECLARE_FLEX_ARRAY(T, member)	\
+-	T member[0]
++#define __DECLARE_FLEX_ARRAY(TYPE, NAME, ...)	\
++	TYPE NAME[0] __VA_ARGS__
+ #else
+ /**
+  * __DECLARE_FLEX_ARRAY() - Declare a flexible array usable in a union
+- *
+  * @TYPE: The type of each flexible array element
+  * @NAME: The name of the flexible array member
++ * @...: The list of member attributes to apply (optional)
+  *
+  * In order to have a flexible array member in a union or alone in a
+  * struct, it needs to be wrapped in an anonymous struct with at least 1
+  * named member, but that member can be empty.
+  */
+-#define __DECLARE_FLEX_ARRAY(TYPE, NAME)	\
++#define __DECLARE_FLEX_ARRAY(TYPE, NAME, ...)	\
+ 	struct { \
+ 		struct { } __empty_ ## NAME; \
+-		TYPE NAME[]; \
++		TYPE NAME[] __VA_ARGS__; \
+ 	}
+ #endif
+ 
 -- 
 2.34.1
 
