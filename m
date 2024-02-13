@@ -1,190 +1,200 @@
-Return-Path: <netdev+bounces-71190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DEEA852913
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 07:37:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90F1385297D
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 07:59:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4890C28324E
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 06:37:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5DC01C238D1
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 06:59:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 579E71426A;
-	Tue, 13 Feb 2024 06:37:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D81D171A1;
+	Tue, 13 Feb 2024 06:59:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ShPu8nEl"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="UdBo+yNJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C2711724
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 06:37:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4FA1428D
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 06:59:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707806253; cv=none; b=aBZRw6s3BfpI4dmHCYzplkThurqgIw0LaFHdr63DY0EWCCxPog1h6cJCjPZqrR0cc1Dve1kRtKl1PKz5S9joBJIoxnaq9+2ooYuf9WON6wXdxcvB0uT1Oao2VDHGFT/62UJcogXw4KvknrfcS48kruITt2hx+RU5IbfbQbtNkd4=
+	t=1707807553; cv=none; b=p9bM3FErunTmwJITnFTKJ3i6cX9y/9W8N0XuzAXraKHUG+cVcwF2u2qSS7RKdSBuJVFCgzniidFK1H9JpDGn8IvKNuVy4EQQVl6k77zz+9hCSc0mzxTdZCdeNAXqJflCBvwqZiEHSmIybBXJ0kaZ55N2kZHPeSS1xfQBFQFenJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707806253; c=relaxed/simple;
-	bh=pkfAvsiLQYidoVwVZs66Qwlwzt3DxwXmLPHU5jj3vmg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ubrmkst4ZetkLgn3MGzSkTa/jV+gOl6MtDYBAYWuXMzSjog6cMP3PdYJ18UUsa6G5foY8FXFN/2d90S2DQ0rlq7EmSxVeieslYGlgjOyakuONnYSAd4Vm7FLq3G15RXVdQ5Dw3zr5fRESYLTqLF21LyL6le6Pwrc/8fJhFFsPA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ShPu8nEl; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5600d950442so4429831a12.1
-        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 22:37:31 -0800 (PST)
+	s=arc-20240116; t=1707807553; c=relaxed/simple;
+	bh=2PCqVnulVRtxfKX+jOse4rhJ+xP6/Ap/a+/UZoa0fQs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=at8ChkPf85I8t7ApXxJqnhcMduZ0fV9mOTWLEHJz7/K3qXppUCQMMlaF8ocfDv/uE2BheqqWiQCg1R+76vBKslzYeLM76nu+DQufnkjVYzUvZD2HJB2QeDebPPbHz04+YcbXZDvUk7xzHfT4C+3Anw6U0Oddempunz8fc9yRKPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=UdBo+yNJ; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-51167e470f7so4846342e87.2
+        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 22:59:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707806250; x=1708411050; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=21trHfN1yOHVqTbKlNpNQCWhPiUjzv8Q1f/uH0l/roc=;
-        b=ShPu8nElHVDO5HUW8UGO2wwhDcWK9p4qUBwu9U8gGn9agGUlBktDE1K/oVZNLiO099
-         PoMAeLm1h44v2DlRbTGH/PuQB/Jq2px0uJDjFWe8AkGkH28DccvEFExFEX/5b8nKm018
-         VsUh1CO4E3QIXsjyLeEM7GoptWl+ewvx4cCojWxYfQIuv3EWyw+3sSgSN2SlK/ZTi9HN
-         wOmsUrd4k1kKshjmgJs3pBwRRZNdzH0vALNsJMIHggLN9i4Bi7agW/0qhBa29IfWLFAL
-         BalZoyo5FVqHSfmo8SWBTbqXGUMvA55hMkG7B9HJ4KrDjftYoypxvIxT8YYaEJPoJiSr
-         MzVA==
+        d=tuxon.dev; s=google; t=1707807548; x=1708412348; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iCpik2vbbKYs8wNuTcz5Utg4u+f8GdmePgUExwK1BdQ=;
+        b=UdBo+yNJ9QLaKC/+6VdknpwLvLi6xWcWgQHhSDrCDAQm2lKjm79jQ5gqtRu6K/cQCq
+         IJ2SThK3ClzIvQsNpu0KHN8qj+G1OO5YxtBHhSjg/N8kb65vVFbfrRqU9pl39mRYG36d
+         u4RgDBUQifw9F6kPCt+eqpOv4YJRTZUlQtdYpqboetuqQqfjJ9nmWUVHEDkSMPJQerFT
+         3qEOvHZrh65430mgn0hoZt7yVFDEeqwY0wnCO/pFsq/aPd7K0i/Z8g7/TlJaUs+uYRj8
+         alkYc2kCTIcynuhWuQcT8qGHNoSxa2pt5lGndE0FfiRa+nFjvC0EKye3t/Bl5Sq4hSXj
+         3XPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707806250; x=1708411050;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=21trHfN1yOHVqTbKlNpNQCWhPiUjzv8Q1f/uH0l/roc=;
-        b=caWXL7bRXgCbn75Ea1buSbLSTewWor3hkyA4Ggf8Yi77Pfi5Qj7Op7JuA6vN/outSx
-         PXUCpUhfK4Da9haZswU4Dish0ewn6U5Vg37U9+x5UIEp+6VPlCROVJhQ5DZVd7ajFwjI
-         wdGHfQB8mv1x56LOWVZVbylD46Epj3jp6xp8dyE+xpynsCfuX1F6pS4W/vYbuUZsyIbU
-         8EuQoMn0Eh4kHFZ4U2cMUOVOSo97HmfQQiy/Gju0tTh2ppoIAnDD0w71hr0wMUNFKbv3
-         I+KfTb7jheBSU2RDDXRgpoSbZJyo6d28GGUpXx6eVCNMM+FGJNzU5SaEPdOZHYzpgD5X
-         O4Ng==
-X-Forwarded-Encrypted: i=1; AJvYcCWlGF2SZmApBR4D10uMht0Jhcaz15szaTm2Pn+ZLCiq+Kru2CEUv6Xq1DAgEv7prm8wb5HuujRW6NFJ3VGV+Wl9jRKRDY3N
-X-Gm-Message-State: AOJu0YzzUyZiXb48r5KBhxqy1QFtxw79CWE8hzPVDOZV/IYpWJm9sPmI
-	wdG16S0iapJ3A1kk3uPEViLdO8AhmWRAtf6OebZpux/uGLNjy1iKuDFnvkSJKUIyOoF0IRFW1Kk
-	Ks0z03yHqUh7yodA2H4NIH/VdKXA=
-X-Google-Smtp-Source: AGHT+IEAkbYopfjG/IBoLm4IkrBXeQrkoXULwZ3+oNU/1yZJLAiFxP238HXVxEfoGpm+Nl608l+96RYPGhKYKi/mthM=
-X-Received: by 2002:a50:ee15:0:b0:560:14c4:58ff with SMTP id
- g21-20020a50ee15000000b0056014c458ffmr6439425eds.28.1707806249674; Mon, 12
- Feb 2024 22:37:29 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707807548; x=1708412348;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iCpik2vbbKYs8wNuTcz5Utg4u+f8GdmePgUExwK1BdQ=;
+        b=tk1ULH3sPomNZ17ACuaapyt/CB2tDolqYZspL5HFIbmL8akc/wA9dZFXFhvtgwt949
+         8gCy6TitnupE0grUw/my/WIYZ3GavRi7wX0Vod3KIkgxGRodMktYGxxA+hMbN/sEcc8H
+         DlPiQEyRjtBTHajoVm43f4YE3r5mbvCnbaVQ90/DRq+p+KCLuZbovhgguFolEfuKa0VT
+         9XxlxNOJF9rgCV/LxbAxX78QSDg9uWA0NVWhej6pmzNJDiefwFrmglVNzlL9zLKWN7fS
+         IAwCSfIUJlxV0zp0CpzPVbINON2rUcXIyblICcCvbSwrsyNnnyJDaLlTTdIAcz2BJz6x
+         nHhg==
+X-Gm-Message-State: AOJu0YzA4qfvQEIRcx9XXpWxemoN4UiB8Q1sgAsj23SwYJ+OqUesqn/8
+	2ZtNQMEz1vif/VtANL/ye3NDP+Gdv59lGwStTFYN4+83T5RzM91YDx4uOP60dFA=
+X-Google-Smtp-Source: AGHT+IGjoR6hnuW3OcU7aaaNQQGAb1sYfgR0pKAvTNOwt2TZKbeYNaZcfd7E/xxMPgIQxROm5H3D5g==
+X-Received: by 2002:ac2:4ac9:0:b0:511:7b35:9563 with SMTP id m9-20020ac24ac9000000b005117b359563mr5107781lfp.19.1707807548051;
+        Mon, 12 Feb 2024 22:59:08 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUKCgnNjA3S3HjaBNCWy4Q7NMoxP44y3hLRWT+ar5k56QUm1zE49O7IEG5sLc+/NOhJ4fpoY92In49wVsupq47PjBfjKOC1EC3TWATyuRXUBqfk0PLnLtrZZkzQ+XXO/B0SJzetreNhVaRLYcelZp/CFRvvcs0gEveAmnsFX1wyPjQah3lnSGQ1icwmCaZSeRliPh4EkMWpElkETJT+PWZw7iLF4gjH76HC2NquanHezRgt8jIV4IarqOBuFjrARt+VERH6J9Nilmw5kZhgQrk4q+/Z0O8FazdWUz+etl8bDvT8bVetEjxxMfEViDo3gfomPzsh+PG8c6A=
+Received: from [192.168.50.4] ([82.78.167.20])
+        by smtp.gmail.com with ESMTPSA id r17-20020a05600c35d100b004106c2278eesm10839306wmq.0.2024.02.12.22.59.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 Feb 2024 22:59:07 -0800 (PST)
+Message-ID: <6a024193-e8bd-4458-9fb4-2aa44e1f4513@tuxon.dev>
+Date: Tue, 13 Feb 2024 08:59:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAL+tcoAWURoNQEq-WckGs6eVQX6VFpHtw4CC9u4Nc7ab0aD+oA@mail.gmail.com>
- <20240213040658.86261-1-kuniyu@amazon.com>
-In-Reply-To: <20240213040658.86261-1-kuniyu@amazon.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 13 Feb 2024 14:36:52 +0800
-Message-ID: <CAL+tcoDDF7yCws=Y7i9Rno0o8d36UY4kdQ8aX+L5h7z+qT67Hw@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 3/6] tcp: add dropreasons in tcp_rcv_state_process()
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	kernelxing@tencent.com, kuba@kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Feb 13, 2024 at 12:07=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.c=
-om> wrote:
->
-> From: Jason Xing <kerneljasonxing@gmail.com>
-> Date: Tue, 13 Feb 2024 09:48:04 +0800
-> > On Mon, Feb 12, 2024 at 11:33=E2=80=AFPM Eric Dumazet <edumazet@google.=
-com> wrote:
-> > >
-> > > On Mon, Feb 12, 2024 at 10:29=E2=80=AFAM Jason Xing <kerneljasonxing@=
-gmail.com> wrote:
-> > > >
-> > > > From: Jason Xing <kernelxing@tencent.com>
-> > >
-> > >
-> > > >                         if (!acceptable)
-> > > > -                               return 1;
-> > > > +                               /* This reason isn't clear. We can =
-refine it in the future */
-> > > > +                               return SKB_DROP_REASON_TCP_CONNREQN=
-OTACCEPTABLE;
-> > >
-> > > tcp_conn_request() might return 0 when a syncookie has been generated=
-.
-> > >
-> > > Technically speaking, the incoming SYN was not dropped :)
-> >
-> > Hi Eric, Kuniyuki
-> >
-> > Sorry, I should have checked tcp_conn_request() carefully last night.
-> > Today, I checked tcp_conn_request() over and over again.
-> >
-> > I didn't find there is any chance to return a negative/positive value,
-> > only 0. It means @acceptable is always true and it should never return
-> > TCP_CONNREQNOTACCEPTABLE for TCP ipv4/6 protocol and never trigger a
-> > reset in this way.
->
-> Ah right, I remember I digged the same thing before and even in the
-> initial commit, conn_request() always returned 0 and tcp_rcv_state_proces=
-s()
-> tested it with if (retval < 0).
-
-Good. Thanks for your double check :)
-
->
-> I think we can clean up the leftover with some comments above
-> ->conn_request() definition so that we can convert it to void
-> when we deprecate DCCP in the near future.
-
-In the next version, I will remove the new
-SKB_DROP_REASON_TCP_CONNREQNOTACCEPTABLE and the comment line which I
-added and keep it as the old way, namely, returning 1.
-
->
->
-> >
-> > For DCCP, there are chances to return -1 in dccp_v4_conn_request().
-> > But I don't think we've already added drop reasons in DCCP before.
-> >
-> > If I understand correctly, there is no need to do any refinement or
-> > even introduce TCP_CONNREQNOTACCEPTABLE new dropreason about the
-> > .conn_request() for TCP.
-> >
-> > Should I add a NEW kfree_skb_reason() in tcp_conn_request() for those
-> > labels, like drop_and_release, drop_and_free, drop, and not return a
-> > drop reason to its caller tcp_rcv_state_process()?
->
-> Most interested reasons will be covered by
->
->   - reqsk q : net_info_ratelimited() in tcp_syn_flood_action() or
->               net_dbg_ratelimited() in pr_drop_req() or
->               __NET_INC_STATS(net, LINUX_MIB_LISTENDROPS) in tcp_listendr=
-op()
->   - accept q: NET_INC_STATS(net, LINUX_MIB_LISTENOVERFLOWS) or
->               __NET_INC_STATS(net, LINUX_MIB_LISTENDROPS) in tcp_listendr=
-op()
->
-> and could be refined by drop reason, but I'm not sure if drop reason
-> is used under such a pressured situation.
-
-Interesting. Let us wait for Eric's response.
-
-Thanks,
-Jason
-
->
-> Also, these failures are now treated with consume_skb().
->
-> Whichever is fine to me, no strong preference.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 5/5] net: ravb: Add runtime PM support
+Content-Language: en-US
+To: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+References: <20240209170459.4143861-1-claudiu.beznea.uj@bp.renesas.com>
+ <20240209170459.4143861-6-claudiu.beznea.uj@bp.renesas.com>
+ <3808dee0-b623-b870-7d96-94cc5fc12350@omp.ru>
+ <7d0ae75d-2fdb-47cb-b57b-20ee477d6081@tuxon.dev>
+ <1990e269-44fe-b45f-09b5-0c84f21778fc@omp.ru>
+From: claudiu beznea <claudiu.beznea@tuxon.dev>
+In-Reply-To: <1990e269-44fe-b45f-09b5-0c84f21778fc@omp.ru>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
 
->
->
-> >
-> > Please correct me if I'm wrong...
-> >
-> > Thanks,
-> > Jason
-> >
-> > >
-> > > I think you need to have a patch to change tcp_conn_request() and its
-> > > friends to return a 'refined' drop_reason
-> > > to avoid future questions / patches.
+
+On 12.02.2024 22:19, Sergey Shtylyov wrote:
+> On 2/12/24 10:56 AM, claudiu beznea wrote:
+> 
+> [...]
+> 
+>>>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>>>
+>>>> Add runtime PM support for the ravb driver. As the driver is used by
+>>>> different IP variants, with different behaviors, to be able to have the
+>>>> runtime PM support available for all devices, the preparatory commits
+>>>> moved all the resources parsing and allocations in the driver's probe
+>>>> function and kept the settings for ravb_open(). This is due to the fact
+>>>> that on some IP variants-platforms tuples disabling/enabling the clocks
+>>>> will switch the IP to the reset operation mode where registers' content is
+>>>
+>>>    This pesky "registers' content" somehow evaded me -- should be "register
+>>> contents" as well...
+>>>
+>>>> lost and reconfiguration needs to be done. For this the rabv_open()
+>>>> function enables the clocks, switches the IP to configuration mode, applies
+>>>> all the registers settings and switches the IP to the operational mode. At
+>>>> the end of ravb_open() IP is ready to send/receive data.
+>>>>
+>>>> In ravb_close() necessary reverts are done (compared with ravb_open()), the
+>>>> IP is switched to reset mode and clocks are disabled.
+>>>>
+>>>> The ethtool APIs or IOCTLs that might execute while the interface is down
+>>>> are either cached (and applied in ravb_open()) or rejected (as at that time
+>>>> the IP is in reset mode). Keeping the IP in the reset mode also increases
+>>>> the power saved (according to the hardware manual).
+>>>>
+>>>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>>> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+>>> [...]
+>>>
+>>>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+>>>> index f4be08f0198d..5bbfdfeef8a9 100644
+>>>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>>>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+>>>> @@ -1939,16 +1939,21 @@ static int ravb_open(struct net_device *ndev)
+>>>>  {
+>>>>  	struct ravb_private *priv = netdev_priv(ndev);
+>>>>  	const struct ravb_hw_info *info = priv->info;
+>>>> +	struct device *dev = &priv->pdev->dev;
+>>>>  	int error;
+>>>>  
+>>>>  	napi_enable(&priv->napi[RAVB_BE]);
+>>>>  	if (info->nc_queues)
+>>>>  		napi_enable(&priv->napi[RAVB_NC]);
+>>>>  
+>>>> +	error = pm_runtime_resume_and_get(dev);
+>>>> +	if (error < 0)
+>>>> +		goto out_napi_off;
+>>>
+>>>    Well, s/error/ret/ -- it would fit better here...
+>>
+>> Using error is the "trademark" of this driver, it is used all around the
+>> driver. I haven't introduced it here, I don't like it. The variable error
+> 
+>    Heh, because it's my usual style. Too bad you don't like it... :-)
+> 
+>> in this particular function is here from the beginning of the driver.
+> 
+>    I think it's well suited for the functions returning either 0 or a
+> (negative) error code. It's *if* (error < 0) that confuses me (as this
+> API can return positive numbers in case of success...
+> 
+>> So, I don't consider changing error to ret is the scope of this series.
+> 
+>    OK, you're probably right... are you going to respin the series because
+> of Biju's comments?
+
+Yes!
+
+Thank you,
+Claudiu Beznea
+
+> 
+> [...]
+>>>> @@ -3066,6 +3089,12 @@ static void ravb_remove(struct platform_device *pdev)
+>>>>  	struct net_device *ndev = platform_get_drvdata(pdev);
+>>>>  	struct ravb_private *priv = netdev_priv(ndev);
+>>>>  	const struct ravb_hw_info *info = priv->info;
+>>>> +	struct device *dev = &priv->pdev->dev;
+>>>> +	int error;
+>>>> +
+>>>> +	error = pm_runtime_resume_and_get(dev);
+>>>> +	if (error < 0)
+>>>> +		return;
+>>>
+>>>    Again, s/erorr/ret/ in this case.
+>>
+>> error was used here to comply with the rest of the driver. So, if you still
+>> want me to change it here and in ravb_remove() please confirm.
+> 
+>    No, we are good enough without that; I'll consider doing a cleanup
+> when/if I have time. :-)
+> 
+>> Thank you,
+>> Claudiu Beznea
+> 
+> MBR, Sergey
 
