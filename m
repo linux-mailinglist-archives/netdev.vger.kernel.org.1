@@ -1,94 +1,186 @@
-Return-Path: <netdev+bounces-71491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A86518539BF
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 19:20:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FE4C8539CE
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 19:22:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F3AC28643B
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 18:20:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1476AB24620
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 18:22:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DB07605BE;
-	Tue, 13 Feb 2024 18:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BLY/AV9I"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12E34605CE;
+	Tue, 13 Feb 2024 18:22:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C2B5FBB3;
-	Tue, 13 Feb 2024 18:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C7AC605CA
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 18:22:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707848428; cv=none; b=GOclrq52o41HCRKP025womeYB0axNFdm2nHH5nF5n+yFmqE7hJ+9xO9OtsMNdcufsi0wDFp49drEbk6eeA+iaUD/3NvOwa7pDwqdNH8wYr8R+jc6IhEO2mApwSjhzOa62gFzAoH8xHvfZg1nQSq1NLkRcG56zF+Il9g+2NE9EAo=
+	t=1707848547; cv=none; b=bL0AMNFFkQye2Z4MaxCuf7xf4wczyiJLMV3TdogR7Jiax434PMBYMIxFb2Z6UkhGlLzdXl8iWz2ifnv/6AqDxxjCNDBJTxdhOmn6jpfpvJ9yGu3kdsoyjWIr0jN21zzkhlCxLN0utpgJd8XuwnOUq0lU2cCl50bNA19uvvgU5bc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707848428; c=relaxed/simple;
-	bh=mePoQ3pSobk0RitQM7iyZCk3GHE+CYs0EY5WhOPY/Ww=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NdpTUTtv4UxwFnYo2xl6UGB98HPvhiYuu4swL+2ov+7SHpzbOaRw4gdT1tCv06I1/BJLJyHB4hdo5U5gf/yXFMjxxFLE3BLT3RSmjHl401tl7am3a5bUnah1GtRJQG2JHOFA+yLajK+TTPLU7McTEaSPdQUeYcqXx0wKoXsDVaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BLY/AV9I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 29444C43399;
-	Tue, 13 Feb 2024 18:20:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707848428;
-	bh=mePoQ3pSobk0RitQM7iyZCk3GHE+CYs0EY5WhOPY/Ww=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=BLY/AV9IMjZHzp0tlPm3pTUgP8tpz1WkNR4YKznekY2IO2WQRJdHAq4kMCN2rZmfD
-	 3M6+z9Q+z+dELRL0y0ic/bldX4nxIFqScbUAQwmWsE+Ijy+B5zScfrwStawbLpKqkC
-	 eNX4sVTqO1qMxc/l+UFircp2Xm7LZSLGyhrTQM3k0M4Za6ivf2LFVjmoTlIdm+OTNo
-	 mhMwvmB1pmsTl/XTz4qYPZOAFa5nhkVhe4dT04/DiW/NDePUGStyDvQ5mL7aj3yjdF
-	 NLQ8wcqYV5BqwE9D6zUcIsCRQYaoTiOCVxKpyODxDHvgB7zOh1t6J1a0r7ctcf0bqw
-	 qruUvRRhemeMA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0DE83D84BCD;
-	Tue, 13 Feb 2024 18:20:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1707848547; c=relaxed/simple;
+	bh=oA2monlzeP2cc7LH7cA0Gz+kCOo6MIy5db3FbENyuEg=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=m9Y1GuzGOx7TFTmeKGN9qYw/j2YqrtuUnuWIuFRygk/cm2mY1T4TYTOxkh2kDA/EWOWW5g/PaSGYRFyPm/S9kk+Q1QQDZ3ZAwBH3Wk27sU18CAposECW2d8+BSnLM/Tws8yOh/X+QeYaWcB002DLUpwc2h+TPnMhBQty1C2UWQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-364214c3e5aso57895ab.1
+        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 10:22:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707848544; x=1708453344;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BScB9QAhTU5GhvuF4Y+/8lTfwT+Fq2wGTO/0B+60vIc=;
+        b=mFYqf3bmOkSgvc3r6uF3CN9xKGutp5uDdjbLUnh2fBvU5eQi5FwhVR9ugqvw7vswK4
+         4YdYafd6LjMj4dF7oFADpqKC9g0OdE4IBiwEyFgkHc0LxOuxNO0drUyegmuhGY4bjMuZ
+         7lBbJhMdU90P3zs+ULAI/oIouBX2olcOOdljJFK85DXZ+EQhc6CcNMpxgvHtetRjdHCd
+         Qmr0F6pJJLkGgxVvQ8EL4Sxd+mk3RhlhRoSu2aGv2Tcvx8pjrEDxxBCgIaU1WQ2IUQh3
+         jUwyBbBbrj1Nkp7gW5m7Va5359cIvfz1GvPGiwjuIAMiYDvBnAgswbF8ay+DN1kDD614
+         UkeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU+GhQgctkiOtIXIdfl58jvMB9DnBgSqi0/rx9wH7wow5Z7YqL5k7i+EbcOWJ8Pua/DH6St39ZLMBueYW5vWL6fmSjzdFP6
+X-Gm-Message-State: AOJu0Yz3i0qup4vrsgKaTaZxu2rvvpESl/RqTqlGsWwjx+oIfOjCkCnx
+	EGMStPiblU1usfyQHUwowKZkYmrLIezsvZkycus14hJa2HI/r8tNQiZHAQBvPOrOJXHrs3f4viQ
+	pv15V7yBQYalhJ/UTqUAbD8nHvjOp5vhLygaXGPmTczztpRrmn+we31U=
+X-Google-Smtp-Source: AGHT+IFn304Zg5fpGwh7LGCvHfSm+euBfmcK55uTBhP50cVsqMj9sLH1TXADMXsOgqniT6vNFhs+9TSWWsYAAqdwjJC6okxa8s5C
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] selftests: net: cope with slow env in so_txtime.sh test
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170784842805.32476.7805933357774588785.git-patchwork-notify@kernel.org>
-Date: Tue, 13 Feb 2024 18:20:28 +0000
-References: <2142d9ed4b5c5aa07dd1b455779625d91b175373.1707730902.git.pabeni@redhat.com>
-In-Reply-To: <2142d9ed4b5c5aa07dd1b455779625d91b175373.1707730902.git.pabeni@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, shuah@kernel.org, vinicius.gomes@intel.com,
- willemb@google.com, linux-kselftest@vger.kernel.org
+X-Received: by 2002:a05:6e02:1c23:b0:363:cf28:f1cc with SMTP id
+ m3-20020a056e021c2300b00363cf28f1ccmr10470ilh.3.1707848544560; Tue, 13 Feb
+ 2024 10:22:24 -0800 (PST)
+Date: Tue, 13 Feb 2024 10:22:24 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000d42dae0611477922@google.com>
+Subject: [syzbot] [netfilter?] WARNING: ODEBUG bug in ip_set_free
+From: syzbot <syzbot+ebbab3e04c88fa141e6b@syzkaller.appspotmail.com>
+To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
+	fw@strlen.de, kadlec@netfilter.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hello:
+Hello,
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+syzbot found the following issue on:
 
-On Mon, 12 Feb 2024 10:43:31 +0100 you wrote:
-> The mentioned test is failing in slow environments:
-> 
->   # SO_TXTIME ipv4 clock monotonic
->   # ./so_txtime: recv: timeout: Resource temporarily unavailable
->   not ok 1 selftests: net: so_txtime.sh # exit=1
-> 
-> Tuning the tolerance in the test binary is error-prone and doomed
-> to failures is slow-enough environment.
-> 
-> [...]
+HEAD commit:    f735966ee23c Merge branches 'for-next/reorg-va-space' and ..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+console output: https://syzkaller.appspot.com/x/log.txt?x=168b6592180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d47605a39da2cf06
+dashboard link: https://syzkaller.appspot.com/bug?extid=ebbab3e04c88fa141e6b
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: arm64
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1000ede0180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=161a6ba2180000
 
-Here is the summary with links:
-  - [net] selftests: net: cope with slow env in so_txtime.sh test
-    https://git.kernel.org/netdev/net/c/a7ee79b9c455
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/bdea2316c4db/disk-f735966e.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/75ba7806a91c/vmlinux-f735966e.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/208f119d45ed/Image-f735966e.gz.xz
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+ebbab3e04c88fa141e6b@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+ODEBUG: free active (active state 0) object: 00000000310f7442 object type: timer_list hint: bitmap_port_gc+0x0/0x4dc net/netfilter/ipset/ip_set_bitmap_port.c:282
+WARNING: CPU: 1 PID: 6165 at lib/debugobjects.c:517 debug_print_object lib/debugobjects.c:514 [inline]
+WARNING: CPU: 1 PID: 6165 at lib/debugobjects.c:517 __debug_check_no_obj_freed lib/debugobjects.c:989 [inline]
+WARNING: CPU: 1 PID: 6165 at lib/debugobjects.c:517 debug_check_no_obj_freed+0x398/0x47c lib/debugobjects.c:1019
+Modules linked in:
+CPU: 1 PID: 6165 Comm: syz-executor468 Not tainted 6.8.0-rc3-syzkaller-gf735966ee23c #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+pc : debug_print_object lib/debugobjects.c:514 [inline]
+pc : __debug_check_no_obj_freed lib/debugobjects.c:989 [inline]
+pc : debug_check_no_obj_freed+0x398/0x47c lib/debugobjects.c:1019
+lr : debug_print_object lib/debugobjects.c:514 [inline]
+lr : __debug_check_no_obj_freed lib/debugobjects.c:989 [inline]
+lr : debug_check_no_obj_freed+0x398/0x47c lib/debugobjects.c:1019
+sp : ffff800097886950
+x29: ffff800097886990 x28: 0000000000000000 x27: ffff80008aeec3c0
+x26: ffff0000d051c718 x25: dfff800000000000 x24: 0000000000000000
+x23: ffff80009365bb10 x22: ffff0000d051c000 x21: 0000000000000000
+x20: ffff8000894dfe30 x19: ffff0000d051c700 x18: ffff800097885e20
+x17: 626f203234343766 x16: ffff80008aca1180 x15: 0000000000000001
+x14: 1ffff00012f10c44 x13: 0000000000000000 x12: 0000000000000000
+x11: 0000000000000002 x10: 0000000000ff0100 x9 : f70d4eacec590700
+x8 : f70d4eacec590700 x7 : 0000000000000001 x6 : 0000000000000001
+x5 : ffff800097886238 x4 : ffff80008ed517e0 x3 : ffff80008036df60
+x2 : 0000000000000001 x1 : 0000000100000000 x0 : 0000000000000000
+Call trace:
+ debug_print_object lib/debugobjects.c:514 [inline]
+ __debug_check_no_obj_freed lib/debugobjects.c:989 [inline]
+ debug_check_no_obj_freed+0x398/0x47c lib/debugobjects.c:1019
+ slab_free_hook mm/slub.c:2093 [inline]
+ slab_free mm/slub.c:4299 [inline]
+ kfree+0x114/0x3cc mm/slub.c:4409
+ kvfree+0x40/0x50 mm/util.c:663
+ ip_set_free+0x28/0x7c net/netfilter/ipset/ip_set_core.c:264
+ bitmap_port_destroy+0xe4/0x324 net/netfilter/ipset/ip_set_bitmap_gen.h:66
+ ip_set_create+0x904/0xf48 net/netfilter/ipset/ip_set_core.c:1157
+ nfnetlink_rcv_msg+0xa78/0xf80 net/netfilter/nfnetlink.c:302
+ netlink_rcv_skb+0x214/0x3c4 net/netlink/af_netlink.c:2543
+ nfnetlink_rcv+0x21c/0x1ed0 net/netfilter/nfnetlink.c:659
+ netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
+ netlink_unicast+0x65c/0x898 net/netlink/af_netlink.c:1367
+ netlink_sendmsg+0x83c/0xb20 net/netlink/af_netlink.c:1908
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ ____sys_sendmsg+0x56c/0x840 net/socket.c:2584
+ ___sys_sendmsg net/socket.c:2638 [inline]
+ __sys_sendmsg+0x26c/0x33c net/socket.c:2667
+ __do_sys_sendmsg net/socket.c:2676 [inline]
+ __se_sys_sendmsg net/socket.c:2674 [inline]
+ __arm64_sys_sendmsg+0x80/0x94 net/socket.c:2674
+ __invoke_syscall arch/arm64/kernel/syscall.c:37 [inline]
+ invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:51
+ el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:136
+ do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:155
+ el0_svc+0x54/0x158 arch/arm64/kernel/entry-common.c:678
+ el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:696
+ el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
+irq event stamp: 524
+hardirqs last  enabled at (523): [<ffff80008035f104>] __up_console_sem kernel/printk/printk.c:341 [inline]
+hardirqs last  enabled at (523): [<ffff80008035f104>] __console_unlock kernel/printk/printk.c:2706 [inline]
+hardirqs last  enabled at (523): [<ffff80008035f104>] console_unlock+0x17c/0x3d4 kernel/printk/printk.c:3038
+hardirqs last disabled at (524): [<ffff80008ad60eac>] el1_dbg+0x24/0x80 arch/arm64/kernel/entry-common.c:436
+softirqs last  enabled at (518): [<ffff80008002189c>] softirq_handle_end kernel/softirq.c:399 [inline]
+softirqs last  enabled at (518): [<ffff80008002189c>] __do_softirq+0xac8/0xce4 kernel/softirq.c:582
+softirqs last disabled at (507): [<ffff80008002ab48>] ____do_softirq+0x14/0x20 arch/arm64/kernel/irq.c:81
+---[ end trace 0000000000000000 ]---
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
