@@ -1,478 +1,268 @@
-Return-Path: <netdev+bounces-71387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 126A185322C
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:44:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BEC085325A
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:53:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDE78282FA0
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:44:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 95907B23BA6
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:53:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 727905645D;
-	Tue, 13 Feb 2024 13:44:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BB2757310;
+	Tue, 13 Feb 2024 13:53:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UE2A7S2C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3836556444;
-	Tue, 13 Feb 2024 13:44:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F2B856764;
+	Tue, 13 Feb 2024 13:53:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707831859; cv=none; b=JqwhRaNfSh6s8+wRu+1pGO8M1Oyggpzl4XewrJBJJGTXSSmqD7RZEmGFTEH2QoaFTMlFXV7iJzVHZN1WDEq0KycdHYGtDvDsiBRdXSVvwaxPQdCRIxmXOhiwJsvE3qvG8RnMJKERVlSBEJNPCMalp08Pzrh8CjqEJZaAu8dq1jI=
+	t=1707832403; cv=none; b=EP9X2dme9h76LuMXdn9qI3FpXR7Jdd1mg8/ePptfitRwtjIsR51Z3h6c3y6MsRX4fcUQnQ+rpz0d8nBgSY/p5GQbIX6QkrIyB7Zf/XtqG9uakXfclsyNpExhTiBu4bk14BhFwtvGoWLJk6uIj9zOA0X+N0xfLYQ78/4EgElXSoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707831859; c=relaxed/simple;
-	bh=Al+OIDSwr1PRilbCX04+e3dBAlrgqKv7y2SaHw6pOeo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HFWy0X9JtnB75GzJqDFDAGAN44NOwH36cMKLv8LyBv17r0+NUvbmEpq4y19c/t7MlZpuIs1DifjnOhoC/IM53QxMURlqYt7fIdP8lT4ouAct4QnF0KvDW5DgoEGLoFZfYbA05iNMKkVbI4uzOFcTsEtE4Y2kBba03TXqZYhv7F4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1707832403; c=relaxed/simple;
+	bh=TT+Uo5hokvB40TVEtKJWlyD5Lcbvm2PVEeGdGbedPV0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gnl+gUtsQzhI/Anw9e5L57wnXznTwmPFgIZvLJ9P4vdANR2GfYCu7RRJ78JNMvlkAMSzZgsR3fT5WyHjZw188K6i4ZK8i5M7Eez8PcGNSReTvfOP8osfdmNtkZeI+wCxbLI9SKrZIFtM1MqdkwEd5zwybGgsG1gKNJtplI9UkHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UE2A7S2C; arc=none smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a3832ef7726so510628266b.0;
-        Tue, 13 Feb 2024 05:44:17 -0800 (PST)
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2d1025717c7so15890031fa.2;
+        Tue, 13 Feb 2024 05:53:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707832399; x=1708437199; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qoCg5rElDx4SNvccw3uK27O6lXXShxjuBSZkeogl0H0=;
+        b=UE2A7S2CvAQG7i25V7vKMA1KeDcn6YpyQmY8/6EIAbE6JrhnsIfYg4ZT3k190sS7AN
+         FmHAe/SZcvxv4qnJjuxOlCeA5N+5/fP0gD4A6yYgCic3wvHDPyoqgPbBGT45JvW5GGfi
+         iM4l/OvvukKS+zVnNWHI81uQuzV4DXFu5ads/LVfJx+r2caPtnBNZeoUMOC2UZyOiYlG
+         fW0O6gHXNsCNQUM/1kFu9C7AgTGnSJXSR4TI8mlwt7L7rfNFtPr8KF+4SaTGOI6ZFCEe
+         FleyKJye51hvjPX3B4+hbrhJxC54Q5/n7i5ocPoBOjU0e5anPNTdkMC+u090b7Xp1FlM
+         ++Eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707831855; x=1708436655;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=m5DeZbkSxboHr0pPFTvXpwxDIQjK3BTjbERvjTy55B4=;
-        b=dNu1Jnz5I/ihEUpWiKeiv8AeVnlqrkSc7vrdQL8pF53zb6x1Tjcr6Ez47iX6KzEinH
-         HeKHm/EiWTyU/N5bCigM7NogqiiBl9FpFZiNzhDmim0rgz6ANq94Q3bsC2ekxug8Cd0C
-         AjLKHdW+vklbFI82QKeW9PD7zgyTjqHK/NHwYKIfyTfy1fdbGTJCpyOy+ZGa0pgmHMrL
-         Lq1JwpiBw2Sin/LLXPOTW+ohB1KI69bp7hS9FPVI81gRToiq/FwHzItEPUl+yjWzXg6w
-         K7x2KRnh77geQaLPLiO21JQJhfaX6A+ECYD9XpZAV/h96C6e7Mxnrp8hJj+ENkRRf5Fg
-         G1Wg==
-X-Forwarded-Encrypted: i=1; AJvYcCXPzDoGATLVxdX++HL0ZSJ3MvtGsDjzcCfh9hWVFq3njIPVT9Peu+lm8mc00s1SE8czWzBUjRx2B7K/YlJwK2wrU97oafOtlmZr6bMEuIHxE/EmADUDy3S2J4OT19wni94yGWJZUubyGtQ6yQQ13ZVBQHPisYMr4MoEx3aoUzeA2bzt1RTtgE/9
-X-Gm-Message-State: AOJu0YwR4WpRQAD1NqT8l7k6tauTPEOZdf6Pew9yQ6aUXUPXG7I2o9k4
-	5F+rl2cTFJlvSuqViWbOqKOnlm+XQyu/nb4R8x+ko5xEF6CgpVok
-X-Google-Smtp-Source: AGHT+IGhRZ61SWtdZeHx3ArbCxE2WR8Ny5X4gZF3rPbcSnW/6AZhuYTHDw7z2mgem0HeiZNreS/j4A==
-X-Received: by 2002:a17:906:5002:b0:a38:45fc:1f01 with SMTP id s2-20020a170906500200b00a3845fc1f01mr6545985ejj.45.1707831855252;
-        Tue, 13 Feb 2024 05:44:15 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVAITtL5myEYzIFRohG+uZUnKEBDGOqkFIdmDb8mx2JyWxEiM4777BteOsIwJmVCxBliB3obNq434+d8Vv9rWZTcsUxiJ0c4d0Sn3sJ9nGGyRlXXYqPaS4HzGVMBuUggunBYMxq9p9GGkFWJdQyVVT/2YCDh7B2ACsFlnFMO7YkdkPGJLp1j4B+TRdIyt5U819953D6GYT0Bb7v91BCs83laDJpWk4Dwx7hHszw6aVf+rTINFuGOKRNiCWEdpXMAwruxtgsdOuNMz1MYpIR1E2OISLuZN/O2dsjR24O2kSraWsCE9eE/G/sLUUdAVCsAYnkdN6l5/8W03ijMTFictNvhq7DZZ3hgFS80YWDbIW0wnNvV+fOgY5Rx3F5SdNlrKZEGH3sErnqQcbeZbR1AyInOQuYHiOhTL6fOTkTgGjK6K9ddUG0k1cBsJW2qbQpeE4NacQCZ2C0QO9n/OKh/Hz7V+CgA+TlMoZSrsbwXBp9RcPvjx0lsAyna2Ty9ufaEkRuk3BOa4Hli3DVh+KDFLWAKOxRLBBf0enUTYEiUolCqrXon/A84k4=
-Received: from gmail.com (fwdproxy-lla-004.fbsv.net. [2a03:2880:30ff:4::face:b00c])
-        by smtp.gmail.com with ESMTPSA id n26-20020a170906689a00b00a38620c3b3dsm1296854ejr.198.2024.02.13.05.44.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Feb 2024 05:44:14 -0800 (PST)
-Date: Tue, 13 Feb 2024 05:44:11 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Andrew Morton <akpm@linux-foundation.org>, weiwan@google.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	horms@kernel.org, Jonathan Corbet <corbet@lwn.net>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	"open list:TRACING" <linux-trace-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v3] net: dqs: add NIC stall detector based on BQL
-Message-ID: <ZctyK+qpXV/pquei@gmail.com>
-References: <20240202165315.2506384-1-leitao@debian.org>
- <dc049b1e556ef7b398fb78c01b6e2e693c185273.camel@redhat.com>
+        d=1e100.net; s=20230601; t=1707832399; x=1708437199;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qoCg5rElDx4SNvccw3uK27O6lXXShxjuBSZkeogl0H0=;
+        b=bn7GRNrjUZ4Rf4D2mL9sHfQULYG3862MYEpE0zEMUSNRK1UuVd+rJ5fYhha54q6L0x
+         T2r5db0bmYhjYzdrg8wVw86xPjbqNtZd/rWQ7GdlOU1b4gNaQdzO+G1C8MZuCHbBTFmi
+         ISPFw6/MFtkWFkeTNOIMIeTkR0hBlmCDBz2QO64ISd+pulEmbj9bPliJgQx+GjPeRBSr
+         d0xYXyZTyxyOeSzOOTPoHgNrz3j/0fiETa0Ly/gaDkBu4ilwoiyOMx1IX1N5mb8voiC6
+         CEjRXTn5zy1UeHlEnnZKG+IiVWvKgtYoHle7cUvRmj1UvFuolci83HLVHaJdJ7D/S0hE
+         BSmg==
+X-Forwarded-Encrypted: i=1; AJvYcCXFQspJYUdPy8nx9sm0hoKG4QoY6bX+w7i6yTOlebG6/5nxf2NDaD2/K1s6dCNn82Et2iPO91Nchu1j6ABfjSWjDf7mejykijY4Ejq7gu9hyJYEvHsiIjIegpBVM7/EGuKXWFLgJhnTPG6cpjoeINJ2y0K+LhLL4Et+KVKAmRKUOuzfSD62
+X-Gm-Message-State: AOJu0YxDU1UYXRMG4Qy4LcIEVPLX/y/Tg9Oeu8qFfZK/y9PW9t8NIgv2
+	7Ug9OqZWag7WVaXsL58JcW0zloDpDt8ZYOgbNioPteQLf2MrQ6+iDLaaftHlLRQwc6lZQWPUDyo
+	aidn8A4DzHGIi5uxvqS9q/82Je+E=
+X-Google-Smtp-Source: AGHT+IEkUoKys1Ghiq72y56fmHbY6NxfFJ/wg6BcyaM28sz53Fd8+OTwEICvkxoRxNu9XlgxuVEkaK1OcSThctp5CtE=
+X-Received: by 2002:a05:651c:60d:b0:2d0:cbf7:4943 with SMTP id
+ k13-20020a05651c060d00b002d0cbf74943mr5293795lje.14.1707832398916; Tue, 13
+ Feb 2024 05:53:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <dc049b1e556ef7b398fb78c01b6e2e693c185273.camel@redhat.com>
+References: <0000000000007cea730610e083e8@google.com> <216c95d9-db1f-487a-bf3d-17a496422485@v0yd.nl>
+ <CABBYNZKPaMLK5+HnsRWR9jwpdZWvbbai6p9XbePhMYdKSYUPPg@mail.gmail.com> <bbd64fd9-395b-441e-be04-39440359b035@v0yd.nl>
+In-Reply-To: <bbd64fd9-395b-441e-be04-39440359b035@v0yd.nl>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 13 Feb 2024 08:53:06 -0500
+Message-ID: <CABBYNZJ=SgwgNz7K9j0nK-aV-wgMF6_yZ9psF1ydWG7HAhwFYw@mail.gmail.com>
+Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Write in __hci_acl_create_connection_sync
+To: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
+Cc: syzbot <syzbot+3f0a39be7a2035700868@syzkaller.appspotmail.com>, 
+	davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com, 
+	kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.von.dentz@intel.com, marcel@holtmann.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 06, 2024 at 12:40:13PM +0100, Paolo Abeni wrote:
-> On Fri, 2024-02-02 at 08:53 -0800, Breno Leitao wrote:
-> > From: Jakub Kicinski <kuba@kernel.org>
-> > 
-> > softnet_data->time_squeeze is sometimes used as a proxy for
-> > host overload or indication of scheduling problems. In practice
-> > this statistic is very noisy and has hard to grasp units -
-> > e.g. is 10 squeezes a second to be expected, or high?
-> > 
-> > Delaying network (NAPI) processing leads to drops on NIC queues
-> > but also RTT bloat, impacting pacing and CA decisions.
-> > Stalls are a little hard to detect on the Rx side, because
-> > there may simply have not been any packets received in given
-> > period of time. Packet timestamps help a little bit, but
-> > again we don't know if packets are stale because we're
-> > not keeping up or because someone (*cough* cgroups)
-> > disabled IRQs for a long time.
-> > 
-> > We can, however, use Tx as a proxy for Rx stalls. Most drivers
-> > use combined Rx+Tx NAPIs so if Tx gets starved so will Rx.
-> > On the Tx side we know exactly when packets get queued,
-> > and completed, so there is no uncertainty.
-> > 
-> > This patch adds stall checks to BQL. Why BQL? Because
-> > it's a convenient place to add such checks, already
-> > called by most drivers, and it has copious free space
-> > in its structures (this patch adds no extra cache
-> > references or dirtying to the fast path).
-> > 
-> > The algorithm takes one parameter - max delay AKA stall
-> > threshold and increments a counter whenever NAPI got delayed
-> > for at least that amount of time. It also records the length
-> > of the longest stall.
-> > 
-> > To be precise every time NAPI has not polled for at least
-> > stall thrs we check if there were any Tx packets queued
-> > between last NAPI run and now - stall_thrs/2.
-> > 
-> > Unlike the classic Tx watchdog this mechanism does not
-> > ignore stalls caused by Tx being disabled, or loss of link.
-> > I don't think the check is worth the complexity, and
-> > stall is a stall, whether due to host overload, flow
-> > control, link down... doesn't matter much to the application.
-> > 
-> > We have been running this detector in production at Meta
-> > for 2 years, with the threshold of 8ms. It's the lowest
-> > value where false positives become rare. There's still
-> > a constant stream of reported stalls (especially without
-> > the ksoftirqd deferral patches reverted), those who like
-> > their stall metrics to be 0 may prefer higher value.
-> > 
-> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > ---
-> > Changelog:
-> > 
-> > v1:
-> >   * https://lore.kernel.org/netdev/202306172057.jx7YhLiu-lkp@intel.com/T/
-> > 
-> > v2:
-> >   * Fix the documentation file in patch 0001, since patch 0002 will
-> >     touch it later.
-> >   * Fix the kernel test robot issues, marking functions as statics.
-> >   * Use #include <linux/bitops.h> instead of <asm/bitops.h>.
-> >   * Added some new comments around, mainly around barriers.
-> >   * Format struct `netdev_queue_attribute` assignments to make
-> >     checkpatch happy.
-> >   * Updated and fixed the path in sysfs-class-net-queues
-> >     documentation.
-> > 
-> > v3:
-> >   * Sending patch 0002 against net-next.
-> > 	- The first patch was accepted against 'net'
-> > 
-> > ---
-> >  .../ABI/testing/sysfs-class-net-queues        | 23 +++++++
-> >  include/linux/dynamic_queue_limits.h          | 35 +++++++++++
-> >  include/trace/events/napi.h                   | 33 ++++++++++
-> >  lib/dynamic_queue_limits.c                    | 58 +++++++++++++++++
-> >  net/core/net-sysfs.c                          | 62 +++++++++++++++++++
-> >  5 files changed, 211 insertions(+)
-> > 
-> > diff --git a/Documentation/ABI/testing/sysfs-class-net-queues b/Documentation/ABI/testing/sysfs-class-net-queues
-> > index 5bff64d256c2..45bab9b6e3ae 100644
-> > --- a/Documentation/ABI/testing/sysfs-class-net-queues
-> > +++ b/Documentation/ABI/testing/sysfs-class-net-queues
-> > @@ -96,3 +96,26 @@ Description:
-> >  		Indicates the absolute minimum limit of bytes allowed to be
-> >  		queued on this network device transmit queue. Default value is
-> >  		0.
-> > +
-> > +What:		/sys/class/net/<iface>/queues/tx-<queue>/byte_queue_limits/stall_thrs
-> > +Date:		Jan 2024
-> > +KernelVersion:	6.9
-> > +Contact:	netdev@vger.kernel.org
-> > +Description:
-> > +		Tx completion stall detection threshold. 
-> 
-> Possibly worth mentioning it's in milliseconds
-> 
-> > Kernel will guarantee
-> > +		to detect all stalls longer than this threshold but may also
-> > +		detect stalls longer than half of the threshold.
-> > +
-> > +What:		/sys/class/net/<iface>/queues/tx-<queue>/byte_queue_limits/stall_cnt
-> > +Date:		Jan 2024
-> > +KernelVersion:	6.9
-> > +Contact:	netdev@vger.kernel.org
-> > +Description:
-> > +		Number of detected Tx completion stalls.
-> > +
-> > +What:		/sys/class/net/<iface>/queues/tx-<queue>/byte_queue_limits/stall_max
-> > +Date:		Jan 2024
-> > +KernelVersion:	6.9
-> > +Contact:	netdev@vger.kernel.org
-> > +Description:
-> > +		Longest detected Tx completion stall. Write 0 to clear.
-> > diff --git a/include/linux/dynamic_queue_limits.h b/include/linux/dynamic_queue_limits.h
-> > index 407c2f281b64..288e98fe85f0 100644
-> > --- a/include/linux/dynamic_queue_limits.h
-> > +++ b/include/linux/dynamic_queue_limits.h
-> > @@ -38,14 +38,21 @@
-> >  
-> >  #ifdef __KERNEL__
-> >  
-> > +#include <linux/bitops.h>
-> >  #include <asm/bug.h>
-> >  
-> > +#define DQL_HIST_LEN		4
-> > +#define DQL_HIST_ENT(dql, idx)	((dql)->history[(idx) % DQL_HIST_LEN])
-> > +
-> >  struct dql {
-> >  	/* Fields accessed in enqueue path (dql_queued) */
-> >  	unsigned int	num_queued;		/* Total ever queued */
-> >  	unsigned int	adj_limit;		/* limit + num_completed */
-> >  	unsigned int	last_obj_cnt;		/* Count at last queuing */
-> >  
-> > +	unsigned long	history_head;
-> > +	unsigned long	history[DQL_HIST_LEN];
-> > +
-> >  	/* Fields accessed only by completion path (dql_completed) */
-> >  
-> >  	unsigned int	limit ____cacheline_aligned_in_smp; /* Current limit */
-> > @@ -62,6 +69,11 @@ struct dql {
-> >  	unsigned int	max_limit;		/* Max limit */
-> >  	unsigned int	min_limit;		/* Minimum limit */
-> >  	unsigned int	slack_hold_time;	/* Time to measure slack */
-> > +
-> > +	unsigned char	stall_thrs;
-> > +	unsigned char	stall_max;
-> 
-> Why don't 'unsigned short'? 
+Hi Jonas,
 
-Yes, it seems fine for me.
+On Mon, Feb 12, 2024 at 7:29=E2=80=AFPM Jonas Dre=C3=9Fler <verdre@v0yd.nl>=
+ wrote:
+>
+> Hi Luiz,
+>
+> On 09.02.24 14:36, Luiz Augusto von Dentz wrote:
+> > Hi Jonas,
+> >
+> > On Fri, Feb 9, 2024 at 7:37=E2=80=AFAM Jonas Dre=C3=9Fler <verdre@v0yd.=
+nl> wrote:
+> >>
+> >> Hi everyone!
+> >>
+> >> On 08.02.24 16:32, syzbot wrote:
+> >>> syzbot has bisected this issue to:
+> >>>
+> >>> commit 456561ba8e495e9320c1f304bf1cd3d1043cbe7b
+> >>> Author: Jonas Dre=C3=9Fler <verdre@v0yd.nl>
+> >>> Date:   Tue Feb 6 11:08:13 2024 +0000
+> >>>
+> >>>       Bluetooth: hci_conn: Only do ACL connections sequentially
+> >>>
+> >>> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D154f85=
+50180000
+> >>> start commit:   b1d3a0e70c38 Add linux-next specific files for 202402=
+08
+> >>> git tree:       linux-next
+> >>> final oops:     https://syzkaller.appspot.com/x/report.txt?x=3D174f85=
+50180000
+> >>> console output: https://syzkaller.appspot.com/x/log.txt?x=3D134f85501=
+80000
+> >>> kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dbb693ba19=
+5662a06
+> >>> dashboard link: https://syzkaller.appspot.com/bug?extid=3D3f0a39be7a2=
+035700868
+> >>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D11d9514=
+7e80000
+> >>> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D107c2d8fe=
+80000
+> >>>
+> >>> Reported-by: syzbot+3f0a39be7a2035700868@syzkaller.appspotmail.com
+> >>> Fixes: 456561ba8e49 ("Bluetooth: hci_conn: Only do ACL connections se=
+quentially")
+> >>>
+> >>> For information about bisection process see: https://goo.gl/tpsmEJ#bi=
+section
+> >>
+> >> Hmm, looking at the backtraces, I think the issue that the introductio=
+n of the
+> >> sequential connect has introduced another async case: In hci_connect_a=
+cl(), when
+> >> we call hci_acl_create_connection_sync(), the conn state no longer imm=
+ediately
+> >> gets set to BT_CONNECT, but remains in BT_OPEN or BT_CLOSED until the =
+hci_sync
+> >> queue actually executes __hci_acl_create_connection_sync().
+> >
+> > Need to double check but I think we do set BT_CONNECT in case of LE
+> > when it is queued so which shall prevent it to be queued multiple
+> > times.
+>
+> Nope, we set it only from within the hci_sync callback, see
+> hci_connect_le_sync(). IMO that makes sense, because in
+> hci_abort_conn_sync(), we send a  HCI_OP_CREATE_CONN_CANCEL in case
+> of conn->state =3D=3D BT_CONNECT, and this OP we wouldn't want to send
+> while the command is still waiting in the queue.
 
-> 
-> 
-> > +	unsigned long	last_reap;
-> > +	unsigned long	stall_cnt;
-> >  };
-> >  
-> >  /* Set some static maximums */
-> > @@ -74,6 +86,8 @@ struct dql {
-> >   */
-> >  static inline void dql_queued(struct dql *dql, unsigned int count)
-> >  {
-> > +	unsigned long map, now, now_hi, i;
-> > +
-> >  	BUG_ON(count > DQL_MAX_OBJECT);
-> >  
-> >  	dql->last_obj_cnt = count;
-> > @@ -86,6 +100,27 @@ static inline void dql_queued(struct dql *dql, unsigned int count)
-> >  	barrier();
-> >  
-> >  	dql->num_queued += count;
-> > +
-> > +	now = jiffies;
-> > +	now_hi = now / BITS_PER_LONG;
-> > +	if (unlikely(now_hi != dql->history_head)) {
-> > +		/* About to reuse slots, clear them */
-> > +		for (i = 0; i < DQL_HIST_LEN; i++) {
-> > +			/* Multiplication masks high bits */
-> > +			if (now_hi * BITS_PER_LONG ==
-> > +			    (dql->history_head + i) * BITS_PER_LONG)
-> > +				break;
-> > +			DQL_HIST_ENT(dql, dql->history_head + i + 1) = 0;
-> > +		}
-> > +		/* pairs with smp_rmb() in dql_check_stall() */
-> > +		smp_wmb();
-> > +		WRITE_ONCE(dql->history_head, now_hi);
-> > +	}
-> > +
-> > +	/* __set_bit() does not guarantee WRITE_ONCE() semantics */
-> > +	map = DQL_HIST_ENT(dql, now_hi);
-> > +	if (!(map & BIT_MASK(now)))
-> > +		WRITE_ONCE(DQL_HIST_ENT(dql, now_hi), map | BIT_MASK(now));
-> 
-> Do you have measure of performance impact, if any? e.g. for udp
-> flood/pktgen/xdp tput tests with extreme pkt rate?
+Yep, well I did a change which should work regardless of BT_CONNECT
+only being set at the callback:
 
-I've looked at our Meta Internal profiler, if that helps. Currently Meta has this feature
-enabled in every machine.
+https://patchwork.kernel.org/project/bluetooth/patch/20240209141612.3554051=
+-1-luiz.dentz@gmail.com/
 
-In the profiler, the only function that shows up in the profiler is dql_completed(),
-which consumes 0.00204% of all kernel cycles. Does it help?
+> >
+> >> This means that now hci_connect_acl() is happy to do multiple
+> >> hci_acl_create_connection_sync calls, and the hci_sync machinery will =
+happily
+> >> execute them right after each other. Then the newly introduced hci_abo=
+rt_conn_sync()
+> >> in __hci_acl_create_connection_sync() calls hci_conn_del() and frees t=
+he conn
+> >> object, so the second time we enter __hci_acl_create_connection_sync()=
+,
+> >> things blow up.
+> >>
+> >> It looks to me like in theory the hci_connect_le_sync() logic is prone=
+ to a
+> >> similar issue, but in practice that's prohibited because in hci_connec=
+t_le_sync()
+> >> we lookup whether the conn object still exists and bail out if it does=
+n't.
+> >>
+> >> Even for LE though I think we can queue multiple hci_connect_le_sync()=
+ calls
+> >> and those will happily send HCI_OP_LE_CREATE_CONN no matter what the c=
+onnection
+> >> state actually is?
+> >>
+> >> So assuming this analysis is correct, what do we do to fix this? It se=
+ems to me
+> >> that
+> >>
+> >> 1) we want a BT_CONNECT_QUEUED state for connections, so that the stat=
+e
+> >> machine covers this additional stage that we have for ACL and LE conne=
+ctions now.
+> >
+> > BT_CONNECT already indicates that connection procedure is in progress.
+>
+> I still think an additional state is necessary. Alternatively (and maybe
+> a lot nicer than the extra state) would be to add some functions to hci_s=
+ync
+> to check for and remove queued/ongoing commands, I'm thinking of a new
+>
+> bool hci_cmd_sync_has(struct hci_dev *hdev, hci_cmd_sync_work_func_t func=
+, void *data);
+> void hci_cmd_sync_cancel(struct hci_dev *hdev, hci_cmd_sync_work_func_t f=
+unc, void *data);
+>
+> I think if we had those, in addition to not needing the additional state,
+> we could also simplify the hci_abort_conn() code quite a bit and possibly
+> get rid of the passing of connection handles to hci_connect_le_sync().
+>
+> I'll give that a try and propose a small patch tomorrow.
+
+Yeah, I did something like in the past for hci_cmd_sync_queue_once, I
+will resend it since it had the following function as well:
+
+bool hci_cmd_sync_lookup(struct hci_dev *hdev, hci_cmd_sync_work_func_t fun=
+c,
+             void *data, hci_cmd_sync_work_destroy_t destroy,
+             bool cancel);
+
+> Cheers,
+> Jonas
+>
+> >
+> >> 2) the conn object can still disappear while the __hci_acl_create_conn=
+ection_sync()
+> >> is queued, so we need something like the "if conn doesn't exist anymor=
+e, bail out"
+> >> check from hci_connect_le_sync() in __hci_acl_create_connection_sync()=
+, too.
+> >
+> > Btw, I'd probably clean up the connect function and create something
+> > like hci_connect/hci_connect_sync which takes care of the details
+> > internally like it was done to abort.
+> >
+> >> That said, the current check in hci_connect_le_sync() that's using the=
+ connection
+> >> handle to lookup the conn does not seem great, aren't these handles re=
+-used
+> >> after connections are torn down?
+> >
+> > Well we could perhaps do a lookup by pointer to see if the connection
+> > hasn't been removed in the meantime, that said to force a clash on the
+> > handles it need to happen in between abort, which frees the handle,
+> > and connect, anyway the real culprit here is that we should be able to
+> > abort the cmd_sync callback like we do in LE:
+> >
+> > https://github.com/bluez/bluetooth-next/blob/master/net/bluetooth/hci_c=
+onn.c#L2943
+> >
+> > That way we stop the connect callback to run and don't have to worry
+> > about handle re-use.
+> >
+> >> Cheers,
+> >> Jonas
+> >
+> >
+> >
 
 
-> What about making all the above conditional to a non zero stall_thrs,
-> alike the check part?
 
-Makes sense, I will update.
-
-> >  }
-> >  
-> >  /* Returns how many objects can be queued, < 0 indicates over limit. */
-> > diff --git a/include/trace/events/napi.h b/include/trace/events/napi.h
-> > index 6678cf8b235b..272112ddaaa8 100644
-> > --- a/include/trace/events/napi.h
-> > +++ b/include/trace/events/napi.h
-> > @@ -36,6 +36,39 @@ TRACE_EVENT(napi_poll,
-> >  		  __entry->work, __entry->budget)
-> >  );
-> >  
-> > +TRACE_EVENT(dql_stall_detected,
-> > +
-> > +	TP_PROTO(unsigned int thrs, unsigned int len,
-> > +		 unsigned long last_reap, unsigned long hist_head,
-> > +		 unsigned long now, unsigned long *hist),
-> > +
-> > +	TP_ARGS(thrs, len, last_reap, hist_head, now, hist),
-> > +
-> > +	TP_STRUCT__entry(
-> > +		__field(	unsigned int,		thrs)
-> > +		__field(	unsigned int,		len)
-> > +		__field(	unsigned long,		last_reap)
-> > +		__field(	unsigned long,		hist_head)
-> > +		__field(	unsigned long,		now)
-> > +		__array(	unsigned long,		hist, 4)
-> > +	),
-> > +
-> > +	TP_fast_assign(
-> > +		__entry->thrs = thrs;
-> > +		__entry->len = len;
-> > +		__entry->last_reap = last_reap;
-> > +		__entry->hist_head = hist_head * BITS_PER_LONG;
-> > +		__entry->now = now;
-> > +		memcpy(__entry->hist, hist, sizeof(entry->hist));
-> > +	),
-> > +
-> > +	TP_printk("thrs %u  len %u  last_reap %lu  hist_head %lu  now %lu  hist %016lx %016lx %016lx %016lx",
-> > +		  __entry->thrs, __entry->len,
-> > +		  __entry->last_reap, __entry->hist_head, __entry->now,
-> > +		  __entry->hist[0], __entry->hist[1],
-> > +		  __entry->hist[2], __entry->hist[3])
-> > +);
-> > +
-> >  #undef NO_DEV
-> >  
-> >  #endif /* _TRACE_NAPI_H */
-> > diff --git a/lib/dynamic_queue_limits.c b/lib/dynamic_queue_limits.c
-> > index fde0aa244148..162d30ae542c 100644
-> > --- a/lib/dynamic_queue_limits.c
-> > +++ b/lib/dynamic_queue_limits.c
-> > @@ -10,10 +10,61 @@
-> >  #include <linux/dynamic_queue_limits.h>
-> >  #include <linux/compiler.h>
-> >  #include <linux/export.h>
-> > +#include <trace/events/napi.h>
-> >  
-> >  #define POSDIFF(A, B) ((int)((A) - (B)) > 0 ? (A) - (B) : 0)
-> >  #define AFTER_EQ(A, B) ((int)((A) - (B)) >= 0)
-> >  
-> > +static void dql_check_stall(struct dql *dql)
-> > +{
-> > +	unsigned long stall_thrs, now;
-> > +
-> > +	/* If we detect a stall see if anything was queued */
-> > +	stall_thrs = READ_ONCE(dql->stall_thrs);
-> > +	if (!stall_thrs)
-> > +		return;
-> > +
-> > +	now = jiffies;
-> > +	if (time_after_eq(now, dql->last_reap + stall_thrs)) {
-> > +		unsigned long hist_head, t, start, end;
-> > +
-> > +		/* We are trying to detect a period of at least @stall_thrs
-> > +		 * jiffies without any Tx completions, but during first half
-> > +		 * of which some Tx was posted.
-> > +		 */
-> > +dqs_again:
-> > +		hist_head = READ_ONCE(dql->history_head);
-> > +		/* pairs with smp_wmb() in dql_queued() */
-> > +		smp_rmb();
-> > +		/* oldest sample since last reap */
-> > +		start = (hist_head - DQL_HIST_LEN + 1) * BITS_PER_LONG;
-> > +		if (time_before(start, dql->last_reap + 1))
-> > +			start = dql->last_reap + 1;
-> > +		/* newest sample we should have already seen a completion for */
-> > +		end = hist_head * BITS_PER_LONG + (BITS_PER_LONG - 1);
-> > +		if (time_before(now, end + stall_thrs / 2))
-> > +			end = now - stall_thrs / 2;
-> > +
-> > +		for (t = start; time_before_eq(t, end); t++)
-> > +			if (test_bit(t % (DQL_HIST_LEN * BITS_PER_LONG),
-> > +				     dql->history))
-> > +				break;
-> > +		if (!time_before_eq(t, end))
-> > +			goto no_stall;
-> > +		if (hist_head != READ_ONCE(dql->history_head))
-> > +			goto dqs_again;
-> > +
-> > +		dql->stall_cnt++;
-> > +		dql->stall_max = max_t(unsigned int, dql->stall_max, now - t);
-> > +
-> > +		trace_dql_stall_detected(dql->stall_thrs, now - t,
-> > +					 dql->last_reap, dql->history_head,
-> > +					 now, dql->history);
-> > +	}
-> > +no_stall:
-> > +	dql->last_reap = now;
-> > +}
-> > +
-> >  /* Records completed count and recalculates the queue limit */
-> >  void dql_completed(struct dql *dql, unsigned int count)
-> >  {
-> > @@ -110,6 +161,8 @@ void dql_completed(struct dql *dql, unsigned int count)
-> >  	dql->prev_last_obj_cnt = dql->last_obj_cnt;
-> >  	dql->num_completed = completed;
-> >  	dql->prev_num_queued = num_queued;
-> > +
-> > +	dql_check_stall(dql);
-> >  }
-> >  EXPORT_SYMBOL(dql_completed);
-> >  
-> > @@ -125,6 +178,10 @@ void dql_reset(struct dql *dql)
-> >  	dql->prev_ovlimit = 0;
-> >  	dql->lowest_slack = UINT_MAX;
-> >  	dql->slack_start_time = jiffies;
-> > +
-> > +	dql->last_reap = jiffies;
-> > +	dql->history_head = jiffies / BITS_PER_LONG;
-> > +	memset(dql->history, 0, sizeof(dql->history));
-> >  }
-> >  EXPORT_SYMBOL(dql_reset);
-> >  
-> > @@ -133,6 +190,7 @@ void dql_init(struct dql *dql, unsigned int hold_time)
-> >  	dql->max_limit = DQL_MAX_LIMIT;
-> >  	dql->min_limit = 0;
-> >  	dql->slack_hold_time = hold_time;
-> > +	dql->stall_thrs = 0;
-> >  	dql_reset(dql);
-> >  }
-> >  EXPORT_SYMBOL(dql_init);
-> > diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-> > index a09d507c5b03..94a622b0bb55 100644
-> > --- a/net/core/net-sysfs.c
-> > +++ b/net/core/net-sysfs.c
-> > @@ -1409,6 +1409,65 @@ static struct netdev_queue_attribute bql_hold_time_attribute __ro_after_init
-> >  	= __ATTR(hold_time, 0644,
-> >  		 bql_show_hold_time, bql_set_hold_time);
-> >  
-> > +static ssize_t bql_show_stall_thrs(struct netdev_queue *queue, char *buf)
-> > +{
-> > +	struct dql *dql = &queue->dql;
-> > +
-> > +	return sprintf(buf, "%u\n", jiffies_to_msecs(dql->stall_thrs));
-> > +}
-> > +
-> > +static ssize_t bql_set_stall_thrs(struct netdev_queue *queue,
-> > +				  const char *buf, size_t len)
-> > +{
-> > +	struct dql *dql = &queue->dql;
-> > +	unsigned int value;
-> > +	int err;
-> > +
-> > +	err = kstrtouint(buf, 10, &value);
-> > +	if (err < 0)
-> > +		return err;
-> > +
-> > +	value = msecs_to_jiffies(value);
-> > +	if (value && (value < 4 || value > 4 / 2 * BITS_PER_LONG))
-> 
-> I admit I'm more than a bit lost with constant usage.. why 4/2 here?
-
-4 in this case is DQL_HIST_LEN, so, it needs to be updated.
-
-> Perhaps some more comments describing the implement logic would be
-> helpful.
-
-Agree, Let me work on it.
-
+--=20
+Luiz Augusto von Dentz
 
