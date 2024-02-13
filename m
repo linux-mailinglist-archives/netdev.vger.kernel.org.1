@@ -1,106 +1,111 @@
-Return-Path: <netdev+bounces-71569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87CDC853FD4
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 00:14:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59418853FDE
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 00:15:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA0CC1C27E48
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 23:14:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C314E1F245C0
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 23:15:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80BFA62A02;
-	Tue, 13 Feb 2024 23:14:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9900762A03;
+	Tue, 13 Feb 2024 23:15:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MCepNLjE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UW3K4hOY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8879629F7
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 23:14:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFDFE629FE;
+	Tue, 13 Feb 2024 23:15:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707866061; cv=none; b=MPqaYwGFTvw2SsH01Hcd2W7kplQDpcWY2l8TjnMacVmvKCstiB91H2m0QrYurnoDwmPDfPnhwisSMXJTFBLUAQoJdw3WzqtpMRfg5zHm8HDqeYIE3Qu+rHcILcyGNZpuYXbI8Dyuyrwh7hnjDoCWFF0vbhpYw/oi3Zg9q1QA634=
+	t=1707866127; cv=none; b=sL/bTReMG/R2yITrk0yrZrG+e2cMISnm+olgmQ78VA1MgNmP0qRRUktdIwgis/LV//f2tNt9BDKSPH1+UmV5oFSb0lrvaY+gh4tx06J+zNkRRgkOFMZ+cvQIO0WH9iDcbE2VTu1CtfNtprCttqgG+S6D/fBNh4YWvuGFuWK/fqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707866061; c=relaxed/simple;
-	bh=eB7RMcMJLJ9Je1NladOcXjy0j4kCuKfh5pdZmU9QjdM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Qq744i5DELuB9PTZSievVxmhbkt/ZfRFCnlAI6d13E8V98EG6B7buGXIgvoSCQ+s4/Ng8VBJApx/F1Jz3Z+cQwwEpZCshTELOWxAdpTx+MdMyJXlfw34pFCByKCaZ0nLSx8gz1mUOyB7b7qxGAH0gv6yjNwT9/LEkBwNlHOukoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=MCepNLjE; arc=none smtp.client-ip=209.85.219.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-dc6d9a8815fso5105937276.3
-        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 15:14:19 -0800 (PST)
+	s=arc-20240116; t=1707866127; c=relaxed/simple;
+	bh=PY3J4S6EauW8fj+XZZM1388/2+rRzvgMyh+ZjtX7LIo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=a1Lmia/WNzcwCVuUoDhbMAcsNTpl4Oobcrnzs6t26bYHvGzT/Ne41SAI0Q7yNN/Bx8WMSr9d3JsduiIJPRu49yuLxEeso7mdSvC3Da9yr1gDHICVxzSAoIxerWLhrqr3CHXhaehYb1QXL6qIHPD7ApHSJ8UU7LKRueAy7KytbPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UW3K4hOY; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-42a029c8e62so30226891cf.1;
+        Tue, 13 Feb 2024 15:15:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1707866058; x=1708470858; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eB7RMcMJLJ9Je1NladOcXjy0j4kCuKfh5pdZmU9QjdM=;
-        b=MCepNLjEB3K8Y3i32lhQSc24CzhtemcYLshw3iGhlKoFMJ2fqaWlKH9/+meepFKaRI
-         C7mU3/3dYHAaGR3PN8YpPnVT/P7FxmaGZg4umxE6pYs8MWosl/tSvU01nhCU8fniNqeg
-         XOCQ7GfqqEPlaFddIGNpe3hiTYP1HbOU3kTQDnH3107gYHtdF9DzLwAfpjTd+FFrbYNo
-         GNwTXPpRUF/N5fMwlgE8rY94fPGbaZL2c8vK3OMMYAHMVervJ0aPnZKM1yMhTZy884Np
-         Th281kGGMgnFKlWC3tqCHC0XwfXriG6M/JiDAg9y/n05W/zrw10UM5htEogiYj51ghpy
-         eC2Q==
+        d=gmail.com; s=20230601; t=1707866125; x=1708470925; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=V/1120jGKl7lOqTVBnO0qLaVIMGkbPiaJJif82Yqxng=;
+        b=UW3K4hOYgbSutrFFlRK0Y2K0jihCy3vaQWDOC8DikeM7W14tnLXMZw0gpHOpKE+B/q
+         yg2ZIO2ZNb3/oQ+71wmqZeWkGxRtQ63zL2h7/2hhBSrPDKm5iL22FuTy7dul4nF0ECPX
+         Vuz8ZL+ueq2KibzZB8T7CAPKKUUO07/vTjKn5gyuDKqe3nGPAkQODf4I7UHneGGLPIDN
+         umZnn8hsRABXxAG8Zq6+bTZs2SiaDEkykKoZokIYh/DLWwC0ZKr9Co7ElIASeFghYQGi
+         X7zpcsPzT1ZmbNDdL0MbDowmrZiab+PDRkD7Ek34g9lKIR21cqbDVRC/1+SyK3rW31uR
+         24Ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707866058; x=1708470858;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eB7RMcMJLJ9Je1NladOcXjy0j4kCuKfh5pdZmU9QjdM=;
-        b=lDGcc+GAoQp0IOVPI8LWibNH7d6dZEz533Nw2BZkIAw1ESLSPiLMO6eJni4qYE3wz1
-         1ll3yJMyIBgztdIVWSZ0sBtfJdB267RYIKRUcvcgoJUuUCxFIgOhWSqjB+Ot5hXI1zrJ
-         zLeHLjBcUvzLkoBI6SKbjg8CIZuI8G8G8vlXqneJXx4VmVVc6Oqvwx3S4vqQ8XZX7f4j
-         FfqSDgfqZRTEibFftoqPqpShLh6m5afpK4Cu0PE6wyiDrhnL2rgFzav3d/PL99QykHvQ
-         QY3muKL0hYoWFagdU/VDjCJmk2yhNVXFKYDhTQ+rAWrlWwXFdXMa1aqXUgWscjYmbUTd
-         7lrQ==
-X-Gm-Message-State: AOJu0YxNx3aAu8XOpTEIJ3N3JbTyB8cyp3S/Jg6K6FM7TUvHtxoudX60
-	lsgW/CZ8FU3UI7B2xtQlg00ZEPpKZKfG0tIMNVIwjdgIr6MZr4+OrRuBT6Hm0nt7VWCBhvDxg38
-	1ik1ZPm66/5vdXs5Janm+JePxXjg6jBci+g2Kf1WUrbnjaqY0zEAH0g==
-X-Google-Smtp-Source: AGHT+IF6qQQEQ0WI9EZCWpwSV/Ap9bumw9mqqt3CzdCQT0n0VTNRwQJwa04YBBGHzfyiPpWo7DP1eP08Q81LZwWXqrM=
-X-Received: by 2002:a25:ae47:0:b0:dcd:49d0:eece with SMTP id
- g7-20020a25ae47000000b00dcd49d0eecemr623009ybe.60.1707866058733; Tue, 13 Feb
- 2024 15:14:18 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707866125; x=1708470925;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=V/1120jGKl7lOqTVBnO0qLaVIMGkbPiaJJif82Yqxng=;
+        b=CJ7bvK5pj+0y+u9JcamD6q+P/yHJ3LtiGNoJHzmd0fC/y1Lk3zfa/OyDjlKGHLYuDP
+         Risbla+69lNvTFPPE14/wbdFxc564B/v+0Azw8LtYW/HS7b4NFJzsaI0y+7YIeHlPesN
+         CRJ8a8etpipKRJirIyFggtOWsMRmyAVKbM2bjazYk3ksF82Ie5V6d0ep+iHS1ujUWTv6
+         Z9zUG6VRrw72D2B6qWggZZXb/dgM9YC6r8K/M00PWXP+Ws1LUKCNCr+jRchALuIsKs+Q
+         m6y06KrFXET74l0XxQKalUW4REuyK6G0WKx6Hlvahyc4Nnm/hYcC1EBMT9s9X2Z3UEkg
+         uBWw==
+X-Forwarded-Encrypted: i=1; AJvYcCUB+JbImeyc0r/g4//l2eY5YylpI3c+bCGpBWdXCsuF6prT49jaCcS0W+31Puf627iG6vWz06rgtfA3G/fEobWYlMIekN+/Zz5pmP7jj3lKC4zyv5MFQBGOaATW245PcR3ljaqZ
+X-Gm-Message-State: AOJu0YyTHyGq3bfdzAtBrgoHuey33lv1B/9YnvHv6ApQS2f9MLoYRC3q
+	N30s3XsV7wbN2t9c6YGwO/MFgsmGEzcE4wXi7h9yjUQGnKf/nFbh
+X-Google-Smtp-Source: AGHT+IHTF5ytKfeTfWY/11zLegTWRXj/8zn7/xDF9rCiBm0rUi48SNifYniBXTiYie+T97TbF+lDew==
+X-Received: by 2002:a05:6214:242f:b0:68c:92ef:e5a9 with SMTP id gy15-20020a056214242f00b0068c92efe5a9mr1215888qvb.10.1707866124802;
+        Tue, 13 Feb 2024 15:15:24 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVpBLEv9C0l6zJIu8rdrfRO9jegJacMd+SCtFgPVMWhoSGH7PLKfZkhxa+SQK7EeZlinLu8+Rl1ikqcp5Wa0yP0AnzEZRUaI4MXDJNaOm13dsQMW30+t+E83QYKIC4IFbxNeonLJH/97F1Byy8cHCFp3Y2p/Uqt6fNjBtB3z3R9/UkHqPPZSDJiWQncnLknXrG3wmGyKnvvF7mIH2xsC4oIY7xckONGWrJszqNH01ZczUrGdAlibkmB/JW8Eo0514UMIcNPDeyyJ6l6vPSg0KxUYII2779Bf0uk2rq8RzAxM+NQVOqNVH2LeDhT8e+qAGbMhCEuLw9u7YSRO0DY14QeeXwEpY7f+oFkvkY7XFXQ21DYwokq1DuLMVxIzmxViygLRDPYQkTN6EM6rtdS/AF1G6KWX9vtpBJckVuejmt8bYU=
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id lx15-20020a0562145f0f00b0068ee9aeacefsm919213qvb.146.2024.02.13.15.15.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Feb 2024 15:15:24 -0800 (PST)
+Message-ID: <1e1bb7c0-0b83-49dd-a8fb-e5ba172e35c7@gmail.com>
+Date: Tue, 13 Feb 2024 15:15:21 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240213220331.239031-1-paweldembicki@gmail.com> <20240213220331.239031-8-paweldembicki@gmail.com>
-In-Reply-To: <20240213220331.239031-8-paweldembicki@gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Wed, 14 Feb 2024 00:14:07 +0100
-Message-ID: <CACRpkdY4d=KaGDo+bmvxZVL0hBWJbMp4E2kNzOq=YqQktRiY4Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 07/15] net: dsa: vsc73xx: Add vlan filtering
-To: Pawel Dembicki <paweldembicki@gmail.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Claudiu Manoil <claudiu.manoil@nxp.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
-	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 14/15] net: dsa: Define max num of bridges in
+ tag8021q implementation
+Content-Language: en-US
+To: Pawel Dembicki <paweldembicki@gmail.com>, netdev@vger.kernel.org
+Cc: linus.walleij@linaro.org, Vladimir Oltean <olteanv@gmail.com>,
+ Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Claudiu Manoil <claudiu.manoil@nxp.com>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
+ linux-kernel@vger.kernel.org
+References: <20240213220331.239031-1-paweldembicki@gmail.com>
+ <20240213220331.239031-15-paweldembicki@gmail.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20240213220331.239031-15-paweldembicki@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Feb 13, 2024 at 11:05=E2=80=AFPM Pawel Dembicki <paweldembicki@gmai=
-l.com> wrote:
-
-> This patch implements VLAN filtering for the vsc73xx driver.
->
-> After starting VLAN filtering, the switch is reconfigured from QinQ to
-> a simple VLAN aware mode. This is required because VSC73XX chips do not
-> support inner VLAN tag filtering.
->
+On 2/13/24 14:03, Pawel Dembicki wrote:
+> Max number of bridges in tag8021q implementation is strictly limited
+> by VBID size: 3 bits. But zero is reserved and only 7 values can be used.
+> 
+> This patch adds define which describe maximum possible value.
+> 
+> Suggested-by: Vladimir Oltean <olteanv@gmail.com>
 > Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
 
-As far as I can tell it does the right thing! Good work.
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+-- 
+Florian
 
-Yours,
-Linus Walleij
 
