@@ -1,388 +1,1129 @@
-Return-Path: <netdev+bounces-71223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8D33852A8C
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 09:07:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE900852BB5
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 09:55:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7462C1F2134E
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 08:07:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27EAD28569B
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 08:55:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4AA3179AC;
-	Tue, 13 Feb 2024 08:07:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69D561B277;
+	Tue, 13 Feb 2024 08:55:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b="qBhHpKbS"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="2NJr7OO4"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2057.outbound.protection.outlook.com [40.107.8.57])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 567C31B599;
-	Tue, 13 Feb 2024 08:07:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.8.57
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707811641; cv=fail; b=nOttCtjPwJAHnyisQKG+O+HYoNEzUlZB/ZvijTEA5oiDQOicTOXrJE5GuVFxi0TsHtgtC81uaXiuLJCp0lUG5wnAjtADbEcpgj2T+pdXfWdSgampbZM7CItiVDCd+un7KJ5TzRJinmOuGv0xosL2FA8um37+DRqpvlfqTNLGQxo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707811641; c=relaxed/simple;
-	bh=Vpw0zKDYx+QaZKgSPbHtZXV8hIZOw4PK3pGbiLTN+xY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kPzuzUSoxHcXy0Jr5NxPYDsnGPuTl5hb05n1YC7omTBwwI03dLc+ZGITI7KyoEkPYm/J/L964s4KmAqne4Td2Wn01Erk3NDeaLq4ogs9b2Xb+vSDthtIJsHfEt51Qg3nYoYgaAMSk7mr0H8hGHJCvChlBCEPbmDIsCuy1fKKbe4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com; spf=fail smtp.mailfrom=leica-geosystems.com; dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b=qBhHpKbS; arc=fail smtp.client-ip=40.107.8.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=leica-geosystems.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=T3dc1MoxvwR7NdqGrDCqEq7HQd10VoRIMClRyho9mMU1Ybfp6bdJc7pT9b+H0Hny/jvVF9NbZo9J3Jyw3sr6CT/2vPar/4Z5AUP3IFzUG9urZ7j2CFGDQukieMNuou4UpL0DJmlU8dzK7sBtmPgPeETRBqpcZhKc4fNUZ6mWcLHhr2wFeYXcNysmITwcgLnKxc5rsSAoBaMinvxe01JVqB80wKHIkN+p4WLEQ5sP7n6RgvBt+nRy52D61Xy1XWZgmZhjMqIBfs8aR0OjWgoh6ElEG5OcSaHJAypHgjiR3XbtybT0m2EKHV2LIxFus4IiR/mjZ5ZWAxDCzPnuN7f2sQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=O3eFUueocJmujmimKrqINFOrmzYjipFdqsGHa40q48s=;
- b=V/kCEbOb2a1rJb8ALKMxuY/infEcnDHSS30+V5Xde/Cj/Zudejy4lEhyELhzFamq6XWo57Yw63YcIVQBaTNXHcdxG5xvDiULLfuH8K2gXjR1ps6yq3UaorlFVbZ/01tBUMMxF0YL6h/pgsojY7HwAo7C01tYonJBk0OBjIZ5XZfFrwFCQtQf4hm4BYMSKZm+7uzAgFlNlz9fuYqPqC1ib1trcfrIP9MtsuazDCQ82TJyPxAANixBAZ22kr5yR3RHJL4tQNR8ggreyZwSMsndPYeJaqzjC3z6nbdjmGg4q1EfwIX6Od7PmKDiRIA8P4ORiRK/Q7hp3lcopPXyVSwYnQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 193.8.40.94) smtp.rcpttodomain=vger.kernel.org
- smtp.mailfrom=leica-geosystems.com; dmarc=pass (p=reject sp=reject pct=100)
- action=none header.from=leica-geosystems.com; dkim=none (message not signed);
- arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=leica-geosystems.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=O3eFUueocJmujmimKrqINFOrmzYjipFdqsGHa40q48s=;
- b=qBhHpKbSGlC6Su9UYzcrWp611g//OLthie8X9/6qWF1n4sKHH6HCuOcI2AJQB/+pMmRo6puysJAbyFmrMSb3TcEwcOZ7Z/unkKns5kLq6v7W0we5gMa1LtS/Q5uEIDC/5BBTXsC5ak4zAa1hPseGUIByz5cZK9Dtic+yFlh1ti8=
-Received: from AS8PR04CA0072.eurprd04.prod.outlook.com (2603:10a6:20b:313::17)
- by AM8PR06MB6835.eurprd06.prod.outlook.com (2603:10a6:20b:1d1::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.39; Tue, 13 Feb
- 2024 08:07:08 +0000
-Received: from AMS0EPF000001B7.eurprd05.prod.outlook.com
- (2603:10a6:20b:313:cafe::ce) by AS8PR04CA0072.outlook.office365.com
- (2603:10a6:20b:313::17) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.39 via Frontend
- Transport; Tue, 13 Feb 2024 08:07:08 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 193.8.40.94)
- smtp.mailfrom=leica-geosystems.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=leica-geosystems.com;
-Received-SPF: Pass (protection.outlook.com: domain of leica-geosystems.com
- designates 193.8.40.94 as permitted sender) receiver=protection.outlook.com;
- client-ip=193.8.40.94; helo=hexagon.com; pr=C
-Received: from hexagon.com (193.8.40.94) by
- AMS0EPF000001B7.mail.protection.outlook.com (10.167.16.171) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7292.25 via Frontend Transport; Tue, 13 Feb 2024 08:07:08 +0000
-Received: from aherlnxbspsrv01.lgs-net.com ([10.60.34.116]) by hexagon.com with Microsoft SMTPSVC(10.0.17763.1697);
-	 Tue, 13 Feb 2024 09:07:08 +0100
-From: Catalin Popescu <catalin.popescu@leica-geosystems.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org,
-	afd@ti.com,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk
-Cc: netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bsp-development.geo@leica-geosystems.com,
-	m.felsch@pengutronix.de,
-	Catalin Popescu <catalin.popescu@leica-geosystems.com>
-Subject: [PATCH v5 2/2] net: phy: dp83826: support TX data voltage tuning
-Date: Tue, 13 Feb 2024 09:07:05 +0100
-Message-Id: <20240213080705.4184566-2-catalin.popescu@leica-geosystems.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240213080705.4184566-1-catalin.popescu@leica-geosystems.com>
-References: <20240213080705.4184566-1-catalin.popescu@leica-geosystems.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 540D71755A
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 08:55:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707814531; cv=none; b=l70FKjkln7l5jQdKS4fwPjOnyc8dT8kuDUIBBeWHCmSGBF8NIYy4gycwM5e5thP9uP5T5fceqEORx+pu2Qh36FUE0Obv1HLYBbu928sEpZQ9BMgmC3GERCw9bm/kcbQu8oy52HJlKXDMehNti9z3xhk5R2PwbtcUpp0Gj/39tDA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707814531; c=relaxed/simple;
+	bh=UvDlU57rKUStI8+hQZ5zJhVm5HJxbLJaBaZ4SNl0ceU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YJt8toNE4YjqUEOKqI0LtBqx7tB2W8+GRHfjrUsXdWOHSiDppp2FPGQg+3kfz6CBgGO3cEoJT7xyQ3FbCtT+lf9G4uTVbd3Wupmv4cp+oTDZbzo7+385q7u9lb55tO+8PgZWAKp4mB1VGYc2LeP2ux5FwePMAZBcVbmcxGETD/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=2NJr7OO4; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5119cfaeb9bso233274e87.1
+        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 00:55:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1707814525; x=1708419325; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y/89vosut6nVjUXeZeVGgQddnwZJJmOONT3Mms07J9E=;
+        b=2NJr7OO4q5BeEL5ddFNX7E/cANUn9+BFoc6If2p1TOzMn7H9XLKl0LNoU1NOkZKAxa
+         oS6wiU7Mpkpx+kDaGh3sQnZUDpypwnFGkYDfQMJu3f13nS5KR2UflEEGvnrWzAHdv8p7
+         B1o+zjEkxn1KqhPSF7X+r53GTcu7sk3P/HIKrTd3eb6Ja2Kc9aqcEbEgPEKlrEtSsFRW
+         tsZ0PuYt8EVeGSGSkBhnZcvEZ70BW/YofAUGqPNklwHMq3QVgaruu3+RwTccTEroJqQl
+         BUBEYSfhjguJECkEIkY3ukigFVS0RJ78J9LHFN2HhA6ukaef6VGxa6Md+fzp+y6NsO5C
+         PGBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707814525; x=1708419325;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Y/89vosut6nVjUXeZeVGgQddnwZJJmOONT3Mms07J9E=;
+        b=GtL2frurF/+TO9zgwTwvqiRBrUSfELMHyD/FhXglvHIjAkgJ0eeq1Jy2EF1o9SohOy
+         julaEeoVqosuolNP/mTuEsVtwX+VdAGuco3R0tD9PBZSKSU5AiSpBh5szzjqhUiW+9eA
+         pSI5BnVEVGvsls9pZRq+fIqdg2xhysJY9oVvj2irHnHKh7Ctg8EUMa8TEovytSh9p7Zf
+         Pk6UoabUMZZC2R9TI8fAPCSE4IGxdXCRSltTwCy9nqmtMvAnVKMhZwJpUofJ1G472ST1
+         87WeEAIaFtBuI2Nq4OQLCJzJIz/anFRe/E8D21isZromTMBu4rb0NUoVIS0Q8ffaxV2l
+         Nw+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXpjF86vQ+O4aGN2d9Eobtb4BD31M07YYgj/8yXqcRqcmpDc+QImIgdy9ngceoBmFQXCbZrf6VWJik9102OPimdcaxr79nN
+X-Gm-Message-State: AOJu0Yyas9aNaJdiKLA7kyxCy3xm/XU6m/KJ2BRmmqRUY2seP1hEMH7O
+	Hj2eQsubbDvDZoNkmP2MgvtBMkPYecUwIo4N8w+f1y1rMSLQBZ4yVC+P0CPUqCM=
+X-Google-Smtp-Source: AGHT+IHwakbLqs+i8yoL7bR6AO5v4aJwwyneQ5rnf3vrlMYTZ6Jpt8JyHcXj2QAAKxF8X2jstoDYsw==
+X-Received: by 2002:a05:6512:5c9:b0:511:970b:2cdc with SMTP id o9-20020a05651205c900b00511970b2cdcmr793749lfo.35.1707814524989;
+        Tue, 13 Feb 2024 00:55:24 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVBS4ONY9ppKuKvZH2uhXMB9r/InpMxmJNac4iPi0niHqHu34iVa5UsANhtXIbeVd9nFtaHwAupn7bH+GTWMAFYyHQdU7PkLJNkTW2AcURQ+BH0gQtfV+HnVy95YiULiIrdz/taKZlhppYBlGOA4t0LLEOELiItTguLWJuzRzAu38rZ/T4wUT/yA8vy2cEFUSdJ3SDw1Kt+2CIuLaE+e/YlRF5B1t+rWukEl7NciVwzP/VLFEfIREe6hB8esEsTL4JgDy1yHrswIP0TpFkCMtZkuvhtIPr1FRmXPzq3kXQJ9jWC1Hw4dgCVnV6wfLteS+PKCS/CZhsLpjro13HzA9n2htARwyxwVNi+j53IHs/SxIjqUz7uw4irBundShg6V48hXrU1QMtEc959LI9pb37kY8Tp
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id s21-20020a05600c45d500b0040fd1629443sm11095936wmo.18.2024.02.13.00.55.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Feb 2024 00:55:24 -0800 (PST)
+Date: Tue, 13 Feb 2024 09:55:20 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	jacob.e.keller@intel.com, michal.kubiak@intel.com,
+	maciej.fijalkowski@intel.com, sridhar.samudrala@intel.com,
+	przemyslaw.kitszel@intel.com, wojciech.drewek@intel.com,
+	pio.raczynski@gmail.com,
+	Piotr Raczynski <piotr.raczynski@intel.com>
+Subject: Re: [iwl-next v1 04/15] ice: add basic devlink subfunctions support
+Message-ID: <ZcsueJ1tr-GdseIt@nanopsycho>
+References: <20240213072724.77275-1-michal.swiatkowski@linux.intel.com>
+ <20240213072724.77275-5-michal.swiatkowski@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-OriginalArrivalTime: 13 Feb 2024 08:07:08.0330 (UTC) FILETIME=[A3BE38A0:01DA5E53]
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AMS0EPF000001B7:EE_|AM8PR06MB6835:EE_
-Content-Type: text/plain
-X-MS-Office365-Filtering-Correlation-Id: f9d5d589-9939-45a2-4fad-08dc2c6ac680
-X-SET-LOWER-SCL-SCANNER: YES
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	216BfGQABM7lt4tv7piphDq2AUicHpI+UMfqDzGOXTzXdFEK8NeeaIYjWYvi92t5sD8U9innzrb51o1kRduDh+IP+dD/sUAjpJDLUi9OHZ/zaVRnRAey3yXLX8p3XIpRS23e1p6NKNB+8osHHDHNBknPSK2fb+7I/b4TjAIFbvDVpIMeiHba8nYUHuLuENPGRkn4gU+UUaAOo4N1kZG9eIr0wove/A3ncie1yqc/U1KNGLsFh57Q4/JE3KqXtbaiIYZW84pEVOJ2td+76jj6ReJ1sk8m6Xw7uZ1UUVyEDvCm8J7n3dXzefg1kTVN10/yOPFb5EVW6hMxBDEHCMXGAdf9bJeIRPTTMO9Eo83H/oLofth8ocRvAfUIxnnI8k+WsY1JFrM6URie+XhqQ0LZldWQLD4isF7ajoqg1So8uY2BJHRIQ8Pxbrk1n56fl3zzUVUM3ybvLjm1mGVmbZVhH7mL7hRjbOfISMTW/iihgzvQVzkAsVrGDkWjKqXqzHwCLZdTharIg7gb546govFL2k4/yW9f3yzEnHFVTbdGhLOKG1iOwPlADIEAmnhHsdwkA30oOLpP4w6ieMbRJfrM4ZeuOcOuODYd/2wjEfTdNZqkypuniQ+2B79FrZ3Q9H1EeM1LcEmZdrhPUy8CpS+QsA==
-X-Forefront-Antispam-Report:
-	CIP:193.8.40.94;CTRY:CH;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:hexagon.com;PTR:ahersrvdom50.leica-geosystems.com;CAT:NONE;SFS:(13230031)(4636009)(376002)(346002)(136003)(396003)(39860400002)(230922051799003)(186009)(1800799012)(82310400011)(451199024)(64100799003)(40470700004)(36840700001)(46966006)(83380400001)(86362001)(66899024)(107886003)(70206006)(70586007)(316002)(2616005)(1076003)(82740400003)(6666004)(478600001)(5660300002)(44832011)(2906002)(81166007)(336012)(8676002)(450100002)(8936002)(4326008)(26005)(921011)(36756003)(356005)(41300700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: leica-geosystems.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Feb 2024 08:07:08.7127
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f9d5d589-9939-45a2-4fad-08dc2c6ac680
-X-MS-Exchange-CrossTenant-Id: 1b16ab3e-b8f6-4fe3-9f3e-2db7fe549f6a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=1b16ab3e-b8f6-4fe3-9f3e-2db7fe549f6a;Ip=[193.8.40.94];Helo=[hexagon.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AMS0EPF000001B7.eurprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR06MB6835
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240213072724.77275-5-michal.swiatkowski@linux.intel.com>
 
-DP83826 offers the possibility to tune the voltage of logical
-levels of the MLT-3 encoded TX data. This is useful when there
-is a voltage drop in between the PHY and the connector and we
-want to increase the voltage levels to compensate for that drop.
+Tue, Feb 13, 2024 at 08:27:13AM CET, michal.swiatkowski@linux.intel.com wrote:
+>From: Piotr Raczynski <piotr.raczynski@intel.com>
+>
+>Implement devlink port handlers responsible for ethernet type devlink
+>subfunctions. Create subfunction devlink port and setup all resources
+>needed for a subfunction netdev to operate. Configure new VSI for each
+>new subfunction, initialize and configure interrupts and Tx/Rx resources.
+>Set correct MAC filters and create new netdev.
+>
+>For now, subfunction is limited to only one Tx/Rx queue pair.
+>
+>Only allocate new subfunction VSI with devlink port new command.
+>This makes sure that real resources are configured only when a new
+>subfunction gets activated. Allocate and free subfunction MSIX
+>interrupt vectors using new API calls with pci_msix_alloc_irq_at
+>and pci_msix_free_irq.
+>
+>Temporarily, before adding auxiliary bus driver for subfunctions,
+>configure subfunction netdev directly for the created devlink
+>port. This will be modified in the next patch to properly that handle
+>devlink port as the port representor.
+>
+>Support both automatic and manual subfunction numbers. If no subfunction
+>number is provided, use xa_alloc to pick a number automatically. This
+>will find the first free index and use that as the number. This reduces
+>burden on users in the simple case where a specific number is not
+>required. It may also be slightly faster to check that a number exists
+>since xarray lookup should be faster than a linear scan of the dyn_ports
+>xarray.
+>
+>Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+>Co-developed-by: Jacob Keller <jacob.e.keller@intel.com>
+>Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+>Signed-off-by: Piotr Raczynski <piotr.raczynski@intel.com>
+>Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+>---
+> drivers/net/ethernet/intel/ice/Makefile       |   1 +
+> .../intel/ice/devlink/ice_devlink_port.c      | 508 ++++++++++++++++++
+> .../intel/ice/devlink/ice_devlink_port.h      |  30 ++
+> drivers/net/ethernet/intel/ice/ice.h          |   4 +
+> drivers/net/ethernet/intel/ice/ice_devlink.c  |   3 +
+> drivers/net/ethernet/intel/ice/ice_lib.c      |   5 +-
+> drivers/net/ethernet/intel/ice/ice_lib.h      |   2 +
+> drivers/net/ethernet/intel/ice/ice_main.c     |  14 +-
+> drivers/net/ethernet/intel/ice/ice_sf_eth.c   | 138 +++++
+> drivers/net/ethernet/intel/ice/ice_sf_eth.h   |  15 +
+> 10 files changed, 716 insertions(+), 4 deletions(-)
+> create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_eth.c
+> create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_eth.h
+>
+>diff --git a/drivers/net/ethernet/intel/ice/Makefile b/drivers/net/ethernet/intel/ice/Makefile
+>index cd4ab46d72a7..d56a7165df95 100644
+>--- a/drivers/net/ethernet/intel/ice/Makefile
+>+++ b/drivers/net/ethernet/intel/ice/Makefile
+>@@ -31,6 +31,7 @@ ice-y := ice_main.o	\
+> 	 ice_idc.o	\
+> 	 ice_devlink.o	\
+> 	 devlink/ice_devlink_port.o	\
+>+	 ice_sf_eth.o	\
+> 	 ice_ddp.o	\
+> 	 ice_fw_update.o \
+> 	 ice_lag.o	\
+>diff --git a/drivers/net/ethernet/intel/ice/devlink/ice_devlink_port.c b/drivers/net/ethernet/intel/ice/devlink/ice_devlink_port.c
+>index c8c823467fcf..90efceaddb02 100644
+>--- a/drivers/net/ethernet/intel/ice/devlink/ice_devlink_port.c
+>+++ b/drivers/net/ethernet/intel/ice/devlink/ice_devlink_port.c
+>@@ -10,6 +10,8 @@
+> #include "ice_eswitch.h"
+> #include "ice_fw_update.h"
+> #include "ice_dcb_lib.h"
+>+#include "ice_sf_eth.h"
+>+#include "ice_fltr.h"
+> 
+> static int ice_active_port_option = -1;
+> 
+>@@ -432,3 +434,509 @@ void ice_devlink_destroy_vf_port(struct ice_vf *vf)
+> 	devlink_port_unregister(&vf->devlink_port);
+> }
+> 
+>+/**
+>+ * ice_activate_dynamic_port - Activate a dynamic port
+>+ * @dyn_port: dynamic port instance to activate
+>+ * @extack: extack for reporting error messages
+>+ *
+>+ * Activate the dynamic port based on its flavour.
+>+ *
+>+ * Return: zero on success or an error code on failure.
+>+ */
+>+static int
+>+ice_activate_dynamic_port(struct ice_dynamic_port *dyn_port,
+>+			  struct netlink_ext_ack *extack)
+>+{
+>+	int err;
+>+
+>+	switch (dyn_port->devlink_port.attrs.flavour) {
+>+	case DEVLINK_PORT_FLAVOUR_PCI_SF:
 
-Prior to PHY configuration, the driver SW resets the PHY which has
-the same effect as the HW reset pin according to the datasheet.
-Hence, there's no need to force update the VOD_CFG registers to make
-sure they hold their reset values. VOD_CFG registers need to be
-updated only if the DT has been configured with values other than
-the reset ones.
+Pointless switch case.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Catalin Popescu <catalin.popescu@leica-geosystems.com>
----
-Changes in v2:
- - remove raw values mapping tables dp83826_cfg_dac_minus_raw/
-   dp83826_cfg_dac_plus_raw and replace them with functions
-   dp83826_to_dac_minus_one_regval/dp83826_to_dac_plus_one_regval
- - increase readability of function dp83826_config_init
- - change return value of function dp83826_of_init from int to void
-   since it never returns any error
+It looks like you have odd habbit of checking things that cannot happen
+all over this patch :) See more below...
 
-Changes in v3:
- - rename DT properties to "-bp"
- - rename DP83826_CFG_DAC_MPERCENT_DEFAULT/DP83826_CFG_DAC_MPERCENT_PER_STEP
-   to DP83826_CFG_DAC_PERCENT_DEFAULT/DP83826_CFG_DAC_PERCENT_PER_STEP and
-   update their values to reflect the new unit "basis point"
- - update commit message with explanation about the registers reset
-   values
 
-Changes in v4:
- - update commit message to be more meaningful
+>+		err = ice_sf_eth_activate(dyn_port, extack);
+>+		if (err)
+>+			return err;
+>+		break;
+>+	default:
+>+		NL_SET_ERR_MSG_MOD(extack, "Unsupported port flavour");
+>+		return -EOPNOTSUPP;
+>+	}
+>+
+>+	dyn_port->active = 1;
 
-Changes in v5:
- - add reviewed-by tag
----
- drivers/net/phy/dp83822.c | 130 ++++++++++++++++++++++++++++++++++++--
- 1 file changed, 126 insertions(+), 4 deletions(-)
+true?
 
-diff --git a/drivers/net/phy/dp83822.c b/drivers/net/phy/dp83822.c
-index b7cb71817780..30f2616ab1c2 100644
---- a/drivers/net/phy/dp83822.c
-+++ b/drivers/net/phy/dp83822.c
-@@ -12,6 +12,7 @@
- #include <linux/of.h>
- #include <linux/phy.h>
- #include <linux/netdevice.h>
-+#include <linux/bitfield.h>
- 
- #define DP83822_PHY_ID	        0x2000a240
- #define DP83825S_PHY_ID		0x2000a140
-@@ -34,6 +35,10 @@
- #define MII_DP83822_GENCFG	0x465
- #define MII_DP83822_SOR1	0x467
- 
-+/* DP83826 specific registers */
-+#define MII_DP83826_VOD_CFG1	0x30b
-+#define MII_DP83826_VOD_CFG2	0x30c
-+
- /* GENCFG */
- #define DP83822_SIG_DET_LOW	BIT(0)
- 
-@@ -110,6 +115,19 @@
- #define DP83822_RX_ER_STR_MASK	GENMASK(9, 8)
- #define DP83822_RX_ER_SHIFT	8
- 
-+/* DP83826: VOD_CFG1 & VOD_CFG2 */
-+#define DP83826_VOD_CFG1_MINUS_MDIX_MASK	GENMASK(13, 12)
-+#define DP83826_VOD_CFG1_MINUS_MDI_MASK		GENMASK(11, 6)
-+#define DP83826_VOD_CFG2_MINUS_MDIX_MASK	GENMASK(15, 12)
-+#define DP83826_VOD_CFG2_PLUS_MDIX_MASK		GENMASK(11, 6)
-+#define DP83826_VOD_CFG2_PLUS_MDI_MASK		GENMASK(5, 0)
-+#define DP83826_CFG_DAC_MINUS_MDIX_5_TO_4	GENMASK(5, 4)
-+#define DP83826_CFG_DAC_MINUS_MDIX_3_TO_0	GENMASK(3, 0)
-+#define DP83826_CFG_DAC_PERCENT_PER_STEP	625
-+#define DP83826_CFG_DAC_PERCENT_DEFAULT		10000
-+#define DP83826_CFG_DAC_MINUS_DEFAULT		0x30
-+#define DP83826_CFG_DAC_PLUS_DEFAULT		0x10
-+
- #define MII_DP83822_FIBER_ADVERTISE    (ADVERTISED_TP | ADVERTISED_MII | \
- 					ADVERTISED_FIBRE | \
- 					ADVERTISED_Pause | ADVERTISED_Asym_Pause)
-@@ -118,6 +136,8 @@ struct dp83822_private {
- 	bool fx_signal_det_low;
- 	int fx_enabled;
- 	u16 fx_sd_enable;
-+	u8 cfg_dac_minus;
-+	u8 cfg_dac_plus;
- };
- 
- static int dp83822_set_wol(struct phy_device *phydev,
-@@ -233,7 +253,7 @@ static int dp83822_config_intr(struct phy_device *phydev)
- 				DP83822_ENERGY_DET_INT_EN |
- 				DP83822_LINK_QUAL_INT_EN);
- 
--		/* Private data pointer is NULL on DP83825/26 */
-+		/* Private data pointer is NULL on DP83825 */
- 		if (!dp83822 || !dp83822->fx_enabled)
- 			misr_status |= DP83822_ANEG_COMPLETE_INT_EN |
- 				       DP83822_DUP_MODE_CHANGE_INT_EN |
-@@ -254,7 +274,7 @@ static int dp83822_config_intr(struct phy_device *phydev)
- 				DP83822_PAGE_RX_INT_EN |
- 				DP83822_EEE_ERROR_CHANGE_INT_EN);
- 
--		/* Private data pointer is NULL on DP83825/26 */
-+		/* Private data pointer is NULL on DP83825 */
- 		if (!dp83822 || !dp83822->fx_enabled)
- 			misr_status |= DP83822_ANEG_ERR_INT_EN |
- 				       DP83822_WOL_PKT_INT_EN;
-@@ -474,6 +494,43 @@ static int dp83822_config_init(struct phy_device *phydev)
- 	return dp8382x_disable_wol(phydev);
- }
- 
-+static int dp83826_config_init(struct phy_device *phydev)
-+{
-+	struct dp83822_private *dp83822 = phydev->priv;
-+	u16 val, mask;
-+	int ret;
-+
-+	if (dp83822->cfg_dac_minus != DP83826_CFG_DAC_MINUS_DEFAULT) {
-+		val = FIELD_PREP(DP83826_VOD_CFG1_MINUS_MDI_MASK, dp83822->cfg_dac_minus) |
-+		      FIELD_PREP(DP83826_VOD_CFG1_MINUS_MDIX_MASK,
-+				 FIELD_GET(DP83826_CFG_DAC_MINUS_MDIX_5_TO_4,
-+					   dp83822->cfg_dac_minus));
-+		mask = DP83826_VOD_CFG1_MINUS_MDIX_MASK | DP83826_VOD_CFG1_MINUS_MDI_MASK;
-+		ret = phy_modify_mmd(phydev, DP83822_DEVADDR, MII_DP83826_VOD_CFG1, mask, val);
-+		if (ret)
-+			return ret;
-+
-+		val = FIELD_PREP(DP83826_VOD_CFG2_MINUS_MDIX_MASK,
-+				 FIELD_GET(DP83826_CFG_DAC_MINUS_MDIX_3_TO_0,
-+					   dp83822->cfg_dac_minus));
-+		mask = DP83826_VOD_CFG2_MINUS_MDIX_MASK;
-+		ret = phy_modify_mmd(phydev, DP83822_DEVADDR, MII_DP83826_VOD_CFG2, mask, val);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	if (dp83822->cfg_dac_plus != DP83826_CFG_DAC_PLUS_DEFAULT) {
-+		val = FIELD_PREP(DP83826_VOD_CFG2_PLUS_MDIX_MASK, dp83822->cfg_dac_plus) |
-+		      FIELD_PREP(DP83826_VOD_CFG2_PLUS_MDI_MASK, dp83822->cfg_dac_plus);
-+		mask = DP83826_VOD_CFG2_PLUS_MDIX_MASK | DP83826_VOD_CFG2_PLUS_MDI_MASK;
-+		ret = phy_modify_mmd(phydev, DP83822_DEVADDR, MII_DP83826_VOD_CFG2, mask, val);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+
- static int dp8382x_config_init(struct phy_device *phydev)
- {
- 	return dp8382x_disable_wol(phydev);
-@@ -509,11 +566,44 @@ static int dp83822_of_init(struct phy_device *phydev)
- 
- 	return 0;
- }
-+
-+static int dp83826_to_dac_minus_one_regval(int percent)
-+{
-+	int tmp = DP83826_CFG_DAC_PERCENT_DEFAULT - percent;
-+
-+	return tmp / DP83826_CFG_DAC_PERCENT_PER_STEP;
-+}
-+
-+static int dp83826_to_dac_plus_one_regval(int percent)
-+{
-+	int tmp = percent - DP83826_CFG_DAC_PERCENT_DEFAULT;
-+
-+	return tmp / DP83826_CFG_DAC_PERCENT_PER_STEP;
-+}
-+
-+static void dp83826_of_init(struct phy_device *phydev)
-+{
-+	struct dp83822_private *dp83822 = phydev->priv;
-+	struct device *dev = &phydev->mdio.dev;
-+	u32 val;
-+
-+	dp83822->cfg_dac_minus = DP83826_CFG_DAC_MINUS_DEFAULT;
-+	if (!device_property_read_u32(dev, "ti,cfg-dac-minus-one-bp", &val))
-+		dp83822->cfg_dac_minus += dp83826_to_dac_minus_one_regval(val);
-+
-+	dp83822->cfg_dac_plus = DP83826_CFG_DAC_PLUS_DEFAULT;
-+	if (!device_property_read_u32(dev, "ti,cfg-dac-plus-one-bp", &val))
-+		dp83822->cfg_dac_plus += dp83826_to_dac_plus_one_regval(val);
-+}
- #else
- static int dp83822_of_init(struct phy_device *phydev)
- {
- 	return 0;
- }
-+
-+static void dp83826_of_init(struct phy_device *phydev)
-+{
-+}
- #endif /* CONFIG_OF_MDIO */
- 
- static int dp83822_read_straps(struct phy_device *phydev)
-@@ -567,6 +657,22 @@ static int dp83822_probe(struct phy_device *phydev)
- 	return 0;
- }
- 
-+static int dp83826_probe(struct phy_device *phydev)
-+{
-+	struct dp83822_private *dp83822;
-+
-+	dp83822 = devm_kzalloc(&phydev->mdio.dev, sizeof(*dp83822),
-+			       GFP_KERNEL);
-+	if (!dp83822)
-+		return -ENOMEM;
-+
-+	phydev->priv = dp83822;
-+
-+	dp83826_of_init(phydev);
-+
-+	return 0;
-+}
-+
- static int dp83822_suspend(struct phy_device *phydev)
- {
- 	int value;
-@@ -610,6 +716,22 @@ static int dp83822_resume(struct phy_device *phydev)
- 		.resume = dp83822_resume,			\
- 	}
- 
-+#define DP83826_PHY_DRIVER(_id, _name)				\
-+	{							\
-+		PHY_ID_MATCH_MODEL(_id),			\
-+		.name		= (_name),			\
-+		/* PHY_BASIC_FEATURES */			\
-+		.probe          = dp83826_probe,		\
-+		.soft_reset	= dp83822_phy_reset,		\
-+		.config_init	= dp83826_config_init,		\
-+		.get_wol = dp83822_get_wol,			\
-+		.set_wol = dp83822_set_wol,			\
-+		.config_intr = dp83822_config_intr,		\
-+		.handle_interrupt = dp83822_handle_interrupt,	\
-+		.suspend = dp83822_suspend,			\
-+		.resume = dp83822_resume,			\
-+	}
-+
- #define DP8382X_PHY_DRIVER(_id, _name)				\
- 	{							\
- 		PHY_ID_MATCH_MODEL(_id),			\
-@@ -628,8 +750,8 @@ static int dp83822_resume(struct phy_device *phydev)
- static struct phy_driver dp83822_driver[] = {
- 	DP83822_PHY_DRIVER(DP83822_PHY_ID, "TI DP83822"),
- 	DP8382X_PHY_DRIVER(DP83825I_PHY_ID, "TI DP83825I"),
--	DP8382X_PHY_DRIVER(DP83826C_PHY_ID, "TI DP83826C"),
--	DP8382X_PHY_DRIVER(DP83826NC_PHY_ID, "TI DP83826NC"),
-+	DP83826_PHY_DRIVER(DP83826C_PHY_ID, "TI DP83826C"),
-+	DP83826_PHY_DRIVER(DP83826NC_PHY_ID, "TI DP83826NC"),
- 	DP8382X_PHY_DRIVER(DP83825S_PHY_ID, "TI DP83825S"),
- 	DP8382X_PHY_DRIVER(DP83825CM_PHY_ID, "TI DP83825M"),
- 	DP8382X_PHY_DRIVER(DP83825CS_PHY_ID, "TI DP83825CS"),
--- 
-2.34.1
 
+>+
+>+	return 0;
+>+}
+>+
+>+/**
+>+ * ice_deactivate_dynamic_port - Deactivate a dynamic port
+>+ * @dyn_port: dynamic port instance to deactivate
+>+ *
+>+ * Undo activation of a dynamic port.
+>+ */
+>+static void ice_deactivate_dynamic_port(struct ice_dynamic_port *dyn_port)
+>+{
+>+	switch (dyn_port->devlink_port.attrs.flavour) {
+>+	case DEVLINK_PORT_FLAVOUR_PCI_SF:
+
+Pointless switch case. Not possible to be anything else then
+DEVLINK_PORT_FLAVOUR_PCI_SF.
+
+
+>+		ice_sf_eth_deactivate(dyn_port);
+>+		break;
+>+	default:
+>+		WARN(1, "Attempting to deactivate port with unexpected port flavour %d",
+>+		     dyn_port->devlink_port.attrs.flavour);
+>+	}
+>+
+>+	dyn_port->active = 0;
+
+false?
+
+
+>+}
+>+
+>+/**
+>+ * ice_dealloc_dynamic_port - Deallocate and remove a dynamic port
+>+ * @dyn_port: dynamic port instance to deallocate
+>+ *
+>+ * Free resources associated with a dynamically added devlink port. Will
+>+ * deactivate the port if its currently active.
+>+ */
+>+static void ice_dealloc_dynamic_port(struct ice_dynamic_port *dyn_port)
+>+{
+>+	struct devlink_port *devlink_port = &dyn_port->devlink_port;
+>+	struct ice_pf *pf = dyn_port->pf;
+>+
+>+	if (dyn_port->active)
+>+		ice_deactivate_dynamic_port(dyn_port);
+>+
+>+	if (devlink_port->attrs.flavour == DEVLINK_PORT_FLAVOUR_PCI_SF)
+
+I don't understand how this check could be false. Remove it.
+
+
+>+		xa_erase(&pf->sf_nums, devlink_port->attrs.pci_sf.sf);
+>+
+>+	devl_port_unregister(devlink_port);
+>+	ice_vsi_free(dyn_port->vsi);
+>+	xa_erase(&pf->dyn_ports, dyn_port->vsi->idx);
+>+	kfree(dyn_port);
+>+}
+>+
+>+/**
+>+ * ice_dealloc_all_dynamic_ports - Deallocate all dynamic devlink ports
+>+ * @pf: pointer to the pf structure
+>+ */
+>+void ice_dealloc_all_dynamic_ports(struct ice_pf *pf)
+>+{
+>+	struct devlink *devlink = priv_to_devlink(pf);
+>+	struct ice_dynamic_port *dyn_port;
+>+	unsigned long index;
+>+
+>+	devl_lock(devlink);
+>+	xa_for_each(&pf->dyn_ports, index, dyn_port)
+>+		ice_dealloc_dynamic_port(dyn_port);
+>+	devl_unlock(devlink);
+
+Hmm, I would assume that the called should already hold the devlink
+instance lock when doing remove. What is stopping user from issuing
+port_new command here, after devl_unlock()?
+
+
+>+}
+>+
+>+/**
+>+ * ice_devlink_port_new_check_attr - Check that new port attributes are valid
+>+ * @pf: pointer to the PF structure
+>+ * @new_attr: the attributes for the new port
+>+ * @extack: extack for reporting error messages
+>+ *
+>+ * Check that the attributes for the new port are valid before continuing to
+>+ * allocate the devlink port.
+>+ *
+>+ * Return: zero on success or an error code on failure.
+>+ */
+>+static int
+>+ice_devlink_port_new_check_attr(struct ice_pf *pf,
+>+				const struct devlink_port_new_attrs *new_attr,
+>+				struct netlink_ext_ack *extack)
+>+{
+>+	if (new_attr->flavour != DEVLINK_PORT_FLAVOUR_PCI_SF) {
+>+		NL_SET_ERR_MSG_MOD(extack, "Flavour other than pcisf is not supported");
+>+		return -EOPNOTSUPP;
+>+	}
+>+
+>+	if (new_attr->controller_valid) {
+>+		NL_SET_ERR_MSG_MOD(extack, "Setting controller is not supported");
+>+		return -EOPNOTSUPP;
+>+	}
+>+
+>+	if (new_attr->port_index_valid) {
+>+		NL_SET_ERR_MSG_MOD(extack, "Port index is autogenerated by the driver");
+
+Does not look like an error message. Please re-phrase.
+
+
+>+		return -EOPNOTSUPP;
+>+	}
+>+
+>+	if (new_attr->pfnum != pf->hw.bus.func) {
+>+		NL_SET_ERR_MSG_MOD(extack, "Incorrect pfnum supplied");
+>+		return -EINVAL;
+>+	}
+>+
+>+	if (!pci_msix_can_alloc_dyn(pf->pdev)) {
+>+		NL_SET_ERR_MSG_MOD(extack, "Dynamic MSIX-X interrupt allocation is not supported");
+>+		return -EOPNOTSUPP;
+>+	}
+>+
+>+	return 0;
+>+}
+>+
+>+/**
+>+ * ice_devlink_port_del - devlink handler for port delete
+>+ * @devlink: pointer to devlink
+>+ * @port: devlink port to be deleted
+>+ * @extack: pointer to extack
+>+ *
+>+ * Deletes devlink port and deallocates all resources associated with
+>+ * created subfunction.
+>+ *
+>+ * Return: zero on success or an error code on failure.
+>+ */
+>+static int
+>+ice_devlink_port_del(struct devlink *devlink, struct devlink_port *port,
+>+		     struct netlink_ext_ack *extack)
+>+{
+>+	struct ice_dynamic_port *dyn_port;
+>+
+>+	dyn_port = ice_devlink_port_to_dyn(port);
+>+	if (!dyn_port) {
+
+Can't happen. Remove the check.
+
+
+>+		NL_SET_ERR_MSG_MOD(extack, "Failed to find Subfunction port with a given index");
+>+		return -EINVAL;
+>+	}
+>+
+>+	ice_dealloc_dynamic_port(dyn_port);
+>+
+>+	return 0;
+>+}
+>+
+>+/**
+>+ * ice_devlink_port_fn_hw_addr_set - devlink handler for mac address set
+>+ * @port: pointer to devlink port
+>+ * @hw_addr: hw address to set
+>+ * @hw_addr_len: hw address length
+>+ * @extack: extack for reporting error messages
+>+ *
+>+ * Sets mac address for the port, verifies arguments and copies address
+>+ * to the subfunction structure.
+>+ *
+>+ * Return: zero on success or an error code on failure.
+>+ */
+>+static int
+>+ice_devlink_port_fn_hw_addr_set(struct devlink_port *port, const u8 *hw_addr,
+>+				int hw_addr_len,
+>+				struct netlink_ext_ack *extack)
+>+{
+>+	struct ice_dynamic_port *dyn_port;
+>+
+>+	if (port->attrs.flavour != DEVLINK_PORT_FLAVOUR_PCI_SF) {
+
+How exactly this can happen? It could not. Remove the check. Remove it
+from the rest of the ops too.
+
+
+>+		NL_SET_ERR_MSG_MOD(extack, "Port is not a Subfunction");
+>+		return -EOPNOTSUPP;
+>+	}
+>+
+>+	dyn_port = ice_devlink_port_to_dyn(port);
+>+
+>+	if (hw_addr_len != ETH_ALEN || !is_valid_ether_addr(hw_addr)) {
+>+		NL_SET_ERR_MSG_MOD(extack, "Invalid ethernet address");
+>+		return -EADDRNOTAVAIL;
+>+	}
+>+
+>+	if (ether_addr_equal(dyn_port->hw_addr, hw_addr)) {
+>+		NL_SET_ERR_MSG_MOD(extack, "address already set");
+
+You start with capital letter in the rest of the messages.
+
+
+>+		return 0;
+>+	}
+>+
+>+	ether_addr_copy(dyn_port->hw_addr, hw_addr);
+>+
+>+	return 0;
+>+}
+>+
+>+/**
+>+ * ice_devlink_port_fn_hw_addr_get - devlink handler for mac address get
+>+ * @port: pointer to devlink port
+>+ * @hw_addr: hw address to set
+>+ * @hw_addr_len: hw address length
+>+ * @extack: extack for reporting error messages
+>+ *
+>+ * Returns mac address for the port.
+>+ *
+>+ * Return: zero on success or an error code on failure.
+>+ */
+>+static int
+>+ice_devlink_port_fn_hw_addr_get(struct devlink_port *port, u8 *hw_addr,
+>+				int *hw_addr_len,
+>+				struct netlink_ext_ack *extack)
+>+{
+>+	struct ice_dynamic_port *dyn_port;
+>+
+>+	if (port->attrs.flavour != DEVLINK_PORT_FLAVOUR_PCI_SF)
+>+		return -EOPNOTSUPP;
+
+Pointless check.
+
+
+>+
+>+	dyn_port = ice_devlink_port_to_dyn(port);
+>+
+>+	ether_addr_copy(hw_addr, dyn_port->hw_addr);
+>+	*hw_addr_len = ETH_ALEN;
+>+
+>+	return 0;
+>+}
+>+
+>+/**
+>+ * ice_devlink_port_fn_state_set - devlink handler for port state set
+>+ * @port: pointer to devlink port
+>+ * @state: state to set
+>+ * @extack: extack for reporting error messages
+>+ *
+>+ * Activates or deactivates the port.
+>+ *
+>+ * Return: zero on success or an error code on failure.
+>+ */
+>+static int
+>+ice_devlink_port_fn_state_set(struct devlink_port *port,
+>+			      enum devlink_port_fn_state state,
+>+			      struct netlink_ext_ack *extack)
+>+{
+>+	struct ice_dynamic_port *dyn_port;
+>+
+>+	if (port->attrs.flavour != DEVLINK_PORT_FLAVOUR_PCI_SF) {
+>+		NL_SET_ERR_MSG_MOD(extack, "Port is not a Subfunction");
+>+		return -EOPNOTSUPP;
+>+	}
+
+Pointless check.
+
+
+>+
+>+	dyn_port = ice_devlink_port_to_dyn(port);
+>+
+>+	switch (state) {
+>+	case DEVLINK_PORT_FN_STATE_ACTIVE:
+>+		if (!dyn_port->active)
+>+			return ice_activate_dynamic_port(dyn_port, extack);
+>+		break;
+>+	case DEVLINK_PORT_FN_STATE_INACTIVE:
+>+		if (dyn_port->active)
+>+			ice_deactivate_dynamic_port(dyn_port);
+>+		break;
+>+	}
+>+
+>+	return 0;
+>+}
+>+
+>+/**
+>+ * ice_devlink_port_fn_state_get - devlink handler for port state get
+>+ * @port: pointer to devlink port
+>+ * @state: admin configured state of the port
+>+ * @opstate: current port operational state
+>+ * @extack: extack for reporting error messages
+>+ *
+>+ * Gets port state.
+>+ *
+>+ * Return: zero on success or an error code on failure.
+>+ */
+>+static int
+>+ice_devlink_port_fn_state_get(struct devlink_port *port,
+>+			      enum devlink_port_fn_state *state,
+>+			      enum devlink_port_fn_opstate *opstate,
+>+			      struct netlink_ext_ack *extack)
+>+{
+>+	struct ice_dynamic_port *dyn_port;
+>+
+>+	if (port->attrs.flavour != DEVLINK_PORT_FLAVOUR_PCI_SF) {
+>+		NL_SET_ERR_MSG_MOD(extack, "Port is not a Subfunction");
+>+		return -EOPNOTSUPP;
+>+	}
+
+Pointless check.
+
+
+>+
+>+	dyn_port = ice_devlink_port_to_dyn(port);
+>+
+>+	if (dyn_port->active) {
+>+		*state = DEVLINK_PORT_FN_STATE_ACTIVE;
+>+		*opstate = DEVLINK_PORT_FN_OPSTATE_ATTACHED;
+>+	} else {
+>+		*state = DEVLINK_PORT_FN_STATE_INACTIVE;
+>+		*opstate = DEVLINK_PORT_FN_OPSTATE_DETACHED;
+>+	}
+>+
+>+	return 0;
+>+}
+>+
+>+static const struct devlink_port_ops ice_devlink_port_sf_ops = {
+>+	.port_del = ice_devlink_port_del,
+>+	.port_fn_hw_addr_get = ice_devlink_port_fn_hw_addr_get,
+>+	.port_fn_hw_addr_set = ice_devlink_port_fn_hw_addr_set,
+>+	.port_fn_state_get = ice_devlink_port_fn_state_get,
+>+	.port_fn_state_set = ice_devlink_port_fn_state_set,
+>+};
+>+
+>+/**
+>+ * ice_reserve_sf_num - Reserve a subfunction number for this port
+>+ * @pf: pointer to the pf structure
+>+ * @new_attr: devlink port attributes requested
+>+ * @extack: extack for reporting error messages
+>+ * @sfnum: on success, the sf number reserved
+>+ *
+>+ * Reserve a subfunction number for this port. Only called for
+>+ * DEVLINK_PORT_FLAVOUR_PCI_SF ports.
+>+ *
+>+ * Return: zero on success or an error code on failure.
+>+ */
+>+static int
+>+ice_reserve_sf_num(struct ice_pf *pf,
+>+		   const struct devlink_port_new_attrs *new_attr,
+>+		   struct netlink_ext_ack *extack, u32 *sfnum)
+>+{
+>+	int err;
+>+
+>+	/* If user didn't request an explicit number, pick one */
+>+	if (!new_attr->sfnum_valid)
+>+		return xa_alloc(&pf->sf_nums, sfnum, NULL, xa_limit_32b,
+>+				GFP_KERNEL);
+>+
+>+	/* Otherwise, check and use the number provided */
+>+	err = xa_insert(&pf->sf_nums, new_attr->sfnum, NULL, GFP_KERNEL);
+>+	if (err) {
+>+		if (err == -EBUSY)
+>+			NL_SET_ERR_MSG_MOD(extack, "Subfunction with given sfnum already exists");
+>+		return err;
+>+	}
+>+
+>+	*sfnum = new_attr->sfnum;
+>+
+>+	return 0;
+>+}
+>+
+>+/**
+>+ * ice_devlink_create_sf_port - Register PCI subfunction devlink port
+>+ * @dyn_port: the dynamic port instance structure for this subfunction
+>+ * @sfnum: the subfunction number to use for the port
+>+ *
+>+ * Register PCI subfunction flavour devlink port for a dynamically added
+>+ * subfunction port.
+>+ *
+>+ * Return: zero on success or an error code on failure.
+>+ */
+>+static int
+>+ice_devlink_create_sf_port(struct ice_dynamic_port *dyn_port, u32 sfnum)
+>+{
+>+	struct devlink_port_attrs attrs = {};
+>+	struct devlink_port *devlink_port;
+>+	struct devlink *devlink;
+>+	struct ice_vsi *vsi;
+>+	struct device *dev;
+>+	struct ice_pf *pf;
+>+	int err;
+>+
+>+	vsi = dyn_port->vsi;
+>+	pf = dyn_port->pf;
+>+	dev = ice_pf_to_dev(pf);
+>+
+>+	devlink_port = &dyn_port->devlink_port;
+>+
+>+	attrs.flavour = DEVLINK_PORT_FLAVOUR_PCI_SF;
+>+	attrs.pci_sf.pf = pf->hw.bus.func;
+>+	attrs.pci_sf.sf = sfnum;
+>+
+>+	devlink_port_attrs_set(devlink_port, &attrs);
+>+	devlink = priv_to_devlink(pf);
+>+
+>+	err = devl_port_register_with_ops(devlink, devlink_port, vsi->idx,
+>+					  &ice_devlink_port_sf_ops);
+>+	if (err) {
+>+		dev_err(dev, "Failed to create devlink port for Subfunction %d",
+>+			vsi->idx);
+>+		return err;
+>+	}
+>+
+>+	return 0;
+>+}
+>+
+>+/**
+>+ * ice_alloc_dynamic_port - Allocate new dynamic port
+>+ * @pf: pointer to the pf structure
+>+ * @new_attr: devlink port attributes requested
+>+ * @extack: extack for reporting error messages
+>+ * @devlink_port: index of newly created devlink port
+>+ *
+>+ * Allocate a new dynamic port instance and prepare it for configuration
+>+ * with devlink.
+>+ *
+>+ * Return: zero on success or an error code on failure.
+>+ */
+>+static int
+>+ice_alloc_dynamic_port(struct ice_pf *pf,
+>+		       const struct devlink_port_new_attrs *new_attr,
+>+		       struct netlink_ext_ack *extack,
+>+		       struct devlink_port **devlink_port)
+>+{
+>+	struct ice_dynamic_port *dyn_port;
+>+	struct ice_vsi *vsi;
+>+	u32 sfnum;
+>+	int err;
+>+
+>+	if (new_attr->flavour == DEVLINK_PORT_FLAVOUR_PCI_SF) {
+>+		err = ice_reserve_sf_num(pf, new_attr, extack, &sfnum);
+>+		if (err)
+>+			return err;
+>+	}
+>+
+>+	dyn_port = kzalloc(sizeof(*dyn_port), GFP_KERNEL);
+>+	if (!dyn_port) {
+>+		err = -ENOMEM;
+>+		goto unroll_reserve_sf_num;
+>+	}
+>+
+>+	vsi = ice_vsi_alloc(pf);
+>+	if (!vsi) {
+>+		NL_SET_ERR_MSG_MOD(extack, "Unable to allocate VSI");
+>+		err = -ENOMEM;
+>+		goto unroll_dyn_port_alloc;
+>+	}
+>+
+>+	dyn_port->vsi = vsi;
+>+	dyn_port->pf = pf;
+>+	dyn_port->active = 0;
+
+Pointless init, the memory is already zeroed.
+
+
+>+	eth_random_addr(dyn_port->hw_addr);
+>+
+>+	err = xa_insert(&pf->dyn_ports, vsi->idx, dyn_port, GFP_KERNEL);
+>+	if (err) {
+>+		NL_SET_ERR_MSG_MOD(extack, "Port index reservation failed");
+>+		goto unroll_vsi_alloc;
+>+	}
+>+
+>+	err = ice_devlink_create_sf_port(dyn_port, sfnum);
+>+	if (err) {
+>+		NL_SET_ERR_MSG_MOD(extack, "Port registration failed");
+>+		goto unroll_xa_insert;
+>+	}
+>+
+>+	*devlink_port = &dyn_port->devlink_port;
+>+
+>+	return 0;
+>+
+>+unroll_xa_insert:
+>+	xa_erase(&pf->dyn_ports, vsi->idx);
+>+unroll_vsi_alloc:
+>+	ice_vsi_free(vsi);
+>+unroll_dyn_port_alloc:
+>+	kfree(dyn_port);
+>+unroll_reserve_sf_num:
+>+	if (new_attr->flavour == DEVLINK_PORT_FLAVOUR_PCI_SF)
+>+		xa_erase(&pf->sf_nums, sfnum);
+>+
+>+	return err;
+>+}
+>+
+>+/**
+>+ * ice_devlink_port_new - devlink handler for the new port
+>+ * @devlink: pointer to devlink
+>+ * @new_attr: pointer to the port new attributes
+>+ * @extack: extack for reporting error messages
+>+ * @devlink_port: pointer to a new port
+>+ *
+>+ * Creates new devlink port, checks new port attributes and reject
+>+ * any unsupported parameters, allocates new subfunction for that port.
+>+ *
+>+ * Return: zero on success or an error code on failure.
+>+ */
+>+int
+>+ice_devlink_port_new(struct devlink *devlink,
+>+		     const struct devlink_port_new_attrs *new_attr,
+>+		     struct netlink_ext_ack *extack,
+>+		     struct devlink_port **devlink_port)
+>+{
+>+	struct ice_pf *pf = (struct ice_pf *)devlink_priv(devlink);
+
+Pointless cast.
+
+
+>+	struct device *dev = ice_pf_to_dev(pf);
+>+	int err;
+>+
+>+	dev_dbg(dev, "%s flavour:%d index:%d pfnum:%d\n", __func__,
+>+		new_attr->flavour, new_attr->port_index, new_attr->pfnum);
+
+How this message could ever help anyone?
+
+
+>+
+>+	err = ice_devlink_port_new_check_attr(pf, new_attr, extack);
+>+	if (err)
+>+		return err;
+>+
+>+	return ice_alloc_dynamic_port(pf, new_attr, extack, devlink_port);
+>+}
+>+
+>diff --git a/drivers/net/ethernet/intel/ice/devlink/ice_devlink_port.h b/drivers/net/ethernet/intel/ice/devlink/ice_devlink_port.h
+>index 983d136f5ddf..2bb203c1713f 100644
+>--- a/drivers/net/ethernet/intel/ice/devlink/ice_devlink_port.h
+>+++ b/drivers/net/ethernet/intel/ice/devlink/ice_devlink_port.h
+>@@ -4,9 +4,39 @@
+> #ifndef _ICE_DEVLINK_PORT_H_
+> #define _ICE_DEVLINK_PORT_H_
+> 
+>+#include "../ice.h"
+>+
+>+/**
+>+ * struct ice_dynamic_port - Track dynamically added devlink port instance
+>+ * @hw_addr: the HW address for this port
+>+ * @active: true if the port has been activated
+>+ * @devlink_port: the associated devlink port structure
+>+ * @pf: pointer to the PF private structure
+>+ * @vsi: the VSI associated with this port
+>+ *
+>+ * An instance of a dynamically added devlink port. Each port flavour
+>+ */
+>+struct ice_dynamic_port {
+>+	u8 hw_addr[ETH_ALEN];
+>+	u8 active : 1;
+>+	struct devlink_port devlink_port;
+>+	struct ice_pf *pf;
+>+	struct ice_vsi *vsi;
+>+};
+>+
+>+void ice_dealloc_all_dynamic_ports(struct ice_pf *pf);
+>+
+> int ice_devlink_create_pf_port(struct ice_pf *pf);
+> void ice_devlink_destroy_pf_port(struct ice_pf *pf);
+> int ice_devlink_create_vf_port(struct ice_vf *vf);
+> void ice_devlink_destroy_vf_port(struct ice_vf *vf);
+> 
+>+#define ice_devlink_port_to_dyn(p) \
+>+	container_of(port, struct ice_dynamic_port, devlink_port)
+>+
+>+int
+>+ice_devlink_port_new(struct devlink *devlink,
+>+		     const struct devlink_port_new_attrs *new_attr,
+>+		     struct netlink_ext_ack *extack,
+>+		     struct devlink_port **devlink_port);
+> #endif /* _ICE_DEVLINK_PORT_H_ */
+>diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+>index c40fc339a604..767ea80684e7 100644
+>--- a/drivers/net/ethernet/intel/ice/ice.h
+>+++ b/drivers/net/ethernet/intel/ice/ice.h
+>@@ -646,6 +646,9 @@ struct ice_pf {
+> 	struct ice_eswitch eswitch;
+> 	struct ice_esw_br_port *br_port;
+> 
+>+	struct xarray dyn_ports;
+>+	struct xarray sf_nums;
+>+
+> #define ICE_INVALID_AGG_NODE_ID		0
+> #define ICE_PF_AGG_NODE_ID_START	1
+> #define ICE_MAX_PF_AGG_NODES		32
+>@@ -902,6 +905,7 @@ int ice_vsi_open(struct ice_vsi *vsi);
+> void ice_set_ethtool_ops(struct net_device *netdev);
+> void ice_set_ethtool_repr_ops(struct net_device *netdev);
+> void ice_set_ethtool_safe_mode_ops(struct net_device *netdev);
+>+void ice_set_ethtool_sf_ops(struct net_device *netdev);
+> u16 ice_get_avail_txq_count(struct ice_pf *pf);
+> u16 ice_get_avail_rxq_count(struct ice_pf *pf);
+> int ice_vsi_recfg_qs(struct ice_vsi *vsi, int new_rx, int new_tx, bool locked);
+>diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/ice_devlink.c
+>index e5f275ca82e5..c186e793153d 100644
+>--- a/drivers/net/ethernet/intel/ice/ice_devlink.c
+>+++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
+>@@ -6,6 +6,7 @@
+> #include "ice.h"
+> #include "ice_lib.h"
+> #include "ice_devlink.h"
+>+#include "devlink/ice_devlink_port.h"
+> #include "ice_eswitch.h"
+> #include "ice_fw_update.h"
+> #include "ice_dcb_lib.h"
+>@@ -1131,6 +1132,8 @@ static const struct devlink_ops ice_devlink_ops = {
+> 
+> 	.rate_leaf_parent_set = ice_devlink_set_parent,
+> 	.rate_node_parent_set = ice_devlink_set_parent,
+>+
+>+	.port_new = ice_devlink_port_new,
+> };
+> 
+> static int
+>diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+>index 8706d0589caa..3472011922c1 100644
+>--- a/drivers/net/ethernet/intel/ice/ice_lib.c
+>+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+>@@ -7,6 +7,7 @@
+> #include "ice_lib.h"
+> #include "ice_fltr.h"
+> #include "ice_dcb_lib.h"
+>+#include "ice_type.h"
+> #include "ice_vsi_vlan_ops.h"
+> 
+> /**
+>@@ -440,7 +441,7 @@ static int ice_vsi_alloc_ring_stats(struct ice_vsi *vsi)
+>  * This deallocates the VSI's queue resources, removes it from the PF's
+>  * VSI array if necessary, and deallocates the VSI
+>  */
+>-static void ice_vsi_free(struct ice_vsi *vsi)
+>+void ice_vsi_free(struct ice_vsi *vsi)
+> {
+> 	struct ice_pf *pf = NULL;
+> 	struct device *dev;
+>@@ -612,7 +613,7 @@ ice_vsi_alloc_def(struct ice_vsi *vsi, struct ice_channel *ch)
+>  *
+>  * returns a pointer to a VSI on success, NULL on failure.
+>  */
+>-static struct ice_vsi *ice_vsi_alloc(struct ice_pf *pf)
+>+struct ice_vsi *ice_vsi_alloc(struct ice_pf *pf)
+> {
+> 	struct device *dev = ice_pf_to_dev(pf);
+> 	struct ice_vsi *vsi = NULL;
+>diff --git a/drivers/net/ethernet/intel/ice/ice_lib.h b/drivers/net/ethernet/intel/ice/ice_lib.h
+>index aa3a85d31f95..9cc7cc57e41a 100644
+>--- a/drivers/net/ethernet/intel/ice/ice_lib.h
+>+++ b/drivers/net/ethernet/intel/ice/ice_lib.h
+>@@ -97,6 +97,8 @@ void ice_dis_vsi(struct ice_vsi *vsi, bool locked);
+> 
+> int ice_vsi_rebuild(struct ice_vsi *vsi, u32 vsi_flags);
+> int ice_vsi_cfg(struct ice_vsi *vsi, struct ice_vsi_cfg_params *params);
+>+struct ice_vsi *ice_vsi_alloc(struct ice_pf *pf);
+>+void ice_vsi_free(struct ice_vsi *vsi);
+> 
+> bool ice_is_reset_in_progress(unsigned long *state);
+> int ice_wait_for_reset(struct ice_pf *pf, unsigned long timeout);
+>diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+>index b0f6a11ae744..e4269a7df7d6 100644
+>--- a/drivers/net/ethernet/intel/ice/ice_main.c
+>+++ b/drivers/net/ethernet/intel/ice/ice_main.c
+>@@ -16,6 +16,7 @@
+> #include "ice_devlink.h"
+> #include "ice_hwmon.h"
+> #include "devlink/ice_devlink_port.h"
+>+#include "ice_sf_eth.h"
+> /* Including ice_trace.h with CREATE_TRACE_POINTS defined will generate the
+>  * ice tracepoint functions. This must be done exactly once across the
+>  * ice driver.
+>@@ -3929,6 +3930,9 @@ static void ice_deinit_pf(struct ice_pf *pf)
+> 
+> 	if (pf->ptp.clock)
+> 		ptp_clock_unregister(pf->ptp.clock);
+>+
+>+	xa_destroy(&pf->dyn_ports);
+>+	xa_destroy(&pf->sf_nums);
+> }
+> 
+> /**
+>@@ -4022,6 +4026,9 @@ static int ice_init_pf(struct ice_pf *pf)
+> 	hash_init(pf->vfs.table);
+> 	ice_mbx_init_snapshot(&pf->hw);
+> 
+>+	xa_init(&pf->dyn_ports);
+>+	xa_init(&pf->sf_nums);
+>+
+> 	return 0;
+> }
+> 
+>@@ -5250,6 +5257,8 @@ static void ice_remove(struct pci_dev *pdev)
+> 	struct ice_pf *pf = pci_get_drvdata(pdev);
+> 	int i;
+> 
+>+	ice_dealloc_all_dynamic_ports(pf);
+>+
+> 	for (i = 0; i < ICE_MAX_RESET_WAIT; i++) {
+> 		if (!ice_is_reset_in_progress(pf->state))
+> 			break;
+>@@ -6561,7 +6570,8 @@ static int ice_up_complete(struct ice_vsi *vsi)
+> 
+> 	if (vsi->port_info &&
+> 	    (vsi->port_info->phy.link_info.link_info & ICE_AQ_LINK_UP) &&
+>-	    vsi->netdev && vsi->type == ICE_VSI_PF) {
+>+	    ((vsi->netdev && vsi->type == ICE_VSI_PF) ||
+>+	     (vsi->netdev && vsi->type == ICE_VSI_SF))) {
+> 		ice_print_link_msg(vsi, true);
+> 		netif_tx_start_all_queues(vsi->netdev);
+> 		netif_carrier_on(vsi->netdev);
+>@@ -7217,7 +7227,7 @@ int ice_vsi_open(struct ice_vsi *vsi)
+> 
+> 	ice_vsi_cfg_netdev_tc(vsi, vsi->tc_cfg.ena_tc);
+> 
+>-	if (vsi->type == ICE_VSI_PF) {
+>+	if (vsi->type == ICE_VSI_PF || vsi->type == ICE_VSI_SF) {
+> 		/* Notify the stack of the actual queue counts. */
+> 		err = netif_set_real_num_tx_queues(vsi->netdev, vsi->num_txq);
+> 		if (err)
+>diff --git a/drivers/net/ethernet/intel/ice/ice_sf_eth.c b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
+>new file mode 100644
+>index 000000000000..f569f176f29f
+>--- /dev/null
+>+++ b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
+>@@ -0,0 +1,138 @@
+>+// SPDX-License-Identifier: GPL-2.0
+>+/* Copyright (c) 2023, Intel Corporation. */
+
+It's 2024
+
+
+>+
+>+#include "ice.h"
+>+#include "ice_lib.h"
+>+#include "ice_txrx.h"
+>+#include "ice_fltr.h"
+>+#include "ice_sf_eth.h"
+>+#include "devlink/ice_devlink_port.h"
+>+
+>+static const struct net_device_ops ice_sf_netdev_ops = {
+>+	.ndo_open = ice_open,
+>+	.ndo_stop = ice_stop,
+>+	.ndo_start_xmit = ice_start_xmit,
+>+	.ndo_vlan_rx_add_vid = ice_vlan_rx_add_vid,
+>+	.ndo_vlan_rx_kill_vid = ice_vlan_rx_kill_vid,
+>+	.ndo_change_mtu = ice_change_mtu,
+>+	.ndo_get_stats64 = ice_get_stats64,
+>+	.ndo_tx_timeout = ice_tx_timeout,
+>+	.ndo_bpf = ice_xdp,
+>+	.ndo_xdp_xmit = ice_xdp_xmit,
+>+	.ndo_xsk_wakeup = ice_xsk_wakeup,
+>+};
+>+
+>+/**
+>+ * ice_sf_cfg_netdev - Allocate, configure and register a netdev
+>+ * @dyn_port: subfunction associated with configured netdev
+>+ *
+>+ * Returns 0 on success, negative value on failure
+>+ */
+>+static int ice_sf_cfg_netdev(struct ice_dynamic_port *dyn_port)
+>+{
+>+	struct net_device *netdev;
+>+	struct ice_vsi *vsi = dyn_port->vsi;
+>+	struct ice_netdev_priv *np;
+>+	int err;
+>+
+>+	netdev = alloc_etherdev_mqs(sizeof(*np), vsi->alloc_txq,
+>+				    vsi->alloc_rxq);
+>+	if (!netdev)
+>+		return -ENOMEM;
+>+
+>+	SET_NETDEV_DEV(netdev, &vsi->back->pdev->dev);
+>+	set_bit(ICE_VSI_NETDEV_ALLOCD, vsi->state);
+>+	vsi->netdev = netdev;
+>+	np = netdev_priv(netdev);
+>+	np->vsi = vsi;
+>+
+>+	ice_set_netdev_features(netdev);
+>+
+>+	netdev->xdp_features = NETDEV_XDP_ACT_BASIC | NETDEV_XDP_ACT_REDIRECT |
+>+			       NETDEV_XDP_ACT_XSK_ZEROCOPY |
+>+			       NETDEV_XDP_ACT_RX_SG;
+>+
+>+	eth_hw_addr_set(netdev, dyn_port->hw_addr);
+>+	ether_addr_copy(netdev->perm_addr, dyn_port->hw_addr);
+>+	netdev->netdev_ops = &ice_sf_netdev_ops;
+>+	SET_NETDEV_DEVLINK_PORT(netdev, &dyn_port->devlink_port);
+>+
+>+	err = register_netdev(netdev);
+
+It the the actual subfunction or eswitch port representor of the
+subfunction. Looks like the port representor. In that case. It should be
+created no matter if the subfunction is activated, when it it created.
+
+If this is the actual subfunction netdev, you should not link it to
+devlink port here.
+
+
+
+>+	if (err) {
+>+		free_netdev(netdev);
+>+		vsi->netdev = NULL;
+>+		return -ENOMEM;
+>+	}
+>+	set_bit(ICE_VSI_NETDEV_REGISTERED, vsi->state);
+>+	netif_carrier_off(netdev);
+>+	netif_tx_stop_all_queues(netdev);
+>+
+>+	return 0;
+>+}
+>+
+>+/**
+>+ * ice_sf_eth_activate - Activate Ethernet subfunction port
+>+ * @dyn_port: the dynamic port instance for this subfunction
+>+ * @extack: extack for reporting error messages
+>+ *
+>+ * Setups netdev resources and filters for a subfunction.
+>+ *
+>+ * Return: zero on success or an error code on failure.
+>+ */
+>+int
+>+ice_sf_eth_activate(struct ice_dynamic_port *dyn_port,
+>+		    struct netlink_ext_ack *extack)
+>+{
+>+	struct ice_vsi_cfg_params params = {};
+>+	struct ice_vsi *vsi = dyn_port->vsi;
+>+	struct ice_pf *pf = dyn_port->pf;
+>+	int err;
+>+
+>+	params.type = ICE_VSI_SF;
+>+	params.pi = pf->hw.port_info;
+>+	params.flags = ICE_VSI_FLAG_INIT;
+>+
+>+	err = ice_vsi_cfg(vsi, &params);
+>+	if (err) {
+>+		NL_SET_ERR_MSG_MOD(extack, "Subfunction vsi config failed");
+>+		return err;
+>+	}
+>+
+>+	err = ice_sf_cfg_netdev(dyn_port);
+>+	if (err) {
+>+		NL_SET_ERR_MSG_MOD(extack, "Subfunction netdev config failed");
+>+		goto err_vsi_decfg;
+>+	}
+>+
+>+	err = ice_fltr_add_mac_and_broadcast(vsi, vsi->netdev->dev_addr,
+>+					     ICE_FWD_TO_VSI);
+>+	if (err)
+>+		NL_SET_ERR_MSG_MOD(extack, "can't add MAC filters for subfunction VSI");
+
+Start with capital letter here.
+
+
+>+
+>+	ice_napi_add(vsi);
+>+
+>+	return err;
+>+
+>+err_vsi_decfg:
+>+	ice_vsi_decfg(vsi);
+>+	return err;
+>+}
+>+
+>+/**
+>+ * ice_sf_eth_deactivate - Deactivate subfunction
+>+ * @dyn_port: the dynamic port instance for this subfunction
+>+ *
+>+ * Free netdev resources and filters for a subfunction.
+>+ */
+>+void ice_sf_eth_deactivate(struct ice_dynamic_port *dyn_port)
+>+{
+>+	struct ice_vsi *vsi = dyn_port->vsi;
+>+
+>+	ice_vsi_close(vsi);
+>+	unregister_netdev(vsi->netdev);
+>+	clear_bit(ICE_VSI_NETDEV_REGISTERED, vsi->state);
+>+	free_netdev(vsi->netdev);
+>+	clear_bit(ICE_VSI_NETDEV_ALLOCD, vsi->state);
+>+	vsi->netdev = NULL;
+>+	ice_vsi_decfg(vsi);
+>+}
+>diff --git a/drivers/net/ethernet/intel/ice/ice_sf_eth.h b/drivers/net/ethernet/intel/ice/ice_sf_eth.h
+>new file mode 100644
+>index 000000000000..f4b8b36b1a67
+>--- /dev/null
+>+++ b/drivers/net/ethernet/intel/ice/ice_sf_eth.h
+>@@ -0,0 +1,15 @@
+>+/* SPDX-License-Identifier: GPL-2.0 */
+>+/* Copyright (c) 2023, Intel Corporation. */
+>+
+>+#ifndef _ICE_SF_ETH_H_
+>+#define _ICE_SF_ETH_H_
+>+
+>+#include "ice.h"
+>+#include "devlink/ice_devlink_port.h"
+>+
+>+int
+>+ice_sf_eth_activate(struct ice_dynamic_port *dyn_port,
+>+		    struct netlink_ext_ack *extack);
+>+void ice_sf_eth_deactivate(struct ice_dynamic_port *dyn_port);
+>+
+>+#endif /* _ICE_SF_ETH_H_ */
+>-- 
+>2.42.0
+
+pw-bot: cr
+
+>
+>
 
