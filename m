@@ -1,101 +1,287 @@
-Return-Path: <netdev+bounces-71391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73DC485326F
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:59:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A745B853271
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:59:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30BE0282AC0
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:59:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DDC028213D
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:59:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA7DD56473;
-	Tue, 13 Feb 2024 13:59:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QHmuOcjR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D747B56B68;
+	Tue, 13 Feb 2024 13:59:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3950142070
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 13:59:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 365E056B65;
+	Tue, 13 Feb 2024 13:59:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707832759; cv=none; b=bo3d9l9ldyWfV4HJpPLVMt7PBwe7Tak8BHkSfJvjuO95k7fOVof9aRePDEl+om7oaA1leaUIyNHeqf7tAVcU8qw50rLcyPTvUnAn7jV+CqVPjCVKIzQ7PnG9q0tNTFVphfGkLX/gWXag+qPWSqckaDOuPEz7GIIJ7DM/MQRptXA=
+	t=1707832764; cv=none; b=swszHgJRoVdPONRRTJjQNYSgXaA24uu4vckKm4w4QMgzOstW6VE2a2D21dMWNvyLYMmy0Uxz73MVGy253Cfd6TWizxxankmDFQNDCPvLDVPdUgcak2nUn9GwdNY9MU/FgjHbpvVW5TKqrInt7UOvNUmPy2slcI9rLlKJc5398EU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707832759; c=relaxed/simple;
-	bh=pgftBDN2uuZkJDLJBWLToB3ZWVhkpa+SKo9QQeutc3I=;
+	s=arc-20240116; t=1707832764; c=relaxed/simple;
+	bh=AFH5mXgYpgm7k1VaeAmR7XOmcIr8m+gl7ANkYB0CJYI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KFhWDxrMhLOdi5rrtTLkdWTtoMoqFUpkWnwe0Eow9IYvf82YwdfgE4miG7wUq15lZx1aNkTCU2tgJ0yDIHpyQdrDzdoQpVl1QU4YbBfkvOQiB8Pi+nFAssS6TSu6LV79whlspFvB5W2x0EDxYYXntjJSbJx71O80TGU2u+xdMao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QHmuOcjR; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-56037115bb8so9956a12.0
-        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 05:59:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707832756; x=1708437556; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pgftBDN2uuZkJDLJBWLToB3ZWVhkpa+SKo9QQeutc3I=;
-        b=QHmuOcjRBtE1zRRjyQgqFheV+t7iIBaodTkEYhuKSxI0XXGZ5aSBy4Zm3fhrUoODI1
-         BDl85503ITsFFrQc73w4NTzCahfk/hGXKoryO+m/YzWZG7igIEFAJqRfl6MslIsF6DA/
-         4DO5/6d/3C7pPEkvb7ONXYJunG/2G2/nBUsa5cAhBVuas+2AAg0O1OA2TaH/Lto1vu4+
-         59Lqq8BZfa/+6y/iNf1FfZ39yDVgD0pdtFc93Ti/+CX0h7EUsEg4fG0JvF4QG+ePcftO
-         oGE9q7FAdgvvAhmsgNifz8PbUjjHXhjDQ0bV9XqMUvA0QB0lccnsJhPklJc4gKOe/qoi
-         ABRw==
+	 To:Cc:Content-Type; b=Rnl9qpyMQ2TwTQbEO41h0UW4cbChSdQcuL39NjhFmJLHRx/Z58S6PjdjzN0QluQx4ZaqXVmb8rYaFlypf+5UTic8kLgeX/8h/Ce3cjystQr2b0TLyWLfyX7z3UE6+Rk22JVwgucbZl0mr8UxUSYWB1kUbG29PX7qdGTACQvW/IY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.161.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-59d29103089so119841eaf.0;
+        Tue, 13 Feb 2024 05:59:23 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707832756; x=1708437556;
+        d=1e100.net; s=20230601; t=1707832762; x=1708437562;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=pgftBDN2uuZkJDLJBWLToB3ZWVhkpa+SKo9QQeutc3I=;
-        b=Ze7XMpCepPEg2Ltc/wSHe93DK6BG4Mg5HerNYcVQV24ZUOfvM5Y5mES2qVUwxAY9E2
-         WMaYcYeEl5hNTBhTO5tBXkMeC4RbPwKoR8XfqhqRO0XXhePwIan6WyC5bZIBpRG9sjwg
-         5XtxEpO8BoYM7M8MpUOzJ46rnfD7P6N0epcFPpWhNVg33eVH11hF6w9X0Fuvt8xea+h1
-         0znloIRp9e7IvbV1KAH55Fl0fS8dDNWi3Hx68iXmgK2OtJyWF0I6kLYopF9enXsJGwvO
-         drP6aNAh/YbVa9ZthXocYbGjfbsyoj2kDilSGDCd58pB7EwpObCxdFV1OQ8+BIcg+Eo8
-         BIIw==
-X-Forwarded-Encrypted: i=1; AJvYcCXoY1KPSA5tpNpJhJ72/Fv2e5Jw4F86Vdv1ewNGrojDh5vG1nAuikxWxp76dfkPD7Zjhpukf84VR2+4mu6evlT2GAQ8OQma
-X-Gm-Message-State: AOJu0Yz0paP/42+f6a9rjOPM87dP8Q7tgVZ8K7pLAOu45WPyNwh33+9E
-	5IznxSACC9GrIqCcRXfIyJGg5MMAm65MMrCp37eCNLO9fG3BXdhpxGS8BqobmeX+QcBH8VgCu6z
-	LnYc+XREdMTERy1zwFSws1MMNjfyKgUMYrgRM
-X-Google-Smtp-Source: AGHT+IGOP2w+ii6860pR3cpWL2cyj2kdB8PRvexOdRrObaq+iXh+LldmbY/M1ByDZB7Z9kBNi5z935MfcT78gw92r0o=
-X-Received: by 2002:a50:9fad:0:b0:55f:cb23:1f1b with SMTP id
- c42-20020a509fad000000b0055fcb231f1bmr151085edf.0.1707832756185; Tue, 13 Feb
- 2024 05:59:16 -0800 (PST)
+        bh=LtLjlT9JbsjIzXWWX8LrQHq6rvO1Du63NHf/SHICIds=;
+        b=AjjcmVRuC33QCJZatlFaIxKuh6pq32iSMZQoHe0uRkWW/PyOIjGYWp0hQn/+U5xEAz
+         O5J5teSY+JsZybAale+CdUWjsNYhIVKAGmW6JxFim9n5tfiroqgIkDqFHifT2DYgkloU
+         t8eS2kXurz/D0pNsvTrZ3XQTD4qbiZsvt/VX8yAdzkff/KBT2FtpPi6/OkTkTy5D5ei8
+         NX7kAI5mLMhKf0rblIcQnNaf9TM9kUnUEGQUg92h/5do8l90Iq61KSAgH/Hf5jgXSdUH
+         KNjNBsAS3Ca8FzPIAD1sjhyPQ5GwBwWHhniSsCwXHQvgXBUPqhmu+Ilcyu1r5eZwtm16
+         bqRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXUy2WGG1FSnNmqbT7nyfHj+Zrc32w3ryRhrYLJVL/UyFWZSjD5HvLP1bJ9kwhRCAfIsVOO/pV7D/z0js09qqFiXNBfG2UZ
+X-Gm-Message-State: AOJu0YyR596b1es09iY8Q1lngExnCYDwkeKm73NZ0tcK/bN5oFA2gQJP
+	MoKQTkC2RKc/ZhQQSByXBgLVe9U3jOqMwhXiKRMTOOpus7l/xu/Iqj3+hxyl89I22o6mInbNjDT
+	UWD5vsWFMNFyJYDVK3lu9/mqL8Gk=
+X-Google-Smtp-Source: AGHT+IEr+CgFXjmG0D1cSHmU1Nn3AjLhgrwPgyZdSrNffcqbKHgcQaT4YBnNpwWH9K3/pSmIsPUk0rmW05Pv8Pgp7K0=
+X-Received: by 2002:a4a:ca0d:0:b0:599:e8ff:66d9 with SMTP id
+ w13-20020a4aca0d000000b00599e8ff66d9mr7635483ooq.1.1707832762197; Tue, 13 Feb
+ 2024 05:59:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240213131205.4309-1-kerneljasonxing@gmail.com>
-In-Reply-To: <20240213131205.4309-1-kerneljasonxing@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 13 Feb 2024 14:59:05 +0100
-Message-ID: <CANn89iKd67ADfCpN=4cV1+SQHak93FK73sUwPF3rmycyHzuAkQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: no need to use acceptable for conn_request
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	dsahern@kernel.org, kuniyu@amazon.com, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
+References: <20240212161615.161935-1-stanislaw.gruszka@linux.intel.com> <20240212161615.161935-4-stanislaw.gruszka@linux.intel.com>
+In-Reply-To: <20240212161615.161935-4-stanislaw.gruszka@linux.intel.com>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Tue, 13 Feb 2024 14:59:10 +0100
+Message-ID: <CAJZ5v0jr4Z=ffm9E+eR7p7rQwbCWEP=YHxNbR9VAEwb8-3e3GA@mail.gmail.com>
+Subject: Re: [PATCH v4 3/3] thermal: intel: hfi: Enable interface only when required
+To: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
+Cc: linux-pm@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, 
+	Ricardo Neri <ricardo.neri-calderon@linux.intel.com>, 
+	Daniel Lezcano <daniel.lezcano@linaro.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jiri Pirko <jiri@resnulli.us>, Johannes Berg <johannes@sipsolutions.net>, 
+	Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 13, 2024 at 2:12=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
+On Mon, Feb 12, 2024 at 5:16=E2=80=AFPM Stanislaw Gruszka
+<stanislaw.gruszka@linux.intel.com> wrote:
 >
-> From: Jason Xing <kernelxing@tencent.com>
+> Enable and disable hardware feedback interface (HFI) when user space
+> handler is present. For example, enable HFI, when intel-speed-select or
+> Intel Low Power daemon is running and subscribing to thermal netlink
+> events. When user space handlers exit or remove subscription for
+> thermal netlink events, disable HFI.
 >
-> Since tcp_conn_request() always returns zero, there is no need to
-> keep the dead code. Remove it then.
+> Summary of changes:
 >
-> Link: https://lore.kernel.org/netdev/CANn89iJwx9b2dUGUKFSV3PF=3DkN5o+kxz3=
-A_fHZZsOS4AnXhBNw@mail.gmail.com/
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> - Register a thermal genetlink notifier
+>
+> - In the notifier, process THERMAL_NOTIFY_BIND and THERMAL_NOTIFY_UNBIND
+> reason codes to count number of thermal event group netlink multicast
+> clients. If thermal netlink group has any listener enable HFI on all
+> packages. If there are no listener disable HFI on all packages.
+>
+> - When CPU is online, instead of blindly enabling HFI, check if
+> the thermal netlink group has any listener. This will make sure that
+> HFI is not enabled by default during boot time.
+>
+> - Actual processing to enable/disable matches what is done in
+> suspend/resume callbacks. Create two functions hfi_do_enable()
+> and hfi_do_disable(), which can be called from  the netlink notifier
+> callback and suspend/resume callbacks.
+>
+> Signed-off-by: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
+> ---
+>  drivers/thermal/intel/intel_hfi.c | 95 +++++++++++++++++++++++++++----
+>  1 file changed, 85 insertions(+), 10 deletions(-)
+>
+> diff --git a/drivers/thermal/intel/intel_hfi.c b/drivers/thermal/intel/in=
+tel_hfi.c
+> index 3b04c6ec4fca..5e1e2b5269b7 100644
+> --- a/drivers/thermal/intel/intel_hfi.c
+> +++ b/drivers/thermal/intel/intel_hfi.c
+> @@ -159,6 +159,7 @@ struct hfi_cpu_info {
+>  static DEFINE_PER_CPU(struct hfi_cpu_info, hfi_cpu_info) =3D { .index =
+=3D -1 };
+>
+>  static int max_hfi_instances;
+> +static int hfi_thermal_clients_num;
+>  static struct hfi_instance *hfi_instances;
+>
+>  static struct hfi_features hfi_features;
+> @@ -477,8 +478,11 @@ void intel_hfi_online(unsigned int cpu)
+>  enable:
+>         cpumask_set_cpu(cpu, hfi_instance->cpus);
+>
+> -       /* Enable this HFI instance if this is its first online CPU. */
+> -       if (cpumask_weight(hfi_instance->cpus) =3D=3D 1) {
+> +       /*
+> +        * Enable this HFI instance if this is its first online CPU and
+> +        * there are user-space clients of thermal events.
+> +        */
+> +       if (cpumask_weight(hfi_instance->cpus) =3D=3D 1 && hfi_thermal_cl=
+ients_num > 0) {
+>                 hfi_set_hw_table(hfi_instance);
+>                 hfi_enable();
+>         }
+> @@ -573,28 +577,93 @@ static __init int hfi_parse_features(void)
+>         return 0;
+>  }
+>
+> -static void hfi_do_enable(void)
+> +/*
+> + * HFI enable/disable run in non-concurrent manner on boot CPU in syscor=
+e
+> + * callbacks or under protection of hfi_instance_lock.
+> + */
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+In the comment above I would say "If concurrency is not prevented by
+other means, the HFI enable/disable routines must be called under
+hfi_instance_lock." and I would retain the comments below (they don't
+hurt IMO).
+
+> +static void hfi_do_enable(void *ptr)
+
+I would call this hfi_enable_instance().
+
+> +{
+> +       struct hfi_instance *hfi_instance =3D ptr;
+
+Why is this variable needed ro even useful?  prt can be passed
+directly to hfi_set_hw_table().
+
+> +
+> +       hfi_set_hw_table(hfi_instance);
+> +       hfi_enable();
+> +}
+> +
+> +static void hfi_do_disable(void *ptr)
+
+And I'd call this hfi_disable_instance().
+
+> +{
+> +       hfi_disable();
+> +}
+> +
+> +static void hfi_syscore_resume(void)
+>  {
+>         /* This code runs only on the boot CPU. */
+>         struct hfi_cpu_info *info =3D &per_cpu(hfi_cpu_info, 0);
+>         struct hfi_instance *hfi_instance =3D info->hfi_instance;
+>
+> -       /* No locking needed. There is no concurrency with CPU online. */
+> -       hfi_set_hw_table(hfi_instance);
+> -       hfi_enable();
+> +       if (hfi_thermal_clients_num > 0)
+> +               hfi_do_enable(hfi_instance);
+>  }
+>
+> -static int hfi_do_disable(void)
+> +static int hfi_syscore_suspend(void)
+>  {
+> -       /* No locking needed. There is no concurrency with CPU offline. *=
+/
+>         hfi_disable();
+>
+>         return 0;
+>  }
+>
+>  static struct syscore_ops hfi_pm_ops =3D {
+> -       .resume =3D hfi_do_enable,
+> -       .suspend =3D hfi_do_disable,
+> +       .resume =3D hfi_syscore_resume,
+> +       .suspend =3D hfi_syscore_suspend,
+> +};
+> +
+> +static int hfi_thermal_notify(struct notifier_block *nb, unsigned long s=
+tate,
+> +                             void *_notify)
+> +{
+> +       struct thermal_genl_notify *notify =3D _notify;
+> +       struct hfi_instance *hfi_instance;
+> +       smp_call_func_t func;
+> +       unsigned int cpu;
+> +       int i;
+> +
+> +       if (notify->mcgrp !=3D THERMAL_GENL_EVENT_GROUP)
+> +               return NOTIFY_DONE;
+> +
+> +       if (state !=3D THERMAL_NOTIFY_BIND && state !=3D THERMAL_NOTIFY_U=
+NBIND)
+> +               return NOTIFY_DONE;
+> +
+> +       mutex_lock(&hfi_instance_lock);
+> +
+> +       switch (state) {
+> +       case THERMAL_NOTIFY_BIND:
+> +               hfi_thermal_clients_num++;
+> +               break;
+> +
+> +       case THERMAL_NOTIFY_UNBIND:
+> +               hfi_thermal_clients_num--;
+> +               break;
+> +       }
+> +
+> +       if (hfi_thermal_clients_num > 0)
+> +               func =3D hfi_do_enable;
+> +       else
+> +               func =3D hfi_do_disable;
+> +
+> +       for (i =3D 0; i < max_hfi_instances; i++) {
+> +               hfi_instance =3D &hfi_instances[i];
+> +               if (cpumask_empty(hfi_instance->cpus))
+> +                       continue;
+> +
+> +               cpu =3D cpumask_any(hfi_instance->cpus);
+> +               smp_call_function_single(cpu, func, hfi_instance, true);
+> +       }
+> +
+> +       mutex_unlock(&hfi_instance_lock);
+
+So AFAICS, one instance can be enabled multiple times because of this.
+  I guess that's OK?  In any case, it would be kind of nice to leave a
+note regarding it somewhere here.
+
+> +
+> +       return NOTIFY_OK;
+> +}
+> +
+> +static struct notifier_block hfi_thermal_nb =3D {
+> +       .notifier_call =3D hfi_thermal_notify,
+>  };
+>
+>  void __init intel_hfi_init(void)
+> @@ -628,10 +697,16 @@ void __init intel_hfi_init(void)
+>         if (!hfi_updates_wq)
+>                 goto err_nomem;
+>
+> +       if (thermal_genl_register_notifier(&hfi_thermal_nb))
+> +               goto err_nl_notif;
+
+Is it possible for any clients to be there before the notifier is
+registered?  If not, it would be good to add a comment about it.
+
+> +
+>         register_syscore_ops(&hfi_pm_ops);
+>
+>         return;
+>
+> +err_nl_notif:
+> +       destroy_workqueue(hfi_updates_wq);
+> +
+>  err_nomem:
+>         for (j =3D 0; j < i; ++j) {
+>                 hfi_instance =3D &hfi_instances[j];
+> --
 
