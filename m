@@ -1,189 +1,131 @@
-Return-Path: <netdev+bounces-71328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65BDD852FDF
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 12:52:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C421852FE3
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 12:53:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CFA42B23770
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 11:52:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEDE61C22813
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 11:53:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0EEB38FB9;
-	Tue, 13 Feb 2024 11:51:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EYEwYK5Q"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6EF437710;
+	Tue, 13 Feb 2024 11:53:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from sonata.ens-lyon.org (sonata.ens-lyon.org [140.77.166.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A1A5381DF
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 11:51:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE45A38DCD;
+	Tue, 13 Feb 2024 11:53:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.77.166.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707825081; cv=none; b=nNToAdRIAPc9PcYsPbWT+NLdRW17HWOjkfVgcsdunQD+hVKUdJ++jeehkaD1qHjfIujF3PtaX5GbqmRHN++tfIW/alvfZwaGzGRxCJlibwF4YvIjIK3FO2/ER84hKgNldIweEAZ/894/eg9L9fHBxkRJXiJmo2xVZhJoX7kuLeU=
+	t=1707825190; cv=none; b=E6NYLH9QyheUMFfyrdSzAxQ55hD1qzbBMweRxiRltOzY3svEhnZSTF6c/xOYS62XrhloiTzUABjFAnDRdqVT/VbB36SzwuQy1Ed4yCDYnLY9Rd5h3Xb3WpQ9w71di2+fZbHerVxfFPenAoxm4UG84057rXCff4lrKZ0uuBtpex4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707825081; c=relaxed/simple;
-	bh=uS4M8+vsGmkHQK0cf9nAqcZUWp7CBWnXPvPw6e0tukM=;
+	s=arc-20240116; t=1707825190; c=relaxed/simple;
+	bh=fkBcdfRB38Ddw/ZwR2iHOK6nOHVyppNnyNGJz41GirY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JiB1CHt2Z+ltyi8eSaoIQLSGXoUXr3PymQOb6bp0iYOmk8qJZ3zrM4Q5l0B3EJPDbhvfgaDpflGwBjURAMIlMwSNn+iiRKxtwopvwppO2SJ25+KMRiIhnjf7/Z0Z3RLo+Qd3ozt1bOirWHY01yK2TyrqxYMhRt9cujPN/X0TIVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EYEwYK5Q; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707825080; x=1739361080;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=uS4M8+vsGmkHQK0cf9nAqcZUWp7CBWnXPvPw6e0tukM=;
-  b=EYEwYK5Q/8OTx7973NW3xJA8X+Sz/0/oE7pRI2bPXBivLNrwGjsF+Owf
-   KZA1mM0vK4YjUzXAEDYYXDpMkCA6KK3Qt8eBzId3ijLZTJ9g9qzyLutGq
-   PQ8moumkKl1+7joslZPrMpD6ZV6N2ihGU4G7GEh3D2qLgldkHGFRg3KuY
-   IMmXop0EayZ1LI5WES2WtuZzmXX2jqPlsMNzJlNohHnhBQvnBeetHxgpy
-   AkHKYp7so997u8R5nFHqKIsxkhHRA5vyEsviiaIUZHTZq4fPUKfJ9lrOu
-   UaQLzlTYR11Tvh7Z7/IRwdYnMD9tCzRSn6Fy8wS4E49RL8LPQkxaZdJuk
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="1680943"
-X-IronPort-AV: E=Sophos;i="6.06,157,1705392000"; 
-   d="scan'208";a="1680943"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2024 03:51:19 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,157,1705392000"; 
-   d="scan'208";a="7507615"
-Received: from unknown (HELO mev-dev) ([10.237.112.144])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2024 03:51:17 -0800
-Date: Tue, 13 Feb 2024 12:51:09 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	pawel.chmielewski@intel.com, sridhar.samudrala@intel.com,
-	jacob.e.keller@intel.com, pio.raczynski@gmail.com,
-	konrad.knitter@intel.com, marcin.szycik@intel.com,
-	wojciech.drewek@intel.com, nex.sw.ncis.nat.hpm.dev@intel.com,
-	przemyslaw.kitszel@intel.com
-Subject: Re: [iwl-next v1 1/7] ice: devlink PF MSI-X max and min parameter
-Message-ID: <ZctXrfWiYkopStMt@mev-dev>
-References: <20240213073509.77622-1-michal.swiatkowski@linux.intel.com>
- <20240213073509.77622-2-michal.swiatkowski@linux.intel.com>
- <ZcswSYA5GqtOb3ll@nanopsycho>
- <Zcs95HiZz5g4QUwt@mev-dev>
- <ZctTL05gEf_7XbhX@nanopsycho>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wbo7oZmVIm61VtyMsZsoD8htHO4LFKnCsn+s8WbGEUYh0WkN8YD8N5ZecjKjhG07CMEL5l0ZTA3zeWo7mCMeSkkM7DXAuL+Szl1BqT/0CvMDR3LvoIGhJjvrH3xmwEpFx7i8xqqts9j0Mgq0Aj2uVm59qgcp3JlN2wiGpCgH190=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ens-lyon.org; spf=pass smtp.mailfrom=bounce.ens-lyon.org; arc=none smtp.client-ip=140.77.166.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ens-lyon.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bounce.ens-lyon.org
+Received: from localhost (localhost [127.0.0.1])
+	by sonata.ens-lyon.org (Postfix) with ESMTP id 7CFBEA01AB;
+	Tue, 13 Feb 2024 12:53:05 +0100 (CET)
+Received: from sonata.ens-lyon.org ([127.0.0.1])
+	by localhost (sonata.ens-lyon.org [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id IUruqtVTJVN6; Tue, 13 Feb 2024 12:53:05 +0100 (CET)
+Received: from begin (nat-inria-interne-52-gw-01-bso.bordeaux.inria.fr [194.199.1.52])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by sonata.ens-lyon.org (Postfix) with ESMTPSA id ED475A01A6;
+	Tue, 13 Feb 2024 12:53:04 +0100 (CET)
+Received: from samy by begin with local (Exim 4.97)
+	(envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1rZrLU-00000007DiE-2ER6;
+	Tue, 13 Feb 2024 12:53:04 +0100
+Date: Tue, 13 Feb 2024 12:53:04 +0100
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: Tom Parkin <tparkin@katalix.com>
+Cc: James Chapman <jchapman@katalix.com>, edumazet@google.com,
+	gnault@redhat.com, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, corbet@lwn.net, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv4] PPPoL2TP: Add more code snippets
+Message-ID: <20240213115304.3oyqkvkb3oqkauwd@begin>
+Mail-Followup-To: Samuel Thibault <samuel.thibault@ens-lyon.org>,
+	Tom Parkin <tparkin@katalix.com>,
+	James Chapman <jchapman@katalix.com>, edumazet@google.com,
+	gnault@redhat.com, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, corbet@lwn.net, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240212222344.xtv233r5sixme32h@begin>
+ <ZctJnCeUCANJvxGj@katalix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZctTL05gEf_7XbhX@nanopsycho>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZctJnCeUCANJvxGj@katalix.com>
+Organization: I am not organized
+User-Agent: NeoMutt/20170609 (1.8.3)
 
-On Tue, Feb 13, 2024 at 12:31:59PM +0100, Jiri Pirko wrote:
-> Tue, Feb 13, 2024 at 11:01:08AM CET, michal.swiatkowski@linux.intel.com wrote:
-> >On Tue, Feb 13, 2024 at 10:03:05AM +0100, Jiri Pirko wrote:
-> >> Tue, Feb 13, 2024 at 08:35:03AM CET, michal.swiatkowski@linux.intel.com wrote:
-> >> >Use generic devlink PF MSI-X parameter to allow user to change MSI-X
-> >> >range.
-> >> >
-> >> >Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-> >> >Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> >> >---
-> >> > drivers/net/ethernet/intel/ice/ice.h         |  8 ++
-> >> > drivers/net/ethernet/intel/ice/ice_devlink.c | 82 ++++++++++++++++++++
-> >> > drivers/net/ethernet/intel/ice/ice_irq.c     |  6 ++
-> >> > 3 files changed, 96 insertions(+)
-> >> >
-> >> >diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-> >> >index c4127d5f2be3..24085f3c0966 100644
-> >> >--- a/drivers/net/ethernet/intel/ice/ice.h
-> >> >+++ b/drivers/net/ethernet/intel/ice/ice.h
-> >> >@@ -94,6 +94,7 @@
-> >> > #define ICE_MIN_LAN_TXRX_MSIX	1
-> >> > #define ICE_MIN_LAN_OICR_MSIX	1
-> >> > #define ICE_MIN_MSIX		(ICE_MIN_LAN_TXRX_MSIX + ICE_MIN_LAN_OICR_MSIX)
-> >> >+#define ICE_MAX_MSIX		256
-> >> > #define ICE_FDIR_MSIX		2
-> >> > #define ICE_RDMA_NUM_AEQ_MSIX	4
-> >> > #define ICE_MIN_RDMA_MSIX	2
-> >> >@@ -535,6 +536,12 @@ struct ice_agg_node {
-> >> > 	u8 valid;
-> >> > };
-> >> > 
-> >> >+struct ice_pf_msix {
-> >> >+	u16 cur;
-> >> >+	u16 min;
-> >> >+	u16 max;
-> >> >+};
-> >> >+
-> >> > struct ice_pf {
-> >> > 	struct pci_dev *pdev;
-> >> > 
-> >> >@@ -604,6 +611,7 @@ struct ice_pf {
-> >> > 	struct msi_map ll_ts_irq;	/* LL_TS interrupt MSIX vector */
-> >> > 	u16 max_pf_txqs;	/* Total Tx queues PF wide */
-> >> > 	u16 max_pf_rxqs;	/* Total Rx queues PF wide */
-> >> >+	struct ice_pf_msix msix;
-> >> > 	u16 num_lan_msix;	/* Total MSIX vectors for base driver */
-> >> > 	u16 num_lan_tx;		/* num LAN Tx queues setup */
-> >> > 	u16 num_lan_rx;		/* num LAN Rx queues setup */
-> >> >diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/ice_devlink.c
-> >> >index cc717175178b..b82ff9556a4b 100644
-> >> >--- a/drivers/net/ethernet/intel/ice/ice_devlink.c
-> >> >+++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
-> >> >@@ -1603,6 +1603,78 @@ enum ice_param_id {
-> >> > 	ICE_DEVLINK_PARAM_ID_LOOPBACK,
-> >> > };
-> >> > 
-> >> >+static int
-> >> >+ice_devlink_msix_max_pf_get(struct devlink *devlink, u32 id,
-> >> >+			    struct devlink_param_gset_ctx *ctx)
-> >> >+{
-> >> >+	struct ice_pf *pf = devlink_priv(devlink);
-> >> >+
-> >> >+	ctx->val.vu16 = pf->msix.max;
-> >> >+
-> >> >+	return 0;
-> >> >+}
-> >> >+
-> >> >+static int
-> >> >+ice_devlink_msix_max_pf_set(struct devlink *devlink, u32 id,
-> >> >+			    struct devlink_param_gset_ctx *ctx)
-> >> >+{
-> >> >+	struct ice_pf *pf = devlink_priv(devlink);
-> >> >+	u16 max = ctx->val.vu16;
-> >> >+
-> >> >+	pf->msix.max = max;
-> >> 
-> >> What's permanent about this exactly?
-> >> 
-> >
-> >I want to store the value here after driver reinit. Isn't it enough to
-> >use this parameter type? Which one should be used for this purpose?
+Tom Parkin, le mar. 13 févr. 2024 10:51:08 +0000, a ecrit:
+> > +        ret = ioctl(session_fd1, PPPIOCGCHAN, &chindx1);
+> > +        if (ret < 0)
+> > +                return -errno;
+> > +
+> > +        ret = ioctl(session_fd2, PPPIOCGCHAN, &chindx2);
+> > +        if (ret < 0)
+> > +                return -errno;
+> > +
+> > +        ppp_chan_fd = open("/dev/ppp", O_RDWR);
+> > +        if (ppp_chan_fd < 0) {
+> > +                return -errno;
+> > +        }
+> > +
+> > +        ret = ioctl(ppp_chan_fd, PPPIOCATTCHAN, &chindx1);
+> > +        if (ret < 0) {
+> > +                close(ppp_chan_fd);
+> > +                return -errno;
+> > +        }
 > 
-> Documentation/networking/devlink/devlink-params.rst say:
+> I think we should drop the PPPIOCATTCHAN ioctl call here.
 > 
-> .. list-table:: Possible configuration modes
->    :widths: 5 90
+> The input file descriptors are called out as being PPPoX sockets
+> created as described earlier, in which case they should both
+> already be attached to a channel.
 > 
->    * - Name
->      - Description
->    * - ``runtime``
->      - set while the driver is running, and takes effect immediately. No
->        reset is required.
->    * - ``driverinit``
->      - applied while the driver initializes. Requires the user to restart
->        the driver using the ``devlink`` reload command.
->    * - ``permanent``
->      - written to the device's non-volatile memory. A hard reset is required
->        for it to take effect.
+> It would make more sense IMO to call out the two ppp_chan_fd file
+> descriptors as being input parameters alongside the PPPoX session file
+> descriptors.
 > 
+> > +
+> > +        ret = ioctl(ppp_chan_fd, PPPIOCBRIDGECHAN, &chindx2);
+> > +        close(ppp_chan_fd);
+> > +        if (ret < 0)
+> > +                return -errno;
+> > +
+> > +It can be noted that in this case no PPP interface is needed, and the PPP
+> > +channel does not need to be kept open.  Only the session PPPoX data sockets need
+> > +to be kept open.
 > 
-> [...]
-Thanks for pointing it, I changed the idea during developing it (at
-first I wanted to store it in NVM) and forgot to change the type.
+> Is it true to say that the PPP channel file descriptors can be closed
+> by userspace?
 
-I will go with driverinit param.
+In our code we do it
+https://code.ffdn.org/sthibaul/l2tpns/-/blob/kernel/l2tpns.c?ref_type=heads#L1295
+and it works all fine indeed (and avoids that fd per session).
 
+That's actually one of the reason why I made the snipped only take the
+pppox sockets, and make it create the ppp chan fd only temporarily. AIUI
+the pppox socket already has a ppp chan (returned by PPPIOCGCHAN), and
+the ppp chan fd is there only for performing the bridging ioctl.
+
+Samuel
 
