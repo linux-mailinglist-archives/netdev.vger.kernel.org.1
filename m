@@ -1,113 +1,149 @@
-Return-Path: <netdev+bounces-71165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10F40852891
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 07:08:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6379B852897
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 07:11:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F1532817BE
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 06:08:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 206312838E9
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 06:11:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90A01125B2;
-	Tue, 13 Feb 2024 06:08:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZAGO/2mQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B02312E40;
+	Tue, 13 Feb 2024 06:11:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD15429A9
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 06:08:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C7D125DE;
+	Tue, 13 Feb 2024 06:11:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707804521; cv=none; b=BDPD+p/ww2rfLjnlYGwM3gHkE0CZfjLH2ao2sYy/tAIPi5UcqSF1Ey/pTRjgbRWTJTEg6UKtHZ1fNP+cwPIg4vwQh4QVu2SOnxRtNfKNfU7Zln8YCS4JSPUhw4OvUGcCpvN1X6Lmw9xwH8PYOTWhWJx6zW3CLOzgLftS0A9hExo=
+	t=1707804690; cv=none; b=aqy1IS5dMEqepdVMF+1cfwH3y//sPGolt6/GEowBqVlN6sfkUb6uIbdmllkmZ5f9WlPBZKEFZCfFXpTOF49KZeKcxWsyYgg1MaB1cQLI51i8Fgqy/3/NP2kjZm4G7xgbiv2rBJxREK5q486/NEJpNdgPzXreW+pFil9n1nNCSio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707804521; c=relaxed/simple;
-	bh=HsvApL4NJgpVi1/bxgY0oH2l725a4FPceKak6s1n8fA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=t/4KbxVynMgA8rq7TRz4C7Tj3BtxJn1UM42CafQTIMpJTAU2Hv5F/SlTx1zlnPVpVfyN5pAWqxkG2qcE8W0Vd8W3Cx8lNNHUEnpomaPbO8IUmbc2kb/V+MSD/blcNN3ScHyg5wiC+ln6MCOMEIV220lxcR549b6y+3WeLjJEN+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZAGO/2mQ; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-561f0f116ecso4515a12.0
-        for <netdev@vger.kernel.org>; Mon, 12 Feb 2024 22:08:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707804518; x=1708409318; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6PfXVRVtdirJEsN9yyc/bgnnALf89nk9t69DaL5EPSw=;
-        b=ZAGO/2mQ0XrB3I0LRuFDvgBMCpt639CPV6pysy9t/F/Sg7MVIGnCo953w6+55MP0j2
-         xDfC14nGx08aKG9X0QqORJW/UlsckJzxpy7NiYj8OoIJT2lPpp8ogKhWMumbCGwaQbej
-         RddUJbrns8BgBhdMePawwfN958cPtl/4hlvyF/usbH4QYa4uo+sYLKPs8cIBhz7sV77p
-         /vwGBvdh1EeALH3HL8CciomBVqSbYs6xK9XPu7SwTTKAJ0SpY4NWiKvG02hjLPJ53J2d
-         SvdLUcu51EuG1epYKtSYhTkjAS5hw4UzMX9MzP1Gwm+QmFRHWH7/J3Tk7DePz+G5pq7x
-         8WHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707804518; x=1708409318;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6PfXVRVtdirJEsN9yyc/bgnnALf89nk9t69DaL5EPSw=;
-        b=VnWywlQqnvoaylGuiJ+2ohkQ+1cAWARj7YE6nF3ERArQypaJ2L6es9HyTpRklDyu9o
-         Et1eDZnttgVYl8n8ynLa4LeHZWckxSwbZKbAvV4SzY11TfRB98bZO26jpTWMywWjCrOt
-         kmevPo3jhV5JAw/2nebgghXBTx9vLlRDjylVOLaVRp4wmhpHzvfblPdgFlC426ErK0Ga
-         ZMDTsbNRiofhGHS0uH3bdZN29apKG25hp41WYD6pDhVvtT3vlkhpHBL5ijUibSzlUkjC
-         67MDB0t9cg84KjIaSs7Ty02cVhhQz5QXYzt1tODppqtPevgUk3TIjPIGWvDebSbgutBL
-         m92w==
-X-Gm-Message-State: AOJu0Yzd6U1Ap4H0NwKDfUPbmdcagRmuzu8lRhIMcNjEZ2slc0r5RN5S
-	Q0Xs8aNREVpDhTZPIbu6lWi6ITxXRJ37cluOZlBF9bw+PGBworm+stThZwQvi8RgdK+VESfh78o
-	8rCPiW4N6EUo19HMEP0ia4MhgpVYXQ6maY9nMBjXKXALE2QHWhg==
-X-Google-Smtp-Source: AGHT+IHieFiznCsDrRELh0V5sXxbt5idALztSaH8Rzkf3XaXDKHn/+mUhc2WubcKxRjsXpTNlxF0wgRCCXxYOxDlTFQ=
-X-Received: by 2002:a50:cd59:0:b0:560:e82e:2cc4 with SMTP id
- d25-20020a50cd59000000b00560e82e2cc4mr41041edj.3.1707804517719; Mon, 12 Feb
- 2024 22:08:37 -0800 (PST)
+	s=arc-20240116; t=1707804690; c=relaxed/simple;
+	bh=PFyLboEBhpUyz1orqNgFN5pE677Wm/BvvN1lOPAD3WU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RHFi0oTfn25UyndzA9/oYk/wLI1q76vBNAoNEB2AHj1yA7PKA7a7c+vkb1Td8sY8jMSxTa5s4HqigmEU0IbWX2QOu/BNsHu6qrElj4hp4FFYm0n4OQWmrN+VgZ93kLGczp5xwV2yqOX0eCwyDhpUJdqkbY7mGm51SX5TyrkhT+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 14FE2227A87; Tue, 13 Feb 2024 07:11:21 +0100 (CET)
+Date: Tue, 13 Feb 2024 07:11:20 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Alexander Duyck <alexanderduyck@fb.com>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, iommu@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 2/7] dma: avoid redundant calls for sync
+ operations
+Message-ID: <20240213061120.GC22451@lst.de>
+References: <20240205110426.764393-1-aleksander.lobakin@intel.com> <20240205110426.764393-3-aleksander.lobakin@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240209203428.307351-1-edumazet@google.com> <20240209203428.307351-7-edumazet@google.com>
- <20240212175845.10f6680a@kernel.org>
-In-Reply-To: <20240212175845.10f6680a@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 13 Feb 2024 07:08:23 +0100
-Message-ID: <CANn89iKnMiAcp2h=RWjp52ucXkDMRJ7kbiiKqJ0iD_akVt3RCA@mail.gmail.com>
-Subject: Re: [PATCH v3 net-next 06/13] net-sysfs: use dev_addr_sem to remove
- races in address_show()
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240205110426.764393-3-aleksander.lobakin@intel.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Tue, Feb 13, 2024 at 2:58=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Fri,  9 Feb 2024 20:34:21 +0000 Eric Dumazet wrote:
-> > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> > index 24fd24b0f2341f662b28ade45ed12a5e6d02852a..28569f195a449700b640300=
-6f70257b8194b516a 100644
-> > --- a/include/linux/netdevice.h
-> > +++ b/include/linux/netdevice.h
-> > @@ -4031,6 +4031,7 @@ int dev_set_mac_address(struct net_device *dev, s=
-truct sockaddr *sa,
-> >                       struct netlink_ext_ack *extack);
-> >  int dev_set_mac_address_user(struct net_device *dev, struct sockaddr *=
-sa,
-> >                            struct netlink_ext_ack *extack);
-> > +extern struct rw_semaphore dev_addr_sem;
->
-> nit: this could potentially live in the net/core/dev.h header?
+On Mon, Feb 05, 2024 at 12:04:21PM +0100, Alexander Lobakin wrote:
+> Quite often, NIC devices do not need dma_sync operations on x86_64
+> at least.
 
-SGTM, I am taking a look.
+This is a fundamental property of the platform being DMA coherent,
+and devices / platforms not having addressing limitations or other
+need for bounce buffering (like all those whacky trusted platform
+schemes).  Nothing NIC-specific here.
 
->
-> I could not spot any real problems but the series seems to not apply
-> to net-next because of 4cd582ffa5a9a5d58e5bac9c5e55ca8eeabffddc
+> In case some device doesn't work with the shortcut:
+> * include <linux/dma-map-ops.h> to the driver source;
+> * call dma_set_skip_sync(dev, false) at the beginning of the probe
+>   callback. This will disable the shortcut and force DMA syncs.
 
-Right, of course, I will rebase and send v4, thanks !
+No, drivers should never include dma-map-ops.h.  If we have a legit
+reason for drivers to ever call it it would have to move to
+dma-mapping.h.  But I see now reason why there would be such a need.
+For now I'd suggest simply dropping this paragraph from the commit
+message.
+
+>  	if (dma_map_direct(dev, ops))
+> +		/*
+> +		 * dma_skip_sync could've been set to false on first SWIOTLB
+> +		 * buffer mapping, but @dma_addr is not necessary an SWIOTLB
+> +		 * buffer. In this case, fall back to more granular check.
+> +		 */
+>  		return dma_direct_need_sync(dev, dma_addr);
+> +
+
+Nit: with such a long block comment adding curly braces would make the
+code a bit more readable.
+
+> +#ifdef CONFIG_DMA_NEED_SYNC
+> +void dma_setup_skip_sync(struct device *dev)
+> +{
+> +	const struct dma_map_ops *ops = get_dma_ops(dev);
+> +	bool skip;
+> +
+> +	if (dma_map_direct(dev, ops))
+> +		/*
+> +		 * dma_skip_sync will be set to false on first SWIOTLB buffer
+> +		 * mapping, if any. During the device initialization, it's
+> +		 * enough to check only for DMA coherence.
+> +		 */
+> +		skip = dev_is_dma_coherent(dev);
+> +	else if (!ops->sync_single_for_device && !ops->sync_single_for_cpu)
+> +		/*
+> +		 * Synchronization is not possible when none of DMA sync ops
+> +		 * is set. This check precedes the below one as it disables
+> +		 * the synchronization unconditionally.
+> +		 */
+> +		skip = true;
+> +	else if (ops->flags & DMA_F_CAN_SKIP_SYNC)
+> +		/*
+> +		 * Assume that when ``DMA_F_CAN_SKIP_SYNC`` is advertised,
+> +		 * the conditions for synchronizing are the same as with
+> +		 * the direct DMA.
+> +		 */
+> +		skip = dev_is_dma_coherent(dev);
+> +	else
+> +		skip = false;
+> +
+> +	dma_set_skip_sync(dev, skip);
+
+I'd just assign directly to dev->dma_skip_sync instead of using a
+local variable and the dma_set_skip_sync call - we are under
+ifdef CONFIG_DMA_NEED_SYNC here and thus know is is available.
+
+> +static inline void swiotlb_disable_dma_skip_sync(struct device *dev)
+> +{
+> +	/*
+> +	 * If dma_skip_sync was set, reset it to false on first SWIOTLB buffer
+> +	 * mapping/allocation to always sync SWIOTLB buffers.
+> +	 */
+> +	if (unlikely(dma_skip_sync(dev)))
+> +		dma_set_skip_sync(dev, false);
+> +}
+
+Nothing really swiotlb-specific here.  Also the naming is a bit odd.
+Maybe have a dma_set_skip_sync helper without the bool to enable
+skipping, and a dma_clear_skip_sync that clear the flag.  The optimization
+to first check the flag here could just move into that latter
+helper.
 
