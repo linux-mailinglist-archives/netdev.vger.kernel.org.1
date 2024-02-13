@@ -1,86 +1,74 @@
-Return-Path: <netdev+bounces-71561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA6FB853E87
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 23:24:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C96EB853EBD
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 23:31:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A62B929201B
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 22:24:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05A261C28030
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 22:31:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 761A46215D;
-	Tue, 13 Feb 2024 22:24:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EB74433AB;
+	Tue, 13 Feb 2024 22:31:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l9BCO3Pz"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="LkQy69fs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA63E62143;
-	Tue, 13 Feb 2024 22:24:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9609627EC;
+	Tue, 13 Feb 2024 22:31:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707863044; cv=none; b=uF39VjHatjixsr5tlns1YqCEecFnE59JTdorp9yi3qdIYdhQiUnFi/eGxda6vBQhYOyS9eNf/lfS2Miz+X943qjAmb0OyeVMk0inORqP3DoNIoN6syMyKnMod7kPr6iLOQLb8w4DaWCPTSPccluZoGcZn014PlC738erNULT230=
+	t=1707863518; cv=none; b=Hb9LdLFv25hhwGqe3ZvPGWKQiweSOm3LG+GEX25oIX7BmeEs0Jz0Pve37wRLCsvyJg7ATFn6NQ3ER7twCTS1vnm2Qra0EdFh7b7n3YaTIHycrYDCZ5nIel8bRJn7H9NQSCIZB9RtKz0zIzcK+bAuWpCIZYqD6BVLpebSlxC8UKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707863044; c=relaxed/simple;
-	bh=Q7yhFk4pX598SxD0gAFPG2cq1/Q1XfZlHBopnV2lvSo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=h2gZsGGMXBreQ/iJ2Jgfev0gtgwOtQrWfZIOSHtLBJRZzEnyRSEWZTqNLxpMqYMR/r4gALYJSE8UZqepVwvd2RDrUmcANjHsOZfmFkRb8pKB1dJZW0yxzeQSWwF+L6vIZ96UknkAigGxMtq5HNPeelqiiLmWnC03pSNTR04OXRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l9BCO3Pz; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1db4977be03so1358845ad.1;
-        Tue, 13 Feb 2024 14:24:02 -0800 (PST)
+	s=arc-20240116; t=1707863518; c=relaxed/simple;
+	bh=AjyFJoB2E5hmBxbkwSQYS3RBJ8kjXzZkJDGogqKHWkA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Fo7mwjFjzUnewEdeToTBzH00koXQuRVuye4N/R1QOpZvcEy8OJ9V/3pjxrV5t7Nkq/wnBxwaxExkzDBg7vQMYaUzSc7PUuLC+O0nxyiXUmaXZABhtuia7e0GENqTCUmglhdygDnf/l7SgV4k40Y8pBBzKZm+r3SZjBokCqC+8Hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=LkQy69fs; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707863042; x=1708467842; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=MmPPVce04OmE6pjEU+43mxBTewwTDrSldoXWGdB+S6k=;
-        b=l9BCO3Pz0ZgsT495TmCSyhY3gxKFVIbTkUt+b579x2/EspyUgVlauHdFgqIaMtS4eQ
-         PAuuPlbLHPwxun5JG+ANZhEjIkMsQCiA7td7T2t5yo1t2Mz2Bgyhyh7cj6ur65wEdfho
-         CavI1O7VfJ7tmXe/qB4iXIWhJUoLQOKJbZzHbCSEwnWxgvhV/sHh/kZnZxzYSN8l1ha3
-         T0foq+UlZwxUa0wJS4QGA1PktR4zDWDQpEmWXuPCV6YN97vUzVFcRGV+vAKBarVgpS38
-         IbinwudBLUnkTqa0A4QfpbznUGPilicQLhhrclU8Km1smXcndZjaIJSItZXLFFXa+l/h
-         Vn6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707863042; x=1708467842;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MmPPVce04OmE6pjEU+43mxBTewwTDrSldoXWGdB+S6k=;
-        b=Mh4smeMEJzFOXnfeld4xukjlFvfzj5ajAxStxsAMknkoWYKvo+4q3O5SjYrmKw7VbU
-         zzJImmV4EMeR+qbu2HplXD86tcwycN7AMJCBSgBr5G8cYp15qqDf5DgXnjwcBRxKIo63
-         D4o2C7MZXtTjgGANRg9G5cdXDkoHYh/lfJGAKwIuTJXaxYH7CqxjsYjTCIvaaSi4frUI
-         Moe5NhHBJr0fpcAhItj4+k8Eqg4dhEVceMN003E8AiyduXnMymuODz5yJxjGT20DPJ0f
-         YWzNSr2LUYtXsJtnWJ7jTCthnyHn2T+iTS2/7wFKpZagVIgEYTuPzPHPBpyyXr5OjKW6
-         x7Zg==
-X-Forwarded-Encrypted: i=1; AJvYcCXObQ8ObDVphZM1I+qOZHYJJSux7AfFz1H9EE6Pv/p7tCafr3+aIMXrvFIED8Uati4gUy1E2ez4t23vPu+KZygXqRmyTjU5MhNT03BZr4IhJ7Mas1OTa+oG7nj2MJkAaZRaFkEB
-X-Gm-Message-State: AOJu0YzV7lllYBBhtP+s3ThMU4ytnZh29XfGB7UtRvy8vd4krPiGqD4t
-	9Lje6gsrNrWS/CPJHDfoRRmU7YSLnuHkHfB7Cm9gHjivRVvnxA89
-X-Google-Smtp-Source: AGHT+IFxIAWWVA/VRD5OF45TafGXBeA6kTytVJZ4XCV0BD7jXp9sXvvd9vxhEfjWFzOQ5wMefamshA==
-X-Received: by 2002:a17:903:1207:b0:1d9:5ef2:a562 with SMTP id l7-20020a170903120700b001d95ef2a562mr254090plh.10.1707863042047;
-        Tue, 13 Feb 2024 14:24:02 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXkwRA7jCuQUCYvCGX5y6jn6WOIQAvqoxyUJoInq4shQ4oAEDnLQTAPlD5c21AXpe6neVlVs8ycyq3JJnMxxjgni56SX2HHl4B9Ccyx0xyihpZAVOsLAm8aSXcw7XeXKz6oX2J78DxbcSSsaVEMpBbJ4s3Sg+7dgcIjDFxyrVdEAzgmFbYV4ZVim6aIQNp1Ly/aADUy0iqKskkXYV+Vb9zvBloQIeibN6GLC4r7OruA68stA/e2U9hYUZBQzvZk4N0RaA4YmTxM/PTi8TEvpCugz7PUwikVUoAeWnM9iy88TNhsknuF9BgDcvw=
-Received: from jmaxwell.com ([203.220.178.35])
-        by smtp.gmail.com with ESMTPSA id iz21-20020a170902ef9500b001db499c5c12sm776490plb.143.2024.02.13.14.23.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Feb 2024 14:24:01 -0800 (PST)
-From: Jon Maxwell <jmaxwell37@gmail.com>
-To: jesse.brandeburg@intel.com
-Cc: anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	jmaxwell37@gmail.com
-Subject: [net-next v3] intel: make module parameters readable in sys filesystem
-Date: Wed, 14 Feb 2024 09:23:44 +1100
-Message-Id: <20240213222344.195885-1-jmaxwell37@gmail.com>
-X-Mailer: git-send-email 2.39.3
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1707863516; x=1739399516;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=xASju9eOcReBWPS5XiOgqPyTtw+QoZR04RComZSbo04=;
+  b=LkQy69fs1jYhP477KyLFvEcnTA3qVobwW3xFS4xzjTQPWKk3U6veeQ4W
+   fRS+s6DbuTTT1v0Pn4nZS86Qk7wUW8XNxr+uMW2BzxcUcG7Tam4NPH6ll
+   1hGCGfSsajQS24/aOvoOr8gklaqlnZCnMwdun/DOded8ywEZqQVPPppRk
+   E=;
+X-IronPort-AV: E=Sophos;i="6.06,158,1705363200"; 
+   d="scan'208";a="65833263"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2024 22:31:54 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:35044]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.24.112:2525] with esmtp (Farcaster)
+ id 5276ae52-4884-4071-a6ca-c88b58983b92; Tue, 13 Feb 2024 22:31:53 +0000 (UTC)
+X-Farcaster-Flow-ID: 5276ae52-4884-4071-a6ca-c88b58983b92
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Tue, 13 Feb 2024 22:31:53 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.101.20) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Tue, 13 Feb 2024 22:31:50 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, Mat Martineau
+	<martineau@kernel.org>, Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher
+	<jaka@linux.ibm.com>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, <mptcp@lists.linux.dev>,
+	<linux-s390@vger.kernel.org>
+Subject: [PATCH v1 net-next] net: Deprecate SO_DEBUG and reclaim SOCK_DBG bit.
+Date: Tue, 13 Feb 2024 14:31:35 -0800
+Message-ID: <20240213223135.85957-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,70 +76,108 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D042UWA001.ant.amazon.com (10.13.139.92) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Linux users sometimes need an easy way to check current values of module
-parameters. For example the module may be manually reloaded with different
-parameters. Make these visible and readable in the /sys filesystem to allow
-that.
+Recently, commit 8e5443d2b866 ("net: remove SOCK_DEBUG leftovers")
+removed the last users of SOCK_DEBUG(), and commit b1dffcf0da22 ("net:
+remove SOCK_DEBUG macro") removed the macro.
 
-Signed-off-by: Jon Maxwell <jmaxwell37@gmail.com>
+Now is the time to deprecate the oldest socket option.
+
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
-V2: Remove the "debug" module parameter as per Andrew Lunns suggestion.
-V3: Correctly format v2.
- drivers/net/ethernet/intel/e100.c             | 4 ++--
- drivers/net/ethernet/intel/igb/igb_main.c     | 2 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 4 ++--
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ include/net/sock.h  | 1 -
+ net/core/sock.c     | 6 +++---
+ net/mptcp/sockopt.c | 4 +---
+ net/smc/af_smc.c    | 5 ++---
+ 4 files changed, 6 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/e100.c b/drivers/net/ethernet/intel/e100.c
-index 01f0f12035caeb7ca1657387538fcebf5c608322..3fcb8daaa2437fa3fe7b98ba9f606dbbb1844e58 100644
---- a/drivers/net/ethernet/intel/e100.c
-+++ b/drivers/net/ethernet/intel/e100.c
-@@ -171,8 +171,8 @@ static int debug = 3;
- static int eeprom_bad_csum_allow = 0;
- static int use_io = 0;
- module_param(debug, int, 0);
--module_param(eeprom_bad_csum_allow, int, 0);
--module_param(use_io, int, 0);
-+module_param(eeprom_bad_csum_allow, int, 0444);
-+module_param(use_io, int, 0444);
- MODULE_PARM_DESC(debug, "Debug level (0=none,...,16=all)");
- MODULE_PARM_DESC(eeprom_bad_csum_allow, "Allow bad eeprom checksums");
- MODULE_PARM_DESC(use_io, "Force use of i/o access mode");
-diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-index 4df8d4153aa5f5ce7ac9dd566180d552be9f5b4f..31d0a43a908c0a4eab4fe1147064a5f5677c9f0b 100644
---- a/drivers/net/ethernet/intel/igb/igb_main.c
-+++ b/drivers/net/ethernet/intel/igb/igb_main.c
-@@ -202,7 +202,7 @@ static struct notifier_block dca_notifier = {
- #endif
- #ifdef CONFIG_PCI_IOV
- static unsigned int max_vfs;
--module_param(max_vfs, uint, 0);
-+module_param(max_vfs, uint, 0444);
- MODULE_PARM_DESC(max_vfs, "Maximum number of virtual functions to allocate per physical function");
- #endif /* CONFIG_PCI_IOV */
+diff --git a/include/net/sock.h b/include/net/sock.h
+index a9d99a9c583f..e20d55a36f9c 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -909,7 +909,6 @@ enum sock_flags {
+ 	SOCK_TIMESTAMP,
+ 	SOCK_ZAPPED,
+ 	SOCK_USE_WRITE_QUEUE, /* whether to call sk->sk_write_space in sock_wfree */
+-	SOCK_DBG, /* %SO_DEBUG setting */
+ 	SOCK_RCVTSTAMP, /* %SO_TIMESTAMP setting */
+ 	SOCK_RCVTSTAMPNS, /* %SO_TIMESTAMPNS setting */
+ 	SOCK_LOCALROUTE, /* route locally only, %SO_DONTROUTE setting */
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 88bf810394a5..0a58dc861908 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -1194,10 +1194,9 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
  
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index bd541527c8c74d6922e8683e2f4493d9b361f67b..9d26ff82a397d4939cf7adea78c217e4071aa166 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -147,13 +147,13 @@ static struct notifier_block dca_notifier = {
+ 	switch (optname) {
+ 	case SO_DEBUG:
++		/* deprecated, but kept for compatibility. */
+ 		if (val && !sockopt_capable(CAP_NET_ADMIN))
+ 			ret = -EACCES;
+-		else
+-			sock_valbool_flag(sk, SOCK_DBG, valbool);
+ 		break;
+ 	case SO_REUSEADDR:
+ 		sk->sk_reuse = (valbool ? SK_CAN_REUSE : SK_NO_REUSE);
+@@ -1619,7 +1618,8 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
  
- #ifdef CONFIG_PCI_IOV
- static unsigned int max_vfs;
--module_param(max_vfs, uint, 0);
-+module_param(max_vfs, uint, 0444);
- MODULE_PARM_DESC(max_vfs,
- 		 "Maximum number of virtual functions to allocate per physical function - default is zero and maximum value is 63. (Deprecated)");
- #endif /* CONFIG_PCI_IOV */
+ 	switch (optname) {
+ 	case SO_DEBUG:
+-		v.val = sock_flag(sk, SOCK_DBG);
++		/* deprecated. */
++		v.val = 0;
+ 		break;
  
- static bool allow_unsupported_sfp;
--module_param(allow_unsupported_sfp, bool, 0);
-+module_param(allow_unsupported_sfp, bool, 0444);
- MODULE_PARM_DESC(allow_unsupported_sfp,
- 		 "Allow unsupported and untested SFP+ modules on 82599-based adapters");
+ 	case SO_DONTROUTE:
+diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
+index da37e4541a5d..f6d90eef3d7c 100644
+--- a/net/mptcp/sockopt.c
++++ b/net/mptcp/sockopt.c
+@@ -81,7 +81,7 @@ static void mptcp_sol_socket_sync_intval(struct mptcp_sock *msk, int optname, in
  
+ 		switch (optname) {
+ 		case SO_DEBUG:
+-			sock_valbool_flag(ssk, SOCK_DBG, !!val);
++			/* deprecated. */
+ 			break;
+ 		case SO_KEEPALIVE:
+ 			if (ssk->sk_prot->keepalive)
+@@ -1458,8 +1458,6 @@ static void sync_socket_options(struct mptcp_sock *msk, struct sock *ssk)
+ 		sk_dst_reset(ssk);
+ 	}
+ 
+-	sock_valbool_flag(ssk, SOCK_DBG, sock_flag(sk, SOCK_DBG));
+-
+ 	if (inet_csk(sk)->icsk_ca_ops != inet_csk(ssk)->icsk_ca_ops)
+ 		tcp_set_congestion_control(ssk, msk->ca_name, false, true);
+ 	__tcp_sock_set_cork(ssk, !!msk->cork);
+diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+index 66763c74ab76..062e16a2766a 100644
+--- a/net/smc/af_smc.c
++++ b/net/smc/af_smc.c
+@@ -445,7 +445,6 @@ static int smc_bind(struct socket *sock, struct sockaddr *uaddr,
+ 			     (1UL << SOCK_LINGER) | \
+ 			     (1UL << SOCK_BROADCAST) | \
+ 			     (1UL << SOCK_TIMESTAMP) | \
+-			     (1UL << SOCK_DBG) | \
+ 			     (1UL << SOCK_RCVTSTAMP) | \
+ 			     (1UL << SOCK_RCVTSTAMPNS) | \
+ 			     (1UL << SOCK_LOCALROUTE) | \
+@@ -511,8 +510,8 @@ static void smc_copy_sock_settings_to_clc(struct smc_sock *smc)
+ 
+ #define SK_FLAGS_CLC_TO_SMC ((1UL << SOCK_URGINLINE) | \
+ 			     (1UL << SOCK_KEEPOPEN) | \
+-			     (1UL << SOCK_LINGER) | \
+-			     (1UL << SOCK_DBG))
++			     (1UL << SOCK_LINGER))
++
+ /* copy only settings and flags relevant for smc from clc to smc socket */
+ static void smc_copy_sock_settings_to_smc(struct smc_sock *smc)
+ {
 -- 
-2.39.3
+2.30.2
 
 
