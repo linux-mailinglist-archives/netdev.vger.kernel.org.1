@@ -1,149 +1,139 @@
-Return-Path: <netdev+bounces-71407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E76A853315
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 15:28:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04867853359
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 15:40:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 237EF1F26230
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:28:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6490EB25340
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:40:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E45FA57873;
-	Tue, 13 Feb 2024 14:28:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 654E241C75;
+	Tue, 13 Feb 2024 14:40:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xes+m9Ej"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eg+O8ckl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F07A57875
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 14:28:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 832021DFD1
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 14:40:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707834528; cv=none; b=HlSfoC8bSXHpxHlgrEzMtgMm+usi1KI7ifo6KR8LK2LbRQ7klILmmWE3dV3JR5qAEREReENiTp9fi7qjKChO+qaJ79jbIRRR5FOfM8jp1FUlBwtlpuLO8ZWsyhr7IKYO+GA36te5ADDdbvZyFjBknaOQs3ZYfWMj840j1HTbbJw=
+	t=1707835248; cv=none; b=LtGVIBhOLTh5tXUQGhkQOVIWiMIqiadejaM7FrDgJSvc27II7VOuf0TmL6yMohk/2LcsmIiqcHfAtNpeTknh+DN09NY2JOgbSsXPJopLrg1erfX+TLbIi2Ac8caJR0H3z4u+rg5Iw+qz48g1njb3glGStjZscXy+1fj+Z8+8W/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707834528; c=relaxed/simple;
-	bh=m8BKtEKYmFACguBQEee1bM3ToNMhG7KzTNQsN6ZSmD4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eNCWiptJeqpOXM7S9V0ICCQC88PGKTLzEu0r2Aptsz8269OvkfzQ5ROasrm3djB91Ks7PlGjdxdfo0ZNxJY9uYv6IY2/8t8B0sBG/N1WJodJPmDqzA5dz2rOkfi2qigO0gbHsq6LB+AIKtizzUhxa35iq2lh4PmgEToavBQaAuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xes+m9Ej; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-561f0f116ecso9948a12.0
-        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 06:28:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707834525; x=1708439325; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=B6TsXUlYE4eDjo4HxvZHAA9eZc9GJx+BqZTfQgO2G+Y=;
-        b=xes+m9EjmSzt2VLtIkCzQuLChThP8XGHO8WM5OsYOr0Ax6pRvzonEL89raN74E1BP/
-         tmu2mlvAd4aPSceaHnxz856ffReikzWIHy+dxc8/9Fr4htofc9l+dwbeM2q1NUCdeDZr
-         3Isb/VNHZQpCHEsciOiJf2IwFyBlx3jZTw0vrAeA2k4loi9B0gYSr40TpAuhI9NYKBN/
-         UWnVWpDYZprbnzNk7Rty+JISLBP/gnInlx+7sLw3UkVpR4l4S4R56Gh+BrcHCfsDI21b
-         jefAi/qZ4BBBvedjiHVcO/ORQZMwykAjOOZgY0sNlo9P2S1cwTpZqQzpFo3XSya3G5Jg
-         oKvQ==
+	s=arc-20240116; t=1707835248; c=relaxed/simple;
+	bh=dcebs8Akhcbuu5RgX0x48su7OUE/IkpsgdCtU7bdsU0=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=uiDThojCIBZjbI1/DemZwWIFGDWUBVwPr18v5pIpq/cdMVf8ljPZmRnMMDPXfrK92+LeLSvO7JO9B0e/wTi6AUp3bxULBTkjB+ICoSTQIyYwXNQyGrOnwaIBVK1ry74Aesn0vqXXB4Kt6WOSgKlnTFEUWCB57hEFX6Rki7pGipg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Eg+O8ckl; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707835245;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=dcebs8Akhcbuu5RgX0x48su7OUE/IkpsgdCtU7bdsU0=;
+	b=Eg+O8cklH/9ULmG4V6NEHFxIimzarxx8yyX3elqgzUFJSa91UOvsHkrdeTOhEeTofZNrix
+	dHdF9q9YjohMd5wV9mUDR+mwQcUPv3ELu0R2HwRP1DoHf5GO5Y8tszdQmqQOAEC7Kq3C0h
+	p2N3/9G+vFso4EkurKTsq7IiUizfbKk=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-414-TNSuwrc1PUipxRHLxQ948Q-1; Tue, 13 Feb 2024 09:40:43 -0500
+X-MC-Unique: TNSuwrc1PUipxRHLxQ948Q-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-40e354aaf56so10588265e9.1
+        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 06:40:42 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707834525; x=1708439325;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=B6TsXUlYE4eDjo4HxvZHAA9eZc9GJx+BqZTfQgO2G+Y=;
-        b=EqVcRkL5hjI3icda8f80JwnxOVz8nQi1pUxP0dheMxgZyhbCBjxgjhFJmQb7qqLbUF
-         epXdYsPeg3jGQdRbr7Gu5jeyPAETu00OrJ37lxj+vLQJIqDwdaFHPKjplZpscft07qqF
-         Kz5PyyEgzO+z9HoGBKzK2f5DAmy1vRLsh61WJN9aKa7p0enJRgHQKciEJDAQIz57eNnA
-         ueFk20ikklZuMh22TN9vSFmXfrbTp0cJkQAg+2iEmYGVaPe+oj3BeTamI3mXLURAZuV3
-         gQ+UaiIxdy1RzMP9+1YO7FDts8J4tml7B1WjlW76LSovRbRgR67tf+VWo290zEx688Ze
-         Zpbw==
-X-Gm-Message-State: AOJu0Yzu4KLArdHsScGqHBVsr+QpN+IQi/LZcM0VmpWTSbUs6+odCvjA
-	NG5aZTn+sVzJq4C/KHkHxt5bQjwfcZ8MSpmHSuwaT8gatHJH14jbCbODIvCpF7XTu/yd2/OTXX5
-	HgpM+W8ux1vBXY2oUxd4KPZeOQp8W2AyA8w7H
-X-Google-Smtp-Source: AGHT+IFiiuBRYZ2n2az0BBr83cdeSbr0ROhSQvkwL1lO9pIVByfu5CRKxGgCPEbwTZCWyvrHHeBujSQ2cw4+4E7k21o=
-X-Received: by 2002:a50:cd59:0:b0:560:e82e:2cc4 with SMTP id
- d25-20020a50cd59000000b00560e82e2cc4mr118180edj.3.1707834525091; Tue, 13 Feb
- 2024 06:28:45 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707835241; x=1708440041;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dcebs8Akhcbuu5RgX0x48su7OUE/IkpsgdCtU7bdsU0=;
+        b=XzEsTa8ZwUvyU/afOaeVZ9fvqlHcAIdv6k92V09SZBThSX+lQrDMz++B6Giw0QlXsT
+         GCcvFcsdpLByNYGdAhHOfaA9M6zh1c2PryoEbSbWgEcMlkZCkYHQOlytPhOLLKlljisg
+         CC58Jh9w8Q5mCDZ2CIisCXX/LU72LRUqg8gom9U9Qbq74tAuubrJi+MXxvDnSJAdqr8B
+         4URgj4ZXMl0zOF8JZQokCN1YYvhiS2iol2RD7LO/g8ce6Ijkk1QAAF5/6TgJbPZBRvjv
+         zLaOgD22VkaE0pk4li0crgBe9UJBH8ZaAGsJMFNWt0etUUl+jq/kMNNRHvaQhp8zJmn+
+         S2Xg==
+X-Gm-Message-State: AOJu0YzTt4VkuxGrE1h4AECEoaVhRRG9mUzdsQcMQ1kSa3tIkKABhv8d
+	albRQAHCLDHc5gZjiw651fs/TZGqW9a7sSo8g7bl3zRH+aAefbSRyBgA6ub5tciQJIHc5QG4vfI
+	JyoHD5aNn75XiSL7h8DkwRlmK3sF+v5PJHWED7wW6ikQlTcOMdSDpB4K6H+PJBw==
+X-Received: by 2002:a05:600c:4c18:b0:410:896d:ca9 with SMTP id d24-20020a05600c4c1800b00410896d0ca9mr7378561wmp.4.1707835241684;
+        Tue, 13 Feb 2024 06:40:41 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFOvlfOola6QVuPqvlfErGcd16AeOWC6l5qSHqSqdiYJIc4cdS5BiPZWxM57inQXmtk7s4WVg==
+X-Received: by 2002:a05:600c:4c18:b0:410:896d:ca9 with SMTP id d24-20020a05600c4c1800b00410896d0ca9mr7378548wmp.4.1707835241331;
+        Tue, 13 Feb 2024 06:40:41 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUb1ux4RMgVdEbMqRkMSaExkU9gm9sYtzCkFE72JIRECVirE84DxpkUtpDc/eQ9p0fiHnbGJKhzYkOxxCKNzlhFwDRe9euGeXGZ5ZTrQ+6S22Y5xK5L6OToP4zs75oZ8Ek8ogZOncCz7CIn6m0MLyd6WQRWBjIGm9Ny1skYuxo=
+Received: from gerbillo.redhat.com (146-241-230-54.dyn.eolo.it. [146.241.230.54])
+        by smtp.gmail.com with ESMTPSA id l13-20020a1c790d000000b00411ac52b54esm3036219wme.46.2024.02.13.06.40.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Feb 2024 06:40:40 -0800 (PST)
+Message-ID: <13267a321e28b697405b918068ec21b28033db6f.camel@redhat.com>
+Subject: Re: [PATCH 1/2] phonet: take correct lock to peek at the RX queue
+From: Paolo Abeni <pabeni@redhat.com>
+To: =?ISO-8859-1?Q?R=E9mi?= Denis-Courmont <remi@remlab.net>, 
+ courmisch@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org
+Cc: netdev@vger.kernel.org
+Date: Tue, 13 Feb 2024 15:40:39 +0100
+In-Reply-To: <B523FFF3-4D2E-4295-9D0F-374FF3359DF1@remlab.net>
+References: <20240210125054.71391-1-remi@remlab.net>
+	 <9c03284dedb5559de0b99fde04bc3e19b5027d6f.camel@redhat.com>
+	 <B523FFF3-4D2E-4295-9D0F-374FF3359DF1@remlab.net>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=mQINBGISiDUBEAC5uMdJicjm3ZlWQJG4u2EU1EhWUSx8IZLUTmEE8zmjPJFSYDcjtfGcbzLPb63BvX7FADmTOkO7gwtDgm501XnQaZgBUnCOUT8qv5MkKsFH20h1XJyqjPeGM55YFAXc+a4WD0YyO5M0+KhDeRLoildeRna1ey944VlZ6Inf67zMYw9vfE5XozBtytFIrRyGEWkQwkjaYhr1cGM8ia24QQVQid3P7SPkR78kJmrT32sGk+TdR4YnZzBvVaojX4AroZrrAQVdOLQWR+w4w1mONfJvahNdjq73tKv51nIpu4SAC1Zmnm3x4u9r22mbMDr0uWqDqwhsvkanYmn4umDKc1ZkBnDIbbumd40x9CKgG6ogVlLYeJa9WyfVMOHDF6f0wRjFjxVoPO6p/ZDkuEa67KCpJnXNYipLJ3MYhdKWBZw0xc3LKiKc+nMfQlo76T/qHMDfRMaMhk+L8gWc3ZlRQFG0/Pd1pdQEiRuvfM5DUXDo/YOZLV0NfRFU9SmtIPhbdm9cV8Hf8mUwubihiJB/9zPvVq8xfiVbdT0sPzBtxW0fXwrbFxYAOFvT0UC2MjlIsukjmXOUJtdZqBE3v3Jf7VnjNVj9P58+MOx9iYo8jl3fNd7biyQWdPDfYk9ncK8km4skfZQIoUVqrWqGDJjHO1W9CQLAxkfOeHrmG29PK9tHIwARAQABtB9QYW9sbyBBYmVuaSA8cGFiZW5pQHJlZGhhdC5jb20+iQJSBBMBCAA8FiEEg1AjqC77wbdLX2LbKSR5jcyPE6QFAmISiDUCGwMFCwkIBwIDIgIBBhUKCQgLAgQWAgMBAh4HAheAAAoJECkkeY3MjxOkJSYQAJcc6MTsuFxYdYZkeWjW//zbD3ApRHzpNlHLVSuJqHr9/aDS+tyszgS8jj9MiqALzgq4iZbg
+ 7ZxN9ZsDL38qVIuFkSpgMZCiUHdxBC11J8nbBSLlpnc924UAyr5XrGA99 6Wl5I4Km3128GY6iAkH54pZpOmpoUyBjcxbJWHstzmvyiXrjA2sMzYjt3Xkqp0cJfIEekOi75wnNPofEEJg28XPcFrpkMUFFvB4Aqrdc2yyR8Y36rbw18sIX3dJdomIP3dL7LoJi9mfUKOnr86Z0xltgcLPGYoCiUZMlXyWgB2IPmmcMP2jLJrusICjZxLYJJLofEjznAJSUEwB/3rlvFrSYvkKkVmfnfro5XEr5nStVTECxfy7RTtltwih85LlZEHP8eJWMUDj3P4Q9CWNgz2pWr1t68QuPHWaA+PrXyasDlcRpRXHZCOcvsKhAaCOG8TzCrutOZ5NxdfXTe3f1jVIEab7lNgr+7HiNVS+UPRzmvBc73DAyToKQBn9kC4jh9HoWyYTepjdcxnio0crmara+/HEyRZDQeOzSexf85I4dwxcdPKXv0fmLtxrN57Ae82bHuRlfeTuDG3x3vl/Bjx4O7Lb+oN2BLTmgpYq7V1WJPUwikZg8M+nvDNcsOoWGbU417PbHHn3N7yS0lLGoCCWyrK1OY0QM4EVsL3TjOfUtCNQYW9sbyBBYmVuaSA8cGFvbG8uYWJlbmlAZ21haWwuY29tPokCUgQTAQgAPBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEoitAhsDBQsJCAcCAyICAQYVCgkICwIEFgIDAQIeBwIXgAAKCRApJHmNzI8TpBzHD/45pUctaCnhee1vkQnmStAYvHmwrWwIEH1lzDMDCpJQHTUQOOJWDAZOFnE/67bxSS81Wie0OKW2jvg1ylmpBA0gPpnzIExQmfP72cQ1TBoeVColVT6Io35BINn+ymM7c0Bn8RvngSEpr3jBtqvvWXjvtnJ5/HbOVQCg62NC6ewosoKJPWpGXMJ9SKsVIOUHsmoWK60spzeiJoSmAwm3zTJQnM5kRh2q
+ iWjoCy8L35zPqR5TV+f5WR5hTVCqmLHSgm1jxwKhPg9L+GfuE4d0SWd84y GeOB3sSxlhWsuTj1K6K3MO9srD9hr0puqjO9sAizd0BJP8ucf/AACfrgmzIqZXCfVS7jJ/M+0ic+j1Si3yY8wYPEi3dvbVC0zsoGj9n1R7B7L9c3g1pZ4L9ui428vnPiMnDN3jh9OsdaXeWLvSvTylYvw9q0DEXVQTv4/OkcoMrfEkfbXbtZ3PRlAiddSZA5BDEkkm6P9KA2YAuooi1OD9d4MW8LFAeEicvHG+TPO6jtKTacdXDRe611EfRwTjBs19HmabSUfFcumL6BlVyceIoSqXFe5jOfGpbBevTZtg4kTSHqymGb6ra6sKs+/9aJiONs5NXY7iacZ55qG3Ib1cpQTps9bQILnqpwL2VTaH9TPGWwMY3Nc2VEc08zsLrXnA/yZKqZ1YzSY9MGXWYLkCDQRiEog1ARAAyXMKL+x1lDvLZVQjSUIVlaWswc0nV5y2EzBdbdZZCP3ysGC+s+n7xtq0o1wOvSvaG9h5q7sYZs+AKbuUbeZPu0bPWKoO02i00yVoSgWnEqDbyNeiSW+vI+VdiXITV83lG6pS+pAoTZlRROkpb5xo0gQ5ZeYok8MrkEmJbsPjdoKUJDBFTwrRnaDOfb+Qx1D22PlAZpdKiNtwbNZWiwEQFm6mHkIVSTUe2zSemoqYX4QQRvbmuMyPIbwbdNWlItukjHsffuPivLF/XsI1gDV67S1cVnQbBgrpFDxN62USwewXkNl+ndwa+15wgJFyq4Sd+RSMTPDzDQPFovyDfA/jxN2SK1Lizam6o+LBmvhIxwZOfdYH8bdYCoSpqcKLJVG3qVcTwbhGJr3kpRcBRz39Ml6iZhJyI3pEoX3bJTlR5Pr1Kjpx13qGydSMos94CIYWAKhegI06aTdvvuiigBwjngo/Rk5S+iEGR5KmTqGyp27o6YxZy6D4NIc6PKUzhIUxfvuHNvfu
+ sD2W1U7eyLdm/jCgticGDsRtweytsgCSYfbz0gdgUuL3EBYN3JLbAU+UZpy v/fyD4cHDWaizNy/KmOI6FFjvVh4LRCpGTGDVPHsQXaqvzUybaMb7HSfmBBzZqqfVbq9n5FqPjAgD2lJ0rkzb9XnVXHgr6bmMRlaTlBMAEQEAAYkCNgQYAQgAIBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEog1AhsMAAoJECkkeY3MjxOkY1YQAKdGjHyIdOWSjM8DPLdGJaPgJdugHZowaoyCxffilMGXqc8axBtmYjUIoXurpl+f+a7S0tQhXjGUt09zKlNXxGcebL5TEPFqgJTHN/77ayLslMTtZVYHE2FiIxkvW48yDjZUlefmphGpfpoXe4nRBNto1mMB9Pb9vR47EjNBZCtWWbwJTIEUwHP2Z5fV9nMx9Zw2BhwrfnODnzI8xRWVqk7/5R+FJvl7s3nY4F+svKGD9QHYmxfd8Gx42PZc/qkeCjUORaOf1fsYyChTtJI4iNm6iWbD9HK5LTMzwl0n0lL7CEsBsCJ97i2swm1DQiY1ZJ95G2Nz5PjNRSiymIw9/neTvUT8VJJhzRl3Nb/EmO/qeahfiG7zTpqSn2dEl+AwbcwQrbAhTPzuHIcoLZYV0xDWzAibUnn7pSrQKja+b8kHD9WF+m7dPlRVY7soqEYXylyCOXr5516upH8vVBmqweCIxXSWqPAhQq8d3hB/Ww2A0H0PBTN1REVw8pRLNApEA7C2nX6RW0XmA53PIQvAP0EAakWsqHoKZ5WdpeOcH9iVlUQhRgemQSkhfNaP9LqR1XKujlTuUTpoyT3xwAzkmSxN1nABoutHEO/N87fpIbpbZaIdinF7b9srwUvDOKsywfs5HMiUZhLKoZzCcU/AEFjQsPTATACGsWf3JYPnWxL9
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <7a01e4c7ddb84292cc284b6664c794b9a6e713a8.1707759574.git.asml.silence@gmail.com>
- <CANn89iJBQLv7JKq5OUYu7gv2y9nh4HOFmG_N7g1S1fVfbn=-uA@mail.gmail.com> <457b4869-8f35-4619-8807-f79fc0122313@gmail.com>
-In-Reply-To: <457b4869-8f35-4619-8807-f79fc0122313@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 13 Feb 2024 15:28:34 +0100
-Message-ID: <CANn89iL4ViyMQ3gm32K6LqfLWEvTeGSn27j729d1x3vaDyCzXQ@mail.gmail.com>
-Subject: Re: [PATCH v2] net: cache for same cpu skb_attempt_defer_free
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org, 
-	pabeni@redhat.com, kuba@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 13, 2024 at 3:17=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.=
-com> wrote:
->
-> On 2/13/24 13:53, Eric Dumazet wrote:
-> > On Tue, Feb 13, 2024 at 2:42=E2=80=AFPM Pavel Begunkov <asml.silence@gm=
-ail.com> wrote:
-> >>
-> >> Optimise skb_attempt_defer_free() executed by the CPU the skb was
-> >> allocated on. Instead of __kfree_skb() -> kmem_cache_free() we can
-> >> disable softirqs and put the buffer into cpu local caches.
-> >>
-> >> Trying it with a TCP CPU bound ping pong benchmark (i.e. netbench), it
-> >> showed a 1% throughput improvement (392.2 -> 396.4 Krps). Cross checki=
-ng
-> >> with profiles, the total CPU share of skb_attempt_defer_free() dropped=
- by
-> >> 0.6%. Note, I'd expect the win doubled with rx only benchmarks, as the
-> >> optimisation is for the receive path, but the test spends >55% of CPU
-> >> doing writes.
-> >>
-> >> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> >> ---
-> >>
-> >> v2: remove in_hardirq()
-> >>
-> >>   net/core/skbuff.c | 16 +++++++++++++++-
-> >>   1 file changed, 15 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> >> index 9b790994da0c..f32f358ef1d8 100644
-> >> --- a/net/core/skbuff.c
-> >> +++ b/net/core/skbuff.c
-> >> @@ -6947,6 +6947,20 @@ void __skb_ext_put(struct skb_ext *ext)
-> >>   EXPORT_SYMBOL(__skb_ext_put);
-> >>   #endif /* CONFIG_SKB_EXTENSIONS */
-> >>
-> >> +static void kfree_skb_napi_cache(struct sk_buff *skb)
-> >> +{
-> >> +       /* if SKB is a clone, don't handle this case */
-> >> +       if (skb->fclone !=3D SKB_FCLONE_UNAVAILABLE) {
-> >> +               __kfree_skb(skb);
-> >> +               return;
-> >> +       }
-> >> +
-> >> +       local_bh_disable();
-> >> +       skb_release_all(skb, SKB_DROP_REASON_NOT_SPECIFIED, false);
-> >
-> > I am trying to understand why we use false instead of true here ?
-> > Or if you prefer:
-> > local_bh_disable();
-> > __napi_kfree_skb(skb, SKB_DROP_REASON_NOT_SPECIFIED);
-> > local_bh_enable();
->
-> Maybe it's my misunderstanding but disabled bh !=3D "napi safe",
-> e.g. the napi_struct we're interested in might be scheduled for
-> another CPU. Which is also why "napi" prefix in percpu
-> napi_alloc_cache sounds a bit misleading to me.
+On Tue, 2024-02-13 at 14:55 +0200, R=C3=A9mi Denis-Courmont wrote:
+> Le 13 f=C3=A9vrier 2024 14:12:57 GMT+02:00, Paolo Abeni <pabeni@redhat.co=
+m> a =C3=A9crit=C2=A0:
+> > On Sat, 2024-02-10 at 14:50 +0200, R=C3=A9mi Denis-Courmont wrote:
+> > > From: R=C3=A9mi Denis-Courmont <courmisch@gmail.com>
+> > >=20
+> > > Reported-by: Luosili <rootlab@huawei.com>
+> > > Signed-off-by: R=C3=A9mi Denis-Courmont <courmisch@gmail.com>
+> >=20
+> > Looks good, but you need to add a non empty commit message.
+>=20
+> With all due respect, the headline is self-explanatory in my opinion. You=
+ can't compare this with the more involved second patch. Also the second pa=
+tch was *not* reported by Huawei Rootlab, but inferred by me and thus has n=
+o existing documentation - unlike this one.
+>=20
+> As for the bug ID, I don't know it (security list didn't pass=C2=A0
+> it on to me). Anyhow it seems that Eric Dumazet already=C2=A0
+> either found it or filled it in, so I don't know what else
+> you're asking for.
 
-Indeed, this is very misleading.
+We don't need a bug ID. We need the hash of the commit introducing the
+issue. You should be able to find it digging in the git history,
+looking for the changeset introducing the problematic code.=20
 
-napi_skb_cache_put() & napi_skb_cache_get() should be renamed eventually.
+We need such tag for both patches. Eric already provided it for 1/2,
+you should find it for patch 2/2.
 
-Thanks.
+See:
+
+https://elixir.bootlin.com/linux/latest/source/Documentation/process/5.Post=
+ing.rst#L204
+
+Cheers,
+
+Paolo
+
 
