@@ -1,61 +1,62 @@
-Return-Path: <netdev+bounces-71110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3CB985240D
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:41:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6EE5852437
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:46:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6ECB9281033
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 00:41:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8325B1F23136
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 00:46:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0588B60EC8;
-	Tue, 13 Feb 2024 00:21:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD3FD64A87;
+	Tue, 13 Feb 2024 00:21:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tt8CwhGz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VCBAK0E2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC559612C9;
-	Tue, 13 Feb 2024 00:21:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81D7463CB4;
+	Tue, 13 Feb 2024 00:21:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707783684; cv=none; b=FlDKglLVOJXRwKzryfeLQ0yeYwNIX0cGoWYtOTs6wk7+UrInYwxx8FDIZ52PkO1f3RNhVs5xAmF6oyqzbOcVRvPB3PDDessLq9+cks31Pc2GIJ+Y0eaj3COrrnmJpgWDRAqSyqNBNLMGcctpI1upvKSjt+zzqjDmKSQENsqimtE=
+	t=1707783716; cv=none; b=FiN3GURxvx+ErDcxbLOPwoqrnuC6lptN0JGI+9X9W0XpbULoJufPST3e7DxyrMIfAMEPR15dJnJwaeH/N1qW0zazF25GoxzW8Fve5a1dS8Un7ukQ4xOiN3SFdIxkiVvnGI+m0bB8Qg8P3OzJNG9C2aVBF2zmFfBCiVpgY+rakOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707783684; c=relaxed/simple;
-	bh=5fjtFvRXq8i+1QkarT25gVcXr9Rd0tLWnEMrGrtbh+A=;
+	s=arc-20240116; t=1707783716; c=relaxed/simple;
+	bh=k89xFbyGwJEbzgkK7f8r2lTSUKobgTo9d5zHFqwHJ7Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RE0EeK+RkeWrytZ6l3waIWI24NLLi6HbMK2n7RTzGywFqS75xYh2BHv0E6bvs8RLZpZBjVreZc2HaXjhxMOT+D2felZU7q+QRQsuraF09OoeZDCJUNLJ1kVkF8cAElVaai1+cwq6ES77ecPmt1lfNvJtUxprrxaiolBCaPzivPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tt8CwhGz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14AB2C43399;
-	Tue, 13 Feb 2024 00:21:22 +0000 (UTC)
+	 MIME-Version; b=O/lMrZg9JhFryUt2SYLSQgJfwgRqJIdQgbSGAp1yV9Qw6m2WIsLF+3UO8XBF37/PtnJWJpQCNxUAxucMUIk/EG+E6CrHO218ShFmU3GwnNVmwfcxLRy2106MqEpiY+wRMUKdfFne0D5AZMMfGIXU7BMxo11ORDBDHL0whHOxVpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VCBAK0E2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAF52C433C7;
+	Tue, 13 Feb 2024 00:21:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707783684;
-	bh=5fjtFvRXq8i+1QkarT25gVcXr9Rd0tLWnEMrGrtbh+A=;
+	s=k20201202; t=1707783716;
+	bh=k89xFbyGwJEbzgkK7f8r2lTSUKobgTo9d5zHFqwHJ7Q=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tt8CwhGzKqj9Oa4xK3qdhuAvtXaMA3QWtawbbgOLIIbPNlJrKAe+VQHZzDoDoA9uB
-	 GLP++i39d9L5vL9vPpgXWDp7tucJsQUpGB71IGVNuasA5SbTmm8nXyKDlFzCJLPmqU
-	 Z5/Cb7SA/hN+42fXF0b0azOK4D9fBvSdNLPbzkFJEruKIpn/HaedDhe8JpH8mL9E5e
-	 8gHkngYAPkOICgto1yhEVGmlBx09M4wfGASlnsrSWGg8SClo7O8w+gWRS/GjC/nmLM
-	 B2LIx6YFpS7ap/O71cG93R8WebTJYXr3fKwbk0kZxE6zcw8T+znGNCqkJkRHgx7FH3
-	 qz2iJjLKroVzA==
+	b=VCBAK0E2uPibjCGm93cnhx9ce1rH5qOzHV0tHAyWABVkqbJTI3I3ldGn67qAIsy6U
+	 mSb0t89bn1f85XcGb1L1cj3fSlihg2FXdSTnQckQdamsqgwWMG+JFtjzKRi2R2RT+C
+	 6a9hSyjpb4phJWiORbnodXXxH40/n093cIv+edwoXUvahu6EX5jMFmjtTKe7k/UMAo
+	 pUh3+ySaCQfewQnozGUpVIxltk2/ysWH5JiSWXsg5JgCIKQT/var5cNZfrFtrOUj6e
+	 AP1scrGUiaeOfNlqgh84qgm+2Uyj6Mm+3GnRZTi993bIucWNHo88fWSLxSwYu9mJFQ
+	 Z3D4OC+kkjLAg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Johannes Berg <johannes.berg@intel.com>,
+Cc: Xiubo Li <xiubli@redhat.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
 	Sasha Levin <sashal@kernel.org>,
-	johannes@sipsolutions.net,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 25/51] wifi: mac80211: accept broadcast probe responses on 6 GHz
-Date: Mon, 12 Feb 2024 19:20:02 -0500
-Message-ID: <20240213002052.670571-25-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 41/51] libceph: fail sparse-read if the data length doesn't match
+Date: Mon, 12 Feb 2024 19:20:18 -0500
+Message-ID: <20240213002052.670571-41-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240213002052.670571-1-sashal@kernel.org>
 References: <20240213002052.670571-1-sashal@kernel.org>
@@ -70,95 +71,79 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.16
 Content-Transfer-Encoding: 8bit
 
-From: Johannes Berg <johannes.berg@intel.com>
+From: Xiubo Li <xiubli@redhat.com>
 
-[ Upstream commit 62a6183c13319e4d2227473a04abd104c4f56dcf ]
+[ Upstream commit cd7d469c25704d414d71bf3644f163fb74e7996b ]
 
-On the 6 GHz band, probe responses are sent as broadcast to
-optimise medium usage. However, without OCE configuration
-we weren't accepting them, which is wrong, even if wpa_s is
-by default enabling OCE. Accept them without the OCE config
-as well.
+Once this happens that means there have bugs.
 
-Link: https://msgid.link/20240129200907.5a89c2821897.I92e9dfa0f9b350bc7f37dd4bb38031d156d78d8a@changeid
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+Signed-off-by: Xiubo Li <xiubli@redhat.com>
+Reviewed-by: Jeff Layton <jlayton@kernel.org>
+Signed-off-by: Ilya Dryomov <idryomov@gmail.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/mac80211/scan.c | 30 ++++++++++++++++++------------
- 1 file changed, 18 insertions(+), 12 deletions(-)
+ include/linux/ceph/osd_client.h |  3 ++-
+ net/ceph/osd_client.c           | 18 +++++++++++++++---
+ 2 files changed, 17 insertions(+), 4 deletions(-)
 
-diff --git a/net/mac80211/scan.c b/net/mac80211/scan.c
-index 68ec2124c3db..a52813f2b08c 100644
---- a/net/mac80211/scan.c
-+++ b/net/mac80211/scan.c
-@@ -9,7 +9,7 @@
-  * Copyright 2007, Michael Wu <flamingice@sourmilk.net>
-  * Copyright 2013-2015  Intel Mobile Communications GmbH
-  * Copyright 2016-2017  Intel Deutschland GmbH
-- * Copyright (C) 2018-2023 Intel Corporation
-+ * Copyright (C) 2018-2024 Intel Corporation
-  */
+diff --git a/include/linux/ceph/osd_client.h b/include/linux/ceph/osd_client.h
+index bf9823956758..f703fb8030de 100644
+--- a/include/linux/ceph/osd_client.h
++++ b/include/linux/ceph/osd_client.h
+@@ -45,6 +45,7 @@ enum ceph_sparse_read_state {
+ 	CEPH_SPARSE_READ_HDR	= 0,
+ 	CEPH_SPARSE_READ_EXTENTS,
+ 	CEPH_SPARSE_READ_DATA_LEN,
++	CEPH_SPARSE_READ_DATA_PRE,
+ 	CEPH_SPARSE_READ_DATA,
+ };
  
- #include <linux/if_arp.h>
-@@ -222,14 +222,18 @@ ieee80211_bss_info_update(struct ieee80211_local *local,
- }
+@@ -64,7 +65,7 @@ struct ceph_sparse_read {
+ 	u64				sr_req_len;  /* orig request length */
+ 	u64				sr_pos;      /* current pos in buffer */
+ 	int				sr_index;    /* current extent index */
+-	__le32				sr_datalen;  /* length of actual data */
++	u32				sr_datalen;  /* length of actual data */
+ 	u32				sr_count;    /* extent count in reply */
+ 	int				sr_ext_len;  /* length of extent array */
+ 	struct ceph_sparse_extent	*sr_extent;  /* extent array */
+diff --git a/net/ceph/osd_client.c b/net/ceph/osd_client.c
+index d3a759e052c8..a2abfda17a24 100644
+--- a/net/ceph/osd_client.c
++++ b/net/ceph/osd_client.c
+@@ -5859,8 +5859,8 @@ static int osd_sparse_read(struct ceph_connection *con,
+ 	struct ceph_osd *o = con->private;
+ 	struct ceph_sparse_read *sr = &o->o_sparse_read;
+ 	u32 count = sr->sr_count;
+-	u64 eoff, elen;
+-	int ret;
++	u64 eoff, elen, len = 0;
++	int i, ret;
  
- static bool ieee80211_scan_accept_presp(struct ieee80211_sub_if_data *sdata,
-+					struct ieee80211_channel *channel,
- 					u32 scan_flags, const u8 *da)
- {
- 	if (!sdata)
- 		return false;
--	/* accept broadcast for OCE */
--	if (scan_flags & NL80211_SCAN_FLAG_ACCEPT_BCAST_PROBE_RESP &&
--	    is_broadcast_ether_addr(da))
-+
-+	/* accept broadcast on 6 GHz and for OCE */
-+	if (is_broadcast_ether_addr(da) &&
-+	    (channel->band == NL80211_BAND_6GHZ ||
-+	     scan_flags & NL80211_SCAN_FLAG_ACCEPT_BCAST_PROBE_RESP))
- 		return true;
-+
- 	if (scan_flags & NL80211_SCAN_FLAG_RANDOM_ADDR)
- 		return true;
- 	return ether_addr_equal(da, sdata->vif.addr);
-@@ -278,6 +282,12 @@ void ieee80211_scan_rx(struct ieee80211_local *local, struct sk_buff *skb)
- 		wiphy_delayed_work_queue(local->hw.wiphy, &local->scan_work, 0);
- 	}
- 
-+	channel = ieee80211_get_channel_khz(local->hw.wiphy,
-+					    ieee80211_rx_status_to_khz(rx_status));
-+
-+	if (!channel || channel->flags & IEEE80211_CHAN_DISABLED)
-+		return;
-+
- 	if (ieee80211_is_probe_resp(mgmt->frame_control)) {
- 		struct cfg80211_scan_request *scan_req;
- 		struct cfg80211_sched_scan_request *sched_scan_req;
-@@ -295,19 +305,15 @@ void ieee80211_scan_rx(struct ieee80211_local *local, struct sk_buff *skb)
- 		/* ignore ProbeResp to foreign address or non-bcast (OCE)
- 		 * unless scanning with randomised address
- 		 */
--		if (!ieee80211_scan_accept_presp(sdata1, scan_req_flags,
-+		if (!ieee80211_scan_accept_presp(sdata1, channel,
-+						 scan_req_flags,
- 						 mgmt->da) &&
--		    !ieee80211_scan_accept_presp(sdata2, sched_scan_req_flags,
-+		    !ieee80211_scan_accept_presp(sdata2, channel,
-+						 sched_scan_req_flags,
- 						 mgmt->da))
- 			return;
- 	}
- 
--	channel = ieee80211_get_channel_khz(local->hw.wiphy,
--					ieee80211_rx_status_to_khz(rx_status));
--
--	if (!channel || channel->flags & IEEE80211_CHAN_DISABLED)
--		return;
--
- 	bss = ieee80211_bss_info_update(local, rx_status,
- 					mgmt, skb->len,
- 					channel);
+ 	switch (sr->sr_state) {
+ 	case CEPH_SPARSE_READ_HDR:
+@@ -5912,8 +5912,20 @@ static int osd_sparse_read(struct ceph_connection *con,
+ 		convert_extent_map(sr);
+ 		ret = sizeof(sr->sr_datalen);
+ 		*pbuf = (char *)&sr->sr_datalen;
+-		sr->sr_state = CEPH_SPARSE_READ_DATA;
++		sr->sr_state = CEPH_SPARSE_READ_DATA_PRE;
+ 		break;
++	case CEPH_SPARSE_READ_DATA_PRE:
++		/* Convert sr_datalen to host-endian */
++		sr->sr_datalen = le32_to_cpu((__force __le32)sr->sr_datalen);
++		for (i = 0; i < count; i++)
++			len += sr->sr_extent[i].len;
++		if (sr->sr_datalen != len) {
++			pr_warn_ratelimited("data len %u != extent len %llu\n",
++					    sr->sr_datalen, len);
++			return -EREMOTEIO;
++		}
++		sr->sr_state = CEPH_SPARSE_READ_DATA;
++		fallthrough;
+ 	case CEPH_SPARSE_READ_DATA:
+ 		if (sr->sr_index >= count) {
+ 			sr->sr_state = CEPH_SPARSE_READ_HDR;
 -- 
 2.43.0
 
