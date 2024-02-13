@@ -1,85 +1,97 @@
-Return-Path: <netdev+bounces-71131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C786B8526DA
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 02:45:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A07778526DF
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 02:45:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 069971C247C5
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:45:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5273B1F259A7
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 01:45:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DA70286A2;
-	Tue, 13 Feb 2024 01:07:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28C9F28E3C;
+	Tue, 13 Feb 2024 01:10:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lUPhreWH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pAXRztj5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360007AE49;
-	Tue, 13 Feb 2024 01:07:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECFB123BB;
+	Tue, 13 Feb 2024 01:10:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707786422; cv=none; b=l2pAkGcOOb19990X/FyLl8zDD+g0ESi5SfhO9giBgq3kXrIIEHvW7OYB0/deSDdMT32a12/dixspq7C7jibEdxuRnWOysRZCEEL2deKeuwBDgWtsvIxrNw7IYpaWPHeyMR6nWGqZwouudHQImwwXofHsYEbQZ53MHAbIJHw6S08=
+	t=1707786626; cv=none; b=QXEt1grjWEQuHDIJ9M9TwwKI/QgQcil5BQV6TAaHAI+JmXiGQlnT5O3hqocG+lVi3KuFcPuYvIfFSgiCxB2PrIkE1f0hRzWjyPiyeTbtNVHsJF9b9o3NZou3jHCYNFUplDy0WlUUhmwMxwjs9G6Wpx4BE0XOTRtBYf/hZPj8ypI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707786422; c=relaxed/simple;
-	bh=yiRjXWW9vRy8oSt2OY9bdE1LF4uXuy72w5FirZcXiWQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=d3+D0zLKxoe8CDjySdtUley40Er/EXTfpHoFQ2iPSGk6mUR9/Fhb86GUHIESlVusocXfOdUszHElwX9dkvKIKHnvM4STub5OrP5Egp/mjF6i8D3BgPnDv3iARJ3823B4GNApbszIGUoy/NY43pBLlxZRg3HtPWHye0/wrzZDy5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lUPhreWH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 538FDC433F1;
-	Tue, 13 Feb 2024 01:07:01 +0000 (UTC)
+	s=arc-20240116; t=1707786626; c=relaxed/simple;
+	bh=l2ZGGv/18ZoTqeFXJtdQeBC6J2Sob8IHyJGeCIkvq10=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=nUatxaHqGeUkc+aOkGhSB3TwTBj5UVmp2TQRjyGKVqIu+x4srVCj/1+YIPgalRZikrY/2+h3r1FddbDaib40xQtsg1/XeB8eyWBbM+ru08ns7l5Sv6S1t634dZf5M4ro7eYr9OTw6T66R7MCV96q0NYJWCb+qXyEdQxRaFH4a90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pAXRztj5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B6D99C43399;
+	Tue, 13 Feb 2024 01:10:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707786421;
-	bh=yiRjXWW9vRy8oSt2OY9bdE1LF4uXuy72w5FirZcXiWQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lUPhreWHveOFJzchwqyfcv++UOsX7plGbmLF+WVZf9oNBAqWh9YCNx+7dleUmWDcH
-	 UH3AIcmOxwP8nDKZ2PBbVutfPQ/ms3dQhMhSaH91uM+fWKsrqzTW2qsPv/E3F9mSEE
-	 Xsukyr6Zg5nfmmQ/25ML5WFZElcSuYcivNxys2ESwhjac+JZ4FBpKds60Y+MZl3SfR
-	 NG3Wqjr6XFKmQtGcA9GZEwDMjE6dU4Nq1zFjMy/i8cLgVrcEk5FXghgTNdFjY450Bs
-	 yB7KDndZv6c3XZ7SQukkSm1noEKw+NOEik0LsPhA1nJNyt11/4EmpZjv8Qti0ugKNu
-	 lNjUMQEmgYScQ==
-Date: Mon, 12 Feb 2024 17:07:00 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
-Cc: linux-pm@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>,
- Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, Ricardo Neri
- <ricardo.neri-calderon@linux.intel.com>, Daniel Lezcano
- <daniel.lezcano@linaro.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko
- <jiri@resnulli.us>, Johannes Berg <johannes@sipsolutions.net>, Florian
- Westphal <fw@strlen.de>, netdev@vger.kernel.org
-Subject: Re: [PATCH v4 1/3] genetlink: Add per family bind/unbind callbacks
-Message-ID: <20240212170700.4eda9c03@kernel.org>
-In-Reply-To: <20240212161615.161935-2-stanislaw.gruszka@linux.intel.com>
-References: <20240212161615.161935-1-stanislaw.gruszka@linux.intel.com>
-	<20240212161615.161935-2-stanislaw.gruszka@linux.intel.com>
+	s=k20201202; t=1707786625;
+	bh=l2ZGGv/18ZoTqeFXJtdQeBC6J2Sob8IHyJGeCIkvq10=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=pAXRztj58dBFe4cZLYjifdmkayS9xynM3JtWJG0voC0AD4O67VB1gS1BgiQXWZ09U
+	 LiS7szWL3RlDeTGAD1YJqS1cEcXz/nSQCt6u8jC/eufbZb2QrjcIMzyxmWL5PgtBai
+	 drYhN5SszBaK40hJ4q2y0xho55uSgWno5pidAT4Ix6i6xE7wnA6/F66C0IZR6u0/NO
+	 PnIljJGxzQEh0PDKRnWiKsa2w8J2Wtf4VUtvS2LA3jWD+MGHG4SZBu5Y6de71jzUJO
+	 JMBe6N84ZvunzaJkbrMxlYFKEyUq1Pj32wGPHD4Zv43gLfOTFDrjHHsOQNil7itiN+
+	 mbocsIMXNPhaA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9F39DC4166E;
+	Tue, 13 Feb 2024 01:10:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] selftests: net: ip_local_port_range: define IPPROTO_MPTCP
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170778662564.1111.991367114536257318.git-patchwork-notify@kernel.org>
+Date: Tue, 13 Feb 2024 01:10:25 +0000
+References: <20240209132512.254520-1-max@internet.ru>
+In-Reply-To: <20240209132512.254520-1-max@internet.ru>
+To: Maxim Galaganov <max@internet.ru>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, shuah@kernel.org, martineau@kernel.org,
+ matttbe@kernel.org, lkft@linaro.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Mon, 12 Feb 2024 17:16:13 +0100 Stanislaw Gruszka wrote:
-> Add genetlink family bind()/unbind() callbacks when adding/removing
-> multicast group to/from netlink client socket via setsockopt() or
-> bind() syscall.
-> 
-> They can be used to track if consumers of netlink multicast messages
-> emerge or disappear. Thus, a client implementing callbacks, can now
-> send events only when there are active consumers, preventing unnecessary
-> work when none exist.
-> 
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
+Hello:
 
-LGTM! genetlink code is a bit hot lately, to avoid any conflicts can
-I put the first patch (or all of them) on a shared branch for both
-netdev and PM to pull in? Once the other two patches are reviewed,
-obviously.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri,  9 Feb 2024 16:25:11 +0300 you wrote:
+> Older glibc's netinet/in.h may leave IPPROTO_MPTCP undefined when
+> building ip_local_port_range.c, that leads to "error: use of undeclared
+> identifier 'IPPROTO_MPTCP'".
+> 
+> Define IPPROTO_MPTCP in such cases, just like in other MPTCP selftests.
+> 
+> Fixes: 122db5e3634b ("selftests/net: add MPTCP coverage for IP_LOCAL_PORT_RANGE")
+> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> Closes: https://lore.kernel.org/netdev/CA+G9fYvGO5q4o_Td_kyQgYieXWKw6ktMa-Q0sBu6S-0y3w2aEQ@mail.gmail.com/
+> Signed-off-by: Maxim Galaganov <max@internet.ru>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] selftests: net: ip_local_port_range: define IPPROTO_MPTCP
+    https://git.kernel.org/netdev/net/c/c2b3ec36b422
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
