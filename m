@@ -1,198 +1,157 @@
-Return-Path: <netdev+bounces-71547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8371D853E86
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 23:24:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA6FB853E87
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 23:24:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B6ACB2C5CE
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 22:09:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A62B929201B
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 22:24:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DB9E626C6;
-	Tue, 13 Feb 2024 22:05:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 761A46215D;
+	Tue, 13 Feb 2024 22:24:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ID1zuOmQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l9BCO3Pz"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D160165BD2
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 22:05:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707861918; cv=fail; b=rqcQHLUoTVpXTydTY+HJWM7PODJ+/N+FFDnNvgPiZhyJTWopWVvHnxJyP9ZT0ANPfJ1UDdeT5cIo9KwkNKdb8HSg8yPA6mTSNuaSQC9EC8egGh3yHINg7b9JQTtlhLQscik8Vcu7LoYOOIHFYsugyDZYXcmM9x+iLdbGMRwYyOY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707861918; c=relaxed/simple;
-	bh=jz+sACUY+mgicUL7KfOrg+tkmrrydbnXpPSBF6/hY/0=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=iAWk7TBc0EAfBDneyoBt49qPHoghtIEjagnxuInTxeoiw3KSGInx2hXfoFyJMV0iBkTGV9Kew34GpXwPXRMg/rN/aBc8F1V1w5D0aSaPvhNuUBc/NDfQh5BNttv6mnbveR4+ulevg/fpB3Rbtb1Ec/sXPFqA4xMvbGMoS/6W2bo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ID1zuOmQ; arc=fail smtp.client-ip=40.107.236.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=F36ju73Flyxdu1pBUNxMXoIxiU6j49XusH3+GY4aomEIghH5zaNOf09r/nKnu9XnsP6cBV3jxcDh+QRdwFgXH3eVMozLBTyD9wZf5n3KUzWAUmD8f197N3DC9MrMl2Y0k33zBiN72nzv7LKfjlAAKHuIhPMv9kjqP+VB/CniHE0fgLwtYLLI7PHdhLgcWWgki14xuihjbgFybf/xBvwYimYwfhCLPs9KJS9NZ9ua7XpaJi3CbV0fPbslJlU1oZ2dS07FGNn5+oT4RZ52qQA4a0yJni7Ii1R2T18r/9mkLJTKBV9htjl0qHwE0ATwd6r04MPuwA00AyGFHZibugbrIw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ao7CgoW/tUd3z1HM+YhoM+5641BBEMEVXcz1NA3sQsQ=;
- b=lA29BjndoEv30nYCxPPP6+Sj6HdOjqgo6vml1iYv9vuL7sTIMnCsrVkCrmUMBCCdz01eQ/+y50Csd/AGkU8JkoeePa+Lgn/SFUdFUsPKNfNLSBYFEqYNl3LO6GIcuLFeJVzRu5gQGmRu8bJKJB7xDmFdW7Tq5vq0L1dBn6yDG/eUp9aUCv9+g0VeHaVjtDVzJcMSfo+ducZGh0RgyT1Qipgamenq7PMF+CWd57zuhlAuG4XWk6DSWJC9U8mV00vgnPI54AGLMybwrc5qzTKvr3Qi3QQJSMq4JQgQQJDPZpoNJ4ZYTg4oR/PtCxkV4jEQBZfzJCZ1aXcbFkSrEOm6Qw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ao7CgoW/tUd3z1HM+YhoM+5641BBEMEVXcz1NA3sQsQ=;
- b=ID1zuOmQEc3yrjYHrofh1juzdjR4Oy7jBy3elzdpaaVXYQP1gKgC+5tpKmrLDQAuuzyrJ24X6XRn4fDiIR1AdvMPBw/MgorDako9bTsQss/fMUZNEcGqO3BvvvHoOP9AeyBqxtqmc1dA2l9W0pr310atWf0kASOreONF+ZF4fA8=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
- MN2PR12MB4080.namprd12.prod.outlook.com (2603:10b6:208:1d9::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.25; Tue, 13 Feb
- 2024 22:05:14 +0000
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::e4b7:89f7:ca60:1b12]) by DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::e4b7:89f7:ca60:1b12%4]) with mapi id 15.20.7292.022; Tue, 13 Feb 2024
- 22:05:14 +0000
-Message-ID: <47fa96be-181e-4d71-a0ce-244bfbe93cb8@amd.com>
-Date: Tue, 13 Feb 2024 14:05:13 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 net-next 7/9] ionic: Add XDP_REDIRECT support
-Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- davem@davemloft.net, kuba@kernel.org, edumazet@google.com
-Cc: brett.creeley@amd.com, drivers@pensando.io
-References: <20240210004827.53814-1-shannon.nelson@amd.com>
- <20240210004827.53814-8-shannon.nelson@amd.com>
- <9f254fa79f100133319f1ca824becc0cfac38cd3.camel@redhat.com>
-From: "Nelson, Shannon" <shannon.nelson@amd.com>
-In-Reply-To: <9f254fa79f100133319f1ca824becc0cfac38cd3.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BY3PR05CA0001.namprd05.prod.outlook.com
- (2603:10b6:a03:254::6) To DS0PR12MB6583.namprd12.prod.outlook.com
- (2603:10b6:8:d1::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA63E62143;
+	Tue, 13 Feb 2024 22:24:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707863044; cv=none; b=uF39VjHatjixsr5tlns1YqCEecFnE59JTdorp9yi3qdIYdhQiUnFi/eGxda6vBQhYOyS9eNf/lfS2Miz+X943qjAmb0OyeVMk0inORqP3DoNIoN6syMyKnMod7kPr6iLOQLb8w4DaWCPTSPccluZoGcZn014PlC738erNULT230=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707863044; c=relaxed/simple;
+	bh=Q7yhFk4pX598SxD0gAFPG2cq1/Q1XfZlHBopnV2lvSo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=h2gZsGGMXBreQ/iJ2Jgfev0gtgwOtQrWfZIOSHtLBJRZzEnyRSEWZTqNLxpMqYMR/r4gALYJSE8UZqepVwvd2RDrUmcANjHsOZfmFkRb8pKB1dJZW0yxzeQSWwF+L6vIZ96UknkAigGxMtq5HNPeelqiiLmWnC03pSNTR04OXRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l9BCO3Pz; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1db4977be03so1358845ad.1;
+        Tue, 13 Feb 2024 14:24:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707863042; x=1708467842; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MmPPVce04OmE6pjEU+43mxBTewwTDrSldoXWGdB+S6k=;
+        b=l9BCO3Pz0ZgsT495TmCSyhY3gxKFVIbTkUt+b579x2/EspyUgVlauHdFgqIaMtS4eQ
+         PAuuPlbLHPwxun5JG+ANZhEjIkMsQCiA7td7T2t5yo1t2Mz2Bgyhyh7cj6ur65wEdfho
+         CavI1O7VfJ7tmXe/qB4iXIWhJUoLQOKJbZzHbCSEwnWxgvhV/sHh/kZnZxzYSN8l1ha3
+         T0foq+UlZwxUa0wJS4QGA1PktR4zDWDQpEmWXuPCV6YN97vUzVFcRGV+vAKBarVgpS38
+         IbinwudBLUnkTqa0A4QfpbznUGPilicQLhhrclU8Km1smXcndZjaIJSItZXLFFXa+l/h
+         Vn6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707863042; x=1708467842;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MmPPVce04OmE6pjEU+43mxBTewwTDrSldoXWGdB+S6k=;
+        b=Mh4smeMEJzFOXnfeld4xukjlFvfzj5ajAxStxsAMknkoWYKvo+4q3O5SjYrmKw7VbU
+         zzJImmV4EMeR+qbu2HplXD86tcwycN7AMJCBSgBr5G8cYp15qqDf5DgXnjwcBRxKIo63
+         D4o2C7MZXtTjgGANRg9G5cdXDkoHYh/lfJGAKwIuTJXaxYH7CqxjsYjTCIvaaSi4frUI
+         Moe5NhHBJr0fpcAhItj4+k8Eqg4dhEVceMN003E8AiyduXnMymuODz5yJxjGT20DPJ0f
+         YWzNSr2LUYtXsJtnWJ7jTCthnyHn2T+iTS2/7wFKpZagVIgEYTuPzPHPBpyyXr5OjKW6
+         x7Zg==
+X-Forwarded-Encrypted: i=1; AJvYcCXObQ8ObDVphZM1I+qOZHYJJSux7AfFz1H9EE6Pv/p7tCafr3+aIMXrvFIED8Uati4gUy1E2ez4t23vPu+KZygXqRmyTjU5MhNT03BZr4IhJ7Mas1OTa+oG7nj2MJkAaZRaFkEB
+X-Gm-Message-State: AOJu0YzV7lllYBBhtP+s3ThMU4ytnZh29XfGB7UtRvy8vd4krPiGqD4t
+	9Lje6gsrNrWS/CPJHDfoRRmU7YSLnuHkHfB7Cm9gHjivRVvnxA89
+X-Google-Smtp-Source: AGHT+IFxIAWWVA/VRD5OF45TafGXBeA6kTytVJZ4XCV0BD7jXp9sXvvd9vxhEfjWFzOQ5wMefamshA==
+X-Received: by 2002:a17:903:1207:b0:1d9:5ef2:a562 with SMTP id l7-20020a170903120700b001d95ef2a562mr254090plh.10.1707863042047;
+        Tue, 13 Feb 2024 14:24:02 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXkwRA7jCuQUCYvCGX5y6jn6WOIQAvqoxyUJoInq4shQ4oAEDnLQTAPlD5c21AXpe6neVlVs8ycyq3JJnMxxjgni56SX2HHl4B9Ccyx0xyihpZAVOsLAm8aSXcw7XeXKz6oX2J78DxbcSSsaVEMpBbJ4s3Sg+7dgcIjDFxyrVdEAzgmFbYV4ZVim6aIQNp1Ly/aADUy0iqKskkXYV+Vb9zvBloQIeibN6GLC4r7OruA68stA/e2U9hYUZBQzvZk4N0RaA4YmTxM/PTi8TEvpCugz7PUwikVUoAeWnM9iy88TNhsknuF9BgDcvw=
+Received: from jmaxwell.com ([203.220.178.35])
+        by smtp.gmail.com with ESMTPSA id iz21-20020a170902ef9500b001db499c5c12sm776490plb.143.2024.02.13.14.23.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Feb 2024 14:24:01 -0800 (PST)
+From: Jon Maxwell <jmaxwell37@gmail.com>
+To: jesse.brandeburg@intel.com
+Cc: anthony.l.nguyen@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	jmaxwell37@gmail.com
+Subject: [net-next v3] intel: make module parameters readable in sys filesystem
+Date: Wed, 14 Feb 2024 09:23:44 +1100
+Message-Id: <20240213222344.195885-1-jmaxwell37@gmail.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|MN2PR12MB4080:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1b89845a-da40-4fa1-bff7-08dc2cdfdb04
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Ke7MBCaxsIkX6RaxEcUoIf7zPZGY3sU8Xtw2FcIkvEFNCBvCYOPC2w5JhTkC9ZLvPUM3woBTvlcsO2cqSv+/ntxfaPhf2mB3OVtj2szVU80DKUJN7D8GgJ6g6ZYmzwUVv7zGTTb75OuesEOyGmkyohFhLk1uHMDI7/m4+Cq95Ma+FoJpOqh4iOCjvxbtmH2Nj/aQG1IqIGgh06oiDYFgPz789/ALhl/kcoZ3C83th5h03vqXvmOZXzZno4BYMX/6cgr9gAkHVS27x7XNj+e/JjoQjniYqoHDkwBrCDPXAuFbtO1esWQwxaPKJgEvaFKHWzpGPKNPzgYmNz5MdOW7zaewMMJxwbMJMAzP/+ar4P1lzE6V0uGSc+A/wsZ/Mv/zuyBWwzJjOVObD+zHHsYcx+q7OR+/VlREP1v+mrhQB6YxMNS3tjhYQh2ccYxktnbvfW5mZpUzqodgl7x6aLsTIYk0fIWgkneM+d3/8ksn5FO4wjNtrRyDEQLNwlq6KHUVp4EGLZ+40+8u/gA263Fz6+CG55yOSmHE58ZLOPAzylO49fV/IYdmMynPKY7XOXQK
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(39860400002)(346002)(376002)(136003)(230922051799003)(451199024)(64100799003)(186009)(1800799012)(31686004)(2906002)(41300700001)(8936002)(83380400001)(5660300002)(66476007)(6512007)(8676002)(66556008)(4326008)(66946007)(26005)(36756003)(2616005)(53546011)(478600001)(6486002)(316002)(6506007)(38100700002)(86362001)(31696002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?N3RwdDlmMGx1TmRGNEswTmN1UzQ1RHZhYXVjR2RaMXFENklHQm5lc3l4bHZX?=
- =?utf-8?B?c1pxeFZWUklPRVhnMHl2bXlEbm1ZQ0NNc3dHVjYwL1c1T0RtM0NPSldmbXV0?=
- =?utf-8?B?MnlMSFg4bmVDY0Y1ODNMbzVEWkJkY2Y5dGkxQVVkN0ljM2lQczBRS3lVb2xU?=
- =?utf-8?B?eng0S0ExbkI4NHF3Z1VHZVAyMUhnMlMzREdKRjVxd09WcU5SMkJ1d0s2WXlx?=
- =?utf-8?B?R1NNYklwMDRXWWhWb0Q2blZDdVlaU0xTcVpSSUNJNlMrWkdUcERKU3dnRXlw?=
- =?utf-8?B?UlgzOFlzTFpKd2xTcWZIeGRxNHl4RDl6ZGkxSFhiNEhmTEkydjZ4ZjJxVGox?=
- =?utf-8?B?aDRCK3ViKzdmWEE4MU9NaE1QNjZWSjl4UjI4SUI0S0didm9qb0JKRkVyUjZD?=
- =?utf-8?B?a1d6dXVlVWJ6bzU4b2FGUnBzMW5TejhjelhXTUNJdE9tT0EraExHNC8ybGVw?=
- =?utf-8?B?Z2w0OWwzY3J4SEMxYWFLMmRDZzZXRzFTK1dDNjFmQXdybTN4SHA0MWY0K0Ja?=
- =?utf-8?B?aGN6Mm84T1pleEx0VFJLeFBtcU5EcE1VWkl6Rm1uazd4dDVaRlN2ZjZibjFD?=
- =?utf-8?B?cm5vMS9semN0aFRyQnVncFpwTlRMd25ybWh6cjk0RS9XOHZDaHlac3d3RGxM?=
- =?utf-8?B?WGxpU1B2MUk3VExZWDFwNkxoUjNsOTlkdjVJdmpzUE1sT1Z1NVE0ZXByS05i?=
- =?utf-8?B?d2xrQXRsV0toTVdsUmw5Tk1jeldvUnhyMUprcUY3QytpR3ducHpXYlgzQ2ta?=
- =?utf-8?B?aERTcktVbDV5WmxFNXNPYmFYUFEzd08vbysrMTE5R2k5c2VuRVoweHZxdWdY?=
- =?utf-8?B?TlVtb0JHRHRWdTJ3MVZ4alh1VnNFS1ppTUZ3MmYybWlFdE9wcEc0T0h2R3FK?=
- =?utf-8?B?RDNxd3YyMnhwQlF1WkxLa3lqeUE2WTBUUHNYWEYxTi9QQjVEY0NmNVZzbWd5?=
- =?utf-8?B?M3BDaUh6TVQxVjBPWTdCa011WXBXM2hnQzB6djM3VWYrSENSQVJUaGVYN1Ju?=
- =?utf-8?B?NzFvbmQxT3FUY1lpYnR0aFY1bnFveGQzU09ZeDJkdW1wdE9aTDlaQVFlekd3?=
- =?utf-8?B?ck1WL1o5WnNNVHEzTytMeEVOU2l0QkRjcGdqWGxPVlMzRkhUMW41cXptT0Jh?=
- =?utf-8?B?c1ptWDA3TzBKOU5zVWpTNE03M2RDSmRMK08yZlZ1Q1B6SVZjdzltQnUxQUNS?=
- =?utf-8?B?ZEIyby8zVlNGU1FjZnFaeXBlTEtpNmRuZVVhT1pHV0xrdUQ0L29kNmFyOGxC?=
- =?utf-8?B?R3pzT2VtRmx4NFlwTjM0YWt2aFdrUXpTQW04TzM1RjdrQVR1VW1lYmNHRUdI?=
- =?utf-8?B?cHVsWkVET1lnd083T1RSUzZ0ZytFMzRDK3N6ZzFIbm1La2ZBNGJnWHh4aWhq?=
- =?utf-8?B?MXJNWVpxMjluRVlhaVg5SDI5UitIY2N0cEtHMzQ4dUVsdmFQZ0JYWFU5Z3BZ?=
- =?utf-8?B?Zk1TMjNteVEwODVCVkRmbTNDR1pSVHFqaHN4TzhrV29NcGxrNnZ5bTZRRmkr?=
- =?utf-8?B?cDZMTmVEOSs4NkhaakVWOWZpSWJHSlNEQjlUbS9ObGNEbTFZdGxxSEk3bTc4?=
- =?utf-8?B?eit0SHd4cTI3dmVKWmFHWDRxZ0pwSDlWYUNQaWRZZmQ1bGtFMnlNb0U3R1B5?=
- =?utf-8?B?WEgrY1FDdm1ueDNwbWdjNmhmMFpWWGpHTmU1QWhyelhBSUF6ZDNwZWRIZ3RI?=
- =?utf-8?B?ZXFXOU5oYXIzVmlyNUxYTFJIQW02Z3RXVEVTdThzYkh1VzcyWnhUYTJIUjZJ?=
- =?utf-8?B?L2tpYXAxdjcwRkpnb2syYVJRSUtESStWRGVJSUREa0NDK3BOek1LZUx1V2Vi?=
- =?utf-8?B?RkN1WnlCb2lJbUNMZ2Ftek9lMDNocjJVdG1SVjlUaklHTFdWeWcwUURSdCs0?=
- =?utf-8?B?S01PSzJiUW02SW92ZlpTVldrNVViM09QdUx5MEtESVlNcUxxdzJjcUd6dG95?=
- =?utf-8?B?d3JlQUloM1hobXZSUDIrTEh0K3J6SEpoa3RKbzVXUTdhQ1RBQVNwMFllZ0RH?=
- =?utf-8?B?ZWF2K0tzdDhHTXUxa2hnNVdZRzhTc3gzczZQUUJHdmxLcXNDcjJWbU1pd0N5?=
- =?utf-8?B?Q0NFaTZ6UEZlRm5NT1hsR0xld3ZNSjdIOHBFL0ExN1E1ODJXclVNTWZ5UGpw?=
- =?utf-8?Q?nQLD1alYNbmvNKhIyOXocIORw?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1b89845a-da40-4fa1-bff7-08dc2cdfdb04
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Feb 2024 22:05:14.4771
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UNW85rpyFjOZD99alKqGObYLSjV1LPo1LUCG3ZatWfGpuFhJWt3jbOSdMPVgs3xuqetC8OLSGUnH+bKxRuLUSg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4080
+Content-Transfer-Encoding: 8bit
 
-On 2/13/2024 3:27 AM, Paolo Abeni wrote:
-> 
-> On Fri, 2024-02-09 at 16:48 -0800, Shannon Nelson wrote:
->> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
->> index 6921fd3a1773..6a2067599bd8 100644
->> --- a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
->> +++ b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
->> @@ -413,7 +413,19 @@ static bool ionic_run_xdp(struct ionic_rx_stats *stats,
->>                break;
->>
->>        case XDP_REDIRECT:
->> -             goto out_xdp_abort;
->> +             /* unmap the pages before handing them to a different device */
->> +             dma_unmap_page(rxq->dev, buf_info->dma_addr,
->> +                            IONIC_PAGE_SIZE, DMA_FROM_DEVICE);
->> +
->> +             err = xdp_do_redirect(netdev, &xdp_buf, xdp_prog);
->> +             if (err) {
->> +                     netdev_dbg(netdev, "xdp_do_redirect err %d\n", err);
->> +                     goto out_xdp_abort;
->> +             }
->> +             buf_info->page = NULL;
->> +             rxq->xdp_flush = true;
->> +             stats->xdp_redirect++;
->> +             break;
-> 
-> After this patch, there is a single 'goto out_xdp_abort' statement.
+Linux users sometimes need an easy way to check current values of module
+parameters. For example the module may be manually reloaded with different
+parameters. Make these visible and readable in the /sys filesystem to allow
+that.
 
-There are three 'goto' statements - error handling for XDP_REDIRECT, 
-error handling for XDP_TX, and for the XDP_DROP/default case.
+Signed-off-by: Jon Maxwell <jmaxwell37@gmail.com>
+---
+V2: Remove the "debug" module parameter as per Andrew Lunns suggestion.
+V3: Correctly format v2.
+ drivers/net/ethernet/intel/e100.c             | 4 ++--
+ drivers/net/ethernet/intel/igb/igb_main.c     | 2 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-> 
-> If you re-order the case as:
-> 
->          case XDP_TX:
->          case XDP_REDIRECT:
->          case XDP_REDIRECT:
->          default:
-> 
-> in patch 4/9, then you will not need to add the mentioned label in the
-> previous patch and the code after this one will be cleaner.
+diff --git a/drivers/net/ethernet/intel/e100.c b/drivers/net/ethernet/intel/e100.c
+index 01f0f12035caeb7ca1657387538fcebf5c608322..3fcb8daaa2437fa3fe7b98ba9f606dbbb1844e58 100644
+--- a/drivers/net/ethernet/intel/e100.c
++++ b/drivers/net/ethernet/intel/e100.c
+@@ -171,8 +171,8 @@ static int debug = 3;
+ static int eeprom_bad_csum_allow = 0;
+ static int use_io = 0;
+ module_param(debug, int, 0);
+-module_param(eeprom_bad_csum_allow, int, 0);
+-module_param(use_io, int, 0);
++module_param(eeprom_bad_csum_allow, int, 0444);
++module_param(use_io, int, 0444);
+ MODULE_PARM_DESC(debug, "Debug level (0=none,...,16=all)");
+ MODULE_PARM_DESC(eeprom_bad_csum_allow, "Allow bad eeprom checksums");
+ MODULE_PARM_DESC(use_io, "Force use of i/o access mode");
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index 4df8d4153aa5f5ce7ac9dd566180d552be9f5b4f..31d0a43a908c0a4eab4fe1147064a5f5677c9f0b 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -202,7 +202,7 @@ static struct notifier_block dca_notifier = {
+ #endif
+ #ifdef CONFIG_PCI_IOV
+ static unsigned int max_vfs;
+-module_param(max_vfs, uint, 0);
++module_param(max_vfs, uint, 0444);
+ MODULE_PARM_DESC(max_vfs, "Maximum number of virtual functions to allocate per physical function");
+ #endif /* CONFIG_PCI_IOV */
+ 
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+index bd541527c8c74d6922e8683e2f4493d9b361f67b..9d26ff82a397d4939cf7adea78c217e4071aa166 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+@@ -147,13 +147,13 @@ static struct notifier_block dca_notifier = {
+ 
+ #ifdef CONFIG_PCI_IOV
+ static unsigned int max_vfs;
+-module_param(max_vfs, uint, 0);
++module_param(max_vfs, uint, 0444);
+ MODULE_PARM_DESC(max_vfs,
+ 		 "Maximum number of virtual functions to allocate per physical function - default is zero and maximum value is 63. (Deprecated)");
+ #endif /* CONFIG_PCI_IOV */
+ 
+ static bool allow_unsupported_sfp;
+-module_param(allow_unsupported_sfp, bool, 0);
++module_param(allow_unsupported_sfp, bool, 0444);
+ MODULE_PARM_DESC(allow_unsupported_sfp,
+ 		 "Allow unsupported and untested SFP+ modules on 82599-based adapters");
+ 
+-- 
+2.39.3
 
-Sure, I can put the XDP_REDIRECT after the XDP_TX, which will clean up 
-patch 6/9 slightly.
-
-And thanks for taking the time to look at these, I appreciate it.
-
-Cheers,
-sln
-
-> 
-> Cheers,
-> 
-> Paolo
-> 
 
