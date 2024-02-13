@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-71570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59418853FDE
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 00:15:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92870853FE5
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 00:16:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C314E1F245C0
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 23:15:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4928A28E6B6
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 23:16:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9900762A03;
-	Tue, 13 Feb 2024 23:15:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F9CA62A04;
+	Tue, 13 Feb 2024 23:16:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UW3K4hOY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ewR7Itku"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFDFE629FE;
-	Tue, 13 Feb 2024 23:15:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A1B62A02;
+	Tue, 13 Feb 2024 23:16:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707866127; cv=none; b=sL/bTReMG/R2yITrk0yrZrG+e2cMISnm+olgmQ78VA1MgNmP0qRRUktdIwgis/LV//f2tNt9BDKSPH1+UmV5oFSb0lrvaY+gh4tx06J+zNkRRgkOFMZ+cvQIO0WH9iDcbE2VTu1CtfNtprCttqgG+S6D/fBNh4YWvuGFuWK/fqU=
+	t=1707866201; cv=none; b=RY7hFXds0PuTXdIfnscje0yFeQfGl4ulmh6TJZx4iC1oJaxU+C8Js8zbtTs4Lu9u1OkSGIQNgknMJfCiLfs+15eMwKUk49IuRWELmHKghQD6LGIsjI6k6AGws0jiudvjUyvdkZJ2FsaPufSzf5Nr31PLk4v5CGcQut30XQct5Rs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707866127; c=relaxed/simple;
-	bh=PY3J4S6EauW8fj+XZZM1388/2+rRzvgMyh+ZjtX7LIo=;
+	s=arc-20240116; t=1707866201; c=relaxed/simple;
+	bh=yn1oH6etk8WPbSVapAg4M6cLEbD0UbBLL7vryXpe9UQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a1Lmia/WNzcwCVuUoDhbMAcsNTpl4Oobcrnzs6t26bYHvGzT/Ne41SAI0Q7yNN/Bx8WMSr9d3JsduiIJPRu49yuLxEeso7mdSvC3Da9yr1gDHICVxzSAoIxerWLhrqr3CHXhaehYb1QXL6qIHPD7ApHSJ8UU7LKRueAy7KytbPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UW3K4hOY; arc=none smtp.client-ip=209.85.160.181
+	 In-Reply-To:Content-Type; b=NhCJRggenjkxX7t7/3vqfVIUNEwYDAw+NDOlkqFIYb68piWj8R6nu8sYqXPaX+P/l/Zo4ey+38YyAnhThsAyhFEd+3Jlx9P5aFu5DNdeAN9Xv7CK8vZY3IiwwLvUEME2nhOFRNtc38wSnb+H/Ly83MK2nE7ryw5NarEO2C+z64A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ewR7Itku; arc=none smtp.client-ip=209.85.219.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-42a029c8e62so30226891cf.1;
-        Tue, 13 Feb 2024 15:15:25 -0800 (PST)
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-68ef590377aso3370206d6.1;
+        Tue, 13 Feb 2024 15:16:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707866125; x=1708470925; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1707866198; x=1708470998; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=V/1120jGKl7lOqTVBnO0qLaVIMGkbPiaJJif82Yqxng=;
-        b=UW3K4hOYgbSutrFFlRK0Y2K0jihCy3vaQWDOC8DikeM7W14tnLXMZw0gpHOpKE+B/q
-         yg2ZIO2ZNb3/oQ+71wmqZeWkGxRtQ63zL2h7/2hhBSrPDKm5iL22FuTy7dul4nF0ECPX
-         Vuz8ZL+ueq2KibzZB8T7CAPKKUUO07/vTjKn5gyuDKqe3nGPAkQODf4I7UHneGGLPIDN
-         umZnn8hsRABXxAG8Zq6+bTZs2SiaDEkykKoZokIYh/DLWwC0ZKr9Co7ElIASeFghYQGi
-         X7zpcsPzT1ZmbNDdL0MbDowmrZiab+PDRkD7Ek34g9lKIR21cqbDVRC/1+SyK3rW31uR
-         24Ag==
+        bh=7HODJpGHPgaeSYLExqKUI5k/ZPn8+GJoHxQaOjnaKjQ=;
+        b=ewR7Itkuwv7KJzz2BJAyq2iRx0uf267wdbl5jvGbk8cjxITlC3bvFuA+z0nGi5vJfE
+         9S9v6vEK8YWMrQBaj183gNf0/ZwLwWKAiK2xlnuoDT3d8shkxPSah3HgkDlR7lg3Sp9/
+         5UWoVDs+dc65IsFtScPnvlmHFSzjaaRZ9ikZfJ32qd2RKzWK+k6Ws6SaH0X4qaGlgrOg
+         4xO17mksH9ycSLGy6M1C9wJrD1LqYr2pNf6i2DCCEt/8CMeXMpeFIOCSYvbQd7nch8zC
+         MkLiVeocZm6eh6cCSa3aEwuJdewR/DVhN71vCTOGTakPz3RnyvSDy4a5SQmG+1fbePPD
+         Qw0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707866125; x=1708470925;
+        d=1e100.net; s=20230601; t=1707866198; x=1708470998;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V/1120jGKl7lOqTVBnO0qLaVIMGkbPiaJJif82Yqxng=;
-        b=CJ7bvK5pj+0y+u9JcamD6q+P/yHJ3LtiGNoJHzmd0fC/y1Lk3zfa/OyDjlKGHLYuDP
-         Risbla+69lNvTFPPE14/wbdFxc564B/v+0Azw8LtYW/HS7b4NFJzsaI0y+7YIeHlPesN
-         CRJ8a8etpipKRJirIyFggtOWsMRmyAVKbM2bjazYk3ksF82Ie5V6d0ep+iHS1ujUWTv6
-         Z9zUG6VRrw72D2B6qWggZZXb/dgM9YC6r8K/M00PWXP+Ws1LUKCNCr+jRchALuIsKs+Q
-         m6y06KrFXET74l0XxQKalUW4REuyK6G0WKx6Hlvahyc4Nnm/hYcC1EBMT9s9X2Z3UEkg
-         uBWw==
-X-Forwarded-Encrypted: i=1; AJvYcCUB+JbImeyc0r/g4//l2eY5YylpI3c+bCGpBWdXCsuF6prT49jaCcS0W+31Puf627iG6vWz06rgtfA3G/fEobWYlMIekN+/Zz5pmP7jj3lKC4zyv5MFQBGOaATW245PcR3ljaqZ
-X-Gm-Message-State: AOJu0YyTHyGq3bfdzAtBrgoHuey33lv1B/9YnvHv6ApQS2f9MLoYRC3q
-	N30s3XsV7wbN2t9c6YGwO/MFgsmGEzcE4wXi7h9yjUQGnKf/nFbh
-X-Google-Smtp-Source: AGHT+IHTF5ytKfeTfWY/11zLegTWRXj/8zn7/xDF9rCiBm0rUi48SNifYniBXTiYie+T97TbF+lDew==
-X-Received: by 2002:a05:6214:242f:b0:68c:92ef:e5a9 with SMTP id gy15-20020a056214242f00b0068c92efe5a9mr1215888qvb.10.1707866124802;
-        Tue, 13 Feb 2024 15:15:24 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVpBLEv9C0l6zJIu8rdrfRO9jegJacMd+SCtFgPVMWhoSGH7PLKfZkhxa+SQK7EeZlinLu8+Rl1ikqcp5Wa0yP0AnzEZRUaI4MXDJNaOm13dsQMW30+t+E83QYKIC4IFbxNeonLJH/97F1Byy8cHCFp3Y2p/Uqt6fNjBtB3z3R9/UkHqPPZSDJiWQncnLknXrG3wmGyKnvvF7mIH2xsC4oIY7xckONGWrJszqNH01ZczUrGdAlibkmB/JW8Eo0514UMIcNPDeyyJ6l6vPSg0KxUYII2779Bf0uk2rq8RzAxM+NQVOqNVH2LeDhT8e+qAGbMhCEuLw9u7YSRO0DY14QeeXwEpY7f+oFkvkY7XFXQ21DYwokq1DuLMVxIzmxViygLRDPYQkTN6EM6rtdS/AF1G6KWX9vtpBJckVuejmt8bYU=
+        bh=7HODJpGHPgaeSYLExqKUI5k/ZPn8+GJoHxQaOjnaKjQ=;
+        b=D+SBXpF2AEmPr3rGo+UNofgcUmwHXDAlBSp+7urJnfoLC8v2wE9z3sGOL7bNckUIqh
+         Lw+L8UEj2daBi++xNmrmRC41dcbr7HCSF2Dc9qqpHC0lYT6JDOyuGqJCRmsPk4yBQR5O
+         pbyB+kJ20n11rcnq5Eqc8KDTYsnrJys8bxUKCtzJzb6EnTVn+qmKTRCcAXHEErTT8Aiq
+         8nHnk3fsZmB7TbRatL1GHX1N5e9lVhDU0CzKdH0edJfkLcfmCUr0FjfyCLG8G9ig3LLl
+         DJXMcG/ejBvTIZvut7issJEuTTqwHzXPjkrNORDCGkhVRZ5bMaN4z8UcUA4ExFIjn7Ne
+         FZOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUy1yOyJW7BNCa4FDBtQF7tTrKsVjAVoICYY1u6n/O8LNDDLvJykyOguIKI923YSrc5iv/MzsuPPGqUdo02IOtizCBKjL1XD6ODvNB/FCqxGvH561zhGZqdwEjtAHedm4iyJf8g
+X-Gm-Message-State: AOJu0Yw5tHYHIN3tekyMprs8EkX+qQhFGByfBH+EQTp0WKHhAB7y+a9u
+	V/SJM1Sv7btWTQrxptqLBTA+S5OM3KISL8XhmwTKyFZLRcg8aM2/
+X-Google-Smtp-Source: AGHT+IGVOTcqr9t7r1mJWO+GREweKk2L52pbdK1UNKT0z8V8V54h42knfmxPrIADrDhaVLlfwUZ6VA==
+X-Received: by 2002:a05:6214:27ca:b0:68e:e7dd:83dd with SMTP id ge10-20020a05621427ca00b0068ee7dd83ddmr1139874qvb.34.1707866198522;
+        Tue, 13 Feb 2024 15:16:38 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUH0iobdVJQhOrcmu0taydggb4an1mBJNJRKfSkuUb73VrynX0NGkZzEKkef1qZrwg27/uQjzFtcdKyFiV2RAWhi/7z2fj510p6ClLL8fo8470xdBpTcCUqBfpqDzVGWGI42JRNIi2i4tecYlNOY2gvbYGh8IlItlQKDTIAWAcl2dN+ZyRhywxW/+3+J7cnsQyJYJXJ0sLHjcMhrqbt3Hphz6RQdnzI88A00LdAddxUoxBoKHORspvhnM6iir9l6uNiwz8+lKZ2OHF7a1OwDWi8XJdvdZRujsE7HBDIFZN18V7ITHb/mTDM/hVhMfcJXuaFUw94tdnC8GlgPPJKOKJDIzH7I3XGDlgSR96FffLMGNeMW6sl6JPPfN/vWMeFc5hWJxAHK12X6+0koUxWf0zY5CR03pKqxurXd/7w2p4YrsY=
 Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id lx15-20020a0562145f0f00b0068ee9aeacefsm919213qvb.146.2024.02.13.15.15.22
+        by smtp.googlemail.com with ESMTPSA id lx15-20020a0562145f0f00b0068ee9aeacefsm919213qvb.146.2024.02.13.15.16.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Feb 2024 15:15:24 -0800 (PST)
-Message-ID: <1e1bb7c0-0b83-49dd-a8fb-e5ba172e35c7@gmail.com>
-Date: Tue, 13 Feb 2024 15:15:21 -0800
+        Tue, 13 Feb 2024 15:16:37 -0800 (PST)
+Message-ID: <b3b50731-a364-425b-a0aa-c68c9f0f272a@gmail.com>
+Date: Tue, 13 Feb 2024 15:16:36 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,32 +77,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 14/15] net: dsa: Define max num of bridges in
- tag8021q implementation
+Subject: Re: [PATCH net-next v4 01/15] net: dsa: vsc73xx: use
+ read_poll_timeout instead delay loop
 Content-Language: en-US
 To: Pawel Dembicki <paweldembicki@gmail.com>, netdev@vger.kernel.org
-Cc: linus.walleij@linaro.org, Vladimir Oltean <olteanv@gmail.com>,
- Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Claudiu Manoil <claudiu.manoil@nxp.com>,
+Cc: linus.walleij@linaro.org, Russell King <linux@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Claudiu Manoil <claudiu.manoil@nxp.com>,
  Alexandre Belloni <alexandre.belloni@bootlin.com>,
- UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
- linux-kernel@vger.kernel.org
+ UNGLinuxDriver@microchip.com, linux-kernel@vger.kernel.org
 References: <20240213220331.239031-1-paweldembicki@gmail.com>
- <20240213220331.239031-15-paweldembicki@gmail.com>
+ <20240213220331.239031-2-paweldembicki@gmail.com>
 From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20240213220331.239031-15-paweldembicki@gmail.com>
+In-Reply-To: <20240213220331.239031-2-paweldembicki@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 2/13/24 14:03, Pawel Dembicki wrote:
-> Max number of bridges in tag8021q implementation is strictly limited
-> by VBID size: 3 bits. But zero is reserved and only 7 values can be used.
+> This commit switches delay loop to read_poll_timeout macro during
+> Arbiter empty check in adjust link function.
 > 
-> This patch adds define which describe maximum possible value.
+> As Russel King suggested:
 > 
-> Suggested-by: Vladimir Oltean <olteanv@gmail.com>
+> "This [change] avoids the issue that on the last iteration, the code reads
+> the register, test it, find the condition that's being waiting for is
+> false, _then_ waits and end up printing the error message - that last
+> wait is rather useless, and as the arbiter state isn't checked after
+> waiting, it could be that we had success during the last wait."
+> 
+> It also remove one short msleep delay.
+> 
+> Suggested-by: Russell King <linux@armlinux.org.uk>
 > Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
 Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 -- 
