@@ -1,172 +1,88 @@
-Return-Path: <netdev+bounces-71414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7369485339B
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 15:52:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDDC38533B7
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 15:55:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DDE5A1F2A4A7
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:52:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F07421C2779F
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:55:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D36FA5DF02;
-	Tue, 13 Feb 2024 14:51:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 483F25A7B3;
+	Tue, 13 Feb 2024 14:54:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rLJi+XbP"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="js+XN5kI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C5B5B1F5
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 14:51:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 089BF57873;
+	Tue, 13 Feb 2024 14:54:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707835913; cv=none; b=oyHx8XvZXXRYnWwrGNuf6VJMpirNerAAFSoiDe8SxdoOVr1Tpc8ThLcfH51OsmY2VrfjQGedHoRVwDdoJ3y3dOnCWeXz7vclisClLXNNjZ3Ercs31P8UmBxxGPJRka7S1Z2xxcKUUOx4hnIgTeGuQyLyyVQm4Vo1swhifk+rWF4=
+	t=1707836071; cv=none; b=jZMhjCXDqm18DnokOqFjW0esCJyM2UEKW2oihwIBiQMqvfqlzCGyLzsox9BLtAAseI7ktplfx0/X+hMuF/x3qDsDTQfFDiasRtPu8JMNASkj4PTPWINfCY1MyvrSYSH4w/DOApYz94dy5J8bG4VTynqcCWmu55fssTd96mTXw4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707835913; c=relaxed/simple;
-	bh=RT+W1llQ2r6hGJ2t8R1MHmof1Jb0u4B+SyQ/6sc6Ooo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PWzyhIS3RVdiMGTL1G3xS+78smmr0+MkweqTWYhC6aPF4pfib/hZgXOdcz+P9OR+vjikbur7l3uo1e64HAhAz2PML6gGGDJ0qSaejxK+us3xw7pTxCuw3wf4ccfm4V4Kb37QUPLR2E3VmMlIJ4vnKQ2Uipi0l1mfoHDxQXgPXXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rLJi+XbP; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-56037115bb8so10777a12.0
-        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 06:51:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707835909; x=1708440709; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AMWDpGfDclpJH/Ggj2FwXDcO3lILA0riLoFGeoe6y8s=;
-        b=rLJi+XbPHgA+xjmPulEAK8ADas8+q4elMrkva0fxiNioZbQ9mG0V9PnDduUW3zyegK
-         kidLXmXdYDehgpmFcpCvcw4/QZiz9zW0gcw9+HHAny5O+t+DiGaU6gxbroufLZdBwT91
-         ex07EHVLL47ptjx5FUasZCPSsrDfL2oIG2d1ZNnM+wOel/QFg3A3ceBzdYk2MqiJG4HT
-         SgVS6SurZ6uPFlkojlnhaogpXvkfjMueRkuWAikclG6JIs80h5NgciWp2oR/dRoA4htM
-         1ig0s5vMt6befWsq4YDf300GHY5y+hGBuKrtTbEoQi2daUApb7FvGdQ6RRbRec+u4s/M
-         vaLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707835909; x=1708440709;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AMWDpGfDclpJH/Ggj2FwXDcO3lILA0riLoFGeoe6y8s=;
-        b=L+V/AU3EJm7jhUJyWtQjbkwid4eheggR8rzX1qZbQd+OJ0ublLapIB879xuSba4Xja
-         LUR3vm6+u4oCTfddTkLq6wJ8ZkW15a6+OBgWiAaR3C+QLQw1DR21q9O89DjuWbDQK/G8
-         gSoHzBNZLzcghIkfaBcLfbq9bTWtpiEEKiAdjMTkGYgMQeXglriymxEHiPMwTDMWijDN
-         bpPKKZsU/HrQ25y9jiIDF7ilvgiyobSCUMnLpHGodBOo797W6e4EQE2zBYZsynDQb7sA
-         V80ydPQKCWQYmbYJinjTIPFFuLhjmLUDS9aTvLq3171LLRcrnVRWtg37/M6sOsVBLp8X
-         h10w==
-X-Forwarded-Encrypted: i=1; AJvYcCV12m/5eS1HXruci/x2IlE6bU38IepQ3txxM6mNqHd+tBkxha9Ia4svIkrE861EyrQvG0hKgwfWECG+cTtJHeX6+UwQx14B
-X-Gm-Message-State: AOJu0YzETeIDDU4OZJfpaG47ZYHuAVXQrmIkYffJlzHhZpef/GK76J+I
-	bsb5OQsKOJkRnCkrLVj602ZWBXl8zmR7m9wkQexpXKz67Nm+UWCWHmc2r8YK64aL+aTZ20Q6q+2
-	WxIVrJjFtecrN8Iiv9ua6BWHuzDmUISK0l4rO
-X-Google-Smtp-Source: AGHT+IGfqYACGEjUOI7V/Rpir4fZ5TMPFFsY+2iSCEWPhBFRoQxs5ewCRgGTA1Fws5XWHQJLWgigu9RN1cYbpTwOfTE=
-X-Received: by 2002:a50:d581:0:b0:562:deb:df00 with SMTP id
- v1-20020a50d581000000b005620debdf00mr47709edi.4.1707835909232; Tue, 13 Feb
- 2024 06:51:49 -0800 (PST)
+	s=arc-20240116; t=1707836071; c=relaxed/simple;
+	bh=G4LX9kvo4BgwHGeUq7JLs9/XHpEGSlotttquVOhu24o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nsnH/kVzFjcRqgVC09THc0CZ9vLZDDk2FI7qmIzkbmp2wWyOYHpntxJjXFtlyXQVdG+/piHVfjz4etM73yfT6N7KrxL6QOaTYTzsESodd3WmcBImoVMQnCavDvs7/aFsOXscXm+Xrm7SK4tr1vcCcLaqfHp2NH1vGEX6/RkUOWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=js+XN5kI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05104C43399;
+	Tue, 13 Feb 2024 14:54:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1707836070;
+	bh=G4LX9kvo4BgwHGeUq7JLs9/XHpEGSlotttquVOhu24o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=js+XN5kIZ2oj49KFq7EeQPD3BbeGrnnYa+LVtQvb+QaepYq6jIdyLRR7/tlQIf3W2
+	 1Ij4Nqv8Ks33RuRMDmxroWfMDoOv1XgKZvCRhiDx3DeRtr6+djHMeQfUT69sVtE3nM
+	 9VNTEtTUQjJIi1kgpqzOHU1uvkIOwDX/lr2NhCM8=
+Date: Tue, 13 Feb 2024 15:54:27 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Ajay Kaher <ajay.kaher@broadcom.com>
+Cc: stable@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
+	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	alexey.makhalov@broadcom.com, vasavi.sirnapalli@broadcom.com,
+	Prathu Baronia <prathubaronia2011@gmail.com>
+Subject: Re: [PATCH v6.1.y-v4.19.y] vhost: use kzalloc() instead of kmalloc()
+ followed by memset()
+Message-ID: <2024021348-always-splendid-c1f8@gregkh>
+References: <1707110377-1483-1-git-send-email-ajay.kaher@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240203190927.19669-1-petr@tesarici.cz> <ea1567d9-ce66-45e6-8168-ac40a47d1821@roeck-us.net>
- <Zct5qJcZw0YKx54r@xhacker>
-In-Reply-To: <Zct5qJcZw0YKx54r@xhacker>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 13 Feb 2024 15:51:35 +0100
-Message-ID: <CANn89i+4tVWezqr=BYZ5AF=9EgV2EPqhdHun=u=ga32CEJ4BXQ@mail.gmail.com>
-Subject: Re: [PATCH net v3] net: stmmac: protect updates of 64-bit statistics counters
-To: Jisheng Zhang <jszhang@kernel.org>
-Cc: Guenter Roeck <linux@roeck-us.net>, Petr Tesarik <petr@tesarici.cz>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Chen-Yu Tsai <wens@csie.org>, 
-	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, 
-	"open list:STMMAC ETHERNET DRIVER" <netdev@vger.kernel.org>, 
-	"moderated list:ARM/STM32 ARCHITECTURE" <linux-stm32@st-md-mailman.stormreply.com>, 
-	"moderated list:ARM/STM32 ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>, 
-	open list <linux-kernel@vger.kernel.org>, 
-	"open list:ARM/Allwinner sunXi SoC support" <linux-sunxi@lists.linux.dev>, Marc Haber <mh+netdev@zugschlus.de>, 
-	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1707110377-1483-1-git-send-email-ajay.kaher@broadcom.com>
 
-On Tue, Feb 13, 2024 at 3:29=E2=80=AFPM Jisheng Zhang <jszhang@kernel.org> =
-wrote:
->
-> On Sun, Feb 11, 2024 at 08:30:21PM -0800, Guenter Roeck wrote:
-> > Hi,
-> >
-> > On Sat, Feb 03, 2024 at 08:09:27PM +0100, Petr Tesarik wrote:
-> > > As explained by a comment in <linux/u64_stats_sync.h>, write side of =
-struct
-> > > u64_stats_sync must ensure mutual exclusion, or one seqcount update c=
-ould
-> > > be lost on 32-bit platforms, thus blocking readers forever. Such lock=
-ups
-> > > have been observed in real world after stmmac_xmit() on one CPU raced=
- with
-> > > stmmac_napi_poll_tx() on another CPU.
-> > >
-> > > To fix the issue without introducing a new lock, split the statics in=
-to
-> > > three parts:
-> > >
-> > > 1. fields updated only under the tx queue lock,
-> > > 2. fields updated only during NAPI poll,
-> > > 3. fields updated only from interrupt context,
-> > >
-> > > Updates to fields in the first two groups are already serialized thro=
-ugh
-> > > other locks. It is sufficient to split the existing struct u64_stats_=
-sync
-> > > so that each group has its own.
-> > >
-> > > Note that tx_set_ic_bit is updated from both contexts. Split this cou=
-nter
-> > > so that each context gets its own, and calculate their sum to get the=
- total
-> > > value in stmmac_get_ethtool_stats().
-> > >
-> > > For the third group, multiple interrupts may be processed by differen=
-t CPUs
-> > > at the same time, but interrupts on the same CPU will not nest. Move =
-fields
-> > > from this group to a newly created per-cpu struct stmmac_pcpu_stats.
-> > >
-> > > Fixes: 133466c3bbe1 ("net: stmmac: use per-queue 64 bit statistics wh=
-ere necessary")
-> > > Link: https://lore.kernel.org/netdev/Za173PhviYg-1qIn@torres.zugschlu=
-s.de/t/
-> > > Cc: stable@vger.kernel.org
-> > > Signed-off-by: Petr Tesarik <petr@tesarici.cz>
-> >
-> > This patch results in a lockdep splat. Backtrace and bisect results att=
-ached.
-> >
-> > Guenter
-> >
-> > ---
-> > [   33.736728] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > [   33.736805] WARNING: inconsistent lock state
-> > [   33.736953] 6.8.0-rc4 #1 Tainted: G                 N
-> > [   33.737080] --------------------------------
-> > [   33.737155] inconsistent {HARDIRQ-ON-W} -> {IN-HARDIRQ-W} usage.
-> > [   33.737309] kworker/0:2/39 [HC1[1]:SC0[2]:HE0:SE0] takes:
-> > [   33.737459] ef792074 (&syncp->seq#2){?...}-{0:0}, at: sun8i_dwmac_dm=
-a_interrupt+0x9c/0x28c
-> > [   33.738206] {HARDIRQ-ON-W} state was registered at:
-> > [   33.738318]   lock_acquire+0x11c/0x368
-> > [   33.738431]   __u64_stats_update_begin+0x104/0x1ac
-> > [   33.738525]   stmmac_xmit+0x4d0/0xc58
->
-> interesting lockdep splat...
-> stmmac_xmit() operates on txq_stats->q_syncp, while the
-> sun8i_dwmac_dma_interrupt() operates on pcpu's priv->xstats.pcpu_stats
-> they are different syncp. so how does lockdep splat happen.
+On Mon, Feb 05, 2024 at 10:49:37AM +0530, Ajay Kaher wrote:
+> From: Prathu Baronia <prathubaronia2011@gmail.com>
+> 
+> From: Prathu Baronia <prathubaronia2011@gmail.com>
+> 
+> commit 4d8df0f5f79f747d75a7d356d9b9ea40a4e4c8a9 upstream
+> 
+> Use kzalloc() to allocate new zeroed out msg node instead of
+> memsetting a node allocated with kmalloc().
+> 
+> Signed-off-by: Prathu Baronia <prathubaronia2011@gmail.com>
+> Message-Id: <20230522085019.42914-1-prathubaronia2011@gmail.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> [Ajay: This is a security fix as per CVE-2024-0340]
 
-Right, I do not see anything obvious yet.
+And this is why I am so grumpy about Red Hat and CVEs, they know how to
+let us know about stuff like this, but no.  Hopefully, someday soon,
+they will soon not be allowed to do this anymore.
+
+{sigh}
+
+Now queued up, thanks.
+
+greg k-h
 
