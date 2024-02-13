@@ -1,258 +1,309 @@
-Return-Path: <netdev+bounces-71341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36FA685305E
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:19:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A73DF853077
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:24:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E19132830AE
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 12:19:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CB5D1F28B5D
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 12:24:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EF573A1D9;
-	Tue, 13 Feb 2024 12:19:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B0753D54D;
+	Tue, 13 Feb 2024 12:24:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="DfKr4DS0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QgVELclO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53A9039FF0
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 12:19:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C02B43AD1
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 12:24:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707826746; cv=none; b=B8Dbtur9+S/VYdqWR1dgEU5Em5CZfnbxbI7THvUg3Ivk9NiqkUdNmR/jolRu4XumIcCVCFQeul6kLBgG4h8ZtiQaQXpZkUPUycAFdIYSqXE0yYMCkB1CNSsEROuw3pVmV0NWzkD/7wydFafDAaIgvOvRKKt4SOk3Fp8nBELdGeg=
+	t=1707827067; cv=none; b=d++NKhhamxDiRjrU0ZT+mKe6zPzUELoOwCnvv9frmDpQV1nt8V5Hcz3DvYhOjJkNnty0ckZF4is/H8hv+fbCZDRsRYr5K+O4sCSuOvGLVmccefmFItLaBMnbO2wJ/ag4n9/FVfzgUwJg8nNUdquNr7LuqatOiysb/M1uL/JkPpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707826746; c=relaxed/simple;
-	bh=DnEgj+4QsSIxzM9Bds8y9D4aNVs2bq4iITcZsRg9LWE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nJ8O+rzM3s+IU14ERvOioBdk8pkxkZSko0vh/hYdy7GcQJgQd2JIpGfX2MyJ1gD7AY1NyvNQo5aW/EL+vmlsnYfPkT2FMJvm7m/ezNEyf/nvANznefPQ5rIRqnwGWkmb+xflAgI+0DD5TcdR3AjnOYPMSWR9gUTURhvfJgnk/3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=DfKr4DS0; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-33b65b2e43eso3012888f8f.1
-        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 04:19:04 -0800 (PST)
+	s=arc-20240116; t=1707827067; c=relaxed/simple;
+	bh=gMjcVfvFqkhk+9MZYM6JIe8vGqmGK1MFNHV+HcU1mE4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=E5su7+wA1J92W4eAP7d6pHTnNItvmiuxF9YN6MjiOdLGJNs2NJAeYW88Fg5zdZIcz1WUaH2QgfePSrr8nF2sRR1y2pNd8HJHByJy+LGL8/YWGO57ixiUF41a/7BGZvJe8aVjeRidr9CvHdSgmvJXAupR6Qs8MQ68GWjBvOESMvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QgVELclO; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-561f0f116ecso8191a12.0
+        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 04:24:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1707826742; x=1708431542; darn=vger.kernel.org;
-        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xGuwSJamm5SWlryCsObNHTVC4Tsf5ALqzgzdD2W7xPs=;
-        b=DfKr4DS0zSo7kkl8ZiLtXuvRz7WbABbZbIrLLYB1LzFA5nvfwPtu2msqBcMeecPTa0
-         J7OCHSoOo9g+9MFDs+SujaPz4G4ll3dMc7Ao3cluohBWfPldPOV1UfKph0JEm3GR7XgH
-         suVuhFgwNzu/kAHuH4s5Pe4CLXovOSAjppMX0=
+        d=google.com; s=20230601; t=1707827063; x=1708431863; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8ST4HsRTSQGGHe/8wtHnxbc4k3ENKew4mrzP3O6ekKg=;
+        b=QgVELclO+s9ScvVS+CkNKQDmPJ4gv2Dj9ZtmFH8N3qoD49OFHx18VsGSWBZfgBr2c/
+         oxJrLtCyHD7IRVwwot053fD6aZN6vSv9btUS7jSXm8T0tF+gTSSxVq93jjnxcjzTjvHJ
+         K9Z/1bOKEtfQnVmiagNrhpsvDeqAMr8mCJ30fhvhJxSRtPIL/JhD1PFY7wIY8PpgrqIr
+         SZmG+bkk1l0kvDahvWDQhiB76ckFrJURq75VZLI22Pxt+Zd3jObAU7OmwVc7vOzRdEed
+         R+vmfduWe8KQNyyDgNm86PBa2s/INNA4PE5/IV1Nkolv2F6VrgQYmj9ilJqq6Xm8Pybb
+         mWFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707826742; x=1708431542;
-        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=xGuwSJamm5SWlryCsObNHTVC4Tsf5ALqzgzdD2W7xPs=;
-        b=kPFJDo5vyU5MMWnSD+0s4/SXTb2sXvcQpn92k3VYyRBYyiCa0FEJLjPqCPQj0StLT4
-         ZFHPpiltsDtVbTCjSXbqTQPfWu9aersOHJlTuaMBmDHUvnryMt2OWKPpBTQwyDHcTHju
-         hHbYfzCYfNRZnlz9Jd6W7OMQ3TXJGm/n+1VmWlq9BwkxGg/H20sklLg+fKOt952dWj/9
-         Xaot3rX77qcKMe9mlzDmcLHYdKR7C8Jnz1ygOXBcEwrZnVZp4x91vITsBUnvI2sfXW4L
-         vl6ZfP/U+zMQUJg5k1ea4FjCLwZ3hYstBrRGr9+P8a3UJHQ02gb7YaENBhfhLq1UO6uT
-         RqUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV693CYn+LvmCvGXptKczr5b7oP0VtEw5Ctr+u6jvHck1Mp1DAUmB2x7V+L46Wpi+mshrLS9o/VxE4xbW5N98tVGVVN2VQN
-X-Gm-Message-State: AOJu0YxUc+vCjN28RYpbIgmLvhu68eR4JkZnZQM7w83EoaZCl9076inY
-	UKW3Vgvsagd3qadecfTHRHRvcMo0viOxFa6j+OvUpwfcPuJB5OdM2vkZsumM6A==
-X-Google-Smtp-Source: AGHT+IG0fqIUc5MSoih/uQEop5V9Eu20KD/+U5x3/ryEugDXC2l7auMTpIBPrRr04vuF6K1gpQW0DA==
-X-Received: by 2002:adf:a29c:0:b0:33c:d15a:e209 with SMTP id s28-20020adfa29c000000b0033cd15ae209mr1161673wra.12.1707826742514;
-        Tue, 13 Feb 2024 04:19:02 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVvI6EbpOqQe/nrHoLYT3J5CHI9xCwg/DevxP3kaTqjuA+6v9/BI9hrIW2SF3fnAlT9+hO0HOMBXv/OcGjHnLtlp+0epnk9qRjQVuRnZiaDRWuaVBxsjNKSLacjZ2hyjBmNqkSenHlseVg8mPVbRjCUoNHfftAJNA7rShdCkqw8m7q2w8U2J9iEnszDuMYmN3k/UkDbgbtRnWI4xy9I5gSCgw==
-Received: from [10.176.68.61] ([192.19.148.250])
-        by smtp.gmail.com with ESMTPSA id k23-20020a5d5257000000b0033b444a39a9sm9376610wrc.54.2024.02.13.04.19.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Feb 2024 04:19:01 -0800 (PST)
-Message-ID: <6eaab8fa-f62e-4f78-9cbe-9b13e3d77ca7@broadcom.com>
-Date: Tue, 13 Feb 2024 13:19:01 +0100
+        d=1e100.net; s=20230601; t=1707827063; x=1708431863;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8ST4HsRTSQGGHe/8wtHnxbc4k3ENKew4mrzP3O6ekKg=;
+        b=VcGO7cq7bMxyf21cLEUk37obkBMbDZFG/DEug2kmOJ+Fc0bj2fbgPHqs3+SKqAG1xg
+         va8GDMDe79iyeXzIipKXkj356U2k31RfmS5z2G2hAbDQYr69AR9LRO0s18djvb1lB/5Q
+         FiPzBEHi2F5E1CUCDNm97sJp1e9V8jN1ME9OprNgrzPTkuCIpJ1V5Hab8f9uOR+CmoRn
+         dzpjTVKIMtrOdfWgAMR8dvXjxq2LZ+By4hQlyKUUrDCYekn3cfSe+uvMknFAonaYKMbf
+         Q89LRKCzmT2NEM5dPpTNLdW8lB/zxD/FIs+saPUZUk/AGBdp8Lq8an1H15djkCj0wmFI
+         Hglg==
+X-Forwarded-Encrypted: i=1; AJvYcCWIvUojHK6gXZwaOyNk4aFP77LCe7GVyT2GaxKCK9wtu75sYqPK1+EAaXqwJoFwGSbT12UuFwRFDTJFQRvWkigKueYGiBmf
+X-Gm-Message-State: AOJu0YxcAgOVMRx1/t593DMoiRGDrWJOBtKp9sLGTrdntDNa3uQZBrC8
+	pYriTH+1zFI7BxOygtsP+RiimaygfBDkmd9IenT2/MzQslsLzvpPma1GimPqeiZrbgms6dDauju
+	W9v3sfpdkD/fSnZF6TC9lDZsx03vE/mP2A1VO2YDgmtWFrUmhGOG4
+X-Google-Smtp-Source: AGHT+IEEk8i34t4IIaHLuADvQ6bIc/V6sdm5SSDqjOv43NGGebnZi+E8L5kbdmjHcuwBKxGpErfGRmA1rqvH2M0Rh3c=
+X-Received: by 2002:a50:cc96:0:b0:560:ea86:4d28 with SMTP id
+ q22-20020a50cc96000000b00560ea864d28mr140644edi.4.1707827062901; Tue, 13 Feb
+ 2024 04:24:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/1] wifi: nl80211: Add support for plumbing SAE groups to
- driver
-To: Johannes Berg <johannes@sipsolutions.net>, Kalle Valo <kvalo@kernel.org>,
- Vinayak Yadawad <vinayak.yadawad@broadcom.com>
-Cc: linux-wireless@vger.kernel.org, jithu.jance@broadcom.com,
- netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
-References: <309965e8ef4d220053ca7e6bd34393f892ea1bb8.1707486287.git.vinayak.yadawad@broadcom.com>
- <87mss6f8jh.fsf@kernel.org>
- <2c38eaed47808a076b6986412f92bb955b0599c3.camel@sipsolutions.net>
- <b4d44fb5-78e5-4408-a108-2c3d340b090e@broadcom.com>
- <b00c3b53cd740e998163f84511ee05dc3051ce8b.camel@sipsolutions.net>
- <df8f02b1-25b0-4dae-a935-cee9ba7f3dc4@broadcom.com>
- <0cb1d7ef63ad1ea1ff4109d85a6bcdcaca16f1c8.camel@sipsolutions.net>
-From: Arend van Spriel <arend.vanspriel@broadcom.com>
-Autocrypt: addr=arend.vanspriel@broadcom.com; keydata=
- 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
-In-Reply-To: <0cb1d7ef63ad1ea1ff4109d85a6bcdcaca16f1c8.camel@sipsolutions.net>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000586fcf0611426683"
+References: <20240209221233.3150253-1-jmaloy@redhat.com> <8d77d8a4e6a37e80aa46cd8df98de84714c384a5.camel@redhat.com>
+In-Reply-To: <8d77d8a4e6a37e80aa46cd8df98de84714c384a5.camel@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 13 Feb 2024 13:24:09 +0100
+Message-ID: <CANn89iJW=nEzVjqxzPht20dUnfqxWGXMO2_EpKUV4JHawBRxfw@mail.gmail.com>
+Subject: Re: [PATCH v3] tcp: add support for SO_PEEK_OFF
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: kuba@kernel.org, passt-dev@passt.top, sbrivio@redhat.com, 
+	lvivier@redhat.com, dgibson@redhat.com, jmaloy@redhat.com, 
+	netdev@vger.kernel.org, davem@davemloft.net
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---000000000000586fcf0611426683
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+On Tue, Feb 13, 2024 at 11:49=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
+>
+> Oops,
+>
+> I just noticed Eric is missing from the recipients list, adding him
+> now.
+>
 
-On 2/13/2024 12:45 PM, Johannes Berg wrote:
-> On Tue, 2024-02-13 at 12:13 +0100, Arend van Spriel wrote:
->>
->> I recall the rule was that nl80211 API changes
->> should also have at least one driver implementing it. Guess we let that
->> slip a couple of times. I fully agree enforcing this.
-> 
-> Well, enforcing it strictly never really worked all that well in
-> practice, since you don't necessarily want to have a complex driver
-> implementation while hashing out the API, and the API fundamentally has
-> to come first.
-> 
-> So in a sense it comes down to trust, and that people will actually
-> follow up with implementations. And yeah, plans can change and you end
-> up not really supporting everything that was defined ... that's life, I
-> guess.
-> 
-> But the mode here seems to be that there's not even any _intent_ to do
-> that?
-> 
-> I guess we could hash out the API, review the patches, and then _not_
-> apply them until a driver is ready? So the first round of reviews would
-> still come with API only, but once that settles we don't actually merge
-> it immediately, unlike normally where we merge a patch we've reviewed?
-> And then if whoever did it lost interest, we already have a reviewed
-> version for anyone else who might need it?
+Hmmm thanks.
 
-Sounds like a plan. Maybe they can get a separate state in patchwork and 
-let them sit there for grabs.
+> On Fri, 2024-02-09 at 17:12 -0500, jmaloy@redhat.com wrote:
+> > From: Jon Maloy <jmaloy@redhat.com>
+> >
+> > When reading received messages from a socket with MSG_PEEK, we may want
+> > to read the contents with an offset, like we can do with pread/preadv()
+> > when reading files. Currently, it is not possible to do that.
+> >
+> > In this commit, we add support for the SO_PEEK_OFF socket option for TC=
+P,
+> > in a similar way it is done for Unix Domain sockets.
+> >
+> > In the iperf3 log examples shown below, we can observe a throughput
+> > improvement of 15-20 % in the direction host->namespace when using the
+> > protocol splicer 'pasta' (https://passt.top).
+> > This is a consistent result.
+> >
+> > pasta(1) and passt(1) implement user-mode networking for network
+> > namespaces (containers) and virtual machines by means of a translation
+> > layer between Layer-2 network interface and native Layer-4 sockets
+> > (TCP, UDP, ICMP/ICMPv6 echo).
+> >
+> > Received, pending TCP data to the container/guest is kept in kernel
+> > buffers until acknowledged, so the tool routinely needs to fetch new
+> > data from socket, skipping data that was already sent.
+> >
+> > At the moment this is implemented using a dummy buffer passed to
+> > recvmsg(). With this change, we don't need a dummy buffer and the
+> > related buffer copy (copy_to_user()) anymore.
+> >
+> > passt and pasta are supported in KubeVirt and libvirt/qemu.
+> >
+> > jmaloy@freyr:~/passt$ perf record -g ./pasta --config-net -f
+> > SO_PEEK_OFF not supported by kernel.
+> >
+> > jmaloy@freyr:~/passt# iperf3 -s
+> > -----------------------------------------------------------
+> > Server listening on 5201 (test #1)
+> > -----------------------------------------------------------
+> > Accepted connection from 192.168.122.1, port 44822
+> > [  5] local 192.168.122.180 port 5201 connected to 192.168.122.1 port 4=
+4832
+> > [ ID] Interval           Transfer     Bitrate
+> > [  5]   0.00-1.00   sec  1.02 GBytes  8.78 Gbits/sec
+> > [  5]   1.00-2.00   sec  1.06 GBytes  9.08 Gbits/sec
+> > [  5]   2.00-3.00   sec  1.07 GBytes  9.15 Gbits/sec
+> > [  5]   3.00-4.00   sec  1.10 GBytes  9.46 Gbits/sec
+> > [  5]   4.00-5.00   sec  1.03 GBytes  8.85 Gbits/sec
+> > [  5]   5.00-6.00   sec  1.10 GBytes  9.44 Gbits/sec
+> > [  5]   6.00-7.00   sec  1.11 GBytes  9.56 Gbits/sec
+> > [  5]   7.00-8.00   sec  1.07 GBytes  9.20 Gbits/sec
+> > [  5]   8.00-9.00   sec   667 MBytes  5.59 Gbits/sec
+> > [  5]   9.00-10.00  sec  1.03 GBytes  8.83 Gbits/sec
+> > [  5]  10.00-10.04  sec  30.1 MBytes  6.36 Gbits/sec
+> > - - - - - - - - - - - - - - - - - - - - - - - - -
+> > [ ID] Interval           Transfer     Bitrate
+> > [  5]   0.00-10.04  sec  10.3 GBytes  8.78 Gbits/sec   receiver
+> > -----------------------------------------------------------
+> > Server listening on 5201 (test #2)
+> > -----------------------------------------------------------
+> > ^Ciperf3: interrupt - the server has terminated
+> > jmaloy@freyr:~/passt#
+> > logout
+> > [ perf record: Woken up 23 times to write data ]
+> > [ perf record: Captured and wrote 5.696 MB perf.data (35580 samples) ]
+> > jmaloy@freyr:~/passt$
+> >
+> > jmaloy@freyr:~/passt$ perf record -g ./pasta --config-net -f
+> > SO_PEEK_OFF supported by kernel.
+> >
+> > jmaloy@freyr:~/passt# iperf3 -s
+> > -----------------------------------------------------------
+> > Server listening on 5201 (test #1)
+> > -----------------------------------------------------------
+> > Accepted connection from 192.168.122.1, port 52084
+> > [  5] local 192.168.122.180 port 5201 connected to 192.168.122.1 port 5=
+2098
+> > [ ID] Interval           Transfer     Bitrate
+> > [  5]   0.00-1.00   sec  1.32 GBytes  11.3 Gbits/sec
+> > [  5]   1.00-2.00   sec  1.19 GBytes  10.2 Gbits/sec
+> > [  5]   2.00-3.00   sec  1.26 GBytes  10.8 Gbits/sec
+> > [  5]   3.00-4.00   sec  1.36 GBytes  11.7 Gbits/sec
+> > [  5]   4.00-5.00   sec  1.33 GBytes  11.4 Gbits/sec
+> > [  5]   5.00-6.00   sec  1.21 GBytes  10.4 Gbits/sec
+> > [  5]   6.00-7.00   sec  1.31 GBytes  11.2 Gbits/sec
+> > [  5]   7.00-8.00   sec  1.25 GBytes  10.7 Gbits/sec
+> > [  5]   8.00-9.00   sec  1.33 GBytes  11.5 Gbits/sec
+> > [  5]   9.00-10.00  sec  1.24 GBytes  10.7 Gbits/sec
+> > [  5]  10.00-10.04  sec  56.0 MBytes  12.1 Gbits/sec
+> > - - - - - - - - - - - - - - - - - - - - - - - - -
+> > [ ID] Interval           Transfer     Bitrate
+> > [  5]   0.00-10.04  sec  12.9 GBytes  11.0 Gbits/sec  receiver
+> > -----------------------------------------------------------
+> > Server listening on 5201 (test #2)
+> > -----------------------------------------------------------
+> > ^Ciperf3: interrupt - the server has terminated
+> > logout
+> > [ perf record: Woken up 20 times to write data ]
+> > [ perf record: Captured and wrote 5.040 MB perf.data (33411 samples) ]
+> > jmaloy@freyr:~/passt$
+> >
+> > The perf record confirms this result. Below, we can observe that the
+> > CPU spends significantly less time in the function ____sys_recvmsg()
+> > when we have offset support.
+> >
+> > Without offset support:
+> > ----------------------
+> > jmaloy@freyr:~/passt$ perf report -q --symbol-filter=3Ddo_syscall_64 \
+> >                        -p ____sys_recvmsg -x --stdio -i  perf.data | he=
+ad -1
+> > 46.32%     0.00%  passt.avx2  [kernel.vmlinux]  [k] do_syscall_64  ____=
+sys_recvmsg
+> >
+> > With offset support:
+> > ----------------------
+> > jmaloy@freyr:~/passt$ perf report -q --symbol-filter=3Ddo_syscall_64 \
+> >                        -p ____sys_recvmsg -x --stdio -i  perf.data | he=
+ad -1
+> > 28.12%     0.00%  passt.avx2  [kernel.vmlinux]  [k] do_syscall_64  ____=
+sys_recvmsg
+> >
+> > Suggested-by: Paolo Abeni <pabeni@redhat.com>
+> > Signed-off-by: Jon Maloy <jmaloy@redhat.com>
+> >
+> > ---
+> > v3: - Applied changes suggested by Stefano Brivio and Paolo Abeni
+> > ---
+> >  net/ipv4/af_inet.c |  1 +
+> >  net/ipv4/tcp.c     | 16 ++++++++++------
+> >  2 files changed, 11 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+> > index 4e635dd3d3c8..5f0e5d10c416 100644
+> > --- a/net/ipv4/af_inet.c
+> > +++ b/net/ipv4/af_inet.c
+> > @@ -1071,6 +1071,7 @@ const struct proto_ops inet_stream_ops =3D {
+> >  #endif
+> >       .splice_eof        =3D inet_splice_eof,
+> >       .splice_read       =3D tcp_splice_read,
+> > +     .set_peek_off      =3D sk_set_peek_off,
+> >       .read_sock         =3D tcp_read_sock,
+> >       .read_skb          =3D tcp_read_skb,
+> >       .sendmsg_locked    =3D tcp_sendmsg_locked,
+> > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> > index 7e2481b9eae1..1c8cab14a32c 100644
+> > --- a/net/ipv4/tcp.c
+> > +++ b/net/ipv4/tcp.c
+> > @@ -1415,8 +1415,6 @@ static int tcp_peek_sndq(struct sock *sk, struct =
+msghdr *msg, int len)
+> >       struct sk_buff *skb;
+> >       int copied =3D 0, err =3D 0;
+> >
+> > -     /* XXX -- need to support SO_PEEK_OFF */
+> > -
+> >       skb_rbtree_walk(skb, &sk->tcp_rtx_queue) {
+> >               err =3D skb_copy_datagram_msg(skb, 0, msg, skb->len);
+> >               if (err)
+> > @@ -2327,6 +2325,7 @@ static int tcp_recvmsg_locked(struct sock *sk, st=
+ruct msghdr *msg, size_t len,
+> >       int target;             /* Read at least this many bytes */
+> >       long timeo;
+> >       struct sk_buff *skb, *last;
+> > +     u32 peek_offset =3D 0;
+> >       u32 urg_hole =3D 0;
+> >
+> >       err =3D -ENOTCONN;
+> > @@ -2360,7 +2359,8 @@ static int tcp_recvmsg_locked(struct sock *sk, st=
+ruct msghdr *msg, size_t len,
+> >
+> >       seq =3D &tp->copied_seq;
+> >       if (flags & MSG_PEEK) {
+> > -             peek_seq =3D tp->copied_seq;
+> > +             peek_offset =3D max(sk_peek_offset(sk, flags), 0);
+> > +             peek_seq =3D tp->copied_seq + peek_offset;
+> >               seq =3D &peek_seq;
+> >       }
+> >
+> > @@ -2463,11 +2463,11 @@ static int tcp_recvmsg_locked(struct sock *sk, =
+struct msghdr *msg, size_t len,
+> >               }
+> >
+> >               if ((flags & MSG_PEEK) &&
+> > -                 (peek_seq - copied - urg_hole !=3D tp->copied_seq)) {
+> > +                 (peek_seq - peek_offset - copied - urg_hole !=3D tp->=
+copied_seq)) {
+> >                       net_dbg_ratelimited("TCP(%s:%d): Application bug,=
+ race in MSG_PEEK\n",
+> >                                           current->comm,
+> >                                           task_pid_nr(current));
+> > -                     peek_seq =3D tp->copied_seq;
+> > +                     peek_seq =3D tp->copied_seq + peek_offset;
+> >               }
+> >               continue;
+> >
+> > @@ -2508,7 +2508,10 @@ static int tcp_recvmsg_locked(struct sock *sk, s=
+truct msghdr *msg, size_t len,
+> >               WRITE_ONCE(*seq, *seq + used);
+> >               copied +=3D used;
+> >               len -=3D used;
+> > -
+> > +             if (flags & MSG_PEEK)
+> > +                     sk_peek_offset_fwd(sk, used);
+> > +             else
+> > +                     sk_peek_offset_bwd(sk, used);
 
-Gr. AvS
+Yet another cache miss in TCP fast path...
 
+We need to move sk_peek_off in a better location before we accept this patc=
+h.
 
---000000000000586fcf0611426683
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-2Gzj3QNJRLsZu1TLyOyBBIr/BE7UiY3RabgRzknBGAPmzhS+fmyM8OtM5BYBsFBrSUFtZZO2p/tf
-Nbc24J2zf2peoZ8MK+7WQqummYlOnz+FyDkA9EybeNMcS5C+xi/PAgMBAAGjggHdMIIB2TAOBgNV
-HQ8BAf8EBAMCBaAwgaMGCCsGAQUFBwEBBIGWMIGTME4GCCsGAQUFBzAChkJodHRwOi8vc2VjdXJl
-Lmdsb2JhbHNpZ24uY29tL2NhY2VydC9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcnQwQQYI
-KwYBBQUHMAGGNWh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24y
-Y2EyMDIwME0GA1UdIARGMEQwQgYKKwYBBAGgMgEoCjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3
-dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAJBgNVHRMEAjAAMEkGA1UdHwRCMEAwPqA8oDqG
-OGh0dHA6Ly9jcmwuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3Js
-MCcGA1UdEQQgMB6BHGFyZW5kLnZhbnNwcmllbEBicm9hZGNvbS5jb20wEwYDVR0lBAwwCgYIKwYB
-BQUHAwQwHwYDVR0jBBgwFoAUljPR5lgXWzR1ioFWZNW+SN6hj88wHQYDVR0OBBYEFIikAXd8CEtv
-ZbDflDRnf3tuStPuMA0GCSqGSIb3DQEBCwUAA4IBAQCdS5XCYx6k2GGZui9DlFsFm75khkqAU7rT
-zBX04sJU1+B1wtgmWTVIzW7ugdtDZ4gzaV0S9xRhpDErjJaltxPbCylb1DEsLj+AIvBR34caW6ZG
-sQk444t0HPb29HnWYj+OllIGMbdJWr0/P95ZrKk2bP24ub3ZP/8SyzrohfIba9WZKMq6g2nTLZE3
-BtkeSGJx/8dy0h8YmRn+adOrxKXHxhSL8BNn8wsmIZyYWe6fRcBtO3Ks2DOLyHCdkoFlN8x9VUQF
-N2ulEgqCbRKkx+qNirW86eF138lr1gRxzclu/38ko//MmkAYR/+hP3WnBll7zbpIt0jc9wyFkSqH
-p8a1MYICbTCCAmkCAQEwazBbMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1z
-YTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMgUGVyc29uYWxTaWduIDIgQ0EgMjAyMAIMTv1t
-bpIzNUky46LXMA0GCWCGSAFlAwQCAQUAoIHUMC8GCSqGSIb3DQEJBDEiBCALciRC5Jd3+CStJN5w
-bYdU7ydWXqk9Lz/IifGqDfWHoDAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJ
-BTEPFw0yNDAyMTMxMjE5MDJaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZIAWUDBAEqMAsGCWCGSAFl
-AwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEKMAsGCSqGSIb3DQEBBzAL
-BglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEAsJsNAkdy52DEv0kmiVVcrHDJx1kKgS7ihvYj
-91FYMpvKKzrpZ4QFw4eiaL633isseBylo50Gyp+TpkHgLe56zpwdnn+8hMNkniB/Di1NcLIp+k6J
-LUUVVBvX/f8FV4aNGSNG2aGA+Er3glcfydFZMXGoM+ea3ANbqDnTYRADUCJfdK74nsyY/Z69ASyN
-HYu7T2UDRGInfQ6iIhVyRxl+q1UfM8ZRK2Gmdfdw990FePJVqImer9QmmuYYCt7B7xhDf9LIHb3a
-K4eWxLSGn6Z51KmpCo/6y82QmoH4fh91vozcW/6wjzS8EcKY+5EzkjKLejrQ6GT/M0G+9oAdNi+M
-rg==
---000000000000586fcf0611426683--
+I always thought MSK_PEEK was very inefficient, I am surprised we
+allow arbitrary loops in recvmsg().
 
