@@ -1,86 +1,90 @@
-Return-Path: <netdev+bounces-71377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECD9B85320D
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:36:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71A5985321B
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:41:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 61FA51F2233E
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:36:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 277C31F2449D
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:41:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BFF855E70;
-	Tue, 13 Feb 2024 13:36:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 012EA56472;
+	Tue, 13 Feb 2024 13:41:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lm8ofKR8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cbhlq75Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D930655E72;
-	Tue, 13 Feb 2024 13:36:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA82856444
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 13:41:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707831378; cv=none; b=W/afvOOPro2NkPLZx+WyQ/vb+AB+JZMtTBlJCUl9nUO5BV8BF7pfuEenkTwjiayAuTec8jpEmZAgTZ0jBPwuVYeEteUNbNU8VI303qFc9YMJIjl8y4ETe1Dk7nsvFJ+JVmFaVPANJH7cEnDgSOTEmwXai+Sux+eVgsEYVFWQ41A=
+	t=1707831673; cv=none; b=ZzHqI5vTkyCGwvjEwziey4fTk+SCBQXnnf1z1tOOHFAvdAWeNmPxxpSG+L+4ZnwqR71fqXzfDS3/g6baQ0fx44lguGtwejLMnDZ5CVPKA8Baxv/q+IZq4T4QWC8dcvF5lbigAIjmRtEZ8VpGpoWkJGhPv2Dm5159rXdEJlNPlHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707831378; c=relaxed/simple;
-	bh=N7AhYS5taaTtOuBRIyerdZXvQWosZFwf8q7uYgacElI=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=RHrKgT9mQX4roGXYG3VHW7aYyRvvg7K4RAAjS29m93eSDblupvGvlR3V7k3tbSkJtyarZxOJM1U8EMAgL3iztX5sltY24mL9D7MIYAWNxYvj97Sk+mnsm2p6GQB2USUgOonzRPnMCesR2n24zslRrNuf1FZ6ZXHYiOJJtrJCCm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lm8ofKR8; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-33cda3dfa06so348933f8f.3;
-        Tue, 13 Feb 2024 05:36:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707831375; x=1708436175; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bZoOHtmLd6o0i6RGJTyIj/F81E7ZeV30E7USouHRFOA=;
-        b=Lm8ofKR8DCghOjYzKxn32thFCum9tURmnkRa/CrS54a49BUmaM+s3JpsccknXwYThU
-         qj3XQt4cPqLJlAJ7oZ4Ribhyf7FoWCAR1ox4PrqHUEuiIhxvzL9RcwNG7g57VmcgDX8N
-         P9hPn4ACa1q0aI9Z6MKGl59DjUZmktriK7RjlDURG27BFFHQj9RWncMmAJcYnF40w5tQ
-         uDrJ+tWFQ7tui596G3/YnDkKK1CF7s4Vb8ZH0vljJRFkUdWvcIQnJmh1BZFrKEvthiTb
-         00Tvt9D2mUoDDVe77fUqJJCqGxz0nEeGJafS7xCuqEw0SIw1yelUfRWY+gGKb6b+ruVI
-         TUQA==
+	s=arc-20240116; t=1707831673; c=relaxed/simple;
+	bh=vKmLuetPiqwNK/NvBA+xm8qgL06cnvFOrzu8BOu3TPA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rWuAXn7k6C516DYBVxhbyJ6fTP+VXCs+JogVjg9Vfoi09t0sSxmHCzHto/Zepn6kXUsTfHmv5JlioMZWnY8iF1sqO0DtHMIOepVVE6G7hN5SF8xdYXmosND2K7vzj4sZZQ7xOnMo16OIXHv0jMZhs0pMXTb7b6+SGnbCUBP1SUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cbhlq75Z; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707831670;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=sM9EeqHVbPE97OjydZplmGb04tZWIE1q6qjGihVxaso=;
+	b=cbhlq75ZthGaABpO+G0qNau7wArEHpjqWwpgPDuOXRIoKje5aPRvxNYLWi1NsXq/avwN1r
+	W4PDDfyT4HEzBNHb6tannJOMex/Wu5t8isxEOcVJZTzYzvg0OGlZHqC3rg/ThgKKL/6v0E
+	Vd0+PAcnGFhypmu87p6/3YopIEDNroI=
+Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
+ [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-184-6SgUwBfgN4--lpHLX_TK9A-1; Tue, 13 Feb 2024 08:41:07 -0500
+X-MC-Unique: 6SgUwBfgN4--lpHLX_TK9A-1
+Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-6e0e62e5d41so2480341b3a.2
+        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 05:41:07 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707831375; x=1708436175;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bZoOHtmLd6o0i6RGJTyIj/F81E7ZeV30E7USouHRFOA=;
-        b=rk1fic2PJ7t1cSpYNNPp9VmcE/OqqUHLzw2anMocIIm3wHAlu2dXdCRt/v9ONF5St2
-         bhLI/8+uVXmtV83DyNZ+QDOUlM1kBNJeMXRM1ghFH/iZVMramuiCBpLEWQxATwtrFXyd
-         XXvfyNDC3MqEOl86Gl8s5fUFzC5F67t92A0n7pAdq14iBTh/OzeyWLWgF9QZuLeHTaJU
-         xW1r9SFpg1etnGk1/xHdmyRUTfWJOyCren5ILVsHAhwANFl1n2UDlfMxs+R6Jf9iCuQS
-         MqvyDvgUU9vGxD01vuQS7e8gwr8W4VDRwmHsL3xQpHd4O13C+fGThJf49yqo8/EBw3O8
-         EGhw==
-X-Forwarded-Encrypted: i=1; AJvYcCXK/NtmtuQdVGec6vKy4oftMqEJG1RKMd60UqgdAmEwPQHN3lfyLxDCMlkl4H3DM+yOIaillW9wiJDQl0e0dtzchbbZEibvLzfy2jhr+mBWEbsJua9Ju51/3cx/wC+CRAfi9R5j
-X-Gm-Message-State: AOJu0YxKe9V0jMId1WCuWmEuQuuBhUTBRrHcnWtYEsZvLOtu+xoYYqe8
-	Cq1NBYlCu2hPD3roaToXnib21ppc4pi/hoHc9v4gmSyZZa2Lsw8k
-X-Google-Smtp-Source: AGHT+IEbI8thEeTyTjfM7ZsCH6ZdR/CnHnkQtyVVo5VSV/x5I987v57cuFq1da8kssS5xKs0QIuCMQ==
-X-Received: by 2002:adf:f1cf:0:b0:33b:4f82:8440 with SMTP id z15-20020adff1cf000000b0033b4f828440mr7581339wro.49.1707831374843;
-        Tue, 13 Feb 2024 05:36:14 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUIIccKV27JVuqfSL+/yDbDH9vX1qyMoUvaeAgR5AJLB3QuTQ/lMwhiVNqlYFLUTosmgyLebjSU5rFDpWkFl1fLljBJ5jCVRCKZ7plTVTphffpIGXQ/A1Csj08JXKzc0R7Mm7cFkcAM6fQprApZYDTCMWI/hjswyRoOFEjtHQXPuPZC33uTRPt5is9MQWyNRzUXKUbscp7WkbwKLEo5DWqFGDhshgABn3ZEo5IfZb75UxWDrzEsQ+jp1bwprTaZmXoHTsCj1IdPRPc5HMyTrv6YE+7QYSsYcI2zvYUEZFTWzqtbNQoiAQoVxmDEv25J72NJfuAOUnYTG0Ne0Io311fnJHxwLloRuPN6BNdiPbdnEn5vzFrtA0DgeguVmhW/s3TbiliNlXE=
-Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.googlemail.com with ESMTPSA id cl3-20020a5d5f03000000b0033b7ce8b496sm7076813wrb.108.2024.02.13.05.36.13
+        d=1e100.net; s=20230601; t=1707831666; x=1708436466;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sM9EeqHVbPE97OjydZplmGb04tZWIE1q6qjGihVxaso=;
+        b=UGcMIAUvrgVHoaelyxVv8p+Ve2GGXmiQb5AAJKWq8MlqHoLV/QyQYndm241saac2Tn
+         Puv+ds8LrkpfThLyP0zvPb8m90z5/5OpguAFIy8bRMgr/vOOFi86zueFmVDidHAf5A7Q
+         /TQnQkn6o0iMBcaypbwPrYiVyAIrqBtSFEYaYeRcd/W5+pxwWfZsqGqeuoYY2QPal9Pl
+         CjaO4UWQYNRvV0QDqCbwwvFa9/FUIfO+YwU8+zl7FpNKYLHF+kKIhQRzbWtS6G+XYZBW
+         1vyQTyqskDm0VXMizvHlzV9bjnoAahZvvxl2mFnTf+nKDEtRY48//9dNB3DydbKKVoFM
+         QWHw==
+X-Gm-Message-State: AOJu0YxqzmAfIeLPY7yldtF67J7Pl4UW9UA+GAORMIoOlKcP7zNC5IFs
+	Yh3Kq9Yx08E6xdOZWWlkHvjlD8lSFMXuuAII4JhvUZ27u5oJtNRTQYQPl097nkxLO/eU2E6b4Eb
+	v0jiE8lHCf+LVYBBKn0d+vcy5N9no4fOkCe+4cQ3GxfFYhx//9hzL5g==
+X-Received: by 2002:a05:6a20:c707:b0:19c:a4d3:2041 with SMTP id hi7-20020a056a20c70700b0019ca4d32041mr15569189pzb.42.1707831666687;
+        Tue, 13 Feb 2024 05:41:06 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHcyeBaNRft6IVSe6YFMBp5QkjLKlFRhM30jbFV2dNHxXXjhh0TOmx3zAxp+5APBQ1oR9mU/A==
+X-Received: by 2002:a05:6a20:c707:b0:19c:a4d3:2041 with SMTP id hi7-20020a056a20c70700b0019ca4d32041mr15569171pzb.42.1707831666433;
+        Tue, 13 Feb 2024 05:41:06 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUPTpsWr88UqwU41Z/VTHCIQBM+G9Y3MSqC3XMWud5NWsOT2+3tszlERKJZO40rLdaH+zJf58/ZX30Bj/62Zv3cA7vVUzL6cLbiOUpTZtrqKq8GMYiP2ETfbtEIh44xzUAQob+BBd4EkxlLNm8U0YpDs1sLrry3sBtUiwReJmph18iVFoQDrF6RAywt4drK+lu1t3kDIWlYmjh9e9oMtQLgwDLIH5+aXXhLk0hugAdcIdBNssLXSgE8HABS0E+dXQXgX3alJfWcmjJo6IXDF0AXXI8tZxEmax4FwAfgaPNGJzMVd7k1dKHYyjVQqzis
+Received: from kernel-devel.local ([240d:1a:c0d:9f00:6883:65ff:fe1c:cf69])
+        by smtp.gmail.com with ESMTPSA id p39-20020a056a0026e700b006e0f3f544fcsm1932208pfw.67.2024.02.13.05.41.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Feb 2024 05:36:14 -0800 (PST)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Robert Marko <robimarko@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [net-next PATCH] net: phy: aquantia: add AQR111 and AQR111B0 PHY ID
-Date: Tue, 13 Feb 2024 14:35:51 +0100
-Message-ID: <20240213133558.1836-1-ansuelsmth@gmail.com>
+        Tue, 13 Feb 2024 05:41:06 -0800 (PST)
+From: Shigeru Yoshida <syoshida@redhat.com>
+To: jmaloy@redhat.com,
+	ying.xue@windriver.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net,
+	linux-kernel@vger.kernel.org,
+	Shigeru Yoshida <syoshida@redhat.com>
+Subject: [PATCH net-next] tipc: Cleanup tipc_nl_bearer_add() error paths
+Date: Tue, 13 Feb 2024 22:40:58 +0900
+Message-ID: <20240213134058.386123-1-syoshida@redhat.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -90,101 +94,55 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add Aquantia AQR111 and AQR111B0 PHY ID. These PHY advertise 10G speed
-but actually supports up to 5G speed, hence some manual fixup is needed.
+Consolidate the error paths of tipc_nl_bearer_add() under the common label
+if the function holds rtnl_lock.
 
-The Aquantia AQR111B0 PHY is just a variant of the AQR111 with smaller
-chip size.
-
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
 ---
- drivers/net/phy/aquantia/aquantia_main.c | 52 ++++++++++++++++++++++++
- 1 file changed, 52 insertions(+)
+ net/tipc/bearer.c | 15 ++++++---------
+ 1 file changed, 6 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/aquantia/aquantia_main.c
-index 97a2fafa15ca..656ea77265a2 100644
---- a/drivers/net/phy/aquantia/aquantia_main.c
-+++ b/drivers/net/phy/aquantia/aquantia_main.c
-@@ -22,6 +22,8 @@
- #define PHY_ID_AQR107	0x03a1b4e0
- #define PHY_ID_AQCS109	0x03a1b5c2
- #define PHY_ID_AQR405	0x03a1b4b0
-+#define PHY_ID_AQR111	0x03a1b610
-+#define PHY_ID_AQR111B0	0x03a1b612
- #define PHY_ID_AQR112	0x03a1b662
- #define PHY_ID_AQR412	0x03a1b712
- #define PHY_ID_AQR113C	0x31c31c12
-@@ -746,6 +748,16 @@ static int aqr107_probe(struct phy_device *phydev)
- 	return aqr_hwmon_probe(phydev);
+diff --git a/net/tipc/bearer.c b/net/tipc/bearer.c
+index 878415c43527..5a526ebafeb4 100644
+--- a/net/tipc/bearer.c
++++ b/net/tipc/bearer.c
+@@ -1079,30 +1079,27 @@ int tipc_nl_bearer_add(struct sk_buff *skb, struct genl_info *info)
+ 	rtnl_lock();
+ 	b = tipc_bearer_find(net, name);
+ 	if (!b) {
+-		rtnl_unlock();
+ 		NL_SET_ERR_MSG(info->extack, "Bearer not found");
+-		return -EINVAL;
++		err = -EINVAL;
++		goto out;
+ 	}
+ 
+ #ifdef CONFIG_TIPC_MEDIA_UDP
+ 	if (attrs[TIPC_NLA_BEARER_UDP_OPTS]) {
+ 		if (b->media->type_id != TIPC_MEDIA_TYPE_UDP) {
+-			rtnl_unlock();
+ 			NL_SET_ERR_MSG(info->extack, "UDP option is unsupported");
+-			return -EINVAL;
++			err = -EINVAL;
++			goto out;
+ 		}
+ 
+ 		err = tipc_udp_nl_bearer_add(b,
+ 					     attrs[TIPC_NLA_BEARER_UDP_OPTS]);
+-		if (err) {
+-			rtnl_unlock();
+-			return err;
+-		}
+ 	}
+ #endif
++out:
+ 	rtnl_unlock();
+ 
+-	return 0;
++	return err;
  }
  
-+static int aqr111_config_init(struct phy_device *phydev)
-+{
-+	/* AQR111 reports supporting speed up to 10G,
-+	 * however only speeds up to 5G are supported.
-+	 */
-+	phy_set_max_speed(phydev, SPEED_5000);
-+
-+	return aqr107_config_init(phydev);
-+}
-+
- static struct phy_driver aqr_driver[] = {
- {
- 	PHY_ID_MATCH_MODEL(PHY_ID_AQ1202),
-@@ -819,6 +831,44 @@ static struct phy_driver aqr_driver[] = {
- 	.get_stats	= aqr107_get_stats,
- 	.link_change_notify = aqr107_link_change_notify,
- },
-+{
-+	PHY_ID_MATCH_MODEL(PHY_ID_AQR111),
-+	.name		= "Aquantia AQR111",
-+	.probe		= aqr107_probe,
-+	.get_rate_matching = aqr107_get_rate_matching,
-+	.config_init	= aqr111_config_init,
-+	.config_aneg    = aqr_config_aneg,
-+	.config_intr	= aqr_config_intr,
-+	.handle_interrupt = aqr_handle_interrupt,
-+	.read_status	= aqr107_read_status,
-+	.get_tunable    = aqr107_get_tunable,
-+	.set_tunable    = aqr107_set_tunable,
-+	.suspend	= aqr107_suspend,
-+	.resume		= aqr107_resume,
-+	.get_sset_count	= aqr107_get_sset_count,
-+	.get_strings	= aqr107_get_strings,
-+	.get_stats	= aqr107_get_stats,
-+	.link_change_notify = aqr107_link_change_notify,
-+},
-+{
-+	PHY_ID_MATCH_MODEL(PHY_ID_AQR111B0),
-+	.name		= "Aquantia AQR111B0",
-+	.probe		= aqr107_probe,
-+	.get_rate_matching = aqr107_get_rate_matching,
-+	.config_init	= aqr111_config_init,
-+	.config_aneg    = aqr_config_aneg,
-+	.config_intr	= aqr_config_intr,
-+	.handle_interrupt = aqr_handle_interrupt,
-+	.read_status	= aqr107_read_status,
-+	.get_tunable    = aqr107_get_tunable,
-+	.set_tunable    = aqr107_set_tunable,
-+	.suspend	= aqr107_suspend,
-+	.resume		= aqr107_resume,
-+	.get_sset_count	= aqr107_get_sset_count,
-+	.get_strings	= aqr107_get_strings,
-+	.get_stats	= aqr107_get_stats,
-+	.link_change_notify = aqr107_link_change_notify,
-+},
- {
- 	PHY_ID_MATCH_MODEL(PHY_ID_AQR405),
- 	.name		= "Aquantia AQR405",
-@@ -894,6 +944,8 @@ static struct mdio_device_id __maybe_unused aqr_tbl[] = {
- 	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR107) },
- 	{ PHY_ID_MATCH_MODEL(PHY_ID_AQCS109) },
- 	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR405) },
-+	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR111) },
-+	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR111B0) },
- 	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR112) },
- 	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR412) },
- 	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR113C) },
+ int __tipc_nl_bearer_set(struct sk_buff *skb, struct genl_info *info)
 -- 
 2.43.0
 
