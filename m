@@ -1,171 +1,100 @@
-Return-Path: <netdev+bounces-71358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66851853108
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:58:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA7B6853118
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 14:00:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0775CB24A37
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 12:58:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C58BD1C264C8
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 13:00:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94CB043ACB;
-	Tue, 13 Feb 2024 12:58:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4089B43AD1;
+	Tue, 13 Feb 2024 12:59:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="PC2o7VK+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LTutCdhe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6E633C490;
-	Tue, 13 Feb 2024 12:58:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 832FA51C44
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 12:59:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707829123; cv=none; b=DGop41xxoSyjLUpQ08XiigcijyOXf3AuccJJfPNONse6QeMCWlJq5euedc4mmemEdhcxfni0tMrViUYAf2ifh/sTporE9mifavgBgata4d0H6uZudoLf9DdrKVw482LszkL+C5fFq3dSMHnIj5INTM98fd5D4VEnnOheEdF03eQ=
+	t=1707829168; cv=none; b=CykVbVPXemNnAxaGdHLrEav6xy/hbBM5kao8ivl3z1Cnv1ONgXMAGR+XyJXy2utWk7Nwhqiw5+m60m7Ehd5B92DuzurWu7pChH+ICgV/92NhlmtAh0BRWAE3n6WRksSdJpqcYiWsYh4HGNcHP147MwTbkPpYScV2Oe4LKqs+l3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707829123; c=relaxed/simple;
-	bh=8aKCQmHWe7W7w4cdBjfprF7BEjuAl+nGvi4s02wY+14=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mK321rivEIN3QWHnppUqXcfFBcT6S6OeKmncIj3A5t/rfS5WIXe5kp30G6lfw8QDCBfjhS54a3acfyLjGjuO6kI8WmgNtpjbRr1JQzilAen2F4lo8yYPlJWnOpd3tpjY7rou/dhk2ql1LhXIPqBHqf2177qY6AxOZkZvq/BfvUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=PC2o7VK+; arc=none smtp.client-ip=3.9.82.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
-Received: from localhost (unknown [IPv6:2a02:8012:909b:0:eaae:9bde:cb7b:6924])
-	(Authenticated sender: tom)
-	by mail.katalix.com (Postfix) with ESMTPSA id B20027D5C1;
-	Tue, 13 Feb 2024 12:58:40 +0000 (GMT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
-	t=1707829120; bh=8aKCQmHWe7W7w4cdBjfprF7BEjuAl+nGvi4s02wY+14=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Disposition:In-Reply-To:From;
-	z=Date:=20Tue,=2013=20Feb=202024=2012:58:40=20+0000|From:=20Tom=20P
-	 arkin=20<tparkin@katalix.com>|To:=20Samuel=20Thibault=20<samuel.th
-	 ibault@ens-lyon.org>,=0D=0A=09James=20Chapman=20<jchapman@katalix.
-	 com>,=20edumazet@google.com,=0D=0A=09gnault@redhat.com,=20davem@da
-	 vemloft.net,=20kuba@kernel.org,=0D=0A=09pabeni@redhat.com,=20corbe
-	 t@lwn.net,=20netdev@vger.kernel.org,=0D=0A=09linux-doc@vger.kernel
-	 .org,=20linux-kernel@vger.kernel.org|Subject:=20Re:=20[PATCHv4]=20
-	 PPPoL2TP:=20Add=20more=20code=20snippets|Message-ID:=20<ZctngNzLYe
-	 /+Iman@katalix.com>|References:=20<20240212222344.xtv233r5sixme32h
-	 @begin>=0D=0A=20<ZctJnCeUCANJvxGj@katalix.com>=0D=0A=20<2024021311
-	 5304.3oyqkvkb3oqkauwd@begin>|MIME-Version:=201.0|Content-Dispositi
-	 on:=20inline|In-Reply-To:=20<20240213115304.3oyqkvkb3oqkauwd@begin
-	 >;
-	b=PC2o7VK+pdQcwYecedvvUXAqJZqbT1Wyw9PKS4f0OmBIKD3C7N9R35HH7t49gQ3TU
-	 NLMHjXHfYjIIm1YCRVW/wsW8flkgJ0hVUMF4bUTyCGQ9I9DSR4Wtw1zHEOXGCoqhuQ
-	 vzBQAr9FtNFrLQkSHydEFMam5O2Q9xvRWUbazeGk6GpV6c2SNG0+w9WmDpZPJlBtNG
-	 vXa0l5930XvXIC04ii8Nir67n2h5sE6FrR86GusTELOD1ofTCsYz365csyKsKwTz8e
-	 pK2x9mTlxCtcdH9i3zsfCG0DR6tGeU7jPyn9Sh9gyhgo/ft3lyOrVrsi0gDdW+xyfz
-	 Dzf2FbwYktyeA==
-Date: Tue, 13 Feb 2024 12:58:40 +0000
-From: Tom Parkin <tparkin@katalix.com>
-To: Samuel Thibault <samuel.thibault@ens-lyon.org>,
-	James Chapman <jchapman@katalix.com>, edumazet@google.com,
-	gnault@redhat.com, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, corbet@lwn.net, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCHv4] PPPoL2TP: Add more code snippets
-Message-ID: <ZctngNzLYe/+Iman@katalix.com>
-References: <20240212222344.xtv233r5sixme32h@begin>
- <ZctJnCeUCANJvxGj@katalix.com>
- <20240213115304.3oyqkvkb3oqkauwd@begin>
+	s=arc-20240116; t=1707829168; c=relaxed/simple;
+	bh=ZrfU4G7zJ1uXerR09+qZJlyVPQyIlnNZvQ/ca6DoNDc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bE9MMrqtG/xJxQUhGQlY5CJEtiMc+FTD8AJmzjLhVZij7BA5FU00e6lyDme3iUg+xK3t+/V4s8q5N073WYhTXWIv1ge29FiAqMkAlOQ3PoTfL3COGyJKvm8d5l2zmNaEvHm8p5bhprNs7qBYHp5Jq8JKR8F6SZvCrt+SHFk969c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LTutCdhe; arc=none smtp.client-ip=209.85.208.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2d0b4ea773eso56591771fa.0
+        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 04:59:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707829164; x=1708433964; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZrfU4G7zJ1uXerR09+qZJlyVPQyIlnNZvQ/ca6DoNDc=;
+        b=LTutCdheN86gz+D/qcD2I+v0a1AKdtm81ypt4O9FT++BU+1j2uNFbFEZLtlIW3l3la
+         Bv1IKjJQ1iYN99Lz5H44UD4QYYuEaiqEDBa/Ub+PgIMAJxb8nXsgy0WLpB2xPqtAN335
+         NCsjvVTZG1lT6G63Eb4j7H6b6RoieS5dDGckpwHkWc3Hcp/4m0ZDHXQxM6+bml7TYoL0
+         OxDwp1tDU0pKtWfUDXjLxP/k0QTDmq9U+PuOBwy1QOy6072TmkNOoBrBB6UdIdCPzKNF
+         ah5xy9574ww4aKkVWDiqmZx9/jMEwb9FoKbAH/YomJ7g8CvjP7ghd7/iBsG9cZkuMlKO
+         wZWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707829164; x=1708433964;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZrfU4G7zJ1uXerR09+qZJlyVPQyIlnNZvQ/ca6DoNDc=;
+        b=AURoz7n04AnMgaacm3JQ0qlYDBQwpzj9ZvCksiuzov5YKJGydyPNa7tV8NMIhbRK/g
+         6lR83U7QValDpF6MH5KqzuP70nq9K6hgPKD5V6R2/FxZ0/L3ss4g5R/oDA6uCDxFchOM
+         +w6UuYf/dVSwgEws4EvuE6gLbwZydG/Ruus37O8fd/Fjti17jJfb53J3sQ7zpJxgApaQ
+         sYIwSW7oIxlSvopOvQC5Wl2MMtRhr6aRo3Jfx/MIPVqYNSm0bJAupfPDzdXsCi4v7Qsb
+         n8q9yECboTm0x60iKSvhNtjQAkElREF8yRjvirL9cDKeuQHQl5BWC5HL6o7LVbo0MzxE
+         eAlA==
+X-Forwarded-Encrypted: i=1; AJvYcCUEfywGQnnMFkvX2wdHOJU+LSh0eaajEoWWygyb/3xw4t9EDZFBi4qk04FflhQSuENkemhCHUtiHxpVGBMD8Sf7In5AnFtp
+X-Gm-Message-State: AOJu0YzQStxM6214lRfn/oBjbQ1eRYYAgFR11KwZUzdftWMU39FhGDcY
+	J3m6dm2jH/hGKwiooEBkfrZczCuqlTzynuwW5JUVzdcjyoNYCD6P/O2tB4Qk69DFsrOR307ATOZ
+	gtMvTst0W0KXsXn3erzyVK1OSjfQ=
+X-Google-Smtp-Source: AGHT+IEujYnnIIj41G1plx69eyF/sT6Nr0ePvf5Sck6cfOt/T2qIGOQ5YdlCyFQRyeNVs4P1Svazee64vscgM1L2vFc=
+X-Received: by 2002:a05:6512:31d3:b0:511:8cb2:2f82 with SMTP id
+ j19-20020a05651231d300b005118cb22f82mr4858164lfe.44.1707829164231; Tue, 13
+ Feb 2024 04:59:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="G2qaJ+yw4/XCnyb6"
-Content-Disposition: inline
-In-Reply-To: <20240213115304.3oyqkvkb3oqkauwd@begin>
+References: <20240212092827.75378-1-kerneljasonxing@gmail.com>
+ <20240212092827.75378-4-kerneljasonxing@gmail.com> <CANn89iKmG=PbXpCfOotWJ3_890Zm-PKYKA5nB2dFhdvdd6YfEQ@mail.gmail.com>
+ <CAL+tcoAWURoNQEq-WckGs6eVQX6VFpHtw4CC9u4Nc7ab0aD+oA@mail.gmail.com>
+ <CANn89iJar+H3XkQ8HpsirH7b-_sbFe9NBUdAAO3pNJK3CKr_bg@mail.gmail.com>
+ <CAL+tcoB1BDAaL3nPNjPAKXM42LK509w30X_djGz18R7EDfzMoQ@mail.gmail.com>
+ <CANn89iJwx9b2dUGUKFSV3PF=kN5o+kxz3A_fHZZsOS4AnXhBNw@mail.gmail.com> <CAL+tcoBdvbA7OFYgdjN=LdLiQ=CyBxCkRy-0S_cPRPhxRHgenA@mail.gmail.com>
+In-Reply-To: <CAL+tcoBdvbA7OFYgdjN=LdLiQ=CyBxCkRy-0S_cPRPhxRHgenA@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 13 Feb 2024 20:58:47 +0800
+Message-ID: <CAL+tcoAkm_A0isuGhZJNeN+MEF8q_qoJjGwJTVWsem8eXseADw@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 3/6] tcp: add dropreasons in tcp_rcv_state_process()
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	dsahern@kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>, Kuniyuki Iwashima <kuniyu@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
 
+> Thanks for your explanation. Since the DCCP seems dead, there is no
 
---G2qaJ+yw4/XCnyb6
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Oops, I have to correct myself: it has nothing to do with DCCP because
+the caller of tcp_rcv_state_process() only exists in the TCP path.
 
-On  Tue, Feb 13, 2024 at 12:53:04 +0100, Samuel Thibault wrote:
-> Tom Parkin, le mar. 13 f=E9vr. 2024 10:51:08 +0000, a ecrit:
-> > > +        ret =3D ioctl(session_fd1, PPPIOCGCHAN, &chindx1);
-> > > +        if (ret < 0)
-> > > +                return -errno;
-> > > +
-> > > +        ret =3D ioctl(session_fd2, PPPIOCGCHAN, &chindx2);
-> > > +        if (ret < 0)
-> > > +                return -errno;
-> > > +
-> > > +        ppp_chan_fd =3D open("/dev/ppp", O_RDWR);
-> > > +        if (ppp_chan_fd < 0) {
-> > > +                return -errno;
-> > > +        }
-> > > +
-> > > +        ret =3D ioctl(ppp_chan_fd, PPPIOCATTCHAN, &chindx1);
-> > > +        if (ret < 0) {
-> > > +                close(ppp_chan_fd);
-> > > +                return -errno;
-> > > +        }
-> >=20
-> > I think we should drop the PPPIOCATTCHAN ioctl call here.
-> >=20
-> > The input file descriptors are called out as being PPPoX sockets
-> > created as described earlier, in which case they should both
-> > already be attached to a channel.
-> >=20
-> > It would make more sense IMO to call out the two ppp_chan_fd file
-> > descriptors as being input parameters alongside the PPPoX session file
-> > descriptors.
-> >=20
-> > > +
-> > > +        ret =3D ioctl(ppp_chan_fd, PPPIOCBRIDGECHAN, &chindx2);
-> > > +        close(ppp_chan_fd);
-> > > +        if (ret < 0)
-> > > +                return -errno;
-> > > +
-> > > +It can be noted that in this case no PPP interface is needed, and th=
-e PPP
-> > > +channel does not need to be kept open.  Only the session PPPoX data =
-sockets need
-> > > +to be kept open.
-> >=20
-> > Is it true to say that the PPP channel file descriptors can be closed
-> > by userspace?
->=20
-> In our code we do it
-> https://code.ffdn.org/sthibaul/l2tpns/-/blob/kernel/l2tpns.c?ref_type=3Dh=
-eads#L1295
-> and it works all fine indeed (and avoids that fd per session).
->=20
-> That's actually one of the reason why I made the snipped only take the
-> pppox sockets, and make it create the ppp chan fd only temporarily. AIUI
-> the pppox socket already has a ppp chan (returned by PPPIOCGCHAN), and
-> the ppp chan fd is there only for performing the bridging ioctl.
-
-Thanks for the code reference -- that makes it clearer.  And I'm glad
-someone (else) is using PPPIOCBRIDGECHAN :-)
-
-It's a while since I was looking in ppp_generic.c and you're right
-about the ppp channel fd.
---=20
-Tom Parkin
-Katalix Systems Ltd
-https://katalix.com
-Catalysts for your Embedded Linux software development
-
---G2qaJ+yw4/XCnyb6
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEsUkgyDzMwrj81nq0lIwGZQq6i9AFAmXLZ30ACgkQlIwGZQq6
-i9DYkAf9GOhgqPlIofeqsI0xOlcmwUwi/8tE99f4HV85ghT242yIB66IYVCyGijG
-L5llsSOJ+d3cjw1/FrDAOFWuPira89FijTidj5ZgXApkGpHZo6Uomq/jYjNLXMh/
-cWqbMo53t2EMrwUgl804vkGAXQ5H9mIkuDGMegjO/Ld3pTDWstwwQWcZZBmUb33f
-116FyZcPNDzXmLvSDi7EBQBoXdZOXcXEaJl9XZZXgGjWrBzcKvs2Ed/emRKUUGRI
-ItlC1udf1eJ4RijloRzOUykwwigd/DdNEqb2xocrhQPnhFLBc2/Qj1iHYJYsMj24
-+U6BGaqqzeVjSqLucUAjj0zKFsOeOg==
-=+am9
------END PGP SIGNATURE-----
-
---G2qaJ+yw4/XCnyb6--
+> need to keep it for TCP as you said. I will send this patch first,
+> then two updated patch series following.
+>
+> Thanks,
+> Jason
 
