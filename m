@@ -1,111 +1,151 @@
-Return-Path: <netdev+bounces-71488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35F1C853953
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 19:02:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3015C853961
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 19:03:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68F331C26ACD
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 18:02:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C43151F24148
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 18:03:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F897604D0;
-	Tue, 13 Feb 2024 18:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 563945FF03;
+	Tue, 13 Feb 2024 18:02:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="nWT/RMDq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ALsnNTxf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A882360DE1
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 18:00:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 892B16088D;
+	Tue, 13 Feb 2024 18:02:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707847204; cv=none; b=CdRyDRov2DXNTDMfTHLCSBau62xWCTWWpzlLeNTrsePXCkNndwJ1wcDO/7NVGAVkRIDgFU2XOuFm+5lss+m5cKC+xguSODtXPfRv1wjWakIZkxfF7SaC16STD6S1ZtmPqoZ30TYfOP/aOm7WpNx48S+NjHeSI/IOcS1p1v4BiUY=
+	t=1707847363; cv=none; b=G2mXO6UwYZgaG3KGOF0Thw6BRP3BOWJZMgrfYGeEDTTOh//oXZdZLHn/Fy1zbBm0U3wKiqlS7Zoxo5C86Lc0ZNQCmPvguxU4qvGsaesaZ/7c5xyDmxvjK5/vmmozs3ovKqBq4iIZQxYCjAo+Y6euduniKFIhET7fd331ue7RsLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707847204; c=relaxed/simple;
-	bh=TvjXDcsy5GxF/6E70d0MCgCzpnXHT2Si5PtFYjTrNA0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nlmsHSlASD93Vj5kEqD/qo8C2aVYblDGQKZ+yXxt+FFMcNLDYq2a6bGDzYuBk6tJJ6PSgmzVDJMRqhcT4rvZmV4fOfCf4J6ZN09mjCOnKfJmpgXCgPQQvZu7rBlBxpwVbBafsarbmY5QFLJbuYGiG6UPi7fwhyDA+jeqbD/Tj5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=nWT/RMDq; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-6e0f4e3bc59so980583b3a.0
-        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 10:00:02 -0800 (PST)
+	s=arc-20240116; t=1707847363; c=relaxed/simple;
+	bh=8mhEJdVwOEi6aObqDezu6duU7QCywcy9Cr7WOE8j2zY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=dBRqBkahEP+vpGT8WETrU80BkX7hMg876jGun6fkSz9D+fD0vqfFC8oILaLxOFvUFTx6is2LhgBOeEsVaYlLJR5z/eDDt4JswXqJTSC8YG7DS0h9RoOTwLNp88CYSWv4tdVfYupQ0FIFN+lqrEUBNycem6NZ4XofWIVL+zx4cVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ALsnNTxf; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-33cddf4b4b5so518248f8f.0;
+        Tue, 13 Feb 2024 10:02:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1707847202; x=1708452002; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fxPirAQpavIzKv9fMWeC7xfOqcl8Yk4GSCo6Uvejoss=;
-        b=nWT/RMDq/JtrvTEFQ0SLbkQYiXO2QjKChZWsKosCG4hJCrRHtitOevB0a4Kp4msBxl
-         IITMlJWg9FyjiPdkjYuxAcEZAj5g52DmJ7dTaOwrphttIb9e+hjumBNxEhygBPSJILTL
-         EUTThuzU9L0E3R20s+AA6GqaGFhWtA0UCuikw=
+        d=gmail.com; s=20230601; t=1707847360; x=1708452160; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BbeBTq4/LfNyHORgmD6XWujV5RVtjEVSRBBFTbCsnHs=;
+        b=ALsnNTxfC22apUuDDYYyAneZ6UwwyWcLapTtPbFB297jrj7vQWID/5n1ifoDhE+IMC
+         9wTZb61fxgqgbzJFiMUcz6xNNJnTi1sWyeRhHgGe80Nx6q2ijqDDbXm3BJGEm7It7IJS
+         anTfMpXgdugN4b0HLTUXJTYwx5Z6rHXYGt87aSDN3fE0WZ0OjkwsEUFvpOtWh9hDgvMi
+         qUwXJ/CMMS5MzhIhefNtGrFZBhfojunOEofHXInVWEJ/8mxl6YrtPZxoGk0neSIoerjl
+         aGvxlNO7sPFI/QibnxUwZVyzckC6b9BJr8f59TMJOZfCZwkT43FmEwILSCmvpXLh9a8Z
+         OMoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707847202; x=1708452002;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fxPirAQpavIzKv9fMWeC7xfOqcl8Yk4GSCo6Uvejoss=;
-        b=nTll9F71tcsP+4HCb9Piq6iKkOYR8FVsFJTiG7n+dzuHUkMMoH9IgUMQYw7rilPr4R
-         dDqB+U3brr7/Xy8KV1XwCkTXyaTu1ie9zJIeZDXuu6LFCNfgjOYJHkmmAwwzxdC7aDLC
-         DFPkyBrEYkyvDkYhYM57DTKO+dv3OAWIriZtzur0B+UWThqnA5PEBm11EJ1/8BA79ZsL
-         frV4l4zIV6UcPyqdb6h7UsF3Mfg3H/+TQgrrJEYxIybbW5pd6gMBEjhZ5pn/922tb9lK
-         X0OBuCpAw109nyE1IoBgnVHrAag27RW4CTaLotQDE/ozw2z8V1k6Lh63CfT3Jj5NSXET
-         AW1g==
-X-Forwarded-Encrypted: i=1; AJvYcCWFR892/MA0z5vDetdVEmmmZ6+nIgb+nJGZuIKci5K6TVUqZx2zrAQb1g9HgQPwKAYDEP7rZZ+36LIR8Q6DDFnBGF1TSnfp
-X-Gm-Message-State: AOJu0Yzx7TJ5+4Bev7L3ttlVvB7JhWkAaWLRu0SxmYNxbB5KdXo6kmPY
-	nmOB0phr9KFsNJElvIXBdaFHYNgc48ZkJ94GAZtUMtNqBuN92Th5hzGi27H1s3x6rGNYVcKBhhI
-	=
-X-Google-Smtp-Source: AGHT+IFnLU6I8dy6/mzsr4+w4iyvfY9n9S0mJzAYlStLSt5gXorOs8zcMVnC8H1qz5TR58WkeVd6fA==
-X-Received: by 2002:a05:6a21:3183:b0:19c:ad6b:e1c2 with SMTP id za3-20020a056a21318300b0019cad6be1c2mr397959pzb.12.1707847202072;
-        Tue, 13 Feb 2024 10:00:02 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCW5tRAPQjI3pcLl22D2Bu0sVo+xfg5ZiS9c2TWVZRy92+lZ2xiOSFl9jDvtsNeF3x+q7ElO8Q+DJeHOOB+vtK+bmi7Z/vnIYMoWo8vXgaHgc3SSn7+lTqI5aeKniRi6dQ/Ic54kc2JqEgC9ywlYyvpo+9BDx3Kr7pDhs2vNaw==
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id y189-20020a62cec6000000b006e0d1e6036bsm5280122pfg.129.2024.02.13.10.00.01
+        d=1e100.net; s=20230601; t=1707847360; x=1708452160;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BbeBTq4/LfNyHORgmD6XWujV5RVtjEVSRBBFTbCsnHs=;
+        b=ZtATjE5v82030BYLNeLUwhZIzKnZ43WMR9zmWaqWu5Myuw9h8aGjI1Ayqy4WurZVVK
+         zw6bifzOou2lEpGFIdxtBxttU2d4IStAg75ge5+xM1qKX2/G03fxMbRBH+3IT0QBs8xS
+         23jGIPOlcEiYWPVDmoxVKUflcK2t5B4Y2Om9GGj8rnQwo8BPvMnv0jWsFzG+MwpnffVA
+         jwWUD8BKdgSclxUMuf2tTTrmxW3ZckrHTkRG7bNCPGL+egeDTrot1Je4In5mdj0vsDAs
+         ySN5Bea5ts5IANMSlCCL9A+P4DHs1f1gLD00Fnq06obGHheCfKjAFfT4oH/0Qt1N6wSw
+         SFcA==
+X-Forwarded-Encrypted: i=1; AJvYcCX+kB1y9r8ZR1h45k5rVlJDOHXYVWQ4lU5svAYA8sSQG0neb/DMl3vsuIpT5vFu1U6PbwpBUEyMCQTQFq5JKCdk3Zp7me9qTeGXvTdYN9Y+PM7wakGAXplpOML6GfJQt63MIV8m
+X-Gm-Message-State: AOJu0YzR8kyFqxPTa9cakO6D0IyQyPG8ZlFnZV+Dlv7vz6D5/767jIK7
+	r41Gdxw5NVKF6ieCvZftvIoXha4fbM+EBqD3YV08GWKr7pYIti+8
+X-Google-Smtp-Source: AGHT+IFvY5EqsQhoUmKf6I4dsYUzkHcap67TCG+Iol9S3200KJGxI7ckF0sz1bvwQZNKmUNyKD/pxw==
+X-Received: by 2002:adf:f64c:0:b0:33b:69ee:9809 with SMTP id x12-20020adff64c000000b0033b69ee9809mr29430wrp.44.1707847359410;
+        Tue, 13 Feb 2024 10:02:39 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWFXRClYhpuflhYv6i4vlhftQVYRlaT8r64eVdssehUVpzPMuHYlzQZUypqEjmjyPw3I99WCB5cu+vhcY2QL3+n1fgAr6V2UWiSaP29eya1k0sga4wbt71dgkAct64Uj+UdwytSejZH5P02UvmxZA3PgApcZeLP6o/ZrpVPK+0YnnUQHBFnCgW4cy5HDyMqq5FQp8TkFnkNRhu/BQVOUiCGFqzFbZEdMTrxCDBoyTOa1bwhyMixzg1iKfCy8LiqBnwFVQSkz/EP+vy7BsVSmc8LHjnUHBYfWvbMpqhyfJeXiYVCbzNkpsvIT5dLFN/2eiqxIHjpR61JDOnvRrpnv++w+oDVB/B/yM0/a4KanPfzaQ4d9rjH0vo+TdzDB2CDqwcQ6SSxgwo=
+Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.googlemail.com with ESMTPSA id z11-20020a5d44cb000000b0033b43a5f53csm10034737wrr.103.2024.02.13.10.02.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Feb 2024 10:00:01 -0800 (PST)
-Date: Tue, 13 Feb 2024 10:00:01 -0800
-From: Kees Cook <keescook@chromium.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: shuah@kernel.org, linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org, jakub@cloudflare.com
-Subject: Re: [PATCH net-next 0/4] selftests: kselftest_harness: support using
- xfail
-Message-ID: <202402130957.7B88284338@keescook>
-References: <20240213154416.422739-1-kuba@kernel.org>
+        Tue, 13 Feb 2024 10:02:39 -0800 (PST)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Robert Marko <robimarko@gmail.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [net-next PATCH] net: phy: aquantia: add AQR113 PHY ID
+Date: Tue, 13 Feb 2024 19:02:26 +0100
+Message-ID: <20240213180228.15859-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240213154416.422739-1-kuba@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Feb 13, 2024 at 07:44:12AM -0800, Jakub Kicinski wrote:
-> Hi!
-> 
-> When running selftests for our subsystem in our CI we'd like all
-> tests to pass. Currently some tests use SKIP for cases they
-> expect to fail, because the kselftest_harness limits the return
-> codes to pass/fail/skip.
-> 
-> Clean up and support the use of the full range of ksft exit codes
-> under kselftest_harness.
-> 
-> To avoid conflicts and get the functionality into the networking
-> tree ASAP I'd like to put the patches on shared branch so that
-> both linux-kselftest and net-next can pull it in. Shuah, please
-> LMK if that'd work for you, and if so which -rc should I base
-> the branch on. Or is merging directly into net-next okay?
+Add Aquantia AQR113 PHY ID. Aquantia AQR113 is just a chip size variant of
+the already supported AQR133C where the only difference is the PHY ID
+and the hw chip size.
 
-I would use XFAIL for seccomp selftests too, but I can wait for the next
-release. i.e. I don't need a shared branch -- it'd be fine in net-next.
-But I defer to Shuah as far as the selftest tree is concerned. (FWIW, I
-don't see any current conflicts.)
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+---
+ drivers/net/phy/aquantia/aquantia_main.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
+diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/aquantia/aquantia_main.c
+index 97a2fafa15ca..aba3a52af11d 100644
+--- a/drivers/net/phy/aquantia/aquantia_main.c
++++ b/drivers/net/phy/aquantia/aquantia_main.c
+@@ -24,6 +24,7 @@
+ #define PHY_ID_AQR405	0x03a1b4b0
+ #define PHY_ID_AQR112	0x03a1b662
+ #define PHY_ID_AQR412	0x03a1b712
++#define PHY_ID_AQR113	0x31c31c40
+ #define PHY_ID_AQR113C	0x31c31c12
+ 
+ #define MDIO_PHYXS_VEND_IF_STATUS		0xe812
+@@ -863,6 +864,25 @@ static struct phy_driver aqr_driver[] = {
+ 	.get_stats	= aqr107_get_stats,
+ 	.link_change_notify = aqr107_link_change_notify,
+ },
++{
++	PHY_ID_MATCH_MODEL(PHY_ID_AQR113),
++	.name		= "Aquantia AQR113",
++	.probe          = aqr107_probe,
++	.get_rate_matching = aqr107_get_rate_matching,
++	.config_init    = aqr113c_config_init,
++	.config_aneg    = aqr_config_aneg,
++	.config_intr    = aqr_config_intr,
++	.handle_interrupt       = aqr_handle_interrupt,
++	.read_status    = aqr107_read_status,
++	.get_tunable    = aqr107_get_tunable,
++	.set_tunable    = aqr107_set_tunable,
++	.suspend        = aqr107_suspend,
++	.resume         = aqr107_resume,
++	.get_sset_count = aqr107_get_sset_count,
++	.get_strings    = aqr107_get_strings,
++	.get_stats      = aqr107_get_stats,
++	.link_change_notify = aqr107_link_change_notify,
++},
+ {
+ 	PHY_ID_MATCH_MODEL(PHY_ID_AQR113C),
+ 	.name           = "Aquantia AQR113C",
+@@ -896,6 +916,7 @@ static struct mdio_device_id __maybe_unused aqr_tbl[] = {
+ 	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR405) },
+ 	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR112) },
+ 	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR412) },
++	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR113) },
+ 	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR113C) },
+ 	{ }
+ };
 -- 
-Kees Cook
+2.43.0
+
 
