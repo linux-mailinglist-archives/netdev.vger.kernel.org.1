@@ -1,125 +1,94 @@
-Return-Path: <netdev+bounces-71233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41E2B852C36
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 10:28:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2764852C3A
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 10:30:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB51B1F2358A
-	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 09:28:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACE48284678
+	for <lists+netdev@lfdr.de>; Tue, 13 Feb 2024 09:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C1D321A0D;
-	Tue, 13 Feb 2024 09:28:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAA482208B;
+	Tue, 13 Feb 2024 09:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HdPMTBF2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D/GVy0dQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3562225A4
-	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 09:28:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870011C68E
+	for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 09:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707816498; cv=none; b=cw9skTlWP1n2Dc0aIHFwzIvL5YaSqw5/l6wosUxkOwiGAR+yaJ+HApSd+5hz8g2j1+LzBCkrtCqcv0+6Kn0dYilfbhoZK4v3qB/gMBywzyfeo7Pzn370MP+ehGtqKEQc8MYdadPxMbS83IEm0b17tyk8A/7/mZpG3vr+ffm8Roc=
+	t=1707816627; cv=none; b=p49DOI6jCHuRzcujChMEq3BQJPEa6n1kMMOuNbjOqfPLd8zDwWRzOgfNFpLWyWry/tbTM7cYwubFdDqjz99EpW0SCTOZI0PNJWeDbtfq6DoYpuQ1wt/Kel8hOrgVRqVBU4C4RImXyDoZ9cuhfohnsvUohMemdP/8mtrSFkq0yNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707816498; c=relaxed/simple;
-	bh=wMD7EJy86DezkdM6K7P2Tk4zuLu3caa/90UIsk8AazE=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=pFqSu0iUyuCE/xNQrpS849Hiv28BRwUsvRbE8SetjrASirDbMb+0ycPHkwmCueSIB+ScVirjZZoTtKYaZDeH1Dp+AIBtmRBl1z1hGV1Gm8hcpMDKvb4jVRKHMQWawyzLEa/5d5hCBHvA6s7aKPno0TKVTxmJy0abxn5t+U4kzvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HdPMTBF2; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707816495;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=wMD7EJy86DezkdM6K7P2Tk4zuLu3caa/90UIsk8AazE=;
-	b=HdPMTBF2kBnEzeS+PhwY7Hng9o9NAJBo4K8+jQ1U9WmN9TosTQKNww/Y5jS948kpmtR0Bm
-	EWhIh2l4TihgBX/sL82aCLcVs/AKghntGqzA8Nh3UlSui1neddfkTnMW0jcsGF7N9qAFio
-	50pBA5zlf2HJeE5Z9TreJ6+gdpsIlQk=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-414-ZLTx6vw2OgKwOpa0pvSifQ-1; Tue, 13 Feb 2024 04:28:14 -0500
-X-MC-Unique: ZLTx6vw2OgKwOpa0pvSifQ-1
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-78315f4f5c2so184786085a.0
-        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 01:28:14 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707816494; x=1708421294;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wMD7EJy86DezkdM6K7P2Tk4zuLu3caa/90UIsk8AazE=;
-        b=cWOpdYJUA6fD6ibhxzWQXCDTBs81xStibCq94yDNvqRB51sdYL6IYK3XvuNEtom8mb
-         JQZWic81zVOVzVpclt8vY/usgmrce+cr0bplK/PqnNiEsFkjIS1jRX1Mt23ZHf238Ur/
-         ZGUu33h1ClPjDXKstFoYtCckbFAHdeBzhbzwIq9cbKEEBivpKFSs8ACpwp5Q7vdVvbmb
-         bu3gQNaYy28yR2dJCDOAQ3YOW/pC/sNRuuNtKwmieykIQstt8VW7Rk9hJabUG9yW5DCO
-         gpjFBvzkeYRGS9kzX+/E3XCHLlMx2ZiXbo6vB11QGJ/X1OpA8/lx21V8QDFZPrV9h6e3
-         I9sA==
-X-Forwarded-Encrypted: i=1; AJvYcCXlueUbeDICYkGuxnf/9g46eu1VtxbAwYzKd/TE2yNs1kqowfD7RLFiVjk8Ev6e3GNA3u0GJjF/rRdKeydyLZaL5+vWA3cV
-X-Gm-Message-State: AOJu0YwxDcH8t3xZHTfuYSsM4vXmwb5Z0QbhSuiVNHph5H5a1069O7s8
-	eesbE55Ck236ILBeAA9BSPujTnqdMcFo5ANAOVELPkhfURYF3/BQQCEt/I8g/+wlDP2NbFc5x5l
-	GvqDv9U9p1A7d52ieHJEWIGmtMR1B5UQtHN+PjtXLhI8CH0iirAprmg==
-X-Received: by 2002:ac8:5904:0:b0:42c:51d5:cc4d with SMTP id 4-20020ac85904000000b0042c51d5cc4dmr11325978qty.1.1707816493846;
-        Tue, 13 Feb 2024 01:28:13 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHqbvgsahW/VxUHmxt3cfVh12ISuHxifU0aLNLwf0JNLeqsLjmuPRH1Zf2/hUBVWCPgt3/ldw==
-X-Received: by 2002:ac8:5904:0:b0:42c:51d5:cc4d with SMTP id 4-20020ac85904000000b0042c51d5cc4dmr11325957qty.1.1707816493478;
-        Tue, 13 Feb 2024 01:28:13 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWjCxyYsBqDybpkxGTcY2eh14M3uMOqlaDcaLctS8+HU50qJDPtHJ0DovOkul2/JVduRzmGCnhG5OyTMlhgnznVphqYUquitaMfbuFxD0tAfeYtKmWN2IH+lS0S+GhO9x8/g861hXxgdKCrWBsqs/N7+ItL2jQIK/GmumPUsC5xK2nO99bsuDIwu1tb83jhibAOKuaQcxWMalmoYxta8Oo2yHxxvJ9TtNHDAvZLk31OBIKVf1vd45pV/IIk
-Received: from gerbillo.redhat.com (146-241-230-54.dyn.eolo.it. [146.241.230.54])
-        by smtp.gmail.com with ESMTPSA id f7-20020ac84987000000b0042c41f05622sm975348qtq.27.2024.02.13.01.28.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Feb 2024 01:28:13 -0800 (PST)
-Message-ID: <a2d34a4d3934c8bf755a9f7fafb0e695829b150a.camel@redhat.com>
-Subject: Re: [PATCH v4 1/1] net:rds: Fix possible deadlock in rds_message_put
-From: Paolo Abeni <pabeni@redhat.com>
-To: allison.henderson@oracle.com, netdev@vger.kernel.org
-Cc: rds-devel@oss.oracle.com, linux-rdma@vger.kernel.org, kuba@kernel.org, 
-	edumazet@google.com, davem@davemloft.net, santosh.shilimkar@oracle.com
-Date: Tue, 13 Feb 2024 10:28:10 +0100
-In-Reply-To: <20240209022854.200292-1-allison.henderson@oracle.com>
-References: <20240209022854.200292-1-allison.henderson@oracle.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+	s=arc-20240116; t=1707816627; c=relaxed/simple;
+	bh=6R1CJ0dGx75FGRWFH3QoOEfdCto9Yy4a+qw6NC+I+1s=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=dLaVw/cmLfj1fiP9gc53rowMgJcS8tm9TgGtnmdp0TGxT+d3kI2bxUfmbzruxOZaA53S1BzS5/1Y9kaxHsJECgWQh56svAY/IsTD74dZPOJZWBJ8F2b9lfFMVT7hT3mITGTMAicu0S7bqu6tbbF9SIvgTSfCHYJ8DWyFRAuB24g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D/GVy0dQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id F121DC433F1;
+	Tue, 13 Feb 2024 09:30:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707816627;
+	bh=6R1CJ0dGx75FGRWFH3QoOEfdCto9Yy4a+qw6NC+I+1s=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=D/GVy0dQLe8DdnFbnjmOsXsBs7rnBLZeSRc15GthUhA91B1+0axJuyzr8hqT2zYML
+	 6yNYRVfYvZfDVOKvZohl/SomS4cGE22kZNoRu7suPVNi3jw+dO3P4tl+Px3YubeJKf
+	 vuA2/EmZ9Tr3GqQ+RSnZ57Z1xWeinEixLPLuNHjjmyDKUy/urLnYBWhEJtzJU2JbAg
+	 zDS+OU4ltQJh5jOjjHJ983h8JiX/5XpKOQKrY43RXrpyAg8cwcrBmaYIhuNYoY2AjP
+	 Ie0XvfVus6AcLHxRaHXR+QseMJKk6vq3xPHOcmq62R27o/64JH/RrVlcLE8CwFvCAE
+	 Zf3QPI63Tk0eQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C32B4C1614E;
+	Tue, 13 Feb 2024 09:30:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: stmmac: Simplify mtl IRQ status checking
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170781662679.26596.16174122173623372072.git-patchwork-notify@kernel.org>
+Date: Tue, 13 Feb 2024 09:30:26 +0000
+References: <20240208-stmmac_irq-v1-1-8bab236026d4@linutronix.de>
+In-Reply-To: <20240208-stmmac_irq-v1-1-8bab236026d4@linutronix.de>
+To: Kurt Kanzenbach <kurt@linutronix.de>
+Cc: alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ mcoquelin.stm32@gmail.com, yannick.vignon@nxp.com, bigeasy@linutronix.de,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
 
-On Thu, 2024-02-08 at 19:28 -0700, allison.henderson@oracle.com wrote:
-> From: Allison Henderson <allison.henderson@oracle.com>
->=20
-> Functions rds_still_queued and rds_clear_recv_queue lock a given socket
-> in order to safely iterate over the incoming rds messages. However
-> calling rds_inc_put while under this lock creates a potential deadlock.
-> rds_inc_put may eventually call rds_message_purge, which will lock
-> m_rs_lock. This is the incorrect locking order since m_rs_lock is
-> meant to be locked before the socket. To fix this, we move the message
-> item to a local list or variable that wont need rs_recv_lock protection.
-> Then we can safely call rds_inc_put on any item stored locally after
-> rs_recv_lock is released.
->=20
-> Fixes: bdbe6fbc6a2f ("RDS: recv.c")
-> Reported-by: syzbot+f9db6ff27b9bfdcfeca0@syzkaller.appspotmail.com
-> Reported-by: syzbot+dcd73ff9291e6d34b3ab@syzkaller.appspotmail.com
->=20
+Hello:
 
-Note that you must avoid empty lines in the tag area. The patch LGTM,
-I'll fix this while applying it, no additional actions required.
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Cheers,
+On Thu, 08 Feb 2024 11:35:25 +0100 you wrote:
+> Commit 8a7cb245cf28 ("net: stmmac: Do not enable RX FIFO overflow
+> interrupts") disabled the RX FIFO overflow interrupts. However, it left the
+> status variable around, but never checks it.
+> 
+> As stmmac_host_mtl_irq_status() returns only 0 now, the code can be
+> simplified.
+> 
+> [...]
 
-Paolo
+Here is the summary with links:
+  - [net-next] net: stmmac: Simplify mtl IRQ status checking
+    https://git.kernel.org/netdev/net-next/c/6256fbfd651c
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
