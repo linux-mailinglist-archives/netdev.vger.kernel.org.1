@@ -1,156 +1,108 @@
-Return-Path: <netdev+bounces-71657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BB578547CA
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 12:10:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 039348547C5
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 12:10:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBE2D290BEF
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 11:10:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 321BA1C22A83
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 11:10:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D77CC18E1F;
-	Wed, 14 Feb 2024 11:10:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1524318EA2;
+	Wed, 14 Feb 2024 11:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="OvRbOOSI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E05J9c6z"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95CA31AAD7;
-	Wed, 14 Feb 2024 11:10:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1AA718B14;
+	Wed, 14 Feb 2024 11:10:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707909046; cv=none; b=kF8KVfFAQXCMattsGi2E/vf6hAinJ6RkR769JtgwHdH1dEjwQTooKAUW8mgh1WTm9ppYIeYF2rgn/RZ/ovofbZT0Au2USR+xJM8/tTm7albKLRu6QF+vJA1IcGtdzqXw3CbBN/PsThu7sPRcK4NU6wzHGwK1OYhPyaUsbzfhILI=
+	t=1707909027; cv=none; b=h+LOgeECfT/S/RdudhvH4HqCQ2pXuTGrlBR1wgMw1XpWCZl2uERVrZPpPxP34yM+7ad8JhS/q03Vong6e8nUTbVhh/q/jF3xmhcKyUE7n+6aXGYvvgVMHbJrNpaAKNnUPmllWaUUUBUcIgXinKizfVef78yb/TTEylhLEmIbnHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707909046; c=relaxed/simple;
-	bh=9O5DIDFBAqx03xsK73U6jOiGef+NZ2P6kKYuXVsb18E=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ZcyFFSLX5Y7QjsS+8WKa/kYgIA3k3CSUYORFRZcOgw5VAKj9DUJY3opdViuIXfUezVUM5WDiga3bKzL8Vg2Lu7EXG9a8ElFuBWMlmYZwvQrmf3XkP6ZoYGvEA/4bHcGtbU1V8sA9AkP39sK/uqmlIbm2Adus05wvMkbDko2u+oI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=OvRbOOSI; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=QC2dNpeJICxTa3mVBoBS5p5m+HVNapWbR+e8emGMp/U=;
-	t=1707909044; x=1709118644; b=OvRbOOSI46axrMp3CIfDeJBctW/ffm8Fc4hZeiPJGtir95n
-	jsAc4Lw70T2KjHkTXdNux6eKrH9DCbtV+748ua1ZFSN/3eREeZAuQxAJiXf69Wp6En8OpzlWD+FkA
-	1P1CBA3MayWfSsSrSMlaJ5r3waQ7V9GYYfrTQNOGMleGbGqQaPmbieblySEtFHQ+yVC01bCZ9Ndg6
-	r/+F2UYb7HI0apWnl1aoZRMja2ed6CMQKUMpzC9aJTFobgajlKAB/jWSiOaDd9oCBt95zvITw/QzB
-	dUtt41MT9sIUWpzGp93Wk2TZKqFkkCN4yAdQKM5UJ7GTQ3E365MkXvtLwd7grFlA==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1raCUR-0000000922G-31tB;
-	Wed, 14 Feb 2024 11:27:43 +0100
-Message-ID: <6641f3f90bdc1d24f3a7fd795be672ce02685630.camel@sipsolutions.net>
-Subject: Re: [PATCH 1/1] wifi: nl80211: Add support for plumbing SAE groups
- to driver
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Kalle Valo <kvalo@kernel.org>, Vinayak Yadawad
-	 <vinayak.yadawad@broadcom.com>, linux-wireless@vger.kernel.org, 
-	jithu.jance@broadcom.com, Arend van Spriel <arend.vanspriel@broadcom.com>, 
-	netdev@vger.kernel.org
-Date: Wed, 14 Feb 2024 11:27:42 +0100
-In-Reply-To: <20240213174314.26982cd8@kernel.org>
-References: 
-	<309965e8ef4d220053ca7e6bd34393f892ea1bb8.1707486287.git.vinayak.yadawad@broadcom.com>
-	 <87mss6f8jh.fsf@kernel.org>
-	 <2c38eaed47808a076b6986412f92bb955b0599c3.camel@sipsolutions.net>
-	 <20240213174314.26982cd8@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+	s=arc-20240116; t=1707909027; c=relaxed/simple;
+	bh=/N+Tr5D1cCwdzGyVTjVobKhxOLKQhp7GUjHGGqZReHw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=KsHRzbf/oHXiwiHqDhBYnc0jcfgQyRyWjUKDPq6+lC9CKoO1gWA1kAenwRas7srcnvMDwSE8wATRQRbPDW/AwL6UIMOlmuS5ZcsDHYf7ZI7kKMAFw3W3QnXu892+IKpAQdG5CDrTmuZvWSU5NSAfl5+BcU8S20TkSqs2Qv30fTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E05J9c6z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3D530C433F1;
+	Wed, 14 Feb 2024 11:10:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707909026;
+	bh=/N+Tr5D1cCwdzGyVTjVobKhxOLKQhp7GUjHGGqZReHw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=E05J9c6zjy/3kPry6R6UbtObeLdt6ciRvZaRUE8FGcM7/dCIRGfvgNEgLfQLk1+SA
+	 Z9F+GkB8OF2iKgwKw8hZhxz0+yOMMnjlJQMmlQRhOfsX3NbuntBYlM+JgdkuGm7p1F
+	 OVLnLUIPS55eHtpvWmoOotBxPgdfp4zbAiWvHBLeH4AUHspG8QzuQTy9isQpt0YuP/
+	 pBJwRQpoqnz9WlH3bcG8BXtZEkVNu2E0z8beEEAM9YOMc391H1xCeXHhIvfUe0FBWk
+	 OlfVs88mbDMzWkCkklwO3NHFsqAiPp+8e16jw0vKVTQYqX75Dng77y3Oqzybu/3J6W
+	 LOXJQqhj0ICIQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1C735D84BCE;
+	Wed, 14 Feb 2024 11:10:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v8 0/4] Per epoll context busy poll support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170790902610.17376.12972731965636317765.git-patchwork-notify@kernel.org>
+Date: Wed, 14 Feb 2024 11:10:26 +0000
+References: <20240213061652.6342-1-jdamato@fastly.com>
+In-Reply-To: <20240213061652.6342-1-jdamato@fastly.com>
+To: Joe Damato <jdamato@fastly.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ chuck.lever@oracle.com, jlayton@kernel.org, linux-api@vger.kernel.org,
+ brauner@kernel.org, edumazet@google.com, davem@davemloft.net,
+ alexander.duyck@gmail.com, sridhar.samudrala@intel.com, kuba@kernel.org,
+ willemdebruijn.kernel@gmail.com, weiwan@google.com, David.Laight@ACULAB.COM,
+ arnd@arndb.de, sdf@google.com, amritha.nambiar@intel.com,
+ viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org, deller@gmx.de,
+ jack@suse.cz, jirislaby@kernel.org, corbet@lwn.net, jpanis@baylibre.com,
+ linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, mpe@ellerman.id.au,
+ nathanl@linux.ibm.com, palmer@dabbelt.com, stfrench@microsoft.com,
+ thuth@redhat.com, tzimmermann@suse.de
 
-On Tue, 2024-02-13 at 17:43 -0800, Jakub Kicinski wrote:
-> I may be missing the point but is there any official way we can
-> designate level of vendor involvement? MAINTAINERS seems like=20
-> the most basic, and we have
->=20
-> BROADCOM BRCM80211 IEEE802.11 WIRELESS DRIVERS
-> M:	Arend van Spriel <arend.vanspriel@broadcom.com>
-> L:	linux-wireless@vger.kernel.org
-> L:	brcm80211@lists.linux.dev
-> L:	brcm80211-dev-list.pdl@broadcom.com
-> S:	Supported
-> F:	drivers/net/wireless/broadcom/brcm80211/
-> F:	include/linux/platform_data/brcmfmac.h
->=20
-> where (for the uninitiated):
->=20
->    Supported:	Someone is actually paid to look after this.
->=20
-> It doesn't seem like Arend is afforded much paid time "to look after
-> this".
+Hello:
 
-I don't know if that's even the core of my complaint. I don't know if
-it's true, but let's assume Arend _does_ get sufficient time to take
-care of the driver.
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-The core of the complaint here is that regardless of that, Broadcom is
-treating the driver as a dead end, a fork in the road they're no longer
-travelling. So "supporting" that driver may all be well, in the sense
-that it's there for the existing hardware/firmware that it supports.
+On Tue, 13 Feb 2024 06:16:41 +0000 you wrote:
+> Greetings:
+> 
+> Welcome to v8.
+> 
+> TL;DR This builds on commit bf3b9f6372c4 ("epoll: Add busy poll support to
+> epoll with socket fds.") by allowing user applications to enable
+> epoll-based busy polling, set a busy poll packet budget, and enable or
+> disable prefer busy poll on a per epoll context basis.
+> 
+> [...]
 
-But! It's not getting new features nor support for new devices, I don't
-even know if it still supports newer firmware images for the devices it
-already supports. Some new driver support is coming in by way of the
-Apple-support folks, but you saw how that's going ...
+Here is the summary with links:
+  - [net-next,v8,1/4] eventpoll: support busy poll per epoll instance
+    https://git.kernel.org/netdev/net-next/c/85455c795c07
+  - [net-next,v8,2/4] eventpoll: Add per-epoll busy poll packet budget
+    https://git.kernel.org/netdev/net-next/c/c6aa2a7778d8
+  - [net-next,v8,3/4] eventpoll: Add per-epoll prefer busy poll option
+    https://git.kernel.org/netdev/net-next/c/de57a2510822
+  - [net-next,v8,4/4] eventpoll: Add epoll ioctl for epoll_params
+    https://git.kernel.org/netdev/net-next/c/18e2bf0edf4d
 
-Yet at the same time Broadcom _are_ sending patches to the core wifi
-stack, in order to support new features/offloads for their new firmware
-builds etc. on some/other/new devices. New features for the stack where
-we cannot actually see the driver implementation, maintain it, etc. Not
-that in many cases the driver implementation would be all that
-interesting, but it's still pushing code and work into upstream that it
-will never benefit from.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-So this disconnect really is the complaint: Broadcom want us to maintain
-the stack for them, do things for them like in this patch in support of
-their latest firmware builds, but they definitely do _not_ want to do
-anything upstream that would actually support these new things they
-have.
 
-At which point, yeah, I'm putting my foot down and saying this has to
-stop. I really don't (**) care about Broadcom doing their own vendor-
-specific APIs if there's zero chance the things they're needed for will
-ever land upstream anyway.
-
-(**) No longer. I used to think that being more open about this would
-encourage folks to start a journey of contributing more upstream, but
-clearly that hasn't worked out.
-
-Now this is why I used to be more open: I will also most definitely not
-accept all the vendor APIs upstream if someone later decides they do
-want an upstream driver, and then push all the vendor stuff on grounds
-that "it's used now and we have to support it" ... We don't, at least
-not upstream, what you sell to your customers really isn't our problem.
-
-(And to be honest, if customers cared, we'd not be in this position)
-
-> On the Ethernet side I have a nebulous hope to require vendors who want
-> the "Supported" status to run our in-tree tests against their HW daily.
-> As a way to trigger the loss of status. Otherwise it's hard to catch
-> people drifting away.
-
-Every day seems a bit excessive? OTOH, every day is a good way of saying
-"you really have to automate this", but then once you do that, maybe you
-don't need to pay anyone to really maintain it, beyond trying to keep
-the tests running?
-
-Also not sure what that status really implies, I think Broadcom would be
-quite happy to just mark the driver as orphaned...
-
-johannes
 
