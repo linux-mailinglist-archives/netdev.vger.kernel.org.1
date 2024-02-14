@@ -1,157 +1,118 @@
-Return-Path: <netdev+bounces-71860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE91A85559F
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 23:18:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 063678555A9
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 23:22:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C4F71C212C5
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 22:18:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A56192903BB
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 22:22:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6C70141996;
-	Wed, 14 Feb 2024 22:18:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A42B1141996;
+	Wed, 14 Feb 2024 22:22:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e5S7unmQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YFlHyR2U"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E986413B7BB;
-	Wed, 14 Feb 2024 22:18:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73C41126F3B;
+	Wed, 14 Feb 2024 22:22:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707949091; cv=none; b=t9lHldG9Vxse638AIVNWdtUdhEWL81fSxpJBVumofXRmdTSgziUV/ZRHFoff3DaigRbrZ21KrpQu76BTVUZ1Y9eOYKsmQ7EoVzN68HOKHIbWaEy6QcupFb+v1tUg7fmULrtoIdzJIEzBl7C6+Ndu4r7RaEflV5ku1R8Bv6m7KOk=
+	t=1707949331; cv=none; b=W+smALPMmikseEx8H6UgDId6Zn2id9El7qPVfsCxxdmvux+iWrJg/FOutE6eNp7XIZzizltaPWRrXfhllraxP60UEtTAyAOTcbiWLa7qQhEucdvCVeWgEsDjjJkUhzCqUE+XiD0q2ypcKH5gO5AAP++7LKvrAoVsw1WwoOz/t/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707949091; c=relaxed/simple;
-	bh=Sd3LHiIC/HJ8oQfgv8x2Xjbdlj3ryLnafieXwXO0BMA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=odAjyL0yjoVc5ERXotDYAfEkCWrSBfZxQdEXDpUB1VOtmBBwsRsXEmIu1iZ3INTaY6Q0ZYTTOzhWocQSaoWgU09n3LJnuYfi5F5qpZZhEhI8Y7Ms2ybnaiWQcCFLSztc6jKUkqyjViEYBnZ2W76eqVUjuEejg/noUU5WtP1xqBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e5S7unmQ; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2d090c83d45so2443711fa.3;
-        Wed, 14 Feb 2024 14:18:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707949087; x=1708553887; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H64vWKrMscP+UtU2SdNH5gXCgsbTGntQcLU1ahmajlM=;
-        b=e5S7unmQAITFlpZ4RZlDClR9qnmpuFqG5/tghXl9aYj18Y+ZVNA69VnATi26TpO9vs
-         vsqbLlYn4zWGAHt6ahu0d922wI4ubgk82jZG7Mzo26b6+vYC8vjktNe0iP97P+mCjTAK
-         j5EQAS/ooYAVFNe9QFNGYDH02hmXkKVMxGQDDIgKC4VSC7klq2s9KD0vh/vMm8jO4RI6
-         z40mHTkFYVFxWPsfXyrkrnU8XiEjYL6CAGrhIKhZaxy6Yyf7UhOvrDQtQ9LRFWnRTgpe
-         CkYNBLSmbRY8YNE0Q0Urs2cz2JIPGaTKX53kDcwxvHc7pC2ug1zNyhOQR5rovAvFFdoe
-         Je7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707949087; x=1708553887;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=H64vWKrMscP+UtU2SdNH5gXCgsbTGntQcLU1ahmajlM=;
-        b=IhZfOrNg9bJljwC4mj9lBsSGI8af2H8sVcY5lonFcUKraPIYvMWl5YnqxmFY4D3Gb6
-         5xJ8ucgmgAVe2V3kQJ7KVNhzRzmw7V8lPG5kl6oTvwu9gQYuI4wlkGqyblc9d5pCARCv
-         QJoBNTY5Gh+r15Suc6a1W29CPykcVc1kuNpLoOpNT8kwponWHjp1jGJb4k9t3B2oii6/
-         /Co4T0KleCZLXR9p6wQmRKDz7QJDRtV5t8qhGaEA/UYm8WRTcVZdj78YXNgXg3JBuylz
-         t38dB5g1YFnEJF+xI7WSqu4lgAqBsGTuT8K9E8IVmtJfjN5tWDF4YbatKWf+JLfP8DMW
-         YcZw==
-X-Forwarded-Encrypted: i=1; AJvYcCV2DI23ObioxixFqSlCbBt0gLVtASuSkwWrZNMQwS3dVOLHO1PhZ3kBU8EnjMUAR4tJIABIxO9y6k12mTAcIBnh9kityN+d+OB4VJ+d2YbEP1Ua5TkI2cXjBGvEipxypbMmaR/GO42sVz91h5aj9Jr0qiEcngLTNGoWMspM32FUJw==
-X-Gm-Message-State: AOJu0Yyv22gKaOPImQLeFuyOtLf32UgaVBMrsBBRbAvh9XDo9ZYhxmLR
-	MaTc5qY93n3ZLe+Rhy5aP1w7zWHIaLDmV8QWxzmW2KTBNbCaDbbOGalij3wIHorRzgr+OS/54nR
-	Og1A+BTlCiWUsVXhL2Q0cIx3zkL0=
-X-Google-Smtp-Source: AGHT+IFQIRkjDKKh52f3N53ULv5NQX4VDybjFiEKg7Wa8QdAp/w3/BrWTCQUd+VlDE8Yc0CacNPfriQZpDwuZPWLPoE=
-X-Received: by 2002:a2e:870f:0:b0:2d1:188b:c3fb with SMTP id
- m15-20020a2e870f000000b002d1188bc3fbmr21382lji.34.1707949087077; Wed, 14 Feb
- 2024 14:18:07 -0800 (PST)
+	s=arc-20240116; t=1707949331; c=relaxed/simple;
+	bh=haWbbEkw2NY+b1BhQhricbLDp7rvk1DgxpMz4z97Gsc=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=AdGR+7ed+/dCH9tuFuDYau7Kk5BhUceS638UmV3LBNiAWHsPMungixTR0uspzPKmWLxcz6fEV9gjwFJyx+sP1VKfOtAaPw4F1XfBEf/KlJBld+pbue7EdvToY+RPnlhgD3pTdISt5ZkJaNAcU0kiTbbfjeGOTJatHJ/cgS1m6a8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YFlHyR2U; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D734AC433F1;
+	Wed, 14 Feb 2024 22:22:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707949330;
+	bh=haWbbEkw2NY+b1BhQhricbLDp7rvk1DgxpMz4z97Gsc=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=YFlHyR2UhwrTMFFPuRlUOHVUVrFfr8+BxUcZ8Y3yg4Vb+mEBKXE0EQAulm1hZnSRi
+	 gSm+mGbyjPIaqsGZ0NKuZBUmBerRv7hj7KoidbBqoxRnyHao1TRtyMtuIU6gfdEBT5
+	 hs7gvrSqIkJp+hTorV/SQ31so4aoyyjxFX47HHcTjKrOLqILbUyDA2Y5pnbtrhmhwz
+	 8giBYc7+jK2LikWvrfrkL4nV77C2suazVuB9UPMoT1rffFrsK68pR2NvFYJ3If3YZ6
+	 Wl6/zdrLH8JPDTpJ2WUBUVp9+E03UWTS9jPNhqd33MwaoN8ADiX2EBL5Beh4SRXaou
+	 kFDnMlzvvRuFg==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C18DDC48BEB;
+	Wed, 14 Feb 2024 22:22:10 +0000 (UTC)
+From: Zachary Goldstein via B4 Relay
+ <devnull+zachary.goldstein.concurrent-rt.com@kernel.org>
+Date: Wed, 14 Feb 2024 17:21:54 -0500
+Subject: [PATCH] arm64: ls1046ardb: Replace XGMII with 10GBASE-R phy mode
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240213-realtek-reset-v3-0-37837e574713@gmail.com>
- <20240213-realtek-reset-v3-3-37837e574713@gmail.com> <CACRpkdZELbOmZieZTDLfA81VuThM7h399BWtuQuQ6U7o8Xb7LA@mail.gmail.com>
-In-Reply-To: <CACRpkdZELbOmZieZTDLfA81VuThM7h399BWtuQuQ6U7o8Xb7LA@mail.gmail.com>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Wed, 14 Feb 2024 19:17:55 -0300
-Message-ID: <CAJq09z4wgPo=1_OtA6Y-0O4gLJ2nxy1jdf0BDoZwVmL=TkOdUg@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 3/3] net: dsa: realtek: support reset controller
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id:
+ <20240214-ls1046-dts-use-10gbase-r-v1-1-8c2d68547393@concurrent-rt.com>
+X-B4-Tracking: v=1; b=H4sIAAE9zWUC/x2MQQqDMBAAvyJ77sJuiIH0K+IhrZt0oVjJWhHEv
+ xs8DXOYOcCkqhg8uwOqbGr6m5vwo4P3J81FUKfm4Mh5cuzxa0w+4LQa/k2QqbxSY0USipFzCn2
+ O0PKlStb9Xg/jeV6yi7OvagAAAA==
+To: Shawn Guo <shawnguo@kernel.org>, Madalin Bucur <madalin.bucur@nxp.com>, 
+ Li Yang <leoyang.li@nxp.com>, Rob Herring <robh+dt@kernel.org>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ Zachary Goldstein <zachary.goldstein@concurrent-rt.com>
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1707949330; l=1035;
+ i=zachary.goldstein@concurrent-rt.com; s=20230809; h=from:subject:message-id;
+ bh=BGRIPx+hnBEVvcJ92A45ST1Vx+ijHTH7otOABNKiaNE=;
+ b=cnJjLYsULO9fgq8vCh9rD+0wuwb3Lt2hZFgIo9bcbpGw2f8YVDH07WSZL9LCktQlciB1AD9P7
+ cU7g9eKBOCODnYsM5p+LfRiwjSZ2jE5iP2/N7RZAjkgqZx0LJiboJjh
+X-Developer-Key: i=zachary.goldstein@concurrent-rt.com; a=ed25519;
+ pk=GLF18lQ96tRolyWMpDtJzDQ9bi7+1+rMHript5TFdSg=
+X-Endpoint-Received:
+ by B4 Relay for zachary.goldstein@concurrent-rt.com/20230809 with auth_id=74
+X-Original-From: Zachary Goldstein <zachary.goldstein@concurrent-rt.com>
+Reply-To: <zachary.goldstein@concurrent-rt.com>
 
-> Hi Luiz,
+From: Zachary Goldstein <zachary.goldstein@concurrent-rt.com>
 
-Hi Linus,
+The AQR107 family does not support XGMII, but USXGMII and
+10GBASE-R instead. Since ce64c1f77a9d ("net: phy: aquantia: add USXGMII
+support and warn if XGMII mode is set") the kernel warns about XGMII
+being used. The LS1046A SoC does not support USXGMII, so use 10GBASE-R
+instead.
 
-> thanks for your patch!
+Signed-off-by: Zachary Goldstein <zachary.goldstein@concurrent-rt.com>
+---
+ arch/arm64/boot/dts/freescale/fsl-ls1046a-rdb.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I'm glad to help ;-)
+diff --git a/arch/arm64/boot/dts/freescale/fsl-ls1046a-rdb.dts b/arch/arm64/boot/dts/freescale/fsl-ls1046a-rdb.dts
+index 07f6cc6e354a..d2066f733dc5 100644
+--- a/arch/arm64/boot/dts/freescale/fsl-ls1046a-rdb.dts
++++ b/arch/arm64/boot/dts/freescale/fsl-ls1046a-rdb.dts
+@@ -149,7 +149,7 @@ ethernet@ea000 {
+ 
+ 	ethernet@f0000 { /* 10GEC1 */
+ 		phy-handle = <&aqr106_phy>;
+-		phy-connection-type = "xgmii";
++		phy-connection-type = "10gbase-r";
+ 	};
+ 
+ 	ethernet@f2000 { /* 10GEC2 */
 
-> On Wed, Feb 14, 2024 at 1:54=E2=80=AFAM Luiz Angelo Daros de Luca
-> <luizluca@gmail.com> wrote:
->
-> > The 'reset-gpios' will not work when the switch reset is controlled by =
-a
-> > reset controller.
-> >
-> > Although the reset is optional and the driver performs a soft reset
-> > during setup, if the initial reset state was asserted, the driver will
-> > not detect it.
-> >
-> > The reset controller will take precedence over the reset GPIO.
-> >
-> > Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-> (...)
-> > +void rtl83xx_reset_assert(struct realtek_priv *priv)
-> > +{
-> > +       int ret;
-> > +
-> > +       if (priv->reset_ctl) {
-> > +               ret =3D reset_control_assert(priv->reset_ctl);
->
-> Actually, reset_control_assert() is NULL-tolerand (as well as the
-> stubs) so you can just issue this unconditionally. If priv->reset_ctl
-> is NULL it will just return 0.
+---
+2.40.1
+base-commit: 841c35169323cd833294798e58b9bf63fa4fa1de
 
-The idea was to avoid gpiod_set_value if the reset_control_assert was
-configured and worked. However, I don't see a big issue in calling
-them both as you don't expect both to be configured.
-I'll remove the "ifs not null" and let both be called.
-
->
-> > +               if (!ret)
-> > +                       return;
-> > +
-> > +               dev_warn(priv->dev,
-> > +                        "Failed to assert the switch reset control: %p=
-e\n",
-> > +                        ERR_PTR(ret));
-> > +       }
-> > +
-> > +       if (priv->reset)
-> > +               gpiod_set_value(priv->reset, true);
->
-> Same here! Also NULL-tolerant. You do not need to check priv->reset.
-> Just issue it.
->
-> > +void rtl83xx_reset_deassert(struct realtek_priv *priv)
->
-> Same comments for deassert.
->
-> With this fixed (the rest looks just fine):
-> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
->
-> Yours,
-> Linus Walleij
 
