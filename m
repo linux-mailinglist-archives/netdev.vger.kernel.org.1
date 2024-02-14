@@ -1,160 +1,105 @@
-Return-Path: <netdev+bounces-71814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F2B2855308
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 20:15:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48D3685530A
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 20:15:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 143191F26FD6
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 19:15:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AB151C21A9C
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 19:15:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D793A13B78B;
-	Wed, 14 Feb 2024 19:14:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF9F813A86D;
+	Wed, 14 Feb 2024 19:14:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YEWwCpxS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ULDemqie"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6CB12D768;
-	Wed, 14 Feb 2024 19:14:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC1F912D768
+	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 19:14:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707938074; cv=none; b=dNZpkgzTcoCfBIM3fxaWeIq+Vn053E+8m1g2b9eT9p0p+PqWiuJCb6RUiGXAEquXJm5GK89RTnpHM84+l2ecKtFHR8Pc1cSDaQBRA4OSC4mPmkASxy/Q9xMIbp3izr1b9I0ABVbGi+YLhEYebjHBqzEfjJctfTbicuYBxbrwHsw=
+	t=1707938085; cv=none; b=UrtAx27dVUzqTb8lBIZPZ/3dEvFGOLDQRIDCSrnEDlUTLGNM65eRWnixT7Nvi1oxmGYw1Jhye5kxcB6eL9fk7n2puW99QxtGR4RXk07xyDG6NQPBzyHaVrp7T199tWowphV+qd+QNdbEPYUnT8OK5axAMTOKmyCg4M393toKfBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707938074; c=relaxed/simple;
-	bh=MaJZuXgtafOGc1X7dn5qpF3FNN6F4IyRYiNdXmKaABM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m4F/LOc89xve3nF4KJ7zwqZrnppmt1FxYAGgU7CLOe6QD948guPinqL/vv31wu2XWLUJxjHVVUuARXRnSqjhAlreDUwzONGbdpIIMOiT3Q3FP0HOAmMnfvU2/g1G/8vSUhHerMO+xsktDV1KYCkfnT6N9B10mymoSe42Vf4CvMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YEWwCpxS; arc=none smtp.client-ip=209.85.166.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-363d953a6c5so221655ab.1;
-        Wed, 14 Feb 2024 11:14:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707938072; x=1708542872; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XcRLFBmhxBNmC++s4eS7gG/u6Bkk3SvDAzwYVX1fDNg=;
-        b=YEWwCpxSFI2jAhBG50HHH3UBEL8NkR69d1I3BuZwMB1ENRfDSsFcAFqUNfDGfD5Ebq
-         OFLhRLk8KjcUn9ZG2QkTiR+GpRjYxp6T9lHdWWrxIBDCY65QUbxPqsEojbWZ3KuhppI7
-         zbQMd+0dNZnnD79kt5EJUeiUqNCDiiR55aelyDsDOAuM+pAw3rIVbzZ187Y3YBMQ52rm
-         GsnNiYwn70OOKEil4lUrIPLKh8FIkdpC29TXeLZFyK0DiFR5a/26O5VQOVUAJBtC3yXy
-         uGM4UE5Z1yKQmfmVqUfwtlWjFU2II1jffxrp7wLcIotZ6DKewThIjTlZcj7SS4Ux1ZgD
-         AYmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707938072; x=1708542872;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XcRLFBmhxBNmC++s4eS7gG/u6Bkk3SvDAzwYVX1fDNg=;
-        b=iGo81cZ2vUzKoCAFLZYfZhBjbwuZIAr8tZse0HyuqvBRNNspNbz6y2euLWK2gBKv1y
-         gQaMf9PFhHhZEDAJNyKZVuxawQDy5Vv7SGJB0KnLdjX9zIsjA5HOLRYIRbtjbKYYXClJ
-         YMGkMjvfTohA/u6kvO1oqs9VmssK3joYo6w6GuSHuhnAth2c6Q0YkcPCagHhHIf97OBz
-         PRioAzuQbOCUV5MfeBSv2rebZFEy+A9gbc9U5vSFr9s7fPJ2txwqWP7SrmyI0xVFrZul
-         L2A4G54QVdx5rF/+4Vbw0AhiGrH5CPBI/mxWJfFXyIfFOL17l721P9rx4IZHQF+bp3yt
-         bUJg==
-X-Forwarded-Encrypted: i=1; AJvYcCV6L9ctkd4oJ1W2YK9xX+SQb+vn24W/7WDFcRyztnStCaG2y9rUGnC8SOoffgT5+bGiFu4THmF5sVPvYC07Bl7+M+GIUYMrmJODQbajV1gBoEKhfFA0uCGlzptTERK58XvMJw==
-X-Gm-Message-State: AOJu0YxGxK6TybKl7GFKtIE2N149KpqPYy1lASBt1wZcAd2W4BEB/6bO
-	VERch3oltTUNpSkmyPPX/P+ihKzrOsfxENQmv9W0GCNCYVY6qg7x6Oaz6Q9bfn0tLkqUg5mNxKW
-	HuINBdXt5AHbunNe2o+lbqAa2b0I=
-X-Google-Smtp-Source: AGHT+IGaAdxT+p5eZyD405tcBTNrXvLLs2Hyo8g4KHuwGDbP+xjemkv9sIqAAL5yG/9jj/y9123Q1qOg0kvRLglpPQM=
-X-Received: by 2002:a92:c841:0:b0:363:d9eb:c2de with SMTP id
- b1-20020a92c841000000b00363d9ebc2demr3924981ilq.6.1707938072122; Wed, 14 Feb
- 2024 11:14:32 -0800 (PST)
+	s=arc-20240116; t=1707938085; c=relaxed/simple;
+	bh=gj3Pm5aJ3SFI1wUg9LLe7kGqlr/JW2l2fYlObGxEYxg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PlpTz/98BAHsE91i0XNnY5Hj7FmNeDE+320T793tvWtPC+IINCqJzecJNHVf/q9L3tVHAfV3LJ1iHpeLnaM6H3iAOKPYbGPjkjrA9dicoqHcEP4xoBjWLJKBFVdz62G4+/vg6j/cnb+vq7QSj9MAwlaK/c+BGYqJN1Qu7SH2+ZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ULDemqie; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC738C433C7;
+	Wed, 14 Feb 2024 19:14:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707938085;
+	bh=gj3Pm5aJ3SFI1wUg9LLe7kGqlr/JW2l2fYlObGxEYxg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ULDemqie1jRNyCb1SwFsE1IyXKHUOD5/dFIGff1Socsza9l5ThImibvWkTYuXfEF8
+	 yTPWIcX9zsEUHzl4g/dvWx514V+DSmXo+j36y72LcVLUDq3VskbWQQeae2fDQ+wy5v
+	 eu3rp0R31KIY7RkbarGampyEFA9Shab3s0T/RKSQLqZxZ2rYvT7C4oiATHuXfRaWtU
+	 lfG1kc3Yn6vdOGN5c7kvK/ws7XtBbMJ/QdjqHZjzwi9Ze7f3xYCSTl2k0yk0UK+7O8
+	 5e2jQuceSMlRzz8Qgfac2VUospJMONMD+SYlNLI/hpTrMzztjcb62OGjtk/AS77kCP
+	 UJWuYvJPIrwyw==
+Date: Wed, 14 Feb 2024 20:14:41 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, lorenzo.bianconi@redhat.com,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	hawk@kernel.org, ilias.apalodimas@linaro.org
+Subject: Re: [PATCH net-next] net: page_pool: make page_pool_create inline
+Message-ID: <Zc0RIWXBnS1TXOnM@lore-desk>
+References: <499bc85ca1d96ec1f7daff6b7df4350dc50e9256.1707931443.git.lorenzo@kernel.org>
+ <20240214101450.25ee7e5d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240214082224.10168-1-dmantipov@yandex.ru>
-In-Reply-To: <20240214082224.10168-1-dmantipov@yandex.ru>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Wed, 14 Feb 2024 14:14:21 -0500
-Message-ID: <CADvbK_fhGKBXyjSqo8shKVKi11SPoVQ2z1+Vde0ranhpsoy0zQ@mail.gmail.com>
-Subject: Re: [PATCH] [v3] net: sctp: fix skb leak in sctp_inq_free()
-To: Dmitry Antipov <dmantipov@yandex.ru>
-Cc: Jakub Kicinski <kuba@kernel.org>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
-	linux-sctp@vger.kernel.org, netdev@vger.kernel.org, 
-	lvc-project@linuxtesting.org, 
-	syzbot+8bb053b5d63595ab47db@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="yKxMMVgP6J95zPBA"
+Content-Disposition: inline
+In-Reply-To: <20240214101450.25ee7e5d@kernel.org>
+
+
+--yKxMMVgP6J95zPBA
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 14, 2024 at 3:23=E2=80=AFAM Dmitry Antipov <dmantipov@yandex.ru=
-> wrote:
->
-> In case of GSO, 'chunk->skb' pointer may point to an entry from
-> fraglist created in 'sctp_packet_gso_append()'. To avoid freeing
-> random fraglist entry (and so undefined behavior and/or memory
-> leak), introduce 'sctp_inq_chunk_free()' helper to ensure that
-> 'chunk->skb' is set to 'chunk->head_skb' (i.e. fraglist head)
-> before calling 'sctp_chunk_free()', and use the aforementioned
-> helper in 'sctp_inq_pop()' as well.
->
-> Reported-by: syzbot+8bb053b5d63595ab47db@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?id=3D0d8351bbe54fd04a492c2daab0=
-164138db008042
-> Fixes: 90017accff61 ("sctp: Add GSO support")
-> Suggested-by: Xin Long <lucien.xin@gmail.com>
-> Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
-Acked-by: Xin Long <lucien.xin@gmail.com>
-> ---
-> v3: https://lore.kernel.org/netdev/CADvbK_cjg7kd7uFWxPBpwMAxwsuCki791zQ7D=
-01y+vk0R5wTSQ@mail.gmail.com
->     - rename helper to 'sctp_inq_chunk_free()' (Xin Long)
-> v2: https://lore.kernel.org/netdev/20240209134703.63a9167b@kernel.org
->     - factor the fix out to helper function (Jakub Kicinski)
-> ---
->  net/sctp/inqueue.c | 14 ++++++++++----
->  1 file changed, 10 insertions(+), 4 deletions(-)
->
-> diff --git a/net/sctp/inqueue.c b/net/sctp/inqueue.c
-> index 7182c5a450fb..5c1652181805 100644
-> --- a/net/sctp/inqueue.c
-> +++ b/net/sctp/inqueue.c
-> @@ -38,6 +38,14 @@ void sctp_inq_init(struct sctp_inq *queue)
->         INIT_WORK(&queue->immediate, NULL);
->  }
->
-> +/* Properly release the chunk which is being worked on. */
-> +static inline void sctp_inq_chunk_free(struct sctp_chunk *chunk)
-> +{
-> +       if (chunk->head_skb)
-> +               chunk->skb =3D chunk->head_skb;
-> +       sctp_chunk_free(chunk);
-> +}
-> +
->  /* Release the memory associated with an SCTP inqueue.  */
->  void sctp_inq_free(struct sctp_inq *queue)
->  {
-> @@ -53,7 +61,7 @@ void sctp_inq_free(struct sctp_inq *queue)
->          * free it as well.
->          */
->         if (queue->in_progress) {
-> -               sctp_chunk_free(queue->in_progress);
-> +               sctp_inq_chunk_free(queue->in_progress);
->                 queue->in_progress =3D NULL;
->         }
->  }
-> @@ -130,9 +138,7 @@ struct sctp_chunk *sctp_inq_pop(struct sctp_inq *queu=
-e)
->                                 goto new_skb;
->                         }
->
-> -                       if (chunk->head_skb)
-> -                               chunk->skb =3D chunk->head_skb;
-> -                       sctp_chunk_free(chunk);
-> +                       sctp_inq_chunk_free(chunk);
->                         chunk =3D queue->in_progress =3D NULL;
->                 } else {
->                         /* Nothing to do. Next chunk in the packet, pleas=
-e. */
-> --
-> 2.43.0
->
+> On Wed, 14 Feb 2024 19:01:28 +0100 Lorenzo Bianconi wrote:
+> > Make page_pool_create utility routine inline a remove exported symbol.
+>=20
+> But why? If you add the kdoc back the LoC saved will be 1.
+
+I would remove the symbol exported since it is just a wrapper for
+page_pool_create_percpu()
+
+>=20
+> >  include/net/page_pool/types.h |  6 +++++-
+> >  net/core/page_pool.c          | 10 ----------
+> >  2 files changed, 5 insertions(+), 11 deletions(-)
+>=20
+> No strong opinion, but if you want to do it please put the helper=20
+> in helpers.h  Let's keep the static inlines clearly separated.
+
+ack, fine to me. I put it there since we already have some inlines in
+page_pool/types.h.
+
+Regards,
+Lorenzo
+
+--yKxMMVgP6J95zPBA
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZc0RIQAKCRA6cBh0uS2t
+rNfEAP4lFjpRuKfyJis8rw/oTjtQvfMZ7MWy9BMjmNocu1V9RgD7BFEgJdBEz9N4
+KvdA4VVh0Ok6u9yv5cl+V+LNvz31lQ8=
+=GGrI
+-----END PGP SIGNATURE-----
+
+--yKxMMVgP6J95zPBA--
 
