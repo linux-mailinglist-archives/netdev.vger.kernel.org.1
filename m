@@ -1,98 +1,112 @@
-Return-Path: <netdev+bounces-71660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67F798548EE
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 13:10:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E480185490B
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 13:19:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D47E28CD81
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 12:10:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9846D1F2897D
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 12:19:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF5701B7EA;
-	Wed, 14 Feb 2024 12:10:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B157A1BC3F;
+	Wed, 14 Feb 2024 12:19:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FyrMFbas"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="2x9mLRTP";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Khnhbq7L"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 708D94436;
-	Wed, 14 Feb 2024 12:10:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AED11BC2F;
+	Wed, 14 Feb 2024 12:19:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707912626; cv=none; b=iiYMDnbpkR5DeUsUBduHlejVKzCsSMfwoFs6fUo+huNWr0lgnHup11u38irC5QcCKgKY+ozoTyNz74b3H+CgA4+6cg7b553Not2yuW487o+38WniO/oTPqP0TpM8x5x7yCJ42LGO+bg/I38bpY8YpLgc/zGhb4jw9jbQe2OP+Og=
+	t=1707913166; cv=none; b=OgRUZAfRWLtStVzFpxkoUDG4M6t+UOncjLYKg81SN+khwnvxF5Z6859Skyr32Dy7zs/3+q5smEsIzrm3VBvjmQYbBlCKnFnwKlNpEwgMTOLI2cd2uuOJ6l2ln1ZFwN9g5pHPFNFdyW6f9q8PLtmKLPZt4WJuadf924kwZ6GmL7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707912626; c=relaxed/simple;
-	bh=x1g6GMNkLoMW1m0Fc0n7IJtC/rw991yy2r9DfS39pRQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jWYfN5vPmkL6AITZvEl9rg0S0khMBpX48Zrvz9fZFzAJGOUYLMGWs9Oq1SbOHGwoBlu00tCnYXR+61GGV05usdLlQTfWhrAfrU5JNOw/bao4tk+UWnrsUVVeaGaopO9mlADvBVTJYQa+xE3TSPjNsmqc02Bc2lbnEAgSzYAXibk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FyrMFbas; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6A0D7C433F1;
-	Wed, 14 Feb 2024 12:10:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707912625;
-	bh=x1g6GMNkLoMW1m0Fc0n7IJtC/rw991yy2r9DfS39pRQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FyrMFbasaadIkbNrMUy9vE03K5vYZIFJmQbWGN/ptTjFv7K9HCTHXzZBXawzonz8S
-	 Cv/g6bGaiMnf0fVZexvFbzuAiXhkdlrwDPFuOxcZPbBQSWzndY5OV+kTLW5llA4Y+q
-	 q23zc3E9syZRXI79Tuyel5Iuayuw29+4z8k+UKhVgWPZFhLy3OzOel/kAQi1RmxCLm
-	 3JHkGJXDsxbH6IYn5kgOWV3WzbsiEYskXvur066PmvyRp8FroeZUmfpECCSDvjGXfb
-	 ESnxF72KUryMNRP5R3FNTyJC3n681zigVIV25s4ApnZtTAzGWB06XpORABq6TrJLFZ
-	 gfjfNcv6LS4wg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4D476D84BCD;
-	Wed, 14 Feb 2024 12:10:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1707913166; c=relaxed/simple;
+	bh=VgFeoYyTB4fn3435l7WNNWsNs0bJNnj0aE0QV7uVYy8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z81QbT+Sct1EY9BZxSFtZJdHCJFhejovXzfAdx/rxIwr0+GXW8iC5bDuc5BYXKGrYqqWCC1JwmZ1XZV6ydkRc73kcO2cG0+IFWuVe6lxh1tMrdq/iwiYwDaQrDGeZZETzuuQT2eg/KjNgWbgq9x14KAeV700B4eVhPaZmh27qMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=2x9mLRTP; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Khnhbq7L; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Wed, 14 Feb 2024 13:19:21 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1707913163;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=K4Y44MKuxNKwjsBvggpladPTLai1AztGkC2oP6HBP0I=;
+	b=2x9mLRTPYvCPfThzEsLM9wIoIp3+23uqIZ1CCb1yEfYQwHDZuh09vTbnJ3a4K9jT6Ih984
+	noxdijAYxCmf6lk8okSNBUODqXLUI5uNyILdRNbDwKWYVx9446upq34AqrThrmRYwK9PZs
+	KjtLRuoDD22cc1gyWLm+5scsTBDFvpNcjF03ASg60UozLRhadoz2XtlB9txB6x3lMQ6fCY
+	fHrOZVh6brjFoBf2KhrrU7atfIThlQxH3jJTuIf3bPtVJUXSnOSy78NlB7CYmeH/klNUnT
+	2Pz+FwinXlSgoqWy0K6tdFXjAQ3d1WCZnxPzEcF8UD8dJe3jR3XsgZLBy5ccIA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1707913163;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=K4Y44MKuxNKwjsBvggpladPTLai1AztGkC2oP6HBP0I=;
+	b=Khnhbq7Lh0wJ4EGBruHaGdcV144e59NZFAjOkxrUsBKs5GNcBYVAqdCde71u/H3NbZBvhb
+	FyiWIjgVLe7uBPCw==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+	=?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Eric Dumazet <edumazet@google.com>, Hao Luo <haoluo@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jiri Olsa <jolsa@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>, Song Liu <song@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Yonghong Song <yonghong.song@linux.dev>
+Subject: Re: [PATCH RFC net-next 1/2] net: Reference bpf_redirect_info via
+ task_struct on PREEMPT_RT.
+Message-ID: <20240214121921.VJJ2bCBE@linutronix.de>
+References: <20240213145923.2552753-1-bigeasy@linutronix.de>
+ <20240213145923.2552753-2-bigeasy@linutronix.de>
+ <66d9ee60-fbe3-4444-b98d-887845d4c187@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v5 1/2] dt-bindings: net: dp83826: support TX data voltage
- tuning
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170791262530.17764.12992441887115183588.git-patchwork-notify@kernel.org>
-Date: Wed, 14 Feb 2024 12:10:25 +0000
-References: <20240213080705.4184566-1-catalin.popescu@leica-geosystems.com>
-In-Reply-To: <20240213080705.4184566-1-catalin.popescu@leica-geosystems.com>
-To: Catalin Popescu <catalin.popescu@leica-geosystems.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- afd@ti.com, andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, bsp-development.geo@leica-geosystems.com,
- m.felsch@pengutronix.de, krzysztof.kozlowski@linaro.org
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <66d9ee60-fbe3-4444-b98d-887845d4c187@kernel.org>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Tue, 13 Feb 2024 09:07:04 +0100 you wrote:
-> Add properties ti,cfg-dac-minus-one-bp/ti,cfg-dac-plus-one-bp
-> to support voltage tuning of logical levels -1/+1 of the MLT-3
-> encoded TX data.
+On 2024-02-13 21:50:51 [+0100], Jesper Dangaard Brouer wrote:
+> I generally like the idea around bpf_xdp_storage.
 > 
-> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> Signed-off-by: Catalin Popescu <catalin.popescu@leica-geosystems.com>
+> I only skimmed the code, but noticed some extra if-statements (for
+> !NULL). I don't think they will make a difference, but I know Toke want
+> me to test it...
+
+I've been looking at the assembly for the return value of
+bpf_redirect_info() and there is a NULL pointer check. I hoped it was
+obvious to be nun-NULL because it is a static struct.
+
+Should this become a problem I could add
+"__attribute__((returns_nonnull))" to the declaration of the function
+which will optimize the NULL check away.
+
+> I'll hopefully have time to look at code closer tomorrow.
 > 
-> [...]
+> --Jesper
 
-Here is the summary with links:
-  - [v5,1/2] dt-bindings: net: dp83826: support TX data voltage tuning
-    https://git.kernel.org/netdev/net-next/c/ed1d7dac08c5
-  - [v5,2/2] net: phy: dp83826: support TX data voltage tuning
-    https://git.kernel.org/netdev/net-next/c/d1d77120bc28
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Sebastian
 
