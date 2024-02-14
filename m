@@ -1,127 +1,148 @@
-Return-Path: <netdev+bounces-71817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5795885533C
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 20:32:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B189855345
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 20:35:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 154DB2818F5
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 19:32:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDE3F1C26AB6
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 19:35:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B21CA13A87B;
-	Wed, 14 Feb 2024 19:32:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08F3C13B785;
+	Wed, 14 Feb 2024 19:35:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aYwOkBmx"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="N+s9jn2d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAEB91E4B7
-	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 19:32:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CC48127B5D;
+	Wed, 14 Feb 2024 19:35:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707939123; cv=none; b=Fc5/PP9Wb/S0d0jChvgnOKMZxlhB3OmozQqyxcGPiAiydPf3xAM98568Bi0PGYlMCuoyVueC38gCcntFf3XMvOPWkkdvpFDvoxhVfirbOtrfMhr91WK4bEXxZGzkfhbtua+vF5S8Awb1kCf8Hp0VpTxVqrfxKkAOFXm0RneacIo=
+	t=1707939353; cv=none; b=EJ3c++lhI3x6U4/WVVBDfAFx9HLRjiSZYGapHCo/rVHB5Xx5PDxOqxbUakU1tFfpjoFGI8OFLSIYPn57/iDT8hKaZDZVobBpquys4AeilWcOorW7zGVAdlChnrjVrKaZHJWvTm7sCip0ORr4JU5kMry0194GcpWcxuXmIM8hoFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707939123; c=relaxed/simple;
-	bh=Y3XGKY7dihZWrRr9u7N+33D68qk8fLvxf8LoyEwJtNs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=o2AxOvhbBexC1XbAcJxAq7AOW9o+F739AQlPjahiIXbRJwNO+vlwviZv5iv3/9M+4y2H8N7LiZXEn3a1wvtOlkioeppN/dIZX4oW+WMniOQU+m9KBPH4hYPJK5zvPGHqgPLwxpPYODiFjKgqjHUG8Y+teRDXutRdkfYdUGWsbcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aYwOkBmx; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-561f0f116ecso2273a12.0
-        for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 11:32:01 -0800 (PST)
+	s=arc-20240116; t=1707939353; c=relaxed/simple;
+	bh=QP7und2hQX09U1WPUXWVo0KBd4aOKh6bm7cKpEUrsWU=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IaKYDImXY0MSxUxJzl3rqDe9pYcSr3fm1c1oNELNQja61/uTQ3PGYH9Vo0BX1//WzR6JPvDuaNw6CCJm5UmbTwvbWyq9KVZpm9cGrMhCl8iwkdBM+CeEssUL//k//5oO6E1+87sO3Flrit0sGHM19RgZWukH6x0zGqIW/V9ho+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=N+s9jn2d; arc=none smtp.client-ip=72.21.196.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707939120; x=1708543920; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eeJAk6Zp6bPsfRxVidxHJKTPkNWhEasrEXb13lPpcs4=;
-        b=aYwOkBmxUqjp7JjWKlrXqD/VY/yySq2Y6RIMtmEySGvQmFAgcMTT+b/a/0ke06cIzx
-         cSQkfJTchSxjqWwPIAxix0Seh//wAHSNyQHZTFPtc7yGvOfWA/gMuQqCtAaKmmTw52T3
-         Lt9ftKN6ryApTbTFehu+4U3sv/uGlDImfsKCZgx1zZHrJ9IZAMr9KAV600ihsrBAUvHt
-         RpIMkfzAAgKoZI0cZ5kIHie2N8v+EZjn4z5QT7sXz0iXh/lgkQa7k3aMbD4KjkRQXg5l
-         djMYN92Ju2Uyxkd7ROtdXQTVlnv01zqYbqV1HyET2OjhMOuuY856PfCWNTKQuE6sD4hK
-         8D/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707939120; x=1708543920;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eeJAk6Zp6bPsfRxVidxHJKTPkNWhEasrEXb13lPpcs4=;
-        b=p+kavvUMSfFa8aMXoenbyFzj+1tq9Eu7bOFemtDZCEzHpoFBJ/RgyvkA0Yhn4hRG/Y
-         CRiO55WYpTsbGHYpuwuYJRaaCfLdQyqd4teG3KzZx6IMWOE8HUXu8rPNAbG5E/uBC3Y5
-         7ODdtcmRs1cWLwN2VQKyc9GP/WVa38NyAN9qt1HtQFIcGcEVvAC8sHIcWDZfVM8s3Vhb
-         UNtVz5hh4/jTq57EPShnJQk9sFZOqJLr9jgWFUDhvKZeldjSIxBWbvWOnUpF1rWxuFNf
-         HXvOM9Htt19gD+1u5xirVOGz2Vu2IPPTUBGlC3FUKtouywdlWIYMQXPV7uslZHVwTJFU
-         uS/A==
-X-Forwarded-Encrypted: i=1; AJvYcCVQ6xNkjdFS2HoNiuoYAFeQzTxZ9zGIzMbPP93WkuepcHLTe+lc+siAFsNeU+8d1+N70TUkRjoMu9jNDP30kNm9GgWkOh1n
-X-Gm-Message-State: AOJu0YzCvdXpc9P1cNE2KKWVGrXvi+fyexhfTORZyJlip6IoXOWbJ+vB
-	DsQ6Sf1FkWpUDqu0Va/ORF4YGvZT9XXONGYdAny6dGVdD0J3aHpyunYmiTERsdaeK++3F6RiZvB
-	udmK1+d45E+OhJsOYgPUOYBLMD4mAXZr+Ll86
-X-Google-Smtp-Source: AGHT+IENMomux6KIPUqN84rNKXooqQTOW8+AzALdtqGiYWL0fag3ORRcxEGlW6tJnqH87GQpxP+sgF1e18X6Dg+FX6k=
-X-Received: by 2002:a50:9f08:0:b0:561:e7d8:50a8 with SMTP id
- b8-20020a509f08000000b00561e7d850a8mr338752edf.0.1707939120002; Wed, 14 Feb
- 2024 11:32:00 -0800 (PST)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1707939353; x=1739475353;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=/ODHAmclPhLwKDZzntU5CXS8RXhxdY9XMuaTQo5LYe8=;
+  b=N+s9jn2dnbEEVDYpI1sl+gcTuHsh5mTNrSSZeBxzM/OZhSoPHhrfk35S
+   suMQJv6HPXTdVx+m+QroEFWObRhoPAASmlR7pn1UZgVyiau9DVnTF8F7Z
+   KnIUKBqLRA2pe64+GH3dpbMz3Hr2MQ3MsuMARIcZISklYrF71+TfQpRPM
+   c=;
+X-IronPort-AV: E=Sophos;i="6.06,160,1705363200"; 
+   d="scan'208";a="381147143"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2024 19:35:49 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:24115]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.41.174:2525] with esmtp (Farcaster)
+ id 6b0001ca-3680-478a-b891-afee419fc99b; Wed, 14 Feb 2024 19:35:47 +0000 (UTC)
+X-Farcaster-Flow-ID: 6b0001ca-3680-478a-b891-afee419fc99b
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Wed, 14 Feb 2024 19:35:41 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.170.9) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Wed, 14 Feb 2024 19:35:38 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <matttbe@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <jaka@linux.ibm.com>,
+	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
+	<linux-s390@vger.kernel.org>, <martineau@kernel.org>,
+	<mptcp@lists.linux.dev>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<wenjia@linux.ibm.com>
+Subject: Re: [PATCH v1 net-next] net: Deprecate SO_DEBUG and reclaim SOCK_DBG bit.
+Date: Wed, 14 Feb 2024 11:35:30 -0800
+Message-ID: <20240214193530.1813-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <60d7072d-392e-489b-8889-404f3c753620@kernel.org>
+References: <60d7072d-392e-489b-8889-404f3c753620@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240214191308.98504-1-kuniyu@amazon.com>
-In-Reply-To: <20240214191308.98504-1-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 14 Feb 2024 20:31:46 +0100
-Message-ID: <CANn89i+Hg174E+stnX7dSb5PzYDk_07biqZL1FSrNFaT5BC2qw@mail.gmail.com>
-Subject: Re: [PATCH v3 net] dccp/tcp: Unhash sk from ehash for tb2 alloc
- failure after check_estalblished().
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
-	Joanne Koong <joannelkoong@gmail.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	syzkaller <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D043UWC002.ant.amazon.com (10.13.139.222) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Wed, Feb 14, 2024 at 8:13=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
->
-> syzkaller reported a warning [0] in inet_csk_destroy_sock() with no
-> repro.
->
->   WARN_ON(inet_sk(sk)->inet_num && !inet_csk(sk)->icsk_bind_hash);
->
-> However, the syzkaller's log hinted that connect() failed just before
-> the warning due to FAULT_INJECTION.  [1]
->
-> When connect() is called for an unbound socket, we search for an
-> available ephemeral port.  If a bhash bucket exists for the port, we
-> call __inet_check_established() or __inet6_check_established() to check
-> if the bucket is reusable.
->
-> If reusable, we add the socket into ehash and set inet_sk(sk)->inet_num.
->
-> Later, we look up the corresponding bhash2 bucket and try to allocate
-> it if it does not exist.
->
-> Although it rarely occurs in real use, if the allocation fails, we must
-> revert the changes by check_established().  Otherwise, an unconnected
-> socket could illegally occupy an ehash entry.
->
-> Note that we do not put tw back into ehash because sk might have
-> already responded to a packet for tw and it would be better to free
-> tw earlier under such memory presure.
->
-> [0]:
->
-> Reported-by: syzkaller <syzkaller@googlegroups.com>
-> Fixes: 28044fc1d495 ("net: Add a bhash2 table hashed by port and address"=
-)
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
+From: Matthieu Baerts <matttbe@kernel.org>
+Date: Wed, 14 Feb 2024 10:32:58 +0100
+> Hi Kuniyuki,
+> 
+> On 13/02/2024 23:31, Kuniyuki Iwashima wrote:
+> > Recently, commit 8e5443d2b866 ("net: remove SOCK_DEBUG leftovers")
+> > removed the last users of SOCK_DEBUG(), and commit b1dffcf0da22 ("net:
+> > remove SOCK_DEBUG macro") removed the macro.
+> > 
+> > Now is the time to deprecate the oldest socket option.
+> 
+> Thank you for looking at this!
+> 
+> My review here below is only about the modifications related to MPTCP.
+> 
+> (...)
+> 
+> > diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
+> > index da37e4541a5d..f6d90eef3d7c 100644
+> > --- a/net/mptcp/sockopt.c
+> > +++ b/net/mptcp/sockopt.c
+> > @@ -81,7 +81,7 @@ static void mptcp_sol_socket_sync_intval(struct mptcp_sock *msk, int optname, in
+> >  
+> >  		switch (optname) {
+> >  		case SO_DEBUG:
+> > -			sock_valbool_flag(ssk, SOCK_DBG, !!val);
+> > +			/* deprecated. */
+> 
+> If it is now a NOOP, maybe better to:
+> 
+>  - remove SO_DEBUG from mptcp_sol_socket_sync_intval() and
+>    mptcp_setsockopt_sol_socket_int()
+> 
+>  - move it just above the "return 0" in mptcp_setsockopt_sol_socket()
+> with the "deprecated" (or "removed") comment
+> 
+> By doing that, we avoid a lock, plus going through the list of subflows
+> for nothing.
+> 
+> WDYT?
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Sounds good!
+
+And I can apply the similar change to the general setsockopt()
+not to take lock_sock().
+
+
+> 
+> >  			break;
+> >  		case SO_KEEPALIVE:
+> >  			if (ssk->sk_prot->keepalive)
+> > @@ -1458,8 +1458,6 @@ static void sync_socket_options(struct mptcp_sock *msk, struct sock *ssk)
+> >  		sk_dst_reset(ssk);
+> >  	}
+> >  
+> > -	sock_valbool_flag(ssk, SOCK_DBG, sock_flag(sk, SOCK_DBG));
+> > -
+> >  	if (inet_csk(sk)->icsk_ca_ops != inet_csk(ssk)->icsk_ca_ops)
+> >  		tcp_set_congestion_control(ssk, msk->ca_name, false, true);
+> >  	__tcp_sock_set_cork(ssk, !!msk->cork);
+> 
+> The rest looks good to me.
+
+Thanks!
 
