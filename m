@@ -1,61 +1,57 @@
-Return-Path: <netdev+bounces-71592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCC4B85416F
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 03:20:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 533C085418B
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 03:24:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF8A91C235A4
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 02:20:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D182B247C6
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 02:24:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFE5A4C79;
-	Wed, 14 Feb 2024 02:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBC574C79;
+	Wed, 14 Feb 2024 02:23:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UQ+4fnQv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sadSjh10"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC838F40
-	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 02:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A7D1118D
+	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 02:23:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707877228; cv=none; b=mexsZdPawclvuYrVc5iObNZq8Hohww876lyxX9XqVMgYFSuXT3KcItWXeSPLrpT2WlzIufe77ckySAGWpbgR8FnE6oFCSRvOTnnGFuKU4+wQ1eQSO5vhc4szr0Lsmr4y+osxP5mh5IfF2dhlbfNy/Jws+8q/YcDEalaARF8P2wY=
+	t=1707877420; cv=none; b=V89K5Hn4tdcfrUxXVwx7MnY8B1XoTCXftPvc6nfcyQPegJqq6nQ97kcxB4cFXSYvErT/yimzneHPG3KvdAFt/kDBRcVyWOvhpY1C0LB5ym4CZvsm5rhqS5Es+KJYFip7a31MTtV270GKo7Cyqeb9gJWErwywp9KEe6KhYkqHK7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707877228; c=relaxed/simple;
-	bh=IM2w7Nsuxp3F9mzK9O6I93M+uzTRaISlf21iTzuUAWE=;
+	s=arc-20240116; t=1707877420; c=relaxed/simple;
+	bh=p0/LKn5ORerskP77DXnNvJbLsjhrc1oAzMJzgXAj7Ek=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GLHpPhTq86nhkd2Mc7APApvyueWTAVCx2uieUrLHNH4sxN7qF2n6zX+Rj5+Qcl6sLSPUcKBU430E2oOx+N04EsiPnR0kOQD+T81GPNS3RT6eG/v6mx9zS8iCQEOcv0ONWwFZxxb1wU3RQqySjWYw5V9gNL9Z4tp4fi/DUG0hpIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UQ+4fnQv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C8F4C433C7;
-	Wed, 14 Feb 2024 02:20:27 +0000 (UTC)
+	 MIME-Version:Content-Type; b=WS1q8PN5fjmEFXovikiABIkgirFCSZnay1EAlAsirBY2y+ebCvY1/VFgG6BwvIE885VlQVMYIBAOMTDbHayz3vPJmziUMLX64VTalxr0RetxWayjHjf664JOVXmfMhRH54XPRmcQ24BTdQ2ZJT33mM/XnXdGSo71EKWGnI/hvoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sadSjh10; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23470C433F1;
+	Wed, 14 Feb 2024 02:23:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707877228;
-	bh=IM2w7Nsuxp3F9mzK9O6I93M+uzTRaISlf21iTzuUAWE=;
+	s=k20201202; t=1707877420;
+	bh=p0/LKn5ORerskP77DXnNvJbLsjhrc1oAzMJzgXAj7Ek=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UQ+4fnQvPPF5reDJ69iCOPONH/aqjJDNnWcDDFXZ/sd893G9FNx++Xi+X9Izhfpiq
-	 G9rCLJjcf+pFmzRb838NEfosif83iRigXT3Sj5+Ltt4AoZjXxLEFKBbkPnLiNjUIW4
-	 18cV5XJ8p1cTGVDoByZQKUihOoa6zOsgv02iuYfBH1s6SEN1/5/Kex+bGmPJg+wBkf
-	 30GdLpi9TQohg9oc5BkiTnr1ZNmpRGeYoMZ+TCPWDghE16EMV1zV7NJPW3hRYcWXIF
-	 3tCHLUiDvaLamuBv5n1nZySTzTP9LURSGcGijxybi7ER1VdZnhDbKGZZzabR4l8SAE
-	 KXVTgmcM0HZmw==
-Date: Tue, 13 Feb 2024 18:20:26 -0800
+	b=sadSjh10W8nAS/kLsUR0uyXdrXF2xLlTtilS+k8XkO/im9DYL6g4fvDuIAPnk+2bj
+	 Kja0ceiC/xf6D1mVC7FD/RcPEt9/Dceb/utHo4A6v+jygoHO9QmKFy9cfeUplwz2h2
+	 B3ql+imEnuG/68n3qol7909gh9w0uhQctGpv5Ke5j4gXkNVZMAY3qFC0uLqW5BVXOn
+	 2C6ZPIPyWF+/Pb6qX8gP9kBAb1NTJcHT6gbtZqf0cSsXpvz2qu6AVy0gBRjJzeUT28
+	 zvgiZNpAY2vF0db1gLZKXonTq5mM9xvIGA1Vu796KA/k1RuYLyr0WMJ8/wWIPhHEba
+	 xA7+/X4sii4wA==
+Date: Tue, 13 Feb 2024 18:23:38 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, <davem@davemloft.net>,
- <pabeni@redhat.com>, <edumazet@google.com>, <netdev@vger.kernel.org>, Kurt
- Kanzenbach <kurt@linutronix.de>, <sasha.neftin@intel.com>, Naama Meir
- <naamax.meir@linux.intel.com>
-Subject: Re: [PATCH net-next] igc: Add support for LEDs on i225/i226
-Message-ID: <20240213182026.7c14d7d4@kernel.org>
-In-Reply-To: <11004b9c-97df-fb6f-efb8-9550ea2b6c03@intel.com>
-References: <20240213184138.1483968-1-anthony.l.nguyen@intel.com>
-	<7a6ae4c1-2436-4909-bb20-32b91210803c@lunn.ch>
-	<24b89ed0-2c2c-2aff-fa59-8ee8f9f22e9a@intel.com>
-	<c4f66726-1726-4dd5-98a8-4f8562421168@lunn.ch>
-	<11004b9c-97df-fb6f-efb8-9550ea2b6c03@intel.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ dsahern@kernel.org, kuniyu@amazon.com, netdev@vger.kernel.org, Jason Xing
+ <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next v4 0/6] introduce dropreasons in tcp receive
+ path
+Message-ID: <20240213182338.397f6d29@kernel.org>
+In-Reply-To: <20240213140508.10878-1-kerneljasonxing@gmail.com>
+References: <20240213140508.10878-1-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,20 +61,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 13 Feb 2024 13:05:43 -0800 Tony Nguyen wrote:
-> > State: Awaiting Upstream  
+On Tue, 13 Feb 2024 22:05:02 +0800 Jason Xing wrote:
+> As title said, we're going to refine the NOT_SPECIFIED reason in the
+> tcp v4/6 receive fast path.
 > 
-> For Awaiting Upstream:
-> 
-> "
-> patch should be reviewed and handled by appropriate sub-maintainer, who 
-> will send it on to the networking trees; patches set to Awaiting 
-> upstream in netdev's patchwork will usually remain in this state, 
-> whether the sub-maintainer requested changes, accepted or rejected the patch
-> "
-> https://docs.kernel.org/process/maintainer-netdev.html#patch-status
+> This serie is another one of the v2 patchset[1] which are here split
+> into six patches. Besides, this patch is made on top of the previous
+> serie[2] I submitted some time ago.
 
-FWIW I think it's one of those things where particular cases may look
-odd, but for those on the patch handling path always following the same
-procedure make the life *so* much easier :(
+Please do not post two similar sets at the same time.
 
