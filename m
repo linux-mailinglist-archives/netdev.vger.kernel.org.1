@@ -1,151 +1,149 @@
-Return-Path: <netdev+bounces-71866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E6BD85564D
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 23:46:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFCDE8556CB
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 00:02:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 818AC1C21632
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 22:46:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97407282D28
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 23:02:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AB8027453;
-	Wed, 14 Feb 2024 22:46:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A60C413B78C;
+	Wed, 14 Feb 2024 23:02:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YcMgnpXB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gt5CNsqr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D60B124B33
-	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 22:46:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF10A4502D
+	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 23:02:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707950769; cv=none; b=YZGfuifejGQ0WphCq72zH9T9qgStCjb2qdonjq/IQzrN/bAr659XZ4AOLMhfwyOqFR+/TDSxjXxS0ZIdqR7nHu+x25PCTOGAckce4Sx3VTz/Oa7K2ca9G+yHa0FPTQy+t9Y6fCTkGymCEbbKfKaudWmji1w16SMmhPZLGrry3Js=
+	t=1707951753; cv=none; b=inJ6ptNP6uzyR4bgSXwIQ+smy1tF+SXydIYXMo1PFjSrg2v2BmyEjcOTCeHZY1U/3N+wbALuMxNhdOvofT+diwMTfJMsvfM14sps88Usq3ewVEkGmind1Y6098G2WnRjHR5sGu6xhoYJS1S7sRUX8ud3Bz7VKb8QQS4FhxCEL2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707950769; c=relaxed/simple;
-	bh=J8kA3EKW+J0KVpprz+2CWZ+CCbORPhunwsXS259I/jA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JzYDyUrXtYraOAMj2sdRHxL+HFzZ6rtxB2KiOiVYAcgRJOFWDP+mKwopYYPAYeJ/358B95RC0fX5hVbSTT9oGjnvd1isfIcltpV5FocS6+v0z+HJRKEwy/ERlxtZeRW9cG93Eho8DGZ0R3+r7s62t7bhllqH5d7Fjp1z5Et6JbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YcMgnpXB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F324DC433C7;
-	Wed, 14 Feb 2024 22:46:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707950769;
-	bh=J8kA3EKW+J0KVpprz+2CWZ+CCbORPhunwsXS259I/jA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YcMgnpXBzON3CZMSa0MwuxpUgHmZmaSqFXSx1kjFyQWMItYU1eLIKkwE0cB8n+RKW
-	 ZSTv/MMhMbbURza69GZo026wgds16gw36XVsSlHK8qtg9A8t+Fpf16UleGhTLJpB0K
-	 DLtAXeXK0Qc3Fhox6fSvg/lCkkpixbyoK9qRJAgfP/SP0h0po0eeYRzSqy1dlhQbEJ
-	 ypehegI16oEIlDcfJi2BA9y758LqQFb4hH1B2gR7/ifeAnyZ6Qs7NkF1eyG1md20vU
-	 ybQbGbDnoEy0HHZwMjJLmWGmTO+Z48zpf+w/B5Dw/Ji9Yy6AaDxTsTmugMayTgTIT8
-	 1vD/OTTwhAPdw==
-Date: Wed, 14 Feb 2024 23:46:05 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
-Cc: netdev@vger.kernel.org, lorenzo.bianconi@redhat.com, kuba@kernel.org,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	hawk@kernel.org, ilias.apalodimas@linaro.org,
-	linyunsheng@huawei.com
-Subject: Re: [RFC net-next] net: page_pool: fix recycle stats for percpu
- page_pool allocator
-Message-ID: <Zc1CrXyLYRR2w9RX@lore-desk>
-References: <e56d630a7a6e8f738989745a2fa081225735a93c.1707933960.git.lorenzo@kernel.org>
- <871q9een8q.fsf@toke.dk>
+	s=arc-20240116; t=1707951753; c=relaxed/simple;
+	bh=cqWEKTv+pK5/gmdVatT0ND12R+9NOiP4SAY4OtzSw/0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=fxsmQV0jNh1mMhVvLok8bp6iEYmcEghZsh0P9vO/9rV5sxMKRM5D+J5rOrF0N9hG17+uDQoppJYJ56XtO+Flgz2Icm7vYiTuHE4kX6BMJ2jWNj7QzZCCU8b6e/fKFo/n5iuOSVSikxyv87z8w5QZxB4lWvlG3YF/fC08oAdiRZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Gt5CNsqr; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707951750;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cqWEKTv+pK5/gmdVatT0ND12R+9NOiP4SAY4OtzSw/0=;
+	b=Gt5CNsqrMA2KY6/kegyD6QHn77uRRDIV+ofhJz5maBjFozUud2flJ6uH4rtrYGob/CrQY0
+	LvgPs0PRwalRcKBIflMW8FDoXe7HSv5AERw3aB3pTT1hNRkfMJU+GWYZ7GaKYWSwcAQJw5
+	QleoQY2RF+AcBVeo4axekgIam8SX0OA=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-204-fMIb_UkQOtmnxTRfatHWmw-1; Wed, 14 Feb 2024 18:02:29 -0500
+X-MC-Unique: fMIb_UkQOtmnxTRfatHWmw-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a2cb0d70d6cso9637666b.2
+        for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 15:02:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707951748; x=1708556548;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cqWEKTv+pK5/gmdVatT0ND12R+9NOiP4SAY4OtzSw/0=;
+        b=H3VJKAq4l/C3jJapFLG15b1PPQqaavOz+weedaKw0fpLwhFA8odAmLHwD4pSadZyUG
+         hEn4B+74CeY3pCqxAXGwthIhQsuk9v2mWJwe7yFQiGmJC8lVeWzXpLOU5Cs3rs+D/nnd
+         hg3kt0WQfhsqD9Nat62qk+m+5tjc7RoS5f64bMlOXiQ8/Y55VLvSpDQRK8x/8LKeCCGp
+         OdbhvMYNpM6Vq2FrPayMMdwUAtDPGyYWgLUt8phRySk3TWIR/zdjEWOIVgCehhwM/rIY
+         8NP6gonQuWugswyD7jAVhq0zt4LHQo87HzWEeqyqwPS3tFmlP2U9vUbbsM6kR9D4/BzV
+         /tUA==
+X-Forwarded-Encrypted: i=1; AJvYcCVzxb/A7Za+Or6iaSZaVXeS/XcFsMdeIk9EHqs6iuJKQAZ35uXKPO6cz+2/hH2K+prIzOfCyKaXNPQu+WQWbUd1U0E1V3YY
+X-Gm-Message-State: AOJu0YwfclqMd5CbUXeSpqVirxqrfwGkOcJo9sXGqoDV8LWM5FgmQmyl
+	dSdEKpeoS11cx2GsGhScTXAZkWNdt0Pk1hyhJnwb0vZOT31ZoCFsdvCBzZ4X3x1vwtTG9pQhBn2
+	aG2Qqmy9Qu6blT0NHWyCnNO0oAPy4zrbh6zuwHlmtX04aTBcHLzqylw==
+X-Received: by 2002:aa7:d952:0:b0:561:ced:4093 with SMTP id l18-20020aa7d952000000b005610ced4093mr22857eds.36.1707951748116;
+        Wed, 14 Feb 2024 15:02:28 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGwAbv0p8XEb5CZdU5nMo7RDOF7CDGsdXTO6nSa/5ofpKs9OFHHVE7UovDzYvqv85RDWD1I6A==
+X-Received: by 2002:aa7:d952:0:b0:561:ced:4093 with SMTP id l18-20020aa7d952000000b005610ced4093mr22849eds.36.1707951747837;
+        Wed, 14 Feb 2024 15:02:27 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWfRik3tmJcJzfVLZR6jJMe8DjlZAARqkTe6s9rFnew4TeesqnMQI7SKcYnc+489yEQ+47mclWuRfTvyjJ2qhtRz9XjmQMpyNpxiG/KOrikjIJmvs/tb8ON0jVFmdLUGdoR/E38cMmNcI+woJxddxG/r0VSibLUsEpBh6YNmv7Npoo+BXO/y+Nrz5xlei8Mo3ETAqGPocxvL01Tn1xJyb8T6guNzM3qComNvvjdwG6iZCcHQD/TI53QRL9xXaK3R+SDTrvHM0lLnMj25yL5+VbaG0CXlH0n9KbHgLZRrCr83aImuRMkjzF1erFFbrJv1RrhNtf+YssD
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id c37-20020a509fa8000000b005639c8b6922sm333804edf.52.2024.02.14.15.02.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Feb 2024 15:02:27 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 1630A10F586A; Thu, 15 Feb 2024 00:02:27 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>, Alexei Starovoitov
+ <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
+ <andrii@kernel.org>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Jakub Kicinski <kuba@kernel.org>, Maciej
+ Fijalkowski <maciej.fijalkowski@intel.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf-next] bpf/test_run: increase Page Pool's ptr_ring
+ size in live frames mode
+In-Reply-To: <87cyszdnrz.fsf@toke.dk>
+References: <20240214153838.4159970-1-aleksander.lobakin@intel.com>
+ <87cyszdnrz.fsf@toke.dk>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Thu, 15 Feb 2024 00:02:27 +0100
+Message-ID: <87y1bmd4zg.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="l6gfZcr5ovPGmwjC"
-Content-Disposition: inline
-In-Reply-To: <871q9een8q.fsf@toke.dk>
-
-
---l6gfZcr5ovPGmwjC
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-> Lorenzo Bianconi <lorenzo@kernel.org> writes:
->=20
-> > Use global page_pool_recycle_stats percpu counter for percpu page_pool
-> > allocator.
-> >
-> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
->=20
-> Neat trick with just referencing the pointer to the global object inside
-> the page_pool. With just a few nits below:
->=20
-> Reviewed-by: Toke H=F8iland-J=F8rgensen <toke@redhat.com>
->=20
-> > ---
-> >  net/core/page_pool.c | 18 +++++++++++++-----
-> >  1 file changed, 13 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> > index 6e0753e6a95b..1bb83b6e7a61 100644
-> > --- a/net/core/page_pool.c
-> > +++ b/net/core/page_pool.c
-> > @@ -31,6 +31,8 @@
-> >  #define BIAS_MAX	(LONG_MAX >> 1)
-> > =20
-> >  #ifdef CONFIG_PAGE_POOL_STATS
-> > +static DEFINE_PER_CPU(struct page_pool_recycle_stats, pp_recycle_stats=
-);
->=20
-> Should we call this pp_system_recycle_stats to be consistent with the
-> naming of the other global variable?
+Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com> writes:
 
-ack, I agree.
+> Alexander Lobakin <aleksander.lobakin@intel.com> writes:
+>
+>> Currently, when running xdp-trafficgen, test_run creates page_pools with
+>> the ptr_ring size of %NAPI_POLL_WEIGHT (64).
+>> This might work fine if XDP Tx queues are polled with the budget
+>> limitation. However, we often clear them with no limitation to ensure
+>> maximum free space when sending.
+>> For example, in ice and idpf (upcoming), we use "lazy" cleaning, i.e. we
+>> clean XDP Tx queue only when the free space there is less than 1/4 of
+>> the queue size. Let's take the ring size of 512 just as an example. 3/4
+>> of the ring is 384 and often times, when we're entering the cleaning
+>> function, we have this whole amount ready (or 256 or 192, doesn't
+>> matter).
+>> Then we're calling xdp_return_frame_bulk() and after 64th frame,
+>> page_pool_put_page_bulk() starts returning pages to the page allocator
+>> due to that the ptr_ring is already full. put_page(), alloc_page() et at
+>> starts consuming a ton of CPU time and leading the board of the perf top
+>> output.
+>>
+>> Let's not limit ptr_ring to 64 for no real reason and allow more pages
+>> to be recycled. Just don't put anything to page_pool_params::size and
+>> let the Page Pool core pick the default of 1024 entries (I don't believe
+>> there are real use cases to clean more than that amount of descriptors).
+>> After the change, the MM layer disappears from the perf top output and
+>> all pages get recycled to the PP. On my test setup on idpf with the
+>> default ring size (512), this gives +80% of Tx performance with no
+>> visible memory consumption increase.
+>>
+>> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+>
+> Hmm, so my original idea with keeping this low was to avoid having a lot
+> of large rings lying around if it is used by multiple processes at once.
+> But we need to move away from the per-syscall allocation anyway, and
+> with Lorenzo's patches introducing a global system page pool we have an
+> avenue for that. So in the meantime, I have no objection to this...
+>
+> Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
 
->=20
-> >  /* alloc_stat_inc is intended to be used in softirq context */
-> >  #define alloc_stat_inc(pool, __stat)	(pool->alloc_stats.__stat++)
-> >  /* recycle_stat_inc is safe to use when preemption is possible. */
-> > @@ -220,14 +222,19 @@ static int page_pool_init(struct page_pool *pool,
-> >  	pool->has_init_callback =3D !!pool->slow.init_callback;
-> > =20
-> >  #ifdef CONFIG_PAGE_POOL_STATS
-> > -	pool->recycle_stats =3D alloc_percpu(struct page_pool_recycle_stats);
-> > -	if (!pool->recycle_stats)
-> > -		return -ENOMEM;
-> > +	if (cpuid < 0) {
-> > +		pool->recycle_stats =3D alloc_percpu(struct page_pool_recycle_stats);
-> > +		if (!pool->recycle_stats)
-> > +			return -ENOMEM;
-> > +	} else {
->=20
-> Maybe add a short comment here to explain what's going on? Something
-> like:
->=20
-> /* When a cpuid is supplied, we're initialising the percpu system page po=
-ol
->  * instance, so use a singular stats object instead of allocating a
->  * separate percpu variable for each (also percpu) page pool instance.
->  */
->=20
-> -Toke
->=20
+Actually, since Lorenzo's patches already landed in net-next, let's just
+move to using those straight away. I'll send a patch for this tomorrow :)
 
-sure, I will add it.
+-Toke
 
-Regards,
-Lorenzo
-
---l6gfZcr5ovPGmwjC
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHQEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZc1CrQAKCRA6cBh0uS2t
-rOuFAPjyO8iVz7iib5gTJWewjcMD9Q24iwzTRRw2OnGTDNSWAQDp1Cc+ieYqGHIB
-2iSwon50TcAmgDYRDfQcC6CdmAnFDw==
-=uz8B
------END PGP SIGNATURE-----
-
---l6gfZcr5ovPGmwjC--
 
