@@ -1,115 +1,107 @@
-Return-Path: <netdev+bounces-71797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71662855186
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 19:08:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0605855194
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 19:09:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4B3B1C206FD
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 18:08:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2F2C1C2159A
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 18:09:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC387128388;
-	Wed, 14 Feb 2024 18:01:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8302612839B;
+	Wed, 14 Feb 2024 18:03:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JfT1XQJG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QO8IGZtG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8FD21272CA
-	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 18:01:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E42961292D5
+	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 18:03:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707933712; cv=none; b=luH0+bJSquBRT5lXLfYXQ0STjB3KOL0RDpL458VPndEDup/kRsLVtsFB5JKwOko4noHT042+LbYVXLXbkhLUheZD5XnobVIF8wzu9sUJjJwrPTOe30V288KiA+KLRrur1LD467x6H68GmAb52ljUJ3nSt+T0sdgH+EvumQ3iDhw=
+	t=1707933837; cv=none; b=YUvt2JJIo3hUnH1+z+Bw9ayq69i9VPG5jJuUaPrAbq2oxHVOAl7DfuI/ShZ1J/EgXXSt6uWr10G9zEsTEIHqxRniKZbFbo8arnQtmhxXgMNq2CvIfqABER6BJhip1czdz5EIjyIexGMRKxcwdDPUP/DnMBiV0FPYbCfLl639UGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707933712; c=relaxed/simple;
-	bh=qY1jLmw81ZZfRJpn8v8sNSnOsKfWw4WiraorVwkA97w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Kw+xePaq4ZerUC+sUpuHf29I6PkcKi0d3lbCFGPaMUPfhcWmPfxyQRKkjJ4HPxLQxPsuxsokxt4vYbIuW5uUSNXpSBbb2MDaiLl6X83lFJafR17MGB5Hw5ILyN0RgVOJpK7S86zYXVqS/eGYgKrkMZieIoAnajX3ncNuM7Yqh5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JfT1XQJG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2288C433C7;
-	Wed, 14 Feb 2024 18:01:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707933712;
-	bh=qY1jLmw81ZZfRJpn8v8sNSnOsKfWw4WiraorVwkA97w=;
-	h=From:To:Cc:Subject:Date:From;
-	b=JfT1XQJGBhPLd+ca1dHp7Jy58fc69iD3V2MNbIXEcStEGLAnzLcnJuER8IYlNLfQ7
-	 VopsxHpjYExSKU3ZsiM6fRWkOLfw9Xfd0HJ4X6K7rcnhDj74VF06ruP+05a0kqEX3e
-	 BpAb99avC9Fo0jmXSzxNT0GmqrMabxs7114JxnouacaWUPXAUyN9ZFToM5L08fM6O0
-	 Hxsg1oTF+ecFnpkGDgrJPeeewoqtvSWzL788TJRs+G9jZOUIeJQ7y9scVHDT/JyLa2
-	 RfB64ltJ9DdIbw8LG2aPHA3JMPjGtVWLRJ18pr37OXVIdZUn3R+x0aabfLBzWnpLRx
-	 SeD9TdWBlxhnw==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: netdev@vger.kernel.org
-Cc: lorenzo.bianconi@redhat.com,
+	s=arc-20240116; t=1707933837; c=relaxed/simple;
+	bh=tiqBUEG2hLM/Nzu8bpZL1r5y4QWrpsbsVwuQRQY2rG8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=N/Vcqnlmjf5eC8zqX7hOfiuK6GwV+O8+Tugtqd1MqgjBc+1InZdmae9ztGQSR56pY5GAc7Bs3FtLVEtHclLmOVMqhKRyIWNfKZgtDWi7qet77YMn1D5l78TnYY0mWduZSMlMAMp4eW6K9QjcATgXOgHrzAb3vewk0gauh8J5uZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QO8IGZtG; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707933836; x=1739469836;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=tiqBUEG2hLM/Nzu8bpZL1r5y4QWrpsbsVwuQRQY2rG8=;
+  b=QO8IGZtG078m8W6ljnu4Psvz6qjEAMrKbiwlXuyDCcNL4zXHyE0dp34b
+   9M8CIe9wqcTocaJfUZxc/55PmhjmFEtdYHnzVM3JiQ+k7rbzZ15777+Lk
+   TYpuB2/ftTx+XQVxEpcoSsY++tFsybCuzp2CQEiabTV0n6dyfoZfaIfAC
+   YGQDLFCUhXeJQNIZ+LVvjx/V6Fl9+HrDyVYiphyOmQlE1GXG/h1E2UbWo
+   QAj3SnnYddRmNdQtoLRKllQ0SynFcFpei+t6ep/jnix4l9tadOR8kqORv
+   6kllMwSmOOCqP5Y0YIrE9u6HlFJJZ0svUx+4TQaae2oWJxDhFfLB0RQLF
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10984"; a="19505798"
+X-IronPort-AV: E=Sophos;i="6.06,160,1705392000"; 
+   d="scan'208";a="19505798"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2024 10:03:55 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,160,1705392000"; 
+   d="scan'208";a="3251272"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmviesa009.fm.intel.com with ESMTP; 14 Feb 2024 10:03:54 -0800
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
 	kuba@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
 	pabeni@redhat.com,
-	hawk@kernel.org,
-	ilias.apalodimas@linaro.org
-Subject: [PATCH net-next] net: page_pool: make page_pool_create inline
-Date: Wed, 14 Feb 2024 19:01:28 +0100
-Message-ID: <499bc85ca1d96ec1f7daff6b7df4350dc50e9256.1707931443.git.lorenzo@kernel.org>
-X-Mailer: git-send-email 2.43.0
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net v2 0/2][pull request] Intel Wired LAN Driver Updates 2024-02-06 (igb, igc)
+Date: Wed, 14 Feb 2024 10:03:43 -0800
+Message-ID: <20240214180347.3219650-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Make page_pool_create utility routine inline a remove exported symbol.
+This series contains updates to igb and igc drivers.
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+Kunwu Chan adjusts firmware version string implementation to resolve
+possible NULL pointer issue for igb.
+
+Sasha removes workaround on igc.
 ---
- include/net/page_pool/types.h |  6 +++++-
- net/core/page_pool.c          | 10 ----------
- 2 files changed, 5 insertions(+), 11 deletions(-)
+v2:
+- Added to commit message (patch 2)
 
-diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
-index 3828396ae60c..0057e584df9a 100644
---- a/include/net/page_pool/types.h
-+++ b/include/net/page_pool/types.h
-@@ -203,9 +203,13 @@ struct page_pool {
- struct page *page_pool_alloc_pages(struct page_pool *pool, gfp_t gfp);
- struct page *page_pool_alloc_frag(struct page_pool *pool, unsigned int *offset,
- 				  unsigned int size, gfp_t gfp);
--struct page_pool *page_pool_create(const struct page_pool_params *params);
- struct page_pool *page_pool_create_percpu(const struct page_pool_params *params,
- 					  int cpuid);
-+static inline struct page_pool *
-+page_pool_create(const struct page_pool_params *params)
-+{
-+	return page_pool_create_percpu(params, -1);
-+}
- 
- struct xdp_mem_info;
- 
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 89c835fcf094..6e0753e6a95b 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -289,16 +289,6 @@ page_pool_create_percpu(const struct page_pool_params *params, int cpuid)
- }
- EXPORT_SYMBOL(page_pool_create_percpu);
- 
--/**
-- * page_pool_create() - create a page pool
-- * @params: parameters, see struct page_pool_params
-- */
--struct page_pool *page_pool_create(const struct page_pool_params *params)
--{
--	return page_pool_create_percpu(params, -1);
--}
--EXPORT_SYMBOL(page_pool_create);
--
- static void page_pool_return_page(struct page_pool *pool, struct page *page);
- 
- noinline
+v1: https://lore.kernel.org/netdev/20240206212820.988687-1-anthony.l.nguyen@intel.com/
+
+The following are changes since commit 9b23fceb4158a3636ce4a2bda28ab03dcfa6a26f:
+  ethernet: cpts: fix function pointer cast warnings
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 1GbE
+
+Kunwu Chan (1):
+  igb: Fix string truncation warnings in igb_set_fw_version
+
+Sasha Neftin (1):
+  igc: Remove temporary workaround
+
+ drivers/net/ethernet/intel/igb/igb.h      |  2 +-
+ drivers/net/ethernet/intel/igb/igb_main.c | 35 ++++++++++++-----------
+ drivers/net/ethernet/intel/igc/igc_phy.c  |  6 +---
+ 3 files changed, 20 insertions(+), 23 deletions(-)
+
 -- 
-2.43.0
+2.41.0
 
 
