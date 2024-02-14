@@ -1,63 +1,61 @@
-Return-Path: <netdev+bounces-71591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1469854165
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 03:13:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCC4B85416F
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 03:20:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D1942827B5
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 02:13:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF8A91C235A4
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 02:20:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80BA05398;
-	Wed, 14 Feb 2024 02:13:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFE5A4C79;
+	Wed, 14 Feb 2024 02:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ktWfJ38Q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UQ+4fnQv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BD4546AB
-	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 02:13:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC838F40
+	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 02:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707876833; cv=none; b=trzQMw3GOOp5BvejmtZn93Jy8+WWEqfgFlu+iWtQAK685YlDi8bBenDYFPphgnuqcvgMRN7pUJHl2nbhLVsstTp1Y8pBtdYloedaqJpowS30u9aELGis7ouOJGzX70F9tFO50OohI4Qha+Xn3IjFCMpOR8ncVmtJkFWaYQJLsCo=
+	t=1707877228; cv=none; b=mexsZdPawclvuYrVc5iObNZq8Hohww876lyxX9XqVMgYFSuXT3KcItWXeSPLrpT2WlzIufe77ckySAGWpbgR8FnE6oFCSRvOTnnGFuKU4+wQ1eQSO5vhc4szr0Lsmr4y+osxP5mh5IfF2dhlbfNy/Jws+8q/YcDEalaARF8P2wY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707876833; c=relaxed/simple;
-	bh=lQNXSwJuhMO0vRmlUmCazz/caFJslTJfAuXVjDyef38=;
+	s=arc-20240116; t=1707877228; c=relaxed/simple;
+	bh=IM2w7Nsuxp3F9mzK9O6I93M+uzTRaISlf21iTzuUAWE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R+c477/Zj6lB/PhUdfUq4UewvAntt42zPh0VY6PXLXG5dl2bEQswwyQDEw3BZMSo41a0WqpjOSXR7qmiLlcdURLnTFm5t05bbsN217j9nRVXRBlcRwzENhcrK6RwmbQ0TTe5fovrxSh0CdvX6BaXdtLi43WtNZB57CiqGXDlpn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ktWfJ38Q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B5E5C433C7;
-	Wed, 14 Feb 2024 02:13:52 +0000 (UTC)
+	 MIME-Version:Content-Type; b=GLHpPhTq86nhkd2Mc7APApvyueWTAVCx2uieUrLHNH4sxN7qF2n6zX+Rj5+Qcl6sLSPUcKBU430E2oOx+N04EsiPnR0kOQD+T81GPNS3RT6eG/v6mx9zS8iCQEOcv0ONWwFZxxb1wU3RQqySjWYw5V9gNL9Z4tp4fi/DUG0hpIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UQ+4fnQv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C8F4C433C7;
+	Wed, 14 Feb 2024 02:20:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707876832;
-	bh=lQNXSwJuhMO0vRmlUmCazz/caFJslTJfAuXVjDyef38=;
+	s=k20201202; t=1707877228;
+	bh=IM2w7Nsuxp3F9mzK9O6I93M+uzTRaISlf21iTzuUAWE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ktWfJ38Q0dUcH6T8zWlNcGLYs5b3IJvc150zAC4qCHw5tyPOvu/uRZIARkgukup9h
-	 h5J74yyUEi2STrwPxKIhZWiSYjPOcWZakudrEdp9LT5UfXS+twIETx7ykqNko8M/+S
-	 rsby2D+opQllO6xLe8E1ObdSSZA+UXu0U3GeH6TNkQoZxzMeWKrQLsrMbLQ+blm4V2
-	 787si9fYmxol/1PUoPgD04cfRFq/H7MQvVwc7VOxvc7D9Eq7qJ5D0Yl6vYOYpMk/Cv
-	 I63/CqTZ89z3lw4O7uRfbcPH0b44A5wa4ulTcEcRusFkHcT39sFDGIPpwPBrFlqCkO
-	 4tH6+CKzowvZA==
-Date: Tue, 13 Feb 2024 18:13:50 -0800
+	b=UQ+4fnQvPPF5reDJ69iCOPONH/aqjJDNnWcDDFXZ/sd893G9FNx++Xi+X9Izhfpiq
+	 G9rCLJjcf+pFmzRb838NEfosif83iRigXT3Sj5+Ltt4AoZjXxLEFKBbkPnLiNjUIW4
+	 18cV5XJ8p1cTGVDoByZQKUihOoa6zOsgv02iuYfBH1s6SEN1/5/Kex+bGmPJg+wBkf
+	 30GdLpi9TQohg9oc5BkiTnr1ZNmpRGeYoMZ+TCPWDghE16EMV1zV7NJPW3hRYcWXIF
+	 3tCHLUiDvaLamuBv5n1nZySTzTP9LURSGcGijxybi7ER1VdZnhDbKGZZzabR4l8SAE
+	 KXVTgmcM0HZmw==
+Date: Tue, 13 Feb 2024 18:20:26 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, Ariel Elior
- <aelior@marvell.com>, Sudarsana Kalluru <skalluru@marvell.com>, Manish
- Chopra <manishc@marvell.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Raju
- Rangoju <rajur@chelsio.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, Jay
- Vosburgh <jay.vosburgh@canonical.com>, Kory Maincent
- <kory.maincent@bootlin.com>, Subbaraya Sundeep <sbhatta@marvell.com>,
- Richard Cochran <richardcochran@gmail.com>, Maxim Georgiev
- <glipus@gmail.com>, Emeel Hakim <ehakim@nvidia.com>, Vadim Fedorenko
- <vadim.fedorenko@linux.dev>
-Subject: Re: [PATCH RFC net-next v1] net: rework FCOE and RFS ops
-Message-ID: <20240213181350.1755f669@kernel.org>
-In-Reply-To: <20240210021000.2011419-1-jesse.brandeburg@intel.com>
-References: <20240210021000.2011419-1-jesse.brandeburg@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, <davem@davemloft.net>,
+ <pabeni@redhat.com>, <edumazet@google.com>, <netdev@vger.kernel.org>, Kurt
+ Kanzenbach <kurt@linutronix.de>, <sasha.neftin@intel.com>, Naama Meir
+ <naamax.meir@linux.intel.com>
+Subject: Re: [PATCH net-next] igc: Add support for LEDs on i225/i226
+Message-ID: <20240213182026.7c14d7d4@kernel.org>
+In-Reply-To: <11004b9c-97df-fb6f-efb8-9550ea2b6c03@intel.com>
+References: <20240213184138.1483968-1-anthony.l.nguyen@intel.com>
+	<7a6ae4c1-2436-4909-bb20-32b91210803c@lunn.ch>
+	<24b89ed0-2c2c-2aff-fa59-8ee8f9f22e9a@intel.com>
+	<c4f66726-1726-4dd5-98a8-4f8562421168@lunn.ch>
+	<11004b9c-97df-fb6f-efb8-9550ea2b6c03@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,29 +65,20 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri,  9 Feb 2024 18:09:57 -0800 Jesse Brandeburg wrote:
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> @@ -10416,14 +10416,11 @@ static const struct net_device_ops ixgbe_netdev_ops = {
->  	.ndo_setup_tc		= __ixgbe_setup_tc,
->  #ifdef IXGBE_FCOE
->  	.ndo_select_queue	= ixgbe_select_queue,
-> -	.ndo_fcoe_ddp_setup = ixgbe_fcoe_ddp_get,
-> -	.ndo_fcoe_ddp_target = ixgbe_fcoe_ddp_target,
-> -	.ndo_fcoe_ddp_done = ixgbe_fcoe_ddp_put,
-> -	.ndo_fcoe_enable = ixgbe_fcoe_enable,
-> -	.ndo_fcoe_disable = ixgbe_fcoe_disable,
-> -	.ndo_fcoe_get_wwn = ixgbe_fcoe_get_wwn,
-> -	.ndo_fcoe_get_hbainfo = ixgbe_fcoe_get_hbainfo,
->  #endif /* IXGBE_FCOE */
-> +	SET_FCOE_OPS(ixgbe_fcoe_enable, ixgbe_fcoe_disable,
-> +		     ixgbe_fcoe_ddp_target, ixgbe_fcoe_ddp_get,
-> +		     ixgbe_fcoe_ddp_put, ixgbe_fcoe_get_hbainfo)
-> +	SET_FCOE_GET_WWN_OPS(ixgbe_fcoe_get_wwn)
->  	.ndo_set_features = ixgbe_set_features,
->  	.ndo_fix_features = ixgbe_fix_features,
->  	.ndo_fdb_add		= ixgbe_ndo_fdb_add,
+On Tue, 13 Feb 2024 13:05:43 -0800 Tony Nguyen wrote:
+> > State: Awaiting Upstream  
+> 
+> For Awaiting Upstream:
+> 
+> "
+> patch should be reviewed and handled by appropriate sub-maintainer, who 
+> will send it on to the networking trees; patches set to Awaiting 
+> upstream in netdev's patchwork will usually remain in this state, 
+> whether the sub-maintainer requested changes, accepted or rejected the patch
+> "
+> https://docs.kernel.org/process/maintainer-netdev.html#patch-status
 
-If we'd be having a vote - I personally find the #ifdef far more
-readable.
+FWIW I think it's one of those things where particular cases may look
+odd, but for those on the patch handling path always following the same
+procedure make the life *so* much easier :(
 
