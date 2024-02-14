@@ -1,158 +1,195 @@
-Return-Path: <netdev+bounces-71757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BE82854F4E
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 18:01:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EB198550D2
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 18:52:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4482BB213CF
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 16:59:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 538B528FD70
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 17:52:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89C34605D6;
-	Wed, 14 Feb 2024 16:58:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C476A1272CA;
+	Wed, 14 Feb 2024 17:52:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZF3d/G5z"
+	dkim=pass (2048-bit key) header.d=naccy.de header.i=@naccy.de header.b="OD0WkNJU";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="K1vDOeMD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wflow2-smtp.messagingengine.com (wflow2-smtp.messagingengine.com [64.147.123.137])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA055604BC
-	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 16:58:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 772C2127B4B
+	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 17:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.137
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707929934; cv=none; b=tm7tsFO27lMlZt46PelagW+aU/nAkBtaX+2yuW46tLCDREDEWh+kWVJTSoi21Dvs196eD0O6DrAY7My26FuU10AQG0hFhoXbNqgPTQlJ+ZIQw0cEkRzP6eiC/leATSR7D/B9T+kHyGz95Oo3iaiw3cAxzYaRaw/QwNpCyx+xSoQ=
+	t=1707933123; cv=none; b=qM6qlkOHCDrl7yZhEZl5iYW6fATQLsOx7XJ27pLuFdFjGfv7cPjaG66b7ptlA3BDy/M2sAfxo3b+3tBzxBCuvo4oBPTqwTGQrMZadsV4uMHdApqJwku96hA/QBVtcwiTEtHYIeFczgLfkSeABinCOR0BZEUoSTRlicb+CbgWbII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707929934; c=relaxed/simple;
-	bh=OSsaNG2FvzVU0LHsrYNC/eZp5qr5JVJ6bAlNSP1GGaI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=edj/MusEAzk7y2lV6rzIUvL8EHfTh5bRG5AUzOO6QxVLImD3m1jBCjYNkn/WfRX/JmdrkLh074FbX/x55iLig2eucFusK0Oxldd+eClWJ3WViBNQX0DtJhxt8bKviirpAzzyvhnVbHlGoykLECT1S5G4y9N0nF1/jpaypW+IFTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZF3d/G5z; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-56037115bb8so27915a12.0
-        for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 08:58:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707929931; x=1708534731; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QyOK3EJeEyKJEt81jU19f6sSTlRmH4ZoITaYsVw9nEo=;
-        b=ZF3d/G5zDd+JCzwBb6Z0JSjev/gYAck3SRMrFgzDy7jip8jjj3ifVxsuS61A1IF1Ne
-         KrKN6PccBPXHoOtMNHLt+UaFzqAwHmgY085ezuWAddlXL20wMu59SwCVa6zygN3eUq7c
-         Su14HW9NP0bsm/CWe0hW8AM8biONOmKFOKR6Sawd+oa7CKf8oAn4gpPsWZqph7jrzZeh
-         7MHnxWGJ7mogYpXA+latifu9NVqnEriZxBckvy5LPr8ec+9ncAUh7TVHoztwb1DVyfKX
-         dc6mNQNge954Yl8/obotKSo4koZbU8dFmVXnp0VSbVwDOuUFmZ1PgjM6007KtVxyYh6Y
-         xQUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707929931; x=1708534731;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QyOK3EJeEyKJEt81jU19f6sSTlRmH4ZoITaYsVw9nEo=;
-        b=QdSjTjlkjFb9FhVp6fRr/S8FTonMUQLRj4Xp/DhoSPwFQf1DouJ3ugRbcNrZTxrTvX
-         v5LWXrnx9qcuhPtA5xFyL9doUbSyU/shJkuajJlbkl0kKjrvMa5Jpz2fnY1hZ8Zjd30i
-         1gSm1Jbnj+AGqNECIgzysJQJV3hQnFyAYS1mDjQITlLjfpsHr6fYXe3ibzWd0zsqagP5
-         f6W2O5t+si4JJGg7oSRsY8d5jY/23bjvzkXX1BAXKi3SS/a7zJsH7z6tPmpr0dmCrXYS
-         FuodspQzVZLh58V5tsaTyrKKAjOJawo1HAAdWTaFhdDevPQ44A3UEBeNfDWwvdUbRzgM
-         Ivog==
-X-Forwarded-Encrypted: i=1; AJvYcCV13SJq4HvrIbB42JcB2RbE7xMEhdZeJ9I2aqPWfT34WUwfUy7IdZJLmCvhz/PoLxxVoyjG/assYc4Lm05ERn2Kd5Sy0nGo
-X-Gm-Message-State: AOJu0Yx7xpNZ6sNoW+2/2HSKguCAFXONor3GouXPenfiY18YyFf9THdq
-	yiFbrwExMZjacpNbezIk/nXrQsCqpLUScBRFQu1NySjl9fvG8YeUzoydHwRF0ipW3gCkaW5pY+R
-	8mmYg0eQ6EWDDNq6nLNKG2IWA/Pmbxe3C0fv7
-X-Google-Smtp-Source: AGHT+IE4tG1X1dYxzIYp2Bzh7QoWLOwjRxwWH/t/jCIoU3Yg+wA31sQ+QEU+t1UUq0hSu9m5cPhcEd5LSb+oOd0di18=
-X-Received: by 2002:a50:8d13:0:b0:560:1a1:eb8d with SMTP id
- s19-20020a508d13000000b0056001a1eb8dmr205884eds.7.1707929930734; Wed, 14 Feb
- 2024 08:58:50 -0800 (PST)
+	s=arc-20240116; t=1707933123; c=relaxed/simple;
+	bh=iKlMzOvO7wOkGmYcXWpPmmsEJ/vZpLj6vS3LzkOExPI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bVQQuB1CcyUePi88Ba6WuML8B6b3MCtAA5k7pAE7dBt06FvwaqNs6GSRyIxuEOLjETsCBALNwLSOxArQR6w4dYGW7P6fXzDjQNvYOfEpIyGO9AXDtgGrTuYcMwfw9RTYjQ2zCGNUg6r+pLi5JLR7gc6SYkdorvrmZ8vis3R6Pro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=naccy.de; spf=pass smtp.mailfrom=naccy.de; dkim=pass (2048-bit key) header.d=naccy.de header.i=@naccy.de header.b=OD0WkNJU; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=K1vDOeMD; arc=none smtp.client-ip=64.147.123.137
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=naccy.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=naccy.de
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+	by mailflow.west.internal (Postfix) with ESMTP id AFF6C2CC02BE;
+	Wed, 14 Feb 2024 12:51:58 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute1.internal (MEProxy); Wed, 14 Feb 2024 12:51:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=naccy.de; h=cc
+	:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm2; t=1707933118; x=1707936718; bh=7DXs/JPhCuc0YrZvFU9/m
+	d/8dz0cuhVcDK9itk64MEE=; b=OD0WkNJU014rofMkFZJfveKrVpmo0ojU94mQ6
+	hUBCxKNBuUZY2shk7iaGCV2nK0hKaTbyU0KBMSZfpxOetPfbgWXvskWRbsn/nhoX
+	Wo1HoDxUUOhjpcp8PIhBSB3EcyvQ3xrzLSOXLu7mzDLdMELKx2nkDzlpruaHEf/6
+	Vw+31PXKl4onOgsRRi/HTxnya0207++Ej7EfEwcTHktzHqnRCs5vXvaH3KnqexQC
+	UCYbAUCKieKLGQBzvvPYdiWMpeZPhyXh2XJwHJ774RsthjBzoXuusE3SrMSzcvK3
+	k1N1P62+WofqQv+fEVTFgrfL4F91+UyJP7jDkSgSBzFdvjsbg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm3; t=1707933118; x=1707936718; bh=7DXs/JPhCuc0YrZvFU9/md/8dz0c
+	uhVcDK9itk64MEE=; b=K1vDOeMDr5ovOs2Giew6ZeCDZ+Ev9TcLnjLGqEB5yvYR
+	VYt8/90yacBlVlBpkCdUe57vRDc/PbvM7ieF35G5Yu3BlApJXD2RfNVEzXPO0ns9
+	Uf+BkXYhP3kqCOlebP4QzGp8GRjcYAe41f0iSThj+TSlc60z/dUThgF4dDPy49Rw
+	C3Y/LrZNAyg7ZCMmebY6LhEgyCcLvphGPXmIyjdZoWHmWdRWhEJQYpnRv7wB3Yt+
+	Ce/EepJPK9wjrkbJ/6t/4oeqJKdpJxJiBZgLJbAcHcol2LyhXJXIJBvk6bBFUEu3
+	cFUylMHnH7lpXh7tr/JsGtkTcaB6JlC9ixUMXC2I2g==
+X-ME-Sender: <xms:vf3MZULYIBc8t9CImr6SlLTfNVvA5YxLZ1PLrN8qOKiXTBmS5lPikA>
+    <xme:vf3MZUJ8FTzfhN81t9hg4U8f3gTh4tCpctD0zUuAK9A-Pzs7OM7fZFm0InfPcUfV0
+    i8bWKd8liLnJyeJzdo>
+X-ME-Received: <xmr:vf3MZUuMAaOM5zGnBoJiTIkfYsvBm3T6kxoyIFEyCAVd1kWuQmc0oxuL8pJtEqdr-3ZnkHLab_in0FKlaiQCrT3fUFGh-Ytl0X-etUKPSA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudejgddutdeiucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepsfhuvghnthhi
+    nhcuffgvshhlrghnuggvshcuoehquggvsehnrggttgihrdguvgeqnecuggftrfgrthhtvg
+    hrnhephfffieeivdeiheegleejtdeuieejlefgffejfeehhefhheffieefgeduhfehiefh
+    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepqhguvg
+    esnhgrtggthidruggv
+X-ME-Proxy: <xmx:vf3MZRaKu2-b5Ce4WQ6fw2aXVA22-P3Y4d18huObOX51L4EV6Fjilw>
+    <xmx:vf3MZbZTda2a_K410ixQvoQVNant596Zg3JVtbB-5TLsUj-C3K-_rA>
+    <xmx:vf3MZdDE2MTU3eRQsGWLDD4MvEpDVVHx3ToQS8z6JHYsVr9EQluN_g>
+    <xmx:vv3MZQPSXIowKv7jb5cKk7-kmkYyOo0J9567f61iIMvNgK3rk_943VVCplS2ZTtG>
+Feedback-ID: i14194934:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 14 Feb 2024 12:51:56 -0500 (EST)
+From: Quentin Deslandes <qde@naccy.de>
+To: netdev@vger.kernel.org
+Cc: David Ahern <dsahern@gmail.com>,
+	Martin KaFai Lau <martin.lau@kernel.org>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	kernel-team@meta.com,
+	Matthieu Baerts <matttbe@kernel.org>,
+	Quentin Deslandes <qde@naccy.de>
+Subject: [PATCH iproute2 v8 0/3] ss: pretty-printing BPF socket-local storage
+Date: Wed, 14 Feb 2024 09:42:32 +0100
+Message-ID: <20240214084235.25618-1-qde@naccy.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240202165315.2506384-1-leitao@debian.org> <CANn89iLWWDjp71R7zttfTcEvZEdmcA1qo47oXkAX5DuciYvOtQ@mail.gmail.com>
- <20240213100457.6648a8e0@kernel.org> <ZczSEBFtq6E6APUJ@gmail.com>
- <CANn89iJH5jpvBCw8csGux9U10HwM+ewnL1A7udBi6uwAX6VBYA@mail.gmail.com> <ZczvGJ90L7689F6J@gmail.com>
-In-Reply-To: <ZczvGJ90L7689F6J@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 14 Feb 2024 17:58:37 +0100
-Message-ID: <CANn89i+zF3k4OyhJsK3sg5zNsFzKAQ5G_ANYEaxOfc41B7S18w@mail.gmail.com>
-Subject: Re: [PATCH net-next v3] net: dqs: add NIC stall detector based on BQL
-To: Breno Leitao <leitao@debian.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, pabeni@redhat.com, 
-	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	weiwan@google.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	horms@kernel.org, Jonathan Corbet <corbet@lwn.net>, Randy Dunlap <rdunlap@infradead.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Johannes Berg <johannes.berg@intel.com>, 
-	=?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>, 
-	"open list:TRACING" <linux-trace-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Feb 14, 2024 at 5:49=E2=80=AFPM Breno Leitao <leitao@debian.org> wr=
-ote:
->
-> On Wed, Feb 14, 2024 at 04:41:36PM +0100, Eric Dumazet wrote:
-> > On Wed, Feb 14, 2024 at 3:45=E2=80=AFPM Breno Leitao <leitao@debian.org=
-> wrote:
-> > >
-> > > On Tue, Feb 13, 2024 at 10:04:57AM -0800, Jakub Kicinski wrote:
-> > > > On Tue, 13 Feb 2024 14:57:49 +0100 Eric Dumazet wrote:
-> > > > > Please note that adding other sysfs entries is expensive for work=
-loads
-> > > > > creating/deleting netdev and netns often.
-> > > > >
-> > > > > I _think_ we should find a way for not creating
-> > > > > /sys/class/net/<interface>/queues/tx-{Q}/byte_queue_limits  direc=
-tory
-> > > > > and files
-> > > > > for non BQL enabled devices (like loopback !)
-> > > >
-> > > > We should try, see if anyone screams. We could use IFF_NO_QUEUE, an=
-d
-> > > > NETIF_F_LLTX as a proxy for "device doesn't have a real queue so BQ=
-L
-> > > > would be pointless"? Obviously better to annotate the drivers which
-> > > > do have BQL support, but there's >50 of them on a quick count..
-> > >
-> > > Let me make sure I understand the suggestion above. We want to disabl=
-e
-> > > BQL completely for devices that has dev->features & NETIF_F_LLTX or
-> > > dev->priv_flags & IFF_NO_QUEUE, right?
-> > >
-> > > Maybe we can add a ->enabled field in struct dql, and set it accordin=
-g
-> > > to the features above. Then we can created the sysfs and process the =
-dql
-> > > operations based on that field. This should avoid some unnecessary ca=
-lls
-> > > also, if we are not display sysfs.
-> > >
-> > > Here is a very simple PoC to represent what I had in mind. Am I in th=
-e
-> > > right direction?
-> >
-> > No, this was really about sysfs entries (aka dql_group)
-> >
-> > Partial patch would be:
->
-> That is simpler than what I imagined. Thanks!
->
+BPF allows programs to store socket-specific data using
+BPF_MAP_TYPE_SK_STORAGE maps. The data is attached to the socket itself,
+and Martin added INET_DIAG_REQ_SK_BPF_STORAGES, so it can be fetched
+using the INET_DIAG mechanism.
 
->
-> for netdev_uses_bql(), would it be similar to what I proposed in the
-> previous message? Let me copy it here.
->
->         static bool netdev_uses_bql(struct net_device *dev)
->         {
->                if (dev->features & NETIF_F_LLTX ||
->                    dev->priv_flags & IFF_NO_QUEUE)
->                        return false;
->
->                return true;
->         }
+Currently, ss doesn't request the socket-local data, this patch aims to
+fix this.
 
-I think this should be fine, yes.
+The first patch requests the socket-local data for the requested map ID
+(--bpf-map-id=) or all the maps (--bpf-maps). It then prints the map_id
+in COL_EXT.
+
+Patch #2 uses libbpf and BTF to pretty print the map's content, like
+`bpftool map dump` would do.
+
+Patch #3 updates ss' man page to explain new options.
+
+While I think it makes sense for ss to provide the socket-local storage
+content for the sockets, it's difficult to conciliate the column-based
+output of ss and having readable socket-local data. Hence, the
+socket-local data is printed in a readable fashion over multiple lines
+under its socket statistics, independently of the column-based approach.
+
+Here is an example of ss' output with --bpf-maps:
+[...]
+ESTAB                  340116             0 [...]
+    map_id: 114 [
+        (struct my_sk_storage){
+            .field_hh = (char)3,
+            (union){
+                .a = (int)17,
+                .b = (int)17,
+            },
+        }
+    ]
+
+Changed this series to an RFC as the merging window for net-next is
+closed.
+
+Changes from v7:
+* Fix comment format and checkpatch warnings (Stephen, David).
+* Replaced Co-authored-by with Co-developed-by + Signed-off-by for
+  Martin's contribution on patch #1 to follow checkpatch requirements,
+  with Martin's approval.
+Changes from v6:
+* Remove column dedicated to BPF socket-local storage (COL_SKSTOR),
+  use COL_EXT instead (Matthieu).
+Changes from v5:
+* Add support for --oneline when printing socket-local data.
+* Use \t to indent instead of "  " to be consistent with other columns.
+* Removed Martin's ack on patch #2 due to amount of lines changed.
+Changes from v4:
+* Fix return code for 2 calls.
+* Fix issue when inet_show_netlink() retries a request.
+* BPF dump object is created in bpf_map_opts_load_info().
+Changes from v3:
+* Minor refactoring to reduce number of HAVE_LIBBF usage.
+* Update ss' man page.
+* btf_dump structure created to print the socket-local data is cached
+  in bpf_map_opts. Creation of the btf_dump structure is performed if
+  needed, before printing the data.
+* If a map can't be pretty-printed, print its ID and a message instead
+  of skipping it.
+* If show_all=true, send an empty message to the kernel to retrieve all
+  the maps (as Martin suggested).
+Changes from v2:
+* bpf_map_opts_is_enabled is not inline anymore.
+* Add more #ifdef HAVE_LIBBPF to prevent compilation error if
+  libbpf support is disabled.
+* Fix erroneous usage of args instead of _args in vout().
+* Add missing btf__free() and close(fd).
+Changes from v1:
+* Remove the first patch from the series (fix) and submit it separately.
+* Remove double allocation of struct rtattr.
+* Close BPF map FDs on exit.
+* If bpf_map_get_fd_by_id() fails with ENOENT, print an error message
+  and continue to the next map ID.
+* Fix typo in new command line option documentation.
+* Only use bpf_map_info.btf_value_type_id and ignore
+  bpf_map_info.btf_vmlinux_value_type_id (unused for socket-local storage).
+* Use btf_dump__dump_type_data() instead of manually using BTF to
+  pretty-print socket-local storage data. This change alone divides the size
+  of the patch series by 2.
+
+Quentin Deslandes (3):
+  ss: add support for BPF socket-local storage
+  ss: pretty-print BPF socket-local storage
+  ss: update man page to document --bpf-maps and --bpf-map-id=
+
+ man/man8/ss.8 |   6 +
+ misc/ss.c     | 404 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 401 insertions(+), 9 deletions(-)
+
+--
+2.43.0
 
