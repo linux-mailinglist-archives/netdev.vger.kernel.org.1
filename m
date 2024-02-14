@@ -1,128 +1,134 @@
-Return-Path: <netdev+bounces-71670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D343E854A5A
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 14:21:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3F5E854A6B
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 14:24:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 117541C26395
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 13:21:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 509A528E9D3
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 13:24:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B2F55466B;
-	Wed, 14 Feb 2024 13:20:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D0CD54789;
+	Wed, 14 Feb 2024 13:23:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="dqA+1IG7";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="BsbGSXWK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GisxKNhP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C65C5466A;
-	Wed, 14 Feb 2024 13:20:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F12EC5810D
+	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 13:23:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707916857; cv=none; b=Icu4cITwW3TdNAtiDyP24LT4h0BfQ3Z3PfiSZdSzBTCRVGkS+nW9f+4pV3/L9hsC2d1zVSAwk+SUWNXQQCJy8wg89vdtxuhhty7qwvlBH2muSAK31Z1WxQ5h0QRcs3uSRBDdT9pZucR49VBqxo5Wy3bNJlPDpUPo4b7GDzmY8ME=
+	t=1707916998; cv=none; b=nXM6oTazT4Mj+4swkEpHa3nA2Jc21kmB5/n/au82eieXcxh7SziZN5+3JmibXksVR761xIFF8M6M+a60xs1YbHJKFKouAQUVqF++WTFNUGN7pJqL6a1UGKCW7CYFIMsMGcb12/T1kJXrK7Re17CLVtuBP9XGJdOJjTZcoQg22nQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707916857; c=relaxed/simple;
-	bh=NasOj5Rgwdnt2BKlk2KyEOGaXNw9z2FOCu2Yo3tJ+qA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dezZ4HsC6pKNNXLtRSy2QBAvP0Q4ZyayOv9u/Y0Gmg5YtxSkaEvxTRnNmKb7M7kkJz4KlXXJxVq7QxCxo4599bXBkDgnFGigOTXX1mndsqBCBDRChx3QZOcvR42LZc8BLf8Onzf0EgjBL/1K34b9dLU9KeyroFoUf/KujexJ35M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=dqA+1IG7; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=BsbGSXWK reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1707916854; x=1739452854;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=yrrdWc24p8EoY0O9KXepRzsU4U8z8HdRzd2XY11wwMM=;
-  b=dqA+1IG7iu1jfjWUgY6d5j06RbiW7wlLNvS5iMsbUb83Y+i/orr2IyKC
-   eVgCBWlfLk6OY9PatGIjrqMrlGjO6Dhw0bw1AMQ3/lG11h5rwld74b178
-   wq8UIDETIEcdDDCKhi93JgJXswjCjloA26S2r5S6gkax85x/QZrg59WsR
-   1DzhsYsbM7bft5srSNvinqd2N9ZdSzzN2OuuldvL1GpIydaalCERfpdbt
-   QX9gofawkSGYjjRHcxe+sb+T1uNLVHG8195GRiWGc8Yd92zWT+ntn7uZO
-   lPFijvmbDQubIePZjWzU3EoMutsZm3v9CwE9YolRsS9LYW33Y9B5LQxKx
-   w==;
-X-IronPort-AV: E=Sophos;i="6.06,159,1705359600"; 
-   d="scan'208";a="35404619"
-Received: from vmailcow01.tq-net.de ([10.150.86.48])
-  by mx1.tq-group.com with ESMTP; 14 Feb 2024 14:20:51 +0100
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 96BA316E1E3;
-	Wed, 14 Feb 2024 14:20:44 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
-	s=dkim; t=1707916850;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=yrrdWc24p8EoY0O9KXepRzsU4U8z8HdRzd2XY11wwMM=;
-	b=BsbGSXWK9tho49jJ39YbUE6Uo5TOWRI0lL8ji3WEhZ/Uy+KdKIX9EAXomsngooSSusykOG
-	F2WIJaEwMDEkjvdBXDYTGNkUxEWCZOb1c0DiJf7DENtk/zSiZpUorpXQcg9VTg4gfrenuI
-	UqJXS5kCI/c4zhBjDewqXUpqtk2jQlzci83r51waH8KTTX6S4WJk2YJ5RkkkJLzKIhK3/A
-	E4Gh9WQ1LJjWfuh40g7u3S4tBG1Is6/WB/GB9iFl8FwxSImJKO70h0S12UrkAzhzVvlYQe
-	3AmUUSk4f+IEE1rVK8TIt8NOOCXP3BFkQEgBZpqEj/zBaiu8xaOj4g6Wm0Q+yg==
-Date: Wed, 14 Feb 2024 14:20:37 +0100
-From: Gregor Herburger <gregor.herburger@ew.tq-group.com>
-To: Dimitri Fedrau <dima.fedrau@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 net-next 05/14] net: phy: marvell-88q2xxx: add driver
- for the Marvell 88Q2220 PHY
-Message-ID: <Zcy9E4riyFRk8B1P@herburgerg-w2>
-References: <20240213213955.178762-1-dima.fedrau@gmail.com>
- <20240213213955.178762-6-dima.fedrau@gmail.com>
+	s=arc-20240116; t=1707916998; c=relaxed/simple;
+	bh=HNraHWOZNH+3RvOHMr8xVWNpbzsIA2kUslt7E3CDhMI=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=FKtKHbNhYWndt+IB48FRcr68RLKTQNWhmbsneMwbp7pTLK9mq1DO6vOLrrNUpiuDrbBuz20oFFe/l/8L17+9KtcipVva8dA7koa1xafXuyc3rZEknolW7Dt4qlunWBrugnheISn05rBLZtNLQEAp7b0xzdW577StNM3fToXCRw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GisxKNhP; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707916995;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Un0QKPb4jdgmT6FE6UlUFtmk4ArcRKmDsqNoetoVwlY=;
+	b=GisxKNhP3Qz0BQ+j5yL7OyEi+0bPPMu4gwbCIjEe32LFPwloGewmOkjCK2Uf2RP2J/t0C5
+	i0tHT7/+lINTdkwNk9cApkUAHe+ZnlENQYKhbr7jENJ1QUOAmWjlN5snuZvbEF3GgJHg00
+	5ya0/RgoMzrbDDPI6cBHnsSCns+4PJw=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-340-mtaO_p68NiGwpcELSI3lSg-1; Wed, 14 Feb 2024 08:23:12 -0500
+X-MC-Unique: mtaO_p68NiGwpcELSI3lSg-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a3120029877so85259666b.1
+        for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 05:23:12 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707916991; x=1708521791;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Un0QKPb4jdgmT6FE6UlUFtmk4ArcRKmDsqNoetoVwlY=;
+        b=QXZIneK1lYRNjAIjp7ks+TWRzj/g6mrGqYbLibtkM62DSbSVibLYePdKRzYas/FDuy
+         yVsEHtp+rbrmPtQeK4TiPSVPlyC6lHX6sBucc5xhYiY9U0ACJItQNBH2/aE2CyTFIAvR
+         EhXcofXgXiENM9VdW1AId7XF7eB1U8ivK4WvpLYnZxK7J57AawKxmVvVZt+aE8jV38gn
+         EknVk1EqK9XPwqzxPC4zy3vhif8xI3UgtVblY0zdAYylu7Uz5BtvhcVs6pZUa3abYU8z
+         mc0xdxClGOBdOkW8u8R8BwJ8Qyp0l4nwySeeTe+hGZ96XOnzKEjdF3Mn/rEq8lw8uxwP
+         6SFg==
+X-Forwarded-Encrypted: i=1; AJvYcCVEPosMgbkqjIiMh2mIEMMy+MZcXJXIT6/CySQJHXBFmHDSowT6XPUvps7vNcNtWTrdbVUjDPqS2yMt3SF1LV4IXutIGonP
+X-Gm-Message-State: AOJu0YwDVtAx7PjFz7srbPMcO3kSxU3PQS2X1vtd+JQ9Wr8KSCj43nyH
+	k6VY2tvxIvw5D/JnZpmp21Zpy1vCSLUFiL8EtdgMTWYTBewb6uAQFshiEn9e0DOx46xyTjPVFeM
+	pZi66zJ4OqpLZr3J84CGrnmcf4e3sWCYdx4J7+xtp3chvDFEJc43jzg==
+X-Received: by 2002:a17:907:1c21:b0:a38:4dc0:22f9 with SMTP id nc33-20020a1709071c2100b00a384dc022f9mr2087115ejc.4.1707916991520;
+        Wed, 14 Feb 2024 05:23:11 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGUhTw8vtSivb9TAW8WtFvo5Bbn9Fb0HKGxLEpjNn3TOAQbWkbLicACvPPyh0Yr8VXL4hnFdA==
+X-Received: by 2002:a17:907:1c21:b0:a38:4dc0:22f9 with SMTP id nc33-20020a1709071c2100b00a384dc022f9mr2087084ejc.4.1707916991244;
+        Wed, 14 Feb 2024 05:23:11 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVJvTxkvTi0OXr5SaNbOUPzhxfQOPqwn/LpyjeMzsPLDnKlESlwBRPektcJBfeTqOcDiQ7e926ctL+/fbSs+5dpK21ZdHKQ636Z30RmG3xV3ARui46TRgI7sNiNgtW8OVLQifX5p+mRwvoOAf3dZHwSgOwIhEHY7oOzllNrH/D9um8I88Hlpdnyif/eJMpalFqlGUVJ2gKIhm9oL3c7HWlry/hBoXWwBhYsZn74B7AC+8nKxVRYt6AdXJQCekrGQ9d9ahUNw2sBn23TMUBBv1zvBJtktINDzjvKpUTL6Ua/BKIyl4TNM0dQElTDXmfeu5YUa6lFZubUcF9iWyb1ocAIZs73MaGj9iUhfQEUdZYBjffjNKF5Zaqhp/SQ6iEEpcjAaj7PzisOvVa7mK8VKwd6+lyMk0VZHOBa7fIg8BLQJUFkE5sA5R7x5Bc3nNeaNjcqx3rTe+bz+OxCHyINSh838yT1athVjzr4OP761FLASiMdbICdG5O3cdjOQQ16H5OVo1XODbYgoSePmj662vu9PrL85k+e8RkdyJ40FnklYXbF6OoHpvRCJ5nvM+L4/7AOFsES0axm7KsRHYpF2x0T4G/teZ2rzlMdGF5n6ob1rm6jsUv6dAUII3eM+cSy2AAEOhKzlaUgyU1V6mVpuCXopUz6IR6Dv4fvAakmqwlKEEN9u0YiMnvEmdXKE5MQdnQ=
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id cw9-20020a170907160900b00a3d559c6113sm439165ejd.204.2024.02.14.05.23.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Feb 2024 05:23:10 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 9728310F57A4; Wed, 14 Feb 2024 14:23:10 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Jesper Dangaard
+ Brouer <hawk@kernel.org>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, =?utf-8?B?QmrDtnJuIFQ=?=
+ =?utf-8?B?w7ZwZWw=?=
+ <bjorn@kernel.org>, "David S. Miller" <davem@davemloft.net>, Alexei
+ Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Eric Dumazet <edumazet@google.com>, Hao
+ Luo <haoluo@google.com>, Jakub Kicinski <kuba@kernel.org>, Jiri Olsa
+ <jolsa@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Jonathan
+ Lemon <jonathan.lemon@gmail.com>, KP Singh <kpsingh@kernel.org>, Maciej
+ Fijalkowski <maciej.fijalkowski@intel.com>, Magnus Karlsson
+ <magnus.karlsson@intel.com>, Martin KaFai Lau <martin.lau@linux.dev>,
+ Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+ Song Liu <song@kernel.org>, Stanislav Fomichev <sdf@google.com>, Thomas
+ Gleixner <tglx@linutronix.de>, Yonghong Song <yonghong.song@linux.dev>
+Subject: Re: [PATCH RFC net-next 1/2] net: Reference bpf_redirect_info via
+ task_struct on PREEMPT_RT.
+In-Reply-To: <20240214121921.VJJ2bCBE@linutronix.de>
+References: <20240213145923.2552753-1-bigeasy@linutronix.de>
+ <20240213145923.2552753-2-bigeasy@linutronix.de>
+ <66d9ee60-fbe3-4444-b98d-887845d4c187@kernel.org>
+ <20240214121921.VJJ2bCBE@linutronix.de>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Wed, 14 Feb 2024 14:23:10 +0100
+Message-ID: <87y1bndvsx.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240213213955.178762-6-dima.fedrau@gmail.com>
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain
 
-Hi Dimitri,
+Sebastian Andrzej Siewior <bigeasy@linutronix.de> writes:
 
-On Tue, Feb 13, 2024 at 10:39:44PM +0100, Dimitri Fedrau wrote:
->  static struct phy_driver mv88q2xxx_driver[] = {
->  	{
->  		.phy_id			= MARVELL_PHY_ID_88Q2110,
-> @@ -255,12 +439,26 @@ static struct phy_driver mv88q2xxx_driver[] = {
->  		.get_sqi		= mv88q2xxx_get_sqi,
->  		.get_sqi_max		= mv88q2xxx_get_sqi_max,
->  	},
-> +	{
-> +		PHY_ID_MATCH_EXACT(PHY_ID_88Q2220_REVB0),
+> On 2024-02-13 21:50:51 [+0100], Jesper Dangaard Brouer wrote:
+>> I generally like the idea around bpf_xdp_storage.
+>> 
+>> I only skimmed the code, but noticed some extra if-statements (for
+>> !NULL). I don't think they will make a difference, but I know Toke want
+>> me to test it...
+>
+> I've been looking at the assembly for the return value of
+> bpf_redirect_info() and there is a NULL pointer check. I hoped it was
+> obvious to be nun-NULL because it is a static struct.
+>
+> Should this become a problem I could add
+> "__attribute__((returns_nonnull))" to the declaration of the function
+> which will optimize the NULL check away.
 
-I tested the series on a 88Q2220 REV B1 (which is id 0x002b0b22). The
-driver works fine on this revision.
+If we know the function will never return NULL (I was wondering about
+that, actually), why have the check in the C code at all? Couldn't we just
+omit it entirely instead of relying on the compiler to optimise it out?
 
-I understand that in the Marvell API the initialization for Rev B0 and
-B1 differ. For B0 some additional init sequence is executed. I did not look
-into the details of this sequence. However this patch seems to work on
-Rev B1.
+-Toke
 
-Would you consider adding compatibility for Rev B1 and following? I
-tested with:
-		.phy_id			= MARVELL_PHY_ID_88Q2220,
-		.phy_id_mask		= MARVELL_PHY_ID_MASK,
-
-Otherwise:
-
-Tested-by: Gregor Herburger <gregor.herburger@ew.tq-group.com>
-
-Best regards
-Gregor
--- 
-TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
-Amtsgericht München, HRB 105018
-Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
-https://www.tq-group.com/
 
