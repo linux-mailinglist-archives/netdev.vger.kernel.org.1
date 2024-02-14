@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-71826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A1CB8553D2
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 21:17:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C394C8553DA
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 21:18:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5191E293BCE
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 20:17:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E88EA1C21896
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 20:18:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A6E913DBAE;
-	Wed, 14 Feb 2024 20:17:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D426813DBB4;
+	Wed, 14 Feb 2024 20:18:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YigXpF4q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fw37fiHL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FCE813DB9F
-	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 20:17:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C99713DBAB
+	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 20:18:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707941835; cv=none; b=k38tGJbNp+mFFbww0gp5nS1goGuOTNOpvk4WrdSj1boiQwxRhbiNZS+ba9wzpf66NxXuCZPWPAzLX17HsxIO5XYewxl7SlvdmYsUW1cxqB1ck4ixZsLlf9xS8702BD327R6xMQ9EUM+R/rr6gRMf4hDMdQfV68OpIbdnvmBckVI=
+	t=1707941886; cv=none; b=lfzYNj7XKHZR3vyQ5oiksNg4yVVToft0DDWEJ64LW/fKjd5N+KxsDSbk+9sq/WJqnM2MqVtDH36Ar6I2jr4CnRQEZqN5CRuNu8+aOl8a4Jughkz3XlxWesK6tMYkR2C4R/goXxEWTqORIMNvaRduFkee0sdU89w3NgWoyOB7KrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707941835; c=relaxed/simple;
-	bh=akKTxfgHLu0FBpqgnqdgGwWq1ZxZR1G1qBQFAgqXk9U=;
+	s=arc-20240116; t=1707941886; c=relaxed/simple;
+	bh=83jsRGAPkQS7NKt6yT3dAKVDWN3GkD/Y8s4615GR2fw=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=DTndnFlE3VsFtr/6sANQ0V8uEv8fxT1GjqV+uqSs/rW7sA3VE/8wAXw1uv11WbydMvAzIkNqpzeHY4Mnyd4cQIWtDhv7K9yOlHsbA7z6XwX+Jbx5Ep5Saa1dmxYzxkqx93ZLbQb5nStxQuuLrkAEz2/smpfQMHicHUkWdTFLgRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YigXpF4q; arc=none smtp.client-ip=209.85.167.54
+	 In-Reply-To:Content-Type; b=ICeHSSfboIvHhFUdOqXwceuvapox49VOPubB8+47XuZpua/HgsjkswsW3Od5jphnmSBxMwSSc+rixGoruI3E7Kh7lX7ek+P6YUooJIQTqfmDNl1WU3eMMaZdMouzTFpZUnn+kx+QoOQt7GNVyxbfhQMl8503OUbL0yUa3rIvhTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fw37fiHL; arc=none smtp.client-ip=209.85.208.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-51147d0abd1so106473e87.1
-        for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 12:17:13 -0800 (PST)
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-56394d0ee54so176105a12.3
+        for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 12:18:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707941832; x=1708546632; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1707941883; x=1708546683; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
          :from:content-language:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=PJqusheqD94Gp9PDSLOXTzyl7fRnOhX2kW8rohaaCpA=;
-        b=YigXpF4qSDO9UeZ7zg5uVuyMBZb+e7c1eHEortwBB3aimJ6ZtuTAQBuRuvUVrYnoEW
-         Kdn0ohqjQjCVClHKOE2zVpser2nwpeuIlyAIo3p7DnQ4taHBz/+jAlVfaN/sa4zqYlVU
-         rwfx8j6kMHwGSkkVRlRqDSSGJCI35id28PsZT/od4dXUhhmZyl20eOzui0lVbu+UiQgE
-         S/lQRpctyXQwAEmH5ovUDO44y2TnjExVMWLfKw0ZAiHOfryofkflOeUnS3/B5vLplWjM
-         nyeNexw0H5i3ixwTXhphy+URtQkGl1EsczuS3rbsZ+b6/MSY3yzGbu/2LXQ/NJ9ibs/O
-         v1Bg==
+        bh=OlZjQr/9QRBPorwQuwD33vZGPEbr+eVZocaHnCgR7dI=;
+        b=fw37fiHLCATTiiCFFL6i38CfkSMZatZ6A2IFhVEnm2b7X61FilNCfASgYchi0Kd/ry
+         1eEEH37mgNKnWdzHf66bBosdt96C42Sw8Kc3MLKF4oxC26CX6K5CpaANWR5rRoCPs0eR
+         roIX/yItCLQwRiAPjh+U7MowVxAWKyGn3ezjJ/ZKvNGTiSvlNf+PBj9eyJhLf8+4zUXF
+         olGEUlOS5X0wtyJ58MasWKAf+OyW1AUxuZ1oxDlcayFe366UVmm6oaDfZFDjr9j98ku/
+         umFelGd7ipjpW5vDslHxeLISkVQbHZi5A+U636YYknJA+YqO8pMeMJdCqanxn+8AghLv
+         tbHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707941832; x=1708546632;
+        d=1e100.net; s=20230601; t=1707941883; x=1708546683;
         h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
          :from:content-language:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=PJqusheqD94Gp9PDSLOXTzyl7fRnOhX2kW8rohaaCpA=;
-        b=neuVtZAMrcmT08Jlu/U55fGkn0qY8pQa/HQ4lpn5uxZ6/rudLwnnJ1DfzHLJI7HO/o
-         P1LNv0MMf/E36+b4k1P9lVgzpoMIzwsexeAgT1OeOAvfyOdC6WemNL7KjCkgIOBj7Rfk
-         u597HK5gwQwmZ6ZCemgxPhhA0DW9v8x3FXG2ykCRpAokSMEZQdPPBmGCEt0mRxoOoGqd
-         7FjnD0vCxjLCdhVEfly/Yp86ZIji4G46QB9B1zhFqwVJxx5LywljVddweuxz9WnOmKdu
-         NUmqQhrqhhHmCalnbUO0DprGSZAyOZ9VPqhlz93Mvu/0UQUnMY3duLHkOOUAnV/yw5O/
-         /OIQ==
-X-Gm-Message-State: AOJu0Yy/Uh/8ovaYWIc9LzCF689dqukZM725H6xTTPiZLegwwvLr0/mw
-	eOYk6SPnNMIE0MwduaTFaRwaM+ewecjXRISkiI88683+F1WIxHoE
-X-Google-Smtp-Source: AGHT+IEbUS/9JPQ1vdk0TaVCpg0LOkc8rnPVqkMPF13lZ68B/2ysmwDqdDP6cXpMZLAHcqZGmP3oKw==
-X-Received: by 2002:a2e:9dd3:0:b0:2d0:cd24:24c3 with SMTP id x19-20020a2e9dd3000000b002d0cd2424c3mr2674693ljj.53.1707941832035;
-        Wed, 14 Feb 2024 12:17:12 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCV2qnlgX5F7R0+7xBk58gmgoLth7tJu8haI+9lHKyW23dOBspqeYOLnydzz+IJg9qwZMtQMEETcCamwc+spCY4zI9WzaVCNB8PndiaN0F4cZXnDxS7dugwKWhwKpvCWDkbrPXt35UoftoQ6cpk4UG6ZA+8SSHaTd8HhCbZtcaJSjhPfVtSWSA3pVKRGZrlq2xF9ozY=
+        bh=OlZjQr/9QRBPorwQuwD33vZGPEbr+eVZocaHnCgR7dI=;
+        b=ZRPrctkziAUG+NCrnvQKbyiHSWqXwJDvU7O92snTaM3fYdhZUgXcnDo/G32fk/p4uW
+         Gy33Dy9t2GCWjN8Z1hiV7+iLuwLJp9X1evwHBq07qrEYM7HQS1k7lFS2y85kbZb1B8ZK
+         phc8j6oDB4JpfQwPV2VbXQFyn46Wptxk7Zy+IzTilxC1BI88pwpm3oEFPSfbFuzIdT14
+         ikZVJWGZQGDkjAfWKyH+HcKwKbbOGLNKiB1h0Z6SJVJX1A/ewHWQrjdxh7qHk5C9EKFt
+         vC9RK3bu5JKW0FYUEN/OU0xSh4q2IWVPw9AVqTHinAkUE3C3Irc3/Dj8BzCK15PxJ1SA
+         Up3A==
+X-Gm-Message-State: AOJu0Yw9yrgq9SEmb+cqqQzWARPHZ+HZ0+22YGBQ+AfQFP6gb6O13M42
+	ZD6jCRYKzSSB1akXSkoOi5ye5RpojCJnMuZ8xCAeDH52xWN6x6cN
+X-Google-Smtp-Source: AGHT+IEjVEabX8Z5kMk34E7wznkM3qCfGvSjxoE2Wj9e+UWC937CyVUfzQFIp3IsJFmgitK15My1kg==
+X-Received: by 2002:a50:ee87:0:b0:561:a6f1:66e3 with SMTP id f7-20020a50ee87000000b00561a6f166e3mr2999020edr.22.1707941883169;
+        Wed, 14 Feb 2024 12:18:03 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCX3asY6z33ge22nPKC7juyk7MRXGFbAejW9LotbOFNSO9gsW2lpGfAWIF1Xvdtr+NPo/8ax15RL2dr/5eXhKdjJzuuefwkSL6CPiV/Uvt/PxtootiSQ6QxM8gp9QKZn8Ybrkb24RVCHcpUVqxjTaf1wOlGFrrdjjRx3IKhlttv1RasNX3IJHfJWjdKwKfO6/QqQj2o=
 Received: from ?IPV6:2a01:c23:c153:4a00:f92b:249d:fae6:3a40? (dynamic-2a01-0c23-c153-4a00-f92b-249d-fae6-3a40.c23.pool.telefonica.de. [2a01:c23:c153:4a00:f92b:249d:fae6:3a40])
-        by smtp.googlemail.com with ESMTPSA id en14-20020a056402528e00b0055fef53460bsm4979118edb.0.2024.02.14.12.17.11
+        by smtp.googlemail.com with ESMTPSA id en14-20020a056402528e00b0055fef53460bsm4979118edb.0.2024.02.14.12.18.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Feb 2024 12:17:11 -0800 (PST)
-Message-ID: <6b683779-ba96-421a-a274-a4288828fd95@gmail.com>
-Date: Wed, 14 Feb 2024 21:17:11 +0100
+        Wed, 14 Feb 2024 12:18:02 -0800 (PST)
+Message-ID: <fae70ab4-bbb7-4131-913c-aaf0a512ecef@gmail.com>
+Date: Wed, 14 Feb 2024 21:18:02 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,7 +77,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 2/5] net: phy: add PHY_EEE_CAP2_FEATURES
+Subject: [PATCH net-next 3/5] net: phy: c45: add and use
+ genphy_c45_read_eee_cap2
 Content-Language: en-US
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>,
@@ -133,65 +134,63 @@ In-Reply-To: <558e122f-e900-4a17-a03a-2b9ec4fed124@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-As a prerequisite for adding EEE CAP2 register support, complement
-PHY_EEE_CAP1_FEATURES with PHY_EEE_CAP2_FEATURES.
-For now only 2500baseT and 5000baseT modes are supported.
+Add and use genphy_c45_read_eee_cap2(), complementing
+genphy_c45_read_eee_cap1().
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/phy/phy_device.c | 11 +++++++++++
- include/linux/phy.h          |  2 ++
- 2 files changed, 13 insertions(+)
+ drivers/net/phy/phy-c45.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 9f37c0bfb..9ab1369ba 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -148,6 +148,14 @@ static const int phy_eee_cap1_features_array[] = {
- __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_eee_cap1_features) __ro_after_init;
- EXPORT_SYMBOL_GPL(phy_eee_cap1_features);
- 
-+static const int phy_eee_cap2_features_array[] = {
-+	ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
-+	ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
-+};
-+
-+__ETHTOOL_DECLARE_LINK_MODE_MASK(phy_eee_cap2_features) __ro_after_init;
-+EXPORT_SYMBOL_GPL(phy_eee_cap2_features);
-+
- static void features_init(void)
- {
- 	/* 10/100 half/full*/
-@@ -232,6 +240,9 @@ static void features_init(void)
- 	linkmode_set_bit_array(phy_eee_cap1_features_array,
- 			       ARRAY_SIZE(phy_eee_cap1_features_array),
- 			       phy_eee_cap1_features);
-+	linkmode_set_bit_array(phy_eee_cap2_features_array,
-+			       ARRAY_SIZE(phy_eee_cap2_features_array),
-+			       phy_eee_cap2_features);
- 
+diff --git a/drivers/net/phy/phy-c45.c b/drivers/net/phy/phy-c45.c
+index 46c87a903..5a245f0cc 100644
+--- a/drivers/net/phy/phy-c45.c
++++ b/drivers/net/phy/phy-c45.c
+@@ -830,6 +830,30 @@ static int genphy_c45_read_eee_cap1(struct phy_device *phydev)
+ 	return 0;
  }
  
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 2249cdb59..aa3fd1468 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -54,6 +54,7 @@ extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_10gbit_features) __ro_after_init;
- extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_10gbit_fec_features) __ro_after_init;
- extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_10gbit_full_features) __ro_after_init;
- extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_eee_cap1_features) __ro_after_init;
-+extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_eee_cap2_features) __ro_after_init;
++/**
++ * genphy_c45_read_eee_cap2 - read supported EEE link modes from register 3.21
++ * @phydev: target phy_device struct
++ */
++static int genphy_c45_read_eee_cap2(struct phy_device *phydev)
++{
++	int val;
++
++	/* IEEE 802.3-2022 45.2.3.11 EEE control and capability 2
++	 * (Register 3.21)
++	 */
++	val = phy_read_mmd(phydev, MDIO_MMD_PCS, MDIO_PCS_EEE_ABLE2);
++	if (val < 0)
++		return val;
++
++	/* IEEE 802.3-2022 45.2.3.11 says 9 bits are reserved. */
++	if (val == 0xffff)
++		return 0;
++
++	mii_eee_cap2_mod_linkmode_sup_t(phydev->supported_eee, val);
++
++	return 0;
++}
++
+ /**
+  * genphy_c45_read_eee_abilities - read supported EEE link modes
+  * @phydev: target phy_device struct
+@@ -848,6 +872,13 @@ int genphy_c45_read_eee_abilities(struct phy_device *phydev)
+ 			return val;
+ 	}
  
- #define PHY_BASIC_FEATURES ((unsigned long *)&phy_basic_features)
- #define PHY_BASIC_T1_FEATURES ((unsigned long *)&phy_basic_t1_features)
-@@ -65,6 +66,7 @@ extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_eee_cap1_features) __ro_after_init;
- #define PHY_10GBIT_FEC_FEATURES ((unsigned long *)&phy_10gbit_fec_features)
- #define PHY_10GBIT_FULL_FEATURES ((unsigned long *)&phy_10gbit_full_features)
- #define PHY_EEE_CAP1_FEATURES ((unsigned long *)&phy_eee_cap1_features)
-+#define PHY_EEE_CAP2_FEATURES ((unsigned long *)&phy_eee_cap2_features)
- 
- extern const int phy_basic_ports_array[3];
- extern const int phy_fibre_port_array[1];
++	/* Same for cap2 (3.21) */
++	if (linkmode_intersects(phydev->supported, PHY_EEE_CAP2_FEATURES)) {
++		val = genphy_c45_read_eee_cap2(phydev);
++		if (val)
++			return val;
++	}
++
+ 	if (linkmode_test_bit(ETHTOOL_LINK_MODE_10baseT1L_Full_BIT,
+ 			      phydev->supported)) {
+ 		/* IEEE 802.3cg-2019 45.2.1.186b 10BASE-T1L PMA status register
 -- 
 2.43.1
 
