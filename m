@@ -1,197 +1,392 @@
-Return-Path: <netdev+bounces-71669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5A19854A51
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 14:19:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 478D9854A16
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 14:09:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2116E1C220EE
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 13:19:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C7AE1C21FD4
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 13:09:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E19E535D7;
-	Wed, 14 Feb 2024 13:19:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E203153392;
+	Wed, 14 Feb 2024 13:09:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="MwpGtHQU"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="FYtc6lQ/"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38507535B4;
-	Wed, 14 Feb 2024 13:19:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 028D953385;
+	Wed, 14 Feb 2024 13:09:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707916775; cv=none; b=E3u0yeTu5IO1sa2+UhzHl7UCbAqDFfHpa1FQoYFSKWjbL6oMHywtXNOsohdc0oD1d3xigUSvC7l4W0AaRpFdCO1bp5lVCg3a4OMFbP2xST2vsx656ImSjdfKc80L0KIRYBsBUjIVwQwFl51Q+xJWngcQtvgaz4ynrbs7gUrv2PY=
+	t=1707916171; cv=none; b=bpDDB0fvAOfGqTLU/kwCRzst1v2VEPTCJJsm5VRxW9h+kss3Hh6KuRM9U4PEfLwZu6zyKOfzdVU3pigc9V49GElP6gvZIhyDUbToir708i9RZLkwYdLRzAlV5j0zmeF7YCrHKWDgJqpdtEm+UFheRO0AFp5kjLzzp65qI549Iis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707916775; c=relaxed/simple;
-	bh=a0o55pxxDCLHmqaWvxrygvI6niPdHttBqY/E85EhHew=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=pblTYUtifmTS/IfY575inb+wucongsyJjmtppSatK8YQ60AlswnCx8SZ6516uZUi++yK69cRfoBIfTv09aAjRw7np3l0//wCosQpqgXqHpg57rNfGH+5rIIl6Rao7RKU9qilItaGoATw9nq6EomlY4OYt3VpzUnXfNsqY9jY3lY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=MwpGtHQU; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=EUpvZ7ImcN6iRBfQR5QrQA+ZGjPdmy3aiW0Hd3hcrnQ=; b=MwpGtHQUzHdeNgQIAJKrYkQir0
-	wL3rGSdwthLpVi6rJBVqink5DidYuAH714ElJOQB18JgkPnzLzshB5K6MexPqnWaCceoLwBQSt5NU
-	Obd5t8XnCd90jFPygROaIlqcGcdFbE3Mbvu/awSVtILfJgE8HCc68BYxaKlyUXOvisb2VlJKcpe3y
-	SjKwhh0tbhX+Mzh8RWpVKaG0NxFwqkMfX99jwZFtevDK1yU+y2ux93FizBw04G1QuR/gS5DsbGljX
-	89R7B1iYhmLU1ogaxm3nfe0mawbV8xNQfC2r08dtHxNkCtRQ1masq6dNVYtlENtrfxgx2niHI31jf
-	qdYN+lqQ==;
-Received: from sslproxy03.your-server.de ([88.198.220.132])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1raEvF-000AMv-Dv; Wed, 14 Feb 2024 14:03:33 +0100
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy03.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1raEvE-000MWP-Sy; Wed, 14 Feb 2024 14:03:32 +0100
-Subject: LSF/MM/BPF: 2024: Call for Proposals [Final Reminder]
-To: lsf-pc@lists.linuxfoundation.org
-Cc: linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
- linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, bpf@vger.kernel.org
-References: <7970ad75-ca6a-34b9-43ea-c6f67fe6eae6@iogearbox.net>
- <4343d07b-b1b2-d43b-c201-a48e89145e5c@iogearbox.net>
- <c91530f0-2688-647d-2603-a7b1673f8e42@iogearbox.net>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <013f8741-4468-b1a4-0569-aee5e1d6b1a8@iogearbox.net>
-Date: Wed, 14 Feb 2024 14:03:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1707916171; c=relaxed/simple;
+	bh=5IyqfNXejzNoE7FoDS85KC9aRBAtulC2nc6pHDFcrcA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NA/0QfewQNMx5M3ZZHaF4BIqjYcgWrXi6HL5l2LQuj2TtTsrNjqxt3SVDV39tisjrnHwCPqsVstr+OoF4azyBVAjbynxvXm6wL8vplLXgEEsKLiBE0LABWQOWMefXzB95eASP4V2TNUmckNLs26kkdwxUlDPs+2QfMZuPcUw9a0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=FYtc6lQ/; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41DN23UJ013630;
+	Wed, 14 Feb 2024 05:09:02 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=pfpt0220; bh=LoU7Ab6b
+	8skjXcwkN/4QvGP99r5FSH5svA2nrjqAUDk=; b=FYtc6lQ/CjVQg0P3B3Z4Yorx
+	Cwi6qv01R8h5EirXAgS7taiL8zUdjo1J8eVR57N90ty1yGU0Hk1yzcZP7mdmOw7O
+	7fboh5+ohu0rGUOwgO6hF/jAKKyC8bpyQWFrdoGLsrZdJmsGJWap3ATJ+RPBZPCp
+	D9uJPNKhhjyswmUeEE/1xlaCwshqjigOKGVGhOiHl+7+CIusn4O5kuDNoFR5MdeI
+	nHv9F1LD2p+/DDEl/rDD9uwNbPxYKRZB+HpFPlCYkG14rlFei7nBDJ1zxwwIu0kp
+	XnT/N+idMUn6qs0hummYK03Ly1Wsnh6/XmCH7QdwpqPjOWnho9atRJTsRcwOvQ==
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3w8hr7hxfm-10
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Wed, 14 Feb 2024 05:09:01 -0800 (PST)
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 14 Feb
+ 2024 05:09:00 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Wed, 14 Feb 2024 05:09:00 -0800
+Received: from hyd1425.marvell.com (unknown [10.29.37.83])
+	by maili.marvell.com (Postfix) with ESMTP id 686583F7050;
+	Wed, 14 Feb 2024 05:08:55 -0800 (PST)
+From: Sai Krishna <saikrishnag@marvell.com>
+To: <bhelgaas@google.com>, <linux-pci@vger.kernel.org>,
+        <richardcochran@gmail.com>, <horms@kernel.org>,
+        <vinicius.gomes@intel.com>, <vadim.fedorenko@linux.dev>,
+        <davem@davemloft.net>, <kuba@kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <sgoutham@marvell.com>,
+        <gakula@marvell.com>, <lcherian@marvell.com>, <hkelam@marvell.com>,
+        <sbhatta@marvell.com>
+CC: Sai Krishna <saikrishnag@marvell.com>,
+        Naveen Mamindlapalli
+	<naveenm@marvell.com>
+Subject: [net-next PATCH v2] octeontx2: Add PTP clock driver for Octeon PTM clock.
+Date: Wed, 14 Feb 2024 18:38:53 +0530
+Message-ID: <20240214130853.1321836-1-saikrishnag@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <c91530f0-2688-647d-2603-a7b1673f8e42@iogearbox.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27185/Wed Feb 14 10:22:57 2024)
+Content-Type: text/plain
+X-Proofpoint-GUID: nv-Z3vp20DIRn0ecXpuiWSzS2ZUTB4D-
+X-Proofpoint-ORIG-GUID: nv-Z3vp20DIRn0ecXpuiWSzS2ZUTB4D-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-14_06,2024-02-14_01,2023-05-22_02
 
-The annual Linux Storage, Filesystem, Memory Management, and BPF
-(LSF/MM/BPF) Summit for 2024 will be held from May 13 to May 15
-at the Hilton Salt Lake City Center in Salt Lake City, Utah, USA.
+The PCIe PTM(Precision time measurement) protocol provides precise
+coordination of events across multiple components like PCIe host
+clock, PCIe EP PHC local clocks of PCIe devices. This patch adds
+support for ptp clock based PTM clock. We can use this PTP device
+to sync the PTM time with CLOCK_REALTIME or other PTP PHC
+devices using phc2sys.
 
-LSF/MM/BPF is an invitation-only technical workshop to map out
-improvements to the Linux storage, filesystem, BPF, and memory
-management subsystems that will make their way into the mainline
-kernel within the coming years.
+Signed-off-by: Sai Krishna <saikrishnag@marvell.com>
+Signed-off-by: Naveen Mamindlapalli <naveenm@marvell.com>
+Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
+---
+v2:
+    - Addressed review comments given by Vadim Fedorenko, Vinicius, Simon Horman
+	1. Driver build restricted to ARM64 and COMPILE_TEST+64BIT
+        2. Fixed Sparse complaints by using readq/writeq like else where
+        3. Modified error conditions, clode cleanup
+        4. Forwarding to linux-pci maintainers as suggested by Jakub 
 
-LSF/MM/BPF 2024 will be a three day, stand-alone conference with
-four subsystem-specific tracks, cross-track discussions, as well
-as BoF and hacking sessions:
+ drivers/ptp/Kconfig          |  11 ++
+ drivers/ptp/Makefile         |   1 +
+ drivers/ptp/ptp_octeon_ptm.c | 243 +++++++++++++++++++++++++++++++++++
+ 3 files changed, 255 insertions(+)
+ create mode 100644 drivers/ptp/ptp_octeon_ptm.c
 
-          https://events.linuxfoundation.org/lsfmmbpf/
-
-On behalf of the committee I am issuing a call for agenda proposals
-that are suitable for cross-track discussion as well as technical
-subjects for the breakout sessions.
-
-If advance notice is required for visa applications then please
-point that out in your proposal or request to attend, and submit
-the topic as soon as possible.
-
-We are asking that you please let us know you want to be invited
-by March 1, 2024. We realize that travel is an ever changing target,
-but it helps us to get an idea of possible attendance numbers.
-Clearly things can and will change, so consider the request to
-attend deadline more about planning and less about concrete plans.
-
-1) Fill out the following Google form to request attendance and
-suggest any topics for discussion:
-
-          https://forms.gle/TGCgBDH1x5pXiWFo7
-
-In previous years we have accidentally missed people's attendance
-requests because they either did not Cc lsf-pc@ or we simply missed
-them in the flurry of emails we get. Our community is large and our
-volunteers are busy, filling this out will help us to make sure we
-do not miss anybody.
-
-2) Proposals for agenda topics should ideally still be sent to the
-following lists to allow for discussion among your peers. This will
-help us figure out which topics are important for the agenda:
-
-          lsf-pc@lists.linux-foundation.org
-
-... and Cc the mailing lists that are relevant for the topic in
-question:
-
-          FS:     linux-fsdevel@vger.kernel.org
-          MM:     linux-mm@kvack.org
-          Block:  linux-block@vger.kernel.org
-          ATA:    linux-ide@vger.kernel.org
-          SCSI:   linux-scsi@vger.kernel.org
-          NVMe:   linux-nvme@lists.infradead.org
-          BPF:    bpf@vger.kernel.org
-
-Please tag your proposal with [LSF/MM/BPF TOPIC] to make it easier
-to track. In addition, please make sure to start a new thread for
-each topic rather than following up to an existing one. Agenda
-topics and attendees will be selected by the program committee,
-but the final agenda will be formed by consensus of the attendees
-on the day.
-
-3) This year we would also like to try and make sure we are
-including new members in the community that the program committee
-may not be familiar with. The Google form has an area for people to
-add required/optional attendees. Please encourage new members of the
-community to submit a request for an invite as well, but additionally
-if maintainers or long term community members could add nominees to
-the form it would help us make sure that new members get the proper
-consideration.
-
-For discussion leaders, slides and visualizations are encouraged to
-outline the subject matter and focus the discussions. Please refrain
-from lengthy presentations and talks in order for sessions to be
-productive; the sessions are supposed to be interactive, inclusive
-discussions.
-
-We are still looking into the virtual component. We will likely run
-something similar to what we did last year, but details on that will
-be forthcoming.
-
-2023: https://lwn.net/Articles/lsfmmbpf2023/
-
-2022: https://lwn.net/Articles/lsfmm2022/
-
-2019: https://lwn.net/Articles/lsfmm2019/
-
-2018: https://lwn.net/Articles/lsfmm2018/
-
-2017: https://lwn.net/Articles/lsfmm2017/
-
-2016: https://lwn.net/Articles/lsfmm2016/
-
-2015: https://lwn.net/Articles/lsfmm2015/
-
-2014: http://lwn.net/Articles/LSFMM2014/
-
-4) If you have feedback on last year's meeting that we can use to
-improve this year's, please also send that to:
-
-          lsf-pc@lists.linux-foundation.org
-
-Thank you on behalf of the program committee:
-
-          Amir Goldstein (Filesystems)
-          Jan Kara (Filesystems)
-          Martin K. Petersen (Storage)
-          Javier González (Storage)
-          Michal Hocko (MM)
-          Dan Williams (MM)
-          Daniel Borkmann (BPF)
-          Martin KaFai Lau (BPF)
+diff --git a/drivers/ptp/Kconfig b/drivers/ptp/Kconfig
+index 604541dcb320..3256b12842a6 100644
+--- a/drivers/ptp/Kconfig
++++ b/drivers/ptp/Kconfig
+@@ -224,4 +224,15 @@ config PTP_DFL_TOD
+ 	  To compile this driver as a module, choose M here: the module
+ 	  will be called ptp_dfl_tod.
+ 
++config PTP_CLOCK_OCTEON
++	tristate "OCTEON PTM PTP clock"
++	depends on PTP_1588_CLOCK
++	depends on (64BIT && COMPILE_TEST) || ARM64
++	default n
++	help
++	  This driver adds support for using Octeon PTM device clock as
++	  a PTP clock.
++
++	  To compile this driver as a module, choose M here: the module
++	  will be called ptp_octeon_ptm.
+ endmenu
+diff --git a/drivers/ptp/Makefile b/drivers/ptp/Makefile
+index 68bf02078053..19e2ab4c7f1b 100644
+--- a/drivers/ptp/Makefile
++++ b/drivers/ptp/Makefile
+@@ -21,3 +21,4 @@ obj-$(CONFIG_PTP_1588_CLOCK_MOCK)	+= ptp_mock.o
+ obj-$(CONFIG_PTP_1588_CLOCK_VMW)	+= ptp_vmw.o
+ obj-$(CONFIG_PTP_1588_CLOCK_OCP)	+= ptp_ocp.o
+ obj-$(CONFIG_PTP_DFL_TOD)		+= ptp_dfl_tod.o
++obj-$(CONFIG_PTP_CLOCK_OCTEON)		+= ptp_octeon_ptm.o
+diff --git a/drivers/ptp/ptp_octeon_ptm.c b/drivers/ptp/ptp_octeon_ptm.c
+new file mode 100644
+index 000000000000..6867c1d28f17
+--- /dev/null
++++ b/drivers/ptp/ptp_octeon_ptm.c
+@@ -0,0 +1,243 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Marvell PTP PHC clock driver for PCIe PTM (Precision Time Measurement) EP
++ *
++ * Copyright (c) 2024 Marvell.
++ *
++ */
++
++#include <linux/delay.h>
++#include <linux/device.h>
++#include <linux/err.h>
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/pci.h>
++#include <linux/slab.h>
++#include <linux/module.h>
++
++#include <linux/ptp_clock_kernel.h>
++
++#include "ptp_private.h"
++
++#define PEMX_PFX_CSX_PFCFGX(pem, pf, _offset)	({typeof(_offset) (offset) = (_offset); \
++						((0x8e0000008000 | (u64)(pem) << 36 \
++						| (pf) << 18 \
++						| (((offset) >> 16) & 1) << 16 \
++						| ((offset) >> 3) << 3) \
++						+ ((((offset) >> 2) & 1) << 2)); })
++
++#define PEMX_CFG_WR(a)			(0x8E0000000018ull | (u64)(a) << 36)
++#define PEMX_CFG_RD(a)			(0x8E0000000020ull | (u64)(a) << 36)
++
++/* Octeon CSRs   */
++#define PEMX_CFG                        0x8e00000000d8ULL
++#define PEMX_PTM_CTL			0x8e0000000098ULL
++#define PEMX_PTM_CTL_CAP		BIT_ULL(10)
++#define PEMX_PTM_LCL_TIME		0x8e00000000a0ULL /* PTM time */
++#define PEMX_PTM_MAS_TIME		0x8e00000000a8ULL /* PTP time */
++
++struct oct_ptp_clock {
++	struct ptp_clock *ptp_clock;
++	struct ptp_clock_info caps;
++	bool cn10k_variant;
++};
++
++static struct oct_ptp_clock oct_ptp_clock;
++static void __iomem *ptm_ctl_addr;
++static void __iomem *ptm_lcl_addr;
++
++/* Config space registers   */
++#define PCIEEPX_PTM_REQ_STAT		(oct_ptp_clock.cn10k_variant ? 0x3a8 : 0x474)
++#define PCIEEPX_PTM_REQ_T1L		(oct_ptp_clock.cn10k_variant ? 0x3b4 : 0x480)
++#define PCIEEPX_PTM_REQ_T1M		(oct_ptp_clock.cn10k_variant ? 0x3b8 : 0x484)
++#define PCIEEPX_PTM_REQ_T4L		(oct_ptp_clock.cn10k_variant ? 0x3c4 : 0x490)
++#define PCIEEPX_PTM_REQ_T4M		(oct_ptp_clock.cn10k_variant ? 0x3c8 : 0x494)
++
++#define PCI_VENDOR_ID_CAVIUM			0x177d
++#define PCI_DEVID_OCTEONTX2_PTP			0xA00C
++#define PCI_SUBSYS_DEVID_95XX			0xB300
++#define PCI_SUBSYS_DEVID_95XXN			0xB400
++#define PCI_SUBSYS_DEVID_95XXMM			0xB500
++#define PCI_SUBSYS_DEVID_96XX			0xB200
++#define PCI_SUBSYS_DEVID_98XX			0xB100
++#define PCI_SUBSYS_DEVID_CN10K_A		0xB900
++#define PCI_SUBSYS_DEVID_CN10K_B		0xBD00
++#define PCI_SUBSYS_DEVID_CNF10K_A		0xBA00
++#define PCI_SUBSYS_DEVID_CNF10K_B		0xBC00
++
++static bool is_otx2_support_ptm(struct pci_dev *pdev)
++{
++	return (pdev->subsystem_device == PCI_SUBSYS_DEVID_96XX ||
++		pdev->subsystem_device == PCI_SUBSYS_DEVID_95XX ||
++		pdev->subsystem_device == PCI_SUBSYS_DEVID_95XXN ||
++		pdev->subsystem_device == PCI_SUBSYS_DEVID_98XX ||
++		pdev->subsystem_device == PCI_SUBSYS_DEVID_95XXMM);
++}
++
++static bool is_cn10k_support_ptm(struct pci_dev *pdev)
++{
++	return (pdev->subsystem_device == PCI_SUBSYS_DEVID_CN10K_A ||
++		pdev->subsystem_device == PCI_SUBSYS_DEVID_CNF10K_A ||
++		pdev->subsystem_device == PCI_SUBSYS_DEVID_CN10K_B ||
++		pdev->subsystem_device == PCI_SUBSYS_DEVID_CNF10K_B);
++}
++
++static int ptp_oct_ptm_adjtime(struct ptp_clock_info *ptp, s64 delta)
++{
++	return -EOPNOTSUPP;
++}
++
++static int ptp_oct_ptm_settime(struct ptp_clock_info *ptp,
++			       const struct timespec64 *ts)
++{
++	return -EOPNOTSUPP;
++}
++
++static u32 read_pcie_config32(int ep_pem, int cfg_addr)
++{
++	void __iomem *addr;
++	u64 val;
++
++	if (oct_ptp_clock.cn10k_variant) {
++		addr = ioremap(PEMX_PFX_CSX_PFCFGX(ep_pem, 0, cfg_addr), 8);
++		if (!addr) {
++			pr_err("PTM_EP: Failed to ioremap Octeon CSR space\n");
++			return -1U;
++		}
++		val = readl(addr);
++		iounmap(addr);
++	} else {
++		addr = ioremap(PEMX_CFG_RD(ep_pem), 8);
++		if (!addr) {
++			pr_err("PTM_EP: Failed to ioremap Octeon CSR space\n");
++			return -1U;
++		}
++		val = ((1 << 15) | (cfg_addr & 0xfff));
++		writeq(val, addr);
++		val = readq(addr) >> 32;
++		iounmap(addr);
++	}
++	return (val & 0xffffffff);
++}
++
++static uint64_t octeon_csr_read(u64 csr_addr)
++{
++	void __iomem *addr;
++	u64 val;
++
++	addr = ioremap(csr_addr, 8);
++	if (!addr) {
++		pr_err("PTM_EP: Failed to ioremap CSR space\n");
++		return -1UL;
++	}
++	val = readq(addr);
++	iounmap(addr);
++	return val;
++}
++
++static int ptp_oct_ptm_gettime(struct ptp_clock_info *ptp, struct timespec64 *ts)
++{
++	u64 ptp_time, val64;
++	u32 val32;
++
++	/* Check for valid PTM context */
++	val32 = read_pcie_config32(0, PCIEEPX_PTM_REQ_STAT);
++	if (!(val32 & 0x1)) {
++		pr_err("PTM_EP: ERROR: PTM context not valid: 0x%x\n", val32);
++
++		ts->tv_sec = 0;
++		ts->tv_nsec = 0;
++
++		return -EINVAL;
++	}
++
++	/* Trigger PTM/PTP capture */
++	val64 = readq(ptm_ctl_addr);
++	val64 |= PEMX_PTM_CTL_CAP;
++	writeq(val64, ptm_ctl_addr);
++	/* Read PTM/PTP clocks  */
++	ptp_time = readq(ptm_lcl_addr);
++
++	*ts = ns_to_timespec64(ptp_time);
++
++	return 0;
++}
++
++static int ptp_oct_ptm_enable(struct ptp_clock_info *ptp,
++			      struct ptp_clock_request *rq, int on)
++{
++	return -EOPNOTSUPP;
++}
++
++static const struct ptp_clock_info ptp_oct_caps = {
++	.owner		= THIS_MODULE,
++	.name		= "OCTEON PTM PHC",
++	.max_adj	= 0,
++	.n_ext_ts	= 0,
++	.n_pins		= 0,
++	.pps		= 0,
++	.adjtime	= ptp_oct_ptm_adjtime,
++	.gettime64	= ptp_oct_ptm_gettime,
++	.settime64	= ptp_oct_ptm_settime,
++	.enable		= ptp_oct_ptm_enable,
++};
++
++static void __exit ptp_oct_ptm_exit(void)
++{
++	iounmap(ptm_ctl_addr);
++	iounmap(ptm_lcl_addr);
++	ptp_clock_unregister(oct_ptp_clock.ptp_clock);
++}
++
++static int __init ptp_oct_ptm_init(void)
++{
++	struct pci_dev *pdev = NULL;
++
++	pdev = pci_get_device(PCI_VENDOR_ID_CAVIUM,
++			      PCI_DEVID_OCTEONTX2_PTP, pdev);
++	if (!pdev)
++		return 0;
++
++	if (octeon_csr_read(PEMX_CFG) & 0x1ULL) {
++		pr_err("PEM0 is configured as RC\n");
++		return 0;
++	}
++
++	if (is_otx2_support_ptm(pdev)) {
++		oct_ptp_clock.cn10k_variant = 0;
++	} else if (is_cn10k_support_ptm(pdev)) {
++		oct_ptp_clock.cn10k_variant = 1;
++	} else {
++		/* PTM_EP: unsupported processor */
++		return 0;
++	}
++
++	ptm_ctl_addr = ioremap(PEMX_PTM_CTL, 8);
++	if (!ptm_ctl_addr) {
++		pr_err("PTM_EP: Failed to ioremap CSR space\n");
++		return 0;
++	}
++
++	ptm_lcl_addr = ioremap(PEMX_PTM_LCL_TIME, 8);
++	if (!ptm_lcl_addr) {
++		pr_err("PTM_EP: Failed to ioremap CSR space\n");
++		return 0;
++	}
++
++	oct_ptp_clock.caps = ptp_oct_caps;
++
++	oct_ptp_clock.ptp_clock = ptp_clock_register(&oct_ptp_clock.caps, NULL);
++	if (IS_ERR(oct_ptp_clock.ptp_clock))
++		return PTR_ERR(oct_ptp_clock.ptp_clock);
++
++	pr_info("PTP device index for PTM clock:%d\n", oct_ptp_clock.ptp_clock->index);
++	pr_info("cn10k_variant %d\n", oct_ptp_clock.cn10k_variant);
++
++	return 0;
++}
++
++module_init(ptp_oct_ptm_init);
++module_exit(ptp_oct_ptm_exit);
++
++MODULE_AUTHOR("Marvell Inc.");
++MODULE_DESCRIPTION("PTP PHC clock using PTM");
++MODULE_LICENSE("GPL");
+-- 
+2.25.1
 
 
