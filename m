@@ -1,483 +1,109 @@
-Return-Path: <netdev+bounces-71864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4FF385560B
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 23:36:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 45C7885564A
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 23:46:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E4D31F2502D
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 22:36:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF01D1F2D0ED
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 22:46:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E177145B0A;
-	Wed, 14 Feb 2024 22:34:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2086325750;
+	Wed, 14 Feb 2024 22:46:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YDUUY4m2"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="VAWpfSDR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2811F145347
-	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 22:34:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A15F1EEF7
+	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 22:46:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707950055; cv=none; b=AO3LM7967PRJcgS/InMzyZ73sWhyfpyjmjZr606zMQZislTn6kCEBnu81eI4xkW6l1+PjDvJKRjzzXUFPNEIiL27Qa03fz1NLwTJS0Ez5Ur7cbWJpHwuajXV72UT2TmiivLwpXnKkn2ENuy+jmdF+7ETtSA66EM7yIWuJtiwu+c=
+	t=1707950767; cv=none; b=Eh/gz44XRcHg2EvvqieCSx91uAiAvYAwyBMs07FS65+d2y622a0WDqJZaOa7MKw1YSYJM9ZjreuZx94c5I96ypIu0kEJrOSKunoQYBszpTjXYV6jIhU3mQHY70PBCTAVYHjQ+yNzucPuGnhKTHj5auvsvdrcxIV9IO6FJ8LmtYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707950055; c=relaxed/simple;
-	bh=nGUqc8rUDRH/MoSUz/6/S1Tk0Dw79H+kXKweg5WpjUo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=mnTdnT31+0V4D/+AkEwEH0FjFN+KLdCHri04nd+4v+BoWGSWWTtrr1Du6BpTxMxpPz1imP/BtPDepppwVQgkwo5qUF0GffsqsclJaqazBpnt0cmqKwCm083bVNkX94bNywSiyXSjsfU31HLCIHcDAQRopS64KrBggACf5w5Ar1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YDUUY4m2; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc3645a6790so402237276.0
-        for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 14:34:12 -0800 (PST)
+	s=arc-20240116; t=1707950767; c=relaxed/simple;
+	bh=8bT3amGiS3fLKoyxXO7JZcJjrrEaDQwfviHZsFxAkb8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YOfMezIuRstGKFeh9sg0inzdPpiPlbI8JqxVQkZosztrfObXW57KB8WEeJ0e6P0rBj8OeDrZQjRLB0qCwUHZIfzOXH0A5tbevcP62at5Wbxltepe1Lk4bK/HYcR6xcP3u5nmk6Or6ZbwoHQayzmzZPTDuEKqqKzHEfH8VO0xABo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=VAWpfSDR; arc=none smtp.client-ip=209.85.215.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-5dc4a487b1eso218201a12.1
+        for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 14:46:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707950052; x=1708554852; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yy4qSuFhfwV20o2GLV3Aj99gAN1q07zX9grReXDXi4s=;
-        b=YDUUY4m27iBFDChAQn+IgNUK8KUuWvxUOqfK8uWBxkSeLVG34UGajWc0VKaZMu/wNL
-         9j9HSbMfVhiAi6b8VMSZCHp9QJzO1RlF4aTmQe5S9D0Zl0VsM6nCPVw+3VRLdmuWAzQK
-         6SMX3l2+MGEZnSaonHf12v2o4hNynhH/K1hOPitdHXOIpJ8o2Y0B/70PuiZfMzd/2Tso
-         /kRswQotJiCKJsk3Jn2P9dTjwnk9xf10j6nkyCENlGagPUWPiHIDARag7kyCHzU4Ygln
-         UNoElRVGNmxNph4pghdrdDp4VOSAY9m0/9swuk/6SgjT2ilrJ26Xw0K5WhuhaJJgq+xd
-         UxEQ==
+        d=chromium.org; s=google; t=1707950765; x=1708555565; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZZP+BxUxePmCLWZ8ZfOeiaW4IXKd0KvZFg6WZ8fL0so=;
+        b=VAWpfSDRfN4q7rvZU3wN2Mv4O4s0TQzoEaJsIKv1i3is3KnIdo4MxOLIfYqGouaZ9n
+         wMTGPZ/vLpqnrpbuLemu3bcevOmWWF4hyIC6deoCOTQvvxuS8hfjrlFjeAneydjX8Z7P
+         /RZaa+rzx5SlRizCRRllXzsFjEdMnhQjRKKGE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707950052; x=1708554852;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yy4qSuFhfwV20o2GLV3Aj99gAN1q07zX9grReXDXi4s=;
-        b=dPZrgAeeBj60ceIzmvyRCqwCO0DjHoygKgzVfJsJByB7Ki93TiKpG5nukYm9XUyCWV
-         33G0iFpRHCHM4HArdU+0caxfbBnR6nzuRDy8xDkJyCeQXkG7yf4nHKmKhE5xQsaO1x94
-         Ek/tNPdoqCwjsttcvIvmhSUiJ7hPsfLgPQkNUfL7xujaNDdZbDLwJ2be9Sy/z2dBhCpO
-         TTAkub04yFYmvEhCRJ5elFHzN48eayxzbtULV6L1tKaWEH4mVZ3Mxu2XW+dEA/zCOi55
-         bsjO0XVWyY6RY7DWUPBifjH1mqViSXpgyBrwv4MMrlHjgSuPK9wyZPzYqxrLIhmdvJj6
-         P8Zg==
-X-Forwarded-Encrypted: i=1; AJvYcCWyjMAniCG0PzeNrUUiaKscjVtcfQyhxQ76xSJyuOOtTpIi8Z/FD71hLGgpl7BXnwoV545kc1+Mxf3Y7+ecZ3aZZcG99xfv
-X-Gm-Message-State: AOJu0Yxo8xx1n115HwNDQqSJS9z86cUiVK6lxfzYTH536iHNkRiJqSHK
-	zIpouVYTgmvQ+TulPmwTPFdKgiJwqTRygxXp5iISfUFDBcnI+w/HjDS9IygNmFWa7cOVME71Iw+
-	AI+SyFbtlFenZm5R15BFB3A==
-X-Google-Smtp-Source: AGHT+IHQxkmsecmDK9qPlW1gUC9GIqjAYdP2lBSh+mp1x74Pn67JMQiWOXNn/53a7fjjapx4xb6RrH/RpVjBTgQEaQ==
-X-Received: from almasrymina.svl.corp.google.com ([2620:15c:2c4:200:e4bb:b13c:bc16:afe5])
- (user=almasrymina job=sendgmr) by 2002:a05:6902:1021:b0:dc6:fa35:b42 with
- SMTP id x1-20020a056902102100b00dc6fa350b42mr871543ybt.2.1707950052197; Wed,
- 14 Feb 2024 14:34:12 -0800 (PST)
-Date: Wed, 14 Feb 2024 14:34:03 -0800
-In-Reply-To: <20240214223405.1972973-1-almasrymina@google.com>
+        d=1e100.net; s=20230601; t=1707950765; x=1708555565;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZZP+BxUxePmCLWZ8ZfOeiaW4IXKd0KvZFg6WZ8fL0so=;
+        b=Zzutrb50V4mvG0oqww8dA2J7Bh+2BzMuzYYnXE8tARHrKmDuQ/2kjxmwt0vUuLUley
+         FLbBFfdCvc4x/GcX2rQGmvNw2B62CJMGjtfkfIp/JtpbxMK0RoL8roAbJTD0NfOWKFat
+         eIOlrtR0FHTlg5jIFgUliBEy9gFtojZscAt9L6feNUfVGEaEKgRvp7+aL90EvsheqWjJ
+         Q16gt462rnISdTfhLC9AcHUxEFePJe2drG1PPPPE9ramh6y4qg7sBLpdlQEuGFBt9csx
+         Albthww4vhSpiRwiX2QPC2JmhqF3TwjjOmze6ZTw2uSeZRUlA6/qVI0ewWVi8F2PfDM2
+         7rgg==
+X-Forwarded-Encrypted: i=1; AJvYcCXNsPGOMwwoJ1W9pZe4p5mRHlu7g6EbLFtPVFbTH5PpnA/p7imf7oL9u60eIEZWA8CxMs4xzqvyrb9aXg/Qp6TwXheKsCjh
+X-Gm-Message-State: AOJu0YyE2R0Nox5gXnFtH/+sLWxVB7PIBPzvPDfxnbx7cF0bNbreLkZu
+	sqrL7L8cUnTmwoJz4tGz6xqFSY6/YdnvKe33aS06ozEViGYHEvkU7qfLWSk5ag==
+X-Google-Smtp-Source: AGHT+IEwKqfIdExn5GXKXrbxOA/cEMTv4gqm1KamsNHD/d7odYizVrN8PnY95/ALxTdDxMyMcTnEUg==
+X-Received: by 2002:a05:6a20:c702:b0:19e:b9a8:bc7a with SMTP id hi2-20020a056a20c70200b0019eb9a8bc7amr256992pzb.60.1707950764884;
+        Wed, 14 Feb 2024 14:46:04 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXUGkaK+uG2HYDYpAKvRgJiRcIWuMgkS/9TgsR66J3nWtHqH9sZHwNHgaLV+Aw5I+5Yho+5LbjqF8WB7N2Ph3FGaG04qfiX5QSW7kmtzs5fyp0+pnVsK2+EfOXM7A8h9CUEhYuH8ztUU6gvjoHDgG8ZFkOG4w4mxDvvkYX1zzkjjzbu2uil2DaCQkewklC5noE8NtF2a36TymKP6b36GAD19eg25KxsFC0voQhzwQqjoDGrzhYs5v334PjeVpU1+m9rcgmsVBQ8FDh+pxGBjGUUKCGQk2vpZjj9j1PfF/7wJziaIGF3PdcMWCbQXb9pzJ5XoIAH058/e8a9vWQu4MX9n9FdQokJvA7jfyf2ZI1mzQz8xM5JryGztpVJddSUITqxQjIWsZHEti2kDugz+Prl2/Awio4EURa09W9UG3QIzXZ+M48m/Dp7Pi9RlMRXQO4YvvyK+ZGSSYER2RPjfYSjPGeTewRJItDlUIyHhoQp19SCBj2U1/IN3KCSE37kzpZ5VrE3mAnTjD0Y/J72QxkuvPBskpwFXlC6w0RWQBGeeYUeZFukAt3A253vVftrPFmwd1ozzR+ElMzLA9NdZkSYEhGJ8Pc=
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id j20-20020a056a00175400b006e04553a4c5sm9894509pfc.52.2024.02.14.14.46.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Feb 2024 14:46:04 -0800 (PST)
+Date: Wed, 14 Feb 2024 14:46:03 -0800
+From: Kees Cook <keescook@chromium.org>
+To: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Theodore Ts'o <tytso@mit.edu>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Carlos Bilbao <carlos.bilbao@amd.com>,
+	Avadhut Naik <avadhut.naik@amd.com>, virtualization@lists.linux.dev,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, tech-board-discuss@lists.linux.dev,
+	workflows@vger.kernel.org
+Subject: Re: [PATCH] Documentation: update mailing list addresses
+Message-ID: <202402141445.F9E9116E9@keescook>
+References: <20240214-lf-org-list-migration-v1-1-ef1eab4b1543@linuxfoundation.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240214223405.1972973-1-almasrymina@google.com>
-X-Mailer: git-send-email 2.43.0.687.g38aa6559b0-goog
-Message-ID: <20240214223405.1972973-3-almasrymina@google.com>
-Subject: [PATCH net-next v8 2/2] net: add netmem to skb_frag_t
-From: Mina Almasry <almasrymina@google.com>
-To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jason Gunthorpe <jgg@nvidia.com>, 
-	"=?UTF-8?q?Christian=20K=C3=B6nig?=" <christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240214-lf-org-list-migration-v1-1-ef1eab4b1543@linuxfoundation.org>
 
-Use struct netmem* instead of page in skb_frag_t. Currently struct
-netmem* is always a struct page underneath, but the abstraction
-allows efforts to add support for skb frags not backed by pages.
+On Wed, Feb 14, 2024 at 03:09:53PM -0500, Konstantin Ryabitsev wrote:
+> The mailman2 server running on lists.linuxfoundation.org will be shut
+> down in very imminent future. Update all instances of obsolete list
+> addresses throughout the tree with their new destinations.
+> 
+> Signed-off-by: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
 
-There is unfortunately 1 instance where the skb_frag_t is assumed to be
-a exactly a bio_vec in kcm. For this case, WARN_ON_ONCE and return error
-before doing a cast.
+Thanks for this! I had just updated the TAB's internal docs for the list
+changes too.
 
-Add skb[_frag]_fill_netmem_*() and skb_add_rx_frag_netmem() helpers so
-that the API can be used to create netmem skbs.
+Reviewed-by: Kees Cook <keescook@chromium.org>
 
-Signed-off-by: Mina Almasry <almasrymina@google.com>
-Acked-by: Paolo Abeni <pabeni@redhat.com>
-
----
-
-v8:
-- Move skb_rx_add_frag_netmem back to .c file, only have
-  skb_rx_add_frag() in header file (Paolo).
-
-v7:
-- Move skb_rx_add_frag to header file (Paolo).
-- Move combine kcm skb_frag_page() check with nr_frags check.
-
-v6:
-- Add static_asserts to validate skb_frag_t to bio_vec cast in
-  kcm_write_msg (Yunsheng)
-
-v4:
-- Handle error in kcm_write_msgs() instead of only warning (Willem)
-
-v3:
-- Renamed the fields in skb_frag_t.
-
-v2:
-- Add skb frag filling helpers.
-
----
- include/linux/skbuff.h | 100 +++++++++++++++++++++++++++++------------
- net/core/skbuff.c      |  34 +++++++++++---
- net/kcm/kcmsock.c      |   7 +--
- 3 files changed, 102 insertions(+), 39 deletions(-)
-
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 696e7680656f..e3a2ed5d09ad 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -37,6 +37,7 @@
- #endif
- #include <net/net_debug.h>
- #include <net/dropreason-core.h>
-+#include <net/netmem.h>
- 
- /**
-  * DOC: skb checksums
-@@ -359,7 +360,11 @@ extern int sysctl_max_skb_frags;
-  */
- #define GSO_BY_FRAGS	0xFFFF
- 
--typedef struct bio_vec skb_frag_t;
-+typedef struct skb_frag {
-+	netmem_ref netmem;
-+	unsigned int len;
-+	unsigned int offset;
-+} skb_frag_t;
- 
- /**
-  * skb_frag_size() - Returns the size of a skb fragment
-@@ -367,7 +372,7 @@ typedef struct bio_vec skb_frag_t;
-  */
- static inline unsigned int skb_frag_size(const skb_frag_t *frag)
- {
--	return frag->bv_len;
-+	return frag->len;
- }
- 
- /**
-@@ -377,7 +382,7 @@ static inline unsigned int skb_frag_size(const skb_frag_t *frag)
-  */
- static inline void skb_frag_size_set(skb_frag_t *frag, unsigned int size)
- {
--	frag->bv_len = size;
-+	frag->len = size;
- }
- 
- /**
-@@ -387,7 +392,7 @@ static inline void skb_frag_size_set(skb_frag_t *frag, unsigned int size)
-  */
- static inline void skb_frag_size_add(skb_frag_t *frag, int delta)
- {
--	frag->bv_len += delta;
-+	frag->len += delta;
- }
- 
- /**
-@@ -397,7 +402,7 @@ static inline void skb_frag_size_add(skb_frag_t *frag, int delta)
-  */
- static inline void skb_frag_size_sub(skb_frag_t *frag, int delta)
- {
--	frag->bv_len -= delta;
-+	frag->len -= delta;
- }
- 
- /**
-@@ -417,7 +422,7 @@ static inline bool skb_frag_must_loop(struct page *p)
-  *	skb_frag_foreach_page - loop over pages in a fragment
-  *
-  *	@f:		skb frag to operate on
-- *	@f_off:		offset from start of f->bv_page
-+ *	@f_off:		offset from start of f->netmem
-  *	@f_len:		length from f_off to loop over
-  *	@p:		(temp var) current page
-  *	@p_off:		(temp var) offset from start of current page,
-@@ -2429,22 +2434,37 @@ static inline unsigned int skb_pagelen(const struct sk_buff *skb)
- 	return skb_headlen(skb) + __skb_pagelen(skb);
- }
- 
-+static inline void skb_frag_fill_netmem_desc(skb_frag_t *frag,
-+					     netmem_ref netmem, int off,
-+					     int size)
-+{
-+	frag->netmem = netmem;
-+	frag->offset = off;
-+	skb_frag_size_set(frag, size);
-+}
-+
- static inline void skb_frag_fill_page_desc(skb_frag_t *frag,
- 					   struct page *page,
- 					   int off, int size)
- {
--	frag->bv_page = page;
--	frag->bv_offset = off;
--	skb_frag_size_set(frag, size);
-+	skb_frag_fill_netmem_desc(frag, page_to_netmem(page), off, size);
-+}
-+
-+static inline void __skb_fill_netmem_desc_noacc(struct skb_shared_info *shinfo,
-+						int i, netmem_ref netmem,
-+						int off, int size)
-+{
-+	skb_frag_t *frag = &shinfo->frags[i];
-+
-+	skb_frag_fill_netmem_desc(frag, netmem, off, size);
- }
- 
- static inline void __skb_fill_page_desc_noacc(struct skb_shared_info *shinfo,
- 					      int i, struct page *page,
- 					      int off, int size)
- {
--	skb_frag_t *frag = &shinfo->frags[i];
--
--	skb_frag_fill_page_desc(frag, page, off, size);
-+	__skb_fill_netmem_desc_noacc(shinfo, i, page_to_netmem(page), off,
-+				     size);
- }
- 
- /**
-@@ -2460,10 +2480,10 @@ static inline void skb_len_add(struct sk_buff *skb, int delta)
- }
- 
- /**
-- * __skb_fill_page_desc - initialise a paged fragment in an skb
-+ * __skb_fill_netmem_desc - initialise a fragment in an skb
-  * @skb: buffer containing fragment to be initialised
-- * @i: paged fragment index to initialise
-- * @page: the page to use for this fragment
-+ * @i: fragment index to initialise
-+ * @netmem: the netmem to use for this fragment
-  * @off: the offset to the data with @page
-  * @size: the length of the data
-  *
-@@ -2472,10 +2492,12 @@ static inline void skb_len_add(struct sk_buff *skb, int delta)
-  *
-  * Does not take any additional reference on the fragment.
-  */
--static inline void __skb_fill_page_desc(struct sk_buff *skb, int i,
--					struct page *page, int off, int size)
-+static inline void __skb_fill_netmem_desc(struct sk_buff *skb, int i,
-+					  netmem_ref netmem, int off, int size)
- {
--	__skb_fill_page_desc_noacc(skb_shinfo(skb), i, page, off, size);
-+	struct page *page = netmem_to_page(netmem);
-+
-+	__skb_fill_netmem_desc_noacc(skb_shinfo(skb), i, netmem, off, size);
- 
- 	/* Propagate page pfmemalloc to the skb if we can. The problem is
- 	 * that not all callers have unique ownership of the page but rely
-@@ -2483,7 +2505,20 @@ static inline void __skb_fill_page_desc(struct sk_buff *skb, int i,
- 	 */
- 	page = compound_head(page);
- 	if (page_is_pfmemalloc(page))
--		skb->pfmemalloc	= true;
-+		skb->pfmemalloc = true;
-+}
-+
-+static inline void __skb_fill_page_desc(struct sk_buff *skb, int i,
-+					struct page *page, int off, int size)
-+{
-+	__skb_fill_netmem_desc(skb, i, page_to_netmem(page), off, size);
-+}
-+
-+static inline void skb_fill_netmem_desc(struct sk_buff *skb, int i,
-+					netmem_ref netmem, int off, int size)
-+{
-+	__skb_fill_netmem_desc(skb, i, netmem, off, size);
-+	skb_shinfo(skb)->nr_frags = i + 1;
- }
- 
- /**
-@@ -2503,8 +2538,7 @@ static inline void __skb_fill_page_desc(struct sk_buff *skb, int i,
- static inline void skb_fill_page_desc(struct sk_buff *skb, int i,
- 				      struct page *page, int off, int size)
- {
--	__skb_fill_page_desc(skb, i, page, off, size);
--	skb_shinfo(skb)->nr_frags = i + 1;
-+	skb_fill_netmem_desc(skb, i, page_to_netmem(page), off, size);
- }
- 
- /**
-@@ -2528,8 +2562,16 @@ static inline void skb_fill_page_desc_noacc(struct sk_buff *skb, int i,
- 	shinfo->nr_frags = i + 1;
- }
- 
--void skb_add_rx_frag(struct sk_buff *skb, int i, struct page *page, int off,
--		     int size, unsigned int truesize);
-+void skb_add_rx_frag_netmem(struct sk_buff *skb, int i, netmem_ref netmem,
-+			    int off, int size, unsigned int truesize);
-+
-+static inline void skb_add_rx_frag(struct sk_buff *skb, int i,
-+				   struct page *page, int off, int size,
-+				   unsigned int truesize)
-+{
-+	skb_add_rx_frag_netmem(skb, i, page_to_netmem(page), off, size,
-+			       truesize);
-+}
- 
- void skb_coalesce_rx_frag(struct sk_buff *skb, int i, int size,
- 			  unsigned int truesize);
-@@ -3378,7 +3420,7 @@ static inline void skb_propagate_pfmemalloc(const struct page *page,
-  */
- static inline unsigned int skb_frag_off(const skb_frag_t *frag)
- {
--	return frag->bv_offset;
-+	return frag->offset;
- }
- 
- /**
-@@ -3388,7 +3430,7 @@ static inline unsigned int skb_frag_off(const skb_frag_t *frag)
-  */
- static inline void skb_frag_off_add(skb_frag_t *frag, int delta)
- {
--	frag->bv_offset += delta;
-+	frag->offset += delta;
- }
- 
- /**
-@@ -3398,7 +3440,7 @@ static inline void skb_frag_off_add(skb_frag_t *frag, int delta)
-  */
- static inline void skb_frag_off_set(skb_frag_t *frag, unsigned int offset)
- {
--	frag->bv_offset = offset;
-+	frag->offset = offset;
- }
- 
- /**
-@@ -3409,7 +3451,7 @@ static inline void skb_frag_off_set(skb_frag_t *frag, unsigned int offset)
- static inline void skb_frag_off_copy(skb_frag_t *fragto,
- 				     const skb_frag_t *fragfrom)
- {
--	fragto->bv_offset = fragfrom->bv_offset;
-+	fragto->offset = fragfrom->offset;
- }
- 
- /**
-@@ -3420,7 +3462,7 @@ static inline void skb_frag_off_copy(skb_frag_t *fragto,
-  */
- static inline struct page *skb_frag_page(const skb_frag_t *frag)
- {
--	return frag->bv_page;
-+	return netmem_to_page(frag->netmem);
- }
- 
- /**
-@@ -3528,7 +3570,7 @@ static inline void *skb_frag_address_safe(const skb_frag_t *frag)
- static inline void skb_frag_page_copy(skb_frag_t *fragto,
- 				      const skb_frag_t *fragfrom)
- {
--	fragto->bv_page = fragfrom->bv_page;
-+	fragto->netmem = fragfrom->netmem;
- }
- 
- bool skb_page_frag_refill(unsigned int sz, struct page_frag *pfrag, gfp_t prio);
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 0d9a489e6ae1..a2bd4734a910 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -115,6 +115,24 @@ static struct kmem_cache *skb_small_head_cache __ro_after_init;
- int sysctl_max_skb_frags __read_mostly = MAX_SKB_FRAGS;
- EXPORT_SYMBOL(sysctl_max_skb_frags);
- 
-+/* kcm_write_msgs() relies on casting paged frags to bio_vec to use
-+ * iov_iter_bvec(). These static asserts ensure the cast is valid is long as the
-+ * netmem is a page.
-+ */
-+static_assert(offsetof(struct bio_vec, bv_page) ==
-+	      offsetof(skb_frag_t, netmem));
-+static_assert(sizeof_field(struct bio_vec, bv_page) ==
-+	      sizeof_field(skb_frag_t, netmem));
-+
-+static_assert(offsetof(struct bio_vec, bv_len) == offsetof(skb_frag_t, len));
-+static_assert(sizeof_field(struct bio_vec, bv_len) ==
-+	      sizeof_field(skb_frag_t, len));
-+
-+static_assert(offsetof(struct bio_vec, bv_offset) ==
-+	      offsetof(skb_frag_t, offset));
-+static_assert(sizeof_field(struct bio_vec, bv_offset) ==
-+	      sizeof_field(skb_frag_t, offset));
-+
- #undef FN
- #define FN(reason) [SKB_DROP_REASON_##reason] = #reason,
- static const char * const drop_reasons[] = {
-@@ -845,17 +863,17 @@ struct sk_buff *__napi_alloc_skb(struct napi_struct *napi, unsigned int len,
- }
- EXPORT_SYMBOL(__napi_alloc_skb);
- 
--void skb_add_rx_frag(struct sk_buff *skb, int i, struct page *page, int off,
--		     int size, unsigned int truesize)
-+void skb_add_rx_frag_netmem(struct sk_buff *skb, int i, netmem_ref netmem,
-+			    int off, int size, unsigned int truesize)
- {
- 	DEBUG_NET_WARN_ON_ONCE(size > truesize);
- 
--	skb_fill_page_desc(skb, i, page, off, size);
-+	skb_fill_netmem_desc(skb, i, netmem, off, size);
- 	skb->len += size;
- 	skb->data_len += size;
- 	skb->truesize += truesize;
- }
--EXPORT_SYMBOL(skb_add_rx_frag);
-+EXPORT_SYMBOL(skb_add_rx_frag_netmem);
- 
- void skb_coalesce_rx_frag(struct sk_buff *skb, int i, int size,
- 			  unsigned int truesize)
-@@ -1999,10 +2017,11 @@ int skb_copy_ubufs(struct sk_buff *skb, gfp_t gfp_mask)
- 
- 	/* skb frags point to kernel buffers */
- 	for (i = 0; i < new_frags - 1; i++) {
--		__skb_fill_page_desc(skb, i, head, 0, psize);
-+		__skb_fill_netmem_desc(skb, i, page_to_netmem(head), 0, psize);
- 		head = (struct page *)page_private(head);
- 	}
--	__skb_fill_page_desc(skb, new_frags - 1, head, 0, d_off);
-+	__skb_fill_netmem_desc(skb, new_frags - 1, page_to_netmem(head), 0,
-+			       d_off);
- 	skb_shinfo(skb)->nr_frags = new_frags;
- 
- release:
-@@ -3740,7 +3759,8 @@ skb_zerocopy(struct sk_buff *to, struct sk_buff *from, int len, int hlen)
- 		if (plen) {
- 			page = virt_to_head_page(from->head);
- 			offset = from->data - (unsigned char *)page_address(page);
--			__skb_fill_page_desc(to, 0, page, offset, plen);
-+			__skb_fill_netmem_desc(to, 0, page_to_netmem(page),
-+					       offset, plen);
- 			get_page(page);
- 			j = 1;
- 			len -= plen;
-diff --git a/net/kcm/kcmsock.c b/net/kcm/kcmsock.c
-index 1184d40167b8..73c200c5c8e4 100644
---- a/net/kcm/kcmsock.c
-+++ b/net/kcm/kcmsock.c
-@@ -627,7 +627,8 @@ static int kcm_write_msgs(struct kcm_sock *kcm)
- 			skb = txm->frag_skb;
- 		}
- 
--		if (WARN_ON(!skb_shinfo(skb)->nr_frags)) {
-+		if (WARN_ON(!skb_shinfo(skb)->nr_frags) ||
-+		    WARN_ON_ONCE(!skb_frag_page(&skb_shinfo(skb)->frags[0]))) {
- 			ret = -EINVAL;
- 			goto out;
- 		}
-@@ -637,8 +638,8 @@ static int kcm_write_msgs(struct kcm_sock *kcm)
- 			msize += skb_frag_size(&skb_shinfo(skb)->frags[i]);
- 
- 		iov_iter_bvec(&msg.msg_iter, ITER_SOURCE,
--			      skb_shinfo(skb)->frags, skb_shinfo(skb)->nr_frags,
--			      msize);
-+			      (const struct bio_vec *)skb_shinfo(skb)->frags,
-+			      skb_shinfo(skb)->nr_frags, msize);
- 		iov_iter_advance(&msg.msg_iter, txm->frag_offset);
- 
- 		do {
 -- 
-2.43.0.687.g38aa6559b0-goog
-
+Kees Cook
 
