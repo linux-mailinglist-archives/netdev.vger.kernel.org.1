@@ -1,41 +1,48 @@
-Return-Path: <netdev+bounces-71641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E882854540
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 10:30:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BACE0854558
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 10:33:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA8F41C276F9
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 09:30:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E6C91F2DF23
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 09:33:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9EED12E7D;
-	Wed, 14 Feb 2024 09:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40C1712B6D;
+	Wed, 14 Feb 2024 09:33:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zv+CDWgu"
 X-Original-To: netdev@vger.kernel.org
-Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2C0312E6C;
-	Wed, 14 Feb 2024 09:29:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13DA9125A2;
+	Wed, 14 Feb 2024 09:33:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707902998; cv=none; b=Is54wVIsyM4sJE1gDU1OPhp7vmItZYKk/AA6Rk6Nvm4iah5hdYSpNfMcgTXvVXwkbcqxuZCxIGp/E/1aheYqWy5YkKd3+8IkP9hmFw4tICk7tTFFxjUxZNxub54LB02AcTXCOjPA6kiEwuBeVd0l77U/TeOUhQHaYEcbey8Y2/c=
+	t=1707903196; cv=none; b=aV5H/j3R0dMRzqL6eUwXJ1SDk/4MkBUeifmQCbeqeV6y/JbwwFYSF8XACEWj2s+qaFeZscbijdKC3/hS7l5aiJFGfwLXCFc/7lsnmxWqq3Vv6zBaOaol8mf4TAWXk0EaJjs2gIRycbRluYl/csbx9Zu339tZOblQgrjYnaCpizI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707902998; c=relaxed/simple;
-	bh=lONzxbEoYUVLxbe6desgi2wkPPm1kZXvIZCsfrCdL50=;
+	s=arc-20240116; t=1707903196; c=relaxed/simple;
+	bh=UISQVml4jbrLszXUXlZ5VcCn4BnTwKFkb9pedFDrCp8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=s9TOVxT7RnDlbCIM1cr4o69XkaOYc/juQTqnwDPl+zSz5UgHhSTFenV1ac1RLIQ0E1flg5XhL0bwRX4qoMLMxoG7LDHBvqHTgkIr3RVnACV7CLFXy6sLu7gEGT0MLBYJmw61zylXZwpokFYWZ5DV4eKa2Mab+SN0KDTEL8dxM2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
-X-IronPort-AV: E=Sophos;i="6.06,159,1705330800"; 
-   d="asc'?scan'208";a="197820337"
-Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
-  by relmlie6.idc.renesas.com with ESMTP; 14 Feb 2024 18:29:54 +0900
-Received: from [10.226.93.95] (unknown [10.226.93.95])
-	by relmlir6.idc.renesas.com (Postfix) with ESMTP id 5294241E74F2;
-	Wed, 14 Feb 2024 18:29:51 +0900 (JST)
-Message-ID: <d685bee8-c760-463b-ba72-6c6dda2cd96c@bp.renesas.com>
-Date: Wed, 14 Feb 2024 09:29:49 +0000
+	 In-Reply-To:Content-Type; b=bB24cf/JQghCKRovPlSiHGqt/WzNGZmy1pO946dJGSSLPQ/pj91YT26q3u/OaOaRXsaAcmdoIsS17AXUOLuTWDbb/GYadTlrsuvWVwPh679yJow46621SM288dEb/giLCwrNnYMCi7pDRS//GlgufCanuJ18ZHkLLkbgFUUDhdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zv+CDWgu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08DD4C433C7;
+	Wed, 14 Feb 2024 09:33:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707903195;
+	bh=UISQVml4jbrLszXUXlZ5VcCn4BnTwKFkb9pedFDrCp8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Zv+CDWgufLAp+veVNy9g5pVHWDgVo4OmEQ1iZF8AJjSQmFKeD2pk+pVW0p8QVX//h
+	 3q9tUgOItRcKJOS6iR5C/eIjXgNLGwJlAxw67KaXsGX5064Lcx9EP4p+xEsHzfxZj+
+	 FykGPnlrlBktKaqjr27tCOP9/9umyX5dFNQUg+GIV48V5pj2w5wFTZIaZCm8wuykb6
+	 Qpx8TLBIF0jYP2RCRFBSnIthz4V1jiIjDjlTdC2W24120Nr/zc2vCLJ19P5QBgZDWE
+	 YsY94bxLXUNEJSx60Jn1J+Tsm37P+IyoAS2Og4yMGj5v/WQRkvX6/FlzivEccrnREI
+	 UVYvHHUXOlMIw==
+Message-ID: <60d7072d-392e-489b-8889-404f3c753620@kernel.org>
+Date: Wed, 14 Feb 2024 10:32:58 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,178 +50,122 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next v2 6/7] net: ravb: Enable SW IRQ Coalescing
- for GbEth
-Content-Language: en-GB
-To: Sergey Shtylyov <s.shtylyov@omp.ru>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
- Wolfram Sang <wsa+renesas@sang-engineering.com>, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240206091909.3191-1-paul.barker.ct@bp.renesas.com>
- <20240206091909.3191-7-paul.barker.ct@bp.renesas.com>
- <2251fe66-11b7-2f30-c905-7bc1b9a57dab@omp.ru>
- <895bdec7-05d6-4435-8be1-fe8ca716cbcb@bp.renesas.com>
- <7c28bbea-0b3f-ee62-05c8-e6f1bc738b0b@omp.ru>
-From: Paul Barker <paul.barker.ct@bp.renesas.com>
-Organization: Renesas Electronics Corporation
-In-Reply-To: <7c28bbea-0b3f-ee62-05c8-e6f1bc738b0b@omp.ru>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------8Vgu0R0Il0ku5RlX1OWVVOg2"
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------8Vgu0R0Il0ku5RlX1OWVVOg2
-Content-Type: multipart/mixed; boundary="------------CCriltInN1UKWAx358KKJ1C5";
- protected-headers="v1"
-From: Paul Barker <paul.barker.ct@bp.renesas.com>
-To: Sergey Shtylyov <s.shtylyov@omp.ru>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
- Wolfram Sang <wsa+renesas@sang-engineering.com>, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-ID: <d685bee8-c760-463b-ba72-6c6dda2cd96c@bp.renesas.com>
-Subject: Re: [RFC PATCH net-next v2 6/7] net: ravb: Enable SW IRQ Coalescing
- for GbEth
-References: <20240206091909.3191-1-paul.barker.ct@bp.renesas.com>
- <20240206091909.3191-7-paul.barker.ct@bp.renesas.com>
- <2251fe66-11b7-2f30-c905-7bc1b9a57dab@omp.ru>
- <895bdec7-05d6-4435-8be1-fe8ca716cbcb@bp.renesas.com>
- <7c28bbea-0b3f-ee62-05c8-e6f1bc738b0b@omp.ru>
-In-Reply-To: <7c28bbea-0b3f-ee62-05c8-e6f1bc738b0b@omp.ru>
-
---------------CCriltInN1UKWAx358KKJ1C5
-Content-Type: multipart/mixed; boundary="------------hivdtR059EkCALa1CPzu50SE"
-
---------------hivdtR059EkCALa1CPzu50SE
+Subject: Re: [PATCH v1 net-next] net: Deprecate SO_DEBUG and reclaim SOCK_DBG
+ bit.
+Content-Language: en-GB, fr-BE
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Mat Martineau <martineau@kernel.org>, Wenjia Zhang <wenjia@linux.ibm.com>,
+ Jan Karcher <jaka@linux.ibm.com>
+Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
+ mptcp@lists.linux.dev, linux-s390@vger.kernel.org
+References: <20240213223135.85957-1-kuniyu@amazon.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20240213223135.85957-1-kuniyu@amazon.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
-On 12/02/2024 20:40, Sergey Shtylyov wrote:
-> On 2/12/24 2:45 PM, Paul Barker wrote:
-> [...]
->>>> diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/ether=
-net/renesas/ravb.h
->>>> index 55a7a08aabef..ca7a66759e35 100644
->>>> --- a/drivers/net/ethernet/renesas/ravb.h
->>>> +++ b/drivers/net/ethernet/renesas/ravb.h
->>>> @@ -1078,6 +1078,7 @@ struct ravb_hw_info {
->>>>  	unsigned nc_queues:1;		/* AVB-DMAC has RX and TX NC queues */
->>>>  	unsigned magic_pkt:1;		/* E-MAC supports magic packet detection */=
+Hi Kuniyuki,
 
->>>>  	unsigned half_duplex:1;		/* E-MAC supports half duplex mode */
->>>> +	unsigned needs_irq_coalesce:1;	/* Requires SW IRQ Coalescing to ac=
-hieve best performance */
->>>
->>>    Is this really a hardware feature?
->>
->> It's more like a requirement to get the best out of this hardware and =
-the Linux networking stack.
->>
->> I considered checking the compatible string in the probe function but =
-I decided that storing a configuration bit in the HW info struct was clea=
-ner.
->=20
->    Yes, but you added the new bit under the "hardware features" commet.=
- :-)
->=20
->>>    Also, s/Requires SW/Needs software/ and s/to achieve best performa=
-nce//,
->>> please...
->>
->> Will do.
->=20
->    The comment is too long, I think. :-)
+On 13/02/2024 23:31, Kuniyuki Iwashima wrote:
+> Recently, commit 8e5443d2b866 ("net: remove SOCK_DEBUG leftovers")
+> removed the last users of SOCK_DEBUG(), and commit b1dffcf0da22 ("net:
+> remove SOCK_DEBUG macro") removed the macro.
+> 
+> Now is the time to deprecate the oldest socket option.
 
-I'll fix both in the next revision.
+Thank you for looking at this!
 
---=20
-Paul Barker
+My review here below is only about the modifications related to MPTCP.
 
---------------hivdtR059EkCALa1CPzu50SE
-Content-Type: application/pgp-keys; name="OpenPGP_0x27F4B3459F002257.asc"
-Content-Disposition: attachment; filename="OpenPGP_0x27F4B3459F002257.asc"
-Content-Description: OpenPGP public key
-Content-Transfer-Encoding: quoted-printable
+(...)
 
------BEGIN PGP PUBLIC KEY BLOCK-----
+> diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
+> index da37e4541a5d..f6d90eef3d7c 100644
+> --- a/net/mptcp/sockopt.c
+> +++ b/net/mptcp/sockopt.c
+> @@ -81,7 +81,7 @@ static void mptcp_sol_socket_sync_intval(struct mptcp_sock *msk, int optname, in
+>  
+>  		switch (optname) {
+>  		case SO_DEBUG:
+> -			sock_valbool_flag(ssk, SOCK_DBG, !!val);
+> +			/* deprecated. */
 
-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3D
-=3DsIIN
------END PGP PUBLIC KEY BLOCK-----
+If it is now a NOOP, maybe better to:
 
---------------hivdtR059EkCALa1CPzu50SE--
+ - remove SO_DEBUG from mptcp_sol_socket_sync_intval() and
+   mptcp_setsockopt_sol_socket_int()
 
---------------CCriltInN1UKWAx358KKJ1C5--
+ - move it just above the "return 0" in mptcp_setsockopt_sol_socket()
+with the "deprecated" (or "removed") comment
 
---------------8Vgu0R0Il0ku5RlX1OWVVOg2
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+By doing that, we avoid a lock, plus going through the list of subflows
+for nothing.
 
------BEGIN PGP SIGNATURE-----
+WDYT?
 
-wnsEABYIACMWIQSiu8gv1Xr0fIw/aoLbaV4Vf/JGvQUCZcyIDQUDAAAAAAAKCRDbaV4Vf/JGvT9f
-AQD3ZTM9h1T4x/eU2txm+Izc1frvr56+GX9Q6xisxc+P2AD9H8tOwaO4TZA1pSueDx9ZVEJFrcg+
-dPyCmfIir8aLbQ0=
-=4ZQM
------END PGP SIGNATURE-----
+>  			break;
+>  		case SO_KEEPALIVE:
+>  			if (ssk->sk_prot->keepalive)
+> @@ -1458,8 +1458,6 @@ static void sync_socket_options(struct mptcp_sock *msk, struct sock *ssk)
+>  		sk_dst_reset(ssk);
+>  	}
+>  
+> -	sock_valbool_flag(ssk, SOCK_DBG, sock_flag(sk, SOCK_DBG));
+> -
+>  	if (inet_csk(sk)->icsk_ca_ops != inet_csk(ssk)->icsk_ca_ops)
+>  		tcp_set_congestion_control(ssk, msk->ca_name, false, true);
+>  	__tcp_sock_set_cork(ssk, !!msk->cork);
 
---------------8Vgu0R0Il0ku5RlX1OWVVOg2--
+The rest looks good to me.
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
