@@ -1,291 +1,230 @@
-Return-Path: <netdev+bounces-71820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2194F85536A
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 20:45:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBEDD85537D
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 20:54:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46AF11C2167B
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 19:45:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4550B1F269FF
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 19:54:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBD5513B7A8;
-	Wed, 14 Feb 2024 19:45:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6718B13DB81;
+	Wed, 14 Feb 2024 19:54:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ry2x5ZxC"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="bBAEB9XS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB1687E767
-	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 19:45:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707939938; cv=fail; b=FzIKXtHY/PUkflZHx5YFGFM2y7RsN4zpKwrG10nMNI0oAI6gEbbiE6oGncZ3VNImooQQa5Nonv80tcQ3SMuFrGczbi3qq0ou83GfLn+yhr6O3ADgUdzVM9YcQ/+nMpG0jF8xHqx+4uiz3xYcQw4JMtcuPoahhfYnoakXzj0TT/0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707939938; c=relaxed/simple;
-	bh=/EsFNUh1yuCmcysR/DDsy+GdhlW0pspLLceFS4yyV1s=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=k4rULZMorAihzoGhwqlK8qNidYowqFdZPwj+s3qFaWKg7CiB4YyP0tXvAnfUeYQmMDg1lgrGxMQGmpQfHelsUP4FA045MV3Tobk1ypzUlhFsM671gQpAdpK8n5FlmSCKoAa7NPHVgaJk0cwJQlChgkWQL3Pbsig6Vu4tj3xNw4M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ry2x5ZxC; arc=fail smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707939937; x=1739475937;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=/EsFNUh1yuCmcysR/DDsy+GdhlW0pspLLceFS4yyV1s=;
-  b=Ry2x5ZxC+tyHQHq+XVlhkVKgOWBSBlUbRYErJ+YCrTaSiiu/icvsuXCS
-   g2nAtiKS8RT3KXxtZzWy7mcqeBCyr44uYpEPUAUNkXJHM8iHpRQrAM4H7
-   1YYvFOBFPTYxn1SNTpn5cV2IbA3+i7GxfB+Z+UzpkX/vtkh7Dz2ddaLCt
-   kFmQwAvOhGXppPpfdooBXkoN4Lrk7iI25TtjOsfeqP6NVYEm+roAkgbfk
-   +c4xebmOKdr3tO7cq63axt37kvo3NIXkF9LJt2wNuU3bjJ1DolVY7hN9S
-   6p/wiGMuCeLZPBPKHMFa8ybsGBbe5v9mwnQDtdH2hWDb5NtcrpoNwcCI9
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10984"; a="5781340"
-X-IronPort-AV: E=Sophos;i="6.06,160,1705392000"; 
-   d="scan'208";a="5781340"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2024 11:45:36 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,160,1705392000"; 
-   d="scan'208";a="7906769"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Feb 2024 11:45:35 -0800
-Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 14 Feb 2024 11:45:35 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Wed, 14 Feb 2024 11:45:35 -0800
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A63B113B7B5;
+	Wed, 14 Feb 2024 19:54:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707940464; cv=none; b=ohNJuvzdL3+6NnRCrPyTKddgeAiyDC0HZG9a1JYO8t0UcFKXg9hXCG566yAalxXo7UJizDuAGsSkhnfbBI0/P1JP0uFTb6Dj1YJrNUx9+JbwBPIo1yuAd7I0zIOoq0eP30aiBvtA97vfUe2smWwwfPY5YWRnNZ1KKu4ordM9XEU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707940464; c=relaxed/simple;
+	bh=pX5ktANLCNHhzCAQMMNXkAAqI+3XxyypNCoWVaVyTY8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=svFUrwEcuQFMMfxiIWc3fRUANN4PtLUTfN7jUfGL88B2zn5jJiJ63vcfMnMWl8eAgg9PObyLTE8l3eQBxfqJ+MveJE6fzLdvUzP7K7XEQBI6VqyTdrDoeUWPq1EeW8FLi7ZGuoDA/0LzOX2M/bDLxu8JvF3EoV7Jos6q3dLny9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=bBAEB9XS; arc=none smtp.client-ip=99.78.197.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1707940462; x=1739476462;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=m2Q4OpjpGBz9kVmtpoHuc0YezpxFLS/C2T7bgx3/2Rs=;
+  b=bBAEB9XSdyf/bm3bMMwTG6zHY3IWoDdJ3lFiM5HR0biDaYGVZVzl6cmH
+   GldFkoUAhOVgd8nHVkHwhCnOEXtA51tZ3EUwGt+58A+NXu8E9BNV3f32y
+   G3nsI7SEyUUarl+5qNVVOk+KLSXnOA2G7VWoWVAZHjAcxXUC3PjdXuIlK
+   M=;
+X-IronPort-AV: E=Sophos;i="6.06,160,1705363200"; 
+   d="scan'208";a="66063691"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2024 19:54:20 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:1991]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.34.156:2525] with esmtp (Farcaster)
+ id b23fa01d-caf8-4308-b77a-06c46f123499; Wed, 14 Feb 2024 19:54:20 +0000 (UTC)
+X-Farcaster-Flow-ID: b23fa01d-caf8-4308-b77a-06c46f123499
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 14 Feb 2024 11:45:34 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gdaqto0feVNMCmYmbIrlJwaUsJdEAsU3sC6HA97qDcjCtKv1XmEi9dqDphtNnAn4NOlSIuR9Rx+/WYDsW4R+UC7sVvb/+oa4PjDtRl6n6oD4o4NTJik2etyVlCCAoFFRISaHJ1qAG/El5RoTo5HFQKW9aTcPIF2Oe/kjQTi4cZYwuf1IOrGxOB0opYsVeznZY5t3q/OLYR9OyOnPvNcTnqSCCUcad9pDP5x6GmjGrqU5y9qK31BuD7kvSyGfJzCcoQjhyx6CkbDkDztEV0gtu6+aWHF1AcbWoBKF6hpeqSGMSf0tITFx4h0nGIeZOxlu/z9wxF4V0vLk4l9iRWWp1w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PC9FnUjr9wite95+5ob6l2FZyM2nxyTGRUl9eAVz1Vc=;
- b=CkaBX7YhTfe7J4DIsCAi8f4CicJGK9YilTE+nyxAde3DZINdgKU4EWX5KhLff95oT4FydKYK7rHhBO9nU/wc5T4fxUBO0JH6FZ5VY3UGl2RmWoEGxO7bZqIe0pJMAbEM8pOI3rMX2E76W8mq+R2I1xZuifPL6w2XjLdXbZ18i6RabPLxU4uqHlxaiJxhdNo6PN25YpGPdX0SAci9oqyDefI+PCcx+GRSmnXAYfyqB8lsOeMCKnkhHnUyhaSYOwebbl8B/2/tw7dPPOXUg3EjeYF1j2iiNi576Uw88jeHsBtftCCjDpbEW0kjFxerovJaXOcMPUkwZsj4mIaYCEMFug==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by PH0PR11MB7616.namprd11.prod.outlook.com (2603:10b6:510:26d::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.27; Wed, 14 Feb
- 2024 19:45:31 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::4069:eb50:16b6:a80d]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::4069:eb50:16b6:a80d%4]) with mapi id 15.20.7292.026; Wed, 14 Feb 2024
- 19:45:31 +0000
-Message-ID: <91f97e78-8b2b-45e4-b687-ee6a19db8644@intel.com>
-Date: Wed, 14 Feb 2024 11:45:28 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [iwl-next v1 04/15] ice: add basic devlink subfunctions support
-To: Jiri Pirko <jiri@resnulli.us>, Michal Swiatkowski
-	<michal.swiatkowski@linux.intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<michal.kubiak@intel.com>, <maciej.fijalkowski@intel.com>,
-	<sridhar.samudrala@intel.com>, <przemyslaw.kitszel@intel.com>,
-	<wojciech.drewek@intel.com>, <pio.raczynski@gmail.com>, Piotr Raczynski
-	<piotr.raczynski@intel.com>
-References: <20240213072724.77275-1-michal.swiatkowski@linux.intel.com>
- <20240213072724.77275-5-michal.swiatkowski@linux.intel.com>
- <ZcsueJ1tr-GdseIt@nanopsycho>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <ZcsueJ1tr-GdseIt@nanopsycho>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0223.namprd04.prod.outlook.com
- (2603:10b6:303:87::18) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+ 15.2.1118.40; Wed, 14 Feb 2024 19:54:20 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.170.9) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Wed, 14 Feb 2024 19:54:16 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, Mat Martineau
+	<martineau@kernel.org>, Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher
+	<jaka@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>, Tony Lu
+	<tonylu@linux.alibaba.com>, "D . Wythe" <alibuda@linux.alibaba.com>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, <mptcp@lists.linux.dev>,
+	<linux-s390@vger.kernel.org>, Gerd Bayer <gbayer@linux.ibm.com>
+Subject: [PATCH v2 net-next] net: Deprecate SO_DEBUG and reclaim SOCK_DBG bit.
+Date: Wed, 14 Feb 2024 11:54:07 -0800
+Message-ID: <20240214195407.3175-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|PH0PR11MB7616:EE_
-X-MS-Office365-Filtering-Correlation-Id: 89bcd5e2-70b3-4b6b-a934-08dc2d9580d9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: y53ACDpPQEOqJO9tYICNxaR//NmYc1XfF/ktLq4z1tIwPZl5i3S18P1GI+2OU8nqPCyC0U3potlmYWz1ySe4XhhXMpBqO4/DYwbqo3q2LapcdLpbk3BMBawmGtQRE2nPzL4VBCifNx4M111plWbT4pxYvN/NCLmDmPQIaAONZr8OAgYvhF2cBzNRK8655Fuu89ZlAqsoMaEJAfuP7sdXf+YOwqIIBfEc89Euzcy6MgnVMsmo9UNkZHCV+YWWtLgnmiPRzjMy1jlD30YOlMh5wL0gmKFfhWrCduesr2JMGfPygKOImLwyvgrWlYEC7x30843A9XnhWAdZwvb19IPZiynS2Ch6aKFSYCvgUJ4FYmNlRalYeNy0t9wtdU+Zz+nXnlzRvlcs2MUitXpZ6dwVLlL/A6MmjLYsJTGt9nZL4D/1jVlrk80n4kouAOGMqoXNzt0LdY6MVOoWU7ojVUr5jNImx7h2fQDwIOJoJis0CmQuiF8zMhDDD6rTtNDLidqvfZz6aEQgKXTfRuggrEa/y6CgoPLUro1H33tObD0UvzMKOqJtCm2fCoJyPxDNjleY
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(346002)(376002)(366004)(136003)(396003)(230922051799003)(64100799003)(451199024)(186009)(1800799012)(2906002)(5660300002)(8936002)(6666004)(6506007)(478600001)(6486002)(53546011)(6512007)(36756003)(38100700002)(26005)(82960400001)(83380400001)(4326008)(31696002)(86362001)(8676002)(2616005)(66946007)(316002)(66556008)(66476007)(31686004)(110136005)(41300700001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dEQyVzMxR0JsTnRpajJBNnJybC8zN3ZVRjIxNlFOVjdpaDBLcGh1eEZiZWRC?=
- =?utf-8?B?ODBaVXpHUVpxV05QV1Y1U1RZWWc3YWtjOCtFa29FQ1M3cC82dDFiNmJieWVB?=
- =?utf-8?B?b0UvU3drTlprQngrM2tIdDFyc29YNkxvZHBPOVVCc2NnemhUN2YwUURRT0tz?=
- =?utf-8?B?TGRvcXJQaG5KVkQ5ZCttSEpJRDh4K0xOWFlINHU2Sm1sL3JMOXk4NnVVb2Rw?=
- =?utf-8?B?SWtkRjY4REZRR3dpTEZvT3NwSFRoOGVDakFzbUJONlhFS3BqNWVtc1QzT0Q2?=
- =?utf-8?B?WVM0QVpicldhZVl1b1lBY1B5aUtLRjZ6ajJWN2NPUzhUdDB5UDFCckJsckRW?=
- =?utf-8?B?aFRnYVk2N0VmeEVxVlQvZlNiK05yZzVIa0NMQ0crTFIvSitMeGNnQ2FoYVEy?=
- =?utf-8?B?RGRNWGRSb0FrMmhIY3pnbGtTOXh6eWwxQXJUSU5kVjc5M2xFQ3RYSVFERWVU?=
- =?utf-8?B?UCtSZ0RUTVhYWitvU3B6NEw2VGNRU1JrRlNIZHptaFU2SzJBRDdKQ0FXbVdZ?=
- =?utf-8?B?ZWhJL1VEMVJkWDRyeGgvWHRRQXJmeTlYM2FjVlZKeDVwK2QrWXVqMVhmeHhS?=
- =?utf-8?B?MERkaEt5aGpFZkNzRHRlSlA3bk5jcmduK3diRTMvUUR1Um4xelZmZE1RUUc2?=
- =?utf-8?B?U0Qva1lpTlFZUHYzS1lqYkVUZWVWZXJYVHlOcUpTZVRZYytldHJwMTJRNU11?=
- =?utf-8?B?cmJycG96M3dNNzBja0NweVNjSS83NlBpUkNSZGpud0k1VlhrYUFSSTQyd05m?=
- =?utf-8?B?V0lGdDhMT1YyK1Vja3hpMElTbG8xVEIzL1I4allqVU1IS0ZwaThGcktKRUZw?=
- =?utf-8?B?VVdaRCtFQVZjRGdDK2RvdnJKclpLeXArUU9IMnZ2N0VKRURvWmVVclNXV3Ns?=
- =?utf-8?B?UTBsMzcyVHozWGVveERtejNwTW9wVnM0NXNPY05tUEMwOFFSRUQyR0V1RmJE?=
- =?utf-8?B?bERONFVadlQrTXRkWmFBZnBWTVpEUE9RUzQrYjJ5ZThNdVhneWtxM25aNXFW?=
- =?utf-8?B?U21VQUNxcGJadUVTZTNTMjRZek81WGVoaWtEc1JzVXFOTHJHNnJoZFJxVDJD?=
- =?utf-8?B?UUh1M3cvMXFYb0VmMUZZcFp6QVVWRnpyZ0UxQmY0S0ZrWnVVVGN2L0E2YUZh?=
- =?utf-8?B?Tmo3WGV5WGx2TzhZRzZyWEF6N2VnNEhnN1ZNK2t4V2VSZzIzZ2x6b05PYkJE?=
- =?utf-8?B?aVNNRlBwWkNsMzV4d2pQVCtnT1AxM1BlN2VNQnIrUWV4ZmFDNytOMFFjTHpG?=
- =?utf-8?B?SzRPbWxzOHFBOFg4d0lHdW85MEhYUnFBaS9HcEUrMXplS01ZcDBoVHJQWldL?=
- =?utf-8?B?djJOZHljdHczMVV3bTNTa2JmQzhxdE1odHZHRm1RQTByTi9wLzBKNkljbW9a?=
- =?utf-8?B?WGxLQ0pFa00zc0dnbHdPdlE2VzNiK3RYY250alQ3L0dJcngyQXRCblVRUXU5?=
- =?utf-8?B?SEx2R2FMbC93ODhWa2h0QkZsRDFCODJEN3Jzc1YzOFdhem5PWnZyd01sNTli?=
- =?utf-8?B?cm1zR0ZWTUxGd1AwS1NyUjEzTlNRM0tzSk1LUmRrM2d0TE9YeGJnS3hJZ2lh?=
- =?utf-8?B?MFlQYm02WG94a1JKVy8renlXdHhFNHpOaU1Db25TSXlDZlJUcG9KUEp0cEpw?=
- =?utf-8?B?cFhraTRpbzV1dHJqNk1LczZWeG5FaytQdHkvL3NTdXdWZnVla29mRlFkcXhR?=
- =?utf-8?B?VUhyeUdiVXQ5QnpxZThPdzFVM0huLzBlUTVQU0lKY2drVXJlbTMraGpNNGVk?=
- =?utf-8?B?Y2xLd2g3ZldiQ0Y5VnpOWTVHWXdJdVR1ekc2cTU1Y2k2U080RklmS1RVdEtt?=
- =?utf-8?B?VzV4MGpQK2Ixang1NjRkclR6Uk1WZDVYV0ZjREF0YXEvU1hnQWVRQ05WaTU2?=
- =?utf-8?B?eG82OVo5Vlp2N1FOTmYxVjY1Qm5ad2IxckRqMUVmSk45T29pbEJDNG9nZlpL?=
- =?utf-8?B?dnBtSjBpekVqY0J1Vk1maGNtQ2I1emYzK2YvanRMWWhMOWNhMlNCN2hTeHRl?=
- =?utf-8?B?NDBOTTNkZXdkOWVNOUtSZzFEajJrNnA0ci96NmEvaFVURjlySHBTYnM4RnhE?=
- =?utf-8?B?aUUwQVpKUnRXcFRxSDdhRkp0RCtWYjFBS1dKVEkzK29aQXByV20zOEp4QjRT?=
- =?utf-8?B?TWJHWjZIa1IvT0M1ZTNYVWJkVXJ1NnZFSGRrN0hWRURPV2ZKTmk0TGg4WXBx?=
- =?utf-8?B?Rmc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 89bcd5e2-70b3-4b6b-a934-08dc2d9580d9
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Feb 2024 19:45:31.6619
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: F8n8b674sVuDwwyAfSJLI+ttudqwd8Nz3VjS/o4YMl36zVpfwepJp1dLpY/uzihhdEsB7jyfodZFrvbhJWwsAnChBlc0qv9XBtQ5VXYY1Pw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB7616
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D046UWA002.ant.amazon.com (10.13.139.39) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
+Recently, commit 8e5443d2b866 ("net: remove SOCK_DEBUG leftovers")
+removed the last users of SOCK_DEBUG(), and commit b1dffcf0da22 ("net:
+remove SOCK_DEBUG macro") removed the macro.
 
+Now is the time to deprecate the oldest socket option.
 
-On 2/13/2024 12:55 AM, Jiri Pirko wrote:
-> Tue, Feb 13, 2024 at 08:27:13AM CET, michal.swiatkowski@linux.intel.com wrote:
->> From: Piotr Raczynski <piotr.raczynski@intel.com>
->>
->> Implement devlink port handlers responsible for ethernet type devlink
->> subfunctions. Create subfunction devlink port and setup all resources
->> needed for a subfunction netdev to operate. Configure new VSI for each
->> new subfunction, initialize and configure interrupts and Tx/Rx resources.
->> Set correct MAC filters and create new netdev.
->>
->> For now, subfunction is limited to only one Tx/Rx queue pair.
->>
->> Only allocate new subfunction VSI with devlink port new command.
->> This makes sure that real resources are configured only when a new
->> subfunction gets activated. Allocate and free subfunction MSIX
->> interrupt vectors using new API calls with pci_msix_alloc_irq_at
->> and pci_msix_free_irq.
->>
->> Temporarily, before adding auxiliary bus driver for subfunctions,
->> configure subfunction netdev directly for the created devlink
->> port. This will be modified in the next patch to properly that handle
->> devlink port as the port representor.
->>
->> Support both automatic and manual subfunction numbers. If no subfunction
->> number is provided, use xa_alloc to pick a number automatically. This
->> will find the first free index and use that as the number. This reduces
->> burden on users in the simple case where a specific number is not
->> required. It may also be slightly faster to check that a number exists
->> since xarray lookup should be faster than a linear scan of the dyn_ports
->> xarray.
->>
->> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
->> Co-developed-by: Jacob Keller <jacob.e.keller@intel.com>
->> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
->> Signed-off-by: Piotr Raczynski <piotr.raczynski@intel.com>
->> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
->> ---
->> drivers/net/ethernet/intel/ice/Makefile       |   1 +
->> .../intel/ice/devlink/ice_devlink_port.c      | 508 ++++++++++++++++++
->> .../intel/ice/devlink/ice_devlink_port.h      |  30 ++
->> drivers/net/ethernet/intel/ice/ice.h          |   4 +
->> drivers/net/ethernet/intel/ice/ice_devlink.c  |   3 +
->> drivers/net/ethernet/intel/ice/ice_lib.c      |   5 +-
->> drivers/net/ethernet/intel/ice/ice_lib.h      |   2 +
->> drivers/net/ethernet/intel/ice/ice_main.c     |  14 +-
->> drivers/net/ethernet/intel/ice/ice_sf_eth.c   | 138 +++++
->> drivers/net/ethernet/intel/ice/ice_sf_eth.h   |  15 +
->> 10 files changed, 716 insertions(+), 4 deletions(-)
->> create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_eth.c
->> create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_eth.h
->>
->> diff --git a/drivers/net/ethernet/intel/ice/Makefile b/drivers/net/ethernet/intel/ice/Makefile
->> index cd4ab46d72a7..d56a7165df95 100644
->> --- a/drivers/net/ethernet/intel/ice/Makefile
->> +++ b/drivers/net/ethernet/intel/ice/Makefile
->> @@ -31,6 +31,7 @@ ice-y := ice_main.o	\
->> 	 ice_idc.o	\
->> 	 ice_devlink.o	\
->> 	 devlink/ice_devlink_port.o	\
->> +	 ice_sf_eth.o	\
->> 	 ice_ddp.o	\
->> 	 ice_fw_update.o \
->> 	 ice_lag.o	\
->> diff --git a/drivers/net/ethernet/intel/ice/devlink/ice_devlink_port.c b/drivers/net/ethernet/intel/ice/devlink/ice_devlink_port.c
->> index c8c823467fcf..90efceaddb02 100644
->> --- a/drivers/net/ethernet/intel/ice/devlink/ice_devlink_port.c
->> +++ b/drivers/net/ethernet/intel/ice/devlink/ice_devlink_port.c
->> @@ -10,6 +10,8 @@
->> #include "ice_eswitch.h"
->> #include "ice_fw_update.h"
->> #include "ice_dcb_lib.h"
->> +#include "ice_sf_eth.h"
->> +#include "ice_fltr.h"
->>
->> static int ice_active_port_option = -1;
->>
->> @@ -432,3 +434,509 @@ void ice_devlink_destroy_vf_port(struct ice_vf *vf)
->> 	devlink_port_unregister(&vf->devlink_port);
->> }
->>
->> +/**
->> + * ice_activate_dynamic_port - Activate a dynamic port
->> + * @dyn_port: dynamic port instance to activate
->> + * @extack: extack for reporting error messages
->> + *
->> + * Activate the dynamic port based on its flavour.
->> + *
->> + * Return: zero on success or an error code on failure.
->> + */
->> +static int
->> +ice_activate_dynamic_port(struct ice_dynamic_port *dyn_port,
->> +			  struct netlink_ext_ack *extack)
->> +{
->> +	int err;
->> +
->> +	switch (dyn_port->devlink_port.attrs.flavour) {
->> +	case DEVLINK_PORT_FLAVOUR_PCI_SF:
-> 
-> Pointless switch case.
-> 
-> It looks like you have odd habbit of checking things that cannot happen
-> all over this patch :) See more below...
-> 
-> 
+Note that setsockopt(SO_DEBUG) is moved not to acquire lock_sock().
 
-I remember asking for this kind of split because I have some work for
-supporting dynamic creation of Scalable IOV VFs which create a VF port
-instead of a SF port. Since it only makes sense in that context, it
-makes sense to remove it from this series and add it when its actually
-necessary.
+Reviewed-by: Gerd Bayer <gbayer@linux.ibm.com>
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+v2:
+  * Move setsockopt(SO_DEBUG) code not to acquire lock_sock().
 
-That's where the whole "dynamic_port" stuff comes from rather than just
-calling it all "sf_port".
+v1: https://lore.kernel.org/netdev/20240213223135.85957-1-kuniyu@amazon.com/
+---
+ include/net/sock.h  |  1 -
+ net/core/sock.c     | 14 +++++++-------
+ net/mptcp/sockopt.c |  8 +-------
+ net/smc/af_smc.c    |  5 ++---
+ 4 files changed, 10 insertions(+), 18 deletions(-)
+
+diff --git a/include/net/sock.h b/include/net/sock.h
+index a9d99a9c583f..e20d55a36f9c 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -909,7 +909,6 @@ enum sock_flags {
+ 	SOCK_TIMESTAMP,
+ 	SOCK_ZAPPED,
+ 	SOCK_USE_WRITE_QUEUE, /* whether to call sk->sk_write_space in sock_wfree */
+-	SOCK_DBG, /* %SO_DEBUG setting */
+ 	SOCK_RCVTSTAMP, /* %SO_TIMESTAMP setting */
+ 	SOCK_RCVTSTAMPNS, /* %SO_TIMESTAMPNS setting */
+ 	SOCK_LOCALROUTE, /* route locally only, %SO_DONTROUTE setting */
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 88bf810394a5..c4c406f4742e 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -1115,6 +1115,11 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
+ 
+ 	/* handle options which do not require locking the socket. */
+ 	switch (optname) {
++	case SO_DEBUG:
++		/* deprecated, but kept for compatibility */
++		if (val && !sockopt_capable(CAP_NET_ADMIN))
++			ret = -EACCES;
++		return 0;
+ 	case SO_PRIORITY:
+ 		if ((val >= 0 && val <= 6) ||
+ 		    sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) ||
+@@ -1193,12 +1198,6 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
+ 	sockopt_lock_sock(sk);
+ 
+ 	switch (optname) {
+-	case SO_DEBUG:
+-		if (val && !sockopt_capable(CAP_NET_ADMIN))
+-			ret = -EACCES;
+-		else
+-			sock_valbool_flag(sk, SOCK_DBG, valbool);
+-		break;
+ 	case SO_REUSEADDR:
+ 		sk->sk_reuse = (valbool ? SK_CAN_REUSE : SK_NO_REUSE);
+ 		break;
+@@ -1619,7 +1618,8 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
+ 
+ 	switch (optname) {
+ 	case SO_DEBUG:
+-		v.val = sock_flag(sk, SOCK_DBG);
++		/* deprecated. */
++		v.val = 0;
+ 		break;
+ 
+ 	case SO_DONTROUTE:
+diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
+index da37e4541a5d..31d09009332a 100644
+--- a/net/mptcp/sockopt.c
++++ b/net/mptcp/sockopt.c
+@@ -80,9 +80,6 @@ static void mptcp_sol_socket_sync_intval(struct mptcp_sock *msk, int optname, in
+ 		bool slow = lock_sock_fast(ssk);
+ 
+ 		switch (optname) {
+-		case SO_DEBUG:
+-			sock_valbool_flag(ssk, SOCK_DBG, !!val);
+-			break;
+ 		case SO_KEEPALIVE:
+ 			if (ssk->sk_prot->keepalive)
+ 				ssk->sk_prot->keepalive(ssk, !!val);
+@@ -183,7 +180,6 @@ static int mptcp_setsockopt_sol_socket_int(struct mptcp_sock *msk, int optname,
+ 	case SO_KEEPALIVE:
+ 		mptcp_sol_socket_sync_intval(msk, optname, val);
+ 		return 0;
+-	case SO_DEBUG:
+ 	case SO_MARK:
+ 	case SO_PRIORITY:
+ 	case SO_SNDBUF:
+@@ -329,7 +325,6 @@ static int mptcp_setsockopt_sol_socket(struct mptcp_sock *msk, int optname,
+ 	case SO_RCVBUFFORCE:
+ 	case SO_MARK:
+ 	case SO_INCOMING_CPU:
+-	case SO_DEBUG:
+ 	case SO_TIMESTAMP_OLD:
+ 	case SO_TIMESTAMP_NEW:
+ 	case SO_TIMESTAMPNS_OLD:
+@@ -363,6 +358,7 @@ static int mptcp_setsockopt_sol_socket(struct mptcp_sock *msk, int optname,
+ 	case SO_WIFI_STATUS:
+ 	case SO_NOFCS:
+ 	case SO_SELECT_ERR_QUEUE:
++	case SO_DEBUG: /* deprecated */
+ 		return 0;
+ 	}
+ 
+@@ -1458,8 +1454,6 @@ static void sync_socket_options(struct mptcp_sock *msk, struct sock *ssk)
+ 		sk_dst_reset(ssk);
+ 	}
+ 
+-	sock_valbool_flag(ssk, SOCK_DBG, sock_flag(sk, SOCK_DBG));
+-
+ 	if (inet_csk(sk)->icsk_ca_ops != inet_csk(ssk)->icsk_ca_ops)
+ 		tcp_set_congestion_control(ssk, msk->ca_name, false, true);
+ 	__tcp_sock_set_cork(ssk, !!msk->cork);
+diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+index 66763c74ab76..062e16a2766a 100644
+--- a/net/smc/af_smc.c
++++ b/net/smc/af_smc.c
+@@ -445,7 +445,6 @@ static int smc_bind(struct socket *sock, struct sockaddr *uaddr,
+ 			     (1UL << SOCK_LINGER) | \
+ 			     (1UL << SOCK_BROADCAST) | \
+ 			     (1UL << SOCK_TIMESTAMP) | \
+-			     (1UL << SOCK_DBG) | \
+ 			     (1UL << SOCK_RCVTSTAMP) | \
+ 			     (1UL << SOCK_RCVTSTAMPNS) | \
+ 			     (1UL << SOCK_LOCALROUTE) | \
+@@ -511,8 +510,8 @@ static void smc_copy_sock_settings_to_clc(struct smc_sock *smc)
+ 
+ #define SK_FLAGS_CLC_TO_SMC ((1UL << SOCK_URGINLINE) | \
+ 			     (1UL << SOCK_KEEPOPEN) | \
+-			     (1UL << SOCK_LINGER) | \
+-			     (1UL << SOCK_DBG))
++			     (1UL << SOCK_LINGER))
++
+ /* copy only settings and flags relevant for smc from clc to smc socket */
+ static void smc_copy_sock_settings_to_smc(struct smc_sock *smc)
+ {
+-- 
+2.30.2
+
 
