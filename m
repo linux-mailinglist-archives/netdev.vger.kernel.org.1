@@ -1,165 +1,101 @@
-Return-Path: <netdev+bounces-71683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 575E2854B5F
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 15:28:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C478C854BBB
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 15:43:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDE971F226A8
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 14:28:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6170A1F24CA2
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 14:43:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA63355E41;
-	Wed, 14 Feb 2024 14:28:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 947455A107;
+	Wed, 14 Feb 2024 14:43:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="DezL2h+g";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="N/3qjuPD"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="OYlFujES"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from nbd.name (nbd.name [46.4.11.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA6AD1A58B;
-	Wed, 14 Feb 2024 14:28:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6311F1CA80;
+	Wed, 14 Feb 2024 14:42:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707920913; cv=none; b=WYdu4SNn8VvmBhDH/Y5eINDoZ2pvtpm05f4Y3ccygN3mMBk9j5nRDuYPcBpGcDo96DpdbTd2wB9Il2syeI5YkW+86CWSuhPZuIVqKkDU19e/JC69eZ8DYNnQwKH6xTSdp7PkspM7OpBhwQrRbmCPInLKJr7veM9Rng2LqUOVw8k=
+	t=1707921780; cv=none; b=HL7NSpIwhzvtf/yLWOAoJhPOSrot+ShN8ckTK2pH1ZEXm5RA+LskjtKsXPbq/swThwMLLdsmjipHbVqabBTv14ENBtdg0B57D6WgLfsa9p1n3q6gNKFH5KAaS63wc3oUM6aIPTMdWnAjw+SRm/jTRydqBBKRZeGiIQHa0SkbemM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707920913; c=relaxed/simple;
-	bh=PgI/c4FednX6iHl32xVlK67vq3R0ovJubc9VLJ1LtH8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aPpS0xaSp3HcEXm64MiYAJzC9WvRIwjQ1UqAsdE3xB72H3aONNA1nccVDXlLS9ZJmge5yubhLxrxytqQyykxGvzI1kH+N090al8nvikcop30i7VtksYqr5EnN21hKMMH+GNGbhb1jQr1Wv9eq3b27iWcmLGSPNqevfc3thxZaso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=DezL2h+g; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=N/3qjuPD; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Wed, 14 Feb 2024 15:28:27 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1707920909;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1x6/b2Kbco5DooPMkROtK4kteG3DvWx4gBprcUEOg3s=;
-	b=DezL2h+g2UvT5RZ9zs5cue/VtROzlcqvPPI4o4l1qhtltz/yvXjP+gusiBkO6Nu+e+nAgw
-	ORF4kUDcC9V4CtnTUaRFb617A3MyV+Od3LPc5YX4QN+eXp6Wq8Snqdyd4oJYXaUQUxnOTJ
-	JxyUdvW7htxDkL63+b20bsOlOqmGwGKrLn0iGEFYIPBXfPLF4fvlUqwuHHKB6pOvAklTSo
-	FSbqLZPBpTv/Qpht+XS/vW+NJfj7rnYU/XDnPp31RSCXZ/Ut9xoWzkWNoNHy0+sDy0NSnV
-	9tjHNAdAW3lKoNW3JmeXRMmYHiNJ4ipb9iLIaPt0A6lZeiMUJWHefgU1Uor5yA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1707920909;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1x6/b2Kbco5DooPMkROtK4kteG3DvWx4gBprcUEOg3s=;
-	b=N/3qjuPDckZz/kcVK1VSvUqNkpRtF38p5ZJWBPnkbftfVN6qhw02dTpxVPO9U2Ll1c+aVE
-	7PnNdzAQIsx4gpBQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	=?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+	s=arc-20240116; t=1707921780; c=relaxed/simple;
+	bh=4kfKQXMjrSswVfEs9TFm2VCVbnaJe/UZ/yq2Vn1p9nU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qiNicJXrQUXfLRxGUNWokD+7C5Qar9UMDIqhJU1/AHboosyJbT72V6sackLB+iIeKLhoGJTdfVi3AHgHMjxD1T23MB7CHazafu0XiSh6Q6jbP1BNgVXhPhgWMbIu/hkFxohjJl3Zg0EnqZfeAIy/yUbo/fn8woPLxfA4lWv7ykU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=OYlFujES; arc=none smtp.client-ip=46.4.11.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
+	s=20160729; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
+	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=rvZNAKQ9eQwBSXPdNcyqhFwbwKHStEKZIKN+cfFuE3Q=; b=OYlFujESUs6qcMYm3TB0qsFgH1
+	4qwjrAoWPYH/dciAjcE6Hn6fX9jwiXsP4sUOf48wlY6/jsjHulI23+vBNjLybhqQWx1/weYpDoIav
+	DoWZJukCKVywIlASoeoUj0CX+z2WznqrOnb/UfFyqJYsBRfGW7VaVXYEmT1Nj/UE5Kk0=;
+Received: from p54ae9e7b.dip0.t-ipconnect.de ([84.174.158.123] helo=localhost.localdomain)
+	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+	(Exim 4.94.2)
+	(envelope-from <nbd@nbd.name>)
+	id 1raGT6-00DWlk-Ky; Wed, 14 Feb 2024 15:42:36 +0100
+From: Felix Fietkau <nbd@nbd.name>
+To: netdev@vger.kernel.org,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
 	"David S. Miller" <davem@davemloft.net>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Eric Dumazet <edumazet@google.com>, Hao Luo <haoluo@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jiri Olsa <jolsa@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Song Liu <song@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Yonghong Song <yonghong.song@linux.dev>
-Subject: Re: [PATCH RFC net-next 1/2] net: Reference bpf_redirect_info via
- task_struct on PREEMPT_RT.
-Message-ID: <20240214142827.3vV2WhIA@linutronix.de>
-References: <20240213145923.2552753-1-bigeasy@linutronix.de>
- <20240213145923.2552753-2-bigeasy@linutronix.de>
- <66d9ee60-fbe3-4444-b98d-887845d4c187@kernel.org>
- <20240214121921.VJJ2bCBE@linutronix.de>
- <87y1bndvsx.fsf@toke.dk>
+	Vlad Buslov <vladbu@nvidia.com>
+Cc: Daniel Golle <daniel@makrotopia.org>,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] netfilter: nf_tables: fix bidirectional offload regression
+Date: Wed, 14 Feb 2024 15:42:35 +0100
+Message-ID: <20240214144235.70341-1-nbd@nbd.name>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <87y1bndvsx.fsf@toke.dk>
+Content-Transfer-Encoding: 8bit
 
-On 2024-02-14 14:23:10 [+0100], Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> Sebastian Andrzej Siewior <bigeasy@linutronix.de> writes:
->=20
-> > On 2024-02-13 21:50:51 [+0100], Jesper Dangaard Brouer wrote:
-> >> I generally like the idea around bpf_xdp_storage.
-> >>=20
-> >> I only skimmed the code, but noticed some extra if-statements (for
-> >> !NULL). I don't think they will make a difference, but I know Toke want
-> >> me to test it...
-> >
-> > I've been looking at the assembly for the return value of
-> > bpf_redirect_info() and there is a NULL pointer check. I hoped it was
-> > obvious to be nun-NULL because it is a static struct.
-> >
-> > Should this become a problem I could add
-> > "__attribute__((returns_nonnull))" to the declaration of the function
-> > which will optimize the NULL check away.
->=20
-> If we know the function will never return NULL (I was wondering about
-> that, actually), why have the check in the C code at all? Couldn't we just
-> omit it entirely instead of relying on the compiler to optimise it out?
+Commit 8f84780b84d6 ("netfilter: flowtable: allow unidirectional rules")
+made unidirectional flow offload possible, while completely ignoring (and
+breaking) bidirectional flow offload for nftables.
+Add the missing flag that was left out as an exercise for the reader :)
 
-The !RT version does:
-| static inline struct bpf_redirect_info *xdp_storage_get_ri(void)
-| {
-|         return this_cpu_ptr(&bpf_redirect_info);
-| }
+Cc: Vlad Buslov <vladbu@nvidia.com>
+Fixes: 8f84780b84d6 ("netfilter: flowtable: allow unidirectional rules")
+Reported-by: Daniel Golle <daniel@makrotopia.org>
+Signed-off-by: Felix Fietkau <nbd@nbd.name>
+---
+ net/netfilter/nft_flow_offload.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-which is static and can't be NULL (unless by mysterious ways the per-CPU
-offset + bpf_redirect_info offset is NULL). Maybe I can put this in
-this_cpu_ptr()=E2=80=A6 Let me think about it.
+diff --git a/net/netfilter/nft_flow_offload.c b/net/netfilter/nft_flow_offload.c
+index 397351fa4d5f..ab9576098701 100644
+--- a/net/netfilter/nft_flow_offload.c
++++ b/net/netfilter/nft_flow_offload.c
+@@ -361,6 +361,7 @@ static void nft_flow_offload_eval(const struct nft_expr *expr,
+ 		ct->proto.tcp.seen[1].flags |= IP_CT_TCP_FLAG_BE_LIBERAL;
+ 	}
+ 
++	__set_bit(NF_FLOW_HW_BIDIRECTIONAL, &flow->flags);
+ 	ret = flow_offload_add(flowtable, flow);
+ 	if (ret < 0)
+ 		goto err_flow_add;
+-- 
+2.43.0
 
-For RT I have:
-| static inline struct bpf_xdp_storage *xdp_storage_get(void)
-| {
-|         struct bpf_xdp_storage *xdp_store =3D current->bpf_xdp_storage;
-|
-|         WARN_ON_ONCE(!xdp_store);
-|         return xdp_store;
-| }
-|
-| static inline struct bpf_redirect_info *xdp_storage_get_ri(void)
-| {
-|         struct bpf_xdp_storage *xdp_store =3D xdp_storage_get();
-|
-|         if (!xdp_store)
-|                 return NULL;
-|         return &xdp_store->ri;
-| }
-
-so if current->bpf_xdp_storage is NULL then we get a warning and a NULL
-pointer. This *should* not happen due to xdp_storage_set() which
-assigns the pointer. However if I missed a spot then there is the check
-which aborts further processing.
-
-During testing I forgot a spot in egress and the test module. You could
-argue that the warning is enough since it should pop up in testing and
-not production because the code is always missed and not by chance (go
-boom, send a report). I *think* I covered all spots, at least the test
-suite didn't point anything out to me.
-I was unsure if I need something around net_tx_action() due to
-TC_ACT_REDIRECT (I think qdisc) but this seems to be handled by
-sch_handle_egress().
-
-> -Toke
-
-Sebastian
 
