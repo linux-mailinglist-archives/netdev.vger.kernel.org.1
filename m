@@ -1,63 +1,41 @@
-Return-Path: <netdev+bounces-71639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE9E685452D
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 10:28:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E882854540
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 10:30:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69E6A286351
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 09:28:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA8F41C276F9
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 09:30:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F3EF12B99;
-	Wed, 14 Feb 2024 09:28:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="I3MEEXdc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9EED12E7D;
+	Wed, 14 Feb 2024 09:29:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B81E12B69;
-	Wed, 14 Feb 2024 09:28:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2C0312E6C;
+	Wed, 14 Feb 2024 09:29:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707902906; cv=none; b=TW3aUzdaFmVhiGk2I9vx58K0NhzWd9Dl5snZjnuoUhUEkdeZDFDZ86Nsa1rueHAbvXVdlhkjFljzz4HsJkm+9Yz2DXGiE6D5BJuxBHOhwcclGSTWts7foe8w0ObmVCzhI8NVPzV41QEwaFlekwCD2xJ3vfxFodsZ9kCJu8BHEh8=
+	t=1707902998; cv=none; b=Is54wVIsyM4sJE1gDU1OPhp7vmItZYKk/AA6Rk6Nvm4iah5hdYSpNfMcgTXvVXwkbcqxuZCxIGp/E/1aheYqWy5YkKd3+8IkP9hmFw4tICk7tTFFxjUxZNxub54LB02AcTXCOjPA6kiEwuBeVd0l77U/TeOUhQHaYEcbey8Y2/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707902906; c=relaxed/simple;
-	bh=7iDIf20OmeYQc9dtbnkqUEwyJYpR4gtKqSRf663dNIE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=PSWoDah7acCBmIulnwSNs5KmIDeuQWSsTZjTcn+fShKCMv9InxVb+t05CMPXy3pXj7fyqAd0X6YeV2CluT8+TtwABWT8IybB0ayO81MxJ/ifIaYy6a0/wqHpg5BnayWmM4QxFlFfSXEQEhdKVFVBW+LBB0pYWV/mabjDG0fmahs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=I3MEEXdc; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41E9JAMv029873;
-	Wed, 14 Feb 2024 09:28:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=tYik73OUjCMVd31RdndFP6ddzTr57qI1pHLEgBgKThc=; b=I3
-	MEEXdcLmdU/9k3O3XySDXQzIz+4kU/FvgF9wSHQHkusA+YvOSd5hBORh+CpojDvE
-	RhNSeE5qaIxqkTTPTDw3bip0dIsQkK138qL7dzav1fEXKk257xBt+jxrArcMPv1q
-	pv4WTqr20YSgD2Fzbe1P2odJfdVQ5K6JLrky/bWsDHDd7/aYxwXfAh7o6qhNvy24
-	vvLUgJX6gJW2n8TCmkrIyOWBX5LLXXccuK7jM69oysbo8cw2+szFycn5dxpNuUGR
-	iSi3Wy8RyjmZ1rrgBKkMWLJGzBRO7jUJixaZBBfX5XcdFmSJNB4qVRUYiBDmAGd9
-	d6qL8JszJVBMeKYhKysg==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3w8eks987a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 14 Feb 2024 09:28:13 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41E9SDfW001639
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 14 Feb 2024 09:28:13 GMT
-Received: from [10.201.2.96] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 14 Feb
- 2024 01:28:07 -0800
-Message-ID: <222b330d-ecc0-4755-b1b5-674e11dcec5c@quicinc.com>
-Date: Wed, 14 Feb 2024 14:58:04 +0530
+	s=arc-20240116; t=1707902998; c=relaxed/simple;
+	bh=lONzxbEoYUVLxbe6desgi2wkPPm1kZXvIZCsfrCdL50=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=s9TOVxT7RnDlbCIM1cr4o69XkaOYc/juQTqnwDPl+zSz5UgHhSTFenV1ac1RLIQ0E1flg5XhL0bwRX4qoMLMxoG7LDHBvqHTgkIr3RVnACV7CLFXy6sLu7gEGT0MLBYJmw61zylXZwpokFYWZ5DV4eKa2Mab+SN0KDTEL8dxM2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
+X-IronPort-AV: E=Sophos;i="6.06,159,1705330800"; 
+   d="asc'?scan'208";a="197820337"
+Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
+  by relmlie6.idc.renesas.com with ESMTP; 14 Feb 2024 18:29:54 +0900
+Received: from [10.226.93.95] (unknown [10.226.93.95])
+	by relmlir6.idc.renesas.com (Postfix) with ESMTP id 5294241E74F2;
+	Wed, 14 Feb 2024 18:29:51 +0900 (JST)
+Message-ID: <d685bee8-c760-463b-ba72-6c6dda2cd96c@bp.renesas.com>
+Date: Wed, 14 Feb 2024 09:29:49 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,81 +43,178 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 4/8] clk: qcom: ipq5332: add gpll0_out_aux clock
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio
-	<konrad.dybcio@linaro.org>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Catalin
- Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <linux-clk@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>
-References: <20240122-ipq5332-nsscc-v4-0-19fa30019770@quicinc.com>
- <20240122-ipq5332-nsscc-v4-4-19fa30019770@quicinc.com>
- <635f5e41-1ca2-4b4e-86a5-fdb8f7b27ef9@lunn.ch>
-From: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
-In-Reply-To: <635f5e41-1ca2-4b4e-86a5-fdb8f7b27ef9@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: k1yxsMlcmMEIAr4Giot05SLm1J4TKlmk
-X-Proofpoint-GUID: k1yxsMlcmMEIAr4Giot05SLm1J4TKlmk
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-14_03,2024-02-12_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
- lowpriorityscore=0 phishscore=0 adultscore=0 malwarescore=0 suspectscore=0
- spamscore=0 mlxlogscore=891 impostorscore=0 priorityscore=1501
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2401310000 definitions=main-2402140073
+Subject: Re: [RFC PATCH net-next v2 6/7] net: ravb: Enable SW IRQ Coalescing
+ for GbEth
+Content-Language: en-GB
+To: Sergey Shtylyov <s.shtylyov@omp.ru>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+ Wolfram Sang <wsa+renesas@sang-engineering.com>, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240206091909.3191-1-paul.barker.ct@bp.renesas.com>
+ <20240206091909.3191-7-paul.barker.ct@bp.renesas.com>
+ <2251fe66-11b7-2f30-c905-7bc1b9a57dab@omp.ru>
+ <895bdec7-05d6-4435-8be1-fe8ca716cbcb@bp.renesas.com>
+ <7c28bbea-0b3f-ee62-05c8-e6f1bc738b0b@omp.ru>
+From: Paul Barker <paul.barker.ct@bp.renesas.com>
+Organization: Renesas Electronics Corporation
+In-Reply-To: <7c28bbea-0b3f-ee62-05c8-e6f1bc738b0b@omp.ru>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------8Vgu0R0Il0ku5RlX1OWVVOg2"
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------8Vgu0R0Il0ku5RlX1OWVVOg2
+Content-Type: multipart/mixed; boundary="------------CCriltInN1UKWAx358KKJ1C5";
+ protected-headers="v1"
+From: Paul Barker <paul.barker.ct@bp.renesas.com>
+To: Sergey Shtylyov <s.shtylyov@omp.ru>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+ Wolfram Sang <wsa+renesas@sang-engineering.com>, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-ID: <d685bee8-c760-463b-ba72-6c6dda2cd96c@bp.renesas.com>
+Subject: Re: [RFC PATCH net-next v2 6/7] net: ravb: Enable SW IRQ Coalescing
+ for GbEth
+References: <20240206091909.3191-1-paul.barker.ct@bp.renesas.com>
+ <20240206091909.3191-7-paul.barker.ct@bp.renesas.com>
+ <2251fe66-11b7-2f30-c905-7bc1b9a57dab@omp.ru>
+ <895bdec7-05d6-4435-8be1-fe8ca716cbcb@bp.renesas.com>
+ <7c28bbea-0b3f-ee62-05c8-e6f1bc738b0b@omp.ru>
+In-Reply-To: <7c28bbea-0b3f-ee62-05c8-e6f1bc738b0b@omp.ru>
 
+--------------CCriltInN1UKWAx358KKJ1C5
+Content-Type: multipart/mixed; boundary="------------hivdtR059EkCALa1CPzu50SE"
 
-On 1/26/2024 1:41 AM, Andrew Lunn wrote:
-> On Mon, Jan 22, 2024 at 11:27:00AM +0530, Kathiravan Thirumoorthy wrote:
->> Add support for gpll0_out_aux clock which acts as the parent for
->> certain networking subsystem (NSS) clocks.
-> 
-> This answers the question i asked for the previous patch.
-> 
-> Why did you split this into two patches?
+--------------hivdtR059EkCALa1CPzu50SE
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
+On 12/02/2024 20:40, Sergey Shtylyov wrote:
+> On 2/12/24 2:45 PM, Paul Barker wrote:
+> [...]
+>>>> diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/ether=
+net/renesas/ravb.h
+>>>> index 55a7a08aabef..ca7a66759e35 100644
+>>>> --- a/drivers/net/ethernet/renesas/ravb.h
+>>>> +++ b/drivers/net/ethernet/renesas/ravb.h
+>>>> @@ -1078,6 +1078,7 @@ struct ravb_hw_info {
+>>>>  	unsigned nc_queues:1;		/* AVB-DMAC has RX and TX NC queues */
+>>>>  	unsigned magic_pkt:1;		/* E-MAC supports magic packet detection */=
 
-driver and binding patch should be separate patches, else checkpatch 
-will complain it.
+>>>>  	unsigned half_duplex:1;		/* E-MAC supports half duplex mode */
+>>>> +	unsigned needs_irq_coalesce:1;	/* Requires SW IRQ Coalescing to ac=
+hieve best performance */
+>>>
+>>>    Is this really a hardware feature?
+>>
+>> It's more like a requirement to get the best out of this hardware and =
+the Linux networking stack.
+>>
+>> I considered checking the compatible string in the probe function but =
+I decided that storing a configuration bit in the HW info struct was clea=
+ner.
+>=20
+>    Yes, but you added the new bit under the "hardware features" commet.=
+ :-)
+>=20
+>>>    Also, s/Requires SW/Needs software/ and s/to achieve best performa=
+nce//,
+>>> please...
+>>
+>> Will do.
+>=20
+>    The comment is too long, I think. :-)
 
-> 
-> Please also give a more detailed description, rather than the vague
-> 'certain networking subsystem (NSS) clocks'
+I'll fix both in the next revision.
 
+--=20
+Paul Barker
 
-Sure, will call out the clock names explicitly in the next spin.
+--------------hivdtR059EkCALa1CPzu50SE
+Content-Type: application/pgp-keys; name="OpenPGP_0x27F4B3459F002257.asc"
+Content-Disposition: attachment; filename="OpenPGP_0x27F4B3459F002257.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> If you device tree and drivers are correct, i should be able to work
-> out what the clock tree looks like, so there is no point trying to
-> hide the information.
+-----BEGIN PGP PUBLIC KEY BLOCK-----
 
+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3D
+=3DsIIN
+-----END PGP PUBLIC KEY BLOCK-----
 
-Clocks which are part of the NSSCC are used by the Networking drivers 
-which are in the pipeline for upstream. Once the networking patches are 
-submitted in the list, we should be able to get the clear picture of the 
-clock tree.
+--------------hivdtR059EkCALa1CPzu50SE--
 
+--------------CCriltInN1UKWAx358KKJ1C5--
 
-> 
->       Andrew
+--------------8Vgu0R0Il0ku5RlX1OWVVOg2
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wnsEABYIACMWIQSiu8gv1Xr0fIw/aoLbaV4Vf/JGvQUCZcyIDQUDAAAAAAAKCRDbaV4Vf/JGvT9f
+AQD3ZTM9h1T4x/eU2txm+Izc1frvr56+GX9Q6xisxc+P2AD9H8tOwaO4TZA1pSueDx9ZVEJFrcg+
+dPyCmfIir8aLbQ0=
+=4ZQM
+-----END PGP SIGNATURE-----
+
+--------------8Vgu0R0Il0ku5RlX1OWVVOg2--
 
