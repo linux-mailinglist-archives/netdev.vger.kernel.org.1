@@ -1,119 +1,201 @@
-Return-Path: <netdev+bounces-71748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CCA5854F37
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 17:56:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DA3B854EF6
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 17:46:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 988F2B23D80
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 16:45:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8D0B28BACF
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 16:46:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F367460861;
-	Wed, 14 Feb 2024 16:45:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEE82604BB;
+	Wed, 14 Feb 2024 16:46:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OMGZNjv7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79562605DF;
-	Wed, 14 Feb 2024 16:45:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00AC4604BA
+	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 16:46:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707929118; cv=none; b=F8Cebg936ch+f55ea4y4rrqxlODxnz7iQpP1lecy04uE5tgaN+XcNHEFSU19DWifBDGAS+frkEnrU/xx08rjgVUgcjrijVM6zYTcY9qfl/Xde/AQQ+XXQEf+KyZMcGmSRmYvvYq0eNLYD4bVU6QOmoQoMaUxzwEuNhNDWpCmr4M=
+	t=1707929165; cv=none; b=l5vAGbOkCUbqIHZluO661Q7k+3EvKcDug+Geypr73bgexaG43pKnuO+nEnKHF2kHRmmao+pcQA/ye1WPR407YqeLrcfWCAPUoTscZMl7AdESgONGgcGpoHSJA+4vDrGSenfmA/cRreF7ZyrA8XnbClnuyM+Qk2WEDDo1AXH6k8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707929118; c=relaxed/simple;
-	bh=loxfsSL7zxInO0eCeagCCwayO51o50MXlBy3g5U0WeM=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=UxJDYB8YQjAFkRKQFNgqaX9e50GftbxnVmrYcaaEiGaIa4iWl8xkPgCppCic7NFKnxiFivubcg3BK4/JqwMl/+WDYX0WZD7iV5Ewaf3aCvLeXc3S/6AtQbGYKE4IztZZuMIqJFDBXHBftysGocgJnlwiJ+tEtIJknLfbTdJo4zs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (178.176.73.178) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 14 Feb
- 2024 19:44:58 +0300
-Subject: Re: [PATCH net v3] net: ravb: Count packets instead of descriptors in
- GbEth RX path
-To: Paul Barker <paul.barker.ct@bp.renesas.com>, "David S . Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, Wolfram Sang
-	<wsa+renesas@sang-engineering.com>, Nikita Yushchenko
-	<nikita.yoush@cogentembedded.com>, =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?=
-	<u.kleine-koenig@pengutronix.de>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>, Lad Prabhakar
-	<prabhakar.mahadev-lad.rj@bp.renesas.com>, Biju Das
-	<biju.das.jz@bp.renesas.com>, <netdev@vger.kernel.org>,
-	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240214151204.2976-1-paul.barker.ct@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <041656ca-6029-ade3-97b5-659f73be216d@omp.ru>
-Date: Wed, 14 Feb 2024 19:44:57 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1707929165; c=relaxed/simple;
+	bh=2q7cLSi0Gd2ENmAbGtzWnZ+mBZp/E6h2LXwHHZHsHkI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uTO+YS5vsCGtmgEzx/kvMRvElNXJgb1I7u9heb1SlybuTDhblpe8oCzAJHyfDjv0R5Q0kMxMTlWRhMsmsdYRmHf8iknY9QPBQQWG7S6QSpZH1xX3aTgvHyYF6bBB12untAYrlEyOdbGkLQUz5UzxayAQ5Xf1YDRqT4Jh3kYL5bY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OMGZNjv7; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-561f8b8c058so1969449a12.0
+        for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 08:46:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707929162; x=1708533962; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SxQN/1zQrCH98IYYOLyInk5Os7l9aGTXjyFr1WcC+WE=;
+        b=OMGZNjv7t+3cDTG0i1Jc0j/PS+bStTg3/tuzCtHsnUCmYB8DLcEY9Hxk/JZXKtTLhO
+         g6dU0Fk/F4Y9yeWf5ahTpc1+J0mmJktW+9mr9cZR0jnfvKcxhNKXkfx431Cpw722XaY9
+         Kq5BHB6frX8i+5Xu3yONln9ygcplK1PZ75dHRUDRMTHOhfGLd7X8VgcHs7Lv3/RytyNS
+         NyxzhvDjRHdUkGgLZfSJ6cuhqi4pqm+NPyLdk7J7A86wDTVL9Kb7zbCdncMzeKSVyt5p
+         4j0SbmIQW080jcgvd89oFqWWVsGaDvKNQjAQipFkgVCtijAUImwjzYezLBjXg6ia4fsv
+         b+bw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707929162; x=1708533962;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SxQN/1zQrCH98IYYOLyInk5Os7l9aGTXjyFr1WcC+WE=;
+        b=Y9pdKdJzjtaSL7X2+ryQXuUW/Mssa2jUplRbEo5Qv8MJ+RTjMO2JmybagUPh/pY2YR
+         mGhGXw49Mhj6fkfoEUJrm7huka38mgb0t4/WYHPx5+4gyHDfU/xMfvEFlmDTUA0Q8Bwv
+         S7WZcfwNMj/kA0kW1Q2t6gNZOe1c4Cl59ZmbchGRlsVChS9c7HHW9PUc2SlsXC03YJce
+         a2tm2avfXy57ih6csRd5viniSLJsYIS+Wm2unm+JqMYSElG7m6CmIanjSgGKkJsmk4YV
+         VsIakoebYUP5MIZ1INxMf9PJ/nZ3HsV4hoZV7GG1RzwR7D+6nMP6w5gkJhGcvPjza7hB
+         3FEg==
+X-Forwarded-Encrypted: i=1; AJvYcCWmNYj4jnrRizNSLIaOZSQh00Am5d5YLhi3Q175kB9WA2BeulQ6KuI6hEJjlp6ES1SuGRDJBJybElX96f5RDShTClwvQoIY
+X-Gm-Message-State: AOJu0YxvwtYb6cgf/D9Ip420gl2hWZy45L2d2tzSAQWEyyg9YsfvuTE9
+	ieWtPCy3Rspd7sDekkLKqqwM/AzTo9Kv/q7vzq1KhFkjDVsuxoAX
+X-Google-Smtp-Source: AGHT+IFnTjS9mtXyhY8TtcRIoPIE0u5cL8S0F7na2Q1yrKH4or2igg07i+Y27IJ/PEHjgcoK/wmKig==
+X-Received: by 2002:aa7:d418:0:b0:563:85aa:c769 with SMTP id z24-20020aa7d418000000b0056385aac769mr1590877edq.20.1707929162077;
+        Wed, 14 Feb 2024 08:46:02 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCV1qlMKYaJKp14wDb4UKwsfNyNPOTyFwImnmc8r2N/uYl5FpDDsRKpokud/1Tv8CnBl3Xl29hGOElLIAeu6aGkHU+lfeqZfLVWsOJeQ9w2RJaigPIrhQ5OxzkJ3UAaT/OhgF+8AHiJChqCq1s1Yb4Z0uOFoRCeiB6IlGRyhJllU67vOiI4Qejd6JI4lEF4+D9f1vJ77hfEmaeX3JKIVI2vo2s0YaQdokgxUFuIC7YqDqS0h9vTwu7l2LfyqOwr3nNu+aPLf7BugnwFGaddiBL3T
+Received: from skbuf ([188.25.173.195])
+        by smtp.gmail.com with ESMTPSA id dh12-20020a0564021d2c00b005638c060464sm384553edb.25.2024.02.14.08.46.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Feb 2024 08:46:01 -0800 (PST)
+Date: Wed, 14 Feb 2024 18:45:59 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Tobias Waldekranz <tobias@waldekranz.com>
+Cc: davem@davemloft.net, kuba@kernel.org, atenart@kernel.org,
+	roopa@nvidia.com, razor@blackwall.org, bridge@lists.linux.dev,
+	netdev@vger.kernel.org, jiri@resnulli.us, ivecera@redhat.com
+Subject: Re: [PATCH v4 net 1/2] net: bridge: switchdev: Skip MDB replays of
+ deferred events on offload
+Message-ID: <20240214164559.njyaoscx2e22esep@skbuf>
+References: <20240212191844.1055186-1-tobias@waldekranz.com>
+ <20240212191844.1055186-1-tobias@waldekranz.com>
+ <20240212191844.1055186-2-tobias@waldekranz.com>
+ <20240212191844.1055186-2-tobias@waldekranz.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240214151204.2976-1-paul.barker.ct@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 02/14/2024 16:30:26
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 183446 [Feb 14 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.73.178 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.73.178 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;omp.ru:7.1.1;178.176.73.178:7.4.1,7.1.2,7.7.3;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: {cloud_iprep_silent}
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.73.178
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 02/14/2024 16:35:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 2/14/2024 2:42:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240212191844.1055186-2-tobias@waldekranz.com>
+ <20240212191844.1055186-2-tobias@waldekranz.com>
 
-On 2/14/24 6:12 PM, Paul Barker wrote:
-
-> The units of "work done" in the RX path should be packets instead of
-> descriptors, as large packets can be spread over multiple descriptors.
+On Mon, Feb 12, 2024 at 08:18:43PM +0100, Tobias Waldekranz wrote:
+> Before this change, generation of the list of MDB events to replay
+> would race against the creation of new group memberships, either from
+> the IGMP/MLD snooping logic or from user configuration.
 > 
-> Fixes: 1c59eb678cbd ("ravb: Fillup ravb_rx_gbeth() stub")
-> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+> While new memberships are immediately visible to walkers of
+> br->mdb_list, the notification of their existence to switchdev event
+> subscribers is deferred until a later point in time. So if a replay
+> list was generated during a time that overlapped with such a window,
+> it would also contain a replay of the not-yet-delivered event.
+> 
+> The driver would thus receive two copies of what the bridge internally
+> considered to be one single event. On destruction of the bridge, only
+> a single membership deletion event was therefore sent. As a
+> consequence of this, drivers which reference count memberships (at
+> least DSA), would be left with orphan groups in their hardware
+> database when the bridge was destroyed.
+> 
+> This is only an issue when replaying additions. While deletion events
+> may still be pending on the deferred queue, they will already have
+> been removed from br->mdb_list, so no duplicates can be generated in
+> that scenario.
+> 
+> To a user this meant that old group memberships, from a bridge in
+> which a port was previously attached, could be reanimated (in
+> hardware) when the port joined a new bridge, without the new bridge's
+> knowledge.
+> 
+> For example, on an mv88e6xxx system, create a snooping bridge and
+> immediately add a port to it:
+> 
+>     root@infix-06-0b-00:~$ ip link add dev br0 up type bridge mcast_snooping 1 && \
+>     > ip link set dev x3 up master br0
+> 
+> And then destroy the bridge:
+> 
+>     root@infix-06-0b-00:~$ ip link del dev br0
+>     root@infix-06-0b-00:~$ mvls atu
+>     ADDRESS             FID  STATE      Q  F  0  1  2  3  4  5  6  7  8  9  a
+>     DEV:0 Marvell 88E6393X
+>     33:33:00:00:00:6a     1  static     -  -  0  .  .  .  .  .  .  .  .  .  .
+>     33:33:ff:87:e4:3f     1  static     -  -  0  .  .  .  .  .  .  .  .  .  .
+>     ff:ff:ff:ff:ff:ff     1  static     -  -  0  1  2  3  4  5  6  7  8  9  a
+>     root@infix-06-0b-00:~$
+> 
+> The two IPv6 groups remain in the hardware database because the
+> port (x3) is notified of the host's membership twice: once via the
+> original event and once via a replay. Since only a single delete
+> notification is sent, the count remains at 1 when the bridge is
+> destroyed.
+> 
+> Then add the same port (or another port belonging to the same hardware
+> domain) to a new bridge, this time with snooping disabled:
+> 
+>     root@infix-06-0b-00:~$ ip link add dev br1 up type bridge mcast_snooping 0 && \
+>     > ip link set dev x3 up master br1
+> 
+> All multicast, including the two IPv6 groups from br0, should now be
+> flooded, according to the policy of br1. But instead the old
+> memberships are still active in the hardware database, causing the
+> switch to only forward traffic to those groups towards the CPU (port
+> 0).
+> 
+> Eliminate the race in two steps:
+> 
+> 1. Grab the write-side lock of the MDB while generating the replay
+>    list.
+> 
+> This prevents new memberships from showing up while we are generating
+> the replay list. But it leaves the scenario in which a deferred event
+> was already generated, but not delivered, before we grabbed the
+> lock. Therefore:
+> 
+> 2. Make sure that no deferred version of a replay event is already
+>    enqueued to the switchdev deferred queue, before adding it to the
+>    replay list, when replaying additions.
+> 
+> Fixes: 4f2673b3a2b6 ("net: bridge: add helper to replay port and host-joined mdb entries")
+> Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
+> ---
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+Excellent from my side, thank you!
 
-[...]
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
-MBR, Sergey
+> @@ -307,6 +336,50 @@ int switchdev_port_obj_del(struct net_device *dev,
+>  }
+>  EXPORT_SYMBOL_GPL(switchdev_port_obj_del);
+>  
+> +/**
+> + *	switchdev_port_obj_act_is_deferred - Is object action pending?
+> + *
+> + *	@dev: port device
+> + *	@nt: type of action; add or delete
+> + *	@obj: object to test
+> + *
+> + *	Returns true if a deferred item is exists, which is equivalent
+> + *	to the action @nt of an object @obj.
+
+nitpick: replace "is exists" with something else like "is pending" or
+"exists".
+
+Also "action of an object" or "on an object"?
+
+> + *
+> + *	rtnl_lock must be held.
+> + */
 
