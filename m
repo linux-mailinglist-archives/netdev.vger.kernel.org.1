@@ -1,161 +1,145 @@
-Return-Path: <netdev+bounces-71636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D3118544F1
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 10:20:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7594F8544F0
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 10:20:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EF211C24CF0
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 09:20:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99FF91C214ED
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 09:20:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E716412E5C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02B281173D;
 	Wed, 14 Feb 2024 09:20:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="HUxMlD7v"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IyJUtvEQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1B9F12B7B;
-	Wed, 14 Feb 2024 09:20:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6037B12B6E
+	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 09:20:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707902405; cv=none; b=V36/r+zuuGLQuecs7K+h7Ykci7agRy4u2jx8MqrUG6sh7br5s0bVql4HEpUjTLy76eVur4N979bBgWOAVQji0naC0Y7P+TMp5WxfaFbkR/wSCI0E/ZU86tQMhUM70X3fcPDcSLxRMEXPBAYVYgvTiqaZqrpHaytAck+cCuLIpww=
+	t=1707902404; cv=none; b=DdGVmNWrg9j9qgryXe82DB5n3Yy6Us+ywN7x1ekOyCLCrxl2GvG+7nwUL9/669TNPQnmek+HOlweqEL+mPzRwGKKZdTnkpeShZucsn58kR6VQJT2/DIPF/T1S0wUXT9DwFUrsa3lDU6K+knGCO+YM5hRRaAGb7fy56jRxpzPbBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707902405; c=relaxed/simple;
-	bh=2fMXcYcvWxaz1npIo1pKnK5llUMcCFybitnqrZX3Ang=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Bg3TggqnIQzHfXIaozk+6ZufROki9jdJKauLbJMjfQY6Wazs5NhKUtGbHhl3Lq5b07bZPhMQI5iiXrNIfI3U4Xwsmj6VXF5Yox3G8pw1V5TD14CkZFRJepkIqoWkbJ2saZsCn4ynX7I8BHj45rJUJTihS+xbgUAt7K9DwlppyNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=HUxMlD7v; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41E7kG5f024087;
-	Wed, 14 Feb 2024 09:19:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=Rmqg+vYr2399W1bV/8QxckiS9s0iEj0WPITAUROA/Tk=; b=HU
-	xMlD7vkMY5bV3o13nV3teuOeBqdIDgzH4WnJaEGBOdHlzRP66cjto+G7tpDDbQm7
-	kxX3NqRwAVBaXotKNmSbh+AIPRRBfAPOYgTHIzcaQ3wzg5bn3TiIGYFWAnp2tTAH
-	lI2BTZrv9AwIBBeB0xtofUV4EvdvUB4Fii5GCIUdPlITWrStD00D+42Aog7HBwpk
-	oPN4QOuTHxOpBB0diGmaLDIRfs7HgLkU6RwOpHvBO/i1At64WX935yL3o/8mEF2v
-	ZcLkl16LqcyB3DV0vtl55vOsKhk80nOSW+hqw9wHhR9a9r8PY6SLE8XkKj2U+2mj
-	xYVK59hD+1bgsPVOSoHA==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3w8jrj8rfh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 14 Feb 2024 09:19:51 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41E9JorD026448
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 14 Feb 2024 09:19:50 GMT
-Received: from [10.201.2.96] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 14 Feb
- 2024 01:19:44 -0800
-Message-ID: <11fda059-3d8d-4030-922a-8fef16349a65@quicinc.com>
-Date: Wed, 14 Feb 2024 14:49:41 +0530
+	s=arc-20240116; t=1707902404; c=relaxed/simple;
+	bh=eu/7H7FqKxSXcatQgWXl10FcinjKw5u6WiuQD1uJiY8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YU8Rzk8sRNn1Ad0GchXGEuAaQSTq0zWzLPvJuc/73ipvO3lVfK8Gn0VZ/AN00CcY/vXwlab4fEdi1a3s+3qrDGVKScD22qwukHt8VtFgMM4vG65D5krd81Z9ZeHgWVdCws+9aW4q/xmz9HDlgpeAa8CJ1zKTp3pH/wxkllNH/Tg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IyJUtvEQ; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1d73066880eso47854655ad.3
+        for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 01:20:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707902402; x=1708507202; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xq5ror960DKyeBS40swjW6lVDDDmShEBMAQk/imeXRM=;
+        b=IyJUtvEQuFuDgtKRaZHQ3yJLjYztOKd6o4ZpXgFSnTF0x0uQK2n5IUZ52WB4UZJ5YE
+         6mPWJDmxpNa/kEuGFZNHQYl5F2suHao6fCrxKHVZt8cptC348HiaBHhx24jo95zpppDw
+         Vkj2WkEc8THIp8444yWK0/niSl1UgWqDo3GMvczyDpjkpZbqtY1VPz56QuMYcqJ4vAag
+         oRbW3fxFF/U/NStM/OwiomAPC+Pzza3e29qsRp5AcNj6h84ydEnLJwKBpixBakPW7Aw6
+         DXGmLRfll47HojZOuQaL/2gHFkbw1M0QxlD7i9S/3vHWasSnQXO5+Hgpa9limp30aXmv
+         9c8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707902402; x=1708507202;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Xq5ror960DKyeBS40swjW6lVDDDmShEBMAQk/imeXRM=;
+        b=al6FVD49NdsEVGTfpkOzcV8id6iS2wffCP+nSAKwffOaKxi7nnWcQsy8m1tN7NXZpA
+         irtK6Amox+wtEQanmiey7P42MbzGRE51aQliXAfCwioop7yZPBzJ6gzsCEzpato68gs7
+         2RdrhfkMMdI5b7a2yPrskaGGuzRoWEx7Vlp9KKDx9gwqlyCIilCGI0UEsVaOHJ0OzdHR
+         q7dxIWdG8uJNH52hdsCwbuMt47BHT0jz/3de4yFAoFT1KEmzIRbt38jcUycC8GS2IAOR
+         28zMFRpHvrreknIlHeZc5WGvZrmBiZNzLfgt8l+o2GcCCaqjcIIjwT5qUusm+pg+0gQS
+         fdwA==
+X-Gm-Message-State: AOJu0YzrO7BMk/6ukLI/GjFBRRLSJnLMez5qNlNvXzGVDd61tqcxVLVL
+	MqKP7RB/eUle+L5vWqt3gAhYIHSGUzBiXOu+kjHXSb7ZxgzNRB8Oy5YRwO2pNKdimg==
+X-Google-Smtp-Source: AGHT+IG7GDQK/Dq4aOakf2ZmTeLfTyhDEJcUOFFUBIQwjCB4j1O5wFpySF5fhq00EgXxbQzvuodQ9Q==
+X-Received: by 2002:a17:90a:de93:b0:290:69e2:de18 with SMTP id n19-20020a17090ade9300b0029069e2de18mr1806739pjv.41.1707902402003;
+        Wed, 14 Feb 2024 01:20:02 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUk3WSeOJYyS3PdPETieDm7d4zxmcFRq9Mb/wBkHRvb35hzA0+3h/c9KIEUrIUGHwxZbhDlbUp0LKqoCCfMT5sf7EWbFlWsKUP1Hh+NOJwy277Hd37sP3OKfpMfoB772RipzTY11srf+dj8UfOWSF9anDVNspOgXj4GnCJTnvnREp28bGrgJ4VRPL7AwK88XIqxqpB3U/88hb1It+slF7fiZpBs1A==
+Received: from Laptop-X1.redhat.com ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id ch7-20020a17090af40700b0029681231ae1sm914850pjb.28.2024.02.14.01.19.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Feb 2024 01:20:01 -0800 (PST)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Liang Li <liali@redhat.com>,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCH net] selftests: bonding: set active slave to primary eth1 specifically
+Date: Wed, 14 Feb 2024 17:19:55 +0800
+Message-ID: <20240214091955.3040930-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/8] clk: qcom: ipq5332: enable few nssnoc clocks in
- driver probe
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio
-	<konrad.dybcio@linaro.org>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Catalin
- Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <linux-clk@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>
-References: <20240122-ipq5332-nsscc-v4-0-19fa30019770@quicinc.com>
- <20240122-ipq5332-nsscc-v4-2-19fa30019770@quicinc.com>
- <7a69a68d-44c2-4589-b286-466d2f2a0809@lunn.ch>
-From: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
-In-Reply-To: <7a69a68d-44c2-4589-b286-466d2f2a0809@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: YNUVd4LGqR4M-i4n7A4gWk_p2qnpAhr4
-X-Proofpoint-ORIG-GUID: YNUVd4LGqR4M-i4n7A4gWk_p2qnpAhr4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-14_02,2024-02-12_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
- priorityscore=1501 impostorscore=0 bulkscore=0 lowpriorityscore=0
- suspectscore=0 mlxlogscore=734 mlxscore=0 spamscore=0 phishscore=0
- adultscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2401310000 definitions=main-2402140071
+Content-Transfer-Encoding: 8bit
 
+In bond priority testing, we set the primary interface to eth1 and
+add eth0,1,2 to bond in serial. This is OK in normal time. But when in
+debug kernel, the bridge port that eth0,1,2 connected would start
+slowly(enter blocking, forwarding state), which cause the primary
+interface down for a while after ensalve and active slave changed.
+Here is a test log from Jakub's debug test[1].
 
+ [  400.399070][   T50] br0: port 1(s0) entered disabled state
+ [  400.400168][   T50] br0: port 4(s2) entered disabled state
+ [  400.941504][ T2791] bond0: (slave eth0): making interface the new active one
+ [  400.942603][ T2791] bond0: (slave eth0): Enslaving as an active interface with an up link
+ [  400.943633][ T2766] br0: port 1(s0) entered blocking state
+ [  400.944119][ T2766] br0: port 1(s0) entered forwarding state
+ [  401.128792][ T2792] bond0: (slave eth1): making interface the new active one
+ [  401.130771][ T2792] bond0: (slave eth1): Enslaving as an active interface with an up link
+ [  401.131643][   T69] br0: port 2(s1) entered blocking state
+ [  401.132067][   T69] br0: port 2(s1) entered forwarding state
+ [  401.346201][ T2793] bond0: (slave eth2): Enslaving as a backup interface with an up link
+ [  401.348414][   T50] br0: port 4(s2) entered blocking state
+ [  401.348857][   T50] br0: port 4(s2) entered forwarding state
+ [  401.519669][  T250] bond0: (slave eth0): link status definitely down, disabling slave
+ [  401.526522][  T250] bond0: (slave eth1): link status definitely down, disabling slave
+ [  401.526986][  T250] bond0: (slave eth2): making interface the new active one
+ [  401.629470][  T250] bond0: (slave eth0): link status definitely up
+ [  401.630089][  T250] bond0: (slave eth1): link status definitely up
+ [...]
+ # TEST: prio (active-backup ns_ip6_target primary_reselect 1)         [FAIL]
+ # Current active slave is eth2 but not eth1
 
-On 1/26/2024 1:35 AM, Andrew Lunn wrote:
-> On Mon, Jan 22, 2024 at 11:26:58AM +0530, Kathiravan Thirumoorthy wrote:
->> gcc_snoc_nssnoc_clk, gcc_snoc_nssnoc_1_clk, gcc_nssnoc_nsscc_clk are
->> enabled by default and it's RCG is properly configured by bootloader.
-> 
-> Which bootloader? Mainline barebox?
+Fix it by setting active slave to primary slave specifically before
+testing.
 
+[1] https://netdev-3.bots.linux.dev/vmksft-bonding-dbg/results/464301/1-bond-options-sh/stdout
 
-Thanks for taking time to review the patches. I couldn't get time to 
-respond back, sorry for the delay.
+Fixes: 481b56e0391e ("selftests: bonding: re-format bond option tests")
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+---
+ tools/testing/selftests/drivers/net/bonding/bond_options.sh | 2 ++
+ 1 file changed, 2 insertions(+)
 
-I was referring to the U-boot which is delivered as part of the QSDK. I 
-will call it out explicitly in the next patch.
+diff --git a/tools/testing/selftests/drivers/net/bonding/bond_options.sh b/tools/testing/selftests/drivers/net/bonding/bond_options.sh
+index d508486cc0bd..9a3d3c389dad 100755
+--- a/tools/testing/selftests/drivers/net/bonding/bond_options.sh
++++ b/tools/testing/selftests/drivers/net/bonding/bond_options.sh
+@@ -62,6 +62,8 @@ prio_test()
+ 
+ 	# create bond
+ 	bond_reset "${param}"
++	# set active_slave to primary eth1 specifically
++	ip -n ${s_ns} link set bond0 type bond active_slave eth1
+ 
+ 	# check bonding member prio value
+ 	ip -n ${s_ns} link set eth0 type bond_slave prio 0
+-- 
+2.43.0
 
-> 
->> Some of the NSS clocks needs these clocks to be enabled. To avoid
->> these clocks being disabled by clock framework, drop these entries
->> from the clock table and enable it in the driver probe itself.
-> 
-> If they are critical clocks, i would expect a device to reference
-> them. The CCF only disabled unused clocks in late_initcall_sync(),
-> which means all drivers should of probed and taken a reference on any
-> clocks they require.
-
-
-Some of the NSSCC clocks are enabled by bootloaders and CCF disables the 
-same (because currently there are no consumers for these clocks 
-available in the tree. These clocks are consumed by the Networking 
-drivers which are being upstreamed). To access the NSSCC clocks, 
-gcc_snoc_nssnoc_clk, gcc_snoc_nssnoc_1_clk, gcc_nssnoc_nsscc_clk clocks 
-needs to be enabled, else system is going to reboot. To prevent this, I 
-enabled it in probe.
-
-However looking back, gcc_snoc_nssnoc_clk, gcc_snoc_nssnoc_1_clk, 
-gcc_nssnoc_nsscc_clk are consumed by the networking drivers only. So is 
-it okay to drop these clocks from the GCC driver and add it back once 
-the actual consumer needs it? So that we don't have to enable it in probe.
-
-Please let me know your thoughts.
-
-
-> 
-> Please correctly describe the clock tree in device tree, not hide
-> clocks because your DT description is not complete.
-> 
->      Andrew
-> 
-> ---
-> pw-bot: cr
 
