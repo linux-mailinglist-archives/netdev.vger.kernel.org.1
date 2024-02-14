@@ -1,192 +1,103 @@
-Return-Path: <netdev+bounces-71626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91027854438
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 09:47:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1703285443A
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 09:48:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82E881C20A97
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 08:47:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C83B828CF3F
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 08:48:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FC226FA7;
-	Wed, 14 Feb 2024 08:47:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 564226FBD;
+	Wed, 14 Feb 2024 08:48:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="rXkDYdSj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tFEFahoq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F09C12B60;
-	Wed, 14 Feb 2024 08:47:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE7086FA8
+	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 08:48:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707900445; cv=none; b=NhLQ4Uckq7tCbUNtGscQXA3uBDnqYIGvJtV7Wb7ANAli8aVVojn54eDSN5UKrzln+W9jAbWzPRpWExiQ2ydWFUQWRcG4Y+RHCQ9vJaOTQA3BzfE+UIlvENEH0dbfDylpqbarVsOVpkqAuqB47rP3FDXUapkMykCcpgWHPMVgU50=
+	t=1707900514; cv=none; b=hkIocTMUG7g1FDGyq/m0ckE87VhzX0D8EuBsEpShvdyFAe2qdZdnEvi+K1TK8hdn3NEe01z3X8+iU5hQUA1oBR8w5TUNvjxRPz0x8dC8ggyJJtH6382y1F9+TF6PFpuH5aP/GADbKT+9ApAKa0wrlL4JMRLgzAA0+Yi5NkvPtlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707900445; c=relaxed/simple;
-	bh=jKZ1qdvxo5B5C/PGd2hoHurAdfual4D3xaJec0APJLs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kCZ0cuy6ECep4JBVGkTHJo3p6uV1CgyM7zYLFo9sKb3UNDw9tZFNhSpNuRTBCjjUyHMEt9NQhq1zh1dwLK7DqB5jkRKivIvZMgsgl+4wyjnCPRWNBTk1OwsDpJ3Z1MBMkz4vu5Pogzjiyj0Q/nw6zhZ/DM7QUKI0+zfXj7QRE3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=de.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=rXkDYdSj; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=de.ibm.com
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41E81H2i014977;
-	Wed, 14 Feb 2024 08:47:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=NbGy7bXJkCDs8pudWJIrjgwCKBFrcoqliAuXZRqGp9A=;
- b=rXkDYdSj9M5Kcuw1YOR2cy0to1qymdCpqUdp3q7LSZCJ4RJICTIRp1x+VxvNt0tsTUDd
- By4/KXUBqmW68hLIYmnkuy2WZ6uw9dWTax48nHMEO8/bhuTa8lT6ecjE0oiOs5bY81Ub
- VdHRNIBqRWhAns9MgLncWBK1OPPK9V48tgFCe22af7UGtZoRp0xePQb1AULCKcmIys70
- wwUKmt8nYJdb/cS6xJ9OHeMtbNon7BeKHq3TlNqETKv6yQZFFm8vPPd8reRA9sHW+s01
- BoCxluPO4gABuvPaKMxR0wHqIiMg6+GGeEFkyttNsRYiQufDloc78ETVJD4eQ0L4RMhO Tw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w8s4usksy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 14 Feb 2024 08:47:19 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41E8kUPs001762;
-	Wed, 14 Feb 2024 08:47:18 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w8s4usksg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 14 Feb 2024 08:47:18 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41E67kOw032596;
-	Wed, 14 Feb 2024 08:47:17 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3w6kftn2ea-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 14 Feb 2024 08:47:17 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41E8lCjP21234404
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 14 Feb 2024 08:47:14 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 551A02004D;
-	Wed, 14 Feb 2024 08:47:12 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 445F72004B;
-	Wed, 14 Feb 2024 08:47:12 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Wed, 14 Feb 2024 08:47:12 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55271)
-	id 17091E034A; Wed, 14 Feb 2024 09:47:12 +0100 (CET)
-From: Alexandra Winter <wintera@linux.ibm.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alexandra Winter <wintera@linux.ibm.com>
-Subject: [PATCH net-next] net/iucv: fix virtual vs physical address confusion
-Date: Wed, 14 Feb 2024 09:47:07 +0100
-Message-Id: <20240214084707.2075331-1-wintera@linux.ibm.com>
-X-Mailer: git-send-email 2.40.1
+	s=arc-20240116; t=1707900514; c=relaxed/simple;
+	bh=tb/rHH7nD+tvYMzZ/pXuxRJUhft+UD56HAU8GYSKNVA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Me1FLIpZCSfkwGIVkRBqv4Qnms5a4cH4wpB4GcU97xFDkjAg8zid2ZVGGrr4ywwG5aof1cB7btN+wAcqW7C5HQ/tehaWS+9uCZhPznnHiDTKfEmKqqrFfZ4PSf67GP0SRj0Z6CISMGX7JBCazpMCeoL0gMxUdU1L0JjLlvxnO98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tFEFahoq; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dcc58cddb50so3249062276.0
+        for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 00:48:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1707900512; x=1708505312; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=VnZBAXHHBHi7NJ95r/XBvn9wLkNSo/WMgRYmbP1bpJM=;
+        b=tFEFahoqv9sXFSjlZ/8B2OECr83kr9wjocte71kUY4h7pe7u/cYeRCa2kvFHCuOse2
+         CZCxU8PXKkVJGwY+30i1C36UUQKiB32D5H5LKJADd5NgFGkq8KEqgiRBE8hyMx+55uj3
+         ldWppqcVrlMm1x2x7Ukhz9ykAY6ik+PT3mY1oj73qv4v2wBkjdqNeyXRsmM6laZ1zLnX
+         2j2biGtQLOjuPlNn/2MYscIh+8K+0xQrE9GH+4d9JCsKjpK7XeBW2V9kBouOaRzwGA2Y
+         cQTZF4PaAL539gZQGGudFguYHzPk6CFk4qlDbYK9gpYJ2CO+E5MEqQcKmLrqGwXdxQwq
+         qLzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707900512; x=1708505312;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VnZBAXHHBHi7NJ95r/XBvn9wLkNSo/WMgRYmbP1bpJM=;
+        b=ZDjn62ZXbrdZ40AO0VSRE8OSCG97Gn3sh1HOTTROKBO+sls5SDaYNaSez+5GuXnudr
+         mjuXOHfhwPBtwUnzAW4poTaUmehTvT5Y1Tzg5CLC/SFyPlT7SeSmyH071Ej3zm91L1SW
+         qk0apAlf67wG0thcVPST83gRJBfoi4RQLAd4eSpPBSit8je3e24uV7pGp/oCYpK061ET
+         N9ZPe07RcQ5mc79kldzxbfBnbXqCvTp/aLolXpIEkqXfnCYGt+kcESCbkHv/zdQQXsHj
+         P6EBHb8p0Hl5hr0/CWuHCSOPsz6osuRp4vL8PfVHTceDT41qltrG7sxsQgvgpeb6F9DY
+         ecRw==
+X-Forwarded-Encrypted: i=1; AJvYcCWDN+EbtdYnMyyDHtJQNjPB4hLmciKShXOyFXuWNxJsDSX+byvtbStDvNTtm4uKGmxj53giRoew55C75FTju7fvtufqRswY
+X-Gm-Message-State: AOJu0Yw0ZhvDtuDwcq2mEfVwHmVocCNJAvmHXYEXMrXdxM/oQIbZ6zDz
+	gCHTA/UhIgU4ftfmw5rLE/9VXPDGiS+J86t+hFIFuQX6r5EbC9tjWa7TkvMNC9eH8sDOfVI/PIQ
+	O4J3r4w1UDg==
+X-Google-Smtp-Source: AGHT+IGqH2Ji1XS8yKB5q7FUw5pXkurHoQqkeSFcC81rXekWCkW6y6p+vwSpG0k9rx+z7LT+GsWhIVuGtnq/nw==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1007:b0:dc9:5ef8:2b2d with SMTP
+ id w7-20020a056902100700b00dc95ef82b2dmr453013ybt.4.1707900511818; Wed, 14
+ Feb 2024 00:48:31 -0800 (PST)
+Date: Wed, 14 Feb 2024 08:48:27 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 9Tx-PHddtH9iJzvsaw2FeGqLhlKGG7XQ
-X-Proofpoint-ORIG-GUID: YlkmprJU6KmAoox4hKpj5RO4D0itNggb
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-14_02,2024-02-12_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
- priorityscore=1501 clxscore=1015 spamscore=0 bulkscore=0 adultscore=0
- malwarescore=0 mlxscore=0 mlxlogscore=999 suspectscore=0
- lowpriorityscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2311290000 definitions=main-2402140067
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.687.g38aa6559b0-goog
+Message-ID: <20240214084829.684541-1-edumazet@google.com>
+Subject: [PATCH 0/2] kobject: reduce uevent_sock_mutex contention
+From: Eric Dumazet <edumazet@google.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christian Brauner <brauner@kernel.org>
+Cc: linux-kernel <linux-kernel@vger.kernel.org>, "Rafael J . Wysocki" <rafael@kernel.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, netdev@vger.kernel.org, 
+	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Eric Dumazet <eric.dumazet@gmail.com>, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Alexander Gordeev <agordeev@linux.ibm.com>
+This series reduces the (small ?) contention over uevent_sock_mutex,
+noticed when creating/deleting many network namespaces/devices.
 
-Fix virtual vs physical address confusion. This does not fix a bug
-since virtual and physical address spaces are currently the same.
+1) uevent_seqnum becomes an atomic64_t
 
-Acked-by: Alexandra Winter <wintera@linux.ibm.com>
-Signed-off-by: Alexander Gordeev <agordeev@linux.ibm.com>
----
- net/iucv/iucv.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+2) Only acquire uevent_sock_mutex whenever using uevent_sock_list
 
-diff --git a/net/iucv/iucv.c b/net/iucv/iucv.c
-index 6334f64f04d5..9e62783e6acb 100644
---- a/net/iucv/iucv.c
-+++ b/net/iucv/iucv.c
-@@ -286,6 +286,7 @@ static union iucv_param *iucv_param_irq[NR_CPUS];
-  */
- static inline int __iucv_call_b2f0(int command, union iucv_param *parm)
- {
-+	unsigned long reg1 = virt_to_phys(parm);
- 	int cc;
- 
- 	asm volatile(
-@@ -296,7 +297,7 @@ static inline int __iucv_call_b2f0(int command, union iucv_param *parm)
- 		"	srl	%[cc],28\n"
- 		: [cc] "=&d" (cc), "+m" (*parm)
- 		: [reg0] "d" ((unsigned long)command),
--		  [reg1] "d" ((unsigned long)parm)
-+		  [reg1] "d" (reg1)
- 		: "cc", "0", "1");
- 	return cc;
- }
-@@ -1123,7 +1124,7 @@ int __iucv_message_receive(struct iucv_path *path, struct iucv_message *msg,
- 
- 	parm = iucv_param[smp_processor_id()];
- 	memset(parm, 0, sizeof(union iucv_param));
--	parm->db.ipbfadr1 = (u32)(addr_t) buffer;
-+	parm->db.ipbfadr1 = (u32)virt_to_phys(buffer);
- 	parm->db.ipbfln1f = (u32) size;
- 	parm->db.ipmsgid = msg->id;
- 	parm->db.ippathid = path->pathid;
-@@ -1241,7 +1242,7 @@ int iucv_message_reply(struct iucv_path *path, struct iucv_message *msg,
- 		parm->dpl.iptrgcls = msg->class;
- 		memcpy(parm->dpl.iprmmsg, reply, min_t(size_t, size, 8));
- 	} else {
--		parm->db.ipbfadr1 = (u32)(addr_t) reply;
-+		parm->db.ipbfadr1 = (u32)virt_to_phys(reply);
- 		parm->db.ipbfln1f = (u32) size;
- 		parm->db.ippathid = path->pathid;
- 		parm->db.ipflags1 = flags;
-@@ -1293,7 +1294,7 @@ int __iucv_message_send(struct iucv_path *path, struct iucv_message *msg,
- 		parm->dpl.ipmsgtag = msg->tag;
- 		memcpy(parm->dpl.iprmmsg, buffer, 8);
- 	} else {
--		parm->db.ipbfadr1 = (u32)(addr_t) buffer;
-+		parm->db.ipbfadr1 = (u32)virt_to_phys(buffer);
- 		parm->db.ipbfln1f = (u32) size;
- 		parm->db.ippathid = path->pathid;
- 		parm->db.ipflags1 = flags | IUCV_IPNORPY;
-@@ -1378,7 +1379,7 @@ int iucv_message_send2way(struct iucv_path *path, struct iucv_message *msg,
- 		parm->dpl.iptrgcls = msg->class;
- 		parm->dpl.ipsrccls = srccls;
- 		parm->dpl.ipmsgtag = msg->tag;
--		parm->dpl.ipbfadr2 = (u32)(addr_t) answer;
-+		parm->dpl.ipbfadr2 = (u32)virt_to_phys(answer);
- 		parm->dpl.ipbfln2f = (u32) asize;
- 		memcpy(parm->dpl.iprmmsg, buffer, 8);
- 	} else {
-@@ -1387,9 +1388,9 @@ int iucv_message_send2way(struct iucv_path *path, struct iucv_message *msg,
- 		parm->db.iptrgcls = msg->class;
- 		parm->db.ipsrccls = srccls;
- 		parm->db.ipmsgtag = msg->tag;
--		parm->db.ipbfadr1 = (u32)(addr_t) buffer;
-+		parm->db.ipbfadr1 = (u32)virt_to_phys(buffer);
- 		parm->db.ipbfln1f = (u32) size;
--		parm->db.ipbfadr2 = (u32)(addr_t) answer;
-+		parm->db.ipbfadr2 = (u32)virt_to_phys(answer);
- 		parm->db.ipbfln2f = (u32) asize;
- 	}
- 	rc = iucv_call_b2f0(IUCV_SEND, parm);
+Eric Dumazet (2):
+  kobject: make uevent_seqnum atomic
+  kobject: reduce uevent_sock_mutex scope
+
+ include/linux/kobject.h |  2 +-
+ kernel/ksysfs.c         |  2 +-
+ lib/kobject_uevent.c    | 24 +++++++++++-------------
+ 3 files changed, 13 insertions(+), 15 deletions(-)
+
 -- 
-2.40.1
+2.43.0.687.g38aa6559b0-goog
 
 
