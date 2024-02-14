@@ -1,156 +1,146 @@
-Return-Path: <netdev+bounces-71664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D8CB8549C5
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 13:56:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D53AA8549D2
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 13:58:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80D771C24051
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 12:56:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13F8E1C23E99
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 12:58:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 941F252F99;
-	Wed, 14 Feb 2024 12:56:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2719752F65;
+	Wed, 14 Feb 2024 12:57:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HLFZf1YE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AxJSsdEw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E07524B2;
-	Wed, 14 Feb 2024 12:56:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49EA31A58B
+	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 12:57:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707915384; cv=none; b=FA51TUZu4B1uYJIXz3f4M5u+OV8ep3shfSt+l2qILFjBeVlpAfjZQCEd2EWIyUHJ/Eh/p9VXI4rx++NxpIfQXT4g9WSLjxMQwb83o8kNi76vBivcJ/wvOmD5KwLK1URwZ5SGF2KPZs/5Z3ezP3DipgfoxUSHDoVLgFCGrkGiAWc=
+	t=1707915440; cv=none; b=CDjZgaq7nIHowtSnGl+I7NkiZ9wiwdjCjbgpwnevaSF5EBJSvtzn0O8015tQmSijNDuInp+Po19XpOkiXceQKXi0PGVfJksQKDv8ViJztgkaQHH0X7T3gEHVstO//QVnrWq3glIH2rPUhYsJE78ggKNWmAzyL6JyYKE3y4QxkkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707915384; c=relaxed/simple;
-	bh=BvZiBFtd1/yR2YlF7wcWOokDKadIUElG7972GToHNVo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R5jDeWJPQW9alww/MUetu5PZll9oo59daNByCvEkvdLjMi57vTF2fCI5N+qaezjLIpvXxvwB1vblFJKDWl8rXNRrqV2J8QEVDRp01I2DrlKkmY7czKbnWJATqJs0XPcuLQsCMPpsR+p8w7+HxiRRPwbVIGcE/YmRynlpTWt3Ca0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HLFZf1YE; arc=none smtp.client-ip=209.85.222.50
+	s=arc-20240116; t=1707915440; c=relaxed/simple;
+	bh=NuSdwFRk0DO/x9itqw7bv9C8lAYMghMKAClLd/VBNWE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MFvD9ks00wVJbwwXBzNr0AiE4dATBThyb12D3hA2LS4fZfkXd1ffMrM5XQczRypi2XZrWgqUU9nzTzt8U/01DBz5j8zY2QRkPds5VA2yCjcqKAnnYHKR5R2wA81HaggwthyfWjGmGRZoTIEvMVTg9hJf2NYMYLTwjMYjKEH3Khs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AxJSsdEw; arc=none smtp.client-ip=209.85.208.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-7d2e16b552dso2845702241.1;
-        Wed, 14 Feb 2024 04:56:22 -0800 (PST)
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2d0bdb8061fso10834611fa.1
+        for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 04:57:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707915382; x=1708520182; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5XHZsoNoLoEFnlnV78+Lk34bmjhSEU006PIr8jhyp/4=;
-        b=HLFZf1YEhhbQPgrCkVhhXBYj4uPF03NCN8w4Ee9prwU07wsoIHi+MmyInxQbnfeC4i
-         y0NkKPPuR48dj49CM689n0wKuH+RFCwCxOYIxv3Jy9qK5CHpzlmHpO5YMNdhFXCZeizf
-         ZV+9BaP3gFwAk5FdGupIAEy2g2AmLrsOL9OgLFzdT+nf3jJfD9Iwq5aAkgzw2XXHEVx6
-         eGMLCID13kLiH9aP0wojEpGl4tv9+iAgjikkRLFjvYxdnxL6U00pYR6jGy2U6up+V2kq
-         IWAcTimOmKvdy8N6Nipv39s/O6xGkb1fYltWAXJcpPYOK3NRDggF/Tjla249C+RdCI2J
-         K/JQ==
+        d=gmail.com; s=20230601; t=1707915436; x=1708520236; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=t409pfsDa+gzCAIaIkPj0DYMM0PdaZcLKRhJ4RiAGsQ=;
+        b=AxJSsdEw6YxCntzGOAebAMgnVu1JL5QJuqXLegylgNbC7IU6C4VjHnTsJxYaGF2mly
+         cZYBJ6qK5vu6HJOOMwgtLTrN7ea2qs8qX6Oqiy2Ycpuh8xIORiOjDn/dD/yi5H+qW72C
+         6BEOWcmSMaM3sL8rBkh1yrvw/l48zqHlKEIzs3kuG8zdMkPq9x/7FGBoWbQZgFX1RhTX
+         wEVm3O2wEVvNm6UwliXlGWjcLMQprOO6wZIW/B/eAXXrXr3QyikEqsbO9an3NZlOj3wi
+         gtitUYt6mebAcUf9eLebv4nQB7igaTTxSOA7TU6blQCie42uGtGkDfaslrPPSUrlw1pQ
+         9wZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707915382; x=1708520182;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5XHZsoNoLoEFnlnV78+Lk34bmjhSEU006PIr8jhyp/4=;
-        b=MEz6s50T0MdkrndBijlhsR7vCZ2fo4BgwKJxMeT0+0FgnIP2lipspHe8aoYMBMrXKJ
-         +vtwVlFXZuyaJhn0+CVANsKOhzENF2yR7BFIuyfLGJTlBlIUsk16D3unqmdPrVpv6DdS
-         hHQEPGGkG2geVrWcO1zElgywiMRAzD//8t8rl3jDKsD1LRxVK5pO//5CrEIda+wrYX9i
-         +Bn8bQJZU3hbXSrYKyT/UvAWTrHoHO4imCr97mFI3EbhbcBIEykyRy5J90AmAjudcZcE
-         y4/yOWxdd9XyDRhrlVNpRCRJ6oJrkrRkh0upEkU7MfAO1Y7ZfRQyUH8NDlqqQILyQQ2U
-         e4Bw==
-X-Forwarded-Encrypted: i=1; AJvYcCX6piNWLm5jbB82HgCnwAGtcCL8lfufJtlQcdGpbcqlCCwvUZcRTXtTp6scuQySX7bedpnNIRISD0QwJ4oZ12lRivyF8invbv9Y+4FV
-X-Gm-Message-State: AOJu0YxlM62V5raFBXKS37pzzrvJ1dUYXmQBEE/4Xw25mA+kik9lqE+t
-	Gn0/luZIW/0F6CMrMn2NXDDZg+fEeKeXf1hJk4PuO4nzlz+gdd5YTvfMgfVtXdEl/4B6Cfji5K3
-	s2ICmQ0v7EgNew2zhoJLJ4HlPJAk=
-X-Google-Smtp-Source: AGHT+IHFduVz+Cu6aMTUgwJZ7KlSTtydgd57+6W1PCptyTCAmb/MDIqrhFLH/CK/s4uBTPBfRUcgdghDDJ60fi08ffA=
-X-Received: by 2002:a05:6102:942:b0:46e:c78e:380c with SMTP id
- a2-20020a056102094200b0046ec78e380cmr3224519vsi.1.1707915381929; Wed, 14 Feb
- 2024 04:56:21 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707915436; x=1708520236;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=t409pfsDa+gzCAIaIkPj0DYMM0PdaZcLKRhJ4RiAGsQ=;
+        b=BdIinxhFNcb1sqStTmBXmpVJqUQOnWJGyprU47oBLGqupzU72SCKumaTM7Zsx6lHH3
+         WRkfd1kNsr+/sikTCNnoEm1yZ5kl8E5kKdZXT1I/S9Znrch7kQ04atY66iISu9TWQdgj
+         U2YXr65TcCsMTkst+wYWYCMmDApg4dICDG3+FCgREkTJ3QhuUACXm5vDYCbg6CPngQWl
+         SO+gUdzdLsowtZ2zYoQh7vh6J3jEncFJyVZEJ1F8HAVhYAfLlbM5wq8vWrjCmyQ34Ypj
+         gPdn/AVCxVVxz/iXNB3IFEQOYhvx5VICqvq086T+0OmGvu173OxJodguwsyaj4i7J2Lw
+         q7OQ==
+X-Gm-Message-State: AOJu0Yyyyqq8GJ8VFGOr9oMBhbAu+kSK5OZrx4sPDhFDNMr3t7wQRUiJ
+	L1P8L42rOyOJ5ase38dkxFgZx6zfPKD+IicTRJxaLyeYQqV97FZw
+X-Google-Smtp-Source: AGHT+IFBY/xtnHLHRywWHMc8QbXqv19HI1uYbsvpPO3M3TTa5rbnd1E/CJoautUW7VZld8BjQ5qlJA==
+X-Received: by 2002:a05:651c:b13:b0:2d1:1e03:e2c6 with SMTP id b19-20020a05651c0b1300b002d11e03e2c6mr730979ljr.4.1707915436039;
+        Wed, 14 Feb 2024 04:57:16 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWGdZzmKzd57MS7IoPDeUC0A29ekw+1SSz/51Ceon2KfkrqgSc0AvavaFZSwM5xV4eUJsPjRUamkXTE/tjLLwUTpA==
+Received: from localhost.localdomain ([83.217.200.232])
+        by smtp.gmail.com with ESMTPSA id s22-20020a2e98d6000000b002d0ca6e0f9fsm842085ljj.15.2024.02.14.04.57.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Feb 2024 04:57:15 -0800 (PST)
+From: Denis Kirjanov <kirjanov@gmail.com>
+X-Google-Original-From: Denis Kirjanov <dkirjanov@suse.de>
+To: stephen@networkplumber.org
+Cc: netdev@vger.kernel.org,
+	Denis Kirjanov <dkirjanov@suse.de>
+Subject: [PATCH v3 iproute2] ifstat: convert sprintf to snprintf
+Date: Wed, 14 Feb 2024 07:56:59 -0500
+Message-Id: <20240214125659.2477-1-dkirjanov@suse.de>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240213220331.239031-1-paweldembicki@gmail.com>
- <20240213220331.239031-3-paweldembicki@gmail.com> <6db0fd10-556d-47ec-b15a-d03e805b2621@gmail.com>
-In-Reply-To: <6db0fd10-556d-47ec-b15a-d03e805b2621@gmail.com>
-From: =?UTF-8?Q?Pawe=C5=82_Dembicki?= <paweldembicki@gmail.com>
-Date: Wed, 14 Feb 2024 13:56:10 +0100
-Message-ID: <CAJN1Kkz9NPMuoKsm4XdmGS=Y9=SkYM-_EZhqxBojfGZycegtjw@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 02/15] net: dsa: vsc73xx: convert to PHYLINK
-To: Florian Fainelli <f.fainelli@gmail.com>
-Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, 
-	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Claudiu Manoil <claudiu.manoil@nxp.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
-	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-=C5=9Br., 14 lut 2024 o 00:19 Florian Fainelli <f.fainelli@gmail.com> napis=
-a=C5=82(a):
->
-> On 2/13/24 14:03, Pawel Dembicki wrote:
-> > This patch replaces the adjust_link api with the phylink apis that prov=
-ide
-> > equivalent functionality.
-> >
-> > The remaining functionality from the adjust_link is now covered in the
-> > phylink_mac_link_* and phylink_mac_config.
-> >
-> > Removes:
-> > .adjust_link
-> > Adds:
-> > .phylink_mac_config
-> > .phylink_mac_link_up
-> > .phylink_mac_link_down
->
-> The implementation of phylink_mac_link_down() strictly mimics what had
-> been done by adjust_link() in the phydev->link =3D=3D 0 case, but it real=
-ly
-> makes me wonder whether some bits do not logically belong to
-> phylink_mac_link_up(), like "Accept packets again" for instance.
->
-> Are we certain there was not an assumption before that we would get
-> adjust_link() called first with phydev->link =3D 0, and then phydev->link
-> =3D1 and that this specific sequence would program things just the way we
-> want?
+Use snprintf to print only valid data
 
-Yes, it was the simplest conversion possible, without any improvements.
+v2: adjust formatting
+v3: fix the issue with a buffer length
 
-Some part is implementation of datasheet (description of ARBEMPTY register)=
-:
+Signed-off-by: Denis Kirjanov <dkirjanov@suse.de>
+---
+ misc/ifstat.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-        /* Discard packets */
-        vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ARBITER, 0,
-                            VSC73XX_ARBDISC, BIT(port), BIT(port));
+diff --git a/misc/ifstat.c b/misc/ifstat.c
+index 721f4914..4ce550b2 100644
+--- a/misc/ifstat.c
++++ b/misc/ifstat.c
+@@ -379,10 +379,10 @@ static void format_rate(FILE *fp, const unsigned long long *vals,
+ 		fprintf(fp, "%8llu ", vals[i]);
+ 
+ 	if (rates[i] > mega) {
+-		sprintf(temp, "%uM", (unsigned int)(rates[i]/mega));
++		snprintf(temp, sizeof(temp), "%uM", (unsigned int)(rates[i]/mega));
+ 		fprintf(fp, "%-6s ", temp);
+ 	} else if (rates[i] > kilo) {
+-		sprintf(temp, "%uK", (unsigned int)(rates[i]/kilo));
++		snprintf(temp, sizeof(temp), "%uK", (unsigned int)(rates[i]/kilo));
+ 		fprintf(fp, "%-6s ", temp);
+ 	} else
+ 		fprintf(fp, "%-6u ", (unsigned int)rates[i]);
+@@ -400,10 +400,10 @@ static void format_pair(FILE *fp, const unsigned long long *vals, int i, int k)
+ 		fprintf(fp, "%8llu ", vals[i]);
+ 
+ 	if (vals[k] > giga) {
+-		sprintf(temp, "%uM", (unsigned int)(vals[k]/mega));
++		snprintf(temp, sizeof(temp), "%uM", (unsigned int)(vals[k]/mega));
+ 		fprintf(fp, "%-6s ", temp);
+ 	} else if (vals[k] > mega) {
+-		sprintf(temp, "%uK", (unsigned int)(vals[k]/kilo));
++		snprintf(temp, sizeof(temp), "%uK", (unsigned int)(vals[k]/kilo));
+ 		fprintf(fp, "%-6s ", temp);
+ 	} else
+ 		fprintf(fp, "%-6u ", (unsigned int)vals[k]);
+@@ -675,7 +675,7 @@ static void server_loop(int fd)
+ 	p.fd = fd;
+ 	p.events = p.revents = POLLIN;
+ 
+-	sprintf(info_source, "%d.%lu sampling_interval=%d time_const=%d",
++	snprintf(info_source, sizeof(info_source), "%d.%lu sampling_interval=%d time_const=%d",
+ 		getpid(), (unsigned long)random(), scan_interval/1000, time_constant/1000);
+ 
+ 	load_info();
+@@ -893,7 +893,7 @@ int main(int argc, char *argv[])
+ 
+ 	sun.sun_family = AF_UNIX;
+ 	sun.sun_path[0] = 0;
+-	sprintf(sun.sun_path+1, "ifstat%d", getuid());
++	snprintf(sun.sun_path + 1, sizeof(sun.sun_path) - 1, "ifstat%d", getuid());
+ 
+ 	if (scan_interval > 0) {
+ 		if (time_constant == 0)
+-- 
+2.30.2
 
-        /* Wait until queue is empty */
-        ret =3D read_poll_timeout(vsc73xx_read, err, err < 0 || (val & BIT(=
-port)),
-                                1000, 10000, false, vsc, VSC73XX_BLOCK_ARBI=
-TER,
-                                0, VSC73XX_ARBEMPTY, &val);
-        if (ret)
-                dev_err(vsc->dev,
-                        "timeout waiting for block arbiter\n");
-        else if (err < 0)
-                dev_err(vsc->dev, "error reading arbiter\n");
-
-        /* Put this port into reset */
-        vsc73xx_write(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_MAC_CFG,
-                      VSC73XX_MAC_CFG_RESET);
-
-
-I agree that VSC73XX_ARBDISC should be moved to phylink_mac_link_up.
-Other things could be optimised and it needs more care. (eg. This
-implementation doesn't disable phy when the interface goes down.) I
-plan to tweak it after the driver becomes usable. Please let me know
-if it should be fixed in this patch.
-
---=20
-Best Regards,
-Pawel Dembicki
 
