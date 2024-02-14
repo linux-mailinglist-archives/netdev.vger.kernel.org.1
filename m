@@ -1,176 +1,221 @@
-Return-Path: <netdev+bounces-71630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3380C854452
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 09:51:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 071D4854474
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 09:58:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4289285698
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 08:51:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C41E1C20DEB
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 08:58:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A6326FD5;
-	Wed, 14 Feb 2024 08:51:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="go6TjQ2k"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8798779E1;
+	Wed, 14 Feb 2024 08:58:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp2-kfki.kfki.hu (smtp2-kfki.kfki.hu [148.6.0.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC4F522E
-	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 08:51:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 309A879C0;
+	Wed, 14 Feb 2024 08:58:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.6.0.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707900669; cv=none; b=Dbz1xZQ8uY1N1Xl39f8MDVfIbuXA34T++cwl0gGMOLD3uJUYCgyGM+5RE4LVFUNy/448LGE7K0NYSRgJE6Rcr3EanmEj2WDc5A58YNdSuWjZ9g7NSOK1BHB5F/CWQkbwm16OSczkXZXUgtZEeTZzjDhw8C9R5hOewQl/eWK2QNc=
+	t=1707901105; cv=none; b=aAT8pSzdl767TYnzFBhMcd1c0FKrfrCCx77iF84EjIWKAzYeSq9Iikk1qswrrZNDX7QwDwiMbrV6NK/XyoxqDvwClaO28bqG8t/uT4pBOeHFCbTm8C0txigVkC17vb2bU5JzT7Fpd+0HLGIV30eMlla3xgxPnKbVu63V2pTlKWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707900669; c=relaxed/simple;
-	bh=XAHBpu95F6iz76GDDF4DIp5SqFbTiT3BIYlaFgKo4zA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j52osueQ5vh8TPkoZ4sdtvkCI1Fs5r7lPKsjgwGyfBW/fGMnzYCGcVGPhsia166cx5YcFJ/+VEe6G7coGgDwKUrCZ7D7S1FkXUp4PAp5HFWLB/xzyN/gBSsc7TTNfybZ4JYMAaDxewwWZxm7xXI3JEqrCIskY2+dqQu6+DqFLP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=go6TjQ2k; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-511972043c3so2204544e87.1
-        for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 00:51:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1707900664; x=1708505464; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mMmIs/bGngTDe4PFUgHEl5eoP7b/3dzx+s9XiukW76w=;
-        b=go6TjQ2k+OHZJ5v9UAF9TsL6m7CG/oPpsoJ2/twLJ8nMIuyrjFyjcnRI2wcuL8QSlj
-         c/TriQWtbc9re16nY64gVy1prQKxOQcLM/QnPV0q+uaCmXPHdmxA8RRiI0kcOBzP83Hp
-         x5xNlEpbk5QZ/gTaKYJWWpjXHERPDIcEkLk/279fS9iRAQuye2QgXyTKs/J6V3DXihKX
-         yKPg1xwJe1UO8qT/aV3NyGLdRISxwkNGV3bvevta5ukn3GRpuXy5xGAnQK1V7zxQ50gx
-         0XcMIOC7ir4t0gZ1YplcKuZXBQ/J1+JulOuKk0uIPQpQt0CTdlm7HV4sFlojtUzJGxW5
-         bNXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707900664; x=1708505464;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mMmIs/bGngTDe4PFUgHEl5eoP7b/3dzx+s9XiukW76w=;
-        b=mhgdAY7NE1KX6xV5VgHqF4Rf0hdg9nMfQKmXqww4/n3Qr/c3r6Uy14OYdhNY6wflOz
-         wS3nAY9YZLIhNc+uikQEuUoGt/Pi2pkBvos+NXncUDRrsZ+7HqEZBUXkzEWt75ZzkaLx
-         4iYuoy6A6Og8/7zXQ0zMoOjFFUu/cc6FSsZoo2BPNCDjylA+wwyXdd/xe30lWsdUBQyP
-         rchXWE5fvP0tEm0jAPSlmfGdYMIZsw99G1aK1z3VHGggfPgE8u8aMBBytMNkgPQaBsQW
-         cbMFbuwjk7I6YkyvfnlyiDB3p5Q3lKP+U0Rt3Nh81WpjBuGgQLbKaNotLlWul6LVEWug
-         qozg==
-X-Forwarded-Encrypted: i=1; AJvYcCU1q/GWxoh1GsKWOqBUre1lNlOfmVe9x3llpidH4aAlOYI9iJT8HS/++GbMXx/kZL0uZ4Z4aNLVy4ChwGNxFBZWRr/1oBbm
-X-Gm-Message-State: AOJu0YxmMPgkkNUkw6bPjp/kvrrBOwhEmvEFt1tLjYRPcNvfBe27uxju
-	VQipvbmIv07w4s8wlHf1Vqzqw1csfg1iz+HBpVb4G1yNeE+36L/HCdScGCVubpg=
-X-Google-Smtp-Source: AGHT+IHr30/QWHMpbLroxSpzCYVw3mwvI22CHE5fE4ZC+dKIzQ0I2nFOlA43NahVyH5NYOHerDC8iw==
-X-Received: by 2002:a05:6512:32b2:b0:511:71fe:87d8 with SMTP id q18-20020a05651232b200b0051171fe87d8mr1648679lfe.38.1707900664308;
-        Wed, 14 Feb 2024 00:51:04 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVst97FGsDaHpF2yqts0eHsfQOzOh+s5X+mpmkq+hYMx68XNyEzMj/25d/t1gGgArBcmlHq8V5f7igGP0rq4XUvmrSDierBBJaWD/5VmBYdB43i0tELCY5ZYBpf7ugpbrsMsPjmLOOcOA19M8yECCm24f9YIvL8siGsYcVkHgSXIC8k690LiQSfeaisv1fJFT3Zr1WXSAQyxM7N5Wbc2OFxKdL8rg5y3JNXXK/H3+DZ/ZUzxBrgi688aIX94WZPeU1XNlcczz5L3E6s6qOYE7RT4Cn7YSx+sI7Zk37UT5YmkudHGBO/mCu7+c2HksYO4OHtKio/cBsY
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id i20-20020a05600c355400b00411e7f702e1sm1138080wmq.30.2024.02.14.00.51.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Feb 2024 00:51:03 -0800 (PST)
-Date: Wed, 14 Feb 2024 09:51:00 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Davide Caratti <dcaratti@redhat.com>, jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com, shmulik.ladkani@gmail.com
-Subject: Re: [PATCH net v2 1/2] net/sched: act_mirred: use the backlog for
- mirred ingress
-Message-ID: <Zcx-9HkcmhDR5_r1@nanopsycho>
-References: <20240214033848.981211-1-kuba@kernel.org>
+	s=arc-20240116; t=1707901105; c=relaxed/simple;
+	bh=uaqZUg8mZx1t6VSWIkjz1N51L+Li3egJ+H+n1pJ1lmw=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=OnmXc9M8z42fvsBtrSyy9b9QCsK/KmUFdxpfXKMysUHvhco9EC+UygE9Vnl8Tu6XfHo4opL7v1IKNzd9ygLihXyUuOA+nqd9gOGVpCb+s/wWL9azLbe+N81Ur788o1ClBIgE+Sbpe6F+zt0J6yA/xZVN0o/K24rRWNx1yjD8DCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=148.6.0.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from localhost (localhost [127.0.0.1])
+	by smtp2.kfki.hu (Postfix) with ESMTP id 4F61CCC02CF;
+	Wed, 14 Feb 2024 09:58:12 +0100 (CET)
+X-Virus-Scanned: Debian amavisd-new at smtp2.kfki.hu
+Received: from smtp2.kfki.hu ([127.0.0.1])
+	by localhost (smtp2.kfki.hu [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP; Wed, 14 Feb 2024 09:58:10 +0100 (CET)
+Received: from blackhole.kfki.hu (blackhole.szhk.kfki.hu [148.6.240.2])
+	by smtp2.kfki.hu (Postfix) with ESMTP id C6C2FCC02CD;
+	Wed, 14 Feb 2024 09:58:09 +0100 (CET)
+Received: by blackhole.kfki.hu (Postfix, from userid 1000)
+	id 78020343167; Wed, 14 Feb 2024 09:58:09 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by blackhole.kfki.hu (Postfix) with ESMTP id 76565343166;
+	Wed, 14 Feb 2024 09:58:09 +0100 (CET)
+Date: Wed, 14 Feb 2024 09:58:09 +0100 (CET)
+From: Jozsef Kadlecsik <kadlec@netfilter.org>
+To: coreteam@netfilter.org
+cc: David Miller <davem@davemloft.net>, edumazet@google.com, 
+    Florian Westphal <fw@strlen.de>, kuba@kernel.org, 
+    linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+    netfilter-devel@vger.kernel.org, pabeni@redhat.com, 
+    Pablo Neira Ayuso <pablo@netfilter.org>, syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [netfilter?] WARNING: ODEBUG bug in ip_set_free
+In-Reply-To: <000000000000d42dae0611477922@google.com>
+Message-ID: <b1d20932-19c1-6cc7-2203-eff38953ad5a@netfilter.org>
+References: <000000000000d42dae0611477922@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240214033848.981211-1-kuba@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
 
-Wed, Feb 14, 2024 at 04:38:47AM CET, kuba@kernel.org wrote:
->The test Davide added in commit ca22da2fbd69 ("act_mirred: use the backlog
->for nested calls to mirred ingress") hangs our testing VMs every 10 or so
->runs, with the familiar tcp_v4_rcv -> tcp_v4_rcv deadlock reported by
->lockdep.
->
->In the past there was a concern that the backlog indirection will
->lead to loss of error reporting / less accurate stats. But the current
->workaround does not seem to address the issue.
+Hi,
 
-Okay, so what the patch actually should change to fix this?
+It seems this is an old bug uncovered now: the bitmap type of sets still
+use del_timer_sync() to cancel the garbage collecors. However
+del_timer_sync() does not prevent rearming, which is triggered by syzbot.
+The proper way to solve the issue is a one-liner:
 
+diff --git a/net/netfilter/ipset/ip_set_bitmap_gen.h b/net/netfilter/ipset/ip_set_bitmap_gen.h
+index cb48a2b9cb9f..60f5e29ac8fd 100644
+--- a/net/netfilter/ipset/ip_set_bitmap_gen.h
++++ b/net/netfilter/ipset/ip_set_bitmap_gen.h
+@@ -294,7 +294,7 @@ mtype_cancel_gc(struct ip_set *set)
+        struct mtype *map = set->data;
 
->
->Fixes: 53592b364001 ("net/sched: act_mirred: Implement ingress actions")
->Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
->Suggested-by: Davide Caratti <dcaratti@redhat.com>
->Link: https://lore.kernel.org/netdev/33dc43f587ec1388ba456b4915c75f02a8aae226.1663945716.git.dcaratti@redhat.com/
->Signed-off-by: Jakub Kicinski <kuba@kernel.org>
->---
->CC: jhs@mojatatu.com
->CC: xiyou.wangcong@gmail.com
->CC: jiri@resnulli.us
->CC: shmulik.ladkani@gmail.com
->---
-> net/sched/act_mirred.c                             | 14 +++++---------
-> .../testing/selftests/net/forwarding/tc_actions.sh |  3 ---
-> 2 files changed, 5 insertions(+), 12 deletions(-)
->
->diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
->index 0a1a9e40f237..291d47c9eb69 100644
->--- a/net/sched/act_mirred.c
->+++ b/net/sched/act_mirred.c
->@@ -232,18 +232,14 @@ static int tcf_mirred_init(struct net *net, struct nlattr *nla,
-> 	return err;
-> }
+        if (SET_WITH_TIMEOUT(set))
+-               del_timer_sync(&map->gc);
++               timer_shutdown_sync(&map->gc);
+ }
+
+ static const struct ip_set_type_variant mtype = {
+
+(There are no other set types in ipset where del_timer_sync() is used.)
+
+I'll need time for testing then if it fixes the bug, then I'll submit the 
+patch.
+
+Best regards,
+Jozsef
+
+On Tue, 13 Feb 2024, syzbot wrote:
+
+> Hello,
 > 
->-static bool is_mirred_nested(void)
->-{
->-	return unlikely(__this_cpu_read(mirred_nest_level) > 1);
->-}
->-
->-static int tcf_mirred_forward(bool want_ingress, struct sk_buff *skb)
->+static int
->+tcf_mirred_forward(bool at_ingress, bool want_ingress, struct sk_buff *skb)
-> {
-> 	int err;
+> syzbot found the following issue on:
 > 
-> 	if (!want_ingress)
-> 		err = tcf_dev_queue_xmit(skb, dev_queue_xmit);
->-	else if (is_mirred_nested())
->+	else if (!at_ingress)
-> 		err = netif_rx(skb);
-> 	else
-> 		err = netif_receive_skb(skb);
->@@ -319,9 +315,9 @@ static int tcf_mirred_to_dev(struct sk_buff *skb, struct tcf_mirred *m,
+> HEAD commit:    f735966ee23c Merge branches 'for-next/reorg-va-space' and ..
+> git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+> console output: https://syzkaller.appspot.com/x/log.txt?x=168b6592180000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=d47605a39da2cf06
+> dashboard link: https://syzkaller.appspot.com/bug?extid=ebbab3e04c88fa141e6b
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> userspace arch: arm64
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1000ede0180000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=161a6ba2180000
 > 
-> 		skb_set_redirected(skb_to_send, skb_to_send->tc_at_ingress);
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/bdea2316c4db/disk-f735966e.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/75ba7806a91c/vmlinux-f735966e.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/208f119d45ed/Image-f735966e.gz.xz
 > 
->-		err = tcf_mirred_forward(want_ingress, skb_to_send);
->+		err = tcf_mirred_forward(at_ingress, want_ingress, skb_to_send);
-> 	} else {
->-		err = tcf_mirred_forward(want_ingress, skb_to_send);
->+		err = tcf_mirred_forward(at_ingress, want_ingress, skb_to_send);
-> 	}
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+ebbab3e04c88fa141e6b@syzkaller.appspotmail.com
 > 
-> 	if (err) {
->diff --git a/tools/testing/selftests/net/forwarding/tc_actions.sh b/tools/testing/selftests/net/forwarding/tc_actions.sh
->index b0f5e55d2d0b..589629636502 100755
->--- a/tools/testing/selftests/net/forwarding/tc_actions.sh
->+++ b/tools/testing/selftests/net/forwarding/tc_actions.sh
->@@ -235,9 +235,6 @@ mirred_egress_to_ingress_tcp_test()
-> 	check_err $? "didn't mirred redirect ICMP"
-> 	tc_check_packets "dev $h1 ingress" 102 10
-> 	check_err $? "didn't drop mirred ICMP"
->-	local overlimits=$(tc_rule_stats_get ${h1} 101 egress .overlimits)
->-	test ${overlimits} = 10
->-	check_err $? "wrong overlimits, expected 10 got ${overlimits}"
+> ------------[ cut here ]------------
+> ODEBUG: free active (active state 0) object: 00000000310f7442 object type: timer_list hint: bitmap_port_gc+0x0/0x4dc net/netfilter/ipset/ip_set_bitmap_port.c:282
+> WARNING: CPU: 1 PID: 6165 at lib/debugobjects.c:517 debug_print_object lib/debugobjects.c:514 [inline]
+> WARNING: CPU: 1 PID: 6165 at lib/debugobjects.c:517 __debug_check_no_obj_freed lib/debugobjects.c:989 [inline]
+> WARNING: CPU: 1 PID: 6165 at lib/debugobjects.c:517 debug_check_no_obj_freed+0x398/0x47c lib/debugobjects.c:1019
+> Modules linked in:
+> CPU: 1 PID: 6165 Comm: syz-executor468 Not tainted 6.8.0-rc3-syzkaller-gf735966ee23c #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+> pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+> pc : debug_print_object lib/debugobjects.c:514 [inline]
+> pc : __debug_check_no_obj_freed lib/debugobjects.c:989 [inline]
+> pc : debug_check_no_obj_freed+0x398/0x47c lib/debugobjects.c:1019
+> lr : debug_print_object lib/debugobjects.c:514 [inline]
+> lr : __debug_check_no_obj_freed lib/debugobjects.c:989 [inline]
+> lr : debug_check_no_obj_freed+0x398/0x47c lib/debugobjects.c:1019
+> sp : ffff800097886950
+> x29: ffff800097886990 x28: 0000000000000000 x27: ffff80008aeec3c0
+> x26: ffff0000d051c718 x25: dfff800000000000 x24: 0000000000000000
+> x23: ffff80009365bb10 x22: ffff0000d051c000 x21: 0000000000000000
+> x20: ffff8000894dfe30 x19: ffff0000d051c700 x18: ffff800097885e20
+> x17: 626f203234343766 x16: ffff80008aca1180 x15: 0000000000000001
+> x14: 1ffff00012f10c44 x13: 0000000000000000 x12: 0000000000000000
+> x11: 0000000000000002 x10: 0000000000ff0100 x9 : f70d4eacec590700
+> x8 : f70d4eacec590700 x7 : 0000000000000001 x6 : 0000000000000001
+> x5 : ffff800097886238 x4 : ffff80008ed517e0 x3 : ffff80008036df60
+> x2 : 0000000000000001 x1 : 0000000100000000 x0 : 0000000000000000
+> Call trace:
+>  debug_print_object lib/debugobjects.c:514 [inline]
+>  __debug_check_no_obj_freed lib/debugobjects.c:989 [inline]
+>  debug_check_no_obj_freed+0x398/0x47c lib/debugobjects.c:1019
+>  slab_free_hook mm/slub.c:2093 [inline]
+>  slab_free mm/slub.c:4299 [inline]
+>  kfree+0x114/0x3cc mm/slub.c:4409
+>  kvfree+0x40/0x50 mm/util.c:663
+>  ip_set_free+0x28/0x7c net/netfilter/ipset/ip_set_core.c:264
+>  bitmap_port_destroy+0xe4/0x324 net/netfilter/ipset/ip_set_bitmap_gen.h:66
+>  ip_set_create+0x904/0xf48 net/netfilter/ipset/ip_set_core.c:1157
+>  nfnetlink_rcv_msg+0xa78/0xf80 net/netfilter/nfnetlink.c:302
+>  netlink_rcv_skb+0x214/0x3c4 net/netlink/af_netlink.c:2543
+>  nfnetlink_rcv+0x21c/0x1ed0 net/netfilter/nfnetlink.c:659
+>  netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
+>  netlink_unicast+0x65c/0x898 net/netlink/af_netlink.c:1367
+>  netlink_sendmsg+0x83c/0xb20 net/netlink/af_netlink.c:1908
+>  sock_sendmsg_nosec net/socket.c:730 [inline]
+>  __sock_sendmsg net/socket.c:745 [inline]
+>  ____sys_sendmsg+0x56c/0x840 net/socket.c:2584
+>  ___sys_sendmsg net/socket.c:2638 [inline]
+>  __sys_sendmsg+0x26c/0x33c net/socket.c:2667
+>  __do_sys_sendmsg net/socket.c:2676 [inline]
+>  __se_sys_sendmsg net/socket.c:2674 [inline]
+>  __arm64_sys_sendmsg+0x80/0x94 net/socket.c:2674
+>  __invoke_syscall arch/arm64/kernel/syscall.c:37 [inline]
+>  invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:51
+>  el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:136
+>  do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:155
+>  el0_svc+0x54/0x158 arch/arm64/kernel/entry-common.c:678
+>  el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:696
+>  el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
+> irq event stamp: 524
+> hardirqs last  enabled at (523): [<ffff80008035f104>] __up_console_sem kernel/printk/printk.c:341 [inline]
+> hardirqs last  enabled at (523): [<ffff80008035f104>] __console_unlock kernel/printk/printk.c:2706 [inline]
+> hardirqs last  enabled at (523): [<ffff80008035f104>] console_unlock+0x17c/0x3d4 kernel/printk/printk.c:3038
+> hardirqs last disabled at (524): [<ffff80008ad60eac>] el1_dbg+0x24/0x80 arch/arm64/kernel/entry-common.c:436
+> softirqs last  enabled at (518): [<ffff80008002189c>] softirq_handle_end kernel/softirq.c:399 [inline]
+> softirqs last  enabled at (518): [<ffff80008002189c>] __do_softirq+0xac8/0xce4 kernel/softirq.c:582
+> softirqs last disabled at (507): [<ffff80008002ab48>] ____do_softirq+0x14/0x20 arch/arm64/kernel/irq.c:81
+> ---[ end trace 0000000000000000 ]---
 > 
-> 	tc filter del dev $h1 egress protocol ip pref 100 handle 100 flower
-> 	tc filter del dev $h1 egress protocol ip pref 101 handle 101 flower
->-- 
->2.43.0
->
+> 
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+> 
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> 
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+> 
+> If you want syzbot to run the reproducer, reply with:
+> #syz test: git://repo/address.git branch-or-commit-hash
+> If you attach or paste a git patch, syzbot will apply it before testing.
+> 
+> If you want to overwrite report's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+> 
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
+> 
+> If you want to undo deduplication, reply with:
+> #syz undup
+> 
+> 
+
+-- 
+E-mail  : kadlec@blackhole.kfki.hu, kadlecsik.jozsef@wigner.hu
+PGP key : https://wigner.hu/~kadlec/pgp_public_key.txt
+Address : Wigner Research Centre for Physics
+          H-1525 Budapest 114, POB. 49, Hungary
 
