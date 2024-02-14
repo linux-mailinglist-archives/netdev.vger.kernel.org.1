@@ -1,257 +1,127 @@
-Return-Path: <netdev+bounces-71760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8F3D854F72
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 18:09:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C58AD854F6D
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 18:07:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C81A3B2C545
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 17:06:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6459E1F221A3
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 17:07:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 999BE60888;
-	Wed, 14 Feb 2024 17:06:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YstKcwJO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D06CE60868;
+	Wed, 14 Feb 2024 17:07:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62D1E60DE7
-	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 17:06:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707930385; cv=fail; b=JxbX7zuo45T0wp4gFYU+KO5AhLMJwuO93i6nQtVxktyBdZCQXYY1iG5mP4iueP5GpViLMzaqByAMxWDDHWeJe1TnEfvtY0lByk0Hzml+0DYw5oY7MBn4qDN3phKvYs0abGpmpdlwZlvhcmzSW46GXMwaJTVaezXSNtjvcsjm7qY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707930385; c=relaxed/simple;
-	bh=hj3Kjx8cZgJDA1GJGLwUihrZTGUtSr/6+1lWmkp+exM=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ookoqYHOyou/sUSN/Nngot00iqYYjoLGqASfNl1glQXX0Yx9rkVIm1LY8W93rA/NcUv6h+lOVC7n2jIJZwcMLE95EezUvTzMyIS3U1UTOjV/oWejxwErsfu5LalW/b10ccHiSg4gNWIP6a9L5GjIJ2GWcprz2rdUmGrsOfP7y28=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YstKcwJO; arc=fail smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707930384; x=1739466384;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=hj3Kjx8cZgJDA1GJGLwUihrZTGUtSr/6+1lWmkp+exM=;
-  b=YstKcwJOaXswIRtUPS5drvux/xdpIH+yl7LIXGFM6yC6u0BkJTKb7cij
-   wgYZAPQn2aQchUJ1dVzR1z5RellwO3V7ExRNU7atnUhXqJ7gtZNOvfnzm
-   0+MANCSEq6sQfK+e4JW4WeA5rKSihB/PoReeH0CCmN1/qDb3wIpuLUW8D
-   zYXHIUVi5N/Su5SRydPRRTHD39O7s9rnPPbtbWuj0+4oOzy7Jig1RKnE5
-   Qm1ln/iMliXANgRhRpdJI5pZjqY/axfBSXnoiCbGQTF73XjzAb1byjQvt
-   Tr8FYvGllUZWTK9NZHOiFip6olCAH8u3qNVvsKHlpUu3LOIzb6vEnfQPT
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10984"; a="5762865"
-X-IronPort-AV: E=Sophos;i="6.06,160,1705392000"; 
-   d="scan'208";a="5762865"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2024 09:06:22 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,160,1705392000"; 
-   d="scan'208";a="3575099"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Feb 2024 09:06:21 -0800
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 14 Feb 2024 09:06:21 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Wed, 14 Feb 2024 09:06:21 -0800
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.40) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 14 Feb 2024 09:06:21 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ViWoagLT23AxCbY1D39VXUZrP0TZ2eb3z6+T+MzpNFVtIkzwoB3ebI8mVr7LQXM6s9MD9y05kPeWXvjeTzF6+W2fakwFAabM8S5aqzp17SXvOGGy61oh6DXNm+92awzK2cGLbbDNGHVBKYkEjgsUFw5QVOJHFZZHD84Ss7qhIkvVb7f4X3XZPfarb0hfBY2eVDSuhXLSlxrJBVu4KqEz+ThsswjzmWtt5xvpO1eum5Z0Bp2kZZ8mRi5NE8v6rp3JPw+lEPvB1p20wv4Ot+s9A4ybcR2R3imZkuHXrPzNyh68k8APcYFk5EXDXzsF3rz8CsLbQ2VcPGghM12kTqKeqg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6MBPCRGNXay0WqzBgggEle2ga3YmUEX9T3BHs20LsI8=;
- b=TrRggmmCZtfbWQxw4fUTn9ydlH6NXpt9zN8ndTenlTD78ojNeXJd/rYhm4EpxLKIFeSvF45eN1EywJALjGpNwPvujK4DdXAU4r0TAu0gA7zHvCwrg+muONx7znsyJjZadWPIYSINi8mQVXZeg2WvspYpVkMZZMLSPzSVASy56ukUJCTw0B9bLsdWB9Oj+7lo8YoK8OCU0qyyqj1Hqcrhn7ZyyE3ZEoCr+VulTTmkwx4WTqlHzRXjY2xflhMi+NexfqRAXgZ3RJToIW83/7c/iZ5DaNS6d2YhCJB33YxyVkujrMZJOGTk/0t+2lYBykWNvNHRqqZux+seAsRY3kGL1A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5186.namprd11.prod.outlook.com (2603:10b6:303:9b::24)
- by SJ2PR11MB8298.namprd11.prod.outlook.com (2603:10b6:a03:545::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.28; Wed, 14 Feb
- 2024 17:06:18 +0000
-Received: from CO1PR11MB5186.namprd11.prod.outlook.com
- ([fe80::bedd:e757:f922:119e]) by CO1PR11MB5186.namprd11.prod.outlook.com
- ([fe80::bedd:e757:f922:119e%4]) with mapi id 15.20.7270.036; Wed, 14 Feb 2024
- 17:06:18 +0000
-Message-ID: <7b89cd46-3957-4d57-88ff-ca30e517d214@intel.com>
-Date: Wed, 14 Feb 2024 09:06:16 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 00/10 iwl-next] idpf: refactor virtchnl messages
-Content-Language: en-US
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<willemdebruijn.kernel@gmail.com>, <przemyslaw.kitszel@intel.com>,
-	<igor.bagnucki@intel.com>
-References: <20240206033804.1198416-1-alan.brady@intel.com>
- <08e761c6-d79a-4a64-a61a-9536dd247322@intel.com>
- <04033c1e-c3f8-4f05-8c88-f0cd642e8c55@intel.com>
-From: Alan Brady <alan.brady@intel.com>
-In-Reply-To: <04033c1e-c3f8-4f05-8c88-f0cd642e8c55@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4P221CA0012.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:303:8b::17) To CO1PR11MB5186.namprd11.prod.outlook.com
- (2603:10b6:303:9b::24)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA77A54FB8;
+	Wed, 14 Feb 2024 17:07:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707930452; cv=none; b=qD2tZ+ucnEIN4DFuQXiKNJpIWPIooQdssZN8fW3xkOUifmYDmtNzKO/p8toH/ulAByKJBHchknF3ggO+eXOIy4NAyFJpMAka++SwjF/XUZpbUJ6jDnwXKvJbQc8o5SaEflVKMCeRdI/a85I7dNh9MCRisXyRHso6im/fqb9nREo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707930452; c=relaxed/simple;
+	bh=WVc+KVsJWg/hJEZDvHdju5OFgugSoNT7Gs02IKHsAtE=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=O1LZ0a8RsdK0sACrMA0BP7Fk4rT2iD2XAtyb2B3KFf7oybaWZqnFwaFrsVC5zlqb8pe2PvlPKGfp7wU2JGfPIdZRoVqbaHjYRHXGU2Lw1DELqLtTiuSFb4qeoxf56Us9M0gVDd1lTtGQa0OcnYqEFC1UBAiDVz7MpN69sejNLhI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (178.176.73.178) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 14 Feb
+ 2024 20:07:20 +0300
+Subject: Re: [PATCH net-next v4 5/6] net: ravb: Do not apply features to
+ hardware if the interface is down
+To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<biju.das.jz@bp.renesas.com>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20240214135800.2674435-1-claudiu.beznea.uj@bp.renesas.com>
+ <20240214135800.2674435-6-claudiu.beznea.uj@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <02f45526-0d56-469c-db3d-de1ef8785685@omp.ru>
+Date: Wed, 14 Feb 2024 20:07:20 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5186:EE_|SJ2PR11MB8298:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4188b6eb-0b3e-4139-88a9-08dc2d7f42de
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: vvvGBeF7mxThWI6t3PpDL2F3bqL78WEBc32PHUx1WjuDWixgcvdGoaQBz7lBq5j/ffseQpRk8mn+CulAPx5oeMCYTMQxcjufxWhf2k5VjOcUm3kBdgrRcsWR4iQMv+Ves+G2MO8CANd/lzIciYyuHEYGPcT4AZt2UakwxBTVifrGX0o+LZsm/cUC02LYgcZLyXwCwbIeZK8DJyVjf7fQ7Rv4KNOic+UwlSdY4bLcRSF1Tj5Jim+qhgZt4ejogyMR3Ih3yb1VeeG1nT5GjDVaUk2HewzmKnUZ9xRViOp5WLG9CeousPNYKtewiwl1Z+gbuKJc8UDkw713TtOsRW1LvcJwAERDF/0Ww4Uq4UIyWPJnPeKkeJ/5b9aDxE+T/5Cah3f7Tkm18+7zfyhO+wyZytQQWCzdteavDh9JV28ddDeL33FXING5rv5rEoiI4Yw+pyAlJwAvXX39LD/NF+fHanKrZyoD7DDm/os6hFwRwNaYK0e+BCKwmjnJVkaOqjZ8WEVs86gWXXc24XPiQ9lU5aqB4hhh1u0IfVXc9Em/o3d4qiuU+StbqicnnGK/ODSN
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5186.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(346002)(366004)(396003)(376002)(136003)(230273577357003)(230922051799003)(1800799012)(186009)(451199024)(64100799003)(4326008)(8676002)(8936002)(66476007)(5660300002)(66556008)(66946007)(2906002)(15650500001)(44832011)(6862004)(83380400001)(26005)(38100700002)(82960400001)(36756003)(31696002)(86362001)(6636002)(6506007)(316002)(37006003)(6486002)(107886003)(2616005)(41300700001)(53546011)(478600001)(6512007)(31686004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aCt2SUhhWHZGUXJuUDQvS2ZLZUFSL01DUjIrSkcrdCt6SGQzUFRGZldSOWQ2?=
- =?utf-8?B?Ti84UEVTTXlOMTFVdWd3TXpiVmhHQWRGams5NnYzV1p3SC9nM1ROM01kZXNJ?=
- =?utf-8?B?SnBkTU02ZStFek5oa3FORm1XNUFzOXhsT0d4d3lGWjhVNTZkVHdLYW9uR2No?=
- =?utf-8?B?TFNyTkpEVzkybG4veUJaK1RwMWxZWmI4OStBV3NqNHcrQU1HekQydzl1b2hQ?=
- =?utf-8?B?NjFzWG5xWlR4aWFHQkVLOWhQYkIzYlFkd3J4QWRjNHVDelJaR1RDNW5UVVk1?=
- =?utf-8?B?MlorK0R4MGx1OTdNSE1KeldUb3JXbzhKNjN4di9SM1R1ZnZwNC96UC91OG0r?=
- =?utf-8?B?UndnQTNKU0xPTnIwSXl3YXMzVUVKd3pmTnZGVldZL2FveC9lYml2TWhaelhD?=
- =?utf-8?B?TEg5RTRHdlRhNWUvT2xLNXFyamdjWGVaV0hUOFF4L2JmUXUxd2F1Wi92UTkw?=
- =?utf-8?B?dTFrN3k2OExkTnFNUW5tdzdYOXdkQXZubm5kandYS0dXcWRDZkF5ZFhyU21E?=
- =?utf-8?B?ekdZQWVyclFVMWl3SmI3R1hGcnBVY3U5NXVEWWk0bnJlVHdYRmNRRS9zUTYv?=
- =?utf-8?B?OUk5YWM2OGVFQUtxWXR3UXpwQmNnbCs3T2haSTNBR00xU3lObUhSNUMrTjhh?=
- =?utf-8?B?N015M0VIcnI4Ry83VkRlRUxwV1hJVlYxbGdXNW96YkZ0Q0V5Y3h3RDlHOFVP?=
- =?utf-8?B?WEZuOXk2RkMrSEhrc21KakpTMXQ4OHdNeHdITVJwTmpaVW9UUVZsK2ZOdjNG?=
- =?utf-8?B?ejFNUnlEUDZRemlxSHBKck14Vk9ESzllMmVRM3V4dExFZUExejIyOS9XZXE4?=
- =?utf-8?B?MGFCL2paSUVZRUMwZ1FtaEFBcjZMNlpWd0dyMkI4RCtLbEdIemw3Mk5ldENN?=
- =?utf-8?B?RDc5bmxYU2pjeGZOc1ZiNEh6Ym1ZcFRNTjA1ZG1IQlVIOXI2U3haMkE5Rm9z?=
- =?utf-8?B?d0Q4RTF6N25EbXBLNzZmTXY1SEFaaFFrT1lLMEt4S0JxenFRZnEvYUl4cWlU?=
- =?utf-8?B?WmJDUmJNc2tKV0xVdUtxVFJvT2dBMkJ0Z25kYWtZUFIzYnFnOHpCVHhsMDY3?=
- =?utf-8?B?dXdESkhtNHdXRXdLSHdYQ2ZOWVBDa3RPd0JXVmNyTmJ0UlJlZFU5OWR4bXhF?=
- =?utf-8?B?Z0Y3YThWNzBrYTk3MUxRclRyS2lXd3drUWFDSzVqc3AyUlFlaXFlZ2FHWkdY?=
- =?utf-8?B?a3FjQTFsWERjckJYeTVoNFNCV3FBNERtMFUvM1htUVVwWEd1QzlRS1c4MHQ2?=
- =?utf-8?B?ZzJFUGxyNFYrbE5USm9hQ0NhMGcyRDlNR3pDQVlRbUFYR0JLTWdCV29SbEkw?=
- =?utf-8?B?MEk0Y0ppRHBoMFluQXlwVXJBUCtnODBCcmJEcWJQV3I5aENkeEVqZWtjL1cv?=
- =?utf-8?B?OWpJRDdoU1RQNVVGQXdLUnBidzcwUnFPOFZjSVhkYlJteVdySjhYMC9nQkQ4?=
- =?utf-8?B?N1ZoOWpiTHB3eGRGMk95bFpjenZlNmNjT2tabnBWSzJXc1lETTdQbDJHNDho?=
- =?utf-8?B?WCtpU25oNTNvZWZpVUo3dWIzbm1GUVRMSkhyM05KV2ZQUEUvWVNvMnpDbllV?=
- =?utf-8?B?U0tNTUZOMDZ4UUFPQlhkNURuQjdwWDB6VTV4YzJpODJZQXRFeUFYYm1RdnJj?=
- =?utf-8?B?MEMveGJqdkpaZURmc2NaMzFPNE11bnYzTU9ac2hESEw2MXZvRnh4WngxeXIr?=
- =?utf-8?B?ekNFT2d3UXFTUThiRXM4MFlZTm16d1BiTUJDTFA2T2I3Vy84UytYTHBGd3Ny?=
- =?utf-8?B?K21QaFBtN2Y3amtGY1JQMVc0RUJaMEY1T2svUjlqdHVNZjg4R0l3TFJYQTRB?=
- =?utf-8?B?V3I0bDR0RGdnYVN3WFptZDlJWUxZNUd5djlKcVFEYWRZcEN4QjBVUVJRT3hR?=
- =?utf-8?B?WGl2WU1VcE5SQXgvNFk3VWtnVGIralMzTklJUzExRjQ0eDRhNFdXV3VHSXhP?=
- =?utf-8?B?djdxZG44Q3BTem42VG9iNTRSN2M5THhRSEVHSGxseDFFYitYRXJMbjg5Rkw5?=
- =?utf-8?B?RjJuQW9JL0RjWXZuaHdzVmhSRS92MWRZYTJMUmZudC9OYytwRTRGZW5PMW5N?=
- =?utf-8?B?ZlNaSUF0TGQ2cTFoVXVQTkRnVkRJSVdETEZ1VnNEM2hvUFpqYjFNOWlkTWdT?=
- =?utf-8?Q?4l6tHa3CFl+XbUWSCfAx1n+hZ?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4188b6eb-0b3e-4139-88a9-08dc2d7f42de
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5186.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Feb 2024 17:06:18.6988
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qDl3R7cgcvfbt9jtLR1hT6r97vbG/vFwDezuGffR+7w2T5x+Cff9o0voO13/Hi7jHEGhNZq6Gu6UdukPBj7kvA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8298
-X-OriginatorOrg: intel.com
+In-Reply-To: <20240214135800.2674435-6-claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 02/14/2024 16:49:17
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 183446 [Feb 14 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.73.178 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.73.178 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;178.176.73.178:7.4.1,7.7.3;omp.ru:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: {cloud_iprep_silent}
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.73.178
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 02/14/2024 16:56:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 2/14/2024 2:42:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On 2/14/2024 6:49 AM, Alexander Lobakin wrote:
-> From: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Date: Tue, 6 Feb 2024 18:02:33 +0100
-> 
->> From: Alan Brady <alan.brady@intel.com>
->> Date: Mon, 5 Feb 2024 19:37:54 -0800
->>
->>> The motivation for this series has two primary goals. We want to enable
->>> support of multiple simultaneous messages and make the channel more
->>> robust. The way it works right now, the driver can only send and receive
->>> a single message at a time and if something goes really wrong, it can
->>> lead to data corruption and strange bugs.
->>
->> This works better than v3.
->> For the basic scenarios:
->>
->> Tested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> 
-> Sorry I'm reverting my tag.
-> After the series, the CP segfaults on each rmmod idpf:
-> 
-> root@mev-imc:/usr/bin/cplane# cp_pim_mdd_handler: MDD interrupt detected
-> cp_pim_mdd_event_handler: reg = 40
-> Jan  1 00:27:57 mev-imc local0.warn LanCP[190]: cp_pim_mdd_handler: MDD
-> interrupt detected
-> cp_pim_mdd_event_handler: reg = 1
-> Jan  1 00:28:54 mev-imc local0.warn LanCP[190]: [hma_create_vport/4257]
-> WARNING: RSS is configured on 1st contiguous num of queuJan  1 00:28:54
-> mev-imc local0.warn LanCP[190]: [hma_create_vport/4257] WARNING: RSS is
-> configured on 1st contiguous num of queuJan  1 00:28:55 mev-imc
-> local0.warn LanCP[190]: [hma_create_vport/4257] WARNING: RSS is
-> configured on 1st contiguous num of queues= 16 start Qid= 34
-> Jan  1 00:28:55 mev-imc local0.warn LanCP[190]: [hma_create_vport/4257]
-> WARNING: RSS is configured on 1st contiguous num of queu16 start Qid= 640
-> Jan  1 00:28:55 mev-imc local0.err LanCP[190]:
-> [cp_del_node_rxbuff_lst/4179] ERR: Resource list is empty, so nothing to
-> delete here
-> Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
-> [cp_uninit_vsi_tc_q_region/222] ERR: Failed to init vsi LUT on vsi 1.
-> Jan  1 00::08 mev-imc local0.err LanCP[190]:
-> [cp_uninit_vsi_fxp_config/1101] ERR: cp_uninit_vsi_rss_config() failed
-> on vsi (1).
-> Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
-> [cp_uninit_vsi_tc_q_region/222] ERR: Failed to init vsi LUT on vsi 6.
-> Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
-> [cp_uninit_vsi_rss_config/340] ERR: faininit_vsi_rss_config() failed on
-> vsi (6).
-> Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
-> [cp_uninit_vsi_tc_q_region/222] ERR: Failed to init vsi LUT on vsi 7.
-> Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
-> [cp_uninit_vsi_rss_config/340] ERR: failed to remove vsi (7)'s queue
-> regions.
-> Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
-> [cp_uninit_vsi_fxp_config/1101] ERR: cp_uninit_vo init vsi LUT on vsi 8.
-> Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
-> [cp_uninit_vsi_rss_config/340] ERR: failed to remove vsi (8)'s queue
-> regions.
-> Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
-> [cp_uninit_vsi_fxp_config/1101] ERR: cp_uninit_vsi_rss_config() failed
-> on vsi (8).
-> Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
-> [cp_uninit_vsi_tc_q_region/222] ERR: Failed to init vsi LUT on vsi 1.
-> Jan  1 00::08 mev-imc local0.err LanCP[190]:
-> [cp_uninit_vsi_fxp_config/1101] ERR: cp_uninit_vsi_rss_config() failed
-> on vsi (1).
-> 
-> [1]+  Segmentation fault      ./imccp 0000:00:01.6 0 cp_init.cfg
-> 
-> Only restarting the CP helps -- restarting the imccp daemon makes it
-> immediately crash again.
-> 
-> This should be dropped from the next-queue until it's fixed.
-> 
-> Thanks,
-> Olek
+On 2/14/24 4:57 PM, Claudiu wrote:
 
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> 
+> Do not apply features to hardware if the interface is down. In case runtime
+> PM is enabled, and while the interface is down, the IP will be in reset
+> mode (as for some platforms disabling the clocks will switch the IP to
+> reset mode, which will lead to losing register contents) and applying
+> settings in reset mode is not an option. Instead, cache the features and
+> apply them in ravb_open() through ravb_emac_init().
+> 
+> To avoid accessing the hardware while the interface is down
+> pm_runtime_active() check was introduced. Along with it the device runtime
+> PM usage counter has been incremented to avoid disabling the device clocks
+> while the check is in progress (if any).
+> 
+> Commit prepares for the addition of runtime PM.
+> 
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-I definitely tested rmmod so I'm frankly not understanding how this can 
-be possible. If you would like I'm happy to sync on how you're able to 
-cause this to happen. Our internal validation verified 1000 load/unloads 
-passed their testing.
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
-Is there more you're doing other than just rmmod?
+[...]
 
-Alan
+MBR, Sergey
 
