@@ -1,97 +1,156 @@
-Return-Path: <netdev+bounces-71663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7090B8549A5
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 13:52:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D8CB8549C5
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 13:56:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FB501F22CC7
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 12:52:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80D771C24051
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 12:56:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73E6452F94;
-	Wed, 14 Feb 2024 12:50:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 941F252F99;
+	Wed, 14 Feb 2024 12:56:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="krzHweqC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HLFZf1YE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4804452F7F;
-	Wed, 14 Feb 2024 12:50:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E07524B2;
+	Wed, 14 Feb 2024 12:56:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707915026; cv=none; b=BR7JnbIN3l6EkaclMwB1m/RB+x4RE0dIvtmZgNjHYMIWCgOxRw772x7JnL8Co5kF3M670sa/HX5wXfkzlndl6sPj+hxbVPF8HC3/jhN1z0QCETAZWC6ElGWeTgSSmAswCIsYBKfXvvqLLtf5/emnIThLtZXILn3DJeaMy/+ZLVo=
+	t=1707915384; cv=none; b=FA51TUZu4B1uYJIXz3f4M5u+OV8ep3shfSt+l2qILFjBeVlpAfjZQCEd2EWIyUHJ/Eh/p9VXI4rx++NxpIfQXT4g9WSLjxMQwb83o8kNi76vBivcJ/wvOmD5KwLK1URwZ5SGF2KPZs/5Z3ezP3DipgfoxUSHDoVLgFCGrkGiAWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707915026; c=relaxed/simple;
-	bh=j27ZC7gvhVvN/TfBI+iXQULEDbsjY/1VfpRBROKcL5A=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=d70rjmZ9cZONMr61DYU5xZKgLE2DCxzsaCkxu+SnQEVqvy9CuaWe9YHWgKOLN0Xl3qZKHIXmjSZupEP/+HWNlCLC1OrJpYzD4larbqec94L8fcFNRF3f80Q5dGCfPnQn8VfabgWsrrSUPLTHdGd26NJcJNVhqaJObd6jFVmq+wY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=krzHweqC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B3F46C43390;
-	Wed, 14 Feb 2024 12:50:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707915025;
-	bh=j27ZC7gvhVvN/TfBI+iXQULEDbsjY/1VfpRBROKcL5A=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=krzHweqCNerRSYMsUctzLkbhfXtOSqMV/2C/DgPEsa6u1EO9swyLBD4PS3eUIaLhp
-	 DLcHExjLXT4vNmOjSJX+DUeHdbP20U0KpcNt6egN2HOucXNZmuyoon4jnNtagkORD/
-	 kXJwfaQVkmIuDsfX6NcR6URjUg5Rpo+PYIpdCV9ye1JdpTNHDR2xPkbkOKbKeeWiJ7
-	 WnWvHQNKq37ehBVrQm2BlUB9BAIkGKFzIYRF6Ke6nfMeQOkrrTzU+RA+d8RGlcaUKD
-	 Yx4F64kFf2BgimFsYHBZRuDHsM4WzCrfhEhWdXxqI1mPFNfMoqaanAiaMW9PeCWxeY
-	 nxIv4pWvpEPTQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 96C5CD84BCE;
-	Wed, 14 Feb 2024 12:50:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1707915384; c=relaxed/simple;
+	bh=BvZiBFtd1/yR2YlF7wcWOokDKadIUElG7972GToHNVo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=R5jDeWJPQW9alww/MUetu5PZll9oo59daNByCvEkvdLjMi57vTF2fCI5N+qaezjLIpvXxvwB1vblFJKDWl8rXNRrqV2J8QEVDRp01I2DrlKkmY7czKbnWJATqJs0XPcuLQsCMPpsR+p8w7+HxiRRPwbVIGcE/YmRynlpTWt3Ca0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HLFZf1YE; arc=none smtp.client-ip=209.85.222.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-7d2e16b552dso2845702241.1;
+        Wed, 14 Feb 2024 04:56:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707915382; x=1708520182; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5XHZsoNoLoEFnlnV78+Lk34bmjhSEU006PIr8jhyp/4=;
+        b=HLFZf1YEhhbQPgrCkVhhXBYj4uPF03NCN8w4Ee9prwU07wsoIHi+MmyInxQbnfeC4i
+         y0NkKPPuR48dj49CM689n0wKuH+RFCwCxOYIxv3Jy9qK5CHpzlmHpO5YMNdhFXCZeizf
+         ZV+9BaP3gFwAk5FdGupIAEy2g2AmLrsOL9OgLFzdT+nf3jJfD9Iwq5aAkgzw2XXHEVx6
+         eGMLCID13kLiH9aP0wojEpGl4tv9+iAgjikkRLFjvYxdnxL6U00pYR6jGy2U6up+V2kq
+         IWAcTimOmKvdy8N6Nipv39s/O6xGkb1fYltWAXJcpPYOK3NRDggF/Tjla249C+RdCI2J
+         K/JQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707915382; x=1708520182;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5XHZsoNoLoEFnlnV78+Lk34bmjhSEU006PIr8jhyp/4=;
+        b=MEz6s50T0MdkrndBijlhsR7vCZ2fo4BgwKJxMeT0+0FgnIP2lipspHe8aoYMBMrXKJ
+         +vtwVlFXZuyaJhn0+CVANsKOhzENF2yR7BFIuyfLGJTlBlIUsk16D3unqmdPrVpv6DdS
+         hHQEPGGkG2geVrWcO1zElgywiMRAzD//8t8rl3jDKsD1LRxVK5pO//5CrEIda+wrYX9i
+         +Bn8bQJZU3hbXSrYKyT/UvAWTrHoHO4imCr97mFI3EbhbcBIEykyRy5J90AmAjudcZcE
+         y4/yOWxdd9XyDRhrlVNpRCRJ6oJrkrRkh0upEkU7MfAO1Y7ZfRQyUH8NDlqqQILyQQ2U
+         e4Bw==
+X-Forwarded-Encrypted: i=1; AJvYcCX6piNWLm5jbB82HgCnwAGtcCL8lfufJtlQcdGpbcqlCCwvUZcRTXtTp6scuQySX7bedpnNIRISD0QwJ4oZ12lRivyF8invbv9Y+4FV
+X-Gm-Message-State: AOJu0YxlM62V5raFBXKS37pzzrvJ1dUYXmQBEE/4Xw25mA+kik9lqE+t
+	Gn0/luZIW/0F6CMrMn2NXDDZg+fEeKeXf1hJk4PuO4nzlz+gdd5YTvfMgfVtXdEl/4B6Cfji5K3
+	s2ICmQ0v7EgNew2zhoJLJ4HlPJAk=
+X-Google-Smtp-Source: AGHT+IHFduVz+Cu6aMTUgwJZ7KlSTtydgd57+6W1PCptyTCAmb/MDIqrhFLH/CK/s4uBTPBfRUcgdghDDJ60fi08ffA=
+X-Received: by 2002:a05:6102:942:b0:46e:c78e:380c with SMTP id
+ a2-20020a056102094200b0046ec78e380cmr3224519vsi.1.1707915381929; Wed, 14 Feb
+ 2024 04:56:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] bnad: fix work_queue type mismatch
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170791502561.7127.2095546229162487454.git-patchwork-notify@kernel.org>
-Date: Wed, 14 Feb 2024 12:50:25 +0000
-References: <20240213100809.458571-1-arnd@kernel.org>
-In-Reply-To: <20240213100809.458571-1-arnd@kernel.org>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: rmody@marvell.com, skalluru@marvell.com, GR-Linux-NIC-Dev@marvell.com,
- kuba@kernel.org, arnd@arndb.de, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, nathan@kernel.org, ndesaulniers@google.com,
- morbo@google.com, justinstitt@google.com, yunchuan@nfschina.com,
- huangj@Brocade.COM, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- llvm@lists.linux.dev
+References: <20240213220331.239031-1-paweldembicki@gmail.com>
+ <20240213220331.239031-3-paweldembicki@gmail.com> <6db0fd10-556d-47ec-b15a-d03e805b2621@gmail.com>
+In-Reply-To: <6db0fd10-556d-47ec-b15a-d03e805b2621@gmail.com>
+From: =?UTF-8?Q?Pawe=C5=82_Dembicki?= <paweldembicki@gmail.com>
+Date: Wed, 14 Feb 2024 13:56:10 +0100
+Message-ID: <CAJN1Kkz9NPMuoKsm4XdmGS=Y9=SkYM-_EZhqxBojfGZycegtjw@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 02/15] net: dsa: vsc73xx: convert to PHYLINK
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, 
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Claudiu Manoil <claudiu.manoil@nxp.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
+	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+=C5=9Br., 14 lut 2024 o 00:19 Florian Fainelli <f.fainelli@gmail.com> napis=
+a=C5=82(a):
+>
+> On 2/13/24 14:03, Pawel Dembicki wrote:
+> > This patch replaces the adjust_link api with the phylink apis that prov=
+ide
+> > equivalent functionality.
+> >
+> > The remaining functionality from the adjust_link is now covered in the
+> > phylink_mac_link_* and phylink_mac_config.
+> >
+> > Removes:
+> > .adjust_link
+> > Adds:
+> > .phylink_mac_config
+> > .phylink_mac_link_up
+> > .phylink_mac_link_down
+>
+> The implementation of phylink_mac_link_down() strictly mimics what had
+> been done by adjust_link() in the phydev->link =3D=3D 0 case, but it real=
+ly
+> makes me wonder whether some bits do not logically belong to
+> phylink_mac_link_up(), like "Accept packets again" for instance.
+>
+> Are we certain there was not an assumption before that we would get
+> adjust_link() called first with phydev->link =3D 0, and then phydev->link
+> =3D1 and that this specific sequence would program things just the way we
+> want?
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+Yes, it was the simplest conversion possible, without any improvements.
 
-On Tue, 13 Feb 2024 11:07:50 +0100 you wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> clang-16 warns about a function pointer cast:
-> 
-> drivers/net/ethernet/brocade/bna/bnad.c:1995:4: error: cast from 'void (*)(struct delayed_work *)' to 'work_func_t' (aka 'void (*)(struct work_struct *)') converts to incompatible function type [-Werror,-Wcast-function-type-strict]
->  1995 |                         (work_func_t)bnad_tx_cleanup);
-> drivers/net/ethernet/brocade/bna/bnad.c:2252:4: error: cast from 'void (*)(void *)' to 'work_func_t' (aka 'void (*)(struct work_struct *)') converts to incompatible function type [-Werror,-Wcast-function-type-strict]
->  2252 |                         (work_func_t)(bnad_rx_cleanup));
-> 
-> [...]
+Some part is implementation of datasheet (description of ARBEMPTY register)=
+:
 
-Here is the summary with links:
-  - bnad: fix work_queue type mismatch
-    https://git.kernel.org/netdev/net/c/5d07e432cb38
+        /* Discard packets */
+        vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ARBITER, 0,
+                            VSC73XX_ARBDISC, BIT(port), BIT(port));
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+        /* Wait until queue is empty */
+        ret =3D read_poll_timeout(vsc73xx_read, err, err < 0 || (val & BIT(=
+port)),
+                                1000, 10000, false, vsc, VSC73XX_BLOCK_ARBI=
+TER,
+                                0, VSC73XX_ARBEMPTY, &val);
+        if (ret)
+                dev_err(vsc->dev,
+                        "timeout waiting for block arbiter\n");
+        else if (err < 0)
+                dev_err(vsc->dev, "error reading arbiter\n");
+
+        /* Put this port into reset */
+        vsc73xx_write(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_MAC_CFG,
+                      VSC73XX_MAC_CFG_RESET);
 
 
+I agree that VSC73XX_ARBDISC should be moved to phylink_mac_link_up.
+Other things could be optimised and it needs more care. (eg. This
+implementation doesn't disable phy when the interface goes down.) I
+plan to tweak it after the driver becomes usable. Please let me know
+if it should be fixed in this patch.
+
+--=20
+Best Regards,
+Pawel Dembicki
 
