@@ -1,132 +1,154 @@
-Return-Path: <netdev+bounces-71750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25559854F07
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 17:48:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 005DA854F15
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 17:49:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A923228FB3B
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 16:48:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B5311F217F7
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 16:49:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDC085D912;
-	Wed, 14 Feb 2024 16:47:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gw+ATCYY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49C3C604AF;
+	Wed, 14 Feb 2024 16:49:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000AA60B9B
-	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 16:47:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D584604AA;
+	Wed, 14 Feb 2024 16:49:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707929279; cv=none; b=YXdpC8qILtIE0r1yZ4Cyu/Qjk4DwkTN8mJ9QjouBOV0wHB8wI705S4hA7J/g0AM8D4S9atxgMN0uojmxW7f0QWmu2vV0DAakhhoiEAziRgzwsN1LZv/2dYim6M+MZtbASUSZTTLbPAHcUKpSmOzDQS1lv4obWshlyvIUTV1PVO0=
+	t=1707929375; cv=none; b=PPs7ywMcH0X4/1V7YmJgXQoYCEbp0jc1dlpi8fDRbWkyw3EVuy9g5bjum0/7/x5JrvgYi0MOf93D6hiUkNgzmaMcyNhWvLRtCTkluCjm2qRyhN3M1MrSYVxWGMlMLz3iSFvSRKzdbiJ3j6XBKda9sIqk2ZTK1YT2QvTLhHWtEeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707929279; c=relaxed/simple;
-	bh=XwJoR7TTLG4MhprZasOKMxLMrkCbF9FIzUucdvqZnQQ=;
+	s=arc-20240116; t=1707929375; c=relaxed/simple;
+	bh=wLHjf5vRxcUwPOIopH3TL7sPSadv97SOrvzzkNBKq9Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vm02Tg3q5lURMQS/wOTN5b5ubeoMa1ynxEvPP/yCmuvZ+vFKvPEtIFqOywzucxKdHfWKQTADsRB0mRkIIBcekSofxs6I5bGPELQy3Gk5eXJQFrZ2/QlUHcqwgLIpEcHnug82iJ/xYPHfhgrDlruBDGcJ0ozXhud1pOugtQNFuMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gw+ATCYY; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=hL1AYWsYoPPiz7JxrgDXDQDMHLRm7LLz7EIwSj2JBqoXKRCG8Drl28/0H/9pRpYQ7Jj7LTwSQ/8ibpt9E0WtvyL0A3gpTwDFWaXNET2P5DiK4scX8odsF4ckgLT57rAp9YNRPIqYN+5zgUsegeCKliu26zl/kqbMpuN2Ro/w4DI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a3d159220c7so244120466b.2
-        for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 08:47:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707929276; x=1708534076; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7vGriv4qu9uDXvdDYwIBv5PlmXymEIEo1vLNuMltzEs=;
-        b=Gw+ATCYY7I/gSKe2JNdn5lM9yty7gwqlnrRvO4u01L0N1FAIDS2hwuG37MzgMNe4A9
-         wsBT7NeYznE0+VM2hCorvKLBwAq+VnHfBJKdkKWG+YwX3C34aUfgeQQSZt8qRBLVmU3/
-         NJ6clZc9inQ3nMqdSNnEewYfvsYDJcLLKYvDgNtSoC5utKgmGeHy60cxAQfPp5s397st
-         CpDwBfuK7hLz1Qy7fYEmwLVdA2vJrK6izNBN7V+7VzzZKzuM2p+6QfUsuf68M3D/kYyL
-         NfxDEo4V/umZlKICyHHUrct1x074AfmDJ/OTOtGio18n6tPDYyP5N+8/9I4ZOJFdzCdz
-         nkQQ==
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a2a17f3217aso734903666b.2;
+        Wed, 14 Feb 2024 08:49:33 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707929276; x=1708534076;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7vGriv4qu9uDXvdDYwIBv5PlmXymEIEo1vLNuMltzEs=;
-        b=b6xdUZ6d9SHr2uJ98UAPGBx7CJAPElWPpprRXKEnl7a83TP5UY5zqFsYeokLcuqRUm
-         87ISqdS2ivY6FVCqX0SueFRbmzO6p1jLzjvdT+g1uSr7te+Utui9lsMp1Mfnc34m96+g
-         gZRB2xeq4VgLr6n9U1oN6g3vH2s1XaXzaMkTnaqQNl2Kmp6Lhpe0oD0ftxXjjenhir+1
-         rPp6XE58qpXIXZond0k2CUl0Ik1kNjbbfwlnZLjAHJ9Bjanglqqr2GQFyjz1j9KBU7CR
-         vjsYvhPi1ovAiZGQBGCvica94RmCdOUWV4p47hhBrd2mhv/NdkHsTKoYbei7D1okGZDI
-         43YA==
-X-Forwarded-Encrypted: i=1; AJvYcCVLgd6flZrzrHIwlXoEAom5qPVowVtrZJldTyJ/mbFrFwttPyZzZVS7g2zwUVVHtZYeh3II0TDbzMLCcWUApXeruPmjkfKK
-X-Gm-Message-State: AOJu0YzigrlcuWaH9fXL1+1CvKxyC11Q4GZ7SQbTPMzVoYDKGc48KItR
-	L4n+k7iLUDixpZ7PAKEaU0ygpkLxf7rhwwvJerp/M6uI94zThdCW
-X-Google-Smtp-Source: AGHT+IEMXax9TzmzcnyStu4w1MT7WsccQURF7KPvDKKN8gNAYkxWqTVPxY20pbi2VoURpx2/JU0sxA==
-X-Received: by 2002:a17:906:f158:b0:a3d:1458:5e58 with SMTP id gw24-20020a170906f15800b00a3d14585e58mr2228545ejb.46.1707929275854;
-        Wed, 14 Feb 2024 08:47:55 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCU8YtrNjenuTOuCM0oYZNDFSvWMlZ6YQjarJ2gF5TliS4Qgjctw4QduMUlCoWU7dJhd8CdrkKy9HPUCm9o3fasEigbgh97goEvxkvy00IZ+g/1ZJyyEmMY0HAUijumHgg9/WDDWCcAjr29Io5fUHXYlCCqd6vO03S/X5oKKYxigrRm+tqhkrqRY3oqLL2Gt3RBJJV0TQhtmwI9M6I2ZnegWDovLoQm6RosE/sO/mx2YmWkW8a07vqwwdFfj6lCZG+5wTbFr7+bGes9AeRzxp8T+
-Received: from skbuf ([188.25.173.195])
-        by smtp.gmail.com with ESMTPSA id vi16-20020a170907d41000b00a3ce31d3ffdsm2327431ejc.93.2024.02.14.08.47.54
+        d=1e100.net; s=20230601; t=1707929372; x=1708534172;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Rj0aHWVxiSiwAuNoveJS6T0pPxpFlEgeoZZflLMqL+4=;
+        b=ZOUTriPAZwKvpC39ZcRNxaA5cNZoOS1lgdJbiAlvS6RJtM8y2Q0jwEqlyOAZ0DwA4v
+         ExIcVWVpJv/uceiCTkplIzOsO4F2GJod6A7YHXho9qWvlFMN98yeZ78TRAoUzTfOplAK
+         9FbB8ZXnZzWyVmP6FhXmFCX8hAz8hP/UBogOz7EM2pg5strEhGOtuTGeI84ZjuLjQ/56
+         qZ+Ty/8Nw5H5JfjiKcNYRA3GrMcGizoVjC8ZkkSBCqVH8iCPpNR/IMLnEKv7l16FXExf
+         V6Notx8DyY43yIArT1LpQlWZ3+qlSeISUKXSn3+00BFgG8PiZQs5ebQGHwN1ELaZ3zKR
+         BQkw==
+X-Forwarded-Encrypted: i=1; AJvYcCUZCBsJocpbbItQqaAP0hWdVJwKj3YurbwfMsfQmaZV6ZL+9ylNGxm7yL0ypVsuQCJ4NRSppLgJWjOrysAHaOvd1+xKj2oS6iZWfwmTzH5fS1in38RGWDxyUnTIeokENs/zYKzLf6Sr2LdpyyD9nAQCQJOT16qIUXbjnBWIWFsWxqpx0EKxt3X7
+X-Gm-Message-State: AOJu0YzVpbgzawvXhY/EhK8yOCarUu/ZuHioJHkTVh+hZtsXNBRDBm7K
+	f62/k5tak8C7JkNIsBopxMznfRrrnRTcvX15VrlDVtSNe3G4t6bkDFW8dyrq
+X-Google-Smtp-Source: AGHT+IHp+Q5QUi8vR/HrB271uoeEA4LI4MRHiC8PFYlclXVxsFY2+xfCdUHZUB41MAfUEZgGWl43Ew==
+X-Received: by 2002:a17:906:d93c:b0:a3d:605b:f54 with SMTP id rn28-20020a170906d93c00b00a3d605b0f54mr1168319ejb.58.1707929371543;
+        Wed, 14 Feb 2024 08:49:31 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVhELNXmdDEzlFnJsSi+DfnFs0gk+OMs8JD8oJkHtx6EBWitz8GRAmwxjGHtIvUQKsSkj1X59CEAzlNt57dPS8jARjUmWMcVXlZZIbuP467Swv5+GJMrjES9YQkIAhK7SRdmgh6qb5NQR05wU6x/OyF6HECu8XUeIBmzdCjbCVQDzxK1J2CuacYQuYbN7Obx2+dMWUy/6NA892geynj5swVYI+eS3mmQtOQXbpy7BaZMW5hFn1olEO3bDV82gTmPdtXfwitZQu4GFUgPyMhteOUr8wjTgk53H5IYRenr5GJTjXkU4fJfXxRMKmPg8RVwK18NqU6XQ348WjTlvaF7EL9sX9iaeo8T2LQ5EDy4je+ZIt7fjQVktkLZrQ9JuVeXclT1YxqPujTVyIluwO5C/cZ/ZupbuRLoSO/P9em80Wh6D7PUv0PD6INxY4wD+CpxnrPPNzQ5Phlb28ZSv538vKJhn+c8Ueb9xZWxBmNWa/YUiVO7aswnzf+EVP8J9DABneqqjI9qY/X+R7w/QazB3QC7BlMlTp2AmE63dSZR5pa8nYXnn01
+Received: from gmail.com (fwdproxy-lla-000.fbsv.net. [2a03:2880:30ff::face:b00c])
+        by smtp.gmail.com with ESMTPSA id tj3-20020a170907c24300b00a3cf5450b28sm1995938ejc.189.2024.02.14.08.49.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Feb 2024 08:47:55 -0800 (PST)
-Date: Wed, 14 Feb 2024 18:47:53 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Tobias Waldekranz <tobias@waldekranz.com>
-Cc: davem@davemloft.net, kuba@kernel.org, atenart@kernel.org,
-	roopa@nvidia.com, razor@blackwall.org, bridge@lists.linux.dev,
-	netdev@vger.kernel.org, jiri@resnulli.us, ivecera@redhat.com
-Subject: Re: [PATCH v4 net 2/2] net: bridge: switchdev: Ensure deferred event
- delivery on unoffload
-Message-ID: <20240214164753.6ij6ksdgz5ailemv@skbuf>
-References: <20240212191844.1055186-1-tobias@waldekranz.com>
- <20240212191844.1055186-1-tobias@waldekranz.com>
- <20240212191844.1055186-3-tobias@waldekranz.com>
- <20240212191844.1055186-3-tobias@waldekranz.com>
+        Wed, 14 Feb 2024 08:49:31 -0800 (PST)
+Date: Wed, 14 Feb 2024 08:49:28 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	pabeni@redhat.com, Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Andrew Morton <akpm@linux-foundation.org>, weiwan@google.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	horms@kernel.org, Jonathan Corbet <corbet@lwn.net>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+	"open list:TRACING" <linux-trace-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v3] net: dqs: add NIC stall detector based on BQL
+Message-ID: <ZczvGJ90L7689F6J@gmail.com>
+References: <20240202165315.2506384-1-leitao@debian.org>
+ <CANn89iLWWDjp71R7zttfTcEvZEdmcA1qo47oXkAX5DuciYvOtQ@mail.gmail.com>
+ <20240213100457.6648a8e0@kernel.org>
+ <ZczSEBFtq6E6APUJ@gmail.com>
+ <CANn89iJH5jpvBCw8csGux9U10HwM+ewnL1A7udBi6uwAX6VBYA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240212191844.1055186-3-tobias@waldekranz.com>
- <20240212191844.1055186-3-tobias@waldekranz.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iJH5jpvBCw8csGux9U10HwM+ewnL1A7udBi6uwAX6VBYA@mail.gmail.com>
 
-On Mon, Feb 12, 2024 at 08:18:44PM +0100, Tobias Waldekranz wrote:
-> When unoffloading a device, it is important to ensure that all
-> relevant deferred events are delivered to it before it disassociates
-> itself from the bridge.
+On Wed, Feb 14, 2024 at 04:41:36PM +0100, Eric Dumazet wrote:
+> On Wed, Feb 14, 2024 at 3:45 PM Breno Leitao <leitao@debian.org> wrote:
+> >
+> > On Tue, Feb 13, 2024 at 10:04:57AM -0800, Jakub Kicinski wrote:
+> > > On Tue, 13 Feb 2024 14:57:49 +0100 Eric Dumazet wrote:
+> > > > Please note that adding other sysfs entries is expensive for workloads
+> > > > creating/deleting netdev and netns often.
+> > > >
+> > > > I _think_ we should find a way for not creating
+> > > > /sys/class/net/<interface>/queues/tx-{Q}/byte_queue_limits  directory
+> > > > and files
+> > > > for non BQL enabled devices (like loopback !)
+> > >
+> > > We should try, see if anyone screams. We could use IFF_NO_QUEUE, and
+> > > NETIF_F_LLTX as a proxy for "device doesn't have a real queue so BQL
+> > > would be pointless"? Obviously better to annotate the drivers which
+> > > do have BQL support, but there's >50 of them on a quick count..
+> >
+> > Let me make sure I understand the suggestion above. We want to disable
+> > BQL completely for devices that has dev->features & NETIF_F_LLTX or
+> > dev->priv_flags & IFF_NO_QUEUE, right?
+> >
+> > Maybe we can add a ->enabled field in struct dql, and set it according
+> > to the features above. Then we can created the sysfs and process the dql
+> > operations based on that field. This should avoid some unnecessary calls
+> > also, if we are not display sysfs.
+> >
+> > Here is a very simple PoC to represent what I had in mind. Am I in the
+> > right direction?
 > 
-> Before this change, this was true for the normal case when a device
-> maps 1:1 to a net_bridge_port, i.e.
+> No, this was really about sysfs entries (aka dql_group)
 > 
->    br0
->    /
-> swp0
-> 
-> When swp0 leaves br0, the call to switchdev_deferred_process() in
-> del_nbp() makes sure to process any outstanding events while the
-> device is still associated with the bridge.
-> 
-> In the case when the association is indirect though, i.e. when the
-> device is attached to the bridge via an intermediate device, like a
-> LAG...
-> 
->     br0
->     /
->   lag0
->   /
-> swp0
-> 
-> ...then detaching swp0 from lag0 does not cause any net_bridge_port to
-> be deleted, so there was no guarantee that all events had been
-> processed before the device disassociated itself from the bridge.
-> 
-> Fix this by always synchronously processing all deferred events before
-> signaling completion of unoffloading back to the driver.
-> 
-> Fixes: 4e51bf44a03a ("net: bridge: move the switchdev object replay helpers to "push" mode")
-> Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
-> ---
+> Partial patch would be:
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+That is simpler than what I imagined. Thanks!
+
+> diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+> index a09d507c5b03d24a829bf7af0b7cf1e6a0bdb65a..094e3b2d78cca40d810b2fa3bd4393d22b30e6ad
+> 100644
+> --- a/net/core/net-sysfs.c
+> +++ b/net/core/net-sysfs.c
+> @@ -1709,9 +1709,11 @@ static int netdev_queue_add_kobject(struct
+> net_device *dev, int index)
+>                 goto err;
+> 
+>  #ifdef CONFIG_BQL
+> -       error = sysfs_create_group(kobj, &dql_group);
+> -       if (error)
+> -               goto err;
+> +       if (netdev_uses_bql(dev)) {
+
+for netdev_uses_bql(), would it be similar to what I proposed in the
+previous message? Let me copy it here.
+
+	static bool netdev_uses_bql(struct net_device *dev)
+	{
+	       if (dev->features & NETIF_F_LLTX ||
+		   dev->priv_flags & IFF_NO_QUEUE)
+		       return false;
+
+	       return true;
+	}
+
+Thanks
 
