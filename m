@@ -1,230 +1,215 @@
-Return-Path: <netdev+bounces-71822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBEDD85537D
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 20:54:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9008D8553B4
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 21:10:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4550B1F269FF
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 19:54:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B02581C2727E
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 20:10:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6718B13DB81;
-	Wed, 14 Feb 2024 19:54:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F242313DBA5;
+	Wed, 14 Feb 2024 20:10:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="bBAEB9XS"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="j7AHgBTX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A63B113B7B5;
-	Wed, 14 Feb 2024 19:54:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 979B613DBA1;
+	Wed, 14 Feb 2024 20:10:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707940464; cv=none; b=ohNJuvzdL3+6NnRCrPyTKddgeAiyDC0HZG9a1JYO8t0UcFKXg9hXCG566yAalxXo7UJizDuAGsSkhnfbBI0/P1JP0uFTb6Dj1YJrNUx9+JbwBPIo1yuAd7I0zIOoq0eP30aiBvtA97vfUe2smWwwfPY5YWRnNZ1KKu4ordM9XEU=
+	t=1707941410; cv=none; b=M+CIqvJhZPwQkKLY3F1hG5i/fNSusAu1ijddcF1yCio3vU6ZA0fV4quwEritmTlrQHxB8trypME5PaAGAN2u55TSGu4JzTVQtYQgp692IyQxtJnYkNaQ6Fcyg8KvJ9obeYDLXzSCCt9TO3O3v7pzKaNniHwYLbjePqehgsPEmVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707940464; c=relaxed/simple;
-	bh=pX5ktANLCNHhzCAQMMNXkAAqI+3XxyypNCoWVaVyTY8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=svFUrwEcuQFMMfxiIWc3fRUANN4PtLUTfN7jUfGL88B2zn5jJiJ63vcfMnMWl8eAgg9PObyLTE8l3eQBxfqJ+MveJE6fzLdvUzP7K7XEQBI6VqyTdrDoeUWPq1EeW8FLi7ZGuoDA/0LzOX2M/bDLxu8JvF3EoV7Jos6q3dLny9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=bBAEB9XS; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1707940462; x=1739476462;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=m2Q4OpjpGBz9kVmtpoHuc0YezpxFLS/C2T7bgx3/2Rs=;
-  b=bBAEB9XSdyf/bm3bMMwTG6zHY3IWoDdJ3lFiM5HR0biDaYGVZVzl6cmH
-   GldFkoUAhOVgd8nHVkHwhCnOEXtA51tZ3EUwGt+58A+NXu8E9BNV3f32y
-   G3nsI7SEyUUarl+5qNVVOk+KLSXnOA2G7VWoWVAZHjAcxXUC3PjdXuIlK
-   M=;
-X-IronPort-AV: E=Sophos;i="6.06,160,1705363200"; 
-   d="scan'208";a="66063691"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2024 19:54:20 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:1991]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.34.156:2525] with esmtp (Farcaster)
- id b23fa01d-caf8-4308-b77a-06c46f123499; Wed, 14 Feb 2024 19:54:20 +0000 (UTC)
-X-Farcaster-Flow-ID: b23fa01d-caf8-4308-b77a-06c46f123499
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Wed, 14 Feb 2024 19:54:20 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.170.9) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Wed, 14 Feb 2024 19:54:16 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, Mat Martineau
-	<martineau@kernel.org>, Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher
-	<jaka@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>, Tony Lu
-	<tonylu@linux.alibaba.com>, "D . Wythe" <alibuda@linux.alibaba.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, <mptcp@lists.linux.dev>,
-	<linux-s390@vger.kernel.org>, Gerd Bayer <gbayer@linux.ibm.com>
-Subject: [PATCH v2 net-next] net: Deprecate SO_DEBUG and reclaim SOCK_DBG bit.
-Date: Wed, 14 Feb 2024 11:54:07 -0800
-Message-ID: <20240214195407.3175-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+	s=arc-20240116; t=1707941410; c=relaxed/simple;
+	bh=sJ2O1TysiYXzPmk/VbHIkh8RUm4JPVEySfwgSUfKEh0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=lIBu3y3yd+euFe1r2SNcCsQhHn58gDBmGy0s99v+7f/SpZ2iNP8YtsrpL9m4kf7uje9FaYy4uSLizVgKjn1Gm3kwUGOThP8fNox72Fl2DfDeF+iMySnYUjenKFXPmh1DfjrE2lB/rgShDApH5lEtOT1l0L3/UjGMsfny2S9JJZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=j7AHgBTX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A030EC433F1;
+	Wed, 14 Feb 2024 20:10:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1707941410;
+	bh=sJ2O1TysiYXzPmk/VbHIkh8RUm4JPVEySfwgSUfKEh0=;
+	h=From:Date:Subject:To:Cc:From;
+	b=j7AHgBTX0a6tWdO0KqlSsaN0z8fLxw5cZyRPqJz7cPtbbUE3qMx4FNf6jZlLsOTb4
+	 aWUnF4DEi3HFoIgwlQwlDUWIGIEJHUy3tZT4T8H7C8/fL+U5hSOJ/zBQy3urQLuN7p
+	 0dx5qw4w+wC4Lskk26kvmPxZ7teYnwQtJJdfHWxk=
+From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+Date: Wed, 14 Feb 2024 15:09:53 -0500
+Subject: [PATCH] Documentation: update mailing list addresses
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWA002.ant.amazon.com (10.13.139.39) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240214-lf-org-list-migration-v1-1-ef1eab4b1543@linuxfoundation.org>
+X-B4-Tracking: v=1; b=H4sIABAezWUC/x3MPQqAMAxA4atIZgNN66BeRRyKpjXgH6mIULy7x
+ fEN38uQWIUT9FUG5VuSHHsJqiuYFr9HRplLgzW2MZYaXAMeGnGVdOEmUf1VBJrQUqDOk3MOij2
+ Vgzz/dxjf9wN53vMhZwAAAA==
+To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Jonathan Corbet <corbet@lwn.net>, Theodore Ts'o <tytso@mit.edu>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Carlos Bilbao <carlos.bilbao@amd.com>, Avadhut Naik <avadhut.naik@amd.com>
+Cc: virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
+ tech-board-discuss@lists.linux.dev, workflows@vger.kernel.org, 
+ Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+X-Mailer: b4 0.13-dev-b7ccd
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6088;
+ i=konstantin@linuxfoundation.org; h=from:subject:message-id;
+ bh=sJ2O1TysiYXzPmk/VbHIkh8RUm4JPVEySfwgSUfKEh0=;
+ b=owGbwMvMwCW27YjM47CUmTmMp9WSGFLPyimUR0QaHSortdecm9mqZ9h3c++/w8zNOhtuSx5i8
+ 56jxcHSUcrCIMbFICumyFK2L3ZTUOFDD7n0HlOYOaxMIEMYuDgFYCIFDgz/DFWyTx47vfDkThVH
+ W8Olfzhmx6qu5Aq/sHLvg03O/z2TPRkZ/uzpKCwS+7r98cYj/Me5H0iveB3hXq90/72wYtSCAP9
+ jLAA=
+X-Developer-Key: i=konstantin@linuxfoundation.org; a=openpgp;
+ fpr=DE0E66E32F1FDD0902666B96E63EDCA9329DD07E
 
-Recently, commit 8e5443d2b866 ("net: remove SOCK_DEBUG leftovers")
-removed the last users of SOCK_DEBUG(), and commit b1dffcf0da22 ("net:
-remove SOCK_DEBUG macro") removed the macro.
+The mailman2 server running on lists.linuxfoundation.org will be shut
+down in very imminent future. Update all instances of obsolete list
+addresses throughout the tree with their new destinations.
 
-Now is the time to deprecate the oldest socket option.
-
-Note that setsockopt(SO_DEBUG) is moved not to acquire lock_sock().
-
-Reviewed-by: Gerd Bayer <gbayer@linux.ibm.com>
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Signed-off-by: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
 ---
-v2:
-  * Move setsockopt(SO_DEBUG) code not to acquire lock_sock().
-
-v1: https://lore.kernel.org/netdev/20240213223135.85957-1-kuniyu@amazon.com/
+Jon, I am sending this primarily to linux-doc, since most of the changes
+are in Documentation/* and only a handful in MAINTAINERS. I think it
+makes most sense to bubble this up via the docs subsystem.
 ---
- include/net/sock.h  |  1 -
- net/core/sock.c     | 14 +++++++-------
- net/mptcp/sockopt.c |  8 +-------
- net/smc/af_smc.c    |  5 ++---
- 4 files changed, 10 insertions(+), 18 deletions(-)
+ Documentation/ABI/testing/sysfs-bus-vdpa                       | 10 +++++-----
+ Documentation/networking/bridge.rst                            |  2 +-
+ Documentation/process/researcher-guidelines.rst                |  2 +-
+ .../translations/sp_SP/process/researcher-guidelines.rst       |  2 +-
+ MAINTAINERS                                                    |  6 +++---
+ 5 files changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index a9d99a9c583f..e20d55a36f9c 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -909,7 +909,6 @@ enum sock_flags {
- 	SOCK_TIMESTAMP,
- 	SOCK_ZAPPED,
- 	SOCK_USE_WRITE_QUEUE, /* whether to call sk->sk_write_space in sock_wfree */
--	SOCK_DBG, /* %SO_DEBUG setting */
- 	SOCK_RCVTSTAMP, /* %SO_TIMESTAMP setting */
- 	SOCK_RCVTSTAMPNS, /* %SO_TIMESTAMPNS setting */
- 	SOCK_LOCALROUTE, /* route locally only, %SO_DONTROUTE setting */
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 88bf810394a5..c4c406f4742e 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -1115,6 +1115,11 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
+diff --git a/Documentation/ABI/testing/sysfs-bus-vdpa b/Documentation/ABI/testing/sysfs-bus-vdpa
+index 4da53878bff6..2c833b5163f2 100644
+--- a/Documentation/ABI/testing/sysfs-bus-vdpa
++++ b/Documentation/ABI/testing/sysfs-bus-vdpa
+@@ -1,6 +1,6 @@
+ What:		/sys/bus/vdpa/drivers_autoprobe
+ Date:		March 2020
+-Contact:	virtualization@lists.linux-foundation.org
++Contact:	virtualization@lists.linux.dev
+ Description:
+ 		This file determines whether new devices are immediately bound
+ 		to a driver after the creation. It initially contains 1, which
+@@ -12,7 +12,7 @@ Description:
  
- 	/* handle options which do not require locking the socket. */
- 	switch (optname) {
-+	case SO_DEBUG:
-+		/* deprecated, but kept for compatibility */
-+		if (val && !sockopt_capable(CAP_NET_ADMIN))
-+			ret = -EACCES;
-+		return 0;
- 	case SO_PRIORITY:
- 		if ((val >= 0 && val <= 6) ||
- 		    sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) ||
-@@ -1193,12 +1198,6 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
- 	sockopt_lock_sock(sk);
+ What:		/sys/bus/vdpa/driver_probe
+ Date:		March 2020
+-Contact:	virtualization@lists.linux-foundation.org
++Contact:	virtualization@lists.linux.dev
+ Description:
+ 		Writing a device name to this file will cause the kernel binds
+ 		devices to a compatible driver.
+@@ -22,7 +22,7 @@ Description:
  
- 	switch (optname) {
--	case SO_DEBUG:
--		if (val && !sockopt_capable(CAP_NET_ADMIN))
--			ret = -EACCES;
--		else
--			sock_valbool_flag(sk, SOCK_DBG, valbool);
--		break;
- 	case SO_REUSEADDR:
- 		sk->sk_reuse = (valbool ? SK_CAN_REUSE : SK_NO_REUSE);
- 		break;
-@@ -1619,7 +1618,8 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
+ What:		/sys/bus/vdpa/drivers/.../bind
+ Date:		March 2020
+-Contact:	virtualization@lists.linux-foundation.org
++Contact:	virtualization@lists.linux.dev
+ Description:
+ 		Writing a device name to this file will cause the driver to
+ 		attempt to bind to the device. This is useful for overriding
+@@ -30,7 +30,7 @@ Description:
  
- 	switch (optname) {
- 	case SO_DEBUG:
--		v.val = sock_flag(sk, SOCK_DBG);
-+		/* deprecated. */
-+		v.val = 0;
- 		break;
+ What:		/sys/bus/vdpa/drivers/.../unbind
+ Date:		March 2020
+-Contact:	virtualization@lists.linux-foundation.org
++Contact:	virtualization@lists.linux.dev
+ Description:
+ 		Writing a device name to this file will cause the driver to
+ 		attempt to unbind from the device. This may be useful when
+@@ -38,7 +38,7 @@ Description:
  
- 	case SO_DONTROUTE:
-diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
-index da37e4541a5d..31d09009332a 100644
---- a/net/mptcp/sockopt.c
-+++ b/net/mptcp/sockopt.c
-@@ -80,9 +80,6 @@ static void mptcp_sol_socket_sync_intval(struct mptcp_sock *msk, int optname, in
- 		bool slow = lock_sock_fast(ssk);
+ What:		/sys/bus/vdpa/devices/.../driver_override
+ Date:		November 2021
+-Contact:	virtualization@lists.linux-foundation.org
++Contact:	virtualization@lists.linux.dev
+ Description:
+ 		This file allows the driver for a device to be specified.
+ 		When specified, only a driver with a name matching the value
+diff --git a/Documentation/networking/bridge.rst b/Documentation/networking/bridge.rst
+index ba14e7b07869..ef8b73e157b2 100644
+--- a/Documentation/networking/bridge.rst
++++ b/Documentation/networking/bridge.rst
+@@ -324,7 +324,7 @@ Contact Info
+ The code is currently maintained by Roopa Prabhu <roopa@nvidia.com> and
+ Nikolay Aleksandrov <razor@blackwall.org>. Bridge bugs and enhancements
+ are discussed on the linux-netdev mailing list netdev@vger.kernel.org and
+-bridge@lists.linux-foundation.org.
++bridge@lists.linux.dev.
  
- 		switch (optname) {
--		case SO_DEBUG:
--			sock_valbool_flag(ssk, SOCK_DBG, !!val);
--			break;
- 		case SO_KEEPALIVE:
- 			if (ssk->sk_prot->keepalive)
- 				ssk->sk_prot->keepalive(ssk, !!val);
-@@ -183,7 +180,6 @@ static int mptcp_setsockopt_sol_socket_int(struct mptcp_sock *msk, int optname,
- 	case SO_KEEPALIVE:
- 		mptcp_sol_socket_sync_intval(msk, optname, val);
- 		return 0;
--	case SO_DEBUG:
- 	case SO_MARK:
- 	case SO_PRIORITY:
- 	case SO_SNDBUF:
-@@ -329,7 +325,6 @@ static int mptcp_setsockopt_sol_socket(struct mptcp_sock *msk, int optname,
- 	case SO_RCVBUFFORCE:
- 	case SO_MARK:
- 	case SO_INCOMING_CPU:
--	case SO_DEBUG:
- 	case SO_TIMESTAMP_OLD:
- 	case SO_TIMESTAMP_NEW:
- 	case SO_TIMESTAMPNS_OLD:
-@@ -363,6 +358,7 @@ static int mptcp_setsockopt_sol_socket(struct mptcp_sock *msk, int optname,
- 	case SO_WIFI_STATUS:
- 	case SO_NOFCS:
- 	case SO_SELECT_ERR_QUEUE:
-+	case SO_DEBUG: /* deprecated */
- 		return 0;
- 	}
+ The list is open to anyone interested: http://vger.kernel.org/vger-lists.html#netdev
  
-@@ -1458,8 +1454,6 @@ static void sync_socket_options(struct mptcp_sock *msk, struct sock *ssk)
- 		sk_dst_reset(ssk);
- 	}
+diff --git a/Documentation/process/researcher-guidelines.rst b/Documentation/process/researcher-guidelines.rst
+index d159cd4f5e5b..beb484c5965d 100644
+--- a/Documentation/process/researcher-guidelines.rst
++++ b/Documentation/process/researcher-guidelines.rst
+@@ -167,4 +167,4 @@ If no one can be found to internally review patches and you need
+ help finding such a person, or if you have any other questions
+ related to this document and the developer community's expectations,
+ please reach out to the private Technical Advisory Board mailing list:
+-<tech-board@lists.linux-foundation.org>.
++<tech-board@groups.linuxfoundation.org>.
+diff --git a/Documentation/translations/sp_SP/process/researcher-guidelines.rst b/Documentation/translations/sp_SP/process/researcher-guidelines.rst
+index 462b3290b7b8..deccc908a68d 100644
+--- a/Documentation/translations/sp_SP/process/researcher-guidelines.rst
++++ b/Documentation/translations/sp_SP/process/researcher-guidelines.rst
+@@ -147,4 +147,4 @@ Si no se puede encontrar a nadie para revisar internamente los parches y necesit
+ ayuda para encontrar a esa persona, o si tiene alguna otra pregunta relacionada
+ con este documento y las expectativas de la comunidad de desarrolladores, por
+ favor contacte con la lista de correo privada Technical Advisory Board:
+-<tech-board@lists.linux-foundation.org>.
++<tech-board@groups.linuxfoundation.org>.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 73d898383e51..ffdfb311349f 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -14010,7 +14010,7 @@ F:	include/uapi/rdma/mlx5-abi.h
  
--	sock_valbool_flag(ssk, SOCK_DBG, sock_flag(sk, SOCK_DBG));
--
- 	if (inet_csk(sk)->icsk_ca_ops != inet_csk(ssk)->icsk_ca_ops)
- 		tcp_set_congestion_control(ssk, msk->ca_name, false, true);
- 	__tcp_sock_set_cork(ssk, !!msk->cork);
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index 66763c74ab76..062e16a2766a 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -445,7 +445,6 @@ static int smc_bind(struct socket *sock, struct sockaddr *uaddr,
- 			     (1UL << SOCK_LINGER) | \
- 			     (1UL << SOCK_BROADCAST) | \
- 			     (1UL << SOCK_TIMESTAMP) | \
--			     (1UL << SOCK_DBG) | \
- 			     (1UL << SOCK_RCVTSTAMP) | \
- 			     (1UL << SOCK_RCVTSTAMPNS) | \
- 			     (1UL << SOCK_LOCALROUTE) | \
-@@ -511,8 +510,8 @@ static void smc_copy_sock_settings_to_clc(struct smc_sock *smc)
+ MELLANOX MLX5 VDPA DRIVER
+ M:	Dragos Tatulea <dtatulea@nvidia.com>
+-L:	virtualization@lists.linux-foundation.org
++L:	virtualization@lists.linux.dev
+ S:	Supported
+ F:	drivers/vdpa/mlx5/
  
- #define SK_FLAGS_CLC_TO_SMC ((1UL << SOCK_URGINLINE) | \
- 			     (1UL << SOCK_KEEPOPEN) | \
--			     (1UL << SOCK_LINGER) | \
--			     (1UL << SOCK_DBG))
-+			     (1UL << SOCK_LINGER))
-+
- /* copy only settings and flags relevant for smc from clc to smc socket */
- static void smc_copy_sock_settings_to_smc(struct smc_sock *smc)
- {
+@@ -21519,7 +21519,7 @@ F:	tools/testing/selftests/drivers/net/team/
+ TECHNICAL ADVISORY BOARD PROCESS DOCS
+ M:	"Theodore Ts'o" <tytso@mit.edu>
+ M:	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+-L:	tech-board-discuss@lists.linux-foundation.org
++L:	tech-board-discuss@lists.linux.dev
+ S:	Maintained
+ F:	Documentation/process/contribution-maturity-model.rst
+ F:	Documentation/process/researcher-guidelines.rst
+@@ -23078,7 +23078,7 @@ F:	drivers/vfio/pci/mlx5/
+ VFIO VIRTIO PCI DRIVER
+ M:	Yishai Hadas <yishaih@nvidia.com>
+ L:	kvm@vger.kernel.org
+-L:	virtualization@lists.linux-foundation.org
++L:	virtualization@lists.linux.dev
+ S:	Maintained
+ F:	drivers/vfio/pci/virtio
+ 
+
+---
+base-commit: 7e90b5c295ec1e47c8ad865429f046970c549a66
+change-id: 20240214-lf-org-list-migration-0f81f19a1333
+
+Best regards,
 -- 
-2.30.2
+Konstantin Ryabitsev <konstantin@linuxfoundation.org>
 
 
