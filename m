@@ -1,245 +1,303 @@
-Return-Path: <netdev+bounces-71586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A74D08540F9
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 01:55:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ED656854105
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 02:13:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E83628E851
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 00:55:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4AF6028D518
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 01:13:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57C53A31;
-	Wed, 14 Feb 2024 00:54:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EAF38821;
+	Wed, 14 Feb 2024 01:13:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nU0+MDQS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SqRTBBLl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8E7CBA45;
-	Wed, 14 Feb 2024 00:54:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707872084; cv=none; b=JxJS2D1MQIDKJD2NuMk1JexpibEV41fPyk6KEV4ICxj/mAtXLktLPMj35LbkrJPi8wc9KC5QfT4ldUc9K5h0cTmj9SuDOusyCqzqUioAOmuaVlqufgjNGTt5MK/jlXygjmNAIaJWMXvTpayFA8aCBu7F2iVltjb+Ir8xY2lOauw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707872084; c=relaxed/simple;
-	bh=hOaFIyeFEphFhH4pYBV+V5h0EBz50ziLoFCM4ZqhWfU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ODZ8C4Nk7uM9QdbCGoMkreXypYUuqstArOGBOK9/qhLS3c1R0IvLkEtXN2lkENQvGOSEKmYJ7+wa5UInoEVEbYVSmJWKai063uxY3Y+uMQVLtLHV6qaMiUtMYk/aXLPr5YCzrWRmO1SglsVamUHen1WQ/IH5L77vYeqVa7Izi3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nU0+MDQS; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6e0a4823881so2071851b3a.0;
-        Tue, 13 Feb 2024 16:54:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707872082; x=1708476882; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NIKXDBK00dVi+0QWmrTHbh/l72GcdDhpXRjOOpOYJHk=;
-        b=nU0+MDQSL6sZDGWEpqpSr7qZtSgd4mFA64DOpfT+IQ8F2wfW5Y1tgY+wPpVqrhT7lM
-         T2/TynesMAjeQ2Pd3xXmAqKDBhPl1Wr8dtw74GCWEhHn+FSrk2DRY5pvgponGOIc2OGk
-         xEsRciGIsdl7/2EuJa1i/ZNseI8aLzje/ePgzlUvk0ddGZA4G4K4yXiv7gh1iyrM96V0
-         yvFp2DF6NpAZbtbcpzLF7nyBC/UjRXBH91gURp09/csQ9owP0m6Kq5UaektOXRTp0KCj
-         kujS2raiPNLrRIVg5m/F5KsYipcIR71ykKnW995Qjl9qJy1JL785sk0vjKOA35S0kWJm
-         VReg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707872082; x=1708476882;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NIKXDBK00dVi+0QWmrTHbh/l72GcdDhpXRjOOpOYJHk=;
-        b=v5B8+Toe6gmlqlW2Eq4ULcy2y9jy1F+sWayindzQDNvimiqrMoyEq2WthN/wmmeBBL
-         PosQvLxJyLoijOQq2UOuuuxwx1aM5K+zGXbhSr3nAVD0NWJ2wxXeJHS9F8WnsGaps8nW
-         bITgk4fmqBkZVrcf9M6hNaAtWFaaEHBpG5nmD2n3d2/Pp4+QC+7eBkBJK0P+uoNbN+L4
-         ToWQXsTeK6s/z63X6vLkwVCiEvsEqZ0HEmBcztGXaUZ4EbOu3ignAiFEWNDzSsHsFm5i
-         0SxILun3qSpJJiuKKKiwT8LlOTz0KaFFwMOqSlu8chFZw8ONgFq7OhpbeYUFe/FU+va8
-         BSDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVY+rTq8gobwAoVwSg2fhiNvcn+2f827Gyi/0/VE/yWKSLq8qgqyz9nqGmitJcBS84RTcQdFO8WGJNqi41fQG1niJS7Rj6i8Pwj7nYu/r6TLzp7VfPGoG2jib4KlvCBMoGs9ZhOIn7+/w==
-X-Gm-Message-State: AOJu0YzO0+3qfCHUII6WUtx8nC54/9wP+bi5kQQoUX3o4g7omCgb/DmJ
-	OWtVtYCEC8e20FHxVnEf23sOKHYguOQLJ66SEJXVgbZE/uQVCCM7
-X-Google-Smtp-Source: AGHT+IE9249CS1p/Wjj2hfUPTG+PlFRkt8Gmr/jd6ZbSfmuQvzCIgCGbxeUshLdCBmL8AXhCq7M5dg==
-X-Received: by 2002:a05:6a00:2d81:b0:6dd:e398:2a84 with SMTP id fb1-20020a056a002d8100b006dde3982a84mr1103792pfb.7.1707872081909;
-        Tue, 13 Feb 2024 16:54:41 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVornoi0FNm3lIOcWTmePAO9Su7SuL2vx44bdYyxQnKpQSMuSKtXeF4CQ55Rz//zn+tEVJ3BfpH2PSY6kbaPsW64qJzS4+Dqa11lm+SQJfwmeZv/+tXYgkxnZAjB9g++VIuXrgO8yz7OQVT8cNHZ1rCpeaXXhdt613P9/vBwX6X4Ca8aKFYtSI7Ve0787c90rUptFDU8hH8Ql4NFyrvQB8fdmhtWK7cJMCVsNRCuO7DMgf+XOFLvIh6/Xz74n80g+eBqpff9PkWU7JK5hXoq1PtOxK4ZQQ98vf+5/iWmM6GTxFIWEGgwp01YNgd2JupqbIEU/kYWWdISHEyHdnI7p2RVp2Cca7GkSwdMM2nT6pqy0zHzw6UnLtp7uAeAF7ld732W4daj31E9c+7HtaYG44oDRGzO5IOz7tpUVaKUktdZn2L3wONoAoeI1Iv5xtwrzzTRfkLib+jER5jWPA5O7X+X/aSMzwRiy1SutVirpHi/E3n8OXbv2i8W1CkIFA=
-Received: from tresc054937.tre-sc.gov.br ([2804:c:204:200:2be:43ff:febc:c2fb])
-        by smtp.gmail.com with ESMTPSA id q10-20020aa7982a000000b006e094bf05f4sm8005694pfl.213.2024.02.13.16.54.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Feb 2024 16:54:41 -0800 (PST)
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Tue, 13 Feb 2024 21:54:17 -0300
-Subject: [PATCH net-next v3 3/3] net: dsa: realtek: support reset
- controller
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2ED08801
+	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 01:13:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707873214; cv=fail; b=KwtcraFhX3QNg1WIpjFPKw4r2Saoz9OGPcSmhlpuLSOxY1cTvb+MEBl0V/r/pMHwtPtvVURTpZsZl8REaOskqhQ9+4Xq5/aiXTM8SUpaYH52nBSjHQoDoPTY+8ubC+2hSURV/TwCAOw8Nu7oCeZZmQaEvPJEM213AEX5Ig1pXFU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707873214; c=relaxed/simple;
+	bh=VbmOEN7U3J3o14deDley5AijqoTAhXMkg/4gwXbA1qo=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=fMNSi4WQDEtraxQHl2/xAKTrtejOXYvYfcGJXR2rqB0xAT6L3eoysfG8c2vY3QYjo6HVrGE0FoRIp9t/vbNFvnaSEQA1Ep92pADbSogDm4Nz4wKuMZqnQl1KgDOlyhXLOdco1uLTPiAlX6xKPCxyweFfCAfvI1zuUa1X6GCqWC0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SqRTBBLl; arc=fail smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707873213; x=1739409213;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=VbmOEN7U3J3o14deDley5AijqoTAhXMkg/4gwXbA1qo=;
+  b=SqRTBBLlDsqQ/3ww97KbHsGjRMJNCrCtjWw5N1k1KBGLsBGDlJICnGIo
+   4nbAN1zZRsOZLftjF2p/1ZTRq3OMYRoUslNrpDFQroUYL/x4RRBAfuuWx
+   iKdwrFOuB55bhdwgTPx2ryXztkoiYqleERvN9QDGdcxa/DfZziOIpVMaZ
+   LIvc8ezzp5Mnvf1VyUmJn6Eg9jdOYq2XV/pJ6iW+MVzq6TINwvMqesfBm
+   3ZIT9VfV5mI6BEgommlbGmt7P/oSo13IfVTw9QmJnR3MecbArG2lrhWE4
+   yQ911l82iiFGeZuFlRrDrJufXr4A/MQMLRRYfsRWWKNEtJVAGjbXNnXNt
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="1759177"
+X-IronPort-AV: E=Sophos;i="6.06,158,1705392000"; 
+   d="scan'208";a="1759177"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2024 17:13:26 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,158,1705392000"; 
+   d="scan'208";a="7690036"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Feb 2024 17:13:26 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 13 Feb 2024 17:13:25 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 13 Feb 2024 17:13:24 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Tue, 13 Feb 2024 17:13:24 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 13 Feb 2024 17:13:24 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=I15XHaUCFbb1HwhlEeLlJmqScccQiA0v1E1khFq5BYRhYZIm7z+3wFwiTnszUFdvK3KdXKmbIKFtxTlq7UVY9/0YAMb7WZ6ljwtpfA39ILpkBxl/JqYYnrXqGWVGRfhnv8/vrb0Zmr6qP9QgLmGUS4REh7j5TT/jtRu+L9aISwO2k78S9o8fR7QkANwM91BCYCD4Sk4a4nOJwSfse8bh/uXZDzwhK42fhBvWkIPnUUsnFb9ZCGzR0aFrfnq/vzSetB2zhNbMRjrMhbG0FKVIHyV5rNRXPVNOLvohQZmFlWkmJQYmNLlT9GC6+69xw+pMF6fxmbGxovZezgcEHdXKJg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=a0QTmdUIrr+wy2I9Y0egpvLa1QyJsvUvyHdJjUGJ7/g=;
+ b=NmPswVBNxCkG5Cq/bjqYRhsrAuWJ7+KTdcCt7ztyQK2rPYMKsUf2YTa3P7HmGLKGuN67aQQPifj8RjU2bzPW6PUr4vnHRWXqB0hTqBXEwoAOwUCUa4fWn2D9sy+fCfWMyA9n68N28jvRRRbvN2hP2XC6qQbcmyNcHkxDS50lktp4SGG8byYzoj4ks5hiL6jKDazbpXToeJExmjnNHYnwKWAUMBm6VkgYYdEgnTZ64yHlh63pEXiY3I8/wBJZ6C/BCCMS3KEHL31gsPlWnVgRP81H9fQwocIAat6/L/JJ3vtnfIICxdVDXMHhGxUQult/+S00AYfDmcZlhyNQBr5vMg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB4839.namprd11.prod.outlook.com (2603:10b6:510:42::18)
+ by IA1PR11MB6323.namprd11.prod.outlook.com (2603:10b6:208:389::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.39; Wed, 14 Feb
+ 2024 01:13:17 +0000
+Received: from PH0PR11MB4839.namprd11.prod.outlook.com
+ ([fe80::8cc7:6be8:dd32:a9e5]) by PH0PR11MB4839.namprd11.prod.outlook.com
+ ([fe80::8cc7:6be8:dd32:a9e5%4]) with mapi id 15.20.7270.036; Wed, 14 Feb 2024
+ 01:13:17 +0000
+Date: Wed, 14 Feb 2024 09:08:06 +0800
+From: Pengfei Xu <pengfei.xu@intel.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Pavel Begunkov
+	<asml.silence@gmail.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+	<netdev@vger.kernel.org>
+Subject: Re: [PATCH v1 net-next 2/3] af_unix: Remove io_uring code for GC.
+Message-ID: <ZcwSdp8+gWAkXcru@xpf.sh.intel.com>
+References: <20240129190435.57228-1-kuniyu@amazon.com>
+ <20240129190435.57228-3-kuniyu@amazon.com>
+ <Zcl/vQnHoKhZ7m0+@xpf.sh.intel.com>
+ <8eb7c0b3-afc7-4dca-b614-397514a1994b@kernel.dk>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <8eb7c0b3-afc7-4dca-b614-397514a1994b@kernel.dk>
+X-ClientProxiedBy: SG2PR03CA0092.apcprd03.prod.outlook.com
+ (2603:1096:4:7c::20) To PH0PR11MB4839.namprd11.prod.outlook.com
+ (2603:10b6:510:42::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240213-realtek-reset-v3-3-37837e574713@gmail.com>
-References: <20240213-realtek-reset-v3-0-37837e574713@gmail.com>
-In-Reply-To: <20240213-realtek-reset-v3-0-37837e574713@gmail.com>
-To: Linus Walleij <linus.walleij@linaro.org>, 
- =?utf-8?q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
- Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
- Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh+dt@kernel.org>, 
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
- Conor Dooley <conor+dt@kernel.org>, Philipp Zabel <p.zabel@pengutronix.de>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Luiz Angelo Daros de Luca <luizluca@gmail.com>
-X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4326; i=luizluca@gmail.com;
- h=from:subject:message-id; bh=hOaFIyeFEphFhH4pYBV+V5h0EBz50ziLoFCM4ZqhWfU=;
- b=owEBbQGS/pANAwAIAbsR27rRBztWAcsmYgBlzA89+ufvAP4Ps9YpHGyvpsXt5yLU0XYlvyQLQ
- IXybpnxTPuJATMEAAEIAB0WIQQRByhHhc1bOhL6L/i7Edu60Qc7VgUCZcwPPQAKCRC7Edu60Qc7
- VpL3B/97jc0w6iKhquAMcFrpzlFXBQP455yQ28HMDQygCsm1joeSSt7cyE+lZrBskt4XQTBuXzV
- nfoZFBz38ri/2t6nPDicl9DR4UxgeojekHgNOuN9lCtSA1doBTFKFMAOASN/fZwkPsvbMsGUJGk
- Rz0zTOgGrz8btgWLaqJoANL7hBwSAR1lZb8d0bAL51Ej1JvRGqxnjd8N++MD1mzjTDlYSFPUpYD
- OLXSkiK1iGgyh/pdP210EF+b6qLdTd+U0Rs+0PW5Squs2SCIVZW71SEYriswc5/IUldYTyaqzbA
- 3BLb9B9bb8PvViXGmyctnltINiju0GaID5yKsP3xCcznD5HV
-X-Developer-Key: i=luizluca@gmail.com; a=openpgp;
- fpr=1107284785CD5B3A12FA2FF8BB11DBBAD1073B56
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB4839:EE_|IA1PR11MB6323:EE_
+X-MS-Office365-Filtering-Correlation-Id: 83eb88d0-be75-43c0-1033-08dc2cfa2018
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: KTNn0FuX1kRl4miA6RdvaZ9FzQ+qBPAUGcBWg56yf2rw65E1svYWm0+JudFRrHVcDH63QCo16ZY8lW1Wo2EIrKmmuo/jMgzekWQIQbwzjDQvgHF4AE9rVX/DMF1KWCGaF7Pea8VddrpbEWm8qdpTZbqCudX1EhdNA/gBJhpOB0IpNS1iD+I7bquN79i+qkl0IzYsboLhFRQPAL5zUYtQtygU72zgUJjuP71mpS0tKYoxWVtaibVDCkHlEhzgkbrzBFARL5Ru4E0uq8Tks2WR8v/chnCeSLELOCrcIFWTR8PUK4GiFLOaRlhKRl+W9+EUHbcDtzT+9WrIAR+br4Trj9A1vthdgO1hzGwc/ly5k5Dczx2/YU2t8L9IKrZ+ClXCXS3/zdZeEnidRSJWhcfhDcaDDKwvbVE/iSc7wTbjt+0M5xsftU29+Tpjuf+ve/RryU758HfBFe4rQ1J7q0jql3wo9OoqSAmAPmDoGGFPs1VBSy7rzQIoA0Q5Sud4zjHTodFh9xzakwIVoVPMd+DvfqkIEAd+1hJrH+5flbP5571/VQuxztBe/ASBXhqhExAU
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4839.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(136003)(366004)(346002)(396003)(230922051799003)(230273577357003)(64100799003)(451199024)(1800799012)(186009)(2906002)(44832011)(478600001)(41300700001)(83380400001)(53546011)(6506007)(6916009)(66556008)(6512007)(6486002)(4326008)(8676002)(66476007)(5660300002)(66946007)(8936002)(26005)(6666004)(54906003)(316002)(38100700002)(82960400001)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?+YeRM8eHGKBa3/1NihUh3qUGSPwMAqjn7uqKyY0uvIgm/PRFej3zlSESFoeW?=
+ =?us-ascii?Q?e2JGdwkYoycRz2BWEDRO7h4xdgHrZyFkyT4AqXTmQyDV6TKrn9lK6hjnbfgd?=
+ =?us-ascii?Q?arMHXR9eSBJfbM4vbmWRHpk+e+4IEVQ5huCSdmhTbyMoipJKebkzFqkSwIfR?=
+ =?us-ascii?Q?vN4u5WwIyuvZQJqYp0cixZv5u2CdmH6edYymWeZx5WNlrPdasGBCy1dVHWcQ?=
+ =?us-ascii?Q?FENoDrkEgB2qY640HA8r0iBGWuD1o/ZSapjp7tnR+9XRvQM92/ruAzaDLlwY?=
+ =?us-ascii?Q?LJyEEiqw09/8zEFCn1VfBCQaL6RH7FtQITpITNtrAuBUxNITAf2RWQ1ZgHk5?=
+ =?us-ascii?Q?EaCdh18j/H0pB1awqpLsv2ESn/Ir6jfKqhNzWl51CbBqFmNt51q3Tg1qJU3Z?=
+ =?us-ascii?Q?y7v3G7cRz78frEJ0LFmS/bejsMG6Yb6Y+mbogngWonZ1srB10xGyKwVetJr/?=
+ =?us-ascii?Q?3o77CNsICURSVclaevDI/hy2jwYUe4hx2/7DYHDs76esY6swznnF0Q1Ybl5a?=
+ =?us-ascii?Q?jG0g1i0NsJCydbdBCtgNlrgT/G5FaJ324v5GauPngvpvBBy7QTQamfd9yOz0?=
+ =?us-ascii?Q?bIcb5jYueFjC5MYPxpZLSYDsDtCDH/1Bfjdv4iOdV26JIRe/pyL5Mpf9GXzL?=
+ =?us-ascii?Q?HLXf4SlRHjPb/R0TSkqJsd/dp4Jf+Vbn4y4YgLet9P6Re5jqA0pIVfi/6Hy/?=
+ =?us-ascii?Q?fzTUvV2WP0+hJqE9Y2AJtoc86DAN5YarhXG98bhPHRmWvI6ApOoaVRzJ/HgV?=
+ =?us-ascii?Q?wdbRV7xDn5z3DGg5UsvO4rH0gvA9pxMFaicqSCXAQfMR6xagQAiEJoul2H0b?=
+ =?us-ascii?Q?4e/0NEkeVoDt8m0RW26PdY6eLIofVR4zP0ZnelDCb2a0jDqR4PHVxfrz6uXo?=
+ =?us-ascii?Q?2u/pdXTeXhtHxh0VwWSKnUSc7z/+M4BK6OP+0XGA6+puH/c+JT16yKk0HNkW?=
+ =?us-ascii?Q?nJ9cYUVEMOGFMEaa+rsVuoKrkc/YCcru27dx8fNXyCjD5rWt0GobCtSoCz2e?=
+ =?us-ascii?Q?U7sJhEj38O4E/75Mt+gFe2E4H83LmGx3Fst9u/BAJ1qUkxgkO07Q0+SoAuTW?=
+ =?us-ascii?Q?7/tdYUztAgeoe4csgK8ompsyMwCIoD6SWx1muj5/gg4wTgoru0FxqRXy6fh6?=
+ =?us-ascii?Q?0vfy6FN2or/gJYIZvZyK3/q3pNbEh65L7cXLzzmuJvYjzOtIJ935qP/vhx36?=
+ =?us-ascii?Q?IlJ/qCzV5BgkAOx5Ja3AFv86mSKf7bA4Mk61R8J3OvHXrSYJYTguUHSnkSnX?=
+ =?us-ascii?Q?lCSMLTrVdW03lzTMycQLGIrD+rQNGD6cHgNpSElFqiLPbX2Z//vzhiUwHR9k?=
+ =?us-ascii?Q?DxxT9HJtMiLFen0D2G7RqpC4jk/tjS02g6Sf/CHswv5T3qpLicEY/K/y60av?=
+ =?us-ascii?Q?wvKokbpQ6DCvA4AO8g1EHBu9GrobmdbpjvsNLA1r6/qdSlhamFXfhk+UDzY8?=
+ =?us-ascii?Q?Mqsot4EbvhVP8hjLdTkUAKiB1uwxOEd7rReRN3kbX0NaCJeUzjo431B8enMV?=
+ =?us-ascii?Q?Q9KJprNiv9orxe0W0+lxbfaAC1cwKP8zFj3+elgNOupzG67bWKgvczA7at/b?=
+ =?us-ascii?Q?qaLslNZWnl5IbRANyC8K7F57dcFWgbX0rh0j4lJy?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 83eb88d0-be75-43c0-1033-08dc2cfa2018
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4839.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Feb 2024 01:13:17.2662
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BWLg5MEyskWiIKhP+e9M4OqTe662YwTBwHvIyY3M2nRkOpHpn1jQXBzfgMXl3fEeKpEcTCSTtgQXD0bj6YvJWg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6323
+X-OriginatorOrg: intel.com
 
-The 'reset-gpios' will not work when the switch reset is controlled by a
-reset controller.
+Hi Jens Axboe,
 
-Although the reset is optional and the driver performs a soft reset
-during setup, if the initial reset state was asserted, the driver will
-not detect it.
+On 2024-02-12 at 10:47:20 -0700, Jens Axboe wrote:
+> On 2/11/24 7:17 PM, Pengfei Xu wrote:
+> > Hi,
+> > 
+> > On 2024-01-29 at 11:04:34 -0800, Kuniyuki Iwashima wrote:
+> >> Since commit 705318a99a13 ("io_uring/af_unix: disable sending
+> >> io_uring over sockets"), io_uring's unix socket cannot be passed
+> >> via SCM_RIGHTS, so it does not contribute to cyclic reference and
+> >> no longer be candidate for garbage collection.
+> >>
+> >> Also, commit 6e5e6d274956 ("io_uring: drop any code related to
+> >> SCM_RIGHTS") cleaned up SCM_RIGHTS code in io_uring.
+> >>
+> >> Let's do it in AF_UNIX as well by reverting commit 0091bfc81741
+> >> ("io_uring/af_unix: defer registered files gc to io_uring release")
+> >> and commit 10369080454d ("net: reclaim skb->scm_io_uring bit").
+> >>
+> >> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> >> ---
+> >>  include/net/af_unix.h |  1 -
+> >>  net/unix/garbage.c    | 25 ++-----------------------
+> >>  net/unix/scm.c        |  6 ------
+> >>  3 files changed, 2 insertions(+), 30 deletions(-)
+> >>
+> >> diff --git a/include/net/af_unix.h b/include/net/af_unix.h
+> >> index f045bbd9017d..9e39b2ec4524 100644
+> >> --- a/include/net/af_unix.h
+> >> +++ b/include/net/af_unix.h
+> >> @@ -20,7 +20,6 @@ static inline struct unix_sock *unix_get_socket(struct file *filp)
+> >>  void unix_inflight(struct user_struct *user, struct file *fp);
+> >>  void unix_notinflight(struct user_struct *user, struct file *fp);
+> >>  void unix_destruct_scm(struct sk_buff *skb);
+> >> -void io_uring_destruct_scm(struct sk_buff *skb);
+> >>  void unix_gc(void);
+> >>  void wait_for_unix_gc(struct scm_fp_list *fpl);
+> >>  struct sock *unix_peer_get(struct sock *sk);
+> >> diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+> >> index af676bb8fb67..ce5b5f87b16e 100644
+> >> --- a/net/unix/garbage.c
+> >> +++ b/net/unix/garbage.c
+> >> @@ -184,12 +184,10 @@ static bool gc_in_progress;
+> >>  
+> >>  static void __unix_gc(struct work_struct *work)
+> >>  {
+> >> -	struct sk_buff *next_skb, *skb;
+> >> -	struct unix_sock *u;
+> >> -	struct unix_sock *next;
+> >>  	struct sk_buff_head hitlist;
+> >> -	struct list_head cursor;
+> >> +	struct unix_sock *u, *next;
+> >>  	LIST_HEAD(not_cycle_list);
+> >> +	struct list_head cursor;
+> >>  
+> >>  	spin_lock(&unix_gc_lock);
+> >>  
+> >> @@ -269,30 +267,11 @@ static void __unix_gc(struct work_struct *work)
+> >>  
+> >>  	spin_unlock(&unix_gc_lock);
+> >>  
+> >> -	/* We need io_uring to clean its registered files, ignore all io_uring
+> >> -	 * originated skbs. It's fine as io_uring doesn't keep references to
+> >> -	 * other io_uring instances and so killing all other files in the cycle
+> >> -	 * will put all io_uring references forcing it to go through normal
+> >> -	 * release.path eventually putting registered files.
+> >> -	 */
+> >> -	skb_queue_walk_safe(&hitlist, skb, next_skb) {
+> >> -		if (skb->destructor == io_uring_destruct_scm) {
+> >> -			__skb_unlink(skb, &hitlist);
+> >> -			skb_queue_tail(&skb->sk->sk_receive_queue, skb);
+> >> -		}
+> >> -	}
+> >> -
+> >>  	/* Here we are. Hitlist is filled. Die. */
+> >>  	__skb_queue_purge(&hitlist);
+> >>  
+> >>  	spin_lock(&unix_gc_lock);
+> >>  
+> >> -	/* There could be io_uring registered files, just push them back to
+> >> -	 * the inflight list
+> >> -	 */
+> >> -	list_for_each_entry_safe(u, next, &gc_candidates, link)
+> >> -		list_move_tail(&u->link, &gc_inflight_list);
+> >> -
+> >>  	/* All candidates should have been detached by now. */
+> >>  	WARN_ON_ONCE(!list_empty(&gc_candidates));
+> >>  
+> >> diff --git a/net/unix/scm.c b/net/unix/scm.c
+> >> index 505e56cf02a2..db65b0ab5947 100644
+> >> --- a/net/unix/scm.c
+> >> +++ b/net/unix/scm.c
+> >> @@ -148,9 +148,3 @@ void unix_destruct_scm(struct sk_buff *skb)
+> >>  	sock_wfree(skb);
+> >>  }
+> >>  EXPORT_SYMBOL(unix_destruct_scm);
+> >> -
+> >> -void io_uring_destruct_scm(struct sk_buff *skb)
+> >> -{
+> >> -	unix_destruct_scm(skb);
+> >> -}
+> >> -EXPORT_SYMBOL(io_uring_destruct_scm);
+> > 
+> > Syzkaller found below issue.
+> > There is WARNING in __unix_gc in v6.8-rc3_internal-devel_hourly-20240205-094544,
+> > the kernel contains kernel-next patches.
+> > 
+> > Bisected and found first bad commit:
+> > "
+> > 11498715f266 af_unix: Remove io_uring code for GC.
+> > "
+> > It's the same patch as above.
+> 
+> It should be fixed by:
+> 
+> commit 1279f9d9dec2d7462823a18c29ad61359e0a007d
+> Author: Kuniyuki Iwashima <kuniyu@amazon.com>
+> Date:   Sat Feb 3 10:31:49 2024 -0800
+> 
+>     af_unix: Call kfree_skb() for dead unix_(sk)->oob_skb in GC.
+> 
+> which is in Linus's tree.
 
-The reset controller will take precedence over the reset GPIO.
+Thank you for the commit tip for the fix. This is indeed the same problem and
+has been fixed.
+I will check the community mail carefully next time to avoid reporting
+duplicate problems.
 
-Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
----
- drivers/net/dsa/realtek/realtek.h |  2 ++
- drivers/net/dsa/realtek/rtl83xx.c | 52 +++++++++++++++++++++++++++++++++++----
- drivers/net/dsa/realtek/rtl83xx.h |  2 ++
- 3 files changed, 51 insertions(+), 5 deletions(-)
+Best Regards,
+Thanks!
 
-diff --git a/drivers/net/dsa/realtek/realtek.h b/drivers/net/dsa/realtek/realtek.h
-index b80bfde1ad04..e0b1aa01337b 100644
---- a/drivers/net/dsa/realtek/realtek.h
-+++ b/drivers/net/dsa/realtek/realtek.h
-@@ -12,6 +12,7 @@
- #include <linux/platform_device.h>
- #include <linux/gpio/consumer.h>
- #include <net/dsa.h>
-+#include <linux/reset.h>
- 
- #define REALTEK_HW_STOP_DELAY		25	/* msecs */
- #define REALTEK_HW_START_DELAY		100	/* msecs */
-@@ -48,6 +49,7 @@ struct rtl8366_vlan_4k {
- 
- struct realtek_priv {
- 	struct device		*dev;
-+	struct reset_control    *reset_ctl;
- 	struct gpio_desc	*reset;
- 	struct gpio_desc	*mdc;
- 	struct gpio_desc	*mdio;
-diff --git a/drivers/net/dsa/realtek/rtl83xx.c b/drivers/net/dsa/realtek/rtl83xx.c
-index 801873754df2..3d1f541936b8 100644
---- a/drivers/net/dsa/realtek/rtl83xx.c
-+++ b/drivers/net/dsa/realtek/rtl83xx.c
-@@ -184,6 +184,13 @@ rtl83xx_probe(struct device *dev,
- 						    "realtek,disable-leds");
- 
- 	/* TODO: if power is software controlled, set up any regulators here */
-+	priv->reset_ctl = devm_reset_control_get_optional(dev, NULL);
-+	if (IS_ERR(priv->reset_ctl)) {
-+		ret = PTR_ERR(priv->reset_ctl);
-+		dev_err_probe(dev, ret, "failed to get reset control\n");
-+		return ERR_CAST(priv->reset_ctl);
-+	}
-+
- 	priv->reset = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_LOW);
- 	if (IS_ERR(priv->reset)) {
- 		dev_err(dev, "failed to get RESET GPIO\n");
-@@ -192,11 +199,11 @@ rtl83xx_probe(struct device *dev,
- 
- 	dev_set_drvdata(dev, priv);
- 
--	if (priv->reset) {
--		gpiod_set_value(priv->reset, 1);
-+	if (priv->reset_ctl || priv->reset) {
-+		rtl83xx_reset_assert(priv);
- 		dev_dbg(dev, "asserted RESET\n");
- 		msleep(REALTEK_HW_STOP_DELAY);
--		gpiod_set_value(priv->reset, 0);
-+		rtl83xx_reset_deassert(priv);
- 		msleep(REALTEK_HW_START_DELAY);
- 		dev_dbg(dev, "deasserted RESET\n");
- 	}
-@@ -292,11 +299,46 @@ EXPORT_SYMBOL_NS_GPL(rtl83xx_shutdown, REALTEK_DSA);
- void rtl83xx_remove(struct realtek_priv *priv)
- {
- 	/* leave the device reset asserted */
--	if (priv->reset)
--		gpiod_set_value(priv->reset, 1);
-+	rtl83xx_reset_assert(priv);
- }
- EXPORT_SYMBOL_NS_GPL(rtl83xx_remove, REALTEK_DSA);
- 
-+void rtl83xx_reset_assert(struct realtek_priv *priv)
-+{
-+	int ret;
-+
-+	if (priv->reset_ctl) {
-+		ret = reset_control_assert(priv->reset_ctl);
-+		if (!ret)
-+			return;
-+
-+		dev_warn(priv->dev,
-+			 "Failed to assert the switch reset control: %pe\n",
-+			 ERR_PTR(ret));
-+	}
-+
-+	if (priv->reset)
-+		gpiod_set_value(priv->reset, true);
-+}
-+
-+void rtl83xx_reset_deassert(struct realtek_priv *priv)
-+{
-+	int ret;
-+
-+	if (priv->reset_ctl) {
-+		ret = reset_control_deassert(priv->reset_ctl);
-+		if (!ret)
-+			return;
-+
-+		dev_warn(priv->dev,
-+			 "Failed to deassert the switch reset control: %pe\n",
-+			 ERR_PTR(ret));
-+	}
-+
-+	if (priv->reset)
-+		gpiod_set_value(priv->reset, false);
-+}
-+
- MODULE_AUTHOR("Luiz Angelo Daros de Luca <luizluca@gmail.com>");
- MODULE_AUTHOR("Linus Walleij <linus.walleij@linaro.org>");
- MODULE_DESCRIPTION("Realtek DSA switches common module");
-diff --git a/drivers/net/dsa/realtek/rtl83xx.h b/drivers/net/dsa/realtek/rtl83xx.h
-index 0ddff33df6b0..c8a0ff8fd75e 100644
---- a/drivers/net/dsa/realtek/rtl83xx.h
-+++ b/drivers/net/dsa/realtek/rtl83xx.h
-@@ -18,5 +18,7 @@ int rtl83xx_register_switch(struct realtek_priv *priv);
- void rtl83xx_unregister_switch(struct realtek_priv *priv);
- void rtl83xx_shutdown(struct realtek_priv *priv);
- void rtl83xx_remove(struct realtek_priv *priv);
-+void rtl83xx_reset_assert(struct realtek_priv *priv);
-+void rtl83xx_reset_deassert(struct realtek_priv *priv);
- 
- #endif /* _RTL83XX_H */
-
--- 
-2.43.0
-
+> 
+> -- 
+> Jens Axboe
+> 
 
