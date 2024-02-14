@@ -1,180 +1,126 @@
-Return-Path: <netdev+bounces-71708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B994854CEE
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 16:34:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55B72854D0C
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 16:39:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 704311C27A47
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 15:34:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13896281CBC
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 15:39:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFAD25D8E7;
-	Wed, 14 Feb 2024 15:34:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BACA5D723;
+	Wed, 14 Feb 2024 15:39:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="icQpm+WR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dlx3Kdn8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 677E95C911;
-	Wed, 14 Feb 2024 15:34:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2F015CDC9;
+	Wed, 14 Feb 2024 15:38:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707924861; cv=none; b=l5dbOGSG6VkEyU/Qlst8WBfMdlavVZeDDn8NpQ9VjTTX7r1inSoOEWST5NX9Kdlyy1jG6ZcHv2WjZPqBN8YRczvr9X7/eEJ9Hv/zA22aEwJpr5rYO98EbJFtMiZaUs//5S0Xhukt6kCRZW6EWJ0q1rKLf4MyMU8nwTGtAyeBloM=
+	t=1707925141; cv=none; b=SjwJDmS7U3UVcRDa3uiaia1H/Hndcl5/9hGWBUkjWlyUfHCALq8hs+0N7axs/EUqpWqaTUTOH2b2NQCmzGe7f7TDX31duacW2ORd9uzr03NYwkrj9734OYtOXqD7W3xFuVeoSRb9aMPiuriI6cq3Xz0ifi6+xvq96sXJWk+qBcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707924861; c=relaxed/simple;
-	bh=RKBYgy5uDM/vBCiN9tBiPR2VpHrXnY5fjxo9XKnCKHs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OPpBQIPzdhETCMZWjvAcYR/1GtygqJBmxmgMNPy5VjB8Sm5Q5pc6CGT6xiVr3pbgJr12y4gTL7tHVoeNeet6U6ukd0LZSlwreNDOyjAwxxHwjiMvWVArzlFmwOp6ZYrd8Rt2hudaYOTQfrAaoPArWQPVPFtigeVhP/ZrvNRMSkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=icQpm+WR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FB29C433C7;
-	Wed, 14 Feb 2024 15:34:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1707924860;
-	bh=RKBYgy5uDM/vBCiN9tBiPR2VpHrXnY5fjxo9XKnCKHs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=icQpm+WRIBCwFmc6GMZyzD7hfrgvougrzlFkQQkENhX2hhFv4tKvrybec2LZPF0p2
-	 g4w+i5vJ2cylBctHyW7nrVqW6KPr/tAxRaWjizo57DBTGi3DOfHaFJKv8GA3osWQx5
-	 zkW+b+wjJITdz0ojCZY2Ccjx1teFWK8MymvaLyFA=
-Date: Wed, 14 Feb 2024 16:34:17 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Bjorn Andersson <andersson@kernel.org>, Kalle Valo <kvalo@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Chris Morgan <macromorgan@hotmail.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	=?iso-8859-1?Q?N=EDcolas_F_=2E_R_=2E_A_=2E?= Prado <nfraprado@collabora.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Peng Fan <peng.fan@nxp.com>, Robert Richter <rrichter@amd.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Terry Bowman <terry.bowman@amd.com>, Lukas Wunner <lukas@wunner.de>,
-	Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>,
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
-	Abel Vesa <abel.vesa@linaro.org>, linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: Re: Re: [PATCH 4/9] PCI: create platform devices for child OF
- nodes of the port node
-Message-ID: <2024021413-grumbling-unlivable-c145@gregkh>
-References: <20240117160748.37682-1-brgl@bgdev.pl>
- <20240117160748.37682-5-brgl@bgdev.pl>
- <2024011707-alibi-pregnancy-a64b@gregkh>
- <CAMRc=Mef7wxRccnfQ=EDLckpb1YN4DNLoC=AYL8v1LLJ=uFH2Q@mail.gmail.com>
- <2024011836-wok-treadmill-c517@gregkh>
- <d2he3ufg6m46zos4swww4t3peyq55blxhirsx37ou37rwqxmz2@5khumvic62je>
- <CAMRc=MeXJjpJhDjyn_P-SGo4rDnEuT9kGN5jAbRcuM_c7_aDzQ@mail.gmail.com>
- <oiwvcvu6wdmpvhss3t7uaqkl5q73mki5pz6liuv66bap4dr2mp@jtjjwzlvt6za>
- <CAMRc=McT8wt6UbKtyofkJo3WcyJ-S4d2MPp8oZmjWbX6LGbETQ@mail.gmail.com>
- <CAMRc=MeWgp27YcS=-dbYdN1is1MEuZ2ar=pW_p9oY0Nf1EbFHA@mail.gmail.com>
+	s=arc-20240116; t=1707925141; c=relaxed/simple;
+	bh=j9jvXH0vsZH1F67chvjpprea3OfhpV6nIJl3B4ccIIY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=haAOukt+HlvI6atltG2cO2BU1NJhJ+rac3eW2+SufMkp5ki3RMTh71LuNyoxal6jgoo7hzRlk6DoS3+nwf8HQEBTA7D4qDeYrjUxJO6dn90QgblskZ/9X5a+NVRII9ywqDMYoeROlpw5W0MhknWRC8dtRFeSfJ/cG4JEsLQVNVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dlx3Kdn8; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707925139; x=1739461139;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=j9jvXH0vsZH1F67chvjpprea3OfhpV6nIJl3B4ccIIY=;
+  b=dlx3Kdn8fse6qckoACTj92+ZxDnKNxTTFxdEEeJyaSaXMDNAf7cdihvP
+   S4+0CAIF0gFlk6VqzlvPuQ/n8T/OHGqDHMcvRNZf1lADEjXG49mQr+U6A
+   XFFmiQMLAkWEox6QhIhRv4Iu/Ne9thKEPUJf3bzB+k7TkGIy6yP0Ug9rL
+   yIp0nPPIBPhPOJxN1Hsu6kM6F9yolIVW2MIBX2DZrFVF5F7N23UL00Vmj
+   dlNxC6hjulEBY9n5bNBPoymoMV0Ww78C0VA4wDoH10Wl7G/wQ/QeO7LSG
+   A0N/cj5gqOCRhVPCG5HxtR1hcnWS0edV2R1fZJg/WTS6Z8NQ3rj7Wxsiy
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10984"; a="2118380"
+X-IronPort-AV: E=Sophos;i="6.06,159,1705392000"; 
+   d="scan'208";a="2118380"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2024 07:38:58 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,159,1705392000"; 
+   d="scan'208";a="34281480"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by fmviesa001.fm.intel.com with ESMTP; 14 Feb 2024 07:38:56 -0800
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH bpf-next] bpf/test_run: increase Page Pool's ptr_ring size in live frames mode
+Date: Wed, 14 Feb 2024 16:38:38 +0100
+Message-ID: <20240214153838.4159970-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMRc=MeWgp27YcS=-dbYdN1is1MEuZ2ar=pW_p9oY0Nf1EbFHA@mail.gmail.com>
 
-On Wed, Feb 07, 2024 at 05:32:38PM +0100, Bartosz Golaszewski wrote:
-> On Fri, Feb 2, 2024 at 11:02 AM Bartosz Golaszewski <brgl@bgdev.pl> wrote:
-> >
-> > On Fri, Feb 2, 2024 at 1:03 AM Bjorn Andersson <andersson@kernel.org> wrote:
-> > >
-> >
-> > [snip]
-> >
-> > > > >
-> > > > > I believe I missed this part of the discussion, why does this need to be
-> > > > > a platform_device? What does the platform_bus bring that can't be
-> > > > > provided by some other bus?
-> > > > >
-> > > >
-> > > > Does it need to be a platform_device? No, of course not. Does it make
-> > > > sense for it to be one? Yes, for two reasons:
-> > > >
-> > > > 1. The ATH11K WLAN module is represented on the device tree like a
-> > > > platform device, we know it's always there and it consumes regulators
-> > > > from another platform device. The fact it uses PCIe doesn't change the
-> > > > fact that it is logically a platform device.
-> > >
-> > > Are you referring to the ath11k SNOC (firmware running on co-processor
-> > > in the SoC) variant?
-> > >
-> > > Afaict the PCIe-attached ath11k is not represented as a platform_device
-> > > in DeviceTree.
-> > >
-> >
-> > My bad. In RB5 it isn't (yet - I want to add it in the power
-> > sequencing series). It is in X13s though[1].
-> >
-> > > Said platform_device is also not a child under the PCIe bus, so this
-> > > would be a different platform_device...
-> > >
-> >
-> > It's the child of the PCIe port node but there's a reason for it to
-> > have the `compatible` property. It's because it's an entity of whose
-> > existence we are aware before the system boots.
-> >
-> > > > 2. The platform bus already provides us with the entire infrastructure
-> > > > that we'd now need to duplicate (possibly adding bugs) in order to
-> > > > introduce a "power sequencing bus".
-> > > >
-> > >
-> > > This is a perfectly reasonable desire. Look at our PMICs, they are full
-> > > of platform_devices. But through the years it's been said many times,
-> > > that this is not a valid or good reason for using platform_devices, and
-> > > as a result we have e.g. auxiliary bus.
-> > >
-> >
-> > Ok, so I cannot find this information anywhere (nor any example). Do
-> > you happen to know if the auxiliary bus offers any software node
-> > integration so that the `compatible` property from DT can get
-> > seamlessly mapped to auxiliary device IDs?
-> >
-> 
-> So I was just trying to port this to using the auxiliary bus, only to
-> find myself literally reimplementing functions from
-> drivers/of/device.c. I have a feeling that this is simply wrong. If
-> we're instantiating devices well defined on the device-tree then IMO
-> we *should* make them platform devices. Anything else and we'll be
-> reimplementing drivers/of/ because we will need to parse the device
-> nodes, check the compatible, match it against drivers etc. Things that
-> are already implemented for the platform bus and of_* APIs.
-> 
-> Greg: Could you chime in and confirm that it's alright to use the
-> platform bus here? Or maybe there is some infrastructure to create
-> auxiliary devices from software nodes?
+Currently, when running xdp-trafficgen, test_run creates page_pools with
+the ptr_ring size of %NAPI_POLL_WEIGHT (64).
+This might work fine if XDP Tx queues are polled with the budget
+limitation. However, we often clear them with no limitation to ensure
+maximum free space when sending.
+For example, in ice and idpf (upcoming), we use "lazy" cleaning, i.e. we
+clean XDP Tx queue only when the free space there is less than 1/4 of
+the queue size. Let's take the ring size of 512 just as an example. 3/4
+of the ring is 384 and often times, when we're entering the cleaning
+function, we have this whole amount ready (or 256 or 192, doesn't
+matter).
+Then we're calling xdp_return_frame_bulk() and after 64th frame,
+page_pool_put_page_bulk() starts returning pages to the page allocator
+due to that the ptr_ring is already full. put_page(), alloc_page() et at
+starts consuming a ton of CPU time and leading the board of the perf top
+output.
 
-Note, I HATE the use of the platform bus here, but I don't have a better
-suggestion.
+Let's not limit ptr_ring to 64 for no real reason and allow more pages
+to be recycled. Just don't put anything to page_pool_params::size and
+let the Page Pool core pick the default of 1024 entries (I don't believe
+there are real use cases to clean more than that amount of descriptors).
+After the change, the MM layer disappears from the perf top output and
+all pages get recycled to the PP. On my test setup on idpf with the
+default ring size (512), this gives +80% of Tx performance with no
+visible memory consumption increase.
 
-I'd love for the auxbus to work, and if you can create that from
-software nodes, all the better!  But I don't think that's possible just
-yet, and you would end up implementing all the same stuff that the
-platform bus has today for this functionality, so I doubt it would be
-worth it.
+Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+---
+ net/bpf/test_run.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-thanks,
+diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
+index dfd919374017..1ad4f1ddcb88 100644
+--- a/net/bpf/test_run.c
++++ b/net/bpf/test_run.c
+@@ -163,7 +163,6 @@ static int xdp_test_run_setup(struct xdp_test_data *xdp, struct xdp_buff *orig_c
+ 	struct page_pool_params pp_params = {
+ 		.order = 0,
+ 		.flags = 0,
+-		.pool_size = xdp->batch_size,
+ 		.nid = NUMA_NO_NODE,
+ 		.init_callback = xdp_test_run_init_page,
+ 		.init_arg = xdp,
+-- 
+2.43.0
 
-greg k-h
 
