@@ -1,150 +1,145 @@
-Return-Path: <netdev+bounces-71640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 226C885452F
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 10:29:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE9E685452D
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 10:28:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9B2E1F2AC01
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 09:29:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69E6A286351
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 09:28:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C501428A;
-	Wed, 14 Feb 2024 09:28:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F3EF12B99;
+	Wed, 14 Feb 2024 09:28:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="OF2YRymp"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="I3MEEXdc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E3012B61;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B81E12B69;
 	Wed, 14 Feb 2024 09:28:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707902908; cv=none; b=bntmwhp5zppDUfocH2APDERAsD8nvHqrOlq8ou8JZHiPEYk67IUbnagjr6ipwwNptD+NQN2a02WR4Z5RXeTHc25K8AcWpbQmiCHLeiHPjztQub3LoZFzJIWlpJwzFj5cJl76kA/Db1aIABi8KYbhtxQl2qw4rsTm57fvSYTSNVg=
+	t=1707902906; cv=none; b=TW3aUzdaFmVhiGk2I9vx58K0NhzWd9Dl5snZjnuoUhUEkdeZDFDZ86Nsa1rueHAbvXVdlhkjFljzz4HsJkm+9Yz2DXGiE6D5BJuxBHOhwcclGSTWts7foe8w0ObmVCzhI8NVPzV41QEwaFlekwCD2xJ3vfxFodsZ9kCJu8BHEh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707902908; c=relaxed/simple;
-	bh=Mb6YxOmtcJ8Ub0l9X+yNHlgp/DjEXeH/cebfjQyMkP4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Jg/47PjiFi4Ux2hz614aYSIIboSM24547PBUzQjidMlxk4x7TuGSrG1k2Uf7HYNoCumPDUMK8VzPb/LY1FsaaENGdpFDhsnp8P6U0KDFEbXMA+06ZFnWjDlCrhbX0KuoI7sZVgeUzyJ46EjuMnDtvNWR3s92+25b6eKiI+ceyzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=OF2YRymp; arc=none smtp.client-ip=83.149.199.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
-Received: from localhost.localdomain (unknown [85.89.126.105])
-	by mail.ispras.ru (Postfix) with ESMTPSA id 8ABD2407672A;
-	Wed, 14 Feb 2024 09:28:16 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 8ABD2407672A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
-	s=default; t=1707902896;
-	bh=VPs3SFZb3IOFTfYaDQIVN+l4DqNHEqyJHkJJnFGGUPw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OF2YRymp0cVZzJyXtUILvhN8lfre24hOBN/XyofoROp2Xf8dZ1rsPQzpGJzC3G+/F
-	 vrJOG1GVAertAUUCgLBQ7g4AP/tNzenhe8wRW2CUofP51heor82z4gxWfQtjtj/NAc
-	 tjELpTMuxUbB/2jjnOxi3D05OwdcWoxeK14c3R/k=
-From: Pavel Sakharov <p.sakharov@ispras.ru>
-To: Simon Horman <horms@kernel.org>
-Cc: Pavel Sakharov <p.sakharov@ispras.ru>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	Alexey Khoroshilov <khoroshilov@ispras.ru>
-Subject: [PATCH net v2] net: stmmac: Fix incorrect dereference in interrupt handlers
-Date: Wed, 14 Feb 2024 12:27:17 +0300
-Message-ID: <20240214092718.331891-1-p.sakharov@ispras.ru>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240206150704.GD1104779@kernel.org>
-References: 
+	s=arc-20240116; t=1707902906; c=relaxed/simple;
+	bh=7iDIf20OmeYQc9dtbnkqUEwyJYpR4gtKqSRf663dNIE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=PSWoDah7acCBmIulnwSNs5KmIDeuQWSsTZjTcn+fShKCMv9InxVb+t05CMPXy3pXj7fyqAd0X6YeV2CluT8+TtwABWT8IybB0ayO81MxJ/ifIaYy6a0/wqHpg5BnayWmM4QxFlFfSXEQEhdKVFVBW+LBB0pYWV/mabjDG0fmahs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=I3MEEXdc; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41E9JAMv029873;
+	Wed, 14 Feb 2024 09:28:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=tYik73OUjCMVd31RdndFP6ddzTr57qI1pHLEgBgKThc=; b=I3
+	MEEXdcLmdU/9k3O3XySDXQzIz+4kU/FvgF9wSHQHkusA+YvOSd5hBORh+CpojDvE
+	RhNSeE5qaIxqkTTPTDw3bip0dIsQkK138qL7dzav1fEXKk257xBt+jxrArcMPv1q
+	pv4WTqr20YSgD2Fzbe1P2odJfdVQ5K6JLrky/bWsDHDd7/aYxwXfAh7o6qhNvy24
+	vvLUgJX6gJW2n8TCmkrIyOWBX5LLXXccuK7jM69oysbo8cw2+szFycn5dxpNuUGR
+	iSi3Wy8RyjmZ1rrgBKkMWLJGzBRO7jUJixaZBBfX5XcdFmSJNB4qVRUYiBDmAGd9
+	d6qL8JszJVBMeKYhKysg==
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3w8eks987a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 14 Feb 2024 09:28:13 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41E9SDfW001639
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 14 Feb 2024 09:28:13 GMT
+Received: from [10.201.2.96] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 14 Feb
+ 2024 01:28:07 -0800
+Message-ID: <222b330d-ecc0-4755-b1b5-674e11dcec5c@quicinc.com>
+Date: Wed, 14 Feb 2024 14:58:04 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 4/8] clk: qcom: ipq5332: add gpll0_out_aux clock
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio
+	<konrad.dybcio@linaro.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Catalin
+ Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <linux-clk@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>
+References: <20240122-ipq5332-nsscc-v4-0-19fa30019770@quicinc.com>
+ <20240122-ipq5332-nsscc-v4-4-19fa30019770@quicinc.com>
+ <635f5e41-1ca2-4b4e-86a5-fdb8f7b27ef9@lunn.ch>
+From: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
+In-Reply-To: <635f5e41-1ca2-4b4e-86a5-fdb8f7b27ef9@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: k1yxsMlcmMEIAr4Giot05SLm1J4TKlmk
+X-Proofpoint-GUID: k1yxsMlcmMEIAr4Giot05SLm1J4TKlmk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-14_03,2024-02-12_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
+ lowpriorityscore=0 phishscore=0 adultscore=0 malwarescore=0 suspectscore=0
+ spamscore=0 mlxlogscore=891 impostorscore=0 priorityscore=1501
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2401310000 definitions=main-2402140073
 
-If 'dev' or 'data' is NULL, the 'priv' variable has an incorrect address
-when dereferencing calling netdev_err().
 
-Since we get as 'dev_id' or 'data' what was passed as the 'dev' argument
-to request_irq() during interrupt initialization (that is, the net_device
-and rx/tx queue pointers initialized at the time of the call) and since
-there are usually no checks for the 'dev_id' argument in such handlers
-in other drivers, remove these checks from the handlers in stmmac driver.
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+On 1/26/2024 1:41 AM, Andrew Lunn wrote:
+> On Mon, Jan 22, 2024 at 11:27:00AM +0530, Kathiravan Thirumoorthy wrote:
+>> Add support for gpll0_out_aux clock which acts as the parent for
+>> certain networking subsystem (NSS) clocks.
+> 
+> This answers the question i asked for the previous patch.
+> 
+> Why did you split this into two patches?
 
-Fixes: 8532f613bc78 ("net: stmmac: introduce MSI Interrupt routines for mac, safety, RX & TX")
-Signed-off-by: Pavel Sakharov <p.sakharov@ispras.ru>
----
-v2: Drop the second argument checks in the handlers as suggested by Serge Semin <fancer.lancer@gmail.com>.
 
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 20 -------------------
- 1 file changed, 20 deletions(-)
+driver and binding patch should be separate patches, else checkpatch 
+will complain it.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 75d029704503..e80d77bd9f1f 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -6059,11 +6059,6 @@ static irqreturn_t stmmac_mac_interrupt(int irq, void *dev_id)
- 	struct net_device *dev = (struct net_device *)dev_id;
- 	struct stmmac_priv *priv = netdev_priv(dev);
- 
--	if (unlikely(!dev)) {
--		netdev_err(priv->dev, "%s: invalid dev pointer\n", __func__);
--		return IRQ_NONE;
--	}
--
- 	/* Check if adapter is up */
- 	if (test_bit(STMMAC_DOWN, &priv->state))
- 		return IRQ_HANDLED;
-@@ -6079,11 +6074,6 @@ static irqreturn_t stmmac_safety_interrupt(int irq, void *dev_id)
- 	struct net_device *dev = (struct net_device *)dev_id;
- 	struct stmmac_priv *priv = netdev_priv(dev);
- 
--	if (unlikely(!dev)) {
--		netdev_err(priv->dev, "%s: invalid dev pointer\n", __func__);
--		return IRQ_NONE;
--	}
--
- 	/* Check if adapter is up */
- 	if (test_bit(STMMAC_DOWN, &priv->state))
- 		return IRQ_HANDLED;
-@@ -6105,11 +6095,6 @@ static irqreturn_t stmmac_msi_intr_tx(int irq, void *data)
- 	dma_conf = container_of(tx_q, struct stmmac_dma_conf, tx_queue[chan]);
- 	priv = container_of(dma_conf, struct stmmac_priv, dma_conf);
- 
--	if (unlikely(!data)) {
--		netdev_err(priv->dev, "%s: invalid dev pointer\n", __func__);
--		return IRQ_NONE;
--	}
--
- 	/* Check if adapter is up */
- 	if (test_bit(STMMAC_DOWN, &priv->state))
- 		return IRQ_HANDLED;
-@@ -6136,11 +6121,6 @@ static irqreturn_t stmmac_msi_intr_rx(int irq, void *data)
- 	dma_conf = container_of(rx_q, struct stmmac_dma_conf, rx_queue[chan]);
- 	priv = container_of(dma_conf, struct stmmac_priv, dma_conf);
- 
--	if (unlikely(!data)) {
--		netdev_err(priv->dev, "%s: invalid dev pointer\n", __func__);
--		return IRQ_NONE;
--	}
--
- 	/* Check if adapter is up */
- 	if (test_bit(STMMAC_DOWN, &priv->state))
- 		return IRQ_HANDLED;
--- 
-2.43.0
+> 
+> Please also give a more detailed description, rather than the vague
+> 'certain networking subsystem (NSS) clocks'
 
+
+Sure, will call out the clock names explicitly in the next spin.
+
+> 
+> If you device tree and drivers are correct, i should be able to work
+> out what the clock tree looks like, so there is no point trying to
+> hide the information.
+
+
+Clocks which are part of the NSSCC are used by the Networking drivers 
+which are in the pipeline for upstream. Once the networking patches are 
+submitted in the list, we should be able to get the clear picture of the 
+clock tree.
+
+
+> 
+>       Andrew
 
