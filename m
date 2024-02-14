@@ -1,107 +1,96 @@
-Return-Path: <netdev+bounces-71713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1968854D14
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 16:40:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6912854D1A
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 16:41:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 108991C214DB
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 15:40:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81822281B85
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 15:41:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52C065D732;
-	Wed, 14 Feb 2024 15:40:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I9JXnHsO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E7DB5D49E;
+	Wed, 14 Feb 2024 15:41:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E6575CDC0
-	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 15:40:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B38524D2;
+	Wed, 14 Feb 2024 15:41:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707925206; cv=none; b=hpeFITYRFQ3a8rDGZuvS7VZ+3qP+6P8uTV3lFewNL5rvw2lynJw9iKasvYPV7vXALune1GGpKV/3eJOrZzW4QMt/1I1TXVrUBaSguWFCGsjf8xgMhBk7QtHv6/ILiLiJJbe1DuG3EkqhQVvQb1LQpnYgrlrl0vjT2ldFKY077SA=
+	t=1707925268; cv=none; b=tB5ilEMnj31OyyUiO+OyGJ+RgQBkrnMVZF/KTwufPVQw42sUBKVdw7Lorr/TYqSqUGDrlUPGHpas/3NjxguyvHOGrjlIy8KZ6l4To4NncZBQj0IZ+bMlvqsQptelSoC2eIK0gKBIs8+gOhUP7zzbsVHpQ6XgvSymzGjE2mdhKZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707925206; c=relaxed/simple;
-	bh=TfLTaaFga3eO6GRl9+UpmmJ+YCVmTd+FMmCAOhuzOkw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=fbHLWnoYa6yWCW/kxoX5WJtO7uNvWBY3YdTLvcyzFi8wh4wHhUN65qW0dZyl/ibwCSMVGyOZmF7tdiPGyYZeGGkA5s1JDYitKPqJHZCBl1QeEUcUq7mEh3q/VzinX3s35ra+KqwhcJoz5pOUtDCNQ7uwx03lgnAT5bEjGdvmlGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I9JXnHsO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 507C8C433F1;
-	Wed, 14 Feb 2024 15:40:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707925205;
-	bh=TfLTaaFga3eO6GRl9+UpmmJ+YCVmTd+FMmCAOhuzOkw=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=I9JXnHsOAFspAFETfT90TB5E/OpdlRH0g9f5BP4IUP0z9ZpWnLuoUFxdY8HutqDPz
-	 FLG/ccPD1YOR4edZ0ntEDGwMXmRTKS+sP8SZOBUF/4oukpzo3lE6AScJlLDHx2AUvR
-	 ++QxlxD/h0R831EISUt2CROxHaFt/XuGAsU7ky+rmqSm5CYlKK9rB1AU4YllEAORTO
-	 09WtHxc7MWfojh5m0IOtjoHZNNiXnQVZxGUZqCmZ9rhhivJwg1RuyjevVOFnnWhT1v
-	 o1puWE6iyDDF/+Hooyd8irCwiPZ5gGAmK/077qyMH7m5yGyGHSXfu0SwVB+83AZti0
-	 atAjspZGtjQNQ==
-Message-ID: <28f82034-14d2-4c1b-8ff2-1a4b0dd04463@kernel.org>
-Date: Wed, 14 Feb 2024 08:40:05 -0700
+	s=arc-20240116; t=1707925268; c=relaxed/simple;
+	bh=ST5p7KUZmliGQNtDY+m9PGEgOmuSM3XMYbc7Qhd2e7U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dzFzrW1E0j9WdU7OuKD9Qz1nk6WGXVMGM/xcIVx4bQs3Hi65mKw0RmdnfrquQBJgTSG6WCtZEhPFmEIXyNFhHMc15a+3lJVSEC+W85PPE01zOeI0JPJiBFJTNjypKYcrrCb+xh2avxCgtKM26FGVG5YAVuXzBY81/+mughF8DxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.41.52] (port=59030 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1raHNY-001J2z-88; Wed, 14 Feb 2024 16:40:58 +0100
+Date: Wed, 14 Feb 2024 16:40:54 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Felix Fietkau <nbd@nbd.name>
+Cc: netdev@vger.kernel.org, Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vlad Buslov <vladbu@nvidia.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] netfilter: nf_tables: fix bidirectional offload
+ regression
+Message-ID: <ZczfBoUtfh9U3p/6@calendula>
+References: <20240214144235.70341-1-nbd@nbd.name>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 3/3] net: ipv6/addrconf: clamp preferred_lft
- to the minimum required
-Content-Language: en-US
-To: Alex Henrie <alexhenrie24@gmail.com>, netdev@vger.kernel.org,
- dan@danm.net, bagasdotme@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, jikos@kernel.org
-References: <20240209061035.3757-1-alexhenrie24@gmail.com>
- <20240214062711.608363-1-alexhenrie24@gmail.com>
- <20240214062711.608363-4-alexhenrie24@gmail.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240214062711.608363-4-alexhenrie24@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240214144235.70341-1-nbd@nbd.name>
+X-Spam-Score: -1.9 (-)
 
-On 2/13/24 11:26 PM, Alex Henrie wrote:
-> If the preferred lifetime was less than the minimum required lifetime,
-> ipv6_create_tempaddr would error out without creating any new address.
-> On my machine and network, this error happened immediately with the
-> preferred lifetime set to 5 seconds or less, after a few minutes with
-> the preferred lifetime set to 6 seconds, and not at all with the
-> preferred lifetime set to 7 seconds. During my investigation, I found a
-> Stack Exchange post from another person who seems to have had the same
-> problem: They stopped getting new addresses if they lowered the
-> preferred lifetime below 3 seconds, and they didn't really know why.
-> 
-> The preferred lifetime is a preference, not a hard requirement. The
-> kernel does not strictly forbid new connections on a deprecated address,
-> nor does it guarantee that the address will be disposed of the instant
-> its total valid lifetime expires. So rather than disable IPv6 privacy
-> extensions altogether if the minimum required lifetime swells above the
-> preferred lifetime, it is more in keeping with the user's intent to
-> increase the temporary address's lifetime to the minimum necessary for
-> the current network conditions.
-> 
-> With these fixes, setting the preferred lifetime to 5 or 6 seconds "just
-> works" because the extra fraction of a second is practically
-> unnoticeable. It's even possible to reduce the time before deprecation
-> to 1 or 2 seconds by setting /proc/sys/net/ipv6/conf/*/regen_min_advance
-> and /proc/sys/net/ipv6/conf/*/dad_transmits to 0. I realize that that is
-> a pretty niche use case, but I know at least one person who would gladly
-> sacrifice performance and convenience to be sure that they are getting
-> the maximum possible level of privacy.
-> 
-> Link: https://serverfault.com/a/1031168/310447
-> Signed-off-by: Alex Henrie <alexhenrie24@gmail.com>
+On Wed, Feb 14, 2024 at 03:42:35PM +0100, Felix Fietkau wrote:
+> Commit 8f84780b84d6 ("netfilter: flowtable: allow unidirectional rules")
+> made unidirectional flow offload possible, while completely ignoring (and
+> breaking) bidirectional flow offload for nftables.
+> Add the missing flag that was left out as an exercise for the reader :)
+
+Thanks for fixing up this, patch is fine.
+
+> Cc: Vlad Buslov <vladbu@nvidia.com>
+> Fixes: 8f84780b84d6 ("netfilter: flowtable: allow unidirectional rules")
+> Reported-by: Daniel Golle <daniel@makrotopia.org>
+> Signed-off-by: Felix Fietkau <nbd@nbd.name>
 > ---
->  Documentation/networking/ip-sysctl.rst |  2 +-
->  net/ipv6/addrconf.c                    | 43 ++++++++++++++++++++------
->  2 files changed, 35 insertions(+), 10 deletions(-)
+>  net/netfilter/nft_flow_offload.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-
-Reviewed-by: David Ahern <dsahern@kernel.org>
-
-
+> diff --git a/net/netfilter/nft_flow_offload.c b/net/netfilter/nft_flow_offload.c
+> index 397351fa4d5f..ab9576098701 100644
+> --- a/net/netfilter/nft_flow_offload.c
+> +++ b/net/netfilter/nft_flow_offload.c
+> @@ -361,6 +361,7 @@ static void nft_flow_offload_eval(const struct nft_expr *expr,
+>  		ct->proto.tcp.seen[1].flags |= IP_CT_TCP_FLAG_BE_LIBERAL;
+>  	}
+>  
+> +	__set_bit(NF_FLOW_HW_BIDIRECTIONAL, &flow->flags);
+>  	ret = flow_offload_add(flowtable, flow);
+>  	if (ret < 0)
+>  		goto err_flow_add;
+> -- 
+> 2.43.0
+> 
+> 
 
