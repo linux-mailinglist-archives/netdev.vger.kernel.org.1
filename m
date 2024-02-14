@@ -1,166 +1,176 @@
-Return-Path: <netdev+bounces-71629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E283885443E
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 09:49:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3380C854452
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 09:51:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7416428D08E
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 08:49:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4289285698
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 08:51:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBB317494;
-	Wed, 14 Feb 2024 08:48:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A6326FD5;
+	Wed, 14 Feb 2024 08:51:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z0eRummk"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="go6TjQ2k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32D18B64A
-	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 08:48:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC4F522E
+	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 08:51:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707900517; cv=none; b=YIGdn/BQNzDMA/EXRoo59Lcs9MN2Mh0RV3xlev2uAyz8P9USAzFdlRrTpM6prfC+vuRAXwGYorSdnfq27MAZGxyNp0+1SjWlnonsjdz5S3O2DPuRapDREo9myWjojblyU1QEvJQt6KNqQVQ/TMSLQ3BiQPcOKog/t9Gh+yMHBHY=
+	t=1707900669; cv=none; b=Dbz1xZQ8uY1N1Xl39f8MDVfIbuXA34T++cwl0gGMOLD3uJUYCgyGM+5RE4LVFUNy/448LGE7K0NYSRgJE6Rcr3EanmEj2WDc5A58YNdSuWjZ9g7NSOK1BHB5F/CWQkbwm16OSczkXZXUgtZEeTZzjDhw8C9R5hOewQl/eWK2QNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707900517; c=relaxed/simple;
-	bh=qi5Bs7Cf2a/XS99tp48PJPpELPUcFcpZoHc9zokTEC4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=UhPbeYRfc6JnZ12pGjsMtz0g0MZ4HqkDtUMsjQOfO2LnR76F9/E/BW9NXYKtA0QaTQwBdWhHUJaKt/B0dsy0FJHZMeDMPH1eiP91WQ34ZhWpH8rFI1OYi995qQYlesjiNxYKazWJbyZR2da0eyPJYYkUxz2p61Vh5T+5vqNZIXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z0eRummk; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5efe82b835fso118116377b3.0
-        for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 00:48:36 -0800 (PST)
+	s=arc-20240116; t=1707900669; c=relaxed/simple;
+	bh=XAHBpu95F6iz76GDDF4DIp5SqFbTiT3BIYlaFgKo4zA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j52osueQ5vh8TPkoZ4sdtvkCI1Fs5r7lPKsjgwGyfBW/fGMnzYCGcVGPhsia166cx5YcFJ/+VEe6G7coGgDwKUrCZ7D7S1FkXUp4PAp5HFWLB/xzyN/gBSsc7TTNfybZ4JYMAaDxewwWZxm7xXI3JEqrCIskY2+dqQu6+DqFLP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=go6TjQ2k; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-511972043c3so2204544e87.1
+        for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 00:51:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707900515; x=1708505315; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vgH6jFYJlZcCO1muBwFlEgXGTqXSIAVOsixhgGigIv4=;
-        b=Z0eRummkMIUk2E9fnjJZQdU8B79u2qa/JnVHPOhX4Qehn04035XMfLPxHE0hQgeGzq
-         tTQi0UZfPFR9+kEM70ivoty+G6oh6RG1iGTzIxXOd1IPe8/KjBnvcVrSaGtNbChUr/FE
-         90Iud7KZX586YdIUFMmOPrv3e8NNYf26LnXBmPyGm/Lksu09nIH9JFtq2WQYlzDCAyCW
-         8N2x1IeU3H/igMm+hcbs02EDF314naiAo7OKSI1SV+XgUEOM1ZcCEm6hwBlUGt6Sh5UE
-         iZB1EvB4i5H3rF/5h8y/ckxrMCO0SDVPgGfx6+04wLYlTpEIRzUkaLareE6fv6OuSoa0
-         Pw7w==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1707900664; x=1708505464; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mMmIs/bGngTDe4PFUgHEl5eoP7b/3dzx+s9XiukW76w=;
+        b=go6TjQ2k+OHZJ5v9UAF9TsL6m7CG/oPpsoJ2/twLJ8nMIuyrjFyjcnRI2wcuL8QSlj
+         c/TriQWtbc9re16nY64gVy1prQKxOQcLM/QnPV0q+uaCmXPHdmxA8RRiI0kcOBzP83Hp
+         x5xNlEpbk5QZ/gTaKYJWWpjXHERPDIcEkLk/279fS9iRAQuye2QgXyTKs/J6V3DXihKX
+         yKPg1xwJe1UO8qT/aV3NyGLdRISxwkNGV3bvevta5ukn3GRpuXy5xGAnQK1V7zxQ50gx
+         0XcMIOC7ir4t0gZ1YplcKuZXBQ/J1+JulOuKk0uIPQpQt0CTdlm7HV4sFlojtUzJGxW5
+         bNXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707900515; x=1708505315;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vgH6jFYJlZcCO1muBwFlEgXGTqXSIAVOsixhgGigIv4=;
-        b=qnthdHRD0MCNVQGCUU0c8hXPt9OOccn2HuGPpHDVGwy9iBqG4pNVx2rTivPKV3JwNJ
-         ptEoNhERwkkwo+/Yjug91nwJXEVBqVBXB3vZ/W8drBZuDIsKQOj2VssKR2+3jakcONCz
-         BhccNcU7Vul6nv8v4JeV/ZSQBy24DnAYec4eFl4FK5gT1aaMwMwgAXbptC23/0F04Tdj
-         CRZAlLdxniTwpevTIcgwG4ylek7KD8nd5AkjfwSgChyNTECCNYoEQUzvmv+SZl9O9CZj
-         O41ud0delalPS0KiQfyZAatMGOqTKZzWcRd3ATiT/6okk/33rPuLBf6u66MtXGeJMOeL
-         FQHA==
-X-Forwarded-Encrypted: i=1; AJvYcCVUaH9CyIImGRhvu3UwzhoP3Osq0OABhpjT8DLLE/zXF5h0f2mGUOh4wfpiAE09BNwMypt844snNfG57WlhpU3ybBBMXdyv
-X-Gm-Message-State: AOJu0Yx8FPBEplwMyobM9INExaodym94IjX9TDFiu42a6YL8yGzlMIeu
-	dscYkRc/z+LijyPU6p0lxPmLohfnI12FmbuXIghJjBpfIr8QQiYrP/n9Yp+jBAT+AYXjvNYMcYr
-	e0vLarumCjA==
-X-Google-Smtp-Source: AGHT+IELTMuQWEVV+IdSL9R1xizsS+OgXyKRcKJaDe+k6pK9UnxJHdzgSNBBRhcMXnwspNDYDODWTVgTed52oA==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:70b:b0:dc6:dfd9:d431 with SMTP
- id k11-20020a056902070b00b00dc6dfd9d431mr391163ybt.1.1707900515291; Wed, 14
- Feb 2024 00:48:35 -0800 (PST)
-Date: Wed, 14 Feb 2024 08:48:29 +0000
-In-Reply-To: <20240214084829.684541-1-edumazet@google.com>
+        d=1e100.net; s=20230601; t=1707900664; x=1708505464;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mMmIs/bGngTDe4PFUgHEl5eoP7b/3dzx+s9XiukW76w=;
+        b=mhgdAY7NE1KX6xV5VgHqF4Rf0hdg9nMfQKmXqww4/n3Qr/c3r6Uy14OYdhNY6wflOz
+         wS3nAY9YZLIhNc+uikQEuUoGt/Pi2pkBvos+NXncUDRrsZ+7HqEZBUXkzEWt75ZzkaLx
+         4iYuoy6A6Og8/7zXQ0zMoOjFFUu/cc6FSsZoo2BPNCDjylA+wwyXdd/xe30lWsdUBQyP
+         rchXWE5fvP0tEm0jAPSlmfGdYMIZsw99G1aK1z3VHGggfPgE8u8aMBBytMNkgPQaBsQW
+         cbMFbuwjk7I6YkyvfnlyiDB3p5Q3lKP+U0Rt3Nh81WpjBuGgQLbKaNotLlWul6LVEWug
+         qozg==
+X-Forwarded-Encrypted: i=1; AJvYcCU1q/GWxoh1GsKWOqBUre1lNlOfmVe9x3llpidH4aAlOYI9iJT8HS/++GbMXx/kZL0uZ4Z4aNLVy4ChwGNxFBZWRr/1oBbm
+X-Gm-Message-State: AOJu0YxmMPgkkNUkw6bPjp/kvrrBOwhEmvEFt1tLjYRPcNvfBe27uxju
+	VQipvbmIv07w4s8wlHf1Vqzqw1csfg1iz+HBpVb4G1yNeE+36L/HCdScGCVubpg=
+X-Google-Smtp-Source: AGHT+IHr30/QWHMpbLroxSpzCYVw3mwvI22CHE5fE4ZC+dKIzQ0I2nFOlA43NahVyH5NYOHerDC8iw==
+X-Received: by 2002:a05:6512:32b2:b0:511:71fe:87d8 with SMTP id q18-20020a05651232b200b0051171fe87d8mr1648679lfe.38.1707900664308;
+        Wed, 14 Feb 2024 00:51:04 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVst97FGsDaHpF2yqts0eHsfQOzOh+s5X+mpmkq+hYMx68XNyEzMj/25d/t1gGgArBcmlHq8V5f7igGP0rq4XUvmrSDierBBJaWD/5VmBYdB43i0tELCY5ZYBpf7ugpbrsMsPjmLOOcOA19M8yECCm24f9YIvL8siGsYcVkHgSXIC8k690LiQSfeaisv1fJFT3Zr1WXSAQyxM7N5Wbc2OFxKdL8rg5y3JNXXK/H3+DZ/ZUzxBrgi688aIX94WZPeU1XNlcczz5L3E6s6qOYE7RT4Cn7YSx+sI7Zk37UT5YmkudHGBO/mCu7+c2HksYO4OHtKio/cBsY
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id i20-20020a05600c355400b00411e7f702e1sm1138080wmq.30.2024.02.14.00.51.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Feb 2024 00:51:03 -0800 (PST)
+Date: Wed, 14 Feb 2024 09:51:00 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Davide Caratti <dcaratti@redhat.com>, jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com, shmulik.ladkani@gmail.com
+Subject: Re: [PATCH net v2 1/2] net/sched: act_mirred: use the backlog for
+ mirred ingress
+Message-ID: <Zcx-9HkcmhDR5_r1@nanopsycho>
+References: <20240214033848.981211-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240214084829.684541-1-edumazet@google.com>
-X-Mailer: git-send-email 2.43.0.687.g38aa6559b0-goog
-Message-ID: <20240214084829.684541-3-edumazet@google.com>
-Subject: [PATCH 2/2] kobject: reduce uevent_sock_mutex scope
-From: Eric Dumazet <edumazet@google.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Christian Brauner <brauner@kernel.org>
-Cc: linux-kernel <linux-kernel@vger.kernel.org>, "Rafael J . Wysocki" <rafael@kernel.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, netdev@vger.kernel.org, 
-	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Eric Dumazet <eric.dumazet@gmail.com>, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240214033848.981211-1-kuba@kernel.org>
 
-This is a followup of commit a3498436b3a0 ("netns: restrict uevents")
+Wed, Feb 14, 2024 at 04:38:47AM CET, kuba@kernel.org wrote:
+>The test Davide added in commit ca22da2fbd69 ("act_mirred: use the backlog
+>for nested calls to mirred ingress") hangs our testing VMs every 10 or so
+>runs, with the familiar tcp_v4_rcv -> tcp_v4_rcv deadlock reported by
+>lockdep.
+>
+>In the past there was a concern that the backlog indirection will
+>lead to loss of error reporting / less accurate stats. But the current
+>workaround does not seem to address the issue.
 
-- uevent_sock_mutex no longer protects uevent_seqnum thanks
-  to prior patch in the series.
+Okay, so what the patch actually should change to fix this?
 
-- uevent_net_broadcast() can run without holding uevent_sock_mutex.
 
-- Instead of grabbing uevent_sock_mutex before calling
-  kobject_uevent_net_broadcast(), we can move the
-  mutex_lock(&uevent_sock_mutex) to the place we iterate over
-  uevent_sock_list : uevent_net_broadcast_untagged().
-
-After this patch, typical netdevice creations and destructions
-calling uevent_net_broadcast_tagged() no longer need to acquire
-uevent_sock_mutex.
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Christian Brauner <brauner@kernel.org>
----
- lib/kobject_uevent.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
-
-diff --git a/lib/kobject_uevent.c b/lib/kobject_uevent.c
-index 9cb1a7fdaeba4fc5c698fbe84f359fb305345be1..03b427e2707e357ab12abeb9da234432c4bc0fb3 100644
---- a/lib/kobject_uevent.c
-+++ b/lib/kobject_uevent.c
-@@ -42,10 +42,9 @@ struct uevent_sock {
- 
- #ifdef CONFIG_NET
- static LIST_HEAD(uevent_sock_list);
--#endif
--
- /* This lock protects uevent_sock_list */
- static DEFINE_MUTEX(uevent_sock_mutex);
-+#endif
- 
- /* the strings here must match the enum in include/linux/kobject.h */
- static const char *kobject_actions[] = {
-@@ -315,6 +314,7 @@ static int uevent_net_broadcast_untagged(struct kobj_uevent_env *env,
- 	int retval = 0;
- 
- 	/* send netlink message */
-+	mutex_lock(&uevent_sock_mutex);
- 	list_for_each_entry(ue_sk, &uevent_sock_list, list) {
- 		struct sock *uevent_sock = ue_sk->sk;
- 
-@@ -334,6 +334,7 @@ static int uevent_net_broadcast_untagged(struct kobj_uevent_env *env,
- 		if (retval == -ENOBUFS || retval == -ESRCH)
- 			retval = 0;
- 	}
-+	mutex_unlock(&uevent_sock_mutex);
- 	consume_skb(skb);
- 
- 	return retval;
-@@ -589,10 +590,8 @@ int kobject_uevent_env(struct kobject *kobj, enum kobject_action action,
- 	if (retval)
- 		goto exit;
- 
--	mutex_lock(&uevent_sock_mutex);
- 	retval = kobject_uevent_net_broadcast(kobj, env, action_string,
- 					      devpath);
--	mutex_unlock(&uevent_sock_mutex);
- 
- #ifdef CONFIG_UEVENT_HELPER
- 	/* call uevent_helper, usually only enabled during early boot */
-@@ -743,9 +742,7 @@ static int uevent_net_rcv_skb(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		return -EPERM;
- 	}
- 
--	mutex_lock(&uevent_sock_mutex);
- 	ret = uevent_net_broadcast(net->uevent_sock->sk, skb, extack);
--	mutex_unlock(&uevent_sock_mutex);
- 
- 	return ret;
- }
--- 
-2.43.0.687.g38aa6559b0-goog
-
+>
+>Fixes: 53592b364001 ("net/sched: act_mirred: Implement ingress actions")
+>Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+>Suggested-by: Davide Caratti <dcaratti@redhat.com>
+>Link: https://lore.kernel.org/netdev/33dc43f587ec1388ba456b4915c75f02a8aae226.1663945716.git.dcaratti@redhat.com/
+>Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+>---
+>CC: jhs@mojatatu.com
+>CC: xiyou.wangcong@gmail.com
+>CC: jiri@resnulli.us
+>CC: shmulik.ladkani@gmail.com
+>---
+> net/sched/act_mirred.c                             | 14 +++++---------
+> .../testing/selftests/net/forwarding/tc_actions.sh |  3 ---
+> 2 files changed, 5 insertions(+), 12 deletions(-)
+>
+>diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+>index 0a1a9e40f237..291d47c9eb69 100644
+>--- a/net/sched/act_mirred.c
+>+++ b/net/sched/act_mirred.c
+>@@ -232,18 +232,14 @@ static int tcf_mirred_init(struct net *net, struct nlattr *nla,
+> 	return err;
+> }
+> 
+>-static bool is_mirred_nested(void)
+>-{
+>-	return unlikely(__this_cpu_read(mirred_nest_level) > 1);
+>-}
+>-
+>-static int tcf_mirred_forward(bool want_ingress, struct sk_buff *skb)
+>+static int
+>+tcf_mirred_forward(bool at_ingress, bool want_ingress, struct sk_buff *skb)
+> {
+> 	int err;
+> 
+> 	if (!want_ingress)
+> 		err = tcf_dev_queue_xmit(skb, dev_queue_xmit);
+>-	else if (is_mirred_nested())
+>+	else if (!at_ingress)
+> 		err = netif_rx(skb);
+> 	else
+> 		err = netif_receive_skb(skb);
+>@@ -319,9 +315,9 @@ static int tcf_mirred_to_dev(struct sk_buff *skb, struct tcf_mirred *m,
+> 
+> 		skb_set_redirected(skb_to_send, skb_to_send->tc_at_ingress);
+> 
+>-		err = tcf_mirred_forward(want_ingress, skb_to_send);
+>+		err = tcf_mirred_forward(at_ingress, want_ingress, skb_to_send);
+> 	} else {
+>-		err = tcf_mirred_forward(want_ingress, skb_to_send);
+>+		err = tcf_mirred_forward(at_ingress, want_ingress, skb_to_send);
+> 	}
+> 
+> 	if (err) {
+>diff --git a/tools/testing/selftests/net/forwarding/tc_actions.sh b/tools/testing/selftests/net/forwarding/tc_actions.sh
+>index b0f5e55d2d0b..589629636502 100755
+>--- a/tools/testing/selftests/net/forwarding/tc_actions.sh
+>+++ b/tools/testing/selftests/net/forwarding/tc_actions.sh
+>@@ -235,9 +235,6 @@ mirred_egress_to_ingress_tcp_test()
+> 	check_err $? "didn't mirred redirect ICMP"
+> 	tc_check_packets "dev $h1 ingress" 102 10
+> 	check_err $? "didn't drop mirred ICMP"
+>-	local overlimits=$(tc_rule_stats_get ${h1} 101 egress .overlimits)
+>-	test ${overlimits} = 10
+>-	check_err $? "wrong overlimits, expected 10 got ${overlimits}"
+> 
+> 	tc filter del dev $h1 egress protocol ip pref 100 handle 100 flower
+> 	tc filter del dev $h1 egress protocol ip pref 101 handle 101 flower
+>-- 
+>2.43.0
+>
 
