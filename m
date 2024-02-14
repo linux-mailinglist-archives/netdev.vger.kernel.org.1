@@ -1,58 +1,60 @@
-Return-Path: <netdev+bounces-71589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F24D8854142
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 02:28:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B496854153
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 02:43:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 318AA1C20912
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 01:28:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14CC11F22BF7
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 01:43:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB75B8F6D;
-	Wed, 14 Feb 2024 01:26:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 878A046AB;
+	Wed, 14 Feb 2024 01:43:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h4S0KaLb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="avm30gpG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92B62125AD;
-	Wed, 14 Feb 2024 01:26:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D5E62563;
+	Wed, 14 Feb 2024 01:43:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707873987; cv=none; b=eWJ5lSOusgc1OyXSIpxCSgM0bnmTaSZ4MbPLMUKRwGnbppjUIDqcJ4H+fsQ2CkkRtvbJscAICJjILbuTSwyzb4x6Bn4vDGkvksKTu+/hhefwfeRMxUWZPSeRR7hcigwnR8+hji5GpZcx9FS99wFEiq9YZrePZlGtg+5vWW6CWg0=
+	t=1707874996; cv=none; b=FvEsGVJucM4Rqi7Bo8i3eKSVa4qVjiGfyTyjgLaej6csWTllcWwMTLR4/nDxxwqgiE7XEB4V3OdyALG4HBm0/7Sqd/OfqbYTB1iYDHeguW6lBK1oHoL2JIDnLFG+5bQxM2hADsqzM18gNV8GEOIZNhzyPWtcEzZi/4VyN1v+83w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707873987; c=relaxed/simple;
-	bh=QqVN4I8a66LbGVcZBXtseJS+ansGULIYrOKlUjQzjzg=;
+	s=arc-20240116; t=1707874996; c=relaxed/simple;
+	bh=nR1F3sMgPwBtW+NSjhinkD81NF0kMwFliFyYB37a+jM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QiBzkROmqitvtF9n8bz9T9MiY5Bm5zyztaDhtKTRfHNgN5fL8Fall+P3V/XcIG6ON/+dpvwIGDm3klIqCW3WGZXc1cvzC8QrmVPbXT3ywn7NBOEzmRNb6LZTk2NdMyuK8/Bis41+pyp3MaV/0C3Y6tqTcb9L76bCresOXsXWeeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h4S0KaLb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94B06C433C7;
-	Wed, 14 Feb 2024 01:26:26 +0000 (UTC)
+	 MIME-Version:Content-Type; b=umGN6DaXeI18QcwkXu97doteFnaRZJwKSDzXiOq8GO4WPFbcGEVI5eALasVyp0rCwtrEqYJ9QpEHHBu+DfRIFdOKz3Ao+BpaQnx7mougpbgov/HlrPkmPm2tQU0aJ3Dswa51lUinRQUwC+Sqkg5xm1UpNpl9KhTvoWS/uTTnA1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=avm30gpG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72D48C433C7;
+	Wed, 14 Feb 2024 01:43:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707873987;
-	bh=QqVN4I8a66LbGVcZBXtseJS+ansGULIYrOKlUjQzjzg=;
+	s=k20201202; t=1707874995;
+	bh=nR1F3sMgPwBtW+NSjhinkD81NF0kMwFliFyYB37a+jM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h4S0KaLb1o+OMmx2bXq4SVkektMTrZqjoAhUzxkddpz41QC63VYJiBD/OGQAZ2uOy
-	 OcTVy1QAXwVJKls9pKD3jKt9TnIVULm2Jfz65gG2ozqLAzTfjQtg3nBMS58Smjffzd
-	 Kfghpib8IrOLEbRpm9NMsEL3i+NRwnh9CZUfuwu5LUcAttrp3YwAkY5aiVv0GtOZNU
-	 Y/ddXC2HHDWidMWL7wdR1GBaCWNbn4RkERLSXLu505irkfwZAYeg+3a9eL5OfItqPM
-	 HKPNm+WSH0dUf63IYvv9S7SZXYjp/1aaqKSQgJAcrFxHL47vJ1D5sJCKv/tWeS/FaO
-	 /ooCo4j6X2nug==
-Date: Tue, 13 Feb 2024 17:26:25 -0800
+	b=avm30gpGDtT3vSTkQx2OFWuteOYnXZ5oCuICoFvWSEX63RGPi5ZieVTbLg7gpukLv
+	 zbiRVol9moPwQ47o16/T/ieXsfGkgarn+4h/SvL3ww3SuH9SxosuscHT2LrxBEoRXg
+	 zMWAx70HF9YuoN7GXmB9io3kyz6ScHP0BxCTHKNFzbUfVLyZE6zVlHBvxprXaTX13q
+	 nXfVUttVqWELTQZ63cjNjJlRUMh1TM96fSHltbA1tRKfRzRKjO4bY63z/mikhhzcda
+	 IrGqdgku8NupanM44MiF+lc7sQU8bRRolncjHabx4BRU3+UnmAJ8GPNdm/MYv7N0w6
+	 wb++Ui48BD5/w==
+Date: Tue, 13 Feb 2024 17:43:14 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Russell King <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>
-Cc: Paolo Abeni <pabeni@redhat.com>, Daniil Dulov <d.dulov@aladdin.ru>,
- Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
-Subject: Re: [PATCH] net: sfp: remove redundant NULL check
-Message-ID: <20240213172625.73643a36@kernel.org>
-In-Reply-To: <cae5b4d55770da3a1dc9678ffa55c9afb9c81723.camel@redhat.com>
-References: <20240211150824.3947-1-d.dulov@aladdin.ru>
-	<cae5b4d55770da3a1dc9678ffa55c9afb9c81723.camel@redhat.com>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: Kalle Valo <kvalo@kernel.org>, Vinayak Yadawad 
+ <vinayak.yadawad@broadcom.com>, linux-wireless@vger.kernel.org,
+ jithu.jance@broadcom.com, Arend van Spriel <arend.vanspriel@broadcom.com>,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH 1/1] wifi: nl80211: Add support for plumbing SAE groups
+ to driver
+Message-ID: <20240213174314.26982cd8@kernel.org>
+In-Reply-To: <2c38eaed47808a076b6986412f92bb955b0599c3.camel@sipsolutions.net>
+References: <309965e8ef4d220053ca7e6bd34393f892ea1bb8.1707486287.git.vinayak.yadawad@broadcom.com>
+	<87mss6f8jh.fsf@kernel.org>
+	<2c38eaed47808a076b6986412f92bb955b0599c3.camel@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,17 +64,33 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 13 Feb 2024 13:43:57 +0100 Paolo Abeni wrote:
-> On Sun, 2024-02-11 at 07:08 -0800, Daniil Dulov wrote:
-> > bus->upstream_ops in sfp_register_bus() cannot be NULL. So remove
-> > redundant NULL check.  
-> 
-> I'm unsure about that?!? in theory drivers could call
-> sfp_bus_add_upstream()/phy_sfp_probe() with NULL ops, even it that very
-> likely doesn't make any sense.
-> 
-> @Russel, @Andrew: WDYT?
+On Mon, 12 Feb 2024 20:58:51 +0100 Johannes Berg wrote:
+> And @Broadcom: we really _want_ you to contribute upstream. But that
+> shouldn't be dumping APIs over the wall when you need them and letting
+> us sort out everything else ...
 
-Since Russell is AFK let me discard this instead of queuing.
-We'll resurrect if any of the maintainers sends review tags or alike.
+I may be missing the point but is there any official way we can
+designate level of vendor involvement? MAINTAINERS seems like 
+the most basic, and we have
+
+BROADCOM BRCM80211 IEEE802.11 WIRELESS DRIVERS
+M:	Arend van Spriel <arend.vanspriel@broadcom.com>
+L:	linux-wireless@vger.kernel.org
+L:	brcm80211@lists.linux.dev
+L:	brcm80211-dev-list.pdl@broadcom.com
+S:	Supported
+F:	drivers/net/wireless/broadcom/brcm80211/
+F:	include/linux/platform_data/brcmfmac.h
+
+where (for the uninitiated):
+
+   Supported:	Someone is actually paid to look after this.
+
+It doesn't seem like Arend is afforded much paid time "to look after
+this".
+
+On the Ethernet side I have a nebulous hope to require vendors who want
+the "Supported" status to run our in-tree tests against their HW daily.
+As a way to trigger the loss of status. Otherwise it's hard to catch
+people drifting away.
 
