@@ -1,127 +1,172 @@
-Return-Path: <netdev+bounces-71761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C58AD854F6D
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 18:07:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D16EE854FA2
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 18:14:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6459E1F221A3
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 17:07:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ABAFBB22ABE
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 17:13:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D06CE60868;
-	Wed, 14 Feb 2024 17:07:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57B2A7A710;
+	Wed, 14 Feb 2024 17:13:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA77A54FB8;
-	Wed, 14 Feb 2024 17:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E89B7A706;
+	Wed, 14 Feb 2024 17:13:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707930452; cv=none; b=qD2tZ+ucnEIN4DFuQXiKNJpIWPIooQdssZN8fW3xkOUifmYDmtNzKO/p8toH/ulAByKJBHchknF3ggO+eXOIy4NAyFJpMAka++SwjF/XUZpbUJ6jDnwXKvJbQc8o5SaEflVKMCeRdI/a85I7dNh9MCRisXyRHso6im/fqb9nREo=
+	t=1707930815; cv=none; b=PIvj7sguSM4Sy4HF/ajdzRKSjujsmdA+LzCBYE2eE/3wic30dDVYTa4d78Hv/xDBCF8kd07DEYTaI/HV2D4avqqK+5TA2+NgumoBDuzEnuofzG96xPmw0DZdJ0jFxv0lBdVfNCakJ1XwbsUYh1aWWWQ5PDtSkwetR45dIbBQIn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707930452; c=relaxed/simple;
-	bh=WVc+KVsJWg/hJEZDvHdju5OFgugSoNT7Gs02IKHsAtE=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=O1LZ0a8RsdK0sACrMA0BP7Fk4rT2iD2XAtyb2B3KFf7oybaWZqnFwaFrsVC5zlqb8pe2PvlPKGfp7wU2JGfPIdZRoVqbaHjYRHXGU2Lw1DELqLtTiuSFb4qeoxf56Us9M0gVDd1lTtGQa0OcnYqEFC1UBAiDVz7MpN69sejNLhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (178.176.73.178) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 14 Feb
- 2024 20:07:20 +0300
-Subject: Re: [PATCH net-next v4 5/6] net: ravb: Do not apply features to
- hardware if the interface is down
-To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<biju.das.jz@bp.renesas.com>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>
-References: <20240214135800.2674435-1-claudiu.beznea.uj@bp.renesas.com>
- <20240214135800.2674435-6-claudiu.beznea.uj@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <02f45526-0d56-469c-db3d-de1ef8785685@omp.ru>
-Date: Wed, 14 Feb 2024 20:07:20 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1707930815; c=relaxed/simple;
+	bh=lnxYYZhuHdZc7D0Y0bEbSBOBkMXVHnRmRIzuiMPc4fU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DjJ1el30yp7j87dXSb5IJXSgRH+mZ2QuzNup0qS9wrrywAU4jX+nIzlteHV2sFFYlVbF0brbsd+Fm5tDSa6k63gUCuGZNQu6mhng410m0NJo8DPebRveCuxJYCwAc2Y/aIAhCw4+MAHr6onFWQqJjVIP7RuhAYziZURLtBOoJ5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.41.52] (port=54270 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1raIp3-001Ooj-PP; Wed, 14 Feb 2024 18:13:27 +0100
+Date: Wed, 14 Feb 2024 18:13:24 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: kovalev@altlinux.org
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	edumazet@google.com, laforge@gnumonks.org, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, nickel@altlinux.org,
+	oficerovas@altlinux.org, dutyrok@altlinux.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH ver.2] gtp: fix use-after-free and null-ptr-deref in
+ gtp_genl_dump_pdp()
+Message-ID: <Zcz0tG9XMqLHMKs+@calendula>
+References: <20240214162733.34214-1-kovalev@altlinux.org>
+ <ZczvJKETNyFE5Glm@calendula>
+ <a4463193-fd73-eca3-616b-d75176d947c6@basealt.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240214135800.2674435-6-claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 02/14/2024 16:49:17
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 183446 [Feb 14 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.73.178 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.73.178 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;178.176.73.178:7.4.1,7.7.3;omp.ru:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: {cloud_iprep_silent}
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.73.178
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 02/14/2024 16:56:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 2/14/2024 2:42:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <a4463193-fd73-eca3-616b-d75176d947c6@basealt.ru>
+X-Spam-Score: -1.9 (-)
 
-On 2/14/24 4:57 PM, Claudiu wrote:
-
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+On Wed, Feb 14, 2024 at 08:06:12PM +0300, kovalev@altlinux.org wrote:
+> 14.02.2024 19:49, Pablo Neira Ayuso wrote:
+> > On Wed, Feb 14, 2024 at 07:27:33PM +0300, kovalev@altlinux.org wrote:
+> > > From: Vasiliy Kovalev <kovalev@altlinux.org>
+> > > 
+> > > The gtp_net_ops pernet operations structure for the subsystem must be
+> > > registered before registering the generic netlink family.
+> > Thanks for finding a remedy for this.
+> > 
+> > If your fix is correct, (I didn't test your patch yet) then maybe this
+> > needs to be fixed in a few more spots in the tree?
+> > 
+> > net/devlink/core.c-static int __init devlink_init(void)
+> > net/devlink/core.c-{
+> > net/devlink/core.c-     int err;
+> > net/devlink/core.c-
+> > net/devlink/core.c-     err = genl_register_family(&devlink_nl_family);
+> > net/devlink/core.c-     if (err)
+> > net/devlink/core.c-             goto out;
+> > net/devlink/core.c:     err = register_pernet_subsys(&devlink_pernet_ops);
+> > net/devlink/core.c-     if (err)
+> > 
+> > net/handshake/netlink.c-        ret = genl_register_family(&handshake_nl_family);
+> > net/handshake/netlink.c-        if (ret) {
+> > net/handshake/netlink.c-                pr_warn("handshake: netlink registration failed (%d)\n", ret);
+> > net/handshake/netlink.c-                handshake_req_hash_destroy();
+> > net/handshake/netlink.c-                return ret;
+> > net/handshake/netlink.c-        }
+> > net/handshake/netlink.c-
+> > net/handshake/netlink.c-        /*
+> > net/handshake/netlink.c-         * ORDER: register_pernet_subsys must be done last.
+> > net/handshake/netlink.c-         *
+> > net/handshake/netlink.c-         *      If initialization does not make it past pernet_subsys
+> > net/handshake/netlink.c-         *      registration, then handshake_net_id will remain 0. That
+> > net/handshake/netlink.c-         *      shunts the handshake consumer API to return ENOTSUPP
+> > net/handshake/netlink.c-         *      to prevent it from dereferencing something that hasn't
+> > net/handshake/netlink.c-         *      been allocated.
+> > net/handshake/netlink.c-         */
+> > net/handshake/netlink.c:        ret = register_pernet_subsys(&handshake_genl_net_ops);
+> > 
+> > net/ipv4/tcp_metrics.c: ret = register_pernet_subsys(&tcp_net_metrics_ops);
+> > net/ipv4/tcp_metrics.c- if (ret < 0)
+> > net/ipv4/tcp_metrics.c-         panic("Could not register tcp_net_metrics_ops\n");
+> > net/ipv4/tcp_metrics.c-
+> > net/ipv4/tcp_metrics.c- ret = genl_register_family(&tcp_metrics_nl_family);
+> > net/ipv4/tcp_metrics.c- if (ret < 0)
+> > net/ipv4/tcp_metrics.c-         panic("Could not register tcp_metrics generic netlink\n");
+> > net/ipv4/tcp_metrics.c-}
+> > 
+> > net/ipv6/ioam6.c-int __init ioam6_init(void)
+> > net/ipv6/ioam6.c-{
+> > net/ipv6/ioam6.c:       int err = register_pernet_subsys(&ioam6_net_ops);
+> > net/ipv6/ioam6.c-       if (err)
+> > net/ipv6/ioam6.c-               goto out;
+> > net/ipv6/ioam6.c-
+> > net/ipv6/ioam6.c-       err = genl_register_family(&ioam6_genl_family);
+> > net/ipv6/ioam6.c-       if (err)
+> > net/ipv6/ioam6.c-               goto out_unregister_pernet_subsys;
+> > 
+> > net/ipv6/seg6.c-        err = genl_register_family(&seg6_genl_family);
+> > net/ipv6/seg6.c-        if (err)
+> > net/ipv6/seg6.c-                goto out;
+> > net/ipv6/seg6.c-
+> > net/ipv6/seg6.c:        err = register_pernet_subsys(&ip6_segments_ops);
+> > net/ipv6/seg6.c-        if (err)
+> > net/ipv6/seg6.c-                goto out_unregister_genl;
+> > 
+> > net/netlink/genetlink.c-        err = genl_register_family(&genl_ctrl);
+> > net/netlink/genetlink.c-        if (err < 0)
+> > net/netlink/genetlink.c-                goto problem;
+> > net/netlink/genetlink.c-
+> > net/netlink/genetlink.c:        err = register_pernet_subsys(&genl_pernet_ops);
+> > net/netlink/genetlink.c-        if (err)
+> > net/netlink/genetlink.c-                goto problem;
 > 
-> Do not apply features to hardware if the interface is down. In case runtime
-> PM is enabled, and while the interface is down, the IP will be in reset
-> mode (as for some platforms disabling the clocks will switch the IP to
-> reset mode, which will lead to losing register contents) and applying
-> settings in reset mode is not an option. Instead, cache the features and
-> apply them in ravb_open() through ravb_emac_init().
+> Most likely, judging by the backtrace, the bug is the same [1]:
 > 
-> To avoid accessing the hardware while the interface is down
-> pm_runtime_active() check was introduced. Along with it the device runtime
-> PM usage counter has been incremented to avoid disabling the device clocks
-> while the check is in progress (if any).
-> 
-> Commit prepares for the addition of runtime PM.
-> 
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> Call Trace:
+>  <TASK>
+>  genl_dumpit+0x119/0x220 net/netlink/genetlink.c:1025
+>  netlink_dump+0x588/0xca0 net/netlink/af_netlink.c:2264
+>  __netlink_dump_start+0x6d0/0x9c0 net/netlink/af_netlink.c:2370
+>  genl_family_rcv_msg_dumpit+0x1e1/0x2d0 net/netlink/genetlink.c:1074
+>  genl_family_rcv_msg net/netlink/genetlink.c:1190 [inline]
+>  genl_rcv_msg+0x470/0x800 net/netlink/genetlink.c:1208
+>  netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2543
+>  genl_rcv+0x28/0x40 net/netlink/genetlink.c:1217
+>  netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
+>  netlink_unicast+0x53b/0x810 net/netlink/af_netlink.c:1367
+>  netlink_sendmsg+0x8b7/0xd70 net/netlink/af_netlink.c:1908
+>  sock_sendmsg_nosec net/socket.c:730 [inline]
+>  __sock_sendmsg+0xd5/0x180 net/socket.c:745
+>  ____sys_sendmsg+0x6ac/0x940 net/socket.c:2584
+>  ___sys_sendmsg+0x135/0x1d0 net/socket.c:2638
+>  __sys_sendmsg+0x117/0x1e0 net/socket.c:2667
+>  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>  do_syscall_64+0xd3/0x250 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x63/0x6b
+> RIP: 0033:0x7f35d567cda9
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+Ok, then a series of fixes probably needs to happen so each maintain
+can review and apply them.
 
-[...]
+Maybe some of these subsystems above can only be compiled built-in, so
+that cannot trigger.
 
-MBR, Sergey
+In any case, are you up to pick on that series?
+
+Thanks.
 
