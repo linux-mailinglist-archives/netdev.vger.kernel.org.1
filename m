@@ -1,145 +1,211 @@
-Return-Path: <netdev+bounces-71728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCEE9854DB1
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 17:08:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54D86854DB3
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 17:08:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71CC81F2ADCF
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 16:08:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3CF828F274
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 16:08:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C5355F54E;
-	Wed, 14 Feb 2024 16:08:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8EE95F865;
+	Wed, 14 Feb 2024 16:08:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oD1VNGcg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CkJp8AaH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 553395EE7E;
-	Wed, 14 Feb 2024 16:08:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4E715EE7E
+	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 16:08:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707926912; cv=none; b=LAosxdQ1O7Mp1zMTO3J8DLUQzg3DKYc96YEnrXv0dJ6ZRmtZIuyMPV6BC3aL8yl5B8Db5o0+tPnBh7iSTwZ6VEVZOFH6uoP/Og0FiweqjOjnLK2hoTD1tpEAnO4ATQt1vJAfJkEplA6XRU1Kf1DukHwb1e0ZyeXu4HlqPOeHjFQ=
+	t=1707926931; cv=none; b=oqu0YKUCPLnpR5MtZW+v9mFdSq7D/5+As6W470eA+5/KSPq91IsSrBGDuaGzZMjhh8OQys7K+XQ3fa0D1+3EgDy1+76tqWgcWQkkl7zoVin0EXfRUoo9Xa1kAOFfb0p7o94In2ymuUhesXVOLTMUqLKWaVnO7NHvWO2ZSAZAIlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707926912; c=relaxed/simple;
-	bh=Keqc0+cgPcB6PjYjiWxkVk/Y5Lw2I720GhazT5VZGrU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=X0wftpzV5vfZXRnGivHoiU5Gt+5FuFJfXEjvqnAj/nSjnybvp2hI5UEjl5u9EbtOvEn6Z3KRkNAbpbpgMZmTDrFMxMv/BeXdoHrUOP5P8KHr7yLD/0M+jetCBvaFvoAF0w7JX+GKkefhaxL9ce6CiWKDHMrgE8C7msg4VCe0hnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oD1VNGcg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73A43C433C7;
-	Wed, 14 Feb 2024 16:08:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707926911;
-	bh=Keqc0+cgPcB6PjYjiWxkVk/Y5Lw2I720GhazT5VZGrU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oD1VNGcgZd2xVXjigkrAxO02r5CpaErkSiS0mgkG/iy3pbXiTaruTBolsBIFZpUSW
-	 jMQFYHEEAfGGMFT6kHIPKsLWC1zu4Jpi86pUX1gKzGMxrq26uJ/bNeD9WsmMjd7Izh
-	 wsloL+StkMG6x5N/U37yiM8h6t35uaM253zVoViSDWPRPtZD8GABst8oj3ANVsyka1
-	 5HBxPKnh3+LKwa8hWrU8BvCYPllaqXr71usYSe3BgMeUqZDAKiX8Md6vkE/+OLKh5B
-	 w0HHq3Ii8Pzh/dc/dMFYkJeVaMWDvQq9AHAwW+21GL/fG9Zx3AAKQAnAaGnpyhvJ/s
-	 THdGimyL1qGnA==
-Date: Wed, 14 Feb 2024 08:08:30 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: Kalle Valo <kvalo@kernel.org>, Vinayak Yadawad 
- <vinayak.yadawad@broadcom.com>, linux-wireless@vger.kernel.org,
- jithu.jance@broadcom.com, Arend van Spriel <arend.vanspriel@broadcom.com>,
- netdev@vger.kernel.org
-Subject: Re: [PATCH 1/1] wifi: nl80211: Add support for plumbing SAE groups
- to driver
-Message-ID: <20240214080830.65f6d649@kernel.org>
-In-Reply-To: <6641f3f90bdc1d24f3a7fd795be672ce02685630.camel@sipsolutions.net>
-References: <309965e8ef4d220053ca7e6bd34393f892ea1bb8.1707486287.git.vinayak.yadawad@broadcom.com>
-	<87mss6f8jh.fsf@kernel.org>
-	<2c38eaed47808a076b6986412f92bb955b0599c3.camel@sipsolutions.net>
-	<20240213174314.26982cd8@kernel.org>
-	<6641f3f90bdc1d24f3a7fd795be672ce02685630.camel@sipsolutions.net>
+	s=arc-20240116; t=1707926931; c=relaxed/simple;
+	bh=pYQ6m2g2xB9FiGc7fUVB9aFo+2SuHOv/Hk+omg8ZnFM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=nF4LtzrDiOOb9fh9XDZdfNnBamMEO5xZHKAcR2xRnofdxvsrw4zGphHaf9DF2vK+sPgZvcMWZt7POxtQ/tGvTYUPvGi2/PrLC68BquQXbxMACVn7NkXwUUkP+rOso55Oyotu7AujhNFnm98AqaZnldava5bEbHy3a/ZFAB/xjFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CkJp8AaH; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707926928;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LFkYGBKgoKWvAKwSi8jHrZTu6gO8Ejnv8YkRpe/tU0c=;
+	b=CkJp8AaH18TLipCtBw/R3+letFgRNQk+5kNDDu4+JPYXmqV/QPYo96uF9BBP+Il03AZi5A
+	1LfwTvoYTMBvUaJFUCBptrAv/NjfCP1p1JheWsuCNk9hZD5NwC8MvWxwvEyzLDqJcNf8vW
+	U4TY0am4Ebb5w90IdUvA8MRT5L4TZC8=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-313-7f0P8GOaOs2mZAW59Zx48g-1; Wed, 14 Feb 2024 11:08:47 -0500
+X-MC-Unique: 7f0P8GOaOs2mZAW59Zx48g-1
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-5611e1da4c6so3804062a12.1
+        for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 08:08:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707926926; x=1708531726;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LFkYGBKgoKWvAKwSi8jHrZTu6gO8Ejnv8YkRpe/tU0c=;
+        b=R3JM+GB9E1tsIe1KB4m0aIvEZhCAog6ZNn7stTOUrTACg2dvRuP/nfMRLXprU8kWNa
+         jQgqcrVQG9aIWQ1bPQH5CeGy//syFbXUj/SGD+zF77CKEYURONSZaaACt9IIext5385F
+         FGvJxGl+vVlCZ/8oChbHMIOBD/bW7Q5jQTE0iJxpzQX64P9RbnldcCLzpFDnIX2oUTGf
+         CdoWLiYReHk1c2Sw+Kbr3n3GcGSiC6Q+eU8OGmcD1YsrHxYymO046kJvQWnO4IBoD29+
+         DhhoPWli83f7Nhh1YSdJNI8Ag09jxnfLwJFOEGIGGReIKeyo9CPNx8kEkPAcpkXmA8k+
+         mdUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVa+TrKuIDITqBbFAk1hzw7DayD3wqUjNdVsbg/BV8xzT8OCD0GuuwUjIveBJtzGbpmUdOhUsMkWrNgEz4c+SlDbr0dw6zf
+X-Gm-Message-State: AOJu0YzPMPbqAjhwUQWe7zPEHaWIr+OFBrDFu/wjqb7EwH4A2qZVWyzv
+	iKlko/LeRKqMFaanRvHUui33ep2IwJlCKw5zXTGj9oW1yQZ2fupg6XddyxrP9N581hzQfYt+Bws
+	2/CK/aPFPD0X/tYBhluMFd0Ik22ezoOLSOxJLPtrwTB1UwTilDLO2Mg==
+X-Received: by 2002:a50:fb02:0:b0:561:f645:aa88 with SMTP id d2-20020a50fb02000000b00561f645aa88mr2658736edq.39.1707926925999;
+        Wed, 14 Feb 2024 08:08:45 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGqMJkRFF7ruKRiTmj9Ex1FZJe+wFMrOrs0QX5Gp+kJGSeSOkxFT4Pppctp781Lc1jKhcoC/g==
+X-Received: by 2002:a50:fb02:0:b0:561:f645:aa88 with SMTP id d2-20020a50fb02000000b00561f645aa88mr2658717edq.39.1707926925681;
+        Wed, 14 Feb 2024 08:08:45 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXhv+05WW9Uc2W8dgxJoZ9zYI2AMvlYhkyzz+2EZWmq7YKUCFlI4VZayvObHgvKf/5ly5iMrX+26uECqTzxXMNj7vHnUD9j9Vb8BLhrfxnqPeMV/tdvEE5PAe/3MhX0YRlS2Kkp9pdU2tVxkXw7cvWrwEQGRH50jucZeSyD5O1VREfFZ/0rH0jsfXhFRzcsXZ+iQq+HzKTba0UYL6Unj9BkZEB6U1xoxQV0AMs3WVoJp8NFy7BAcXVuQeVghGOsQE4gjzDs7Tysv3rOPukyzsh7AdVqlKkjLElry+1JJAqTBj4uFaM84yH64fZedec8j50DKpYB8BsQ9uupX27KYlWhZRXgX8emfQEU0l0NcTsjZi/F6CN8qCB80thiJ0Twjfox1+i8UPXqJgKzHYLllAwiAdA26OBZJh2C01HSrCwhzRojtMXFtM3FWjfX6bunVNWTSsRwjEG+p2P/JY/me0TarTwvuCIZQWpu9SxgK7mCG88tgbPilko/N5pvNEUiDR2uptiH6MFEeEPcTPIg26QVmenO2d2uUPdjQKA4qsDTldmrunb241dNZEtBO42PS6nVmGhpbuPh61nBx/b7smATRhzicWQKMGCr1OMi+Rr5ocU5QdoJ/A5jFVEd2Bua6yRyC9KwRsp3RuznoQy+QuB5V5a/qm9O7aV2g3lVcYEhujgtOmhgR3HtyIigR+Qs6ZenDKl0
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id x21-20020aa7d395000000b0056166a5ee75sm4699065edq.30.2024.02.14.08.08.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Feb 2024 08:08:45 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id A167A10F57E5; Wed, 14 Feb 2024 17:08:44 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, =?utf-8?B?QmrDtnJuIFTDtnBlbA==?=
+ <bjorn@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Alexei Starovoitov <ast@kernel.org>, Andrii
+ Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Eric
+ Dumazet <edumazet@google.com>, Hao Luo <haoluo@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Jiri Olsa <jolsa@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, KP
+ Singh <kpsingh@kernel.org>, Maciej Fijalkowski
+ <maciej.fijalkowski@intel.com>, Magnus Karlsson
+ <magnus.karlsson@intel.com>, Martin KaFai Lau <martin.lau@linux.dev>,
+ Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+ Song Liu <song@kernel.org>, Stanislav Fomichev <sdf@google.com>, Thomas
+ Gleixner <tglx@linutronix.de>, Yonghong Song <yonghong.song@linux.dev>
+Subject: Re: [PATCH RFC net-next 1/2] net: Reference bpf_redirect_info via
+ task_struct on PREEMPT_RT.
+In-Reply-To: <20240214142827.3vV2WhIA@linutronix.de>
+References: <20240213145923.2552753-1-bigeasy@linutronix.de>
+ <20240213145923.2552753-2-bigeasy@linutronix.de>
+ <66d9ee60-fbe3-4444-b98d-887845d4c187@kernel.org>
+ <20240214121921.VJJ2bCBE@linutronix.de> <87y1bndvsx.fsf@toke.dk>
+ <20240214142827.3vV2WhIA@linutronix.de>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Wed, 14 Feb 2024 17:08:44 +0100
+Message-ID: <87le7ndo4z.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 14 Feb 2024 11:27:42 +0100 Johannes Berg wrote:
-> > It doesn't seem like Arend is afforded much paid time "to look after
-> > this".  
-> 
-> I don't know if that's even the core of my complaint. I don't know if
-> it's true, but let's assume Arend _does_ get sufficient time to take
-> care of the driver.
+Sebastian Andrzej Siewior <bigeasy@linutronix.de> writes:
 
-Right, right, I know that's not the core of your complaint. More of an
-adjacent question about somehow reflecting the "vendor engagement level"
+> On 2024-02-14 14:23:10 [+0100], Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>> Sebastian Andrzej Siewior <bigeasy@linutronix.de> writes:
+>>=20
+>> > On 2024-02-13 21:50:51 [+0100], Jesper Dangaard Brouer wrote:
+>> >> I generally like the idea around bpf_xdp_storage.
+>> >>=20
+>> >> I only skimmed the code, but noticed some extra if-statements (for
+>> >> !NULL). I don't think they will make a difference, but I know Toke wa=
+nt
+>> >> me to test it...
+>> >
+>> > I've been looking at the assembly for the return value of
+>> > bpf_redirect_info() and there is a NULL pointer check. I hoped it was
+>> > obvious to be nun-NULL because it is a static struct.
+>> >
+>> > Should this become a problem I could add
+>> > "__attribute__((returns_nonnull))" to the declaration of the function
+>> > which will optimize the NULL check away.
+>>=20
+>> If we know the function will never return NULL (I was wondering about
+>> that, actually), why have the check in the C code at all? Couldn't we ju=
+st
+>> omit it entirely instead of relying on the compiler to optimise it out?
+>
+> The !RT version does:
+> | static inline struct bpf_redirect_info *xdp_storage_get_ri(void)
+> | {
+> |         return this_cpu_ptr(&bpf_redirect_info);
+> | }
+>
+> which is static and can't be NULL (unless by mysterious ways the per-CPU
+> offset + bpf_redirect_info offset is NULL). Maybe I can put this in
+> this_cpu_ptr()=E2=80=A6 Let me think about it.
+>
+> For RT I have:
+> | static inline struct bpf_xdp_storage *xdp_storage_get(void)
+> | {
+> |         struct bpf_xdp_storage *xdp_store =3D current->bpf_xdp_storage;
+> |
+> |         WARN_ON_ONCE(!xdp_store);
+> |         return xdp_store;
+> | }
+> |
+> | static inline struct bpf_redirect_info *xdp_storage_get_ri(void)
+> | {
+> |         struct bpf_xdp_storage *xdp_store =3D xdp_storage_get();
+> |
+> |         if (!xdp_store)
+> |                 return NULL;
+> |         return &xdp_store->ri;
+> | }
+>
+> so if current->bpf_xdp_storage is NULL then we get a warning and a NULL
+> pointer. This *should* not happen due to xdp_storage_set() which
+> assigns the pointer. However if I missed a spot then there is the check
+> which aborts further processing.
+>
+> During testing I forgot a spot in egress and the test module. You could
+> argue that the warning is enough since it should pop up in testing and
+> not production because the code is always missed and not by chance (go
+> boom, send a report). I *think* I covered all spots, at least the test
+> suite didn't point anything out to me.
 
-> The core of the complaint here is that regardless of that, Broadcom is
-> treating the driver as a dead end, a fork in the road they're no longer
-> travelling. So "supporting" that driver may all be well, in the sense
-> that it's there for the existing hardware/firmware that it supports.
-> 
-> But! It's not getting new features nor support for new devices, I don't
-> even know if it still supports newer firmware images for the devices it
-> already supports. Some new driver support is coming in by way of the
-> Apple-support folks, but you saw how that's going ...
+Well, I would prefer if we could make sure we covered everything and not
+have this odd failure mode where redirect just mysteriously stops
+working. At the very least, if we keep the check we should have a
+WARN_ON in there to make it really obvious that something needs to be
+fixed.
 
-To a large extent I think it's on us to define what "paid to look after
-a driver" means. Any line we draw, no matter how arbitrary, can be used
-by the developers to justify the time spent working upstream to their
-management. Or so I hope.
+This brings me to another thing I was going to point out separately, but
+may as well mention it here: It would be good if we could keep the
+difference between the RT and !RT versions as small as possible to avoid
+having subtle bugs that only appear in one configuration.
 
-Since Broadcom didn't abandon client WiFi chipsets, wouldn't it be
-reasonable to expect someone to work on the upstream driver at least
-half time?
+I agree with Jesper that the concept of a stack-allocated "run context"
+for the XDP program makes sense in general (and I have some vague ideas
+about other things that may be useful to stick in there). So I'm
+wondering if it makes sense to do that even in the !RT case? We can't
+stick the pointer to it into 'current' when running in softirq, but we
+could change the per-cpu variable to just be a pointer that gets
+populated by xdp_storage_set()?
 
-> Yet at the same time Broadcom _are_ sending patches to the core wifi
-> stack, in order to support new features/offloads for their new firmware
-> builds etc. on some/other/new devices. New features for the stack where
-> we cannot actually see the driver implementation, maintain it, etc. Not
-> that in many cases the driver implementation would be all that
-> interesting, but it's still pushing code and work into upstream that it
-> will never benefit from.
-> 
-> So this disconnect really is the complaint: Broadcom want us to maintain
-> the stack for them, do things for them like in this patch in support of
-> their latest firmware builds, but they definitely do _not_ want to do
-> anything upstream that would actually support these new things they
-> have.
-> 
-> At which point, yeah, I'm putting my foot down and saying this has to
-> stop. I really don't (**) care about Broadcom doing their own vendor-
-> specific APIs if there's zero chance the things they're needed for will
-> ever land upstream anyway.
-> 
-> (**) No longer. I used to think that being more open about this would
-> encourage folks to start a journey of contributing more upstream, but
-> clearly that hasn't worked out.
-> 
-> Now this is why I used to be more open: I will also most definitely not
-> accept all the vendor APIs upstream if someone later decides they do
-> want an upstream driver, and then push all the vendor stuff on grounds
-> that "it's used now and we have to support it" ... We don't, at least
-> not upstream, what you sell to your customers really isn't our problem.
-> 
-> (And to be honest, if customers cared, we'd not be in this position)
-> 
-> > On the Ethernet side I have a nebulous hope to require vendors who want
-> > the "Supported" status to run our in-tree tests against their HW daily.
-> > As a way to trigger the loss of status. Otherwise it's hard to catch
-> > people drifting away.  
-> 
-> Every day seems a bit excessive? OTOH, every day is a good way of saying
-> "you really have to automate this", but then once you do that, maybe you
-> don't need to pay anyone to really maintain it, beyond trying to keep
-> the tests running?
+I'm not really sure if this would be performance neutral (it's just
+moving around a few bits of memory, but we do gain an extra pointer
+deref), but it should be simple enough to benchmark.
 
-Ack, I'm curious what would end up happening. It's not the primary
-reason for working on a shared test pool just a potential side benefit.
+> I was unsure if I need something around net_tx_action() due to
+> TC_ACT_REDIRECT (I think qdisc) but this seems to be handled by
+> sch_handle_egress().
 
-> Also not sure what that status really implies, I think Broadcom would be
-> quite happy to just mark the driver as orphaned...
+Yup, I believe you're correct.
+
+-Toke
+
 
