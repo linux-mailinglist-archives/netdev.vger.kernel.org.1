@@ -1,160 +1,239 @@
-Return-Path: <netdev+bounces-71609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1892D854282
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 06:46:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D562A8542C5
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 07:26:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 822F11F2136D
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 05:46:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FF9F1F23222
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 06:26:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D6A7CA73;
-	Wed, 14 Feb 2024 05:46:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B0E110A2C;
+	Wed, 14 Feb 2024 06:26:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="MvK2RfOR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VOgcpSYE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7151411183
-	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 05:45:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ECB210A1B
+	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 06:26:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707889561; cv=none; b=qbsJYr+law5ya7LxLtD4kfBf8PjmpqebpBEo6xLYtEQilFs2hjQadXOHXTNKSxOZGtO97DaqBkkIyJPHmxAB8uJyfqlfy8osh7CgBbbJuTwj8eyulmOQ3e+59BMIsEPlt/myVqM9EIc5rwONiX2Jj2FzE1T6NGcJ2VAi05Mozr8=
+	t=1707891988; cv=none; b=QisH4nv53jKpDK8FoaFcOauR9PR8jO2Go/PWG5ehZxKbaNT7fwhfXbyMlxHDt820Hch8QWJdvCMxUSzCc0vrrK5OFgCMvriAjisVFmrKmZU7A2eo2ABd0lpXEhJ8g2x8Hyns/6vSz7jadSVB8bqOePl/z4CxmAIH+lTJL2gb6Zk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707889561; c=relaxed/simple;
-	bh=JmjxFOUh3LKPSsN8pCRC8VOF/s6zvo9bNDnyMFYthA8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qn1BkRq5zbOrLJ0R/K7ISn51+3OlmPXWqM6KTuIM428xDk+bAfSAffAqMk0+x9Wjx067fOhyI0vwecyg1TRW9q6nn0hVnUwuGWfSUCN52PwXfpyDj2aNTIuRzJqAEIQe7aZ3ugWpPRTtGR0x3NPheSRAXGEb0y3xCo4YMaizaXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=MvK2RfOR; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-33cdedb40c4so730477f8f.2
-        for <netdev@vger.kernel.org>; Tue, 13 Feb 2024 21:45:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1707889556; x=1708494356; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/AAhQjlryQad1Zs2AYpvY1IsmIDvrveMyNvF06IB4YQ=;
-        b=MvK2RfORjhKN3vOgEeS8Ne6fil/SZ3NbMaxCodY2+09nEPj7c67OAyrZ83aAmBzID5
-         5ZruIkx/uNHcXWub5wVaoh1N5QQ1KCJxUc6WiFgdSRh0Il9G+PKiteE87ifFG4fO4Ti2
-         P69PUoLAiz6PhS2t0BvwLU55FhJr1n5LIATODjAzNy/2BsTxg3to1iD6Py0YZuW0HG1a
-         Q8MvwzfiYRNdO0Ksd4kGQxX8Ex+mMsG3OB8bs20Kb5JR2OMBQWFJi01XknQKRl0w1lHd
-         kxKjQsLUcdRPpGZTkpqfoJyN5LIe0rxzMppojYrsHy+01368BEzcpM5QKIxOUE9e1x1+
-         oI+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707889556; x=1708494356;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/AAhQjlryQad1Zs2AYpvY1IsmIDvrveMyNvF06IB4YQ=;
-        b=t50FdfZXnlA1BKiVn5CHf2Ii7HT4jZwh3znqIeXICDtRgiFXZNdV9oAtD0vWW07R9D
-         5Bd8H0dcAiaUrmQeI4iZv3Gr0qdqResKAQed85LBLe/h7e7Wu83WxRJzJH81UseDwopH
-         hhailFxZ+dX8kposp+PdOSqab8GgVaul3R7+Awo6KgoaSpbYUHogcjg0c5GhPYJJslyr
-         f7E1gASiAUesW/h4QyKW7XNbQxSLmcnkgnNBhU/Z5qUn3Gd3dFmrM9yJwyaSxnnUfXxR
-         q6GeSFz0W0z0SX1GrZ+oUcPI4h57uwLdf5/mVPNJH3rvLkPEN8tS7hZNo9fsuPRQHAVn
-         4vQw==
-X-Gm-Message-State: AOJu0YyfaY8gL54DB0wIZFuBkXhSeo5/aCGXzely11e7g+FLPAZCDZYn
-	3YTmiksre0+08aeilqzIfv+QyH1UTS8yvCBMDDZfaf1WZ7EOc/qTwNdaITu6Ok8=
-X-Google-Smtp-Source: AGHT+IHWDtZFUv6VmzlW+aWnM9Z58t2KoCaFJW2zVad9uJzsaZq4Q5o9aGgaIajWJS0rO/ufHqUwGQ==
-X-Received: by 2002:adf:eec5:0:b0:33b:fef:c094 with SMTP id a5-20020adfeec5000000b0033b0fefc094mr894627wrp.22.1707889556410;
-        Tue, 13 Feb 2024 21:45:56 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXYZBf36twkWsapTUvPo4T5Syd6owZfabMh3dJCCV9obon6MgGwx2rXNdnzmw3RE/MXeL60agKXPMdT9H2Xzy4Xp+pbSwB4HGpFl3UyVTITqWoI9w5KF70vScuulmFxI0OBeWvCR00nTV1JISK3xp4lbRUkeu0Ij1qVgVJoqExPjT6OZqimk7cVaj7J8yslwrRAB2IrRlaPVVl8ihdgBPchTN0RPZDuEUPuDXlsPLt3Vqg/M6yD2MTJaC8OeAd+ePINtIyLoJ4+LMJyuU4TjpAsnLaJSC4LE8MVOAPs6KxUh8tWiUEfnHWRnKGx5ibfihba8JIJFqgNjjDIHYhTuCZSshojOyVupjf3Z7DYhadTD+QWL7d3
-Received: from [192.168.50.4] ([82.78.167.20])
-        by smtp.gmail.com with ESMTPSA id cl7-20020a5d5f07000000b0033b8881f31dsm5234037wrb.68.2024.02.13.21.45.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Feb 2024 21:45:55 -0800 (PST)
-Message-ID: <f6d71cc1-0208-44a3-a977-e90a0978fbe8@tuxon.dev>
-Date: Wed, 14 Feb 2024 07:45:54 +0200
+	s=arc-20240116; t=1707891988; c=relaxed/simple;
+	bh=Rr60Xpfs0ugTI2/zGgJVJ36z4D+ssHoGg27XnCH7Mqk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EDOO57rhpAdJPSANplqDxxxRFqa3zxbo4PIgbD3F28BSD96S0lUD0sIiqXr7NIyJU66eOtg5zQK8hKHu+KlnaX72BCT4WERKa+S5hU50est60AAvbxOqNBEJpq+eRHE8yg7Zxz0hX1vBsMx0sZsBivE1DV39w8yNLH5dfIL3C18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VOgcpSYE; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707891986; x=1739427986;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Rr60Xpfs0ugTI2/zGgJVJ36z4D+ssHoGg27XnCH7Mqk=;
+  b=VOgcpSYEJX8lM54C1YteOWkbx6W7SeoNPkmm6t881v1XeBIoJUInI5HM
+   JYDTd2l2JEweeAi6VUemTFjZWphnTAI5jtWP6Hjrgj3u0dVu6aeWB2NCx
+   c3I/iFHxrQ4J3i8kRqjESfMSK02FgML21V6FYxMPrMEuKX4P+zj9TvXLC
+   48b/RpUgHHzA+HS329BYYcOERNNFa8nKLRXAbcZMbK2SyFvqNMUKkzFpy
+   UJCTfojhO6MIC69NbLjPqHXNVAZMHSx1pNp3h6/gSambnDELTIId6Wvt7
+   bMXBlLqy9wwjBMDOH3k31Bo6JrCfSEA0cdONXTyrfaAk8r2Xhf+mnVyBS
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="1798486"
+X-IronPort-AV: E=Sophos;i="6.06,159,1705392000"; 
+   d="scan'208";a="1798486"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2024 22:26:24 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,159,1705392000"; 
+   d="scan'208";a="3422285"
+Received: from unknown (HELO mev-dev) ([10.237.112.144])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2024 22:26:22 -0800
+Date: Wed, 14 Feb 2024 07:26:17 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: maciej.fijalkowski@intel.com, netdev@vger.kernel.org,
+	michal.kubiak@intel.com, intel-wired-lan@lists.osuosl.org,
+	pio.raczynski@gmail.com, sridhar.samudrala@intel.com,
+	jacob.e.keller@intel.com, wojciech.drewek@intel.com,
+	Piotr Raczynski <piotr.raczynski@intel.com>,
+	przemyslaw.kitszel@intel.com
+Subject: Re: [Intel-wired-lan] [iwl-next v1 04/15] ice: add basic devlink
+ subfunctions support
+Message-ID: <ZcxdCU/yo0R5cRAq@mev-dev>
+References: <20240213072724.77275-1-michal.swiatkowski@linux.intel.com>
+ <20240213072724.77275-5-michal.swiatkowski@linux.intel.com>
+ <ZcsueJ1tr-GdseIt@nanopsycho>
+ <Zcs442A/+nuLJw6j@mev-dev>
+ <ZctSGPf6v0QlfMUu@nanopsycho>
+ <ZctaY7AfjS/N2J9X@mev-dev>
+ <ZcuDd4ajkQnxJz77@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 4/6] net: ravb: Move the update of
- ndev->features to ravb_set_features()
-To: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- biju.das.jz@bp.renesas.com
-Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-References: <20240213094110.853155-1-claudiu.beznea.uj@bp.renesas.com>
- <20240213094110.853155-5-claudiu.beznea.uj@bp.renesas.com>
- <3747ad9a-217a-2f43-835a-7c23f6a710d2@omp.ru>
-From: claudiu beznea <claudiu.beznea@tuxon.dev>
-Content-Language: en-US
-In-Reply-To: <3747ad9a-217a-2f43-835a-7c23f6a710d2@omp.ru>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZcuDd4ajkQnxJz77@nanopsycho>
 
-
-
-On 13.02.2024 21:52, Sergey Shtylyov wrote:
-> On 2/13/24 12:41 PM, Claudiu wrote:
+On Tue, Feb 13, 2024 at 03:57:59PM +0100, Jiri Pirko wrote:
+> Tue, Feb 13, 2024 at 01:02:43PM CET, michal.swiatkowski@linux.intel.com wrote:
+> >On Tue, Feb 13, 2024 at 12:27:20PM +0100, Jiri Pirko wrote:
+> >> Tue, Feb 13, 2024 at 10:39:47AM CET, michal.swiatkowski@linux.intel.com wrote:
+> >> >On Tue, Feb 13, 2024 at 09:55:20AM +0100, Jiri Pirko wrote:
+> >> >> Tue, Feb 13, 2024 at 08:27:13AM CET, michal.swiatkowski@linux.intel.com wrote:
+> >> >> >From: Piotr Raczynski <piotr.raczynski@intel.com>
+> >> 
+> >> [...]
+> >> 
+> >> 
+> >> >
+> >> >> 
+> >> >> >+}
+> >> >> >+
+> >> >> >+/**
+> >> >> >+ * ice_dealloc_dynamic_port - Deallocate and remove a dynamic port
+> >> >> >+ * @dyn_port: dynamic port instance to deallocate
+> >> >> >+ *
+> >> >> >+ * Free resources associated with a dynamically added devlink port. Will
+> >> >> >+ * deactivate the port if its currently active.
+> >> >> >+ */
+> >> >> >+static void ice_dealloc_dynamic_port(struct ice_dynamic_port *dyn_port)
+> >> >> >+{
+> >> >> >+	struct devlink_port *devlink_port = &dyn_port->devlink_port;
+> >> >> >+	struct ice_pf *pf = dyn_port->pf;
+> >> >> >+
+> >> >> >+	if (dyn_port->active)
+> >> >> >+		ice_deactivate_dynamic_port(dyn_port);
+> >> >> >+
+> >> >> >+	if (devlink_port->attrs.flavour == DEVLINK_PORT_FLAVOUR_PCI_SF)
+> >> >> 
+> >> >> I don't understand how this check could be false. Remove it.
+> >> >>
+> >> >Yeah, will remove
+> >> >
+> >> >> 
+> >> >> >+		xa_erase(&pf->sf_nums, devlink_port->attrs.pci_sf.sf);
+> >> >> >+
+> >> >> >+	devl_port_unregister(devlink_port);
+> >> >> >+	ice_vsi_free(dyn_port->vsi);
+> >> >> >+	xa_erase(&pf->dyn_ports, dyn_port->vsi->idx);
+> >> >> >+	kfree(dyn_port);
+> >> >> >+}
+> >> >> >+
+> >> >> >+/**
+> >> >> >+ * ice_dealloc_all_dynamic_ports - Deallocate all dynamic devlink ports
+> >> >> >+ * @pf: pointer to the pf structure
+> >> >> >+ */
+> >> >> >+void ice_dealloc_all_dynamic_ports(struct ice_pf *pf)
+> >> >> >+{
+> >> >> >+	struct devlink *devlink = priv_to_devlink(pf);
+> >> >> >+	struct ice_dynamic_port *dyn_port;
+> >> >> >+	unsigned long index;
+> >> >> >+
+> >> >> >+	devl_lock(devlink);
+> >> >> >+	xa_for_each(&pf->dyn_ports, index, dyn_port)
+> >> >> >+		ice_dealloc_dynamic_port(dyn_port);
+> >> >> >+	devl_unlock(devlink);
+> >> >> 
+> >> >> Hmm, I would assume that the called should already hold the devlink
+> >> >> instance lock when doing remove. What is stopping user from issuing
+> >> >> port_new command here, after devl_unlock()?
+> >> >>
+> >> >It is only called from remove path, but I can move it upper.
+> >> 
+> >> I know it is called on remove path. Again, what is stopping user from
+> >> issuing port_new after ice_dealloc_all_dynamic_ports() is called?
+> >> 
+> >> [...]
+> >> 
+> >What is a problem here? Calling port_new from user perspective will have
+> >devlink lock, right? Do you mean that devlink lock should be taken for
+> >whole cleanup, so from the start to the moment when devlink is
+> >unregister? I wrote that, I will do that in next version (moving it
 > 
->> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->>
->> Commit c2da9408579d ("ravb: Add Rx checksum offload support for GbEth")
->> introduced support for setting GbEth features. With this the IP-specific
->> features update functions update the ndev->features individually.
->>
->> Next commits add runtime PM support for the ravb driver. The runtime PM
->> implementation will enable/disable the IP clocks on
->> the ravb_open()/ravb_close() functions. Accessing the IP registers with
->> clocks disabled blocks the system.
->>
->> The ravb_set_features() function could be executed when the Ethernet
->> interface is closed so we need to ensure we don't access IP registers while
->> the interface is down when runtime PM support will be in place.
->>
->> For these, move the update of ndev->features to ravb_set_features() and
->> make the IP-specific features set function return int. In this way we
->> update the ndev->features only when the IP-specific features set function
->> returns success and we can avoid code duplication when introducing
->> runtime PM registers protection.
->>
->> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> [...]
+> Yep, otherwise you can ice_dealloc_all_dynamic_ports() and end up with
+> another port created after that which nobody cleans-up.
 > 
->> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
->> index 7a7f743a1fef..b3b91783bb7a 100644
->> --- a/drivers/net/ethernet/renesas/ravb_main.c
->> +++ b/drivers/net/ethernet/renesas/ravb_main.c
->> @@ -2475,7 +2475,7 @@ static int ravb_change_mtu(struct net_device *ndev, int new_mtu)
->>  	return 0;
->>  }
->>  
->> -static void ravb_set_rx_csum(struct net_device *ndev, bool enable)
->> +static int ravb_set_rx_csum(struct net_device *ndev, bool enable)
->>  {
->>  	struct ravb_private *priv = netdev_priv(ndev);
->>  	unsigned long flags;
->> @@ -2492,6 +2492,8 @@ static void ravb_set_rx_csum(struct net_device *ndev, bool enable)
->>  	ravb_rcv_snd_enable(ndev);
->>  
->>  	spin_unlock_irqrestore(&priv->lock, flags);
->> +
->> +	return 0;
->>  }
->>  
->>  static int ravb_endisable_csum_gbeth(struct net_device *ndev, enum ravb_reg reg,
-> 
->    Wait! You're not updating the call site of ravb_set_rx_csum(), are you?
-> It looks like the above 2 hunks aren't needed...
 
-A, you're right. I'll update it in the next version.
+Thanks for pointing it, as you mentioned in other patch, I will take a
+lock for whole init/cleanup.
 
-Thank you,
-Claudiu Beznea
-
-> 
-> [...]
-> 
-> MBR, Sergey
+> >upper).
+> >
+> >> 
+> >> >> 
+> >> >> >+	struct device *dev = ice_pf_to_dev(pf);
+> >> >> >+	int err;
+> >> >> >+
+> >> >> >+	dev_dbg(dev, "%s flavour:%d index:%d pfnum:%d\n", __func__,
+> >> >> >+		new_attr->flavour, new_attr->port_index, new_attr->pfnum);
+> >> >> 
+> >> >> How this message could ever help anyone?
+> >> >>
+> >> >Probably only developer of the code :p, will remove it
+> >> 
+> >> How exactly?
+> >>
+> >I meant this code developer, it probably was used to check if number and
+> >indexes are correct, but now it should be removed. Like, leftover after
+> >developing, sorry.
+> >
+> >> [...]
+> >> 
+> >> 
+> >> >> >+static int ice_sf_cfg_netdev(struct ice_dynamic_port *dyn_port)
+> >> >> >+{
+> >> >> >+	struct net_device *netdev;
+> >> >> >+	struct ice_vsi *vsi = dyn_port->vsi;
+> >> >> >+	struct ice_netdev_priv *np;
+> >> >> >+	int err;
+> >> >> >+
+> >> >> >+	netdev = alloc_etherdev_mqs(sizeof(*np), vsi->alloc_txq,
+> >> >> >+				    vsi->alloc_rxq);
+> >> >> >+	if (!netdev)
+> >> >> >+		return -ENOMEM;
+> >> >> >+
+> >> >> >+	SET_NETDEV_DEV(netdev, &vsi->back->pdev->dev);
+> >> >> >+	set_bit(ICE_VSI_NETDEV_ALLOCD, vsi->state);
+> >> >> >+	vsi->netdev = netdev;
+> >> >> >+	np = netdev_priv(netdev);
+> >> >> >+	np->vsi = vsi;
+> >> >> >+
+> >> >> >+	ice_set_netdev_features(netdev);
+> >> >> >+
+> >> >> >+	netdev->xdp_features = NETDEV_XDP_ACT_BASIC | NETDEV_XDP_ACT_REDIRECT |
+> >> >> >+			       NETDEV_XDP_ACT_XSK_ZEROCOPY |
+> >> >> >+			       NETDEV_XDP_ACT_RX_SG;
+> >> >> >+
+> >> >> >+	eth_hw_addr_set(netdev, dyn_port->hw_addr);
+> >> >> >+	ether_addr_copy(netdev->perm_addr, dyn_port->hw_addr);
+> >> >> >+	netdev->netdev_ops = &ice_sf_netdev_ops;
+> >> >> >+	SET_NETDEV_DEVLINK_PORT(netdev, &dyn_port->devlink_port);
+> >> >> >+
+> >> >> >+	err = register_netdev(netdev);
+> >> >> 
+> >> >> It the the actual subfunction or eswitch port representor of the
+> >> >> subfunction. Looks like the port representor. In that case. It should be
+> >> >> created no matter if the subfunction is activated, when it it created.
+> >> >> 
+> >> >> If this is the actual subfunction netdev, you should not link it to
+> >> >> devlink port here.
+> >> >>
+> >> >This is the actual subfunction netdev. Where in this case it should be
+> >> >linked?
+> >> 
+> >> To the SF auxdev, obviously.
+> >> 
+> >> Here, you should have eswitch port representor netdev.
+> >> 
+> >Oh, ok, thanks, will link it correctly in next version.
+> >
 
