@@ -1,149 +1,137 @@
-Return-Path: <netdev+bounces-71867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFCDE8556CB
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 00:02:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 541FB8556F4
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 00:14:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97407282D28
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 23:02:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 870B81C251AD
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 23:14:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A60C413B78C;
-	Wed, 14 Feb 2024 23:02:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1806314199D;
+	Wed, 14 Feb 2024 23:14:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gt5CNsqr"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dWDTxDVg"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF10A4502D
-	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 23:02:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54EED13F006;
+	Wed, 14 Feb 2024 23:14:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707951753; cv=none; b=inJ6ptNP6uzyR4bgSXwIQ+smy1tF+SXydIYXMo1PFjSrg2v2BmyEjcOTCeHZY1U/3N+wbALuMxNhdOvofT+diwMTfJMsvfM14sps88Usq3ewVEkGmind1Y6098G2WnRjHR5sGu6xhoYJS1S7sRUX8ud3Bz7VKb8QQS4FhxCEL2o=
+	t=1707952443; cv=none; b=TTnrgnKzp9fV+CMBqnME+gqobyCrXaN0KId+9uSHTRirYgL6nedpyijCRUFXughoLM+NCuIs1wVR98Wts8a6En3INi1yvuCy4NF35kOpIjI+nx2rAh6k8rGEG9UGxwFM/B8EXUw4d6tluntC6uom7BJiMq/JmkceU265ywoBpUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707951753; c=relaxed/simple;
-	bh=cqWEKTv+pK5/gmdVatT0ND12R+9NOiP4SAY4OtzSw/0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=fxsmQV0jNh1mMhVvLok8bp6iEYmcEghZsh0P9vO/9rV5sxMKRM5D+J5rOrF0N9hG17+uDQoppJYJ56XtO+Flgz2Icm7vYiTuHE4kX6BMJ2jWNj7QzZCCU8b6e/fKFo/n5iuOSVSikxyv87z8w5QZxB4lWvlG3YF/fC08oAdiRZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Gt5CNsqr; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707951750;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cqWEKTv+pK5/gmdVatT0ND12R+9NOiP4SAY4OtzSw/0=;
-	b=Gt5CNsqrMA2KY6/kegyD6QHn77uRRDIV+ofhJz5maBjFozUud2flJ6uH4rtrYGob/CrQY0
-	LvgPs0PRwalRcKBIflMW8FDoXe7HSv5AERw3aB3pTT1hNRkfMJU+GWYZ7GaKYWSwcAQJw5
-	QleoQY2RF+AcBVeo4axekgIam8SX0OA=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-204-fMIb_UkQOtmnxTRfatHWmw-1; Wed, 14 Feb 2024 18:02:29 -0500
-X-MC-Unique: fMIb_UkQOtmnxTRfatHWmw-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a2cb0d70d6cso9637666b.2
-        for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 15:02:28 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707951748; x=1708556548;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cqWEKTv+pK5/gmdVatT0ND12R+9NOiP4SAY4OtzSw/0=;
-        b=H3VJKAq4l/C3jJapFLG15b1PPQqaavOz+weedaKw0fpLwhFA8odAmLHwD4pSadZyUG
-         hEn4B+74CeY3pCqxAXGwthIhQsuk9v2mWJwe7yFQiGmJC8lVeWzXpLOU5Cs3rs+D/nnd
-         hg3kt0WQfhsqD9Nat62qk+m+5tjc7RoS5f64bMlOXiQ8/Y55VLvSpDQRK8x/8LKeCCGp
-         OdbhvMYNpM6Vq2FrPayMMdwUAtDPGyYWgLUt8phRySk3TWIR/zdjEWOIVgCehhwM/rIY
-         8NP6gonQuWugswyD7jAVhq0zt4LHQo87HzWEeqyqwPS3tFmlP2U9vUbbsM6kR9D4/BzV
-         /tUA==
-X-Forwarded-Encrypted: i=1; AJvYcCVzxb/A7Za+Or6iaSZaVXeS/XcFsMdeIk9EHqs6iuJKQAZ35uXKPO6cz+2/hH2K+prIzOfCyKaXNPQu+WQWbUd1U0E1V3YY
-X-Gm-Message-State: AOJu0YwfclqMd5CbUXeSpqVirxqrfwGkOcJo9sXGqoDV8LWM5FgmQmyl
-	dSdEKpeoS11cx2GsGhScTXAZkWNdt0Pk1hyhJnwb0vZOT31ZoCFsdvCBzZ4X3x1vwtTG9pQhBn2
-	aG2Qqmy9Qu6blT0NHWyCnNO0oAPy4zrbh6zuwHlmtX04aTBcHLzqylw==
-X-Received: by 2002:aa7:d952:0:b0:561:ced:4093 with SMTP id l18-20020aa7d952000000b005610ced4093mr22857eds.36.1707951748116;
-        Wed, 14 Feb 2024 15:02:28 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGwAbv0p8XEb5CZdU5nMo7RDOF7CDGsdXTO6nSa/5ofpKs9OFHHVE7UovDzYvqv85RDWD1I6A==
-X-Received: by 2002:aa7:d952:0:b0:561:ced:4093 with SMTP id l18-20020aa7d952000000b005610ced4093mr22849eds.36.1707951747837;
-        Wed, 14 Feb 2024 15:02:27 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWfRik3tmJcJzfVLZR6jJMe8DjlZAARqkTe6s9rFnew4TeesqnMQI7SKcYnc+489yEQ+47mclWuRfTvyjJ2qhtRz9XjmQMpyNpxiG/KOrikjIJmvs/tb8ON0jVFmdLUGdoR/E38cMmNcI+woJxddxG/r0VSibLUsEpBh6YNmv7Npoo+BXO/y+Nrz5xlei8Mo3ETAqGPocxvL01Tn1xJyb8T6guNzM3qComNvvjdwG6iZCcHQD/TI53QRL9xXaK3R+SDTrvHM0lLnMj25yL5+VbaG0CXlH0n9KbHgLZRrCr83aImuRMkjzF1erFFbrJv1RrhNtf+YssD
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id c37-20020a509fa8000000b005639c8b6922sm333804edf.52.2024.02.14.15.02.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Feb 2024 15:02:27 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 1630A10F586A; Thu, 15 Feb 2024 00:02:27 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>, Alexei Starovoitov
- <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
- <andrii@kernel.org>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, Martin KaFai Lau
- <martin.lau@linux.dev>, Jakub Kicinski <kuba@kernel.org>, Maciej
- Fijalkowski <maciej.fijalkowski@intel.com>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf-next] bpf/test_run: increase Page Pool's ptr_ring
- size in live frames mode
-In-Reply-To: <87cyszdnrz.fsf@toke.dk>
-References: <20240214153838.4159970-1-aleksander.lobakin@intel.com>
- <87cyszdnrz.fsf@toke.dk>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Thu, 15 Feb 2024 00:02:27 +0100
-Message-ID: <87y1bmd4zg.fsf@toke.dk>
+	s=arc-20240116; t=1707952443; c=relaxed/simple;
+	bh=gLQgyk5X0dfGFtt2TT12BCejyHtjgLKvuI1NVtt0538=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=MTB51t14FxkxtnyOXmhW/qSP+6hxzp0GpVXgZUm17qrLnsL4pent859xP1fiP9jzBI/tNGfdSM85cUrNBl8dzlxbgODeX1E63VsZdg8wxgp2XPT6Th1dAyzKi5MwVVJO7tmYwO+bWZ477lUCNmHZSWQ9v2MjIg5eP4uNZTDdY3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dWDTxDVg; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	Message-Id:Date:Subject:From:From:Sender:Reply-To:Subject:Date:Message-ID:To:
+	Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Ww5EvsQOF699jHBYzWd4MuRfBoadfrzO0BL2hjc2gH4=; b=dWDTxDVgFCcm1eSezpPWqrkHOt
+	q1YKXH5ZsiCxLqjUpS1X8SFfaQPmlJimqna1uzCpAbUuPpNIpISxhJA1NQAHbJumWFQga4pcsYdtM
+	THBl3jyIuWyFcXmHbjapk8+Z+1n9k9rTKaJGvNPeYo272zJSaB50K+eQE0YdvWXxVg1U=;
+Received: from c-76-156-77-114.hsd1.mn.comcast.net ([76.156.77.114] helo=thinkpad.home.lunn.ch)
+	by vps0.lunn.ch with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1raORx-007pqx-4l; Thu, 15 Feb 2024 00:13:57 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+Subject: [PATCH net-next v2 0/8] drivers: net: Convert EEE handling to use
+ linkmode bitmaps
+Date: Wed, 14 Feb 2024 17:13:17 -0600
+Message-Id: <20240214-keee-u32-cleanup-v2-0-4ac534b83d66@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAA1JzWUC/3WNQQqDMBBFryKz7pQYU4ldeY/iQs1YQ2WUxIhFc
+ veG7Lt8PP77F3hyljw8iwscHdbblRPIWwHj3POb0JrEIIVUQgqFHyLCUEkcF+o5bDjo2tRaPbT
+ RAtJsczTZMydfwLQj07lDl8xs/b66b/46yuz/Z48SBU5DTUJXsjFN3y6B+T7O0MUYf58MDWG4A
+ AAA
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Ariel Elior <aelior@marvell.com>, 
+ Manish Chopra <manishc@marvell.com>, 
+ Jesse Brandeburg <jesse.brandeburg@intel.com>, 
+ Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org, 
+ Andrew Lunn <andrew@lunn.ch>
+X-Mailer: b4 0.12.4
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2155; i=andrew@lunn.ch;
+ h=from:subject:message-id; bh=gLQgyk5X0dfGFtt2TT12BCejyHtjgLKvuI1NVtt0538=;
+ b=owEBbQKS/ZANAwAKAea/DcumaUyEAcsmYgBlzUkiGKMiPon6NtfhjVIhDqS+MTgu2ROwdFN6V
+ xw/QM+lh/CJAjMEAAEKAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCZc1JIgAKCRDmvw3LpmlM
+ hEvuD/wLKhX67mktUeliEEcXu/9ijGnoEzC9f7I6P41hTv8taKyQCcsxwJXIqrxHPqgmc8UaHFY
+ nTaYI7j1ZPgZl2in7IoP8z70KgT2oZCi/6RAL1G8zybnb7UapD6fXbuZQoxN11sShSD9z9ld+X8
+ foRAPfcma7ZDRLfOBejWREPkkd1eNVqs5uQhZMnyKI0i8+8uvW5fMIN8z7qF7zBZVnqESvDe8Vi
+ dMI/zyq8gyiCrX5xtyKQ54dzTw1HxpMJ7n4PTkASp7YdsRFKYSFzJLJbcGHhyAeB+zhZ/xrrp2B
+ oVrv1aMfe9W73U0dNWhmj8Q7xIPf8Kv2L/EJUIoAfYo0SMXXruaNhf/XpquBMrueYZo+hRQ2lIS
+ ftygWZnJfZ7FbsuI/qNreZSaIs2UNViUTAdGhtKwY/AdUE+24Ci2PJiwntVEBAzFytFM43OdH7K
+ eZeCO0Z/aD7ePbow3zoayL6q8xMZNRtcakQV1avmlj6gX/tLCFYTxDHF0TgA5brp+hBwR5G5LSw
+ OQv+YgMUYLzoV+nsyEbzEakITZEKnPOYdM//4+2dpEJSDGndtBtTFqaUlrv7FvVDJUBdj/jIKl7
+ Vw+lMmIToHcfgiUUJ6ifCkyCCMR0j9nCnveYiaCRtPWbJDo1MxCuVGnfC+qrpZEDjckowyb5UyD
+ yfZFeNXcYdE47oQ==
+X-Developer-Key: i=andrew@lunn.ch; a=openpgp;
+ fpr=61FB1025CB53263916F9E1B7E6BF0DCBA6694C84
 
-Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com> writes:
+EEE has until recently been limited to lower speeds due to the use of
+the legacy u32 for link speeds. This restriction has been lifted, with
+the use of linkmode bitmaps. This patchset convert some MAC drivers
+still using the old _u32 to link modes, with the aim of soon being
+able to remove the legacy _u32 members in the keee structure.
 
-> Alexander Lobakin <aleksander.lobakin@intel.com> writes:
->
->> Currently, when running xdp-trafficgen, test_run creates page_pools with
->> the ptr_ring size of %NAPI_POLL_WEIGHT (64).
->> This might work fine if XDP Tx queues are polled with the budget
->> limitation. However, we often clear them with no limitation to ensure
->> maximum free space when sending.
->> For example, in ice and idpf (upcoming), we use "lazy" cleaning, i.e. we
->> clean XDP Tx queue only when the free space there is less than 1/4 of
->> the queue size. Let's take the ring size of 512 just as an example. 3/4
->> of the ring is 384 and often times, when we're entering the cleaning
->> function, we have this whole amount ready (or 256 or 192, doesn't
->> matter).
->> Then we're calling xdp_return_frame_bulk() and after 64th frame,
->> page_pool_put_page_bulk() starts returning pages to the page allocator
->> due to that the ptr_ring is already full. put_page(), alloc_page() et at
->> starts consuming a ton of CPU time and leading the board of the perf top
->> output.
->>
->> Let's not limit ptr_ring to 64 for no real reason and allow more pages
->> to be recycled. Just don't put anything to page_pool_params::size and
->> let the Page Pool core pick the default of 1024 entries (I don't believe
->> there are real use cases to clean more than that amount of descriptors).
->> After the change, the MM layer disappears from the perf top output and
->> all pages get recycled to the PP. On my test setup on idpf with the
->> default ring size (512), this gives +80% of Tx performance with no
->> visible memory consumption increase.
->>
->> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
->
-> Hmm, so my original idea with keeping this low was to avoid having a lot
-> of large rings lying around if it is used by multiple processes at once.
-> But we need to move away from the per-syscall allocation anyway, and
-> with Lorenzo's patches introducing a global system page pool we have an
-> avenue for that. So in the meantime, I have no objection to this...
->
-> Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+A couple of Intel drivers do odd things with EEE, setting the autoneg
+bit. It is unclear why, no other driver does, ethtool does not display
+it, and EEE is always negotiated. One patch in this series deletes
+this code. Comments on why its actually useful and should be kept are
+gratefully received.
 
-Actually, since Lorenzo's patches already landed in net-next, let's just
-move to using those straight away. I'll send a patch for this tomorrow :)
+Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+---
+Changes in v2:
+- igb: Fix type 100BaseT to 1000BaseT.
+- Link to v1: https://lore.kernel.org/r/20240204-keee-u32-cleanup-v1-0-fb6e08329d9a@lunn.ch
 
--Toke
+---
+Andrew Lunn (8):
+      net: usb: r8152: Use linkmode helpers for EEE
+      net: usb: ax88179_178a: Use linkmode helpers for EEE
+      net: qlogic: qede: Use linkmode helpers for EEE
+      net: ethernet: ixgbe: Convert EEE to use linkmodes
+      net: intel: i40e/igc: Remove setting Autoneg in EEE capabilities
+      net: intel: e1000e: Use linkmode helpers for EEE
+      net: intel: igb: Use linkmode helpers for EEE
+      net: intel: igc: Use linkmode helpers for EEE
+
+ drivers/net/ethernet/intel/e1000e/ethtool.c      | 17 +++++--
+ drivers/net/ethernet/intel/i40e/i40e_ethtool.c   |  7 +--
+ drivers/net/ethernet/intel/igb/igb_ethtool.c     | 33 ++++++++-----
+ drivers/net/ethernet/intel/igc/igc_ethtool.c     | 13 ++---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c | 48 ++++++++++---------
+ drivers/net/ethernet/qlogic/qede/qede_ethtool.c  | 60 +++++++++++++++---------
+ drivers/net/usb/Kconfig                          |  1 +
+ drivers/net/usb/ax88179_178a.c                   |  9 ++--
+ drivers/net/usb/r8152.c                          | 31 ++++++------
+ 9 files changed, 123 insertions(+), 96 deletions(-)
+---
+base-commit: d1d77120bc2867b3e449e07ee656a26b2fb03d1e
+change-id: 20240204-keee-u32-cleanup-b86d68458d80
+
+Best regards,
+-- 
+Andrew Lunn <andrew@lunn.ch>
 
 
