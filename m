@@ -1,94 +1,270 @@
-Return-Path: <netdev+bounces-71765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F398854FC3
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 18:19:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43AF085500C
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 18:24:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32B0F1F227B5
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 17:19:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 684FB1C21325
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 17:24:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74873839FE;
-	Wed, 14 Feb 2024 17:19:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="35fvl8bj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C221285282;
+	Wed, 14 Feb 2024 17:20:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA4A7F7E0;
-	Wed, 14 Feb 2024 17:19:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF88E839ED;
+	Wed, 14 Feb 2024 17:20:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707931143; cv=none; b=DcP4o+yc7Zrys9WChikFsjtbe8XguIjwYCSaEeooHp35FmI0nzYn5EkfLm8QCo5dNx+e/HwUJHDUkQr/cX0nNRvNRg4WOm9egGA7eBAGZuvfnY6/A/hiC82egsDoJt+UR/BGLq1sf09orz29epYcMt/6GN5HMYKSpwlWsgHP3w4=
+	t=1707931256; cv=none; b=QF3/lu5wFsJl7ZsVBV7lGQa6rk8OYot1Piw+WT4cFMg4x7XuMUCuuIRfzme1r6IPHHdp6j5XDuu/Z/6JZ32MKNhmG+kLyDaHVTR5PuBJtKvmOieYbzCWSMxOEmusHhPtBbqSwlx360dOS3L6/EEgdGKBZvrklgCtnNQRvvgn5CQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707931143; c=relaxed/simple;
-	bh=FzmanoFfNktS2f2G7iWqRptc+GWThwORnp08ceRIa4k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dIP7xbNGG65ZScvawCoTBYbs5Xu6JiyLEnkxV7yop6ZNQUwAAQOEfztQ3LBETep2sNAKJtMJogiDUWINLMjbi9kbmsKh0hdSB6Obg3iDXuaNF8ZAoTDO2fTHyqu6/ebKnEOnv8LnTK8Ujjvat1vSBdded1uTdrKyOtgJIPcKjrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=35fvl8bj; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=rqjuTCEFxSun0myagncIypgOBLIS1dt11iBFupB/8I0=; b=35fvl8bjUNypOVFnnp7BYsLaCU
-	htuVcTLOpxRx5y6RRlA9/WqKclOgTV47qY8c6NfL7YGMbIBx+MIRCEjT2nY2lJTVLPBbVaWW8KXYt
-	ch1niwMWsbH4e9GxFF89AOQhp44UDWWLlkYFlT9CDZL6kQgrJSk/0dEEpH6Qpipl3X+g=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1raIuR-007oA8-FZ; Wed, 14 Feb 2024 18:18:59 +0100
-Date: Wed, 14 Feb 2024 18:18:59 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Mark Brown <broonie@kernel.org>,
-	Frank Rowand <frowand.list@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
-	Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v3 05/17] net: pse-pd: Introduce PSE types
- enumeration
-Message-ID: <d2f974e4-6b31-49c0-88ac-7741a980739c@lunn.ch>
-References: <20240208-feature_poe-v3-0-531d2674469e@bootlin.com>
- <20240208-feature_poe-v3-5-531d2674469e@bootlin.com>
+	s=arc-20240116; t=1707931256; c=relaxed/simple;
+	bh=DRFlqUoQ+56jX8SosJW0HOg/C/81XeRHYKQhTNegNK0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KmiWFU5gOpzYZYF5zo8ir6NnR8WPmhhn32J3RGDjCmmKHmZz8q6gEXgBTmIjFxA7+u5MauL7iUFSl4uQVhqSaUzYCt1kH8SIjJqCWJ1xMfqUSM8NkP2XNnPciHunhWDEoV/3q2cwi0QE1W7lxVvskmGiNNztENSs6485D9QiuUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 22EF71FB;
+	Wed, 14 Feb 2024 09:21:35 -0800 (PST)
+Received: from [10.57.47.86] (unknown [10.57.47.86])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 65B743F766;
+	Wed, 14 Feb 2024 09:20:51 -0800 (PST)
+Message-ID: <893ad3a4-ba24-43cf-8200-b8cd7742622d@arm.com>
+Date: Wed, 14 Feb 2024 17:20:50 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240208-feature_poe-v3-5-531d2674469e@bootlin.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 1/7] dma: compile-out DMA sync op calls when
+ not used
+Content-Language: en-GB
+To: Alexander Lobakin <aleksander.lobakin@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+ Marek Szyprowski <m.szyprowski@samsung.com>, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>,
+ Magnus Karlsson <magnus.karlsson@intel.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Alexander Duyck <alexanderduyck@fb.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20240214162201.4168778-1-aleksander.lobakin@intel.com>
+ <20240214162201.4168778-2-aleksander.lobakin@intel.com>
+From: Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <20240214162201.4168778-2-aleksander.lobakin@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 08, 2024 at 02:08:42PM +0100, Kory Maincent wrote:
-> Introduce an enumeration to define PSE types (C33 or PoDL),
-> utilizing a bitfield for potential future support of both types.
-> Include 'pse_get_types' helper for external access to PSE type info.
+On 2024-02-14 4:21 pm, Alexander Lobakin wrote:
+> Some platforms do have DMA, but DMA there is always direct and coherent.
+> Currently, even on such platforms DMA sync operations are compiled and
+> called.
+> Add a new hidden Kconfig symbol, DMA_NEED_SYNC, and set it only when
+> either sync operations are needed or there is DMA ops or swiotlb
+> enabled. Set dma_need_sync() and dma_skip_sync() depending on this
+> symbol state and don't call sync ops when dma_skip_sync() is true.
+> The change allows for future optimizations of DMA sync calls depending
+> on compile-time or runtime conditions.
 > 
-> Sponsored-by: Dent Project <dentproject@linuxfoundation.org>
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> ---
+>   kernel/dma/Kconfig          |  4 ++
+>   include/linux/dma-mapping.h | 80 +++++++++++++++++++++++++++++++------
+>   kernel/dma/mapping.c        | 20 +++++-----
+>   3 files changed, 81 insertions(+), 23 deletions(-)
+> 
+> diff --git a/kernel/dma/Kconfig b/kernel/dma/Kconfig
+> index d62f5957f36b..1c9ff05b1ecb 100644
+> --- a/kernel/dma/Kconfig
+> +++ b/kernel/dma/Kconfig
+> @@ -107,6 +107,10 @@ config DMA_BOUNCE_UNALIGNED_KMALLOC
+>   	bool
+>   	depends on SWIOTLB
+>   
+> +config DMA_NEED_SYNC
+> +	def_bool ARCH_HAS_SYNC_DMA_FOR_DEVICE || ARCH_HAS_SYNC_DMA_FOR_CPU || \
+> +		 ARCH_HAS_SYNC_DMA_FOR_CPU_ALL || DMA_OPS || SWIOTLB
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+I'm not sure DMA_OPS belongs here - several architectures have 
+non-trivial ops without syncs, e.g. Alpha.
 
-    Andrew
+> +
+>   config DMA_RESTRICTED_POOL
+>   	bool "DMA Restricted Pool"
+>   	depends on OF && OF_RESERVED_MEM && SWIOTLB
+> diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
+> index 4a658de44ee9..6c7640441214 100644
+> --- a/include/linux/dma-mapping.h
+> +++ b/include/linux/dma-mapping.h
+> @@ -117,13 +117,13 @@ dma_addr_t dma_map_resource(struct device *dev, phys_addr_t phys_addr,
+>   		size_t size, enum dma_data_direction dir, unsigned long attrs);
+>   void dma_unmap_resource(struct device *dev, dma_addr_t addr, size_t size,
+>   		enum dma_data_direction dir, unsigned long attrs);
+> -void dma_sync_single_for_cpu(struct device *dev, dma_addr_t addr, size_t size,
+> +void __dma_sync_single_for_cpu(struct device *dev, dma_addr_t addr, size_t size,
+>   		enum dma_data_direction dir);
+> -void dma_sync_single_for_device(struct device *dev, dma_addr_t addr,
+> +void __dma_sync_single_for_device(struct device *dev, dma_addr_t addr,
+>   		size_t size, enum dma_data_direction dir);
+> -void dma_sync_sg_for_cpu(struct device *dev, struct scatterlist *sg,
+> +void __dma_sync_sg_for_cpu(struct device *dev, struct scatterlist *sg,
+>   		    int nelems, enum dma_data_direction dir);
+> -void dma_sync_sg_for_device(struct device *dev, struct scatterlist *sg,
+> +void __dma_sync_sg_for_device(struct device *dev, struct scatterlist *sg,
+>   		       int nelems, enum dma_data_direction dir);
+>   void *dma_alloc_attrs(struct device *dev, size_t size, dma_addr_t *dma_handle,
+>   		gfp_t flag, unsigned long attrs);
+> @@ -147,7 +147,7 @@ u64 dma_get_required_mask(struct device *dev);
+>   bool dma_addressing_limited(struct device *dev);
+>   size_t dma_max_mapping_size(struct device *dev);
+>   size_t dma_opt_mapping_size(struct device *dev);
+> -bool dma_need_sync(struct device *dev, dma_addr_t dma_addr);
+> +bool __dma_need_sync(struct device *dev, dma_addr_t dma_addr);
+>   unsigned long dma_get_merge_boundary(struct device *dev);
+>   struct sg_table *dma_alloc_noncontiguous(struct device *dev, size_t size,
+>   		enum dma_data_direction dir, gfp_t gfp, unsigned long attrs);
+> @@ -195,19 +195,19 @@ static inline void dma_unmap_resource(struct device *dev, dma_addr_t addr,
+>   		size_t size, enum dma_data_direction dir, unsigned long attrs)
+>   {
+>   }
+> -static inline void dma_sync_single_for_cpu(struct device *dev, dma_addr_t addr,
+> -		size_t size, enum dma_data_direction dir)
+> +static inline void __dma_sync_single_for_cpu(struct device *dev,
+> +		dma_addr_t addr, size_t size, enum dma_data_direction dir)
+
+To me it would feel more logical to put all the wrappers inside the 
+#ifdef CONFIG_HAS_DMA and not touch these stubs at all (what does it 
+mean to skip an inline no-op?). Or in fact, if dma_skip_sync() is 
+constant false for !HAS_DMA, then we could also just make the external 
+function declarations unconditional and remove the stubs. Not a critical 
+matter though, and I defer to whatever Christoph thinks is most 
+maintainable.
+
+>   {
+>   }
+> -static inline void dma_sync_single_for_device(struct device *dev,
+> +static inline void __dma_sync_single_for_device(struct device *dev,
+>   		dma_addr_t addr, size_t size, enum dma_data_direction dir)
+>   {
+>   }
+> -static inline void dma_sync_sg_for_cpu(struct device *dev,
+> +static inline void __dma_sync_sg_for_cpu(struct device *dev,
+>   		struct scatterlist *sg, int nelems, enum dma_data_direction dir)
+>   {
+>   }
+> -static inline void dma_sync_sg_for_device(struct device *dev,
+> +static inline void __dma_sync_sg_for_device(struct device *dev,
+>   		struct scatterlist *sg, int nelems, enum dma_data_direction dir)
+>   {
+>   }
+> @@ -277,7 +277,7 @@ static inline size_t dma_opt_mapping_size(struct device *dev)
+>   {
+>   	return 0;
+>   }
+> -static inline bool dma_need_sync(struct device *dev, dma_addr_t dma_addr)
+> +static inline bool __dma_need_sync(struct device *dev, dma_addr_t dma_addr)
+>   {
+>   	return false;
+>   }
+> @@ -348,18 +348,72 @@ static inline void dma_unmap_single_attrs(struct device *dev, dma_addr_t addr,
+>   	return dma_unmap_page_attrs(dev, addr, size, dir, attrs);
+>   }
+>   
+> +static inline void __dma_sync_single_range_for_cpu(struct device *dev,
+> +		dma_addr_t addr, unsigned long offset, size_t size,
+> +		enum dma_data_direction dir)
+> +{
+> +	__dma_sync_single_for_cpu(dev, addr + offset, size, dir);
+> +}
+> +
+> +static inline void __dma_sync_single_range_for_device(struct device *dev,
+> +		dma_addr_t addr, unsigned long offset, size_t size,
+> +		enum dma_data_direction dir)
+> +{
+> +	__dma_sync_single_for_device(dev, addr + offset, size, dir);
+> +}
+
+There is no need to introduce these two.
+
+> +
+> +static inline bool dma_skip_sync(const struct device *dev)
+> +{
+> +	return !IS_ENABLED(CONFIG_DMA_NEED_SYNC);
+> +}
+> +
+> +static inline bool dma_need_sync(struct device *dev, dma_addr_t dma_addr)
+> +{
+> +	return !dma_skip_sync(dev) ? __dma_need_sync(dev, dma_addr) : false;
+> +}
+
+That's a bit of a mind-bender... is it actually just
+
+	return !dma_skip_sync(dev) && __dma_need_sync(dev, dma_addr);
+
+?
+
+(I do still think the negative flag makes it all a little harder to 
+follow in general than a positive "device needs to consider syncs" flag 
+would.)
+
+> +static inline void dma_sync_single_for_cpu(struct device *dev, dma_addr_t addr,
+> +		size_t size, enum dma_data_direction dir)
+> +{
+> +	if (!dma_skip_sync(dev))
+> +		__dma_sync_single_for_cpu(dev, addr, size, dir);
+> +}
+> +
+> +static inline void dma_sync_single_for_device(struct device *dev,
+> +		dma_addr_t addr, size_t size, enum dma_data_direction dir)
+> +{
+> +	if (!dma_skip_sync(dev))
+> +		__dma_sync_single_for_device(dev, addr, size, dir);
+> +}
+> +
+> +static inline void dma_sync_sg_for_cpu(struct device *dev,
+> +		struct scatterlist *sg, int nelems, enum dma_data_direction dir)
+> +{
+> +	if (!dma_skip_sync(dev))
+> +		__dma_sync_sg_for_cpu(dev, sg, nelems, dir);
+> +}
+> +
+> +static inline void dma_sync_sg_for_device(struct device *dev,
+> +		struct scatterlist *sg, int nelems, enum dma_data_direction dir)
+> +{
+> +	if (!dma_skip_sync(dev))
+> +		__dma_sync_sg_for_device(dev, sg, nelems, dir);
+> +}
+> +
+>   static inline void dma_sync_single_range_for_cpu(struct device *dev,
+>   		dma_addr_t addr, unsigned long offset, size_t size,
+>   		enum dma_data_direction dir)
+>   {
+> -	return dma_sync_single_for_cpu(dev, addr + offset, size, dir);
+> +	if (!dma_skip_sync(dev))
+> +		__dma_sync_single_for_cpu(dev, addr + offset, size, dir);
+>   }
+>   
+>   static inline void dma_sync_single_range_for_device(struct device *dev,
+>   		dma_addr_t addr, unsigned long offset, size_t size,
+>   		enum dma_data_direction dir)
+>   {
+> -	return dma_sync_single_for_device(dev, addr + offset, size, dir);
+> +	if (!dma_skip_sync(dev))
+> +		__dma_sync_single_for_device(dev, addr + offset, size, dir);
+>   }
+
+These two don't need changing either, since the dma_sync_single_* 
+wrappers have already taken care of it.
+
+Thanks,
+Robin.
 
