@@ -1,125 +1,143 @@
-Return-Path: <netdev+bounces-71637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A64D98544F9
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 10:21:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C3368544FE
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 10:21:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59A671F2C24F
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 09:21:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28FAC2819C8
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 09:21:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBDFC125CF;
-	Wed, 14 Feb 2024 09:20:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79ADD7499;
+	Wed, 14 Feb 2024 09:21:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ARE4m//X"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eUI7jCzx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7081ACA73;
-	Wed, 14 Feb 2024 09:20:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED1A3125C3
+	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 09:21:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707902455; cv=none; b=Fp/hYVGFqed0dQCOrGfqf2+BPvv7h1YFxYFwI3jqJrqQ7CGGKUrhvZhE/kA/3FTkNRlRoz5K6hIM4a3xauBDX3EHugXWQ+x47YoCNp7zem2/QDkxpH11O7Hn3g+bYI2OGpwKmIJPCFXnsEGTfLbdnFmAVGTU8NlLiaW9ua41Bo4=
+	t=1707902496; cv=none; b=I5kiqyZShTpl+8zMn+HZ0c+D/hSe+tver8zTYiO0Ay6dzDrub3aZnL+Pfyh98BVmGrnT4qYVYvx+fKtYHeAqhzkfyUhQAz8Ms3mUBirPK4dVT+INVz2NiUrDC7x/VJYQrGX8szOh+NwvuoTjiy0xi+c4ZtS88qzM9oBD8xD+WKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707902455; c=relaxed/simple;
-	bh=1V7vBgcSelzRxGc+Yp06s7YCcpAeGumWC0XRRRTAgJE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=eNAMFmq+BIzo4DYcA1LJl1Vuk3uiaHWvoslujpe5CFQviMLjrri7y3uxnx9oykH46vfkFf2k6STLM+BncaGnnEQUxItt1g8IAFXWRxHXpyAN9u9PcID3tZjl8wgOzA8r/7/7NPS+naL0RRN354qNZ3W6wEeh/7dbyOC8P5dgN1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=ARE4m//X; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41E6qvXl020154;
-	Wed, 14 Feb 2024 09:20:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=c1fGLw+Aj6mriPq5WpKl/zYCaU0Xd8piAX+/oLGdicg=; b=AR
-	E4m//X3oroCi1qswAUYrzIiiFRCx7YOTVo/CRkOwzy+N1+0dhGqo3dN2Iq/+uLn7
-	ubyVoCrzqe2BC751Xg3vH1N+oUkKxezWdYbazJi4xXUsvMZLR4dsWBPZTqTqpgpe
-	Cg9floGgzHSUl/GF1bMPtAQGR5qg3RGC1XbsL1dCGZYr+6gex/JEv9UmHXTxLMnA
-	2HOsKzwu38kMsfWTBD/Xvo/Vm7tMoFCWKdWVKDNN+fj1O89vBaqHw8iEKw1Sde6M
-	/iF0rmDCIhU2HZMekS+89TBxlkURbXqgqA4ycucIzI+ja09xgEfT1rBAktjXyaxk
-	xhpQPIDrn4vVHHgbIv1Q==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3w8enn97dc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 14 Feb 2024 09:20:40 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41E9KduW027597
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 14 Feb 2024 09:20:39 GMT
-Received: from [10.201.2.96] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 14 Feb
- 2024 01:20:33 -0800
-Message-ID: <d121c049-ad77-4783-b42e-626c809fe98c@quicinc.com>
-Date: Wed, 14 Feb 2024 14:50:33 +0530
+	s=arc-20240116; t=1707902496; c=relaxed/simple;
+	bh=Us+gU2RdsSuJlzVfYELTSS5MwQiekcjSDYnrthhTD24=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BbueYKSe/rSE7M9g2MQJNkfQR7XUbmVu3n/MXAUeRAfNz8HA3PdxE4Qv/3Hcm6xkH2T9OKlGZSuIfM0i8REGo/hHbeRMtq+7rbM54yDhRI38LepPGmZ+4cWsh/d+78P+lFfRREwQmc/uPp9iQ+qRTIijMZRvAphWj6djIdgZ3TE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eUI7jCzx; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6e11596b2e7so4256b3a.1
+        for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 01:21:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707902494; x=1708507294; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WWjAw44NUAHjhZwj0P/plLcMvgNRDO6qzGUn18t+8Ss=;
+        b=eUI7jCzxfUHtni6L7XK0xjgBOTFP3n+9mN2LD3s5Uj98zc57kWPZn823uOr0b4u9QR
+         KXl6J+bLiNRosqSmzbRt8Uhu6NzaBuocqi7BBe9hhf39u/uo1zH/EnVk0B81WN461s8b
+         my5o7TF54dAdaFzXoPLKHh0IedNdMqQfW8/XI9830sZkqcxCrvLmrqNbJs9Of9NWYTRf
+         /XQvuM9Ql6mOArgNJx/AvaslVugO+gQ5bw3w6/iBhGg1Cky7zBvOv+uoRKRCz9Q4Mz9+
+         FFjOyOHyArETvSGCwcnobUVFIsU7wxXPL4ueZwFMfDElXqsN79Z59Cugy6c/rt8FerLt
+         GDLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707902494; x=1708507294;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WWjAw44NUAHjhZwj0P/plLcMvgNRDO6qzGUn18t+8Ss=;
+        b=vnCickw5Xwf8xftvS2l8Xf0IeYP4Td51jYYxYHkmD/XSgBxgv48QDju0EfZvEIPm4O
+         Z3iyYYFO9sPR125njfwfl4wke2aifxMjJ+WAWpj9G7/dGPup1meqZT1+zUzCT4oM0XS5
+         VEgll0KCqfrNmmqj/xOWd1Dp4tYPv88PPV9xe6/ac/zFdhxI4nZDKwWIPdJzfr4O9bbn
+         v2G4DEo1lyXglcObgSojT1LG6BmyBlnviu2AJMcb3UrW2kNjqvT/garGZPoZu4cn4x9y
+         lglOaJRGuGDRNhZrqPmjUFZzXJrs3NKNiqbFd1I79XAPflRKEekInPwM2XZL1j69dECx
+         63qg==
+X-Gm-Message-State: AOJu0YzBjE9oitxIGe9Lg292MJz+DrAB5yHorWsb3fM1UkD8Ou52Ch9Q
+	Lfj7sGDaVpNoNTvrMVVK9dc1b3e7dSvfjP80XW+MHnCbvw14YpJwPlUH45VShLAMVg==
+X-Google-Smtp-Source: AGHT+IGZBH4a725MMUh2/pOnvZT9zn+Mdj3zgiEZyJFKOWIcNky/fokovIHcoxcp31m7vDBKLDbvzw==
+X-Received: by 2002:a05:6a00:1803:b0:6e1:738:93cf with SMTP id y3-20020a056a00180300b006e1073893cfmr2163403pfa.30.1707902493678;
+        Wed, 14 Feb 2024 01:21:33 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWqtFUJ0cDbm7TKFo8uqNvUUuql7lvd+xr5XdQfhfpggcjX9QbY731KmOu2S7UjaIsYsrZ98YrVuGt4sAzYlW5opZpAQ+MDn198h5q4vSoLrlKJGeNCxadC4ocUkdpqxDga9CceqM/qdXsSV9VRyflvHlPjc9yTc6KWuqKY0v6R9gp9rPblU7KW1TsaQZYivzJsUiruISg/uWEB4z4Xzw3yLJ45EQ==
+Received: from Laptop-X1.redhat.com ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id e27-20020a056a0000db00b006e04474ddc6sm8622994pfj.41.2024.02.14.01.21.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Feb 2024 01:21:33 -0800 (PST)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Liang Li <liali@redhat.com>,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCH net-next] selftests: bonding: make sure new active is not null
+Date: Wed, 14 Feb 2024 17:21:28 +0800
+Message-ID: <20240214092128.3041109-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 3/8] dt-bindings: clock: ipq5332: add definition for
- GPLL0_OUT_AUX clock
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio
-	<konrad.dybcio@linaro.org>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Catalin
- Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <linux-clk@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski@linaro.org>
-References: <20240122-ipq5332-nsscc-v4-0-19fa30019770@quicinc.com>
- <20240122-ipq5332-nsscc-v4-3-19fa30019770@quicinc.com>
- <b939445e-c0a8-48fd-bc95-25c4f22e1e0d@lunn.ch>
-From: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
-In-Reply-To: <b939445e-c0a8-48fd-bc95-25c4f22e1e0d@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: kLLLijcgKzudMQkHfupaqSNWqyV6OgEv
-X-Proofpoint-ORIG-GUID: kLLLijcgKzudMQkHfupaqSNWqyV6OgEv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-14_02,2024-02-12_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 phishscore=0 mlxscore=0 impostorscore=0 priorityscore=1501
- spamscore=0 malwarescore=0 bulkscore=0 adultscore=0 mlxlogscore=635
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2401310000 definitions=main-2402140071
+Content-Transfer-Encoding: 8bit
 
+One of Jakub's tests[1] shows that there may be period all ports
+are down and no active slave. This makes the new_active_slave null
+and the test fails. Add a check to make sure the new active is not null.
 
+ [  189.051966] br0: port 2(s1) entered disabled state
+ [  189.317881] bond0: (slave eth1): link status definitely down, disabling slave
+ [  189.318487] bond0: (slave eth2): making interface the new active one
+ [  190.435430] br0: port 4(s2) entered disabled state
+ [  190.773786] bond0: (slave eth0): link status definitely down, disabling slave
+ [  190.774204] bond0: (slave eth2): link status definitely down, disabling slave
+ [  190.774715] bond0: now running without any active interface!
+ [  190.877760] bond0: (slave eth0): link status definitely up
+ [  190.878098] bond0: (slave eth0): making interface the new active one
+ [  190.878495] bond0: active interface up!
+ [  191.802872] br0: port 4(s2) entered blocking state
+ [  191.803157] br0: port 4(s2) entered forwarding state
+ [  191.813756] bond0: (slave eth2): link status definitely up
+ [  192.847095] br0: port 2(s1) entered blocking state
+ [  192.847396] br0: port 2(s1) entered forwarding state
+ [  192.853740] bond0: (slave eth1): link status definitely up
+ # TEST: prio (active-backup ns_ip6_target primary_reselect 1)         [FAIL]
+ # Current active slave is null but not eth0
 
-On 1/26/2024 1:37 AM, Andrew Lunn wrote:
-> On Mon, Jan 22, 2024 at 11:26:59AM +0530, Kathiravan Thirumoorthy wrote:
->> Add the definition for GPLL0_OUT_AUX clock.
-> 
-> The commit message should answer the question "Why?". Why are you
-> adding this clock? What consumes it?
-> 
->         Andrew
+[1] https://netdev-3.bots.linux.dev/vmksft-bonding/results/464481/1-bond-options-sh/stdout
 
+Fixes: 45bf79bc56c4 ("selftests: bonding: reduce garp_test/arp_validate test time")
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+---
+ tools/testing/selftests/drivers/net/bonding/bond_options.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Ack, will add more details in the next spin.
+diff --git a/tools/testing/selftests/drivers/net/bonding/bond_options.sh b/tools/testing/selftests/drivers/net/bonding/bond_options.sh
+index 6fd0cff3e1e9..644ea5769e81 100755
+--- a/tools/testing/selftests/drivers/net/bonding/bond_options.sh
++++ b/tools/testing/selftests/drivers/net/bonding/bond_options.sh
+@@ -50,13 +50,13 @@ active_slave_changed()
+ 	local old_active_slave=$1
+ 	local new_active_slave=$(cmd_jq "ip -n ${s_ns} -d -j link show bond0" \
+ 				".[].linkinfo.info_data.active_slave")
+-	test "$old_active_slave" != "$new_active_slave"
++	[ "$new_active_slave" != "$old_active_slave" -a "$new_active_slave" != "null" ]
+ }
+ 
+ check_active_slave()
+ {
+ 	local target_active_slave=$1
+-	slowwait 2 active_slave_changed $active_slave
++	slowwait 5 active_slave_changed $active_slave
+ 	active_slave=$(cmd_jq "ip -n ${s_ns} -d -j link show bond0" ".[].linkinfo.info_data.active_slave")
+ 	test "$active_slave" = "$target_active_slave"
+ 	check_err $? "Current active slave is $active_slave but not $target_active_slave"
+-- 
+2.43.0
+
 
