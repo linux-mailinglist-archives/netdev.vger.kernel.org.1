@@ -1,57 +1,60 @@
-Return-Path: <netdev+bounces-71593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 533C085418B
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 03:24:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A517854191
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 03:44:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D182B247C6
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 02:24:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA7BDB23849
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 02:44:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBC574C79;
-	Wed, 14 Feb 2024 02:23:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 952A0387;
+	Wed, 14 Feb 2024 02:44:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sadSjh10"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JixVEReS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A7D1118D
-	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 02:23:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AA6420EB;
+	Wed, 14 Feb 2024 02:44:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707877420; cv=none; b=V89K5Hn4tdcfrUxXVwx7MnY8B1XoTCXftPvc6nfcyQPegJqq6nQ97kcxB4cFXSYvErT/yimzneHPG3KvdAFt/kDBRcVyWOvhpY1C0LB5ym4CZvsm5rhqS5Es+KJYFip7a31MTtV270GKo7Cyqeb9gJWErwywp9KEe6KhYkqHK7g=
+	t=1707878669; cv=none; b=U5A4hwtgw++AbxaVIQ4WspX1kwmip/HDnNGDotoj+gi4zlgWYvD0zijyKWi+o9rVApOS/W1VDNiamU16vkr0JHmZFgBEfs+uPNL6c0I0wp2p3WH3R5JgoHXNA/RpIP4au3rFJKRD0pZGHEoCJtYT0Ce0e/sbmb96TTPvyD9GD3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707877420; c=relaxed/simple;
-	bh=p0/LKn5ORerskP77DXnNvJbLsjhrc1oAzMJzgXAj7Ek=;
+	s=arc-20240116; t=1707878669; c=relaxed/simple;
+	bh=F9SLSrJ9tazlMoBwo9qdHzu3gmcgsg3epPk8XMRqOfk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WS1q8PN5fjmEFXovikiABIkgirFCSZnay1EAlAsirBY2y+ebCvY1/VFgG6BwvIE885VlQVMYIBAOMTDbHayz3vPJmziUMLX64VTalxr0RetxWayjHjf664JOVXmfMhRH54XPRmcQ24BTdQ2ZJT33mM/XnXdGSo71EKWGnI/hvoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sadSjh10; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23470C433F1;
-	Wed, 14 Feb 2024 02:23:40 +0000 (UTC)
+	 MIME-Version:Content-Type; b=jJy3P1IMXqetM9MNFumnGQQYRfSZZpR3JN3q2AQjQ3wKKR6pDw6v7vZ3viW4b36Ut1HuMlYQ6WxjDlRQJTs//4/amf7kc+x5+AC4RwCBF8u4Yb0R5bZPyTWH/prsBxE1oUEciOZmW+Ev/76NHjHscoC5U2Rh9KtE7z514siqypg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JixVEReS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 724CEC433F1;
+	Wed, 14 Feb 2024 02:44:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707877420;
-	bh=p0/LKn5ORerskP77DXnNvJbLsjhrc1oAzMJzgXAj7Ek=;
+	s=k20201202; t=1707878668;
+	bh=F9SLSrJ9tazlMoBwo9qdHzu3gmcgsg3epPk8XMRqOfk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sadSjh10W8nAS/kLsUR0uyXdrXF2xLlTtilS+k8XkO/im9DYL6g4fvDuIAPnk+2bj
-	 Kja0ceiC/xf6D1mVC7FD/RcPEt9/Dceb/utHo4A6v+jygoHO9QmKFy9cfeUplwz2h2
-	 B3ql+imEnuG/68n3qol7909gh9w0uhQctGpv5Ke5j4gXkNVZMAY3qFC0uLqW5BVXOn
-	 2C6ZPIPyWF+/Pb6qX8gP9kBAb1NTJcHT6gbtZqf0cSsXpvz2qu6AVy0gBRjJzeUT28
-	 zvgiZNpAY2vF0db1gLZKXonTq5mM9xvIGA1Vu796KA/k1RuYLyr0WMJ8/wWIPhHEba
-	 xA7+/X4sii4wA==
-Date: Tue, 13 Feb 2024 18:23:38 -0800
+	b=JixVEReSHI1W74Z4j/HBPFYhemampMieVUQhZMp+aFV5N2hbaL0bhkXMFxdmGNhEI
+	 22uBV6A5N227sux9F8n5Qq5t9yLveOhM5M5HReKmnujOiUxRZOsz8jNnQL4VgTIbxZ
+	 2d0qtfXfYvEBuKY3YreWySkIidJuUUqevCNAlAIJFWJqMNh2HQdWR1x2ypASVfnlMU
+	 EEyNwPJp2xhG/GDaPl9WBTigYV0AXeMPC/mKvW+DlJQdCQd5dcWzxcb+j4SU/ypcWF
+	 4QY9If8DlOWvZHV3fn/YwXdqYu3Gx+cpTN/FseEg5Rr6thW+OSUWybmycX35N1hJEZ
+	 kltLXfp+wqzmA==
+Date: Tue, 13 Feb 2024 18:44:27 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- dsahern@kernel.org, kuniyu@amazon.com, netdev@vger.kernel.org, Jason Xing
- <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next v4 0/6] introduce dropreasons in tcp receive
+To: John Ernberg <john.ernberg@actia.se>
+Cc: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark
+ Wang <xiaoning.wang@nxp.com>, NXP Linux Team <linux-imx@nxp.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Paolo
+ Abeni" <pabeni@redhat.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: fec: Always call fec_restart() in resume
  path
-Message-ID: <20240213182338.397f6d29@kernel.org>
-In-Reply-To: <20240213140508.10878-1-kerneljasonxing@gmail.com>
-References: <20240213140508.10878-1-kerneljasonxing@gmail.com>
+Message-ID: <20240213184427.5af2d7eb@kernel.org>
+In-Reply-To: <20240212105010.2258421-1-john.ernberg@actia.se>
+References: <20240212105010.2258421-1-john.ernberg@actia.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,13 +64,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 13 Feb 2024 22:05:02 +0800 Jason Xing wrote:
-> As title said, we're going to refine the NOT_SPECIFIED reason in the
-> tcp v4/6 receive fast path.
+On Mon, 12 Feb 2024 10:50:30 +0000 John Ernberg wrote:
+> Tested on 6.1 kernel and forward ported. I discovered this when we
+> upgraded from 5.10 to 6.1, but the resume path in the FEC driver has had
+> this imbalance since at least 2009.
 > 
-> This serie is another one of the v2 patchset[1] which are here split
-> into six patches. Besides, this patch is made on top of the previous
-> serie[2] I submitted some time ago.
+> This is also why I target the -next tree, I can't identify a proper commit
+> to blame with a Fixes. Let me know if this should be the net tree anyway.
 
-Please do not post two similar sets at the same time.
+I thought you bisected it to one or two specific changes?
+I'd put those down as Fixes tags and target net.
 
