@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-71775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E93C8550B2
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 18:47:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C0788550BF
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 18:50:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0EB61F21731
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 17:47:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EA421C2906D
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 17:50:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFFDA126F32;
-	Wed, 14 Feb 2024 17:47:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A7C686AC5;
+	Wed, 14 Feb 2024 17:50:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="NvB7UOVv"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uMJSRQ6I"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1076A7C086;
-	Wed, 14 Feb 2024 17:47:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A75F022071;
+	Wed, 14 Feb 2024 17:50:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707932869; cv=none; b=VlFooZJQzAanXuIxYhGmKbQBz30Q4vTjDtXFVmirKMvE1Pc6Lmttso/jIIFk+jNw3NOlVTHlj9ar3mzgLpMai8uNACcDJGVkVRowb9AgWk/tmaua2TdeypFAWtZNzFX0g2FGkLCuY335TcIuWk7tHWBd1n1JzX9pXJFhpIB4NwE=
+	t=1707933013; cv=none; b=jmSWUCBUkWxX+k30m2FcDmiydU+TPNZG2St6aqJLzT1TSI3EDuPX7LpPQZZVa86EH0y9gPq0egjooxxTZQyGFlhosAWnn3tVgvGADbVM+MgGGCW3t5O+6mvRhKeaC8Jj5TSF6ZGNlB1Pl73XK32tl2h/uB+bZk/W/ObH5ofXWcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707932869; c=relaxed/simple;
-	bh=KlUBQqK+6n3jqOyvX5qVxvbuW9H8Qor440P3GLbiFHY=;
+	s=arc-20240116; t=1707933013; c=relaxed/simple;
+	bh=ZeAjhz2SHZ7qVY+YITXk+ILH2yqzuQc9Jpvkue+5hpk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=joIwv+rNF0BaFXav7diaZE681k0WX85XKSje4u/mB5Ftwzxry1Z7BSEtF9sa0gK7K147IZgxPPPPl+ZNeBbY3fkUF7NpvnPjOA6un9MBV3d3GfK2/s9sAnMaFfxIcW21GtlkqhX8wT30Yr7M6kV4KidXhZ5vggFluySHIRyA5Wk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=NvB7UOVv; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=qStPwfLG2VoF0PfoRBsWtpst4m3IC7q+nBHfo3BfdOMUfofz0Vys+Q4eYWPIlyx9lHhri3re8/kgjwbdHMKpg5LUqdnJYeQQIWgV8dXv+PgFl76Y2i9b7SjvzZZaHtrC616u6RdcPblS3ehppvpwYG+PNKipXm3TKeyjeh+w9Pg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=uMJSRQ6I; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,33 +36,29 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=4AgW43/ZPNVaqgHs/W1JnLiMLuTKT90hZrZhRANHsgY=; b=NvB7UOVvlodUdCe1w+BPn1pjlO
-	avg7DROE34d4tfi5IoIFOGyhHZhRpNY4V5es2VAovOXNrPb2C7hTLqoxwHxnmHTbJlmjg0crw5PPe
-	pY4svyrXh8+RBxDOFQ1iWItr0c/OU/sEAfBgUZ3bXVkaoWmW0FY/cKuKZFZIXEYLWhz4=;
+	bh=LscDPLZ+ohMWAjRIWzZ8eZizMWZKhn6yplli/9BNMCw=; b=uMJSRQ6INcdTlrMNOJGqYqFrv3
+	2EIJ0woTdfL3Jo2LS3aygZipk1KIuuLMROTyHWOiSMyLG7ZtklHviIfm53POqko4pAjV3cHh76TwN
+	d6DpMU5lmLfGrCan6QTRHw7STOUzaNqVQP9tpEaJ19DVFahKRFjsTLgNwCxzcRUyhrF0=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1raJMG-007oOH-Tp; Wed, 14 Feb 2024 18:47:44 +0100
-Date: Wed, 14 Feb 2024 18:47:44 +0100
+	id 1raJOd-007oPB-37; Wed, 14 Feb 2024 18:50:11 +0100
+Date: Wed, 14 Feb 2024 18:50:11 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: David <david@davidv.dev>
-Cc: Jakub Kicinski <kuba@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+To: Dimitri Fedrau <dima.fedrau@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Xiongwei Song <xiongwei.song@windriver.com>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:NETWORKING [IPv4/IPv6]" <netdev@vger.kernel.org>
-Subject: Re: [PATCH v2 1/2] net: make driver settling time configurable
-Message-ID: <2619af18-257d-4673-b74b-206ed8b2527f@lunn.ch>
-References: <20240208093722.246930-1-david@davidv.dev>
- <20240208095358.251381-1-david@davidv.dev>
- <20240209135944.265953be@kernel.org>
- <7485f0b2-93fe-4c82-95e8-5b0e10f9fa7a@lunn.ch>
- <ee37f457-3d2d-4c18-b22f-dfb315b3c078@davidv.dev>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jean Delvare <jdelvare@suse.com>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hwmon@vger.kernel.org
+Subject: Re: [PATCH v6 net-next 08/14] net: phy: marvell-88q2xxx: add support
+ for temperature sensor
+Message-ID: <84e591c9-18db-4edf-8e3e-deed0cc8e131@lunn.ch>
+References: <20240213213955.178762-1-dima.fedrau@gmail.com>
+ <20240213213955.178762-9-dima.fedrau@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,19 +67,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ee37f457-3d2d-4c18-b22f-dfb315b3c078@davidv.dev>
+In-Reply-To: <20240213213955.178762-9-dima.fedrau@gmail.com>
 
-> Would it make sense to move this to a build-time configuration flag?
+On Tue, Feb 13, 2024 at 10:39:47PM +0100, Dimitri Fedrau wrote:
+> Marvell 88q2xxx devices have an inbuilt temperature sensor. Add hwmon
+> support for this sensor.
 > 
-> I do not have a gut-feeling for which behaviors should be configurable
-> 
-> at build vs run time.
+> Signed-off-by: Dimitri Fedrau <dima.fedrau@gmail.com>
 
-If it is build time, it becomes the distribution problem to pick a
-value.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Might be best to just bite the bullet, set it to 0, and fixup whatever
-breaks.
-
-	Andrew
+    Andrew
 
