@@ -1,83 +1,70 @@
-Return-Path: <netdev+bounces-71638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C3368544FE
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 10:21:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 226C885452F
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 10:29:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28FAC2819C8
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 09:21:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9B2E1F2AC01
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 09:29:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79ADD7499;
-	Wed, 14 Feb 2024 09:21:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C501428A;
+	Wed, 14 Feb 2024 09:28:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eUI7jCzx"
+	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="OF2YRymp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED1A3125C3
-	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 09:21:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E3012B61;
+	Wed, 14 Feb 2024 09:28:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707902496; cv=none; b=I5kiqyZShTpl+8zMn+HZ0c+D/hSe+tver8zTYiO0Ay6dzDrub3aZnL+Pfyh98BVmGrnT4qYVYvx+fKtYHeAqhzkfyUhQAz8Ms3mUBirPK4dVT+INVz2NiUrDC7x/VJYQrGX8szOh+NwvuoTjiy0xi+c4ZtS88qzM9oBD8xD+WKo=
+	t=1707902908; cv=none; b=bntmwhp5zppDUfocH2APDERAsD8nvHqrOlq8ou8JZHiPEYk67IUbnagjr6ipwwNptD+NQN2a02WR4Z5RXeTHc25K8AcWpbQmiCHLeiHPjztQub3LoZFzJIWlpJwzFj5cJl76kA/Db1aIABi8KYbhtxQl2qw4rsTm57fvSYTSNVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707902496; c=relaxed/simple;
-	bh=Us+gU2RdsSuJlzVfYELTSS5MwQiekcjSDYnrthhTD24=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BbueYKSe/rSE7M9g2MQJNkfQR7XUbmVu3n/MXAUeRAfNz8HA3PdxE4Qv/3Hcm6xkH2T9OKlGZSuIfM0i8REGo/hHbeRMtq+7rbM54yDhRI38LepPGmZ+4cWsh/d+78P+lFfRREwQmc/uPp9iQ+qRTIijMZRvAphWj6djIdgZ3TE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eUI7jCzx; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6e11596b2e7so4256b3a.1
-        for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 01:21:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707902494; x=1708507294; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WWjAw44NUAHjhZwj0P/plLcMvgNRDO6qzGUn18t+8Ss=;
-        b=eUI7jCzxfUHtni6L7XK0xjgBOTFP3n+9mN2LD3s5Uj98zc57kWPZn823uOr0b4u9QR
-         KXl6J+bLiNRosqSmzbRt8Uhu6NzaBuocqi7BBe9hhf39u/uo1zH/EnVk0B81WN461s8b
-         my5o7TF54dAdaFzXoPLKHh0IedNdMqQfW8/XI9830sZkqcxCrvLmrqNbJs9Of9NWYTRf
-         /XQvuM9Ql6mOArgNJx/AvaslVugO+gQ5bw3w6/iBhGg1Cky7zBvOv+uoRKRCz9Q4Mz9+
-         FFjOyOHyArETvSGCwcnobUVFIsU7wxXPL4ueZwFMfDElXqsN79Z59Cugy6c/rt8FerLt
-         GDLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707902494; x=1708507294;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WWjAw44NUAHjhZwj0P/plLcMvgNRDO6qzGUn18t+8Ss=;
-        b=vnCickw5Xwf8xftvS2l8Xf0IeYP4Td51jYYxYHkmD/XSgBxgv48QDju0EfZvEIPm4O
-         Z3iyYYFO9sPR125njfwfl4wke2aifxMjJ+WAWpj9G7/dGPup1meqZT1+zUzCT4oM0XS5
-         VEgll0KCqfrNmmqj/xOWd1Dp4tYPv88PPV9xe6/ac/zFdhxI4nZDKwWIPdJzfr4O9bbn
-         v2G4DEo1lyXglcObgSojT1LG6BmyBlnviu2AJMcb3UrW2kNjqvT/garGZPoZu4cn4x9y
-         lglOaJRGuGDRNhZrqPmjUFZzXJrs3NKNiqbFd1I79XAPflRKEekInPwM2XZL1j69dECx
-         63qg==
-X-Gm-Message-State: AOJu0YzBjE9oitxIGe9Lg292MJz+DrAB5yHorWsb3fM1UkD8Ou52Ch9Q
-	Lfj7sGDaVpNoNTvrMVVK9dc1b3e7dSvfjP80XW+MHnCbvw14YpJwPlUH45VShLAMVg==
-X-Google-Smtp-Source: AGHT+IGZBH4a725MMUh2/pOnvZT9zn+Mdj3zgiEZyJFKOWIcNky/fokovIHcoxcp31m7vDBKLDbvzw==
-X-Received: by 2002:a05:6a00:1803:b0:6e1:738:93cf with SMTP id y3-20020a056a00180300b006e1073893cfmr2163403pfa.30.1707902493678;
-        Wed, 14 Feb 2024 01:21:33 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWqtFUJ0cDbm7TKFo8uqNvUUuql7lvd+xr5XdQfhfpggcjX9QbY731KmOu2S7UjaIsYsrZ98YrVuGt4sAzYlW5opZpAQ+MDn198h5q4vSoLrlKJGeNCxadC4ocUkdpqxDga9CceqM/qdXsSV9VRyflvHlPjc9yTc6KWuqKY0v6R9gp9rPblU7KW1TsaQZYivzJsUiruISg/uWEB4z4Xzw3yLJ45EQ==
-Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id e27-20020a056a0000db00b006e04474ddc6sm8622994pfj.41.2024.02.14.01.21.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Feb 2024 01:21:33 -0800 (PST)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1707902908; c=relaxed/simple;
+	bh=Mb6YxOmtcJ8Ub0l9X+yNHlgp/DjEXeH/cebfjQyMkP4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Jg/47PjiFi4Ux2hz614aYSIIboSM24547PBUzQjidMlxk4x7TuGSrG1k2Uf7HYNoCumPDUMK8VzPb/LY1FsaaENGdpFDhsnp8P6U0KDFEbXMA+06ZFnWjDlCrhbX0KuoI7sZVgeUzyJ46EjuMnDtvNWR3s92+25b6eKiI+ceyzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=OF2YRymp; arc=none smtp.client-ip=83.149.199.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
+Received: from localhost.localdomain (unknown [85.89.126.105])
+	by mail.ispras.ru (Postfix) with ESMTPSA id 8ABD2407672A;
+	Wed, 14 Feb 2024 09:28:16 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 8ABD2407672A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
+	s=default; t=1707902896;
+	bh=VPs3SFZb3IOFTfYaDQIVN+l4DqNHEqyJHkJJnFGGUPw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=OF2YRymp0cVZzJyXtUILvhN8lfre24hOBN/XyofoROp2Xf8dZ1rsPQzpGJzC3G+/F
+	 vrJOG1GVAertAUUCgLBQ7g4AP/tNzenhe8wRW2CUofP51heor82z4gxWfQtjtj/NAc
+	 tjELpTMuxUbB/2jjnOxi3D05OwdcWoxeK14c3R/k=
+From: Pavel Sakharov <p.sakharov@ispras.ru>
+To: Simon Horman <horms@kernel.org>
+Cc: Pavel Sakharov <p.sakharov@ispras.ru>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Liang Li <liali@redhat.com>,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCH net-next] selftests: bonding: make sure new active is not null
-Date: Wed, 14 Feb 2024 17:21:28 +0800
-Message-ID: <20240214092128.3041109-1-liuhangbin@gmail.com>
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	Alexey Khoroshilov <khoroshilov@ispras.ru>
+Subject: [PATCH net v2] net: stmmac: Fix incorrect dereference in interrupt handlers
+Date: Wed, 14 Feb 2024 12:27:17 +0300
+Message-ID: <20240214092718.331891-1-p.sakharov@ispras.ru>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240206150704.GD1104779@kernel.org>
+References: 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,57 +73,77 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-One of Jakub's tests[1] shows that there may be period all ports
-are down and no active slave. This makes the new_active_slave null
-and the test fails. Add a check to make sure the new active is not null.
+If 'dev' or 'data' is NULL, the 'priv' variable has an incorrect address
+when dereferencing calling netdev_err().
 
- [  189.051966] br0: port 2(s1) entered disabled state
- [  189.317881] bond0: (slave eth1): link status definitely down, disabling slave
- [  189.318487] bond0: (slave eth2): making interface the new active one
- [  190.435430] br0: port 4(s2) entered disabled state
- [  190.773786] bond0: (slave eth0): link status definitely down, disabling slave
- [  190.774204] bond0: (slave eth2): link status definitely down, disabling slave
- [  190.774715] bond0: now running without any active interface!
- [  190.877760] bond0: (slave eth0): link status definitely up
- [  190.878098] bond0: (slave eth0): making interface the new active one
- [  190.878495] bond0: active interface up!
- [  191.802872] br0: port 4(s2) entered blocking state
- [  191.803157] br0: port 4(s2) entered forwarding state
- [  191.813756] bond0: (slave eth2): link status definitely up
- [  192.847095] br0: port 2(s1) entered blocking state
- [  192.847396] br0: port 2(s1) entered forwarding state
- [  192.853740] bond0: (slave eth1): link status definitely up
- # TEST: prio (active-backup ns_ip6_target primary_reselect 1)         [FAIL]
- # Current active slave is null but not eth0
+Since we get as 'dev_id' or 'data' what was passed as the 'dev' argument
+to request_irq() during interrupt initialization (that is, the net_device
+and rx/tx queue pointers initialized at the time of the call) and since
+there are usually no checks for the 'dev_id' argument in such handlers
+in other drivers, remove these checks from the handlers in stmmac driver.
 
-[1] https://netdev-3.bots.linux.dev/vmksft-bonding/results/464481/1-bond-options-sh/stdout
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-Fixes: 45bf79bc56c4 ("selftests: bonding: reduce garp_test/arp_validate test time")
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+Fixes: 8532f613bc78 ("net: stmmac: introduce MSI Interrupt routines for mac, safety, RX & TX")
+Signed-off-by: Pavel Sakharov <p.sakharov@ispras.ru>
 ---
- tools/testing/selftests/drivers/net/bonding/bond_options.sh | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+v2: Drop the second argument checks in the handlers as suggested by Serge Semin <fancer.lancer@gmail.com>.
 
-diff --git a/tools/testing/selftests/drivers/net/bonding/bond_options.sh b/tools/testing/selftests/drivers/net/bonding/bond_options.sh
-index 6fd0cff3e1e9..644ea5769e81 100755
---- a/tools/testing/selftests/drivers/net/bonding/bond_options.sh
-+++ b/tools/testing/selftests/drivers/net/bonding/bond_options.sh
-@@ -50,13 +50,13 @@ active_slave_changed()
- 	local old_active_slave=$1
- 	local new_active_slave=$(cmd_jq "ip -n ${s_ns} -d -j link show bond0" \
- 				".[].linkinfo.info_data.active_slave")
--	test "$old_active_slave" != "$new_active_slave"
-+	[ "$new_active_slave" != "$old_active_slave" -a "$new_active_slave" != "null" ]
- }
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 20 -------------------
+ 1 file changed, 20 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 75d029704503..e80d77bd9f1f 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -6059,11 +6059,6 @@ static irqreturn_t stmmac_mac_interrupt(int irq, void *dev_id)
+ 	struct net_device *dev = (struct net_device *)dev_id;
+ 	struct stmmac_priv *priv = netdev_priv(dev);
  
- check_active_slave()
- {
- 	local target_active_slave=$1
--	slowwait 2 active_slave_changed $active_slave
-+	slowwait 5 active_slave_changed $active_slave
- 	active_slave=$(cmd_jq "ip -n ${s_ns} -d -j link show bond0" ".[].linkinfo.info_data.active_slave")
- 	test "$active_slave" = "$target_active_slave"
- 	check_err $? "Current active slave is $active_slave but not $target_active_slave"
+-	if (unlikely(!dev)) {
+-		netdev_err(priv->dev, "%s: invalid dev pointer\n", __func__);
+-		return IRQ_NONE;
+-	}
+-
+ 	/* Check if adapter is up */
+ 	if (test_bit(STMMAC_DOWN, &priv->state))
+ 		return IRQ_HANDLED;
+@@ -6079,11 +6074,6 @@ static irqreturn_t stmmac_safety_interrupt(int irq, void *dev_id)
+ 	struct net_device *dev = (struct net_device *)dev_id;
+ 	struct stmmac_priv *priv = netdev_priv(dev);
+ 
+-	if (unlikely(!dev)) {
+-		netdev_err(priv->dev, "%s: invalid dev pointer\n", __func__);
+-		return IRQ_NONE;
+-	}
+-
+ 	/* Check if adapter is up */
+ 	if (test_bit(STMMAC_DOWN, &priv->state))
+ 		return IRQ_HANDLED;
+@@ -6105,11 +6095,6 @@ static irqreturn_t stmmac_msi_intr_tx(int irq, void *data)
+ 	dma_conf = container_of(tx_q, struct stmmac_dma_conf, tx_queue[chan]);
+ 	priv = container_of(dma_conf, struct stmmac_priv, dma_conf);
+ 
+-	if (unlikely(!data)) {
+-		netdev_err(priv->dev, "%s: invalid dev pointer\n", __func__);
+-		return IRQ_NONE;
+-	}
+-
+ 	/* Check if adapter is up */
+ 	if (test_bit(STMMAC_DOWN, &priv->state))
+ 		return IRQ_HANDLED;
+@@ -6136,11 +6121,6 @@ static irqreturn_t stmmac_msi_intr_rx(int irq, void *data)
+ 	dma_conf = container_of(rx_q, struct stmmac_dma_conf, rx_queue[chan]);
+ 	priv = container_of(dma_conf, struct stmmac_priv, dma_conf);
+ 
+-	if (unlikely(!data)) {
+-		netdev_err(priv->dev, "%s: invalid dev pointer\n", __func__);
+-		return IRQ_NONE;
+-	}
+-
+ 	/* Check if adapter is up */
+ 	if (test_bit(STMMAC_DOWN, &priv->state))
+ 		return IRQ_HANDLED;
 -- 
 2.43.0
 
