@@ -1,121 +1,131 @@
-Return-Path: <netdev+bounces-71622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 463698543E1
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 09:15:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E043D8543FF
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 09:23:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7F5C28904E
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 08:15:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 979D4283BFC
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 08:23:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 060F511CB3;
-	Wed, 14 Feb 2024 08:15:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ADDC11CBD;
+	Wed, 14 Feb 2024 08:23:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="2Hi3sxu3"
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="Qg2BY/qy"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from forward100a.mail.yandex.net (forward100a.mail.yandex.net [178.154.239.83])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CE04125A2;
-	Wed, 14 Feb 2024 08:15:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12F1011CB3;
+	Wed, 14 Feb 2024 08:23:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.83
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707898510; cv=none; b=i2vkcknKD9iR60iOzVkJa64iS6XdnQmBvrLRs09cLMKb44m8tx8gqGk+7ydXPq5wzzs5Hr707VVbNEW1y3q5krn99xY7Ui8T2XI5uhAZfzI74JsRR8SwHCq4X7AddIPEOIG2/9PMfEX4Jxk0CQbN80xKxrN6PjDyl5xZMcHIKp8=
+	t=1707899011; cv=none; b=F2PPw/z2Ks5GLx7mK+HJenZR9/pTSYbpTHcHw306WYLWKcWfP/fjK/vwrXqJWZFTLMTsNseeoB0GTqkljyNCoVpRe9EwedEkeeGHWPzfPhcDCbGMUlj9KyStdx9taltA6y56GaHIcEUM+djp+uzLiOE5uur4o99gISvNzQTj58Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707898510; c=relaxed/simple;
-	bh=R1qEZaJZqEahESp0vUMVsznWrk1nhHpzObybxfL6gjg=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qTD6m+Vyo1pA7hRS5AAgsrzpiv8PQixEG1QOCsEo4SK3sTjpG+bS126HGIFBcLVuKldVCJWiqOYjqDwMQceS9BF4q2NSc0njSZe0H0ZzjwIDz0Q1wPtPHzomrn0zZPO2+c+6tczXDex5e8g2yiGVVC4gZ4aj5pI0qQr0ZEO50aY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=2Hi3sxu3; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1707898510; x=1739434510;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=R1qEZaJZqEahESp0vUMVsznWrk1nhHpzObybxfL6gjg=;
-  b=2Hi3sxu3KM/y18BIdJtYyMkzkWnI6/rToE2SIV3Skh4t3A2zZ3evc9Ms
-   fUTirA42tG56e/0GPdWeS3W56LK6/gymUPgf5aEd8KZemmh66Tjkj44xK
-   w+GaOz1nhmypbpvHYkb2sTg32/Bq460PBgfwPJr1BXutzLl5qGTxtsMiM
-   2lOHUbi7kwKz5wyn6NYJsEd0e/65Ptt/nLmTfZ6CnuS+cr8FQk+jsOhkt
-   hEuOzh7XAJpPSCK9SWwBuxsctedE23E+HJ1YzCEHCxw343hkFSDkuTqWY
-   SCfWScxv69hom9yVYxI37Ski+rLqUt5dQvxN6kbRV9ygACuzqQAn/X5b+
-   Q==;
-X-CSE-ConnectionGUID: CP2X/acaTSCOFjJ1bbznCQ==
-X-CSE-MsgGUID: GHR+fUgGQOG+4nuI6k8xAg==
-X-IronPort-AV: E=Sophos;i="6.06,159,1705388400"; 
-   d="scan'208";a="16217464"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Feb 2024 01:15:09 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 14 Feb 2024 01:14:43 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex04.mchp-main.com
- (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Wed, 14 Feb 2024 01:14:43 -0700
-Date: Wed, 14 Feb 2024 09:14:42 +0100
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: Florian Fainelli <f.fainelli@gmail.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <lars.povlsen@microchip.com>,
-	<Steen.Hegelund@microchip.com>, <daniel.machon@microchip.com>,
-	<UNGLinuxDriver@microchip.com>, <u.kleine-koenig@pengutronix.de>,
-	<rmk+kernel@armlinux.org.uk>, <vladimir.oltean@nxp.com>,
-	<jacob.e.keller@intel.com>, <yuehaibing@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: sparx5: Add spinlock for frame
- transmission from CPU
-Message-ID: <20240214081442.w533wvcvqpvq5352@DEN-DL-M31836.microchip.com>
-References: <20240213121705.4070598-1-horatiu.vultur@microchip.com>
- <5476743f-3648-4038-97f8-a9df22c0f507@gmail.com>
+	s=arc-20240116; t=1707899011; c=relaxed/simple;
+	bh=vOup1lyDgT26CO7ZP799HSFYXN/BdJFV4caQI77Tq9Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=D+xpVrCkQURtGfl3EyA0eb5Rw6ZJ1+w/3cbbpS2vVIxb88knTV9MQDLlY6UcXPqQW/+afGSBQYk43GspsWAO0O/K+N8d7WK1dMEItppOiLCZBxVgmF9tl6eBumwuK+8VGKFtgW9nfN8su42EhXgDEVITPbcUpfFtU8J2jlxNBhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=Qg2BY/qy; arc=none smtp.client-ip=178.154.239.83
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from mail-nwsmtp-smtp-production-main-59.iva.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-59.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:b587:0:640:8986:0])
+	by forward100a.mail.yandex.net (Yandex) with ESMTPS id 891F146DA9;
+	Wed, 14 Feb 2024 11:23:18 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-59.iva.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id HNjbWlMl4iE0-TWaSbnY9;
+	Wed, 14 Feb 2024 11:23:17 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1707898997; bh=o0U2gKeVA7auzNi460xU9iMkCx6X7DW5O9hy4tb94fg=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=Qg2BY/qyTjpVTewEgNi70lxD4aamB9RNkcmDjyoZWEERzd+nDiMADA75XCoIfFBDT
+	 cc8EJFTAAiW+vvZPnDoJhCYjZnjePMF185IosLF+Ke09O9LDXvkU9EAMDn5loHtpHv
+	 xIIZ7At0yWDtuV4z4LdRx0lMWqnlc4UT4D2sctcE=
+Authentication-Results: mail-nwsmtp-smtp-production-main-59.iva.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+From: Dmitry Antipov <dmantipov@yandex.ru>
+To: Xin Long <lucien.xin@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	linux-sctp@vger.kernel.org,
+	netdev@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	Dmitry Antipov <dmantipov@yandex.ru>,
+	syzbot+8bb053b5d63595ab47db@syzkaller.appspotmail.com
+Subject: [PATCH] [v3] net: sctp: fix skb leak in sctp_inq_free()
+Date: Wed, 14 Feb 2024 11:22:24 +0300
+Message-ID: <20240214082224.10168-1-dmantipov@yandex.ru>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <5476743f-3648-4038-97f8-a9df22c0f507@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-The 02/13/2024 09:26, Florian Fainelli wrote:
-> 
-> On 2/13/24 04:17, Horatiu Vultur wrote:
-> > Both registers used when doing manual injection or fdma injection are
-> > shared between all the net devices of the switch. It was noticed that
-> > when having two process which each of them trying to inject frames on
-> > different ethernet ports, that the HW started to behave strange, by
-> > sending out more frames then expected. When doing fdma injection it is
-> > required to set the frame in the DCB and then make sure that the next
-> > pointer of the last DCB is invalid. But because there is no locks for
-> > this, then easily this pointer between the DCB can be broken and then it
-> > would create a loop of DCBs. And that means that the HW will
-> > continuously transmit these frames in a loop. Until the SW will break
-> > this loop.
-> > Therefore to fix this issue, add a spin lock for when accessing the
-> > registers for manual or fdma injection.
-> > 
-> > Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
-> 
-> Any reason you targeted 'net-next' rather than 'net', as this appears to
-> be clearly a bug fix here?
+In case of GSO, 'chunk->skb' pointer may point to an entry from
+fraglist created in 'sctp_packet_gso_append()'. To avoid freeing
+random fraglist entry (and so undefined behavior and/or memory
+leak), introduce 'sctp_inq_chunk_free()' helper to ensure that
+'chunk->skb' is set to 'chunk->head_skb' (i.e. fraglist head)
+before calling 'sctp_chunk_free()', and use the aforementioned
+helper in 'sctp_inq_pop()' as well.
 
-Yes, it is a bug but it is not something that happens all the
-time and I thought this fits more into the lines of 'This could be a
-problem ...' therefore I had targeted 'net-next'.
-But if you consider that I should target 'net' instead of 'net-next' I
-can do that.
+Reported-by: syzbot+8bb053b5d63595ab47db@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?id=0d8351bbe54fd04a492c2daab0164138db008042
+Fixes: 90017accff61 ("sctp: Add GSO support")
+Suggested-by: Xin Long <lucien.xin@gmail.com>
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+---
+v3: https://lore.kernel.org/netdev/CADvbK_cjg7kd7uFWxPBpwMAxwsuCki791zQ7D01y+vk0R5wTSQ@mail.gmail.com
+    - rename helper to 'sctp_inq_chunk_free()' (Xin Long)
+v2: https://lore.kernel.org/netdev/20240209134703.63a9167b@kernel.org
+    - factor the fix out to helper function (Jakub Kicinski)
+---
+ net/sctp/inqueue.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-> --
-> Florian
-> 
-
+diff --git a/net/sctp/inqueue.c b/net/sctp/inqueue.c
+index 7182c5a450fb..5c1652181805 100644
+--- a/net/sctp/inqueue.c
++++ b/net/sctp/inqueue.c
+@@ -38,6 +38,14 @@ void sctp_inq_init(struct sctp_inq *queue)
+ 	INIT_WORK(&queue->immediate, NULL);
+ }
+ 
++/* Properly release the chunk which is being worked on. */
++static inline void sctp_inq_chunk_free(struct sctp_chunk *chunk)
++{
++	if (chunk->head_skb)
++		chunk->skb = chunk->head_skb;
++	sctp_chunk_free(chunk);
++}
++
+ /* Release the memory associated with an SCTP inqueue.  */
+ void sctp_inq_free(struct sctp_inq *queue)
+ {
+@@ -53,7 +61,7 @@ void sctp_inq_free(struct sctp_inq *queue)
+ 	 * free it as well.
+ 	 */
+ 	if (queue->in_progress) {
+-		sctp_chunk_free(queue->in_progress);
++		sctp_inq_chunk_free(queue->in_progress);
+ 		queue->in_progress = NULL;
+ 	}
+ }
+@@ -130,9 +138,7 @@ struct sctp_chunk *sctp_inq_pop(struct sctp_inq *queue)
+ 				goto new_skb;
+ 			}
+ 
+-			if (chunk->head_skb)
+-				chunk->skb = chunk->head_skb;
+-			sctp_chunk_free(chunk);
++			sctp_inq_chunk_free(chunk);
+ 			chunk = queue->in_progress = NULL;
+ 		} else {
+ 			/* Nothing to do. Next chunk in the packet, please. */
 -- 
-/Horatiu
+2.43.0
+
 
