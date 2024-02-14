@@ -1,206 +1,128 @@
-Return-Path: <netdev+bounces-71668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D032B854A34
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 14:13:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D343E854A5A
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 14:21:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E939B23A10
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 13:13:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 117541C26395
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 13:21:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07CA4535A0;
-	Wed, 14 Feb 2024 13:13:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B2F55466B;
+	Wed, 14 Feb 2024 13:20:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="o+R85huF"
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="dqA+1IG7";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="BsbGSXWK"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B8FD53E0D;
-	Wed, 14 Feb 2024 13:13:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C65C5466A;
+	Wed, 14 Feb 2024 13:20:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707916400; cv=none; b=jJ4220bsZQkjdnBb+w0WxDkrfqQIvWzWCIXor6sBMqmSlCRgtC66v8+AUdK3uigJtr/n3uvzpGgc2T0BvFmnil1yyNvVoSDSWJ/FO7sYZb46l8mQNxykTa9Di8Eys1RMk6vsqRNHdfARhYXhsu9xD8w02s6YI4en+GpRV0rbcD0=
+	t=1707916857; cv=none; b=Icu4cITwW3TdNAtiDyP24LT4h0BfQ3Z3PfiSZdSzBTCRVGkS+nW9f+4pV3/L9hsC2d1zVSAwk+SUWNXQQCJy8wg89vdtxuhhty7qwvlBH2muSAK31Z1WxQ5h0QRcs3uSRBDdT9pZucR49VBqxo5Wy3bNJlPDpUPo4b7GDzmY8ME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707916400; c=relaxed/simple;
-	bh=trNel9DGiBM9izEKSSd/SarU5GGAHEjWvzZ33PVmI/w=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dtEWuum6EOl0TO95RcezLdMoLYZc+ekG3J6Xl7k7P9y23ElbZUsQu9XjuFx4NHPatW1wOO52tl7Dilyf3DAG8elJ5nmqQRJQp2IX2d1yZIbtF/QWPxXYzsF89saAVvpWETiuevN2cik+ibjnR1yTT4T8+HLmrYK9M+OlzsH+Q9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=o+R85huF; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A93444000B;
-	Wed, 14 Feb 2024 13:13:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1707916395;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yoAjEMlVwFZdXBa82MjfrxBFsO3UeSV1bx1OSrRYZw8=;
-	b=o+R85huFFD6K3kjeRghvtDXOyBJKIWQiti408PeQ5wsVaLIvqUe0c4Vv65+MF5zU9e0XAQ
-	7t89FsKLZJtQ023ajRy/DL+B0cX7Rz5llmD+XPpwCXAdXNfasJ0c7pHwURc8qgnnMXwqMx
-	5fhB6aWU39RpEpN5+7Qyeysk91SVaCiAXHHBBRuu1PpS1plXq+P1S8FrEuEy0PsoLSG63S
-	Ca9qyl9dmi/rn/3ekkj9GF1/szixWhVHVRjcr9JxPbpWEqE8fUmWU7JI8tPkw5hVMRka9G
-	YBjwBrB6HF8wkQrxn41t7SlM9l98Wh1m/xypGctR1b/GKmo3oHhSgdhgcSb58A==
-Date: Wed, 14 Feb 2024 14:13:10 +0100
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: Rob Herring <robh@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
- <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>, Mark Brown <broonie@kernel.org>,
- Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Heiner
- Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v3 10/17] dt-bindings: net: pse-pd: Add another
- way of describing several PSE PIs
-Message-ID: <20240214141310.119364c4@kmaincent-XPS-13-7390>
-In-Reply-To: <20240209144349.GA3678044-robh@kernel.org>
-References: <20240208-feature_poe-v3-0-531d2674469e@bootlin.com>
-	<20240208-feature_poe-v3-10-531d2674469e@bootlin.com>
-	<20240209144349.GA3678044-robh@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1707916857; c=relaxed/simple;
+	bh=NasOj5Rgwdnt2BKlk2KyEOGaXNw9z2FOCu2Yo3tJ+qA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dezZ4HsC6pKNNXLtRSy2QBAvP0Q4ZyayOv9u/Y0Gmg5YtxSkaEvxTRnNmKb7M7kkJz4KlXXJxVq7QxCxo4599bXBkDgnFGigOTXX1mndsqBCBDRChx3QZOcvR42LZc8BLf8Onzf0EgjBL/1K34b9dLU9KeyroFoUf/KujexJ35M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=dqA+1IG7; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=BsbGSXWK reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1707916854; x=1739452854;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=yrrdWc24p8EoY0O9KXepRzsU4U8z8HdRzd2XY11wwMM=;
+  b=dqA+1IG7iu1jfjWUgY6d5j06RbiW7wlLNvS5iMsbUb83Y+i/orr2IyKC
+   eVgCBWlfLk6OY9PatGIjrqMrlGjO6Dhw0bw1AMQ3/lG11h5rwld74b178
+   wq8UIDETIEcdDDCKhi93JgJXswjCjloA26S2r5S6gkax85x/QZrg59WsR
+   1DzhsYsbM7bft5srSNvinqd2N9ZdSzzN2OuuldvL1GpIydaalCERfpdbt
+   QX9gofawkSGYjjRHcxe+sb+T1uNLVHG8195GRiWGc8Yd92zWT+ntn7uZO
+   lPFijvmbDQubIePZjWzU3EoMutsZm3v9CwE9YolRsS9LYW33Y9B5LQxKx
+   w==;
+X-IronPort-AV: E=Sophos;i="6.06,159,1705359600"; 
+   d="scan'208";a="35404619"
+Received: from vmailcow01.tq-net.de ([10.150.86.48])
+  by mx1.tq-group.com with ESMTP; 14 Feb 2024 14:20:51 +0100
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 96BA316E1E3;
+	Wed, 14 Feb 2024 14:20:44 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
+	s=dkim; t=1707916850;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=yrrdWc24p8EoY0O9KXepRzsU4U8z8HdRzd2XY11wwMM=;
+	b=BsbGSXWK9tho49jJ39YbUE6Uo5TOWRI0lL8ji3WEhZ/Uy+KdKIX9EAXomsngooSSusykOG
+	F2WIJaEwMDEkjvdBXDYTGNkUxEWCZOb1c0DiJf7DENtk/zSiZpUorpXQcg9VTg4gfrenuI
+	UqJXS5kCI/c4zhBjDewqXUpqtk2jQlzci83r51waH8KTTX6S4WJk2YJ5RkkkJLzKIhK3/A
+	E4Gh9WQ1LJjWfuh40g7u3S4tBG1Is6/WB/GB9iFl8FwxSImJKO70h0S12UrkAzhzVvlYQe
+	3AmUUSk4f+IEE1rVK8TIt8NOOCXP3BFkQEgBZpqEj/zBaiu8xaOj4g6Wm0Q+yg==
+Date: Wed, 14 Feb 2024 14:20:37 +0100
+From: Gregor Herburger <gregor.herburger@ew.tq-group.com>
+To: Dimitri Fedrau <dima.fedrau@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 net-next 05/14] net: phy: marvell-88q2xxx: add driver
+ for the Marvell 88Q2220 PHY
+Message-ID: <Zcy9E4riyFRk8B1P@herburgerg-w2>
+References: <20240213213955.178762-1-dima.fedrau@gmail.com>
+ <20240213213955.178762-6-dima.fedrau@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240213213955.178762-6-dima.fedrau@gmail.com>
+X-Last-TLS-Session-Version: TLSv1.3
 
-Hello Rob,
+Hi Dimitri,
 
-Thanks for your review!
+On Tue, Feb 13, 2024 at 10:39:44PM +0100, Dimitri Fedrau wrote:
+>  static struct phy_driver mv88q2xxx_driver[] = {
+>  	{
+>  		.phy_id			= MARVELL_PHY_ID_88Q2110,
+> @@ -255,12 +439,26 @@ static struct phy_driver mv88q2xxx_driver[] = {
+>  		.get_sqi		= mv88q2xxx_get_sqi,
+>  		.get_sqi_max		= mv88q2xxx_get_sqi_max,
+>  	},
+> +	{
+> +		PHY_ID_MATCH_EXACT(PHY_ID_88Q2220_REVB0),
 
-On Fri, 9 Feb 2024 14:43:49 +0000
-Rob Herring <robh@kernel.org> wrote:
+I tested the series on a 88Q2220 REV B1 (which is id 0x002b0b22). The
+driver works fine on this revision.
 
-> On Thu, Feb 08, 2024 at 02:08:47PM +0100, Kory Maincent wrote:
-> > Before hand we set "#pse-cell" to 1 to define a PSE controller with =20
->=20
-> #pse-cells
->=20
-> > several PIs (Power Interface). The drawback of this was that we could n=
-ot
-> > have any information on the PI except its number. =20
->=20
-> Then increase it to what you need. The whole point of #foo-cells is that=
-=20
-> it is variable depending on what the provider needs.=20
->=20
-> > Add support for pse_pis and pse_pi node to be able to have more informa=
-tion
-> > on the PI like the number of pairset used and the pairset pinout. =20
->=20
-> Please explain the problem you are trying to solve, not your solution. I=
-=20
-> don't understand what the problem is to provide any useful suggestions=20
-> on the design.
+I understand that in the Marvell API the initialization for Rev B0 and
+B1 differ. For B0 some additional init sequence is executed. I did not look
+into the details of this sequence. However this patch seems to work on
+Rev B1.
 
-Please see Oleksij's reply.
-Thank you Oleksij, for the documentation!!
+Would you consider adding compatibility for Rev B1 and following? I
+tested with:
+		.phy_id			= MARVELL_PHY_ID_88Q2220,
+		.phy_id_mask		= MARVELL_PHY_ID_MASK,
 
-> >=20
-> > Sponsored-by: Dent Project <dentproject@linuxfoundation.org> =20
->=20
-> Is this a recognized tag? First I've seen it.
+Otherwise:
 
-This is not a standard tag but it has been used several times in the past.
+Tested-by: Gregor Herburger <gregor.herburger@ew.tq-group.com>
 
-> > =20
-> > -required:
-> > -  - "#pse-cells"
-> > +  pse_pis:
-> > +    $ref: "#/$defs/pse_pis"
-> > +
-> > +$defs: =20
->=20
-> $defs is for when you need multiple copies of the same thing. I don't=20
-> see that here.
-
-I made this choice for better readability but indeed it is used only once.
-I will remove it then.
-
-> > +  pse_pis:
-> > +    type: object
-> > +    description:
-> > +      Kind of a matrix to identify the concordance between a PSE Power
-> > +      Interface and one or two (PoE4) physical ports.
-> > +
-> > +    properties:
-> > +      "#address-cells":
-> > +        const: 1
-> > +
-> > +      "#size-cells":
-> > +        const: 0
-> > +
-> > +    patternProperties:
-> > +      "^pse_pi@[0-9]+$": =20
->=20
-> Unit-addresses are hex.
-
-Oops sorry for the mistake.
-
->=20
-> > +        $ref: "#/$defs/pse_pi"
-> > +
-> > +    required:
-> > +      - "#address-cells"
-> > +      - "#size-cells"
-> > +
-> > +  pse_pi:
-> > +    description:
-> > +      PSE PI device for power delivery via pairsets, compliant with IE=
-EE
-> > +      802.3-2022, Section 145.2.4. Each pairset comprises a positive a=
-nd a
-> > +      negative VPSE pair, adhering to the pinout configurations detail=
-ed in
-> > +      the standard.
-> > +    type: object
-> > +    properties:
-> > +      reg:
-> > +        maxItems: 1 =20
->=20
-> As you are defining the addressing here, you need to define what the=20
-> "addresses" are.
-
-Yes I will add some documentation in next version.
-
-> > +          values are "alternative-a" and "alternative-b". Each name sh=
-ould
-> > +          correspond to a phandle in the 'pairset' property pointing t=
-o the
-> > +          power supply for that pairset.
-> > +        $ref: /schemas/types.yaml#/definitions/string-array
-> > +        minItems: 1
-> > +        maxItems: 2
-> > +        items:
-> > +          - enum:
-> > +            - "alternative-a"
-> > +            - "alternative-b" =20
->=20
-> This leaves the 2nd entry undefined. You need the dictionary form of=20
-> 'items' rather than a list. IOW, Drop the '-' under items.
-
-Oh thanks! That is what I was looking for. I was struggling using the right
-description.
-
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Best regards
+Gregor
+-- 
+TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
+Amtsgericht München, HRB 105018
+Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
+https://www.tq-group.com/
 
