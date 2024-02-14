@@ -1,104 +1,139 @@
-Return-Path: <netdev+bounces-71616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AB1B854320
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 07:57:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A4BC85435C
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 08:23:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D74A1C227A4
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 06:56:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5CE9AB261BF
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 07:23:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 916CF1119E;
-	Wed, 14 Feb 2024 06:56:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iNd5u5wS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5764111B9;
+	Wed, 14 Feb 2024 07:23:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D72FE10A36;
-	Wed, 14 Feb 2024 06:56:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 730BA111B5;
+	Wed, 14 Feb 2024 07:23:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707893814; cv=none; b=q79Ll6pezL082wtO0Gz8EACpwr9hP9bwo2xCLWlM/b2FegOk4nUPw6zJvuc27l+QNqGGTGfgytMzb9Jibn9hXhop7TLpK7KmxuoPK0VYAaiewVAiajsvm9Va3napXksE9HlnyGvFISFG+9y8dx93vKi3EOvnAI7jI6k0qgd6+yw=
+	t=1707895396; cv=none; b=SUkPGKKXmaqKw86QQbotyab7xkKbwj2/yrGFejdlWILtuIyGyKF2NG2kxlIJEhTQTL6PAhTc46988LU7qV6k4eldLj3dGynvHMQ0JZJIxnoxZ2J3E1I4Offzet5aQT9Ome+b16AG0Z58yiQFB29I9k3kZAkaZ2f27AnrbejWAtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707893814; c=relaxed/simple;
-	bh=ej1BQtIHZiJ+bLZHpdlP2uCwPAjbVbr4Q3laG2jWjMw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EKShVO0ZtItmfVGd0XvzB4qO1yXDQWzgvCNUDxloHino0e7gihJuFo6HGfr+VEOcem1CD/dFd63vAJ/AH/XLRn+ZUP+LEbRcoCJ9BqQzlIO+vdjncoflWXpQOBG3Q2A/YxpRsgvomsPRVqDcuYHqLXIJcjTxadkkCMCeFb2HmvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iNd5u5wS; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2d0e5212559so47941341fa.0;
-        Tue, 13 Feb 2024 22:56:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707893811; x=1708498611; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QorNyLHCzFQBTdpX8FSaT6urIZmUqpVjItDahBTzfOQ=;
-        b=iNd5u5wSl0weZpNClXiJrLpljdHhjftqh3BZDvJ10+d/XcLCsYXlOa3C+xLhTs4k5U
-         sp3kd2K6GYyHj9tJNfnQQAM+jfKFCnsKXHoV9z4qKMuxixMPJyKE05B2CNoKR7rP1WnF
-         OkZvL1ix+hhtdLaxPaInBf2d0PCsVkL6M6OMJrzqQ5Sc4bnjIqM3VZK/pAQMQVQOcK9U
-         t/+e9yASvDdZxiM2ORTb2EA+3Vv0DC5prcprwS6t4GjExYKnw5roBPU/dTSh2L5bIKSS
-         EYVqoDG4i+MNc6vsTjoYiYQ36a6BlqA/99UItArU0zUAYwhkAiaF52Jb3OvhcUr4XF0o
-         OB1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707893811; x=1708498611;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QorNyLHCzFQBTdpX8FSaT6urIZmUqpVjItDahBTzfOQ=;
-        b=ArzuGQQrgcqqWqtBWrko1Vp8c+B+QuXKjj43uKUPHpJMAqW6gOZtPOcQy7OdMUtzTb
-         w2ss3frSqAVqohPZsk6oYdYbsb51mu1xPrqmjbBRNxGmcbVE7SoEuxCT47MVGAZB8tzv
-         LlrcES4VclP82si9UdlxAt4dZuX1Jn/yx/5wva9nvBRynHb64iu5DdPJaXLIqHDWpzB5
-         1T7Zv+mKHD7nwx60yXJ3nrIcU3pAyG8bmXKewFub0d076Epw4AbPnTHzWGhEPYLR52OE
-         eRo5dEUckak2Zxbl1xrKhhG/wY+UYgl21oyNh+BAMO7j+EDV1d0ewCJGQ9DEU6xbLDg5
-         DZ3w==
-X-Forwarded-Encrypted: i=1; AJvYcCUCS3iOTF2ozo9XPf0Dhb5hpxp8HpPe7snk8wxnm6wjhGYw368ouoCgn4DEqkdpAx7uH0CLNcz3fLZPMA2/N7bcd0XupKc/wF7derFnSWxJYWDhrnAAM2WTKFA5XDc+nooV0ZP8
-X-Gm-Message-State: AOJu0YzuLQFh+kZYifzTZ6VyWeLHD53tyOh+uC0c7KA+ey5lLCwPGGwB
-	kMCDJnzOu1aBYEDVNF76r8teZ9JNvv2dG+uvq+EqJMEAEe0fleqs
-X-Google-Smtp-Source: AGHT+IEFQzhVaCIBrydcsY5zV5nmDj5qCS8gmDaoF3oeKAStErzDYIu5fFWV2EKHTerZ+wjatmLa4Q==
-X-Received: by 2002:a2e:a585:0:b0:2d0:ce72:570b with SMTP id m5-20020a2ea585000000b002d0ce72570bmr1403977ljp.48.1707893810555;
-        Tue, 13 Feb 2024 22:56:50 -0800 (PST)
-Received: from eichest-laptop ([178.197.206.161])
-        by smtp.gmail.com with ESMTPSA id u3-20020a05600c00c300b00411ec07674esm622452wmm.31.2024.02.13.22.56.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Feb 2024 22:56:50 -0800 (PST)
-Date: Wed, 14 Feb 2024 07:56:48 +0100
-From: Stefan Eichenberger <eichest@gmail.com>
-To: Dimitri Fedrau <dima.fedrau@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 net-next 14/14] net: phy: marvell-88q2xxx: move
- interrupt configuration
-Message-ID: <ZcxkMBfnJo2cJyWv@eichest-laptop>
-References: <20240213213955.178762-1-dima.fedrau@gmail.com>
- <20240213213955.178762-15-dima.fedrau@gmail.com>
+	s=arc-20240116; t=1707895396; c=relaxed/simple;
+	bh=zYB2nxLixfzl3ch2TWuc6MXy/7yfnH7admD1znY/Ky8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=km4r5TzbXr57BJcq0aAMiOCvAXXRePqxaj7GSReyTuNhgINWAgkI4gvV9Isb0L6leikoGyo3c0ooVgQ+B42fAvaCdRAVSABhjLhCOGDsKvCOVt/vy4cAFKJy+HVQR2FrHwb4Frqey5qmczXr1/9n7RMrsVVq+qAEy17FeIe+5IQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.224] (ip5f5aea4b.dynamic.kabel-deutschland.de [95.90.234.75])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 1916E61E5FE05;
+	Wed, 14 Feb 2024 08:22:21 +0100 (CET)
+Message-ID: <926b5031-47d2-42d7-938d-01fc4ebc9dc0@molgen.mpg.de>
+Date: Wed, 14 Feb 2024 08:22:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240213213955.178762-15-dima.fedrau@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [net-next v3] intel: make module parameters
+ readable in sys filesystem
+To: Jon Maxwell <jmaxwell37@gmail.com>, jesse.brandeburg@intel.com
+Cc: intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org,
+ edumazet@google.com, anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
+ kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net
+References: <20240213222344.195885-1-jmaxwell37@gmail.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20240213222344.195885-1-jmaxwell37@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Feb 13, 2024 at 10:39:53PM +0100, Dimitri Fedrau wrote:
-> Move interrupt configuration from mv88q222x_revb0_config_init to
-> mv88q2xxx_config_init. Same register and bits are used for the 88q2xxx
-> devices.
+Dear Jon,
+
+
+Thank you very much for your patch.
+
+Am 13.02.24 um 11:23 PM schrieb Jon Maxwell:
+> Linux users sometimes need an easy way to check current values of module
+> parameters. For example the module may be manually reloaded with different
+> parameters. Make these visible and readable in the /sys filesystem to allow
+> that.
 > 
-> Signed-off-by: Dimitri Fedrau <dima.fedrau@gmail.com>
+> Signed-off-by: Jon Maxwell <jmaxwell37@gmail.com>
+> ---
+> V2: Remove the "debug" module parameter as per Andrew Lunns suggestion.
 
-I couldn't test it because we don't have the interrupt pin connected but
-according to datasheet of the 88Q2110 it looks good.
+Please mention this in the commit message, why `debug` should not be 
+exposed.
 
-Reviewed-by: Stefan Eichenberger <eichest@gmail.com>
+
+Kind regards,
+
+Paul
+
+
+> V3: Correctly format v2.
+>   drivers/net/ethernet/intel/e100.c             | 4 ++--
+>   drivers/net/ethernet/intel/igb/igb_main.c     | 2 +-
+>   drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 4 ++--
+>   3 files changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/e100.c b/drivers/net/ethernet/intel/e100.c
+> index 01f0f12035caeb7ca1657387538fcebf5c608322..3fcb8daaa2437fa3fe7b98ba9f606dbbb1844e58 100644
+> --- a/drivers/net/ethernet/intel/e100.c
+> +++ b/drivers/net/ethernet/intel/e100.c
+> @@ -171,8 +171,8 @@ static int debug = 3;
+>   static int eeprom_bad_csum_allow = 0;
+>   static int use_io = 0;
+>   module_param(debug, int, 0);
+> -module_param(eeprom_bad_csum_allow, int, 0);
+> -module_param(use_io, int, 0);
+> +module_param(eeprom_bad_csum_allow, int, 0444);
+> +module_param(use_io, int, 0444);
+>   MODULE_PARM_DESC(debug, "Debug level (0=none,...,16=all)");
+>   MODULE_PARM_DESC(eeprom_bad_csum_allow, "Allow bad eeprom checksums");
+>   MODULE_PARM_DESC(use_io, "Force use of i/o access mode");
+> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+> index 4df8d4153aa5f5ce7ac9dd566180d552be9f5b4f..31d0a43a908c0a4eab4fe1147064a5f5677c9f0b 100644
+> --- a/drivers/net/ethernet/intel/igb/igb_main.c
+> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
+> @@ -202,7 +202,7 @@ static struct notifier_block dca_notifier = {
+>   #endif
+>   #ifdef CONFIG_PCI_IOV
+>   static unsigned int max_vfs;
+> -module_param(max_vfs, uint, 0);
+> +module_param(max_vfs, uint, 0444);
+>   MODULE_PARM_DESC(max_vfs, "Maximum number of virtual functions to allocate per physical function");
+>   #endif /* CONFIG_PCI_IOV */
+>   
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> index bd541527c8c74d6922e8683e2f4493d9b361f67b..9d26ff82a397d4939cf7adea78c217e4071aa166 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> @@ -147,13 +147,13 @@ static struct notifier_block dca_notifier = {
+>   
+>   #ifdef CONFIG_PCI_IOV
+>   static unsigned int max_vfs;
+> -module_param(max_vfs, uint, 0);
+> +module_param(max_vfs, uint, 0444);
+>   MODULE_PARM_DESC(max_vfs,
+>   		 "Maximum number of virtual functions to allocate per physical function - default is zero and maximum value is 63. (Deprecated)");
+>   #endif /* CONFIG_PCI_IOV */
+>   
+>   static bool allow_unsupported_sfp;
+> -module_param(allow_unsupported_sfp, bool, 0);
+> +module_param(allow_unsupported_sfp, bool, 0444);
+>   MODULE_PARM_DESC(allow_unsupported_sfp,
+>   		 "Allow unsupported and untested SFP+ modules on 82599-based adapters");
+>   
 
