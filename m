@@ -1,124 +1,80 @@
-Return-Path: <netdev+bounces-71803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 824F48551B7
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 19:12:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B05938551C1
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 19:13:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 364631F225D5
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 18:12:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79585B28927
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 18:12:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51F701292C2;
-	Wed, 14 Feb 2024 18:08:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="alzPC9Wo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7489112A15E;
+	Wed, 14 Feb 2024 18:09:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E419128836
-	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 18:08:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9E3812A156;
+	Wed, 14 Feb 2024 18:09:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707934128; cv=none; b=aZ0tuOEDy1DCxWqwYczEqiwHapGGkh1uEFwzgQKsr0fDLoU1JExv/sXmVYzC5TQOM7/lTFd+8lyET71BgxRnmfY42HDSNzCDxTCCuhNOL9fCQHi/vhu0GycQYzNgHVJGcfD4tM9YatBMAn1qF6Y73//LDNm0C4kGFHvSmYqgYZw=
+	t=1707934154; cv=none; b=Ga9exVhHHxPqrPeh+3ai6BdP/gBwgQQmLSGoRBCYJmsiezdSkkFiXqiK1cxiUG9i1r+Kbcc7dzEjRPgWBwpWoaee/VfaEt69tXUOy8cvTOmnkqApq2XpgY1kN5If0DlKLd9c+Y4gZ/F3VrwzW7ESXyfX0driN983gYD9+OMnls0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707934128; c=relaxed/simple;
-	bh=jGOaR9YzbYSApWmKBAUmeMYCI/NFoJh2wnbvudW6gts=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cibQeJqZqnK7Z5lFQkUggVMETeFTxVufF/kp1S1ikg7IikW1EnjRScHCcjjKJenox3yXwAB0B2QmW7UsRiBBB+HT+/c4RmeCa2JzFvsraNLD3VlZtNchWVUxRXu0+YGtLSZLLQIRK4gOUwzRJM6zeIlMxb83Ihh/xVC+TrDxZ6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=alzPC9Wo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E16BC433C7;
-	Wed, 14 Feb 2024 18:08:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707934127;
-	bh=jGOaR9YzbYSApWmKBAUmeMYCI/NFoJh2wnbvudW6gts=;
-	h=From:To:Cc:Subject:Date:From;
-	b=alzPC9WoRcovjGWSQTKym5lX6GIHY8TavF2zPFHEM76UBHgd/maz4uhO2Shg286hg
-	 WI1+MdVqIjmqWUhAM6PkeT+VgBuTI52LbiQ5HTUYCvecF51eiLEuoEarO1FQXT5s+o
-	 cgjePRL+2gUdtrWxd8hfI/j6bhZ2f9YvZstn9sQLk1ryKw7r3PnckgOhifwWWdfABD
-	 3XI0hbZwUDYa/G1m0eQpCwigqZCNIYx0/5Y8ufiO0DDqipabavMHLtCCdZtoBXQf4+
-	 QI56HNsQrTMX3dwTKo1LgwsbcKVOwrHoGB5WHNlhhH6Z4yb0IeHtY8U+4EtOknUvY+
-	 9gzljYF70voCg==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: netdev@vger.kernel.org
-Cc: lorenzo.bianconi@redhat.com,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	hawk@kernel.org,
-	ilias.apalodimas@linaro.org,
-	linyunsheng@huawei.com,
-	toke@redhat.com
-Subject: [RFC net-next] net: page_pool: fix recycle stats for percpu page_pool allocator
-Date: Wed, 14 Feb 2024 19:08:40 +0100
-Message-ID: <e56d630a7a6e8f738989745a2fa081225735a93c.1707933960.git.lorenzo@kernel.org>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1707934154; c=relaxed/simple;
+	bh=xJfgsHzx/81y0EEpfzs/vdStj/XBLTzhMIkOKysBaGc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eJQk82nmTFWvG93VIZ76eNLnAf71crmFvqiYqytTpx9XKpRw4vVXXwa+s+sD2S1D2MvuJ972OiAUEqGJLtgreOfXw2Gr+JF3iBgLKnPnBzizafy+e3bcTruTl1EAtkRSLBZjObhcHWh2hE9NjMJ1NHkLJfJ+WGx+gDNQHxpZSBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1CBAE1FB;
+	Wed, 14 Feb 2024 10:09:53 -0800 (PST)
+Received: from [10.57.47.86] (unknown [10.57.47.86])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6A7453F7B4;
+	Wed, 14 Feb 2024 10:09:09 -0800 (PST)
+Message-ID: <fba9018d-3783-4d3c-8948-409d7d5258d5@arm.com>
+Date: Wed, 14 Feb 2024 18:09:08 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 1/7] dma: compile-out DMA sync op calls when
+ not used
+Content-Language: en-GB
+To: Alexander Lobakin <aleksander.lobakin@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+ Marek Szyprowski <m.szyprowski@samsung.com>, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>,
+ Magnus Karlsson <magnus.karlsson@intel.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Alexander Duyck <alexanderduyck@fb.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20240214162201.4168778-1-aleksander.lobakin@intel.com>
+ <20240214162201.4168778-2-aleksander.lobakin@intel.com>
+From: Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <20240214162201.4168778-2-aleksander.lobakin@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Use global page_pool_recycle_stats percpu counter for percpu page_pool
-allocator.
+On 2024-02-14 4:21 pm, Alexander Lobakin wrote:
+[...]
+> +static inline bool dma_skip_sync(const struct device *dev)
+> +{
+> +	return !IS_ENABLED(CONFIG_DMA_NEED_SYNC);
+> +}
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- net/core/page_pool.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+One more thing, could we please also make this conditional on 
+!CONFIG_DMA_API_DEBUG so that that doesn't lose coverage for validating 
+syncs?
 
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 6e0753e6a95b..1bb83b6e7a61 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -31,6 +31,8 @@
- #define BIAS_MAX	(LONG_MAX >> 1)
- 
- #ifdef CONFIG_PAGE_POOL_STATS
-+static DEFINE_PER_CPU(struct page_pool_recycle_stats, pp_recycle_stats);
-+
- /* alloc_stat_inc is intended to be used in softirq context */
- #define alloc_stat_inc(pool, __stat)	(pool->alloc_stats.__stat++)
- /* recycle_stat_inc is safe to use when preemption is possible. */
-@@ -220,14 +222,19 @@ static int page_pool_init(struct page_pool *pool,
- 	pool->has_init_callback = !!pool->slow.init_callback;
- 
- #ifdef CONFIG_PAGE_POOL_STATS
--	pool->recycle_stats = alloc_percpu(struct page_pool_recycle_stats);
--	if (!pool->recycle_stats)
--		return -ENOMEM;
-+	if (cpuid < 0) {
-+		pool->recycle_stats = alloc_percpu(struct page_pool_recycle_stats);
-+		if (!pool->recycle_stats)
-+			return -ENOMEM;
-+	} else {
-+		pool->recycle_stats = &pp_recycle_stats;
-+	}
- #endif
- 
- 	if (ptr_ring_init(&pool->ring, ring_qsize, GFP_KERNEL) < 0) {
- #ifdef CONFIG_PAGE_POOL_STATS
--		free_percpu(pool->recycle_stats);
-+		if (cpuid < 0)
-+			free_percpu(pool->recycle_stats);
- #endif
- 		return -ENOMEM;
- 	}
-@@ -251,7 +258,8 @@ static void page_pool_uninit(struct page_pool *pool)
- 		put_device(pool->p.dev);
- 
- #ifdef CONFIG_PAGE_POOL_STATS
--	free_percpu(pool->recycle_stats);
-+	if (pool->cpuid < 0)
-+		free_percpu(pool->recycle_stats);
- #endif
- }
- 
--- 
-2.43.0
-
+Thanks,
+Robin.
 
