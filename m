@@ -1,50 +1,61 @@
-Return-Path: <netdev+bounces-71602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6C698541C3
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 04:20:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02C908541D0
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 04:38:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA2C41C258D2
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 03:20:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 290921C2681B
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 03:38:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 913A4947A;
-	Wed, 14 Feb 2024 03:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B029B947A;
+	Wed, 14 Feb 2024 03:38:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hAUYtPAE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IwQDjEko"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6546320EB;
-	Wed, 14 Feb 2024 03:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B7F9945A
+	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 03:38:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707880828; cv=none; b=MEYN5WDEjxmnpW8zmI+dnWC8EC+ua40eHmmxeUz2p3uIY5TVtwJL33vwrsT3TPhyqu9AkH+IgO3aRLAxz+4JeEY7MNGHatHegsmXCDBOKVZYT9leHf3Z6+SNVxgjUdx8zO3z4zlQEBzMCihhYx2d0qwT4z62s48RbUsuCKgZqZs=
+	t=1707881935; cv=none; b=nSEt9H1pfGFHUJKIhmW+BehnDsvpy39bH515eIH9MOYN0BxjJFqYHvrZSn4ggbZlO6g6W9ukplqK01cqy9qcJTQ6k9P2lHBvV+aSYpKcI2G5IxV6ooPYLdNbUHIwJHtm6Xlp1w6toZnFrSyv6MKt9dZ6zY8+DXeA29EcYl9X+6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707880828; c=relaxed/simple;
-	bh=XjTwCFHpxyrJIwCIb3fyxD9On3e7S2NhTGj1avU1A3U=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ADUGNCCfADHxVT8HUxyUeH8ZqS07x+/8XHtjSERJh2Sx7fvuSydfZAEpRuH4feyTrlAcY66gMjVrDGOTVqPQuw35INTvGgSPB/COeCRnZGf3NcI7EuNpJg31Go+2KgMel0vSbzQ3aLBXCBsB8XHOF00Vkqs9DQJSCWKrLpdSmT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hAUYtPAE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F4072C433F1;
-	Wed, 14 Feb 2024 03:20:27 +0000 (UTC)
+	s=arc-20240116; t=1707881935; c=relaxed/simple;
+	bh=/xRk9VP67CdYncrwVJrBRitZSAcO6M3ZS+xcniuLcLM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BHmB4c9+gt2Yle+bEhrFXoaJeHpuwiCJ27ZTOR3pmO9BaprothwKKh+TKx1p8TGKsEkaJVWLBfNVQg9SLTTG9rRA73YotJCCzQo+9k+D/5irVCtTXlFWw172ZSRCZAG8yb+ybu2QBGv6nvYtnmeazNvsfrLJFyKjStAuOrGdSsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IwQDjEko; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89137C433F1;
+	Wed, 14 Feb 2024 03:38:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707880828;
-	bh=XjTwCFHpxyrJIwCIb3fyxD9On3e7S2NhTGj1avU1A3U=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hAUYtPAEnkNlI0sp3Z3mIJDPFW0Q/pKSGVHY6iUZgu2DFWoYcYdkoOdkfn9/3iFN9
-	 f0UA/KBn5jtQgTq3OOJyMfIl9YeNbAPtjqmgTcDWwuB6wM6GNKF6/MU0PR1fATzgCw
-	 6wbxkmIVuzyUAw9AzIJd8tDK3KYThcw5pQICUO5h46x9DlS0JMWNlfVa5y7eP2yiMz
-	 9gFNk9KwiCNnqjmpVOuTy2mGNZMTLSjMVEk/7Lmn6B0LioCcVedZn890o0gwzTF84R
-	 x9eidxySk3bW3SaYgWZePkgVWpBrpR1x8D2u1NWF4P9oPEJrtTqNyTV+PC+gwqzcbc
-	 ZT6F5cpKyYxyw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D891CDC99FC;
-	Wed, 14 Feb 2024 03:20:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1707881935;
+	bh=/xRk9VP67CdYncrwVJrBRitZSAcO6M3ZS+xcniuLcLM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=IwQDjEko1jYlOMxuHlUMkWEoWpsy0NjY5dzti0gKJYM66HoZLOfeklMXbbPoG8cXT
+	 c4iZapzCUYYSbK2FjIofZ3dZM3tYaNv11o2Xa8dogJq9s/HZHBY50JBPgPE4Wwk0Fx
+	 yuR/P1hgKX0ZAFcOYV+B1BCTVb3VNzjxHqIMNDJd5Os5vMgciL7tSZh6XtZc0bMvOP
+	 5IcTEWda1TltoJZn0koEDuW/xFTiAtzhF3Ug3euQGFHasj0/OFtszGkJb8/Zhfjast
+	 Oycoc/KYAvGNz3b7IW6uPqvdyH/wxURwFv+ThKgf3e/Np4iNDbV8hAVwcOXkXMn/A4
+	 gFToaD8Q/yb2w==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Davide Caratti <dcaratti@redhat.com>,
+	jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	shmulik.ladkani@gmail.com
+Subject: [PATCH net v2 1/2] net/sched: act_mirred: use the backlog for mirred ingress
+Date: Tue, 13 Feb 2024 19:38:47 -0800
+Message-ID: <20240214033848.981211-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,43 +63,84 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: dsa: realtek: fix digital interface select
- macro for EXT0
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170788082787.27530.15182736427269542366.git-patchwork-notify@kernel.org>
-Date: Wed, 14 Feb 2024 03:20:27 +0000
-References: <20240212-realtek-fix_ext0-v1-1-f3d2536d191a@gmail.com>
-In-Reply-To: <20240212-realtek-fix_ext0-v1-1-f3d2536d191a@gmail.com>
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: linus.walleij@linaro.org, alsi@bang-olufsen.dk, andrew@lunn.ch,
- f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hello:
+The test Davide added in commit ca22da2fbd69 ("act_mirred: use the backlog
+for nested calls to mirred ingress") hangs our testing VMs every 10 or so
+runs, with the familiar tcp_v4_rcv -> tcp_v4_rcv deadlock reported by
+lockdep.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+In the past there was a concern that the backlog indirection will
+lead to loss of error reporting / less accurate stats. But the current
+workaround does not seem to address the issue.
 
-On Mon, 12 Feb 2024 18:34:33 -0300 you wrote:
-> While no supported devices currently utilize EXT0, the register reserves
-> the bits for an EXT0. EXT0 is utilized by devices from the generation
-> prior to rtl8365mb, such as those supported by the driver library
-> rtl8367b.
-> 
-> Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-> 
-> [...]
+Fixes: 53592b364001 ("net/sched: act_mirred: Implement ingress actions")
+Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Suggested-by: Davide Caratti <dcaratti@redhat.com>
+Link: https://lore.kernel.org/netdev/33dc43f587ec1388ba456b4915c75f02a8aae226.1663945716.git.dcaratti@redhat.com/
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: jhs@mojatatu.com
+CC: xiyou.wangcong@gmail.com
+CC: jiri@resnulli.us
+CC: shmulik.ladkani@gmail.com
+---
+ net/sched/act_mirred.c                             | 14 +++++---------
+ .../testing/selftests/net/forwarding/tc_actions.sh |  3 ---
+ 2 files changed, 5 insertions(+), 12 deletions(-)
 
-Here is the summary with links:
-  - [net-next] net: dsa: realtek: fix digital interface select macro for EXT0
-    https://git.kernel.org/netdev/net-next/c/32e4a5447ed9
-
-You are awesome, thank you!
+diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+index 0a1a9e40f237..291d47c9eb69 100644
+--- a/net/sched/act_mirred.c
++++ b/net/sched/act_mirred.c
+@@ -232,18 +232,14 @@ static int tcf_mirred_init(struct net *net, struct nlattr *nla,
+ 	return err;
+ }
+ 
+-static bool is_mirred_nested(void)
+-{
+-	return unlikely(__this_cpu_read(mirred_nest_level) > 1);
+-}
+-
+-static int tcf_mirred_forward(bool want_ingress, struct sk_buff *skb)
++static int
++tcf_mirred_forward(bool at_ingress, bool want_ingress, struct sk_buff *skb)
+ {
+ 	int err;
+ 
+ 	if (!want_ingress)
+ 		err = tcf_dev_queue_xmit(skb, dev_queue_xmit);
+-	else if (is_mirred_nested())
++	else if (!at_ingress)
+ 		err = netif_rx(skb);
+ 	else
+ 		err = netif_receive_skb(skb);
+@@ -319,9 +315,9 @@ static int tcf_mirred_to_dev(struct sk_buff *skb, struct tcf_mirred *m,
+ 
+ 		skb_set_redirected(skb_to_send, skb_to_send->tc_at_ingress);
+ 
+-		err = tcf_mirred_forward(want_ingress, skb_to_send);
++		err = tcf_mirred_forward(at_ingress, want_ingress, skb_to_send);
+ 	} else {
+-		err = tcf_mirred_forward(want_ingress, skb_to_send);
++		err = tcf_mirred_forward(at_ingress, want_ingress, skb_to_send);
+ 	}
+ 
+ 	if (err) {
+diff --git a/tools/testing/selftests/net/forwarding/tc_actions.sh b/tools/testing/selftests/net/forwarding/tc_actions.sh
+index b0f5e55d2d0b..589629636502 100755
+--- a/tools/testing/selftests/net/forwarding/tc_actions.sh
++++ b/tools/testing/selftests/net/forwarding/tc_actions.sh
+@@ -235,9 +235,6 @@ mirred_egress_to_ingress_tcp_test()
+ 	check_err $? "didn't mirred redirect ICMP"
+ 	tc_check_packets "dev $h1 ingress" 102 10
+ 	check_err $? "didn't drop mirred ICMP"
+-	local overlimits=$(tc_rule_stats_get ${h1} 101 egress .overlimits)
+-	test ${overlimits} = 10
+-	check_err $? "wrong overlimits, expected 10 got ${overlimits}"
+ 
+ 	tc filter del dev $h1 egress protocol ip pref 100 handle 100 flower
+ 	tc filter del dev $h1 egress protocol ip pref 101 handle 101 flower
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
