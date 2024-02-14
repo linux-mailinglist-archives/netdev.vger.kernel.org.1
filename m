@@ -1,122 +1,85 @@
-Return-Path: <netdev+bounces-71800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C42A8551FB
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 19:20:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 271948551AA
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 19:10:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3DBA8B31589
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 18:09:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6693298614
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 18:10:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C482912C7F0;
-	Wed, 14 Feb 2024 18:03:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D481812D766;
+	Wed, 14 Feb 2024 18:04:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kUsKDdKB"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Hhy+CkfP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2233712C7E3
-	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 18:03:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B53D1292DB;
+	Wed, 14 Feb 2024 18:04:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707933839; cv=none; b=if/z+dn2lleM3iFUA56SlwZawAnmFylu5AkRIZdkfYvq66y/M3Jdp6+4F/s936QoDXiJzeVvVC5bCDIXLaIbZ93jTLfX3+nfyI55rPSeFa0WQleQbTHYNXFxD4e7Sg9SjK+k24ZwSHi5pkumgSJsitRlRAghY12otQfZ4L+aBOc=
+	t=1707933884; cv=none; b=aT4Nfp5sU8I1IcKjGnusvEsHSjHfnQSP8RM4MxBR4lWb/lcSTVT3IshemNOP8/jCoa+SNYzPXFtKaW01xB4NanChnqKxvo9QqWlALxxtIoOGC4ERw8Na7fLLCxLyPt4vsJ4aK6JSKjF5PwFZW9ckyLT5+tlpn9FgSu+UZu8qc78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707933839; c=relaxed/simple;
-	bh=R6xknYZmHiaEcCbJz5m6dXCbplm9//j4SfgceruhKyE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HerAlZhwHXUie0gMRAkTJOtPkvTL3d3k5BI92w0hTjZva2jcmDEX8HpxROv2orsISpThgabkWTmIM9sZwGyKM67SgWp8/arXLpDYGLDbVMWjQn+JVZmRukfQJZveDqumoIf1190c9C22PQ9QEQ2ghjYT0Gm92eHTvyxTXp8m/os=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kUsKDdKB; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707933838; x=1739469838;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=R6xknYZmHiaEcCbJz5m6dXCbplm9//j4SfgceruhKyE=;
-  b=kUsKDdKBw5h972oC5QKIEw11dObmTO8uQgunOaTkKO+rPGUt55HHgCWm
-   5n0a48dcBrosMWTPqpmnPE6B0sXi1zsd1vKH4kxelYanaTaD6xO1j0mPe
-   O+K7xybZLwmbuFdcmMaaX3aRKZCzAN5Nz4g3hbYNcBKnEj/Tlhw31g/It
-   oUq1+4MdaFjdH5+slIPMe3aNALtIBIjUo29i+m/A2O5GvjEwskZkK8fmf
-   sf0Q330BZC6/3AYS2k3jmBOt3ZdLY0lETYb3R2s7u31d3Nw15i4VHCvMc
-   OyH3z31c5Ssq+dXJE7Q6iwMupIVxUAj+wDtX13dyxGOIGIYRmsz3tnyYM
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10984"; a="19505807"
-X-IronPort-AV: E=Sophos;i="6.06,160,1705392000"; 
-   d="scan'208";a="19505807"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2024 10:03:56 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,160,1705392000"; 
-   d="scan'208";a="3251279"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa009.fm.intel.com with ESMTP; 14 Feb 2024 10:03:55 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Sasha Neftin <sasha.neftin@intel.com>,
-	anthony.l.nguyen@intel.com,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	Naama Meir <naamax.meir@linux.intel.com>
-Subject: [PATCH net v2 2/2] igc: Remove temporary workaround
-Date: Wed, 14 Feb 2024 10:03:45 -0800
-Message-ID: <20240214180347.3219650-3-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20240214180347.3219650-1-anthony.l.nguyen@intel.com>
-References: <20240214180347.3219650-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1707933884; c=relaxed/simple;
+	bh=tp9WBVv4tk8bpCmaDHshpr73lQEddgNoO5Q4jQr2A9U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OZxxOfDvzRkciUt9m38PGzDbmKyaB6O826/pn9f+OBMaAALGPUb/3V6dkU6np7kd+JSR7gVA2W4NkoWpjjFH5UQvKqPvsmYHl/1xx0DbD8c8fUIQ9qCm3T1ROy+1wcx3/Um7Ooy971JYdh8/D3KIgQRo2UF8ldE+HsdmOSEgWWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Hhy+CkfP; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=asjQTJ1uTvWYrDDXb91A7DvAB5RkaQAzani0ICferZo=; b=Hhy+CkfP9/tE8VikwnH77iK+Od
+	+5MVECwCQMsHwEWGCRWu/299CEaWjr16LDuw/KnLeRUSmNu6SUsCnPp6XVaCbere563/JkYRO0Jjg
+	EUpGxqzTLuGpioOJ6izUSlMEXZFvj7iXwYUy/MxRJ6V1D7CkUg1Iy2xoOFWpbBoHsoWw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1raJck-007oXp-BD; Wed, 14 Feb 2024 19:04:46 +0100
+Date: Wed, 14 Feb 2024 19:04:46 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Robert Marko <robimarko@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH] net: phy: aquantia: add AQR111 and AQR111B0 PHY
+ ID
+Message-ID: <e1b02bfc-0e84-4b4d-804a-3db2ce546e3a@lunn.ch>
+References: <20240213133558.1836-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240213133558.1836-1-ansuelsmth@gmail.com>
 
-From: Sasha Neftin <sasha.neftin@intel.com>
+On Tue, Feb 13, 2024 at 02:35:51PM +0100, Christian Marangi wrote:
+> Add Aquantia AQR111 and AQR111B0 PHY ID. These PHY advertise 10G speed
+> but actually supports up to 5G speed, hence some manual fixup is needed.
+> 
+> The Aquantia AQR111B0 PHY is just a variant of the AQR111 with smaller
+> chip size.
+> 
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 
-PHY_CONTROL register works as defined in the IEEE 802.3 specification
-(IEEE 802.3-2008 22.2.4.1). Tidy up the temporary workaround.
+The discussion around provisioning should not prevent this being
+merged.
 
-User impact: PHY can now be powered down when the ethernet link is down.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Testing hints: ip link set down <device> (or just disconnect the
-ethernet cable).
-
-Oldest tested NVM version is: 1045:740.
-
-Fixes: 5586838fe9ce ("igc: Add code for PHY support")
-Signed-off-by: Sasha Neftin <sasha.neftin@intel.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/igc/igc_phy.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/igc/igc_phy.c b/drivers/net/ethernet/intel/igc/igc_phy.c
-index 7cd8716d2ffa..861f37076861 100644
---- a/drivers/net/ethernet/intel/igc/igc_phy.c
-+++ b/drivers/net/ethernet/intel/igc/igc_phy.c
-@@ -130,11 +130,7 @@ void igc_power_down_phy_copper(struct igc_hw *hw)
- 	/* The PHY will retain its settings across a power down/up cycle */
- 	hw->phy.ops.read_reg(hw, PHY_CONTROL, &mii_reg);
- 	mii_reg |= MII_CR_POWER_DOWN;
--
--	/* Temporary workaround - should be removed when PHY will implement
--	 * IEEE registers as properly
--	 */
--	/* hw->phy.ops.write_reg(hw, PHY_CONTROL, mii_reg);*/
-+	hw->phy.ops.write_reg(hw, PHY_CONTROL, mii_reg);
- 	usleep_range(1000, 2000);
- }
- 
--- 
-2.41.0
-
+    Andrew
 
