@@ -1,57 +1,81 @@
-Return-Path: <netdev+bounces-71742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A85E854E5F
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 17:30:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EC06854E9E
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 17:35:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B13A1C28AD2
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 16:30:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABCCF1F22710
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 16:35:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D08F66027A;
-	Wed, 14 Feb 2024 16:27:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 431FF60269;
+	Wed, 14 Feb 2024 16:32:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="mOnBVfN/"
 X-Original-To: netdev@vger.kernel.org
-Received: from air.basealt.ru (air.basealt.ru [194.107.17.39])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC80D6025A;
-	Wed, 14 Feb 2024 16:27:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51BB060254;
+	Wed, 14 Feb 2024 16:32:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707928077; cv=none; b=J0kJuF8JXLvCOT/F6u+PekvtmKKEonVx7tKWTItFP8aRmS7olGlHUWwmIYwueTv2GEDgD+qaWYVg+6A6A3fpvShtEyG7Tji7ATXpfEXo7f8bves3y0Wap8lHfMQUJRpeYxKjypMnUJ6bJytlBAW/k04Au5lNRakSRi+B5gBv6UA=
+	t=1707928370; cv=none; b=l8UxkHCPaqa5Uau9h6SmEtWeawdKmLeSTk6Q/mZK1KpCLhLyjSJT6yK4DOu4P0Ez8pnGHwTSZECPp70vifHDkQsm87sC10gvv7ektAkOIeUTny0CHET5HcsZI68aRrYqfYeTQOAr3yszjMZQEoRNw0ibH9XMqCALeDzo2uhM7Qg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707928077; c=relaxed/simple;
-	bh=pQJlihVfjtSfZ4xDAFcZyiTy4mQy3t/31h0t8ugdBlA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=s41YDUCVo6tJf7Dbx8H9Cn9cVYDXW6lKK8LmhhdH8GpfKrQ/LLqttLlBrsiN44bThe1wabcnFphi4aHKeJspu1j/GXfAhTQMlldBOgMLljWS3hfkLVpjX7x1v9g4LkcwhEFybojmdQuniNAEE/zDgAbSeWY8zz6YtJY745ztG3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
-Received: by air.basealt.ru (Postfix, from userid 490)
-	id 3C4CD2F20256; Wed, 14 Feb 2024 16:27:51 +0000 (UTC)
-X-Spam-Level: 
-Received: from altlinux.ipa.basealt.ru (unknown [178.76.204.78])
-	by air.basealt.ru (Postfix) with ESMTPSA id 349C62F2025D;
-	Wed, 14 Feb 2024 16:27:46 +0000 (UTC)
-From: kovalev@altlinux.org
-To: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: edumazet@google.com,
-	pablo@netfilter.org,
-	laforge@gnumonks.org,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	kovalev@altlinux.org,
-	nickel@altlinux.org,
-	oficerovas@altlinux.org,
-	dutyrok@altlinux.org,
-	stable@vger.kernel.org
-Subject: [PATCH ver.2] gtp: fix use-after-free and null-ptr-deref in gtp_genl_dump_pdp()
-Date: Wed, 14 Feb 2024 19:27:33 +0300
-Message-Id: <20240214162733.34214-1-kovalev@altlinux.org>
-X-Mailer: git-send-email 2.33.8
+	s=arc-20240116; t=1707928370; c=relaxed/simple;
+	bh=03sJ2hDczb8lu598NQs1X/W4Y9/EjHIxR85MWTfK+Lw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pbLplNxghDh4kyiuYEHhaOZOLkk1tzqAmvM+CzNTOSdwKKebDEVkQs8sz3V7uIuE1Rg9bd3RE1zORc7aSasEmGgxo0mAOFPJl2AfCwCNAINvFQBY/1YarHJPLcNqDmDWpiUqnyWHpN6xL368bfYxcNsz31Z1ajkja/TXXpO6PkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=mOnBVfN/; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41EGRJQv006641;
+	Wed, 14 Feb 2024 16:32:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=WKALQ+lDwn3emaVlHdtwZPAsOGX41pzOtb3nal5YbHw=;
+ b=mOnBVfN/M6FlaiowH1cEnmD2IShhFtEflD+UyjiLFT/VhzGzwfp0FUb+lljv45D8qLy9
+ guO8wARGgCFNUcTed07mgTwsoy2fpC5NbCjrFEi8GWLvDKWwBRMpyJl6qBWbZJp8xAh/
+ OHuLi+Sq0gJuqXjy2ubyZV/2D+Cgt57P+b6FTd8PEF7HrkM/xcpC3rPFBP4TcgzD6MJd
+ 155h7v7nN/vll1SuA9eHOhvxwZg2BmRHhv7kwvwbO+FohnKJLd7a/plcY1iG/P0g+5xA
+ QR0BhSVT2uNaafuAF2i2Spyds5clhFG8RaqGuIXwMUJI0P45en1f20Wndt7LRw1TEaY1 jQ== 
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w912385rk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 14 Feb 2024 16:32:47 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41EDtcN9016184;
+	Wed, 14 Feb 2024 16:32:46 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3w6mympwda-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 14 Feb 2024 16:32:46 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41EGWe0162914960
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 14 Feb 2024 16:32:42 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 625072004B;
+	Wed, 14 Feb 2024 16:32:40 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 52B1E20043;
+	Wed, 14 Feb 2024 16:32:40 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Wed, 14 Feb 2024 16:32:40 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55669)
+	id 145D6E1774; Wed, 14 Feb 2024 17:32:40 +0100 (CET)
+From: Alexander Gordeev <agordeev@linux.ibm.com>
+To: Alexandra Winter <wintera@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] net/iucv: fix the allocation size of iucv_path_table array
+Date: Wed, 14 Feb 2024 17:32:40 +0100
+Message-Id: <20240214163240.2537189-1-agordeev@linux.ibm.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,97 +83,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: aci-nP1IVeIgb66j2QNZ_uqq5RFYFdm8
+X-Proofpoint-ORIG-GUID: aci-nP1IVeIgb66j2QNZ_uqq5RFYFdm8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-14_09,2024-02-14_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
+ priorityscore=1501 phishscore=0 suspectscore=0 bulkscore=0
+ lowpriorityscore=0 mlxscore=0 spamscore=0 adultscore=0 malwarescore=0
+ mlxlogscore=900 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2311290000 definitions=main-2402140129
 
-From: Vasiliy Kovalev <kovalev@altlinux.org>
+iucv_path_table is a dynamically allocated array of pointers to
+struct iucv_path items. Yet, its size is calculated as if it was
+an array of struct iucv_path items.
 
-The gtp_net_ops pernet operations structure for the subsystem must be
-registered before registering the generic netlink family.
-
-Syzkaller hit 'general protection fault in gtp_genl_dump_pdp' bug:
-
-general protection fault, probably for non-canonical address
-0xdffffc0000000002: 0000 [#1] PREEMPT SMP KASAN NOPTI
-KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017]
-CPU: 1 PID: 5826 Comm: gtp Not tainted 6.8.0-rc3-std-def-alt1 #1
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.0-alt1 04/01/2014
-RIP: 0010:gtp_genl_dump_pdp+0x1be/0x800 [gtp]
-Code: c6 89 c6 e8 64 e9 86 df 58 45 85 f6 0f 85 4e 04 00 00 e8 c5 ee 86
-      df 48 8b 54 24 18 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <80>
-      3c 02 00 0f 85 de 05 00 00 48 8b 44 24 18 4c 8b 30 4c 39 f0 74
-RSP: 0018:ffff888014107220 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000002 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-R13: ffff88800fcda588 R14: 0000000000000001 R15: 0000000000000000
-FS:  00007f1be4eb05c0(0000) GS:ffff88806ce80000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f1be4e766cf CR3: 000000000c33e000 CR4: 0000000000750ef0
-PKRU: 55555554
-Call Trace:
- <TASK>
- ? show_regs+0x90/0xa0
- ? die_addr+0x50/0xd0
- ? exc_general_protection+0x148/0x220
- ? asm_exc_general_protection+0x22/0x30
- ? gtp_genl_dump_pdp+0x1be/0x800 [gtp]
- ? __alloc_skb+0x1dd/0x350
- ? __pfx___alloc_skb+0x10/0x10
- genl_dumpit+0x11d/0x230
- netlink_dump+0x5b9/0xce0
- ? lockdep_hardirqs_on_prepare+0x253/0x430
- ? __pfx_netlink_dump+0x10/0x10
- ? kasan_save_track+0x10/0x40
- ? __kasan_kmalloc+0x9b/0xa0
- ? genl_start+0x675/0x970
- __netlink_dump_start+0x6fc/0x9f0
- genl_family_rcv_msg_dumpit+0x1bb/0x2d0
- ? __pfx_genl_family_rcv_msg_dumpit+0x10/0x10
- ? genl_op_from_small+0x2a/0x440
- ? cap_capable+0x1d0/0x240
- ? __pfx_genl_start+0x10/0x10
- ? __pfx_genl_dumpit+0x10/0x10
- ? __pfx_genl_done+0x10/0x10
- ? security_capable+0x9d/0xe0
-
-Fixes: 459aa660eb1d ("gtp: add initial driver for datapath of GPRS Tunneling Protocol (GTP-U)")
-Cc: stable@vger.kernel.org
-Signed-off-by: Vasiliy Kovalev <kovalev@altlinux.org>
+Signed-off-by: Alexander Gordeev <agordeev@linux.ibm.com>
 ---
- drivers/net/gtp.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ net/iucv/iucv.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
-index b1919278e931f4..2129ae42c70304 100644
---- a/drivers/net/gtp.c
-+++ b/drivers/net/gtp.c
-@@ -1907,20 +1907,20 @@ static int __init gtp_init(void)
- 	if (err < 0)
- 		goto error_out;
+diff --git a/net/iucv/iucv.c b/net/iucv/iucv.c
+index 9e62783e6acb..5b56ae6612dd 100644
+--- a/net/iucv/iucv.c
++++ b/net/iucv/iucv.c
+@@ -156,7 +156,7 @@ static char iucv_error_pathid[16] = "INVALID PATHID";
+ static LIST_HEAD(iucv_handler_list);
  
--	err = genl_register_family(&gtp_genl_family);
-+	err = register_pernet_subsys(&gtp_net_ops);
- 	if (err < 0)
- 		goto unreg_rtnl_link;
+ /*
+- * iucv_path_table: an array of iucv_path structures.
++ * iucv_path_table: array of pointers to iucv_path structures.
+  */
+ static struct iucv_path **iucv_path_table;
+ static unsigned long iucv_max_pathid;
+@@ -545,7 +545,7 @@ static int iucv_enable(void)
  
--	err = register_pernet_subsys(&gtp_net_ops);
-+	err = genl_register_family(&gtp_genl_family);
- 	if (err < 0)
--		goto unreg_genl_family;
-+		goto unreg_pernet_subsys;
- 
- 	pr_info("GTP module loaded (pdp ctx size %zd bytes)\n",
- 		sizeof(struct pdp_ctx));
- 	return 0;
- 
--unreg_genl_family:
--	genl_unregister_family(&gtp_genl_family);
-+unreg_pernet_subsys:
-+	unregister_pernet_subsys(&gtp_net_ops);
- unreg_rtnl_link:
- 	rtnl_link_unregister(&gtp_link_ops);
- error_out:
+ 	cpus_read_lock();
+ 	rc = -ENOMEM;
+-	alloc_size = iucv_max_pathid * sizeof(struct iucv_path);
++	alloc_size = iucv_max_pathid * sizeof(*iucv_path_table);
+ 	iucv_path_table = kzalloc(alloc_size, GFP_KERNEL);
+ 	if (!iucv_path_table)
+ 		goto out;
 -- 
-2.33.8
+2.40.1
 
 
