@@ -1,78 +1,205 @@
-Return-Path: <netdev+bounces-71649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 631DD854732
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 11:34:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D144B85472A
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 11:32:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C8FCB20D91
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 10:34:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AFD01F2993B
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 10:32:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32D9E10A10;
-	Wed, 14 Feb 2024 10:34:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90680524C;
+	Wed, 14 Feb 2024 10:32:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="lDQx2/0g"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hCAK4iSh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F085F17543;
-	Wed, 14 Feb 2024 10:34:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707906863; cv=none; b=exKmn+GqxQmuNYgWcCja2icCx1X+VisJBjwj1/NllKrqAlGyCAx5m8TH5BzqBRuFzRpQASLMkVPJDaK+uPkyXRtPh8htuh6Z7fW7TiBSWDWXit9HadqJGyhQN2ygCdC7oscDxBW4VsAEJpt1KfOuXG0Kg6On5I6oKuK3md1Ywas=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707906863; c=relaxed/simple;
-	bh=DkS4pHSLevwnDUiaBlD8B/uLDOdKpNV1qvB47nYEqPw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PUd36Zh0bj7bFA0MPZIV2vC3etC2hcuh/KeaGYvES3fbiwVk8fHPFKsiec4auM9uU0X9gBp6sf5hZl9MCbQiIesyUC8umbKazBx+7ldqA1odtqugjquYOA06kRb0SM+zQpRWOmIsSznXvgHhLPFJxv22lOK4tphvnBFaxGvAx8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=lDQx2/0g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9952C433F1;
-	Wed, 14 Feb 2024 10:34:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1707906862;
-	bh=DkS4pHSLevwnDUiaBlD8B/uLDOdKpNV1qvB47nYEqPw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lDQx2/0giln9bSgIWKwhm0lRPICkGgbmBs5pbsKMA3UOZqGxJHwOO/VlVAXHWqpcY
-	 1Euqnq7GXzADgKEYPs9Pgz8ZbyLvBpEoLFLZJdWPpIYhru9Pi2aQwb9u0NApbuhNmi
-	 a+X4ZZVFf9OAxcpZKVSsiM94KPmwTTiLYdD3E5C8=
-Date: Wed, 14 Feb 2024 11:27:20 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Christian Brauner <brauner@kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>, netdev@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <eric.dumazet@gmail.com>
-Subject: Re: [PATCH 0/2] kobject: reduce uevent_sock_mutex contention
-Message-ID: <2024021444-getaway-partly-e055@gregkh>
-References: <20240214084829.684541-1-edumazet@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB6CB522D
+	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 10:32:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707906750; cv=fail; b=nth4SShwbvEJDQjnMjwI0PF3zUVQ3eniyCAMdXTl+70jA6yRKyt+K+a9XRO79aj4XX/429RF+rmNfY0SMzJRLvmVUfBAZqx19bFFH8ZuuZJgeuEse0b8KorBjA76SUGsDBV1hXJj0mg70PB6eULYOCPt/u5Kv+ellJ8AUhC4Thg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707906750; c=relaxed/simple;
+	bh=0BFt7b4xGYLtuc0gKv3inZXH7X762Z6YDoo1l0YH3FA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=LRF27viz+B/t6YT+qvj3WyVhdb5pUgAV38R91at/2nhEtMRTIs2qJ00xPUD3XENK3/oCOK7aiA/++yws0zLgKjcAfd6zyUi/dWfW+3f/gVSxdZUzcuI+snApGKk+ior8IY2ceWQ13vKJkiE7dm7zs8tdVNgd2rKb6iKM3TWCg3o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hCAK4iSh; arc=fail smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707906749; x=1739442749;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=0BFt7b4xGYLtuc0gKv3inZXH7X762Z6YDoo1l0YH3FA=;
+  b=hCAK4iShCL8eKx5tOhNN0oXKkmvDse2w+SDYh9RCCSdhK6gG5QdOOwLL
+   /kAnM15l5UK+K9VLPZ4jkokNX69TUE8yuPKzCpw0iGJWFyfT6Z3Gxdi6G
+   HwzBCNGHn2fm9UeWBHsSa98SQXwIst6/UDxVZVtoROmJ0pyvBMDQFY86V
+   LfCpOd+GmDxO7mdRiHpi3n9gDxl9Bp1fkfoatCIF0LM6Ji/EnT9I4yEpw
+   O90KEE+xn4HlnjumAoKxPgyNwnaQOiilAsNL6FMahI2BljTlMs/vRTxVM
+   Ek6CwHvUL+m1zuU9Cz59c6ztsUvYcxdvzv4pz8J7CV6l/k+5DHa4995pM
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="5720212"
+X-IronPort-AV: E=Sophos;i="6.06,159,1705392000"; 
+   d="scan'208";a="5720212"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2024 02:32:28 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,159,1705392000"; 
+   d="scan'208";a="3127292"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Feb 2024 02:32:28 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 14 Feb 2024 02:32:27 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 14 Feb 2024 02:32:27 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 14 Feb 2024 02:32:27 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.101)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 14 Feb 2024 02:32:27 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=j5ItGdryYl6XgP9fCGuFpMTiEOJWqprnYWoD9b5fW/fT0XQi1U8idSQHsHQ/yqQOdvzhui9+mMmVzrgSoy8hUVTDiGV9ThV72XVzdIRA3ikrijKorU6qYerNS7vYBrtQ1fHbylYd1WmpXGvVGQvTeDR+8tj4mnmJDEwz7citARNIInnhm1f4SPNl8BLIPzhZUanS3vb/G+RE5+jkMvp4TegBYDTar1K8ipI55m8cYsWhtUiu5vvzkvIEEeamvebCD2Z/N6mFi8O/CbhLJOatYOZpxBSMKIU4KRRMeLPKGZnCq90OlSF7GLT/rw1qTXwwixZWLV9zRz1Y1Gqu5Qr7qg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Rd3Si5XmMdbr8etEwqAvRZ/apAHuEZzhTUstXyvL+PM=;
+ b=g7X/7PNdn4hRxsMCNCl140rRu9k3CEQ+XtmdCx+JbB5g1s5DeQJrpxwMWPi7OT3/ls1VsouCBm+LTYWCkIll0WPVELyqFVumNgECaWTawL6kkcl2oOzaFaNRkS+ufoSqHcEHT+doGzl6RmsgDqm01tM7axdXfsJeCFWxn9eBF3FdcAHf3IruKFu9LIsS7B+XVRLBdslnAJGOFu8/hyt40XCU/TZCMPZgiUKgwwzPY3yehvmykFmNGcRkpZQp+cTlmE+uZNDV5WIkwUf9sgNmJ8l5LmQ3VNWEF2WxapDNJUiWKynqp4w+aIOT+VomUpMGNUTix1O2/kIDVNHpcouG8g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CYYPR11MB8429.namprd11.prod.outlook.com (2603:10b6:930:c2::15)
+ by IA0PR11MB8400.namprd11.prod.outlook.com (2603:10b6:208:482::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.35; Wed, 14 Feb
+ 2024 10:32:17 +0000
+Received: from CYYPR11MB8429.namprd11.prod.outlook.com
+ ([fe80::5fa2:8779:8bd1:9bda]) by CYYPR11MB8429.namprd11.prod.outlook.com
+ ([fe80::5fa2:8779:8bd1:9bda%3]) with mapi id 15.20.7292.026; Wed, 14 Feb 2024
+ 10:32:17 +0000
+From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
+To: "Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Brandeburg, Jesse"
+	<jesse.brandeburg@intel.com>, Eric Dumazet <edumazet@google.com>, "Nguyen,
+ Anthony L" <anthony.l.nguyen@intel.com>, "Brady, Alan"
+	<alan.brady@intel.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next v1 1/2] igb: simplify pci ops
+ declaration
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v1 1/2] igb: simplify pci ops
+ declaration
+Thread-Index: AQHaXG2/HD27JXfUjUeMqPUDKfMZerEJqKsQ
+Date: Wed, 14 Feb 2024 10:32:16 +0000
+Message-ID: <CYYPR11MB84291EE45CF96C20CBA1EEFDBD4E2@CYYPR11MB8429.namprd11.prod.outlook.com>
+References: <20240210220109.3179408-1-jesse.brandeburg@intel.com>
+ <20240210220109.3179408-2-jesse.brandeburg@intel.com>
+In-Reply-To: <20240210220109.3179408-2-jesse.brandeburg@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CYYPR11MB8429:EE_|IA0PR11MB8400:EE_
+x-ms-office365-filtering-correlation-id: 61c975c2-6eac-41fe-4836-08dc2d483770
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: o+5Io+iF0HZpT3NvqKS4fMYwqHbG7VhsE6IScU8jK2W2tNeqxI4MT3405rhebxuirjyHXlyR/HZ4S8tjLCPBRuEo5EYGURpW2MeDI50C92jAcUDflukDeT61GXQTPIbhQ1mOvKrI9Uuo4ag7t9lQNgc4uVjqRNOdeI8nBMD6rawGNDmeWUn01u2wKDLlgUYOtdix2CSF237ztOk9WKLRhugSJWI01iPpBmEd7GFD2gbbbU0dV5k49JQAGhto1piXUt1r8i/H9Szt1iEiLBTrmwVa25R8G5+TlcWjUA4pb8L9UVgvAWOZFg903wYMtRd6xr2LirwhUOCVWqcHUrN3IRHUVAK46lI7+4wsv/KMFpyUT35Zy2gezE80C1HKPZoKdhiN10aNurWHEP8f32FeRhk/4LjLsXYP2WMbOFfHpcuRO6/w29wqTp+4y5EA3Z2NHGU9s2KVH3oA8XXKOtvAXQZHmULuHsHrd8Llccm6q9xLKH5N7a+r1ZzXOyS+HXe4/lElxcKBYxPtoSa27TvTbzvjXcIEWVJh/iZ/aP6l23KgB3eK/nDUkP4S2eFEhNE2tNj20QKi7BrlsSJlGF4rnbbsXiDPtl7PkCXvjAem+0q+7bviG/8u5uM00aUQf5xL
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR11MB8429.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(39860400002)(396003)(366004)(346002)(376002)(230922051799003)(1800799012)(451199024)(186009)(64100799003)(33656002)(38070700009)(55016003)(41300700001)(316002)(64756008)(66556008)(4744005)(8676002)(2906002)(54906003)(66446008)(478600001)(8936002)(4326008)(110136005)(66476007)(66946007)(82960400001)(38100700002)(86362001)(122000001)(76116006)(9686003)(5660300002)(52536014)(26005)(71200400001)(7696005)(83380400001)(6506007)(53546011);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?zYNiqv7O7NN3lmnObePhDKMISG1meQX8XKloyPUG7uq1wwSMMCeb2h79yAxd?=
+ =?us-ascii?Q?/v/fpMB1mnExNDTWTDac8eGwPpvytOOH0JGL50eRcy5++0BVxJOJn9usPVg3?=
+ =?us-ascii?Q?ALW8JFccuwuL8ZZl5/zkzXsZ/QEOtiSrD8/5vxS6XDgibsTXCPyRJrF4vWw+?=
+ =?us-ascii?Q?PwrHG5APny+eZcwF1hg02plL6GyyHGhbBxAz44esDlrgiKaC/0jyEmVEc1FE?=
+ =?us-ascii?Q?Cy1dllNCY0dIUn2v1PBBHNLRvGXUfLmSx25mdjgHrm9jzoTv+z03+1L4WANX?=
+ =?us-ascii?Q?LrFD0pumPfs3Rl/mmaA3AyRrLgJnAPR3Q2OZ/Uo+DlluzzrlIjFcu8HMDqNp?=
+ =?us-ascii?Q?V8Y179PSftvlqz0r4VshoW7CloA+dWIVZ03dttWCT3hwDTbGXciWyv2/Jw5C?=
+ =?us-ascii?Q?o4now9pyI5BeuRgtlvP5N6GP7zfpoa3yNrA+IGdLml9FND3SjGOqbahHqmMk?=
+ =?us-ascii?Q?RQboBXMsNZmKThWsJIG7g0uK/GQpuFWC+CB9Tjm8NpY/xmVSIlykcvVPuQfC?=
+ =?us-ascii?Q?NSXezvozuFSMT0/AeDJqVNYWDz+L9MQo6Mlrezfv3faI543fBePhQU2sIYwK?=
+ =?us-ascii?Q?q7+RZVlqNczTtNsjKAwHXYQlLeTosC/ZEyqwt+YXd5LkrLNpuDJP6LLMQJ90?=
+ =?us-ascii?Q?yHqxNIHN8HxCqYF+/Q6INdLz2F3UDvLldpXHkLoDFrdsFiX/tdeuaCtPw+EA?=
+ =?us-ascii?Q?xdgNGX4vkQ9fyMOKCmb3dlyzro9ey+lk7WjW60Jw8keQ086gK4HhZe2WHORj?=
+ =?us-ascii?Q?qxel0f9i9BaHslyFMAcGYBGEgI9ySnnXP2spvN9SlP041zCkkVrcFUORmzC0?=
+ =?us-ascii?Q?6oc2cYI3AEDEZ0a4nRJAZrC/VpbMHA1Ue14oD2/090tDfnMOaabG83B49y/Q?=
+ =?us-ascii?Q?6NWdXaTuWgFSjMov3+5xdJgd5jZlHZ7I5uajHjkEJgwbkNc+tDqCeBqxA/WZ?=
+ =?us-ascii?Q?LAUizzVcBL0Djj8Krt9ip+zx4HBqHkm3YokqkZezQa7/cirMTGyJbbSrjLLh?=
+ =?us-ascii?Q?brAcZj2psIPEdi2z3ovMYQJEsu2c9UqPaC1wBPfgGEUxeztR9dvI2SizdA+m?=
+ =?us-ascii?Q?VQIdZzwYp8q57ImLwiJNwRC66FczxNcivfnzdo5wXBp2BCcMMmTWBAoCpfg1?=
+ =?us-ascii?Q?LRi3hHStrjuKvVRUowF8ERiUwKR0Qg2+JErkktdMArrFI5IV99+2AfwxKRmg?=
+ =?us-ascii?Q?Svjn3jit2TxkzqaYxbRYeVFifyf6LcIyZaDydbK1e5CGs4XISYptTD3u6gge?=
+ =?us-ascii?Q?7jRlzXRm/Y0jaKkddu3wDrz5an9kF9g6QQSnR8nou+2lShlcb9yKYZlPHfrc?=
+ =?us-ascii?Q?uW/Pc2B2AYbiIrTnhFDPr0ltybtekQsdDVzunyvaR3bMNBY+h67p7q79E7Qb?=
+ =?us-ascii?Q?EV+saoLYV+oOvGRyhTrzH8AfbMAT+ivYGlqQPL88YUFWQirW4gkQFK90vlv2?=
+ =?us-ascii?Q?vm1s+ng0b1cbnMnjh49thmPpovop9svQawSB5HbuO+6wt3Ji2v+C8CgOydWo?=
+ =?us-ascii?Q?j4gPgzCHcy96+5Yy+fTU3mhs6eDsJ3ELvleF0CI9vlrVmbLwzgTZ4sAgArQs?=
+ =?us-ascii?Q?LVFrMrXy4C7U6McltSSOMsso0DIZLyD/Seck3pu8EfraLrBWFdYaljyRdltx?=
+ =?us-ascii?Q?tA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240214084829.684541-1-edumazet@google.com>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CYYPR11MB8429.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 61c975c2-6eac-41fe-4836-08dc2d483770
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Feb 2024 10:32:17.0250
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Q17nx5RjkNwIWRP3DHTvgfbaVOoHfGZ8Vhp4vvsX/JBnFo2JKTajQi0y/7ODdVLXPgDsomI4TXkNec1XDZYxpBkiHK17JQyqveuzdHkzuPbYB6n13po+qLmN9IQdr0vR
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB8400
+X-OriginatorOrg: intel.com
 
-On Wed, Feb 14, 2024 at 08:48:27AM +0000, Eric Dumazet wrote:
-> This series reduces the (small ?) contention over uevent_sock_mutex,
-> noticed when creating/deleting many network namespaces/devices.
-> 
-> 1) uevent_seqnum becomes an atomic64_t
-> 
-> 2) Only acquire uevent_sock_mutex whenever using uevent_sock_list
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of J=
+esse Brandeburg
+> Sent: Sunday, February 11, 2024 3:31 AM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; Brandeburg, Jesse <jesse.brandeburg@intel.com=
+>; Eric Dumazet <edumazet@google.com>; Nguyen, Anthony L <anthony.l.nguyen@=
+intel.com>; Brady, Alan <alan.brady@intel.com>; Jakub Kicinski <kuba@kernel=
+.org>; Paolo Abeni <pabeni@redhat.com>; David S. Miller <davem@davemloft.ne=
+t>
+> Subject: [Intel-wired-lan] [PATCH iwl-next v1 1/2] igb: simplify pci ops =
+declaration
+>
+> The igb driver was pre-declaring tons of functions just so that it could
+> have an early declaration of the pci_driver struct.
+>
+> Delete a bunch of the declarations and move the struct to the bottom of t=
+he
+> file, after all the functions are declared.
+>
+> Reviewed-by: Alan Brady <alan.brady@intel.com>
+> Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+> ---
+> e1p v2: add back mistakenly deleted pm ops struct.
+> ---
+>  drivers/net/ethernet/intel/igb/igb_main.c | 51 ++++++++++-------------
+>  1 file changed, 22 insertions(+), 29 deletions(-)
+>
 
-Cool, any boot-time measured speedups from this?  Or is this just tiny
-optimizations that you noticed doing reviews?
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
+ntingent worker at Intel)
 
-thanks,
-
-greg k-h
 
