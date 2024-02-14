@@ -1,245 +1,250 @@
-Return-Path: <netdev+bounces-71686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ABDB854BC7
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 15:45:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E914854BDD
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 15:50:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 67903B25E63
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 14:45:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2F121C217D3
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 14:50:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB2705A7A4;
-	Wed, 14 Feb 2024 14:45:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 331CE5B20A;
+	Wed, 14 Feb 2024 14:50:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IP3p89Yi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A135A4E1;
-	Wed, 14 Feb 2024 14:45:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707921943; cv=none; b=enCGne/tkc2of/ljsgx2h/pvRuox+MYi0oajJC3vxSXQu4sTbVCyxUasgyQd7QPjJkNTH5sUL9e970itWIEjw6Qfjj2Hb0djOGG2mfpxy/dxLNmv5Atd9GooFeF4MSU9fWCX7gxvBgVVVCCbDX4xRAdwKoswRt736crkq1nVaOU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707921943; c=relaxed/simple;
-	bh=8MyxQT7/gBC6vuc7ry6wUblncxJirCttHsUs/0lAXNM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L33E2wWnQ/uPhEXfRLsCeThtr2Dn/heBBMjqiExOIsgpQmwh0ZwObnTO1O3njUnTPVDB8HN+x/9s/HUaI+t4awZRQ/iK2npp804p81CKeRt7Nw7fEfwwyBDdGARL6X5ZQDzd3Wxpt1yxDIDhjKX47UCoAyNt/mHwUEI3xlreKxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a293f2280c7so787988366b.1;
-        Wed, 14 Feb 2024 06:45:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707921940; x=1708526740;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lhd2wrMWsy/2+hyUeyTKyzA2QO1XJBxjRCV0ZhF1M4A=;
-        b=peOcILwPoKJM+IdjLnNqXZ7jGfgeHc4JjDy1PfTGafZRU0aAoZRcoxUKWH34UAtK7X
-         uqQkE4PmW6PDskDWfg07mryp0Jj1GYG5yHgxK7xjNkthNrgp2PcbflUDPo7q9/YPPcg0
-         PrNM35p9d6yJtn3KXph6bgCbF5NuK5TTjs/TdyjIDULxTmsCYYz0D/59FthfViy1itdM
-         hziZLI781LsG3DDNUdt0jJvDtLpMX7I0RRvnbWN+gVgPgNLYzuyJfHAvSA7UiXh+mKeP
-         05W1zF6Q5IhF2GvZbyqtXn7TOKnflsA6e+40iRp5JuW0g7cpK/pZyeSb2R4KV3nceb3c
-         FqXg==
-X-Forwarded-Encrypted: i=1; AJvYcCXxCxc+zUtEnRB+Bs6tonpcBoPgG6KD51CieUTRyW2nAXovfDSYkmxf5Qc1qLVoo2lrGIIDZwiOtznbkdeMfy5wTRoN5SFWPfCYRKrxAY/bar9/saYAtj6Vuc20AQ2hbBdz8F5XIFmXoKxWAjSMsIqDTtxroa4WL2BwKd+Vi3drAnfkLnTxQeEx
-X-Gm-Message-State: AOJu0YxpKVd6N8NkR2puNUUuhZEp7d9ZAWms8JCr4+aW9hE8cuDARcdb
-	aosXubM7DnGC38rKdMmeoePKG7dJwFhJ2Y7ccveEu0nGDvKDUJh6
-X-Google-Smtp-Source: AGHT+IElnGmGnTSC+OXTn2OYMpnhKwSyaIIjRsWcfzpIJQ0aMjD+Tu9o9gmBlBhtEGPZXoLMr7XXQw==
-X-Received: by 2002:a17:906:6c9a:b0:a3d:1f59:7412 with SMTP id s26-20020a1709066c9a00b00a3d1f597412mr2427327ejr.72.1707921939927;
-        Wed, 14 Feb 2024 06:45:39 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVTsXHkq5jVto/WnQvCEgK7kD9VAQVdHZunDPtDhbAJSGpzLFwVmZ9VDC77j/5TOC1gTxmooMzpk8d2VIJlJlEj1Z0moiaBCtCwxscWRWaMfp8aaGf6jiBKSyvVcfOI7mofUoeaIcOZ1sqxDuFmN6usNYCpO2Fd9e6I/ACx4QMjx58h8cyMvKR88OwjLrisXlTr27uuUwFgcd9gXjKH2aWWdSZUVwCWaBvqCuXmq3loFgjzLMQxezhArspue6enbEsZts3LYOyEUTgMvsxzONiza0VMz3k3+KrxN+mNH9WZ34yc08f6Hlhr5v5E/QexC3Q4QDM92nd/jXYispbFV6YSOfBLNG81rvd/73Qj30ecnUngxM50b00K700jZizwwR0A39y4oiJ0ln5ltdCecSHh+2l1BzZp74uSgLc6lXBnoyTy2xH0a3ifYRDg0TJIf24LgYmyKOIbPj57gGaEc0SAnnKIXTtfZGRx9WCKfQXqMrnbv6dM9EOcKDMNas8h4zvJwe7eMzwvYLQtBZeM7lsTBZ3WQzF5XLHwbpMc7RMJp4OcsZRh
-Received: from gmail.com (fwdproxy-lla-009.fbsv.net. [2a03:2880:30ff:9::face:b00c])
-        by smtp.gmail.com with ESMTPSA id rg8-20020a1709076b8800b00a3d2f55bc2esm955212ejc.161.2024.02.14.06.45.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Feb 2024 06:45:39 -0800 (PST)
-Date: Wed, 14 Feb 2024 06:45:36 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>, edumazet@google.com
-Cc: Eric Dumazet <edumazet@google.com>, davem@davemloft.net,
-	pabeni@redhat.com, Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Andrew Morton <akpm@linux-foundation.org>, weiwan@google.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	horms@kernel.org, Jonathan Corbet <corbet@lwn.net>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	"open list:TRACING" <linux-trace-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v3] net: dqs: add NIC stall detector based on BQL
-Message-ID: <ZczSEBFtq6E6APUJ@gmail.com>
-References: <20240202165315.2506384-1-leitao@debian.org>
- <CANn89iLWWDjp71R7zttfTcEvZEdmcA1qo47oXkAX5DuciYvOtQ@mail.gmail.com>
- <20240213100457.6648a8e0@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E5395A7BB
+	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 14:50:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707922203; cv=fail; b=XARJ/SKqe1t2Q1MmqBIinH3Pk+6H1FyLCGBFpTf3wlYahfDfr0wvTkULIJ6a/FP0CgU9vELNm5WMBoJp6yIOF4dO4HIqXAny818861eiswpj5GkNZ0hqVpJlaBc+1IUDPi+V4aLIAAhwzhAXp3v/Vw4ol8X5lF8DultChVrpj5c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707922203; c=relaxed/simple;
+	bh=/PmEQR95z7IKRHhyDQvzjjepL743ZL6p5FcrXt/rOoY=;
+	h=Message-ID:Date:Subject:From:To:CC:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=eg3pl48UIkBxPXSkG6AFb4d3tLlZR3LgkZ7+o584mBA0sBJ87COOw/EzUmwnOFuzV/ogyoAB+ex2KM7Ow4ppvI6UDPWCWTR6ekYjeesXZmSyw/v5E4gE66Vrei/9sjMM3bYyb6r3TqQm4sVfx4UtyN2F1rfIBztlMTiLtCIcL48=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IP3p89Yi; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707922201; x=1739458201;
+  h=message-id:date:subject:from:to:cc:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=/PmEQR95z7IKRHhyDQvzjjepL743ZL6p5FcrXt/rOoY=;
+  b=IP3p89YipABwLuu9VCXi0huWfOzTOgPPxvgwOFSN5xCHpbGmIJwpkjvC
+   ofg8+KI1zEKWqQ3CgauaZx9I6JJtI1gJQgcvMryR53N82F1pAkxE2pHFZ
+   w7AG5Y4QabcS0HWc3xpV7dFmGLQlHKATLN5BFCliYZcErRtdnvziMIAQK
+   5/+S3ubDhmzXPae2IHnYoSi9b+AUqJc1oIfDnmcjqIZGkDajIwXJAVYuA
+   /4ofYizBtxlLoONLPpJ7sl5Jhe0WJ18VS2oLNSuZX5Tn+UPYlmi6ydQlX
+   Pc0ZHPqIqLuZmyVDtmeMkWt/M2OI2sq4q11+1pqM6XFrxoD7wIMq59yaa
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10982"; a="13357743"
+X-IronPort-AV: E=Sophos;i="6.06,159,1705392000"; 
+   d="scan'208";a="13357743"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2024 06:50:00 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,159,1705392000"; 
+   d="scan'208";a="7828831"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Feb 2024 06:49:59 -0800
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 14 Feb 2024 06:49:57 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 14 Feb 2024 06:49:57 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 14 Feb 2024 06:49:57 -0800
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.169)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 14 Feb 2024 06:49:57 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Yd+/3z63iCQGucNnG46QOjF/gvHZa9HJtzttK4TuLlgq6ZfeoyakGYAVE4FQLdh/32cPtHkG4I7DhGGnxPMLsYE3fUMXhtd+79SmEP3Y1Y4429MsVpLxvDtCshtgDKCnuc+KaN3xLtm6uvoIvhWPOGwHBsQR5hCBDPFkSTCf0cau3MTqoE6SHwEZ564tKYRgHhWztHNaaL3VRhcw0/KrQtFLgGl2UgDtEgaNftjJJ19B+0NMUT9JMBFVZ18D+aJC0rvqk4EnoibV7qxy4igHTkMKP/IAoqI9bkADUlv6B8MnSnkGgi0rGqbNsbXYWcHoMcgrEtfRz6QyR2rLlijvVg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CNQZ7oWvcSVkOotsxDQSs3VMw3GXOlGhvOnt5ByrqUY=;
+ b=GTqvoLft75TYSKiSf3jFaLMvgDUBWJx851QrK/1oyNlDbKN0MjbBLLO9LtwEQ61+H7XgvRQlU0hvI5n+V4++pJSZKZhVirugvQJFM0U5z3R7rEtV1aG9h1+9MZlCjZTvg+SUpU2VS0pLOvDwsqymeu4gRryLJenXqB9Ak1GQAbRdIutteAyuk1OOgQsN2fStc/Jk+82zvjX0+ZiB8NxZJHX9KfXr7ZKsd6x67OnAoTaBupntlJNhfRFE6geeyIjlk/fEmzRPg88kfG83fOrdELg7JgleFpaA2u5HQrEeTrBjc4urMkpsZ2nHiOHBSh1XZ2Aj+ljzQvUr9NlsNknoyw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by BY1PR11MB8128.namprd11.prod.outlook.com (2603:10b6:a03:52c::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.39; Wed, 14 Feb
+ 2024 14:49:55 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::c806:4ac2:939:3f6]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::c806:4ac2:939:3f6%6]) with mapi id 15.20.7270.036; Wed, 14 Feb 2024
+ 14:49:55 +0000
+Message-ID: <04033c1e-c3f8-4f05-8c88-f0cd642e8c55@intel.com>
+Date: Wed, 14 Feb 2024 15:49:51 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 00/10 iwl-next] idpf: refactor virtchnl messages
+Content-Language: en-US
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: Alan Brady <alan.brady@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<willemdebruijn.kernel@gmail.com>, <przemyslaw.kitszel@intel.com>,
+	<igor.bagnucki@intel.com>
+References: <20240206033804.1198416-1-alan.brady@intel.com>
+ <08e761c6-d79a-4a64-a61a-9536dd247322@intel.com>
+In-Reply-To: <08e761c6-d79a-4a64-a61a-9536dd247322@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR3P281CA0210.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a5::19) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240213100457.6648a8e0@kernel.org>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|BY1PR11MB8128:EE_
+X-MS-Office365-Filtering-Correlation-Id: 56912938-850e-4821-35f7-08dc2d6c34fa
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: jFFWp3psryVkmrXOrpdkXulJvpLyq7nnqaXVUMk1FvrczJEqSI2SqR9IX1M4exvOjUUhpe7nF/c3PrY5/H9OjwJLX5lwbWTKURwAlfwQ2AxLO0Wuy4FFTlsgoS2VnD8fKtqLOzXBPtV0AGUKx39QVfkxVqYnmH1zbPLD4b5FOMM9rrx7TY/dx9bor7NFqSevBiAs4tMxkWeWCVh3fhguy3R3wEe/zcnPZwYSbMX5VoO1de7ncyOT+XwPo6GSC4AGvuIWtYd35LwXOd9mo9lbdSsT2EGTUarUjTR8sslOUXXozlk6+djCXvSJyfSFDu27qbmP/uxodJF5g7wW7nZAyy8AOhV39sBuCQY+YtCUnJ7PcbCs1VAsp4d3XTeW8OMA/ZK9UfJHYiXmbfY9dEv/dR5UV9/LfojYE7FPGWf+6ErhYDzeBbsLoBkUSYlUgcPVGqrkHv3nKzeAoYYCk4JEYKfybl13EmV1fB5bbIA7Rtl6I2X3l8UCh1izZ8pr0uSUHPMrpsqVAJlLwmhC/tLhKHH8pwCQIGHftvRAPaOlhbvudCfBtwGUWVGCIQ37Ip5R
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(396003)(39860400002)(346002)(376002)(230922051799003)(230273577357003)(1800799012)(186009)(64100799003)(451199024)(36756003)(2616005)(66946007)(26005)(107886003)(6862004)(478600001)(6636002)(66476007)(8676002)(66556008)(83380400001)(4326008)(8936002)(5660300002)(37006003)(31696002)(316002)(6666004)(6512007)(86362001)(6486002)(82960400001)(38100700002)(41300700001)(6506007)(2906002)(15650500001)(31686004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?b0FwTXZhSENvWHpBVmkzcTVRdkFwYUNMVTkxb3JBWTl3WG0xS0dhM2M0VXkr?=
+ =?utf-8?B?c0FRQW90N0JaU2xSMW4rUXB0Y0FYdUJYVy83SHpzZnU2UW1LeU5pQzRyOWNM?=
+ =?utf-8?B?RStnWVR4YXFkWGc5SzdFcmdFbGpxWGpZS04vdVNxQVh5Mk96cXp1aGxHSEN3?=
+ =?utf-8?B?YnI1aGpjWFF3Y3VKSUdUL2NpNllYWTF6UHVSL09QZ2lwdExhQk02aEh2VWps?=
+ =?utf-8?B?UUlOOUpML1UwOGQvcHB4ZVlqL3drbEFMUXlXTW9nTmJuYk1EcDYyY213QzZW?=
+ =?utf-8?B?OHNVd2pnbElsZkhlTGNqOG12MUJQd3VDVURzZnBieGFsMnFZMEcxYktkZ1M1?=
+ =?utf-8?B?Q2JFRFNUbHBnUUJsYWlNSDFUUmR4MVB5TGZ3UUlETm5ITDQyN2hQN2oyOEEv?=
+ =?utf-8?B?eEU4bGVnRVFxMXAzbDVsZVREaFRZL2pMeHZaOFJabHcra0pRNGQxejBBTzJL?=
+ =?utf-8?B?QnFra0FIN1BOR3U1NDJOc1lBYzFwN01EVXN5UXZnVHFWbGUvNXJkTlkzT0N3?=
+ =?utf-8?B?NG5OR0NmenFTWEVEdHQzQkhGOXRMeGxENklPUXJ1NjNOUUVuNVlKdTdtT2Q1?=
+ =?utf-8?B?aTlqdmsvTk9ueTdWMzNvRzQ2ZVA5K3B2bjZrbGZ3NEtyTEJRdlVCaW9PaUtY?=
+ =?utf-8?B?VHhiUnJPcHlEZ05tOG9tNVlFeGNiUEZSa0dTWkZxN3lsOTNOR0QwYXBNMmpH?=
+ =?utf-8?B?QUtsakI4QUhuRmN1MVZ4VGNmS0tCYUMvejJ4ZlVlamRFYjdlbmtCZURDRDhh?=
+ =?utf-8?B?MnhvQlljeEl3ODZBTW15Mk1GanlvS0pJQkhBWXpwM0VtNVpzNU5hZkswVEt3?=
+ =?utf-8?B?cXZoVXhGa3VhRVRaU3MxNlRaNVRlZmZYazNQMHBzTi8yeFFiN3RLaWlrWFh5?=
+ =?utf-8?B?NXdGNEhjUXBsVWFYYW0vUjE5MEhQQ1BxWEwrK05mN0JzS1kvc0w3R3A0Ny9i?=
+ =?utf-8?B?WDdRVmFhOXZzcm5Xa3JSZVdNNmlHc1B4VDh0ZWNtRnVIVGxKNG9oL0tRa2gv?=
+ =?utf-8?B?UG9nZno0aFlRLzRZRG9VUVdpNjRqaVZtemxCSFJIaXhhNCtVRUJYQ3hFMkxB?=
+ =?utf-8?B?VmRBSm9UTk44aDdzeHFrUFFHaU9kY1dWblVsa2E0TVU5QjAxY280b0k0Um1C?=
+ =?utf-8?B?ajNWcnRnTk5zcXR1MVl2d1hYSTkrak83K3ZMRkRkY0ZWZUJjOW9mMHdiZjI3?=
+ =?utf-8?B?VE5qdmlub0lDbWwyUFZ4c1RJU2dtK1M1cnVjNmxjTU83NmFlbzJWN1JnTG41?=
+ =?utf-8?B?NWJndldFS0ZzWWdkR2xPYzh2MjI4dHNJaFNvRk9mMEpEWTF5T3ROUGF4amlq?=
+ =?utf-8?B?NGtKajN4ajBWeDE4L0lhY3p6QXRqN2p2Y1FpYVBjN05ka3JTMXZEcFdyelNn?=
+ =?utf-8?B?dE1MbjFJUkl5N0MwdGZ0cS9KbmtRL1MrYTB6MTlZLzFSK1RzSU8xd2JaZHFE?=
+ =?utf-8?B?S04xZmpwa0l3RE5CUXk1M3VReDM3NzFWUmtXNFY4QmIzdmd3b2dGQVhjc0c2?=
+ =?utf-8?B?VGU3elNSSUR3b0RSdWlwNHlQUnJLazA2VWF4SHlpcjk3Qnh6MmFyVWRZa1BV?=
+ =?utf-8?B?Zm94TU4rRVMyUlg3ZFprQ0NPUVM3RWdnbnNYVlNpbndjb25TZGhBS3JnRHY2?=
+ =?utf-8?B?KzNNTE9lR2xtV1EvWG02RHJZaXNxN0VPbXoyTUNGWUJzdHlsellPcFpSZkw0?=
+ =?utf-8?B?MitOOUJhdzBUajJmTGhwOG1TUnJIdENDM1NRbWI0Q3Zmb1F6dS9NZnhybDI0?=
+ =?utf-8?B?cjdGSjRCSUJxTDY5aXdDN09YTVUzWTduQmZzN2dzcUhpVWxsdTJ0eDg5Z0hT?=
+ =?utf-8?B?U0x2Sk9BajRwblg4ZmxYUmFRbWVTMXE1MGRQcmlJZVd6ZFZVWEFicVJuVFJD?=
+ =?utf-8?B?NnlRMjZ1eDFUenNld28rVjAvYlhuVFFocHR0WkpKYVcwSThlZmZ5cUhMSTZJ?=
+ =?utf-8?B?dmRuWVFxS2QxcStka1JSemQzVFk3Z2lLU0wzTlNXYWlON1I1VzZRTXdlNmFx?=
+ =?utf-8?B?U20yRnRETkVoMmh3NFpFWlhZd1Y1UEYxS1hzS1BxQ3REVUNrbVRMenR4ZWVP?=
+ =?utf-8?B?UVRUZWxaZ2YvQTBXTHRPRHcrdkNkRGZjaG1XaDB5RHhWMHpHY0JGb1RmY1NK?=
+ =?utf-8?B?VU1yNTVid3BJYU5DSkZ2bVQ4VEpNUHAvQW1Uc1pqU0plVWhZTUV2bUdnYk85?=
+ =?utf-8?B?YVE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 56912938-850e-4821-35f7-08dc2d6c34fa
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Feb 2024 14:49:55.6060
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Nw0uEbe6BZ320/et0Uyoqy5UpW8zTLXwVtlRJyohCZR9Zy/rW+4iMR8bBGB5AV8y350BGzV1cT4Xl1GENQuIdjUo6TTzS1DaHRpKWo8LjMo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY1PR11MB8128
+X-OriginatorOrg: intel.com
 
-On Tue, Feb 13, 2024 at 10:04:57AM -0800, Jakub Kicinski wrote:
-> On Tue, 13 Feb 2024 14:57:49 +0100 Eric Dumazet wrote:
-> > Please note that adding other sysfs entries is expensive for workloads
-> > creating/deleting netdev and netns often.
-> > 
-> > I _think_ we should find a way for not creating
-> > /sys/class/net/<interface>/queues/tx-{Q}/byte_queue_limits  directory
-> > and files
-> > for non BQL enabled devices (like loopback !)
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Date: Tue, 6 Feb 2024 18:02:33 +0100
+
+> From: Alan Brady <alan.brady@intel.com>
+> Date: Mon, 5 Feb 2024 19:37:54 -0800
 > 
-> We should try, see if anyone screams. We could use IFF_NO_QUEUE, and
-> NETIF_F_LLTX as a proxy for "device doesn't have a real queue so BQL 
-> would be pointless"? Obviously better to annotate the drivers which
-> do have BQL support, but there's >50 of them on a quick count..
+>> The motivation for this series has two primary goals. We want to enable
+>> support of multiple simultaneous messages and make the channel more
+>> robust. The way it works right now, the driver can only send and receive
+>> a single message at a time and if something goes really wrong, it can
+>> lead to data corruption and strange bugs.
+> 
+> This works better than v3.
+> For the basic scenarios:
+> 
+> Tested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 
-Let me make sure I understand the suggestion above. We want to disable
-BQL completely for devices that has dev->features & NETIF_F_LLTX or
-dev->priv_flags & IFF_NO_QUEUE, right?
+Sorry I'm reverting my tag.
+After the series, the CP segfaults on each rmmod idpf:
 
-Maybe we can add a ->enabled field in struct dql, and set it according
-to the features above. Then we can created the sysfs and process the dql
-operations based on that field. This should avoid some unnecessary calls
-also, if we are not display sysfs.
+root@mev-imc:/usr/bin/cplane# cp_pim_mdd_handler: MDD interrupt detected
+cp_pim_mdd_event_handler: reg = 40
+Jan  1 00:27:57 mev-imc local0.warn LanCP[190]: cp_pim_mdd_handler: MDD
+interrupt detected
+cp_pim_mdd_event_handler: reg = 1
+Jan  1 00:28:54 mev-imc local0.warn LanCP[190]: [hma_create_vport/4257]
+WARNING: RSS is configured on 1st contiguous num of queuJan  1 00:28:54
+mev-imc local0.warn LanCP[190]: [hma_create_vport/4257] WARNING: RSS is
+configured on 1st contiguous num of queuJan  1 00:28:55 mev-imc
+local0.warn LanCP[190]: [hma_create_vport/4257] WARNING: RSS is
+configured on 1st contiguous num of queues= 16 start Qid= 34
+Jan  1 00:28:55 mev-imc local0.warn LanCP[190]: [hma_create_vport/4257]
+WARNING: RSS is configured on 1st contiguous num of queu16 start Qid= 640
+Jan  1 00:28:55 mev-imc local0.err LanCP[190]:
+[cp_del_node_rxbuff_lst/4179] ERR: Resource list is empty, so nothing to
+delete here
+Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
+[cp_uninit_vsi_tc_q_region/222] ERR: Failed to init vsi LUT on vsi 1.
+Jan  1 00::08 mev-imc local0.err LanCP[190]:
+[cp_uninit_vsi_fxp_config/1101] ERR: cp_uninit_vsi_rss_config() failed
+on vsi (1).
+Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
+[cp_uninit_vsi_tc_q_region/222] ERR: Failed to init vsi LUT on vsi 6.
+Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
+[cp_uninit_vsi_rss_config/340] ERR: faininit_vsi_rss_config() failed on
+vsi (6).
+Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
+[cp_uninit_vsi_tc_q_region/222] ERR: Failed to init vsi LUT on vsi 7.
+Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
+[cp_uninit_vsi_rss_config/340] ERR: failed to remove vsi (7)'s queue
+regions.
+Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
+[cp_uninit_vsi_fxp_config/1101] ERR: cp_uninit_vo init vsi LUT on vsi 8.
+Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
+[cp_uninit_vsi_rss_config/340] ERR: failed to remove vsi (8)'s queue
+regions.
+Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
+[cp_uninit_vsi_fxp_config/1101] ERR: cp_uninit_vsi_rss_config() failed
+on vsi (8).
+Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
+[cp_uninit_vsi_tc_q_region/222] ERR: Failed to init vsi LUT on vsi 1.
+Jan  1 00::08 mev-imc local0.err LanCP[190]:
+[cp_uninit_vsi_fxp_config/1101] ERR: cp_uninit_vsi_rss_config() failed
+on vsi (1).
 
-Here is a very simple PoC to represent what I had in mind. Am I in the
-right direction?
+[1]+  Segmentation fault      ./imccp 0000:00:01.6 0 cp_init.cfg
 
-diff --git a/include/linux/dynamic_queue_limits.h b/include/linux/dynamic_queue_limits.h
-index 407c2f281b64..a9d17597ea80 100644
---- a/include/linux/dynamic_queue_limits.h
-+++ b/include/linux/dynamic_queue_limits.h
-@@ -62,6 +62,7 @@ struct dql {
- 	unsigned int	max_limit;		/* Max limit */
- 	unsigned int	min_limit;		/* Minimum limit */
- 	unsigned int	slack_hold_time;	/* Time to measure slack */
-+	bool		enabled;		/* Queue is active */
- };
- 
- /* Set some static maximums */
-@@ -101,7 +102,7 @@ void dql_completed(struct dql *dql, unsigned int count);
- void dql_reset(struct dql *dql);
- 
- /* Initialize dql state */
--void dql_init(struct dql *dql, unsigned int hold_time);
-+void dql_init(struct net_device *dev, struct dql *dql, unsigned int hold_time);
- 
- #endif /* _KERNEL_ */
- 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index ef7bfbb98497..5c69bbf4267d 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -3541,6 +3541,9 @@ static inline void netdev_tx_sent_queue(struct netdev_queue *dev_queue,
- 					unsigned int bytes)
- {
- #ifdef CONFIG_BQL
-+	if (!dev_queue->dql.enabled)
-+		return
-+
- 	dql_queued(&dev_queue->dql, bytes);
- 
- 	if (likely(dql_avail(&dev_queue->dql) >= 0))
-@@ -3573,7 +3576,8 @@ static inline bool __netdev_tx_sent_queue(struct netdev_queue *dev_queue,
- {
- 	if (xmit_more) {
- #ifdef CONFIG_BQL
--		dql_queued(&dev_queue->dql, bytes);
-+		if (dev_queue->dql.enabled)
-+			dql_queued(&dev_queue->dql, bytes);
- #endif
- 		return netif_tx_queue_stopped(dev_queue);
- 	}
-@@ -3617,7 +3621,7 @@ static inline void netdev_tx_completed_queue(struct netdev_queue *dev_queue,
- 					     unsigned int pkts, unsigned int bytes)
- {
- #ifdef CONFIG_BQL
--	if (unlikely(!bytes))
-+	if (unlikely(!bytes) || !dev_queue->dql.enabled)
- 		return;
- 
- 	dql_completed(&dev_queue->dql, bytes);
-@@ -3656,6 +3660,9 @@ static inline void netdev_completed_queue(struct net_device *dev,
- static inline void netdev_tx_reset_queue(struct netdev_queue *q)
- {
- #ifdef CONFIG_BQL
-+	if (!q->dql.enabled)
-+		return;
-+
- 	clear_bit(__QUEUE_STATE_STACK_XOFF, &q->state);
- 	dql_reset(&q->dql);
- #endif
-diff --git a/lib/dynamic_queue_limits.c b/lib/dynamic_queue_limits.c
-index fde0aa244148..0a0a51f06c3b 100644
---- a/lib/dynamic_queue_limits.c
-+++ b/lib/dynamic_queue_limits.c
-@@ -10,6 +10,7 @@
- #include <linux/dynamic_queue_limits.h>
- #include <linux/compiler.h>
- #include <linux/export.h>
-+#include <linux/netdevice.h>
- 
- #define POSDIFF(A, B) ((int)((A) - (B)) > 0 ? (A) - (B) : 0)
- #define AFTER_EQ(A, B) ((int)((A) - (B)) >= 0)
-@@ -128,11 +129,21 @@ void dql_reset(struct dql *dql)
- }
- EXPORT_SYMBOL(dql_reset);
- 
--void dql_init(struct dql *dql, unsigned int hold_time)
-+static bool netdev_dql_supported(struct net_device *dev)
-+{
-+	if (dev->features & NETIF_F_LLTX ||
-+	    dev->priv_flags & IFF_NO_QUEUE)
-+		return false;
-+
-+	return true;
-+}
-+
-+void dql_init(struct net_device *dev, struct dql *dql, unsigned int hold_time)
- {
- 	dql->max_limit = DQL_MAX_LIMIT;
- 	dql->min_limit = 0;
- 	dql->slack_hold_time = hold_time;
- 	dql_reset(dql);
-+	dql->enabled = netdev_dql_supported(dev);
- }
- EXPORT_SYMBOL(dql_init);
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 9bb792cecc16..76aa70ee2c87 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -10052,7 +10052,7 @@ static void netdev_init_one_queue(struct net_device *dev,
- 	netdev_queue_numa_node_write(queue, NUMA_NO_NODE);
- 	queue->dev = dev;
- #ifdef CONFIG_BQL
--	dql_init(&queue->dql, HZ);
-+	dql_init(dev, &queue->dql, HZ);
- #endif
- }
- 
-diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-index a09d507c5b03..144ce4bb57bc 100644
---- a/net/core/net-sysfs.c
-+++ b/net/core/net-sysfs.c
-@@ -1709,9 +1709,11 @@ static int netdev_queue_add_kobject(struct net_device *dev, int index)
- 		goto err;
- 
- #ifdef CONFIG_BQL
--	error = sysfs_create_group(kobj, &dql_group);
--	if (error)
--		goto err;
-+	if (queue->dql.enabled) {
-+		error = sysfs_create_group(kobj, &dql_group);
-+		if (error)
-+			goto err;
-+	}
- #endif
- 
- 	kobject_uevent(kobj, KOBJ_ADD);
+Only restarting the CP helps -- restarting the imccp daemon makes it
+immediately crash again.
+
+This should be dropped from the next-queue until it's fixed.
+
+Thanks,
+Olek
 
