@@ -1,90 +1,89 @@
-Return-Path: <netdev+bounces-71706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71708-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEEE5854CD3
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 16:33:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B994854CEE
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 16:34:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6EE53B28CDE
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 15:33:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 704311C27A47
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 15:34:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 596705CDC9;
-	Wed, 14 Feb 2024 15:31:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFAD25D8E7;
+	Wed, 14 Feb 2024 15:34:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JWdzZKjF"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="icQpm+WR"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9016E5CDC0
-	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 15:30:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 677E95C911;
+	Wed, 14 Feb 2024 15:34:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707924661; cv=none; b=JNgZcuxpivlwr+HbhZXfXz8xbS1fH0QdSCwJgmX5nakWTS1jv3JTEpMyXX7EaJcr4JP2pu5lOGTLbLO0AljB4y0VgDhJPn0ZwJk3cQ+DLFK19eRZP6ZM8u+gmVeZTT6RjidrLqP8U9UYRvtXlDDi0p8edM+JVoY1Clto2iD5T3U=
+	t=1707924861; cv=none; b=l5dbOGSG6VkEyU/Qlst8WBfMdlavVZeDDn8NpQ9VjTTX7r1inSoOEWST5NX9Kdlyy1jG6ZcHv2WjZPqBN8YRczvr9X7/eEJ9Hv/zA22aEwJpr5rYO98EbJFtMiZaUs//5S0Xhukt6kCRZW6EWJ0q1rKLf4MyMU8nwTGtAyeBloM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707924661; c=relaxed/simple;
-	bh=imEYAaOuILDczCvFEeCOt+vcfsdZnaBpsXXGf8Fgy/E=;
+	s=arc-20240116; t=1707924861; c=relaxed/simple;
+	bh=RKBYgy5uDM/vBCiN9tBiPR2VpHrXnY5fjxo9XKnCKHs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NG3mlEXBEg/IlRvMvdz0++lPVt0Eqd4HY45frpqd44TWxQ0EA5IDIVk/ii8nUPiBOhXNiqx4xoO3dn1qfiVIq9GEC4w/nt4bmYWxyFkbCLke1SQgx4oIPIztaIPsDe3irQJxjtN0QDo0uYpGDM/orYzlXCPEdyL1zOAftf46XTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JWdzZKjF; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707924658;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TXtkMJiy9FSVGUapjk3HwcfAOYHMrdW7JcBdsr+ZOjo=;
-	b=JWdzZKjFuqJQUfEOZ5FSyXYCvWe+YK+HUtghPn2RU1lBs41/Pa9GrywtzV1TJOMwaayR9v
-	0qjyhFZ6R/PA139aq4hf0KWW5so4m1NZXg2Lonv8547SQVc4Xlhlv6QYFCskUkOYYvH3SX
-	wezPtCJnqTtjeUWhaFCwJZDOznXVgzI=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-361-9YWl4YP2MeuiF0eNAAf5tw-1; Wed, 14 Feb 2024 10:30:56 -0500
-X-MC-Unique: 9YWl4YP2MeuiF0eNAAf5tw-1
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-781d8e14fd8so276951985a.3
-        for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 07:30:56 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707924654; x=1708529454;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TXtkMJiy9FSVGUapjk3HwcfAOYHMrdW7JcBdsr+ZOjo=;
-        b=n3nUMAoYUCwJjE8Ct3X7HDk3B1X4pazPj1Ps3zrsPk8cn3l1Fs3rSOeryVM8SXWY81
-         aRa4Gy/LFriizOeNHQ4sjA4DJGD42CkgrCNusjjx3+DgXs4pE98bv85XMBn+uxp0EOtq
-         noKG4jkDBoqFzF76O+v/eSbeAGJDbj1nj9co63I1L7/oyUY5XkqkNahZfhJgh8v9HAPQ
-         YcDFCQ1VslmEQReqLMAjwSHRcrtdyYlhNgUSvSUpOwp36PKoJXOzhmxZEv5H8Nil9Lcb
-         o8J8SXTxG7rqce8ndgAmn2y7lKjq4ZJg/x5fQ0aHTNy36fGKKaYDuw5t+lod7wehZzHf
-         /yrg==
-X-Forwarded-Encrypted: i=1; AJvYcCWfKAW13PAs7hlGcN8xR9BuMs7/ptUASMs4MbSb+FGADQXSmSkN4vn4sdy4z3bwHTQNbgTESIIUYwTaiO0YeXsJS56cBCdR
-X-Gm-Message-State: AOJu0YxYVaZmj2Wr9f8F+42TqAwzjNAdqKTeTukIfPd/J29MxkMSlPRx
-	rPLcolnx/EXlaCkeYMKuNDr05Cu3F6ZWEWZiwhnMgHTclIGzj9QRvzC/nszd5txXIVdzP3GSEjq
-	hUS8k9/epg76MHXN8izdWgR+3d6Xo04IZQ91zKQyeJWQ+aqnuyUhAdXYCseZPYg==
-X-Received: by 2002:a05:620a:1a1f:b0:787:17d9:99ee with SMTP id bk31-20020a05620a1a1f00b0078717d999eemr4022840qkb.16.1707924654627;
-        Wed, 14 Feb 2024 07:30:54 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH88Dl2z7jLBSDjNRGeTdaIafgx/Ol4hk/y3KCPjs2fl7LXuAl/XwXG4yFI2sbiK5o2Nm0ucA==
-X-Received: by 2002:a05:620a:1a1f:b0:787:17d9:99ee with SMTP id bk31-20020a05620a1a1f00b0078717d999eemr4022820qkb.16.1707924654373;
-        Wed, 14 Feb 2024 07:30:54 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUtPO0kTAQxC5RZDfT0VwlKpsx01C7b9CzNvzvWd6AKIHeWCr0OcCKLraDCcdxoR+SsVALOJlgHXHr5baasQMpBSwwAqMboWHTPsl/t3Ft4JCGaTkZY2RmxSZcu
-Received: from localhost ([78.208.134.164])
-        by smtp.gmail.com with ESMTPSA id y9-20020a37e309000000b0078731e6d47csm183867qki.116.2024.02.14.07.30.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Feb 2024 07:30:54 -0800 (PST)
-Date: Wed, 14 Feb 2024 16:30:48 +0100
-From: Andrea Claudi <aclaudi@redhat.com>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: David Ahern <dsahern@gmail.com>, netdev@vger.kernel.org,
-	sgallagh@redhat.com
-Subject: Re: [PATCH] iproute2: fix build failure on ppc64le
-Message-ID: <ZczcqOHwlGC1Pmzx@renaissance-vector>
-References: <d13ef7c00b60a50a5e8ddbb7ff138399689d3483.1707474099.git.aclaudi@redhat.com>
- <20240209083533.1246ddcc@hermes.local>
- <3730d7e4-058f-421f-8ecf-a9475440ef58@gmail.com>
- <20240209164542.716b4d7a@hermes.local>
+	 Content-Type:Content-Disposition:In-Reply-To; b=OPpBQIPzdhETCMZWjvAcYR/1GtygqJBmxmgMNPy5VjB8Sm5Q5pc6CGT6xiVr3pbgJr12y4gTL7tHVoeNeet6U6ukd0LZSlwreNDOyjAwxxHwjiMvWVArzlFmwOp6ZYrd8Rt2hudaYOTQfrAaoPArWQPVPFtigeVhP/ZrvNRMSkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=icQpm+WR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FB29C433C7;
+	Wed, 14 Feb 2024 15:34:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1707924860;
+	bh=RKBYgy5uDM/vBCiN9tBiPR2VpHrXnY5fjxo9XKnCKHs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=icQpm+WRIBCwFmc6GMZyzD7hfrgvougrzlFkQQkENhX2hhFv4tKvrybec2LZPF0p2
+	 g4w+i5vJ2cylBctHyW7nrVqW6KPr/tAxRaWjizo57DBTGi3DOfHaFJKv8GA3osWQx5
+	 zkW+b+wjJITdz0ojCZY2Ccjx1teFWK8MymvaLyFA=
+Date: Wed, 14 Feb 2024 16:34:17 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Bjorn Andersson <andersson@kernel.org>, Kalle Valo <kvalo@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Chris Morgan <macromorgan@hotmail.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	=?iso-8859-1?Q?N=EDcolas_F_=2E_R_=2E_A_=2E?= Prado <nfraprado@collabora.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Peng Fan <peng.fan@nxp.com>, Robert Richter <rrichter@amd.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Terry Bowman <terry.bowman@amd.com>, Lukas Wunner <lukas@wunner.de>,
+	Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>,
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+	Abel Vesa <abel.vesa@linaro.org>, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: Re: Re: [PATCH 4/9] PCI: create platform devices for child OF
+ nodes of the port node
+Message-ID: <2024021413-grumbling-unlivable-c145@gregkh>
+References: <20240117160748.37682-1-brgl@bgdev.pl>
+ <20240117160748.37682-5-brgl@bgdev.pl>
+ <2024011707-alibi-pregnancy-a64b@gregkh>
+ <CAMRc=Mef7wxRccnfQ=EDLckpb1YN4DNLoC=AYL8v1LLJ=uFH2Q@mail.gmail.com>
+ <2024011836-wok-treadmill-c517@gregkh>
+ <d2he3ufg6m46zos4swww4t3peyq55blxhirsx37ou37rwqxmz2@5khumvic62je>
+ <CAMRc=MeXJjpJhDjyn_P-SGo4rDnEuT9kGN5jAbRcuM_c7_aDzQ@mail.gmail.com>
+ <oiwvcvu6wdmpvhss3t7uaqkl5q73mki5pz6liuv66bap4dr2mp@jtjjwzlvt6za>
+ <CAMRc=McT8wt6UbKtyofkJo3WcyJ-S4d2MPp8oZmjWbX6LGbETQ@mail.gmail.com>
+ <CAMRc=MeWgp27YcS=-dbYdN1is1MEuZ2ar=pW_p9oY0Nf1EbFHA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,42 +93,88 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240209164542.716b4d7a@hermes.local>
+In-Reply-To: <CAMRc=MeWgp27YcS=-dbYdN1is1MEuZ2ar=pW_p9oY0Nf1EbFHA@mail.gmail.com>
 
-On Fri, Feb 09, 2024 at 04:45:42PM -0800, Stephen Hemminger wrote:
-> On Fri, 9 Feb 2024 15:14:28 -0700
-> David Ahern <dsahern@gmail.com> wrote:
+On Wed, Feb 07, 2024 at 05:32:38PM +0100, Bartosz Golaszewski wrote:
+> On Fri, Feb 2, 2024 at 11:02 AM Bartosz Golaszewski <brgl@bgdev.pl> wrote:
+> >
+> > On Fri, Feb 2, 2024 at 1:03 AM Bjorn Andersson <andersson@kernel.org> wrote:
+> > >
+> >
+> > [snip]
+> >
+> > > > >
+> > > > > I believe I missed this part of the discussion, why does this need to be
+> > > > > a platform_device? What does the platform_bus bring that can't be
+> > > > > provided by some other bus?
+> > > > >
+> > > >
+> > > > Does it need to be a platform_device? No, of course not. Does it make
+> > > > sense for it to be one? Yes, for two reasons:
+> > > >
+> > > > 1. The ATH11K WLAN module is represented on the device tree like a
+> > > > platform device, we know it's always there and it consumes regulators
+> > > > from another platform device. The fact it uses PCIe doesn't change the
+> > > > fact that it is logically a platform device.
+> > >
+> > > Are you referring to the ath11k SNOC (firmware running on co-processor
+> > > in the SoC) variant?
+> > >
+> > > Afaict the PCIe-attached ath11k is not represented as a platform_device
+> > > in DeviceTree.
+> > >
+> >
+> > My bad. In RB5 it isn't (yet - I want to add it in the power
+> > sequencing series). It is in X13s though[1].
+> >
+> > > Said platform_device is also not a child under the PCIe bus, so this
+> > > would be a different platform_device...
+> > >
+> >
+> > It's the child of the PCIe port node but there's a reason for it to
+> > have the `compatible` property. It's because it's an entity of whose
+> > existence we are aware before the system boots.
+> >
+> > > > 2. The platform bus already provides us with the entire infrastructure
+> > > > that we'd now need to duplicate (possibly adding bugs) in order to
+> > > > introduce a "power sequencing bus".
+> > > >
+> > >
+> > > This is a perfectly reasonable desire. Look at our PMICs, they are full
+> > > of platform_devices. But through the years it's been said many times,
+> > > that this is not a valid or good reason for using platform_devices, and
+> > > as a result we have e.g. auxiliary bus.
+> > >
+> >
+> > Ok, so I cannot find this information anywhere (nor any example). Do
+> > you happen to know if the auxiliary bus offers any software node
+> > integration so that the `compatible` property from DT can get
+> > seamlessly mapped to auxiliary device IDs?
+> >
 > 
-> > On 2/9/24 9:35 AM, Stephen Hemminger wrote:
-> > > On Fri,  9 Feb 2024 11:24:47 +0100
-> > > Andrea Claudi <aclaudi@redhat.com> wrote:
-> > >   
-> > >> ss.c:3244:34: warning: format ‘%llu’ expects argument of type ‘long long unsigned int’, but argument 2 has type ‘__u64’ {aka ‘long unsigned int’} [-Wformat=]
-> > >>  3244 |                 out(" rcv_nxt:%llu", s->mptcpi_rcv_nxt);
-> > >>       |                               ~~~^   ~~~~~~~~~~~~~~~~~
-> > >>       |                                  |    |
-> > >>       |                                  |    __u64 {aka long unsigned int}
-> > >>       |                                  long long unsigned int
-> > >>       |                               %lu
-> > >>
-> > >> This happens because __u64 is defined as long unsigned on ppc64le.  As
-> > >> pointed out by Florian Weimar, we should use -D__SANE_USERSPACE_TYPES__
-> > >> if we really want to use long long unsigned in iproute2.  
-> > > 
-> > > Ok, this looks good.
-> > > Another way to fix would be to use the macros defined in inttypes.h
-> > > 
-> > > 		out(" rcv_nxt:"PRIu64, s->mptcpi_rcv_nxt);
-> > >   
-> > 
-> > since the uapi is __u64, I think this is the better approach.
+> So I was just trying to port this to using the auxiliary bus, only to
+> find myself literally reimplementing functions from
+> drivers/of/device.c. I have a feeling that this is simply wrong. If
+> we're instantiating devices well defined on the device-tree then IMO
+> we *should* make them platform devices. Anything else and we'll be
+> reimplementing drivers/of/ because we will need to parse the device
+> nodes, check the compatible, match it against drivers etc. Things that
+> are already implemented for the platform bus and of_* APIs.
 > 
-> NVM
-> Tried it, but __u64 is not the same as uint64_t even on x86.
-> __u64 is long long unsigned int
-> uint64_t is long unsigned int
->
+> Greg: Could you chime in and confirm that it's alright to use the
+> platform bus here? Or maybe there is some infrastructure to create
+> auxiliary devices from software nodes?
 
-Is there anything more I can do about this?
+Note, I HATE the use of the platform bus here, but I don't have a better
+suggestion.
 
+I'd love for the auxbus to work, and if you can create that from
+software nodes, all the better!  But I don't think that's possible just
+yet, and you would end up implementing all the same stuff that the
+platform bus has today for this functionality, so I doubt it would be
+worth it.
+
+thanks,
+
+greg k-h
 
