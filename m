@@ -1,156 +1,146 @@
-Return-Path: <netdev+bounces-71755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B912854F48
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 17:59:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2891854F3F
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 17:57:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D66EEB20C57
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 16:55:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F27CD1C222C4
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 16:57:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9151A604C5;
-	Wed, 14 Feb 2024 16:55:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC694604CB;
+	Wed, 14 Feb 2024 16:57:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="lQDi39L+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB786604BA;
-	Wed, 14 Feb 2024 16:55:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 468C860DC2;
+	Wed, 14 Feb 2024 16:57:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707929742; cv=none; b=QQXo8VM+we3zmRThsN3eVj3gBWYmE+w2Lz3F37jOPsYTQhBtkBwGmxd586PvQgkEGj+tQthn17gOxZp41cToHuihqOzlPeBmy6c0IwWTH3PiRnQjPFSB9Oewbd07URTHUPgmzYQP7QE75FaqCKnRpMqwpLuu6mCDBO36RtIr6h8=
+	t=1707929869; cv=none; b=tWRMS3TE4b8QaKm9ZxIXj+vUPY6RM/LCONjhFBMURkk+EfFwe87QDjUnFS+qgFlhNryB6O0MKdpEz1XfE7VtkZUrXsignWANYvRrkjvNNcpfVSBu3oVCmGtrJ3r891G5ui5rIwFsW+hlIKNcGZifYUt7JScoUiRvGBaLPlX9f1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707929742; c=relaxed/simple;
-	bh=R4aO56oitobWIyygbTcNM6DX/tMQVEEpkvRemh26eN0=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=j0VHTzCLfZRJ+1LoJu/U9d96fYEeJbVliKqGt+CjlQymjaJgtpgepHyMQzQmU0wPDQdgSv9hzAaRAts/GdwjxImD5CSzQZr0p2nOycz3M/NwmCXWknV62Ijk3YOZWlv/iUPOkvN7FRCxogpBQxa+QWdOchjBe1Nl/K6XFGUidOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (178.176.73.178) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 14 Feb
- 2024 19:55:29 +0300
-Subject: Re: [PATCH net-next v4 4/6] net: ravb: Move the update of
- ndev->features to ravb_set_features()
-To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<biju.das.jz@bp.renesas.com>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>
-References: <20240214135800.2674435-1-claudiu.beznea.uj@bp.renesas.com>
- <20240214135800.2674435-5-claudiu.beznea.uj@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <d1f1bb09-2c13-1d1c-b403-35b537778286@omp.ru>
-Date: Wed, 14 Feb 2024 19:55:28 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1707929869; c=relaxed/simple;
+	bh=bHjsv3Dqq5tJu1jXyCBKwRegCnc+WTLnw6hQn8pGFdQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=a5tktyb8kP16yARc0xsTf2CCqyr6GvKk0ZySqowuNlL06KaXpktRnddm8lhf6Jl5oyJw4qz6ll+rVNiy2QVg0YEzyA3+m2o5umOv8/BweTYC5rzpn0jkrWgc6Zs0DZmpGldFludhFQ+mBUV/Gpy8PmMxXyRdKwzqWbtUaSgEZ2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=lQDi39L+; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41EDpr7l016391;
+	Wed, 14 Feb 2024 16:57:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=A5/2i+d4cJP3/60L5tMUEpskhePWx2EdlGQ/W9UG2eQ=; b=lQ
+	Di39L+AEIzJN08BKF0NUKFAzXaxvjLSQItwYbb5iZIvlcVL8Ctp3eRI6gfVh3R8Z
+	xxuzHQllsycusDnguTN7A/VKGX31nhwJMrZ73rL5F4Uq2g0RZSmhnPNTeRl6E+8Q
+	drBcu8bXAFaxn85QomxoNxFaYubC2ctDasRSxJZOupsjQy7n+pmf8tuJTmS2DQAt
+	nVZm39toAdxSTAUXCn6iY+1tz/XVGUthS5HSpzC4l4KkI4zLIe4uJ0+d11nbCoUz
+	qhThdyTTfKDvJEeLhpAuM+9LcvTyYaLHHHS3awxjQ38TDecjcpB/sB6KqF2tfu+f
+	aLCJFj6x5F+PdnEi/Vpw==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3w8myg1kew-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 14 Feb 2024 16:57:41 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41EGve4U019335
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 14 Feb 2024 16:57:40 GMT
+Received: from [10.110.88.210] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 14 Feb
+ 2024 08:57:39 -0800
+Message-ID: <0da40ae1-c033-4089-a64e-27d16bce7ab6@quicinc.com>
+Date: Wed, 14 Feb 2024 08:57:39 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240214135800.2674435-5-claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/1] wifi: nl80211: Add support for plumbing SAE groups to
+ driver
 Content-Language: en-US
+To: Johannes Berg <johannes@sipsolutions.net>,
+        Jakub Kicinski
+	<kuba@kernel.org>
+CC: Kalle Valo <kvalo@kernel.org>,
+        Vinayak Yadawad
+	<vinayak.yadawad@broadcom.com>,
+        <linux-wireless@vger.kernel.org>, <jithu.jance@broadcom.com>,
+        Arend van Spriel <arend.vanspriel@broadcom.com>,
+        <netdev@vger.kernel.org>
+References: <309965e8ef4d220053ca7e6bd34393f892ea1bb8.1707486287.git.vinayak.yadawad@broadcom.com>
+ <87mss6f8jh.fsf@kernel.org>
+ <2c38eaed47808a076b6986412f92bb955b0599c3.camel@sipsolutions.net>
+ <20240213174314.26982cd8@kernel.org>
+ <6641f3f90bdc1d24f3a7fd795be672ce02685630.camel@sipsolutions.net>
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+In-Reply-To: <6641f3f90bdc1d24f3a7fd795be672ce02685630.camel@sipsolutions.net>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 02/14/2024 16:36:43
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 183446 [Feb 14 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.73.178 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.73.178 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2;178.176.73.178:7.4.1,7.7.3
-X-KSE-AntiSpam-Info: {cloud_iprep_silent}
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.73.178
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 02/14/2024 16:41:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 2/14/2024 2:42:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: Kx9ea3egh2xxbCUPzUjaLRaOBrcrUXS-
+X-Proofpoint-ORIG-GUID: Kx9ea3egh2xxbCUPzUjaLRaOBrcrUXS-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-14_09,2024-02-14_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=0
+ mlxlogscore=408 priorityscore=1501 impostorscore=0 bulkscore=0 mlxscore=0
+ adultscore=0 lowpriorityscore=0 spamscore=0 clxscore=1011 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2401310000
+ definitions=main-2402140131
 
-On 2/14/24 4:57 PM, Claudiu wrote:
-
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+On 2/14/2024 2:27 AM, Johannes Berg wrote:
+> At which point, yeah, I'm putting my foot down and saying this has to
+> stop. I really don't (**) care about Broadcom doing their own vendor-
+> specific APIs if there's zero chance the things they're needed for will
+> ever land upstream anyway.
 > 
-> Commit c2da9408579d ("ravb: Add Rx checksum offload support for GbEth")
-> introduced support for setting GbEth features. With this the IP-specific
-> features update functions update the ndev->features individually.
+> (**) No longer. I used to think that being more open about this would
+> encourage folks to start a journey of contributing more upstream, but
+> clearly that hasn't worked out.
 > 
-> Next commits add runtime PM support for the ravb driver. The runtime PM
-> implementation will enable/disable the IP clocks on
-> the ravb_open()/ravb_close() functions. Accessing the IP registers with
-> clocks disabled blocks the system.
+> Now this is why I used to be more open: I will also most definitely not
+> accept all the vendor APIs upstream if someone later decides they do
+> want an upstream driver, and then push all the vendor stuff on grounds
+> that "it's used now and we have to support it" ... We don't, at least
+> not upstream, what you sell to your customers really isn't our problem.
 > 
-> The ravb_set_features() function could be executed when the Ethernet
-> interface is closed so we need to ensure we don't access IP registers while
-> the interface is down when runtime PM support will be in place.
-> 
-> For these, move the update of ndev->features to ravb_set_features(). In
-> this way we update the ndev->features only when the IP-specific features
-> set function returns success and we can avoid code duplication when
-> introducing runtime PM registers protection.
-> 
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-[...]
+> (And to be honest, if customers cared, we'd not be in this position)
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+I feel a need to respond since, as part of the thread, Qualcomm was also
+mentioned, and rightfully so. In addition to our in-tree ath drivers we
+have multiple out-of-tree wifi drivers, some for mobile-based products
+and some for infrastructure-based products. And we have also contributed
+patches in the past that were only in support of our out-of-tree drivers.
 
-> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-> index 7a7f743a1fef..ac23779d1cc5 100644
-> --- a/drivers/net/ethernet/renesas/ravb_main.c
-> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-[...]
-> @@ -2567,8 +2564,15 @@ static int ravb_set_features(struct net_device *ndev,
->  {
->  	struct ravb_private *priv = netdev_priv(ndev);
->  	const struct ravb_hw_info *info = priv->info;
-> +	int ret;
+There are good reasons these out-of-tree drivers exist, but there is
+also a movement, at least for the Qualcomm infrastructure products, to
+transition to an upstream driver, in part due to customer requests. So
+it is disconcerting that you are talking about inserting barriers to
+converting to an upstream driver. Converting from an out-of-tree driver
+to an upstream driver involves significance NRE cost with little to no
+revenue gain, but that is something Qualcomm is willing to do for the
+driver. But we need our userspace interfaces to survive since both
+Qualcomm and our customers have years of work invested in the existing
+userspace interfaces and applications. The customers who want an
+upstream driver do not want to be forced to rewrite their applications
+to support it.
 
-   I'd use 'error' here, it would fit well... :-)
+In the kernel we have a clear mantra to not break userspace. That should
+hopefully hold true when converting from an out-of-tree driver to an
+upstream one.
 
-> +
-> +	ret = info->set_feature(ndev, features);
-> +	if (ret)
-> +		return ret;
->  
-> -	return info->set_feature(ndev, features);
-> +	ndev->features = features;
-> +
-> +	return 0;
->  }
->  
->  static const struct net_device_ops ravb_netdev_ops = {
-
-MBR, Sergey
+/jeff
 
