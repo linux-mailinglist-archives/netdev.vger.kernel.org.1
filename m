@@ -1,153 +1,145 @@
-Return-Path: <netdev+bounces-71744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2D24854EBE
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 17:39:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56370854EC9
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 17:40:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E95628D09E
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 16:39:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B2601C28088
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 16:40:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23C7F60861;
-	Wed, 14 Feb 2024 16:36:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D43A5DF03;
+	Wed, 14 Feb 2024 16:39:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="KXwWjoRY";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="t6DTWNcr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J0IXz2WD"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6273360DD7;
-	Wed, 14 Feb 2024 16:36:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85D62604A3
+	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 16:39:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707928574; cv=none; b=cGhIqLTyryEYsWpeWgds5gjN0KrjBrR8+39IBTTxEnQiVXjAvATDdPZYnC18Wtp/l9xAjlffVb5vXKSFJxD0GsMx/SwSAbqPQRMPSduqKAYIRO5xOcgJjSd89oM6Trh8pJLcPzBlt55LPNB+z/RrrVbGgcOI8wXXA/RTXj/y1uI=
+	t=1707928754; cv=none; b=HUwHdCNpiyeQB13AsqocBFEitsJiFcCUS7mePb+BjAdI+tFmvTpGyAO3N4EPBwvUbPEX2KonOYUOIna/L8Qet7qWXmhMeo0aZYFEKPqxwRcK/EAM6wJLdrNeGS4/rijn2VSZ8Vwe6ryPmijT6oRSIr6HFaVwCprZuJ0Twl7vLvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707928574; c=relaxed/simple;
-	bh=WsY3Ur/foPCNEZ7U/F93RS64sAsZc3fOM8esZ2Qa3oI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S0VgXg7oSZGO/MoILH26MGmxcXCqHh7ukg7Daff85Sz7qpC8PcBvv2Xm7DiOkM7AXkSk3WK4B06SXMB414XW2k4uVHuCq0gU81KRjViraTqpohsLBVgQzdg6xbmX7PQDMIVOpwyAu1BvB5ahBI6J/WNJAwhg3AOqPQ5+dfc/fzo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=KXwWjoRY; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=t6DTWNcr; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Wed, 14 Feb 2024 17:36:07 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1707928569;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WsY3Ur/foPCNEZ7U/F93RS64sAsZc3fOM8esZ2Qa3oI=;
-	b=KXwWjoRYUm70NG3zZcjzfqv18cbB9q5IOg8ZJR2DOIRWf+8NBzkPJ8qsrW7Gqly2D0JvEO
-	h+/Az9CAE0wKKQJIy/x8qu1b7Zj/QDZEamXS+aMDWBW5FQbQxiP+3UpCt/2Y6CZMUqJ+5T
-	VvLdB5KhX+lfbKDRxYLcngGsHlkSigCipNeLk9yfrXiYA9NaMEL0IwfdS3FIm8wBpPYpfi
-	p5kQ4KhdyJcIGf+R3JVTARc74IFGB6gxonRZgb+GvBUl3Pxo2ydswPaRWj74AefX5ZULDE
-	0vKaEH9z/oBECeowCUG5j9N6xZSXuy96EW1AOOL+rpKA215Vmr5PwSQjM594Zw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1707928569;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WsY3Ur/foPCNEZ7U/F93RS64sAsZc3fOM8esZ2Qa3oI=;
-	b=t6DTWNcrUNeTvFXzsIyiGBxpvtWSfFfyw/mw0JFLrl9ruGcD9wpYBGhlThOD5oUzlsHK3U
-	ZucC3vfOgaY1JgAw==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	=?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Eric Dumazet <edumazet@google.com>, Hao Luo <haoluo@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jiri Olsa <jolsa@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Song Liu <song@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Yonghong Song <yonghong.song@linux.dev>
-Subject: Re: [PATCH RFC net-next 1/2] net: Reference bpf_redirect_info via
- task_struct on PREEMPT_RT.
-Message-ID: <20240214163607.RjjT5bO_@linutronix.de>
-References: <20240213145923.2552753-1-bigeasy@linutronix.de>
- <20240213145923.2552753-2-bigeasy@linutronix.de>
- <66d9ee60-fbe3-4444-b98d-887845d4c187@kernel.org>
- <20240214121921.VJJ2bCBE@linutronix.de>
- <87y1bndvsx.fsf@toke.dk>
- <20240214142827.3vV2WhIA@linutronix.de>
- <87le7ndo4z.fsf@toke.dk>
+	s=arc-20240116; t=1707928754; c=relaxed/simple;
+	bh=nttmJ+jTAO5V2LTBqxjyS5ZLK66cAwYXoazfIiT/FJY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tskxJxhvFshMhmPDZiEr+YYgizYLWWL8aUiL3+l233qEVkHYVQkQQx+nLITHAYEUOeFGXqcpgGqSdVz0Tu7ASgrwqR0jke2XUHpO0kduIDjrFlLHR80nldMD1wYicNA1gy+e54uS8Yi77UW6VXBMJqoQLmAU/7RJm6s2dA3D7P4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J0IXz2WD; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5638ae09ec1so953333a12.0
+        for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 08:39:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707928751; x=1708533551; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VBNebMn83RS2gWNUXknQM5an4qP55hULzmFLGEKJjOc=;
+        b=J0IXz2WDckyWIsXRoCUl0sO5SkZla3bcqf5ecQNuNgQLRqiHVK8xFY+Ybv84jyTbFX
+         nG1Ep5gK5qflZwNbFJ0+vE0J1t+zNIudNTxDKXpqFsPgVeV2hydtC2jWU0WGrrPunqdF
+         PFhSend+TOv7j9OV7WvloWYTF64lHxnH2PK5rBZz9oxpgKLeAmKu/DfXTjbQET8bD0e+
+         iPMCDX2TMoPjVkPTdYHJlYGPUh+QEolykORyYOpJgJkFajZuQHUmJQhcFR22dcP+pK+h
+         9St0WOuLiroOhCQZX5lGsH14e8EAPzeDfASPsUqZIRg/iwYrUwYzxjrZCa2rwxP3OeiE
+         XOGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707928751; x=1708533551;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VBNebMn83RS2gWNUXknQM5an4qP55hULzmFLGEKJjOc=;
+        b=EDmPyXoWCPhX0TbXEM0bXE7dP+npVmuJCHB0fNBPFw8Hfy9OfNY0D0r+OAHmaW2bmm
+         PRJ8Ef4et4N4q7ok2/67uCPd/mAiLIQ8US5o2PfAJmfXjCe7nXXe5hgKmSEjAGmVdykC
+         hROtacTcLTqkwqNOy+KoM+1GU8lm5FRzzJnXCEQqkPJyfLLuTl9qCB6/iWU9Hz6giezz
+         Vc6hLtrKdBOGAzcuDNvglgpf0ncuhKOY/mhacrTAToRR6I62HHiapxNAQa1qet+KUB1X
+         tS6Xntwop5dcrT1jNnLjR3ZZk9EqpceG6doqoO6dmNQijV/07Dq88/lO/Z1iiTewkMlL
+         jfvw==
+X-Forwarded-Encrypted: i=1; AJvYcCWWeHDQREEfZMxrhFEFsNaMbQ1EnRJ327wxzldOpb0Bk8gWDRjOuuT/R9xj3t3/8udXuGS2N7Rh+Ec7a4H1fHZteBI/suP5
+X-Gm-Message-State: AOJu0YwaN3Lty5DhBf0/nTrWKXDAVYJoZ7cHX5APKkPmjBWcasTGRc7e
+	8PfywMwZWvBm3GN28XsxpsxSVXk91uMc2+RvGhWArO/UBM5J/3TL
+X-Google-Smtp-Source: AGHT+IHJZ96JzXwy+SujP+BLjpVXBzieeOhT8TXUJrHCZWu3N755ZF5YgSa4shq98f7GhEBCHuksaw==
+X-Received: by 2002:a05:6402:530d:b0:561:f0f1:5e01 with SMTP id eo13-20020a056402530d00b00561f0f15e01mr2171520edb.10.1707928750602;
+        Wed, 14 Feb 2024 08:39:10 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVqI5+BalssfgbclntHNF+gOVrCd0yTexn80Cm/zmUNt3Kt68Ns0v4LQ5yt00OBz3UDFkUyE4YRcK2t9m4EWZn5YSbOJbEOhLqIT2JqiWtTbs8MSCOOLBRkwJ32Up5zgYVGJF3T1T4a628zJIpS/8G3dBh8uQ0PpBg60lhM5PQdIIrg
+Received: from ?IPV6:2620:10d:c096:310::23d8? ([2620:10d:c092:600::1:1e51])
+        by smtp.gmail.com with ESMTPSA id dc11-20020a056402310b00b005613cbbdb81sm4832717edb.80.2024.02.14.08.39.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 14 Feb 2024 08:39:10 -0800 (PST)
+Message-ID: <d8948716-ed07-48ab-a933-671f1fc4ee58@gmail.com>
+Date: Wed, 14 Feb 2024 16:37:41 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <87le7ndo4z.fsf@toke.dk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] net: cache for same cpu skb_attempt_defer_free
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+ davem@davemloft.net, dsahern@kernel.org, pabeni@redhat.com
+References: <7a01e4c7ddb84292cc284b6664c794b9a6e713a8.1707759574.git.asml.silence@gmail.com>
+ <CANn89iJBQLv7JKq5OUYu7gv2y9nh4HOFmG_N7g1S1fVfbn=-uA@mail.gmail.com>
+ <457b4869-8f35-4619-8807-f79fc0122313@gmail.com>
+ <20240213191341.3370a443@kernel.org>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20240213191341.3370a443@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 2024-02-14 17:08:44 [+0100], Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> > During testing I forgot a spot in egress and the test module. You could
-> > argue that the warning is enough since it should pop up in testing and
-> > not production because the code is always missed and not by chance (go
-> > boom, send a report). I *think* I covered all spots, at least the test
-> > suite didn't point anything out to me.
->=20
-> Well, I would prefer if we could make sure we covered everything and not
-> have this odd failure mode where redirect just mysteriously stops
-> working. At the very least, if we keep the check we should have a
-> WARN_ON in there to make it really obvious that something needs to be
-> fixed.
+On 2/14/24 03:13, Jakub Kicinski wrote:
+> On Tue, 13 Feb 2024 14:07:24 +0000 Pavel Begunkov wrote:
+>>>> +       local_bh_disable();
+>>>> +       skb_release_all(skb, SKB_DROP_REASON_NOT_SPECIFIED, false);
+>>>
+>>> I am trying to understand why we use false instead of true here ?
+>>> Or if you prefer:
+>>> local_bh_disable();
+>>> __napi_kfree_skb(skb, SKB_DROP_REASON_NOT_SPECIFIED);
+>>> local_bh_enable();
+> 
+> FWIW I had the same reaction. napi_safe = false followed by
+> napi_skb_cache_put() looks sus. No argument that naming is bad,
+> not the first time it comes up :(
+> 
+>> Maybe it's my misunderstanding but disabled bh != "napi safe",
+>> e.g. the napi_struct we're interested in might be scheduled for
+>> another CPU. Which is also why "napi" prefix in percpu
+>> napi_alloc_cache sounds a bit misleading to me.
+> 
+> FWIW the skb recycling is called napi_* to hint to driver authors that
+> if they are in NAPI context this is a better function to call.
 
-Agree.
+Which is absolutely reasonable, napi_skb_cache_put() on the
+other hand is rather internal and wouldn't be used by drivers
+directly.
+I guess I'll just do a little bit of renaming later hopefully after
+this patch is taken in, unless there are other comments / objections.
 
-> This brings me to another thing I was going to point out separately, but
-> may as well mention it here: It would be good if we could keep the
-> difference between the RT and !RT versions as small as possible to avoid
-> having subtle bugs that only appear in one configuration.
+> The connection to a particular NAPI instance matters only for the page
+> pool recycling, but that's handled. The conditions you actually
+> need to look out for are hardware IRQs and whatever async paths which
+> can trigger trigger while NAPI is half way thru touching the cache of
+> the local CPU.
 
-Yes. I do so, too.
+Yeah the usual percpu (bh protected) caching stuff and likes, and
+the question is rather about the semantics.
 
-> I agree with Jesper that the concept of a stack-allocated "run context"
-> for the XDP program makes sense in general (and I have some vague ideas
-> about other things that may be useful to stick in there). So I'm
-> wondering if it makes sense to do that even in the !RT case? We can't
-> stick the pointer to it into 'current' when running in softirq, but we
-> could change the per-cpu variable to just be a pointer that gets
-> populated by xdp_storage_set()?
+To draw some conclusion, do you suggest to change anything
+in the patch?
 
-I *think* that it could be added to current. The assignment currently
-allows nesting so that is not a problem. Only the outer most set/clear
-would do something. If you run in softirq, you would hijack a random
-task_struct. If the pointer is already assigned then the list and so one
-must be empty because access is only allowed in BH-disabled sections.
+>> The second reason is that it shouldn't change anything
+>> performance wise
+>>
+>> napi_pp_put_page(napi_safe) {
+>>       ...
+>>       if (napi_safe || in_softirq()) { ... }
+>> }
 
-However, using per-CPU for the pointer (instead of task_struct) would
-have the advantage that it is always CPU/node local memory while the
-random task_struct could have been allocated on a different NUMA node.
-
-> I'm not really sure if this would be performance neutral (it's just
-> moving around a few bits of memory, but we do gain an extra pointer
-> deref), but it should be simple enough to benchmark.
-
-My guess is that we remain with one per-CPU dereference and an
-additional "add offset". That is why I kept the !RT bits as they are
-before getting yelled at.
-
-I could prepare something and run a specific test if you have one.
-
-> -Toke
-
-Sebastian
+-- 
+Pavel Begunkov
 
