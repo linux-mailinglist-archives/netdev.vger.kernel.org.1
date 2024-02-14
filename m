@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-71836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C46A885544A
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 21:48:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 012A785544D
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 21:48:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 543AC28775F
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 20:48:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABE20285446
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 20:48:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A50F613B7B2;
-	Wed, 14 Feb 2024 20:47:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED2E113B785;
+	Wed, 14 Feb 2024 20:48:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DM6JlSpC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QH/UmNRR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 893D913EFE8
-	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 20:47:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C48931B7E2
+	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 20:48:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707943647; cv=fail; b=UxZ8OuTHLp2hDGNQ6Dc3XMTcqFJskxnn+92Foi7U1WxlRrrx00WwKmNFpy5NVtEgexcaeHdItjhmvzEnH7FP0450Vd5IgUCJWWt4/2d3MG99sFPW+C0W8gcWZmZtoM74Y3o5GjKSaODnOYf/H95aB5yh3Pq+V//jpf3GWOr9w5k=
+	t=1707943711; cv=fail; b=n3dL6isV57EqbCQyeRZbviY54w9fC1x4S9+5WxHoiJUVvTetMbEL8fVGBuzHvyeRzejoDpwCDkWeu6qj1FBYg6PDAPXPmuns6t5NxqsHqwR1PIWyPEO8ojb3Ohj7ZSrzpjAXnGvFPBQh2Aeo3ioEZZD1aTbdvFfPRSbOCrMiDEY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707943647; c=relaxed/simple;
-	bh=AMnVPT3YsaL83SCknAVxDWGrAe08XwSa4DstRoszdeY=;
+	s=arc-20240116; t=1707943711; c=relaxed/simple;
+	bh=gy0iysc5Da9R0DB4N/I2bqAEIU6fDGI+UDTLHiVvtiU=;
 	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=YSuruLTZd2SO9uOOBNoOhtk+7Ifi5i/nHAqTvzX5h2vPGtwyIq6x5+lw48sOVE7M5m+tCmpMqg9O2YhtBdCsWVxSqvN7HRdWJJE8va4qoIAlkGfc83DAZ5wd8eE1EMmO1L6dNm9zQh8Hs+jKhI1e02caicSHV/RKBlwmY5+CB8M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DM6JlSpC; arc=fail smtp.client-ip=192.198.163.9
+	 Content-Type:MIME-Version; b=Jdt3cC0rGIWEFspafaaBHoAXKgA91r6EoWU+OhWujmDZzmOrclcYBzmSqEZU5rmYAeoJhqYSsjA0bI9UKliiJLzagS0iYeXOEeRBD23leOIRFsMjtlNrq0VjsvQPQXRoPeIbPH8ByYbraO4Bl3FmYj3GuJn+q24D/e8Ob0+kbqE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QH/UmNRR; arc=fail smtp.client-ip=198.175.65.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707943645; x=1739479645;
+  t=1707943710; x=1739479710;
   h=message-id:date:subject:to:cc:references:from:
    in-reply-to:content-transfer-encoding:mime-version;
-  bh=AMnVPT3YsaL83SCknAVxDWGrAe08XwSa4DstRoszdeY=;
-  b=DM6JlSpCtD7VarN6+7QITMtOubgkYyfC3OnQ+rmBZQlAqIhdGA90exoR
-   5X672Z9mwAmE4JkZz9TJXawsMi7TEI9eN4Jewuazr/Oi49sA8gTZKHZBB
-   bU318fs6anLHqCMCWfc6FVxiiIugUx52V1DxwQXS+TXfxFrmDGQPis0qK
-   JJrSieXTHyzEedUKI6hHMr+1Cf67gF7511QQ3ag6zDjsIzLBhWgmTqE7Z
-   RMmUrmLyEZraB0Q5bmCuYMS5d7Vc0mzJJd0QQA44OpcIpRX7dz+XIHWAB
-   JimZx93f+yl6ywqfCU86YxmiuSrteYm06EeT6w5cl+Qb2Db9QuY3qbnPc
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10984"; a="12728205"
+  bh=gy0iysc5Da9R0DB4N/I2bqAEIU6fDGI+UDTLHiVvtiU=;
+  b=QH/UmNRR8xlI7Dfwjb874IIiq8PuIDdtBDYNyze3hnJ/DAUXvFWYo01Z
+   pkX9cpMAWj16dWYoVlIsFls32A4InxSJuqEOi4B1vaaYXMpNC/AKcD70C
+   qkZgwfYLgfwpeUWDYJvAfNHOC77ZCn/TS1B3FKRYk4+IirQ20ZVyiXGPo
+   GLCQoS24K6rJfVgwaMC62vj7ZDlnoltjo23LabZvxeltz9ZhxvDxt0C9t
+   v9o5oZS+NP99YQYKULNdIb842eOXtxruIw8bLgZ68T9lnOA6nxOzQvGLs
+   6LyD3mIgA++yBG75UwVeMOPMj6CxVhpNAtorkXCtkHMCcUonlMovnt2ad
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10984"; a="1922194"
 X-IronPort-AV: E=Sophos;i="6.06,160,1705392000"; 
-   d="scan'208";a="12728205"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2024 12:47:24 -0800
+   d="scan'208";a="1922194"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2024 12:48:30 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,160,1705392000"; 
-   d="scan'208";a="3675911"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orviesa008.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Feb 2024 12:47:24 -0800
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+   d="scan'208";a="8060794"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orviesa004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Feb 2024 12:48:29 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 14 Feb 2024 12:47:23 -0800
+ 15.1.2507.35; Wed, 14 Feb 2024 12:48:28 -0800
 Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Wed, 14 Feb 2024 12:47:23 -0800
+ 15.1.2507.35 via Frontend Transport; Wed, 14 Feb 2024 12:48:28 -0800
 Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.168)
  by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 14 Feb 2024 12:47:23 -0800
+ 15.1.2507.35; Wed, 14 Feb 2024 12:48:26 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MuOsheiRbckL7TQluNXfffPP11gV+nHMNo9/rE9j5zWIav82Hyd5M9q72uECUQ1eoLvWJI2hcgdO8r39dDSZfxdCb7iq2b5UPF/tOWUZGWyjQdApDKIzK8G2ZrmEUsJ7a3vCDDQBluUjRW05TPi9LDHRYFp/10TaXZBh1Uprh8ABQK18Y5lYMjY5PuT2jleLnHXgv81hKUdhi+03qUjh3ZBgHBr+DUXP8btTIzaddJ9E5S3CGQwMgmq+QBqQEIbogYdRcOiWWXlOqxyl4fznfydUiQfo+dauwUFxNGxkKBHbzMlUTsbpt99q1aINnADGnVxw2BshWuHFQbe6MlYwBA==
+ b=ZuE74pNZoLxkdIKYDegYfhjMVPaav/FwNjwTYWR4HvY2FXm1dtR3n2+JWs+K3oY3Tvy82fD9FjvLDUSrw7q24KNDraN6SjhBe41BLcgiDZ3zqm7wV29H6+GmAB02L62caGJPo5Bc7i+5qnuJuFuiE8hjb3iMiJiEalLUEvRxncQxQ7AD5WV4CvN3RnuNPD4WnLwhI4OW3/mDKzyfH7VaqpIX8Irh7Z+VnSp4vikk8omYlQQ88mGd+fE4Otg1DG8CIV9bP6EwQJL6Je0H3+ELqIDvF8PN++Vf3NQJ/fpVkHU66hpJsY5K5RUAGPsNsesTrSkmh7cPkbYbozSZ8DxyIw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ADpMie1hsGRbhxEhhneyvQmeTMpVVWDL2D7mUOO51ro=;
- b=NNWJqW3x+TuD2LFtUmfL5kx+DJ5CWXCjpwiEnoQ4Ikxn/KGijqEuo2tnRg2LqFEYBu7vsbPFNqjtEjpW8R8RyTKDCpEDo6vpmLsjUXmSBvPbycDBF2bzoHQptyftjssMq1zmbAkoq0BZc+y884pILarkS5TmyeTReHtlExLyPIRv3qrZ7uqsuYI3EhIR3CjjRFFOUFjkcQ+08M4hY1vWOSrgc3nM5mHPum43dnP/7IDxj0gRFDH43f6WZkz1l1NYjj4I2olwMtpdyUtrmBB5NDGi1rgWQNqt6wOtIdXNTsXjdthrcHdDECs/OtIm/sdJ2bkVpaa1Je3yzw/hmEK/Xw==
+ bh=Nzfc/eAvI3Of2h7RNgadH4b+39IDIc4as2FvkxKgoFE=;
+ b=hMjq07ckprHrsJiAqixmGhKmnW/Si8LEzyYAvA64jb6yzd+Z2RmVwBMWl1/rWzVdotEfn9ArL7/GeMCsU2Wqmv4iKfzRzeIJGafzXW5J/o4zFXkSLUcjAHKPNcfseFt/dJUi9mvotYLcem2amCauISJp28H4eEbP6wmTBTguWXI+svkpNGne53qOh/19hkHXtTCT2/Yp9BUKW7Sa0C8EDyasOekd6U6Bt+huNJFTzCdfyDfCGQfiNJqWp76KLbBQDn5foLAlpHehvSM1Bjx0pKgcFyZe4ErXxEV+TQAiLqniTsyrTSgzWriviWxqrmoFS0GNtmzgXWo0wm/eu/0KLg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
@@ -82,16 +82,16 @@ Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
  by CH0PR11MB5410.namprd11.prod.outlook.com (2603:10b6:610:d1::20) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.39; Wed, 14 Feb
- 2024 20:47:21 +0000
+ 2024 20:48:24 +0000
 Received: from CO1PR11MB5089.namprd11.prod.outlook.com
  ([fe80::4069:eb50:16b6:a80d]) by CO1PR11MB5089.namprd11.prod.outlook.com
  ([fe80::4069:eb50:16b6:a80d%4]) with mapi id 15.20.7292.026; Wed, 14 Feb 2024
- 20:47:21 +0000
-Message-ID: <e3bdd081-8c81-4c23-b822-091d3f122afa@intel.com>
-Date: Wed, 14 Feb 2024 12:47:15 -0800
+ 20:48:24 +0000
+Message-ID: <ceca2088-10c2-4a7e-ac4f-50a5338187ac@intel.com>
+Date: Wed, 14 Feb 2024 12:48:23 -0800
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 1/2] net/bnx2x: Prevent access to a freed page in
- page_pool
+Subject: Re: [PATCH v10 0/2] bnx2x: Fix error recovering in switch
+ configuration
 Content-Language: en-US
 To: Thinh Tran <thinhtr@linux.vnet.ibm.com>, <kuba@kernel.org>
 CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <manishc@marvell.com>,
@@ -99,9 +99,8 @@ CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <manishc@marvell.com>,
 	<edumazet@google.com>, <VENKATA.SAI.DUGGI@ibm.com>, <drc@linux.vnet.ibm.com>,
 	<abdhalee@in.ibm.com>
 References: <cover.1707848297.git.thinhtr@linux.vnet.ibm.com>
- <f6b3a268be868e9a528f2549392bf2bdf16e285d.1707848297.git.thinhtr@linux.vnet.ibm.com>
 From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <f6b3a268be868e9a528f2549392bf2bdf16e285d.1707848297.git.thinhtr@linux.vnet.ibm.com>
+In-Reply-To: <cover.1707848297.git.thinhtr@linux.vnet.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 X-ClientProxiedBy: MW4PR04CA0085.namprd04.prod.outlook.com
@@ -115,140 +114,91 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|CH0PR11MB5410:EE_
-X-MS-Office365-Filtering-Correlation-Id: 37e883a1-bd89-47d2-26fc-08dc2d9e2428
+X-MS-Office365-Filtering-Correlation-Id: 168a4521-c381-44d1-c7b1-08dc2d9e4990
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: kEm/PAVL5egMf6PHxjIHab4OV51yRb4ooVYc7I4qopxrGR0qibkqtzh/iSg9fifwoCXD6CnWtprPQAcdHMv8DaRd9O1USZJ6kvbdBdOpz0N4bkw4ubEjnUlwhgIOW/PN6pFq4uIPJvi+zsTrlguuSOVFwLYSf4wZV6aaH6dALK/Z/hAxLHQ5f0ae/C5KnGk4WFMJxLBKFYhhFISwFaNysGJvjw9R9IJEsuPhcaVAwamqMNmPxM9RdEvVkOXYOkgQQUss203D7EhhIusfaMMXvk/5oPwU6kqNe2Fp0cYMDQ49kH4x7PLWscPoiMKOLbp9ctY7TARqhrYCRy9zuEw/6HksxwFVYvxlBtOON1286tU63ZF0B8YFXzsKoh9WDq8g0B3fLgOQ+jkA69V308s9n5RDv4fb+8M0jQ3KZC5RkqsGbOWNouu1fBOg2c3aY2ELw4ObvbMdeovnFhIhcZIZsyLIV5sDKH1fChBBHQ8gaMAd/W7k8U5iSoDO7WsPl2F1ziZImLJdgHxBWqE5HyBiGO4cXXjPXeIvM7XHuEs1BppbzfKwRNo3VeGHYRDfpjEd
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(366004)(396003)(136003)(346002)(230922051799003)(1800799012)(186009)(64100799003)(451199024)(83380400001)(26005)(2616005)(38100700002)(4326008)(7416002)(8936002)(8676002)(66556008)(66946007)(2906002)(66476007)(6506007)(6512007)(478600001)(6486002)(82960400001)(41300700001)(53546011)(6666004)(316002)(36756003)(5660300002)(86362001)(31696002)(31686004);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 4Vhf5QjX1fWJ+lucIssQ5noCG2IHpJwAUAdatacWjyVrEh2Hft4ng5ogZDn6ntUMQGV3eRC2BQbVnfASh5rHSi6MRQCXIiuo0h1P9OBlWxO0/nT25DHPkpqBxsFv5S0nAsZ0A6Qur53R73ExbsLgtkfEiwt3iN2qEnWBTqgU2uM/zdvJC+ooum+dxExzm81fdbSGI+SXDHi2b47ZSMXxEDon0FeoWVdViZAcir++vRxNPgYDvnROi/Ha2g1DMCLjKJhbSUp14nSZz4nQMUydbaiIXxrOOyv/A99gUoxW/FaFQbjfYvF/lO4mv/lXuG8X6+ktcWNE63kFtOJTb5sIrLoi5rXEzSIWNcf6zJaKv0o787bAl3jWol7DdmC9gPT9RAJRtlBryYAm0uohIb1Gmx6+NodSKEJ7nl25307n0BTDVX7IgEy+x9r0CVWxO9K1Z5D1Bpccqpb7vehCtZanytNrZmD0+77+vWW3tQq0vX/+F68ThBc+fV74VfrdAXqcYU8emqB7vO2Op4B5ulMGZTp9WJcmVCqZENiALD1+lSZJPMMntKajdTaZkyWye4F8IRN8SaoCEjCdOJnpF+MfCA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(366004)(396003)(136003)(346002)(230922051799003)(1800799012)(186009)(64100799003)(451199024)(83380400001)(26005)(2616005)(38100700002)(4326008)(7416002)(8936002)(8676002)(66556008)(66946007)(2906002)(66476007)(966005)(6506007)(6512007)(478600001)(6486002)(82960400001)(41300700001)(53546011)(316002)(36756003)(5660300002)(86362001)(31696002)(31686004);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TUxpU2R3NFNIM1V3dDVUYXA2K0FyVU1vVElVNEFRRFQxMWNDT0F4TngvcEpO?=
- =?utf-8?B?cmxsb1RoNkVJbzJiaXZCSVZrbXhudnB4dEMvbHBVaFYyclFDWFZKWWRlMGhJ?=
- =?utf-8?B?anp5U1kxNmh1QnNTL3R1cy9tNS9iYTBjd3VWR1RtNFZ1MmpiaitKYmNBT0VZ?=
- =?utf-8?B?dUNlK3NiZ1E4Kzh2R2VuaGtRQ1BhZGhsclkwdWNZc281TkM0YmRwVVhJYVNV?=
- =?utf-8?B?QWF6ajB6LzgycGF0RE8xWS9ocEpyU2dGOFQ5dXEzcXNTV0xlOFFrbFBjanVs?=
- =?utf-8?B?d3UrODV5RGVzRXk0QjROTEU2LzN6akRKZVdwNTVENmI0dndCd3BjaDdsYk5T?=
- =?utf-8?B?K1drbzg5TjJyT0VydnloeVJkcWxWOEp2SjM0cnJiL09kcUMweDhaaWQvT2Fv?=
- =?utf-8?B?WVBwNkZiOWJHZEt4OElQbWw3OGttTm9DN2tnZjU1QlhjVmRDWUNsM1B2aFpo?=
- =?utf-8?B?ZUFiNDV4NUFPWmNaeTJyTzcwMXFXdE90S25lT3RQN2pIVDRDcmRRU1pPUzZB?=
- =?utf-8?B?S1dBTEovSE16SDd2MXA0V09Kb2g5T1F2STNpek5tK09FOEVKck1kWitRQ0VY?=
- =?utf-8?B?bVlvQmhkRDE4SmhyQzloZWVCZWFNSXBVbGtiNkQ1MTRYLzVGU09CSm1oV1U3?=
- =?utf-8?B?aXBFWTZ0NE1Zc3IyY3l5aGM2bWV3Y2w5eVhKWDVsejkxZGpNV1R0Rnhsbk9r?=
- =?utf-8?B?RFF1SkRDMXFjQm5RODhuc1J2S0MyaTRNZFpyRmR6MmsxZW92MHhlSERxcTlR?=
- =?utf-8?B?dkZTSnJEWVB6Qng2WXVtRytrckp4MWZML29jMWlodWk0aWJJdEZ1anBNR0J1?=
- =?utf-8?B?d1MzaCtKSC80dDA5U0xNNi9YaW80bHdjcUFmakorQXNFb09aVnU4Y0lQOUNR?=
- =?utf-8?B?bzl4Yll2R0RyOGNFdEJxQ2lpam9DNE5SSi9GTTZXS0VveERvR3NISHJPWGZ2?=
- =?utf-8?B?eHNwelZ3cFhnTkY3ZVd2VzdLMUpSMFpoQ1d1UU5FTFVhaHRtby9TZnljRDFT?=
- =?utf-8?B?ZDdOcmFneHFtZlZwQVpnQ2VIUzNGOGpmM3lhRnZlckJUZmN4d1dGRmViU0pn?=
- =?utf-8?B?bzdmZGo3SzBlV2EraGJ3ZlBaTDdsdXBIclpXb3h6SFA5Y1JqbmFLTGVpSGlW?=
- =?utf-8?B?Z3QxbkVVU2lBalN1aENMMm9DaFFXclFuTWFNUEh3UWVER0JYRUhtRCtvMXhM?=
- =?utf-8?B?K21raFBCdzAxbDZ4RkEyWmdpRkVCR3IvcENMdTZZWDhEQmc5YWdhQW5XeTdW?=
- =?utf-8?B?RGJrL2JKUzJSMms2dHVEZW01YnRDR0kwZ01veDJWLzJRTm9PYWVKUENKa0xS?=
- =?utf-8?B?RWRmTSsxU0hGTDZXNisvdU5aeXB2NGptdHB3K1dacjlKdDRwNktrZ3VCU1kz?=
- =?utf-8?B?dDFyNTR6ZXFDZFFOb09td0dPN1BuOHZhZkppMDhVcVEveHpCSDI3OUVjNzFB?=
- =?utf-8?B?a0dXbjVRdk14WVlHQXVvWElvaDVZTEVzRzVva2RuZVR2WFpmcVZrRUV0em5J?=
- =?utf-8?B?Y05jd2k4R3Y0Nm1Rdjl2NkFGY0VFaXhySDBqU3dtM3UvK1Q2OVkwcjFTWWZZ?=
- =?utf-8?B?eFhxMVJTbWoySlRqSGQ3Qkl4V0pCbS9LeTEwd0RvaVZpQUtRdmlGc0RYTHZi?=
- =?utf-8?B?M0tTUHpJYmhYWE5NTkNtZGVMVFp2dW40dW1EL2dHRUtYenBGK1FOSkQ2Mytx?=
- =?utf-8?B?ZHY3OE5RRGZJcmN3RTUwMjRFd2VWemMwRG9tY2tiREUyMWJ6RzlibmNyMTRU?=
- =?utf-8?B?aVNyWEt5UkNBN2Zmd2x0WEhHZGtVajI1RnZQanRxOGNTQ01aSXMyck9NSFhp?=
- =?utf-8?B?UTl0d3VsZHBkd1M3eXhEOXNDV05oNVl5dzROdlpPdFgrcVlRWW9TYUVxQVA1?=
- =?utf-8?B?QktMNDBHZ2lmL2FvNkdxc0JzVWY5RnNsK211NGNWUnJCOUk0WDlvM2VsZ2t1?=
- =?utf-8?B?c1lPQ0ZkcGV6WEFiVEMrcVFrSGVvMzlGTUZWR2x2ZzZNTS9KSmRGSmN0cVJ1?=
- =?utf-8?B?bzBjRm5RemFlMUpMWkp6eXdUWVlXT1k2STkwQ0tiRVQxUVNUSXVCTUZqTFYy?=
- =?utf-8?B?OHhiTU5qaVBxMlk0OGhxWXVYdTZaL3JCeXdZWGtza21YdU9aRUxLdGVEM21K?=
- =?utf-8?B?RGdaZUNwSHBad1A1M0svejRDZm90TUZyT0VyT2lzZmVGeUVJTkJSeTIwdEc2?=
- =?utf-8?B?UGc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 37e883a1-bd89-47d2-26fc-08dc2d9e2428
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MXpoeFVUc2x3Z2ZyYXhWK2RjZk95SUNTZ1dBN2tZa2YwMTV5UThLTktDUFRZ?=
+ =?utf-8?B?UFRZc3IrOFRMZU5FTkRGdGFabjdzVXMzVFlZelRlc3cybVIxY0h1TnN0eG5T?=
+ =?utf-8?B?VkVQKzhzRUxvdWk2blpZRllHazdIZnIwWnFDbnZiaEhCYzQ4S2RBUXBZM2ta?=
+ =?utf-8?B?UlFzRTUvWlc2bHhoUTdoMnpmdlRmRGRBTEQ3WVJyMjh5WSt6LzZWN1NoRHNl?=
+ =?utf-8?B?ZnZiYmNwRi9xSmN3Sm9neFFlS3pLeERKTG9SNlROcGk4Q1p5djR3clFaRFV6?=
+ =?utf-8?B?TkRudmtEMHZvTm9BUlN4N29idGJqL2xZaGFkOVZUWFBwOGhJbW4vODJLdzF5?=
+ =?utf-8?B?S2hrNEVSSmJjemthZXI4eG91WndzM2pOd3dtVkhJcUF5RzYzR2w5STR6eDZF?=
+ =?utf-8?B?aTdHYjhvYzZXMXE4a2lPa1hxb2FXbDZpOVk3RlAyRUlLWHJqTCtFazRLbmR5?=
+ =?utf-8?B?dFNKZW90RnNCSVRIbmh2a3RLVFhJcUdDN3VZUlBpWGo2UFFIdndiV2FJaXVv?=
+ =?utf-8?B?WFFrOWRkaTF6dkE1cExoU08xTkJDYjZVUjNtcVozTGEzSjhhSGU4aEU2OWQz?=
+ =?utf-8?B?ald3WXc0dTNsaVJXa0pxd3BZOGxmazdVaEdkNTdyQnhucHltNFIwN2tCSUFY?=
+ =?utf-8?B?T3M1WEI4NllPdWNIdXd6dVlPR1JMV0RKRUtHN2UyVWczaGpMZUxsNGMvbWln?=
+ =?utf-8?B?Z2xQREJwZHVqSXVjWHZCOVZXbWp3S3lyeWhIdytxWUY4cXpZa1lOSDlHUGFU?=
+ =?utf-8?B?NzdHRzhtZXA5TEZFeFhFZ1crSGdqak9URGU0N2YwV1I4a2EzaDY0VEFpRlA3?=
+ =?utf-8?B?d2pLdzJVVDJ0ejZBZjhGVDBxakRNUXF5ZWsrMUVtWXJYU0c3SzUvbkNPeU5y?=
+ =?utf-8?B?QUNDS1prdisrZFIzM1I3RmZNSDRiSTVxVnE2NkRzTTlwaU1IcDAzUTRJcHYz?=
+ =?utf-8?B?V2dOMGNQYWdtUnlCcGxtMVB3S3c4dU9zRUVUdWN1Q2kvOTRLTXZNaHdoRXNS?=
+ =?utf-8?B?cWVzeVpKTUdSamV6TVcxNlpZRlYzOGFzWklXU0RBQjVrSmwxM1lQMGlLWVFL?=
+ =?utf-8?B?YzE1SFZqbVdlVE1rb1ZVSk42TEVWNnY1TVhVbnVEL1ZNdHdXM0VtL2NMZmd6?=
+ =?utf-8?B?MllhNklGcE9UWDhTVGgySnVsRVNMeGxQRUFPWllPMmpZSC96RXN0T3p6VmJU?=
+ =?utf-8?B?bFlDL0RRT0R4T0ozUXhudE8zY2FvelQ4dEJId3E4b3ppR2J1Z1QrelM1Q3la?=
+ =?utf-8?B?eHRHZVJHQ0tmU0lZeDROSGRacGk0WU45OGFNZGJ2NnN3cnFiWkRUZ3NJUC9i?=
+ =?utf-8?B?SFlOVU1KU1FuNWg0TTJOWHlCNDlxZVVVY0RIN3k3eVRucXM1WmNMQmlCYTU2?=
+ =?utf-8?B?N2IrV2hhZnhkNHlFZGpuQlpnenNkdkFsQjkvWXE1Y0l2VmNpRG51ajFDZUZB?=
+ =?utf-8?B?M0w5ZDh6enVJWU1sN0NiendQM21qekwxS1dYZEJCVlRRNEZDRkVSazhIMlNC?=
+ =?utf-8?B?bHRUVi9DNVRXM1puTWJlU1Z4elJOUmhqclpZQUg5ZG9qSGtKclpvTElva3F2?=
+ =?utf-8?B?disrQjRQWDE4SGYwRVF6L3FwdjFtdjFpQXpJR0g5Q2pjTWNLMGx4NnR6angz?=
+ =?utf-8?B?WkZVZlI2dUg5ZG5NaVozRG5pWTdyeXNyZ0pwU2tMWFNCVng3aDJJV0loZGpO?=
+ =?utf-8?B?eE1KTzBxVG81aHZBaCs5V1FzRm5ZcmRsN0dia2k2U215K3BYeDdUSGhDcHBl?=
+ =?utf-8?B?ZGQxZ2REREMvOTBDS1hEM0dYbS93VHViSkU1RDRGQ0h6c082eFdWOUcxRFVZ?=
+ =?utf-8?B?UHU5clRmb0I1dkgrbnJENUtsd1c5UmlpT0tOWGdOaDVpSHRiMG1DSmMwZjlz?=
+ =?utf-8?B?S0NYeit2c1F6eDd6TmpOd2hDb1VNNGNMYnNPd0NWTk0raG9BbTdvZkJrYW9i?=
+ =?utf-8?B?RDU4aUVHWlV3a2g0dlRlaXR2RXJjeUttcHlYejFXQyszcGkwZFgzRGJuTnlK?=
+ =?utf-8?B?NURDOUEwOTlPdGNLU0t0SnNkdHUyTm5aN3pVdU5MOW5zOHBzQk1aczlGTFBN?=
+ =?utf-8?B?Z3k4b0tnRW14NG8yTUovTVNaSmEzQnh6Q1d5Y1pmUFdsaDRGVy80S04xa25k?=
+ =?utf-8?B?UjdQR0daMmdFem02QUZlSkVwbk1LUllVeDk2N3ZTd3V4S0RpQlgrZGtlS3F4?=
+ =?utf-8?B?TXc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 168a4521-c381-44d1-c7b1-08dc2d9e4990
 X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Feb 2024 20:47:21.5220
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Feb 2024 20:48:24.4469
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5kLQxHY84BoUub/8+cWcEpah5IG1t5QGtHtj0rq0NA8IOkYtzmeOc6Rcn83Y0sUNBDWdUzgKoiaUO9tmvqvpLLXfdE6y+RF7Ef2GVLJyzYU=
+X-MS-Exchange-CrossTenant-UserPrincipalName: K0ghr+gXYGiiCoSrjCwOERWRjjd3mAYRBO8Mxj27PnhJEkEvfbSUKKHMDpnytzlM6d+oXoROpVxacY+7FhWuz7Pdk7aoEF0dDfk8JT6UJ6c=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB5410
 X-OriginatorOrg: intel.com
 
 
 
 On 2/13/2024 10:32 AM, Thinh Tran wrote:
-> Fix race condition leading to system crash during EEH error handling
+> Please refer to the initial cover letter
+> https://lore.kernel.org/all/20230818161443.708785-1-thinhtr@linux.vnet.ibm.com
 > 
-> During EEH error recovery, the bnx2x driver's transmit timeout logic
-> could cause a race condition when handling reset tasks. The
-> bnx2x_tx_timeout() schedules reset tasks via bnx2x_sp_rtnl_task(),
-> which ultimately leads to bnx2x_nic_unload(). In bnx2x_nic_unload()
-> SGEs are freed using bnx2x_free_rx_sge_range(). However, this could
-> overlap with the EEH driver's attempt to reset the device using
-> bnx2x_io_slot_reset(), which also frees SGEs. This race condition can
-> result in system crashes due to accessing freed memory locations.
+> In series Version 6, the patch
+>    [v6,1/4] bnx2x: new flag for tracking HW resource
+> was successfully made it to the mainline kernel
+> https://github.com/torvalds/linux/commit/bf23ffc8a9a777dfdeb04232e0946b803adbb6a9
+> but the rest of the patches did not.
 > 
-> [  793.003930] EEH: Beginning: 'slot_reset'
-> [  793.003937] PCI 0011:01:00.0#10000: EEH: Invoking bnx2x->slot_reset()
-> [  793.003939] bnx2x: [bnx2x_io_slot_reset:14228(eth1)]IO slot reset initializing...
-> [  793.004037] bnx2x 0011:01:00.0: enabling device (0140 -> 0142)
-> [  793.008839] bnx2x: [bnx2x_io_slot_reset:14244(eth1)]IO slot reset --> driver unload
-> [  793.122134] Kernel attempted to read user page (0) - exploit attempt? (uid: 0)
-> [  793.122143] BUG: Kernel NULL pointer dereference on read at 0x00000000
-> [  793.122147] Faulting instruction address: 0xc0080000025065fc
-> [  793.122152] Oops: Kernel access of bad area, sig: 11 [#1]
-> .....
-> [  793.122315] Call Trace:
-> [  793.122318] [c000000003c67a20] [c00800000250658c] bnx2x_io_slot_reset+0x204/0x610 [bnx2x] (unreliable)
-> [  793.122331] [c000000003c67af0] [c0000000000518a8] eeh_report_reset+0xb8/0xf0
-> [  793.122338] [c000000003c67b60] [c000000000052130] eeh_pe_report+0x180/0x550
-> [  793.122342] [c000000003c67c70] [c00000000005318c] eeh_handle_normal_event+0x84c/0xa60
-> [  793.122347] [c000000003c67d50] [c000000000053a84] eeh_event_handler+0xf4/0x170
-> [  793.122352] [c000000003c67da0] [c000000000194c58] kthread+0x1c8/0x1d0
-> [  793.122356] [c000000003c67e10] [c00000000000cf64] ret_from_kernel_thread+0x5c/0x64
-> 
-> To solve this issue, we need to verify page pool allocations before
-> freeing.
-> 
-> Fixes: 4cace675d687 ("bnx2x: Alloc 4k fragment for each rx ring buffer element")
-> 
-> Signed-off-by: Thinh Tran <thinhtr@linux.vnet.ibm.com>
+> The following patch has been excluded from this series:
+>     net/bnx2x: prevent excessive debug information during a TX timeout
+> based on concerns raised by some developers that it might omit valuable
+> debugging details as in some other scenarios may cause the TX timeout.
 > 
 > 
-> ---
->  drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+> v9: adding "Fixes:" tag to commit messages for patch
+>     net/bnx2x: Prevent access to a freed page in page_pool
 > 
-> diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h
-> index d8b1824c334d..0bc1367fd649 100644
-> --- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h
-> +++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h
-> @@ -1002,9 +1002,6 @@ static inline void bnx2x_set_fw_mac_addr(__le16 *fw_hi, __le16 *fw_mid,
->  static inline void bnx2x_free_rx_mem_pool(struct bnx2x *bp,
->  					  struct bnx2x_alloc_pool *pool)
->  {
-> -	if (!pool->page)
-> -		return;
-> -
->  	put_page(pool->page);
->  
->  	pool->page = NULL;
-> @@ -1015,6 +1012,9 @@ static inline void bnx2x_free_rx_sge_range(struct bnx2x *bp,
->  {
->  	int i;
->  
-> +	if (!fp->page_pool.page)
-> +		return;
-> +
+> v8: adding stack trace to commit messages for patch
+>     net/bnx2x: Prevent access to a freed page in page_pool
+> 
+> v7: resubmitting patches.
+> 
 
-Doesn't this still leave a race window where put_page was already called
-but page hasn't yet been set NULL? I think you either need to assign
-NULL first (and possibly WRITE_ONCE or a barrier depending on platform?)
-or some other serialization mechanism to ensure only one thread runs here?
-
-I guess the issue you're seeing is that bnx2x_free_rx_sge_range calls
-bnx2x_free_rx_sge even if the page was already removed? Does that mean
-you already have some other serialization ensuring that you can't have
-both threads call put_page simultaneously?
-
->  	if (fp->mode == TPA_MODE_DISABLED)
->  		return;
->  
+The subject didn't clearly identify net-next or net... but the contents
+of the series seem to be one bug fix which would make sense to go to net
+(unless the bug itself isn't in net yet?) and one refactor that doesn't
+seem reasonable to go to net..
 
