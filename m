@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-71783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA7D88550E7
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 18:55:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A48368550EF
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 18:56:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 189371C29725
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 17:55:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F26828E6AB
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 17:56:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7F941272CE;
-	Wed, 14 Feb 2024 17:55:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 648EC127B6D;
+	Wed, 14 Feb 2024 17:56:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="owtK9vph"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Ags5qKqz"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F7701272CD;
-	Wed, 14 Feb 2024 17:55:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC28127B5F;
+	Wed, 14 Feb 2024 17:56:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707933343; cv=none; b=u+HWYsCjMSas5VTWkt654m1uTvPgjE6M7uRS3/Z+jv7ENFvQXzXB6A+seweEd18GV7+aPPIRL9kOGk6d0hjC64ESnM3WzNUiRmLDp/p0JyxE9Lz3xhvGrDYd8ruM+0V8sfdbAkpt4TRYMRSo9CGpixCLAG1368As8cWpIfuujE4=
+	t=1707933363; cv=none; b=TMJcbnHiYvqYoirLLGbJzJ4SrJSRh83oenBvFQcB0r1IjElTctMDYHL8fHZxMWNMyUoA9gipdupvGsbPRBWsjPRH+u+Wru6HzAI/xupduqIwNfp57y0eqnvgbMUIpzhEXYVbZ7+sfYGglMCPP22p/fWSSgjwPbDN8vVc9VN/6kg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707933343; c=relaxed/simple;
-	bh=Nw7+vdT/duayZz/jMu/uTkdvCgtRC8RYfJqfMVkxq0Q=;
+	s=arc-20240116; t=1707933363; c=relaxed/simple;
+	bh=EPgOn88Bqs3+CbigrNlKuT37+FLfbDO+xmmDOk72BtU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fa1MAWqjqhrsfEKfKU6SHk7pe4+ZOsH97W8BX2XXvKUQ+DHSKKRcCO2eoe+GMF2IoGEoGIXgTKL3SRjZhmkQHCClM85PWbfOUzNT0YkqJlEAiIUPohqrD+OD2Ua+RcqruFa/ivlCwrpTtCocC9tjsUZVTuK5okA3mPD2CkpkW/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=owtK9vph; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=XtswMEdiySx6Yb4qwS3vfKAdIqhPSD17B1MdAS4ZNnwPWbTh61aNHstStXqiIXyvnwB71H6Q9ajlydpKoH+XAUnkcKcpWhF9Vft0o1Spgso6xwVtU1Rtu5zxp0RU/eprhgD2KYHi3blusAZE+ECmsTdyzWkIjRMp2p7CMrfW2mw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Ags5qKqz; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=7PW7iQBUkHKpGxwZBS1QhoLnsi0mP3M0IqEdbwJt7cg=; b=owtK9vphaHlWGfIV56l03Iqbqh
-	G/Y8mbMMXJrnKJNswm2o7LGdiQpGl895H0ibVdKZ/i4rVk+AnL/X+DvtIU1IzPN9d7f3YirDTNvCF
-	v7miZpQz5AvG3Owh/knmB+lydFXZGrZs5LnKZzEEL1wAEK+DNnqzCezzPDi6Gk0v6ZpY=;
+	bh=FjPork/vCYUNmQ8wmh/BaLGaTRTv7+JxGtfWI5A+6XI=; b=Ags5qKqzplLOLZ99ZzVKqUcQEL
+	0DHvjNd/tNy5KTst0xvEnwUZEKu9NSYOsyjkZtb14+qCgus0m3G94sBwGvDVnSo1oFMcdsGMQgz9M
+	B/OWvNjr7fiEZEffbNT67hHhoZ7qP+pKYA58JdToblnngKOwoRtTPdiTfQkebxxX3XZY=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1raJU1-007oRw-Ez; Wed, 14 Feb 2024 18:55:45 +0100
-Date: Wed, 14 Feb 2024 18:55:45 +0100
+	id 1raJUL-007oSe-Pd; Wed, 14 Feb 2024 18:56:05 +0100
+Date: Wed, 14 Feb 2024 18:56:05 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Dimitri Fedrau <dima.fedrau@gmail.com>
 Cc: Heiner Kallweit <hkallweit1@gmail.com>,
@@ -52,11 +52,11 @@ Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 net-next 13/14] net: phy: marvell-88q2xxx: remove
- duplicated assignment of pma_extable
-Message-ID: <0595282e-8734-4f9e-8d3e-0867b2cc0d41@lunn.ch>
+Subject: Re: [PATCH v6 net-next 14/14] net: phy: marvell-88q2xxx: move
+ interrupt configuration
+Message-ID: <32493eb6-a55d-401c-b359-0c58b1d22f12@lunn.ch>
 References: <20240213213955.178762-1-dima.fedrau@gmail.com>
- <20240213213955.178762-14-dima.fedrau@gmail.com>
+ <20240213213955.178762-15-dima.fedrau@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,12 +65,12 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240213213955.178762-14-dima.fedrau@gmail.com>
+In-Reply-To: <20240213213955.178762-15-dima.fedrau@gmail.com>
 
-On Tue, Feb 13, 2024 at 10:39:52PM +0100, Dimitri Fedrau wrote:
-> Remove assignment of phydev->pma_extable in mv88q222x_revb0_config_init.
-> It is already done in mv88q2xxx_config_init, just call
-> mv88q2xxx_config_init.
+On Tue, Feb 13, 2024 at 10:39:53PM +0100, Dimitri Fedrau wrote:
+> Move interrupt configuration from mv88q222x_revb0_config_init to
+> mv88q2xxx_config_init. Same register and bits are used for the 88q2xxx
+> devices.
 > 
 > Signed-off-by: Dimitri Fedrau <dima.fedrau@gmail.com>
 
