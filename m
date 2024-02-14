@@ -1,145 +1,109 @@
-Return-Path: <netdev+bounces-71716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAEF2854D23
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 16:42:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEDB5854D44
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 16:48:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A537428159B
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 15:42:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B20C28B2C2
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 15:48:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 519F45D756;
-	Wed, 14 Feb 2024 15:42:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E9905D8F8;
+	Wed, 14 Feb 2024 15:48:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="H+jixvZO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bVV9pLFY"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A23E5D732;
-	Wed, 14 Feb 2024 15:42:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 586585D75E;
+	Wed, 14 Feb 2024 15:48:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707925326; cv=none; b=JtoTsTdAumfYRnnMRG69RMbcUpyCGFsR0zZ0ymXEgnRJVyWgSEORUs0mHFyBYOV8d15KlWCJ7sJHHsCXkzweoefZf7c1O5iXd9Cdlf/NfWZmjBDdpYE/NMwmczVBokJp/g3i1ibT7Z23moN6bLZ2AsTsRwRWLV5X69mfrZZRFe8=
+	t=1707925714; cv=none; b=KPp8T6jNZ5mqChFgS1VEjFSWya1ujM5H7mXD80nqGA0nFFSj8tRQvqhnVw53CRqygid63rFX6jHojPl5BCC26fKTIhFPyPmlkvkOfD/ckkJ1RfA1tlqjPfiDE5wPKFgWtFQ+POJeTyil68LIIcD/MZd4sb/fknoYzOy4j8NlXxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707925326; c=relaxed/simple;
-	bh=fNbaUQKnlqEMDtnT9Negz1cAQM5I1BvNB5V3Wy7E/7k=;
+	s=arc-20240116; t=1707925714; c=relaxed/simple;
+	bh=z3XwdfOdEHfS4GV1GgNNK7GZS40lTdoLjyVB6nLYx3Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OjNVqDn2lCBKFP6d5nSdGJ8c3S7dkAe3inll4YROP2R70oRgW1/Om9Pn/BRxR/IVwKTYkLuqdG3pRVnzvkgkIa9PvSTdkY7PE+5ISNC1aHEwA5HefGvUjhXoR300+UkbKXZ7Skg9gMJ2Ddw32l3+A6zGbYrpYsmmU8v7FJTiiQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=H+jixvZO; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id F1C5A1BF204;
-	Wed, 14 Feb 2024 15:41:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1707925314;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Na5G4sxiicAdKoJQUQHlrk8NKd8DIbup+Qjfv3MfFOA=;
-	b=H+jixvZObQoWqFarWziwlCexqzc1ILdE2JO0jQ/4k3ZZGF0oB2Nu0xg+QsZi0QTY4FMDAV
-	7cLDqjnpiPOp/U6nJTMgD4YgyNsiOdkeEEgIRN89s7ajuOJKtKzY5hN5zQj5+XBzxJiTe/
-	cTZaaxt2rJbDVQ5ujTtwcAop0eybMTcU6hQg9gjkPHPaotTzZC9QrpNGsX8AjJz+DUZal3
-	WYUi8LAAPdd5jouNPy6+HxD5odAIvuk0Xn2zwgykX7FNlz92HnNEvO117cDGHPwVBMDbQK
-	ZXRx7fEV0TaSw8qrAK3L+MqFM/hWC/EnmuxXzAZPCHe9lg7kMVbwRMno2IlzcA==
-Date: Wed, 14 Feb 2024 16:41:50 +0100
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: Rob Herring <robh@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
- <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>, Mark Brown <broonie@kernel.org>,
- Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Heiner
- Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v3 10/17] dt-bindings: net: pse-pd: Add another
- way of describing several PSE PIs
-Message-ID: <20240214164150.5be591d0@kmaincent-XPS-13-7390>
-In-Reply-To: <20240214141310.119364c4@kmaincent-XPS-13-7390>
-References: <20240208-feature_poe-v3-0-531d2674469e@bootlin.com>
-	<20240208-feature_poe-v3-10-531d2674469e@bootlin.com>
-	<20240209144349.GA3678044-robh@kernel.org>
-	<20240214141310.119364c4@kmaincent-XPS-13-7390>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	 MIME-Version:Content-Type; b=je70XZ0Oikvnq/qwEfxzf6lcMgKBUZU8RHeTvDLFFE23GHtaR6Ml1cPxdbjIRXshjg2682hw2s36orFxvT4UMlZe5e1OE7AsMmkykG6fj/s9F4Vr+AF353A76VK/8RbbSHxLo2hQ/iJQYk4akoKk2fuHxRn98tIoCvaBjKNW2Mo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bVV9pLFY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D573C433F1;
+	Wed, 14 Feb 2024 15:48:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707925713;
+	bh=z3XwdfOdEHfS4GV1GgNNK7GZS40lTdoLjyVB6nLYx3Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bVV9pLFYnPUAZlhUY5y0ikLVaG0dOL0NIEnh97b0e4CXBb19J5aXXBTou6slwO4Ey
+	 G0d6/tqvDjychPuL7COFamHwBmXGbT3Ui3cPcfOlyIx1ecUwb6eHLKtnm6CtJGKD2V
+	 D48uxXaynCRnXZiNQK1RYvGmh2mi8pzxnfdVISf/L7BzGuIDelpelCr5tL3jz5pdf7
+	 4NCBsbhoU97MvP5af5odCdH2lWn10msAPDCmMmG6SM/wCezxkmdmfzhXuk36bqDsT8
+	 T0ihWfTFgyF4JLROqd1uy71GgXZbI/LUWNbvx5JQRiVxV5sywghopHJlIzDoUrDgj+
+	 G9i3Mx3TFDwdw==
+Date: Wed, 14 Feb 2024 07:48:32 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Leon Romanovsky
+ <leonro@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>, Jiri Pirko
+ <jiri@nvidia.com>, Leonid Bloch <lbloch@nvidia.com>, Itay Avraham
+ <itayavr@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>, David Ahern
+ <dsahern@kernel.org>, Aron Silverton <aron.silverton@oracle.com>,
+ andrew.gospodarek@broadcom.com, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
+Message-ID: <20240214074832.713ca16a@kernel.org>
+In-Reply-To: <Zcx53N8lQjkpEu94@infradead.org>
+References: <20240207072435.14182-1-saeed@kernel.org>
+	<Zcx53N8lQjkpEu94@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, 14 Feb 2024 14:13:10 +0100
-K=C3=B6ry Maincent <kory.maincent@bootlin.com> wrote:
+On Wed, 14 Feb 2024 00:29:16 -0800 Christoph Hellwig wrote:
+> With my busy kernel contributor head on I have to voice my
+> dissatisfaction with the subsystem maintainer overreach that's causing
+> the troubles here. 
 
-> Hello Rob,
->=20
-> Thanks for your review!
->=20
-> On Fri, 9 Feb 2024 14:43:49 +0000
-> Rob Herring <robh@kernel.org> wrote:
->=20
-> > On Thu, Feb 08, 2024 at 02:08:47PM +0100, Kory Maincent wrote: =20
-> > > Before hand we set "#pse-cell" to 1 to define a PSE controller with  =
- =20
-> >=20
-> > #pse-cells
-> >  =20
-> > > several PIs (Power Interface). The drawback of this was that we could=
- not
-> > > have any information on the PI except its number.   =20
-> >=20
-> > Then increase it to what you need. The whole point of #foo-cells is tha=
-t=20
-> > it is variable depending on what the provider needs.=20
-> >  =20
-> > > Add support for pse_pis and pse_pi node to be able to have more
-> > > information on the PI like the number of pairset used and the pairset
-> > > pinout.   =20
-> >=20
-> > Please explain the problem you are trying to solve, not your solution. =
-I=20
-> > don't understand what the problem is to provide any useful suggestions=
-=20
-> > on the design. =20
->=20
-> Please see Oleksij's reply.
-> Thank you Oleksij, for the documentation!!
->=20
-> > >=20
-> > > Sponsored-by: Dent Project <dentproject@linuxfoundation.org>   =20
-> >=20
-> > Is this a recognized tag? First I've seen it. =20
->=20
-> This is not a standard tag but it has been used several times in the past.
+Overreach is unfortunate, I'd love to say "please do merge it as part 
+of RDMA". You probably don't trust my opinion but Jason admitted himself
+this is primarily for RDMA. RDMA is what it is in terms of openness and
+all vendors trying to sell their secret magic sauce.
 
-Not so much used indeed:
-$ git log --grep=3D"Sponsored" | grep Sponsored    =20
-    Sponsored by:  The FreeBSD Foundation
-    Sponsored by:  The FreeBSD Foundation
-    Sponsored by:  The FreeBSD Foundation
-    Sponsored by:  The FreeBSD Foundation
-    Sponsored-by: Google Chromium project
-    Sponsored: Google ChromeOS
-    Sponsored: Google ChromeOS
+The problem is that some RDMA stuff is built really closely on TCP,
+and given Jason's and co. inability to understand that good fences
+make good neighbors it will soon start getting into the netdev stack :|
 
-Is it ok to keep it?
+Ah, and I presume they may also want it for their DOCA products. 
+So 80% RDMA, 15% DOCA, 5% the rest is my guess.
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+> I think all maintainers can and should voice the
+> opinions, be those technical or political, but trying to block a useful
+> feature without lots of precedence because it is vaguely related to the
+> subsystem is not helpful. 
+
+Not sure what you mean by "without lots of precedence" but you can ask
+around netdev. We have nacked such interfaces multiple times.
+The best proof the rule exists and is well established it is that Saeed
+has himself asked us a number of times to lift it.
+
+What should be expected of us is fairness and not engaging in politics.
+We have a clear rule against opaque user space to FW interfaces,
+and I don't see how we could enforce that fairly for pure Ethernet
+devices if big vendors get to do whatever they want.
+
+> Note that this is absolutely not intended to
+> shut the discussion down - if we can find valid arguments why some of
+> this functionality should also be reported through a netdev API we
+> should continue that.
+
+Once again, netdev requirements for debug are - you can do whatever you
+want but other than knobs clearly defined in the code interface must be
+read only.
 
