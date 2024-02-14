@@ -1,337 +1,320 @@
-Return-Path: <netdev+bounces-71821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DF97855370
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 20:47:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B2B5855354
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 20:41:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62D901C22031
-	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 19:47:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 845461F21FDA
+	for <lists+netdev@lfdr.de>; Wed, 14 Feb 2024 19:41:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A1A913DB96;
-	Wed, 14 Feb 2024 19:46:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6880213B799;
+	Wed, 14 Feb 2024 19:41:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="TC4Vh5o2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Num6IaqH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5670A13B7A6
-	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 19:46:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707940005; cv=none; b=COWAsehHuApsLOjZP84AxP11XXULCb2woQ/eiPDZKjug8aUsuXrsWRAxWp+2z9+YNCOmoHfYMKFnAWPRXtZ7rRFBg5Jc7TxIOcxZzdxF0OtmBcm5IUI7CFB9ByULYyutOY4HRXtpI7k/aNIX3yiLANZIHzhM0IRL1Nmywiso0YU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707940005; c=relaxed/simple;
-	bh=8JANgonbhxeKKW+uDQio029nIJhsiCtPP+8BxgNgaqA=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 MIME-Version:Content-Type; b=YBNnXhIrhroy/4U+/UB1Osq7jjrZFXy3Gq6Mk1uVlTjBdCAFHm/hYNRzVdzQduvfv031o77fVv3/rU7mD4MrCcZwbkbU5LCynVYnY1HnJxxyJCtQcXQ1ANA8ajlSeJ3y5A3xUPX+u1OHd0thv7HKVZCkgskM+Y6oW/NrVxVnwyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=TC4Vh5o2; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-511a04c837bso83464e87.0
-        for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 11:46:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1707940001; x=1708544801; darn=vger.kernel.org;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=winRWyZ6BCVdhQy1fH4iOgSBQ13zKw7iL7yywIIe8RM=;
-        b=TC4Vh5o2ipdYYhiVIo0VFwbMCkrojjOgHEGWOyV5k2xl9uFraXrY6yRKkXyFHJduGA
-         seHjJelGx+0NJ1D0rH91Rs65BLALU8OBHEeyZs8oTDCgLre1vemJZunECl8qN+3WCFO7
-         KMPgs7yZ9gVw+OFYp1PHDNhACHTo5k4aMMs/Viuxb/kkGfkfvAgK3bNJiFaHMsqg6FtI
-         3Wt6izpSMxC2IvYDWQf9ynrKvg6aH7WMQGvKBkP0pUUifvWE3kKI12r1LiYR7RbvkuYO
-         UrCm/msYLXSBE2IUhIqGFRKRaAspBHmh+/pTx3+Qmif+puYmoy/bIPFY1m24utgw1mwk
-         Esjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707940001; x=1708544801;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=winRWyZ6BCVdhQy1fH4iOgSBQ13zKw7iL7yywIIe8RM=;
-        b=RudKIqrnlt2PQV/vI1M5WfgJuruVvvAlDKU/Eq3egOHQBm0s6P/J7jIYunbH/02DLw
-         cquGS+NXZ1IiiZv+R6MuyRKujTNvnZqufcBwY9/R0EpW0JzBq5hDvsE59Sm1rMZT6Nd5
-         7WxXub/WVdC4TywwF8X2nFWFPRiWXG3qBSKqyTsAO4QEzjCmgsBglOQSWRoGYeLPrkAp
-         uf5aAG2GYxi01SAZeI2FAAmPV3StMEF1N1tsW5Bgg2JWLFmCwEyzlU+Kij3eSIsWPbqS
-         fsCxT9dFOwhST348CYYMW0XYx5IdIUvhOJnOzVcVDKY1IdPzHau2EL7T6zAMeVHaD/Fn
-         8VAg==
-X-Forwarded-Encrypted: i=1; AJvYcCX0yS0bfsV26XxV7rlexuYL3820LUohiAYGxFguJiWo5rRi7t+GNaQDg1h7I6vCdxfzJbdRti2nhS9KcfX8zYHuyelRC3AZ
-X-Gm-Message-State: AOJu0Yz+zxxWq1QhJj/eWvzD5bgFHZ6KF9XT1Mqox/NTf1e27AlecmUt
-	O/RgBbmg2O6p+TYYSO8c8f1NW0CUEHYKpAjwluU7Jqk9by5acN7XjsamWJRRoJw=
-X-Google-Smtp-Source: AGHT+IGWermj9iVugSzWhtIFX8NBulc1XSNjHnrLZ7WhZ7HXabcKCDnvgoLRTVngyqH/61APFx2j5w==
-X-Received: by 2002:ac2:4a9a:0:b0:511:850b:3665 with SMTP id l26-20020ac24a9a000000b00511850b3665mr2289521lfp.64.1707940001157;
-        Wed, 14 Feb 2024 11:46:41 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUoQpOe4pUjNikhk9lzdssveN4E5ukf1phZAwk7gzSwX3oNszJej4o+tpxLn4S4Uh3qs0yHNxeivHgLFAHvHVYtYL2cOyW3CVRdSasaiRFuskvr3IXoiW0K2M/pvnT/2jBZiaB7E363CHlqRMKXsc/MsvBl/sYSqnX2Gj2R4GQ=
-Received: from cloudflare.com ([2a09:bac5:5064:2dc::49:1f2])
-        by smtp.gmail.com with ESMTPSA id vv3-20020a170907a68300b00a3d29f0afeasm1266079ejc.2.2024.02.14.11.46.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Feb 2024 11:46:40 -0800 (PST)
-References: <20240213154416.422739-1-kuba@kernel.org>
- <20240213154416.422739-4-kuba@kernel.org>
-User-agent: mu4e 1.6.10; emacs 29.2
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: shuah@kernel.org, keescook@chromium.org,
- linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 3/4] selftests: kselftest_harness: support
- using xfail
-Date: Wed, 14 Feb 2024 20:40:59 +0100
-In-reply-to: <20240213154416.422739-4-kuba@kernel.org>
-Message-ID: <87o7ciltgh.fsf@cloudflare.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74F99128368
+	for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 19:41:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707939677; cv=fail; b=KoifzjWOYWtOWhp0l0/C/ExQdmTrXw6squmDdivt6xjYDwjjyoLkEZI85SzI6yp6rYWw2WxgbBBJUlFhOFYDL1kSzv5bn1k1gtpUsAKKd8Enc9NJf89PlY4dEc6blz/m+Y2dS4Aq+P/9Pg26tSjKAhgN+D5oVq1fjaj8iPhZflg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707939677; c=relaxed/simple;
+	bh=/yyLrxwXyBp1bWtAfP/WV3mjNGLMopgeR8ziuNUlu1k=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=YwcOk7t6HMESMjCUgFPUAdgcycCMBI3mgKvcdfuQoDu+hREkSbF1GhfN0Z2myijBZhSHbHmVxsrk7qeCQLm2m5ZX39GAGQaTtxihmkhvyXIPqc4k5dv4tyxhsHe261wYqqvGGJ4WCCKTjb7lm2YD6y3MD7ZXmfgFEGRhdCzz5Dg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Num6IaqH; arc=fail smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707939676; x=1739475676;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=/yyLrxwXyBp1bWtAfP/WV3mjNGLMopgeR8ziuNUlu1k=;
+  b=Num6IaqHE+AfvaY7WmdSp3yy9LaY8KLw7pOgnnoXKn5XGUzsKpZtBAvW
+   O1wmJG8gZXLvSpKHRPh904Ky+x5FGDIBRS0yU1JN7NFPSQdkxwAHUkGrN
+   +cCKpynowxFDEQ1DVsnZbnwGYabVAfeyjcW5htDow3gkgQNZfQ0AwJGGP
+   Ff9SNgIStX/lBAdja0FYXy2RgGLnrufU6fZJCBV1dqpQoXfR6k6q7QEEj
+   +5+ZTdg9PV33uBQkLU4WihGj95+QQ+0N5IEK/2XcVCCk1+ODd1GvcqMXX
+   kcxZOaT8EyvBwkoNXk7K7nPAa5F5xr7jO2w3rC9R/q1myMvMS5TyUdkJ9
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10984"; a="1877024"
+X-IronPort-AV: E=Sophos;i="6.06,160,1705392000"; 
+   d="scan'208";a="1877024"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2024 11:41:15 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,160,1705392000"; 
+   d="scan'208";a="34103555"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Feb 2024 11:41:15 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 14 Feb 2024 11:41:14 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 14 Feb 2024 11:41:14 -0800
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.100)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 14 Feb 2024 11:41:13 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Q/Lu2giwXdr1fUZg7CtLcAfR4H7p6PDfh/6plxou/k7YM/LciP5Zu6Acp+5sO4svB2FFax2+IJj8H5PYahi9eJt9e8KD+dSgbgdvZkw6lMrNMXXpFuk4Lh2hl6/J7EanJ26ebBi8d6UOguoRymNFbhAnKQCThEXFyFaR5gLYDl6gtPhjkKfsHKLZAWclQJZo8pnP7gp3gV3/wbYYYE6FjAtLaNIQiJsv+Hc5/wkgjIpV2VZ9Fc038AsBBoxVwx6NOD8z+3JvJn2/qX19DrGSKt4A7KRq1+kPvi16WhweY56Rx/rk/aVzrFZ1zQnOOxq39yXU2We9+XiuOpm+OP55Wg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=D1xin84ZVgA8Sppi5QR2gNQCpuBF4RzchEcFI+3iYwc=;
+ b=e1cEJBjAsyOXuhomhpB2Zm5stKCsDXQIbbSqP8INd3RTNimQ17DuAVmi8Mdn02Z+cnP9ZzTFmlRMDV1Qv7TRAP2+cPcIFVpCOJ17h/G3uVy0funtGAFIksSHRKrK8xBVJDK3XYGVlXZ4X0jz2RWtjePXsfZL3LoyXFKlxjOnTVne3UNeMC9fZgiuVAmkMjR9aKlnTG0E+JdZ6G4Zt1pgawIBipAg5quujiNpmtvr4ttHUVKUumCbDWs5vpE3FDa841s8tyXNsiHcvwvkImVQYxNCMRCgkc0LnmoPyCepDFxDnW8FV5k2hmCJRNLSziVW7ILpV6bj86zgEnMO4bWJDA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by MN0PR11MB6182.namprd11.prod.outlook.com (2603:10b6:208:3c6::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.27; Wed, 14 Feb
+ 2024 19:41:11 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::4069:eb50:16b6:a80d]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::4069:eb50:16b6:a80d%4]) with mapi id 15.20.7292.026; Wed, 14 Feb 2024
+ 19:41:11 +0000
+From: "Keller, Jacob E" <jacob.e.keller@intel.com>
+To: Jiri Pirko <jiri@resnulli.us>
+CC: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kubiak, Michal"
+	<michal.kubiak@intel.com>, "Fijalkowski, Maciej"
+	<maciej.fijalkowski@intel.com>, "Samudrala, Sridhar"
+	<sridhar.samudrala@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "Drewek, Wojciech"
+	<wojciech.drewek@intel.com>, "pio.raczynski@gmail.com"
+	<pio.raczynski@gmail.com>, Piotr Raczynski <piotr.raczynski@intel.com>
+Subject: RE: [iwl-next v1 07/15] ice: add auxiliary device sfnum attribute
+Thread-Topic: [iwl-next v1 07/15] ice: add auxiliary device sfnum attribute
+Thread-Index: AQHaXmKUfZDRhKb8okGjE1aORRDlabEIIxgAgAAHHICAACQDAIABOVaAgAC222A=
+Date: Wed, 14 Feb 2024 19:41:11 +0000
+Message-ID: <CO1PR11MB5089D91A3610E600ACEC8AF6D64E2@CO1PR11MB5089.namprd11.prod.outlook.com>
+References: <20240213072724.77275-1-michal.swiatkowski@linux.intel.com>
+ <20240213072724.77275-8-michal.swiatkowski@linux.intel.com>
+ <ZcsvYt4-f_MHT3QC@nanopsycho> <Zcs8LsRrbOfUdIL7@mev-dev>
+ <ZctSpPamhrlF4ILg@nanopsycho> <ZctYm9CVJzV+uxip@mev-dev>
+ <6b62fe60-b1e2-49e0-b374-775ef42d07dd@intel.com>
+ <Zcx9qWyr4IXn8rXa@nanopsycho>
+In-Reply-To: <Zcx9qWyr4IXn8rXa@nanopsycho>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CO1PR11MB5089:EE_|MN0PR11MB6182:EE_
+x-ms-office365-filtering-correlation-id: b8097f27-90cb-4c21-7f70-08dc2d94e5d9
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: li/GCc87OJeig9EaZDj4KSok6xHULc7rUwGJgyK0MHqcfZB98/aDOYdbIZa3uTdfV8abAoAhXuWhbVDyH2ojOFivoIUGOz3mdZDxu1FNKsCok/OHXulTeMmXqxrctCA0XsuJa8BnS5V/1rrOUmqcvrdwh5SviPdVc+Raisuxhz4lbOtOOISJJD+0MSlwFINfgARTay57FLv17fSSlWMCY9apkaD0CyzNpadf9ijE6xv3urNFMAy9SbtosjStLTKGVDPtsFmDXqPo8txlIHAosdtYPAWpTML1Bpnhku/ngl27NxE4lmkzP2g4ePqukA3kHKht6pgTiH5hs0sq7OIv7m1aRdORfPvz5hV7WUPZddwdDIHJB0NPW3unjb6Swe4Ii+61a2EaJ4+iZRVoib9MCK0iIetKli0M7frlL8txBForYg+JD0WTNUBocHbvkuGWL51R9pMJxkkL25W7VX36/ML+NsFDlI6pftSTVsF9GmPCEb4JGI7ZsjXnmIsDHts49VbisiK+YTttNNyzWjIwi6BNS1NaTwO4DWrr7zc3pBrGoHq9No1dHLj+j8CTsYfE2tySSGPqnZtrayrSoa1+WbBHUAOrb8SWWnOssZ4/AFo=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(376002)(39860400002)(346002)(366004)(230922051799003)(1800799012)(451199024)(186009)(64100799003)(82960400001)(86362001)(83380400001)(38100700002)(71200400001)(478600001)(76116006)(54906003)(316002)(7696005)(6506007)(6916009)(33656002)(9686003)(53546011)(26005)(122000001)(38070700009)(2906002)(55016003)(66946007)(8676002)(4326008)(66446008)(52536014)(5660300002)(64756008)(66556008)(66476007)(8936002)(41300700001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?EJWi8xVeOpTmsQXOtlkOZldNjuBcnu4ZJ8+IxIxGG0H5+03xYagnpj8lckpE?=
+ =?us-ascii?Q?GxgAkFmYslOpDM+WmB2f9PtPN3BxhS7d4yGUpAll3OGL8GQrnrBbzzgkQOe8?=
+ =?us-ascii?Q?nJMW26DRgeOCu0lfb7TH59naK03NcTcPAKd01fxp7s7N6FLPCRDbxKFQeUL+?=
+ =?us-ascii?Q?9GlY1qDy4XVxqB1ifGPzkNhFlDipVnKn7Q6BFWaqJQy0ya8yS4mK0sKKDRkL?=
+ =?us-ascii?Q?1v3Skl6VOJNBMX+SdGnjQHZBvp73q2hUqAUu8mxmFesqmv+NP2Db/m352VHb?=
+ =?us-ascii?Q?O1yivMoNuOPmsHtmKhBWxbnDe47D1o71kWG/JbA9lB8uouwJe9tvIDgrOtEq?=
+ =?us-ascii?Q?9SIQtmUAHwsdt+s4a0LnkQeEerKafa8ztcAXuL6kDpEb+MjtBkCo3vEGTfuf?=
+ =?us-ascii?Q?aRDOzn6liGvtS/HVac8wQeK3iKtGY+3fA50AiomPml/wi+EpiSRGL7k6MGZ7?=
+ =?us-ascii?Q?KeKi2ClYNUIMeidTsrGQ2fr1FVkc3Q2adL/xugQvju4CO+KUjxkdPF0dayrQ?=
+ =?us-ascii?Q?w5oc9wy4WdzPXpqw5EhdmM8hQbirdhIXDvHPlOMO7Mwf+2/BRAxz1JV7QMBE?=
+ =?us-ascii?Q?Opw2zMV5+79kJBu/TNao3aPJxsUwxrKNlXdRBfdW6a5+KANSC/fcER7qZy4q?=
+ =?us-ascii?Q?Snyz4jeXVZrOFr13W5FN1Irf2jqnGGz91X4C/KvefUMWcHKMNdiOB3S9oQGz?=
+ =?us-ascii?Q?kgIi31zT3BCf6EQlBSGa7SQUeZTA0TqzTkB14+382Y3z17hpusluEviSLZrb?=
+ =?us-ascii?Q?+a2hcNwEhDHc1AaQ63ZvcfvH/4T34Of/7K5CW1+1ne2tUwmndsU01196b50E?=
+ =?us-ascii?Q?KfFutSgLIo8ClpFEYGLR8NaKvTsn31rg/vIRehdQm4jNliK3Z+Aiz5QHzyFj?=
+ =?us-ascii?Q?c5EBCPjIms65PRofsZYV3/rSFwL/y/RPMhOxcvmqH8fjr/6rty8N/0Ymwd73?=
+ =?us-ascii?Q?gdsuqkvt2nhwr4AA9hdvJdfzptfZ1hlt8uNt9Sp8UD72wAQtRNivf6WgQrXT?=
+ =?us-ascii?Q?hIT0zYH9HQT6yvyhGtnIoVRSt3qSiBUFOGjzmMP+Oiz9MoZ+TZ3W1qAoY17b?=
+ =?us-ascii?Q?t7PB7rmgWAOLUEJUdCSlpQXBRl9c19LV6iDc6VMnwLWoj6ohZVbnZcr1qRRt?=
+ =?us-ascii?Q?vDNlg7A6/A2bWbtOiZVoaVNoihB8x6EtQXZt5VYzaxvVGW4gAsn6w8aIuB4E?=
+ =?us-ascii?Q?mfiSt/Aa60B9uFo+E5ci1/6ixDDd8RaY+DqyVq9+MAss4f5diQkQvK7CJCcC?=
+ =?us-ascii?Q?rzxF00ahFqGP3WE80ZXywL+6/e1XrIqJBU1xPv6FruV9NfUFm35n+U1Ttl+I?=
+ =?us-ascii?Q?V/NExZp71B0ZRCHeF5WB7TmjsxaAdiFJN2dsS1ygEm7gd59EpTdrO9zVrFBb?=
+ =?us-ascii?Q?nIUovSNhrf6Xpx4A0Iv3+Jw2qNZl/LR8NIp2fwxIbDVplBKFId6EkDyscHt+?=
+ =?us-ascii?Q?gMNXxY30p/Ond/tTR5JBhqUyQGrLATs+wvf1cdU10eb/JOr8EE24ttSs5swz?=
+ =?us-ascii?Q?uDlCvxLx0hHKe7CBybnXom1iAK85L4BDfNpc5hprCgJ7ZwhhAwk/FhOuYHSG?=
+ =?us-ascii?Q?Uo3TtglLz402cO4YZjbNi2baKrOhz/uyM4PWAkJ2?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b8097f27-90cb-4c21-7f70-08dc2d94e5d9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Feb 2024 19:41:11.3967
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 8MGMu1Gur+O0f+2M8d0LEr4UqQHloVR1Kptm7Ia01g4NQWgzheI5udtIDrdfeZuUzcGSFGaZJE9OrKzfS2ZcM5EiKHvurthLUwTcAgtihCM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR11MB6182
+X-OriginatorOrg: intel.com
 
-On Tue, Feb 13, 2024 at 07:44 AM -08, Jakub Kicinski wrote:
-> Selftest summary includes XFAIL but there's no way to use
-> it from within the harness. Support it in a similar way to skip.
->
-> Currently tests report skip for things they expect to fail
-> e.g. when given combination of parameters is known to be unsupported.
-> This is confusing because in an ideal environment and fully featured
-> kernel no tests should be skipped.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  tools/testing/selftests/kselftest_harness.h | 37 +++++++++++++++++++++
->  1 file changed, 37 insertions(+)
->
-> diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/selftests/kselftest_harness.h
-> index 618b41eac749..561a817117f9 100644
-> --- a/tools/testing/selftests/kselftest_harness.h
-> +++ b/tools/testing/selftests/kselftest_harness.h
-> @@ -141,6 +141,33 @@
->  	statement; \
->  } while (0)
->  
-> +/**
-> + * XFAIL()
-> + *
-> + * @statement: statement to run after reporting XFAIL
-> + * @fmt: format string
-> + * @...: optional arguments
-> + *
-> + * .. code-block:: c
-> + *
-> + *     XFAIL(statement, fmt, ...);
-> + *
-> + * This forces a "pass" after reporting why something is expected to fail,
-> + * and runs "statement", which is usually "return" or "goto skip".
-> + */
-> +#define XFAIL(statement, fmt, ...) do { \
-> +	snprintf(_metadata->results->reason, \
-> +		 sizeof(_metadata->results->reason), fmt, ##__VA_ARGS__); \
-> +	if (TH_LOG_ENABLED) { \
-> +		fprintf(TH_LOG_STREAM, "#      XFAIL      %s\n", \
-> +			_metadata->results->reason); \
-> +	} \
-> +	_metadata->passed = 1; \
-> +	_metadata->xfail = 1; \
-> +	_metadata->trigger = 0; \
-> +	statement; \
-> +} while (0)
-> +
->  /**
->   * TEST() - Defines the test function and creates the registration
->   * stub
-> @@ -834,6 +861,7 @@ struct __test_metadata {
->  	int termsig;
->  	int passed;
->  	int skip;	/* did SKIP get used? */
-> +	int xfail;	/* did XFAIL get used? */
->  	int trigger; /* extra handler after the evaluation */
->  	int timeout;	/* seconds to wait for test timeout */
->  	bool timed_out;	/* did this test timeout instead of exiting? */
-> @@ -941,6 +969,9 @@ void __wait_for_test(struct __test_metadata *t)
->  			/* SKIP */
->  			t->passed = 1;
->  			t->skip = 1;
-> +		} else if (WEXITSTATUS(status) == KSFT_XFAIL) {
-> +			t->passed = 1;
-> +			t->xfail = 1;
->  		} else if (t->termsig != -1) {
->  			t->passed = 0;
->  			fprintf(TH_LOG_STREAM,
-> @@ -1112,6 +1143,7 @@ void __run_test(struct __fixture_metadata *f,
->  	/* reset test struct */
->  	t->passed = 1;
->  	t->skip = 0;
-> +	t->xfail = 0;
->  	t->trigger = 0;
->  	t->no_print = 0;
->  	memset(t->results->reason, 0, sizeof(t->results->reason));
-> @@ -1133,6 +1165,8 @@ void __run_test(struct __fixture_metadata *f,
->  		t->fn(t, variant);
->  		if (t->skip)
->  			_exit(KSFT_SKIP);
-> +		if (t->xfail)
-> +			_exit(KSFT_XFAIL);
->  		if (t->passed)
->  			_exit(KSFT_PASS);
->  		/* Something else happened. */
-> @@ -1146,6 +1180,9 @@ void __run_test(struct __fixture_metadata *f,
->  	if (t->skip)
->  		ksft_test_result_skip("%s\n", t->results->reason[0] ?
->  					t->results->reason : "unknown");
-> +	else if (t->xfail)
-> +		ksft_test_result_xfail("%s\n", t->results->reason[0] ?
-> +				       t->results->reason : "unknown");
->  	else
->  		ksft_test_result(t->passed, "%s%s%s.%s\n",
->  			f->name, variant->name[0] ? "." : "", variant->name, t->name);
 
-On second thought, if I can suggest a follow up change so this:
 
-ok 17 # XFAIL SCTP doesn't support IP_BIND_ADDRESS_NO_PORT
+> -----Original Message-----
+> From: Jiri Pirko <jiri@resnulli.us>
+> Sent: Wednesday, February 14, 2024 12:45 AM
+> To: Keller, Jacob E <jacob.e.keller@intel.com>
+> Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>; intel-wired-
+> lan@lists.osuosl.org; netdev@vger.kernel.org; Kubiak, Michal
+> <michal.kubiak@intel.com>; Fijalkowski, Maciej <maciej.fijalkowski@intel.=
+com>;
+> Samudrala, Sridhar <sridhar.samudrala@intel.com>; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>; Drewek, Wojciech
+> <wojciech.drewek@intel.com>; pio.raczynski@gmail.com; Piotr Raczynski
+> <piotr.raczynski@intel.com>
+> Subject: Re: [iwl-next v1 07/15] ice: add auxiliary device sfnum attribut=
+e
+>=20
+> Tue, Feb 13, 2024 at 11:04:00PM CET, jacob.e.keller@intel.com wrote:
+> >
+> >
+> >On 2/13/2024 3:55 AM, Michal Swiatkowski wrote:
+> >> On Tue, Feb 13, 2024 at 12:29:40PM +0100, Jiri Pirko wrote:
+> >>> Tue, Feb 13, 2024 at 10:53:50AM CET, michal.swiatkowski@linux.intel.c=
+om
+> wrote:
+> >>>> On Tue, Feb 13, 2024 at 09:59:14AM +0100, Jiri Pirko wrote:
+> >>>>> Tue, Feb 13, 2024 at 08:27:16AM CET, michal.swiatkowski@linux.intel=
+.com
+> wrote:
+> >>>>>> From: Piotr Raczynski <piotr.raczynski@intel.com>
+> >>>>>>
+> >>>>>> Add read only sysfs attribute for each auxiliary subfunction
+> >>>>>> device. This attribute is needed for orchestration layer
+> >>>>>> to distinguish SF devices from each other since there is no
+> >>>>>> native devlink mechanism to represent the connection between
+> >>>>>> devlink instance and the devlink port created for the port
+> >>>>>> representor.
+> >>>>>>
+> >>>>>> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> >>>>>> Signed-off-by: Piotr Raczynski <piotr.raczynski@intel.com>
+> >>>>>> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.=
+com>
+> >>>>>> ---
+> >>>>>> drivers/net/ethernet/intel/ice/ice_sf_eth.c | 31
+> +++++++++++++++++++++
+> >>>>>> 1 file changed, 31 insertions(+)
+> >>>>>>
+> >>>>>> diff --git a/drivers/net/ethernet/intel/ice/ice_sf_eth.c
+> b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
+> >>>>>> index ab90db52a8fc..abee733710a5 100644
+> >>>>>> --- a/drivers/net/ethernet/intel/ice/ice_sf_eth.c
+> >>>>>> +++ b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
+> >>>>>> @@ -224,6 +224,36 @@ static void ice_sf_dev_release(struct device
+> *device)
+> >>>>>> 	kfree(sf_dev);
+> >>>>>> }
+> >>>>>>
+> >>>>>> +static ssize_t
+> >>>>>> +sfnum_show(struct device *dev, struct device_attribute *attr, cha=
+r *buf)
+> >>>>>> +{
+> >>>>>> +	struct devlink_port_attrs *attrs;
+> >>>>>> +	struct auxiliary_device *adev;
+> >>>>>> +	struct ice_sf_dev *sf_dev;
+> >>>>>> +
+> >>>>>> +	adev =3D to_auxiliary_dev(dev);
+> >>>>>> +	sf_dev =3D ice_adev_to_sf_dev(adev);
+> >>>>>> +	attrs =3D &sf_dev->dyn_port->devlink_port.attrs;
+> >>>>>> +
+> >>>>>> +	return sysfs_emit(buf, "%u\n", attrs->pci_sf.sf);
+> >>>>>> +}
+> >>>>>> +
+> >>>>>> +static DEVICE_ATTR_RO(sfnum);
+> >>>>>> +
+> >>>>>> +static struct attribute *ice_sf_device_attrs[] =3D {
+> >>>>>> +	&dev_attr_sfnum.attr,
+> >>>>>> +	NULL,
+> >>>>>> +};
+> >>>>>> +
+> >>>>>> +static const struct attribute_group ice_sf_attr_group =3D {
+> >>>>>> +	.attrs =3D ice_sf_device_attrs,
+> >>>>>> +};
+> >>>>>> +
+> >>>>>> +static const struct attribute_group *ice_sf_attr_groups[2] =3D {
+> >>>>>> +	&ice_sf_attr_group,
+> >>>>>> +	NULL
+> >>>>>> +};
+> >>>>>> +
+> >>>>>> /**
+> >>>>>>  * ice_sf_eth_activate - Activate Ethernet subfunction port
+> >>>>>>  * @dyn_port: the dynamic port instance for this subfunction
+> >>>>>> @@ -262,6 +292,7 @@ ice_sf_eth_activate(struct ice_dynamic_port
+> *dyn_port,
+> >>>>>> 	sf_dev->dyn_port =3D dyn_port;
+> >>>>>> 	sf_dev->adev.id =3D id;
+> >>>>>> 	sf_dev->adev.name =3D "sf";
+> >>>>>> +	sf_dev->adev.dev.groups =3D ice_sf_attr_groups;
+> >>>>>
+> >>>>> Ugh. Custom driver sysfs files like this are always very questionab=
+le.
+> >>>>> Don't do that please. If you need to expose sfnum, please think abo=
+ut
+> >>>>> some common way. Why exactly you need to expose it?
+> >>>>
+> >>>> Uh, hard question. I will drop it and check if it still needed to ex=
+pose
+> >>>> the sfnum, probably no, as I have never used this sysfs during testi=
+ng.
+> >>>>
+> >>>> Should devlink be used for it?
+> >>>
+> >>> sfnum is exposed over devlink on the port representor. If you need to
+> >>> expose it on the actual SF, we have to figure it out. But again, why?
+> >>>
+> >>>
+> >
+> >I vaguely remember some internal discussion about orchestration software
+> >wanting to know which subfunction was associated with which auxiliary
+> >device. However, I think a much better solution would be to expose the
+> >auxiliary device ID out of devlink_port instead, through devlink port.
+> >
+> >I can't find any notes on this and it was quite some time ago so maybe
+> >things have changed.
+> >
+> >If we enable support for user-space configurable sfnum, then we can just
+> >have the orchestration software pick its sfnum (or check the netlink
+> >return value from the port add), so probably this is not that useful.
+>=20
+> This is already solved by nested devlink. When you properly call
+> devl_port_fn_devlink_set(), you link the SF devlink instance with the
+> eswitch port representor. Then the user sees:
+>=20
+> $ devlink port
+> pci/0000:08:00.1/98304: type eth netdev eth4 flavour pcisf controller 0 p=
+fnum 1
+> sfnum 109 splittable false
+>   function:
+>     hw_addr 00:00:00:00:00:00 state active opstate attached roce enable
+>       nested_devlink:
+>         auxiliary/mlx5_core.sf.2
+>=20
 
-... becomes this
+Excellent. That looks to resolve this entirely then.
 
-ok 17 ip_local_port_range.ip4_stcp.late_bind # XFAIL SCTP doesn't support IP_BIND_ADDRESS_NO_PORT
+Thanks,
+Jake
 
-You see, we parse test results if they are in TAP format. Lack of test
-name for xfail'ed and skip'ed tests makes it difficult to report in CI
-which subtest was it. Happy to contribute it, once this series gets
-applied.
-
-A quick 'n dirty change could look like below. Open to better ideas.
-
----8<---
-
-diff --git a/tools/testing/selftests/kselftest.h b/tools/testing/selftests/kselftest.h
-index a781e6311810..b73985df9cb9 100644
---- a/tools/testing/selftests/kselftest.h
-+++ b/tools/testing/selftests/kselftest.h
-@@ -211,7 +211,8 @@ static inline __printf(1, 2) void ksft_test_result_fail(const char *msg, ...)
- 		ksft_test_result_fail(fmt, ##__VA_ARGS__);\
- 	} while (0)
- 
--static inline __printf(1, 2) void ksft_test_result_xfail(const char *msg, ...)
-+static inline __printf(2, 3) void ksft_test_result_xfail(const char *test_name,
-+							 const char *msg, ...)
- {
- 	int saved_errno = errno;
- 	va_list args;
-@@ -219,7 +220,7 @@ static inline __printf(1, 2) void ksft_test_result_xfail(const char *msg, ...)
- 	ksft_cnt.ksft_xfail++;
- 
- 	va_start(args, msg);
--	printf("ok %u # XFAIL ", ksft_test_num());
-+	printf("ok %u %s # XFAIL ", ksft_test_num(), test_name);
- 	errno = saved_errno;
- 	vprintf(msg, args);
- 	va_end(args);
-diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/selftests/kselftest_harness.h
-index 561a817117f9..2db647f98abc 100644
---- a/tools/testing/selftests/kselftest_harness.h
-+++ b/tools/testing/selftests/kselftest_harness.h
-@@ -56,6 +56,7 @@
- #include <asm/types.h>
- #include <ctype.h>
- #include <errno.h>
-+#include <limits.h>
- #include <stdbool.h>
- #include <stdint.h>
- #include <stdio.h>
-@@ -1140,6 +1141,8 @@ void __run_test(struct __fixture_metadata *f,
- 		struct __fixture_variant_metadata *variant,
- 		struct __test_metadata *t)
- {
-+	char test_name[LINE_MAX];
-+
- 	/* reset test struct */
- 	t->passed = 1;
- 	t->skip = 0;
-@@ -1149,8 +1152,9 @@ void __run_test(struct __fixture_metadata *f,
- 	memset(t->results->reason, 0, sizeof(t->results->reason));
- 	t->results->step = 1;
- 
--	ksft_print_msg(" RUN           %s%s%s.%s ...\n",
--	       f->name, variant->name[0] ? "." : "", variant->name, t->name);
-+	snprintf(test_name, sizeof(test_name), "%s%s%s.%s",
-+		 f->name, variant->name[0] ? "." : "", variant->name, t->name);
-+	ksft_print_msg(" RUN           %s ...\n", test_name);
- 
- 	/* Make sure output buffers are flushed before fork */
- 	fflush(stdout);
-@@ -1174,18 +1178,16 @@ void __run_test(struct __fixture_metadata *f,
- 	} else {
- 		__wait_for_test(t);
- 	}
--	ksft_print_msg("         %4s  %s%s%s.%s\n", t->passed ? "OK" : "FAIL",
--	       f->name, variant->name[0] ? "." : "", variant->name, t->name);
-+	ksft_print_msg("         %4s  %s\n", t->passed ? "OK" : "FAIL", test_name);
- 
- 	if (t->skip)
- 		ksft_test_result_skip("%s\n", t->results->reason[0] ?
- 					t->results->reason : "unknown");
- 	else if (t->xfail)
--		ksft_test_result_xfail("%s\n", t->results->reason[0] ?
-+		ksft_test_result_xfail(test_name, "%s\n", t->results->reason[0] ?
- 				       t->results->reason : "unknown");
- 	else
--		ksft_test_result(t->passed, "%s%s%s.%s\n",
--			f->name, variant->name[0] ? "." : "", variant->name, t->name);
-+		ksft_test_result(t->passed, "%s\n", test_name);
- }
- 
- static int test_harness_run(int argc, char **argv)
-diff --git a/tools/testing/selftests/mm/mremap_test.c b/tools/testing/selftests/mm/mremap_test.c
-index 2f8b991f78cb..0abab3b32c88 100644
---- a/tools/testing/selftests/mm/mremap_test.c
-+++ b/tools/testing/selftests/mm/mremap_test.c
-@@ -575,8 +575,7 @@ static void run_mremap_test_case(struct test test_case, int *failures,
- 
- 	if (remap_time < 0) {
- 		if (test_case.expect_failure)
--			ksft_test_result_xfail("%s\n\tExpected mremap failure\n",
--					      test_case.name);
-+			ksft_test_result_xfail(test_case.name, "\n\tExpected mremap failure\n");
- 		else {
- 			ksft_test_result_fail("%s\n", test_case.name);
- 			*failures += 1;
-diff --git a/tools/testing/selftests/net/tcp_ao/key-management.c b/tools/testing/selftests/net/tcp_ao/key-management.c
-index 24e62120b792..928f067513da 100644
---- a/tools/testing/selftests/net/tcp_ao/key-management.c
-+++ b/tools/testing/selftests/net/tcp_ao/key-management.c
-@@ -123,8 +123,8 @@ static void try_delete_key(char *tst_name, int sk, uint8_t sndid, uint8_t rcvid,
- 		return;
- 	}
- 	if (err && fault(FIXME)) {
--		test_xfail("%s: failed to delete the key %u:%u %d",
--			   tst_name, sndid, rcvid, err);
-+		test_xfail(tst_name, "failed to delete the key %u:%u %d",
-+			   sndid, rcvid, err);
- 		return;
- 	}
- 	if (!err) {
-@@ -283,8 +283,7 @@ static void assert_no_current_rnext(const char *tst_msg, int sk)
- 
- 	errno = 0;
- 	if (ao_info.set_current || ao_info.set_rnext) {
--		test_xfail("%s: the socket has current/rnext keys: %d:%d",
--			   tst_msg,
-+		test_xfail(tst_msg, "the socket has current/rnext keys: %d:%d",
- 			   (ao_info.set_current) ? ao_info.current_key : -1,
- 			   (ao_info.set_rnext) ? ao_info.rnext : -1);
- 	} else {
-diff --git a/tools/testing/selftests/net/tcp_ao/lib/aolib.h b/tools/testing/selftests/net/tcp_ao/lib/aolib.h
-index fbc7f6111815..0d6f33b51758 100644
---- a/tools/testing/selftests/net/tcp_ao/lib/aolib.h
-+++ b/tools/testing/selftests/net/tcp_ao/lib/aolib.h
-@@ -59,8 +59,8 @@ static inline void __test_print(void (*fn)(const char *), const char *fmt, ...)
- 	__test_print(__test_ok, fmt "\n", ##__VA_ARGS__)
- #define test_skip(fmt, ...)						\
- 	__test_print(__test_skip, fmt "\n", ##__VA_ARGS__)
--#define test_xfail(fmt, ...)						\
--	__test_print(__test_xfail, fmt "\n", ##__VA_ARGS__)
-+#define test_xfail(test_name, fmt, ...)					\
-+	__test_print(__test_xfail, test_name, fmt "\n", ##__VA_ARGS__)
- 
- #define test_fail(fmt, ...)						\
- do {									\
 
