@@ -1,154 +1,170 @@
-Return-Path: <netdev+bounces-72013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05C508562EB
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 13:17:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9CAE8562D6
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 13:14:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2AD51B2D06E
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 12:11:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF02E1C208E8
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 12:14:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F8C312C528;
-	Thu, 15 Feb 2024 12:11:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B54412C7F5;
+	Thu, 15 Feb 2024 12:13:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qcp3WdT6"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Ys/Qfe7m"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7473312C52E
-	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 12:11:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8887012BF05
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 12:13:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707999074; cv=none; b=QRHSkBhZlHr2oDQiAom/R6ZFfENU7Vh1KpNT9sC18fljCU2NfL2zP7tuNvphrgwAgv6TZg5l9Dsn3Pty5F8ZjijrzUvZJ5z0m5xyLGfVFdWeOz+GhOKgxSG4X9Oaw7OWssbFbeUM3AY3nh10rJH0C0dHSwnOk3WikGx/qT8qkwE=
+	t=1707999232; cv=none; b=gVcLraev8mVPDmQ4XDEQeMWbp59LHUCu8dOPbrnnMDF25gBrN0q5GxgEkDRJZDMb3K4uwfGGJPHUbVC2m18I16b3xNTOJAUK49KEHlcKK7QLmMa/byksR25BV3v+Iis4cHWE3biFGna2iMPqmwjwB0ZZnUMd0DblWmeE1oxSy6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707999074; c=relaxed/simple;
-	bh=L3m1v7dm2KWKLtFqWNe3XL/Vkr0NCf8pS7Xhm41647o=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=KTFJTASyu9XwGvJez62xUVEsk45MRGPPpgB0NIUpWfK22ymCgtrXRbgeujNEiVAtQj7CK0OHDScGPE3RWYL1vf/15x/2m7isnf4d8a/om7kAIxMWce+A/0SvkYxreYTQLJbPrfiVwF0+e3gIb9CLm0r0g+E1UKNX/nC69wR4iuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qcp3WdT6; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707999071;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9bwFQNaFcBiYz0Xnc/Zyrw1wJaON0pmUhTftxdM5l5k=;
-	b=Qcp3WdT6zj1xkfvvsgZVdJGdzKkl5a8dctjYtGRKBnBnqvkxQ4AdZi0DwpesqzGHcE2Am0
-	5i7bcZu2y2+oeXxXb9x8mVy5ptL4smgj/dlZVap0hUKXoFfcKhsf3juiu1vo8/Lbp4jizP
-	pg2aj9+Lj8stZP5/spnF1OFb+717cBo=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-102-ePqmaJzMMMGsfSWzRebskQ-1; Thu, 15 Feb 2024 07:11:10 -0500
-X-MC-Unique: ePqmaJzMMMGsfSWzRebskQ-1
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-55d71ec6ef3so524663a12.0
-        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 04:11:09 -0800 (PST)
+	s=arc-20240116; t=1707999232; c=relaxed/simple;
+	bh=75aSx4mlppEK+0D5pEBXAG1XJMjf5iYhpFM4vSd5YC0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gVZQbjXPWwwgHicK5sIMa7JAsFVQOnn51E8sdROJU0zpA1q1NTZBSP1XxsYA2V+WJkc04UhNS0pmC6GZTb2H4su6GPCuo/3J8Q17NNS/M1+WBB8tAYEezNqAJ+bWTeTFdcbQNAapGTaZVbIDq/H2Vh+RvVakEjFyE3Ewci1xDLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=Ys/Qfe7m; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-33d10936af1so155074f8f.1
+        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 04:13:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1707999228; x=1708604028; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pCOeUKQKqQx9f8JhpbG3MRAvrOwnBIZGYQFdNoVumQw=;
+        b=Ys/Qfe7mRPZ9BeUJmqRcIKB5QKUj9a9qmIdoEBGe7x223TbwVxLy55H1rvN1VX/Dng
+         qCqcY0ITt8ocoqPHStHPQrLVNpSDzdk3CICRx5dm2l+jyOJzerL8hRR3YX+QR1kgpr/P
+         w84JaJMNTCwAhfi8kGEHqwNPaf/7Csa2EBrBnh/yWTzlLCKCrY80bwWtEapkjArLml7K
+         9vpyZwJH8QJ5D9VINYcOUpxOlOHE+xBrZC7ZZXZwHMNosvG4fsK2GLjtZDnCibjilA/3
+         UU7X2FzmIfLGPyzDAdbp8k5bl4h89encFyqgMrtG+Krx2u3F1rtbdiafJsgm6h632Zue
+         JVaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707999069; x=1708603869;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9bwFQNaFcBiYz0Xnc/Zyrw1wJaON0pmUhTftxdM5l5k=;
-        b=OlieE5n6LpOgQRLJYlUEVFFopsrRsZu5/6Spv+jJrm3cV8SoJSDbhECYb7bG5TjZEk
-         hfwlCMw6qjGrTRGAJq/0UhP3kUNtEk9gSJNej+///24Ca7kWs5pxGvoMRltNf2khPMEI
-         lIYdX4h5g3UFEn9OJF3OmhjCNIrmRyLFAz8lyYYrAm/q5gxL7tmxNxFpJTjqFcfnCmSi
-         UHybD7BxnwW1bogE7IMmz006i63vZlJtRCtRXw1+TIcI3eXnMQz1kFgZmSoR5tshZfTO
-         3Wa1nsmcCf2xCvM0QOZH1liKrHZE/v1hf3p7ToAoUUtei7DMZ+FlGSphoUe5cQkiPOVT
-         Vu1g==
-X-Forwarded-Encrypted: i=1; AJvYcCWv3GUXmSpAwLBU+kc+E7QS5BxR4Rbo1+8Ut/eX1t/cidafeWyVLK/r9A1mIh0xW6Ye4F0CCFZT08+x15G1SPD3FuRWTdyR
-X-Gm-Message-State: AOJu0YzkhHAqn3hNHLimpL/bNyAD1kW0ZotrhJnIDvxviIHKifAEnGv/
-	RW6VWHS0Jb8qoKDiI73COAvXg6LJCX/JsltjSJ7dk2e/xMAe9NPn5QDB1fbR8ldQkdQTDg6XFcC
-	05FxPa6XVu9khO1yZCiggVu6ehmEzdpupmGpsh7xr0yteNRFWSYmhmw==
-X-Received: by 2002:aa7:d8d2:0:b0:563:8df4:1b19 with SMTP id k18-20020aa7d8d2000000b005638df41b19mr1247832eds.22.1707999068931;
-        Thu, 15 Feb 2024 04:11:08 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFa+wpQFm8gKml7wpXhzm1nTwdQeDKKKzBP6IxI/rAxz8aMa9kpeOrOY9BTBiktE3oinSRRNA==
-X-Received: by 2002:aa7:d8d2:0:b0:563:8df4:1b19 with SMTP id k18-20020aa7d8d2000000b005638df41b19mr1247814eds.22.1707999068528;
-        Thu, 15 Feb 2024 04:11:08 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id h32-20020a0564020ea000b00561e675a3casm473017eda.68.2024.02.15.04.11.07
+        d=1e100.net; s=20230601; t=1707999228; x=1708604028;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pCOeUKQKqQx9f8JhpbG3MRAvrOwnBIZGYQFdNoVumQw=;
+        b=TeLeaS92aoEdKfvqRejufqw3Gd9VY3B1wLyio3081dhy78CYVa85Xw75sTF3HkoAql
+         KV9KvdYCllA30Q7U8gUH5Sgj6XCxFzcJVqfwcUkBuG9Ce10b1asJ4rnQVH4tZvBNp1j3
+         KEtwWGghgwxHG58249RyDX/0xvFqd78Q7H7YQQZ1HvDebWGoJXVnlLDMvtTa88i8Xz/f
+         lV+6iMwrPZzjis7XIENLDL9lXfSGaT5M+ipnZ6e4nZ3jWXw9sWfmOpcWescAHwjL11Y8
+         jCDQJ1sqUdSVA88gNxm0z4ZLVY5iMZGehzipyHVczp6rQcHRmmMC5debPy+kA79YVtJq
+         6tXw==
+X-Gm-Message-State: AOJu0YznHrHvsXnnkVWPDDb22Dv0tXaxJE63sU/W4EgBoPKIYUv69J07
+	DsGyB7GeViRdNzw2Yo8d7JnT9Ej6XnAsH0kv00Q8VN/+v6GRgjPrUEvkxbn823c=
+X-Google-Smtp-Source: AGHT+IGUjtsJF/mxh0wEjqtCUStJCqOJ3M0vOhGt7y84LkqzucYUjWF82wybsdP68ht+qxLP6JbnLA==
+X-Received: by 2002:a05:6000:1085:b0:33c:e07d:17a5 with SMTP id y5-20020a056000108500b0033ce07d17a5mr1151430wrw.35.1707999228462;
+        Thu, 15 Feb 2024 04:13:48 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id cl2-20020a5d5f02000000b0033afe816977sm1658712wrb.66.2024.02.15.04.13.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Feb 2024 04:11:08 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 9D41210F59A2; Thu, 15 Feb 2024 13:11:07 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, =?utf-8?B?QmrDtnJuIFQ=?=
- =?utf-8?B?w7ZwZWw=?=
- <bjorn@kernel.org>, "David S. Miller" <davem@davemloft.net>, Alexei
- Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Eric Dumazet <edumazet@google.com>, Hao
- Luo <haoluo@google.com>, Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard
- Brouer <hawk@kernel.org>, Jiri Olsa <jolsa@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, KP
- Singh <kpsingh@kernel.org>, Maciej Fijalkowski
- <maciej.fijalkowski@intel.com>, Magnus Karlsson
- <magnus.karlsson@intel.com>, Martin KaFai Lau <martin.lau@linux.dev>,
- Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Song Liu <song@kernel.org>, Stanislav Fomichev <sdf@google.com>, Thomas
- Gleixner <tglx@linutronix.de>, Yonghong Song <yonghong.song@linux.dev>
-Subject: Re: [PATCH RFC net-next 1/2] net: Reference bpf_redirect_info via
- task_struct on PREEMPT_RT.
-In-Reply-To: <20240215090428.3OW_j0S8@linutronix.de>
-References: <20240213145923.2552753-1-bigeasy@linutronix.de>
- <20240213145923.2552753-2-bigeasy@linutronix.de> <87il2rdnxs.fsf@toke.dk>
- <20240215090428.3OW_j0S8@linutronix.de>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Thu, 15 Feb 2024 13:11:07 +0100
-Message-ID: <87sf1uc4h0.fsf@toke.dk>
+        Thu, 15 Feb 2024 04:13:48 -0800 (PST)
+Date: Thu, 15 Feb 2024 13:13:45 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
+	edumazet@google.com, donald.hunter@gmail.com
+Subject: Re: [patch net-next] tools: ynl: fix attr_space variable to exist
+ even if processing unknown attribute
+Message-ID: <Zc3_-YMMiCd6fc-9@nanopsycho>
+References: <20240213070443.442910-1-jiri@resnulli.us>
+ <8bcd540b747ae30edc10c5208d7876b901e702b8.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8bcd540b747ae30edc10c5208d7876b901e702b8.camel@redhat.com>
 
-Sebastian Andrzej Siewior <bigeasy@linutronix.de> writes:
-
-> On 2024-02-14 17:13:03 [+0100], Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->> > diff --git a/net/core/dev.c b/net/core/dev.c
->> > index de362d5f26559..c3f7d2a6b6134 100644
->> > --- a/net/core/dev.c
->> > +++ b/net/core/dev.c
->> > @@ -4044,12 +4048,16 @@ static __always_inline struct sk_buff *
->> >  sch_handle_egress(struct sk_buff *skb, int *ret, struct net_device *d=
-ev)
->> >  {
->> >  	struct bpf_mprog_entry *entry =3D rcu_dereference_bh(dev->tcx_egress=
-);
->> > +	struct bpf_xdp_storage *xdp_store __free(xdp_storage_clear) =3D NULL;
->> >  	enum skb_drop_reason drop_reason =3D SKB_DROP_REASON_TC_EGRESS;
->> > +	struct bpf_xdp_storage __xdp_store;
->> >  	int sch_ret;
->> >=20=20
->> >  	if (!entry)
->> >  		return skb;
->> >=20=20
->> > +	xdp_store =3D xdp_storage_set(&__xdp_store);
->> > +
->> >  	/* qdisc_skb_cb(skb)->pkt_len & tcx_set_ingress() was
->> >  	 * already set by the caller.
->> >  	 */
->>=20
->>=20
->> These, and the LWT code, don't actually have anything to do with XDP,
->> which indicates that the 'xdp_storage' name misleading. Maybe
->> 'bpf_net_context' or something along those lines? Or maybe we could just
->> move the flush lists into bpf_redirect_info itself and just keep that as
->> the top-level name?
+Thu, Feb 15, 2024 at 11:59:08AM CET, pabeni@redhat.com wrote:
+>On Tue, 2024-02-13 at 08:04 +0100, Jiri Pirko wrote:
+>> From: Jiri Pirko <jiri@nvidia.com>
+>> 
+>> If message contains unknown attribute and user passes
+>> "--process-unknown" command line option, _decode() gets called with space
+>> arg set to None. In that case, attr_space variable is not initialized
+>> used which leads to following trace:
+>> 
+>> Traceback (most recent call last):
+>>   File "./tools/net/ynl/cli.py", line 77, in <module>
+>>     main()
+>>   File "./tools/net/ynl/cli.py", line 68, in main
+>>     reply = ynl.dump(args.dump, attrs)
+>>             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+>>   File "tools/net/ynl/lib/ynl.py", line 909, in dump
+>>     return self._op(method, vals, [], dump=True)
+>>            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>>   File "tools/net/ynl/lib/ynl.py", line 894, in _op
+>>     rsp_msg = self._decode(decoded.raw_attrs, op.attr_set.name)
+>>               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>>   File "tools/net/ynl/lib/ynl.py", line 639, in _decode
+>>     self._rsp_add(rsp, attr_name, None, self._decode_unknown(attr))
+>>                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+>>   File "tools/net/ynl/lib/ynl.py", line 569, in _decode_unknown
+>>     return self._decode(NlAttrs(attr.raw), None)
+>>            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>>   File "tools/net/ynl/lib/ynl.py", line 630, in _decode
+>>     search_attrs = SpaceAttrs(attr_space, rsp, outer_attrs)
+>>                               ^^^^^^^^^^
+>> UnboundLocalError: cannot access local variable 'attr_space' where it is not associated with a value
+>> 
+>> Fix this by setting attr_space to None in case space is arg None.
+>> 
+>> Fixes: bf8b832374fb ("tools/net/ynl: Support sub-messages in nested attribute spaces")
+>> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+>> ---
+>>  tools/net/ynl/lib/ynl.py | 6 ++++--
+>>  1 file changed, 4 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+>> index 03c7ca6aaae9..b16d24b7e288 100644
+>> --- a/tools/net/ynl/lib/ynl.py
+>> +++ b/tools/net/ynl/lib/ynl.py
+>> @@ -588,10 +588,12 @@ class YnlFamily(SpecFamily):
+>>          revalue = search_attrs.lookup(selector)turn decoded
+>>  
+>>      def _decode(self, attrs, space, outer_attrs = None):
+>> +        rsp = dict()
+>>          if space:
+>>              attr_space = self.attr_sets[space]
+>> -        rsp = dict()
+>> -        search_attrs = SpaceAttrs(attr_space, rsp, outer_attrs)
+>> +            search_attrs = SpaceAttrs(attr_space, rsp, outer_attrs)
+>> +        else:
+>> +            search_attrs = None
 >
-> I'm going to rename it for now as suggested for now. If it is a better
-> fit to include the lists into bpf_redirect_info then I will update
-> accordingly.
+>It looks like that later-on the code could call self._decode_sub_msg()
+>-> self._resolve_selector() with search_attrs == None, and the latter
+>will unconditionally do:
+>
+>	value = search_attrs.lookup(selector)
 
-OK, SGTM.
+How exactly you can reach this? You won't get past:
+            try:
+                attr_spec = attr_space.attrs_by_val[attr.type]
+            except (KeyError, UnboundLocalError):
+                if not self.process_unknown:
+                    raise Exception(f"Space '{space}' has no attribute with value '{attr.type}'")
+                attr_name = f"UnknownAttr({attr.type})"
+                self._rsp_add(rsp, attr_name, None, self._decode_unknown(attr))
+                continue
 
--Toke
 
+
+>
+>I think we need to explicitly handle the None value there.
+>
+>Thanks,
+>
+>Paolo
+>
 
