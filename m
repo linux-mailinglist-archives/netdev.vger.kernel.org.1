@@ -1,114 +1,113 @@
-Return-Path: <netdev+bounces-72023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20905856380
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 13:44:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF3BF856386
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 13:45:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C97E31F253D5
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 12:44:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C9C2288F2D
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 12:45:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E6A612D740;
-	Thu, 15 Feb 2024 12:44:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A39A812D75B;
+	Thu, 15 Feb 2024 12:45:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QqDoWKPq"
+	dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b="acgOdNSd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mta-64-225.siemens.flowmailer.net (mta-64-225.siemens.flowmailer.net [185.136.64.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C327712AACB;
-	Thu, 15 Feb 2024 12:44:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45CD12D740
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 12:44:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708001058; cv=none; b=ej2Xsv7gzKvqNq3b4wIkVJHSdi+BfG5kmScJ6d+VuJf2f+XydT/Th0gITX7rVxYFX8L0miW/8Nrue1vd9XSKbHeJPvQlSwGNioROpXLcE9GEWY16CiTqQT1bH+dAm2Nrr30wFttd5MAsfp7r9X8F1bkw6fHIBUsEZBls6g6ULlo=
+	t=1708001104; cv=none; b=tCuNFICQZcRTZzIzhKwcEmod7UgSYjYatZSPVuJXbTIhIN9un/4pQvJojrSyawkpPAxVx4WBVtYhEeEZ3OZM/DQQZYbwg2W6+JvMN3II7ECZ9QvGXWRXvQMtj/SRSHsdS6ymZMsaNr69FRjy1bLmzajXQ7EBZMtVcupMuh+Z9c4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708001058; c=relaxed/simple;
-	bh=r1FxEu7xC45zbK6jeor2QIQRLZj0KW7OA0dTG6OjJEQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qGg450sc2ZBhHrl34UxVijoFIwJfcdwOkypxGYJXR0Ckmfn52wf+OFyiruNANZ5vDdrek/Gjtj5Vm0nOF5yN4uN/HAN6NqyJDEhtkNfqNQmODx0ArWhGPD0gMh5zREzybtp3jJioHmf4TzbUotODheR+8QzFxu0pNuzmQzVS7Vo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=QqDoWKPq; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41FCgsA0004998;
-	Thu, 15 Feb 2024 12:44:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=r1FxEu7xC45zbK6jeor2QIQRLZj0KW7OA0dTG6OjJEQ=;
- b=QqDoWKPqye//nidmakhAh/uu47+gWQXWCa+JjfskzZsqAjcTh3hE4wW871vboFLsghcH
- /BXyDgUviSCS9Pp5nICJSZEl4JEihmoCeDvq4t7gL+QnR8yjVfecVsDTWiT/n/55b7K0
- XepwpDAzlO76DwnUYbgypZMl5QL1SVBiV+bSlNVmU7xHxH762XuKXnPkdeTcB4YqGTin
- mToz7exhsU9i3eIJvof/IjcnVAjA0OTdx3gKPQ5qSd0a/jqjvNiQgfx3kkTOWYwk3+bS
- +G4WoBm0BFjhrELi9VTG03NyrGo6zpQOlbJPiUL9lLxFwgZFP+BkcW94diG9Zt1PxMiM Kw== 
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w9juvr0qk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 15 Feb 2024 12:44:14 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41FA0TmG032605;
-	Thu, 15 Feb 2024 12:44:13 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3w6kftvww5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 15 Feb 2024 12:44:13 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41FCi8Rh18088480
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 15 Feb 2024 12:44:10 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4E29F2005A;
-	Thu, 15 Feb 2024 12:44:08 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1FB942004F;
-	Thu, 15 Feb 2024 12:44:08 +0000 (GMT)
-Received: from li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com (unknown [9.155.204.135])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Thu, 15 Feb 2024 12:44:08 +0000 (GMT)
-Date: Thu, 15 Feb 2024 13:44:06 +0100
-From: Alexander Gordeev <agordeev@linux.ibm.com>
-To: Alexandra Winter <wintera@linux.ibm.com>
-Cc: Thorsten Winkler <twinkler@linux.ibm.com>, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net/iucv: fix the allocation size of iucv_path_table
- array
-Message-ID: <Zc4HFotndpEHAnjb@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
-References: <20240214163240.2537189-1-agordeev@linux.ibm.com>
- <9b93b9c0-4b0f-4654-b9e6-4fc045cb6817@linux.ibm.com>
+	s=arc-20240116; t=1708001104; c=relaxed/simple;
+	bh=m6I1LJiYUD1G+/74Dd6FRlu8IypGqRxQxcnKqXeM7F8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=W3PS1Q/wfEaC0LEJj+sdyRCek0gzs6NiC9VxWkH8zv3dr490zaDHbiSGoPmKlnFxygwJgBTjKaWQvbs3XIczjjQ72wS329AIci8HQ2QjYwvQz5el8YcYlzlckOhey21opuD4kb5mcA+HOSfKSlVEKAET9mZP5euD1hWfpcx3DL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b=acgOdNSd; arc=none smtp.client-ip=185.136.64.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
+Received: by mta-64-225.siemens.flowmailer.net with ESMTPSA id 20240215124456cea09a2e2cc9996ed6
+        for <netdev@vger.kernel.org>;
+        Thu, 15 Feb 2024 13:44:56 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
+ d=siemens.com; i=diogo.ivo@siemens.com;
+ h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
+ bh=ui08RXLlMeyrrk71srApeALk5WRCw9H0QNeubMIeJOc=;
+ b=acgOdNSdNcXhJWLMH8LFpCLRpXF307OLlsonSkik3JQIHXFEoUA9lkKw2YFaLCZEaWBjrr
+ sxo7KDj/L8qjVd0ZRbdawFV3sRWLKU07D5vGQujnbQS0XMcc+1nnl9oWzJvb/ctn7tu+zORe
+ HYrZVBuuJK4b0lm7pacn1ZLRsRAWU=;
+Message-ID: <ce2c5ee0-3bed-490e-ac57-58e849ec1eee@siemens.com>
+Date: Thu, 15 Feb 2024 12:44:54 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9b93b9c0-4b0f-4654-b9e6-4fc045cb6817@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: kSf-l5Lh_exKnladEW-Evr_FwHX0R--F
-X-Proofpoint-ORIG-GUID: kSf-l5Lh_exKnladEW-Evr_FwHX0R--F
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-15_11,2024-02-14_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 phishscore=0
- mlxscore=0 adultscore=0 bulkscore=0 mlxlogscore=510 impostorscore=0
- clxscore=1015 malwarescore=0 suspectscore=0 priorityscore=1501
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402150101
-
-On Thu, Feb 15, 2024 at 09:30:39AM +0100, Alexandra Winter wrote:
-> Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
-
-Thank you, Alexandra.
-
-> Good catch, thank you.
-> As we allocate a more than we need, I don't this
-> needs to be backported to stable. Do you agree?
+Subject: Re: [PATCH net] net: ti: icssg-prueth: Remove duplicate cleanup calls
+ in emac_ndo_stop()
+To: danishanwar@ti.com, rogerq@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch,
+ vigneshr@ti.com, jan.kiszka@siemens.com, dan.carpenter@linaro.org,
+ robh@kernel.org, grygorii.strashko@ti.com, horms@kernel.org,
+ diogo.ivo@siemens.com
+Cc: linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org
+References: <20240206152052.98217-1-diogo.ivo@siemens.com>
+Content-Language: en-US
+From: Diogo Ivo <diogo.ivo@siemens.com>
+In-Reply-To: <20240206152052.98217-1-diogo.ivo@siemens.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Flowmailer-Platform: Siemens
+Feedback-ID: 519:519-1320519:519-21489:flowmailer
 
 
-Frankly, I do not know. It does not hurt and if it is a matter of
-few bytes, I would not bother.
+On 2/6/24 15:20, Diogo Ivo wrote:
+> Remove the duplicate calls to prueth_emac_stop() and
+> prueth_cleanup_tx_chns() in emac_ndo_stop().
+>
+> Fixes: 128d5874c082 ("net: ti: icssg-prueth: Add ICSSG ethernet driver")
+> Fixes: 186734c15886 ("net: ti: icssg-prueth: add packet timestamping and ptp support")
+> Signed-off-by: Diogo Ivo <diogo.ivo@siemens.com>
+> ---
+>   drivers/net/ethernet/ti/icssg/icssg_prueth.c | 4 ----
+>   1 file changed, 4 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> index 411898a4f38c..cf7b73f8f450 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> @@ -1489,9 +1489,6 @@ static int emac_ndo_stop(struct net_device *ndev)
+>   	/* Destroying the queued work in ndo_stop() */
+>   	cancel_delayed_work_sync(&emac->stats_work);
+>   
+> -	/* stop PRUs */
+> -	prueth_emac_stop(emac);
+> -
+>   	if (prueth->emacs_initialized == 1)
+>   		icss_iep_exit(emac->iep);
+>   
+> @@ -1502,7 +1499,6 @@ static int emac_ndo_stop(struct net_device *ndev)
+>   
+>   	free_irq(emac->rx_chns.irq[rx_flow], emac);
+>   	prueth_ndev_del_tx_napi(emac, emac->tx_ch_num);
+> -	prueth_cleanup_tx_chns(emac);
+>   
+>   	prueth_cleanup_rx_chns(emac, &emac->rx_chns, max_rx_flows);
+>   	prueth_cleanup_tx_chns(emac);
 
-Thanks!
+Hello,
+
+Gentle ping on this patch.
+
+
+Thank you,
+
+Diogo
+
 
