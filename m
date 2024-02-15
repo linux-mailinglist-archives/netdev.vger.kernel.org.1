@@ -1,72 +1,93 @@
-Return-Path: <netdev+bounces-71911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 947D78558CF
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 02:48:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99ABB8558DF
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 03:00:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FF4B28D1CC
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 01:48:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05C27B26634
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 02:00:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35A7717E9;
-	Thu, 15 Feb 2024 01:48:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D47F915D1;
+	Thu, 15 Feb 2024 02:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IP4XpKT5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a868M2Im"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1180415D1
-	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 01:48:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB70A1C02;
+	Thu, 15 Feb 2024 02:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707961733; cv=none; b=aIWFxt/KdSUZhjYr5IZcfr5A5cH4onqKBMKuWg6iTUtkKAdfOfrNDyDMz3NXGmv9OV25hJGRcUQ1cg2uJKdRJMokpJtGjxqkDVJkMh9kt8iBsx9DBeEzWS++GSVKUcRI/qlxjL36ueF3/VUggqTKJuJBcAte/FStoytw3TcDQK4=
+	t=1707962428; cv=none; b=fb8qjKcE9Zwdz7X2GmqMBthYr1tCfdRIxjyJ6g5LOGabb6SAqlaZ8uZInrs5TpfABa3son1ROOAzoCqTsbwkDZ6A5aZJL0WhTDnKBpAFAsO83byk+LD/h49HQAP+3kEc6wS0T0iYcZSlbuKk0/ZJHTl1nV1PCNeOxOw6AKQDjLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707961733; c=relaxed/simple;
-	bh=xkhSILE+/K7ZL9GISttocyi6q5Ym9WIcNr0RJlFjLbU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=StaD3tx9XJL4xsR/eA2uzc6IY5coeynaLf1xXDswxTac0lwBhcvB2XOc0c4FrLRUFGV5o3/x/GiheD8dhdMNMks9Wad+RyDOxA4aMubRlh/UNkvujwITo4Zgmpzf3c9dznua1Ba/tSGdwQWZmXcYnoE8E+3ElbTOp/OoaBOvB78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IP4XpKT5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34BCAC433F1;
-	Thu, 15 Feb 2024 01:48:52 +0000 (UTC)
+	s=arc-20240116; t=1707962428; c=relaxed/simple;
+	bh=RMJnR8ZenPKenrnWDBa25lav899D0NZrP4NcKIeHokg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=RiLaagOgiVpfqwY3irleflE4gKxI6rSH6ddcVt9g9DgpWwJgml0PyGq8sfHPce/CFZElHtmllNVAEVxk1hyvQI02Ff7pmL16AURrONvGSR2pEMcyvhTL00QPevS9QpslpoQpduvcZ8HEgJ1bAdf/MhP/9iNvqSDv3ex9OIoLZVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a868M2Im; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 222D4C43390;
+	Thu, 15 Feb 2024 02:00:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707961732;
-	bh=xkhSILE+/K7ZL9GISttocyi6q5Ym9WIcNr0RJlFjLbU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IP4XpKT5d4Ecp9D4k0pCVUHy2iz0sB3cFqBoszs9dgmziabRGOQGXFntEQpCsbGvi
-	 IJEh5CxIINpiN4C4e/70bmwbXEFZU0n6knvGBCQwiOfKTuugHq1+vQKH85xhyYF2kQ
-	 iO7RrvioJIvWZN3YKZ8UM7p5IEciWHm1GwSBxs2oSRmhzVWLr+FntEAtmPYi3nCA+J
-	 VrTF0rMqdDAkEUvV3ReKvRPP2A2R/yI8NNhem4ncp0+vmj+CohKvqP4t/voBbf2hA3
-	 H49HbYwwqfAC8b9Zrf4oqyLFFx/r9rSS0CslRsCPSx2t3mgga8IcqejAnAEnGBrDsv
-	 wOiAKaZEuyYWw==
-Date: Wed, 14 Feb 2024 17:48:50 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 0/5][pull request] Intel Wired LAN Driver
- Updates 2024-02-12 (ice)
-Message-ID: <20240214174850.3dac6f97@kernel.org>
-In-Reply-To: <20240212211202.1051990-1-anthony.l.nguyen@intel.com>
-References: <20240212211202.1051990-1-anthony.l.nguyen@intel.com>
+	s=k20201202; t=1707962428;
+	bh=RMJnR8ZenPKenrnWDBa25lav899D0NZrP4NcKIeHokg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=a868M2ImT98AdRcudWLAJNRnjNFM/5ZVnZaRaq575PhZIhLsxhH6aP06ICFffBUVY
+	 W9KDPa769cknWLecYGEFkBU5hUkzXnjLV4pOj9mlzhbWoIi5fY91+1X1BCzOQYZ9Mo
+	 hb6xcP0lXBA0tzBfxE5FfnB79/TWEPM6HMQj9Ro+PmcW0+9iVht90QP7pzWfor+wJT
+	 q/qXzDAB0frtdyEKPes3uKK83nqY8D7l8gTz+y4rwf+hAwIR53oRhI9qHIeMJI/RXz
+	 cqFMU7W0fJF4AzrGoKY5L78pYkyiYaZup8hBNjchx4UaF2njLRexde/PUnnkzJEWym
+	 Bkp7KditAULZA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 08565D84BCE;
+	Thu, 15 Feb 2024 02:00:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: wireless-2024-02-14
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170796242803.31402.14492891620721293.git-patchwork-notify@kernel.org>
+Date: Thu, 15 Feb 2024 02:00:28 +0000
+References: <20240214184326.132813-3-johannes@sipsolutions.net>
+In-Reply-To: <20240214184326.132813-3-johannes@sipsolutions.net>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
 
-On Mon, 12 Feb 2024 13:11:54 -0800 Tony Nguyen wrote:
-> This series contains updates to ice driver only.
-> 
-> Grzegorz adds support for E825-C devices.
-> 
-> Wojciech reworks devlink reload to fulfill expected conditions (remove
-> and readd).
+Hello:
 
-Looks like this got (silently) applied, thanks!
+This pull request was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 14 Feb 2024 19:41:42 +0100 you wrote:
+> Hi,
+> 
+> So this came later than I wanted, I simply forgot earlier.
+> Not much to say about it, just a handful of fixes, mostly
+> in iwlwifi.
+> 
+> As reported by Stephen earlier, this has a conflict against
+> -next material, but once pulled into net I plan on pulling
+> it into wireless-next to resolve that.
+> 
+> [...]
+
+Here is the summary with links:
+  - pull-request: wireless-2024-02-14
+    https://git.kernel.org/netdev/net/c/63a3dd6e62c8
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
