@@ -1,163 +1,134 @@
-Return-Path: <netdev+bounces-72055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72056-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7748A85653F
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 15:02:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F1898565B6
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 15:16:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAAAB1C24A2B
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 14:02:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EAF4CB2CF63
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 14:15:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA40C131753;
-	Thu, 15 Feb 2024 14:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB3EC12EBC1;
+	Thu, 15 Feb 2024 14:14:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fzl+ntlY"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nDw579tI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A25AC130E40;
-	Thu, 15 Feb 2024 14:01:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A6C129A80;
+	Thu, 15 Feb 2024 14:14:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708005719; cv=none; b=jn0BHbRLDV8+VELwKLAIv+F5Pciib5+VpQIDYPKsVbWhTldACOoFhzoiVOShB6YuKc9JkeX7LgI73g13L3KB1SjcpGp5tE36VE1HFUeZVCceUqvJOg/XgakNceN/O+FdezELnI+LpVkPXK/1AxoZFnl9lDECmxE3I623s/KDxI8=
+	t=1708006475; cv=none; b=omM37sBDPQBapZNQIVS31OVQdR9m3f7bSxXV2HwaHJRDfEzx2FVlufKhZVLKGnRwXln+fLFs0oJeCOa6o45hp3zv4hFWnFneOBQbxs0QSIUb/pvbIAKGvIHY/lRbHta83CePa+9tRJ2ikxHyl6iQPGBarz4U2SotPBQCS2T8ONs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708005719; c=relaxed/simple;
-	bh=bLg41PBwIDfC4cOMyvGi417/i5cujID83zbmEWIwlIk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IlxoemJbP3zd+szDEpkuYST20RbiSnkGo5vGvrl8zQ888GS48+difW3FcfV3nX+6XphyH+lEunn97NvYIk+k8OHAVuRw0XdYa2WbjmyrpubIgE0C4ykcuphoBdbR76h2dz2jxcVwzLBBhA0+LjyinQZ9dTPcratQBlwhmeDer9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fzl+ntlY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6713C433F1;
-	Thu, 15 Feb 2024 14:01:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708005719;
-	bh=bLg41PBwIDfC4cOMyvGi417/i5cujID83zbmEWIwlIk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Fzl+ntlYyRi/vtCED9/HzdjjUKeMuLr9Xu3bOqrjQ5gWQIM4YQ/D9HvtIVwT1LquD
-	 lRSotN4e6LZO7GdACZBD7qw95AA985TpebHFOL7Hv4ozL0zXnkzq772LDollgNmgTC
-	 FoG+w5AZlRJaSLuqCig0fykzd7jDyjGHa4VFwKEltF7TlZnPJCehNdNm4aOy2LLoyO
-	 cnCxuUTUl9IxPdRIIuR1oSuflBUmLySWf2kKVGLDPRlDRwfhCyr00V51ZxdGtphzUI
-	 vlQl0YVDLzs4SzH/FHM3ZfJQABlIly8uolOh3rSIqbceXeLlaThopuCq4l+2ZW3gkj
-	 JO9aBgk9l/VnQ==
-Date: Thu, 15 Feb 2024 15:01:55 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] page_pool: disable direct recycling based on
- pool->cpuid on destroy
-Message-ID: <Zc4ZU0BsXkVgFZ3p@lore-desk>
-References: <20240215113905.96817-1-aleksander.lobakin@intel.com>
- <87v86qc4qd.fsf@toke.dk>
- <8aa809c0-585f-4750-98d4-e19165c6ff73@intel.com>
- <Zc4Tht2TAkFOhq9Y@lore-desk>
- <15766d46-162c-4c99-84a0-7a4bc60c3289@intel.com>
+	s=arc-20240116; t=1708006475; c=relaxed/simple;
+	bh=0KmmJF7es5qjGJptTPHwSdrE9Au+2EbQ8WnCPfcgii8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cfWRx7aBJ2OVr3eUvR13S9m2ZF5WwYyBgvbG5qJS6WOUGXXOqJKBlIxx8uOkHfRg1hydKMNwCrLEvwXnW/FdWIHGA3+UvejjBCNZyPFRKvu7fUfZJQqViv2uzyQwexBTbtTE4cgiUiC34WrJipXB7tq2JE3BOCijtFnPlqelbq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nDw579tI; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41FE2QAJ029709;
+	Thu, 15 Feb 2024 14:14:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Qoh53EwvSI9X7jHwJNqWFg94YPQZpOq8pRhjLES4yGY=;
+ b=nDw579tIIkzZyEiBUEZuluO/c26Nfo3dOpWJrOXwQF1bO0OWRg7B4k2Q9875OzadldMw
+ xUqDsIZ1rYB4g2N4hBQWMbiXcXObWGKDG4LPcWjF6YaprRucdWLuV8Q7tnMHqmhjQYVq
+ GLr0OjVGfYjKGROwq6zQwIozCtvIPs64JURPLDK41Ry6ny//7vS+Dtd5mq4Pz9fsC56g
+ b5rfZdeIPPxnW/BCSVZixNG6MqPeHnf7ivmcWIchqGaZoVggufReQF3Z7QwM0ZPfmcUc
+ hJZdjjOlYzE1/ICKFWdg5W14VTsMrbjO7c8nHE//QmaQDTV5F6dh7To896Jv747SrZoY 9A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w9m1a0ee8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 15 Feb 2024 14:14:29 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41FE2Q3O029699;
+	Thu, 15 Feb 2024 14:14:29 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w9m1a0edt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 15 Feb 2024 14:14:28 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41FDqM87024878;
+	Thu, 15 Feb 2024 14:14:27 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3w6mfpn5dp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 15 Feb 2024 14:14:27 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41FEEMoP2032266
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 15 Feb 2024 14:14:24 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 25AB92004E;
+	Thu, 15 Feb 2024 14:14:22 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CF9052004D;
+	Thu, 15 Feb 2024 14:14:21 +0000 (GMT)
+Received: from [9.152.224.128] (unknown [9.152.224.128])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 15 Feb 2024 14:14:21 +0000 (GMT)
+Message-ID: <020edf58-c839-41c1-a302-4a75423a1761@linux.ibm.com>
+Date: Thu, 15 Feb 2024 15:14:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="MN2cs1CvNJYC3dkc"
-Content-Disposition: inline
-In-Reply-To: <15766d46-162c-4c99-84a0-7a4bc60c3289@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net-next] net: Deprecate SO_DEBUG and reclaim SOCK_DBG
+ bit.
+Content-Language: en-US
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Matthieu Baerts <matttbe@kernel.org>,
+        Mat Martineau <martineau@kernel.org>,
+        Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
+        Wen Gu <guwen@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>,
+        "D . Wythe" <alibuda@linux.alibaba.com>
+Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
+        mptcp@lists.linux.dev, linux-s390@vger.kernel.org,
+        Gerd Bayer <gbayer@linux.ibm.com>
+References: <20240214195407.3175-1-kuniyu@amazon.com>
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <20240214195407.3175-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: LSSaPSZRfFPi7d3TS2Csxpa551B1sVaV
+X-Proofpoint-ORIG-GUID: pv6Dn-rrpeMGpJ4w1C0nxLk8wRNgxCt-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-15_13,2024-02-14_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
+ mlxscore=0 adultscore=0 bulkscore=0 phishscore=0 malwarescore=0
+ clxscore=1011 mlxlogscore=790 lowpriorityscore=0 impostorscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2402150114
 
 
---MN2cs1CvNJYC3dkc
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-> From: Lorenzo Bianconi <lorenzo@kernel.org>
-> Date: Thu, 15 Feb 2024 14:37:10 +0100
->=20
-> >> From: Toke H=F8iland-J=F8rgensen <toke@redhat.com>
-> >> Date: Thu, 15 Feb 2024 13:05:30 +0100
-> >>
-> >>> Alexander Lobakin <aleksander.lobakin@intel.com> writes:
-> >>>
-> >>>> Now that direct recycling is performed basing on pool->cpuid when se=
-t,
-> >>>> memory leaks are possible:
-> >>>>
-> >>>> 1. A pool is destroyed.
-> >>>> 2. Alloc cache is emptied (it's done only once).
-> >>>> 3. pool->cpuid is still set.
-> >>>> 4. napi_pp_put_page() does direct recycling basing on pool->cpuid.
-> >>>> 5. Now alloc cache is not empty, but it won't ever be freed.
-> >>>
-> >>> Did you actually manage to trigger this? pool->cpuid is only set for =
-the
-> >>> system page pool instance which is never destroyed; so this seems a v=
-ery
-> >>> theoretical concern?
-> >>
-> >> To both Lorenzo and Toke:
-> >>
-> >> Yes, system page pools are never destroyed, but we might latter use
-> >> cpuid in non-persistent PPs. Then there will be memory leaks.
-> >> I was able to trigger this by creating bpf/test_run page_pools with the
-> >> cpuid set to test direct recycling of live frames.
-> >=20
-> > what about avoiding the page to be destroyed int this case? I do not li=
-ke the
->=20
-> I think I didn't get what you wanted to say here :s
+On 14.02.24 20:54, Kuniyuki Iwashima wrote:
+> +	case SO_DEBUG:
+> +		/* deprecated, but kept for compatibility */
+> +		if (val && !sockopt_capable(CAP_NET_ADMIN))
+> +			ret = -EACCES;
+> +		return 0;
 
-My assumption here was cpuid will be set just system page_pool so it is jus=
-t a
-matter of not running page_pool_destroy for them. Anyway in the future we c=
-ould
-allow to set cpuid even for non-system page_pool if the pool is linked to a
-given rx-queue and the queue is pinned to a given cpu.
+Setting ret has no effect here. Maybe you mean something like:
+> +		if (val && !sockopt_capable(CAP_NET_ADMIN))
+> +			return -EACCES;
+> +		return 0;
 
-Regards,
-Lorenzo
+or 
 
->=20
-> Rewriting cpuid doesn't introduce any new checks on hotpath. Destroying
-> the pool is slowpath and we shouldn't hurt hotpath to handle it.
->=20
-> > idea of overwriting the cpuid field for it.
->=20
-> We also overwrite pp->p.napi field a couple lines below. It happens only
-> when destroying the pool, we don't care about the fields at this point.
->=20
-> >=20
-> > Regards,
-> > Lorenzo
-> >=20
-> >>
-> >>>
-> >>> I guess we could still do this in case we find other uses for setting
-> >>> the cpuid; I don't think the addition of the READ_ONCE() will have any
-> >>> measurable overhead on the common arches?
-> >>
-> >> READ_ONCE() is cheap, but I thought it's worth mentioning in the
-> >> commitmsg anyway :)
-> >>
-> >>>
-> >>> -Toke
->=20
-> Thanks,
-> Olek
-
---MN2cs1CvNJYC3dkc
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZc4ZUwAKCRA6cBh0uS2t
-rIttAP9o5h37WPKS26lffxdmH29qGnoV/x0d8qqUkHSo3YRIyAD+MTT6z4V3J8bb
-fhu+Znf8NbyvyQVE13nMFnBjRxKKBw8=
-=bjmB
------END PGP SIGNATURE-----
-
---MN2cs1CvNJYC3dkc--
+return (val && !sockopt_capable(CAP_NET_ADMIN)) ? -EACCESS : 0;
 
