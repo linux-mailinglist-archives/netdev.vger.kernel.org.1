@@ -1,95 +1,147 @@
-Return-Path: <netdev+bounces-72080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 230058568A5
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 17:00:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F8778568B5
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 17:03:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C99771F233E0
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 16:00:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F2111F235F7
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 16:03:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0D6213399B;
-	Thu, 15 Feb 2024 16:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02CC6134748;
+	Thu, 15 Feb 2024 16:02:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VIivHZOk"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="kF0taM9q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 898A8133993;
-	Thu, 15 Feb 2024 16:00:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F3851339AC;
+	Thu, 15 Feb 2024 16:02:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708012831; cv=none; b=CwF9s6hpq5AtyXnEPkGwCm4dEUacgWz3MX3WxDsR8qha1W2eF2V861TLhur9fcMbSK+JKYLRr+7Fw0olBHIEwterqq3ZeDNqz2FQK5KaJ/c8MTP+mzXlMFv/9JPzqZ8zZVlkP+3OSo47pFFbYTeNOQzUXeU7fZT1zPFQ7GhU4Ug=
+	t=1708012959; cv=none; b=LMufxWy4VRkUsNp3Zp0tRnN8jqXVBC/W4AaeVaHj7cF4nT7jlS/lm06TJponMS3aMNTJAIFl4Mcc5kPn+ZVQ91Pnx3CWR4f0i3b8VqVOYwI8hyIZGZYZFbmIZF2/l+Wp67rpPwVz9gRZNvi7FijzZLNQlQqceCnOm2eFdcvosvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708012831; c=relaxed/simple;
-	bh=BXkarRnrP9ql3/F0jVVEdEj9rG4J9sjU6VHcSMrN6BE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=J/xcx0WbpHsSzJVWzds6Tar4pKAVoVOqSy7KVEWHJjQwgyY/1uG+7wDf35vkZJL1SUo/a4NGPbKnGsOl7itf1/Id4KDPpevtQPh81IgagWtkC1OEnDwEEvBUIB9uJPCZ1Dk+buCZ6IWhFhhUAMSBt6weGAEawUH74l43Tzkq+do=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VIivHZOk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0880FC43390;
-	Thu, 15 Feb 2024 16:00:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708012831;
-	bh=BXkarRnrP9ql3/F0jVVEdEj9rG4J9sjU6VHcSMrN6BE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VIivHZOk6jxdd577mnEbjH+58sxhG9ymrK6rOXBZW7kMRtFsHr0HGn/MJSwbhY8VD
-	 E7AGjJJYShMFTUg13RLTln51ujBsl65c0aBFV2CbM+DydYXevhMaH+xnUwhT1NnekG
-	 rrFb8fEmd2EtM1XGhC1ncxwzY6NjxFyyrpxBYoggCIyvKFLUxvpAeNbGh5Gh0oeSH6
-	 cnKhHlyts4JZMJfbXXZjz/Eip2+jp7lCgohtWNC9uQkbZOoisTNoE/+A/LiMtLX0X8
-	 HQGF1yjK2m+0MP7+UYzr0UoW9KXDV0U2zyyXxNCS4K7vy1SoP1qhlPc9kGRwnB1Rz7
-	 5JHW71X5h7/SA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E50ACD8C978;
-	Thu, 15 Feb 2024 16:00:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1708012959; c=relaxed/simple;
+	bh=vCX30uSOIcfJD/9firrildGpUnUbZaUq1SXGVFbONvc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c+iHgRwzPK2LIKFAWn4p0W8qg7JDVFmhiT1p+9wDkOWwLMVhMDbr0DZ842uXARya+KkdMn4j/UryqulI87HS8Pln2HgZw/izyF4zN537hH2AAybf9sYVHhKETam6hmMen8G3TE6wuyecyMKvJ4EHxnvXQLuflAJl17IXBi2518g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=kF0taM9q; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=YQNWh7GF/RgZwIhyO2ZMjQuqWh+GiSsA9oHVl02ggEI=; b=kF0taM9qJfyXAROo0+zXB7uFzR
+	aoGafoZ/LScV/hDufIGDnoF4KI4wt9lrgKS/EXyBbTBLRfPq7gq6+ZlBwhY2ZyAfLYzuQ1kEaBsSS
+	Rwg3kblOtlpazxzqEMhvXUYAfzpkVnUjofCw3nFg0HC/Px1LcHzHR/RlnZmciaXvgbP/6dN1AVZlx
+	0QVFypKSnv6J+hcMiBMWEkHSvqmdnlz+htm02NNe1+/Lds/tjpfvxuKVS31nY12q6Kneh6UHyhfij
+	X+g/g/B3uNYv8H+UzMXEcBjdiLv3TXoyhjNlCbE7xsBrajeFI90DjQ2PMEAQnIKam8jPIRx9F0eyL
+	qhjbkZhA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39184)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1raeBx-0004O8-0I;
+	Thu, 15 Feb 2024 16:02:29 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1raeBu-0004og-5y; Thu, 15 Feb 2024 16:02:26 +0000
+Date: Thu, 15 Feb 2024 16:02:26 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Daniil Dulov <d.dulov@aladdin.ru>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
+Subject: Re: [PATCH] net: sfp: remove redundant NULL check
+Message-ID: <Zc41kuP2iwK3AlWv@shell.armlinux.org.uk>
+References: <20240211150824.3947-1-d.dulov@aladdin.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] pppoe: Fix memory leak in pppoe_sendmsg()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170801283093.9967.12597229007790214662.git-patchwork-notify@kernel.org>
-Date: Thu, 15 Feb 2024 16:00:30 +0000
-References: <20240214085814.3894917-1-Ilia.Gavrilov@infotecs.ru>
-In-Reply-To: <20240214085814.3894917-1-Ilia.Gavrilov@infotecs.ru>
-To: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
-Cc: mostrows@earthlink.net, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org,
- syzbot+6bdfd184eac7709e5cc9@syzkaller.appspotmail.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240211150824.3947-1-d.dulov@aladdin.ru>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 14 Feb 2024 09:01:50 +0000 you wrote:
-> syzbot reports a memory leak in pppoe_sendmsg [1].
+On Sun, Feb 11, 2024 at 07:08:24AM -0800, Daniil Dulov wrote:
+> bus->upstream_ops in sfp_register_bus() cannot be NULL. So remove
+> redundant NULL check.
 > 
-> The problem is in the pppoe_recvmsg() function that handles errors
-> in the wrong order. For the skb_recv_datagram() function, check
-> the pointer to skb for NULL first, and then check the 'error' variable,
-> because the skb_recv_datagram() function can set 'error'
-> to -EAGAIN in a loop but return a correct pointer to socket buffer
-> after a number of attempts, though 'error' remains set to -EAGAIN.
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+
+It probably would've been better to include in here details of the two
+paths that lead to this point, and indicate why it's safe to remove the
+NULL check.
+
+The first path is via sfp_register_socket(), which checks that
+bus->upstream_ops is not NULL prior to calling sfp_register_bus().
+Therefore, "ops" can not be NULL when sfp_register_bus() is called
+via this path.
+
+The second path is via sfp_bus_add_upstream(), and this path assumes
+that the "ops" passed into this function will not be NULL. Nothing in
+this code makes that guarantee, and it's up to the design(er) to
+determine whether NULL is permitted or not. It's not something that
+an automated checker ought to be suggesting.
+
+In this particular instance, I, as the interface designer, do indeed
+intend that "ops" will not be NULL here, so the patch can remove the
+check is acceptable in this instance.
+
+However, I'll go back to my original point: this is *not* something
+that automated tools should be identifying, and it is *not* something
+that should be used to throw patches randomly out, especially where
+the commit message doesn't include human analysis details.
+
+
 > 
-> [...]
+> Fixes: ce0aa27ff3f6 ("sfp: add sfp-bus to bridge between network devices and sfp cages")
+> Signed-off-by: Daniil Dulov <d.dulov@aladdin.ru>
+> ---
+>  drivers/net/phy/sfp-bus.c | 14 ++++++--------
+>  1 file changed, 6 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/net/phy/sfp-bus.c b/drivers/net/phy/sfp-bus.c
+> index 850915a37f4c..829cb1dccc27 100644
+> --- a/drivers/net/phy/sfp-bus.c
+> +++ b/drivers/net/phy/sfp-bus.c
+> @@ -478,14 +478,12 @@ static int sfp_register_bus(struct sfp_bus *bus)
+>  	const struct sfp_upstream_ops *ops = bus->upstream_ops;
+>  	int ret;
+>  
+> -	if (ops) {
+> -		if (ops->link_down)
+> -			ops->link_down(bus->upstream);
+> -		if (ops->connect_phy && bus->phydev) {
+> -			ret = ops->connect_phy(bus->upstream, bus->phydev);
+> -			if (ret)
+> -				return ret;
+> -		}
+> +	if (ops->link_down)
+> +		ops->link_down(bus->upstream);
+> +	if (ops->connect_phy && bus->phydev) {
+> +		ret = ops->connect_phy(bus->upstream, bus->phydev);
+> +		if (ret)
+> +			return ret;
+>  	}
+>  	bus->registered = true;
+>  	bus->socket_ops->attach(bus->sfp);
+> -- 
+> 2.25.1
+> 
+> 
 
-Here is the summary with links:
-  - [net] pppoe: Fix memory leak in pppoe_sendmsg()
-    https://git.kernel.org/netdev/net/c/dc34ebd5c018
-
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
