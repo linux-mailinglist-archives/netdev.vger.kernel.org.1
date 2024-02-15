@@ -1,118 +1,119 @@
-Return-Path: <netdev+bounces-72010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB431856282
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 13:05:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C5948562B8
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 13:11:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD5441C233D6
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 12:05:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 38370B23446
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 12:08:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5723B12BF00;
-	Thu, 15 Feb 2024 12:05:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE44E12BEA7;
+	Thu, 15 Feb 2024 12:08:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YfVT70Xr"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="tpSBuAoa"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B27D412AADA
-	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 12:05:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF13112AAE4
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 12:08:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707998737; cv=none; b=D0Khp3P849rEJHUwoi1XUb4KcFVyN10ZmPuWQLZELjk5XCN3caDoSf/wyfsZ3lryLEft0d6HpGGkRGsitgEgXWb2S36uMdlwoK6BgKTuAnw6JnKr4y+CU+X64NZnvKdpZ5sbFwS/tsjXxknLJ3Y0QYn1gMqDdq6ktYm/G/8/h3I=
+	t=1707998930; cv=none; b=EXMYE73udERsSXijIpRxDo16foR463N4Hjt9fM9sdwTH/0Y31+zcC01PslwjaONtCCGsWODy3OhCsSKYDobzzESfgkHVD4rBBR8anGtTXwdYvX+j9RgADILhCD2RM8HPbU6/a7rY3qztU1M98XhUjrXslWJfzJtbn6jhjvE5jzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707998737; c=relaxed/simple;
-	bh=CbSKbK1omO7SIzg5N1xXqurgbpEYg8FvdIpUX/tdDrA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=h9mRKmTMM6vzuZmRDOvON+8pzOT0fIm6TpaOvqoMerPcRIiw9A0Eu0xlC1+1Pn+hE0TWy86T3oMTSkFjG44RmMgCy8K2V7B8MLTbK+NJhEGOsH+FeJtRJ+0zv3V5rXaE9kcBTOVLvzkXn7tCuWjMKimUSjK096DWkhCUTNwsfoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YfVT70Xr; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707998734;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CbSKbK1omO7SIzg5N1xXqurgbpEYg8FvdIpUX/tdDrA=;
-	b=YfVT70XriNgIWzKQ/pG04TzDc6Z5qvgFLVzr4Iha3g4pL0eq6psUWlqIf7x+bC6IEk/xLd
-	LPBeZSSN5Sw/91jC6h4g5d0wboWJBtB369jixeZMKiPOecwUCUVGZAa77LA9TM1IlqD+wX
-	2zvfD/WcwSu/i7c+Z2Kld6Z/F0qzOdQ=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-44-IeKdAZLAMn6xIK2PIYMyyA-1; Thu, 15 Feb 2024 07:05:33 -0500
-X-MC-Unique: IeKdAZLAMn6xIK2PIYMyyA-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a3d38947c35so48151066b.3
-        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 04:05:32 -0800 (PST)
+	s=arc-20240116; t=1707998930; c=relaxed/simple;
+	bh=2R+2SYI+vDxPHDhMyo/AhefkTHa62dvSGCCw3EsDWiI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gvHlnq9jNe6Z0lQyAxOuVUlaX2hVbIKUGSq1XE8YBNT5yiAvd5xDnDZDHRYJlCupbNnBPJQtdBz8JKuKA9zcx0maYAowvngPx75aUsVqFSyltu3wd1F1cGiHwQG5VN5o3DBRGd9McN/NS4bM5900Nu0t179cakV3IdrywTzbbDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=tpSBuAoa; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-339289fead2so439298f8f.3
+        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 04:08:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1707998927; x=1708603727; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=BASPsZRieoQj9jYTUskhFfUS6hYoPGwKU3/AwR9xS+w=;
+        b=tpSBuAoaCppegz3MUOQInY33MjMUga28yQcmBtj0wgMjuKx6C54AUnYscOI2MSRzLu
+         clnB4IOA4X1t7m1Z71knnBIwyIjrkZgn/r8C3Kbpr0lVf4VPXgee8HFKKm5usiB9RV9d
+         /6Fwp8RCTcIoAJTHjmVh/GtqEUuR62X7UNQCUp8AsNDYnnQSDLBeEpEpdwNFkK2bFBpZ
+         8X7ONyvhlwFOcbDpsTUJS/AGLjotLymSDUOFGRwT4dpgWngnO+SoZKooloE5ZF17uzV6
+         GsGIhs0U69huG9gSJzHUergMd9ao3g+uLBI696lBJu4RAnCmf5f8OSLSEYq1xAZKUBwo
+         S7rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707998732; x=1708603532;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CbSKbK1omO7SIzg5N1xXqurgbpEYg8FvdIpUX/tdDrA=;
-        b=E+sGnl8RpMDNwzF0RYAJOhIQAF/5Nv3FUTxEiHxMNAJd8O+ENhcFmx7hKo6YSLzdyh
-         HTUMOfo2fEiKrNZOjiAFrZuLewM6lmNwGgjJy7it1p2SmgoI9zNGOJHFKRyyKdyL+RA3
-         3rs+sivmaZf6HHA0oljioiQzBe0rUO+Rg2d5rWkwuxv+zum/PwhsFNPyltDXtgRRi6l1
-         Gv9SutYe7QsnT2SNSdL9sCFa/GvvztnCGfNyq20/exHhHrbeiS2+ATOROccsmx1Ao2C1
-         MgICEPH2UsRgCdsIAbGXDOOTQWesswlJv+XHu7Ll+KYvC5W1qRN36w/T5fuEkVdSobqN
-         eyhw==
-X-Forwarded-Encrypted: i=1; AJvYcCWeGdL2ZjitFE7JMKhLXnNY5lnNMhAQ+jaLmq39NoNHMxJGzLEjsSVcLlM0cSCjpcQPBtHt3PRR5yOQ0FdNTwVKSvAoxqgR
-X-Gm-Message-State: AOJu0YwnK1oQqEyfYFvRS4JrdRLrH4BIIdhJaiWA2a/5nWjajr2qAuGA
-	e8DJALCSwddr2G+/DeEA5mY/ee9Yehca5Wy47yOLdrxv9xs8vCAB8/dELsD1VcrtGnqVzFI8x5I
-	Zg8R3TS8b40fHGrjFMLl1RY/bSvZ0Jj8sfv0BO64XXYurDGrZfxFJHg==
-X-Received: by 2002:a17:906:80d7:b0:a3d:a4bf:8fd3 with SMTP id a23-20020a17090680d700b00a3da4bf8fd3mr628235ejx.49.1707998732056;
-        Thu, 15 Feb 2024 04:05:32 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHw+wzerRQ+mi4gSktWu0188A5Sc9gu68b+T99IOSd6NOn/+2nPfd/fOYDNmhEXrS6GL8zbDQ==
-X-Received: by 2002:a17:906:80d7:b0:a3d:a4bf:8fd3 with SMTP id a23-20020a17090680d700b00a3da4bf8fd3mr628214ejx.49.1707998731672;
-        Thu, 15 Feb 2024 04:05:31 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id s26-20020a170906a19a00b00a3d636e412bsm474883ejy.123.2024.02.15.04.05.31
+        d=1e100.net; s=20230601; t=1707998927; x=1708603727;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BASPsZRieoQj9jYTUskhFfUS6hYoPGwKU3/AwR9xS+w=;
+        b=beZ6R/G2tYVadgZ3QyUcAnV0+sHMpDgalCxQeGF6UUNA2JG712ZRmEYFGxM6wMojJp
+         22+bogASmPbVOpekVMf+Z4Xvm6uqCX2p6JoOKuzqeUpwCKIxkiUSaBser+fTJtP3+8YY
+         AQ8jNkJk5hA9xwsdqHdr8CHpMOb8bK7dVtmWnulyzErptW/muO88nOWeXlTdt96P5BUZ
+         yQOQIq3TMnuFCAqeq6xGEoXv1wNAPjfoGJ2XSXahguVchXmVY1jTg2VCE3DNIfHMaWet
+         otaVrFpw+/Cuo3cHztK3ornW5vvGx2VTlsbub8UZLDXlCWDBG9rF0rSapcFbjqZMDfPT
+         qhQg==
+X-Forwarded-Encrypted: i=1; AJvYcCUDSe/JgdxGxG5fQQXZ1R30XMQZhWwtBuZ3Ax9s2pauU0WXRvDJmNTx79kiERY2VQWi6tHRf3PyFjCIuQwL8F7TDcuo7g+B
+X-Gm-Message-State: AOJu0Yxh+xKBYKFQVXYgeoX3rJgxo071fibxM85WDYTn48rjol+FIIT5
+	claEJumAVF3cZPo0m2dQDo6iGsTan/VLA+TV8otXPkPxJnE4zWpbWE5uQJNz7fw=
+X-Google-Smtp-Source: AGHT+IGDOXaVHge1pDULeXoNelmKSM5rpkJ5GMZV50wGfG+qBDJR7lHWGWA/AhhqA7QP5Hi+iNfZHw==
+X-Received: by 2002:adf:f28d:0:b0:33d:1153:f428 with SMTP id k13-20020adff28d000000b0033d1153f428mr239073wro.17.1707998926687;
+        Thu, 15 Feb 2024 04:08:46 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id x13-20020a5d54cd000000b0033cf5094fcesm1626405wrv.36.2024.02.15.04.08.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Feb 2024 04:05:31 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id EF30510F59A0; Thu, 15 Feb 2024 13:05:30 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, Lorenzo Bianconi
- <lorenzo@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] page_pool: disable direct recycling based on
- pool->cpuid on destroy
-In-Reply-To: <20240215113905.96817-1-aleksander.lobakin@intel.com>
-References: <20240215113905.96817-1-aleksander.lobakin@intel.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Thu, 15 Feb 2024 13:05:30 +0100
-Message-ID: <87v86qc4qd.fsf@toke.dk>
+        Thu, 15 Feb 2024 04:08:46 -0800 (PST)
+Date: Thu, 15 Feb 2024 13:08:42 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Saeed Mahameed <saeed@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Jason Gunthorpe <jgg@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+	Leonid Bloch <lbloch@nvidia.com>, Itay Avraham <itayavr@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	David Ahern <dsahern@kernel.org>,
+	Aron Silverton <aron.silverton@oracle.com>,
+	andrew.gospodarek@broadcom.com, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
+Message-ID: <Zc3-ynqAEaVvGua-@nanopsycho>
+References: <20240207072435.14182-1-saeed@kernel.org>
+ <Zcx53N8lQjkpEu94@infradead.org>
+ <20240214074832.713ca16a@kernel.org>
+ <Zc22mMN2ovCadgRY@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zc22mMN2ovCadgRY@infradead.org>
 
-Alexander Lobakin <aleksander.lobakin@intel.com> writes:
+Thu, Feb 15, 2024 at 08:00:40AM CET, hch@infradead.org wrote:
+>On Wed, Feb 14, 2024 at 07:48:32AM -0800, Jakub Kicinski wrote:
 
-> Now that direct recycling is performed basing on pool->cpuid when set,
-> memory leaks are possible:
+[...]
+
+
+>> > I think all maintainers can and should voice the
+>> > opinions, be those technical or political, but trying to block a useful
+>> > feature without lots of precedence because it is vaguely related to the
+>> > subsystem is not helpful. 
+>> 
+>> Not sure what you mean by "without lots of precedence" but you can ask
 >
-> 1. A pool is destroyed.
-> 2. Alloc cache is emptied (it's done only once).
-> 3. pool->cpuid is still set.
-> 4. napi_pp_put_page() does direct recycling basing on pool->cpuid.
-> 5. Now alloc cache is not empty, but it won't ever be freed.
+>Should have been with.  Just about every subsystem with complex devices
+>has this kind of direct interface for observability and co in at least
+>some drivers.
 
-Did you actually manage to trigger this? pool->cpuid is only set for the
-system page pool instance which is never destroyed; so this seems a very
-theoretical concern?
-
-I guess we could still do this in case we find other uses for setting
-the cpuid; I don't think the addition of the READ_ONCE() will have any
-measurable overhead on the common arches?
-
--Toke
-
+What about configuration? How do you ensure the direct FW/HW access
+is used only for observability/debug purposes. I mean, if you can't,
+I think it is incorrect to name it that way, isn't it?
 
