@@ -1,254 +1,134 @@
-Return-Path: <netdev+bounces-72142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF7C0856B4B
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:40:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F799856B56
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:41:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9CA12B246CA
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 17:40:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9519D1F26E0F
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 17:41:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5331A1369A2;
-	Thu, 15 Feb 2024 17:39:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EB9D136995;
+	Thu, 15 Feb 2024 17:41:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fQET31Um"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ftMnwCeT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D3C138490;
-	Thu, 15 Feb 2024 17:39:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AADB81353FA
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 17:41:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708018788; cv=none; b=kJf0IZSaSmt+N3II3FHItaiSf34zVFanzFsJFgYgVdlZIfN1wonCEDKKcoveRCY0Q70y+TUoB2SAdgjGvwkG0cwl6Oj4XwvGknGcsmv4092ng/8xdOJDhOOGcQU81tTUBSCPZP+WAItZNpbAoTk6urWLDr12qbmrLAWnMR1+CVE=
+	t=1708018886; cv=none; b=LM9cpeugRLTXh3IfADox5KESvFdY+bFQVksFpgpXnpWdRmPhy6Pjwd0MdRv0ZiJJE+YL7BV842zYsYYEuq9/u2YnHgb1CTxGRztDbyP1/yfHMBLHfoiMb65XexJeqMH7qbS4vafN+G5vgUDrzoshYYPMRD11bRn3bzhvMlJWFE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708018788; c=relaxed/simple;
-	bh=DepMm0E1rykVEHl91v/EejSEa+JDtowq+qU872OTaog=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RtOT02ZZtq/mcYFo4/lS0ZXnf9wsNtBDhUPGeCvv/4A3p2gFqGtpWxxhLk/wmsX6lNPesTQs4iuaqn/L6M9oG+fTFRGcntOH4jdjCxttSdpVRtvLOf9FRe48y7tlDIg1pv1e0jknWdsV+3BCqc3wlEsySGbs02v8yEleAxiFGzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fQET31Um; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-51178bbb5d9so1291412e87.2;
-        Thu, 15 Feb 2024 09:39:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708018784; x=1708623584; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=g1ki9zK7OcLCmqsO7Ewd3y2YJoqglQbEuSLuAip6u9k=;
-        b=fQET31Um4+3b6Inowc9NZrgNFFLgqrwVPE3Vn3wA08moGsfYOBnh9wMNGiUPNf+e9R
-         WwXCXA+zvhx+4ZUI+GFEtkkwa0JsWSBv1jszxIReQj4aYG7wwTZ83GFHDzJFMlk51H4u
-         Fx9jIeHUIG8QZ0BpY0q/+Muic8HHxPNEo0VUi/bkqCSu7/RryHp+vpBTgZx0j1J3bj5l
-         EC6+v0yBFZ1FB1EjErplCuxWlohWXl0ZDW1ttjYaTiipVXPaK6xrNTdZimqlXQMzwXPC
-         D5HwWbWaINkvlQeAiV8H9Hm7n/9FuI++DrgSF16qesM+CO/Khe74Pc+iLQhgLoYwdMX+
-         pYmg==
+	s=arc-20240116; t=1708018886; c=relaxed/simple;
+	bh=2nt51Mgp2aV8+Qg96ITupHU3npusE6ImfhDZbMjyfXc=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ZGzGe1FzzuB12lxxGJFawZtjM952LOqgw7j5iJdAwLoLnyy6MgWVdk34IqBmNP1FLpX/Y3vUebdfB2wapFLXC5Ss80bOFeQR6x41kjHa8d02XB1ZmSFySyneAl8g17HKgwXivMMoRZX0zMVr+hjDMP8BQxNafH8e+sTz2Bv9YVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ftMnwCeT; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708018882;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=2nt51Mgp2aV8+Qg96ITupHU3npusE6ImfhDZbMjyfXc=;
+	b=ftMnwCeTov8B1KLongsKtD5jZ16zHtuB3BkQ03eAR+YYpTRliG8IaI+fojkCls3vL9Aepz
+	IbJiXOntx+/joGQ1bP9So/Wj4p8G5v20cvUgWRzio3KsiSSHH3JS0oDiJGPoiyRTijPm2o
+	k16I4qMlNgn4omheSqg3i9tW39dQgBk=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-267-fbjXs4DnNHiILch1flbnsg-1; Thu, 15 Feb 2024 12:41:21 -0500
+X-MC-Unique: fbjXs4DnNHiILch1flbnsg-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-41232628d57so340895e9.0
+        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 09:41:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708018784; x=1708623584;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=g1ki9zK7OcLCmqsO7Ewd3y2YJoqglQbEuSLuAip6u9k=;
-        b=RKskyCGtRmybQyQG0i7g0R4iAsRie03YfEwyFLn8w3UR4WzDaJRKzWta+K2ukrZuh8
-         mjMn8tuSMU7a5SwkK91K0U8FYVX1rSYPgxs2h67xe6+9quLbI6wACsMrPFmDgKvBiEs5
-         sq4PAKk0y2MlLi2OEqnFlw0tYbjn+yeq61g8lKrxvnvCcQqVASDLgyBa3hl/l1uvL+Mg
-         tz2O7rrCRGxR7Gnbe+I5L9bQYBmdXuRoAsFsCojVaKmMF0Zy6/2srzP4HqkuBuvz7WZz
-         6XUODKiCibRXfHcRLucOjTtcuc9Df/a3LErwnnSnZxNVncTTTLilr1XAOb3PV9X/mhFN
-         i7gA==
-X-Forwarded-Encrypted: i=1; AJvYcCUB/qrD/FbFkLCi+vGVulHVI7utn+M4A4cr6Xdz8J3lbd9F54/gQ8OJMB1uFfEc9OS7Vl7rSV3YHTgzOsWg1JPp/o1OfGX/llA8w71z
-X-Gm-Message-State: AOJu0Yx6A/02BmgN5qMq3hdcYb2yc7x6JmvnE3/stEo27Cu7LbSPNyJM
-	IumhHYom1jqPrSwyMjS49UkvoILnxzaJcfgyet3R9Gg6YwTNRj4W
-X-Google-Smtp-Source: AGHT+IEOAuW75/Z347ixI4RTdUIvVIqm8O4WQjbwpKWvkWS8noyX3FQEWifQ4dByJEDwos73dXtPzw==
-X-Received: by 2002:ac2:4ac9:0:b0:511:8bc0:9231 with SMTP id m9-20020ac24ac9000000b005118bc09231mr1767732lfp.55.1708018783678;
-        Thu, 15 Feb 2024 09:39:43 -0800 (PST)
-Received: from skbuf ([188.25.173.195])
-        by smtp.gmail.com with ESMTPSA id h32-20020a0564020ea000b00561e675a3casm736119eda.68.2024.02.15.09.39.42
+        d=1e100.net; s=20230601; t=1708018880; x=1708623680;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2nt51Mgp2aV8+Qg96ITupHU3npusE6ImfhDZbMjyfXc=;
+        b=vrrwfcL0uWxv7eJ6qbSxWcIOJl23UPzAWXYokGp7MorB2+DVpLacqpwVCI74a9jz+v
+         AOuKajiyFJd1cxvijSyS6VanghWzzYDRwlVmpomVnTFrDqG262Shhn+mL02a+SdFTmLu
+         7iBsOED7LphshmES1iEyMkXZPWEWVPlOhSsJNLlwcVHBIDT3rNIucvYrVyZE4qS9WNmF
+         BRt8vh0AJSBHRyP6iIZFup3MWFpozOSO7HLHFRZkbYE/wx4LU2qwmV9tY8kwtgs2Ddud
+         W4vcXUnay4Kqk4x2rIoAzuifhFUPb5AluqMsLl1lLL99jaYDwjlYjU1a8TX6ad4LuU22
+         zOKA==
+X-Forwarded-Encrypted: i=1; AJvYcCUqI3Gp9B7PqqXR8q5FSFJuT5sQBl/oFnUvUsYfwCe0BibrZWiRVd7w0AbKWee6Vaw2hfhSubDl9HpwvvZlN+2qJls+QXXC
+X-Gm-Message-State: AOJu0YzLfBegz5BdqbOMAyfH9alslv7/XJXz3YFw0rB6e9RgDULaX6Mn
+	Ge6sqGxHDeDe/RevPnsCk8gXzNf3quRMbvRvn05doD6T2+cP2GAXlcNHFio+db3VGn0n/RGVcgZ
+	7fp74Ya1sBUAF5LZJ/gwuY4rTC7Ms/bTFnVqeW41LtizMcaAnvZl8Zg==
+X-Received: by 2002:a05:6000:69a:b0:33b:10ca:d85b with SMTP id bo26-20020a056000069a00b0033b10cad85bmr1801385wrb.5.1708018879981;
+        Thu, 15 Feb 2024 09:41:19 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF6gPozbzyteRDfoEzFbq1eXrFspX+afEVA859A+jRqzLM37iUUdnBaTE+oiRXKJQ7ni1evpQ==
+X-Received: by 2002:a05:6000:69a:b0:33b:10ca:d85b with SMTP id bo26-20020a056000069a00b0033b10cad85bmr1801376wrb.5.1708018879651;
+        Thu, 15 Feb 2024 09:41:19 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-227-156.dyn.eolo.it. [146.241.227.156])
+        by smtp.gmail.com with ESMTPSA id ay14-20020a5d6f0e000000b0033b2799815csm2648744wrb.86.2024.02.15.09.41.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Feb 2024 09:39:43 -0800 (PST)
-Date: Thu, 15 Feb 2024 19:39:40 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Pawel Dembicki <paweldembicki@gmail.com>
-Cc: netdev@vger.kernel.org, linus.walleij@linaro.org,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v4 12/15] net: dsa: vsc73xx: introduce tag 8021q
- for vsc73xx
-Message-ID: <20240215173940.4jscb7dk6wnkdsyg@skbuf>
-References: <20240213220331.239031-1-paweldembicki@gmail.com>
- <20240213220331.239031-1-paweldembicki@gmail.com>
- <20240213220331.239031-13-paweldembicki@gmail.com>
- <20240213220331.239031-13-paweldembicki@gmail.com>
+        Thu, 15 Feb 2024 09:41:19 -0800 (PST)
+Message-ID: <178b9f2dbb3c56fcfef46a97ea395bdd13ebfb59.camel@redhat.com>
+Subject: Re: [PATCH v3] tcp: add support for SO_PEEK_OFF
+From: Paolo Abeni <pabeni@redhat.com>
+To: Jon Maloy <jmaloy@redhat.com>, Eric Dumazet <edumazet@google.com>
+Cc: kuba@kernel.org, passt-dev@passt.top, sbrivio@redhat.com,
+ lvivier@redhat.com,  dgibson@redhat.com, netdev@vger.kernel.org,
+ davem@davemloft.net
+Date: Thu, 15 Feb 2024 18:41:17 +0100
+In-Reply-To: <20687849-ec5c-9ce5-0a18-cc80f5b64816@redhat.com>
+References: <20240209221233.3150253-1-jmaloy@redhat.com>
+	 <8d77d8a4e6a37e80aa46cd8df98de84714c384a5.camel@redhat.com>
+	 <CANn89iJW=nEzVjqxzPht20dUnfqxWGXMO2_EpKUV4JHawBRxfw@mail.gmail.com>
+	 <eaee3c892545e072095e7b296ddde598f1e966d9.camel@redhat.com>
+	 <CANn89iL=npDL0S+w-F-iE2kmQ2rnNSA7K9ic9s-4ByLkvHPHYg@mail.gmail.com>
+	 <20072ba530b34729589a3d527c420a766b49e205.camel@redhat.com>
+	 <CANn89iL2FvTVYv6ym58=4L-K-kSan6R4PEv488ztyX4HsNquug@mail.gmail.com>
+	 <725a92b4813242549f2316e6682d3312b5e658d8.camel@redhat.com>
+	 <CANn89i+bc=OqkwpHy0F_FDSKCM7Hxr7p2hvxd3Fg7Z+TriPNTA@mail.gmail.com>
+	 <20687849-ec5c-9ce5-0a18-cc80f5b64816@redhat.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240213220331.239031-13-paweldembicki@gmail.com>
- <20240213220331.239031-13-paweldembicki@gmail.com>
 
-On Tue, Feb 13, 2024 at 11:03:25PM +0100, Pawel Dembicki wrote:
-> This commit introduces a new tagger based on 802.1q tagging.
-> It's designed for the vsc73xx driver. The VSC73xx family doesn't have
-> any tag support for the RGMII port, but it could be based on VLANs.
-> 
-> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
-> ---
-> v4:
->   - rebase to net-next/main
-> v3:
->   - Introduce a patch after the tagging patch split
-> 
->  include/net/dsa.h           |  2 ++
->  net/dsa/Kconfig             |  6 ++++
->  net/dsa/Makefile            |  1 +
->  net/dsa/tag_vsc73xx_8021q.c | 69 +++++++++++++++++++++++++++++++++++++
->  4 files changed, 78 insertions(+)
->  create mode 100644 net/dsa/tag_vsc73xx_8021q.c
-> 
-> diff --git a/include/net/dsa.h b/include/net/dsa.h
-> index 7c0da9effe4e..b79e136e4c41 100644
-> --- a/include/net/dsa.h
-> +++ b/include/net/dsa.h
-> @@ -56,6 +56,7 @@ struct phylink_link_state;
->  #define DSA_TAG_PROTO_RTL8_4T_VALUE		25
->  #define DSA_TAG_PROTO_RZN1_A5PSW_VALUE		26
->  #define DSA_TAG_PROTO_LAN937X_VALUE		27
-> +#define DSA_TAG_PROTO_VSC73XX_8021Q_VALUE	28
->  
->  enum dsa_tag_protocol {
->  	DSA_TAG_PROTO_NONE		= DSA_TAG_PROTO_NONE_VALUE,
-> @@ -86,6 +87,7 @@ enum dsa_tag_protocol {
->  	DSA_TAG_PROTO_RTL8_4T		= DSA_TAG_PROTO_RTL8_4T_VALUE,
->  	DSA_TAG_PROTO_RZN1_A5PSW	= DSA_TAG_PROTO_RZN1_A5PSW_VALUE,
->  	DSA_TAG_PROTO_LAN937X		= DSA_TAG_PROTO_LAN937X_VALUE,
-> +	DSA_TAG_PROTO_VSC73XX_8021Q	= DSA_TAG_PROTO_VSC73XX_8021Q_VALUE,
->  };
->  
->  struct dsa_switch;
-> diff --git a/net/dsa/Kconfig b/net/dsa/Kconfig
-> index 8e698bea99a3..e59360071c67 100644
-> --- a/net/dsa/Kconfig
-> +++ b/net/dsa/Kconfig
-> @@ -166,6 +166,12 @@ config NET_DSA_TAG_TRAILER
->  	  Say Y or M if you want to enable support for tagging frames at
->  	  with a trailed. e.g. Marvell 88E6060.
->  
-> +config NET_DSA_TAG_VSC73XX_8021Q
-> +	tristate "Tag driver for Microchip/Vitesse VSC73xx family of switches, using VLAN"
-> +	help
-> +	  Say Y or M if you want to enable support for tagging frames with a
-> +	  custom VLAN-based header.
-> +
->  config NET_DSA_TAG_XRS700X
->  	tristate "Tag driver for XRS700x switches"
->  	help
-> diff --git a/net/dsa/Makefile b/net/dsa/Makefile
-> index 8a1894a42552..555c07cfeb71 100644
-> --- a/net/dsa/Makefile
-> +++ b/net/dsa/Makefile
-> @@ -37,6 +37,7 @@ obj-$(CONFIG_NET_DSA_TAG_RTL8_4) += tag_rtl8_4.o
->  obj-$(CONFIG_NET_DSA_TAG_RZN1_A5PSW) += tag_rzn1_a5psw.o
->  obj-$(CONFIG_NET_DSA_TAG_SJA1105) += tag_sja1105.o
->  obj-$(CONFIG_NET_DSA_TAG_TRAILER) += tag_trailer.o
-> +obj-$(CONFIG_NET_DSA_TAG_VSC73XX_8021Q) += tag_vsc73xx_8021q.o
->  obj-$(CONFIG_NET_DSA_TAG_XRS700X) += tag_xrs700x.o
->  
->  # for tracing framework to find trace.h
-> diff --git a/net/dsa/tag_vsc73xx_8021q.c b/net/dsa/tag_vsc73xx_8021q.c
-> new file mode 100644
-> index 000000000000..0bf150a10576
-> --- /dev/null
-> +++ b/net/dsa/tag_vsc73xx_8021q.c
-> @@ -0,0 +1,69 @@
-> +// SPDX-License-Identifier: GPL-2.0 OR MIT
-> +/* Copyright (C) 2023 Pawel Dembicki <paweldembicki@gmail.com>
+Note: please send text-only email to netdev.
 
-It's 2024 already :)
+On Thu, 2024-02-15 at 10:11 -0500, Jon Maloy wrote:
+> I wonder if the following could be acceptable:
+>=20
+> =C2=A0if (flags & MSG_PEEK)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sk_peek_offset_fwd(sk, used);
+> =C2=A0else if (peek_offset > 0)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sk_peek_offset_bwd(sk, used);
+>=20
+> =C2=A0peek_offset is already present in the data cache, and if it has the=
+ value
+> =C2=A0zero it means either that that sk->sk_peek_off is unused (-1) or ac=
+tually is zero.
+> =C2=A0Either way, no rewind is needed in that case.
 
-> + */
-> +#include <linux/dsa/8021q.h>
-> +
-> +#include "tag.h"
-> +#include "tag_8021q.h"
-> +
-> +#define VSC73XX_8021Q_NAME "vsc73xx-8021q"
-> +
-> +static struct sk_buff *vsc73xx_xmit(struct sk_buff *skb, struct net_device *netdev)
-> +{
-> +	struct dsa_port *dp = dsa_user_to_port(netdev);
-> +	u16 queue_mapping = skb_get_queue_mapping(skb);
-> +	u16 tx_vid = dsa_tag_8021q_standalone_vid(dp);
-> +	u8 pcp;
-> +
-> +	if (skb->offload_fwd_mark) {
-> +		unsigned int bridge_num = dsa_port_bridge_num_get(dp);
-> +		struct net_device *br = dsa_port_bridge_dev_get(dp);
-> +
-> +		if (br_vlan_enabled(br))
-> +			return skb;
-> +
-> +		tx_vid = dsa_tag_8021q_bridge_vid(bridge_num);
-> +	}
-> +
-> +	pcp = netdev_txq_to_tc(netdev, queue_mapping);
-> +
-> +	return dsa_8021q_xmit(skb, netdev, ETH_P_8021Q,
-> +			      ((pcp << VLAN_PRIO_SHIFT) | tx_vid));
-> +}
-> +
-> +static struct sk_buff *vsc73xx_rcv(struct sk_buff *skb, struct net_device *netdev)
-> +{
-> +	int src_port = -1, switch_id = -1, vbid = -1, vid = -1;
-> +
-> +	if (skb_vlan_tag_present(skb)) {
-> +		/* Normal traffic path. */
-> +		dsa_8021q_rcv(skb, &src_port, &switch_id, &vbid, &vid);
+I agree the above should avoid touching cold cachelines in the
+fastpath, and looks functionally correct to me.
 
-dsa_8021q_rcv() also works with VLAN tags in the skb head, not in the
-hwaccel area. So please remove "if (skb_vlan_tag_present())" and the
-"else" clause, and let dsa_tag_8021q_find_user() below fail if it will.
+The last word is up to Eric :)
 
-> +	} else {
-> +		netdev_warn(netdev, "Couldn't decode source port\n");
-> +		return NULL;
-> +	}
-> +
-> +	skb->dev = dsa_tag_8021q_find_user(netdev, src_port, switch_id, vid, vbid);
-> +	if (!skb->dev) {
-> +		netdev_warn(netdev, "Couldn't decode source port\n");
-> +		return NULL;
-> +	}
-> +
-> +	dsa_default_offload_fwd_mark(skb);
-> +
-> +	return skb;
-> +}
-> +
-> +static const struct dsa_device_ops vsc73xx_8021q_netdev_ops = {
-> +	.name			= VSC73XX_8021Q_NAME,
-> +	.proto			= DSA_TAG_PROTO_VSC73XX_8021Q,
-> +	.xmit			= vsc73xx_xmit,
-> +	.rcv			= vsc73xx_rcv,
-> +	.needed_headroom	= VLAN_HLEN,
-> +	.promisc_on_conduit	= true,
-> +};
-> +
-> +MODULE_LICENSE("GPL");
-> +MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_VSC73XX_8021Q, VSC73XX_8021Q_NAME);
-> +
-> +module_dsa_tag_driver(vsc73xx_8021q_netdev_ops);
-> -- 
-> 2.34.1
-> 
+Cheers,
+
+Paolo
+
 
