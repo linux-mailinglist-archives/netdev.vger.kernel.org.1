@@ -1,133 +1,99 @@
-Return-Path: <netdev+bounces-72187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11B61856E6F
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 21:16:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A098D856E83
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 21:23:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5EC71F22BC7
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 20:16:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2FBDBB25D7B
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 20:23:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A4113AA35;
-	Thu, 15 Feb 2024 20:16:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="RWejxXsq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B11313AA5D;
+	Thu, 15 Feb 2024 20:23:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from air.basealt.ru (air.basealt.ru [194.107.17.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 398DC13A89D;
-	Thu, 15 Feb 2024 20:16:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AA5113A879
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 20:23:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708028206; cv=none; b=QnjxWdqm7IdNmf3O6/TKg9GZ13/FPZvVjN8eZQr7pRTqDdY0NZGemf9SFEoo8B0ASrPDiQItCU+6hAclDA7KKcs5NDm3uTO8SXCwKacUqiPK+lV5/4SHZlLh8wElJNxKDIZ9wn+vvW38LHjeHwTyWGuUxnbC7Zcg9de3ONr3KbA=
+	t=1708028615; cv=none; b=RLRh8eKi66LrrlkzRkMlHqewx5nNuXzneZUL+3/IBZzVlp7eeIzlMSxBvFN8LABbCcDhLEQnPH2ei5MGm+0bk2qd+S2fV622BKtv9vEJPQcy9/uGugLjWADDD5+Zs5hwhbljHSJchtEMea7xVNw7Vz+F+jY7mXZB9rDqjhTtcjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708028206; c=relaxed/simple;
-	bh=qEoishFH9LSRy8HKcQT4KXqD7rpsFJk2tkkb37zTSQg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CdhnNvI6XpXlXPt3JwczEBm4C1DCC1KLVE52fWIMkDED5/GcGw8Q1vxuFLeGDSgmFABsGBKQ96fFZbfIWz53qicrgQZrFDlm5M9gFmgdSySDd3xM3bn2bV3nefF+rF12H8Yn46JKf7ldcCJmhjyB/PABljDQH/OuRhGuvsv9tZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=RWejxXsq; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1708028205; x=1739564205;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=YBjtAKZ77n9OzAqyM18gje3GFkDj2C2xPunRe3LSwdE=;
-  b=RWejxXsq9zUWRFHl4oHihpRhXJ39V1A90fmfOnqT/8UtLAlsykdRiu6d
-   1XDCXlznSjj3F/cC5XwlfkjBiqGeI/dha7SYfa2aSfnQyWzohmmxJsYBs
-   2g+mZqorBBJ+H3ixBW1Y3rIfoe2jTi7NsI4EJyQ4rz5I2/8gJa8vpFSaL
-   E=;
-X-IronPort-AV: E=Sophos;i="6.06,162,1705363200"; 
-   d="scan'208";a="66349554"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2024 20:16:42 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:14292]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.60.209:2525] with esmtp (Farcaster)
- id 1a26d7d8-1842-4416-a8a6-b81504bdf866; Thu, 15 Feb 2024 20:16:42 +0000 (UTC)
-X-Farcaster-Flow-ID: 1a26d7d8-1842-4416-a8a6-b81504bdf866
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 15 Feb 2024 20:16:38 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.170.20) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.40;
- Thu, 15 Feb 2024 20:16:34 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <ncardwell@google.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <jaka@linux.ibm.com>,
-	<jonesrick@google.com>, <kuba@kernel.org>, <kuni1840@gmail.com>,
-	<kuniyu@amazon.com>, <linux-s390@vger.kernel.org>, <martineau@kernel.org>,
-	<matttbe@kernel.org>, <mptcp@lists.linux.dev>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <soheil@google.com>, <wenjia@linux.ibm.com>,
-	<ycheng@google.com>
-Subject: Re: [PATCH v1 net-next] net: Deprecate SO_DEBUG and reclaim SOCK_DBG bit.
-Date: Thu, 15 Feb 2024 12:16:27 -0800
-Message-ID: <20240215201627.14449-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <CADVnQykqkpNTfO30_aswZEaeSkdu5YNuKag++h-RSguALdeohw@mail.gmail.com>
-References: <CADVnQykqkpNTfO30_aswZEaeSkdu5YNuKag++h-RSguALdeohw@mail.gmail.com>
+	s=arc-20240116; t=1708028615; c=relaxed/simple;
+	bh=UmTpHsje2P8xOhy5wFmXSO4HJiI8a4wYhbZ5ZFI2yY0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Feb31l1zgiuuE6GD97yBMWU64yC+lzYwCVxSXuebfIaO6PqfPTA83IVNjjn2AYT7hzNZwDZcvnwzb/gfhWQN29KzEFTHBMRGv/0hbjKV67jpGfAygk/LLCIR/D5d7dzDxin88cCf3DKrLdBwrnzsqM3KM9q7BNwAUrMrmrhnb/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
+Received: by air.basealt.ru (Postfix, from userid 490)
+	id 527CB2F2025B; Thu, 15 Feb 2024 20:23:23 +0000 (UTC)
+X-Spam-Level: 
+Received: from altlinux.ipa.basealt.ru (unknown [178.76.204.78])
+	by air.basealt.ru (Postfix) with ESMTPSA id 312CB2F20259;
+	Thu, 15 Feb 2024 20:23:20 +0000 (UTC)
+From: kovalev@altlinux.org
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	jiri@resnulli.us,
+	jacob.e.keller@intel.com,
+	johannes@sipsolutions.net,
+	idosch@nvidia.com,
+	kovalev@altlinux.org
+Subject: [PATCH] genetlink: fix potencial use-after-free and null-ptr-deref in genl_dumpit()
+Date: Thu, 15 Feb 2024 23:23:09 +0300
+Message-Id: <20240215202309.29723-1-kovalev@altlinux.org>
+X-Mailer: git-send-email 2.33.8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D035UWA002.ant.amazon.com (10.13.139.60) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Neal Cardwell <ncardwell@google.com>
-Date: Thu, 15 Feb 2024 12:57:35 -0700
-> On Tue, Feb 13, 2024 at 3:32 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
-> >
-> > Recently, commit 8e5443d2b866 ("net: remove SOCK_DEBUG leftovers")
-> > removed the last users of SOCK_DEBUG(), and commit b1dffcf0da22 ("net:
-> > remove SOCK_DEBUG macro") removed the macro.
-> >
-> > Now is the time to deprecate the oldest socket option.
-> >
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > ---
-> 
-> I would like to kindly implore you to please not remove the
-> functionality of the SO_DEBUG socket option. This socket option is a
-> key mechanism that the Google TCP team uses for automated testing of
-> Linux TCP, including BBR congestion control.
-> 
-> Widely used tools like netperf allow users to enable the SO_DEBUG
-> socket option via the command line (-g in netperf). Then debugging
-> code in the kernel can use the SOCK_DBG bit to decide whether to take
-> special actions, such as logging debug information, which can be used
-> to generate graphs or assertions about correct internal behavior. For
-> example, the transperf network testing tool that our team open-sourced
-> - https://github.com/google/transperf - uses the netperf -g/SO_DEBUG
-> mechanism to trigger debug logging that we use for testing,
-> troubleshooting, analysis, and development.
-> 
-> The SO_DEBUG mechanism is nice in that it works well no matter what
-> policy an application or benchmarking tool uses for choosing other
-> attributes (like port numbers) that could conceivably be used to point
-> out connections that should receive debug treatment. For example, most
-> benchmarking or production workloads will effectively end up with
-> random port numbers, which makes port numbers hard to use  for
-> triggering debug treatment.
-> 
-> This mechanism is very simple and battle-tested, it works well, and
-> IMHO it would be a tragedy to remove it. It would cause our team
-> meaningful headaches to replace it. Please keep the SO_DEBUG socket
-> option functionality as-is. :-)
-> 
-> Thanks for your consideration on this!
+From: Vasiliy Kovalev <kovalev@altlinux.org>
 
-Oh that's an interesting use case!
-I didn't think of out-of-tree uses.
-Sure, I'll drop the patch.
+The pernet operations structure for the subsystem must be registered
+before registering the generic netlink family.
 
-Thanks!
+Fixes: 134e63756d5f ("genetlink: make netns aware")
+Signed-off-by: Vasiliy Kovalev <kovalev@altlinux.org>
+---
+ net/netlink/genetlink.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/net/netlink/genetlink.c b/net/netlink/genetlink.c
+index 8c7af02f845400..3bd628675a569f 100644
+--- a/net/netlink/genetlink.c
++++ b/net/netlink/genetlink.c
+@@ -1879,14 +1879,16 @@ static int __init genl_init(void)
+ {
+ 	int err;
+ 
+-	err = genl_register_family(&genl_ctrl);
+-	if (err < 0)
+-		goto problem;
+-
+ 	err = register_pernet_subsys(&genl_pernet_ops);
+ 	if (err)
+ 		goto problem;
+ 
++	err = genl_register_family(&genl_ctrl);
++	if (err < 0) {
++		unregister_pernet_subsys(&genl_pernet_ops);
++		goto problem;
++	}
++
+ 	return 0;
+ 
+ problem:
+-- 
+2.33.8
+
 
