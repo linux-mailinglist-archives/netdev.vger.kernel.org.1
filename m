@@ -1,158 +1,159 @@
-Return-Path: <netdev+bounces-71951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAD608559AF
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 05:14:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18AF28559E7
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 05:48:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1466CB237CE
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 04:14:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 193351C21790
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 04:48:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 299F39476;
-	Thu, 15 Feb 2024 04:14:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36E1863AC;
+	Thu, 15 Feb 2024 04:48:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="1nTFXC/u"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="I6L9U/aW"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2083.outbound.protection.outlook.com [40.107.212.83])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 401626FD9
-	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 04:14:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.83
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707970458; cv=fail; b=A8DObsHsFlKs4PNZ14MOfO8cKDY1mvNgYoYRZxEQeBit+5x8pbuKiPAxYfycZcu27i2Prkt0qlmkL/N22GMVGSeaxCKibLPAk+NZUQwkYM9OouepOTBdUMZu2u7m0pbRocaOeRm+jO9DG1CLkVOPndO2DrUC2y19TjcIeTfBrT8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707970458; c=relaxed/simple;
-	bh=9p+gktORETbG5s4arN+zJGswLiDNumevDXlpQPLS/68=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=imSlCOhSbRfGlN2cwBQZjI25Ne1DRiAPGHwtdCmwShgnDgzS9XBrk34wbUv9mVjVQrd9X9PyiwdRM6PClw/NKPto93IaSHsmkE9Edn0x9w3QKpqaYNUkWlagJymKweYU+X2gMbiBNgs3fdMBRlQHT1uyQpKtQwscyN3pWE8A8HY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=1nTFXC/u; arc=fail smtp.client-ip=40.107.212.83
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NHVw/wnMkEh/U3ZF1LgMu3F8ImoKRXAsaJc4ZY+IVjAfZlPPv2905bOHPrdC09RAXyUwttTVCK+kT2uP0aBrEJuNQK76HevIjeh1TUqJvTCQjfPFmC+fZs+LABISVye3j55wmGIl+OoDGLQQtUYDxVL3sj8j6z01CuBPQXYn/efTMnNBB1xvQ/NJLz97moox0xDIBEke5WSnJ5lo7xE+6Xl0+19XMuhAwLLGwQH0A+codbGTVTtgg7Y0SHEKWa1KAU8tvotn21KR/ufC2IgHE3KPXRSnmhiIub2jXLYfAKzRhddMtJhdA6nqXUDsuZFsxMX8e8ysboMeEuIqMLaxsQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ddfvvPbTvuahZ3zQAoEP7Vrmf8pCZfybWhYO1D3WyfA=;
- b=Y2+P4VXW2p1dJyesjfq6HKlg2XCcau+saK2LiGmilT4XGZOiaUhX8O3urLE6Mv21vyl3XmkaUeJqTDLz2tXC8kanoevVX/8FIV0g+5r+LhoTHWH97Xkg/4+rk4qS5JmyZ+ZmLzoQfiyV6pCQxv3Vowp65RgmOk3U5BDAiKdih5eaqvgQLpfWHvgdop6sW67xNMXX6CkXQp6Kow6VkWX2qDhKS4j3aWqzAfOJvIgcS2H0JrfLP8Cg4uO0ZFXZ3y6HBqgYfJZmygj6pUttjwoj6oQdzn8FWM7SjbcwCL62BPkMclKxWDT/4H9+L0aHJb+wM/d89EQl4tGCCOv6plRuoQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ddfvvPbTvuahZ3zQAoEP7Vrmf8pCZfybWhYO1D3WyfA=;
- b=1nTFXC/ulagV0q4AT6QrvrLe5jjTDZPSka6ZtABkpH+lAhah0zzPcX1j3WFiI/K59/gOc2D603VtKbW1OQSN0ZS7d81mDTAOVb71zOZAKeRydu9feoaT1JSmOXhmdGSwQKKpDQO1hSALxLBU/JPq43qmGSoePt7I2BXMqJp/+ks=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
- PH0PR12MB5677.namprd12.prod.outlook.com (2603:10b6:510:14d::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7292.25; Thu, 15 Feb 2024 04:14:13 +0000
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::e4b7:89f7:ca60:1b12]) by DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::e4b7:89f7:ca60:1b12%4]) with mapi id 15.20.7292.022; Thu, 15 Feb 2024
- 04:14:13 +0000
-Message-ID: <e91243b1-a5d8-4b61-8674-6fa6400b10fb@amd.com>
-Date: Wed, 14 Feb 2024 20:14:11 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 net-next 9/9] ionic: implement xdp frags support
-Content-Language: en-US
-To: Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org,
- davem@davemloft.net, kuba@kernel.org, edumazet@google.com, pabeni@redhat.com
-Cc: brett.creeley@amd.com, drivers@pensando.io
-References: <20240214175909.68802-1-shannon.nelson@amd.com>
- <20240214175909.68802-10-shannon.nelson@amd.com>
- <1c64d64f-23c6-4efa-80d4-e39fdaf16280@intel.com>
-From: "Nelson, Shannon" <shannon.nelson@amd.com>
-In-Reply-To: <1c64d64f-23c6-4efa-80d4-e39fdaf16280@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR03CA0057.namprd03.prod.outlook.com
- (2603:10b6:a03:33e::32) To DS0PR12MB6583.namprd12.prod.outlook.com
- (2603:10b6:8:d1::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C78B1C0F;
+	Thu, 15 Feb 2024 04:48:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707972506; cv=none; b=JLMcdGqryIG5n0/cIMhBjFlFaSHMAJDqm7WPVXqJPCSYmWtfg5bPAq0FEHp4lLX95y5OfISY5ihQ2RD18eJJBK08/OSYvFCRTAcg2HBS1x7b7kNn1odkUg1Jmo3WEak6OsULAAi9diBZRVYzLVK4pnOycIQwQVVVJM38OKovm74=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707972506; c=relaxed/simple;
+	bh=5o/3QD9IVMwO2DGQRthGEJt8ZrCdo7xAiiwUB1JC6oI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=I4iTV0VVuHh8eyAAZ4QKHc3OZPWL7nMGtURWOmEdU3q2WxW73uZDuhrHnZWk7OVESSlfP7qHnih2CyFPCso6INznQJVnqRWvHnQq0OnEw+vhSezLvikTdxrYs5/m+hqszr+i84IutYvjdq+wLGfdTM4F8pRmNCyIPHoCyHhFY1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=I6L9U/aW; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41F4MMq5010025;
+	Thu, 15 Feb 2024 04:47:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=57EHGLJUekwB27YpA6QFEIQ+R7ja+si5OreIJSovoWE=; b=I6
+	L9U/aWMxUFIONiViC/rPMptUXOIMM1RhOQJyZW2FDRKY6inCPze0mh3VDlNmPdVd
+	6nwnhL6I3Rn0R76S8bkxwaHfe0owUcrwF25poFgD6o/InKuSy/TbEWOnLRV21icO
+	sPdJs2+BmNNHLivcFR+nP2oKxCMCrzv8nmgNQUyArobj1eNo8Q0DWk7Vr/J/DJi6
+	cq764ZBP4dRnVd9+fxW+mD6hvLXamQ9h+q3d+wSjDoTbsKTzTPxTVKVuFsAmA693
+	WN3AnmKitgWwQ6Zj3IY4+Jf/XxqbsnCGuLlR7Q0SR2bUpWWUDvpMVzKiiKByhdof
+	it/93PSOMC25fRxzmB1g==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3w9bfs01h0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 15 Feb 2024 04:47:53 +0000 (GMT)
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41F4lqGO019041
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 15 Feb 2024 04:47:52 GMT
+Received: from [10.216.17.27] (10.80.80.8) by nalasex01b.na.qualcomm.com
+ (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 14 Feb
+ 2024 20:47:44 -0800
+Message-ID: <7a567b50-66f1-4737-ae6c-0dabd1d39bcf@quicinc.com>
+Date: Thu, 15 Feb 2024 10:17:41 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|PH0PR12MB5677:EE_
-X-MS-Office365-Filtering-Correlation-Id: 480beb64-8b98-4ed9-e4b4-08dc2ddc915d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	XtcbYYYTJHF7p0il5R7ARY2G7oakdmHc6JkdA10lqavhAMPL0GzcRU5Gk9bkRggUbOtDmaktYeqmHrV6SgRhcVRKBNo9wvF2bT0f9ChsUYO9LojEQUHR/dAJ0lLamRCbdwnuk0+VZU6zNubYofiGT0e1WYUUYHbv7Kt2saC6UxpSRqJaUMuXX09atzE2xmxro4KhOiRus2yyNJ8qKH3U/1FXEXt8t58j+Fv9t11HCtqTWsEjI6H+HsnvSVh4FSMcjlKXHo5375qN1wINbCiAr4mIDl4XiWOssFRxWWYihRCrGZfN+2SC5D374CEu8fOMxICaOyLzdAO85lBgOaYfP+tPK+jYfG1P1viwmLuztDV3MqX+41HgC2SzUVXewL1Fhk12zExlM/0LyiO5RiT7Mi+2+auxWaxPgXixxneRTA14bE1Vxs014iXgPdp3kHtRTJOM+WwSuW0M+t6u0/goGsbxECaHtImzokCFS3Ap4QMIKIUxbRIFc77AwoWK+bar2dW0U/R0z9PZ9lhfUDpaP1XwfjBVUdC3StjKEYd7tmGAoutogPVFK6QtfqkVuGeY
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(39860400002)(376002)(396003)(136003)(366004)(230922051799003)(64100799003)(451199024)(186009)(1800799012)(31686004)(478600001)(6512007)(6486002)(41300700001)(5660300002)(8676002)(2906002)(8936002)(4326008)(4744005)(53546011)(86362001)(66476007)(66946007)(6506007)(316002)(66556008)(2616005)(31696002)(38100700002)(36756003)(26005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?bjBRY1ZVYXE1a0U1d1gvaEVDd2M3RmZHbks0NTNpYU5va043d3RBcGlENHg4?=
- =?utf-8?B?ak9oYlFvK2JVTGFxSkV4UlRUZEZ5dW0rbTl5djNoa210S0VIT2liVDBFVER2?=
- =?utf-8?B?cHNWN0JFa1FnSVg5ckt0elI4RzdpZUpzT1NUVG1LK2M4ZjVLTWhKMzFkNGFr?=
- =?utf-8?B?QWEvMlRFdmxHc3hkQ2UxazY4VDRXaVlxQm8yNXJ5NHIxNnRyNkdQQnZLWFUv?=
- =?utf-8?B?TDEzR3lEUXF3SUM4YjdrUnYxVk1jWTJwcXkxNGgyZDRVdW9VSnhlMTlzUU40?=
- =?utf-8?B?RVRqaGFpcm44RWFGdWVlSXlFT3U2N0o0disrMGlQeXVLZVhGRllMUXh6WHo1?=
- =?utf-8?B?RXlodWFvZERHemZUZ0RndTdDRWNmdUR0NDdPaXl0UG4xUzZmTER6UkNIZmZn?=
- =?utf-8?B?eTc0WVBkU2RheS9hWlgzMFRxTEhXcWpyV0o0eFFYUE1vNW5lVzd1UFZoWW1m?=
- =?utf-8?B?TlBWbzRGZXF2L1dWcGVadGpjZklFWkxUU2FBTmlranBHNkQxN3JuT0xZUHdU?=
- =?utf-8?B?eEdSU1NocTQ4MUU4dk4yRG52RWRDdWtPSGNhcFdVOTIyUG4zalg4RGlGUWdw?=
- =?utf-8?B?ZHhIUVBIcjZ5eit2M1pIT3BrNDNxT21FaFlrcU9iSkVsZnp0Y3ZyMFYvRVpT?=
- =?utf-8?B?dk9rREhJU2tJbitUblAvcGZRUnhTSjFRSVB4eVg5ck92REZ4ZDd0VUExNE5I?=
- =?utf-8?B?T3pHRlcxV1VwQU1lOTJ1aUpBS3JEdkVwVmxFRXNqSVVoUGdmUVhSTjNmNWQ2?=
- =?utf-8?B?QytlVXRla0ZTWHhUODJmQ0Z2OUFVSDZ1aEFjZEFqYi9iMWVNUUJmVnRjbTd6?=
- =?utf-8?B?NWZ6djFSUG5nMHIwbUV3aW13STE4c0IvNC9aR0hiRXFnRzBKYXIyb1o5YThj?=
- =?utf-8?B?VUZPeHowQk1wb3RSVnpvSlRvYXpQRGFoM1o2dm1nck84aWdIYlB1NVZJTXZH?=
- =?utf-8?B?ZWNQRk4vQWNXNk9ZZUFQekVqWE1TVjVmTEM1WEEzcXZOWk1sNDZvQjlwN29h?=
- =?utf-8?B?Q2R4L1F3QlR4dzExQ2JlVWw5UEVoYkFRenhlQ210VFV1Zmt1V0dPazhueFhC?=
- =?utf-8?B?dmU4NmlrMWpkZ29oN1JYK1BFQncvbmlJTHozOGtNeVRpMTNaclpiUkc4a2dv?=
- =?utf-8?B?SVNtNWtUZE85RU04SEVrWEYwRXdBUGVoc2FEakVoeTZHUytlZnFmZ1lnWXBS?=
- =?utf-8?B?bUlCMHpoMzdUZUQ3MFkwMVA3VlZDalJ1N05zb3htbXV4VG1IdEkvWDZCWWQ2?=
- =?utf-8?B?S0xtektORUJkaXFHdEhLUmZDWnp2c0Z0ZHFSNEUvTWROZHhGQVVvWlpqVnV4?=
- =?utf-8?B?TjhrRXNleVd5NnJUMDRQYzRNQUpZNU1tMVpaVFNaNythNk9zVi9wZ0g5REFT?=
- =?utf-8?B?MFZDems4VmJaUjhhcVBxWTkrNnBBNE0xbVN6WE5ic0t1a1l2Nm1iN3lhTnov?=
- =?utf-8?B?OVR0LzlKaXZ2Ynp0aUx1Sk9uZ1p2Wi80YUNBTjhDQTBncHJUbXBpY2hHY1JO?=
- =?utf-8?B?aXpPa2loRXFOV0kvRXkrOEo1SHVadW5MQVJSZXA1bGtsUWplL3F1Ujh4eU1z?=
- =?utf-8?B?THlRc25wZWpvMXVKMVVEbTFJbTFHUWJWSlhRczFTQlJIMUVaUktWeVlZaU4y?=
- =?utf-8?B?ZUJYU2hZN0RLeUQyN2FQY3phbTFaT1N3b20rVlJqcUtuQVdkajdrRkluaEJy?=
- =?utf-8?B?UFdTS0JFRWc0UzNySVZ2NVBQSHJ6QTdDYVMyY2xLVFdMQXFOUWZOMElVdTMw?=
- =?utf-8?B?TWJDZ1FTYkkzYUFpQUFvUm0xVG1MeEhtRkcwQy9DeURqWElXYWxTSG14NnFK?=
- =?utf-8?B?VGJ3SVA0WFdtdjl5Z0tHQno3NmQ2V0RaWFJsOTZkSG1BMmx4Tk94ajJHaEdO?=
- =?utf-8?B?YlBCZ2xOTW1PRTE1ODM3Q2pOVmkweWo5cHJ1UC8yQ1hLZDVySGFpeW5EejZx?=
- =?utf-8?B?YTBnR3FjQ2djMTVJZTJqZ3pWNXhmODBNWDRwUUhGVkQ5amRUUklNbUpTaXpr?=
- =?utf-8?B?OVBLdUtrUUNWRGM3MnM3OWVhWEM4NkdLSHVzV3RPTkRwWjVUZFh5SFprSmph?=
- =?utf-8?B?NVN5UFI2TkZVSWJ4OC9laFNDdlF1OHJWWllTN2JWNXVZdVczUXBwSndzYWpi?=
- =?utf-8?Q?y1traLEBtV9sdJydnbHBK2veY?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 480beb64-8b98-4ed9-e4b4-08dc2ddc915d
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Feb 2024 04:14:13.6615
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: IPq291RkYFNLVmnsstalBAp2enp4SVHNchMA7RvnXS0R5Uhmc/q9T//FIvypupmXT98Awph9iJ6pMj6B02Ak1A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB5677
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4] net: stmmac: dwmac-qcom-ethqos: Add support
+ for 2.5G SGMII
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Jose Abreu
+	<joabreu@synopsys.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+        Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        <kernel@quicinc.com>, Andrew Halaney <ahalaney@redhat.com>
+References: <20240208111714.11456-1-quic_snehshah@quicinc.com>
+ <20240212173015.0341f0ee@kernel.org>
+From: Sneh Shah <quic_snehshah@quicinc.com>
+In-Reply-To: <20240212173015.0341f0ee@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: 3RXFTHEoRYOKGGlv-yqGshlNz6ajAfjq
+X-Proofpoint-GUID: 3RXFTHEoRYOKGGlv-yqGshlNz6ajAfjq
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-15_04,2024-02-14_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ bulkscore=0 phishscore=0 suspectscore=0 priorityscore=1501 spamscore=0
+ clxscore=1015 adultscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2401310000 definitions=main-2402150033
 
-On 2/14/2024 2:06 PM, Jacob Keller wrote:
-> 
-> On 2/14/2024 9:59 AM, Shannon Nelson wrote:
->> Add support for using scatter-gather / frags in XDP in both
->> Rx and Tx paths.
->>
->> Co-developed-by: Brett Creeley <brett.creeley@amd.com>
->> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
->> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
-> 
-> 
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 
-Thanks, Jake, for all the reviews.
 
-sln
+On 2/13/2024 7:00 AM, Jakub Kicinski wrote:
+> On Thu,  8 Feb 2024 16:47:14 +0530 Sneh Shah wrote:
+>> Serdes phy needs to operate at 2500 mode for 2.5G speed and 1000
+>> mode for 1G/100M/10M speed.
+>> Added changes to configure serdes phy and mac based on link speed.
+>> Changing serdes phy speed involves multiple register writes for
+>> serdes block. To avoid redundant write operations only update serdes
+>> phy when new speed is different.
+> 
+> Sounds like 2 separate changes in one patch, please split the
+> optimization of not writing the registers multiple times and
+> the 2.5G support.
+> 
+
+Optimization is part of 2.5G support change only. with introduction of
+2.5G speed support we need to update reconfigure serdes phy. there are
+2 different serdes configs.
+1. config for 2.5G
+2. common config 1G/100M/10M
+
+The change here is not to reconfigure serdes phy among
+1G/100M/10M speeds and only reconfigure if it switches to 2.5G.
+
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+>> index 31631e3f89d0..6bbdbb7bef44 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+>> @@ -106,6 +106,7 @@ struct qcom_ethqos {
+>>  	struct clk *link_clk;
+>>  	struct phy *serdes_phy;
+>>  	unsigned int speed;
+>> +	int serdes_speed;
+> 
+> Why signed if speed itself is unsigned?
+
+In stmmac speed can be assigned as SPEED_UNKNOWN which will be -1.
+I will fix speed being unsigned int in a separate patch.
+
+> 
+>>  	/* Enable and restart the Auto-Negotiation */
+>>  	if (ane)
+>>  		value |= GMAC_AN_CTRL_ANE | GMAC_AN_CTRL_RAN;
+>> +	else
+>> +		value &= ~GMAC_AN_CTRL_ANE;
+> 
+> That looks unrelated. Either a separate patch or please explain in the
+> commit msg why.
+
+For 2.5G speed support MAC PCS autoneg needs to be disabled.
+This adds the change to disable PCS autoneg. I will update commit
+message to add more dtails
 
