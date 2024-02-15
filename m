@@ -1,170 +1,157 @@
-Return-Path: <netdev+bounces-71991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA2428560B7
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 12:05:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 325168560F1
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 12:09:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26AB21F2242D
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 11:05:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3A3B285746
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 11:09:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99BAF129A98;
-	Thu, 15 Feb 2024 10:59:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 142C712BF39;
+	Thu, 15 Feb 2024 11:07:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kpz6q7xp"
+	dkim=fail reason="signature verification failed" (4096-bit key) header.d=ycharbi.fr header.i=@ycharbi.fr header.b="Gey/D1rY"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.ycharbi.fr (mail.ycharbi.fr [45.83.229.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 994748529F
-	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 10:59:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2024A12A142
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 11:07:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.83.229.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707994756; cv=none; b=Kgtz8EkCxOv2Hmq+EQp+k3OBfald9cHNLSdE9ZGgvCxXhwE2Soor4K2lD5PLgfn0Xz+9Z7hlg2HpGvrm4QfQW5s+juQEJflLao5kjnu2XEcX3VOKQIIVRi72yg78IQxvE8qT5ePFY/3BvYeOxyKW6ZEMalzgq3hdGlMWekCENMU=
+	t=1707995265; cv=none; b=EF6+U5zogW6vUslGclNiuZnyBfCMyzfEnuoTu7yQmQ9oTdOi6dyYLNOK2vPxI4Xc3kZN3EkWnaVCH/J8jQZbANgbBLZFOo/cBvxYigShj1Wf5fGXPqRvgkk+NLGVvlsHNHDrMCm9cwfqruiecA9jher6kG0pinhh4VCLjyQoDXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707994756; c=relaxed/simple;
-	bh=RoOhYsWKl4id9h2UBMjJnCZPzwetbNdKICsUFnEQ9bA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=czRk9eNg4N9T15NSH5+JJl1ryNohAM82jIVXP8ucQmw5AzzGPSJwsMRFxMIAmXARMRpvk9C+r/O54s3NkIFSpjlu6i6RhR3400woYrIOVoPxE3D7K/u8q1tfn24MsuvnVppNL0uzHM6vandTFV2OPQUi+K9L4QX51ZxnrOJ4mac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Kpz6q7xp; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707994753;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=woqgG7qDUaCEdyTuoC12m4r/isYcHMcNv/Nepgm3+JQ=;
-	b=Kpz6q7xpcIJu8NmQ4Qw5/rECizdRXHua65wvlI5kKT2WZMzbPfU9mHAvn1wdeR1dh5gCgq
-	HxkEBBQJf6YjS84bv6vzz9caDJ3q+FF0tk3TIoxUj1KbXRja9FOsdY8u+auAwKpW5RlHPQ
-	5ky3zu3axQKNy4YCe6SwgA1Wvd4p8XM=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-436-hnRcslzLNrCYF2v2SPqPyA-1; Thu, 15 Feb 2024 05:59:11 -0500
-X-MC-Unique: hnRcslzLNrCYF2v2SPqPyA-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-411e27d561dso1747515e9.0
-        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 02:59:11 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707994750; x=1708599550;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=woqgG7qDUaCEdyTuoC12m4r/isYcHMcNv/Nepgm3+JQ=;
-        b=VKYXPZoWLL6NfOiKYZIFVaNJeHg4s5TfMk5Eb2OD1kYZV2hhVjwACgjS9c2zKiBIcc
-         ks8CBzI6UsvbDvsSk28yeBeftmBV+0q+8hS1TBcNBxBCC23KzXdkyLZQUGhwBMa37NCl
-         tfQa3wF7L1sdcX/u/fiWbas5hEhY1eeRpkSAF5FHXeDvV2EG1G8mO+BZyMkP7jGnQZUG
-         AhplUGRb4cBYzw0Q5azCS50REWKlAbb7xY2YLl8xLnbM0hZqaEIqTymiNtvusqtPKcTh
-         fj2yd10uBzNwLvVK+mNKrxtVV8NB+gxI37YwZCmDMCueO7LjK4InNRabuOoPTfAzhRLE
-         iePA==
-X-Forwarded-Encrypted: i=1; AJvYcCXb8G2Lszxp6gMyaOO7GnIHezcGcwfy0IYITNuJlDoP80G5UUFvQKoPyPikjpZBMiVSopdyIAdQE4XPIJiltuJLgWnzX+ct
-X-Gm-Message-State: AOJu0YxXrQ/W9pGY5tofB5oEwiKo/WK5cTkPiyfGn9G7XXimfxqk2OyW
-	JLeg3QPRu/gTF004bxgQmZvRtO0NvKt0dGJ9hR3j60+Txz9BO0vZXnkNzYBwcHDhJCS4ds+AzjD
-	+qBtuMW6DFX06ZqIDbawknyzQwsroenjpS4UDlYGZUvsGzVg1Mb7D+g==
-X-Received: by 2002:a05:600c:4f15:b0:411:dd14:8c36 with SMTP id l21-20020a05600c4f1500b00411dd148c36mr1022602wmq.2.1707994750291;
-        Thu, 15 Feb 2024 02:59:10 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFL6gXUtDYGp5A2tJLOK0tEzbzBXqS1/Ue//Eq8lYqnI+XjjiQuS0mZaoxeSpZ2FKNyb5dJEQ==
-X-Received: by 2002:a05:600c:4f15:b0:411:dd14:8c36 with SMTP id l21-20020a05600c4f1500b00411dd148c36mr1022589wmq.2.1707994749918;
-        Thu, 15 Feb 2024 02:59:09 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-227-156.dyn.eolo.it. [146.241.227.156])
-        by smtp.gmail.com with ESMTPSA id z21-20020a05600c221500b004101f27737asm4647602wml.29.2024.02.15.02.59.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Feb 2024 02:59:09 -0800 (PST)
-Message-ID: <8bcd540b747ae30edc10c5208d7876b901e702b8.camel@redhat.com>
-Subject: Re: [patch net-next] tools: ynl: fix attr_space variable to exist
- even if processing unknown attribute
-From: Paolo Abeni <pabeni@redhat.com>
-To: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com, 
-	donald.hunter@gmail.com
-Date: Thu, 15 Feb 2024 11:59:08 +0100
-In-Reply-To: <20240213070443.442910-1-jiri@resnulli.us>
-References: <20240213070443.442910-1-jiri@resnulli.us>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+	s=arc-20240116; t=1707995265; c=relaxed/simple;
+	bh=IT6a5Nw4dZlYOm4J/MrtHC1WGfvjoiWJ6lT8CMBCrxg=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc; b=TbNjqURcZOSj0uxNNd3vdzXSMG7qHOD8bZdU9HbnB70QYMcwhwxstkW/c9kRRQ1ie1MGbtBY0iUK/zSQGuubSdhY7A6tKuCBQLN8YmyPoLQuOwyCGlUOv/ssXtp07Rebla0lYN4EekS4AGtVtJgGvRuPVZKmAt05hc3MzbQ5sOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ycharbi.fr; spf=pass smtp.mailfrom=ycharbi.fr; dkim=pass (4096-bit key) header.d=ycharbi.fr header.i=@ycharbi.fr header.b=Gey/D1rY; arc=none smtp.client-ip=45.83.229.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ycharbi.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ycharbi.fr
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ycharbi.fr; s=mail;
+	t=1707994938; bh=IT6a5Nw4dZlYOm4J/MrtHC1WGfvjoiWJ6lT8CMBCrxg=;
+	h=Date:List-Unsubscribe:From:Subject:To:Cc:From;
+	b=Gey/D1rY1Hh6LQ8897aj1ktICIoWwsHtOVA1Dz4ABSCaqriRfzCPyfCC36nDOKxzx
+	 7WDcI7QIoQZQHF8pWTWu4i+sQtg2J7u5JyMgFRIg4yf3oJ7EFeGAlV1btEWdfnOCmk
+	 FkldulEYtnKqVKDO5/ahsGkhUftH0Fri5FFiBp2u+PQZLs7NMXr8sOSjS+16q2InpM
+	 1B4DU6JHi+WXQGnQqcje6fGZnBoVzrDo8Tu1hXqNFVr2WnyenJJskK3etGXvkDjSoP
+	 UWnXwsCE5f63JNvIMrdt8kodP8s98azNKIz9t/1hMVj4OLOUcwW0x14wtuDMfVnuCY
+	 hgfNVT8UiarSj/XniYofUtMAe/8UqYNRULX6wjzin9MHdl1mwXLtHqoCy/uijoXBxy
+	 CYoo8ORCyLuof44QM4725YIFKCfu9vG5oJ/69ogGFk+F/TnXRpUbTFY4dYmWjw4iY+
+	 LJf5JaTXYo1p0kxJ1/DJyGeZFLO16A+DeT4pUh+ircDF2eIOSzsfo1HIhgMtUvEGuk
+	 bv6ICX2XyptQAJtjFnjF8piGk6d55sI1o/TudOxWge1L27FEz0wxaqT74TvOwlzzBQ
+	 ck2qRo3k1z0SGSbC+4dJBRLG3tiAZ3QwgNUzCSaI4WomcJqyqxEhc0ffdVU0YLnYBz
+	 jaUqQSjaPoDOYK7wxeTulh/Q=
+Date: Thu, 15 Feb 2024 11:02:18 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+From: kernel.org-fo5k2w@ycharbi.fr
+Message-ID: <8267673cce94022974bcf35b2bf0f6545105d03e@ycharbi.fr>
+TLS-Required: No
+Subject: Non-functional ixgbe driver between Intel X553 chipset and Cisco
+ switch via kernel >=6.1 under Debian
+To: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+X-Spam-Report: 
+	* -1.0 ALL_TRUSTED Passed through trusted hosts only via SMTP
+	*  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
+	*       valid
+	* -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
+	*      envelope-from domain
+	* -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+	* -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
+	*      author's domain
 
-On Tue, 2024-02-13 at 08:04 +0100, Jiri Pirko wrote:
-> From: Jiri Pirko <jiri@nvidia.com>
->=20
-> If message contains unknown attribute and user passes
-> "--process-unknown" command line option, _decode() gets called with space
-> arg set to None. In that case, attr_space variable is not initialized
-> used which leads to following trace:
->=20
-> Traceback (most recent call last):
->   File "./tools/net/ynl/cli.py", line 77, in <module>
->     main()
->   File "./tools/net/ynl/cli.py", line 68, in main
->     reply =3D ynl.dump(args.dump, attrs)
->             ^^^^^^^^^^^^^^^^^^^^^^^^^^
->   File "tools/net/ynl/lib/ynl.py", line 909, in dump
->     return self._op(method, vals, [], dump=3DTrue)
->            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
->   File "tools/net/ynl/lib/ynl.py", line 894, in _op
->     rsp_msg =3D self._decode(decoded.raw_attrs, op.attr_set.name)
->               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
->   File "tools/net/ynl/lib/ynl.py", line 639, in _decode
->     self._rsp_add(rsp, attr_name, None, self._decode_unknown(attr))
->                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
->   File "tools/net/ynl/lib/ynl.py", line 569, in _decode_unknown
->     return self._decode(NlAttrs(attr.raw), None)
->            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
->   File "tools/net/ynl/lib/ynl.py", line 630, in _decode
->     search_attrs =3D SpaceAttrs(attr_space, rsp, outer_attrs)
->                               ^^^^^^^^^^
-> UnboundLocalError: cannot access local variable 'attr_space' where it is =
-not associated with a value
->=20
-> Fix this by setting attr_space to None in case space is arg None.
->=20
-> Fixes: bf8b832374fb ("tools/net/ynl: Support sub-messages in nested attri=
-bute spaces")
-> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
-> ---
->  tools/net/ynl/lib/ynl.py | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->=20
-> diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-> index 03c7ca6aaae9..b16d24b7e288 100644
-> --- a/tools/net/ynl/lib/ynl.py
-> +++ b/tools/net/ynl/lib/ynl.py
-> @@ -588,10 +588,12 @@ class YnlFamily(SpecFamily):
->          revalue =3D search_attrs.lookup(selector)turn decoded
-> =20
->      def _decode(self, attrs, space, outer_attrs =3D None):
-> +        rsp =3D dict()
->          if space:
->              attr_space =3D self.attr_sets[space]
-> -        rsp =3D dict()
-> -        search_attrs =3D SpaceAttrs(attr_space, rsp, outer_attrs)
-> +            search_attrs =3D SpaceAttrs(attr_space, rsp, outer_attrs)
-> +        else:
-> +            search_attrs =3D None
+Hello,
 
-It looks like that later-on the code could call self._decode_sub_msg()
--> self._resolve_selector() with search_attrs =3D=3D None, and the latter
-will unconditionally do:
+(Please note that I don't speak English, sorry if the traction is not fai=
+thful to your language)
 
-	value =3D search_attrs.lookup(selector)
+Following Bjorn Helgaas's advice (https://bugzilla.kernel.org/show_bug.cg=
+i?id=3D218050#c14), I'm coming to you in the hope of finding a solution t=
+o a problem encountered by several users of the ixgbe driver. The subject=
+ has been discussed in the messages and comments on the following pages:
+https://marc.info/?l=3Dlinux-netdev&m=3D170118007007901&w=3D2
+https://forum.proxmox.com/threads/intel-x553-sfp-ixgbe-no-go-on-pve8.1351=
+29/
+https://www.servethehome.com/the-everything-fanless-home-server-firewall-=
+router-and-nas-appliance-qotom-qnap-teamgroup/
+https://www.servethehome.com/intel-x553-networking-and-proxmox-ve-8-1-3/?=
+unapproved=3D518173&moderation-hash=3De57a05288058d3ff253ceb42e9ada905
+https://forum.proxmox.com/threads/proxmox-8-kernel-6-2-16-4-pve-ixgbe-dri=
+ver-fails-to-load-due-to-pci-device-probing-failure.131203/
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218491
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218050
 
-I think we need to explicitly handle the None value there.
+Having myself decided to purchase a Qotom Q20332G9-S10 machine with X553 =
+chipset for testing purposes, I can see the effectiveness of the connecti=
+on problem between the PC's X553 SFP+ and a Cisco switch SFP+. For my par=
+t, this happens under GNU/Linux Debian 12 - kernel 6.1.76 and Sid - kerne=
+l 6.6.13. So it's not specific to Proxmox.
+I should point out that under GNU/Linux Debian 11 - kernel 5.10, the netw=
+ork card (X553 via ixgbe) works without problems. So this is a relatively=
+ "recent" bug.
 
-Thanks,
+Here's my test environment:
+- 1 Qotom Q20332G9-S10 (I used a 16GB Intel Optane M10 M.2 SSD with a fre=
+sh GNU/Linux Debian 12)
+- 1 Cisco DAC cable (tested with a 1M and a 3M)
+- 1 PC with Mellanox Connectx-3 2x SFP+ network card (running GNU/Linux D=
+ebian SID installed several years ago)
+- 1 Cisco 3560CX-12PD-S switch (2 SFP+ ports) with IOS 15.2(7)E2
 
-Paolo
+Connecting the Qotom Q20332G9-S10 (X553) to the Mellanox Connectx-3 works=
+ without a hitch and without any special handling (the linux-image-6.1.0-=
+17-amd64 ixgbe driver works in this configuration). Full 10gbps speeds be=
+tween the two with an "iperf".
 
+At this stage, I've ruled out a hardware incompatibility (OSI level 1) si=
+nce the DAC works with the X553. So there's no need to use compatibility =
+tricks as suggested in the link comments with the "allow_unsupported_sfp=
+=3D1" parameter. This will be useless in the following tests (I've checke=
+d).
+
+Where it gets tricky is when you connect it (the Qotom) to the Cisco swit=
+ch.
+Before an "ip link eno1 up", the Cisco raises the link on its side, but t=
+he Debian doesn't (link DOWN). After the "ip link eno1 up", the link drop=
+s and never comes back. There does seem to be a driver problem in recent =
+kernels (GNU/Linux Debian Stable and Sid).
+
+After compiling the driver manually (https://downloadmirror.intel.com/812=
+532/ixgbe-5.19.9.tar.gz) following the documentation already shared by ot=
+hers (https://www.xmodulo.com/download-install-ixgbe-driver-ubuntu-debian=
+.html), it works with the Cisco (after a "shut/no shut" of the latter's 1=
+0gbe port).
+
+So we end up with a working machine (I even configured and used the SR-IO=
+V successfully right afterwards).
+
+PS: I also tested with Debian Sid
+
+I've finally tried the commands you were giving Skyler without any result=
+ (rmmod ixgbe; modprobe ixgbe; ethtool -S eno1 | grep fault).
+
+For the moment, the Qotom machine is dedicated to testing, so I'm availab=
+le to carry out any manipulations you may wish to make to advance the sub=
+ject.
+Can we work on diagnosing this problem so that the next stable release of=
+ Debian is fully functional with this Intel network card?
+
+Best regards.
+
+=E2=A2=80=E2=A3=B4=E2=A0=BE=E2=A0=BB=E2=A2=B6=E2=A3=A6=E2=A0=80
+=E2=A3=BE=E2=A0=81=E2=A2=A0=E2=A0=92=E2=A0=80=E2=A3=BF=E2=A1=81 Yohan Cha=
+rbi
+=E2=A2=BF=E2=A1=84=E2=A0=98=E2=A0=B7=E2=A0=9A=E2=A0=8B=E2=A0=80 Cordialem=
+ent
+=E2=A0=88=E2=A0=B3=E2=A3=84=E2=A0=80
 
