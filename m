@@ -1,172 +1,188 @@
-Return-Path: <netdev+bounces-72171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90E9A856C9E
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 19:30:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E494B856CDC
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 19:39:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 43CA21F22C60
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:30:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C7C06B230CA
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:31:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1D3F146911;
-	Thu, 15 Feb 2024 18:26:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2771B13A86C;
+	Thu, 15 Feb 2024 18:27:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eNJENkXJ"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="WJrb/0be"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8053014601F;
-	Thu, 15 Feb 2024 18:26:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70D0213A274
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 18:27:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708021580; cv=none; b=iTpScc50w+O2rTssbKCiAOT0upZP1dzPbd+PLgVokQwGl8vjZD6GTWPY7SFCNxurjd3I5XVIRAgRgJ2C73zxyIB/PyS1e716KHvekEcXEdAnwmLsrfIHvpKBD5TyG4KaGXFGaD9p7QJfeizjFhsTm7vXmIBL0GkR1or9yzNkc8k=
+	t=1708021659; cv=none; b=HhLks1/tBFSpF50TjzJwmEc6/YzNADOcl9H5pgxg9N8f4D9LyfQGhRXzDwiu9kp0eZ6HmFOpJquMAUHlwKI1YUF2CZbfoDz+awOiEtpNdntPfgurY9koz3au4hGRq5hqw5nwC/YD/orHSxOFFsaMvIgn19yiAzcnEaeKKJevjI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708021580; c=relaxed/simple;
-	bh=x222K/iVJq1Vit9kTzhOmvETqEf55fuMWAFaC+bQJPA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Yfz1xghAVhZWzaJg6ncCzZtamNH/DrfzlLsNgsIhwMN3bL9lY6YwPdbyFtfYaysQ4kvOj62a1Z2khXctBSVAYYtLhk4FU2x5mexiAo6EesvQ4PtrQR2l4MdXpbiRGBOhdYHtYqOh82aCB2u0YQYxuJQerbiZW1zOwxRBaXxC9qI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eNJENkXJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A69FC43394;
-	Thu, 15 Feb 2024 18:26:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708021580;
-	bh=x222K/iVJq1Vit9kTzhOmvETqEf55fuMWAFaC+bQJPA=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=eNJENkXJQd3tdenz6UODUvk6smrVpiDRE9Dbhz0k/rHhyIDmwPRjV8AP20UFaiXr1
-	 2gpsp/H/0S47m3/kCpgJMQ0bKv1RVSH730ydj6nhTCAcx2xLxADd+A+VMRaogFIr4K
-	 zpDwAxiXaw7uYrD/nG43dO1o6crao0msx0LGo+kUKZe3hcSLKMoikfHzqgdMsJco6i
-	 HbpA/DqNWZvDGVvbJ72mgsp3R/2EzMgXkZLDBGZ2jOtyFVMGLrWKseXxxPThwLA+Uu
-	 6qtk4fRO4yYaNCqysM1waQN/CuwTERtmkLZEpO5E4cg4jDsZeh3hiURbE590WJ5D2O
-	 wOSGCOYpvt0LA==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Thu, 15 Feb 2024 19:25:40 +0100
-Subject: [PATCH net 13/13] selftests: mptcp: diag: unique 'cestab' subtest
- names
+	s=arc-20240116; t=1708021659; c=relaxed/simple;
+	bh=gCKeqqEoWH3afBPUl1wBbtFR0huzq0L7Jk/1+erfWxo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=rtnt7lq87cfg4wJMIfd0S0i9DWS3U1e4kixLchvRgOOG/4rml1CN1MOL/mfMwO0iO5lERkKNvlC4NOUSIHGDT2s1u5YbaJauQ+ElW2tUR++E9ud7bxDE0iglxNPxUJPRQ8eD6A9awGVppQjHUnyM5FUqHknkWnSAMjKSRCSYM7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=WJrb/0be; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-68f2e166b25so1183146d6.3
+        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 10:27:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1708021656; x=1708626456; darn=vger.kernel.org;
+        h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zohuW/VocjIWZpBZ85+N2x5C0V6CD5TTXdjAQd6cQMY=;
+        b=WJrb/0beRr0eEVqqyOyNiS9H0cc58L5N6lcjXexBodXX3yW9oVemRhIBnSYiH77gHy
+         zyLcgDjQdQOplbF923XoBeXGuUWp/Rp9zDZSjtNsG/P6dqZ8Kk1Yt2/wMDNdrGS45gLW
+         WbKfP92HrXHk12kKwUthyhY2wrnoiZVNpdYXo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708021656; x=1708626456;
+        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zohuW/VocjIWZpBZ85+N2x5C0V6CD5TTXdjAQd6cQMY=;
+        b=K+R5XTobiZugkPFy07nnNdiT6fSQNxTVQh7+u6Acb+mAXVipn6ELIN055gI1P61URj
+         N6IVbbUpiJ55M64xSEIYJipWMcyjKx1MuU4UucIKhC3XizVZm+9C7ZUdnlavjIrcwVtW
+         mizBZ2YIPzmakWx0kCrhjzry5c5ax2e8kUOyswSlYrqrqez46a9OgeO117J5nqMdNjcS
+         3TXzL+Jo8QLiwjvUMKxMbgTT5wAuvRw2aPXll5RTW6/sWk5pyKhc5YDBT7UUt7M/UDOs
+         atFayUuMkepzA/GCPAn3XNTpqe/nNNZ/9XVH5Qdacv8qbjXSuCuQsotKNYHoS8J8KOUp
+         jd4A==
+X-Gm-Message-State: AOJu0YxAc9crP45WgTeoTFZVaYrE0l0FvzhW4bVn7zJ56YcwiV4HkTz/
+	E6flA67gqVC5UCmN0XCSM8Rn866hF/2TeCtpeedVpJYLaIhqQgbJrdkgxS19ZnkyE/icysgs526
+	zaJkBJEMMcBHlUiApvVQVPoV7VM0tjcU2h8tw12BI3SCrW+gkhxT3hRnRsTOe4jPnVQFgqmW/hG
+	9RWA2wn5CHYyQyI/9qkxLIpj5XLItx0UIIZC62zsr6rQ==
+X-Google-Smtp-Source: AGHT+IEz3iKUyBrZgQm/Emz1j6Fuc3lFpqKDXfEHxyNNLkgLDvuFv6l7tzUAm2NoYbVv0hiSodWTNA==
+X-Received: by 2002:a0c:dd14:0:b0:68c:8ae0:b413 with SMTP id u20-20020a0cdd14000000b0068c8ae0b413mr2129041qvk.30.1708021655821;
+        Thu, 15 Feb 2024 10:27:35 -0800 (PST)
+Received: from stbirv-lnx-1.igp.broadcom.net ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id mf4-20020a0562145d8400b0068f13038031sm901515qvb.5.2024.02.15.10.27.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Feb 2024 10:27:35 -0800 (PST)
+From: Justin Chen <justin.chen@broadcom.com>
+To: netdev@vger.kernel.org
+Cc: Justin Chen <justin.chen@broadcom.com>
+Subject: [PATCH 0/2] net: bcmasp: bug fixes for bcmasp
+Date: Thu, 15 Feb 2024 10:27:30 -0800
+Message-Id: <20240215182732.1536941-1-justin.chen@broadcom.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240215-upstream-net-20240215-misc-fixes-v1-13-8c01a55d8f6a@kernel.org>
-References: <20240215-upstream-net-20240215-misc-fixes-v1-0-8c01a55d8f6a@kernel.org>
-In-Reply-To: <20240215-upstream-net-20240215-misc-fixes-v1-0-8c01a55d8f6a@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Davide Caratti <dcaratti@redhat.com>, 
- Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, stable@vger.kernel.org
-X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2535; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=x222K/iVJq1Vit9kTzhOmvETqEf55fuMWAFaC+bQJPA=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBlzlcdkqqo1as8l+1WTgonChxLYAPdqGM3qqqWv
- xMvz1RVmtOJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZc5XHQAKCRD2t4JPQmmg
- c7P5EADAORF4I6xRVCuIteRM18Viuxr5KG8CJBSnyQSeTV/vonia8wze3JPh9GE6VpUkY0bqPvJ
- Z6yMC991t6M5QFmkPW5hfBjuQQcqeeZ/40MuMkAM1ssJFVq67Dmw19grT1ZLjriD3qXaW+xn5rn
- h3nWRaxK0GZo1NE0tdkwTt0dsmJOfDSH0YSp8Gyxu4iBzbkXfcOV93FDcqdbJne+qTWVZxJKQ8H
- /UZQcRbbO0dWoRh42yISUgigPMQwQuFusT3h6xoIKLek5U97L0dyFquk/X57yRXuoiXu9kYiDI8
- sCvaQL+I6UhulZWWdKVc7bCi6690tmsA9/LFqUNl2n6lFTxJiEg9A0bwTp4L1bowf8UuwNggn+B
- r66SCrglwMHiYXrSJhDxHs9mabj3gGlhqFUzr6qGv3EA189mweNnRmnO12HEOoOTdhVCSoc51W+
- T7OWhhhs1BPgcfnGOjXuOe9tY90XJW6B6a5dZlKKIvXebdaxyVKBfQc//PwyMXFguUdNXd8cD2R
- Ur0C13HAFW7cHBV/cY63MJAzdf2lPQl+6ws8FX+erP5ES7dkboC9do2SeKQVQ4UkDiDYDTnokgF
- HfKz4bR1ASlAhkmE/IK2u0AR3FGAImFLy0kSqC/GUcg/AVyFytIlG4p2KAcCALzY3l3camMdeKA
- lr+DTNHNrTLEXgw==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="00000000000016696706116fc812"
 
-It is important to have a unique (sub)test name in TAP, because some CI
-environments drop tests with duplicated name.
+--00000000000016696706116fc812
+Content-Transfer-Encoding: 8bit
 
-Some 'cestab' subtests from the diag selftest had the same names, e.g.:
+Fix two bugs.
 
-    ....chk 0 cestab
+- Indicate that PM is managed by mac to prevent double pm calls. This
+  doesn't lead to a crash, but waste a noticable amount of time
+  suspending/resuming.
 
-Now the previous value is taken, to have different names, e.g.:
+- Sanity check for OOB write was off by one. Leading to a false error
+  when using the full array.
 
-    ....chk 2->0 cestab after flush
+Florian Fainelli (1):
+  net: bcmasp: Indicate MAC is in charge of PHY PM
 
-While at it, the 'after flush' info is added, similar to what is done
-with the 'in use' subtests. Also inspired by these 'in use' subtests,
-'many' is displayed instead of a large number:
+Justin Chen (1):
+  net: bcmasp: Sanity check is off by one
 
-    many msk socket present                           [  ok  ]
-    ....chk many msk in use                           [  ok  ]
-    ....chk many cestab                               [  ok  ]
-    ....chk many->0 msk in use after flush            [  ok  ]
-    ....chk many->0 cestab after flush                [  ok  ]
-
-Fixes: 81ab772819da ("selftests: mptcp: diag: check CURRESTAB counters")
-Cc: stable@vger.kernel.org
-Reviewed-by: Geliang Tang <geliang@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- tools/testing/selftests/net/mptcp/diag.sh | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
-
-diff --git a/tools/testing/selftests/net/mptcp/diag.sh b/tools/testing/selftests/net/mptcp/diag.sh
-index 266656a16229..0a58ebb8b04c 100755
---- a/tools/testing/selftests/net/mptcp/diag.sh
-+++ b/tools/testing/selftests/net/mptcp/diag.sh
-@@ -189,10 +189,15 @@ chk_msk_inuse()
- # $1: cestab nr
- chk_msk_cestab()
- {
--	local cestab=$1
-+	local expected=$1
-+	local msg="....chk ${2:-${expected}} cestab"
-+
-+	if [ "${expected}" -eq 0 ]; then
-+		msg+=" after flush"
-+	fi
- 
- 	__chk_nr "mptcp_lib_get_counter ${ns} MPTcpExtMPCurrEstab" \
--		 "${cestab}" "....chk ${cestab} cestab" ""
-+		 "${expected}" "${msg}" ""
- }
- 
- wait_connected()
-@@ -236,7 +241,7 @@ chk_msk_cestab 2
- flush_pids
- 
- chk_msk_inuse 0 "2->0"
--chk_msk_cestab 0
-+chk_msk_cestab 0 "2->0"
- 
- echo "a" | \
- 	timeout ${timeout_test} \
-@@ -256,7 +261,7 @@ chk_msk_cestab 1
- flush_pids
- 
- chk_msk_inuse 0 "1->0"
--chk_msk_cestab 0
-+chk_msk_cestab 0 "1->0"
- 
- NR_CLIENTS=100
- for I in `seq 1 $NR_CLIENTS`; do
-@@ -278,11 +283,11 @@ done
- 
- wait_msk_nr $((NR_CLIENTS*2)) "many msk socket present"
- chk_msk_inuse $((NR_CLIENTS*2)) "many"
--chk_msk_cestab $((NR_CLIENTS*2))
-+chk_msk_cestab $((NR_CLIENTS*2)) "many"
- flush_pids
- 
- chk_msk_inuse 0 "many->0"
--chk_msk_cestab 0
-+chk_msk_cestab 0 "many->0"
- 
- mptcp_lib_result_print_all_tap
- exit $ret
+ drivers/net/ethernet/broadcom/asp2/bcmasp.c      | 6 +++---
+ drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c | 3 +++
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
 -- 
-2.43.0
+2.34.1
 
+
+--00000000000016696706116fc812
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+NhTY3E+cXCB11wty89QStajwXdhGJTYEvUgvsq1h8CwJj9w/38ldAQf5WjhPmApYeJR2ewFrBMCM
+4lHkdRJ6TDc9nXoEkypUfjJkJHe7Eal06tosh6JpAgMBAAGjggHZMIIB1TAOBgNVHQ8BAf8EBAMC
+BaAwgaMGCCsGAQUFBwEBBIGWMIGTME4GCCsGAQUFBzAChkJodHRwOi8vc2VjdXJlLmdsb2JhbHNp
+Z24uY29tL2NhY2VydC9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcnQwQQYIKwYBBQUHMAGG
+NWh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwME0G
+A1UdIARGMEQwQgYKKwYBBAGgMgEoCjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxz
+aWduLmNvbS9yZXBvc2l0b3J5LzAJBgNVHRMEAjAAMEkGA1UdHwRCMEAwPqA8oDqGOGh0dHA6Ly9j
+cmwuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3JsMCMGA1UdEQQc
+MBqBGGp1c3Rpbi5jaGVuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSME
+GDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUIWGeYuaTsnIada5Xx8TR3cheUbgw
+DQYJKoZIhvcNAQELBQADggEBAHNQlMqQOFYPYFO71A+8t+qWMmtOdd2iGswSOvpSZ/pmGlfw8ZvY
+dRTkl27m37la84AxRkiVMes14JyOZJoMh/g7fbgPlU14eBc6WQWkIA6AmNkduFWTr1pRezkjpeo6
+xVmdBLM4VY1TFDYj7S8H2adPuypd62uHMY/MZi+BIUys4uAFA+N3NuUBNjcVZXYPplYxxKEuIFq6
+sDL+OV16G+F9CkNMN3txsym8Nnx5WAYZb6+rBUIhMGz70V05xsHQfzvo2s7f0J1tJ5BoRlPPhL0h
+VOnWA3h71u9TfSsv+PXVm3P21TfOS2uc1hbzEqyENCP4i5XQ0rv0TmPW42GZ0o4xggJtMIICaQIB
+ATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhH
+bG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwj8BKLXNpALfemdRAwDQYJ
+YIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIGzGOaZ9MONuFTJmfx+BX+kxxjCLY9kr+Ilq
+3KWakXcbMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDIxNTE4
+MjczNlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFl
+AwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATAN
+BgkqhkiG9w0BAQEFAASCAQBoujPv8kQA8cJRj0IFAAiv396CEQ2gwo1qTNWQm9ePtrixAwblP4KP
+DOBEeeFvX7I4SoaRseZeyZZb4bbTwlx48eEURcWsJ3bY1OqEg11a5oJ0B7z7OReKaHqrAKgdr7/4
+kyjS2kEFfdK88n4KJHpycWtX/OMaYXj/2s6+8RxwIY2Klh0HWZ2ZXOy2EcF9SVYBjKpwsZxy4xbS
+Xe1TTE1WT7pfVd5CAFSPBw85dNoFWzzlFeOflsJRARxjDBZ7W9NsbTEqTpAIxh1gVDtdQUf+8Pag
+ylm9UC73QqfvDIfV3pHidcgKePBg93FUM1psF6dl+zz45/yuTcevcOZujtWH
+--00000000000016696706116fc812--
 
