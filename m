@@ -1,148 +1,136 @@
-Return-Path: <netdev+bounces-72177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95173856D7E
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 20:17:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B5426856DD6
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 20:37:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7B0B1C21EC4
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 19:17:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E76931C21997
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 19:37:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2535139565;
-	Thu, 15 Feb 2024 19:17:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C97F5DF16;
+	Thu, 15 Feb 2024 19:37:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j/pkdJIP"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="gD3PqADp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1182595;
-	Thu, 15 Feb 2024 19:17:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20DD51386AE;
+	Thu, 15 Feb 2024 19:37:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708024653; cv=none; b=QrTxQ7iU5+HM3h1j74eODtp5J47Q1t2Z1I7+Gmq3jwQXtGecZdvOy77H35weRKF7VQ/mR0mp2Zf3F2RNblMU8QUYODs6edlJZva3m2+rjmoWUxVhjdEOrIGZ7wIsV8QOmKkep0hCuwwuIWYEyyy03mC+XEaQzDz5eaapxQknIKI=
+	t=1708025874; cv=none; b=OqPHJaB8noZ3k/ezR5l6ZgYmuXP6DFVtVaFQ64J1Mo/jkGz/OTGQMPtiFGeDvviT07+LrgEti4GZeoFLThY7OupgYYZAMxwJVhDMx9dy5qL2I5d0lwE4JyvS2MwNYHBx0IqmSg+XzmGYkY65ABVeL04zdITMPq+qXLT2PWYJGgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708024653; c=relaxed/simple;
-	bh=nq1gXXMtQTFmzjqZbMFawObh/b5GZMKjRfQ9FOAf2eI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WtJt5e/LYoygutpvtSE0eGE0tHZh5Y3sjbs1uVerkUrQBczibxKtLAHb4TozoWjLaUVYxnO7RSbi9oJ0YttB05C06kJBKQvZcWK0Uau2fFHj+ScckbSnrxrr2oLlodMbWdOh4NnEA+fGgaz4k9m99KFyZRZmsYka1ZcJWLkL8RE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=j/pkdJIP; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708024652; x=1739560652;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=nq1gXXMtQTFmzjqZbMFawObh/b5GZMKjRfQ9FOAf2eI=;
-  b=j/pkdJIPUPJPVEkjSKERG3Xw0iIIOMvZLm1F2S81v0A/aUWou/H1QleT
-   aVidnTtEYz3PTmCd7/Bb1vOlUnR6Gf3GoaYwla3qoCWcx+XnTXBIz4Bdc
-   tllbIJBVL9BzGNPcJr7Luxcr/dgP6dmiUgsy4FqMCNN2JJainDLWJdhbG
-   a92Laxl/HVi7qCvMvHofE8jXNR6wBWVkLUCthcKN5Z80us7o6FUv3xrhs
-   LS8oMTP8FrFzhJbJIEVo7oUbFMKruc3MycQQ1zSUkblbb7I0dZR1H5+u/
-   i5zV99ttMnCzxGJtMCfYOzrvVz9m52lv1E80ArALUP6OA2qp6JT5AmlCD
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10985"; a="2255249"
-X-IronPort-AV: E=Sophos;i="6.06,162,1705392000"; 
-   d="scan'208";a="2255249"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2024 11:17:32 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10985"; a="912215250"
-X-IronPort-AV: E=Sophos;i="6.06,162,1705392000"; 
-   d="scan'208";a="912215250"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmsmga002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2024 11:17:27 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.97)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1rahEa-00000004s7i-0DgF;
-	Thu, 15 Feb 2024 21:17:24 +0200
-Date: Thu, 15 Feb 2024 21:17:23 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: Yury Norov <yury.norov@gmail.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew@lunn.ch>,
-	Mark Brown <broonie@kernel.org>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v3 RESEND 3/6] bitmap: Make bitmap_onto() available to
- users
-Message-ID: <Zc5jQ3zR51MDIovB@smile.fi.intel.com>
-References: <20240212075646.19114-1-herve.codina@bootlin.com>
- <20240212075646.19114-4-herve.codina@bootlin.com>
- <ZcoOpPb9HfXOYmAr@smile.fi.intel.com>
- <20240212143753.620ddd6e@bootlin.com>
- <ZcokwpMb6SFWhLBB@smile.fi.intel.com>
- <20240212152022.75b10268@bootlin.com>
- <Zcos9F3ZCX5c936p@smile.fi.intel.com>
- <Zcptyd/AWrDD3EAL@yury-ThinkPad>
- <20240215184612.438bd4f2@bootlin.com>
+	s=arc-20240116; t=1708025874; c=relaxed/simple;
+	bh=WXIARXXddfCsVR07+zyJ3q/HPdPO2/5lAfbkMserF7c=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FLTInbewcscjLtw2hdTQhOXWpr72hcpC4YyHmISu4Pn8gI6+PGtovMwl3n5pKPvQ7gXLdkEWl3fBBuMuBRsG8btSp7ytMe/JPTOMchjw0j485fXD7oBEmYhEjAMJ7DnIMUKCurR3XZfeteBz3jpDJYdyKqRbjWt93Gk857PVYiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=gD3PqADp; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1708025872; x=1739561872;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=hP7VaigpFFD7y7UzfJ+iUqewRB+4Xpb4jyQOfXFvD68=;
+  b=gD3PqADp7z4mLZLSGHYp/L8T3mhJyNALbymtXCfZhp3cpVRXXcIEQ8yl
+   jGUxUXeS862x+dIyfHJ7zHoI9ZsmwamMiY06jezGtsTViYjhI0tJwrWoE
+   6EdAe4yHWQImSl/uygjxduanV0gPDnrOuqMellcpe/itdEvrlNwRLk/Ie
+   4=;
+X-IronPort-AV: E=Sophos;i="6.06,162,1705363200"; 
+   d="scan'208";a="386859129"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2024 19:37:48 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:46876]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.41.174:2525] with esmtp (Farcaster)
+ id 7f4c9c30-e282-4ae6-a84d-4a2491c20c50; Thu, 15 Feb 2024 19:37:47 +0000 (UTC)
+X-Farcaster-Flow-ID: 7f4c9c30-e282-4ae6-a84d-4a2491c20c50
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Thu, 15 Feb 2024 19:37:44 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.170.20) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.40;
+ Thu, 15 Feb 2024 19:37:41 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <matttbe@kernel.org>
+CC: <alibuda@linux.alibaba.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<gbayer@linux.ibm.com>, <guwen@linux.alibaba.com>, <jaka@linux.ibm.com>,
+	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
+	<linux-s390@vger.kernel.org>, <martineau@kernel.org>,
+	<mptcp@lists.linux.dev>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<tonylu@linux.alibaba.com>, <wenjia@linux.ibm.com>
+Subject: Re: [PATCH v2 net-next] net: Deprecate SO_DEBUG and reclaim SOCK_DBG bit.
+Date: Thu, 15 Feb 2024 11:37:33 -0800
+Message-ID: <20240215193733.11427-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <28ca6b01-248c-43f6-b20f-79ff39f03974@kernel.org>
+References: <28ca6b01-248c-43f6-b20f-79ff39f03974@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240215184612.438bd4f2@bootlin.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D036UWC004.ant.amazon.com (10.13.139.205) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Thu, Feb 15, 2024 at 06:46:12PM +0100, Herve Codina wrote:
-> On Mon, 12 Feb 2024 11:13:13 -0800
-> Yury Norov <yury.norov@gmail.com> wrote:
-
-...
-
-> > That's I agree. Scatter/gather from your last approach sound better.
-> > Do you plan to send a v2?
-
-See below.
-
-...
-
-> > I think your scatter/gather is better then this onto/off by naming and
-> > implementation. If you'll send a v2, and it would work for Herve, I'd
-> > prefer scatter/gather. But we can live with onto/off as well.
+From: Matthieu Baerts <matttbe@kernel.org>
+Date: Thu, 15 Feb 2024 10:58:58 +0100
+> Hi Kuniyuki,
 > 
-> Andy, I tested your bitmap_{scatter,gather}() in my code.
-> I simply replaced my bitmap_{onto,off}() calls by calls to your helpers and
-> it works perfectly for my use case.
+> On 14/02/2024 20:54, Kuniyuki Iwashima wrote:
+> > Recently, commit 8e5443d2b866 ("net: remove SOCK_DEBUG leftovers")
+> > removed the last users of SOCK_DEBUG(), and commit b1dffcf0da22 ("net:
+> > remove SOCK_DEBUG macro") removed the macro.
+> > 
+> > Now is the time to deprecate the oldest socket option.
+> > 
+> > Note that setsockopt(SO_DEBUG) is moved not to acquire lock_sock().
+> > 
+> > Reviewed-by: Gerd Bayer <gbayer@linux.ibm.com>
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > ---
+> > v2:
+> >   * Move setsockopt(SO_DEBUG) code not to acquire lock_sock().
 > 
-> I didn't use your whole patch
->   "[PATCH v1 2/5] lib/bitmap: Introduce bitmap_scatter() and bitmap_gather() helpers"
-> because it didn't apply on a v6.8-rc1 based branch.
-> I just manually extracted the needed functions for my tests and I didn't look
-> at the lib/test_bitmap.c part.
+> Thank you for the v2!
 > 
-> Now what's the plan ?
-> Andy, do you want to send a v2 of this patch or may I get the patch, modify it
-> according to reviews already present in v1 and integrate it in my current
-> series ?
+> Good idea to have modified that in net/core/sock.c too!
+> 
+> Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> 
+> 
+> I don't think we need to do anything else, but just to be sure: do we
+> need to tell the userspace this socket option has been deprecated?
+> SO_DEBUG is a bit particular, so I guess it is fine not to do anything
+> else, but except by looking at the kernel version, I don't think the
+> userspace can know it has no more effect.
+> 
+> I didn't find many examples of other deprecated socket options, apart
+> from SO_BSDCOMPAT. For years, there was a warning, removed a few years
+> ago: f4ecc748533d ("net: Stop warning about SO_BSDCOMPAT usage"). I
+> guess we don't want that for SO_DEBUG, right?
 
-I would like to do that, but under pile of different things.
-I would try my best but if you have enough time and motivation feel free
-to take over, address the comments and integrate in your series.
+I was also wondering if I should add pr_info_once(), but it seems not
+worth adding.
 
-I dunno what to do with bitmap_onto(), perhaps in a separate patch we can
-replace it with bitmap_scatter() (IIUC) with explanation that the former
-1) uses atomic ops while being non-atomic as a whole, and b) having quite
-hard to get documentation. At least that's how I see it, I mean that I would
-like to leave bitmap_onto() alone and address it separately.
+With a rough grep,
 
-> Yury, any preferences ?
+  $ git log -S SOCK_DEBUG net
 
--- 
-With Best Regards,
-Andy Shevchenko
+except for the legacy protocols (appletalk, dccp, x25) that 8e5443d2b866
+touched recently, TCP was the last real user of SOCK_DEBUG() and it's
+2019-02-25 (5 years ago!) that 9946b3410b61 removed the use.
 
+So, I think we don't need such warning.
 
+Thanks!
 
