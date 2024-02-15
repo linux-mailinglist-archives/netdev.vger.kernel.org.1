@@ -1,177 +1,95 @@
-Return-Path: <netdev+bounces-71989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 642AB85607B
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 12:01:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 668EB856090
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 12:02:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D59B1C238B1
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 11:01:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22207286088
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 11:02:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E378512E1F5;
-	Thu, 15 Feb 2024 10:47:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B7F912A171;
+	Thu, 15 Feb 2024 10:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ALqpmOtT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iKKGdMo9"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3984112DDB6
-	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 10:47:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F04B012D755;
+	Thu, 15 Feb 2024 10:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707994048; cv=none; b=jyqqn4z0xZRkNbWb7uTHDzgDmwGUm4lS5X6XxED1O4JG6H93C3pjLEJYQx8/MKad6Ew/hijK4Cm77Jfa+FTU6yC5dCGXID0aSr4vCeB6NDNgCLGjQVESsrAz8FZDJeRTlrjRH03IdP69rHIALGgsulcRNIanLSW0ot12ldh4YyY=
+	t=1707994228; cv=none; b=ca5S/syr/rc09lH1NUUHkAiHNCM5n8k9BBY5smEM0AA+qp/JAzpz5mlp88b3+fSxVFkrXwMHLNzGvz1LCNe42UuDyKyWPXyEBoEFKGf/mj3+M7/NfpejDfhIXGWhYdTyU6Gandu2xiz85+gg8FR7RIg+CRo13vEDb44/0udwD6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707994048; c=relaxed/simple;
-	bh=e4D5siPzGIT2I8EAgYCXD+KsEPE9cc4aUS1UCWRHBFY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=LZJ0abbekuToSa12Y4Sn8DVcd8bwxQaJ3yReC+1d4LFKTfmmoC5YJ6xWDzp3jIF4Nde1HzKgL5tz2Kl0btBF6TJG6+YWkqAGHK5vfPbouTYJpW8UWhhuo9S2EWs1Cdwjm4iCbDN8Y0kvKYJzBr9XovbA/6wMO1YmdePJNzMHD9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ALqpmOtT; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707994046;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=ZDI9baZMetrqyJo1wIZ/D/RqqsOmJwsksCZtQl0+Oxk=;
-	b=ALqpmOtTdfSXeYq9yJl0wS2vn9UOrRIKeFCBQNTJjfV7ADwwsngO3BFzOrQxGw8161hl5+
-	1TW7ibtPhzfp/+VglX5wZHZLfwCZGeIHo4UQpl95+EzlOP9Nyl+kP9Aomhnp1V5HzH5Rgn
-	B4WOU+s6R48ZsFreEBbq5cNwI6C0BXg=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-660-c7Oyqjf0PWKtPIbfpwgQVw-1; Thu, 15 Feb 2024 05:47:24 -0500
-X-MC-Unique: c7Oyqjf0PWKtPIbfpwgQVw-1
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-51161bd080aso254275e87.0
-        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 02:47:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707994043; x=1708598843;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZDI9baZMetrqyJo1wIZ/D/RqqsOmJwsksCZtQl0+Oxk=;
-        b=M7+zn5p+eaH2rd/QvkftgrGoJ+uzuG2/lkyS/goFu57AFebjXGVO6DPIZHlKsWzkDS
-         thJ0GLNxvmGZQ++fHXlJzLadabzz5IJnG3bSLX3CQevShdT9H/89XI063jVhKyPFw/iy
-         o9SsM+CVnz+ru9ygEv3ufB2UaVELxr181kGGHnGxXgdo34XhbS1e3Tr/qS9woN6udPfQ
-         /s20Yxlpx2LvRkTchk7cc8ZoAZvxThxXuZMRMnzqag0kO8gFs6qpJQocdq8JazXwL7fN
-         0SZpPllBZg9zMXqdBvnE1HpwCUcRRcjTvtK5BkjyAIKSGK5c4MCO33as+F/S2kNdSlTi
-         F01A==
-X-Forwarded-Encrypted: i=1; AJvYcCWiORxqA0nqmMbSvRu7kbmLYYVaxklGBXhBCjWVs6wKMrgAmoA1kewXSMRPvTAU+fVvg0SB+YkMIehEz6yHpdy+AEit9DaF
-X-Gm-Message-State: AOJu0YyrKB94neinpO8T0yXIcu0jw0v1HQvRpXQ5Mbwwu8yu4ofwkt3c
-	d1NnAPbW3VjNLdYtExmKEVWdLNmck/6nYeiRPdm9gQPYCBW05XhPQPTxM93cOYCiSBA4MJTyjjU
-	I6qBBexNYaE1vUYTPZLKGDIVOWd0pjJyfp6BuZ0hCuh1zkAml5NUiRg==
-X-Received: by 2002:a19:650e:0:b0:511:8819:e8be with SMTP id z14-20020a19650e000000b005118819e8bemr815455lfb.6.1707994043040;
-        Thu, 15 Feb 2024 02:47:23 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFnpAB0DvqRdkJX5tH+4WWOj5F+ve231YQXDISI3lMCd0A3ewMnH3ZhmD55UrEuT5V+RwMbGA==
-X-Received: by 2002:a19:650e:0:b0:511:8819:e8be with SMTP id z14-20020a19650e000000b005118819e8bemr815440lfb.6.1707994042659;
-        Thu, 15 Feb 2024 02:47:22 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-227-156.dyn.eolo.it. [146.241.227.156])
-        by smtp.gmail.com with ESMTPSA id x17-20020a05600c21d100b00410b98a5c77sm4580112wmj.32.2024.02.15.02.47.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Feb 2024 02:47:22 -0800 (PST)
-Message-ID: <3e15fbcc6cc87f4bafea8bc0a7164366cb1f4439.camel@redhat.com>
-Subject: Re: [PATCH] net: stmmac: xgmac: fix initializer element is not
- constant error
-From: Paolo Abeni <pabeni@redhat.com>
-To: Mark O'Donovan <shiftee@posteo.net>, Jacob Keller
- <jacob.e.keller@intel.com>,  linux-kernel@vger.kernel.org
-Cc: alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net,
-  edumazet@google.com, kuba@kernel.org, mcoquelin.stm32@gmail.com, 
- netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org
-Date: Thu, 15 Feb 2024 11:47:20 +0100
-In-Reply-To: <867da21e-7f30-4caf-9f78-260d426e4186@posteo.net>
-References: <20240212154319.907447-1-shiftee@posteo.net>
-	 <44c29a45-86fa-4e41-b4b5-e69187f0712e@intel.com>
-	 <867da21e-7f30-4caf-9f78-260d426e4186@posteo.net>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+	s=arc-20240116; t=1707994228; c=relaxed/simple;
+	bh=mPkAl0B5FPIBBKPul56eqRHQGADbH4mMnMRWdtErg+w=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bfSB3aSQw7HToM9G9TjWzOrn64l7mIHfobgp7eD5EYIRTdGe5pyys4VJ49jBmFwxmEP893Kcp1B7UgQu11oW0ztNccY1cMKcyCX547sd1RdIVdZFA3AzLs3xfs/8ITS7C4nCJgm6ZF3KGT/QG4ZlVIrWqx0jsuzoe8qkhJbdVKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iKKGdMo9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B6263C43394;
+	Thu, 15 Feb 2024 10:50:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707994227;
+	bh=mPkAl0B5FPIBBKPul56eqRHQGADbH4mMnMRWdtErg+w=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=iKKGdMo97+gMGlXF3RKyljSDVdfnPV4jamidEMBm4y9otufE+I+yBIbCyjdaZGQH4
+	 JzH3IizJJl9Wcb6z9pd4OhUym6xY0YuRUsZLh5Ycnyf+cy/CDV1EqwnAOK+FhQAL5m
+	 3oQ6VcWIQ2hzsMZbodKEQxOonUNEFFMCmqvDNm4fjyVtxpFmp4CloNNq0sVwQ/9xhj
+	 NeYy66odtJbGxCb4YgYZ6MFLTLA8KyBanrkL68M8P42oke1ZEBhAXykFDTnaxg/OTs
+	 nBDnfxlwSvIyJpaPFBCd+mBoSRBew8m15cSIvEmjpAcqdbvtL+MyQ9D5UMbRi0aa5K
+	 E+sfiUDhzuKpQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9B5A8D8C97D;
+	Thu, 15 Feb 2024 10:50:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: phy: qca807x: move interface mode check to
+ .config_init_once
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170799422763.15473.1497115981711263607.git-patchwork-notify@kernel.org>
+Date: Thu, 15 Feb 2024 10:50:27 +0000
+References: <20240212115043.1725918-1-robimarko@gmail.com>
+In-Reply-To: <20240212115043.1725918-1-robimarko@gmail.com>
+To: Robert Marko <robimarko@gmail.com>
+Cc: andersson@kernel.org, konrad.dybcio@linaro.org, andrew@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ ansuelsmth@gmail.com, linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-Hi,
+Hello:
 
-On Wed, 2024-02-14 at 22:07 +0000, Mark O'Donovan wrote:
-> On 14/02/2024 20:31, Jacob Keller wrote:
-> >=20
-> >=20
-> > On 2/12/2024 7:43 AM, Mark O'Donovan wrote:
-> > > GCC prior to 8.x gives an "initializer element is not constant"
-> > > error for the uses of dpp_tx_err in dwxgmac3_dma_dpp_errors.
-> > > Newer compilers accept either version.
-> > >=20
-> > > More info here:
-> > > https://lore.kernel.org/all/20240103-fix-bq24190_charger-vbus_desc-no=
-n-const-v1-1-115ddf798c70@kernel.org
-> > >=20
-> > > Signed-off-by: Mark O'Donovan <shiftee@posteo.net>
-> > > ---
-> >=20
-> > I'm not sure whether the Linux kernel project has an explicit cutoff fo=
-r
-> > what versions of GCC (or other compilers) are supported. GCC 8 was firs=
-t
-> > released in 2018.
-> >=20
-> > The fix provided here is fairly straight forward, and while I do think
-> > the benefit of using builtin types vs using the macros is nice, I don't
-> > see that as a strong enough reason to hold up supporting the older comp=
-iler.
-> >=20
-> > Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> >=20
-> > >   drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c | 4 ++--
-> > >   1 file changed, 2 insertions(+), 2 deletions(-)
-> > >=20
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/dr=
-ivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> > > index 323c57f03c93..c02c035b81c0 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> > > @@ -830,8 +830,8 @@ static const struct dwxgmac3_error_desc dwxgmac3_=
-dma_errors[32]=3D {
-> > >   	{ false, "UNKNOWN", "Unknown Error" }, /* 31 */
-> > >   };
-> > >  =20
-> > > -static const char * const dpp_rx_err =3D "Read Rx Descriptor Parity =
-checker Error";
-> > > -static const char * const dpp_tx_err =3D "Read Tx Descriptor Parity =
-checker Error";
-> > > +#define dpp_rx_err "Read Rx Descriptor Parity checker Error"
-> > > +#define dpp_tx_err "Read Tx Descriptor Parity checker Error"
-> > >   static const struct dwxgmac3_error_desc dwxgmac3_dma_dpp_errors[32]=
- =3D {
-> > >   	{ true, "TDPES0", dpp_tx_err },
-> > >   	{ true, "TDPES1", dpp_tx_err },
-> > >=20
-> > > base-commit: 841c35169323cd833294798e58b9bf63fa4fa1de
->=20
-> Thanks Jacob.
->=20
-> The minimum versions for compilers and other tools are documented here:
-> https://www.kernel.org/doc/html/latest/process/changes.html
->=20
-> I am using a SLES 15 server to build, the first version of which came out=
- in 2017.
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Note that we already have net commit
-1692b9775e745f84b69dc8ad0075b0855a43db4e addressing this issue.
+On Mon, 12 Feb 2024 12:49:34 +0100 you wrote:
+> Currently, we are checking whether the PHY package mode matches the
+> individual PHY interface modes at PHY package probe time, but at that time
+> we only know the PHY package mode and not the individual PHY interface
+> modes as of_get_phy_mode() that populates it will only get called once the
+> netdev to which PHY-s are attached to is being probed and thus this check
+> will always fail and return -EINVAL.
+> 
+> [...]
 
-Thanks,
+Here is the summary with links:
+  - [net-next] net: phy: qca807x: move interface mode check to .config_init_once
+    https://git.kernel.org/netdev/net-next/c/3be0d950b628
 
-Paolo
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
