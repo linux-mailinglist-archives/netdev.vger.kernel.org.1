@@ -1,109 +1,118 @@
-Return-Path: <netdev+bounces-72069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2072E856773
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 16:25:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D702F85677D
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 16:26:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2C391F274B4
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 15:25:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76C411F21C00
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 15:26:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E180A133983;
-	Thu, 15 Feb 2024 15:22:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4B6917591;
+	Thu, 15 Feb 2024 15:25:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b="WSFCdqFk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QMmjruRo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-64-228.siemens.flowmailer.net (mta-64-228.siemens.flowmailer.net [185.136.64.228])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80E78132C1E
-	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 15:22:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.228
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA34113248E;
+	Thu, 15 Feb 2024 15:25:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708010576; cv=none; b=r1AjskFZJaK5C81t+i7tkGN9RkMLjHbLRSS64UoeRTOcJaHJ9Dr/owRnZCl+DJAl8ghSurk/MGugj1ETQ3WN4ku0ny+VcGJCzWFBxNwjuAbUXaqkiQWtbYEqJm5YwHtw5yIpkXBv29i2PlRqSl8SpIlI0vChjfclkzE/b+5r0Q0=
+	t=1708010701; cv=none; b=niQx7yJ3X0eChXXfDLYRq7AlAud6cNWckvYb1n37l/mOGZczKXPOxm7rAzk/XelKkS2J2MTZzldBlLnU2BK1/jIXN6zLFZkcff1E0nd+K4ryr85YIQDLricDM8UuxcA4SUqweyjNguzejbiscoXyvA71e+DP3Mwk6QUJwawfYYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708010576; c=relaxed/simple;
-	bh=FO7jRW8lFIFAdFgQNKkjdDeHv4Jt6uYAUDOvYJToSHg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=do4oc6EbZKSHBvna+Le8CsQQ95XPkeWhg5cbVSy3c2FyRyBaalvXP88GEvAENco4mTLK5dXVBkwZyypL754QdWraYrc3F7m3nnNNXX1wzmvtSz3H+gjPXHhOpLg4HnoUvtTAXBocQAiDJYvPwOd4k1WKSd5sNOo5OO0JUFbLb9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b=WSFCdqFk; arc=none smtp.client-ip=185.136.64.228
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-64-228.siemens.flowmailer.net with ESMTPSA id 2024021515224313aee860e09d055415
-        for <netdev@vger.kernel.org>;
-        Thu, 15 Feb 2024 16:22:44 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
- d=siemens.com; i=diogo.ivo@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc;
- bh=nuPT01weBKXw5lY3LWl5ewOYMWR86hkUe5K2ujILz3M=;
- b=WSFCdqFkdPSyf+CjiQLHiiidUlTGuRay8ha8SX2t903CHQ46BgNrhbhaw6UuE4YfmmO4+d
- PDH9bSM135kPuc0DZGbffXIfqyySQTjHJo4CwEv92g7EAq0HROIYM0Ar8hMqZbmtRMTVkXJW
- PH+Ij0JsMoNSZoE0LI8f3HN0q607A=;
-From: Diogo Ivo <diogo.ivo@siemens.com>
-To: danishanwar@ti.com,
-	rogerq@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew@lunn.ch,
-	jan.kiszka@siemens.com,
-	dan.carpenter@linaro.org,
-	robh@kernel.org
-Cc: Diogo Ivo <diogo.ivo@siemens.com>,
-	linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v2] net: ti: icssg-prueth: Remove duplicate cleanup calls in emac_ndo_stop()
-Date: Thu, 15 Feb 2024 15:22:01 +0000
-Message-ID: <20240215152203.431268-1-diogo.ivo@siemens.com>
+	s=arc-20240116; t=1708010701; c=relaxed/simple;
+	bh=uhxRO4ebIbwjJVX5/1bnO3OZrGC6rJ1h4nCHDG4vJzY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CutOOY1R2/dtpMIkmN0BvIg9os/XeoIO3isea0uZDiQnqd/oCJGd1irICyoiTJW9tQGvM0Nvh2PrFHbToQdmC1fuhcdxI0TW8V2pTQa9VD6NDeY3pHX6vC4klqeRsuHXZ4iTzmBYZqCONuzA5ZPNQ6xiKpnlErhVuEe3b7FvPFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QMmjruRo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE5FBC433C7;
+	Thu, 15 Feb 2024 15:25:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708010701;
+	bh=uhxRO4ebIbwjJVX5/1bnO3OZrGC6rJ1h4nCHDG4vJzY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QMmjruRo5WurqTin0+zFj9UxmGTzuVcWMCfGelFp0VapOWM+oqTRS2eJohSFyghJl
+	 IKKYi/vAI9HKEKEB3eGB+fVqHHc66pHjqlmzZNjZ456kTdv9Jf0T8yCCuRMYZuq5fw
+	 HdmVV0sWij6ZIN7bOLlt2OOR82/7pwBERcENhiSrt33JPV7aMvTxig+rjyhFGrzsI5
+	 xciFFaeWoI9mESL3MblWHz3NKaAVT5FAs+36H/x4pOvi9UefK3f/k96QaEugPp+e8t
+	 J4i26Y+OSsTunQjKYOjbalqKn2YrMH+uorlXDYBgeahdCTC2lptqCs+upD3czpXqX3
+	 lDzkeR+hjvo+A==
+Date: Thu, 15 Feb 2024 07:24:59 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, horms@kernel.org,
+ Johannes Berg <johannes.berg@intel.com>, Amritha Nambiar
+ <amritha.nambiar@intel.com>
+Subject: Re: [PATCH net-next] net: sysfs: Do not create sysfs for non BQL
+ device
+Message-ID: <20240215072459.2e3697ee@kernel.org>
+In-Reply-To: <20240215112729.1778958-1-leitao@debian.org>
+References: <20240215112729.1778958-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-1320519:519-21489:flowmailer
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Remove the duplicate calls to prueth_emac_stop() and
-prueth_cleanup_tx_chns() in emac_ndo_stop().
+On Thu, 15 Feb 2024 03:27:27 -0800 Breno Leitao wrote:
+> Creation of sysfs entries is expensive, mainly for workloads that
+> constantly creates netdev and netns often.
+> 
+> Do not create BQL sysfs entries for devices that don't need,
+> basically those that do not have a real queue, i.e, devices that has
+> NETIF_F_LLTX and IFF_NO_QUEUE, such as `lo` interface.
+> 
+> This will remove the /sys/class/net/eth0/queues/tx-X/byte_queue_limits/
+> directory for these devices.
+> 
+> In the example below, eth0 has the `byte_queue_limits` directory but not
+> `lo`.
+> 
+> 	# ls /sys/class/net/lo/queues/tx-0/
+> 	traffic_class  tx_maxrate  tx_timeout  xps_cpus  xps_rxqs
+> 
+> 	# ls /sys/class/net/eth0/queues/tx-0/byte_queue_limits/
+> 	hold_time  inflight  limit  limit_max  limit_min
 
-Signed-off-by: Diogo Ivo <diogo.ivo@siemens.com>
-Reviewed-by: Roger Quadros <rogerq@kernel.org>
-Reviewed-by: MD Danish Anwar <danishanwar@ti.com>
----
-Changes in v2:
- - Removed Fixes: tags
- - Added Reviewed-by's
+I'm tempted to also get rid of the #ifdefs while at it.
 
- drivers/net/ethernet/ti/icssg/icssg_prueth.c | 4 ----
- 1 file changed, 4 deletions(-)
+> +static bool netdev_uses_bql(struct net_device *dev)
+> +{
+> +	if (dev->features & NETIF_F_LLTX ||
+> +	    dev->priv_flags & IFF_NO_QUEUE)
+> +		return false;
+> +
+> +	return true;
 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index 411898a4f38c..cf7b73f8f450 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -1489,9 +1489,6 @@ static int emac_ndo_stop(struct net_device *ndev)
- 	/* Destroying the queued work in ndo_stop() */
- 	cancel_delayed_work_sync(&emac->stats_work);
+make this
+	return IS_ENABLED(CONFIG_BQL);
+
+And throw in something like:
+
+diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+index a09d507c5b03..119075dff0ee 100644
+--- a/net/core/net-sysfs.c
++++ b/net/core/net-sysfs.c
+@@ -1454,6 +1454,9 @@ static const struct attribute_group dql_group = {
+        .name  = "byte_queue_limits",
+        .attrs  = dql_attrs,
+ };
++#else
++/* Fake declaration, all the code using it should be dead */
++extern const struct attribute_group dql_group;
+ #endif /* CONFIG_BQL */
  
--	/* stop PRUs */
--	prueth_emac_stop(emac);
--
- 	if (prueth->emacs_initialized == 1)
- 		icss_iep_exit(emac->iep);
- 
-@@ -1502,7 +1499,6 @@ static int emac_ndo_stop(struct net_device *ndev)
- 
- 	free_irq(emac->rx_chns.irq[rx_flow], emac);
- 	prueth_ndev_del_tx_napi(emac, emac->tx_ch_num);
--	prueth_cleanup_tx_chns(emac);
- 
- 	prueth_cleanup_rx_chns(emac, &emac->rx_chns, max_rx_flows);
- 	prueth_cleanup_tx_chns(emac);
--- 
-2.43.1
+ #ifdef CONFIG_XPS
 
+You should then be able to remove the #ifdef CONFIG_BQL around the
+uses of netdev_uses_bql(), compiler will realize it always returns
+false and eliminate the code making use of &dql_group.
 
