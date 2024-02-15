@@ -1,124 +1,125 @@
-Return-Path: <netdev+bounces-72146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 101A6856B64
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:46:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E49E856B66
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:46:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D2011C21D76
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 17:46:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFDA01F22217
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 17:46:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C4991369AF;
-	Thu, 15 Feb 2024 17:46:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3594E1369A5;
+	Thu, 15 Feb 2024 17:46:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="od8eOLiE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JHVW2LIH"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEFB21369AB;
-	Thu, 15 Feb 2024 17:46:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 690C8137C20
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 17:46:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708019181; cv=none; b=CKjjobuqmWrZKMvwOYtRfufHMPZSf6GTttnJfOCIKTj65At8V6p9zWc3KbjUCMKoZShWFJqdl8KtK5nWoTv6ty35TH5tI8mlVCKsLzGrxWZt7Y/oo33PlbN/mUVvk3LizZNyS6HH96pzyCeeOmqv1HrMJC0raQm3u+Eeq/uUPAA=
+	t=1708019196; cv=none; b=ezNOLO9sfoNBC7r/L/RveEMUvCnpL4dGo+lHQB+3OT/3/9czfLPFiKKuuGBj5wjAAWPDLUHYszDtSPpydakcOoXZz2jZ5IDWHkZ4orXiIdqG5ER7uZ208j4Ge9aEYpNHRtc3uVogMUQ/0Lu70Y7y1iHqZd+nIp3hQMRuRSWcl4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708019181; c=relaxed/simple;
-	bh=tSVwzJYE9mMhTP4PRPrJFe7vbFAidXXe9lT6bNV75jA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hk3vWjUdcjKBKPaJOG1NIaG/73AZT1a/7jAEGxS+VRVb3k+z2uMlkqYm4WAtJxaqaKWyL3P2WloKlo/FN4esqWJU6/rBC39m4tRFynTHMrK3zG5XmzNPWMOo2wKTgSmAkdkeWlXvp2Z0X2QjLUBgWo+k7iCzutJgGVfOz+FtqRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=od8eOLiE; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B0EC8240002;
-	Thu, 15 Feb 2024 17:46:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1708019176;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=inH8EjjrxlOBnJ9O5h+irj6SqwiMSYBxDH0OH8nLG0A=;
-	b=od8eOLiECnaDNLhsK97ovwmZovi+OYGOWZvJEle+XxC1RECogVyhPrpR6DAxahyqcuJXLi
-	4bYPCe04UCrdEK1ybZNKSKNV0KESVI0c8btHLeJbauEN0NU2vn3WRfdf+CIK6lKWaPYige
-	jwDl3wjhlgn4idv9iFOj4Wj/8DWtEOeykZbM5cSCWJXLh4r5kr84XSQ/2uTZ7UbcnWzERO
-	+CLGKxUN3Im1ZM0sBJ00W8OGbjudjEVw2JOm03ugtvoorwu97/ZiRdCIYzS3ItxWYwDZju
-	cR49LC4DmHxkO3dYTL4Ad9s2sz4TWnpbBF+d7ENqiLUjs2C/epqVz6P23t797A==
-Date: Thu, 15 Feb 2024 18:46:12 +0100
-From: Herve Codina <herve.codina@bootlin.com>
-To: Yury Norov <yury.norov@gmail.com>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Vadim Fedorenko
- <vadim.fedorenko@linux.dev>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew@lunn.ch>, Mark Brown
- <broonie@kernel.org>, Christophe Leroy <christophe.leroy@csgroup.eu>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v3 RESEND 3/6] bitmap: Make bitmap_onto() available to
- users
-Message-ID: <20240215184612.438bd4f2@bootlin.com>
-In-Reply-To: <Zcptyd/AWrDD3EAL@yury-ThinkPad>
-References: <20240212075646.19114-1-herve.codina@bootlin.com>
-	<20240212075646.19114-4-herve.codina@bootlin.com>
-	<ZcoOpPb9HfXOYmAr@smile.fi.intel.com>
-	<20240212143753.620ddd6e@bootlin.com>
-	<ZcokwpMb6SFWhLBB@smile.fi.intel.com>
-	<20240212152022.75b10268@bootlin.com>
-	<Zcos9F3ZCX5c936p@smile.fi.intel.com>
-	<Zcptyd/AWrDD3EAL@yury-ThinkPad>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1708019196; c=relaxed/simple;
+	bh=gP799Hw7NNkxb4OtI45g7vCZwtn/f/+WjXB46u2riWI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fqZH/Y6lCnz0gzsOGGZQJXHlEMUIwnFd7D0/2jTjh75NXNo5H0PBbpk9EFYBcqnC+4O1E0yJNF/UzaJ6B3e8gnocIv5sjp2xYzsOpMcd6SAudF8/sM4Zsy2NbRlR61ejWMiThNfDUv2L/4ZPm7lH/5CI/LpHig2pUWxXPWJiL9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JHVW2LIH; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-563dd5bd382so71a12.1
+        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 09:46:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1708019192; x=1708623992; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wrbbgS5IFLC04j4ol7wixx3VoqSRukujNYOqeLy/Tj8=;
+        b=JHVW2LIHAgQml2YcHHfBH2ivPdBHRGnl3n31WS96NM5TfaLyJdUWPfSriU0+Eyxe1Z
+         qGgiiQM72lltRr5urvhsDVQeJ6Gav2AMRIZCCXl8YF4nInHYtCDpSiYX5FxVio3aUDC/
+         uvYBveETyzvWWWwj3ldqetaIrWkwzSbm55L1646PTj81c2LEcTw3LBljcEhoHVdODJh9
+         L24q4DAF6WOoFRcoTQBgNam63dORzrzkG2TcwUpnPvUnLZQLqWTSOJtA3N4IKy7sznMG
+         bRkDOQg1Lr/laJLZKdM90To5ff1QsnXOyijVPOWHcub6f/4Ao8ECfQp2X1Dk3N0qBfvU
+         38ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708019192; x=1708623992;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wrbbgS5IFLC04j4ol7wixx3VoqSRukujNYOqeLy/Tj8=;
+        b=GKhErled6pH+U6T3YdFEDHQqFXbOZUpSN/94KcQkii3FZP9g3xwgQfTVLSfDk5+rJ3
+         0PWBU5PNx7drIRhL3O4BUeZpxcJbvV8QMcgdKK5hluEDgZ93JS1FL5IXYXb3b2n5mbR4
+         3MZ8PH5QQcYwlOj5+T1TaIzx8P3iX+vJDClYuAzkI4SYr+hJ91sUyNrzdPuwsYhdlHMD
+         JlCOderRKflnU0ee51fGp6iPFUjFwU1HQ/1S+LmpShSotQ7hq/lYTb3XxaqM5PZvhV/D
+         LBlr2YJQOEyDNd8ngt5lInsifiVHYSIaYtmuPBuAxbTaSIMBTI3CYEwr9YlKAqWUAcp5
+         6z7A==
+X-Forwarded-Encrypted: i=1; AJvYcCWYtuXgrFvL0nM6I18itteTNXB2vmUy0jvy6kCdHoET7Z02O5JOu0vJmAgAPsj8xhWj7XoqGrHy2F2NJdywX4Rf4QQxGiYO
+X-Gm-Message-State: AOJu0YygPlzGvxzP+JomPfYHDXcdTbI5UPGY1UAQF7nP2LUqVvMXxF7h
+	08MtN84KcQtMTsWTzrSGFauK09rPxkPCLldGc71VIgcU4ZnoyrElE2mqbYMPSeO7HwE2QvTRh2f
+	gMqC0c78i0in8tRXCernFJvnv5kkiNa+iOLaD
+X-Google-Smtp-Source: AGHT+IGuia/mk6fNALuebkkgZMkpTELxRjyQnguWv9uSUuMGe5xGsAMLeMypQICyXEfv/RgEOaREduHcq6rWaBmJD0I=
+X-Received: by 2002:a50:cd8c:0:b0:561:a93:49af with SMTP id
+ p12-20020a50cd8c000000b005610a9349afmr5724edi.7.1708019192439; Thu, 15 Feb
+ 2024 09:46:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+References: <20240209221233.3150253-1-jmaloy@redhat.com> <8d77d8a4e6a37e80aa46cd8df98de84714c384a5.camel@redhat.com>
+ <CANn89iJW=nEzVjqxzPht20dUnfqxWGXMO2_EpKUV4JHawBRxfw@mail.gmail.com>
+ <eaee3c892545e072095e7b296ddde598f1e966d9.camel@redhat.com>
+ <CANn89iL=npDL0S+w-F-iE2kmQ2rnNSA7K9ic9s-4ByLkvHPHYg@mail.gmail.com>
+ <20072ba530b34729589a3d527c420a766b49e205.camel@redhat.com>
+ <CANn89iL2FvTVYv6ym58=4L-K-kSan6R4PEv488ztyX4HsNquug@mail.gmail.com>
+ <725a92b4813242549f2316e6682d3312b5e658d8.camel@redhat.com>
+ <CANn89i+bc=OqkwpHy0F_FDSKCM7Hxr7p2hvxd3Fg7Z+TriPNTA@mail.gmail.com>
+ <20687849-ec5c-9ce5-0a18-cc80f5b64816@redhat.com> <178b9f2dbb3c56fcfef46a97ea395bdd13ebfb59.camel@redhat.com>
+In-Reply-To: <178b9f2dbb3c56fcfef46a97ea395bdd13ebfb59.camel@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 15 Feb 2024 18:46:18 +0100
+Message-ID: <CANn89iKXOZdT7_ww_Jytm4wMoXAe0=pqX+M_iVpNGaHqe_9o4Q@mail.gmail.com>
+Subject: Re: [PATCH v3] tcp: add support for SO_PEEK_OFF
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Jon Maloy <jmaloy@redhat.com>, kuba@kernel.org, passt-dev@passt.top, 
+	sbrivio@redhat.com, lvivier@redhat.com, dgibson@redhat.com, 
+	netdev@vger.kernel.org, davem@davemloft.net
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Andy, Yury,
+On Thu, Feb 15, 2024 at 6:41=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> Note: please send text-only email to netdev.
+>
+> On Thu, 2024-02-15 at 10:11 -0500, Jon Maloy wrote:
+> > I wonder if the following could be acceptable:
+> >
+> >  if (flags & MSG_PEEK)
+> >         sk_peek_offset_fwd(sk, used);
+> >  else if (peek_offset > 0)
+> >        sk_peek_offset_bwd(sk, used);
+> >
+> >  peek_offset is already present in the data cache, and if it has the va=
+lue
+> >  zero it means either that that sk->sk_peek_off is unused (-1) or actua=
+lly is zero.
+> >  Either way, no rewind is needed in that case.
+>
+> I agree the above should avoid touching cold cachelines in the
+> fastpath, and looks functionally correct to me.
+>
+> The last word is up to Eric :)
+>
 
-On Mon, 12 Feb 2024 11:13:13 -0800
-Yury Norov <yury.norov@gmail.com> wrote:
+An actual patch seems needed.
 
-...
+In the current form, local variable peek_offset is 0 when !MSG_PEEK.
 
-> 
-> That's I agree. Scatter/gather from your last approach sound better.
-> Do you plan to send a v2?
-> 
-...
-> 
-> I think your scatter/gather is better then this onto/off by naming and
-> implementation. If you'll send a v2, and it would work for Herve, I'd
-> prefer scatter/gather. But we can live with onto/off as well.
-> 
-
-Andy, I tested your bitmap_{scatter,gather}() in my code.
-I simply replaced my bitmap_{onto,off}() calls by calls to your helpers and
-it works perfectly for my use case.
-
-I didn't use your whole patch
-  "[PATCH v1 2/5] lib/bitmap: Introduce bitmap_scatter() and bitmap_gather() helpers"
-because it didn't apply on a v6.8-rc1 based branch.
-I just manually extracted the needed functions for my tests and I didn't look
-at the lib/test_bitmap.c part.
-
-Now what's the plan ?
-Andy, do you want to send a v2 of this patch or may I get the patch, modify it
-according to reviews already present in v1 and integrate it in my current
-series ?
-
-Yury, any preferences ?
-
-Best regards,
-Hervé
--- 
-Hervé Codina, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+So the "else if (peek_offset > 0)" would always be false.
 
