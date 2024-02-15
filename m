@@ -1,61 +1,59 @@
-Return-Path: <netdev+bounces-71890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49EB785584F
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 01:31:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DBE4855857
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 01:36:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0750A28D7AB
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 00:31:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70DA61C223B8
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 00:36:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6217E623;
-	Thu, 15 Feb 2024 00:31:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06FA4639;
+	Thu, 15 Feb 2024 00:36:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iWXfgN/o"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i9vsonBp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E7B8383
-	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 00:31:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7ED1623
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 00:36:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707957094; cv=none; b=bP6nC9StKDFYDUgnw7B9AE2aP2QaGRlJ3bklKWAZFuX8aXLCGHTOtqwElmbpBZL7BNdLdVAnZrbae7CJkJYld5JUVwQCYo6RT/W+hxm0r8yKBjb0XFvNaInRpKTTZu7yYe+/GP8DCyDml4wP9/aM0JzGdZFG2hAR0snCgaYG+IQ=
+	t=1707957380; cv=none; b=h0/O4rhzjgEChvBA0iWfWn9UP82IapBrFH96aFwjvT20/ZLd6LPi4EyEcyKXttS0oVkC31DXZRwPdgcicPoQCvs16UdrYo6dE/reyVV3DvNjL8n4DEidlps/F1Tl+Os6XKQ1EUfI/wZTEAn/WFUFMuGZObuki3zQIgCpiKuVZSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707957094; c=relaxed/simple;
-	bh=V+ajUQlKttqSUAO4XdYZG1Wuj6aV00As8gCKQxC4HQs=;
+	s=arc-20240116; t=1707957380; c=relaxed/simple;
+	bh=yZXNywq+jH/3EcQoyJzddecCsyCJjxBPogPn3wRz2uw=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iQPGMX1aBRhayxb2s8xnsxiqJqXLX0DkTvESvF4wde/p8Ear7/AYo4lLd0PgsoRPcdZ3T7Lyg4MlgXMZg99ExuXs8b/H7P96rSfixV+mG29NPoNyRBzGrkvqclzJd+Neo57IRow+MjJwO/msO1tnwtI1jgMugPN5490AcXcD0QI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iWXfgN/o; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48FE9C433F1;
-	Thu, 15 Feb 2024 00:31:33 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Jvpvvo/qzator2UtCcapKiCG0wiV4IhuD3ehH916Qr86mm5yADsVvCBGnxi023mHZH2ggZcwZwKRLZeJ6sHx9UpHlCujUYF6u6YHFU43fRwXjW9noGolFgwC0hM0F335W7JJpMLdQ0dcM5fEe0AOzbR9WzBwNUWyG1nB2ZD2W/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i9vsonBp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BA12C433C7;
+	Thu, 15 Feb 2024 00:36:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707957093;
-	bh=V+ajUQlKttqSUAO4XdYZG1Wuj6aV00As8gCKQxC4HQs=;
+	s=k20201202; t=1707957380;
+	bh=yZXNywq+jH/3EcQoyJzddecCsyCJjxBPogPn3wRz2uw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iWXfgN/oD8EHW7W0xaIcjwLMRGaneqyxlnzi36tkXYI/ViKKQLG6fxCyXjiGTeXX2
-	 rLu8jRoqOuYypuogGv+XaYcgQSU6udp2pdwIzBEvhzBUXQYB9Tv6YgDwXRM/qflZ0W
-	 SiLm469o17k3CL885ZFAcW0cs3I/Lxi9TYWvDVAJFs3yMJJ/g+fnSiI/87XVsy5pca
-	 V6/O+2+zl10pHB23JvX6tkbdKaOFTVWfLg2la4GE/KfDI658O1zi/wGxNCaQsgcCqH
-	 duroCbdwBMmMdiLCZSjw4X600IpgZt49JjO//aJiW+uFpheb95hzNE8cQWoMIg1iM7
-	 jk8znNm9+dW/Q==
-Date: Wed, 14 Feb 2024 16:31:32 -0800
+	b=i9vsonBpx2wAuAlmBY9H4eDBR5bGQS/s05Nh33yEbBBlNqzqlJ9jbcBe5rjGoSWdy
+	 YutQ1F7QF72ileYdBJ7xQRYdWbUq2pJY9WuY+VAg2luZR+uATMTRbJEWCapV7Mv7pB
+	 kuLss72PPFr5Iodj6uOJUPj6AHsVXYCESG/J3d17e9lTJRIaQ08sw4iGJbY8DnGiFi
+	 m2E8Pf40bPLfJT7vSlDNCQJec8pcHCaryZzxq4ogmaVJRJIzfksiNJf33MHKIY8dKq
+	 rY05d4dOQuQB2ibY3D/pZ4zQQdDpGItuLjVhkWR1d8kQshESxlerhxwsH3DZTN0Hwk
+	 yz2V3L4LcQ02Q==
+Date: Wed, 14 Feb 2024 16:36:19 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Davide Caratti <dcaratti@redhat.com>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, davem@davemloft.net,
- netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com, Marcelo
- Ricardo Leitner <marcelo.leitner@gmail.com>, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, shmulik.ladkani@gmail.com
-Subject: Re: [PATCH net] net/sched: act_mirred: use the backlog for mirred
- ingress
-Message-ID: <20240214163132.54fd74bc@kernel.org>
-In-Reply-To: <Zczl_QQ200PvyzH5@dcaratti.users.ipa.redhat.com>
-References: <20240209235413.3717039-1-kuba@kernel.org>
-	<CAM0EoMmXrLv4aPo1btG2_oi4fTX=gZzO90jyHQzWvM26ZUFbww@mail.gmail.com>
-	<CAM0EoM=sUpX1yOL7yO5Z4UGOakxw1+GK97yqs4U5WyOy7U+SxQ@mail.gmail.com>
-	<Zczl_QQ200PvyzH5@dcaratti.users.ipa.redhat.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Alan Brady <alan.brady@intel.com>, <intel-wired-lan@lists.osuosl.org>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, <netdev@vger.kernel.org>,
+ Emil Tantilov <emil.s.tantilov@intel.com>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH 1/1 iwl-net] idpf: disable local BH
+ when scheduling napi for marker packets
+Message-ID: <20240214163619.522486a5@kernel.org>
+In-Reply-To: <2e3001f8-a079-4d44-863f-979baca3b38c@intel.com>
+References: <20240208004243.1762223-1-alan.brady@intel.com>
+	<2e3001f8-a079-4d44-863f-979baca3b38c@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,19 +63,21 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 14 Feb 2024 17:10:37 +0100 Davide Caratti wrote:
-> > So tests pass - but on the list i only see one patch and the other is
-> > on lore, not sure how to ACK something that is not on email, but FWIW:
-> > Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> > 
-> > The second patch avoids the recursion issue (which was the root cause)
-> > and the first patch is really undoing ca22da2fbd693  
+On Tue, 13 Feb 2024 14:16:47 +0100 Alexander Lobakin wrote:
+> > Fix softirq's not being handled during napi_schedule() call when
+> > receiving marker packets for queue disable by disabling local bottom
+> > half.  
 > 
-> If I well read, Jakub's patch [1] uses the backlog for egress->ingress
-> regardless of the "nest level": no more calls to netif_receive_skb():
-> It's the same as my initial proposal for fixing the OVS soft-lockup [2],
-> the code is different because now we have tcf_mirred_to_dev().
+> BTW, how exactly does this help?
+> 
+> __napi_schedule() already disables interrupts (local_irq_save()).
+> napi_schedule_prep() only has READ_ONCE() and other atomic read/write
+> helpers.
+> 
+> It's always been safe to call napi_schedule() with enabled BH, so I
+> don't really understand how this works.
 
-FWIW feel free to add your Sob or Co-dev+Sob!
-It is very much the same solution as what you posted at some stage.
+Sorry for late reply. IIRC the problem isn't a race but the fact that
+local_irq_restore() does not have a hook for BH. IOW we may just set 
+the bit that the BH is pending but never call into softirq.c to run it.
 
