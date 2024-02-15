@@ -1,120 +1,116 @@
-Return-Path: <netdev+bounces-72150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 997E7856B9B
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:52:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1AC5856BB3
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:56:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC84E1C203D8
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 17:52:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 824E4B26513
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 17:56:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66164137C20;
-	Thu, 15 Feb 2024 17:52:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65DC413848D;
+	Thu, 15 Feb 2024 17:56:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gsNS5axL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QeJXX/+u"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 809E31369AC;
-	Thu, 15 Feb 2024 17:52:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7F63136641
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 17:56:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708019522; cv=none; b=Lw5PzTjARDVN3vjIppRICtQNpapiJOfUeqb6md/ObjYD4N03tdjUVVY8XNVRdLvx39g7i+O2nPIqmpOf9XZLOoU5cIO7qZCK7iM9o5HkBieYhQAx8HXpns9R7Fd/72OHeCjYCq7ntG8g3gqLOcXZeTgi4pykfT58B6VdYpaOhL8=
+	t=1708019774; cv=none; b=qML72j77C8ZJDlYwZcqd2FWkIqYZX4oPlWu4OD0aupjziItEF+YQrnvNW7tGXTlV6yHtmrgT4VgKmmU1kFeYGmPWJjv5i7fz7PU/GzsjOnSn2bvMj4wKdqgkSWrklMnPzFeJgm96/Foc4MmwR7aSwZ761bA5DJnDAr0GZPYCsZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708019522; c=relaxed/simple;
-	bh=M6zXTumOL2shrnbpTbNe6dcztXS6mmrTVGsLmlPGQoY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F/mPh9B8TFywnmUjrW5FvIzPd6hPlwQj+OIYAWCmo2RTD5xyeBkfLInmYkiavGxr3pCmXOVwduOY6MM6kRR6mSbdinm5UkYRAbBbrotifa8pYuQ3MOqE9YPzdMwYQp29lqR9qu5UqIcQvRfTYZrvg2so8gLwbZuknIHDHZDs3K0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=gsNS5axL; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=afifmMcrSbICMT6eW/B4pDL5KgJCwV2V/YrMyURwkms=; b=gsNS5axLRq3buRV6dXpy+Bz2As
-	8UXaY7jygcMiSlnXuOamtkRuVun1KmDgFmKGqN5cX53zP9UdBrWpreEjbzvNTW1Knmqt7VmBo/0pI
-	4M2SnqUkG4OMzJ4OdowkDh+L8Ggg+jPwosskYbdlI0dGpnfXN3dZgxznbLiGynmBvU5M=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1raftr-007umH-W8; Thu, 15 Feb 2024 18:51:55 +0100
-Date: Thu, 15 Feb 2024 18:51:55 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Rob Herring <robh@kernel.org>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Mark Brown <broonie@kernel.org>,
-	Frank Rowand <frowand.list@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
-	Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v3 14/17] dt-bindings: net: pse-pd: Add bindings
- for PD692x0 PSE controller
-Message-ID: <65099b67-b7dc-4d78-ba42-d550aae2c31e@lunn.ch>
-References: <20240208-feature_poe-v3-0-531d2674469e@bootlin.com>
- <20240208-feature_poe-v3-14-531d2674469e@bootlin.com>
- <20240209145727.GA3702230-robh@kernel.org>
- <ZciUQqjM4Z8Tc6Db@pengutronix.de>
- <618be4b1-c52c-4b8f-8818-1e4150867cad@lunn.ch>
- <Zc3IrO_MXIdLXnEL@pengutronix.de>
+	s=arc-20240116; t=1708019774; c=relaxed/simple;
+	bh=oKtv2APj8l0mO1DIuBTt0dKeKN83ha+KYp6qE3pmWkU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UkkyssC+Ku+DPfZ8RquON8mbOWwb/qqRU//UPeR2a/Bc8PXuFccjgg1nHlkfQ+LOZZmi66U6lTleyKxVY3f36uLQNMqOzTtlXj3wpdCezJiCoGSozgFz68II9DNpvtRqpJFWYyUIil2lAVs7Kib0f5wSZhsghei0aIiQzhcNxm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QeJXX/+u; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708019771;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oKtv2APj8l0mO1DIuBTt0dKeKN83ha+KYp6qE3pmWkU=;
+	b=QeJXX/+ujLiA+17I0sCw+W2Sg8ndlYq8Lo3dYAC7ojTSHWBRTr0lG2Ahh7s+5vSKlJsWF8
+	LbywZjGRXWqsbgfAyG34uiaMWk3vTzg97UE1mtD2HuCWIbE07ysMVbzsuDOOt6zAdgizRM
+	bxPboNlAXvWjW+P7rwN03TAacKE9gus=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-673-k1MZ3wlHO--hfRp2MtOlYg-1; Thu, 15 Feb 2024 12:56:10 -0500
+X-MC-Unique: k1MZ3wlHO--hfRp2MtOlYg-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-511535180b4so975928e87.2
+        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 09:56:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708019768; x=1708624568;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oKtv2APj8l0mO1DIuBTt0dKeKN83ha+KYp6qE3pmWkU=;
+        b=cHsXTm5UQJvHxqft9QYhjaEnl3dXIWvXUYYF2wRTf0LUUz37qa1HO1S5be/Apbg0Pw
+         4OaZr/8Z2rPyIghYGUP6TN4yWVIuSGRFPj/vD8JjVbMKN2Y6JwH/IU46M44pv3PWdXpx
+         qL5hmiIvkfFIxheXz6JLmLOZQLN0Vp8wGRGu/MgI2eYQmR4u++GFeNCEVhTS8SvnFKUk
+         BSgKQABo+3dMH4K1SU9U9hesETfRSSMIf5NquVYG6gChdxpHdJ9x8w9wek2aahjYnIll
+         qlJuUcJUqdjc0ncu3NXRDbjfayAvjWg10mKduGQcEucWjXRt0S0faou5xrCX/Ijr0FyC
+         SUBg==
+X-Forwarded-Encrypted: i=1; AJvYcCUoHPTAN77NEwbCyusPpCKkdbxIBgtGEIkpvTtiDXMBK6M92c+BkZaVthwj3LLZJpxUlETzFxtF2Ubtj5IMfAxI2fSqAx6b
+X-Gm-Message-State: AOJu0Yzt0UpMdKkZATZ6b6vR7gWhLjPIef+JZ/htWuOH/cCjfPB7Fuku
+	dFyh82KUtXKrmxFlGJN8npfBvcqRSZ/qL1TFlnOyIRatRtS3rPRQ12th3JF+NDNtdPqiHQIcYlw
+	Hk2LLfzTYZyHm6Yz/m0fSPo/qAW2af1vgz6i6ynVfhEnz8rfi4695ibAnbjX9ENx7WeigSH3NBl
+	3BNFQnsOylpFpvmyVGx08Zi6hgXRXv
+X-Received: by 2002:a19:5205:0:b0:511:47f7:62e0 with SMTP id m5-20020a195205000000b0051147f762e0mr1856535lfb.21.1708019768632;
+        Thu, 15 Feb 2024 09:56:08 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFbf9A7YdOFWhLkLSXMyiedaavL5pPS9/qcv4yiSmUOuIOMITpLfF+9dRh+rZbSBmpnhoYoaYxAoAhZWKVKWRI=
+X-Received: by 2002:a19:5205:0:b0:511:47f7:62e0 with SMTP id
+ m5-20020a195205000000b0051147f762e0mr1856525lfb.21.1708019768324; Thu, 15 Feb
+ 2024 09:56:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zc3IrO_MXIdLXnEL@pengutronix.de>
+References: <20240209235413.3717039-1-kuba@kernel.org> <CAM0EoMmXrLv4aPo1btG2_oi4fTX=gZzO90jyHQzWvM26ZUFbww@mail.gmail.com>
+ <CAM0EoM=sUpX1yOL7yO5Z4UGOakxw1+GK97yqs4U5WyOy7U+SxQ@mail.gmail.com>
+ <Zczl_QQ200PvyzH5@dcaratti.users.ipa.redhat.com> <20240214163132.54fd74bc@kernel.org>
+In-Reply-To: <20240214163132.54fd74bc@kernel.org>
+From: Davide Caratti <dcaratti@redhat.com>
+Date: Thu, 15 Feb 2024 18:55:57 +0100
+Message-ID: <CAKa-r6vwCpK0ZcoaFgQtdFaQ15_RF0zE+jR0_NoZdwg9D1ybbQ@mail.gmail.com>
+Subject: Re: [PATCH net] net/sched: act_mirred: use the backlog for mirred ingress
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, davem@davemloft.net, netdev@vger.kernel.org, 
+	edumazet@google.com, pabeni@redhat.com, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
+	shmulik.ladkani@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Hm.. good question. I didn't found the answer in the spec. By combining all
-> puzzle parts I assume, different Alternative configurations are designed
-> to handle conflict between "PSE Physical Layer classification" and PHY
-> autoneg.
-> 
-> Here is how multi-pulse Physical Layer classification is done:
-> https://img.electronicdesign.com/files/base/ebm/electronicdesign/image/2020/07/Figure_5.5f2094553a61c.png
-> 
-> this is the source:
-> https://www.electronicdesign.com/technologies/power/whitepaper/21137799/silicon-labs-90-w-power-over-ethernet-explained
-> 
-> To avoid classification conflict with autoneg. Assuming, PHY on PD side
-> will be not powered until classification is completed. The only source
-> of pulses is the PHY on PSE side (if it is not under control of software
-> on PSE side or Midspan PSE is used), so aneg pulses should be send on
-> negative PoE pair? This all is just speculation, I would need to ask
-> some expert or do testing.
-> 
-> If this assumption is correct, PHY framework will need to know exact
-> layout of MDI-X setting and/or silent PHY until PSE classification is done.
+hi,
+On Thu, Feb 15, 2024 at 1:31=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
 
-Ideally, we don't want to define a DT binding, and then find it is
-wrong for 1000BaseT and above and we need to change it.
+[...]
 
-So, either somebody needs to understand 1000BaseT and can say the
-proposed binding works, or we explicitly document the binding is
-limited to 10BaseT and 100BaseT.
+> > If I well read, Jakub's patch [1] uses the backlog for egress->ingress
+> > regardless of the "nest level": no more calls to netif_receive_skb():
+> > It's the same as my initial proposal for fixing the OVS soft-lockup [2]=
+,
+> > the code is different because now we have tcf_mirred_to_dev().
+>
+> FWIW feel free to add your Sob or Co-dev+Sob!
+> It is very much the same solution as what you posted at some stage.
 
-I'm not sure the second solution will actually fly. This was being
-tested with Marvell Prestera switch. I doubt it even has any Fast
-Ethernet ports.
-
-	Andrew
+I'm ok with the current tags! thanks!
+--=20
+davide
 
 
