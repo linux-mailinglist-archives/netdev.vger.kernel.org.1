@@ -1,134 +1,121 @@
-Return-Path: <netdev+bounces-72056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F1898565B6
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 15:16:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BD2F85660C
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 15:34:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EAF4CB2CF63
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 14:15:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F6D21F25E3E
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 14:34:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB3EC12EBC1;
-	Thu, 15 Feb 2024 14:14:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 666B8132C01;
+	Thu, 15 Feb 2024 14:33:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nDw579tI"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="jfnLugIp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A6C129A80;
-	Thu, 15 Feb 2024 14:14:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A09D969DF0;
+	Thu, 15 Feb 2024 14:33:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708006475; cv=none; b=omM37sBDPQBapZNQIVS31OVQdR9m3f7bSxXV2HwaHJRDfEzx2FVlufKhZVLKGnRwXln+fLFs0oJeCOa6o45hp3zv4hFWnFneOBQbxs0QSIUb/pvbIAKGvIHY/lRbHta83CePa+9tRJ2ikxHyl6iQPGBarz4U2SotPBQCS2T8ONs=
+	t=1708007636; cv=none; b=d7wpQ1dLefc89cOlagZQmLk8IaujAsmSoENKCsbagI1NYbQ/c+vbHfOvqkWKlY7Gsr3SB5K/QZ8amJgFvnEWd/I8u+exDmB4ZzbxrovH7d40Kk2gHbwUYP1N4tCaGWf2gFUpZ2huBgWhC3cKAI0qmNqw6vMQS/7ytAlsVzwHar8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708006475; c=relaxed/simple;
-	bh=0KmmJF7es5qjGJptTPHwSdrE9Au+2EbQ8WnCPfcgii8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cfWRx7aBJ2OVr3eUvR13S9m2ZF5WwYyBgvbG5qJS6WOUGXXOqJKBlIxx8uOkHfRg1hydKMNwCrLEvwXnW/FdWIHGA3+UvejjBCNZyPFRKvu7fUfZJQqViv2uzyQwexBTbtTE4cgiUiC34WrJipXB7tq2JE3BOCijtFnPlqelbq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nDw579tI; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41FE2QAJ029709;
-	Thu, 15 Feb 2024 14:14:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Qoh53EwvSI9X7jHwJNqWFg94YPQZpOq8pRhjLES4yGY=;
- b=nDw579tIIkzZyEiBUEZuluO/c26Nfo3dOpWJrOXwQF1bO0OWRg7B4k2Q9875OzadldMw
- xUqDsIZ1rYB4g2N4hBQWMbiXcXObWGKDG4LPcWjF6YaprRucdWLuV8Q7tnMHqmhjQYVq
- GLr0OjVGfYjKGROwq6zQwIozCtvIPs64JURPLDK41Ry6ny//7vS+Dtd5mq4Pz9fsC56g
- b5rfZdeIPPxnW/BCSVZixNG6MqPeHnf7ivmcWIchqGaZoVggufReQF3Z7QwM0ZPfmcUc
- hJZdjjOlYzE1/ICKFWdg5W14VTsMrbjO7c8nHE//QmaQDTV5F6dh7To896Jv747SrZoY 9A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w9m1a0ee8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 15 Feb 2024 14:14:29 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41FE2Q3O029699;
-	Thu, 15 Feb 2024 14:14:29 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w9m1a0edt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 15 Feb 2024 14:14:28 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41FDqM87024878;
-	Thu, 15 Feb 2024 14:14:27 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3w6mfpn5dp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 15 Feb 2024 14:14:27 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41FEEMoP2032266
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 15 Feb 2024 14:14:24 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 25AB92004E;
-	Thu, 15 Feb 2024 14:14:22 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CF9052004D;
-	Thu, 15 Feb 2024 14:14:21 +0000 (GMT)
-Received: from [9.152.224.128] (unknown [9.152.224.128])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 15 Feb 2024 14:14:21 +0000 (GMT)
-Message-ID: <020edf58-c839-41c1-a302-4a75423a1761@linux.ibm.com>
-Date: Thu, 15 Feb 2024 15:14:21 +0100
+	s=arc-20240116; t=1708007636; c=relaxed/simple;
+	bh=x/C4JrMOvi9rCj9I7QPAKYQAw03CTw9sUHduKSKVXmQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ucoBl5hC0jW3oQiw9j1OBOAKIaEA7rg6uG3bd+EO0icp92WljNqTHXP3Rqnx4BMeEpixmz+mvc4OcJGlQDFEgkK4SnD4VIzHwTDrB1QMASk8aLxsoDKrwY5WwqEnH+FpeX9skBZVBqkrUSQkDxxz07xCeZLVpWN9vYND+t6kaeo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=jfnLugIp; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 489A520002;
+	Thu, 15 Feb 2024 14:33:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1708007625;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cdrzonxR0aohlaO272Q7MZrzcpjlQwtAuBm+FlVa2Zk=;
+	b=jfnLugIptfivZ7YdFpbIK7v/kS9Z5wDYbgN9JxdaFDSBKmFMzZioHeQjDfhB5IjWglucM4
+	Sqi0DuPcWmiN2jFy9WL98/pukDSqt8ZnZqlmQPyHcJCMqdvrB6agaUXCwMmTrc78hEyMwR
+	p9myXchCskW8S842CIb2DvZ0LqUh0ajdZvF7nyrRcMa4ZvEQomuyZsfYidc7uzMkZY7DK8
+	Cokymg3a2p/uT6FDqq/dh8gIDEao+tPQ4fDkDmU+TbMEqdjlRv/3Heh3apBXZUyneqM0pH
+	hM1waaf3aoSIhHIIFMwRm7PFg+qencCW54aQTPgtMaM6Kzg9nxdcDA7ca8g+Pw==
+Date: Thu, 15 Feb 2024 15:33:42 +0100
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Rob Herring <robh@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis
+ Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>, Mark Brown <broonie@kernel.org>,
+ Frank Rowand <frowand.list@gmail.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v3 10/17] dt-bindings: net: pse-pd: Add another
+ way of describing several PSE PIs
+Message-ID: <20240215153342.0be61fe0@kmaincent-XPS-13-7390>
+In-Reply-To: <377d2e0f-dc0c-400f-9c10-f4a158146ceb@lunn.ch>
+References: <20240208-feature_poe-v3-0-531d2674469e@bootlin.com>
+	<20240208-feature_poe-v3-10-531d2674469e@bootlin.com>
+	<20240209144349.GA3678044-robh@kernel.org>
+	<20240214141310.119364c4@kmaincent-XPS-13-7390>
+	<20240214164150.5be591d0@kmaincent-XPS-13-7390>
+	<20240215135130.GA4139246-robh@kernel.org>
+	<377d2e0f-dc0c-400f-9c10-f4a158146ceb@lunn.ch>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next] net: Deprecate SO_DEBUG and reclaim SOCK_DBG
- bit.
-Content-Language: en-US
-To: Kuniyuki Iwashima <kuniyu@amazon.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Matthieu Baerts <matttbe@kernel.org>,
-        Mat Martineau <martineau@kernel.org>,
-        Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
-        Wen Gu <guwen@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>,
-        "D . Wythe" <alibuda@linux.alibaba.com>
-Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
-        mptcp@lists.linux.dev, linux-s390@vger.kernel.org,
-        Gerd Bayer <gbayer@linux.ibm.com>
-References: <20240214195407.3175-1-kuniyu@amazon.com>
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <20240214195407.3175-1-kuniyu@amazon.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: LSSaPSZRfFPi7d3TS2Csxpa551B1sVaV
-X-Proofpoint-ORIG-GUID: pv6Dn-rrpeMGpJ4w1C0nxLk8wRNgxCt-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-15_13,2024-02-14_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
- mlxscore=0 adultscore=0 bulkscore=0 phishscore=0 malwarescore=0
- clxscore=1011 mlxlogscore=790 lowpriorityscore=0 impostorscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402150114
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
+On Thu, 15 Feb 2024 15:01:08 +0100
+Andrew Lunn <andrew@lunn.ch> wrote:
 
+> > > Not so much used indeed:
+> > > $ git log --grep=3D"Sponsored" | grep Sponsored    =20
+> > >     Sponsored by:  The FreeBSD Foundation
+> > >     Sponsored by:  The FreeBSD Foundation
+> > >     Sponsored by:  The FreeBSD Foundation
+> > >     Sponsored by:  The FreeBSD Foundation
+> > >     Sponsored-by: Google Chromium project
+> > >     Sponsored: Google ChromeOS
+> > >     Sponsored: Google ChromeOS
+> > >=20
+> > > Is it ok to keep it? =20
+> >=20
+> > IMO, its use should be documented like other tags, or it should not be=
+=20
+> > used. Just write a sentence to the same effect. =20
+>=20
+> Or include a patch to document it :-)
 
-On 14.02.24 20:54, Kuniyuki Iwashima wrote:
-> +	case SO_DEBUG:
-> +		/* deprecated, but kept for compatibility */
-> +		if (val && !sockopt_capable(CAP_NET_ADMIN))
-> +			ret = -EACCES;
-> +		return 0;
+It seems someone has already tried to send a patch to add this tag but it h=
+as
+not been accepted due to maintainers extra works bring by the tag:
+https://lore.kernel.org/lkml/20230817220957.41582-1-giulio.benetti@benettie=
+ngineering.com/
 
-Setting ret has no effect here. Maybe you mean something like:
-> +		if (val && !sockopt_capable(CAP_NET_ADMIN))
-> +			return -EACCES;
-> +		return 0;
+I will replace it by a small sentence then.
 
-or 
-
-return (val && !sockopt_capable(CAP_NET_ADMIN)) ? -EACCESS : 0;
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
