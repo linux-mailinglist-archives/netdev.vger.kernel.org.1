@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-72079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00DC08568A4
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 230058568A5
 	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 17:00:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32932B20EB6
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 16:00:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C99771F233E0
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 16:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DAA9133983;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0D6213399B;
 	Thu, 15 Feb 2024 16:00:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K1iZzhPJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VIivHZOk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4705053369;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 898A8133993;
 	Thu, 15 Feb 2024 16:00:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708012831; cv=none; b=u3Bb2Vy+n4VfQZZGxiA1Hz8KVY4CJwcfxYx6/OxJt7pO13OP+Ho+mF2B3RhDEukKVpFaqbn+2D+OgexxH+uahinCeJYtWcAw8WAbeLMPyuup01LIAqmikHCUv+ssGBhMREJT6vc6DgJRk+fUsOOyM4MrHLZLu3/lXNn5JaSFuhc=
+	t=1708012831; cv=none; b=CwF9s6hpq5AtyXnEPkGwCm4dEUacgWz3MX3WxDsR8qha1W2eF2V861TLhur9fcMbSK+JKYLRr+7Fw0olBHIEwterqq3ZeDNqz2FQK5KaJ/c8MTP+mzXlMFv/9JPzqZ8zZVlkP+3OSo47pFFbYTeNOQzUXeU7fZT1zPFQ7GhU4Ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708012831; c=relaxed/simple;
-	bh=jVl6RIQfO+ykWLPFOq/qj8zG4RmnkDO0QquABQhgzCY=;
+	bh=BXkarRnrP9ql3/F0jVVEdEj9rG4J9sjU6VHcSMrN6BE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=fZPwDbM5G6WCZjEOsBRIWBFWZKT57ToP8GhEWF8sCR7XD4AuLzcH80jNgQgo50NMgNsilkXTzdz1wg6Mc45bYumk+6AlJfRkTFTYorcsWd2WeDxvhipnKC6EioCzEOBxGreztVWGbbXc19U8TsrWZTbrU5bCnFBX8ruEBEuVfKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K1iZzhPJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 13595C433C7;
+	 In-Reply-To:To:Cc; b=J/xcx0WbpHsSzJVWzds6Tar4pKAVoVOqSy7KVEWHJjQwgyY/1uG+7wDf35vkZJL1SUo/a4NGPbKnGsOl7itf1/Id4KDPpevtQPh81IgagWtkC1OEnDwEEvBUIB9uJPCZ1Dk+buCZ6IWhFhhUAMSBt6weGAEawUH74l43Tzkq+do=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VIivHZOk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0880FC43390;
 	Thu, 15 Feb 2024 16:00:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1708012831;
-	bh=jVl6RIQfO+ykWLPFOq/qj8zG4RmnkDO0QquABQhgzCY=;
+	bh=BXkarRnrP9ql3/F0jVVEdEj9rG4J9sjU6VHcSMrN6BE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=K1iZzhPJTrSCg6ftU4a1RQcUyxoF4Bl9FmTf7RB1L7LM9m7DTusFPUMjbh87yippQ
-	 Wfn0hfnQkWMKACcNLWHHiLfso23vjfF//CPOKyYTQjzcsDXosVzruq7h20Kj1lfRYS
-	 8KxOhEew2ZNOvw4QFXjGIJACfpSKOMGPd/sGXLjkXyWHf33LHcGJvwRsIpyY9ws/I3
-	 iSrKYmL1RDi1ZGaBS+xxhjFFDYSy6EzOz7darQUOvdBr8eNNJz8LD6zuhYPVkxamBy
-	 MCNVV0ndjrQTLU+JTnCfZhBCzs9fgEJTrdA+pD8/QInVGxxx3kzM7zg9aXikbaP8Xk
-	 v94knrCMLpZ5g==
+	b=VIivHZOk6jxdd577mnEbjH+58sxhG9ymrK6rOXBZW7kMRtFsHr0HGn/MJSwbhY8VD
+	 E7AGjJJYShMFTUg13RLTln51ujBsl65c0aBFV2CbM+DydYXevhMaH+xnUwhT1NnekG
+	 rrFb8fEmd2EtM1XGhC1ncxwzY6NjxFyyrpxBYoggCIyvKFLUxvpAeNbGh5Gh0oeSH6
+	 cnKhHlyts4JZMJfbXXZjz/Eip2+jp7lCgohtWNC9uQkbZOoisTNoE/+A/LiMtLX0X8
+	 HQGF1yjK2m+0MP7+UYzr0UoW9KXDV0U2zyyXxNCS4K7vy1SoP1qhlPc9kGRwnB1Rz7
+	 5JHW71X5h7/SA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id ED7ABDC9A04;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E50ACD8C978;
 	Thu, 15 Feb 2024 16:00:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,38 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] [v3] net: sctp: fix skb leak in sctp_inq_free()
+Subject: Re: [PATCH net] pppoe: Fix memory leak in pppoe_sendmsg()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170801283096.9967.10675822819256962996.git-patchwork-notify@kernel.org>
+ <170801283093.9967.12597229007790214662.git-patchwork-notify@kernel.org>
 Date: Thu, 15 Feb 2024 16:00:30 +0000
-References: <20240214082224.10168-1-dmantipov@yandex.ru>
-In-Reply-To: <20240214082224.10168-1-dmantipov@yandex.ru>
-To: Dmitry Antipov <dmantipov@yandex.ru>
-Cc: lucien.xin@gmail.com, kuba@kernel.org, marcelo.leitner@gmail.com,
- linux-sctp@vger.kernel.org, netdev@vger.kernel.org,
- lvc-project@linuxtesting.org,
- syzbot+8bb053b5d63595ab47db@syzkaller.appspotmail.com
+References: <20240214085814.3894917-1-Ilia.Gavrilov@infotecs.ru>
+In-Reply-To: <20240214085814.3894917-1-Ilia.Gavrilov@infotecs.ru>
+To: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
+Cc: mostrows@earthlink.net, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org,
+ syzbot+6bdfd184eac7709e5cc9@syzkaller.appspotmail.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 14 Feb 2024 11:22:24 +0300 you wrote:
-> In case of GSO, 'chunk->skb' pointer may point to an entry from
-> fraglist created in 'sctp_packet_gso_append()'. To avoid freeing
-> random fraglist entry (and so undefined behavior and/or memory
-> leak), introduce 'sctp_inq_chunk_free()' helper to ensure that
-> 'chunk->skb' is set to 'chunk->head_skb' (i.e. fraglist head)
-> before calling 'sctp_chunk_free()', and use the aforementioned
-> helper in 'sctp_inq_pop()' as well.
+On Wed, 14 Feb 2024 09:01:50 +0000 you wrote:
+> syzbot reports a memory leak in pppoe_sendmsg [1].
+> 
+> The problem is in the pppoe_recvmsg() function that handles errors
+> in the wrong order. For the skb_recv_datagram() function, check
+> the pointer to skb for NULL first, and then check the 'error' variable,
+> because the skb_recv_datagram() function can set 'error'
+> to -EAGAIN in a loop but return a correct pointer to socket buffer
+> after a number of attempts, though 'error' remains set to -EAGAIN.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3] net: sctp: fix skb leak in sctp_inq_free()
-    https://git.kernel.org/netdev/net/c/4e45170d9acc
+  - [net] pppoe: Fix memory leak in pppoe_sendmsg()
+    https://git.kernel.org/netdev/net/c/dc34ebd5c018
 
 You are awesome, thank you!
 -- 
