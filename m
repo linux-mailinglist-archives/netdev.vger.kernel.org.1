@@ -1,59 +1,61 @@
-Return-Path: <netdev+bounces-71889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61A8D85584B
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 01:25:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49EB785584F
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 01:31:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E13D288FF1
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 00:25:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0750A28D7AB
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 00:31:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1AE219A;
-	Thu, 15 Feb 2024 00:25:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6217E623;
+	Thu, 15 Feb 2024 00:31:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sN3RcBV4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iWXfgN/o"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B849C38D;
-	Thu, 15 Feb 2024 00:25:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E7B8383
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 00:31:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707956715; cv=none; b=f3pEnQiXgKlbaQ4QS7jeXRrCBm+hoiJOOyRaKN1NF4UV0sSpYsToke+ax1vRJoxdbfz27NYSek86IYlZKN6Av08revlYQlo8hc+lOjzk5A4i+GOzwf6SK8EMiO8cTUGukFvMOPe6/oSdrmaxcDG/UXPLhR+mkk6vCI5ILRGnxFw=
+	t=1707957094; cv=none; b=bP6nC9StKDFYDUgnw7B9AE2aP2QaGRlJ3bklKWAZFuX8aXLCGHTOtqwElmbpBZL7BNdLdVAnZrbae7CJkJYld5JUVwQCYo6RT/W+hxm0r8yKBjb0XFvNaInRpKTTZu7yYe+/GP8DCyDml4wP9/aM0JzGdZFG2hAR0snCgaYG+IQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707956715; c=relaxed/simple;
-	bh=gOMOiAiGSlIqnFFLDxvgvxJAtnCqDrleDRQOc374xIg=;
+	s=arc-20240116; t=1707957094; c=relaxed/simple;
+	bh=V+ajUQlKttqSUAO4XdYZG1Wuj6aV00As8gCKQxC4HQs=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HM7mLMdDcVOOT/c0jRHDclUZs3DgFh/ZsKOx4HtmT7D7a3Cz++VbSgL5tXuRUdry7U51HSvnsvAO4cXjtHxquLfgEpgR4EywyQcecJOetTG2LYhLcrOJXl+GVDNoyN5d1ZcRE/I3yEWzwMuQY+kyLv3Sfw9nMlu3NJUHAVO59G4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sN3RcBV4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0939FC433C7;
-	Thu, 15 Feb 2024 00:25:15 +0000 (UTC)
+	 MIME-Version:Content-Type; b=iQPGMX1aBRhayxb2s8xnsxiqJqXLX0DkTvESvF4wde/p8Ear7/AYo4lLd0PgsoRPcdZ3T7Lyg4MlgXMZg99ExuXs8b/H7P96rSfixV+mG29NPoNyRBzGrkvqclzJd+Neo57IRow+MjJwO/msO1tnwtI1jgMugPN5490AcXcD0QI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iWXfgN/o; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48FE9C433F1;
+	Thu, 15 Feb 2024 00:31:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707956715;
-	bh=gOMOiAiGSlIqnFFLDxvgvxJAtnCqDrleDRQOc374xIg=;
+	s=k20201202; t=1707957093;
+	bh=V+ajUQlKttqSUAO4XdYZG1Wuj6aV00As8gCKQxC4HQs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sN3RcBV4AUgrenUj270nUBtbQ/GT7L9hb3Y5Bm1pr1ggDWxUCqZzFilB5bVKixz80
-	 PYlyrzki2RlSSAdRV2svHHu8zH5hJOWhZh4R8we7OXjcw3Tz9jxp2kpUA2p60DQlgQ
-	 DqN5hH4Tcf9Qkf7Gq/YdvNnppTeaxnrZHz0ZWlIxuoTf9Lz5tF/mumoLnLTi1IxD8v
-	 zPRhO2Ql11sS5KVAlqy2tvw6mOZ28zcp4fGLwvdUQ7R/s9Q41/MtSAE+Qm7u+zbFch
-	 f10snLabDgM5DqTtK0PP2Nr86oC7Y2YD0DUOLWFX2KQxzN7FlA+2HWk77qYtLmqYaQ
-	 WVYnHiDGwEKOQ==
-Date: Wed, 14 Feb 2024 16:25:14 -0800
+	b=iWXfgN/oD8EHW7W0xaIcjwLMRGaneqyxlnzi36tkXYI/ViKKQLG6fxCyXjiGTeXX2
+	 rLu8jRoqOuYypuogGv+XaYcgQSU6udp2pdwIzBEvhzBUXQYB9Tv6YgDwXRM/qflZ0W
+	 SiLm469o17k3CL885ZFAcW0cs3I/Lxi9TYWvDVAJFs3yMJJ/g+fnSiI/87XVsy5pca
+	 V6/O+2+zl10pHB23JvX6tkbdKaOFTVWfLg2la4GE/KfDI658O1zi/wGxNCaQsgcCqH
+	 duroCbdwBMmMdiLCZSjw4X600IpgZt49JjO//aJiW+uFpheb95hzNE8cQWoMIg1iM7
+	 jk8znNm9+dW/Q==
+Date: Wed, 14 Feb 2024 16:31:32 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jakub Sitnicki <jakub@cloudflare.com>, keescook@chromium.org
-Cc: shuah@kernel.org, linux-kselftest@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 3/4] selftests: kselftest_harness: support
- using xfail
-Message-ID: <20240214162514.60347ac2@kernel.org>
-In-Reply-To: <87jzn6lnou.fsf@cloudflare.com>
-References: <20240213154416.422739-1-kuba@kernel.org>
-	<20240213154416.422739-4-kuba@kernel.org>
-	<87o7ciltgh.fsf@cloudflare.com>
-	<87jzn6lnou.fsf@cloudflare.com>
+To: Davide Caratti <dcaratti@redhat.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, davem@davemloft.net,
+ netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com, Marcelo
+ Ricardo Leitner <marcelo.leitner@gmail.com>, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, shmulik.ladkani@gmail.com
+Subject: Re: [PATCH net] net/sched: act_mirred: use the backlog for mirred
+ ingress
+Message-ID: <20240214163132.54fd74bc@kernel.org>
+In-Reply-To: <Zczl_QQ200PvyzH5@dcaratti.users.ipa.redhat.com>
+References: <20240209235413.3717039-1-kuba@kernel.org>
+	<CAM0EoMmXrLv4aPo1btG2_oi4fTX=gZzO90jyHQzWvM26ZUFbww@mail.gmail.com>
+	<CAM0EoM=sUpX1yOL7yO5Z4UGOakxw1+GK97yqs4U5WyOy7U+SxQ@mail.gmail.com>
+	<Zczl_QQ200PvyzH5@dcaratti.users.ipa.redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,64 +65,19 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 14 Feb 2024 22:46:46 +0100 Jakub Sitnicki wrote:
-> > On second thought, if I can suggest a follow up change so this:
-> >
-> > ok 17 # XFAIL SCTP doesn't support IP_BIND_ADDRESS_NO_PORT
-> >
-> > ... becomes this
-> >
-> > ok 17 ip_local_port_range.ip4_stcp.late_bind # XFAIL SCTP doesn't support IP_BIND_ADDRESS_NO_PORT
-> >
-> > You see, we parse test results if they are in TAP format. Lack of test
-> > name for xfail'ed and skip'ed tests makes it difficult to report in CI
-> > which subtest was it. Happy to contribute it, once this series gets
-> > applied.  
+On Wed, 14 Feb 2024 17:10:37 +0100 Davide Caratti wrote:
+> > So tests pass - but on the list i only see one patch and the other is
+> > on lore, not sure how to ACK something that is not on email, but FWIW:
+> > Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> > 
+> > The second patch avoids the recursion issue (which was the root cause)
+> > and the first patch is really undoing ca22da2fbd693  
 > 
-> Should have said "harder", not "difficult". That was an overstatement.
-> 
-> Test name can be extracted from diagnostic lines preceeding the status.
-> 
-> #  RUN           ip_local_port_range.ip4_stcp.late_bind ...
-> #      XFAIL      SCTP doesn't support IP_BIND_ADDRESS_NO_PORT
-> #            OK  ip_local_port_range.ip4_stcp.late_bind
-> ok 17 ip_local_port_range.ip4_stcp.late_bind # XFAIL SCTP doesn't support IP_BIND_ADDRESS_NO_PORT
-> 
-> It just makes the TAP parser easier if the test name is included on the
-> status line. That would be the motivation here. Let me know what you
-> think.
+> If I well read, Jakub's patch [1] uses the backlog for egress->ingress
+> regardless of the "nest level": no more calls to netif_receive_skb():
+> It's the same as my initial proposal for fixing the OVS soft-lockup [2],
+> the code is different because now we have tcf_mirred_to_dev().
 
-Good catch, I just copied what we do for skip and completely missed
-this. As you said we'd report:
-
-ok 17 # XFAIL SCTP doesn't support IP_BIND_ADDRESS_NO_PORT
-
-and I think that's sort of closer to valid TAP than to valid KTAP
-which always mentions test/test_case_name:
-
-https://docs.kernel.org/dev-tools/ktap.html
-
-We currently do the same thing for SKIP, e.g.:
-
-#  RUN           ip_local_port_range.ip4_stcp.late_bind ...
-#      SKIP      SCTP doesn't support IP_BIND_ADDRESS_NO_PORT
-#            OK  ip_local_port_range.ip4_stcp.late_bind
-ok 17 # SKIP SCTP doesn't support IP_BIND_ADDRESS_NO_PORT
-
-I'm not sure if we can realistically do surgery on the existing print
-helpers to add the test_name, because:
-
-$ git grep 'ksft_test_result_*' | wc -l
-915
-
-That'd be a cruel patch to send.
-
-But I do agree that adding the test_name to the prototype is a good
-move, to avoid others making the same mistake. Should we introduce
-a new set of helpers which take the extra arg and call them
-ksft_test_report_*() instead of ksft_test_result_*() ?
-
-Maybe we're overthinking and a local fix in the harness is enough.
-
-Kees, WDYT?
+FWIW feel free to add your Sob or Co-dev+Sob!
+It is very much the same solution as what you posted at some stage.
 
