@@ -1,116 +1,176 @@
-Return-Path: <netdev+bounces-72151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1AC5856BB3
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:56:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F322856BB4
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:56:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 824E4B26513
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 17:56:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 530731C20ED4
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 17:56:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65DC413848D;
-	Thu, 15 Feb 2024 17:56:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QeJXX/+u"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 439E1137C5A;
+	Thu, 15 Feb 2024 17:56:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7F63136641
-	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 17:56:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90FBA1369AC;
+	Thu, 15 Feb 2024 17:56:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708019774; cv=none; b=qML72j77C8ZJDlYwZcqd2FWkIqYZX4oPlWu4OD0aupjziItEF+YQrnvNW7tGXTlV6yHtmrgT4VgKmmU1kFeYGmPWJjv5i7fz7PU/GzsjOnSn2bvMj4wKdqgkSWrklMnPzFeJgm96/Foc4MmwR7aSwZ761bA5DJnDAr0GZPYCsZc=
+	t=1708019796; cv=none; b=X1/h3xgy8acEN2N4sMoh6ZHt9DaJW/z4Mq5ScUlrJ0SPz9ssHWpVQofa9LwsJBTzEeO0BODeIzKj+6r6I9UbUnHsBLdwDRf058sB6LO4ALyPlmFMpEfZy2myCx14mQWLj+bOLMWR3kLO2u/+gpA0UtaQmoPdTrMw40XoFNPY77U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708019774; c=relaxed/simple;
-	bh=oKtv2APj8l0mO1DIuBTt0dKeKN83ha+KYp6qE3pmWkU=;
+	s=arc-20240116; t=1708019796; c=relaxed/simple;
+	bh=TuF1KEybph6ylUIliKE2DQ1QggXNi9SZIZBAKqc+ogY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UkkyssC+Ku+DPfZ8RquON8mbOWwb/qqRU//UPeR2a/Bc8PXuFccjgg1nHlkfQ+LOZZmi66U6lTleyKxVY3f36uLQNMqOzTtlXj3wpdCezJiCoGSozgFz68II9DNpvtRqpJFWYyUIil2lAVs7Kib0f5wSZhsghei0aIiQzhcNxm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QeJXX/+u; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708019771;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oKtv2APj8l0mO1DIuBTt0dKeKN83ha+KYp6qE3pmWkU=;
-	b=QeJXX/+ujLiA+17I0sCw+W2Sg8ndlYq8Lo3dYAC7ojTSHWBRTr0lG2Ahh7s+5vSKlJsWF8
-	LbywZjGRXWqsbgfAyG34uiaMWk3vTzg97UE1mtD2HuCWIbE07ysMVbzsuDOOt6zAdgizRM
-	bxPboNlAXvWjW+P7rwN03TAacKE9gus=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-673-k1MZ3wlHO--hfRp2MtOlYg-1; Thu, 15 Feb 2024 12:56:10 -0500
-X-MC-Unique: k1MZ3wlHO--hfRp2MtOlYg-1
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-511535180b4so975928e87.2
-        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 09:56:09 -0800 (PST)
+	 To:Cc:Content-Type; b=RbGmiVmSfKw/FeOI0EU4038pTXzTb/fAVnsAbcBVpol8WAT1GYDTBGInh0eK9DIlZ2N1Flcz9JuDUUMcEM4QGJGtgy/HVWR1xpT37So7g/y3QJRWs3RhfcjsIBQnSjBoOIJOq7FssDWIrpbCW4egmZLFzrtVt0bqfkAw7BZQe9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.161.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-59cbf204d52so124678eaf.1;
+        Thu, 15 Feb 2024 09:56:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708019768; x=1708624568;
+        d=1e100.net; s=20230601; t=1708019793; x=1708624593;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=oKtv2APj8l0mO1DIuBTt0dKeKN83ha+KYp6qE3pmWkU=;
-        b=cHsXTm5UQJvHxqft9QYhjaEnl3dXIWvXUYYF2wRTf0LUUz37qa1HO1S5be/Apbg0Pw
-         4OaZr/8Z2rPyIghYGUP6TN4yWVIuSGRFPj/vD8JjVbMKN2Y6JwH/IU46M44pv3PWdXpx
-         qL5hmiIvkfFIxheXz6JLmLOZQLN0Vp8wGRGu/MgI2eYQmR4u++GFeNCEVhTS8SvnFKUk
-         BSgKQABo+3dMH4K1SU9U9hesETfRSSMIf5NquVYG6gChdxpHdJ9x8w9wek2aahjYnIll
-         qlJuUcJUqdjc0ncu3NXRDbjfayAvjWg10mKduGQcEucWjXRt0S0faou5xrCX/Ijr0FyC
-         SUBg==
-X-Forwarded-Encrypted: i=1; AJvYcCUoHPTAN77NEwbCyusPpCKkdbxIBgtGEIkpvTtiDXMBK6M92c+BkZaVthwj3LLZJpxUlETzFxtF2Ubtj5IMfAxI2fSqAx6b
-X-Gm-Message-State: AOJu0Yzt0UpMdKkZATZ6b6vR7gWhLjPIef+JZ/htWuOH/cCjfPB7Fuku
-	dFyh82KUtXKrmxFlGJN8npfBvcqRSZ/qL1TFlnOyIRatRtS3rPRQ12th3JF+NDNtdPqiHQIcYlw
-	Hk2LLfzTYZyHm6Yz/m0fSPo/qAW2af1vgz6i6ynVfhEnz8rfi4695ibAnbjX9ENx7WeigSH3NBl
-	3BNFQnsOylpFpvmyVGx08Zi6hgXRXv
-X-Received: by 2002:a19:5205:0:b0:511:47f7:62e0 with SMTP id m5-20020a195205000000b0051147f762e0mr1856535lfb.21.1708019768632;
-        Thu, 15 Feb 2024 09:56:08 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFbf9A7YdOFWhLkLSXMyiedaavL5pPS9/qcv4yiSmUOuIOMITpLfF+9dRh+rZbSBmpnhoYoaYxAoAhZWKVKWRI=
-X-Received: by 2002:a19:5205:0:b0:511:47f7:62e0 with SMTP id
- m5-20020a195205000000b0051147f762e0mr1856525lfb.21.1708019768324; Thu, 15 Feb
- 2024 09:56:08 -0800 (PST)
+        bh=YZ8FCvjBSwO1+PySvFl38tJc1e3pyzew41E1PYnJ2OE=;
+        b=k/XVB4JVQ5nVgiRu04Ch+3xnfAr40iXerPaJs6qH+YvTpAreOgQkHUFYkhuDnoBGdS
+         deB3PvpNCu8o2whsSFpuLkFNGAz0UFVVLvM++uPx0kLDs/Nh7lxzGg62fFOSY0P87JyV
+         hlQzIIKjN1rB9PKhAlnVFG+puvlIL2jIPpqSHUC9slsU4eJSNWBzU9shFt3dN++chWCA
+         pxR/4HPjKZ+zDKr6Jq0wMPYe/Y2OOa+izSe3tHlAIe0y6HWUoyaerbrwq+jpU3ZR7K30
+         tw1pSBxe3qS6wN8W+04gfvBA18s7e2r8gze/ucp6V9EnMx2Qrd2dbeSlDq01j1Ph5v1G
+         TBsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW0IyIGbWNlLPZgsN887Tyy1RIZgp0mC2WJhHVDj5nr6TTACwVIK43qU3AG/7BmP9D7kaaI+LpTJowGAcnZYLwmjq0YY3IQJE2RQVjqgFtpwlNLhbiVPg5sI+KMXTummi/qtq5phflbmh8n2SqXd7uQ+iThh01QqZD0M3Rx2ZajA/NznqI=
+X-Gm-Message-State: AOJu0YxXGW2DhNILXXINNlw0+MV1G7NdPFtN+GMzaxJnPey/2PhB2q9n
+	ydfN1otBFTVD96QD6HOMKypzymNlYEGn9oS4CHEUktGGStP5rM/LcjcBpFnbJo4yHnxkKm7uD0P
+	kQljmRkp6Mnj3zw/n2kXjhFkMNXY=
+X-Google-Smtp-Source: AGHT+IH/vNu6c059P8zO30xGLCar/Psr/gbqRAJZY8XQC76s0ZF1GUieq2Cmd3doYtNrBJCuQcncnK+ZAl1Cf2RqLFs=
+X-Received: by 2002:a4a:d5d8:0:b0:59c:d8cd:ecee with SMTP id
+ a24-20020a4ad5d8000000b0059cd8cdeceemr2196209oot.1.1708019793504; Thu, 15 Feb
+ 2024 09:56:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240209235413.3717039-1-kuba@kernel.org> <CAM0EoMmXrLv4aPo1btG2_oi4fTX=gZzO90jyHQzWvM26ZUFbww@mail.gmail.com>
- <CAM0EoM=sUpX1yOL7yO5Z4UGOakxw1+GK97yqs4U5WyOy7U+SxQ@mail.gmail.com>
- <Zczl_QQ200PvyzH5@dcaratti.users.ipa.redhat.com> <20240214163132.54fd74bc@kernel.org>
-In-Reply-To: <20240214163132.54fd74bc@kernel.org>
-From: Davide Caratti <dcaratti@redhat.com>
-Date: Thu, 15 Feb 2024 18:55:57 +0100
-Message-ID: <CAKa-r6vwCpK0ZcoaFgQtdFaQ15_RF0zE+jR0_NoZdwg9D1ybbQ@mail.gmail.com>
-Subject: Re: [PATCH net] net/sched: act_mirred: use the backlog for mirred ingress
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, davem@davemloft.net, netdev@vger.kernel.org, 
-	edumazet@google.com, pabeni@redhat.com, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
-	shmulik.ladkani@gmail.com
+References: <6017196.lOV4Wx5bFT@kreacher>
+In-Reply-To: <6017196.lOV4Wx5bFT@kreacher>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Thu, 15 Feb 2024 18:56:21 +0100
+Message-ID: <CAJZ5v0jNNYmmiVHgMpTb7nqCty9Pw6zn3+ydNHEdHJBCZJCJ4g@mail.gmail.com>
+Subject: Re: [PATCH v2 0/9] thermal: Writable trip points handling rework
+To: "Rafael J. Wysocki" <rjw@rjwysocki.net>
+Cc: Linux PM <linux-pm@vger.kernel.org>, Lukasz Luba <lukasz.luba@arm.com>, 
+	LKML <linux-kernel@vger.kernel.org>, Daniel Lezcano <daniel.lezcano@linaro.org>, 
+	Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>, 
+	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, Zhang Rui <rui.zhang@intel.com>, 
+	netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, 
+	Miri Korenblit <miriam.rachel.korenblit@intel.com>, linux-wireless@vger.kernel.org, 
+	Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, 
+	Pengutronix Kernel Team <kernel@pengutronix.de>, 
+	Manaf Meethalavalappu Pallikunhi <quic_manafm@quicinc.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-hi,
-On Thu, Feb 15, 2024 at 1:31=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
+On Mon, Feb 12, 2024 at 7:44=E2=80=AFPM Rafael J. Wysocki <rjw@rjwysocki.ne=
+t> wrote:
 >
-
-[...]
-
-> > If I well read, Jakub's patch [1] uses the backlog for egress->ingress
-> > regardless of the "nest level": no more calls to netif_receive_skb():
-> > It's the same as my initial proposal for fixing the OVS soft-lockup [2]=
-,
-> > the code is different because now we have tcf_mirred_to_dev().
+> Hi Everyone,
 >
-> FWIW feel free to add your Sob or Co-dev+Sob!
-> It is very much the same solution as what you posted at some stage.
+> This is an update of
+>
+> https://lore.kernel.org/linux-pm/3232442.5fSG56mABF@kreacher/
+>
+> fixing a few bugs and renaming the new trip point flags introduced by it.
+>
+> The original description of the patch series is still applicable:
+>
+> "The purpose of this patch series is to allow thermal zone creators
+>  to specify which properties (temperature or hysteresis) of which
+>  trip points can be set from user space via sysfs on a per-trip basis
+>  instead of passing writable trips masks to the thermal zone registration
+>  function which is both cumbersome and error prone and it doesn't even
+>  allow to request different treatment of different trip properties.
+>
+>  The writable trip masks used today only affect trip temperatures (that i=
+s, if
+>  a trip point is in a writable trips mask, its temperature can be set via
+>  sysfs) and they only take effect if the CONFIG_THERMAL_WRITABLE_TRIPS ke=
+rnel
+>  configuration option is set, which appears to be assumed by at least som=
+e
+>  of the drivers using writable trips masks.  Some other drivers using the=
+m
+>  simply select CONFIG_THERMAL_WRITABLE_TRIPS which pretty much defeats it=
+s
+>  purpose (and imx even sets this option in its defconfig).
+>
+>  For this reasons, patch [1/9] removes CONFIG_THERMAL_WRITABLE_TRIPS and =
+makes
+>  the writable trips masks always work.
+>
+>  Moreover, trip hysteresis, which is not affected either by the writable =
+trips
+>  masks or by CONFIG_THERMAL_WRITABLE_TRIPS, can only be set via sysfs if =
+the
+>  .set_trip_hyst() operation is provided by the given thermal zone, but cu=
+rrently
+>  this thermal zone operation is used by no one, so effectively trip hyste=
+resis
+>  cannot be set via sysfs at all.  This is not a problem for the majority =
+of
+>  drivers that want trip temperatures to be set via sysfs, because they al=
+so
+>  don't want trip hysteresis to be changed for any trips (at least as far =
+as I
+>  can say), but there are use cases in which it is desirable to be able to
+>  update trip hysteresis as well as trip temperature (for example see
+>  https://lore.kernel.org/linux-pm/20240106191502.29126-1-quic_manafm@quic=
+inc.com/).
+>  Those use cases are not addressed here directly, but after this series
+>  addressing them should be relatively straightforward.
+>
+>  Namely, patch [2/9] adds flags to struct thermal_trip and defines two of=
+ them
+>  to indicate whether or not setting the temperature or hysteresis of the =
+given
+>  trip via sysfs is allowed.  If a writable trips mask is passed to
+>  thermal_zone_device_register_with_trips(), is it is used to set the
+>  "writable temperature" flag for the trips covered by it and that flag is
+>  then consulted by the thermal sysfs code.  The "writable hysteresis" tri=
+p
+>  flag is also taken into account by the thermal sysfs code, but it is not=
+ set
+>  automatically in any case.
+>
+>  Patch [3/9] is based on the observation that the .set_trip_hyst() therma=
+l zone
+>  operation is never used - it simply drops that callback from struct
+>  thermal_zone_device_ops and adjusts the code checking its presence.
+>
+>  Patches [4-8/9] update drivers using writable trips masks to set the new
+>  "writable temperature" flag directly instead and some of them are simpli=
+fied
+>  a bit as a result.  After these patches, all of the callers of
+>  thermal_zone_device_register_with_trips() pass a zero writable trips mas=
+k
+>  to it, so patch [9/9] drops that mask from the functions argument list a=
+nd
+>  adjusts all of its callers accordingly.
+>
+>  After all of the changes in this series, allowing the hysteresis value t=
+o be
+>  set via sysfs for a given trip is a matter of setting its "writable
+>  hysteresis" flag (and analogously for trip temperature)."
 
-I'm ok with the current tags! thanks!
---=20
-davide
+By the lack of comments I gather that this series is not controversial.
 
+It unlocks further development and it should be run through linux-next
+for a couple of weeks before the merge window, so reviews are welcome.
+
+Thanks!
 
