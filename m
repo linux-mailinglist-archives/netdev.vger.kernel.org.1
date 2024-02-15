@@ -1,138 +1,160 @@
-Return-Path: <netdev+bounces-71996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5371856112
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 12:12:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C5EE856189
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 12:28:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1414D1C21255
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 11:12:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EE201C22FE5
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 11:28:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C352F12BE8A;
-	Thu, 15 Feb 2024 11:10:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U3a9XxhZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9939212AAD6;
+	Thu, 15 Feb 2024 11:28:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3B0812AAD6
-	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 11:10:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C421612AADB;
+	Thu, 15 Feb 2024 11:28:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707995456; cv=none; b=mO7vU0gfdhUFMr5Nv2kd11yMMvD0i8jgH/6IkcSNCCySDCOZOCIrwn2f0RbZDiY3sX2mjM7oA/H6biwlkDJnXoQlk08UpxocJg3pAA1aaf8hsSeQoQsbCOeYkstcvVq5apxg0CVDsS3+v67Q8mMDqNMUdoFVPowk/BryE1Ez4u8=
+	t=1707996501; cv=none; b=XbzfzNm34l6qFzEOn9M5Wjnp2CJXiamcOnTrhBzP+x2EyNSwVJoYMMl70Z8GF1tYrSW9E3LR5i0y8rLL4v8+UMxcYoxG7HaqPK7oCf4vbIIlisJyXO569npS+AHcijzRIwJLkqJSZ1uSYCBmn4o2wdV8dwYIQ4Q/lncDo5ZUBXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707995456; c=relaxed/simple;
-	bh=ZDiELU1jsPTiD3JKAh+/XIyTSS23xbyEr99u1lE9Ejo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Q7eZodEFukm7gy0x8OQhqbOVBPYpXag/q+uFU0rwX/X59qKx4q9FkYLPuKVCdDP0/YUSltf20kF4vGB8BID73EVrFzowdQpm2d0Xxqnmdt+XvQ15pnc2dx9p620M5i7Od658ahD608NIQW0htUx+KlY1VwreuZQwywVIyjaKu4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U3a9XxhZ; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1707996501; c=relaxed/simple;
+	bh=Dp+Cq84Wj+5NY9LGhzGsuOIbQ+NVEu+tERFpSmpZ9PI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bx3MqfVcB3cuyoprteJ0c8fstmdiSvROFBK8wJaRhutS5URnC0WZtI4ZT1HzaJlo6WJgFtcWD8M+tORc2ZXy+HZZ/4HtC20jBt2d/q5q6WzxRGST79FhGcan/e/m4k7/UWANlPwKPorVdS4tSYluBb/BiLNzWmncDCRtMqXGMZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5116b540163so1171781e87.1
-        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 03:10:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707995453; x=1708600253; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=e4Gti3bIwc1p+CTHoXEGQMBiCl6NHy2ixnQbXd0gIF4=;
-        b=U3a9XxhZQEEVuTgstrr5jom5O2RRmtTe3dwmTBViuJ1gs5bc2QUUXMbWy35Pzg5XT9
-         d+75O2xLQ77BVKStyoqwi+xb/zlEwXONfzXvGi3+ieXGCaF1riuG4nxGAbJXPtu/Vgny
-         AcrkC4LuzdkS6ktOq/wwjr+6ow7RzsdydIOZZAEkUXLlEK6wFGCQCAd/S7UxWGCe5ydE
-         ISsDS4xeA7ohWDDn4R6lqlxtLN53DPvyZHIlv5SndypR5DiVZ3dj+qhe5RyauEfjpFgF
-         wZiivyBu2Yocr/RhJXK/pTvuseBmJUt6t1cmty3sYQp9IA5V3nHOz9+B+IVwy7L8m47q
-         5jsA==
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-563b7b3e3ecso436640a12.0;
+        Thu, 15 Feb 2024 03:28:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707995453; x=1708600253;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=e4Gti3bIwc1p+CTHoXEGQMBiCl6NHy2ixnQbXd0gIF4=;
-        b=xK3VgagqY6Mr3IKFeMD58LSUAde/zZf1d0PtAivJg1XtLIACjdqHgk7XRUgpbVnh7n
-         Z1bfhptNcASi/MTjRSFL8IsHsSVKzuOZ0ltiDmjX3Df8EpfSdSnCPuExjHQw0dTMEpOT
-         FM8NB6LSce7fBsbFkVuVvNtXqC+8l2ur1YrVuaHXFzkTXWRwGQ3H2JVeZSc6G/ar1a6O
-         wr5NT7SPhwZPl4IduW3rZD68vDf91E6Ytxo9ovKByWDlH8kHlGFfVNep5wVSUfRTB71l
-         LatjRVzbuWg1hsb1fYvreUnyDx3objmLUavgdcKa97fPAfBuvS4KcNTQGbFOwVKXM5QN
-         AHOw==
-X-Forwarded-Encrypted: i=1; AJvYcCVKt+AKoDuf/JT7wGbkQe3A3t8PJbL4T2TmYYcLxGiBOjnqm03+fePEAG32ik2bY6jTI+uwnXf+dZ+dp0O0Q1FkfOav+SrT
-X-Gm-Message-State: AOJu0Yw4VD/4jVD7iPr4N1fLl9SSeUFOrE0bSY4o2bSqmzuRngZG0dHE
-	lHR7MNfZec8Z792QJnrhRP+sUuMbDF6ZYb1bTqilEBQjQ19OjOir83vYnG1x2QfYmLQ+2jcLvbD
-	YeVGL7JkjSFw8jrFyKL0grHrSv5gvzRP48xU=
-X-Google-Smtp-Source: AGHT+IEa5GnNmsElTjs5cpmGdpszWmtj+9Kv9d5FBTQEMptq2kxympkXXYtRWmdMs0rB0Q8tDlb+3y8s5I6b9edfgT8=
-X-Received: by 2002:ac2:5dfb:0:b0:511:8dae:6e59 with SMTP id
- z27-20020ac25dfb000000b005118dae6e59mr1200895lfq.38.1707995452629; Thu, 15
- Feb 2024 03:10:52 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707996498; x=1708601298;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5Y09j1ngc6D4JfQjGhKOAspK/YYGYWEbXTOGP8EVOtw=;
+        b=OGL4QzOIv1+H2KjlM/e3aEDGxkgPn/8pZDIxwmEjU7SspwRICD6htjVHlWH/8T5siy
+         55FZsB3DPAl1E07INN3IuOfUlgeUN9sL3IjU02hxyHpQIEffnEXKNoQjRWXqf0+U4jcB
+         mV75lvbO4iriXwlzvqX/bVo4WfxzKqlGG0xYjFJ9m5ifQrxz61Qqkm/lFBFayowhBQVR
+         td1sVSmZQ++zaF8QGGGoCGaXoz44qSr9lOJzVWl3rFs6suv49CB2eaFtZaH9S/P314d9
+         QuoIKw3h0k1tJ+izfwbl3+nakOAiI5QH2l4T2+tJDI+tuEVRfqX6OQ7DgTfPgM7mj0yz
+         K3lQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVYPZ3qfME41O0FIObKVrSL+D4mtVaCy1rKDrh6Parbcq5dUXnd2KqTNZO4n2FSWUp+eJv2tpS1uEAf+Y5TNUYGdsFaiznEtvG8VcKv
+X-Gm-Message-State: AOJu0YxenkwZGGnrdwHAEV+pLL3uCcxrEI5fNHEXMfXM/sDLubHwHRUL
+	vJtUliIADxmPLEgUpPEnptOr5grKpYFLbTekF4ozk7hF1N8q+1nV
+X-Google-Smtp-Source: AGHT+IFxc9j7u/F7yTSPhZHhcGlpEerv1tdLMoPiI/44li++WR008GioEmenBxh1eqwSoa/t9Xj7+A==
+X-Received: by 2002:a50:fb03:0:b0:55c:7b3b:5990 with SMTP id d3-20020a50fb03000000b0055c7b3b5990mr932623edq.7.1707996497835;
+        Thu, 15 Feb 2024 03:28:17 -0800 (PST)
+Received: from localhost (fwdproxy-lla-009.fbsv.net. [2a03:2880:30ff:9::face:b00c])
+        by smtp.gmail.com with ESMTPSA id eo14-20020a056402530e00b005621a9b09fbsm447312edb.41.2024.02.15.03.28.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Feb 2024 03:28:17 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+To: kuba@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	horms@kernel.org,
+	Johannes Berg <johannes.berg@intel.com>,
+	Amritha Nambiar <amritha.nambiar@intel.com>
+Subject: [PATCH net-next] net: sysfs: Do not create sysfs for non BQL device
+Date: Thu, 15 Feb 2024 03:27:27 -0800
+Message-Id: <20240215112729.1778958-1-leitao@debian.org>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240215012027.11467-1-kerneljasonxing@gmail.com> <c987d2c79e4a4655166eb8eafef473384edb37fb.camel@redhat.com>
-In-Reply-To: <c987d2c79e4a4655166eb8eafef473384edb37fb.camel@redhat.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 15 Feb 2024 19:10:15 +0800
-Message-ID: <CAL+tcoCvZE4F=Br5UgXzp7cQORNMAB8gVMnZm5QT-xXdqD9=AA@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 00/11] introduce drop reasons for tcp receive path
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	dsahern@kernel.org, kuniyu@amazon.com, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Feb 15, 2024 at 6:12=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> Hi,
->
-> On Thu, 2024-02-15 at 09:20 +0800, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > When I was debugging the reason about why the skb should be dropped in
-> > syn cookie mode, I found out that this NOT_SPECIFIED reason is too
-> > general. Thus I decided to refine it.
-> >
-> > v5:
-> > Link: https://lore.kernel.org/netdev/20240213134205.8705-1-kerneljasonx=
-ing@gmail.com/
-> > Link: https://lore.kernel.org/netdev/20240213140508.10878-1-kerneljason=
-xing@gmail.com/
-> > 1. Use SKB_DROP_REASON_IP_OUTNOROUTES instead of introducing a new
-> >    one (Eric, David)
-> > 2. Reuse SKB_DROP_REASON_NOMEM to handle failure of request socket
-> >    allocation (Eric)
-> > 3. Reuse NO_SOCKET instead of introducing COOKIE_NOCHILD
-> > 4. avoid duplication of these opt_skb tests/actions (Eric)
-> > 5. Use new name (TCP_ABORT_ON_DATA) for readability (David)
-> > 6. Reuse IP_OUTNOROUTES instead of INVALID_DST (Eric)
->
-> It looks like this is causing a lot of self-test failures:
->
-> https://netdev.bots.linux.dev/contest.html?pw-n=3D0&branch=3Dnet-next-202=
-4-02-15--06-00&pass=3D0&skip=3D0
->
-> due to tcp connect timeout, e.g.:
->
-> https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/466281/9-tcp-fasto=
-pen-backup-key-sh/stdout
->
-> please have look.
+Creation of sysfs entries is expensive, mainly for workloads that
+constantly creates netdev and netns often.
 
-Thanks for your report. I double checked the series and found out my
-new version of patch [4/11] is wrong. I will fix that.
+Do not create BQL sysfs entries for devices that don't need,
+basically those that do not have a real queue, i.e, devices that has
+NETIF_F_LLTX and IFF_NO_QUEUE, such as `lo` interface.
 
-I will continue to check the logic of the rest.
+This will remove the /sys/class/net/eth0/queues/tx-X/byte_queue_limits/
+directory for these devices.
 
-Thanks,
-Jason
+In the example below, eth0 has the `byte_queue_limits` directory but not
+`lo`.
 
->
-> Thanks!
->
-> Paolo
->
+	# ls /sys/class/net/lo/queues/tx-0/
+	traffic_class  tx_maxrate  tx_timeout  xps_cpus  xps_rxqs
+
+	# ls /sys/class/net/eth0/queues/tx-0/byte_queue_limits/
+	hold_time  inflight  limit  limit_max  limit_min
+
+Suggested-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ net/core/net-sysfs.c | 23 ++++++++++++++++++-----
+ 1 file changed, 18 insertions(+), 5 deletions(-)
+
+diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+index a09d507c5b03..c79bc11a0347 100644
+--- a/net/core/net-sysfs.c
++++ b/net/core/net-sysfs.c
+@@ -1417,6 +1417,15 @@ static ssize_t bql_show_inflight(struct netdev_queue *queue,
+ 	return sysfs_emit(buf, "%u\n", dql->num_queued - dql->num_completed);
+ }
+ 
++static bool netdev_uses_bql(struct net_device *dev)
++{
++	if (dev->features & NETIF_F_LLTX ||
++	    dev->priv_flags & IFF_NO_QUEUE)
++		return false;
++
++	return true;
++}
++
+ static struct netdev_queue_attribute bql_inflight_attribute __ro_after_init =
+ 	__ATTR(inflight, 0444, bql_show_inflight, NULL);
+ 
+@@ -1709,9 +1718,11 @@ static int netdev_queue_add_kobject(struct net_device *dev, int index)
+ 		goto err;
+ 
+ #ifdef CONFIG_BQL
+-	error = sysfs_create_group(kobj, &dql_group);
+-	if (error)
+-		goto err;
++	if (netdev_uses_bql(dev)) {
++		error = sysfs_create_group(kobj, &dql_group);
++		if (error)
++			goto err;
++	}
+ #endif
+ 
+ 	kobject_uevent(kobj, KOBJ_ADD);
+@@ -1734,7 +1745,8 @@ static int tx_queue_change_owner(struct net_device *ndev, int index,
+ 		return error;
+ 
+ #ifdef CONFIG_BQL
+-	error = sysfs_group_change_owner(kobj, &dql_group, kuid, kgid);
++	if (netdev_uses_bql(ndev))
++		error = sysfs_group_change_owner(kobj, &dql_group, kuid, kgid);
+ #endif
+ 	return error;
+ }
+@@ -1768,7 +1780,8 @@ netdev_queue_update_kobjects(struct net_device *dev, int old_num, int new_num)
+ 		if (!refcount_read(&dev_net(dev)->ns.count))
+ 			queue->kobj.uevent_suppress = 1;
+ #ifdef CONFIG_BQL
+-		sysfs_remove_group(&queue->kobj, &dql_group);
++		if (netdev_uses_bql(dev))
++			sysfs_remove_group(&queue->kobj, &dql_group);
+ #endif
+ 		kobject_put(&queue->kobj);
+ 	}
+-- 
+2.39.3
+
 
