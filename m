@@ -1,111 +1,149 @@
-Return-Path: <netdev+bounces-72075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75B598567DE
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 16:35:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 061ED856820
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 16:41:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29E401F2D48A
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 15:35:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39CDA1C238C3
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 15:41:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40B00134CC2;
-	Thu, 15 Feb 2024 15:31:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C6D4133437;
+	Thu, 15 Feb 2024 15:41:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YjruMFXZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VtlnUwjB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B5D913475D
-	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 15:31:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4563F12C548;
+	Thu, 15 Feb 2024 15:41:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708011115; cv=none; b=bpD/Yox98SGyMrWX9jvJtpc0AA3fFP98R3Ud0C2I3Y7UFl0JZJekLsVEM/SKmvpfjammbki7Cox4hBS76daAPf+6NzE+I24LnuX2xFg0aF9LJVm6xcLv6na6Y3LFR/5Hv4wJa498qf9qmfeWMgFSfvly6QmHeA7lEQ6nY+AO5Bc=
+	t=1708011705; cv=none; b=S9Gxr1tQ3kSdtx88js+7zcHdu73Eu2GDu9tNxJzJysqtdV6iBdXxkRV+ZRs2lJ5FhupHygZIW/B5xusTmDdSMLhEKk7xpb7rMt/9Oj8u2wzOfrfQuPxnb5GxH3a2HNegRs4a+sG/qG7wzey2QJ7DDAmLiymAjTQrouGD2y4g+NE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708011115; c=relaxed/simple;
-	bh=5CMsVyXfgK+Pboaj0i/IYYizUIL+ptbdl0pl6qPJGjQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DnM3fUHMGHHke9QiaXlz0sgkRTrLpUoZS0T98eSopuUsuXh8tfvPu+EEht0YtJcWwMoDvaiVpL5AUk7624uZ/h63DZBVzvnCrnHxXR0rm+Kg9+kpH3CCXIK/ePyRKpVJbg1+nEaknTMaZMlQ9yuSgd+1hu2XJHy16rHgz5HeUI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YjruMFXZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41924C433C7;
-	Thu, 15 Feb 2024 15:31:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708011114;
-	bh=5CMsVyXfgK+Pboaj0i/IYYizUIL+ptbdl0pl6qPJGjQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YjruMFXZq8YD3I39WiC3FCkmzPHkhyADk9Sw5unoLtpGDvqXbqMJwl3MEVsF8T+2s
-	 0lAxiIUwdiLx0oYB0YxNPqq/qOcT74Ph7h1xRL+QFMuFdiOukAPJHE+iRrNhsZFKIq
-	 irSlXTMgSSmGuTxLF62TfWaUabcwW0FSH5eosSx8W7mhwx7bTBx4yduFXNXfhcWUYl
-	 NyXgpREP2wHoSvQlo6bd6qKWqw+TWioh79obVoP7Uy+QhcWMaBVPzfk4wKOevy1Xv5
-	 nesOYaGU+Lu+HGW57YxRrkh0Y4Qco0h1MU13YLu3Qo67JYMqZUuQ0bpy7+JRO4g58M
-	 Z1TGx8BIEg0Bw==
-Date: Thu, 15 Feb 2024 16:31:50 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	netdev@vger.kernel.org, lorenzo.bianconi@redhat.com,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	hawk@kernel.org, ilias.apalodimas@linaro.org,
-	linyunsheng@huawei.com, toke@redhat.com
-Subject: Re: [RFC net-next] net: page_pool: fix recycle stats for percpu
- page_pool allocator
-Message-ID: <Zc4uZucrtv5dNt_1@lore-desk>
-References: <e56d630a7a6e8f738989745a2fa081225735a93c.1707933960.git.lorenzo@kernel.org>
- <bff45ab9-2818-4b37-837e-f18ffcab8f47@intel.com>
- <20240215070414.4d522c88@kernel.org>
+	s=arc-20240116; t=1708011705; c=relaxed/simple;
+	bh=Pgd5J6Uby1Zyd/C1wyBnm9ePGiFzIsnkC58Bl/jyjRE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q0Fg4Ww3BqvVSzCocNrvI6N8/iuCS0qDDFMxayNoSBw4M1OP6FXlAvti09RMbiO5aO4EDp1oCJM32uMewsw4maeKidYTRCD2Dmr+V+tCygZyuSImO1YYrlYK3ZcZr/iSOQLTKoGU2lMr9+5L3f4I/20oC7D4lTETCDCqTcNEhk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VtlnUwjB; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708011703; x=1739547703;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Pgd5J6Uby1Zyd/C1wyBnm9ePGiFzIsnkC58Bl/jyjRE=;
+  b=VtlnUwjB9oH4wtbAK9eJ9lbg3AmBfsaYryM5f8oAsH8z6R4NtEW91Ssp
+   1cinY5rg96Km0fe17mqRO6mh5pkQd9rX+dZs1T3miXlNSTuVnGESqPoBe
+   riOXqhWDmbrfHkzGBaiuYgbp8muTtM1G6edSDGL0KMDomhxURAVnuLXKy
+   X0l8CWv5gLMQeyKvUMUwahZD5LvewgHDT5h+vqvMG55O1kN8fz6HZ4bWT
+   1LWqalsvQviAtPlqrcujah3tfNfqthsDc1GSrPtJlu39mIxSxeqIXjeSz
+   WoGGs51XPhU4EZj8uUtm7QnDLpHBXlfakemCQJgw0SSFbJyiC+Pk4V2dn
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10984"; a="5888083"
+X-IronPort-AV: E=Sophos;i="6.06,162,1705392000"; 
+   d="scan'208";a="5888083"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2024 07:41:42 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10984"; a="935682308"
+X-IronPort-AV: E=Sophos;i="6.06,162,1705392000"; 
+   d="scan'208";a="935682308"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by fmsmga001.fm.intel.com with ESMTP; 15 Feb 2024 07:41:39 -0800
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+	id B54E2204; Thu, 15 Feb 2024 17:41:38 +0200 (EET)
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	linux-kernel@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Johannes Berg <johannes@sipsolutions.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next v1 1/1] wireless: Add KHZ_PER_GHZ to units.h and reuse
+Date: Thu, 15 Feb 2024 17:41:36 +0200
+Message-ID: <20240215154136.630029-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.43.0.rc1.1.gbec44491f096
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="mErLHErWZ0B8Dba3"
-Content-Disposition: inline
-In-Reply-To: <20240215070414.4d522c88@kernel.org>
+Content-Transfer-Encoding: 8bit
 
+The KHZ_PER_GHZ might be used by others (with the name aligned
+with similar constants). Define it in units.h and convert
+wireless to use it.
 
---mErLHErWZ0B8Dba3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ include/linux/units.h | 5 ++++-
+ net/wireless/reg.c    | 7 +++----
+ 2 files changed, 7 insertions(+), 5 deletions(-)
 
-> On Thu, 15 Feb 2024 14:41:52 +0100 Alexander Lobakin wrote:
-> > For example, if I have an Rx queue always pinned to one CPU, I might
-> > want to create a PP for this queue with the cpuid set already to save
-> > some cycles when recycling. We might also reuse cpuid later for some
-> > more optimizations or features.
->=20
-> You say "pin Rx queue to one CPU" like that's actually possible to do
-> reliably :)
->=20
-> > Maybe add a new PP_FLAG indicating that system percpu PP stats should be
-> > used?
->=20
-> Part of me feels like checking the dev pointer would be good enough.
-> It may make sense to create more per CPU pools for particular devices
-> further down, but creating more pools without no dev / DMA mapping
-> makes no sense, right?
->=20
-> Dunno if looking at dev is not too hacky, tho, flags are cheap.
+diff --git a/include/linux/units.h b/include/linux/units.h
+index 45110daaf8d3..00e15de33eca 100644
+--- a/include/linux/units.h
++++ b/include/linux/units.h
+@@ -24,10 +24,13 @@
+ #define NANOHZ_PER_HZ		1000000000UL
+ #define MICROHZ_PER_HZ		1000000UL
+ #define MILLIHZ_PER_HZ		1000UL
++
+ #define HZ_PER_KHZ		1000UL
+-#define KHZ_PER_MHZ		1000UL
+ #define HZ_PER_MHZ		1000000UL
+ 
++#define KHZ_PER_MHZ		1000UL
++#define KHZ_PER_GHZ		1000000UL
++
+ #define MILLIWATT_PER_WATT	1000UL
+ #define MICROWATT_PER_MILLIWATT	1000UL
+ #define MICROWATT_PER_WATT	1000000UL
+diff --git a/net/wireless/reg.c b/net/wireless/reg.c
+index 50cadbad485f..753f8e9aa4b1 100644
+--- a/net/wireless/reg.c
++++ b/net/wireless/reg.c
+@@ -57,6 +57,8 @@
+ #include <linux/verification.h>
+ #include <linux/moduleparam.h>
+ #include <linux/firmware.h>
++#include <linux/units.h>
++
+ #include <net/cfg80211.h>
+ #include "core.h"
+ #include "reg.h"
+@@ -1289,20 +1291,17 @@ static bool is_valid_rd(const struct ieee80211_regdomain *rd)
+ static bool freq_in_rule_band(const struct ieee80211_freq_range *freq_range,
+ 			      u32 freq_khz)
+ {
+-#define ONE_GHZ_IN_KHZ	1000000
+ 	/*
+ 	 * From 802.11ad: directional multi-gigabit (DMG):
+ 	 * Pertaining to operation in a frequency band containing a channel
+ 	 * with the Channel starting frequency above 45 GHz.
+ 	 */
+-	u32 limit = freq_khz > 45 * ONE_GHZ_IN_KHZ ?
+-			20 * ONE_GHZ_IN_KHZ : 2 * ONE_GHZ_IN_KHZ;
++	u32 limit = freq_khz > 45 * KHZ_PER_GHZ ? 20 * KHZ_PER_GHZ : 2 * KHZ_PER_GHZ;
+ 	if (abs(freq_khz - freq_range->start_freq_khz) <= limit)
+ 		return true;
+ 	if (abs(freq_khz - freq_range->end_freq_khz) <= limit)
+ 		return true;
+ 	return false;
+-#undef ONE_GHZ_IN_KHZ
+ }
+ 
+ /*
+-- 
+2.43.0.rc1.1.gbec44491f096
 
-I would vote for a dedicated flag ;)
-
-Regards,
-Lorenzo
-
---mErLHErWZ0B8Dba3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZc4uZgAKCRA6cBh0uS2t
-rLvTAQCLgcKS/sSIPrrkRJTqa3XlZMf45GJpvYaaE+Aqz+GyJgEAqnk1aCzPR0m9
-JeUf6fSM9p877ceWIT+DyqkRvPUB6A8=
-=fBwR
------END PGP SIGNATURE-----
-
---mErLHErWZ0B8Dba3--
 
