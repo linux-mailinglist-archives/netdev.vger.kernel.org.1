@@ -1,141 +1,128 @@
-Return-Path: <netdev+bounces-72043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E315A85645D
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 14:29:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44C27856484
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 14:34:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 218141C22480
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 13:29:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C7F46B220E8
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 13:29:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A9FF130AEC;
-	Thu, 15 Feb 2024 13:29:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B0AC130E44;
+	Thu, 15 Feb 2024 13:29:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hAzxL4oK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NAQiFr7m"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E9D12FB3A
-	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 13:29:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6417E130E3E;
+	Thu, 15 Feb 2024 13:29:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708003751; cv=none; b=WDtny1GAsDZRr7KJjoo0X9sn1LK0+0pM+kWEcBFpLKP/wn8JOGXwxlB7WxVK8MooGLUkvoJX23v9WF1cZYhscvDJIdy7ITnqwlW8Iy9o+EdWsOJ3kPiJdLQYNr68AbL8eeiu5/hVBehS1g4A1tTkvnHa2InZJEDvzxQQE1q0uRQ=
+	t=1708003752; cv=none; b=V0HLbb0rPnUj1EL5oNt7x54TWAP00eAbxE7E5Y0vjfrZSyh29OtWWGZZ28kbDcFr+2dJEzV48IOiOU+XCt6hQmjjd7+xnHqzBsOYG9Z0Xosl067AymfNLPEZVbwanvetTiqSAU5rbnWqC4ESQ4I/05md8CbjAPFLYcI2cxATnsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708003751; c=relaxed/simple;
-	bh=5eeVkjyvudX/pKW1hZPYEgCAdxgDwkfCTULdfvhHo34=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ikA0wOag12s/zcQMoEHupTJYnBi0ATVF2hMUs76eT4lI516c58XzXBIGDJ8ruGA+5Du6xFhHU+xKd92lt5cBM4lt4nCTMh8ByBQ1jiFHlVHxzaWLWl5CYcW2QQO+U2P8kQSDeDIsepLEIRI1AcohTw8Vv3vMbj66QKrUOXYk1pI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hAzxL4oK; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708003748;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5eeVkjyvudX/pKW1hZPYEgCAdxgDwkfCTULdfvhHo34=;
-	b=hAzxL4oKGUadZyghNALNPr3EksB5b6cQku4DbT9sv5RpaDVWWLB92sc4NrKSImtzmt4Fbc
-	9/lpDThgdFMD05ueZaPQ2mxQWH1O3U1RJi1Do/qWb+hiJbiXhmHpDhygN5kQu/QtLBeV+y
-	QUn6OD61rz4mss55F5E0Fq0laQbHUm8=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-596-rrjr78ZzNTSwMRN7gkGnnQ-1; Thu, 15 Feb 2024 08:29:07 -0500
-X-MC-Unique: rrjr78ZzNTSwMRN7gkGnnQ-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a3c3f477eb7so42061566b.0
-        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 05:29:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708003745; x=1708608545;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5eeVkjyvudX/pKW1hZPYEgCAdxgDwkfCTULdfvhHo34=;
-        b=OnsF62ggoOJz1jPYHN1ErWtKe+GutbUPTRLKgaW/2zT3r+6hPeKT/LOdT4k9fmowbr
-         ooCntupn3OKfp/Y1i2LhylTlIMdbxJea4sNKsEi/XHmm7q8jW1Xt3hLJ2pNBP13HR2tO
-         /afsm7sOJW7xnHajUhCCZ4Nqy44+NyTshWjc7rA97oc8dUVr3TgrM16YJKH9l12miAcd
-         2q3bUNrCBZGXgNWSKmfcwAoQJS6oYLchMwt4/SqETUYHkLYvnFnu3vehaGt6RLxHadP3
-         bwlj4URKcNXIBsuGvx1MZjcinhhEW7MlUYiLaG4oLt66qohy+wLPBa81C8TfCoVqMA7m
-         bfeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXSruyVPce7DxL+sli/K4fM6zMOd8L6smCcvjGtTJP6iH9S4P59sgyLLH4gf1SgSZQGejV57wRj8zPQX9Zhn3lQ1R+YwcSE
-X-Gm-Message-State: AOJu0YxrcmeWsSRzoipKLoucC/cmQ5oR8OThJtMbnHJVPH41lD4snvGJ
-	GR/GkszhqpKdiCe45uSkNbvlQdhcyPSHKbVjM2hprYjO37+exKxCXbjA+xa2S7+NT9pAKS73gMf
-	07wFU75ADTnQNOxVIrI6AlIbTq1n/QlUpYvdYDDTUJ3+mIJ+wdgCHDTgD6JkIig==
-X-Received: by 2002:a17:906:24d7:b0:a3d:3781:6edc with SMTP id f23-20020a17090624d700b00a3d37816edcmr1280801ejb.55.1708003745152;
-        Thu, 15 Feb 2024 05:29:05 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHenfB7DY75o/58zvNxuONlHdNOgFk3aJKOzSO8iJ3lT0l6WsgAs9wbABWWtdZ7pihKzcwGfA==
-X-Received: by 2002:a17:906:24d7:b0:a3d:3781:6edc with SMTP id f23-20020a17090624d700b00a3d37816edcmr1280785ejb.55.1708003744827;
-        Thu, 15 Feb 2024 05:29:04 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id vh2-20020a170907d38200b00a3d784f1daesm539293ejc.132.2024.02.15.05.29.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Feb 2024 05:29:04 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id EC50910F59BF; Thu, 15 Feb 2024 14:29:03 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>, Lorenzo Bianconi
- <lorenzo@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] page_pool: disable direct recycling based on
- pool->cpuid on destroy
-In-Reply-To: <8aa809c0-585f-4750-98d4-e19165c6ff73@intel.com>
-References: <20240215113905.96817-1-aleksander.lobakin@intel.com>
- <87v86qc4qd.fsf@toke.dk> <8aa809c0-585f-4750-98d4-e19165c6ff73@intel.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Thu, 15 Feb 2024 14:29:03 +0100
-Message-ID: <87plwxdffk.fsf@toke.dk>
+	s=arc-20240116; t=1708003752; c=relaxed/simple;
+	bh=2+JNMFaL+epx7QSXNjlhcxeVpelRDQbM9W5unaiMKz8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H4WNOSLHFdWqjJlakJgRA+it1TYfzVZ6n576DMovF8SefEUc9m2PESz1K+oM2T3Kc5OA1YkqF5bg7J56cxw1QFzMGs8R7ibPRRI3ceIArLJNeRINviNkd6WJGCnizP8DEz2OxuuQCPSSjYCdbIzM2D6CB7Zya/t3oaiBBo2kRgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NAQiFr7m; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97ADDC433C7;
+	Thu, 15 Feb 2024 13:29:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708003751;
+	bh=2+JNMFaL+epx7QSXNjlhcxeVpelRDQbM9W5unaiMKz8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NAQiFr7mbS4QNKvcSI8zRSYeIiKDDGOdFlqEtaIoIn8g7fDq2/rc2Uy0DbbAF2P7j
+	 gX9lwLVEKs9ezTMuD7X7H4N+l2S+YdNpoz6WOYB2wW48jIY/BLCRzbCgg5Uj8Q8nST
+	 A07rKoDMYRuHLNCbecuitjot7WeNvEGECq2KFSlnkK9Ks/5aDzssvivXVyd9AoUG8A
+	 T9bUlrfM93qaYvlSrnRwqB3IHCJ2nAYYX8q9wHbyHfKcsslQRjDoze5jjtzRSZaDJH
+	 1ma93XYKphK7yzErHqTLAmoKWffzWww1JciWnkoxTa03R1NWPLzZQc16cih1lSfLsa
+	 mQqQK+DqffKBA==
+Date: Thu, 15 Feb 2024 07:29:08 -0600
+From: Rob Herring <robh@kernel.org>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Frank Wunderlich <frank-w@public-files.de>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Lucien Jheng <lucien.jheng@airoha.com>,
+	Zhi-Jun You <hujy652@protonmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next 1/2] dt-bindings: net: airoha,en8811h: Add
+ en8811h serdes polarity
+Message-ID: <20240215132908.GA4004551-robh@kernel.org>
+References: <20240206194751.1901802-1-ericwouds@gmail.com>
+ <20240206194751.1901802-2-ericwouds@gmail.com>
+ <76f9aeed-9c8c-4bbf-98b5-98e9ee7dfff8@linaro.org>
+ <f2b4009a-c5c3-4f86-9085-61ada4f2ab1e@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f2b4009a-c5c3-4f86-9085-61ada4f2ab1e@gmail.com>
 
-Alexander Lobakin <aleksander.lobakin@intel.com> writes:
+On Wed, Feb 07, 2024 at 05:42:58PM +0100, Eric Woudstra wrote:
+> 
+> Hi krzysztof,
+> 
+> I mistakenly thought that changing from rfc-patch to patch, the number
+> would reset. I will mark the next one v2, or do you want me to mark it v3?
+> 
+> I have been using realtek,rtl82xx.yaml as an example. I see all your
+> comments apply to this file also, so it would seem I could have chosen
+> a better example. I will change it according your remarks.
+> 
+> >> +
+> >> +allOf:
+> >> +  - $ref: ethernet-phy.yaml#
+> >> +
+> >> +properties:
+> > 
+> > This won't match to anything... missing compatible. You probably want to
+> > align with ongoing work on the lists.
+> 
+> As for the compatible string, the PHY reports it's c45-id okay and
+> phylink can find the driver with this id. Therefore I have left the
+> compatible string out of the devicetree node of the phy and not
+> specified it in the binding (also same as realtek,rtl82xx.yaml).
+> 
+> If you are implying that I need to use it, then I will add:
+> 
+> select:
+>   properties:
+>     compatible:
+>       contains:
+>         enum:
+>           - ethernet-phy-id03a2.a411
+>   required:
+>     - compatible
 
-> From: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> Date: Thu, 15 Feb 2024 13:05:30 +0100
->
->> Alexander Lobakin <aleksander.lobakin@intel.com> writes:
->>=20
->>> Now that direct recycling is performed basing on pool->cpuid when set,
->>> memory leaks are possible:
->>>
->>> 1. A pool is destroyed.
->>> 2. Alloc cache is emptied (it's done only once).
->>> 3. pool->cpuid is still set.
->>> 4. napi_pp_put_page() does direct recycling basing on pool->cpuid.
->>> 5. Now alloc cache is not empty, but it won't ever be freed.
->>=20
->> Did you actually manage to trigger this? pool->cpuid is only set for the
->> system page pool instance which is never destroyed; so this seems a very
->> theoretical concern?
->
-> To both Lorenzo and Toke:
->
-> Yes, system page pools are never destroyed, but we might latter use
-> cpuid in non-persistent PPs. Then there will be memory leaks.
-> I was able to trigger this by creating bpf/test_run page_pools with the
-> cpuid set to test direct recycling of live frames.
->
->>=20
->> I guess we could still do this in case we find other uses for setting
->> the cpuid; I don't think the addition of the READ_ONCE() will have any
->> measurable overhead on the common arches?
->
-> READ_ONCE() is cheap, but I thought it's worth mentioning in the
-> commitmsg anyway :)
+Don't need any of this unless you have a common/generic fallback 
+compatible.
 
-Right. I'm OK with changing this as a form of future-proofing if we end
-up finding other uses for setting the cpuid field, so:
-
-Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-
+> 
+> To the binding, and
+> 
+> 	compatible = "ethernet-phy-id03a2.a411";
+> 
+> To the devicetree node of the phy again.
+> 
+> Best regards,
+> 
+> Eric Woudstra
 
