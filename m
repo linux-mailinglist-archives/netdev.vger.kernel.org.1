@@ -1,254 +1,152 @@
-Return-Path: <netdev+bounces-72201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F930856F2B
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 22:17:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28482856F78
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 22:43:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E77828A569
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 21:17:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC8AFB2252E
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 21:43:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D07F613DB83;
-	Thu, 15 Feb 2024 21:17:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8FD613DB90;
+	Thu, 15 Feb 2024 21:43:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amacapital-net.20230601.gappssmtp.com header.i=@amacapital-net.20230601.gappssmtp.com header.b="OfGb+fF3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z7b/kcNP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEBA9139564
-	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 21:17:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B8A613B7BE;
+	Thu, 15 Feb 2024 21:43:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708031864; cv=none; b=AA7tydtOBWZlDY7UuaAjckNqo2u+r0+AusCCo5fUmLOYhKElG3vcWu9bFVEvT5mxI6AOrPRKt9ykF1Uf4A0cB4BU4VOnFg/qhovTcbxvHf6sf0u/CpXhABCYF45tKAGizDQQnSodrwKSjDR2nFC7Sd+/8HOscM80VzwirV7S6tQ=
+	t=1708033429; cv=none; b=gKGIws6HTnCoMdOenFHfWg+H+wEWTenl2ynGQH79yTBkpeVgFAZdPjoVIHT5D8hSs0k5zB5g6ajrh3lmLvIr4ZUnt1acuG5DCQMaeQTUheKxRPK6AcNGCDch0Gf000l3KfCLwywU2i02DYvXO1RcBGGv9LvVd6gkZyznup+D5do=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708031864; c=relaxed/simple;
-	bh=GMdwI3fm9SQE6wKyJ2TCQU/TPq3GZeZGNtA8/BFVjPo=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=q4bb3gUyL0nb7lOfF4ufYdL3QMIrN2nuDLauhIMSAJdRTbLX4EMR+5y1npH+K43WnxNN3sFffsD7Ilv++YNBfDv2l1CbBxfOPc2pUN18+67Rv5bhBGU93CClgoxdr/9yk5YHLWmJ+q5TjZPB2xCgC+WkwYp4kjbykEmrE8zNkUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net; spf=pass smtp.mailfrom=amacapital.net; dkim=pass (2048-bit key) header.d=amacapital-net.20230601.gappssmtp.com header.i=@amacapital-net.20230601.gappssmtp.com header.b=OfGb+fF3; arc=none smtp.client-ip=209.85.221.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amacapital.net
-Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-4c0afaca1efso689584e0c.0
-        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 13:17:42 -0800 (PST)
+	s=arc-20240116; t=1708033429; c=relaxed/simple;
+	bh=QaEZlqJFcTfiTUOyjsDsoswbJ0CUnBjYeZ73Th5EEfE=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=F+2shX/gIbphkHkAMFOqbb8MkuRZZMrJbRfi/OOfRtHi+S4pOtO7sg58cRgBwcF85L7qnRALbWDWvGqbELD+QTlYe+705jvFftAG74FBaACw01XFQXNWhkxVtvUZC52MaNFh5GnUtNoHGs8n0j/oSVQ9lPmx9wE/51+4L/Pntd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z7b/kcNP; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-33b28aadb28so713258f8f.3;
+        Thu, 15 Feb 2024 13:43:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amacapital-net.20230601.gappssmtp.com; s=20230601; t=1708031861; x=1708636661; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=FzdAusQEQghjJLnPtEh1TUa7eBlZsPccrUElXKRTBfk=;
-        b=OfGb+fF3nG7cSLLIgXMTSEg6Guy8L6Xy9nM/zz8gQBK/Y23j6lVR91l7vRlAu53P5l
-         jd8c66U7kIqhpC5dpkW470FOQ6o7O2OnQpgYPBq9D/IkYK60ZnFbwGr1LhpF2hqNv/wM
-         Yr9WCgu7Vseh86Eg15/CloIdbUrtYgrC7f271v9dfgjq8pMB8HEnNGqRmPfVr3RKCPHf
-         Tc6dYd1P9ZoQ6yM3Z6xw3ZV9xQrzVWSrSdpMIo1BRcB5aQlzv91fNf9jr9gVuN3QdDf+
-         0HzifUHo1kEyNNlYsTej5dSIC2ioJCvJYdHad5Fcp2sXrUVH84ZVEuSsVqBzkJXLaZHh
-         7nBw==
+        d=gmail.com; s=20230601; t=1708033426; x=1708638226; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=a10Ci9q0vKOTRsi2gPzKUjUwhpFZoCzWi4g8A+iVQbI=;
+        b=Z7b/kcNP0VXMGOYKSi7gWcGluT6MhBpNqGm2hXk+ZUCxHFVRSBLV42FTKAzZ6xO00S
+         l+zTKwzeTGbXjr7j0MoyFquPzKLT6ZBsGjPASHdsqY6ymAbY0l5HLs6bQVnYwYzO/nNl
+         iJxqy+Thddzh982+CfHiKpJJmDv0wsgXU1+O5bNeeNIfuvnjg4U0Zg93l5z4BJkrGvWa
+         0nX+Htixt3Nh3aCL8qE+1GAJ0dkAG2ISgZQTJlLCZOyQcrEcmit/eeC+qT9hQ3pbx4Kj
+         rBkSFEz6aXHyQHGbx+sgOXIjEih/NQ56p3MiXSAxQQys7wdyhEWLcJLwG5w5GWk+90AT
+         5o9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708031861; x=1708636661;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FzdAusQEQghjJLnPtEh1TUa7eBlZsPccrUElXKRTBfk=;
-        b=e1QlUivINFN3j75qb8CXU9UW98yKWqnATL9ncKNJa7ky3fxSg1o8DwOfPxe3xhIJQJ
-         5N1qEdC7zq0rU/4gN98ls7Wl6Esh5/EiI2CBDGSDyqnELffRh6/x02frfAJVcgJtMB+I
-         lANn1BcSTkXTcFjUI2hyeGtbe7hy9QdH+lnwCm6UdTdqdpl06HYiOPvDmw2Zhx3j9fP9
-         x78A4nm0Lbyl44mLpgjiaWc2vSXKnU3LCIvibK8YbBJJIy2pKM2u7Kgo+rccQa/tDg00
-         FhifoSEXh38RGZ3lFou6qjhQmDXeWlub7wCRHaALcGkln2LZzDmYVIcssYShe56CQ99i
-         emEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV8Oekhwc7YrdkvLK4//QCtCpUfObdVCagXd0vMMXabAQEqDfFyj0ARua47kaOCEr16ARkk+QwjJQkDBOjeiZgx/TjseIuH
-X-Gm-Message-State: AOJu0YweuTGEVKjNP+vKtuw1KlepTKs3JyoKl+dBOBziClixjLZxiN0T
-	UEcPyJUj3psaGlfARyeaJvayDfrquS93AIM+A79+njNHlPLsfSPW8+ocyyW2+e8YUAqRb5q0Jan
-	tateT1Gnl46AqkQIKEhmsipArftqA7sdcDNoKW2zvfqTDjV25T84l
-X-Google-Smtp-Source: AGHT+IFPY+wNI0v+lnORgUwKzdEFiKcEI7REdvZ/chmdqRR1E2wIi86IrNOx75FgKlYudm0icpKFDaPBqq8ri4ZtPio=
-X-Received: by 2002:a1f:4a04:0:b0:4bd:54d0:e6df with SMTP id
- x4-20020a1f4a04000000b004bd54d0e6dfmr2912410vka.1.1708031861567; Thu, 15 Feb
- 2024 13:17:41 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708033426; x=1708638226;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=a10Ci9q0vKOTRsi2gPzKUjUwhpFZoCzWi4g8A+iVQbI=;
+        b=msjVx4vcU2jR65C8EMtjfQNBKG2a5ycqDx5Wdj4KQxahlt2FOxEWTp38phE4GwM4xy
+         SCmdrU6u6cgSrAihoBo7UFUOmClc0/ONKGF12SNyqZtw49BRBTlhYHfYN11EmphJUHXp
+         gYYd8tBLGNURRnBpNYrDzoBH5NlmxNuD1KX/Q7YbUKmjCycpeTN6Qh8jIo/eiojqEeV/
+         UDk7VyDr8Ibo3GUI5YuDjz177wb1dqqJEcJIYKKzPUkC/9afnBmZZtqdpIfhVqqSu4bk
+         b4gU8Lc0/wVaEUcfsvJEMD9e3txoEpi909CWcr6vPzg5tU6hJQlc1JvnvAA+kBk7uDUy
+         8nrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXcTkpnuMija3WEUChkd+yRTSSrDIoOgxD+9flJXmeF5L9GRs9sEAo92OcWVeuiFoyV3arTj1FUvbC3/AQ6HjA2dYKfHvSj2nW8y517TgHHmsupHO5w5w/X0722keIK1PQLnMPA
+X-Gm-Message-State: AOJu0YwlCjOGCCTIWCuWuAExqZTjwHlL+7S0+8ubvoa6QNyfIjYUWjaD
+	n08DEP234kfgSptmWUxvs/Gya7T6dVgJyQDPnsDUVcTSDjyhSho/
+X-Google-Smtp-Source: AGHT+IHfgLD79KYgorlZdaTvX73xBlXRjpZdgwQp5SX3Eg5atbw0+Uw2AGN/UX8xO/2hsrCDjlrhfA==
+X-Received: by 2002:adf:979a:0:b0:33d:f4b:d484 with SMTP id s26-20020adf979a000000b0033d0f4bd484mr1681844wrb.16.1708033426035;
+        Thu, 15 Feb 2024 13:43:46 -0800 (PST)
+Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.googlemail.com with ESMTPSA id k3-20020a056000004300b0033b79d385f6sm284740wrx.47.2024.02.15.13.43.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Feb 2024 13:43:45 -0800 (PST)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Robert Marko <robimarko@gmail.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [net-next PATCH] net: phy: aquantia: add AQR813 PHY ID
+Date: Thu, 15 Feb 2024 22:43:30 +0100
+Message-ID: <20240215214331.18162-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Andy Lutomirski <luto@amacapital.net>
-Date: Thu, 15 Feb 2024 13:17:30 -0800
-Message-ID: <CALCETrWUtYmSWw9-K1To8UDHe5THqEiwVyeSRNFQBaGuHs4cgg@mail.gmail.com>
-Subject: SO_RESERVE_MEM doesn't quite work, at least on UDP
-To: Wei Wang <weiwan@google.com>, Network Development <netdev@vger.kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-With SO_RESERVE_MEM, I can reserve memory, and it gets credited to
-sk_forward_alloc.  But, as far as I can tell, nothing keeps it from
-getting "reclaimed" (i.e. un-credited from sk_forward_alloc and
-uncharged).  So, for UDP at least, it basically doesn't work.
+Aquantia AQR813 is the Octal Port variant of the AQR113. Add PHY ID for
+it to provide support for it.
 
-Here's a test program in Python:
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+---
+This is based on the AQR113 patch that has been already reviewed
+and accepted (still not in net-next as a rebase was needed)
 
-#!/usr/bin/python3
+ drivers/net/phy/aquantia/aquantia_main.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-import typing
-import argparse
-import socket
-import sys
-import dataclasses
-import struct
+diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/aquantia/aquantia_main.c
+index a6a7980585f5..71bfddb8f453 100644
+--- a/drivers/net/phy/aquantia/aquantia_main.c
++++ b/drivers/net/phy/aquantia/aquantia_main.c
+@@ -28,6 +28,7 @@
+ #define PHY_ID_AQR412	0x03a1b712
+ #define PHY_ID_AQR113	0x31c31c40
+ #define PHY_ID_AQR113C	0x31c31c12
++#define PHY_ID_AQR813	0x31c31cb2
+ 
+ #define MDIO_PHYXS_VEND_IF_STATUS		0xe812
+ #define MDIO_PHYXS_VEND_IF_STATUS_TYPE_MASK	GENMASK(7, 3)
+@@ -961,6 +962,25 @@ static struct phy_driver aqr_driver[] = {
+ 	.get_stats      = aqr107_get_stats,
+ 	.link_change_notify = aqr107_link_change_notify,
+ },
++{
++	PHY_ID_MATCH_MODEL(PHY_ID_AQR813),
++	.name		= "Aquantia AQR813",
++	.probe		= aqr107_probe,
++	.get_rate_matching = aqr107_get_rate_matching,
++	.config_init	= aqr107_config_init,
++	.config_aneg    = aqr_config_aneg,
++	.config_intr	= aqr_config_intr,
++	.handle_interrupt = aqr_handle_interrupt,
++	.read_status	= aqr107_read_status,
++	.get_tunable    = aqr107_get_tunable,
++	.set_tunable    = aqr107_set_tunable,
++	.suspend	= aqr107_suspend,
++	.resume		= aqr107_resume,
++	.get_sset_count	= aqr107_get_sset_count,
++	.get_strings	= aqr107_get_strings,
++	.get_stats	= aqr107_get_stats,
++	.link_change_notify = aqr107_link_change_notify,
++},
+ };
+ 
+ module_phy_driver(aqr_driver);
+@@ -979,6 +999,7 @@ static struct mdio_device_id __maybe_unused aqr_tbl[] = {
+ 	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR412) },
+ 	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR113) },
+ 	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR113C) },
++	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR813) },
+ 	{ }
+ };
+ 
+-- 
+2.43.0
 
-SO_RESERVE_MEM = 73
-
-@dataclasses.dataclass
-class MemInfo:
-    RMEM_ALLOC : int
-    RCVBUF : int
-    WMEM_ALLOC : int
-    SNDBUF : int
-    FWD_ALLOC : int
-    WMEM_QUEUED : int
-    OPTMEM : int
-    BACKLOG : int
-    DROPS : int
-
-def sk_meminfo(s : socket.socket) -> MemInfo:
-    nvars = len(dataclasses.fields(MemInfo))
-    buf = s.getsockopt(socket.SOL_SOCKET, 55, 4*nvars) # SO_MEMINFO
-    return MemInfo(*struct.unpack(f"{nvars}I", buf))
-
-def main() -> None:
-    parser = argparse.ArgumentParser(description='Measure UDP socket
-receive buffers')
-    parser.add_argument('--sendsize', type=int, default=1024,
-                        help='Size of each individual send')
-    parser.add_argument('--rcvbuf', type=int,
-                        help='SO_RCVBUF')
-    parser.add_argument('--reserve-mem', type=int,
-                        help='SO_RESERVE_MEM')
-    args = parser.parse_args()
-
-    receiver = socket.socket(socket.AF_INET, socket.SOCK_DGRAM,
-socket.IPPROTO_UDP)
-    receiver.bind(('127.0.0.1', 0))
-    bound_addr = receiver.getsockname()
-    print('Receiving on %s:%d' % bound_addr, file=sys.stderr)
-
-    sender = socket.socket(socket.AF_INET, socket.SOCK_DGRAM,
-socket.IPPROTO_UDP)
-    sender.connect(bound_addr)
-
-    if args.rcvbuf is not None:
-        receiver.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, args.rcvbuf)
-    print('SO_RCVBUF = %d' % receiver.getsockopt(socket.SOL_SOCKET,
-socket.SO_RCVBUF))
-
-    if args.reserve_mem is not None:
-        receiver.setsockopt(socket.SOL_SOCKET, SO_RESERVE_MEM, args.reserve_mem)
-        print('SO_RESERVE_MEM %d succeeded' % args.reserve_mem)
-
-    print(f"{'sent':>10} {'total':>10}")
-
-    meminfo = sk_meminfo(receiver)
-    print(f"{'':>10} {0:>10} {meminfo}")
-
-    bytes_sent = 0
-    while meminfo.DROPS == 0:
-        bytes_now = args.sendsize
-        sender.send(bytes_now * b'x')
-        bytes_sent += bytes_now
-
-        meminfo = sk_meminfo(receiver)
-        print(f"{bytes_now:>10} {bytes_sent:>10} {meminfo}")
-
-    # Be polite to anyone watching using dropwatch or similar tools:
-drain the socket
-    receiver.setblocking(False)
-    ndgrams = 0
-    while True:
-        try:
-            receiver.recv(1)
-            ndgrams += 1
-        except OSError:
-            break
-    print('Drained %d datagrams' % ndgrams)
-
-    meminfo = sk_meminfo(receiver)
-    print(f"{'':>10} {'':>10} {meminfo}")
-
-
-if __name__ == '__main__':
-    main()
-
-SO_RCVBUF = 212992
-SO_RESERVE_MEM 100000 succeeded
-      sent      total
-                    0 MemInfo(RMEM_ALLOC=0, RCVBUF=212992,
-WMEM_ALLOC=0, SNDBUF=212992, FWD_ALLOC=102400, WMEM_QUEUED=0,
-OPTMEM=0, BACKLOG=0, DROPS=0)
-      1024       1024 MemInfo(RMEM_ALLOC=2304, RCVBUF=212992,
-WMEM_ALLOC=0, SNDBUF=212992, FWD_ALLOC=100096, WMEM_QUEUED=0,
-OPTMEM=0, BACKLOG=0, DROPS=0)
-      1024       2048 MemInfo(RMEM_ALLOC=4608, RCVBUF=212992,
-WMEM_ALLOC=0, SNDBUF=212992, FWD_ALLOC=97792, WMEM_QUEUED=0, OPTMEM=0,
-BACKLOG=0, DROPS=0)
-      1024       3072 MemInfo(RMEM_ALLOC=6912, RCVBUF=212992,
-WMEM_ALLOC=0, SNDBUF=212992, FWD_ALLOC=95488, WMEM_QUEUED=0, OPTMEM=0,
-BACKLOG=0, DROPS=0)
-      1024       4096 MemInfo(RMEM_ALLOC=9216, RCVBUF=212992,
-WMEM_ALLOC=0, SNDBUF=212992, FWD_ALLOC=93184, WMEM_QUEUED=0, OPTMEM=0,
-BACKLOG=0, DROPS=0)
-      1024       5120 MemInfo(RMEM_ALLOC=11520, RCVBUF=212992,
-WMEM_ALLOC=0, SNDBUF=212992, FWD_ALLOC=90880, WMEM_QUEUED=0, OPTMEM=0,
-BACKLOG=0, DROPS=0)
-      1024       6144 MemInfo(RMEM_ALLOC=13824, RCVBUF=212992,
-WMEM_ALLOC=0, SNDBUF=212992, FWD_ALLOC=88576, WMEM_QUEUED=0, OPTMEM=0,
-BACKLOG=0, DROPS=0)
-      1024       7168 MemInfo(RMEM_ALLOC=16128, RCVBUF=212992,
-WMEM_ALLOC=0, SNDBUF=212992, FWD_ALLOC=86272, WMEM_QUEUED=0, OPTMEM=0,
-BACKLOG=0, DROPS=0)
-      1024       8192 MemInfo(RMEM_ALLOC=18432, RCVBUF=212992,
-WMEM_ALLOC=0, SNDBUF=212992, FWD_ALLOC=83968, WMEM_QUEUED=0, OPTMEM=0,
-BACKLOG=0, DROPS=0)
-      1024       9216 MemInfo(RMEM_ALLOC=20736, RCVBUF=212992,
-WMEM_ALLOC=0, SNDBUF=212992, FWD_ALLOC=81664, WMEM_QUEUED=0, OPTMEM=0,
-BACKLOG=0, DROPS=0)
-      1024      10240 MemInfo(RMEM_ALLOC=23040, RCVBUF=212992,
-WMEM_ALLOC=0, SNDBUF=212992, FWD_ALLOC=79360, WMEM_QUEUED=0, OPTMEM=0,
-BACKLOG=0, DROPS=0)
-      1024      11264 MemInfo(RMEM_ALLOC=25344, RCVBUF=212992,
-WMEM_ALLOC=0, SNDBUF=212992, FWD_ALLOC=77056, WMEM_QUEUED=0, OPTMEM=0,
-BACKLOG=0, DROPS=0)
-      1024      12288 MemInfo(RMEM_ALLOC=27648, RCVBUF=212992,
-WMEM_ALLOC=0, SNDBUF=212992, FWD_ALLOC=74752, WMEM_QUEUED=0, OPTMEM=0,
-BACKLOG=0, DROPS=0)
-      1024      13312 MemInfo(RMEM_ALLOC=29952, RCVBUF=212992,
-WMEM_ALLOC=0, SNDBUF=212992, FWD_ALLOC=72448, WMEM_QUEUED=0, OPTMEM=0,
-BACKLOG=0, DROPS=0)
-      1024      14336 MemInfo(RMEM_ALLOC=32256, RCVBUF=212992,
-WMEM_ALLOC=0, SNDBUF=212992, FWD_ALLOC=70144, WMEM_QUEUED=0, OPTMEM=0,
-BACKLOG=0, DROPS=0)
-
-<-- Okay, looks like it's working as expected.
-
-      1024      94208 MemInfo(RMEM_ALLOC=211968, RCVBUF=212992,
-WMEM_ALLOC=0, SNDBUF=212992, FWD_ALLOC=1024, WMEM_QUEUED=0, OPTMEM=0,
-BACKLOG=0, DROPS=0)
-      1024      95232 MemInfo(RMEM_ALLOC=214272, RCVBUF=212992,
-WMEM_ALLOC=0, SNDBUF=212992, FWD_ALLOC=2816, WMEM_QUEUED=0, OPTMEM=0,
-BACKLOG=0, DROPS=0)
-
-<-- And now we're out of space.
-
-      1024      96256 MemInfo(RMEM_ALLOC=214272, RCVBUF=212992,
-WMEM_ALLOC=0, SNDBUF=212992, FWD_ALLOC=2816, WMEM_QUEUED=0, OPTMEM=0,
-BACKLOG=0, DROPS=1)
-
-<-- And we drop the next datagram, as expected
-
-Drained 93 datagrams
-                      MemInfo(RMEM_ALLOC=0, RCVBUF=212992,
-WMEM_ALLOC=0, SNDBUF=212992, FWD_ALLOC=4096, WMEM_QUEUED=0, OPTMEM=0,
-BACKLOG=0, DROPS=1)
-
-<-- Now read all the queued data.  Whoops, sk_forward_alloc == 4096.
-Where'd the reservation go?
-
-Am I right that this is a bug?  What's the right way to fix it?
-
---Andy
 
