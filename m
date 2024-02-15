@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-71912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99ABB8558DF
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 03:00:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 833688558E7
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 03:10:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05C27B26634
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 02:00:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B62D31C20D84
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 02:10:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D47F915D1;
-	Thu, 15 Feb 2024 02:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B4F81870;
+	Thu, 15 Feb 2024 02:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a868M2Im"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TQl6EniS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB70A1C02;
-	Thu, 15 Feb 2024 02:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D85E9184E
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 02:10:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707962428; cv=none; b=fb8qjKcE9Zwdz7X2GmqMBthYr1tCfdRIxjyJ6g5LOGabb6SAqlaZ8uZInrs5TpfABa3son1ROOAzoCqTsbwkDZ6A5aZJL0WhTDnKBpAFAsO83byk+LD/h49HQAP+3kEc6wS0T0iYcZSlbuKk0/ZJHTl1nV1PCNeOxOw6AKQDjLU=
+	t=1707963026; cv=none; b=PdzUlx8taUZKhdjFRkB2Sw9AaC8ADKERdovPSFd9nVL2HL12aDwVtzbUCwT/mv38fRzut47J6N+JDxTE1XaTbYkDrBK01h2OMwfo6LoxuDMJatrqmWDrCUS/A/lneeNAgSpqe4AsGRYoZRQ9sFF5WvvFxthik2Ijrh1fF0XCpys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707962428; c=relaxed/simple;
-	bh=RMJnR8ZenPKenrnWDBa25lav899D0NZrP4NcKIeHokg=;
+	s=arc-20240116; t=1707963026; c=relaxed/simple;
+	bh=/9zJKtXFiVXKx6n41lA+c7sE7Kbf4fjNJ0TZPPgIEtU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=RiLaagOgiVpfqwY3irleflE4gKxI6rSH6ddcVt9g9DgpWwJgml0PyGq8sfHPce/CFZElHtmllNVAEVxk1hyvQI02Ff7pmL16AURrONvGSR2pEMcyvhTL00QPevS9QpslpoQpduvcZ8HEgJ1bAdf/MhP/9iNvqSDv3ex9OIoLZVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a868M2Im; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 222D4C43390;
-	Thu, 15 Feb 2024 02:00:28 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=FJlK0pnC6VNTuV3xFLXxotBSLalcqFl8zMLjN9m5uicrYQsCJieDCsQswFp03rpvbhACpo69Xtx8ewY1a8/7eMw+2N2T891Hv79YWk1TfuikOJE8YKrCvbmZOSvLIwjBrXe5QWvjg+Rh2bWDfO+tmIch4Gr1OLz5XQrO5XWYW0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TQl6EniS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4B04FC433C7;
+	Thu, 15 Feb 2024 02:10:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707962428;
-	bh=RMJnR8ZenPKenrnWDBa25lav899D0NZrP4NcKIeHokg=;
+	s=k20201202; t=1707963026;
+	bh=/9zJKtXFiVXKx6n41lA+c7sE7Kbf4fjNJ0TZPPgIEtU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=a868M2ImT98AdRcudWLAJNRnjNFM/5ZVnZaRaq575PhZIhLsxhH6aP06ICFffBUVY
-	 W9KDPa769cknWLecYGEFkBU5hUkzXnjLV4pOj9mlzhbWoIi5fY91+1X1BCzOQYZ9Mo
-	 hb6xcP0lXBA0tzBfxE5FfnB79/TWEPM6HMQj9Ro+PmcW0+9iVht90QP7pzWfor+wJT
-	 q/qXzDAB0frtdyEKPes3uKK83nqY8D7l8gTz+y4rwf+hAwIR53oRhI9qHIeMJI/RXz
-	 cqFMU7W0fJF4AzrGoKY5L78pYkyiYaZup8hBNjchx4UaF2njLRexde/PUnnkzJEWym
-	 Bkp7KditAULZA==
+	b=TQl6EniS9bV1WqmaMUUd2D//jwDVpFypyjYNSJE3daC+BjMPz+Jsq4pBWsNgXLkrx
+	 iumqImDzoeoqPIv5G/9HQBQDwZYxZehRSyiJc5MPzK3Mc+ExT1JGpSeFfAuBQ46w1q
+	 SpvltNHCAhMdzWG6QN2A3zPPJQc7sKG+qzZeHT4bH3d6prT4fF7aXm14E6X5yNjJYE
+	 zhi0yFnvIxcq4K+KJQ/chwFioMwt2FGwe8adz12uN6XDmfe0guexypSwV3ilviK2jo
+	 BNEXsrjfy4dCTI7o5ChfIY7wkSW+mEw6gbosUnexFO+/20bSGCvlj8VOe9lHChv8mC
+	 YfY0BZWjlOslA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 08565D84BCE;
-	Thu, 15 Feb 2024 02:00:28 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2B962D8C96A;
+	Thu, 15 Feb 2024 02:10:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: wireless-2024-02-14
+Subject: Re: [PATCH net] ice: Add check for lport extraction to LAG init
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170796242803.31402.14492891620721293.git-patchwork-notify@kernel.org>
-Date: Thu, 15 Feb 2024 02:00:28 +0000
-References: <20240214184326.132813-3-johannes@sipsolutions.net>
-In-Reply-To: <20240214184326.132813-3-johannes@sipsolutions.net>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+ <170796302617.4642.9242434883572737628.git-patchwork-notify@kernel.org>
+Date: Thu, 15 Feb 2024 02:10:26 +0000
+References: <20240213183957.1483857-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20240213183957.1483857-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, david.m.ertman@intel.com,
+ przemyslaw.kitszel@intel.com, marcin.szycik@linux.intel.com,
+ horms@kernel.org, sujai.buvaneswaran@intel.com,
+ himasekharx.reddy.pucha@intel.com
 
 Hello:
 
-This pull request was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 14 Feb 2024 19:41:42 +0100 you wrote:
-> Hi,
+On Tue, 13 Feb 2024 10:39:55 -0800 you wrote:
+> From: Dave Ertman <david.m.ertman@intel.com>
 > 
-> So this came later than I wanted, I simply forgot earlier.
-> Not much to say about it, just a handful of fixes, mostly
-> in iwlwifi.
-> 
-> As reported by Stephen earlier, this has a conflict against
-> -next material, but once pulled into net I plan on pulling
-> it into wireless-next to resolve that.
+> To fully support initializing the LAG support code, a DDP package that
+> extracts the logical port from the metadata is required.  If such a
+> package is not present, there could be difficulties in supporting some
+> bond types.
 > 
 > [...]
 
 Here is the summary with links:
-  - pull-request: wireless-2024-02-14
-    https://git.kernel.org/netdev/net/c/63a3dd6e62c8
+  - [net] ice: Add check for lport extraction to LAG init
+    https://git.kernel.org/netdev/net/c/dadd1701ae11
 
 You are awesome, thank you!
 -- 
