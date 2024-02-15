@@ -1,196 +1,198 @@
-Return-Path: <netdev+bounces-72004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69F2A856248
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 12:56:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43F14856250
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 12:57:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D064C1F2643D
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 11:56:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 012EB2855CB
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 11:57:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 169BD12BE97;
-	Thu, 15 Feb 2024 11:56:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 689B012BE9A;
+	Thu, 15 Feb 2024 11:57:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ZeRwhGNM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UQ84AC55"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DD4912B167;
-	Thu, 15 Feb 2024 11:55:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41F2A12AAE5;
+	Thu, 15 Feb 2024 11:57:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707998160; cv=none; b=JzP3m93y9kdxP/Bi0KBDFpAfwWlIxkZeHizXURr/3Qjgs8Jhp9D5B/4ACMocsPAHQ+YrtHLwQn02nHRjg0oHPN3ej3nC/4PBKuD9OGaR1IW48tG9cTaqMvZG2M8VwviGf2wamEVoTN0MVwKLs2NN1/uYW0FIojCyM+oJnGQ8CEs=
+	t=1707998230; cv=none; b=W0VCudskVAOrvCm8JyAsn/7S6Jp+2PzXYlYldewb0ZFFHZ4zVbDMT8d8H/7XG8wTqQjeCAiGfMGkP+pAecNBnNpM+WJ7KnZJqbiDtJo46ZJju7SsJ2LCQ8l9HNsVBGL0yge/ALswbZSq1qAW7g1RqNeo38nOcs2J6JLMIvWU8Pc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707998160; c=relaxed/simple;
-	bh=//cQOtBN0V7j51HQx8FZ9ZotpiIIad0J8ye4LiZogMY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Cgd0bcsn8HWaDq2ijwa50JY4O02Z2KuEElyE1aznyj61lFA5VSOkiuDezpbxf3XTjgo2bOouWkE10183OXq4V+RjfCGbcHf7oiRZbWjmZrP8OF//OPbeA/JziFZCI4IHp+5s0+3ku+nKLfGWqG+T6hHkYPiHAEuVl5bg1CBzhSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zurich.ibm.com; spf=pass smtp.mailfrom=zurich.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ZeRwhGNM; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zurich.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zurich.ibm.com
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41FBMxbm024505;
-	Thu, 15 Feb 2024 11:55:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=JQIyZwMesH5CFC5utWtjUqVuw91qgGFyn2rlfKPbq3w=;
- b=ZeRwhGNMRLCB1BITsxyxobIBp1U9nEFm08cgWrGaCxHSUjuVzQt01m8Cce2hp45IPedp
- 1HG7HMRWSgAIkYMiRK57v8eMUkEnvr+rjulaVUKLhdustx8vsRuidya0vkabCdvbBcVi
- EybwPyaqyNze9yCI/Li94R46r5ja/O7U1jknbKSpIEsO2xP7/CSX4UZKCxUcy6binKkq
- oYnMxUFnbbRa+zUGORbNtvMgcQK0/L+RdMXwmJ0brVvhGfjavL7G6XiihjH4WJUA/A8l
- XVHSFoLC1LlIbl5hHv5ZvsqJHwa+7qfYjttnkG46bth/2qFDth0406qiCyNM0ofenyJr dg== 
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w9hpdgqxn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 15 Feb 2024 11:55:50 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41FBqvTE016495;
-	Thu, 15 Feb 2024 11:55:50 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3w6mymvcwf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 15 Feb 2024 11:55:49 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41FBtjse24969942
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 15 Feb 2024 11:55:48 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D9AD820040;
-	Thu, 15 Feb 2024 11:55:45 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A9E1320065;
-	Thu, 15 Feb 2024 11:55:45 +0000 (GMT)
-Received: from spoke.zurich.ibm.com (unknown [9.4.68.71])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 15 Feb 2024 11:55:45 +0000 (GMT)
-From: Bernard Metzler <bmt@zurich.ibm.com>
-To: jgg@ziepe.ca, leon@kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        Bernard Metzler <bmt@zurich.ibm.com>,
-        syzbot+e7c51d3be3a5ddfa0d7a@syzkaller.appspotmail.com
-Subject: [PATCH] RDMA/siw: Fix handling netdev going down event
-Date: Thu, 15 Feb 2024 12:55:24 +0100
-Message-Id: <20240215115524.126477-1-bmt@zurich.ibm.com>
-X-Mailer: git-send-email 2.38.1
+	s=arc-20240116; t=1707998230; c=relaxed/simple;
+	bh=8EtCj8174u/9CY5HA4Rdd9Ev916skpFEoWMR5yIz1Dc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z9YLd0VLVVJ7C3SPyzlcycX46/LPAhM58GfOiaubocEjHvopD+8ljxAceLgKRN3a0V6Nias7I82c5HDaGaOwj18eO8m1X3t7SYEmjkNG+F6CsJ9dOjDPwWW/4lSi0dAK/32YDlN2K+16Nit9n7xXCQ8Dyux4ylupunceE9Lvo4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UQ84AC55; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BA4BC43390;
+	Thu, 15 Feb 2024 11:57:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707998229;
+	bh=8EtCj8174u/9CY5HA4Rdd9Ev916skpFEoWMR5yIz1Dc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UQ84AC55K5n9FYtlt2jUyhI/L8qxHMjIenJ7cF4dEyBBnrAaeCFCC6VnbNZ95vxQP
+	 njcvBKPpz4pU2B9ViYvpH7Zs/sHlE9tFWwYovTOqrmT3nZYk4oV2go08LKjEFFnXpg
+	 I3X07kaPGGeS178gExqPqGuBzgygKADD4m3FHpyQP3tft0U+5LK6lZ+3G8V4nly0uh
+	 NCFRgzVTjjz63xAogD/fWdWlZ66k5IB9QBbLkpE30xzyMPFbamBhnUOE0juxlcYww6
+	 i+OZvAOP9J7TE1bXIB1S3ZG4bN/5fbx5SYyqpsR5zYzMy9PlS0SR9Zt6hnq/cheQLF
+	 9k3Li6CSuPJDQ==
+Date: Thu, 15 Feb 2024 12:57:05 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] page_pool: disable direct recycling based on
+ pool->cpuid on destroy
+Message-ID: <Zc38EQhnIX8IVn5E@lore-desk>
+References: <20240215113905.96817-1-aleksander.lobakin@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: v4NgQi1OaHOJ0Hsh7DWgUK7XH1f27yZ1
-X-Proofpoint-GUID: v4NgQi1OaHOJ0Hsh7DWgUK7XH1f27yZ1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-15_10,2024-02-14_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- lowpriorityscore=0 spamscore=0 phishscore=0 bulkscore=0 mlxscore=0
- impostorscore=0 mlxlogscore=958 malwarescore=0 clxscore=1015 adultscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402150093
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="lhZuqyEuG84JyEoi"
+Content-Disposition: inline
+In-Reply-To: <20240215113905.96817-1-aleksander.lobakin@intel.com>
 
-siw uses the NETDEV_GOING_DOWN event to schedule work which
-gracefully clears all related siw devices connections. This
-fix avoids re-initiating and re-scheduling this work if still
-pending from a previous invocation.
 
-Fixes: bdcf26bf9b3a ("rdma/siw: network and RDMA core interface")
-Reported-by: syzbot+e7c51d3be3a5ddfa0d7a@syzkaller.appspotmail.com
-Signed-off-by: Bernard Metzler <bmt@zurich.ibm.com>
----
- drivers/infiniband/sw/siw/siw_main.c | 56 ++++++++++++++--------------
- 1 file changed, 28 insertions(+), 28 deletions(-)
+--lhZuqyEuG84JyEoi
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/drivers/infiniband/sw/siw/siw_main.c b/drivers/infiniband/sw/siw/siw_main.c
-index 723903bd30c5..6c61f62b322c 100644
---- a/drivers/infiniband/sw/siw/siw_main.c
-+++ b/drivers/infiniband/sw/siw/siw_main.c
-@@ -276,6 +276,31 @@ static const struct ib_device_ops siw_device_ops = {
- 	INIT_RDMA_OBJ_SIZE(ib_ucontext, siw_ucontext, base_ucontext),
- };
- 
-+/*
-+ * Network link becomes unavailable. Mark all
-+ * affected QP's accordingly.
-+ */
-+static void siw_netdev_down(struct work_struct *work)
-+{
-+	struct siw_device *sdev =
-+		container_of(work, struct siw_device, netdev_down);
-+
-+	struct siw_qp_attrs qp_attrs;
-+	struct list_head *pos, *tmp;
-+
-+	memset(&qp_attrs, 0, sizeof(qp_attrs));
-+	qp_attrs.state = SIW_QP_STATE_ERROR;
-+
-+	list_for_each_safe(pos, tmp, &sdev->qp_list) {
-+		struct siw_qp *qp = list_entry(pos, struct siw_qp, devq);
-+
-+		down_write(&qp->state_lock);
-+		WARN_ON(siw_qp_modify(qp, &qp_attrs, SIW_QP_ATTR_STATE));
-+		up_write(&qp->state_lock);
-+	}
-+	ib_device_put(&sdev->base_dev);
-+}
-+
- static struct siw_device *siw_device_create(struct net_device *netdev)
- {
- 	struct siw_device *sdev;
-@@ -319,6 +344,7 @@ static struct siw_device *siw_device_create(struct net_device *netdev)
- 	xa_init_flags(&sdev->mem_xa, XA_FLAGS_ALLOC1);
- 
- 	ib_set_device_ops(base_dev, &siw_device_ops);
-+	INIT_WORK(&sdev->netdev_down, siw_netdev_down);
- 	rv = ib_device_set_netdev(base_dev, netdev, 1);
- 	if (rv)
- 		goto error;
-@@ -364,37 +390,11 @@ static struct siw_device *siw_device_create(struct net_device *netdev)
- 	return ERR_PTR(rv);
- }
- 
--/*
-- * Network link becomes unavailable. Mark all
-- * affected QP's accordingly.
-- */
--static void siw_netdev_down(struct work_struct *work)
--{
--	struct siw_device *sdev =
--		container_of(work, struct siw_device, netdev_down);
--
--	struct siw_qp_attrs qp_attrs;
--	struct list_head *pos, *tmp;
--
--	memset(&qp_attrs, 0, sizeof(qp_attrs));
--	qp_attrs.state = SIW_QP_STATE_ERROR;
--
--	list_for_each_safe(pos, tmp, &sdev->qp_list) {
--		struct siw_qp *qp = list_entry(pos, struct siw_qp, devq);
--
--		down_write(&qp->state_lock);
--		WARN_ON(siw_qp_modify(qp, &qp_attrs, SIW_QP_ATTR_STATE));
--		up_write(&qp->state_lock);
--	}
--	ib_device_put(&sdev->base_dev);
--}
--
- static void siw_device_goes_down(struct siw_device *sdev)
- {
--	if (ib_device_try_get(&sdev->base_dev)) {
--		INIT_WORK(&sdev->netdev_down, siw_netdev_down);
-+	if (ib_device_try_get(&sdev->base_dev) &&
-+	    !work_pending(&sdev->netdev_down))
- 		schedule_work(&sdev->netdev_down);
--	}
- }
- 
- static int siw_netdev_event(struct notifier_block *nb, unsigned long event,
--- 
-2.38.1
+> Now that direct recycling is performed basing on pool->cpuid when set,
+> memory leaks are possible:
+>=20
+> 1. A pool is destroyed.
+> 2. Alloc cache is emptied (it's done only once).
+> 3. pool->cpuid is still set.
+> 4. napi_pp_put_page() does direct recycling basing on pool->cpuid.
+> 5. Now alloc cache is not empty, but it won't ever be freed.
+>=20
+> In order to avoid that, rewrite pool->cpuid to -1 when unlinking NAPI to
+> make sure no direct recycling will be possible after emptying the cache.
+> This involves a bit of overhead as pool->cpuid now must be accessed
+> via READ_ONCE() to avoid partial reads.
+> Rename page_pool_unlink_napi() -> page_pool_disable_direct_recycling()
+> to reflect what it actually does and unexport it.
 
+Hi Alexander,
+
+IIUC the reported issue, it requires the page_pool is destroyed (correct?),
+but system page_pool (the only one with cpuid not set to -1) will never be
+destroyed at runtime (or at we should avoid that). Am I missing something?
+
+Rergards,
+Lorenzo
+
+>=20
+> Fixes: 2b0cfa6e4956 ("net: add generic percpu page_pool allocator")
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> ---
+>  include/net/page_pool/types.h |  5 -----
+>  net/core/page_pool.c          | 10 +++++++---
+>  net/core/skbuff.c             |  2 +-
+>  3 files changed, 8 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
+> index 3828396ae60c..3590fbe6e3f1 100644
+> --- a/include/net/page_pool/types.h
+> +++ b/include/net/page_pool/types.h
+> @@ -210,17 +210,12 @@ struct page_pool *page_pool_create_percpu(const str=
+uct page_pool_params *params,
+>  struct xdp_mem_info;
+> =20
+>  #ifdef CONFIG_PAGE_POOL
+> -void page_pool_unlink_napi(struct page_pool *pool);
+>  void page_pool_destroy(struct page_pool *pool);
+>  void page_pool_use_xdp_mem(struct page_pool *pool, void (*disconnect)(vo=
+id *),
+>  			   struct xdp_mem_info *mem);
+>  void page_pool_put_page_bulk(struct page_pool *pool, void **data,
+>  			     int count);
+>  #else
+> -static inline void page_pool_unlink_napi(struct page_pool *pool)
+> -{
+> -}
+> -
+>  static inline void page_pool_destroy(struct page_pool *pool)
+>  {
+>  }
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index 89c835fcf094..e8b9399d8e32 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -949,8 +949,13 @@ void page_pool_use_xdp_mem(struct page_pool *pool, v=
+oid (*disconnect)(void *),
+>  	pool->xdp_mem_id =3D mem->id;
+>  }
+> =20
+> -void page_pool_unlink_napi(struct page_pool *pool)
+> +static void page_pool_disable_direct_recycling(struct page_pool *pool)
+>  {
+> +	/* Disable direct recycling based on pool->cpuid.
+> +	 * Paired with READ_ONCE() in napi_pp_put_page().
+> +	 */
+> +	WRITE_ONCE(pool->cpuid, -1);
+> +
+>  	if (!pool->p.napi)
+>  		return;
+> =20
+> @@ -962,7 +967,6 @@ void page_pool_unlink_napi(struct page_pool *pool)
+> =20
+>  	WRITE_ONCE(pool->p.napi, NULL);
+>  }
+> -EXPORT_SYMBOL(page_pool_unlink_napi);
+> =20
+>  void page_pool_destroy(struct page_pool *pool)
+>  {
+> @@ -972,7 +976,7 @@ void page_pool_destroy(struct page_pool *pool)
+>  	if (!page_pool_put(pool))
+>  		return;
+> =20
+> -	page_pool_unlink_napi(pool);
+> +	page_pool_disable_direct_recycling(pool);
+>  	page_pool_free_frag(pool);
+> =20
+>  	if (!page_pool_release(pool))
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index 0d9a489e6ae1..b41856585c24 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -1018,7 +1018,7 @@ bool napi_pp_put_page(struct page *page, bool napi_=
+safe)
+>  		unsigned int cpuid =3D smp_processor_id();
+> =20
+>  		allow_direct =3D napi && READ_ONCE(napi->list_owner) =3D=3D cpuid;
+> -		allow_direct |=3D (pp->cpuid =3D=3D cpuid);
+> +		allow_direct |=3D READ_ONCE(pp->cpuid) =3D=3D cpuid;
+>  	}
+> =20
+>  	/* Driver set this to memory recycling info. Reset it on recycle.
+> --=20
+> 2.43.0
+>=20
+
+--lhZuqyEuG84JyEoi
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZc38EQAKCRA6cBh0uS2t
+rOtLAQD3JBmShlBpliJcxIqzBFd5Vw12O8XuEw5ESHqBRpi2yQEA1shHcfMpUK41
+j5pEAYpRezmFaoDcGroD8y3dKQt/3QM=
+=REM3
+-----END PGP SIGNATURE-----
+
+--lhZuqyEuG84JyEoi--
 
