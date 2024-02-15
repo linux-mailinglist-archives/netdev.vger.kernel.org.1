@@ -1,200 +1,67 @@
-Return-Path: <netdev+bounces-72148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3146856B8D
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:49:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B00AF856B93
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:50:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5BB81C22FB5
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 17:49:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E298E1C2436B
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 17:50:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAEE1137C3C;
-	Thu, 15 Feb 2024 17:49:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A163613848A;
+	Thu, 15 Feb 2024 17:50:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="rpu7FVkZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qgg/EgrV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D443132C04
-	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 17:49:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CAB3132C04
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 17:50:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708019359; cv=none; b=VYI0dv1Z15rcz4UF1i2uFgUdBE7qrUTKRcAlQ9aL4ZQRLuB8yoTjb/X+JKgGbQDdbM/24T9VVuYozk+WwpnGTwFP0H5UyZK6XGMlamre3JShurx3VMqdKiZT8d8bHRYjmfCsdqxF72dZHv7Vl02N0m32wDGokh1N2xUvSrEmmEw=
+	t=1708019407; cv=none; b=MbfA7nRFfuxi5NRo2Z9iJRKAc6Ij77KDp6RJBbEbpq4udVls6u6cmeKDhi9dnl4tqrbHqz2CQ0nr0+zkRmXx2pHkDicTT4nGm3NPpkVjTQomLjgan9DpMTFQ3Obxwc2lKJe29IYSFF7LArnC504nNJKFyQQ4+q3axS30Oevuk3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708019359; c=relaxed/simple;
-	bh=U0JFFwyDzDAYTa90FsvXX1UBz6aubxIXT9g8ZeVH5ak=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lNYHBI4128M6x1iiyIVIti1idAvdibMnZtHEyyDXfcNE7q7A9KjH5cd8gAkWuSnIHpzwRkEO7kjhSsjOgL+isfAZnLyaNORF9WyRe4xB7jKpGqu8fGx6ddIztmSg/20BhZKJhvfiM4Anj/ppXkJC+YInPzf5cNEZLXnRUsx+n6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=rpu7FVkZ; arc=none smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-607d8506099so8086547b3.0
-        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 09:49:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1708019356; x=1708624156; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GKJH/sdzxRbGj/GrO9+Z+lN1Jd7UdkMhb2otIV3stYQ=;
-        b=rpu7FVkZjeXTTn0tuCxUMYdlZXaYCAz7kZmAt4/FpCpModUuA1RzgA+WXKxjrGayDs
-         srClw+dFnH8ydeO02dneMrxTJp3+cMWlsVqHA1V2jPjysiu/w2bCd4kGIu7p/CyCki/c
-         /gSZfyYXcXTIFNofflFvpEWimx2Fr/5XuClHJUKrXaOpUVAgCWXgINidOo1920ghvJtE
-         XB8VaHlwKxmp534Kx1gDQ8n+vsP90U7DbJ0oIMlU3SMCAlDg1LyETNJiPg6rnIggneLM
-         Oj9m8LjCEgYEBwsLMCnoTJ52O8KGYDIElZk9Xxau5v632YxYaIA7k922EDQZdyz7Q1+L
-         GFRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708019356; x=1708624156;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GKJH/sdzxRbGj/GrO9+Z+lN1Jd7UdkMhb2otIV3stYQ=;
-        b=LnGNvihqs+uPoJ3eP4fF2MKSHGGAoFgvq+rPEk3aZLnJYuSgVIfNDVvBwAKl0WXxG0
-         S3J4+WvSH9IGNkd1j6/ShkZ/ORtKIVSMeX8SNUQyrac2RHu4M0xRLUfnhuNlHKyO21Tw
-         msle36qatRjue590uhB9C1mHtbHAF8xcqXgWT6bjuCmWZSAWfUeRsoITQAe9isuPJ4Lt
-         r1cZ638TqlV1if6l/ZFFr71jybOoOyCIskJyPWAxYV4SXgDFXuSfIoy7M8Tu6rY98PfX
-         qKgqK0c8pIgxBP0nhMUE4RJKMW5k9cODy2Ky0PIemUSY94nBUqWgAiSAO77nK/IcOeKf
-         rZwg==
-X-Forwarded-Encrypted: i=1; AJvYcCXLDEtPSW0xRjskht1cgaUu5Xa/2aNXkfHwXvRFGbO5/Tjy4h/57aCbWk5dS2Fj+dhbdQ+6zcFHXFf5qKs65V3GUBSTVA0x
-X-Gm-Message-State: AOJu0YyHf+a6bdSLhw4XpKd2Fxw8v2fTxq0Yh4ZzeG+uQlgV6kvg33V5
-	wC31bAGT+onfDLy7+L2g4YEObslpW0axxaU+lybtoOhevBOq10Y8SVJ2EuE1UmBJ8hwpz8GXFAj
-	zMpO2zkUDBr8h2XJtGNRmyDvLLiH0hLLHY3kP
-X-Google-Smtp-Source: AGHT+IHSyB1k8GhC13KtB+5SWdJ6jy0sE1GtxffnwM1CS5Lu2dBFvgzZ2TasOVbhoQJjk7j8YQNm4fSLvK7EYO7IrYk=
-X-Received: by 2002:a0d:d817:0:b0:604:ac3b:a38b with SMTP id
- a23-20020a0dd817000000b00604ac3ba38bmr2362753ywe.14.1708019356510; Thu, 15
- Feb 2024 09:49:16 -0800 (PST)
+	s=arc-20240116; t=1708019407; c=relaxed/simple;
+	bh=ipKHUvdxfU/Fw6F47ktyigKFnQbW75lrbU9Zj9grFe4=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=aa+S/xwgGUBQ7lTUO5YAxvmMJIUHVnH9YjyhXmW7fxGlxa2X+mh92kHKglSKTSdtRvjg7JU9UleEOIXSV9MxkEmfiwjuHGCx9d2P8iJRNi8hV/FLlX0TYLPqXT3iWVLLuPDSxN8mw6ADhQFAyr7F76yt2lXZCG3X3tTuWQB5viE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qgg/EgrV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7260C433C7;
+	Thu, 15 Feb 2024 17:50:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708019407;
+	bh=ipKHUvdxfU/Fw6F47ktyigKFnQbW75lrbU9Zj9grFe4=;
+	h=Date:From:To:Cc:Subject:From;
+	b=qgg/EgrVqbvxRSbIY6lGkamjnleQV2udR+ZCsi2skQ7P85YtH6JChO6K7OKNsDAjD
+	 xw0k+BYsRj4DvRndhTl030ouCIMovoKUakxsSwR6Xzvm54CjZovbDihWCS/aWaBNSF
+	 pwXsc4vJwmNJ0rSidWDiYw+PcD08JZfU8YHkALGyrtNiCKTXOiE0oqvnNQA9g3mOHz
+	 /TkLA4mWDy5ZR8wBW/J1dqwq+ekAuDppZ+vCWmn/r98kB/x8eBSch8q+TsjY/A6UXn
+	 RF/dv8vSub7BMSTFd9dp83Y6yLSmZRpS2AWgGyh3wxipwydcG5gxikpp6r23yXmPPa
+	 aChlCMOb2UVRQ==
+Date: Thu, 15 Feb 2024 09:50:05 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: [TEST] gre_multipath_nh_res takes forever
+Message-ID: <20240215095005.7d680faa@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240215160458.1727237-1-ast@fiberby.net> <20240215160458.1727237-4-ast@fiberby.net>
-In-Reply-To: <20240215160458.1727237-4-ast@fiberby.net>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Thu, 15 Feb 2024 12:49:05 -0500
-Message-ID: <CAM0EoMmyGwA9Q=RibR+Fc41_dPZyhBRWiBEejSbPsS9NhaUFVQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/3] net: sched: make skip_sw actually skip software
-To: =?UTF-8?B?QXNiasO4cm4gU2xvdGggVMO4bm5lc2Vu?= <ast@fiberby.net>
-Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	llu@fiberby.dk, Vlad Buslov <vladbu@nvidia.com>, 
-	Marcelo Ricardo Leitner <mleitner@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 15, 2024 at 11:06=E2=80=AFAM Asbj=C3=B8rn Sloth T=C3=B8nnesen <=
-ast@fiberby.net> wrote:
->
-> TC filters come in 3 variants:
-> - no flag (no opinion, process wherever possible)
-> - skip_hw (do not process filter by hardware)
-> - skip_sw (do not process filter by software)
->
-> However skip_sw is implemented so that the skip_sw
-> flag can first be checked, after it has been matched.
->
-> IMHO it's common when using skip_sw, to use it on all rules.
->
-> So if all filters in a block is skip_sw filters, then
-> we can bail early, we can thus avoid having to match
-> the filters, just to check for the skip_sw flag.
->
->  +----------------------------+--------+--------+--------+
->  | Test description           | Pre    | Post   | Rel.   |
->  |                            | kpps   | kpps   | chg.   |
->  +----------------------------+--------+--------+--------+
->  | basic forwarding + notrack | 1264.9 | 1277.7 |  1.01x |
->  | switch to eswitch mode     | 1067.1 | 1071.0 |  1.00x |
->  | add ingress qdisc          | 1056.0 | 1059.1 |  1.00x |
->  +----------------------------+--------+--------+--------+
->  | 1 non-matching rule        |  927.9 | 1057.1 |  1.14x |
->  | 10 non-matching rules      |  495.8 | 1055.6 |  2.13x |
->  | 25 non-matching rules      |  280.6 | 1053.5 |  3.75x |
->  | 50 non-matching rules      |  162.0 | 1055.7 |  6.52x |
->  | 100 non-matching rules     |   87.7 | 1019.0 | 11.62x |
->  +----------------------------+--------+--------+--------+
->
-> perf top (100 n-m skip_sw rules - pre patch):
->   25.57%  [kernel]  [k] __skb_flow_dissect
->   20.77%  [kernel]  [k] rhashtable_jhash2
->   14.26%  [kernel]  [k] fl_classify
->   13.28%  [kernel]  [k] fl_mask_lookup
->    6.38%  [kernel]  [k] memset_orig
->    3.22%  [kernel]  [k] tcf_classify
->
-> perf top (100 n-m skip_sw rules - post patch):
->    4.28%  [kernel]  [k] __dev_queue_xmit
->    3.80%  [kernel]  [k] check_preemption_disabled
->    3.68%  [kernel]  [k] nft_do_chain
->    3.08%  [kernel]  [k] __netif_receive_skb_core.constprop.0
->    2.59%  [kernel]  [k] mlx5e_xmit
->    2.48%  [kernel]  [k] mlx5e_skb_from_cqe_mpwrq_nonlinear
->
+Hi!
 
-The concept makes sense - but i am wondering when you have a mix of
-skip_sw and skip_hw if it makes more sense to just avoid looking up
-skip_sw at all in the s/w datapath? Potentially by separating the
-hashes for skip_sw/hw. I know it's a deeper surgery - but would be
-more general purpose....unless i am missing something
+I bumped the timeouts for forwarding tests with kernel debug enabled
+yesterday, and gre_multipath_nh_res still doesn't finish even tho it
+runs for close to 3 hours. On a non-debug kernel it takes around 30min.
 
-> Test setup:
->  DUT: Intel Xeon D-1518 (2.20GHz) w/ Nvidia/Mellanox ConnectX-6 Dx 2x100G
->  Data rate measured on switch (Extreme X690), and DUT connected as
->  a router on a stick, with pktgen and pktsink as VLANs.
->  Pktgen was in range 12.79 - 12.95 Mpps across all tests.
->
-
-Hrm. Those are "tiny" numbers (25G @64B is about 3x that). What are
-the packet sizes?
-Perhaps the traffic generator is a limitation here?
-Also feels like you are doing exact matches? A sample flower rule
-would have helped.
-
-cheers,
-jamal
-> Signed-off-by: Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.net>
-> ---
->  include/net/pkt_cls.h | 5 +++++
->  net/core/dev.c        | 3 +++
->  2 files changed, 8 insertions(+)
->
-> diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
-> index a4ee43f493bb..a065da4df7ff 100644
-> --- a/include/net/pkt_cls.h
-> +++ b/include/net/pkt_cls.h
-> @@ -74,6 +74,11 @@ static inline bool tcf_block_non_null_shared(struct tc=
-f_block *block)
->         return block && block->index;
->  }
->
-> +static inline bool tcf_block_has_skip_sw_only(struct tcf_block *block)
-> +{
-> +       return block && atomic_read(&block->filtercnt) =3D=3D atomic_read=
-(&block->skipswcnt);
-> +}
-> +
->  static inline struct Qdisc *tcf_block_q(struct tcf_block *block)
->  {
->         WARN_ON(tcf_block_shared(block));
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index d8dd293a7a27..7cd014e5066e 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -3910,6 +3910,9 @@ static int tc_run(struct tcx_entry *entry, struct s=
-k_buff *skb,
->         if (!miniq)
->                 return ret;
->
-> +       if (tcf_block_has_skip_sw_only(miniq->block))
-> +               return ret;
-> +
->         tc_skb_cb(skb)->mru =3D 0;
->         tc_skb_cb(skb)->post_ct =3D false;
->         tcf_set_drop_reason(skb, *drop_reason);
-> --
-> 2.43.0
->
+You probably have a better idea how to address this than me, but it
+seems to time out on the IPv6 tests - I wonder if using mausezahn 
+instead of ping for IPv6 would help a bit?
 
