@@ -1,155 +1,118 @@
-Return-Path: <netdev+bounces-72072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A54B085679D
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 16:30:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9197F8567FD
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 16:37:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1BF01C238B5
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 15:30:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 52C21B253D7
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 15:34:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8190C133413;
-	Thu, 15 Feb 2024 15:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C75A1339A0;
+	Thu, 15 Feb 2024 15:31:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FYt1Y9IX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M3vNe30Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB335133412;
-	Thu, 15 Feb 2024 15:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA17D133431;
+	Thu, 15 Feb 2024 15:31:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708011022; cv=none; b=LhEYYBoYF9cX9P+iKnEnl3ECBvPlOirVp2a4EW5eH6G5xvEZ0QPYZJSsBVkcNtr9HxA8r+3vKbg+Q3+qDg1Dyr896STMK2FtJTJvueQNvRGrBBwHxN1bu4AKUZnwblQyHR72CEC0QEdLmY1TXe4F2Z2EcWUqR3BVyVFRieM3YPY=
+	t=1708011078; cv=none; b=cQ2TblvLNC5osJtL5/eIx4VgDfYOgvp8zyWG4tSjSYVasSrkfWNjQRKuOkMOQsP7sbX6CdVrFEoso4BDFAFH3grzyFc+fhH6gdFf1iRu2o41LaWNENGdz36On90gXJIQHz4kF6suxoxlXE+8tujk1H38Ow/D2R70y/H5ztBG/Uw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708011022; c=relaxed/simple;
-	bh=zJC9CXq4dcvLk4nahJYJkn9RNZzyk2capY7kPps0jfg=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Jf8GO54g48daf6UFpnWfT6VZv/+knLKC1lrNRmlnDdfsjtNp3lCy2tBFGFh9RpaU8WcEIqdcQwjNbyRT2rHUDJIX2/PGbjC1FPBqEOqS1D+Eoh9/fKtKl1hYx31/wSNZ8RKJj6j9QqQxwwFRqikFG1ZSNrpilhetvw3lc5pojRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FYt1Y9IX; arc=none smtp.client-ip=209.85.221.53
+	s=arc-20240116; t=1708011078; c=relaxed/simple;
+	bh=dLfIX3aUyBqo2RdTxsMyCriWrHkLIgqJmVYmc44D6GE=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hBCHSL5T79KGkfXG+uV4d9OeLNXiRel5RJ2RhxeRf2kERgFbD72f+igCFX/kshwCJYJ87WwNWBQ3ko2H2fyxjNnterq0qCkGRs9APRgzI3cshtHGgXQUNgPD8SzmrCR3h1JjLhkJ0di4q1LB0a1Jftr4U/609r5O2jYNlGKlsbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M3vNe30Y; arc=none smtp.client-ip=209.85.221.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-33934567777so583450f8f.1;
-        Thu, 15 Feb 2024 07:30:20 -0800 (PST)
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-33aea66a31cso559762f8f.1;
+        Thu, 15 Feb 2024 07:31:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708011019; x=1708615819; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=EzxJs9cxp9wBXtsvla3RFm6+Tnd21QJFktLvuH+bRvc=;
-        b=FYt1Y9IXb613l1zUAVUyMDMt6MAk/hDI/KcYS6Zb/yH1mcG8oYAFN33tzqTcoFGaVa
-         qe4Dqm9xxAAzobc5OsJw+O6IVIzXrFCb4jGBgf3hRpqJU7oJhqaNjQJrSvcvUhkrzmfy
-         lfW1Po8VfA4OLXk7c/QXtf3NeI+y7DgylVP3ayOAAecqYsX4pC64Kppal1KFMSIaUwzQ
-         Nfa+MkTsuf4iwzZwic5Gt4PfA/sxT4+t1b6wvi+SO2EzPlsXVuwGWlwtDwtNFK0eMaHO
-         AdhyOgHfBCUeoTReV/Po5HrV4RrGqVT6sNoANBivIHFG6Y7Bw+GEwCETilP2URDX+Be+
-         x7ag==
+        d=gmail.com; s=20230601; t=1708011075; x=1708615875; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=yKrpTQJQFLvHUzVWUoBR2+UEWTVnDVznNd1fLBttIMw=;
+        b=M3vNe30Y4ESHC64TLuvxzm5KCQx4GhCsMFTUyVEo6mRWXa0YyIe8+elRQ6NhSkYMU0
+         GfD4iXrJ7tU/jWAhcMZtpax19sw0sElSuX/l/lGBZSiJBmB6LN3RcYnlTD9OmtgRT1xP
+         x+ujmxGTOScHPtOZ3R+72LTK+UPNfXYeJt3Vpfz9wUqbScD7cp/RwBbkamR/l1x/yvj0
+         2TnbjTLaL4VYL/6paMLWz97iCeHkEU7sVX+o8sm9YxWdt3VBpmCo4E1Hs0ysXsJK+K6O
+         AhT7OdslzR5i/77L+/YuJbM7LO0FnoZgCJmUMHXLvbtVO56pU93YIqxBcio/XRl/rU95
+         jW5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708011019; x=1708615819;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EzxJs9cxp9wBXtsvla3RFm6+Tnd21QJFktLvuH+bRvc=;
-        b=Js9xy8DeMDsj0bKwoIFbFW/omDT0bGqZzWghA99vXe26UtJP2cteZxtrOnwYYRnL2n
-         hAXIEXOamanZqLLpvYBHp1Yc9KEjdppyeke6kONv3FG2XnNYgU2DCNtoyjDdITecN1uf
-         0ZL5HE2koHPgvX2mi3k8pEgm1MIdd3Ya207V7URFKL7D2jxhkHehou8N91r1YAZaQqEV
-         g/VTPv4jRlcfHCBS8AVPPCTIcngIxZcbapRK2D07UfpaxLR8uj/6fFEF7D3gqOpEJTsa
-         JO9O9r8TFhtuCiiGTZGPocG8HoHT12UNyKslG+Pn8kJjL9KJn4zaGDMzSXi+LsSyXJsf
-         i84A==
-X-Forwarded-Encrypted: i=1; AJvYcCWjQPbeDxcdUIl8SoKD9wAgRl0QnaqbMmuYYUWooP5RfsTEPg+ZARkjtQ9bOzt4w09/sgDSf45tK9GZ0Amu4YPipNkmyfvI7357Gh25HHDmal72m+uOwZBRGETy+rP2dqAQfqUk
-X-Gm-Message-State: AOJu0YyAINrsJSbHUK0Bu82dbkGiE1TnHu0VWOUv26B0fFH7yi3wPKLA
-	x/kUOWqhUsMA9wVoC0PZ+JRiIf6/e5IHA7uZx2/R7IdYc/V/+aP5
-X-Google-Smtp-Source: AGHT+IHF7rKg/9MCZPVlX/Ke7iQnZQZu+vy6LFb1PkdX9Co6PiiXKJmEo79kh4rjUsb+iAPXp7V0Yg==
-X-Received: by 2002:a5d:43d0:0:b0:33c:d9fb:2277 with SMTP id v16-20020a5d43d0000000b0033cd9fb2277mr1503222wrr.40.1708011018678;
-        Thu, 15 Feb 2024 07:30:18 -0800 (PST)
-Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.googlemail.com with ESMTPSA id x4-20020a5d54c4000000b00337d6f0013esm2046141wrv.107.2024.02.15.07.30.17
+        d=1e100.net; s=20230601; t=1708011075; x=1708615875;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yKrpTQJQFLvHUzVWUoBR2+UEWTVnDVznNd1fLBttIMw=;
+        b=gTUyiqVVQtzpHL/9Bz5Q8h0GQ6JAH9pKU7v0z0AWbQTTbAIZ5YqPQY15DeRcc7xUuh
+         SvWM78Zm78hAD/qV7ikalxEeOj1vSxq4fVdyQNc617yHtQNWsHC5DCdIOxWlqPMhAYJF
+         SUxtM/WULCf6FNFan4sNetcL9Qk0aWYNpBUa5OW0RXhJ4v3BMBUbWIEv8uHjBcSDgDMw
+         pUt3DuLxC1b9hl4Q+ZDaqXyIC6CKsSGCwwuo1/yyfEOmz7W4o2Ol1153bpmGcRfp8cdH
+         iCbX5RpyyAKPAILTa1X6uajUJj3kx0xP5WJ0HzNX79h+D8Pcen3rXaZ36IMaJ5FMysBD
+         SC5w==
+X-Forwarded-Encrypted: i=1; AJvYcCWwgHo7lREKDkV1yCQXYMYp6k5LgKxir08TwHUqkIBRrdY6tbVb0845be9IKJFvXxvJKGRIzjroCv2RNKJgdmovSM/9682fIwnblrukWnUF0VgWcdsZ1k2hPT1Z2Zk0qxMVxWJy
+X-Gm-Message-State: AOJu0YyHXx8odKqKkyzOko3E9kMO+r0Ceo6Wi9cyYHQWIXZ+k04r3tYw
+	Yd1GSXaxZ6kEm2mDuWe7BN68K0r203EQg1PEgsVtEJZ5RR79t5zB
+X-Google-Smtp-Source: AGHT+IHtJa43taH8kjVEW1xAmQDivjclGzmFMF9S6JofmjqqzjF5JBe78KImWL/Bx0Ac2GGLazCztg==
+X-Received: by 2002:adf:db4a:0:b0:33b:179d:d9aa with SMTP id f10-20020adfdb4a000000b0033b179dd9aamr1823427wrj.26.1708011074413;
+        Thu, 15 Feb 2024 07:31:14 -0800 (PST)
+Received: from Ansuel-XPS. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.gmail.com with ESMTPSA id bx23-20020a5d5b17000000b0033cfbe7343asm2230699wrb.8.2024.02.15.07.31.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Feb 2024 07:30:18 -0800 (PST)
+        Thu, 15 Feb 2024 07:31:14 -0800 (PST)
+Message-ID: <65ce2e42.5d0a0220.ee3ec.8566@mx.google.com>
+X-Google-Original-Message-ID: <Zc4uP714kvDr1tqh@Ansuel-XPS.>
+Date: Thu, 15 Feb 2024 16:31:11 +0100
 From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
 	Robert Marko <robimarko@gmail.com>,
 	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [net-next PATCH v2] net: phy: aquantia: add AQR113 PHY ID
-Date: Thu, 15 Feb 2024 16:30:05 +0100
-Message-ID: <20240215153010.2129-1-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>
+Subject: Re: [net-next PATCH] net: phy: aquantia: add AQR113 PHY ID
+References: <20240213180228.15859-1-ansuelsmth@gmail.com>
+ <1d30f923-8391-4e36-bf3f-2cdb733d464c@lunn.ch>
+ <e9c0e96314a36ca4320ff215c03d5f7dc0e01235.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e9c0e96314a36ca4320ff215c03d5f7dc0e01235.camel@redhat.com>
 
-Add Aquantia AQR113 PHY ID. Aquantia AQR113 is just a chip size variant of
-the already supported AQR133C where the only difference is the PHY ID
-and the hw chip size.
+On Thu, Feb 15, 2024 at 01:35:40PM +0100, Paolo Abeni wrote:
+> Hi,
+> 
+> On Wed, 2024-02-14 at 19:05 +0100, Andrew Lunn wrote:
+> > On Tue, Feb 13, 2024 at 07:02:26PM +0100, Christian Marangi wrote:
+> > > Add Aquantia AQR113 PHY ID. Aquantia AQR113 is just a chip size variant of
+> > > the already supported AQR133C where the only difference is the PHY ID
+> > > and the hw chip size.
+> > > 
+> > > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> > 
+> > Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> 
+> This does not apply cleanly anymore after "net: phy: aquantia: add
+> AQR111 and AQR111B0 PHY ID". Could you please rebase it?
+>
 
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
----
-Changes v2:
-- Rebase on top of net-next
-- Add Reviewed-by tag
+Sure, sent v2 and thanks for checking this.
 
- drivers/net/phy/aquantia/aquantia_main.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
-
-diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/aquantia/aquantia_main.c
-index 109387acabeb..a6a7980585f5 100644
---- a/drivers/net/phy/aquantia/aquantia_main.c
-+++ b/drivers/net/phy/aquantia/aquantia_main.c
-@@ -26,6 +26,7 @@
- #define PHY_ID_AQR111B0	0x03a1b612
- #define PHY_ID_AQR112	0x03a1b662
- #define PHY_ID_AQR412	0x03a1b712
-+#define PHY_ID_AQR113	0x31c31c40
- #define PHY_ID_AQR113C	0x31c31c12
- 
- #define MDIO_PHYXS_VEND_IF_STATUS		0xe812
-@@ -922,6 +923,25 @@ static struct phy_driver aqr_driver[] = {
- 	.get_stats	= aqr107_get_stats,
- 	.link_change_notify = aqr107_link_change_notify,
- },
-+{
-+	PHY_ID_MATCH_MODEL(PHY_ID_AQR113),
-+	.name		= "Aquantia AQR113",
-+	.probe          = aqr107_probe,
-+	.get_rate_matching = aqr107_get_rate_matching,
-+	.config_init    = aqr113c_config_init,
-+	.config_aneg    = aqr_config_aneg,
-+	.config_intr    = aqr_config_intr,
-+	.handle_interrupt       = aqr_handle_interrupt,
-+	.read_status    = aqr107_read_status,
-+	.get_tunable    = aqr107_get_tunable,
-+	.set_tunable    = aqr107_set_tunable,
-+	.suspend        = aqr107_suspend,
-+	.resume         = aqr107_resume,
-+	.get_sset_count = aqr107_get_sset_count,
-+	.get_strings    = aqr107_get_strings,
-+	.get_stats      = aqr107_get_stats,
-+	.link_change_notify = aqr107_link_change_notify,
-+},
- {
- 	PHY_ID_MATCH_MODEL(PHY_ID_AQR113C),
- 	.name           = "Aquantia AQR113C",
-@@ -957,6 +977,7 @@ static struct mdio_device_id __maybe_unused aqr_tbl[] = {
- 	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR111B0) },
- 	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR112) },
- 	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR412) },
-+	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR113) },
- 	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR113C) },
- 	{ }
- };
 -- 
-2.43.0
-
+	Ansuel
 
