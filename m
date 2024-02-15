@@ -1,183 +1,170 @@
-Return-Path: <netdev+bounces-72198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19776856F14
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 22:08:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D927C856F19
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 22:09:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6DF4283794
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 21:08:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 791CB1F23B18
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 21:09:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21AFA13B2B4;
-	Thu, 15 Feb 2024 21:08:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F0D13B2BF;
+	Thu, 15 Feb 2024 21:09:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UUi+fmhD"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="GzFBilVp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698C613B287
-	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 21:08:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9200913B287
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 21:09:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708031323; cv=none; b=aOEN6uMGxrrbuQopXG1teH5Kg3775z6QFLMJpXKyZFLeZ8WwwSow2NdRmYbcqbjslStLmLNkd9T3+IeNcRQ+Yb9Z1GxFhnpyKrkCLASFZXOqRIQh/fBGdoeD/1q/KUyUHN4q7Uph4ufIKNG03no/dh4QLjvYAVGUp/ZeZrIrVas=
+	t=1708031378; cv=none; b=ARVfeIR4SJl1IbysmIfjG3W4uqeABNAZZ4ceH91+pObLVk+4FMBKZ3JQzEnQIv2U4msoIsSknIWbi8dt4ZIO83elbNZ72lMaRokD0HL/i5xHuBtX/oHwjfHZSnylqAZOx16qEJzULB3QvMZfMZFXN8+e/zSfk0UU/Qp9D7mdUmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708031323; c=relaxed/simple;
-	bh=7Goj4wFHsYDwDBblv5ig8OGTaceUGxF4ohnzJyXrXM8=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=EU7uDR07omg6Dru21CbhkWEJvmnb81bO6XnR04XDTzyuS/my5kDfnCz5wrG8Z6yiNPaHgidyszStni3z39o84DhysuazxmMzCDW2djB5FudQit6nKNT75XgqOit0zo39YvRpUNMTMCn6aKintmaRZl1sDA3JrJ+dTc6WqA7ebjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UUi+fmhD; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-563c595f968so1002693a12.0
-        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 13:08:41 -0800 (PST)
+	s=arc-20240116; t=1708031378; c=relaxed/simple;
+	bh=M48WQBn6YgvQbDcEahjl9zOb9wTEi7nGcfpHNGAFA/I=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sz4IsgMo2BtveKzGxJ9+KCUsReaV9p+bvEnxfngyHN+K/2p9qf1qRAYa+s84F0HhMD5IRhTdnWZvhzYR8IR/EBqO8fiioXrWxa+XaZTU/aoB/wvpiQ7DcaZQV0ISinv25vYPKkn86Exrraf6cIx9GRsQzBeqJ1wFt8isJUH98vI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=GzFBilVp; arc=none smtp.client-ip=99.78.197.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708031319; x=1708636119; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=9JqRpxUumFeEIpkURzxkU5/aKTk8yPJiFCkH0KGCjxQ=;
-        b=UUi+fmhDJDCM07CCxIVXl3Bj23fQpRWgkPLRm9aJhdkeEh3JGfItlNJFy7v7rmcISW
-         OVwZLQqHfOkPDXJxXU0lRSCCz/4d24djYcHDVCJP5y49YHXpYrBL2k6csHlznQpvBinx
-         HOPsXJnhD78ZlHC6D+28z6YEfNs2Ym3GtjNgj56mnaooC+CNGoL9yt1uahaJF5a2Xpg7
-         grTWpNecPTnxwbra3g1Slp19AEbZov+52zcuJaUJH/2j+uzVRR7y3KjorrWWaOqba0nB
-         TbZaNaPZa1WHmMR+UpAl1DRj9WAWYreAJYcoFbAR+KkAR1vtm2E0N+8bbAwYW6aR8iUj
-         025g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708031319; x=1708636119;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9JqRpxUumFeEIpkURzxkU5/aKTk8yPJiFCkH0KGCjxQ=;
-        b=qAxDegfeKludlq/JQkdaJNstLFh5wErPdNJ+48c7kHDNQjJvrGHV7erngGjJGBRjIF
-         9QunRewL6DJbG9uzB/9Kk7OseWn4DK+DIXeFns4neVOn4VUG6xnP5k1ymqBXc5fKfTSV
-         oR3nsiXAWfan9bRdUeXpGT0Si24r34EUFfiBqmwBdBpl2Vmv+zk6XpruRCSI1NFYUpFD
-         wzFtsTjSsxsjpGFmdXmAWDZhiUbnDpaHijq3E3RHCDa0uFlzP9EWlI3fyb8U+YbqWiRx
-         D0WOVCQ8C6y4siTCRfmOBvTtfJtOxzzeyjok0RPL17b4xMpZuNddmpaUC783EYYU9J1T
-         S9vg==
-X-Forwarded-Encrypted: i=1; AJvYcCUh9d39j7T8hfuz642ZFHxrjRw5z92+Ufpwiie9/zWQknc5poY0Y7XIcxZ4Wk0LBPWf8UQ3SFiYQtepmA5dwGo0yYUm9wMZ
-X-Gm-Message-State: AOJu0Yx07hCLQHBNwji+LDZSxiBwo46lnEe4ssmn9SjjPyI4+Fyjqndo
-	IuKz343WZ+rTouYOpsHtj+V7iAIRIE0M1DYcWz/TnlQnsAU0wCCD
-X-Google-Smtp-Source: AGHT+IG1QtoY10FT1fkSydZKCCIPWWAobQ4lAv8V4kcx47K3rhgz4HB/3/CwvScZ2u3104DAyzpvVw==
-X-Received: by 2002:aa7:ce15:0:b0:560:590:10b9 with SMTP id d21-20020aa7ce15000000b00560059010b9mr2100786edv.2.1708031319316;
-        Thu, 15 Feb 2024 13:08:39 -0800 (PST)
-Received: from ?IPV6:2a01:c23:c544:200:b8db:381c:cff6:c7bf? (dynamic-2a01-0c23-c544-0200-b8db-381c-cff6-c7bf.c23.pool.telefonica.de. [2a01:c23:c544:200:b8db:381c:cff6:c7bf])
-        by smtp.googlemail.com with ESMTPSA id q15-20020aa7cc0f000000b005638caeff4bsm890893edt.22.2024.02.15.13.08.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Feb 2024 13:08:38 -0800 (PST)
-Message-ID: <3604a59e-4287-428f-b4ba-8528d2ffdbe9@gmail.com>
-Date: Thu, 15 Feb 2024 22:08:40 +0100
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1708031376; x=1739567376;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=/rYsTvWEiitBRJ22e/2HUzb3GtXQOiIlx4QgyQJdc6g=;
+  b=GzFBilVpH/v1RrJshf6KVk5wf+9biItbK2wCCAbtWa6atcf7JsYAZ+Gn
+   e39U8zEwy7EH+J9f4EnnjADfVy2lxBjBUmh5E2UwnNN8aYqkbuz+l0Cxg
+   ASoRc48d9tiT3JImgYhki/24ICdYmlhObea21ihVWkDVDIflynHMpZGSM
+   c=;
+X-IronPort-AV: E=Sophos;i="6.06,162,1705363200"; 
+   d="scan'208";a="66360459"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2024 21:09:34 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:22009]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.29.119:2525] with esmtp (Farcaster)
+ id f7956208-2ad0-49c1-aeed-75675e94f279; Thu, 15 Feb 2024 21:09:33 +0000 (UTC)
+X-Farcaster-Flow-ID: f7956208-2ad0-49c1-aeed-75675e94f279
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Thu, 15 Feb 2024 21:09:32 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.170.20) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Thu, 15 Feb 2024 21:09:30 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kerneljasonxing@gmail.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kernelxing@tencent.com>, <kuba@kernel.org>, <kuniyu@amazon.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: [PATCH net-next v5 03/11] tcp: use drop reasons in cookie check for ipv4
+Date: Thu, 15 Feb 2024 13:09:22 -0800
+Message-ID: <20240215210922.19969-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240215012027.11467-4-kerneljasonxing@gmail.com>
+References: <20240215012027.11467-4-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] ethtool: check for unsupported modes in EEE
- advertisement
-From: Heiner Kallweit <hkallweit1@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <c02d4d86-6e65-4270-bc46-70acb6eb2d4a@gmail.com>
- <Zc4zhPSceYVlYnWc@shell.armlinux.org.uk>
- <6ecc5c66-53b9-40c9-9fe4-b091afbe2f7f@gmail.com>
-Content-Language: en-US
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <6ecc5c66-53b9-40c9-9fe4-b091afbe2f7f@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D043UWA004.ant.amazon.com (10.13.139.41) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 15.02.2024 21:27, Heiner Kallweit wrote:
-> On 15.02.2024 16:53, Russell King (Oracle) wrote:
->> On Thu, Feb 15, 2024 at 02:05:54PM +0100, Heiner Kallweit wrote:
->>> Let the core check whether userspace returned unsupported modes in the
->>> EEE advertisement bitmap. This allows to remove these checks from
->>> drivers.
->>
->> Why is this a good thing to implement?
->>
-> Because it allows to remove all the duplicated checks from drivers.
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 15 Feb 2024 09:20:19 +0800
+> From: Jason Xing <kernelxing@tencent.com>
 > 
->> Concerns:
->> 1) This is a change of behaviour for those drivers that do not
->> implement this behaviour.
->>
-> Not of regular behavior. And at least for all drivers using phylib
-> it's no change.
+> Now it's time to use the prepared definitions to refine this part.
+> Four reasons used might enough for now, I think.
 > 
->> 2) This behaviour is different from ksettings_set() which silently
->> trims the advertisement down to the modes that are supported
->>
-> It's the same check that we have in genphy_c45_ethtool_set_eee().
-> So it's in line with what we do in phylib.
-> But I would also be fine with silently trimming the advertisement.
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> --
+> v5:
+> Link: https://lore.kernel.org/netdev/CANn89i+iELpsoea6+C-08m6+=JkneEEM=nAj-28eNtcOCkwQjw@mail.gmail.com/
+> Link: https://lore.kernel.org/netdev/632c6fd4-e060-4b8e-a80e-5d545a6c6b6c@kernel.org/
+> 1. Use SKB_DROP_REASON_IP_OUTNOROUTES instead of introducing a new one (Eric, David)
+> 2. Reuse SKB_DROP_REASON_NOMEM to handle failure of request socket allocation (Eric)
+> 3. Reuse NO_SOCKET instead of introducing COOKIE_NOCHILD
+> ---
+>  net/ipv4/syncookies.c | 18 +++++++++++++-----
+>  1 file changed, 13 insertions(+), 5 deletions(-)
 > 
->> 3) This check is broken. Userspace is at liberty to pass in ~0 for
->> the supported mask and the advertising mask which subverts this
->> check.
->>
-> ethtool retrieves the supported mask with get_eee() from kernel.
-> And this (unmodified) value is passed with set_eee().
-> So at least with ethtool this scenario can't occur.
-> 
-In addition: In the netlink case the supported mask isn't even
-transferred to userspace for the set_eee operation.
+> diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
+> index 38f331da6677..aeb61c880fbd 100644
+> --- a/net/ipv4/syncookies.c
+> +++ b/net/ipv4/syncookies.c
+> @@ -421,8 +421,10 @@ struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb)
+>  		if (IS_ERR(req))
+>  			goto out;
+>  	}
+> -	if (!req)
+> +	if (!req) {
+> +		SKB_DR_SET(reason, NOMEM);
 
->> So... I think overall, it's a NAK to this from me - I don't think
->> it's something that anyone should implement. Restricting the
->> advertisement to the modes that are supported (where the supported
->> mask is pulled from the network driver and not userspace) would
->> be acceptable, but is that actually necessary?
->>
-> 
+NOMEM is not appropriate when mptcp_subflow_init_cookie_req() fails.
 
+
+>  		goto out_drop;
+> +	}
+>  
+>  	ireq = inet_rsk(req);
+>  
+> @@ -434,8 +436,10 @@ struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb)
+>  	 */
+>  	RCU_INIT_POINTER(ireq->ireq_opt, tcp_v4_save_options(net, skb));
+>  
+> -	if (security_inet_conn_request(sk, skb, req))
+> +	if (security_inet_conn_request(sk, skb, req)) {
+> +		SKB_DR_SET(reason, SECURITY_HOOK);
+>  		goto out_free;
+> +	}
+>  
+>  	tcp_ao_syncookie(sk, skb, req, AF_INET);
+>  
+> @@ -452,8 +456,10 @@ struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb)
+>  			   ireq->ir_loc_addr, th->source, th->dest, sk->sk_uid);
+>  	security_req_classify_flow(req, flowi4_to_flowi_common(&fl4));
+>  	rt = ip_route_output_key(net, &fl4);
+> -	if (IS_ERR(rt))
+> +	if (IS_ERR(rt)) {
+> +		SKB_DR_SET(reason, IP_OUTNOROUTES);
+>  		goto out_free;
+> +	}
+>  
+>  	/* Try to redo what tcp_v4_send_synack did. */
+>  	req->rsk_window_clamp = tp->window_clamp ? :dst_metric(&rt->dst, RTAX_WINDOW);
+> @@ -476,10 +482,12 @@ struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb)
+>  	/* ip_queue_xmit() depends on our flow being setup
+>  	 * Normal sockets get it right from inet_csk_route_child_sock()
+>  	 */
+> -	if (ret)
+> +	if (ret) {
+>  		inet_sk(ret)->cork.fl.u.ip4 = fl4;
+> -	else
+> +	} else {
+> +		SKB_DR_SET(reason, NO_SOCKET);
+
+This also seems wrong to me.
+
+e.g. syn_recv_sock() could fail with sk_acceptq_is_full(sk),
+then the listener is actually found.
+
+
+>  		goto out_drop;
+> +	}
+>  out:
+>  	return ret;
+>  out_free:
+> -- 
+> 2.37.3
+> 
 
