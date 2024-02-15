@@ -1,203 +1,184 @@
-Return-Path: <netdev+bounces-71943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FB30855966
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 04:12:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA9E6855919
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 04:05:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F02911F2CE93
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 03:12:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03475B24E3D
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 03:05:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3128A6FD2;
-	Thu, 15 Feb 2024 03:08:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A041864;
+	Thu, 15 Feb 2024 03:05:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Vsl1yFIr"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="ZhasJfnO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 525B3611B;
-	Thu, 15 Feb 2024 03:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E3204A05
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 03:05:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707966533; cv=none; b=b7d+ZQ+ZdxstqR72As7cd8cqUKT1IExZenJmv974hft1OvRpUCYdTbU/FdEb1cctDLjbxl3Wi51HzKBN0/khsTugPfxQD+uijZ+UF4WTmRfnR/qvV1ACOTMCQNganY3bQb4cBYfKMB1lIEEfIfUWtkqp0wS74p+qxWxPBNZkSe8=
+	t=1707966323; cv=none; b=vB7Q+S0n5HIJJGxin8Wz1Kai+8AQKDEjcP4botCwcI2xUVpji4k/5ndEcETUmav/hYZrwSz2TsSKuYYDnbEJq3C73gtJcHvO+S8DxvpBYlNMCNUccEDF20mbIhbiNukWzVIZD6Hd+qQvul38Pe86FFn6J4KoIg+3muBAgqYrElM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707966533; c=relaxed/simple;
-	bh=qvmE9ozt+922Am67EghiGlMAntqBBBPRw+LPiyCAFes=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hx1NARbaEEZZ+y9qvvzGn9gv440KdljKsMddgcabRwIAdmyRzvcTvmzqBbh0co3YM0zKMo+EJFS1IO/RXXrzrYpeV4URJZXdNw7zF27Cl6/aD7K8IF6O3vsxSR0tMdfTCYQ3ixORaQBm/H89slJckjTr+wQPP7cJIBw5Ub/Duh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Vsl1yFIr; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707966532; x=1739502532;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=qvmE9ozt+922Am67EghiGlMAntqBBBPRw+LPiyCAFes=;
-  b=Vsl1yFIrzGyB74w6qHdmSe/75lA/Y91AMd/wze4YnSKqCyO1X5CssomT
-   +sDLZbk4EDil7qThVTwxstsX5KGjIFtOv/+MuX9vwiBi8+kAXe/pzDThB
-   GcPblx2k1nstDqF8xuDmRwTRDoWRXjelIdUhwI+gIuRUB72n3LZdfsfwO
-   vDZiifomVst5GFCaWpz8PZfVdb4eW8txWamopT9xQYjSgopR8Fz1bHSJ5
-   /nqXn7AoFcz1jcvvCVPXAXsZ2FglZ3Eva92kbU7rgGIh9v9TpNL5dImf/
-   jNmKyb6GXJGQ6H/GkiYS48akk5ddilcDoejfwjkkdDpOZDtP8z1L0JPYQ
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10984"; a="19461453"
-X-IronPort-AV: E=Sophos;i="6.06,161,1705392000"; 
-   d="scan'208";a="19461453"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2024 19:08:51 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,161,1705392000"; 
-   d="scan'208";a="3385871"
-Received: from yongliang-ubuntu20-ilbpg12.png.intel.com ([10.88.229.33])
-  by fmviesa009.fm.intel.com with ESMTP; 14 Feb 2024 19:08:35 -0800
-From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-To: Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
-	David E Box <david.e.box@linux.intel.com>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Mark Gross <markgross@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>
-Cc: Andrew Halaney <ahalaney@redhat.com>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	platform-driver-x86@vger.kernel.org,
-	linux-hwmon@vger.kernel.org,
-	bpf@vger.kernel.org,
-	Voon Wei Feng <weifeng.voon@intel.com>,
-	Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>,
-	Lai Peter Jun Ann <jun.ann.lai@intel.com>,
-	Abdul Rahim Faizal <faizal.abdul.rahim@intel.com>
-Subject: [PATCH net-next v5 9/9] stmmac: intel: interface switching support for ADL-N platform
-Date: Thu, 15 Feb 2024 11:04:59 +0800
-Message-Id: <20240215030500.3067426-10-yong.liang.choong@linux.intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240215030500.3067426-1-yong.liang.choong@linux.intel.com>
-References: <20240215030500.3067426-1-yong.liang.choong@linux.intel.com>
+	s=arc-20240116; t=1707966323; c=relaxed/simple;
+	bh=XQQUXJwbqJLCCf4zLjFHNZ5/X0OzLVljNQX9uXnnymU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NAQpvQVnpUkqmoqKvp7RkhZUVUL3QOwT4Gx6hMxUE9D5kDRLx+2qNGTwA/er++UN4SS4BBOU+Q5ol6vg13k0UYxmKivM6+8FjVIYKlToOru4cXMEwrR+Y3YPgme5j5oIGjQycyrqxX/jmCvRPbO3nrCmgSbcbJIP5UaoJB2ib2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=ZhasJfnO; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1db562438e0so3326215ad.3
+        for <netdev@vger.kernel.org>; Wed, 14 Feb 2024 19:05:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1707966320; x=1708571120; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yBVC5RzP0fTrPT+l1F9kKP29YyFrCG1YG6/Oc+yKVZM=;
+        b=ZhasJfnO7R4tet583VDs6igZsNa5EJLFF4k13uWxyw07NwbnxOEm6WvfxmNNX+RCU0
+         QCaRadQi+4GeiDH1P0FtlXEok+rwXl96N3Z+eU6vn/gYn2VSL2cgmhPvnGeBRSAnhJMm
+         fxUy4p7So8+F80yV2hMQY5sjUEvqHn5cKP/mPaHQ+y22O4jHACx8C3c9fH6kiKeIkraE
+         PdaluD4Tf/addkPgJwFtinPiCqgTxs+YK+iIY0CxptLskRTAeb47Jo/ZGYIMe7LbTlcF
+         WEgGnZnKPEVvFqNAaEasUT52N6AnIRXQP18gmbP85PUUFO0PIykJjMiDQc3ZagWZio/B
+         3GwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707966320; x=1708571120;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yBVC5RzP0fTrPT+l1F9kKP29YyFrCG1YG6/Oc+yKVZM=;
+        b=xTqe//PuL77hOZvhF/rx+cTuraHUT8Qw5eSk+qNGsByI+fo5S64WWBIFTs+IAZJdBb
+         3Ulusksnijq7C+tORG1Ox5Ei9tMkonc4jOOIbt/0kOg3RvbwB2JhTb/6HkxZWcKgGUzX
+         QZdmMh0LPKWPrnyA71FuBMpud6liZ92+Uq9WBPzbsdqaB2OeKlXqXdD1UVexLtiUuAP/
+         3QncYiEXKs1Q1Nog67c5tl6rud/pL6NrrfTIjH9aztHF0irJqjOb7J3hc2LPjOzYd1D8
+         s0nvoLTylAjIXYndrLcH/5S12huPZCyem/WiowVizu2trDXXcBfYI2M1VB8UbPzC2NQP
+         bZyg==
+X-Forwarded-Encrypted: i=1; AJvYcCVfqFODDIjmZEaNH8ILOKn0yIFmBHVYV8WN6nRYS2HofBj0apz+PjPhcMOIy1PDHDCrScoZQvVWnGP9v3gchD+TnE7rTGgd
+X-Gm-Message-State: AOJu0Yxcf6OL2hfg9Otmf9jBiGtD1ao3i5bNO3fkSTjsLlacuk7ZS1RX
+	MM5WIesU/4u120ACS09AHy7ZpQqvVeiCqP+BTd/6wcPCjGnG1g6YoiD2oqSmEJg=
+X-Google-Smtp-Source: AGHT+IFO9lRbYOHiISCvnM4d3MKt1zmKhVLVTKzazxwpWqu6Addn6ZN7I3g/EuFV9A9uQv+hN4msOw==
+X-Received: by 2002:a17:902:c40c:b0:1db:5093:5e23 with SMTP id k12-20020a170902c40c00b001db50935e23mr653121plk.28.1707966320633;
+        Wed, 14 Feb 2024 19:05:20 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id a8-20020a170902ecc800b001d9641003cfsm156387plh.142.2024.02.14.19.05.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Feb 2024 19:05:20 -0800 (PST)
+Date: Wed, 14 Feb 2024 19:05:19 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: David Ahern <dsahern@gmail.com>
+Cc: Andrea Claudi <aclaudi@redhat.com>, netdev@vger.kernel.org,
+ sgallagh@redhat.com
+Subject: Re: [PATCH] iproute2: fix build failure on ppc64le
+Message-ID: <20240214190519.1233eef6@hermes.local>
+In-Reply-To: <d2707550-36c2-45d3-ae76-f83b4c19f88c@gmail.com>
+References: <d13ef7c00b60a50a5e8ddbb7ff138399689d3483.1707474099.git.aclaudi@redhat.com>
+	<20240209083533.1246ddcc@hermes.local>
+	<3730d7e4-058f-421f-8ecf-a9475440ef58@gmail.com>
+	<20240209164542.716b4d7a@hermes.local>
+	<ZczcqOHwlGC1Pmzx@renaissance-vector>
+	<d2707550-36c2-45d3-ae76-f83b4c19f88c@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-'intel_get_pcs_neg_mode' and 'intel_config_serdes' was provided to
-handle interface mode change for ADL-S platform.
+On Wed, 14 Feb 2024 08:49:02 -0700
+David Ahern <dsahern@gmail.com> wrote:
 
-Modphy register lane was provided to configure serdes on interface
-mode changing.
+> On 2/14/24 8:30 AM, Andrea Claudi wrote:
+> > On Fri, Feb 09, 2024 at 04:45:42PM -0800, Stephen Hemminger wrote: =20
+> >> On Fri, 9 Feb 2024 15:14:28 -0700
+> >> David Ahern <dsahern@gmail.com> wrote:
+> >> =20
+> >>> On 2/9/24 9:35 AM, Stephen Hemminger wrote: =20
+> >>>> On Fri,  9 Feb 2024 11:24:47 +0100
+> >>>> Andrea Claudi <aclaudi@redhat.com> wrote:
+> >>>>    =20
+> >>>>> ss.c:3244:34: warning: format =E2=80=98%llu=E2=80=99 expects argume=
+nt of type =E2=80=98long long unsigned int=E2=80=99, but argument 2 has typ=
+e =E2=80=98__u64=E2=80=99 {aka =E2=80=98long unsigned int=E2=80=99} [-Wform=
+at=3D]
+> >>>>>  3244 |                 out(" rcv_nxt:%llu", s->mptcpi_rcv_nxt);
+> >>>>>       |                               ~~~^   ~~~~~~~~~~~~~~~~~
+> >>>>>       |                                  |    |
+> >>>>>       |                                  |    __u64 {aka long unsig=
+ned int}
+> >>>>>       |                                  long long unsigned int
+> >>>>>       |                               %lu
+> >>>>>
+> >>>>> This happens because __u64 is defined as long unsigned on ppc64le. =
+ As
+> >>>>> pointed out by Florian Weimar, we should use -D__SANE_USERSPACE_TYP=
+ES__
+> >>>>> if we really want to use long long unsigned in iproute2.   =20
+> >>>>
+> >>>> Ok, this looks good.
+> >>>> Another way to fix would be to use the macros defined in inttypes.h
+> >>>>
+> >>>> 		out(" rcv_nxt:"PRIu64, s->mptcpi_rcv_nxt);
+> >>>>    =20
+> >>>
+> >>> since the uapi is __u64, I think this is the better approach. =20
+> >>
+> >> NVM
+> >> Tried it, but __u64 is not the same as uint64_t even on x86.
+> >> __u64 is long long unsigned int
+> >> uint64_t is long unsigned int
+> >> =20
+> >=20
+> > Is there anything more I can do about this?
+> >  =20
+>=20
+> where does the uint64_t come in? include/uapi/linux/mptcp.h has
+> mptcpi_rcv_nxt as __u64 and PRIu64 macros should be working without a
+> problem - this is what perf tool uses consistently.
 
-Signed-off-by: Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>
-Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
----
- .../net/ethernet/stmicro/stmmac/dwmac-intel.c | 49 ++++++++++++++++++-
- .../net/ethernet/stmicro/stmmac/dwmac-intel.h |  2 +
- 2 files changed, 50 insertions(+), 1 deletion(-)
+I just did this:
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-index c79d8e3c3b24..f0f3d35bdb69 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-@@ -992,6 +992,53 @@ static int adls_sgmii_phy1_data(struct pci_dev *pdev,
- static struct stmmac_pci_info adls_sgmii1g_phy1_info = {
- 	.setup = adls_sgmii_phy1_data,
- };
-+
-+static int adln_common_data(struct pci_dev *pdev,
-+			    struct plat_stmmacenet_data *plat)
-+{
-+	struct intel_priv_data *intel_priv = plat->bsp_priv;
-+
-+	plat->rx_queues_to_use = 6;
-+	plat->tx_queues_to_use = 4;
-+	plat->clk_ptp_rate = 204800000;
-+
-+	plat->safety_feat_cfg->tsoee = 1;
-+	plat->safety_feat_cfg->mrxpee = 0;
-+	plat->safety_feat_cfg->mestee = 1;
-+	plat->safety_feat_cfg->mrxee = 1;
-+	plat->safety_feat_cfg->mtxee = 1;
-+	plat->safety_feat_cfg->epsi = 0;
-+	plat->safety_feat_cfg->edpp = 0;
-+	plat->safety_feat_cfg->prtyen = 0;
-+	plat->safety_feat_cfg->tmouten = 0;
-+
-+	intel_priv->tsn_lane_registers = adln_tsn_lane_registers;
-+	intel_priv->max_tsn_lane_registers = ARRAY_SIZE(adln_tsn_lane_registers);
-+
-+	return intel_mgbe_common_data(pdev, plat);
-+}
-+
-+static int adln_sgmii_phy0_data(struct pci_dev *pdev,
-+				struct plat_stmmacenet_data *plat)
-+{
-+	struct intel_priv_data *intel_priv = plat->bsp_priv;
-+
-+	plat->bus_id = 1;
-+	plat->phy_interface = PHY_INTERFACE_MODE_SGMII;
-+	plat->max_speed = SPEED_2500;
-+	plat->serdes_powerup = intel_serdes_powerup;
-+	plat->serdes_powerdown = intel_serdes_powerdown;
-+	plat->get_pcs_neg_mode = intel_get_pcs_neg_mode;
-+	plat->config_serdes = intel_config_serdes;
-+	intel_priv->pid_modphy = PID_MODPHY1;
-+
-+	return adln_common_data(pdev, plat);
-+}
-+
-+static struct stmmac_pci_info adln_sgmii1g_phy0_info = {
-+	.setup = adln_sgmii_phy0_data,
-+};
-+
- static const struct stmmac_pci_func_data galileo_stmmac_func_data[] = {
- 	{
- 		.func = 6,
-@@ -1374,7 +1421,7 @@ static const struct pci_device_id intel_eth_pci_id_table[] = {
- 	{ PCI_DEVICE_DATA(INTEL, TGLH_SGMII1G_1, &tgl_sgmii1g_phy1_info) },
- 	{ PCI_DEVICE_DATA(INTEL, ADLS_SGMII1G_0, &adls_sgmii1g_phy0_info) },
- 	{ PCI_DEVICE_DATA(INTEL, ADLS_SGMII1G_1, &adls_sgmii1g_phy1_info) },
--	{ PCI_DEVICE_DATA(INTEL, ADLN_SGMII1G, &tgl_sgmii1g_phy0_info) },
-+	{ PCI_DEVICE_DATA(INTEL, ADLN_SGMII1G, &adln_sgmii1g_phy0_info) },
- 	{ PCI_DEVICE_DATA(INTEL, RPLP_SGMII1G, &tgl_sgmii1g_phy0_info) },
- 	{}
- };
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.h b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.h
-index 093eed977ab0..2c6b50958988 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.h
-@@ -124,8 +124,10 @@ static const struct pmc_serdes_regs pid_modphy1_2p5g_regs[] = {
- 	{}
- };
- 
-+static const int adln_tsn_lane_registers[] = {6};
- static const int ehl_tsn_lane_registers[] = {7, 8, 9, 10, 11};
- #else
-+static const int adln_tsn_lane_registers[] = {};
- static const int ehl_tsn_lane_registers[] = {};
- #endif /* CONFIG_INTEL_PMC_IPC */
- 
--- 
-2.34.1
+diff --git a/misc/ss.c b/misc/ss.c
+index 5296cabe9982..679d50b8fef6 100644
+--- a/misc/ss.c
++++ b/misc/ss.c
+@@ -8,6 +8,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <unistd.h>
++#include <inttypes.h>
+ #include <fcntl.h>
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+@@ -3241,7 +3242,7 @@ static void mptcp_stats_print(struct mptcp_info *s)
+        if (s->mptcpi_snd_una)
+                out(" snd_una:%llu", s->mptcpi_snd_una);
+        if (s->mptcpi_rcv_nxt)
+-               out(" rcv_nxt:%llu", s->mptcpi_rcv_nxt);
++               out(" rcv_nxt:%" PRIu64, s->mptcpi_rcv_nxt);
+        if (s->mptcpi_local_addr_used)
+                out(" local_addr_used:%u", s->mptcpi_local_addr_used);
+        if (s->mptcpi_local_addr_max)
+
+
+And got this:
+    CC       ss.o
+ss.c: In function =E2=80=98mptcp_stats_print=E2=80=99:
+ss.c:3245:21: warning: format =E2=80=98%lu=E2=80=99 expects argument of typ=
+e =E2=80=98long unsigned int=E2=80=99, but argument 2 has type =E2=80=98__u=
+64=E2=80=99 {aka =E2=80=98long long unsigned int=E2=80=99} [-Wformat=3D]
+ 3245 |                 out(" rcv_nxt:%" PRIu64, s->mptcpi_rcv_nxt);
+      |                     ^~~~~~~~~~~~         ~~~~~~~~~~~~~~~~~
+      |                                           |
+      |                                           __u64 {aka long long unsi=
+gned int}
+In file included from ss.c:11:
+/usr/include/inttypes.h:105:41: note: format string is defined here
+  105 | # define PRIu64         __PRI64_PREFIX "u"
 
 
