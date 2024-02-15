@@ -1,184 +1,148 @@
-Return-Path: <netdev+bounces-71969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71970-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0774855C0C
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 09:10:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17CF9855C33
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 09:19:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 076C91C2872B
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 08:10:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A34AA1F22BF9
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 08:19:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E363911713;
-	Thu, 15 Feb 2024 08:10:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QZ8UdmkO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 794D912B7C;
+	Thu, 15 Feb 2024 08:18:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 110DE12B87;
-	Thu, 15 Feb 2024 08:10:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5178512B90
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 08:18:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707984637; cv=none; b=UxOsBvmx6TVgEQfPembeQebETMz4D3gBvxv0H3MnSOvjabEk+vC1hEia/b8oLNwIZVGC0RvIGRFCb+PtKz+NuKb7sO+10kXnhYaSo2nKs/PP/kIDvjqAeXiU6mfEAlXmAzqS3c9Ei54fRf9XHa2/qQuxDXyskm0RoJAtSpAHWgg=
+	t=1707985105; cv=none; b=HHzeE0IMUusBiJQM0qvGR7UiT1cmstHj5TltOnKXfYIo00RyyQFRteUF/2ZgUSe+rxIo517di78ROMncpK1Sz6KswUbRjUiwPYdgVQIzKBgIepSqu7Axpfdl4v1DETAsLufMFJgDdqa5hXprcShL+uP3FabKFFFa82dOyHvCXW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707984637; c=relaxed/simple;
-	bh=xFilebdpUOTKDaW3difRJkzOKNTenYbbMTwQ+jLo0Tg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=pVA1bFTVUCsjQUtKQCDWJc/UQPN2X1wM15+HwrAmHMnayNpXylNio8iq5iLzphdelOPVeiMWGpb81Bd3bOYU0iufo6TmemJzjFp/cnxmbJ6X2d9Pp0HRuIRTUEuuKLoHSdCfBbLohsMkvcGtosw1fyg5KunVhqOGQFucX9W402E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QZ8UdmkO; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-33b28aadb28so253101f8f.3;
-        Thu, 15 Feb 2024 00:10:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707984634; x=1708589434; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=EZhexOGrvx6hSKAHRm6JY4eNhDRld529voKN7twHhNE=;
-        b=QZ8UdmkOmhs2VOEATIFTNn28Gb5MwqiyAA2khKZJzWCjnMdm+9fsrU7KKk/5+J8KR6
-         hsLisqcdK8Dhq6qHOpRlFqzD6H77hGg6b8fPACxp0wnmEe1JnXcfgOJ4y2yZ+1Ldi6lK
-         aN+VkY7MncBle4D/YUiI0nKgjrYfy3WPDtg+LvSTEKRKLAZG2jKmUoG1HWrOYAb8eoSZ
-         G/RNxFuoD1CLdBTk4iLlSldqgBv9TO+170HmUEB/DsnvWlr1QFb6FONCgOAfVW/TKf4n
-         kEbNlE+kzze12sBJcFJhLSZfFoul2l00PAx6Gi9/6Yq0kqOngXt7kIT4ORWDEqRyZtb/
-         y7rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707984634; x=1708589434;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EZhexOGrvx6hSKAHRm6JY4eNhDRld529voKN7twHhNE=;
-        b=e9VjzZChbQpsL6Ci75Gy5QOnPzpJ8yVrOkjNyHwT6hwd4mmIajdbrNpY0QsMwmoKxR
-         FWhe9hZ5ksFpEZw+KxfSbSPY4MkaU3R6zTA1vpruTtw7nXtXEUiWdc6L+4kmGWEbClAv
-         hYY49emOSITzKS+9BX+xWaz9lWAaymKi7V60D6jua37v7B2C5pEOiyxsMRFsCH2P+Q2e
-         l630RQk3uZtYPqcm3pudgG9dBsWwm+Z1KIhc7R5Nkqt4lwHnZ2mA5fid44qw3J8Vd8kq
-         7hzRfPSTjLLBXl01lMng7Rmmitogbf1VK28rlvk54Ud2ahyC7drx4rd5LJXDO15RRqoU
-         A2Cw==
-X-Forwarded-Encrypted: i=1; AJvYcCVUF2L7d3ZoCvgjT4mKU1QyDeuDX6UcAIKRwqEi5wEc06rysPk0bZvPlxUqaVksJY9aGgmnJQXxwxgO7aNG2JToeD6kt1EvvvuMdgjtjWNTmKmQM8ZyAWXkG5x3HzqG/XXugKWI
-X-Gm-Message-State: AOJu0YxN19IVHvOMV6ad5oMalJJ0IGumldmwhuhHaKSgc3ukSlLZalUV
-	hcUdCkRN83EA/LM53/G4KCa6pQBkFTeKpd0T6xZAbzXV6d6iCNwu
-X-Google-Smtp-Source: AGHT+IEWdkjwJ3jIpNxoL6I2N2x8CaR/i9ycebzVY7CCKE7d+csrAx6paQFfciUbLER2vE0F2Hba7w==
-X-Received: by 2002:adf:fdc8:0:b0:33c:e34f:c2c0 with SMTP id i8-20020adffdc8000000b0033ce34fc2c0mr653491wrs.34.1707984633844;
-        Thu, 15 Feb 2024 00:10:33 -0800 (PST)
-Received: from ?IPv6:2001:a61:3456:4e01:6ae:b55a:bd1d:57fc? ([2001:a61:3456:4e01:6ae:b55a:bd1d:57fc])
-        by smtp.gmail.com with ESMTPSA id bw15-20020a0560001f8f00b0033b75d0993esm976949wrb.74.2024.02.15.00.10.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Feb 2024 00:10:33 -0800 (PST)
-Message-ID: <be512dfd907d3d0a30aac8d055605d519d7c7613.camel@gmail.com>
-Subject: Re: [PATCH] net: ethernet: adi: requires PHYLIB support
-From: Nuno =?ISO-8859-1?Q?S=E1?= <noname.nuno@gmail.com>
-To: Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org
-Cc: kernel test robot <lkp@intel.com>, Lennart Franzen
- <lennart@lfdomain.com>,  Alexandru Tachici <alexandru.tachici@analog.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org
-Date: Thu, 15 Feb 2024 09:10:33 +0100
-In-Reply-To: <20240215070050.2389-1-rdunlap@infradead.org>
-References: <20240215070050.2389-1-rdunlap@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+	s=arc-20240116; t=1707985105; c=relaxed/simple;
+	bh=T2XuyeJ06MJPPCxU0//IIk7MVsi0C5XUfXUB6lx/2NI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O1imxYJvMyGqQS2BPGFI8zh/AWx2RwvI/wzWZ1YDePH+xkfeT61v4Op2eGlAOmMDwrPKqLoI/mxSdbYP09tKjhDjuraGJFfTXZnyMEFKbtvZ1e/dStJr9YnCL/wd9/3v6uApzSB+VTJ6z7Lxq1wqxbYmBkRCA9fbP3RkIK2ij/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1raWwN-0002wJ-5C; Thu, 15 Feb 2024 09:17:55 +0100
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1raWwG-000qaq-AJ; Thu, 15 Feb 2024 09:17:48 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1raWwG-009xxI-0d;
+	Thu, 15 Feb 2024 09:17:48 +0100
+Date: Thu, 15 Feb 2024 09:17:48 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Rob Herring <robh@kernel.org>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Mark Brown <broonie@kernel.org>,
+	Frank Rowand <frowand.list@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v3 14/17] dt-bindings: net: pse-pd: Add bindings
+ for PD692x0 PSE controller
+Message-ID: <Zc3IrO_MXIdLXnEL@pengutronix.de>
+References: <20240208-feature_poe-v3-0-531d2674469e@bootlin.com>
+ <20240208-feature_poe-v3-14-531d2674469e@bootlin.com>
+ <20240209145727.GA3702230-robh@kernel.org>
+ <ZciUQqjM4Z8Tc6Db@pengutronix.de>
+ <618be4b1-c52c-4b8f-8818-1e4150867cad@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <618be4b1-c52c-4b8f-8818-1e4150867cad@lunn.ch>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Wed, 2024-02-14 at 23:00 -0800, Randy Dunlap wrote:
-> This driver uses functions that are supplied by the Kconfig symbol
-> PHYLIB, so select it to ensure that they are built as needed.
->=20
-> When CONFIG_ADIN1110=3Dy and CONFIG_PHYLIB=3Dm, there are multiple build
-> (linker) errors that are resolved by this Kconfig change:
->=20
-> =C2=A0=C2=A0 ld: drivers/net/ethernet/adi/adin1110.o: in function `adin11=
-10_net_open':
-> =C2=A0=C2=A0 drivers/net/ethernet/adi/adin1110.c:933: undefined reference=
- to `phy_start'
-> =C2=A0=C2=A0 ld: drivers/net/ethernet/adi/adin1110.o: in function `adin11=
-10_probe_netdevs':
-> =C2=A0=C2=A0 drivers/net/ethernet/adi/adin1110.c:1603: undefined referenc=
-e to
-> `get_phy_device'
-> =C2=A0=C2=A0 ld: drivers/net/ethernet/adi/adin1110.c:1609: undefined refe=
-rence to
-> `phy_connect'
-> =C2=A0=C2=A0 ld: drivers/net/ethernet/adi/adin1110.o: in function `adin11=
-10_disconnect_phy':
-> =C2=A0=C2=A0 drivers/net/ethernet/adi/adin1110.c:1226: undefined referenc=
-e to
-> `phy_disconnect'
-> =C2=A0=C2=A0 ld: drivers/net/ethernet/adi/adin1110.o: in function `devm_m=
-diobus_alloc':
-> =C2=A0=C2=A0 include/linux/phy.h:455: undefined reference to `devm_mdiobu=
-s_alloc_size'
-> =C2=A0=C2=A0 ld: drivers/net/ethernet/adi/adin1110.o: in function
-> `adin1110_register_mdiobus':
-> =C2=A0=C2=A0 drivers/net/ethernet/adi/adin1110.c:529: undefined reference=
- to
-> `__devm_mdiobus_register'
-> =C2=A0=C2=A0 ld: drivers/net/ethernet/adi/adin1110.o: in function `adin11=
-10_net_stop':
-> =C2=A0=C2=A0 drivers/net/ethernet/adi/adin1110.c:958: undefined reference=
- to `phy_stop'
-> =C2=A0=C2=A0 ld: drivers/net/ethernet/adi/adin1110.o: in function `adin11=
-10_disconnect_phy':
-> =C2=A0=C2=A0 drivers/net/ethernet/adi/adin1110.c:1226: undefined referenc=
-e to
-> `phy_disconnect'
-> =C2=A0=C2=A0 ld: drivers/net/ethernet/adi/adin1110.o: in function `adin11=
-10_adjust_link':
-> =C2=A0=C2=A0 drivers/net/ethernet/adi/adin1110.c:1077: undefined referenc=
-e to
-> `phy_print_status'
-> =C2=A0=C2=A0 ld: drivers/net/ethernet/adi/adin1110.o: in function `adin11=
-10_ioctl':
-> =C2=A0=C2=A0 drivers/net/ethernet/adi/adin1110.c:790: undefined reference=
- to `phy_do_ioctl'
-> =C2=A0=C2=A0 ld: drivers/net/ethernet/adi/adin1110.o:(.rodata+0xf60): und=
-efined reference to
-> `phy_ethtool_get_link_ksettings'
-> =C2=A0=C2=A0 ld: drivers/net/ethernet/adi/adin1110.o:(.rodata+0xf68): und=
-efined reference to
-> `phy_ethtool_set_link_ksettings'
->=20
-> Fixes: bc93e19d088b ("net: ethernet: adi: Add ADIN1110 support")
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202402070626.eZsfVHG5-lkp@i=
-ntel.com/
-> Cc: Lennart Franzen <lennart@lfdomain.com>
-> Cc: Alexandru Tachici <alexandru.tachici@analog.com>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: netdev@vger.kernel.org
-> ---
+On Wed, Feb 14, 2024 at 06:41:54PM +0100, Andrew Lunn wrote:
+> > Alternative A and B Overview
+> > ----------------------------
+> > 
+> > - **Alternative A:** Utilizes the data-carrying pairs for power transmission in
+> >   10/100BaseT networks. The power delivery's polarity in this alternative can
+> >   vary based on the MDI (Medium Dependent Interface) or MDI-X (Medium Dependent
+> >   Interface Crossover) configuration.
+> > 
+> > - **Alternative B:** Delivers power over the spare pairs not used for data in
+> >   10/100BaseT networks. Unlike Alternative A, Alternative B's method separates
+> >   power from data lines within the cable. Though it is less influenced by data
+> >   transmission direction, Alternative B includes two configurations with
+> >   different polarities, known as variant X and variant S, to accommodate
+> >   different network requirements and device specifications.
+> 
+> Thanks for this documentation.
+> 
+> It might be worth pointing out that RJ-45 supports up to 4
+> pairs. However, 10/100BaseT only makes use of two pairs for data
+> transfer from the four. 1000BaseT and above make use of all four pairs
+> for data transfer. If you don't know this, it is not so obvious what
+> 'data-carrying pairs' and 'spare pairs' mean.
 
-Reviewed-by: Nuno Sa <nuno.sa@analog.com>
+@Kory, can you please update it.
 
+> And what happens for 1000BaseT when all four pairs are in use?
 
-> =C2=A0drivers/net/ethernet/adi/Kconfig |=C2=A0=C2=A0=C2=A0 1 +
-> =C2=A01 file changed, 1 insertion(+)
->=20
-> diff -- a/drivers/net/ethernet/adi/Kconfig b/drivers/net/ethernet/adi/Kco=
-nfig
-> --- a/drivers/net/ethernet/adi/Kconfig
-> +++ b/drivers/net/ethernet/adi/Kconfig
-> @@ -7,6 +7,7 @@ config NET_VENDOR_ADI
-> =C2=A0	bool "Analog Devices devices"
-> =C2=A0	default y
-> =C2=A0	depends on SPI
-> +	select PHYLIB
-> =C2=A0	help
-> =C2=A0	=C2=A0 If you have a network (Ethernet) card belonging to this cla=
-ss, say Y.
-> =C2=A0
+Hm.. good question. I didn't found the answer in the spec. By combining all
+puzzle parts I assume, different Alternative configurations are designed
+to handle conflict between "PSE Physical Layer classification" and PHY
+autoneg.
 
+Here is how multi-pulse Physical Layer classification is done:
+https://img.electronicdesign.com/files/base/ebm/electronicdesign/image/2020/07/Figure_5.5f2094553a61c.png
+
+this is the source:
+https://www.electronicdesign.com/technologies/power/whitepaper/21137799/silicon-labs-90-w-power-over-ethernet-explained
+
+To avoid classification conflict with autoneg. Assuming, PHY on PD side
+will be not powered until classification is completed. The only source
+of pulses is the PHY on PSE side (if it is not under control of software
+on PSE side or Midspan PSE is used), so aneg pulses should be send on
+negative PoE pair? This all is just speculation, I would need to ask
+some expert or do testing.
+
+If this assumption is correct, PHY framework will need to know exact
+layout of MDI-X setting and/or silent PHY until PSE classification is done.
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
