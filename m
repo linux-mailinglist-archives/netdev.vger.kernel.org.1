@@ -1,157 +1,172 @@
-Return-Path: <netdev+bounces-71992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 325168560F1
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 12:09:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B8918560F7
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 12:10:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3A3B285746
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 11:09:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AEA6C1F21292
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 11:10:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 142C712BF39;
-	Thu, 15 Feb 2024 11:07:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C470212AAC3;
+	Thu, 15 Feb 2024 11:09:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (4096-bit key) header.d=ycharbi.fr header.i=@ycharbi.fr header.b="Gey/D1rY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i0A7bOSG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ycharbi.fr (mail.ycharbi.fr [45.83.229.9])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2024A12A142
-	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 11:07:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.83.229.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8775127B6D
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 11:08:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707995265; cv=none; b=EF6+U5zogW6vUslGclNiuZnyBfCMyzfEnuoTu7yQmQ9oTdOi6dyYLNOK2vPxI4Xc3kZN3EkWnaVCH/J8jQZbANgbBLZFOo/cBvxYigShj1Wf5fGXPqRvgkk+NLGVvlsHNHDrMCm9cwfqruiecA9jher6kG0pinhh4VCLjyQoDXk=
+	t=1707995341; cv=none; b=LPbA1EFFcISc3dv7FkUrZ63NWzbq2C0HuIHJt5mkBu7Lh01GgzqHEI0uyey4Qkr8Oqv64ihFuXaozhUKkLSorj5JPZxfYQyj66J+7pZmy8jKc5fJCfD17Nv6ZIEmwez7ep9sjRpuO+bC/WYBdoPJoGXWlPii7wJLmOCX8qsFzMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707995265; c=relaxed/simple;
-	bh=IT6a5Nw4dZlYOm4J/MrtHC1WGfvjoiWJ6lT8CMBCrxg=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc; b=TbNjqURcZOSj0uxNNd3vdzXSMG7qHOD8bZdU9HbnB70QYMcwhwxstkW/c9kRRQ1ie1MGbtBY0iUK/zSQGuubSdhY7A6tKuCBQLN8YmyPoLQuOwyCGlUOv/ssXtp07Rebla0lYN4EekS4AGtVtJgGvRuPVZKmAt05hc3MzbQ5sOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ycharbi.fr; spf=pass smtp.mailfrom=ycharbi.fr; dkim=pass (4096-bit key) header.d=ycharbi.fr header.i=@ycharbi.fr header.b=Gey/D1rY; arc=none smtp.client-ip=45.83.229.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ycharbi.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ycharbi.fr
+	s=arc-20240116; t=1707995341; c=relaxed/simple;
+	bh=C8zDuNCtvAvOU/gsvl4Q6K/P9HsY4GAZgSvWntVfAxM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VmmNeTQt+xJwxV6C/G4f1Crol9ZnhXVZQZK87mhV3ycq2bCmbym9OLpHVroF0f7UFyXfeW7eD6bvr1qY7VdfJ2mmfsUV9AxSFvSW4GGusmRTlWQhrORVKdUa8dDYI+C16re6JUuRsrHjJaNkqr6vPNlj8jDHjQ1k5wsk1UG2ScY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i0A7bOSG; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-55ee686b5d5so955970a12.0
+        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 03:08:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707995338; x=1708600138; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0WYqu1uGvpOq+dRkjJudJW22GWPChtm8s4VU+hAgVC8=;
+        b=i0A7bOSGzC6hqFIdA0FW/XUEDXci0czeO1se7N/r/GhRRDE51qgoANgin8/l3ZP1rO
+         X7OQRCmAOLk6HLzlre7qoQA853I2iEokN3J+QUs6hVUKsfs/4o1tirgm9NSb3YuEDyoU
+         RSILMufmaJNmFSquGEG2gbWARg+9VnWTttEONYGwRXzp3DJutXCa4nPzIgTDLEcPzAvx
+         WmSdjyiR+EM5yTaK73nCYHcdaAhu8mRCpMzocEGkPqrW8LJYIxVB/sGCog10d7ZZdIKb
+         Niiho5bo13XfvLnqtntIuDsGRzH/lT22Z5pS/WzOFoyZAxT2WamRMfwOB1fWP0YfZDd6
+         eaVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707995338; x=1708600138;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0WYqu1uGvpOq+dRkjJudJW22GWPChtm8s4VU+hAgVC8=;
+        b=tnEGZ4kMUIkVadmByW0oYYwaqNtYgliNFtN5Ef7QavL2GXELkE1jl8ZqYOguIul1cC
+         t2A6600e8ca9IiMMdZHJY5cddrbZI3W1IVY3hqqmArs+bi1N2RY0l6qkuBfNEEr/Q3ZP
+         BToVv4Gzmd8aFtIGSxw9sZW2iUo4x+uu+3bxVfjPoPczvB7Bq/qdMcAXqu76MsdGmV7e
+         Vdf8vWD+5AkB9mTv9ORlOhOjvtsMAqZHVFWyfaKZKfbGTdqVTesekJfKYO9D1yEnwi9i
+         XkNuowpchEpKF6zka16tdx5nxK8WhgASdZe/NKCO7nUES6q81YGcwRgVIna0hUvlfFZi
+         zTrQ==
+X-Gm-Message-State: AOJu0YzR3VDFI0t8zos4Ujz9ta7Y9n+VzY56zeycTWihrlMVXiE38wmd
+	mVltqxm0NF6JjNO67vqd/x2h8RVytLRQ82ubgLb9g5BZw79sLkC1ueL8HGNcDv5UaX1Z1oyuViw
+	bwK2NeenY+NXYrKFdbzriWaw+EU8=
+X-Google-Smtp-Source: AGHT+IGVoyvGqjsIsW6jB8UzETJkce/xaAFHhNBg4FbEZTbKEEBIYi2oYp1uyvS1c3GpZF3j+vP0iVYjTLtVoLTLTAk=
+X-Received: by 2002:aa7:d047:0:b0:55f:ec52:73c4 with SMTP id
+ n7-20020aa7d047000000b0055fec5273c4mr1176947edo.34.1707995337623; Thu, 15 Feb
+ 2024 03:08:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ycharbi.fr; s=mail;
-	t=1707994938; bh=IT6a5Nw4dZlYOm4J/MrtHC1WGfvjoiWJ6lT8CMBCrxg=;
-	h=Date:List-Unsubscribe:From:Subject:To:Cc:From;
-	b=Gey/D1rY1Hh6LQ8897aj1ktICIoWwsHtOVA1Dz4ABSCaqriRfzCPyfCC36nDOKxzx
-	 7WDcI7QIoQZQHF8pWTWu4i+sQtg2J7u5JyMgFRIg4yf3oJ7EFeGAlV1btEWdfnOCmk
-	 FkldulEYtnKqVKDO5/ahsGkhUftH0Fri5FFiBp2u+PQZLs7NMXr8sOSjS+16q2InpM
-	 1B4DU6JHi+WXQGnQqcje6fGZnBoVzrDo8Tu1hXqNFVr2WnyenJJskK3etGXvkDjSoP
-	 UWnXwsCE5f63JNvIMrdt8kodP8s98azNKIz9t/1hMVj4OLOUcwW0x14wtuDMfVnuCY
-	 hgfNVT8UiarSj/XniYofUtMAe/8UqYNRULX6wjzin9MHdl1mwXLtHqoCy/uijoXBxy
-	 CYoo8ORCyLuof44QM4725YIFKCfu9vG5oJ/69ogGFk+F/TnXRpUbTFY4dYmWjw4iY+
-	 LJf5JaTXYo1p0kxJ1/DJyGeZFLO16A+DeT4pUh+ircDF2eIOSzsfo1HIhgMtUvEGuk
-	 bv6ICX2XyptQAJtjFnjF8piGk6d55sI1o/TudOxWge1L27FEz0wxaqT74TvOwlzzBQ
-	 ck2qRo3k1z0SGSbC+4dJBRLG3tiAZ3QwgNUzCSaI4WomcJqyqxEhc0ffdVU0YLnYBz
-	 jaUqQSjaPoDOYK7wxeTulh/Q=
-Date: Thu, 15 Feb 2024 11:02:18 +0000
-Content-Type: text/plain; charset="utf-8"
+References: <20240215012027.11467-1-kerneljasonxing@gmail.com> <20240215012027.11467-5-kerneljasonxing@gmail.com>
+In-Reply-To: <20240215012027.11467-5-kerneljasonxing@gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 15 Feb 2024 19:08:20 +0800
+Message-ID: <CAL+tcoAgSjwsmFnDh_Gs9ZgMi-y5awtVx+4VhJPNRADjo7LLSA@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 04/11] tcp: directly drop skb in cookie check
+ for ipv6
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, kuniyu@amazon.com
+Cc: netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-From: kernel.org-fo5k2w@ycharbi.fr
-Message-ID: <8267673cce94022974bcf35b2bf0f6545105d03e@ycharbi.fr>
-TLS-Required: No
-Subject: Non-functional ixgbe driver between Intel X553 chipset and Cisco
- switch via kernel >=6.1 under Debian
-To: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-X-Spam-Report: 
-	* -1.0 ALL_TRUSTED Passed through trusted hosts only via SMTP
-	*  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-	*       valid
-	* -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-	*      envelope-from domain
-	* -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-	* -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-	*      author's domain
 
-Hello,
+On Thu, Feb 15, 2024 at 9:20=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
+>
+> From: Jason Xing <kernelxing@tencent.com>
+>
+> Like previous patch does, only moving skb drop logical code to
+> cookie_v6_check() for later refinement.
+>
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> --
+> v5
+> Link: https://lore.kernel.org/netdev/CANn89iKz7=3D1q7e8KY57Dn3ED7O=3DRCOf=
+LxoHQKO4eNXnZa1OPWg@mail.gmail.com/
+> 1. avoid duplication of these opt_skb tests/actions (Eric)
+> ---
+>  net/ipv6/syncookies.c |  4 ++++
+>  net/ipv6/tcp_ipv6.c   | 11 ++++-------
+>  2 files changed, 8 insertions(+), 7 deletions(-)
+>
+> diff --git a/net/ipv6/syncookies.c b/net/ipv6/syncookies.c
+> index 6b9c69278819..ea0d9954a29f 100644
+> --- a/net/ipv6/syncookies.c
+> +++ b/net/ipv6/syncookies.c
+> @@ -177,6 +177,7 @@ struct sock *cookie_v6_check(struct sock *sk, struct =
+sk_buff *skb)
+>         struct sock *ret =3D sk;
+>         __u8 rcv_wscale;
+>         int full_space;
+> +       SKB_DR(reason);
+>
+>         if (!READ_ONCE(net->ipv4.sysctl_tcp_syncookies) ||
+>             !th->ack || th->rst)
+> @@ -256,10 +257,13 @@ struct sock *cookie_v6_check(struct sock *sk, struc=
+t sk_buff *skb)
+>         ireq->ecn_ok &=3D cookie_ecn_ok(net, dst);
+>
+>         ret =3D tcp_get_cookie_sock(sk, skb, req, dst);
+> +       if (!ret)
+> +               goto out_drop;
+>  out:
+>         return ret;
+>  out_free:
+>         reqsk_free(req);
+>  out_drop:
+> +       kfree_skb_reason(skb, reason);
+>         return NULL;
+>  }
+> diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+> index 57b25b1fc9d9..1ca4f11c3d6f 100644
+> --- a/net/ipv6/tcp_ipv6.c
+> +++ b/net/ipv6/tcp_ipv6.c
+> @@ -1653,16 +1653,13 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff=
+ *skb)
+>         if (sk->sk_state =3D=3D TCP_LISTEN) {
+>                 struct sock *nsk =3D tcp_v6_cookie_check(sk, skb);
+>
+> -               if (!nsk)
+> -                       goto discard;
+> -
+> -               if (nsk !=3D sk) {
+> +               if (nsk && nsk !=3D sk) {
+>                         if (tcp_child_process(sk, nsk, skb))
+>                                 goto reset;
+> -                       if (opt_skb)
+> -                               __kfree_skb(opt_skb);
+> -                       return 0;
+>                 }
+> +               if (opt_skb)
+> +                       __kfree_skb(opt_skb);
+> +               return 0;
 
-(Please note that I don't speak English, sorry if the traction is not fai=
-thful to your language)
+Oops, the above lines went wrong, which could cause the error that
+Paolo reported in my patch[0/11] email.
 
-Following Bjorn Helgaas's advice (https://bugzilla.kernel.org/show_bug.cg=
-i?id=3D218050#c14), I'm coming to you in the hope of finding a solution t=
-o a problem encountered by several users of the ixgbe driver. The subject=
- has been discussed in the messages and comments on the following pages:
-https://marc.info/?l=3Dlinux-netdev&m=3D170118007007901&w=3D2
-https://forum.proxmox.com/threads/intel-x553-sfp-ixgbe-no-go-on-pve8.1351=
-29/
-https://www.servethehome.com/the-everything-fanless-home-server-firewall-=
-router-and-nas-appliance-qotom-qnap-teamgroup/
-https://www.servethehome.com/intel-x553-networking-and-proxmox-ve-8-1-3/?=
-unapproved=3D518173&moderation-hash=3De57a05288058d3ff253ceb42e9ada905
-https://forum.proxmox.com/threads/proxmox-8-kernel-6-2-16-4-pve-ixgbe-dri=
-ver-fails-to-load-due-to-pci-device-probing-failure.131203/
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218491
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218050
+The error could happen when if:
+    nsk !=3D NULL && nsk =3D=3D sk
+it will return 0, which is against old behaviour :(
 
-Having myself decided to purchase a Qotom Q20332G9-S10 machine with X553 =
-chipset for testing purposes, I can see the effectiveness of the connecti=
-on problem between the PC's X553 SFP+ and a Cisco switch SFP+. For my par=
-t, this happens under GNU/Linux Debian 12 - kernel 6.1.76 and Sid - kerne=
-l 6.6.13. So it's not specific to Proxmox.
-I should point out that under GNU/Linux Debian 11 - kernel 5.10, the netw=
-ork card (X553 via ixgbe) works without problems. So this is a relatively=
- "recent" bug.
+I will fix this...
 
-Here's my test environment:
-- 1 Qotom Q20332G9-S10 (I used a 16GB Intel Optane M10 M.2 SSD with a fre=
-sh GNU/Linux Debian 12)
-- 1 Cisco DAC cable (tested with a 1M and a 3M)
-- 1 PC with Mellanox Connectx-3 2x SFP+ network card (running GNU/Linux D=
-ebian SID installed several years ago)
-- 1 Cisco 3560CX-12PD-S switch (2 SFP+ ports) with IOS 15.2(7)E2
-
-Connecting the Qotom Q20332G9-S10 (X553) to the Mellanox Connectx-3 works=
- without a hitch and without any special handling (the linux-image-6.1.0-=
-17-amd64 ixgbe driver works in this configuration). Full 10gbps speeds be=
-tween the two with an "iperf".
-
-At this stage, I've ruled out a hardware incompatibility (OSI level 1) si=
-nce the DAC works with the X553. So there's no need to use compatibility =
-tricks as suggested in the link comments with the "allow_unsupported_sfp=
-=3D1" parameter. This will be useless in the following tests (I've checke=
-d).
-
-Where it gets tricky is when you connect it (the Qotom) to the Cisco swit=
-ch.
-Before an "ip link eno1 up", the Cisco raises the link on its side, but t=
-he Debian doesn't (link DOWN). After the "ip link eno1 up", the link drop=
-s and never comes back. There does seem to be a driver problem in recent =
-kernels (GNU/Linux Debian Stable and Sid).
-
-After compiling the driver manually (https://downloadmirror.intel.com/812=
-532/ixgbe-5.19.9.tar.gz) following the documentation already shared by ot=
-hers (https://www.xmodulo.com/download-install-ixgbe-driver-ubuntu-debian=
-.html), it works with the Cisco (after a "shut/no shut" of the latter's 1=
-0gbe port).
-
-So we end up with a working machine (I even configured and used the SR-IO=
-V successfully right afterwards).
-
-PS: I also tested with Debian Sid
-
-I've finally tried the commands you were giving Skyler without any result=
- (rmmod ixgbe; modprobe ixgbe; ethtool -S eno1 | grep fault).
-
-For the moment, the Qotom machine is dedicated to testing, so I'm availab=
-le to carry out any manipulations you may wish to make to advance the sub=
-ject.
-Can we work on diagnosing this problem so that the next stable release of=
- Debian is fully functional with this Intel network card?
-
-Best regards.
-
-=E2=A2=80=E2=A3=B4=E2=A0=BE=E2=A0=BB=E2=A2=B6=E2=A3=A6=E2=A0=80
-=E2=A3=BE=E2=A0=81=E2=A2=A0=E2=A0=92=E2=A0=80=E2=A3=BF=E2=A1=81 Yohan Cha=
-rbi
-=E2=A2=BF=E2=A1=84=E2=A0=98=E2=A0=B7=E2=A0=9A=E2=A0=8B=E2=A0=80 Cordialem=
-ent
-=E2=A0=88=E2=A0=B3=E2=A3=84=E2=A0=80
+>         } else
+>                 sock_rps_save_rxhash(sk, skb);
+>
+> --
+> 2.37.3
+>
 
