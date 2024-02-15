@@ -1,176 +1,159 @@
-Return-Path: <netdev+bounces-72216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A35F28571B1
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 00:39:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEBC585717E
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 00:22:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 444FC1F235E7
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 23:39:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66B91281599
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 23:21:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABFEB145354;
-	Thu, 15 Feb 2024 23:39:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB50F145322;
+	Thu, 15 Feb 2024 23:21:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="qTDaBESc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YsI4PMKX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C17F145341;
-	Thu, 15 Feb 2024 23:39:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2831F13DBA4;
+	Thu, 15 Feb 2024 23:21:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708040363; cv=none; b=a/+z2sZGXXw8wBQt69C0qi+Lk4Nvos6+Ww/ERK7QFRQERmZ/CCZl4ITp2umuK06n0sOsjLcjuF8wo6Vb/w/B8uAwNFOdnDDv/fzptRVXy+ThanllgCJTUvvAcW+W0izETdOpKoDMArSpJyts7Q833cNObwHgNs1sASfkPH6GyM8=
+	t=1708039315; cv=none; b=iyWvNl0mpi2gc4KKnubhDLV9nvO3qBo/H37k8uaU6zO1qcqE02CZI63G+C9zR/tOtZ1LHkJZT/C9YyhGAdt4PDkOWFEG92m9OsWK1v8eC1p57IrLoPVgmOmHXFq5jIq81XkQLjrP7dG9nz0zy1XGLs7+ilDLvCp/AVFbqR/QYqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708040363; c=relaxed/simple;
-	bh=URV7oyByK6o8bPCLQ/8vg7XBUGK01WMkHJBuUllx3Mc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DIgXUVD1RK1rA27Rgjmj65qL/3nYqBXSGH4EetU5HFelJAHM5Y8x/RI4poCRfpph/rBjAeWvS5djW5ZBo+4NFPSXfz3jcWQJB9c1b9oVNNgUpZIXcgBsvnJHStnVGtspqEEL1bcMwc5LyAAuKjftTQXlFfsMB8T1Hf1QNBp7s5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=qTDaBESc; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id C1BB7600D4;
-	Thu, 15 Feb 2024 23:39:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1708040357;
-	bh=URV7oyByK6o8bPCLQ/8vg7XBUGK01WMkHJBuUllx3Mc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=qTDaBESccAS5RH9OS82EZE64QBejkFE6umPmgOE6uNK7mpNJamJ8htJWSR1JnXvFk
-	 FuPgAaSuwj5z3N6wvxl7WR3cNQvP5I/ZLD2APaVO88UEvoPB3J9BTHmq0zjBqLxt2J
-	 rKC16H1BdXpJHwWM4Fyt0oC1g8D9qXuuzV1ADBV1WE37qc9RtLKzk5r9rHDgDWu/uA
-	 7ZzENL3gH0Z6KQ1y7l2MJpYtCTB5D7MBhv1P0DwKSz90SX6DdCWXuhBeDiC0jxx2Al
-	 ujV7meHn+TwgMjV7HzyIkjDNiobtIsmQFPBMdD4fsYcVAaQIKu+tJUeL40TZeBEecE
-	 h7rUTW5WC3mqA==
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	by x201s (Postfix) with ESMTP id 6370C200400;
-	Thu, 15 Feb 2024 23:19:27 +0000 (UTC)
-Message-ID: <99307ddb-2c4e-4ed3-a5e0-d67bb75e2187@fiberby.net>
-Date: Thu, 15 Feb 2024 23:19:27 +0000
+	s=arc-20240116; t=1708039315; c=relaxed/simple;
+	bh=PxZ0C5029R4CmL53vNyyyaYcbdLIwRGPgflhW6LzmCw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Trw4slXnMogdazZlkIXHQ5W1W2HANo+sRHaCncxSt+Np6x4g3xpwXJt3bt9sbbTKu29vKbkN6viQMhK3Y6ELNohDXHem1OM5g1CH7VdAxTthDwFpxi1kNgOPEmYa6k8ly3xxGe+J59RFSbn5+7gD9Pg2A8bfraeOP+FWQZosjJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YsI4PMKX; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-411d76c9ce3so11898565e9.3;
+        Thu, 15 Feb 2024 15:21:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708039312; x=1708644112; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6D72u9OCvXFc6xIZabN3BHkMoZhGyXgCQr1DeQ1S8gQ=;
+        b=YsI4PMKXbnwLvPqr03H140KZU9clMCADu5IwnJYSTDzSA29mJ00XrH7KyuLm97wa3/
+         0fjat+vU1MsSUVsK5pW9UhDQ9ZYzmyeKQggyK6Cz/sTJuve1VGKrJwL6kdBsI77SQ0B7
+         5DKGHx3/RalefnZRk03HDFiWSRFndpBpbF/Nj7C24oNmJPR+qCSa/z5YSQXrvkIB7HHe
+         mVKPNz0uauWxXlNVSt9TP9U8W4qMs+BtPcXbqh0B/cAYPw/VuIQDfTYfEiwwaUhtyZof
+         lUw6/5u7JUIeIRBGcQCbXtfESIuGIoSAywKROjMkt/3J1BdmstWei6qShM8LKOF+WVUW
+         T5sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708039312; x=1708644112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6D72u9OCvXFc6xIZabN3BHkMoZhGyXgCQr1DeQ1S8gQ=;
+        b=M2Zu19mnjhURIon53ooC7DswmL+zkVoa7oXeW8lsvx0uOmWY9gSWNBAp4dQccceRP4
+         h5y9ATYngf8Ks2un7aimwpjXHXga4Aa3k3la1UiHUei1+dPtehJ0LYVvC9GsG0TEeJxS
+         YaRC5uocBd2MHqzRexFvJmfvadAemIWe19r8ru9DFZpz3ZP1zHiAlZP3jmsMXRDQ8AP5
+         Q4ZDqkRQNAEA3xPVXX7WrYS0Hu1hn/iEnc3fDUchBmvh5Eu+7aUqa7uAc80udJvKiDwn
+         in2iLmTy3sx6RBStVZtgf5axEvabSh9BBPWnE7vMCfL5suVfxcZj81JDRaAl07IbOtAR
+         Uc5g==
+X-Forwarded-Encrypted: i=1; AJvYcCUF280JdBT4HFIYN9DfiLWuLPMGFEgS7rNr/QbI+DwNMZG4czCo5MaPM+lBZoQMyQyDDqpzjQh7wHqVufjTbUd4IbEoxjSgB8pF+vEiaUivh3YtOX8J5tY87b2i9f74a8uv3ZxAD4tYbwaz9vaucWlY3oC+JT72GdcY7Fm13a7cLlfEIRs=
+X-Gm-Message-State: AOJu0YwAQ78Os5b5dfKprcZsmqZdmv/T7lNnszMlNj8f9gdg9eFtBWvy
+	872IAT3UuRriOF/jXsV0xO+R+MEzQc6t/Zbc1IusxOo0etWWu9Md
+X-Google-Smtp-Source: AGHT+IFM+Tkd6DmAKXKi//1/Ntx3dDJahu5QeiRyAdMYEH9RSkeO98alH8ZM5ZhVx6fRbAST+feLtw==
+X-Received: by 2002:a5d:5106:0:b0:33c:f574:3706 with SMTP id s6-20020a5d5106000000b0033cf5743706mr2319455wrt.63.1708039312294;
+        Thu, 15 Feb 2024 15:21:52 -0800 (PST)
+Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
+        by smtp.gmail.com with ESMTPSA id o8-20020a05600c4fc800b00410e638357asm541891wmq.10.2024.02.15.15.21.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Feb 2024 15:21:51 -0800 (PST)
+From: Colin Ian King <colin.i.king@gmail.com>
+To: Johannes Berg <johannes@sipsolutions.net>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] wifi: mac80211: clean up assignments to pointer cache.
+Date: Thu, 15 Feb 2024 23:21:51 +0000
+Message-Id: <20240215232151.2075483-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/3] net: sched: cls_api: add filter counter
-Content-Language: en-US
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
- <xiyou.wangcong@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, llu@fiberby.dk
-References: <20240215160458.1727237-1-ast@fiberby.net>
- <20240215160458.1727237-3-ast@fiberby.net> <Zc5JFhLI_KZtdy5P@nanopsycho>
-From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
-In-Reply-To: <Zc5JFhLI_KZtdy5P@nanopsycho>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi Jiri,
+From: Colin Ian King <colin.i.king@intel.com>
 
-Thanks for the review.
+The assignment to pointer cache in function mesh_fast_tx_gc can
+be made at the declaration time rather than a later assignment.
+There are also 3 functions where pointer cache is being initialized
+at declaration time and later re-assigned again with the same
+value, these are redundant and can be removed.
 
-On 2/15/24 17:25, Jiri Pirko wrote:
-> Thu, Feb 15, 2024 at 05:04:43PM CET, ast@fiberby.net wrote:
->> Maintain a count of filters per block.
->>
->> Counter updates are protected by cb_lock, which is
->> also used to protect the offload counters.
->>
->> Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
->> ---
->> include/net/sch_generic.h |  2 ++
->> net/sched/cls_api.c       | 20 ++++++++++++++++++++
->> 2 files changed, 22 insertions(+)
->>
->> diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
->> index 46a63d1818a0..7af0621db226 100644
->> --- a/include/net/sch_generic.h
->> +++ b/include/net/sch_generic.h
->> @@ -427,6 +427,7 @@ struct tcf_proto {
->> 	 */
->> 	spinlock_t		lock;
->> 	bool			deleting;
->> +	bool			counted;
->> 	refcount_t		refcnt;
->> 	struct rcu_head		rcu;
->> 	struct hlist_node	destroy_ht_node;
->> @@ -476,6 +477,7 @@ struct tcf_block {
->> 	struct flow_block flow_block;
->> 	struct list_head owner_list;
->> 	bool keep_dst;
->> +	atomic_t filtercnt; /* Number of filters */
->> 	atomic_t skipswcnt; /* Number of skip_sw filters */
->> 	atomic_t offloadcnt; /* Number of oddloaded filters */
->> 	unsigned int nooffloaddevcnt; /* Number of devs unable to do offload */
->> diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
->> index 397c3d29659c..c750cb662142 100644
->> --- a/net/sched/cls_api.c
->> +++ b/net/sched/cls_api.c
->> @@ -411,11 +411,13 @@ static void tcf_proto_get(struct tcf_proto *tp)
->> }
->>
->> static void tcf_chain_put(struct tcf_chain *chain);
->> +static void tcf_block_filter_cnt_update(struct tcf_block *block, bool *counted, bool add);
->>
->> static void tcf_proto_destroy(struct tcf_proto *tp, bool rtnl_held,
->> 			      bool sig_destroy, struct netlink_ext_ack *extack)
->> {
->> 	tp->ops->destroy(tp, rtnl_held, extack);
->> +	tcf_block_filter_cnt_update(tp->chain->block, &tp->counted, false);
->> 	if (sig_destroy)
->> 		tcf_proto_signal_destroyed(tp->chain, tp);
->> 	tcf_chain_put(tp->chain);
->> @@ -2364,6 +2366,7 @@ static int tc_new_tfilter(struct sk_buff *skb, struct nlmsghdr *n,
->> 	err = tp->ops->change(net, skb, tp, cl, t->tcm_handle, tca, &fh,
->> 			      flags, extack);
->> 	if (err == 0) {
->> +		tcf_block_filter_cnt_update(block, &tp->counted, true);
->> 		tfilter_notify(net, skb, n, tp, block, q, parent, fh,
->> 			       RTM_NEWTFILTER, false, rtnl_held, extack);
->> 		tfilter_put(tp, fh);
->> @@ -3478,6 +3481,23 @@ int tcf_exts_dump_stats(struct sk_buff *skb, struct tcf_exts *exts)
->> }
->> EXPORT_SYMBOL(tcf_exts_dump_stats);
->>
->> +static void tcf_block_filter_cnt_update(struct tcf_block *block, bool *counted, bool add)
-> 
-> Can't you move this up to avoid forward declaration?
+Cleans up code and three clang scan build warnings:
+warning: Value stored to 'cache' during its initialization is never
+read [deadcode.DeadStores]
 
-Sure, will do that in v2.
+Signed-off-by: Colin Ian King <colin.i.king@intel.com>
+---
+ net/mac80211/mesh_pathtbl.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-I had considered it, but in the end decided to keep it next to the related offloadcnt logic.
-
-
->> +{
->> +	lockdep_assert_not_held(&block->cb_lock);
->> +
->> +	down_write(&block->cb_lock);
->> +	if (*counted != add) {
->> +		if (add) {
->> +			atomic_inc(&block->filtercnt);
->> +			*counted = true;
->> +		} else {
->> +			atomic_dec(&block->filtercnt);
->> +			*counted = false;
->> +		}
->> +	}
->> +	up_write(&block->cb_lock);
->> +}
->> +
->> static void tcf_block_offload_inc(struct tcf_block *block, u32 *flags)
->> {
->> 	if (*flags & TCA_CLS_FLAGS_IN_HW)
->> -- 
->> 2.43.0
->>
-
+diff --git a/net/mac80211/mesh_pathtbl.c b/net/mac80211/mesh_pathtbl.c
+index 735edde1bd81..91b55d6a68b9 100644
+--- a/net/mac80211/mesh_pathtbl.c
++++ b/net/mac80211/mesh_pathtbl.c
+@@ -599,13 +599,12 @@ void mesh_fast_tx_cache(struct ieee80211_sub_if_data *sdata,
+ 
+ void mesh_fast_tx_gc(struct ieee80211_sub_if_data *sdata)
+ {
+ 	unsigned long timeout = msecs_to_jiffies(MESH_FAST_TX_CACHE_TIMEOUT);
+-	struct mesh_tx_cache *cache;
++	struct mesh_tx_cache *cache = &sdata->u.mesh.tx_cache;
+ 	struct ieee80211_mesh_fast_tx *entry;
+ 	struct hlist_node *n;
+ 
+-	cache = &sdata->u.mesh.tx_cache;
+ 	if (atomic_read(&cache->rht.nelems) < MESH_FAST_TX_CACHE_THRESHOLD_SIZE)
+ 		return;
+ 
+ 	spin_lock_bh(&cache->walk_lock);
+@@ -621,9 +620,8 @@ void mesh_fast_tx_flush_mpath(struct mesh_path *mpath)
+ 	struct mesh_tx_cache *cache = &sdata->u.mesh.tx_cache;
+ 	struct ieee80211_mesh_fast_tx *entry;
+ 	struct hlist_node *n;
+ 
+-	cache = &sdata->u.mesh.tx_cache;
+ 	spin_lock_bh(&cache->walk_lock);
+ 	hlist_for_each_entry_safe(entry, n, &cache->walk_head, walk_list)
+ 		if (entry->mpath == mpath)
+ 			mesh_fast_tx_entry_free(cache, entry);
+@@ -636,9 +634,8 @@ void mesh_fast_tx_flush_sta(struct ieee80211_sub_if_data *sdata,
+ 	struct mesh_tx_cache *cache = &sdata->u.mesh.tx_cache;
+ 	struct ieee80211_mesh_fast_tx *entry;
+ 	struct hlist_node *n;
+ 
+-	cache = &sdata->u.mesh.tx_cache;
+ 	spin_lock_bh(&cache->walk_lock);
+ 	hlist_for_each_entry_safe(entry, n, &cache->walk_head, walk_list)
+ 		if (rcu_access_pointer(entry->mpath->next_hop) == sta)
+ 			mesh_fast_tx_entry_free(cache, entry);
+@@ -650,9 +647,8 @@ void mesh_fast_tx_flush_addr(struct ieee80211_sub_if_data *sdata,
+ {
+ 	struct mesh_tx_cache *cache = &sdata->u.mesh.tx_cache;
+ 	struct ieee80211_mesh_fast_tx *entry;
+ 
+-	cache = &sdata->u.mesh.tx_cache;
+ 	spin_lock_bh(&cache->walk_lock);
+ 	entry = rhashtable_lookup_fast(&cache->rht, addr, fast_tx_rht_params);
+ 	if (entry)
+ 		mesh_fast_tx_entry_free(cache, entry);
 -- 
-Best regards
-Asbjørn Sloth Tønnesen
-Network Engineer
-Fiberby - AS42541
+2.43.0
+
 
