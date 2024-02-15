@@ -1,77 +1,106 @@
-Return-Path: <netdev+bounces-72066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBBF38566E3
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 16:07:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C625C8566F6
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 16:11:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09BB91C21762
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 15:07:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83D252899E9
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 15:11:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B86913248E;
-	Thu, 15 Feb 2024 15:07:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3E05132499;
+	Thu, 15 Feb 2024 15:11:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p6CMUpjy"
+	dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b="kK4lOiEy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mta-65-225.siemens.flowmailer.net (mta-65-225.siemens.flowmailer.net [185.136.65.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BE2713248C;
-	Thu, 15 Feb 2024 15:07:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1FBF13248B
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 15:10:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.65.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708009625; cv=none; b=jkfrNzWGXEcMWN3f98s/jWkm1rqo9IdlGllc2B6W3JMg1fk1d0YB8SOXten+2rMafccCuBvGOFUb0L9f22/yy791QF0zkuo0+kbRa74mjb8JOoTbRS739fGlCBzuVksFIgC5fxj5gFeAtguQMzLmULiLeUTChKP+kfahGNywkzs=
+	t=1708009860; cv=none; b=tdFKZilJb1M7FKMlQZg9gkchBc2sqmaGSaQWPCFAWNs0smRCBsAloEheEEUHzoLzvGomDoQgUGHH7SjOeWFJMP7tItB2gdK6BknSKtSjx1WHm9wL1J3AIxrkjnd4JKPrQm4oQAajxJK9pmbY5en3v4jGcKOGa8rB0IT6d/pJ6XA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708009625; c=relaxed/simple;
-	bh=APbTYbrFKsK1aFlZYDmNbwlcHKD8AvqIn33+kl5q9Zs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NvKNfeaQkVBTVuW/lThxXHCN2gFU5NWLGCy4nD04j5sb+ZSJwkuO/8SodkvirBUt4f0/FJtkzQZOHrPOSrrM12mxw1vaz5N7uXMswYaM6rNpoW9NCCmwxZrQINtN6uvAjpSVMHs1H5CZy9kPC0Pg6kwWD1+zYff62IQQTDee/PI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p6CMUpjy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD018C433F1;
-	Thu, 15 Feb 2024 15:07:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708009624;
-	bh=APbTYbrFKsK1aFlZYDmNbwlcHKD8AvqIn33+kl5q9Zs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=p6CMUpjybOvijzJAz14N+SxauIPXop8vdct1x+z6embZyTHJTPNs3V+5oSqFVq7nA
-	 ncvew9PwtqYtSYdNydVEaw4ATxcEvBePDg0QTJEKFWCgevl+Gx2VGtWUx4VtK0MB8Y
-	 RolV6FhYvXiimJCMaq2MIOVzTlk1T3AHdBELhhmUXZ80uJPsa5srF83+cGFe9ISB0Q
-	 J3ZijV/+eaW/PWSFcDqgcC2ROddPv6yHUvycyTtku9kYuFNFfXtHjMpg0TQMCMGVsa
-	 popozFcVHZSx4MiSe/YNqgwdjxvBGmJudrTSqz4cc2cFv+HD2MYjvzPyg16x1Qq6uu
-	 U06aBDnSPO7Og==
-Date: Thu, 15 Feb 2024 07:07:02 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Matthieu Baerts
- <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, Wenjia Zhang
- <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>, Wen Gu
- <guwen@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>, "D . Wythe"
- <alibuda@linux.alibaba.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
- <netdev@vger.kernel.org>, <mptcp@lists.linux.dev>,
- <linux-s390@vger.kernel.org>, Gerd Bayer <gbayer@linux.ibm.com>
-Subject: Re: [PATCH v2 net-next] net: Deprecate SO_DEBUG and reclaim
- SOCK_DBG bit.
-Message-ID: <20240215070702.717e8e9b@kernel.org>
-In-Reply-To: <20240214195407.3175-1-kuniyu@amazon.com>
-References: <20240214195407.3175-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1708009860; c=relaxed/simple;
+	bh=cp2eUH5egMxj0cEFqB6tsXn6DbEGcgeQmtehEa59y2Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NlbTzkL4cQz5eLJvA7Kbejl3cd9apGFFq7KA9zJauUw6KeKv0RhsUjBWzvCg2oDIeE0t6EUrc7kKBMwkzHqOQZQqk6YcOTAKhg43S/cL3l976JAWT/ficoPZFhNmAatsR1cjBkTjrnX/EDk2ThnqsLHxyFDpQwz2rRXQ0VBARV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b=kK4lOiEy; arc=none smtp.client-ip=185.136.65.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
+Received: by mta-65-225.siemens.flowmailer.net with ESMTPSA id 202402151510464271b5342c41b25c45
+        for <netdev@vger.kernel.org>;
+        Thu, 15 Feb 2024 16:10:47 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
+ d=siemens.com; i=diogo.ivo@siemens.com;
+ h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
+ bh=e+mQxWuLTkUKp413+j0vTtl6jufruL+g0RwpCcEiRxg=;
+ b=kK4lOiEyWhtqmbAtFtM9XtD48wNH1g1CPHCnv/zBKMhgdMRR4zhulp+e6OS13KZPNJLxS9
+ lAjeVBzjxVug7dra59NNfNC1ndqaDuCAYzBri4VX/ZgkdJJ/CMuBzihAdyNnHUidrdYkJgla
+ /c/Nve+Jz9iblvAoNuiGFyM0GZxoM=;
+Message-ID: <c143cfbf-c474-42b8-adbb-13676e177d34@siemens.com>
+Date: Thu, 15 Feb 2024 15:10:45 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH net] net: ti: icssg-prueth: Remove duplicate cleanup calls
+ in emac_ndo_stop()
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: danishanwar@ti.com, rogerq@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, vigneshr@ti.com,
+ jan.kiszka@siemens.com, dan.carpenter@linaro.org, robh@kernel.org,
+ grygorii.strashko@ti.com, horms@kernel.org,
+ linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+ diogo.ivo@siemens.com
+References: <20240206152052.98217-1-diogo.ivo@siemens.com>
+ <ce2c5ee0-3bed-490e-ac57-58e849ec1eee@siemens.com>
+ <3279544c-fbe9-446c-9218-4d2c59f30905@lunn.ch>
+From: Diogo Ivo <diogo.ivo@siemens.com>
+In-Reply-To: <3279544c-fbe9-446c-9218-4d2c59f30905@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Flowmailer-Platform: Siemens
+Feedback-ID: 519:519-1320519:519-21489:flowmailer
 
-On Wed, 14 Feb 2024 11:54:07 -0800 Kuniyuki Iwashima wrote:
-> Recently, commit 8e5443d2b866 ("net: remove SOCK_DEBUG leftovers")
-> removed the last users of SOCK_DEBUG(), and commit b1dffcf0da22 ("net:
-> remove SOCK_DEBUG macro") removed the macro.
 
-Unrelated to this patch but speaking of deprecating things - do you
-want to go ahead with deleting DCCP? I don't recall our exact plan,
-I thought it was supposed to happen early in the year :)
+On 2/15/24 14:53, Andrew Lunn wrote:
+>> Hello,
+>>
+>> Gentle ping on this patch.
+> Gentle ping's don't work for netdev. Merging patches is pretty much
+> driver by patchwork, so it is good to look there and see the state of
+> the patch.
+>
+> https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpatchwork.kernel.org%2Fproject%2Fnetdevbpf%2Fpatch%2F20240206152052.98217-1-diogo.ivo%40siemens.com%2F&data=05%7C02%7Cdiogo.ivo%40siemens.com%7Cc6a5a844ef59437e85f308dc2e35cb4b%7C38ae3bcd95794fd4addab42e1495d55a%7C1%7C0%7C638436055786669669%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C0%7C%7C%7C&sdata=CMjL%2Bkc9%2BOo0igLSnX4OzgxO3CGKP2m67afScU0pG0I%3D&reserved=0
+>
+> This is marked as Changes Requested.
+>
+> Looking at the discussion, it seemed to conclude this is a cleanup,
+> not a fix. Hence the two Fixes: probably want removing.
+>
+> Please repost with them removed, and the Reviewed-by's added.
+>
+> You should also set the patch subject to include [net-next] to
+> indicate which tree this patch is for:
+>
+> https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwww.kernel.org%2Fdoc%2Fhtml%2Flatest%2Fprocess%2Fmaintainer-netdev.html%23netdev-faq&data=05%7C02%7Cdiogo.ivo%40siemens.com%7Cc6a5a844ef59437e85f308dc2e35cb4b%7C38ae3bcd95794fd4addab42e1495d55a%7C1%7C0%7C638436055786678320%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C0%7C%7C%7C&sdata=ZS2Gn%2F9kqM7UKL9VD8mSCXeegsx%2BXI6jvgW30XoqQ2M%3D&reserved=0
+>
+>         Andrew
+
+Ok, thank you for the clarification!
+
+I'll prepare the patch as requested.
+
+
+Thanks,
+
+Diogo
+
 
