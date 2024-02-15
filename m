@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-71913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 833688558E7
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 03:10:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A50A18558E8
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 03:10:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B62D31C20D84
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 02:10:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 614BB286C3B
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 02:10:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B4F81870;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D3361C01;
 	Thu, 15 Feb 2024 02:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TQl6EniS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qEMtrqAh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D85E9184E
-	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 02:10:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D86181864;
+	Thu, 15 Feb 2024 02:10:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707963026; cv=none; b=PdzUlx8taUZKhdjFRkB2Sw9AaC8ADKERdovPSFd9nVL2HL12aDwVtzbUCwT/mv38fRzut47J6N+JDxTE1XaTbYkDrBK01h2OMwfo6LoxuDMJatrqmWDrCUS/A/lneeNAgSpqe4AsGRYoZRQ9sFF5WvvFxthik2Ijrh1fF0XCpys=
+	t=1707963026; cv=none; b=jAG+PGx3d2ESikaBF7v7pQHjn5kIFRosRGT/PLl4EJwkYlSOWwTRZdozddsywS5Iwpv66jsbr6gW4BJvzgp53Bs9DRAftbOI2d+QCvEEPJ+bY6rqqAINzWkMwEYtNKC07G2lqNGy7q1D5Zikgc4LLh7g2Lvf5lRlmegncl1JCcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707963026; c=relaxed/simple;
-	bh=/9zJKtXFiVXKx6n41lA+c7sE7Kbf4fjNJ0TZPPgIEtU=;
+	bh=TRpMoCvwfFbxonJFRlBlF9/A9UNFCFWTdjIEOaC59A8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FJlK0pnC6VNTuV3xFLXxotBSLalcqFl8zMLjN9m5uicrYQsCJieDCsQswFp03rpvbhACpo69Xtx8ewY1a8/7eMw+2N2T891Hv79YWk1TfuikOJE8YKrCvbmZOSvLIwjBrXe5QWvjg+Rh2bWDfO+tmIch4Gr1OLz5XQrO5XWYW0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TQl6EniS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4B04FC433C7;
+	 In-Reply-To:To:Cc; b=RtXnl0UR9dzIxHA3uz/Zkxdl1CBCalmgiQHHGLMuCoXKVJRYM0naUZgvxTyxI8FUdvz6CAPRVtSOniKQT3LOit8GeBwS1SNEoltynZffZT+qmECDb7aYi3SdH3+GEbtKHyIrcbpmOsZjEgl/un3x4ThdVAmrMbRfFotrIKCitus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qEMtrqAh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 54EE0C43394;
 	Thu, 15 Feb 2024 02:10:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1707963026;
-	bh=/9zJKtXFiVXKx6n41lA+c7sE7Kbf4fjNJ0TZPPgIEtU=;
+	bh=TRpMoCvwfFbxonJFRlBlF9/A9UNFCFWTdjIEOaC59A8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TQl6EniS9bV1WqmaMUUd2D//jwDVpFypyjYNSJE3daC+BjMPz+Jsq4pBWsNgXLkrx
-	 iumqImDzoeoqPIv5G/9HQBQDwZYxZehRSyiJc5MPzK3Mc+ExT1JGpSeFfAuBQ46w1q
-	 SpvltNHCAhMdzWG6QN2A3zPPJQc7sKG+qzZeHT4bH3d6prT4fF7aXm14E6X5yNjJYE
-	 zhi0yFnvIxcq4K+KJQ/chwFioMwt2FGwe8adz12uN6XDmfe0guexypSwV3ilviK2jo
-	 BNEXsrjfy4dCTI7o5ChfIY7wkSW+mEw6gbosUnexFO+/20bSGCvlj8VOe9lHChv8mC
-	 YfY0BZWjlOslA==
+	b=qEMtrqAhJawIL0Xzk29yMX12P7BMc4yxeMOFiXTX0tOgVeff0hjXO7LZDI+09OIi0
+	 zB8zmKy0Ohfs58bWd3YIjOZzZsueSGwHlFFMTvxONCHu6yqkVpuJZi03tdOlxmNl4L
+	 Qiwvmel3m2MjbHp8/180lVx1h6bQQKbmrgkrnjPDkVyxjQkhZCS/wtS+47Em+UlxjZ
+	 99od5+X3gDqZOcf9C3bIpcBY4n+eVXCOa3VPrI9VwqMWRV9+NIoTrNMgBuRxnlt808
+	 LFgGKQD1UGYkI0/1c4EW+lTrEG9uE80sd8vwcT73lVM3sqee6V0Cq5luTq7V1CkvX5
+	 TF80URCcrrNrQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2B962D8C96A;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 37D8BD84BC1;
 	Thu, 15 Feb 2024 02:10:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,38 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] ice: Add check for lport extraction to LAG init
+Subject: Re: [PATCH net] selftests: tls: increase the wait in
+ poll_partial_rec_async
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170796302617.4642.9242434883572737628.git-patchwork-notify@kernel.org>
+ <170796302621.4642.14716044906778450294.git-patchwork-notify@kernel.org>
 Date: Thu, 15 Feb 2024 02:10:26 +0000
-References: <20240213183957.1483857-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20240213183957.1483857-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, david.m.ertman@intel.com,
- przemyslaw.kitszel@intel.com, marcin.szycik@linux.intel.com,
- horms@kernel.org, sujai.buvaneswaran@intel.com,
- himasekharx.reddy.pucha@intel.com
+References: <20240213142055.395564-1-kuba@kernel.org>
+In-Reply-To: <20240213142055.395564-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, shuah@kernel.org, linux-kselftest@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 13 Feb 2024 10:39:55 -0800 you wrote:
-> From: Dave Ertman <david.m.ertman@intel.com>
+On Tue, 13 Feb 2024 06:20:55 -0800 you wrote:
+> Test runners on debug kernels occasionally fail with:
 > 
-> To fully support initializing the LAG support code, a DDP package that
-> extracts the logical port from the metadata is required.  If such a
-> package is not present, there could be difficulties in supporting some
-> bond types.
+>  # #  RUN           tls_err.13_aes_gcm.poll_partial_rec_async ...
+>  # # tls.c:1883:poll_partial_rec_async:Expected poll(&pfd, 1, 5) (0) == 1 (1)
+>  # # tls.c:1870:poll_partial_rec_async:Expected status (256) == 0 (0)
+>  # # poll_partial_rec_async: Test failed at step #17
+>  # #          FAIL  tls_err.13_aes_gcm.poll_partial_rec_async
+>  # not ok 699 tls_err.13_aes_gcm.poll_partial_rec_async
+>  # # FAILED: 698 / 699 tests passed.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] ice: Add check for lport extraction to LAG init
-    https://git.kernel.org/netdev/net/c/dadd1701ae11
+  - [net] selftests: tls: increase the wait in poll_partial_rec_async
+    https://git.kernel.org/netdev/net/c/2ec197fda25f
 
 You are awesome, thank you!
 -- 
