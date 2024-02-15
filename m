@@ -1,114 +1,127 @@
-Return-Path: <netdev+bounces-72196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80E43856EA2
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 21:35:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2342856F09
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 22:04:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A035282514
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 20:35:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39B181C21D83
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 21:04:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3631913AA41;
-	Thu, 15 Feb 2024 20:35:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFCA413B2AC;
+	Thu, 15 Feb 2024 21:03:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lSgD07zm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WagP35sA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E6E618E01
-	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 20:35:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BAF341C61;
+	Thu, 15 Feb 2024 21:03:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708029304; cv=none; b=Gek5ml09pyxAttFGBBFtzhRqbSP96fpTvNCfr/Sdn7vh0DZAM/xFZrB3b9K4yI7ZXQ1ZZh89KhntlLfuiANKtCFj6ZT7D97dDNr5xASixcEWZxV/1o+OmgGBuw5Yxkoo1axtdo4Iniw7uHqiDTQQv10eyzY//6B28U3olfC7JVA=
+	t=1708031036; cv=none; b=X/dD+w8W1pFw2+0hr+/37X2ifrCJHI+XwnUuG+Fgz8WZRY2XdtyO06FCE2rWvisImqxoGx41pPTdCU+hULPOtntz6W9icbFMWARHmo6cKoT6ZjrzF2qQDEWJx33/O6StfpDh82hUIhYUm4goUBn6FuacZtC73HGYxYcC+uq3up0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708029304; c=relaxed/simple;
-	bh=h3PYUBQe3yCtRxrjIQDEU1Mw8km0CzUKEmbLDcQ7Cag=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GqaahNU9JJGobrdyIQmZkR8ajpNHBpDqwTuG++0j+LONOlwbPMyJN6h+wOEGn9ndT9Oa8N/nDH5F56wXufDWxMLDIOiToSIHPs7oWGX9EWt4L+VbPGBNH/nFQGOsDqlkWejR90quneN1TfiqCnrGcAXS+6YVKxz09HG+sYkbeKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lSgD07zm; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-563dfa4ccdcso3572a12.1
-        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 12:35:02 -0800 (PST)
+	s=arc-20240116; t=1708031036; c=relaxed/simple;
+	bh=BJNmghe578Dr0q6jJp6nQZwXix12LotZLSHYuCxzj6U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l37/zH/H0ho6t8a6K93OiWOXGwvSXPFBJkKkO8l7Ce+z7h4OYH+tgrzmHHWnHhBiGHr4e6EJ70vs9d9VGJn3KyWn6pSG3uyfRqcUHz8BKuywgEB84JvWBdKMWhJboM+LsMz3SUz+gayB/05qkSwBAf6e9EzanmXQUZi2MvsLng8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WagP35sA; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-511976c126dso1776335e87.1;
+        Thu, 15 Feb 2024 13:03:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708029300; x=1708634100; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7an4kvg31W2wSTkLx7ZBTIK5HZwT7PN0lj9ZiIjsxxM=;
-        b=lSgD07zmswupjf4puHHqQA6Tb+NnLRJwq716PuyLm5uzhgKWkK6Nygbc+QBwMz7CsG
-         k47hrrqRbNhnTTbuwewCJ0QH7KL0nk70/qOjnAqZyH+KanH7rb2gy0DIOBNl2mFsS56A
-         Pi5HOi6i1GBbRNtwwgABResLi/muoPP6WwMv8q1SUovllA9v+YbINj4P5/Mg/NXX6J1o
-         LtIGqpJKgNaWsDAfzCLRDn1xavn5VV+IimbRLXglGYP9afuBxDrj47ASNdSO+ZKuMVq+
-         EQZdcGPj+2cTuo8zFL+lmJ0RxLZaIkONdVz7Wdl11FmR1IcBZPKqt7Mg7nsJV2n7+OFD
-         nnbA==
+        d=gmail.com; s=20230601; t=1708031033; x=1708635833; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ky2ZahidDUXO2cGFTczfagUmFQuczB83RWWZ7vrowF4=;
+        b=WagP35sAFLZFY3+tiWomwrXrqwaQTJtU7c6i4H3nT39tQ8hgl7Al3vjVrtrUW7wuwF
+         ffysSslhXKSRZqKQhercTGGYdfEgB869FZD0h2z9DEk1aIkncUiLePqOzrntbH5EeJL3
+         FipWfq97Bi+tM8y778HjTU2devVQHM1gBbEHTNdlzTUN4GYasFJ34T2pjWWkAWuyJy+W
+         EciUsMEZXjUiO4ywEE7+MIArD3Z4RnJzz0t5/kEFprwjqpksQY7Ix4+T6MbyykmIHAK+
+         HbRgLcgZIqFo0lW6l7Uk3UoEo6iVP/vvNpizypLLwURKA+yzfb/STQ1EQZS5z9kg8MNt
+         dpAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708029300; x=1708634100;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7an4kvg31W2wSTkLx7ZBTIK5HZwT7PN0lj9ZiIjsxxM=;
-        b=hvHTbOdi2SxuWFmPV10bJEBHqofsLUfsAgsqODYb4i1Y4b8BAuneDfFyLNisEB8kJI
-         yMREwfzX9K4HxoIuAnwer+HQmHcKi8/Sa+mUdtzXs9JIK+zPY5fcDpy0avCeRe4pbKts
-         7u6Jk3yFCe+2Abkq5fPuRafYGfmHuB6APHPZuIRLwQsQzRwJwXWdxTA8rrPePvRewfdD
-         CVFlzEuFInyE+hTmP1yXMn5bAYuNs6Fr2JI0u5M2rabsCb4fs2VCziQgWiM8mX2cYG/f
-         bUc/h7uAoapWk3G5Yl6qY6gT3n8y/5K3dnTLQJka+AOrMXSVBCcOBhVkZqIGnrlTns7M
-         Hc0g==
-X-Gm-Message-State: AOJu0Yy40RXqto97EDR//y2/de0AihKB7kdzuu7uDgWzYwxG8zo1I1om
-	bwk9bnsazKfLkw0bZzs4ZeYxx5WGtsmFp1CW25h6X06RljK1d9+5mdQgoqLveNNZVQM0EJLixhz
-	ksOvCZzYjDHXvFGVSD7iCqyl0wBOE8T49XFgd
-X-Google-Smtp-Source: AGHT+IE1FNvWdJuD8MBnl+NvqqcGD5WY0JV3xoxcn/Lt3BGv7ra2iU5eZvjtja3V+ZweGzhA+O390CJ1hJa0g+zZHnU=
-X-Received: by 2002:a50:d607:0:b0:563:adf3:f5f4 with SMTP id
- x7-20020a50d607000000b00563adf3f5f4mr43235edi.1.1708029300357; Thu, 15 Feb
- 2024 12:35:00 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708031033; x=1708635833;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ky2ZahidDUXO2cGFTczfagUmFQuczB83RWWZ7vrowF4=;
+        b=HGkDSkeWmYorRbqZ+hqm3hn5T9/PXpv6Rk6JQVml/FDVewmQiv92+WT9jEQMwlUjms
+         oelefI9wzIKKKix/efr/IZkcf9mvA1tIcrOEYd/OfO070KlIdr2uMMOOrwcfV17sOige
+         1VnjNNVkvRzDnPQpbRvfqWkup8aTJMksc2gYh7ospuny1uB7CJTzL/161QIb8y7dJ5/p
+         yAk23h39KrZI6jvtzvb/DfIuoZiPYqfTYrZv2HWH2NTkSjNeN5dfhmNdGy6uIJhTmfXS
+         oY0p7kxWyikLoa2yFtyQ/ohYH+dpLA7LuEZoXInHuKlht3IliC1GXdjvEFL28JKWzW4W
+         vd7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXjpFjmUHDrpCOnS/BObsmdAR1tgq4IaYsJZ965UTX4Gmkdx7bdFIDVz/phKFDHuzmbaB2wQshFh+GghZml/bwUOciWJHTFEqlH8s2SOVjdRPA4q2885RkivwtYy+2zcDcdXFCP
+X-Gm-Message-State: AOJu0Yy5ARX8MglQB/YlaTa5ca89yqmX2Kn5Fco3A6aKLZQcnzNDVCHe
+	znZtjjS8EDMErT7ksKTKNWqkVPQuiH23ny7o1nmlcA/4E4CY1Bw+6UGoJYdx
+X-Google-Smtp-Source: AGHT+IE0q8c+07du9QdFQWzS1GQSJ3+K8PVrqti7ePCn+9czzhmuN6wNeYywXIJZxS95bQrpPsWi0A==
+X-Received: by 2002:a05:6512:1192:b0:512:8aeb:aaa8 with SMTP id g18-20020a056512119200b005128aebaaa8mr1890037lfr.49.1708031033197;
+        Thu, 15 Feb 2024 13:03:53 -0800 (PST)
+Received: from debian ([93.184.186.109])
+        by smtp.gmail.com with ESMTPSA id ps7-20020a170906bf4700b00a3d12d84cffsm903512ejb.167.2024.02.15.13.03.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Feb 2024 13:03:52 -0800 (PST)
+Date: Thu, 15 Feb 2024 22:03:50 +0100
+From: Dimitri Fedrau <dima.fedrau@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 net-next 09/14] net: phy: marvell-88q2xxx: add cable
+ test support
+Message-ID: <20240215210350.GB3103@debian>
+References: <20240213213955.178762-1-dima.fedrau@gmail.com>
+ <20240213213955.178762-10-dima.fedrau@gmail.com>
+ <fe604759-d1cd-4a4d-ba64-69936b3e6598@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240215202949.29879-1-kovalev@altlinux.org>
-In-Reply-To: <20240215202949.29879-1-kovalev@altlinux.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 15 Feb 2024 21:34:49 +0100
-Message-ID: <CANn89i+TNVtk8UT1+2QeeKHR-b6AQoopdxpcqcbNVOp9+JYSYw@mail.gmail.com>
-Subject: Re: [PATCH] tcp_metrics: fix possible memory leak in tcp_metrics_init()
-To: kovalev@altlinux.org
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org, 
-	kuba@kernel.org, pabeni@redhat.com, ebiederm@xmission.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fe604759-d1cd-4a4d-ba64-69936b3e6598@lunn.ch>
 
-On Thu, Feb 15, 2024 at 9:29=E2=80=AFPM <kovalev@altlinux.org> wrote:
->
-> From: Vasiliy Kovalev <kovalev@altlinux.org>
->
-> Fixes: 6493517eaea9 ("tcp_metrics: panic when tcp_metrics_init fails.")
-> Signed-off-by: Vasiliy Kovalev <kovalev@altlinux.org>
-> ---
->  net/ipv4/tcp_metrics.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/net/ipv4/tcp_metrics.c b/net/ipv4/tcp_metrics.c
-> index c2a925538542b5..517c7f801dc220 100644
-> --- a/net/ipv4/tcp_metrics.c
-> +++ b/net/ipv4/tcp_metrics.c
-> @@ -1048,6 +1048,8 @@ void __init tcp_metrics_init(void)
->                 panic("Could not register tcp_net_metrics_ops\n");
->
->         ret =3D genl_register_family(&tcp_metrics_nl_family);
-> -       if (ret < 0)
-> +       if (ret < 0) {
->                 panic("Could not register tcp_metrics generic netlink\n")=
-;
-> +               unregister_pernet_subsys(&tcp_net_metrics_ops);
-> +       }
->  }
+Am Wed, Feb 14, 2024 at 06:54:58PM +0100 schrieb Andrew Lunn:
+> > +static int mv88q222x_cable_test_get_status(struct phy_device *phydev,
+> > +					   bool *finished)
+> > +{
+> > +	int ret;
+> > +	u32 dist;
+> > +
+> > +	ret = phy_read_mmd(phydev, MDIO_MMD_PCS, MDIO_MMD_PCS_MV_TDR_STATUS);
+> > +	if (ret < 0)
+> > +		return ret;
+> > +
+> > +	*finished = true;
+> 
+> That looks odd. Is there no status bit which says it has completed? Is
+> it guaranteed to complete within a fixed time? How is it guaranteed that
+> mv88q222x_cable_test_get_status() is called at the necessary delay after 
+> mv88q222x_cable_test_start()?
+> 
+According to the datasheet and the Marvell API bits(0:1) can be used to
+check if the test has completed. Sample code waits 500ms before checking
+the bits. If the test is not completed after the delay the corresponding
+function returns with an error.
 
-Well, the whole point of panic() is to crash the host.
+I just used bits(7:4) where 2'b1000 means that the test is in progress,
+and setting *finished = false. I didn't introduced any delay, relying
+on the reschedule delay of the PHY state machine. I didn't notice any
+problems with this approach. Anyway if the test does not complete for
+whatever reasons we get stuck here, right ? Don't know if this can
+happen. Probably we should take the safer path described in the Marvell
+API.
 
-We do not expect to recover.
+Dimitri
 
