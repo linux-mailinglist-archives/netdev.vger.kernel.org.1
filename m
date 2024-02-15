@@ -1,112 +1,159 @@
-Return-Path: <netdev+bounces-72157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A966856C3A
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 19:14:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3923856C67
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 19:25:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D0551C21E81
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:14:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2DEB281E8E
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:25:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62FCA13849A;
-	Thu, 15 Feb 2024 18:13:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8BB51386B1;
+	Thu, 15 Feb 2024 18:25:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jj3WcKDl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OXI8H0HU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C28136995;
-	Thu, 15 Feb 2024 18:13:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B83132C37;
+	Thu, 15 Feb 2024 18:25:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708020800; cv=none; b=j1JoCdCGr9KXOBpRmb2X6vG+CpLKzigIbtP4kq+1d2a00KD49nFajw37ajrXIs71kLkv4xXWs89BAQHY24DKh+N4FEnUb7SG4BZrPBU4cWQI+Pk1uCXCCceUdyC1wXCVnVaVugmFXffzjkznoysdWtP4LSs9YJN44zJTzyQZe1s=
+	t=1708021537; cv=none; b=IfUR48B9WCFAzPACPqxt12jB6JGsONhffiTuyAKg8I8Mrs15o6K5TFfRAvBXYVBGtIc9Qnzm1pPB6pbnu3SYfWs8280rzEvasUSqg5cNN3SGeO1gtMi+J5nINGbqclbSu1/7Nt/EBF3P99UT2i74TXbZBNf/t6YFdm/hrCcaqzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708020800; c=relaxed/simple;
-	bh=Vi81D9bfSDr+m+P3qTgsqyjlvtqqJ9WpSh3551CARqg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VqOY/NMd71ez4G8aHWOZ3XOJXAYt1Pp3MgK/SDPldwy7g/rdpNhGc/5LOPH+dm0/bF13o7Tcy7UsYWggxW05atZP+NYIZgtC4hpwaE2g5k35vJVdf4aaB1jj9aksesGFd90GB18UfvPURBlGpJSK12LN8JfwVAbaHq48UFFoJ2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jj3WcKDl; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-563cb3ba9daso580491a12.3;
-        Thu, 15 Feb 2024 10:13:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708020797; x=1708625597; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=juVCM1rRHSBlSMP/d1mEg6+OxvELnwq4fa4K1QNtEvM=;
-        b=Jj3WcKDlTxcJIrqKJ/XI23QzNpFRbAMcSKCGlBX5ZXWywQ+rqXD4zoRuNo6++YuOva
-         BDpAvkbOT9lnBFtZhdC4taAIJmkJx97uLTkXgPUmKRRlUzuH4hGUx36F+mchFaPilnYq
-         F9AYJiK6X6k3XJF6Dd95Y6QQRWRFnqMcn8WwbqzTf9z/ezH+XlcaQvRywF5lCKK6IitC
-         5Lt7qs+YYpXPw4DBgSSZdjYIkn0d7B1qrlz18tC+rJQNJUL8rrhn1KYy8yvByKjG/YDu
-         e2Wb7eFMfkdzq9wfZMMzUHeDfg7ooVseT4E4r6QmkbuQqW0Z1li33vSrylAE8XENvF1z
-         rvTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708020797; x=1708625597;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=juVCM1rRHSBlSMP/d1mEg6+OxvELnwq4fa4K1QNtEvM=;
-        b=WAxyiusNxY0CrgoIW0krfWCb/0wUxETzzb3M3JLtdRQ/7c6YB40bE4G9GJkoHHQXWh
-         k4FIu+IYRGEqHnnr2OVc2afUffBRLE/GW+xX7A+4K9ioDT9dBv1s0UsVIssRz2l37Y9u
-         xz6YEPffLUl7j23SCTCeNyAzcAlxhJLS6z2nNlgVgXItOyl87XVUSp2jkm3FX0dm3MPV
-         LpnbOhwwMTIHe90KClZ3JhxyEXFwdefa+OGwUOInzS3ju00VpQ/ndyI0/hYoOMHFOVpH
-         1xNChu9RpoLTcqSf/X68g7nDo/M8mraTHAk84NGn7QkM7ERC8NRUGU2bCb6fGFs7YE3P
-         jDtg==
-X-Forwarded-Encrypted: i=1; AJvYcCVfFi0s2vXZFQxriLbhCDnzvbEgadvJLuAQoiyahipUywvB9w1v0bW4SSiVh3ZJjpI3TJn/s0Oi+BwwhfzZRFDzcn1A0UzpcmhmFEK0
-X-Gm-Message-State: AOJu0YzRtrcmypAtJebSJAiREUlTk7PlxSqOq44ytQ9JkHIF0thQDstS
-	e108+hdV6L4B7gnsa15N/fFWJsfLIEu3/U7v7WCMerKHS+iAncsC
-X-Google-Smtp-Source: AGHT+IGthifnHmAEqhCcEbmUdCkSxu/XDdmbCurctxhen5Mi8VcqjRFROKiGLYJYhV8U36BlXdTjWw==
-X-Received: by 2002:aa7:c48c:0:b0:561:4238:e6e2 with SMTP id m12-20020aa7c48c000000b005614238e6e2mr2147942edq.29.1708020796710;
-        Thu, 15 Feb 2024 10:13:16 -0800 (PST)
-Received: from skbuf ([188.25.173.195])
-        by smtp.gmail.com with ESMTPSA id z9-20020aa7c649000000b00563819d224esm774517edr.21.2024.02.15.10.13.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Feb 2024 10:13:16 -0800 (PST)
-Date: Thu, 15 Feb 2024 20:13:14 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Pawel Dembicki <paweldembicki@gmail.com>
-Cc: netdev@vger.kernel.org, linus.walleij@linaro.org,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v4 15/15] net: dsa: vsc73xx: Add bridge support
-Message-ID: <20240215181314.nq5zscq2oum44oem@skbuf>
-References: <20240213220331.239031-1-paweldembicki@gmail.com>
- <20240213220331.239031-1-paweldembicki@gmail.com>
- <20240213220331.239031-16-paweldembicki@gmail.com>
- <20240213220331.239031-16-paweldembicki@gmail.com>
+	s=arc-20240116; t=1708021537; c=relaxed/simple;
+	bh=V2c9t1KLwlqoanTaNYTv58ugynfQZ/9FZ1F536Q19bw=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=H1u6JWr2Vtv3nqO07CdNG49PcTCb2G9DzuCUXTwyTQzycGvaf+XcZFekgTavHGdZFMEMz4TVuRgogXy0rpIR7iptjtfiOXpLbyU/ISAN2BY6r36DdYyCo1/KyYOudD0YqqZHkQXT//tzguuauWjn0HT6M+0J+6RU8pdv14Z6SvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OXI8H0HU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC1E2C433C7;
+	Thu, 15 Feb 2024 18:25:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708021537;
+	bh=V2c9t1KLwlqoanTaNYTv58ugynfQZ/9FZ1F536Q19bw=;
+	h=From:Subject:Date:To:Cc:From;
+	b=OXI8H0HUq6C4fPv/BHW3MRruti2nkdJgcI58RsbdE7Qw8tihAmPAt0cmlq8oDJgLb
+	 QfGxuCRizH0Ab25wZlUNfEAv74GcGWaf2F9ayrGvlZb5C/1ovxiYbr/KsD7F14vObU
+	 77WI4fRjze2qoE5Fa84bj37mIvY7UuydkDld2thtD6kQe+speKlfBim05mbyTGsXVr
+	 SXRTrIgXPKSBwFuk5CQDWWqnRCRXpk9CVYuzHzacmscSepJTsJbHNVGaggInhkh0bc
+	 y0dYiikeIMyy4MN5LccOGXlLDh80rnS5HKzpX/PAFobgkQp8SzC662yprQQ1TEm+b5
+	 9PB//ZzLee6IA==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net 00/13] mptcp: misc. fixes for v6.8
+Date: Thu, 15 Feb 2024 19:25:27 +0100
+Message-Id: <20240215-upstream-net-20240215-misc-fixes-v1-0-8c01a55d8f6a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240213220331.239031-16-paweldembicki@gmail.com>
- <20240213220331.239031-16-paweldembicki@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABdXzmUC/z2MQQqEMBAEvyJzdiDJ6rLsV8SDxFbnYFYyKgvi3
+ x08eKxuqg5SZIHStzgoYxeVXzLwZUFx6tIIlt6YgguVC77mbdE1o5s5YeVnnUUjD/KHsnt9fI3
+ oqz6+yTJLxn1YpSGTqD3PC/pp6md3AAAA
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Davide Caratti <dcaratti@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ Geliang Tang <tanggeliang@kylinos.cn>, stable@vger.kernel.org, 
+ Boris Pismenny <borisp@nvidia.com>, 
+ John Fastabend <john.fastabend@gmail.com>
+X-Mailer: b4 0.12.4
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3423; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=V2c9t1KLwlqoanTaNYTv58ugynfQZ/9FZ1F536Q19bw=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBlzlcczGT2qSuCiXg8+2y1DkJyC+bGPYCzu3w8u
+ u5hA7gJi4OJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZc5XHAAKCRD2t4JPQmmg
+ c6bID/9qAl1mKRGeujL3mhl8AXGWOhacO2h7L0yxImE8cZIQAPGrYBUm7colu0st9gsWdHaOnWY
+ ueNyNAHjzv1vbYpH//tQMdpkzYzgpqpv74lrF+DmL2HGxBFka4qZ7H/Ktjvr/Ii+EwNDpQ8T+gS
+ xNbWgpgCTj7kCwKJ/q5KV7ZX7MopaNSxAOljO41Oe44SCWnSvmNqRH7AjLVhni0scRCuXY1EvrQ
+ Kl4EkyQOLIND5OxczK5LKlubAp1pDnrRn+I9SoPcY4qQEYCt5UXxp/HDgPjy6vmEVqfxPO2H6HO
+ XARfVLIBXAS3PrgiJu8vUHkSqwg/5g9+saBESqRd1+S9O0bt3l2QdFfFz73aMP3gQtFyrSWr5m5
+ 1hB61reLNwC54pBpswXrhfEvjwol0bEGO17wCxzdDvRO9xhUXzULHhKufeaqwErLxTyVYWmUnNo
+ fUy0coEI0pfASrd40ausKUiiXzPbqTAF7FcoWKyoAessR4RlkOiwboNvSqD+B7I0Wluyc6bMjSc
+ At6yXonqs2b8MwNNGXeBSl68VzJgkZNrSg94gAmdPXfmDIiHdrsuJGTaeYyuBZrgq6wMNY1NdEp
+ 0H4oaPUzBAUyfCjMrl+K5SAPWr10G+y4AGbYruK3cu1O8tAZi3C/i1hqjWm+tZhDiu0Pgo3PrB6
+ EqHxKxmBgntg4tg==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-On Tue, Feb 13, 2024 at 11:03:28PM +0100, Pawel Dembicki wrote:
-> This patch adds bridge support for vsc73xx driver.
-> It introduce two functions for port_bridge_join and
-> vsc73xx_port_bridge_leave handling.
-> 
-> Those functions implement forwarding adjust and use
-> dsa_tag_8021q_bridge_* api for adjust VLAN configuration.
-> 
-> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
-> ---
+This series includes 4 types of fixes:
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+Patches 1 and 2 force the path-managers not to allocate a new address
+entry when dealing with the "special" ID 0, reserved to the address of
+the initial subflow. These patches can be backported up to v5.19 and
+v5.12 respectively.
+
+Patch 3 to 6 fix the in-kernel path-manager not to create duplicated
+subflows. Patch 6 is the main fix, but patches 3 to 5 are some kind of
+pre-requisities: they fix some data races that could also lead to the
+creation of unexpected subflows. These patches can be backported up to
+v5.7, v5.10, v6.0, and v5.15 respectively.
+
+Note that patch 3 modifies the existing ULP API. No better solutions
+have been found for -net, and there is some similar prior art, see
+commit 0df48c26d841 ("tcp: add tcpi_bytes_acked to tcp_info"). Please
+also note that TLS ULP Diag has likely the same issue.
+
+Patches 7 to 9 fix issues in the selftests, when executing them on older
+kernels, e.g. when testing the last version of these kselftests on the
+v5.15.148 kernel as it is done by LKFT when validating stable kernels.
+These patches only avoid printing expected errors the console and
+marking some tests as "OK" while they have been skipped. Patches 7 and 8
+can be backported up to v6.6.
+
+Patches 10 to 13 make sure all MPTCP selftests subtests have a unique
+name. It is important to have a unique (sub)test name in TAP, because
+that's the test identifier. Some CI environments might drop tests with
+duplicated names. Patches 10 to 12 can be backported up to v6.6.
+
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Geliang Tang (2):
+      mptcp: add needs_id for userspace appending addr
+      mptcp: add needs_id for netlink appending addr
+
+Matthieu Baerts (NGI0) (7):
+      selftests: mptcp: pm nl: also list skipped tests
+      selftests: mptcp: pm nl: avoid error msg on older kernels
+      selftests: mptcp: diag: fix bash warnings on older kernels
+      selftests: mptcp: simult flows: fix some subtest names
+      selftests: mptcp: userspace_pm: unique subtest names
+      selftests: mptcp: diag: unique 'in use' subtest names
+      selftests: mptcp: diag: unique 'cestab' subtest names
+
+Paolo Abeni (4):
+      mptcp: fix lockless access in subflow ULP diag
+      mptcp: fix data races on local_id
+      mptcp: fix data races on remote_id
+      mptcp: fix duplicate subflow creation
+
+ include/net/tcp.h                                 |  2 +-
+ net/mptcp/diag.c                                  |  8 ++-
+ net/mptcp/pm_netlink.c                            | 69 ++++++++++++++---------
+ net/mptcp/pm_userspace.c                          | 15 ++---
+ net/mptcp/protocol.c                              |  2 +-
+ net/mptcp/protocol.h                              | 15 ++++-
+ net/mptcp/subflow.c                               | 15 ++---
+ net/tls/tls_main.c                                |  2 +-
+ tools/testing/selftests/net/mptcp/diag.sh         | 41 ++++++++------
+ tools/testing/selftests/net/mptcp/pm_netlink.sh   |  8 ++-
+ tools/testing/selftests/net/mptcp/simult_flows.sh |  3 +-
+ tools/testing/selftests/net/mptcp/userspace_pm.sh |  4 +-
+ 12 files changed, 116 insertions(+), 68 deletions(-)
+---
+base-commit: c40c0d3a768c78a023a72fb2ceea00743e3a695d
+change-id: 20240215-upstream-net-20240215-misc-fixes-03815ec14dc6
+
+Best regards,
+-- 
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
 
