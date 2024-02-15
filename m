@@ -1,68 +1,57 @@
-Return-Path: <netdev+bounces-71894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57B3485587F
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 01:59:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF5B985588A
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 02:02:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4A3DB29A5B
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 00:59:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E6B21C223C5
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 01:02:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CA30818;
-	Thu, 15 Feb 2024 00:59:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E7DA50;
+	Thu, 15 Feb 2024 01:02:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZMf6Eq5R"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CVQoZunP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D85A59;
-	Thu, 15 Feb 2024 00:59:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21F2E184E;
+	Thu, 15 Feb 2024 01:02:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707958745; cv=none; b=kAa+bauCpxeXEZCk4eixAxA815zUk1jR+JYaIvAECg3aWxak7V66FSevvyUYMZA2Does/LpxmN+5gYtZXh4CrEDYdgQbJKroIyFUm7eBAl+5xnCyefymKibwbmnqnmX/f5++a8gAgR0uUZvxFR01LTWJRTQISsLVYXuuYkYNqVE=
+	t=1707958925; cv=none; b=JLOL08xUOyIlEqQGraj+QMJDwvZ5q9zMlzzBiKHci7APQ59K/lQ3cRHQH41GPDoNegLzjr/6D1wsnjV+SIMB+r7Bxoo+pj25FjGQmaT3G+m5kY8Y0Ey8v40xID8I/7owxZgcQ0Wfws3ia9oXt+wv6WKg9G0pvufYR62AmBQ7hHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707958745; c=relaxed/simple;
-	bh=Nl+odjlfK+R+k/m+CZLLi9s6iAFfj0YBGYAq3Za4WGA=;
+	s=arc-20240116; t=1707958925; c=relaxed/simple;
+	bh=Z7IBwlxEVPqGxWdYiyD7ZJELI6QCwfFBuGkNDpX6rrQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kZSk4RywuHBbmpCFW7+iHXBQdNPF0tJdYTZ1Paat/+B6PJcQsvGIsHQmQHsmDOSBWdPK8PrPDOmEWANjfpO3UkoRkacVGMhb+3NGHlpZ6QDyxjcAWHV3x77+SFcr2Ye7rk93vBoBabxSpDhcdv6dwnZZdaEPOsjn1MxE9xXaqoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZMf6Eq5R; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DE8AC433F1;
-	Thu, 15 Feb 2024 00:59:03 +0000 (UTC)
+	 MIME-Version:Content-Type; b=feoUdIAoGgGs7bWRHQBIzuu5jZ52ZiHTWTnS1ilPYn/43VUcAuK6CCzPdmx9GKrWb1qpu394bssadpK6XaXWIwh2AAuwgFHoKKa1Yn9R9Kzgh19aXlX4YJ78uIl/WhNeAN1vH8Xr9464Z+TY8iaGOR2PsT2dOpsB3r9H/eLC5MI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CVQoZunP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C5F4C433C7;
+	Thu, 15 Feb 2024 01:02:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707958744;
-	bh=Nl+odjlfK+R+k/m+CZLLi9s6iAFfj0YBGYAq3Za4WGA=;
+	s=k20201202; t=1707958924;
+	bh=Z7IBwlxEVPqGxWdYiyD7ZJELI6QCwfFBuGkNDpX6rrQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZMf6Eq5RsvfPskmrJzatmYAiSPCm41VIsaNzxFrS0QiNVtEA2VPMn8J7L8y1+pejr
-	 WuJsto4TmDDe5hdsHhdUrNBvNL3/yNSaDj0oLMpmz/VdDaUfrHZl6fWRtN3gSnC2ky
-	 ykmOESm2qcDTvwibwgOoQ4SwG2Ss1zHETKGb5rOZUNv+s2DLmvHUErat+yqt3n+n1S
-	 OcsInxQJwNmzMBmlK6l7RV4jmrVRCroySN8v0LgilU2biEn7gvTVJHbZZPYPiv78mb
-	 fkWnpwTS2wMQLMBLKEAHNME6yx5OmVQFLLWG2PxsiyLBHlqDj2rJ8o/W+uDONbh4QQ
-	 TvJi3MTFT1xfA==
-Date: Wed, 14 Feb 2024 16:59:02 -0800
+	b=CVQoZunPb8jvNkG6H2BcauSGZlEDjo4hi1jrW8wc9BkZx7jvJgL0H0piu0fejtxSq
+	 H+nksj2s+5vH9/AhV0nGy3BAZYnvh2fB+4zmb+2nqYPMeXrPWl1rD/FoUC4kKAfeop
+	 uc1IubG66AtffHzHRNx89IWicLY06hu73DDhLO4SqArrcVuCo2utRFZc2BdR72ZCpu
+	 y0aTMDVKk4+zBeNgHmnjkvK695Jawn000dSgPz45HpzD798WcWPvlf4LPCSADvHikE
+	 XlOLdfMpECewgAIyWmoAllgeLxNxA2htBM57hNbxih4SmluDuS4FnwjQuVyn2WDS5h
+	 8FsXb/9CSH/VQ==
+Date: Wed, 14 Feb 2024 17:02:03 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
- <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- linux-arm-kernel@lists.infradead.org, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg
- <jesse.brandeburg@intel.com>, Jonathan Corbet <corbet@lwn.net>, Marek
- =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Piergiorgio Beruto
- <piergiorgio.beruto@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- =?UTF-8?B?Tmljb2zDsg==?= Veronese <nicveronese@gmail.com>, Simon Horman
- <horms@kernel.org>, mwojtas@chromium.org
-Subject: Re: [PATCH net-next v7 00/13] Introduce PHY listing and
- link_topology tracking
-Message-ID: <20240214165902.55bf3a04@kernel.org>
-In-Reply-To: <20240213150431.1796171-1-maxime.chevallier@bootlin.com>
-References: <20240213150431.1796171-1-maxime.chevallier@bootlin.com>
+To: Rand Deeb <rand.sec96@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, deeb.rand@confident.ru,
+ lvc-project@linuxtesting.org, voskresenski.stanislav@confident.ru
+Subject: Re: [PATCH] dl2k: Fix potential NULL pointer dereference in
+ receive_packet()
+Message-ID: <20240214170203.5bf20e2d@kernel.org>
+In-Reply-To: <20240213200900.41722-1-rand.sec96@gmail.com>
+References: <20240213200900.41722-1-rand.sec96@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,47 +61,19 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 13 Feb 2024 16:04:17 +0100 Maxime Chevallier wrote:
-> This is V7 for the link topology addition, allowing to track all PHYs
-> that are linked to netdevices.
-> 
-> The main change in V7 is the protection of the main internal API
-> entrypoints (link_topo_init/cleanup, link_topo_add/del_phy) by
-> IS_REACHABLE(CONFIG_PHYLIB).
-> 
-> That's restrictive, but it looks difficult to do otherwise while still keep the
-> data structure opaque and not add dependency clutter with PHYLIB.
-> 
-> As you can tell, I'm unsure about this, so please don't hesitate to
-> comment on that part :)
-> 
-> The other changes are very minor, the only one is a call to netdev_put
-> in the .done() netlink callback.
-> 
-> As a remainder, here's what the PHY listings would look like :
->  - eth0 has a 88x3310 acting as media converter, and an SFP module with
->    an embedded 88e1111 PHY
->  - eth2 has a 88e1510 PHY
+On Tue, 13 Feb 2024 23:09:00 +0300 Rand Deeb wrote:
+> +			if (skb == NULL) {
 
-Needs a rebase, core has been busy lately:
+if (!skb) is more common
 
-Applying: net: phy: Introduce ethernet link topology representation
-Using index info to reconstruct a base tree...
-M	MAINTAINERS
-M	drivers/net/phy/Makefile
-M	drivers/net/phy/phy_device.c
-M	include/linux/netdevice.h
-M	include/linux/phy.h
-M	net/core/dev.c
-Falling back to patching base and 3-way merge...
-Auto-merging net/core/dev.c
-CONFLICT (content): Merge conflict in net/core/dev.c
-Auto-merging include/linux/phy.h
-Auto-merging include/linux/netdevice.h
-Auto-merging drivers/net/phy/phy_device.c
-Auto-merging drivers/net/phy/Makefile
-Auto-merging MAINTAINERS
-Recorded preimage for 'net/core/dev.c'
+> +				np->rx_ring[entry].fraginfo = 0;
+> +				printk (KERN_INFO
+> +				       "%s: receive_packet: "
+> +				       "Unable to re-allocate Rx skbuff.#%d\n",
+> +				       dev->name, entry);
+
+no prints on allocation failure, please, there logs will include OOM
+splats already. A counter as suggested by Jake would be better.
 -- 
 pw-bot: cr
 
