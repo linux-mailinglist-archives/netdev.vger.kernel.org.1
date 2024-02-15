@@ -1,214 +1,149 @@
-Return-Path: <netdev+bounces-72174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4876A856CAA
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 19:32:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 527FF856D07
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 19:46:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBF2C1F22427
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:32:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72D4A1C21CD3
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:46:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 936BC13AA28;
-	Thu, 15 Feb 2024 18:27:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 095D31386BE;
+	Thu, 15 Feb 2024 18:46:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="dkocPXiw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tlew/9Ss"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E766D13A886
-	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 18:27:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDD831386AE;
+	Thu, 15 Feb 2024 18:46:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708021662; cv=none; b=SR/wYCtqlcgHl98RjD14RXiGgijcpB4MIylK3O7PSvq/J9f5QmHF+z2UUv5ueBG0Q6SVQcWc8KbNMnodcJGGGSE+WkLvlPuYhXKVIWgByoBi0ubE7aRXJazY16Akxv3crEOJ+MzB3yDUmhO17CMbpASMXuCfthP9RERnqpoZ8UA=
+	t=1708022778; cv=none; b=PWvioEkvOAP7srhtjigSi2Mq3hjl1qjWjiOVDy2vmzbeGElzASF5Czi/H7Y4kGMK94wyF2AbcmmIIVUyGZTajyYFaTx0sM+m5hF4kAhrkkkYOLTddT0V7sYY1SRe/UxZpCGY+QU2oZC+bh+UC1p2quNeIn4j7Iy6liH+MRSJOlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708021662; c=relaxed/simple;
-	bh=ie+iGNEbrInmXeM7EUsBPBcgubCE4VG7+3jCyBzKxUo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ik45w95OSo4bRT01qzO/i1HSjBNn6EcvsqKX3rShO/kD3frYtOhRGoC5sB6J6r6EFQiGpB5TN9BfmdxcjKizYOotaxbY4484YPneE5QF00WlK6TV965TIc7q292AzFAiRN/b/AuGZ9/RdvjLekySQw2e90bWb1yVjsWKn9sdASs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=dkocPXiw; arc=none smtp.client-ip=209.85.167.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-3c132695f1bso923899b6e.2
-        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 10:27:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1708021660; x=1708626460; darn=vger.kernel.org;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=DjN0KrN4K8ta78wKaCE8wWbE++XwSGRWgX9GpS4l5Vc=;
-        b=dkocPXiwKxPjNKvKpn1Giz/yJsLYGr08t/1oDKqQPxhngCye9Toe5F12ArYExOYp1C
-         nxN0p/eHoTUcsqSCPNyxJ5jvkdEWvA8w3PzC+FlZB+bG5KgONkTGQF7/jcyQOfTG4s8r
-         HVqhkBI2cy05zn8sSdlCykqe8ApGLZq50vMOg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708021660; x=1708626460;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DjN0KrN4K8ta78wKaCE8wWbE++XwSGRWgX9GpS4l5Vc=;
-        b=BE0InFPNsJOTs58+Hp5mqDVuJni9mX4q8fPWCFcLvACWu7BotljcNgCK6Uozmxt7MU
-         5NFCDHspMRxBgxh1abOBfqf3jH1A7jwnYfdpsXNZ1cwlgKbVIipvh00fbtruPUYJ/eYF
-         ra7EK5gG+iZA2iK7TfqQ4wZlkNuJtIeVx4Mfu0OHlNRZpBmo3zlGqChB9GrEghzAbdlW
-         MWY+9e+u2y9UIg7frfvFPmKlWxp51hqrfQ4uPo7QwKo6QXfDj08rySgRoeYhuyJOGDYF
-         RE745zs+vrTRxenfy12HpTvNG407ZQ+C1FSW/x3TBluyAtjMcoz82sTnm9gAvu4/vK0O
-         GUrw==
-X-Gm-Message-State: AOJu0Yyn+KqF3RsgAzcr+/dcwLzqoXfBf2nYslGmRspJYFfhIQbUlOnX
-	j4+6GCGTPdlAUpUuQEnS1Ghu+6zmz0N+WyCzV3ezteugu/S3jHt1o7hn4oSOsP3ivY61j2CDsG/
-	QP+Briv1DYfqb5Wm3eHJkVTsZXTZJmdnzMXWmWSMdV2SQ//eurfxvQ2P/MeJ8L8PGCQXyHCsZ6Z
-	FbUS4j8AIUq5sC6vK3uUkhWc+60qWAViLbTNQPX7nGwQ==
-X-Google-Smtp-Source: AGHT+IHmhET1pIJGjsljlBZCoPCqcZ+qIT9ia2lHH5LqZUw/o0RXU9TJFUjekxtmoP5WcjUZzAj/nQ==
-X-Received: by 2002:a05:6808:9a3:b0:3c0:326a:9cff with SMTP id e3-20020a05680809a300b003c0326a9cffmr2709373oig.23.1708021659611;
-        Thu, 15 Feb 2024 10:27:39 -0800 (PST)
-Received: from stbirv-lnx-1.igp.broadcom.net ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id mf4-20020a0562145d8400b0068f13038031sm901515qvb.5.2024.02.15.10.27.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Feb 2024 10:27:39 -0800 (PST)
-From: Justin Chen <justin.chen@broadcom.com>
-To: netdev@vger.kernel.org
-Cc: Justin Chen <justin.chen@broadcom.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Hangyu Hua <hbh25y@gmail.com>,
-	bcm-kernel-feedback-list@broadcom.com (open list:BROADCOM ASP 2.0 ETHERNET DRIVER),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH 2/2] net: bcmasp: Sanity check is off by one
-Date: Thu, 15 Feb 2024 10:27:32 -0800
-Message-Id: <20240215182732.1536941-3-justin.chen@broadcom.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240215182732.1536941-1-justin.chen@broadcom.com>
-References: <20240215182732.1536941-1-justin.chen@broadcom.com>
+	s=arc-20240116; t=1708022778; c=relaxed/simple;
+	bh=gsqZ97hpL+qwMfZA8WVX81FYsijpd+FqSBNu6MOGT5Q=;
+	h=Date:Content-Type:MIME-Version:From:To:Cc:In-Reply-To:References:
+	 Message-Id:Subject; b=qAJwdq3WQ1WBgriHtOm4eBDb99xMmU/JzijwQROsg4stjJW+EtV1HYhOgwEUjhbPVhsp5gla1lnMajdCkFujINTuos63d9wBcR9N+zjvvu69o/ZG+SstBusYLvp75WsCgjQDjvpUTm2GTXEb6elg/REn4SegOnHVZaYNBLNgiOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tlew/9Ss; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96D28C433F1;
+	Thu, 15 Feb 2024 18:46:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708022778;
+	bh=gsqZ97hpL+qwMfZA8WVX81FYsijpd+FqSBNu6MOGT5Q=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=tlew/9Ss3MNeqTJjIN56A8/T4CV50IX+T+8/QuKNeBr2PrLn/b03nxDIcysewSSUP
+	 87YhpUZQLyvyD2TXT4uTypFyRDmBO5POpMKbjd6Imog0bX3VxTf89FWuqkIHeawruf
+	 bXcPq0w66y+ixEhBDm9LJmvT16eVIaHMyBAYNBXube5cx+w/b3KwUwuXmVtC20OcAD
+	 JF/bWuQlZxMcNeFIUzpVC3ay6Re0pFwTP3gLamR2XrJChchXT2vNed7HMoabh/Z1r1
+	 qTRDStwaafgan4QrGrDGyrFKjuFKb4UzknD33Vs1MknEmOelP40bi6+c+DTOu8FwBF
+	 pX3mthT+ykz7w==
+Date: Thu, 15 Feb 2024 12:46:16 -0600
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000050f80b06116fc800"
-
---00000000000050f80b06116fc800
-Content-Transfer-Encoding: 8bit
-
-A sanity check for OOB write is off by one leading to a false positive
-when the array is full.
-
-Fixes: 9b90aca97f6d ("net: ethernet: bcmasp: fix possible OOB write in bcmasp_netfilt_get_all_active()")
-Signed-off-by: Justin Chen <justin.chen@broadcom.com>
----
- drivers/net/ethernet/broadcom/asp2/bcmasp.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.c b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-index 29b04a274d07..80245c65cc90 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-@@ -535,9 +535,6 @@ int bcmasp_netfilt_get_all_active(struct bcmasp_intf *intf, u32 *rule_locs,
- 	int j = 0, i;
- 
- 	for (i = 0; i < NUM_NET_FILTERS; i++) {
--		if (j == *rule_cnt)
--			return -EMSGSIZE;
--
- 		if (!priv->net_filters[i].claimed ||
- 		    priv->net_filters[i].port != intf->port)
- 			continue;
-@@ -547,6 +544,9 @@ int bcmasp_netfilt_get_all_active(struct bcmasp_intf *intf, u32 *rule_locs,
- 		    priv->net_filters[i - 1].wake_filter)
- 			continue;
- 
-+		if (j == *rule_cnt)
-+			return -EMSGSIZE;
-+
- 		rule_locs[j++] = priv->net_filters[i].fs.location;
- 	}
- 
--- 
-2.34.1
+From: Rob Herring <robh@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Rob Herring <robh+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+ Luis Chamberlain <mcgrof@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>, 
+ netdev@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org, 
+ Andrew Lunn <andrew@lunn.ch>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Dent Project <dentproject@linuxfoundation.org>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Frank Rowand <frowand.list@gmail.com>, Mark Brown <broonie@kernel.org>, 
+ Oleksij Rempel <o.rempel@pengutronix.de>, 
+ Russ Weight <russ.weight@linux.dev>, Eric Dumazet <edumazet@google.com>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+ Jakub Kicinski <kuba@kernel.org>
+In-Reply-To: <20240215-feature_poe-v4-11-35bb4c23266c@bootlin.com>
+References: <20240215-feature_poe-v4-0-35bb4c23266c@bootlin.com>
+ <20240215-feature_poe-v4-11-35bb4c23266c@bootlin.com>
+Message-Id: <170802277529.323906.8697693998570251856.robh@kernel.org>
+Subject: Re: [PATCH net-next v4 11/17] dt-bindings: net: pse-pd: Add
+ another way of describing several PSE PIs
 
 
---00000000000050f80b06116fc800
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+On Thu, 15 Feb 2024 17:02:52 +0100, Kory Maincent wrote:
+> PSE PI setup may encompass multiple PSE controllers or auxiliary circuits
+> that collectively manage power delivery to one Ethernet port.
+> Such configurations might support a range of PoE standards and require
+> the capability to dynamically configure power delivery based on the
+> operational mode (e.g., PoE2 versus PoE4) or specific requirements of
+> connected devices. In these instances, a dedicated PSE PI node becomes
+> essential for accurately documenting the system architecture. This node
+> would serve to detail the interactions between different PSE controllers,
+> the support for various PoE modes, and any additional logic required to
+> coordinate power delivery across the network infrastructure.
+> 
+> The old usage of "#pse-cells" is unsuficient as it carries only the PSE PI
+> index information.
+> 
+> This patch is sponsored by Dent Project <dentproject@linuxfoundation.org>.
+> 
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> ---
+> 
+> Changes in v3:
+> - New patch
+> 
+> Changes in v4:
+> - Remove $def
+> - Fix pairset-names item list
+> - Upgrade few properties description
+> - Update the commit message
+> ---
+>  .../bindings/net/pse-pd/pse-controller.yaml        | 84 +++++++++++++++++++++-
+>  1 file changed, 81 insertions(+), 3 deletions(-)
+> 
 
-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
-NhTY3E+cXCB11wty89QStajwXdhGJTYEvUgvsq1h8CwJj9w/38ldAQf5WjhPmApYeJR2ewFrBMCM
-4lHkdRJ6TDc9nXoEkypUfjJkJHe7Eal06tosh6JpAgMBAAGjggHZMIIB1TAOBgNVHQ8BAf8EBAMC
-BaAwgaMGCCsGAQUFBwEBBIGWMIGTME4GCCsGAQUFBzAChkJodHRwOi8vc2VjdXJlLmdsb2JhbHNp
-Z24uY29tL2NhY2VydC9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcnQwQQYIKwYBBQUHMAGG
-NWh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwME0G
-A1UdIARGMEQwQgYKKwYBBAGgMgEoCjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxz
-aWduLmNvbS9yZXBvc2l0b3J5LzAJBgNVHRMEAjAAMEkGA1UdHwRCMEAwPqA8oDqGOGh0dHA6Ly9j
-cmwuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3JsMCMGA1UdEQQc
-MBqBGGp1c3Rpbi5jaGVuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSME
-GDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUIWGeYuaTsnIada5Xx8TR3cheUbgw
-DQYJKoZIhvcNAQELBQADggEBAHNQlMqQOFYPYFO71A+8t+qWMmtOdd2iGswSOvpSZ/pmGlfw8ZvY
-dRTkl27m37la84AxRkiVMes14JyOZJoMh/g7fbgPlU14eBc6WQWkIA6AmNkduFWTr1pRezkjpeo6
-xVmdBLM4VY1TFDYj7S8H2adPuypd62uHMY/MZi+BIUys4uAFA+N3NuUBNjcVZXYPplYxxKEuIFq6
-sDL+OV16G+F9CkNMN3txsym8Nnx5WAYZb6+rBUIhMGz70V05xsHQfzvo2s7f0J1tJ5BoRlPPhL0h
-VOnWA3h71u9TfSsv+PXVm3P21TfOS2uc1hbzEqyENCP4i5XQ0rv0TmPW42GZ0o4xggJtMIICaQIB
-ATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhH
-bG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwj8BKLXNpALfemdRAwDQYJ
-YIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJa8liF1on5AqvMzEvC4z3tONqvhlTUdleCn
-0uIV8F3rMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDIxNTE4
-Mjc0MFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFl
-AwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATAN
-BgkqhkiG9w0BAQEFAASCAQAMxmGwC6DVxwYuh9icoREQNaa5HlADDpr2gG1rd3oSbZdRrDSk4zvN
-ZSXVfONb//CvWFXmVUpPcRnB1iJFPiqEszTmPoOsk7kB+wbP7So1xf7+R/9oDCM2+XBw75hH3GcJ
-Cy1Evp4UdOPnkZqlOTXINgmbkeUrAbSVQFzCAtWuhPSiW5Msuc6O2DDgQOmLfHPQMgJfnMnuhj4e
-feWBeGrYgqC8C+SDTvKOZBEpgS/RUsMUhcXiVUGirQypHibAIaDlSSYLz4nfaf5tzOBagLLh5us+
-JNoWTJ8593hNxa/98uoJMZNACyj6QeTuCV3RM3TyHfl+p8pZA4w+yqP6mue8
---00000000000050f80b06116fc800--
+My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
+on your patch (DT_CHECKER_FLAGS is new in v5.13):
+
+yamllint warnings/errors:
+./Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml:74:19: [error] string value is redundantly quoted with any quotes (quoted-strings)
+./Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml:75:19: [error] string value is redundantly quoted with any quotes (quoted-strings)
+./Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml:84:111: [warning] line too long (111 > 110 characters) (line-length)
+./Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml:86:111: [warning] line too long (111 > 110 characters) (line-length)
+./Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml:87:111: [warning] line too long (111 > 110 characters) (line-length)
+./Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml:88:111: [warning] line too long (111 > 110 characters) (line-length)
+./Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml:89:111: [warning] line too long (111 > 110 characters) (line-length)
+./Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml:90:111: [warning] line too long (111 > 110 characters) (line-length)
+./Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml:91:111: [warning] line too long (111 > 110 characters) (line-length)
+./Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml:92:111: [warning] line too long (111 > 110 characters) (line-length)
+./Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml:93:111: [warning] line too long (111 > 110 characters) (line-length)
+
+dtschema/dtc warnings/errors:
+
+doc reference errors (make refcheckdocs):
+Warning: Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml references a file that doesn't exist: Documentation/networking/pse-pd/pse-pi.rst
+Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml: Documentation/networking/pse-pd/pse-pi.rst
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240215-feature_poe-v4-11-35bb4c23266c@bootlin.com
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
 
