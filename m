@@ -1,117 +1,87 @@
-Return-Path: <netdev+bounces-72214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3B3F85719D
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 00:33:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB3F985719F
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 00:33:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6151C284857
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 23:33:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68F6A28495B
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 23:33:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12A5013B7A2;
-	Thu, 15 Feb 2024 23:33:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74CB4141995;
+	Thu, 15 Feb 2024 23:33:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e47L7sLl"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="x3QJhEtB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1222612C53A;
-	Thu, 15 Feb 2024 23:33:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6FE212C53A
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 23:33:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708039990; cv=none; b=iQZgea46/aVXiHxiJGbXUWRK7q+s6XWCBlyIilDLYtzDVbbPc65aJ96G4c17q/BCrh4MwFkeAWtrQMeTkBTziY14A5SHN0UzsNbVU0s4Q6c8tyeJusaiq1crV6B/yC0MrPZpayYmeKlOiNkKJX61/7kHDkcZXEG5PA6CepebfNA=
+	t=1708040002; cv=none; b=pBmovggiQsyp8iCT0Qvl52a4wsxlIPvIt4cZD6Io3DP9Ol5LwqFaL/Tlgd8M0czwnEQiSvAYigkGiDnU2/ZwRn+1ZeNqpG+K8VxrATxgn35M7kMNuiHF0DDf1yt7AqphQPkX2jJxpvAK96k9hEFHwc2qwDCh9xTGSyH8zX0pY7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708039990; c=relaxed/simple;
-	bh=ogDnkah+1kseDBaMGbqErn7uqANEFp4Tc516iZ0KoSo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Yv+qsZAm0Y8JKW3OJJ2HGXxNWkvNB+a1yPtDW2JW9ulJj9utMW9zbA5FpAcHyTGAPhlBVWo8vcOUJ1gFxlaANoFoVshP4LlZlPcEiAXgXgTZAH4l+KkbtnXZ5pDE64YvCp++NluccrnbWuwvnEeE4zqI/F5iSCUsf/+A2ZIjDV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e47L7sLl; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5116ec49081so1764622e87.2;
-        Thu, 15 Feb 2024 15:33:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708039985; x=1708644785; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=daKJLiXz02A2IhuUMvvcuGUrV+LM5fm3TkypFzv3PXc=;
-        b=e47L7sLly43p6+pt6AdDawJ2fx6U2VS/X64HxL92mjO0SNMlyuSanb7TAd6LSkj2f4
-         IZkkTKyye5QPn1rJz/62IyV5ZL9dTDUzaxMI7b/4MYUV33fremvlaoM36UVYO/nsnB91
-         hA3YsuosmKMMbhRJ9JN+roYFk4gzl7vpe8ea1UblL3dTP5z52WWmjm54uHpS0BS8FmF1
-         Evphur3aYj1B0ikdxayMKcPNJTuSteM9CtONUij3iwwIydZICt3fmFF+zfqqqdKKyDfV
-         ht0QmkPgis4mh35isqNJRDnHAKeaPY4sXIDMUNp8i4PgkMBeA0wD7vU/XFEJHVz/4SiH
-         KTPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708039985; x=1708644785;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=daKJLiXz02A2IhuUMvvcuGUrV+LM5fm3TkypFzv3PXc=;
-        b=AQGUCCMzmXt11cP9eY+y+raAbyfcF6EkJduX4dcnnF//rO1Jvwge+6JJf+99Mf2GzD
-         u+5mEmRiCID9IqciwnO1rCv0+RYhKxHh+tv5uLYyIDQNxuL5BGXhLc0hyqljWnlJTMLY
-         eZzsJi7weU16UB5XUhYcOO2Sx3wX6w9ROSfPV7/sgFNcurZdudMdZL+psv5zPdwyv9Kf
-         LJs8bE6FKdhecbzHeh8WSjpzCwirP+VXzY93rxMZ7i116JqSeVwWLlhT8DCeiier4Itz
-         dQ1hQCrm5WqFNxcm0UyhS4wWQvDSP4VOGG31SobdhOTFIx1HZyEhwtZSh8PNu53K45oU
-         OsXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXxUGpIZkjW3MWd7T/bwtkFmZw82JoyjqxUiFfWLupZN9u3GXqMJlyBjVmP6BYo4qyHFB+CKywHQpuVMJMHzg7BCNA8GvgO/Yx2DCSSAQBuJHM8MYJn5W5mjiU/8SbseXGgCkDf
-X-Gm-Message-State: AOJu0Yza3zBAPoJNak0arqtg387BCWKR3ZMvhm0c3hAIuwwkccX91jvF
-	gqKI4aiHqSKuGo5vqEfvoGu6OByNsPMeA9LEiofJmvUS3dWpyQw1z3dT6if9tDTuiSQ3edaSZuC
-	SIMJN8P8K16HEj26/x0WTKjoa8IKXexr+KrB1BA==
-X-Google-Smtp-Source: AGHT+IENE8wf43qBl0Zp/ufGQixz/JdkekROujmuqvnHC8RivAR2m57lA0A1PMlQoGO6fQcrDbwFtrvrszZ9J489ujM=
-X-Received: by 2002:a05:6512:200e:b0:512:8dad:2918 with SMTP id
- a14-20020a056512200e00b005128dad2918mr1038613lfb.53.1708039984757; Thu, 15
- Feb 2024 15:33:04 -0800 (PST)
+	s=arc-20240116; t=1708040002; c=relaxed/simple;
+	bh=goLYH9/JQzERA85X9HA2W7b54t0FsA8aZa/ed96S/3E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jp8LVCRjpruFNis+gtnpl5jgNSZKrD5aiB16J/2tcJjNOa3XJxBNncAGryj3tZO+mZ3PU+Xiy4iLdpND/U/A+vbDSSHQJhACNYsXxydG/H58R6GEjIk2FwI3lPk69/LCJ8+oMwr9Fpaof2rY1MPPjpzWDmR0/oiEkhtuzFimvzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=x3QJhEtB; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Ut2takEv/lTh0QQM0d9Rd54jW9GTFw0XGLxgs44u2lI=; b=x3QJhEtByfBnAMDsSrkM5qOPhx
+	vh54VlTnJjPLBUPJPPMk1a9evt3NiMbZA+1xgn4rdm8V8xSpVsiIjxRfSO5MEgUQde0eLzj8uGxk5
+	jJvszgAczYtbK60rHZIoQ/rI49q8xDS45ybd79hKO153rwTCMFRjJgs1unLcw9FNB2XI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ralEF-007vcc-Nz; Fri, 16 Feb 2024 00:33:19 +0100
+Date: Fri, 16 Feb 2024 00:33:19 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	David Miller <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next] ethtool: check for unsupported modes in EEE
+ advertisement
+Message-ID: <ab9ec289-3d40-4541-b22a-a72beaf1e742@lunn.ch>
+References: <c02d4d86-6e65-4270-bc46-70acb6eb2d4a@gmail.com>
+ <Zc4zhPSceYVlYnWc@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240213200900.41722-1-rand.sec96@gmail.com> <20240214170203.5bf20e2d@kernel.org>
-In-Reply-To: <20240214170203.5bf20e2d@kernel.org>
-From: Rand Deeb <rand.sec96@gmail.com>
-Date: Fri, 16 Feb 2024 02:32:54 +0300
-Message-ID: <CAN8dotmVcmpqxO0SyPvit20Ny-tU3OMHr0LLoXRQ3bpPTS5WqA@mail.gmail.com>
-Subject: Re: [PATCH] dl2k: Fix potential NULL pointer dereference in receive_packet()
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, deeb.rand@confident.ru, 
-	lvc-project@linuxtesting.org, voskresenski.stanislav@confident.ru
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zc4zhPSceYVlYnWc@shell.armlinux.org.uk>
 
-On Thu, Feb 15, 2024 at 4:02=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Tue, 13 Feb 2024 23:09:00 +0300 Rand Deeb wrote:
-> > +                     if (skb =3D=3D NULL) {
->
-> if (!skb) is more common
->
-> > +                             np->rx_ring[entry].fraginfo =3D 0;
-> > +                             printk (KERN_INFO
-> > +                                    "%s: receive_packet: "
-> > +                                    "Unable to re-allocate Rx skbuff.#=
-%d\n",
-> > +                                    dev->name, entry);
->
-> no prints on allocation failure, please, there logs will include OOM
-> splats already. A counter as suggested by Jake would be better.
-> --
-> pw-bot: cr
+On Thu, Feb 15, 2024 at 03:53:40PM +0000, Russell King (Oracle) wrote:
+> On Thu, Feb 15, 2024 at 02:05:54PM +0100, Heiner Kallweit wrote:
+> > Let the core check whether userspace returned unsupported modes in the
+> > EEE advertisement bitmap. This allows to remove these checks from
+> > drivers.
+> 
+> Why is this a good thing to implement?
+> 
+> Concerns:
+> 1) This is a change of behaviour for those drivers that do not
+> implement this behaviour.
 
-Dear Jakub,
-Thank you for your feedback and suggestions.
+Hi Heiner
 
-Regarding your comment on using `(!skb)` instead of `(skb =3D=3D NULL)`, I
-understand that `(!skb)` is more common and is also recommended by `
-checkpatch.pl`. However, I chose to keep the original code style and logic
-to maintain consistency and avoid confusion, especially for other
-developers who might be familiar with the existing format. The same
-applies to the `printk` statement. In the same function, there is an exact
-block of code used; should I fix it too?
+You say phylib does this by default? Are there any none phylib/phylink
+drivers which don't implement this behaviour?
+
+	Andrew
+
 
