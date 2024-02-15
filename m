@@ -1,172 +1,242 @@
-Return-Path: <netdev+bounces-71993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B8918560F7
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 12:10:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE9D1856109
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 12:11:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AEA6C1F21292
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 11:10:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 573581F21548
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 11:11:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C470212AAC3;
-	Thu, 15 Feb 2024 11:09:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2972212AACB;
+	Thu, 15 Feb 2024 11:10:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i0A7bOSG"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="GrswMLsi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8775127B6D
-	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 11:08:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63885129A91;
+	Thu, 15 Feb 2024 11:10:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707995341; cv=none; b=LPbA1EFFcISc3dv7FkUrZ63NWzbq2C0HuIHJt5mkBu7Lh01GgzqHEI0uyey4Qkr8Oqv64ihFuXaozhUKkLSorj5JPZxfYQyj66J+7pZmy8jKc5fJCfD17Nv6ZIEmwez7ep9sjRpuO+bC/WYBdoPJoGXWlPii7wJLmOCX8qsFzMc=
+	t=1707995411; cv=none; b=Aw4cQhBJlNtOR56sKy7d3H/lyiieE0K5sOxzvcYRzGOTxqa3qal2RzSbCJ6H0auLeFeu0/fTXIEXONKigCycJWsZfqn9dmfIGHOjP6OBZS1aiiBEFrJZJunJjjyRAlgrNnNMxQojzk0ghmx/5rlUFOm8YJhQ6M3qKmPCOsUQC1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707995341; c=relaxed/simple;
-	bh=C8zDuNCtvAvOU/gsvl4Q6K/P9HsY4GAZgSvWntVfAxM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VmmNeTQt+xJwxV6C/G4f1Crol9ZnhXVZQZK87mhV3ycq2bCmbym9OLpHVroF0f7UFyXfeW7eD6bvr1qY7VdfJ2mmfsUV9AxSFvSW4GGusmRTlWQhrORVKdUa8dDYI+C16re6JUuRsrHjJaNkqr6vPNlj8jDHjQ1k5wsk1UG2ScY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i0A7bOSG; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-55ee686b5d5so955970a12.0
-        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 03:08:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707995338; x=1708600138; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0WYqu1uGvpOq+dRkjJudJW22GWPChtm8s4VU+hAgVC8=;
-        b=i0A7bOSGzC6hqFIdA0FW/XUEDXci0czeO1se7N/r/GhRRDE51qgoANgin8/l3ZP1rO
-         X7OQRCmAOLk6HLzlre7qoQA853I2iEokN3J+QUs6hVUKsfs/4o1tirgm9NSb3YuEDyoU
-         RSILMufmaJNmFSquGEG2gbWARg+9VnWTttEONYGwRXzp3DJutXCa4nPzIgTDLEcPzAvx
-         WmSdjyiR+EM5yTaK73nCYHcdaAhu8mRCpMzocEGkPqrW8LJYIxVB/sGCog10d7ZZdIKb
-         Niiho5bo13XfvLnqtntIuDsGRzH/lT22Z5pS/WzOFoyZAxT2WamRMfwOB1fWP0YfZDd6
-         eaVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707995338; x=1708600138;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0WYqu1uGvpOq+dRkjJudJW22GWPChtm8s4VU+hAgVC8=;
-        b=tnEGZ4kMUIkVadmByW0oYYwaqNtYgliNFtN5Ef7QavL2GXELkE1jl8ZqYOguIul1cC
-         t2A6600e8ca9IiMMdZHJY5cddrbZI3W1IVY3hqqmArs+bi1N2RY0l6qkuBfNEEr/Q3ZP
-         BToVv4Gzmd8aFtIGSxw9sZW2iUo4x+uu+3bxVfjPoPczvB7Bq/qdMcAXqu76MsdGmV7e
-         Vdf8vWD+5AkB9mTv9ORlOhOjvtsMAqZHVFWyfaKZKfbGTdqVTesekJfKYO9D1yEnwi9i
-         XkNuowpchEpKF6zka16tdx5nxK8WhgASdZe/NKCO7nUES6q81YGcwRgVIna0hUvlfFZi
-         zTrQ==
-X-Gm-Message-State: AOJu0YzR3VDFI0t8zos4Ujz9ta7Y9n+VzY56zeycTWihrlMVXiE38wmd
-	mVltqxm0NF6JjNO67vqd/x2h8RVytLRQ82ubgLb9g5BZw79sLkC1ueL8HGNcDv5UaX1Z1oyuViw
-	bwK2NeenY+NXYrKFdbzriWaw+EU8=
-X-Google-Smtp-Source: AGHT+IGVoyvGqjsIsW6jB8UzETJkce/xaAFHhNBg4FbEZTbKEEBIYi2oYp1uyvS1c3GpZF3j+vP0iVYjTLtVoLTLTAk=
-X-Received: by 2002:aa7:d047:0:b0:55f:ec52:73c4 with SMTP id
- n7-20020aa7d047000000b0055fec5273c4mr1176947edo.34.1707995337623; Thu, 15 Feb
- 2024 03:08:57 -0800 (PST)
+	s=arc-20240116; t=1707995411; c=relaxed/simple;
+	bh=jvC+lMRGc6c7n5MUk7PAjVtPBj27Vmls03WU2plIzsI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mxQ279pujBT6t0NWYHUw1j5vOBGlmtteXG0+wYLObXJSbl+mEoOIwrE6ihDG7GADoZpinaVgW0xuYG62oD53dlPcxPzY2G4Zsw7qxByjLk7/E4zIx5CWvkiVbYhd/c+7kY9/krFgLzzUmmgbU4I5koaBfJL594Un0THamiPrZbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=GrswMLsi; arc=none smtp.client-ip=198.47.23.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 41FB9xXm081717;
+	Thu, 15 Feb 2024 05:09:59 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1707995399;
+	bh=HedDIvMLYfuWkKr9N3wYCvW8OcWi6ejb9YfzXb/Bzvg=;
+	h=From:To:CC:Subject:Date;
+	b=GrswMLsiwU/cAv2jsnm3AfqhIVIP17EMF1M72cPxVQVJtlm3Nj+e4QE8wJLZhZ9cw
+	 7QJLXM7t/Te8T5ZAs5X4Co3f6vmMolSzG0bD50+a78CKThU3XlJ1ZOQ6UxmvMXgnfy
+	 yVBTliURsNRIgYqzRzvrEwkqpMRVc6+1lE1Vc6lg=
+Received: from DFLE106.ent.ti.com (dfle106.ent.ti.com [10.64.6.27])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 41FB9xDx046597
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 15 Feb 2024 05:09:59 -0600
+Received: from DFLE105.ent.ti.com (10.64.6.26) by DFLE106.ent.ti.com
+ (10.64.6.27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 15
+ Feb 2024 05:09:58 -0600
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE105.ent.ti.com
+ (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 15 Feb 2024 05:09:58 -0600
+Received: from localhost (chintan-thinkstation-p360-tower.dhcp.ti.com [172.24.227.220])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 41FB9wix069245;
+	Thu, 15 Feb 2024 05:09:58 -0600
+From: Chintan Vankar <c-vankar@ti.com>
+To: Chintan Vankar <c-vankar@ti.com>,
+        Dan Carpenter
+	<dan.carpenter@linaro.org>,
+        Roger Quadros <rogerq@kernel.org>,
+        Siddharth
+ Vadapalli <s-vadapalli@ti.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+        Eric
+ Dumazet <edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+Subject: [PATCH net-next 1/2] net: ethernet: ti: am65-cpts: Enable PTP RX HW timestamp using CPTS FIFO
+Date: Thu, 15 Feb 2024 16:39:52 +0530
+Message-ID: <20240215110953.3225099-1-c-vankar@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240215012027.11467-1-kerneljasonxing@gmail.com> <20240215012027.11467-5-kerneljasonxing@gmail.com>
-In-Reply-To: <20240215012027.11467-5-kerneljasonxing@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 15 Feb 2024 19:08:20 +0800
-Message-ID: <CAL+tcoAgSjwsmFnDh_Gs9ZgMi-y5awtVx+4VhJPNRADjo7LLSA@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 04/11] tcp: directly drop skb in cookie check
- for ipv6
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, kuniyu@amazon.com
-Cc: netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-On Thu, Feb 15, 2024 at 9:20=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> From: Jason Xing <kernelxing@tencent.com>
->
-> Like previous patch does, only moving skb drop logical code to
-> cookie_v6_check() for later refinement.
->
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> --
-> v5
-> Link: https://lore.kernel.org/netdev/CANn89iKz7=3D1q7e8KY57Dn3ED7O=3DRCOf=
-LxoHQKO4eNXnZa1OPWg@mail.gmail.com/
-> 1. avoid duplication of these opt_skb tests/actions (Eric)
-> ---
->  net/ipv6/syncookies.c |  4 ++++
->  net/ipv6/tcp_ipv6.c   | 11 ++++-------
->  2 files changed, 8 insertions(+), 7 deletions(-)
->
-> diff --git a/net/ipv6/syncookies.c b/net/ipv6/syncookies.c
-> index 6b9c69278819..ea0d9954a29f 100644
-> --- a/net/ipv6/syncookies.c
-> +++ b/net/ipv6/syncookies.c
-> @@ -177,6 +177,7 @@ struct sock *cookie_v6_check(struct sock *sk, struct =
-sk_buff *skb)
->         struct sock *ret =3D sk;
->         __u8 rcv_wscale;
->         int full_space;
-> +       SKB_DR(reason);
->
->         if (!READ_ONCE(net->ipv4.sysctl_tcp_syncookies) ||
->             !th->ack || th->rst)
-> @@ -256,10 +257,13 @@ struct sock *cookie_v6_check(struct sock *sk, struc=
-t sk_buff *skb)
->         ireq->ecn_ok &=3D cookie_ecn_ok(net, dst);
->
->         ret =3D tcp_get_cookie_sock(sk, skb, req, dst);
-> +       if (!ret)
-> +               goto out_drop;
->  out:
->         return ret;
->  out_free:
->         reqsk_free(req);
->  out_drop:
-> +       kfree_skb_reason(skb, reason);
->         return NULL;
->  }
-> diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-> index 57b25b1fc9d9..1ca4f11c3d6f 100644
-> --- a/net/ipv6/tcp_ipv6.c
-> +++ b/net/ipv6/tcp_ipv6.c
-> @@ -1653,16 +1653,13 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff=
- *skb)
->         if (sk->sk_state =3D=3D TCP_LISTEN) {
->                 struct sock *nsk =3D tcp_v6_cookie_check(sk, skb);
->
-> -               if (!nsk)
-> -                       goto discard;
-> -
-> -               if (nsk !=3D sk) {
-> +               if (nsk && nsk !=3D sk) {
->                         if (tcp_child_process(sk, nsk, skb))
->                                 goto reset;
-> -                       if (opt_skb)
-> -                               __kfree_skb(opt_skb);
-> -                       return 0;
->                 }
-> +               if (opt_skb)
-> +                       __kfree_skb(opt_skb);
-> +               return 0;
+CPTS module supports capturing timestamp for every packet it receives,
+add a new function named "am65_cpts_rx_find_ts()" to get the timestamp
+of received packets from CPTS FIFO.
 
-Oops, the above lines went wrong, which could cause the error that
-Paolo reported in my patch[0/11] email.
+Add another function named "am65_cpts_rx_timestamp()" which internally
+calls "am65_cpts_rx_find_ts()" function and timestamps the received
+PTP packets.
 
-The error could happen when if:
-    nsk !=3D NULL && nsk =3D=3D sk
-it will return 0, which is against old behaviour :(
+Signed-off-by: Chintan Vankar <c-vankar@ti.com>
+---
+ drivers/net/ethernet/ti/am65-cpts.c | 84 +++++++++++++++++++++--------
+ drivers/net/ethernet/ti/am65-cpts.h | 11 ++--
+ 2 files changed, 67 insertions(+), 28 deletions(-)
 
-I will fix this...
+diff --git a/drivers/net/ethernet/ti/am65-cpts.c b/drivers/net/ethernet/ti/am65-cpts.c
+index c66618d91c28..92a3b40e60d6 100644
+--- a/drivers/net/ethernet/ti/am65-cpts.c
++++ b/drivers/net/ethernet/ti/am65-cpts.c
+@@ -859,29 +859,6 @@ static long am65_cpts_ts_work(struct ptp_clock_info *ptp)
+ 	return delay;
+ }
+ 
+-/**
+- * am65_cpts_rx_enable - enable rx timestamping
+- * @cpts: cpts handle
+- * @en: enable
+- *
+- * This functions enables rx packets timestamping. The CPTS can timestamp all
+- * rx packets.
+- */
+-void am65_cpts_rx_enable(struct am65_cpts *cpts, bool en)
+-{
+-	u32 val;
+-
+-	mutex_lock(&cpts->ptp_clk_lock);
+-	val = am65_cpts_read32(cpts, control);
+-	if (en)
+-		val |= AM65_CPTS_CONTROL_TSTAMP_EN;
+-	else
+-		val &= ~AM65_CPTS_CONTROL_TSTAMP_EN;
+-	am65_cpts_write32(cpts, val, control);
+-	mutex_unlock(&cpts->ptp_clk_lock);
+-}
+-EXPORT_SYMBOL_GPL(am65_cpts_rx_enable);
+-
+ static int am65_skb_get_mtype_seqid(struct sk_buff *skb, u32 *mtype_seqid)
+ {
+ 	unsigned int ptp_class = ptp_classify_raw(skb);
+@@ -906,6 +883,67 @@ static int am65_skb_get_mtype_seqid(struct sk_buff *skb, u32 *mtype_seqid)
+ 	return 1;
+ }
+ 
++static u64 am65_cpts_find_rx_ts(struct am65_cpts *cpts, struct sk_buff *skb,
++				int ev_type, u32 skb_mtype_seqid)
++{
++	struct list_head *this, *next;
++	struct am65_cpts_event *event;
++	unsigned long flags;
++	u32 mtype_seqid;
++	u64 ns = 0;
++
++	am65_cpts_fifo_read(cpts);
++	spin_lock_irqsave(&cpts->lock, flags);
++	list_for_each_safe(this, next, &cpts->events) {
++		event = list_entry(this, struct am65_cpts_event, list);
++		if (time_after(jiffies, event->tmo)) {
++			list_del_init(&event->list);
++			list_add(&event->list, &cpts->pool);
++			continue;
++		}
++
++		mtype_seqid = event->event1 &
++			      (AM65_CPTS_EVENT_1_MESSAGE_TYPE_MASK |
++			       AM65_CPTS_EVENT_1_SEQUENCE_ID_MASK |
++			       AM65_CPTS_EVENT_1_EVENT_TYPE_MASK);
++
++		if (mtype_seqid == skb_mtype_seqid) {
++			ns = event->timestamp;
++			list_del_init(&event->list);
++			list_add(&event->list, &cpts->pool);
++			break;
++		}
++	}
++	spin_unlock_irqrestore(&cpts->lock, flags);
++
++	return ns;
++}
++
++void am65_cpts_rx_timestamp(struct am65_cpts *cpts, struct sk_buff *skb)
++{
++	struct am65_cpts_skb_cb_data *skb_cb = (struct am65_cpts_skb_cb_data *)skb->cb;
++	struct skb_shared_hwtstamps *ssh;
++	int ret;
++	u64 ns;
++
++	ret = am65_skb_get_mtype_seqid(skb, &skb_cb->skb_mtype_seqid);
++	if (!ret)
++		return; /* if not PTP class packet */
++
++	skb_cb->skb_mtype_seqid |= (AM65_CPTS_EV_RX << AM65_CPTS_EVENT_1_EVENT_TYPE_SHIFT);
++
++	dev_dbg(cpts->dev, "%s mtype seqid %08x\n", __func__, skb_cb->skb_mtype_seqid);
++
++	ns = am65_cpts_find_rx_ts(cpts, skb, AM65_CPTS_EV_RX, skb_cb->skb_mtype_seqid);
++	if (!ns)
++		return;
++
++	ssh = skb_hwtstamps(skb);
++	memset(ssh, 0, sizeof(*ssh));
++	ssh->hwtstamp = ns_to_ktime(ns);
++}
++EXPORT_SYMBOL_GPL(am65_cpts_rx_timestamp);
++
+ /**
+  * am65_cpts_tx_timestamp - save tx packet for timestamping
+  * @cpts: cpts handle
+diff --git a/drivers/net/ethernet/ti/am65-cpts.h b/drivers/net/ethernet/ti/am65-cpts.h
+index 6e14df0be113..6099d772799d 100644
+--- a/drivers/net/ethernet/ti/am65-cpts.h
++++ b/drivers/net/ethernet/ti/am65-cpts.h
+@@ -22,9 +22,9 @@ void am65_cpts_release(struct am65_cpts *cpts);
+ struct am65_cpts *am65_cpts_create(struct device *dev, void __iomem *regs,
+ 				   struct device_node *node);
+ int am65_cpts_phc_index(struct am65_cpts *cpts);
++void am65_cpts_rx_timestamp(struct am65_cpts *cpts, struct sk_buff *skb);
+ void am65_cpts_tx_timestamp(struct am65_cpts *cpts, struct sk_buff *skb);
+ void am65_cpts_prep_tx_timestamp(struct am65_cpts *cpts, struct sk_buff *skb);
+-void am65_cpts_rx_enable(struct am65_cpts *cpts, bool en);
+ u64 am65_cpts_ns_gettime(struct am65_cpts *cpts);
+ int am65_cpts_estf_enable(struct am65_cpts *cpts, int idx,
+ 			  struct am65_cpts_estf_cfg *cfg);
+@@ -48,17 +48,18 @@ static inline int am65_cpts_phc_index(struct am65_cpts *cpts)
+ 	return -1;
+ }
+ 
+-static inline void am65_cpts_tx_timestamp(struct am65_cpts *cpts,
++static inline void am65_cpts_rx_timestamp(struct am65_cpts *cpts,
+ 					  struct sk_buff *skb)
+ {
+ }
+ 
+-static inline void am65_cpts_prep_tx_timestamp(struct am65_cpts *cpts,
+-					       struct sk_buff *skb)
++static inline void am65_cpts_tx_timestamp(struct am65_cpts *cpts,
++					  struct sk_buff *skb)
+ {
+ }
+ 
+-static inline void am65_cpts_rx_enable(struct am65_cpts *cpts, bool en)
++static inline void am65_cpts_prep_tx_timestamp(struct am65_cpts *cpts,
++					       struct sk_buff *skb)
+ {
+ }
+ 
+-- 
+2.34.1
 
->         } else
->                 sock_rps_save_rxhash(sk, skb);
->
-> --
-> 2.37.3
->
 
