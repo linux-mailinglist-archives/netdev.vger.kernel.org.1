@@ -1,135 +1,164 @@
-Return-Path: <netdev+bounces-72046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72048-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20056856491
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 14:37:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 584588564A6
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 14:42:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0E861F21809
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 13:37:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AEE41C210C3
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 13:42:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04F2B130ACA;
-	Thu, 15 Feb 2024 13:37:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0008F12FF8C;
+	Thu, 15 Feb 2024 13:41:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S1e/2dlz"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="OxMr/dfM";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="TRh4sP/M";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="OxMr/dfM";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="TRh4sP/M"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D012712FF7F;
-	Thu, 15 Feb 2024 13:37:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EF9512BF3D
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 13:41:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708004234; cv=none; b=tMVHMT/pXj+zQc65LYji7SkUCkS+Jcwmw4IKOYAkrENY58dxbtTtr3pWTtkgCvOeD+Crs0mrz+b/Ux82I8zYVV8btj4KhxtrOhJvjKLlbh7+Xl/q7vuegTzpM7lemq9dDhal2yOvH6Orf1Lxb0zb5lC0c2hlD8JvKo3GMKEx4dA=
+	t=1708004511; cv=none; b=I22iYP3vvymDawIbA14vUW1afczgKSTyb3hl8xVvLrk09cILTnorbzQ5OpobE+Qookkdt5ZWcIDRz6dVqKhLCHvhvpamQKbVF2rEzeKOh17gPQ9hBbPQHyw/oKmxujJWZ8JGPMm6LFQ1DV8SFzvSyDnVIQ/WsbajNzqE8t8NoCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708004234; c=relaxed/simple;
-	bh=PFVxtk7+DZ0DWAk3Wc+rdZQ+V9hnlPmccXAlqx5M7eM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jND8xivFnD5gg0Yy0KodKllxWqDb2Bmtruk42LgYrPPkKQGZVdab8gvMQ1Fct3Bl5nSz+17dDtstr2EnsYe3CySbckdViNd7FRk+Ze1hOr0jf3PKSgL1Zqe6qDVlmuLCURgdIGS+EIabPMfibxLvcwTSfBhd4TvFuT1jeS2rlfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S1e/2dlz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0BCDC433C7;
-	Thu, 15 Feb 2024 13:37:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708004234;
-	bh=PFVxtk7+DZ0DWAk3Wc+rdZQ+V9hnlPmccXAlqx5M7eM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=S1e/2dlz+50J6jjmgBIN2URUTZmnc7ALcdTSep8FsCPgGRXiqVXjl56plOSsa/KNI
-	 cqiE0wvyF9OIFjSYsjxZmyalEAo5zkmZxWEAgKH0rtMCmwutb5YOz8Ky/ieebDD7GD
-	 lyp1UgYX/iJrdSFGDzzoo5Su0p0ucadd8TKNsp4Ybbxyc1ZuL6qNA6E6SzYzHyTtvf
-	 tnQqhvjWIJgUdDkXfDzN67YkP16WScFIk3xKlo3+SQEQ5ZqaOc059N4Mruat2t5EcC
-	 4nRILszRrDisu93gYIg/K45KMDHqWopKEneSp8qnYsDDw5Sy4e+Kv7bRZ6Y7TM1XNh
-	 NQKGKhq+/dTNw==
-Date: Thu, 15 Feb 2024 14:37:10 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] page_pool: disable direct recycling based on
- pool->cpuid on destroy
-Message-ID: <Zc4Tht2TAkFOhq9Y@lore-desk>
-References: <20240215113905.96817-1-aleksander.lobakin@intel.com>
- <87v86qc4qd.fsf@toke.dk>
- <8aa809c0-585f-4750-98d4-e19165c6ff73@intel.com>
+	s=arc-20240116; t=1708004511; c=relaxed/simple;
+	bh=dcwLihil4igzzwUhpkcu9HoHeqw9l+1dIq2/TwMXeSg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PmrN9+Wt7aOiD7I474h2S7Ts1H+sYYCoyvoAEbhdCE0+VtpdAaybE+90abBzC/VkDKSqlZbJd9nPzKNPKUrR9ZxDsGRxaQy8p7zBVmNpkju3MgCg835Jbk5zW7ij6fzRFf4QK0j5xgtrXLPnnXPGDYETj8pZA6xTBwX+5AMG6ko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=OxMr/dfM; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=TRh4sP/M; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=OxMr/dfM; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=TRh4sP/M; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:98])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 7972A21D98;
+	Thu, 15 Feb 2024 13:41:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1708004508; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=F/zc2dnO4itUQdbZCCHiTIsPsEZquxX3wzRQavNOJ6Y=;
+	b=OxMr/dfMbFj6OaOIZo0bTKQ32AHclCT+CoxWaq9CHoK5vxHq42mB0WT7YeEw8Ev+PVLD+J
+	fa5Y9xTdazJ5oqF4qar2Fkvwj2Wo/r+n6AtAbeRPdVmkq7tEI5bEX43oUBiObgNYumAvLv
+	CEhPxqX+Bkh8QqE0MDZYVgNni3MvDpg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1708004508;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=F/zc2dnO4itUQdbZCCHiTIsPsEZquxX3wzRQavNOJ6Y=;
+	b=TRh4sP/MdFLz6UwniamnFaoWLHKehIlRViAJhrbna2g6ukSuOlZ8abBrT20OwPjK06Ju/6
+	N/3r2AlusjChnFCw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1708004508; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=F/zc2dnO4itUQdbZCCHiTIsPsEZquxX3wzRQavNOJ6Y=;
+	b=OxMr/dfMbFj6OaOIZo0bTKQ32AHclCT+CoxWaq9CHoK5vxHq42mB0WT7YeEw8Ev+PVLD+J
+	fa5Y9xTdazJ5oqF4qar2Fkvwj2Wo/r+n6AtAbeRPdVmkq7tEI5bEX43oUBiObgNYumAvLv
+	CEhPxqX+Bkh8QqE0MDZYVgNni3MvDpg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1708004508;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=F/zc2dnO4itUQdbZCCHiTIsPsEZquxX3wzRQavNOJ6Y=;
+	b=TRh4sP/MdFLz6UwniamnFaoWLHKehIlRViAJhrbna2g6ukSuOlZ8abBrT20OwPjK06Ju/6
+	N/3r2AlusjChnFCw==
+Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id 0E713139D0;
+	Thu, 15 Feb 2024 13:41:47 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap2.dmz-prg2.suse.org with ESMTPSA
+	id YkxIOpsUzmWYHQAAn2gu4w
+	(envelope-from <dkirjanov@suse.de>); Thu, 15 Feb 2024 13:41:47 +0000
+Message-ID: <f6ae42d5-5fb8-476e-acfa-db192ac8aec9@suse.de>
+Date: Thu, 15 Feb 2024 16:41:47 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="JwdDwmzJQxeHUrty"
-Content-Disposition: inline
-In-Reply-To: <8aa809c0-585f-4750-98d4-e19165c6ff73@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH ethtool] ethtool: put driver specific code into drivers
+ dir
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>, Denis Kirjanov <kirjanov@gmail.com>
+Cc: mkubecek@suse.cz, netdev@vger.kernel.org
+References: <20240214135505.7721-1-dkirjanov@suse.de>
+ <2951e395-7982-47bb-a9f6-c732c2affaaf@lunn.ch>
+From: Denis Kirjanov <dkirjanov@suse.de>
+In-Reply-To: <2951e395-7982-47bb-a9f6-c732c2affaaf@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="OxMr/dfM";
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="TRh4sP/M"
+X-Spamd-Result: default: False [-0.44 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 XM_UA_NO_VERSION(0.01)[];
+	 FROM_HAS_DN(0.00)[];
+	 RCPT_COUNT_THREE(0.00)[4];
+	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 MIME_GOOD(-0.10)[text/plain];
+	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:98:from];
+	 TO_DN_SOME(0.00)[];
+	 BAYES_HAM(-0.14)[68.18%];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 DKIM_TRACE(0.00)[suse.de:+];
+	 MX_GOOD(-0.01)[];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim];
+	 FREEMAIL_TO(0.00)[lunn.ch,gmail.com];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 RCVD_TLS_ALL(0.00)[];
+	 MID_RHS_MATCH_FROM(0.00)[]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Score: -0.44
+X-Rspamd-Queue-Id: 7972A21D98
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spamd-Bar: /
 
 
---JwdDwmzJQxeHUrty
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-> From: Toke H=F8iland-J=F8rgensen <toke@redhat.com>
-> Date: Thu, 15 Feb 2024 13:05:30 +0100
->=20
-> > Alexander Lobakin <aleksander.lobakin@intel.com> writes:
-> >=20
-> >> Now that direct recycling is performed basing on pool->cpuid when set,
-> >> memory leaks are possible:
-> >>
-> >> 1. A pool is destroyed.
-> >> 2. Alloc cache is emptied (it's done only once).
-> >> 3. pool->cpuid is still set.
-> >> 4. napi_pp_put_page() does direct recycling basing on pool->cpuid.
-> >> 5. Now alloc cache is not empty, but it won't ever be freed.
-> >=20
-> > Did you actually manage to trigger this? pool->cpuid is only set for the
-> > system page pool instance which is never destroyed; so this seems a very
-> > theoretical concern?
->=20
-> To both Lorenzo and Toke:
->=20
-> Yes, system page pools are never destroyed, but we might latter use
-> cpuid in non-persistent PPs. Then there will be memory leaks.
-> I was able to trigger this by creating bpf/test_run page_pools with the
-> cpuid set to test direct recycling of live frames.
+On 2/14/24 21:12, Andrew Lunn wrote:
+> On Wed, Feb 14, 2024 at 08:55:05AM -0500, Denis Kirjanov wrote:
+>> the patch moves the driver specific code in drivers
+>> directory
+> 
+> It is normal for the commit message to give the answer to the question
+> "Why?".
 
-what about avoiding the page to be destroyed int this case? I do not like t=
-he
-idea of overwriting the cpuid field for it.
+"For better code organization the patch moves the driver-specific code into drivers directory"
 
-Regards,
-Lorenzo
+> 
+> Also, what is your definition of a driver? I would not really call the
+> sfp parts drivers.
 
->=20
-> >=20
-> > I guess we could still do this in case we find other uses for setting
-> > the cpuid; I don't think the addition of the READ_ONCE() will have any
-> > measurable overhead on the common arches?
->=20
-> READ_ONCE() is cheap, but I thought it's worth mentioning in the
-> commitmsg anyway :)
->=20
-> >=20
-> > -Toke
-> >=20
->=20
-> Thanks,
-> Olek
+Sure, I'll put them back in the next version
 
---JwdDwmzJQxeHUrty
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZc4ThgAKCRA6cBh0uS2t
-rMKzAQCWGs8izokKKobJ1o5bjr0dNcsLSO9pBKgU1pZJzetrwQEA6Vm0zCDsUzog
-/Eh2aXqvy9gf0llzRVEpBYYSeLz0zgA=
-=r6Tb
------END PGP SIGNATURE-----
-
---JwdDwmzJQxeHUrty--
+> 
+>     Andrew
+> 
 
