@@ -1,146 +1,181 @@
-Return-Path: <netdev+bounces-72133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 803D0856AE6
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:24:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 36E10856AEB
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:25:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B33E91C2390D
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 17:24:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C3511C2290A
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 17:25:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 015A0136672;
-	Thu, 15 Feb 2024 17:24:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECECC136998;
+	Thu, 15 Feb 2024 17:25:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="FUmy2o8z"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="KBtxMHqC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8B8D136661
-	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 17:24:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB4B713667C
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 17:25:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708017844; cv=none; b=azU5xWrmmwBkQSUrXwIG1U6ef6zTYm6y7Vozykj2vF6aYOYpaXK8WbkxbR2g3VsGAEA6EYNYq4lSnDfuMWj/klsOGzQlP2IGRPpjhcScuariTSO9JVPUWh5Q9oUzj04knXE1DCMotuqOojDfGg/IDi6Wwyh7rJCzEvbze4/xzGA=
+	t=1708017951; cv=none; b=Vo38mMyx5+jJZ2oXbwZXcXvCTyFb/o6gKcZh0WjXZtl8A5KEqcOzua+eWF0UDDWkMmV7SeJz90w9gP7g57Gvriy1cko2dHRPzmEgJ8Lg7ZIhWs8uDqvYQQJw1EjWS1a8G0xUOi0x3ogZs58fBsfWP7ONiMOtyO4QqiDJwAquoc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708017844; c=relaxed/simple;
-	bh=/0443loGy5tUz569Yp/S1Q3+MQhR3MGAH8oZodWdsPc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Zf5wr9nnkx7oIt1UohxGzUj5mb+y/Go4Ji8q9Z4dqDEa1HX3uIyuwWhig9OHvmD8D/WrDgSEGD65UhO+tF/DIcjvYAJXQ6TgtaL6qt5Qs6Qt/9mmlNByt0+MFQdt8sX4X0n0Bw0q1q/ULtZDjTMJuo3bsVYr3DCS/npbNw9ARAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=FUmy2o8z; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1d934c8f8f7so10693705ad.2
-        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 09:24:02 -0800 (PST)
+	s=arc-20240116; t=1708017951; c=relaxed/simple;
+	bh=v5JNUzQrlc/Ze3O2xGRTThncYAxGfewIlMkjSF3Zios=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jQb+xkDYc9WLLy3rIcrHfXADmhxCAqYcf8Q9A3SwGvz1Pbo7yGdBj7nDOoHc6sIt38GziGVhXr8IpEl6AtlTSiKnpgzN+Jg5oF24tYM7iYdpH0HImU6NS5lyKPxmlGT0eRyg+3rLM7qgO0WAEfhvj5BzfAjwjmV8Xuqs3/qiTxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=KBtxMHqC; arc=none smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2d0d799b55cso13749091fa.0
+        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 09:25:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1708017842; x=1708622642; darn=vger.kernel.org;
-        h=mime-version:references:in-reply-to:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/0443loGy5tUz569Yp/S1Q3+MQhR3MGAH8oZodWdsPc=;
-        b=FUmy2o8z/CYprWfUJyPAgvWEr1eMEKJOipw1fVRavLdTFTsjWUdiU8ZHOHxTLM1bbr
-         /GbhPlwe9acSfK8YgkTdFBQe1eGsFIPvqhqSQtx1yDdI0WYupl50k9iSXthwfc/EN+KR
-         L+u4bxOM8A6OmnBoyZpsPECuIuJpUj27lywp0AeuxzZbmHRFDuJXxpDxwfUoEyfgC+Ca
-         a9SdhVbTmonvtjxgqm2zh68akKZIvKAyEj5btHwBHRxegXXRiECIknBjyUao8+kb2vRU
-         WvP0zD2wIWGWKuhndwegwwvHVp8Zct/ECqIe5SjuC2HdWcjtYnPtPE6IOz/xZr9NSLC5
-         s7zw==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708017946; x=1708622746; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=cuuhvY1knev/MlE0VuD+OUGRlkZI73nAFQGnaq1zL0U=;
+        b=KBtxMHqCVMh5xPPcV57Mh1w2jL5TdymJRJhKtgk+r9qRE2j2Ew/E5a6q5yl/+JI1Lm
+         c442uJREe0uBvvW6fTWe/XhPPNkHn8lnC8WQvTp9ypWAH83+2NiXN4Vyd41OC978M5fu
+         cr+W5XV4wtlj0K4jrUaIlQTqYdbSI3rrVJh+NbCZUN6z1gmjIe0FsO/ANwjJrU4riEMf
+         12YuKUkkv88qI5iHrrQKQVbLCOjrYwaqD1Nlbw5mvAZJZM2iQawpR9CnhQGPEQ1GRMwI
+         NTjj24IChQLnX91BEQ4elM2ztFQRi5k9OrfCRDY2IOKDndUq56vgduCHoAKtsYZqCcBl
+         +mEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708017842; x=1708622642;
-        h=mime-version:references:in-reply-to:message-id:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/0443loGy5tUz569Yp/S1Q3+MQhR3MGAH8oZodWdsPc=;
-        b=hXHh72Dw76sNznAnn++Iltt4dtEZuzSEbT3kXc7N17Il0CtyQMCyzsannK55aic7pa
-         I32qex3GnzPmXcycPhv3rcdwmmOKO6tLfeOn+j4+7rn2wm4wvhYRdHQtTNq9DnJ0gF+e
-         95nngF3nKffp7Ty4+Jky0YOfXP/qdcV1DkVaV+8RmTGzxTcg/JvuV4QKBOrGqr8ev22g
-         6t90oNCU7pdaVaBth7Yar4Ej24OZ4xpxkhFwBupHu0n1w3528HLrtCidw8vhlE1G2Ye9
-         +d8kVBPtOw/4SU9spFzZHTSEBPih8rMSECAJ5d9aiRH6vFfBRcuIpCS2rxvDtcpsVAFP
-         afNA==
-X-Forwarded-Encrypted: i=1; AJvYcCW36O3wOb20CQFVFvzPwOUmCFTOYoYCnuln9JrXhLXW5jyBEo70Wcg8KPzeSGUfIrSI1+n7uKdTcy7j5JH4PrpWVYvMyEbg
-X-Gm-Message-State: AOJu0YxqMJNUuf45yy1t8N+CStt7gcOeh3Kd69osTVCCi5f6mGmalNd+
-	jm9k6k7sKe1UMydkseW6yfUtojVJtbFmjp4J/HE+XWenVqKt4axjj+gnG1z4OXQ=
-X-Google-Smtp-Source: AGHT+IGSbneskwm9uDBxYfMqg3Yo1y+uJeeRS8rFmyh+ukno/mxPlzC27DHcddpsPnlLgMYk70HQiQ==
-X-Received: by 2002:a17:903:2281:b0:1db:7052:2f75 with SMTP id b1-20020a170903228100b001db70522f75mr2870113plh.49.1708017841961;
-        Thu, 15 Feb 2024 09:24:01 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id v9-20020a1709028d8900b001db7e3411f7sm1512125plo.134.2024.02.15.09.24.01
+        d=1e100.net; s=20230601; t=1708017946; x=1708622746;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cuuhvY1knev/MlE0VuD+OUGRlkZI73nAFQGnaq1zL0U=;
+        b=g1i971zmjyEfjltVBmN8r2zrqA1IyG+Fi3M3S/5+R5jFZ+4d3PVmIdPpvLf6TK8qlA
+         /rzQNtR0Dtg0xh4++9jMZotfxlxv5jybpuobguax9bLDve521as/hkWyy+sB9Hz19FQj
+         YEIFCTsBpfLQPgBeptGHCaiWjUCoH3mHaAhkeP0EioUna6Eg/9TI6/mkYP2HcBiAyoLB
+         xIIdkVAxhWFwLCUNVZ3bBJCTiWDBcdjD5lq0sal0pZZEN9wTbXej3onYEaE+OZudlKI5
+         6eznr03wJrICTG19+TvakTgZMKC06WScY9nTLgIHW1acTHiRmJDO81kOuEuj3DubA/Wz
+         xogQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU3/+9FW68ABvErR5Medo6K2Y9O6q7wh4VQZycjw5YGe8KEneIfEkTLwIXyNdZC+xek/waWM+zSPd0Afu2xonXT8llXNY+O
+X-Gm-Message-State: AOJu0Yzb/JHjC2ls4F7H+/DliPSDuPpZy3wrVBl01UyuBLHxnIpMQq58
+	x+LZvda//g3YdcRa8Ez5nL/N2fn3AA06HA8FgViJzWNRDj9GvrxxqevlKQQ/rKI=
+X-Google-Smtp-Source: AGHT+IHzhRx80m5IBOtXuSj/+pQiwLJQtSioIzJZd/nWxl+IXjeO2sK+5VQ6E+UDzeoRGOcklOLO0A==
+X-Received: by 2002:a2e:bb85:0:b0:2d1:1e3c:5739 with SMTP id y5-20020a2ebb85000000b002d11e3c5739mr1696957lje.31.1708017945695;
+        Thu, 15 Feb 2024 09:25:45 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 18-20020a05600c231200b00411a0477755sm5667334wmo.9.2024.02.15.09.25.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Feb 2024 09:24:01 -0800 (PST)
-Date: Thu, 15 Feb 2024 09:23:58 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- Tristram.Ha@microchip.com, Oleksij Rempel <o.rempel@pengutronix.de>,
- UNGLinuxDriver@microchip.com, netdev@vger.kernel.org, Sebastian Andrzej
- Siewior <bigeasy@linutronix.de>, George McCollister
- <george.mccollister@gmail.com>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, <davem@davemloft.net>
-Subject: Re: [net][hsr] Question regarding HSR RedBox functionality
- implementation (preferably on KSZ9477)
-Message-ID: <20240215092358.54c86b2b@hermes.local>
-In-Reply-To: <20240215125156.0d9f3cb7@wsk>
-References: <20230928124127.379115e6@wsk>
-	<20231003095832.4bec4c72@wsk>
-	<20231003104410.dhngn3vvdfdcurga@skbuf>
-	<20230922133108.2090612-1-lukma@denx.de>
-	<20230926225401.bganxwmtrgkiz2di@skbuf>
-	<20230928124127.379115e6@wsk>
-	<20231003095832.4bec4c72@wsk>
-	<20231003104410.dhngn3vvdfdcurga@skbuf>
-	<20240109133234.74c47dcd@wsk>
-	<20240109133234.74c47dcd@wsk>
-	<20240109125205.u6yc3z4neter24ae@skbuf>
-	<20240109150414.6a402fec@wsk>
-	<20240214114436.67568a49@wsk>
-	<20240215125156.0d9f3cb7@wsk>
+        Thu, 15 Feb 2024 09:25:44 -0800 (PST)
+Date: Thu, 15 Feb 2024 18:25:42 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: =?iso-8859-1?Q?Asbj=F8rn_Sloth_T=F8nnesen?= <ast@fiberby.net>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, llu@fiberby.dk
+Subject: Re: [PATCH net-next 2/3] net: sched: cls_api: add filter counter
+Message-ID: <Zc5JFhLI_KZtdy5P@nanopsycho>
+References: <20240215160458.1727237-1-ast@fiberby.net>
+ <20240215160458.1727237-3-ast@fiberby.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/tV8SGA8eh=904HgXGhQW1T_";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240215160458.1727237-3-ast@fiberby.net>
 
---Sig_/tV8SGA8eh=904HgXGhQW1T_
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Thu, Feb 15, 2024 at 05:04:43PM CET, ast@fiberby.net wrote:
+>Maintain a count of filters per block.
+>
+>Counter updates are protected by cb_lock, which is
+>also used to protect the offload counters.
+>
+>Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
+>---
+> include/net/sch_generic.h |  2 ++
+> net/sched/cls_api.c       | 20 ++++++++++++++++++++
+> 2 files changed, 22 insertions(+)
+>
+>diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+>index 46a63d1818a0..7af0621db226 100644
+>--- a/include/net/sch_generic.h
+>+++ b/include/net/sch_generic.h
+>@@ -427,6 +427,7 @@ struct tcf_proto {
+> 	 */
+> 	spinlock_t		lock;
+> 	bool			deleting;
+>+	bool			counted;
+> 	refcount_t		refcnt;
+> 	struct rcu_head		rcu;
+> 	struct hlist_node	destroy_ht_node;
+>@@ -476,6 +477,7 @@ struct tcf_block {
+> 	struct flow_block flow_block;
+> 	struct list_head owner_list;
+> 	bool keep_dst;
+>+	atomic_t filtercnt; /* Number of filters */
+> 	atomic_t skipswcnt; /* Number of skip_sw filters */
+> 	atomic_t offloadcnt; /* Number of oddloaded filters */
+> 	unsigned int nooffloaddevcnt; /* Number of devs unable to do offload */
+>diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+>index 397c3d29659c..c750cb662142 100644
+>--- a/net/sched/cls_api.c
+>+++ b/net/sched/cls_api.c
+>@@ -411,11 +411,13 @@ static void tcf_proto_get(struct tcf_proto *tp)
+> }
+> 
+> static void tcf_chain_put(struct tcf_chain *chain);
+>+static void tcf_block_filter_cnt_update(struct tcf_block *block, bool *counted, bool add);
+> 
+> static void tcf_proto_destroy(struct tcf_proto *tp, bool rtnl_held,
+> 			      bool sig_destroy, struct netlink_ext_ack *extack)
+> {
+> 	tp->ops->destroy(tp, rtnl_held, extack);
+>+	tcf_block_filter_cnt_update(tp->chain->block, &tp->counted, false);
+> 	if (sig_destroy)
+> 		tcf_proto_signal_destroyed(tp->chain, tp);
+> 	tcf_chain_put(tp->chain);
+>@@ -2364,6 +2366,7 @@ static int tc_new_tfilter(struct sk_buff *skb, struct nlmsghdr *n,
+> 	err = tp->ops->change(net, skb, tp, cl, t->tcm_handle, tca, &fh,
+> 			      flags, extack);
+> 	if (err == 0) {
+>+		tcf_block_filter_cnt_update(block, &tp->counted, true);
+> 		tfilter_notify(net, skb, n, tp, block, q, parent, fh,
+> 			       RTM_NEWTFILTER, false, rtnl_held, extack);
+> 		tfilter_put(tp, fh);
+>@@ -3478,6 +3481,23 @@ int tcf_exts_dump_stats(struct sk_buff *skb, struct tcf_exts *exts)
+> }
+> EXPORT_SYMBOL(tcf_exts_dump_stats);
+> 
+>+static void tcf_block_filter_cnt_update(struct tcf_block *block, bool *counted, bool add)
 
-On Thu, 15 Feb 2024 12:51:56 +0100
-Lukasz Majewski <lukma@denx.de> wrote:
-
-> > to:
-> > ip link add name hsr1 type hsr slave1 lan4 slave2 lan5 interlink lan3
-> > supervision 45 =20
->=20
-> Please find the draft proposal of iproute2 patch to add support for HSR
-> interlink passing network device:
->=20
-> https://github.com/lmajewski/iproute2/commit/5edf2ab77786ab49419712a4defa=
-42a600fe47c2
+Can't you move this up to avoid forward declaration?
 
 
-Please post patches to mailing list for review directly.
-
---Sig_/tV8SGA8eh=904HgXGhQW1T_
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEn2/DRbBb5+dmuDyPgKd/YJXN5H4FAmXOSK4ACgkQgKd/YJXN
-5H6SMA//RT6G+pA3oWRymkCyo3rxcKUjjIbhQqJtJBRCnvEJbxlrHrC5tMXHucB2
-dg1Q8UDwGWLTwpN9DRm3V1M7MOiZzSdqnuF34t+U1qTQG0Bi4ccpkU+wpIOLd8st
-XH38Rwg4n/weHJncJdPRd1V3s3pL73dRDcFFSdPJFPaswyq6UnF08u4kFHs7YAcy
-vdBtAXwdmJiri9XK2SU8a4o8MqbDZoc1OMiHCxT9tpldZD4/t2X8G24CAzM5Ma3B
-/RA62UJ6xzvfwS5RF5nhCITh8GFhZYYfUs/RD3UxiNJitwl2m4VFTG8TIz0YfuJR
-C4Mg7OhguQpFealHpiEjU7hOTP3Zfwc+Ec55YUnf8tdyAaZbNUABvFlG8ICAo3u4
-It/pt5dEuBLWeSRKd5EWjd+lgAhJXoceyiJ5NCBHWwH3KO82kZeT+sh2Q9gHjrsK
-+/X22kBBCWfiI4txTOLHH+TDaKbQACibxmRBoIUIduz6FGf5jq4sO0r1WMp7kZfT
-ri3oRoSj8oG+nVeEq8ZLQC6IqMCg0bBNmJJhf/Cb4O4rlPXtbp85Yu+UWLS04DuO
-xwZ4V3eEm3Qz3iNIlvu7FfVF0ENxaDYEMN2T7WEWVvFu668k1TOaDRuhMKSqADxb
-lWmwAbnE4IE/wjL8iUozzWPu1MhK6t/4BLcvFn4lRN0gaOeUA3o=
-=7aRk
------END PGP SIGNATURE-----
-
---Sig_/tV8SGA8eh=904HgXGhQW1T_--
+>+{
+>+	lockdep_assert_not_held(&block->cb_lock);
+>+
+>+	down_write(&block->cb_lock);
+>+	if (*counted != add) {
+>+		if (add) {
+>+			atomic_inc(&block->filtercnt);
+>+			*counted = true;
+>+		} else {
+>+			atomic_dec(&block->filtercnt);
+>+			*counted = false;
+>+		}
+>+	}
+>+	up_write(&block->cb_lock);
+>+}
+>+
+> static void tcf_block_offload_inc(struct tcf_block *block, u32 *flags)
+> {
+> 	if (*flags & TCA_CLS_FLAGS_IN_HW)
+>-- 
+>2.43.0
+>
 
