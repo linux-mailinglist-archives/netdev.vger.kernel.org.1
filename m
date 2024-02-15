@@ -1,125 +1,200 @@
-Return-Path: <netdev+bounces-72147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E49E856B66
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:46:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3146856B8D
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:49:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFDA01F22217
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 17:46:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5BB81C22FB5
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 17:49:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3594E1369A5;
-	Thu, 15 Feb 2024 17:46:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAEE1137C3C;
+	Thu, 15 Feb 2024 17:49:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JHVW2LIH"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="rpu7FVkZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 690C8137C20
-	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 17:46:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D443132C04
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 17:49:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708019196; cv=none; b=ezNOLO9sfoNBC7r/L/RveEMUvCnpL4dGo+lHQB+3OT/3/9czfLPFiKKuuGBj5wjAAWPDLUHYszDtSPpydakcOoXZz2jZ5IDWHkZ4orXiIdqG5ER7uZ208j4Ge9aEYpNHRtc3uVogMUQ/0Lu70Y7y1iHqZd+nIp3hQMRuRSWcl4M=
+	t=1708019359; cv=none; b=VYI0dv1Z15rcz4UF1i2uFgUdBE7qrUTKRcAlQ9aL4ZQRLuB8yoTjb/X+JKgGbQDdbM/24T9VVuYozk+WwpnGTwFP0H5UyZK6XGMlamre3JShurx3VMqdKiZT8d8bHRYjmfCsdqxF72dZHv7Vl02N0m32wDGokh1N2xUvSrEmmEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708019196; c=relaxed/simple;
-	bh=gP799Hw7NNkxb4OtI45g7vCZwtn/f/+WjXB46u2riWI=;
+	s=arc-20240116; t=1708019359; c=relaxed/simple;
+	bh=U0JFFwyDzDAYTa90FsvXX1UBz6aubxIXT9g8ZeVH5ak=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fqZH/Y6lCnz0gzsOGGZQJXHlEMUIwnFd7D0/2jTjh75NXNo5H0PBbpk9EFYBcqnC+4O1E0yJNF/UzaJ6B3e8gnocIv5sjp2xYzsOpMcd6SAudF8/sM4Zsy2NbRlR61ejWMiThNfDUv2L/4ZPm7lH/5CI/LpHig2pUWxXPWJiL9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JHVW2LIH; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-563dd5bd382so71a12.1
-        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 09:46:34 -0800 (PST)
+	 To:Cc:Content-Type; b=lNYHBI4128M6x1iiyIVIti1idAvdibMnZtHEyyDXfcNE7q7A9KjH5cd8gAkWuSnIHpzwRkEO7kjhSsjOgL+isfAZnLyaNORF9WyRe4xB7jKpGqu8fGx6ddIztmSg/20BhZKJhvfiM4Anj/ppXkJC+YInPzf5cNEZLXnRUsx+n6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=rpu7FVkZ; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-607d8506099so8086547b3.0
+        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 09:49:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708019192; x=1708623992; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1708019356; x=1708624156; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wrbbgS5IFLC04j4ol7wixx3VoqSRukujNYOqeLy/Tj8=;
-        b=JHVW2LIHAgQml2YcHHfBH2ivPdBHRGnl3n31WS96NM5TfaLyJdUWPfSriU0+Eyxe1Z
-         qGgiiQM72lltRr5urvhsDVQeJ6Gav2AMRIZCCXl8YF4nInHYtCDpSiYX5FxVio3aUDC/
-         uvYBveETyzvWWWwj3ldqetaIrWkwzSbm55L1646PTj81c2LEcTw3LBljcEhoHVdODJh9
-         L24q4DAF6WOoFRcoTQBgNam63dORzrzkG2TcwUpnPvUnLZQLqWTSOJtA3N4IKy7sznMG
-         bRkDOQg1Lr/laJLZKdM90To5ff1QsnXOyijVPOWHcub6f/4Ao8ECfQp2X1Dk3N0qBfvU
-         38ow==
+        bh=GKJH/sdzxRbGj/GrO9+Z+lN1Jd7UdkMhb2otIV3stYQ=;
+        b=rpu7FVkZjeXTTn0tuCxUMYdlZXaYCAz7kZmAt4/FpCpModUuA1RzgA+WXKxjrGayDs
+         srClw+dFnH8ydeO02dneMrxTJp3+cMWlsVqHA1V2jPjysiu/w2bCd4kGIu7p/CyCki/c
+         /gSZfyYXcXTIFNofflFvpEWimx2Fr/5XuClHJUKrXaOpUVAgCWXgINidOo1920ghvJtE
+         XB8VaHlwKxmp534Kx1gDQ8n+vsP90U7DbJ0oIMlU3SMCAlDg1LyETNJiPg6rnIggneLM
+         Oj9m8LjCEgYEBwsLMCnoTJ52O8KGYDIElZk9Xxau5v632YxYaIA7k922EDQZdyz7Q1+L
+         GFRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708019192; x=1708623992;
+        d=1e100.net; s=20230601; t=1708019356; x=1708624156;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wrbbgS5IFLC04j4ol7wixx3VoqSRukujNYOqeLy/Tj8=;
-        b=GKhErled6pH+U6T3YdFEDHQqFXbOZUpSN/94KcQkii3FZP9g3xwgQfTVLSfDk5+rJ3
-         0PWBU5PNx7drIRhL3O4BUeZpxcJbvV8QMcgdKK5hluEDgZ93JS1FL5IXYXb3b2n5mbR4
-         3MZ8PH5QQcYwlOj5+T1TaIzx8P3iX+vJDClYuAzkI4SYr+hJ91sUyNrzdPuwsYhdlHMD
-         JlCOderRKflnU0ee51fGp6iPFUjFwU1HQ/1S+LmpShSotQ7hq/lYTb3XxaqM5PZvhV/D
-         LBlr2YJQOEyDNd8ngt5lInsifiVHYSIaYtmuPBuAxbTaSIMBTI3CYEwr9YlKAqWUAcp5
-         6z7A==
-X-Forwarded-Encrypted: i=1; AJvYcCWYtuXgrFvL0nM6I18itteTNXB2vmUy0jvy6kCdHoET7Z02O5JOu0vJmAgAPsj8xhWj7XoqGrHy2F2NJdywX4Rf4QQxGiYO
-X-Gm-Message-State: AOJu0YygPlzGvxzP+JomPfYHDXcdTbI5UPGY1UAQF7nP2LUqVvMXxF7h
-	08MtN84KcQtMTsWTzrSGFauK09rPxkPCLldGc71VIgcU4ZnoyrElE2mqbYMPSeO7HwE2QvTRh2f
-	gMqC0c78i0in8tRXCernFJvnv5kkiNa+iOLaD
-X-Google-Smtp-Source: AGHT+IGuia/mk6fNALuebkkgZMkpTELxRjyQnguWv9uSUuMGe5xGsAMLeMypQICyXEfv/RgEOaREduHcq6rWaBmJD0I=
-X-Received: by 2002:a50:cd8c:0:b0:561:a93:49af with SMTP id
- p12-20020a50cd8c000000b005610a9349afmr5724edi.7.1708019192439; Thu, 15 Feb
- 2024 09:46:32 -0800 (PST)
+        bh=GKJH/sdzxRbGj/GrO9+Z+lN1Jd7UdkMhb2otIV3stYQ=;
+        b=LnGNvihqs+uPoJ3eP4fF2MKSHGGAoFgvq+rPEk3aZLnJYuSgVIfNDVvBwAKl0WXxG0
+         S3J4+WvSH9IGNkd1j6/ShkZ/ORtKIVSMeX8SNUQyrac2RHu4M0xRLUfnhuNlHKyO21Tw
+         msle36qatRjue590uhB9C1mHtbHAF8xcqXgWT6bjuCmWZSAWfUeRsoITQAe9isuPJ4Lt
+         r1cZ638TqlV1if6l/ZFFr71jybOoOyCIskJyPWAxYV4SXgDFXuSfIoy7M8Tu6rY98PfX
+         qKgqK0c8pIgxBP0nhMUE4RJKMW5k9cODy2Ky0PIemUSY94nBUqWgAiSAO77nK/IcOeKf
+         rZwg==
+X-Forwarded-Encrypted: i=1; AJvYcCXLDEtPSW0xRjskht1cgaUu5Xa/2aNXkfHwXvRFGbO5/Tjy4h/57aCbWk5dS2Fj+dhbdQ+6zcFHXFf5qKs65V3GUBSTVA0x
+X-Gm-Message-State: AOJu0YyHf+a6bdSLhw4XpKd2Fxw8v2fTxq0Yh4ZzeG+uQlgV6kvg33V5
+	wC31bAGT+onfDLy7+L2g4YEObslpW0axxaU+lybtoOhevBOq10Y8SVJ2EuE1UmBJ8hwpz8GXFAj
+	zMpO2zkUDBr8h2XJtGNRmyDvLLiH0hLLHY3kP
+X-Google-Smtp-Source: AGHT+IHSyB1k8GhC13KtB+5SWdJ6jy0sE1GtxffnwM1CS5Lu2dBFvgzZ2TasOVbhoQJjk7j8YQNm4fSLvK7EYO7IrYk=
+X-Received: by 2002:a0d:d817:0:b0:604:ac3b:a38b with SMTP id
+ a23-20020a0dd817000000b00604ac3ba38bmr2362753ywe.14.1708019356510; Thu, 15
+ Feb 2024 09:49:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240209221233.3150253-1-jmaloy@redhat.com> <8d77d8a4e6a37e80aa46cd8df98de84714c384a5.camel@redhat.com>
- <CANn89iJW=nEzVjqxzPht20dUnfqxWGXMO2_EpKUV4JHawBRxfw@mail.gmail.com>
- <eaee3c892545e072095e7b296ddde598f1e966d9.camel@redhat.com>
- <CANn89iL=npDL0S+w-F-iE2kmQ2rnNSA7K9ic9s-4ByLkvHPHYg@mail.gmail.com>
- <20072ba530b34729589a3d527c420a766b49e205.camel@redhat.com>
- <CANn89iL2FvTVYv6ym58=4L-K-kSan6R4PEv488ztyX4HsNquug@mail.gmail.com>
- <725a92b4813242549f2316e6682d3312b5e658d8.camel@redhat.com>
- <CANn89i+bc=OqkwpHy0F_FDSKCM7Hxr7p2hvxd3Fg7Z+TriPNTA@mail.gmail.com>
- <20687849-ec5c-9ce5-0a18-cc80f5b64816@redhat.com> <178b9f2dbb3c56fcfef46a97ea395bdd13ebfb59.camel@redhat.com>
-In-Reply-To: <178b9f2dbb3c56fcfef46a97ea395bdd13ebfb59.camel@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 15 Feb 2024 18:46:18 +0100
-Message-ID: <CANn89iKXOZdT7_ww_Jytm4wMoXAe0=pqX+M_iVpNGaHqe_9o4Q@mail.gmail.com>
-Subject: Re: [PATCH v3] tcp: add support for SO_PEEK_OFF
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jon Maloy <jmaloy@redhat.com>, kuba@kernel.org, passt-dev@passt.top, 
-	sbrivio@redhat.com, lvivier@redhat.com, dgibson@redhat.com, 
-	netdev@vger.kernel.org, davem@davemloft.net
+References: <20240215160458.1727237-1-ast@fiberby.net> <20240215160458.1727237-4-ast@fiberby.net>
+In-Reply-To: <20240215160458.1727237-4-ast@fiberby.net>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Thu, 15 Feb 2024 12:49:05 -0500
+Message-ID: <CAM0EoMmyGwA9Q=RibR+Fc41_dPZyhBRWiBEejSbPsS9NhaUFVQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/3] net: sched: make skip_sw actually skip software
+To: =?UTF-8?B?QXNiasO4cm4gU2xvdGggVMO4bm5lc2Vu?= <ast@fiberby.net>
+Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	llu@fiberby.dk, Vlad Buslov <vladbu@nvidia.com>, 
+	Marcelo Ricardo Leitner <mleitner@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 15, 2024 at 6:41=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
+On Thu, Feb 15, 2024 at 11:06=E2=80=AFAM Asbj=C3=B8rn Sloth T=C3=B8nnesen <=
+ast@fiberby.net> wrote:
 >
-> Note: please send text-only email to netdev.
+> TC filters come in 3 variants:
+> - no flag (no opinion, process wherever possible)
+> - skip_hw (do not process filter by hardware)
+> - skip_sw (do not process filter by software)
 >
-> On Thu, 2024-02-15 at 10:11 -0500, Jon Maloy wrote:
-> > I wonder if the following could be acceptable:
-> >
-> >  if (flags & MSG_PEEK)
-> >         sk_peek_offset_fwd(sk, used);
-> >  else if (peek_offset > 0)
-> >        sk_peek_offset_bwd(sk, used);
-> >
-> >  peek_offset is already present in the data cache, and if it has the va=
-lue
-> >  zero it means either that that sk->sk_peek_off is unused (-1) or actua=
-lly is zero.
-> >  Either way, no rewind is needed in that case.
+> However skip_sw is implemented so that the skip_sw
+> flag can first be checked, after it has been matched.
 >
-> I agree the above should avoid touching cold cachelines in the
-> fastpath, and looks functionally correct to me.
+> IMHO it's common when using skip_sw, to use it on all rules.
 >
-> The last word is up to Eric :)
+> So if all filters in a block is skip_sw filters, then
+> we can bail early, we can thus avoid having to match
+> the filters, just to check for the skip_sw flag.
+>
+>  +----------------------------+--------+--------+--------+
+>  | Test description           | Pre    | Post   | Rel.   |
+>  |                            | kpps   | kpps   | chg.   |
+>  +----------------------------+--------+--------+--------+
+>  | basic forwarding + notrack | 1264.9 | 1277.7 |  1.01x |
+>  | switch to eswitch mode     | 1067.1 | 1071.0 |  1.00x |
+>  | add ingress qdisc          | 1056.0 | 1059.1 |  1.00x |
+>  +----------------------------+--------+--------+--------+
+>  | 1 non-matching rule        |  927.9 | 1057.1 |  1.14x |
+>  | 10 non-matching rules      |  495.8 | 1055.6 |  2.13x |
+>  | 25 non-matching rules      |  280.6 | 1053.5 |  3.75x |
+>  | 50 non-matching rules      |  162.0 | 1055.7 |  6.52x |
+>  | 100 non-matching rules     |   87.7 | 1019.0 | 11.62x |
+>  +----------------------------+--------+--------+--------+
+>
+> perf top (100 n-m skip_sw rules - pre patch):
+>   25.57%  [kernel]  [k] __skb_flow_dissect
+>   20.77%  [kernel]  [k] rhashtable_jhash2
+>   14.26%  [kernel]  [k] fl_classify
+>   13.28%  [kernel]  [k] fl_mask_lookup
+>    6.38%  [kernel]  [k] memset_orig
+>    3.22%  [kernel]  [k] tcf_classify
+>
+> perf top (100 n-m skip_sw rules - post patch):
+>    4.28%  [kernel]  [k] __dev_queue_xmit
+>    3.80%  [kernel]  [k] check_preemption_disabled
+>    3.68%  [kernel]  [k] nft_do_chain
+>    3.08%  [kernel]  [k] __netif_receive_skb_core.constprop.0
+>    2.59%  [kernel]  [k] mlx5e_xmit
+>    2.48%  [kernel]  [k] mlx5e_skb_from_cqe_mpwrq_nonlinear
 >
 
-An actual patch seems needed.
+The concept makes sense - but i am wondering when you have a mix of
+skip_sw and skip_hw if it makes more sense to just avoid looking up
+skip_sw at all in the s/w datapath? Potentially by separating the
+hashes for skip_sw/hw. I know it's a deeper surgery - but would be
+more general purpose....unless i am missing something
 
-In the current form, local variable peek_offset is 0 when !MSG_PEEK.
+> Test setup:
+>  DUT: Intel Xeon D-1518 (2.20GHz) w/ Nvidia/Mellanox ConnectX-6 Dx 2x100G
+>  Data rate measured on switch (Extreme X690), and DUT connected as
+>  a router on a stick, with pktgen and pktsink as VLANs.
+>  Pktgen was in range 12.79 - 12.95 Mpps across all tests.
+>
 
-So the "else if (peek_offset > 0)" would always be false.
+Hrm. Those are "tiny" numbers (25G @64B is about 3x that). What are
+the packet sizes?
+Perhaps the traffic generator is a limitation here?
+Also feels like you are doing exact matches? A sample flower rule
+would have helped.
+
+cheers,
+jamal
+> Signed-off-by: Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.net>
+> ---
+>  include/net/pkt_cls.h | 5 +++++
+>  net/core/dev.c        | 3 +++
+>  2 files changed, 8 insertions(+)
+>
+> diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
+> index a4ee43f493bb..a065da4df7ff 100644
+> --- a/include/net/pkt_cls.h
+> +++ b/include/net/pkt_cls.h
+> @@ -74,6 +74,11 @@ static inline bool tcf_block_non_null_shared(struct tc=
+f_block *block)
+>         return block && block->index;
+>  }
+>
+> +static inline bool tcf_block_has_skip_sw_only(struct tcf_block *block)
+> +{
+> +       return block && atomic_read(&block->filtercnt) =3D=3D atomic_read=
+(&block->skipswcnt);
+> +}
+> +
+>  static inline struct Qdisc *tcf_block_q(struct tcf_block *block)
+>  {
+>         WARN_ON(tcf_block_shared(block));
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index d8dd293a7a27..7cd014e5066e 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -3910,6 +3910,9 @@ static int tc_run(struct tcx_entry *entry, struct s=
+k_buff *skb,
+>         if (!miniq)
+>                 return ret;
+>
+> +       if (tcf_block_has_skip_sw_only(miniq->block))
+> +               return ret;
+> +
+>         tc_skb_cb(skb)->mru =3D 0;
+>         tc_skb_cb(skb)->post_ct =3D false;
+>         tcf_set_drop_reason(skb, *drop_reason);
+> --
+> 2.43.0
+>
 
