@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-72156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA402856C2A
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 19:10:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A966856C3A
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 19:14:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35D071F238F5
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:10:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D0551C21E81
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:14:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 193F013849A;
-	Thu, 15 Feb 2024 18:09:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62FCA13849A;
+	Thu, 15 Feb 2024 18:13:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RIY+9Vl7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jj3WcKDl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D2CB1369AD;
-	Thu, 15 Feb 2024 18:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C28136995;
+	Thu, 15 Feb 2024 18:13:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708020599; cv=none; b=XcPpAR+GguhKIr7jeim/OtziCAF66VyH5PGvLzBztdo9h2wLiRTawY6BR+H/8l+nKx6TEMAAHCydfcCCaBlLuFoAA5TkB+xNnB5biXAl/5JZjGg1sJWeHB8Z4Ljkyj6mkC0crLKcPl7Ki1CNuP1Kt3qERvhDLmQl33AOlo1yBdg=
+	t=1708020800; cv=none; b=j1JoCdCGr9KXOBpRmb2X6vG+CpLKzigIbtP4kq+1d2a00KD49nFajw37ajrXIs71kLkv4xXWs89BAQHY24DKh+N4FEnUb7SG4BZrPBU4cWQI+Pk1uCXCCceUdyC1wXCVnVaVugmFXffzjkznoysdWtP4LSs9YJN44zJTzyQZe1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708020599; c=relaxed/simple;
-	bh=9LTX5p5ECOAIOrnzChPk4OdgPxQGNVKmHTp4cFz6qSw=;
+	s=arc-20240116; t=1708020800; c=relaxed/simple;
+	bh=Vi81D9bfSDr+m+P3qTgsqyjlvtqqJ9WpSh3551CARqg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pg+PMcchCyTOQBff5Qk5y3KyEeCWHr/863MpDWuBKwZELTICMp1Y3F1rWC77dhb2ssH7a3b3x3xyZFrukQ4s9hxTODUiz4qVF8UXDQETJIb1DFeqVYMgsoP6qDB6bW/3OmMwhv0BqdjBHIb8l2SiJoCiAvOcwIeryHm3UIND7fY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RIY+9Vl7; arc=none smtp.client-ip=209.85.167.41
+	 Content-Type:Content-Disposition:In-Reply-To; b=VqOY/NMd71ez4G8aHWOZ3XOJXAYt1Pp3MgK/SDPldwy7g/rdpNhGc/5LOPH+dm0/bF13o7Tcy7UsYWggxW05atZP+NYIZgtC4hpwaE2g5k35vJVdf4aaB1jj9aksesGFd90GB18UfvPURBlGpJSK12LN8JfwVAbaHq48UFFoJ2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jj3WcKDl; arc=none smtp.client-ip=209.85.208.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-51181d8f52fso1473663e87.3;
-        Thu, 15 Feb 2024 10:09:56 -0800 (PST)
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-563cb3ba9daso580491a12.3;
+        Thu, 15 Feb 2024 10:13:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708020595; x=1708625395; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1708020797; x=1708625597; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MsK9sMUkCnAium0cXNBDUzfqUg2ZTSLKAEAIbODiMlA=;
-        b=RIY+9Vl7VG0jt5rGLAq7FcR2bqFMEQUDEHPcaX9PRaVq3UuiIuMimDnrmvmisZ1Lh8
-         hJRrC5sAT7wHWvNjvnm0QpHsQY5RWmNUIDq/J6mgVq+Sx4fwmZg8NxN1JrremeyX9DSN
-         /hwPNia5URc6CNYqKIqh5MjbczeFgVctvjlZSFrz7YmKAbkKIzeNUYGia04i9ZX9o6wf
-         eqDHe89/yUkt3N5x0PbU3lIlmayfPJ7eR/x254By2o0dMN4/W/OJpx+dSiFYxBC67q+v
-         KCrE4iNI+SF8zGqFeUWiG5+u9Y2ei+Y1b52LYwqqM5WU4tFh/kq5Oz3icKgmpWMA79VG
-         7+TQ==
+        bh=juVCM1rRHSBlSMP/d1mEg6+OxvELnwq4fa4K1QNtEvM=;
+        b=Jj3WcKDlTxcJIrqKJ/XI23QzNpFRbAMcSKCGlBX5ZXWywQ+rqXD4zoRuNo6++YuOva
+         BDpAvkbOT9lnBFtZhdC4taAIJmkJx97uLTkXgPUmKRRlUzuH4hGUx36F+mchFaPilnYq
+         F9AYJiK6X6k3XJF6Dd95Y6QQRWRFnqMcn8WwbqzTf9z/ezH+XlcaQvRywF5lCKK6IitC
+         5Lt7qs+YYpXPw4DBgSSZdjYIkn0d7B1qrlz18tC+rJQNJUL8rrhn1KYy8yvByKjG/YDu
+         e2Wb7eFMfkdzq9wfZMMzUHeDfg7ooVseT4E4r6QmkbuQqW0Z1li33vSrylAE8XENvF1z
+         rvTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708020595; x=1708625395;
+        d=1e100.net; s=20230601; t=1708020797; x=1708625597;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MsK9sMUkCnAium0cXNBDUzfqUg2ZTSLKAEAIbODiMlA=;
-        b=mDxR62OJ8rp5jWoA8/JT01ZbyO8xHh0Cxv3783bGkhO6hKqRWbksc6ZL8MVM1IOnmG
-         jfHuMX3C03ZR05O3uadJhJYLIHRkKNcSdtxjn2JUsqwrc7Qb+yPuZkEPmOpcE97uI+9w
-         7c+3GSi5OKZCPBo39cAvyFzeB3X61IEUIAqfmi8sSFGnwfoyZC8HXWtJYKt1xNgjmG9y
-         bqb+yIdoN1BaBUZJmtBu/y+za8dBXZQ4i0eBcSXuGZeyoDdLtVs102ic3wCrR3PKWw9Y
-         WscSvjnSyEx4YG+P3sjq69Kaqn53S9k6Wx9scYqAm16WkpUczpWAho7BIedYHVkJoWrt
-         oZ4A==
-X-Forwarded-Encrypted: i=1; AJvYcCVcrBBs0YEO2zulVsKhaH7s0s6TfA01Fz2O5tWozu0sQDrsRf78edgVPS8epk5qxUP8LuqZcNo6satT32TXrZjcWpbTMH1VJbh8lbVt
-X-Gm-Message-State: AOJu0YzviAMVN61dWd2jn3c6dCLeFtkOTDlLbPdAPA5k2uUsZKG/Dta0
-	jjVLQ83hMfErQAZaJmHR3AgyMM9QIGM13wjjf+FjzQHXewsNGJ4N
-X-Google-Smtp-Source: AGHT+IGmPCAzrJRmFJvVMrsiuRVs+q5aNELJEAQBaCzuITGqFHhoSV/ayO6lNlEu2bIZKCXz5Vbnig==
-X-Received: by 2002:a19:911e:0:b0:511:941d:37d4 with SMTP id t30-20020a19911e000000b00511941d37d4mr1823053lfd.5.1708020594849;
-        Thu, 15 Feb 2024 10:09:54 -0800 (PST)
+        bh=juVCM1rRHSBlSMP/d1mEg6+OxvELnwq4fa4K1QNtEvM=;
+        b=WAxyiusNxY0CrgoIW0krfWCb/0wUxETzzb3M3JLtdRQ/7c6YB40bE4G9GJkoHHQXWh
+         k4FIu+IYRGEqHnnr2OVc2afUffBRLE/GW+xX7A+4K9ioDT9dBv1s0UsVIssRz2l37Y9u
+         xz6YEPffLUl7j23SCTCeNyAzcAlxhJLS6z2nNlgVgXItOyl87XVUSp2jkm3FX0dm3MPV
+         LpnbOhwwMTIHe90KClZ3JhxyEXFwdefa+OGwUOInzS3ju00VpQ/ndyI0/hYoOMHFOVpH
+         1xNChu9RpoLTcqSf/X68g7nDo/M8mraTHAk84NGn7QkM7ERC8NRUGU2bCb6fGFs7YE3P
+         jDtg==
+X-Forwarded-Encrypted: i=1; AJvYcCVfFi0s2vXZFQxriLbhCDnzvbEgadvJLuAQoiyahipUywvB9w1v0bW4SSiVh3ZJjpI3TJn/s0Oi+BwwhfzZRFDzcn1A0UzpcmhmFEK0
+X-Gm-Message-State: AOJu0YzRtrcmypAtJebSJAiREUlTk7PlxSqOq44ytQ9JkHIF0thQDstS
+	e108+hdV6L4B7gnsa15N/fFWJsfLIEu3/U7v7WCMerKHS+iAncsC
+X-Google-Smtp-Source: AGHT+IGthifnHmAEqhCcEbmUdCkSxu/XDdmbCurctxhen5Mi8VcqjRFROKiGLYJYhV8U36BlXdTjWw==
+X-Received: by 2002:aa7:c48c:0:b0:561:4238:e6e2 with SMTP id m12-20020aa7c48c000000b005614238e6e2mr2147942edq.29.1708020796710;
+        Thu, 15 Feb 2024 10:13:16 -0800 (PST)
 Received: from skbuf ([188.25.173.195])
-        by smtp.gmail.com with ESMTPSA id vu6-20020a170907a64600b00a3c5d10bcdbsm782485ejc.114.2024.02.15.10.09.53
+        by smtp.gmail.com with ESMTPSA id z9-20020aa7c649000000b00563819d224esm774517edr.21.2024.02.15.10.13.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Feb 2024 10:09:54 -0800 (PST)
-Date: Thu, 15 Feb 2024 20:09:52 +0200
+        Thu, 15 Feb 2024 10:13:16 -0800 (PST)
+Date: Thu, 15 Feb 2024 20:13:14 +0200
 From: Vladimir Oltean <olteanv@gmail.com>
 To: Pawel Dembicki <paweldembicki@gmail.com>
 Cc: netdev@vger.kernel.org, linus.walleij@linaro.org,
@@ -79,13 +79,12 @@ Cc: netdev@vger.kernel.org, linus.walleij@linaro.org,
 	Alexandre Belloni <alexandre.belloni@bootlin.com>,
 	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v4 13/15] net: dsa: vsc73xx: Implement vsc73xx
- 8021q tagger
-Message-ID: <20240215180952.b55l3qxno2mexqqs@skbuf>
+Subject: Re: [PATCH net-next v4 15/15] net: dsa: vsc73xx: Add bridge support
+Message-ID: <20240215181314.nq5zscq2oum44oem@skbuf>
 References: <20240213220331.239031-1-paweldembicki@gmail.com>
  <20240213220331.239031-1-paweldembicki@gmail.com>
- <20240213220331.239031-14-paweldembicki@gmail.com>
- <20240213220331.239031-14-paweldembicki@gmail.com>
+ <20240213220331.239031-16-paweldembicki@gmail.com>
+ <20240213220331.239031-16-paweldembicki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,74 +93,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240213220331.239031-14-paweldembicki@gmail.com>
- <20240213220331.239031-14-paweldembicki@gmail.com>
+In-Reply-To: <20240213220331.239031-16-paweldembicki@gmail.com>
+ <20240213220331.239031-16-paweldembicki@gmail.com>
 
-In the context of DSA, tagger is synonymous with "tagging protocol
-driver", aka what the previous patch implemented in
-net/dsa/tag_vsc73xx_8021q.c. It would be better to rename the commit
-title to "Implement the tag_8021q VLAN operations".
-
-On Tue, Feb 13, 2024 at 11:03:26PM +0100, Pawel Dembicki wrote:
-> This patch is a simple implementation of 802.1q tagging in the vsc73xx
-> driver. Currently, devices with DSA_TAG_PROTO_NONE are not functional.
-> The VSC73XX family doesn't provide any tag support for external Ethernet
-> ports.
+On Tue, Feb 13, 2024 at 11:03:28PM +0100, Pawel Dembicki wrote:
+> This patch adds bridge support for vsc73xx driver.
+> It introduce two functions for port_bridge_join and
+> vsc73xx_port_bridge_leave handling.
 > 
-> The only option available is VLAN-based tagging, which requires constant
-> hardware VLAN filtering. While the VSC73XX family supports provider
-> bridging, it only supports QinQ without full implementation of 802.1AD.
-> This means it only allows the doubled 0x8100 TPID.
+> Those functions implement forwarding adjust and use
+> dsa_tag_8021q_bridge_* api for adjust VLAN configuration.
 > 
-> In the simple port mode, QinQ is enabled to preserve forwarding of
-> VLAN-tagged frames.
-> 
-> The tag driver introduces the most basic functionality required for
-> proper tagging support.
-
-I guess this sentence is in place from before the tagging protocol
-driver split in v3. Please remove it, it is confusing now.
-
-> 
+> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 > Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
 > ---
-> v4:
->   - adjust tag8021q implementation for changed untagged vlan storage
->   - minor fixes
-> v3:
->   - Split tagger and tag implementation into separate commits
-> 
->  drivers/net/dsa/Kconfig                |  2 +-
->  drivers/net/dsa/vitesse-vsc73xx-core.c | 38 ++++++++++++++++++++++++--
->  2 files changed, 37 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/dsa/Kconfig b/drivers/net/dsa/Kconfig
-> index 3092b391031a..22a04636d09e 100644
-> --- a/drivers/net/dsa/Kconfig
-> +++ b/drivers/net/dsa/Kconfig
-> @@ -126,7 +126,7 @@ config NET_DSA_SMSC_LAN9303_MDIO
->  
->  config NET_DSA_VITESSE_VSC73XX
->  	tristate
-> -	select NET_DSA_TAG_NONE
-> +	select NET_DSA_TAG_VSC73XX_8021Q
->  	select FIXED_PHY
->  	select VITESSE_PHY
->  	select GPIOLIB
-> diff --git a/drivers/net/dsa/vitesse-vsc73xx-core.c b/drivers/net/dsa/vitesse-vsc73xx-core.c
-> index 6c7bd1c200b4..9f94ae8c763a 100644
-> --- a/drivers/net/dsa/vitesse-vsc73xx-core.c
-> +++ b/drivers/net/dsa/vitesse-vsc73xx-core.c
-> @@ -17,6 +17,7 @@
->  #include <linux/kernel.h>
->  #include <linux/module.h>
->  #include <linux/device.h>
-> +#include <linux/iopoll.h>
 
-I believe iopoll.h is misplaced in this patch. Probably the first one to
-have used read_poll_timeout() should have included it.
-
->  #include <linux/of.h>
->  #include <linux/of_mdio.h>
->  #include <linux/bitops.h>
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
