@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-72019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 331E5856331
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DEE9856332
 	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 13:30:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 346801C217ED
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A8EE1C21C01
 	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 12:30:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21BA812C815;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29E8812CD80;
 	Thu, 15 Feb 2024 12:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SwKuH8eH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h/Fl+8D1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED61A18EA2;
-	Thu, 15 Feb 2024 12:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C973EA86
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 12:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708000229; cv=none; b=dq59fPKyPJIvmoKw/BG6j5dqhy2XP5iiGCxPV6xPto5VY3V+8aDol/ClkJkX0YzR0zEKraGHP2MuA2A0EyLKcbeM2Xxrs2btRbZla0xU/w9rENuAoupuMoxFr9Gb6LOr3CNVQpcixbKjflZ64eac3eeffTsmrd3s7p8P4oeGS/Y=
+	t=1708000229; cv=none; b=erC0GiF5c+6DX1oxshOOBSX89DFTSSTBowB72adU7wvSDSfZ4wVqV6PisLmAOPo8kdJm+DM7o/nshS+gSP3XZHpgggODYRQUmcNp32ZJ2S6itotfmV2ESStjkOJPEhlYrWIvKOz70Ip5DqZ0r09Es4/ISkyMwklmoAn8nQ9k+ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708000229; c=relaxed/simple;
-	bh=B+YQ99SF1f7s20FoqQoRtIlLxfE6ABfVDyypZUEl59s=;
+	bh=cAR0auQAm5///UiI+Gy8apskhhJ/ii9dDolbnJteFR8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SBJzQ0DLtL3UPDiFhTNNzXeYZSPGl63tkpoND5kI28yLY+HU+T/ugd6zocW0JgENjoTvVT8j9MGhFCMlQKgFWfrce9Joc/LRwJEMMvEltmO/OeYMTvSuraBFqJd75pPFvIiLdw/RnNP3S4MkdQ6HfDgwZLJFk+Aw/hGK4/xru0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SwKuH8eH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9273FC433F1;
+	 In-Reply-To:To:Cc; b=QlhmxXbC7S/DUGzQhkES3a8dd3Rd0O/Rw1h98vQT0dPuYR7uFgVryYVRWOc+MHvcNlUneW765H9jwp7yz4nTPGGBYBmEt1xiFXM8ZErDm6lJCWUmqZ4tNGl0MnRVbclgGAt7M6PRqEJbeClvBDx1AJeI0tBfvoS6kLnTIKfOMVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h/Fl+8D1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A0DD4C43390;
 	Thu, 15 Feb 2024 12:30:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1708000228;
-	bh=B+YQ99SF1f7s20FoqQoRtIlLxfE6ABfVDyypZUEl59s=;
+	bh=cAR0auQAm5///UiI+Gy8apskhhJ/ii9dDolbnJteFR8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=SwKuH8eHPHALSIqEi+4NxYhO1VIiTrZfh3RyAmIWri/MTTsUHUYVP+KDNt+2imBWN
-	 hlU2RwmOFAoctbl0rjF/mRTwtqXt56asy7szP3cmj19mibHcgbaU4DVSWvz+cYho2D
-	 qE/IdakVfaoPup8bCSZ0Uq/xzRbJGh3UOKhZYvIknezoLi8ofCqRM/bOIm7yTiiu6j
-	 h3N8vZyXzczQnQ7XrHyyy+TtoLhu/NLoxyY6nW0sB5Bc7S11rBoD7ws5vcGngnKPo8
-	 xVoZdO2pn6vhwD7MonXxO32zP8d+hoCtDal9XxTuEh0M9FnDH+0FCioVa0gOf+Fujv
-	 HOXKTnF1ezjlg==
+	b=h/Fl+8D11DgijIKTxyTC/VgBo9EVjL8YQXTIkDtUQWSGXL/b618f1rFvL3OMY00VB
+	 HkhaFGsIkxIIY3221qmMxLhqvWNHbRw1lzTumgKYVSG7uTIpHS9Ndi+CLURtsyROWs
+	 Am32/9bUKQufbpI1bHem8mJQDt/IismSWm4s+7kyELnF3YrYmRWV+sFXj2i0KNHGhA
+	 pzd66jKza1u3JiFyECfaLeyL4NkE0XSdINNuFU3YkX+PAVgggeyxGPKBH181qtkKIG
+	 pGPSOoLM3830D5w+RffIkVfzMY0xQK/0Qz9YklR95sKTjjD9bZnixy0ks5TnAP3y67
+	 u+FfZPpfew/KQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 73525D8C978;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 87656D8C97D;
 	Thu, 15 Feb 2024 12:30:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,40 +52,33 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: mdio_bus: make mdio_bus_type const
+Subject: Re: [PATCH net-next] net: ena: Remove unlikely() from IS_ERR() condition
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170800022846.10978.18400205281341107095.git-patchwork-notify@kernel.org>
+ <170800022854.10978.8131872573482174754.git-patchwork-notify@kernel.org>
 Date: Thu, 15 Feb 2024 12:30:28 +0000
-References: <20240213-bus_cleanup-mdio-v1-1-f9e799da7fda@marliere.net>
-In-Reply-To: <20240213-bus_cleanup-mdio-v1-1-f9e799da7fda@marliere.net>
-To: Ricardo B. Marliere <ricardo@marliere.net>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- gregkh@linuxfoundation.org
+References: <20240213161502.2297048-1-kheib@redhat.com>
+In-Reply-To: <20240213161502.2297048-1-kheib@redhat.com>
+To: Kamal Heib <kheib@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ shayagr@amazon.com, darinzon@amazon.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Tue, 13 Feb 2024 11:48:00 -0300 you wrote:
-> Since commit d492cc2573a0 ("driver core: device.h: make struct
-> bus_type a const *"), the driver core can properly handle constant
-> struct bus_type, move the mdio_bus_type variable to be a constant
-> structure as well, placing it into read-only memory which can not be
-> modified at runtime.
+On Tue, 13 Feb 2024 11:15:02 -0500 you wrote:
+> IS_ERR() is already using unlikely internally.
 > 
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Suggested-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Signed-off-by: Ricardo B. Marliere <ricardo@marliere.net>
-> 
-> [...]
+> Signed-off-by: Kamal Heib <kheib@redhat.com>
+> ---
+>  drivers/net/ethernet/amazon/ena/ena_netdev.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Here is the summary with links:
-  - net: mdio_bus: make mdio_bus_type const
-    https://git.kernel.org/netdev/net-next/c/81800aef0eba
+  - [net-next] net: ena: Remove unlikely() from IS_ERR() condition
+    https://git.kernel.org/netdev/net-next/c/e8d8acad5a85
 
 You are awesome, thank you!
 -- 
