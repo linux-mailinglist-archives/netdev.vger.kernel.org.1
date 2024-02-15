@@ -1,81 +1,50 @@
-Return-Path: <netdev+bounces-72017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAE2685631B
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 13:27:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 331E5856331
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 13:30:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6748428258C
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 12:27:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 346801C217ED
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 12:30:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2073E12BF00;
-	Thu, 15 Feb 2024 12:27:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21BA812C815;
+	Thu, 15 Feb 2024 12:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="VieJJYmK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SwKuH8eH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EAE212BF15
-	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 12:27:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED61A18EA2;
+	Thu, 15 Feb 2024 12:30:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708000054; cv=none; b=DpyoOzKDg7oUQ336NRvFmyOjlUu1Ariv7ru0rNhe2kPHUka9h6w9TS7UhNJomCOZf7Q6SKhkNhG18OxItVwZ9Hnf0zAYi32qvsplIuv2jBMtXv3ClX3naDX49DblP78kLMlLxmstg7cveDfkTS7Jk99jz76NhhxUb72V/+r3Wyg=
+	t=1708000229; cv=none; b=dq59fPKyPJIvmoKw/BG6j5dqhy2XP5iiGCxPV6xPto5VY3V+8aDol/ClkJkX0YzR0zEKraGHP2MuA2A0EyLKcbeM2Xxrs2btRbZla0xU/w9rENuAoupuMoxFr9Gb6LOr3CNVQpcixbKjflZ64eac3eeffTsmrd3s7p8P4oeGS/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708000054; c=relaxed/simple;
-	bh=lQjqwfFIpfguek3ysT86icCdMOt9lb9UMoTX5trS2Oc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IK2I9707hk71YstNk7SKY3+gpHN0269JSxtxIxlvqClQzXoZxefEFbkOBf2qaXSema3hxVWytg82lFh4e8NYyisCMZ4tc9BEEESv95p7pSENhBtmf0ZfhfZgwAGEpkLBpmkijI6Jol91g3Syxfoky3Xae5AjFvbTSprFnAXgs2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=VieJJYmK; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3394ca0c874so461165f8f.2
-        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 04:27:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708000049; x=1708604849; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=29rgK9RLEgR1oboieHyNa5NitwkN9svbE6p8t/OozIQ=;
-        b=VieJJYmK8PvbaRalTGxvTYUHAK6yZIIneYyFnZVEm2HzJdwi8L82sUk+cODw+3JnBf
-         S0QEMxOvwaCbTS99aRYaSJVUBshnrDuUBhl6c/RXAPNKR2vU+I2dSwII4k/v/hWVA75u
-         hEYN2NV9xUVqAIMOvvkfNp8VZnqBOKkJtfwUdVpr7qQYkVPQy3aEZVbfiw6VhDmAu9w4
-         U3L8Ac05jMohUH7TXyR7d5C3y+Ee91O1tRVOvhiPyz5yGWhcnX8iwM13i9F7EZRhi6kT
-         GhqAi3JHtqItP/H8E4XxKP1kfdqwevSQ2kCf0ASclSQEYdTYInsJymGOdGtgi9GXEav1
-         b1XQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708000049; x=1708604849;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=29rgK9RLEgR1oboieHyNa5NitwkN9svbE6p8t/OozIQ=;
-        b=u3AH2QtNAN5yWZJHMdtHwf9y7VDutXUPAkNXmsrpEShj4meC03kx8rAmqW5Ors9Y9F
-         6FeNnvmi0kiiJC+BgeU+gQCzvD6alKYv0Y68FNScpQZhAl2h4VO5FdOzfDAPwJrHs8iW
-         8ZnhQULwNE726a5lg8oHkdFn8dbMt4uW3YtpSXstAHBifX/C5gkDiId1TcOsCLzXNN8n
-         pqsrDFXHOcosBrFI0PBZ4e2x3PRnd6kILrr2jIIcv19TLsbwDnYs55Kd3nsqsax1NPqX
-         pnhfYhvKUyNm2l60GuNZs1BLf8gSKarn0xKzhF2+RKD4qHvc1ry1yYFEwtl+x5nOnOI7
-         lPqA==
-X-Gm-Message-State: AOJu0YwMizeFvqG/h1qNZjJ7I7gGYqXY2UVLahHIbrOLnPiND5PnkYMQ
-	SyN7c8FjJo7fHQs/IrSJycxDFKrzO25aWQPUAa8gp/Tk8P1X6b3XkOAuACxrQQ8LjrQq0eMhTeW
-	ACy0=
-X-Google-Smtp-Source: AGHT+IHyDMpwPwuQP22SMTNssv/4Kje376SGV3PztzB53oUb3kbXkS12a2qHaEWmucobUT9so6gn1Q==
-X-Received: by 2002:a05:6000:698:b0:33d:9f:efff with SMTP id bo24-20020a056000069800b0033d009fefffmr1994545wrb.16.1708000049482;
-        Thu, 15 Feb 2024 04:27:29 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id l15-20020a5d668f000000b0033cf4727a46sm1665465wru.25.2024.02.15.04.27.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Feb 2024 04:27:29 -0800 (PST)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	donald.hunter@gmail.com
-Subject: [patch net-next v2] tools: ynl: don't access uninitialized attr_space variable
-Date: Thu, 15 Feb 2024 13:27:26 +0100
-Message-ID: <20240215122726.29248-1-jiri@resnulli.us>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1708000229; c=relaxed/simple;
+	bh=B+YQ99SF1f7s20FoqQoRtIlLxfE6ABfVDyypZUEl59s=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=SBJzQ0DLtL3UPDiFhTNNzXeYZSPGl63tkpoND5kI28yLY+HU+T/ugd6zocW0JgENjoTvVT8j9MGhFCMlQKgFWfrce9Joc/LRwJEMMvEltmO/OeYMTvSuraBFqJd75pPFvIiLdw/RnNP3S4MkdQ6HfDgwZLJFk+Aw/hGK4/xru0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SwKuH8eH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9273FC433F1;
+	Thu, 15 Feb 2024 12:30:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708000228;
+	bh=B+YQ99SF1f7s20FoqQoRtIlLxfE6ABfVDyypZUEl59s=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=SwKuH8eHPHALSIqEi+4NxYhO1VIiTrZfh3RyAmIWri/MTTsUHUYVP+KDNt+2imBWN
+	 hlU2RwmOFAoctbl0rjF/mRTwtqXt56asy7szP3cmj19mibHcgbaU4DVSWvz+cYho2D
+	 qE/IdakVfaoPup8bCSZ0Uq/xzRbJGh3UOKhZYvIknezoLi8ofCqRM/bOIm7yTiiu6j
+	 h3N8vZyXzczQnQ7XrHyyy+TtoLhu/NLoxyY6nW0sB5Bc7S11rBoD7ws5vcGngnKPo8
+	 xVoZdO2pn6vhwD7MonXxO32zP8d+hoCtDal9XxTuEh0M9FnDH+0FCioVa0gOf+Fujv
+	 HOXKTnF1ezjlg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 73525D8C978;
+	Thu, 15 Feb 2024 12:30:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,69 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] net: mdio_bus: make mdio_bus_type const
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170800022846.10978.18400205281341107095.git-patchwork-notify@kernel.org>
+Date: Thu, 15 Feb 2024 12:30:28 +0000
+References: <20240213-bus_cleanup-mdio-v1-1-f9e799da7fda@marliere.net>
+In-Reply-To: <20240213-bus_cleanup-mdio-v1-1-f9e799da7fda@marliere.net>
+To: Ricardo B. Marliere <ricardo@marliere.net>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ gregkh@linuxfoundation.org
 
-From: Jiri Pirko <jiri@nvidia.com>
+Hello:
 
-If message contains unknown attribute and user passes
-"--process-unknown" command line option, _decode() gets called with space
-arg set to None. In that case, attr_space variable is not initialized
-used which leads to following trace:
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Traceback (most recent call last):
-  File "./tools/net/ynl/cli.py", line 77, in <module>
-    main()
-  File "./tools/net/ynl/cli.py", line 68, in main
-    reply = ynl.dump(args.dump, attrs)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "tools/net/ynl/lib/ynl.py", line 909, in dump
-    return self._op(method, vals, [], dump=True)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "tools/net/ynl/lib/ynl.py", line 894, in _op
-    rsp_msg = self._decode(decoded.raw_attrs, op.attr_set.name)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "tools/net/ynl/lib/ynl.py", line 639, in _decode
-    self._rsp_add(rsp, attr_name, None, self._decode_unknown(attr))
-                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "tools/net/ynl/lib/ynl.py", line 569, in _decode_unknown
-    return self._decode(NlAttrs(attr.raw), None)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "tools/net/ynl/lib/ynl.py", line 630, in _decode
-    search_attrs = SpaceAttrs(attr_space, rsp, outer_attrs)
-                              ^^^^^^^^^^
-UnboundLocalError: cannot access local variable 'attr_space' where it is not associated with a value
+On Tue, 13 Feb 2024 11:48:00 -0300 you wrote:
+> Since commit d492cc2573a0 ("driver core: device.h: make struct
+> bus_type a const *"), the driver core can properly handle constant
+> struct bus_type, move the mdio_bus_type variable to be a constant
+> structure as well, placing it into read-only memory which can not be
+> modified at runtime.
+> 
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Suggested-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Signed-off-by: Ricardo B. Marliere <ricardo@marliere.net>
+> 
+> [...]
 
-Fix this by moving search_attrs assignment under the if statement
-above it to make sure attr_space is initialized.
+Here is the summary with links:
+  - net: mdio_bus: make mdio_bus_type const
+    https://git.kernel.org/netdev/net-next/c/81800aef0eba
 
-Fixes: bf8b832374fb ("tools/net/ynl: Support sub-messages in nested attribute spaces")
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
-v1->v2:
-- avoid attr_space set in else case
-- alter the patch subject and patch description to better describe the
-  fix.
----
- tools/net/ynl/lib/ynl.py | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-index 03c7ca6aaae9..f45ee5f29bed 100644
---- a/tools/net/ynl/lib/ynl.py
-+++ b/tools/net/ynl/lib/ynl.py
-@@ -588,10 +588,10 @@ class YnlFamily(SpecFamily):
-         return decoded
- 
-     def _decode(self, attrs, space, outer_attrs = None):
-+        rsp = dict()
-         if space:
-             attr_space = self.attr_sets[space]
--        rsp = dict()
--        search_attrs = SpaceAttrs(attr_space, rsp, outer_attrs)
-+            search_attrs = SpaceAttrs(attr_space, rsp, outer_attrs)
- 
-         for attr in attrs:
-             try:
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
