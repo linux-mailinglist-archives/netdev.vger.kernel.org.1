@@ -1,154 +1,167 @@
-Return-Path: <netdev+bounces-72155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4A98856C08
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 19:04:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA402856C2A
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 19:10:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76E1B1F226EA
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:04:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35D071F238F5
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:10:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA7B11384A4;
-	Thu, 15 Feb 2024 18:04:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 193F013849A;
+	Thu, 15 Feb 2024 18:09:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RIY+9Vl7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A28B135A40;
-	Thu, 15 Feb 2024 18:04:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D2CB1369AD;
+	Thu, 15 Feb 2024 18:09:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708020269; cv=none; b=BpiYtl1CwAv1uBR+rQvye2YYcbn89TiSkPeUIyMYpa81dLZODF2w14XZGJ/+ICarTSuEAylIJ8U6LPpcri8hA4qys95KNAD136ntWrpNUq0fGHz+IGa6PZ2NPSqnw8VgcUrEun1ibO7BHpvzG9LJ3S1zUK1dpQZFlPHNxIPfEo0=
+	t=1708020599; cv=none; b=XcPpAR+GguhKIr7jeim/OtziCAF66VyH5PGvLzBztdo9h2wLiRTawY6BR+H/8l+nKx6TEMAAHCydfcCCaBlLuFoAA5TkB+xNnB5biXAl/5JZjGg1sJWeHB8Z4Ljkyj6mkC0crLKcPl7Ki1CNuP1Kt3qERvhDLmQl33AOlo1yBdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708020269; c=relaxed/simple;
-	bh=OOdq3VXO7hmheUjpDNjJV2uW/HQVgnjzp9qxVRAt1Q4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=t3JHiYjptI1O+TOVaA1Gq4Ni7YB2lKibv4+UNYEzJG+SmHbhW5TIaXv5ycDkME9Xu0C0NyEnh3stgmaMDZr2d/KNR46jTKArhaKvheuiGvdUC+M1NLgUvV8r4zo8KZ3Ksgoy307Tswbe914TRRjvZ/DznN1PYgNyjWHw0zfhqiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.161.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	s=arc-20240116; t=1708020599; c=relaxed/simple;
+	bh=9LTX5p5ECOAIOrnzChPk4OdgPxQGNVKmHTp4cFz6qSw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pg+PMcchCyTOQBff5Qk5y3KyEeCWHr/863MpDWuBKwZELTICMp1Y3F1rWC77dhb2ssH7a3b3x3xyZFrukQ4s9hxTODUiz4qVF8UXDQETJIb1DFeqVYMgsoP6qDB6bW/3OmMwhv0BqdjBHIb8l2SiJoCiAvOcwIeryHm3UIND7fY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RIY+9Vl7; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-59cbf204d52so125954eaf.1;
-        Thu, 15 Feb 2024 10:04:27 -0800 (PST)
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-51181d8f52fso1473663e87.3;
+        Thu, 15 Feb 2024 10:09:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708020595; x=1708625395; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MsK9sMUkCnAium0cXNBDUzfqUg2ZTSLKAEAIbODiMlA=;
+        b=RIY+9Vl7VG0jt5rGLAq7FcR2bqFMEQUDEHPcaX9PRaVq3UuiIuMimDnrmvmisZ1Lh8
+         hJRrC5sAT7wHWvNjvnm0QpHsQY5RWmNUIDq/J6mgVq+Sx4fwmZg8NxN1JrremeyX9DSN
+         /hwPNia5URc6CNYqKIqh5MjbczeFgVctvjlZSFrz7YmKAbkKIzeNUYGia04i9ZX9o6wf
+         eqDHe89/yUkt3N5x0PbU3lIlmayfPJ7eR/x254By2o0dMN4/W/OJpx+dSiFYxBC67q+v
+         KCrE4iNI+SF8zGqFeUWiG5+u9Y2ei+Y1b52LYwqqM5WU4tFh/kq5Oz3icKgmpWMA79VG
+         7+TQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708020267; x=1708625067;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Lb5qWV79xfsy1nob2raR3IdkShVhRb4uV1Pha2M3jlQ=;
-        b=dipl/1mVYsc0eLzzSW95xt0CHidvf9jEry0PnvBB2GhqnlhbjJKYauiZZqzdQrmApz
-         LgPsNuf2ucrPbFE98zTAsUexY9MQzlppJJC4fdp0zRijeKTY8nQJiPvPTUZCbr3LlWyd
-         fZe9wzfdO+uFxINL2lZSxDURiKf08/shYxqp2q+4lPivD7dJKHX5lCvsEKedIxhL89ss
-         eIUyZ6DhQ5aaoLo/MPoXqd0IqIUW+CcNASwtezO68U5RPgwNrKggQOgWPn0X0KMF30D7
-         PJ6mZ5OmASKtdjNioLVdhKln4IRS1pmb+9V7+EFW97gmw1t1K+Nap/vgTZ11UOgvQLku
-         U75Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUcf0cA/ftJkfCfsMx+Go1cbbOZ4e8ybMnTrA7mYhhE1wi7RfE1jSWwAnMKu0aaBOi4tkic12qsK5uAMwzelKG3TnJ8oGaMEtQ3OZMIxkqHGmzlKP8nuy4zhugDB3qSVsRTe9Wvm0HS8sr1/khsVfDu5uJpmfve9lo95CyLSYT7xC4qRzI=
-X-Gm-Message-State: AOJu0Yw/XMnWVyoFJ6zLMCMRSpFIuhQf5X4XqW8etlzh2RNLFNk9x3Gp
-	WU68kNO0GuOAgLQWheLncAgDX9z3b1u2Ww6sPrNG8iV4i1w1794L2VAVxSakXQGn9DCQwUAk1yg
-	eQ4TyhdLa3+MIw8ATP5QIk9usWTZIu4nd
-X-Google-Smtp-Source: AGHT+IFtgxPxCy0j7Fv+BWzHYBZiXW3bHFmfrbcpc91leSPMJZqEpf3xxW9UF1Qig/NKYHxMcHLKEG4GC2jON4Ds9O0=
-X-Received: by 2002:a4a:d5d8:0:b0:59c:d8cd:ecee with SMTP id
- a24-20020a4ad5d8000000b0059cd8cdeceemr2219735oot.1.1708020266819; Thu, 15 Feb
- 2024 10:04:26 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708020595; x=1708625395;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MsK9sMUkCnAium0cXNBDUzfqUg2ZTSLKAEAIbODiMlA=;
+        b=mDxR62OJ8rp5jWoA8/JT01ZbyO8xHh0Cxv3783bGkhO6hKqRWbksc6ZL8MVM1IOnmG
+         jfHuMX3C03ZR05O3uadJhJYLIHRkKNcSdtxjn2JUsqwrc7Qb+yPuZkEPmOpcE97uI+9w
+         7c+3GSi5OKZCPBo39cAvyFzeB3X61IEUIAqfmi8sSFGnwfoyZC8HXWtJYKt1xNgjmG9y
+         bqb+yIdoN1BaBUZJmtBu/y+za8dBXZQ4i0eBcSXuGZeyoDdLtVs102ic3wCrR3PKWw9Y
+         WscSvjnSyEx4YG+P3sjq69Kaqn53S9k6Wx9scYqAm16WkpUczpWAho7BIedYHVkJoWrt
+         oZ4A==
+X-Forwarded-Encrypted: i=1; AJvYcCVcrBBs0YEO2zulVsKhaH7s0s6TfA01Fz2O5tWozu0sQDrsRf78edgVPS8epk5qxUP8LuqZcNo6satT32TXrZjcWpbTMH1VJbh8lbVt
+X-Gm-Message-State: AOJu0YzviAMVN61dWd2jn3c6dCLeFtkOTDlLbPdAPA5k2uUsZKG/Dta0
+	jjVLQ83hMfErQAZaJmHR3AgyMM9QIGM13wjjf+FjzQHXewsNGJ4N
+X-Google-Smtp-Source: AGHT+IGmPCAzrJRmFJvVMrsiuRVs+q5aNELJEAQBaCzuITGqFHhoSV/ayO6lNlEu2bIZKCXz5Vbnig==
+X-Received: by 2002:a19:911e:0:b0:511:941d:37d4 with SMTP id t30-20020a19911e000000b00511941d37d4mr1823053lfd.5.1708020594849;
+        Thu, 15 Feb 2024 10:09:54 -0800 (PST)
+Received: from skbuf ([188.25.173.195])
+        by smtp.gmail.com with ESMTPSA id vu6-20020a170907a64600b00a3c5d10bcdbsm782485ejc.114.2024.02.15.10.09.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Feb 2024 10:09:54 -0800 (PST)
+Date: Thu, 15 Feb 2024 20:09:52 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, linus.walleij@linaro.org,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v4 13/15] net: dsa: vsc73xx: Implement vsc73xx
+ 8021q tagger
+Message-ID: <20240215180952.b55l3qxno2mexqqs@skbuf>
+References: <20240213220331.239031-1-paweldembicki@gmail.com>
+ <20240213220331.239031-1-paweldembicki@gmail.com>
+ <20240213220331.239031-14-paweldembicki@gmail.com>
+ <20240213220331.239031-14-paweldembicki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <6017196.lOV4Wx5bFT@kreacher> <22182690.EfDdHjke4D@kreacher>
-In-Reply-To: <22182690.EfDdHjke4D@kreacher>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Thu, 15 Feb 2024 19:04:15 +0100
-Message-ID: <CAJZ5v0i4i=OAj142eV3Vton5o25YzMF6x0ZSNFBOZgjWb1ccpg@mail.gmail.com>
-Subject: Re: [PATCH v2 6/9] wifi: iwlwifi: mvm: Set THERMAL_TRIP_FLAG_RW_TEMP directly
-To: Linux PM <linux-pm@vger.kernel.org>, 
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>
-Cc: Lukasz Luba <lukasz.luba@arm.com>, LKML <linux-kernel@vger.kernel.org>, 
-	Daniel Lezcano <daniel.lezcano@linaro.org>, 
-	Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>, 
-	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, Zhang Rui <rui.zhang@intel.com>, 
-	netdev@vger.kernel.org, "Rafael J. Wysocki" <rjw@rjwysocki.net>, 
-	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, linux-wireless@vger.kernel.org, 
-	Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, 
-	Pengutronix Kernel Team <kernel@pengutronix.de>, 
-	Manaf Meethalavalappu Pallikunhi <quic_manafm@quicinc.com>, Kalle Valo <kvalo@kernel.org>, 
-	Johannes Berg <johannes@sipsolutions.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240213220331.239031-14-paweldembicki@gmail.com>
+ <20240213220331.239031-14-paweldembicki@gmail.com>
 
-On Mon, Feb 12, 2024 at 7:42=E2=80=AFPM Rafael J. Wysocki <rjw@rjwysocki.ne=
-t> wrote:
->
-> From: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
->
-> It is now possible to flag trip points with THERMAL_TRIP_FLAG_RW_TEMP
-> to allow their temperature to be set from user space via sysfs instead
-> of using a nonzero writable trips mask during thermal zone registration,
-> so make the iwlwifi code do that.
->
-> No intentional functional impact.
->
-> Note that this change is requisite for dropping the mask argument from
-> thermal_zone_device_register_with_trips() going forward.
->
-> Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+In the context of DSA, tagger is synonymous with "tagging protocol
+driver", aka what the previous patch implemented in
+net/dsa/tag_vsc73xx_8021q.c. It would be better to rename the commit
+title to "Implement the tag_8021q VLAN operations".
+
+On Tue, Feb 13, 2024 at 11:03:26PM +0100, Pawel Dembicki wrote:
+> This patch is a simple implementation of 802.1q tagging in the vsc73xx
+> driver. Currently, devices with DSA_TAG_PROTO_NONE are not functional.
+> The VSC73XX family doesn't provide any tag support for external Ethernet
+> ports.
+> 
+> The only option available is VLAN-based tagging, which requires constant
+> hardware VLAN filtering. While the VSC73XX family supports provider
+> bridging, it only supports QinQ without full implementation of 802.1AD.
+> This means it only allows the doubled 0x8100 TPID.
+> 
+> In the simple port mode, QinQ is enabled to preserve forwarding of
+> VLAN-tagged frames.
+> 
+> The tag driver introduces the most basic functionality required for
+> proper tagging support.
+
+I guess this sentence is in place from before the tagging protocol
+driver split in v3. Please remove it, it is confusing now.
+
+> 
+> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
 > ---
->
-> v1 -> v2:
->    * Rename trip flag (Stanislaw).
->    * Fix coding mistake in iwl_mvm_thermal_zone_register().
->    * Add "wifi:" prefix to the subject (Kalle).
+> v4:
+>   - adjust tag8021q implementation for changed untagged vlan storage
+>   - minor fixes
+> v3:
+>   - Split tagger and tag implementation into separate commits
+> 
+>  drivers/net/dsa/Kconfig                |  2 +-
+>  drivers/net/dsa/vitesse-vsc73xx-core.c | 38 ++++++++++++++++++++++++--
+>  2 files changed, 37 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/dsa/Kconfig b/drivers/net/dsa/Kconfig
+> index 3092b391031a..22a04636d09e 100644
+> --- a/drivers/net/dsa/Kconfig
+> +++ b/drivers/net/dsa/Kconfig
+> @@ -126,7 +126,7 @@ config NET_DSA_SMSC_LAN9303_MDIO
+>  
+>  config NET_DSA_VITESSE_VSC73XX
+>  	tristate
+> -	select NET_DSA_TAG_NONE
+> +	select NET_DSA_TAG_VSC73XX_8021Q
+>  	select FIXED_PHY
+>  	select VITESSE_PHY
+>  	select GPIOLIB
+> diff --git a/drivers/net/dsa/vitesse-vsc73xx-core.c b/drivers/net/dsa/vitesse-vsc73xx-core.c
+> index 6c7bd1c200b4..9f94ae8c763a 100644
+> --- a/drivers/net/dsa/vitesse-vsc73xx-core.c
+> +++ b/drivers/net/dsa/vitesse-vsc73xx-core.c
+> @@ -17,6 +17,7 @@
+>  #include <linux/kernel.h>
+>  #include <linux/module.h>
+>  #include <linux/device.h>
+> +#include <linux/iopoll.h>
 
-I think that all of the feedback on the v1 of this patch has been
-addressed, so are there any more concerns regarding it?
+I believe iopoll.h is misplaced in this patch. Probably the first one to
+have used read_poll_timeout() should have included it.
 
-If not, it would be nice to get an ACK for it, so it can be routed
-through the PM tree.
-
-> ---
->  drivers/net/wireless/intel/iwlwifi/mvm/tt.c |    6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
->
-> Index: linux-pm/drivers/net/wireless/intel/iwlwifi/mvm/tt.c
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> --- linux-pm.orig/drivers/net/wireless/intel/iwlwifi/mvm/tt.c
-> +++ linux-pm/drivers/net/wireless/intel/iwlwifi/mvm/tt.c
-> @@ -667,9 +667,6 @@ static  struct thermal_zone_device_ops t
->         .set_trip_temp =3D iwl_mvm_tzone_set_trip_temp,
->  };
->
-> -/* make all trips writable */
-> -#define IWL_WRITABLE_TRIPS_MSK (BIT(IWL_MAX_DTS_TRIPS) - 1)
-> -
->  static void iwl_mvm_thermal_zone_register(struct iwl_mvm *mvm)
->  {
->         int i, ret;
-> @@ -692,11 +689,12 @@ static void iwl_mvm_thermal_zone_registe
->         for (i =3D 0 ; i < IWL_MAX_DTS_TRIPS; i++) {
->                 mvm->tz_device.trips[i].temperature =3D THERMAL_TEMP_INVA=
-LID;
->                 mvm->tz_device.trips[i].type =3D THERMAL_TRIP_PASSIVE;
-> +               mvm->tz_device.trips[i].flags =3D THERMAL_TRIP_FLAG_RW_TE=
-MP;
->         }
->         mvm->tz_device.tzone =3D thermal_zone_device_register_with_trips(=
-name,
->                                                         mvm->tz_device.tr=
-ips,
->                                                         IWL_MAX_DTS_TRIPS=
-,
-> -                                                       IWL_WRITABLE_TRIP=
-S_MSK,
-> +                                                       0,
->                                                         mvm, &tzone_ops,
->                                                         NULL, 0, 0);
->         if (IS_ERR(mvm->tz_device.tzone)) {
->
->
->
->
+>  #include <linux/of.h>
+>  #include <linux/of_mdio.h>
+>  #include <linux/bitops.h>
 
