@@ -1,93 +1,82 @@
-Return-Path: <netdev+bounces-72123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11650856987
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 17:27:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6053C856A01
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 17:52:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9654C291E5B
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 16:27:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E3B3284CB7
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 16:52:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E0CB13473B;
-	Thu, 15 Feb 2024 16:27:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A439913666F;
+	Thu, 15 Feb 2024 16:52:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="O3eXekOJ"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VbqIAF96"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 018D513399E;
-	Thu, 15 Feb 2024 16:27:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D552213665E
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 16:52:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708014447; cv=none; b=rYNlXKBL5IrnTfegumx/DLSmrDgCAYMdmY5ANZ8jXYGbEJqVB9QXOye5bJBVS+d7NgEbmlWZnW/hpg7/FCAxdMBuhOwvQIS2qgixuLlNyZm9ESvU2CYpFB05u5dUDgUCCgB7y72Bee50B/EkzBjK+0zpx+iNS6sqJBR8WfdcpE8=
+	t=1708015952; cv=none; b=cZvpO6016Az4fZtBmn5kmslU/oom1IrLvGP5T5QU1yqJptM/Se/ufQzwx56R2oBoqMVbTFYrSYNJZ5i15NhA6k0xbc+EBnclHGEwhML1jtdP14zm55XfokZz9qlCy6TAAwKAsGUa43E2v2CYF6ksXKIwuZrSE3PiM0N0ufkUrYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708014447; c=relaxed/simple;
-	bh=CyRI1uCzCoGWcjKACcwDD3OCyQCqdt4SPHYVdoOyQ1A=;
+	s=arc-20240116; t=1708015952; c=relaxed/simple;
+	bh=NLK7NjArN3ZvCJtdaYIKgWL+29pKUXW2zpoNvi9AN9U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CI5iDFmU55BTUuyGe+7/o9kEZijUHkK3oXFhZc2ufWt0+XnSSaqIy39MiHAeSPN7LaSxZzIc9dCGlpbLSYGT0K0IYhLwA1lMTOyOCa1hichXRsPztjuRNusXFViawbycDOAEOeL5yGU8W9cjsaRcavtmOadQ0kZrNvdlBPeJppQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=O3eXekOJ; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=EWZIyim+Tuvyt3wOnNkE0nCb5ATARobWhzBcyG/FuL0=; b=O3eXekOJVXDVMI39FdMDQkdpcQ
-	PyjL5Dp5oG/MIRx71Pmy9Oi9Hqr6Y5DXH1kPsFJECm5WupOzQxQbOVHAWtYrJvcQR6gWYx+INfcsj
-	RgJ5BhvXhBy8LpAGO6Bn9EVL+nCHFpRakzgLNGrKYS6chsqYXFfNQMp5Nd1DEibb8RGpESJD22vtb
-	mxLpMMerGDK7pWuuZvnrxKzUtE77cgbAHo+Sa3QVBQX9uYcpWwISHvv0IwKzm14Mn+ILqGbTXFctw
-	zuJqNDDoa8H2VHQp77/Mb+L9J5ruUXBZddwARnpiVsfxS6tP/jxZCuvDl3nVDDB7Iy5CRJ2DGWnBp
-	sIXX7vsQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50496)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1raeZg-0004Qb-2H;
-	Thu, 15 Feb 2024 16:27:00 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1raeZb-0004pl-Eb; Thu, 15 Feb 2024 16:26:55 +0000
-Date: Thu, 15 Feb 2024 16:26:55 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-Cc: Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
-	David E Box <david.e.box@linux.intel.com>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Mark Gross <markgross@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Serge Semin <fancer.lancer@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	platform-driver-x86@vger.kernel.org, linux-hwmon@vger.kernel.org,
-	bpf@vger.kernel.org, Voon Wei Feng <weifeng.voon@intel.com>,
-	Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>,
-	Lai Peter Jun Ann <jun.ann.lai@intel.com>,
-	Abdul Rahim Faizal <faizal.abdul.rahim@intel.com>
-Subject: Re: [PATCH net-next v5 1/9] net: phylink: provide
- mac_get_pcs_neg_mode() function
-Message-ID: <Zc47T/qv8Xg2SA21@shell.armlinux.org.uk>
-References: <20240215030500.3067426-1-yong.liang.choong@linux.intel.com>
- <20240215030500.3067426-2-yong.liang.choong@linux.intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=rYHvvz/HyVK+tPVXGFUdXqupUqSoDSEAEUPIjvBW7FZlNeF7ablW2q4evoc2mEKuEhFRhco38UvtyocrBEs0fKlNT+RvFywJN4bxYcRGjZARI0g/FLhQAFqj2zKoFuLRS4D1WPBBoqMzOqjnJrFPQ0bAQY1yVhxRfOIzKVSFUOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=VbqIAF96; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a3db0b8b313so57798066b.0
+        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 08:52:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1708015949; x=1708620749; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=BDZ8qB5BWwBXJ6yx7sr6Txj2nZN3+5M0e1F2LI9Ho4g=;
+        b=VbqIAF96lqCB1wFKwTiNUjPpQfEqG0yburQBQFdf2tdzYp93AuRcZrCY3GAt/Hywpi
+         Wzo+sqoaIxIwSFRpJks2+232pFCVXJJt5ygAXc8sTLNDlGD7IjcwPOaB7gtULAJ8GRtG
+         1Oa9op0qaAE+kSibZrtFnF3D/Tl+xQLtIBToAzhubIdT5hbpqAMQTXcYrT4kxg2b6JDY
+         B8Wi5MUzRtLKuom0r5C/jCvxF3zZemSDCrK2aXA9JxGMWLQ36ml2OC09wTEZFew7cx7Z
+         GUq7DK7ixg72xYW2NmeflLMZ1w5kEj9ygDlrrYEeQk33nO/75YaUQ+Rnfsv6APepL0/I
+         fMHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708015949; x=1708620749;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BDZ8qB5BWwBXJ6yx7sr6Txj2nZN3+5M0e1F2LI9Ho4g=;
+        b=xBKTCnKizNjKkD6lWEtUrXBKtqBtdq+VDRG5kexl1JVDbNjlSxq2zcjnz3rlAJc0JN
+         5RVi6lnUeT2nxkz9R5htOECMFgPlkYkYajMFlKFD0TkJLtLs6eOCR30r+beZRLjUrRga
+         Hhdhv4VydxntwE8O7PekmMNvu4B1RcyzfqymGl0JDZlKBB0s9OMYooyr6XiLul860nQT
+         Hx3mFWQm9YasvjkMnTWCw/o3WwHo3IdKBb58p719o/4n/1nVqqfCT2uCGsELuKtW5Pqk
+         qaB5cA/14HRs9htg1dtvH8ZmQQkXREVFtOxbqQtspqItV71qdeFz8r2yTflrC/iW4Jd6
+         lK7g==
+X-Forwarded-Encrypted: i=1; AJvYcCWaHvcPt0dzxG+WEm0wkKfEIyna6FOaJuWmpXkZoJqjQ7oCn5i7kjio8zMGu6zbJLgTzGN09ynnYBmkk4Fa6Icp6FN52Qzu
+X-Gm-Message-State: AOJu0YwsTBZy0f+qyQvIOMm3fvb24BaE/qnZRjR4ts4xkl+gJuD1VLcl
+	SeFjeYHXNh1+dEkyJYl5dRsOAckEMPAwSTAsZ1yJ/uelnMcMyHRtFcZdUswnrzA=
+X-Google-Smtp-Source: AGHT+IFyoufoz8RHceaQKL1qsabL9C7M3ugX6XL4wgs0M8mtd5lnbnhRwgAqOIwaMgYvJrydVEbNEg==
+X-Received: by 2002:a17:906:455a:b0:a3d:180d:a9fc with SMTP id s26-20020a170906455a00b00a3d180da9fcmr1852959ejq.1.1708015949004;
+        Thu, 15 Feb 2024 08:52:29 -0800 (PST)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id ti1-20020a170907c20100b00a3d90d6fca8sm710807ejc.8.2024.02.15.08.52.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Feb 2024 08:52:28 -0800 (PST)
+Date: Thu, 15 Feb 2024 19:52:24 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Diogo Ivo <diogo.ivo@siemens.com>
+Cc: danishanwar@ti.com, rogerq@kernel.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	andrew@lunn.ch, jan.kiszka@siemens.com, robh@kernel.org,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: ti: icssg-prueth: Remove duplicate
+ cleanup calls in emac_ndo_stop()
+Message-ID: <f9bd0e83-f3bd-4804-81ff-89923b42693b@moroto.mountain>
+References: <20240215152203.431268-1-diogo.ivo@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,69 +85,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240215030500.3067426-2-yong.liang.choong@linux.intel.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20240215152203.431268-1-diogo.ivo@siemens.com>
 
-On Thu, Feb 15, 2024 at 11:04:51AM +0800, Choong Yong Liang wrote:
-> Phylink invokes the 'mac_get_pcs_neg_mode' function during interface mode
-> switching and initial startup.
+On Thu, Feb 15, 2024 at 03:22:01PM +0000, Diogo Ivo wrote:
+> Remove the duplicate calls to prueth_emac_stop() and
+> prueth_cleanup_tx_chns() in emac_ndo_stop().
 > 
-> This function is optional; if 'phylink_pcs_neg_mode' fails to accurately
-> reflect the current PCS negotiation mode, the MAC driver can determine the
-> mode based on the interface mode, current link negotiation mode, and
-> advertising link mode.
-> 
-> For instance, if the interface switches from 2500baseX to SGMII mode,
-> and the current link mode is MLO_AN_PHY, calling 'phylink_pcs_neg_mode'
-> would yield PHYLINK_PCS_NEG_OUTBAND. Since the MAC and PCS driver require
-> PHYLINK_PCS_NEG_INBAND_ENABLED, the 'mac_get_pcs_neg_mode' function
-> will calculate the mode based on the interface, current link negotiation
-> mode, and advertising link mode, returning PHYLINK_PCS_NEG_OUTBAND to
-> enable the PCS to configure the correct settings.
+> Signed-off-by: Diogo Ivo <diogo.ivo@siemens.com>
+> Reviewed-by: Roger Quadros <rogerq@kernel.org>
+> Reviewed-by: MD Danish Anwar <danishanwar@ti.com>
+> ---
+> Changes in v2:
+>  - Removed Fixes: tags
+>  - Added Reviewed-by's
 
-This paragraph doesn't make sense - at least to me. It first talks about
-requiring PHYLINK_PCS_NEG_INBAND_ENABLED when in SGMII mode. On this:
+Thanks!
 
-1) are you sure that the hardware can't be programmed for the SGMII
-symbol repititions? 
+Reviewed-by: Dan Carpenter <dan.carpenter@linaro.org>
 
-2) what happens if you're paired with a PHY (e.g. on a SFP module)
-which uses SGMII but has no capability of providing the inband data?
-(They do exist.) If your hardware truly does require inband data, it
-is going to be fundamentally inoperative with these modules.
+regards,
+dan carpenter
 
-Next, you then talk about returning PHYLINK_PCS_NEG_OUTBAND for the
-"correct settings". How does this relate to the first part where you
-basically describe the problem as SGMII requring inband? Basically
-the two don't follow.
-
-How, from a design point of view, because this fundamentally allows
-drivers to change how the system behaves, it will allow radically
-different behaviours for the same parameters between different drivers.
-I am opposed to that - I want to see a situation where we have uniform
-behaviour for the same configuration, and where hardware doesn't
-support something, we have some way to indicate that via some form
-of capabilities.
-
-The issue of whether 2500base-X has inband or not is a long standing
-issue, and there are arguments (and hardware) that take totally
-opposing views on this. There is hardware where 2500base-X inband
-_must_ be used or the link doesn't come up. There is also hardware
-where 2500base-X inband is not "supported" in documentation but works
-in practice. There is also hardware where 2500base-X inband doesn't
-work. The whole thing is a total mess (thanks IEEE 802.3 for not
-getting on top of this early enough... and what's now stated in 802.3
-for 2500base-X is now irrelevant because they were too late to the
-party.)
-
-I haven't been able to look at this issue over the last few weeks
-because of being at a summit, and then suffering with flu and its
-recovery. However, I have been working on how we can identify the
-capabilities of the PCS and PHY w.r.t. inband support in various
-interface modes, and how we can handle the result. That work is
-ongoing (as and when I have a clear head from after-flu effects.)
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
