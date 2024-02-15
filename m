@@ -1,149 +1,105 @@
-Return-Path: <netdev+bounces-72076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 061ED856820
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 16:41:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7A83856890
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 16:54:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39CDA1C238C3
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 15:41:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C3871F214F1
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 15:54:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C6D4133437;
-	Thu, 15 Feb 2024 15:41:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F26012DD9A;
+	Thu, 15 Feb 2024 15:54:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VtlnUwjB"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jJVYV1VB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4563F12C548;
-	Thu, 15 Feb 2024 15:41:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D78D158AAC
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 15:53:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708011705; cv=none; b=S9Gxr1tQ3kSdtx88js+7zcHdu73Eu2GDu9tNxJzJysqtdV6iBdXxkRV+ZRs2lJ5FhupHygZIW/B5xusTmDdSMLhEKk7xpb7rMt/9Oj8u2wzOfrfQuPxnb5GxH3a2HNegRs4a+sG/qG7wzey2QJ7DDAmLiymAjTQrouGD2y4g+NE=
+	t=1708012442; cv=none; b=m9uIlrg8UUubUA22LAeVtP1AiqrBQTYJj0F7pKz4S7G4WJMFTDG21mzS95cOLVdw/NjZfy/+s0CQ8OO53Vmpi14O6gDxR+qYSCiZAJkzfH3sLHvhZi+QtrbB5kbzvbU6YKHARez9rCzCh2HDWnfPA+CMFAc3AOKCzKN1MbS2QtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708011705; c=relaxed/simple;
-	bh=Pgd5J6Uby1Zyd/C1wyBnm9ePGiFzIsnkC58Bl/jyjRE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q0Fg4Ww3BqvVSzCocNrvI6N8/iuCS0qDDFMxayNoSBw4M1OP6FXlAvti09RMbiO5aO4EDp1oCJM32uMewsw4maeKidYTRCD2Dmr+V+tCygZyuSImO1YYrlYK3ZcZr/iSOQLTKoGU2lMr9+5L3f4I/20oC7D4lTETCDCqTcNEhk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VtlnUwjB; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708011703; x=1739547703;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Pgd5J6Uby1Zyd/C1wyBnm9ePGiFzIsnkC58Bl/jyjRE=;
-  b=VtlnUwjB9oH4wtbAK9eJ9lbg3AmBfsaYryM5f8oAsH8z6R4NtEW91Ssp
-   1cinY5rg96Km0fe17mqRO6mh5pkQd9rX+dZs1T3miXlNSTuVnGESqPoBe
-   riOXqhWDmbrfHkzGBaiuYgbp8muTtM1G6edSDGL0KMDomhxURAVnuLXKy
-   X0l8CWv5gLMQeyKvUMUwahZD5LvewgHDT5h+vqvMG55O1kN8fz6HZ4bWT
-   1LWqalsvQviAtPlqrcujah3tfNfqthsDc1GSrPtJlu39mIxSxeqIXjeSz
-   WoGGs51XPhU4EZj8uUtm7QnDLpHBXlfakemCQJgw0SSFbJyiC+Pk4V2dn
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10984"; a="5888083"
-X-IronPort-AV: E=Sophos;i="6.06,162,1705392000"; 
-   d="scan'208";a="5888083"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2024 07:41:42 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10984"; a="935682308"
-X-IronPort-AV: E=Sophos;i="6.06,162,1705392000"; 
-   d="scan'208";a="935682308"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by fmsmga001.fm.intel.com with ESMTP; 15 Feb 2024 07:41:39 -0800
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-	id B54E2204; Thu, 15 Feb 2024 17:41:38 +0200 (EET)
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	linux-kernel@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Johannes Berg <johannes@sipsolutions.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	s=arc-20240116; t=1708012442; c=relaxed/simple;
+	bh=Oc5+lPpSUiakDbqIfYv/gZBIsjCwGULH0qG6WAJ8Ruc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IFROaZhtTWE11l//j+L072RF5v5L9sawep8uOEbaLI/xTtXF6f4lFM2KJBLkO9EIOSlSHtHP/QlNQ5nIiNGvjZtOPM4Oc0eu5CKLp8ge4906NW38VlSUf6ld4bdI5Mw8GTaaxdwdi5R0GBRpvpO6kn4MCeRTl8KOqqhMFdZnjl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jJVYV1VB; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=0W+CbKKFQDzrq2lDw5NSSaJufxovEZSoYHS/h4el85o=; b=jJVYV1VBiRSHGuQdBS88qg3PNo
+	z4e+eWAkuK0Fv86/Jv+w6EJpGP+PbQIadr5Fm0Mur/RWbaIkMXdVhUD1bo+iCkERslMZCrirxR8PD
+	scl1jyu2eCHdOswX9TJmZ1h1brPZlg4tnlSdisxer0y9QzZgId6yJIo4H9VhRlv7rhan8CzjQ1x7v
+	vTWhHgvW3KTZL7mcU5GIAw/9GLHP0uXdy0zvT/R+MddCOEAsNwhEUwqEGyCQETWG+krXLZmpdZ1Vk
+	fqxyH49Wax5yLzMFhhAVC8O38sFFTdqKmvXdVc4Bpl0GkIfPUWMQNGxRmbhN3IBPlF4DINoUCSuOU
+	4v2td/5w==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36722)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rae3S-0004NU-1z;
+	Thu, 15 Feb 2024 15:53:42 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rae3Q-0004oX-AK; Thu, 15 Feb 2024 15:53:40 +0000
+Date: Thu, 15 Feb 2024 15:53:40 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next v1 1/1] wireless: Add KHZ_PER_GHZ to units.h and reuse
-Date: Thu, 15 Feb 2024 17:41:36 +0200
-Message-ID: <20240215154136.630029-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.43.0.rc1.1.gbec44491f096
+	David Miller <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next] ethtool: check for unsupported modes in EEE
+ advertisement
+Message-ID: <Zc4zhPSceYVlYnWc@shell.armlinux.org.uk>
+References: <c02d4d86-6e65-4270-bc46-70acb6eb2d4a@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c02d4d86-6e65-4270-bc46-70acb6eb2d4a@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-The KHZ_PER_GHZ might be used by others (with the name aligned
-with similar constants). Define it in units.h and convert
-wireless to use it.
+On Thu, Feb 15, 2024 at 02:05:54PM +0100, Heiner Kallweit wrote:
+> Let the core check whether userspace returned unsupported modes in the
+> EEE advertisement bitmap. This allows to remove these checks from
+> drivers.
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- include/linux/units.h | 5 ++++-
- net/wireless/reg.c    | 7 +++----
- 2 files changed, 7 insertions(+), 5 deletions(-)
+Why is this a good thing to implement?
 
-diff --git a/include/linux/units.h b/include/linux/units.h
-index 45110daaf8d3..00e15de33eca 100644
---- a/include/linux/units.h
-+++ b/include/linux/units.h
-@@ -24,10 +24,13 @@
- #define NANOHZ_PER_HZ		1000000000UL
- #define MICROHZ_PER_HZ		1000000UL
- #define MILLIHZ_PER_HZ		1000UL
-+
- #define HZ_PER_KHZ		1000UL
--#define KHZ_PER_MHZ		1000UL
- #define HZ_PER_MHZ		1000000UL
- 
-+#define KHZ_PER_MHZ		1000UL
-+#define KHZ_PER_GHZ		1000000UL
-+
- #define MILLIWATT_PER_WATT	1000UL
- #define MICROWATT_PER_MILLIWATT	1000UL
- #define MICROWATT_PER_WATT	1000000UL
-diff --git a/net/wireless/reg.c b/net/wireless/reg.c
-index 50cadbad485f..753f8e9aa4b1 100644
---- a/net/wireless/reg.c
-+++ b/net/wireless/reg.c
-@@ -57,6 +57,8 @@
- #include <linux/verification.h>
- #include <linux/moduleparam.h>
- #include <linux/firmware.h>
-+#include <linux/units.h>
-+
- #include <net/cfg80211.h>
- #include "core.h"
- #include "reg.h"
-@@ -1289,20 +1291,17 @@ static bool is_valid_rd(const struct ieee80211_regdomain *rd)
- static bool freq_in_rule_band(const struct ieee80211_freq_range *freq_range,
- 			      u32 freq_khz)
- {
--#define ONE_GHZ_IN_KHZ	1000000
- 	/*
- 	 * From 802.11ad: directional multi-gigabit (DMG):
- 	 * Pertaining to operation in a frequency band containing a channel
- 	 * with the Channel starting frequency above 45 GHz.
- 	 */
--	u32 limit = freq_khz > 45 * ONE_GHZ_IN_KHZ ?
--			20 * ONE_GHZ_IN_KHZ : 2 * ONE_GHZ_IN_KHZ;
-+	u32 limit = freq_khz > 45 * KHZ_PER_GHZ ? 20 * KHZ_PER_GHZ : 2 * KHZ_PER_GHZ;
- 	if (abs(freq_khz - freq_range->start_freq_khz) <= limit)
- 		return true;
- 	if (abs(freq_khz - freq_range->end_freq_khz) <= limit)
- 		return true;
- 	return false;
--#undef ONE_GHZ_IN_KHZ
- }
- 
- /*
+Concerns:
+1) This is a change of behaviour for those drivers that do not
+implement this behaviour.
+
+2) This behaviour is different from ksettings_set() which silently
+trims the advertisement down to the modes that are supported
+
+3) This check is broken. Userspace is at liberty to pass in ~0 for
+the supported mask and the advertising mask which subverts this
+check.
+
+So... I think overall, it's a NAK to this from me - I don't think
+it's something that anyone should implement. Restricting the
+advertisement to the modes that are supported (where the supported
+mask is pulled from the network driver and not userspace) would
+be acceptable, but is that actually necessary?
+
 -- 
-2.43.0.rc1.1.gbec44491f096
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
