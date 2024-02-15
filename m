@@ -1,144 +1,152 @@
-Return-Path: <netdev+bounces-71974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F379C855C91
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 09:35:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A665855CCB
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 09:46:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 311221C23C1A
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 08:35:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3077B22190
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 08:34:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9137D10A3F;
-	Thu, 15 Feb 2024 08:35:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D487811183;
+	Thu, 15 Feb 2024 08:34:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ImEJ3zz0"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="TxGAAZCm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 950B312B7C;
-	Thu, 15 Feb 2024 08:35:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0A176138;
+	Thu, 15 Feb 2024 08:34:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707986149; cv=none; b=Pe34JytdlXjYAa59i5m+SzjiQMjAMpVH5FqG0/w1L+d6IfAkKTQDe3UWxqDSvS3ujYPCzbEehvw/ED16EfwUrc17MF82A/c0qfoc1l8z6XxQJKVDAqfdAcjZL8uVg9f72i1LrkPTb/ih1l+lrj/9cd8Dj9fj2fQAWX9kEMfQ9LY=
+	t=1707986047; cv=none; b=uJNphwalOv/hCoUsqdxeDepYSZNE8fkCAEsapW0jSl/YdzIHdX/IshUOfumjPwwE2xC/ed7R4I9I0HtsJXG3CGiicyQNyu50kg+KKDr/5XSZmHc/S37b1PJvg7DbBjja2NWJ+mkGsFmjnGOscH3DXhYv5Es2g9GJmj6rfjaZxUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707986149; c=relaxed/simple;
-	bh=FhFRsdnjiIq6sjb+TJlazH/LxV6WTSCnRl8GCpI2gTg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OKnqgLA5un6rBtTaRIkAM4pRxDgrRereLOdTNYOlOgCSGmBT0qB9292bfznFuS4jyTPre/wFBm9+kPMhooL+PZpA5xLtU7VezPv4nsfFo/x64UJOddX72ySxbiAi4j4Z+2FQOnMlG4wfa8EsNEWF+QH1Sjtm3lITDB5xHcqaZ0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ImEJ3zz0; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41F7X8ES008393;
-	Thu, 15 Feb 2024 08:35:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=8vUYrjsku4Wxx92le0TgU8L8Gm2U7l/97SGNJHzGThY=;
- b=ImEJ3zz0udDpnz/XprPjZctP5Ik0OSGdAE1JxQK58tfXcKv4hTvbM6KMZmRCM/6Dduv2
- jDjz+oPvnrZBDkNOQnSpctDTV1FkTlZt/A1O6i0bdrCsQ/2pTu5eUNDf0j/7G4xdLpJr
- 2w3cCeDwMk3jB8RM9dx2sBI0QZX8WAzkTu0MQflui19FpedGZi+Y8kepB2echMMZsDSz
- BKLZ676ddhpcJmFz7Zs4bsRn11WTe6NQkx5OiExXX9vbvhmCi24ZdrWzVsl0XuMD0q9P
- JpA1E2kffSp5/j15GoJI93sqbYyaw5Fj3yfubQfRg+Ibvco38Dp7m7YN+bYoeUteg3er Lw== 
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w9eapsj4d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 15 Feb 2024 08:35:46 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41F6NdPK009896;
-	Thu, 15 Feb 2024 08:30:45 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3w6npm34wj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 15 Feb 2024 08:30:45 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41F8Udrw36700636
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 15 Feb 2024 08:30:41 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B5C5C2004E;
-	Thu, 15 Feb 2024 08:30:39 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 987DB20063;
-	Thu, 15 Feb 2024 08:30:39 +0000 (GMT)
-Received: from [9.155.206.240] (unknown [9.155.206.240])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 15 Feb 2024 08:30:39 +0000 (GMT)
-Message-ID: <9b93b9c0-4b0f-4654-b9e6-4fc045cb6817@linux.ibm.com>
-Date: Thu, 15 Feb 2024 09:30:39 +0100
+	s=arc-20240116; t=1707986047; c=relaxed/simple;
+	bh=1PN5B4HatVU4lz03ulC8NL9fJ0XJu/MDPjB+SmKs/Ow=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CpScA9JHI82jOvR3OP5TCa6qcekYHHiYcAiefCIk/BnxkrWSBH3/dkCEF5U6DbP2GeivhKNTKnBv4MaYhGdLyJQFM7ollEHMcUR5/vlnO47oLDBiK7RYQnQeINYThVHGFNDE0WQkUMKsx38itOlS7+qOqUK+0OjUT7x0bZU4bnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=TxGAAZCm; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1707986046; x=1739522046;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=1PN5B4HatVU4lz03ulC8NL9fJ0XJu/MDPjB+SmKs/Ow=;
+  b=TxGAAZCmYExn2sPDtEstudLL8eapoCxNJWxq3LjMGy/C/YzaFU0llDGu
+   dpJqrdBNZozIIooH+oQoa5TAWMV3WOYw+bBBTig2grCuMxTDtTyVAKKiw
+   biCRhzmQw6tCi0GgMS+xQX5VTZuRi8bAPAANTBr++MNeyQ8vUYM4gJ3bH
+   p8bCiaP90wBx/Sp5JUl8HNGw15Pve5yli33CmUaLNuyLPMSUSnEB6W/w9
+   KTiwmzfCRA18fUevoPjcog1ghawOQoxwaU7s+rm7ADqVQF4I5MOw3nBKx
+   hJf6rLVnOKv6Zqrav4zN9fkxgg8wW/2BPu0Wr+5m+L8Pn5hLlnuNYhXmO
+   Q==;
+X-CSE-ConnectionGUID: 1+ZJrS8eQVCWRu3QTzhT8A==
+X-CSE-MsgGUID: bM0MQsLhRxaPsBiqvRBQLA==
+X-IronPort-AV: E=Sophos;i="6.06,161,1705388400"; 
+   d="scan'208";a="247019029"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 15 Feb 2024 01:34:04 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 15 Feb 2024 01:33:40 -0700
+Received: from DEN-DL-M31836.microsemi.net (10.10.85.11) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Thu, 15 Feb 2024 01:33:37 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <lars.povlsen@microchip.com>,
+	<Steen.Hegelund@microchip.com>, <daniel.machon@microchip.com>,
+	<UNGLinuxDriver@microchip.com>
+CC: <u.kleine-koenig@pengutronix.de>, <rmk+kernel@armlinux.org.uk>,
+	<jacob.e.keller@intel.com>, <yuehaibing@huawei.com>,
+	<vladimir.oltean@nxp.com>, <netdev@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>
+Subject: [PATCH net v2] net: sparx5: Add spinlock for frame transmission from CPU
+Date: Thu, 15 Feb 2024 09:33:33 +0100
+Message-ID: <20240215083333.2139380-1-horatiu.vultur@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/iucv: fix the allocation size of iucv_path_table
- array
-Content-Language: en-US
-To: Alexander Gordeev <agordeev@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20240214163240.2537189-1-agordeev@linux.ibm.com>
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <20240214163240.2537189-1-agordeev@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: CNnHr_4rpEWXkhzxgecqzKTJh15Axrt7
-X-Proofpoint-ORIG-GUID: CNnHr_4rpEWXkhzxgecqzKTJh15Axrt7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-15_08,2024-02-14_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=925 clxscore=1015
- malwarescore=0 priorityscore=1501 phishscore=0 adultscore=0 spamscore=0
- impostorscore=0 suspectscore=0 mlxscore=0 lowpriorityscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
- definitions=main-2402150066
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
+Both registers used when doing manual injection or fdma injection are
+shared between all the net devices of the switch. It was noticed that
+when having two process which each of them trying to inject frames on
+different ethernet ports, that the HW started to behave strange, by
+sending out more frames then expected. When doing fdma injection it is
+required to set the frame in the DCB and then make sure that the next
+pointer of the last DCB is invalid. But because there is no locks for
+this, then easily this pointer between the DCB can be broken and then it
+would create a loop of DCBs. And that means that the HW will
+continuously transmit these frames in a loop. Until the SW will break
+this loop.
+Therefore to fix this issue, add a spin lock for when accessing the
+registers for manual or fdma injection.
 
+Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+Reviewed-by: Daniel Machon <daniel.machon@microchip.com>
+---
+v1->v2:
+- target net instead of net-next
+---
+ drivers/net/ethernet/microchip/sparx5/sparx5_main.c   | 1 +
+ drivers/net/ethernet/microchip/sparx5/sparx5_main.h   | 1 +
+ drivers/net/ethernet/microchip/sparx5/sparx5_packet.c | 2 ++
+ 3 files changed, 4 insertions(+)
 
-On 14.02.24 17:32, Alexander Gordeev wrote:
-> iucv_path_table is a dynamically allocated array of pointers to
-> struct iucv_path items. Yet, its size is calculated as if it was
-> an array of struct iucv_path items.
-> 
-> Signed-off-by: Alexander Gordeev <agordeev@linux.ibm.com>
-> ---
->  net/iucv/iucv.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/iucv/iucv.c b/net/iucv/iucv.c
-> index 9e62783e6acb..5b56ae6612dd 100644
-> --- a/net/iucv/iucv.c
-> +++ b/net/iucv/iucv.c
-> @@ -156,7 +156,7 @@ static char iucv_error_pathid[16] = "INVALID PATHID";
->  static LIST_HEAD(iucv_handler_list);
->  
->  /*
-> - * iucv_path_table: an array of iucv_path structures.
-> + * iucv_path_table: array of pointers to iucv_path structures.
->   */
->  static struct iucv_path **iucv_path_table;
->  static unsigned long iucv_max_pathid;
-> @@ -545,7 +545,7 @@ static int iucv_enable(void)
->  
->  	cpus_read_lock();
->  	rc = -ENOMEM;
-> -	alloc_size = iucv_max_pathid * sizeof(struct iucv_path);
-> +	alloc_size = iucv_max_pathid * sizeof(*iucv_path_table);
->  	iucv_path_table = kzalloc(alloc_size, GFP_KERNEL);
->  	if (!iucv_path_table)
->  		goto out;
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
+index d1f7fc8b1b71a..3c066b62e6894 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
+@@ -757,6 +757,7 @@ static int mchp_sparx5_probe(struct platform_device *pdev)
+ 	platform_set_drvdata(pdev, sparx5);
+ 	sparx5->pdev = pdev;
+ 	sparx5->dev = &pdev->dev;
++	spin_lock_init(&sparx5->tx_lock);
+ 
+ 	/* Do switch core reset if available */
+ 	reset = devm_reset_control_get_optional_shared(&pdev->dev, "switch");
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.h b/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
+index 6f565c0c0c3dc..316fed5f27355 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
+@@ -280,6 +280,7 @@ struct sparx5 {
+ 	int xtr_irq;
+ 	/* Frame DMA */
+ 	int fdma_irq;
++	spinlock_t tx_lock; /* lock for frame transmission */
+ 	struct sparx5_rx rx;
+ 	struct sparx5_tx tx;
+ 	/* PTP */
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c b/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c
+index 6db6ac6a3bbc2..ac7e1cffbcecf 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c
+@@ -244,10 +244,12 @@ netdev_tx_t sparx5_port_xmit_impl(struct sk_buff *skb, struct net_device *dev)
+ 	}
+ 
+ 	skb_tx_timestamp(skb);
++	spin_lock(&sparx5->tx_lock);
+ 	if (sparx5->fdma_irq > 0)
+ 		ret = sparx5_fdma_xmit(sparx5, ifh, skb);
+ 	else
+ 		ret = sparx5_inject(sparx5, ifh, skb, dev);
++	spin_unlock(&sparx5->tx_lock);
+ 
+ 	if (ret == -EBUSY)
+ 		goto busy;
+-- 
+2.34.1
 
-
-Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
-
-Good catch, thank you.
-As we allocate a more than we need, I don't this
-needs to be backported to stable. Do you agree?
 
