@@ -1,181 +1,170 @@
-Return-Path: <netdev+bounces-72134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72135-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36E10856AEB
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:25:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 266AA856AEE
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:26:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C3511C2290A
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 17:25:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D06F828B744
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 17:26:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECECC136998;
-	Thu, 15 Feb 2024 17:25:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EA6C136990;
+	Thu, 15 Feb 2024 17:26:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="KBtxMHqC"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="d6gTYzrk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB4B713667C
-	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 17:25:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E6ED1339B2;
+	Thu, 15 Feb 2024 17:26:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708017951; cv=none; b=Vo38mMyx5+jJZ2oXbwZXcXvCTyFb/o6gKcZh0WjXZtl8A5KEqcOzua+eWF0UDDWkMmV7SeJz90w9gP7g57Gvriy1cko2dHRPzmEgJ8Lg7ZIhWs8uDqvYQQJw1EjWS1a8G0xUOi0x3ogZs58fBsfWP7ONiMOtyO4QqiDJwAquoc0=
+	t=1708017979; cv=none; b=b0+bxxZnTuunq4fvxApQkCYPdhtOMMZSppDqWQ/Zgd6280154Sgf7hPXnb1ITPL7MFAw9of2M+K/xurun+TeD7d9VmTZef+sD38u+xshunq7NDSJlEdhJo0NkhlAlbaeRdNyTeI27NREoTD4UaURuaBameG1CsKBAadj6FQUjBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708017951; c=relaxed/simple;
-	bh=v5JNUzQrlc/Ze3O2xGRTThncYAxGfewIlMkjSF3Zios=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jQb+xkDYc9WLLy3rIcrHfXADmhxCAqYcf8Q9A3SwGvz1Pbo7yGdBj7nDOoHc6sIt38GziGVhXr8IpEl6AtlTSiKnpgzN+Jg5oF24tYM7iYdpH0HImU6NS5lyKPxmlGT0eRyg+3rLM7qgO0WAEfhvj5BzfAjwjmV8Xuqs3/qiTxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=KBtxMHqC; arc=none smtp.client-ip=209.85.208.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2d0d799b55cso13749091fa.0
-        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 09:25:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708017946; x=1708622746; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=cuuhvY1knev/MlE0VuD+OUGRlkZI73nAFQGnaq1zL0U=;
-        b=KBtxMHqCVMh5xPPcV57Mh1w2jL5TdymJRJhKtgk+r9qRE2j2Ew/E5a6q5yl/+JI1Lm
-         c442uJREe0uBvvW6fTWe/XhPPNkHn8lnC8WQvTp9ypWAH83+2NiXN4Vyd41OC978M5fu
-         cr+W5XV4wtlj0K4jrUaIlQTqYdbSI3rrVJh+NbCZUN6z1gmjIe0FsO/ANwjJrU4riEMf
-         12YuKUkkv88qI5iHrrQKQVbLCOjrYwaqD1Nlbw5mvAZJZM2iQawpR9CnhQGPEQ1GRMwI
-         NTjj24IChQLnX91BEQ4elM2ztFQRi5k9OrfCRDY2IOKDndUq56vgduCHoAKtsYZqCcBl
-         +mEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708017946; x=1708622746;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cuuhvY1knev/MlE0VuD+OUGRlkZI73nAFQGnaq1zL0U=;
-        b=g1i971zmjyEfjltVBmN8r2zrqA1IyG+Fi3M3S/5+R5jFZ+4d3PVmIdPpvLf6TK8qlA
-         /rzQNtR0Dtg0xh4++9jMZotfxlxv5jybpuobguax9bLDve521as/hkWyy+sB9Hz19FQj
-         YEIFCTsBpfLQPgBeptGHCaiWjUCoH3mHaAhkeP0EioUna6Eg/9TI6/mkYP2HcBiAyoLB
-         xIIdkVAxhWFwLCUNVZ3bBJCTiWDBcdjD5lq0sal0pZZEN9wTbXej3onYEaE+OZudlKI5
-         6eznr03wJrICTG19+TvakTgZMKC06WScY9nTLgIHW1acTHiRmJDO81kOuEuj3DubA/Wz
-         xogQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU3/+9FW68ABvErR5Medo6K2Y9O6q7wh4VQZycjw5YGe8KEneIfEkTLwIXyNdZC+xek/waWM+zSPd0Afu2xonXT8llXNY+O
-X-Gm-Message-State: AOJu0Yzb/JHjC2ls4F7H+/DliPSDuPpZy3wrVBl01UyuBLHxnIpMQq58
-	x+LZvda//g3YdcRa8Ez5nL/N2fn3AA06HA8FgViJzWNRDj9GvrxxqevlKQQ/rKI=
-X-Google-Smtp-Source: AGHT+IHzhRx80m5IBOtXuSj/+pQiwLJQtSioIzJZd/nWxl+IXjeO2sK+5VQ6E+UDzeoRGOcklOLO0A==
-X-Received: by 2002:a2e:bb85:0:b0:2d1:1e3c:5739 with SMTP id y5-20020a2ebb85000000b002d11e3c5739mr1696957lje.31.1708017945695;
-        Thu, 15 Feb 2024 09:25:45 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 18-20020a05600c231200b00411a0477755sm5667334wmo.9.2024.02.15.09.25.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Feb 2024 09:25:44 -0800 (PST)
-Date: Thu, 15 Feb 2024 18:25:42 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: =?iso-8859-1?Q?Asbj=F8rn_Sloth_T=F8nnesen?= <ast@fiberby.net>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, llu@fiberby.dk
-Subject: Re: [PATCH net-next 2/3] net: sched: cls_api: add filter counter
-Message-ID: <Zc5JFhLI_KZtdy5P@nanopsycho>
-References: <20240215160458.1727237-1-ast@fiberby.net>
- <20240215160458.1727237-3-ast@fiberby.net>
+	s=arc-20240116; t=1708017979; c=relaxed/simple;
+	bh=wpvYxSVLWfwRfU8XWrQQv24yac6bhrNor1LrbZespGw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RnCiFFsgJ4+d7Jqk6fR3QsSsjhp9E1idQdbDUYJdrdXQ4vs855vhisz9EUh9S/3371dE0FDBBNa060zyyKjN1WdQ+pvVq4xU34Bof8yLeQQhBRKLk60MxCNbXogWc5cMhcHm6a1dOTgO8CczdIES6ZM80mTwPSTmxDQLhmHvuXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=d6gTYzrk; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41FFT5Rn022525;
+	Thu, 15 Feb 2024 17:26:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2023-11-20; bh=OtKQRNORPDYn0Y5hER7+bF1OLu9vZNSd/ghGX8H1WpQ=;
+ b=d6gTYzrkG88iH0Ww62/qmwe6NI+eH6jvqbLPSk8yC+KuC6HAGUML/WuCCeJ0W+sDHLtk
+ kq5XcQZ3vciaebNWOMcEYNbPcUSbGNc5hW/1cp2LrzVr4UYivxxmjj7pH5RlztArUd/f
+ tuxzwhM2b1saIzpG7RpAt1CrFy/GVogpBqmIdlyhNM/giq8/Cv0bKENE/sKShhyHZYjA
+ 1YL/+OKpMXLVsXUR/54cWAuiiAcVf2eXgMk4b2evlvulneyW4Wsuwz+y/Sf71VmqjbsA
+ 4nRexLDZ5pbPbZFI3D8W6QNIBe7NI87ciUgIfpnCahp/42z2NnmrO5qXP8vPmCWLj7fX qw== 
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3w92db2tm8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 15 Feb 2024 17:26:08 +0000
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 41FGZqiI013767;
+	Thu, 15 Feb 2024 17:26:07 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3w6apdqrw4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 15 Feb 2024 17:26:07 +0000
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41FHQ6j3025624;
+	Thu, 15 Feb 2024 17:26:06 GMT
+Received: from pkannoju-vm.us.oracle.com (dhcp-10-191-247-28.vpn.oracle.com [10.191.247.28])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3w6apdqrt0-1;
+	Thu, 15 Feb 2024 17:26:06 +0000
+From: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
+To: j.vosburgh@gmail.com, andy@greyhouse.net, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: rajesh.sivaramasubramaniom@oracle.com, rama.nichanamatlu@oracle.com,
+        manjunath.b.patil@oracle.com,
+        Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
+Subject: [PATCH RFC] bonding: rate-limit bonding driver inspect messages
+Date: Thu, 15 Feb 2024 22:55:54 +0530
+Message-Id: <20240215172554.4211-1-praveen.kannoju@oracle.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240215160458.1727237-3-ast@fiberby.net>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-15_16,2024-02-14_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
+ suspectscore=0 mlxscore=0 phishscore=0 bulkscore=0 malwarescore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2402150140
+X-Proofpoint-GUID: m58sarWKwedKz45Wfy4Y-ZiasB4wqALy
+X-Proofpoint-ORIG-GUID: m58sarWKwedKz45Wfy4Y-ZiasB4wqALy
 
-Thu, Feb 15, 2024 at 05:04:43PM CET, ast@fiberby.net wrote:
->Maintain a count of filters per block.
->
->Counter updates are protected by cb_lock, which is
->also used to protect the offload counters.
->
->Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
->---
-> include/net/sch_generic.h |  2 ++
-> net/sched/cls_api.c       | 20 ++++++++++++++++++++
-> 2 files changed, 22 insertions(+)
->
->diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
->index 46a63d1818a0..7af0621db226 100644
->--- a/include/net/sch_generic.h
->+++ b/include/net/sch_generic.h
->@@ -427,6 +427,7 @@ struct tcf_proto {
-> 	 */
-> 	spinlock_t		lock;
-> 	bool			deleting;
->+	bool			counted;
-> 	refcount_t		refcnt;
-> 	struct rcu_head		rcu;
-> 	struct hlist_node	destroy_ht_node;
->@@ -476,6 +477,7 @@ struct tcf_block {
-> 	struct flow_block flow_block;
-> 	struct list_head owner_list;
-> 	bool keep_dst;
->+	atomic_t filtercnt; /* Number of filters */
-> 	atomic_t skipswcnt; /* Number of skip_sw filters */
-> 	atomic_t offloadcnt; /* Number of oddloaded filters */
-> 	unsigned int nooffloaddevcnt; /* Number of devs unable to do offload */
->diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
->index 397c3d29659c..c750cb662142 100644
->--- a/net/sched/cls_api.c
->+++ b/net/sched/cls_api.c
->@@ -411,11 +411,13 @@ static void tcf_proto_get(struct tcf_proto *tp)
-> }
-> 
-> static void tcf_chain_put(struct tcf_chain *chain);
->+static void tcf_block_filter_cnt_update(struct tcf_block *block, bool *counted, bool add);
-> 
-> static void tcf_proto_destroy(struct tcf_proto *tp, bool rtnl_held,
-> 			      bool sig_destroy, struct netlink_ext_ack *extack)
-> {
-> 	tp->ops->destroy(tp, rtnl_held, extack);
->+	tcf_block_filter_cnt_update(tp->chain->block, &tp->counted, false);
-> 	if (sig_destroy)
-> 		tcf_proto_signal_destroyed(tp->chain, tp);
-> 	tcf_chain_put(tp->chain);
->@@ -2364,6 +2366,7 @@ static int tc_new_tfilter(struct sk_buff *skb, struct nlmsghdr *n,
-> 	err = tp->ops->change(net, skb, tp, cl, t->tcm_handle, tca, &fh,
-> 			      flags, extack);
-> 	if (err == 0) {
->+		tcf_block_filter_cnt_update(block, &tp->counted, true);
-> 		tfilter_notify(net, skb, n, tp, block, q, parent, fh,
-> 			       RTM_NEWTFILTER, false, rtnl_held, extack);
-> 		tfilter_put(tp, fh);
->@@ -3478,6 +3481,23 @@ int tcf_exts_dump_stats(struct sk_buff *skb, struct tcf_exts *exts)
-> }
-> EXPORT_SYMBOL(tcf_exts_dump_stats);
-> 
->+static void tcf_block_filter_cnt_update(struct tcf_block *block, bool *counted, bool add)
+Rate limit bond driver log messages, to prevent a log flood in a run-away
+situation, e.g couldn't get rtnl lock. Message flood leads to instability
+of system and loss of other crucial messages.
 
-Can't you move this up to avoid forward declaration?
+v2: Use exising net_ratelimit() instead of introducing new rate-limit
+parameter.
 
+Signed-off-by: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
+---
+ drivers/net/bonding/bond_main.c | 36 ++++++++++++++++++++----------------
+ 1 file changed, 20 insertions(+), 16 deletions(-)
 
->+{
->+	lockdep_assert_not_held(&block->cb_lock);
->+
->+	down_write(&block->cb_lock);
->+	if (*counted != add) {
->+		if (add) {
->+			atomic_inc(&block->filtercnt);
->+			*counted = true;
->+		} else {
->+			atomic_dec(&block->filtercnt);
->+			*counted = false;
->+		}
->+	}
->+	up_write(&block->cb_lock);
->+}
->+
-> static void tcf_block_offload_inc(struct tcf_block *block, u32 *flags)
-> {
-> 	if (*flags & TCA_CLS_FLAGS_IN_HW)
->-- 
->2.43.0
->
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 4e0600c..e92eba1 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -2610,12 +2610,13 @@ static int bond_miimon_inspect(struct bonding *bond)
+ 			commit++;
+ 			slave->delay = bond->params.downdelay;
+ 			if (slave->delay) {
+-				slave_info(bond->dev, slave->dev, "link status down for %sinterface, disabling it in %d ms\n",
+-					   (BOND_MODE(bond) ==
+-					    BOND_MODE_ACTIVEBACKUP) ?
+-					    (bond_is_active_slave(slave) ?
+-					     "active " : "backup ") : "",
+-					   bond->params.downdelay * bond->params.miimon);
++				if (net_ratelimit())
++					slave_info(bond->dev, slave->dev, "link status down for %sinterface, disabling it in %d ms\n",
++						   (BOND_MODE(bond) ==
++						   BOND_MODE_ACTIVEBACKUP) ?
++						   (bond_is_active_slave(slave) ?
++						   "active " : "backup ") : "",
++						   bond->params.downdelay * bond->params.miimon);
+ 			}
+ 			fallthrough;
+ 		case BOND_LINK_FAIL:
+@@ -2623,9 +2624,10 @@ static int bond_miimon_inspect(struct bonding *bond)
+ 				/* recovered before downdelay expired */
+ 				bond_propose_link_state(slave, BOND_LINK_UP);
+ 				slave->last_link_up = jiffies;
+-				slave_info(bond->dev, slave->dev, "link status up again after %d ms\n",
+-					   (bond->params.downdelay - slave->delay) *
+-					   bond->params.miimon);
++				if (net_ratelimit())
++					slave_info(bond->dev, slave->dev, "link status up again after %d ms\n",
++						   (bond->params.downdelay - slave->delay) *
++						   bond->params.miimon);
+ 				commit++;
+ 				continue;
+ 			}
+@@ -2648,18 +2650,20 @@ static int bond_miimon_inspect(struct bonding *bond)
+ 			slave->delay = bond->params.updelay;
+ 
+ 			if (slave->delay) {
+-				slave_info(bond->dev, slave->dev, "link status up, enabling it in %d ms\n",
+-					   ignore_updelay ? 0 :
+-					   bond->params.updelay *
+-					   bond->params.miimon);
++				if (net_ratelimit())
++					slave_info(bond->dev, slave->dev, "link status up, enabling it in %d ms\n",
++						   ignore_updelay ? 0 :
++						   bond->params.updelay *
++						   bond->params.miimon);
+ 			}
+ 			fallthrough;
+ 		case BOND_LINK_BACK:
+ 			if (!link_state) {
+ 				bond_propose_link_state(slave, BOND_LINK_DOWN);
+-				slave_info(bond->dev, slave->dev, "link status down again after %d ms\n",
+-					   (bond->params.updelay - slave->delay) *
+-					   bond->params.miimon);
++				if (net_ratelimit())
++					slave_info(bond->dev, slave->dev, "link status down again after %d ms\n",
++						   (bond->params.updelay - slave->delay) *
++						   bond->params.miimon);
+ 				commit++;
+ 				continue;
+ 			}
+-- 
+1.8.3.1
+
 
