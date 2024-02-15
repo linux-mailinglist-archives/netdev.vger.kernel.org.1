@@ -1,123 +1,323 @@
-Return-Path: <netdev+bounces-72153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BFC1856BD0
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 19:00:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D22A0856BEA
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 19:03:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3EAA1C21092
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:00:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88F2B28E989
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 18:03:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DFC713848E;
-	Thu, 15 Feb 2024 18:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F701136995;
+	Thu, 15 Feb 2024 18:03:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f7j0pfEl"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="XJQceDhU";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="O23wHTHk"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC7F136995
-	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 18:00:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708020031; cv=none; b=pNZaz3o/oFbSFBRLujOZMnSk2qradnax0DmIEx51TU0zxkczQbaQhppFxoK+npmj21e5GG33NgOYgVE7e2ezMdQvdt6KdjNBpnKFIwEjo7Xk5VklrUfZ1RiJ/V0bQXEJhBrALdhysOcWBQkESsswN9A1wCaFebhrN6BII5nRGp4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708020031; c=relaxed/simple;
-	bh=Ewks1KSKMZE/5FKOLwqiLlEnmGTEup08tVXYlkkXo/Y=;
-	h=From:References:MIME-Version:In-Reply-To:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rzZrV7BUh45+izDAysmr5CxSTtrodpGwhQ/VmOAZeqelQh8tlDGiV5Ixo357GX4MzJwhvLskQDei8IAewRtBkWKitqOdsZropTht1kOH26EfAQyBKrZ4CJuNZPeSif8AgwGgQUujahqT0pkegY2c1DMhHXtHVreKYPSFLLI4y5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f7j0pfEl; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708020028;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/G5lguk93gTD6qpeik1vqHfX1oWMt+Ae5AYgN6rGWcE=;
-	b=f7j0pfElsXQTlRWKuRG7iFgZ4YU5n6TZrpYRBfKqngPoQ9A4bEAvPBA9Cu2oein4+wJAA+
-	OTm8ZsbycNi6ATKmryg5qvQenPQxqXGtYCV2Y6Xu8Z34oyhEoyzqo0GzsvF8XSUVxTSBX0
-	7ExqTkYCipOd5HIKMgDFGf1XG15c6uk=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-216-4ROKz19eMaask7iqw6UEFw-1; Thu, 15 Feb 2024 13:00:27 -0500
-X-MC-Unique: 4ROKz19eMaask7iqw6UEFw-1
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-561601cca8eso773248a12.3
-        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 10:00:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708020024; x=1708624824;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:in-reply-to
-         :mime-version:references:from:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=/G5lguk93gTD6qpeik1vqHfX1oWMt+Ae5AYgN6rGWcE=;
-        b=OB954c2gomYNAtVBgKZ+ST3VnOM77uyqykb7zU5KJwdS2EnWjEyCnm0kt5a7VC7iwy
-         q/UZfhxem2X9ZjpVO0Pb7JwxDR3QylAjynorvhzakt09i8Dis4kK11V5KNJRZTFcL9zo
-         I1T0Py4InGCHXCEN/J6wtsDa6wXp7Kw1VA+PMNRd/MifE6IDLz5iyrTmWxu2Kx/IQIXY
-         lx7K4A9xItRoJSgeeEJPRgOTESkB00fa9VAbABGKCz03/+0NU7gtASubq2QqtaZF80IB
-         xZnBZxu9XK+qXiJ38wX5JdbqMOnY8cfK8TZPURn4OvRHzUa6Vh1aWIjDWu6BXEs7ng0S
-         uagA==
-X-Forwarded-Encrypted: i=1; AJvYcCVDTvXwOprxVNC6tne6uGaajM1uyGdRVLlAVNkUdQHciRteP3uIQ6p7GcTkn/aPTnYYb31mzFJ24s8gB0skw2tz8ui+S2Bx
-X-Gm-Message-State: AOJu0YwqA0Gmh/w/IAungMp5TcuPelEoa3hxbPYCj3wmEB9quiVO7wHm
-	sp/admliP9yg3sXhUtYd9mzuElkQNxG0PjdFyWaJjp6O5hUbvB/FtBuIBfVzVEbIH8hl9bquFP4
-	Y1kv54VNnd5spbUEhff94prP9RaFIyHVvbf7lsGTplD2sRcKG/UkiNg6m2bMP00TgXOS/jqXayx
-	QU8DQEY0tppmqMIQDuBJh8XzEbohlsr2CC0o8k
-X-Received: by 2002:a50:ef0c:0:b0:55f:fc6f:835a with SMTP id m12-20020a50ef0c000000b0055ffc6f835amr1945633eds.31.1708020024806;
-        Thu, 15 Feb 2024 10:00:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGt5/2XZHqnW+bw+e2xQmI5SA0wHRscwwZ8k8k+My0Czfk4P01c6nuWd39BUwAH29EiSVWVAM2AqF5Up0waUHA=
-X-Received: by 2002:a50:ef0c:0:b0:55f:fc6f:835a with SMTP id
- m12-20020a50ef0c000000b0055ffc6f835amr1945614eds.31.1708020024507; Thu, 15
- Feb 2024 10:00:24 -0800 (PST)
-Received: from 753933720722 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 15 Feb 2024 10:00:23 -0800
-From: Marcelo Ricardo Leitner <mleitner@redhat.com>
-References: <20240215160458.1727237-1-ast@fiberby.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 588D1135A40;
+	Thu, 15 Feb 2024 18:03:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708020202; cv=fail; b=kKp+Qu1Xx2xT04uVQHE7Qh4lY1IzzYvFmiAkbVyvzUxmuWMPwr7ZBiNKPhclcr6KqF2B9xYG9q8B7Df+Sqjrhs+F2m7ulOX6IOGZ7VF1OXlY/bM1pUT119kWmzdlJP2YHQD5fgJXY8joqdJUNfwVC9ieOB4YJ44gj5xo8TPHZCU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708020202; c=relaxed/simple;
+	bh=1BTgm3tHP3MCFnMnp8Gsp5isSQ3Hc2uJxrM7Wf5QQVY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=iit5S77RQhqE/pPsCGqtNB87CeC931e8dgoWsTTot6MxJCZD4zFAsecpUta2NNtPqRjvfVi96LING4ih4zqbDPjm8Oow9AcRTvGBsSwxpKnDt0yMRwoI1R73KXlN4gqWFyrWY/XvCaR+kod10ibJBMHdyju3hFYcO2lodDGrd/4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=XJQceDhU; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=O23wHTHk; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41FFTABS006064;
+	Thu, 15 Feb 2024 18:03:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2023-11-20;
+ bh=QvBPHZ4rmuqcRLtjbz2o5NY+9rTbEMPkaFZREIbezpk=;
+ b=XJQceDhUf2ZirU9SiqcEjvSO2j1Yg3RMZ3RmmQUK3trb1hHtWb8kpEYgLeGBeOrGykbF
+ XxZXU1JzPJaMrSqTzO3l2J4bISDe9nFAfYtRaMq4qNu1Uzx+BNfzntZUUlapu1dRkf1k
+ R6LVmMqTsi4YEh7vejs11m9BAaLTL8CjzzOBsTa6R6MasqVc/kK8nft+pGO/uUa6hq59
+ eDKHqpB5h+cKmJirpXk8wiepqMCpM6NXK9Fi143lVHQD3S3JihMEUghmzBDc790Q6TpV
+ osNAS8WGK7ZTe+5bvt0LzeaA/Dam0l+LyPlXbumg+3B+9E7g86uiyyp2V6PiqOwEkiGl Cg== 
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3w92ppjvue-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 15 Feb 2024 18:03:08 +0000
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 41FGufII013780;
+	Thu, 15 Feb 2024 18:03:08 GMT
+Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2101.outbound.protection.outlook.com [104.47.55.101])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3w6apdsmqy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 15 Feb 2024 18:03:08 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AIHxYYeDQQl0087L3i3X/FeY2reYiZr6wH3m7xr/KizBC/PPBy1PXFHdzo5VNrCA7NIHXdIfsItK27uDDgI/c2MkF4Lp3D5Zmi2FRkgou0JQ/YpuWCBfLX7njE40T9t7IPugcxOVdVhfHWcnYuT3pd2WdoDymnmfh8WAsE4VRaub8nR7o9NawBpNvtJlM6SvsZJqdSG0AgY/vvgMsGY37vF3fS/91cgsltzCT6bTtasGR6dMC4yGnCbjXDynj4dzHCkARny+PBA81ujHacfPQ0uTOer0H9uuvn6peYPOE9D1BD+rt0u0pnnAp97NeeAkgMnn2AmahkxidTqUHZowtw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QvBPHZ4rmuqcRLtjbz2o5NY+9rTbEMPkaFZREIbezpk=;
+ b=C6wQoGp926h3kXjayVGqc9YEQdK5Oq8sHgy9Y3SRHDl41BNXRThsYeTHvn7o11cxB0B1q2TQ6CMoCq1+FISBlk74DAOImYKHlUXocCms8NJ/h8Sn7OVpqbnF7V6abgmtTMvCMAj32ppYBkhwIlaJVvrAfrM27KUihZBwrH0S65rdbXvYwOfhPFe15YH0rTK7eSZwV//Lg2zgJqFvfVuyM+OBG6zX+7HkGJLf6einL/uMKx2GdFL3H8BejxXlCNC1qbY/06ULK+WMsL0FlupT4Tr7oqy1mH6z5ErZoCTRkQQ04ljs+XNzBoUEltIvp6h8iCCM+Wq/8uPimH808AzUdw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QvBPHZ4rmuqcRLtjbz2o5NY+9rTbEMPkaFZREIbezpk=;
+ b=O23wHTHkCc8S20k6NZTxVXR3Ykr64EiP8rpW7v4lbuI9hFPR+4ysW/8DjOOBTpz44gGX4gHpZFc76gNMELkkCcl/wBVMUstzXmDSj2kc0/zRI2Bn2gHHAeuiyUs/BCwX0s5YOrDh4hChvlvSABzWcYwrVd/qeXlS39c4uUjlwfo=
+Received: from SA1PR10MB6445.namprd10.prod.outlook.com (2603:10b6:806:29d::6)
+ by SN7PR10MB6500.namprd10.prod.outlook.com (2603:10b6:806:2a7::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.25; Thu, 15 Feb
+ 2024 18:03:05 +0000
+Received: from SA1PR10MB6445.namprd10.prod.outlook.com
+ ([fe80::f51a:7f6d:973d:c219]) by SA1PR10MB6445.namprd10.prod.outlook.com
+ ([fe80::f51a:7f6d:973d:c219%4]) with mapi id 15.20.7292.028; Thu, 15 Feb 2024
+ 18:03:05 +0000
+From: Praveen Kannoju <praveen.kannoju@oracle.com>
+To: Jay Vosburgh <jay.vosburgh@canonical.com>
+CC: "andy@greyhouse.net" <andy@greyhouse.net>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Rajesh
+ Sivaramasubramaniom <rajesh.sivaramasubramaniom@oracle.com>,
+        Rama
+ Nichanamatlu <rama.nichanamatlu@oracle.com>,
+        Manjunath Patil
+	<manjunath.b.patil@oracle.com>
+Subject: RE: [PATCH RFC] bonding: rate-limit bonding driver inspect messages
+Thread-Topic: [PATCH RFC] bonding: rate-limit bonding driver inspect messages
+Thread-Index: AQHaXwBJpRniMP9JNU66kt9+kpIT0bEKKuqAgAGI0CA=
+Date: Thu, 15 Feb 2024 18:03:04 +0000
+Message-ID: 
+ <SA1PR10MB64450CA1D56F8873331615BC8C4D2@SA1PR10MB6445.namprd10.prod.outlook.com>
+References: <20240214044245.33170-1-praveen.kannoju@oracle.com>
+ <7713.1707935675@famine>
+In-Reply-To: <7713.1707935675@famine>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR10MB6445:EE_|SN7PR10MB6500:EE_
+x-ms-office365-filtering-correlation-id: a1db4926-c8d8-4871-de35-08dc2e505bac
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ YarJOegVNWaSJdiL0rbSEqagY9zcLIZzjFxqgE/MGXK0/Fo26ToGCjY0ScCHhrH75ULYmqj+AjvMSGnEisfnqavagtDo7Id7bRXwKpl9PaioOD2Y6/3YGW7EnYE4G8vHw6LCpl+Ei5qvc1nFR24r+Z7NvCWdnw6Fg+J2eHO21wMyTMtbX1tzDgIgF641Lo4heHI6Sl5yekT45oI/bwIi3XapaVlEJIzjhtNdn0D/mPzNjAILfkuKGjQOT+7vbWz78OtnvME3XbLjo0MXBQnhL8WCmvkNGRiXueyhC0vUANvxKoVbxQ7HOvCp54MXYgR/4ovZpz97zJA/VjPEbjU/t//InPTtfWzsNlnP1NqlgUZwb9LF/nr3gaQobuOUmT77VYfkZExUEb1tcOpne87pjgC9MoPZuA9QE5mgthv9xNNuLsaN9MxhkVoDrrQbd7zbqtAgxkSGF6kxiDKkcJVPqZStHYB3RBOKZ7tOX2rTBrw+vMX9RW9Uxt5jaIlCu7/eF4I5crCOeGIMa33CLcrcRS6oYsTyrFsQhPx5UpAbFEHFgUp3HB8uBopkNaRBtQJcd6vio18vwdW7Y4RYuz1A7mJalwxHxj+puiL5/eOi3jIgMRVlIEdgr5Aphuc8EOqy
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR10MB6445.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(39860400002)(136003)(376002)(366004)(230922051799003)(64100799003)(1800799012)(186009)(451199024)(55016003)(316002)(71200400001)(54906003)(15650500001)(44832011)(2906002)(5660300002)(66446008)(7696005)(66476007)(64756008)(86362001)(66946007)(66556008)(8676002)(76116006)(4326008)(6916009)(8936002)(6506007)(478600001)(45080400002)(26005)(38070700009)(83380400001)(41300700001)(52536014)(107886003)(122000001)(53546011)(33656002)(9686003)(38100700002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?us-ascii?Q?eNB2lj3eJPoGmLbSn6+HtQVT0caEGVD0ZD+4Cu25PF6RcjqBRgtWYlusbEi2?=
+ =?us-ascii?Q?cKSlNBGYltG5JJJMNSBSQ60fIDB66gLhIgwS6D6Qv0g0MmtJANXFot+se00+?=
+ =?us-ascii?Q?n3VQJShTUilP/myA0hwUG4eSRnOHC2nL65kUmL0WOs6pP+yzHORgJDF1WKVH?=
+ =?us-ascii?Q?QMHCyUsztKk2QeMzgEVtrJk9L9WX3AdhRs6EYQ86fJmbCIaL2X03sDarwDtx?=
+ =?us-ascii?Q?4k3t8608SKPzcjO2m3XAlsHc4pODxfxVQSkLS7V9cnmcuDN2DqaC+2GE9c+h?=
+ =?us-ascii?Q?izISV/F7M+ZqcljRG7QZ2zueZTUtWRwgRKMzxv1L0P+4S64SK8viKQykME8b?=
+ =?us-ascii?Q?vJv9GZDCWAAvioJ2HIkpa8SAOwCv+xbWe71dEOG3TxCOmmoUCRF7ZEAk/ZGa?=
+ =?us-ascii?Q?AglcDIudQ3bsc+su0uRrdlsKS5hr+yVA1gSfUfhWkMbBv2qMR3/AZ7nyKP/+?=
+ =?us-ascii?Q?+jFhjgmwpH8gPfHT2kfS4y+GGAXFKkgY8UzZ3258785tTdmySEdnmXpxZxJb?=
+ =?us-ascii?Q?F3VTeZJhe3jNOijYV32k3Qeo72zwLH3Fp2KK+Dzz70aIC2M+LhZ7kGD+iyjs?=
+ =?us-ascii?Q?s76K6Dd8/BlPf1BgNJQyab76FLfQ+cThOb0OULYjiWCabqzVLDcQ42lpsxfH?=
+ =?us-ascii?Q?BGuuvkU4PYJjhjw4jYas33vzy7ZkdVQlPw9UOE/O3+Q8F2I5mWj8Qs6Fcc4g?=
+ =?us-ascii?Q?4t3QzhmTNhsP7hwDDbSrbyS9FK/8Zvf1SgVvJ4MNThE94J2X8nDqbfiCxzCD?=
+ =?us-ascii?Q?en1CB5qBNDg5Xlwu2E9I0ymC/5lmHKCc3oTT/wNUQe/LLHhwGrBkisrHOyzA?=
+ =?us-ascii?Q?l9gil27ncG1RkuweivInfqBYLG7XOOMCSe7ZSGvzMnOY/5Fj8/c5l88w+fsm?=
+ =?us-ascii?Q?0LI0FVSqTnKssoo7QreEaq3UgUqRsJ9SFQyteKnhqFTjOuojJ20ENRPou1l1?=
+ =?us-ascii?Q?W8O0vDQ59bmElnFhMklhYoFLuRsLre8h0Nw+CedJI2hTw/r7T4GZycL3t6Ae?=
+ =?us-ascii?Q?3Ia8uhrKq/JFhMfpW6y30+4qg8vR4q9ap6dOzV2uc5VIMMCw+34PoqOUstM3?=
+ =?us-ascii?Q?k3UmDi7kVxbhDnCenX7rOcRrok21ZSyzl+zIOmyPoheGH4kEKL9attb+R+Xy?=
+ =?us-ascii?Q?oGgFaowP2E9LGVQNK5UmkPMToUbBQJdVcw1+oQ6c+H6OZd3Rj8J8vqNoBtwh?=
+ =?us-ascii?Q?g6dMmsPPRuTDFxvQ6ZmJYKPKNHGvRX7eF+gHFl3UpAQPEbRKSgv+pOIoiTQW?=
+ =?us-ascii?Q?CpT/ws/I/Upa+oExH1us6iQHhn1F3c+WyeBg5+p8MJIP6iH+XEKAoUlL0iEJ?=
+ =?us-ascii?Q?eh1fOUn8GBqGhp2z6vtq4zAafRRhiZzFP0DTz4dKv1V3H1l/RhPwYnNvfwsO?=
+ =?us-ascii?Q?dTPlLiOJfPNJlSshOBR0yOmnNlxxbEvwViVjnRdBbT8otAWnVdRFRwSV9Ubm?=
+ =?us-ascii?Q?oBkKrnBRtAnLttRr2OR43CQJyQTJBtgS+g0s4qMWl2OSRs03PkjE5lPUQrOE?=
+ =?us-ascii?Q?MR4kDs7Ix0YcLQoTyrf2D9688zGzcyiYB0ZNvFW6memcpgS4KOYJJH3IKk7X?=
+ =?us-ascii?Q?+92sYAwEhlGTsnKseIiDW234dKIBFKUhLyqhIyPx?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240215160458.1727237-1-ast@fiberby.net>
-Date: Thu, 15 Feb 2024 10:00:23 -0800
-Message-ID: <CALnP8ZZYftDYCVFQ18a8+GN8-n_YsWkXOWeCVAoVZFfjLezK2Q@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/3] make skip_sw actually skip software
-To: =?UTF-8?B?QXNiasO4cm4gU2xvdGggVMO4bm5lc2Vu?= <ast@fiberby.net>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, llu@fiberby.dk
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	GigghutEUAAfUhEOCE98jK0HzLlPLDCdMkj3sTtruXplcbNjelrAnvz1pWnuHmfJux6XWlanVIiDgXrrci/LxhWqtYnOKogHvrYGpxSuuEyYtBn8NR/Xb+V2XiQ3vIi8OrnbIOkBN9cAATiXkovOnITtNdlWDCaeeT3j11AYloAaQr5mKhhwHMryd6+HjwxGekodWzVUoSONBSZqXZshNFW3CpP5JoMqz9xWbYqSAiNo77yzGvdieHN61DUxuEie4JGESGYy8Z0axLDxzLdRj3O1poH9j5o+Ovz1PXmstYJ3q+izMHSbtz4pP6h80t/NiOMnDGB5DxLnMvrSETThRIiE8IG7XcbR8G8SYEGwhM+P4FsnHk6xXFMnfl3VhV4lMJc27VbrXGYGtdBjhxe0fErI6xvtSqlrGSdkFl4bsTQ8lj5UsFDTA/kuOwiQ6nXIxwQi5dntDZgDbYW9lTGdJwlRq6oBQSvKGwdUs+x5P6L9r2jmrDiIQlJe3RZ3sHb1nwYFpSTaKL4m7e+1Du9gsTTOEIZj5gitg14qBhDwh2rQEs9buwja7VSiscpcNrn3XJHF1b0xWqFBQ7tnvUvUQhK7g9w+5k3/iwTgI8uz2u4=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR10MB6445.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a1db4926-c8d8-4871-de35-08dc2e505bac
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Feb 2024 18:03:04.6689
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ZWy4tGJzVk/xf9T9KS2FouvGk4iViPTtUd29SVCuuy8bFLRvJ0nV/6nG15TLfABmC4hqAigFHPIbfLaFCpFiZaDaANLDTjYi0QSf+2Cz6A0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR10MB6500
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-15_16,2024-02-14_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
+ suspectscore=0 mlxscore=0 phishscore=0 bulkscore=0 malwarescore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2402150145
+X-Proofpoint-ORIG-GUID: MxZrfzNWF3_4eveI0a2jmUvYIhyb1Ahx
+X-Proofpoint-GUID: MxZrfzNWF3_4eveI0a2jmUvYIhyb1Ahx
 
-Hi,
 
-On Thu, Feb 15, 2024 at 04:04:41PM +0000, Asbj=C3=B8rn Sloth T=C3=B8nnesen =
-wrote:
-...
-> Since we use TC flower offload for the hottest
-> prefixes, and leave the long tail to Linux / the CPU.
-> we therefore need both the hardware and software
-> datapath to perform well.
->
-> I found that skip_sw rules, are quite expensive
-> in the kernel datapath, sice they must be evaluated
-> and matched upon, before the kernel checks the
-> skip_sw flag.
->
-> This patchset optimizes the case where all rules
-> are skip_sw.
+> -----Original Message-----
+> From: Jay Vosburgh <jay.vosburgh@canonical.com>
+> Sent: 15 February 2024 12:05 AM
+> To: Praveen Kannoju <praveen.kannoju@oracle.com>
+> Cc: andy@greyhouse.net; davem@davemloft.net; edumazet@google.com; kuba@ke=
+rnel.org; pabeni@redhat.com;
+> netdev@vger.kernel.org; linux-kernel@vger.kernel.org; Rajesh Sivaramasubr=
+amaniom <rajesh.sivaramasubramaniom@oracle.com>;
+> Rama Nichanamatlu <rama.nichanamatlu@oracle.com>; Manjunath Patil <manjun=
+ath.b.patil@oracle.com>
+> Subject: Re: [PATCH RFC] bonding: rate-limit bonding driver inspect messa=
+ges
+>=20
+> Praveen Kumar Kannoju <praveen.kannoju@oracle.com> wrote:
+>=20
+> >Rate limit bond driver log messages, to prevent a log flood in a
+> >run-away situation, e.g couldn't get rtnl lock. Message flood leads to
+> >instability of system and loss of other crucial messages.
+> >
+> >Signed-off-by: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
+> >---
+> > drivers/net/bonding/bond_main.c | 34 +++++++++++++++++++---------------
+> > include/net/bonding.h           | 11 +++++++++++
+> > 2 files changed, 30 insertions(+), 15 deletions(-)
+> >
+> >diff --git a/drivers/net/bonding/bond_main.c
+> >b/drivers/net/bonding/bond_main.c index 4e0600c..32098dd 100644
+> >--- a/drivers/net/bonding/bond_main.c
+> >+++ b/drivers/net/bonding/bond_main.c
+> >@@ -2610,12 +2610,13 @@ static int bond_miimon_inspect(struct bonding *b=
+ond)
+> > 			commit++;
+> > 			slave->delay =3D bond->params.downdelay;
+> > 			if (slave->delay) {
+> >-				slave_info(bond->dev, slave->dev, "link status down for %sinterface=
+, disabling it in %d ms\n",
+> >-					   (BOND_MODE(bond) =3D=3D
+> >-					    BOND_MODE_ACTIVEBACKUP) ?
+> >-					    (bond_is_active_slave(slave) ?
+> >+				bond_info_rl(bond->dev, slave->dev,
+> >+					     "link status down for %sinterface, disabling it in %d ms\n",
+> >+					     (BOND_MODE(bond) =3D=3D
+> >+					     BOND_MODE_ACTIVEBACKUP) ?
+> >+					     (bond_is_active_slave(slave) ?
+> > 					     "active " : "backup ") : "",
+> >-					   bond->params.downdelay * bond->params.miimon);
+> >+					     bond->params.downdelay * bond->params.miimon);
+>=20
+> 	Why not use net_info_ratelimited() or net_ratelimit()?  The rest of the =
+bonding messages that are rate limited are almost all
+> gated by the net rate limiter.
+>=20
+> 	-J
 
-The talk is interesting. Yet, I don't get how it is set up.
-How do you use a dedicated block for skip_sw, and then have a
-catch-all on sw again please?
+Thank you for the reply, Jay. Yes, I agree. Used net_ratelimit() and resent=
+ the v2 patch. Please review and provide your comments.
 
-I'm missing which traffic is being matched against the sw datapath. In
-theory, you have all the heavy duty filters offloaded, so the sw
-datapath should be seeing only a few packets, right?
-
-  Marcelo
-
+>=20
+> > 			}
+> > 			fallthrough;
+> > 		case BOND_LINK_FAIL:
+> >@@ -2623,9 +2624,10 @@ static int bond_miimon_inspect(struct bonding *bo=
+nd)
+> > 				/* recovered before downdelay expired */
+> > 				bond_propose_link_state(slave, BOND_LINK_UP);
+> > 				slave->last_link_up =3D jiffies;
+> >-				slave_info(bond->dev, slave->dev, "link status up again after %d ms=
+\n",
+> >-					   (bond->params.downdelay - slave->delay) *
+> >-					   bond->params.miimon);
+> >+				bond_info_rl(bond->dev, slave->dev,
+> >+					     "link status up again after %d ms\n",
+> >+					     (bond->params.downdelay - slave->delay) *
+> >+					     bond->params.miimon);
+> > 				commit++;
+> > 				continue;
+> > 			}
+> >@@ -2648,18 +2650,20 @@ static int bond_miimon_inspect(struct bonding *b=
+ond)
+> > 			slave->delay =3D bond->params.updelay;
+> >
+> > 			if (slave->delay) {
+> >-				slave_info(bond->dev, slave->dev, "link status up, enabling it in %=
+d ms\n",
+> >-					   ignore_updelay ? 0 :
+> >-					   bond->params.updelay *
+> >-					   bond->params.miimon);
+> >+				bond_info_rl(bond->dev, slave->dev,
+> >+					     "link status up, enabling it in %d ms\n",
+> >+					     ignore_updelay ? 0 :
+> >+					     bond->params.updelay *
+> >+					     bond->params.miimon);
+> > 			}
+> > 			fallthrough;
+> > 		case BOND_LINK_BACK:
+> > 			if (!link_state) {
+> > 				bond_propose_link_state(slave, BOND_LINK_DOWN);
+> >-				slave_info(bond->dev, slave->dev, "link status down again after %d =
+ms\n",
+> >-					   (bond->params.updelay - slave->delay) *
+> >-					   bond->params.miimon);
+> >+				bond_info_rl(bond->dev, slave->dev,
+> >+					     "link status down again after %d ms\n",
+> >+					     (bond->params.updelay - slave->delay) *
+> >+					     bond->params.miimon);
+> > 				commit++;
+> > 				continue;
+> > 			}
+> >diff --git a/include/net/bonding.h b/include/net/bonding.h index
+> >5b8b1b6..ebdfaf0 100644
+> >--- a/include/net/bonding.h
+> >+++ b/include/net/bonding.h
+> >@@ -39,8 +39,19 @@
+> > #define __long_aligned __attribute__((aligned((sizeof(long)))))
+> > #endif
+> >
+> >+DEFINE_RATELIMIT_STATE(bond_rs, DEFAULT_RATELIMIT_INTERVAL,
+> >+		       DEFAULT_RATELIMIT_BURST);
+> >+
+> >+#define bond_ratelimited_function(function, ...)	\
+> >+do {							\
+> >+	if (__ratelimit(&bond_rs))		\
+> >+		function(__VA_ARGS__);			\
+> >+} while (0)
+> >+
+> > #define slave_info(bond_dev, slave_dev, fmt, ...) \
+> > 	netdev_info(bond_dev, "(slave %s): " fmt, (slave_dev)->name,
+> > ##__VA_ARGS__)
+> >+#define bond_info_rl(bond_dev, slave_dev, fmt, ...) \
+> >+	bond_ratelimited_function(slave_info, fmt, ##__VA_ARGS__)
+> > #define slave_warn(bond_dev, slave_dev, fmt, ...) \
+> > 	netdev_warn(bond_dev, "(slave %s): " fmt, (slave_dev)->name,
+> >##__VA_ARGS__)  #define slave_dbg(bond_dev, slave_dev, fmt, ...) \
+> >--
+> >1.8.3.1
+> >
+> >
+>=20
+> ---
+> 	-Jay Vosburgh, jay.vosburgh@canonical.com
 
