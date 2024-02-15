@@ -1,127 +1,183 @@
-Return-Path: <netdev+bounces-72197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2342856F09
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 22:04:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19776856F14
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 22:08:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39B181C21D83
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 21:04:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6DF4283794
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 21:08:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFCA413B2AC;
-	Thu, 15 Feb 2024 21:03:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21AFA13B2B4;
+	Thu, 15 Feb 2024 21:08:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WagP35sA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UUi+fmhD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BAF341C61;
-	Thu, 15 Feb 2024 21:03:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698C613B287
+	for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 21:08:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708031036; cv=none; b=X/dD+w8W1pFw2+0hr+/37X2ifrCJHI+XwnUuG+Fgz8WZRY2XdtyO06FCE2rWvisImqxoGx41pPTdCU+hULPOtntz6W9icbFMWARHmo6cKoT6ZjrzF2qQDEWJx33/O6StfpDh82hUIhYUm4goUBn6FuacZtC73HGYxYcC+uq3up0=
+	t=1708031323; cv=none; b=aOEN6uMGxrrbuQopXG1teH5Kg3775z6QFLMJpXKyZFLeZ8WwwSow2NdRmYbcqbjslStLmLNkd9T3+IeNcRQ+Yb9Z1GxFhnpyKrkCLASFZXOqRIQh/fBGdoeD/1q/KUyUHN4q7Uph4ufIKNG03no/dh4QLjvYAVGUp/ZeZrIrVas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708031036; c=relaxed/simple;
-	bh=BJNmghe578Dr0q6jJp6nQZwXix12LotZLSHYuCxzj6U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l37/zH/H0ho6t8a6K93OiWOXGwvSXPFBJkKkO8l7Ce+z7h4OYH+tgrzmHHWnHhBiGHr4e6EJ70vs9d9VGJn3KyWn6pSG3uyfRqcUHz8BKuywgEB84JvWBdKMWhJboM+LsMz3SUz+gayB/05qkSwBAf6e9EzanmXQUZi2MvsLng8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WagP35sA; arc=none smtp.client-ip=209.85.167.53
+	s=arc-20240116; t=1708031323; c=relaxed/simple;
+	bh=7Goj4wFHsYDwDBblv5ig8OGTaceUGxF4ohnzJyXrXM8=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=EU7uDR07omg6Dru21CbhkWEJvmnb81bO6XnR04XDTzyuS/my5kDfnCz5wrG8Z6yiNPaHgidyszStni3z39o84DhysuazxmMzCDW2djB5FudQit6nKNT75XgqOit0zo39YvRpUNMTMCn6aKintmaRZl1sDA3JrJ+dTc6WqA7ebjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UUi+fmhD; arc=none smtp.client-ip=209.85.208.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-511976c126dso1776335e87.1;
-        Thu, 15 Feb 2024 13:03:55 -0800 (PST)
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-563c595f968so1002693a12.0
+        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 13:08:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708031033; x=1708635833; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ky2ZahidDUXO2cGFTczfagUmFQuczB83RWWZ7vrowF4=;
-        b=WagP35sAFLZFY3+tiWomwrXrqwaQTJtU7c6i4H3nT39tQ8hgl7Al3vjVrtrUW7wuwF
-         ffysSslhXKSRZqKQhercTGGYdfEgB869FZD0h2z9DEk1aIkncUiLePqOzrntbH5EeJL3
-         FipWfq97Bi+tM8y778HjTU2devVQHM1gBbEHTNdlzTUN4GYasFJ34T2pjWWkAWuyJy+W
-         EciUsMEZXjUiO4ywEE7+MIArD3Z4RnJzz0t5/kEFprwjqpksQY7Ix4+T6MbyykmIHAK+
-         HbRgLcgZIqFo0lW6l7Uk3UoEo6iVP/vvNpizypLLwURKA+yzfb/STQ1EQZS5z9kg8MNt
-         dpAw==
+        d=gmail.com; s=20230601; t=1708031319; x=1708636119; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=9JqRpxUumFeEIpkURzxkU5/aKTk8yPJiFCkH0KGCjxQ=;
+        b=UUi+fmhDJDCM07CCxIVXl3Bj23fQpRWgkPLRm9aJhdkeEh3JGfItlNJFy7v7rmcISW
+         OVwZLQqHfOkPDXJxXU0lRSCCz/4d24djYcHDVCJP5y49YHXpYrBL2k6csHlznQpvBinx
+         HOPsXJnhD78ZlHC6D+28z6YEfNs2Ym3GtjNgj56mnaooC+CNGoL9yt1uahaJF5a2Xpg7
+         grTWpNecPTnxwbra3g1Slp19AEbZov+52zcuJaUJH/2j+uzVRR7y3KjorrWWaOqba0nB
+         TbZaNaPZa1WHmMR+UpAl1DRj9WAWYreAJYcoFbAR+KkAR1vtm2E0N+8bbAwYW6aR8iUj
+         025g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708031033; x=1708635833;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ky2ZahidDUXO2cGFTczfagUmFQuczB83RWWZ7vrowF4=;
-        b=HGkDSkeWmYorRbqZ+hqm3hn5T9/PXpv6Rk6JQVml/FDVewmQiv92+WT9jEQMwlUjms
-         oelefI9wzIKKKix/efr/IZkcf9mvA1tIcrOEYd/OfO070KlIdr2uMMOOrwcfV17sOige
-         1VnjNNVkvRzDnPQpbRvfqWkup8aTJMksc2gYh7ospuny1uB7CJTzL/161QIb8y7dJ5/p
-         yAk23h39KrZI6jvtzvb/DfIuoZiPYqfTYrZv2HWH2NTkSjNeN5dfhmNdGy6uIJhTmfXS
-         oY0p7kxWyikLoa2yFtyQ/ohYH+dpLA7LuEZoXInHuKlht3IliC1GXdjvEFL28JKWzW4W
-         vd7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXjpFjmUHDrpCOnS/BObsmdAR1tgq4IaYsJZ965UTX4Gmkdx7bdFIDVz/phKFDHuzmbaB2wQshFh+GghZml/bwUOciWJHTFEqlH8s2SOVjdRPA4q2885RkivwtYy+2zcDcdXFCP
-X-Gm-Message-State: AOJu0Yy5ARX8MglQB/YlaTa5ca89yqmX2Kn5Fco3A6aKLZQcnzNDVCHe
-	znZtjjS8EDMErT7ksKTKNWqkVPQuiH23ny7o1nmlcA/4E4CY1Bw+6UGoJYdx
-X-Google-Smtp-Source: AGHT+IE0q8c+07du9QdFQWzS1GQSJ3+K8PVrqti7ePCn+9czzhmuN6wNeYywXIJZxS95bQrpPsWi0A==
-X-Received: by 2002:a05:6512:1192:b0:512:8aeb:aaa8 with SMTP id g18-20020a056512119200b005128aebaaa8mr1890037lfr.49.1708031033197;
-        Thu, 15 Feb 2024 13:03:53 -0800 (PST)
-Received: from debian ([93.184.186.109])
-        by smtp.gmail.com with ESMTPSA id ps7-20020a170906bf4700b00a3d12d84cffsm903512ejb.167.2024.02.15.13.03.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Feb 2024 13:03:52 -0800 (PST)
-Date: Thu, 15 Feb 2024 22:03:50 +0100
-From: Dimitri Fedrau <dima.fedrau@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 net-next 09/14] net: phy: marvell-88q2xxx: add cable
- test support
-Message-ID: <20240215210350.GB3103@debian>
-References: <20240213213955.178762-1-dima.fedrau@gmail.com>
- <20240213213955.178762-10-dima.fedrau@gmail.com>
- <fe604759-d1cd-4a4d-ba64-69936b3e6598@lunn.ch>
+        d=1e100.net; s=20230601; t=1708031319; x=1708636119;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9JqRpxUumFeEIpkURzxkU5/aKTk8yPJiFCkH0KGCjxQ=;
+        b=qAxDegfeKludlq/JQkdaJNstLFh5wErPdNJ+48c7kHDNQjJvrGHV7erngGjJGBRjIF
+         9QunRewL6DJbG9uzB/9Kk7OseWn4DK+DIXeFns4neVOn4VUG6xnP5k1ymqBXc5fKfTSV
+         oR3nsiXAWfan9bRdUeXpGT0Si24r34EUFfiBqmwBdBpl2Vmv+zk6XpruRCSI1NFYUpFD
+         wzFtsTjSsxsjpGFmdXmAWDZhiUbnDpaHijq3E3RHCDa0uFlzP9EWlI3fyb8U+YbqWiRx
+         D0WOVCQ8C6y4siTCRfmOBvTtfJtOxzzeyjok0RPL17b4xMpZuNddmpaUC783EYYU9J1T
+         S9vg==
+X-Forwarded-Encrypted: i=1; AJvYcCUh9d39j7T8hfuz642ZFHxrjRw5z92+Ufpwiie9/zWQknc5poY0Y7XIcxZ4Wk0LBPWf8UQ3SFiYQtepmA5dwGo0yYUm9wMZ
+X-Gm-Message-State: AOJu0Yx07hCLQHBNwji+LDZSxiBwo46lnEe4ssmn9SjjPyI4+Fyjqndo
+	IuKz343WZ+rTouYOpsHtj+V7iAIRIE0M1DYcWz/TnlQnsAU0wCCD
+X-Google-Smtp-Source: AGHT+IG1QtoY10FT1fkSydZKCCIPWWAobQ4lAv8V4kcx47K3rhgz4HB/3/CwvScZ2u3104DAyzpvVw==
+X-Received: by 2002:aa7:ce15:0:b0:560:590:10b9 with SMTP id d21-20020aa7ce15000000b00560059010b9mr2100786edv.2.1708031319316;
+        Thu, 15 Feb 2024 13:08:39 -0800 (PST)
+Received: from ?IPV6:2a01:c23:c544:200:b8db:381c:cff6:c7bf? (dynamic-2a01-0c23-c544-0200-b8db-381c-cff6-c7bf.c23.pool.telefonica.de. [2a01:c23:c544:200:b8db:381c:cff6:c7bf])
+        by smtp.googlemail.com with ESMTPSA id q15-20020aa7cc0f000000b005638caeff4bsm890893edt.22.2024.02.15.13.08.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Feb 2024 13:08:38 -0800 (PST)
+Message-ID: <3604a59e-4287-428f-b4ba-8528d2ffdbe9@gmail.com>
+Date: Thu, 15 Feb 2024 22:08:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fe604759-d1cd-4a4d-ba64-69936b3e6598@lunn.ch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] ethtool: check for unsupported modes in EEE
+ advertisement
+From: Heiner Kallweit <hkallweit1@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <c02d4d86-6e65-4270-bc46-70acb6eb2d4a@gmail.com>
+ <Zc4zhPSceYVlYnWc@shell.armlinux.org.uk>
+ <6ecc5c66-53b9-40c9-9fe4-b091afbe2f7f@gmail.com>
+Content-Language: en-US
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <6ecc5c66-53b9-40c9-9fe4-b091afbe2f7f@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Am Wed, Feb 14, 2024 at 06:54:58PM +0100 schrieb Andrew Lunn:
-> > +static int mv88q222x_cable_test_get_status(struct phy_device *phydev,
-> > +					   bool *finished)
-> > +{
-> > +	int ret;
-> > +	u32 dist;
-> > +
-> > +	ret = phy_read_mmd(phydev, MDIO_MMD_PCS, MDIO_MMD_PCS_MV_TDR_STATUS);
-> > +	if (ret < 0)
-> > +		return ret;
-> > +
-> > +	*finished = true;
+On 15.02.2024 21:27, Heiner Kallweit wrote:
+> On 15.02.2024 16:53, Russell King (Oracle) wrote:
+>> On Thu, Feb 15, 2024 at 02:05:54PM +0100, Heiner Kallweit wrote:
+>>> Let the core check whether userspace returned unsupported modes in the
+>>> EEE advertisement bitmap. This allows to remove these checks from
+>>> drivers.
+>>
+>> Why is this a good thing to implement?
+>>
+> Because it allows to remove all the duplicated checks from drivers.
 > 
-> That looks odd. Is there no status bit which says it has completed? Is
-> it guaranteed to complete within a fixed time? How is it guaranteed that
-> mv88q222x_cable_test_get_status() is called at the necessary delay after 
-> mv88q222x_cable_test_start()?
+>> Concerns:
+>> 1) This is a change of behaviour for those drivers that do not
+>> implement this behaviour.
+>>
+> Not of regular behavior. And at least for all drivers using phylib
+> it's no change.
 > 
-According to the datasheet and the Marvell API bits(0:1) can be used to
-check if the test has completed. Sample code waits 500ms before checking
-the bits. If the test is not completed after the delay the corresponding
-function returns with an error.
+>> 2) This behaviour is different from ksettings_set() which silently
+>> trims the advertisement down to the modes that are supported
+>>
+> It's the same check that we have in genphy_c45_ethtool_set_eee().
+> So it's in line with what we do in phylib.
+> But I would also be fine with silently trimming the advertisement.
+> 
+>> 3) This check is broken. Userspace is at liberty to pass in ~0 for
+>> the supported mask and the advertising mask which subverts this
+>> check.
+>>
+> ethtool retrieves the supported mask with get_eee() from kernel.
+> And this (unmodified) value is passed with set_eee().
+> So at least with ethtool this scenario can't occur.
+> 
+In addition: In the netlink case the supported mask isn't even
+transferred to userspace for the set_eee operation.
 
-I just used bits(7:4) where 2'b1000 means that the test is in progress,
-and setting *finished = false. I didn't introduced any delay, relying
-on the reschedule delay of the PHY state machine. I didn't notice any
-problems with this approach. Anyway if the test does not complete for
-whatever reasons we get stuck here, right ? Don't know if this can
-happen. Probably we should take the safer path described in the Marvell
-API.
+>> So... I think overall, it's a NAK to this from me - I don't think
+>> it's something that anyone should implement. Restricting the
+>> advertisement to the modes that are supported (where the supported
+>> mask is pulled from the network driver and not userspace) would
+>> be acceptable, but is that actually necessary?
+>>
+> 
 
-Dimitri
 
