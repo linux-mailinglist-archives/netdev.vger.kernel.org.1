@@ -1,159 +1,107 @@
-Return-Path: <netdev+bounces-71952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-71953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18AF28559E7
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 05:48:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD5478559F0
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 06:06:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 193351C21790
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 04:48:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8033828A9CE
+	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 05:06:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36E1863AC;
-	Thu, 15 Feb 2024 04:48:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="I6L9U/aW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38BEE79DF;
+	Thu, 15 Feb 2024 05:06:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C78B1C0F;
-	Thu, 15 Feb 2024 04:48:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86F09539A;
+	Thu, 15 Feb 2024 05:06:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707972506; cv=none; b=JLMcdGqryIG5n0/cIMhBjFlFaSHMAJDqm7WPVXqJPCSYmWtfg5bPAq0FEHp4lLX95y5OfISY5ihQ2RD18eJJBK08/OSYvFCRTAcg2HBS1x7b7kNn1odkUg1Jmo3WEak6OsULAAi9diBZRVYzLVK4pnOycIQwQVVVJM38OKovm74=
+	t=1707973610; cv=none; b=sRoUKV/pTvcJfLDOmhORDDr03ZI5GuWRIklkE9/COIZu37j7tJO++4BauTt30TAMrMmUxauHpHDOfc4u0mjVHm3XGxcZkfLhouweZOLOFKJ8PyfdgFo3fnyJE4t22zFDrD7xDRPos+NBs5WAtj4QqO3moHFWI+HahtM+4mZThbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707972506; c=relaxed/simple;
-	bh=5o/3QD9IVMwO2DGQRthGEJt8ZrCdo7xAiiwUB1JC6oI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=I4iTV0VVuHh8eyAAZ4QKHc3OZPWL7nMGtURWOmEdU3q2WxW73uZDuhrHnZWk7OVESSlfP7qHnih2CyFPCso6INznQJVnqRWvHnQq0OnEw+vhSezLvikTdxrYs5/m+hqszr+i84IutYvjdq+wLGfdTM4F8pRmNCyIPHoCyHhFY1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=I6L9U/aW; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41F4MMq5010025;
-	Thu, 15 Feb 2024 04:47:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=57EHGLJUekwB27YpA6QFEIQ+R7ja+si5OreIJSovoWE=; b=I6
-	L9U/aWMxUFIONiViC/rPMptUXOIMM1RhOQJyZW2FDRKY6inCPze0mh3VDlNmPdVd
-	6nwnhL6I3Rn0R76S8bkxwaHfe0owUcrwF25poFgD6o/InKuSy/TbEWOnLRV21icO
-	sPdJs2+BmNNHLivcFR+nP2oKxCMCrzv8nmgNQUyArobj1eNo8Q0DWk7Vr/J/DJi6
-	cq764ZBP4dRnVd9+fxW+mD6hvLXamQ9h+q3d+wSjDoTbsKTzTPxTVKVuFsAmA693
-	WN3AnmKitgWwQ6Zj3IY4+Jf/XxqbsnCGuLlR7Q0SR2bUpWWUDvpMVzKiiKByhdof
-	it/93PSOMC25fRxzmB1g==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3w9bfs01h0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 15 Feb 2024 04:47:53 +0000 (GMT)
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41F4lqGO019041
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 15 Feb 2024 04:47:52 GMT
-Received: from [10.216.17.27] (10.80.80.8) by nalasex01b.na.qualcomm.com
- (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 14 Feb
- 2024 20:47:44 -0800
-Message-ID: <7a567b50-66f1-4737-ae6c-0dabd1d39bcf@quicinc.com>
-Date: Thu, 15 Feb 2024 10:17:41 +0530
+	s=arc-20240116; t=1707973610; c=relaxed/simple;
+	bh=EhSg2QHqNh/t2QONcG+qGuJ0J095P903O68xo1d47Pg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=udiBohXkhwwZAh1uiF0wDJFWBmTJBdPsWGEY6+V1dKGJaIOtazdCMNYnZ84rUY6hd2Hq3xcp3VE1vk5vDHTUOjOaOFAFL4Iuuzen4RfgRGm6VsL19gHCozJMQKdXnH7QBMUbHVQr1kSeRSyYzcQ80TP18RhKGZVv23XpQZoRrNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 2BDCC67373; Thu, 15 Feb 2024 06:06:43 +0100 (CET)
+Date: Thu, 15 Feb 2024 06:06:42 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Robin Murphy <robin.murphy@arm.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Alexander Duyck <alexanderduyck@fb.com>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, iommu@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 1/7] dma: compile-out DMA sync op calls
+ when not used
+Message-ID: <20240215050642.GA4861@lst.de>
+References: <20240214162201.4168778-1-aleksander.lobakin@intel.com> <20240214162201.4168778-2-aleksander.lobakin@intel.com> <893ad3a4-ba24-43cf-8200-b8cd7742622d@arm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4] net: stmmac: dwmac-qcom-ethqos: Add support
- for 2.5G SGMII
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Jose Abreu
-	<joabreu@synopsys.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-        Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@quicinc.com>, Andrew Halaney <ahalaney@redhat.com>
-References: <20240208111714.11456-1-quic_snehshah@quicinc.com>
- <20240212173015.0341f0ee@kernel.org>
-From: Sneh Shah <quic_snehshah@quicinc.com>
-In-Reply-To: <20240212173015.0341f0ee@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: 3RXFTHEoRYOKGGlv-yqGshlNz6ajAfjq
-X-Proofpoint-GUID: 3RXFTHEoRYOKGGlv-yqGshlNz6ajAfjq
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-15_04,2024-02-14_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- bulkscore=0 phishscore=0 suspectscore=0 priorityscore=1501 spamscore=0
- clxscore=1015 adultscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2401310000 definitions=main-2402150033
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <893ad3a4-ba24-43cf-8200-b8cd7742622d@arm.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
+On Wed, Feb 14, 2024 at 05:20:50PM +0000, Robin Murphy wrote:
+>>   +config DMA_NEED_SYNC
+>> +	def_bool ARCH_HAS_SYNC_DMA_FOR_DEVICE || ARCH_HAS_SYNC_DMA_FOR_CPU || \
+>> +		 ARCH_HAS_SYNC_DMA_FOR_CPU_ALL || DMA_OPS || SWIOTLB
+>
+> I'm not sure DMA_OPS belongs here - several architectures have non-trivial 
+> ops without syncs, e.g. Alpha.
 
+True, but peeking through the ops is a bit hard.  And I don't think it's
+worth optimizing the dma sync performance on Alpha :)
 
-On 2/13/2024 7:00 AM, Jakub Kicinski wrote:
-> On Thu,  8 Feb 2024 16:47:14 +0530 Sneh Shah wrote:
->> Serdes phy needs to operate at 2500 mode for 2.5G speed and 1000
->> mode for 1G/100M/10M speed.
->> Added changes to configure serdes phy and mac based on link speed.
->> Changing serdes phy speed involves multiple register writes for
->> serdes block. To avoid redundant write operations only update serdes
->> phy when new speed is different.
-> 
-> Sounds like 2 separate changes in one patch, please split the
-> optimization of not writing the registers multiple times and
-> the 2.5G support.
-> 
+>> +static inline void __dma_sync_single_for_cpu(struct device *dev,
+>> +		dma_addr_t addr, size_t size, enum dma_data_direction dir)
+>
+> To me it would feel more logical to put all the wrappers inside the #ifdef 
+> CONFIG_HAS_DMA and not touch these stubs at all (what does it mean to skip 
+> an inline no-op?). Or in fact, if dma_skip_sync() is constant false for 
+> !HAS_DMA, then we could also just make the external function declarations 
+> unconditional and remove the stubs. Not a critical matter though, and I 
+> defer to whatever Christoph thinks is most maintainable.
 
-Optimization is part of 2.5G support change only. with introduction of
-2.5G speed support we need to update reconfigure serdes phy. there are
-2 different serdes configs.
-1. config for 2.5G
-2. common config 1G/100M/10M
+Your idea sounds reasonable to me, but I don't have a strong preference.
 
-The change here is not to reconfigure serdes phy among
-1G/100M/10M speeds and only reconfigure if it switches to 2.5G.
+>> +static inline bool dma_need_sync(struct device *dev, dma_addr_t dma_addr)
+>> +{
+>> +	return !dma_skip_sync(dev) ? __dma_need_sync(dev, dma_addr) : false;
+>> +}
+>
+> That's a bit of a mind-bender... is it actually just
+>
+> 	return !dma_skip_sync(dev) && __dma_need_sync(dev, dma_addr);
+>
+> ?
 
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
->> index 31631e3f89d0..6bbdbb7bef44 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
->> @@ -106,6 +106,7 @@ struct qcom_ethqos {
->>  	struct clk *link_clk;
->>  	struct phy *serdes_phy;
->>  	unsigned int speed;
->> +	int serdes_speed;
-> 
-> Why signed if speed itself is unsigned?
+That looks a lot more readable for sure.
 
-In stmmac speed can be assigned as SPEED_UNKNOWN which will be -1.
-I will fix speed being unsigned int in a separate patch.
+> (I do still think the negative flag makes it all a little harder to follow 
+> in general than a positive "device needs to consider syncs" flag would.)
 
-> 
->>  	/* Enable and restart the Auto-Negotiation */
->>  	if (ane)
->>  		value |= GMAC_AN_CTRL_ANE | GMAC_AN_CTRL_RAN;
->> +	else
->> +		value &= ~GMAC_AN_CTRL_ANE;
-> 
-> That looks unrelated. Either a separate patch or please explain in the
-> commit msg why.
+Probably.
 
-For 2.5G speed support MAC PCS autoneg needs to be disabled.
-This adds the change to disable PCS autoneg. I will update commit
-message to add more dtails
 
