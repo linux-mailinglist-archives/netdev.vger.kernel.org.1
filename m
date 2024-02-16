@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-72306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4C108577A2
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 09:27:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9EC98577A7
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 09:28:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 900CEB21A29
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 08:27:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE094281614
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 08:28:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A286317741;
-	Fri, 16 Feb 2024 08:23:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE94117C76;
+	Fri, 16 Feb 2024 08:26:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hyY52mB+"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h7vxQ5xI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE9141BDD3
-	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 08:23:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12E1D18B1B
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 08:26:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708071838; cv=none; b=EZBw4/VY9gIbpF/C8EZZOwnCXv66zmbqtGVyEmaji2tSTDfWNU6WLNl8cxv6xGEwV6QpkNwFNntEkZWffOjKMKEfOqVdXlOOM9qJdu8cBcbETMQBoSOjyx7OncyLvpUPZEvLWLUplAKjItSecDBFX4MxWKUkvPaDHHbaO2pwYTM=
+	t=1708072007; cv=none; b=IgRSrpb7tjp2H/0eIwc8DLVOF1OkRW8F25pIbUKaywA+KXGdAHhYwyG6Iz9ei9vgj+9rsG6rwZHggXrwcxJ1BRs8N5EvJfe7CgHoIcWygPS9f975oV3VuK3n4kGJYJeVso3xDIPL+MGeC455iAfUhnUpSjrddYuYYYxGHu40yFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708071838; c=relaxed/simple;
-	bh=CuSzYkpW1cnbd7QLiY8ENrnT3YE8nLPOXunubIBTc1Q=;
+	s=arc-20240116; t=1708072007; c=relaxed/simple;
+	bh=d8ITzOV2En/D6OHhB7+vXjklnG93i0n5W26sz5HKW9M=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HrfsbYVXbChRzaheRpKybT6FU8XCZtUr0oooETVyZHF3Jn5ouXp3Q5X7CeDusy0Phw5lIbN4uNhNDWN9jQtITG/UkT5QpWr6deHl3QbkEbW5ZhN4tgRTdPdUbxBw6purU6bPsrETXaZrT2DQnR+8zddh5aZ9noZppVuwjMUDGBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hyY52mB+; arc=none smtp.client-ip=209.85.208.52
+	 In-Reply-To:Content-Type; b=W52q6199QMWdfOoIgUGPGQvrdrcU9UmrSGKCwvxXVDPQ0htDT200sWvlvHJu91/jYzr2qqjQyThkW/Q1N/eAK1QwrgaknNYNC3ZtBvWoYLUZ6Ybm1hTG2EtGMunCsuQDRlgbq4ugp6I0LfAr5x090q82LqsTe8SINSLmNtnqQKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=h7vxQ5xI; arc=none smtp.client-ip=209.85.218.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5611e54a92dso2345407a12.2
-        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 00:23:56 -0800 (PST)
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a3deb3f563bso19373666b.2
+        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 00:26:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708071835; x=1708676635; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1708072004; x=1708676804; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Cy3LXUzEOfblety0Bw1Qjn68YCgKHMaFfLyUL/Ni24s=;
-        b=hyY52mB+eY0ra707WIBQUBBYO8rcdDRgWUzeRUrWjOGGgqgqZFukR9yzXSPMC4Afbm
-         zvEVhuNZ/WlfP11mG2HlAQlbUPQDfIajCt0jrzObWtBZZt5U6lhqDmNgKFMaf9pGaUxn
-         QUmGs2aS6YLGJziWeLh4m7NRq0BB+pv67oLZtRga9uQOEMs5VzHsCm/9xiXSg3yiHXf1
-         SXTWLwBYfAhTuQsjnVLIzH151R5oBniWfEKm63763AzJnPfo2sx2gQ0+rW+O35MZsF2e
-         1nXRcq0hdjDjuU8pbCFRPdQybk2QjZ8tZRYdAg8boZyyYnh40yn+jvEv6daxJZS3kcrQ
-         LmcA==
+        bh=WAeqAPxibxxRq/h+JRwkxgNp/YZEgtvVqoDwz03RZEY=;
+        b=h7vxQ5xIT90O4qJGSpAq8dBq45eXn6kehv0luZWJS3SKY4yR7HV+Zk1pVIxvnz2c3Z
+         wQVfUUGWxjcWOopJBaUIN2Jkq73QpAHnShXugWz1JExalPKHgisUFAk4WWy1dpNxGsLC
+         HBdpYlnoQIzXKTC3u6Ad7LzKmPFzmW8e2VgvbykfRLzA0ci873WtGBQF89np/weir2GL
+         AV5JrhilFebuC9dONQxTBHUcqCsdvSc5DyrAVXQ5n6GgW65FdzRPWy5yxYiUFC9SZCV6
+         ZpaILuJL3U22vZdD5AKPLT3Mqha524Q/K0+lrLaoPlPgVUqXezcbIsjP+IZjVdFxAEZf
+         8HaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708071835; x=1708676635;
+        d=1e100.net; s=20230601; t=1708072004; x=1708676804;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cy3LXUzEOfblety0Bw1Qjn68YCgKHMaFfLyUL/Ni24s=;
-        b=iAX8bgY1y7x25YFHbuHXe3d4D3mwRpnQ6JIt2Gy/6C3i9eAH9BTIrsqUYwOgl5CLtm
-         aqDvyjReQ5oKKHRtE+CeznnaZEeLg0IwPSuqtd7N0E4NUSlI/JISwd/Bxp/j8k2vFHGf
-         an6bxDJXqaEvI9mqDRywqtS/P03xBJr2wMMSVBFDROGZs/mGOvJim02NdTgcl/aNmEjk
-         BwSoq+nM+AGLok7mXUPb6FUcjZhKTdOjW9dCWSQFjJC12IyJ41mWaeucMaq0NdvtrAI0
-         8uzJXJUwjWvvngcJbPeOsWkOsB4iUeVzxErpoMyosrtZH7HKsn8RiZ1Itfpo1jJIgDWP
-         IP6A==
-X-Gm-Message-State: AOJu0YyiQZ8YuZOu8jT42tCI9J5I/C8bJqRhv0JwnZN4+DuInhkca3tc
-	mAw3X0JA8ryumJ6yeD82edOaFdfUY590HIvSWI2WamSxATWOYfs+tE9JyPZiEak=
-X-Google-Smtp-Source: AGHT+IGq/dh41TSBWnHjI/60+m3wWYWEYYnc9Ru61/hm+O7hpItu994ZfNVTMifi2a7L2ggk1W0bcw==
-X-Received: by 2002:a17:906:2dc7:b0:a3d:dee9:e554 with SMTP id h7-20020a1709062dc700b00a3ddee9e554mr610611eji.13.1708071835000;
-        Fri, 16 Feb 2024 00:23:55 -0800 (PST)
+        bh=WAeqAPxibxxRq/h+JRwkxgNp/YZEgtvVqoDwz03RZEY=;
+        b=ic6EHNK4UdzY++eicresKSeTboDUHR9myQYfBoSINvKQos5uaUqhKe8uvgVy4kcsXU
+         13AoihERSLh2Nzt/XKrcpDGU8NrpAiqmYU6715MysL8LfRXqEDruSZYApJOnJjFcxELm
+         9Tpdhx924QV6hJXA4S/2ohdT7pRpLA1QTidoJQD43A3KTPKTEet/m78pPq3eVEO8WRfp
+         IIcBShuggcfvbE2Cr1pHhpgyhQmVNNXPDz1dDUYEUquDe24AvEU20EjATMTOvov3LlKy
+         oQq5EjoNpRyphSDA9r+ZN8QB6G9dE7fwLM1XFxyybpJl/B4UzwZgBHP+IRx+hIgivnCQ
+         JGyA==
+X-Gm-Message-State: AOJu0YzCwbmz9iKa1Jv/RVx7pBLWLbihUZypiGn8rt+jJ71UgbFJx0yr
+	RJB2ScJcq6ozhbM+bIbOZh/Y/8R5SvtTtBzDHz44hmG0DNCzsEjFVL07NMpxyjg=
+X-Google-Smtp-Source: AGHT+IHJTnxShsG5u7QLqZGNtK7dvkKWkY8/CjMheJRB68tWDN4021Cuiiw/3kxOQeAsYnSaEx+vKQ==
+X-Received: by 2002:a17:906:e4f:b0:a3d:63b:c43 with SMTP id q15-20020a1709060e4f00b00a3d063b0c43mr2789303eji.17.1708072004333;
+        Fri, 16 Feb 2024 00:26:44 -0800 (PST)
 Received: from [192.168.0.22] ([78.10.207.130])
-        by smtp.gmail.com with ESMTPSA id vg12-20020a170907d30c00b00a3d6a2d3904sm1328560ejc.146.2024.02.16.00.23.53
+        by smtp.gmail.com with ESMTPSA id vu6-20020a170907a64600b00a3c5d10bcdbsm1310341ejc.114.2024.02.16.00.26.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Feb 2024 00:23:54 -0800 (PST)
-Message-ID: <acc38b94-7810-4db3-9d7c-5d269d99d709@linaro.org>
-Date: Fri, 16 Feb 2024 09:23:53 +0100
+        Fri, 16 Feb 2024 00:26:43 -0800 (PST)
+Message-ID: <d77faffc-5bde-41f1-b6a2-ddd665c3ee08@linaro.org>
+Date: Fri, 16 Feb 2024 09:26:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,7 +75,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/6] dt-bindings: net: remove outdated hisilicon-femac
+Subject: Re: [PATCH 2/6] net: hisi_femac: remove unused compatible strings
 Content-Language: en-US
 To: Yang Xiwen <forbidden405@outlook.com>,
  Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
@@ -89,9 +89,9 @@ To: Yang Xiwen <forbidden405@outlook.com>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  devicetree@vger.kernel.org
 References: <20240216-net-v1-0-e0ad972cda99@outlook.com>
- <20240216-net-v1-3-e0ad972cda99@outlook.com>
- <86a4d31d-80e4-4c11-9c71-e14494e3c8f2@linaro.org>
- <SEZPR06MB69597BA5B7F02E0B9995131A964C2@SEZPR06MB6959.apcprd06.prod.outlook.com>
+ <20240216-net-v1-2-e0ad972cda99@outlook.com>
+ <68c9477a-3940-4024-8c86-aa6106e8a210@linaro.org>
+ <SEZPR06MB695938B228E762B9B53BAF2F964C2@SEZPR06MB6959.apcprd06.prod.outlook.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -137,42 +137,37 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <SEZPR06MB69597BA5B7F02E0B9995131A964C2@SEZPR06MB6959.apcprd06.prod.outlook.com>
+In-Reply-To: <SEZPR06MB695938B228E762B9B53BAF2F964C2@SEZPR06MB6959.apcprd06.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 16/02/2024 09:03, Yang Xiwen wrote:
-> On 2/16/2024 3:21 PM, Krzysztof Kozlowski wrote:
+On 16/02/2024 09:21, Yang Xiwen wrote:
+> On 2/16/2024 3:20 PM, Krzysztof Kozlowski wrote:
 >> On 16/02/2024 00:48, Yang Xiwen via B4 Relay wrote:
 >>> From: Yang Xiwen <forbidden405@outlook.com>
 >>>
->>> The user documented(Hi3516) is not found in current kernel anymore.
->>> Remove this binding entirely due to recent driver changes.
->> Hardware does not change because you decided to re-implement driver.
-> 
-> The only hardware i have is the hi3798mv200. According to downstream 
-> driver name, this is supposed to be a hisi-femac-v3 actually. I don't 
-> know much about Hi3516, but it confuses me a lot. According to the 
-> device tree node example in the text binding file, the MDIO bus is 
-> supposed to be inside the femac core (femac core is at 0x0-0x1000 & 
-> 0x1100-0x1300 and mdio bus is at 0x1100-0x1120). So i think it's highly 
-> possible they are the same hardware. But according to the TRM and my 
-> tests, there are 3 clocks in total for femac core in hi3798mv200, one 
-> for mac ctrl, one for ahb bus(I'm sure this "bus" clock is not MDIO bus 
-> clock), and one for phy, which is very similar to the hisi-gmac driver.
-> 
-> Which complicates things a lot is the complex clock enabling timing 
-> requirements here. at least for hi3798mv200(and all SoCs with 
-> hisi-femac-v3 core i think according to the downstream kernel source), 
-> It must strictly follow the sequence in hisi_femac_phy_reset() (disable 
-> MAC clk and BUS clk first before asserting PHY reset), or the PHY would 
-> fail to work. So as said in previous reply, the simplest way is to do 
-> all resets and clocks management in the MAC driver, or else it'll be 
-> very hard to implement. I can't find an easy way to "tell" a driver to 
-> kindly disable its clocks remotely.
-> 
+>>> These compatible strings are not found in any mainline dts, remove them.
+>> That's not a real reason. What about all other users?
+> The people who want their devices being supported should post a working 
+> dts first. Having found the dts missing is strongly telling me that this 
 
-None of these explain why support for these devices should be dropped...
+Considering how poor HiSilicon contributions were - in numbers and
+quality - that's kind of expected. :(
+
+
+> SoC(Hi3516) is orphan and EOL already. I can't even find it in git 
+> commit logs. I'll argue that the old binding is simply wrong, and does 
+> not describe the hardware properly. Who knows? Could anyone tell me if 
+> the driver is still working for Hi3516 or not? I'm very willing to keep 
+> the backward compatibility if someone can tell me the effort i paid to 
+> maintain the old binding really makes sense. But the only things i found 
+> in mainline kernel about Hi3516 is an CRG(clock) driver and this femac 
+> driver. And it's been 8 years since last update for this SoC.
+
+OK, that's fine with me, but please add parts of this explanation to the
+commit msg (SoC is EOL, driver looks buggy and might not even work,
+platform was upstreamed 8 years ago and no maintenance work happened on
+it, thus it looks abandoned etc.).
 
 Best regards,
 Krzysztof
