@@ -1,211 +1,240 @@
-Return-Path: <netdev+bounces-72543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE84F8587C8
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 22:15:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E7548587D9
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 22:18:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA7A61C2582E
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 21:15:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40F1D1C20384
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 21:18:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9FEB145341;
-	Fri, 16 Feb 2024 21:15:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8955145331;
+	Fri, 16 Feb 2024 21:18:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QyrRLgal"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="uCwC4LRW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA2201420DF;
-	Fri, 16 Feb 2024 21:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708118110; cv=fail; b=O4WXli1QCDn4GVJTCrmpUq6WwUNpTfISUUkrBHDF71EO6BHCsef/T8ktTVdPDBeABb/czZ+4gwA75SUWLGcMjZjEmgPOjTV8HfpLPbDq3tCMOrULoGDnA3Mnh7mb8GOodOGrfB5eqKV4VcyFi0ip4A4UnaQYWb4stHKDCqqPw6A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708118110; c=relaxed/simple;
-	bh=kJqHc06iJeZqfKjD6f3gRmA/8lazpK1O3xgG3wD4f6E=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=d+FMWrpeshvKDXcyzZm8ne6LepoQfgVlwP4IRHNK+IP9esCVkx/dSTT0asVqOkL50tCohXvABAekgw/ucWOjq8vJg7/PwcNWYaruHlS9WKKYMKe/w8+bacm4m9NKEQ5nHtWxTFSWLrS+u2gumC2bcvhIZcmxWUmtTOkCDfJNcys=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QyrRLgal; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708118109; x=1739654109;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=kJqHc06iJeZqfKjD6f3gRmA/8lazpK1O3xgG3wD4f6E=;
-  b=QyrRLgal8OWrli331wQTig9Nu0LY99DgSZmz13CMNA6GgjGllwtfWfoF
-   YwtnQAu4GCj/jrDo/YIwsL4R87cIc9kKZLsvUlTPQkWp0IWoQqpxefNpk
-   rqKjptw5HeI6c4wHy2j9YsytydYkwfPRhTyJjdGwJR7A1C7xbvuf/IWm9
-   Ye+5p02hG3Hm4FAQttSULT5yj42TotfJzObyzzCjB3dYFloTvDMIx2b/C
-   3nQl5fAesycCWfuozFRuO/FKZFSlkKnCYzgIAqQTPcNueBrvU0i7DChuv
-   RDGmZ++8oOgqGZL0M5KTa0n3QoYbJYK7Q6/XTa4sHQiXPIfEPUJWcafz8
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10986"; a="13665132"
-X-IronPort-AV: E=Sophos;i="6.06,165,1705392000"; 
-   d="scan'208";a="13665132"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2024 13:15:06 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,165,1705392000"; 
-   d="scan'208";a="41430761"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 16 Feb 2024 13:15:05 -0800
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 16 Feb 2024 13:15:04 -0800
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 16 Feb 2024 13:15:03 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 16 Feb 2024 13:15:03 -0800
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.168)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 16 Feb 2024 13:15:03 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UAzX7zOiws06f6mP/EbT6hnL6zAhPIzZVjMnJoGyWYWFxAemZRR4MY3Wkk+M46vqeznGye9CkoACcqkJ9jwdZTc2QKfY3/0UFZzLcUeZsnS8FkWpt/tjeBdo/CVZsmuo8i8ht+ZL1F/wSdrcdXvqS83Knk747qvGF/qapDBHKj0VhedfKRFNvRzcCkgUNT8RBuinKYKfr1NJZEu5teMJR6xuNTzQFeTQ/WlR08OCTHvVrUK9MKMDS8lr24qo6b8P8Ql4F5mTJB0liKuEJMxZyUAC7dW1/iZQoe5lI5JsB92bFzeJwVvA7MYWZ1oLznzo5oBiNvKViXzQyHTo1RfXWQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kr5h8/YiVpshaePM0I05fgfueS5wsXgtVgTNVWHXVis=;
- b=WQ3RFQ9Xz/ODvnIFLHMVNPt91yL0Wikf/w8CQqS1OXExrWoWq0tQj/XS8ldJTlb1IlQ89jcd4g9Xs0t4wmIqWOsu5fLfhrs4S4eg1EHmTgx3ThaPPZhyv82DPEHCwPdhYVdPzfohj6DgesVlzWhRUOyqFTocD5shqwRywok7kVnrSuxFwkqcSQug3NaUFfeNP84MBsOl/4Z2Ksc0xVMHXMrL7zp1gmGQQlrgdmOsVHZZpgUjaTn4mPUJUwzsLBZa3O5Ye3NFTzMaWhUlRa78Yl+A4WwpqjT+WQ39U+kX2i9mSO9e7DMjY0VBKh/MlXX3DOZbL9SnsYvlcCZR9LiZ6g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
- by DS0PR11MB7262.namprd11.prod.outlook.com (2603:10b6:8:13c::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.31; Fri, 16 Feb
- 2024 21:15:01 +0000
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::c164:13f3:4e42:5c83]) by BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::c164:13f3:4e42:5c83%7]) with mapi id 15.20.7270.033; Fri, 16 Feb 2024
- 21:14:59 +0000
-Message-ID: <b227037c-16e0-37b5-a5ac-cf8eb0d3556f@intel.com>
-Date: Fri, 16 Feb 2024 13:14:53 -0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH net-next v8 1/2] ethtool: Add GTP RSS hash options to
- ethtool.h
-To: Takeru Hayasaka <hayatake396@gmail.com>
-CC: Paolo Abeni <pabeni@redhat.com>, Jesse Brandeburg
-	<jesse.brandeburg@intel.com>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Jonathan
- Corbet" <corbet@lwn.net>, <intel-wired-lan@lists.osuosl.org>,
-	<netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <mailhol.vincent@wanadoo.fr>,
-	<vladimir.oltean@nxp.com>, <laforge@gnumonks.org>, Marcin Szycik
-	<marcin.szycik@linux.intel.com>
-References: <20240212020403.1639030-1-hayatake396@gmail.com>
- <CADFiAcL+2vVUHWcWS_o3Oxk67tuZeNk8+8ygjGGKK3smop595A@mail.gmail.com>
- <8eb6384a82fc4c4b9c99463a6ff956f04c9d5e33.camel@redhat.com>
- <bad0da2c-546b-2e05-feea-d395439a0bb0@intel.com>
- <CADFiAc+RP91PfEBAnwbABjrHJkdLc0=nm3_TE=+ZaN1AiVQEEQ@mail.gmail.com>
-Content-Language: en-US
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-In-Reply-To: <CADFiAc+RP91PfEBAnwbABjrHJkdLc0=nm3_TE=+ZaN1AiVQEEQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0145.namprd04.prod.outlook.com
- (2603:10b6:303:84::30) To BL3PR11MB6435.namprd11.prod.outlook.com
- (2603:10b6:208:3bb::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA9431419BF
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 21:18:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708118325; cv=none; b=ih+RYTWnaRabnf2kKbSK/SwZvNEjD7cMJuMQwfPAsgjDunl5XO6e5B1a2AO4ztEmjnMMUSDFzEML1pwcP3ETpW/d1VLNHEO/WsWeW4kAKN+2jkehCBlzmnbcrdd7PYP4ntRASFviWHUHfMaSGokAItWcHscrjV4tUu0AWRV6bf8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708118325; c=relaxed/simple;
+	bh=R5J9/38m4huGVzj6VnbfWK8LZpvdu5bP507wckFn6vM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LVAI+k80tLYs2b/32WsAmFASI9T1uKc49kBvNASm+fu4T/88Gc9R9JGJ6H1HQ+0qpZ8WrDCsLlun7hZRb9Bh1j31t4mIgFMcKFjxKSNfmeWtGWBGJSiGR1RKbot5GeHFBV76IOsrAcnWHkOAMEcGoskrSpSzLSS4Hw+g0RYZIkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=uCwC4LRW; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-607d9c4fa90so22548367b3.2
+        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 13:18:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1708118323; x=1708723123; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=d0ALIyLJQOD7Y1oSXLJGwwO+HUyvfSbunY9m+pRm/cs=;
+        b=uCwC4LRWWkfp6XCpKk2r+GSMXUdJf2rE8wxsLUQYCHh93xDWvZTbITiTW9RV6Y403/
+         1hab6/Wre95g3mgTFa5XwqfxaSaVq4wq4srjSV+t4OVvWcXvycnUmba9beLRHauS4fMh
+         OfM2RUbHAMscAM/MwH2BYuTnuAlBaddNOovIx0PX7igTtzV/OKp/DnHblxdo5nYE8vrW
+         q4u/ZJ/UaaEBlOGSZ5Y0UIeHbt1AgVGpbfaa1ZNp5/y5pK9j0vlnUofKqxEKOG6DysL1
+         +qas8DcyZAVnlw6oNQn5Z8K+nfHnUAWXi6kdw+AJStROs9s/i5U4O3VXO7AbHiXEWk1A
+         nwAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708118323; x=1708723123;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=d0ALIyLJQOD7Y1oSXLJGwwO+HUyvfSbunY9m+pRm/cs=;
+        b=Y6eZCf8IAIZaW8PNHp46hAJU7nkr8ICLSlX1mdSBeNNlalaEzGdr12GoPzNnKjBtO9
+         zTnIfmTciKmaNZe4IczPBokKykiWwEIRcfL+oHZOYwkZV11oRU0vPjBE+zUkXfMZ4XuV
+         qavsxFrAE0i4FQ9f5uVsllnTGaAEF91skr8bxnh7GYMePU+V/0YFK1naxeRovYAgeRWw
+         El4IzLfKbV4i6OzRRP+He9zPqo90rYp9V/FUUQNSxNYbSl9xfoCtefYWZYhS15QdubT0
+         vQbybEoSbMmo3P0cbXBGTmoK8GaW/+RFZH4FPIODLJzT+hSi0VL1vi03JLhc8qO9WwwY
+         7utA==
+X-Gm-Message-State: AOJu0YzOznVgh6IbcWt5hIRoqkPzJPmJeVPIX8mRby8H0nb0Vuy/BEJp
+	7rStVVYoltxdCX75gwBNhMkyrwziNUcLwrbygq6JGVpZCpfmKWaG1sse7F/hAt632eVv+5s0XhJ
+	gjlb2byPYaQyPP/Nc2fgwj0jW6W8MD5RhkTGmZw2rWcxfvuU=
+X-Google-Smtp-Source: AGHT+IEWv6uh5bOVz9Y/JJpHWRPR9H86cGzqsIav8/KYbYNZDCULR1sXVJhtTaXjNLWlN1c4KpFkWgXITxioJ+mau6I=
+X-Received: by 2002:a81:4902:0:b0:607:ce8e:fe26 with SMTP id
+ w2-20020a814902000000b00607ce8efe26mr6050567ywa.14.1708118321976; Fri, 16 Feb
+ 2024 13:18:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR11MB6435:EE_|DS0PR11MB7262:EE_
-X-MS-Office365-Filtering-Correlation-Id: 03e35de4-f189-4a2c-317b-08dc2f3454e0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: mTV3PD38X5dDwxWOHTs83OGsXqp8CYQ7zIE/iY+fpcegpL75MgNUv9+K/fr62GDWhKnbOuXLJqaAmmLZ4sHhXGpfgxrJmePbDVGECQ6bvMvHcrFLQgYG+tEQ/dTdRVkFFum05JDfQXkYbQZA8N40htPd8awdOdFX2d1NkCaKESSmss97GjruDawHYnVpZnZu3DqDtMELGc064r/VXP55vu4nzbumfC+trxiLrAPxEojGKbIRqDonUVsXQ98SB0Na3JL6B/Th8Uxfn99MB4U7UaMbxFtXVFBys1x67PKaocOBBdforsGxq2jJ7Geb6eI2NGENvkvCYw2vPYQEqyZGVp2mQ0vvmUc8BeILQhLJtEw5YadGN2FmFdS3ZuVTBpKjIEBCu2EFYwneobCRaIHs725y8z56fW93yc0WU0XvR13azDYt2YAuNtD5t/R3rrqOqzTOpEpKtWYBCfvQnaNm3RulyYSlyGdQ1kbhlrHr0xS36VJ7+mMuPU5j8LSzruJ0OZn8SBa9YMMWLjXf9V+W22j0fL4Y8ePkRzsuu1T20WU=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(346002)(136003)(396003)(366004)(376002)(230922051799003)(64100799003)(186009)(1800799012)(451199024)(8676002)(41300700001)(316002)(26005)(4326008)(2616005)(6916009)(8936002)(66946007)(66556008)(66476007)(6666004)(478600001)(966005)(6486002)(53546011)(54906003)(6506007)(6512007)(38100700002)(82960400001)(36756003)(86362001)(31696002)(31686004)(5660300002)(4744005)(2906002)(7416002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cHFUYTJnSDY2QUdoNmNzVDY3MlEzOEd5QmZYTnhWT0FORkhpVGRERlNDZE5x?=
- =?utf-8?B?VnMwZmZORmlmb1dZMW1oMUo3ZnN0NEFpdG5MV2IvUVl6TDkwb1hwOU9zTWFK?=
- =?utf-8?B?ajlsQXU4MjBWekhHY0FrbEVuTTR6ZDJIOW91cUR4bFlmdFpjWmluejNUZTJ0?=
- =?utf-8?B?cnpwcG1EQmtaZ2pJK1dobGlEZnNRRzRLZFdYMUZLc0lmcHdub1ErT2NGWTN0?=
- =?utf-8?B?UE1TWERUQkJjYzVhWTE1NzlrQ2Q4bDVjVkp4bS9wYXZQYXF6UW5QNXRNWkJK?=
- =?utf-8?B?RXROT25aMlBxQ1JQU3VQb2VZbmJLMlFzdFNBbkJSY21wL0l1S0o2UUFUSkl0?=
- =?utf-8?B?OGxrN1cxR0hOSDRMU0c4NysxVURLWWxvU0MrdHlpVVBFR1Y3ZEptbXRMQWo2?=
- =?utf-8?B?b0JTdkI3alJkMXd0R2YvYURhY2pDS0QzZnBRTnFQSDdhWTVDajk2VmlFQUhQ?=
- =?utf-8?B?bi9Bb0xIRUh5QVR3bFZIb1Q1STVvRHN6d1A3TG5mNFlZS21LWHhidk40NG5j?=
- =?utf-8?B?SjNmL3ZXdnBrWTl1d0cwMDIzRXQ2NkJESTZWTURQNERqL2h3dXQ5Y1Y4ZlZp?=
- =?utf-8?B?Vk1rQkZFZ2tyVmF6SVAwUXpwdGIxZ0ltRTNrZ0FsT09VeDNoeDljUGl4b1Ev?=
- =?utf-8?B?NEphaDdwM0U2Zlh2bEdUV0NhZlV6WnFIeW9WSGRRWG9DVlUyVkFKZ0xCM1FP?=
- =?utf-8?B?NTBvRVlFMklWczhDaW90S3hINTV4RkRrSGRzSkpYZHVpMlhhckdRVy8waitM?=
- =?utf-8?B?Q3QxTnNlNVN5MU43OWY5cXkycTVRTGJsVXNDakZUNEtsWExocm4xRzhKcmgx?=
- =?utf-8?B?NnlHWUhPTkh3c2FUQzRFZjZhcm1sL3dvQ3o2dTBQNlZKRnJFbHVqRTJrZWZI?=
- =?utf-8?B?SzlKKzY5MklLS09yM3BlRkphNjB0b2Z2aFlFcStSaTdJTkRlQ0w4bksyR0tT?=
- =?utf-8?B?YVhzMmhjaHI0cnl0cmIyK1Rkc0dDUWxyaW03S3FKWG13bWhOYVF0WTFGKzg2?=
- =?utf-8?B?WWhOWVJVZEV3TmxiK3BLRFZTNTlFNHFKZCtXQnV0djFGOTN4VUZrZVl5V1ZK?=
- =?utf-8?B?bVBBMTZxOGQ4dURxa09CWjh3VURwYkdXZnAzdjc0NzZxbWxsOFFkV2kzbmQw?=
- =?utf-8?B?cldYZllacVoyeFNNTktjN3haOExwc0hnTHRXWjBLS0R4WVhhck5ZUGRYVzY1?=
- =?utf-8?B?WUJlaERHTG8xRDlmT1FvTXJ0THpLTmNSL2E4clBDbW02Rk0xUkp0dmNmeHV1?=
- =?utf-8?B?NkttdGIyVFN4RXRITElldkswY01aYUVtRHZqR1FsUmNGM0IyMHMyYi9IZ2tk?=
- =?utf-8?B?MUM3S3dlR0RrbXoxMVd5T1JBQml4R0MwZUFxcVpTdTQ2S3dCT3lKR0NEaVBo?=
- =?utf-8?B?aEdKZm5BaG9NNnJjYmtlaFlBWEoxN1MyTW05eVJBTGUvbWQ5K1pmdUJHK2k4?=
- =?utf-8?B?cGxoT2hrM3R4WVZiYzBzUHhQY29hcVNjVGVZUStaN1pVTGR4dUd6S3dlOXlm?=
- =?utf-8?B?eWYwcEZsMXFDOHpTZzBmT1c5WDF1ZHV6YXF0OXVKK25hckQ5SG5sWThhTVJI?=
- =?utf-8?B?Z1lrZmVTTEgwbk85ZnBySEkrVE9NTzNYcmRNVTV3bjRwcG1WSnFhd3N1MGxm?=
- =?utf-8?B?U3hMUy9jN0ovdlB3a3VML0VocUtiaTJOWUQxbWZTREd6QXJqcHQ3MFppUmgw?=
- =?utf-8?B?UXRndGlQMTFMRy80V0oxUmJISllMZUxSemRUV0pnUXNqMkVNRW1WY2V4ZURj?=
- =?utf-8?B?cGRsMFNZdVAzN0R6ZG5jQTRjMVdNUndTVkRDYktYTmk4NGhxSmd3SmJWMm5I?=
- =?utf-8?B?QTgwMzdHOGNMUWtWSnhWRjhFaDk4YkhERjBRYUd5UGdxZGl2SmJHcmlmclJv?=
- =?utf-8?B?aHo4NjU5a2Z3OG9OZDVkY0FWUzl0NGdtR1V2Wkd3N1FBVlFZUGZWOXQvUzRz?=
- =?utf-8?B?RXZqMUZrZzIrRUF6eTB0N0tzV3FFb29WU3FBY1YzbUR0Rkg4Z0JuSHkvemZ1?=
- =?utf-8?B?Mm5tZlViTFJ1OG93OVNYTkJaQzFvTDJxSTY2OGhmR3REMi9Cb0k3TmJTdEw3?=
- =?utf-8?B?bnlyVW5PdFk3dllmRXBMNEhENzBqeGpKM0VWWUlNS0tiU3JvQXJCc2NHQkhj?=
- =?utf-8?B?ZTdqa3dYZDY1bHN4aVdmM2pLZHdaUkJJaXluSTJSV1JlcTcxWDRjbVYyS1U3?=
- =?utf-8?B?ZkE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 03e35de4-f189-4a2c-317b-08dc2f3454e0
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Feb 2024 21:14:59.0626
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JvtfzDvjW766UB50sVJTQC3W88GpXEw/vx8sE8VLXZibtW+EKQ3HTjPGrC3MooHvtcsr2ypI6rJ/0c9Wy5MizWu9Cx/nskxb9mGXUs3saEQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7262
-X-OriginatorOrg: intel.com
+References: <20240122194801.152658-1-jhs@mojatatu.com> <20240122194801.152658-16-jhs@mojatatu.com>
+ <6841ee07-40c6-9a67-a1a7-c04cbff84757@iogearbox.net> <CAM0EoMnjEpZrajgfKLQhsJjDANsdsZf3z2W8CT9FTMQDw2hGMw@mail.gmail.com>
+ <a567ac93-2564-2235-b65f-d0940da076a5@iogearbox.net> <CAM0EoM=XPJ96s3Y=ivrjH-crGb6hRu4hi90WB-O_SkxvLZNYpQ@mail.gmail.com>
+In-Reply-To: <CAM0EoM=XPJ96s3Y=ivrjH-crGb6hRu4hi90WB-O_SkxvLZNYpQ@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Fri, 16 Feb 2024 16:18:30 -0500
+Message-ID: <CAM0EoM=TfDESv=Ewsf_HM3aN+p+718DXoVm-vvmz+5+7-9z3dQ@mail.gmail.com>
+Subject: Re: [PATCH v10 net-next 15/15] p4tc: add P4 classifier
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
+	namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com, 
+	Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, jiri@resnulli.us, 
+	xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org, 
+	khalidm@nvidia.com, toke@redhat.com, mattyk@nvidia.com, bpf@vger.kernel.org, 
+	Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2/16/2024 6:14 AM, Takeru Hayasaka wrote:
-> Hi Tony-san and Paolo-san!
-> 
->>> The series LGTM. I *think* the series should go first in the intel
-> 
-> Thank you both for picking up on the topic!
-> 
->> I agree. I think it would make sense for this to go through IWL.
-> 
-> I understand. So, it means that it will go through the IWL branch and
-> then through net-next.
+On Thu, Jan 25, 2024 at 12:59=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com=
+> wrote:
+>
+> On Thu, Jan 25, 2024 at 10:47=E2=80=AFAM Daniel Borkmann <daniel@iogearbo=
+x.net> wrote:
+> >
+> > On 1/24/24 3:40 PM, Jamal Hadi Salim wrote:
+> > > On Wed, Jan 24, 2024 at 8:59=E2=80=AFAM Daniel Borkmann <daniel@iogea=
+rbox.net> wrote:
+> > >> On 1/22/24 8:48 PM, Jamal Hadi Salim wrote:
+> > [...]
+> > >>>
+> > >>> It should also be noted that it is feasible to split some of the in=
+gress
+> > >>> datapath into XDP first and more into TC later (as was shown above =
+for
+> > >>> example where the parser runs at XDP level). YMMV.
+> > >>> Regardless of choice of which scheme to use, none of these will aff=
+ect
+> > >>> UAPI. It will all depend on whether you generate code to load on XD=
+P vs
+> > >>> tc, etc.
+> > >>>
+> > >>> Co-developed-by: Victor Nogueira <victor@mojatatu.com>
+> > >>> Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+> > >>> Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
+> > >>> Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+> > >>> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> > >>
+> > >> My objections from last iterations still stand, and I also added a n=
+ak,
+> > >> so please do not just drop it with new revisions.. from the v10 as y=
+ou
+> > >> wrote you added further code but despite the various community feedb=
+ack
+> > >> the design still stands as before, therefore:
+> > >>
+> > >> Nacked-by: Daniel Borkmann <daniel@iogearbox.net>
+> > >
+> > > We didnt make code changes - but did you read the cover letter and th=
+e
+> > > extended commentary in this patch's commit log? We should have
+> > > mentioned it in the changes log. It did respond to your comments.
+> > > There's text that says "the filter manages the lifetime of the
+> > > pipeline" - which in the future could include not only tc but XDP but
+> > > also the hardware path (in the form of a file that gets loaded). I am
+> > > not sure if that message is clear. Your angle being this is layer
+> > > violation. In the last discussion i asked you for suggestions and we
+> > > went the tcx route, which didnt make sense, and  then you didnt
+> > > respond.
+> > [...]
+> >
+> > >> Also as mentioned earlier I don't think tc should hold references on
+> > >> XDP programs in here. It doesn't make any sense aside from the fact
+> > >> that the cls_p4 is also not doing anything with it. This is somethin=
+g
+> > >> that a user space control plane should be doing i.e. managing a XDP
+> > >> link on the target device.
+> > >
+> > > This is the same argument about layer violation that you made earlier=
+.
+> > > The filter manages the p4 pipeline - i.e it's not just about the ebpf
+> > > blob(s) but for example in the future (discussions are still ongoing
+> > > with vendors who have P4 NICs) a filter could be loaded to also
+> > > specify the location of the hardware blob.
+> >
+> > Ah, so there is a plan to eventually add HW offload support for cls_p4?
+> > Or is this only specifiying a location of a blob through some opaque
+> > cookie value from user space?
+>
+> Current thought process is it will be something along these lines (the
+> commit provides more details):
+>
+> tc filter add block 22 ingress protocol all prio 1 p4 pname simple_l3 \
+>    prog type hw filename "mypnameprog.o" ... \
+>    prog type xdp obj $PARSER.o section parser/xdp pinned_link
+> /sys/fs/bpf/mylink \
+>    action bpf obj $PROGNAME.o section prog/tc-ingress
+>
+> These discussions are still ongoing - but that is the current
+> consensus. Note: we are not pushing any code for that, but hope it
+> paints the bigger picture....
+> The idea is the cls p4 owns the lifetime of the pipeline. Installing
+> the filter instantiates the p4 pipeline "simple_l3" and triggers a lot
+> of the refcounts to make sure the pipeline and its components stays
+> alive.
+> There could be multiple such filters - when someone deletes the last
+> filter, then it is safe to delete the pipeline.
+> Essentially the filter manages the lifetime of the pipeline.
+>
+> > > I would be happy with a suggestion that gets us moving forward with
+> > > that context in mind.
+> >
+> > My question on the above is mainly what does it bring you to hold a
+> > reference on the XDP program? There is no guarantee that something else
+> > will get loaded onto XDP, and then eventually the cls_p4 is the only
+> > entity holding the reference but w/o 'purpose'. We do have BPF links
+> > and the user space component orchestrating all this needs to create
+> > and pin the BPF link in BPF fs, for example. An artificial reference
+> > on XDP prog feels similar as if you'd hold a reference on an inode
+> > out of tc.. Again, that should be delegated to the control plane you
+> > have running interacting with the compiler which then manages and
+> > loads its artifacts. What if you would also need to set up some
+> > netfilter rules for the SW pipeline, would you then embed this too?
+>
+> Sorry, a slight tangent first:
+> P4 is self-contained, there are a handful of objects that are defined
+> by the spec (externs, actions, tables, etc) and we model them in the
+> patchset, so that part is self-contained. For the extra richness such
+> as the netfilter example you quoted - based on my many years of
+> experience deploying SDN - using daemons(sorry if i am reading too
+> much in what I think you are implying) for control is not the best
+> option i.e you need all kinds of coordination - for example where do
+> you store state, what happens when the daemon dies, how do you
+> graceful restarts etc. Based on that, if i can put things in the
+> kernel (which is essentially a "perpetual daemon", unless the kernel
+> crashes) it's a lot simpler to manage as a source of truth especially
+> when there is not that much info. There is a limit when there are
+> multiple pieces (to use your netfilter example) because you need
+> another layer to coordinate things.
+>
+> Re: the XDP part - our key reason is mostly managerial, in that the
+> filter is the lifetime manager of the pipeline; and that if i dump
+> that filter i can see all the details in regards to the pipeline(tc,
+> XDP and in future hw, etc) in one spot. You are right, the link
+> pinning is our protection from someone replacing the XDP prog (this
+> was a tip from Toke in the early days) and the comparison of tc
+> holding inode is apropos.
+> There's some history: in the early days we were also using metadata
+> which comes from the XDP program at the tc layer if more processing
+> was to be done (and there was extra metadata which told us which XDP
+> prog produced it which we would vet before trusting the metadata).
+> Given all the above, we should still be able to hold this info without
+> necessarily holding the extra refcount and be able to see this detail.
+> So we can remove the refcounting.
+>
 
-Yes, it will go through next-queue/dev-queue and then to net-next
-https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue.git/
+Daniel?
 
-> Is there any assistance I can provide to facilitate this process?
+cheers,
+jamal
 
-Everything is good for now. If we have issues or questions we will reach 
-out to you.
 
-Thanks,
-Tony
-
-> Thanks,
-> Takeru
+> cheers,
+> jamal
+>
+> > Thanks,
+> > Daniel
 
