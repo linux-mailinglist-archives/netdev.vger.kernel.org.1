@@ -1,145 +1,140 @@
-Return-Path: <netdev+bounces-72349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36432857A67
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 11:38:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9432857A66
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 11:38:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1600284C12
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 10:38:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0DFDDB21988
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 10:37:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77DFC47A61;
-	Fri, 16 Feb 2024 10:37:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D501750264;
+	Fri, 16 Feb 2024 10:37:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=analog.com header.i=@analog.com header.b="zLGiLBps"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YV83zgHC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00128a01.pphosted.com (mx0a-00128a01.pphosted.com [148.163.135.77])
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C57975024B;
-	Fri, 16 Feb 2024 10:37:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D63B47A61
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 10:37:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708079876; cv=none; b=tOMUib/PqSVjhINvGd5s/oMbJKu+5TbMyD0huJ8L46jAU3RlWPwLoy6whnMFoUn51IsZF/FsOq3KfbdiGnK0Tuys4feK023vG9Fp9DY1q6FvqAkYbtMr+kGocS4eS9bD44tw1BWOykVSRQTJJeWnrMm2ZxyAbyk6oSV6ojSaEbY=
+	t=1708079874; cv=none; b=EujyrRAu4mOyHUybhbumrXJrQh/4Mfrer4i87XaoHMocN+guDgwOFrviaowchbzuS4kcdItahWU971Teh9uzg2Xjhz0RfOBSNk1bEZeEfm3cAAOtMaM7orSXd0pQGAyxZSlst6DWRriaTsjtRez63T2/7q6ChrlcExk0eXpXpKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708079876; c=relaxed/simple;
-	bh=7w5jv6QBk2/9lvLC8JIUUMdOq38VCmIKWqk57My91PY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NAIb1TEMOwDtxPYQwB5RlLdGqvL0EIv3scvOmnhQq2GdneuRdAZ0mpZuildADrUod2xVwrOGPZSw17nLdQMwYsD3c0bf8JkkM94K4ntkuwKOKZi/Gcosz7O5lKarsr7TXBUfJPTMXM+6PxhEtEhhaCYKwP4C8hpMcCwak2wl1Po=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=analog.com; spf=pass smtp.mailfrom=analog.com; dkim=pass (2048-bit key) header.d=analog.com header.i=@analog.com header.b=zLGiLBps; arc=none smtp.client-ip=148.163.135.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=analog.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=analog.com
-Received: from pps.filterd (m0167089.ppops.net [127.0.0.1])
-	by mx0a-00128a01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41G8fACY027604;
-	Fri, 16 Feb 2024 05:37:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=analog.com; h=
-	from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding:content-type; s=DKIM; bh=B9bLeUCJqfKS
-	KnaFxbVP0cIjyGkssCt+mEyA8pb9+8c=; b=zLGiLBpswe9EbCqe+UAuMKtQeRyl
-	IQXpaXEzUHB+g/fWVw/tdJGIZSKH/nT0xGseUGOpjtY3Uru0sVyJ9fgNDvlrvhaG
-	ZyofzOpn1Q3Tof/1e5HyEAWrbKA2mVGXiXqxo7UXdwcjDwnxWZraWU939+2NKWkU
-	oVIXbZwRSKPSzNRiGBa/V41/LrHbG8nRwTRgVkD/wgCDWbRFElxN06eKvzlD62DQ
-	myooyP7vLdgG8vLWCR7rpWFw+KxRVSpwuVSR6mEo9KupmQkgQOXrGZ/yw6OmcYLQ
-	ul/tVkverWVJ++vpaj2aBraMbdF35h9T5wX1tU1KBensItt5eWfZ7n0gRA==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-00128a01.pphosted.com (PPS) with ESMTPS id 3w92gcgj6n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 16 Feb 2024 05:37:38 -0500 (EST)
-Received: from m0167089.ppops.net (m0167089.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.24/8.17.1.24) with ESMTP id 41GAbc6u025252;
-	Fri, 16 Feb 2024 05:37:38 -0500
-Received: from nwd2mta4.analog.com ([137.71.173.58])
-	by mx0a-00128a01.pphosted.com (PPS) with ESMTPS id 3w92gcgj6k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 16 Feb 2024 05:37:38 -0500 (EST)
-Received: from ASHBMBX8.ad.analog.com (ASHBMBX8.ad.analog.com [10.64.17.5])
-	by nwd2mta4.analog.com (8.14.7/8.14.7) with ESMTP id 41GAbbdV011414
-	(version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 16 Feb 2024 05:37:37 -0500
-Received: from ASHBCASHYB4.ad.analog.com (10.64.17.132) by
- ASHBMBX8.ad.analog.com (10.64.17.5) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.14; Fri, 16 Feb 2024 05:37:36 -0500
-Received: from ASHBMBX9.ad.analog.com (10.64.17.10) by
- ASHBCASHYB4.ad.analog.com (10.64.17.132) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.14; Fri, 16 Feb 2024 05:37:36 -0500
-Received: from zeus.spd.analog.com (10.66.68.11) by ashbmbx9.ad.analog.com
- (10.64.17.10) with Microsoft SMTP Server id 15.2.986.14 via Frontend
- Transport; Fri, 16 Feb 2024 05:37:36 -0500
-Received: from debian.ad.analog.com ([10.48.65.188])
-	by zeus.spd.analog.com (8.15.1/8.15.1) with ESMTP id 41GAbG9P004173;
-	Fri, 16 Feb 2024 05:37:19 -0500
-From: Ciprian Regus <ciprian.regus@analog.com>
-To: <linux-kernel@vger.kernel.org>
-CC: Ciprian Regus <ciprian.regus@analog.com>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>,
-        Dell Jin <dell.jin.code@outlook.com>,
-        "Amit Kumar
- Mahapatra" <amit.kumar-mahapatra@amd.com>,
-        Yang Yingliang
-	<yangyingliang@huawei.com>, <netdev@vger.kernel.org>
-Subject: [net-next] net: ethernet: adi: adin1110: Reduce the MDIO_TRDONE poll interval
-Date: Fri, 16 Feb 2024 12:36:32 +0200
-Message-ID: <20240216103636.1231815-1-ciprian.regus@analog.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1708079874; c=relaxed/simple;
+	bh=zSxuOcQydPZO/thKgJiAI/eeN26OyT9n+VxXKUnZIOg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=NXDbs12onPYMk8fRFf3+xg4LhzJpcOM9unx+YC4jCrVXzjRnCVB6oxOALVKyY42LF7ADX5TzC5cUbFERZMbM51WnwEFPu6sJbaMjP88PZpridt7o4/R2eWrHPAqdCAE389yrmsEk/EBkp4vBoDMd4I03JKkf36j6UIAr/Ze2MlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=YV83zgHC; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
+	:In-Reply-To:From:References:To:Subject:MIME-Version:Date:Message-ID:Sender:
+	Reply-To:Cc:Content-ID:Content-Description;
+	bh=8qSHjqBvLAcDjd38RNeBMUhMumamJFd2MHylRlOvUFI=; b=YV83zgHC3Hi/88R5h+/taKOn7u
+	PzuMsdTfNc9jgVSTZNk5KHY09USVw1e5fwA7i59hvpAvfL8IGvcFaeF2gt0pyc29jYWVgAR1FSzK5
+	wO5ETNBDKuikS718w/x2hoQe6r4qBFoLWuSWDZMavif40J8px5NP5joWtoQQuYxouwT/WX/fi/2Kn
+	GnhuFsTetooUwfG9AizjRGOsOs5nvYsZHOrVk+mgVBm/AUZizpGRn3ZAbaIkrt++IuWH3PpsepyU3
+	XmQGfre8UOfZrXKY8RN3Z4YB/XW/19eO+4aMUYR8sHahoCzsKyAJtp6Z5xjY4ix2br8/WuT7CtkX/
+	QrNkD1bA==;
+Received: from fpd2fa7e2a.ap.nuro.jp ([210.250.126.42] helo=[192.168.1.6])
+	by desiato.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1ravbB-0000000HRDr-3iVO;
+	Fri, 16 Feb 2024 10:37:42 +0000
+Message-ID: <64f7670f-b9b9-4d05-b6b7-630f0e5837fc@infradead.org>
+Date: Fri, 16 Feb 2024 19:37:35 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 net] ps3/gelic: Fix SKB allocation
+Content-Language: en-US
+To: Paolo Abeni <pabeni@redhat.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ sambat goson <sombat3960@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <4a6ab7b8-0dcc-43b8-a647-9be2a767b06d@infradead.org>
+ <125361c7ec88478e04595a53aacc406ef656f136.camel@redhat.com>
+ <7b695ae5-f7ce-454e-b94a-295013efddb5@csgroup.eu>
+ <e29708440f07273fe93e3a1a7922428980f3e4a7.camel@redhat.com>
+From: Geoff Levand <geoff@infradead.org>
+In-Reply-To: <e29708440f07273fe93e3a1a7922428980f3e4a7.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ADIRuleOP-NewSCL: Rule Triggered
-X-Proofpoint-GUID: m7CAQch-jsXTH0TAdM9zbKcBG5odpx97
-X-Proofpoint-ORIG-GUID: 3bZ3h3fFse4KJ4_pUxIIwv7L30dHJ7wo
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-16_08,2024-02-14_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- clxscore=1011 priorityscore=1501 phishscore=0 spamscore=0 adultscore=0
- impostorscore=0 malwarescore=0 mlxlogscore=521 bulkscore=0 mlxscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2401310000 definitions=main-2402160086
 
-In order to do a clause 22 access to the PHY registers of the ADIN1110,
-we have to write the MDIO frame to the ADIN1110_MDIOACC register, and
-then poll the MDIO_TRDONE bit (for a 1) in the same register. The
-device will set this bit to 1 once the internal MDIO transaction is
-done. In practice, this bit takes ~50 - 60 us to be set.
+On 2/13/24 22:09, Paolo Abeni wrote:
+> On Tue, 2024-02-13 at 12:56 +0000, Christophe Leroy wrote:
+>>
+>> Le 13/02/2024 à 13:07, Paolo Abeni a écrit :
+>>> On Sat, 2024-02-10 at 17:15 +0900, Geoff Levand wrote:
+>>>> Commit 3ce4f9c3fbb3 ("net/ps3_gelic_net: Add gelic_descr structures") of
+>>>> 6.8-rc1 did not allocate a network SKB for the gelic_descr, resulting in a
+>>>> kernel panic when the SKB variable (struct gelic_descr.skb) was accessed.
+>>>>
+>>>> This fix changes the way the napi buffer and corresponding SKB are
+>>>> allocated and managed.
+>>>
+>>> I think this is not what Jakub asked on v3.
+>>>
+>>> Isn't something alike the following enough to fix the NULL ptr deref?
+>>
+>> If you think it is enough, please explain in more details.
+> 
+> I'm unsure it will be enough, but at least the quoted line causes a
+> NULL ptr dereference:
+> 
+> 	descr->skb = netdev_alloc_skb(*card->netdev, rx_skb_size);
+> 	if (!descr->skb) {
+> 		descr->hw_regs.payload.dev_addr = 0; /* tell DMAC don't touch memory */
+> 		return -ENOMEM;
+> 	}
+> 	// here descr->skb is not NULL...
+> 
+> 	descr->hw_regs.dmac_cmd_status = 0;
+> 	descr->hw_regs.result_size = 0;
+> 	descr->hw_regs.valid_size = 0;
+> 	descr->hw_regs.data_error = 0;
+> 	descr->hw_regs.payload.dev_addr = 0;
+> 	descr->hw_regs.payload.size = 0;
+> 	descr->skb = NULL;
+> 	// ... and now it's NULL for no apparent good reason
 
-The first attempt to poll the bit is right after the ADIN1110_MDIOACC
-register is written, so it will always be read as 0. The next check will
-only be done after 10 ms, which will result in the MDIO transactions
-taking a long time to complete. Reduce this polling interval to 100 us.
+As I mentioned in an earlier mail, the SKB pointer is set to NULL
+so we can detect if an SKB has been allocated.
+ 
+> 
+> 	offset = ((unsigned long)descr->skb->data) &
+>         //                            ^^^^^^^ NULL ptr deref
+> 
+> 		(GELIC_NET_RXBUF_ALIGN - 1);
+> 	if (offset)
+> 		skb_reserve(descr->skb, GELIC_NET_RXBUF_ALIGN - offset);
+> 	/* io-mmu-map the skb */
+> 	cpu_addr = dma_map_single(ctodev(card), descr->skb->data,
+> 				  GELIC_NET_MAX_FRAME, DMA_FROM_DEVICE);
+> 
+> 
+> The buggy line in introduced by the blamed commit.
+> 
+>>  From my point of view, when looking at commit 3ce4f9c3fbb3 
+>> ("net/ps3_gelic_net: Add gelic_descr structures") that introduced the 
+>> problem, it is not obvious.
+> 
+> That change is quite complex. It could includes other issues - quickly
+> skimming over it I could not see them.
 
-Signed-off-by: Ciprian Regus <ciprian.regus@analog.com>
----
- drivers/net/ethernet/adi/adin1110.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+The proposed change was tested by both Sambat and I.  It fixes the
+problem, and no ill effects were seen.
 
-diff --git a/drivers/net/ethernet/adi/adin1110.c b/drivers/net/ethernet/adi/adin1110.c
-index d7c274af6d4d..6fca19e6ae67 100644
---- a/drivers/net/ethernet/adi/adin1110.c
-+++ b/drivers/net/ethernet/adi/adin1110.c
-@@ -467,3 +467,3 @@ static int adin1110_mdio_read(struct mii_bus *bus, int phy_id, int reg)
- 	ret = readx_poll_timeout(adin1110_read_mdio_acc, priv, val,
--				 (val & ADIN1110_MDIO_TRDONE), 10000, 30000);
-+				 (val & ADIN1110_MDIO_TRDONE), 100, 30000);
- 	if (ret < 0)
-@@ -498,3 +498,3 @@ static int adin1110_mdio_write(struct mii_bus *bus, int phy_id,
- 	return readx_poll_timeout(adin1110_read_mdio_acc, priv, val,
--				  (val & ADIN1110_MDIO_TRDONE), 10000, 30000);
-+				  (val & ADIN1110_MDIO_TRDONE), 100, 30000);
- }
--- 
-2.39.2
+-Geoff
+
 
 
