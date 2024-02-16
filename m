@@ -1,141 +1,183 @@
-Return-Path: <netdev+bounces-72398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE7F2857E5D
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 15:01:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E58C9857E5F
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 15:01:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E89AB228E6
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 14:00:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F07051C247C8
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 14:01:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1684C12C55F;
-	Fri, 16 Feb 2024 14:00:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5638212BF17;
+	Fri, 16 Feb 2024 14:01:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VgPIHn++"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="cZ9dnzPn"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF80E12C547
-	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 14:00:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0E461BDD8;
+	Fri, 16 Feb 2024 14:01:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708092047; cv=none; b=DEJ0JhBGjitHELuG2xXqLF4QjWGkH58tFNSQJrkZvo8p8PyQHrrHEm0lhXkkRHvcCuS0PqIv7DuqjlpUIPd9NCVQxL9Ijzqs6EP8Os2bB29J1SvrY4kMACJ5+j/DcL+cDFQjrvNJsMEKjiUNdlWS0rvu/8DH+lgKGynO3Dx++iY=
+	t=1708092081; cv=none; b=IcdNu54ThYw05RMrVQ4rxxk/VD3b1p0X8r3ARYomWXoCMniQCL0m2nVCcyanbHhDSKoz7jvS2kY021+jQnprVnZtX1WUsGU6QIBR18vh6Yc0Je73y0SoG7VklVeB0bYY7ADc+6gn3jJOF4SiQq6TvJHQD0b5XYaNrnNc6jQWblc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708092047; c=relaxed/simple;
-	bh=21ncnwEnUoXv+hRqMt7TP45+3FncijYHN5SkzR1tt8g=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=lDp/KgnK/Wf9RlCqaF8Sg4cuRivOmYFmzZsqbMCSQMH8XFTt7tSo1HyuAqUMlyxRJMseFrx1bY2nXbvDQeX73yK9lOCqK/XyiqUPhOh5ctBooDyiPMlBMwj9m0qsgBWaOc4Q+PEPY7HmDtB3S9DhElzL1r3VoplCWvGeAVRHcCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VgPIHn++; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708092043;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=21ncnwEnUoXv+hRqMt7TP45+3FncijYHN5SkzR1tt8g=;
-	b=VgPIHn++YfpHdQqR6DSBLjZ3CekDZh2RNoLshGN0xqJhXShEzg0hlqhOVxUnpLUC516r93
-	LY+hVozaiwbJaqhMMwTB0qiHNTI7F7c5Jk45Va/Eej+t/nBNVYEtHi4KX17cZnR4vyHMSA
-	5mnmYpV0IBumGEmqo5RDzdliltfdUQ4=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-21-rxU_7OG7N7OhUEXJj28jow-1; Fri, 16 Feb 2024 09:00:42 -0500
-X-MC-Unique: rxU_7OG7N7OhUEXJj28jow-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-55926c118e5so1738441a12.3
-        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 06:00:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708092040; x=1708696840;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=21ncnwEnUoXv+hRqMt7TP45+3FncijYHN5SkzR1tt8g=;
-        b=g+xS4AtwEskw0lUbtAZNMIg8cN0Fg19ZI4ROtiUr6VpsgEJVKjGntxW9j0n4wH8Yx6
-         itV3hW5bj7Ar3N6Qt+p0Sek5edfEXqi23HIMDbBR4/GJysGt0PAearAF7vwmf4FRWvsa
-         BoBlLlk5J86KBIKwaTy9U/z4GN1bLK+E1LHWFK2Z+DCvN5ii61wGB9RRleXaskmjlEFZ
-         EOUSlBuTYy5w0zXdmUuqF3awXFeo506V6BBKeatEZ9bRO9ATLdjrTh5G3wn1xOfM+YzI
-         oN31mlK8rIcqDHFuWFJ/fxM3gb9jlZ4Ccqx++RAC5gpe7bULR8RZMSgOyZYF4d3XRfKq
-         JUPg==
-X-Forwarded-Encrypted: i=1; AJvYcCWi4g3+IW2FmCQF5/i2v7ioVieT+Ejm9gygXo49Jhis9a/rZzg19LL7+fM2nv+3hYHmmY4HwMz6OncHJHvsQ5iJzE+N21SM
-X-Gm-Message-State: AOJu0YyfE3g7JwTc4qh7rIegw5dq4H4Bu/6bTD1xGxcKyqPVsNswpI0p
-	HZSm+Yk+gfeAgcqqkuZxb051dkyEhRtOtACCNMcqA983D5qoRJ+xznE2+ElZG/gXzDKdvOaDmK+
-	1cqqrauq8RW+cy0czcsN0XZrYlyQIAPiRpt8Jl9KyvdhLSmqDgBaKkw==
-X-Received: by 2002:aa7:d39a:0:b0:560:4f1c:99c0 with SMTP id x26-20020aa7d39a000000b005604f1c99c0mr3754060edq.13.1708092040733;
-        Fri, 16 Feb 2024 06:00:40 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEH9qLErIx9BTiLXdRzSFEVfAu/4I+PSZLkGaxAafzAUsaGy/sW9sX57lS2R3vwbol5SzyQFA==
-X-Received: by 2002:aa7:d39a:0:b0:560:4f1c:99c0 with SMTP id x26-20020aa7d39a000000b005604f1c99c0mr3754022edq.13.1708092040363;
-        Fri, 16 Feb 2024 06:00:40 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id b2-20020a0564021f0200b00563b96523c5sm1346763edb.80.2024.02.16.06.00.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Feb 2024 06:00:39 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 8734310F5BE9; Fri, 16 Feb 2024 15:00:39 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
- Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
- <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
- <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
- Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
- netdev@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next 0/3] Change BPF_TEST_RUN use the system page
- pool for live XDP frames
-In-Reply-To: <a33c3cb6-a58c-440a-b296-7e062fa8f967@intel.com>
-References: <20240215132634.474055-1-toke@redhat.com>
- <4a1ef449-5189-4788-ae51-3d1c4a09d3a2@intel.com> <87mss1d5ct.fsf@toke.dk>
- <a33c3cb6-a58c-440a-b296-7e062fa8f967@intel.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Fri, 16 Feb 2024 15:00:39 +0100
-Message-ID: <87h6i8cxvc.fsf@toke.dk>
+	s=arc-20240116; t=1708092081; c=relaxed/simple;
+	bh=5x71ZGn9eERzODLmiS9usSdv9M+F4w7Rdht/BFSRVGg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=b2INoQdNLiD4NNhWljd9mKDQdp2q/xy8re+oBOvpqb45K6PhLo02Kz8f5Ko4DOVeYrbtF72lLk+6SM9GUdTaeU1hDKwzzO/kCw491snjIsNkSDKqsvWCk6GNmVpce9g2xY1nYEmkeEkBmFAXIe6AvJVBqBrg6t4fvGSUiYC3kVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=cZ9dnzPn; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 4C219600D4;
+	Fri, 16 Feb 2024 14:01:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1708092074;
+	bh=5x71ZGn9eERzODLmiS9usSdv9M+F4w7Rdht/BFSRVGg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=cZ9dnzPnX34nlCraw6AoRN8PlG5pr/ifB1VcDbL9L+8Fo/hWihXuViuFsOuT+2IPa
+	 k9GTHMc52z0wDq+2jhCDpWaB5weAI3xtiy0X4hQMk5qhGm7HjI8rwfmySdgysaouvy
+	 ovhiseL79cIukaRHVCagQ0/cx6DKJUxbSuwCBwKbUca1QHcsVIuV1Bjko1fCbCWkdY
+	 UHSERolsOWWdIM5IMko+0kcT33tXHfkrsbFq0gktkk9ULguqP6VLaSzLwH75JjMcfS
+	 U+v60dPfGaEYNpX1g9ICXTrboj6lBTMnshYIbU9u/kj3gF0wiOwqcCB2cgvRkaFoT4
+	 YOlGgr0s2AXbA==
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by x201s (Postfix) with ESMTP id 165CD2004F9;
+	Fri, 16 Feb 2024 14:01:07 +0000 (UTC)
+Message-ID: <28bf1467-b7ce-4e36-a4ef-5445f65edd97@fiberby.net>
+Date: Fri, 16 Feb 2024 14:01:06 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 3/3] net: sched: make skip_sw actually skip
+ software
+Content-Language: en-US
+To: Vlad Buslov <vladbu@nvidia.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
+ <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, llu@fiberby.dk
+References: <20240215160458.1727237-1-ast@fiberby.net>
+ <20240215160458.1727237-4-ast@fiberby.net> <871q9cdbyl.fsf@nvidia.com>
+From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
+In-Reply-To: <871q9cdbyl.fsf@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Alexander Lobakin <aleksander.lobakin@intel.com> writes:
+Hi Vlad,
 
-> From: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> Date: Thu, 15 Feb 2024 18:06:42 +0100
->
->> Alexander Lobakin <aleksander.lobakin@intel.com> writes:
->>=20
->>> From: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
->>> Date: Thu, 15 Feb 2024 14:26:29 +0100
->>>
->>>> Now that we have a system-wide page pool, we can use that for the live
->>>> frame mode of BPF_TEST_RUN (used by the XDP traffic generator), and
->>>> avoid the cost of creating a separate page pool instance for each
->>>> syscall invocation. See the individual patches for more details.
->>>
->>> Tested xdp-trafficgen on my development tree[0], no regressions from the
->>> net-next with my patch which increases live frames PP size.
->>>
->>> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
->>> Tested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
->>=20
->> Great, thanks for taking it for a spin! :)
->
-> BTW, you remove the usage of page_pool->slow.init_callback, maybe we
-> could remove it completely?
+On 2/16/24 08:47, Vlad Buslov wrote:
+> On Thu 15 Feb 2024 at 16:04, Asbjørn Sloth Tønnesen <ast@fiberby.net> wrote:
+>> TC filters come in 3 variants:
+>> - no flag (no opinion, process wherever possible)
+>> - skip_hw (do not process filter by hardware)
+>> - skip_sw (do not process filter by software)
+>>
+>> However skip_sw is implemented so that the skip_sw
+>> flag can first be checked, after it has been matched.
+>>
+>> IMHO it's common when using skip_sw, to use it on all rules.
+>>
+>> So if all filters in a block is skip_sw filters, then
+>> we can bail early, we can thus avoid having to match
+>> the filters, just to check for the skip_sw flag.
+>>
+>>   +----------------------------+--------+--------+--------+
+>>   | Test description           | Pre    | Post   | Rel.   |
+>>   |                            | kpps   | kpps   | chg.   |
+>>   +----------------------------+--------+--------+--------+
+>>   | basic forwarding + notrack | 1264.9 | 1277.7 |  1.01x |
+>>   | switch to eswitch mode     | 1067.1 | 1071.0 |  1.00x |
+>>   | add ingress qdisc          | 1056.0 | 1059.1 |  1.00x |
+>>   +----------------------------+--------+--------+--------+
+>>   | 1 non-matching rule        |  927.9 | 1057.1 |  1.14x |
+>>   | 10 non-matching rules      |  495.8 | 1055.6 |  2.13x |
+>>   | 25 non-matching rules      |  280.6 | 1053.5 |  3.75x |
+>>   | 50 non-matching rules      |  162.0 | 1055.7 |  6.52x |
+>>   | 100 non-matching rules     |   87.7 | 1019.0 | 11.62x |
+>>   +----------------------------+--------+--------+--------+
+>>
+>> perf top (100 n-m skip_sw rules - pre patch):
+>>    25.57%  [kernel]  [k] __skb_flow_dissect
+>>    20.77%  [kernel]  [k] rhashtable_jhash2
+>>    14.26%  [kernel]  [k] fl_classify
+>>    13.28%  [kernel]  [k] fl_mask_lookup
+>>     6.38%  [kernel]  [k] memset_orig
+>>     3.22%  [kernel]  [k] tcf_classify
+>>
+>> perf top (100 n-m skip_sw rules - post patch):
+>>     4.28%  [kernel]  [k] __dev_queue_xmit
+>>     3.80%  [kernel]  [k] check_preemption_disabled
+>>     3.68%  [kernel]  [k] nft_do_chain
+>>     3.08%  [kernel]  [k] __netif_receive_skb_core.constprop.0
+>>     2.59%  [kernel]  [k] mlx5e_xmit
+>>     2.48%  [kernel]  [k] mlx5e_skb_from_cqe_mpwrq_nonlinear
+>>
+>> Test setup:
+>>   DUT: Intel Xeon D-1518 (2.20GHz) w/ Nvidia/Mellanox ConnectX-6 Dx 2x100G
+>>   Data rate measured on switch (Extreme X690), and DUT connected as
+>>   a router on a stick, with pktgen and pktsink as VLANs.
+>>   Pktgen was in range 12.79 - 12.95 Mpps across all tests.
+>>
+>> Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
+>> ---
+>>   include/net/pkt_cls.h | 5 +++++
+>>   net/core/dev.c        | 3 +++
+>>   2 files changed, 8 insertions(+)
+>>
+>> diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
+>> index a4ee43f493bb..a065da4df7ff 100644
+>> --- a/include/net/pkt_cls.h
+>> +++ b/include/net/pkt_cls.h
+>> @@ -74,6 +74,11 @@ static inline bool tcf_block_non_null_shared(struct tcf_block *block)
+>>   	return block && block->index;
+>>   }
+>>   
+>> +static inline bool tcf_block_has_skip_sw_only(struct tcf_block *block)
+>> +{
+>> +	return block && atomic_read(&block->filtercnt) == atomic_read(&block->skipswcnt);
+>> +}
+> 
+> Note that this introduces a read from heavily contended cache-line on
+> data path for all classifiers, including the ones that don't support
+> offloads. Wonder if this a concern for users running purely software tc.
 
-Ohh, you're right. Totally forgot that this was something I introduced
-for this use case :D
+Unfortunately, I don't have access to any multi-CPU machines, so I haven't been
+able to test the impact of that.
 
-I'll send a follow-up to get rid of it after this lands.
+Alternatively I guess I could also maintain a static key in the counter update logic.
 
--Toke
 
+>> +
+>>   static inline struct Qdisc *tcf_block_q(struct tcf_block *block)
+>>   {
+>>   	WARN_ON(tcf_block_shared(block));
+>> diff --git a/net/core/dev.c b/net/core/dev.c
+>> index d8dd293a7a27..7cd014e5066e 100644
+>> --- a/net/core/dev.c
+>> +++ b/net/core/dev.c
+>> @@ -3910,6 +3910,9 @@ static int tc_run(struct tcx_entry *entry, struct sk_buff *skb,
+>>   	if (!miniq)
+>>   		return ret;
+>>   
+>> +	if (tcf_block_has_skip_sw_only(miniq->block))
+>> +		return ret;
+>> +
+>>   	tc_skb_cb(skb)->mru = 0;
+>>   	tc_skb_cb(skb)->post_ct = false;
+>>   	tcf_set_drop_reason(skb, *drop_reason);
+> 
+
+-- 
+Best regards
+Asbjørn Sloth Tønnesen
+Network Engineer
+Fiberby - AS42541
 
