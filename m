@@ -1,303 +1,204 @@
-Return-Path: <netdev+bounces-72483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30CE8858556
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 19:36:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0241C85859E
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 19:47:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DBBEF2822D9
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 18:36:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81B1E1F24658
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 18:47:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6DE75823A;
-	Fri, 16 Feb 2024 18:36:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB77713AA49;
+	Fri, 16 Feb 2024 18:44:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="MHCeH5sK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Zp1l9kHr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC1C812FB18;
-	Fri, 16 Feb 2024 18:36:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0621B139573
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 18:44:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708108590; cv=none; b=CtWDzoTtIigL239Jdw8BsW7hot/ArbZPrqwy4cJDkXdD3X9YbLxE8/KQhq8lQulBDi01YZWDsvjIVIaCSR5gJURc065Z8d3mjYjLp2Lhkd/IBayAiySYSxYrOEvT8TGYpS7qwEFoL/ICgWEOGo+mDK8cllP604m2KPOf8AtA1n8=
+	t=1708109058; cv=none; b=bxdVAQR3CcwOdKPRlh3LS3AyNOikHMgyHMC9GKwzhPBpqyzKpfSv2OJo4OgBC2lgCedw2QGnxkiVzBdyCtANv6Ajiu0ZTPK4L1WKwtov934JOKSpyDE9NvKhdVUlRCT9lnbWQSNW7OG8uhbx2ZWtPAEmxKvM4ssGWee5yRL5aTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708108590; c=relaxed/simple;
-	bh=oqTI47UPGm5QWoa3Y+pRZMEWwDd887Y0WmKXcGssIeQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=TskgLHdNNpBORgqQ/Bozy5tXuEeFSk4qRImKj0hs64RDmOAZCzmXxSgOlyRVE4CyrES63/fEF5WopLmubFDQbVWhBMy+rsliPw8uPf4M7Md9xYkvD5VTecEJk4Si8Bvd3qqyYAxlxWzGurn1wt/OCJ1lze8tAofpN13cvy9FDyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=MHCeH5sK; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41GFClLJ028736;
-	Fri, 16 Feb 2024 18:36:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=7uYGIOhorRfFYM07d6BgQvHbh4+Amx/g8VFcswZ4CBo=; b=MH
-	CeH5sKtgsRKtR8rzMCG5UB4dMAdjZllHcdgEw8zNCOAMzAK3HmFqsP4bgEWpqY3y
-	VoDEg1swJFDAnHRmVww6k8PgGyRBRodMlRRMZ+TdiRT0072XWDNzLZMNv+EKSWu5
-	11cqepzWr1FPaAhyvfZXswRjRk7a7lydtXObLlCBggBr9gOmlAD4UL4jIHluMIWd
-	mkGFBjM1BCgAvzFPUBJNY1LUhzTw1mqIpkKzdAmOX5YWBy6eKliokYHdfm9d3At9
-	qQ/NISeZpyrimGw15Y0WVXr0zNq031T1zps23fyqXE0P+7SAB/wrrKi99D7wgqyE
-	KxSt0oLGL374emRpy2sQ==
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wa03r9j5k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 16 Feb 2024 18:36:15 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41GIaED3002325
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 16 Feb 2024 18:36:15 GMT
-Received: from [10.110.31.126] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Fri, 16 Feb
- 2024 10:36:10 -0800
-Message-ID: <05998dfc-e7ec-420a-a0a8-c9284368b13c@quicinc.com>
-Date: Fri, 16 Feb 2024 10:36:10 -0800
+	s=arc-20240116; t=1708109058; c=relaxed/simple;
+	bh=is74SxLH2fcG4nxpWW0Ms5pfDS6vmrGLVq+/QoSqAAM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=p395JTbcqswBS8i0aOSGYWKmOI5xBihKllEoyS03CAUkJR2maJkdh6fhcka0LehOfT7cMVAC762I4HzY4iEJvgSzWo8rF390SpTy1Cl6Bf5CvOHaNKaz6OyBSa+eCTZztgTd+g8f6wMNEVRCeSmlwTtilTdk+SYvbvUAriYeZtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Zp1l9kHr; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-561f0f116ecso714a12.0
+        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 10:44:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1708109055; x=1708713855; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Vd6bah5kWJs/p0C4VpOMLJEbY6JolrQ4onPS5UWgI9g=;
+        b=Zp1l9kHrXqt5boXyQXYi4KPUO8K7MMDLX/2VFa5phAGU9U4rf3k4Tvz/m3g5qXbqD+
+         zmat53esWmzRLEgmOwnoAH8ege2uMsA8VJaM03th4fZLUnrMENcefb6jUZNpv5oxRjCh
+         5e01X+HgM7T9YC5Tj19WBUj7CQ2GnLS96zHnFIhmNvK7WzfRiFJ80hY62OclnVUs14iX
+         YS7waSbL+NcnUN7KwyVd3C0ysFe8NLJuLtJ3RuoQkcez5E/MKZyauqVId4+TEEmLootz
+         ZUx1OTfjKU2xvSOkT6P8qBhryrUHWsAnnlQ7eli69ixWw+FFlxy3lZgRsqBzmsTenMhn
+         Rmuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708109055; x=1708713855;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Vd6bah5kWJs/p0C4VpOMLJEbY6JolrQ4onPS5UWgI9g=;
+        b=PbhVkwCCjFmXa+5PkSCGq8Cdkc5y3SeYM3Ao2XyUKQ9zsxFhHzZO7FO2A68KmU1Mmm
+         daXXrS3n8L/rS83W8UVJd+aHAaUnSZRAewDdS2CvQcF9Cb50DcOedlm8DEcb2yroJMUK
+         4Q2O7wHPxld8in8+zZnkMXFu9O1qtwIP77Hy3yLlg5jBgq0ipn9IOFprgvKis04mpUeh
+         uqXtWCtnEGYRPzHIp+qox+n5vnmPyDG+wiN/QavYgrcvLmSNPFi6X50dqf4JPycVoqXw
+         /ExvY/L+0qNam8ab5cm5lDJoywACW42XDTyujW92JSr7cPcr7ez3dtJs5bwiq9m3kyJm
+         V9TA==
+X-Forwarded-Encrypted: i=1; AJvYcCUZYXoFJj07SN/jn2//9aBa0Io2dIpU5f/d4L2QPMc6cgQcUaEOYUaA/+0b44duY1GOhkHsusMoaH98SE1ssWQWKwtLz+EC
+X-Gm-Message-State: AOJu0Yzp1fnElYMVtxxjpMofJtBN5yQQMi/4P6u4K7egEM//4cNLIs4Q
+	E3XcuqVY/8ddwIRSYcJeLBete2iVKGSuOif8dsaRZEgiZvXoXfhXc4h4I50MuJa7dHrblhXlWWq
+	ceYjxwBSGmr4phWClH5Kv0ZUUSsNI7o+1snyIpvv6uOYd0vjxdgBm
+X-Google-Smtp-Source: AGHT+IE6SF1IU42agrlb0Z9BmG8VA/Flsiy03gMawoNmEFORdtCKS7bLtlhiD4KF+tuwE8IUnK8Al3LUFj3t2GwCaj4=
+X-Received: by 2002:a50:d598:0:b0:560:ea86:4d28 with SMTP id
+ v24-20020a50d598000000b00560ea864d28mr9527edi.4.1708108598067; Fri, 16 Feb
+ 2024 10:36:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v1] net: Add skb user timestamp flag to
- distinguish between timestamps
-Content-Language: en-US
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Andrew Halaney <ahalaney@redhat.com>
-CC: <kernel@quicinc.com>
-References: <20240215215632.2899370-1-quic_abchauha@quicinc.com>
- <65cfa53c89e52_e53c9294ce@willemb.c.googlers.com.notmuch>
-From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
-In-Reply-To: <65cfa53c89e52_e53c9294ce@willemb.c.googlers.com.notmuch>
+References: <CALCETrWUtYmSWw9-K1To8UDHe5THqEiwVyeSRNFQBaGuHs4cgg@mail.gmail.com>
+ <396f9c38e2e2a14120e629cbc13353ec0aa15a62.camel@redhat.com> <CALCETrVwAT39fM89O0BqW9KAVfOFQo590g-Zs6mt+yAkoCvZZQ@mail.gmail.com>
+In-Reply-To: <CALCETrVwAT39fM89O0BqW9KAVfOFQo590g-Zs6mt+yAkoCvZZQ@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 16 Feb 2024 19:36:24 +0100
+Message-ID: <CANn89iKPPt3tozuDaSfsop5YbvgRoKha=dgTR2-ReoYEvA-_DA@mail.gmail.com>
+Subject: Re: SO_RESERVE_MEM doesn't quite work, at least on UDP
+To: Andy Lutomirski <luto@amacapital.net>
+Cc: Paolo Abeni <pabeni@redhat.com>, Wei Wang <weiwan@google.com>, 
+	Network Development <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: DpUtYm74WbKAcGQAUJVOKTZdxvW25HUR
-X-Proofpoint-GUID: DpUtYm74WbKAcGQAUJVOKTZdxvW25HUR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-16_17,2024-02-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- mlxlogscore=999 lowpriorityscore=0 mlxscore=0 adultscore=0
- priorityscore=1501 clxscore=1011 bulkscore=0 phishscore=0 spamscore=0
- suspectscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2401310000 definitions=main-2402160145
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Feb 16, 2024 at 7:00=E2=80=AFPM Andy Lutomirski <luto@amacapital.ne=
+t> wrote:
+>
+> On Fri, Feb 16, 2024 at 12:11=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> =
+wrote:
+> >
+> > On Thu, 2024-02-15 at 13:17 -0800, Andy Lutomirski wrote:
+> > > With SO_RESERVE_MEM, I can reserve memory, and it gets credited to
+> > > sk_forward_alloc.  But, as far as I can tell, nothing keeps it from
+> > > getting "reclaimed" (i.e. un-credited from sk_forward_alloc and
+> > > uncharged).  So, for UDP at least, it basically doesn't work.
+> >
+> > SO_RESERVE_MEM is basically not implemented (yet) for UDP. Patches are
+> > welcome - even if I would be curious about the use-case.
+>
+> I've been chasing UDP packet drops under circumstances where they
+> really should not be happening.  I *think* something regressed between
+> 6.2 and 6.5 (as I was seeing a lot of drops on a 6.5 machine and not
+> on a 6.2 machine, and they're both under light load and subscribed to
+> the same multicast group).  But regardless of whether there's an
+> actual regression, the logic seems rather ancient and complex.  All I
+> want is a reasonable size buffer, and I have plenty of memory.  (It's
+> not 1995 any more -- I have many GB of RAM and I need a few tens of kB
+> of buffer.)
+>
+> And, on inspection of the code, so far I've learned, in no particular ord=
+er:
+>
+> 1. __sk_raise_mem_allocated() is called very frequently (as the
+> sk_forward_alloc mechanism is not particularly effective at reserving
+> memory).  And it calls sk_memory_allocated_add(), which looked
+> suspiciously like a horrible scalability problem until this patch:
+>
+> commit 3cd3399dd7a84ada85cb839989cdf7310e302c7d
+> Author: Eric Dumazet <edumazet@google.com>
+> Date:   Wed Jun 8 23:34:09 2022 -0700
+>
+>     net: implement per-cpu reserves for memory_allocated
+>
+> and I suspect that the regression I'm chasing is here:
+>
+> commit 4890b686f4088c90432149bd6de567e621266fa2
+> Author: Eric Dumazet <edumazet@google.com>
+> Date:   Wed Jun 8 23:34:11 2022 -0700
+>
+>     net: keep sk->sk_forward_alloc as small as possible
+>
+> (My hypothesis is that, before this change, there would frequently be
+> enough sk_forward_alloc left to at least drastically reduce the
+> frequency of transient failures due to protocol memory limits.)
+>
+> 2. If a socket wants to use memory in excess of sk_forward_alloc
+> (which is now very small) and rcvbuf is sufficient, it goes through
+> __sk_mem_raise_allocated, and that has a whole lot of complex rules.
+>
+> 2a. It checks memcg.  This does page_counter_try_charge, which does an
+> unconditional atomic add.  Possibly more than one.  Ouch.
+>
+> 2b. It checks *global* per-protocol memory limits, and the defaults
+> are *small* by modern standards.  One slow program with a UDP socket
+> and a big SO_RCVBUF can easily use all the UDP memory, for example.
+> Also, why on Earth are we using global limits in a memcg world?
+>
+> 2c. The per-protocol limits really look buggy.  The code says:
+>
+>     if (sk_has_memory_pressure(sk)) {
+>         u64 alloc;
+>
+>         if (!sk_under_memory_pressure(sk))
+>             return 1;
+>         alloc =3D sk_sockets_allocated_read_positive(sk);
+>         if (sk_prot_mem_limits(sk, 2) > alloc *
+>             sk_mem_pages(sk->sk_wmem_queued +
+>                  atomic_read(&sk->sk_rmem_alloc) +
+>                  sk->sk_forward_alloc))
+>             return 1;
+>     }
+>
+> <-- Surely there should be a return 1 here?!?
+>
+> suppress_allocation:
+>
+> That goes all the way back to:
+>
+> commit 3ab224be6d69de912ee21302745ea4
+> 5a99274dbc
+> Author: Hideo Aoki <haoki@redhat.com>
+> Date:   Mon Dec 31 00:11:19 2007 -0800
+>
+>     [NET] CORE: Introducing new memory accounting interface.
+>
+> But it wasn't used for UDP back then, and I don't think the code path
+> in question is or was reachable for TCP.
+>
+> 3. A failure in any of this stuff gives the same drop_reason.  IMO it
+> would be really nice if the drop reason were split up into, say,
+> RCVBUFF_MEMCG, RCVBUF_PROTO_HARDLIMIT, RCVBUFF_PROTO_PRESSURE or
+> similar.
+>
+>
+> And maybe there should be a way (a memcg option?) to just turn the
+> protocol limits off entirely within a memcg.  Or to have per-memcg
+> protocol limits.  Or something.  A single UDP socket in a different
+> memcg should not be able to starve the whole system such that even
+> just two (!) queued UDP datagrams don't fit in a receive queue.
+>
+>
+> Anyway, SO_RESERVE_MEM looks like it ought to make enqueueing on that
+> socket faster and more scalable.  And exempt from random failures due
+> to protocol memory limits.
 
+Yes, this was the goal, but so far only implemented for TCP.
 
-On 2/16/2024 10:11 AM, Willem de Bruijn wrote:
-> Abhishek Chauhan wrote:
->> Bridge driver today has no support to forward the userspace timestamp
->> packets and ends up resetting the timestamp. ETF qdisc checks the
->> packet coming from userspace and encounters to be 0 thereby dropping
->> time sensitive packets. These changes will allow userspace timestamps
->> packets to be forwarded from the bridge to NIC drivers.
->>
->> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
->> ---
->> Note:- I am a little skeptical of using bool inside the skbuff
->> structure as no one today has used bool so far in the struct.
->> (Expecting some comments from upstream for sure) 
->>
->> I am also touching the heart of sk buff so i hope this is reviewed
->> thoroughly. I have crossed checked multiple times on all the ipv4
->> /ipv6 paths where userspace timestamp is populated. I tried as much
->> as possible to cover all the references and made sure i put my changes
->> in place.  
->>
->> Bug description:- If the physical network interface is bridged the 
->> etf packets are dropped since bridge driver before forwarding the packet
->> is setting the userspace timestamp to 0.
->>
->> Bridge driver call stack 
->>
->> [  157.120189] now is set to 1706054553072734733
->> [  157.120194] tx time from SKB is 0 <== SKB when reaches the etf qdisc is 0 
->> [  157.120195] q->last time is 0
->> [  157.120197] CPU: 3 PID: 9206 Comm: a.out Tainted: G        W  OE  X  -------  ---  5.14.0-999.323ES.test.el9.aarch64 #1
->> [  157.120201] Hardware name: Qualcomm SA8775P Ride (DT)
->> [  157.120202] Call trace:
->> [  157.120203]  dump_backtrace+0xb0/0x130
->> [  157.120212]  show_stack+0x1c/0x30
->> [  157.120215]  dump_stack_lvl+0x74/0x8c
->> [  157.120220]  dump_stack+0x14/0x24
->> [  157.120223]  etf_enqueue_timesortedlist+0x114/0x20c [sch_etf]
->> [  157.120230]  dev_qdisc_enqueue+0x2c/0x110
->> [  157.120234]  __dev_xmit_skb+0x114/0x644
->> [  157.120236]  __dev_queue_xmit+0x31c/0x774
->> [  157.120238]  br_dev_queue_push_xmit+0xd4/0x120 [bridge]
->> [  157.120253]  br_forward_finish+0xdc/0xec [bridge]  <== This function is culprit as its making the tstamp as 0
->> [root@ecbldauto-lvarm04-lnx ~]# [  157.120263]  __br_forward+0xd8/0x210 [bridge]
->> [  157.120272]  br_forward+0x12c/0x150 [bridge]
->> [  157.120281]  br_dev_xmit+0x288/0x49c [bridge]
->> [  157.120290]  dev_hard_start_xmit+0xe4/0x2b4
->> [  157.120292]  __dev_queue_xmit+0x6ac/0x774
->> [  157.120294]  neigh_resolve_output+0x128/0x1ec
->> [  157.120297]  ip_finish_output2+0x184/0x54c
->> [  157.120300]  __ip_finish_output+0xa4/0x19c
->> [  157.120302]  ip_finish_output+0x38/0xf0
->> [  157.120303]  ip_output+0x13c/0x1f4
->> [  157.120305]  ip_send_skb+0x54/0x10c
->> [  157.120307]  udp_send_skb+0x128/0x394
->> [  157.120310]  udp_sendmsg+0x7e8/0xa6c
->> [  157.120311]  inet_sendmsg+0x48/0x70
->> [  157.120313]  sock_sendmsg+0x54/0x60
->> [  157.120315]  ____sys_sendmsg+0x1f8/0x254
->> [  157.120316]  ___sys_sendmsg+0x84/0xcc
->> [  157.120318]  __sys_sendmsg+0x60/0xb0
->> [  157.120319]  __arm64_sys_sendmsg+0x28/0x30
->> [  157.120320]  invoke_syscall.constprop.0+0x7c/0xd0
->> [  157.120323]  el0_svc_common.constprop.0+0x140/0x150
->> [  157.120325]  do_el0_svc+0x38/0xa0
->> [  157.120327]  el0_svc+0x38/0x1d0
->> [  157.120329]  el0t_64_sync_handler+0xb4/0x130
->> [  157.120330]  el0t_64_sync+0x17c/0x180
->>
->> After my changes:- 
->> [ 2215.130148] now is set to 1706056610952501031 
->> [ 2215.130154] tx time from SKB is 1706056610953467393 <== Time is forwarded to etf correctly
->> [ 2215.130155] q->last time is 1706056591423364609
->> [ 2215.130158] CPU: 1 PID: 108166 Comm: a.out Tainted: G        W  OE  X  -------  ---  5.14.0-999.323ES.test.el9.aarch64 #1
->> [ 2215.130162] Hardware name: Qualcomm SA8775P Ride (DT) [ 2215.130163] Call trace:
->> [ 2215.130164]  dump_backtrace+0xb0/0x130 
->> [ 2215.130172]  show_stack+0x1c/0x30 [root@ecbldauto-lvarm04-lnx ~]# 
->> [ 2215.130175]  dump_stack_lvl+0x74/0x8c [ 2215.130181]  dump_stack+0x14/0x24 
->> [ 2215.130184]  etf_enqueue_timesortedlist+0x114/0x20c [sch_etf] 
->> [ 2215.130191]  dev_qdisc_enqueue+0x2c/0x110 
->> [ 2215.130197]  __dev_xmit_skb+0x114/0x644 
->> [ 2215.130200]  __dev_queue_xmit+0x31c/0x774 
->> [ 2215.130202]  br_dev_queue_push_xmit+0xd4/0x120 [bridge] 
->> [ 2215.130217]  br_forward_finish+0xe4/0xf0 [bridge] 
->> [ 2215.130226]  __br_forward+0xd8/0x20c [bridge] 
->> [ 2215.130235]  br_forward+0x12c/0x150 [bridge] 
->> [ 2215.130243]  br_dev_xmit+0x288/0x49c [bridge] 
->> [ 2215.130252]  dev_hard_start_xmit+0xe4/0x2b4 
->> [ 2215.130254]  __dev_queue_xmit+0x6ac/0x774 
->> [ 2215.130257]  neigh_hh_output+0xcc/0x140 
->> [ 2215.130260]  ip_finish_output2+0x300/0x54c 
->> [ 2215.130262]  __ip_finish_output+0xa4/0x19c 
->> [ 2215.130263]  ip_finish_output+0x38/0xf0 
->> [ 2215.130265]  ip_output+0x13c/0x1f4 
->> [ 2215.130267]  ip_send_skb+0x54/0x110 
->> [ 2215.130269]  udp_send_skb+0x128/0x394 
->> [ 2215.130271]  udp_sendmsg+0x7e8/0xa6c 
->> [ 2215.130272]  inet_sendmsg+0x48/0x70 
->> [ 2215.130275]  sock_sendmsg+0x54/0x60 
->> [ 2215.130277]  ____sys_sendmsg+0x1f8/0x254 
->> [ 2215.130278]  ___sys_sendmsg+0x84/0xcc 
->> [ 2215.130279]  __sys_sendmsg+0x60/0xb0 
->> [ 2215.130281]  __arm64_sys_sendmsg+0x28/0x30 
->> [ 2215.130282]  invoke_syscall.constprop.0+0x7c/0xd0
->> [ 2215.130285]  el0_svc_common.constprop.0+0x140/0x150
->> [ 2215.130287]  do_el0_svc+0x38/0xa0
->> [ 2215.130289]  el0_svc+0x38/0x1d0
->> [ 2215.130291]  el0t_64_sync_handler+0xb4/0x130 
->> [ 2215.130292]  el0t_64_sync+0x17c/0x180
->>
->>
->>  include/linux/skbuff.h  | 13 +++++++++++++
->>  include/net/inet_sock.h |  1 +
->>  include/net/sock.h      |  1 +
->>  net/core/sock.c         |  1 +
->>  net/ipv4/ip_output.c    |  3 +++
->>  net/ipv4/raw.c          |  1 +
->>  net/ipv6/ip6_output.c   |  2 ++
->>  net/ipv6/raw.c          |  1 +
->>  net/packet/af_packet.c  |  3 +++
->>  9 files changed, 26 insertions(+)
->>
->> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
->> index 2dde34c29203..b098b7d30b56 100644
->> --- a/include/linux/skbuff.h
->> +++ b/include/linux/skbuff.h
->> @@ -744,6 +744,7 @@ typedef unsigned char *sk_buff_data_t;
->>   *	@tstamp: Time we arrived/left
->>   *	@skb_mstamp_ns: (aka @tstamp) earliest departure time; start point
->>   *		for retransmit timer
->> + *	@user_delivery_time: states that timestamp was populated from userspace
->>   *	@rbnode: RB tree node, alternative to next/prev for netem/tcp
->>   *	@list: queue head
->>   *	@ll_node: anchor in an llist (eg socket defer_list)
->> @@ -879,6 +880,8 @@ struct sk_buff {
->>  		ktime_t		tstamp;
->>  		u64		skb_mstamp_ns; /* earliest departure time */
->>  	};
->> +	/* States that time is from userspace */
->> +	bool            user_delivery_time;
->>  	/*
->>  	 * This is the control buffer. It is free to use for every
->>  	 * layer. Please put your private variables there. If you
->> @@ -4208,6 +4211,16 @@ static inline void skb_clear_tstamp(struct sk_buff *skb)
->>  	if (skb->mono_delivery_time)
->>  		return;
->>  
->> +	/* When userspace timestamp packets are forwarded via bridge
->> +	 * the br_forward_finish clears the tstamp and the tstamp
->> +	 * from the userspace is lost. Hence the check for user
->> +	 * delivery time. With the below check now tc-etf qdisc will
->> +	 * not end up dropping the packets if the packet is forwarded via
->> +	 * bridge interface.
->> +	 */
->> +	if (skb->user_delivery_time)
->> +		return;
->> +
->>  	skb->tstamp = 0;
->>  }
->>  
->> diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
->> index d94c242eb3ed..e7523545a493 100644
->> --- a/include/net/inet_sock.h
->> +++ b/include/net/inet_sock.h
->> @@ -175,6 +175,7 @@ struct inet_cork {
->>  	__u16			gso_size;
->>  	u64			transmit_time;
->>  	u32			mark;
->> +	bool			user_delivery_time;
->>  };
-> 
-> There's no need for a cork member, as by definition the fields in this
-> struct are coming from userspace.
-> 
-> There is a very high bar to adding new fields to sk_buff, because it
-> is used by many paths and would be enormous if stuck with fields for
-> every intersection between a pair of features.
-> 
-> The goal here is for the bridge to disambiguate earliest delivery time
-> timestamps from which? From those looped through ip forwarding? Why
-> does the bridge zero the tstamp field at all? That might help finding
-> a reasonable implementation.
-> 
-> We have run in the issue of labeling the value of skb->tstamp before.
-> With redirect and looping it is definitely subtle.
+Have you tried to bump SK_MEMORY_PCPU_RESERVE to a higher value ?
 
-Thanks for your comments Willem,
-
-There is a clear explanation of why this is needed as part of the below link 
-https://patchwork.kernel.org/project/netdevbpf/patch/20220302195525.3480280-1-kafai@fb.com/
-
-From the above link Martin KaFai Lau has mentioned and i quote. 
-
-"In the future, another bit (e.g. skb->user_delivery_time) can be added
-for the SCM_TXTIME where the clock base is tracked by sk->sk_clockid."
-
-Bridge driver from what i understand should not alter the skb if its the forwarding path. 
-
-Please correct me if i am wrong here. 
-
-
-
+SK_MEMORY_PCPU_RESERVE has been set to a very conservative value,
+based on TCP workloads.
 
