@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-72345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD299857A2A
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 11:20:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B024857A2B
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 11:20:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E01D51C218A9
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 10:20:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0680DB21FE3
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 10:20:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C822B241E4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE540241EC;
 	Fri, 16 Feb 2024 10:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EF0Twjad"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TvvV+oPi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE082377D
-	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 10:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4D4F2377F;
+	Fri, 16 Feb 2024 10:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708078826; cv=none; b=qyrwHPBHJuVq3v3rah8oK0PVvq1gG0BqnbIL8OyFUSN6cgCGX2NyTLBsYqNrM/5HUChASpLkp08UYRuBu+MDjn3bjcLwOmBlKbGmLwndffS8Oq+l+CKfSLGtm9VXj+i22p3wWJFiSJAL3cKqRvQ0jOZu6QLb9XyYof00OO6Q9HQ=
+	t=1708078826; cv=none; b=bSDpg9esidO/g4e1sEsXc8LjjvFqd7C77AT6V/ovaMj0EhyUmYvxjy7Y90zqqZbCNumzOSmUmWdZB1dtcxVXz9Ifaq3Y/v4jkdRbCeR/mZnSIPs89VMP6KSWXzWU/6IA/6M9ry/DEb7XuRoLsiK/gaPrsqAEsU9+r4brKiDAijc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708078826; c=relaxed/simple;
-	bh=dsVz3a66cGXNXH3HKive+U53NRChX+1FLzoY6hly7F4=;
+	bh=pZsYna/et6p2/duoVCMi3/XrHQ+0U2MOIh5owo7Tw0Q=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WkjwNo/hNYkKTuGurP+lj9WeF9I+sWIBya+y02uKv4N6dlE/2MHPCgxJR1CwMlKrSxh9xBz9mMfugIs5UsGUTeXIDYzLebcRZwWjcn01hcg+Ttg8EXfvhy+mtk5AzSa+KeCgrTjFYiEflpmMAW2Kx+FRBwA3PiwKDRdJjH9KX4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EF0Twjad; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0E673C43390;
+	 In-Reply-To:To:Cc; b=RjOxw1x2tKjkHtImoH5EmA+KcyskE9ynw7mMOhykKApwUkHqxeSDcym4CY+NMJQ88r/bTzwobyV6cQ+oVlxaaq1RmD+PcpDvPAEIaO2v0UXlGzaxwL9Z/PhPOdtGUNf9hQROSaXg+vsofSQA8QqPWhVBZXj1yAfEhjsua4Bm4FE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TvvV+oPi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4145EC433B2;
 	Fri, 16 Feb 2024 10:20:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1708078826;
-	bh=dsVz3a66cGXNXH3HKive+U53NRChX+1FLzoY6hly7F4=;
+	bh=pZsYna/et6p2/duoVCMi3/XrHQ+0U2MOIh5owo7Tw0Q=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=EF0Twjadbz0IhwF0XN+HReWLoMvqJGyTcq18SldjqD2y2TEemylusj+SEwXa3t60U
-	 u8SADo6+IOSkp1ciC79wET4O3t2CukpA3ZzWX0Qp4lkY2+l5cWJ2SA359XTSk15WdJ
-	 3zNPbXVbQKlNuiywoaNGohwSw/+LK4fvv7t0idJNijd+peu9ztpAMRGN8LFRw4V9JC
-	 0QXSwHTbMgravtzO4jyy+b9/gFJl57H/uKR83Sgmw6c1cFkwxJb+Xae4FpB8gReI+k
-	 0oQNJcBqMC4aEO+1PDrO7jUlaRyklu018o5mpsFBgs4hx4jr2ZQopEJBSEZTCSPsUn
-	 bO5rqU/AHBCRQ==
+	b=TvvV+oPiL7QxQtHP+CNstFlmM1I3NW/nXjBqhpT3MMXTLvJXGPnb5tTvp8w3o7gni
+	 WPu6KV7rgFqO8x8CNtn8vG+mfZSZdyHDCqynPqXsl8RH9UxPKSwB2t45jNbWL8U06u
+	 mMDzNkrOYI/OqT5e6irJ2lVBrVY+TO2HmRJ5wvT2FLlWUH3QpsaAlh22VPg5vJ3deb
+	 XemMWIh3w5LHZ+AYn8IFpq9L3EHQEXNoCnPzxjfBbTdo2CJ8RyYlITKCIy2xabeQxR
+	 skY3lS34th8BTiVxhE0VSblwt79MzHUfET1g5dqpvqKtgsea+Idq53g3VlPdpJ0FkU
+	 VuaFqrmMh6eXw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DFA0AD84BCD;
-	Fri, 16 Feb 2024 10:20:25 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2B974D8C966;
+	Fri, 16 Feb 2024 10:20:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,46 +52,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3 1/2] net/sched: act_mirred: use the backlog for mirred
- ingress
+Subject: Re: [PATCH RESEND2 net-next] tcp: Spelling s/curcuit/circuit/
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170807882591.14678.14888297610557827138.git-patchwork-notify@kernel.org>
-Date: Fri, 16 Feb 2024 10:20:25 +0000
-References: <20240215143346.1715054-1-kuba@kernel.org>
-In-Reply-To: <20240215143346.1715054-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, marcelo.leitner@gmail.com, dcaratti@redhat.com,
- jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- shmulik.ladkani@gmail.com
+ <170807882617.14678.5225852820514541606.git-patchwork-notify@kernel.org>
+Date: Fri, 16 Feb 2024 10:20:26 +0000
+References: <edf02e55949ac00329a6df72940cc2f5e8bec55e.1708002686.git.geert+renesas@glider.be>
+In-Reply-To: <edf02e55949ac00329a6df72940cc2f5e8bec55e.1708002686.git.geert+renesas@glider.be>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu, 15 Feb 2024 06:33:45 -0800 you wrote:
-> The test Davide added in commit ca22da2fbd69 ("act_mirred: use the backlog
-> for nested calls to mirred ingress") hangs our testing VMs every 10 or so
-> runs, with the familiar tcp_v4_rcv -> tcp_v4_rcv deadlock reported by
-> lockdep.
+On Thu, 15 Feb 2024 14:12:21 +0100 you wrote:
+> Fix a misspelling of "circuit".
 > 
-> The problem as previously described by Davide (see Link) is that
-> if we reverse flow of traffic with the redirect (egress -> ingress)
-> we may reach the same socket which generated the packet. And we may
-> still be holding its socket lock. The common solution to such deadlocks
-> is to put the packet in the Rx backlog, rather than run the Rx path
-> inline. Do that for all egress -> ingress reversals, not just once
-> we started to nest mirred calls.
-> 
-> [...]
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> ---
+>  net/ipv4/tcp_input.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Here is the summary with links:
-  - [net,v3,1/2] net/sched: act_mirred: use the backlog for mirred ingress
-    https://git.kernel.org/netdev/net/c/52f671db1882
-  - [net,v3,2/2] net/sched: act_mirred: don't override retval if we already lost the skb
-    https://git.kernel.org/netdev/net/c/166c2c8a6a4d
+  - [RESEND2,net-next] tcp: Spelling s/curcuit/circuit/
+    https://git.kernel.org/netdev/net-next/c/21bd52ea38a8
 
 You are awesome, thank you!
 -- 
