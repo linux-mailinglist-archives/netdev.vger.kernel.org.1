@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-72508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C3188586D4
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 21:33:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F19AE8586E0
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 21:34:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E1556B22BCA
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 20:33:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E75C1F24DF0
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 20:34:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34EB71468F6;
-	Fri, 16 Feb 2024 20:33:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CDE61487F6;
+	Fri, 16 Feb 2024 20:33:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="y6k7gcJp"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="RopNAYmB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC34B13B289
-	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 20:33:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6FA5145FEF
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 20:33:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708115597; cv=none; b=B2X3Uo5sGBKylm6TnznrLhYFXIP9/wBfU8/8KZ56c1GnNux2gpXp3CNTuvhrQFYx3g8aOUxGk93/u42bcDNb0rCpVze1Tc3deiq+4KRZFIZGAja7sPuA+dnIze/7uh6Kl825oHLKYEnZNY37w34/j3p9hl6tZVdY1QyTD8Ts2No=
+	t=1708115600; cv=none; b=VjzSDH77QJZF8t306utMFPEELuYNftfxC225jBMCiHCbp4eFkLhgnuLXnopd76WnvLo24xI83CNGVgpXl6GYLmiJtdUZ4aaQZIzwtPXj1yDAA6nfmF8fqMTgg8zcrcOEYTQ9a7ANfkqEhkmQoGC1S7fO+tTVcBbpRSjBm7dTbZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708115597; c=relaxed/simple;
-	bh=2ltRDktWv/9W2XdsRxj5VGYiomy6evtqamrK4xBuy4U=;
+	s=arc-20240116; t=1708115600; c=relaxed/simple;
+	bh=7siulsM+YIxL/zjVU9vKxvQTmEA2EKQzsqGyT9XfH/0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rt/Vjch4GjERmtPRUBTj3Y4cRyVf53tvZv4/iR+XUy/s4OcFKyn08Ny8J1kNgno+kq85THwfuuI9xNJiXmatucPDlcMDZ4k2aQ3mMlF2/hC/1yKQh+0Svh47T08H6fI+UT6YFwuVeZUgbR3qmuMuIAjWy4x/F5bM/Es2QfJZeu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=y6k7gcJp; arc=none smtp.client-ip=209.85.128.54
+	 MIME-Version; b=eVqEJiRNcRhm/aA6GcarEiNGq8CnBTynyG6GJfB+5mFv93q4wwTElBvbNvJ74SvnNiOF8PoiNgGIfHv7RjCo27vEkQWBtaIsPumD1ZTVESV+5xoZrxtr7F+uLE0S/a2EYodEJn12D44yT1S60TpDS879NZ79Zm2lLxNuWUwZEng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=RopNAYmB; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4124c3a7a75so6790515e9.0
-        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 12:33:15 -0800 (PST)
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-411d715c401so19060135e9.1
+        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 12:33:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1708115594; x=1708720394; darn=vger.kernel.org;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1708115595; x=1708720395; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ck620ZgSsNsz/9RxF9gWPnIMgXNLaJ0oGJUqb+80gj0=;
-        b=y6k7gcJpn+XZ7AWF0/XvQ4Q96VAarA6gk2frrhD65tMM3JI9chOvKebMHaLmx4VQiy
-         6SyTWxxIavK/cq/ZWOWDmyNL8aQ7ZpAPOS+QbbNjvv6lwYLullK5EHPYW1rKz2HeEuGE
-         REY6g/xSFDyFDikTpkIhvvvaIdB0KTc1IDerWBG62xuN5qmk0Gw7GuMS30WD1arpBHQ+
-         JSLKA/Tl4G0zDeSEZkjdyoNdLLpHpJbJYiZI8QvQgWXBs0A/7+pCBR98BsTT077hmART
-         8mZxoDeB7vnlYJILMdHv6J8oSe44huKkGYx14nIb0jVR6QEyPfLq6FnBSjhLdqnIPFUI
-         e7TQ==
+        bh=aLo65DzlI0Pw6qQCEKnNFvuFSJmqXUdVDuf68OGs0ug=;
+        b=RopNAYmBLzbU0E8FWuUlqcWP+GlVGJt0id3KbTdr5k9HaYH+UzwCoQfr0p1eAnfS2Y
+         q9/ws62XvkUz89rZck2b2fw5t1uyn2WBFJ0Hf0MSsaobdw3m0k98z5FaG6tknDpRE1wY
+         K10/03ea4vPXLOYm9561Jquaq6kOLSduihRk/P7VN3fTPQ2bRogDP18BW0prc0klPtpq
+         pmfSKOsmTYGK5j5OcMDiHCLtyrqrGp0RWIq+4Z31VISMBcoQGOACQFLvBO9fQ0FkjX3o
+         Av22SeTujKCnxSC2kmjHEWJqUp1JlrSdt0MPnMF/ljI3K+m/uUNTjTefCWM4yYs187Oi
+         r8tQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708115594; x=1708720394;
+        d=1e100.net; s=20230601; t=1708115595; x=1708720395;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Ck620ZgSsNsz/9RxF9gWPnIMgXNLaJ0oGJUqb+80gj0=;
-        b=d3lUAWL2oHWFtelFKlFSQhPGG/dzXnTdlb6NuKryWmbJheblmgKzsgDB+b1zVbxFGb
-         2ZC/aeU41GDjXpM+9f0dWNXkB9ZlRptCYya/jkViPjzKNPn9C/apvcCRGxZu4D/3lg+x
-         0vxs4/9YP+m3YFvAKBKlmI+QmBNP54RRrgrNZ8nKZfEScpHn3W5sQgMVzuNiSJpg7omJ
-         ss78AFggt+B8OhJkOT11QX/G+dTC8iwV1FR4rOKvWnKUDxoV/pPVkDc5I1UJx+gsjonH
-         QsjJVX/YdesJHpidqArf0F1+bIPH0VUbIbHoZUMrnAXxXjfc7RVNnIEor+AKIGsMLuqT
-         JoxA==
-X-Forwarded-Encrypted: i=1; AJvYcCWjy+9K4FcexhYU4X3qvtf95sAWEgy7dCYhTm3t3Pc8XD1j/bt19vDCM06pSGswb8YX8Bp8PpLPuFrM0u+ldNatKgECdGgh
-X-Gm-Message-State: AOJu0YyZF2Nv8+Q5+3FQyFo0OrVuwiNgPPx9xVz466u2UJOvF73kKrrO
-	SYSq7f5GqMYW4vSUiHt7hACKVYaWZstzcDrXi7cVuKHffppRdObQKYTXFPwvrvI=
-X-Google-Smtp-Source: AGHT+IFWK3RiERh4OJ6PyhlMX4HmF3lfvM2tBpYy/a0m9DxHn1nwJ9Sx7MIneHFQhvuUZ8wTNDj2GA==
-X-Received: by 2002:a05:600c:1389:b0:40e:dbdf:9fb4 with SMTP id u9-20020a05600c138900b0040edbdf9fb4mr4364542wmf.23.1708115593893;
-        Fri, 16 Feb 2024 12:33:13 -0800 (PST)
+        bh=aLo65DzlI0Pw6qQCEKnNFvuFSJmqXUdVDuf68OGs0ug=;
+        b=vy704cSOqiFrjRwD4QCAYdSOC6dfNlWVhsQJdbQcUHVGrbMvrKgncyxdfZ7DHWyBOA
+         5cdg/gNEYRLh+Sdksak3/kJvgJ1wOg2KYU+xEAn6jg4ktmp+CYox1VKnV7YsRaPIQ50K
+         iPSQYpRE/S1THOJep4wBAZoDD2UucGdoxV7TVyLGi9uPy0gpG6WG+Ro11dSpX5Dqlvls
+         YEfyY1F08cKGeVbAGW2L3Nv+QnQQnCDZV6/jlScOPwkpxBN25nQbBSapOycDqUqwqk/y
+         w9UlrQJ8JFO5/st+c1X143erQ7NoFxPTyPwhY7Q+y8GMR37nOsfPAMqDrhfePu0RKS08
+         NyQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWRQCky+VUyuncJnvTQAh/fbxo7F7l1DaE/OvXyru1ILhyIFh7oPukPeVtvBP+3zmqx3VFW3+Q6v1YbzPbGUGqNRAdR87Ax
+X-Gm-Message-State: AOJu0Yzod0EZD3TAPheS+wHGSax0N89Ey69/3Gv/RbRDmomogYzx10FI
+	9i6CGRqmneswSbFbeF3Fen850TigkKaD9JDcBUiuqwrOgtDSn11sANKcRrxniWA=
+X-Google-Smtp-Source: AGHT+IFiDpD9jnNjXHaYBDe5iqmGRvtMJpVfZZ7zS3b3nDAA5bd5zEp/CAbSuDJNq9KUS4HizlvLyA==
+X-Received: by 2002:a05:600c:b91:b0:411:e398:9f33 with SMTP id fl17-20020a05600c0b9100b00411e3989f33mr4538745wmb.15.1708115595442;
+        Fri, 16 Feb 2024 12:33:15 -0800 (PST)
 Received: from brgl-uxlite.home ([2a01:cb1d:334:ac00:7758:12d:16:5f19])
-        by smtp.gmail.com with ESMTPSA id m5-20020a05600c4f4500b0041253d0acd6sm1420528wmq.47.2024.02.16.12.33.12
+        by smtp.gmail.com with ESMTPSA id m5-20020a05600c4f4500b0041253d0acd6sm1420528wmq.47.2024.02.16.12.33.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Feb 2024 12:33:13 -0800 (PST)
+        Fri, 16 Feb 2024 12:33:15 -0800 (PST)
 From: Bartosz Golaszewski <brgl@bgdev.pl>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
@@ -108,9 +108,9 @@ Cc: linux-bluetooth@vger.kernel.org,
 	linux-pci@vger.kernel.org,
 	linux-pm@vger.kernel.org,
 	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: [PATCH v5 02/18] arm64: defconfig: enable ath12k as a module
-Date: Fri, 16 Feb 2024 21:31:59 +0100
-Message-Id: <20240216203215.40870-3-brgl@bgdev.pl>
+Subject: [PATCH v5 03/18] dt-bindings: regulator: describe the PMU module of the QCA6390 package
+Date: Fri, 16 Feb 2024 21:32:00 +0100
+Message-Id: <20240216203215.40870-4-brgl@bgdev.pl>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240216203215.40870-1-brgl@bgdev.pl>
 References: <20240216203215.40870-1-brgl@bgdev.pl>
@@ -124,25 +124,188 @@ Content-Transfer-Encoding: 8bit
 
 From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-Build the ath12k driver as a module for arm64 default config.
+The QCA6390 package contains discreet modules for WLAN and Bluetooth. They
+are powered by the Power Management Unit (PMU) that takes inputs from the
+host and provides LDO outputs. This document describes this module.
 
 Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 ---
- arch/arm64/configs/defconfig | 1 +
- 1 file changed, 1 insertion(+)
+ .../bindings/regulator/qcom,qca6390-pmu.yaml  | 166 ++++++++++++++++++
+ 1 file changed, 166 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml
 
-diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
-index b8adb28185ad..23d6bb156cbc 100644
---- a/arch/arm64/configs/defconfig
-+++ b/arch/arm64/configs/defconfig
-@@ -409,6 +409,7 @@ CONFIG_WCN36XX=m
- CONFIG_ATH11K=m
- CONFIG_ATH11K_AHB=m
- CONFIG_ATH11K_PCI=m
-+CONFIG_ATH12K=m
- CONFIG_BRCMFMAC=m
- CONFIG_MWIFIEX=m
- CONFIG_MWIFIEX_SDIO=m
+diff --git a/Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml b/Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml
+new file mode 100644
+index 000000000000..b71fa782fc63
+--- /dev/null
++++ b/Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml
+@@ -0,0 +1,166 @@
++# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/regulator/qcom,qca6390-pmu.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Qualcomm Technologies, Inc. QCA6390 PMU Regulators
++
++maintainers:
++  - Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
++
++description:
++  The QCA6390 package contains discreet modules for WLAN and Bluetooth. They
++  are powered by the Power Management Unit (PMU) that takes inputs from the
++  host and provides LDO outputs. This document describes this module.
++
++properties:
++  compatible:
++    const: qcom,qca6390-pmu
++
++  vddaon-supply:
++    description: VDD_AON supply regulator handle
++
++  vddpmu-supply:
++    description: VDD_PMU supply regulator handle
++
++  vddrfa0p95-supply:
++    description: VDD_RFA_0P95 supply regulator handle
++
++  vddrfa1p3-supply:
++    description: VDD_RFA_1P3 supply regulator handle
++
++  vddrfa1p9-supply:
++    description: VDD_RFA_1P9 supply regulator handle
++
++  vddpcie1p3-supply:
++    description: VDD_PCIE_1P3 supply regulator handle<S-Del>
++
++  vddpcie1p9-supply:
++    description: VDD_PCIE_1P9 supply regulator handle
++
++  vddio-supply:
++    description: VDD_IO supply regulator handle
++
++  wlan-enable-gpios:
++    maxItems: 1
++    description:
++      GPIO line enabling the ATH11K WLAN module supplied by the PMU
++
++  bt-enable-gpios:
++    maxItems: 1
++    description:
++      GPIO line enabling the ATH11K Bluetooth module supplied by the PMU
++
++  regulators:
++    type: object
++    description:
++      LDO outputs of the PMU
++
++    patternProperties:
++      "^ldo[0-9]$":
++        $ref: regulator.yaml#
++        type: object
++        unevaluatedProperties: false
++
++    additionalProperties: false
++
++required:
++  - compatible
++  - vddaon-supply
++  - vddpmu-supply
++  - vddrfa0p95-supply
++  - vddrfa1p3-supply
++  - vddrfa1p9-supply
++  - vddpcie1p3-supply
++  - vddpcie1p9-supply
++  - vddio-supply
++  - wlan-enable-gpios
++  - bt-enable-gpios
++  - regulators
++
++additionalProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/gpio/gpio.h>
++    pmu {
++        compatible = "qcom,qca6390-pmu";
++
++        pinctrl-names = "default";
++        pinctrl-0 = <&bt_en_state>, <&wlan_en_state>;
++
++        vddaon-supply = <&vreg_s6a_0p95>;
++        vddpmu-supply = <&vreg_s2f_0p95>;
++        vddrfa0p95-supply = <&vreg_s2f_0p95>;
++        vddrfa1p3-supply = <&vreg_s8c_1p3>;
++        vddrfa1p9-supply = <&vreg_s5a_1p9>;
++        vddpcie1p3-supply = <&vreg_s8c_1p3>;
++        vddpcie1p9-supply = <&vreg_s5a_1p9>;
++        vddio-supply = <&vreg_s4a_1p8>;
++
++        wlan-enable-gpios = <&tlmm 20 GPIO_ACTIVE_HIGH>;
++        bt-enable-gpios = <&tlmm 21 GPIO_ACTIVE_HIGH>;
++
++        regulators {
++            vreg_pmu_rfa_cmn: ldo0 {
++                regulator-name = "vreg_pmu_rfa_cmn";
++                regulator-min-microvolt = <760000>;
++                regulator-max-microvolt = <840000>;
++            };
++
++            vreg_pmu_aon_0p59: ldo1 {
++                regulator-name = "vreg_pmu_aon_0p59";
++                regulator-min-microvolt = <540000>;
++                regulator-max-microvolt = <840000>;
++            };
++
++            vreg_pmu_wlcx_0p8: ldo2 {
++                regulator-name = "vreg_pmu_wlcx_0p8";
++                regulator-min-microvolt = <760000>;
++                regulator-max-microvolt = <840000>;
++            };
++
++            vreg_pmu_wlmx_0p85: ldo3 {
++                regulator-name = "vreg_pmu_wlmx_0p85";
++                regulator-min-microvolt = <810000>;
++                regulator-max-microvolt = <890000>;
++            };
++
++            vreg_pmu_btcmx_0p85: ldo4 {
++                regulator-name = "vreg_pmu_btcmx_0p85";
++                regulator-min-microvolt = <810000>;
++                regulator-max-microvolt = <890000>;
++            };
++
++            vreg_pmu_rfa_0p8: ldo5 {
++                regulator-name = "vreg_pmu_rfa_0p8";
++                regulator-min-microvolt = <760000>;
++                regulator-max-microvolt = <840000>;
++            };
++
++            vreg_pmu_rfa_1p2: ldo6 {
++                regulator-name = "vreg_pmu_rfa_1p2";
++                regulator-min-microvolt = <1187000>;
++                regulator-max-microvolt = <1313000>;
++            };
++
++            vreg_pmu_rfa_1p7: ldo7 {
++                regulator-name = "vreg_pmu_rfa_1p7";
++                regulator-min-microvolt = <1710000>;
++                regulator-max-microvolt = <1890000>;
++            };
++
++            vreg_pmu_pcie_0p9: ldo8 {
++                regulator-name = "vreg_pmu_pcie_0p9";
++                regulator-min-microvolt = <870000>;
++                regulator-max-microvolt = <970000>;
++            };
++
++            vreg_pmu_pcie_1p8: ldo9 {
++                regulator-name = "vreg_pmu_pcie_1p8";
++                regulator-min-microvolt = <1710000>;
++                regulator-max-microvolt = <1890000>;
++            };
++        };
++    };
 -- 
 2.40.1
 
