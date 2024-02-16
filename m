@@ -1,222 +1,210 @@
-Return-Path: <netdev+bounces-72400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B00C857EBE
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 15:09:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50492857EC3
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 15:09:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00CB9283AD5
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 14:09:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 75ADC1C25132
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 14:09:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CA4212C55A;
-	Fri, 16 Feb 2024 14:08:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63B9C12C55F;
+	Fri, 16 Feb 2024 14:09:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="FvMsY3gn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sznp/xIp"
 X-Original-To: netdev@vger.kernel.org
-Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01olkn2077.outbound.protection.outlook.com [40.92.107.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4609A59B5F;
-	Fri, 16 Feb 2024 14:08:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.107.77
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708092527; cv=fail; b=dmFJT4aNN4na9SXysDBSGBwDOdoQ/mR8cXFkC9wiJ+Ge5DAl9PnFFofbO7UsW94xzgYiOolpZx9Iq1jBdMTnymcRyLj2z64vY75kcLmUhG3j8VRkdAZ+M+V4YeVE6eahf/7k1t6Hw6/EdP4MQwLY2aXfFCvL4+bI4s7/xAt2HUQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708092527; c=relaxed/simple;
-	bh=0DWYtTq10NL4yLFRWlqy/H61RG0Pwtj7pjnMATgPafI=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=fT6SIMxBDdIX12AUgr8XIPzIkqOtOKruVJ273+wIFQ9Wphh6teJxbxOZBQ8BUCDm5YYVzeWK/XsUE439aSUQHJQxp8I9sUQ9vRfl7W0wlHQxzhlkIUErZr8RaPjEQCQRnCrRSdYKNn5bv9q7ScN5N/YQQPOEPtJ0tYpxXbUU6eY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=FvMsY3gn; arc=fail smtp.client-ip=40.92.107.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bmkJa9rVsbezCujJ3LzhVrVq0ciobK0OIUk8yGxys4gemg0oTeEBhPly42hi9tc/5rfFUXfnA5XwjRqQ8cjLM6zyS6g5VK4q4jJJ+mQsiD/WaLS7Fx7asrhBxWdCBkssnGHHYbauHFFvZaMAVv20/jk8eSA33VUnOxGXd4xErHgHIUe5EqYQ2bWbqs492ep0xMtO0mLncxH1gjYaehPyuu239+ZvgUzUcfKP1eMYTh7KMD/e+DzIlV4OlbFNqMKbKSg++tTX2hAGwphyecP1ML51Nk66sXozrBQk/toRj2uvY/i7jTRkLzRZHHhqvtmyAn2G2CAD/dgqpJyqglWB5g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fTJysSDiko1zL4wGyReBjKC4Lw1WUTDPn9ct1DOiFuA=;
- b=LWCdiN/y6DVJCeXm6BPMzn3IMf9L/ow3MZpFXs+wJB8PqnCmGTrPlEhDSgKo+NFzKs6AoCTBLTLmg/sSl4Bu8zopWSAR+AmdR3PA4KKK5ksbN+NTTFAqcQDhp2rQbpuGEtEtVMyTJbNLhnQgb8iAPlQleR1qQB4j/jR0t+hrXKQ/ewdy9f9Z0LhTmL4ChhlPE1cEIdVxWXV7pE2/Ju3fWDS2p+UDFfainwLiEZ5WukWvXedIL4cflsY0IQhUeZMKq1ERYMyBlF0KnnknxsetvFCClbAFv3x3nC92Y59kv8Ot8ee4MWtvHrTvflnbtBMKsIJPBSnLshlCaEpH3fy+yQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fTJysSDiko1zL4wGyReBjKC4Lw1WUTDPn9ct1DOiFuA=;
- b=FvMsY3gnw/o/FdkHv1x8sesKOjvtww1nXyRZ3T9G6qsdkysCE6bEMT3VRGPp0+1AzpiFOKcq6gN9grGJ5EOiB7UQYj814TwN+tH24V+7h4GlB2mptlvH6A0iMuvnhJncoKULxPZiHSj7D8Z8ewq9Z5ti2YRKcqIB9PMxSYuc1ulZ+RteQ0LVCF0Q2u3nVxTeP2hUs9fLp6isfby13DgkX4rxyHmRk59wiziV/8VzKgCpZZ2fsXZKg/ten+nIRRFWVIlgWghw+3+5YqFymONHh1pVAn5ynB5A+FuNJZsn7hDO/s+mPXhaqpZtmJ8dsF3LFnk0jxrUca6/aIvU6HKM4Q==
-Received: from SEZPR06MB6959.apcprd06.prod.outlook.com (2603:1096:101:1ed::14)
- by TYZPR06MB7282.apcprd06.prod.outlook.com (2603:1096:405:a1::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.31; Fri, 16 Feb
- 2024 14:08:40 +0000
-Received: from SEZPR06MB6959.apcprd06.prod.outlook.com
- ([fe80::9a6b:d813:8f4b:cba1]) by SEZPR06MB6959.apcprd06.prod.outlook.com
- ([fe80::9a6b:d813:8f4b:cba1%4]) with mapi id 15.20.7292.029; Fri, 16 Feb 2024
- 14:08:40 +0000
-Message-ID:
- <SEZPR06MB695985C02333DC5915A1203E964C2@SEZPR06MB6959.apcprd06.prod.outlook.com>
-Date: Fri, 16 Feb 2024 22:08:34 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/6] net: hisilicon: add support for hisi_femac core on
- Hi3798MV200
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Yisen Zhuang <yisen.zhuang@huawei.com>,
- Salil Mehta <salil.mehta@huawei.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Yang Xiwen <forbidden405@foxmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
-References: <20240216-net-v1-0-e0ad972cda99@outlook.com>
- <20240216-net-v1-1-e0ad972cda99@outlook.com>
- <d3ac4638-d0bf-4c6c-bccd-519ad1f4dc5e@lunn.ch>
- <SEZPR06MB69593E00C6A69AFAC61BF2BD964C2@SEZPR06MB6959.apcprd06.prod.outlook.com>
- <143ee08e-e53a-41c1-8020-55b495394dd4@lunn.ch>
-From: Yang Xiwen <forbidden405@outlook.com>
-In-Reply-To: <143ee08e-e53a-41c1-8020-55b495394dd4@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TMN:
- [NFOYI0Bmxq0o6zGSBmW5/uVCUaRxMq6GvJJZQugCteLYH23t1d/rQpihrpvfssao0SEovUy+IR4=]
-X-ClientProxiedBy: TYAPR01CA0175.jpnprd01.prod.outlook.com
- (2603:1096:404:ba::19) To SEZPR06MB6959.apcprd06.prod.outlook.com
- (2603:1096:101:1ed::14)
-X-Microsoft-Original-Message-ID:
- <c256611a-375c-42f9-a6a8-dfcb68b61f2f@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E53C12BF25
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 14:09:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708092553; cv=none; b=XEXdiZuT1lku3esJgOW5Wd4qeHCLaU0095JFrHtZTh35lvQmNBJeuaZsCvU2L5DO2WALEODQ15fOxfRhyAXSSm3mzHYwRzTMVKQPAmqa4FTJEy5XceP+Mv8ec+yGdEaFU0qlDaubQnVTCUcsKPRXWm9TK2lBD8ttbWF7jfItPLQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708092553; c=relaxed/simple;
+	bh=iC8OfTlpD6CiwjJQGN2dLRP6kSbr4Kw70y2EAzMojOE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Tieg/8AmpoW5CsI1S1WG/p+Y2L6SqVlt/tcJhpNrgjp2hjF5K9c3KZ+4MQAzFo2kVwocJ+DusVucES2LiGbaAOzepLJt/cSWnNXlDJv19+iN+W4MEEVlcISR4DGK8jV1vvmOjcKAQx1x636z7iKeOYt60jD/XhDWPgZu/fMywpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sznp/xIp; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2d12bdd9a64so7382521fa.1
+        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 06:09:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708092550; x=1708697350; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YEj5JexTouLScRj18CbLhZLlLt1uHEPqZkcFoZJYiI8=;
+        b=Sznp/xIpyMtts4+AVlBoGxQNqFf0in8xQqz9+cJ7tHmTvs4ri0Cr3w1o5g+/IvFgyu
+         Ucgbs1EqrOii5PqKoEFdFq6CfKu62UU3kSR92SbVI80S+tBbr+6eW1bAjJKm0wWudXB/
+         QnVAA01bLRNMd6BUzkOOLO7tlxoSOWzkV5DGMVYR87nOZ2YvmX+R9E0W9PXu/G4XtUTO
+         +R8qisvt0A6ZHjCdIQvr7MxOiT4AuTVWzGOA/E0pI7qNffISiUPHlp67Y1lC+ywYYtCs
+         ThiFz1a4TAYR+I7B3nl/78F9ZBj4m+HhtLqGJxn46PD1A1f3adrDHlvafdhp/p6FBZJu
+         dm/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708092550; x=1708697350;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YEj5JexTouLScRj18CbLhZLlLt1uHEPqZkcFoZJYiI8=;
+        b=bFsDWhArJ1p5QVr0OdD2DlU32BzcX2DK5TvXEIaqjzpCrqwr0qBOz2rt6LD0lEsC0p
+         URdtgb1N9B3AulkKAbyoWAVsqj1XjT3+niA4SxxLpp+kD5bfhaL+7mMOcEbGpdX+d077
+         VMxcH2hF7vOCIZeGsDx/JkDd00QsY6nKf+zXD9Fqm6MX9vyyOoO9oDc9IRtarDoY2hgU
+         OeHtByK4FIL/eyrWvo7/hyCNhQ006DqdC2UkCL3kXI/nABxc5SolixjaTrbpFwtX+K2k
+         S9W/+v5JjOAH7bzO1CMDkrVCF1vtUWquWuJtkvYc+FJm0qBY01oilUvlpe8Jy6p04PD3
+         Zl2Q==
+X-Gm-Message-State: AOJu0Yy/xw46Wm59PUYSgf4UTB4pGJPjU7oQ3RRFoOUzQGXEaK0i0Q0R
+	fUntYUx8jhIrPFJfXUoVx7pUTDzI+30xtFevzhDj3dnDDBI9o4jH
+X-Google-Smtp-Source: AGHT+IHlkA922cwaz8mMvlouQ6qGy4ymZxYncrREhxh2jbOfrdifBDw0z7IRtl4+PyuAag+spqY+HQ==
+X-Received: by 2002:ac2:430a:0:b0:511:680c:94e9 with SMTP id l10-20020ac2430a000000b00511680c94e9mr3007710lfh.3.1708092549325;
+        Fri, 16 Feb 2024 06:09:09 -0800 (PST)
+Received: from localhost.localdomain ([83.217.200.232])
+        by smtp.gmail.com with ESMTPSA id x9-20020ac259c9000000b0051166fc7faesm605535lfn.75.2024.02.16.06.09.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Feb 2024 06:09:08 -0800 (PST)
+From: Denis Kirjanov <kirjanov@gmail.com>
+X-Google-Original-From: Denis Kirjanov <dkirjanov@suse.de>
+To: mkubecek@suse.cz
+Cc: netdev@vger.kernel.org,
+	Denis Kirjanov <dkirjanov@suse.de>
+Subject: [PATCH ethtool] move variable-sized members to the end of structs
+Date: Fri, 16 Feb 2024 09:08:53 -0500
+Message-Id: <20240216140853.5213-1-dkirjanov@suse.de>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SEZPR06MB6959:EE_|TYZPR06MB7282:EE_
-X-MS-Office365-Filtering-Correlation-Id: 646e7709-2001-497a-682e-08dc2ef8c660
-X-MS-Exchange-SLBlob-MailProps:
-	7J/vb0KDx3izcbpLHFk7TRYcAS8nbhnwdddozxY5odVw2MXbiKma9N1T7XtEN7ojadTCU2At93bQE+DO1perRCymYAqYRFcLV5lPWglmB2D2AhaefR8hPyZ/vJW7b8hNPSFyHK7ESYKjfQFxM9cntvxDhhKQKq+xXo2k/YpUyttV4X31b6BksieGFJQFp+0Ou6YCZ6FVaMP1051M9HiJKfCCY/jtMUTCDkgu1Vo2RBsEkeKT7vFs4BkuTJOG2+L5f+JTvaUaNsuFa9JTrQHrbsuvcN8MDPEfDBi809v3pYtMgJdQIlbXgRhXerg8J0xViCof1Fn4TDYBf3SKlObc5HLKCT+u63GJBJdoBgtEZHsMLUkP3vsfmss02ziKRY+Ak94o1QtIPR4vYWK8xdf7RdMncvGLCONnz7RRVtj5bIybfM+w+B3vWgpVT39Eg0B6W8MdGt876Uwi4TCLNicoX5vpJHtpOEGZv81eeia20W58oB32Gxo9bsMZ0u41cv21tvCmPDmAXlTFPnZf7CK+gUL1u4nOdzznYgjdnnS+6IINtuvhMr6sgw+ILt+/3gLSrfUH/lQLF/Y9Rz5xRVtZNDcHqBQ9ysIGvM+j1xcl0UkF4NEufnSdW907o6x7MtsHV5fFdqKa5vvnVvdsqB92j7R42/VmO8BrVNCAtu0zzEGl8ZN8/4fjeWCGI/Mz8sQNlp6ND2MHPi74wyiXDzdk1Jo8+w3EQKQ09g4q9RsX+S0HzPKZTyRBIBl2z4lqmApvwV6kzxJDXe8N8jyUneIpYNwlQI1aDYODWSEbaUyhqus=
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	yGEGwxPXtLZomyJjivkcSSGgIX5q4tgGHJRuP0ShCuwMYn46le5knSf+1o6vqgWUjEp8NDArG0XyvzxqA233g4gn6JvBE/haEET/C08uBLuB9EEjDY8PyqsudxIouEQ2r5hb3yohUY6LHVhI9Ul/cfbkCreRbcSzFlGYqajQ9pfH/dMrq/FWJEWBkIFv3sI+2X2uSgWl+IMZov5HC6DneGdPc7KBFoJLYYBqUBe7j1LgLlhmmdgmzypw/HVfomDtw+AhAx+qbkiHIpdwWRfjcGQ+bfgSPV4mvLyz9xherP8WTy9DuPsGX0EwCv5qRaXx3IA9KrVBMvOmnEB+nCrKHQwbf0JmkuDJkFbbXimhspS3QG0Upc8TAW0tZkmxtqdtKpGGSqze1MHIxmUSjkR4qbtRZN7OWdKghQhfegzC0qPkiJMCzCY38xkaRUVgL1zE3k0uf8It9Xw1LTYzUw7HjBt+RavLe8mhM3yNrFYeNHIYXuFitzP9kV4oeVGx9N2sQKjYeN8Rvr8V1gZxI7QlfCqY/cREN6dHAKe0dTLVRVnxEoOOhXrx77M4OKPV0Xmj
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RWtBcXRkTFlOalF4SGtOMU5WOXZJWFB4Z2U2Sm5GK1VneDhURVZhdE9PT3hG?=
- =?utf-8?B?MmVua3JUSTErS2lpM3Y2R3MvcG1YQ0RCNmd0eUUxOUN4QmtpanA1cVUvTmp5?=
- =?utf-8?B?c2g4cFF6TGJrakM2cnZORFN0NE5acEs2dU5tV3Q4MTBDM0hUUkNZNHJrd2pB?=
- =?utf-8?B?cDhuSzNlZFlxYWhyN2JsNU1ld3hvWFRWK25xSG9YM0YyTlpwODY5L0p5R2xo?=
- =?utf-8?B?Q0tMOHR2NFk2Zk1NREsxNUExM3pxQmUzVzF0NUFNWnczSm4vTkVrUmlrdytK?=
- =?utf-8?B?b3hpc2NFWDNXRWIwQWp6YjVLSVhONjllMGhlVGdhaWZvUWRnVnc5NUZZeHJq?=
- =?utf-8?B?SFN0c3FmWHlLbmtlYjJGbjhWdmlpRHZIOEI3Skx0Rk5CRVZERzZLSFdWNERn?=
- =?utf-8?B?VjdzcWdsSHZ5cjdnVjR4Q2xBM25PTVQybEVNR0VlZUwzL2dLenI0RSs1Z2x2?=
- =?utf-8?B?VDBIQWVKMTR6aEdPdHdCemFqVWxmcEJudDVNWitodXpQWXFpMkNWL0NxclhM?=
- =?utf-8?B?Rjd0Z09rSndRNHZ0ejNteHNtMWVLUEdBYUVENFcyU3pwNkNNem9yWktGODdE?=
- =?utf-8?B?OWpXQk1hd25laUcxaUgzMWl2ei9MaVVqSVJKWnNxZWNiS0dxTVozdkdkdXVE?=
- =?utf-8?B?VitRVWZFMEtwV1FNeVVOaC9wZDBXYUFvZ2dSKzVWbllSSU4rNmFzK3F6SGNp?=
- =?utf-8?B?dy9sd3VNQ0Z4amsrWk1NTmRNNkhQb09pWjlVdW15QkIzb2Vwd1d1RXo5NkpK?=
- =?utf-8?B?TDZ1R0IzVEt5dVZuWm13VFV3Z2IxazExdzZWMzZZc21tQVVZNG15cG91dzZ2?=
- =?utf-8?B?T0dxbnVtUUYvR015SERHUXcva29qSzVOOWpHa2pYUHdBR3U3WmRvMDNzb1Fo?=
- =?utf-8?B?R0ZzYi9QeVVNMnJYUmg4NDdTRTNWWno4ait3U1pvVTF1dHU2L1VWME5NS3Z1?=
- =?utf-8?B?dVFWRnNMYTd2UThxaUNPZG1NQnBlQlg3UGt1M3l1ZTQ3T1RaNTZFcDZ3N0dt?=
- =?utf-8?B?MHFHeU1rSW5hazNreW4zSmNJM0IvenVGY2xRUHFoTmIvcDlXMi9PZ2M3aHYr?=
- =?utf-8?B?VnNEWUV4WjBkMkc3UmdFeFBFWTJ3VHQ2T2pzUXFFTTZpbEloRmRpcG5TRVh4?=
- =?utf-8?B?Wmh1K0wya2ZjYitDUENDN01sTUloQTkvSTA2c3hPbjZHZlpPS0pJaXM4dis0?=
- =?utf-8?B?cEl2VjBDcStYVWtvaC83RjlKbjBCd2VHeVBnV1BZYWRHR2tJam9iNzRueGxp?=
- =?utf-8?B?b0FpaC8rRTQzZ0QyMHQvWnJqblhnS2g0VGRSa1RWV3czcnZseUd1K1FEL1ZC?=
- =?utf-8?B?TDJ4L21FZzBuVkFieUpZL1R1TDl5VWNZcXJ0TCs2Ym9zd0dWd3B6K2ZNNzdK?=
- =?utf-8?B?L1k2MHFqUk1kSEFQU1ROQlAvRHpVVEJ6RTh1YkxRc3hmR0M2NUNqY1FwZ3Qz?=
- =?utf-8?B?a1BHYlR1bGNtc3hFTHJVZ3VTM3VPTWV1cFM0OGYwa1VHajYzM0UwUnZOUGFv?=
- =?utf-8?B?YUN0NWo3R1M2bndKeTV3cGRaM0FsQXEvMTgyZWJLbTgwRFZlbVVyR09IQnhq?=
- =?utf-8?B?L3phR1grMXQ2ODNDZ2pxOXNLRXBHeGlqbXpxL243cGVGQjIwOHZGWUtZcHBh?=
- =?utf-8?B?TGxEM2lsRE5FTWg3SmF5c2h0N2h4WGJQNFhkOE9Bb1diMWJuQkZ4a0diWWpE?=
- =?utf-8?B?dEpvMW1SdGVjYjJZUDg5WWJ1MWplOXdWc0N5OHJjZlR5TGY5Z3dYZU1YZ0VJ?=
- =?utf-8?Q?0fsrpzFykQdKMzWqUzr253T+RPHI4rlHkTV/EMW?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 646e7709-2001-497a-682e-08dc2ef8c660
-X-MS-Exchange-CrossTenant-AuthSource: SEZPR06MB6959.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Feb 2024 14:08:39.6174
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR06MB7282
+Content-Transfer-Encoding: 8bit
 
-On 2/16/2024 9:58 PM, Andrew Lunn wrote:
-> On Fri, Feb 16, 2024 at 09:41:29PM +0800, Yang Xiwen wrote:
->> On 2/16/2024 9:23 PM, Andrew Lunn wrote:
->>>> +	// Register the optional MDIO bus
->>>> +	for_each_available_child_of_node(node, mdio_np) {
->>>> +		if (of_node_name_prefix(mdio_np, "mdio")) {
->>>> +			priv->mdio_pdev = of_platform_device_create(mdio_np, NULL, dev);
->>>> +			of_node_put(mdio_np);
->>>> +			if (!priv->mdio_pdev) {
->>>> +				dev_err(dev, "failed to register MDIO bus device\n");
->>>> +				goto out_free_netdev;
->>>> +			}
->>>> +			mdio_registered = true;
->>>> +			break;
->>>> +		}
->>>> +	}
->>>> +
->>>> +	if (!mdio_registered)
->>>> +		dev_warn(dev, "MDIO subnode notfound. This is usually a bug.\n");
->>> I don't understand the architecture of this device yet...
->>>
->>> It seems like you have an integrated PHY? In the example, you used a
->>> phy-handle to bind the MAC to the PHY. So why is the MDIO bus
->>> optional?
->> Because the MAC can also support external PHY according to the datasheet.
->> Maybe some other SoCs didn't implement this internal PHY and used an
->> external PHY instead.
->>> Do the MII signals from the MAC also go to SoC pins, so you could use
->>> an external PHY? Is there a SERDES so you could connect to an SFP
->>> cage?
->> No. MII signals is not accessible outside of the SoC. The SoC only exports
->> FEPHY pins (i.e. RXN(P) and TXN(P)).
->>> Also, do the MDIO pins go to SoC pins? Can the MDIO bus master be used
->>> to control external PHYs?
->> It can, but not for Hi3798MV200. The datasheet said it can use both internal
->> phy or external phy. But for Hi3798MV200, seems impossible.
-> So for the Hi3798MV200 this is not optional, the MDIO bus is
-> mandatory.
->
-> Also, it sounds like it exists in the silicon. So it is better to
-> always describe it in the .dtsi file.
->
-> And i took a quick look at mdio-hisi-femac.c. It has a probe function
-> which does:
->
->          data->membase = devm_platform_ioremap_resource(pdev, 0);
->
-> meaning it expects to have its own address range. It is a device of
-> its own. That also explains the compatible. So please move the MDIO
-> bus to a node of its own, rather than embedding it within the MAC
-> node.
+The patch fixes the following clang warnings:
 
-It won't work. Hi3798MV200 does not have a dedicated MDIO bus clock. 
-this clock is merged to MAC clock for this SoC. We need to enable 
-CLK_BUS and CLK_MAC before MDIO bus access.
+warning: field 'xxx' with variable sized type 'xxx' not at the end of a struct
+ or class is a GNU extension [-Wgnu-variable-sized-type-not-at-end]
 
-Assigning CLK_MAC and CLK_BUS to MDIO bus device does not work either. 
-Because the clocks will be enabled twice, the MAC controller will be 
-unable to disable the clocks during PHY reset.
+Signed-off-by: Denis Kirjanov <dkirjanov@suse.de>
+---
+ ethtool.c  | 18 +++++++++---------
+ internal.h |  2 +-
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
-Note that the source is contributed by HiSilicon almost 8 yrs ago. And 
-they had never proved that this driver  works. They are not doing things 
-like this in downstream.
-
->
-> 	Andrew
-
-
+diff --git a/ethtool.c b/ethtool.c
+index 3ac15a7..32e79ae 100644
+--- a/ethtool.c
++++ b/ethtool.c
+@@ -1736,8 +1736,8 @@ get_stringset(struct cmd_context *ctx, enum ethtool_stringset set_id,
+ 	      ptrdiff_t drvinfo_offset, int null_terminate)
+ {
+ 	struct {
+-		struct ethtool_sset_info hdr;
+ 		u32 buf[1];
++		struct ethtool_sset_info hdr;
+ 	} sset_info;
+ 	struct ethtool_drvinfo drvinfo;
+ 	u32 len, i;
+@@ -2683,8 +2683,8 @@ do_ioctl_glinksettings(struct cmd_context *ctx)
+ {
+ 	int err;
+ 	struct {
+-		struct ethtool_link_settings req;
+ 		__u32 link_mode_data[3 * ETHTOOL_LINK_MODE_MASK_MAX_KERNEL_NU32];
++		struct ethtool_link_settings req;
+ 	} ecmd;
+ 	struct ethtool_link_usettings *link_usettings;
+ 	unsigned int u32_offs;
+@@ -2752,8 +2752,8 @@ do_ioctl_slinksettings(struct cmd_context *ctx,
+ 		       const struct ethtool_link_usettings *link_usettings)
+ {
+ 	struct {
+-		struct ethtool_link_settings req;
+ 		__u32 link_mode_data[3 * ETHTOOL_LINK_MODE_MASK_MAX_KERNEL_NU32];
++		struct ethtool_link_settings req;
+ 	} ecmd;
+ 	unsigned int u32_offs;
+ 
+@@ -5206,8 +5206,8 @@ static int do_get_phy_tunable(struct cmd_context *ctx)
+ 
+ 	if (!strcmp(argp[0], "downshift")) {
+ 		struct {
+-			struct ethtool_tunable ds;
+ 			u8 count;
++			struct ethtool_tunable ds;
+ 		} cont;
+ 
+ 		cont.ds.cmd = ETHTOOL_PHY_GTUNABLE;
+@@ -5224,8 +5224,8 @@ static int do_get_phy_tunable(struct cmd_context *ctx)
+ 			fprintf(stdout, "Downshift disabled\n");
+ 	} else if (!strcmp(argp[0], "fast-link-down")) {
+ 		struct {
+-			struct ethtool_tunable fld;
+ 			u8 msecs;
++			struct ethtool_tunable fld;
+ 		} cont;
+ 
+ 		cont.fld.cmd = ETHTOOL_PHY_GTUNABLE;
+@@ -5246,8 +5246,8 @@ static int do_get_phy_tunable(struct cmd_context *ctx)
+ 				cont.msecs);
+ 	} else if (!strcmp(argp[0], "energy-detect-power-down")) {
+ 		struct {
+-			struct ethtool_tunable ds;
+ 			u16 msecs;
++			struct ethtool_tunable ds;
+ 		} cont;
+ 
+ 		cont.ds.cmd = ETHTOOL_PHY_GTUNABLE;
+@@ -5494,8 +5494,8 @@ static int do_set_phy_tunable(struct cmd_context *ctx)
+ 	/* Do it */
+ 	if (ds_changed) {
+ 		struct {
+-			struct ethtool_tunable ds;
+ 			u8 count;
++			struct ethtool_tunable ds;
+ 		} cont;
+ 
+ 		cont.ds.cmd = ETHTOOL_PHY_STUNABLE;
+@@ -5510,8 +5510,8 @@ static int do_set_phy_tunable(struct cmd_context *ctx)
+ 		}
+ 	} else if (fld_changed) {
+ 		struct {
+-			struct ethtool_tunable fld;
+ 			u8 msecs;
++			struct ethtool_tunable fld;
+ 		} cont;
+ 
+ 		cont.fld.cmd = ETHTOOL_PHY_STUNABLE;
+@@ -5526,8 +5526,8 @@ static int do_set_phy_tunable(struct cmd_context *ctx)
+ 		}
+ 	} else if (edpd_changed) {
+ 		struct {
+-			struct ethtool_tunable fld;
+ 			u16 msecs;
++			struct ethtool_tunable fld;
+ 		} cont;
+ 
+ 		cont.fld.cmd = ETHTOOL_PHY_STUNABLE;
+diff --git a/internal.h b/internal.h
+index 4b994f5..e0beec6 100644
+--- a/internal.h
++++ b/internal.h
+@@ -152,12 +152,12 @@ struct ethtool_link_usettings {
+ 	struct {
+ 		__u8 transceiver;
+ 	} deprecated;
+-	struct ethtool_link_settings base;
+ 	struct {
+ 		ETHTOOL_DECLARE_LINK_MODE_MASK(supported);
+ 		ETHTOOL_DECLARE_LINK_MODE_MASK(advertising);
+ 		ETHTOOL_DECLARE_LINK_MODE_MASK(lp_advertising);
+ 	} link_modes;
++	struct ethtool_link_settings base;
+ };
+ 
+ #define ethtool_link_mode_for_each_u32(index)			\
 -- 
-Regards,
-Yang Xiwen
+2.30.2
 
 
