@@ -1,163 +1,146 @@
-Return-Path: <netdev+bounces-72385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98506857D96
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 14:21:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 03D32857D91
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 14:21:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5573D284AD2
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 13:21:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A35D2891B3
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 13:21:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48B67129A7C;
-	Fri, 16 Feb 2024 13:21:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E0FC1292F4;
+	Fri, 16 Feb 2024 13:21:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="KVrbIyro"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LsjWmn3I"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7DC71292F4
-	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 13:21:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D86171292C0;
+	Fri, 16 Feb 2024 13:21:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708089697; cv=none; b=rr1WF/eV4KsEB7oHR6jiGoxqclIl4KtH/4nbIzyenhCSXFnyrMT0VsBiZuTmC3mQvnNZeEEJRb2i2cBBfDMjMioUCEu65sztFklWQXnZF99ymDwDGeQ7KiLwNdmr9MkwQO/uu6Yt5ofX+pKyASS4UGVQQKKzvlmzLXk1D+B8PzY=
+	t=1708089684; cv=none; b=GzUg5cHxuVE3ID/DAr/20OXvvFb8GEG45HxcrQhr6Q2Na2sRegbrgcVvF8vCm/O1tfFWOIMQij6DXdzmlAOSJz8zmDp4TVJYtSbfYcHvh2WDHb9Ewv07cTz5mWgy+3k0mZe8IFgdk6CWKSuFCYF10fthaBWjya9clJjAMW24moc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708089697; c=relaxed/simple;
-	bh=OgF4aCM9udP+jQVjHy1Lopqloy8u3ulYgAGZ+P07+9M=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iqeSLj2z66ROppl1ZxGx7181uuoryNEnTkbbwsm9iyeYKwlk3O5aUcfivp4/vfp9ifpvjw7v2egTso2LN5jnxUobwcN6rneM6ybwb0TNJ2UYT/Qrd2ganSvNNq05x3vxTD+ABik9Hb2L9qIo+Xw1WRoU8CsZHiEGyK+1Hn0tSFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=KVrbIyro; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 364528718A;
-	Fri, 16 Feb 2024 14:21:31 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1708089691;
-	bh=cx1Tkohw7MR43RIHlKNBQnflQSMvDB/BofzUaMoe+uk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=KVrbIyro1jgRuIn8NihG2bK28whmvSocj1WkD65JZAVuwch/CXaPIvKDo+TeqthHC
-	 qPLNEuJPyq9GyfteILA7wa+bunIgQQaUiOAu/lAAsHOfhy3mAgXeoUyMOOmaYidcB5
-	 igmSI2V0XcW7mBiVYrBld1iV47JXbj5fGTcrpP49pPvTJAfY7Mfop3AqAiEckRXtzu
-	 fu4A6nnZph0vN0C/4kXMMmxnZCmcbbjp2zkCDH6eYaau7fujA7aRQGT807hoG79ULE
-	 VN7t8+boA4mK5tHSGnkAwtaJnQ0kIIH+qVkkLGkXYbkxJvVBah62npDwgniS3F4mnG
-	 ffOwX6c7wgy1g==
-From: Lukasz Majewski <lukma@denx.de>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Stephen Hemminger <stephen@networkplumber.org>
-Cc: Eric Dumazet <edumazet@google.com>,
+	s=arc-20240116; t=1708089684; c=relaxed/simple;
+	bh=x/3vrG9nda17m8L+3fb++8h+gBsjD4a7VisFEsFYkSQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=afGbiwCzpVGTzXL9O4jisGykX3/Hdno23Of1+5Gi4+t+3jiK8qzC38+F79PlIIctmXaCgB2VWa6sOHmyClMD/1JHKdOp13t1NtjN7CnuLWO3G7zOMX2qCrBfJIAMUConQt4mcX4JFofD9fbdkDfD9jbwkfeENr0A6ntFNs5YFG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LsjWmn3I; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a26f73732c5so115819066b.3;
+        Fri, 16 Feb 2024 05:21:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708089681; x=1708694481; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cWSv/HmhGBg0kRCfTQuNOynwzv3tVN0eXsPreJCp1X4=;
+        b=LsjWmn3I6m9ucKPFCpuBOUam5zuQLv6es3v4aHIxOzhY0+Oy8hB2zrkB3Za8qdafyW
+         6OHqBBWqmB9CB0VAjrizBFURfoseLm37fpA+AtCJJo7MvPJf3HlOvQ6+lm2oy5xixXxj
+         UoVCzedIdu2bvz9ix+E5SXlpaNQGfln8bWximEV3H5ZfD88XJAu9Z7qKV5S3ALCkLeSq
+         k7mF4e/GowjtqzvPEV/eAgJ9BQpLdZQtX1FRhk5/2jIzR9NHjDq5PItOZtVJ4SKgmix7
+         PtirfGuFYhLgZclodmxw4uxSoigsSNCwP3akE489yU3M2MywGANA47e52X6BrWMVQCyq
+         mHjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708089681; x=1708694481;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cWSv/HmhGBg0kRCfTQuNOynwzv3tVN0eXsPreJCp1X4=;
+        b=jPNNGDQD6m3BZYPfWE73HA7CLfF3WqTGYF6nxrsC7TPk0+eSgPRz4mzXlL5rgH4ssR
+         IRxRQ+ZWnkJ5rY514dSrKj1DrNDzTYTckPq7/hwbdXBfrWrGPxUHlwhHmMJkgoAKYDW1
+         Mzb7wVcKJoNtgY385RkewDkRJJdFe/Gb112ytpT4XKmP5Wbm8fy/WhEqaj8jd8bT/Bqo
+         OxpLpwR7F14knxG3whQHT7B+D1dEDbmVNBqYByoOhFNQcD5sBRtLYxzXnMR709uHW5Bl
+         n2SKDX/CG4uqfbewZx2C9d9qBPketDnmdXLOvopqgzA9t0g/+e8CCZQyEWpUMPCDeIlZ
+         DAhw==
+X-Forwarded-Encrypted: i=1; AJvYcCUnfQPcsXdBOoBVxGPyhVHn9oInaU+gjcGfHjgjw4MS9+ZdeB7aZbanRnBcik28shPQPrP16+azLmGt1jw0IAKV0I3/dPsoln/fLrzM
+X-Gm-Message-State: AOJu0Yw45IDxAn7zou80F0M9z7jGblZpZmOCI7YlA7pjqMSugAi46NnY
+	tSfxY77VTeyYdbUtuVzm6AXmKYYEKH93Ythsir8zzH/mmXKNoam3
+X-Google-Smtp-Source: AGHT+IHS6t0+yz0DNbmIYBN7/I+Mse00vqFH2vC3TH0Ujs7kCiCWjyYbatSvL8XkSi1pAgZwA8n6sA==
+X-Received: by 2002:a17:907:7658:b0:a3d:ec2c:676b with SMTP id kj24-20020a170907765800b00a3dec2c676bmr891599ejc.65.1708089680738;
+        Fri, 16 Feb 2024 05:21:20 -0800 (PST)
+Received: from skbuf ([188.25.173.195])
+        by smtp.gmail.com with ESMTPSA id a9-20020a1709065f8900b00a389490cb21sm1536268eju.216.2024.02.16.05.21.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Feb 2024 05:21:20 -0800 (PST)
+Date: Fri, 16 Feb 2024 15:21:17 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, linus.walleij@linaro.org,
+	Andrew Lunn <andrew@lunn.ch>,
 	Florian Fainelli <f.fainelli@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	Lukasz Majewski <lukma@denx.de>
-Subject: [PATCH] ip link: hsr: Add support for passing information about INTERLINK device
-Date: Fri, 16 Feb 2024 14:21:14 +0100
-Message-Id: <20240216132114.2606777-1-lukma@denx.de>
-X-Mailer: git-send-email 2.39.2
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v4 07/15] net: dsa: vsc73xx: Add vlan filtering
+Message-ID: <20240216132117.ajxg3vyds4ffpbaj@skbuf>
+References: <20240213220331.239031-1-paweldembicki@gmail.com>
+ <20240213220331.239031-8-paweldembicki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240213220331.239031-8-paweldembicki@gmail.com>
 
-The HSR capable device can operate in two modes of operations -
-Doubly Attached Node for HSR (DANH) and RedBOX.
+On Tue, Feb 13, 2024 at 11:03:20PM +0100, Pawel Dembicki wrote:
+> +static int
+> +vsc73xx_port_vlan_filtering(struct dsa_switch *ds, int port,
+> +			    bool vlan_filtering, struct netlink_ext_ack *extack)
+> +{
+> +	enum vsc73xx_port_vlan_conf port_vlan_conf = VSC73XX_VLAN_IGNORE;
+> +	struct vsc73xx *vsc = ds->priv;
+> +	bool store_untagged  = false;
+> +	bool store_pvid = false;
+> +	u16 vlan_no, vlan_untagged;
+> +
+> +	/* The swap processed bellow is required because vsc73xx is using tag8021q.
+> +	 * When vlan_filtering is disabled, tag8021q use pvid/untagged vlans for
+> +	 * port recognition. The values configured for vlans < 3072 are stored
+> +	 * in storage table. When vlan_filtering is enabled, we need to restore
+> +	 * pvid/untagged from storage and keep values used for tag8021q.
+> +	 */
+> +
+> +	if (vlan_filtering) {
+> +		/* Use VLAN_N_VID to count all vlans */
+> +		u16 num_untagged = vsc73xx_bridge_vlan_num_untagged(vsc, port, VLAN_N_VID);
+> +
+> +		port_vlan_conf = (num_untagged > 1) ?
+> +				 VSC73XX_VLAN_FILTER_UNTAG_ALL : VSC73XX_VLAN_FILTER;
+> +
+> +		vlan_untagged = vsc73xx_find_first_vlan_untagged(vsc, port);
+> +		if (vlan_no < VLAN_N_VID) {
 
-The latter one allows connection of non-HSR aware device to HSR network.
-This node is called SAN (Singly Attached Network) and is connected via
-INTERLINK network device.
+One more that I've missed. There's a bug here. You don't mean "vlan_no"
+(which at this stage is uninitialized), but "vlan_untagged".
 
-This patch adds support for passing information about the INTERLINK device,
-so the Linux driver can properly setup it.
-
-Signed-off-by: Lukasz Majewski <lukma@denx.de>
----
- include/uapi/linux/if_link.h |  1 +
- ip/iplink_hsr.c              | 22 +++++++++++++++++++++-
- 2 files changed, 22 insertions(+), 1 deletion(-)
-
-diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-index 41708e2..aa70ed6 100644
---- a/include/uapi/linux/if_link.h
-+++ b/include/uapi/linux/if_link.h
-@@ -1122,6 +1122,7 @@ enum {
- 	IFLA_HSR_PROTOCOL,		/* Indicate different protocol than
- 					 * HSR. For example PRP.
- 					 */
-+	IFLA_HSR_INTERLINK,		/* HSR interlink network device */
- 	__IFLA_HSR_MAX,
- };
- 
-diff --git a/ip/iplink_hsr.c b/ip/iplink_hsr.c
-index da2d03d..1f048fd 100644
---- a/ip/iplink_hsr.c
-+++ b/ip/iplink_hsr.c
-@@ -25,12 +25,15 @@ static void print_usage(FILE *f)
- {
- 	fprintf(f,
- 		"Usage:\tip link add name NAME type hsr slave1 SLAVE1-IF slave2 SLAVE2-IF\n"
--		"\t[ supervision ADDR-BYTE ] [version VERSION] [proto PROTOCOL]\n"
-+		"\t[ interlink INTERLINK-IF ] [ supervision ADDR-BYTE ] [ version VERSION ]\n"
-+		"\t[ proto PROTOCOL ]\n"
- 		"\n"
- 		"NAME\n"
- 		"	name of new hsr device (e.g. hsr0)\n"
- 		"SLAVE1-IF, SLAVE2-IF\n"
- 		"	the two slave devices bound to the HSR device\n"
-+		"INTERLINK-IF\n"
-+		"	the interlink device bound to the HSR network to connect SAN device\n"
- 		"ADDR-BYTE\n"
- 		"	0-255; the last byte of the multicast address used for HSR supervision\n"
- 		"	frames (default = 0)\n"
-@@ -86,6 +89,12 @@ static int hsr_parse_opt(struct link_util *lu, int argc, char **argv,
- 			if (ifindex == 0)
- 				invarg("No such interface", *argv);
- 			addattr_l(n, 1024, IFLA_HSR_SLAVE2, &ifindex, 4);
-+		} else if (matches(*argv, "interlink") == 0) {
-+			NEXT_ARG();
-+			ifindex = ll_name_to_index(*argv);
-+			if (ifindex == 0)
-+				invarg("No such interface", *argv);
-+			addattr_l(n, 1024, IFLA_HSR_INTERLINK, &ifindex, 4);
- 		} else if (matches(*argv, "help") == 0) {
- 			usage();
- 			return -1;
-@@ -113,6 +122,9 @@ static void hsr_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- 	if (tb[IFLA_HSR_SLAVE2] &&
- 	    RTA_PAYLOAD(tb[IFLA_HSR_SLAVE2]) < sizeof(__u32))
- 		return;
-+	if (tb[IFLA_HSR_INTERLINK] &&
-+	    RTA_PAYLOAD(tb[IFLA_HSR_INTERLINK]) < sizeof(__u32))
-+		return;
- 	if (tb[IFLA_HSR_SEQ_NR] &&
- 	    RTA_PAYLOAD(tb[IFLA_HSR_SEQ_NR]) < sizeof(__u16))
- 		return;
-@@ -136,6 +148,14 @@ static void hsr_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- 	else
- 		print_null(PRINT_ANY, "slave2", "slave2 %s ", "<none>");
- 
-+	if (tb[IFLA_HSR_INTERLINK])
-+		print_string(PRINT_ANY,
-+			     "interlink",
-+			     "interlink %s ",
-+			     ll_index_to_name(rta_getattr_u32(tb[IFLA_HSR_INTERLINK])));
-+	else
-+		print_null(PRINT_ANY, "interlink", "interlink %s ", "<none>");
-+
- 	if (tb[IFLA_HSR_SEQ_NR])
- 		print_int(PRINT_ANY,
- 			  "seq_nr",
--- 
-2.20.1
-
+> +			store_untagged  = vsc73xx_port_get_untagged(vsc, port, &vlan_no, false);
+> +			vsc73xx_vlan_change_untagged(vsc, port, vlan_untagged,
+> +						     vlan_untagged < VLAN_N_VID, false);
+> +			vsc->untagged_storage[port] = store_untagged ? vlan_no : VLAN_N_VID;
+> +		}
+> +	} else {
+> +		vsc73xx_vlan_change_untagged(vsc, port, vsc->untagged_storage[port],
+> +					     vsc->untagged_storage[port] < VLAN_N_VID, false);
+> +	}
+> +
+> +	vsc73xx_set_vlan_conf(vsc, port, port_vlan_conf);
+> +
+> +	store_pvid = vsc73xx_port_get_pvid(vsc, port, &vlan_no, false);
+> +	vsc73xx_vlan_change_pvid(vsc, port, vsc->pvid_storage[port],
+> +				 vsc->pvid_storage[port] < VLAN_N_VID, false);
+> +	vsc->pvid_storage[port] = store_pvid ? vlan_no : VLAN_N_VID;
+> +
+> +	return 0;
+> +}
 
