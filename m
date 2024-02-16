@@ -1,94 +1,93 @@
-Return-Path: <netdev+bounces-72311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97B6E8577F8
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 09:51:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0000F857833
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 09:57:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 850801C20E22
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 08:51:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10220B211EA
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 08:57:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F0F1B297;
-	Fri, 16 Feb 2024 08:47:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BB0E1802A;
+	Fri, 16 Feb 2024 08:56:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="RKFedAqy"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CrsZxBl2"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2081.outbound.protection.outlook.com [40.107.243.81])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CF631862F;
-	Fri, 16 Feb 2024 08:47:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DCC917BD6;
+	Fri, 16 Feb 2024 08:56:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.41
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708073223; cv=fail; b=NywWJpHsIl25esIC6OnQK3P1GzMkd+rpwQfoyAy7WvsANnQA2VtdYK4p0lIvUoJw8TTqHCkhAmwO7oNuZfycMGDFMSlBLTkzMhNERCyuf3AlUbhyDLwdefjQMxPLwJaPzextBXZdyAoXcs0F+jUXUCvX+z0SmajT1omGh7eFP/I=
+	t=1708073804; cv=fail; b=JoELioj8t0zH70MlP9PRWYipZVvdtCToB73A/SsyMmxu0QFH19jejaA7Ry6qgLorZuPkRroyWAMzNFUxWX+0z+OKy5LeeJzVfpTYGxA5LPcVeQREf2zcwd7/K85BX2O/7XlU0j1Cy4a8nh+i1ejFYW6EwwOCsrisgvkOqJCEV5c=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708073223; c=relaxed/simple;
-	bh=tL3WvbMvdqZ256RnFMXh8vg6/l6QuV1mEh3+REdoo/I=;
+	s=arc-20240116; t=1708073804; c=relaxed/simple;
+	bh=X+hc+1P0z3IvkX8FX1DS1p5o88isvxL8xj2aD0PIczA=;
 	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=Jo7RnXY7GCARn8DAZsBYwVanfHSN4k+5q1JEcoywg08GQLAcHzSRORenjXnhIfbBvNB/LYpGJK3IH9006EVFLF6vqWbJJ3h7igGcxBWQJAEbdYJwJSyV1vpAc1N1unyrXI5wD9y1fS/OCg8+SzlsQHx4xl5OFdyxuNDAa6gDtss=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=RKFedAqy; arc=fail smtp.client-ip=40.107.243.81
+	 MIME-Version:Content-Type; b=ppRSp8TImspvywiYOKpCQ6MVXsRyMi38F4+HJ8r6i7mPbqDRC1zKYacbLU0avzLYrtkuryDVfND5cZskQ515sKhnCDjFxEB50s3bVN2/H/qbyM4iDt8tjjKokclHKndFNd/qUrwo9egw9AKMODZTRk895fXhHdkRZCqqGStOkvQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=CrsZxBl2; arc=fail smtp.client-ip=40.107.236.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=d149IThZzwbWyfsVrNTI+/KbJ1mJ+Qe8F15xj+pMYOpft7mWyKrG4qvRWMdraf4CE7A6Z3EooLENsEc6lERwNFVWtwZoi+kt1S2oX9f6AD7iDHip7UvDoVX2DoLBZ9QjJzAtaktSIi9ux6eJZ9Q7bEUh6vXv3pyx7SH+90J38bbkxRR/x0D1SDwKfKi78SYzcaKeelzhqsNWdij4dLZ1YhZ1n2gSlkiGvKBBKZEtTHc7x9vIBQ40fAo0YDQbyiOMBNlD5pPaeC1I4658fQrF39ixlqNni9OnlUuo1F7PWRTP+TAOYxguCLYdcTCMpFV/rFCCBVJo3avZpHvVGpbqOA==
+ b=TguaNfraMFhSFjcTDZyOtlKmFJVJVudKlOrgFOoqOQ30amWtCfw+cbpxP6ciQ77ONxGC7o+BE8x9n27gzaRYBB4DI2biwVX3fSebXZM+x0KBVHpXrp3DjhgvNo0GGpDbAn5Ywvt27bU9FVoPViP9svhOCdsgT+uSb1OAcbIsEy+aRVgWgttjmhnyqaPQYbdeRTf0bbGurvyY94zXl0tmd64PPJNpyH9FBI7lQFK5lRMzYejd+bReITpF0Aa42gMCe0ikyunTB6/PiRzon2aUHcosE5GlBhKKJhdYtSwTUlaNwra4yeAoVbnkuEnn13pzZJvlltFVOaoVMCeRyxfqRQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tL3WvbMvdqZ256RnFMXh8vg6/l6QuV1mEh3+REdoo/I=;
- b=gTGjhHCSMNJqd77HvK6aVFqWlIt20CJfuhR7WMyxPaeaxEeyTWJzgFMVlnN1pCqizHtV6qZYZA0dDpXv6bJlZgxDllKFvHo0HgTrdbRUYIQNSIDp9vk7g9PobpNmOQnbgYTnZE/BrO0kMq6A3JHUl+4WFwTnKyOJRQiBUASCh8G1lp6UGcNUgkvLZqLJwiknwrQjE2EvwSMGTh2YvzC5pqyss0BI5dHT2xZD/vyHV3GjvuF5l9I398M0+C4ukUxrw2QF5ik8e4cLl6HmuWbUE6NcJ5sH6z/D3btNl7/ZYBNAzytcyxth7zqdw4P2Tl2SOTs+llUMeyQEArjJ7xVKWg==
+ bh=NrmAB+aUY0Jr1bYbRAMAa00B92HbgX5ycs3dYx+xs4g=;
+ b=MmE+ICrI+lK00NsqSJr2KVGrI0m7J88M9fU6/IPbd8n5yRTYGGaOjdMOVxC/aWf/tOcaql41EXESioFH+f3znI4X0mCogJll1Okno3qhJwTKxODsPLM0iBjAqWRYC2lSc8NnznzKQX3GJhmUuHztjsv8YKQRkEI5ibgBWfQoTM0hY7AlFyoQCy90+Wv14hnzZGfnm2l3BW6GL/9Zw4b8onbnveS8tn31V3byx7AIt29c1YsWM8NdW89BbbNJT3qBTcqqol+KEWMpg7c5FH7lRp8ITH2P9S4rQM9JFrQbKdhbbvAKLsZKAcJtk/swpeeq7PyLT7tM6A0aKNe7/jEhNQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=fiberby.dk smtp.mailfrom=nvidia.com;
+ 216.228.117.161) smtp.rcpttodomain=fiberby.dk smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tL3WvbMvdqZ256RnFMXh8vg6/l6QuV1mEh3+REdoo/I=;
- b=RKFedAqyb+PQBl3NNX4VHBdtXW4ggbWi0ft8PX3DXO2ykmHlv/LM9L/yu1pHUQw6sE4pjdFHS1DFbKzlftxW8hOvoc/lU2gmxBkYUskGsn21mCT4q9ylIuyPPIk8bw1yy1o/PREYwhneLI5k4I2OhFJjZgkyeqIY8vZFG9iGqq7J8syTuL+zJe4YmYLDGScHd/iOopoNgYdKyEoiVrfIK8wmlc7bhwgXSf2xakLO2wOzxwAVfrZtW+Whi47e2AeVL1mMjRch7jy2H1ImwoxPnSdtG2Vh+Y8eFuLpjS3c95YtCdAOm6o8X1tgEFTP36qkqR9r61AlfH0JfVh3gNTiPQ==
-Received: from DM6PR02CA0060.namprd02.prod.outlook.com (2603:10b6:5:177::37)
- by DM6PR12MB4089.namprd12.prod.outlook.com (2603:10b6:5:213::19) with
+ bh=NrmAB+aUY0Jr1bYbRAMAa00B92HbgX5ycs3dYx+xs4g=;
+ b=CrsZxBl2y0YxJ+SAm4CP+qfxAGAKOO6+FgtmX96h/sBRde++slRMXYrEZRc9mzozisG6wsDh/fPeazC+aCjc5Xx8kQexAdeMh/OwnSzwR9zbTXFTHE10z+bvYUce0OFsu8PupmddVYJ/O4ipVGE+XSMr6zFLX4IN5FG/EIXCkTzTAT68b4vOzKXfeTWNzlH3MedtqIv3Csq50a/D9WBOb1pge0hibDfxdIlXEBCUKSsEhvQE6OQRCU3aOcfZEqQpbcOeJManME362ujAOKECvHoFL620Vh6VSKT1zpdfR4CO8JnQirkQbLmDUFsivIBU8oYh1T8SmNOgEXcgD4bOAA==
+Received: from DM6PR17CA0011.namprd17.prod.outlook.com (2603:10b6:5:1b3::24)
+ by DM6PR12MB4863.namprd12.prod.outlook.com (2603:10b6:5:1b9::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.12; Fri, 16 Feb
- 2024 08:46:57 +0000
-Received: from CH3PEPF00000009.namprd04.prod.outlook.com
- (2603:10b6:5:177:cafe::ef) by DM6PR02CA0060.outlook.office365.com
- (2603:10b6:5:177::37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.29 via Frontend
- Transport; Fri, 16 Feb 2024 08:46:57 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.15; Fri, 16 Feb
+ 2024 08:56:38 +0000
+Received: from CY4PEPF0000EDD4.namprd03.prod.outlook.com
+ (2603:10b6:5:1b3:cafe::42) by DM6PR17CA0011.outlook.office365.com
+ (2603:10b6:5:1b3::24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.39 via Frontend
+ Transport; Fri, 16 Feb 2024 08:56:38 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CH3PEPF00000009.mail.protection.outlook.com (10.167.244.36) with Microsoft
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CY4PEPF0000EDD4.mail.protection.outlook.com (10.167.241.208) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7292.25 via Frontend Transport; Fri, 16 Feb 2024 08:46:56 +0000
+ 15.20.7292.25 via Frontend Transport; Fri, 16 Feb 2024 08:56:37 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Fri, 16 Feb
- 2024 00:46:48 -0800
+ 2024 00:56:23 -0800
 Received: from fedora.nvidia.com (10.126.231.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Fri, 16 Feb
- 2024 00:46:46 -0800
+ 2024 00:56:20 -0800
 References: <20240215160458.1727237-1-ast@fiberby.net>
- <CALnP8ZZYftDYCVFQ18a8+GN8-n_YsWkXOWeCVAoVZFfjLezK2Q@mail.gmail.com>
+ <20240215160458.1727237-4-ast@fiberby.net>
 User-agent: mu4e 1.10.5; emacs 29.1.90
 From: Vlad Buslov <vladbu@nvidia.com>
-To: Marcelo Ricardo Leitner <mleitner@redhat.com>
-CC: =?utf-8?Q?Asbj=C3=B8rn?= Sloth =?utf-8?Q?T=C3=B8nnesen?=
-	<ast@fiberby.net>, Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
-	<xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Daniel Borkmann
-	<daniel@iogearbox.net>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <llu@fiberby.dk>
-Subject: Re: [PATCH net-next 0/3] make skip_sw actually skip software
-Date: Fri, 16 Feb 2024 10:44:36 +0200
-In-Reply-To: <CALnP8ZZYftDYCVFQ18a8+GN8-n_YsWkXOWeCVAoVZFfjLezK2Q@mail.gmail.com>
-Message-ID: <875xyodcek.fsf@nvidia.com>
+To: =?utf-8?Q?Asbj=C3=B8rn?= Sloth =?utf-8?Q?T=C3=B8nnesen?= <ast@fiberby.net>
+CC: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>, Daniel Borkmann <daniel@iogearbox.net>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <llu@fiberby.dk>
+Subject: Re: [PATCH net-next 3/3] net: sched: make skip_sw actually skip
+ software
+Date: Fri, 16 Feb 2024 10:47:18 +0200
+In-Reply-To: <20240215160458.1727237-4-ast@fiberby.net>
+Message-ID: <871q9cdbyl.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,61 +96,127 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PEPF00000009:EE_|DM6PR12MB4089:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9a4992f8-f687-4e25-3d01-08dc2ecbd519
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EDD4:EE_|DM6PR12MB4863:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3f642276-b806-48bb-4f5e-08dc2ecd2f45
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	a9y+0oX9x0/TS/hLX68bcR5oiyBUxIl/9kSiEvaRUNEnOvwV5cx9JtbnSCezvM1tc/FnejanBYAH+p4sM9nUzKbkgJXQs8wTv3VffHXsTZz0yGFt3BbWtVshQ92PJsVe40k1nqaAA0QDuN7vTv8DTq9D6PzGi4Yem0mNOZurdY0EzXW9l0ebCHXaspjI0Gs/fZTqQmJpTM0JDkbx9G99kx8fFDoi3QFO8qi9BbCMrUinmN6rhNJbEhbFioibwAEF4Kuw2PdFjlFaGmGIMFBq5lpf6IaSWsNN6ygk/ZSQ2Kn2LkvVUoqFdSj8jtGq9wL2jQ/z6YM3M+wKEC9iKEueebeU4tagQ4hGgc8nZflVgD1a9yRAuhQ8wSrZ20rR68ofvNtLgGtLKeKAzQSdWuEq7IGKSodzBd94qHAlInUs+EplIlitxAGyIN+yAqN+88xAfr5+gKuJzGi5jhLp70l6LZIE1FrcvY9DkGDVh98o6Ac422SkJyp0HmMMHPhqYuaKtzHH2IOQiBetqq6E3G32wWj8ZOTKXMmqtP00NIcUUV5rcVeCcBT+gPBKcuGJa4KlUCdKr9uBIMVBjerUSMNG2rp7T0BtB1ry4r0Qht+oiIAFziKy91rsIE2EYUjKiuCn3b423h010ZNKQaMJj55NOOlkY+CU7V5SljjFQ0bffVM=
+	3ZjqSZ6oKpwWLM6Sy7zwBAjIClbfCGXDiPLDRQOfNBAaxtDosKed447k1IVe5vIyUF3SyU3Ijb3PiqLkhRYPT9+rgSmDt9STbYjpMSsZaevg1MOl+pB3u97aepIk4hFJDUjP/hLODVPsNZx5fW2zqvD5tcGEOk9YIsZK8N4ME3BwSOPPDSPWKJyOSUjnBRIgU710Qx1i+VKt8ckDzhGGy2a93a4PxN8k54XH7AM60qBGm8rEvDfr9S9urKNLJ1p+IvhY71Eh6JCxIUH/gNn/ufu1Ika5yKhLHJcuednbfJQ3mIAkBU6krhYwlrrqQn4AlszfvwhzABb/4e4+DSq3TC4zn/1r+CvIwK7MLKIgWpzBin0Nb0HzrB9hTUR+rchxaX5RLWw+L74uhlcBP7HdCy0tVqgGLWGfsYEx3eZYIks6v7qukcjys/kw57K/rUR576xi00u1Y94V3RByCcrBj/NjuULVafb/0TsesCts0tL1X2HxHKePluf4InUDI4u4Mq04i5GQvXbbKvYVUcCbMLtqTAkHqXMpUKhRWKGjbQUf5+SnYEBgryuD3gz1GvaliXZo57BE7LurLZ+GfURMCsJWLb7iTBx8qKXYUN2VUq5D6d7yvFeBqTKcE4SB2I/cxhSceCeic8mNlHYi3fGXnQ==
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(39860400002)(346002)(396003)(376002)(230922051799003)(36860700004)(451199024)(186009)(1800799012)(82310400011)(64100799003)(46966006)(40470700004)(6666004)(478600001)(41300700001)(2906002)(5660300002)(4326008)(8936002)(8676002)(7696005)(70586007)(70206006)(6916009)(2616005)(54906003)(316002)(336012)(426003)(83380400001)(356005)(86362001)(82740400003)(7636003)(16526019)(36756003)(26005);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(376002)(136003)(346002)(396003)(39860400002)(230922051799003)(82310400011)(1800799012)(186009)(64100799003)(451199024)(36860700004)(40470700004)(46966006)(2906002)(8936002)(8676002)(4326008)(5660300002)(66574015)(426003)(336012)(83380400001)(2616005)(16526019)(26005)(36756003)(86362001)(356005)(7636003)(82740400003)(6916009)(54906003)(70586007)(70206006)(316002)(7696005)(478600001)(41300700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Feb 2024 08:46:56.6488
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Feb 2024 08:56:37.4918
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9a4992f8-f687-4e25-3d01-08dc2ecbd519
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3f642276-b806-48bb-4f5e-08dc2ecd2f45
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CH3PEPF00000009.namprd04.prod.outlook.com
+	CY4PEPF0000EDD4.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4089
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4863
 
+On Thu 15 Feb 2024 at 16:04, Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.=
+net> wrote:
+> TC filters come in 3 variants:
+> - no flag (no opinion, process wherever possible)
+> - skip_hw (do not process filter by hardware)
+> - skip_sw (do not process filter by software)
+>
+> However skip_sw is implemented so that the skip_sw
+> flag can first be checked, after it has been matched.
+>
+> IMHO it's common when using skip_sw, to use it on all rules.
+>
+> So if all filters in a block is skip_sw filters, then
+> we can bail early, we can thus avoid having to match
+> the filters, just to check for the skip_sw flag.
+>
+>  +----------------------------+--------+--------+--------+
+>  | Test description           | Pre    | Post   | Rel.   |
+>  |                            | kpps   | kpps   | chg.   |
+>  +----------------------------+--------+--------+--------+
+>  | basic forwarding + notrack | 1264.9 | 1277.7 |  1.01x |
+>  | switch to eswitch mode     | 1067.1 | 1071.0 |  1.00x |
+>  | add ingress qdisc          | 1056.0 | 1059.1 |  1.00x |
+>  +----------------------------+--------+--------+--------+
+>  | 1 non-matching rule        |  927.9 | 1057.1 |  1.14x |
+>  | 10 non-matching rules      |  495.8 | 1055.6 |  2.13x |
+>  | 25 non-matching rules      |  280.6 | 1053.5 |  3.75x |
+>  | 50 non-matching rules      |  162.0 | 1055.7 |  6.52x |
+>  | 100 non-matching rules     |   87.7 | 1019.0 | 11.62x |
+>  +----------------------------+--------+--------+--------+
+>
+> perf top (100 n-m skip_sw rules - pre patch):
+>   25.57%  [kernel]  [k] __skb_flow_dissect
+>   20.77%  [kernel]  [k] rhashtable_jhash2
+>   14.26%  [kernel]  [k] fl_classify
+>   13.28%  [kernel]  [k] fl_mask_lookup
+>    6.38%  [kernel]  [k] memset_orig
+>    3.22%  [kernel]  [k] tcf_classify
+>
+> perf top (100 n-m skip_sw rules - post patch):
+>    4.28%  [kernel]  [k] __dev_queue_xmit
+>    3.80%  [kernel]  [k] check_preemption_disabled
+>    3.68%  [kernel]  [k] nft_do_chain
+>    3.08%  [kernel]  [k] __netif_receive_skb_core.constprop.0
+>    2.59%  [kernel]  [k] mlx5e_xmit
+>    2.48%  [kernel]  [k] mlx5e_skb_from_cqe_mpwrq_nonlinear
+>
+> Test setup:
+>  DUT: Intel Xeon D-1518 (2.20GHz) w/ Nvidia/Mellanox ConnectX-6 Dx 2x100G
+>  Data rate measured on switch (Extreme X690), and DUT connected as
+>  a router on a stick, with pktgen and pktsink as VLANs.
+>  Pktgen was in range 12.79 - 12.95 Mpps across all tests.
+>
+> Signed-off-by: Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.net>
+> ---
+>  include/net/pkt_cls.h | 5 +++++
+>  net/core/dev.c        | 3 +++
+>  2 files changed, 8 insertions(+)
+>
+> diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
+> index a4ee43f493bb..a065da4df7ff 100644
+> --- a/include/net/pkt_cls.h
+> +++ b/include/net/pkt_cls.h
+> @@ -74,6 +74,11 @@ static inline bool tcf_block_non_null_shared(struct tc=
+f_block *block)
+>  	return block && block->index;
+>  }
+>=20=20
+> +static inline bool tcf_block_has_skip_sw_only(struct tcf_block *block)
+> +{
+> +	return block && atomic_read(&block->filtercnt) =3D=3D atomic_read(&bloc=
+k->skipswcnt);
+> +}
 
-On Thu 15 Feb 2024 at 10:00, Marcelo Ricardo Leitner <mleitner@redhat.com> =
-wrote:
-> Hi,
->
-> On Thu, Feb 15, 2024 at 04:04:41PM +0000, Asbj=C3=B8rn Sloth T=C3=B8nnese=
-n wrote:
-> ...
->> Since we use TC flower offload for the hottest
->> prefixes, and leave the long tail to Linux / the CPU.
->> we therefore need both the hardware and software
->> datapath to perform well.
->>
->> I found that skip_sw rules, are quite expensive
->> in the kernel datapath, sice they must be evaluated
->> and matched upon, before the kernel checks the
->> skip_sw flag.
->>
->> This patchset optimizes the case where all rules
->> are skip_sw.
->
-> The talk is interesting. Yet, I don't get how it is set up.
-> How do you use a dedicated block for skip_sw, and then have a
-> catch-all on sw again please?
->
-> I'm missing which traffic is being matched against the sw datapath. In
-> theory, you have all the heavy duty filters offloaded, so the sw
-> datapath should be seeing only a few packets, right?
+Note that this introduces a read from heavily contended cache-line on
+data path for all classifiers, including the ones that don't support
+offloads. Wonder if this a concern for users running purely software tc.
 
-Yeah, I also didn't get the idea here. The cited paragraphs seem to
-contradict each other.
+> +
+>  static inline struct Qdisc *tcf_block_q(struct tcf_block *block)
+>  {
+>  	WARN_ON(tcf_block_shared(block));
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index d8dd293a7a27..7cd014e5066e 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -3910,6 +3910,9 @@ static int tc_run(struct tcx_entry *entry, struct s=
+k_buff *skb,
+>  	if (!miniq)
+>  		return ret;
+>=20=20
+> +	if (tcf_block_has_skip_sw_only(miniq->block))
+> +		return ret;
+> +
+>  	tc_skb_cb(skb)->mru =3D 0;
+>  	tc_skb_cb(skb)->post_ct =3D false;
+>  	tcf_set_drop_reason(skb, *drop_reason);
 
 
