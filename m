@@ -1,152 +1,102 @@
-Return-Path: <netdev+bounces-72404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35ED2857EE4
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 15:12:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0F24857EF7
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 15:12:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CACA41F21F98
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 14:12:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 54779B27B87
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 14:12:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35CB412DD8D;
-	Fri, 16 Feb 2024 14:11:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B89C12DD80;
+	Fri, 16 Feb 2024 14:11:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="f3bfQzZs"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="oCudOuxD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BC9112D778;
-	Fri, 16 Feb 2024 14:11:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B39B912CDAD;
+	Fri, 16 Feb 2024 14:11:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708092676; cv=none; b=nTFd1Cu5Te4aWEPq46zzULlPMr0p4RBdEiYUGjjQqSVnMhDebh4tqWk6Q7jBpeRIU9/3+ZOcdgxJ/gsoJU6p/R2LzcBkELQaAZW5L4p0K/fMfMtG43MaokKXHWAOzUmwYJijV2cldJrXUnG9D5rSOgF3vjFc50GnMnsc2uP7e8E=
+	t=1708092700; cv=none; b=eglLXxTWsmGyNKh7QG/NRy2WI98Z35aX8JQJ/RkhcDraq4DOt5+zVtpAuu/zpCPIs61wgj5B/UokZPXNVrokU7ib4TsoSQ85wtJSan7tz3HgQw77cjuEyaZts1MaweoApelD2Y00EoUhfMOjNwJzMGQibNnpQjQhYnJn72Dykh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708092676; c=relaxed/simple;
-	bh=2bctLjJu1CNalpP9XkMgtsWlrtyNTMVUDArTVHoqU08=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=UtAZwXJzhiLS9dG0W9NZxTkyXXq9u7abp4gGkVhfmDtFRTyOUU+ssj/zx6foBUksN1LzBC2yQbLr+6GUbJ/QrZMHZ6Oe2HjYl8UzqOJdBJiGolRvK7TOmmBs9+rGw+lFFTJMsgCSg99fUxL10V2FjqRIpfDn7p4WNzZnhK1RpkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=f3bfQzZs; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41GCtsoA009450;
-	Fri, 16 Feb 2024 14:11:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : from : subject : to : cc : references : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=AQ3pb+i/hg43l2d6kpsPZq9HQhZMcN8L4NDp00NKoKU=;
- b=f3bfQzZsBQdkQfVjoDW82nQzvCg88W5VODU4XOgdKmMzDIaZ/d15l2IOfSC+1nJLZff/
- V6TVj+T1rVmKwbJR82Euw9PDNTTrJg7Mlwpqu/L+LBjXirkYyRUoeMI3avGqZMg6rgKE
- JCRX60OqTPWpFQXwbE9kIbtLCXMsDMLxjxCm2nJOKjZXxzLMoYoO/I5jCgRSEWbMXUM1
- A1XJI/pQgInEl5qaMlf3BqCP8Th7jo34zevK3ulR02b8dU2OSmWt2rtDlsvSiwQ1ipSC
- Srws4MHzb2sA0IoM/mSPQxlI1F1rZMH5/IRPS6qzmBJLgERTLljBkmX4ceJj7QF18LP0 ag== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wa7ehasae-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 16 Feb 2024 14:11:09 +0000
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41GEAuIi018241;
-	Fri, 16 Feb 2024 14:11:08 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wa7ehasa1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 16 Feb 2024 14:11:08 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41GBjYOl009914;
-	Fri, 16 Feb 2024 14:11:07 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3w6p63b76j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 16 Feb 2024 14:11:07 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41GEB4B847186470
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 16 Feb 2024 14:11:07 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9DE7058045;
-	Fri, 16 Feb 2024 14:11:04 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3605C58069;
-	Fri, 16 Feb 2024 14:11:01 +0000 (GMT)
-Received: from [9.171.40.55] (unknown [9.171.40.55])
-	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 16 Feb 2024 14:11:00 +0000 (GMT)
-Message-ID: <0be9c41b-19f9-437a-9a3a-8ed15cbbd155@linux.ibm.com>
-Date: Fri, 16 Feb 2024 15:11:00 +0100
+	s=arc-20240116; t=1708092700; c=relaxed/simple;
+	bh=/JBzgGoPm0eAFGIdZQX28KB66+owY5uuYmdgGLTTA7w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iuRknYKQ1bM5i0JW+ZxAA1T7qjca3K3DY/Jed0frx1NPAtfGe1taLj2WMXogvgTEsdii4OISCsiN3zkQkyW4AXXOq5OfCziuUcGeb7oLjAPUZs+gip7BLfgCAcJ6TDILpQ++iU9FDZdSyT8CNkcBdaJuj4oJEeOVDPCdnHOEZCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=oCudOuxD; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=gXok714HXjWAbtIIpdJSn0VRn+9Uj8prlIuY8eyJf4o=; b=oCudOuxDukPnLJJ59CEe2wFteK
+	JFQgtsGw+JsD507WomKv96l2x8TqVtit5FQ+dwqQ/eEluq0yD2xjONtFZPFKzIcKJGUSOxDKBkRZF
+	bjsxTM3GCPonyBpxp6SolOrsDL5YF0eQ15wZkAxhzZBkd5dapDsB6J3vVxPCLPSx6xbQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1raywC-007zHr-NJ; Fri, 16 Feb 2024 15:11:36 +0100
+Date: Fri, 16 Feb 2024 15:11:36 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Yang Xiwen <forbidden405@outlook.com>
+Cc: Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Yang Xiwen <forbidden405@foxmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH v2 0/6] net: hisi-femac: add support for Hi3798MV200,
+ remove unmaintained compatibles
+Message-ID: <b244b8ef-9a30-42dc-b9e8-a9d35cce99a3@lunn.ch>
+References: <20240216-net-v2-0-89bd4b7065c2@outlook.com>
+ <254d3c4d-bc74-4a26-9c23-17b4399c3755@lunn.ch>
+ <SEZPR06MB695927E7E18D62EB1E6FB603964C2@SEZPR06MB6959.apcprd06.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-Subject: Re: [PATCH net-next 03/15] net/smc: introduce virtual ISM device
- loopback-ism
-To: Wen Gu <guwen@linux.alibaba.com>, wintera@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        jaka@linux.ibm.com, Gerd Bayer <gbayer@linux.ibm.com>
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
-        tonylu@linux.alibaba.com, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240111120036.109903-1-guwen@linux.alibaba.com>
- <20240111120036.109903-4-guwen@linux.alibaba.com>
-Content-Language: en-GB
-In-Reply-To: <20240111120036.109903-4-guwen@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: vnw048yDMNPGQbBmJ_RanSxABMRM0wBY
-X-Proofpoint-GUID: Uq9Yw-bVdQ-ATQV7Uh6LO2Z-VrtkYZ1K
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-16_11,2024-02-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1015
- spamscore=0 priorityscore=1501 lowpriorityscore=0 phishscore=0
- adultscore=0 bulkscore=0 mlxscore=0 suspectscore=0 mlxlogscore=999
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402160112
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SEZPR06MB695927E7E18D62EB1E6FB603964C2@SEZPR06MB6959.apcprd06.prod.outlook.com>
 
+On Fri, Feb 16, 2024 at 09:38:31PM +0800, Yang Xiwen wrote:
+> On 2/16/2024 9:37 PM, Andrew Lunn wrote:
+> > On Fri, Feb 16, 2024 at 06:01:59PM +0800, Yang Xiwen via B4 Relay wrote:
+> > > Signed-off-by: Yang Xiwen <forbidden405@outlook.com>
+> > > ---
+> > > Changes in v2:
+> > > - replace email.
+> > > - hisi-femac: s/BUS/MACIF (Andrew Lunn)
+> > > - hisi-femac: add "hisilicon,hisi-femac" compatible since the driver
+> > >    seems generic enough for various SoCs
+> > > - hisi-femac-mdio: convert binding to YAML (Krzysztof Kozlowski)
+> > > - rewrite commit logs (Krzysztof Kozlowski)
+> > > - Link to v1: https://lore.kernel.org/r/20240216-net-v1-0-e0ad972cda99@outlook.com
+> > Generally, you wait for discussion to finish before posting a new
+> > version. Also, netdev requests you wait a minimum of 24 hours between
+> > versions.
+> > 
+> > Having discussion happening on two different versions of a patchset
+> > at once just causes confusion.
+> Sorry for that, it's the first time i send netdev patches.
 
+Reading this might help you:
 
-On 11.01.24 13:00, Wen Gu wrote:
-> This introduces a kind of virtual ISM device loopback-ism for SMCDv2.1.
-> loopback-ism is implemented by software and serves inter-process or
-> inter-container SMC communication in the same OS instance. It is created
-> during SMC module loading and destroyed upon unloading. The support for
-> loopback-ism can be configured via CONFIG_SMC_LO.
-> 
-> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
-> ---
->   net/smc/Kconfig        |  13 +++
->   net/smc/Makefile       |   2 +-
->   net/smc/af_smc.c       |  12 ++-
->   net/smc/smc_loopback.c | 181 +++++++++++++++++++++++++++++++++++++++++
->   net/smc/smc_loopback.h |  33 ++++++++
->   5 files changed, 239 insertions(+), 2 deletions(-)
->   create mode 100644 net/smc/smc_loopback.c
->   create mode 100644 net/smc/smc_loopback.h
-> 
-> diff --git a/net/smc/Kconfig b/net/smc/Kconfig
-> index 746be3996768..e191f78551f4 100644
-> --- a/net/smc/Kconfig
-> +++ b/net/smc/Kconfig
-> @@ -20,3 +20,16 @@ config SMC_DIAG
->   	  smcss.
->   
->   	  if unsure, say Y.
-> +
-> +config SMC_LO
-> +	bool "SMC_LO: virtual ISM loopback-ism for SMC"
-> +	depends on SMC
-> +	default n
-> +	help
-> +	  SMC_LO provides a kind of virtual ISM device called loopback-ism
-Don't forget to update "s/virtual/emulated/" later. ;-)
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
 
-<...>
+	Andrew
 
