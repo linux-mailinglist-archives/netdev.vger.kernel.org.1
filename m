@@ -1,193 +1,199 @@
-Return-Path: <netdev+bounces-72369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88EFC857C1C
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 12:53:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B172857C33
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 12:59:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6E0F1C21224
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 11:53:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EEAE1C20E0B
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 11:59:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB3577F3C;
-	Fri, 16 Feb 2024 11:53:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57D4859169;
+	Fri, 16 Feb 2024 11:59:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="XOvfnGmD"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="2opTShBd";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="bKgh3/lu";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="2opTShBd";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="bKgh3/lu"
 X-Original-To: netdev@vger.kernel.org
-Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sgaapc01olkn2100.outbound.protection.outlook.com [40.92.53.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15AE112E7E;
-	Fri, 16 Feb 2024 11:53:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.53.100
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708084403; cv=fail; b=Uy46Gcno+7LjqpX6rDns6Y5B84pT6YmruK9uYjg9tWEVqzkJezIUKhM5hHav/2LO7eoHibCiUunSujINRdrHXSfLvlCcV2D0KP8A9lJSdG/rufqV3yHqWbpI9Ju8Ny4MZ28xUgUjhxjsYgVmfKlCQYyJKkLimvkjJxYJz9h2X/8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708084403; c=relaxed/simple;
-	bh=g9h0OvYin4b69dg9YDl7w+M7iDyzAapndj6rMhOhRWw=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=bscAAsM5YAgrtJnL5F8mSLROQrgMkb6ntJEk+i80VQJmVBw9bTqFDZwIuErTl08mXRidRjxBYXTf5MR4ST3IyKdx+W6FGJBCj7wYKh0xum1ORYHynm6AS4CFIupaLSZUICNGuXTv6nQ1zh4LVM85hEp8y/vnAzkA9zpYRz4G37A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=XOvfnGmD; arc=fail smtp.client-ip=40.92.53.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jaEXWWmPxI3pNYYwbh4YdgXoulFgq11Uq7zKrTT3nT6wjtLYhf6FfvnYB9ntNDG7vA7if5NnugbJT9yL112lQkW49YvGrWnCaKDV2E5n+XABD5n+Za/TwMnrStPK1c2XFJBX9WjOnS2viMsD+ydTRi/lDHy5i/3rcNF0MlgiOtptferTaz+uns0TJOOl9OGg0Z+NXIQBIzkET2omrYydrpPJTZ9P+55L7ATf2xtU0GFLo7nm8bXigW3cF/o+13JC/XUEFQIUAcxaUFPbCtkuVhoVtxXr1m9r7g6aqXHpBQBOJKPgG96K3C323CuQu83cJCfkliNwG7bLQE73uLvyQg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MaPa4eSviFNFcsOe2bymgmoKnY/C86TkWZ6RURd7nHs=;
- b=WgMsuflNbRjawpSILhL+HslumR3OsoYFAEIYrV/lUNBlO8VlTNnbzN74bcfzeT0oKnhSThM8qYXeKuj7mLGr6oWk8E70QUNKKDMNW9/G2t/s5N/eZL+uoWYSLLYivBjP+K4kttokpuc4FAyK/NxOUWtWF2QqOcvAClsveARHPGQhX6oZOaBE8Qt3JEhzb0Yimhryyid0A+WyPYAlltrSqESAjxvTb1t5fysc6tdsKqR/oIIIK+471vKP9mgxMl1GukEyU0Dd1fbvFjV9Znk3nr15RmmGGJlCHi4TaMrFlktT2iCXWutIPn/vrEwO207oHkCOq2WievWWyAnwV3e7IQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MaPa4eSviFNFcsOe2bymgmoKnY/C86TkWZ6RURd7nHs=;
- b=XOvfnGmDAJZ//0TBIyWkbuM1DOD//NL2W4XQd62ifNb0J6dqBHy0IX9WCWI9CZiu+gSCB3by9XS3OBHsbVnX+b1h9BnJAXdXNkQIMsMPuLpAvCVnYWU860MuH5uqM9r1geArwb50JnkYHkYn7R77mLNysiREAWxwYtYFxNDzVvgbKStmGPu5cE1s0Sg97krYfLsE4vbkb/7tjo8pRq50eN7UJarUk6vX4Z4b6ixufSiSSLAzWA43rkTvCMO6ySvO3ztwkCSIfl2K4FcFVMs4c/OgdHU3Ya+CV0mUle0x3yotDzZ/KDTYcH3hJImU/aoR7PiG/Vi0EspsdlIxgPwO7w==
-Received: from SEZPR06MB6959.apcprd06.prod.outlook.com (2603:1096:101:1ed::14)
- by TYSPR06MB7599.apcprd06.prod.outlook.com (2603:1096:405:c2::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.31; Fri, 16 Feb
- 2024 11:53:15 +0000
-Received: from SEZPR06MB6959.apcprd06.prod.outlook.com
- ([fe80::9a6b:d813:8f4b:cba1]) by SEZPR06MB6959.apcprd06.prod.outlook.com
- ([fe80::9a6b:d813:8f4b:cba1%4]) with mapi id 15.20.7292.029; Fri, 16 Feb 2024
- 11:53:15 +0000
-Message-ID:
- <SEZPR06MB695975016141241B1B904F70964C2@SEZPR06MB6959.apcprd06.prod.outlook.com>
-Date: Fri, 16 Feb 2024 19:53:05 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 4/6] dt-bindings: net: add hisilicon,hisi-femac
-Content-Language: en-US
-To: Rob Herring <robh@kernel.org>
-Cc: netdev@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
- Russell King <linux@armlinux.org.uk>, Eric Dumazet <edumazet@google.com>,
- Yisen Zhuang <yisen.zhuang@huawei.com>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- devicetree@vger.kernel.org, Heiner Kallweit <hkallweit1@gmail.com>,
- Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Rob Herring <robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Salil Mehta <salil.mehta@huawei.com>, Yang Xiwen <forbidden405@foxmail.com>
-References: <20240216-net-v2-0-89bd4b7065c2@outlook.com>
- <20240216-net-v2-4-89bd4b7065c2@outlook.com>
- <170808424648.2323386.17364036307896639662.robh@kernel.org>
-From: Yang Xiwen <forbidden405@outlook.com>
-In-Reply-To: <170808424648.2323386.17364036307896639662.robh@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TMN:
- [ggJC3P7CoGu4tj4FgcVVeLRt3IhP8o7HY9G9uODQ1zJE2eKA4hgwRHnkplZcltw6Tayr/tYorsc=]
-X-ClientProxiedBy: PS2PR06CA0004.apcprd06.prod.outlook.com
- (2603:1096:300:56::16) To SEZPR06MB6959.apcprd06.prod.outlook.com
- (2603:1096:101:1ed::14)
-X-Microsoft-Original-Message-ID:
- <68eb0b4d-188d-4b5c-966c-712f1dfb24c0@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58CAE54F9F
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 11:59:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708084765; cv=none; b=JdJ4HrxOWshnqI7Kx3qYglgdV18Z5jwhyzV30LI4hQp2YMxASpi2CIdGj5tJjaj1rEpt595DeuiGQ4fz/LlrST0cjdKht6PXajGv0tqLoCc+3FVw6YalpryBXIh8T2Bw+7QDmJjDK2Df9f/ehQshsFa+9Cp2klhGMa/AkAyjMro=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708084765; c=relaxed/simple;
+	bh=GP9sL2QY97HnexsvD0a+MYkcwox3XX3dlxHzzhGXi+Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Eko/iRpX71TRMbc0xE/F9avwlRAKQXm7UT+zlhl7JRpJVd4FsM4Z3jaRAD8A1vuaaKk39+IRpntQdSA7jPSekhTep65RL+WrkICjHPFKiQk8dEEwrt31zDDbd9h3PSk9SdLjYL7bmsK4s0UTnumWyIHWbBpANB9qxmH0rTi7SjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=2opTShBd; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=bKgh3/lu; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=2opTShBd; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=bKgh3/lu; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from lion.mk-sys.cz (unknown [10.100.225.114])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 8916422265;
+	Fri, 16 Feb 2024 11:59:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1708084761; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=g6gVisu1Un75wrWyYqgkRyhwWHcWoQJZogJFmcssMTU=;
+	b=2opTShBd8NV950rHHawrDauId7XxYDdbLfptu0xx05Qdo0DTuZ9wwUT1SDh5T22niA5o4L
+	snu3nY146lar3xLdks2wCEP4/8aaC26Ka5RRbXCmTU9LuXLc9wNrkjdctPh+EWC79McKeA
+	IVW5qsTKeynubrNeqmok7XFJHNfAj88=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1708084761;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=g6gVisu1Un75wrWyYqgkRyhwWHcWoQJZogJFmcssMTU=;
+	b=bKgh3/luVlcPlatE/6OP4w7rrrRpP8Iu7HqFyWOF4+dEj4fUDchQ751P+ORwVw0FHhO9Ws
+	vxoux85SZXH2B4Aw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1708084761; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=g6gVisu1Un75wrWyYqgkRyhwWHcWoQJZogJFmcssMTU=;
+	b=2opTShBd8NV950rHHawrDauId7XxYDdbLfptu0xx05Qdo0DTuZ9wwUT1SDh5T22niA5o4L
+	snu3nY146lar3xLdks2wCEP4/8aaC26Ka5RRbXCmTU9LuXLc9wNrkjdctPh+EWC79McKeA
+	IVW5qsTKeynubrNeqmok7XFJHNfAj88=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1708084761;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=g6gVisu1Un75wrWyYqgkRyhwWHcWoQJZogJFmcssMTU=;
+	b=bKgh3/luVlcPlatE/6OP4w7rrrRpP8Iu7HqFyWOF4+dEj4fUDchQ751P+ORwVw0FHhO9Ws
+	vxoux85SZXH2B4Aw==
+Received: by lion.mk-sys.cz (Postfix, from userid 1000)
+	id 76F5F20147; Fri, 16 Feb 2024 12:59:21 +0100 (CET)
+Date: Fri, 16 Feb 2024 12:59:21 +0100
+From: Michal Kubecek <mkubecek@suse.cz>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Miller <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Russell King - ARM Linux <linux@armlinux.org.uk>
+Subject: Re: Question on ethtool strategy wrt legacy ioctl
+Message-ID: <20240216115921.incijidup6rpeyre@lion.mk-sys.cz>
+References: <77a48e2f-ddb1-44d8-8e3f-5bc5cb015e9f@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SEZPR06MB6959:EE_|TYSPR06MB7599:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0e35df0c-2192-45b3-c3f4-08dc2ee5da7f
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Lxptoj0SjoliluSrK2LVLceQtwyYcw296Qkn+GLF8tZ4ihqCscubw/Lhfve63vrmOaWOHfXRXjcKeaKFJO50EiYcBhfBhS34DSMzBlJP1GaG46ivnASLPrs6IF2hJHXjCKYR2cAE8CurPk8UeMGQ/OQTcUibXl4HTLUeF7RcSt/ey3E+5nGI5TSaiNyONAFZl9XC2RC3yItYv5Rq0ID79DdFdUZDBU1pJEcXBsuHLvFf99ydtVEvtjEFgLFxijqalbnJc9y3AN+/GUEosdBxTJ1SIJGwao6jxsvkNgW7MT2wN7Blt/XBP+dfEsHFBPsliphr4Tx0a6kKqNcw4vusyApNQtkAlUyJOvmSQ+N4KJ9yrT68DyHWvZxNa4Vcyt1w144bnDlzedrPcdrCp/aAmouB356ZNOFSb7/dapKw0F/Q/JTuxVS8EHU1XhJNNViBgXQD8VWHBRuJupG5V9tUu8/nyKoAkY4q6UdFOS74Xr78RnKzsBI52BZIKWBBKi2U6zw9ob8Q+P1D1XM9+t7/EmwPs08NbnfbDf0qRRsW2+/lbPQopfV3B5NVfZ6B9aF0hODB2c6tg2119qTfXfqbZQAiGTaj4iYvVmGSN3xc8X95W8b/qfWu677OC6uqPlqoBSH0zy+03xC3nXmgd0E75g==
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?eVMzQTVuZ3FNY2pmbnhUbStsM3Fkd1hmN3ZaVGllejZ0Ukw0TmhMaVdaTGkv?=
- =?utf-8?B?VHVSRnhkV01WY255eXc3ZFhkSnVoWG1lT3Z6cGZUK1NTc0VGcTExRUlnV0Nq?=
- =?utf-8?B?cjRYRVRqMkpqQzdYRCtqajRUWjN4bTREZG5XSDkwSDRtV0RZZkR3bDNrenVP?=
- =?utf-8?B?TzBzTGZtY1V2eDVCYWFSTkIrbno2S244TXRjbkpnSFQ1aHQ1UDlOcVhINWNO?=
- =?utf-8?B?OXFQSnAyS2ZacGZrQy9sV1FNQWE1VWlSOENuWmQ0aHg1TlZ3OGlqVVozbUlQ?=
- =?utf-8?B?cGxybjN1TCs2YWo1WmQrME9ScUxtSlNsSmZZVHh3RXNxTWdvWFRhbkRVQVU4?=
- =?utf-8?B?d05hQ1ZnNFhDU0g4R0djK0MyME16eFd3OGxzY09WUVpxNjdUaU9FeEJRMTEy?=
- =?utf-8?B?U1dvN3JjSmRzU1RpYXRPQUs3UGR0Z2NRS2hVbjVvUU5QWTA5RlpYdjRRamlX?=
- =?utf-8?B?eHVqaW1wNzN2djZFdy9QRm84Y0h4T0NWa3ZnTlJxU2t0T0FwZWF0TGxrOE9R?=
- =?utf-8?B?bDBzdWpLSHMrcGc5YnFtZk5PQzdPSDNNc2VXbWcxTlBpdlJOWk1PRExYOVow?=
- =?utf-8?B?bmhxRHhaU3JORE92dDVsRGswWHRweE8zR1d6T0xSZTNzVmsxQWcyeEpEWDky?=
- =?utf-8?B?QWNPNklYTThxM0I5aW81ZFNQWkVhbFh3c0ZrdlRBMkhzcFVBZW9ielRvdWFo?=
- =?utf-8?B?dFVsaEZkNklreXQ3Z1haNXQ5dEI3RGFHSnRLY0pkR1htWGxsS3VNUnVBZnF4?=
- =?utf-8?B?Vkg3QnMwYUF6NUNEcDF2dExSR3RFWGhMQ3ZKeHpFZmU4cEhQTjZkbm4xTjZZ?=
- =?utf-8?B?QTRITlM2MFBRZFZSODhGUHdXS2lNRVBjYjlFTUJSOVN6NXB0TnVxQ1VWMHp4?=
- =?utf-8?B?UHBZaWF5cWRZU3pqRDF5VFBVYlczODRtbTNVNWRBbHJ3bk9ZbG1BYncrVHZW?=
- =?utf-8?B?STdRUkFNRXRYODBOa1ZvbDh0YXdFWFhubHR3cDhOQTczWXJlQ0xYcmtjWDdi?=
- =?utf-8?B?YU1QQzV4LzE3Y0dycU5aRXdnYlJwcHkvOTJNbjE3TWVuQkdjNVREOEMvczF0?=
- =?utf-8?B?azV4Q0Z6bGFNZTJnVmpBZStXUldsSVJ0WTk2UEV2ZFNmN0g5Y1ArejFmR0NW?=
- =?utf-8?B?bTJvc3RYODVqMFVRM2V6Qm5Xd2Z1UWpibXRvaDVoT0NaWU15VzFsNUJlVlhu?=
- =?utf-8?B?cFhEbUg3TmVQRVZHRTlYcVF0eEJsNFVPMVNjUnB4UGVvR3ppZzZKSmVQM21y?=
- =?utf-8?B?LzcrUTlDc0hNZDByWmN0aDMyTDdIUU9jRndtc1Rra0J2OEozbFVJbDBTNFN2?=
- =?utf-8?B?SlpuaTl0aGxOajBKNEQxTm5VcVo5SUtMK3d4ZVF0aHNnMHFtMlZJb3lLVldp?=
- =?utf-8?B?Rlp0aDJWa29XTFY4RDMrVER4K2V2RkFJMXNESHg1aEFCWEZnaldSd2pVUXhX?=
- =?utf-8?B?TGRoOFpmaVlaK2RtcE1DM1Foc1Z0WndEZUdmOHZOeE82KzJ5aHVLRG5hTFFs?=
- =?utf-8?B?YWhHQ2pLRTZKa2czUEcrTE5sbG9ENnJDdWVOS3VJelg2eVNFQXJ0cEovaXd3?=
- =?utf-8?B?dXE3ejJuTW9DK2dLUjFnZktxTjByNDU2SFVyKy9NTFNzY1FIY0NxNWwyQlFw?=
- =?utf-8?B?a1IzdUdQQVJEYitDQ3Z4dmlZQTBUVTc1WEFaT0ZVL3NBcGhGS0xIQ2ZnSEJ1?=
- =?utf-8?B?TVNGSWlZS2tlSlpsd0E2Sm11Z1JSbHBzUkFhaElaRlpsTEs2dFpaTDJHS1Y4?=
- =?utf-8?Q?Is6Twcdf6Z+qJ/ZO82EKHYjijkjTkRl0mp3V9ll?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0e35df0c-2192-45b3-c3f4-08dc2ee5da7f
-X-MS-Exchange-CrossTenant-AuthSource: SEZPR06MB6959.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Feb 2024 11:53:14.5529
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYSPR06MB7599
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="c63bvxbpyjduzlml"
+Content-Disposition: inline
+In-Reply-To: <77a48e2f-ddb1-44d8-8e3f-5bc5cb015e9f@gmail.com>
+Authentication-Results: smtp-out1.suse.de;
+	none
+X-Spam-Level: 
+X-Spam-Score: -6.40
+X-Spamd-Result: default: False [-6.40 / 50.00];
+	 ARC_NA(0.00)[];
+	 TO_DN_EQ_ADDR_SOME(0.00)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 NEURAL_HAM_SHORT(-0.20)[-0.999];
+	 RCPT_COUNT_SEVEN(0.00)[8];
+	 SIGNED_PGP(-2.00)[];
+	 FREEMAIL_TO(0.00)[gmail.com];
+	 RCVD_COUNT_ZERO(0.00)[0];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+,1:+,2:~];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 BAYES_HAM(-3.00)[100.00%]
+X-Spam-Flag: NO
 
-On 2/16/2024 7:50 PM, Rob Herring wrote:
-> On Fri, 16 Feb 2024 18:02:03 +0800, Yang Xiwen wrote:
->> This binding gets rewritten. Compared to previous txt based binding doc,
->> the following changes are made according to the TRM:
->>
->> - No "hisi-femac-v1/2" binding anymore
->> - Remove unmaintained Hi3516 SoC, add Hi3798MV200
->> - add MDIO subnode
->> - add ahb bus clock, phy clock and reset
->>
->> Signed-off-by: Yang Xiwen <forbidden405@outlook.com>
->> ---
->>   .../bindings/net/hisilicon,hisi-femac.yaml         | 117 +++++++++++++++++++++
->>   1 file changed, 117 insertions(+)
->>
-> My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-> on your patch (DT_CHECKER_FLAGS is new in v5.13):
->
-> yamllint warnings/errors:
->
-> dtschema/dtc warnings/errors:
-> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml:
-> Error in referenced schema matching $id: http://devicetree.org/schemas/net/hisilicon,hisi-femac-mdio.yaml
-> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.example.dtb: ethernet@9c30000: mdio@1100: False schema does not allow {'compatible': ['hisilicon,hisi-femac-mdio'], 'reg': [[4352, 32]], '#address-cells': [[1]], '#size-cells': [[0]], 'status': ['okay'], 'ethernet-phy@1': {'reg': [[1]], '#phy-cells': [[0]]}}
-> 	from schema $id: http://devicetree.org/schemas/net/hisilicon,hisi-femac.yaml#
-> Documentation/devicetree/bindings/net/hisilicon,hisi-femac.example.dtb: /example-0/ethernet@9c30000/mdio@1100: failed to match any schema with compatible: ['hisilicon,hisi-femac-mdio']
-Seems i forgot to rearrange these patches. Will fix in v3.
-> doc reference errors (make refcheckdocs):
->
-> See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240216-net-v2-4-89bd4b7065c2@outlook.com
->
-> The base for the series is generally the latest rc1. A different dependency
-> should be noted in *this* patch.
->
-> If you already ran 'make dt_binding_check' and didn't see the above
-> error(s), then make sure 'yamllint' is installed and dt-schema is up to
-> date:
->
-> pip3 install dtschema --upgrade
->
-> Please check and re-submit after running the above command yourself. Note
-> that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-> your schema. However, it must be unset to test all examples with your schema.
->
 
--- 
-Regards,
-Yang Xiwen
+--c63bvxbpyjduzlml
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Feb 16, 2024 at 11:53:26AM +0100, Heiner Kallweit wrote:
+> When working on ethtool functionality on both sides, userspace and
+> kernel, the following questions came to my mind:
+>=20
+> - Is there any good reason why somebody would set CONFIG_ETHTOOL_NETLINK =
+=3D n ?
+>   Or can this config option be removed?
+
+I can imagine systems where there is no use for ethtool interface as
+such so it IMHO makes sense to make the whole interface optional.
+Originally I wanted to do this when the netlink interface was introduced
+but it would require some changes outside the netlink code (there are
+some hardwired calls into ethtool code in parts of kernel where you
+wouldn't exactly expect them) so it fell into the "one day" category.
+It would be nice to make the ioctl part optional but until netlink
+supports all features provided by ioctl, it would make little practical
+sense.
+
+> - If for a certain ethtool functionality ioctl and netlink is
+> supported, can the ioctl part be removed more sooner than later? Or is
+> there any scenario where netlink can't be used?
+>=20
+> - Do we have to support the case that a user wants to use an old
+> ethtool w/o netlink support with a new kernel? Or is it acceptable to
+> urge such users to upgrade their userspace ethtool?
+
+We probably could if ethtool were the only userspace utility using the
+interface which is not the case. There are other pieces of software
+using it, some known (I'm sure wicked does and I assume so does
+NetworkManager) but also some unknown and perhaps some which are not
+public at all.
+
+One of the reasons why I believe there are privately developed utilities
+used only within certain environments is that while inspecting the
+interface, I realized that for some parts of the ioctl interface, there
+were few years between introducing the kernel side and the ethtool side
+- which only makes sense if those who introduced it needed the interface
+for their own software and didn't actually care about ethtool support.
+And IIRC there is already a feature in the netlink interface which still
+lacks the ethtool counterpart.
+
+So I'm afraid removing ioctl support for parts of the interface that are
+fully supported via netlink would be seen as "breaking the userspace".
+
+>   Remark: I see there's certain functionality which is supported via
+>   netlink only and doesn't have an ioctl fallback.
+
+Yes, the general policy is that no new features should be added to the
+ioctl interface, with the exception of trivial extensions like support
+for new link modes.
+
+Michal
+
+--c63bvxbpyjduzlml
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmXPThMACgkQ538sG/LR
+dpWYgggAo6AL4eoQF6qgt762cz1JuhPRQeg2cgj1KkI8znW9pmYwK5cMtsc94QVH
+D7NmYYRVosGZ2m10UFVNN0QIyBwtXdqDt8Q+X7uCYpIJkbCL69EpVN0AaKK94UK4
+MFT5ksKzZa0rs6gRy95x8sGLhxOva43PGBAnu+XnkoN1hCF2aILIXjqtbUcrMAkD
+Dgt0LdwOWKSMa5dW+bgMY8VtPC/lvby/C3dY5lfgFQHASbRJLvsXUh7vugKJGVrI
+eziNte0x4QwoWq4/YzhjZNnPwxND/Vei8LeJDSgnz4PSDdO6zJLxm1DThGDSqfG1
+T2ktwMQfsNQOKKvGpH2znY1W5Tt7oQ==
+=1E/s
+-----END PGP SIGNATURE-----
+
+--c63bvxbpyjduzlml--
 
