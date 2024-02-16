@@ -1,197 +1,197 @@
-Return-Path: <netdev+bounces-72477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D87485847F
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 18:47:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 960E58584B7
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 19:00:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41B0B1C20E6F
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 17:47:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D8CE2841EF
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 18:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DF5713329A;
-	Fri, 16 Feb 2024 17:47:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D51A133404;
+	Fri, 16 Feb 2024 18:00:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LoDAoQQP"
+	dkim=pass (2048-bit key) header.d=amacapital-net.20230601.gappssmtp.com header.i=@amacapital-net.20230601.gappssmtp.com header.b="ALVLV8kU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67BBB132499;
-	Fri, 16 Feb 2024 17:47:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708105661; cv=fail; b=T9P6ZHcsoOUtXAmdDw85EdKKgkNQnzPdOC4a3LA+xhStlQyDY43C5UIRpWrDBZ4D6N/aw00bM4Ze/RNZraJ62JKRkm9WKD/0eUgwrburINF6VfiJhTFFZn9HHMd12V2aeMw03XX+TfmcrmK+UlFSY/4Ox5XkVek5ZVat9/9j8xU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708105661; c=relaxed/simple;
-	bh=oBHZTMq48YefuxmsqASxTsj3zFKRTO8cy2/d2AbpHRg=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=jv4OipYDqybZlGu1m/CCBImvaqXvR8lSsgNfan+wqr0qDkYnsKRLRV3+zS4mXuHWNN5IyY9MH/gwe2Clt6ggBy+gogO29wDQd9+bY/iydcvlzqIeofOligJNsiC9qscPCb7RyVhV3TIAw/K4tmbVG64Uwk3PVYJMk2mHPSQPwjA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LoDAoQQP; arc=fail smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708105660; x=1739641660;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=oBHZTMq48YefuxmsqASxTsj3zFKRTO8cy2/d2AbpHRg=;
-  b=LoDAoQQPjJQS/zbgMCi33nf8tA2nCHY2VuCnDNtWKNaG7qD2d/vP7b/H
-   gr5zmuAluZr8rHDG14eunr4l5JasMXyofBiMgUoCZlHxqquqyE0v+6xnh
-   M6F12Uqv39W98ssFWxCyOF+ZMN6sFmuZwroB2w9tSgedRVBcqDZlGeHz3
-   lRbKn7stqflubAKck504xnnTBu+sE4Az4dfYx+9KZWTiaNV4QGPMPpB38
-   b58psNGdJGywzuvsY4dZ4mA09+aJ5gvnLoEsVoMr8yAwgb5EQXWGfLSha
-   PqgqliIYzT/P+cHgrDXih8kXc+HSkc46S/6pNdOXBpTsYVw1ZEYdQGkB0
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10986"; a="6052706"
-X-IronPort-AV: E=Sophos;i="6.06,165,1705392000"; 
-   d="scan'208";a="6052706"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2024 09:47:40 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,165,1705392000"; 
-   d="scan'208";a="4254408"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 16 Feb 2024 09:47:40 -0800
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 16 Feb 2024 09:47:39 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 16 Feb 2024 09:47:39 -0800
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.101)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 16 Feb 2024 09:47:39 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=F6FxJh+zhqyyyU+lUc7dsNuZR7G6PD2bunkeBA9XvqUqedNUMKTqlcxPD7bUf9hOQm5jTL7Nv4hxmpiS6WNZEmujgYOhQxzedmGKxEvziLhVAguI2x41aPLBou/Z1ONruTPlGXVFYIhumtjMZZ0JzVa0FLS7btW3O4knU2LwCQHAGYyjTixAYj438fFyJYCfoYk5RjHa8X2ngkMTtSuXj92CIifWXYGcuoxeN8KfbwMVgt4ODjmvlhrqbqmIIpbyTHczs746ygEZJKazEKrWiWAiuXL58dvO5YLINxJKc7ZLNd3RKozbYjnmxRo8XzEv76QqTxu+EwUXm4BsVZu4kg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BlHJYNpwPA8YpI0GHZ0VBKe2oAwGLPhy+PKJoAa2VQU=;
- b=C+zsnQAcSGgF44mkIS+JAjdSrARbhIpKlEsOiupT7dtOHhHC4v79MAj7YADil5fCKOVB2uHG369sen3VqbCMpcOv3mdmd9nTj+tAFC3M0RPcv1B9A4o+d+tdS2DFy+UM14g2WAjyuASUQ4kfegYCjrUvLZkilVEP6dtBlGDXjvj1y80ooWAhAMBO1e5MNHln9v+jgLKgGxi9+XIXh0U/wl4CwBiHcLfiCjn563e+A+zeRnBED+JeXMjLn/L4aNApJ4UNjRAR59/8JKMOl1vFjVydHpbuOmQ/0cFxkRcMOTX2pWc6Jo6TpdXDOdBwFmeE2MP822bU4peLmgST649VWA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by DS7PR11MB7859.namprd11.prod.outlook.com (2603:10b6:8:da::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.26; Fri, 16 Feb
- 2024 17:47:37 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::c806:4ac2:939:3f6]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::c806:4ac2:939:3f6%6]) with mapi id 15.20.7270.036; Fri, 16 Feb 2024
- 17:47:37 +0000
-Message-ID: <96eb3dce-599c-49c6-b18a-ad3af33f88c4@intel.com>
-Date: Fri, 16 Feb 2024 18:47:33 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] page_pool: disable direct recycling based on
- pool->cpuid on destroy
-To: "David S. Miller" <davem@davemloft.net>
-CC: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
-	=?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240215113905.96817-1-aleksander.lobakin@intel.com>
-Content-Language: en-US
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-In-Reply-To: <20240215113905.96817-1-aleksander.lobakin@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DUZPR01CA0032.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:468::11) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BB7612FB3F
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 18:00:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708106432; cv=none; b=XlTk6ZCYDcE8gCFLUnNEuYPs6vC6RnVxtMXvwh2KwF1j6PgPvlcM4Cw8YcOeuJF/0XSfcf+Leyqw867jcL69OD5cQOzwP1c6S6c/LiRP2Dmueg9f58hAWFZxcChNjLHlEZ76KcICqok92oh8SP3030ZXkr6QytTTuIEnicUuLj8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708106432; c=relaxed/simple;
+	bh=15DJW3Vr5PesgonWy6zK6eRGv86QSnj1CkAtnm2Ndp4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YVD0X2KiPd2KJX2Hgrch6JLSe+Uor69aQehZK3PggmtSk+rQauScd0h0T9fmc/eYJOb3Bw9DfONwwmH+Kep6RZwJQ61BNhKKGrF34SUGNxxWSUR5cB8hiwS54Hicb/4pgZqZ6akIMkUGitTk1ll18OsJE44V//Xhs2WgF0NYTck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net; spf=pass smtp.mailfrom=amacapital.net; dkim=pass (2048-bit key) header.d=amacapital-net.20230601.gappssmtp.com header.i=@amacapital-net.20230601.gappssmtp.com header.b=ALVLV8kU; arc=none smtp.client-ip=209.85.221.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amacapital.net
+Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-4c02af52a21so909927e0c.3
+        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 10:00:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=amacapital-net.20230601.gappssmtp.com; s=20230601; t=1708106429; x=1708711229; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ueEA8J46wPMLSHTgtE5vFK5FiSgNPoNFDj0S3sr1uM0=;
+        b=ALVLV8kUn32GwLzHzQ+GuYQAT4PilVpeSgs1vfncmlTMAOOj+QVN9oJlKdNhoGZ86q
+         nk5ijx7tERB1X6Itg6oS4XrfmpbxGBT1V+jCUCKHFkaHUs7BDXOxi0peD1K57ZjHt6Ek
+         Ybg5d159aKog+6FsB4aRfj6aR1K/O9FjgYfp39dNEIcvaDZk5etE2IRMBSvCmcjfJWg6
+         mamEBhuODRvV0NHmUbH015O+2inirl7kxR6+9tBBbPbOsisLR4e/lz8JG0E7QlXyXj+q
+         HoH4R74L4pfAUe6v5qpMARTC+8zzIuHYMsZ+eWf2p9Eh1MWn5ilSG/ivhmGuqUYh2AgW
+         li8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708106429; x=1708711229;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ueEA8J46wPMLSHTgtE5vFK5FiSgNPoNFDj0S3sr1uM0=;
+        b=KwfLfE60Y2jYjLhHBJPdS8fVQWm1pffBoVTNkVgheKpAa67eJdTyhlPcHH5eIbGp4J
+         ZemV/+1xLTo7fNHjJDMcXdsLa2pbH8dd1nOgt/qtS/GXP/tt5XxwyByASf3pPDSsKpky
+         xHv0UEnGr7oVgr2CsQExjoLtSU00rh+In1z/lsLGv0VujD0zP+GQ1KUDmBL1s6xTQSqd
+         d9qPIDmYTZoYCW9Ou75oNy+vmZfF+XAeLZSjZWsQo4GR3doVQE2ljtc/Q33F3dK8QsE7
+         oj52ofvv55W1r0/tj+P/dcjbueTUL92ZNeO914P/yWyfNMDC8+1cySn6XbMTsy3K9pDq
+         BVwA==
+X-Forwarded-Encrypted: i=1; AJvYcCULu00AGkuSEMEVV2RAwFLVHTbMyfkMJSk8LTBlnGuErqif9U/dcztQqiIaNK96oJHOzf3MIL42oakdDrwFVNP2FoktIAba
+X-Gm-Message-State: AOJu0Ywe3FNzYr05+TBGDc3BTq781oOKacw2qe4bFnRgubXxrvTW2QEN
+	A7h97nphcmOswso1gNTmm9XvgEWbIjngH7TcY3AjRJcECnTqlnnj7CoguXH2HuLwMzLV2Vg6W2A
+	Y3nIggr0WntbwagUnrHUQW7Fle8ibEqUVvWVp
+X-Google-Smtp-Source: AGHT+IHGCcc6vqRTtVdvSB4obBROtkaaqjpgiuQtcR3CSpTdrzZo4MTwQ4iFCAZA44KhZXCcPI7yhXn6K1LqE1rxNGA=
+X-Received: by 2002:a05:6122:1c2:b0:4c7:344c:4eb1 with SMTP id
+ h2-20020a05612201c200b004c7344c4eb1mr863397vko.11.1708106428538; Fri, 16 Feb
+ 2024 10:00:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|DS7PR11MB7859:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3b4ca424-7ce7-4948-aa76-08dc2f175d08
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: hwnk7T6SwddQGGtDqzkHH8ZJdwnSnM5ymQ/lxlSbaoMGsEDvkoQ+DoMqH4Py85IU3Bb4ZO73i+Bbn83SeH68xmyouMOuEiH5vlIFIETh8hMOE/mRUtsWleKVzSTohpjabhzyCjGy/ATz4w/v+BY5TZpNjBHmyN18eQuOzgrA4ZV58icVq8/NjqSNT0KOoOVszqLP7kgnA31HZHLGWqxNLiOgLd9G/7TU/EpIpcSJUE1csMjT16Tv4RXPuOtO69VACgmxC/BucHykW33qUFAx4jJKdTh3fTfOEA97zQM0pmUu43xYzLuljIOMSEwcx76Q8xPt89eXh3Aw8FNHyVyR41psgpduUnUkh5hJwAisj+1MVHhfrnDIS+qwvog8a0yEOEUVpstIXaTmHSQaj5055xFQEkSshRuyE7Ok9Q/hrnJDYyxC3L5fkbjA0o6yfQO4zLTbz56Dj8STTr4ufso8rakxuaBqFwrKEVVg08o7sEXDx6m8LNOe9M00BsxDuL0Tm/b7sHio/Q8i7EdBblZg2IKSaxFN9nYjBJSEs4DYGBj/n6E62S/hXc2HzLNmi+6S
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(136003)(346002)(366004)(396003)(39860400002)(230922051799003)(451199024)(64100799003)(186009)(1800799012)(2906002)(26005)(4744005)(5660300002)(82960400001)(38100700002)(86362001)(478600001)(83380400001)(2616005)(6506007)(6512007)(36756003)(316002)(6666004)(6916009)(4326008)(66476007)(54906003)(31696002)(66946007)(66556008)(8936002)(8676002)(6486002)(41300700001)(31686004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NlljaGNiQzc5S2pTRXBjOElEOEtBMG8vUzVISjZOOUh4ZThOc2ZqUnl6Mk1F?=
- =?utf-8?B?aFBQWVpnNHB5MWprSWlzY29zcVBrS3FYaURCWVg3d1lJUWZSRnVReVQ2S3dM?=
- =?utf-8?B?VkVPTjJrU0FzUEZ4amJhQ2FzWlJNSUpncXMzdU4vZlRzdnQ3ZjZrYjZpM3NV?=
- =?utf-8?B?Uy9lSFBoNHIrOURnNGRKMVN3Wkowdjd4OW01THJMYUVySzZ3YldORkJPZE1l?=
- =?utf-8?B?STd0azc4MnV1WXBJckUrMjZoSUM3TG9xeXJoRklOZ3JneTBaNU9ydDQ3ejNx?=
- =?utf-8?B?RXhmVHRnRG13bGV0aGhKWTBPVzFWYWZSRVpFMVh0Y2NXMVNUcmloSXJhYlNU?=
- =?utf-8?B?enFuOWVjRHMxUDZkU29FUTluTzQrRWYyWXlDQy9qeHpPdERhend3WlJVeTRT?=
- =?utf-8?B?QzNGMVUzM1lJZ3Bjckw3QllMckFXNnZoZGYza0xrNTVLS1hrMkIxcm4xWXZr?=
- =?utf-8?B?YXlQdHlwc0hNaUI4RVFtY3pLTXIxek5ncmFMdjRBais1MmFvUTcvN1p3bGh5?=
- =?utf-8?B?QVpjUTU5SmVEZjZNUnlOU3cyNzFrSnM4VTF5U3ROYzhqVUJZazJnNm1WaVJt?=
- =?utf-8?B?b3JQY25oZXBNeEdmUE5VTkZqWlVEcTJKcmtnWVdVL0Fxd1dIRDF5bEpnVVFJ?=
- =?utf-8?B?SE1oZERFTEorekFNUTZSQ1VMUVRnK09SWXVSMVhQbkZpMWpwVWQySFNiemdU?=
- =?utf-8?B?WUw3NnhvV3gvSVdaNDJoZ2Z2cXZRZEJNQW5aQ2VOYkxYczU0dkRvN0IyWWJN?=
- =?utf-8?B?MHVPenFxRnVPTXNiQ2s1NmxQelR4alJxVzhWUytZQlV3M1I2azZjSDVUZnNR?=
- =?utf-8?B?OWVNMUlGTFRtS082aFhYT0hvdFJmdU1FOWtlalNNREQ0TWVZZEE2RGE0OWEz?=
- =?utf-8?B?bTRBRFc1Z04yeFNFVVEwM3QwQVdFMkhXVkk1V2dMU21rV2NHVFJLamF5cUNo?=
- =?utf-8?B?VWY3MHdmS0NhbzBHSmlYeXRYeFUvZEU5bThPbE56R3d3cFJnZ1dkWFV2ZEg5?=
- =?utf-8?B?U2JiN1pSSk84U1lxZS85a1FkZEtFcmNHcnJrNkRmd0ZVcWl1ZmZTcDRNcjBI?=
- =?utf-8?B?YXhFc1lGN1NuQ25iK092bFpmSHlMNjdzWUN4N240cmRRQjFGcGlOR0RSZ0Fy?=
- =?utf-8?B?dDk5L1hOMjA0UzJOdDI0dEtnU2tCN05sVkNOcXJ2Z2lEaG5jdFFsY3RTejNj?=
- =?utf-8?B?bTRuLzhCcG9xVGszR1g4TTJLM09SdXI2cG0zejNyM3NyR3UrSkV0T3V3UEZx?=
- =?utf-8?B?dGpQV2x3YndEcnlnTWNnN1R3TXpYSUR6Z05JR2pheWd2UUIrSXZLczRzdmky?=
- =?utf-8?B?Tkl4b2ZPZlRuVnZKZGFGRjloVFdjb2s2RkN3Z1dUdE5DU3dlYUg4UkJiK2xM?=
- =?utf-8?B?WjhNSWxCWFNNRkxXL293R3RHNWQ2dFpFRjR5Z2UzS0FvenlWTGZjVlMzSi9J?=
- =?utf-8?B?Yk40OFNiQUxTbHF1dTBLek1DTkRMQlUxeWkrM3FwZUE0dldqT2VuVVRsL1JY?=
- =?utf-8?B?L05XYVk4aFcybjUvbUlxeGlWS294SUIzWFROMXRhaVlMTWJmK1FHOS95ZE85?=
- =?utf-8?B?OWFsMU1IVUJGRGhHdHpGeGlwVHJOVzcxY2IzT2xYSnNYSktyZmpxKzZqU2pp?=
- =?utf-8?B?UkxEemhzRG9LckRLRTFEeEVaejMzaHJxMGx3eGh3a3lXbWc4TzhaUUNFNHJQ?=
- =?utf-8?B?cjdaLzRseUJrZnFLcnlweWtCUTg1Um42Qk5PWEFGNWlNU3JhZkJZY0xzdVQ3?=
- =?utf-8?B?SGRVWjA2bG0rWVU4TXd3aVNlMi9USnZEZGlWV1l0UFdjZ2NBaXRjLzlJMzRp?=
- =?utf-8?B?QU14bE1oUXFvVTZwaHJ3ZjBHYkJuZ01aSmdmZFVlNWx2TDJwRXR0VjRZNHZF?=
- =?utf-8?B?MktseUxFRVhrSWNreVVGbE83U1JGNFpvc2M0YWc1YWR3ZFhzaUxTVEJPNGpl?=
- =?utf-8?B?NGN2VlVPaDI4SVNnRGJyK3R1cFVtaDI2RzAybDNQOHZpajI1WjY2SDg2MXNY?=
- =?utf-8?B?N0hIeW1MTmxtcGtRaVR5M0NnSnpka2hEUGhiRVIxbTFvU3d6bE13czdDWEVR?=
- =?utf-8?B?SXVKNEplbDFXdkVsRGRwb09uUE44MkpFc0pWSlNvYU9pQWttY2Y2aGdFMUpG?=
- =?utf-8?B?Rm42a0VCdm1FMUhNZTNnazY1c3hHcitsTEdQSEo4WmpBRXhWcnh3aEhkOHpo?=
- =?utf-8?B?eFE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3b4ca424-7ce7-4948-aa76-08dc2f175d08
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Feb 2024 17:47:37.4132
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3WKx03hCQTSEw/4DPE8aYKVKidT4LwkwMPBtp5UlIr8ZdPSd/31CAkkqIq7FQZq596mJ+X+Prsp7ngFiGLkEME+EPbEa+kjnGGvhxZP+0uw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB7859
-X-OriginatorOrg: intel.com
+References: <CALCETrWUtYmSWw9-K1To8UDHe5THqEiwVyeSRNFQBaGuHs4cgg@mail.gmail.com>
+ <396f9c38e2e2a14120e629cbc13353ec0aa15a62.camel@redhat.com>
+In-Reply-To: <396f9c38e2e2a14120e629cbc13353ec0aa15a62.camel@redhat.com>
+From: Andy Lutomirski <luto@amacapital.net>
+Date: Fri, 16 Feb 2024 10:00:17 -0800
+Message-ID: <CALCETrVwAT39fM89O0BqW9KAVfOFQo590g-Zs6mt+yAkoCvZZQ@mail.gmail.com>
+Subject: Re: SO_RESERVE_MEM doesn't quite work, at least on UDP
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Wei Wang <weiwan@google.com>, Network Development <netdev@vger.kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Date: Thu, 15 Feb 2024 12:39:05 +0100
+On Fri, Feb 16, 2024 at 12:11=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
+>
+> On Thu, 2024-02-15 at 13:17 -0800, Andy Lutomirski wrote:
+> > With SO_RESERVE_MEM, I can reserve memory, and it gets credited to
+> > sk_forward_alloc.  But, as far as I can tell, nothing keeps it from
+> > getting "reclaimed" (i.e. un-credited from sk_forward_alloc and
+> > uncharged).  So, for UDP at least, it basically doesn't work.
+>
+> SO_RESERVE_MEM is basically not implemented (yet) for UDP. Patches are
+> welcome - even if I would be curious about the use-case.
 
-> Now that direct recycling is performed basing on pool->cpuid when set,
-> memory leaks are possible:
-> 
-> 1. A pool is destroyed.
-> 2. Alloc cache is emptied (it's done only once).
-> 3. pool->cpuid is still set.
-> 4. napi_pp_put_page() does direct recycling basing on pool->cpuid.
-> 5. Now alloc cache is not empty, but it won't ever be freed.
-> 
-> In order to avoid that, rewrite pool->cpuid to -1 when unlinking NAPI to
-> make sure no direct recycling will be possible after emptying the cache.
-> This involves a bit of overhead as pool->cpuid now must be accessed
-> via READ_ONCE() to avoid partial reads.
-> Rename page_pool_unlink_napi() -> page_pool_disable_direct_recycling()
-> to reflect what it actually does and unexport it.
+I've been chasing UDP packet drops under circumstances where they
+really should not be happening.  I *think* something regressed between
+6.2 and 6.5 (as I was seeing a lot of drops on a 6.5 machine and not
+on a 6.2 machine, and they're both under light load and subscribed to
+the same multicast group).  But regardless of whether there's an
+actual regression, the logic seems rather ancient and complex.  All I
+want is a reasonable size buffer, and I have plenty of memory.  (It's
+not 1995 any more -- I have many GB of RAM and I need a few tens of kB
+of buffer.)
 
-PW says "Changes requested", but I don't see any in the thread, did I
-miss something? :D
+And, on inspection of the code, so far I've learned, in no particular order=
+:
 
-Thanks,
-Olek
+1. __sk_raise_mem_allocated() is called very frequently (as the
+sk_forward_alloc mechanism is not particularly effective at reserving
+memory).  And it calls sk_memory_allocated_add(), which looked
+suspiciously like a horrible scalability problem until this patch:
+
+commit 3cd3399dd7a84ada85cb839989cdf7310e302c7d
+Author: Eric Dumazet <edumazet@google.com>
+Date:   Wed Jun 8 23:34:09 2022 -0700
+
+    net: implement per-cpu reserves for memory_allocated
+
+and I suspect that the regression I'm chasing is here:
+
+commit 4890b686f4088c90432149bd6de567e621266fa2
+Author: Eric Dumazet <edumazet@google.com>
+Date:   Wed Jun 8 23:34:11 2022 -0700
+
+    net: keep sk->sk_forward_alloc as small as possible
+
+(My hypothesis is that, before this change, there would frequently be
+enough sk_forward_alloc left to at least drastically reduce the
+frequency of transient failures due to protocol memory limits.)
+
+2. If a socket wants to use memory in excess of sk_forward_alloc
+(which is now very small) and rcvbuf is sufficient, it goes through
+__sk_mem_raise_allocated, and that has a whole lot of complex rules.
+
+2a. It checks memcg.  This does page_counter_try_charge, which does an
+unconditional atomic add.  Possibly more than one.  Ouch.
+
+2b. It checks *global* per-protocol memory limits, and the defaults
+are *small* by modern standards.  One slow program with a UDP socket
+and a big SO_RCVBUF can easily use all the UDP memory, for example.
+Also, why on Earth are we using global limits in a memcg world?
+
+2c. The per-protocol limits really look buggy.  The code says:
+
+    if (sk_has_memory_pressure(sk)) {
+        u64 alloc;
+
+        if (!sk_under_memory_pressure(sk))
+            return 1;
+        alloc =3D sk_sockets_allocated_read_positive(sk);
+        if (sk_prot_mem_limits(sk, 2) > alloc *
+            sk_mem_pages(sk->sk_wmem_queued +
+                 atomic_read(&sk->sk_rmem_alloc) +
+                 sk->sk_forward_alloc))
+            return 1;
+    }
+
+<-- Surely there should be a return 1 here?!?
+
+suppress_allocation:
+
+That goes all the way back to:
+
+commit 3ab224be6d69de912ee21302745ea4
+5a99274dbc
+Author: Hideo Aoki <haoki@redhat.com>
+Date:   Mon Dec 31 00:11:19 2007 -0800
+
+    [NET] CORE: Introducing new memory accounting interface.
+
+But it wasn't used for UDP back then, and I don't think the code path
+in question is or was reachable for TCP.
+
+3. A failure in any of this stuff gives the same drop_reason.  IMO it
+would be really nice if the drop reason were split up into, say,
+RCVBUFF_MEMCG, RCVBUF_PROTO_HARDLIMIT, RCVBUFF_PROTO_PRESSURE or
+similar.
+
+
+And maybe there should be a way (a memcg option?) to just turn the
+protocol limits off entirely within a memcg.  Or to have per-memcg
+protocol limits.  Or something.  A single UDP socket in a different
+memcg should not be able to starve the whole system such that even
+just two (!) queued UDP datagrams don't fit in a receive queue.
+
+
+Anyway, SO_RESERVE_MEM looks like it ought to make enqueueing on that
+socket faster and more scalable.  And exempt from random failures due
+to protocol memory limits.
+
+
+--Andy
 
