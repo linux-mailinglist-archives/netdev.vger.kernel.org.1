@@ -1,233 +1,214 @@
-Return-Path: <netdev+bounces-72496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 726758585D1
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 19:53:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5E768585EB
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 20:04:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 287042898A5
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 18:53:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74F9DB20B99
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 19:04:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C74C81353FF;
-	Fri, 16 Feb 2024 18:52:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCF2D135403;
+	Fri, 16 Feb 2024 19:04:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ck+WO+AD"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="FnRl2O24"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2066.outbound.protection.outlook.com [40.107.237.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FE351353F0;
-	Fri, 16 Feb 2024 18:52:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708109577; cv=none; b=LR/zSg2JUUM1XyOjYzc++ILT/OsMVo2dcFAs7iTbn0oJ2mGUlTXEw+9IZENWD/+EJRGSgLpbJfezkH/eY+8mz7yLubiTaSZKKuqZjQLpKaiexrlCV/KrDcYbakqA+QzNBD2XP/C9YafJeWQ89X4+vV4LbR/G4xW9oBE4EpPQ5fU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708109577; c=relaxed/simple;
-	bh=3WkD8y+Hm2LbxjUUEU7dK0+hHpLtVVkdwRsfFhX61YI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a3wGLgyi4pKe838gzeFYXeka5PNy30fDqvB6wh6L7USV43gAfRHkX/HMz2t+kijZnnXvvrZpyKZfHTLwyzoYgmjwShu+YqmpE93gxwZTjCNMb1OMIbpGGeZ5QZ0+Te2OHCTz+wFfzYKI2DT1uW/kFAnMCSk251LZgW/WYY7ZoAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ck+WO+AD; arc=none smtp.client-ip=209.85.160.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-42dc7ccabbaso8516851cf.0;
-        Fri, 16 Feb 2024 10:52:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708109575; x=1708714375; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=w66qiBcuO517k0fIfzU2tv5eomSTAcruHYKVEIiNz7U=;
-        b=ck+WO+ADeEfG2y4BG7FocgevHgRR7k15rEZb9UQeOEMToSgNJplPszgHE4y691I2S5
-         RxjQbK4Jjk8/icHfUJAfhxzPMzmDIzZ3Lwa0yZZYnk59UIe31BgpmIGW/tzPGrttTkGG
-         oxxVX9iiAtmbIJOHJe+tEWKv5Gwl1poUhaf26Hdjb6gmTIpT2eA3I4M1bP+FASkuW4gg
-         zRO1BxjPIGXFosXNaKOLzmpfxLd3Wv0Hhr4WLpprvMlUw14ajsZYbL/y30orxzqFORsg
-         N5gULBcfbJPYR/Ccckx5QLvvqN+QMhq1BargarvnR4qvAfcP0HL6qUSe4E3vlSFspkXa
-         pFvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708109575; x=1708714375;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=w66qiBcuO517k0fIfzU2tv5eomSTAcruHYKVEIiNz7U=;
-        b=ExF6rrxbjW2LA2bce1A23XjMZYyKYEVhyKfqcjPViT6WJSMNTsaNRd7mGV4KNN/LUZ
-         xAfjEY7r8APMoTGv9StSKUP7f9xOojsFphySLa8OnSdjezcJscm4Z4l+6lV1akd+joFA
-         pvhRfkI+iTw/QI17SFRf4JxLm4/EaVYsr1ETreAsuC8UFRW38S2ELu2DdX4BBLk+w4bH
-         OyzieW/Y/YCJ8qJS7ckJSK6LHpPfUqAQ/H5R7Pt5gZfgA1SwJ7KvNOuc+Me3zPDGx5AX
-         e/S4DyKGbpaJysksr1z3455qg6OiE4rJOfpvsFaSfOwxpFgCf3RFaufAwHX2Q5u0I+bf
-         wMaA==
-X-Forwarded-Encrypted: i=1; AJvYcCUpzWZyDZBHwPfWr7Fb96pe6EnZRZoo47ATuNcq/xS39PbvwpxGMN2Lo/zIQ5cde8Eel/4556Gf0JOb3OzgAh5w8bfc38S6fKeMM9Hjce/WGPn1lo9r0xGpuFnTCASe6S1aEFu2nha85lHqtaPL5bMF52CKlzYzEggnThr0gdbq
-X-Gm-Message-State: AOJu0Yx8aVLf4lETrlj7SzeG+UNqtFO0eFOfxrvgqN/7fhilzXDsMrG5
-	IEnX4uEkC+smtNfyrKYTmMJU2RPKgnuwaHgKJVA58xT+CpgqCPhT
-X-Google-Smtp-Source: AGHT+IGi4/giR855KA+m+KaoReOo/3kdOIgybpIeUkxcyuMIxsIsRMDjoh4w3/EXWLQ6H6JRkjhOZQ==
-X-Received: by 2002:ac8:5acb:0:b0:42c:74ef:8f82 with SMTP id d11-20020ac85acb000000b0042c74ef8f82mr6389156qtd.67.1708109574675;
-        Fri, 16 Feb 2024 10:52:54 -0800 (PST)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id e18-20020ac86712000000b0042c61b99f42sm183180qtp.46.2024.02.16.10.52.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Feb 2024 10:52:54 -0800 (PST)
-Message-ID: <57a8160e-7f56-40b1-a69a-1fc56d8a79df@gmail.com>
-Date: Fri, 16 Feb 2024 10:52:50 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED14513540F;
+	Fri, 16 Feb 2024 19:04:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.66
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708110273; cv=fail; b=OdCkLVNXfvO3mS1REd90WRIy2L5K7Wp0995esDYZNPf5l58nW/EGFSneBAqoR7pmO3JTwjo/ABZI6bAXtnah+7RaewhBNBZzzPrvnfmVHpyrRK7HgJUMFhUShiCf8dJqitb8mZaviZP2ASjBWRTtIvwZPSzRABfEeBhf7oKmPxM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708110273; c=relaxed/simple;
+	bh=DofgLIhbaDW72XEZSQ1W3oJWYUcItSwRO7yzwIYE98g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=abpSLvKhu1GT8RoETMUPiLEc1FUUgwbOhmqAUyn8bi8vM4ciXC+d4Gyg/wLr38yZoOPigKR4QPcMUJxON499/AwIWo1635MoOcRavaPsBQSpdCqPZ+QBv8UbNsuRX6lfJdqDr03ClzKX6AjKRWDMN9AKEv4tYiabYPCSevP8K0M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=FnRl2O24; arc=fail smtp.client-ip=40.107.237.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iPLl+MDDuLUWDi8Fyw/2pD3WcB4f10qOJzTiBbXNzjZKLl++oiG0GtnqJLctTewXWaTSbNcry8BsJOo3AyI8jKf7KZR3RNGg+OjdMILvektAY1TYjadNeFlZxegSoNOjqv+MbtGz/YgrkeyJiV/I1CYOnxM1qfZWf8kAfLdBQiZnD1WV9f3gl3zey32FKTtfNN7dNnUwsR2tNBV03mvhU6RxoZ9iYEc8QzgxHg6/mRy8aahW+VP5Vr2s8V5hue/cX+tTEoShCNwPSrblH9lHGbSIWiLR/MS6fMN8o55QYOrShccyjvQb5N4+V9VTpGFGPfOzTIsRXsyP/qNNJ6wKMA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fTzvQufVrgwXjeiUsxCykAo3AjhtlDEBiHqIS8Likyk=;
+ b=nFq1glu9Y2mRyeydIRygmkzfCsAreDWmIkXapvu2vLIpc009TNX18JT7PmVNS6y0hE9y31r7SMhcw0MwoCPdKwCE2MMjAUAB1DinKjgPJ9FTvw5bH267cfWgjbe/r0u4iuPC2fSxKHOyi4Jj0i6Z1Jt3fhdkgPjggRTaMj/dtkYmFIkv1KpzK/CLnAbie+4Pe2pzwE5sE6gYWQ+6fOssJvB85TfK16K7yboQmVilQ3+1lL8qsngO9LBZHm5kidsQNkrlNs4YKUhOvREd+U0lARmSwckqLYokmpEoVM3638hf+7AnkedAlZByf/Jaw8zEttmt+joDCj7u7v2jcM/wyw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fTzvQufVrgwXjeiUsxCykAo3AjhtlDEBiHqIS8Likyk=;
+ b=FnRl2O246+scVNQ2+uVZtHEc8nv7cpLcBT2TkFMjxNT66t1ptT2PA5jDy3wy0ExyUctKhHiOFuNNv5bdvU6Z/RSduCLMuTWpsYZpZ2a4nQ9nqd6SKnD3EnTNAcODghue2bOxgkJeFk0cUorGWu0zNPNx0OdR45TMo27JoRiJsq+Ali7ErbuDT6Dhs8sJh3hFwtH0Nv4cDH+pRrJH8kZglRUxWaWzF4asy0nInjEw95V540Ba7LjwdEWJeY70KjRdHSyz1kXb0t38LhkyL6bIYh6/cMQqChdBYwtO6C5jiLDYbREbYc58D11Dj2ihhZUxMRgUdXViLQ2Wbmg4Vmw/BA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by MN0PR12MB6344.namprd12.prod.outlook.com (2603:10b6:208:3d3::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.15; Fri, 16 Feb
+ 2024 19:04:28 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::96dd:1160:6472:9873]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::96dd:1160:6472:9873%6]) with mapi id 15.20.7316.012; Fri, 16 Feb 2024
+ 19:04:28 +0000
+Date: Fri, 16 Feb 2024 15:04:26 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+	Leonid Bloch <lbloch@nvidia.com>, Itay Avraham <itayavr@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	David Ahern <dsahern@kernel.org>,
+	Aron Silverton <aron.silverton@oracle.com>,
+	andrew.gospodarek@broadcom.com, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
+Message-ID: <20240216190426.GG13330@nvidia.com>
+References: <20240207072435.14182-1-saeed@kernel.org>
+ <Zcx53N8lQjkpEu94@infradead.org>
+ <20240214074832.713ca16a@kernel.org>
+ <20240215132138.GK1088888@nvidia.com>
+ <20240215171013.60566d7b@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240215171013.60566d7b@kernel.org>
+X-ClientProxiedBy: MN2PR16CA0001.namprd16.prod.outlook.com
+ (2603:10b6:208:134::14) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC net-next v8 04/13] net: Change the API of PHY default
- timestamp to MAC
-Content-Language: en-US
-To: Kory Maincent <kory.maincent@bootlin.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
- Radu Pirea <radu-nicolae.pirea@oss.nxp.com>,
- Jay Vosburgh <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jonathan Corbet <corbet@lwn.net>,
- Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com,
- Simon Horman <horms@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Rahul Rameshbabu <rrameshbabu@nvidia.com>
-References: <20240216-feature_ptp_netnext-v8-0-510f42f444fb@bootlin.com>
- <20240216-feature_ptp_netnext-v8-4-510f42f444fb@bootlin.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- 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
-In-Reply-To: <20240216-feature_ptp_netnext-v8-4-510f42f444fb@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MN0PR12MB6344:EE_
+X-MS-Office365-Filtering-Correlation-Id: 263870e2-ec90-42a3-4046-08dc2f221925
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	bL51VZMHeK1qGOmaXZb4C9/7AHttlbIKmVe0YD2irYugiA4CjQwwp1WxEeLaWW5euE9aNaJ9sHKyA8ANwHyL2Qd5YK8cjMlT7JqJp5gMkIhJ2nN1AaE2ynBt0/72B05fhNS2+j5itUbc20CxG3dJm8ImkLMy+5NG4WinyJ6HqI11s7F7Lt3KzQUYstJ2cgDAh2xoHppFC9FwC4RdSUvwAO04w2aaa6gn+jq2lBLkx1IJxhUAq04weeKKX13vWkD05PGUmIV2l1+JSY+5R5kEXLRbxD8OK2mk4AFh3fwTjFZByN+SHDOmAVC+4eaOHftk6Z+ECybToAXOS6gtxb4Vm75cFGzn72gtR6icgIQ2C4CkgTFjqttNB6C/XpMs0W6SavtOIk7GQRJlgxOILW2AeRs5grMJ9uDvz8VPTk1DfQfuTXPGmNknik9nbBesR8ZQzfPhvx72852zlKnUVdz95KrMu0G8V1Ec3bclXtFORvvU+HFOgC3j5oPdOMkFOyHCICietmkxTResS/2YHjmAXkXCWyvjEqTR7nWvZl00n/WzHWoLlQd/aBADyc81AOWD
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(39860400002)(136003)(366004)(346002)(376002)(230922051799003)(64100799003)(1800799012)(186009)(451199024)(83380400001)(26005)(316002)(6916009)(41300700001)(4326008)(8936002)(54906003)(8676002)(66946007)(66556008)(66476007)(2616005)(1076003)(6486002)(6506007)(6512007)(478600001)(36756003)(38100700002)(33656002)(86362001)(5660300002)(7416002)(2906002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?gdjmT7mBZ9TBwW+rx0xPaRqnY+iYoAjmn63sRMQVV069No/IzzBQioLmOCSP?=
+ =?us-ascii?Q?yzwDvFkkHUWeDG2jbf90YiFbUdwqy0c3PKWd/9+eKdj0EcKdTyAQdm9uLnLz?=
+ =?us-ascii?Q?6pdiKUzaK9KLT2nhhF6L++08KmGHz4ED3TLGGwbSxOIy5qvPjdoMf2JBQLFX?=
+ =?us-ascii?Q?m84M897xHcyhkb3GvYYKHO5SujSVjXA8uoR+/aslu3dcTU0SKND67odjAnAR?=
+ =?us-ascii?Q?XWX+uY6ZLce/BfMnE8SyhWLgUaCQRiHtIqFlBNJiP3KpRVBwHYggrVBLZnlM?=
+ =?us-ascii?Q?/kOuV4Yn5mWWO1F/lUWhjpHqAVoVb/jrBMtV4En7CWw96az6Shg7UYaGPFh1?=
+ =?us-ascii?Q?c3svh+IpId4hNqPxoJR92GqVm9ysgWW9OC6ssz1shYSl6TOZNB4TdbqcWG9B?=
+ =?us-ascii?Q?Vp13Q4GytPIUAVtpnAzP4iKb5PyXzwH2VXToXtn2T0nwcNgLQYFF9PcRGxTm?=
+ =?us-ascii?Q?WQmRUH88aIVXUpjmwkirxD/YH4pHVHyMfAxlncVLhd9dAJBkDEd/E2wPQRXq?=
+ =?us-ascii?Q?dQOw3/SzvHQ3lG0er3hk7aSguxCO0nEzAPNCCo48UnsqMqyoUoVgCeW5G3Bs?=
+ =?us-ascii?Q?qzW6UgCxLGtFYQc/KOOBsp7Lkj9VG5iHpJqbaJfkntPQhy3MnXiZFIOncky4?=
+ =?us-ascii?Q?H2I1uq93MAzRe2D7jQh3Sn9/vskgBaXLqfUYIFi3hKS784kOIl/vOcbQQw0Y?=
+ =?us-ascii?Q?WtroKCSLGpEcgbk2r9QGOP17qVpYz3+gvARjI6NEHoni2i2BZG72iErsIHs3?=
+ =?us-ascii?Q?y8b4wYQYAdCLJrFeTxEEtae0EHt+XNxWEBfrOb+oJ1ZvYNCYTbJt9x9WeGO7?=
+ =?us-ascii?Q?bAJPcGpK1U+E3EiKiCc15gf09wqUEbiTwIhtK+fAAjsQwBDdyWoWt9Zw2o6N?=
+ =?us-ascii?Q?/gEeV7u5+VSAFvAZwF3UB+hHwdrpIuT++X+Wz+zUuS5qze4AxDMNa3I/SWF5?=
+ =?us-ascii?Q?PRSXhAfuzwTtt30TEeCZhsYpaRBzgWn2hYCHs7AzBLJ6iOmiYiiC828a6InF?=
+ =?us-ascii?Q?ETPHzvKqvNhPv1GmwaslQv5K4LXQg77MRmEC6tvROp5vW3XbKRCd8bvXloTR?=
+ =?us-ascii?Q?n0rlTEKeN7RIWVG5BNTdICaqajfq5SjTD9xIqvk0lVs1/wcKfmuK1KXH8bho?=
+ =?us-ascii?Q?LooLMYKF8yfetAiK+3+6PmufAWvaLULBDCJE+1X0u+102Pvod6B/z02smalv?=
+ =?us-ascii?Q?BfHXykwcp/ZaYnIF/wR8hs97/5R5ThbFELGeiOKe5awP2BcMbBof2XIbaTHX?=
+ =?us-ascii?Q?sw4dXICOXWQ7wNzW1/SWDG32iUDfo3yinMLA/Tu9hD9MXW9ypTk7uhtq0n3b?=
+ =?us-ascii?Q?SVY05/b4eBDBaojz2F8YBXeeiNsoTwbkQL//niFBfe6N+tLJPELTnCA+eNyg?=
+ =?us-ascii?Q?KvaxummuvyAEAacv8Qfaq+BnaPcQAh/gTyIGahL+5EqUM4CyHDvOezBrYybV?=
+ =?us-ascii?Q?LflxPvS0rJwmtxsrwYehZxvy77NG0MxIYzhjryeQla3rNjSbbfsfjl19c+7E?=
+ =?us-ascii?Q?8D0E6jqo1uBmdL7MAe2fF7ODpnt0zBbyqe9PGXvEvEwO+be80aQQgNe7R9vd?=
+ =?us-ascii?Q?/ELBDU9D+fWIsIxVDMkC7DP1766fdMkAaqBUIeEp?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 263870e2-ec90-42a3-4046-08dc2f221925
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Feb 2024 19:04:27.9038
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: nMfciWipur4LS2gBd1LJK0huN4NGaqiLIb47IUerKyvFbrC/+9Czyk+4Bx7BpivS
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6344
 
-On 2/16/24 07:52, Kory Maincent wrote:
-> Change the API to select MAC default time stamping instead of the PHY.
-> Indeed the PHY is closer to the wire therefore theoretically it has less
-> delay than the MAC timestamping but the reality is different. Due to lower
-> time stamping clock frequency, latency in the MDIO bus and no PHC hardware
-> synchronization between different PHY, the PHY PTP is often less precise
-> than the MAC. The exception is for PHY designed specially for PTP case but
-> these devices are not very widespread. For not breaking the compatibility
-> default_timestamp flag has been introduced in phy_device that is set by
-> the phy driver to know we are using the old API behavior.
+On Thu, Feb 15, 2024 at 05:10:13PM -0800, Jakub Kicinski wrote:
+> On Thu, 15 Feb 2024 09:21:38 -0400 Jason Gunthorpe wrote:
+> > On Wed, Feb 14, 2024 at 07:48:32AM -0800, Jakub Kicinski wrote:
+> > > On Wed, 14 Feb 2024 00:29:16 -0800 Christoph Hellwig wrote:  
+> > > > With my busy kernel contributor head on I have to voice my
+> > > > dissatisfaction with the subsystem maintainer overreach that's causing
+> > > > the troubles here.   
+> > > 
+> > > Overreach is unfortunate, I'd love to say "please do merge it as part 
+> > > of RDMA". You probably don't trust my opinion but Jason admitted himself
+> > > this is primarily for RDMA.  
+> > 
+> > "admitted"? You make it sound like a crime. I've been very clear on
+> > this need from the RDMA community since the first posting.
 > 
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> ---
+> Sorry, unintentional :) Maybe it's a misunderstanding but my impression
+> was that at least Saeed was trying hard to make this driver a common
+> one, not just for RDMA.
+
+The hardware is common, this is a driver to talk to the shared FW. I
+don't know how you'd do just one when netdev is effectively an RDMA
+application running in the kernel, from the perspective of the FW.
+
+There is no real line between these things beyond the artificial one
+we have created in the kernel.
+
+> > > The problem is that some RDMA stuff is built really closely on TCP,  
+> > 
+> > Huh? Since when? Are you talking about soft-iwarp? That is a reasearch
+> > project and Bernard is very responsive, if you have issues ask him and
+> > he will help.
+> > 
+> > Otherwise the actual HW devices are not entangled with netdev TCP, the
+> > few iWarp devices have their own TCP implementation, in accordance
+> > with what the IETF standardized.
 > 
-> Changes in v5:
-> - Extract the API change in this patch.
-> - Rename whitelist to allowlist.
-> - Set NETDEV_TIMESTAMPING in register_netdevice function.
-> - Add software timestamping case description in ts_info.
+> There are some things I know either from work or otherwise told me 
+> in confidence which I can't share. This is very frustrating for
+> me, and probably for you, sorry :(
+
+Well, all I can say is I know of no forthcoming RDMA things with any
+different relationship to TCP. I think if someone wants to more TCP
+they will have a hard time, and I'm not inclined to seriously help
+anyone get more TCP into RDMA. iWarp is trouble enough already.
+
+> > I seem to recall you saying RDMA shouldn't call any netdev APIs at
+> > all. We were unable to agree on where to build the fence for this
+> > reason.
 > 
-> Change in v6:
-> - Replace the allowlist phy with a default_timestamp flag to know which
->    phy is using old API behavior.
-> - Fix dereferenced of a possible null pointer.
-> - Follow timestamping layer naming update.
-> - Update timestamp default set between MAC and software.
-> - Update ts_info returned in case of software timestamping.
+> Last time you were calling into the IPsec stack right? It's not just 
+> a basic API. IDK how to draw a line, definitely open to suggestions!
+
+I thought the two halfs of the mlx5 driver were co-ordinating their
+usage of the shared HW around the ipsec configuration pushed into the
+device by netdev xfrm.
+
+> > > Ah, and I presume they may also want it for their DOCA products. 
+> > > So 80% RDMA, 15% DOCA, 5% the rest is my guess.  
+> > 
+> > I don't know all details about DOCA, but what I know about runs over
+> > RDMA.
 > 
-> Change in v8:
-> - Reform the implementation to use a simple phy_is_default_hwtstamp helper
->    instead of saving the hwtstamp in the net_device struct.
-> ---
->   drivers/net/phy/bcm-phy-ptp.c     |  3 +++
->   drivers/net/phy/dp83640.c         |  3 +++
->   drivers/net/phy/micrel.c          |  6 ++++++
->   drivers/net/phy/mscc/mscc_ptp.c   |  3 +++
->   drivers/net/phy/nxp-c45-tja11xx.c |  3 +++
->   include/linux/phy.h               | 17 +++++++++++++++++
->   net/core/dev_ioctl.c              |  8 +++-----
->   net/core/timestamping.c           | 10 ++++++++--
->   net/ethtool/common.c              |  2 +-
->   9 files changed, 47 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/net/phy/bcm-phy-ptp.c b/drivers/net/phy/bcm-phy-ptp.c
-> index 617d384d4551..d3e825c951ee 100644
-> --- a/drivers/net/phy/bcm-phy-ptp.c
-> +++ b/drivers/net/phy/bcm-phy-ptp.c
-> @@ -931,6 +931,9 @@ struct bcm_ptp_private *bcm_ptp_probe(struct phy_device *phydev)
->   		return ERR_CAST(clock);
->   	priv->ptp_clock = clock;
->   
-> +	/* Timestamp selected by default to keep legacy API */
-> +	phydev->default_timestamp = true;
-> +
->   	priv->phydev = phydev;
->   	bcm_ptp_init(priv);
->   
-> diff --git a/drivers/net/phy/dp83640.c b/drivers/net/phy/dp83640.c
-> index 5c42c47dc564..64fd1a109c0f 100644
-> --- a/drivers/net/phy/dp83640.c
-> +++ b/drivers/net/phy/dp83640.c
-> @@ -1450,6 +1450,9 @@ static int dp83640_probe(struct phy_device *phydev)
->   	phydev->mii_ts = &dp83640->mii_ts;
->   	phydev->priv = dp83640;
->   
-> +	/* Timestamp selected by default to keep legacy API */
-> +	phydev->default_timestamp = true;
-> +
+> Well, since you're an RDMA person that's not really saying much
+> about existence of other parts.
 
-This probably does not matter too much given that the mii_ts is not 
-visible until we fully probed the PHY, though for consistency and to be 
-on the safe side, it would be more prudent to set default_timestamp 
-before finishing the mii_ts assignment, in case we ever become more 
-aggressive at exposing objects to user-space/kernel-space. Probably over 
-thinking this.
+<shrug> why does DOCA matter? Should we have not done io_uring because
+Oracle might use it? Besides, from what I know about DOCA it is almost
+all data plane stuff and RDMA fully covers that already..
 
-More comments below:
-
-[snip]
-
->   
-> -	if (!skb->dev || !skb->dev->phydev || !skb->dev->phydev->mii_ts)
-> +	if (!skb->dev)
-> +		return false;
-> +
-> +	if (!phy_is_default_hwtstamp(skb->dev->phydev))
-
-Was not obvious that we could remove the phydev NULL check, but it's 
-fine because phy_is_default_hwtstamp() calls phy_has_hwtstamp() first, 
-and that function has that check. Seems a bit brittle, but fair enough.
--- 
-Florian
-
+Regards,
+Jason
 
