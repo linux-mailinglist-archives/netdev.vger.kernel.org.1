@@ -1,71 +1,74 @@
-Return-Path: <netdev+bounces-72528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 640438587A2
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 22:06:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CEAC8587A3
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 22:07:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96E381C26B38
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 21:06:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EE231C26277
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 21:07:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08BA941A92;
-	Fri, 16 Feb 2024 21:06:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B638A12CDBC;
+	Fri, 16 Feb 2024 21:06:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="f5qcNXMs"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="mfst4j5V"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F67728E2B
-	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 21:06:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE00F28E2B
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 21:06:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708117588; cv=none; b=et6U6RCg4DhTnmMZAU9F99CSaayyXIoSJZQPH9JLRFvezTqKfbkSrREp0YRWpx2N/i3pRm4NDxoscPLjkET7RataKs9vdlM+snY1m/8atUZoXaEMJ8dmYTLnC/DTDEhxhoIy84c5OINLtdN+0KxY6QM3Y6jd0/JYd1l/JdZCHYk=
+	t=1708117618; cv=none; b=vBEh36H/U661l1PgjHaGLrs5YYd9tXhZhyivvZU2IFAee3Y4yqrXVVw/YbxhBdg1zDnycDOzLv+9KqeHK2gQtqBnrz1BJiE+9z0Y4j0ULoOhojcaT1ISNbxQIftNDpdvJ5HdUvCBABkDVwnAbSNml3GNqS03YGPEBkjEKzkH+6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708117588; c=relaxed/simple;
-	bh=nyyTcg7M3SaOlU6u8WbJucb6cfowHp/cGKSAnyA2H2o=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=m/Ia4mtXVJboLFJckiAFfeD4jlVUzWklRh9JLhqn/RGU7uO38e9ceV6sGlnCZOyHHZarOBoJ8mbMrazgZuudbXBE9Cj5rh2AimE+ycAlc1YgVJLgIr98gs/kDepMEdLtECSZZI9AOPQSkt4+5XK74MvMIbNY7O7s2yqiLPc5ZSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=f5qcNXMs; arc=none smtp.client-ip=99.78.197.218
+	s=arc-20240116; t=1708117618; c=relaxed/simple;
+	bh=yCXsbPuUXSWnmyP68qIAls9pEc09WtzRY8NsAaCIozs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SqBwkSNHs4I3IOfNq1KbuWGWdav0DrjsMet2t5H+Yh5pGlThV7eGb5MYiJpNTJD/SElaRoEBAPxEuWKFb6LblQRGLEypK/8h/dth4sFF17yOQ0scgaoyS9qYVqvoZ82XWwa1i0reco/DWC0nL5lUjI/+EmLX0G3hQgoK18Gahak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=mfst4j5V; arc=none smtp.client-ip=72.21.196.25
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1708117587; x=1739653587;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=AO7HEql7TvqW+06Q7aKT8PrpPLbZmbNcsqc2Fa7j67Y=;
-  b=f5qcNXMsXo5BRWj/7/iC5uQm8Aez2HbGQEE9tU+FC9mWvue4wgRGa6l7
-   zBVvcLWZi7kvPzNn9t6PEZb1XR0AB4Kbdf0HPEQLVXRjik6htf7g9kzG/
-   cc047emTPWwkTDfl8jAOUxe4UwlqYTeG8Xa1M06SOfQVmjXs6tyhsgL+I
-   Q=;
+  t=1708117617; x=1739653617;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=e1P2JASlBZPYvR82g/gWgcenHoE/0XMLa9Yu6hd7l78=;
+  b=mfst4j5VtHyI8epINNwJNgpIv0P58az2j68LfnMhrhK47jK3oBea4BtB
+   iG8+6w1HQT2e7mk1MC0OiR/4Chvr1RT6J2roxKP0irVAHOjbJj8lEL9hV
+   +Ci4iKrJgblXqJbetNDRvembeGERANqJoZ7EZRXhOTXay0LjWTmLOArao
+   Y=;
 X-IronPort-AV: E=Sophos;i="6.06,165,1705363200"; 
-   d="scan'208";a="274710238"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2024 21:06:25 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:64697]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.29.119:2525] with esmtp (Farcaster)
- id 27fb96e4-dbe8-4c5c-9306-d8359be8fc52; Fri, 16 Feb 2024 21:06:24 +0000 (UTC)
-X-Farcaster-Flow-ID: 27fb96e4-dbe8-4c5c-9306-d8359be8fc52
+   d="scan'208";a="381672608"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2024 21:06:54 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:54078]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.12.175:2525] with esmtp (Farcaster)
+ id d12ed02c-d34f-462e-b9dc-2b26ac436b34; Fri, 16 Feb 2024 21:06:52 +0000 (UTC)
+X-Farcaster-Flow-ID: d12ed02c-d34f-462e-b9dc-2b26ac436b34
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 16 Feb 2024 21:06:24 +0000
+ 15.2.1118.40; Fri, 16 Feb 2024 21:06:49 +0000
 Received: from 88665a182662.ant.amazon.com.com (10.106.100.6) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 16 Feb 2024 21:06:21 +0000
+ 15.2.1118.40; Fri, 16 Feb 2024 21:06:46 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v2 net-next 00/14] af_unix: Rework GC.
-Date: Fri, 16 Feb 2024 13:05:42 -0800
-Message-ID: <20240216210556.65913-1-kuniyu@amazon.com>
+Subject: [PATCH v2 net-next 01/14] af_unix: Add struct unix_vertex in struct unix_sock.
+Date: Fri, 16 Feb 2024 13:05:43 -0800
+Message-ID: <20240216210556.65913-2-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240216210556.65913-1-kuniyu@amazon.com>
+References: <20240216210556.65913-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,96 +77,92 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWA004.ant.amazon.com (10.13.139.76) To
+X-ClientProxiedBy: EX19D044UWA001.ant.amazon.com (10.13.139.100) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-When we pass a file descriptor to an AF_UNIX socket via SCM_RIGTHS,
-the underlying struct file of the inflight fd gets its refcount bumped.
-If the fd is of an AF_UNIX socket, we need to track it in case it forms
-cyclic references.
+We will replace the garbage collection algorithm for AF_UNIX,
+where we will consider each inflight file descriptor of AF_UNIX
+sockets as an edge in a directed graph.
 
-Let's say we send a fd of AF_UNIX socket A to B and vice versa and
-close() both sockets.
+Here, we introduce a new struct unix_vertex representing a vertex
+in the graph and add it to struct unix_sock.
 
-When created, each socket's struct file initially has one reference.
-After the fd exchange, both refcounts are bumped up to 2.  Then, close()
-decreases both to 1.  From this point on, no one can touch the file/socket.
+In the following patch, we will allocate another struct per edge,
+which we finally link to the inflight socket's unix_vertex.edges
+when sendmsg() succeeds.
 
-However, the struct file has one refcount and thus never calls the
-release() function of the AF_UNIX socket.
+Also, we will count the number of edges as unix_vertex.out_degree.
 
-That's why we need to track all inflight AF_UNIX sockets and run garbage
-collection.
+The first time an AF_UNIX socket is passed successfully, we will
+link its unix_vertex.entry to a global list.
 
-This series replaces the current GC implementation that locks each inflight
-socket's receive queue and requires trickiness in other places.
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+ include/net/af_unix.h | 8 ++++++++
+ net/unix/af_unix.c    | 1 +
+ net/unix/garbage.c    | 8 ++++++++
+ 3 files changed, 17 insertions(+)
 
-The new GC does not lock each socket's queue to minimise its effect and
-tries to be lightweight if there is no cyclic reference or no update in
-the shape of the inflight fd graph.
-
-The new implementation is based on Tarjan's Strongly Connected Components
-algorithm, and we consider each inflight file descriptor of AF_UNIX sockets
-as an edge in a directed graph.
-
-For the details, please see each patch.
-
-  patch 1  -  5 : Add struct to express inflight socket graphs
-  patch       6 : Optimse inflight fd counting
-  patch       7 : Group SCC possibly forming a cycle
-  patch 8  - 10 : Make GC lightweight
-  patch 11 - 12 : Detect dead cycle references
-  patch      13 : Replace GC algorithm
-  patch      14 : selftest
-
-After this series is applied, we can remove the two ugly tricks for race,
-scm_fp_dup() in unix_attach_fds() and spin_lock dance in unix_peek_fds()
-as done in patch 14/15 of v1.
-
-
-Changes:
-  v2:
-    * Drop 2 cleanup patches (patch 14/15 in v1)
-
-    * Patch 2
-      * Fix build error when CONFIG_UNIX=n
-    * Patch 7
-      * Fix build warning for using goto label at the end of the loop
-    * Patch 13
-      * Call kfree_skb() for oob skb
-    * Patch 14
-      * Add test case for MSG_OOB
-
-  v1: https://lore.kernel.org/netdev/20240203030058.60750-1-kuniyu@amazon.com/
-
-
-Kuniyuki Iwashima (14):
-  af_unix: Add struct unix_vertex in struct unix_sock.
-  af_unix: Allocate struct unix_edge for each inflight AF_UNIX fd.
-  af_unix: Link struct unix_edge when queuing skb.
-  af_unix: Save listener for embryo socket.
-  af_unix: Fix up unix_edge.successor for embryo socket.
-  af_unix: Bulk update unix_tot_inflight/unix_inflight when queuing skb.
-  af_unix: Detect Strongly Connected Components.
-  af_unix: Save O(n) setup of Tarjan's algo.
-  af_unix: Skip GC if no cycle exists.
-  af_unix: Avoid Tarjan's algorithm if unnecessary.
-  af_unix: Assign a unique index to SCC.
-  af_unix: Detect dead SCC.
-  af_unix: Replace garbage collection algorithm.
-  selftest: af_unix: Test GC for SCM_RIGHTS.
-
- include/net/af_unix.h                         |  33 +-
- include/net/scm.h                             |   8 +
- net/core/scm.c                                |   9 +
- net/unix/af_unix.c                            |  27 +-
- net/unix/garbage.c                            | 473 +++++++++++-------
- tools/testing/selftests/net/.gitignore        |   1 +
- tools/testing/selftests/net/af_unix/Makefile  |   2 +-
- .../selftests/net/af_unix/scm_rights.c        | 286 +++++++++++
- 8 files changed, 632 insertions(+), 207 deletions(-)
- create mode 100644 tools/testing/selftests/net/af_unix/scm_rights.c
-
+diff --git a/include/net/af_unix.h b/include/net/af_unix.h
+index 627ea8e2d915..664f6bff60ab 100644
+--- a/include/net/af_unix.h
++++ b/include/net/af_unix.h
+@@ -22,9 +22,16 @@ extern unsigned int unix_tot_inflight;
+ 
+ void unix_inflight(struct user_struct *user, struct file *fp);
+ void unix_notinflight(struct user_struct *user, struct file *fp);
++void unix_init_vertex(struct unix_sock *u);
+ void unix_gc(void);
+ void wait_for_unix_gc(struct scm_fp_list *fpl);
+ 
++struct unix_vertex {
++	struct list_head edges;
++	struct list_head entry;
++	unsigned long out_degree;
++};
++
+ struct sock *unix_peer_get(struct sock *sk);
+ 
+ #define UNIX_HASH_MOD	(256 - 1)
+@@ -62,6 +69,7 @@ struct unix_sock {
+ 	struct path		path;
+ 	struct mutex		iolock, bindlock;
+ 	struct sock		*peer;
++	struct unix_vertex	vertex;
+ 	struct list_head	link;
+ 	unsigned long		inflight;
+ 	spinlock_t		lock;
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 4892e9428c9f..ae145b6f77d8 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -996,6 +996,7 @@ static struct sock *unix_create1(struct net *net, struct socket *sock, int kern,
+ 	u->path.dentry = NULL;
+ 	u->path.mnt = NULL;
+ 	spin_lock_init(&u->lock);
++	unix_init_vertex(u);
+ 	INIT_LIST_HEAD(&u->link);
+ 	mutex_init(&u->iolock); /* single task reading lock */
+ 	mutex_init(&u->bindlock); /* single task binding lock */
+diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+index 51acf795f096..6a71997ac67a 100644
+--- a/net/unix/garbage.c
++++ b/net/unix/garbage.c
+@@ -101,6 +101,14 @@ struct unix_sock *unix_get_socket(struct file *filp)
+ 	return NULL;
+ }
+ 
++void unix_init_vertex(struct unix_sock *u)
++{
++	struct unix_vertex *vertex = &u->vertex;
++
++	vertex->out_degree = 0;
++	INIT_LIST_HEAD(&vertex->edges);
++}
++
+ DEFINE_SPINLOCK(unix_gc_lock);
+ unsigned int unix_tot_inflight;
+ static LIST_HEAD(gc_candidates);
 -- 
 2.30.2
 
