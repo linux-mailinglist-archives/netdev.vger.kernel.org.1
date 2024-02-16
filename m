@@ -1,146 +1,170 @@
-Return-Path: <netdev+bounces-72527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 725FF85877E
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 21:53:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 640438587A2
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 22:06:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DDF828A95E
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 20:53:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96E381C26B38
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 21:06:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62BE7135A74;
-	Fri, 16 Feb 2024 20:53:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08BA941A92;
+	Fri, 16 Feb 2024 21:06:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QELlytjF"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="f5qcNXMs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FD231D690;
-	Fri, 16 Feb 2024 20:53:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F67728E2B
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 21:06:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708116789; cv=none; b=Jpgs8E/NU9fQuY7RLko+/qccbULCVtRRGFT3ya/M+LBgU3ksVIELgVGM5w+knimTlN2o+2UYEGpYxGhWZce0GsGvGNZWN4+yXmPUZV4HSGLt3GyE+Z4U/EAs1W2UDnyc6LEtAOnsId8btS+aG0OwRYMgHtc43Rm+Eao6u5VHPIQ=
+	t=1708117588; cv=none; b=et6U6RCg4DhTnmMZAU9F99CSaayyXIoSJZQPH9JLRFvezTqKfbkSrREp0YRWpx2N/i3pRm4NDxoscPLjkET7RataKs9vdlM+snY1m/8atUZoXaEMJ8dmYTLnC/DTDEhxhoIy84c5OINLtdN+0KxY6QM3Y6jd0/JYd1l/JdZCHYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708116789; c=relaxed/simple;
-	bh=bJFoLhJIy8Ldus1bMGVPuw/0hLQGmz9TRmx5cOR8DQg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P8W1XCDNwtg9ok5M/kNmi2ZtsBuewJQRgRWPUT7KWqrJqcHvhF3kjLjtBvRauisOM0zFxjvZ6/aE9o3SSlooUUOmRE1ScyYkYaAlbR5/vtbmj/8Ua/MLt0NrStd0uF4mdPs7r+KYOR7kj1LoTUBHIrypJwDq3a4JbWO/Mo77ShM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QELlytjF; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a3d6d160529so150709766b.0;
-        Fri, 16 Feb 2024 12:53:07 -0800 (PST)
+	s=arc-20240116; t=1708117588; c=relaxed/simple;
+	bh=nyyTcg7M3SaOlU6u8WbJucb6cfowHp/cGKSAnyA2H2o=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=m/Ia4mtXVJboLFJckiAFfeD4jlVUzWklRh9JLhqn/RGU7uO38e9ceV6sGlnCZOyHHZarOBoJ8mbMrazgZuudbXBE9Cj5rh2AimE+ycAlc1YgVJLgIr98gs/kDepMEdLtECSZZI9AOPQSkt4+5XK74MvMIbNY7O7s2yqiLPc5ZSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=f5qcNXMs; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708116786; x=1708721586; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8k6u5v/IIS31CpQ7yJE8KmztE2tyWtuh+i65Ku7owlg=;
-        b=QELlytjFBzR/hQ50JgRxKzlgoe7JJuhc9/z3Tvb7DJnCmDO4Pa3B6XRyIrFNkLzCoS
-         NeCdtAH0M8NO4pyz7yw4rD/RnVs+EJzaw5T+s1sql+uJxkd+X4fLwctxSe+9rpVhTuaS
-         iRs5DVd6oE6zn3zOnnJZGY/y64Lobpqj1XxcdPP2kU936Pydy4eBguTEISKPHSHbeW1n
-         zKmQxDYNiSrC5NN9Wp1ne1HXAPlE1lWjglqMEHJzld6nfzoXnjShGDRfcCYWHMtZUjzw
-         9C5oM2ClXI0ilcZfLTICEh7FkL/ryUHA7rPNi5Xt32ji6PzLEm+rikexQ/+1+M0w0DPG
-         Wq0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708116786; x=1708721586;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8k6u5v/IIS31CpQ7yJE8KmztE2tyWtuh+i65Ku7owlg=;
-        b=AKFtRpndjlCyY+urTz22b4hEQ9Qu8CORfI7+YaovLj8b44hjeME4E/nCuca4//kdxH
-         3xSPKo90TPzwH6DfqOsrLWz7HgCbVQbbo00V7129SQ7TVuOvnI2vvTujBU4XRYSDcUUo
-         Z88vhynbMJD8PhRC5wsdxK8iy0FQMGni12JaLpsmvrjgBFheQChZ77cn+iZ/5/brwOdm
-         lerepGcLZNQ3e/kH3SH9MbgZ39Lwv14dcIM+P+EZ1xKs+71+8yiuhAKmiLfL6WhRBJPF
-         8f+7UQ7wIHmbXq0khUZ5D6/K9+WBAHWFmMgGe+Z6YCsQHgItCt9qdRAMa2p56Sm3RE1M
-         YnMg==
-X-Forwarded-Encrypted: i=1; AJvYcCUgip/gJYZ8U6OfWD08kiW2Z3nOpziM4+k7zmRU3sebRZmMnYeM15BuwO1mChSgNKlSP9AcAfimjkZi+aLVP+gLBEBXSTJT4bs4aJjZBis8AHCK8M/p7fegsmAdvecwS6HpTGXX
-X-Gm-Message-State: AOJu0YxyoXPLImdJ3N+6j35nU0lvIYELtH0Y0UORh315o0TcR7mn7Zv+
-	xYyu2E0vOxoDKm6Rwxw2IEb7WQMU6qcVptjBti5jMgEqBejHTDOS
-X-Google-Smtp-Source: AGHT+IHdjG52bCC5e7grroCqkwPF8LjGui542YDrj/LbvgnC95FzO1rOxKzxAapGSYjT6tezkJ6/sw==
-X-Received: by 2002:a17:906:2b09:b0:a3d:2222:7f84 with SMTP id a9-20020a1709062b0900b00a3d22227f84mr4558963ejg.37.1708116785671;
-        Fri, 16 Feb 2024 12:53:05 -0800 (PST)
-Received: from debian ([93.184.186.109])
-        by smtp.gmail.com with ESMTPSA id n18-20020a170906379200b00a3de6cf49ebsm331799ejc.6.2024.02.16.12.53.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Feb 2024 12:53:05 -0800 (PST)
-Date: Fri, 16 Feb 2024 21:53:02 +0100
-From: Dimitri Fedrau <dima.fedrau@gmail.com>
-To: Gregor Herburger <gregor.herburger@ew.tq-group.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: Re: [PATCH v6 net-next 05/14] net: phy: marvell-88q2xxx: add
- driver for the Marvell 88Q2220 PHY
-Message-ID: <20240216205302.GC3873@debian>
-References: <20240213213955.178762-1-dima.fedrau@gmail.com>
- <20240213213955.178762-6-dima.fedrau@gmail.com>
- <Zcy9E4riyFRk8B1P@herburgerg-w2>
- <20240215202403.GA3103@debian>
- <Zc8oUt4fnD7ltxq4@herburgerg-w2>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1708117587; x=1739653587;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=AO7HEql7TvqW+06Q7aKT8PrpPLbZmbNcsqc2Fa7j67Y=;
+  b=f5qcNXMsXo5BRWj/7/iC5uQm8Aez2HbGQEE9tU+FC9mWvue4wgRGa6l7
+   zBVvcLWZi7kvPzNn9t6PEZb1XR0AB4Kbdf0HPEQLVXRjik6htf7g9kzG/
+   cc047emTPWwkTDfl8jAOUxe4UwlqYTeG8Xa1M06SOfQVmjXs6tyhsgL+I
+   Q=;
+X-IronPort-AV: E=Sophos;i="6.06,165,1705363200"; 
+   d="scan'208";a="274710238"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2024 21:06:25 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:64697]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.29.119:2525] with esmtp (Farcaster)
+ id 27fb96e4-dbe8-4c5c-9306-d8359be8fc52; Fri, 16 Feb 2024 21:06:24 +0000 (UTC)
+X-Farcaster-Flow-ID: 27fb96e4-dbe8-4c5c-9306-d8359be8fc52
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Fri, 16 Feb 2024 21:06:24 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.106.100.6) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Fri, 16 Feb 2024 21:06:21 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v2 net-next 00/14] af_unix: Rework GC.
+Date: Fri, 16 Feb 2024 13:05:42 -0800
+Message-ID: <20240216210556.65913-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zc8oUt4fnD7ltxq4@herburgerg-w2>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D046UWA004.ant.amazon.com (10.13.139.76) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Am Fri, Feb 16, 2024 at 10:18:10AM +0100 schrieb Gregor Herburger:
-> On Thu, Feb 15, 2024 at 09:24:03PM +0100, Dimitri Fedrau wrote:
-> > > Hi Dimitri,
-> > >
-> > Hi Gregor,
-> > 
-> > > On Tue, Feb 13, 2024 at 10:39:44PM +0100, Dimitri Fedrau wrote:
-> > > >  static struct phy_driver mv88q2xxx_driver[] = {
-> > > >  	{
-> > > >  		.phy_id			= MARVELL_PHY_ID_88Q2110,
-> > > > @@ -255,12 +439,26 @@ static struct phy_driver mv88q2xxx_driver[] = {
-> > > >  		.get_sqi		= mv88q2xxx_get_sqi,
-> > > >  		.get_sqi_max		= mv88q2xxx_get_sqi_max,
-> > > >  	},
-> > > > +	{
-> > > > +		PHY_ID_MATCH_EXACT(PHY_ID_88Q2220_REVB0),
-> > > 
-> > > I tested the series on a 88Q2220 REV B1 (which is id 0x002b0b22). The
-> > > driver works fine on this revision.
-> > > 
-> > > I understand that in the Marvell API the initialization for Rev B0 and
-> > > B1 differ. For B0 some additional init sequence is executed. I did not look
-> > > into the details of this sequence. However this patch seems to work on
-> > > Rev B1.
-> > >
-> > > Would you consider adding compatibility for Rev B1 and following? I
-> > > tested with:
-> > > 		.phy_id			= MARVELL_PHY_ID_88Q2220,
-> > > 		.phy_id_mask		= MARVELL_PHY_ID_MASK,
-> > >
-> > 
-> > thanks for testing. I would stick to the exact initialization sequence
-> > provided by the Marvell API. Registers and bits are mostly undocumented
-> > and I think it is safest this way. Besides that it should be relatively
-> > easy to add the support for rev. B1 by just adding the init sequence for
-> > it.
-> 
-> Ok. I will have an closer look at the marvell API and eventually come up
-> with a patch for Rev. B1.
-> 
-> There is also a Rev.B2 for which I cannot find any init sequence. But
-> Rev. B1 will no longer be produced so I need a solution for B2
-> eventually.
->
-After having a quick glance at the latest Marvell API release, the init
-sequences for B1 and B2 are almost the same. It differs by a single
-register write. Would be great if you can come up with a patch.
+When we pass a file descriptor to an AF_UNIX socket via SCM_RIGTHS,
+the underlying struct file of the inflight fd gets its refcount bumped.
+If the fd is of an AF_UNIX socket, we need to track it in case it forms
+cyclic references.
 
-Dimitri
+Let's say we send a fd of AF_UNIX socket A to B and vice versa and
+close() both sockets.
+
+When created, each socket's struct file initially has one reference.
+After the fd exchange, both refcounts are bumped up to 2.  Then, close()
+decreases both to 1.  From this point on, no one can touch the file/socket.
+
+However, the struct file has one refcount and thus never calls the
+release() function of the AF_UNIX socket.
+
+That's why we need to track all inflight AF_UNIX sockets and run garbage
+collection.
+
+This series replaces the current GC implementation that locks each inflight
+socket's receive queue and requires trickiness in other places.
+
+The new GC does not lock each socket's queue to minimise its effect and
+tries to be lightweight if there is no cyclic reference or no update in
+the shape of the inflight fd graph.
+
+The new implementation is based on Tarjan's Strongly Connected Components
+algorithm, and we consider each inflight file descriptor of AF_UNIX sockets
+as an edge in a directed graph.
+
+For the details, please see each patch.
+
+  patch 1  -  5 : Add struct to express inflight socket graphs
+  patch       6 : Optimse inflight fd counting
+  patch       7 : Group SCC possibly forming a cycle
+  patch 8  - 10 : Make GC lightweight
+  patch 11 - 12 : Detect dead cycle references
+  patch      13 : Replace GC algorithm
+  patch      14 : selftest
+
+After this series is applied, we can remove the two ugly tricks for race,
+scm_fp_dup() in unix_attach_fds() and spin_lock dance in unix_peek_fds()
+as done in patch 14/15 of v1.
+
+
+Changes:
+  v2:
+    * Drop 2 cleanup patches (patch 14/15 in v1)
+
+    * Patch 2
+      * Fix build error when CONFIG_UNIX=n
+    * Patch 7
+      * Fix build warning for using goto label at the end of the loop
+    * Patch 13
+      * Call kfree_skb() for oob skb
+    * Patch 14
+      * Add test case for MSG_OOB
+
+  v1: https://lore.kernel.org/netdev/20240203030058.60750-1-kuniyu@amazon.com/
+
+
+Kuniyuki Iwashima (14):
+  af_unix: Add struct unix_vertex in struct unix_sock.
+  af_unix: Allocate struct unix_edge for each inflight AF_UNIX fd.
+  af_unix: Link struct unix_edge when queuing skb.
+  af_unix: Save listener for embryo socket.
+  af_unix: Fix up unix_edge.successor for embryo socket.
+  af_unix: Bulk update unix_tot_inflight/unix_inflight when queuing skb.
+  af_unix: Detect Strongly Connected Components.
+  af_unix: Save O(n) setup of Tarjan's algo.
+  af_unix: Skip GC if no cycle exists.
+  af_unix: Avoid Tarjan's algorithm if unnecessary.
+  af_unix: Assign a unique index to SCC.
+  af_unix: Detect dead SCC.
+  af_unix: Replace garbage collection algorithm.
+  selftest: af_unix: Test GC for SCM_RIGHTS.
+
+ include/net/af_unix.h                         |  33 +-
+ include/net/scm.h                             |   8 +
+ net/core/scm.c                                |   9 +
+ net/unix/af_unix.c                            |  27 +-
+ net/unix/garbage.c                            | 473 +++++++++++-------
+ tools/testing/selftests/net/.gitignore        |   1 +
+ tools/testing/selftests/net/af_unix/Makefile  |   2 +-
+ .../selftests/net/af_unix/scm_rights.c        | 286 +++++++++++
+ 8 files changed, 632 insertions(+), 207 deletions(-)
+ create mode 100644 tools/testing/selftests/net/af_unix/scm_rights.c
+
+-- 
+2.30.2
+
 
