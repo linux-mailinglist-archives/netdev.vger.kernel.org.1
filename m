@@ -1,141 +1,124 @@
-Return-Path: <netdev+bounces-72461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB741858324
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 17:57:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8143385832E
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 17:59:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 133AC1C22599
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 16:57:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3686E1F240DE
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 16:59:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 909B0130AF7;
-	Fri, 16 Feb 2024 16:57:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39458130AFE;
+	Fri, 16 Feb 2024 16:58:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="fcafaV6/";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="cZf9ceIF"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="gqnPFHeJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E91B9130AF2;
-	Fri, 16 Feb 2024 16:57:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6B01E86B
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 16:58:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708102662; cv=none; b=hIUVkaEGkxDv4PQS1RUg5bsM7HVUHixlwd84JCyzfPuerI3HuKYGakpFokWCDnLBCiw5lDOMTSFz1DvBbSPvPs1+zkGJsVucR/IIWP3cig96oZ/eBe3RRWCqf6VWb4/7fYIR2kZt3yEAOX0Hlj3Kvsw6/6cx+C/fHIo1bD0TFWw=
+	t=1708102727; cv=none; b=owptPUVnJiliDwez0MvcVi511YSDdd1JTkkOsdz1at0e3o2fkqVD1B4ihFX18z3tsFBZSQJhv3RiVsW0VMtLECOMFM4Bh4iTB/pTsAkEc8xIDMkQ4vcw5KtqBjxREfEXtEMPVD39/SsBBd+m0grk9jUaw6PZXdfMqQhJ7Xei79Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708102662; c=relaxed/simple;
-	bh=kaPNPJvzjPget46jaXL8xszSapcjiU23O7CPCwGlTn4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bWnUrtlLCw1jH0XZtmmDsvTpSHIJtrEphYodPbVhUIyqW8Jxe0YQ4TKV1LB0hYSpCEYnjqcK4Nf1m5UxzO0HcqF/0lqQoScuYj56hDEi2aEKSKlNxAY9hhVHRmNInzBx5d8N6MxkHwi0BuqXhvLpTkLtOeV8HddvCzQq6XC+zYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=fcafaV6/; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=cZf9ceIF; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Fri, 16 Feb 2024 17:57:37 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1708102658;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aFmDNEElF/VWZeUTxvj+mfaiyGTApkE7wx3z3xUMwXQ=;
-	b=fcafaV6/dvA6nPxfuowbaVmvagJFAos5XinbbIvoXeitAixnlPQ/A9+YvhijVclnUzUq3H
-	lDqov57ezGvej4Gj9f2JtTOLBiIPdeusuQeTJvWnkc2339/UDp0o6/vKgWN2gJRGuYczov
-	+POeHGGMXIZYBbwnoKfr/yG7gdHI1XevYDgP+47EzkkrA0Nci9LVa71HWypsFsUb5UVZCn
-	r8Ua3ikc5kQ4c5vEBceXUbOXciia27M3m2IRFKbgoYWvc+j8HkkPTtrSk3K1qFVuvokzX8
-	Ik+U2y21m4YFSgqnb5N99L4dEF7FKiFSrOicbdFgF3hYf+xAFd50cZK6zaR70A==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1708102658;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aFmDNEElF/VWZeUTxvj+mfaiyGTApkE7wx3z3xUMwXQ=;
-	b=cZf9ceIFXFfsWHctMTzDR4bxMOb8RsPz7989okTAFS0nkRHxcjgZKHuAIa32eoIEzDtIsA
-	SNX6OiliPyppyiDw==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	=?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Eric Dumazet <edumazet@google.com>, Hao Luo <haoluo@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jiri Olsa <jolsa@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Song Liu <song@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Yonghong Song <yonghong.song@linux.dev>
-Subject: Re: [PATCH RFC net-next 1/2] net: Reference bpf_redirect_info via
- task_struct on PREEMPT_RT.
-Message-ID: <20240216165737.oIFG5g-U@linutronix.de>
-References: <20240213145923.2552753-1-bigeasy@linutronix.de>
- <20240213145923.2552753-2-bigeasy@linutronix.de>
- <66d9ee60-fbe3-4444-b98d-887845d4c187@kernel.org>
- <20240214121921.VJJ2bCBE@linutronix.de>
- <87y1bndvsx.fsf@toke.dk>
- <20240214142827.3vV2WhIA@linutronix.de>
- <87le7ndo4z.fsf@toke.dk>
- <20240214163607.RjjT5bO_@linutronix.de>
- <87jzn5cw90.fsf@toke.dk>
+	s=arc-20240116; t=1708102727; c=relaxed/simple;
+	bh=cpUEa6ai1cFG09U3vUgDslnNrsuDM9ngSB7aEUEiGHw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=YVb6GDjwh2aVjmJxRdHj9cY4lwjp/BnomzoeqBFi0QdX9+xuwwtaHqorgOwBBBkwfL3WmZnf5aleR+wD8YBcxhpofWjhnzoBe6SxKECPujZ/zo5UksLnRpZFSi6EbKw1WEyS0aBRZrqotC7g26++CQJIWWyC3Abdpv8UlvaUe74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=gqnPFHeJ; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41GF9gHW017298;
+	Fri, 16 Feb 2024 16:58:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=alkTJLisXLDxeGDV1uSdCeVm1bbXDIbArtc02zk+hkM=; b=gq
+	nPFHeJR2JpRLv9Ldbfbk61Ydva/tJEM9e4oN4JSiHs5AxdffgDSUWxi26Dz/Wb2k
+	7KJ0+4G9hPFCdJMbNCv9tGFIVJfNlEFCy+mBMSQCoe2pLegqq4uIBJmppJvEert4
+	Ve0MCd1SqQis5z2rEt+8v+FWZZmyfCk1nFKwHf+e7x5jOKfhP01iR1b79GHnQ16v
+	9t1J/KqL73VmT7/RIuUorV2NlhwAkXhtxKReAj9DtR7GfNHKQO5M6xZW7zUDONgw
+	+xvTks4TR+LHSRMsRYeeapJ9A6gv4pJnX0iM92iLpDUFCdZAXvc4T8HcuaYTdH7M
+	hn1Px9B7n9clOOCw3bLQ==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3w9yta9dha-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 16 Feb 2024 16:58:39 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41GGwcAa021248
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 16 Feb 2024 16:58:38 GMT
+Received: from [10.110.53.145] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Fri, 16 Feb
+ 2024 08:58:38 -0800
+Message-ID: <4cad6137-ac69-4253-9f45-ce51e90c081f@quicinc.com>
+Date: Fri, 16 Feb 2024 08:58:37 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <87jzn5cw90.fsf@toke.dk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH ethtool] move variable-sized members to the end of structs
+Content-Language: en-US
+To: Michal Kubecek <mkubecek@suse.cz>, Denis Kirjanov <kirjanov@gmail.com>
+CC: <netdev@vger.kernel.org>, Denis Kirjanov <dkirjanov@suse.de>
+References: <20240216140853.5213-1-dkirjanov@suse.de>
+ <20240216145752.aihdclrz6o53tgl2@lion.mk-sys.cz>
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+In-Reply-To: <20240216145752.aihdclrz6o53tgl2@lion.mk-sys.cz>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: e7TJDGQ89GovCRqocrURNf9DPcZILUCB
+X-Proofpoint-ORIG-GUID: e7TJDGQ89GovCRqocrURNf9DPcZILUCB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-16_16,2024-02-16_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ impostorscore=0 bulkscore=0 priorityscore=1501 adultscore=0 spamscore=0
+ phishscore=0 clxscore=1011 mlxscore=0 malwarescore=0 mlxlogscore=378
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2401310000 definitions=main-2402160135
 
-On 2024-02-15 21:23:23 [+0100], Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> The tricky part is that the traffic actually has to stress the CPU,
-> which means that the offered load has to be higher than what the CPU can
-> handle. Which generally means running on high-speed NICs with small
-> packets: a modern server CPU has no problem keeping up with a 10G link
-> even at 64-byte packet size, so a 100G NIC is needed, or the test needs
-> to be run on a low-powered machine.
+On 2/16/2024 6:57 AM, Michal Kubecek wrote:
+> On Fri, Feb 16, 2024 at 09:08:53AM -0500, Denis Kirjanov wrote:
+>> The patch fixes the following clang warnings:
+>>
+>> warning: field 'xxx' with variable sized type 'xxx' not at the end of a struct
+>>  or class is a GNU extension [-Wgnu-variable-sized-type-not-at-end]
+>>
+>> Signed-off-by: Denis Kirjanov <dkirjanov@suse.de>
+> 
+> Have you checked if this does not break the ioctl interface? Many of
+> these structures (maybe even all of them) are directly passed to kernel
+> via ioctl so that rearranging them would break the data block format
+> expected by kernel.
+> 
+> AFAICS at least in the cases that I checked, the outer struct member is
+> exactly the data expected as variable part of the inner struct.
+> 
+> Michal
 
-I have 10G box. I can tell cpufreq to go down to 1.1Ghz and I could
-reduce the queues to one and hope that it is slow enough.
+Yes, it seems the correct solution is to just remove from struct
+ethtool_link_settings:
+	__u32	link_mode_masks[];
 
-> As a traffic generator, the xdp-trafficgen utility also in xdp-tools can
-> be used, or the in-kernel pktgen, or something like T-rex or Moongen.
-> Generally serving UDP traffic with 64-byte packets on a single port
-> is enough to make sure the traffic is serviced by a single CPU, although
-> some configuration may be needed to steer IRQs as well.
+This is unused in the driver, and the mask-handing command creates an
+ecmd which appends the masks
 
-I played with xdp-trafficgen:
-| # xdp-trafficgen udp eno2  -v
-| Current rlimit is infinity or 0. Not raising
-| Kernel supports 5-arg xdp_cpumap_kthread tracepoint
-| Error in ethtool ioctl: Operation not supported
-| Got -95 queues for ifname lo
-| Kernel supports 5-arg xdp_cpumap_kthread tracepoint
-| Got 94 queues for ifname eno2
-| Transmitting on eno2 (ifindex 3)
-| lo->eno2                        0 err/s                 0 xmit/s
-| lo->eno2                        0 err/s                 0 xmit/s
-| lo->eno2                        0 err/s                 0 xmit/s
+However this is a UAPI struct, so this potentially breaks userspace
+compilation (but not the UABI).
 
-I even tried set the MAC address with -M/ -m but nothing happens. I see
-and on drop side something happening when I issue a ping command.
-Does something ring a bell? Otherwise I try the pktgen. This is a Debian
-kernel (just to ensure I didn't break something or forgot a config
-switch).
+/jeff
 
-> -Toke
-
-Sebastian
 
