@@ -1,149 +1,180 @@
-Return-Path: <netdev+bounces-72305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 840BD85779E
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 09:26:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4C108577A2
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 09:27:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 007151F2017A
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 08:26:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 900CEB21A29
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 08:27:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8EE417BB3;
-	Fri, 16 Feb 2024 08:23:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A286317741;
+	Fri, 16 Feb 2024 08:23:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vKTiPsEA"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hyY52mB+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09DBD17756
-	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 08:23:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE9141BDD3
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 08:23:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708071797; cv=none; b=J3qDZx1mhNifZa1X2J6hfJqhSgODiLTutr//uJ9gEvH8dYUuuKINhtfc5Tx485K1OeHB0FQVPJATUioUtsqZX+WaPgZDLVIJZTxk7ah3Ij5cHSARkzQ636D7DeqJXDnUdhFArscFj58R9x4aw1PiNu/VXumgC5j3qxqAR93s5fY=
+	t=1708071838; cv=none; b=EZBw4/VY9gIbpF/C8EZZOwnCXv66zmbqtGVyEmaji2tSTDfWNU6WLNl8cxv6xGEwV6QpkNwFNntEkZWffOjKMKEfOqVdXlOOM9qJdu8cBcbETMQBoSOjyx7OncyLvpUPZEvLWLUplAKjItSecDBFX4MxWKUkvPaDHHbaO2pwYTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708071797; c=relaxed/simple;
-	bh=fUUn6AnMvlCd1xQgv5EKb346fzCDc72nsHuZzfqrAhM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=akpl7OYqm2Zl/15jvnHw3M9LEl4fCjN5ECRobuuCumFwmansvzgPXyC/68JvTOFZsU4TK6tHuiFE/rAzaR3GLBvY6i2ohwDTl+OWWrjKS76AyuTHE84RHNbTC6OY7jOhvJ2i/mDd2dBcmE3Z5U5D3VbEnUQRAuruIwwbzkHa/vI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vKTiPsEA; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-563dfa4ccdcso5207a12.1
-        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 00:23:15 -0800 (PST)
+	s=arc-20240116; t=1708071838; c=relaxed/simple;
+	bh=CuSzYkpW1cnbd7QLiY8ENrnT3YE8nLPOXunubIBTc1Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HrfsbYVXbChRzaheRpKybT6FU8XCZtUr0oooETVyZHF3Jn5ouXp3Q5X7CeDusy0Phw5lIbN4uNhNDWN9jQtITG/UkT5QpWr6deHl3QbkEbW5ZhN4tgRTdPdUbxBw6purU6bPsrETXaZrT2DQnR+8zddh5aZ9noZppVuwjMUDGBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hyY52mB+; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5611e54a92dso2345407a12.2
+        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 00:23:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708071794; x=1708676594; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fUUn6AnMvlCd1xQgv5EKb346fzCDc72nsHuZzfqrAhM=;
-        b=vKTiPsEAlEEw4fx+SzsjM3g6IsBM/1Dvs4UsDCpkRF18Ya+AN++4NpvYqVEo9MVZ/Q
-         hFJ9aqj5tne7p3wjSfLkWnP4GzTYu2Z+TnfCj+DXZYnxDj8lO8uDACvlrIs0593IQDCU
-         9W3/K/Qs5dV3G6oBq4Ns2yD+eQDQ5b3WRPh9eX+NVoe+wdlakA5HwJE3tTjxj/uqA32L
-         paFtZ+1TrL5zr4Irb9m1x58n0OMIdULt7+/EZDKmtLWGFe+ntw+SX3NiI8NcAwUc4zrw
-         qSBCAqOSE6b8BooFKMz6y1jwLj2/bl/xbhIdG8vI2CRbWjm+hA9wZLD4eW1i0tUvsQkI
-         pTeQ==
+        d=linaro.org; s=google; t=1708071835; x=1708676635; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Cy3LXUzEOfblety0Bw1Qjn68YCgKHMaFfLyUL/Ni24s=;
+        b=hyY52mB+eY0ra707WIBQUBBYO8rcdDRgWUzeRUrWjOGGgqgqZFukR9yzXSPMC4Afbm
+         zvEVhuNZ/WlfP11mG2HlAQlbUPQDfIajCt0jrzObWtBZZt5U6lhqDmNgKFMaf9pGaUxn
+         QUmGs2aS6YLGJziWeLh4m7NRq0BB+pv67oLZtRga9uQOEMs5VzHsCm/9xiXSg3yiHXf1
+         SXTWLwBYfAhTuQsjnVLIzH151R5oBniWfEKm63763AzJnPfo2sx2gQ0+rW+O35MZsF2e
+         1nXRcq0hdjDjuU8pbCFRPdQybk2QjZ8tZRYdAg8boZyyYnh40yn+jvEv6daxJZS3kcrQ
+         LmcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708071794; x=1708676594;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fUUn6AnMvlCd1xQgv5EKb346fzCDc72nsHuZzfqrAhM=;
-        b=Y0XTyLgNT4aojpshu7TW3lUjdDPIIN+eAjhts8UGMVF8VOhTGQVJNSQEx1q3hKU1G1
-         /PpfNcZsZBqX7PWbhhf91ZRLZ7yUMbnNuCcd/o/r1TS7LbGE2n1IciJNaT7VugGflHlW
-         qZfADN7aCkF1ladS/x2cA/Qn6mClto9FKdul3hHMUU+1P9efVcU+bIYEgfh0jTKDO30R
-         b0gGUF/xgAaqdWOGl1Dnc/wUWcYJqUSehUCqVTQDz4vbcXvs2ZrxgZBufVJWPUJUSU2K
-         eUSM5A03sf2ZZxPCD55Bj66aOWL+u2xxSuSk66HULDQAnRL7hDyiQ4+VmX/EXIXaeJ/t
-         6ZPA==
-X-Forwarded-Encrypted: i=1; AJvYcCWdHW2bPNYneH21d6t8l9tLGy3t/nrKcz4+oiapbpv+xUnwrLFogpMvQjVtXd2sfrOJweRUYkQwz+94ZgzUgupQUVScl4s/
-X-Gm-Message-State: AOJu0YwmNhnoTEM0R0j2EwzWCEWG0xYoAr/QuenNXo9+afp4okxFtx0d
-	0PVixnzGybepKL123CQ/w9eAeXEKF8cimlae48WI1Wx+H4oQlHHWpTyg1NC0q0vkhHGvwcd8GIi
-	LZ1Jjt7d1JMn0EHOlhPn9W/xENQw1+3kfzSVw
-X-Google-Smtp-Source: AGHT+IG1QaSo/SWZpMQwRSx5xsZV5+mFf4z/pSJbIJII2nQ9E44C3wuuDXCC6XbcQpq3b9IZr10OXvVAvpJ8usiMmIk=
-X-Received: by 2002:a50:cd8c:0:b0:562:70d:758 with SMTP id p12-20020a50cd8c000000b00562070d0758mr130337edi.2.1708071793909;
- Fri, 16 Feb 2024 00:23:13 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708071835; x=1708676635;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Cy3LXUzEOfblety0Bw1Qjn68YCgKHMaFfLyUL/Ni24s=;
+        b=iAX8bgY1y7x25YFHbuHXe3d4D3mwRpnQ6JIt2Gy/6C3i9eAH9BTIrsqUYwOgl5CLtm
+         aqDvyjReQ5oKKHRtE+CeznnaZEeLg0IwPSuqtd7N0E4NUSlI/JISwd/Bxp/j8k2vFHGf
+         an6bxDJXqaEvI9mqDRywqtS/P03xBJr2wMMSVBFDROGZs/mGOvJim02NdTgcl/aNmEjk
+         BwSoq+nM+AGLok7mXUPb6FUcjZhKTdOjW9dCWSQFjJC12IyJ41mWaeucMaq0NdvtrAI0
+         8uzJXJUwjWvvngcJbPeOsWkOsB4iUeVzxErpoMyosrtZH7HKsn8RiZ1Itfpo1jJIgDWP
+         IP6A==
+X-Gm-Message-State: AOJu0YyiQZ8YuZOu8jT42tCI9J5I/C8bJqRhv0JwnZN4+DuInhkca3tc
+	mAw3X0JA8ryumJ6yeD82edOaFdfUY590HIvSWI2WamSxATWOYfs+tE9JyPZiEak=
+X-Google-Smtp-Source: AGHT+IGq/dh41TSBWnHjI/60+m3wWYWEYYnc9Ru61/hm+O7hpItu994ZfNVTMifi2a7L2ggk1W0bcw==
+X-Received: by 2002:a17:906:2dc7:b0:a3d:dee9:e554 with SMTP id h7-20020a1709062dc700b00a3ddee9e554mr610611eji.13.1708071835000;
+        Fri, 16 Feb 2024 00:23:55 -0800 (PST)
+Received: from [192.168.0.22] ([78.10.207.130])
+        by smtp.gmail.com with ESMTPSA id vg12-20020a170907d30c00b00a3d6a2d3904sm1328560ejc.146.2024.02.16.00.23.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Feb 2024 00:23:54 -0800 (PST)
+Message-ID: <acc38b94-7810-4db3-9d7c-5d269d99d709@linaro.org>
+Date: Fri, 16 Feb 2024 09:23:53 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240130091300.2968534-1-tj@kernel.org> <20240130091300.2968534-7-tj@kernel.org>
- <Zc7zLsEhDzGkCH9m@slm.duckdns.org>
-In-Reply-To: <Zc7zLsEhDzGkCH9m@slm.duckdns.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 16 Feb 2024 09:23:00 +0100
-Message-ID: <CANn89iKDsJPY=QQrTHK0Jw=s=A_G_GzcOA0WsqXaytWAVV3R4Q@mail.gmail.com>
-Subject: Re: [PATCH 6/8] net: tcp: tsq: Convert from tasklet to BH workqueue
-To: Tejun Heo <tj@kernel.org>
-Cc: torvalds@linux-foundation.org, mpatocka@redhat.com, 
-	linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev, msnitzer@redhat.com, 
-	ignat@cloudflare.com, damien.lemoal@wdc.com, bob.liu@oracle.com, 
-	houtao1@huawei.com, peterz@infradead.org, mingo@kernel.org, 
-	netdev@vger.kernel.org, allen.lkml@gmail.com, kernel-team@meta.com, 
-	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Wei <davidhwei@meta.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/6] dt-bindings: net: remove outdated hisilicon-femac
+Content-Language: en-US
+To: Yang Xiwen <forbidden405@outlook.com>,
+ Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
+ <salil.mehta@huawei.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Yang Xiwen <forbidden405@foxmail.com>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org
+References: <20240216-net-v1-0-e0ad972cda99@outlook.com>
+ <20240216-net-v1-3-e0ad972cda99@outlook.com>
+ <86a4d31d-80e4-4c11-9c71-e14494e3c8f2@linaro.org>
+ <SEZPR06MB69597BA5B7F02E0B9995131A964C2@SEZPR06MB6959.apcprd06.prod.outlook.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <SEZPR06MB69597BA5B7F02E0B9995131A964C2@SEZPR06MB6959.apcprd06.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Feb 16, 2024 at 6:31=E2=80=AFAM Tejun Heo <tj@kernel.org> wrote:
->
-> Hello,
->
-> On Mon, Jan 29, 2024 at 11:11:53PM -1000, Tejun Heo wrote:
-> > The only generic interface to execute asynchronously in the BH context =
-is
-> > tasklet; however, it's marked deprecated and has some design flaws. To
-> > replace tasklets, BH workqueue support was recently added. A BH workque=
-ue
-> > behaves similarly to regular workqueues except that the queued work ite=
-ms
-> > are executed in the BH context.
-> >
-> > This patch converts TCP Small Queues implementation from tasklet to BH
-> > workqueue.
-> >
-> > Semantically, this is an equivalent conversion and there shouldn't be a=
-ny
-> > user-visible behavior changes. While workqueue's queueing and execution
-> > paths are a bit heavier than tasklet's, unless the work item is being q=
-ueued
-> > every packet, the difference hopefully shouldn't matter.
-> >
-> > My experience with the networking stack is very limited and this patch
-> > definitely needs attention from someone who actually understands networ=
-king.
->
-> On Jakub's recommendation, I asked David Wei to perform production memcac=
-he
-> benchmark on the backported conversion patch. There was no discernible
-> difference before and after. Given that this is likely as hot as it gets =
-for
-> the path on a real workloal, the conversions shouldn't hopefully be
-> noticeable in terms of performance impact.
->
-> Jakub, I'd really appreciate if you could ack. David, would it be okay if=
- I
-> add your Tested-by?
+On 16/02/2024 09:03, Yang Xiwen wrote:
+> On 2/16/2024 3:21 PM, Krzysztof Kozlowski wrote:
+>> On 16/02/2024 00:48, Yang Xiwen via B4 Relay wrote:
+>>> From: Yang Xiwen <forbidden405@outlook.com>
+>>>
+>>> The user documented(Hi3516) is not found in current kernel anymore.
+>>> Remove this binding entirely due to recent driver changes.
+>> Hardware does not change because you decided to re-implement driver.
+> 
+> The only hardware i have is the hi3798mv200. According to downstream 
+> driver name, this is supposed to be a hisi-femac-v3 actually. I don't 
+> know much about Hi3516, but it confuses me a lot. According to the 
+> device tree node example in the text binding file, the MDIO bus is 
+> supposed to be inside the femac core (femac core is at 0x0-0x1000 & 
+> 0x1100-0x1300 and mdio bus is at 0x1100-0x1120). So i think it's highly 
+> possible they are the same hardware. But according to the TRM and my 
+> tests, there are 3 clocks in total for femac core in hi3798mv200, one 
+> for mac ctrl, one for ahb bus(I'm sure this "bus" clock is not MDIO bus 
+> clock), and one for phy, which is very similar to the hisi-gmac driver.
+> 
+> Which complicates things a lot is the complex clock enabling timing 
+> requirements here. at least for hi3798mv200(and all SoCs with 
+> hisi-femac-v3 core i think according to the downstream kernel source), 
+> It must strictly follow the sequence in hisi_femac_phy_reset() (disable 
+> MAC clk and BUS clk first before asserting PHY reset), or the PHY would 
+> fail to work. So as said in previous reply, the simplest way is to do 
+> all resets and clocks management in the MAC driver, or else it'll be 
+> very hard to implement. I can't find an easy way to "tell" a driver to 
+> kindly disable its clocks remotely.
+> 
 
-I presume memcache benchmark is using small RPC ?
+None of these explain why support for these devices should be dropped...
 
-TSQ matters for high BDP, and is very time sensitive.
+Best regards,
+Krzysztof
 
-Things like slow TX completions (firing from napi poll, BH context)
-can hurt TSQ.
-
-If we add on top of these slow TX completions, an additional work
-queue overhead, I really am not sure...
-
-I would recommend tests with pfifo_fast qdisc (not FQ which has a
-special override for TSQ limits)
-
-Eventually we could add in TCP a measure of the time lost because of
-TSQ, regardless of the kick implementation (tasklet or workqueue).
-Measuring the delay between when a tcp socket got tcp_wfree approval
-to deliver more packets, and time it finally delivered these packets
-could be implemented with a bpftrace program.
 
