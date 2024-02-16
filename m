@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-72333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DDBA857954
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 10:51:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98A32857955
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 10:52:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1682A1F21632
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3CBF8B2185A
 	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 09:51:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 633A01F93E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 657F1200BF;
 	Fri, 16 Feb 2024 09:50:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YSGt5TOb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rW8i9EJS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F0EC200C4
-	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 09:50:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DA56200C3;
+	Fri, 16 Feb 2024 09:50:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708077025; cv=none; b=eVwURBNbOuIjdFtMMYEgOC6YWP7hPgotZ3ywJC1lN1FR84C0Sg9IRRFDBYsFOwVXjDJvUyg9WbBbGNd150khY0RnIuslZpqQb/hUtLEIP4rk86drYe2NnvKuIQAbuTsxkCIqwzwIPf5jEAsrFm1nCXGTWkmoevRj08+NFtgb+QU=
+	t=1708077025; cv=none; b=HxqR5ryzLkO88co9WBBaZqYh3h1ZsiUlPb6aKEiYgOiOMjMHwe6W57Qr9bn7ayqxdormW6ZnRjisE4aIoGazGNcTN7DjKx7P56rYs1EgQSiiqhffzVAVOUUsKQJnhhjM2pOtCO8TZjDSoBIwFBQ4ulDcVIs7UJQT88BR8FvcL74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708077025; c=relaxed/simple;
-	bh=H7Zk8DzMwJgogZ1RwAVQQc8dPhzXPwVbDeyZcHB4tBI=;
+	bh=3fUqkoR5VIgWpzZjyR5yo8/i8AhhynJaZljV/ufzDns=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=t2s81g9l7E9UVq98j3cC/zN+B78z4seLxNsOIFRiTEOERT5sYKLPe3py8N+i6DE9SCG5rKRWzclLHgntOx7+MROtHX+4SwihvrCWzY5+9/svAtEsecArcjoK98uCtapYhfltwR1I7xdJ5Ifwe3hOzYgx21RDQTGwGnlTO6Cl2k4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YSGt5TOb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D4A6DC43330;
+	 In-Reply-To:To:Cc; b=CU3R3Fa2S2xg9B5UySecL7eTfbqWdmZ2/fOoMgCEoQAWafPn9VXKZGDC8NCumXGbmqGLjlfJ0i0gVst/nTeXJab+K4RpjQYq6qLggi1KMlwFMt5/V2clI2CKIOFKITLiolrYZwLDRrLEJi5L0nVVCaM3x+QitGpX66DmBgJMdmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rW8i9EJS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CBD0EC43399;
 	Fri, 16 Feb 2024 09:50:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1708077024;
-	bh=H7Zk8DzMwJgogZ1RwAVQQc8dPhzXPwVbDeyZcHB4tBI=;
+	bh=3fUqkoR5VIgWpzZjyR5yo8/i8AhhynJaZljV/ufzDns=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=YSGt5TObAZPH9StpfDMgM6m0fSGtCXuZ60u9BQ3SDktzRA3brImBV+eMuy7gwAtnF
-	 lY7blKXG4gvLajaopnsDkGzcL9VZox/F0LpX/TYMsxOrQNEq8Bw2g/4eNNJp86HQqV
-	 Oy5wl4FiaDQjnbkIs7iEBZEGHPG83PEcYR2U1PzLQFPjIWq17Yvl8jd9R05X/M//we
-	 pKu4mybG/3/tPvoUthBD6Vwn8FxJNnHGmlATe5nX3lb3/Igmz3MyKeDHWo6D4hUt2+
-	 jkSrAK+MzJJMa4xCUothJMBI3C9+HgkFLP95MVGpCrzeelj9zklOTAt1kr9SvuPNlA
-	 cQE+lsR4bJXtQ==
+	b=rW8i9EJSvLy+JqlaTwWjwAIZ3xXCguZMAY7Ga1v4eDZumEsN4gGeQJVDSXVg4Wt6x
+	 UMezsAtWPHMRyQL6H+AgZnR6dQqCYCLxbwDFLhvXtoj4gqUwnoCadb63FxWpvL0z9N
+	 pdIn3/So56Hee63ajr5g9epfRaekiXJW8U29kWiJNgrHpSGv4fFLFB0/6uqiZepPwg
+	 4sDg35yArTjUkqeK+U/X0C5HrvEgN2fV1xfs6jZWmUOmvfnlAGE/KAk5A/ijr7RFSA
+	 lpaPsEGuVL83L5RgBQKs1LeqiPsZNPrXr4O7R1eLUi/TKfFyyLKSRSEa0YgpAOthg1
+	 7DjZbzN1QCFlQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B8C6DD84BCD;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AE3DFDC99EC;
 	Fri, 16 Feb 2024 09:50:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,38 +52,57 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 net] dccp/tcp: Unhash sk from ehash for tb2 alloc failure
- after check_estalblished().
+Subject: Re: [PATCH] net: ethernet: adi: requires PHYLIB support
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170807702475.29322.4063439451772691558.git-patchwork-notify@kernel.org>
+ <170807702470.29322.7670195818484778024.git-patchwork-notify@kernel.org>
 Date: Fri, 16 Feb 2024 09:50:24 +0000
-References: <20240214191308.98504-1-kuniyu@amazon.com>
-In-Reply-To: <20240214191308.98504-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, joannelkoong@gmail.com,
- kuni1840@gmail.com, netdev@vger.kernel.org, syzkaller@googlegroups.com
+References: <20240215070050.2389-1-rdunlap@infradead.org>
+In-Reply-To: <20240215070050.2389-1-rdunlap@infradead.org>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-kernel@vger.kernel.org, lkp@intel.com, lennart@lfdomain.com,
+ alexandru.tachici@analog.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Wed, 14 Feb 2024 11:13:08 -0800 you wrote:
-> syzkaller reported a warning [0] in inet_csk_destroy_sock() with no
-> repro.
+On Wed, 14 Feb 2024 23:00:50 -0800 you wrote:
+> This driver uses functions that are supplied by the Kconfig symbol
+> PHYLIB, so select it to ensure that they are built as needed.
 > 
->   WARN_ON(inet_sk(sk)->inet_num && !inet_csk(sk)->icsk_bind_hash);
+> When CONFIG_ADIN1110=y and CONFIG_PHYLIB=m, there are multiple build
+> (linker) errors that are resolved by this Kconfig change:
 > 
-> However, the syzkaller's log hinted that connect() failed just before
-> the warning due to FAULT_INJECTION.  [1]
+>    ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_net_open':
+>    drivers/net/ethernet/adi/adin1110.c:933: undefined reference to `phy_start'
+>    ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_probe_netdevs':
+>    drivers/net/ethernet/adi/adin1110.c:1603: undefined reference to `get_phy_device'
+>    ld: drivers/net/ethernet/adi/adin1110.c:1609: undefined reference to `phy_connect'
+>    ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_disconnect_phy':
+>    drivers/net/ethernet/adi/adin1110.c:1226: undefined reference to `phy_disconnect'
+>    ld: drivers/net/ethernet/adi/adin1110.o: in function `devm_mdiobus_alloc':
+>    include/linux/phy.h:455: undefined reference to `devm_mdiobus_alloc_size'
+>    ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_register_mdiobus':
+>    drivers/net/ethernet/adi/adin1110.c:529: undefined reference to `__devm_mdiobus_register'
+>    ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_net_stop':
+>    drivers/net/ethernet/adi/adin1110.c:958: undefined reference to `phy_stop'
+>    ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_disconnect_phy':
+>    drivers/net/ethernet/adi/adin1110.c:1226: undefined reference to `phy_disconnect'
+>    ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_adjust_link':
+>    drivers/net/ethernet/adi/adin1110.c:1077: undefined reference to `phy_print_status'
+>    ld: drivers/net/ethernet/adi/adin1110.o: in function `adin1110_ioctl':
+>    drivers/net/ethernet/adi/adin1110.c:790: undefined reference to `phy_do_ioctl'
+>    ld: drivers/net/ethernet/adi/adin1110.o:(.rodata+0xf60): undefined reference to `phy_ethtool_get_link_ksettings'
+>    ld: drivers/net/ethernet/adi/adin1110.o:(.rodata+0xf68): undefined reference to `phy_ethtool_set_link_ksettings'
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3,net] dccp/tcp: Unhash sk from ehash for tb2 alloc failure after check_estalblished().
-    https://git.kernel.org/netdev/net/c/66b60b0c8c4a
+  - net: ethernet: adi: requires PHYLIB support
+    https://git.kernel.org/netdev/net/c/a9f80df4f514
 
 You are awesome, thank you!
 -- 
