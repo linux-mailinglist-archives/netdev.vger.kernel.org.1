@@ -1,98 +1,114 @@
-Return-Path: <netdev+bounces-72246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C665C8572B6
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 01:42:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45D6B8572BC
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 01:45:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67AA51F22CBC
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 00:42:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7782E1C2137C
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 00:45:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58247DDC1;
-	Fri, 16 Feb 2024 00:41:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1698CC2D6;
+	Fri, 16 Feb 2024 00:43:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AQ/u6HGl"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tv+itwG+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30F81946F;
-	Fri, 16 Feb 2024 00:41:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB5E8BE4D
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 00:43:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708044092; cv=none; b=DwDLdjAD0qVzpUxKj7DVEOPXHTKjeMjaJXPd6P5yFQM3Ls8ac8y759LVOJNsDyORnYrgGv4AtTrOP6bhC2PDy3mwTLtluE3eoL6b6b91ibjKytijXTP1OSEDp0r+z68bFwq7rag/pnDGaCApeOKO17FCPPF0KURgxnxWjBZ06Fo=
+	t=1708044213; cv=none; b=gnCpM6iW6S0VO8LjqNJrvjWgGbiyUTtjlCBGMrVvFT8fnHZ5ZXaFQ8GqnMCORXvm1l/+YJKfNyMk+cvlYrv5AG+gMrpXfPfu7k6QevWnOknuG/m6UzyD5zOmLbOclUNCI3i18FC4jufhKb0xmPXcSy/Ckh4Q9Ug6nao4AdL+1Qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708044092; c=relaxed/simple;
-	bh=hO1c5nGTovIvhjqxDgR/7VZPe6HATF0p1iglGL7g2mQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sbY+jevS63MUOXlSy3kNIH6k2HP3QFPQg5Frkn0eJGIWJCKkToVXCTLriUbMxXeqeSSfEl2NIZiWO7DkNn97lPcEektOP9QBxRWHp40yGr599LcyRS6Z0fG7ulGcRMV2LJ2pfJKRMmJ9qeNHvHqoWLoSjkTqJ8/XEbanBSqDais=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AQ/u6HGl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFA6DC433A6;
-	Fri, 16 Feb 2024 00:41:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708044092;
-	bh=hO1c5nGTovIvhjqxDgR/7VZPe6HATF0p1iglGL7g2mQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=AQ/u6HGlqBbE386G5Mpr0vYotn/Z/vsWAVwpPKB4iy9FsIaclTc7UkKRADomAhxLO
-	 Whzc+fmxnyvTW4SfG1qdqgMG95Mn8gx2u2aTMHoFPiDPwGtI+XiHTZypHbS3+lySlZ
-	 H3rQCvYv15GBOafdSNr4rjzCHozllTWCYmDQgFnUtHpMqb+8Ril7OWVsSFCvVN9Hrs
-	 VIoYf6FU/curNbhAqaGAZR1YZvmeDppjYHhYNksicCWybwDKyumRs8s/Ii+4j1pQdE
-	 MOomQcxmeI74pkRf6LOvbazNM2wjMeOsZGseSz2lsy4O0EZ6cVSVwudSSZ4aFSMXX1
-	 8SVyfBTV1Q+TQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: jakub@cloudflare.com
-Cc: shuah@kernel.org,
-	keescook@chromium.org,
-	linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [RFC 7/7] selftests: kselftest_harness: let PASS / FAIL provide diagnostic
-Date: Thu, 15 Feb 2024 16:41:22 -0800
-Message-ID: <20240216004122.2004689-8-kuba@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240216004122.2004689-1-kuba@kernel.org>
-References: <20240216004122.2004689-1-kuba@kernel.org>
+	s=arc-20240116; t=1708044213; c=relaxed/simple;
+	bh=2+VZnPCSYNk+2pPRyl152ePQ0FX0U8JpHjxax5vPuDY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NtjmT4ibDAH+Dm2BDeHVoa1j9R5Ta3YNTU7vi/qqZTSnG9l/ZlmgEfxtMJ7qRh3IuHPrbWIHUnBcyEXFt05dBCNk2XTRKek+6y/baXP7kWC1aQlyucEIPH7pgMPaTGboqoEVVXKBy88FOCfRMr09YpgJeE8fw+zdCdfT9iY+U24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tv+itwG+; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <11f40993-ec02-48b7-aec5-13ff7cddf665@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1708044208;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KlOE/QHrK685/cBSEGlCbbuAZty4HqZtwl2hI0O+jio=;
+	b=tv+itwG+azGIKJ3yf3N8V0VgYXvjLKRlNl497rfWJd7CpaqicNRKY2qiWipQT1saJxVnNj
+	2ET24KwQQh84jFd/9tAmCflA3IxxlWQjPSdARAYSJ60kbx98IfUNBRGbzk4elELkgj2qCQ
+	sFSGpacZdFq7hENHEjQbYTByzwIXDV0=
+Date: Fri, 16 Feb 2024 08:43:18 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH] net/mlx5: fix possible stack overflows
+To: Arnd Bergmann <arnd@arndb.de>, Arnd Bergmann <arnd@kernel.org>,
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Yevgeny Kliteynik <kliteyn@nvidia.com>,
+ Alex Vesker <valex@nvidia.com>, Hamdan Igbaria <hamdani@nvidia.com>,
+ Netdev <netdev@vger.kernel.org>, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240213100848.458819-1-arnd@kernel.org>
+ <84874528-daea-424d-af63-b9b86835fae6@linux.dev>
+ <2ebe5a36-ce81-4d26-a12b-7affbd65c5e3@app.fastmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <2ebe5a36-ce81-4d26-a12b-7affbd65c5e3@app.fastmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Switch to printing KTAP line for PASS / FAIL with ksft_test_result_code(),
-this gives us the ability to report diagnostic messages for free.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- tools/testing/selftests/kselftest_harness.h | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+在 2024/2/15 16:03, Arnd Bergmann 写道:
+> On Thu, Feb 15, 2024, at 01:18, Zhu Yanjun wrote:
+>> 在 2024/2/13 18:08, Arnd Bergmann 写道:
+>>>    static int
+>>> -dr_dump_rule_rx_tx(struct seq_file *file, struct mlx5dr_rule_rx_tx *rule_rx_tx,
+>>> +dr_dump_rule_rx_tx(struct seq_file *file, char *buff,
+>>> +		   struct mlx5dr_rule_rx_tx *rule_rx_tx,
+>>>    		   bool is_rx, const u64 rule_id, u8 format_ver)
+>>>    {
+>>>    	struct mlx5dr_ste *ste_arr[DR_RULE_MAX_STES + DR_ACTION_MAX_STES];
+>>> @@ -533,7 +532,7 @@ dr_dump_rule_rx_tx(struct seq_file *file, struct mlx5dr_rule_rx_tx *rule_rx_tx,
+>>>    		return 0;
+>>>    
+>>>    	while (i--) {
+>>> -		ret = dr_dump_rule_mem(file, ste_arr[i], is_rx, rule_id,
+>> Before buff is reused, I am not sure whether buff should be firstly
+>> zeroed or not.
+> I don't see why it would, but if you want to zero it, that would be
+> a separate patch that is already needed on the existing code,
+> which never zeroes its buffers.
 
-diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/selftests/kselftest_harness.h
-index 5fca75e180b8..202f599c1462 100644
---- a/tools/testing/selftests/kselftest_harness.h
-+++ b/tools/testing/selftests/kselftest_harness.h
-@@ -1174,14 +1174,12 @@ void __run_test(struct __fixture_metadata *f,
- 
- 	if (t->results->reason[0])
- 		diagnostic = t->results->reason;
-+	else if (t->exit_code == KSFT_PASS || t->exit_code == KSFT_FAIL)
-+		diagnostic = "";
- 	else
- 		diagnostic = "unknown";
- 
--	if (t->exit_code == KSFT_SKIP || t->exit_code == KSFT_XFAIL)
--		ksft_test_result_code(t->exit_code, test_name,
--				      "%s", diagnostic);
--	else
--		ksft_test_result(__test_passed(t), "%s\n", test_name);
-+	ksft_test_result_code(t->exit_code, test_name, "%s", diagnostic);
- }
- 
- static int test_harness_run(int argc, char **argv)
--- 
-2.43.0
+Sure. I agree with you. In the existing code, the buffers are not zeroed.
 
+But to a buffer which is used for several times, it is good to zero it 
+before it is used again.
+
+Can you add a new commit with the following?
+
+1). Zero the buffers in the existing code
+
+2). Add the zero functionality to your patch
+
+ From my perspective, it is good to the whole commit.
+
+Please Jason and Leon comment on this.
+
+Thanks,
+
+Zhu Yanjun
+
+>
+>      Arnd
 
