@@ -1,141 +1,99 @@
-Return-Path: <netdev+bounces-72468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEDA88583DC
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 18:16:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4304E8583E8
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 18:17:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69E68284F58
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 17:16:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBB45284D7B
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 17:17:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9303813328F;
-	Fri, 16 Feb 2024 17:13:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6841B130E59;
+	Fri, 16 Feb 2024 17:16:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yj9IDzlD"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4LoqQsbW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B75130AEC;
-	Fri, 16 Feb 2024 17:13:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50D9C1E53F;
+	Fri, 16 Feb 2024 17:16:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708103638; cv=none; b=FlrkwhPdD/vUeMJr1FAdCv4kvjSCN6Fo0WDrCymQNtMM9KIWtYKvFqAcftEWfVTidWHdaMi9jNRiFfyf7ReXZCKBX+CrVqc9NtmNkxzKfFzmRc3ekUOXcaKVa+9ifcqotUv797Zp/lmDq4c1QfF3l7pFK/p9N6i7rrqTvb9HOQE=
+	t=1708103810; cv=none; b=syUhZlItkmtED7m4c58JqHP0/4uBsvMD2AKRnka0Eoy92JiL/wJl+ZFuqI/1uevlKXus4rI+OoRyZqxe+EJCqmW97fQVkPBaNUHJR8eWJ7JAsN/ghnfIzqVzFoFLLvEnV0oRrfu8IytiiFPEXMqUorNF8v0inRBQgrPbeQl/WAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708103638; c=relaxed/simple;
-	bh=fYAA8xilO4KnYgQIZVtA9ts8YuATLRGZ6f+s+rtRDWY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H8DZPeP6ZVcMP/bNcQr9bJ4fTAZHzgzkB+9iIL2Rt6bH7B62qw0/TyOLJYd0sPj/rD+VWUo2d/fb6gSoq56kmXICtZfzQnpdnziW1s8leoyVKJbmkRds5p+uFNa6X1faqgsxfw31aIWR5UFUzkCzCzebxaLg0Z4OJaHG3C/juYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yj9IDzlD; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-42dd6f6518fso3968381cf.1;
-        Fri, 16 Feb 2024 09:13:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708103635; x=1708708435; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pjvfE09Bk+j8kTulAxyHuFEo7lsn+ZYbAj8sdSsLEQI=;
-        b=Yj9IDzlDG1aTmi1TACel/VWh7ehQQRcrkkRID722mJoaDb9qQniQl8kQlyiuccb4RY
-         O+ckjz5lQgij8YH/mSwvOtn75+HDH8DCR33XBqVlGaGEAf/KQqvuc8lyNhRhBeuondYr
-         9pYLapqMVkzr+mUdLFH8wB4VfIadgWh9MRjuKXAV49LN3AYM8lrp4xbBlA1G2DL4K14i
-         3CNSl54/HW4uAtgVjsiy8145urN8dBpziQjH8nV793upmMPs1RbndAS1pjtywD4WCHQz
-         GcHdmv/fY55CAQm/XepslWuMP2OeRKiEulCRuavuQiaawEswV8ibx3WdzKyqYRgavOSD
-         uzUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708103635; x=1708708435;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pjvfE09Bk+j8kTulAxyHuFEo7lsn+ZYbAj8sdSsLEQI=;
-        b=fTLPq0CeUy1Tre5piqqHf8S541lM22tpPEnrTkTCNcl2ZwubIEpZBuMD0Q9Qk5yxE8
-         xgB4xtoSWPIJbu/c5wKf9KqlQSg6yxEjC8WZflZfCv3vpuG65gnObjGDPMDWP4TsdYIw
-         xw3cxOoPb2KWpkIGS3Rp49TZUG7mJFoPcXl0wWsjnlFVkghxuSvOdMZv6C0NptKygUqp
-         HaYtoqsPbQe02K8xxUbMw8igPAc0TYH/H2pKo860UnpayZXx+Xbnucq1vdTXLNrN36nf
-         XLASuAnj9+kzxRzQwjpg7McVvtdDBBttBf3k51Gm6E8T8YGF5Zm0abPJHRujk20FR/ES
-         3TyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX3+UY3GuchyrjShmRMB8rtI3A49OvxwGB9whyjVemZrKX4GhO3u7VvK63IL5YU8n3NpXSfkaPE/ZxM5xgcYa8OVW1dqv8LhhRpZb7Y
-X-Gm-Message-State: AOJu0Yx5h9TGubp3NwIAliJEnQcSpa61IBYx8LFLIpvDMfA/DCvTo4pN
-	8o6v3N4ckZaHiUJE8k5AC7FTlDCLfaeMcCxRqobL4x02zgbGhUJy
-X-Google-Smtp-Source: AGHT+IGwY7as3MWB8rYJ4I9pgzQYCKHYP5+MPcdYB0dE1tHD/o8J8JD84q4msCMJqeg9XyYibSA/xg==
-X-Received: by 2002:a05:622a:15d6:b0:42c:7c75:b73b with SMTP id d22-20020a05622a15d600b0042c7c75b73bmr6001337qty.18.1708103635473;
-        Fri, 16 Feb 2024 09:13:55 -0800 (PST)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id y20-20020ac85f54000000b0042c5512c329sm105660qta.17.2024.02.16.09.13.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Feb 2024 09:13:54 -0800 (PST)
-Message-ID: <61bdd802-abe4-4544-8e48-9493a6bb99c8@gmail.com>
-Date: Fri, 16 Feb 2024 09:13:51 -0800
+	s=arc-20240116; t=1708103810; c=relaxed/simple;
+	bh=3pfy3uw6X4A5yd7ITUWZQtrvTmTq4SidsDEt+RRdoz0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Rc4OOiOKr4p04QAZumePrFcGtytfk9aUPO+4HfC4wSa/sTCjKnCUf4peIpsgb9+Cr1aiir5DBTwR974AaFj0XcY7OoOdffLYbp8HR71+ujOz/aP2T1hq7QpYqpMkebOKr7wyIr2CLiqpR82Gy4mab1yiFu7brmmZLiqsKmqaJFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4LoqQsbW; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=l9mYR212SPf+R9mwmI8TrJIzfSG5c5mRs1Qtd2wu1Xk=; b=4LoqQsbW0LUQvAGL26r5DYs7C2
+	N6jZG5oN0YVkqrD4JZ0CSnYCKKVwGtrc0DcawUGSO88B8jpSh7Un3PuVuROheCX/nDDBI8sRrZ6RV
+	RmMWNkhMQLn6JT1XnZx/JLj4Cw67ryxo7c6vCWV0s2ye1u3dw0cfpC3cgoZtLHjxC+7Y=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rb1pT-00805C-TI; Fri, 16 Feb 2024 18:16:51 +0100
+Date: Fri, 16 Feb 2024 18:16:51 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
+Cc: Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, linux-arm-msm@vger.kernel.org,
+	linux-clk@vger.kernel.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v4 2/8] clk: qcom: ipq5332: enable few nssnoc clocks in
+ driver probe
+Message-ID: <9638a213-76a5-4a72-b6b2-018ae50305be@lunn.ch>
+References: <20240122-ipq5332-nsscc-v4-0-19fa30019770@quicinc.com>
+ <20240122-ipq5332-nsscc-v4-2-19fa30019770@quicinc.com>
+ <7a69a68d-44c2-4589-b286-466d2f2a0809@lunn.ch>
+ <11fda059-3d8d-4030-922a-8fef16349a65@quicinc.com>
+ <17e2400e-6881-4e9e-90c2-9c4f77a0d41d@lunn.ch>
+ <8c9ee34c-a97b-4acf-a093-9ac2afc28d0e@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: stmmac: mmc_core: Assign, don't add interrupt
- registers
-Content-Language: en-US
-To: Jesper Nilsson <jesper.nilsson@axis.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- kernel@axis.com
-References: <20240216-stmmac_stats-v1-1-7065fa4613f8@axis.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20240216-stmmac_stats-v1-1-7065fa4613f8@axis.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8c9ee34c-a97b-4acf-a093-9ac2afc28d0e@quicinc.com>
 
-On 2/16/24 07:24, Jesper Nilsson wrote:
-> The MMC IPC interrupt status and interrupt mask registers are of
-> little use as Ethernet statistics, but incrementing counters
-> based on the current interrupt and interrupt mask registers
-> makes them worse than useless.
-> 
-> For example, if the interrupt mask is set to 0x08420842,
-> the current code will increment by that amount each iteration,
-> leading to the following sequence of nonsense:
-> 
-> mmc_rx_ipc_intr_mask: 969816526
-> mmc_rx_ipc_intr_mask: 1108361744
-> 
-> Change the increment to a straight assignment to make the
-> statistics at least nominally useful.
-> 
-> Signed-off-by: Jesper Nilsson <jesper.nilsson@axis.com>
-> ---
->   drivers/net/ethernet/stmicro/stmmac/mmc_core.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/mmc_core.c b/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
-> index 6a7c1d325c46..6051a22b3cec 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
-> @@ -280,8 +280,8 @@ static void dwmac_mmc_read(void __iomem *mmcaddr, struct stmmac_counters *mmc)
->   	mmc->mmc_rx_vlan_frames_gb += readl(mmcaddr + MMC_RX_VLAN_FRAMES_GB);
->   	mmc->mmc_rx_watchdog_error += readl(mmcaddr + MMC_RX_WATCHDOG_ERROR);
->   	/* IPC */
-> -	mmc->mmc_rx_ipc_intr_mask += readl(mmcaddr + MMC_RX_IPC_INTR_MASK);
-> -	mmc->mmc_rx_ipc_intr += readl(mmcaddr + MMC_RX_IPC_INTR);
-> +	mmc->mmc_rx_ipc_intr_mask = readl(mmcaddr + MMC_RX_IPC_INTR_MASK);
-> +	mmc->mmc_rx_ipc_intr = readl(mmcaddr + MMC_RX_IPC_INTR);
+> You can get the source at https://git.codelinaro.org/clo/qsdk/oss/boot/u-boot-2016/-/tree/NHSS.QSDK.12.2?ref_type=heads
 
-So in premise I agree with the patch, that incrementing those is not the 
-right way to go about them. However these registers are currently 
-provided as part of the statistics set, but they should instead be 
-accessed via the register dumping method.
+Cool, thanks. But is it really u-boot from 2016?
 
-In either case you will get at best a snapshot of those two registers at 
-any given time and I suppose this can help diagnose a stuck RX 
-condition, but not much more than that.
--- 
-Florian
+> Yeah agree with your comments.
+> 
+> QSDK's u-boot enables the network support, so the required NSSCC clocks are
+> turned ON and left it in ON state. CCF tries to disables the unused NSSCC
+> clocks but system goes for reboot.
+> 
+> Reason being, to access the NSSCC clocks, these GCC clocks
+> (gcc_snoc_nssnoc_clk, gcc_snoc_nssnoc_1_clk, gcc_nssnoc_nsscc_clk)
+> should be turned ON. But CCF disables these clocks as well due to the lack
+> of consumer.
 
+So there is your solution, make NSSCC a consumer of the clocks it
+actually consumes. If it needs these clocks, it should get and enable
+them.
+
+	Andrew
 
