@@ -1,129 +1,96 @@
-Return-Path: <netdev+bounces-72273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A1E38575A0
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 06:31:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB1278575AE
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 06:40:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F3F11F24E3A
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 05:31:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DEE31F24E65
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 05:40:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E806512E70;
-	Fri, 16 Feb 2024 05:31:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E47B12E75;
+	Fri, 16 Feb 2024 05:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CYk41q+X"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ftaC8Y/L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 655AD12E5D;
-	Fri, 16 Feb 2024 05:31:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E92B912E74;
+	Fri, 16 Feb 2024 05:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708061490; cv=none; b=SoJxg2jKgThgm3yBJ4qTpKpNr4+R0bKh1a0MRIEbtzuGP1kgcVMvIwBVZuvMyVb/F/r/NY+wEuRblxxoEDZhWcThizjVI97brMPvESIFT+VbTbvpoFN9iYswfUQ2oZfemAHF19EDnnH/S201u8OQnfpFF9BkPXS6+WF4TyTXOrM=
+	t=1708062026; cv=none; b=UcJBqGHoozNLMKEsJwv6MtStUHA8AufmJ3FQkoVa67nOvJZ1Y2vG8e6HN9chCFLYMruyVBzrFRhNAPaDEpd5a9f4h4ial8cV+NFVf8bayfCcFwPB9A2XN+fPOsKjUNLyFhJ6CEBgHvKPbQ4JseHxD/rBDAXrhlPaNbuKihUye9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708061490; c=relaxed/simple;
-	bh=IO6wXrWgnOjdRNHYOyVqjCgY14opWEM+FIcIepTxP2A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JlCl4B4P+ip47/mzFdPIgnkxjsoG3Scqc+TuIGgbPFYgUJ910FCrnNDjmMG+lG44glB33yHaLpfYwCtkW2aY7iz9nykT0wiH9NgKnqnn6dCwiC2FKKa61s8vr6dUprB2ecsueixEPiKgC33DJL+hdxUj1Ow3qsFrMffzdeMstCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CYk41q+X; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-29080973530so1336033a91.1;
-        Thu, 15 Feb 2024 21:31:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708061489; x=1708666289; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tjqvFkfM5Lfa1Uthf+wvZFrrDCYAGzM+X3+/QDBtjEM=;
-        b=CYk41q+XMi7pEKFm5ccZKryI1/CHhTiA7ESChp5L3AErW7lk+c6fwAlDxdq0QA2Ziu
-         Wq783wrwrhBm2ql3TTt2eYxeYsQYusCD//alGnMcBRn33hZin5Ki2tbdKnvj8jtVou+F
-         lhphAjHoZYV2+O9FnhAo/8BbGWh+pcLIt3FU8Fg3SE5sd5lpge2VsZOW0ilLyaBEi1QC
-         NEb+XQUJ/DW6gd3BPFVVUn+RF8r4E7QXHyJMxgNp9gj0hA8UEtAqkNzC71PRqQe7l9x+
-         bh0Qiy7wnzUNkc6fFp9hBB+gX0f9h9lx5FuBp8sKfXuj0Qu0802jdPJZV/o3VRj2fQb2
-         t0Tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708061489; x=1708666289;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tjqvFkfM5Lfa1Uthf+wvZFrrDCYAGzM+X3+/QDBtjEM=;
-        b=HR7kWmDHH4q5HyxWEjUGkObw+LKQETEY3i/Flsi+5WjXKAHKLOuzEX+3KP1nOe9thb
-         JLg5ogYbJq0tInZ3/owStAFcUf+iEPnCh7m2gFdM4YFBkyAKRv1p/wtjyIB09UorLc12
-         8Me6Yi5M/A7xiLw/Ds+f8KyKvwSCr4Q9GWGT4C7IcZQga+7Arhiiezy2BtOurQHKtIWA
-         vtUCnVXcYiuFO90FOOh+mAfLZWEHPKh0RN2g55wfXg33cLsnEw6lTU8i87qrxp+nB6gV
-         gU10zsSu96OEeYXc/BKTAJZK5ZxfwVqsTlmliEKygs0p5GF851HrMOC2Y/q4ZspLqYBM
-         lGCA==
-X-Forwarded-Encrypted: i=1; AJvYcCV2LLl/Vc2tJSsHqqbQ9q/Sf/0O1Co53K4ifxlZgdKJwuBYaJvJ/6ai+fckKg5NISDKhxg/iX83yj12DkwwbGyfzVxGKxq5
-X-Gm-Message-State: AOJu0Yx22YpN8iIWUREUPawBtTK9D0y5/UrsRIlyZRaGy5WGvWjox4S6
-	N7jbOfIk4L4M3cVxJ2YRbsIEHoSI6XJ9YBQ/sg8Kt6GFibSscm5K
-X-Google-Smtp-Source: AGHT+IF3YmN1qawIPxNBZ267l/ivRrJxf0WqB2STpKTxG3GPCe2BMlVFVyRTIk7pohrmWgR5uF5SPQ==
-X-Received: by 2002:a17:90b:fca:b0:299:3007:ad13 with SMTP id gd10-20020a17090b0fca00b002993007ad13mr1404504pjb.32.1708061488696;
-        Thu, 15 Feb 2024 21:31:28 -0800 (PST)
-Received: from localhost (dhcp-141-239-158-86.hawaiiantel.net. [141.239.158.86])
-        by smtp.gmail.com with ESMTPSA id t22-20020a17090a1c9600b00298e639d17esm2647645pjt.22.2024.02.15.21.31.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Feb 2024 21:31:28 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Thu, 15 Feb 2024 19:31:26 -1000
-From: Tejun Heo <tj@kernel.org>
-To: torvalds@linux-foundation.org, mpatocka@redhat.com
-Cc: linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev,
-	msnitzer@redhat.com, ignat@cloudflare.com, damien.lemoal@wdc.com,
-	bob.liu@oracle.com, houtao1@huawei.com, peterz@infradead.org,
-	mingo@kernel.org, netdev@vger.kernel.org, allen.lkml@gmail.com,
-	kernel-team@meta.com, Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, David Wei <davidhwei@meta.com>
-Subject: Re: [PATCH 6/8] net: tcp: tsq: Convert from tasklet to BH workqueue
-Message-ID: <Zc7zLsEhDzGkCH9m@slm.duckdns.org>
-References: <20240130091300.2968534-1-tj@kernel.org>
- <20240130091300.2968534-7-tj@kernel.org>
+	s=arc-20240116; t=1708062026; c=relaxed/simple;
+	bh=e0btg/nEkxmcE3ZWPeSYCuKrkKskM0N98V08CLYKCUc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=h/jpNeHV33A2nAGlRLJ7oYL7pSarV8ySAmT5kJtX5BmTOb0Fov+e4bPQAR4hHNUXBkXZ7qAIyfJ4J2W6EZJW2sG/DEbw533W5vjOy809hv9DRpSJiTMybBSmqdOw4k8/ejxyZqnLsIeYcRdgwuKyNF6c3IpMoU6qPxqNU/wS/Mo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ftaC8Y/L; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4A4A5C43390;
+	Fri, 16 Feb 2024 05:40:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708062025;
+	bh=e0btg/nEkxmcE3ZWPeSYCuKrkKskM0N98V08CLYKCUc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ftaC8Y/L2MJLrxO8K3x9aCi1OcVZ7Q3iLr6Rkcoz9fyF61af8gnvcl+a2X7qUQ9QL
+	 tESdu5xDv0nFdcLSw3RpAxY6LEwZe71uwHyXmDBDIvPCexy1MuqRLF3c31PW1U27I0
+	 wpImsG8oxt4Ybc3i3qC8/zLkyU+wn1mKbtnWNZW8K2zhH6JlVBbStKzdNXoc/TlRf3
+	 oYj9K5iTV8Q2MkMozU3l1JdrqrDRTGmRkV3gVoKOlGUmjOqaJ4zHAU8VzYCMYb+J4J
+	 vun+yNgo6izH2PIIQi5X7ZXSEhnhutak5KqeWMLZa4J8mRkHEHoIfN4/obVUFx/9h8
+	 TPg+JqJdiCwtA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 26666D8C97D;
+	Fri, 16 Feb 2024 05:40:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240130091300.2968534-7-tj@kernel.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2] net: dsa: remove OF-based MDIO bus
+ registration from DSA core
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170806202514.18199.5277727035517778240.git-patchwork-notify@kernel.org>
+Date: Fri, 16 Feb 2024 05:40:25 +0000
+References: <20240213-for-netnext-dsa-mdio-bus-v2-1-0ff6f4823a9e@arinc9.com>
+In-Reply-To: <20240213-for-netnext-dsa-mdio-bus-v2-1-0ff6f4823a9e@arinc9.com>
+To: =?utf-8?b?QXLEsW7DpyDDnE5BTCB2aWEgQjQgUmVsYXkgPGRldm51bGwrYXJpbmMudW5hbC5h?=@codeaurora.org,
+	=?utf-8?b?cmluYzkuY29tQGtlcm5lbC5vcmc+?=@codeaurora.org
+Cc: andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ mithat.guner@xeront.com, erkin.bozoglu@xeront.com, luizluca@gmail.com,
+ ALSI@bang-olufsen.dk, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ arinc.unal@arinc9.com
 
-Hello,
+Hello:
 
-On Mon, Jan 29, 2024 at 11:11:53PM -1000, Tejun Heo wrote:
-> The only generic interface to execute asynchronously in the BH context is
-> tasklet; however, it's marked deprecated and has some design flaws. To
-> replace tasklets, BH workqueue support was recently added. A BH workqueue
-> behaves similarly to regular workqueues except that the queued work items
-> are executed in the BH context.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 13 Feb 2024 10:29:05 +0300 you wrote:
+> From: Arınç ÜNAL <arinc.unal@arinc9.com>
 > 
-> This patch converts TCP Small Queues implementation from tasklet to BH
-> workqueue.
+> The code block under the "!ds->user_mii_bus && ds->ops->phy_read" check
+> under dsa_switch_setup() populates ds->user_mii_bus. The use of
+> ds->user_mii_bus is inappropriate when the MDIO bus of the switch is
+> described on the device tree [1].
 > 
-> Semantically, this is an equivalent conversion and there shouldn't be any
-> user-visible behavior changes. While workqueue's queueing and execution
-> paths are a bit heavier than tasklet's, unless the work item is being queued
-> every packet, the difference hopefully shouldn't matter.
-> 
-> My experience with the networking stack is very limited and this patch
-> definitely needs attention from someone who actually understands networking.
+> [...]
 
-On Jakub's recommendation, I asked David Wei to perform production memcache
-benchmark on the backported conversion patch. There was no discernible
-difference before and after. Given that this is likely as hot as it gets for
-the path on a real workloal, the conversions shouldn't hopefully be
-noticeable in terms of performance impact.
+Here is the summary with links:
+  - [net-next,v2] net: dsa: remove OF-based MDIO bus registration from DSA core
+    https://git.kernel.org/netdev/net-next/c/ae94dc25fd73
 
-Jakub, I'd really appreciate if you could ack. David, would it be okay if I
-add your Tested-by?
-
-Thanks.
-
+You are awesome, thank you!
 -- 
-tejun
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
