@@ -1,155 +1,233 @@
-Return-Path: <netdev+bounces-72495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B62BB8585C8
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 19:51:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 726758585D1
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 19:53:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E9D71F2177E
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 18:51:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 287042898A5
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 18:53:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E6E1353E3;
-	Fri, 16 Feb 2024 18:50:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C74C81353FF;
+	Fri, 16 Feb 2024 18:52:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AbYulZUm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ck+WO+AD"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9FF61353E4
-	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 18:50:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FE351353F0;
+	Fri, 16 Feb 2024 18:52:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708109442; cv=none; b=J8c5BVRzc8zIB3KAXEsU+0f6Evedl+iz8DujqTXl7JsrqrGwxyc83mvKR9PFa1NtVMbYG8u4M6hfI/1yLwbfWoK/3Veg2OJMqHg1oTRvQRZNzNwddhrBOq1jew8NMu2bgWBG1/f9ryWPbsKLu8Pl2Uql+Ygz3odS0rRCdR+GNUI=
+	t=1708109577; cv=none; b=LR/zSg2JUUM1XyOjYzc++ILT/OsMVo2dcFAs7iTbn0oJ2mGUlTXEw+9IZENWD/+EJRGSgLpbJfezkH/eY+8mz7yLubiTaSZKKuqZjQLpKaiexrlCV/KrDcYbakqA+QzNBD2XP/C9YafJeWQ89X4+vV4LbR/G4xW9oBE4EpPQ5fU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708109442; c=relaxed/simple;
-	bh=5K5in29s2ilrU1P9jDQ0b6DBfBDJkEiiMKGFmnHWvWM=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=Fz8RJhWvuJ6JTkLPR992BMDSe0fLX+5GmpdYd2u9XqyVsjS4fLCo4lu7QfrPw4wXkKzgyYvQtLcvyoqOhPwITTHF8Bfg6DB8RaPJvGR3IAPsHk14L2Hjc5AAxBiIx4RlfR+4aVa58ZkY6GWA4ZrGjr9cR+h6MUxxsV8BNGeQv8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AbYulZUm; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708109439;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cG/xi4a8F8EewDkwJevk3BPCAWziD77wFZSl7GoN0rI=;
-	b=AbYulZUmDw2XIL5XZcoHzt1ObCrp/ckcczG5TnrrVOpNIUBTiJ7HjHPpOBStIYTitvP3LY
-	gBkIpRfU35pGrEz9dAaF/Vt1hVk5N+zUZ/AgmwRDYz5pWrCTu2cUYNaTbj7VoLsIDlDo4I
-	/sy34cMCkEOBGt1qanma6XucH4OX2Cc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-260-TXmcfDuNNSy8g6qnevYRSw-1; Fri, 16 Feb 2024 13:50:36 -0500
-X-MC-Unique: TXmcfDuNNSy8g6qnevYRSw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A839B84C65E;
-	Fri, 16 Feb 2024 18:50:35 +0000 (UTC)
-Received: from RHTPC1VM0NT (unknown [10.22.33.57])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id A58932166AE7;
-	Fri, 16 Feb 2024 18:50:34 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Pravin
- B Shelar <pshelar@ovn.org>,  dev@openvswitch.org,  Ilya Maximets
- <i.maximets@ovn.org>,  Simon Horman <horms@ovn.org>,  Eelco Chaudron
- <echaudro@redhat.com>,  Shuah Khan <shuah@kernel.org>,
-  linux-kselftest@vger.kernel.org
-Subject: Re: [RFC 4/7] selftests: openvswitch: delete previously allocated
- netns
-References: <20240216152846.1850120-1-aconole@redhat.com>
-	<20240216152846.1850120-5-aconole@redhat.com>
-	<7f51a2e2bfe1e3ee15f12f655e6d7ab5d9d73b5a.camel@redhat.com>
-Date: Fri, 16 Feb 2024 13:50:34 -0500
-In-Reply-To: <7f51a2e2bfe1e3ee15f12f655e6d7ab5d9d73b5a.camel@redhat.com>
-	(Paolo Abeni's message of "Fri, 16 Feb 2024 17:31:53 +0100")
-Message-ID: <f7tmss0fdl1.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.3 (gnu/linux)
+	s=arc-20240116; t=1708109577; c=relaxed/simple;
+	bh=3WkD8y+Hm2LbxjUUEU7dK0+hHpLtVVkdwRsfFhX61YI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=a3wGLgyi4pKe838gzeFYXeka5PNy30fDqvB6wh6L7USV43gAfRHkX/HMz2t+kijZnnXvvrZpyKZfHTLwyzoYgmjwShu+YqmpE93gxwZTjCNMb1OMIbpGGeZ5QZ0+Te2OHCTz+wFfzYKI2DT1uW/kFAnMCSk251LZgW/WYY7ZoAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ck+WO+AD; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-42dc7ccabbaso8516851cf.0;
+        Fri, 16 Feb 2024 10:52:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708109575; x=1708714375; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=w66qiBcuO517k0fIfzU2tv5eomSTAcruHYKVEIiNz7U=;
+        b=ck+WO+ADeEfG2y4BG7FocgevHgRR7k15rEZb9UQeOEMToSgNJplPszgHE4y691I2S5
+         RxjQbK4Jjk8/icHfUJAfhxzPMzmDIzZ3Lwa0yZZYnk59UIe31BgpmIGW/tzPGrttTkGG
+         oxxVX9iiAtmbIJOHJe+tEWKv5Gwl1poUhaf26Hdjb6gmTIpT2eA3I4M1bP+FASkuW4gg
+         zRO1BxjPIGXFosXNaKOLzmpfxLd3Wv0Hhr4WLpprvMlUw14ajsZYbL/y30orxzqFORsg
+         N5gULBcfbJPYR/Ccckx5QLvvqN+QMhq1BargarvnR4qvAfcP0HL6qUSe4E3vlSFspkXa
+         pFvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708109575; x=1708714375;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=w66qiBcuO517k0fIfzU2tv5eomSTAcruHYKVEIiNz7U=;
+        b=ExF6rrxbjW2LA2bce1A23XjMZYyKYEVhyKfqcjPViT6WJSMNTsaNRd7mGV4KNN/LUZ
+         xAfjEY7r8APMoTGv9StSKUP7f9xOojsFphySLa8OnSdjezcJscm4Z4l+6lV1akd+joFA
+         pvhRfkI+iTw/QI17SFRf4JxLm4/EaVYsr1ETreAsuC8UFRW38S2ELu2DdX4BBLk+w4bH
+         OyzieW/Y/YCJ8qJS7ckJSK6LHpPfUqAQ/H5R7Pt5gZfgA1SwJ7KvNOuc+Me3zPDGx5AX
+         e/S4DyKGbpaJysksr1z3455qg6OiE4rJOfpvsFaSfOwxpFgCf3RFaufAwHX2Q5u0I+bf
+         wMaA==
+X-Forwarded-Encrypted: i=1; AJvYcCUpzWZyDZBHwPfWr7Fb96pe6EnZRZoo47ATuNcq/xS39PbvwpxGMN2Lo/zIQ5cde8Eel/4556Gf0JOb3OzgAh5w8bfc38S6fKeMM9Hjce/WGPn1lo9r0xGpuFnTCASe6S1aEFu2nha85lHqtaPL5bMF52CKlzYzEggnThr0gdbq
+X-Gm-Message-State: AOJu0Yx8aVLf4lETrlj7SzeG+UNqtFO0eFOfxrvgqN/7fhilzXDsMrG5
+	IEnX4uEkC+smtNfyrKYTmMJU2RPKgnuwaHgKJVA58xT+CpgqCPhT
+X-Google-Smtp-Source: AGHT+IGi4/giR855KA+m+KaoReOo/3kdOIgybpIeUkxcyuMIxsIsRMDjoh4w3/EXWLQ6H6JRkjhOZQ==
+X-Received: by 2002:ac8:5acb:0:b0:42c:74ef:8f82 with SMTP id d11-20020ac85acb000000b0042c74ef8f82mr6389156qtd.67.1708109574675;
+        Fri, 16 Feb 2024 10:52:54 -0800 (PST)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id e18-20020ac86712000000b0042c61b99f42sm183180qtp.46.2024.02.16.10.52.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Feb 2024 10:52:54 -0800 (PST)
+Message-ID: <57a8160e-7f56-40b1-a69a-1fc56d8a79df@gmail.com>
+Date: Fri, 16 Feb 2024 10:52:50 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net-next v8 04/13] net: Change the API of PHY default
+ timestamp to MAC
+Content-Language: en-US
+To: Kory Maincent <kory.maincent@bootlin.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
+ Radu Pirea <radu-nicolae.pirea@oss.nxp.com>,
+ Jay Vosburgh <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>,
+ Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com,
+ Simon Horman <horms@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Rahul Rameshbabu <rrameshbabu@nvidia.com>
+References: <20240216-feature_ptp_netnext-v8-0-510f42f444fb@bootlin.com>
+ <20240216-feature_ptp_netnext-v8-4-510f42f444fb@bootlin.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ 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
+In-Reply-To: <20240216-feature_ptp_netnext-v8-4-510f42f444fb@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Paolo Abeni <pabeni@redhat.com> writes:
+On 2/16/24 07:52, Kory Maincent wrote:
+> Change the API to select MAC default time stamping instead of the PHY.
+> Indeed the PHY is closer to the wire therefore theoretically it has less
+> delay than the MAC timestamping but the reality is different. Due to lower
+> time stamping clock frequency, latency in the MDIO bus and no PHC hardware
+> synchronization between different PHY, the PHY PTP is often less precise
+> than the MAC. The exception is for PHY designed specially for PTP case but
+> these devices are not very widespread. For not breaking the compatibility
+> default_timestamp flag has been introduced in phy_device that is set by
+> the phy driver to know we are using the old API behavior.
+> 
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> ---
+> 
+> Changes in v5:
+> - Extract the API change in this patch.
+> - Rename whitelist to allowlist.
+> - Set NETDEV_TIMESTAMPING in register_netdevice function.
+> - Add software timestamping case description in ts_info.
+> 
+> Change in v6:
+> - Replace the allowlist phy with a default_timestamp flag to know which
+>    phy is using old API behavior.
+> - Fix dereferenced of a possible null pointer.
+> - Follow timestamping layer naming update.
+> - Update timestamp default set between MAC and software.
+> - Update ts_info returned in case of software timestamping.
+> 
+> Change in v8:
+> - Reform the implementation to use a simple phy_is_default_hwtstamp helper
+>    instead of saving the hwtstamp in the net_device struct.
+> ---
+>   drivers/net/phy/bcm-phy-ptp.c     |  3 +++
+>   drivers/net/phy/dp83640.c         |  3 +++
+>   drivers/net/phy/micrel.c          |  6 ++++++
+>   drivers/net/phy/mscc/mscc_ptp.c   |  3 +++
+>   drivers/net/phy/nxp-c45-tja11xx.c |  3 +++
+>   include/linux/phy.h               | 17 +++++++++++++++++
+>   net/core/dev_ioctl.c              |  8 +++-----
+>   net/core/timestamping.c           | 10 ++++++++--
+>   net/ethtool/common.c              |  2 +-
+>   9 files changed, 47 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/net/phy/bcm-phy-ptp.c b/drivers/net/phy/bcm-phy-ptp.c
+> index 617d384d4551..d3e825c951ee 100644
+> --- a/drivers/net/phy/bcm-phy-ptp.c
+> +++ b/drivers/net/phy/bcm-phy-ptp.c
+> @@ -931,6 +931,9 @@ struct bcm_ptp_private *bcm_ptp_probe(struct phy_device *phydev)
+>   		return ERR_CAST(clock);
+>   	priv->ptp_clock = clock;
+>   
+> +	/* Timestamp selected by default to keep legacy API */
+> +	phydev->default_timestamp = true;
+> +
+>   	priv->phydev = phydev;
+>   	bcm_ptp_init(priv);
+>   
+> diff --git a/drivers/net/phy/dp83640.c b/drivers/net/phy/dp83640.c
+> index 5c42c47dc564..64fd1a109c0f 100644
+> --- a/drivers/net/phy/dp83640.c
+> +++ b/drivers/net/phy/dp83640.c
+> @@ -1450,6 +1450,9 @@ static int dp83640_probe(struct phy_device *phydev)
+>   	phydev->mii_ts = &dp83640->mii_ts;
+>   	phydev->priv = dp83640;
+>   
+> +	/* Timestamp selected by default to keep legacy API */
+> +	phydev->default_timestamp = true;
+> +
 
-> On Fri, 2024-02-16 at 10:28 -0500, Aaron Conole wrote:
->> Many openvswitch test cases reused netns and interface names.  This works
->> fine as long as the test case cleans up gracefully.  However, if there is
->> some kind of ungraceful termination (such as an external signal) the net=
-ns
->> or interfaces can be left lingering. =C2=A0
->
-> It looks the openvswitch.sh test script is already trying quite hard to
-> delete the allocated resources on ungraceful termination via "trap...".
->
-> That is usually enough for other self-tests, could you please detail
-> when it fails here?
+This probably does not matter too much given that the mii_ts is not 
+visible until we fully probed the PHY, though for consistency and to be 
+on the safe side, it would be more prudent to set default_timestamp 
+before finishing the mii_ts assignment, in case we ever become more 
+aggressive at exposing objects to user-space/kernel-space. Probably over 
+thinking this.
 
-I thought it should work - but at least what I observed is that when the
-vng spawned VM was running the tests, it would TERM portions of the
-subshell, but not the running openvswitch.sh script.  That left these
-namespaces and interfaces lingering.
+More comments below:
 
->> This happens when the selftest
->> timeout gets exceeded, while running under very slow debugging condition=
-s.
->
-> 'timeout' should send SIG_TERM, and the script already handle that
-> gracefully?
+[snip]
 
-At least, I didn't observe that to be the case when it got terminated.
-I'll remove the timeout setting and try to reproduce it.
+>   
+> -	if (!skb->dev || !skb->dev->phydev || !skb->dev->phydev->mii_ts)
+> +	if (!skb->dev)
+> +		return false;
+> +
+> +	if (!phy_is_default_hwtstamp(skb->dev->phydev))
 
->> The solution here is to cleanup the netns on executing the next test.
->
-> I suggest avoiding this, it could end up killing innocent alias netns.
->
-> You could consider using the 'setup_ns' helper from the
-> tools/testing/selftests/net/lib.sh library to always generate unique
-> netns names.
-
-Okay - I will look into that.
-
->> Signed-off-by: Aaron Conole <aconole@redhat.com>
->> ---
->>  tools/testing/selftests/net/openvswitch/openvswitch.sh | 4 ++++
->>  1 file changed, 4 insertions(+)
->>=20
->> diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/to=
-ols/testing/selftests/net/openvswitch/openvswitch.sh
->> index 678a72ad47c1..8dc315585710 100755
->> --- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
->> +++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
->> @@ -115,6 +115,10 @@ ovs_netns_spawn_daemon() {
->>=20=20
->>  ovs_add_netns_and_veths () {
->>  	info "Adding netns attached: sbx:$1 dp:$2 {$3, $4, $5}"
->> +	ntns_e=3D`ip netns list | grep $3`
->> +	[ "$ntns_e" !=3D "" ] && ip netns del "$3"
->> +	if4_e=3D`ip link show $4 2>/dev/null`
->
-> Minor unrelated note: $() is preferable to `` for sub-shells, as it's
-> more friendly to nesting, string expansing, quotes, etc.
-
-Okay - I'll prefer it in future.  I didn't know how much I should be
-worrying about non-POSIX shells (I seem to remember that `` is accepted
-in more shells).
-
-> Cheers,
->
-> Paolo
+Was not obvious that we could remove the phydev NULL check, but it's 
+fine because phy_is_default_hwtstamp() calls phy_has_hwtstamp() first, 
+and that function has that check. Seems a bit brittle, but fair enough.
+-- 
+Florian
 
 
