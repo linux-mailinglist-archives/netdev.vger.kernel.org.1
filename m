@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-72433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05211858148
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 16:37:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2280A85813C
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 16:36:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3890C1C21016
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 15:37:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7444B21B45
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 15:36:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DC891420A6;
-	Fri, 16 Feb 2024 15:28:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 066E0139581;
+	Fri, 16 Feb 2024 15:28:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W66p4Xsr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="grz+0Mh3"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A732C13AA56
-	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 15:28:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FDBB12FF84
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 15:28:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708097338; cv=none; b=eRU1gKaTbVBuhXLTMVHZcW5aM5bEi5foxxPdf9yd0+uhp6fDjGSDyY06F2sNvFtkV0UT7Je71sHF++v22XY8nuSIstTBtHMC6zfEBHD4iRDrBFgyO8QCapKkY+sp1+WHqaw9Zhv+1FnnekU3AtlSWarHSQQedCj9Mqcbqh4Ko0g=
+	t=1708097335; cv=none; b=rjJVR7amBZjgRpZmETnqkqA7IjP4DAo4Dui5/2bMxaQH+KpWst0TvJPUBARJ2n6LBzuAkXVx2tL7MNRd9ibnH/mVFxxpgU173RRTcV31oAzcseoQ188P8kf+DpAjEB17p9oxKckTPCgOKeUC5IcIKdQFwXo83Wi0N9B/WMKvdtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708097338; c=relaxed/simple;
-	bh=gFKj/PeEIe6OjteVeU7pc6vwa/E3Z3NoAKff2scSwiQ=;
+	s=arc-20240116; t=1708097335; c=relaxed/simple;
+	bh=Mif2Pw9Dh6MEkFyqulQXsxVjnIm4JFp+wr4NhK2k9K8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=M7LGDH5yyiAEvbq+evLuFSIYIzles47jNFnNDj6soebC73UdC3/lHZ0XPgpJscwlY78XK2uJhvgZl3kp5l7+4xopGBBT5RjvUZm/UzkEv5rfXGTyP6mfIK5kdMglfP4S3Mgw5pIRVmeZJLl7GSKhcvwwhoZB3lqCW4SO0D/nT2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W66p4Xsr; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=sfk/RVdwAqjQj0X7NatguzjBvdJPHsb/3BrLTf5vQnPP2evOOyaWKstj558nrrnWp0l6rqHmXM4FJV8Yf32WaDqlRs+0qnVqyaP4WG3vJCNK3u4YNwQ/m8Xew5w5I0DtCtJBM/+xhUv4lsstOCM1zYBe0WtdrjYhBXgUX136bxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=grz+0Mh3; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708097335;
+	s=mimecast20190719; t=1708097333;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=aD4pjXcBxUTwpnjEXzSh5eXbo4UExERB9Ao4MtQZ2EA=;
-	b=W66p4Xsr0EqqqXGOIRDlPZ+HBNxIDJ5MhIix35tiM1WTew4Fp6Yjh6x3beeKFg26vtmmXN
-	PdRhqrgISIe0WmJKHxOkl3MLiVHlfjdq/15+rxIYtFYEuZANyJplDMtVd0tNT2Re8/YYP5
-	f+g9Acq2brF8a6oRkzDqVc5oKEgVEnQ=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-323-ehuCETy6MRiidclAeDfzIw-1; Fri,
- 16 Feb 2024 10:28:51 -0500
-X-MC-Unique: ehuCETy6MRiidclAeDfzIw-1
+	bh=X7CZOyXG6xCsS25p93OCgGL3CKwaUM6KdPuUn2c9nUM=;
+	b=grz+0Mh3e56Si5ouaqrxkMxmyng77uo5ipxXsfhASx0rIv9Rsu67yGKkivpnbh2WTwFpxc
+	lgE8e9PJi2A0/klWddQyJ0y3sguscsIj6s8DmCuAcIWXkz9WX/cQ2bJdICW3sigQPSuuW9
+	12wU+apPehF8hRNXaXWb+elG52xTwGQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-654-F2P-j2oBNnyNfOk3U04lOg-1; Fri, 16 Feb 2024 10:28:51 -0500
+X-MC-Unique: F2P-j2oBNnyNfOk3U04lOg-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7C93B3C1E9CA;
-	Fri, 16 Feb 2024 15:28:50 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 04472863721;
+	Fri, 16 Feb 2024 15:28:51 +0000 (UTC)
 Received: from RHTPC1VM0NT.lan (unknown [10.22.33.57])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0E5AA1C06532;
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 89C3F1C060B1;
 	Fri, 16 Feb 2024 15:28:50 +0000 (UTC)
 From: Aaron Conole <aconole@redhat.com>
 To: netdev@vger.kernel.org
@@ -68,9 +68,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Eelco Chaudron <echaudro@redhat.com>,
 	Shuah Khan <shuah@kernel.org>,
 	linux-kselftest@vger.kernel.org
-Subject: [RFC 5/7] selftests: openvswitch: make arping test a bit 'slower'
-Date: Fri, 16 Feb 2024 10:28:44 -0500
-Message-ID: <20240216152846.1850120-6-aconole@redhat.com>
+Subject: [RFC 6/7] selftests: openvswitch: insert module when running the tests
+Date: Fri, 16 Feb 2024 10:28:45 -0500
+Message-ID: <20240216152846.1850120-7-aconole@redhat.com>
 In-Reply-To: <20240216152846.1850120-1-aconole@redhat.com>
 References: <20240216152846.1850120-1-aconole@redhat.com>
 Precedence: bulk
@@ -82,31 +82,57 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-The arping test transmits a single packet and immediately tries to pull
-the log for upcall details.  This works fine in practice on most systems
-but can fail under a slower VM where it can take a while for the log
-data to be written.  By adding addtional transmits we give the system
-time to write, and also increase the opportunity to not miss processing
-the upcall queue.
+The openvswitch tests do not attempt to insert the openvswitch module
+automatically.  Now the test will auto load the module and try to
+unload it at the end.  The test harness includes the option to not
+load the module, which is helpful when developing changes and loading
+the module from a different location.
 
 Signed-off-by: Aaron Conole <aconole@redhat.com>
 ---
- tools/testing/selftests/net/openvswitch/openvswitch.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../testing/selftests/net/openvswitch/openvswitch.sh  | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-index 8dc315585710..a2c106104fb8 100755
+index a2c106104fb8..e7c9b4fc5591 100755
 --- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
 +++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-@@ -598,7 +598,7 @@ test_upcall_interfaces() {
+@@ -672,12 +672,14 @@ run_test() {
+ exitcode=0
+ desc=0
+ all_skipped=true
++LOAD_MOD=yes
  
- 	sleep 1
- 	info "sending arping"
--	ip netns exec upc arping -I l0 172.31.110.20 -c 1 \
-+	ip netns exec upc arping -I l0 172.31.110.20 -c 3 \
- 	    >$ovs_dir/arping.stdout 2>$ovs_dir/arping.stderr
+ while getopts :pvt o
+ do
+ 	case $o in
+ 	p) PAUSE_ON_FAIL=yes;;
+ 	v) VERBOSE=1;;
++	n) LOAD_MOD=no;;
+ 	t) if which tcpdump > /dev/null 2>&1; then
+ 		TRACING=1
+ 	   else
+@@ -697,6 +699,10 @@ for arg do
+ 	command -v > /dev/null "test_${arg}" || { echo "=== Test ${arg} not found"; usage; }
+ done
  
- 	grep -E "MISS upcall\[0/yes\]: .*arp\(sip=172.31.110.1,tip=172.31.110.20,op=1,sha=" $ovs_dir/left0.out >/dev/null 2>&1 || return 1
++if [ "$LOAD_MOD" == "yes" ]; then
++	modprobe openvswitch
++fi
++
+ name=""
+ desc=""
+ for t in ${tests}; do
+@@ -716,4 +722,9 @@ for t in ${tests}; do
+ 	desc=""
+ done
+ 
++
++if [ "$LOAD_MOD" == "yes" ]; then
++	modprobe -r openvswitch
++fi
++
+ exit ${exitcode}
 -- 
 2.41.0
 
