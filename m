@@ -1,139 +1,200 @@
-Return-Path: <netdev+bounces-72578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97D1A858935
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 23:53:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F60B8589CD
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 00:10:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC2731C2145C
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 22:53:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C52DC1C22376
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 23:10:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D5A01482F0;
-	Fri, 16 Feb 2024 22:53:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE76E1487E7;
+	Fri, 16 Feb 2024 23:10:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="PV/OID6E"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AOXSXFWr"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2058.outbound.protection.outlook.com [40.107.237.58])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF6A71419A2
-	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 22:53:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.58
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708124002; cv=fail; b=PIjenLH0lQEIpRmRsAmcdo3Me8cy7pNDaBRMWaxBdUgN3aNvdPH7df/MVJvgAJIPFBzr/+L6E1Ap6eGkfv+4zgKaLiZsSsfYxVWh5m3cuDEsUlKWzq7bIh7rLE8XetS7G+vDNHoC0xXkYLmf4EqztB0/d0pvjINZhzflM4J5aX4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708124002; c=relaxed/simple;
-	bh=hHLEgGIECUkGQMpOW2vzX7zy7Ea7mtswroGX7t9Qhj4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NKEjIaWlQeWN8y/RzCHyi4d5ASYryBmJxEClJjVfPoRG7fSSbnbonQ04DLscaYujJijOVW78r5RZyBXeKGORcSeYz8WFcY/EV7aesTW4DKCNqH6m5UKvEEYVbddlNB190vnd476/C3rwQgudz/ckZn5qd5BcUqJn9z5qA7bXVGU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=PV/OID6E; arc=fail smtp.client-ip=40.107.237.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IPZy7piuAMjSLCCRiOxcnfkSE315a/vcWujyQ3dDB52Xd/zeKjkg9xZigV3jLcQtyVbEw5fKW49d1ZMOgOcM5sgJmIj2YzelaaT30Yj5aIVuGNc/gIkRdEKJzEGQg/dr2I3f+IUR7W/EJfShVWYrmB1oGNTZFBePglCWdjhqkVPRoAoevyVbvR28ulJrmltW4CVbugHHVTlgEbTP3eIxawhhiGKnA6ZvjO5Ensa6nsHWzmHDzUX66ZWTFOQ9X/J4duna91q1OPchvPcwHJJx3jc5ZJ7lxu6vOcR+lpuy3uRH7Z89NMeRU+auA9BtSqGwp6kq/12839jVchgXHSVTWg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sMwDLgGGCMUOPvp1DsoHjRJxfAMHphawG3GKcF5vyIk=;
- b=g+dHpPHfHA+n/p8KMidSAsiHZhCPXY2oh7ytuahJa0wD5B3ClCJPYhIhmHzaE+6SWUOg9mjhQYbXu0yL6VZ7kM6YdXmFVozbqX6IUjMRDNzx8aZsW/A0BVV+r3ots9uJz7FOtetYmuAbRDwOK/j8E+JhHE0IshiRzIGJ6DhUbV82O8PlMVqHgQDhdsa75cgLyDyjAfx/3XpD+T5R13vDOAqCQ9g46ED+EyNVOSV7VxnYxw6ye4dEtEkjN3Baf0nzS02S0Tw5EoAAWNvX7yr9KcdRiVrbDIy/O3ZnBtJId2KE7AsZHiWGTkVasq01tzcZ355He/3ly+zk1dtMF3VLXw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sMwDLgGGCMUOPvp1DsoHjRJxfAMHphawG3GKcF5vyIk=;
- b=PV/OID6ENiuMrZkPvod639QLt28VBn1ZrTMEqg4+487Tj0Q/h+x6rNBgdGgggubISt64oOoLoff/sVaULJlKnyg3PqbuKxcZRQyjGvcWlV/zThqfJE5g1fBLoqKK2N6ydmxJMphmKaPU4WmJVOUrYCa861ioP1SgQE9MXfGGPYU=
-Received: from DM6PR03CA0045.namprd03.prod.outlook.com (2603:10b6:5:100::22)
- by PH7PR12MB7116.namprd12.prod.outlook.com (2603:10b6:510:1ef::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.15; Fri, 16 Feb
- 2024 22:53:18 +0000
-Received: from DS1PEPF00017090.namprd03.prod.outlook.com
- (2603:10b6:5:100:cafe::93) by DM6PR03CA0045.outlook.office365.com
- (2603:10b6:5:100::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.26 via Frontend
- Transport; Fri, 16 Feb 2024 22:53:18 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS1PEPF00017090.mail.protection.outlook.com (10.167.17.132) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7292.25 via Frontend Transport; Fri, 16 Feb 2024 22:53:17 +0000
-Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 16 Feb
- 2024 16:53:15 -0600
-From: Shannon Nelson <shannon.nelson@amd.com>
-To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<edumazet@google.com>, <pabeni@redhat.com>
-CC: <brett.creeley@amd.com>, <drivers@pensando.io>, Shannon Nelson
-	<shannon.nelson@amd.com>
-Subject: [PATCH net] ionic: use pci_is_enabled not open code
-Date: Fri, 16 Feb 2024 14:52:59 -0800
-Message-ID: <20240216225259.72875-1-shannon.nelson@amd.com>
-X-Mailer: git-send-email 2.17.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C8AC1487C7
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 23:10:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708125013; cv=none; b=ML1uHddI2uiYMAWXurzLyWWALSjyKAiQcx3NGrBgZiyVCV0tWehmMqXLdoAmjSimebQKQM6UT2o4Bhjal551oenKkiUg0rQSQQsxvDw/BmFuz7bbrZLy8iN7eNQKKUeF5QLNXeZVfehPhr3nsm6y3YzzZeBxOuYczHOCi5MXzQI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708125013; c=relaxed/simple;
+	bh=mfmEA6zSa+OORWqKlFgSku5kK5nwRZdQXnKi8D/SPd8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Y/Fwk23B/7cnwhSCXtErtOroFRgFtYc4Dy0XiuylCmYgRLylktLvL3EeVtHMSSO8ALWxdqkh4VojpiVsizT5LlLsvRb3ID4/taM/hNr8U1w4Fa4i0ki1KJ/tlZ1Pz0wV0aPVAI8pGLmcwkWXZmBZi4kLuOJikYLXcDulr+kpkHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=AOXSXFWr; arc=none smtp.client-ip=209.85.128.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-607fe8cc6d8so9763827b3.1
+        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 15:10:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1708125010; x=1708729810; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=EpftqacOdWcIxz3VUpc3zI1U/E0RwbiBZdYsX7Kb7J4=;
+        b=AOXSXFWrpecqGsj3FvbdDQIjHjP887SkBI4Bl4qgqmEyp6wk619/ClmzdoNIeOtz1j
+         tDFBRTTZ4BXijtr5HVAG7cqu0BwWijfc2LxgvgRliDfPlGHPIGKzJIhHQjwHJelHjVyQ
+         rp/dpDg/lvX62bGEdspeYlpgcqI7rCHt98CpiYsWMLSCTyHysVsLgsH/Mi9PXkv8IZPW
+         RnrDP9WUVm04kHfQ67x4VehA87dgAMMC2vEyqSy2YCDH6nUvxKMvEaFL93I/+w8AsTPZ
+         1hRoKNSn/OHxCPYYv+J9IC1EJfc+1aBHZQcbLbRU6Wlr1XeozRteflUVXWLLrhaypy2B
+         //xA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708125010; x=1708729810;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EpftqacOdWcIxz3VUpc3zI1U/E0RwbiBZdYsX7Kb7J4=;
+        b=k8PLaqm2OlYzEuKaVknW57e4Kp2hrhEaqStsaEwLc6QkcA/56yPJ/oi9TPyg9h4y8d
+         qaXUvIds0luRInP9vT8RjBhtD/zYbFsuPGTjyOYsGvoiQYwFfFYmlcl236O9KZFC398p
+         LjIKAmZpR4rPqA1rpiZa6c183efL303aH9Pxp8Bwvp+rjDfr2v1+P4sJx3DQLr5qIUDA
+         91kHXqh3dkJLZGkyu/BEVEZ2IlpTSAOsF8rRIN3FcZqNY+fFT1Z9y5rKVT38/ikEpAcY
+         CKIEyg4B5NjsOwgL6v3+qcUnLT3cFywRCjJTbSIT11wIOmTy5KbYGwJIAY9ru5BzsK9h
+         +5Yw==
+X-Forwarded-Encrypted: i=1; AJvYcCXw7av8TurU6Nk0xQIZYSPG9H7AeWI9RR/xhF4vrG00GF2NaMpT7/ZH52GhqZTcpTxYzoX2lOVwhhNAixEBAXZpCourKGMB
+X-Gm-Message-State: AOJu0YzRjsOpIzlz7AzI8jszJAW40wWzEBKRNWUZjNMoLjZdc5zn8VHP
+	n0kQlOgjMfffHy8CuPlkHfPqEEKt0wFP+v+MpS/dAVV8PPVwnCWGSe3KoUup7S/wwUmOTOF0MWE
+	q/v568zHronCt7wU07s9L2N6kxl77cGT3xTFjgg==
+X-Google-Smtp-Source: AGHT+IH7vS67BhaJmZ0qKWVe6no0q/4H1vlJ1cE1CsXNcFt1Pp6VcJPBg/0mptzu0uQFXbGKADhe7nfa9TyYWhC6deg=
+X-Received: by 2002:a0d:ebc6:0:b0:607:ec66:36b3 with SMTP id
+ u189-20020a0debc6000000b00607ec6636b3mr5019006ywe.19.1708125010589; Fri, 16
+ Feb 2024 15:10:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF00017090:EE_|PH7PR12MB7116:EE_
-X-MS-Office365-Filtering-Correlation-Id: d2c7b111-5d03-4428-528f-08dc2f42110f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Q4Hg+BulOVHHRFdkkx7kRXCAJGT4aM/t/T5HEq90EcHZotrziZ8MrhPbm5472+ugPrZkNYrT7fp5NXYp4yXkjRFu7dZOjcjYHuff9Eh4aFNsCKP/OVXhAbkpwp0NwZwFKX30GEGCBtwym2TVTBNPbzFlSP4q1epEJWVmuWUuRW1nI3hTlOiUFo//tNx13LoZoCpkzV+45tU5Z8arQxcSIMNGeiRfStpsPhJI3FpMRzoENmw/TytHp206v6JkZorAfOus0EtEJBFROLcL2eu6UaiLZlzfgynX+RhC4aydMwHQMfwY19t6bgpgBAALc/ocF+h9y4rFnBgdJdaMuUfU+4o+wDSNPIyVKZLF80zKaMAHhhyzh8LzvOdZ6Ya1iOAo7dJN9ffDtLPheR5IkKza/rG4AsZZGWTzXXOTLebYk6SlVezJXxEiloG/TDv3SyrVCKAS8OuYnjl5oWV9+DvPf5KsXQ3uRP2qJx+hcGA40V4MJ0wI4prvIEugjd0tjJZju7DOAIL8EqiEIqLp6FT8YufQljNnL42Una4KYS+XSuGDobmiyOteDGp7MWd4N9SN6uu+J49UCOWXcfUREANwyaifvf/tKCYgQtedEacoVd4/JKZvuo3eja5wnl86ayb4DcA9AevkEBVf3hfT2E2T9r32XFZ61DzxsVj/BAT4lCY=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(136003)(376002)(396003)(346002)(230922051799003)(1800799012)(64100799003)(36860700004)(451199024)(186009)(82310400011)(40470700004)(46966006)(86362001)(356005)(81166007)(70206006)(70586007)(4326008)(8676002)(8936002)(82740400003)(2906002)(54906003)(44832011)(4744005)(5660300002)(110136005)(6666004)(36756003)(83380400001)(478600001)(316002)(41300700001)(16526019)(1076003)(2616005)(336012)(426003)(26005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Feb 2024 22:53:17.8300
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d2c7b111-5d03-4428-528f-08dc2f42110f
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS1PEPF00017090.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7116
+References: <20240216203215.40870-1-brgl@bgdev.pl> <20240216203215.40870-9-brgl@bgdev.pl>
+In-Reply-To: <20240216203215.40870-9-brgl@bgdev.pl>
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Sat, 17 Feb 2024 01:09:59 +0200
+Message-ID: <CAA8EJpry2yiGXrtPqZ6RXnoTqQZr_hxA_gCPsUbmyFtEBuD4VA@mail.gmail.com>
+Subject: Re: [PATCH v5 08/18] arm64: dts: qcom: sm8650-qrd: add the Wifi node
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Kalle Valo <kvalo@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konrad.dybcio@linaro.org>, Liam Girdwood <lgirdwood@gmail.com>, 
+	Mark Brown <broonie@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Saravana Kannan <saravanak@google.com>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>, 
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
+	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Since there is a utility available for this, use
-the API rather than open code.
+On Fri, 16 Feb 2024 at 22:33, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
+>
+> From: Neil Armstrong <neil.armstrong@linaro.org>
+>
+> Describe the ath12k WLAN on-board the WCN7850 module present on the
+> board.
 
-Fixes: 13943d6c8273 ("ionic: prevent pci disable of already disabled device")
-Reviewed-by: Brett Creeley <brett.creeley@amd.com>
-Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
----
- drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+WCN7850 is the same combo WiFi + BT chip. Is there any reason for
+describing its parts separately rather than using the same PMU
+approach?
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-index c49aa358e424..10a9d80db32c 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-@@ -223,7 +223,7 @@ static void ionic_clear_pci(struct ionic *ionic)
- 	ionic_unmap_bars(ionic);
- 	pci_release_regions(ionic->pdev);
- 
--	if (atomic_read(&ionic->pdev->enable_cnt) > 0)
-+	if (pci_is_enabled(ionic->pdev))
- 		pci_disable_device(ionic->pdev);
- }
- 
+>
+> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
+> [Bartosz:
+>   - move the pcieport0 node into the .dtsi
+>   - make regulator naming consistent with existing DT code
+>   - add commit message]
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> ---
+>  arch/arm64/boot/dts/qcom/sm8650-qrd.dts | 29 +++++++++++++++++++++++++
+>  arch/arm64/boot/dts/qcom/sm8650.dtsi    | 10 +++++++++
+>  2 files changed, 39 insertions(+)
+>
+> diff --git a/arch/arm64/boot/dts/qcom/sm8650-qrd.dts b/arch/arm64/boot/dts/qcom/sm8650-qrd.dts
+> index b07cac2e5bc8..4623c358f634 100644
+> --- a/arch/arm64/boot/dts/qcom/sm8650-qrd.dts
+> +++ b/arch/arm64/boot/dts/qcom/sm8650-qrd.dts
+> @@ -845,6 +845,28 @@ &pcie0 {
+>         status = "okay";
+>  };
+>
+> +&pcieport0 {
+> +       wifi@0 {
+> +               compatible = "pci17cb,1107";
+> +               reg = <0x10000 0x0 0x0 0x0 0x0>;
+> +
+> +               pinctrl-names = "default";
+> +               pinctrl-0 = <&wlan_en>;
+> +
+> +               enable-gpios = <&tlmm 16 GPIO_ACTIVE_HIGH>;
+> +
+> +               vdd-supply = <&vreg_s4i_0p85>;
+> +               vddio-supply = <&vreg_l15b_1p8>;
+> +               vddio1p2-supply = <&vreg_l3c_1p2>;
+> +               vddaon-supply = <&vreg_s2c_0p8>;
+> +               vdddig-supply = <&vreg_s3c_0p9>;
+> +               vddrfa1p2-supply = <&vreg_s1c_1p2>;
+> +               vddrfa1p8-supply = <&vreg_s6c_1p8>;
+> +
+> +               clocks = <&rpmhcc RPMH_RF_CLK1>;
+> +       };
+> +};
+> +
+>  &pcie0_phy {
+>         vdda-phy-supply = <&vreg_l1i_0p88>;
+>         vdda-pll-supply = <&vreg_l3i_1p2>;
+> @@ -1139,6 +1161,13 @@ wcd_default: wcd-reset-n-active-state {
+>                 bias-disable;
+>                 output-low;
+>         };
+> +
+> +       wlan_en: wlan-en-state {
+> +               pins = "gpio16";
+> +               function = "gpio";
+> +               drive-strength = <8>;
+> +               bias-pull-down;
+> +       };
+>  };
+>
+>  &uart14 {
+> diff --git a/arch/arm64/boot/dts/qcom/sm8650.dtsi b/arch/arm64/boot/dts/qcom/sm8650.dtsi
+> index d488b3b3265e..baf4932e460c 100644
+> --- a/arch/arm64/boot/dts/qcom/sm8650.dtsi
+> +++ b/arch/arm64/boot/dts/qcom/sm8650.dtsi
+> @@ -2293,6 +2293,16 @@ &mc_virt SLAVE_EBI1 QCOM_ICC_TAG_ALWAYS>,
+>                         dma-coherent;
+>
+>                         status = "disabled";
+> +
+> +                       pcieport0: pcie@0 {
+> +                               device_type = "pci";
+> +                               reg = <0x0 0x0 0x0 0x0 0x0>;
+> +                               #address-cells = <3>;
+> +                               #size-cells = <2>;
+> +                               ranges;
+> +
+> +                               bus-range = <0x01 0xff>;
+> +                       };
+>                 };
+>
+>                 pcie0_phy: phy@1c06000 {
+> --
+> 2.40.1
+>
+
+
 -- 
-2.17.1
-
+With best wishes
+Dmitry
 
