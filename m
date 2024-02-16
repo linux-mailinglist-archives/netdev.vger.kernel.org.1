@@ -1,180 +1,230 @@
-Return-Path: <netdev+bounces-72421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31125858021
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 16:05:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26C8285802B
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 16:07:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 561F71C20AAB
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 15:05:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D27D02823F4
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 15:07:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE1A712F383;
-	Fri, 16 Feb 2024 15:05:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B32F12F38C;
+	Fri, 16 Feb 2024 15:07:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="mjpAljld"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="ezh8ad/P"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2046.outbound.protection.outlook.com [40.107.244.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBAA612EBF9;
-	Fri, 16 Feb 2024 15:05:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708095953; cv=fail; b=ZaxBjKJN6TubAvOH16B2RoN2U6VrQog4IFaKkZW8cCICQVQ48oxW8ZTIoBGPqTkmBlkLE2vdh3aTF9kYhxgciQRK1p8CJTfiWhM+kKabWKC0zCVFB700bXDOUVnPeB+njA/QuCBsXS4Yg+/o2jUlog9Z5xzT/0tFPE5BoK+Odfk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708095953; c=relaxed/simple;
-	bh=nPTZR00HxSNJqi19ptaNnq9qzfkAqEVNBnYuXoKqJiE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=ID9AIW/Mhthmrgq2j4LwtCBqIpgB+B4YzPIhhTd0CGhgOPMZwTYoUkoVzU9hGe1NVKlb9pgkNdQ1yIPVcVQMnqRgL01YgHkOk+NwgDWpCZZMiJqjIRG8//ZV61qS+ZhpTg5t5H++BJSyPzC9wD3l42eSjPykUwCyc9u5RZzuwF4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=mjpAljld; arc=fail smtp.client-ip=40.107.244.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JmrabtBEw6cYCy+LVp1vuzT2BYvL/U2qUNQ56mgymlg3IDl+lNV89sezRzHGB+xaoZBA7VjMZyWzSJ1xHSAe0aIESdRx4g6G6ReV5b+zk8p0Ohd0PS7VEqAK2qiRXN/WMVE38KjcaHWbmSgFi58/mSPNOnZRM2KvwVojx1wa/MOpdZmA5m8J6KZMYD0xPBpaHN/yPhlVF+6SMIh89C6HGU41wD4RKulnRJ9PLEV51DXS95aTv1nAANFNqsBd7QHaB6joFw7UcX3ql8FkH3qWOjEl/HcJgRIw9wM3j419bFuZVzdbkCXKoohyDP5p33VZKAvBd+jP+lNNQW/7OqKVdA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Sp9+K+DlJ4MqoYLe/om6Nl4AIO68COthXe24NqKeoyA=;
- b=AO217vO/RnRgoLkEbZpBvUG/Y2D+T2ZPtOPaj+TLFp3tNPTMP1ohv473OGyyZbzPk+dTWLezIGYEfV7VinUoUcIhkq2Oq+3oBX8kqEP8RJXoSObN394BDSXtA4FWPXPE4Uejega6W8WsmDx/wZwiIYUnLJJM+UPezS5+WJLKI0FYdibPK/SR0ck04FHp6Qrvf93MH9SkZDZb8DN4JVwDti/zaQctac8gencLlCxjW3/KCl2+AFQQLdVG/6eAReH1x8GzQesGyiReawvnPe7gYl0BsoCy+6KXAuO87KOg1kadTscXwmm3e/xYkLRHRJbaEYCFHwuD53bhpKdPx5AS3g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Sp9+K+DlJ4MqoYLe/om6Nl4AIO68COthXe24NqKeoyA=;
- b=mjpAljldCeKn0i9GYgM2g4Y9l1yWykKh/gBY2PKymvJIE6bzjdvV3ajprfgK17kKBbx5AEjYrLNwFnQZ1EvaE3CBq28EHwSK1DfzbBH9uoI6gDnfKKaQ4fuQ/0lw/3WJDHYCrEbnrrep+rHXu78uaCQigPUmztIXqnM0tEeoba2VU7ira80Nup20M3gjEZ/OuwDxA+/tQUpnYKNgHdJ8hGb4ke79ZqZwlHFy0ja1sY8BRSDZMtIDTOVlFkCMI+jqpwW503m2uluU2qRVuz9HhgYPd5+VqO6E9/3uKZUjEYJ1ZPOVYnqguUOWnCchaHFWD3eraF+y/34townY+Maojw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SA1PR12MB6797.namprd12.prod.outlook.com (2603:10b6:806:259::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.12; Fri, 16 Feb
- 2024 15:05:47 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::96dd:1160:6472:9873]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::96dd:1160:6472:9873%6]) with mapi id 15.20.7316.012; Fri, 16 Feb 2024
- 15:05:47 +0000
-Date: Fri, 16 Feb 2024 11:05:46 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
-	Leonid Bloch <lbloch@nvidia.com>, Itay Avraham <itayavr@nvidia.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	David Ahern <dsahern@kernel.org>,
-	Aron Silverton <aron.silverton@oracle.com>,
-	andrew.gospodarek@broadcom.com, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
-Message-ID: <20240216150546.GD13330@nvidia.com>
-References: <20240207072435.14182-1-saeed@kernel.org>
- <Zcx53N8lQjkpEu94@infradead.org>
- <20240214074832.713ca16a@kernel.org>
- <Zc22mMN2ovCadgRY@infradead.org>
- <20240215170046.58d565ef@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240215170046.58d565ef@kernel.org>
-X-ClientProxiedBy: BL1PR13CA0323.namprd13.prod.outlook.com
- (2603:10b6:208:2c1::28) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1089412EBFE
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 15:07:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708096069; cv=none; b=BKZeCSpCcIeSMbsfmWUt1hOYUxaQE2ohdQsaxBkdqtLqKSk7nIplhjtwYBt1Upr90RNEwqa58OMbUty+8ds3SWYDsu6SxpU6ImwQrJbAOf771A6cyX39R9vx0nMEsr0YHvlweIdP8GYIjTZzGUWr9vGH5a6oVk+GKdFNCd/0ayM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708096069; c=relaxed/simple;
+	bh=dz57b6MPs4sjkEZDmmbKb7QUqIItUq3KGAxEbVI0qFE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KjQy+pITMfsiAs175+isJZosBGYMDzf4UhX0Bi1bvMu/K1Hm5LuPYKnAICl/5sgQ4YI1iC3ouAe1CthvlihlOv3247yJSZHVeTjOTowl0JQTubOHKSpNtnjxeRz6j3P1A680nzTGD6fAoWBdOU/m4hIczR2ypa/ubJfYWV7NRs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=ezh8ad/P; arc=none smtp.client-ip=209.85.128.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-607c4fbae6dso15030427b3.0
+        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 07:07:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1708096066; x=1708700866; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jABSvVFdybJnwFndUwOT4Ar5XFTLlUPXCxtIkhAdQUc=;
+        b=ezh8ad/PZL8wcDMUYIoqRkQBVkl/aSQYKRcX41mw12cpmZfCKtTcWzy553N08pmnB0
+         UtVBtswheddEUen7QKakG+mdEyBe7Rx9DK0Podh0iIvf7ahwva2SMldmz7sqCzqcWFMd
+         Tt+6ebqpY5OrSqi5b+RsgHkLL3/jxyWbeSBu+wdxaEQja4sFmmUKTEzTexS0ckDScAnM
+         9YUksyzQCnRpOgaziSLG2h5RbJmSsHk1KK9s0QPaLC76kZGtF+6r57yeAO7Srl4Lj243
+         07Ho8KDSdHgH4oqi1jpG1IOuXEbg7lDmhB0tuDIZji+wHNdDebP8WeTks/JVbTd+29lx
+         3lfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708096066; x=1708700866;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jABSvVFdybJnwFndUwOT4Ar5XFTLlUPXCxtIkhAdQUc=;
+        b=ReItStvonWdYuaIyWvMumFql4gC24VGCPrQkUMIzF50kZhXnyEkTeXFrpM11UK6idQ
+         NgJ8Fp7E39DzO/iHEXvvw4LowL4eggWEP8/Cd2MErKBcAF9GJJ0/0JC1eypVlqo1EJbI
+         fNaSebaV+dKZd/9Rebbch0DauPSzoqp0WPWCiuGZ66nGLkQhbTs3StP5srF8oQZUG1gI
+         nxfnqZGRtxNLWA+RWYctKdlP0qGiz1tjebwsqyPTYHe5Gk/1zyEt8yO+i36tlXs8Z5r3
+         DEX0AmQS95gLHceXXmCUTJg5SdhcJYTY2DVwRM4o49FEzNMs6NVMY3XafEkTkdd5x9aB
+         WPsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUkV0hjAJGMEFSAxldpGnMvTab8u+3eKowiZOAMzjG3mzg91c8QI/c07ZCR+p6TtcWx1nOaWV+AbtG9bpl4pV/6+5tyMs8j
+X-Gm-Message-State: AOJu0Ywv+yG+N51zdBOA2D140oJhP1ozYWQZN+wGjCQ+fstakJN16eMd
+	IyX5uviUXqO59gA0nH6qxArvIRtXnWW+roT3PPVB3GHMRP0kfAU1X0VSUZWr1Ldw9sw3fHOKXG8
+	AuogPXW5S8YQCaWmjMxOoAi7YVazqgRXUJaoQ
+X-Google-Smtp-Source: AGHT+IH3Q1PhMiM2GSdEx5fJpTkjVFwL8omSuJrobSp1jQ0+iYRdL0Z4f0YYJ0+1/K8H/u7Bqh2bNCmwsszRw53c5XA=
+X-Received: by 2002:a81:b041:0:b0:604:df1e:41ee with SMTP id
+ x1-20020a81b041000000b00604df1e41eemr5087014ywk.46.1708096065912; Fri, 16 Feb
+ 2024 07:07:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SA1PR12MB6797:EE_
-X-MS-Office365-Filtering-Correlation-Id: 65155c20-d6c7-4a50-da81-08dc2f00c1a5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	4s17byXx9c20570xd/H46UmlCM5uBzty5kfxk3EqU+62SZgZpV/pS+EitkcvdGNrl09cmkwfIzSTFRiX2RQQ0V+FSAj6jMZmli+/89FleQZEr8yRpJbCnN4ZbFhy5tPaS9DDTlwtZ59r91Sb3J2viRWcYVqOQh7jmPWE/uQmBk35UIZyCR8TTc2sF7LAW4rs7Ax/O4+bYs9kiYo0VNhM+qqGPaugL5LnX5mP/NZizPH4xHWj6B7Ux6KE+rlgbypAHwptPRxF5u2b0koF4qghkn1X6ij3OINUBlmCbtlyoS0rrkG7372xbCfH6IcnfngMWL4778m9iq5Kfo+BwPWWYmQJdjXwCnfQ7MI5D9663/vr39f4pkHkC+4pcB5VzE5H6h2VlmQeEMMq+mtDREu2ExyhUOONGCiuGVP4Ba7+Dm08HQtD4St0qdx2WljQacSBJvq2/ckw4KDtCn+SUTbifXzHhFOjtuom/F42BCcV3XMwXFL42XbEDJfcLqEzLs0C8GRmeOsZOemS2OIJs4neW9fEwuIhWuAkvR/Dj9DX6AtHLsD8ml144wYP6gxdR9fO
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(376002)(396003)(346002)(39860400002)(230922051799003)(451199024)(1800799012)(186009)(64100799003)(66946007)(66556008)(5660300002)(66476007)(316002)(6916009)(2906002)(4326008)(7416002)(8936002)(8676002)(86362001)(478600001)(33656002)(38100700002)(83380400001)(36756003)(6506007)(6512007)(54906003)(6486002)(41300700001)(2616005)(26005)(1076003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?opR+aDskhQKr62SSuzlC1QdeGBRmBR/Ru8kASTB0/rgEvI+kvHta/clRSsRo?=
- =?us-ascii?Q?Ov7Ogxes72MARp7Ftvlg2v2QlYnlM9Tx5sSxiGCg3R3KzmwS8gZ+ufPHMqUA?=
- =?us-ascii?Q?1TKoNDHlJhL07hwcNdAxp5dMWsHfBPAdfQtp0P4w/Qo8HAULKJ6t6NsqyKCL?=
- =?us-ascii?Q?m/jgu/zBFH14R+AkL2oA2c9KuFfqcCnRzOYb2oR4BzPHSleRsLlkz5Q8yUrZ?=
- =?us-ascii?Q?8RrpS8Fx5Rf8FgWQFFX+Z4SW8GCBtNdCjuU7qSsarTQkxmS8NUJ3ZlPpBTvI?=
- =?us-ascii?Q?ZINxGvRV9szkuAG/riCSfWgHNMGBv6sDsZt0NPoxC7tYvIcqf/4f7FWy+sNc?=
- =?us-ascii?Q?+Yv07fSXPQ0E024z8Ytx38J1MHgyA2+U0WYsKKIVJPFFy2uzy2m0vy4hTEBn?=
- =?us-ascii?Q?nJQ6QMTXT/73KfhFdnnvMoO7gn1CI1A+FSlc8n763KP/ajNDAoSEl+ZLqkxi?=
- =?us-ascii?Q?7+1Kk1mnPZIIhlJEJ595INtbmwalAtVJ+m1VpYAdcMH97qdJBjRy5aosYrTu?=
- =?us-ascii?Q?4x6LreeTNRS8ohEiLkqGct37x3/SGyev/OMui/WpPIcv8qrMXZawsf0A0zVr?=
- =?us-ascii?Q?p1VEyqrw5Cn34LJWwR94xkJsQGa8mkBqXpzJZEBfT+6yl7/4KU1HdBaZkw1M?=
- =?us-ascii?Q?tfb3c0qpVpm3HCPX7Oo4xNsbIji+z1vPnBi3aA3KmzTwnAhMgJ07CG/THNcq?=
- =?us-ascii?Q?eMgHCD42mvj8GuSUukmrtLxlsiwTI+tKdCT0aYu4lVREeewpvTUQzThZxHo7?=
- =?us-ascii?Q?v+Vh+5apfO3PArqHLUaxo9/XJnHImjxygnGmWK8Eh5sGnYomAplfVvhTq/d/?=
- =?us-ascii?Q?g+IwyuJ/Q7rNkItYIrWsopbiNATt3OsvbnHSxPo8MyIqlNcYdQvswQlcHcVc?=
- =?us-ascii?Q?K+TZ+/PuqORiDsrHNdD7cDCyCuyNhjdzDHCvLWKg1G/q9VVkszBjTOQni+vA?=
- =?us-ascii?Q?DY+f0bTQfl/GooietdVgzqIYHH53dmaKwLH2L6x9SX0dcISAhJTxflx2YcBu?=
- =?us-ascii?Q?iNd2VedGT7IUP+j5LGzwAtMchu5KL8Ngbh/PlxcY2WMZWfJUfaQMzF4pFP0i?=
- =?us-ascii?Q?dn5GUyHPymPMPv5y9pEfCaVZgdWYZZAMsmcw9LRH4G5lQN/gBGIetyfvZ6yk?=
- =?us-ascii?Q?CD+FhCd4bvFV24w/KZqauE0QQOo7a7in+kWg2pFuHD02c16idSjF1dhUNr7a?=
- =?us-ascii?Q?ZFLlUdXBdEl+LOYLViPi4fdKOZM9NN9nD4W/1I+dayPuu3xUXrXO1+HVKJDm?=
- =?us-ascii?Q?+gYPGyuY3btBNGq+qQIgghK192t+N9RhyEETlanWJMzF60jLHZvP5+ftAWIJ?=
- =?us-ascii?Q?2y7g3AT9QOvPiYXvOaxsTAG26rGcEFQsH0V5f7mkzevDanl81a4rvlE0gDf7?=
- =?us-ascii?Q?JOGWEzhiLB6LUIWvV3RUr5uL0ewR1INIMX9UfFKh9+ZhlkOcF0Ak9vQkYfIg?=
- =?us-ascii?Q?9Mr+VDe9Sc8sTfDzalSXJZ2uw25164UHufWaKBLe3w5q5Mx8L2XDTGHYrmWT?=
- =?us-ascii?Q?TMkSNpHArty0S2Z2LYHFQhasr/5LLQExynlOBXVagjdoXtZ0hd+0pbAtkWy6?=
- =?us-ascii?Q?18PACk74r88MVd6nxPAlXFVh6WSniCmu5nzP72Wx?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 65155c20-d6c7-4a50-da81-08dc2f00c1a5
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Feb 2024 15:05:47.6738
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jamKDxHvNmP7I2qpCp9Krw7Dn8HZK3eOZxTZTAZjPRkkmzNBdklC5IxgjADkHelW
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6797
+References: <20240215160458.1727237-1-ast@fiberby.net> <20240215160458.1727237-4-ast@fiberby.net>
+ <CAM0EoMmyGwA9Q=RibR+Fc41_dPZyhBRWiBEejSbPsS9NhaUFVQ@mail.gmail.com> <Zc9bw8eHa5z_xh6Y@nanopsycho>
+In-Reply-To: <Zc9bw8eHa5z_xh6Y@nanopsycho>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Fri, 16 Feb 2024 10:07:34 -0500
+Message-ID: <CAM0EoMngVoBcbX7cqTdbW8dG1v_ysc1SZK+4y-9j-5Tbq6gaYw@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/3] net: sched: make skip_sw actually skip software
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: =?UTF-8?B?QXNiasO4cm4gU2xvdGggVMO4bm5lc2Vu?= <ast@fiberby.net>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, llu@fiberby.dk, Vlad Buslov <vladbu@nvidia.com>, 
+	Marcelo Ricardo Leitner <mleitner@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 15, 2024 at 05:00:46PM -0800, Jakub Kicinski wrote:
+On Fri, Feb 16, 2024 at 7:57=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrote=
+:
+>
+> Thu, Feb 15, 2024 at 06:49:05PM CET, jhs@mojatatu.com wrote:
+> >On Thu, Feb 15, 2024 at 11:06=E2=80=AFAM Asbj=C3=B8rn Sloth T=C3=B8nnese=
+n <ast@fiberby.net> wrote:
+> >>
+> >> TC filters come in 3 variants:
+> >> - no flag (no opinion, process wherever possible)
+> >> - skip_hw (do not process filter by hardware)
+> >> - skip_sw (do not process filter by software)
+> >>
+> >> However skip_sw is implemented so that the skip_sw
+> >> flag can first be checked, after it has been matched.
+> >>
+> >> IMHO it's common when using skip_sw, to use it on all rules.
+> >>
+> >> So if all filters in a block is skip_sw filters, then
+> >> we can bail early, we can thus avoid having to match
+> >> the filters, just to check for the skip_sw flag.
+> >>
+> >>  +----------------------------+--------+--------+--------+
+> >>  | Test description           | Pre    | Post   | Rel.   |
+> >>  |                            | kpps   | kpps   | chg.   |
+> >>  +----------------------------+--------+--------+--------+
+> >>  | basic forwarding + notrack | 1264.9 | 1277.7 |  1.01x |
+> >>  | switch to eswitch mode     | 1067.1 | 1071.0 |  1.00x |
+> >>  | add ingress qdisc          | 1056.0 | 1059.1 |  1.00x |
+> >>  +----------------------------+--------+--------+--------+
+> >>  | 1 non-matching rule        |  927.9 | 1057.1 |  1.14x |
+> >>  | 10 non-matching rules      |  495.8 | 1055.6 |  2.13x |
+> >>  | 25 non-matching rules      |  280.6 | 1053.5 |  3.75x |
+> >>  | 50 non-matching rules      |  162.0 | 1055.7 |  6.52x |
+> >>  | 100 non-matching rules     |   87.7 | 1019.0 | 11.62x |
+> >>  +----------------------------+--------+--------+--------+
+> >>
+> >> perf top (100 n-m skip_sw rules - pre patch):
+> >>   25.57%  [kernel]  [k] __skb_flow_dissect
+> >>   20.77%  [kernel]  [k] rhashtable_jhash2
+> >>   14.26%  [kernel]  [k] fl_classify
+> >>   13.28%  [kernel]  [k] fl_mask_lookup
+> >>    6.38%  [kernel]  [k] memset_orig
+> >>    3.22%  [kernel]  [k] tcf_classify
+> >>
+> >> perf top (100 n-m skip_sw rules - post patch):
+> >>    4.28%  [kernel]  [k] __dev_queue_xmit
+> >>    3.80%  [kernel]  [k] check_preemption_disabled
+> >>    3.68%  [kernel]  [k] nft_do_chain
+> >>    3.08%  [kernel]  [k] __netif_receive_skb_core.constprop.0
+> >>    2.59%  [kernel]  [k] mlx5e_xmit
+> >>    2.48%  [kernel]  [k] mlx5e_skb_from_cqe_mpwrq_nonlinear
+> >>
+> >
+> >The concept makes sense - but i am wondering when you have a mix of
+> >skip_sw and skip_hw if it makes more sense to just avoid looking up
+> >skip_sw at all in the s/w datapath? Potentially by separating the
+> >hashes for skip_sw/hw. I know it's a deeper surgery - but would be
+>
+> Yeah, there could be 2 hashes: skip_sw/rest
+> rest is the only one that needs to be looked-up in kernel datapath.
+> skip_sw is just for control path.
+>
+> But is it worth the efford? I mean, since now, nobody seemed to care. If
+> this patchset solves the problem for this usecase, I think it is enough.
+>
 
-> But this is a bit of a vicious cycle, vendors have little incentive 
-> to interoperate, and primarily focus on adding secret sauce outside of 
-> the standard. In fact you're lucky if the vendor didn't bake some
-> extension which requires custom switches into the NICs :(
+May not be worth the effort - and this is a reasonable use case. The
+approach is a hack nonetheless and kills at least some insects. To
+address the issues Vlad brought up, perhaps we should wrap it under
+some kconfig.
 
-This may all seem shocking if you come from the netdev world, but this
-has been normal for HPC networking for the last 30 years at least.
+cheers,
+jamal
 
-My counter perspective would be that we are currently in a pretty good
-moment for HPC industry because we actually have open source
-implementations for most of it. In fact most actual deployments are
-running something quite close to the mainline open source stack.
-
-The main hold out right now is Cray/HPE's Slingshot networking family
-(based on ethernet apparently), but less open source.
-
-I would say the HPC community has a very different community goal post
-that netdev land. Make your thing, whatever it is. Come with an open
-kernel driver, a open rdma-core, a open libfabric/ucx and plug into
-the open dpdk/nccl/ucx/libfabric layer and demonstrate your thing
-works with openmpi/etc applications.
-
-Supporting that open stack is broadly my north star for the kernel
-perspective as Mesa is to DRM.
-
-Several points of this chain are open industry standards driven by
-technical working group communities.
-
-This is what the standardization and interoperability looks like
-here. It is probably totally foreign from a netdev view point, far
-less focus on the wire protocol, devices and kernel. Here the focus is
-on application and software interoperability. Still, it is open in
-a pretty solid way.
-
-Jason
+> In that case, I'm fine with this patch:
+>
+> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+>
+>
+>
+> >more general purpose....unless i am missing something
+> >
+> >> Test setup:
+> >>  DUT: Intel Xeon D-1518 (2.20GHz) w/ Nvidia/Mellanox ConnectX-6 Dx 2x1=
+00G
+> >>  Data rate measured on switch (Extreme X690), and DUT connected as
+> >>  a router on a stick, with pktgen and pktsink as VLANs.
+> >>  Pktgen was in range 12.79 - 12.95 Mpps across all tests.
+> >>
+> >
+> >Hrm. Those are "tiny" numbers (25G @64B is about 3x that). What are
+> >the packet sizes?
+> >Perhaps the traffic generator is a limitation here?
+> >Also feels like you are doing exact matches? A sample flower rule
+> >would have helped.
+> >
+> >cheers,
+> >jamal
+> >> Signed-off-by: Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.net>
+> >> ---
+> >>  include/net/pkt_cls.h | 5 +++++
+> >>  net/core/dev.c        | 3 +++
+> >>  2 files changed, 8 insertions(+)
+> >>
+> >> diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
+> >> index a4ee43f493bb..a065da4df7ff 100644
+> >> --- a/include/net/pkt_cls.h
+> >> +++ b/include/net/pkt_cls.h
+> >> @@ -74,6 +74,11 @@ static inline bool tcf_block_non_null_shared(struct=
+ tcf_block *block)
+> >>         return block && block->index;
+> >>  }
+> >>
+> >> +static inline bool tcf_block_has_skip_sw_only(struct tcf_block *block=
+)
+> >> +{
+> >> +       return block && atomic_read(&block->filtercnt) =3D=3D atomic_r=
+ead(&block->skipswcnt);
+> >> +}
+> >> +
+> >>  static inline struct Qdisc *tcf_block_q(struct tcf_block *block)
+> >>  {
+> >>         WARN_ON(tcf_block_shared(block));
+> >> diff --git a/net/core/dev.c b/net/core/dev.c
+> >> index d8dd293a7a27..7cd014e5066e 100644
+> >> --- a/net/core/dev.c
+> >> +++ b/net/core/dev.c
+> >> @@ -3910,6 +3910,9 @@ static int tc_run(struct tcx_entry *entry, struc=
+t sk_buff *skb,
+> >>         if (!miniq)
+> >>                 return ret;
+> >>
+> >> +       if (tcf_block_has_skip_sw_only(miniq->block))
+> >> +               return ret;
+> >> +
+> >>         tc_skb_cb(skb)->mru =3D 0;
+> >>         tc_skb_cb(skb)->post_ct =3D false;
+> >>         tcf_set_drop_reason(skb, *drop_reason);
+> >> --
+> >> 2.43.0
+> >>
 
