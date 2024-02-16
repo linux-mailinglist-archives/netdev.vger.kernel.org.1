@@ -1,132 +1,97 @@
-Return-Path: <netdev+bounces-72258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D602857382
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 02:40:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA0F2857390
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 02:50:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5791B22EB2
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 01:40:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77A0FB22402
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 01:50:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5294AD2EE;
-	Fri, 16 Feb 2024 01:40:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD1EAD528;
+	Fri, 16 Feb 2024 01:50:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aGbnbfb3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BCNjiWM4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A7C2F9DA;
-	Fri, 16 Feb 2024 01:40:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A05F6149DE5;
+	Fri, 16 Feb 2024 01:50:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708047638; cv=none; b=rvMYbeZh30Tp3augB54g2Hx9qQoB/NCvmu3wEGVzRhL9onjs1Zl8Yrjal7SOMKRguS/rRIE/p1flPowloF2jjTg7+9w0NvTax2wIc+wxVn+PRnNhQBPeK9s21fiQXlhbtJs2sBHoUTmAcszBOfzjZ/FS2zz5ULVHDRr5iweD5Jg=
+	t=1708048254; cv=none; b=bsEJsLVS88rcqBFJd0cHRFgukZcvlwkW/MzRudVfdIALAPMIpgGx1VnLIlcdINEEKLBA9vK6cWkC3z2+YYypk4rFCULMNvRJbXrEQN1N7yF3etoU9D8zFlz74JFoc+X2GgBnVo6GmoDEPh2sfpQQ6V52EOYaKu9Xh80/aAFcsHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708047638; c=relaxed/simple;
-	bh=KHdlvUaHaDZaHCD4P4fvcHX8hb7Xkbd/GjEnKKFwBXk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iILvBy6jDfpBiZSeUGZ2/pWE6PdfwNorhrASMyXXaDp9D2YkMgKkFHQ0eZXkQK9jY+HmPNvv5yhUl0glAcv0WQGnBgWi8M4Hvtj84w9XG3E7srfOwlfOHUCcPLyjAtS8ybTZ1AHh20POcMRmQKcPRPLJ+ZMWgzCNcyCwmDVRgyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aGbnbfb3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FA71C433F1;
-	Fri, 16 Feb 2024 01:40:36 +0000 (UTC)
+	s=arc-20240116; t=1708048254; c=relaxed/simple;
+	bh=o1hvIgV7egchyLLtwD9Rie1hNU90A1OCQxnNdV0kcM4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=e04hMEOoujIq8pSNJTV9UR4YuyvcMiAcaEcsfZACWFeqjt4bq2ilylutGp2H+d7a4q1rWv//Tb7piJUBZPKHonRnuFXLmGZ2mCbLfLCDuwFK1J2s97YWZDpbwqEfA8Qd0kiPgUgt8NCpxdC4l8w+4QSdiiYSz0TOrmEablfmqwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BCNjiWM4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 17094C43390;
+	Fri, 16 Feb 2024 01:50:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708047637;
-	bh=KHdlvUaHaDZaHCD4P4fvcHX8hb7Xkbd/GjEnKKFwBXk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aGbnbfb35z3yv+Qi/s8NVgVpAWQgFJ3huflDP5lPv+eyXCw24T8OQvHtZFCD5tqp8
-	 SjXP7K/HUjo02Qy+9KQMX2q6hVCOf/TBsZjXygNsdZa9dC4VBEhCsu7Q9POmhsk7Xg
-	 RJUuwBJ7gbeC16myH0pVhB46T31NAHeSp5nU2uRlmLVdkfq7D5Q285JyKHyMABPhLo
-	 2qMSrHeUD3KWJ7HW7d1f2PgZLx+1eK1u99wXHHu9dm0nTgvexHRVDlqLS3ifk661x8
-	 342CH8htKf+pU07kGKPgUI7LJkT58ZxwdQivl4ZKEZ1WRLcTVU2uuz5MW02Ca6CEfW
-	 YvWDdS8XYWdwg==
-Date: Thu, 15 Feb 2024 17:40:34 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Andy Gospodarek <andrew.gospodarek@broadcom.com>, Christoph Hellwig
- <hch@infradead.org>, Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann
- <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Leon
- Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, Leonid Bloch
- <lbloch@nvidia.com>, Itay Avraham <itayavr@nvidia.com>, Saeed Mahameed
- <saeedm@nvidia.com>, David Ahern <dsahern@kernel.org>, Aron Silverton
- <aron.silverton@oracle.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
-Message-ID: <20240215174034.34817c31@kernel.org>
-In-Reply-To: <20240214183755.GH1088888@nvidia.com>
-References: <20240207072435.14182-1-saeed@kernel.org>
-	<Zcx53N8lQjkpEu94@infradead.org>
-	<ZczntnbWpxUFLxjp@C02YVCJELVCG.dhcp.broadcom.net>
-	<20240214175735.GG1088888@nvidia.com>
-	<20240214101126.0c3681ee@kernel.org>
-	<20240214183755.GH1088888@nvidia.com>
+	s=k20201202; t=1708048254;
+	bh=o1hvIgV7egchyLLtwD9Rie1hNU90A1OCQxnNdV0kcM4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=BCNjiWM4zUN9wSG3QxHZ365AzzRhaus+zeQa6IYcS4UIXJOvcPq3tK63pwF6SIAQn
+	 7aJUvQ+S2akFr2unJMRW71IH7UoG9GUqifRZXugyOdc1qSt5xCkLCQksUU+/e/hRb/
+	 t6A2W6shiF3lslrJWF/tAfro9MLxKJTrQ3vZAbcT5TVkAu2sgJk33TlUJzfEeExDvz
+	 7WVbSe8hazByLsmX3mLq2Y7QeysHgZZLRSjqtz6VBlIC3SE+Ag1arRUKIq36pIHhOT
+	 bDrlXAwCmlaxoutQvOuDmMdY6Cn44PhVDKjlMn+YxakqMg7tMSCHEPXtLZ2espm2rV
+	 yvce+U6vxrVTg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F21CFD8C978;
+	Fri, 16 Feb 2024 01:50:53 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] configs/debug: add NET debug config
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170804825398.15074.5229912930240995775.git-patchwork-notify@kernel.org>
+Date: Fri, 16 Feb 2024 01:50:53 +0000
+References: <20240212-kconfig-debug-enable-net-v1-1-fb026de8174c@kernel.org>
+In-Reply-To: <20240212-kconfig-debug-enable-net-v1-1-fb026de8174c@kernel.org>
+To: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Cc: linux-kernel@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, quic_qiancai@quicinc.com,
+ keescook@chromium.org, mptcp@lists.linux.dev, netdev@vger.kernel.org,
+ akpm@linux-foundation.org
 
-On Wed, 14 Feb 2024 14:37:55 -0400 Jason Gunthorpe wrote:
-> On Wed, Feb 14, 2024 at 10:11:26AM -0800, Jakub Kicinski wrote:
-> > On Wed, 14 Feb 2024 13:57:35 -0400 Jason Gunthorpe wrote:  
-> > > There is a clear split in my mind between:
-> > >  - inspection debugging
-> > >  - invasive mutating debugging
-> > >  - configuration  
-> > 
-> > Yes there's a clear split, and how are you going to enforce it on 
-> > an opaque interface? Put an "evil" bit in the common header?  
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 12 Feb 2024 11:47:14 +0100 you wrote:
+> The debug.config file is really great to easily enable a bunch of
+> general debugging features on a CI-like setup. But it would be great to
+> also include core networking debugging config.
 > 
-> The interface is opaque through a subsystem, it doesn't mean it is
-> completely opaque to every driver layer in the kernel. There is still a
-> HW specific kernel driver that delivers the FW command to the actual
-> HW.
+> A few CI's validating features from the Net tree also enable a few other
+> debugging options on top of debug.config. A small selection is quite
+> generic for the whole net tree. They validate some assumptions in
+> different parts of the core net tree. As suggested by Jakub Kicinski in
+> [1], having them added to this debug.config file would help other CIs
+> using network features to find bugs in this area.
 > 
-> In the mlx5 model the kernel driver stamps the command with "uid"
-> which is effectively a security scope label. This cannot be avoided by
-> userspace and is fundamental to why mlx5ctl is secure in a lockdown
-> kernel.
-> 
-> For example mlx5's FW interface has the concept of security scopes. We
-> have several defined today:
->  - Kernel
->  - Userspace rdma
->  - Userspace rdma with CAP_NET_RAW
->  - Userspace rdma with CAP_SYS_RAWIO
-> 
-> So we trivally add three more for the scopes I listed above. The
-> mlx5ctl driver as posted already introduced a new scope, for example.
-> 
-> Userspace will ask the kernel for an appropriate security scope after
-> opening the char-device. If userspace asks for invasive then you get a
-> taint. Issuing an invasive command without a kernel applied invasive
-> security label will be rejected by the FW.
-> 
-> We trust the kernel to apply the security label for the origin of the
-> command. We trust the the device FW to implement security scopes,
-> because these are RDMA devices and all of RDMA and all of SRIOV
-> virtualization are totally broken if the device FW cannot be trusted
-> to maintain security separation between scopes.
+> [...]
 
-You have changed the argument.
+Here is the summary with links:
+  - configs/debug: add NET debug config
+    https://git.kernel.org/netdev/net-next/c/3738d710af51
 
-The problem Andy was raising is that users having access to low level
-configuration will make it impossible for distro's support to tell
-device configuration. There won't be any trace of activity at the OS
-level.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-To which you replied that you can differentiate between debugging and
-configuration on an opaque interface, _in the kernel_.
 
-Which I disagree with, obviously.
-
-And now you're saying that you can maintain security if you trust 
-the firmware to enforce some rules.
-
-I'm not talking about security here, the evil bit is just an example
-of an unsound design.
 
