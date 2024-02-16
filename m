@@ -1,105 +1,85 @@
-Return-Path: <netdev+bounces-72406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 650F5857F10
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 15:14:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F5F6857F32
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 15:23:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C10E1F26AB5
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 14:14:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9814B21A52
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 14:23:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E652612CDB9;
-	Fri, 16 Feb 2024 14:14:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58FF412CD9A;
+	Fri, 16 Feb 2024 14:23:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eVnEpKND"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AuJoMt6k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62F3512CDA5;
-	Fri, 16 Feb 2024 14:14:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33DF2129A98
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 14:23:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708092855; cv=none; b=iWTqbZ1lANo5Q3T0NPDFYrcDe4gIw0SOUitDHaRhpMfBeemkKj4y84VQE/JOsrdIr1mFVKQFlGhdWGUzAY8Sypl0xQjKgtJ6K7ptls3I6evNsrU/ZZhRIRmbBGskEsLEL3+hP7zJC+cS26Zg2eODi83g/mNVKb+KJ8USVt1Ebvg=
+	t=1708093386; cv=none; b=RJSueli1/quWvVTKWgqfQjpPZwSlM1RxdhPt/vcmrM6YTBuNpJKDKGj0fo8QRbE0Z7jZcqTEwjoJskxnRIsPMdXM12mRMZdH/m+kKaHfi3bnII9IFgO1xVTcpdj+EdjogTPTt9GixbFicksTcNyPYooVBHc20Z672fXs2Bkfkxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708092855; c=relaxed/simple;
-	bh=/DxwTOf5kx7rr7gaBgtPBS5c57nxY8Bp64eyQ45LJhg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AYguqPSOg0rP/N4tEQuF1axF+qNTHPb9TYchp3eOE3nw3UnaiRNhOeqnFG2ynIeQ0DheHgiaF5e7lAzNczC6cpBtVKnIu0O0dThZJezruBr3S8FYbbCA4he4zyhRFO0afCb4o0C16I3kERha+MJPvskWa5Cm2jmvYN4ORIbjpx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eVnEpKND; arc=none smtp.client-ip=209.85.219.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-dcdb210cb6aso2187536276.2;
-        Fri, 16 Feb 2024 06:14:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708092853; x=1708697653; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=/DxwTOf5kx7rr7gaBgtPBS5c57nxY8Bp64eyQ45LJhg=;
-        b=eVnEpKNDaoRJUN5ybxrkYL0WLXLcgpyRIBrRgA8Tk5N8ZdotVhMmqgozatvZzmxzkU
-         qb3ck6yD54WqhPGSEi34eDoM9Hn5B5vpjIK6lVBJXxPT2TMtvbBYtZenXNolm98nGGXi
-         hNNJEKyJ2GcwJGjVPIP2H0HWeeiLdSfNTTM5y7aWsaoR5HvjduH8469ogX+G7V4mxFBV
-         2iLIKrzSlbhnJYleo5qU0fhF2BXzEvmGqxUWRr5HG1AddTn009uCosWjMNHMkP9a8jo3
-         QQ4JTHLut1s/hY8aMwOFlM7j1ipYzLxy1IhbJNQDIpm4F3JwzN2/qMbdj6xEV1eoSMhr
-         hJkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708092853; x=1708697653;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/DxwTOf5kx7rr7gaBgtPBS5c57nxY8Bp64eyQ45LJhg=;
-        b=fRshqHNZ3iP8HqakDlDYp+iZxGxRKzDII2gJUPOpFF1oV/N1W/qT6MrjQ9TuA7heLn
-         +M3ndQnsvuOqW/t0vXMEtiJuiIlTnSLEUqbpKvZBaq0V97+pGa+dEg2RTe9CtKk6Pq3U
-         POYm+A9xDSv8CiiQ/x1/8wq/jPAQJdbYgoNn+s3lwUwxExJZegzzx67mn8K8gysq/0b5
-         kNMrqlnZWk5XfxWGnRpJPYc427WKmINd5r4x2EG1cc/5WMi52uZWKPdzGuUl8f6qch/W
-         xdfQNoRZU8XQD0aiyvEZDGQShwLEVqsK32LSy+TjO6cPIuc18JxZV3WG67l0LSsqhu3f
-         JmdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW2BPXcSqviUMzzt2yWOQ58+VJqU1sbMLQIwgcSKKHT9ljtZksgxyFdrjLG6r5bJijqNTKSnOywFIleNRddO1+ibFGrksGEavVNATqBD+Uv4mSsh7HMXXySXPIJ/eXwGfrg/0VGIDyhPS3Cn5nbx5665k8ABsWtSOMCDxFIm0Nk
-X-Gm-Message-State: AOJu0YwqY6+qDVsKnqD+VQADLluuaHb+q/wGbNpSqwj31c7Qr+n8dEps
-	L6bIi7b6PqRQUIfcd7P+0FCZzgksiodnIEpZR1HWeOjryVrjMp05EhFrxCm5MxcS8Hmrd8zJzSe
-	iz9JFntAR9cXo/J7/Dg55tyDctFk=
-X-Google-Smtp-Source: AGHT+IGQeDpO3qLCUtbOk3p+jTtxbU6hWaP/Iz24wCfOyfu8LY3PZiARuxQt9DyBevQPnS648u0las74DokIjDihun4=
-X-Received: by 2002:a25:d3cf:0:b0:dc7:4c92:16a3 with SMTP id
- e198-20020a25d3cf000000b00dc74c9216a3mr4371146ybf.27.1708092853137; Fri, 16
- Feb 2024 06:14:13 -0800 (PST)
+	s=arc-20240116; t=1708093386; c=relaxed/simple;
+	bh=43WCqBhdRA6zo4LNP7kqS2yxm+KtQr+uHeTnhRLMFOc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PZyl9LW6xQKpUGm9Krjl5VCdUT9Br6VoS13JZGPQl5k2gyjGOW4WjU7MjPTYda/jHPfst3uwhBQAE3jcWh4j00SwZX+uNr9sfUG2e4XVAmLX3rgPna6kivnkaWyrdTWTqeg04AYlCg7V0g83Yb8pTJmjvPrFjxXiz5sgoar7zgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AuJoMt6k; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C05DC433F1;
+	Fri, 16 Feb 2024 14:23:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708093385;
+	bh=43WCqBhdRA6zo4LNP7kqS2yxm+KtQr+uHeTnhRLMFOc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=AuJoMt6knDajRdBbYcQd1zXRI02RWeOKpd6HRNuxZRLVENP4S4wLB343LqtRmdLiE
+	 Gomr7+fXy3fT+aRXiIqI+hWH4aQ+0yvWF5+M7KFarLEOWMs1RpsLUvnyZdVFYJIi28
+	 Gs8Sn/uSe6a4hvBm5vFTFIHfuWkTsjBkv0+Z/ffbV40i8gKXtpBrRwNTjagDpiIfpb
+	 EaP+sK6Zl5IuyNKBCmHizAiqMu3cKLRe1oBUaIk2VtDCEdqFQR+aXqwWV9gYIMjr6K
+	 dpcTaniECSF2R/6Thk8itJ4LAGiAjF6c7XCbPuPODWAtHKzHRCUE0I37xcSKZX+CKh
+	 VLwJ0ib5ID1xg==
+Date: Fri, 16 Feb 2024 06:23:04 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jeremy Kerr <jk@codeconstruct.com.au>
+Cc: netdev@vger.kernel.org, Matt Johnston <matt@codeconstruct.com.au>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, David Howells <dhowells@redhat.com>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, Liang Chen <liangchen.linux@gmail.com>,
+ Johannes Berg <johannes.berg@intel.com>
+Subject: Re: [PATCH net-next 10/11] net: mctp: tests: Test that outgoing
+ skbs have flow data populated
+Message-ID: <20240216062304.2c3428d9@kernel.org>
+In-Reply-To: <73b3194049ea75649cc22c17f7d11fa6f9487894.1708071380.git.jk@codeconstruct.com.au>
+References: <cover.1708071380.git.jk@codeconstruct.com.au>
+	<73b3194049ea75649cc22c17f7d11fa6f9487894.1708071380.git.jk@codeconstruct.com.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240212020403.1639030-1-hayatake396@gmail.com>
- <CADFiAcL+2vVUHWcWS_o3Oxk67tuZeNk8+8ygjGGKK3smop595A@mail.gmail.com>
- <8eb6384a82fc4c4b9c99463a6ff956f04c9d5e33.camel@redhat.com> <bad0da2c-546b-2e05-feea-d395439a0bb0@intel.com>
-In-Reply-To: <bad0da2c-546b-2e05-feea-d395439a0bb0@intel.com>
-From: Takeru Hayasaka <hayatake396@gmail.com>
-Date: Fri, 16 Feb 2024 23:14:02 +0900
-Message-ID: <CADFiAc+RP91PfEBAnwbABjrHJkdLc0=nm3_TE=+ZaN1AiVQEEQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v8 1/2] ethtool: Add GTP RSS hash options to ethtool.h
-To: anthony.l.nguyen@intel.com
-Cc: Paolo Abeni <pabeni@redhat.com>, Jesse Brandeburg <jesse.brandeburg@intel.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Jonathan Corbet <corbet@lwn.net>, intel-wired-lan@lists.osuosl.org, 
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, mailhol.vincent@wanadoo.fr, 
-	vladimir.oltean@nxp.com, laforge@gnumonks.org, 
-	Marcin Szycik <marcin.szycik@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Tony-san and Paolo-san!
+On Fri, 16 Feb 2024 16:19:20 +0800 Jeremy Kerr wrote:
+> +static void mctp_test_packet_flow(struct kunit *test)
+> +{
+> +	kunit_skip(test, "Requires CONFIG_MCTP_FLOWS=y");
+> +}
+> +
+> +static void mctp_test_fragment_flow(struct kunit *test)
+> +{
+> +	kunit_skip(test, "Requires CONFIG_MCTP_FLOWS=y");
+> +}
 
-> > The series LGTM. I *think* the series should go first in the intel
+These two get skipped when running:
 
-Thank you both for picking up on the topic!
+./tools/testing/kunit/kunit.py run --alltests
 
-> I agree. I think it would make sense for this to go through IWL.
-
-I understand. So, it means that it will go through the IWL branch and
-then through net-next.
-Is there any assistance I can provide to facilitate this process?
-
-Thanks,
-Takeru
+Is it possible to make all-test include the right config option
+automatically, so they can run?
 
