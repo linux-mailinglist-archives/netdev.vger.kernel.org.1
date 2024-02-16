@@ -1,147 +1,140 @@
-Return-Path: <netdev+bounces-72435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 521E785815F
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 16:38:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01FF485818E
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 16:42:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7182B24A61
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 15:38:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96ED0B2719C
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 15:42:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EC74148318;
-	Fri, 16 Feb 2024 15:31:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H+6Caqnp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EF15134CCC;
+	Fri, 16 Feb 2024 15:38:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D326314830D;
-	Fri, 16 Feb 2024 15:31:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DA4C134751;
+	Fri, 16 Feb 2024 15:38:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708097464; cv=none; b=bZS3HTHJqydgvkJjS3nzLprafwyv3bDd0/4PVLYnrzrC42Spkw8FgLPSeQ4qGuDaLhyw/fZcG8O2JKMq2gkFxlgWcmuvYOJiStUZlvVhjl8ayWUzx0lvRKKu/rxH97bk9yeEwlXFMCUDPOLn6vIIIfxajF95E94nLtk3LYvVafI=
+	t=1708097904; cv=none; b=A4U/fUAZkwz8YlImfoiN3si/ucRBilQw6C+ePEb6he92vNpockkGuCwtJ4XDi+aabai3qT7cD04t5k4jL1GvJez83DUVgx6HQJl+2rxOM9HYkdXJV+Vbjv+neh8D1iG5Qfx2zZatTdohuFC02Hrr4MQCaBZGI6T0u8OtUOViVvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708097464; c=relaxed/simple;
-	bh=2bBhhj/QaqwbzNPHueTQmD9VG87w9Epku43Ofb/Leug=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y0OYLcVrDCwr2+E3w46v1AiI4mhm4Azo2B3oFA8DKr85Dp0Djph7H3khwXL8fJtgHot8O3D0+b2y92OwnPHh+d7rLotsWqYVvf4KfLmG6/bw7US54OaqsWEYH69HLFSEv7jj2pk9XZKJ81Wiomgb1loayS0IWAV1S+ukAoyXzVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H+6Caqnp; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4121b1aad00so5804065e9.1;
-        Fri, 16 Feb 2024 07:31:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708097461; x=1708702261; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6JNadx/71R49yGFH6Dmy90ffsy+AmiQ1eqphcJgygK8=;
-        b=H+6Caqnpr4JKH0NM177DYXNXXuWSELz4HbabZ6CFl/SsEbmqVSQcDxSLGBIRLdPgoy
-         ldfkLN3h6DBfa5LWU7iYAHVURWXP8nGJ2quUaamTO+na/5Gk+Sh5Z1DvVu7KOAfvhPes
-         D+aIKbTm4t2lFKutlIZ7/OlPi3bsQ6ks6fqulBi6QbKM2dxclp9nFo6ilH9h5xemw24z
-         Q8yoDaYpinzd+WMj4wPf5Zasg6+fQFZWOxz65j0HEab+PY6kwtd0kyqBpu8l+EsMbHQ9
-         dauOLFIfJHBSMPlFQWQCki88mX98pDVQxYSEn/R2wzof0GdpCCHRHsxHWtKgPbrQiX7+
-         fyIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708097461; x=1708702261;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6JNadx/71R49yGFH6Dmy90ffsy+AmiQ1eqphcJgygK8=;
-        b=L5Sbf3n6Pek2r7hmu6vMcc+QrxYJLVp/yxiY6t5qVjxYAeJ/vuOB/6ChxjljdSIB3D
-         MbVDy3/i1KBIPKy48drkiN08BDmj+dvpnpS0NMRXzC5r7z9JAz/+fKPzcVfLHCJzhS6a
-         oFSa2CZV/3+Zyo2PU7oXAGF2DmnOTiCrHev1fJg2tm+bna4du7hgrCLCoMLf6A4TgSO6
-         jcgZQBAmtaGI/yEWyhd+jPK3SZyG46qU1xlO4CgCOD26Gbxkd0qLUYfzS6j9RYeaLqSL
-         kS5LfASyHeVADNyfoqRDvq8lKSisx1VbsNyBMdHPM/PkYnvc57XqapNkED62AnkLuubA
-         B/5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXJO18DGbwXUjVnPbHGkYv/2oQHzoeRgH3qkQR+RqE8bC5KDKuVcWaGd9ZWn0D9pvNvfDyYrrXF+VXO/oxUVnM744ObKWZUOzlhEdxHKtaBnN00a+g05rEsNq4HJIFPUeibkrSWLn6uD28pVOgTdLUNcsa+ue8OioQhzb6FZ7bpiPYhBYFg
-X-Gm-Message-State: AOJu0Yykh4d3fb8RCwTHW2KmOm6BiktSgMwsv+H/gmq6aFrCsDcHFsZT
-	mjJPa3J1NJk0DL391xbOj4ZabSLTjPgc4JAOMqXESo+XnjR0G7Jr4JWhwSBE
-X-Google-Smtp-Source: AGHT+IFrhxmizJLaTT2UDH3EzhKGyyUFsHaJBJRaLK/lgAJlamqvdLFCtTuza/WnM3XQMaZjsZ2J7w==
-X-Received: by 2002:a5d:6350:0:b0:33d:27b6:68d1 with SMTP id b16-20020a5d6350000000b0033d27b668d1mr53556wrw.34.1708097460716;
-        Fri, 16 Feb 2024 07:31:00 -0800 (PST)
-Received: from [10.83.37.178] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id h5-20020a05600016c500b0033d200aff9asm1769437wrf.56.2024.02.16.07.30.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Feb 2024 07:31:00 -0800 (PST)
-Message-ID: <4f3bc406-1671-4f37-98e4-38e00590f487@gmail.com>
-Date: Fri, 16 Feb 2024 15:30:57 +0000
+	s=arc-20240116; t=1708097904; c=relaxed/simple;
+	bh=v/umiByrbo+UMHmoZPas/+iyEgbA76j9zUbPB2HafrE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tEhMhNrSx0exhbPldMR0vmsMq7ZK9z4gjleFNQ/cEdMJ3U+/uxnylzto/0+0fMcHGC9ueU5dSn5eP2FayZJkCD0Fi9qjKFu9xgLptnPxjXDOAJcafv1FMBEiGCGbOJL302w1OQsgJrNsypq12WwGccJGuZQjoO6A1u7t3O/k2Sc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.41.52] (port=38106 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1rb0Hy-004Gjh-Uo; Fri, 16 Feb 2024 16:38:13 +0100
+Date: Fri, 16 Feb 2024 16:38:10 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>,
+	coreteam@netfilter.org, netdev-driver-reviewers@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>, netfilter-devel@vger.kernel.org
+Subject: Re: [netfilter-core] [ANN] net-next is OPEN
+Message-ID: <Zc+BYmrv/0pRKY+w@calendula>
+References: <20240123072010.7be8fb83@kernel.org>
+ <d0e28c67-51ad-4da1-a6df-7ebdbd45cd2b@kernel.org>
+ <65b133e83f53e_225ba129414@willemb.c.googlers.com.notmuch>
+ <20240124082255.7c8f7c55@kernel.org>
+ <20240124090123.32672a5b@kernel.org>
+ <26616300-dc28-47d1-88bb-1c7247d1699d@kernel.org>
+ <ZbFiixyMFpQnxzCH@calendula>
+ <7a1014ee-7e1d-4be4-bab2-07ddde8a84b7@kernel.org>
+ <ZcNSPoqQkMBenwue@calendula>
+ <51bdbaab-a611-4f4d-aa8c-e004102220f3@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH][next] net: tcp: Remove redundant initialization of
- variable len
-Content-Language: en-US
-To: Colin Ian King <colin.i.king@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
- Eric Dumazet <edumazet@google.com>
-References: <20240216125443.2107244-1-colin.i.king@gmail.com>
- <CANn89iJM=fVSkzz9HRU+HXYm+R+owKqah0TT8sY-soEXf2HiNA@mail.gmail.com>
-From: Dmitry Safonov <0x7f454c46@gmail.com>
-In-Reply-To: <CANn89iJM=fVSkzz9HRU+HXYm+R+owKqah0TT8sY-soEXf2HiNA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <51bdbaab-a611-4f4d-aa8c-e004102220f3@kernel.org>
+X-Spam-Score: -1.9 (-)
 
-On 2/16/24 13:00, Eric Dumazet wrote:
-> On Fri, Feb 16, 2024 at 1:54 PM Colin Ian King <colin.i.king@gmail.com> wrote:
->>
->> The variable len being initialized with a value that is never read, an
->> if statement is initializing it in both paths of the if statement.
->> The initialization is redundant and can be removed.
->>
->> Cleans up clang scan build warning:
->> net/ipv4/tcp_ao.c:512:11: warning: Value stored to 'len' during its
->> initialization is never read [deadcode.DeadStores]
->>
->> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+Hi,
 
-LGTM,
+Sorry for taking a while.
 
-Reviewed-by: Dmitry Safonov <0x7f454c46@gmail.com>
-
->> ---
->>  net/ipv4/tcp_ao.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
->> index 87db432c6bb4..3afeeb68e8a7 100644
->> --- a/net/ipv4/tcp_ao.c
->> +++ b/net/ipv4/tcp_ao.c
->> @@ -509,9 +509,9 @@ static int tcp_ao_hash_header(struct tcp_sigpool *hp,
->>                               bool exclude_options, u8 *hash,
->>                               int hash_offset, int hash_len)
->>  {
->> -       int err, len = th->doff << 2;
->>         struct scatterlist sg;
->>         u8 *hdr = hp->scratch;
->> +       int err, len;
->>
->>         /* We are not allowed to change tcphdr, make a local copy */
->>         if (exclude_options) {
->> --
->> 2.39.2
->>
+On Wed, Feb 07, 2024 at 12:33:44PM +0100, Matthieu Baerts wrote:
+> Hi Pablo,
 > 
-> Cc Dmitry Safonov
+> Thank you for your reply!
 > 
-> Dmitry, can you take a look ?
-
-Thanks for Cc'ing!
-
+> On 07/02/2024 10:49, Pablo Neira Ayuso wrote:
+> > Hi Matthieu,
+> > 
+> > On Tue, Feb 06, 2024 at 07:31:44PM +0100, Matthieu Baerts wrote:
+> > [...]
+> >> Good point, I understand it sounds better to use 'iptables-nft' in new
+> >> kselftests. I should have added a bit of background and not just a link
+> >> to this commit: at that time (around ~v6.4), we didn't need to force
+> >> using 'iptables-legacy' on -net or net-next tree. But we needed that
+> >> when testing kernels <= v5.15.
+> >>
+> >> When validating (old) stable kernels, the recommended practice is
+> >> apparently [1] to use the kselftests from the last stable version, e.g.
+> >> using the kselftests from v6.7.4 when validating kernel v5.15.148. The
+> >> kselftests are then supposed to support older kernels, e.g. by skipping
+> >> some parts if a feature is not available. I didn't know about that
+> >> before, and I don't know if all kselftests devs know about that.
+> > 
+> > We are sending backports to stable kernels, if one stable kernel
+> > fails, then we have to fix it.
 > 
-> Thanks !
+> Do you validate stable kernels by running the kselftests from the same
+> version (e.g. both from v5.15.x) or by using the kselftests from the
+> last stable one (e.g. kernel v5.15.148 validated using the kselftests
+> from v6.7.4)?
 
-Thanks,
-             Dmitry
+We have kselftests, but nftables/tests/shell probe for kernel
+capabilities then it runs tests according to what the kernel
+supports, this includes packet and control plane path tests. For
+iptables, there are iptables-tests.py for the control plane path.
 
+> >> I don't think that's easy to support old kernels, especially in the
+> >> networking area, where some features/behaviours are not directly exposed
+> >> to the userspace. Some MPTCP kselftests have to look at /proc/kallsyms
+> >> or use other (ugly?) workarounds [2] to predict what we are supposed to
+> >> have, depending on the kernel that is being used. But something has to
+> >> be done, not to have big kselftests, with many different subtests,
+> >> always marked as "failed" when validating new stable releases.
+> > 
+> > iptables-nft is supported in all of the existing stable kernels.
+> 
+> OK, then we should not have had the bug we had. I thought we were using
+> features that were not supported in v5.15.
+
+I don't think so, iptables-nft supports the same features as
+iptables-legacy.
+
+> >> Back to the modification to use 'iptables-legacy', maybe a kernel config
+> >> was missing, but the same kselftest, with the same list of kconfig to
+> >> add, was not working with the v5.15 kernel, while everything was OK with
+> >> a v6.4 one. With 'iptables-legacy', the test was running fine on both. I
+> >> will check if maybe an old kconfig option was not missing.
+> > 
+> > I suspect this is most likely kernel config missing, as it happened to Jakub.
+> 
+> Probably, yes. I just retried by testing a v5.15.148 kernel using the
+> kselftests from the net-next tree and forcing iptables-nft: I no longer
+> have the issue I had one year ago. Not sure why, we already had
+> NFT_COMPAT=m back then. Maybe because we recently added IP_NF_FILTER and
+> similar, because we noticed some CI didn't have them?
+> Anyway, I will then switch back to iptables-nft. Thanks for the suggestion!
+
+Thanks. If you experience any issue, report back to netfilter-devel@
 
