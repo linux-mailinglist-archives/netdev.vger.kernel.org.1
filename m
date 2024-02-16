@@ -1,121 +1,219 @@
-Return-Path: <netdev+bounces-72378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3AA8857CF9
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 13:54:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26C51857CFD
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 13:57:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5DD31C238E5
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 12:54:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C554EB2171E
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 12:57:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A73A1292CA;
-	Fri, 16 Feb 2024 12:54:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECDFF12883C;
+	Fri, 16 Feb 2024 12:57:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Be6SJ7T8"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="WTKygDLi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF6E9266D4;
-	Fri, 16 Feb 2024 12:54:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6633E78683
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 12:57:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708088088; cv=none; b=K82K/MTXgxaB8oL34cvzxoXVQyyU+MDvbZ4UQLAol1RDk6hrLXkLqeEBT1Z/TtIH6qkVmbS3Lb+Pm/pgIvqT1id99z6ZzjYqFGN6suAl7iF+NS5FysfkZ3jWVjAcufSFyXBOAjUMIFAFD/U5KoptFjstpmXBb2SObXIjsaRqVTU=
+	t=1708088268; cv=none; b=k9PvskK878biKUepdfkRERT97BYPpGINvWYUfJD0pA0brCBUS0EUY8/WukNH5VFu30iBg9DHIOppXleg0RHO2QwZkXjskznggoaDLafoYHW/6G2ngKiysYxOLsuDbybbkrOThuPd1RFMzulR98HNPEgdbc/508v0qLc0D+WGMC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708088088; c=relaxed/simple;
-	bh=tH0kdxyBWBGqfP/aVOfyxzUdVukg/+pepClSHy99W70=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=OXpJEZiGvnSLSzFbWLC7St+PM+CfK1+BfS9wQbl96cOLEBBGDhImYLgNaSqwUmv8Dl8Gau8KOiU/OLR58EjdhqmVa/+oZXg0/540VcHDPC3poLunhoww3QwVz5zpHRqecSemKgnC7Mlt3Z1msrJ39z8egW8pl124UtPi4M0F/Rs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Be6SJ7T8; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-33d153254b7so498020f8f.0;
-        Fri, 16 Feb 2024 04:54:46 -0800 (PST)
+	s=arc-20240116; t=1708088268; c=relaxed/simple;
+	bh=w2l0ylVB1x/HuoHnk6UUEgl7ExtREHdymzM1UYAT1bk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t+k8I7bQ2thhwrS0rRbqFJY1gumrJ/HNNykKsFwDSpfGJ/CzVIF8c6e2O46Hmbtppa/M76Q6FMvhew+20ZVyDPqvH22MG+6uo1NipvgmrpSj3iMCMDF41e9jjDcXNBKn6DDKIpkl1Thpff2wHMsZgFB2uib50QFTW+GK9NmbtJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=WTKygDLi; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-411f165ef9bso16442645e9.0
+        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 04:57:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708088085; x=1708692885; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bEcs0xF6NsN2yndITWHFP0bv87xKQqUwp6fc0rUr7Us=;
-        b=Be6SJ7T8E4Yx1Hi+2yYWchugKtxI6BLx/k/jgvOYSC9guClOvyRN8qxcbzCxTOqF9y
-         h+I/4EeRL04z/PNN4sbBp/XXaB/wMgSmNhrGkQWaWG1tqvw4965MJrnFABJO9ckRdmc1
-         ufpFCvBBHH+gdmbUP06OwpjrO00lDSB8khLpcS4pvaTCNn2gXBoqeZJ1o/1v07ufzl4a
-         3GSIPdM0NeXE8Z7bi4XNsURzItZAgNSe58h7TABp6vxWePl8JUKApMm66yY7vzgcAZ2U
-         nD19qlXtkUdIPM8dNgtZ0QOOS9QfPwjvLPyvoHCxaY5j7p2ZXxDl1QVO845FnJxydR6C
-         KAOA==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708088263; x=1708693063; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=uiUzSTVrsxjbS/hZAUDiyEUoLZBQOXDndHGZfvZSTaI=;
+        b=WTKygDLigFTY3fNr1ZdFSs9U6vmbKu+wQ+kpgjnmM1dJzKdQRXc3BoGrLvmDfPEq+5
+         KZpzE2YUwiKE7Cjdb3rs4HmbRE42/G42KIU463H0g0FQ6nBKfmypXdl1DHqn+OH7cPG5
+         bzbIOy/nAELJgthIpfYQdF4+eG5vpEbL5pxIzlITxMidFJ5vAnDUqmrFeo8pcBM8TVji
+         5DFCizy6xhKuH63Bww1alwczIW4RW6KaszlkYstbJVMmYanjqzX3bgaPTw7mZ4g7+6i9
+         3vBADDIHEMTy9cydTp89fqmVH3d+CCDRx7SGU3woDzCV0jOwKOrJlF7URSKdOefX4uN4
+         huQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708088085; x=1708692885;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bEcs0xF6NsN2yndITWHFP0bv87xKQqUwp6fc0rUr7Us=;
-        b=B/ovdmSOs+42MTwKyK+iSn/b0ZFlGjfT5LXa9rkOmVIbP6or8W6/ZDAh2/wRhvnH1u
-         KmKpsIAgU97Iz1ILQmWN+0IHXBV5fE7vSIstQKfb59Ug5PpgAEk8bqqbx8hntbj5+/wd
-         FdlJQ7txXw9n9XtZ2x7RJ+mrFjSJ8JH/MwtOF40ru9yOp1/BGUSwc6LqLL4fCaqFQyc8
-         HFYu6DFKXIjkZSx7Y6V54yOBz+iaBUVkmw2A/P9ooVdmNy7HF/JTqrZE4YE8w8AnKusI
-         5cPHo8yHjTze1uv0UnKfYmHKyK0arx3NHdYk5i2YLG6e79s1oh6iXLhlCWSgGxd6qUwY
-         cDFA==
-X-Forwarded-Encrypted: i=1; AJvYcCU9Q7x7CEczHCulHNXPD0URQGyvpg6jMtrlw16MwEA4spMEXBxMr8hYxsWPYO62wxLcLZT3vwPutjL8l/JxhFRn5UdUmkB+wWA2qvfb9ewMhXu3xpL45Q3otwBLDYLZWr3XYyE/
-X-Gm-Message-State: AOJu0YxtbJiZL7VZBuHoln8vPlYXwHV/VW9kkDb3t8WA2wXndE+FoYAt
-	H1p2DorssKACA4FGpQ3yPqDyfI0IVI/8fsmyYkMczUIFvtS7QGYS
-X-Google-Smtp-Source: AGHT+IFMPn2oquqm21v74s6a/9ew+juZRTbUTboyoq4FEcC6Y4+blWJRB6s4tNG3V2L2lEiUt5u07g==
-X-Received: by 2002:a5d:508c:0:b0:33d:1f9f:b01 with SMTP id a12-20020a5d508c000000b0033d1f9f0b01mr973514wrt.16.1708088084789;
-        Fri, 16 Feb 2024 04:54:44 -0800 (PST)
-Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
-        by smtp.gmail.com with ESMTPSA id e14-20020a5d4e8e000000b0033cdf1f15e8sm2159531wru.16.2024.02.16.04.54.43
+        d=1e100.net; s=20230601; t=1708088263; x=1708693063;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uiUzSTVrsxjbS/hZAUDiyEUoLZBQOXDndHGZfvZSTaI=;
+        b=N6rV8mpOCpipvY5QsYDP/4Cn9Xm5JbFSvkwgWh4OycDjd2nZ8Ly/bFHX3A2CasadEi
+         G7CM3/QGHr4219yvbf9YLfASyxit0iScJrsSTgEqjuzpKp/VGtzj6zbvH3J8HE4Zca8r
+         xwkkRIl+ASH3oR3xIdffJhe2hUsJvATYv7ld0QUqnUwQ/eV4YPeHerW4mBRsp4d81K/6
+         fWNx0JJ2IZEPdyQeQ6gbS7KMJhR1V4gVSXX9ZBsu3FgcHpNHHawZUrRHZF7hM4k+VuGY
+         cCDxaQtvCLL+dQ6JF0Gdc3vqdeSHYxfvtdoYDEENxp/JxM61/28RtDeem0IHD9lHahsW
+         blbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVMrk+dQiqqwz2SBd6g6NH0ICO/d4xS02Y8zXd3eT3kS3Wzs3daa84CgCzre+ZAf+CRvcv5oVAXZLSA2kA2dmupqEH68VT5
+X-Gm-Message-State: AOJu0YzuRqhmj2sB9kF/5J/WnihcV/EX/zzgXnKC1qaK4Xmon1+wH4KN
+	Qp2V0Ne85vZ6bMoX+NhZ4c7XOW7s9HKSY4dZct2bIrd4RaF9iED+o7JJk48+CcU=
+X-Google-Smtp-Source: AGHT+IGPi7qDkQjeZAk9W6Bi0ss6+KHR3xR9GWNpIb52GnkGjYQgeYmsuPejkh0ek4HalEtqRY/qjg==
+X-Received: by 2002:a05:600c:a386:b0:412:268f:1fa4 with SMTP id hn6-20020a05600ca38600b00412268f1fa4mr2698394wmb.1.1708088263594;
+        Fri, 16 Feb 2024 04:57:43 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id v11-20020a05600c444b00b00410d7e55e5asm2329981wmn.3.2024.02.16.04.57.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Feb 2024 04:54:44 -0800 (PST)
-From: Colin Ian King <colin.i.king@gmail.com>
-To: Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH][next] net: tcp: Remove redundant initialization of variable len
-Date: Fri, 16 Feb 2024 12:54:43 +0000
-Message-Id: <20240216125443.2107244-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.39.2
+        Fri, 16 Feb 2024 04:57:42 -0800 (PST)
+Date: Fri, 16 Feb 2024 13:57:39 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: =?iso-8859-1?Q?Asbj=F8rn_Sloth_T=F8nnesen?= <ast@fiberby.net>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, llu@fiberby.dk,
+	Vlad Buslov <vladbu@nvidia.com>,
+	Marcelo Ricardo Leitner <mleitner@redhat.com>
+Subject: Re: [PATCH net-next 3/3] net: sched: make skip_sw actually skip
+ software
+Message-ID: <Zc9bw8eHa5z_xh6Y@nanopsycho>
+References: <20240215160458.1727237-1-ast@fiberby.net>
+ <20240215160458.1727237-4-ast@fiberby.net>
+ <CAM0EoMmyGwA9Q=RibR+Fc41_dPZyhBRWiBEejSbPsS9NhaUFVQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAM0EoMmyGwA9Q=RibR+Fc41_dPZyhBRWiBEejSbPsS9NhaUFVQ@mail.gmail.com>
 
-The variable len being initialized with a value that is never read, an 
-if statement is initializing it in both paths of the if statement.
-The initialization is redundant and can be removed.
+Thu, Feb 15, 2024 at 06:49:05PM CET, jhs@mojatatu.com wrote:
+>On Thu, Feb 15, 2024 at 11:06 AM Asbjørn Sloth Tønnesen <ast@fiberby.net> wrote:
+>>
+>> TC filters come in 3 variants:
+>> - no flag (no opinion, process wherever possible)
+>> - skip_hw (do not process filter by hardware)
+>> - skip_sw (do not process filter by software)
+>>
+>> However skip_sw is implemented so that the skip_sw
+>> flag can first be checked, after it has been matched.
+>>
+>> IMHO it's common when using skip_sw, to use it on all rules.
+>>
+>> So if all filters in a block is skip_sw filters, then
+>> we can bail early, we can thus avoid having to match
+>> the filters, just to check for the skip_sw flag.
+>>
+>>  +----------------------------+--------+--------+--------+
+>>  | Test description           | Pre    | Post   | Rel.   |
+>>  |                            | kpps   | kpps   | chg.   |
+>>  +----------------------------+--------+--------+--------+
+>>  | basic forwarding + notrack | 1264.9 | 1277.7 |  1.01x |
+>>  | switch to eswitch mode     | 1067.1 | 1071.0 |  1.00x |
+>>  | add ingress qdisc          | 1056.0 | 1059.1 |  1.00x |
+>>  +----------------------------+--------+--------+--------+
+>>  | 1 non-matching rule        |  927.9 | 1057.1 |  1.14x |
+>>  | 10 non-matching rules      |  495.8 | 1055.6 |  2.13x |
+>>  | 25 non-matching rules      |  280.6 | 1053.5 |  3.75x |
+>>  | 50 non-matching rules      |  162.0 | 1055.7 |  6.52x |
+>>  | 100 non-matching rules     |   87.7 | 1019.0 | 11.62x |
+>>  +----------------------------+--------+--------+--------+
+>>
+>> perf top (100 n-m skip_sw rules - pre patch):
+>>   25.57%  [kernel]  [k] __skb_flow_dissect
+>>   20.77%  [kernel]  [k] rhashtable_jhash2
+>>   14.26%  [kernel]  [k] fl_classify
+>>   13.28%  [kernel]  [k] fl_mask_lookup
+>>    6.38%  [kernel]  [k] memset_orig
+>>    3.22%  [kernel]  [k] tcf_classify
+>>
+>> perf top (100 n-m skip_sw rules - post patch):
+>>    4.28%  [kernel]  [k] __dev_queue_xmit
+>>    3.80%  [kernel]  [k] check_preemption_disabled
+>>    3.68%  [kernel]  [k] nft_do_chain
+>>    3.08%  [kernel]  [k] __netif_receive_skb_core.constprop.0
+>>    2.59%  [kernel]  [k] mlx5e_xmit
+>>    2.48%  [kernel]  [k] mlx5e_skb_from_cqe_mpwrq_nonlinear
+>>
+>
+>The concept makes sense - but i am wondering when you have a mix of
+>skip_sw and skip_hw if it makes more sense to just avoid looking up
+>skip_sw at all in the s/w datapath? Potentially by separating the
+>hashes for skip_sw/hw. I know it's a deeper surgery - but would be
 
-Cleans up clang scan build warning:
-net/ipv4/tcp_ao.c:512:11: warning: Value stored to 'len' during its
-initialization is never read [deadcode.DeadStores]
+Yeah, there could be 2 hashes: skip_sw/rest
+rest is the only one that needs to be looked-up in kernel datapath.
+skip_sw is just for control path.
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
- net/ipv4/tcp_ao.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+But is it worth the efford? I mean, since now, nobody seemed to care. If
+this patchset solves the problem for this usecase, I think it is enough.
 
-diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
-index 87db432c6bb4..3afeeb68e8a7 100644
---- a/net/ipv4/tcp_ao.c
-+++ b/net/ipv4/tcp_ao.c
-@@ -509,9 +509,9 @@ static int tcp_ao_hash_header(struct tcp_sigpool *hp,
- 			      bool exclude_options, u8 *hash,
- 			      int hash_offset, int hash_len)
- {
--	int err, len = th->doff << 2;
- 	struct scatterlist sg;
- 	u8 *hdr = hp->scratch;
-+	int err, len;
- 
- 	/* We are not allowed to change tcphdr, make a local copy */
- 	if (exclude_options) {
--- 
-2.39.2
+In that case, I'm fine with this patch:
 
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+
+
+
+>more general purpose....unless i am missing something
+>
+>> Test setup:
+>>  DUT: Intel Xeon D-1518 (2.20GHz) w/ Nvidia/Mellanox ConnectX-6 Dx 2x100G
+>>  Data rate measured on switch (Extreme X690), and DUT connected as
+>>  a router on a stick, with pktgen and pktsink as VLANs.
+>>  Pktgen was in range 12.79 - 12.95 Mpps across all tests.
+>>
+>
+>Hrm. Those are "tiny" numbers (25G @64B is about 3x that). What are
+>the packet sizes?
+>Perhaps the traffic generator is a limitation here?
+>Also feels like you are doing exact matches? A sample flower rule
+>would have helped.
+>
+>cheers,
+>jamal
+>> Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
+>> ---
+>>  include/net/pkt_cls.h | 5 +++++
+>>  net/core/dev.c        | 3 +++
+>>  2 files changed, 8 insertions(+)
+>>
+>> diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
+>> index a4ee43f493bb..a065da4df7ff 100644
+>> --- a/include/net/pkt_cls.h
+>> +++ b/include/net/pkt_cls.h
+>> @@ -74,6 +74,11 @@ static inline bool tcf_block_non_null_shared(struct tcf_block *block)
+>>         return block && block->index;
+>>  }
+>>
+>> +static inline bool tcf_block_has_skip_sw_only(struct tcf_block *block)
+>> +{
+>> +       return block && atomic_read(&block->filtercnt) == atomic_read(&block->skipswcnt);
+>> +}
+>> +
+>>  static inline struct Qdisc *tcf_block_q(struct tcf_block *block)
+>>  {
+>>         WARN_ON(tcf_block_shared(block));
+>> diff --git a/net/core/dev.c b/net/core/dev.c
+>> index d8dd293a7a27..7cd014e5066e 100644
+>> --- a/net/core/dev.c
+>> +++ b/net/core/dev.c
+>> @@ -3910,6 +3910,9 @@ static int tc_run(struct tcx_entry *entry, struct sk_buff *skb,
+>>         if (!miniq)
+>>                 return ret;
+>>
+>> +       if (tcf_block_has_skip_sw_only(miniq->block))
+>> +               return ret;
+>> +
+>>         tc_skb_cb(skb)->mru = 0;
+>>         tc_skb_cb(skb)->post_ct = false;
+>>         tcf_set_drop_reason(skb, *drop_reason);
+>> --
+>> 2.43.0
+>>
 
