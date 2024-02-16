@@ -1,127 +1,184 @@
-Return-Path: <netdev+bounces-72285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3104285771F
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 08:57:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F77885774E
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 09:17:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE1D61F23479
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 07:57:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE954282060
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 08:17:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3FA517BC4;
-	Fri, 16 Feb 2024 07:56:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 550E71CD13;
+	Fri, 16 Feb 2024 08:03:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="rV87rYkC"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01olkn2022.outbound.protection.outlook.com [40.92.107.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F82A17BCC
-	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 07:56:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708070180; cv=none; b=mHwrkkOsLIEcJ+j4gFIfjL4Md0abOl4mNewlBlnaBVzvhbrc85HTVywpowGs61knXea91Lwg289oI1JTDJOSbDWWVIDYnFnO2AdPPmrUCOJe1FZlR+AMJ8ls0hFVCJqX1nt6kjg1mCD0KZ42ILDcsej/BIKyJvIitRxXDiq3fg4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708070180; c=relaxed/simple;
-	bh=7Pa9RjFBb172HlPrKPKDBn4IiTBiyGH+Iyana8ZOtJo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XbMe8VI/rLyDAPpzY0uPZX8TN1wHYw6SIIfRUNYZoqzB/bw+4UUH+TPXNDXW5XpocaAmUoxD8Yan7T4S5glXsZTRyQZPWjGiZshi+4TR7gLHCVCcTV52vz916Ogy2INaVPF0eO992oxhFhIpKxjPcODDtL+ESQdKDUv2lGT1wJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rat4l-0003T5-D9; Fri, 16 Feb 2024 08:56:03 +0100
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rat4j-0012AD-TX; Fri, 16 Feb 2024 08:56:01 +0100
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 7C63C29010B;
-	Fri, 16 Feb 2024 07:56:01 +0000 (UTC)
-Date: Fri, 16 Feb 2024 08:56:00 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Francesco Dolcini <francesco@dolcini.it>
-Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-	Chandrasekar Ramakrishnan <rcsekar@samsung.com>, Wolfgang Grandegger <wg@grandegger.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Francesco Dolcini <francesco.dolcini@toradex.com>, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] can: m_can: remove redundant check for pm_clock_support
-Message-ID: <20240216-panning-sesame-2bc66afeeb6a-mkl@pengutronix.de>
-References: <20240104235723.46931-1-francesco@dolcini.it>
- <20240216074527.GA5457@francesco-nb>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 466591CD0B;
+	Fri, 16 Feb 2024 08:03:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.107.22
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708070594; cv=fail; b=cmcJ1qiYJ+/VrNG/Hw+vUpFdUTpHPkeOWDgXypVPMv1ip0etbPYbQ1MIS3bMsejQzO+8mlmnaGSAMQNGcQ2/req+p3MQghTv0FQckVpC0bqOy1qEIJ9QCFLBhufjVkKB59EmQoy3u11/t+3UND8ipjkYJbsl0ZZC3pmyZhoiDRU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708070594; c=relaxed/simple;
+	bh=vGMYYhcJfxqSwv1fxv3Ynp4ubt4dWHJsxQfNwOzrMYM=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=G1254s6cXml2gb+TcLjVN+6L1CS2YDtb0ZRRjsBYhfISYTu3a7zbUZMoRFSwsLPx4sLrGTIA2XcRhz8kv32e7e4WLW3NVkHJqkddT0MrTUDoycA2vOtQEt3rvJuD0/9/t0Gqy0CYrluswkWGe7a5azTKJfstkE3BDzAQtLjT4Wc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=rV87rYkC; arc=fail smtp.client-ip=40.92.107.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TN6110ZaNW5lU7XuzAWaHFaGUI6z/U+H1jtGBVlBDjDcKvHWRuQxTIHVBPzXBibo7zvZ1X7AGaJkngNoYlN4ZWi9drj8Z2nwq+GHagv6YeEwOKAGNEbpXM1Kt/ujH38y3XKaee3/Nx/8/98LzSwlgEuc2GELyWa1sVdxtWncWUgk5mT1YxjOwVRPx+h+oCjYK2fWt87nWPlXwWETwTCjzp8Xw7MA9IG2atkKMekna+8jvwEl58kKqBIbE+uyoqU0js9ogZJTfj/Q5TdOk0SMG4Bi/PvRxg7OsHJ2feErWqZ3mYLLYL0gt77oiyruJ9KyoBI2J7Zv6Qhc+W04WJLXOg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=j96xoxWxxG9BSsoTXyOHJjZm8ZyVGqnxn4Jmvj/Df94=;
+ b=M9cxTb/dCtdUdMHFldUKptVsNO4Inht1RLj7iHob41h2SGhdqx7fYlnqVNukHyLEVUoN2p0jS9NLyf3ohXQJfXO8t6+M8dv1hp78vtHYHL7dsRLYoEnVO1QTPAVxice5H2yCuHyGB+ZbWSivJxQKxGOqnU+S3ubbOMaQ/dJNuW0DnJdtB4xNtls7SpZydR+aaI4T8hGAdboGSZZ+4b5r+VMALrq6FnE2MgoXO2vQslYL10mEPY5HxeDOo3lhL11v/Ny6jcsUpQ/Eyi9zsZPNfr3aL5StKqslo0QOyDinZCWUisExcz3VdrVAP3Xbpv7Hybtt9LpALJe/n2mVbY5IBw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=j96xoxWxxG9BSsoTXyOHJjZm8ZyVGqnxn4Jmvj/Df94=;
+ b=rV87rYkCKDnl3QBfm8gK5RxKfuRg5YYY/ZFYv7IzxO7Dz7ML3zFEhfnLRw1FygZRccBFAuQ3gWECFfIgG1LVfxeAUh25oz56kATG7j3jsSkoiOVb/pZULaay1RKjV9CXbUp83VAqbY9AMflzwFKLpHKiOpfM6Bn9YghSGGtSFaZh9+DfPdXvRO/2vWudxumqyeVA5iRrjNt2WYlFBa9xlShhytSDNQVXqPZ/EEJiCGqoxmse1v9MUjJ869thaEoDYjnlgbEmMQoJyi/qTKODmA3DvWofdjjt0oOPq7bXj+Q6FFoVUcZZFKjjyv0dRbijmc1zyGUQ2ljBNv8AeelmOg==
+Received: from SEZPR06MB6959.apcprd06.prod.outlook.com (2603:1096:101:1ed::14)
+ by PSAPR06MB4360.apcprd06.prod.outlook.com (2603:1096:301:78::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.31; Fri, 16 Feb
+ 2024 08:03:07 +0000
+Received: from SEZPR06MB6959.apcprd06.prod.outlook.com
+ ([fe80::9a6b:d813:8f4b:cba1]) by SEZPR06MB6959.apcprd06.prod.outlook.com
+ ([fe80::9a6b:d813:8f4b:cba1%4]) with mapi id 15.20.7292.026; Fri, 16 Feb 2024
+ 08:03:07 +0000
+Message-ID:
+ <SEZPR06MB69597BA5B7F02E0B9995131A964C2@SEZPR06MB6959.apcprd06.prod.outlook.com>
+Date: Fri, 16 Feb 2024 16:03:02 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/6] dt-bindings: net: remove outdated hisilicon-femac
+Content-Language: en-US
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+ Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
+ <salil.mehta@huawei.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Yang Xiwen <forbidden405@foxmail.com>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org
+References: <20240216-net-v1-0-e0ad972cda99@outlook.com>
+ <20240216-net-v1-3-e0ad972cda99@outlook.com>
+ <86a4d31d-80e4-4c11-9c71-e14494e3c8f2@linaro.org>
+From: Yang Xiwen <forbidden405@outlook.com>
+In-Reply-To: <86a4d31d-80e4-4c11-9c71-e14494e3c8f2@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TMN:
+ [5Oc4VLRNK/o4xC69BubHq9wb4dS+Q7TT0qDCgYpUnlQ+FCj4KEOQDvV41MHh7zCZaXf+WHCroiQ=]
+X-ClientProxiedBy: PS1PR01CA0010.apcprd01.prod.exchangelabs.com
+ (2603:1096:300:75::22) To SEZPR06MB6959.apcprd06.prod.outlook.com
+ (2603:1096:101:1ed::14)
+X-Microsoft-Original-Message-ID:
+ <55fe101f-2ee0-4b7c-949b-7646fce48b34@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="2pwjxutxb5pv4fzu"
-Content-Disposition: inline
-In-Reply-To: <20240216074527.GA5457@francesco-nb>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SEZPR06MB6959:EE_|PSAPR06MB4360:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6894770f-05c9-4782-55cf-08dc2ec5b566
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	e6hhyOCYNqN3pNEAQ1GCmM5Jk2mwFLBMhmKNvan0goJuektKCBa1bYMvioYCkLWqdRO4vDkYy4G6gURsZTHrLA9qLz4ns6kRrlUCn1boBaAnvSjQZcc438P8eMi07K4Tu/OxfpJCyNlUzrLqnoG3SOirk54IjHtKqs0FL5qmeJX/JgHUwZJowB/E5TeosYtVnQzbQSYE7O2Id26jtY/ZpBznfgK/dviL/iXKJr7JirlZjoSgyOblI935ZtoGQCIBFZCMBa6qmWIgeiOVywEXceNJSoxRT6zlQoWWac4FhKhByQPEyRtEL9uaV+7R1PvFBzVP7gWzKcWh/lbW9uSvP5PmRX8t5LS97H0CA5TAXHclhUh/PMrCqntm2DKzNMeK/OXkPlijJhJIvU6cEDjlLLfcILNqOP72ROC1FkxIi3olQg5tYEkmVeQR8bmO0/uB5N7kmhaljWi31gU9i9F+RAiAHB/ciFzbgkeayVGdLn+LK4BqnMVDDj46RsylSEIrbEUD0CiIMjzJ9RfMoE2DXFjPl2M2sM4AVKUEaJ8tVZPr4PTZzITf6Kxza3Na8Zz3
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?anN4OElCbFdZamVnTTlRN0ZTVG5uWjAxMzFSM2ZNUG1XQzJnTlpIUDU4Tndt?=
+ =?utf-8?B?bzhMdlpucHYzUDV6RDgxOWxreVVXUWpmUXMrckt2VFA2ZmpoK0FwM1BVd1ps?=
+ =?utf-8?B?bFNXYk5mQ0gzWXpYV3hxaFVtMnByNyt3eVpUcUk4UzdZdDBPMlRXNzBGMnJV?=
+ =?utf-8?B?ODR3VVpra0VuUEVJSDhlUVBWOVpsVWtwUElndzlweVFNL2lsQ01iVDJZVGxk?=
+ =?utf-8?B?cUY3alU4a1FPeW9QV2hZd2laNmZZSm81REluVW5Md2tja0NNY2VMb2huRll4?=
+ =?utf-8?B?RXFUZmhWYTJ2QVZSaUFVVm1MdUl1Q2N6RCthZVZCTjdBVlVPcGVmcjNVN2Fr?=
+ =?utf-8?B?RW4rK3BTTnYwZkFkSDc1VUp1MFRUaWZSTzYwWmNUbW5EREdsem1BWUpmYTZk?=
+ =?utf-8?B?SmdGQTNicnViRFE1TU44Y1hWcHE3MUFqSC9hS1U1L09tMHhOcDVDcG1xcmE0?=
+ =?utf-8?B?dXlJY0x3T3ViMTE3K1hDakV5bEhEVG93MGtjN0ExTm9FTU82c0w1TjBmcUdC?=
+ =?utf-8?B?S3JHZ20yNk1PeDlCcm5YQTZrVm9ockdwU0crM1ZzRkxMc0pFY3ZRblBUd3Fv?=
+ =?utf-8?B?STYxVTBBSjB4UUJleG9HZXo0Q2IrSXdlUFNSOGNHRHJuYys2SS9BRE54cjRh?=
+ =?utf-8?B?QjJpcnBZSUxZSHRuNGFiaXJGUXdsc0liVEcvOVF6QmtCL1RYdDJhMlRBSThX?=
+ =?utf-8?B?bnJTcHlxSWVwZnExK3Z3Q2RxMkFOdzZFK0sraG5ZU3RDaFRlQUFlK2M4WDds?=
+ =?utf-8?B?amZ3WkdmWEpjSmpSWmVodEExV1laZjdkakNWRVVSQlBWMFJ1MUV3c0pwSk4r?=
+ =?utf-8?B?YlhYd1JYRkVLUFNsdUw3K2RqUWd3b2gxeDNEdzhEbUJhclNDTFRDb2txSzJW?=
+ =?utf-8?B?SWhvMTRhYnIzWkFpeWp0bkhsQk4yQlZoTzROTjVUN1B5MkxwUGtEdE5ia3Bl?=
+ =?utf-8?B?ZkNBdVBCZE51OUVidVRqRUljREsyTEFZcm9tZTFTZlVxTDBvK2RIZWRLMUhv?=
+ =?utf-8?B?b3BvWWV4UkVDY2hjdlpObG9YNVdKS3ZVZkNWaFFNQU8ySHZGOVhheVR3VFlC?=
+ =?utf-8?B?dmFKc1lVM0lhbVZGVzFLMThJbzZORHVtVXl3b3p3amJ3OWgrZzIzUkNTeXhy?=
+ =?utf-8?B?a0w5cGdlSmdYbkZtOFBiNFA4dDVCTUk2ampZaVJ4YTA2dStva1poQ0ZpaUh3?=
+ =?utf-8?B?bVRHNlQwV1dJRklXUklYc2xjNnBqcU9TYkVwOXpGN2J3NFY0dFVvbVZQNzZo?=
+ =?utf-8?B?S1RpVE1yRzJ3a0ZOeVo3Umw5ZTVaRCszZVFlNkZLR1pRWk9uVUtHUkVNd1g5?=
+ =?utf-8?B?cEdVUW9oV1pwTjYxNnZndER4aHZZZC83VDNGZWNSTHQ3TW1LaFJldyt4Wm9E?=
+ =?utf-8?B?bHh1bkV3WkNxWWo3ZzBKdk04djJYUEZvd1BwbWl3RTdlaXFXNXJtMWdadGk3?=
+ =?utf-8?B?VG11M1BXRXRlei9hQjRDWWRRZHRvSUo5UlZpSXFlOEpmUTFVdUdETHhLL2xH?=
+ =?utf-8?B?bFdaZDJzN1pocU9aU0JZcEpvTitiUWdaZ2k3bHloT1J3dzArcXlFeFpYdjFZ?=
+ =?utf-8?B?YWZiK1R1S29TTVZ3d0c3eG1sT25wT2p3b2pOaWFHTDlYZTBSWWZZUCtyaUtF?=
+ =?utf-8?B?QUFVWG40WWR5RW1LNnc4UlBHdnJYSDRGSWFwR3RQd0oxUjQ5RUJXL204czdV?=
+ =?utf-8?B?Z0phMkFUT2pQc3hwNW1aMUtJNUN4dVoxWGZtbFpNVnlKWHpDSmt3OVp6cG5w?=
+ =?utf-8?Q?QICTBLzUmLllCiq08ZdYNZhhihb0fs1fPjzuB3x?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6894770f-05c9-4782-55cf-08dc2ec5b566
+X-MS-Exchange-CrossTenant-AuthSource: SEZPR06MB6959.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Feb 2024 08:03:06.8188
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PSAPR06MB4360
 
+On 2/16/2024 3:21 PM, Krzysztof Kozlowski wrote:
+> On 16/02/2024 00:48, Yang Xiwen via B4 Relay wrote:
+>> From: Yang Xiwen <forbidden405@outlook.com>
+>>
+>> The user documented(Hi3516) is not found in current kernel anymore.
+>> Remove this binding entirely due to recent driver changes.
+> Hardware does not change because you decided to re-implement driver.
 
---2pwjxutxb5pv4fzu
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The only hardware i have is the hi3798mv200. According to downstream 
+driver name, this is supposed to be a hisi-femac-v3 actually. I don't 
+know much about Hi3516, but it confuses me a lot. According to the 
+device tree node example in the text binding file, the MDIO bus is 
+supposed to be inside the femac core (femac core is at 0x0-0x1000 & 
+0x1100-0x1300 and mdio bus is at 0x1100-0x1120). So i think it's highly 
+possible they are the same hardware. But according to the TRM and my 
+tests, there are 3 clocks in total for femac core in hi3798mv200, one 
+for mac ctrl, one for ahb bus(I'm sure this "bus" clock is not MDIO bus 
+clock), and one for phy, which is very similar to the hisi-gmac driver.
 
-On 16.02.2024 08:45:27, Francesco Dolcini wrote:
-> Hello Marc and Vincent,
->=20
-> On Fri, Jan 05, 2024 at 12:57:23AM +0100, Francesco Dolcini wrote:
-> > From: Francesco Dolcini <francesco.dolcini@toradex.com>
-> >=20
-> > m_can_clk_start() already skip starting the clock when
-> > clock support is disabled, remove the redundant check in
-> > m_can_class_register().
-> >=20
-> > This also solves the imbalance with m_can_clk_stop() that is called
-> > afterward in the same function before the return.
-> >=20
-> > Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
->=20
-> Did you missed this? Or do you have some concern with it?
+Which complicates things a lot is the complex clock enabling timing 
+requirements here. at least for hi3798mv200(and all SoCs with 
+hisi-femac-v3 core i think according to the downstream kernel source), 
+It must strictly follow the sequence in hisi_femac_phy_reset() (disable 
+MAC clk and BUS clk first before asserting PHY reset), or the PHY would 
+fail to work. So as said in previous reply, the simplest way is to do 
+all resets and clocks management in the MAC driver, or else it'll be 
+very hard to implement. I can't find an easy way to "tell" a driver to 
+kindly disable its clocks remotely.
 
-Somehow missed it in the last PR, but already part of the next PR.
+>
+>
+> Best regards,
+> Krzysztof
+>
 
-regards,
-Marc
+-- 
+Regards,
+Yang Xiwen
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---2pwjxutxb5pv4fzu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmXPFQwACgkQKDiiPnot
-vG/iDwgAmM9nBdYvm5wqDwxWU8iSl2Bdq2PS3zvmB+7XOu1iYOQ8vV9XTMv5pHrL
-1GyKQSTbp0QZ/cVUOXzWa0PATlS9xKXetojJ6V2hFoN/9P0AHhkhVTU04dwsMyM4
-NNQDWV2ENdaeKWpThVB9Yatx07lIXl5XOtmPxEqIR3LR59h1EpL2ODLXUADUU4Zu
-NklAV0XUefT+TX3ckwq/14oZhVaUf+8rXWqUvAw4OpUENWwVqWdUamrZfBFfC9bw
-lWKITH27Fa51hfZOgyW1EmZC2Tmq5h/T5ONJP9UXk0J4VH178BS6IEBSbeoZFfgN
-FJAjp782wSr5d+UNawMUKyaiL+VDiw==
-=VaPV
------END PGP SIGNATURE-----
-
---2pwjxutxb5pv4fzu--
 
