@@ -1,151 +1,146 @@
-Return-Path: <netdev+bounces-72526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83D58858773
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 21:45:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 725FF85877E
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 21:53:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E41AFB27BAB
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 20:45:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DDF828A95E
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 20:53:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F53A13B2B0;
-	Fri, 16 Feb 2024 20:44:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62BE7135A74;
+	Fri, 16 Feb 2024 20:53:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="a70QFPIy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QELlytjF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2FB713AA3E
-	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 20:44:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FD231D690;
+	Fri, 16 Feb 2024 20:53:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708116275; cv=none; b=cWqnpNvYZ4aaGJY0yvS1x/GxHC6TyX6ScJvhc9bWNuIF5FCfJuDUV5dOBVvEhKLwbHcJpRZNoGV7i19RMEb5oAwuDHNRu7sUb1F8IoHqjMhghoiZzy2908V/z5zmel43GTD0C0n+OmInwS7fxDlqgCA7ekRsEGB6sycSVo4rwKI=
+	t=1708116789; cv=none; b=Jpgs8E/NU9fQuY7RLko+/qccbULCVtRRGFT3ya/M+LBgU3ksVIELgVGM5w+knimTlN2o+2UYEGpYxGhWZce0GsGvGNZWN4+yXmPUZV4HSGLt3GyE+Z4U/EAs1W2UDnyc6LEtAOnsId8btS+aG0OwRYMgHtc43Rm+Eao6u5VHPIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708116275; c=relaxed/simple;
-	bh=dcgKF8UiBBz34XJT7VHWm6Do34FT3jmf0XIZ/Dyw5Gc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=N53DoLsLlstVh8jcUW2ea0SJZU0JncPIC8AfsZl3MXX788wYSUJJjuvmSMlHubm+KB2YeEiJlDgj6oOLbWCCpufX5jP9sYAjnxgTsd5GUcW8qjFY3ng7x+w5WbZeohKMbVwPW0PvJSYj2WIJrZCIa5bYhZuBArKso0haSdxxExQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=a70QFPIy; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6e104196e6eso2614757b3a.0
-        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 12:44:33 -0800 (PST)
+	s=arc-20240116; t=1708116789; c=relaxed/simple;
+	bh=bJFoLhJIy8Ldus1bMGVPuw/0hLQGmz9TRmx5cOR8DQg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P8W1XCDNwtg9ok5M/kNmi2ZtsBuewJQRgRWPUT7KWqrJqcHvhF3kjLjtBvRauisOM0zFxjvZ6/aE9o3SSlooUUOmRE1ScyYkYaAlbR5/vtbmj/8Ua/MLt0NrStd0uF4mdPs7r+KYOR7kj1LoTUBHIrypJwDq3a4JbWO/Mo77ShM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QELlytjF; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a3d6d160529so150709766b.0;
+        Fri, 16 Feb 2024 12:53:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1708116273; x=1708721073; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=KfdPOM/mYc/pJQP93wRUe5zkjH2nJXn1uubLQkwefXU=;
-        b=a70QFPIyG4/o5/xtmwXYobO4aNYt4Vr1abmDz2KqPg3ykNeFldET8fWLAR3kDwVwiW
-         WBKbf6o6Ktns4fTlQHDySxUm/+Kke7cy0gDmSUoE+iEiNAS5WF2uD/EHpbIYFFgPEMDr
-         BkioCPp2YnG3mQDmYrkphCZQLDW4yg/K1nLBk=
+        d=gmail.com; s=20230601; t=1708116786; x=1708721586; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8k6u5v/IIS31CpQ7yJE8KmztE2tyWtuh+i65Ku7owlg=;
+        b=QELlytjFBzR/hQ50JgRxKzlgoe7JJuhc9/z3Tvb7DJnCmDO4Pa3B6XRyIrFNkLzCoS
+         NeCdtAH0M8NO4pyz7yw4rD/RnVs+EJzaw5T+s1sql+uJxkd+X4fLwctxSe+9rpVhTuaS
+         iRs5DVd6oE6zn3zOnnJZGY/y64Lobpqj1XxcdPP2kU936Pydy4eBguTEISKPHSHbeW1n
+         zKmQxDYNiSrC5NN9Wp1ne1HXAPlE1lWjglqMEHJzld6nfzoXnjShGDRfcCYWHMtZUjzw
+         9C5oM2ClXI0ilcZfLTICEh7FkL/ryUHA7rPNi5Xt32ji6PzLEm+rikexQ/+1+M0w0DPG
+         Wq0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708116273; x=1708721073;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KfdPOM/mYc/pJQP93wRUe5zkjH2nJXn1uubLQkwefXU=;
-        b=F0zeZyRo7ZDeEJfH5PdjhnKu4aZVxcKagW6m/gG3TSFt6HQMztm1R5oWRIsCrPxgYc
-         5uPS11kGW9LZ2f5CN7NQzrQnrKSSZSlb/M1/li3JdBDbwv9WMXxEH05IwzM87De6Hb4B
-         VoCnACv62BDsx9eh/SS7/KuIO4X3G/d8TcXSoF1DVdLgwvMEXQ1Dy4MlXpspS0lzM9Mx
-         i6edAgYziivUs2PN+swAC7kjBsw1YCxjEfvlPR8wxi7eT6X48fd0zkZtT8+2TZX4vlh8
-         PltJuZSfliogrSv+MEC2Nv7R/1xysGBuHtdnQcu2Ms5R6m2HnWAuasq/rv2CuNLc/Oe/
-         6Lpw==
-X-Forwarded-Encrypted: i=1; AJvYcCWLsD3cVW3Q8KdlfiArpfaZVD/T67gWN1oag16G7iod9JKAalt6xr1LkRiMFUh3Zc5z0DIFJHW5X8/d9NHRoF8WV6R4ymkx
-X-Gm-Message-State: AOJu0YyGC0JOk2LMeqlZB1EfTazUFe07lu+G5AlOL7GKP8M3eKJCSTs1
-	bwWSLuvT0hT7nEgYpCsVPhBoHbzigVyctmSLGW4QaUSFLSIpji9ewP8VqpVfVA==
-X-Google-Smtp-Source: AGHT+IFMp/+uwtXoTt8ZTB7NzHGsxYYLBqDWpyM5s8tBLrts/aiShty1PMRbExqYCcV/V7ylknMcZg==
-X-Received: by 2002:a05:6a00:3d11:b0:6d9:b4e6:ffb with SMTP id lo17-20020a056a003d1100b006d9b4e60ffbmr7107600pfb.0.1708116272797;
-        Fri, 16 Feb 2024 12:44:32 -0800 (PST)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id e3-20020aa798c3000000b006dfff453f8esm366899pfm.75.2024.02.16.12.44.32
+        d=1e100.net; s=20230601; t=1708116786; x=1708721586;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8k6u5v/IIS31CpQ7yJE8KmztE2tyWtuh+i65Ku7owlg=;
+        b=AKFtRpndjlCyY+urTz22b4hEQ9Qu8CORfI7+YaovLj8b44hjeME4E/nCuca4//kdxH
+         3xSPKo90TPzwH6DfqOsrLWz7HgCbVQbbo00V7129SQ7TVuOvnI2vvTujBU4XRYSDcUUo
+         Z88vhynbMJD8PhRC5wsdxK8iy0FQMGni12JaLpsmvrjgBFheQChZ77cn+iZ/5/brwOdm
+         lerepGcLZNQ3e/kH3SH9MbgZ39Lwv14dcIM+P+EZ1xKs+71+8yiuhAKmiLfL6WhRBJPF
+         8f+7UQ7wIHmbXq0khUZ5D6/K9+WBAHWFmMgGe+Z6YCsQHgItCt9qdRAMa2p56Sm3RE1M
+         YnMg==
+X-Forwarded-Encrypted: i=1; AJvYcCUgip/gJYZ8U6OfWD08kiW2Z3nOpziM4+k7zmRU3sebRZmMnYeM15BuwO1mChSgNKlSP9AcAfimjkZi+aLVP+gLBEBXSTJT4bs4aJjZBis8AHCK8M/p7fegsmAdvecwS6HpTGXX
+X-Gm-Message-State: AOJu0YxyoXPLImdJ3N+6j35nU0lvIYELtH0Y0UORh315o0TcR7mn7Zv+
+	xYyu2E0vOxoDKm6Rwxw2IEb7WQMU6qcVptjBti5jMgEqBejHTDOS
+X-Google-Smtp-Source: AGHT+IHdjG52bCC5e7grroCqkwPF8LjGui542YDrj/LbvgnC95FzO1rOxKzxAapGSYjT6tezkJ6/sw==
+X-Received: by 2002:a17:906:2b09:b0:a3d:2222:7f84 with SMTP id a9-20020a1709062b0900b00a3d22227f84mr4558963ejg.37.1708116785671;
+        Fri, 16 Feb 2024 12:53:05 -0800 (PST)
+Received: from debian ([93.184.186.109])
+        by smtp.gmail.com with ESMTPSA id n18-20020a170906379200b00a3de6cf49ebsm331799ejc.6.2024.02.16.12.53.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Feb 2024 12:44:32 -0800 (PST)
-From: Kees Cook <keescook@chromium.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Kees Cook <keescook@chromium.org>,
+        Fri, 16 Feb 2024 12:53:05 -0800 (PST)
+Date: Fri, 16 Feb 2024 21:53:02 +0100
+From: Dimitri Fedrau <dima.fedrau@gmail.com>
+To: Gregor Herburger <gregor.herburger@ew.tq-group.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Abel Wu <wuyun.abel@bytedance.com>,
-	Breno Leitao <leitao@debian.org>,
-	Alexander Mikhalitsyn <alexander@mihalicyn.com>,
-	David Howells <dhowells@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH] sock: Use unsafe_memcpy() for sock_copy()
-Date: Fri, 16 Feb 2024 12:44:24 -0800
-Message-Id: <20240216204423.work.066-kees@kernel.org>
-X-Mailer: git-send-email 2.34.1
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: Re: [PATCH v6 net-next 05/14] net: phy: marvell-88q2xxx: add
+ driver for the Marvell 88Q2220 PHY
+Message-ID: <20240216205302.GC3873@debian>
+References: <20240213213955.178762-1-dima.fedrau@gmail.com>
+ <20240213213955.178762-6-dima.fedrau@gmail.com>
+ <Zcy9E4riyFRk8B1P@herburgerg-w2>
+ <20240215202403.GA3103@debian>
+ <Zc8oUt4fnD7ltxq4@herburgerg-w2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1864; i=keescook@chromium.org;
- h=from:subject:message-id; bh=dcgKF8UiBBz34XJT7VHWm6Do34FT3jmf0XIZ/Dyw5Gc=;
- b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBlz8knIiqX0gNushGFi5tcu+b6Z2huNDqRuDpnD
- 7OBa/E/fjGJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZc/JJwAKCRCJcvTf3G3A
- Jka2D/49xf0HEbfzzY6ewPuxOsgLo3p19BQFaeQdlEVmWTaTYVIkRIeAWuEM4tucWsRNjfFhtwL
- 6h3b29oXEkNy+gSDIPriR9wiJ22Wc1ZNZitIyF5f6Vw6JdPJIDULPiAIF5SIEAJJCLOgbW+9kDG
- ZK1tFnFSilN3mdrPd+RaXPlGxvAfrGTb4Z13bkYd4odPAq/suwjVfTFnIGZGh+Dw7f6YWzEkKhd
- FW+B/PJ/EXxf+tQD2nVLFBZwE/iGUKYROXMrQarGY9On+dW/KZzVYK1Xm3ku9MUDeF2kBlqwIqN
- +v37IyAiiVTpM5O9Hmvdkm8J1AT9kWx4LMGK1TyQwwUpfgBrFs6MLmj+rRlubFGDuFJCRscbTY9
- EqysezRvgwPS68ntriQ2+6J6Gprejz/KiUneDnklbHYHoD0O/iopV0CqZUItKqH+ZEg2fHx0yHK
- 2x1f1c7Cg8A9zVRy/fS77XTqQTLDKzVUKCV00Ug68xBain4Htb7k7KocPnSGgD/twCM5QioXQkj
- G5jg31qGUDwOMmWJMMG7MTjkHUEoxzRO+MqT0LBW+8kHR1M2zDSakXjZcjkSvlkWu8LegHqTIdG
- vFpt7rr5iY4esTyi0IA3MfGnzTMPkuM2BA3sVo+rZUkepnNhuVIQAmZHj/7j2ntVSzc+9fApR8G
- XtCi7K1 Uu1NLRFw==
-X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zc8oUt4fnD7ltxq4@herburgerg-w2>
 
-While testing for places where zero-sized destinations were still
-showing up in the kernel, sock_copy() was found, which is using very
-specific memcpy() offsets for both avoiding a portion of struct sock,
-and copying beyond the end of it (since struct sock is really just a
-common header before the protocol-specific allocation). Instead of
-trying to unravel this historical lack of container_of(), just switch
-to unsafe_memcpy(), since that's effectively what was happening already
-(memcpy() wasn't checking 0-sized destinations while the code base was
-being converted away from fake flexible arrays).
+Am Fri, Feb 16, 2024 at 10:18:10AM +0100 schrieb Gregor Herburger:
+> On Thu, Feb 15, 2024 at 09:24:03PM +0100, Dimitri Fedrau wrote:
+> > > Hi Dimitri,
+> > >
+> > Hi Gregor,
+> > 
+> > > On Tue, Feb 13, 2024 at 10:39:44PM +0100, Dimitri Fedrau wrote:
+> > > >  static struct phy_driver mv88q2xxx_driver[] = {
+> > > >  	{
+> > > >  		.phy_id			= MARVELL_PHY_ID_88Q2110,
+> > > > @@ -255,12 +439,26 @@ static struct phy_driver mv88q2xxx_driver[] = {
+> > > >  		.get_sqi		= mv88q2xxx_get_sqi,
+> > > >  		.get_sqi_max		= mv88q2xxx_get_sqi_max,
+> > > >  	},
+> > > > +	{
+> > > > +		PHY_ID_MATCH_EXACT(PHY_ID_88Q2220_REVB0),
+> > > 
+> > > I tested the series on a 88Q2220 REV B1 (which is id 0x002b0b22). The
+> > > driver works fine on this revision.
+> > > 
+> > > I understand that in the Marvell API the initialization for Rev B0 and
+> > > B1 differ. For B0 some additional init sequence is executed. I did not look
+> > > into the details of this sequence. However this patch seems to work on
+> > > Rev B1.
+> > >
+> > > Would you consider adding compatibility for Rev B1 and following? I
+> > > tested with:
+> > > 		.phy_id			= MARVELL_PHY_ID_88Q2220,
+> > > 		.phy_id_mask		= MARVELL_PHY_ID_MASK,
+> > >
+> > 
+> > thanks for testing. I would stick to the exact initialization sequence
+> > provided by the Marvell API. Registers and bits are mostly undocumented
+> > and I think it is safest this way. Besides that it should be relatively
+> > easy to add the support for rev. B1 by just adding the init sequence for
+> > it.
+> 
+> Ok. I will have an closer look at the marvell API and eventually come up
+> with a patch for Rev. B1.
+> 
+> There is also a Rev.B2 for which I cannot find any init sequence. But
+> Rev. B1 will no longer be produced so I need a solution for B2
+> eventually.
+>
+After having a quick glance at the latest Marvell API release, the init
+sequences for B1 and B2 are almost the same. It differs by a single
+register write. Would be great if you can come up with a patch.
 
-Avoid the following false positive warning with future changes to
-CONFIG_FORTIFY_SOURCE:
-
-  memcpy: detected field-spanning write (size 3068) of destination "&nsk->__sk_common.skc_dontcopy_end" at net/core/sock.c:2057 (size 0)
-
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org
----
- net/core/sock.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 0a7f46c37f0c..b7ea358eb18f 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -2053,8 +2053,9 @@ static void sock_copy(struct sock *nsk, const struct sock *osk)
- 
- 	memcpy(nsk, osk, offsetof(struct sock, sk_dontcopy_begin));
- 
--	memcpy(&nsk->sk_dontcopy_end, &osk->sk_dontcopy_end,
--	       prot->obj_size - offsetof(struct sock, sk_dontcopy_end));
-+	unsafe_memcpy(&nsk->sk_dontcopy_end, &osk->sk_dontcopy_end,
-+		      prot->obj_size - offsetof(struct sock, sk_dontcopy_end),
-+		      /* alloc is larger than struct, see sk_prot_alloc() */);
- 
- #ifdef CONFIG_SECURITY_NETWORK
- 	nsk->sk_security = sptr;
--- 
-2.34.1
-
+Dimitri
 
