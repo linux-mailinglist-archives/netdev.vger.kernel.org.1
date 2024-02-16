@@ -1,140 +1,214 @@
-Return-Path: <netdev+bounces-72458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B88285825D
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 17:24:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70D6F85826C
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 17:26:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBA342817AA
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 16:24:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 954971C20FED
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 16:26:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3285112FB3E;
-	Fri, 16 Feb 2024 16:24:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D444012FF89;
+	Fri, 16 Feb 2024 16:26:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EVX9P81m"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GTlNlHgB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A42CF12CDA0;
-	Fri, 16 Feb 2024 16:24:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE17D12FF6F
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 16:26:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708100680; cv=none; b=rbjrB1SoSDSsqXD1RRBW83ea7BRS9Ncifg/5CQsbvEqMXsulHO8bpBTfAt1nRsbcsSXF52NDCg5KjGX9wSsF4s2yT/hM4LNHTC1mQKw7ZJ4kTEslWPeRd6b8aJefj/EgW2YygKup5eC0qn4ftioHxemAZ2NDTeL6mL2RpLsxUEA=
+	t=1708100805; cv=none; b=D89dQdT+Unpi/kuppFi9V11Pk3rGHuH7rYdsi7eTyJq72FB9QrbYC+2ItUkcAGPHfPv3adctcKhpRq/7UK1+J0TxVJ8+ogJbwlSh2kKNtOvK/uEps+9JIGjwzK5o2rXA4LRITqezkIPyFyz8LooR5qqFowR4buirNuQRRXyKwcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708100680; c=relaxed/simple;
-	bh=U6YG9Ti4C0gWK/nGR2s4gkUdINqjSSAttW9vvgbqrtU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uZ02gDJTWQbkjt+Yk6uPXDlUKodWIEAl3ke1dVeISq/zA2Oz3md9s3Y4DJCB2CkG9oO3oOklxeqY3h5mGLQH/6oTULTOWk01k1ZWmtYscJqunoix2xmd4Xx9rsUpkXadStHkzhxaRpKEL0ozdm9uOT7ka5guXf3s8vrfi5O6JtM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EVX9P81m; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6e104196e6eso2335159b3a.0;
-        Fri, 16 Feb 2024 08:24:38 -0800 (PST)
+	s=arc-20240116; t=1708100805; c=relaxed/simple;
+	bh=LcZm2kWHQ4w78fgPQiXn6fezOQZ4PZIfAqO2QKgVre4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=p8iudjvC1wx3HFfZy5CrQArIYvafcGWnqONg0cobpSBHmEJ4nFoNXfw5EnUBqoU7yRz0V1K6NcmZGm0fl49+Ub33lRsgBQZPgYf8KagdPVVezXzjLbaqLSs/XMvH8CPtA1QEKD8o3yHMfSRjuhyZ0kbR9T4itxoI+qW8pa9rZFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=GTlNlHgB; arc=none smtp.client-ip=209.85.219.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-dcbd1d4904dso2373448276.3
+        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 08:26:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708100678; x=1708705478; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YQ+UNV/EAPr4AAhwPiPwcLP/Ta6X6kk2pf9+0780rLc=;
-        b=EVX9P81mYfg58/qZs9aH5PTsYlqIgoQPMBliRRfr8E+u1GhKLBwvOlEE93NopZE88a
-         3B7WeHSVYns08p3bh6oojL18tV7mGi8jkTai7zXnb40z6IClIrrA57bFl5KFgXiokvlO
-         Diq6x18SYrw/E5ZzwO85PhuyiBTabPfYo8LZOdT3B42PuQe4YfRTVsmEHSdzI1nwtVoq
-         xrnbdNVT29WrtZbdQ94Ay1bSxJQpZyDm6Q4/hQyIMFUFxETJV4lyXgP9A67rIo+d8bgk
-         YZPVIp348IHLiJ4pQOGSnUQQ5ms1n/taKG7IAVd/QnHSsQc37F1acckRWaDS8hqcc0V4
-         QL+Q==
+        d=linaro.org; s=google; t=1708100803; x=1708705603; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=44tIHP3e27m9mssG+F+MhxgHY8yrYPkp9JDOgoTDz6k=;
+        b=GTlNlHgBjngckS2bqahEVfaHLmZT7hItTbsRUPRkylEaTS3U0rg1cZ7MBDcSDzQVW6
+         HnCoAEOq4cKV0xelIa8Hr4kciMMYPmKat7L2Bav7DXzj1VAmVJxgFrs1rJsNP0Rxc8Rx
+         Tk3L8+4lVEkBhWSMGN4kapsJR00FXmEhddi4HgdtTSFuhdAthJRmW+p8ZQZvgCmJP/JE
+         7VBoyM4eR1yOOCRt3/SNR/2H1VD8DKnV0IH5KvzcoQv+fej3ML3ddZEExOv7xlQ8GNOi
+         QeptJG7C3epNKhif52dnDqQLFqmeAD8iySp0sz+2lGFz7X+BYCnbAWwnX3EAGfb0TBQ0
+         JKwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708100678; x=1708705478;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YQ+UNV/EAPr4AAhwPiPwcLP/Ta6X6kk2pf9+0780rLc=;
-        b=M/Y77BRTNWhSBhE1ECf5RqrjGp/vZe7KDuuWTwgu6WP1H2UpHzx2S5CVjxT5GJG27/
-         2bKUfYIrLe/G2yAMgRbpy7BibiAHHCr8w7FWM6FPIZDhi0Z4JFq7nd0CFtSwKMDq4HIn
-         84YOi/eYrn7WIORjvx+rzwLGQ1tu6NZAr5kSxW5HW+hKw6alLU/EssAY0kvmv/jB5Nq9
-         pDOzJlz7xsMXsQvvU2BYoFk50W3wBnbns6TvxyAExLvZyINpBpb7aIIDNEWNpahi/nSO
-         T7yrEXQW+LBZB60EnPLn+SfP8WDfkUfvUEmDuKXdUFmxEdnVmD/xtAYEdOFbG0i/fyq1
-         e4kQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVzJuMTIwms4GxDtGooerYDXuDaZF0K2mZfltkiufijAej3byAM9yV3QKbuzs+HJYpSJFUhHvPf31+Fm/uxv6dELi7F2ThY4pEoceCcblExo6SpKr9MRUrGOVOf2R4AzDo1ji/6
-X-Gm-Message-State: AOJu0YwsqY53n5wYDMxr4HLZ2wXfKVGCg0Igsiqf0LrlZa8JdumiaHwx
-	ZXaFOj+cMbOWzt2nuXxFR94VOhfJLDc1v4ZBBn0/yNGQvMXNjMsT
-X-Google-Smtp-Source: AGHT+IHb4zZg1UAszeDHy7JoD5f7d909sEn93hlBJmzyVRU53SDtzBN4FcJ5+lA4W5FXP6Z8EfsGSA==
-X-Received: by 2002:a05:6a00:1995:b0:6e0:e618:7eb0 with SMTP id d21-20020a056a00199500b006e0e6187eb0mr6237661pfl.8.1708100677762;
-        Fri, 16 Feb 2024 08:24:37 -0800 (PST)
-Received: from localhost (dhcp-141-239-158-86.hawaiiantel.net. [141.239.158.86])
-        by smtp.gmail.com with ESMTPSA id l15-20020a62be0f000000b006e133caaaa1sm151113pff.16.2024.02.16.08.24.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Feb 2024 08:24:37 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Fri, 16 Feb 2024 06:24:36 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: torvalds@linux-foundation.org, mpatocka@redhat.com,
-	linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev,
-	msnitzer@redhat.com, ignat@cloudflare.com, damien.lemoal@wdc.com,
-	bob.liu@oracle.com, houtao1@huawei.com, peterz@infradead.org,
-	mingo@kernel.org, netdev@vger.kernel.org, allen.lkml@gmail.com,
-	kernel-team@meta.com, "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, David Wei <davidhwei@meta.com>
-Subject: Re: [PATCH 6/8] net: tcp: tsq: Convert from tasklet to BH workqueue
-Message-ID: <Zc-MRN2tUmsCQLZO@slm.duckdns.org>
-References: <20240130091300.2968534-1-tj@kernel.org>
- <20240130091300.2968534-7-tj@kernel.org>
- <Zc7zLsEhDzGkCH9m@slm.duckdns.org>
- <CANn89iKDsJPY=QQrTHK0Jw=s=A_G_GzcOA0WsqXaytWAVV3R4Q@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1708100803; x=1708705603;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=44tIHP3e27m9mssG+F+MhxgHY8yrYPkp9JDOgoTDz6k=;
+        b=rwuIEnwJ1wMSF5U1VvTaPUb7Y3N9bRA/7gx24uqgmtEIfEIdVL8C8V5MR7+yLNmLzv
+         7og7X8hwxp54g2oxWSK2Zy86JuJNdeAnbm9rMWhPcoFEzMcLiclSy5yxTPSnKFBA0pcu
+         cg/5MikuI/b5Ius2V3U1DwDsGwO6u/mdIyJVeQxtn+pXyD+0DW5iP6edrKjhVw9/Nhlz
+         4ZB+GUElOAJ8xdpf4VKvVgXIVD7me7LdV4RTbaCfir/Cst6LVEFe6UPROQT87BPTYIao
+         6ijNwWEJoeucpghMPXgRdz45fve/ETxmBJUzDXajh3BSdnrCXNQWPr1mOAM0C9uEOVUB
+         LyJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXkB52cPYubak5JW5si3EtGtwfYgq6mSAqaBiiNiSq8YoekIYGEUA+CiEwrrOFIE76BhwnptOWHLOPndspDta1e/zVzdVQ1
+X-Gm-Message-State: AOJu0YwQsmV/ncvBTGw6TPPTxMuhPhnoEP1bV8SnYzOIUXAWjHJhJB03
+	ain0XRbYituIkPpOp3/BXSigegqS2g8vGmkuGAcFEZpBMpoeKijj/svtxkqdopF6OwtEQbCDplK
+	rzkidWrHtsut/CZF/IMPC1OdMXHlsUM46kA9LHg==
+X-Google-Smtp-Source: AGHT+IFuPYMq3HZ+E6QHC5yDkivYMMpl37gr1Cmwb52o7W8sSopxMnfNkn0jZFsKmhZQB/3N98O6EzewnPB6rpzvq84=
+X-Received: by 2002:a25:2002:0:b0:dcc:9e88:b1a with SMTP id
+ g2-20020a252002000000b00dcc9e880b1amr4736884ybg.7.1708100802770; Fri, 16 Feb
+ 2024 08:26:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANn89iKDsJPY=QQrTHK0Jw=s=A_G_GzcOA0WsqXaytWAVV3R4Q@mail.gmail.com>
+References: <20240122-ipq5332-nsscc-v4-0-19fa30019770@quicinc.com>
+ <20240122-ipq5332-nsscc-v4-2-19fa30019770@quicinc.com> <7a69a68d-44c2-4589-b286-466d2f2a0809@lunn.ch>
+ <11fda059-3d8d-4030-922a-8fef16349a65@quicinc.com> <17e2400e-6881-4e9e-90c2-9c4f77a0d41d@lunn.ch>
+ <8c9ee34c-a97b-4acf-a093-9ac2afc28d0e@quicinc.com>
+In-Reply-To: <8c9ee34c-a97b-4acf-a093-9ac2afc28d0e@quicinc.com>
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Fri, 16 Feb 2024 18:26:31 +0200
+Message-ID: <CAA8EJppe6aNf2WJ5BvaX8SPTbuaEwzRm74F8QKyFtbmnGQt=1w@mail.gmail.com>
+Subject: Re: [PATCH v4 2/8] clk: qcom: ipq5332: enable few nssnoc clocks in
+ driver probe
+To: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konrad.dybcio@linaro.org>, Michael Turquette <mturquette@baylibre.com>, 
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Richard Cochran <richardcochran@gmail.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hello, Eric. How have you been?
+On Fri, 16 Feb 2024 at 17:33, Kathiravan Thirumoorthy
+<quic_kathirav@quicinc.com> wrote:
+>
+>
+>
+> On 2/14/2024 8:14 PM, Andrew Lunn wrote:
+> > On Wed, Feb 14, 2024 at 02:49:41PM +0530, Kathiravan Thirumoorthy wrote:
+> >>
+> >>
+> >> On 1/26/2024 1:35 AM, Andrew Lunn wrote:
+> >>> On Mon, Jan 22, 2024 at 11:26:58AM +0530, Kathiravan Thirumoorthy wrote:
+> >>>> gcc_snoc_nssnoc_clk, gcc_snoc_nssnoc_1_clk, gcc_nssnoc_nsscc_clk are
+> >>>> enabled by default and it's RCG is properly configured by bootloader.
+> >>>
+> >>> Which bootloader? Mainline barebox?
+> >>
+> >>
+> >> Thanks for taking time to review the patches. I couldn't get time to respond
+> >> back, sorry for the delay.
+> >>
+> >> I was referring to the U-boot which is delivered as part of the QSDK. I will
+> >> call it out explicitly in the next patch.
+> >
+> > I've never used QSDK u-boot, so i can only make comments based on my
+> > experience with other vendors build of u-boot. That experience is, its
+> > broken for my use cases, and i try to replace it as soon as possible
+> > with upstream.
+> >
+> > I generally want to TFTP boot the kernel and the DT blob. Sometimes
+> > vendor u-boot has networking disabled. Or the TFTP client is
+> > missing. If it is there, the IP addresses are fixed, and i don't want
+> > to modify my network to make it compatible with the vendor
+> > requirements. If the IP addresses can be configured, sometimes there
+> > is no FLASH support so its not possible to actually write the
+> > configuration to FLASH so that it does the right thing on reboot
+> > etc...
+> >
+> > Often the vendor u-boot is a black box, no sources. Can you give me a
+> > git URL for the u-boot in QSDK? If the sources are open, i could at
+> > least rebuild it with everything turned on.
+>
+>
+> You can get the source at
+> https://git.codelinaro.org/clo/qsdk/oss/boot/u-boot-2016/-/tree/NHSS.QSDK.12.2?ref_type=heads
+>
+> You should be able to TFTP the images, write into the flash and
+> configure the IP and so on...
+>
+>
+> >
+> > But still, it is better that Linux makes no assumptions about what the
+> > boot loader has done. That makes it much easier to change the
+> > bootloader.
+> >
+> >>>> Some of the NSS clocks needs these clocks to be enabled. To avoid
+> >>>> these clocks being disabled by clock framework, drop these entries
+> >>>> from the clock table and enable it in the driver probe itself.
+> >>>
+> >>> If they are critical clocks, i would expect a device to reference
+> >>> them. The CCF only disabled unused clocks in late_initcall_sync(),
+> >>> which means all drivers should of probed and taken a reference on any
+> >>> clocks they require.
+> >>
+> >>
+> >> Some of the NSSCC clocks are enabled by bootloaders and CCF disables the
+> >> same (because currently there are no consumers for these clocks available in
+> >> the tree. These clocks are consumed by the Networking drivers which are
+> >> being upstreamed).
+> >
+> > If there is no network drivers, you don't need clocks to the
+> > networking hardware. So CCF turning them off seems correct.
+>
+>
+> Yeah agree with your comments.
+>
+> QSDK's u-boot enables the network support, so the required NSSCC clocks
+> are turned ON and left it in ON state. CCF tries to disables the unused
+> NSSCC clocks but system goes for reboot.
+>
+>
+> Reason being, to access the NSSCC clocks, these GCC clocks
+> (gcc_snoc_nssnoc_clk, gcc_snoc_nssnoc_1_clk, gcc_nssnoc_nsscc_clk)
+> should be turned ON. But CCF disables these clocks as well due to the
+> lack of consumer.
 
-On Fri, Feb 16, 2024 at 09:23:00AM +0100, Eric Dumazet wrote:
-...
-> TSQ matters for high BDP, and is very time sensitive.
-> 
-> Things like slow TX completions (firing from napi poll, BH context)
-> can hurt TSQ.
-> 
-> If we add on top of these slow TX completions, an additional work
-> queue overhead, I really am not sure...
+This means that NSSCC is also a consumer of those clocks. Please fix
+both DT and nsscc driver to handle NSSNOC clocks.
 
-Just to be sure, the workqueue here is executing in the same softirq context
-as tasklets. This isn't the usual workqueue which has to go through the
-scheduler. The only difference would be that workqueue does a bit more work
-(e.g. to manage the currenty executing hashtable) than tasklet. It's
-unlikely to show noticeable latency penalty in any practical case although
-the extra overhead would likely be visible in targeted microbenches where
-all that happens is scheduling and running noop work items.
+> > Once you have actual drivers, this should solve itself, the drivers
+> > will consume the clocks.
+>
+>
+> Given that, NSSCC is being built as module, there is no issue in booting
+> the kernel. But if you do insmod of the nsscc-ipq5332.ko, system will
+> reset.
+>
+> Without the networking drivers, there is no need to install this module.
+> And as you stated, once the drivers are available, there will be no issues.
+>
+> So can I explain the shortcomings of installing this module without the
+> networking drivers in cover letter and drop this patch all together?
 
-> I would recommend tests with pfifo_fast qdisc (not FQ which has a
-> special override for TSQ limits)
+No. Using allyesconfig or allmodconfig and installing the full modules
+set should work.
 
-David, do you think this is something we can do?
+> >> However looking back, gcc_snoc_nssnoc_clk, gcc_snoc_nssnoc_1_clk,
+> >> gcc_nssnoc_nsscc_clk are consumed by the networking drivers only. So is it
+> >> okay to drop these clocks from the GCC driver and add it back once the
+> >> actual consumer needs it?
+> >
+> > But why should you remove them. If nothing is using them, they should
+> > be turned off.
+> >
+> >     Andrew
+>
 
-> Eventually we could add in TCP a measure of the time lost because of
-> TSQ, regardless of the kick implementation (tasklet or workqueue).
-> Measuring the delay between when a tcp socket got tcp_wfree approval
-> to deliver more packets, and time it finally delivered these packets
-> could be implemented with a bpftrace program.
-
-I don't have enough context here but it sounds like you are worried about
-adding latency in that path. This conversion is unlikely to make a
-noticeable difference there. The interface and sementics are workqueue but
-the work items are being executed exactly the same way from the same
-softirqs as tasklets. Would testing with pfifo_fast be sufficient to dispel
-your concern?
-
-Thanks.
 
 -- 
-tejun
+With best wishes
+Dmitry
 
