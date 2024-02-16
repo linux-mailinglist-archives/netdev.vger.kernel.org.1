@@ -1,113 +1,132 @@
-Return-Path: <netdev+bounces-72257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4A9D857378
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 02:34:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D602857382
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 02:40:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4EA9FB21470
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 01:34:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5791B22EB2
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 01:40:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BF70DDC5;
-	Fri, 16 Feb 2024 01:34:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5294AD2EE;
+	Fri, 16 Feb 2024 01:40:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UrNsZHFZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aGbnbfb3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66BCDDDC1;
-	Fri, 16 Feb 2024 01:34:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A7C2F9DA;
+	Fri, 16 Feb 2024 01:40:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708047286; cv=none; b=TEIr8jyKYM1P1terqUYNwW42VS6HLkurHfEMG+VDpP5cTLrEJML3ckHyDJByNwuLpQdZ8obE4t7mgj1CEyb9tLTGVh2hca+1bhYPDchia+qGrdfKkg5qZ4ek5A9xFO6NWrqqUaBF0aR4fbSlmvmPC/xvsMoI1uDFwbMppv1Bcfk=
+	t=1708047638; cv=none; b=rvMYbeZh30Tp3augB54g2Hx9qQoB/NCvmu3wEGVzRhL9onjs1Zl8Yrjal7SOMKRguS/rRIE/p1flPowloF2jjTg7+9w0NvTax2wIc+wxVn+PRnNhQBPeK9s21fiQXlhbtJs2sBHoUTmAcszBOfzjZ/FS2zz5ULVHDRr5iweD5Jg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708047286; c=relaxed/simple;
-	bh=Omkyv/ijNPsT9zBVZmn3vGXG+CLOXI+snt+6eX6Zbck=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O5lurw62cyTqF38+LZE6pBXAsoJd5ijQzkE3JXU/S+vSXbRy60kerw/2pWZ+wIW+vIzky3D3wwF4MyEJHvYbujHGtcvFJeRoFYaWFvYPt/AqO0i15Ters57RswgFE3idoaQ89qSSj0kO6w4Z7D7Ijt8n0VfNqayPhy/FXDW3PTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UrNsZHFZ; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-33d146737e6so485443f8f.0;
-        Thu, 15 Feb 2024 17:34:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708047282; x=1708652082; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=jzFjftUHCCCXFtG6EptiA3RMrTwV5kvtkepZmVTZewE=;
-        b=UrNsZHFZ01sMC4WlwMLdbP/ybDgdl5/JrVtcXUqnKBDZ5f5XEuUyA/9766ePLi8n0E
-         J1vKx6cX3iUctApKf/FZsR162FG4NvYVbh2B+tT0oasqEuRzZ+m6eae5hKuf69X3b//+
-         IeyQLbW9+EpMdbE+0WWdCzakWRuglBW3N+T1t60r9u+JIyEmPto7aZ0UCASibsoABu5N
-         ND6onRnT5Sfy15aVW+RAmx6VRlEmWQfwAIV+pt4PDmfTrOF9d1rVbgimfrLevEJRw7Uk
-         vD9PJD2DxGmhv//9hvV9zcquu+758FQJh+uboSaJSm6Xhs6gRvXSxXKjAd+Vj1BOynvi
-         lM0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708047282; x=1708652082;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jzFjftUHCCCXFtG6EptiA3RMrTwV5kvtkepZmVTZewE=;
-        b=tK0+aJE9iGGxngT9I2c/2huoDnNakeH368oDpP97m5+bvYSkhBaH9bbXfEKqG7l7cP
-         8BOKMBeyJuiaSszSg7CCd9Gt8s52UdJVX0fJwPpLGzKdIY++uVEeiHispS3ikAbMWDGL
-         w6Q/TEkZUDyZrKZYOuBn2n5Kgs2YaLEr63CXd9fIWfdTEyKDYpkMn2xRaUmjOgD88LUT
-         p2y7aQUEwcOTnHVD1kgkBlTVxhYTedc5PEBsbqPU7oH48A6TtufmlCLeINWXp66hQveE
-         8HwCPHyB+0RrAgOL0QhVbisMNEo8F/oLmxHHEIYH5ve89mKeZPCq8hK0vXgBj6+KzEHY
-         JcbA==
-X-Forwarded-Encrypted: i=1; AJvYcCW2hH9mL8FGKtVHzo6ZbZK6YLNYEp3P9Ono0K/fkp7sYY7/kONM8w1z5Jmmy9eSXUmsewOuY6/XHo8EbyKaXxQFBNiyaWU5UV7mwvn62O7qB47e5u0pOXVOH3bNbtFNF2eoNdUd
-X-Gm-Message-State: AOJu0YzjzKk2Lp+TRLIv63BkJtuAytVUNNLlzxB5ENK9HFY73gs/NLhp
-	4u+u8/7dhrPD7krPGWl+kiSvLsN1WCVbWDrseJdfbZNG89HwgqZb
-X-Google-Smtp-Source: AGHT+IEKX4mPK8p3LVtgqAEYyCPcuWaiS7Wg/M61Uzh8Z2MrCR1EPMqWz1zamkiXHkPSe7lbjeYPxA==
-X-Received: by 2002:adf:f892:0:b0:33c:fb94:1e12 with SMTP id u18-20020adff892000000b0033cfb941e12mr2617815wrp.54.1708047282318;
-        Thu, 15 Feb 2024 17:34:42 -0800 (PST)
-Received: from skbuf ([188.25.173.195])
-        by smtp.gmail.com with ESMTPSA id b7-20020adfe647000000b0033b406bc689sm665199wrn.75.2024.02.15.17.34.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Feb 2024 17:34:41 -0800 (PST)
-Date: Fri, 16 Feb 2024 03:34:39 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: arinc.unal@arinc9.com
-Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Russell King <linux@armlinux.org.uk>, mithat.guner@xeront.com,
-	erkin.bozoglu@xeront.com,
-	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH netnext 0/8] MT7530 DSA Subdriver Improvements Act III
-Message-ID: <20240216013439.dq7s5hp74mjahy4d@skbuf>
-References: <20240208-for-netnext-mt7530-improvements-3-v1-0-d7c1cfd502ca@arinc9.com>
+	s=arc-20240116; t=1708047638; c=relaxed/simple;
+	bh=KHdlvUaHaDZaHCD4P4fvcHX8hb7Xkbd/GjEnKKFwBXk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iILvBy6jDfpBiZSeUGZ2/pWE6PdfwNorhrASMyXXaDp9D2YkMgKkFHQ0eZXkQK9jY+HmPNvv5yhUl0glAcv0WQGnBgWi8M4Hvtj84w9XG3E7srfOwlfOHUCcPLyjAtS8ybTZ1AHh20POcMRmQKcPRPLJ+ZMWgzCNcyCwmDVRgyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aGbnbfb3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FA71C433F1;
+	Fri, 16 Feb 2024 01:40:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708047637;
+	bh=KHdlvUaHaDZaHCD4P4fvcHX8hb7Xkbd/GjEnKKFwBXk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=aGbnbfb35z3yv+Qi/s8NVgVpAWQgFJ3huflDP5lPv+eyXCw24T8OQvHtZFCD5tqp8
+	 SjXP7K/HUjo02Qy+9KQMX2q6hVCOf/TBsZjXygNsdZa9dC4VBEhCsu7Q9POmhsk7Xg
+	 RJUuwBJ7gbeC16myH0pVhB46T31NAHeSp5nU2uRlmLVdkfq7D5Q285JyKHyMABPhLo
+	 2qMSrHeUD3KWJ7HW7d1f2PgZLx+1eK1u99wXHHu9dm0nTgvexHRVDlqLS3ifk661x8
+	 342CH8htKf+pU07kGKPgUI7LJkT58ZxwdQivl4ZKEZ1WRLcTVU2uuz5MW02Ca6CEfW
+	 YvWDdS8XYWdwg==
+Date: Thu, 15 Feb 2024 17:40:34 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Andy Gospodarek <andrew.gospodarek@broadcom.com>, Christoph Hellwig
+ <hch@infradead.org>, Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann
+ <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Leon
+ Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, Leonid Bloch
+ <lbloch@nvidia.com>, Itay Avraham <itayavr@nvidia.com>, Saeed Mahameed
+ <saeedm@nvidia.com>, David Ahern <dsahern@kernel.org>, Aron Silverton
+ <aron.silverton@oracle.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
+Message-ID: <20240215174034.34817c31@kernel.org>
+In-Reply-To: <20240214183755.GH1088888@nvidia.com>
+References: <20240207072435.14182-1-saeed@kernel.org>
+	<Zcx53N8lQjkpEu94@infradead.org>
+	<ZczntnbWpxUFLxjp@C02YVCJELVCG.dhcp.broadcom.net>
+	<20240214175735.GG1088888@nvidia.com>
+	<20240214101126.0c3681ee@kernel.org>
+	<20240214183755.GH1088888@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240208-for-netnext-mt7530-improvements-3-v1-0-d7c1cfd502ca@arinc9.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 08, 2024 at 08:51:28AM +0300, Arınç ÜNAL via B4 Relay wrote:
-> Hello!
+On Wed, 14 Feb 2024 14:37:55 -0400 Jason Gunthorpe wrote:
+> On Wed, Feb 14, 2024 at 10:11:26AM -0800, Jakub Kicinski wrote:
+> > On Wed, 14 Feb 2024 13:57:35 -0400 Jason Gunthorpe wrote:  
+> > > There is a clear split in my mind between:
+> > >  - inspection debugging
+> > >  - invasive mutating debugging
+> > >  - configuration  
+> > 
+> > Yes there's a clear split, and how are you going to enforce it on 
+> > an opaque interface? Put an "evil" bit in the common header?  
 > 
-> This is the third patch series with the goal of simplifying the MT7530 DSA
-> subdriver and improving support for MT7530, MT7531, and the switch on the
-> MT7988 SoC.
+> The interface is opaque through a subsystem, it doesn't mean it is
+> completely opaque to every driver layer in the kernel. There is still a
+> HW specific kernel driver that delivers the FW command to the actual
+> HW.
+> 
+> In the mlx5 model the kernel driver stamps the command with "uid"
+> which is effectively a security scope label. This cannot be avoided by
+> userspace and is fundamental to why mlx5ctl is secure in a lockdown
+> kernel.
+> 
+> For example mlx5's FW interface has the concept of security scopes. We
+> have several defined today:
+>  - Kernel
+>  - Userspace rdma
+>  - Userspace rdma with CAP_NET_RAW
+>  - Userspace rdma with CAP_SYS_RAWIO
+> 
+> So we trivally add three more for the scopes I listed above. The
+> mlx5ctl driver as posted already introduced a new scope, for example.
+> 
+> Userspace will ask the kernel for an appropriate security scope after
+> opening the char-device. If userspace asks for invasive then you get a
+> taint. Issuing an invasive command without a kernel applied invasive
+> security label will be rejected by the FW.
+> 
+> We trust the kernel to apply the security label for the origin of the
+> command. We trust the the device FW to implement security scopes,
+> because these are RDMA devices and all of RDMA and all of SRIOV
+> virtualization are totally broken if the device FW cannot be trusted
+> to maintain security separation between scopes.
 
-There was an automation failure, you used the name "netnext" in the
-subject prefix and patchwork reacted with "Patch does not apply to net"...
+You have changed the argument.
 
-Please resend to get some build testing. I gave a quick look over the
-patches and I didn't see anything obviously objectionable.
+The problem Andy was raising is that users having access to low level
+configuration will make it impossible for distro's support to tell
+device configuration. There won't be any trace of activity at the OS
+level.
+
+To which you replied that you can differentiate between debugging and
+configuration on an opaque interface, _in the kernel_.
+
+Which I disagree with, obviously.
+
+And now you're saying that you can maintain security if you trust 
+the firmware to enforce some rules.
+
+I'm not talking about security here, the evil bit is just an example
+of an unsound design.
 
