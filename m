@@ -1,175 +1,222 @@
-Return-Path: <netdev+bounces-72307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9EC98577A7
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 09:28:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA6DE8577D8
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 09:44:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE094281614
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 08:28:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3D0F28368D
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 08:44:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE94117C76;
-	Fri, 16 Feb 2024 08:26:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DF3E1804F;
+	Fri, 16 Feb 2024 08:40:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h7vxQ5xI"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="m/IPNiNK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2081.outbound.protection.outlook.com [40.107.100.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12E1D18B1B
-	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 08:26:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708072007; cv=none; b=IgRSrpb7tjp2H/0eIwc8DLVOF1OkRW8F25pIbUKaywA+KXGdAHhYwyG6Iz9ei9vgj+9rsG6rwZHggXrwcxJ1BRs8N5EvJfe7CgHoIcWygPS9f975oV3VuK3n4kGJYJeVso3xDIPL+MGeC455iAfUhnUpSjrddYuYYYxGHu40yFw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708072007; c=relaxed/simple;
-	bh=d8ITzOV2En/D6OHhB7+vXjklnG93i0n5W26sz5HKW9M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W52q6199QMWdfOoIgUGPGQvrdrcU9UmrSGKCwvxXVDPQ0htDT200sWvlvHJu91/jYzr2qqjQyThkW/Q1N/eAK1QwrgaknNYNC3ZtBvWoYLUZ6Ybm1hTG2EtGMunCsuQDRlgbq4ugp6I0LfAr5x090q82LqsTe8SINSLmNtnqQKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=h7vxQ5xI; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a3deb3f563bso19373666b.2
-        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 00:26:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708072004; x=1708676804; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WAeqAPxibxxRq/h+JRwkxgNp/YZEgtvVqoDwz03RZEY=;
-        b=h7vxQ5xIT90O4qJGSpAq8dBq45eXn6kehv0luZWJS3SKY4yR7HV+Zk1pVIxvnz2c3Z
-         wQVfUUGWxjcWOopJBaUIN2Jkq73QpAHnShXugWz1JExalPKHgisUFAk4WWy1dpNxGsLC
-         HBdpYlnoQIzXKTC3u6Ad7LzKmPFzmW8e2VgvbykfRLzA0ci873WtGBQF89np/weir2GL
-         AV5JrhilFebuC9dONQxTBHUcqCsdvSc5DyrAVXQ5n6GgW65FdzRPWy5yxYiUFC9SZCV6
-         ZpaILuJL3U22vZdD5AKPLT3Mqha524Q/K0+lrLaoPlPgVUqXezcbIsjP+IZjVdFxAEZf
-         8HaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708072004; x=1708676804;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WAeqAPxibxxRq/h+JRwkxgNp/YZEgtvVqoDwz03RZEY=;
-        b=ic6EHNK4UdzY++eicresKSeTboDUHR9myQYfBoSINvKQos5uaUqhKe8uvgVy4kcsXU
-         13AoihERSLh2Nzt/XKrcpDGU8NrpAiqmYU6715MysL8LfRXqEDruSZYApJOnJjFcxELm
-         9Tpdhx924QV6hJXA4S/2ohdT7pRpLA1QTidoJQD43A3KTPKTEet/m78pPq3eVEO8WRfp
-         IIcBShuggcfvbE2Cr1pHhpgyhQmVNNXPDz1dDUYEUquDe24AvEU20EjATMTOvov3LlKy
-         oQq5EjoNpRyphSDA9r+ZN8QB6G9dE7fwLM1XFxyybpJl/B4UzwZgBHP+IRx+hIgivnCQ
-         JGyA==
-X-Gm-Message-State: AOJu0YzCwbmz9iKa1Jv/RVx7pBLWLbihUZypiGn8rt+jJ71UgbFJx0yr
-	RJB2ScJcq6ozhbM+bIbOZh/Y/8R5SvtTtBzDHz44hmG0DNCzsEjFVL07NMpxyjg=
-X-Google-Smtp-Source: AGHT+IHJTnxShsG5u7QLqZGNtK7dvkKWkY8/CjMheJRB68tWDN4021Cuiiw/3kxOQeAsYnSaEx+vKQ==
-X-Received: by 2002:a17:906:e4f:b0:a3d:63b:c43 with SMTP id q15-20020a1709060e4f00b00a3d063b0c43mr2789303eji.17.1708072004333;
-        Fri, 16 Feb 2024 00:26:44 -0800 (PST)
-Received: from [192.168.0.22] ([78.10.207.130])
-        by smtp.gmail.com with ESMTPSA id vu6-20020a170907a64600b00a3c5d10bcdbsm1310341ejc.114.2024.02.16.00.26.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Feb 2024 00:26:43 -0800 (PST)
-Message-ID: <d77faffc-5bde-41f1-b6a2-ddd665c3ee08@linaro.org>
-Date: Fri, 16 Feb 2024 09:26:42 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FA281BF5D;
+	Fri, 16 Feb 2024 08:40:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.81
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708072835; cv=fail; b=NImc3yn1xTpzkPrXwH38AS0F1uqdkWh3XoVJ33yarsCBqwAugROleW9XKO3FSQVg5I8lLt9BG2BkTWTfCvUDE1dtpuZSUBYw7olBEuG9a7pu6TV4JAgTf2jbB2u1ZC/K/boQ0W3Tr55zZj6YTmM1I9vQBdODsb3ukXXtdYEZ8ns=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708072835; c=relaxed/simple;
+	bh=vcUPCUlylqtrdeSpoWwVYAiI5KV5q0ib86+L4C2vVfo=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=ukhEN2d75DGt3QzNGWX0A0SaYq+EBXnmyMSCnsweuCPm+Zb6hTwV/JliW+Bui4wOjvMW9n22VNwi2Pxi4K+M9E+GkTaYKjFIN+PRHvL5TGpxEsGqA4TGzXoQf6ZbYTLQzozdwj0uU0lq+YMk0k3P/n8B49Zzc5chZtoC8MP86y8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=m/IPNiNK; arc=fail smtp.client-ip=40.107.100.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DakhCVmfLh3NZVKJfl0IFw+NzUrEf2CQ3EQ2jSW9H2bbx4o2PnwsUHWNKdvX7v7tJE8RNUxi4tNLRVmNjNxLauKhIlDaBpIXtAxB719XyA1Kh8xxrNs6SgSNVbk+4YP5nx4A/yG1vfgTzp6v1nzOan2LmdoLnwdxJ69aUmgYxeq5DNkgxxNt1U9bU5lwaxZiBNHfREEYpr7B7GMKjE0/CvPSxxHze/+PN00ZlZZboR1EPdd5eso/DadFjjhB1VEoYuyZuN6jvpYEv9b0K2USW0zT9XFXYJTG9HVxuh0G7I6086rS9+LYFDxZMCf5VP3u8KuGxRxn1zhJ2/F5VewfhQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+w1rECigBpp6HzJWD+4BnqV6Kp+gLOycyFvGNiyW9CM=;
+ b=Ipx0EKPyNBh1EWX2A+uwSvslpo/M2qGyAXD6GdDmsalo+zdhPrKOIvDtY6O/OwBc23NL7t/PKOlB6E6guULs++Nhgvd66bz56y8aLJL4KA5iIGpZLTPpY3GaOZqTHIeYnq8yxjI4YN0pDaWZVsRFu54hCdepZ23mtz+QEBzYd3kSFVcH+lG1/rjosxsTzJgfmj1Ov8D5i8Qgxf+lV99N2E7uPokoy2mlTDYhEHdabonZEszN4J7z2pCYxnwlybHWSrEKLW72ZRZwULEG2JfQZTf22hPB6Zcd4W7q1rV9CQY65vJR6nIwXMmaVGvmpfaanYzS66bKBBLDtMDOrPP7UA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+w1rECigBpp6HzJWD+4BnqV6Kp+gLOycyFvGNiyW9CM=;
+ b=m/IPNiNKgqt66c3DvmYeET8eC5UdAcaSC2cdvl16lliSlFTIy++ylpnj7/goKS6NPnrf1EyzD74cVkli3SbfwUOhZafi0WQME91J4ys5HMGeFtOADSHFmB3c7BVl/4nanT2CBXptPGIzyNZbenH3Z7CgBy5bE4MiMpVqQWsvPEVpHhOtCmfI/jCQ37hmOykmabPiPgTDnyhsxo5F3iEFzZezRhr6JMhXIQRP4Dx2/4mvG7dHR2WvWUpg7HH9ZNIA0NXkDh7h/eSC8SW79vfKu0oErM8/+e1bOSaVK5EFvVwhL1gxgobtTgqxkdLOpQMMVuGDxLXhp3nzkr3itKfhtA==
+Received: from DM6PR07CA0056.namprd07.prod.outlook.com (2603:10b6:5:74::33) by
+ SN7PR12MB6789.namprd12.prod.outlook.com (2603:10b6:806:26b::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.12; Fri, 16 Feb
+ 2024 08:40:30 +0000
+Received: from CY4PEPF0000FCC0.namprd03.prod.outlook.com
+ (2603:10b6:5:74:cafe::49) by DM6PR07CA0056.outlook.office365.com
+ (2603:10b6:5:74::33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.26 via Frontend
+ Transport; Fri, 16 Feb 2024 08:40:30 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CY4PEPF0000FCC0.mail.protection.outlook.com (10.167.242.102) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7292.25 via Frontend Transport; Fri, 16 Feb 2024 08:40:30 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Fri, 16 Feb
+ 2024 00:40:19 -0800
+Received: from fedora.nvidia.com (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Fri, 16 Feb
+ 2024 00:40:17 -0800
+References: <20240215160458.1727237-1-ast@fiberby.net>
+ <20240215160458.1727237-2-ast@fiberby.net>
+ <CAM0EoMndBjwC8Otx6th_dM_aV_r80NeLEke9C8PwzGt1q3vAMA@mail.gmail.com>
+ <a4798b5d-1a8a-41ab-842f-52e8c7ac00ed@fiberby.net>
+User-agent: mu4e 1.10.5; emacs 29.1.90
+From: Vlad Buslov <vladbu@nvidia.com>
+To: =?utf-8?Q?Asbj=C3=B8rn?= Sloth =?utf-8?Q?T=C3=B8nnesen?= <ast@fiberby.net>
+CC: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>, Daniel Borkmann <daniel@iogearbox.net>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <llu@fiberby.dk>,
+	Marcelo Ricardo Leitner <mleitner@redhat.com>
+Subject: Re: [PATCH net-next 1/3] net: sched: cls_api: add skip_sw counter
+Date: Fri, 16 Feb 2024 10:35:40 +0200
+In-Reply-To: <a4798b5d-1a8a-41ab-842f-52e8c7ac00ed@fiberby.net>
+Message-ID: <87a5o0dcpd.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/6] net: hisi_femac: remove unused compatible strings
-Content-Language: en-US
-To: Yang Xiwen <forbidden405@outlook.com>,
- Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
- <salil.mehta@huawei.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Yang Xiwen <forbidden405@foxmail.com>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org
-References: <20240216-net-v1-0-e0ad972cda99@outlook.com>
- <20240216-net-v1-2-e0ad972cda99@outlook.com>
- <68c9477a-3940-4024-8c86-aa6106e8a210@linaro.org>
- <SEZPR06MB695938B228E762B9B53BAF2F964C2@SEZPR06MB6959.apcprd06.prod.outlook.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <SEZPR06MB695938B228E762B9B53BAF2F964C2@SEZPR06MB6959.apcprd06.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000FCC0:EE_|SN7PR12MB6789:EE_
+X-MS-Office365-Filtering-Correlation-Id: abfd1028-6e7a-4ed0-3e17-08dc2ecaeee0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	g5ow/cBUMt2jcHsrnD2LU45T1Z9f8ikVUWkmJaaetZj0wEG7QGi0JyAXvWMV1gmEYSa5pgft8tzjE0jZJ2V02be24HMJmfaYHxwka2JkEVeJ2aBy/Niot6oecTArb9ay2GhqAy2gdgmM2IvhpZmmnf6Kk5Mb9a4O3tnavGi2uio5vvvkXx25tO8pbWEVPO8sf27K6vqdm7v6RSoa2q50mMIZIQk0eczEreGyFOQ/SM5ADvCm1jkjVtaKj5TgErNVXER+a1bqxiQl+kOYD9RIl1qflkvY/Hoa6WdQgb5VULe9e6ktUyEUUkINjyruPIb1B552jzeJramYMLkmfuPjtdloGy5bK1zGGCQAi5FxyR6zrlZV3jjM1j5CSVEdpD8JJMRibmZEKJcKbiYFpQAM2DNJVOReKpu+7C1622j52erMgj+TA6/o3JufhyEtxkpnGlktXo11IkvsQGDfpzdKQ7O6j3fZ1cIkHkpxDnvAd23+B63wJ12qu1F3vsN80utXYkTN9oqpBcmEpHIrWES18bHi0T2/y5K3HzYu4rbotrSoSAh3ls97+e4hKF4kqXSDolxeozwqcPMfIr5jiUbaRcwp+Q5ck7WUuYF6nLpselDYXxWymErDVbTk78t7cchMxZy5z8u41IBRWX+aBcF6FRj7z8tEn23X7JpkK+rKdv8=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(346002)(396003)(39860400002)(136003)(376002)(230922051799003)(186009)(36860700004)(82310400011)(1800799012)(64100799003)(451199024)(46966006)(40470700004)(70586007)(41300700001)(70206006)(82740400003)(7636003)(2906002)(16526019)(86362001)(4326008)(316002)(5660300002)(8676002)(8936002)(356005)(36756003)(426003)(83380400001)(336012)(54906003)(6916009)(53546011)(7696005)(66574015)(478600001)(6666004)(26005)(2616005);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Feb 2024 08:40:30.4618
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: abfd1028-6e7a-4ed0-3e17-08dc2ecaeee0
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000FCC0.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6789
 
-On 16/02/2024 09:21, Yang Xiwen wrote:
-> On 2/16/2024 3:20 PM, Krzysztof Kozlowski wrote:
->> On 16/02/2024 00:48, Yang Xiwen via B4 Relay wrote:
->>> From: Yang Xiwen <forbidden405@outlook.com>
+On Thu 15 Feb 2024 at 23:34, Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.=
+net> wrote:
+> Hi Jamal,
+>
+> Thank you for the review.
+>
+> On 2/15/24 17:39, Jamal Hadi Salim wrote:
+>> +Cc Vlad and Marcelo..
+>> On Thu, Feb 15, 2024 at 11:06=E2=80=AFAM Asbj=C3=B8rn Sloth T=C3=B8nnese=
+n <ast@fiberby.net>
+>> wrote:
 >>>
->>> These compatible strings are not found in any mainline dts, remove them.
->> That's not a real reason. What about all other users?
-> The people who want their devices being supported should post a working 
-> dts first. Having found the dts missing is strongly telling me that this 
+>>> Maintain a count of skip_sw filters.
+>>>
+>>> This counter is protected by the cb_lock, and is updated
+>>> at the same time as offloadcnt.
+>>>
+>>> Signed-off-by: Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.net>
+>>> ---
+>>>   include/net/sch_generic.h | 1 +
+>>>   net/sched/cls_api.c       | 4 ++++
+>>>   2 files changed, 5 insertions(+)
+>>>
+>>> diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+>>> index 934fdb977551..46a63d1818a0 100644
+>>> --- a/include/net/sch_generic.h
+>>> +++ b/include/net/sch_generic.h
+>>> @@ -476,6 +476,7 @@ struct tcf_block {
+>>>          struct flow_block flow_block;
+>>>          struct list_head owner_list;
+>>>          bool keep_dst;
+>>> +       atomic_t skipswcnt; /* Number of skip_sw filters */
+>>>          atomic_t offloadcnt; /* Number of oddloaded filters */
+>> For your use case is skipswcnt ever going to be any different than offlo=
+adcnt?
+>
+> No, we only use skip_sw filters, since we only use TC as a control path to
+> install skip_sw rules into hardware.
+>
+> AFAICT offloadcnt is the sum of skip_sw filters, and filters with no flag=
+s which
+> have implicitly been offloaded.
+>
+> The reason that I didn't just use offloadcnt, is that I'm not sure if it =
+is
+> acceptable to treat implicitly offloaded rules without skip_sw, as if the=
+y were
+> explicitly skip_sw. It sounds reasonable, given that the filters without =
+skip_* flags
+> shouldn't really care.
 
-Considering how poor HiSilicon contributions were - in numbers and
-quality - that's kind of expected. :(
+It is not acceptable since there are valid use-cases where packets need
+to match sw filters that are supposedly also in-hw. For example, filters
+with tunnel_key set action during neighbor update event.
 
-
-> SoC(Hi3516) is orphan and EOL already. I can't even find it in git 
-> commit logs. I'll argue that the old binding is simply wrong, and does 
-> not describe the hardware properly. Who knows? Could anyone tell me if 
-> the driver is still working for Hi3516 or not? I'm very willing to keep 
-> the backward compatibility if someone can tell me the effort i paid to 
-> maintain the old binding really makes sense. But the only things i found 
-> in mainline kernel about Hi3516 is an CRG(clock) driver and this femac 
-> driver. And it's been 8 years since last update for this SoC.
-
-OK, that's fine with me, but please add parts of this explanation to the
-commit msg (SoC is EOL, driver looks buggy and might not even work,
-platform was upstreamed 8 years ago and no maintenance work happened on
-it, thus it looks abandoned etc.).
-
-Best regards,
-Krzysztof
+>
+> I tried to only trigger the TC bypass, in the cases that I was absolutely=
+ sure would
+> be safe as a first step.
+>
+>
+>> cheers,
+>> jamal
+>>=20
+>>>          unsigned int nooffloaddevcnt; /* Number of devs unable to do o=
+ffload */
+>>>          unsigned int lockeddevcnt; /* Number of devs that require rtnl=
+ lock. */
+>>> diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+>>> index ca5676b2668e..397c3d29659c 100644
+>>> --- a/net/sched/cls_api.c
+>>> +++ b/net/sched/cls_api.c
+>>> @@ -3483,6 +3483,8 @@ static void tcf_block_offload_inc(struct tcf_bloc=
+k *block, u32 *flags)
+>>>          if (*flags & TCA_CLS_FLAGS_IN_HW)
+>>>                  return;
+>>>          *flags |=3D TCA_CLS_FLAGS_IN_HW;
+>>> +       if (tc_skip_sw(*flags))
+>>> +               atomic_inc(&block->skipswcnt);
+>>>          atomic_inc(&block->offloadcnt);
+>>>   }
+>>>
+>>> @@ -3491,6 +3493,8 @@ static void tcf_block_offload_dec(struct tcf_bloc=
+k *block, u32 *flags)
+>>>          if (!(*flags & TCA_CLS_FLAGS_IN_HW))
+>>>                  return;
+>>>          *flags &=3D ~TCA_CLS_FLAGS_IN_HW;
+>>> +       if (tc_skip_sw(*flags))
+>>> +               atomic_dec(&block->skipswcnt);
+>>>          atomic_dec(&block->offloadcnt);
+>>>   }
+>>>
+>>> --
+>>> 2.43.0
+>>>
 
 
