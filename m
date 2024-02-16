@@ -1,165 +1,122 @@
-Return-Path: <netdev+bounces-72364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F1D2857B7A
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 12:21:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 084B8857BBB
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 12:31:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98222B245A6
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 11:21:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F0E51C2197B
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 11:31:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EED6877629;
-	Fri, 16 Feb 2024 11:21:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF89A77F09;
+	Fri, 16 Feb 2024 11:31:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AFI7SYWo"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="iWu99/2L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B5BD76C73
-	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 11:21:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD1359B54
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 11:31:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708082501; cv=none; b=tQ0UiEHMZmRWPmtWL9fdIGra3hEqn/DW7LDgpEPlxNiTPZVVucOtIR6zH524vVYlV0zr2YGMe1c2hStIP99vaRexHYIymNoLsA5oEKZSqgUzo1HkH0CoUh+AAHjKYb7KVqawNXKNQIcdfSpzKerScxWwvJEV8ISH5sTUPIWSvJ8=
+	t=1708083115; cv=none; b=GNL/BnAEpZ+wxDwJ2owfSmgNzCkLhVsJMwz7TfrkrZYUp5AiyVHUaE22WFPFB4t8l3G6kYh4+Zo2vVhC+KH3Lg7stAsA+IeUnc+GERJnTLQbyp9R4mT2jySqENEv+vbTWzLCGCJTw9yYSaLXR2chDAd5Xybppr3beHpma0L7u5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708082501; c=relaxed/simple;
-	bh=ARsbqmkZlJY9NMBt3SmFhEAa2WrR9M7L85xrLa/BHBg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eMHo/b1ASuVMPIjL/X4IBLat5e4OxalqQayveQiDO5YPhDtdzzKhIvN/57ozOehMtWv0WKq7aJtoFcMM9CyEVytfLGcoAo2yW8xFE++Hl9SWa9GOOnqv2o6JU8Phu8FFQUolGI/NpTq6QhEOL9DzmoAm6BSQgDJ+hZ+ts+gCBHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AFI7SYWo; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-55c2cf644f3so2365962a12.1
-        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 03:21:39 -0800 (PST)
+	s=arc-20240116; t=1708083115; c=relaxed/simple;
+	bh=x4a/tf43SYwAyXSNT3Y0mvvq8ruGltxxWUk/AN760DM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SBQx3Ydkhdpm8wQS5UAy14hU0pbxrxTjbl4ml1ZqHNCihMsrXfEkOzXSrc/fKObdBnvo/4MPBqjYw7aFU6zfUmvQUApVKZL9savRWPdJ3ZvWDOpYf0l4cvc0K5JgxJk0YtOAcv/5NgSCGOTR37dtbR5OK/TiruApdRG4Ik/uZNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=iWu99/2L; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3394b892691so1282210f8f.1
+        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 03:31:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708082498; x=1708687298; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kHdcoPIZ5j6Hk9zqguDIOQQ/4PKG4aeFidRGUIVltn0=;
-        b=AFI7SYWoiR17Xv6h1dCjaNRJQyUSmvD0yjLOqG/Oor5I1c4OD9K//IqnVbNJt03dVG
-         zcvWS+RxkHmzfm94+iT+SopDdOfxfyQmivWx2Vvxyx03kQiFp+zMca20BfQ1GOGrb30+
-         LmmXQon6ENixsaDxzYXP9sFwkDjAduRz+OiAjaxhGuHFlk0RVgj94MN5WsI+bPHie2G5
-         wMcwYHF3nRDMPWikiubY9Jw2UJKaS3ofJvbTEe98V4jOKz9d0ax/BrCQ6Iqd3iTSujDj
-         uzo76cvqH66YUsqnOGO1HNqz41DAqJtPajbKnaALbfphWxZFOp1RMOcuOK+TCTAKuZFb
-         W7CA==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708083111; x=1708687911; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wiiHKDcOiMXGmzdIXjXYceqWaWZroHQbJqSietsv9iA=;
+        b=iWu99/2LEs2qhW9jKM396/z/0KV64ZRy7r+086WeLphdXfrzI4r0AiO28s+dr6veQX
+         WOeRRlll9dXrjFGYgsyEZHDnpRFc61aMuEbw1AWmtFq9nj63jRkj6tR5wbrFTsa1ezD6
+         nhy3tV70SZqLk1X8y4xhaGtHrWRTClR3iBIV1bkCy0YHZB+Qzdn0yQLymNo//Ng0lRP9
+         hsoYt/uzBxp/WGNwckbPmJpoQ+ZLDZxE37Z7tlj0qKO5JmS92XJDHi51LCA2uQGW99Yy
+         Ihft9Mh0XrM+HDeeIbV8eV1BCPPdiIo3CXWAz/pEIQN31lMvAQ6a8lN9iiO2diTn3aEh
+         BwQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708082498; x=1708687298;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kHdcoPIZ5j6Hk9zqguDIOQQ/4PKG4aeFidRGUIVltn0=;
-        b=xBF6FSIp3CtActmJZRNQiKE1L9IYH/pAgSWtvx1tOTAp++jv6OphMqdRU/X7VeQlPx
-         NYR9XPSauyKBI9BZyG68r2pDGC3BByHOeKxU+VuMJe02daqBXNEENnUU0x5JKmPuHGzQ
-         8XLuP9y0gsMo9j50RJLmvSlUI/YQA2i08p+acgyMFKGstmH3rwxZnKL6ru44ApDd500f
-         Q86/c3wGM9Hu65uknJ6Pm7skUTAXtdMznxNGKTfxF80R+A+scR8Pr06OTzsoxWwfYCt+
-         OVW2XSSxqS6B15qhTj9xm8N1jQgRajWqqfo36X7tZEG2QrthfyqnD06OvJKVFEQ7Y3Pd
-         jIng==
-X-Forwarded-Encrypted: i=1; AJvYcCUGT3dqjtTpbsew0SLBIws0yO7YCWjXTiUvDy4AgcItNJ/tk1UGQinP7QNNA6lTT6S+P/bj25eO92hGq5tXeuT6XLswPJ0L
-X-Gm-Message-State: AOJu0Yxu09yJJP6WsJUdfdwG7OqQ7lYQaoByTGLqR/X3MjRThoPoEiTV
-	9K+OfNcXTRm5rxjbKZkuSNbUsea4E8AGfLgkLZXHOuFBL6Sbh1V4
-X-Google-Smtp-Source: AGHT+IHVMjJKd+Nc/qyBJQ8tOPQCx9yhSsNTLWaPu5Gi6sA/UjQduk6vVMzA6R5S3YcTUpgT1l+arw==
-X-Received: by 2002:aa7:ca4d:0:b0:562:7705:57c8 with SMTP id j13-20020aa7ca4d000000b00562770557c8mr3343687edt.34.1708082498108;
-        Fri, 16 Feb 2024 03:21:38 -0800 (PST)
-Received: from ?IPV6:2a01:c22:73a8:7a00:dc5a:d3b4:cb75:f027? (dynamic-2a01-0c22-73a8-7a00-dc5a-d3b4-cb75-f027.c22.pool.telefonica.de. [2a01:c22:73a8:7a00:dc5a:d3b4:cb75:f027])
-        by smtp.googlemail.com with ESMTPSA id l11-20020aa7c3cb000000b005640022af58sm227852edr.83.2024.02.16.03.21.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Feb 2024 03:21:37 -0800 (PST)
-Message-ID: <50ad932c-4775-4201-b2ce-f5f21eaa966d@gmail.com>
-Date: Fri, 16 Feb 2024 12:21:37 +0100
+        d=1e100.net; s=20230601; t=1708083111; x=1708687911;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wiiHKDcOiMXGmzdIXjXYceqWaWZroHQbJqSietsv9iA=;
+        b=V44E97ZKA5TdSL0tdnBYiARUHrFeliN7NxJNbWFMThMCg9R92pALFSwY7yagRkD7I3
+         JAWMYZ/JioQ5e+AQkNGDwp19wnzuYHsoTsdLARHXdUZpftiGrVOF9bvEME6C2+rr2koI
+         JW31VJXLAnqfdB5FoDrMSMIsOBbgf1Ju2I9QYrlBfgHRNqSIU/ZO6AcotcS8Sq1qKdaP
+         TxguolqRY31uk7IbqpYXZvpbAgaofK5AljGQ/z5bR/vBmiseKJsvG3JFjFRFIP4TMmhq
+         pN0dZ9tsFMwvJapPqhJoamvgz6LFmuR/IDyoN/i4v/O88XijBMNN4++KYISwm8DepGYr
+         iOdA==
+X-Gm-Message-State: AOJu0YyG5cLM0b00b9TH7eOAvVsjWA505BPv8gYAAB2PrD+V/tPUeaPk
+	Va87iQnDEBwYQuElFBs/CcPnKAfMfol9xfSldw+sFhU5qvB7pcySr4LbtwXD1tvSl9ym27LKxk+
+	a
+X-Google-Smtp-Source: AGHT+IE0nsI3miKo0yzm8pYwVcDkJYD+XwOFilm+O+3j4JzMDwf7vLS7l7JqYA9Mpyh/54yFnp6rdQ==
+X-Received: by 2002:a05:6000:104d:b0:33b:4c26:85df with SMTP id c13-20020a056000104d00b0033b4c2685dfmr3098998wrx.35.1708083110768;
+        Fri, 16 Feb 2024 03:31:50 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id d2-20020adfef82000000b0033b75b39aebsm1995850wro.11.2024.02.16.03.31.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Feb 2024 03:31:50 -0800 (PST)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com
+Subject: [patch net-next] devlink: fix port dump cmd type
+Date: Fri, 16 Feb 2024 12:31:47 +0100
+Message-ID: <20240216113147.50797-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] ethtool: check for unsupported modes in EEE
- advertisement
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>,
- "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <c02d4d86-6e65-4270-bc46-70acb6eb2d4a@gmail.com>
- <Zc4zhPSceYVlYnWc@shell.armlinux.org.uk>
- <ab9ec289-3d40-4541-b22a-a72beaf1e742@lunn.ch>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <ab9ec289-3d40-4541-b22a-a72beaf1e742@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 16.02.2024 00:33, Andrew Lunn wrote:
-> On Thu, Feb 15, 2024 at 03:53:40PM +0000, Russell King (Oracle) wrote:
->> On Thu, Feb 15, 2024 at 02:05:54PM +0100, Heiner Kallweit wrote:
->>> Let the core check whether userspace returned unsupported modes in the
->>> EEE advertisement bitmap. This allows to remove these checks from
->>> drivers.
->>
->> Why is this a good thing to implement?
->>
->> Concerns:
->> 1) This is a change of behaviour for those drivers that do not
->> implement this behaviour.
-> 
-> Hi Heiner
-> 
-> You say phylib does this by default? Are there any none phylib/phylink
-> drivers which don't implement this behaviour?
-> 
-Very few drivers ignore unknown/unsupported modes:
-bnx2, r8152, ax88179, igc
-Basically the ones using ethtool_adv_to_mmd_eee_adv_t() on the userspace-provided
-EEE advertisement. However for e.g. Intel drivers the behavior isn't consistent,
-some of their drivers check for unsupported modes and bail out if found.
+From: Jiri Pirko <jiri@nvidia.com>
 
-> 	Andrew
-> 
-Heiner
+Unlike other commands, due to a c&p error, port dump fills-up cmd with
+wrong value, different from port-get request cmd, port-get doit reply
+and port notification.
+
+Fix it by filling cmd with value DEVLINK_CMD_PORT_NEW.
+
+Skimmed through devlink userspace implementations, none of them cares
+about this cmd value. Only ynl, for which, this is actually a fix, as it
+expects doit and dumpit ops rsp_value to be the same.
+
+Omit the fixes tag, even thought this is fix, better to target this for
+next release.
+
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+---
+ net/devlink/port.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/devlink/port.c b/net/devlink/port.c
+index 78592912f657..4b2d46ccfe48 100644
+--- a/net/devlink/port.c
++++ b/net/devlink/port.c
+@@ -583,7 +583,7 @@ devlink_nl_port_get_dump_one(struct sk_buff *msg, struct devlink *devlink,
+ 
+ 	xa_for_each_start(&devlink->ports, port_index, devlink_port, state->idx) {
+ 		err = devlink_nl_port_fill(msg, devlink_port,
+-					   DEVLINK_CMD_NEW,
++					   DEVLINK_CMD_PORT_NEW,
+ 					   NETLINK_CB(cb->skb).portid,
+ 					   cb->nlh->nlmsg_seq, flags,
+ 					   cb->extack);
+-- 
+2.43.2
+
 
