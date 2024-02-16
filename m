@@ -1,59 +1,79 @@
-Return-Path: <netdev+bounces-72436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01FF485818E
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 16:42:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DF498581A2
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 16:44:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96ED0B2719C
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 15:42:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE3E1289B66
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 15:44:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EF15134CCC;
-	Fri, 16 Feb 2024 15:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEB9812F369;
+	Fri, 16 Feb 2024 15:44:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="i8bUIEw0"
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DA4C134751;
-	Fri, 16 Feb 2024 15:38:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05EDC12BF03;
+	Fri, 16 Feb 2024 15:44:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708097904; cv=none; b=A4U/fUAZkwz8YlImfoiN3si/ucRBilQw6C+ePEb6he92vNpockkGuCwtJ4XDi+aabai3qT7cD04t5k4jL1GvJez83DUVgx6HQJl+2rxOM9HYkdXJV+Vbjv+neh8D1iG5Qfx2zZatTdohuFC02Hrr4MQCaBZGI6T0u8OtUOViVvE=
+	t=1708098243; cv=none; b=UEJFavedJKlCOV/KoVMxWhVei+UO0qJs0lbk67mxHfeLVFgHXmsZ6IcZI9kMXgLHEyPbZs2YtuRKTfm1Rj4P0vhC0XaKCQ+EzjkKbCoWrxBztp0fZJ4aoax5S3y6BNWZkI1toE1u3LYrGqASDkGVSCCgp++KiuhjzNoAKQb9ti8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708097904; c=relaxed/simple;
-	bh=v/umiByrbo+UMHmoZPas/+iyEgbA76j9zUbPB2HafrE=;
+	s=arc-20240116; t=1708098243; c=relaxed/simple;
+	bh=F+QVlPQi+jHUwVgrFftfh61LcSMs2H+6H2+hUGJpckA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tEhMhNrSx0exhbPldMR0vmsMq7ZK9z4gjleFNQ/cEdMJ3U+/uxnylzto/0+0fMcHGC9ueU5dSn5eP2FayZJkCD0Fi9qjKFu9xgLptnPxjXDOAJcafv1FMBEiGCGbOJL302w1OQsgJrNsypq12WwGccJGuZQjoO6A1u7t3O/k2Sc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.41.52] (port=38106 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1rb0Hy-004Gjh-Uo; Fri, 16 Feb 2024 16:38:13 +0100
-Date: Fri, 16 Feb 2024 16:38:10 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>,
-	coreteam@netfilter.org, netdev-driver-reviewers@vger.kernel.org,
-	Hangbin Liu <liuhangbin@gmail.com>, netfilter-devel@vger.kernel.org
-Subject: Re: [netfilter-core] [ANN] net-next is OPEN
-Message-ID: <Zc+BYmrv/0pRKY+w@calendula>
-References: <20240123072010.7be8fb83@kernel.org>
- <d0e28c67-51ad-4da1-a6df-7ebdbd45cd2b@kernel.org>
- <65b133e83f53e_225ba129414@willemb.c.googlers.com.notmuch>
- <20240124082255.7c8f7c55@kernel.org>
- <20240124090123.32672a5b@kernel.org>
- <26616300-dc28-47d1-88bb-1c7247d1699d@kernel.org>
- <ZbFiixyMFpQnxzCH@calendula>
- <7a1014ee-7e1d-4be4-bab2-07ddde8a84b7@kernel.org>
- <ZcNSPoqQkMBenwue@calendula>
- <51bdbaab-a611-4f4d-aa8c-e004102220f3@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=nii9mnHDBzZNZxojhiYLB5CnB5oBgNhnkcLv3B5jyBwepOkM5zh+QJmLRttS71b6AfOn5n/yigvRziP9mJi3SR8KIO0HnDot7+6NgwQBYgo5gYPWZJ19LCqkNyPfsVTk32Qyi6JkD2FRqpa1yHG70Amg9s6ACs0vxpk7vC/GyrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=i8bUIEw0; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=mW8V17MsmL7VEwiMKsJzk5HQ8Z5PWc1CNNBk+B48w+A=; b=i8bUIEw0N70QsZY2kDWJw1w4Tm
+	6gzsJwmiUQN3C2NpHmyiXWkKt28KIwMPjgnx/9xrlHwCJES6JRmoQUaZD5nEIt36e+f5uo8g2HT+h
+	H9kX4R3NSAGfSw30WE6TPGAnrQuOP6x4LSxQDqyzuQe/C0mnUkingYlhy9lGC5TMIaGaD2na7FwjS
+	jjbeVQl9EJEasTrVJfdyFYsvW/WjFuOOD99gweBMdJUso+9N2a2jpUlnRvn9qyRUxdAgWkkNNnr6j
+	B5GhiKYPFc28873AR+zyIPUs5iEmpUBKFzjpvnOEVolxujCmlSijC2qYYPmuU0ewkbcaE518+DQ5N
+	r7G6PVoA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33656)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rb0NH-0005ns-1X;
+	Fri, 16 Feb 2024 15:43:39 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rb0N8-0005jP-NS; Fri, 16 Feb 2024 15:43:30 +0000
+Date: Fri, 16 Feb 2024 15:43:30 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: arinc.unal@arinc9.com
+Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH netnext 8/8] net: dsa: mt7530: simplify link operations
+ and force link down on all ports
+Message-ID: <Zc+ConfebmQdpCOF@shell.armlinux.org.uk>
+References: <20240208-for-netnext-mt7530-improvements-3-v1-0-d7c1cfd502ca@arinc9.com>
+ <20240208-for-netnext-mt7530-improvements-3-v1-8-d7c1cfd502ca@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,79 +82,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <51bdbaab-a611-4f4d-aa8c-e004102220f3@kernel.org>
-X-Spam-Score: -1.9 (-)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240208-for-netnext-mt7530-improvements-3-v1-8-d7c1cfd502ca@arinc9.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hi,
-
-Sorry for taking a while.
-
-On Wed, Feb 07, 2024 at 12:33:44PM +0100, Matthieu Baerts wrote:
-> Hi Pablo,
+On Thu, Feb 08, 2024 at 08:51:36AM +0300, Arınç ÜNAL via B4 Relay wrote:
+> From: Arınç ÜNAL <arinc.unal@arinc9.com>
 > 
-> Thank you for your reply!
+> Currently, the link operations for switch MACs are scattered across
+> port_enable, port_disable, phylink_mac_config, phylink_mac_link_up, and
+> phylink_mac_link_down.
 > 
-> On 07/02/2024 10:49, Pablo Neira Ayuso wrote:
-> > Hi Matthieu,
-> > 
-> > On Tue, Feb 06, 2024 at 07:31:44PM +0100, Matthieu Baerts wrote:
-> > [...]
-> >> Good point, I understand it sounds better to use 'iptables-nft' in new
-> >> kselftests. I should have added a bit of background and not just a link
-> >> to this commit: at that time (around ~v6.4), we didn't need to force
-> >> using 'iptables-legacy' on -net or net-next tree. But we needed that
-> >> when testing kernels <= v5.15.
-> >>
-> >> When validating (old) stable kernels, the recommended practice is
-> >> apparently [1] to use the kselftests from the last stable version, e.g.
-> >> using the kselftests from v6.7.4 when validating kernel v5.15.148. The
-> >> kselftests are then supposed to support older kernels, e.g. by skipping
-> >> some parts if a feature is not available. I didn't know about that
-> >> before, and I don't know if all kselftests devs know about that.
-> > 
-> > We are sending backports to stable kernels, if one stable kernel
-> > fails, then we have to fix it.
+> port_enable and port_disable clears the link settings. Move that to
+> mt7530_setup() and mt7531_setup_common() which set up the switches. This
+> way, the link settings are cleared on all ports at setup, and then only
+> once with phylink_mac_link_down() when a link goes down.
 > 
-> Do you validate stable kernels by running the kselftests from the same
-> version (e.g. both from v5.15.x) or by using the kselftests from the
-> last stable one (e.g. kernel v5.15.148 validated using the kselftests
-> from v6.7.4)?
+> Enable force mode at setup to apply the force part of the link settings.
+> This ensures that only active ports will have their link up.
 
-We have kselftests, but nftables/tests/shell probe for kernel
-capabilities then it runs tests according to what the kernel
-supports, this includes packet and control plane path tests. For
-iptables, there are iptables-tests.py for the control plane path.
+I think we may have a different interpretation of what phylink's
+mac_link_down() and mac_link_up() are supposed to be doing here.
+Of course, you have read the documentation of these methods so are
+fully aware of what they're supposed to do. So you are aware that
+when inband mode is being used, forcing the link down may be
+counter-productive depending on how the hardware works.
 
-> >> I don't think that's easy to support old kernels, especially in the
-> >> networking area, where some features/behaviours are not directly exposed
-> >> to the userspace. Some MPTCP kselftests have to look at /proc/kallsyms
-> >> or use other (ugly?) workarounds [2] to predict what we are supposed to
-> >> have, depending on the kernel that is being used. But something has to
-> >> be done, not to have big kselftests, with many different subtests,
-> >> always marked as "failed" when validating new stable releases.
-> > 
-> > iptables-nft is supported in all of the existing stable kernels.
-> 
-> OK, then we should not have had the bug we had. I thought we were using
-> features that were not supported in v5.15.
-
-I don't think so, iptables-nft supports the same features as
-iptables-legacy.
-
-> >> Back to the modification to use 'iptables-legacy', maybe a kernel config
-> >> was missing, but the same kselftest, with the same list of kconfig to
-> >> add, was not working with the v5.15 kernel, while everything was OK with
-> >> a v6.4 one. With 'iptables-legacy', the test was running fine on both. I
-> >> will check if maybe an old kconfig option was not missing.
-> > 
-> > I suspect this is most likely kernel config missing, as it happened to Jakub.
-> 
-> Probably, yes. I just retried by testing a v5.15.148 kernel using the
-> kselftests from the net-next tree and forcing iptables-nft: I no longer
-> have the issue I had one year ago. Not sure why, we already had
-> NFT_COMPAT=m back then. Maybe because we recently added IP_NF_FILTER and
-> similar, because we noticed some CI didn't have them?
-> Anyway, I will then switch back to iptables-nft. Thanks for the suggestion!
-
-Thanks. If you experience any issue, report back to netfilter-devel@
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
