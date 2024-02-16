@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-72552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE73E858828
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 22:43:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62E0B85882B
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 22:43:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D0A61C22849
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 21:43:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7B621F2453F
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 21:43:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA706146918;
-	Fri, 16 Feb 2024 21:43:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAA1114601E;
+	Fri, 16 Feb 2024 21:43:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d6UEhZev"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GW9prO7P"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 318B7136678
-	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 21:43:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A19F1482F5
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 21:43:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708119789; cv=none; b=WRHpBtEQ+5lcmmXJ7pxnMzzsrhOd3mtojMw/ijGIExuoUmZEtSSQfugZSYzbKGWUjN+5xck9aXY2U4yhR+1FEPGHdUGwmeufMc8Nbq6QZ4k6Un+c0UEojfP3b4FGQtJFRkXxU7+xl8mfnrFjAg5P1Tbx8k1AyoPo6ae4npcmT8g=
+	t=1708119793; cv=none; b=XMMe7mwGxGaDdcpLhfZCLVgUNkJ6x+aNchL9uFdDypMZkYCkZn8jynNn58j/q5QBgc4tL69Y4UMpIeLyju2Rg3Xx/cTRk/WtnCNI9AIR/qw20oF0PADaI01ftoM7zA5d44DcHhnDpRnQTCy7KRu5zqC/9H9W/IwMj04ZVVETesc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708119789; c=relaxed/simple;
-	bh=OFyK+F8Wp1iECPLPS32ZsmMxJA/uPlii7zrTFJr/RX8=;
+	s=arc-20240116; t=1708119793; c=relaxed/simple;
+	bh=sPlfiwbfVmbStlFpIp26VFu8oILFomFo936NBfn32k4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dsVTY0HSGFVmiZbkBJdS9yv/cJ6qAsovLRg1AGhruivIZKDLllGtWvD9odAKLlLxeksfh26kzKpMQKYBvKcKg0fPJZ23rairJa9n6D3q9zc6vJKLKofOfAoxXajd3u8KnTuQS0b+s3ST92Qrn2kZxjpG4d/Io5EEMcXSv67Cu1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d6UEhZev; arc=none smtp.client-ip=198.175.65.19
+	 MIME-Version; b=HSKgvpkKvKmed53a39Xjs1EEdOreLbScJe2CMFFGu9iOWNC79Y9HJuQDNVO1wY1fUXGeSlUJ5j2DNuq/+JU4JRN3kTedQigp7tSaaKOOSM71o5aen+rc2DGsMbbn0q8zVSFgm9Fk8vZM69yEjNN5aKSU9tBGjVTUxlv01GBj0ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GW9prO7P; arc=none smtp.client-ip=198.175.65.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708119789; x=1739655789;
+  t=1708119792; x=1739655792;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=OFyK+F8Wp1iECPLPS32ZsmMxJA/uPlii7zrTFJr/RX8=;
-  b=d6UEhZevbFu9wdCdbQxANzUypNi3VRumJgQ83cwowP5GE2QM1zAxWlXO
-   ZORFwstZ/Hvafv/NwdZWS0jrxv6qUYzsgJILUohzstkQFs9Ua+kUDJns3
-   l7zoilaUe7HUrAEUCKexPkhXecNEKa0LxXALdr1U22to/uf5Xq3NfSlqg
-   bHhvWlTT0Q2Em/WJ5M4QhPzIAcZE7CJKvJ5E1VcVz6eMFRuUhUlA0oCMN
-   WWVn5tEIl2iPKQuoBwCCoXmtVe3MGKyYwN0lcU7DCWJkIa14wXQw4hDjf
-   PonTTA1avx0QHfg+52b3C3E+ok+TpzySiYY0DlGRK0Rt8OgCU7wadt3yP
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10986"; a="2122871"
+  bh=sPlfiwbfVmbStlFpIp26VFu8oILFomFo936NBfn32k4=;
+  b=GW9prO7PoeAaMzuzj9DxRBGwFyLRMhTDx8M6j8xv286t60bHCUdAA0gh
+   kux1Oat5C9QteFwtLJtKAKa68r/592uN0DzOB/U2X6sLsxzC73Y76iHEl
+   P1TqL+yb5b7fi3M77zcZidP/Cbhs4AdWPJzHXPMA4Rzy2HO/wnqX2kB3H
+   1xYzQYI+hN5Ib72CIQWqlily9VsOL3taPX2rhdYZyBe20chuDSp4YvL+a
+   cRMVB7of1ZoAIfvkvdXkgLd/ILoUbL904s2OR8IZSm6X6B5WFBFW+l1P2
+   pv5s8CMbVzO2O9N3Ea2CH+bwD+0rSdaKomUKtnPssTfxaCPc8PzkLjOKd
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10986"; a="2122897"
 X-IronPort-AV: E=Sophos;i="6.06,165,1705392000"; 
-   d="scan'208";a="2122871"
+   d="scan'208";a="2122897"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2024 13:43:03 -0800
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2024 13:43:04 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,165,1705392000"; 
-   d="scan'208";a="8618672"
+   d="scan'208";a="8618675"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa005.jf.intel.com with ESMTP; 16 Feb 2024 13:42:51 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -65,9 +65,9 @@ Cc: Ivan Vecera <ivecera@redhat.com>,
 	Wojciech Drewek <wojciech.drewek@intel.com>,
 	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>,
 	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next 1/5] i40e: Use existing helper to find flow director VSI
-Date: Fri, 16 Feb 2024 13:42:38 -0800
-Message-ID: <20240216214243.764561-2-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 2/5] i40e: Introduce and use macros for iterating VSIs and VEBs
+Date: Fri, 16 Feb 2024 13:42:39 -0800
+Message-ID: <20240216214243.764561-3-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20240216214243.764561-1-anthony.l.nguyen@intel.com>
 References: <20240216214243.764561-1-anthony.l.nguyen@intel.com>
@@ -81,8 +81,22 @@ Content-Transfer-Encoding: 8bit
 
 From: Ivan Vecera <ivecera@redhat.com>
 
-Use existing i40e_find_vsi_by_type() to find a VSI
-associated with flow director.
+Introduce i40e_for_each_vsi() and i40e_for_each_veb() helper
+macros and use them to iterate relevant arrays.
+
+Replace pattern:
+for (i = 0; i < pf->num_alloc_vsi; i++)
+by:
+i40e_for_each_vsi(pf, i, vsi)
+
+and pattern:
+for (i = 0; i < I40E_MAX_VEB; i++)
+by
+i40e_for_each_veb(pf, i, veb)
+
+These macros also check if array item pf->vsi[i] or pf->veb[i]
+are not NULL and skip such items so we can remove redundant
+checks from loop bodies.
 
 Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
 Signed-off-by: Ivan Vecera <ivecera@redhat.com>
@@ -90,45 +104,1052 @@ Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Conting
 Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/i40e/i40e_main.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/intel/i40e/i40e.h        |  56 ++-
+ drivers/net/ethernet/intel/i40e/i40e_dcb_nl.c |  10 +-
+ .../net/ethernet/intel/i40e/i40e_debugfs.c    |  54 +--
+ drivers/net/ethernet/intel/i40e/i40e_main.c   | 389 ++++++++----------
+ 4 files changed, 264 insertions(+), 245 deletions(-)
 
+diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
+index 9b701615c7c6..5acb26644be7 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e.h
++++ b/drivers/net/ethernet/intel/i40e/i40e.h
+@@ -686,6 +686,54 @@ struct i40e_pf {
+ 	struct list_head ddp_old_prof;
+ };
+ 
++/**
++ * __i40e_pf_next_vsi - get next valid VSI
++ * @pf: pointer to the PF struct
++ * @idx: pointer to start position number
++ *
++ * Find and return next non-NULL VSI pointer in pf->vsi array and
++ * updates idx position. Returns NULL if no VSI is found.
++ **/
++static __always_inline struct i40e_vsi *
++__i40e_pf_next_vsi(struct i40e_pf *pf, int *idx)
++{
++	while (*idx < pf->num_alloc_vsi) {
++		if (pf->vsi[*idx])
++			return pf->vsi[*idx];
++		(*idx)++;
++	}
++	return NULL;
++}
++
++#define i40e_pf_for_each_vsi(_pf, _i, _vsi)			\
++	for (_i = 0, _vsi = __i40e_pf_next_vsi(_pf, &_i);	\
++	     _vsi;						\
++	     _i++, _vsi = __i40e_pf_next_vsi(_pf, &_i))
++
++/**
++ * __i40e_pf_next_veb - get next valid VEB
++ * @pf: pointer to the PF struct
++ * @idx: pointer to start position number
++ *
++ * Find and return next non-NULL VEB pointer in pf->veb array and
++ * updates idx position. Returns NULL if no VEB is found.
++ **/
++static __always_inline struct i40e_veb *
++__i40e_pf_next_veb(struct i40e_pf *pf, int *idx)
++{
++	while (*idx < I40E_MAX_VEB) {
++		if (pf->veb[*idx])
++			return pf->veb[*idx];
++		(*idx)++;
++	}
++	return NULL;
++}
++
++#define i40e_pf_for_each_veb(_pf, _i, _veb)			\
++	for (_i = 0, _veb = __i40e_pf_next_veb(_pf, &_i);	\
++	     _veb;						\
++	     _i++, _veb = __i40e_pf_next_veb(_pf, &_i))
++
+ /**
+  * i40e_mac_to_hkey - Convert a 6-byte MAC Address to a u64 hash key
+  * @macaddr: the MAC Address as the base key
+@@ -1120,14 +1168,12 @@ struct i40e_vsi *i40e_find_vsi_from_id(struct i40e_pf *pf, u16 id);
+ static inline struct i40e_vsi *
+ i40e_find_vsi_by_type(struct i40e_pf *pf, u16 type)
+ {
++	struct i40e_vsi *vsi;
+ 	int i;
+ 
+-	for (i = 0; i < pf->num_alloc_vsi; i++) {
+-		struct i40e_vsi *vsi = pf->vsi[i];
+-
+-		if (vsi && vsi->type == type)
++	i40e_pf_for_each_vsi(pf, i, vsi)
++		if (vsi->type == type)
+ 			return vsi;
+-	}
+ 
+ 	return NULL;
+ }
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_dcb_nl.c b/drivers/net/ethernet/intel/i40e/i40e_dcb_nl.c
+index b96a92187ab3..8aa43aefe84c 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_dcb_nl.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_dcb_nl.c
+@@ -947,16 +947,16 @@ static int i40e_dcbnl_vsi_del_app(struct i40e_vsi *vsi,
+ static void i40e_dcbnl_del_app(struct i40e_pf *pf,
+ 			       struct i40e_dcb_app_priority_table *app)
+ {
++	struct i40e_vsi *vsi;
+ 	int v, err;
+ 
+-	for (v = 0; v < pf->num_alloc_vsi; v++) {
+-		if (pf->vsi[v] && pf->vsi[v]->netdev) {
+-			err = i40e_dcbnl_vsi_del_app(pf->vsi[v], app);
++	i40e_pf_for_each_vsi(pf, v, vsi)
++		if (vsi->netdev) {
++			err = i40e_dcbnl_vsi_del_app(vsi, app);
+ 			dev_dbg(&pf->pdev->dev, "Deleting app for VSI seid=%d err=%d sel=%d proto=0x%x prio=%d\n",
+-				pf->vsi[v]->seid, err, app->selector,
++				vsi->seid, err, app->selector,
+ 				app->protocolid, app->priority);
+ 		}
+-	}
+ }
+ 
+ /**
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
+index ef70ddbe9c2f..b236b0f93202 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
+@@ -24,14 +24,18 @@ enum ring_type {
+  **/
+ static struct i40e_vsi *i40e_dbg_find_vsi(struct i40e_pf *pf, int seid)
+ {
++	struct i40e_vsi *vsi;
+ 	int i;
+ 
+-	if (seid < 0)
++	if (seid < 0) {
+ 		dev_info(&pf->pdev->dev, "%d: bad seid\n", seid);
+-	else
+-		for (i = 0; i < pf->num_alloc_vsi; i++)
+-			if (pf->vsi[i] && (pf->vsi[i]->seid == seid))
+-				return pf->vsi[i];
++
++		return NULL;
++	}
++
++	i40e_pf_for_each_vsi(pf, i, vsi)
++		if (vsi->seid == seid)
++			return vsi;
+ 
+ 	return NULL;
+ }
+@@ -43,11 +47,13 @@ static struct i40e_vsi *i40e_dbg_find_vsi(struct i40e_pf *pf, int seid)
+  **/
+ static struct i40e_veb *i40e_dbg_find_veb(struct i40e_pf *pf, int seid)
+ {
++	struct i40e_veb *veb;
+ 	int i;
+ 
+-	for (i = 0; i < I40E_MAX_VEB; i++)
+-		if (pf->veb[i] && pf->veb[i]->seid == seid)
+-			return pf->veb[i];
++	i40e_pf_for_each_veb(pf, i, veb)
++		if (veb->seid == seid)
++			return veb;
++
+ 	return NULL;
+ }
+ 
+@@ -653,12 +659,11 @@ static void i40e_dbg_dump_desc(int cnt, int vsi_seid, int ring_id, int desc_n,
+  **/
+ static void i40e_dbg_dump_vsi_no_seid(struct i40e_pf *pf)
+ {
++	struct i40e_vsi *vsi;
+ 	int i;
+ 
+-	for (i = 0; i < pf->num_alloc_vsi; i++)
+-		if (pf->vsi[i])
+-			dev_info(&pf->pdev->dev, "dump vsi[%d]: %d\n",
+-				 i, pf->vsi[i]->seid);
++	i40e_pf_for_each_vsi(pf, i, vsi)
++		dev_info(&pf->pdev->dev, "dump vsi[%d]: %d\n", i, vsi->seid);
+ }
+ 
+ /**
+@@ -718,11 +723,8 @@ static void i40e_dbg_dump_veb_all(struct i40e_pf *pf)
+ 	struct i40e_veb *veb;
+ 	int i;
+ 
+-	for (i = 0; i < I40E_MAX_VEB; i++) {
+-		veb = pf->veb[i];
+-		if (veb)
+-			i40e_dbg_dump_veb_seid(pf, veb->seid);
+-	}
++	i40e_pf_for_each_veb(pf, i, veb)
++		i40e_dbg_dump_veb_seid(pf, veb->seid);
+ }
+ 
+ /**
+@@ -873,9 +875,10 @@ static ssize_t i40e_dbg_command_write(struct file *filp,
+ 			goto command_write_done;
+ 		}
+ 
+-		for (i = 0; i < I40E_MAX_VEB; i++)
+-			if (pf->veb[i] && pf->veb[i]->seid == uplink_seid)
++		i40e_pf_for_each_veb(pf, i, veb)
++			if (veb->seid == uplink_seid)
+ 				break;
++
+ 		if (i >= I40E_MAX_VEB && uplink_seid != 0 &&
+ 		    uplink_seid != pf->mac_seid) {
+ 			dev_info(&pf->pdev->dev,
+@@ -892,7 +895,9 @@ static ssize_t i40e_dbg_command_write(struct file *filp,
+ 			dev_info(&pf->pdev->dev, "add relay failed\n");
+ 
+ 	} else if (strncmp(cmd_buf, "del relay", 9) == 0) {
++		struct i40e_veb *veb;
+ 		int i;
++
+ 		cnt = sscanf(&cmd_buf[9], "%i", &veb_seid);
+ 		if (cnt != 1) {
+ 			dev_info(&pf->pdev->dev,
+@@ -906,9 +911,10 @@ static ssize_t i40e_dbg_command_write(struct file *filp,
+ 		}
+ 
+ 		/* find the veb */
+-		for (i = 0; i < I40E_MAX_VEB; i++)
+-			if (pf->veb[i] && pf->veb[i]->seid == veb_seid)
++		i40e_pf_for_each_veb(pf, i, veb)
++			if (veb->seid == veb_seid)
+ 				break;
++
+ 		if (i >= I40E_MAX_VEB) {
+ 			dev_info(&pf->pdev->dev,
+ 				 "del relay: relay %d not found\n", veb_seid);
+@@ -916,7 +922,7 @@ static ssize_t i40e_dbg_command_write(struct file *filp,
+ 		}
+ 
+ 		dev_info(&pf->pdev->dev, "deleting relay %d\n", veb_seid);
+-		i40e_veb_release(pf->veb[i]);
++		i40e_veb_release(veb);
+ 	} else if (strncmp(cmd_buf, "add pvid", 8) == 0) {
+ 		unsigned int v;
+ 		int ret;
+@@ -1251,8 +1257,8 @@ static ssize_t i40e_dbg_command_write(struct file *filp,
+ 			if (cnt == 0) {
+ 				int i;
+ 
+-				for (i = 0; i < pf->num_alloc_vsi; i++)
+-					i40e_vsi_reset_stats(pf->vsi[i]);
++				i40e_pf_for_each_vsi(pf, i, vsi)
++					i40e_vsi_reset_stats(vsi);
+ 				dev_info(&pf->pdev->dev, "vsi clear stats called for all vsi's\n");
+ 			} else if (cnt == 1) {
+ 				vsi = i40e_dbg_find_vsi(pf, vsi_seid);
 diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 54eb55464e31..6e59a9509868 100644
+index 6e59a9509868..43e1b4f7f9dc 100644
 --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
 +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -15630,6 +15630,7 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- #ifdef CONFIG_I40E_DCB
- 	enum i40e_get_fw_lldp_status_resp lldp_status;
- #endif /* CONFIG_I40E_DCB */
+@@ -310,11 +310,12 @@ static int i40e_put_lump(struct i40e_lump_tracking *pile, u16 index, u16 id)
+  **/
+ struct i40e_vsi *i40e_find_vsi_from_id(struct i40e_pf *pf, u16 id)
+ {
++	struct i40e_vsi *vsi;
+ 	int i;
+ 
+-	for (i = 0; i < pf->num_alloc_vsi; i++)
+-		if (pf->vsi[i] && (pf->vsi[i]->id == id))
+-			return pf->vsi[i];
++	i40e_pf_for_each_vsi(pf, i, vsi)
++		if (vsi->id == id)
++			return vsi;
+ 
+ 	return NULL;
+ }
+@@ -552,24 +553,19 @@ void i40e_vsi_reset_stats(struct i40e_vsi *vsi)
+  **/
+ void i40e_pf_reset_stats(struct i40e_pf *pf)
+ {
++	struct i40e_veb *veb;
+ 	int i;
+ 
+ 	memset(&pf->stats, 0, sizeof(pf->stats));
+ 	memset(&pf->stats_offsets, 0, sizeof(pf->stats_offsets));
+ 	pf->stat_offsets_loaded = false;
+ 
+-	for (i = 0; i < I40E_MAX_VEB; i++) {
+-		if (pf->veb[i]) {
+-			memset(&pf->veb[i]->stats, 0,
+-			       sizeof(pf->veb[i]->stats));
+-			memset(&pf->veb[i]->stats_offsets, 0,
+-			       sizeof(pf->veb[i]->stats_offsets));
+-			memset(&pf->veb[i]->tc_stats, 0,
+-			       sizeof(pf->veb[i]->tc_stats));
+-			memset(&pf->veb[i]->tc_stats_offsets, 0,
+-			       sizeof(pf->veb[i]->tc_stats_offsets));
+-			pf->veb[i]->stat_offsets_loaded = false;
+-		}
++	i40e_pf_for_each_veb(pf, i, veb) {
++		memset(&veb->stats, 0, sizeof(veb->stats));
++		memset(&veb->stats_offsets, 0, sizeof(veb->stats_offsets));
++		memset(&veb->tc_stats, 0, sizeof(veb->tc_stats));
++		memset(&veb->tc_stats_offsets, 0, sizeof(veb->tc_stats_offsets));
++		veb->stat_offsets_loaded = false;
+ 	}
+ 	pf->hw_csum_rx_error = 0;
+ }
+@@ -2879,6 +2875,7 @@ int i40e_sync_vsi_filters(struct i40e_vsi *vsi)
+  **/
+ static void i40e_sync_filters_subtask(struct i40e_pf *pf)
+ {
++	struct i40e_vsi *vsi;
+ 	int v;
+ 
+ 	if (!pf)
+@@ -2890,11 +2887,10 @@ static void i40e_sync_filters_subtask(struct i40e_pf *pf)
+ 		return;
+ 	}
+ 
+-	for (v = 0; v < pf->num_alloc_vsi; v++) {
+-		if (pf->vsi[v] &&
+-		    (pf->vsi[v]->flags & I40E_VSI_FLAG_FILTER_CHANGED) &&
+-		    !test_bit(__I40E_VSI_RELEASING, pf->vsi[v]->state)) {
+-			int ret = i40e_sync_vsi_filters(pf->vsi[v]);
++	i40e_pf_for_each_vsi(pf, v, vsi) {
++		if ((vsi->flags & I40E_VSI_FLAG_FILTER_CHANGED) &&
++		    !test_bit(__I40E_VSI_RELEASING, vsi->state)) {
++			int ret = i40e_sync_vsi_filters(vsi);
+ 
+ 			if (ret) {
+ 				/* come back and try again later */
+@@ -5166,6 +5162,7 @@ static void i40e_reset_interrupt_capability(struct i40e_pf *pf)
+  **/
+ static void i40e_clear_interrupt_scheme(struct i40e_pf *pf)
+ {
++	struct i40e_vsi *vsi;
+ 	int i;
+ 
+ 	if (test_bit(__I40E_MISC_IRQ_REQUESTED, pf->state))
+@@ -5175,9 +5172,10 @@ static void i40e_clear_interrupt_scheme(struct i40e_pf *pf)
+ 		      I40E_IWARP_IRQ_PILE_ID);
+ 
+ 	i40e_put_lump(pf->irq_pile, 0, I40E_PILE_VALID_BIT-1);
+-	for (i = 0; i < pf->num_alloc_vsi; i++)
+-		if (pf->vsi[i])
+-			i40e_vsi_free_q_vectors(pf->vsi[i]);
++
++	i40e_pf_for_each_vsi(pf, i, vsi)
++		i40e_vsi_free_q_vectors(vsi);
++
+ 	i40e_reset_interrupt_capability(pf);
+ }
+ 
+@@ -5274,12 +5272,11 @@ static void i40e_unquiesce_vsi(struct i40e_vsi *vsi)
+  **/
+ static void i40e_pf_quiesce_all_vsi(struct i40e_pf *pf)
+ {
++	struct i40e_vsi *vsi;
+ 	int v;
+ 
+-	for (v = 0; v < pf->num_alloc_vsi; v++) {
+-		if (pf->vsi[v])
+-			i40e_quiesce_vsi(pf->vsi[v]);
+-	}
++	i40e_pf_for_each_vsi(pf, v, vsi)
++		i40e_quiesce_vsi(vsi);
+ }
+ 
+ /**
+@@ -5288,12 +5285,11 @@ static void i40e_pf_quiesce_all_vsi(struct i40e_pf *pf)
+  **/
+ static void i40e_pf_unquiesce_all_vsi(struct i40e_pf *pf)
+ {
++	struct i40e_vsi *vsi;
+ 	int v;
+ 
+-	for (v = 0; v < pf->num_alloc_vsi; v++) {
+-		if (pf->vsi[v])
+-			i40e_unquiesce_vsi(pf->vsi[v]);
+-	}
++	i40e_pf_for_each_vsi(pf, v, vsi)
++		i40e_unquiesce_vsi(vsi);
+ }
+ 
+ /**
+@@ -5354,14 +5350,13 @@ int i40e_vsi_wait_queues_disabled(struct i40e_vsi *vsi)
+  **/
+ static int i40e_pf_wait_queues_disabled(struct i40e_pf *pf)
+ {
++	struct i40e_vsi *vsi;
+ 	int v, ret = 0;
+ 
+-	for (v = 0; v < pf->num_alloc_vsi; v++) {
+-		if (pf->vsi[v]) {
+-			ret = i40e_vsi_wait_queues_disabled(pf->vsi[v]);
+-			if (ret)
+-				break;
+-		}
++	i40e_pf_for_each_vsi(pf, v, vsi) {
++		ret = i40e_vsi_wait_queues_disabled(vsi);
++		if (ret)
++			break;
+ 	}
+ 
+ 	return ret;
+@@ -6778,32 +6773,29 @@ int i40e_veb_config_tc(struct i40e_veb *veb, u8 enabled_tc)
+  **/
+ static void i40e_dcb_reconfigure(struct i40e_pf *pf)
+ {
++	struct i40e_vsi *vsi;
++	struct i40e_veb *veb;
+ 	u8 tc_map = 0;
+ 	int ret;
+-	u8 v;
++	int v;
+ 
+ 	/* Enable the TCs available on PF to all VEBs */
+ 	tc_map = i40e_pf_get_tc_map(pf);
+ 	if (tc_map == I40E_DEFAULT_TRAFFIC_CLASS)
+ 		return;
+ 
+-	for (v = 0; v < I40E_MAX_VEB; v++) {
+-		if (!pf->veb[v])
+-			continue;
+-		ret = i40e_veb_config_tc(pf->veb[v], tc_map);
++	i40e_pf_for_each_veb(pf, v, veb) {
++		ret = i40e_veb_config_tc(veb, tc_map);
+ 		if (ret) {
+ 			dev_info(&pf->pdev->dev,
+ 				 "Failed configuring TC for VEB seid=%d\n",
+-				 pf->veb[v]->seid);
++				 veb->seid);
+ 			/* Will try to configure as many components */
+ 		}
+ 	}
+ 
+ 	/* Update each VSI */
+-	for (v = 0; v < pf->num_alloc_vsi; v++) {
+-		if (!pf->vsi[v])
+-			continue;
+-
++	i40e_pf_for_each_vsi(pf, v, vsi) {
+ 		/* - Enable all TCs for the LAN VSI
+ 		 * - For all others keep them at TC0 for now
+ 		 */
+@@ -6812,17 +6804,17 @@ static void i40e_dcb_reconfigure(struct i40e_pf *pf)
+ 		else
+ 			tc_map = I40E_DEFAULT_TRAFFIC_CLASS;
+ 
+-		ret = i40e_vsi_config_tc(pf->vsi[v], tc_map);
++		ret = i40e_vsi_config_tc(vsi, tc_map);
+ 		if (ret) {
+ 			dev_info(&pf->pdev->dev,
+ 				 "Failed configuring TC for VSI seid=%d\n",
+-				 pf->vsi[v]->seid);
++				 vsi->seid);
+ 			/* Will try to configure as many components */
+ 		} else {
+ 			/* Re-configure VSI vectors based on updated TC map */
+-			i40e_vsi_map_rings_to_vectors(pf->vsi[v]);
+-			if (pf->vsi[v]->netdev)
+-				i40e_dcbnl_set_all(pf->vsi[v]);
++			i40e_vsi_map_rings_to_vectors(vsi);
++			if (vsi->netdev)
++				i40e_dcbnl_set_all(vsi);
+ 		}
+ 	}
+ }
+@@ -9257,7 +9249,9 @@ int i40e_close(struct net_device *netdev)
+  **/
+ void i40e_do_reset(struct i40e_pf *pf, u32 reset_flags, bool lock_acquired)
+ {
++	struct i40e_vsi *vsi;
+ 	u32 val;
++	int i;
+ 
+ 	/* do the biggest reset indicated */
+ 	if (reset_flags & BIT_ULL(__I40E_GLOBAL_RESET_REQUESTED)) {
+@@ -9313,29 +9307,20 @@ void i40e_do_reset(struct i40e_pf *pf, u32 reset_flags, bool lock_acquired)
+ 			 "FW LLDP is enabled\n");
+ 
+ 	} else if (reset_flags & BIT_ULL(__I40E_REINIT_REQUESTED)) {
+-		int v;
+-
+ 		/* Find the VSI(s) that requested a re-init */
+-		dev_info(&pf->pdev->dev,
+-			 "VSI reinit requested\n");
+-		for (v = 0; v < pf->num_alloc_vsi; v++) {
+-			struct i40e_vsi *vsi = pf->vsi[v];
++		dev_info(&pf->pdev->dev, "VSI reinit requested\n");
+ 
+-			if (vsi != NULL &&
+-			    test_and_clear_bit(__I40E_VSI_REINIT_REQUESTED,
++		i40e_pf_for_each_vsi(pf, i, vsi) {
++			if (test_and_clear_bit(__I40E_VSI_REINIT_REQUESTED,
+ 					       vsi->state))
+-				i40e_vsi_reinit_locked(pf->vsi[v]);
++				i40e_vsi_reinit_locked(vsi);
+ 		}
+ 	} else if (reset_flags & BIT_ULL(__I40E_DOWN_REQUESTED)) {
+-		int v;
+-
+ 		/* Find the VSI(s) that needs to be brought down */
+ 		dev_info(&pf->pdev->dev, "VSI down requested\n");
+-		for (v = 0; v < pf->num_alloc_vsi; v++) {
+-			struct i40e_vsi *vsi = pf->vsi[v];
+ 
+-			if (vsi != NULL &&
+-			    test_and_clear_bit(__I40E_VSI_DOWN_REQUESTED,
++		i40e_pf_for_each_vsi(pf, i, vsi) {
++			if (test_and_clear_bit(__I40E_VSI_DOWN_REQUESTED,
+ 					       vsi->state)) {
+ 				set_bit(__I40E_VSI_DOWN, vsi->state);
+ 				i40e_down(vsi);
+@@ -9888,6 +9873,8 @@ static void i40e_vsi_link_event(struct i40e_vsi *vsi, bool link_up)
+  **/
+ static void i40e_veb_link_event(struct i40e_veb *veb, bool link_up)
+ {
++	struct i40e_veb *veb_it;
 +	struct i40e_vsi *vsi;
  	struct i40e_pf *pf;
- 	struct i40e_hw *hw;
- 	u16 wol_nvm_bits;
-@@ -15640,7 +15641,6 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- #endif /* CONFIG_I40E_DCB */
- 	int err;
+ 	int i;
+ 
+@@ -9896,14 +9883,14 @@ static void i40e_veb_link_event(struct i40e_veb *veb, bool link_up)
+ 	pf = veb->pf;
+ 
+ 	/* depth first... */
+-	for (i = 0; i < I40E_MAX_VEB; i++)
+-		if (pf->veb[i] && (pf->veb[i]->uplink_seid == veb->seid))
+-			i40e_veb_link_event(pf->veb[i], link_up);
++	i40e_pf_for_each_veb(pf, i, veb_it)
++		if (veb_it->uplink_seid == veb->seid)
++			i40e_veb_link_event(veb_it, link_up);
+ 
+ 	/* ... now the local VSIs */
+-	for (i = 0; i < pf->num_alloc_vsi; i++)
+-		if (pf->vsi[i] && (pf->vsi[i]->uplink_seid == veb->seid))
+-			i40e_vsi_link_event(pf->vsi[i], link_up);
++	i40e_pf_for_each_vsi(pf, i, vsi)
++		if (vsi->uplink_seid == veb->seid)
++			i40e_vsi_link_event(vsi, link_up);
+ }
+ 
+ /**
+@@ -9995,6 +9982,8 @@ static void i40e_link_event(struct i40e_pf *pf)
+  **/
+ static void i40e_watchdog_subtask(struct i40e_pf *pf)
+ {
++	struct i40e_vsi *vsi;
++	struct i40e_veb *veb;
+ 	int i;
+ 
+ 	/* if interface is down do nothing */
+@@ -10015,15 +10004,14 @@ static void i40e_watchdog_subtask(struct i40e_pf *pf)
+ 	/* Update the stats for active netdevs so the network stack
+ 	 * can look at updated numbers whenever it cares to
+ 	 */
+-	for (i = 0; i < pf->num_alloc_vsi; i++)
+-		if (pf->vsi[i] && pf->vsi[i]->netdev)
+-			i40e_update_stats(pf->vsi[i]);
++	i40e_pf_for_each_vsi(pf, i, vsi)
++		if (vsi->netdev)
++			i40e_update_stats(vsi);
+ 
+ 	if (test_bit(I40E_FLAG_VEB_STATS_ENA, pf->flags)) {
+ 		/* Update the stats for the active switching components */
+-		for (i = 0; i < I40E_MAX_VEB; i++)
+-			if (pf->veb[i])
+-				i40e_update_veb_stats(pf->veb[i]);
++		i40e_pf_for_each_veb(pf, i, veb)
++			i40e_update_veb_stats(veb);
+ 	}
+ 
+ 	i40e_ptp_rx_hang(pf);
+@@ -10380,18 +10368,18 @@ static int i40e_reconstitute_veb(struct i40e_veb *veb)
+ {
+ 	struct i40e_vsi *ctl_vsi = NULL;
+ 	struct i40e_pf *pf = veb->pf;
+-	int v, veb_idx;
+-	int ret;
++	struct i40e_veb *veb_it;
++	struct i40e_vsi *vsi;
++	int v, ret;
+ 
+ 	/* build VSI that owns this VEB, temporarily attached to base VEB */
+-	for (v = 0; v < pf->num_alloc_vsi && !ctl_vsi; v++) {
+-		if (pf->vsi[v] &&
+-		    pf->vsi[v]->veb_idx == veb->idx &&
+-		    pf->vsi[v]->flags & I40E_VSI_FLAG_VEB_OWNER) {
+-			ctl_vsi = pf->vsi[v];
++	i40e_pf_for_each_vsi(pf, v, vsi)
++		if (vsi->veb_idx == veb->idx &&
++		    vsi->flags & I40E_VSI_FLAG_VEB_OWNER) {
++			ctl_vsi = vsi;
+ 			break;
+ 		}
+-	}
++
+ 	if (!ctl_vsi) {
+ 		dev_info(&pf->pdev->dev,
+ 			 "missing owner VSI for veb_idx %d\n", veb->idx);
+@@ -10421,13 +10409,11 @@ static int i40e_reconstitute_veb(struct i40e_veb *veb)
+ 	i40e_config_bridge_mode(veb);
+ 
+ 	/* create the remaining VSIs attached to this VEB */
+-	for (v = 0; v < pf->num_alloc_vsi; v++) {
+-		if (!pf->vsi[v] || pf->vsi[v] == ctl_vsi)
++	i40e_pf_for_each_vsi(pf, v, vsi) {
++		if (vsi == ctl_vsi)
+ 			continue;
+ 
+-		if (pf->vsi[v]->veb_idx == veb->idx) {
+-			struct i40e_vsi *vsi = pf->vsi[v];
+-
++		if (vsi->veb_idx == veb->idx) {
+ 			vsi->uplink_seid = veb->seid;
+ 			ret = i40e_add_vsi(vsi);
+ 			if (ret) {
+@@ -10441,10 +10427,10 @@ static int i40e_reconstitute_veb(struct i40e_veb *veb)
+ 	}
+ 
+ 	/* create any VEBs attached to this VEB - RECURSION */
+-	for (veb_idx = 0; veb_idx < I40E_MAX_VEB; veb_idx++) {
+-		if (pf->veb[veb_idx] && pf->veb[veb_idx]->veb_idx == veb->idx) {
+-			pf->veb[veb_idx]->uplink_seid = veb->seid;
+-			ret = i40e_reconstitute_veb(pf->veb[veb_idx]);
++	i40e_pf_for_each_veb(pf, v, veb_it) {
++		if (veb_it->veb_idx == veb->idx) {
++			veb_it->uplink_seid = veb->seid;
++			ret = i40e_reconstitute_veb(veb_it);
+ 			if (ret)
+ 				break;
+ 		}
+@@ -10718,6 +10704,7 @@ static void i40e_clean_xps_state(struct i40e_vsi *vsi)
+ static void i40e_prep_for_reset(struct i40e_pf *pf)
+ {
+ 	struct i40e_hw *hw = &pf->hw;
++	struct i40e_vsi *vsi;
+ 	int ret = 0;
+ 	u32 v;
+ 
+@@ -10732,11 +10719,9 @@ static void i40e_prep_for_reset(struct i40e_pf *pf)
+ 	/* quiesce the VSIs and their queues that are not already DOWN */
+ 	i40e_pf_quiesce_all_vsi(pf);
+ 
+-	for (v = 0; v < pf->num_alloc_vsi; v++) {
+-		if (pf->vsi[v]) {
+-			i40e_clean_xps_state(pf->vsi[v]);
+-			pf->vsi[v]->seid = 0;
+-		}
++	i40e_pf_for_each_vsi(pf, v, vsi) {
++		i40e_clean_xps_state(vsi);
++		vsi->seid = 0;
+ 	}
+ 
+ 	i40e_shutdown_adminq(&pf->hw);
+@@ -10850,6 +10835,7 @@ static void i40e_rebuild(struct i40e_pf *pf, bool reinit, bool lock_acquired)
+ 	const bool is_recovery_mode_reported = i40e_check_recovery_mode(pf);
+ 	struct i40e_vsi *vsi = pf->vsi[pf->lan_vsi];
+ 	struct i40e_hw *hw = &pf->hw;
++	struct i40e_veb *veb;
+ 	int ret;
  	u32 val;
--	u32 i;
+ 	int v;
+@@ -10992,14 +10978,10 @@ static void i40e_rebuild(struct i40e_pf *pf, bool reinit, bool lock_acquired)
+ 	if (vsi->uplink_seid != pf->mac_seid) {
+ 		dev_dbg(&pf->pdev->dev, "attempting to rebuild switch\n");
+ 		/* find the one VEB connected to the MAC, and find orphans */
+-		for (v = 0; v < I40E_MAX_VEB; v++) {
+-			if (!pf->veb[v])
+-				continue;
+-
+-			if (pf->veb[v]->uplink_seid == pf->mac_seid ||
+-			    pf->veb[v]->uplink_seid == 0) {
+-				ret = i40e_reconstitute_veb(pf->veb[v]);
+-
++		i40e_pf_for_each_veb(pf, v, veb) {
++			if (veb->uplink_seid == pf->mac_seid ||
++			    veb->uplink_seid == 0) {
++				ret = i40e_reconstitute_veb(veb);
+ 				if (!ret)
+ 					continue;
  
- 	err = pci_enable_device_mem(pdev);
- 	if (err)
-@@ -15990,12 +15990,9 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	INIT_LIST_HEAD(&pf->vsi[pf->lan_vsi]->ch_list);
+@@ -11009,13 +10991,13 @@ static void i40e_rebuild(struct i40e_pf *pf, bool reinit, bool lock_acquired)
+ 				 * If orphan failed, we'll report the error
+ 				 * but try to keep going.
+ 				 */
+-				if (pf->veb[v]->uplink_seid == pf->mac_seid) {
++				if (veb->uplink_seid == pf->mac_seid) {
+ 					dev_info(&pf->pdev->dev,
+ 						 "rebuild of switch failed: %d, will try to set up simple PF connection\n",
+ 						 ret);
+ 					vsi->uplink_seid = pf->mac_seid;
+ 					break;
+-				} else if (pf->veb[v]->uplink_seid == 0) {
++				} else if (veb->uplink_seid == 0) {
+ 					dev_info(&pf->pdev->dev,
+ 						 "rebuild of orphan VEB failed: %d\n",
+ 						 ret);
+@@ -12098,6 +12080,7 @@ static int i40e_init_interrupt_scheme(struct i40e_pf *pf)
+  */
+ static int i40e_restore_interrupt_scheme(struct i40e_pf *pf)
+ {
++	struct i40e_vsi *vsi;
+ 	int err, i;
  
- 	/* if FDIR VSI was set up, start it now */
+ 	/* We cleared the MSI and MSI-X flags when disabling the old interrupt
+@@ -12114,13 +12097,12 @@ static int i40e_restore_interrupt_scheme(struct i40e_pf *pf)
+ 	/* Now that we've re-acquired IRQs, we need to remap the vectors and
+ 	 * rings together again.
+ 	 */
 -	for (i = 0; i < pf->num_alloc_vsi; i++) {
--		if (pf->vsi[i] && pf->vsi[i]->type == I40E_VSI_FDIR) {
--			i40e_vsi_open(pf->vsi[i]);
--			break;
+-		if (pf->vsi[i]) {
+-			err = i40e_vsi_alloc_q_vectors(pf->vsi[i]);
+-			if (err)
+-				goto err_unwind;
+-			i40e_vsi_map_rings_to_vectors(pf->vsi[i]);
+-		}
++	i40e_pf_for_each_vsi(pf, i, vsi) {
++		err = i40e_vsi_alloc_q_vectors(vsi);
++		if (err)
++			goto err_unwind;
++
++		i40e_vsi_map_rings_to_vectors(vsi);
+ 	}
+ 
+ 	err = i40e_setup_misc_vector(pf);
+@@ -13122,8 +13104,8 @@ static int i40e_ndo_bridge_setlink(struct net_device *dev,
+ 	struct i40e_netdev_priv *np = netdev_priv(dev);
+ 	struct i40e_vsi *vsi = np->vsi;
+ 	struct i40e_pf *pf = vsi->back;
+-	struct i40e_veb *veb = NULL;
+ 	struct nlattr *attr, *br_spec;
++	struct i40e_veb *veb;
+ 	int i, rem;
+ 
+ 	/* Only for PF VSI for now */
+@@ -13131,10 +13113,11 @@ static int i40e_ndo_bridge_setlink(struct net_device *dev,
+ 		return -EOPNOTSUPP;
+ 
+ 	/* Find the HW bridge for PF VSI */
+-	for (i = 0; i < I40E_MAX_VEB && !veb; i++) {
+-		if (pf->veb[i] && pf->veb[i]->seid == vsi->uplink_seid)
+-			veb = pf->veb[i];
+-	}
++	i40e_pf_for_each_veb(pf, i, veb)
++		if (veb->seid == vsi->uplink_seid)
++			break;
++	if (i == I40E_MAX_VEB)
++		veb = NULL; /* No VEB found */
+ 
+ 	br_spec = nlmsg_find_attr(nlh, sizeof(struct ifinfomsg), IFLA_AF_SPEC);
+ 	if (!br_spec)
+@@ -13207,12 +13190,10 @@ static int i40e_ndo_bridge_getlink(struct sk_buff *skb, u32 pid, u32 seq,
+ 		return -EOPNOTSUPP;
+ 
+ 	/* Find the HW bridge for the PF VSI */
+-	for (i = 0; i < I40E_MAX_VEB && !veb; i++) {
+-		if (pf->veb[i] && pf->veb[i]->seid == vsi->uplink_seid)
+-			veb = pf->veb[i];
+-	}
+-
+-	if (!veb)
++	i40e_pf_for_each_veb(pf, i, veb)
++		if (veb->seid == vsi->uplink_seid)
++			break;
++	if (i == I40E_MAX_VEB)
+ 		return 0;
+ 
+ 	return ndo_dflt_bridge_getlink(skb, pid, seq, dev, veb->bridge_mode,
+@@ -14143,9 +14124,9 @@ static int i40e_add_vsi(struct i40e_vsi *vsi)
+  **/
+ int i40e_vsi_release(struct i40e_vsi *vsi)
+ {
++	struct i40e_veb *veb, *veb_it;
+ 	struct i40e_mac_filter *f;
+ 	struct hlist_node *h;
+-	struct i40e_veb *veb = NULL;
+ 	struct i40e_pf *pf;
+ 	u16 uplink_seid;
+ 	int i, n, bkt;
+@@ -14215,20 +14196,18 @@ int i40e_vsi_release(struct i40e_vsi *vsi)
+ 	 * the orphan VEBs yet.  We'll wait for an explicit remove request
+ 	 * from up the network stack.
+ 	 */
+-	for (n = 0, i = 0; i < pf->num_alloc_vsi; i++) {
+-		if (pf->vsi[i] &&
+-		    pf->vsi[i]->uplink_seid == uplink_seid &&
+-		    (pf->vsi[i]->flags & I40E_VSI_FLAG_VEB_OWNER) == 0) {
++	n = 0;
++	i40e_pf_for_each_vsi(pf, i, vsi)
++		if (vsi->uplink_seid == uplink_seid &&
++		    (vsi->flags & I40E_VSI_FLAG_VEB_OWNER) == 0)
+ 			n++;      /* count the VSIs */
 -		}
 -	}
-+	vsi = i40e_find_vsi_by_type(pf, I40E_VSI_FDIR);
-+	if (vsi)
-+		i40e_vsi_open(vsi);
+-	for (i = 0; i < I40E_MAX_VEB; i++) {
+-		if (!pf->veb[i])
+-			continue;
+-		if (pf->veb[i]->uplink_seid == uplink_seid)
++
++	veb = NULL;
++	i40e_pf_for_each_veb(pf, i, veb_it) {
++		if (veb_it->uplink_seid == uplink_seid)
+ 			n++;     /* count the VEBs */
+-		if (pf->veb[i]->seid == uplink_seid)
+-			veb = pf->veb[i];
++		if (veb_it->seid == uplink_seid)
++			veb = veb_it;
+ 	}
+ 	if (n == 0 && veb && veb->uplink_seid != 0)
+ 		i40e_veb_release(veb);
+@@ -14405,22 +14384,18 @@ struct i40e_vsi *i40e_vsi_setup(struct i40e_pf *pf, u8 type,
+ 	 *
+ 	 * Find which uplink_seid we were given and create a new VEB if needed
+ 	 */
+-	for (i = 0; i < I40E_MAX_VEB; i++) {
+-		if (pf->veb[i] && pf->veb[i]->seid == uplink_seid) {
+-			veb = pf->veb[i];
++	i40e_pf_for_each_veb(pf, i, veb)
++		if (veb->seid == uplink_seid)
+ 			break;
+-		}
+-	}
++	if (i == I40E_MAX_VEB)
++		veb = NULL;
  
- 	/* The driver only wants link up/down and module qualification
- 	 * reports from firmware.  Note the negative logic.
+ 	if (!veb && uplink_seid != pf->mac_seid) {
+-
+-		for (i = 0; i < pf->num_alloc_vsi; i++) {
+-			if (pf->vsi[i] && pf->vsi[i]->seid == uplink_seid) {
+-				vsi = pf->vsi[i];
++		i40e_pf_for_each_vsi(pf, i, vsi)
++			if (vsi->seid == uplink_seid)
+ 				break;
+-			}
+-		}
+-		if (!vsi) {
++
++		if (i == pf->num_alloc_vsi) {
+ 			dev_info(&pf->pdev->dev, "no such uplink_seid %d\n",
+ 				 uplink_seid);
+ 			return NULL;
+@@ -14448,11 +14423,10 @@ struct i40e_vsi *i40e_vsi_setup(struct i40e_pf *pf, u8 type,
+ 			}
+ 			i40e_config_bridge_mode(veb);
+ 		}
+-		for (i = 0; i < I40E_MAX_VEB && !veb; i++) {
+-			if (pf->veb[i] && pf->veb[i]->seid == vsi->uplink_seid)
+-				veb = pf->veb[i];
+-		}
+-		if (!veb) {
++		i40e_pf_for_each_veb(pf, i, veb)
++			if (veb->seid == vsi->uplink_seid)
++				break;
++		if (i == I40E_MAX_VEB) {
+ 			dev_info(&pf->pdev->dev, "couldn't add VEB\n");
+ 			return NULL;
+ 		}
+@@ -14681,29 +14655,24 @@ static void i40e_switch_branch_release(struct i40e_veb *branch)
+ 	struct i40e_pf *pf = branch->pf;
+ 	u16 branch_seid = branch->seid;
+ 	u16 veb_idx = branch->idx;
++	struct i40e_vsi *vsi;
++	struct i40e_veb *veb;
+ 	int i;
+ 
+ 	/* release any VEBs on this VEB - RECURSION */
+-	for (i = 0; i < I40E_MAX_VEB; i++) {
+-		if (!pf->veb[i])
+-			continue;
+-		if (pf->veb[i]->uplink_seid == branch->seid)
+-			i40e_switch_branch_release(pf->veb[i]);
+-	}
++	i40e_pf_for_each_veb(pf, i, veb)
++		if (veb->uplink_seid == branch->seid)
++			i40e_switch_branch_release(veb);
+ 
+ 	/* Release the VSIs on this VEB, but not the owner VSI.
+ 	 *
+ 	 * NOTE: Removing the last VSI on a VEB has the SIDE EFFECT of removing
+ 	 *       the VEB itself, so don't use (*branch) after this loop.
+ 	 */
+-	for (i = 0; i < pf->num_alloc_vsi; i++) {
+-		if (!pf->vsi[i])
+-			continue;
+-		if (pf->vsi[i]->uplink_seid == branch_seid &&
+-		   (pf->vsi[i]->flags & I40E_VSI_FLAG_VEB_OWNER) == 0) {
+-			i40e_vsi_release(pf->vsi[i]);
+-		}
+-	}
++	i40e_pf_for_each_vsi(pf, i, vsi)
++		if (vsi->uplink_seid == branch_seid &&
++		    (vsi->flags & I40E_VSI_FLAG_VEB_OWNER) == 0)
++			i40e_vsi_release(vsi);
+ 
+ 	/* There's one corner case where the VEB might not have been
+ 	 * removed, so double check it here and remove it if needed.
+@@ -14741,19 +14710,19 @@ static void i40e_veb_clear(struct i40e_veb *veb)
+  **/
+ void i40e_veb_release(struct i40e_veb *veb)
+ {
+-	struct i40e_vsi *vsi = NULL;
++	struct i40e_vsi *vsi, *vsi_it;
+ 	struct i40e_pf *pf;
+ 	int i, n = 0;
+ 
+ 	pf = veb->pf;
+ 
+ 	/* find the remaining VSI and check for extras */
+-	for (i = 0; i < pf->num_alloc_vsi; i++) {
+-		if (pf->vsi[i] && pf->vsi[i]->uplink_seid == veb->seid) {
++	i40e_pf_for_each_vsi(pf, i, vsi_it)
++		if (vsi_it->uplink_seid == veb->seid) {
++			vsi = vsi_it;
+ 			n++;
+-			vsi = pf->vsi[i];
+ 		}
+-	}
++
+ 	if (n != 1) {
+ 		dev_info(&pf->pdev->dev,
+ 			 "can't remove VEB %d with %d VSIs left\n",
+@@ -14851,6 +14820,7 @@ struct i40e_veb *i40e_veb_setup(struct i40e_pf *pf, u16 flags,
+ 				u8 enabled_tc)
+ {
+ 	struct i40e_veb *veb, *uplink_veb = NULL;
++	struct i40e_vsi *vsi;
+ 	int vsi_idx, veb_idx;
+ 	int ret;
+ 
+@@ -14864,9 +14834,10 @@ struct i40e_veb *i40e_veb_setup(struct i40e_pf *pf, u16 flags,
+ 	}
+ 
+ 	/* make sure there is such a vsi and uplink */
+-	for (vsi_idx = 0; vsi_idx < pf->num_alloc_vsi; vsi_idx++)
+-		if (pf->vsi[vsi_idx] && pf->vsi[vsi_idx]->seid == vsi_seid)
++	i40e_pf_for_each_vsi(pf, vsi_idx, vsi)
++		if (vsi->seid == vsi_seid)
+ 			break;
++
+ 	if (vsi_idx == pf->num_alloc_vsi && vsi_seid != 0) {
+ 		dev_info(&pf->pdev->dev, "vsi seid %d not found\n",
+ 			 vsi_seid);
+@@ -14874,10 +14845,9 @@ struct i40e_veb *i40e_veb_setup(struct i40e_pf *pf, u16 flags,
+ 	}
+ 
+ 	if (uplink_seid && uplink_seid != pf->mac_seid) {
+-		for (veb_idx = 0; veb_idx < I40E_MAX_VEB; veb_idx++) {
+-			if (pf->veb[veb_idx] &&
+-			    pf->veb[veb_idx]->seid == uplink_seid) {
+-				uplink_veb = pf->veb[veb_idx];
++		i40e_pf_for_each_veb(pf, veb_idx, veb) {
++			if (veb->seid == uplink_seid) {
++				uplink_veb = veb;
+ 				break;
+ 			}
+ 		}
+@@ -14899,7 +14869,7 @@ struct i40e_veb *i40e_veb_setup(struct i40e_pf *pf, u16 flags,
+ 	veb->enabled_tc = (enabled_tc ? enabled_tc : 0x1);
+ 
+ 	/* create the VEB in the switch */
+-	ret = i40e_add_veb(veb, pf->vsi[vsi_idx]);
++	ret = i40e_add_veb(veb, vsi);
+ 	if (ret)
+ 		goto err_veb;
+ 	if (vsi_idx == pf->lan_vsi)
+@@ -14930,6 +14900,7 @@ static void i40e_setup_pf_switch_element(struct i40e_pf *pf,
+ 	u16 uplink_seid = le16_to_cpu(ele->uplink_seid);
+ 	u8 element_type = ele->element_type;
+ 	u16 seid = le16_to_cpu(ele->seid);
++	struct i40e_veb *veb;
+ 
+ 	if (printconfig)
+ 		dev_info(&pf->pdev->dev,
+@@ -14948,12 +14919,12 @@ static void i40e_setup_pf_switch_element(struct i40e_pf *pf,
+ 			int v;
+ 
+ 			/* find existing or else empty VEB */
+-			for (v = 0; v < I40E_MAX_VEB; v++) {
+-				if (pf->veb[v] && (pf->veb[v]->seid == seid)) {
++			i40e_pf_for_each_veb(pf, v, veb)
++				if (veb->seid == seid) {
+ 					pf->lan_veb = v;
+ 					break;
+ 				}
+-			}
++
+ 			if (pf->lan_veb >= I40E_MAX_VEB) {
+ 				v = i40e_veb_mem_alloc(pf);
+ 				if (v < 0)
+@@ -16238,6 +16209,8 @@ static void i40e_remove(struct pci_dev *pdev)
+ {
+ 	struct i40e_pf *pf = pci_get_drvdata(pdev);
+ 	struct i40e_hw *hw = &pf->hw;
++	struct i40e_vsi *vsi;
++	struct i40e_veb *veb;
+ 	int ret_code;
+ 	int i;
+ 
+@@ -16295,24 +16268,19 @@ static void i40e_remove(struct pci_dev *pdev)
+ 	/* If there is a switch structure or any orphans, remove them.
+ 	 * This will leave only the PF's VSI remaining.
+ 	 */
+-	for (i = 0; i < I40E_MAX_VEB; i++) {
+-		if (!pf->veb[i])
+-			continue;
+-
+-		if (pf->veb[i]->uplink_seid == pf->mac_seid ||
+-		    pf->veb[i]->uplink_seid == 0)
+-			i40e_switch_branch_release(pf->veb[i]);
+-	}
++	i40e_pf_for_each_veb(pf, i, veb)
++		if (veb->uplink_seid == pf->mac_seid ||
++		    veb->uplink_seid == 0)
++			i40e_switch_branch_release(veb);
+ 
+ 	/* Now we can shutdown the PF's VSIs, just before we kill
+ 	 * adminq and hmc.
+ 	 */
+-	for (i = pf->num_alloc_vsi; i--;)
+-		if (pf->vsi[i]) {
+-			i40e_vsi_close(pf->vsi[i]);
+-			i40e_vsi_release(pf->vsi[i]);
+-			pf->vsi[i] = NULL;
+-		}
++	i40e_pf_for_each_vsi(pf, i, vsi) {
++		i40e_vsi_close(vsi);
++		i40e_vsi_release(vsi);
++		pf->vsi[i] = NULL;
++	}
+ 
+ 	i40e_cloud_filter_exit(pf);
+ 
+@@ -16349,18 +16317,17 @@ static void i40e_remove(struct pci_dev *pdev)
+ 	/* Clear all dynamic memory lists of rings, q_vectors, and VSIs */
+ 	rtnl_lock();
+ 	i40e_clear_interrupt_scheme(pf);
+-	for (i = 0; i < pf->num_alloc_vsi; i++) {
+-		if (pf->vsi[i]) {
+-			if (!test_bit(__I40E_RECOVERY_MODE, pf->state))
+-				i40e_vsi_clear_rings(pf->vsi[i]);
+-			i40e_vsi_clear(pf->vsi[i]);
+-			pf->vsi[i] = NULL;
+-		}
++	i40e_pf_for_each_vsi(pf, i, vsi) {
++		if (!test_bit(__I40E_RECOVERY_MODE, pf->state))
++			i40e_vsi_clear_rings(vsi);
++
++		i40e_vsi_clear(vsi);
++		pf->vsi[i] = NULL;
+ 	}
+ 	rtnl_unlock();
+ 
+-	for (i = 0; i < I40E_MAX_VEB; i++) {
+-		kfree(pf->veb[i]);
++	i40e_pf_for_each_veb(pf, i, veb) {
++		kfree(veb);
+ 		pf->veb[i] = NULL;
+ 	}
+ 
 -- 
 2.41.0
 
