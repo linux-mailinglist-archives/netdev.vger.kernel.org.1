@@ -1,114 +1,103 @@
-Return-Path: <netdev+bounces-72247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45D6B8572BC
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 01:45:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11D6B857323
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 02:10:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7782E1C2137C
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 00:45:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 577812857AE
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 01:10:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1698CC2D6;
-	Fri, 16 Feb 2024 00:43:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAFF39445;
+	Fri, 16 Feb 2024 01:00:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tv+itwG+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BCqteF2K"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB5E8BE4D
-	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 00:43:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB16E8F55;
+	Fri, 16 Feb 2024 01:00:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708044213; cv=none; b=gnCpM6iW6S0VO8LjqNJrvjWgGbiyUTtjlCBGMrVvFT8fnHZ5ZXaFQ8GqnMCORXvm1l/+YJKfNyMk+cvlYrv5AG+gMrpXfPfu7k6QevWnOknuG/m6UzyD5zOmLbOclUNCI3i18FC4jufhKb0xmPXcSy/Ckh4Q9Ug6nao4AdL+1Qo=
+	t=1708045248; cv=none; b=T35SKdWDwGM7rrhW5yASyNWn57YZqrQBj1dYPVIxXrvBnSn5LoAn2tyXrKRSgU6ombTqz8ClRN1neCe5Gs2pyfJvZAY7M8Mj5/MXzQM6SIe2we6f5KW9IsDyqnSCy88EbEiWjRg330L1n3MTSNLmz3WMvfz748/5B8uMHtQgP1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708044213; c=relaxed/simple;
-	bh=2+VZnPCSYNk+2pPRyl152ePQ0FX0U8JpHjxax5vPuDY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NtjmT4ibDAH+Dm2BDeHVoa1j9R5Ta3YNTU7vi/qqZTSnG9l/ZlmgEfxtMJ7qRh3IuHPrbWIHUnBcyEXFt05dBCNk2XTRKek+6y/baXP7kWC1aQlyucEIPH7pgMPaTGboqoEVVXKBy88FOCfRMr09YpgJeE8fw+zdCdfT9iY+U24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tv+itwG+; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <11f40993-ec02-48b7-aec5-13ff7cddf665@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1708044208;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KlOE/QHrK685/cBSEGlCbbuAZty4HqZtwl2hI0O+jio=;
-	b=tv+itwG+azGIKJ3yf3N8V0VgYXvjLKRlNl497rfWJd7CpaqicNRKY2qiWipQT1saJxVnNj
-	2ET24KwQQh84jFd/9tAmCflA3IxxlWQjPSdARAYSJ60kbx98IfUNBRGbzk4elELkgj2qCQ
-	sFSGpacZdFq7hENHEjQbYTByzwIXDV0=
-Date: Fri, 16 Feb 2024 08:43:18 +0800
+	s=arc-20240116; t=1708045248; c=relaxed/simple;
+	bh=+dDgnU3ZkrjHe2f8ANYZEXxyh3W3/N5+qFKaHROFQjU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hR6tp7xY4lLeceN5QlLarKBHN0uY/dmNszCK3QwOQD0TnuTgnQhl/Q/duhuOwcop6XRFZxkxoV1++h5MVqq9GUQ5g0NWIhAZJQkc3SRc6WHTRT3a5bVTCU1WBBiCm8NU+qAlewW8ghXiGHaFedNP8SZg3q1tMLE+O126r+gQti4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BCqteF2K; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 693EEC433F1;
+	Fri, 16 Feb 2024 01:00:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708045248;
+	bh=+dDgnU3ZkrjHe2f8ANYZEXxyh3W3/N5+qFKaHROFQjU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BCqteF2KZkBD/XMzhKjjbxKUtvLqdkGNuCWI6A6kWgqy+syTndaIHpsbIhS4pxbAp
+	 UmMEkDDCao9xjdSYkDm918Pe9jerH5dLqNeZecLL9epIYcUVa2Wh9XaqOa8Q0wJChH
+	 LyNbx57nXbkJWKvWX9aYrj3gMnnlnsHnwYGzv5Hs1lHC49ajycJ38Fk/pwZJZJ3uNY
+	 WmSIxelgEKaoYY8p2UUD2trduuEQ49XwsN6zBKl6fh3Nr785Q8CQEGszFEn2+UTMJc
+	 z4vwAs/mm5M+FkBxUtOsZ+CB8h99b4zHz5aX7TXxka3YG+Msx94e84uU2yTu2fVxgY
+	 yVC2AwsLICM9g==
+Date: Thu, 15 Feb 2024 17:00:46 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Leon Romanovsky
+ <leonro@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>, Jiri Pirko
+ <jiri@nvidia.com>, Leonid Bloch <lbloch@nvidia.com>, Itay Avraham
+ <itayavr@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>, David Ahern
+ <dsahern@kernel.org>, Aron Silverton <aron.silverton@oracle.com>,
+ andrew.gospodarek@broadcom.com, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
+Message-ID: <20240215170046.58d565ef@kernel.org>
+In-Reply-To: <Zc22mMN2ovCadgRY@infradead.org>
+References: <20240207072435.14182-1-saeed@kernel.org>
+	<Zcx53N8lQjkpEu94@infradead.org>
+	<20240214074832.713ca16a@kernel.org>
+	<Zc22mMN2ovCadgRY@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] net/mlx5: fix possible stack overflows
-To: Arnd Bergmann <arnd@arndb.de>, Arnd Bergmann <arnd@kernel.org>,
- Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Yevgeny Kliteynik <kliteyn@nvidia.com>,
- Alex Vesker <valex@nvidia.com>, Hamdan Igbaria <hamdani@nvidia.com>,
- Netdev <netdev@vger.kernel.org>, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240213100848.458819-1-arnd@kernel.org>
- <84874528-daea-424d-af63-b9b86835fae6@linux.dev>
- <2ebe5a36-ce81-4d26-a12b-7affbd65c5e3@app.fastmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <2ebe5a36-ce81-4d26-a12b-7affbd65c5e3@app.fastmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Wed, 14 Feb 2024 23:00:40 -0800 Christoph Hellwig wrote:
+> On Wed, Feb 14, 2024 at 07:48:32AM -0800, Jakub Kicinski wrote:
+> > Overreach is unfortunate, I'd love to say "please do merge it as part 
+> > of RDMA". You probably don't trust my opinion but Jason admitted himself
+> > this is primarily for RDMA. RDMA is what it is in terms of openness and
+> > all vendors trying to sell their secret magic sauce.  
+> 
+> Common.  RDMA has two important open standards, one of them even done
+> in IETF that most open of all standards organizations.
 
-在 2024/2/15 16:03, Arnd Bergmann 写道:
-> On Thu, Feb 15, 2024, at 01:18, Zhu Yanjun wrote:
->> 在 2024/2/13 18:08, Arnd Bergmann 写道:
->>>    static int
->>> -dr_dump_rule_rx_tx(struct seq_file *file, struct mlx5dr_rule_rx_tx *rule_rx_tx,
->>> +dr_dump_rule_rx_tx(struct seq_file *file, char *buff,
->>> +		   struct mlx5dr_rule_rx_tx *rule_rx_tx,
->>>    		   bool is_rx, const u64 rule_id, u8 format_ver)
->>>    {
->>>    	struct mlx5dr_ste *ste_arr[DR_RULE_MAX_STES + DR_ACTION_MAX_STES];
->>> @@ -533,7 +532,7 @@ dr_dump_rule_rx_tx(struct seq_file *file, struct mlx5dr_rule_rx_tx *rule_rx_tx,
->>>    		return 0;
->>>    
->>>    	while (i--) {
->>> -		ret = dr_dump_rule_mem(file, ste_arr[i], is_rx, rule_id,
->> Before buff is reused, I am not sure whether buff should be firstly
->> zeroed or not.
-> I don't see why it would, but if you want to zero it, that would be
-> a separate patch that is already needed on the existing code,
-> which never zeroes its buffers.
+While I don't dispute that there are standards which can be read,
+the practical interoperability of RDMA devices is extremely low.
+By practical I mean having two devices from different vendors
+achieve any reasonable performance talking to each other.
+Even two devices from _the same_ vendor but different generations
+are unlikely to perform.
 
-Sure. I agree with you. In the existing code, the buffers are not zeroed.
+Given how RDMA is deployed (uniform, greenfield/full replacement)
+this is entirely reasonable from the engineering perspective.
 
-But to a buffer which is used for several times, it is good to zero it 
-before it is used again.
+But this is a bit of a vicious cycle, vendors have little incentive 
+to interoperate, and primarily focus on adding secret sauce outside of 
+the standard. In fact you're lucky if the vendor didn't bake some
+extension which requires custom switches into the NICs :(
 
-Can you add a new commit with the following?
+Compare that to WiFi, which is a level of standardization netdev folks
+are more accustomed to. You can connect a new device from vendor X to 
+a 10 year old AP from vendor Y and it will run with high perf.
 
-1). Zero the buffers in the existing code
-
-2). Add the zero functionality to your patch
-
- From my perspective, it is good to the whole commit.
-
-Please Jason and Leon comment on this.
-
-Thanks,
-
-Zhu Yanjun
-
->
->      Arnd
+Unfortunately because of the AI craze I have some experience
+with RDMA deployments now. Perhaps you have more, perhaps your
+experience differs.
 
