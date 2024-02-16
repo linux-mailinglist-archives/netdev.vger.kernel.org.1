@@ -1,83 +1,141 @@
-Return-Path: <netdev+bounces-72467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 514678583BF
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 18:14:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEDA88583DC
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 18:16:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C17B1C2181E
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 17:14:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69E68284F58
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 17:16:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 796B0132474;
-	Fri, 16 Feb 2024 17:11:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9303813328F;
+	Fri, 16 Feb 2024 17:13:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ON1alLpW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yj9IDzlD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D840131E52;
-	Fri, 16 Feb 2024 17:11:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B75130AEC;
+	Fri, 16 Feb 2024 17:13:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708103516; cv=none; b=gfCWeiPMZ/qR8C5xrlGcW42DlT5s33TeEWkTErbRrGGRGTFU4NJHv9OVQ5m4U55jF4N06mgfsjSAYHXjdfJi931iZbRX7gv5iWYqfe3yvsU+j1KBCMKK5cMf/KpYz8bIJJCCaqzagvrn96LSINaYcmZYvrAuFhaqUOFf1GHmiV0=
+	t=1708103638; cv=none; b=FlrkwhPdD/vUeMJr1FAdCv4kvjSCN6Fo0WDrCymQNtMM9KIWtYKvFqAcftEWfVTidWHdaMi9jNRiFfyf7ReXZCKBX+CrVqc9NtmNkxzKfFzmRc3ekUOXcaKVa+9ifcqotUv797Zp/lmDq4c1QfF3l7pFK/p9N6i7rrqTvb9HOQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708103516; c=relaxed/simple;
-	bh=YA/Nyoyhx7bhuyZ5awSGZBjpvqQmwwyKXWrJOIuIBWU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LE3xBEahEszQQq2egDeVsSdKox6zgj0rglj7ekOhVoUmn9iM1VbY914hi4HpcIqPh7NFSINVaywwcTviIOG2ufbi8d0NF09XRAvnii92oWfV1RJmWvKt+xGlAfK/VdOq+mMrZJ3K7RgS+i8it/GLdLnE60gtWcljqDUzvD/+Qxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ON1alLpW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DD82C433C7;
-	Fri, 16 Feb 2024 17:11:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708103516;
-	bh=YA/Nyoyhx7bhuyZ5awSGZBjpvqQmwwyKXWrJOIuIBWU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ON1alLpWJzLydjqiInBCLacsObWIPgmYxWJuGf3kbezZmrdPIbpXI3DehMLSG54GC
-	 7Xa/63q8h+Jztw03mPO4hNDsZrKS9/GUAofvS05wpJrTKq65wflfRX+7UBK56ok6rC
-	 8cKgo6xPPZLpTRHDSxmlqNFDPa0Fu/ChYw9LzsUF4Jr0I0AVhov/fiJ8lr/sXD9NtO
-	 GdMJDWiN6imJB108wCamhCoMHpZJNiXVHgzjbL3YRmG4mIr+pXFP4xEDFJNLdZFF7l
-	 6aRCfXUA8wgCyMeMN7y2Pb9xXy1FrjQEDQs7Rt3waiU140FsN5FnSJd+hYjVCmkjVR
-	 OJxaUC8rjle8g==
-Date: Fri, 16 Feb 2024 17:11:52 +0000
-From: Simon Horman <horms@kernel.org>
-To: Imran Khan <imran.f.khan@oracle.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] connector/cn_proc: make comm length as TASK_COMM_LEN.
-Message-ID: <20240216171152.GO40273@kernel.org>
-References: <20240209121046.1192739-1-imran.f.khan@oracle.com>
- <20240209075032.1deb447a@kernel.org>
- <890de365-f844-4ed9-af9d-90f5ff4bccbd@oracle.com>
+	s=arc-20240116; t=1708103638; c=relaxed/simple;
+	bh=fYAA8xilO4KnYgQIZVtA9ts8YuATLRGZ6f+s+rtRDWY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=H8DZPeP6ZVcMP/bNcQr9bJ4fTAZHzgzkB+9iIL2Rt6bH7B62qw0/TyOLJYd0sPj/rD+VWUo2d/fb6gSoq56kmXICtZfzQnpdnziW1s8leoyVKJbmkRds5p+uFNa6X1faqgsxfw31aIWR5UFUzkCzCzebxaLg0Z4OJaHG3C/juYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yj9IDzlD; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-42dd6f6518fso3968381cf.1;
+        Fri, 16 Feb 2024 09:13:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708103635; x=1708708435; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pjvfE09Bk+j8kTulAxyHuFEo7lsn+ZYbAj8sdSsLEQI=;
+        b=Yj9IDzlDG1aTmi1TACel/VWh7ehQQRcrkkRID722mJoaDb9qQniQl8kQlyiuccb4RY
+         O+ckjz5lQgij8YH/mSwvOtn75+HDH8DCR33XBqVlGaGEAf/KQqvuc8lyNhRhBeuondYr
+         9pYLapqMVkzr+mUdLFH8wB4VfIadgWh9MRjuKXAV49LN3AYM8lrp4xbBlA1G2DL4K14i
+         3CNSl54/HW4uAtgVjsiy8145urN8dBpziQjH8nV793upmMPs1RbndAS1pjtywD4WCHQz
+         GcHdmv/fY55CAQm/XepslWuMP2OeRKiEulCRuavuQiaawEswV8ibx3WdzKyqYRgavOSD
+         uzUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708103635; x=1708708435;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pjvfE09Bk+j8kTulAxyHuFEo7lsn+ZYbAj8sdSsLEQI=;
+        b=fTLPq0CeUy1Tre5piqqHf8S541lM22tpPEnrTkTCNcl2ZwubIEpZBuMD0Q9Qk5yxE8
+         xgB4xtoSWPIJbu/c5wKf9KqlQSg6yxEjC8WZflZfCv3vpuG65gnObjGDPMDWP4TsdYIw
+         xw3cxOoPb2KWpkIGS3Rp49TZUG7mJFoPcXl0wWsjnlFVkghxuSvOdMZv6C0NptKygUqp
+         HaYtoqsPbQe02K8xxUbMw8igPAc0TYH/H2pKo860UnpayZXx+Xbnucq1vdTXLNrN36nf
+         XLASuAnj9+kzxRzQwjpg7McVvtdDBBttBf3k51Gm6E8T8YGF5Zm0abPJHRujk20FR/ES
+         3TyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX3+UY3GuchyrjShmRMB8rtI3A49OvxwGB9whyjVemZrKX4GhO3u7VvK63IL5YU8n3NpXSfkaPE/ZxM5xgcYa8OVW1dqv8LhhRpZb7Y
+X-Gm-Message-State: AOJu0Yx5h9TGubp3NwIAliJEnQcSpa61IBYx8LFLIpvDMfA/DCvTo4pN
+	8o6v3N4ckZaHiUJE8k5AC7FTlDCLfaeMcCxRqobL4x02zgbGhUJy
+X-Google-Smtp-Source: AGHT+IGwY7as3MWB8rYJ4I9pgzQYCKHYP5+MPcdYB0dE1tHD/o8J8JD84q4msCMJqeg9XyYibSA/xg==
+X-Received: by 2002:a05:622a:15d6:b0:42c:7c75:b73b with SMTP id d22-20020a05622a15d600b0042c7c75b73bmr6001337qty.18.1708103635473;
+        Fri, 16 Feb 2024 09:13:55 -0800 (PST)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id y20-20020ac85f54000000b0042c5512c329sm105660qta.17.2024.02.16.09.13.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Feb 2024 09:13:54 -0800 (PST)
+Message-ID: <61bdd802-abe4-4544-8e48-9493a6bb99c8@gmail.com>
+Date: Fri, 16 Feb 2024 09:13:51 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <890de365-f844-4ed9-af9d-90f5ff4bccbd@oracle.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: stmmac: mmc_core: Assign, don't add interrupt
+ registers
+Content-Language: en-US
+To: Jesper Nilsson <jesper.nilsson@axis.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ kernel@axis.com
+References: <20240216-stmmac_stats-v1-1-7065fa4613f8@axis.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20240216-stmmac_stats-v1-1-7065fa4613f8@axis.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sat, Feb 10, 2024 at 10:19:24AM +1100, Imran Khan wrote:
+On 2/16/24 07:24, Jesper Nilsson wrote:
+> The MMC IPC interrupt status and interrupt mask registers are of
+> little use as Ethernet statistics, but incrementing counters
+> based on the current interrupt and interrupt mask registers
+> makes them worse than useless.
 > 
-> Hello Jakub,
-> On 10/2/2024 2:50 am, Jakub Kicinski wrote:
-> > On Fri,  9 Feb 2024 23:10:46 +1100 Imran Khan wrote:
-> >> Since comm_proc_event::comm contains a task_struct::comm,
-> >> make its size same as TASK_COMM_LEN and avoid magic number
-> >> in buffer size.
-> > 
-> > missed CCing netdev?
-> Thanks for getting back on this. Actually get_maintainer.pl for cn_proc.h was
-> not showing any maintainers, so I took the "To" list from cn_proc.c.
-> For CCing I stuck with what get_maintainer.pl was showing.
-> I have added netdev in CC now.
+> For example, if the interrupt mask is set to 0x08420842,
+> the current code will increment by that amount each iteration,
+> leading to the following sequence of nonsense:
+> 
+> mmc_rx_ipc_intr_mask: 969816526
+> mmc_rx_ipc_intr_mask: 1108361744
+> 
+> Change the increment to a straight assignment to make the
+> statistics at least nominally useful.
+> 
+> Signed-off-by: Jesper Nilsson <jesper.nilsson@axis.com>
+> ---
+>   drivers/net/ethernet/stmicro/stmmac/mmc_core.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/mmc_core.c b/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
+> index 6a7c1d325c46..6051a22b3cec 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
+> @@ -280,8 +280,8 @@ static void dwmac_mmc_read(void __iomem *mmcaddr, struct stmmac_counters *mmc)
+>   	mmc->mmc_rx_vlan_frames_gb += readl(mmcaddr + MMC_RX_VLAN_FRAMES_GB);
+>   	mmc->mmc_rx_watchdog_error += readl(mmcaddr + MMC_RX_WATCHDOG_ERROR);
+>   	/* IPC */
+> -	mmc->mmc_rx_ipc_intr_mask += readl(mmcaddr + MMC_RX_IPC_INTR_MASK);
+> -	mmc->mmc_rx_ipc_intr += readl(mmcaddr + MMC_RX_IPC_INTR);
+> +	mmc->mmc_rx_ipc_intr_mask = readl(mmcaddr + MMC_RX_IPC_INTR_MASK);
+> +	mmc->mmc_rx_ipc_intr = readl(mmcaddr + MMC_RX_IPC_INTR);
 
-Thanks Imran,
+So in premise I agree with the patch, that incrementing those is not the 
+right way to go about them. However these registers are currently 
+provided as part of the statistics set, but they should instead be 
+accessed via the register dumping method.
 
-please consider submitting a patch to add cn_proc.h (x2?) to MAINTAINERS.
+In either case you will get at best a snapshot of those two registers at 
+any given time and I suppose this can help diagnose a stuck RX 
+condition, but not much more than that.
+-- 
+Florian
+
 
