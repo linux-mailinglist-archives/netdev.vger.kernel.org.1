@@ -1,58 +1,57 @@
-Return-Path: <netdev+bounces-72466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E5A2858391
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 18:09:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 514678583BF
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 18:14:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 513811C209EF
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 17:09:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C17B1C2181E
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 17:14:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F09A132C1E;
-	Fri, 16 Feb 2024 17:09:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 796B0132474;
+	Fri, 16 Feb 2024 17:11:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="IvPMsUPI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ON1alLpW"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9CB5132C1C
-	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 17:09:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D840131E52;
+	Fri, 16 Feb 2024 17:11:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708103342; cv=none; b=qHkxsT/BDiQBh/7QZxbGX+mgLDh6wm3eMQl+LV3Uz4SuQ/7DwFC1y9BFKX8KrokhfExMe+Wmvjanu2bdWOj6+lewhucIHNKQ1IR0vz/cBjTpkAhR23JAv+/YfVqPHEMAXU9/4SVL1IVhdYGrHcC7TCKMiFQrN4ayQhiacyOdix0=
+	t=1708103516; cv=none; b=gfCWeiPMZ/qR8C5xrlGcW42DlT5s33TeEWkTErbRrGGRGTFU4NJHv9OVQ5m4U55jF4N06mgfsjSAYHXjdfJi931iZbRX7gv5iWYqfe3yvsU+j1KBCMKK5cMf/KpYz8bIJJCCaqzagvrn96LSINaYcmZYvrAuFhaqUOFf1GHmiV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708103342; c=relaxed/simple;
-	bh=mwcIZ8VaHZlxdXJtTQRsoato/BRA7EPIPqOaUKJhG9U=;
+	s=arc-20240116; t=1708103516; c=relaxed/simple;
+	bh=YA/Nyoyhx7bhuyZ5awSGZBjpvqQmwwyKXWrJOIuIBWU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gJNTMs4vpqJG6cYEJ3tmdQyvgHn7/94ZAxBhGfv0sRBZ2MYnHW12FRf+YBS7wK4IVOJMCGxrY4PddkXW/Hja/iBG2sWHrU3xO3Lquy8ZmSBxrGsypxSGVTszEY+nLFFzKlWXDtDNRWCaeGtWBFcsR9EeYlx9em+Dx7k3hsacmwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=IvPMsUPI; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=n6Y+ufwBSCHTehVAd4FmUyt5EOEPwFwQlTOCxOoQxoM=; b=IvPMsUPIp0uMcWq9ElkGRx4nxj
-	8BZDJWGagTIBHt02CS2+3mTQko6hrLpN/k6R7L5lMamsJ1L+TDZT/YEmHvEx4icAdrAMIheUtCJbF
-	l0/voIT9g5HrYPc6L9Beb0empA08Bd8frY419JXyCcn3XNSmgXjlxfUNvHz0L/fY3shI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rb1hp-008022-SF; Fri, 16 Feb 2024 18:08:57 +0100
-Date: Fri, 16 Feb 2024 18:08:57 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Michal Kubecek <mkubecek@suse.cz>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, David Miller <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: Question on ethtool strategy wrt legacy ioctl
-Message-ID: <4c6221c6-6c14-4799-8cc6-0f8129a8dcab@lunn.ch>
-References: <77a48e2f-ddb1-44d8-8e3f-5bc5cb015e9f@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LE3xBEahEszQQq2egDeVsSdKox6zgj0rglj7ekOhVoUmn9iM1VbY914hi4HpcIqPh7NFSINVaywwcTviIOG2ufbi8d0NF09XRAvnii92oWfV1RJmWvKt+xGlAfK/VdOq+mMrZJ3K7RgS+i8it/GLdLnE60gtWcljqDUzvD/+Qxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ON1alLpW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DD82C433C7;
+	Fri, 16 Feb 2024 17:11:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708103516;
+	bh=YA/Nyoyhx7bhuyZ5awSGZBjpvqQmwwyKXWrJOIuIBWU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ON1alLpWJzLydjqiInBCLacsObWIPgmYxWJuGf3kbezZmrdPIbpXI3DehMLSG54GC
+	 7Xa/63q8h+Jztw03mPO4hNDsZrKS9/GUAofvS05wpJrTKq65wflfRX+7UBK56ok6rC
+	 8cKgo6xPPZLpTRHDSxmlqNFDPa0Fu/ChYw9LzsUF4Jr0I0AVhov/fiJ8lr/sXD9NtO
+	 GdMJDWiN6imJB108wCamhCoMHpZJNiXVHgzjbL3YRmG4mIr+pXFP4xEDFJNLdZFF7l
+	 6aRCfXUA8wgCyMeMN7y2Pb9xXy1FrjQEDQs7Rt3waiU140FsN5FnSJd+hYjVCmkjVR
+	 OJxaUC8rjle8g==
+Date: Fri, 16 Feb 2024 17:11:52 +0000
+From: Simon Horman <horms@kernel.org>
+To: Imran Khan <imran.f.khan@oracle.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH] connector/cn_proc: make comm length as TASK_COMM_LEN.
+Message-ID: <20240216171152.GO40273@kernel.org>
+References: <20240209121046.1192739-1-imran.f.khan@oracle.com>
+ <20240209075032.1deb447a@kernel.org>
+ <890de365-f844-4ed9-af9d-90f5ff4bccbd@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,22 +60,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <77a48e2f-ddb1-44d8-8e3f-5bc5cb015e9f@gmail.com>
+In-Reply-To: <890de365-f844-4ed9-af9d-90f5ff4bccbd@oracle.com>
 
-On Fri, Feb 16, 2024 at 11:53:26AM +0100, Heiner Kallweit wrote:
-> When working on ethtool functionality on both sides, userspace and kernel, the following questions came to my mind:
+On Sat, Feb 10, 2024 at 10:19:24AM +1100, Imran Khan wrote:
 > 
-> - Is there any good reason why somebody would set CONFIG_ETHTOOL_NETLINK = n ?
+> Hello Jakub,
+> On 10/2/2024 2:50 am, Jakub Kicinski wrote:
+> > On Fri,  9 Feb 2024 23:10:46 +1100 Imran Khan wrote:
+> >> Since comm_proc_event::comm contains a task_struct::comm,
+> >> make its size same as TASK_COMM_LEN and avoid magic number
+> >> in buffer size.
+> > 
+> > missed CCing netdev?
+> Thanks for getting back on this. Actually get_maintainer.pl for cn_proc.h was
+> not showing any maintainers, so I took the "To" list from cn_proc.c.
+> For CCing I stuck with what get_maintainer.pl was showing.
+> I have added netdev in CC now.
 
-An embedded kernel might do this, to slim the kernel down a
-bit. busybox does not have an implementation of ethtool(1), but it
-does make a couple of ethtool ioctl calls in some of its commands.
+Thanks Imran,
 
-> - If for a certain ethtool functionality ioctl and netlink is
->   supported, can the ioctl part be removed more sooner than later?
-
-Depending on what you removed, that would break busybox. We cannot
-force users to make use of netlink.
-
-      Andrew
+please consider submitting a patch to add cn_proc.h (x2?) to MAINTAINERS.
 
