@@ -1,116 +1,163 @@
-Return-Path: <netdev+bounces-72383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E167857D8D
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 14:20:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98506857D96
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 14:21:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED510288591
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 13:20:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5573D284AD2
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 13:21:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9446B12A166;
-	Fri, 16 Feb 2024 13:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48B67129A7C;
+	Fri, 16 Feb 2024 13:21:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="KVrbIyro"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCCFA1E4A0
-	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 13:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7DC71292F4
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 13:21:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708089628; cv=none; b=USBA1uFAFa/9ckRzohpvNiIb4+ecQBvEE+MdZws+x7gnBgP5iAvvWh2w9gZaHTc0GwUlKkFhI50CVGoVmy/aQ0LLy5GdX82rLsXe2BB9cxTR/ntLFwldXCIr25DJk3CuKj5nfGZtEzYN25/nbqixAnTgdSVn7C9pRCrVqUj3pdU=
+	t=1708089697; cv=none; b=rr1WF/eV4KsEB7oHR6jiGoxqclIl4KtH/4nbIzyenhCSXFnyrMT0VsBiZuTmC3mQvnNZeEEJRb2i2cBBfDMjMioUCEu65sztFklWQXnZF99ymDwDGeQ7KiLwNdmr9MkwQO/uu6Yt5ofX+pKyASS4UGVQQKKzvlmzLXk1D+B8PzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708089628; c=relaxed/simple;
-	bh=LfHmheaX1gxHX3QcScZ7NgVdpG8pZqo68GDkffkktKk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cXhAgSCJ80US2CXUXliO0ahHoFgxB+MbNRnxl9o6dhJaxooCHbMDs1/tl15x4VdtB9vQeVSKIOxioZwyWhGqOOJDjEFgiHwfDTWiheKSp9SZsDwL7c6Gz4z+M0ZeNSdhTBdcyG6VtjFGTb1zy/1zsj1eu3sNOR7CLJK3HXt3L7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1ray8H-0001hG-1V; Fri, 16 Feb 2024 14:20:01 +0100
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1ray8E-0015MK-Us; Fri, 16 Feb 2024 14:19:58 +0100
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 7DF97290405;
-	Fri, 16 Feb 2024 13:19:58 +0000 (UTC)
-Date: Fri, 16 Feb 2024 14:19:57 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: "Goud, Srinivas" <srinivas.goud@amd.com>
-Cc: Appana Durga Kedareswara rao <appana.durga.rao@xilinx.com>, 
-	Naga Sureshkumar Relli <naga.sureshkumar.relli@xilinx.com>, Wolfgang Grandegger <wg@grandegger.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-	Conor Dooley <conor+dt@kernel.org>, "Simek, Michal" <michal.simek@amd.com>, 
-	"linux-can@vger.kernel.org" <linux-can@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	Conor Dooley <conor.dooley@microchip.com>
-Subject: Re: RE: [PATCH v8 0/3] Add ECC feature support to Tx and Rx FIFOs
- for Xilinx CAN Controller.
-Message-ID: <20240216-grapple-unwind-ee92af7b4b1d-mkl@pengutronix.de>
-References: <20240213-xilinx_ecc-v8-0-8d75f8b80771@pengutronix.de>
- <PH8PR12MB6675AAAC5D7A86D2CAA382D6E14D2@PH8PR12MB6675.namprd12.prod.outlook.com>
+	s=arc-20240116; t=1708089697; c=relaxed/simple;
+	bh=OgF4aCM9udP+jQVjHy1Lopqloy8u3ulYgAGZ+P07+9M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iqeSLj2z66ROppl1ZxGx7181uuoryNEnTkbbwsm9iyeYKwlk3O5aUcfivp4/vfp9ifpvjw7v2egTso2LN5jnxUobwcN6rneM6ybwb0TNJ2UYT/Qrd2ganSvNNq05x3vxTD+ABik9Hb2L9qIo+Xw1WRoU8CsZHiEGyK+1Hn0tSFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=KVrbIyro; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 364528718A;
+	Fri, 16 Feb 2024 14:21:31 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1708089691;
+	bh=cx1Tkohw7MR43RIHlKNBQnflQSMvDB/BofzUaMoe+uk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=KVrbIyro1jgRuIn8NihG2bK28whmvSocj1WkD65JZAVuwch/CXaPIvKDo+TeqthHC
+	 qPLNEuJPyq9GyfteILA7wa+bunIgQQaUiOAu/lAAsHOfhy3mAgXeoUyMOOmaYidcB5
+	 igmSI2V0XcW7mBiVYrBld1iV47JXbj5fGTcrpP49pPvTJAfY7Mfop3AqAiEckRXtzu
+	 fu4A6nnZph0vN0C/4kXMMmxnZCmcbbjp2zkCDH6eYaau7fujA7aRQGT807hoG79ULE
+	 VN7t8+boA4mK5tHSGnkAwtaJnQ0kIIH+qVkkLGkXYbkxJvVBah62npDwgniS3F4mnG
+	 ffOwX6c7wgy1g==
+From: Lukasz Majewski <lukma@denx.de>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Stephen Hemminger <stephen@networkplumber.org>
+Cc: Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	Lukasz Majewski <lukma@denx.de>
+Subject: [PATCH] ip link: hsr: Add support for passing information about INTERLINK device
+Date: Fri, 16 Feb 2024 14:21:14 +0100
+Message-Id: <20240216132114.2606777-1-lukma@denx.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="vnqlg3uvjn2uzdnc"
-Content-Disposition: inline
-In-Reply-To: <PH8PR12MB6675AAAC5D7A86D2CAA382D6E14D2@PH8PR12MB6675.namprd12.prod.outlook.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
+The HSR capable device can operate in two modes of operations -
+Doubly Attached Node for HSR (DANH) and RedBOX.
 
---vnqlg3uvjn2uzdnc
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The latter one allows connection of non-HSR aware device to HSR network.
+This node is called SAN (Singly Attached Network) and is connected via
+INTERLINK network device.
 
-On 15.02.2024 13:59:33, Goud, Srinivas wrote:
-> Thanks, tested with v8 changes, it is working fine.
+This patch adds support for passing information about the INTERLINK device,
+so the Linux driver can properly setup it.
 
-Thanks for testing,
-Marc
+Signed-off-by: Lukasz Majewski <lukma@denx.de>
+---
+ include/uapi/linux/if_link.h |  1 +
+ ip/iplink_hsr.c              | 22 +++++++++++++++++++++-
+ 2 files changed, 22 insertions(+), 1 deletion(-)
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
+index 41708e2..aa70ed6 100644
+--- a/include/uapi/linux/if_link.h
++++ b/include/uapi/linux/if_link.h
+@@ -1122,6 +1122,7 @@ enum {
+ 	IFLA_HSR_PROTOCOL,		/* Indicate different protocol than
+ 					 * HSR. For example PRP.
+ 					 */
++	IFLA_HSR_INTERLINK,		/* HSR interlink network device */
+ 	__IFLA_HSR_MAX,
+ };
+ 
+diff --git a/ip/iplink_hsr.c b/ip/iplink_hsr.c
+index da2d03d..1f048fd 100644
+--- a/ip/iplink_hsr.c
++++ b/ip/iplink_hsr.c
+@@ -25,12 +25,15 @@ static void print_usage(FILE *f)
+ {
+ 	fprintf(f,
+ 		"Usage:\tip link add name NAME type hsr slave1 SLAVE1-IF slave2 SLAVE2-IF\n"
+-		"\t[ supervision ADDR-BYTE ] [version VERSION] [proto PROTOCOL]\n"
++		"\t[ interlink INTERLINK-IF ] [ supervision ADDR-BYTE ] [ version VERSION ]\n"
++		"\t[ proto PROTOCOL ]\n"
+ 		"\n"
+ 		"NAME\n"
+ 		"	name of new hsr device (e.g. hsr0)\n"
+ 		"SLAVE1-IF, SLAVE2-IF\n"
+ 		"	the two slave devices bound to the HSR device\n"
++		"INTERLINK-IF\n"
++		"	the interlink device bound to the HSR network to connect SAN device\n"
+ 		"ADDR-BYTE\n"
+ 		"	0-255; the last byte of the multicast address used for HSR supervision\n"
+ 		"	frames (default = 0)\n"
+@@ -86,6 +89,12 @@ static int hsr_parse_opt(struct link_util *lu, int argc, char **argv,
+ 			if (ifindex == 0)
+ 				invarg("No such interface", *argv);
+ 			addattr_l(n, 1024, IFLA_HSR_SLAVE2, &ifindex, 4);
++		} else if (matches(*argv, "interlink") == 0) {
++			NEXT_ARG();
++			ifindex = ll_name_to_index(*argv);
++			if (ifindex == 0)
++				invarg("No such interface", *argv);
++			addattr_l(n, 1024, IFLA_HSR_INTERLINK, &ifindex, 4);
+ 		} else if (matches(*argv, "help") == 0) {
+ 			usage();
+ 			return -1;
+@@ -113,6 +122,9 @@ static void hsr_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
+ 	if (tb[IFLA_HSR_SLAVE2] &&
+ 	    RTA_PAYLOAD(tb[IFLA_HSR_SLAVE2]) < sizeof(__u32))
+ 		return;
++	if (tb[IFLA_HSR_INTERLINK] &&
++	    RTA_PAYLOAD(tb[IFLA_HSR_INTERLINK]) < sizeof(__u32))
++		return;
+ 	if (tb[IFLA_HSR_SEQ_NR] &&
+ 	    RTA_PAYLOAD(tb[IFLA_HSR_SEQ_NR]) < sizeof(__u16))
+ 		return;
+@@ -136,6 +148,14 @@ static void hsr_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
+ 	else
+ 		print_null(PRINT_ANY, "slave2", "slave2 %s ", "<none>");
+ 
++	if (tb[IFLA_HSR_INTERLINK])
++		print_string(PRINT_ANY,
++			     "interlink",
++			     "interlink %s ",
++			     ll_index_to_name(rta_getattr_u32(tb[IFLA_HSR_INTERLINK])));
++	else
++		print_null(PRINT_ANY, "interlink", "interlink %s ", "<none>");
++
+ 	if (tb[IFLA_HSR_SEQ_NR])
+ 		print_int(PRINT_ANY,
+ 			  "seq_nr",
+-- 
+2.20.1
 
---vnqlg3uvjn2uzdnc
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmXPYPsACgkQKDiiPnot
-vG8xrggAlIv4YXPwzJA/DC6whBfwx82iIe0vk+luYLVA0uU0cbq4EdorElh0G0lr
-HUY/IaeZ8f3tMbKUozl9YKOmhdZNEtRvmej8XV/vNUT++lc1J//tVmgXOBNl+6F0
-SR1zS9a3xBQ0h7ouuLkfHLDcybxZK4ImEcBmj0s7oRnvTruZ5ZpfoxJZmv1toGb5
-YFk1r7KCh7IzvW3D/u+/lgIYkEA3Gk5ie9D5s/TuhmGmeiEd5u+LmoIOg/F4zPY+
-ISMoTWfEZniC6Y9QR3Rsb+XDvammBVCPglFX8Okz3fkLko8s8Cik/GbF17BLNMic
-MqWJu8mCGml9zQDFbhWqb78FQFY+sQ==
-=v4VS
------END PGP SIGNATURE-----
-
---vnqlg3uvjn2uzdnc--
 
