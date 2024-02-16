@@ -1,136 +1,87 @@
-Return-Path: <netdev+bounces-72559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6D4E85885B
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 23:07:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FF22858868
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 23:13:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D1C61F22B84
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 22:07:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 026A1282714
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 22:13:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 819D01482E2;
-	Fri, 16 Feb 2024 22:07:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24CF11482E2;
+	Fri, 16 Feb 2024 22:13:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="JABqaPdL"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="07/RfGlT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69E20146900;
-	Fri, 16 Feb 2024 22:06:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C6514600B
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 22:13:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708121221; cv=none; b=B+p4LpbRF/UXPymJjfRC1HFn2fw/oofhoR5f+51kC4JAYnkFxX9DsTqe/2uCZ8yN++msDCwhLi2JZHh7JSaXGqE6lXeQOzkkPbX6UFFF/+PojzDJ43aag9i/dC6ElU/KdQMbL9wcc4lc8CeI0LSrbEMTIfO1S2BdazZB+TY+uzI=
+	t=1708121596; cv=none; b=DgtTWfEOTR1rC0XDNJHLpYoQ2IjispEF7jUPvoBQqWPoyRq2wwU8sPfJOTctbU2m7lRkg5aV0sIhYLyKP7V20CxBdPov4e19RoxQINqGIEF+xvibIhwRXSV2tmZGTXo08STogvfzZ5d6JGQO2xmK9OMuow4ZkauhnQe3lv8jvLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708121221; c=relaxed/simple;
-	bh=6WONRnosR0Fp6iJnVPXy3F6vPXXlIX/5qT82o+Br1wc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tvnIGdmI2liC23SJyRXhtyZj2edKIj96b3sO8mPXbYEHHSq3SsmRIJ/HB5kQJbfzMn+Nzp5GGHBNfByqDHK7NyCpx3mluY8ICP8LL/kgmnoad1hPe4tbnZ76a2ehrYwquu7upcPkH2gnKEKsRGDZkz/jFMWWPynnDZZ2ac/AenY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=JABqaPdL; arc=none smtp.client-ip=52.119.213.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1708121217; x=1739657217;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=luqn3+mL66LkEnqJW2Idc2GGi5UV6QGJD0hWMbRsxiY=;
-  b=JABqaPdL++w9JKhXsmLGNZXYGGQp028otuk2JQmLbwiPJezkpTOdwtYJ
-   3FRk/TsM9UTKeVrAPrPGNPreKWxIajc8Ye9lufPBHjyPX9FBOlrc0M+ZE
-   84CHBYYBHDcQUrOh97rogmBaq6W+QKW9OOX1ueyCmrkdEZPBp7Z/OcKse
-   8=;
-X-IronPort-AV: E=Sophos;i="6.06,165,1705363200"; 
-   d="scan'208";a="185388154"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2024 22:06:49 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:31833]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.24.112:2525] with esmtp (Farcaster)
- id b2c3214c-81a0-4661-9e5f-a145032dd5b0; Fri, 16 Feb 2024 22:06:48 +0000 (UTC)
-X-Farcaster-Flow-ID: b2c3214c-81a0-4661-9e5f-a145032dd5b0
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 16 Feb 2024 22:06:48 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.106.100.6) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.40;
- Fri, 16 Feb 2024 22:06:44 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <keescook@chromium.org>
-CC: <alexander@mihalicyn.com>, <davem@davemloft.net>, <dhowells@redhat.com>,
-	<edumazet@google.com>, <kuba@kernel.org>, <kuniyu@amazon.com>,
-	<leitao@debian.org>, <linux-hardening@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <wuyun.abel@bytedance.com>
-Subject: Re: [PATCH] sock: Use unsafe_memcpy() for sock_copy()
-Date: Fri, 16 Feb 2024 14:06:29 -0800
-Message-ID: <20240216220629.71672-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240216204423.work.066-kees@kernel.org>
-References: <20240216204423.work.066-kees@kernel.org>
+	s=arc-20240116; t=1708121596; c=relaxed/simple;
+	bh=3aimH8FspEs+csOBlAHgVFPfFbmqvZ8ZuQlmVDHEjMs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kOKA698K6MRfEWdM+r+Of1nc25XIW3le8y88xUEvfC/nOgpe0+rlsRfmK5fmOCURrJJMHo5P3HxzvwsrqbCYbXkBw31AD722jcsAWerYfocgF3jFG+z1DDYgbMAOO7353y3i96Ih6T4YaUEibv71+pHYYGJt/s7UUnT3faVbmKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=07/RfGlT; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=IPNy8U1/V8k7vRZK1MvGyZgQ98uI9Vj14PHzlW32EYw=; b=07/RfGlTJmfy8GRri68+RvOABF
+	izgLPAsSBSYSphe5DiIwA6gSEZJKcgBrUjvQyvb+eqCg69Q5z7TpDuP1mX/CcjAGYF160aCVYcVfG
+	OKulH+pz5IZNce7zm3q54KBnKYoL9jdYPz1Gpufizh75zG90niPM2BTWl+ZIYpOy3HQ4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rb6SL-0081Qe-9u; Fri, 16 Feb 2024 23:13:17 +0100
+Date: Fri, 16 Feb 2024 23:13:17 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, steen.hegelund@microchip.com,
+	netdev@vger.kernel.org, horatiu.vultur@microchip.com,
+	Woojung.Huh@microchip.com, Nicolas.Ferre@microchip.com,
+	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com,
+	Pier.Beruto@onsemi.com, Selvamani.Rajagopal@onsemi.com
+Subject: Re: [PATCH net-next v2 0/9] Add support for OPEN Alliance 10BASE-T1x
+ MACPHY Serial Interface
+Message-ID: <1e6c9bf1-2c36-4574-bd52-5b88c48eb959@lunn.ch>
+References: <20231023154649.45931-1-Parthiban.Veerasooran@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D037UWB001.ant.amazon.com (10.13.138.123) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231023154649.45931-1-Parthiban.Veerasooran@microchip.com>
 
-From: Kees Cook <keescook@chromium.org>
-Date: Fri, 16 Feb 2024 12:44:24 -0800
-> While testing for places where zero-sized destinations were still
-> showing up in the kernel, sock_copy() was found, which is using very
-> specific memcpy() offsets for both avoiding a portion of struct sock,
-> and copying beyond the end of it (since struct sock is really just a
-> common header before the protocol-specific allocation). Instead of
-> trying to unravel this historical lack of container_of(), just switch
-> to unsafe_memcpy(), since that's effectively what was happening already
-> (memcpy() wasn't checking 0-sized destinations while the code base was
-> being converted away from fake flexible arrays).
-> 
-> Avoid the following false positive warning with future changes to
-> CONFIG_FORTIFY_SOURCE:
-> 
->   memcpy: detected field-spanning write (size 3068) of destination "&nsk->__sk_common.skc_dontcopy_end" at net/core/sock.c:2057 (size 0)
-> 
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+On Mon, Oct 23, 2023 at 09:16:40PM +0530, Parthiban Veerasooran wrote:
+> This patch series contain the below updates,
+> - Adds support for OPEN Alliance 10BASE-T1x MACPHY Serial Interface in the
+>   net/ethernet/oa_tc6.c.
+> - Adds driver support for Microchip LAN8650/1 Rev.B0 10BASE-T1S MACPHY
+>   Ethernet driver in the net/ethernet/microchip/lan865x.c.
 
-I confirmed unsafe_memcpy() is just memcpy() without fortified checks.
+Hi Parthiban
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Omsemi also have a TC6 device, which should use this framework. They
+would like to make progress getting their device supported in
+mainline.
 
+What is happening with this patchset? Its been a few months since you
+posted this. Will there be a new version soon? Has Microchip stopped
+development? Postponed it because of other priorities etc?
 
-> ---
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: netdev@vger.kernel.org
-> ---
->  net/core/sock.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/core/sock.c b/net/core/sock.c
-> index 0a7f46c37f0c..b7ea358eb18f 100644
-> --- a/net/core/sock.c
-> +++ b/net/core/sock.c
-> @@ -2053,8 +2053,9 @@ static void sock_copy(struct sock *nsk, const struct sock *osk)
->  
->  	memcpy(nsk, osk, offsetof(struct sock, sk_dontcopy_begin));
->  
-> -	memcpy(&nsk->sk_dontcopy_end, &osk->sk_dontcopy_end,
-> -	       prot->obj_size - offsetof(struct sock, sk_dontcopy_end));
-> +	unsafe_memcpy(&nsk->sk_dontcopy_end, &osk->sk_dontcopy_end,
-> +		      prot->obj_size - offsetof(struct sock, sk_dontcopy_end),
-> +		      /* alloc is larger than struct, see sk_prot_alloc() */);
->  
->  #ifdef CONFIG_SECURITY_NETWORK
->  	nsk->sk_security = sptr;
-> -- 
-> 2.34.1
+Thanks
+	Andrew
 
