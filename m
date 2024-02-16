@@ -1,106 +1,106 @@
-Return-Path: <netdev+bounces-72547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72548-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A066858802
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 22:28:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA9DA85880F
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 22:33:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9E052829E7
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 21:28:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21BDDB21CDC
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 21:32:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FACD145328;
-	Fri, 16 Feb 2024 21:28:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32235145FF8;
+	Fri, 16 Feb 2024 21:32:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZmVWs447"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="SIo2CdYl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15351E865
-	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 21:28:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0FE7135A6F
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 21:32:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708118908; cv=none; b=NFZ74fo/NfT+82thmz21HQAuSme4T4MH07dzB19jT9pglak/T/gzxOtj6x7PHHkE5rBEtq/3ZaZfWezcsA7G0a6SDRteVW+BpaoJeGGKOwQ7OKFy5iS28t2yfAE52onHuUakcwX4pn6utpYGhEPcZuI3eMXgY+ia4LeRVrGaoaQ=
+	t=1708119146; cv=none; b=gSerbnGjNIRePBXliR3+yf/z8JpXZuxr5jQ1bzt0g5e9/osr72g5U7FQ/Gg2pPEolFgy+P4musseV5R5/4Bk3Ovfg1xjnsZw1z6JCnIa/5Ri1ZhkVYHDwTH1i3zP67xdF2GQUm0iIHOSBW0AXg4mhBSsAo9ulrsul0AZzOt9ih4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708118908; c=relaxed/simple;
-	bh=v7v60Ty/5b4Zz6hT4BrUQaiAwThbMI/RiuVRUFCDA+Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MHa3pv4iX9MfRwmLYNZpOIf8xZ/iF1CZKH1I1g8J6H2XQzTBR2W0ODmFmbAdaT/i04NyzdhCxXfPXyQ6Smf9AUo1PqHJDwElE3fYE0x774B/9duh81sFJyo8Xjv6JQIzTRF9MFj9Rjau9H2JtE2paezPrIthSWvEjb9v00TtG0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZmVWs447; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-410c9f17c9eso8515e9.0
-        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 13:28:26 -0800 (PST)
+	s=arc-20240116; t=1708119146; c=relaxed/simple;
+	bh=BaWe4bMmpPNIFme2TB4IMKoF4JCB3A9aQpd7EHxHVYk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ahijzRau0kLqFW1GDmNPwAOeYQ12xTVA4I4P5zjoJl5ciHPvF1BI7Ed4WkpxfB0KBhWwHniBZceTaGfdoo+3Bmpuflndpqut3Z+EO2vwONNw2PtTQ6F097UZXAeBBcIlmRT0S8SbtcmsKRI7a7G887wGkbvZsvFDa4nI0UeKfco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=SIo2CdYl; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6e10303de41so1200417b3a.1
+        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 13:32:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708118905; x=1708723705; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QdLHtQ6CWH/fioH68sO6XOGnLk4Xe7fros588zVgkHo=;
-        b=ZmVWs447KqWVrsVqud/tRzTgMTMsNYFLbS3EBUN6xmfdccz2Fv80SlNzfeV/3S59XT
-         Q/WK4lwLLHnDRD6Jd9P5H0SUsFv4CSiUIRNen229PMDsGPEJ5PMVFy7cACAqPE7OMb08
-         OWQe8vCoYP1yzSzpV824ieZQkcck4MCvgCQiwF5aW4gcYlbnVwPCQgRQoNeExAPkCFww
-         3galk7A4SpJXgEay1vYoe1KAndTxMhJF8NWQ6qj1T6EZcYRdrvf6n/WgbftFI0qDgZ3K
-         YxM3IbJjCf8mwzyZRFWFd4zZmJyqoeoPtYHT8HtT+/wYHhP8+LTy+NT0LFB0TL5Fvp0J
-         g2aQ==
+        d=chromium.org; s=google; t=1708119143; x=1708723943; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6sXIGyK5fJBS6Ih9dubAjV9UnamZEvWqzmWKeqKFQcw=;
+        b=SIo2CdYl4o6nmM8vf4cuQewqFnKbwwWRSwN77XgB1+PzXvqjRUrLRab4SmfaZiN/XD
+         7yUWNUCxdfYd6gMCfQxG8lK2pL5WYuT43kr0TdSMSn7KPvX+zv8Hs9JO3m1rPosBckKa
+         9+F+rKUAsTtdlFlVoAzy1MDUEZe6gktzJY7Ek=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708118905; x=1708723705;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QdLHtQ6CWH/fioH68sO6XOGnLk4Xe7fros588zVgkHo=;
-        b=C9MGcQqdfykTqOL9shVcB3nyvC2eZrvWaK07Ugog/wuz1cicYQ1egYp74tYy6tPHll
-         hKTHGJnfYDhCvuJX7qZfJs64dky66KakVt1Tij4k4vvLxRLNS/UQ126SJwJrEDv5aS4K
-         jTt51amVgrRn3kdwHI0nvjYV4WnFE3OFtvV6Wk4sjRgOA/5wtTk+xgOXzU1AJZDwZrmk
-         aSaOhskgkGvk6NowNKsMdk3JJkJ/045DW5ML250lZWnvaFSmN0f7t4j9IM0ScO6Gz3mJ
-         atB0t4RbwWpAZp+MnkrVJSm8A94jI5Iyst9fvvXQE7wa7uX5OiiMyp1S19WSu/YH+z8C
-         i1EA==
-X-Forwarded-Encrypted: i=1; AJvYcCVIb2MLgE4B6P/RB1keLsGjgnLeGftrduuYmpZeH9oXptz8pO6TFnk5pjYYyyJ2hUk72lqD188qPnfhVKeG1jhhW3L8KrVQ
-X-Gm-Message-State: AOJu0YxbtCvHmNEjf2cAGWU54pmLt/Nc4pg/0nJb/mOGEt0c7Cfk/PbC
-	K1B3tgmIIB2wBkmCXlxMi9FpCcYlU7Lpim2mggwdKSFywhnjfxy5GpZS0vAupeTzJ7G2t9NTqg7
-	+LaiAj7zQGIdNxPlWb1xyFvIGokmPO8P6blN1
-X-Google-Smtp-Source: AGHT+IG30b66wJqqJmDMWB2glk4NHHnxw+lrj49jntnXLdpfJSp44N12EpErIdcErjSR4gZRbEIslo2X5HayR4+tyiE=
-X-Received: by 2002:a05:600c:6025:b0:412:40fc:51a7 with SMTP id
- az37-20020a05600c602500b0041240fc51a7mr61152wmb.7.1708118904870; Fri, 16 Feb
- 2024 13:28:24 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708119143; x=1708723943;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6sXIGyK5fJBS6Ih9dubAjV9UnamZEvWqzmWKeqKFQcw=;
+        b=hIq1GHgQwfkdEUWmUVa3oKVAW9PWuIywCfVvEpyh8QkcSXF5bI6idga7eC0LIO29uP
+         zntOOAKMooU22aTV0LCwsE31JsdUOuD1vPIhJm03bRuZCeIbIu/zTaTuW0cJR5KbqJ2u
+         2Vi4Fg3wbKxJRVCu7pt5GSbYEy+UylVR43moC65b6Jv3/ZcmpB46LfokdDv4XhTSVl6K
+         1VeQTVRiH1jPItEzht+c9O4av8UVWHCxk7PqPvGtNkp9T0DaVvX7/uQVeJyNVvM/QnM3
+         YmLCx1gPpBZ+NpojTe8nYpyhmg0Kfk6mIUYSdNycHATzRwJTyTwFzaL2119BCaDd+gNx
+         S2yA==
+X-Forwarded-Encrypted: i=1; AJvYcCU+BpH62uOniqKVvYf+lMieELiXQ/7g9tjr7VmmjSm7kYW4IKiZ6V7SGSLV1O3OozFI1H/cgGpffyFe4iJ8TSyTvA4mLOJw
+X-Gm-Message-State: AOJu0YzCyPZ1GmCtIoJnkF0yXGMECyXNgfaJM8Zxk8NIEe1jmtIaoRLd
+	yUs8Xt1eSUyT6gXCJKMZThg6/dIflDP3v0a0HX+q352O3iu6HqjC7QIqTYhWRQ==
+X-Google-Smtp-Source: AGHT+IFuEiX6j8DiaCOSSkq9g3NAQytMa+JQBiTjrmoweTW4grnjh79jt7WMWs5n6/iVNwUaQiRcVQ==
+X-Received: by 2002:a05:6a21:168d:b0:19e:9c82:b139 with SMTP id np13-20020a056a21168d00b0019e9c82b139mr6259963pzb.45.1708119143182;
+        Fri, 16 Feb 2024 13:32:23 -0800 (PST)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id n12-20020a63ee4c000000b005dc4b562f6csm361538pgk.3.2024.02.16.13.32.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Feb 2024 13:32:13 -0800 (PST)
+Date: Fri, 16 Feb 2024 13:32:12 -0800
+From: Kees Cook <keescook@chromium.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: jakub@cloudflare.com, shuah@kernel.org, linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [RFC 0/7] selftests: kselftest_harness: use common result
+ printing helper
+Message-ID: <202402161328.02EE71595A@keescook>
+References: <20240216004122.2004689-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240216210556.65913-1-kuniyu@amazon.com>
-In-Reply-To: <20240216210556.65913-1-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 16 Feb 2024 22:28:11 +0100
-Message-ID: <CANn89i+oURrHhvODH0U9gzR869r_3EK5zuRBNYAV_Frrj_3GRA@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 00/14] af_unix: Rework GC.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240216004122.2004689-1-kuba@kernel.org>
 
-On Fri, Feb 16, 2024 at 10:06=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.c=
-om> wrote:
->
-> When we pass a file descriptor to an AF_UNIX socket via SCM_RIGTHS,
-> the underlying struct file of the inflight fd gets its refcount bumped.
-> If the fd is of an AF_UNIX socket, we need to track it in case it forms
-> cyclic references.
->
-> Let's say we send a fd of AF_UNIX socket A to B and vice versa and
-> close() both sockets.
->
-> When created, each socket's struct file initially has one reference.
-> After the fd exchange, both refcounts are bumped up to 2.  Then, close()
-> decreases both to 1.  From this point on, no one can touch the file/socke=
-t.
+On Thu, Feb 15, 2024 at 04:41:15PM -0800, Jakub Kicinski wrote:
+> First 3 patches rearrange kselftest_harness to use exit code
+> as an enum rather than separate passed/skip/xfail members.
 
-Note that I have pending syzbot reports about af_unix. (apparently
-syzbot found its way with SO_PEEK_OFF)
+One thought I was having here while porting other stuff to use XFAIL was
+that in the strictest sense, XFAIL isn't like SKIP, which can be used to
+avoid running a test entirely. XFAIL is about the expected outcome,
+which means that if we're going to support XFAIL correctly, we need to
+distinguish when a test was marked XFAIL but it _didn't_ fail.
 
-I would prefer we wait a bit before reworking the whole thing.
+The implicit expectation is that a test outcome should be "pass". If
+something is marked "xfail", we're saying a successful test is that it
+fails. If it _passes_ instead of failing, this is unexpected and should
+be reported as well. (i.e. an XPASS -- unexpected pass)
+
+I think if we mix intent with result code, we're going to lose the
+ability to make this distinction in the future. (Right now the harness
+doesn't do it either -- it treats XFAIL as a special SKIP.)
+
+-- 
+Kees Cook
 
