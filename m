@@ -1,131 +1,370 @@
-Return-Path: <netdev+bounces-72350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FDED857A79
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 11:39:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A95B857A99
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 11:47:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84E351C21B9D
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 10:39:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 88E851F24AA4
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 10:47:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9377E51C44;
-	Fri, 16 Feb 2024 10:38:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59AF7524BD;
+	Fri, 16 Feb 2024 10:47:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d22jyz4u"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="JuAuUjBx"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45FA50A79
-	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 10:38:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22372535A5;
+	Fri, 16 Feb 2024 10:47:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708079905; cv=none; b=LXBr8F1L2AX2hEgNZ1KFA8Pk6EaDYclM2Oz+DVvFeTJi8SHwwfDfHBLEDdvHbfTj5J+S4LfJM6hBAJuyJ5UQ2ZA0acI3CHmeBUGMJ0bPXgs0uPrgoIqGuBzplZCqo6se2ZKKp+ny0gNmnPPEt/3o0+zmsbG8X3s9vQppB1s2okI=
+	t=1708080449; cv=none; b=McWPEbQX6yGebo6h/8yK+/jWho500Lsm27IZ5S/hKCu3X3gdqmYEccoBogRT+OkVRF7r8E4o1nQbvWos0khha5TMuol+q1aiTIzC63rj4gnT6lNhKBD7yiC03UPB+ol/nPh2RaJoRr8LeDCqzXd5SY0gc3yaGbJjstZ/KN21nGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708079905; c=relaxed/simple;
-	bh=uXS0K1Hemb43XKcyT4HTpQeAHH1Vn8JgUmz/2CBpgAg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=u9i3W0abZArGEUBOK0q278PprMR+P7HkW3rC7XR1hMxKKZNfbm5IyVPybJooOuA/zN/mrbnCvPJRzIRKRBBXDRdQbGulRIdPGV9StqPZgyq/+xRA55Or0Ht18/LQsfkFVSdutQz2zmHlO89P2nh4JkLLjFzFuhBPmWm+uiXy6yE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d22jyz4u; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708079902;
+	s=arc-20240116; t=1708080449; c=relaxed/simple;
+	bh=Q5R/8SUslPHdWj3Qf/Y7JhyVUt5V40WPulzuQB+vQKI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aC7JBbSqUgKGWYgwb34Fiuhv/dlmE/Gzn/QgaTj+HGa/y2QIxdZzE4FVSp0fooQGBEiHAkdcD86Z1mu+jSO8pNWnMmlNGoY2a57IR6HLmx/I/h5H8nObY1MPUnyRdhGKKFWP6hrzKOoEbND9k6ARpBmTrF+k8Sk5p4g8m3PDF3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=JuAuUjBx; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 7BCE8FF805;
+	Fri, 16 Feb 2024 10:47:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1708080444;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=uXS0K1Hemb43XKcyT4HTpQeAHH1Vn8JgUmz/2CBpgAg=;
-	b=d22jyz4uEd8Pu9i8n0t5eHWN1pWnJZ2W8gR7FpvzcF4w2veU4FIzKgiNqeJmTI8m1kgbm4
-	Vk+j47GlPTa5hvSGPZCcCI47Tl2VrwBNmkBZMabqG6gOmghcxdoCmr1XE7Y4xOtwrnBTuF
-	NrTaeNMAX4HY+YuzKZ1QJRFHVqxoOnY=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-410-z9lX2JWFPAKrnFgWsV9U8A-1; Fri, 16 Feb 2024 05:38:20 -0500
-X-MC-Unique: z9lX2JWFPAKrnFgWsV9U8A-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-33b226e710dso130828f8f.1
-        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 02:38:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708079900; x=1708684700;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uXS0K1Hemb43XKcyT4HTpQeAHH1Vn8JgUmz/2CBpgAg=;
-        b=SYB96eFXKgo4ZJiHOV2ccr774Tp6Y3ec35a2DrvD0tgs4vswUzTS6UPPTNhY9BaMsY
-         2pWz0Ex5j7AJhNKb77KAQAyou0fBzsGOnD3XZl2VmWZj8qKf7yS+nYliabKn0yh8vZrx
-         zlCueTwNYVPcYf1pQ2MjuHMyKqxiVtBQi0XlvBRw6q8aKjE8DXARwFYlSRW5sGjDoL7I
-         gss12onlnddxniJ61ZhNENPIMLIec02W8NSSs0z5MPSTdPzaAGaPjx9Mnk7LkQNG7CTX
-         3mrmXGZXua/B9CQ9y/q1Z+ezc9sUFwpWtclPSwD5oPjCwqKT4z05UTK4vIuH1h1hz9i2
-         V3kA==
-X-Forwarded-Encrypted: i=1; AJvYcCWDVJemGs/sO60DCj1qCWb2HS3d4IrvrKT9N2zAieh8XbHyAE38B9znUkUXCbKg3S3reX10YdxWK7tXfw0SGOF27JzkQ8w9
-X-Gm-Message-State: AOJu0YyAb9g/5L6sfiwFENkSWwLi64E9AWzWJ1cC7bO1Xvbd7jgTtKqD
-	VGxZtTPGmXK0sIVq9fLQkFuePrpAJJiCnBtjLi6sMkkJknmPQBD/98CGcvFT9UZQCIWkGzMBjDX
-	2VdEJDb+w5MFLIBsLtEWExcKna/0fQTdKhlnnbJ1yHzoRbwhd78bDwQ==
-X-Received: by 2002:a05:6000:a15:b0:33c:fa05:68b with SMTP id co21-20020a0560000a1500b0033cfa05068bmr1506631wrb.0.1708079899854;
-        Fri, 16 Feb 2024 02:38:19 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHOpUnHvWrvjuBSsXLayos3wTqurw1S/vs1tdzJsC2+R2S85v+XZoA+fg7qbxJU/ThZhN7fZQ==
-X-Received: by 2002:a05:6000:a15:b0:33c:fa05:68b with SMTP id co21-20020a0560000a1500b0033cfa05068bmr1506614wrb.0.1708079899480;
-        Fri, 16 Feb 2024 02:38:19 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-239-108.dyn.eolo.it. [146.241.239.108])
-        by smtp.gmail.com with ESMTPSA id j18-20020a5d6192000000b0033b6e26f0f9sm1811706wru.42.2024.02.16.02.38.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Feb 2024 02:38:18 -0800 (PST)
-Message-ID: <ea379c684c8dbab360dce3e9add3b3a33a00143f.camel@redhat.com>
-Subject: Re: [PATCH net-next v11 0/3] netdevsim: link and forward skbs
- between ports
-From: Paolo Abeni <pabeni@redhat.com>
-To: David Wei <dw@davidwei.uk>, Jakub Kicinski <kuba@kernel.org>, Jiri Pirko
-	 <jiri@resnulli.us>, Sabrina Dubroca <sd@queasysnail.net>, 
-	netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>
-Date: Fri, 16 Feb 2024 11:38:17 +0100
-In-Reply-To: <20240215194325.1364466-1-dw@davidwei.uk>
-References: <20240215194325.1364466-1-dw@davidwei.uk>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+	 in-reply-to:in-reply-to:references:references;
+	bh=GjAwS62w0l3U2ufG6A+rcoAlJXJZ7s34vp7zsEJzR6k=;
+	b=JuAuUjBxIIQs8YIHT6/SY+sh1Qstl0s6NM4ZJGG4RmqjgRnmnMc+U1S2yv4buFIPFDe33Y
+	yuydW7zosZKH68q+ARea34tJyLxBng0YqYfxdoJJzwa0Aqb172o3PCumZyfnYLvzpAZTla
+	GgXoFgpnUoQ8M0713psxCKJy4oRdpZtJLa0zgI2cktxY6h1hlOkuk8Ksfcus2iRPTnFDSc
+	VimVynzo+hOSItc0o9iecaEjE7kWpAIEMzgZ1xjngFya3sJkqdyT3e08L8cda5T7M1mZfj
+	fLpGaBH7Hd5uznBDntDZSiy4/DOFKAXilTJpDm4cIko5bZqRxiyRxD+WpOmI5w==
+Message-ID: <af66e632-071f-4c39-ab38-62782e6eff05@arinc9.com>
+Date: Fri, 16 Feb 2024 13:47:17 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net RFC] net: dsa: mt7530: fix link-local frames that
+ ingress vlan filtering ports
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ =?UTF-8?Q?Alvin_=C5=A0ipraga?= <ALSI@bang-olufsen.dk>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Bartel Eerdekens <bartel.eerdekens@constell8.be>, mithat.guner@xeront.com,
+ erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <65bbf40d.170a0220.a87f4.becdSMTPIN_ADDED_BROKEN@mx.google.com>
+ <65bbf40d.170a0220.a87f4.becdSMTPIN_ADDED_BROKEN@mx.google.com>
+ <20240201232619.nsmm7lvafuem2gou@skbuf>
+ <20240216012445.em247rxfjnyufwm5@skbuf>
+Content-Language: en-US
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <20240216012445.em247rxfjnyufwm5@skbuf>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
 
-Hi,
+On 16.02.2024 04:24, Vladimir Oltean wrote:
+> On Fri, Feb 02, 2024 at 01:26:19AM +0200, Vladimir Oltean wrote:
+>> On Thu, Feb 01, 2024 at 10:13:39PM +0300, Arınç ÜNAL via B4 Relay wrote:
+>>> One remaining limitation is that the ingress port must have a PVID assigned
+>>> to it for the frame to be trapped to the CPU port. A PVID is set by default
+>>> on vlan aware and vlan unaware ports. However, when the network interface
+>>> that pertains to the ingress port is attached to a vlan_filtering enabled
+>>> bridge, the user can remove the PVID assignment from it which would prevent
+>>> the link-local frames from being trapped to the CPU port.
+>>>
+>>> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+>>> ---
+>>> I couldn't figure out a way to bypass VLAN table lookup for link-local
+>>> frames to directly trap them to the CPU port. The CPU port is hardcoded for
+>>> MT7530. For MT7531 and the switch on the MT7988 SoC, it depends on the port
+>>> matrix to choose the CPU port to trap the frames to. Port matrix and VLAN
+>>> table seem to go hand in hand so I don't know if this would even be
+>>> possible.
+>>>
+>>> If possible to implement, link-local frames must not be influenced by the
+>>> VLAN table. They must always be trapped to the CPU port, and trapped
+>>> untagged.
+>>
+>> Isn't this, in effect, what the "Leaky VLAN Enable" bit does?
+> 
+> Hm? Any news on this? I suppose this was the reason for submitting the
+> otherwise ok patch as RFC?
 
-On Thu, 2024-02-15 at 11:43 -0800, David Wei wrote:
-> This patchset adds the ability to link two netdevsim ports together and
-> forward skbs between them, similar to veth. The goal is to use netdevsim
-> for testing features e.g. zero copy Rx using io_uring.
->=20
-> This feature was tested locally on QEMU, and a selftest is included.
+I was just finalising my response. I wanted to study the switch a little
+bit so that I could give a better response than "the leaky VLAN option
+doesn't do anything :/".
 
-this apparently causes rtnetlink.sh self-tests failures:
+ From what I understand, with the leaky VLAN option enabled, the frame won't
+possibly be dropped at the VLAN table lookup procedure. This is useless in
+this case because with commit ("net: dsa: mt7530: drop untagged frames on
+VLAN-aware ports without PVID"), PVC.ACC_FRM of port without PVID set on
+software is set to TAGGED to prevent untagged frames ingressing through
+this port from being forwarded. So what we need instead is to allow
+untagged frames to be forwarded.
 
-https://netdev.bots.linux.dev/flakes.html?tn-needle=3Drtnetlink-sh
+With PVC.ACC_FRM set to ALL, all VLAN-untagged frames will be forwarded
+[1]. With that, we need to configure the switch in a way that only the
+link-local frames will be forwarded. I have yet to find a way to achieve
+this.
 
-example failure:
+Before that, here's how I think the switching procedure works.
 
-https://netdev-3.bots.linux.dev/vmksft-net/results/467721/18-rtnetlink-sh/s=
-tdout
+VLAN-tagged/VLAN-untagged frame ingresses through port
 
-the ipsec_offload test (using netdevsim) fails.
+1. Address Table Learning
 
-@Jakub: it looks like the rtnetlink.sh test is currently ignored by
-patchwork, skimming over the recent failures they are roughly
-correlated to this series submission: the test looks otherwise
-reasonably stable to me.
+    The switch will add an entry to the MAC address table; the source
+    address as ADDRESS, the ingress port as PORT / FILTER, [if tagged
+    frame and PVC.VLAN_ATTR = USER: VID on the VLAN tag; if untagged frame
+    (and PVC.VLAN_ATTR = USER or TRANSPARENT), or PVC.VLAN_ATTR =
+    TRANSPARENT (and untagged or tagged frame): PPBV1.G0_PORT_VID] as CVID.
 
-Cheers,
+2. Address Table Lookup Procedure
 
-Paolo
+    For unicast frame type, the switch will look up the destination address
+    as ADDRESS on the MAC address table. If the destination address does not
+    match a MAC address table entry, the ports set on MFC.UNU_FFP will be
+    the forwardable ports.
 
+    For broadcast frame type, the ports set on MFC.BC_FFP will be the
+    forwardable ports.
+
+    For non-IP-multicast multicast frame type, the ports set on MFC.UNM_FFP
+    will be the forwardable ports.
+
+3. If PVC.ACC_FRM is set to TAGGED, the switch will drop VLAN-untagged
+    frames.
+
+4. If PCR.PORT_VLAN is set to PORT_MATRIX mode, skip to step 6.
+
+5. VLAN Table Lookup Procedure
+
+    The switch will look up the VID on the VLAN table. If the frame is
+    VLAN-untagged, the VID will be PPBV1.G0_PORT_VID of the ingress port. If
+    entry with the VID does not exist on the VLAN table entry, on SECURITY
+    and CHECK modes, the switch will drop the frame. On FALLBACK mode, the
+    switch won't drop the frame.
+
+    The switch will look up the ingress port on PORT_MEM on the VLAN table
+    entry that matches the VID. If the ingress port is not set on PORT_MEM,
+    on SECURITY mode, the switch will drop the frame. On FALLBACK and CHECK
+    modes, the switch won't drop the frame.
+
+6. The switch will look up the ports set on PCR.PORT_MATRIX to narrow down
+    the ports to forward the frame to. The ingress port will be excluded.
+
+7. VLAN Tag Egress Procedure
+
+    The EG_TAG bit for frames:
+
+    PPPoE Discovery_ARP/RARP: PPP_EG_TAG and ARP_EG_TAG in the APC register.
+    IGMP_MLD: IGMP_EG_TAG and MLD_EG_TAG in the IMC register.
+    BPDU and PAE: BPDU_EG_TAG and PAE_EG_TAG in the BPC register.
+    REV_01 and REV_02: R01_EG_TAG and R02_EG_TAG in the RGAC1 register.
+    REV_03 and REV_0E: R03_EG_TAG and R0E_EG_TAG in the RGAC2 register.
+    REV_10 and REV_20: R10_EG_TAG and R20_EG_TAG in the RGAC3 register.
+    REV_21 and REV_UN: R21_EG_TAG and RUN_EG_TAG in the RGAC4 register.
+
+    For other frames, one of these options set the earliest in this order
+    will apply to the frame:
+
+    EG_TAG in the address table.
+    EG_TAG in the PVC register.
+    EG_CON and EG_TAG per port in the VLAN table.
+    EG_TAG in the PCR register.
+
+Frame egresses through port(s)
+
+Clarifications:
+
+- MAC SA of untagged frames are learned even with PVC.ACC_FRM of the
+   ingress port set to TAGGED. That's why the 3rd step comes after the 1st
+   step. Untagged frames are still dropped with PCR.PORT_VLAN of the ingress
+   port set to PORT_MATRIX mode. That's why the 3rd step comes before the
+   4th step. I can't prove untagged frames are dropped before address table
+   lookup.
+
+- IP multicast frames are looked up on "Destination IP Address Table", and
+   "Source IP Address Table" if IGMPv3/MLDv2. I haven't studied these yet so
+   I didn't explain processing IP multicast frames.
+
+With VLAN-untagged frames forwarded, frames will leak to non-ingress ports
+[2].
+
+We can at least egress non-link-local frames tagged [3]. As stated above,
+PVC_EG_TAG does not apply to link-local frames.
+
+If we could disable unicast frame forwarding completely, and unknown
+(broadcast, multicast) frame flooding for frames with certain VID, we could
+set PVID to 4095 when there's no PVID on software, and disable them for VID
+4095 frames. I don't believe this operation exists on this switch IP.
+
+In conclusion, these are the options:
+- Let frames tagged with VID 0 leak to non-ingress ports for the benefit
+   of always trapping link-local frames.
+- Find a way to prevent the leaks.
+- Keep disallowing untagged frames from being forwarded, link-local frames
+   won't always be trapped.
+
+I would love your input as someone who has much more experience than I do.
+
+[1]
+diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+index eab1f52e7eb3..1e160b6eb035 100644
+--- a/drivers/net/dsa/mt7530.c
++++ b/drivers/net/dsa/mt7530.c
+@@ -1699,11 +1699,6 @@ mt7530_port_vlan_add(struct dsa_switch *ds, int port,
+  		/* This VLAN is overwritten without PVID, so unset it */
+  		priv->ports[port].pvid = G0_PORT_VID_DEF;
+  
+-		/* Only accept tagged frames if the port is VLAN-aware */
+-		if (dsa_port_is_vlan_filtering(dsa_to_port(ds, port)))
+-			mt7530_rmw(priv, MT7530_PVC_P(port), ACC_FRM_MASK,
+-				   MT7530_VLAN_ACC_TAGGED);
+-
+  		mt7530_rmw(priv, MT7530_PPBV1_P(port), G0_PORT_VID_MASK,
+  			   G0_PORT_VID_DEF);
+  	}
+
+With this and the commands below, link-local frames will be trapped to the
+CPU port.
+
+ip l add br0 type bridge vlan_filtering 1 && \
+ip l set lan1 master br0 && \
+ip l set br0 up && \
+ip l set lan1 up && \
+bridge v a vid 1 dev lan1 && \
+tcpdump -X -i eth0
+
+[2]
+Enabled ports: P0-P4 as user & P6 as CPU
+
+On VLAN filtering bridge: P0, P1
+On VID 0:                 P0, P1 (no PVID on software)
+                           P2, P3, P4 (standalone)
+                           P6 (CPU port)
+
+Address table:
+PORT / FILTER of VID 0 entry ADDRESS PC0: 00000001 (destination port is P0)
+PORT / FILTER of VID 0 entry ADDRESS PC1: 00000010 (destination port is P1)
+[...]
+PORT / FILTER of VID 0 entry ADDRESS SoC: 01000000 (destination port is P6)
+
+VLAN table:
+PORT_MEM of VID 0 entry: 01011111
+
+P0 & P1 registers:
+PVC.ACC_FRM = ALL
+PPBV1.G0_PORT_VID = 0
+PCR.PORT_VLAN = SECURITY
+PVC.VLAN_ATTR = USER
+PCR.PORT_MATRIX = 01000011
+
+VLAN egress configuration:
+EG_TAG of VID 0 address table entry ADDRESS PC0 & PC1 = SYSTEM_DEFAULT
+P0 & P1 PVC.EG_TAG = SYSTEM_DEFAULT
+EG_CON/[EG_TAG per port] of VID 0 VLAN table entry = EG_TAG (TAGGED for P0
+& P1, STACK for P6)
+P0 & P1 PCR.EG_TAG = SYSTEM_DEFAULT
+
+Global registers:
+MFC.BC_FFP =  01011111
+MFC.UNU_FFP = 01011111
+
+Broadcast untagged frame ingresses through P0:
+1. An entry is added to the MAC address table. P0 as destination port, 0 as
+    CVID.
+2. MFC.BC_FFP is used to set the forwardable ports, 01011111.
+3. Untagged frame is allowed.
+4. VLAN table is not skipped.
+5. VLAN table entry with 0 as VID exists, the frame is allowed. Ingress
+    port is set on PORT_MEM, the frame is allowed.
+6. Bitwise AND with PCR.PORT_MATRIX results in 01000011. Bitwise AND with
+    ~00000001 (ingress port) results in 01000010. Frame egresses through P1
+    & P6.
+7. EG_TAG per port of VID 0 VLAN table entry applies. Frame eggresses
+    tagged through P1, stacked through P6.
+
+Unicast untagged frame with destination address PC1 ingresses through P0:
+1. An entry is added to the MAC address table. P0 as destination port, 0 as
+    CVID.
+2. Destination address matches an entry. PORT / FILTER of the matching
+    entry is used to set the forwardable ports, 00000010.
+3. Untagged frame is allowed.
+4. VLAN table is not skipped.
+5. VLAN table entry with 0 as VID exists, the frame is allowed. Ingress
+    port is set on PORT_MEM, the frame is allowed.
+6. Bitwise AND with PCR.PORT_MATRIX results in 00000010. Bitwise AND with
+    ~00000001 (ingress port) results in 00000010. Frame egresses through P1.
+7. EG_TAG per port of VID 0 VLAN table entry applies. Frame eggresses
+    tagged.
+
+Unicast untagged frame with unknown destination address ingresses through
+P0:
+1. An entry is added to the MAC address table. P0 as destination port, 0 as
+    CVID.
+2. Destination address doesn't match an entry. MFC.UNU_FFP is used to set
+    the forwardable ports, 01011111.
+3. Untagged frame is allowed.
+4. VLAN table is not skipped.
+5. VLAN table entry with 0 as VID exists, the frame is allowed. Ingress
+    port is set on PORT_MEM, the frame is allowed.
+6. Bitwise AND with PCR.PORT_MATRIX results in 01000011. Bitwise AND with
+    ~00000001 (ingress port) results in 01000010. Frame egresses through P1
+    & P6.
+7. EG_TAG per port of VID 0 VLAN table entry applies. Frame eggresses
+    tagged through P1, stacked through P6.
+
+[3]
+diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+index eab1f52e7eb3..2c7c5eaba4b6 100644
+--- a/drivers/net/dsa/mt7530.c
++++ b/drivers/net/dsa/mt7530.c
+@@ -1699,10 +1699,10 @@ mt7530_port_vlan_add(struct dsa_switch *ds, int port,
+  		/* This VLAN is overwritten without PVID, so unset it */
+  		priv->ports[port].pvid = G0_PORT_VID_DEF;
+  
+-		/* Only accept tagged frames if the port is VLAN-aware */
++		/* Egress leaks tagged */
+  		if (dsa_port_is_vlan_filtering(dsa_to_port(ds, port)))
+-			mt7530_rmw(priv, MT7530_PVC_P(port), ACC_FRM_MASK,
+-				   MT7530_VLAN_ACC_TAGGED);
++			mt7530_rmw(priv, MT7530_PVC_P(port), PVC_EG_TAG_MASK,
++				   PVC_EG_TAG(MT7530_VLAN_EG_TAGGED));
+  
+  		mt7530_rmw(priv, MT7530_PPBV1_P(port), G0_PORT_VID_MASK,
+  			   G0_PORT_VID_DEF);
+diff --git a/drivers/net/dsa/mt7530.h b/drivers/net/dsa/mt7530.h
+index 3ef9ed0163a1..5ff9a30ef4de 100644
+--- a/drivers/net/dsa/mt7530.h
++++ b/drivers/net/dsa/mt7530.h
+@@ -259,6 +259,7 @@ enum mt7530_port_mode {
+  enum mt7530_vlan_port_eg_tag {
+  	MT7530_VLAN_EG_DISABLED = 0,
+  	MT7530_VLAN_EG_CONSISTENT = 1,
++	MT7530_VLAN_EG_TAGGED = 6,
+  };
+  
+  enum mt7530_vlan_port_attr {
+
+Arınç
 
