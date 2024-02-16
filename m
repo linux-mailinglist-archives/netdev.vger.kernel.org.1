@@ -1,204 +1,176 @@
-Return-Path: <netdev+bounces-72492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72484-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0241C85859E
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 19:47:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81845858568
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 19:40:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81B1E1F24658
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 18:47:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 413CB2824C6
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 18:40:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB77713AA49;
-	Fri, 16 Feb 2024 18:44:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B32CC135415;
+	Fri, 16 Feb 2024 18:40:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Zp1l9kHr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZBksYlYq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0621B139573
-	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 18:44:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C66221353FF;
+	Fri, 16 Feb 2024 18:40:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708109058; cv=none; b=bxdVAQR3CcwOdKPRlh3LS3AyNOikHMgyHMC9GKwzhPBpqyzKpfSv2OJo4OgBC2lgCedw2QGnxkiVzBdyCtANv6Ajiu0ZTPK4L1WKwtov934JOKSpyDE9NvKhdVUlRCT9lnbWQSNW7OG8uhbx2ZWtPAEmxKvM4ssGWee5yRL5aTg=
+	t=1708108804; cv=none; b=eDfd3o27nWXUOml32iDca168YMjEJ3snUy7HNlNm5+7EvoAksXNw76vX5R+KkwJy+R/tZC43Cf65RU7oR6TdLrUmU2R9glGngNGk0rMBI69QfyYckCzkygpaRIH1XpDzU86x8n7TVdgGGDeMGZexR1uPkZCvcrZUjbGp4XrHR0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708109058; c=relaxed/simple;
-	bh=is74SxLH2fcG4nxpWW0Ms5pfDS6vmrGLVq+/QoSqAAM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=p395JTbcqswBS8i0aOSGYWKmOI5xBihKllEoyS03CAUkJR2maJkdh6fhcka0LehOfT7cMVAC762I4HzY4iEJvgSzWo8rF390SpTy1Cl6Bf5CvOHaNKaz6OyBSa+eCTZztgTd+g8f6wMNEVRCeSmlwTtilTdk+SYvbvUAriYeZtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Zp1l9kHr; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-561f0f116ecso714a12.0
-        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 10:44:16 -0800 (PST)
+	s=arc-20240116; t=1708108804; c=relaxed/simple;
+	bh=KFXs/nTuMM+dWIefmFTAjCBQ7XDB+JXn9nNipT7JTdY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ptdOKv957LqwlGRg5DRC+qHNMklKuaqU1F7W4XrCIzLnwnt6/4bWMm7Y5+29KF6UHuX3tb2omtTjxiT0KuEPGyIQ6A+D3g6nRpcLUYDjFwu0fW6Dji/xkWwxGMn9bftLTouLsR5wx+cWm/1Fz+Gm7O4BXASOowXhbh1a1uGyP18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZBksYlYq; arc=none smtp.client-ip=209.85.208.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2d21a68dd3bso10833201fa.1;
+        Fri, 16 Feb 2024 10:40:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708109055; x=1708713855; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Vd6bah5kWJs/p0C4VpOMLJEbY6JolrQ4onPS5UWgI9g=;
-        b=Zp1l9kHrXqt5boXyQXYi4KPUO8K7MMDLX/2VFa5phAGU9U4rf3k4Tvz/m3g5qXbqD+
-         zmat53esWmzRLEgmOwnoAH8ege2uMsA8VJaM03th4fZLUnrMENcefb6jUZNpv5oxRjCh
-         5e01X+HgM7T9YC5Tj19WBUj7CQ2GnLS96zHnFIhmNvK7WzfRiFJ80hY62OclnVUs14iX
-         YS7waSbL+NcnUN7KwyVd3C0ysFe8NLJuLtJ3RuoQkcez5E/MKZyauqVId4+TEEmLootz
-         ZUx1OTfjKU2xvSOkT6P8qBhryrUHWsAnnlQ7eli69ixWw+FFlxy3lZgRsqBzmsTenMhn
-         Rmuw==
+        d=gmail.com; s=20230601; t=1708108801; x=1708713601; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=78yCkR98MtM+p4wYvsxZI+i3GmUiyMdPBkkAbm+jo8c=;
+        b=ZBksYlYqd0qX38Ohl63ZfywnHOxEVFKtzXVffHLhTQ4g+1iZyCfcwl6iYlzMUIbpi8
+         E5y0IhgRIAy2ashQkIFhP2UmCo4kJF3W7Q0mcfoVAFwhosL6CnW5QlN4zBFY3HZ41gpq
+         wVHsMHV5l0ypYViGffoRgmHtjqWAV+zihMcS99scjjRfLxnOD+uls16qi6JrMh6zHa8f
+         OdJE6uLW7pngQg3HZ6aK0AC7UpMz0Thj+7wr4/8aTmb7VqiCjkkpU+Iw6qOQXvHMvV28
+         0n/kFnK1ZEPa1elqjpau2YJY3XFHVXMKTjmMEApemQwxbjbSLWSRmq8ZsFjb950VP2dT
+         n4zQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708109055; x=1708713855;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Vd6bah5kWJs/p0C4VpOMLJEbY6JolrQ4onPS5UWgI9g=;
-        b=PbhVkwCCjFmXa+5PkSCGq8Cdkc5y3SeYM3Ao2XyUKQ9zsxFhHzZO7FO2A68KmU1Mmm
-         daXXrS3n8L/rS83W8UVJd+aHAaUnSZRAewDdS2CvQcF9Cb50DcOedlm8DEcb2yroJMUK
-         4Q2O7wHPxld8in8+zZnkMXFu9O1qtwIP77Hy3yLlg5jBgq0ipn9IOFprgvKis04mpUeh
-         uqXtWCtnEGYRPzHIp+qox+n5vnmPyDG+wiN/QavYgrcvLmSNPFi6X50dqf4JPycVoqXw
-         /ExvY/L+0qNam8ab5cm5lDJoywACW42XDTyujW92JSr7cPcr7ez3dtJs5bwiq9m3kyJm
-         V9TA==
-X-Forwarded-Encrypted: i=1; AJvYcCUZYXoFJj07SN/jn2//9aBa0Io2dIpU5f/d4L2QPMc6cgQcUaEOYUaA/+0b44duY1GOhkHsusMoaH98SE1ssWQWKwtLz+EC
-X-Gm-Message-State: AOJu0Yzp1fnElYMVtxxjpMofJtBN5yQQMi/4P6u4K7egEM//4cNLIs4Q
-	E3XcuqVY/8ddwIRSYcJeLBete2iVKGSuOif8dsaRZEgiZvXoXfhXc4h4I50MuJa7dHrblhXlWWq
-	ceYjxwBSGmr4phWClH5Kv0ZUUSsNI7o+1snyIpvv6uOYd0vjxdgBm
-X-Google-Smtp-Source: AGHT+IE6SF1IU42agrlb0Z9BmG8VA/Flsiy03gMawoNmEFORdtCKS7bLtlhiD4KF+tuwE8IUnK8Al3LUFj3t2GwCaj4=
-X-Received: by 2002:a50:d598:0:b0:560:ea86:4d28 with SMTP id
- v24-20020a50d598000000b00560ea864d28mr9527edi.4.1708108598067; Fri, 16 Feb
- 2024 10:36:38 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708108801; x=1708713601;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=78yCkR98MtM+p4wYvsxZI+i3GmUiyMdPBkkAbm+jo8c=;
+        b=TzUt1ffT1eTEZ+KSWRJnZ397wZlBx5dq8OmWzqXdrBwPQzd1Ea1ho2NGlCw64Vdxa6
+         jEkjiiIxLmYpn4OujZ5Ny8edGZZyU4kt87d/Re8oxUd821SJ7QEKGomTOzTa159iVYuj
+         Llo/v2eeu38aT80y792qJSvoo2MIl2cfYwtJpOA23jOdSvFddXxOsKs6/RKnADwW8eIc
+         RdbsRWUCF5YE6v73qOQrCwDJeuO6EBiGNiRWfcL/0PoI793h2SpZnsfV9+IXRPrccZb8
+         glB5XNlQuB7FU9x5ZX5rtk/Hnzid/56bLiJMr8ni8lTzYifyMqqvufr2b7nOMN2wnblo
+         VS3w==
+X-Forwarded-Encrypted: i=1; AJvYcCW3sQNTguPEXn2YuekWPJwFekgK07yiat8ehvr8sCiC7G1B0aZ/3C5DS4Otbpkb26VzroCd4oQERZVSYm8oTs1cceFs9/ut8fjOgXiDN/qwXaFV1yGN3RJYc9tOc7vkfX1h4NNb
+X-Gm-Message-State: AOJu0YzuOnYg9cQSz/TKOHfYJuHZ8+j4wrxzY8BTq63jm9Wakxza91ti
+	CUqCbBVZFg2QkTKWSZZ2a7SSqybVkyXEzwxg/1YCkVBkXfR0bzpekqQJaBvK9/o=
+X-Google-Smtp-Source: AGHT+IEvHkxvQ6cNkCmZuYs+2CZMXFD63NlZarr3kAV6W5xtYY+lZFIlRQZFKvqM4Pp1UmjhNiMPnA==
+X-Received: by 2002:ac2:5197:0:b0:512:851d:82c5 with SMTP id u23-20020ac25197000000b00512851d82c5mr3905235lfi.0.1708108800548;
+        Fri, 16 Feb 2024 10:40:00 -0800 (PST)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id x8-20020ac24888000000b005129e5d7f11sm39651lfc.125.2024.02.16.10.39.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Feb 2024 10:40:00 -0800 (PST)
+Date: Fri, 16 Feb 2024 21:39:57 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Pavel Sakharov <p.sakharov@ispras.ru>
+Cc: Simon Horman <horms@kernel.org>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org, 
+	Alexey Khoroshilov <khoroshilov@ispras.ru>
+Subject: Re: [PATCH net v2] net: stmmac: Fix incorrect dereference in
+ interrupt handlers
+Message-ID: <52l2oudptsknq7tkorvz6o3h2t2gzstkk34oorks3eul5k22br@kqm674m5cwyy>
+References: <20240206150704.GD1104779@kernel.org>
+ <20240214092718.331891-1-p.sakharov@ispras.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CALCETrWUtYmSWw9-K1To8UDHe5THqEiwVyeSRNFQBaGuHs4cgg@mail.gmail.com>
- <396f9c38e2e2a14120e629cbc13353ec0aa15a62.camel@redhat.com> <CALCETrVwAT39fM89O0BqW9KAVfOFQo590g-Zs6mt+yAkoCvZZQ@mail.gmail.com>
-In-Reply-To: <CALCETrVwAT39fM89O0BqW9KAVfOFQo590g-Zs6mt+yAkoCvZZQ@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 16 Feb 2024 19:36:24 +0100
-Message-ID: <CANn89iKPPt3tozuDaSfsop5YbvgRoKha=dgTR2-ReoYEvA-_DA@mail.gmail.com>
-Subject: Re: SO_RESERVE_MEM doesn't quite work, at least on UDP
-To: Andy Lutomirski <luto@amacapital.net>
-Cc: Paolo Abeni <pabeni@redhat.com>, Wei Wang <weiwan@google.com>, 
-	Network Development <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240214092718.331891-1-p.sakharov@ispras.ru>
 
-On Fri, Feb 16, 2024 at 7:00=E2=80=AFPM Andy Lutomirski <luto@amacapital.ne=
-t> wrote:
->
-> On Fri, Feb 16, 2024 at 12:11=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> =
-wrote:
-> >
-> > On Thu, 2024-02-15 at 13:17 -0800, Andy Lutomirski wrote:
-> > > With SO_RESERVE_MEM, I can reserve memory, and it gets credited to
-> > > sk_forward_alloc.  But, as far as I can tell, nothing keeps it from
-> > > getting "reclaimed" (i.e. un-credited from sk_forward_alloc and
-> > > uncharged).  So, for UDP at least, it basically doesn't work.
-> >
-> > SO_RESERVE_MEM is basically not implemented (yet) for UDP. Patches are
-> > welcome - even if I would be curious about the use-case.
->
-> I've been chasing UDP packet drops under circumstances where they
-> really should not be happening.  I *think* something regressed between
-> 6.2 and 6.5 (as I was seeing a lot of drops on a 6.5 machine and not
-> on a 6.2 machine, and they're both under light load and subscribed to
-> the same multicast group).  But regardless of whether there's an
-> actual regression, the logic seems rather ancient and complex.  All I
-> want is a reasonable size buffer, and I have plenty of memory.  (It's
-> not 1995 any more -- I have many GB of RAM and I need a few tens of kB
-> of buffer.)
->
-> And, on inspection of the code, so far I've learned, in no particular ord=
-er:
->
-> 1. __sk_raise_mem_allocated() is called very frequently (as the
-> sk_forward_alloc mechanism is not particularly effective at reserving
-> memory).  And it calls sk_memory_allocated_add(), which looked
-> suspiciously like a horrible scalability problem until this patch:
->
-> commit 3cd3399dd7a84ada85cb839989cdf7310e302c7d
-> Author: Eric Dumazet <edumazet@google.com>
-> Date:   Wed Jun 8 23:34:09 2022 -0700
->
->     net: implement per-cpu reserves for memory_allocated
->
-> and I suspect that the regression I'm chasing is here:
->
-> commit 4890b686f4088c90432149bd6de567e621266fa2
-> Author: Eric Dumazet <edumazet@google.com>
-> Date:   Wed Jun 8 23:34:11 2022 -0700
->
->     net: keep sk->sk_forward_alloc as small as possible
->
-> (My hypothesis is that, before this change, there would frequently be
-> enough sk_forward_alloc left to at least drastically reduce the
-> frequency of transient failures due to protocol memory limits.)
->
-> 2. If a socket wants to use memory in excess of sk_forward_alloc
-> (which is now very small) and rcvbuf is sufficient, it goes through
-> __sk_mem_raise_allocated, and that has a whole lot of complex rules.
->
-> 2a. It checks memcg.  This does page_counter_try_charge, which does an
-> unconditional atomic add.  Possibly more than one.  Ouch.
->
-> 2b. It checks *global* per-protocol memory limits, and the defaults
-> are *small* by modern standards.  One slow program with a UDP socket
-> and a big SO_RCVBUF can easily use all the UDP memory, for example.
-> Also, why on Earth are we using global limits in a memcg world?
->
-> 2c. The per-protocol limits really look buggy.  The code says:
->
->     if (sk_has_memory_pressure(sk)) {
->         u64 alloc;
->
->         if (!sk_under_memory_pressure(sk))
->             return 1;
->         alloc =3D sk_sockets_allocated_read_positive(sk);
->         if (sk_prot_mem_limits(sk, 2) > alloc *
->             sk_mem_pages(sk->sk_wmem_queued +
->                  atomic_read(&sk->sk_rmem_alloc) +
->                  sk->sk_forward_alloc))
->             return 1;
->     }
->
-> <-- Surely there should be a return 1 here?!?
->
-> suppress_allocation:
->
-> That goes all the way back to:
->
-> commit 3ab224be6d69de912ee21302745ea4
-> 5a99274dbc
-> Author: Hideo Aoki <haoki@redhat.com>
-> Date:   Mon Dec 31 00:11:19 2007 -0800
->
->     [NET] CORE: Introducing new memory accounting interface.
->
-> But it wasn't used for UDP back then, and I don't think the code path
-> in question is or was reachable for TCP.
->
-> 3. A failure in any of this stuff gives the same drop_reason.  IMO it
-> would be really nice if the drop reason were split up into, say,
-> RCVBUFF_MEMCG, RCVBUF_PROTO_HARDLIMIT, RCVBUFF_PROTO_PRESSURE or
-> similar.
->
->
-> And maybe there should be a way (a memcg option?) to just turn the
-> protocol limits off entirely within a memcg.  Or to have per-memcg
-> protocol limits.  Or something.  A single UDP socket in a different
-> memcg should not be able to starve the whole system such that even
-> just two (!) queued UDP datagrams don't fit in a receive queue.
->
->
-> Anyway, SO_RESERVE_MEM looks like it ought to make enqueueing on that
-> socket faster and more scalable.  And exempt from random failures due
-> to protocol memory limits.
+On Wed, Feb 14, 2024 at 12:27:17PM +0300, Pavel Sakharov wrote:
+> If 'dev' or 'data' is NULL, the 'priv' variable has an incorrect address
+> when dereferencing calling netdev_err().
+> 
+> Since we get as 'dev_id' or 'data' what was passed as the 'dev' argument
+> to request_irq() during interrupt initialization (that is, the net_device
+> and rx/tx queue pointers initialized at the time of the call) and since
+> there are usually no checks for the 'dev_id' argument in such handlers
+> in other drivers, remove these checks from the handlers in stmmac driver.
+> 
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-Yes, this was the goal, but so far only implemented for TCP.
+LGTM. Thanks!
 
-Have you tried to bump SK_MEMORY_PCPU_RESERVE to a higher value ?
+Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
 
-SK_MEMORY_PCPU_RESERVE has been set to a very conservative value,
-based on TCP workloads.
+-Serge(y)
+
+> 
+> Fixes: 8532f613bc78 ("net: stmmac: introduce MSI Interrupt routines for mac, safety, RX & TX")
+> Signed-off-by: Pavel Sakharov <p.sakharov@ispras.ru>
+> ---
+> v2: Drop the second argument checks in the handlers as suggested by Serge Semin <fancer.lancer@gmail.com>.
+> 
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 20 -------------------
+>  1 file changed, 20 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 75d029704503..e80d77bd9f1f 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -6059,11 +6059,6 @@ static irqreturn_t stmmac_mac_interrupt(int irq, void *dev_id)
+>  	struct net_device *dev = (struct net_device *)dev_id;
+>  	struct stmmac_priv *priv = netdev_priv(dev);
+>  
+> -	if (unlikely(!dev)) {
+> -		netdev_err(priv->dev, "%s: invalid dev pointer\n", __func__);
+> -		return IRQ_NONE;
+> -	}
+> -
+>  	/* Check if adapter is up */
+>  	if (test_bit(STMMAC_DOWN, &priv->state))
+>  		return IRQ_HANDLED;
+> @@ -6079,11 +6074,6 @@ static irqreturn_t stmmac_safety_interrupt(int irq, void *dev_id)
+>  	struct net_device *dev = (struct net_device *)dev_id;
+>  	struct stmmac_priv *priv = netdev_priv(dev);
+>  
+> -	if (unlikely(!dev)) {
+> -		netdev_err(priv->dev, "%s: invalid dev pointer\n", __func__);
+> -		return IRQ_NONE;
+> -	}
+> -
+>  	/* Check if adapter is up */
+>  	if (test_bit(STMMAC_DOWN, &priv->state))
+>  		return IRQ_HANDLED;
+> @@ -6105,11 +6095,6 @@ static irqreturn_t stmmac_msi_intr_tx(int irq, void *data)
+>  	dma_conf = container_of(tx_q, struct stmmac_dma_conf, tx_queue[chan]);
+>  	priv = container_of(dma_conf, struct stmmac_priv, dma_conf);
+>  
+> -	if (unlikely(!data)) {
+> -		netdev_err(priv->dev, "%s: invalid dev pointer\n", __func__);
+> -		return IRQ_NONE;
+> -	}
+> -
+>  	/* Check if adapter is up */
+>  	if (test_bit(STMMAC_DOWN, &priv->state))
+>  		return IRQ_HANDLED;
+> @@ -6136,11 +6121,6 @@ static irqreturn_t stmmac_msi_intr_rx(int irq, void *data)
+>  	dma_conf = container_of(rx_q, struct stmmac_dma_conf, rx_queue[chan]);
+>  	priv = container_of(dma_conf, struct stmmac_priv, dma_conf);
+>  
+> -	if (unlikely(!data)) {
+> -		netdev_err(priv->dev, "%s: invalid dev pointer\n", __func__);
+> -		return IRQ_NONE;
+> -	}
+> -
+>  	/* Check if adapter is up */
+>  	if (test_bit(STMMAC_DOWN, &priv->state))
+>  		return IRQ_HANDLED;
+> -- 
+> 2.43.0
+> 
 
