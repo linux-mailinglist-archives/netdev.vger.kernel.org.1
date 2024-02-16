@@ -1,231 +1,165 @@
-Return-Path: <netdev+bounces-72363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82111857B1F
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 12:07:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F1D2857B7A
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 12:21:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C18D1C23076
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 11:07:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98222B245A6
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 11:21:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09DFC6025F;
-	Fri, 16 Feb 2024 11:05:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EED6877629;
+	Fri, 16 Feb 2024 11:21:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P/XlO3pL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AFI7SYWo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3AB458AC1;
-	Fri, 16 Feb 2024 11:05:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B5BD76C73
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 11:21:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708081544; cv=none; b=j10MqBAvSpLm5+FxGmkoTmsh4QoYUZlBS0N2NY1QMcC2oUp8711feCyZG2eCfwB1kC/icbLIN0QszgLIauwWjoz9XmQn4gmAa8ItCSbVOdUre1p5dqP+R0XwrKLNJdpypk54D8clOieQhkJYPkQMn3sBXXgwPDq+OWDszH606yE=
+	t=1708082501; cv=none; b=tQ0UiEHMZmRWPmtWL9fdIGra3hEqn/DW7LDgpEPlxNiTPZVVucOtIR6zH524vVYlV0zr2YGMe1c2hStIP99vaRexHYIymNoLsA5oEKZSqgUzo1HkH0CoUh+AAHjKYb7KVqawNXKNQIcdfSpzKerScxWwvJEV8ISH5sTUPIWSvJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708081544; c=relaxed/simple;
-	bh=td9ArVknXuzyTB8FXUOyI13YbxdPw2V6dLjZ0FXccDI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=u4jr5FyOjCaJGofAm7YbtCpXoF+lWk6D6Id1QlXqdXGvJOowUxpnGxj/rTyp1c66HB+JUrJnzC5UD0U+QfWEmoTKNLv1yxr8BnF0H+LxcFLEaTf5LqoT1M9BRfkZfbH5emjZxaUNjmxxM2NreaU6yRGTlh6CWauEoFLi902rqTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P/XlO3pL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5AED7C4166A;
-	Fri, 16 Feb 2024 11:05:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708081544;
-	bh=td9ArVknXuzyTB8FXUOyI13YbxdPw2V6dLjZ0FXccDI=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=P/XlO3pL9pqeVzP2EWfZwOcV2OYLrhF091DQWn2r3Xh05ASkcpAfRXC7K8LqTd6qG
-	 YkTF1FpLRBkWHwrJ1HaojsFK8zM+6lrD2wmtut0YQXyXHklYO8HNzoUP/sAscb//+A
-	 NsNAUWFQ+TWc/vuduAHUKPNCISoqyYMmT2cQOL4yx//uPdNd7H3qnh0YLzO7iuzpTW
-	 Ep4dx1OTUVvkydxCTIQC3N7Hjx+Lv7b0NQ6mYc/+RsmxQCNHJ9vOfhqgoEyIvluVIX
-	 5hwLey8r9HLbVY6hI2BPmfO801DakYk/2xpzqb4CCruR5iIbuf7ogDrkPfPm8+bgr9
-	 NLzUr0QNmei4g==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 491E8C48BF0;
-	Fri, 16 Feb 2024 11:05:44 +0000 (UTC)
-From: =?utf-8?b?QXLEsW7DpyDDnE5BTA==?= via B4 Relay
- <devnull+arinc.unal.arinc9.com@kernel.org>
-Date: Fri, 16 Feb 2024 14:05:36 +0300
-Subject: [PATCH net-next v2 8/8] net: dsa: mt7530: simplify link operations
- and force link down on all ports
+	s=arc-20240116; t=1708082501; c=relaxed/simple;
+	bh=ARsbqmkZlJY9NMBt3SmFhEAa2WrR9M7L85xrLa/BHBg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eMHo/b1ASuVMPIjL/X4IBLat5e4OxalqQayveQiDO5YPhDtdzzKhIvN/57ozOehMtWv0WKq7aJtoFcMM9CyEVytfLGcoAo2yW8xFE++Hl9SWa9GOOnqv2o6JU8Phu8FFQUolGI/NpTq6QhEOL9DzmoAm6BSQgDJ+hZ+ts+gCBHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AFI7SYWo; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-55c2cf644f3so2365962a12.1
+        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 03:21:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708082498; x=1708687298; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kHdcoPIZ5j6Hk9zqguDIOQQ/4PKG4aeFidRGUIVltn0=;
+        b=AFI7SYWoiR17Xv6h1dCjaNRJQyUSmvD0yjLOqG/Oor5I1c4OD9K//IqnVbNJt03dVG
+         zcvWS+RxkHmzfm94+iT+SopDdOfxfyQmivWx2Vvxyx03kQiFp+zMca20BfQ1GOGrb30+
+         LmmXQon6ENixsaDxzYXP9sFwkDjAduRz+OiAjaxhGuHFlk0RVgj94MN5WsI+bPHie2G5
+         wMcwYHF3nRDMPWikiubY9Jw2UJKaS3ofJvbTEe98V4jOKz9d0ax/BrCQ6Iqd3iTSujDj
+         uzo76cvqH66YUsqnOGO1HNqz41DAqJtPajbKnaALbfphWxZFOp1RMOcuOK+TCTAKuZFb
+         W7CA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708082498; x=1708687298;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kHdcoPIZ5j6Hk9zqguDIOQQ/4PKG4aeFidRGUIVltn0=;
+        b=xBF6FSIp3CtActmJZRNQiKE1L9IYH/pAgSWtvx1tOTAp++jv6OphMqdRU/X7VeQlPx
+         NYR9XPSauyKBI9BZyG68r2pDGC3BByHOeKxU+VuMJe02daqBXNEENnUU0x5JKmPuHGzQ
+         8XLuP9y0gsMo9j50RJLmvSlUI/YQA2i08p+acgyMFKGstmH3rwxZnKL6ru44ApDd500f
+         Q86/c3wGM9Hu65uknJ6Pm7skUTAXtdMznxNGKTfxF80R+A+scR8Pr06OTzsoxWwfYCt+
+         OVW2XSSxqS6B15qhTj9xm8N1jQgRajWqqfo36X7tZEG2QrthfyqnD06OvJKVFEQ7Y3Pd
+         jIng==
+X-Forwarded-Encrypted: i=1; AJvYcCUGT3dqjtTpbsew0SLBIws0yO7YCWjXTiUvDy4AgcItNJ/tk1UGQinP7QNNA6lTT6S+P/bj25eO92hGq5tXeuT6XLswPJ0L
+X-Gm-Message-State: AOJu0Yxu09yJJP6WsJUdfdwG7OqQ7lYQaoByTGLqR/X3MjRThoPoEiTV
+	9K+OfNcXTRm5rxjbKZkuSNbUsea4E8AGfLgkLZXHOuFBL6Sbh1V4
+X-Google-Smtp-Source: AGHT+IHVMjJKd+Nc/qyBJQ8tOPQCx9yhSsNTLWaPu5Gi6sA/UjQduk6vVMzA6R5S3YcTUpgT1l+arw==
+X-Received: by 2002:aa7:ca4d:0:b0:562:7705:57c8 with SMTP id j13-20020aa7ca4d000000b00562770557c8mr3343687edt.34.1708082498108;
+        Fri, 16 Feb 2024 03:21:38 -0800 (PST)
+Received: from ?IPV6:2a01:c22:73a8:7a00:dc5a:d3b4:cb75:f027? (dynamic-2a01-0c22-73a8-7a00-dc5a-d3b4-cb75-f027.c22.pool.telefonica.de. [2a01:c22:73a8:7a00:dc5a:d3b4:cb75:f027])
+        by smtp.googlemail.com with ESMTPSA id l11-20020aa7c3cb000000b005640022af58sm227852edr.83.2024.02.16.03.21.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Feb 2024 03:21:37 -0800 (PST)
+Message-ID: <50ad932c-4775-4201-b2ce-f5f21eaa966d@gmail.com>
+Date: Fri, 16 Feb 2024 12:21:37 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id:
- <20240216-for-netnext-mt7530-improvements-3-v2-8-094cae3ff23b@arinc9.com>
-References:
- <20240216-for-netnext-mt7530-improvements-3-v2-0-094cae3ff23b@arinc9.com>
-In-Reply-To:
- <20240216-for-netnext-mt7530-improvements-3-v2-0-094cae3ff23b@arinc9.com>
-To: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>, 
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, 
- Florian Fainelli <f.fainelli@gmail.com>, 
- Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
- Russell King <linux@armlinux.org.uk>
-Cc: mithat.guner@xeront.com, erkin.bozoglu@xeront.com, 
- Bartel Eerdekens <bartel.eerdekens@constell8.be>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, 
- =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>
-X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1708081540; l=5194;
- i=arinc.unal@arinc9.com; s=arinc9-patatt; h=from:subject:message-id;
- bh=3PnEpSD/b9sLXrH/ouiQE55BJAdoplXfAHA3Ch+TLls=;
- b=mSaVHEzCy4ejGcjX96SnPb/qltroYfKxJok9jX4XC6EEKUgprqU+eyIwYXvYzGj3FGdeQTMiz
- RZCb+leeyYiAYQTbPcfrjcTZTQSfLKSqIKcXmsLArrQw1X2bfF2KpZu
-X-Developer-Key: i=arinc.unal@arinc9.com; a=ed25519;
- pk=VmvgMWwm73yVIrlyJYvGtnXkQJy9CvbaeEqPQO9Z4kA=
-X-Endpoint-Received:
- by B4 Relay for arinc.unal@arinc9.com/arinc9-patatt with auth_id=115
-X-Original-From: =?utf-8?b?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Reply-To: <arinc.unal@arinc9.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] ethtool: check for unsupported modes in EEE
+ advertisement
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>,
+ "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <c02d4d86-6e65-4270-bc46-70acb6eb2d4a@gmail.com>
+ <Zc4zhPSceYVlYnWc@shell.armlinux.org.uk>
+ <ab9ec289-3d40-4541-b22a-a72beaf1e742@lunn.ch>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <ab9ec289-3d40-4541-b22a-a72beaf1e742@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Arınç ÜNAL <arinc.unal@arinc9.com>
+On 16.02.2024 00:33, Andrew Lunn wrote:
+> On Thu, Feb 15, 2024 at 03:53:40PM +0000, Russell King (Oracle) wrote:
+>> On Thu, Feb 15, 2024 at 02:05:54PM +0100, Heiner Kallweit wrote:
+>>> Let the core check whether userspace returned unsupported modes in the
+>>> EEE advertisement bitmap. This allows to remove these checks from
+>>> drivers.
+>>
+>> Why is this a good thing to implement?
+>>
+>> Concerns:
+>> 1) This is a change of behaviour for those drivers that do not
+>> implement this behaviour.
+> 
+> Hi Heiner
+> 
+> You say phylib does this by default? Are there any none phylib/phylink
+> drivers which don't implement this behaviour?
+> 
+Very few drivers ignore unknown/unsupported modes:
+bnx2, r8152, ax88179, igc
+Basically the ones using ethtool_adv_to_mmd_eee_adv_t() on the userspace-provided
+EEE advertisement. However for e.g. Intel drivers the behavior isn't consistent,
+some of their drivers check for unsupported modes and bail out if found.
 
-Currently, the link operations for switch MACs are scattered across
-port_enable, port_disable, phylink_mac_config, phylink_mac_link_up, and
-phylink_mac_link_down.
-
-port_enable and port_disable clears the link settings. Move that to
-mt7530_setup() and mt7531_setup_common() which set up the switches. This
-way, the link settings are cleared on all ports at setup, and then only
-once with phylink_mac_link_down() when a link goes down.
-
-Enable force mode at setup to apply the force part of the link settings.
-This ensures that only active ports will have their link up.
-
-Now that the bit for setting the port on force mode is done on
-mt7530_setup() and mt7531_setup_common(), get rid of PMCR_FORCE_MODE_ID()
-which helped determine which bit to use for the switch model.
-
-The "MT7621 Giga Switch Programming Guide v0.3", "MT7531 Reference Manual
-for Development Board v1.0", and "MT7988A Wi-Fi 7 Generation Router
-Platform: Datasheet (Open Version) v0.1" documents show that these bits are
-enabled at reset:
-
-PMCR_IFG_XMIT(1) (not part of PMCR_LINK_SETTINGS_MASK)
-PMCR_MAC_MODE (not part of PMCR_LINK_SETTINGS_MASK)
-PMCR_TX_EN
-PMCR_RX_EN
-PMCR_BACKOFF_EN (not part of PMCR_LINK_SETTINGS_MASK)
-PMCR_BACKPR_EN (not part of PMCR_LINK_SETTINGS_MASK)
-PMCR_TX_FC_EN
-PMCR_RX_FC_EN
-
-These bits also don't exist on the MT7530_PMCR_P(6) register of the switch
-on the MT7988 SoC:
-
-PMCR_IFG_XMIT()
-PMCR_MAC_MODE
-PMCR_BACKOFF_EN
-PMCR_BACKPR_EN
-
-Remove the setting of the bits not part of PMCR_LINK_SETTINGS_MASK on
-phylink_mac_config as they're already set.
-
-Suggested-by: Vladimir Oltean <olteanv@gmail.com>
-Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
----
- drivers/net/dsa/mt7530.c | 26 +++++++++++++-------------
- drivers/net/dsa/mt7530.h |  2 --
- 2 files changed, 13 insertions(+), 15 deletions(-)
-
-diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-index 5c8ad41ce8cd..1ae11b180d54 100644
---- a/drivers/net/dsa/mt7530.c
-+++ b/drivers/net/dsa/mt7530.c
-@@ -1018,7 +1018,6 @@ mt7530_port_enable(struct dsa_switch *ds, int port,
- 	priv->ports[port].enable = true;
- 	mt7530_rmw(priv, MT7530_PCR_P(port), PCR_MATRIX_MASK,
- 		   priv->ports[port].pm);
--	mt7530_clear(priv, MT7530_PMCR_P(port), PMCR_LINK_SETTINGS_MASK);
- 
- 	mutex_unlock(&priv->reg_mutex);
- 
-@@ -1038,7 +1037,6 @@ mt7530_port_disable(struct dsa_switch *ds, int port)
- 	priv->ports[port].enable = false;
- 	mt7530_rmw(priv, MT7530_PCR_P(port), PCR_MATRIX_MASK,
- 		   PCR_MATRIX_CLR);
--	mt7530_clear(priv, MT7530_PMCR_P(port), PMCR_LINK_SETTINGS_MASK);
- 
- 	mutex_unlock(&priv->reg_mutex);
- }
-@@ -2257,6 +2255,12 @@ mt7530_setup(struct dsa_switch *ds)
- 	mt7530_mib_reset(ds);
- 
- 	for (i = 0; i < MT7530_NUM_PORTS; i++) {
-+		/* Clear link settings and enable force mode to force link down
-+		 * on all ports until they're enabled later.
-+		 */
-+		mt7530_rmw(priv, MT7530_PMCR_P(i), PMCR_LINK_SETTINGS_MASK |
-+			   PMCR_FORCE_MODE, PMCR_FORCE_MODE);
-+
- 		/* Disable forwarding by default on all ports */
- 		mt7530_rmw(priv, MT7530_PCR_P(i), PCR_MATRIX_MASK,
- 			   PCR_MATRIX_CLR);
-@@ -2359,6 +2363,12 @@ mt7531_setup_common(struct dsa_switch *ds)
- 		     UNU_FFP_MASK);
- 
- 	for (i = 0; i < MT7530_NUM_PORTS; i++) {
-+		/* Clear link settings and enable force mode to force link down
-+		 * on all ports until they're enabled later.
-+		 */
-+		mt7530_rmw(priv, MT7530_PMCR_P(i), PMCR_LINK_SETTINGS_MASK |
-+			   MT7531_FORCE_MODE, MT7531_FORCE_MODE);
-+
- 		/* Disable forwarding by default on all ports */
- 		mt7530_rmw(priv, MT7530_PCR_P(i), PCR_MATRIX_MASK,
- 			   PCR_MATRIX_CLR);
-@@ -2657,23 +2667,13 @@ mt753x_phylink_mac_config(struct dsa_switch *ds, int port, unsigned int mode,
- 			  const struct phylink_link_state *state)
- {
- 	struct mt7530_priv *priv = ds->priv;
--	u32 mcr_cur, mcr_new;
- 
- 	if ((port == 5 || port == 6) && priv->info->mac_port_config)
- 		priv->info->mac_port_config(ds, port, mode, state->interface);
- 
--	mcr_cur = mt7530_read(priv, MT7530_PMCR_P(port));
--	mcr_new = mcr_cur;
--	mcr_new &= ~PMCR_LINK_SETTINGS_MASK;
--	mcr_new |= PMCR_IFG_XMIT(1) | PMCR_MAC_MODE | PMCR_BACKOFF_EN |
--		   PMCR_BACKPR_EN | PMCR_FORCE_MODE_ID(priv->id);
--
- 	/* Are we connected to external phy */
- 	if (port == 5 && dsa_is_user_port(ds, 5))
--		mcr_new |= PMCR_EXT_PHY;
--
--	if (mcr_new != mcr_cur)
--		mt7530_write(priv, MT7530_PMCR_P(port), mcr_new);
-+		mt7530_set(priv, MT7530_PMCR_P(port), PMCR_EXT_PHY);
- }
- 
- static void mt753x_phylink_mac_link_down(struct dsa_switch *ds, int port,
-diff --git a/drivers/net/dsa/mt7530.h b/drivers/net/dsa/mt7530.h
-index 8a8144868eaa..a71166e0a7fc 100644
---- a/drivers/net/dsa/mt7530.h
-+++ b/drivers/net/dsa/mt7530.h
-@@ -304,8 +304,6 @@ enum mt7530_vlan_port_acc_frm {
- 					 MT7531_FORCE_DPX | \
- 					 MT7531_FORCE_RX_FC | \
- 					 MT7531_FORCE_TX_FC)
--#define  PMCR_FORCE_MODE_ID(id)		((((id) == ID_MT7531) || ((id) == ID_MT7988)) ?	\
--					 MT7531_FORCE_MODE : PMCR_FORCE_MODE)
- #define  PMCR_LINK_SETTINGS_MASK	(PMCR_TX_EN | PMCR_FORCE_SPEED_1000 | \
- 					 PMCR_RX_EN | PMCR_FORCE_SPEED_100 | \
- 					 PMCR_TX_FC_EN | PMCR_RX_FC_EN | \
-
--- 
-2.40.1
-
+> 	Andrew
+> 
+Heiner
 
