@@ -1,181 +1,124 @@
-Return-Path: <netdev+bounces-72426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE95685811F
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 16:33:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D63D858138
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 16:36:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F0961C20896
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 15:33:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80A9D1C209B0
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 15:36:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B2B512FB37;
-	Fri, 16 Feb 2024 15:24:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B80DB137C47;
+	Fri, 16 Feb 2024 15:28:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="BWVCT3bW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dyWVvfB5"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-ve1eur01on2052.outbound.protection.outlook.com [40.107.14.52])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73C1512FB36;
-	Fri, 16 Feb 2024 15:24:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.14.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708097087; cv=fail; b=oyGOIcvzotwl5yY2gnMxlvpv8lkj8iF/e6avIuxVZml3Gc2AmUFXjv2bGQsJaZvo9dboKlGGWk9DrhGnfr1koaK2AzfmdOCDFKMoF7dKKVSwx8eax167Uy62UmwMCM/hmH0aYHkV5yrs3ztdbT6ay3MIjo/DrEIcruuTFTbv+BY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708097087; c=relaxed/simple;
-	bh=KLt7lkxMIDXwqVaa187HXcW2n371/Kn3gOTNz7xxQIQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=izzj9PM7sFJH+huksknSPZ3usSIzpHoyTLMd6R9ukLcZBUWfBktqv4SYt5a/Itn3j4xJCWtqfDn44SshLxtCjkrqVt3C+h4/ZSaMDuRQJWo8N/Ygx8JkBkokjKO98g09nAWqb8Bk55tSFViquxrepuGlqGwfWcdo7YgsyfAuav4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=axis.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=BWVCT3bW; arc=fail smtp.client-ip=40.107.14.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=axis.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gT7l+K0uiYbEZ9Btcgx18GvCiLqfYXFDto9tJJT6f3MO/dkM2wPC++AYF8/Zln/LL6a3cdirkaz+krcIrzk/+78KLM+b7+vGXgmJ30TKto5/z6EL9Stq77ym5WsXV4c7uJwKRM4hxO9IlOavj9rB4DXQox0LyzB+2VAIQCrcsf3RUWlhi9AdWuZc32PluumM82iRpAjQz7npCZDOF1QwTikqHC/pPbPVFau9zWuV7xdRLgqoMSiXXu5ZIF5S1z0OneiGjdDMbOIcywgX2VDWmKraqt5feprg4pAWhUu+uzbXUrW3wqiSMmJKqS5gJ6mQuKURimL4ZL/KGTJCKqm6QA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=37sPE7amiEW/LSX22nPYRRTcsfGA/KdN6cUCAu0caMo=;
- b=K6m+029TjOBDUfaggbDiCzMEYw6rXaASO0EGHx9DDYnaVetsE6RiwijLeBZyQUh21pYdm6RHS9jZ84sMztbU8c6jvHsxZvGsZFknmky5CDtBaCIBjNwMQWEU/n1bMSjT05ldUf/f5nikPV8l5JWBO57h2Az75XTcuBFsojPmALKBdVfZ+Bp/RFifFWekmv7j2r7WkHsSapBxZqEX659SZzfc0NMQSniUM+YUQ1NjlDho5WlGGjx1BhyYcYH50EvWjVYkAMoTJwgYsPVVzbhy5TW4wO7d0fa4nXHm7C4r7mkABC4l8JEDwjKWD2egoI6fsvCRZVFL6N6a8kbvr6IyWg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
- 195.60.68.100) smtp.rcpttodomain=davemloft.net smtp.mailfrom=axis.com;
- dmarc=fail (p=none sp=none pct=100) action=none header.from=axis.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=37sPE7amiEW/LSX22nPYRRTcsfGA/KdN6cUCAu0caMo=;
- b=BWVCT3bWLezGZ4YNRA3eUmnHdFNmxIGzbiP4pWbKy1m1b6os9GvD0woLLMUSY/VciCflj6BA8J6rEyUVR1MreNqdeCiRmj1RVb0A+/nmBiUuhFeSKHtV6LURftvfJ+TOglOjgViDbyfblx/kUr+yxjs2dfA9qDrbbRU6sYqxjhE=
-Received: from AM6PR02CA0036.eurprd02.prod.outlook.com (2603:10a6:20b:6e::49)
- by GVXPR02MB10805.eurprd02.prod.outlook.com (2603:10a6:150:158::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.29; Fri, 16 Feb
- 2024 15:24:39 +0000
-Received: from AMS0EPF0000019D.eurprd05.prod.outlook.com
- (2603:10a6:20b:6e:cafe::3) by AM6PR02CA0036.outlook.office365.com
- (2603:10a6:20b:6e::49) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.39 via Frontend
- Transport; Fri, 16 Feb 2024 15:24:39 +0000
-X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 195.60.68.100)
- smtp.mailfrom=axis.com; dkim=none (message not signed)
- header.d=none;dmarc=fail action=none header.from=axis.com;
-Received-SPF: Fail (protection.outlook.com: domain of axis.com does not
- designate 195.60.68.100 as permitted sender) receiver=protection.outlook.com;
- client-ip=195.60.68.100; helo=mail.axis.com;
-Received: from mail.axis.com (195.60.68.100) by
- AMS0EPF0000019D.mail.protection.outlook.com (10.167.16.249) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7292.25 via Frontend Transport; Fri, 16 Feb 2024 15:24:38 +0000
-Received: from se-mail01w.axis.com (10.20.40.7) by se-mail01w.axis.com
- (10.20.40.7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Fri, 16 Feb
- 2024 16:24:38 +0100
-Received: from se-intmail01x.se.axis.com (10.0.5.60) by se-mail01w.axis.com
- (10.20.40.7) with Microsoft SMTP Server id 15.1.2375.34 via Frontend
- Transport; Fri, 16 Feb 2024 16:24:38 +0100
-Received: from pc55637-2337.se.axis.com (pc55637-2337.se.axis.com [10.88.4.11])
-	by se-intmail01x.se.axis.com (Postfix) with ESMTP id 7D2D7146C8;
-	Fri, 16 Feb 2024 16:24:38 +0100 (CET)
-Received: by pc55637-2337.se.axis.com (Postfix, from userid 363)
-	id 805D422DFE41; Fri, 16 Feb 2024 16:24:38 +0100 (CET)
-From: Jesper Nilsson <jesper.nilsson@axis.com>
-Date: Fri, 16 Feb 2024 16:24:21 +0100
-Subject: [PATCH] net: stmmac: mmc_core: Assign, don't add interrupt
- registers
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03F6D12F58E
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 15:28:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708097334; cv=none; b=UIP+37zERBpkXfL91iM8Rd788jXUt9/0jB8+cZ66cvpf03KOmXBEVjy2co42EjUdSInntUxHW+sEWdcyp1fwYz+Ib+cIhCTsXqyu2eph1pcxoDpGmrCUBifsqauRNhzeafNj+yJa71ZXUZVrw9D6M4vh+RT/tv6nfABuOGyM+0M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708097334; c=relaxed/simple;
+	bh=t1h2kdMiTtuCIfBL0CePWXZ+Hjndv9p3kwl2Y/ZmQy4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pugaQGUQsTZDxjwsWE/6LgcD2uXRrZZu/opsEbNpxj9KDbyq4YDMowcp3EMNjXAydRB+KLiIKwqMBCjonE2kEuxpEvEcn38OZWzV7nZP+H1d/iWGPiWqdoYoW8I+y+xXJN/dqQYk9kMPexvVjH55m3kSgopJjGBvqT0nbYeHHgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dyWVvfB5; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708097331;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=edt3xu1cmL6LpGIFSJYthkfNUPiclw0xLjPATKYu3z0=;
+	b=dyWVvfB51x0OOLkDVigOrNSO4zJrlaYbsKTpAytiALPBK+lg/DpDnB9cQYYfAotQNhNiN5
+	5I3krWrOJlBwrBwp+idzmhQTBeEfU/dRPiczEa54IbK65L+vevpvOjF5qbV+C91Cc7sefJ
+	XjYPXn465JyyE0s8ZqU2ixWnxfho668=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-135-QPe5yCaSMlueCLk9gypxSQ-1; Fri,
+ 16 Feb 2024 10:28:48 -0500
+X-MC-Unique: QPe5yCaSMlueCLk9gypxSQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C56A1383D745;
+	Fri, 16 Feb 2024 15:28:47 +0000 (UTC)
+Received: from RHTPC1VM0NT.lan (unknown [10.22.33.57])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 467171C060B1;
+	Fri, 16 Feb 2024 15:28:47 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pravin B Shelar <pshelar@ovn.org>,
+	dev@openvswitch.org,
+	Ilya Maximets <i.maximets@ovn.org>,
+	Simon Horman <horms@ovn.org>,
+	Eelco Chaudron <echaudro@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org
+Subject: [RFC 0/7] selftests: openvswitch: cleanups for running as selftests
+Date: Fri, 16 Feb 2024 10:28:39 -0500
+Message-ID: <20240216152846.1850120-1-aconole@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20240216-stmmac_stats-v1-1-7065fa4613f8@axis.com>
-X-B4-Tracking: v=1; b=H4sIACR+z2UC/x3MQQqAIBBA0avIrBPUzEVXiQjJqWZhhSMRiHdPW
- r7F/wUYEyHDKAokfIjpOht0J2A9/LmjpNAMRhmrjHaSc4x+XTj7zBL7welgnQoKoSV3wo3efzf
- NtX7B5gzPXgAAAA==
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
-	<joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>
-CC: <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<kernel@axis.com>, Jesper Nilsson <jesper.nilsson@axis.com>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1708097078; l=1873;
- i=jesper.nilsson@axis.com; s=20240216; h=from:subject:message-id;
- bh=KLt7lkxMIDXwqVaa187HXcW2n371/Kn3gOTNz7xxQIQ=;
- b=3AALvebc5WkJMbXlrwZxPpsh1ObS6AysvNlUkoKDysRlH9NCs9RnpgTWV+fLG7HDlSKOqIyPe
- 7QLfuZE3uWxDndTDmgJVBcsqLy5Nf8nwDBFp8fi9h+qWyLn8IbDsfKR
-X-Developer-Key: i=jesper.nilsson@axis.com; a=ed25519;
- pk=RDobTFVrTaE8iMP112Wk0CDiLdcV7I+OkaCECzhr/bI=
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AMS0EPF0000019D:EE_|GVXPR02MB10805:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4b8cb483-070b-4cda-4313-08dc2f036409
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	4oX4JGtheX+f2uX5984nJb+nT7QU/Rl4A8HnTm6vL2KgcQ3+uSnBGmEHt0/BkXhbCIYzyDjRZPiciAXZKAKSfNGRoK1zWxJ5izpDYP28SrAiOliulLq0lunBeXFtpTbcPTS1zZXXE0SNCgtjmn8QJ6UOqmxfig+SZmsMHY5KH80ZGgdICMTFXq0Sw8DxqZ66Luf5zGYvRtE+4VNynwZAjwJpUH+JH4ResLdsQgSRGgvj07rcvsKavb3JR01sjLIpKOSONKYjh+mGEuwCkzrW+ENMb2c7Bw7QGQkTaZfHtNyFDwTdvtKdxaS07hjHqDRs/S4dgQAXXYJRcRcrrDObULR3Qh7AgOblEHdDsv9WIoD8trooQ1+V8LporRZVdQrwE584RqumLz9NKQ0v0pIviU/WEYtMighgPMUbvp5miNziOZG5ZL4xvoPf1vCqVZrut2du23F7iW+4p2R6zzIpPZcO4Bg6xOLbdw9fJi3mIoF9mZIFKyA/o9tKdo1vVbHCv0I7Iw7vjugYWQIofT1Qm8Da1/27Tj34AwxmTQemVhYyo8GAlS6dvjSmKxEcalqQHpIAuHjDc1P7V3NzCiCV+YOwhvo22mg9O7ULrkseBq55UoSVQOX6nCTWYUZATgxmPM/EpPehkKdcAhUVzfEMG3UZTV/8DkN2vmGS6chqADU=
-X-Forefront-Antispam-Report:
-	CIP:195.60.68.100;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.axis.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(346002)(376002)(396003)(136003)(39860400002)(230922051799003)(82310400011)(186009)(64100799003)(451199024)(36860700004)(1800799012)(46966006)(40470700004)(478600001)(2616005)(316002)(7416002)(5660300002)(44832011)(2906002)(8676002)(8936002)(4326008)(70586007)(70206006)(54906003)(110136005)(42186006)(41300700001)(6666004)(36756003)(26005)(83380400001)(426003)(107886003)(81166007)(86362001)(336012)(356005)(6266002)(82740400003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: axis.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Feb 2024 15:24:38.9191
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4b8cb483-070b-4cda-4313-08dc2f036409
-X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=78703d3c-b907-432f-b066-88f7af9ca3af;Ip=[195.60.68.100];Helo=[mail.axis.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AMS0EPF0000019D.eurprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR02MB10805
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-The MMC IPC interrupt status and interrupt mask registers are of
-little use as Ethernet statistics, but incrementing counters
-based on the current interrupt and interrupt mask registers
-makes them worse than useless.
+The series is a host of cleanups to the openvswitch selftest suite
+which should be ready to run under the netdev selftest runners using
+vng.  For now, the testing has been done with RW directories, but
+additional testing will be done to try and keep it all as RO to be
+more friendly.
 
-For example, if the interrupt mask is set to 0x08420842,
-the current code will increment by that amount each iteration,
-leading to the following sequence of nonsense:
+There is one more test case I plan which will print the debug log
+details when a test case fails so that a developer can get a clear
+picture why the test case failed.  That will be done for the proper
+submission as another patch in this series.
 
-mmc_rx_ipc_intr_mask: 969816526
-mmc_rx_ipc_intr_mask: 1108361744
+Additionally, the timeout setting was just an arbitrary number that
+I picked, but needs more testing to tune it properly (since 5
+minutes may be a bit too long).
 
-Change the increment to a straight assignment to make the
-statistics at least nominally useful.
+Tested on fedora 38 using virtme-ng with the following commandline:
 
-Signed-off-by: Jesper Nilsson <jesper.nilsson@axis.com>
----
- drivers/net/ethernet/stmicro/stmmac/mmc_core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+../virtme-ng/vng -v --run . --user root --cpus 4 \
+    --rwdir=/home/aconole/git/linux/tools/testing/selftests/net/openvswitch/ \
+    -- \
+    make -C tools/testing/selftests/net/openvswitch \
+         TARGETS=openvswitch TEST_PROGS=openvswitch.sh run_tests
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/mmc_core.c b/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
-index 6a7c1d325c46..6051a22b3cec 100644
---- a/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
-@@ -280,8 +280,8 @@ static void dwmac_mmc_read(void __iomem *mmcaddr, struct stmmac_counters *mmc)
- 	mmc->mmc_rx_vlan_frames_gb += readl(mmcaddr + MMC_RX_VLAN_FRAMES_GB);
- 	mmc->mmc_rx_watchdog_error += readl(mmcaddr + MMC_RX_WATCHDOG_ERROR);
- 	/* IPC */
--	mmc->mmc_rx_ipc_intr_mask += readl(mmcaddr + MMC_RX_IPC_INTR_MASK);
--	mmc->mmc_rx_ipc_intr += readl(mmcaddr + MMC_RX_IPC_INTR);
-+	mmc->mmc_rx_ipc_intr_mask = readl(mmcaddr + MMC_RX_IPC_INTR_MASK);
-+	mmc->mmc_rx_ipc_intr = readl(mmcaddr + MMC_RX_IPC_INTR);
- 	/* IPv4 */
- 	mmc->mmc_rx_ipv4_gd += readl(mmcaddr + MMC_RX_IPV4_GD);
- 	mmc->mmc_rx_ipv4_hderr += readl(mmcaddr + MMC_RX_IPV4_HDERR);
+Aaron Conole (7):
+  selftests: openvswitch: add test case error directories to clean list
+  selftests: openvswitch: be more verbose with selftest debugging
+  selftests: openvswitch: use non-graceful kills when needed
+  selftests: openvswitch: delete previously allocated netns
+  selftests: openvswitch: make arping test a bit 'slower'
+  selftests: openvswitch: insert module when running the tests
+  selftests: openvswitch: add config and timeout settings
 
----
-base-commit: 0dd3ee31125508cd67f7e7172247f05b7fd1753a
-change-id: 20240216-stmmac_stats-e3561d460d0e
+ .../selftests/net/openvswitch/Makefile        | 12 ++++-
+ .../testing/selftests/net/openvswitch/config  | 50 +++++++++++++++++++
+ .../selftests/net/openvswitch/openvswitch.sh  | 33 +++++++++---
+ .../selftests/net/openvswitch/settings        |  1 +
+ 4 files changed, 89 insertions(+), 7 deletions(-)
+ create mode 100644 tools/testing/selftests/net/openvswitch/config
+ create mode 100644 tools/testing/selftests/net/openvswitch/settings
 
-Best regards,
 -- 
-
-/^JN - Jesper Nilsson
--- 
-               Jesper Nilsson -- jesper.nilsson@axis.com
+2.41.0
 
 
