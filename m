@@ -1,166 +1,147 @@
-Return-Path: <netdev+bounces-72228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1AAD85722C
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 00:59:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5D19857232
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 01:05:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E62ED1C22F92
-	for <lists+netdev@lfdr.de>; Thu, 15 Feb 2024 23:59:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A769283317
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 00:05:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50774145FE3;
-	Thu, 15 Feb 2024 23:59:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9A32624;
+	Fri, 16 Feb 2024 00:05:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="etbRRQqC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IR3cI7bt"
 X-Original-To: netdev@vger.kernel.org
-Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01olkn2010.outbound.protection.outlook.com [40.92.107.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B98E145324;
-	Thu, 15 Feb 2024 23:59:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.107.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708041572; cv=fail; b=qkSUMKs3r1qft+8u+E8yvB9yYTFoVVT9hWpS1a7dbMPOBWGXXv+kkdXylQvp+lWb10X8LrupnFt2mlv9lxeoqOX6TSaMhof0/Mo5kbLHD4YGf0TwIq1B3PVLmIL+o/rsXwY/p8s1udPJApuodGCE6xygwOG65Nvab1+L+dIRqMc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708041572; c=relaxed/simple;
-	bh=clGF3tjChdBSqT6SCEngpatyNxzb14g5o4HuhMeVcY0=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=o1bQZ7SBjha36pxsbHJ+HDmj74A9R/YmbENDCbzzUiJrF4wVAGSxp7Jg61bpf24/gzXIdTFmb/9vgVeP2xJc99JGCM81YlO4P8agDbi1EAZNTM8OQk6IfXl0eExy3QoKzx2qlPImVjkqIH5UOxb1UzqHtzL3zFYYd71aLms5Xo0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=etbRRQqC; arc=fail smtp.client-ip=40.92.107.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CiwIdCtZkbjjrNgC7ZLmAt+UiazciLLZd+dWT+t4Bs+JRXbGMyVAUspgvY054XWEW18qj+AE78ex6STk8bCTNyAdZnOSFIBxCiV8EhIPjph/aGrQth2kIPfTfXFp4wkD0eJw45uZP8cHFbX+Dhu8flZuQmbInsWi7RkQUgwtE6o/T1l/Pqf49eD3fhC4NLPFgVQM9tFbbL4RY8XpwzDfm3rZ6Am11PrmigDcqLn5qANBhJQA1dlOSxUPIgHyhJe/IcnPBquboPAuMgxv8nQDE/wNkFU9zTDQFMkqt0pHs99BKwD3WY2m6nqsGDnsYfNhM3N/EoYn/nOj4jk2o9zspg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XxlJ8AJW6ElPohuO/zw1b6TZQbuF/7fyb34xrwPxyuw=;
- b=GxK6tXAJeCPvsGFYslwLVp1r4C3j3kTbLd4o3987PuXnBufFmHYnhEBpl4hKyr2/4/zpIgjq3IhQIft/larSfiU4xoY6lsvDeD1xV2TTJceSIQ6me2Rr+xna/dR+dXVlPaMQI/z7LL0+5MNeYX0UfCuA+MYaxJufUxPm5qrj7xRqvbsawtWV6bcxbXLoiAbAmzLr+8hRkrvSm1FMuTvOhKCkXCUj3BZgfJlopYLb3Z/lSLuItR7aY3YGees6bSVuObhnGsHGknH0WGPFeYR8fCJ5aSF8bInJwqxQAh7tiRVH0rSmTT0XKVNbmOIbYaMbiQfKuJDFYKH1e+JOxCWMfA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XxlJ8AJW6ElPohuO/zw1b6TZQbuF/7fyb34xrwPxyuw=;
- b=etbRRQqCj49DYZCqAhvZsz2cA8/Pjur34OuhTbWTQCcjc4xMKjuaXxp/Oibiq+5h2/yDkuulW9fDhU75Gk/WgSCe/rYKuFd/Bc3Dn69HIkLaaNXJQA2L4c2ISOyJo3w3cLhnH+pb2itEM9VmZLbzIpYfKalq6jlf4WDhqbJLnHFRtWzQxizo+4zusobOusZyDYr4kdr8tn2cpb1BjZeveQYKmwD6EVWha5EVTLxCbm0v0PP68GboCcIW/r9th1qBiISevpdrWyp3IbTGfbfyUdYnj8WHF0vnK1VjiDp5qj7e0RoN8FF8T5KFf95eXKGgnKHevhaV0wV836QvRQZqfA==
-Received: from SEZPR06MB6959.apcprd06.prod.outlook.com (2603:1096:101:1ed::14)
- by JH0PR06MB7470.apcprd06.prod.outlook.com (2603:1096:990:a7::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.26; Thu, 15 Feb
- 2024 23:59:23 +0000
-Received: from SEZPR06MB6959.apcprd06.prod.outlook.com
- ([fe80::9a6b:d813:8f4b:cba1]) by SEZPR06MB6959.apcprd06.prod.outlook.com
- ([fe80::9a6b:d813:8f4b:cba1%4]) with mapi id 15.20.7292.026; Thu, 15 Feb 2024
- 23:59:23 +0000
-Message-ID:
- <SEZPR06MB695972ECA5223EF5F81077BD964D2@SEZPR06MB6959.apcprd06.prod.outlook.com>
-Date: Fri, 16 Feb 2024 07:59:19 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/6] net: hisilicon: add support for hisi_femac core on
- Hi3798MV200
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Yisen Zhuang <yisen.zhuang@huawei.com>,
- Salil Mehta <salil.mehta@huawei.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Yang Xiwen <forbidden405@foxmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
-References: <20240216-net-v1-0-e0ad972cda99@outlook.com>
- <20240216-net-v1-1-e0ad972cda99@outlook.com>
- <c00dad08-00f5-41f0-861c-cb40593b49fd@lunn.ch>
-From: Yang Xiwen <forbidden405@outlook.com>
-In-Reply-To: <c00dad08-00f5-41f0-861c-cb40593b49fd@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TMN:
- [9kTsuTuzqBIQjatx5eZv4zhGYeVPOP80uD9c6hV2o5z9iA/u4k7qE8KJETfk276A20iWQo4ho6I=]
-X-ClientProxiedBy: TY2PR02CA0036.apcprd02.prod.outlook.com
- (2603:1096:404:a6::24) To SEZPR06MB6959.apcprd06.prod.outlook.com
- (2603:1096:101:1ed::14)
-X-Microsoft-Original-Message-ID:
- <eed0e226-aea6-4574-b85b-4ec4bed17c9b@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36FD0170
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 00:05:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708041912; cv=none; b=Vmf1a7v1MIOpVb+Ozi0GJp0xSKvK9PGRoB+adXZA1OGsqx2bnJ9rfddpfnA01QXDi3syeSaxVWzn5Ln0mkkURwL4pAVK+UvceUiKe5zJLi9CsEDz9xbNKxqkQruKPOLtmUnsIwmKyHRlClu+dNhFBh1CzXl7IUEyRJo9flxMxcI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708041912; c=relaxed/simple;
+	bh=LoOnC4FQRv0F/O+cUjwXbOIDhDRls+e8GzdMRDc8KhE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EYbYGZSf0uJnKcifrlbGxmr39HEEguKAUSkExEZ1XNbARZL0HToDRhsPO/+UlIbDktI7M9qYr2geDwU+T0CBTCpKHtgdkpsySVu7SHlIPVLGI5RqQrAUOpw8wwlTnTu5kMIUDmXnOkfIpOul+ArTnDnQzTu2w0oWxcIapiuOOdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IR3cI7bt; arc=none smtp.client-ip=209.85.222.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-7d5fce59261so863635241.3
+        for <netdev@vger.kernel.org>; Thu, 15 Feb 2024 16:05:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1708041910; x=1708646710; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=diXWtKNJBAfA4PgnFo0WoPDjp1XguB77YFwSlLLsiFQ=;
+        b=IR3cI7bt53zqM6Rc7R51ECix2OD1Bni9dQscoOPEc91+WbeHHbF3BCKuMNlasG/U4U
+         OwGBqeehAdnI5o+KOfuLE90YqX2QiLNHIozy4XyBdQwCjftvbbNkKnC3C5MUUpf35MA/
+         EonINoUytCJwydT/Bt33pRiYJ8z+OGM00rPJUwOTMTzZRAlWX4aM7mbLwkm8rrPs/XqZ
+         pGiu0YHAl+h7ferrSZGBT/iHOpbLNGzfwzUvyuDzebALNlQxVrjRA0l8BNkvqh6hK14y
+         NKwp4TSXgA0LgRim67alJuaPLOly6jjXQYe+KlEfEv08q0nLMrnze/MBx9UBx7rPTRvJ
+         nM6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708041910; x=1708646710;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=diXWtKNJBAfA4PgnFo0WoPDjp1XguB77YFwSlLLsiFQ=;
+        b=oNTvCkqktfXfEy+Zz7qP+oWGpHEeOJgOuVEXnxsHsFE3SQEHyz/L43/SwLa6NvCvHa
+         Wb/g1RoA7ogxkwx0RwWUJOHVs0nCNSYLAsbIgvwpv18yJXFC+X9TnAywvTXMqkFiO6aM
+         yaWqH/RAYh7se6s0rQ0vwNTbul55YJzY0LBbGouoZP8bwrIG4d96uFSiyq9+mU80Ad4I
+         3XqPx06tu8J2pjKAzfS23ruTVMtxFtnjoRmug+Mzc7vdMf27wht2ATWk1uXmqvMRhz8G
+         9GugBbehbVhlV5WrlYJaXVxAs6SC7X2iMflRS5K0xlTlIi5rVaVSs7u21qR1Eh7MAgJ3
+         ka1g==
+X-Forwarded-Encrypted: i=1; AJvYcCVBh1ocKw0ULl98kZJszqpgmo+4aJbp2gFubD00iA6HaIWp6Hy5SHbEm14MCUPhWHiv4the59FGIXcsrGxfz2NRszE6ZN4a
+X-Gm-Message-State: AOJu0Yxyarw3b9KSPfIqpDlP+7/aUyvxgaNOzOuux6fvSVcKxB8B/vaj
+	V003GnFH6Zj25NPXllwz/U+ij9KIClzrOCh7RvwWUv2R3vdXciVXrAGCvh0HtYtupNSvFFjrhGa
+	0UIKQcponO3cjk3ET8bJGK6fBSRBn1wbtMzlv
+X-Google-Smtp-Source: AGHT+IFIplzGzmriL1xaco+Og2hYr/egwhzq10LIBoz2G6IYXCZo3nz2w4ZXagy0mqXn2T0wS9sEvcT0l7HtxNN29lo=
+X-Received: by 2002:a1f:edc1:0:b0:4c0:2181:81ac with SMTP id
+ l184-20020a1fedc1000000b004c0218181acmr3240323vkh.14.1708041909812; Thu, 15
+ Feb 2024 16:05:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SEZPR06MB6959:EE_|JH0PR06MB7470:EE_
-X-MS-Office365-Filtering-Correlation-Id: fd06764b-5322-4b71-bb04-08dc2e8221f5
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	G2HjaBn7QmnLIwASG7Qhy0wqSTUW87jl0XCUPx3ry40G0Tt9mtx7F5QMeMqHH+2WuUKCd3mn2pwBUu7IYzzVTEhoWQHIov6AVAv4OWTkGl9ta3DgHuwvbwSpwRrZvT2fAKVy9YG8rXRnIcAY8EdcT8xS1WYEGeepmuZ/RW7gBON5QjlweuV6LPWLfQjoeAA9scpZbDbTbCzRVbr4ucIxeoA4CvAlPipBGPD86yXQUF9zsunZnGOfEMbhFr7udqRgqtd4FQ0PIeRhOLWZpxzr3mX6nO7wwIjCJINHmYvuauxUaLSiRhQNY+X25Wir06mWkBCAWPW8hKaJz0Lyo5GQm9ItFenNoMD1ZMVt7YV7b199iFKE0IDpo7c1Esf7nTgBJxI9ajjzBLflN5K59VIbAiM2YqKVH+JodFRSYxHSEMY01o32kAQdfMMiRdh+KrRjMW9bOq2MhkTJJzpQOSEkc1oiRbGWVijyzsKAJ+hp2h8N9XltOAzv1QpG87rC4IRQKDaotdJLy9QVQPN50nMjGsZQoxhlBRnQxEgRxpJZb4dXTMVBA/5ceDUfpK8HGVmp
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WVV5bFo4cXg0UTNpbVdNeTRLL0JNSkpFY0VSSW1YcGhKamdoOE9SS2djVUgv?=
- =?utf-8?B?UU9jM0VGYS9hYlJGVTVWT1picHI3UmRwNEpVcWFxQ29nRXNRdDdjd3FSdlNZ?=
- =?utf-8?B?SW14bzBaN0cyQUZJTVlkZENxSW5ZWFIvcXpUaWtkaEc5YkdxMjcvczhzRlRQ?=
- =?utf-8?B?MnRyV05qNTF6UjVraVc0cEFrY05kbE1GTldTQm5tWkgwaTA4SHlTVDVUQ2FN?=
- =?utf-8?B?czVNZHBmbVlNL2lxMncyUkZMUHFRZkFrOGk3eUpta3BsT0lXUWwzMC9LN3Fm?=
- =?utf-8?B?Yk16Ymk2bWYrT2Nwd2hoaDFkT2dweDVBVDdwcFVjejJtU28rRU9KZ0FKS2Vm?=
- =?utf-8?B?M1Arb0hMR2k3U1kxa0pFVXVuUWlmamlLKzVRM1FicG96eU8yek83R1IzNmh3?=
- =?utf-8?B?UXp0OUZSWk1BQkd2c0VGRUt4cmFSNGExMkFrOG85bWVRMmdJN0VZV1ZUTno4?=
- =?utf-8?B?Nmo4dHZzbFAwVmNqS1hqcWtrMzMweFdHNXZ6bXRNaU8vMVVFRENad1lsWHpK?=
- =?utf-8?B?UEJZZkoxcit4QzNpbjIwVGlBdW45dEJXOG1JSVBqdGs5SEQyTlBkMlA1RWw1?=
- =?utf-8?B?RzllSnQ4WTJVL1FuTU9Zd1JKSUtJV1RrUHFYeHZsRnM4blJUNzR5cTZoYU9C?=
- =?utf-8?B?ZXZVK1dzTlEyaHNabnEyWlpiZk9HcWh0MUF1czBrSWV3eVRveVhNMUZXNTZN?=
- =?utf-8?B?cWQ5dTQyVmdCWlRjYy9VQXNYSkdYY1hMU1NtWkxaWXRXK0NXRUNiSWVrelRp?=
- =?utf-8?B?ZmFEWnlDVFVZQ21OMGxYSkhOUk1WWnRsZVYyWEpXZzk0Vng3a3pVNnhMMWNs?=
- =?utf-8?B?RnZHQTAwYVR6ZUlBWjFpV0lIRTROMXhORVptRnN4bExPS3BvQ0xEQXZtQjdk?=
- =?utf-8?B?YW5wNUI4ZktJVlJualAxd29YWHJUUmJQUURyQ29ERzk4R2Z3TDBQV2FEbExB?=
- =?utf-8?B?QldnZUpOT2xNS3JVQ1hCYWJKaUNmL284aEN6T20yZ0Y3bm84L1ZHeWhoOGtq?=
- =?utf-8?B?VVlpdDlmK3VrUytYNXVXTkFIRzFVcUg1N3FRbWRjZVkzeEt2dkZMSXA1bi92?=
- =?utf-8?B?d3lnbnJvYjFhVjhqN1dubFh1MWtSK29IeEZ4WlhGemZCakphQUg1SWVnQ1du?=
- =?utf-8?B?eUxtRjhtZGhPUlVHaXNubERBRlV6dTMyc3hORkgvRGdNUXlGQUFMQUlOeW4w?=
- =?utf-8?B?TURvM2czNUxnZXVvTjdleG4zeVlieFlFNk45MDJBKzFNUDk5UUdKRW5XUGVs?=
- =?utf-8?B?ajZmelMvaUFEdnAxa1ZqYlkremVJb0Rkc1lnNmpNQ2IzdkhRMENVVks1WFNI?=
- =?utf-8?B?WmpJdnBDSGlyd1psRTA4bDJkMEZlOWorS3BzcWtER2ZvR1YzRHkvVXhibVVF?=
- =?utf-8?B?bnE2ZThkb1NLUEo2QThEREp4dHBDOGpSRTZIUVFKUG5yVjJjTXBDRXc5c280?=
- =?utf-8?B?aUZ6RVJQNGFUdE43WWFpMmh5Z05md2xERjdTSDhzWlN3N3kyZ2k1bjZMSnda?=
- =?utf-8?B?aHBkQWs5RUhTNytHUERZeTl5SzRFMCtDWGw2cVVxYWNUSm9GZUVwKzYrbm1W?=
- =?utf-8?B?UzRud3B3dVZHRzFSSWVhdUtwTjIyS0tHemJLcmlnRkNRb04wYW9uZW9aQWNO?=
- =?utf-8?B?YzFwbU5SR0k5UkE0cVdmK04wZWR5VWhNdFpyRm5qNml3ZTBsdXoxTzA3bDNx?=
- =?utf-8?B?UHN3alJ5Wmlrdll1RWtLelBWeC9SYnF1Zm9WWVo2alZmNFQ1OHBvWnVyK3FZ?=
- =?utf-8?Q?ZaVqQ03VuXgtg7JR47hE8BzBWnSmyOa/blrewkE?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fd06764b-5322-4b71-bb04-08dc2e8221f5
-X-MS-Exchange-CrossTenant-AuthSource: SEZPR06MB6959.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Feb 2024 23:59:23.1600
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: JH0PR06MB7470
+References: <CADVnQykqkpNTfO30_aswZEaeSkdu5YNuKag++h-RSguALdeohw@mail.gmail.com>
+ <20240215201627.14449-1-kuniyu@amazon.com>
+In-Reply-To: <20240215201627.14449-1-kuniyu@amazon.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Thu, 15 Feb 2024 17:04:53 -0700
+Message-ID: <CADVnQynSy8V9etoiL9jLMgqAdGwbLXnCYia4j3pp60pxbdg7zA@mail.gmail.com>
+Subject: Re: [PATCH v1 net-next] net: Deprecate SO_DEBUG and reclaim SOCK_DBG bit.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, jaka@linux.ibm.com, 
+	jonesrick@google.com, kuba@kernel.org, kuni1840@gmail.com, 
+	linux-s390@vger.kernel.org, martineau@kernel.org, matttbe@kernel.org, 
+	mptcp@lists.linux.dev, netdev@vger.kernel.org, pabeni@redhat.com, 
+	soheil@google.com, wenjia@linux.ibm.com, ycheng@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2/16/2024 7:57 AM, Andrew Lunn wrote:
->> +	for (i = 0; i < CLK_NUM; i++) {
->> +		priv->clks[i] = devm_clk_get_enabled(&pdev->dev, clk_strs[i]);
->> +		if (IS_ERR(priv->clks[i])) {
->> +			dev_err(dev, "failed to get enabled clk %s: %ld\n", clk_strs[i],
->> +				PTR_ERR(priv->clks[i]));
->> +			ret = -ENODEV;
->> +			goto out_free_netdev;
->> +		}
-> The clk API has devm_clk_bulk_ versions. Please take a look at them, and see
-> if it will simplify the code.
-I know this API, but it can't be used. We need to control clocks 
-individually in reset procedure.
-> 	Andrew
+On Thu, Feb 15, 2024 at 1:16=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
+m> wrote:
+>
+> From: Neal Cardwell <ncardwell@google.com>
+> Date: Thu, 15 Feb 2024 12:57:35 -0700
+> > On Tue, Feb 13, 2024 at 3:32=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazo=
+n.com> wrote:
+> > >
+> > > Recently, commit 8e5443d2b866 ("net: remove SOCK_DEBUG leftovers")
+> > > removed the last users of SOCK_DEBUG(), and commit b1dffcf0da22 ("net=
+:
+> > > remove SOCK_DEBUG macro") removed the macro.
+> > >
+> > > Now is the time to deprecate the oldest socket option.
+> > >
+> > > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > > ---
+> >
+> > I would like to kindly implore you to please not remove the
+> > functionality of the SO_DEBUG socket option. This socket option is a
+> > key mechanism that the Google TCP team uses for automated testing of
+> > Linux TCP, including BBR congestion control.
+> >
+> > Widely used tools like netperf allow users to enable the SO_DEBUG
+> > socket option via the command line (-g in netperf). Then debugging
+> > code in the kernel can use the SOCK_DBG bit to decide whether to take
+> > special actions, such as logging debug information, which can be used
+> > to generate graphs or assertions about correct internal behavior. For
+> > example, the transperf network testing tool that our team open-sourced
+> > - https://github.com/google/transperf - uses the netperf -g/SO_DEBUG
+> > mechanism to trigger debug logging that we use for testing,
+> > troubleshooting, analysis, and development.
+> >
+> > The SO_DEBUG mechanism is nice in that it works well no matter what
+> > policy an application or benchmarking tool uses for choosing other
+> > attributes (like port numbers) that could conceivably be used to point
+> > out connections that should receive debug treatment. For example, most
+> > benchmarking or production workloads will effectively end up with
+> > random port numbers, which makes port numbers hard to use  for
+> > triggering debug treatment.
+> >
+> > This mechanism is very simple and battle-tested, it works well, and
+> > IMHO it would be a tragedy to remove it. It would cause our team
+> > meaningful headaches to replace it. Please keep the SO_DEBUG socket
+> > option functionality as-is. :-)
+> >
+> > Thanks for your consideration on this!
+>
+> Oh that's an interesting use case!
+> I didn't think of out-of-tree uses.
+> Sure, I'll drop the patch.
+>
+> Thanks!
 
+Great! Thank you!
 
--- 
-Regards,
-Yang Xiwen
-
+neal
 
