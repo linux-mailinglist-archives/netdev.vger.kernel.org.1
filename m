@@ -1,148 +1,117 @@
-Return-Path: <netdev+bounces-72291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9CA585777F
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 09:22:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16D2A857789
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 09:23:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 209F1B22F9B
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 08:22:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A0421C21139
+	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 08:23:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 774E31B946;
-	Fri, 16 Feb 2024 08:15:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0DAB1BC39;
+	Fri, 16 Feb 2024 08:19:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="3Lphuj25"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="HZFkTeAD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3730F1BC20
-	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 08:15:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1101C69F
+	for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 08:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708071339; cv=none; b=sW1yNXUnS9kfk9O8hdRVWFzyInE9zHpqTa4H6jEMMa1U2OzMMy1Fnz8mGDVf66gYjFETCEWMeY7e3hRxOGDZPcb0mZOqVPvTWtKn+6ZUi0uVtkk1/5MjPtD28E4sqi26Xn0lEA5dKDpX4fLJdjhnYu2DzJ2w4kvz9tiIcEWV69I=
+	t=1708071581; cv=none; b=MJci5MyOLBL7H1vkaZVe3RbjVliJa1eWTZQpDsdKlMnIp7DSdJ1boAvLzZNPmur437JIbi+wBd3wS4Jaw8CjME4TCT+qNUQa188Y22jiJ0+hQ984Z1yzdKzy/OQ3d6jxr0uSkde85zH3K1bxfK3YnP8UGhX+R1h3sr/FOmX3fGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708071339; c=relaxed/simple;
-	bh=3L/hz/lf/7MFoLStZYx4UGhXUVHf0EGVI7Cc7cl5eKw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ObcMZhiYO1IjvED94c1/gKEgyIanMHZV7GNvCNqBVC3Rv9bf1S1qltN0PsxVDYdlhHvDbYGH5Q/miCVOEwMC13U6OOoD9MDaXe6mAUn9xy1EHCrXmkgnZL8UUQRlc8dVQxpN/nySZeWjP8kKG1Q1nqrNNeJMcXLNuzCtOFM/9Yg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=3Lphuj25; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-339289fead2so990631f8f.3
-        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 00:15:36 -0800 (PST)
+	s=arc-20240116; t=1708071581; c=relaxed/simple;
+	bh=9hgz5+EFxfUIpB+WnRkb79eXsnxvdlyUvB3WaEPxiUQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CEhBftiVmj5sLOpXZCGfP4MynMNx80qv6V1YFaa4nx7UXp4LQX2W/vKSrUqQUnLMYlDi9Z5TYV4PIqCFVI7Jf+uG1IzQF48/PRYS19SFiEf4QZf5UiEL6/lj/xtGZc9cucM+L9AQfdw3ZKgt/zdrsEALITxAJIoPRRritROT6MM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=HZFkTeAD; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+Received: by codeconstruct.com.au (Postfix, from userid 10000)
+	id D19142014A; Fri, 16 Feb 2024 16:19:31 +0800 (AWST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708071335; x=1708676135; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GL4WmqvqiSIskyW4xR+Yk3Ow1yO5qB6abu8KWxhW6lM=;
-        b=3Lphuj252zshFsxhjVlArkfrhkuBMQyhGGt+zBP+lLBCC9tKK07xeA8ICXThZ09EhG
-         DVrnGIdHLYXtMNTkIVGz+GyP5Lz/KMp6Ib9KDtEIOCxstRx5SlgpiKmqZQJL+Agvj6TZ
-         BFWAB3zEqlAwivNnalpZUSFxddvujBHniFm5TO730LD5n5+jpi2D0yLB2cGz/Zh/FwXE
-         /F5DiPvBX7yztogum16bPqBfz67WBx1NgcMTBZpqtZkYjLykbzce/MhEYySk96ycL4V+
-         kxXvxmDC94tICGCJbyDcSqt99Twdo+NagnmpT/zv4A9KivgUAz7WmCiLeBA3ynqodUko
-         RN3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708071335; x=1708676135;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GL4WmqvqiSIskyW4xR+Yk3Ow1yO5qB6abu8KWxhW6lM=;
-        b=tBLj2WOZa7taqAuHl6tBrKr2UttTRZ95KZ/y3bw7p5y5gFoMBOmrvEaEu06jl39Z2U
-         fafctHOG3jr9A8PZClIpNFMVL/ufV85dSi6SzYItZCwsL0wOrbMzuOKn5ykrbZCefwXs
-         ULM4NtzIwwvl8eqHbl4Zm7LNRugS9/cABrSBRO8rMT4iaE5x8JfMUvQnhSAC4Q09tjwG
-         WMV8HiIDaJeKH4dqyDp8vGgH2lVhY+J6GvCaT6eXVhapWTRX164spcqQqtB09A2uwjzS
-         e31BW9gG7A2oUOuXUvz6tMSGQNq5eQitkz8Ne8S3jpig7eKSLwyzuAUcCL0Macv0mX5u
-         YISQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWlsbGFD5eYeo1TDhUo6UmhzApaWaQ90xrXE72q+dGyi4aAJ5bSDT3hYZkLV/o9tpZyKCsW8VfjUNNY+ULLqhAmENRPJ0iQ
-X-Gm-Message-State: AOJu0Yws3oyc9kgAFrvm0lvluYCjQAYLhnrDXhVl2IG2WXvUx3A+wHX6
-	28teUAUVI6H1KlPSKPVTQQ2GTQwPJcBv+KczsDZG7OPUtSBSJU0De2Qsmpupnbk=
-X-Google-Smtp-Source: AGHT+IHv3//RnTodpaQsMEJGkv4jyxWYdYjIp5FFAbcGwVYWV0We3jDvSurl+nxeBOYudt1DGkgI4w==
-X-Received: by 2002:adf:f892:0:b0:33b:2300:9cdc with SMTP id u18-20020adff892000000b0033b23009cdcmr3590635wrp.46.1708071335111;
-        Fri, 16 Feb 2024 00:15:35 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id g1-20020a056000118100b00337d5cd0d8asm1457101wrx.90.2024.02.16.00.15.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Feb 2024 00:15:34 -0800 (PST)
-Date: Fri, 16 Feb 2024 09:15:31 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jacob Keller <jacob.e.keller@intel.com>, William Tu <witu@nvidia.com>,
-	bodong@nvidia.com, jiri@nvidia.com, netdev@vger.kernel.org,
-	saeedm@nvidia.com,
-	"aleksander.lobakin@intel.com" <aleksander.lobakin@intel.com>
-Subject: Re: [RFC PATCH v3 net-next] Documentation: devlink: Add devlink-sd
-Message-ID: <Zc8Zo0rCBzmGqTLf@nanopsycho>
-References: <20240131143009.756cc25c@kernel.org>
- <dc9f44a8-857b-498a-8b8c-3445e4749366@nvidia.com>
- <20240131151726.1ddb9bc9@kernel.org>
- <Zbtu5alCZ-Exr2WU@nanopsycho>
- <20240201200041.241fd4c1@kernel.org>
- <Zbyd8Fbj8_WHP4WI@nanopsycho>
- <20240208172633.010b1c3f@kernel.org>
- <Zc4Pa4QWGQegN4mI@nanopsycho>
- <aa954911-e6c8-40f8-964c-517e2d8f8ea7@intel.com>
- <20240215180729.07314879@kernel.org>
+	d=codeconstruct.com.au; s=2022a; t=1708071571;
+	bh=bXPLzqTSwCC6KKTJNk6uKWBVqPZ8x5kT8VRXK4ya3FM=;
+	h=From:To:Cc:Subject:Date;
+	b=HZFkTeADko5VBMPa2OqP3jzCzmxFSHQk/t/siCFhGei9zW2MBm4qGSxuTk0W8pFkL
+	 MndyQLA+VenD/XYJZ0vcQ9PGLadtRcibNdo09I89XWi45jP+DeBmiNICyeY81MVUS3
+	 WZNJ5amIXJG5DXMyx+uW4q/UbjIcZ0Sp1mgvC8a8RIzpemE6QusiqPa+QFmUN87sxo
+	 K0DZ1mlqn1bUADpltnKpTb2hMRfbO1LZcKXY6LYplE+tKXIEQUX8Ce82zaQeVuirxs
+	 Em3vLhIHV5eNtRN7qA3BsWOSVOFizURyC7r8QyYBXDP0bJO3Zzhi+TKKTtMcRl6jLh
+	 P5peBkOOyS0kw==
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: netdev@vger.kernel.org
+Cc: Matt Johnston <matt@codeconstruct.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Liang Chen <liangchen.linux@gmail.com>,
+	Johannes Berg <johannes.berg@intel.com>
+Subject: [PATCH net-next 00/11] MCTP core protocol updates, minor fixes & tests
+Date: Fri, 16 Feb 2024 16:19:10 +0800
+Message-Id: <cover.1708071380.git.jk@codeconstruct.com.au>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240215180729.07314879@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-Fri, Feb 16, 2024 at 03:07:29AM CET, kuba@kernel.org wrote:
->On Thu, 15 Feb 2024 09:41:31 -0800 Jacob Keller wrote:
->> I don't know offhand if we have a device which can share pools
->> specifically, but we do have multi-PF devices which have a lot of shared
->> resources. However, due to the multi-PF PCIe design. I looked into ways
->> to get a single devlink across the devices.. but ultimately got stymied
->> and gave up.
->> 
->> This left us with accepting the limitation that each PF gets its own
->> devlink and can't really communicate with other PFs.
->> 
->> The existing solution has just been to partition the shared resources
->> evenly across PFs, typically via firmware. No flexibility.
->> 
->> I do think the best solution here would be to figure out a generic way
->> to tie multiple functions into a single devlink representing the device.
->> Then each function gets the set of devlink_port objects associated to
->> it. I'm not entirely sure how that would work. We could hack something
->> together with auxbus.. but thats pretty ugly. Some sort of orchestration
->> in the PCI layer that could identify when a device wants to have some
->> sort of "parent" driver which loads once and has ties to each of the
->> function drivers would be ideal.
->> 
->> Then this parent driver could register devlink, and each function driver
->> could connect to it and allocate ports and function-specific resources.
->> 
->> Alternatively a design which loads a single driver that maintains
->> references to each function could work but that requires a significant
->> change to the entire driver design and is unlikely to be done for
->> existing drivers...
->
->I think the complexity mostly stems from having to answer what the
->"right behavior" is. At least that's what I concluded when thinking
->about it back at Netronome :)  If you do a strict hierarchy where
->one PF is preassigned the role of the leader, and just fail if anything
->unexpected happens - it should be doable. We already kinda have the
->model where devlink is the "first layer of probing" and "reload_up()"
->is the second.
->
->Have you had a chance to take a closer look at mlx5 "socket direct"
->(rename pending) implementation?
->
->BTW Jiri, weren't you expecting that to use component drivers or some
->such?
+This series implements some procotol improvements for AF_MCTP,
+particularly for systems with multiple MCTP networks defined. For those,
+we need to add the network ID to the tag lookups, which then suggests an
+updated version of the tag allocate / drop ioctl to allow the net ID to
+be specified there too.
 
-IIRC, turned out that was not suitable for this case by my colleagues.
-You have to ask them why, I don't recall.
+The ioctl change affects uabi, so might warrant some extra attention.
 
-But socket direct is a different kind of story. There 2/n PFs are just
-separate NUMA PCI channels to a single FW entity.
+There are also a couple of new kunit tests for multiple-net
+configurations.
+
+We have a fix for populating the flow data when fragmenting, and a
+testcase for that too.
+
+Of course, any queries/comments/etc., please let me know!
+
+Cheers,
+
+
+Jeremy
+
+
+Jeremy Kerr (11):
+  net: mctp: avoid confusion over local/peer dest/source addresses
+  net: mctp: Add some detail on the key allocation implementation
+  net: mctp: make key lookups match the ANY address on either local or
+    peer
+  net: mctp: tests: create test skbs with the correct net and device
+  net: mctp: separate key correlation across nets
+  net: mctp: provide a more specific tag allocation ioctl
+  net: mctp: tests: Add netid argument to __mctp_route_test_init
+  net: mctp: tests: Add MCTP net isolation tests
+  net: mctp: copy skb ext data when fragmenting
+  net: mctp: tests: Test that outgoing skbs have flow data populated
+  net: mctp: tests: Add a test for proper tag creation on local output
+
+ include/net/mctp.h         |   6 +-
+ include/uapi/linux/mctp.h  |  32 +++
+ net/core/skbuff.c          |   8 +
+ net/mctp/af_mctp.c         | 117 +++++++++--
+ net/mctp/route.c           | 105 ++++++++--
+ net/mctp/test/route-test.c | 413 +++++++++++++++++++++++++++++++++++--
+ net/mctp/test/utils.c      |   2 +
+ 7 files changed, 628 insertions(+), 55 deletions(-)
+
+-- 
+2.39.2
+
 
