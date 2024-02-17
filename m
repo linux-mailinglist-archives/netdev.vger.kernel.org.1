@@ -1,103 +1,128 @@
-Return-Path: <netdev+bounces-72619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B28F858D76
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 07:18:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B12F858D87
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 07:35:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B32C11F224C6
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 06:18:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 070AD282B07
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 06:35:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B26B51CA9F;
-	Sat, 17 Feb 2024 06:18:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B3E91C2BC;
+	Sat, 17 Feb 2024 06:35:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JiTvRVn4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PUalBi4V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 469E71B7E5;
-	Sat, 17 Feb 2024 06:18:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3974ADF44;
+	Sat, 17 Feb 2024 06:35:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708150714; cv=none; b=WkEklN9qChWzIlIbThPtF/TycrG7f2vX0bmFicx1w6rM68deHMLxCNq9MDCVHR+z+Rjk++TCFp6z9XMPhJSk74yROQW9ubgMoAkns3Jb4BBKoWafkPXzTPxRsbT1kOQDtC9DqPLY6GPnjwCGzQe02pPD/dXHwoeHKDGx0SIAOQg=
+	t=1708151702; cv=none; b=KhS9/UYcTPgsyQsttcZeflvpZRfMTc7XhzqnTdsM4ud5G2DEKJYnjX6x2g+UCc5qfRGGZLaVHLqtiZqBoXY9Y6lKpsLqskKcKK/bFVMaMINdMJD7UEjfyjz/77uX6FRTXxg58RLqsM4W/odxt0eTl+rKwLz247lHJ5bWAyKdObQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708150714; c=relaxed/simple;
-	bh=HDGjIiHl6JexBertXG8SmqhqLZJIWv57C2E5U+Ef8c8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fXGfhYeY7V2w6x7dm/ygOjr2mYJLJQkpozQe11mEhiQIdVzKNtcBQ+fWPbP1UHFGZttqr8rsHL9/nNQbjMWi1FP3JuVjPvE6glwcpzQNXOgytml9VANEClWgp7uR8tfUtMyPZVCcy38sr5UDoAe63UUcqthQ7eQLLPZaX7yVIa0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JiTvRVn4; arc=none smtp.client-ip=209.85.219.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-dcd7c526cc0so3054615276.1;
-        Fri, 16 Feb 2024 22:18:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708150712; x=1708755512; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=HDGjIiHl6JexBertXG8SmqhqLZJIWv57C2E5U+Ef8c8=;
-        b=JiTvRVn4R/mreZBNbyEpyjzBY3+IlXOsqwqGsvyQE1Vu4Ubs2cLUuCSjEnqikaOqiC
-         KY0qFBjxXgVAFLKP7fp2PG6r8p6y/Y8gswVzv9DB54+Fz9wp65dL981ekfhMo3ciVwuP
-         4K14lQZ39YHc8RTWr27YvHA5zEdRuiYQishQOpUfshNbDCamLcTZBeNd3IK7YPCtdPuH
-         TLFFTE/hFgDAq2kKX4INcUf3D2UaKAsst5PHyGsjlKd9nRLUYstVOhIL8jXOaigCy9pn
-         R4NKTpv1S8uUVZ44JbTQDx8vn6Yj4FWxBkc0WwPMCYfE9bRXQxpmQGjv3L0Ekz1DKjuI
-         4kig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708150712; x=1708755512;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HDGjIiHl6JexBertXG8SmqhqLZJIWv57C2E5U+Ef8c8=;
-        b=nMwzl6kpkrwZq/q8+mBeB1SEn32uHsF/Ufpc/nxxEP5cHrf1osyCTMWmWoEEquWJ19
-         0eTyDqyOb815pV5SXh09gIJDOARA7AVLaQ0+U3BYLTD10I90h/wn3fjqqKoEOVx4JdSF
-         4lk2OxOTWL9i6+MSi2sx/yLvjBWvBaF4/nd//0brYgXA7kf9Ic4V7wSCD3KBEdyjJa0E
-         BZyaQPvQfI4qB1kjd0fHAh+S1HKcz1IrPrEIyf4KMKeL89FnYLkM4+NYFRFsK0yZ/hYc
-         fI/emQ60ezF5cnYJHWOK8TvllqsP6aukjYwbDLJ0cJ28/4O3YJCMAfH4PN3mn9Goitt1
-         SR+w==
-X-Forwarded-Encrypted: i=1; AJvYcCW7ukEHWNmVNseyPJq2vQACFAtaL9n5qXfLsxgGGWKo5k083JE3u03E/UK37iztnAwHsu47ZXrN6F4c0yAWtfUhJ4dR5Q9h7hVBPPHEu6ZQDjOeGU3ck/cmT1HjToBmGsbKI4+EFaGhDJpA8z2Aajlpg9HtZfOG0wopFsfqfNW/
-X-Gm-Message-State: AOJu0YxXLpDbbnyid1jqVu/hpH8/0U+uEZTTY+1U3+kUDTfPfdRmGLIS
-	tgbAgFNNKCelMKayflxdc/bWEoOvO0jbrBJxT8o9GWu6CSQnmotXAPgeI4MauQwyMPuWnnQefwI
-	RoFPjRWjs2ZcS8hZYmGDIr2ef/iU=
-X-Google-Smtp-Source: AGHT+IHCh7huCKCOiKjghM4S6CgmsfthTmyxRgJc2uBOcAsh9Yi+EnV9V7BrFKj6FNlpMEtJpumjLDc02x1w5ZVLeXU=
-X-Received: by 2002:a05:6902:2487:b0:dc6:e5ef:3013 with SMTP id
- ds7-20020a056902248700b00dc6e5ef3013mr8370316ybb.0.1708150712074; Fri, 16 Feb
- 2024 22:18:32 -0800 (PST)
+	s=arc-20240116; t=1708151702; c=relaxed/simple;
+	bh=P9v5bwlS7CEx0RGF6l5RaEMQEbJkoeMSl0AVCOm8vZY=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=HLWqx8eysvc2DJCFXMh1MoLJeAm5dMzVZ2GkAzp4wFfPs5c9177WWC3khY2GDHtWZAYnKk6NpDNLcYDJEwE9SK9gpq3ZyFgczqC4yEHKMlLw1dkuDrcavW8nHdojWzNuqJD1p/KQLLcaM8icd+Scg85RvRSurzAXCbW+VcTesDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PUalBi4V; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3882C433C7;
+	Sat, 17 Feb 2024 06:34:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708151701;
+	bh=P9v5bwlS7CEx0RGF6l5RaEMQEbJkoeMSl0AVCOm8vZY=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=PUalBi4VP+acTF5G4CtuSGC3cR8sQbK3vDeWzN46QQLixXZLxuyUXwthX0sl9EHUf
+	 LpsdqZzpsOwOxRH2yD+qTppUTUgQpSLvZFiQFDr+s/glNQTDza4ujEzNd4pCrodZnh
+	 yDMnaOJgndboanGlyO53uXPVLI/apL+vO6VZAnbNkF1rgdngRR9+5zYFltwnFPJQAr
+	 crS5pF1cQ52gePqMPhy9D5jtr4rXQGmB7vDXDyA3i8lj11G0eOdB1QkcvahmudtwA9
+	 eJwEXWM05Jxj6HaI3LZpt0woUQjXrhmDdLHa9fJ+XBHqCuiiBz2v5n4PeZbD9mpVXq
+	 F7OZs8l+23rhA==
+From: Kalle Valo <kvalo@kernel.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>,
+    Jeff Johnson <quic_jjohnson@quicinc.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,  Luiz Augusto von Dentz
+ <luiz.dentz@gmail.com>,  "David S . Miller" <davem@davemloft.net>,  Eric
+ Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
+ Abeni <pabeni@redhat.com>,  Rob Herring <robh@kernel.org>,  Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>,  Conor Dooley
+ <conor+dt@kernel.org>,  Bjorn Andersson <andersson@kernel.org>,  Konrad
+ Dybcio <konrad.dybcio@linaro.org>,  Liam Girdwood <lgirdwood@gmail.com>,
+  Mark Brown <broonie@kernel.org>,  Catalin Marinas
+ <catalin.marinas@arm.com>,  Will Deacon <will@kernel.org>,  Bjorn Helgaas
+ <bhelgaas@google.com>,  Saravana Kannan <saravanak@google.com>,  Geert
+ Uytterhoeven <geert+renesas@glider.be>,  Arnd Bergmann <arnd@arndb.de>,
+  Neil Armstrong <neil.armstrong@linaro.org>,  Marek Szyprowski
+ <m.szyprowski@samsung.com>,  Alex Elder <elder@linaro.org>,  Srini
+ Kandagatla <srinivas.kandagatla@linaro.org>,  Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>,  Abel Vesa <abel.vesa@linaro.org>,
+  Manivannan Sadhasivam <mani@kernel.org>,  Lukas Wunner <lukas@wunner.de>,
+  Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+  linux-bluetooth@vger.kernel.org,  netdev@vger.kernel.org,
+  devicetree@vger.kernel.org,  linux-kernel@vger.kernel.org,
+  linux-wireless@vger.kernel.org,  linux-arm-msm@vger.kernel.org,
+  linux-arm-kernel@lists.infradead.org,  linux-pci@vger.kernel.org,
+  linux-pm@vger.kernel.org,  Bartosz Golaszewski
+ <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v5 06/18] dt-bindings: new: wireless: describe the
+ ath12k PCI module
+References: <20240216203215.40870-1-brgl@bgdev.pl>
+	<20240216203215.40870-7-brgl@bgdev.pl>
+Date: Sat, 17 Feb 2024 08:34:52 +0200
+In-Reply-To: <20240216203215.40870-7-brgl@bgdev.pl> (Bartosz Golaszewski's
+	message of "Fri, 16 Feb 2024 21:32:03 +0100")
+Message-ID: <87cysvd2er.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240212020403.1639030-1-hayatake396@gmail.com>
- <CADFiAcL+2vVUHWcWS_o3Oxk67tuZeNk8+8ygjGGKK3smop595A@mail.gmail.com>
- <8eb6384a82fc4c4b9c99463a6ff956f04c9d5e33.camel@redhat.com>
- <bad0da2c-546b-2e05-feea-d395439a0bb0@intel.com> <CADFiAc+RP91PfEBAnwbABjrHJkdLc0=nm3_TE=+ZaN1AiVQEEQ@mail.gmail.com>
- <b227037c-16e0-37b5-a5ac-cf8eb0d3556f@intel.com>
-In-Reply-To: <b227037c-16e0-37b5-a5ac-cf8eb0d3556f@intel.com>
-From: Takeru Hayasaka <hayatake396@gmail.com>
-Date: Sat, 17 Feb 2024 15:18:21 +0900
-Message-ID: <CADFiAcLo+3L1DVHaKpkPg8MXq=rDt6ykO==Q5hrW_-yV_mKbsQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v8 1/2] ethtool: Add GTP RSS hash options to ethtool.h
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Jesse Brandeburg <jesse.brandeburg@intel.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Jonathan Corbet <corbet@lwn.net>, intel-wired-lan@lists.osuosl.org, 
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, mailhol.vincent@wanadoo.fr, 
-	vladimir.oltean@nxp.com, laforge@gnumonks.org, 
-	Marcin Szycik <marcin.szycik@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 
-Hi Tony-san
+Bartosz Golaszewski <brgl@bgdev.pl> writes:
 
-Thanks for your reply!
-> Everything is good for now. If we have issues or questions we will reach
-> out to you.
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>
+> Add device-tree bindings for the ATH12K module found in the WCN7850
+> package.
+>
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> ---
+>  .../net/wireless/qcom,ath12k-pci.yaml         | 103 ++++++++++++++++++
+>  1 file changed, 103 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/wireless/qcom,ath12k-pci.yaml
+>
+> diff --git a/Documentation/devicetree/bindings/net/wireless/qcom,ath12k-pci.yaml b/Documentation/devicetree/bindings/net/wireless/qcom,ath12k-pci.yaml
+> new file mode 100644
+> index 000000000000..063c576b99a0
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/wireless/qcom,ath12k-pci.yaml
+> @@ -0,0 +1,103 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +# Copyright (c) 2024 Linaro Limited
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/wireless/qcom,ath12k-pci.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Qualcomm Technologies ath12k wireless devices (PCIe)
+> +
+> +maintainers:
+> +  - Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-Okay. Let me know if there's anything I can help with:)
+Jeff and me are the ath12k driver maintainers so shouldn't we listed
+here as well?
 
-Thanks
-Takeru
+Jeff, this reminds me that we should add you to qcom,ath10k.yaml,
+qcom,ath11k-pci.yaml and qcom,ath11k.yaml as maintainer.
+
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
