@@ -1,146 +1,109 @@
-Return-Path: <netdev+bounces-72650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08C6585912A
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 17:46:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68001859138
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 17:55:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9DA34B21853
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 16:45:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D3821F220EA
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 16:55:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B66537D3E6;
-	Sat, 17 Feb 2024 16:45:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F9C07D416;
+	Sat, 17 Feb 2024 16:55:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EHmDLqTw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MjRBOOk1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050967C6E9
-	for <netdev@vger.kernel.org>; Sat, 17 Feb 2024 16:45:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE3FD7D40F;
+	Sat, 17 Feb 2024 16:55:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708188353; cv=none; b=RrCh3wOS4cHxxWtXdzBXPhCaVpimV6Neu4MB5sWY9Z13KNWxJuyj6V/9LzqUGWvzu337SCwlcICWZLaztt0CylRbvN52jG5UxSEh9pgf9DAZzjzELBsAPCm25/cixiLIuhODM9cBxSzE8UgVm2e0C7EsCsHhmOSQZ8JBsXOQ+4o=
+	t=1708188922; cv=none; b=XSM+PgpP4TNlzEInKXvy8vuZhuc5EzRd6Z4paB4xZGutUqxAmHR4+hqKbrSWapPXzyRR5TwucabzICqOFs8gIacnIahymai3eq4ZGPqWHZoNDctQUh9EcLlaFvesn007MiSxgAPftDq9MXhGBUo3YECW2JnwSBWP6QCH7WRvdPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708188353; c=relaxed/simple;
-	bh=jnNx/uqfu3MLSSg6puGANl2kdnhsWwqi8IjbRuM06nA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Gl/TQ7R7qYpuX3B4xAGh9CcVJ2QHmwSngCKV4knmpXogQxJgNAghQeJxP2mqPKPtGXDQ/Drst1cXJTxM5ac/0eha1Mv3AuYgDGW2NUbyCU9yvXn8I+6mNw1fxEKZ+he/9ZYCzjL5SlEScBD+ZBsYB2TiqPBgYhPO281jB0wBz0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=EHmDLqTw; arc=none smtp.client-ip=209.85.219.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-dbed0710c74so1460835276.1
-        for <netdev@vger.kernel.org>; Sat, 17 Feb 2024 08:45:51 -0800 (PST)
+	s=arc-20240116; t=1708188922; c=relaxed/simple;
+	bh=8ebv9RjHbb+ATx+/pj6wfe0MacLYUX4hb804VnXVpeM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dEPeF3n6edPCQz5lALDq11MlgcoTaFa23ri6AeQ6PzTgKBl57mL/cVkM487uO2ovM/2XKgZ2YkvJXWEW+UK24va6kPZjkWND8D6A5o8ly91ZE7J+WQoYgBuwnCEpFNRnxy0as0cmzh7r0xKIUhGPijcOiJGFMB8HeSDBUxdI1U8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MjRBOOk1; arc=none smtp.client-ip=209.85.210.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-6e2f6c7e623so330162a34.1;
+        Sat, 17 Feb 2024 08:55:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708188351; x=1708793151; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=8b4mZDPM8eGHJ9kfKGWzDwm7bcatVceDQyS3pKcfyeA=;
-        b=EHmDLqTwYTX8oymXtAWA4HPpYtFTeD4plFX+mf3NEG17EgoGsCArVnmFpkE/LbPqZ8
-         6edlP36Hs5Z1588riiAocj6r89AmQcrLBzReJoiVHGTxsNX+lafl0R70MfTZLFJwk9v6
-         6e7vetaZfN+q8ICXViNr5jS3O1C6largIluLL/KsauPKUfxqYk5ALNsMdJaiYT7a5PnG
-         HWe56IJcQEFZeoUp5noFBnkIIH8HxKMZKReOiEl8szLuiOvhiWwbYx66OF9oDU9Eywer
-         0Skr/GWU6qKR/Q+8FeGuFXck1cKPJkEFu0hRs6Z6r1TElPI0z0w3z9cW7ZwGN2+X1zIh
-         IQNg==
+        d=gmail.com; s=20230601; t=1708188920; x=1708793720; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6N7H1dJxAdgtz17OJV7h2M/b32+Y0VMenOKk4p0Y73M=;
+        b=MjRBOOk1SyjRJHuLMgabToRrfnSCyTLy1MpfS0nW5E12NVu+tbEYSF8mQ8MnPptGgq
+         kJagE7BHVpvfK2ZHVgDs23B9OzGIhhpyWTxadzF+lA3hYdKVw1BpQ1KD39+LDP6GU+nI
+         q48UAlu6wHXCXGZgcUZjYtv8o6tO2K2qRea8W7PaIddQPvTLC6JqVRqJmJ7d4KUEmqtb
+         SnvzjtHY0kwW+j60VXre+sssf1IIJwvCgkszdKMm8+6N4MFp6QubYeAP2aUKaaHc0R08
+         1BCSjayJUccSq1KDYuo//tlTTqxC/qOicyd0P07lg10qiOizPengQReDS99nipzafs7g
+         kHbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708188351; x=1708793151;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8b4mZDPM8eGHJ9kfKGWzDwm7bcatVceDQyS3pKcfyeA=;
-        b=SLwAGyQw22l3hQdeStZLvfG8m8VCEq/4/D8iYoro2DnUl5q9pMvLAXhpLFSy06iyYz
-         oSmQ6ZMkFmnT5vykt6dXE91OlPiTT90wzrA/UMWQP0JNfnM0aBUzIq8sRm01Fv23xRkl
-         H3lRrg/pjvA7MkJ//sBSMbMOqxcYoKFYpdg9UC6HNKDySouHZebDxAK1BsQLR4PWE9JO
-         zuUOuW5tPTNdF2uaJot9wajG3AwtMcqO1vGOeDfPUDpnNoAJsXSeLTIh745aHEXDmIQY
-         eBWZfPUUWpjepjnzEGZosKaV3R+YQXx7Cov+R42yP7GGvnvNCmzAFxy/z7CHZq2FrhT5
-         MtuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVu24DUs/v5m5qlhDoXI0uCuKFMXaKQMCjZsnRPHXFgD8q/O9oTA64UfaoaoqRN6wxmzDbS53hEaWwzSYRyUL5dLktCvJTD
-X-Gm-Message-State: AOJu0YzJ5MWTyKb8skuqHqp/2NkY1a4Tmo7ySqffXQ8i+WykNOxr4ElC
-	k0rSnCfq1XPSvJHp77zU+Olvkzlz/rrSF6byF93zMNNPCaKTAARj3M7CyQWG3xHKXqsypoZ4sza
-	xW9JyXODlbhpZ9lJ+UUml83aAoBxYrMp/af0ONg==
-X-Google-Smtp-Source: AGHT+IEqILzoK/VmX6sfUGgYoxs+Kj6m9usmVnKhsv0jSGQKkMhWk4CcrhNvGz0Qw6T1QZh9IOG6jFOhIBdsPvVlWDI=
-X-Received: by 2002:a5b:18d:0:b0:dc6:d093:8622 with SMTP id
- r13-20020a5b018d000000b00dc6d0938622mr7622931ybl.15.1708188351064; Sat, 17
- Feb 2024 08:45:51 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708188920; x=1708793720;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6N7H1dJxAdgtz17OJV7h2M/b32+Y0VMenOKk4p0Y73M=;
+        b=iNBdTjHe64v+sBh9iCTXvdRllX0PoR6d/u+Lu8XmC9f4zadeA4dNdy0BcvDvwlup6q
+         ynoOorRCW/+TYpKYqPgcG0LoPf9HeEBy/mJu0AEiZ0MHCt+OpdybRy47caluSmqqO3mi
+         EfG5F0GYRUZsQTMz08ULu9YHacTV42GMcI+W15lRMWJEn+wZXtVrsV/NgVdGFuU6EEpb
+         peMub4Eeu7mDQwy4SOqKFNBtdQxsdh3bedyW5J2T2oMWsUv6VhpwxcEKuGXbHJvtgeGT
+         c4AAXGOqTxJLZED7CHUcp8PaKzjtNDmxojCF+U5C99mLqA2y/1/AQX20+fIgMNb1cl6n
+         ii9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXNWWHm0UhA1ZbCBkLGvjj9wjCmu9jZcRVSR2sL2d+hxfC/O1eQ2/0qoEKzAbnk7fzsCqAf0ClNRyff44Ihf55SRK35FhUtnTGnhtMU2vBHSJ1ZDEDg9gxsCt/S6qFjQDA1TuUm
+X-Gm-Message-State: AOJu0YziBmLUpyNC3w89xCls7N/ZeovenI1BKRmUIALmdQUHi755K0tL
+	OTN7m/leOHqoasf5+8fCDzu4j9Rb4ZPX7yoXn6Oi2sIMeIijF+P/
+X-Google-Smtp-Source: AGHT+IGbFFkZ2PWjmMxaXxYBlH/e83lIN7wTMd/FjXj5Co/BgIFwbdfXGResrmYNGntMpaORY52b2w==
+X-Received: by 2002:a05:6359:4595:b0:178:686b:900e with SMTP id no21-20020a056359459500b00178686b900emr5562703rwb.3.1708188919682;
+        Sat, 17 Feb 2024 08:55:19 -0800 (PST)
+Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id i13-20020a25f20d000000b00dcc620f4139sm771059ybe.14.2024.02.17.08.55.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 17 Feb 2024 08:55:19 -0800 (PST)
+Date: Sat, 17 Feb 2024 08:55:16 -0800
+From: Richard Cochran <richardcochran@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, sasha.neftin@intel.com,
+	kurt@linutronix.de, anthony.l.nguyen@intel.com,
+	jesse.brandeburg@intel.com, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jeff Kirsher <jeffrey.t.kirsher@intel.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [iwl-net v1 2/2] igb: Fix missing time sync events
+Message-ID: <ZdDk9AHE8svlNbbl@hoboy.vegasvil.org>
+References: <20240217010455.58258-1-vinicius.gomes@intel.com>
+ <20240217010455.58258-3-vinicius.gomes@intel.com>
+ <ZdDLI4o1Bll1xvH6@hoboy.vegasvil.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240122-ipq5332-nsscc-v4-0-19fa30019770@quicinc.com>
- <20240122-ipq5332-nsscc-v4-2-19fa30019770@quicinc.com> <7a69a68d-44c2-4589-b286-466d2f2a0809@lunn.ch>
- <11fda059-3d8d-4030-922a-8fef16349a65@quicinc.com> <17e2400e-6881-4e9e-90c2-9c4f77a0d41d@lunn.ch>
- <8c9ee34c-a97b-4acf-a093-9ac2afc28d0e@quicinc.com> <CAA8EJppe6aNf2WJ5BvaX8SPTbuaEwzRm74F8QKyFtbmnGQt=1w@mail.gmail.com>
- <74f585c2-d220-4324-96eb-1a945fef9608@quicinc.com>
-In-Reply-To: <74f585c2-d220-4324-96eb-1a945fef9608@quicinc.com>
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Date: Sat, 17 Feb 2024 18:45:40 +0200
-Message-ID: <CAA8EJppuNRB9fhjimg4SUR2PydX7-KLWSb9H-nC-oSMYVOME-Q@mail.gmail.com>
-Subject: Re: [PATCH v4 2/8] clk: qcom: ipq5332: enable few nssnoc clocks in
- driver probe
-To: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konrad.dybcio@linaro.org>, Michael Turquette <mturquette@baylibre.com>, 
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Richard Cochran <richardcochran@gmail.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZdDLI4o1Bll1xvH6@hoboy.vegasvil.org>
 
-On Sat, 17 Feb 2024 at 17:45, Kathiravan Thirumoorthy
-<quic_kathirav@quicinc.com> wrote:
->
->
-> <snip>
->
-> >> Reason being, to access the NSSCC clocks, these GCC clocks
-> >> (gcc_snoc_nssnoc_clk, gcc_snoc_nssnoc_1_clk, gcc_nssnoc_nsscc_clk)
-> >> should be turned ON. But CCF disables these clocks as well due to the
-> >> lack of consumer.
-> >
-> > This means that NSSCC is also a consumer of those clocks. Please fix
-> > both DT and nsscc driver to handle NSSNOC clocks.
->
->
-> Thanks Dmitry. I shall include these clocks in the NSSCC DT node and
-> enable the same in the NSSCC driver probe.
+On Sat, Feb 17, 2024 at 07:05:07AM -0800, Richard Cochran wrote:
 
-Or use them through pm_clk. This might be better, as the system
-doesn't need these clocks if NSSCC is suspended.
+> Does setting ICR.Time_Sync[TXTS] also clear ICR.Time_Sync[RXTS] ?
+> 
+> That is what you seem to be saying.
 
->
-> >
-> >>> Once you have actual drivers, this should solve itself, the drivers
-> >>> will consume the clocks.
-> >>
-> >>
-> >> Given that, NSSCC is being built as module, there is no issue in booting
-> >> the kernel. But if you do insmod of the nsscc-ipq5332.ko, system will
-> >> reset.
-> >>
-> >> Without the networking drivers, there is no need to install this module.
-> >> And as you stated, once the drivers are available, there will be no issues.
-> >>
-> >> So can I explain the shortcomings of installing this module without the
-> >> networking drivers in cover letter and drop this patch all together?
-> >
-> > No. Using allyesconfig or allmodconfig and installing the full modules
-> > set should work.
-> >
->
->
-> Okay, Got it. Thanks for the information.
->
-> <snip>
+Okay, so you really mean that if the _same_ bit becomes set between
+the read and the acknowledgment, then that event will be missed,
+right?
 
+In that case, thank you for fixing this more than nine year old bug!
 
+Acked-by: Richard Cochran <richardcochran@gmail.com>
 
--- 
-With best wishes
-Dmitry
+ 
 
