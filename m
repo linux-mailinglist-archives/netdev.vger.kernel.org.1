@@ -1,94 +1,126 @@
-Return-Path: <netdev+bounces-72701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDC4A85932D
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 23:45:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98562859398
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 00:23:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 658361F222D1
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 22:45:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4888C2813F5
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 23:22:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F2E57F7D5;
-	Sat, 17 Feb 2024 22:45:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82F587FBD2;
+	Sat, 17 Feb 2024 23:22:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="kzRoPuDU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S52fd1MV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2DCC7CF1F
-	for <netdev@vger.kernel.org>; Sat, 17 Feb 2024 22:45:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E53F17E567;
+	Sat, 17 Feb 2024 23:22:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708209907; cv=none; b=c3jaNVO9Re9PKdnYubSw/f3ods9FBFdn/F7w4zwEecuHmKG0N+WyWASMDL541iPeAYguNcxniy+eQ7viJqhZzkenvtSbgPzf11LWOTNhWxNBMysgUHJdaXvq3AoYQoF4nSyjZRXsZmzyr1no+iS1kMaW0EtkaBhD+qzvAgui/DE=
+	t=1708212176; cv=none; b=e6QDhNq+j0lRzBSTrBZ8adFhtoTLVTvqGFRyboGQIqmJlFIoL6J4yLf1DYr4TF2pnBcvQ0cRnJbXNttauJgyDl/ZZ1yngaSn9x4KFfUPVQoTB6lS2lGdck+0ffRZ7prWy7U/+6YE5gfbezJBS+1hLRr6fY0/5ua0YCENoqyZdXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708209907; c=relaxed/simple;
-	bh=urM+nLCqAhqOanY4utAYiFvmTeBTP9vM1GuLdCAu7dU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MB1SrMkxHnMW5yzlRwpn0Ep7Ylr/cYw1h6H6dbL0A7gW39jHcxZxkzKDlOxMCuUBckQ11uBfDcLdT3Xn5KOGyzyYLkOLU7oyqYIyKiyzf4CvmK8lMHd3/Xb5JX5f4DmIIP/+2fhHxjpvUddGuy41bDuYAvaTMURO9Xmn69PQcT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=kzRoPuDU; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-53fbf2c42bfso1721941a12.3
-        for <netdev@vger.kernel.org>; Sat, 17 Feb 2024 14:45:05 -0800 (PST)
+	s=arc-20240116; t=1708212176; c=relaxed/simple;
+	bh=a+QvVBjsGmqPcbi3qCCaAJe48zdumCLnTL6lnP3CrXo=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R6tOMRRKd4PBOVzcpY+m/5sMFrYA6EbhkL10gp7VFaYytWlg4t/+fGo0U8QzDk73ogSVsTU3jzbKDj+lVzOeACqHn5XP2zhvRTS2u+KjhEBB8uV7+P6b50yQgVx8hoOBz04WD+iMG/GLpwhlO8xUmWC7c3HDr3UYLOsQQIOE5+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S52fd1MV; arc=none smtp.client-ip=209.85.167.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-3bbc649c275so1720958b6e.0;
+        Sat, 17 Feb 2024 15:22:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1708209905; x=1708814705; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6zYveub7yYw/4yOK4qfAyNaSqjm09WW1iA3q80zNNrI=;
-        b=kzRoPuDU1k7WdDDWHWFIgd4yz75FvLnn0aJYYAL3SndOZpcv77XLMTIQHNuPvOVqat
-         7BW2yeWSAjm6YhG6dGfoN+Nvg3BpRWI50TU4gzN1WhHL9xk2ALAZZ+XWx2CEJGyT/XPS
-         Aiu1M30MDTXYfHh2xiIWjTJnyBDOVUQLOqN1U=
+        d=gmail.com; s=20230601; t=1708212174; x=1708816974; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=cbH9uymS/8c7/s6JqpxYO8BrELFkxi0FtyBb1T3F1as=;
+        b=S52fd1MVOILXemrpWPEJMFq8Q36eBLd/0k3ncgIyxnnJE+gXl+FJNJYnTAuuVuhf7D
+         QKR3P+3QtgXYpjTaQZpOlaRlkPp+w9yPzOWr088AtzQB3O0kMcppPjYCZ6lbKMpSzaAe
+         OPbFEgzeiA9CPK5IjUiXdyi/8FvArIS+G2XQ5RLFoW+2JyyWqeOAEBFbpJN6n0C/q/XM
+         pTWh+LCq0+SaAyo1DzcTJGIQgQECCTczl9Yh019KlC86DJoUtZ+LyAm+Taj9qabr7RX/
+         AQA6qtXoymnSys897laaAHjLc+wQEiNt9f3CFFP5I94/lwHVqhSniAlgqFjk4kQzOGbH
+         Bjvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708209905; x=1708814705;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1708212174; x=1708816974;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6zYveub7yYw/4yOK4qfAyNaSqjm09WW1iA3q80zNNrI=;
-        b=v8yEH5AHLqGWLkzG3EwSnfJ+rMDDsYcoC88Cn/eqZSqFUW1joEWsjPRrc51juZLvRB
-         ldWX4X6vVQctW4D5ENogUNOwtIvBvz2wdzH7YOh2VSMrjW3yOTvSZlQFsWBpUVN2UuBy
-         sU4IhjBpE8wWcQQG+gFnAj3c72TJ1T/nIQ8DxqplcBWMJ3LtxnSZpMHbneCcAOmI0rIm
-         EkaL5P18LK4GsXZwfTB699dVUgXOFauoakxF/pycLYsxpObIvaNk/Lw6hQiTzZAaG1Pn
-         9EOPu8uEMbbLXTVb4ZA+5/eIAsZVqWpQ3cMycGD8twFiZ9n8xmAMMSoj8Dl/tEhsGTFR
-         ct1g==
-X-Forwarded-Encrypted: i=1; AJvYcCWOSMa+H6kFc/izbqNLBKkl/AZZTB6Mw6rPkimf5sNJwYXJJMB3yHxnEb+l/rgP0eKInV7tNPsmm2Bn6MoaeoAqtS/0mpq0
-X-Gm-Message-State: AOJu0YzBpq29bU5uNLbA7+CFcFL3sPmeU1r+/g9RpjDfvxboykJWUGrv
-	hvlVMHHIEiHI7slbFEInxRyvs02T//jng3h/WL4sqAnrCeDr/xji8V+wjGZ11w==
-X-Google-Smtp-Source: AGHT+IGfBwCI/zJRAfkI3/3guXIHn5ScNJfsMg7yf6ZXenaRb2Xqpg5ydDYfgeE6X+Dq0UeBGs5IJw==
-X-Received: by 2002:a05:6a20:9c97:b0:19e:bca3:213f with SMTP id mj23-20020a056a209c9700b0019ebca3213fmr11331029pzb.52.1708209905129;
-        Sat, 17 Feb 2024 14:45:05 -0800 (PST)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id w3-20020a17090a528300b002990d91d31dsm2270321pjh.15.2024.02.17.14.45.04
+        bh=cbH9uymS/8c7/s6JqpxYO8BrELFkxi0FtyBb1T3F1as=;
+        b=hVOTA2pEdaXeEGWikLHPKTCmk0tf/q9VYEGVgXo9zriIK7iW/dIQjUlr9JJyLUWgjk
+         Mkskoe4chjuuy1lmMVMeSPqAdUi5VKssBMdfdloxZ/6DAULYNJtxBSJZvtK/lYLRQR1b
+         eVWf5iQVFHpYQED43mwWsa0q9yZXwdbeiAmjAMlGH3WkdG7sT7b89uApBxMTUQyoMzPK
+         Je4SHoCf+2Zg6hFsnmVbZ+5llmYJOdjuVSGkPE8tfD1ICOS0mdKx3BxylP8hKAbaCXaf
+         j20LJzexqobaAd89ipY7UStTIVxY4aL5khe5T8hXY2W3nZHk5NgMrDZw88hK1Ku91h3k
+         BxHA==
+X-Forwarded-Encrypted: i=1; AJvYcCVMhH6+MroJUWpcw1jBtBGnV1Tq17p2EOPLCsfsofTzHxq4DP5+Q/K/SffZFpDVDZ6PQQM84om4xDN4w4Y0dgCOfuWLiW9ZpS/4N/vOkix/6owiChGz3Iiwo5Lv49Ogogtv/T4taFYaLsMF26PLAoBcB/PJ1lpFfin98RgINGZ5ogFd8l79QlnpeS7OQZgTinKfU3fG4fWCgP/p/HRMrwN7x1Mi
+X-Gm-Message-State: AOJu0YyHbH3dbSHMt9ooDamFz6+ebOl5fRKXzKb3Hr3OluH8tNHbT12H
+	CPKqlHsZ4GrRGe7Kq+MsT+AHybn85vU8hJUem/EO2qBSzsNlm0kn
+X-Google-Smtp-Source: AGHT+IGQKGBOkmuDc5gI2jIBVXWXAkHQ3X9wz3V5z8Dx1FdEbbwkWxIBFI2JRf0mUeEdUoy2E0VubQ==
+X-Received: by 2002:a05:6808:2a4f:b0:3c0:3b90:ae1f with SMTP id fa15-20020a0568082a4f00b003c03b90ae1fmr7196758oib.49.1708212173842;
+        Sat, 17 Feb 2024 15:22:53 -0800 (PST)
+Received: from Ansuel-XPS. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.gmail.com with ESMTPSA id qm12-20020a056214568c00b0068c88a31f1bsm1518837qvb.89.2024.02.17.15.22.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 17 Feb 2024 14:45:04 -0800 (PST)
-Date: Sat, 17 Feb 2024 14:45:03 -0800
-From: Kees Cook <keescook@chromium.org>
-To: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+        Sat, 17 Feb 2024 15:22:53 -0800 (PST)
+Message-ID: <65d13fcd.050a0220.88fe3.665f@mx.google.com>
+X-Google-Original-Message-ID: <ZdE_xfQcwQ6hninK@Ansuel-XPS.>
+Date: Sun, 18 Feb 2024 00:22:45 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Michael Hennerich <michael.hennerich@analog.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"linux-hardening @ vger . kernel . org" <linux-hardening@vger.kernel.org>
-Subject: Re: [PATCH bpf-next] bpf: Check return from set_memory_rox() and
- friends
-Message-ID: <202402171444.C121486@keescook>
-References: <63322c8e8454de9b240583de58cd730bc97bb789.1708165016.git.christophe.leroy@csgroup.eu>
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Qingfang Deng <dqfext@gmail.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Kevin Hilman <khilman@baylibre.com>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	UNGLinuxDriver@microchip.com, Peter Geis <pgwipeout@gmail.com>,
+	Frank <Frank.Sae@motor-comm.com>, Xu Liang <lxu@maxlinear.com>,
+	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+	Andrei Botila <andrei.botila@oss.nxp.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Michal Simek <michal.simek@amd.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Wedson Almeida Filho <wedsonaf@gmail.com>,
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <benno.lossin@proton.me>,
+	Andreas Hindborg <a.hindborg@samsung.com>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Robert Marko <robimarko@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	David Epping <david.epping@missinglinkelectronics.com>,
+	Harini Katakam <harini.katakam@amd.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-amlogic@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-rockchip@lists.infradead.org, rust-for-linux@vger.kernel.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [net-next RFC PATCH 0/3] net: phy: detach PHY driver OPs from
+ phy_driver struct
+References: <20240217194116.8565-1-ansuelsmth@gmail.com>
+ <ZdEOpB1oVDE8+Qhq@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,22 +129,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <63322c8e8454de9b240583de58cd730bc97bb789.1708165016.git.christophe.leroy@csgroup.eu>
+In-Reply-To: <ZdEOpB1oVDE8+Qhq@shell.armlinux.org.uk>
 
-On Sat, Feb 17, 2024 at 11:24:07AM +0100, Christophe Leroy wrote:
-> arch_protect_bpf_trampoline() and alloc_new_pack() call
-> set_memory_rox() which can fail, leading to unprotected memory.
+On Sat, Feb 17, 2024 at 07:53:08PM +0000, Russell King (Oracle) wrote:
+> On Sat, Feb 17, 2024 at 08:41:11PM +0100, Christian Marangi wrote:
+> > Posting as RFC due to the massive change to a fundamental struct.
+> > 
+> > While adding some PHY ID for Aquantia, I notice that there is a
+> > big problem with duplicating OPs with each PHY.
+> > 
+> > The original idea to prevent this was to use mask on the PHY ID
+> > and identify PHY Family. Problem is that OEM started to use all
+> > kind of PHY ID and this is not doable, hence for PHY that have
+> > the same OPs, we have to duplicate all of them.
+> > 
+> > This is present in Aquantia PHY, but is much more present in
+> > other PHY, especially in the BCM7XXX where they use a big macro
+> > for common PHYs.
+> > 
+> > To reduce patch delta, I added the additional variable without
+> > adding tabs as this would have resulted in a massive patch.
+> > Also to have patch bisectable, this change has to be in one go
+> > hence I had to use this trick to reduce patch delta.
+> > 
+> > Other solution to this problem were to introduce additional
+> > variables to phy_driver struct but that would have resulted
+> > in having 2 different way to do the same thing and that is not O.K.
+> > 
+> > I took care to compile-test all the PHY, only exception is the unique
+> > RUST driver, where I still have to learn that funny language and
+> > I didn't had time to update it, so that is the only driver that
+> > I think require some fixup.
+> > 
+> > I posted 2 example that would benefits from this change, but I can
+> > find much more in other PHY driver.
 > 
-> Take into account return from set_memory_XX() functions and add
-> __must_check flag to arch_protect_bpf_trampoline().
+> Would it make more sense instead of this big churn, to instead
+> introduce into struct phy_driver:
 > 
-> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+> 	struct mdio_device_id	*ids;
+> 
+> which would then allow a phy_driver structure to be matched by
+> several device IDs?
 
-Thanks for doing this! This seems to hit all the right error paths that
-I can see.
+Yes that was an alternative idea, but is it good to then have 2 way to
+declare PHY ID?
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
+Also the name should be changed... Maybe an array of a struct PHY_ID,
+name that ends with a sentinel?
+
+> 
+> We then would not need to touch any of the existing drivers initially,
+> and a later cleanup could be to identify those where all the ops are
+> the same for several phy_driver structures, and convert them over.
+
+We have many PHY that already have macro to define the same OPs and
+change only name PHY ID and mask.
 
 -- 
-Kees Cook
+	Ansuel
 
