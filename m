@@ -1,330 +1,268 @@
-Return-Path: <netdev+bounces-72638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D21B858F5A
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 13:40:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB3FA858FE1
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 15:02:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C868E1F22BEC
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 12:40:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 351BC28295F
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 14:02:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAF927A714;
-	Sat, 17 Feb 2024 12:40:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 828A97AE6B;
+	Sat, 17 Feb 2024 14:02:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="lJUz/Tl2";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="ra64DCPQ"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HFfH7NS+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3C077A72C;
-	Sat, 17 Feb 2024 12:39:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708173600; cv=fail; b=qgcPxH4/N/O4KPS4NVofSaJ33e4n2AlAXp0MiFF7DRprqyBFxepUUb6Y/3jncEmD/t2URt5mvrvQR23JrYaVpsVsxpdM74O31GJK26PRvWER3zqM1PfLciSvvaW7bRgZLYJG2eg/yqFgVQ4N+CNxGFeJcAWLxXX3S+NBdIHI6bA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708173600; c=relaxed/simple;
-	bh=SSoJZ4iN51yAAvqHO30JDipHk+8EN5o0qN7X6x5MWxY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=OlMUK/ylr7dJbRvuNpRtPscfbWRIpr+oFDF+BXtKQKDNleidJ6TQWW0fPh+Sb646pieHy1H0bZWWNBN4wDv4T1j8LL8P2rizjJEDHeIFEhY1ttG/zyd+Z3oOPvMO4KUB1nng8vM1L5cTXd+A2mUXFDbIQ4OWZFw+iOP6FaxamA0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=lJUz/Tl2; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=ra64DCPQ; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41HCErA8016914;
-	Sat, 17 Feb 2024 12:39:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2023-11-20;
- bh=Ee+J2GayXoUg853GqKsmLty8FMDF8NV4iDWJa362SWI=;
- b=lJUz/Tl2y/nmN6NMvVxUZVAFT69UcOidIUYHpzqX5OX9WhQ+mKdQXXCebeBdCw8i57qY
- hDdsPSE2uTKpS1A/MSmV7yN7Psbu0lCSikIRHNS8nh3UZMv8e0jwEIHpt9Atjll93Ntj
- HqS6Pt7LOa/Clv2SutQ+EsSVfKDNxlqkgLqedcRowkxiWCLMPsrBnllGS6w6UeWvry00
- gF5ulVPPAX8a2R2wHUkIHqPf3FePv+5tX3xSfCqTEKvoJY6DRjlu9M+ESt8J5GId+KXT
- plTMLj56pebsmwV0nxOwvoilQj9XVL0M8Nnyi5yKAzu4AGcVE6Jkf1NXxjuhysS1NxxE UQ== 
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3wamucrpxr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sat, 17 Feb 2024 12:39:47 +0000
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 41HBSUtq016501;
-	Sat, 17 Feb 2024 12:39:46 GMT
-Received: from nam04-bn8-obe.outbound.protection.outlook.com (mail-bn8nam04lp2040.outbound.protection.outlook.com [104.47.74.40])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3wak83wcky-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sat, 17 Feb 2024 12:39:46 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cH+VompRIEhhR697rQ7qkcmC0i4kaiRkfOo3p3Q+OKBDcwvIdzJWE3wS5Ewdgcbw4ivPsGcu2y7gyBM5VTEWqLoo8uqlTiCXF2/gbQsfjyCL8ckLXKOD0qB2zp/V3ORiOT4CN3rTjWufLzB3Eg4CJyV8ylgBOrNvOW/ZSVNz5RXDSIK7R/hhu2UD89LJkvSIxnnRm2YoEXkinVXodI2VUE/h4y18Jaum1Sv9dJf/apAE/4nS6Sqaiq+IDAMWcMgO2hmINYmhl4O3mujxxOpO63demcWEzdyISzklpQAbcdmigwn4/sNyzHWnciHehttfWlVTBuyF4gu2O384DkxHew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ee+J2GayXoUg853GqKsmLty8FMDF8NV4iDWJa362SWI=;
- b=m75xkSQRGXm4IHoAvSrRsRD1yQJgzv9u51Xy1F1VLdOVZK9hSGwX3Qpow6spAffFOHiGXAGb3BwMuu2jaMQ2YI36mNgNE7mmw8Fog4ObDJqPTRYaq8l2YC+Br662d0I3xbBYI45l8y/zoCIeOrmtTNd1j7kVXIe5WfwuStPrUHTSWtz0VCXdgKvYiQCWwvo2/gIBwHppDcO9TxRf7Pp6WpQ5FT7t5SaRkzdbL2IaO5KZFPMxaSPLSiJxNfCYIEh/4WGXCisOO/qZxZbddAWtaKn0SC3WosUVcjWQU57VvMr3Bhwfj3I8o3YCJUl5UPjrbyx7Hwt4y2CjAroKBHDRWw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A3FB6A025
+	for <netdev@vger.kernel.org>; Sat, 17 Feb 2024 14:01:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708178521; cv=none; b=bUeLVCQqwmedEgIrqG2qGE6sdGktGTzBahItEUtZ6RCUbW0QjiVYtA5yajKHXirlvYtoFWttNgZl21c3lRAKf0smepi0bgHM7Axr9azL4ONTE1sG5DlzjtTuWqWy0y5SYSft4LNpdVJBR3JiLzWG+jbMqpbhaATabB7hS09lMSg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708178521; c=relaxed/simple;
+	bh=UqbGwt0t6wp2BJOZU3Pyz2nrZoLA3E0RRUpLzG5ehA8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Jio0Z+U9FYnIFprvuwAUqCpybpqHCD/3/HKtYoCmp9iE9i8Y2og9qASJBqUq34WFBxO2RS7FfNQOqvJEF3+hf5U7SyrHqLe9WkX3OTNWsrJFgEVEbWqJlXaEh5p6ThFiIjBvzw2Gy79LakRO3g+xtL/xRHv7sNz6YdwWJThTmGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=HFfH7NS+; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2d2305589a2so2106951fa.1
+        for <netdev@vger.kernel.org>; Sat, 17 Feb 2024 06:01:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ee+J2GayXoUg853GqKsmLty8FMDF8NV4iDWJa362SWI=;
- b=ra64DCPQAwCbZfWrpsrqBSalrvtWFWOgzF4xkeDuOp9V2oUUG6olbo0Gf9YjakyQwPIb5URgcgInnx6fVywYkXhMhqHmSsu6JuogisalWbZL9MSMndiQoR+qgr0gfXp6t4rCqdUck/pe2GSV17roIRbv2Xf39F9tSq7NydgIvYE=
-Received: from SA1PR10MB6445.namprd10.prod.outlook.com (2603:10b6:806:29d::6)
- by SA1PR10MB6615.namprd10.prod.outlook.com (2603:10b6:806:2b8::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.31; Sat, 17 Feb
- 2024 12:39:44 +0000
-Received: from SA1PR10MB6445.namprd10.prod.outlook.com
- ([fe80::f51a:7f6d:973d:c219]) by SA1PR10MB6445.namprd10.prod.outlook.com
- ([fe80::f51a:7f6d:973d:c219%4]) with mapi id 15.20.7292.028; Sat, 17 Feb 2024
- 12:39:44 +0000
-From: Praveen Kannoju <praveen.kannoju@oracle.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-CC: "j.vosburgh@gmail.com" <j.vosburgh@gmail.com>,
-        "andy@greyhouse.net"
-	<andy@greyhouse.net>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "kuba@kernel.org"
-	<kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Rajesh
- Sivaramasubramaniom <rajesh.sivaramasubramaniom@oracle.com>,
-        Rama
- Nichanamatlu <rama.nichanamatlu@oracle.com>,
-        Manjunath Patil
-	<manjunath.b.patil@oracle.com>
-Subject: RE: [PATCH RFC] bonding: rate-limit bonding driver inspect messages
-Thread-Topic: [PATCH RFC] bonding: rate-limit bonding driver inspect messages
-Thread-Index: AQHaYDQQSI4J0p3dLk+q/3SGugGtKrEMrZSAgAHMEYA=
-Date: Sat, 17 Feb 2024 12:39:44 +0000
-Message-ID: 
- <SA1PR10MB6445D15BA6BF3CD57CC690328C532@SA1PR10MB6445.namprd10.prod.outlook.com>
-References: <20240215172554.4211-1-praveen.kannoju@oracle.com>
- <Zc8k2wYZRvtfrtmW@Laptop-X1>
-In-Reply-To: <Zc8k2wYZRvtfrtmW@Laptop-X1>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR10MB6445:EE_|SA1PR10MB6615:EE_
-x-ms-office365-filtering-correlation-id: c14530bf-2766-4045-4b8e-08dc2fb584cb
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 
- mW1vUgW/BkMMm5kfV3vgsZloitU1j9Og28p7b7YHHyg5DyhykWA7Dcc+Aiscy/MVJysj5bOQGeTtErpERS2y45B4zSe8vqKvgS5QoGi2vJa9WiRirBypC8gdAQtL6DT0BXUVfe/qoGF3cnM86vkfQh4Oy/5O21hiHOo4PdR1jusyB+FSTZ5+SVDvTFzm+yIhJIzXMO6PvGNiclfKFeC5AdeysmhuCeVfKnKTBNmi2Y5vCZ6kM8e8UwBOdCMG156Ujj0zxEEXiv3MeTdVD3wRfUK+t2YTnJvWlZh6UpezV7FBcieZ+96xirsfv+H6Ki7FWlwGHJyEW95Rwd/I3jtmpr3UrrF5G3EWvMKrJADz2eB62nM+EzTyoogP5rocZJI+urEzB8lzuK589yHv9hNcQRuOWrSBrNm0E9L8SLNQp82F1HPEcxLjmytajcwcQ34kBKOybn4uI8sKVCT9crtHHWaVrT/YAcssov9ZEwEwcjpDSNSBWD7iierS8ipW4Xz6YsCMZfw8j59IpmKqBkyVLU8nvp/2hfTPX5JVfFUSCVRnJWaVbryXRQivcmKhrCLTyBnoh8evEYrDCP9y59Rg5Vv7N03/fTbrrjj4rurwT82WNxe5WX0tLn7l+/+MFCox
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR10MB6445.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(346002)(136003)(366004)(396003)(376002)(230922051799003)(64100799003)(1800799012)(451199024)(186009)(38100700002)(55016003)(53546011)(7696005)(55236004)(6506007)(9686003)(86362001)(33656002)(122000001)(4326008)(8676002)(66446008)(66946007)(6916009)(76116006)(66476007)(64756008)(44832011)(52536014)(2906002)(8936002)(15650500001)(66556008)(5660300002)(83380400001)(71200400001)(478600001)(45080400002)(41300700001)(316002)(107886003)(38070700009)(26005)(54906003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?us-ascii?Q?HY99O1qsa7DG9WrAs3UAzbItqiBhBdrZWULnUWkhu+4cZnmt8o7YgT9xQ5Dv?=
- =?us-ascii?Q?ZFRh4b4KJx4AMufrJVwEscAFdwFyhBdumqOdvu2MrsAaHmJft1exUSzwfp1g?=
- =?us-ascii?Q?S3DP39w+Cvub+HHw/rxqbgUfoaNC2Ha6O1w0R5z1siftNLZ2g3rkH3lwkzp3?=
- =?us-ascii?Q?5Qq3Z9a54GUWhrlI4Nvo2QiA14s4joqVG1gofUTL0JNIpZt8q5sbqpV3FfBc?=
- =?us-ascii?Q?nxIBH/TrgVkqJe8cQ2nrObD8MukeawL7b2aE4R7Yjv7QK6xnpkbL4b5E7TDa?=
- =?us-ascii?Q?evzLf0Opp5qsjhjTftt3vaAhamlWAvBd+FCPDKFJB4Orh9LSzl8tMzmVuvcD?=
- =?us-ascii?Q?IOqnfmt3KfDeq75piaLSG+wdXA7QXTsPe0lljw9wRnDYX8LeIM2MLjM2f3Uf?=
- =?us-ascii?Q?5xYEuehckmVTuyMm+6EyUuZHc073t2PaOWQx9p9PDiSf1+V6lC/bIy73l/W/?=
- =?us-ascii?Q?rZThU25YC7eMEHBBCRvbuZX25tmcKhnKVKBfzsGHIlpMPsx0JNAT7j8QBIpV?=
- =?us-ascii?Q?iDpY5jyLn9QXsh3mWZKIidy/PUgYLeLKJ+UQDwvj0NYYqoAYCR//Pz1CpnLE?=
- =?us-ascii?Q?fcYXOmQ/MLT0O2TmT/rXgR+E1y9GX5tZOrqtAChh1zvkvPJqC2tmphu1qEqm?=
- =?us-ascii?Q?TmQMCd3zVnKized9zg7R6zjwoti8QMTrVT45L5ctw8M719fpEMzD5TfRaq4J?=
- =?us-ascii?Q?3w2vjn5E5vUPrlqy1Qet5Wkg0Kg9fWGJ68J4bNhRzuS3mx9wrsbO5ocCWG1t?=
- =?us-ascii?Q?RegNV/pTNZh1PFELzpwq1xB5JN2OVgiw5WdX929WzpV6Lh6/55/51u52hasO?=
- =?us-ascii?Q?tdTHB+vCUAdOBuT0ccVk/xJg7rcdAweLW9dEUmosAI68gNqiCzsaNB1Y8WZ6?=
- =?us-ascii?Q?yc0TQfryNTHSTlvjfMkIRM1RZIguEbsz3SeiaGT8AfAQZG5vIJFBebn7abfv?=
- =?us-ascii?Q?sQcjCgew0fGq6GbkMy4hVnHZunOfW5qDM/0lBsFpiZ7VUVrxroqwh0a5svXV?=
- =?us-ascii?Q?rf7IgT/E/Fb4la9aQxwxR+B+3fEiZAFwZIzVMOdiAf3CSbQuOPvJ0vkyAaZR?=
- =?us-ascii?Q?DckgxepH6fGUPQqlTFVe8wmWP296RKlR5u/HrBA7yB297W8QiL/M+OKOFGYJ?=
- =?us-ascii?Q?AysGQFYJfRLI55TFs8qcQB0yNju+V9W6SehESWOfgGiSaQ1u/IGjyx6HnfxS?=
- =?us-ascii?Q?StBOxPxHAdEuMIpqKD42kLIFCZs/UZCEtIjAoDcJCoeCvFlac10NHonuOQpz?=
- =?us-ascii?Q?un+tjLDdlFiSC9AJs393SumeHekUCvfOqUISkG+26SHsCPtPeK1CieIxrBX2?=
- =?us-ascii?Q?qsjz5tg7sR/AK8BUJWRi1UWOwOrgTe/m1eZgRmMHoPyQtdigubBSux4Lvqck?=
- =?us-ascii?Q?xdElypW/MturNCS6s/zwPN8G7q5nLOg16KYyOgBvQlpz6qTZXx8EUrCy/oA+?=
- =?us-ascii?Q?CRDqox0uGf2EtH01PZVeGSrPHLQ3y/IuyzRXgLzzYOHPjgIkOxn8HS0TJnlS?=
- =?us-ascii?Q?X+BjbZSINBF/dPzbSEc71nPIIZadiVlR4xW1pwg1L++5cW00BGcaptrTIt9Y?=
- =?us-ascii?Q?iK8bZKRAjJHifPNcUyxG9M9Qhc6i51Kzb1o+vzuWalqnFx0n1lED/OL3XVlf?=
- =?us-ascii?Q?vQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=linaro.org; s=google; t=1708178517; x=1708783317; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XausAk3wcLMS6aTKh7J69TRAU825TD7w7U2A7K837UA=;
+        b=HFfH7NS+Jm1ayYZNpvdC4j7VUVlwtmFqnubAEbqSTMHY23Eb80Ad8tWeOByMZUeAEd
+         gHlTWY3/k8pyxNilg+llxMXnfvKNM2JDKidIDUKGsSigmuphvcmcFRt+OY6u2DDvFNQC
+         Qmvg/RQ7Lfu85rc+SS2YCs+Cv0S1UnF0RTPyySUUCEVSaGjd6HXjUKVMp2lIZg7yn1Y8
+         1t0hfdI/8xvT7wT2sytbUFf3u8s+Lo3FoHeO5U5m68UabottirMA/+i854dw1kTtNgch
+         cg+ShLMIAQQjZTFXNqckVrx6OJlnBWlP3XRtWFTixH3kizJmYY3reK3o5oLs9WwDVZnw
+         EmIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708178517; x=1708783317;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XausAk3wcLMS6aTKh7J69TRAU825TD7w7U2A7K837UA=;
+        b=j4jmzdJsYOnMMwrOJSM4b7aby4N6+WbpQ4xTvKZRlMaSKvU8Yi6uMIoRPjmzKoDWzw
+         umW71KdNLllc7hyvDvb0VTr7KTwtwK7y/IU+8u2StkHwU3LJhLet7IzkJJpEulpspKaJ
+         hE499F3YRfuiyEOyywqswdTrnLJHou63o3K2S3R0G6aeUEwlCdA6CYl2rhCZ1V8cWEDx
+         KnWL9koIolBVyOHnDIBaOeMzVeC64e1FXz7AOB2Zow9UuSHArtZJeD8oe0ZVI+fygkh2
+         6nox1VJH59O2hBye+xV/UDcNyUIVZwqrE8wbFZI4Zsz+PtVD6AuWTHHwZPlZUuwSuyBk
+         YJPA==
+X-Forwarded-Encrypted: i=1; AJvYcCXBr1pMqr9CTsnT88fwZW1IuZ8x9XqzwkINL+do4kjqmj67SOHIr157AD1q0VbvCH7jPcp04jKHgO8JDBiKrjw2SmwABW/Z
+X-Gm-Message-State: AOJu0YxfgzXunwFQKQDmfd/uS7aWH5/l+Z/qAbSbojeffTlEB5oXx9+o
+	lx0peWnXH/kw6SgnaK91e5RUmcrU/ebU4Zt0KY/CLQ8aW7VbE8Ah8baPnzHvAZo=
+X-Google-Smtp-Source: AGHT+IHh5r7eqr2G0VMvB4lHnvn/22pI4BxegT8XvwdHZr9YDHIYA6OWcp0oD8D7X/lPF9ccKPKZVw==
+X-Received: by 2002:ac2:5926:0:b0:511:694b:245a with SMTP id v6-20020ac25926000000b00511694b245amr4853944lfi.58.1708178517566;
+        Sat, 17 Feb 2024 06:01:57 -0800 (PST)
+Received: from [192.168.0.22] ([78.10.207.130])
+        by smtp.gmail.com with ESMTPSA id vh6-20020a170907d38600b00a3cf436af4fsm1008809ejc.3.2024.02.17.06.01.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 17 Feb 2024 06:01:56 -0800 (PST)
+Message-ID: <0d7b5549-f56b-4693-878f-e513fbf5ca16@linaro.org>
+Date: Sat, 17 Feb 2024 15:01:55 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	n9DV/0LzIp+eRnFhp4y6eEgNKiS2YrMvi6xK1n2fjsR8/MSnUxix4BH5fQJy0e2+dUDTdCnaUv4SWUXx9O1T6eLPeGywKT6+uZRTKnnDqOhVy76TfpwQrY3xequR25Eh5sy7JqcdNHp3+yFw4+EecO+TJS2rTrrbjqvhbYOW9jA3KyzR7sNegviIOAjryUiyy3KVOC7tYsE/LIw2wG0m7ehcLcOsTbm7B3Ko+YIEHQaAINH0FB6Kw2sZChowb1N6LP2W0w0D+bI9B0++x+qtpFcGetgZRZcnP4+f0YGRWzjp/WNetkVBjovGVHYGIQFtE+54fSuUaG8Fj5g44ccbKrVS1o5HLO1MZle562PFGfJ/N+VjG/HpalsIVWYWCmhc2EPU9ZfXcTyU/j7AyaBZAkzavVNbtWQVUNd5IKq3AmrskJecAx6vjiXVgKRDN20DlW3RymNEcaBklEKoV4F8rU430iVfC7rFC/bjovGjFaGXx3ZjwDFruIJc+BX7HYoE3XdSM6twAihsR6FYa/CGz32tbxL8x/AKfRoF65v8H6XfQ3pUC1L7ymNElPfP0kLCUvJrEDalSNgJC6WV0M3Oc1VMEerQInyY0OMyI98BTWw=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR10MB6445.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c14530bf-2766-4045-4b8e-08dc2fb584cb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Feb 2024 12:39:44.2941
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: OnsdcSXgaV8HZN8kktPy3oiMxc0hzoKXBGmOCkQdvXMgAS/5h2vUKp6JFZfBmGwitcMrPVpapfnO/sYSkAJaQMxPb7WrcZtDM7NAo/OiEY4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR10MB6615
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-17_09,2024-02-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 mlxscore=0 mlxlogscore=999 adultscore=0 bulkscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402170102
-X-Proofpoint-GUID: OUrXf7j7bkNByLfqjAbYejJZdQg1iN-b
-X-Proofpoint-ORIG-GUID: OUrXf7j7bkNByLfqjAbYejJZdQg1iN-b
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 11/17] dt-bindings: net: pse-pd: Add another
+ way of describing several PSE PIs
+Content-Language: en-US
+To: Kory Maincent <kory.maincent@bootlin.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain <mcgrof@kernel.org>,
+ Russ Weight <russ.weight@linux.dev>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Oleksij Rempel
+ <o.rempel@pengutronix.de>, Mark Brown <broonie@kernel.org>,
+ Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
+References: <20240215-feature_poe-v4-0-35bb4c23266c@bootlin.com>
+ <20240215-feature_poe-v4-11-35bb4c23266c@bootlin.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20240215-feature_poe-v4-11-35bb4c23266c@bootlin.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-> -----Original Message-----
-> From: Hangbin Liu <liuhangbin@gmail.com>
-> Sent: 16 February 2024 02:33 PM
-> To: Praveen Kannoju <praveen.kannoju@oracle.com>
-> Cc: j.vosburgh@gmail.com; andy@greyhouse.net; davem@davemloft.net; edumaz=
-et@google.com; kuba@kernel.org;
-> pabeni@redhat.com; netdev@vger.kernel.org; linux-kernel@vger.kernel.org; =
-Rajesh Sivaramasubramaniom
-> <rajesh.sivaramasubramaniom@oracle.com>; Rama Nichanamatlu <rama.nichanam=
-atlu@oracle.com>; Manjunath Patil
-> <manjunath.b.patil@oracle.com>
-> Subject: Re: [PATCH RFC] bonding: rate-limit bonding driver inspect messa=
-ges
->=20
-> On Thu, Feb 15, 2024 at 10:55:54PM +0530, Praveen Kumar Kannoju wrote:
-> > Rate limit bond driver log messages, to prevent a log flood in a
-> > run-away situation, e.g couldn't get rtnl lock. Message flood leads to
-> > instability of system and loss of other crucial messages.
->=20
-> Hi Praveen,
->=20
-> The patch looks good to me. But would you please help explain why these
-> slave_info() are chosen under net_ratelimit?
->=20
-> Thanks
-> Hangbin
+On 15/02/2024 17:02, Kory Maincent wrote:
+> PSE PI setup may encompass multiple PSE controllers or auxiliary circuits
+> that collectively manage power delivery to one Ethernet port.
+> Such configurations might support a range of PoE standards and require
+> the capability to dynamically configure power delivery based on the
+> operational mode (e.g., PoE2 versus PoE4) or specific requirements of
+> connected devices. In these instances, a dedicated PSE PI node becomes
+> essential for accurately documenting the system architecture. This node
+> would serve to detail the interactions between different PSE controllers,
+> the support for various PoE modes, and any additional logic required to
+> coordinate power delivery across the network infrastructure.
+> 
+> The old usage of "#pse-cells" is unsuficient as it carries only the PSE PI
+> index information.
+> 
+> This patch is sponsored by Dent Project <dentproject@linuxfoundation.org>.
+> 
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> ---
+> 
+> Changes in v3:
+> - New patch
+> 
+> Changes in v4:
+> - Remove $def
+> - Fix pairset-names item list
+> - Upgrade few properties description
+> - Update the commit message
+> ---
+>  .../bindings/net/pse-pd/pse-controller.yaml        | 84 +++++++++++++++++++++-
+>  1 file changed, 81 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml b/Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml
+> index 2d382faca0e6..6f4faec216a5 100644
+> --- a/Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml
+> +++ b/Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml
+> @@ -13,6 +13,7 @@ description: Binding for the Power Sourcing Equipment (PSE) as defined in the
+>  
+>  maintainers:
+>    - Oleksij Rempel <o.rempel@pengutronix.de>
+> +  - Kory Maincent <kory.maincent@bootlin.com>
+>  
+>  properties:
+>    $nodename:
+> @@ -22,11 +23,88 @@ properties:
+>      description:
+>        Used to uniquely identify a PSE instance within an IC. Will be
+>        0 on PSE nodes with only a single output and at least 1 on nodes
+> -      controlling several outputs.
+> +      controlling several outputs which are not described in the pse_pis
+> +      subnode. This property is deprecated, please use pse_pis instead.
+>      enum: [0, 1]
+>  
+> -required:
+> -  - "#pse-cells"
+> +  pse_pis:
 
-Thank you, Hangbin.
+How did this appear here? Underscores are no allowed.
 
-The routine bond_mii_monitor() periodically inspects the slave carrier stat=
-e in order to detect for state changes, on a state change internally record=
-s it and does the state change action.
+> +    type: object
 
-Parked-to-Parked state changes goes through transient state. As an example =
-for Up to Down, BOND_LINK_UP to BOND_LINK_DOWN, is thru BOND_LINK_FAIL.  In=
- order to attain next parked state or transient state bond needs rtnl mutex=
-. If in a situation it cannot get it, a state change wouldn't happen.  In o=
-rder to achieve a state change as quickly as possible  bond_mii_monitor() r=
-eschedules itself to come around after 1 msec. And every single come around=
- reinspects the link and sees a state change compared to its internally rec=
-orded, which in reality internal state could be not changed earlier as fail=
-ed to get rtnl lock, and throws again log indicating it sees a state change=
-. If attaining rtnl mutex take long say hypothetical 5 secs, then bond logs=
- 5000 state change message. 1 message at every 1 msec.=20
 
-And in production environments we have seen bond taking long to achieve a s=
-tate as someone else holding rtnl. Many processes do get rtnl lock.  As an =
-example we can see eth drivers. They hold rtnl mutex for the entire duratio=
-n while performing a fault recovery. There are many such scenarios.
+Missing description.
 
-This patch doesn't change -how- bond functions. It only simply limits this =
-kind of log flood.=20
+> +
+> +    properties:
+> +      "#address-cells":
+> +        const: 1
+> +
+> +      "#size-cells":
+> +        const: 0
+> +
+> +    required:
+> +      - "#address-cells"
+> +      - "#size-cells"
+> +
+> +    patternProperties:
 
--
-Praveen.
-> >
-> > v2: Use exising net_ratelimit() instead of introducing new rate-limit
-> > parameter.
-> >
-> > Signed-off-by: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
-> > ---
-> >  drivers/net/bonding/bond_main.c | 36
-> > ++++++++++++++++++++----------------
-> >  1 file changed, 20 insertions(+), 16 deletions(-)
-> >
-> > diff --git a/drivers/net/bonding/bond_main.c
-> > b/drivers/net/bonding/bond_main.c index 4e0600c..e92eba1 100644
-> > --- a/drivers/net/bonding/bond_main.c
-> > +++ b/drivers/net/bonding/bond_main.c
-> > @@ -2610,12 +2610,13 @@ static int bond_miimon_inspect(struct bonding *=
-bond)
-> >  			commit++;
-> >  			slave->delay =3D bond->params.downdelay;
-> >  			if (slave->delay) {
-> > -				slave_info(bond->dev, slave->dev, "link status down for %sinterfac=
-e, disabling it in %d ms\n",
-> > -					   (BOND_MODE(bond) =3D=3D
-> > -					    BOND_MODE_ACTIVEBACKUP) ?
-> > -					    (bond_is_active_slave(slave) ?
-> > -					     "active " : "backup ") : "",
-> > -					   bond->params.downdelay * bond->params.miimon);
-> > +				if (net_ratelimit())
-> > +					slave_info(bond->dev, slave->dev, "link status down for %sinterfa=
-ce, disabling it in %d ms\n",
-> > +						   (BOND_MODE(bond) =3D=3D
-> > +						   BOND_MODE_ACTIVEBACKUP) ?
-> > +						   (bond_is_active_slave(slave) ?
-> > +						   "active " : "backup ") : "",
-> > +						   bond->params.downdelay * bond->params.miimon);
-> >  			}
-> >  			fallthrough;
-> >  		case BOND_LINK_FAIL:
-> > @@ -2623,9 +2624,10 @@ static int bond_miimon_inspect(struct bonding *b=
-ond)
-> >  				/* recovered before downdelay expired */
-> >  				bond_propose_link_state(slave, BOND_LINK_UP);
-> >  				slave->last_link_up =3D jiffies;
-> > -				slave_info(bond->dev, slave->dev, "link status up again after %d m=
-s\n",
-> > -					   (bond->params.downdelay - slave->delay) *
-> > -					   bond->params.miimon);
-> > +				if (net_ratelimit())
-> > +					slave_info(bond->dev, slave->dev, "link status up again after %d =
-ms\n",
-> > +						   (bond->params.downdelay - slave->delay) *
-> > +						   bond->params.miimon);
-> >  				commit++;
-> >  				continue;
-> >  			}
-> > @@ -2648,18 +2650,20 @@ static int bond_miimon_inspect(struct bonding *=
-bond)
-> >  			slave->delay =3D bond->params.updelay;
-> >
-> >  			if (slave->delay) {
-> > -				slave_info(bond->dev, slave->dev, "link status up, enabling it in =
-%d ms\n",
-> > -					   ignore_updelay ? 0 :
-> > -					   bond->params.updelay *
-> > -					   bond->params.miimon);
-> > +				if (net_ratelimit())
-> > +					slave_info(bond->dev, slave->dev, "link status up, enabling it in=
- %d ms\n",
-> > +						   ignore_updelay ? 0 :
-> > +						   bond->params.updelay *
-> > +						   bond->params.miimon);
-> >  			}
-> >  			fallthrough;
-> >  		case BOND_LINK_BACK:
-> >  			if (!link_state) {
-> >  				bond_propose_link_state(slave, BOND_LINK_DOWN);
-> > -				slave_info(bond->dev, slave->dev, "link status down again after %d=
- ms\n",
-> > -					   (bond->params.updelay - slave->delay) *
-> > -					   bond->params.miimon);
-> > +				if (net_ratelimit())
-> > +					slave_info(bond->dev, slave->dev, "link status down again after %=
-d ms\n",
-> > +						   (bond->params.updelay - slave->delay) *
-> > +						   bond->params.miimon);
-> >  				commit++;
-> >  				continue;
-> >  			}
-> > --
-> > 1.8.3.1
-> >
+No underscores.
+
+> +      "^pse_pi@[0-9a-f]+$":
+> +        type: object
+> +        description:
+> +          PSE PI for power delivery via pairsets, compliant with IEEE
+> +          802.3-2022, Section 145.2.4. Each pairset comprises a positive and
+> +          a negative VPSE pair, adhering to the pinout configurations
+> +          detailed in the standard.
+> +          See Documentation/networking/pse-pd/pse-pi.rst for details.
+> +
+> +        properties:
+> +          reg:
+> +            description:
+> +              Address describing the PSE PI index.
+> +            maxItems: 1
+> +
+> +          "#pse-cells":
+> +            const: 0
+> +
+> +          pairset-names:
+> +            $ref: /schemas/types.yaml#/definitions/string-array
+> +            description:
+> +              Names of the pairsets as per IEEE 802.3-2022, Section 145.2.4.
+> +              Valid values are "alternative-a" and "alternative-b". Each name
+> +              should correspond to a phandle in the 'pairset' property
+> +              pointing to the power supply for that pairset.
+> +            minItems: 1
+> +            maxItems: 2
+> +            items:
+> +              enum:
+> +                - "alternative-a"
+> +                - "alternative-b"
+
+No need for quotes.
+
+I believe you did not test it, so I will skip reviewing the rest.
+
+
+Best regards,
+Krzysztof
+
 
