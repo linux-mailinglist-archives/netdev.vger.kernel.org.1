@@ -1,133 +1,146 @@
-Return-Path: <netdev+bounces-72649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 060638590C0
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 17:03:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08C6585912A
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 17:46:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB171282210
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 16:03:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9DA34B21853
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 16:45:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0799F7C6DE;
-	Sat, 17 Feb 2024 16:03:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B66537D3E6;
+	Sat, 17 Feb 2024 16:45:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X6Bz2TXO"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EHmDLqTw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D81F31D53D
-	for <netdev@vger.kernel.org>; Sat, 17 Feb 2024 16:03:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050967C6E9
+	for <netdev@vger.kernel.org>; Sat, 17 Feb 2024 16:45:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708185808; cv=none; b=prQBVT2l1Ppx0ZvkjUZ5ufnNS7QaBo5EvMlB1zYMej+u0ZQXt8BIe0NSCY2XSwQerpKGFgEetBXHPgoYn2k1gX0pk+RyufnOC6cJFrsxGjXB1wN4ec1+eeg87ROPr2iQTie89soF3Uk1DsMGUf36zM9eCmW8PFR23vnqKYWBwp4=
+	t=1708188353; cv=none; b=RrCh3wOS4cHxxWtXdzBXPhCaVpimV6Neu4MB5sWY9Z13KNWxJuyj6V/9LzqUGWvzu337SCwlcICWZLaztt0CylRbvN52jG5UxSEh9pgf9DAZzjzELBsAPCm25/cixiLIuhODM9cBxSzE8UgVm2e0C7EsCsHhmOSQZ8JBsXOQ+4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708185808; c=relaxed/simple;
-	bh=+Zw+4WncBkvZ9K3jD5FgUbbdsI6PCd65vBmR3SDi0lI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sutPDDaIUF8/s50vnrH4FOjBL+ah2K1gybRF1R4WGCos8pNv6OGI3H4E4PztrGsD8l84gOPzwYD3BUOICUjU0vNE064Wdw3LR2CADqsM4Uguw5LyBdmXRD2O/A2FGEAR8S19Hd9cTzHnziisyGpAr1q4ja4rqrKplj1TfCskiFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X6Bz2TXO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC37AC433F1;
-	Sat, 17 Feb 2024 16:03:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708185808;
-	bh=+Zw+4WncBkvZ9K3jD5FgUbbdsI6PCd65vBmR3SDi0lI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=X6Bz2TXOR2ZeHfCqiTCDneysd694dKcYEWgkxKeC47bZZxJM5hqjPUr9IByjsjxFO
-	 Eu4vUrP7C9UCZkFCHmGuOTUD81DFy9knHgwpPl+6qteoe3iJZAB4YLGzjw4QduGrCG
-	 HSmNY8ovaW/QrZdlanuohQfjAFioR3ty/LAYG5pDnxLVaBIIcjptOvq3pnAR+Wvevu
-	 8Xjlw72EqtTIbBARkpKfc2bEfoCxVtMgMDcBGVyxlp7uoDWH6sz1J6JEjJBVPtWTU3
-	 RXXHs9THR/193INMe++x6AIz+oEo3vAWv0tgK7sTe9izroPra2c8oK8OPI2SK4Zhht
-	 0rRi4XFzZFCCw==
-Date: Sat, 17 Feb 2024 16:03:24 +0000
-From: Simon Horman <horms@kernel.org>
-To: Raju Rangoju <Raju.Rangoju@amd.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, Shyam-sundar.S-k@amd.com,
-	Sudheesh Mavila <sudheesh.mavila@amd.com>
-Subject: Re: [PATCH v4 net-next 2/2] amd-xgbe: add support for Crater
- ethernet device
-Message-ID: <20240217160324.GQ40273@kernel.org>
-References: <20240205204900.2442500-1-Raju.Rangoju@amd.com>
- <20240205204900.2442500-3-Raju.Rangoju@amd.com>
- <20240207190946.GM1297511@kernel.org>
- <9d7ee663-86ea-9fb8-dbf4-31726354a398@amd.com>
+	s=arc-20240116; t=1708188353; c=relaxed/simple;
+	bh=jnNx/uqfu3MLSSg6puGANl2kdnhsWwqi8IjbRuM06nA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Gl/TQ7R7qYpuX3B4xAGh9CcVJ2QHmwSngCKV4knmpXogQxJgNAghQeJxP2mqPKPtGXDQ/Drst1cXJTxM5ac/0eha1Mv3AuYgDGW2NUbyCU9yvXn8I+6mNw1fxEKZ+he/9ZYCzjL5SlEScBD+ZBsYB2TiqPBgYhPO281jB0wBz0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=EHmDLqTw; arc=none smtp.client-ip=209.85.219.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-dbed0710c74so1460835276.1
+        for <netdev@vger.kernel.org>; Sat, 17 Feb 2024 08:45:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1708188351; x=1708793151; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=8b4mZDPM8eGHJ9kfKGWzDwm7bcatVceDQyS3pKcfyeA=;
+        b=EHmDLqTwYTX8oymXtAWA4HPpYtFTeD4plFX+mf3NEG17EgoGsCArVnmFpkE/LbPqZ8
+         6edlP36Hs5Z1588riiAocj6r89AmQcrLBzReJoiVHGTxsNX+lafl0R70MfTZLFJwk9v6
+         6e7vetaZfN+q8ICXViNr5jS3O1C6largIluLL/KsauPKUfxqYk5ALNsMdJaiYT7a5PnG
+         HWe56IJcQEFZeoUp5noFBnkIIH8HxKMZKReOiEl8szLuiOvhiWwbYx66OF9oDU9Eywer
+         0Skr/GWU6qKR/Q+8FeGuFXck1cKPJkEFu0hRs6Z6r1TElPI0z0w3z9cW7ZwGN2+X1zIh
+         IQNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708188351; x=1708793151;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8b4mZDPM8eGHJ9kfKGWzDwm7bcatVceDQyS3pKcfyeA=;
+        b=SLwAGyQw22l3hQdeStZLvfG8m8VCEq/4/D8iYoro2DnUl5q9pMvLAXhpLFSy06iyYz
+         oSmQ6ZMkFmnT5vykt6dXE91OlPiTT90wzrA/UMWQP0JNfnM0aBUzIq8sRm01Fv23xRkl
+         H3lRrg/pjvA7MkJ//sBSMbMOqxcYoKFYpdg9UC6HNKDySouHZebDxAK1BsQLR4PWE9JO
+         zuUOuW5tPTNdF2uaJot9wajG3AwtMcqO1vGOeDfPUDpnNoAJsXSeLTIh745aHEXDmIQY
+         eBWZfPUUWpjepjnzEGZosKaV3R+YQXx7Cov+R42yP7GGvnvNCmzAFxy/z7CHZq2FrhT5
+         MtuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVu24DUs/v5m5qlhDoXI0uCuKFMXaKQMCjZsnRPHXFgD8q/O9oTA64UfaoaoqRN6wxmzDbS53hEaWwzSYRyUL5dLktCvJTD
+X-Gm-Message-State: AOJu0YzJ5MWTyKb8skuqHqp/2NkY1a4Tmo7ySqffXQ8i+WykNOxr4ElC
+	k0rSnCfq1XPSvJHp77zU+Olvkzlz/rrSF6byF93zMNNPCaKTAARj3M7CyQWG3xHKXqsypoZ4sza
+	xW9JyXODlbhpZ9lJ+UUml83aAoBxYrMp/af0ONg==
+X-Google-Smtp-Source: AGHT+IEqILzoK/VmX6sfUGgYoxs+Kj6m9usmVnKhsv0jSGQKkMhWk4CcrhNvGz0Qw6T1QZh9IOG6jFOhIBdsPvVlWDI=
+X-Received: by 2002:a5b:18d:0:b0:dc6:d093:8622 with SMTP id
+ r13-20020a5b018d000000b00dc6d0938622mr7622931ybl.15.1708188351064; Sat, 17
+ Feb 2024 08:45:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9d7ee663-86ea-9fb8-dbf4-31726354a398@amd.com>
+References: <20240122-ipq5332-nsscc-v4-0-19fa30019770@quicinc.com>
+ <20240122-ipq5332-nsscc-v4-2-19fa30019770@quicinc.com> <7a69a68d-44c2-4589-b286-466d2f2a0809@lunn.ch>
+ <11fda059-3d8d-4030-922a-8fef16349a65@quicinc.com> <17e2400e-6881-4e9e-90c2-9c4f77a0d41d@lunn.ch>
+ <8c9ee34c-a97b-4acf-a093-9ac2afc28d0e@quicinc.com> <CAA8EJppe6aNf2WJ5BvaX8SPTbuaEwzRm74F8QKyFtbmnGQt=1w@mail.gmail.com>
+ <74f585c2-d220-4324-96eb-1a945fef9608@quicinc.com>
+In-Reply-To: <74f585c2-d220-4324-96eb-1a945fef9608@quicinc.com>
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Sat, 17 Feb 2024 18:45:40 +0200
+Message-ID: <CAA8EJppuNRB9fhjimg4SUR2PydX7-KLWSb9H-nC-oSMYVOME-Q@mail.gmail.com>
+Subject: Re: [PATCH v4 2/8] clk: qcom: ipq5332: enable few nssnoc clocks in
+ driver probe
+To: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konrad.dybcio@linaro.org>, Michael Turquette <mturquette@baylibre.com>, 
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Richard Cochran <richardcochran@gmail.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Feb 12, 2024 at 05:27:32PM +0530, Raju Rangoju wrote:
-> 
-> 
-> On 2/8/2024 12:39 AM, Simon Horman wrote:
-> > On Tue, Feb 06, 2024 at 02:19:00AM +0530, Raju Rangoju wrote:
-> > > Add the necessary support to enable Crater ethernet device. Since the
-> > > BAR1 address cannot be used to access the XPCS registers on Crater, use
-> > > the smn functions.
-> > > 
-> > > Some of the ethernet add-in-cards have dual PHY but share a single MDIO
-> > > line (between the ports). In such cases, link inconsistencies are
-> > > noticed during the heavy traffic and during reboot stress tests. Using
-> > > smn calls helps avoid such race conditions.
-> > > 
-> > > Suggested-by: Sudheesh Mavila <sudheesh.mavila@amd.com>
-> > > Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
-> > > ---
-> > >   drivers/net/ethernet/amd/xgbe/xgbe-common.h |   5 +
-> > >   drivers/net/ethernet/amd/xgbe/xgbe-dev.c    |  57 ++++++++
-> > >   drivers/net/ethernet/amd/xgbe/xgbe-pci.c    |  33 ++++-
-> > >   drivers/net/ethernet/amd/xgbe/xgbe-smn.h    | 139 ++++++++++++++++++++
-> > >   drivers/net/ethernet/amd/xgbe/xgbe.h        |   7 +
-> > >   5 files changed, 240 insertions(+), 1 deletion(-)
-> > >   create mode 100644 drivers/net/ethernet/amd/xgbe/xgbe-smn.h
-> > 
-> > Hi Raju,
-> > 
-> > This patch seems to be doing a lot.
-> > 
-> > * Add support for XGBE_RN_PCI_DEVICE_ID to xgbe_pci_probe()
-> > * Add fallback implementations of amd_smn_(write|read)()
-> > * Add XGBE_XPCS_ACCESS_V3 support to xgbe_(read|write)_mmd_regs()
-> > * Add XGBE_XPCS_ACCESS_V3 support to xgbe_pci_probe()
-> > * Add support for PCI_VDEVICE(AMD, 0x1641)
-> > 
-> > So a similar theme to my comment on patch 1/1,
-> > I wonder if it could be broken up into separate patches.
-> 
-> Hi Simon,
-> 
-> In my v2[*] series I had initially split pci_id patch to separate patch.
-> But, I had received a comment from you about "W=1 allmodconfig builds on
-> x86_64 with gcc-13 and clang-16 flag that xgbe_v3 us defined but not used."
-> In this series, I had ensured warnings are taken care.
-> 
-> However, based on your new comments I will further try to separate the
-> patches taking care of warnings.
-> 
-> [*] "[PATCH v2 net-next 2/4] amd-xgbe: add support for Crater ethernet
-> device"
+On Sat, 17 Feb 2024 at 17:45, Kathiravan Thirumoorthy
+<quic_kathirav@quicinc.com> wrote:
+>
+>
+> <snip>
+>
+> >> Reason being, to access the NSSCC clocks, these GCC clocks
+> >> (gcc_snoc_nssnoc_clk, gcc_snoc_nssnoc_1_clk, gcc_nssnoc_nsscc_clk)
+> >> should be turned ON. But CCF disables these clocks as well due to the
+> >> lack of consumer.
+> >
+> > This means that NSSCC is also a consumer of those clocks. Please fix
+> > both DT and nsscc driver to handle NSSNOC clocks.
+>
+>
+> Thanks Dmitry. I shall include these clocks in the NSSCC DT node and
+> enable the same in the NSSCC driver probe.
 
-Thanks, I understand your point that I have provided somewhat conflicting
-advice there. Sorry about that.
+Or use them through pm_clk. This might be better, as the system
+doesn't need these clocks if NSSCC is suspended.
 
-> > I will also say that I am surprised to see this driver using
-> > full licence preambles rather than SPDX headers. I assume that
-> > is due to direction from legal. And if so, I accept that you may not
-> > be in a position to change this. But my comment stands.
-> 
-> This is done to ensure xgbe-smn.h license match with license in all the
-> other files.
+>
+> >
+> >>> Once you have actual drivers, this should solve itself, the drivers
+> >>> will consume the clocks.
+> >>
+> >>
+> >> Given that, NSSCC is being built as module, there is no issue in booting
+> >> the kernel. But if you do insmod of the nsscc-ipq5332.ko, system will
+> >> reset.
+> >>
+> >> Without the networking drivers, there is no need to install this module.
+> >> And as you stated, once the drivers are available, there will be no issues.
+> >>
+> >> So can I explain the shortcomings of installing this module without the
+> >> networking drivers in cover letter and drop this patch all together?
+> >
+> > No. Using allyesconfig or allmodconfig and installing the full modules
+> > set should work.
+> >
+>
+>
+> Okay, Got it. Thanks for the information.
+>
+> <snip>
 
-Yes, understood.
 
-I think that it owuld be ideal if, as an activity separate to this
-patch-set, some work was done to use SPDX for this driver.
+
+-- 
+With best wishes
+Dmitry
 
