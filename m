@@ -1,133 +1,83 @@
-Return-Path: <netdev+bounces-72601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CBB7858CD3
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 02:36:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9B67858CD7
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 02:41:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 485A8283ED9
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 01:36:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 275F41C21B5D
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 01:41:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2639E1773D;
-	Sat, 17 Feb 2024 01:36:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F3CC1B7EA;
+	Sat, 17 Feb 2024 01:40:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p9iLCs5I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="siUT6ilt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E381E1AAB1;
-	Sat, 17 Feb 2024 01:36:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76DFF1B285;
+	Sat, 17 Feb 2024 01:40:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708133801; cv=none; b=DQjBWB+9duT3W7ZemcGhfkc2gxYBFf3SIxfMz05+syPkWWdAMrNrcJGJDF0pXEjvUTD8rwxZO1/tt5ShPEPYp742cl92jKiX+/7yzkAdubVw0UTzYXvAKQQ3iR+VhfuUrd4wzmsN25oAhAxmuc8/7hnp4JwuIVqmlAt9aLHdpa0=
+	t=1708134055; cv=none; b=G9y4JCBNzFnX6FUSqqTHmHYNcZ49GaubhYGuyowen9S+wQidBtLkEZp7bsF6v5JyRrts7D9cRRFInHMN/n/b3/yn2TkjUjuH9ECWJBpdRTkuPss4q6KCsKFzTPy66W7BsADZ6ualloqH1CI86IQBBraLgfBs3N38pekmkxsqwJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708133801; c=relaxed/simple;
-	bh=DTCpAO4XHgQ7XYEX4RWkTVGsLXOrpf2SdYe7zEkHOCM=;
+	s=arc-20240116; t=1708134055; c=relaxed/simple;
+	bh=TAP5n1rVZvF9tSNg+8A4StR3ZkRSgV4HRvZCjjDEcMs=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LKBBjeRnlGNWcVVqlJhN+3M6wcrayHaLiHmiHpYvdpP99Y0+aiNQ/PXoShGizuwTgAd3QUgsBvjZn2TOrJ0PG0Zc4ydwgtfzWK01tHEuciCgezC2jpf58yAMa5wVqx5C3k8AVcPT6JabLVMoD4jie9NfQ4QXRX1gfKtTdAjwlp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p9iLCs5I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98898C433F1;
-	Sat, 17 Feb 2024 01:36:39 +0000 (UTC)
+	 MIME-Version:Content-Type; b=YuXwJO5nTEzKzan4uuuLwhHO18c7VTOr29UO7pitnd0zr8BPDoDfYVpGpAU9kc0tHo7VX6qKbRGLQW0F3LFjrUdEonWZJLUlFMQxBRL4dPZUkYvgYiOdy1akN3N5uXy7q9UZwdz5us+59mCX+eF2VEIlLwFeWdTo4PAgwi5rgsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=siUT6ilt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA579C433C7;
+	Sat, 17 Feb 2024 01:40:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708133800;
-	bh=DTCpAO4XHgQ7XYEX4RWkTVGsLXOrpf2SdYe7zEkHOCM=;
+	s=k20201202; t=1708134055;
+	bh=TAP5n1rVZvF9tSNg+8A4StR3ZkRSgV4HRvZCjjDEcMs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=p9iLCs5IcyTmVVn11UfzCP01EVK7zi3wpMp626MSyjlqK8zoAmgYzK8fEmv8Z1lRO
-	 0YUya8h6MkBLj2FNYnyYU2uQdZceqNbktGmyTYjWSZ44wE6Ufgh4fVsV7JRGY/qnjF
-	 PlwI2vN+R3q8zPzhPXHN5aPbAxvkvpHeb2Vg9rqJ0VtGMwU/QdgS0QoPfGRb9GHD7u
-	 GEULx2opWMGGI11SjbObp56jkw1dAcSFb10UgaXg6mm/c80g3CH17Llw95+CT6k8Lc
-	 vjImilbpVTWQjRSz2YTHhUmOCgNfo+eOGWbcCOn4G/OkVrOXFC0BWHr6h4yZRuNXLG
-	 +PwTPkgw5Vvtw==
-Date: Fri, 16 Feb 2024 17:36:38 -0800
+	b=siUT6iltK+1Xqdm11f3iUZ0/6lWjfVwPKG/F5jFiuF40V3DqFkgk2tEMRVY7QBg1F
+	 vw9wVKvt73nfKwf014XryecooCvXtBkNRdaguEtio5XnJS26ilTq+zSuEOHBpm3Nop
+	 Ii0BtGuz03wpMQn2PT/O3TeSGiAULJHk6CpRNytJHpy2+4Vc4A4cTOqHF7TGdEDnfg
+	 0HlNceYCvko+bHDjBdJSpndRVFPBfyU3DUFBl8ywKQsi5aDsuZyNBQGIA5mBBvaULu
+	 g3asx3WbNrWnWGQCIzNytm7vu+jaq96JXxIV2tO1/0q4EO07rIO85zjG0BAvoMy6mO
+	 sAj/CkBADuBPw==
+Date: Fri, 16 Feb 2024 17:40:54 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
- <corbet@lwn.net>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight
- <russ.weight@linux.dev>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley
- <conor+dt@kernel.org>, Oleksij Rempel <o.rempel@pengutronix.de>, Mark Brown
- <broonie@kernel.org>, Frank Rowand <frowand.list@gmail.com>, Andrew Lunn
- <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, devicetree@vger.kernel.org, Dent Project
- <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v4 05/17] net: pse-pd: Introduce PSE types
- enumeration
-Message-ID: <20240216173638.4bb12af2@kernel.org>
-In-Reply-To: <20240216104211.2c11d1cc@kmaincent-XPS-13-7390>
-References: <20240215-feature_poe-v4-0-35bb4c23266c@bootlin.com>
-	<20240215-feature_poe-v4-5-35bb4c23266c@bootlin.com>
-	<20240215105846.6dd48886@kernel.org>
-	<20240216104211.2c11d1cc@kmaincent-XPS-13-7390>
+To: shuah@kernel.org, keescook@chromium.org
+Cc: linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
+ jakub@cloudflare.com
+Subject: Re: [PATCH net-next v2 0/4] selftests: kselftest_harness: support
+ using xfail
+Message-ID: <20240216174054.4e051f9a@kernel.org>
+In-Reply-To: <20240216002619.1999225-1-kuba@kernel.org>
+References: <20240216002619.1999225-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, 16 Feb 2024 10:42:11 +0100 K=C3=B6ry Maincent wrote:
-> > On Thu, 15 Feb 2024 17:02:46 +0100 Kory Maincent wrote: =20
-> > > Introduce an enumeration to define PSE types (C33 or PoDL),
-> > > utilizing a bitfield for potential future support of both types.
-> > > Include 'pse_get_types' helper for external access to PSE type info. =
-  =20
-> >=20
-> > I haven't read the series, just noticed this breaks the build:
-> >=20
-> > error: ../include/uapi/linux/pse.h: missing "WITH Linux-syscall-note" f=
-or
-> > SPDX-License-Identifier =20
->=20
-> By curiosity how do you get that error?=20
-> Is it with C=3D1? I didn't faced it with W=3D1.
-> C=3D1 is broken for several architecture like arm64, indeed I forgot to r=
-un it.
+On Thu, 15 Feb 2024 16:26:15 -0800 Jakub Kicinski wrote:
+> Hi!
+> 
+> When running selftests for our subsystem in our CI we'd like all
+> tests to pass. Currently some tests use SKIP for cases they
+> expect to fail, because the kselftest_harness limits the return
+> codes to pass/fail/skip.
+> 
+> Clean up and support the use of the full range of ksft exit codes
+> under kselftest_harness.
+> 
+> Merge plan is to put it on top of -rc4 and merge into net-next.
+> That way others should be able to pull the patches without
+> any networking changes.
 
-Not 100% sure, TBH, I suspect it's somehow enabled by allmodconfig.
-I don't think it's a C=3D1 thing because our clang build doesn't do C=3D1
-and it also hit it.
+I need to rejig these to follow Kees's suggestion from:
 
-> > but why the separate header? Is it going to be used in other parts of
-> > uAPI than just in ethtool? =20
->=20
-> We might use it in pse core if capabilities between PoE and PoDL differ b=
-ut I
-> am not sure about it.
-> Do you prefer to move it to ethtool header and add prefix ETHTOOL_ to the=
- enum
-> values?
-
-I don't know enough to have an opinion :) Whatever you end up doing,
-it's probably worth documenting the reason for the choice in the commit
-message?
-
-> > > This patch is sponsored by Dent Project <dentproject@linuxfoundation.=
-org>   =20
-> >=20
-> > side-note: no objections to the line but for accounting purposes
-> > (i.e. when we generate development stats) we use the Author / From
-> > line exclusively. So it'd be easier to compute stats of things funded
-> > by Dent if you used:
-> >=20
-> > From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
-> >=20
-> > but that's entirely up to you :) =20
->=20
-> Does adding the line side to the SOB in the commit message is sufficient =
-or
-> should I modify the git send email config?
-
-I think you can sed -i s/// the patches? When the From in the email
-file doesn't match your git config IIUC git will include the from line
-in the body and pick it up from them. IOW it will work. The scripts look
-at git author so s-o-b won't do much.
+https://lore.kernel.org/all/20240216163119.7cc38231@kernel.org/
+-- 
+pw-bot: cr
 
