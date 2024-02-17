@@ -1,104 +1,103 @@
-Return-Path: <netdev+bounces-72610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72611-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBACF858D11
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 04:27:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15AF2858D14
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 04:32:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 815D71F228C7
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 03:27:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4C72283D5B
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 03:32:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33A251B7F4;
-	Sat, 17 Feb 2024 03:27:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F40CA1BC4C;
+	Sat, 17 Feb 2024 03:32:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="baAYNsbm"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="Qw1u3i5Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB64E149E0B
-	for <netdev@vger.kernel.org>; Sat, 17 Feb 2024 03:27:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA3C918E02
+	for <netdev@vger.kernel.org>; Sat, 17 Feb 2024 03:32:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708140434; cv=none; b=tOk8xB9BIvlZpRmgQAykOggeK4L8bfzk4aQYiuHSIoM+A03rDkuu/n0OxFcRSf4Bomu9q90XJsinV6UkLQGOa+fweDWjPpZXCXJV/Yu+kHqkrN8FGfz7cRs0NcUKnRV1P1e4H0uap/39JWj4xo57p1l2tIvgLxI6YruKtd66mJ8=
+	t=1708140747; cv=none; b=h5afnGZI7HSMIcw0cmTupQeo/K/ovm8UMuAbldyggC+8pwDsTMzgSXT18IO1pd34su7kD45FuR7fN7SBOy3Zv8ghBES/t1BJo9Km3jHa6CwxxVUtIgoO9pjs39tRW/FFOP0JZrEe+x7kQUgiFfAZYQprbH/4YA4D0M47eOA0J/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708140434; c=relaxed/simple;
-	bh=lb4cvV1LXgTw9K1co2vNpge7+BqvQQT0p9tPRIYZ8bI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=L1u+RjfxchBs6vrMh3rMRRE0LJsYSd/w3fbLQgR86KzjAPTpcdwzsaAXIyqSLEGcYVyRQhOBvGlCrNFCbt3S+WYLeoJ4AOISIp4+8lnkXaTYWmaYc6ZZrPBtnfLlTcI1xRsK3KwapJZK8qR8eGxnV3ibrVv4Utf+m89n6ZxgVjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=baAYNsbm; arc=none smtp.client-ip=209.85.166.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-36517cfd690so1103605ab.2
-        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 19:27:12 -0800 (PST)
+	s=arc-20240116; t=1708140747; c=relaxed/simple;
+	bh=KwnWiWgBLK45ipQm1LvA4GS8zCYnWhhLyR9RnXg+/js=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=WapbiCD0HrWhoF+af8t589AEeymov7Dd19GF2sxiie57yUnBMW/58+t/LqiK+ezC48BmXjjmOm5IXYKTGVhmTBBAAi4WFpPqYxWfLmJxadpgwaoC3wNoz/f889NmrXzG3e9d16oHIBsQnkSoOv21uFvdDjRj9PxuZLV61AnSBhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=Qw1u3i5Y; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+Received: from pecola.lan (unknown [159.196.93.152])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 8C8B820075;
+	Sat, 17 Feb 2024 11:32:22 +0800 (AWST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1708140432; x=1708745232; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RNUiI76F3+Wbspl0N6YjZFJcyO5wIRtjcOISW2fp9uk=;
-        b=baAYNsbmbwlm4gjRGTXtQmLBC0s5WzvZnnT36/eaq/45aSbhssKKiw9opWYFPJPWVP
-         C0opVr/KZiWD41Ftwz84HboghHwoJKXv686yuFnbiY2e4pOEIfzKiPOfDfIcBLgJD5P2
-         EwRLoLMlbWy/Mq95wUOHHBTQwP3fEIjYgOhPQ5x6mTfrwUbKSPKdV7jajxzAhuE1EbGd
-         eTyYUAK3KFSuQGRj9Fg9ZjtQssbeirWCgpRIn9NqHTh3jnbN8lGiaozLy6E7xn+aJ04c
-         wzpM19s+JaSAvcdunyUrNUeL4GGODY0jyZZrNkuxhePTaFyfR6+iQGBbSMZEnWp5Xe7o
-         VU0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708140432; x=1708745232;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RNUiI76F3+Wbspl0N6YjZFJcyO5wIRtjcOISW2fp9uk=;
-        b=t132nLC/wTUW2CducUtblw9UGG49ZYwnKsTbJrxao/1qwuKRdwF92k2+ARjaMQdOch
-         p9SxPFaWsEua+G5VRiJ5cbKQFJ9ooOorAAJ37uaZSAxSpGatanOjseXsimXhaZeExhgD
-         tzxRDR7Hsb/sBvqquBQlA4iQ47lVkMJigGldk01iyN3zbdujkznOkdD6I7x5gdhiGDWk
-         KoP3IHThlvBtjvjbpRd8yiFs3BD7sobFzPd0bMI6Lxz1deXslC8sns5bCmlTlldo7/S5
-         +tST99TnIprXbsmth5tylT8iHhwnZopK+kAPIz+G1Ow46XsaO0ieOEYz06+hy4cxpVZt
-         AwGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVWIELz60R999G0RNhbL6uWnDi6EsLcpT/6LTgDLFQMlGDP6pbwwQx6QHIlqFF3qzv4aq1VNEfrmnXoDEHGco65o05NwuLT
-X-Gm-Message-State: AOJu0YzMmTFVCsJfpTrnFfAZsh6GlL8XXyLRryizaiU9c081Yapevwse
-	SpwDngxLstzvgJY8W0ZNmNZmMY+TqBSUA4o2FM5v5Jc4vbLiHamaYNx3haQPk0Q=
-X-Google-Smtp-Source: AGHT+IGfwLmgQQv6/5fgLNB9KZaNXnLgRz6LXfQebQgQ0y1G+faU9N+tu9ExuuBmW15WpSRm36layg==
-X-Received: by 2002:a92:d852:0:b0:365:b71:487a with SMTP id h18-20020a92d852000000b003650b71487amr3769572ilq.9.1708140431763;
-        Fri, 16 Feb 2024 19:27:11 -0800 (PST)
-Received: from [10.1.110.102] ([50.247.56.82])
-        by smtp.gmail.com with ESMTPSA id q20-20020a63d614000000b005cd8044c6fesm626075pgg.23.2024.02.16.19.27.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Feb 2024 19:27:11 -0800 (PST)
-Message-ID: <1bfeac24-73f3-4e9b-96e4-b9354be27285@davidwei.uk>
-Date: Fri, 16 Feb 2024 20:27:09 -0700
+	d=codeconstruct.com.au; s=2022a; t=1708140743;
+	bh=KwnWiWgBLK45ipQm1LvA4GS8zCYnWhhLyR9RnXg+/js=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=Qw1u3i5YnZ4HSz97Q2bwmaAaShO8K3tV2u94Fq583+8YYf7WPWNIIonz30xDCQNHS
+	 G2Ldld/gQ+ESFfHLnlMB7dS9l1LHV4EvvpEDgFjOkuGLR7VDJzYuVCvHU98XfYVdi8
+	 eGiDxHFZbeT1BJVnKF6TDUdkO50wBWeG6RHiYuSjk/rFvTY5tDAi4qg04vPxBrHH5c
+	 m9xCebhR4umwSk5ODmnyYNTigxE5Bam9p82cpsn87EVcQwgbF/R57qWezv/mJSorKb
+	 HTbEZpyt80MuhHonCETSEpwr7wSRKu9c7zbso3EWbhOQsI+JFFlXKJkRbH0Wsk1K/u
+	 I/1gvb6WbyxOA==
+Message-ID: <f2162cfdba3d388a94c6e8f66bdc899f1a2ca6c7.camel@codeconstruct.com.au>
+Subject: Re: [PATCH net-next 10/11] net: mctp: tests: Test that outgoing
+ skbs have flow data populated
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Matt Johnston <matt@codeconstruct.com.au>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, David Howells <dhowells@redhat.com>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, Liang Chen <liangchen.linux@gmail.com>, 
+ Johannes Berg <johannes.berg@intel.com>
+Date: Sat, 17 Feb 2024 11:32:22 +0800
+In-Reply-To: <20240216062304.2c3428d9@kernel.org>
+References: <cover.1708071380.git.jk@codeconstruct.com.au>
+	 <73b3194049ea75649cc22c17f7d11fa6f9487894.1708071380.git.jk@codeconstruct.com.au>
+	 <20240216062304.2c3428d9@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 0/3] netdevsim: link and forward skbs between
- ports
-Content-Language: en-GB
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
- Sabrina Dubroca <sd@queasysnail.net>, netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
-References: <20240215194325.1364466-1-dw@davidwei.uk>
- <ea379c684c8dbab360dce3e9add3b3a33a00143f.camel@redhat.com>
- <cf9e07d6-6693-4511-93a6-e375d6f0e738@davidwei.uk>
- <20240216174859.7e65c1bf@kernel.org>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20240216174859.7e65c1bf@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 2024-02-16 18:48, Jakub Kicinski wrote:
-> Also looks like the new test managed to flake once while it was sitting
-> in patchwork ?
-> 
-> https://netdev-3.bots.linux.dev/vmksft-netdevsim-dbg/results/468440/13-peer-sh/stdout
+Hi Jakub,
 
-I can't repro it locally in QEMU. Maybe it's due to the leaky ref bug?
+> > +static void mctp_test_packet_flow(struct kunit *test)
+> > +{
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kunit_skip(test, "Requires C=
+ONFIG_MCTP_FLOWS=3Dy");
+> > +}
+> > +
+> > +static void mctp_test_fragment_flow(struct kunit *test)
+> > +{
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kunit_skip(test, "Requires C=
+ONFIG_MCTP_FLOWS=3Dy");
+> > +}
+>=20
+> These two get skipped when running:
+>=20
+> ./tools/testing/kunit/kunit.py run --alltests
+>=20
+> Is it possible to make all-test include the right config option
+> automatically, so they can run?
 
-I'll send another revision and hopefully this doesn't happen again.
+Sure! I assume that's just a matter of adding to all_tests.config, and
+getting the dependencies sorted. I will send an update shortly.
+
+Would you prefer a v2 of the series, or just that one patch?
+
+Cheers,
+
+
+Jeremy
 
