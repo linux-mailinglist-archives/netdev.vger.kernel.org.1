@@ -1,367 +1,182 @@
-Return-Path: <netdev+bounces-72588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 083B9858A52
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 00:50:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C8EC858A7F
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 01:04:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5659DB234B1
-	for <lists+netdev@lfdr.de>; Fri, 16 Feb 2024 23:50:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A105282ED1
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 00:04:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C65C214A0AB;
-	Fri, 16 Feb 2024 23:50:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37792173;
+	Sat, 17 Feb 2024 00:04:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="U8q5O9Nj"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="kkbger9l"
 X-Original-To: netdev@vger.kernel.org
-Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
+Received: from omta038.useast.a.cloudfilter.net (omta038.useast.a.cloudfilter.net [44.202.169.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 335DA1DFFD;
-	Fri, 16 Feb 2024 23:50:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D20119F
+	for <netdev@vger.kernel.org>; Sat, 17 Feb 2024 00:04:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708127415; cv=none; b=brLhDCk8giyKpWX1yjduOCP3dhNgemCpoHX/mvTc1VDGqPZ56w2jBXMT0/vckE1nc8TNQcgxw+rEdUzHm1s+mSNCoJcdmiFY3LEgMuDtvjz59d7GLRSKNXqz4fUgCXwpfeakZycgayJDSaKHR0dvejpCFIf8sutaFt8OVDAl17A=
+	t=1708128291; cv=none; b=txv9GsBDCfyO53Uh781Sa4e5aGK+4ghxUMN+1Mp2qpy9QiKDRxxhvCT6Np7PpvzwjzRYMA5/G8MmD4tG0rFEGFN3y/7P7TloMgE1unoMDy2BETOHIhDVqgtbrKuFG0xdM5CtMZtPfsSkHusRSxeXApggVIm+XucPBvbXQMJvYEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708127415; c=relaxed/simple;
-	bh=J8FXU7aHYZuODWspt2kUR8S1w28W8VmvUfgLuCM8cWA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nRURKYdqKzyF71Qn2uUDRREZMF3jIFR9IIQYXhMsKjt4TkvBf8KS5aGY5/KIkr0VFS5UrbOdoGfPsrH+hNtXvqN9kk4H2GDH+CD0We8xhM7Feheafx1Aim4/Kv/y9UXc8pagHCsXHaq7p4vdJmehSJFFOI8S71qMECXMOjJApcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=U8q5O9Nj; arc=none smtp.client-ip=139.165.32.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
-Received: from localhost.localdomain (125.179-65-87.adsl-dyn.isp.belgacom.be [87.65.179.125])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id BF415200C992;
-	Sat, 17 Feb 2024 00:44:26 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be BF415200C992
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1708127066;
-	bh=9j5eVpiBwzw5ltDCPFe2hsyvQP/Xgv6qbYI20MohXf8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=U8q5O9Nj59vvVIzHuQFzN6OH7r3zRtBcokHLHAk+64iTZhAE6Wiz0fjNTOddW/08f
-	 9r0E4ZzyNbnjPQG/4LfgnSbUD+6fJt92s7Rjm1tYU35KQ4MJI3g3rI/1Cmug9SVyTZ
-	 4kNIO1UyGNnLTiL5VoIO6f90asrlslLJ3RPFtL6Ztzv0Nrls6KOAno/PcC76TjNRJq
-	 gQCPgyvxxKh6GCceCbDVIu6sCKjAh3iDqqCOngJyALFaPc3AhJLaTb5L2Qj7w/WaoW
-	 bTnhAkNlKZSzrK7Xd3J97T7aXa1/akCwDp6Ztd2FeXc/6MGgN4G0s7sql9pcyPXJa0
-	 fAOUjAkzxvU+Q==
-From: Justin Iurman <justin.iurman@uliege.be>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	justin.iurman@uliege.be
-Subject: [PATCH net 2/2] selftests: ioam6: refactoring to align with the fix
-Date: Sat, 17 Feb 2024 00:43:56 +0100
-Message-Id: <20240216234356.32243-3-justin.iurman@uliege.be>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240216234356.32243-1-justin.iurman@uliege.be>
-References: <20240216234356.32243-1-justin.iurman@uliege.be>
+	s=arc-20240116; t=1708128291; c=relaxed/simple;
+	bh=3nKxXv+a13aom4LTOZ3NnsV2RrerkFayOaft5ppMDkw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RGCTaxT94whazbjoa5MLnV7spPsVSaeAvoGmLAnCvD/3nrWk7wLuTLWeycGYkZGVdSNdLlw3lyJ1M3dirzBC+n4cUMwIyZ8X/49LxKeCsQnEgQIEMCtZ8WXVYInkXWWoJf4747b/APOFBLndzW1xiHHOCT7gtv3Q7vpoHi9nz70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=kkbger9l; arc=none smtp.client-ip=44.202.169.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
+Received: from eig-obgw-5007a.ext.cloudfilter.net ([10.0.29.141])
+	by cmsmtp with ESMTPS
+	id b53NrzbdH9gG6b8C9r5R2H; Sat, 17 Feb 2024 00:04:41 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id b8C8r9eqWKqFNb8C8rd47y; Sat, 17 Feb 2024 00:04:40 +0000
+X-Authority-Analysis: v=2.4 cv=QvT93kyd c=1 sm=1 tr=0 ts=65cff818
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=VhncohosazJxI00KdYJ/5A==:17
+ a=IkcTkHD0fZMA:10 a=k7vzHIieQBIA:10 a=wYkD_t78qR0A:10 a=NEAV23lmAAAA:8
+ a=cm27Pg_UAAAA:8 a=VwQbUJbxAAAA:8 a=A7XncKjpAAAA:8 a=pGLkceISAAAA:8
+ a=J1Y8HTJGAAAA:8 a=1XWaLZrsAAAA:8 a=20KFwNOVAAAA:8 a=S3e1UlYFMFTUAia5eQoA:9
+ a=QEXdDO2ut3YA:10 a=xmb-EsYY8bH0VWELuYED:22 a=AjGcO6oz07-iQ99wixmX:22
+ a=R9rPLQDAdC6-Ub70kJmZ:22 a=y1Q9-5lHfBjTkpIzbSAN:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ljkmbjR1wZVH0YMxK1quNarSuTzJMheeVQqhKZsr5SM=; b=kkbger9lKaj723jXWSInOx6/G1
+	E347snhH6PKIcvwa+H9yyCmJJg7R2tWkSxbUzcXyNN/j5tpWsy1YzhPTyJhgTwFkjwR0Co5vH0YH4
+	yPKOUK+A1WEA8e+i2tBGYn4DS/fjcjnZATu0H3KhZY/9Wq3VXlEPu8/6lgpXTEC7Jb6b1ldoLl2IQ
+	FUIuaQ0WBVrFBtagt2SljBfVkeYWYIrTlY6Srdd0TdPW5vDUukrw8nrpCidSpaxF3bRspvbLiNpPq
+	ls6fdqgqkISKEnXZZh3hcZxxJtpJ38UF8oNSOdfxScOuwuTUnsYuMNJ6AriiEFB1qgcXYD4ES6hF0
+	w6einTVA==;
+Received: from [201.172.172.225] (port=49674 helo=[192.168.15.10])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96.2)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1rb8C7-002dlw-0R;
+	Fri, 16 Feb 2024 18:04:39 -0600
+Message-ID: <9ed28341-8bf7-4b6a-ba9a-6cfe07dc5964@embeddedor.com>
+Date: Fri, 16 Feb 2024 18:04:14 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: sched: Annotate struct tc_pedit with __counted_by
+To: Kees Cook <keescook@chromium.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
+ <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, "Gustavo A. R. Silva"
+ <gustavoars@kernel.org>, netdev@vger.kernel.org,
+ linux-hardening@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>,
+ Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling
+ <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ linux-kernel@vger.kernel.org, llvm@lists.linux.dev
+References: <20240216232744.work.514-kees@kernel.org>
+Content-Language: en-US
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <20240216232744.work.514-kees@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 201.172.172.225
+X-Source-L: No
+X-Exim-ID: 1rb8C7-002dlw-0R
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.15.10]) [201.172.172.225]:49674
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 8
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfFTfySNWVN+TDGs/IPTD4UkQQ8JpuKXxN9RUgrwj8lc/0qEajf2QwMfS1ih2LWqTT9Lw188AgOfS8BMfMT4d6HQgvD80prqegRe0vwTdoTO+pK5KwwDG
+ YOeNOa3aH7BB/en/t+STKyIAais9g8NJ4N4Wk3US0p/JXTo93iKQwq9n35MCmY+S8Fm0JWmZVyaOvNJWR+MP+Qq2Igy+4I14Qbs=
 
-ioam6_parser uses a packet socket. After the fix to prevent writing to
-cloned skb's, the receiver does not see its IOAM data anymore, which
-makes input/forward ioam-selftests to fail. As a workaround,
-ioam6_parser now uses an IPv6 raw socket and leverages ancillary data to
-get hop-by-hop options. As a consequence, the hook is "after" the IOAM
-data insertion by the receiver and all tests are working again.
 
-Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
----
- tools/testing/selftests/net/ioam6.sh       |  38 ++++----
- tools/testing/selftests/net/ioam6_parser.c | 101 +++++++++++----------
- 2 files changed, 73 insertions(+), 66 deletions(-)
 
-diff --git a/tools/testing/selftests/net/ioam6.sh b/tools/testing/selftests/net/ioam6.sh
-index fe59ca3e5596..12491850ae98 100755
---- a/tools/testing/selftests/net/ioam6.sh
-+++ b/tools/testing/selftests/net/ioam6.sh
-@@ -367,14 +367,12 @@ run_test()
-   local desc=$2
-   local node_src=$3
-   local node_dst=$4
--  local ip6_src=$5
--  local ip6_dst=$6
--  local if_dst=$7
--  local trace_type=$8
--  local ioam_ns=$9
--
--  ip netns exec $node_dst ./ioam6_parser $if_dst $name $ip6_src $ip6_dst \
--         $trace_type $ioam_ns &
-+  local ip6_dst=$5
-+  local trace_type=$6
-+  local ioam_ns=$7
-+  local type=$8
-+
-+  ip netns exec $node_dst ./ioam6_parser $name $trace_type $ioam_ns $type &
-   local spid=$!
-   sleep 0.1
- 
-@@ -489,7 +487,7 @@ out_undef_ns()
-          trace prealloc type 0x800000 ns 0 size 4 dev veth0
- 
-   run_test ${FUNCNAME[0]} "${desc} ($1 mode)" $ioam_node_alpha $ioam_node_beta \
--         db01::2 db01::1 veth0 0x800000 0
-+         db01::1 0x800000 0 $1
- 
-   [ "$1" = "encap" ] && ip -netns $ioam_node_beta link set ip6tnl0 down
- }
-@@ -509,7 +507,7 @@ out_no_room()
-          trace prealloc type 0xc00000 ns 123 size 4 dev veth0
- 
-   run_test ${FUNCNAME[0]} "${desc} ($1 mode)" $ioam_node_alpha $ioam_node_beta \
--         db01::2 db01::1 veth0 0xc00000 123
-+         db01::1 0xc00000 123 $1
- 
-   [ "$1" = "encap" ] && ip -netns $ioam_node_beta link set ip6tnl0 down
- }
-@@ -543,14 +541,14 @@ out_bits()
-       if [ $cmd_res != 0 ]
-       then
-         npassed=$((npassed+1))
--        log_test_passed "$descr"
-+        log_test_passed "$descr ($1 mode)"
-       else
-         nfailed=$((nfailed+1))
--        log_test_failed "$descr"
-+        log_test_failed "$descr ($1 mode)"
-       fi
-     else
- 	run_test "out_bit$i" "$descr ($1 mode)" $ioam_node_alpha \
--           $ioam_node_beta db01::2 db01::1 veth0 ${bit2type[$i]} 123
-+           $ioam_node_beta db01::1 ${bit2type[$i]} 123 $1
-     fi
-   done
- 
-@@ -574,7 +572,7 @@ out_full_supp_trace()
-          trace prealloc type 0xfff002 ns 123 size 100 dev veth0
- 
-   run_test ${FUNCNAME[0]} "${desc} ($1 mode)" $ioam_node_alpha $ioam_node_beta \
--         db01::2 db01::1 veth0 0xfff002 123
-+         db01::1 0xfff002 123 $1
- 
-   [ "$1" = "encap" ] && ip -netns $ioam_node_beta link set ip6tnl0 down
- }
-@@ -604,7 +602,7 @@ in_undef_ns()
-          trace prealloc type 0x800000 ns 0 size 4 dev veth0
- 
-   run_test ${FUNCNAME[0]} "${desc} ($1 mode)" $ioam_node_alpha $ioam_node_beta \
--         db01::2 db01::1 veth0 0x800000 0
-+         db01::1 0x800000 0 $1
- 
-   [ "$1" = "encap" ] && ip -netns $ioam_node_beta link set ip6tnl0 down
- }
-@@ -624,7 +622,7 @@ in_no_room()
-          trace prealloc type 0xc00000 ns 123 size 4 dev veth0
- 
-   run_test ${FUNCNAME[0]} "${desc} ($1 mode)" $ioam_node_alpha $ioam_node_beta \
--         db01::2 db01::1 veth0 0xc00000 123
-+         db01::1 0xc00000 123 $1
- 
-   [ "$1" = "encap" ] && ip -netns $ioam_node_beta link set ip6tnl0 down
- }
-@@ -651,7 +649,7 @@ in_bits()
-            dev veth0
- 
-     run_test "in_bit$i" "${desc/<n>/$i} ($1 mode)" $ioam_node_alpha \
--           $ioam_node_beta db01::2 db01::1 veth0 ${bit2type[$i]} 123
-+           $ioam_node_beta db01::1 ${bit2type[$i]} 123 $1
-   done
- 
-   [ "$1" = "encap" ] && ip -netns $ioam_node_beta link set ip6tnl0 down
-@@ -679,7 +677,7 @@ in_oflag()
-          trace prealloc type 0xc00000 ns 123 size 4 dev veth0
- 
-   run_test ${FUNCNAME[0]} "${desc} ($1 mode)" $ioam_node_alpha $ioam_node_beta \
--         db01::2 db01::1 veth0 0xc00000 123
-+         db01::1 0xc00000 123 $1
- 
-   [ "$1" = "encap" ] && ip -netns $ioam_node_beta link set ip6tnl0 down
- 
-@@ -703,7 +701,7 @@ in_full_supp_trace()
-          trace prealloc type 0xfff002 ns 123 size 80 dev veth0
- 
-   run_test ${FUNCNAME[0]} "${desc} ($1 mode)" $ioam_node_alpha $ioam_node_beta \
--         db01::2 db01::1 veth0 0xfff002 123
-+         db01::1 0xfff002 123 $1
- 
-   [ "$1" = "encap" ] && ip -netns $ioam_node_beta link set ip6tnl0 down
- }
-@@ -731,7 +729,7 @@ fwd_full_supp_trace()
-          trace prealloc type 0xfff002 ns 123 size 244 via db01::1 dev veth0
- 
-   run_test ${FUNCNAME[0]} "${desc} ($1 mode)" $ioam_node_alpha $ioam_node_gamma \
--         db01::2 db02::2 veth0 0xfff002 123
-+         db02::2 0xfff002 123 $1
- 
-   [ "$1" = "encap" ] && ip -netns $ioam_node_gamma link set ip6tnl0 down
- }
-diff --git a/tools/testing/selftests/net/ioam6_parser.c b/tools/testing/selftests/net/ioam6_parser.c
-index d9d1d4190126..14b354e14d25 100644
---- a/tools/testing/selftests/net/ioam6_parser.c
-+++ b/tools/testing/selftests/net/ioam6_parser.c
-@@ -8,7 +8,6 @@
- #include <errno.h>
- #include <limits.h>
- #include <linux/const.h>
--#include <linux/if_ether.h>
- #include <linux/ioam6.h>
- #include <linux/ipv6.h>
- #include <stdlib.h>
-@@ -512,14 +511,6 @@ static int str2id(const char *tname)
- 	return -1;
- }
- 
--static int ipv6_addr_equal(const struct in6_addr *a1, const struct in6_addr *a2)
--{
--	return ((a1->s6_addr32[0] ^ a2->s6_addr32[0]) |
--		(a1->s6_addr32[1] ^ a2->s6_addr32[1]) |
--		(a1->s6_addr32[2] ^ a2->s6_addr32[2]) |
--		(a1->s6_addr32[3] ^ a2->s6_addr32[3])) == 0;
--}
--
- static int get_u32(__u32 *val, const char *arg, int base)
- {
- 	unsigned long res;
-@@ -603,70 +594,88 @@ static int (*func[__TEST_MAX])(int, struct ioam6_trace_hdr *, __u32, __u16) = {
- 
- int main(int argc, char **argv)
- {
--	int fd, size, hoplen, tid, ret = 1;
--	struct in6_addr src, dst;
-+	int fd, size, hoplen, tid, ret = 1, on = 1;
-+	__u8 buffer[512], is_encap;
- 	struct ioam6_hdr *opt;
--	struct ipv6hdr *ip6h;
--	__u8 buffer[400], *p;
--	__u16 ioam_ns;
-+	struct cmsghdr *cmsg;
-+	struct msghdr msg;
-+	struct iovec iov;
- 	__u32 tr_type;
-+	__u16 ioam_ns;
-+	__u8 *ptr;
- 
--	if (argc != 7)
-+	if (argc != 5)
- 		goto out;
- 
--	tid = str2id(argv[2]);
-+	tid = str2id(argv[1]);
- 	if (tid < 0 || !func[tid])
- 		goto out;
- 
--	if (inet_pton(AF_INET6, argv[3], &src) != 1 ||
--	    inet_pton(AF_INET6, argv[4], &dst) != 1)
-+	if (get_u32(&tr_type, argv[2], 16) ||
-+	    get_u16(&ioam_ns, argv[3], 0))
- 		goto out;
- 
--	if (get_u32(&tr_type, argv[5], 16) ||
--	    get_u16(&ioam_ns, argv[6], 0))
-+	if (!strcmp(argv[4], "inline"))
-+		is_encap = 0;
-+	else if (!strcmp(argv[4], "encap"))
-+		is_encap = 1;
-+	else
- 		goto out;
- 
--	fd = socket(AF_PACKET, SOCK_DGRAM, __cpu_to_be16(ETH_P_IPV6));
--	if (!fd)
-+	fd = socket(PF_INET6, SOCK_RAW,
-+		    is_encap ? IPPROTO_IPV6 : IPPROTO_ICMPV6);
-+	if (fd < 0)
- 		goto out;
- 
--	if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE,
--		       argv[1], strlen(argv[1])))
--		goto close;
-+	setsockopt(fd, IPPROTO_IPV6, IPV6_RECVHOPOPTS,  &on, sizeof(on));
- 
-+	iov.iov_len = 1;
-+	iov.iov_base = malloc(CMSG_SPACE(sizeof(buffer)));
-+	if (!iov.iov_base)
-+		goto close;
- recv:
--	size = recv(fd, buffer, sizeof(buffer), 0);
-+	memset(&msg, 0, sizeof(msg));
-+	msg.msg_iov = &iov;
-+	msg.msg_iovlen = 1;
-+	msg.msg_control = buffer;
-+	msg.msg_controllen = CMSG_SPACE(sizeof(buffer));
-+
-+	size = recvmsg(fd, &msg, 0);
- 	if (size <= 0)
- 		goto close;
- 
--	ip6h = (struct ipv6hdr *)buffer;
-+	for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL;
-+	     cmsg = CMSG_NXTHDR(&msg, cmsg)) {
-+		if (cmsg->cmsg_level != IPPROTO_IPV6 ||
-+		    cmsg->cmsg_type != IPV6_HOPOPTS ||
-+		    cmsg->cmsg_len < sizeof(struct ipv6_hopopt_hdr))
-+			continue;
- 
--	if (!ipv6_addr_equal(&ip6h->saddr, &src) ||
--	    !ipv6_addr_equal(&ip6h->daddr, &dst))
--		goto recv;
-+		ptr = (__u8 *)CMSG_DATA(cmsg);
- 
--	if (ip6h->nexthdr != IPPROTO_HOPOPTS)
--		goto close;
-+		hoplen = (ptr[1] + 1) << 3;
-+		ptr += sizeof(struct ipv6_hopopt_hdr);
- 
--	p = buffer + sizeof(*ip6h);
--	hoplen = (p[1] + 1) << 3;
--	p += sizeof(struct ipv6_hopopt_hdr);
-+		while (hoplen > 0) {
-+			opt = (struct ioam6_hdr *)ptr;
- 
--	while (hoplen > 0) {
--		opt = (struct ioam6_hdr *)p;
-+			if (opt->opt_type == IPV6_TLV_IOAM &&
-+			    opt->type == IOAM6_TYPE_PREALLOC) {
-+				ptr += sizeof(*opt);
-+				ret = func[tid](tid,
-+						(struct ioam6_trace_hdr *)ptr,
-+						tr_type, ioam_ns);
-+				goto close;
-+			}
- 
--		if (opt->opt_type == IPV6_TLV_IOAM &&
--		    opt->type == IOAM6_TYPE_PREALLOC) {
--			p += sizeof(*opt);
--			ret = func[tid](tid, (struct ioam6_trace_hdr *)p,
--					   tr_type, ioam_ns);
--			break;
-+			ptr += opt->opt_len + 2;
-+			hoplen -= opt->opt_len + 2;
- 		}
--
--		p += opt->opt_len + 2;
--		hoplen -= opt->opt_len + 2;
- 	}
-+
-+	goto recv;
- close:
-+	free(iov.iov_base);
- 	close(fd);
- out:
- 	return ret;
--- 
-2.34.1
+On 2/16/24 17:27, Kees Cook wrote:
+> Prepare for the coming implementation by GCC and Clang of the __counted_by
+> attribute. Flexible array members annotated with __counted_by can have
+> their accesses bounds-checked at run-time checking via CONFIG_UBSAN_BOUNDS
+> (for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
+> functions).
+> 
+> As found with Coccinelle[1], add __counted_by for struct tc_pedit.
+> Additionally, since the element count member must be set before accessing
+> the annotated flexible array member, move its initialization earlier.
+> 
+> Link: https://github.com/kees/kernel-tools/blob/trunk/coccinelle/examples/counted_by.cocci [1]
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> ---
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Jamal Hadi Salim <jhs@mojatatu.com>
+> Cc: Cong Wang <xiyou.wangcong@gmail.com>
+> Cc: Jiri Pirko <jiri@resnulli.us>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+> Cc: netdev@vger.kernel.org
+> Cc: linux-hardening@vger.kernel.org
 
+`opt->nkeys` updated before `memcpy()`, looks good to me:
+
+Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+
+Thanks!
+--
+Gustavo
+
+> ---
+>   include/uapi/linux/tc_act/tc_pedit.h | 2 +-
+>   net/sched/act_pedit.c                | 2 +-
+>   2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/uapi/linux/tc_act/tc_pedit.h b/include/uapi/linux/tc_act/tc_pedit.h
+> index f3e61b04fa01..f5cab7fc96ab 100644
+> --- a/include/uapi/linux/tc_act/tc_pedit.h
+> +++ b/include/uapi/linux/tc_act/tc_pedit.h
+> @@ -62,7 +62,7 @@ struct tc_pedit_sel {
+>   	tc_gen;
+>   	unsigned char           nkeys;
+>   	unsigned char           flags;
+> -	struct tc_pedit_key     keys[0];
+> +	struct tc_pedit_key     keys[] __counted_by(nkeys);
+>   };
+>   
+>   #define tc_pedit tc_pedit_sel
+> diff --git a/net/sched/act_pedit.c b/net/sched/act_pedit.c
+> index 2ef22969f274..21e863d2898c 100644
+> --- a/net/sched/act_pedit.c
+> +++ b/net/sched/act_pedit.c
+> @@ -515,11 +515,11 @@ static int tcf_pedit_dump(struct sk_buff *skb, struct tc_action *a,
+>   		spin_unlock_bh(&p->tcf_lock);
+>   		return -ENOBUFS;
+>   	}
+> +	opt->nkeys = parms->tcfp_nkeys;
+>   
+>   	memcpy(opt->keys, parms->tcfp_keys,
+>   	       flex_array_size(opt, keys, parms->tcfp_nkeys));
+>   	opt->index = p->tcf_index;
+> -	opt->nkeys = parms->tcfp_nkeys;
+>   	opt->flags = parms->tcfp_flags;
+>   	opt->action = p->tcf_action;
+>   	opt->refcnt = refcount_read(&p->tcf_refcnt) - ref;
 
