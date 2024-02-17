@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-72608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8209858D00
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 03:52:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDB8C858D01
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 03:53:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E05491C21320
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 02:52:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 456002851AB
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 02:53:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5622A12E78;
-	Sat, 17 Feb 2024 02:52:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32D62171D1;
+	Sat, 17 Feb 2024 02:53:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="bRsapKWx"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="lNuAlxdX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4EA22CA7
-	for <netdev@vger.kernel.org>; Sat, 17 Feb 2024 02:52:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C484B23D0
+	for <netdev@vger.kernel.org>; Sat, 17 Feb 2024 02:53:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708138360; cv=none; b=EnsPzUS1UqG+NB91CFbZJpY8M46CDXHznmDEVYsCyuF+ceyqRbcDu+5pOkhsc9hDJ+3UXW4XBjGbY70PjVBIWTliqELHnWWWKS5ldS+zpyX7IkeFcw2Hw1AI4G4fvdfFatYD0e6mYjg+E7vxG4j199iAmWd3Enqr0EkSICgCLjk=
+	t=1708138389; cv=none; b=UxJPg3cK+DyxnqISgyEUikVkMqo3zPuvlp+/hvUO8vpouTh5dERxYiwBxIG3EJ3MVmhhbamoCmeVDMKYPqSbc36b3iUtUi9bTmKCt2XtDKdWTfrPZKc63nDc7NdPcepk/bfr5B1B9x9+cfrhndbveAfw44u+378kA43HutUNMjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708138360; c=relaxed/simple;
-	bh=F1nuZPp+nv3k/HkLXTKDgpweDjvF7iE8250zHGkyFtU=;
+	s=arc-20240116; t=1708138389; c=relaxed/simple;
+	bh=xWedILKpA8swNFdXJCxMZL5Wmx8ikAWc9clk3Wc56iY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QXU9CjVOnngl/U93S4xlhs26OYQB1hd9KtoaYArjWkLR10zh3t9FT1YNypN+3hba+9KT9ythpRQSgoSpdqTGu1zsU+TfyPxzQ2hk9GW3iE7UoOhtes45NATZbYVb5GtXynrbbfYvo1ZfnB2pSAKf5msCfW7qmdFmxBgLnv7AgJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=bRsapKWx; arc=none smtp.client-ip=209.85.214.171
+	 In-Reply-To:Content-Type; b=jGEdB1RY8Mv3+f9tpOhbyuIsemHVR5DVXWn4ARGlEGbSFiNEV95hXOFiq/X7d/IDibDES7bB10XSuNFY97sYznVVKloL38METVrwVnNg12ZmgJLhyTHR77I+gtnaCrp90x5XoQeCNUeU7zL0h7G6dxYEjLiCZa341VcbyiXgbJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=lNuAlxdX; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1d51ba18e1bso28013835ad.0
-        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 18:52:38 -0800 (PST)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1dba94f9201so11407825ad.0
+        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 18:53:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1708138358; x=1708743158; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1708138387; x=1708743187; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=NP2KTtF5lD4gpHsrutGea9pOtPpXIo8zNJIqPVBXSuA=;
-        b=bRsapKWxaesmhN4jQPzihA9tq9as7/+dZWvJd1QFGXbSoXlKAPXUC/bnT43ZW/kIcB
-         55ZPUZCtKVNXtjfec7bqagznSHWf5uMmzt8D377ce1YxHdWe7ls3hog8KJu61u8tW2d+
-         T8Yue+GUvab0uVprUBB/AZ4UdGismOf43gD3y/RGME8X+8fo9l2IR6pkwIu83nUXCsM6
-         1nAGZ9XJxrZdOGUzFy5BC5gQTM2lCxB4apuX9coby8sKO/ufOZpxuqMjQAatrVuf9fzp
-         B3AxDBKzBPfDdG1R5caVGmocS3VSmYR9xvSKpTzM4zYisHTeIx+PyG7XO12570zTI+fp
-         Gt1A==
+        bh=kE8XebWoZx41+yO25UAJXmvFKFZab2wApIilugYjFUk=;
+        b=lNuAlxdX4RlOMwY382ooS3dbwOCkWt3kc5RHg8pjO73yF5UFsd+aqNk4sxy3jsg/BD
+         ZbT3l1+pOYaAyg2gaHZs/w7ieTAhxpQlMH9va1lWnpsAULMtdR8uggGHq6fmBQ2/Vkqx
+         CzM6w2gqpUAv9X+oX/h+Cjc3U8qursiNMXbPhWp9E2RTxI3elObof0VnusUPJiObAhZ2
+         GOUpHyrl+YThHrR40k1kAbGomwkgzBPyl/WsScTn+6aLQKaE7thLJsIERGZbJTvCwXKl
+         yGx0vZPa8cIe2ng9ovBf3xcOdjUBHUL44Vi0r9AGq722x1ZHrExvDt8Kfg69LW1/OxAs
+         mHtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708138358; x=1708743158;
+        d=1e100.net; s=20230601; t=1708138387; x=1708743187;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NP2KTtF5lD4gpHsrutGea9pOtPpXIo8zNJIqPVBXSuA=;
-        b=JuUGX/EAyrzv+VifKMkrHhmuQgSFnPHETnpO7DTHGjCtzrUXQys9zXmTTYdhhzouLd
-         7jq81m+98k7BIMOUCUHH8GpPLA85cfce3r4zMX/1c8Rg1EDuCvm8N1ndyH3734fJ1TP7
-         kNd4xPBtAmTySjc1AV6NlJVG5U9JA0MMnZ0FuWswkBSJhzMBA+U5zNmfBlcdYSSVear8
-         2Pk6xNMticasI6goJu7v9tqVNA3qMma0p+98kx20hfD9QE7rt8z9/mTsxBNw1xdns2He
-         wNW7cpFg39V0Dl9uDcVx+DZopxRxPv2ZZlKnV/x62xx4XzZY/CaH9YqtO68SXe8kCCER
-         dKmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUvRS7gJktUU3s+x9AE5qEkdNLWHjvC2wgkGTLy54PzoZrt0QDBXyfMaEm7emwarrjMrC6OgCDOL/NQxPAKfj840XLKAsR+
-X-Gm-Message-State: AOJu0Yz63JOtC74c1xjN02IHcJarqV04Fzga/BwlXa/DIAN2uA7JQT4P
-	QXV9YAa5cpLPxBNsIaVx9IyR/f4EOHogNhGNpi1ZVahBmaartx4gpQz2Bwnw5zA=
-X-Google-Smtp-Source: AGHT+IH29YCEbDjfqXQIauWvVpcsK5OvpfLXI+8JkndGNDcMGlJJUpPtLgOVEQYSbaMlTVoVoP5wog==
-X-Received: by 2002:a17:903:11c3:b0:1d7:5943:21b8 with SMTP id q3-20020a17090311c300b001d7594321b8mr9134170plh.16.1708138357985;
-        Fri, 16 Feb 2024 18:52:37 -0800 (PST)
+        bh=kE8XebWoZx41+yO25UAJXmvFKFZab2wApIilugYjFUk=;
+        b=vsz+IowUl0svR63aRomqEY4fsXSofTZeOqgm/LsYuGUT8Wv1gg17uMwB0RolM2x+sX
+         CTpNcVFEWbImE4y4DDUCk1hjpdvMMu8/+7FM2UVn3x3u9UyCCbrqgApXaIMREF371Ilf
+         ml4KrjVeP6cs/52IuZsMabyc4L3hDC4fyC2BtTPmsMsLiPuC3FZwSkBm1+uhdAERAOKX
+         M4Jm9h0HpVJuSMbC6IDZ8Ox32+3bJH1Nfu/jV+tSfR29FZlJU4pzm6TOMyTHtlflg4Pi
+         vHpmwSXLx1/0Iv/pR++dT0MeTUkz61UpdEiDVJAWICwY3DFomJcLZy6iGC2zkLco3pdx
+         AfpA==
+X-Forwarded-Encrypted: i=1; AJvYcCVeOFLaiKxbLAN470PMLAD6xIwipcTIAPoPpxORYMJ79T3I5hp84pwihdAKJuSoR+vSz/SLUOIuJHQD68lXXnRHlkIZZ/eT
+X-Gm-Message-State: AOJu0YyBIhrpZ/GPnpZxa2cIPS1FWGW49jzUe8FrH8Wz9dyHIWpP2PcW
+	6wfDvNWv3KpZsUh9K2Rwh3JxFNj1/enceuJetE3KWtumbikaV/bqphId3cuXYcs=
+X-Google-Smtp-Source: AGHT+IHIFFw9xBbbr3xhSDRYIGOv2u+RC2kxyt8iQuFPfJG1QgLXHHVOylfxXJJwnuFolxnAdzcrbA==
+X-Received: by 2002:a17:902:684a:b0:1db:730c:c077 with SMTP id f10-20020a170902684a00b001db730cc077mr5609139pln.58.1708138387163;
+        Fri, 16 Feb 2024 18:53:07 -0800 (PST)
 Received: from [10.1.110.102] ([50.247.56.82])
-        by smtp.gmail.com with ESMTPSA id y5-20020a170902e18500b001db499c5c12sm509452pla.143.2024.02.16.18.52.37
+        by smtp.gmail.com with ESMTPSA id y5-20020a170902e18500b001db499c5c12sm509452pla.143.2024.02.16.18.53.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Feb 2024 18:52:37 -0800 (PST)
-Message-ID: <17df4023-6b03-4e95-b3b5-eddbda229386@davidwei.uk>
-Date: Fri, 16 Feb 2024 19:52:35 -0700
+        Fri, 16 Feb 2024 18:53:06 -0800 (PST)
+Message-ID: <82d0bfd2-2b49-47cd-b91e-b5e749682537@davidwei.uk>
+Date: Fri, 16 Feb 2024 19:53:06 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,39 +76,65 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 0/3] netdevsim: link and forward skbs between
- ports
+Subject: Re: [PATCH net-next v11 1/3] netdevsim: allow two netdevsim ports to
+ be connected
 Content-Language: en-GB
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
- Sabrina Dubroca <sd@queasysnail.net>, netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, Sabrina Dubroca <sd@queasysnail.net>,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
 References: <20240215194325.1364466-1-dw@davidwei.uk>
- <ea379c684c8dbab360dce3e9add3b3a33a00143f.camel@redhat.com>
- <cf9e07d6-6693-4511-93a6-e375d6f0e738@davidwei.uk>
- <20240216174731.5dce1a43@kernel.org>
+ <20240215194325.1364466-2-dw@davidwei.uk>
+ <20240216174646.6a0dd168@kernel.org>
 From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20240216174731.5dce1a43@kernel.org>
+In-Reply-To: <20240216174646.6a0dd168@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 2024-02-16 18:47, Jakub Kicinski wrote:
-> On Fri, 16 Feb 2024 12:13:42 -0700 David Wei wrote:
->>> this apparently causes rtnetlink.sh self-tests failures:
->>>
->>> https://netdev.bots.linux.dev/flakes.html?tn-needle=rtnetlink-sh
->>>
->>> example failure:
->>>
->>> https://netdev-3.bots.linux.dev/vmksft-net/results/467721/18-rtnetlink-sh/stdout
->>>
->>> the ipsec_offload test (using netdevsim) fails.  
->>
->> Thanks for catching this Paulo. Can I sort this out in a separate patch,
->> as the rtnetlink.sh test is disabled in CI right now?
+On 2024-02-16 18:46, Jakub Kicinski wrote:
+> On Thu, 15 Feb 2024 11:43:23 -0800 David Wei wrote:
+>> +	ns_a = get_net_ns_by_fd(netnsfd_a);
+>> +	if (IS_ERR(ns_a)) {
+>> +		pr_err("Could not find netns with fd: %d\n", netnsfd_a);
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	ns_b = get_net_ns_by_fd(netnsfd_b);
+>> +	if (IS_ERR(ns_b)) {
+>> +		pr_err("Could not find netns with fd: %d\n", netnsfd_b);
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	err = -EINVAL;
+>> +	rtnl_lock();
+>> +	dev_a = __dev_get_by_index(ns_a, ifidx_a);
+>> +	if (!dev_a) {
+>> +		pr_err("Could not find device with ifindex %u in netnsfd %d\n", ifidx_a, netnsfd_a);
+>> +		goto out_put_netns_a;
+>> +	}
+>> +
+>> +	if (!netdev_is_nsim(dev_a)) {
+>> +		pr_err("Device with ifindex %u in netnsfd %d is not a netdevsim\n", ifidx_a, netnsfd_a);
+>> +		goto out_put_netns_a;
+>> +	}
+>> +
+>> +	dev_b = __dev_get_by_index(ns_b, ifidx_b);
+>> +	if (!dev_b) {
+>> +		pr_err("Could not find device with ifindex %u in netnsfd %d\n", ifidx_b, netnsfd_b);
+>> +		goto out_put_netns_b;
+>> +	}
+>> +
+>> +	if (!netdev_is_nsim(dev_b)) {
+>> +		pr_err("Device with ifindex %u in netnsfd %d is not a netdevsim\n", ifidx_b, netnsfd_b);
+>> +		goto out_put_netns_b;
+>> +	}
+>> +
+>> +	if (dev_a == dev_b) {
+>> +		pr_err("Cannot link a netdevsim to itself\n");
+>> +		goto out_put_netns_b;
 > 
-> Looks like the code needs fixing, still, so please tack the rtnetlink
-> fix onto the v12
+> You need to fix the gotos here :( You're leaking the references 
+> to the namespaces on error paths :(
 
-Okay I'll add it on!
+Sorry about that, should check every time I move code around. :(
 
