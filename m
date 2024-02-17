@@ -1,179 +1,123 @@
-Return-Path: <netdev+bounces-72612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72613-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEB8B858D16
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 04:47:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96D7E858D17
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 04:47:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A37A1C20FAF
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 03:47:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 504A01F22B21
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 03:47:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FF0D1BC2D;
-	Sat, 17 Feb 2024 03:47:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EDFA1B7E5;
+	Sat, 17 Feb 2024 03:47:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fy9xYHHN"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698E21947E
-	for <netdev@vger.kernel.org>; Sat, 17 Feb 2024 03:46:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9562718E02
+	for <netdev@vger.kernel.org>; Sat, 17 Feb 2024 03:47:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708141622; cv=none; b=e3gvRZoz8eaPNT83D4HC/wN/Sljt+j8/81E94hrkkmNicjydqbUwTFWqwKY6g/WsRvIz8NlZNVbnHtB/wDEMZv0lXptDcBOVUvojl459zsUmPIKW+Zy/D+7MSVTk47VBj4CamUrY8CbobJ5HH++kqVwonaijDJklBKRX09I03X0=
+	t=1708141659; cv=none; b=i2PKMVsgAQ3Tishd+OU+Wl6sgBktqDU+3ipZmNxjgLTX6JK6U7U/u3cTnH/RC3k42gddIk7otV/qqj7TsmJzuQ6NZmqDLC3TRqAIyBnCyscFdd/UVOlRHkiaCpSc7lnut4G+JS9PosEOFRuNLX+MbEhzI464tv9N2auPFvXD2Gs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708141622; c=relaxed/simple;
-	bh=f2J33Ra6MZcOm5toscKELQvfNYqvLyIvbJ5/Yd7aM1s=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=IHOxEajUNfAHKUHQ3HiiqeZxsPsKq8FTcOosC/TqcVVDnSnJrfuhmgtaHHuoHWpC8Pj/uHiOmwdJrQhK+dFbOpmwJ9k9FmIpv6sHLgF/4p3Y2zc9haMuvTUQzjcj7OqgiPD+qYNmkVYP7pQRkoCUXH5Vi0YVf151Za6SdskgXtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4TcF3h3gpHz1FKdQ;
-	Sat, 17 Feb 2024 11:42:08 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id 98CEA1402CC;
-	Sat, 17 Feb 2024 11:46:55 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Sat, 17 Feb
- 2024 11:46:55 +0800
-Subject: Re: [PATCH net-next] net: page_pool: fix recycle stats for system
- page_pool allocator
-To: Lorenzo Bianconi <lorenzo@kernel.org>, <netdev@vger.kernel.org>
-CC: <lorenzo.bianconi@redhat.com>, <kuba@kernel.org>, <davem@davemloft.net>,
-	<edumazet@google.com>, <pabeni@redhat.com>, <hawk@kernel.org>,
-	<ilias.apalodimas@linaro.org>, <toke@redhat.com>,
-	<aleksander.lobakin@intel.com>
-References: <87f572425e98faea3da45f76c3c68815c01a20ee.1708075412.git.lorenzo@kernel.org>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <2f315c01-37ba-77e2-1d0f-568f453b3166@huawei.com>
-Date: Sat, 17 Feb 2024 11:46:55 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	s=arc-20240116; t=1708141659; c=relaxed/simple;
+	bh=i+Xhnu2emPM8c3ZSTUcSQSlVRJkZNYRsb+nGgWaEsf0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GaZfXowJc5vrYX/ITOwhRs6c2wlKeUdgqBuB3ZI44iXo39DSRoRyXEmrx1baG+ochZ3fbYCIzhk/jOq4qtpFzuYW++S4vIKia9DlbldeqVctlq5UNPUA+yG/OSI1E7N35Dq9yNnaq6fpKHMAt7GuUQWvNP3HpSO76oAzAGALS1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fy9xYHHN; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-6080f44d128so1829977b3.2
+        for <netdev@vger.kernel.org>; Fri, 16 Feb 2024 19:47:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708141656; x=1708746456; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=abRQKB3Tjfx1ABWZplXt9I8J14hGcd94gAE4dJYLpFw=;
+        b=fy9xYHHN2ThQcAiMeumwhgN+9iAm8aMV0+ERRH5Y8+pFjYFlOkPOUmbZX792v5OzfK
+         o2buLvUkxSNrMARAG8F7MAsnLPiLBs8PKlsnf2dz46ryrGZzqT3eS2Cti6hJFTsbYcNr
+         78wnxw61RES5FI5iGhdilfFB99dGNRfux4nl1XxxrBUmE7w5W/BdgyQAdWDn83EcjY6E
+         IQ7wJCYPng3ZREUuSFtXXC3F3ekB4xkhqFuIsr185XjcgIXGuzaAgtcD4xw/tLeV/ogi
+         LEEf/+MRlzB32Z95kIDKpHSAOyNZZZSmlYAFS4wNvX7OZ14KH4tbQStVeh82406RVOz2
+         DF5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708141656; x=1708746456;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=abRQKB3Tjfx1ABWZplXt9I8J14hGcd94gAE4dJYLpFw=;
+        b=mZOj7cPHUajigWvPg0CDu2UR4OcTVnzUcJQbIC5WHonpd+YtRJT6ffqCuGUWC4Cn+h
+         gSJzRlV2NojE3EgXacsODSw9AI0M7h6tKCBRlCwwXtp5zBLMJ3iHavGU9ZVTn93+O9lS
+         PP3dJNvQzRv51lII9mbih5KNpFpjFOtoncZMskfCPCrxI+tQQylTpeOdWMozTA390fbc
+         OwOGNfv61cc2Bvim3kp1IrLPxtTM8GEWMZmWqac22hEs6CWgsphxnUEFxG6wN6zjZ8NF
+         kcH1KqSWJs4/654oPmROTZq6WbDd9Ufm53YxfbI/uNx/7tzVlt/44GJw7ER452sOSbES
+         VAwA==
+X-Gm-Message-State: AOJu0Yw8NF+vxd7Fj85Vs4yoBGKQBC8Xz0oGbpBta+tuJNykONX2Hmat
+	EtnlEowtBencRbFA8CAha1+XdEZXOaNfbKrDe33ihcjP3MXYBPXO8pSBea8u
+X-Google-Smtp-Source: AGHT+IEo9XX4B071OBcZrFOTUJ+0glG0vTnhjiKBTdcJm/HW8QbJtg+32hBrI/4xhpHfdLDXgvkjkw==
+X-Received: by 2002:a81:b724:0:b0:607:ec79:4db0 with SMTP id v36-20020a81b724000000b00607ec794db0mr5012791ywh.48.1708141656012;
+        Fri, 16 Feb 2024 19:47:36 -0800 (PST)
+Received: from kickker.attlocal.net ([2600:1700:6cf8:1240:14e1:45d8:b0d1:cb6f])
+        by smtp.gmail.com with ESMTPSA id s5-20020a817705000000b00607bc220c5esm632678ywc.102.2024.02.16.19.47.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Feb 2024 19:47:35 -0800 (PST)
+From: Thinker Lee <thinker.li@gmail.com>
+To: netdev@vger.kernel.org
+Cc: dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Subject: [PATCH bpf-next v3 1/3] x86/cfi,bpf: Add a stub function for get_info of struct tcp_congestion_ops.
+Date: Fri, 16 Feb 2024 19:47:34 -0800
+Message-Id: <20240217034734.1869771-1-thinker.li@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <87f572425e98faea3da45f76c3c68815c01a20ee.1708075412.git.lorenzo@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemm500005.china.huawei.com (7.185.36.74)
+Content-Transfer-Encoding: 8bit
 
-On 2024/2/16 17:25, Lorenzo Bianconi wrote:
-> Use global percpu page_pool_recycle_stats counter for system page_pool
-> allocator instead of allocating a separate percpu variable for each
-> (also percpu) page pool instance.
+From: Kui-Feng Lee <thinker.li@gmail.com>
 
-I may missed some obvious discussion in previous version due to spring
-holiday.
+struct tcp_congestion_ops is missing a stub function for get_info.  This is
+required for checking the consistency of cfi_stubs of struct_ops.
 
-> 
-> Reviewed-by: Toke Hoiland-Jorgensen <toke@redhat.com>
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
->  include/net/page_pool/types.h |  5 +++--
->  net/core/dev.c                |  1 +
->  net/core/page_pool.c          | 22 +++++++++++++++++-----
->  3 files changed, 21 insertions(+), 7 deletions(-)
-> 
-> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
-> index 3828396ae60c..2515cca6518b 100644
-> --- a/include/net/page_pool/types.h
-> +++ b/include/net/page_pool/types.h
-> @@ -18,8 +18,9 @@
->  					* Please note DMA-sync-for-CPU is still
->  					* device driver responsibility
->  					*/
-> -#define PP_FLAG_ALL		(PP_FLAG_DMA_MAP |\
-> -				 PP_FLAG_DMA_SYNC_DEV)
-> +#define PP_FLAG_SYSTEM_POOL	BIT(2) /* Global system page_pool */
-> +#define PP_FLAG_ALL		(PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV | \
-> +				 PP_FLAG_SYSTEM_POOL)
->  
->  /*
->   * Fast allocation side cache array/stack
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index cc9c2eda65ac..c588808be77f 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -11738,6 +11738,7 @@ static int net_page_pool_create(int cpuid)
->  #if IS_ENABLED(CONFIG_PAGE_POOL)
->  	struct page_pool_params page_pool_params = {
->  		.pool_size = SYSTEM_PERCPU_PAGE_POOL_SIZE,
-> +		.flags = PP_FLAG_SYSTEM_POOL,
->  		.nid = NUMA_NO_NODE,
->  	};
->  	struct page_pool *pp_ptr;
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index 89c835fcf094..8f0c4e76181b 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -31,6 +31,8 @@
->  #define BIAS_MAX	(LONG_MAX >> 1)
->  
->  #ifdef CONFIG_PAGE_POOL_STATS
-> +static DEFINE_PER_CPU(struct page_pool_recycle_stats, pp_system_recycle_stats);
-> +
->  /* alloc_stat_inc is intended to be used in softirq context */
->  #define alloc_stat_inc(pool, __stat)	(pool->alloc_stats.__stat++)
->  /* recycle_stat_inc is safe to use when preemption is possible. */
-> @@ -220,14 +222,23 @@ static int page_pool_init(struct page_pool *pool,
->  	pool->has_init_callback = !!pool->slow.init_callback;
->  
->  #ifdef CONFIG_PAGE_POOL_STATS
-> -	pool->recycle_stats = alloc_percpu(struct page_pool_recycle_stats);
-> -	if (!pool->recycle_stats)
-> -		return -ENOMEM;
-> +	if (!(pool->p.flags & PP_FLAG_SYSTEM_POOL)) {
-> +		pool->recycle_stats = alloc_percpu(struct page_pool_recycle_stats);
-> +		if (!pool->recycle_stats)
-> +			return -ENOMEM;
-> +	} else {
-> +		/* For system page pool instance we use a singular stats object
-> +		 * instead of allocating a separate percpu variable for each
-> +		 * (also percpu) page pool instance.
-> +		 */
-> +		pool->recycle_stats = &pp_system_recycle_stats;
+Cc: Peter Zijlstra <peterz@infradead.org>
+Signed-off-by: Kui-Feng Lee <thinker.li@gmail.com>
+---
+ net/ipv4/bpf_tcp_ca.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-Do we need to return -EINVAL here if page_pool_init() is called with
-pool->p.flags & PP_FLAG_SYSTEM_POOL being true and cpuid being a valid
-cpu?
-If yes, it seems we may be able to use the cpuid to decide if we need
-to allocate a new pool->recycle_stats without adding a new flag.
+diff --git a/net/ipv4/bpf_tcp_ca.c b/net/ipv4/bpf_tcp_ca.c
+index 7f518ea5f4ac..6ab5d9c36416 100644
+--- a/net/ipv4/bpf_tcp_ca.c
++++ b/net/ipv4/bpf_tcp_ca.c
+@@ -321,6 +321,12 @@ static u32 bpf_tcp_ca_sndbuf_expand(struct sock *sk)
+ 	return 0;
+ }
+ 
++static size_t bpf_tcp_ca_get_info(struct sock *sk, u32 ext, int *attr,
++				  union tcp_cc_info *info)
++{
++	return 0;
++}
++
+ static void __bpf_tcp_ca_init(struct sock *sk)
+ {
+ }
+@@ -340,6 +346,7 @@ static struct tcp_congestion_ops __bpf_ops_tcp_congestion_ops = {
+ 	.cong_control = bpf_tcp_ca_cong_control,
+ 	.undo_cwnd = bpf_tcp_ca_undo_cwnd,
+ 	.sndbuf_expand = bpf_tcp_ca_sndbuf_expand,
++	.get_info = bpf_tcp_ca_get_info,
+ 
+ 	.init = __bpf_tcp_ca_init,
+ 	.release = __bpf_tcp_ca_release,
+-- 
+2.34.1
 
-If no, the API for page_pool_create_percpu() seems a litte weird as it
-relies on the user calling it correctly.
-
-Also, do we need to enforce that page_pool_create_percpu() is only called
-once for the same cpu? if no, we may have two page_pool instance sharing
-the same stats.
-
-> +	}
->  #endif
->  
->  	if (ptr_ring_init(&pool->ring, ring_qsize, GFP_KERNEL) < 0) {
->  #ifdef CONFIG_PAGE_POOL_STATS
-> -		free_percpu(pool->recycle_stats);
-> +		if (!(pool->p.flags & PP_FLAG_SYSTEM_POOL))
-> +			free_percpu(pool->recycle_stats);
->  #endif
->  		return -ENOMEM;
->  	}
-> @@ -251,7 +262,8 @@ static void page_pool_uninit(struct page_pool *pool)
->  		put_device(pool->p.dev);
->  
->  #ifdef CONFIG_PAGE_POOL_STATS
-> -	free_percpu(pool->recycle_stats);
-> +	if (!(pool->p.flags & PP_FLAG_SYSTEM_POOL))
-> +		free_percpu(pool->recycle_stats);
->  #endif
->  }
->  
-> 
 
