@@ -1,123 +1,168 @@
-Return-Path: <netdev+bounces-72630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDEB0858EB6
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 11:28:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1113858EC3
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 11:34:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E61B1F21AE5
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 10:28:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 41981B209DD
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 10:34:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A70062C85C;
-	Sat, 17 Feb 2024 10:28:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C905A487B4;
+	Sat, 17 Feb 2024 10:34:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="tYWLhEQh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MRQJcQ8f"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A449D2C6A4;
-	Sat, 17 Feb 2024 10:28:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 431681D525
+	for <netdev@vger.kernel.org>; Sat, 17 Feb 2024 10:34:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708165724; cv=none; b=LdzMbAJ7BPVKWCBdQiak2wJBFjW6nniFCg5dAk3Nhix8j8Edy09B/K2Rb/mtj9NGl5nL6l+Dz5GgHmFjOTqfYzr6UvlRqfNvm9M8RUW7q96WG8K+6Skb/NtLA3R4hCgWV1Nq8dI5aQ5ocoXtDGtw+HIJ5ntpzcLDglInKpT026g=
+	t=1708166080; cv=none; b=KPOSzTV0aso6DsC4Ic6i/u04IR1A9gbPmQ/lCCgNfQ5+c55jTEreGidmTFzLaRFIwL+7GgOwL0k7fOhIvAnI9XvLRH4QrIIUOuc+hHfP7uWDQHhPucNCsLRtKu+3QCek2gRodg3bwH/vkNF+Ij43nUYJ+YLpM2PAaPYPgU5i11g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708165724; c=relaxed/simple;
-	bh=sDT0IZg/T72E+ZZXyLdjzueUeralMw/ejE2pyoF2J1s=;
+	s=arc-20240116; t=1708166080; c=relaxed/simple;
+	bh=LoYxog7Iul3HP3wdb7G/rin5j1GdLBooMdZyC/FXOxY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EvDKL/R60SGwPbTv0H2P+6MLtQl6QF5RG1L3fKZUGTMjb+02NzM52QWRlEevxYANQR3npiyMawk0oYzjYpYyLLTDMIImpJl978zwxAhTeH+dCMakk4z4+XZD2cnE341Kye4O/zcMEkTyg36WMfIoX9slMBJ1BH/HsPN2ZSpujDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=tYWLhEQh; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=zW6/SWxGJHOFLV38kHr7ZjS0MYE8Rz8g0t7ofw+Cuo8=; b=tYWLhEQhTmPqy7/y0Sb//DKRCG
-	PXCxOnCm00wXSxEHj8mpcRlVyUSIjbT4fp1GyW357yq3YM5ib91HHpY0qH6P21EQFoDllZphCzEVC
-	013abUoqZ8VPLUBODiRsK1PSHCIpsEm1N0VkH1ahkdj1+5HljScGM6g2SqC2OcVaRs9hPuyNO/5H2
-	Haxf/38GIBK5LL7aEGPdzLXszuyyF5H7bSGm2iR2+Aw2EgeGMb/BXL0Ct2146ikCAjW4UAiVBE20O
-	lhmZ6lPNg3H6bMudelIGsl44Lg0YjgpAhjHrfdG2+wP/+yvmPqWQlMhR4hCtV9OW1fl/La4Kwipvj
-	kmR56c2A==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53314)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rbHvj-0007CE-1N;
-	Sat, 17 Feb 2024 10:28:23 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rbHvg-0006Ry-IO; Sat, 17 Feb 2024 10:28:20 +0000
-Date: Sat, 17 Feb 2024 10:28:20 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Sergio Palumbo <palumbo.ser@outlook.it>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: sfp: add quirk for OEM DFP-34X-2C2 GPON
- ONU SFP
-Message-ID: <ZdCKRIJfRWkDCs/n@shell.armlinux.org.uk>
-References: <f8cf41f2-4a90-4ef5-b214-906319bd82d4@outlook.it>
- <AS1PR03MB818911164FB76698446CFEDC82472@AS1PR03MB8189.eurprd03.prod.outlook.com>
- <ZcI+7grKa33oLtwc@shell.armlinux.org.uk>
- <AS1PR03MB818926990092981B0E09E60B82442@AS1PR03MB8189.eurprd03.prod.outlook.com>
- <ZcSZtLSWd09xqc10@shell.armlinux.org.uk>
- <AS1PR03MB8189A24B92030AA8F011C7B582442@AS1PR03MB8189.eurprd03.prod.outlook.com>
- <ZcTzMgxmA6WOoiA/@shell.armlinux.org.uk>
- <AS1PR03MB81891A5F3C8B1A7542746CB582442@AS1PR03MB8189.eurprd03.prod.outlook.com>
- <ZcUBP3g0XNMG/aU2@shell.armlinux.org.uk>
- <AS1PR03MB8189ADFF1A475AE7DB281BE782532@AS1PR03MB8189.eurprd03.prod.outlook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=vDNtj76v21D4nTYo2+cmD1mUR1lDuJuzF9zxHWggbfYVQv8/Lv6eEQwod0R2nC0RMsyCiIK6uTkYyJamlHs1aGYFn4iRpOwsbbxv4IJmU+/m22tIIRHKb099DLDtIjbC2Fr2cP6zw5W7qI0KAjupTLcfqisAUzFJvRcPxFVkk6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MRQJcQ8f; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708166078;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UWlBXzFEHwPmVbbRP4UZJxYV5Y85+s2Si79ETMcdxqU=;
+	b=MRQJcQ8f4GSy/ArcEYtwtzWE4bAlERDwidV1rCwAyXd9XSz+GIurRJiv84YAAzCrVR0X3G
+	UZz8ElC3HIb+llfQsOAN+rfJ2Ws1uhaT/CIxsitCeADQAWyraq6uPVXU7eqDBkMDyDO3g0
+	1SK1+j0BQAoghA44Bi03QF579BBz8Y4=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-562-yZm6E4N0OhK2buPWfpENNw-1; Sat, 17 Feb 2024 05:34:36 -0500
+X-MC-Unique: yZm6E4N0OhK2buPWfpENNw-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-511559b30edso2062752e87.3
+        for <netdev@vger.kernel.org>; Sat, 17 Feb 2024 02:34:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708166075; x=1708770875;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UWlBXzFEHwPmVbbRP4UZJxYV5Y85+s2Si79ETMcdxqU=;
+        b=FvQijg4ehc0WUx7iGOLiC5Vww9pS+65YVkD4gfBK7GH+//hGX1Sishb0Adt+B40UXy
+         S3J9iwrEO3RuvS6mC9SXibFH5vZiyx6PU4/FC3bsHOHbY6pe9xDzFdWhR0mLsXfoRh5P
+         NkxR8DIjgYasqg4sOsju9gGWUouthRKJVnw4G39vvQBhSBQntTVNfWB0dX3ozLeWdund
+         rhkGN2oxvmK8YhOmtTzLVKyVlZsWx6wGB1B2hvz23ZdakApI9wQAL1mDwr2pLikBBPmb
+         7/mj2fKPjDrvtvmDI9n1L9tdgK0DHgeGULe4Opp+5C8no9hTxPOiUDyxfscuF5SRovg6
+         P7Rw==
+X-Forwarded-Encrypted: i=1; AJvYcCVOTL6diYcMIpHjlvw7SRu91wl1Km+Dw53O5Th7KpBmHhCyLfbYixuKYSd3zMDA+Rwh21842nq2btxjh+HBq7xXYSIr1m+p
+X-Gm-Message-State: AOJu0YyphuwgV+loV05zJVQ8042cSq2HZE2mAOpHaTHIFiJnN+A0O/A3
+	fe7H3XwocjGItSJQluPC7Jincj5eHF7IAKWzzW/Qm23E1bovvhLb84p3FYy5jba7HkUZQsqXrWC
+	6908zNRKpSQbx5GL+GqSyOrFkS0dxiMjVupl4GxqRirIK434VM71aQg==
+X-Received: by 2002:ac2:483c:0:b0:511:a40b:e5d0 with SMTP id 28-20020ac2483c000000b00511a40be5d0mr4559581lft.11.1708166074774;
+        Sat, 17 Feb 2024 02:34:34 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEvqBbxclKvPPd1enIMmyMjyfNjsZ9GgGBrmfMmER/7sJQZOnsb/Pz4hBPGwuMO/QSuPQ7/Vw==
+X-Received: by 2002:ac2:483c:0:b0:511:a40b:e5d0 with SMTP id 28-20020ac2483c000000b00511a40be5d0mr4559564lft.11.1708166074412;
+        Sat, 17 Feb 2024 02:34:34 -0800 (PST)
+Received: from localhost (net-93-71-3-198.cust.vodafonedsl.it. [93.71.3.198])
+        by smtp.gmail.com with ESMTPSA id t18-20020a05600c451200b0040fd1629443sm4945014wmo.18.2024.02.17.02.34.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 17 Feb 2024 02:34:33 -0800 (PST)
+Date: Sat, 17 Feb 2024 11:34:32 +0100
+From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+To: Julian Wiedmann <jwiedmann.dev@gmail.com>
+Cc: Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org,
+	kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, bpf@vger.kernel.org, toke@redhat.com,
+	willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+	sdf@google.com, hawk@kernel.org, ilias.apalodimas@linaro.org,
+	linyunsheng@huawei.com
+Subject: Re: [PATCH v9 net-next 3/4] xdp: add multi-buff support for xdp
+ running in generic mode
+Message-ID: <ZdCLuFZu_94_HTz5@lore-desk>
+References: <cover.1707729884.git.lorenzo@kernel.org>
+ <1044d6412b1c3e95b40d34993fd5f37cd2f319fd.1707729884.git.lorenzo@kernel.org>
+ <8b68b781-879a-43b5-be41-7b5f75342daf@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="NkVwt6B95GaEKL1v"
+Content-Disposition: inline
+In-Reply-To: <8b68b781-879a-43b5-be41-7b5f75342daf@gmail.com>
+
+
+--NkVwt6B95GaEKL1v
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <AS1PR03MB8189ADFF1A475AE7DB281BE782532@AS1PR03MB8189.eurprd03.prod.outlook.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Feb 17, 2024 at 11:13:14AM +0100, Sergio Palumbo wrote:
-> [   15.459629] sfp sfp-1: module OEM              DFP-34X-2C2      rev      sn XPONxxxxxxxx     dc 230912
-> [   15.469121] mtk_soc_eth 15100000.ethernet eth1: requesting link mode inband/2500base-x with support 0000000,00000200,0000e440
-> [   15.509967] sfp sfp-2: module                                   rev 1.0  sn 2307210038       dc 230721
-> [   15.519434] mt7530-mdio mdio-bus:1f sfp2: requesting link mode inband/2500base-x with support 0000000,00000000,0000e440
-> [   24.360320] mt7530-mdio mdio-bus:1f sfp2: configuring for inband/2500base-x link mode
-> [   24.368145] mt7530-mdio mdio-bus:1f sfp2: major config 2500base-x
-> [   24.374258] mt7530-mdio mdio-bus:1f sfp2: phylink_mac_config: mode=inband/2500base-x/Unknown/Unknown adv=0000000,00000000,0000e440 pause=04 link=0 an=1
-> [   24.389679] br-lan: port 5(sfp2) entered blocking state
-> [   24.394948] br-lan: port 5(sfp2) entered disabled state
-> [   24.402405] device sfp2 entered promiscuous mode
+[...]
+> > +	nskb =3D napi_build_skb(data, truesize);
+> > +	if (!nskb) {
+> > +		page_pool_free_va(pool, data, true);
+> > +		return -ENOMEM;
+> > +	}
+> > +
+> > +	skb_reserve(nskb, headroom);
+> > +	skb_copy_header(nskb, skb);
+> > +	skb_mark_for_recycle(nskb);
+> > +
+> > +	err =3D skb_copy_bits(skb, 0, nskb->data, size);
+> > +	if (err) {
+> > +		consume_skb(nskb);
+> > +		return err;
+> > +	}
+> > +	skb_put(nskb, size);
+> > +
+> > +	head_off =3D skb_headroom(nskb) - skb_headroom(skb);
+> > +	skb_headers_offset_update(nskb, head_off);
+> > +
+> > +	off =3D size;
+> > +	len =3D skb->len - off;
+> > +	for (i =3D 0; i < MAX_SKB_FRAGS && off < skb->len; i++) {
+> > +		struct page *page;
+> > +		u32 page_off;
+> > +
+> > +		size =3D min_t(u32, len, PAGE_SIZE);
+> > +		truesize =3D size;
+> > +
+> > +		page =3D page_pool_dev_alloc(pool, &page_off, &truesize);
+> > +		if (!data) {
 
-This shows that the interface has been configured for 2500base-X.
-However, there is no link report.
+ack, right. I will post a fix, thx for reporting the issue.
 
-> A stated by you the system is still connecting at 2500base-X even if the
-> module is set for 1000base-X, as far as I can see, without any error.
+Regards,
+Lorenzo
 
-Right, because, as I've said many times, the kernel has *no* idea that
-the module internals has been configured to operate at 1000base-X.
+> > +			consume_skb(nskb);
+> > +			return -ENOMEM;
+> > +		}
+> > +
+>=20
+> This should check for !page instead, no?
+>=20
+> (picked up as CID 1583654 by the coverity scan for linux-next)
+>=20
 
-> My assumption that the module could have forced the speed down to
-> 1000base-X was completely wrong.
+--NkVwt6B95GaEKL1v
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Correct - considering that I wrote all this code, it is insulting to
-have to go to this extent to get the point across.
+-----BEGIN PGP SIGNATURE-----
 
-So now that we have agreement that the kernel is trying to use
-2500base-X, you now need to get off your high horse and accept that
-it isn't working because there is _no_ _link_ with the module.
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZdCLuAAKCRA6cBh0uS2t
+rJ0GAQDpZH9iE0YdpE+xW6XCH02knrRdVHMCuz43ocVx+1pq6AEAropqtCCaPw+8
+4DiE29pcuDb4larv+MZ25gK+4+Vg1Qk=
+=gjEQ
+-----END PGP SIGNATURE-----
 
-In other words, you need to accept that I'm right and you're wrong.
+--NkVwt6B95GaEKL1v--
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
