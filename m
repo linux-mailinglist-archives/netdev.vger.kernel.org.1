@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-72667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E061B8591DA
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 19:50:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 236E48591DC
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 19:50:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99A14283941
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 18:50:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F6ED1C221F8
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 18:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF0F67D414;
-	Sat, 17 Feb 2024 18:50:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82A8E7E564;
+	Sat, 17 Feb 2024 18:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uUcVBUDU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LvJFMC7l"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A8241E498;
-	Sat, 17 Feb 2024 18:50:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E1A27E11C
+	for <netdev@vger.kernel.org>; Sat, 17 Feb 2024 18:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708195826; cv=none; b=ZFqowSjlb8AOYpMVNxYOyPfWp0sIdQgjLW9M8k1EQY5znYZKECfFTpzAFZax/J4HJ6hHmT4U8NJzVEbWlZrud78/f2Yd/1yUIgWc0fi4IEkAmd1MZJ0j8IOpNF1piTunAGr4BMzRMFml7sc5mKeEv3fqNQZwDW5n6xdQa4e4F98=
+	t=1708195827; cv=none; b=LxtO0dajroAIGiyeJ7vetjkDEUf0ghVN1GZOyuqs7C41kFbDX1Qb6N4w5gwRjXB7UnATFCaA0aghHa0bDcL/QiedcY26Y2o7nN3P9/3AdgYPNwahacyzXyK5aJzHYWWxCYIS/oHSjwYvRbkKkCd/VGmEFn2yllyZEIg6sQo0sns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708195826; c=relaxed/simple;
-	bh=tDHoBtrkxZ/0jzu6S3iKZ2VIA9W0xR3UxtvM71RgyeQ=;
+	s=arc-20240116; t=1708195827; c=relaxed/simple;
+	bh=+mfWOp0t69vcsebXWOwjjO3A6FjD6AfQ4lnVEjLwx/M=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jPrUpynPYWcwCNKkHg04fNyHEMfi4UZabVjjUUcOsElJtNFHoroPQTMJedCLVK45VA5y4dappYxSwSsM24vZh+Uaqu7P1bkkjsnpe+GBiSfaqUg8/gT5RKyAWWKLzfFDkMsGwDfS8rLIHfRTAmVL4TN7Mzj835PbNkW7y1lKj9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uUcVBUDU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C59E3C43390;
-	Sat, 17 Feb 2024 18:50:25 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=c2D7bd0hojlVfavs3YmgUMrO+NpD2XIqglhbNmQqk+xKKHoEmCKDIxGYKO/eGolhP5zRugrYEYlpnLmog7SSVw8O1L8w1o9GjIVjdd+j6e69Tc3tLoIDTaeTLh8p5jFgvqbGGyQ4x63/cZ6ib9T6DPFnMbW2oCMy19m+gHi+2Z4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LvJFMC7l; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E59FAC43390;
+	Sat, 17 Feb 2024 18:50:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708195825;
-	bh=tDHoBtrkxZ/0jzu6S3iKZ2VIA9W0xR3UxtvM71RgyeQ=;
+	s=k20201202; t=1708195826;
+	bh=+mfWOp0t69vcsebXWOwjjO3A6FjD6AfQ4lnVEjLwx/M=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=uUcVBUDUh/5Qu6NcsXej5qk2ggMnUtyzEFashF4WpcCPX9ABF2o6VQkc/gokvfcRk
-	 Lq07Ojgiy2ippKfN+pgDxJbpF0w861xfTYr80XgImvSESf7CXpzdk/g9B+UrNtf7MX
-	 5PO2EqNj+0X9AqmGDItvvGHZb9l2Q/TWMNImwHmwrVgIDYqo36AEZ6azuR7x4UlQZa
-	 uhcDpUVRbkEmsmJgROzGJGWs+Sgil+JonBoKxUrpP0Cl5pCmEeUgF1vvGoWTx/fyFx
-	 p9CkdaG6Lpx7vkKWBqMrbTRfRCg6Uz/kt6F7g/THmw0hZeMuiNhPil78Dso/36mRG3
-	 lbzoMRS9bvBGg==
+	b=LvJFMC7lahjMNXXkUauwVbaHMsgTmUGkM3iOLNJgy9CdC/g1ua5cFBcw0MmABmzxf
+	 kCwFOLGnIZMEkOwnROarB7F3qQlqRI+6b3En1/E/2+FzjxKn7Wqk8B27yAdcQRuMw3
+	 T7DU7BmVktnlqOL9ggqM9vfiRh7tuMg8AmATfrPmd4UTC0Yb+kUOZOcF4hilOJg3GR
+	 CHhKRWX1YbmK35cFoqzF2T76HcCq/UTlt961/gQgeMNjY5Rp7/UhaWqziKb5pi04QV
+	 JmDa81ebMXzL1KlSRTjc1OH+VPAwqy1dz0dhcdhJHdU7qMp44q2ASXeMuhnH7mJlU4
+	 tbDyEBiNH3lxQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id ADF62C04E24;
-	Sat, 17 Feb 2024 18:50:25 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D202EC04E24;
+	Sat, 17 Feb 2024 18:50:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: stmmac: Fix incorrect dereference in interrupt
- handlers
+Subject: Re: [PATCH net-next 0/5] net: phy: add support for the EEE 2 registers
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170819582570.11703.17257609518253001084.git-patchwork-notify@kernel.org>
-Date: Sat, 17 Feb 2024 18:50:25 +0000
-References: <20240214092718.331891-1-p.sakharov@ispras.ru>
-In-Reply-To: <20240214092718.331891-1-p.sakharov@ispras.ru>
-To: Pavel Sakharov <p.sakharov@ispras.ru>
-Cc: horms@kernel.org, alexandre.torgue@foss.st.com, fancer.lancer@gmail.com,
- joabreu@synopsys.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
- netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- lvc-project@linuxtesting.org, khoroshilov@ispras.ru
+ <170819582685.11703.13036425492207082914.git-patchwork-notify@kernel.org>
+Date: Sat, 17 Feb 2024 18:50:26 +0000
+References: <558e122f-e900-4a17-a03a-2b9ec4fed124@gmail.com>
+In-Reply-To: <558e122f-e900-4a17-a03a-2b9ec4fed124@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: andrew@lunn.ch, linux@armlinux.org.uk, pabeni@redhat.com,
+ edumazet@google.com, kuba@kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Wed, 14 Feb 2024 12:27:17 +0300 you wrote:
-> If 'dev' or 'data' is NULL, the 'priv' variable has an incorrect address
-> when dereferencing calling netdev_err().
+On Wed, 14 Feb 2024 21:15:31 +0100 you wrote:
+> This series adds support for the EEE 2 registers. Most relevant and
+> for now the only supported modes are 2500baseT and 5000baseT.
 > 
-> Since we get as 'dev_id' or 'data' what was passed as the 'dev' argument
-> to request_irq() during interrupt initialization (that is, the net_device
-> and rx/tx queue pointers initialized at the time of the call) and since
-> there are usually no checks for the 'dev_id' argument in such handlers
-> in other drivers, remove these checks from the handlers in stmmac driver.
+> Heiner Kallweit (5):
+>   net: mdio: add helpers for accessing the EEE CAP2 registers
+>   net: phy: add PHY_EEE_CAP2_FEATURES
+>   net: phy: c45: add and use genphy_c45_read_eee_cap2
+>   net: phy: c45: add support for EEE link partner ability 2 to
+>     genphy_c45_read_eee_lpa
+>   net: phy: c45: add support for MDIO_AN_EEE_ADV2
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] net: stmmac: Fix incorrect dereference in interrupt handlers
-    https://git.kernel.org/netdev/net/c/97dde8402633
+  - [net-next,1/5] net: mdio: add helpers for accessing the EEE CAP2 registers
+    https://git.kernel.org/netdev/net-next/c/80e4021c25d8
+  - [net-next,2/5] net: phy: add PHY_EEE_CAP2_FEATURES
+    https://git.kernel.org/netdev/net-next/c/ef6ee3a31bdc
+  - [net-next,3/5] net: phy: c45: add and use genphy_c45_read_eee_cap2
+    https://git.kernel.org/netdev/net-next/c/b63584c86edb
+  - [net-next,4/5] net: phy: c45: add support for EEE link partner ability 2 to genphy_c45_read_eee_lpa
+    https://git.kernel.org/netdev/net-next/c/1bbe04e305fb
+  - [net-next,5/5] net: phy: c45: add support for MDIO_AN_EEE_ADV2
+    https://git.kernel.org/netdev/net-next/c/9a1e31299dec
 
 You are awesome, thank you!
 -- 
