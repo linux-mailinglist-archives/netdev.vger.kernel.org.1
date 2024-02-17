@@ -1,166 +1,206 @@
-Return-Path: <netdev+bounces-72678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3900859232
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 20:54:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 333A0859243
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 21:03:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E98E9B21BB3
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 19:54:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 69D0CB223E8
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 20:03:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BAA57E57A;
-	Sat, 17 Feb 2024 19:54:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 663607E593;
+	Sat, 17 Feb 2024 20:03:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="MRU7aZcE"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="F/IiSYaa"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C4DC134A4;
-	Sat, 17 Feb 2024 19:54:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C1EF7E581;
+	Sat, 17 Feb 2024 20:03:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708199665; cv=none; b=l//TPdJa7soAm+Ww3oCCfYpq/S0XnCPMN6dK41xqk7I9HQdfNahMtgqxvQaeP5aFPAyvCDsOURuHcupNO5EhHCijVKMMYIqgf7wxMlCx5QrMflbWPHMeauuse4t3Tyc3WqAuJ590jzAG+h4GatTYbFWSOuv/D4a0bkzHaJhfSfc=
+	t=1708200192; cv=none; b=K10fpkDzqVFxeYJYvMxeiSabHM75TRCmLEkVZlv6InuQTfxY05tG0hdjPY1LZokHitHMI+GHAgW50WOHaon8z1zv+gN+ZYPu6WWGqapkg8A6LfYqmq4kDW95VcNiNuQkwNLmD7evJzQtKLyd1+Y0+favkVnz51ydikqOCLlNKD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708199665; c=relaxed/simple;
-	bh=t09QwnGKwNdWNtIAyIzaHqi1xlUXki01YfuTCunZSJk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KT9aTUw8wKdPk7B/5YBMiTizjj2R8FHTm84dUUcK1taZ0xzrWqJ11UTALEkWTES6+bTL5DBgXazKlgcssjnn+TLySHyJnpUzdclR5cE3RuUDcz1je35kWwdfyAqP/9IlSp6Igwr3Hu72wwT8w6XidM5EDxfF9T9qywj1hsuCIPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=MRU7aZcE; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=wrLeVjW0ciuJszz4zjPY8G3BJ5RGtt3yEGrW/DSBE6s=; b=MRU7aZcE2NM7dNQziM3PQNJsnH
-	Ky1yXYghGe0xrGkHqqC34Lq74gMVRokiF+u13tk9DIaBxx+dL5y1u/9B1bMTOCxUnlzhMA/3Eb2XN
-	PyubFSsl5G++haDa/a6L8VQBQBTO7LKBnr0z5y0fRYPzSXO4o90EciWf3dnqGo2AL3EvTn6/kPpex
-	gyYjvZ+OrGkD3a3pxQUD8byvavOYL2OTaFZwD/1ATO+N01uyn60PuOMyulb6Q/F61I65NMYr0CmPp
-	N1r5JxCcahrParQlxVKDsIzLQcbnM+bls8Tm4Hn62mHdnpTfQyj0+ep6OX4MzIFaUi7LTljqyfvPk
-	rABGBg8w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38274)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rbQkT-0008E1-2M;
-	Sat, 17 Feb 2024 19:53:21 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rbQkG-0006lB-8R; Sat, 17 Feb 2024 19:53:08 +0000
-Date: Sat, 17 Feb 2024 19:53:08 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Michael Hennerich <michael.hennerich@analog.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Kevin Hilman <khilman@baylibre.com>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	UNGLinuxDriver@microchip.com, Peter Geis <pgwipeout@gmail.com>,
-	Frank <Frank.Sae@motor-comm.com>, Xu Liang <lxu@maxlinear.com>,
-	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
-	Andrei Botila <andrei.botila@oss.nxp.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Michal Simek <michal.simek@amd.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Wedson Almeida Filho <wedsonaf@gmail.com>,
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <benno.lossin@proton.me>,
-	Andreas Hindborg <a.hindborg@samsung.com>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Robert Marko <robimarko@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	David Epping <david.epping@missinglinkelectronics.com>,
-	Harini Katakam <harini.katakam@amd.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-amlogic@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, rust-for-linux@vger.kernel.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [net-next RFC PATCH 0/3] net: phy: detach PHY driver OPs from
- phy_driver struct
-Message-ID: <ZdEOpB1oVDE8+Qhq@shell.armlinux.org.uk>
-References: <20240217194116.8565-1-ansuelsmth@gmail.com>
+	s=arc-20240116; t=1708200192; c=relaxed/simple;
+	bh=657CVr7tfJs38s/e+riEk+9HfKOiiqg4XsfObmLlsco=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=l3rTffRrH3mP3lQT7BN/mQI+FNK3ryN6LVucpCly5s3+t2fHPV7o75woVcxQq7MbezM+FyuFnf3E+g3s6aNcH9dfvial6+sZpUo07BjjL6HabMKXTTcDc3QpPMAlELcIt0/1MJ0yM3ZuK3s8a/otg2wt6jgfsh2sPHTegKIM5vI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=F/IiSYaa; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41HK0vqP012879;
+	Sat, 17 Feb 2024 20:02:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=RoEi4O8xbtRc7rlAK2bkzLD3VTDSIZBvlHQgm7CqB4I=; b=F/
+	IiSYaa+61kDkR/B1A+0O7XDmgL0DNBQNJKTlCHeMOvoOFIE2v16kcwvpzZD2FDoY
+	1B2W/7ud5ob6R5TJx7sfnOWfgsNFFKjiD3pP4A7YdbRwDSpvcEuiLnX2eU8nYoVk
+	UfwyyBvfb1b+Rab/85w+j7C6QvvhPg2JArFJcR+8rO3L3ZiaDpLFdjo6ZbqEJVv4
+	EBBOFO2gevblf9AvkswAaGeLWI15bhn3t1n73BMxVfMBDIi6hkZqqUjWfLM+fu3a
+	wGlgNO1rHDqCziYU2VtpNTgUCAMIwsFSw+AsJNuUmG2gr4yImxcVQE8exIv43XQc
+	YA5vBVdhJMNgqYVaQ5Xg==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wam4q0yny-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 17 Feb 2024 20:02:39 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41HK2cCk026372
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 17 Feb 2024 20:02:38 GMT
+Received: from [10.110.11.212] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Sat, 17 Feb
+ 2024 12:02:36 -0800
+Message-ID: <c084edd6-22cf-49a4-9dac-75163a1f4088@quicinc.com>
+Date: Sat, 17 Feb 2024 12:02:35 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240217194116.8565-1-ansuelsmth@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 06/18] dt-bindings: new: wireless: describe the ath12k
+ PCI module
+To: Bartosz Golaszewski <brgl@bgdev.pl>, Kalle Valo <kvalo@kernel.org>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz
+	<luiz.dentz@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio
+	<konrad.dybcio@linaro.org>,
+        Liam Girdwood <lgirdwood@gmail.com>, Mark Brown
+	<broonie@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon
+	<will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+        Saravana Kannan
+	<saravanak@google.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        Arnd
+ Bergmann <arnd@arndb.de>,
+        Neil Armstrong <neil.armstrong@linaro.org>,
+        Marek
+ Szyprowski <m.szyprowski@samsung.com>,
+        Alex Elder <elder@linaro.org>,
+        Srini
+ Kandagatla <srinivas.kandagatla@linaro.org>,
+        Greg Kroah-Hartman
+	<gregkh@linuxfoundation.org>,
+        Abel Vesa <abel.vesa@linaro.org>,
+        Manivannan
+ Sadhasivam <mani@kernel.org>,
+        Lukas Wunner <lukas@wunner.de>,
+        Dmitry
+ Baryshkov <dmitry.baryshkov@linaro.org>,
+        <linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-wireless@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-pci@vger.kernel.org>,
+        <linux-pm@vger.kernel.org>,
+        Bartosz Golaszewski
+	<bartosz.golaszewski@linaro.org>
+References: <20240216203215.40870-1-brgl@bgdev.pl>
+ <20240216203215.40870-7-brgl@bgdev.pl> <87cysvd2er.fsf@kernel.org>
+ <CAMRc=Md10bNPswsLqdCmqzEmD+QmyZ+Eb4SUWknH-j5kK-speQ@mail.gmail.com>
+Content-Language: en-US
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+In-Reply-To: <CAMRc=Md10bNPswsLqdCmqzEmD+QmyZ+Eb4SUWknH-j5kK-speQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: cfNhiVdKuQrXnHOS8wjzgI2PKgKw5PcM
+X-Proofpoint-GUID: cfNhiVdKuQrXnHOS8wjzgI2PKgKw5PcM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-17_18,2024-02-16_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 malwarescore=0 clxscore=1011 suspectscore=0 bulkscore=0
+ spamscore=0 phishscore=0 mlxscore=0 lowpriorityscore=0 adultscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2401310000 definitions=main-2402170165
 
-On Sat, Feb 17, 2024 at 08:41:11PM +0100, Christian Marangi wrote:
-> Posting as RFC due to the massive change to a fundamental struct.
+On 2/17/2024 10:30 AM, Bartosz Golaszewski wrote:
+> On Sat, Feb 17, 2024 at 7:35 AM Kalle Valo <kvalo@kernel.org> wrote:
+>>
+>> Bartosz Golaszewski <brgl@bgdev.pl> writes:
+>>
+>>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>>
+>>> Add device-tree bindings for the ATH12K module found in the WCN7850
+>>> package.
+>>>
+>>> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>> ---
+>>>  .../net/wireless/qcom,ath12k-pci.yaml         | 103 ++++++++++++++++++
+>>>  1 file changed, 103 insertions(+)
+>>>  create mode 100644 Documentation/devicetree/bindings/net/wireless/qcom,ath12k-pci.yaml
+>>>
+>>> diff --git a/Documentation/devicetree/bindings/net/wireless/qcom,ath12k-pci.yaml b/Documentation/devicetree/bindings/net/wireless/qcom,ath12k-pci.yaml
+>>> new file mode 100644
+>>> index 000000000000..063c576b99a0
+>>> --- /dev/null
+>>> +++ b/Documentation/devicetree/bindings/net/wireless/qcom,ath12k-pci.yaml
+>>> @@ -0,0 +1,103 @@
+>>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>>> +# Copyright (c) 2024 Linaro Limited
+>>> +%YAML 1.2
+>>> +---
+>>> +$id: http://devicetree.org/schemas/net/wireless/qcom,ath12k-pci.yaml#
+>>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>>> +
+>>> +title: Qualcomm Technologies ath12k wireless devices (PCIe)
+>>> +
+>>> +maintainers:
+>>> +  - Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>
+>> Jeff and me are the ath12k driver maintainers so shouldn't we listed
+>> here as well?
+>>
 > 
-> While adding some PHY ID for Aquantia, I notice that there is a
-> big problem with duplicating OPs with each PHY.
+> Sure will do. I also noticed the subject is wrong, should have been
+> "net" not "new".
 > 
-> The original idea to prevent this was to use mask on the PHY ID
-> and identify PHY Family. Problem is that OEM started to use all
-> kind of PHY ID and this is not doable, hence for PHY that have
-> the same OPs, we have to duplicate all of them.
+> Also, Jeff is not showing up for ath12k bindings in get_maintainer.pl.
+> You could consider adding an N: ath12k entry to MAINTAINERS.
 > 
-> This is present in Aquantia PHY, but is much more present in
-> other PHY, especially in the BCM7XXX where they use a big macro
-> for common PHYs.
+> Bartosz
 > 
-> To reduce patch delta, I added the additional variable without
-> adding tabs as this would have resulted in a massive patch.
-> Also to have patch bisectable, this change has to be in one go
-> hence I had to use this trick to reduce patch delta.
-> 
-> Other solution to this problem were to introduce additional
-> variables to phy_driver struct but that would have resulted
-> in having 2 different way to do the same thing and that is not O.K.
-> 
-> I took care to compile-test all the PHY, only exception is the unique
-> RUST driver, where I still have to learn that funny language and
-> I didn't had time to update it, so that is the only driver that
-> I think require some fixup.
-> 
-> I posted 2 example that would benefits from this change, but I can
-> find much more in other PHY driver.
+>> Jeff, this reminds me that we should add you to qcom,ath10k.yaml,
+>> qcom,ath11k-pci.yaml and qcom,ath11k.yaml as maintainer.
 
-Would it make more sense instead of this big churn, to instead
-introduce into struct phy_driver:
+OK, I'll update those files.
 
-	struct mdio_device_id	*ids;
+And looking at MAINTAINERS, in ath10 we have an explicit path:
+F:	Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml
 
-which would then allow a phy_driver structure to be matched by
-several device IDs?
+And in ath11k we have an explicit path:
+F:	Documentation/devicetree/bindings/net/wireless/qcom,ath11k.yaml
 
-We then would not need to touch any of the existing drivers initially,
-and a later cleanup could be to identify those where all the ops are
-the same for several phy_driver structures, and convert them over.
+However the ath11k entry is missing:
+Documentation/devicetree/bindings/net/wireless/qcom,ath11k-pci.yaml
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+So it looks like I have a few patches:
+- update my entries in MAINTAINERS to use my @kernel.org e-mail
+- add myself to the existing *ath1*k*.yaml files as a maintainer
+- update MAINTAINERS to replace F: *.yaml with N: ath1*k to match any
+related files, including the YAML files
+
+/jeff
 
