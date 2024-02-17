@@ -1,182 +1,122 @@
-Return-Path: <netdev+bounces-72589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C8EC858A7F
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 01:04:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 323CC858BC3
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 01:28:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A105282ED1
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 00:04:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E51491F2136E
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 00:28:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37792173;
-	Sat, 17 Feb 2024 00:04:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FC4F17722;
+	Sat, 17 Feb 2024 00:11:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="kkbger9l"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="A3zfP+Dd"
 X-Original-To: netdev@vger.kernel.org
-Received: from omta038.useast.a.cloudfilter.net (omta038.useast.a.cloudfilter.net [44.202.169.37])
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D20119F
-	for <netdev@vger.kernel.org>; Sat, 17 Feb 2024 00:04:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6902149DEF
+	for <netdev@vger.kernel.org>; Sat, 17 Feb 2024 00:11:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708128291; cv=none; b=txv9GsBDCfyO53Uh781Sa4e5aGK+4ghxUMN+1Mp2qpy9QiKDRxxhvCT6Np7PpvzwjzRYMA5/G8MmD4tG0rFEGFN3y/7P7TloMgE1unoMDy2BETOHIhDVqgtbrKuFG0xdM5CtMZtPfsSkHusRSxeXApggVIm+XucPBvbXQMJvYEo=
+	t=1708128717; cv=none; b=X7AmcnS69TmtuU6Hf9wKZxhoreRycwR399MZLDQQ1zoR3V/A7JzK1uAEoTjXjAHWZ8UUGUamrIsAsvFIiOrR+RL46RSwUHbYFZVX8Qjqyr9fvuUkyK5fxhvwUyjWaP4S8KTP5rEgu71fqINKMDx1garGhUEZbdXZ+EkGAce1GPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708128291; c=relaxed/simple;
-	bh=3nKxXv+a13aom4LTOZ3NnsV2RrerkFayOaft5ppMDkw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RGCTaxT94whazbjoa5MLnV7spPsVSaeAvoGmLAnCvD/3nrWk7wLuTLWeycGYkZGVdSNdLlw3lyJ1M3dirzBC+n4cUMwIyZ8X/49LxKeCsQnEgQIEMCtZ8WXVYInkXWWoJf4747b/APOFBLndzW1xiHHOCT7gtv3Q7vpoHi9nz70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=kkbger9l; arc=none smtp.client-ip=44.202.169.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
-Received: from eig-obgw-5007a.ext.cloudfilter.net ([10.0.29.141])
-	by cmsmtp with ESMTPS
-	id b53NrzbdH9gG6b8C9r5R2H; Sat, 17 Feb 2024 00:04:41 +0000
-Received: from gator4166.hostgator.com ([108.167.133.22])
-	by cmsmtp with ESMTPS
-	id b8C8r9eqWKqFNb8C8rd47y; Sat, 17 Feb 2024 00:04:40 +0000
-X-Authority-Analysis: v=2.4 cv=QvT93kyd c=1 sm=1 tr=0 ts=65cff818
- a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=VhncohosazJxI00KdYJ/5A==:17
- a=IkcTkHD0fZMA:10 a=k7vzHIieQBIA:10 a=wYkD_t78qR0A:10 a=NEAV23lmAAAA:8
- a=cm27Pg_UAAAA:8 a=VwQbUJbxAAAA:8 a=A7XncKjpAAAA:8 a=pGLkceISAAAA:8
- a=J1Y8HTJGAAAA:8 a=1XWaLZrsAAAA:8 a=20KFwNOVAAAA:8 a=S3e1UlYFMFTUAia5eQoA:9
- a=QEXdDO2ut3YA:10 a=xmb-EsYY8bH0VWELuYED:22 a=AjGcO6oz07-iQ99wixmX:22
- a=R9rPLQDAdC6-Ub70kJmZ:22 a=y1Q9-5lHfBjTkpIzbSAN:22
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ljkmbjR1wZVH0YMxK1quNarSuTzJMheeVQqhKZsr5SM=; b=kkbger9lKaj723jXWSInOx6/G1
-	E347snhH6PKIcvwa+H9yyCmJJg7R2tWkSxbUzcXyNN/j5tpWsy1YzhPTyJhgTwFkjwR0Co5vH0YH4
-	yPKOUK+A1WEA8e+i2tBGYn4DS/fjcjnZATu0H3KhZY/9Wq3VXlEPu8/6lgpXTEC7Jb6b1ldoLl2IQ
-	FUIuaQ0WBVrFBtagt2SljBfVkeYWYIrTlY6Srdd0TdPW5vDUukrw8nrpCidSpaxF3bRspvbLiNpPq
-	ls6fdqgqkISKEnXZZh3hcZxxJtpJ38UF8oNSOdfxScOuwuTUnsYuMNJ6AriiEFB1qgcXYD4ES6hF0
-	w6einTVA==;
-Received: from [201.172.172.225] (port=49674 helo=[192.168.15.10])
-	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96.2)
-	(envelope-from <gustavo@embeddedor.com>)
-	id 1rb8C7-002dlw-0R;
-	Fri, 16 Feb 2024 18:04:39 -0600
-Message-ID: <9ed28341-8bf7-4b6a-ba9a-6cfe07dc5964@embeddedor.com>
-Date: Fri, 16 Feb 2024 18:04:14 -0600
+	s=arc-20240116; t=1708128717; c=relaxed/simple;
+	bh=INVAINQPPzGPh0As1CgntyCxtp3AWHiwOlqVdovjx1g=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=K9TPuy+keUmq1du5d9iWnQJnac0Lu214hE0YG6n+o1AxDE/hDL0A1IZWUfapYzvW5y6YSqi/y+bgp/G4vtl2ISCAdO8jnQPE1cy5bWN6dM+EjSil2khA3Z7N2tYNFgoUltJaSyCPgNzFooeXSXg8ZvHfkM5EgYxtCzTn3pIKNRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=A3zfP+Dd; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+Received: from pecola.lan (unknown [159.196.93.152])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 7573C20075;
+	Sat, 17 Feb 2024 08:11:52 +0800 (AWST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=codeconstruct.com.au; s=2022a; t=1708128712;
+	bh=INVAINQPPzGPh0As1CgntyCxtp3AWHiwOlqVdovjx1g=;
+	h=Subject:From:To:Date:In-Reply-To:References;
+	b=A3zfP+DdoAZ5LsW75DaCLB6Vy8xuU8IxfpkhzrbhQS+e7oM85h9eXHkygSPQ1XKo2
+	 2KjAfGyLdnTjJlNB2as2B6WfTn8Gr8SZBRNeKFWgiUw+vUdQ3trqtKkmUWxyyiZgoa
+	 QeGGeYIh9cihMx9XXenA/p52Pt/teJoZ3JM2nkSDT1bX0ZqO3wynNKnkXvMSPjiLxj
+	 kAcnKg6aGh3vfyMYAMQ3mPcdj7XOz4rMRgaPtrU9EU8wMSVUuU8/1x3vdO5OI5vqTi
+	 qOOJcBO9oq9sq938K3HH9hbNoZb/e/YjUfxrz+tvpvW1U08p/uT47q+fVWH+O3S+Yi
+	 qYvDUlBvIdwsQ==
+Message-ID: <86a4f9a9f1cd6e47b2e85731d5d864644ec25bc4.camel@codeconstruct.com.au>
+Subject: Re: MCTP - Bus lock between send and receive
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: "Ramaiah, DharmaBhushan" <Dharma.Ramaiah@dell.com>, 
+	"netdev@vger.kernel.org"
+	 <netdev@vger.kernel.org>, "matt@codeconstruct.com.au"
+	 <matt@codeconstruct.com.au>
+Date: Sat, 17 Feb 2024 08:11:52 +0800
+In-Reply-To: <SJ0PR19MB44153C87D151BA76C93DD289874C2@SJ0PR19MB4415.namprd19.prod.outlook.com>
+References: 
+	<SJ0PR19MB44153C87D151BA76C93DD289874C2@SJ0PR19MB4415.namprd19.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: sched: Annotate struct tc_pedit with __counted_by
-To: Kees Cook <keescook@chromium.org>, Jakub Kicinski <kuba@kernel.org>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
- <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, "Gustavo A. R. Silva"
- <gustavoars@kernel.org>, netdev@vger.kernel.org,
- linux-hardening@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>,
- Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling
- <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- linux-kernel@vger.kernel.org, llvm@lists.linux.dev
-References: <20240216232744.work.514-kees@kernel.org>
-Content-Language: en-US
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-In-Reply-To: <20240216232744.work.514-kees@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 201.172.172.225
-X-Source-L: No
-X-Exim-ID: 1rb8C7-002dlw-0R
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: ([192.168.15.10]) [201.172.172.225]:49674
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 8
-X-Org: HG=hgshared;ORG=hostgator;
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
-X-CMAE-Envelope: MS4xfFTfySNWVN+TDGs/IPTD4UkQQ8JpuKXxN9RUgrwj8lc/0qEajf2QwMfS1ih2LWqTT9Lw188AgOfS8BMfMT4d6HQgvD80prqegRe0vwTdoTO+pK5KwwDG
- YOeNOa3aH7BB/en/t+STKyIAais9g8NJ4N4Wk3US0p/JXTo93iKQwq9n35MCmY+S8Fm0JWmZVyaOvNJWR+MP+Qq2Igy+4I14Qbs=
+
+Hi Dharma,
+
+> Linux implementation of the MCTP is via sockets and is realized using
+> the =E2=80=9Csendto=E2=80=9D and =E2=80=9Crecvfrom=E2=80=9D. Requestor in=
+tending to send a request
+> uses =E2=80=9Csendto=E2=80=9D and the response is obtained using =E2=80=
+=9Crecvfrom=E2=80=9D. From the
+> basic code walkthrough, it appears that the i2c bus is not locked
+> between the =E2=80=9Csendto=E2=80=9D and =E2=80=9Crecvfrom=E2=80=9D i.e.,=
+ bus is not locked till the
+> response is received.
+
+We do take the i2c bus lock over the duration of the MCTP
+request/response (or timeout if there is no response). Most of the logic
+is here:
+
+ =C2=A0https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/t=
+ree/drivers/net/mctp/mctp-i2c.c#n483
+
+> =C2=A0This presents following problems.
+> =C2=A0
+> =C2=A0=C2=A0=C2=A01. If multiple applications are communicating to the sa=
+me device,
+> device may end up receiving back-to-back requests before sending the
+> response for the first request. Few of the devices may not support
+> multiple outstanding commands and few of the cases depending on the
+> protocol it might throw device into unknown state.
+
+The bus lock does not exclude this. MCTP, as well as some upper-layer
+protocols, have specific provisions for multiple messages in flight, and
+we assume that the devices will generally behave correctly here. If not,
+we can generally quirk this in an upper layer application.
+
+If there are misbehaving devices that require special handling across
+protocols, we could look at implementing specific behaviours for those,
+but would need details first...
+
+> =C2=A0=C2=A0=C2=A01. Consider a case of mux on the I2C bus and there are =
+multiple
+> MCTP devices connected on each mux segment. Applications intending to
+> communicate to a device on a different mux segment at the same time
+> might mux out each other causing the response to be dropped.
+
+Yes, this is the primary use-case for the bus locking.
+
+> Is my understanding correct and is this a known limitation of MCTP on
+> Linux?
+
+No, this is not correct - we do have bus locking implemented.
+
+Cheers,
 
 
-
-On 2/16/24 17:27, Kees Cook wrote:
-> Prepare for the coming implementation by GCC and Clang of the __counted_by
-> attribute. Flexible array members annotated with __counted_by can have
-> their accesses bounds-checked at run-time checking via CONFIG_UBSAN_BOUNDS
-> (for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
-> functions).
-> 
-> As found with Coccinelle[1], add __counted_by for struct tc_pedit.
-> Additionally, since the element count member must be set before accessing
-> the annotated flexible array member, move its initialization earlier.
-> 
-> Link: https://github.com/kees/kernel-tools/blob/trunk/coccinelle/examples/counted_by.cocci [1]
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-> ---
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Jamal Hadi Salim <jhs@mojatatu.com>
-> Cc: Cong Wang <xiyou.wangcong@gmail.com>
-> Cc: Jiri Pirko <jiri@resnulli.us>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-> Cc: netdev@vger.kernel.org
-> Cc: linux-hardening@vger.kernel.org
-
-`opt->nkeys` updated before `memcpy()`, looks good to me:
-
-Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-
-Thanks!
---
-Gustavo
-
-> ---
->   include/uapi/linux/tc_act/tc_pedit.h | 2 +-
->   net/sched/act_pedit.c                | 2 +-
->   2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/uapi/linux/tc_act/tc_pedit.h b/include/uapi/linux/tc_act/tc_pedit.h
-> index f3e61b04fa01..f5cab7fc96ab 100644
-> --- a/include/uapi/linux/tc_act/tc_pedit.h
-> +++ b/include/uapi/linux/tc_act/tc_pedit.h
-> @@ -62,7 +62,7 @@ struct tc_pedit_sel {
->   	tc_gen;
->   	unsigned char           nkeys;
->   	unsigned char           flags;
-> -	struct tc_pedit_key     keys[0];
-> +	struct tc_pedit_key     keys[] __counted_by(nkeys);
->   };
->   
->   #define tc_pedit tc_pedit_sel
-> diff --git a/net/sched/act_pedit.c b/net/sched/act_pedit.c
-> index 2ef22969f274..21e863d2898c 100644
-> --- a/net/sched/act_pedit.c
-> +++ b/net/sched/act_pedit.c
-> @@ -515,11 +515,11 @@ static int tcf_pedit_dump(struct sk_buff *skb, struct tc_action *a,
->   		spin_unlock_bh(&p->tcf_lock);
->   		return -ENOBUFS;
->   	}
-> +	opt->nkeys = parms->tcfp_nkeys;
->   
->   	memcpy(opt->keys, parms->tcfp_keys,
->   	       flex_array_size(opt, keys, parms->tcfp_nkeys));
->   	opt->index = p->tcf_index;
-> -	opt->nkeys = parms->tcfp_nkeys;
->   	opt->flags = parms->tcfp_flags;
->   	opt->action = p->tcf_action;
->   	opt->refcnt = refcount_read(&p->tcf_refcnt) - ref;
+Jeremy
 
