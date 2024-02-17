@@ -1,231 +1,290 @@
-Return-Path: <netdev+bounces-72628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC5E8858E9B
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 11:13:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94945858EAD
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 11:24:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D4E7282DA7
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 10:13:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E88FF1F21C13
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 10:24:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2830B1D55F;
-	Sat, 17 Feb 2024 10:13:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99E8B1DDF6;
+	Sat, 17 Feb 2024 10:24:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04olkn2015.outbound.protection.outlook.com [40.92.74.15])
+Received: from pegase1.c-s.fr (pegase1.c-s.fr [93.17.236.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9403D1D528;
-	Sat, 17 Feb 2024 10:13:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.74.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708164803; cv=fail; b=iWq+ResTbjEk2gyPrdvSzhhxhGgpMHAAX5NnoQY+ZT/UUurPi8+rCYzOvuFEXfSr1/fgPkpfA0roD2cKFkyR8RiTEfmnDQaFtk75R7EnKTjZCwOT270qrk14H3q3G2Dk6i8fKcBhwA8OfozWrepAWqaNbnS0zBCJpmDrbsQxkoE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708164803; c=relaxed/simple;
-	bh=2XT6XWYRa0shVjWsCfFCbZ6bwiKwTRbmDMyMqvEVwAA=;
-	h=Message-ID:Date:From:Subject:To:Cc:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=bH128BPQwQZ9JcUg2WdpS4PpzI8IZEnKgFcsZaogumwDX41dVMzVO9e3FQ0W7tpQIZxXNUb1fMvFCjngQeVok6Ub+6r2VFp/QkcpyjUHpECl3VcxwgGKDzO77dJDgIQKvt9eqiu+4Hpm37tprWlTK9qd3ww5BFPRTMgLx8mPqJU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.it; spf=pass smtp.mailfrom=outlook.it; arc=fail smtp.client-ip=40.92.74.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.it
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LA3jDA2JXOhHVE9OgdJ66iVnrR82J9tSiKd9OoH4gdfr65G1GlpOUNuXc5Dj5Mn/Skb8auFikMn8Z8SzyqiNJx631avzpZbFlVJhMdPdoe0ygCRcMquiLSUs9TR05fYyGFNjCmkDO5k6HGsXoOJeWohlRAGWiQalnbgYYuhHf2qRRXj1G10jz7FQ3O+Vdmpi6RMORG259mREVD2z7wCR/IgGwWugdu9cZgKSWn0uNjDQawvLGiEJab1RrddmogxO6A9FuHDCAXABlat5wQonrpK9kU6T0E7tfee/wRNAos/ufIIAOxYyO706Y5snyg9LxWonNGqcmNyk7wd6+iKOMQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1LXWk9qHuhxZxhbEh4lQ2NlLHTHhrHYyOOtrXmbeYbw=;
- b=SyaNNSn23bIiwZSxUItoQQRqCm/UqeZ/lz1w2vOu4qngOiU2gZanxqAU/duHaBZqgRxOkZ83NxjM+NLICe76zb1DsbhC+SXXpV+Unz8WA3a4wp+vDFaTupkBeoE992k78z0J9JPknSYtAjWGLNdbF3Yx/sngiYhmgDZi51vtR1w2URr3dJ8n4MOQhTxE+FR6HGKpbUgYPrj44AjGEZSC6pY0Y3VFdkG7IQTCh+kXZ6qM703B7lpAEsmf5+ib9XzsrcChqsNwHEKsUF+8HhLauGCYSEM/+YkX7t9flFSNo38yao9PGdcg5xsoW1TZdhFcW06kuGhT/hWtK7WXiqESgA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-Received: from AS1PR03MB8189.eurprd03.prod.outlook.com (2603:10a6:20b:47d::10)
- by DU0PR03MB9567.eurprd03.prod.outlook.com (2603:10a6:10:41f::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.32; Sat, 17 Feb
- 2024 10:13:17 +0000
-Received: from AS1PR03MB8189.eurprd03.prod.outlook.com
- ([fe80::ffb3:3ff8:6ea9:52b5]) by AS1PR03MB8189.eurprd03.prod.outlook.com
- ([fe80::ffb3:3ff8:6ea9:52b5%5]) with mapi id 15.20.7292.026; Sat, 17 Feb 2024
- 10:13:17 +0000
-Message-ID:
- <AS1PR03MB8189ADFF1A475AE7DB281BE782532@AS1PR03MB8189.eurprd03.prod.outlook.com>
-Date: Sat, 17 Feb 2024 11:13:14 +0100
-User-Agent: Mozilla Thunderbird
-From: Sergio Palumbo <palumbo.ser@outlook.it>
-Subject: Re: [PATCH net-next] net: sfp: add quirk for OEM DFP-34X-2C2 GPON ONU
- SFP
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <AS1PR03MB8189D48114A559B080AF5BEA82422@AS1PR03MB8189.eurprd03.prod.outlook.com>
- <Zb1+p6FiJwUF53xc@shell.armlinux.org.uk>
- <f8cf41f2-4a90-4ef5-b214-906319bd82d4@outlook.it>
- <AS1PR03MB818911164FB76698446CFEDC82472@AS1PR03MB8189.eurprd03.prod.outlook.com>
- <ZcI+7grKa33oLtwc@shell.armlinux.org.uk>
- <AS1PR03MB818926990092981B0E09E60B82442@AS1PR03MB8189.eurprd03.prod.outlook.com>
- <ZcSZtLSWd09xqc10@shell.armlinux.org.uk>
- <AS1PR03MB8189A24B92030AA8F011C7B582442@AS1PR03MB8189.eurprd03.prod.outlook.com>
- <ZcTzMgxmA6WOoiA/@shell.armlinux.org.uk>
- <AS1PR03MB81891A5F3C8B1A7542746CB582442@AS1PR03MB8189.eurprd03.prod.outlook.com>
- <ZcUBP3g0XNMG/aU2@shell.armlinux.org.uk>
-Content-Language: it
-In-Reply-To: <ZcUBP3g0XNMG/aU2@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TMN: [1u+wdsksHtR2OVUywKL3EMa7r9uqgQELqCPx45QW0PMRRIbaw0B7SjmLKqbeyrC8]
-X-ClientProxiedBy: MI1P293CA0016.ITAP293.PROD.OUTLOOK.COM (2603:10a6:290:3::8)
- To AS1PR03MB8189.eurprd03.prod.outlook.com (2603:10a6:20b:47d::10)
-X-Microsoft-Original-Message-ID:
- <b6dc4151-3878-474e-84fc-2874f8fd9d85@outlook.it>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B37D281E;
+	Sat, 17 Feb 2024 10:24:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.236.30
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708165462; cv=none; b=B5KKg1JED7k/GMm2WoR4sI+n4eokVsSxnbUYyM6/6HGHd6kZ0jFGEJtEJJCXEMDd6Zj5XG4t0mykuCRFjbK2ztSKc372mhC8x6uFkWalL3A8vNGuqMT60JzNEpmrerGZIQ5v7tz7fg01/2YVE1do+tLhJgZqG0ysMUDV6TiYzes=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708165462; c=relaxed/simple;
+	bh=Mz+g/1CVM2PJP2Uq812BuwnoZ/L5UEO66m09oWnr1QU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WQvBrvQrcHcfdKG+B11wOFv56JfwN/roY/yA1i+GU2GinoUBe/TyC3VERDWNcQibMqvK63GVPMQltX7591HPV7/7tMM+HT8PsSowWU9TeFL41COtYrE/0M4b0q+7T1GC8av+Z07R00+hk45f1TJstcKMwjJ1XsyVh7VJqSTrJV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.236.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub3.si.c-s.fr [192.168.12.233])
+	by localhost (Postfix) with ESMTP id 4TcPzb6CXPz9v73;
+	Sat, 17 Feb 2024 11:24:11 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+	by localhost (pegase1.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id 6KspJ0V2-DIb; Sat, 17 Feb 2024 11:24:11 +0100 (CET)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase1.c-s.fr (Postfix) with ESMTP id 4TcPzb5FtVz9v6y;
+	Sat, 17 Feb 2024 11:24:11 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id A5B908B76E;
+	Sat, 17 Feb 2024 11:24:11 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id rrFoO8lLqJVF; Sat, 17 Feb 2024 11:24:11 +0100 (CET)
+Received: from PO20335.idsi0.si.c-s.fr (unknown [192.168.232.2])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 5EB7E8B763;
+	Sat, 17 Feb 2024 11:24:10 +0100 (CET)
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kees Cook <keescook@chromium.org>,
+	"linux-hardening @ vger . kernel . org" <linux-hardening@vger.kernel.org>
+Subject: [PATCH bpf-next] bpf: Check return from set_memory_rox() and friends
+Date: Sat, 17 Feb 2024 11:24:07 +0100
+Message-ID: <63322c8e8454de9b240583de58cd730bc97bb789.1708165016.git.christophe.leroy@csgroup.eu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS1PR03MB8189:EE_|DU0PR03MB9567:EE_
-X-MS-Office365-Filtering-Correlation-Id: a36d8fb6-3d5f-4888-6f23-08dc2fa10f66
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	cBtKFD1uUkeRjY0YVSl9Y6vkWcGIK4bT8vkTgSVr9mt3QMTGhNM3eoY8v6uAIJbGDGZDD3MzdD2jwAzxDzen0fZVTPO3Fhpd99zkU52mfzTTgrUjrn6jk3ikpN+70sJJ94namnbz5G+3iKKKNlmJqPhiehExZo55BML7AAlZA7sFIMentRkYxiICVuebHqZNzGwvsxfX8DimT3x5ZAHjsCSH9I8uEp+dmSQqcBe4hGUZRKMeyWVSZ2BvvxlFUOUVV2yHDrusDV7PSn943uXlv0046tn0HBM2pBeuLlArc4IJ5D2Z4ggPi10VQLHcnGckkXFtXcuFdwbnC9UXzdq7M96oRNAuRj4RbuOvsLbKCMvckGtUjuwGfxowmVHL6xUWkxrPbhvYw4Ngk+Aqq1AdCKhQHm1vOxMNJe8d1gUBSY+8xfkXu/Cj15bwaIfAQv1kRqufvehrDnEPAghgd8ibz3CX/e9Vayzt546o98zHNafRa7QxEh4yVWsBIXMBNpAupBB5oz7yTugyfcilgwY4EwrbFGnZLojuQ9WQPlP30UXBa2DX/nbTs9JoBHNtwUnv
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RmdXQkFXekRwaDNxT05sRlVBSmtNSUpHZzlUWWx4S2I1TlBCVVVKTmwzN29V?=
- =?utf-8?B?QVI0VG0yUmdBc1VaUkRBNVRIWVprcjRjWWkyV2kvby9xV24wMENGNyt2M3Bs?=
- =?utf-8?B?WVI2b2RTSytGKzhnQ0d5UFpOcDc3enVKb1pEb2tYMWFwQWVOVDBRbk1jazEz?=
- =?utf-8?B?MDhWbmx5VlNJRUpWaml1MFZ2UWdxUExlR3BkanM4dUt5bnlwZmlZOWtRcVpq?=
- =?utf-8?B?cmdubWdZelQ3L0RHRGxscFRTeURWUzFtZmtxMzJ6eldncGdlM1h3RWdtZVpR?=
- =?utf-8?B?MktFTG0rRlpESWppZGRxRFFrYlQzSkZGeGJ1OUJzdnFaa2ZXM1pKZkErdXBQ?=
- =?utf-8?B?NWtFaytMZWpWS1lCZVFPMzZ0U2NMbEFyd0x2amxtdkQwbFIxNkVKbGZqNk4v?=
- =?utf-8?B?V0RYeE1qY3ZqUXpGeTNRZ2pUeE1lZEtkcU9nRVVsVitKRHprUGZPV0dWeDJL?=
- =?utf-8?B?MURmWkZPWHFnbEdaTXFIOWhtMCtyRzgyVGNxNEhpaDN4VVlTWXRRUnVoOVlK?=
- =?utf-8?B?SW9xNE5lWlZnb3hDWTQvWE5uWHhsMzZPaUNHc1RFdHJzeTBpTVE2UWUvTjY4?=
- =?utf-8?B?YmsrdDc5MksrMUluVm50OUF3WXZjL2dxa1Z3SkJwOVhjeTQ0L1VDWG5XQXZt?=
- =?utf-8?B?OGZFVk9iYjA3NUl0SVFoTmJSZ3B1aUtyR1pNc04wMTZGWm9qWGVnK2RuMUhh?=
- =?utf-8?B?ZzBGRTVOMVR4blZ1UVMzQ0hreUorU1dZaHNieHF2R2VRQlJ0R3pFSnFaU296?=
- =?utf-8?B?dUVRcnRZSnFaYmtlVUlRdmw3OFBvUXZlQVhyZUFTUUh1RG1VbWVGY0oxdng4?=
- =?utf-8?B?VjgycU56VHUrWWRZSmxyd3drQkI3MUhOU2RNTS9MN1YxQzNsRnM1TW9WS1RP?=
- =?utf-8?B?bFgrTHBpSlZtK2xuRFFyNWF3VFRYOEUzR1Bjd21IYkxVcDhxc216MzNySEcw?=
- =?utf-8?B?SzhtQUdrSXNWcnFDVHBDVkwybGV2OThJOXNKd3pBSEhEVDBiR08vdllzVUcx?=
- =?utf-8?B?NC9McVFYeC9IckZSRXRxWVNCbndqZDZCa0tzN3Job3BkZ0NYemZDNkRYWExs?=
- =?utf-8?B?a0NzV2RDdFAyUXMySVJETnRIZTdLMGhGbDJGY21paEJUeWtGZWwrMjQ1V1hR?=
- =?utf-8?B?Y05FaUhGME1zbGhMMlRrQWpMbTBpOWRNSS9HS2N2L0FuME15U1RQUWUvb3lD?=
- =?utf-8?B?QlRQUkprdmlPVTIrWmFDbVE1a21QTkE2YjlMbW1nSDJ6ZHpNa0VaTEFzU1BP?=
- =?utf-8?B?R2p5TEVRNU9yZnZnM095UlBJZjFWaU5mUG9GdGhjWnorZ1JCTU1pSWV5T0Z2?=
- =?utf-8?B?QUFmOGZUNi8xQlJ2NHg4RTNrZzRzaE5jVGQ3VVhmcWtBRDlvaURmWUx5MnhL?=
- =?utf-8?B?bE16Mk0rSWZoUWI4bTRVUHRMQ3Y3ZkhLbXFMUWdMdFp4bVdpSytESkZMYU04?=
- =?utf-8?B?V2NHaktLbGJPTnRDN016S0Jhcyt5RUgreEo3cm5vNzU1STJsOTNxNDZtSVZR?=
- =?utf-8?B?N0ptdytIRUM0TkNHMDlTZTVxZkYzRzk3akR4a2pzSDk4ODIreHhnbm02d0NN?=
- =?utf-8?B?QWhrV1pEQlY5Y090bkNPV0dYaEJ5ekwyQU1kRTd3WU9YZERHMjVKNC9NYkpM?=
- =?utf-8?B?a0JBQkp5QkxHM2xDSG9ieGk2Ykxsc1dHOGh5MUFxcWhiWGV4M240dElqUUVn?=
- =?utf-8?B?d2dCL0lwazZMQm5jc09vTStpdEk1c3p0bXQ4d0YycEkwRkpnWGI1NXgreEJ4?=
- =?utf-8?Q?C7Iza/1Z7rGZlzpfJhm1Au2zt43yEgpQkd2azCz?=
-X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-76d7b.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: a36d8fb6-3d5f-4888-6f23-08dc2fa10f66
-X-MS-Exchange-CrossTenant-AuthSource: AS1PR03MB8189.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Feb 2024 10:13:17.7553
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR03MB9567
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1708165448; l=6853; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=Mz+g/1CVM2PJP2Uq812BuwnoZ/L5UEO66m09oWnr1QU=; b=YEQ3YCkk7J/1zGFK/ZSlyru0s4KexlE0XcLFVWKXeuTKMVK6q0ZK4DS5AuxlH0/h+hGSMoxRU O7BYxxTK8QeAcyh9SKokVb9ivVqn208+RoHx3eOdpBoZRkSdtyz6u2w
+X-Developer-Key: i=christophe.leroy@csgroup.eu; a=ed25519; pk=HIzTzUj91asvincQGOFx6+ZF5AoUuP9GdOtQChs7Mm0=
+Content-Transfer-Encoding: 8bit
 
-Hello Russell,
-unfortunately I did not have time imediately to run tests.
-Now I had some time available to run some more test, this is the result:
+arch_protect_bpf_trampoline() and alloc_new_pack() call
+set_memory_rox() which can fail, leading to unprotected memory.
 
-The current situation:
-Host supports		Module		Mode		Functional
-1000base-X		LAN_SDS_MODE=1	1000base-X	Not tested
-1000base-X		LAN_SDS_MODE=6	1000base-X	Not tested
-1000base-X + 2500base-X	LAN_SDS_MODE=1	1000base-X	Yes
-1000base-X + 2500base-X	LAN_SDS_MODE=6	1000base-X	Yes
+Take into account return from set_memory_XX() functions and add
+__must_check flag to arch_protect_bpf_trampoline().
 
-I recompiled the linux firmware with the #define DEBUG in phylink.c
+Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+---
+ arch/x86/net/bpf_jit_comp.c    |  6 ++++--
+ include/linux/bpf.h            |  4 ++--
+ kernel/bpf/bpf_struct_ops.c    |  9 +++++++--
+ kernel/bpf/core.c              | 25 +++++++++++++++++++------
+ kernel/bpf/trampoline.c        | 18 ++++++++++++------
+ net/bpf/bpf_dummy_struct_ops.c |  4 +++-
+ 6 files changed, 47 insertions(+), 19 deletions(-)
 
-With the quirk:
-Host supports		Module		Mode		Functional
-1000base-X		LAN_SDS_MODE=1	1000base-X	Not tested
-1000base-X		LAN_SDS_MODE=6	1000base-X	Not tested
-1000base-X + 2500base-X	LAN_SDS_MODE=1	2500base-X	Yes
-1000base-X + 2500base-X	LAN_SDS_MODE=6	2500base-X	Yes
-
- From the above it is clear that:
-- using the quirk the module is always working at 2500base-X if the host is capable of 2500base-X
-- the internal settings of te module does not affect the speed
-
-Here below an extract of the kernel log with phylink debug for 1000base-X + 2500base-X	LAN_SDS_MODE=1	2500base-X :
-sfp-1/eth1= DFP-34X-2C2 module
-sfp-2/lan = sfp/ethernet copper module working at 2500base-X
-
-Sat Feb 10 19:17:29 2024 kern.info kernel: [    2.111137] mt7530-mdio mdio-bus:1f: configuring for fixed/2500base-x link mode
-Sat Feb 10 19:17:29 2024 kern.debug kernel: [    2.118440] mt7530-mdio mdio-bus:1f: major config 2500base-x
-Sat Feb 10 19:17:29 2024 kern.debug kernel: [    2.124099] mt7530-mdio mdio-bus:1f: phylink_mac_config: mode=fixed/2500base-x/2.5Gbps/Full adv=0000000,00008000,00006240 pause=03 link=0 an=1
-Sat Feb 10 19:17:29 2024 kern.info kernel: [    2.138585] mt7530-mdio mdio-bus:1f: Link is Up - 2.5Gbps/Full - flow control rx/tx
-Sat Feb 10 19:17:29 2024 kern.info kernel: [    2.147273] mt7530-mdio mdio-bus:1f wan (uninitialized): PHY [mt7530-0:00] driver [MediaTek MT7531 PHY] (irq=146)
-Sat Feb 10 19:17:29 2024 kern.debug kernel: [    2.157515] mt7530-mdio mdio-bus:1f wan (uninitialized): phy: setting supported 0000000,00000000,000062ef advertising 0000000,00000000,000062ef
-Sat Feb 10 19:17:29 2024 kern.info kernel: [    2.180320] mt7530-mdio mdio-bus:1f lan1 (uninitialized): PHY [mt7530-0:01] driver [MediaTek MT7531 PHY] (irq=147)
-Sat Feb 10 19:17:29 2024 kern.debug kernel: [    2.190651] mt7530-mdio mdio-bus:1f lan1 (uninitialized): phy: setting supported 0000000,00000000,000062ef advertising 0000000,00000000,000062ef
-Sat Feb 10 19:17:29 2024 kern.info kernel: [    2.213265] mt7530-mdio mdio-bus:1f lan2 (uninitialized): PHY [mt7530-0:02] driver [MediaTek MT7531 PHY] (irq=148)
-Sat Feb 10 19:17:29 2024 kern.debug kernel: [    2.223598] mt7530-mdio mdio-bus:1f lan2 (uninitialized): phy: setting supported 0000000,00000000,000062ef advertising 0000000,00000000,000062ef
-Sat Feb 10 19:17:29 2024 kern.info kernel: [    2.246219] mt7530-mdio mdio-bus:1f lan3 (uninitialized): PHY [mt7530-0:03] driver [MediaTek MT7531 PHY] (irq=149)
-Sat Feb 10 19:17:29 2024 kern.debug kernel: [    2.256552] mt7530-mdio mdio-bus:1f lan3 (uninitialized): phy: setting supported 0000000,00000000,000062ef advertising 0000000,00000000,000062ef
-Sat Feb 10 19:17:29 2024 kern.info kernel: [    2.279159] mt7530-mdio mdio-bus:1f lan4 (uninitialized): PHY [mt7530-0:04] driver [MediaTek MT7531 PHY] (irq=150)
-Sat Feb 10 19:17:29 2024 kern.debug kernel: [    2.289490] mt7530-mdio mdio-bus:1f lan4 (uninitialized): phy: setting supported 0000000,00000000,000062ef advertising 0000000,00000000,000062ef
-Sat Feb 10 19:17:29 2024 kern.info kernel: [    7.482162] mtk_soc_eth 15100000.ethernet eth0: configuring for fixed/2500base-x link mode
-Sat Feb 10 19:17:29 2024 kern.debug kernel: [    7.490445] mtk_soc_eth 15100000.ethernet eth0: major config 2500base-x
-Sat Feb 10 19:17:29 2024 kern.debug kernel: [    7.497041] mtk_soc_eth 15100000.ethernet eth0: phylink_mac_config: mode=fixed/2500base-x/2.5Gbps/Full adv=0000000,00008000,00006240 pause=03 link=0 an=1
-Sat Feb 10 19:17:29 2024 kern.info kernel: [    7.510911] mtk_soc_eth 15100000.ethernet eth0: Link is Up - 2.5Gbps/Full - flow control rx/tx
-Sat Feb 10 19:17:29 2024 kern.info kernel: [    7.556750] mt7530-mdio mdio-bus:1f lan1: configuring for phy/gmii link mode
-Sat Feb 10 19:17:29 2024 kern.debug kernel: [    7.563831] mt7530-mdio mdio-bus:1f lan1: major config gmii
-Sat Feb 10 19:17:29 2024 kern.debug kernel: [    7.569386] mt7530-mdio mdio-bus:1f lan1: phylink_mac_config: mode=phy/gmii/Unknown/Unknown adv=0000000,00000000,00000000 pause=00 link=0 an=0
-Sat Feb 10 19:17:29 2024 kern.debug kernel: [    7.585159] mt7530-mdio mdio-bus:1f lan1: phy link up gmii/1Gbps/Full/rx/tx
-Sat Feb 10 19:17:29 2024 kern.info kernel: [    7.586893] mt7530-mdio mdio-bus:1f lan1: Link is Up - 1Gbps/Full - flow control rx/tx
-Sat Feb 10 19:17:29 2024 kern.info kernel: [   15.122661] sfp sfp-1: Host maximum power 3.0W
-Sat Feb 10 19:17:29 2024 kern.info kernel: [   15.127875] sfp sfp-2: Host maximum power 3.0W
-Sat Feb 10 19:17:29 2024 kern.info kernel: [   15.459629] sfp sfp-1: module OEM              DFP-34X-2C2      rev      sn XPONxxxxxxxx     dc 230912
-Sat Feb 10 19:17:29 2024 kern.debug kernel: [   15.469121] mtk_soc_eth 15100000.ethernet eth1: requesting link mode inband/2500base-x with support 0000000,00000200,0000e440
-Sat Feb 10 19:17:29 2024 kern.info kernel: [   15.509967] sfp sfp-2: module                                   rev 1.0  sn 2307210038       dc 230721
-Sat Feb 10 19:17:29 2024 kern.debug kernel: [   15.519434] mt7530-mdio mdio-bus:1f sfp2: requesting link mode inband/2500base-x with support 0000000,00000000,0000e440
-Sat Feb 10 19:17:31 2024 kern.info kernel: [   24.360320] mt7530-mdio mdio-bus:1f sfp2: configuring for inband/2500base-x link mode
-Sat Feb 10 19:17:31 2024 kern.debug kernel: [   24.368145] mt7530-mdio mdio-bus:1f sfp2: major config 2500base-x
-Sat Feb 10 19:17:31 2024 kern.debug kernel: [   24.374258] mt7530-mdio mdio-bus:1f sfp2: phylink_mac_config: mode=inband/2500base-x/Unknown/Unknown adv=0000000,00000000,0000e440 pause=04 link=0 an=1
-Sat Feb 10 19:17:31 2024 kern.info kernel: [   24.389679] br-lan: port 5(sfp2) entered blocking state
-Sat Feb 10 19:17:31 2024 kern.info kernel: [   24.394948] br-lan: port 5(sfp2) entered disabled state
-Sat Feb 10 19:17:31 2024 kern.info kernel: [   24.402405] device sfp2 entered promiscuous mode
-Sat Feb 10 19:17:31 2024 kern.info kernel: [   24.414853] mt7530-mdio mdio-bus:1f wan: configuring for phy/gmii link mode
-Sat Feb 10 19:17:31 2024 kern.debug kernel: [   24.421873] mt7530-mdio mdio-bus:1f wan: major config gmii
-Sat Feb 10 19:17:31 2024 kern.debug kernel: [   24.427355] mt7530-mdio mdio-bus:1f wan: phylink_mac_config: mode=phy/gmii/Unknown/Unknown adv=0000000,00000000,00000000 pause=00 link=0 an=0
-Sat Feb 10 19:17:31 2024 kern.debug kernel: [   24.443005] mt7530-mdio mdio-bus:1f wan: phy link down gmii/Unknown/Unknown/off
-Sat Feb 10 19:17:31 2024 kern.info kernel: [   24.472639] mtk_soc_eth 15100000.ethernet eth1: configuring for inband/2500base-x link mode
-Sat Feb 10 19:17:31 2024 kern.debug kernel: [   24.481074] mtk_soc_eth 15100000.ethernet eth1: major config 2500base-x
-Sat Feb 10 19:17:31 2024 kern.debug kernel: [   24.487693] mtk_soc_eth 15100000.ethernet eth1: phylink_mac_config: mode=inband/2500base-x/Unknown/Unknown adv=0000000,00000000,0000e440 pause=04 link=0 an=1
-
-A stated by you the system is still connecting at 2500base-X even if the module is set for 1000base-X, as far as I can see, without any error.
-My assumption that the module could have forced the speed down to 1000base-X was completely wrong.
-
-Making a final recap:
-- The module without the quirk is only showing up at 1000base-X due to a wrong EEPROM data
-- The module without the quirk is working at 1000base-X in both of the 2 internal configurations
-- The module with the quirk is only showing up at 1000base-X and 2500base-X
-- The module with the quirk is working at 2500base-X in both of the 2 internal configurations
-
-This module as is a GPON-ONU/ONT and is configured by the OLT same as FS GPON-INU-34-20BI and HUAWEI MA5671A already validated for the quirk.
-
-Thanks for your patience and suggestions.
-I remain at your disposal for any further test I can do.
-I hope that with the above evidence the patch could be acceptable for both OEM and ODI vendor.
-
-Sergio Palumbo
-
-
-
-
+diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
+index 919f647c740f..db05e0ba9f68 100644
+--- a/arch/x86/net/bpf_jit_comp.c
++++ b/arch/x86/net/bpf_jit_comp.c
+@@ -2780,12 +2780,14 @@ void arch_free_bpf_trampoline(void *image, unsigned int size)
+ 	bpf_prog_pack_free(image, size);
+ }
+ 
+-void arch_protect_bpf_trampoline(void *image, unsigned int size)
++int arch_protect_bpf_trampoline(void *image, unsigned int size)
+ {
++	return 0;
+ }
+ 
+-void arch_unprotect_bpf_trampoline(void *image, unsigned int size)
++int arch_unprotect_bpf_trampoline(void *image, unsigned int size)
+ {
++	return 0;
+ }
+ 
+ int arch_prepare_bpf_trampoline(struct bpf_tramp_image *im, void *image, void *image_end,
+diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+index e30100597d0a..169847ed1f8d 100644
+--- a/include/linux/bpf.h
++++ b/include/linux/bpf.h
+@@ -1112,8 +1112,8 @@ int arch_prepare_bpf_trampoline(struct bpf_tramp_image *im, void *image, void *i
+ 				void *func_addr);
+ void *arch_alloc_bpf_trampoline(unsigned int size);
+ void arch_free_bpf_trampoline(void *image, unsigned int size);
+-void arch_protect_bpf_trampoline(void *image, unsigned int size);
+-void arch_unprotect_bpf_trampoline(void *image, unsigned int size);
++int __must_check arch_protect_bpf_trampoline(void *image, unsigned int size);
++int arch_unprotect_bpf_trampoline(void *image, unsigned int size);
+ int arch_bpf_trampoline_size(const struct btf_func_model *m, u32 flags,
+ 			     struct bpf_tramp_links *tlinks, void *func_addr);
+ 
+diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
+index 02068bd0e4d9..7638a735f48f 100644
+--- a/kernel/bpf/bpf_struct_ops.c
++++ b/kernel/bpf/bpf_struct_ops.c
+@@ -522,7 +522,9 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
+ 			if (err)
+ 				goto reset_unlock;
+ 		}
+-		arch_protect_bpf_trampoline(st_map->image, PAGE_SIZE);
++		err = arch_protect_bpf_trampoline(st_map->image, PAGE_SIZE);
++		if (err)
++			goto reset_unlock;
+ 		/* Let bpf_link handle registration & unregistration.
+ 		 *
+ 		 * Pair with smp_load_acquire() during lookup_elem().
+@@ -531,7 +533,10 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
+ 		goto unlock;
+ 	}
+ 
+-	arch_protect_bpf_trampoline(st_map->image, PAGE_SIZE);
++	err = arch_protect_bpf_trampoline(st_map->image, PAGE_SIZE);
++	if (err)
++		goto reset_unlock;
++
+ 	err = st_ops->reg(kdata);
+ 	if (likely(!err)) {
+ 		/* This refcnt increment on the map here after
+diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+index ea6843be2616..23ce17da3bf7 100644
+--- a/kernel/bpf/core.c
++++ b/kernel/bpf/core.c
+@@ -898,23 +898,30 @@ static LIST_HEAD(pack_list);
+ static struct bpf_prog_pack *alloc_new_pack(bpf_jit_fill_hole_t bpf_fill_ill_insns)
+ {
+ 	struct bpf_prog_pack *pack;
++	int err;
+ 
+ 	pack = kzalloc(struct_size(pack, bitmap, BITS_TO_LONGS(BPF_PROG_CHUNK_COUNT)),
+ 		       GFP_KERNEL);
+ 	if (!pack)
+ 		return NULL;
+ 	pack->ptr = bpf_jit_alloc_exec(BPF_PROG_PACK_SIZE);
+-	if (!pack->ptr) {
+-		kfree(pack);
+-		return NULL;
+-	}
++	if (!pack->ptr)
++		goto out;
+ 	bpf_fill_ill_insns(pack->ptr, BPF_PROG_PACK_SIZE);
+ 	bitmap_zero(pack->bitmap, BPF_PROG_PACK_SIZE / BPF_PROG_CHUNK_SIZE);
+ 	list_add_tail(&pack->list, &pack_list);
+ 
+ 	set_vm_flush_reset_perms(pack->ptr);
+-	set_memory_rox((unsigned long)pack->ptr, BPF_PROG_PACK_SIZE / PAGE_SIZE);
++	err = set_memory_rox((unsigned long)pack->ptr, BPF_PROG_PACK_SIZE / PAGE_SIZE);
++	if (err)
++		goto out_free;
+ 	return pack;
++
++out_free:
++	bpf_jit_free_exec(pack->ptr);
++out:
++	kfree(pack);
++	return NULL;
+ }
+ 
+ void *bpf_prog_pack_alloc(u32 size, bpf_jit_fill_hole_t bpf_fill_ill_insns)
+@@ -929,9 +936,15 @@ void *bpf_prog_pack_alloc(u32 size, bpf_jit_fill_hole_t bpf_fill_ill_insns)
+ 		size = round_up(size, PAGE_SIZE);
+ 		ptr = bpf_jit_alloc_exec(size);
+ 		if (ptr) {
++			int err;
++
+ 			bpf_fill_ill_insns(ptr, size);
+ 			set_vm_flush_reset_perms(ptr);
+-			set_memory_rox((unsigned long)ptr, size / PAGE_SIZE);
++			err = set_memory_rox((unsigned long)ptr, size / PAGE_SIZE);
++			if (err) {
++				bpf_jit_free_exec(ptr);
++				ptr = NULL;
++			}
+ 		}
+ 		goto out;
+ 	}
+diff --git a/kernel/bpf/trampoline.c b/kernel/bpf/trampoline.c
+index d382f5ebe06c..6e64ac9083b6 100644
+--- a/kernel/bpf/trampoline.c
++++ b/kernel/bpf/trampoline.c
+@@ -456,7 +456,9 @@ static int bpf_trampoline_update(struct bpf_trampoline *tr, bool lock_direct_mut
+ 	if (err < 0)
+ 		goto out_free;
+ 
+-	arch_protect_bpf_trampoline(im->image, im->size);
++	err = arch_protect_bpf_trampoline(im->image, im->size);
++	if (err)
++		goto out_free;
+ 
+ 	WARN_ON(tr->cur_image && total == 0);
+ 	if (tr->cur_image)
+@@ -1072,17 +1074,21 @@ void __weak arch_free_bpf_trampoline(void *image, unsigned int size)
+ 	bpf_jit_free_exec(image);
+ }
+ 
+-void __weak arch_protect_bpf_trampoline(void *image, unsigned int size)
++int __weak arch_protect_bpf_trampoline(void *image, unsigned int size)
+ {
+ 	WARN_ON_ONCE(size > PAGE_SIZE);
+-	set_memory_rox((long)image, 1);
++	return set_memory_rox((long)image, 1);
+ }
+ 
+-void __weak arch_unprotect_bpf_trampoline(void *image, unsigned int size)
++int __weak arch_unprotect_bpf_trampoline(void *image, unsigned int size)
+ {
++	int err;
+ 	WARN_ON_ONCE(size > PAGE_SIZE);
+-	set_memory_nx((long)image, 1);
+-	set_memory_rw((long)image, 1);
++
++	err = set_memory_nx((long)image, 1);
++	if (err)
++		return err;
++	return set_memory_rw((long)image, 1);
+ }
+ 
+ int __weak arch_bpf_trampoline_size(const struct btf_func_model *m, u32 flags,
+diff --git a/net/bpf/bpf_dummy_struct_ops.c b/net/bpf/bpf_dummy_struct_ops.c
+index 8906f7bdf4a9..6d49a00fba4d 100644
+--- a/net/bpf/bpf_dummy_struct_ops.c
++++ b/net/bpf/bpf_dummy_struct_ops.c
+@@ -129,7 +129,9 @@ int bpf_struct_ops_test_run(struct bpf_prog *prog, const union bpf_attr *kattr,
+ 	if (err < 0)
+ 		goto out;
+ 
+-	arch_protect_bpf_trampoline(image, PAGE_SIZE);
++	err = arch_protect_bpf_trampoline(image, PAGE_SIZE);
++	if (err)
++		goto out;
+ 	prog_ret = dummy_ops_call_op(image, args);
+ 
+ 	err = dummy_ops_copy_args(args);
+-- 
+2.43.0
 
 
