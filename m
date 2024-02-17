@@ -1,151 +1,165 @@
-Return-Path: <netdev+bounces-72697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 766858592FB
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 22:31:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80C7C85931E
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 23:10:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03C101F223A3
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 21:31:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31E5B283CCD
+	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 22:10:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 981A97F7F4;
-	Sat, 17 Feb 2024 21:30:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40D7680035;
+	Sat, 17 Feb 2024 22:10:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="kb7PIdjw"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="c6TUOfad"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCFF57E760;
-	Sat, 17 Feb 2024 21:30:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19C7E7CF0D;
+	Sat, 17 Feb 2024 22:10:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708205459; cv=none; b=YHj4yXlwSwu1rAWk1hPFO8JYEe2mSUHsIDTsCgpe/pdx46lJSBr2sGtaa/ce0fqortD0oURHhbU+tRcpjsI1JqTIKfS/eQZ1UgcFOZ/7IA0gHHGBuueDoEI0MuBALT3VXeEq6ToLkP6XjaStalr6V0o0eU4dlJmMZ+xjgk9Q8mQ=
+	t=1708207820; cv=none; b=kF06D0hdMoE8dS5krrpg9tqhkFXDpPH72KPxQoZSWXYgCRasNfT2tAE2ZiI1xo3Xoc2mXzhOSIwTFvQYnvhiMs234afh540+P+BvCOr7vFM+qcNz1Dg3d4Isr87/t3HY64X61U2PK8E4MWpH8yu2IbBdvHr9dlT4L3z/OEnAUoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708205459; c=relaxed/simple;
-	bh=czOliQ0OxjGx6AeLHhquochMzRqKg9PUNsJjQq3EbPU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=EkUpwxA8RKRbEL0XlDl92yxRxC339UDUqw+6kxOcbZIhh4pSQV+ny2LAnZ8l41FQk/vVZIh83lhist6LNIMDlp2K+3Q5pDQJRZrR/nS5o0dpzRKKKPfIkM4oyMuPPgHksD4IjbBfk+dyxoBUlXtsYs2myMHVQT/RJs9uZyd/ShE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=kb7PIdjw; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41HLTsDW019092;
-	Sat, 17 Feb 2024 21:30:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:date:subject:mime-version:content-type
-	:content-transfer-encoding:message-id:to:cc; s=qcppdkim1; bh=60n
-	ZSbuMq1De8FlLK4k1D6fMOSTbtJSL1lSZrb1xVfY=; b=kb7PIdjwaeYF+nIcIEL
-	HBsBUVwWVtHHpwS+WOPgd/B/LGaEYxfJb9rbEIz3XWUBRVmg7VmnVKR6UdFz8uTL
-	aQLoUL3lM5ZqN00tabMahHpHwe5K+QutL0wt+vQvRmMIqMzxyVZFeDagxSQun62S
-	nBoMPgNeYNllVq3hnONEdKcYZu+1Ut4+Xy2AXmOxyD9UebqBSIYjyMmFwyWcM/Aj
-	WSqyRUa/zH5d1HOpbNTzG5J68fxqv5eDMKh7S4+MtqaPXgPY+8JnC4TrovvCJVOc
-	27wgxpbGTnWj0YUjBhWTkNmmsnFkOHxUa4nrY3g75si3Y8dbNf9VHZpQ/xtrmtBO
-	l5g==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wam4q11y9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 17 Feb 2024 21:30:45 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41HLUiow016969
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 17 Feb 2024 21:30:44 GMT
-Received: from [169.254.0.1] (10.49.16.6) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Sat, 17 Feb
- 2024 13:30:44 -0800
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-Date: Sat, 17 Feb 2024 13:30:43 -0800
-Subject: [PATCH] dt-bindings: net: wireless: qcom: Update maintainers
+	s=arc-20240116; t=1708207820; c=relaxed/simple;
+	bh=mYKwzXe2ZRGlF20vDTg03J91yT8nqSlhzoN8Ylq1xjE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hMTwvWUAlrwm7iTaWOTSGiinBjgFnBqdB8QG6D6E+y4dBLmt0MFPkDDMa9oMdC2Rhj5xvAIy7dc5o1VtC2ZjdDkLeKVycpz2aWgT+kYvlLkqfo1ZBChlWckJNTSqbBZslQj4/oPtBfp+sKM9+06PdisfN1KpByjXFhnEkwGi+pE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=c6TUOfad; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=dBMEFj+vUqAqgSWaC9a7/Khmdxlt5g8WjS7g/9NczGU=; b=c6TUOfadK4NqEjqMqSb5/Ek+Gq
+	CSL/AFvP1Zq8sMM+xK7J2+sqWrkksPZNvHspX8F9efTEIbztyWQz+li5nMENrtD09dqVHeJWQ04Rz
+	ssNHCK2YCkMFw5ibUxERy7+Cj8czdLNeGHVtpgVtXS4Lemr7UrpjeJW9UD5U3D8sXrKc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rbSsp-0085e9-VR; Sat, 17 Feb 2024 23:10:07 +0100
+Date: Sat, 17 Feb 2024 23:10:07 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Cc: Kory Maincent <kory.maincent@bootlin.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Radu Pirea <radu-nicolae.pirea@oss.nxp.com>,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH RFC net-next v8 04/13] net: Change the API of PHY default
+ timestamp to MAC
+Message-ID: <9e2ce7a0-e938-4f5f-aae9-cfee3a066628@lunn.ch>
+References: <20240216-feature_ptp_netnext-v8-0-510f42f444fb@bootlin.com>
+ <20240216-feature_ptp_netnext-v8-4-510f42f444fb@bootlin.com>
+ <87jzn4gtlv.fsf@nvidia.com>
+ <b8926fe5-81ef-40ea-9e87-5e84b368b745@lunn.ch>
+ <87o7cebx9z.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20240217-ath1xk-maintainer-v1-1-9f7ff5fb6bf4@quicinc.com>
-X-B4-Tracking: v=1; b=H4sIAIIl0WUC/x2MQQqAIBAAvyJ7TlCJzL4SHSTXXCILlQikvycd5
- jCHmQoZE2GGiVVIeFOmMzaRHYM12LghJ9cclFC9UFJzW4J8dn5YiqWBiQ/Gr9brUXpnoHVXQk/
- P/5yX9/0AjyxS9GMAAAA=
-To: Kalle Valo <kvalo@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        "Paolo
- Abeni" <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
-        "Krzysztof
- Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>
-CC: Jeff Johnson <jjohnson@kernel.org>, <ath10k@lists.infradead.org>,
-        <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <ath11k@lists.infradead.org>, Jeff Johnson <quic_jjohnson@quicinc.com>
-X-Mailer: b4 0.13.0
-X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: rozfTO-K88W-M-tEmD9hjBJvAWSV-ZPx
-X-Proofpoint-GUID: rozfTO-K88W-M-tEmD9hjBJvAWSV-ZPx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-17_20,2024-02-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- impostorscore=0 malwarescore=0 clxscore=1011 suspectscore=0 bulkscore=0
- spamscore=0 phishscore=0 mlxscore=0 lowpriorityscore=0 adultscore=0
- mlxlogscore=643 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2401310000 definitions=main-2402170178
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87o7cebx9z.fsf@nvidia.com>
 
-Add Jeff Johnson as a maintainer of the qcom,ath1*k.yaml files.
+> > Could you give some examples? It seems odd to me, the application
+> > wants a less accurate timestamp?
+> >
+> > Is it more about overheads? A MAC timestamp might be less costly than
+> > a PHY timestamp?
+> 
+> It's a combination of both though I think primarily about line rate.
+> This point is somewhat carried over from the previous discussions on
+> this patch series in the last revision.
 
-Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
----
- Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml     | 1 +
- Documentation/devicetree/bindings/net/wireless/qcom,ath11k-pci.yaml | 1 +
- Documentation/devicetree/bindings/net/wireless/qcom,ath11k.yaml     | 1 +
- 3 files changed, 3 insertions(+)
+Sorry, i've not been keeping up with the discussion. That could also
+mean whatever i say below is total nonsense!
 
-diff --git a/Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml b/Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml
-index 7758a55dd328..9b3ef4bc3732 100644
---- a/Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml
-+++ b/Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml
-@@ -8,6 +8,7 @@ title: Qualcomm Technologies ath10k wireless devices
- 
- maintainers:
-   - Kalle Valo <kvalo@kernel.org>
-+  - Jeff Johnson <jjohnson@kernel.org>
- 
- description:
-   Qualcomm Technologies, Inc. IEEE 802.11ac devices.
-diff --git a/Documentation/devicetree/bindings/net/wireless/qcom,ath11k-pci.yaml b/Documentation/devicetree/bindings/net/wireless/qcom,ath11k-pci.yaml
-index 817f02a8b481..41d023797d7d 100644
---- a/Documentation/devicetree/bindings/net/wireless/qcom,ath11k-pci.yaml
-+++ b/Documentation/devicetree/bindings/net/wireless/qcom,ath11k-pci.yaml
-@@ -9,6 +9,7 @@ title: Qualcomm Technologies ath11k wireless devices (PCIe)
- 
- maintainers:
-   - Kalle Valo <kvalo@kernel.org>
-+  - Jeff Johnson <jjohnson@kernel.org>
- 
- description: |
-   Qualcomm Technologies IEEE 802.11ax PCIe devices
-diff --git a/Documentation/devicetree/bindings/net/wireless/qcom,ath11k.yaml b/Documentation/devicetree/bindings/net/wireless/qcom,ath11k.yaml
-index 7d5f982a3d09..672282cdfc2f 100644
---- a/Documentation/devicetree/bindings/net/wireless/qcom,ath11k.yaml
-+++ b/Documentation/devicetree/bindings/net/wireless/qcom,ath11k.yaml
-@@ -9,6 +9,7 @@ title: Qualcomm Technologies ath11k wireless devices
- 
- maintainers:
-   - Kalle Valo <kvalo@kernel.org>
-+  - Jeff Johnson <jjohnson@kernel.org>
- 
- description: |
-   These are dt entries for Qualcomm Technologies, Inc. IEEE 802.11ax
+> I assume the device in question
+> here cannot timestamp at the PHY at a high rate.
+> 
+>   https://lore.kernel.org/netdev/20231120093723.4d88fb2a@kernel.org/
+> 
+> >
+> > Or is the application not actually doing PTP, it does not care about
+> > the time of the packet on the wire, but it is more about media access
+> > control? Maybe the applications you are talking about are misusing the
+> > PTP API for something its not intended?
+> 
+> So hardware timestamping is not a PTP specific API or application right?
 
----
-base-commit: 3ab6aff5793c3c7bdf6535d9b0024544a4abbdd5
-change-id: 20240217-ath1xk-maintainer-69fcaf781fd9
+Well, we have drivers/ptp. The IOCTL numbers are all PTP_XXXX. It
+seems like the subsystem started life in order to support PTP. It is
+not unusual for a subsystem to gain extra capabilities, and maybe PTP
+timestamps can be used in a more general way than the PTP
+protocol.
 
+> It's purely a socket option that is not tied to PTP (unless I am missing
+> something here).
+> 
+>   https://docs.kernel.org/networking/timestamping.html#timestamp-generation
+> 
+> So you could use this information for other applications like congestion
+> control where you do not want to limit the line rate using the PHY
+> timestamping mechanism.
+
+I think the key API point here is, you need to separate PTP stamping
+from other sorts of stamping. PTP stamping generally works better at
+the lowest point. So PTP stamping could be PHY stamping. If the PHY
+does not support PTP, or its implementation is poor, PTP stamping can
+be performed at the MAC. There are plenty of MACs which support that.
+So we need an API to configure where PTP stamping is performed.
+
+I expect the socket option is more generic. It is more about, give me
+a time stamp at a specific point in the stack. It is probably not
+being used by PTP, it could be used for flow control, etc. We probably
+need an API to configure that SOF_TIMESTAMPING_RX_HARDWARE actually
+means. It could be the PHY time stamp, maybe the MAC timestamp. Same
+for SOF_TIMESTAMPING_TX_HARDWARE, it could be the MAC, could be the
+PHY. But whatever they mean, i expect they are separate PTP.
+
+> In mlx5, we only steering PTP traffic to our PHY timestamping mechanism
+> through a traffic matching logic.
+> 
+>   https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.h?id=a6e0cb150c514efba4aaba4069927de43d80bb59#n71
+> 
+> This is because we do not want to PHY/port timestamp timing related
+> applications such as congestion control. I think it makes sense for
+> specialized timestamping applications to instead use the ethtool ioctl
+> to reconfigure using the PHY timestamps if the device is capable of PHY
+> timestamping. (So have the change be in userspace application tools like
+> linuxptp where precise but low <relative> rate timestamp information is
+> ideal).
+
+I would expect linuxptp is only interested in the PTP timestamp. It
+might be interested where the stamp is coming from, PHY or MAC, but it
+probably does not care too much, it just assumes the time stamp is
+good for PTP. But i would expect linuxptp has no interest in what the
+generic socket options are doing.
+
+    Andrew
 
