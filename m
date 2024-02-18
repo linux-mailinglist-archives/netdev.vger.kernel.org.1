@@ -1,78 +1,60 @@
-Return-Path: <netdev+bounces-72763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 989FE859898
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 19:36:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 539EB8597EC
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 18:04:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C06551C20BE3
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 18:36:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18BB4281460
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 17:04:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E0596D1AC;
-	Sun, 18 Feb 2024 18:35:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C910C6EB5D;
+	Sun, 18 Feb 2024 17:04:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gdawcmHJ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="CMozmuNq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3AB86341A;
-	Sun, 18 Feb 2024 18:35:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD2C96F085
+	for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 17:04:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708281357; cv=none; b=W6hnesHSjSOww95oaCOO1P4AQdA+uxvdpugPOyOorfLmPXKL2c0u3SddM9isSYNmU6Hr4Ao/h3mvyZ2aQ4qs2l/LtCH+2m/3kbSZyIWf2WvWJYnA2QdQ+4g+5+PfQ01Q2dB6uK6huxJBkss66ToE2lsRpc5eVFHN4L0b/6tSVdo=
+	t=1708275854; cv=none; b=Cs6EfIq4W36zIpuWxxR/gnb5joq6tsLV7Cm1fJ/21iXuQaxZTIiMteac96TVbTIehSjCXSzCy1uaeR9A7YdezG436KdOSaaud8/RHMt+XQ4LUhJPWNGzbYdsazsIn+BsVeVgewmLPmuFrXjo766mubl7gY3/pQgNKXDwgS5Sojc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708281357; c=relaxed/simple;
-	bh=5fuux1HAirtBiYVp43TmFsANlPjwHWYFEx8MXM16p6k=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=it+V73VItZ60aThscE/OC4WhdPeX+PhnZ02ZI7p7LXdWWH1nAxAqg5VI8dzLqtgTfXRt8YwMbs+FVoXF23GGnsy3E/45eQz/l2hGb053lLooAMtYp4C3qg4677u7xMXJuKTzQaxCebeNjtdHQUZuX2yfmisGNCzcVxSSYtnbydU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gdawcmHJ; arc=none smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-42ce63b1d30so40096361cf.3;
-        Sun, 18 Feb 2024 10:35:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708281354; x=1708886154; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rtlFK2N47ATXOiP1HgXvAlQ7VAuyaeK7nB3D2FRWvkg=;
-        b=gdawcmHJzaU3npzbZ9iGce4JBxkG0GxOfjtDXK8663kOMUiYKB1w1DXP+L1NZVCcwW
-         L1aZlXHt9b/P0LM0wowItyL4O55UsZh6+6vos3a8BQOQCKzwxY/xEWEWYC1ZfZ3VALCP
-         /Rv+FFpgvUigAVF8XxIWVNHprsPl2184zLVr+6dYIO1Odiem1PrzE6RlE4gKPjGY8PdC
-         KWs6k/3d1f2EJozq77WJNtyMPpZV4XXfYAgpWPaEHjX/dSO3/GZ2PbszxObhur89OQ6H
-         2clbms3LnOwgVsWKLnWiePjZcOK+Itkb75QtIIZZw3r8F32GZIM84PQ5ul5rzn9x0iVK
-         eXKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708281354; x=1708886154;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rtlFK2N47ATXOiP1HgXvAlQ7VAuyaeK7nB3D2FRWvkg=;
-        b=fQMJyFmEP0n+EKUHx5V0TLKi0Sf4IlDn9WZVTWfFDv4xkvI8r84z+xvuRse8BfEg+V
-         2W1LJB5ucOXvpH00Oq9Tpepkh/qKkHurp2A6lVn20nWY7uf4rtp0j94FwwtwYCoEOTzy
-         WQ0PC18ND1weCgOJag80EAX8a5BojWwPNKBl8pD0yTTbPRgfIJe7dpzU7PC+X3lhcGrz
-         9wa8DAe8F1TIDDwkMAiNd8jJfOBDI02MfHm9BCp+Dsyx/1pr/JoqvQzkhGrLLdqgqWG9
-         Tb1EM/iu04h67xEAyfhmmUlBjhOx1F8ZCTXNXIdINXkQdITfHVKDicQ2klQN8Brkrvav
-         +h+g==
-X-Forwarded-Encrypted: i=1; AJvYcCXpdJ2NZo5fuOKG7rKBiYwVpthdKZwDn69bS09xf3hdB+Jl89LlWHZIJVeglZbrONGlKtIn/FkXH3L/APYM08uj0VqD8/XtWk3fHdkv
-X-Gm-Message-State: AOJu0Yzs9xirdttn/3UTMQMPO8KhdJnwwfxQRArVNxp4jWh7yzK1TTYr
-	pjQtXyZFFL1jiF8BFFap3D40tqwy/x4FCZIaC02anHBBD5Z7Qe66
-X-Google-Smtp-Source: AGHT+IEsGtbyPHD9+xbewDdwoJ8fl023wuuWU2V8e7302Cwwd7xV+PRUpoDCmgLcjwR5VsR6WbToDw==
-X-Received: by 2002:a05:620a:1928:b0:787:54a5:9047 with SMTP id bj40-20020a05620a192800b0078754a59047mr4612171qkb.34.1708281354320;
-        Sun, 18 Feb 2024 10:35:54 -0800 (PST)
-Received: from localhost ([2601:8c:502:14f0:acdd:1182:de4a:7f88])
-        by smtp.gmail.com with ESMTPSA id c9-20020a05620a11a900b007859c6a3a7esm1764078qkk.105.2024.02.18.10.35.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 Feb 2024 10:35:53 -0800 (PST)
-Date: Sun, 18 Feb 2024 08:35:51 -0500
-From: Oliver Crumrine <ozlinuxc@gmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] net: copy routing table more efficiently in
- rt_dst_clone
-Message-ID: <xlabdyc4izitfdfpuoy2p2hi3abiq4mrrgizdqz45k7xeftbsg@ee6jgncdaqg7>
+	s=arc-20240116; t=1708275854; c=relaxed/simple;
+	bh=mFCgfPYSUlTXF+kMvfuLJvTSEi8eRbN5TxrMQi8Rv+Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=or5s2CWMY+3CyOkEwPtFJbYN+l9zn/7mwV5OJve7s8sqR7XjcH4hNYupFylsb1GtqNd67AtzwMncWrAGivBvCVC11fu2giqgbGPnCUBo4ZdKy72g4brqtx28MdcL4D+gTtSDxfJSfOD500N92/6yGxZbhPqdPdrN4NU27OQ5KrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=CMozmuNq; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=30Jv3pZxWyNuFxBMP3ZB8seikc+h5WX0/Mh0ZWr0RI8=; b=CMozmuNqYbPAnBWzihlO9nO0MM
+	VcN6ery2VyAwf0w27SrF/HgAh+PriCwwIDlBqgCwESTC29/YxB8xiIzXB6eVTpahQ0PY133pQA/FW
+	lp6CtK+xb33GHkodnVFmGdOlKEv2K8SWbWJTSOLO2EQ0JuQl+jxETchHmo8d7oA678mI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rbkaF-0088G6-Hu; Sun, 18 Feb 2024 18:04:07 +0100
+Date: Sun, 18 Feb 2024 18:04:07 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Michael Chan <mchan@broadcom.com>, Jakub Kicinski <kuba@kernel.org>,
+	David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Russell King - ARM Linux <linux@armlinux.org.uk>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next] tg3: copy only needed fields from
+ userspace-provided EEE data
+Message-ID: <14978af2-0b94-4677-b303-da7c690abcca@lunn.ch>
+References: <59bd00bf-7263-43d9-a438-c2930bfdb91c@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,44 +63,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <59bd00bf-7263-43d9-a438-c2930bfdb91c@gmail.com>
 
-Instead of copying field-by-field, copy the entire struct at once. This
-should lead to a performance improvment in rt_dst_clone.
+On Sun, Feb 18, 2024 at 03:49:55PM +0100, Heiner Kallweit wrote:
+> The current code overwrites fields in tp->eee with unchecked data from
+> edata, e.g. the bitmap with supported modes. ethtool properly returns
+> the received data from get_eee() call, but we have no guarantee that
+> other users of the ioctl set_eee() interface behave properly too.
+> Therefore copy only fields which are actually needed.
+> 
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 
-Signed-off-by: Oliver Crumrine <ozlinuxc@gmail.com>
----
- net/ipv4/route.c | 16 +---------------
- 1 file changed, 1 insertion(+), 15 deletions(-)
+This one needed some time for me to understand. I missed that when
+programming the PHY to advertise, it is hard coded what it actually
+advertises. So there is no need to copy the advertise linkmode from
+edata.
 
-diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index 16615d107cf0..ebb17c3a0dec 100644
---- a/net/ipv4/route.c
-+++ b/net/ipv4/route.c
-@@ -1664,22 +1664,8 @@ struct rtable *rt_dst_clone(struct net_device *dev, struct rtable *rt)
- 			   rt->dst.flags);
- 
- 	if (new_rt) {
-+		*new_rt = *rt;
- 		new_rt->rt_genid = rt_genid_ipv4(dev_net(dev));
--		new_rt->rt_flags = rt->rt_flags;
--		new_rt->rt_type = rt->rt_type;
--		new_rt->rt_is_input = rt->rt_is_input;
--		new_rt->rt_iif = rt->rt_iif;
--		new_rt->rt_pmtu = rt->rt_pmtu;
--		new_rt->rt_mtu_locked = rt->rt_mtu_locked;
--		new_rt->rt_gw_family = rt->rt_gw_family;
--		if (rt->rt_gw_family == AF_INET)
--			new_rt->rt_gw4 = rt->rt_gw4;
--		else if (rt->rt_gw_family == AF_INET6)
--			new_rt->rt_gw6 = rt->rt_gw6;
--
--		new_rt->dst.input = rt->dst.input;
--		new_rt->dst.output = rt->dst.output;
--		new_rt->dst.error = rt->dst.error;
- 		new_rt->dst.lastuse = jiffies;
- 		new_rt->dst.lwtstate = lwtstate_get(rt->dst.lwtstate);
- 	}
--- 
-2.43.0
+I suspect this driver is broken in that it does not wait for the
+result of the auto-neg to enable/disable EEE in the hardware. But it
+could be hiding somewhere in the code and i also missed that.
 
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
