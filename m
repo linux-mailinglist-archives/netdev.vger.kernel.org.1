@@ -1,108 +1,198 @@
-Return-Path: <netdev+bounces-72792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 910158599AA
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 23:07:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 37F9F8599CE
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 23:23:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DEB31F212B4
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 22:07:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9F551F2134B
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 22:22:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C980674E3F;
-	Sun, 18 Feb 2024 22:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="A4qtgmbz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10976745CD;
+	Sun, 18 Feb 2024 22:22:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EF9374297;
-	Sun, 18 Feb 2024 22:07:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 591017318D
+	for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 22:22:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708294047; cv=none; b=MVUoMaR6nlDVLQ0LwBzWxjpdjzlj9q3anCc5wMxH15mzOiRJDviNpghCeFjTwi8l2Cbhm6eTQIe7BF9Nzq4bYW4xQT1gTBzQSzqhyOqzmzUapvCD+PdBrVlVON3tswLIh1QvxNawbCsLU+X9al8sG8W5l9Ge8t6iE7//9B2dgNA=
+	t=1708294940; cv=none; b=VvkF5kZsGQyyZL9sGwRxmBSqWsBdRhNlzhUfLHPBBPWvQ/9uFAsIvN/oq4IDPuAOqGp8xDfh+KNeIY3lR8xhI7S8oHvUn2Ghr+AEoxLQTRY0icca/HtRAJq7pHWWABXyJIDC9VnJy9AInOicuHrw0XVwTQLv/MDu/IZ5y+T8Dmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708294047; c=relaxed/simple;
-	bh=e0yWxLc3AYNv/5zFp3fPm6gjPgJpcMpeFj9+grm07MI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jOGZH284DD43dxah3r8lb28BQRA+eT+gO2zvvnkf9SyvZ5ssQtzKFBQZlwPJ/XWU22il5y3eWF+tcdnwBlteT+1vc7u1tqRzoPhxBSRlXQfmjunTOOBtDeuDbYAWgyfEujBUV8HgLt+K2gjpEeFMXqnGytYXf7JFu6FP299JQtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=A4qtgmbz; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=NadklAa6Tnip8w2TUfxFFu3aktzUd6Kx6TcCLDek8NE=; b=A4qtgmbzFk7aBDbe/5E1HGAoLz
-	+VhQCph3UweeUHCROTXnLDt1OCD543Lw8LyR/FEpU8ocfQMox+OFHPxZZH2PZE3lh1/dEFxjfNl78
-	beRrqUd3jBgZvenJ8ekSn3vqA/9RNKWM67KhmRyceOr8PrlDbOmTD6l4pUQD178cUocM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rbpJU-00893B-FH; Sun, 18 Feb 2024 23:07:08 +0100
-Date: Sun, 18 Feb 2024 23:07:08 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Robert Marko <robimarko@gmail.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
-	Nipun Gupta <nipun.gupta@amd.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Puneet Gupta <puneet.gupta@amd.com>,
-	Abhijit Gangurde <abhijit.gangurde@amd.com>,
-	Umang Jain <umang.jain@ideasonboard.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next RFC PATCH 1/6] net: phy: add support for defining
- multiple PHY IDs in PHY driver
-Message-ID: <5233847b-a94b-4cd2-b976-232755f209d5@lunn.ch>
-References: <20240218190034.15447-1-ansuelsmth@gmail.com>
- <20240218190034.15447-2-ansuelsmth@gmail.com>
- <ZdJbciylnw8+ve8V@shell.armlinux.org.uk>
- <65d2613d.170a0220.2eb48.a510@mx.google.com>
- <829f8c7d-c09b-4264-818a-3f7b047ec44f@lunn.ch>
- <65d2682a.5d0a0220.3fef2.efe4@mx.google.com>
- <ZdJpyGkFRiRufySw@shell.armlinux.org.uk>
- <65d26c13.df0a0220.63f42.d8e6@mx.google.com>
+	s=arc-20240116; t=1708294940; c=relaxed/simple;
+	bh=hKCkF2Nc02tElu4OZDLKcK7Rpu1cpp/hq4ESd91kik8=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=pYSe4gkU5wm9k91A9IY6k6sHT8Bcbs/DM3brDu18JoxoS9XALFigpLQS14Pr9iZFx5FSn0+v/T8NHhDgQXjh/KyKvjghsBUQ/NpphsQm1NZidj/0AkQjkE8gJ1IHkmEBLFZ14cA7gWsssGtEKt8fTIh6cFPBNN2+fFqHckBAzJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-365035aed34so28324025ab.1
+        for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 14:22:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708294937; x=1708899737;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3ZYk1LMO5y6n5tGB1SFVJxfsyQYKQ7bfwvDflpKRAPI=;
+        b=ijaOdhhF5abTSh5Mgqy2LWpMvtX9jpOoGekPzLKogjsiSQ5mmdd3cfaTYxNLWNhTCh
+         XgYDcjAAd+a6v+MjQvQXd9mivQx7i85+J+jpEuK1tPBxb00vEu6BaLNn93hJOSpL49+H
+         WESx8xs4w9dYdbBOT1DRdiifWA67nywJIXEsq2iXy4Hrmmj2K7NrTkBQRn7C59/b53uF
+         ctk11QLVAO0YmUU8XWQgbefRrXengCkvSCw1mwYQQu2ipO4KqflarVGnebq7riMw8Dju
+         oHQ4gnfPomKl/EmK35kPH3gX9eoCEqxpov12nEsooCQpSBZC4ed3WuBtsc9bR9QqAK5P
+         qs/g==
+X-Forwarded-Encrypted: i=1; AJvYcCVBlViPsmH0wyTIvtNhqIUrON9oMtjT6U5gijHhQqvk/dQrfsGlWZUPgZfxuyFbnvXnUeDC16c3y+ltfBLeEGebjpXumPCn
+X-Gm-Message-State: AOJu0Yy35uPVG8PdGdB1BFIAj20lg6TUWzM4Sf4lgwaFYY3xeuN23MdU
+	Jj6E48IaaBjRGHi6TECUzhgrbf5a3EijwLKIgKPTEYqUjLGEHC5hAuceYzsM6izoFsiugu9b4ik
+	t6h2pheY47hwZfvpI7Q4YiNpoX7QbC83v8Xw2a1mkxxVVH3VjIoepdU8=
+X-Google-Smtp-Source: AGHT+IGJnExPV9Xp6gCG90zK3qSJ71JHKUOQY4H1LWGqTi9yZIMSzgcyvwkAvmwc6Dcuj0xwYH9KNyd3az04FZ7sgm6V8a5CwTTn
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <65d26c13.df0a0220.63f42.d8e6@mx.google.com>
+X-Received: by 2002:a05:6e02:12cb:b0:365:3086:74f7 with SMTP id
+ i11-20020a056e0212cb00b00365308674f7mr89848ilm.4.1708294937599; Sun, 18 Feb
+ 2024 14:22:17 -0800 (PST)
+Date: Sun, 18 Feb 2024 14:22:17 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000ed666a0611af6818@google.com>
+Subject: [syzbot] [net?] [bpf?] BUG: unable to handle kernel NULL pointer
+ dereference in dev_map_hash_update_elem
+From: syzbot <syzbot+8cd36f6b65f3cafd400a@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, haoluo@google.com, hawk@kernel.org, 
+	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
+	netdev@vger.kernel.org, sdf@google.com, song@kernel.org, 
+	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-> With the allocated mdio_devic_id it would result in this snipped
-> 
-> 	const struct mdio_device_id *driver_dev_id;
-> 	struct mdio_device_id *dev_id;
-> 	int err = 0;
-> 
-> 	phydev->drv = phydrv;
-> 	/* Fill the mdio_device_id for the PHY istance.
-> 	 * If PHY driver provide an array of PHYs, search the right one,
-> 	 * in the other case fill it with the phy_driver data.
-> 	 */
-> 	if (phy_driver_match(phydrv, phydev, &driver_dev_id) && driver_dev_id) {
-> 		/* If defined, overwrite the PHY driver dev name with a
-> 		 * more specific one from the matching dev_id.
-> 		 */
-> 		phydev->dev_id = driver_dev_id;
-> 		if (driver_dev_id->name)
-> 			drv->name = driver_dev_id->name;
+Hello,
 
-What is drv here? You should not be changing the name within the
-driver structure, since that is shared by a number of devices.
+syzbot found the following issue on:
 
-       Andrew
+HEAD commit:    7e90b5c295ec Merge tag 'trace-tools-v6.8-rc4' of git://git..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1460a080180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f8ee3942159acc92
+dashboard link: https://syzkaller.appspot.com/bug?extid=8cd36f6b65f3cafd400a
+compiler:       arm-linux-gnueabi-gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: arm
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/8ead8862021c/non_bootable_disk-7e90b5c2.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/79d91883bc70/vmlinux-7e90b5c2.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/0dcf5ad6b94a/zImage-7e90b5c2.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+8cd36f6b65f3cafd400a@syzkaller.appspotmail.com
+
+8<--- cut here ---
+Unable to handle kernel NULL pointer dereference at virtual address 00000014 when read
+[00000014] *pgd=85006003, *pmd=fe2d5003
+Internal error: Oops: 207 [#1] PREEMPT SMP ARM
+Modules linked in:
+CPU: 1 PID: 7433 Comm: syz-executor.1 Not tainted 6.8.0-rc4-syzkaller #0
+Hardware name: ARM-Versatile Express
+PC is at __dev_map_hash_lookup_elem kernel/bpf/devmap.c:269 [inline]
+PC is at __dev_map_hash_update_elem kernel/bpf/devmap.c:972 [inline]
+PC is at dev_map_hash_update_elem+0x90/0x210 kernel/bpf/devmap.c:1010
+LR is at get_lock_parent_ip include/linux/ftrace.h:977 [inline]
+LR is at preempt_latency_start kernel/sched/core.c:5843 [inline]
+LR is at preempt_count_add+0x12c/0x150 kernel/sched/core.c:5868
+pc : [<803e5ed8>]    lr : [<8027b2b4>]    psr: 60000093
+sp : dfaf1da8  ip : dfaf1d68  fp : dfaf1de4
+r10: 00000001  r9 : 84658000  r8 : 84e58110
+r7 : 00000001  r6 : a0000013  r5 : 84e58000  r4 : ffffffff
+r3 : 00000001  r2 : 00000010  r1 : 00000000  r0 : a0000013
+Flags: nZCv  IRQs off  FIQs on  Mode SVC_32  ISA ARM  Segment none
+Control: 30c5387d  Table: 83e1be00  DAC: 00000000
+Register r0 information: non-slab/vmalloc memory
+Register r1 information: NULL pointer
+Register r2 information: zero-size pointer
+Register r3 information: non-paged memory
+Register r4 information: non-paged memory
+Register r5 information: slab kmalloc-cg-512 start 84e58000 pointer offset 0 size 512
+Register r6 information: non-slab/vmalloc memory
+Register r7 information: non-paged memory
+Register r8 information: slab kmalloc-cg-512 start 84e58000 pointer offset 272 size 512
+Register r9 information: slab net_namespace start 84658000 pointer offset 0 size 3264
+Register r10 information: non-paged memory
+Register r11 information: 2-page vmalloc region starting at 0xdfaf0000 allocated at kernel_clone+0xac/0x3c8 kernel/fork.c:2902
+Register r12 information: 2-page vmalloc region starting at 0xdfaf0000 allocated at kernel_clone+0xac/0x3c8 kernel/fork.c:2902
+Process syz-executor.1 (pid: 7433, stack limit = 0xdfaf0000)
+Stack: (0xdfaf1da8 to 0xdfaf2000)
+1da0:                   dfaf1dc4 ffffffff 00000000 caa92d0f dfaf1de4 84e58000
+1dc0: 824aeaf0 86a45440 86a45c80 84f14000 00000004 84e58000 dfaf1e14 dfaf1de8
+1de0: 8038c070 803e5e54 00000001 00000000 80883e10 84e580b8 84f14001 84f14000
+1e00: dfaf1ec8 86a45440 dfaf1e6c dfaf1e18 8038cff8 8038be80 00000001 00000000
+1e20: 00000000 00000004 20000280 00000004 00000000 86a45c80 200002c0 00000000
+1e40: dfaf1e6c 00000000 00000020 dfaf1ea0 00000002 200002c0 00000020 00000000
+1e60: dfaf1f8c dfaf1e70 80392a58 8038cdb0 00000000 00000000 20000013 83f0d400
+1e80: dfaf1ee0 dfaf1fb0 dfaf1ea4 dfaf1e98 80883e10 dfaf1ee0 dfaf1fb0 80200288
+1ea0: 200002c0 00000000 00000008 00000000 00000008 8041ad38 00000000 00000000
+1ec0: 00000000 00000000 00000003 00000000 20000240 00000000 20000280 00000000
+1ee0: 00000001 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+1f00: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+1f20: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+1f40: 00000000 00000000 00000000 00000000 00000000 00000000 80203134 caa92d0f
+1f60: 8261c978 00000000 00000000 0014c2c8 00000182 80200288 83f0d400 00000182
+1f80: dfaf1fa4 dfaf1f90 80394e5c 803927e8 200002c0 00000000 00000000 dfaf1fa8
+1fa0: 80200060 80394e3c 00000000 00000000 00000002 200002c0 00000020 00000000
+1fc0: 00000000 00000000 0014c2c8 00000182 7ec5132e 7ec5132f 003d0f00 76b440fc
+1fe0: 76b43f08 76b43ef8 000167e8 00050bb0 60000010 00000002 00000000 00000000
+Backtrace: 
+[<803e5e48>] (dev_map_hash_update_elem) from [<8038c070>] (bpf_map_update_value+0x1fc/0x2d4 kernel/bpf/syscall.c:202)
+ r10:84e58000 r9:00000004 r8:84f14000 r7:86a45c80 r6:86a45440 r5:824aeaf0
+ r4:84e58000
+[<8038be74>] (bpf_map_update_value) from [<8038cff8>] (map_update_elem+0x254/0x460 kernel/bpf/syscall.c:1553)
+ r8:86a45440 r7:dfaf1ec8 r6:84f14000 r5:84f14001 r4:84e580b8
+[<8038cda4>] (map_update_elem) from [<80392a58>] (__sys_bpf+0x27c/0x2104 kernel/bpf/syscall.c:5445)
+ r10:00000000 r9:00000020 r8:200002c0 r7:00000002 r6:dfaf1ea0 r5:00000020
+ r4:00000000
+[<803927dc>] (__sys_bpf) from [<80394e5c>] (__do_sys_bpf kernel/bpf/syscall.c:5561 [inline])
+[<803927dc>] (__sys_bpf) from [<80394e5c>] (sys_bpf+0x2c/0x48 kernel/bpf/syscall.c:5559)
+ r10:00000182 r9:83f0d400 r8:80200288 r7:00000182 r6:0014c2c8 r5:00000000
+ r4:00000000
+[<80394e30>] (sys_bpf) from [<80200060>] (ret_fast_syscall+0x0/0x1c arch/arm/mm/proc-v7.S:66)
+Exception stack(0xdfaf1fa8 to 0xdfaf1ff0)
+1fa0:                   00000000 00000000 00000002 200002c0 00000020 00000000
+1fc0: 00000000 00000000 0014c2c8 00000182 7ec5132e 7ec5132f 003d0f00 76b440fc
+1fe0: 76b43f08 76b43ef8 000167e8 00050bb0
+Code: e595210c e1a06000 e2433001 e003300a (e7924103) 
+---[ end trace 0000000000000000 ]---
+----------------
+Code disassembly (best guess):
+   0:	e595210c 	ldr	r2, [r5, #268]	@ 0x10c
+   4:	e1a06000 	mov	r6, r0
+   8:	e2433001 	sub	r3, r3, #1
+   c:	e003300a 	and	r3, r3, sl
+* 10:	e7924103 	ldr	r4, [r2, r3, lsl #2] <-- trapping instruction
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
