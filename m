@@ -1,89 +1,113 @@
-Return-Path: <netdev+bounces-72776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A72DB859918
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 20:36:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D1AD85991F
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 20:44:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9BC01C210BE
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 19:36:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B9AC1C209ED
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 19:44:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B40371B30;
-	Sun, 18 Feb 2024 19:36:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BA866F53E;
+	Sun, 18 Feb 2024 19:43:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QLnKC2tu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D21383A3
-	for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 19:36:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8FEE6F086
+	for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 19:43:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708284965; cv=none; b=VJLiQyxEW91KL3ln+OSLYHVhBEOzp7E207xEb9HxcvRie6VzHgWAhhqhdcX+WKB4PU0LNmzZr63RnGVUIuMBBwva5heWPWxclWje5PbFQCaLNq8sh8cB4Xo/mJm/97Kn4mi2c3+HfPkYFAHVvjpqTpbQHbeXZo7d1qfo2t6Sm8Q=
+	t=1708285438; cv=none; b=Qy1VBNoVsRMne3TjrKk8R4Cv4Nqsrj2lr0vFtn0PRha6FOJ+q4wePhgm1Hn93WNtDTAJtmWFx497UKITmD7m/TPeD3XF9caR0MPkTyrmRImOBuvxku+ouRJMEXNU9JtboOlf/HHZRbpaQthg+uo1x0KP/cc4PqwJ+d8OJCx2l5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708284965; c=relaxed/simple;
-	bh=3FX4rtGdKWDOzhksBPXgjGi3CFyV5x/Dl113EV0q9qM=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=AZztg8nFvRGKuwoQ/o1955c76DSycFjHn7Ym43tgYpvem15KTvNQ9hBDFXYcEPDT6oQ6bdhzkikm/etHUaWTEi4Ma9yij6NdV4BapTc/M4usYnE10JFlkE40k2d0g84s7EJNeKEKZTDrSnRldXH57Pu+qodYQlGPgq4GGeK7lk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-36531d770d1so1580225ab.3
-        for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 11:36:03 -0800 (PST)
+	s=arc-20240116; t=1708285438; c=relaxed/simple;
+	bh=ZSgg56MDDikMxD9lFICzp5aLOSYnhukufSJJ+LaxfFc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jotdud7xVx0pdo4QItxMFP6rnJLD1EMqSyexNrfvzXmeiF3wuec1ygsp+ei//Xt1Q84D7XQdMyFA7P4iiZFEZF77iNdLZerxN0DecknFyhdGmMn5YS5W61pW9w5WHRjb5fP+QsYpTU35pl21L3tdyyA8GA5cgJIMW1Yq4GDcZL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QLnKC2tu; arc=none smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2d23473a563so8216091fa.3
+        for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 11:43:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708285435; x=1708890235; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LneWVvxgKNr3a5cjbUb7k/3W5Ksd7fPA6MKpRdyePWk=;
+        b=QLnKC2tuK7O5qBdNhkPJM0OiSdmNfRxp7aZSw2ZEDvJbOftx2zuUwSSxFgyoCzgdX4
+         8bQ6SDNU0TP//HCIthI7eSfMSWqFKzpXXovnxqrRC+vc+jqp1PKiJyUd7hM5vNAPiutK
+         NHVHhsJnWbiTSe9TL+C3zw6O3l3Gwuv4yNC5fpHKQy2whVURkMo5Qi4dbS/JbU/kMJEb
+         Ho7tiuNeu5Zx/t4bv3LGaKqs3Acmfu7LiYzFXuvXCT4Zjf9tw87UaI9EWRAYe0sbIBd8
+         QYTNx4p1O8S4mM5DK1TFem8f30dXDWOSRmqd/G+MpFtiL2tNbS2w1jKTV+sdcinAwtIy
+         KbaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708284963; x=1708889763;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5VjE8fPbReWrcIR9LUQJ053LQQACtWBbX685F4g+ltc=;
-        b=JwUz44kMt0fJDoiL7D/rNDOwOAOO82DcAUabn5kfc1gsACWTzwT3qgyqHAgzKN9saP
-         O2SYBEhillDblKVE8R6X3z9cd0dtU9Qe8chFpI+2BXALY1Z1lU01fHNrivMgZWQj3N9v
-         lsyx+NphF6MhYqDqwdAJ8FyVZaCBCtyrbcd1qAzt2q25v7vrIANwXWy74rqu/VqPyZ3U
-         M09m2qxrGBD3I9+jq3eYcb4n5oakm1cTmPJUzKbBRn9VzdW2G4OEKTFdtp4tcjPvj/sW
-         X+c+1D0G23rYzEzu/UDC01Lf89g2/b3V4XVD0P7huHKKe/6uWTz0XL6lOciZYVtq5Z32
-         mf0g==
-X-Forwarded-Encrypted: i=1; AJvYcCWJi5uRJpU1aH9VtXHMIS6WJTw+FnATqjnTsjP/48D3S104ckpfUcoI5tL06pI38wjE8IP7679fPyqpLR/LaqZxKl+5tgnV
-X-Gm-Message-State: AOJu0YyxkrcYdgv3xRE1gCCr2Hz8lrUk8rUqqN8cHSiLLLGjQbbhWGZF
-	XFk6l3FDVSSyFsAxsEZwjLh9/T0GlZyhzPjco9Kio8UWyFe0+uYs7WAYm5n+d0+MOZhDh2Kwkwt
-	F8dRDWKsUjXx4xYI8rfYiLI0+/r+qYZCnOSYQYTq4jEJCMvIb19+cs48=
-X-Google-Smtp-Source: AGHT+IF4So7qhdMKtZscBnCFO7cz0QMU2cVZeGgVgDx6aEAicBGXOfuVRrpdnDybQ7dx23IBtYxxe/9lylfo0cVkGE6dXfexrIM5
+        d=1e100.net; s=20230601; t=1708285435; x=1708890235;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LneWVvxgKNr3a5cjbUb7k/3W5Ksd7fPA6MKpRdyePWk=;
+        b=R5mPAhUc408wr4aWSA1U/t7q5NT9fi1GD797LXEK7rUuOO0NmAsmNVo68SpuqS0tzf
+         f+gDKnddSWPvIwecbkL7/4onQKtpUlVBasNkgSawa548Eb9qIqYa6lZIg2LBJojq2gzu
+         avdiFGs32mIaqWcY9uklLjG1ctEWAoKYVgOm6JiTjMnqlyKU4AG0GyPWZkVCAQ7vc0e8
+         cEjCQAxKWqkSvf7bXV6187ybd38F/+yhtkIOZ7e2mfUNelWsbMFVUMgXiW5YnNZ+9E3y
+         5ck5n7sRZO2xZjfv7ejP5w9gwVG31HDRYyEfhumLontHYABFwPlp1vCjvIrWiTDj+cxJ
+         ImMg==
+X-Forwarded-Encrypted: i=1; AJvYcCX+USjZRM9e1kPUDyk+n6rVDQkp/KyejFcBBSvG4SL1EoTNNgW7bxDRnBNpAJQXuCP/SpbyAhxvxpicPMcf5hSsdZDTYsSR
+X-Gm-Message-State: AOJu0YzWdxSxh+tHRSyzmKyiYt+KYzrGmyPR0PBSUFwWjTF81hLKeg7l
+	G1uCRyXd9qlsNFMg+LfPMyhOkGFRePezYQr1Noe7rF3vOlhT++f9
+X-Google-Smtp-Source: AGHT+IFKba6EanrSgC1DrAUrNyGzmAlb1FQ6MBNqLof53YER2MOmrJIXvFvdKWA0o01RBzHHpGSHQA==
+X-Received: by 2002:a05:6512:3a88:b0:512:a450:e1ee with SMTP id q8-20020a0565123a8800b00512a450e1eemr3349127lfu.1.1708285433945;
+        Sun, 18 Feb 2024 11:43:53 -0800 (PST)
+Received: from mishin.sarov.local (95-37-3-243.dynamic.mts-nn.ru. [95.37.3.243])
+        by smtp.gmail.com with ESMTPSA id t18-20020a195f12000000b005114dc093desm660012lfb.259.2024.02.18.11.43.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 18 Feb 2024 11:43:53 -0800 (PST)
+From: Maks Mishin <maks.mishinfz@gmail.com>
+X-Google-Original-From: Maks Mishin <maks.mishinFZ@gmail.com>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: Maks Mishin <maks.mishinFZ@gmail.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH] ctrl: Add check for result rtnl_dump_filter()
+Date: Sun, 18 Feb 2024 22:43:09 +0300
+Message-Id: <20240218194309.31482-1-maks.mishinFZ@gmail.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:481c:b0:471:647b:47b3 with SMTP id
- cp28-20020a056638481c00b00471647b47b3mr97325jab.6.1708284963017; Sun, 18 Feb
- 2024 11:36:03 -0800 (PST)
-Date: Sun, 18 Feb 2024 11:36:03 -0800
-In-Reply-To: <20240218190032.39987-1-kuniyu@amazon.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000655a600611ad164e@google.com>
-Subject: Re: [syzbot] [net?] INFO: task hung in unix_stream_sendmsg
-From: syzbot <syzbot+ecab4d36f920c3574bf9@syzkaller.appspotmail.com>
-To: asml.silence@gmail.com, axboe@kernel.dk, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, kuniyu@amazon.com, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+Added check for result of rtnl_dump_filter() function
+for catch errors linked with dump.
+Found by RASU JSC.
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+Signed-off-by: Maks Mishin <maks.mishinFZ@gmail.com>
+---
+ genl/ctrl.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Reported-and-tested-by: syzbot+ecab4d36f920c3574bf9@syzkaller.appspotmail.com
+diff --git a/genl/ctrl.c b/genl/ctrl.c
+index aff922a4..467a2830 100644
+--- a/genl/ctrl.c
++++ b/genl/ctrl.c
+@@ -313,7 +313,10 @@ static int ctrl_list(int cmd, int argc, char **argv)
+ 			goto ctrl_done;
+ 		}
+ 
+-		rtnl_dump_filter(&rth, print_ctrl2, stdout);
++		if (rtnl_dump_filter(&rth, print_ctrl2, stdout) < 0) {
++			fprintf(stderr, "Dump terminated\n");
++			exit(1);
++		}
+ 
+ 	}
+ 
+-- 
+2.30.2
 
-Tested on:
-
-commit:         25236c91 af_unix: Fix task hung while purging oob_skb ..
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git
-console output: https://syzkaller.appspot.com/x/log.txt?x=151b970c180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c368c5806a3ee9fc
-dashboard link: https://syzkaller.appspot.com/bug?extid=ecab4d36f920c3574bf9
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=13ecdffc180000
-
-Note: testing is done by a robot and is best-effort only.
 
