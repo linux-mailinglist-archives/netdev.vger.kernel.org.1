@@ -1,171 +1,151 @@
-Return-Path: <netdev+bounces-72762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE92F859866
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 19:04:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43FED8598D0
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 20:02:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EDA60B20A66
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 18:04:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4C901F2117A
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 19:02:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CD126EB42;
-	Sun, 18 Feb 2024 18:04:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FA196F09E;
+	Sun, 18 Feb 2024 19:00:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P8iZtd/A"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J01y7xoj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD3E06EB78
-	for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 18:04:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C9726F064;
+	Sun, 18 Feb 2024 19:00:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708279487; cv=none; b=lwfP2pmj96l4PszZcPkgJm8RrPdFwDq/44QfCEZ/rVUoPu44TVvrWq2D1boTXB3pLulreJCpJ7SifC70G5jKfx1K/q0Aw0x0KEZJvBQ7QminYrZ6lhC5qfY0N2Qz1hMorG+KrV1XKcrV01g+VP0/7wWuD433amZAWcyWtVQJFfU=
+	t=1708282847; cv=none; b=a0nWKNtNjONpj16/eMkk7WShfrMe/vPU7MMmMALLAvhU9CQBt3UpgnUZHWH3/6uzzhzN4bmQLeFs9a7/t5hPXjfWaDJEtqZgAp9Xw7DNzUNshDd/I2y9pBCl1Q9WBClyT22AYOSYuRsS4xCZzRkfu2DZXX34hySNjsPLifrS2RI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708279487; c=relaxed/simple;
-	bh=QT53atjJJ1vw7GU3v0lQnlNsfRJBd9sRcnUo6SKvZoY=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=nUGkfm27CIUv2/usHg3xWGv6zVCtF/FJcN2dYKXv08uZgkqZJp6QdfnzVreagzAP+3LIr+wXTxULhfz22ncu7zR2tshUIKg8Y4nDHSNkXL7NJu+MGE/4hWvthqBKDPzlkbEWVFh6T5iRhH582/BoCZx5teHqpgdUf8FGSAdlPw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P8iZtd/A; arc=none smtp.client-ip=209.85.208.49
+	s=arc-20240116; t=1708282847; c=relaxed/simple;
+	bh=+fN+q98VpY8IjI1MBMjHL55COKOUOcO50sgpN3QZVSs=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=jYr0jOZTzQx43qBj8wDwrNvVbH5gI2O0YqmybFkalrS5HPXn8tDVG/sQpGLy0zkH4uLZL/HDa2XCF3D0/b12Z9q7PUgicit33wrG1KiOeXPmuZCMBP8RoC3Z4W8Z1oW/aAs+7IPcUUZK2FG25Kfm5cI9eWcJ4bp1XAOPTJOQZ7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J01y7xoj; arc=none smtp.client-ip=209.85.208.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5611e54a92dso4777284a12.2
-        for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 10:04:45 -0800 (PST)
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2d23473a563so7926581fa.3;
+        Sun, 18 Feb 2024 11:00:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708279484; x=1708884284; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=W5zEuthr4m6qNdMoc14v8jKuscSwrPopo1Du60QwSHQ=;
-        b=P8iZtd/AnY2FiVk9Mc5MJb2sHCafiUBvM+bNWusFUivuvCjeRRdRIPST2oYOFZPNZx
-         TfTmTQhu99S9nfZ2fYTzyrmUe9WBzXzuFXN6Gab7Maa50C+mqKnj9MOmchHHaY5WR1XX
-         4HRhHOfg0Q4X5cQWtd2knQYDJ857vuP9ua9mnw2j/wtxPJwjOkVdwxwKYc9toD2fU9vL
-         c2vN+jG4d20AOTS7oKXuLkeabzp+jHlnx+0Q2uZih7t+eS7Ua3w/DHBXoC8m87pr03nD
-         X0LXLVV9+nuz1LYDg8PJdwTQla9+mTGY605cwUeyZqkvO9ztrIVYvnUUgz2xZjKS3mm1
-         fPig==
+        d=gmail.com; s=20230601; t=1708282843; x=1708887643; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ugw282irBh1ZorGeTnwJP2X/5ka0Fa/kP4DGUbl7TpM=;
+        b=J01y7xojVtxrP/5K0KvdLRUKoyBhtGhbGuLb7bppXBla9Y9a5FZ6zgdnHumzHUKO1A
+         kqCw8zz6OSQTVFT2d59Ix6/b2xwu9wGG0CBp5fgHJ/FoH+QkuinSNzTpKa9lphIDioxi
+         5YwPhaVhgLFDk1vgqQ0OEx1KH2trfvqpBoeYGQmiSaHKOROGE3vhIyQrugbjPwZwdOgO
+         prvEOMXv2AeothD6BeKxiON0Ix/CDr6kl6E7n4XUr02tDdNZKScrlP5K8W7WvjoiXlra
+         YT+6V8p+QbNtNAhzWeyjdxnJORsOaBmhefNJGyZvJntPPMwtuA6UFtYRoH3tO3h89Wsi
+         jHmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708279484; x=1708884284;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W5zEuthr4m6qNdMoc14v8jKuscSwrPopo1Du60QwSHQ=;
-        b=SZqW7D/On9smcKyIg8Xu8XRnn+BnGfijAnmyuqOjSeZZyL1Jkq5b/DcYVyJGvlJ4Vr
-         eCeEDGkYP5i+icg9V0V9cjDvmVNknAYIaMfJQqUr3YE8J7S8J9B0dzcmkBHt1qQMJnVy
-         9HXN1qxNGyP3oWF44wSG9zjbt79gz+Xpb1/j7V423FacAJMG8oRedrizUPnx40KbH+G0
-         2kkRI6JoLwRgvdXmJ1bNYk+i1TR/YewlpgOYPtH3xTGDIYwmDBwCg9Kidd2WUugHDfZZ
-         OANOSAVMeHvqd53xg2PmFEeTvo/H/WUFvLdskTxjB3W/B+8/Mxi+d9kE63rEazwHJDs3
-         RZYg==
-X-Gm-Message-State: AOJu0Yx9f+F9PVoQKR/egIr/t6y1vSJabAUX3TU6W5AXaj9YFyBKt5iA
-	VFX8adgNiLRFmp8Zrwp8DmIqFuoIbxMlisW042yHCA5uPdPNT9p/
-X-Google-Smtp-Source: AGHT+IHZIYfZe9Cc/AzQfwrQ3oED3/GAdaJhszYPSmRsZg60kHDzr32f2FSdGuDh7koCK9vRdMN2Uw==
-X-Received: by 2002:aa7:ca56:0:b0:564:6fe5:71f8 with SMTP id j22-20020aa7ca56000000b005646fe571f8mr711926edt.32.1708279483053;
-        Sun, 18 Feb 2024 10:04:43 -0800 (PST)
-Received: from ?IPV6:2a01:c23:b9e5:d800:2cda:54d5:8742:3de1? (dynamic-2a01-0c23-b9e5-d800-2cda-54d5-8742-3de1.c23.pool.telefonica.de. [2a01:c23:b9e5:d800:2cda:54d5:8742:3de1])
-        by smtp.googlemail.com with ESMTPSA id es11-20020a056402380b00b00561e675a3casm1945439edb.68.2024.02.18.10.04.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 18 Feb 2024 10:04:42 -0800 (PST)
-Message-ID: <9fcf20f5-7763-4bde-8ed8-fc81722ad509@gmail.com>
-Date: Sun, 18 Feb 2024 19:04:42 +0100
+        d=1e100.net; s=20230601; t=1708282843; x=1708887643;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ugw282irBh1ZorGeTnwJP2X/5ka0Fa/kP4DGUbl7TpM=;
+        b=jvN3P1gf8lQItyJ0nI3vWrXH6LHBkAezr4oJiyPduuRdgpd9fSX8fXhnBZoAf+whNU
+         0Uos0NZzseDy0A5G5+7laMsxIn72izYwuoI9VQLJwtrC96MK6JhFR1AlOR3QAIjolZxi
+         eX6ZyZL45c4PFZE+6gS30RA4UDSH4g0GtNd7Y+NcMfVTsnYoQFFyWTY+D55jP+brfns3
+         sWWMJLEpVUV2AbGPU7LhJENWsbhY4kJsbbeDxJxactGqLAzAwIJbYKMxEJyfXSQPWYOX
+         C0enlMERjEE13njH6IaNFKW2H3fw83tJpkmghvKQK9SnK5BkmV62lsr6EFtO1frVN0pt
+         NTpw==
+X-Forwarded-Encrypted: i=1; AJvYcCWIHI9fYgKI+VA/DZSsvZSE0vexqyAto+D4n5yXyY06XG3GBYGOu/piXReTUBYvtC4DJED4OPYpy+NeBbuMgIL/J530Nepkm5gwXKVx5zOswRrwFJ1BaVL3jc3PsthK/6AHU/Bw
+X-Gm-Message-State: AOJu0YywhNpAtsMKEjlG31zu2HNoBpHtPu1pO3kAar0PjdBONKpQWH8Q
+	7Dg2bjfTdgtz7aui1bWKrLW+OxUiSI8snGufiFbvxBlxyn+l0/HI
+X-Google-Smtp-Source: AGHT+IEXLBde9dQZbYJSTmWJ04vcELWmg0GSmWGAhRIDsRgIh0UcSCIsPKOdVOiJlU1cmc68gYElZQ==
+X-Received: by 2002:a2e:9956:0:b0:2d2:3018:6eda with SMTP id r22-20020a2e9956000000b002d230186edamr2274750ljj.39.1708282842871;
+        Sun, 18 Feb 2024 11:00:42 -0800 (PST)
+Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.googlemail.com with ESMTPSA id m15-20020a056000008f00b0033b728190c1sm8115762wrx.79.2024.02.18.11.00.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 18 Feb 2024 11:00:42 -0800 (PST)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Robert Marko <robimarko@gmail.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
+	Nipun Gupta <nipun.gupta@amd.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Puneet Gupta <puneet.gupta@amd.com>,
+	Abhijit Gangurde <abhijit.gangurde@amd.com>,
+	Umang Jain <umang.jain@ideasonboard.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [net-next RFC PATCH 0/6] net: phy: support multi PHY in phy_driver Was: net: phy: detach PHY driver OPs from phy_driver struct
+Date: Sun, 18 Feb 2024 20:00:26 +0100
+Message-ID: <20240218190034.15447-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Pavan Chebbi <pavan.chebbi@broadcom.com>,
- Michael Chan <mchan@broadcom.com>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- David Miller <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] tg3: simplify tg3_phy_autoneg_cfg
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Make use of ethtool_adv_to_mmd_eee_adv_t() to simplify the code.
+This is an alternative implementation of "net: phy: detach PHY driver OPs
+from phy_driver struct" with the same object in mind.
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/ethernet/broadcom/tg3.c | 17 ++++-------------
- 1 file changed, 4 insertions(+), 13 deletions(-)
+As was pointed out in the previous series, deatching OPs is a way too big
+change (although IMHO needed, but I understand the problem with downstream
+and ugly code). As suggested and was already an idea discussed privately,
+a more easier approach is introduce an alternative way in phy_driver
+struct to declare PHY with the use of an array of IDs.
 
-diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-index 7a07c5216..62ff4381a 100644
---- a/drivers/net/ethernet/broadcom/tg3.c
-+++ b/drivers/net/ethernet/broadcom/tg3.c
-@@ -4354,21 +4354,12 @@ static int tg3_phy_autoneg_cfg(struct tg3 *tp, u32 advertise, u32 flowctrl)
- 	if (!err) {
- 		u32 err2;
- 
--		val = 0;
--		/* Advertise 100-BaseTX EEE ability */
--		if (advertise & ADVERTISED_100baseT_Full)
--			val |= MDIO_AN_EEE_ADV_100TX;
--		/* Advertise 1000-BaseT EEE ability */
--		if (advertise & ADVERTISED_1000baseT_Full)
--			val |= MDIO_AN_EEE_ADV_1000T;
--
--		if (!tp->eee.eee_enabled) {
-+		if (!tp->eee.eee_enabled)
- 			val = 0;
--			linkmode_zero(tp->eee.advertised);
--		} else {
--			mii_eee_cap1_mod_linkmode_t(tp->eee.advertised, val);
--		}
-+		else
-+			val = ethtool_adv_to_mmd_eee_adv_t(advertise);
- 
-+		mii_eee_cap1_mod_linkmode_t(tp->eee.advertised, val);
- 		err = tg3_phy_cl45_write(tp, MDIO_MMD_AN, MDIO_AN_EEE_ADV, val);
- 		if (err)
- 			val = 0;
+Some small changes were needed to mod_devicetable to make mdio_device_id
+more suitable for the task.
+
+This implementation keep the single way to declare PHY ID in phy_driver
+but also indotruce .ids where a table of mdio_device_id can be defined.
+Each entry can optionally have a .name variable to define a more specific
+PHY name (for phydev_info/err.. usage) that if detected will overwrite
+the dev name.
+
+An example of this name is a phy_driver with a .name "Aquantia 107/102"
+and .ids with single mdio_device_id with "Aquantia 107" and "Aquantia 102"
+
+"Aquantia 107/102" will be used for early PHY driver probe and the more
+specific name will be used as soon as the phydev dev_id is populated.
+
+Aquantia driver is reworked to this implementation and BCM7xxx driver
+table is rewritten to greatly benefits from this implementation.
+
+While at it I also notice a strange problem with detected PHY ID and
+C45 PHYs. Probably i will have to drop it, but including in this series
+just to make someone aware and maybe discuss about it too?
+
+Christian Marangi (6):
+  net: phy: add support for defining multiple PHY IDs in PHY driver
+  net: phy: fill phy_id with C45 PHY
+  mod_devicetable: permit to define a name for an mdio_device_id
+  net: phy: support named mdio_device_id PHY IDs
+  net: phy: aquantia: group common OPs for PHYs where possible
+  net: phy: bcm7xxx: rework phy_driver table to new multiple PHY ID
+    format
+
+ drivers/net/phy/aquantia/aquantia_main.c | 170 +++++++++--------------
+ drivers/net/phy/bcm7xxx.c                | 140 +++++++++++--------
+ drivers/net/phy/phy_device.c             | 104 +++++++++++---
+ include/linux/mod_devicetable.h          |   2 +
+ include/linux/phy.h                      |   8 +-
+ 5 files changed, 243 insertions(+), 181 deletions(-)
+
 -- 
-2.43.2
+2.43.0
 
 
