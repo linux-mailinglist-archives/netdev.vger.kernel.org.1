@@ -1,112 +1,180 @@
-Return-Path: <netdev+bounces-72786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61D45859948
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 21:42:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 173DF859955
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 21:44:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 682141C20B02
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 20:42:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49565281809
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 20:44:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FD026D1AB;
-	Sun, 18 Feb 2024 20:42:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19FD17429B;
+	Sun, 18 Feb 2024 20:44:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nSzpFWrk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T+q9o/O/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E58FD6BFC5
-	for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 20:42:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5326673183;
+	Sun, 18 Feb 2024 20:44:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708288970; cv=none; b=EFG2q8nRJBNJycVLa5oOZCGKfJ5fpi9nzgejQ/dVbHgYcN5//wNNWrt8DYgAZL7dL0aWxWdnYVVv17Z4RLa/zcu5otIOqPf+3qtR4HgfebntFZxYDMVb0xuK5k195/8jhqwLMvlPsumpI321hQcT2bMyl74eFXVA3d373i0r+g8=
+	t=1708289047; cv=none; b=Ls5hBauFVIF8bRQ63LABw/U2R4njri+tsJ7iWnzgBjPqy02F2eXSDMJlLEJKvbezaQaXf13in9FIxSaXBPbQj8A9bpR976rP7xy8tx2F1I3cQHpYOStEsMuAlmsGMxG/aI5SRGOlfE80Zk3Vwa0s8I56lAjn5kIYOn9lq7boFaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708288970; c=relaxed/simple;
-	bh=gfVvYAWNY6yAxXBb1KaiR9CHUCQ11MCSpG5xdmXJV+A=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=f3I7WSaUU9H4GgYtJwTkdyGtYub+yUFWK75Wk7MgMa2ENsMikaZtvun/LTbpNfMfSk/bFsVcJ9wZwPmZW4WlLCNjUsd8fUkK8SrUFXO3dL37lsFgM5XM3mCevj8K8ofvjls3Iuj6a2TT5DORiHZbTB6QT7EJu+0PgvMb5yfLsAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nSzpFWrk; arc=none smtp.client-ip=209.85.167.50
+	s=arc-20240116; t=1708289047; c=relaxed/simple;
+	bh=p5ORb8oX+qE/djHJJBL+ZNcZv9f3KUTdFpnTFDG2t88=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j92l4s8filo2fda5JElCr8eMYBD6NcHOK/Xp6bSRPfb3IYKa86nwe8lbWsZsM8a/JExRDSxvEO32GmnYamZ630I6RR7TO9yCLPFMwVSfnlvEK1VW7IyZmn32GhEb+UmpU67SkEYgCMquvCcSP5ob+2f3Qeh3oYoY7RCG9QGNmvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T+q9o/O/; arc=none smtp.client-ip=209.85.221.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5120ecfd75cso5188750e87.0
-        for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 12:42:48 -0800 (PST)
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-33cd57b7eabso1919484f8f.2;
+        Sun, 18 Feb 2024 12:44:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708288967; x=1708893767; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=A4wuobbkvZGCZAhSKedoEZZtznCmj4kzN6YiqJeHCoA=;
-        b=nSzpFWrkIYKmye2DkqV73V2UNKY3OTMiJOZB/ZBMEFxhwaDujzwZF/Y2PU9+ogrlh5
-         5oq5BwbGwHpKV8h4WI3A3a/wghNpiugOZIrW6yWI820gU2qSairBUNyEk5b2wlfE+5aH
-         VVMFCN0MSX5kgTJbeANJbrwZtRPeSPkdlie1NB/kpbmYiwTTH4szB3OGK6c7Nmedu3Tn
-         s9zGMkp3XSuPGGxippim0Cze1m0S4a9Zv+AZhqHgC7w8vapPvD4FGL2B6ptoCiZrK8sP
-         ug+SvFvjkHKafAwteka9nyy6MVxtuQCf6Tq95K0TyWe7PezvbTS3OaNTSAtfsUDgfDKi
-         Itjw==
+        d=gmail.com; s=20230601; t=1708289043; x=1708893843; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=NDC0OtHeGnwCP7LZXlpdwmX/HcyCP1GbfLj1JZV6aQU=;
+        b=T+q9o/O/EgOvDfRu8C5Ph2xhj6KCyivGWoS5R7FQDy0EKZnZaiU8RFYWpwiXrmAaUh
+         zcU2Zc92Q5rhdvtf8ACX9w0YhjPnGq942RrgdsZ6LBDaxUdZ12pkCj2u2c1fnejEoby6
+         LEP6EqlernZ0sQ278jl08YRxuAvB7ylv2Dt26sBRnEyOXR+6shCizkJbjkWmr+FBf59e
+         7vyHEjxtWMOtBHC/Qq319fXC1N4x8DxnmneuBD2AcjLESN7b9bwkvqUc4V+o5omCZ80C
+         WO7Rd4sa9pSJiLT+7j6nyzrqLL8bfAa8cw53f8PP2aojMPrwDvkPXPFEzMgseizDghpn
+         YIOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708288967; x=1708893767;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=A4wuobbkvZGCZAhSKedoEZZtznCmj4kzN6YiqJeHCoA=;
-        b=GfElVbmAJ43j+m+4elcdT4lOXKvroH8f9vX1wocD6PU6vm2UzC6D39NtQ7zGb4Qt7j
-         H9S2dlLgbUCdTNVKhW/9Blf6mIhw07SIi1tulwECK62+Y6NePDuALFp/M0CMLZvHl27V
-         LJK8vAVi1UC0H2j1+qf9AjUzlfElYOAxs5EaShxEutA6FP8iDWa3ej+WAyOFH4dXyW7x
-         +o4Z/rbdRO9kaLMDfPuYgecJIpZzYeofSa2DRrEooj+jWeZZQmQQPoQVfi/a6IkK1HPN
-         p10v7R5fLOKG2o1c+kF8EX6GPhkReo1Lok0KknAyn3gCE9cpfQHiKlbGlRPH2eRrJOZR
-         CFow==
-X-Forwarded-Encrypted: i=1; AJvYcCXwER/5+PaTC1pEofMDnngkRLuU/Zfy9MW1xkGXddvdkkPzHZzs3bcp3N35UXMTGB6acn3ZeVatfZTBcXVYRGiG8g3fdE45
-X-Gm-Message-State: AOJu0YwXCOJGaaocdOq6mUo8UMJIoQ8Sg9ia0l/yBac328I9BQgIK3Tc
-	Et4J/TufrAqcf/eMqfOWqx3T7QeBYqmmHpbq8oN3P0iLMufcxd4i
-X-Google-Smtp-Source: AGHT+IHQrAkFosp2/Oq+wdEEibNuo7/2rDYcjzT1fw7vGkg10OV4FlM4yok6+Efb8csj9Ci98NOYIw==
-X-Received: by 2002:a19:ad48:0:b0:512:ac39:d1f9 with SMTP id s8-20020a19ad48000000b00512ac39d1f9mr1287469lfd.37.1708288967037;
-        Sun, 18 Feb 2024 12:42:47 -0800 (PST)
-Received: from mishin.sarov.local (95-37-3-243.dynamic.mts-nn.ru. [95.37.3.243])
-        by smtp.gmail.com with ESMTPSA id i22-20020a056512007600b005116e3c5b07sm649818lfo.254.2024.02.18.12.42.46
+        d=1e100.net; s=20230601; t=1708289043; x=1708893843;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NDC0OtHeGnwCP7LZXlpdwmX/HcyCP1GbfLj1JZV6aQU=;
+        b=WEwRzUyrdcJ/D8af9tWqxkDSG/4BEQx4+gOfkiDChYVGjWAryT5ZwAm1wgPpzUP+BJ
+         OeN2/qSPhlxjjcrbx4R+aNJ/y/lWzhdCZ5CQuCli5WPYG9PbdIDIxeEfGT0wwDtMJ24X
+         7H+k1jgWEi2tNWEivOweYF1nSmko3u1iBdKAic9wbWzAW3MWN5o4D7WdaSkLViXbCg5D
+         nLdJX/ejjbQgBJyjXLR04OjAJDuGChchjpfddgWW/9IiJP7Js1IOG7yXq4O+O6SCv2ds
+         Mj39p3P/6cxtJo2lDP5sHXcM5VgJkOx4mHMFAXXjj2xKyXDO7QXg8NNeVYSVlT8WZP5w
+         HhMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVjsooQLPnOTD+DLEgJwji1opITZa9x6rm+UhE83EU2DybSesb/rSvzsbs7NYybOZoiMPAZNjFDGxk/F8IWloZnPbQd0yjdNRssVzENij1sLBdS9mi6xobcSrnXmBxtTLLUZMqv
+X-Gm-Message-State: AOJu0YzPICb7niD/RkVbcElnFtvVrCKAp6j6UgABPDxGBNbwhyctgQ33
+	Wqp1IWcQIscb5dt7C9TqT7x/R17bzr4WkIFOyv8e/fPK9H7Q2sL0
+X-Google-Smtp-Source: AGHT+IG8kLwsfXqd9+VdPpPTiHaKlo0kMwOtWqhD0Mtda4FmJeWD+7sUTqdsaB0lNtKMeQvRrJ59LA==
+X-Received: by 2002:a5d:5182:0:b0:33d:1eea:4346 with SMTP id k2-20020a5d5182000000b0033d1eea4346mr4465564wrv.37.1708289043425;
+        Sun, 18 Feb 2024 12:44:03 -0800 (PST)
+Received: from Ansuel-XPS. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.gmail.com with ESMTPSA id o18-20020adfcf12000000b0033b87c2725csm8366021wrj.104.2024.02.18.12.44.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 Feb 2024 12:42:46 -0800 (PST)
-From: Maks Mishin <maks.mishinfz@gmail.com>
-X-Google-Original-From: Maks Mishin <maks.mishinFZ@gmail.com>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: Maks Mishin <maks.mishinFZ@gmail.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH] ipmaddr: Add check for result of sscanf
-Date: Sun, 18 Feb 2024 23:42:03 +0300
-Message-Id: <20240218204203.7564-1-maks.mishinFZ@gmail.com>
-X-Mailer: git-send-email 2.30.2
+        Sun, 18 Feb 2024 12:44:03 -0800 (PST)
+Message-ID: <65d26c13.df0a0220.63f42.d8e6@mx.google.com>
+X-Google-Original-Message-ID: <ZdJsE7d2GcQKTuAR@Ansuel-XPS.>
+Date: Sun, 18 Feb 2024 21:44:03 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Robert Marko <robimarko@gmail.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
+	Nipun Gupta <nipun.gupta@amd.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Puneet Gupta <puneet.gupta@amd.com>,
+	Abhijit Gangurde <abhijit.gangurde@amd.com>,
+	Umang Jain <umang.jain@ideasonboard.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next RFC PATCH 1/6] net: phy: add support for defining
+ multiple PHY IDs in PHY driver
+References: <20240218190034.15447-1-ansuelsmth@gmail.com>
+ <20240218190034.15447-2-ansuelsmth@gmail.com>
+ <ZdJbciylnw8+ve8V@shell.armlinux.org.uk>
+ <65d2613d.170a0220.2eb48.a510@mx.google.com>
+ <829f8c7d-c09b-4264-818a-3f7b047ec44f@lunn.ch>
+ <65d2682a.5d0a0220.3fef2.efe4@mx.google.com>
+ <ZdJpyGkFRiRufySw@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZdJpyGkFRiRufySw@shell.armlinux.org.uk>
 
-Added comparison of result sscanf with 2 to avoid
-potential troubles with args of sscanf.
-Found by RASU JSC.
+On Sun, Feb 18, 2024 at 08:34:16PM +0000, Russell King (Oracle) wrote:
+> On Sun, Feb 18, 2024 at 09:27:22PM +0100, Christian Marangi wrote:
+> > On Sun, Feb 18, 2024 at 09:10:30PM +0100, Andrew Lunn wrote:
+> > > > > > +	phy_dev_id = (struct mdio_device_id *)&phydev->dev_id;
+> > > > > 
+> > > > > Why this cast? Try to write code that doesn't need casts.
+> > > > > 
+> > > > 
+> > > > This cast is needed to keep the dev_id const in the phy_device struct so
+> > > > that other are warned to not modify it and should only be handled by
+> > > > phy_probe since it's the one that fills it.
+> > > > 
+> > > > Alternative is to drop const and drop the warning.
+> > > 
+> > > Can you propagate the const. Make phy_dev_id point to a const?
+> > >
+> > 
+> > Mhh not following, I tried changing to const struct mdio_device_id *phy_dev_id
+> > but that results in memcpy complain (dest is void * not const) and
+> > writing in read-only for the single PHY part (the else part)
+> > 
+> > An alternative might be to make dev_id a pointer in struct phy_device
+> > and dynamically allocate a mdio_device_id for the case of single PHY
+> > (else case). That effectively remove the need of this cast but I would
+> > love to skip checking for -ENOMEM (this is why i made that local)
+> > 
+> > If it's OK to dynamically allocate for the else case then I will make
+> > this change. I just tested this implementation and works correctly with
+> > not warning.
+> 
+> Why do we need memcpy() etc - as I demonstrated in my proposal, it's
+> not necessary if we introduce a mdio_device_id within struct phy_driver
+> and we can just store a const pointer to the mdio_device_id that
+> matched. That was very much an intentional decision in my proposal to
+> make the code simple.
+>
 
-Signed-off-by: Maks Mishin <maks.mishinFZ@gmail.com>
----
- ip/ipmaddr.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+With the allocated mdio_devic_id it would result in this snipped
 
-diff --git a/ip/ipmaddr.c b/ip/ipmaddr.c
-index 2418b303..00e91004 100644
---- a/ip/ipmaddr.c
-+++ b/ip/ipmaddr.c
-@@ -148,7 +148,9 @@ static void read_igmp(struct ma_info **result_p)
- 		if (buf[0] != '\t') {
- 			size_t len;
- 
--			sscanf(buf, "%d%s", &m.index, m.name);
-+			if (sscanf(buf, "%d%s", &m.index, m.name) != 2)
-+				return;
-+
- 			len = strlen(m.name);
- 			if (m.name[len - 1] == ':')
- 				m.name[len - 1] = '\0';
+	const struct mdio_device_id *driver_dev_id;
+	struct mdio_device_id *dev_id;
+	int err = 0;
+
+	phydev->drv = phydrv;
+	/* Fill the mdio_device_id for the PHY istance.
+	 * If PHY driver provide an array of PHYs, search the right one,
+	 * in the other case fill it with the phy_driver data.
+	 */
+	if (phy_driver_match(phydrv, phydev, &driver_dev_id) && driver_dev_id) {
+		/* If defined, overwrite the PHY driver dev name with a
+		 * more specific one from the matching dev_id.
+		 */
+		phydev->dev_id = driver_dev_id;
+		if (driver_dev_id->name)
+			drv->name = driver_dev_id->name;
+	} else {
+		dev_id = kzalloc(sizeof(*phydev->dev_id), GFP_KERNEL);
+		if (!dev_id) {
+			err = -ENOMEM;
+			goto out;
+		}
+		dev_id->phy_id = phydrv->phy_id;
+		dev_id->phy_id_mask = phydrv->phy_id_mask;
+		dev_id->name = phydrv->name;
+		phydev->dev_id = dev_id;
+	}
+
+Is it ok? (in phy.h the thing is const struct mdio_device_id *ids)
+I don't really like modifying phy_driver too much.
+
 -- 
-2.30.2
-
+	Ansuel
 
