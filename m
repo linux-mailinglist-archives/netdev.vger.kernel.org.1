@@ -1,106 +1,139 @@
-Return-Path: <netdev+bounces-72705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96AEA8593FE
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 03:12:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 973CC859447
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 04:09:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 373AE1F21B08
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 02:12:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CD8D282FAA
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 03:09:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08813EA4;
-	Sun, 18 Feb 2024 02:12:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C90A15C9;
+	Sun, 18 Feb 2024 03:09:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="Qc4KDQxF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nTDQKvOd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 014CA15C0
-	for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 02:12:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EC9515C0;
+	Sun, 18 Feb 2024 03:09:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708222361; cv=none; b=l3ixsqlMsJoIzS7keNNxSv1IqMnd5NF2iNHFV8H67HwmhrirBNGSkbx6LLSHbdqb4g9EGg3/KBGyoZ5K1dkY1Z1ToUzl6DVMvEBHUlSwbEiROvctUfbwMxBNbT6wQFGTkcLZnSbBJtY8TovFZWKFTk3uh4z3hcTqIpJeFnSHcyI=
+	t=1708225768; cv=none; b=K6aavmN4mcmvUU1tVNzzrwq+ImUQlvw8VGKP7Mi8pNpISwRPOAyDCowa3qDdLp8oIrg5Nyp089Y2HebOQCHvlHSPVjoRysBtVLDFoj0LOehk7D+pg3u5dN31G787YQMVrabfksP3iKofDyoy7tPVoEDpfN1UpcAgo+j+U5TqeIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708222361; c=relaxed/simple;
-	bh=9tkQ6ztc+FIsC9tnahmvOipvbwqXOtWa5lRD8Xz+7sg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=e7DF+4VnTHIJylNqUomr2WByaxUbUDtZheja+KCRTMMjj//0JPQRZN2JCfVSn7dpa7cIIZty1O1G6m53PMOz9XlEF+n5CoyaYkwxD/fpUDmF+eo8Av8TFw7ktyr1n5DoIUcReL6V1WOwCuABXl4bSXWLT0ILMfGXZK/a2Tcq3nY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=Qc4KDQxF; arc=none smtp.client-ip=209.85.215.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-5dbcfa0eb5dso2965359a12.3
-        for <netdev@vger.kernel.org>; Sat, 17 Feb 2024 18:12:39 -0800 (PST)
+	s=arc-20240116; t=1708225768; c=relaxed/simple;
+	bh=zR1HMsmGMaZ26j+bVBfRm28Ttxn0fhdBC7DIwY1gBS0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VgnEhDyTs7FRf3Vg/GmXr/3rERwpZlgKmwQhc+cuoVTP8/c30foyZBIzpYv8bVg47/R1SUyqirw7TK48u/xvGHjBtgJ8RIkdi4fglAsF3rXSlWr9RJBs+FUb9QoUnH7GvCEAtSHhr2HYi5yFkLEi+NlFH5Ccs9t4rBpnIH5/4No=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nTDQKvOd; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6e457fab0e2so36900b3a.0;
+        Sat, 17 Feb 2024 19:09:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1708222359; x=1708827159; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/xYJJlqKaHO1pkncPtZXJXYEbaIAzOI1fFVt20ftCrw=;
-        b=Qc4KDQxFwbAS0af8uTL3Apu9V1S5UjAu/NoHa1acLjRvEaObBRj6eJ2u+7/3FSDpLQ
-         ImEJuzvAB/UNRW43tXC3z2ZUftA5CblLxMQeqBK7P5vGYqxdRvwRv85jN0AFuUJDwU+r
-         MUpBgCgjCzZ12SQ89U6f7QTDdG6Sq1O42YU2KDaYoozGQj29HTr6PbduQ4C2UNmTQY/J
-         bcO5kCEuRWOocs6z6REZol1/g14EXZAzDBA0MiHR0RGwqOqtUMeT1EMTQO8V4MbdW3mO
-         T3bVWEQiglQ9g4Q0AbC66DVw5mCpKQULZm9iJSAmrGnGGdhnV5OZKCnPm3zu4gYRUkv+
-         iFew==
+        d=gmail.com; s=20230601; t=1708225766; x=1708830566; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0fBKftuuEdPNjupg4JnWY07VpPh6NclVscigNTiWYfM=;
+        b=nTDQKvOdqgXkFlrthdZqhtQCbcSUxaeZdxOl8dF8zbxes0rUxO0LBGJFMWDGZe+/hC
+         USEX+NINP66G6dY4KQ2yXhifPgvdxufsNXcLLLJyQIuV165i9vX8HxIOBBUKCvrMdxcz
+         UYzH/fk53r3FwcttZlgv5mUo9fgXPB70/LPcIjiTKKa0zN6ZiRrPE8xGuELWa1IwMeuM
+         HHC+ZKOQy2zShVQuEMBJIwbm89gvc2ylMDa1oyPUb7aeMw6zS6W86XbnkhEEBcFS4wfS
+         6Ev1YSwfeCqhbZdIBYe4JyI3e3uP4zG9OZS/o0xgnqlqr+QVZrVPbP3xrQjbvCbW52oc
+         KFNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708222359; x=1708827159;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/xYJJlqKaHO1pkncPtZXJXYEbaIAzOI1fFVt20ftCrw=;
-        b=eeWKbwR5LpD4opFNWs3WIv5BHxFTvF23aoIWXX6iKAeH3/frrfaXMx149zL79rsYsG
-         bcKAWc9kgcmYJXFFsTtEohSHHxJ2dzfwTfGWvuLGvyLqn+UdALatpUzYDtefoOqs+hx+
-         w2QpQwejWZQfk6251+eFv6k0N52kJR/VsXjW+DJMk33G/cpmykxsJBr+XFtfq/nr5/uw
-         Xx3khNw3afm5zejrBwdEE5Aw+EhQKIGFh2yiVknkzuH3IPk4gGTUVMgJ+ibbmD4Wqa4W
-         PPgyk7EGZTYfMPxKG7LmEISwhaT6wIbASSyG+kLD1ev8QgZtXaXYVU/1lFU42nTtUGSW
-         1VCg==
-X-Forwarded-Encrypted: i=1; AJvYcCWk90jQsJEi+sWA8tMFDbzstCjpUPfObnTKDfb6+Nw0DrFLwnnUDSxZbDzJMlMmyrzysP45ZeevLhGOfvq/X/hmzLrHvT/5
-X-Gm-Message-State: AOJu0Yx6IrD5q/rmPyM0w8faotvFxJatrR+opdHCvuzcUr+CYnngmlzV
-	uWp8D6lsU+V6Dh5s4CiV/0HB6TFPkR02QWA7mUwJHebe+rOkPBmLaIHkOibCM7M=
-X-Google-Smtp-Source: AGHT+IGAjZZo/5b/mALKX6lQInelzixTc/kjkrQyfIAb0XUOF35zD515tWDY7c0DXDlJSVvT3CY5Lg==
-X-Received: by 2002:a17:903:1105:b0:1d9:8832:f800 with SMTP id n5-20020a170903110500b001d98832f800mr10146861plh.8.1708222359202;
-        Sat, 17 Feb 2024 18:12:39 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id v4-20020a170902b7c400b001dbcfa3dcdesm1356882plz.33.2024.02.17.18.12.38
+        d=1e100.net; s=20230601; t=1708225766; x=1708830566;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0fBKftuuEdPNjupg4JnWY07VpPh6NclVscigNTiWYfM=;
+        b=H9+eMwaysMIql/CZ6n2LDqDbddNqYxB2c0gJd2iNMGOfNGqWvxkB5JhhjRLUxskyQM
+         rsSmDDu7CsV9Oz3F1AJCbjJgNcyARRA3kpYYoCYz0LIryY9ZrYuDRLyBFvSO8aqegKs9
+         k+/QxSvLfERNE6SFGbikGTpIsMfW7q8u3IWuEAUMcZgbua+RJS+Pasqnh2IqvQogWpHC
+         71IN2WLgHAR/O82Lg2tzS5os6AnRj5c7rR455yQOToNMtt6PHVq0zvtGTuHk/K5vzZBi
+         5RtT696Kv2Zf6OWCLe9kdlQmvgjUW7hhKrVWIks9UCM+KYUDsRYrxsxwwitCXSppOxZ/
+         Qazw==
+X-Forwarded-Encrypted: i=1; AJvYcCV1cw5kbHzKYamw7p68O4pTujYdyv9klinTQ5eLxNTslqBsflcx642A1QseNwJWvx7CAK7oWAc9w5/JKneomLrTcXPx3DY7LbYgBq4yAKmsAhzFpXXCg3SCo0cZGxvrx5DWyTtE
+X-Gm-Message-State: AOJu0YyZKXxw9yRo/09fJYkwHc3yRSce5MRsnmHwsmV00BjSN6EzVL8S
+	Ilb9z35GX/UXiqIZZGI9Jo1dttBHx9RqTlZA6dS0NZqDV3pq1oNl
+X-Google-Smtp-Source: AGHT+IGDFbWIs6WEwZplgbWM6ycPwdoYi6LUzqNSJYP6obqc33HnI6Doo+s+fJ0oGuV3HfnIRSHFcQ==
+X-Received: by 2002:a05:6a00:d5c:b0:6e0:df2d:e7fe with SMTP id n28-20020a056a000d5c00b006e0df2de7femr10554154pfv.11.1708225766271;
+        Sat, 17 Feb 2024 19:09:26 -0800 (PST)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id q18-20020a62ae12000000b006e3e362b180sm713018pff.114.2024.02.17.19.09.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 17 Feb 2024 18:12:38 -0800 (PST)
-Date: Sat, 17 Feb 2024 18:12:37 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: David Laight <David.Laight@ACULAB.COM>
-Cc: 'Denis Kirjanov' <kirjanov@gmail.com>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, Denis Kirjanov <dkirjanov@suse.de>
-Subject: Re: [PATCH v3 iproute2] ifstat: convert sprintf to snprintf
-Message-ID: <20240217181237.449d2f59@hermes.local>
-In-Reply-To: <369729fa83564583acbb5c7903641867@AcuMS.aculab.com>
-References: <20240214125659.2477-1-dkirjanov@suse.de>
-	<369729fa83564583acbb5c7903641867@AcuMS.aculab.com>
+        Sat, 17 Feb 2024 19:09:25 -0800 (PST)
+Date: Sun, 18 Feb 2024 11:09:20 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Praveen Kannoju <praveen.kannoju@oracle.com>
+Cc: "j.vosburgh@gmail.com" <j.vosburgh@gmail.com>,
+	"andy@greyhouse.net" <andy@greyhouse.net>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Rajesh Sivaramasubramaniom <rajesh.sivaramasubramaniom@oracle.com>,
+	Rama Nichanamatlu <rama.nichanamatlu@oracle.com>,
+	Manjunath Patil <manjunath.b.patil@oracle.com>
+Subject: Re: [PATCH RFC] bonding: rate-limit bonding driver inspect messages
+Message-ID: <ZdF04GYACphhBCwl@Laptop-X1>
+References: <20240215172554.4211-1-praveen.kannoju@oracle.com>
+ <Zc8k2wYZRvtfrtmW@Laptop-X1>
+ <SA1PR10MB6445D15BA6BF3CD57CC690328C532@SA1PR10MB6445.namprd10.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SA1PR10MB6445D15BA6BF3CD57CC690328C532@SA1PR10MB6445.namprd10.prod.outlook.com>
 
-On Sat, 17 Feb 2024 17:51:01 +0000
-David Laight <David.Laight@ACULAB.COM> wrote:
-
-> From: Denis Kirjanov
-> > Sent: 14 February 2024 12:57
+On Sat, Feb 17, 2024 at 12:39:44PM +0000, Praveen Kannoju wrote:
+> > -----Original Message-----
+> > From: Hangbin Liu <liuhangbin@gmail.com>
+> > Sent: 16 February 2024 02:33 PM
+> > To: Praveen Kannoju <praveen.kannoju@oracle.com>
+> > Cc: j.vosburgh@gmail.com; andy@greyhouse.net; davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
+> > pabeni@redhat.com; netdev@vger.kernel.org; linux-kernel@vger.kernel.org; Rajesh Sivaramasubramaniom
+> > <rajesh.sivaramasubramaniom@oracle.com>; Rama Nichanamatlu <rama.nichanamatlu@oracle.com>; Manjunath Patil
+> > <manjunath.b.patil@oracle.com>
+> > Subject: Re: [PATCH RFC] bonding: rate-limit bonding driver inspect messages
 > > 
-> > Use snprintf to print only valid data  
+> > On Thu, Feb 15, 2024 at 10:55:54PM +0530, Praveen Kumar Kannoju wrote:
+> > > Rate limit bond driver log messages, to prevent a log flood in a
+> > > run-away situation, e.g couldn't get rtnl lock. Message flood leads to
+> > > instability of system and loss of other crucial messages.
+> > 
+> > Hi Praveen,
+> > 
+> > The patch looks good to me. But would you please help explain why these
+> > slave_info() are chosen under net_ratelimit?
+> > 
+> > Thanks
+> > Hangbin
 > 
-> ... to avoid potentially overflowed the temporary buffer.
+> Thank you, Hangbin.
 > 
-> Also probably worth using scnprintf() to avoid another change
-> when snprintf() is removed (because the return value is dangerous).
+> The routine bond_mii_monitor() periodically inspects the slave carrier state in order to detect for state changes, on a state change internally records it and does the state change action.
 > 
+> Parked-to-Parked state changes goes through transient state. As an example for Up to Down, BOND_LINK_UP to BOND_LINK_DOWN, is thru BOND_LINK_FAIL.  In order to attain next parked state or transient state bond needs rtnl mutex. If in a situation it cannot get it, a state change wouldn't happen.  In order to achieve a state change as quickly as possible  bond_mii_monitor() reschedules itself to come around after 1 msec. 
 
-No.
-Read the thread, return value is almost never used in iproute2
-and where it is, the checks are in place.
+I think a large miimon downdelay/updelay setting could reduce this.
+
+> And every single come around reinspects the link and sees a state change compared to its internally recorded, which in reality internal state could be not changed earlier as failed to get rtnl lock, and throws again log indicating it sees a state change. If attaining rtnl mutex take long say hypothetical 5 secs, then bond logs 5000 state change message. 1 message at every 1 msec. 
+
+Anyway, setting the rate limit do reduce the message flood. Would you please
+summarise the paragraph and add it in commit description when post the formal
+patch?
+
+thanks
+Hangbin
+
 
