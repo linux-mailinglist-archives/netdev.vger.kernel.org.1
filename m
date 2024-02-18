@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-72761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7914885984B
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 18:50:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC73185984A
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 18:50:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 83A4EB21174
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 17:50:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 966F3281B64
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 17:50:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF0376EB7E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF07D6EB7F;
 	Sun, 18 Feb 2024 17:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eN5e7Nmf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pNH8IJ2E"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8F39442
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B9266BB58
 	for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 17:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708278626; cv=none; b=L+9eLJWm8oP6DHWI02aNmHyvTVCTFj7s41hKUt078ZJtwGCjzqSvJOS7Bb3OIM08uCSXe1+Pv1LAu1xk5f/NGa98frsNVKW3OY6breR7kIS0bZirb3yRHch82yyQRv2cYKvbQjLMcaAR/aw2LkvqZ/fnc4DM9aGgg5H9n9+qa/0=
+	t=1708278626; cv=none; b=IP5sd0lam/Ix1GmJTuInnsSc6V6EvhAUWLTvs8K+J0FDVqhtUZOSIO25gp/LNhf+I00lULMKJxyB9AotfVoTM/5fDNiSc7obViEAHeBhHo/g+Moajj0J6URhLa9R5JlGuNBeET8Zf1en2FqpISMam1x5ThxIV9HdqSJxM9gmOGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708278626; c=relaxed/simple;
-	bh=0KzohIJGn6Lju14VR2kZ7Mz9ZZJbDIGaGdi+SUyVH0Q=;
+	bh=Arg5IYgbFZxDNEXGigVOshFsxH86bJXtm8ixxUbMSvk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=dI+AFdI7n6rqJqqstp5dxAf9kuH2ssYieHsyvJV7qiQRjD0v2I7q5tUqNXZDbeAgY/vE21La/Cl/FuEaDv/yErlevMfMaq3orHtvHuy90I6M681UqHGhsb9Avt55rJAzbr9n6bGX9fXohZAyGVMBFZCcsqVoL7Zfk67FAoopqUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eN5e7Nmf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3A161C433F1;
+	 In-Reply-To:To:Cc; b=pDdJV9HsGvdYSVeZe+hsqseObmkYGD27cKXcAscULDMw5HWVyPp8K7M5lQQTRwpg0dlZYkxUSmfqwgdy2qpeny0VSNxgk25yCpMg1xZWlIb4+otYZUaSb5MGmQVixycLrarjHQvJhTnnIQnSNoAFhogBna2Uj289sW4UshQwPhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pNH8IJ2E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 40A12C43394;
 	Sun, 18 Feb 2024 17:50:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1708278626;
-	bh=0KzohIJGn6Lju14VR2kZ7Mz9ZZJbDIGaGdi+SUyVH0Q=;
+	bh=Arg5IYgbFZxDNEXGigVOshFsxH86bJXtm8ixxUbMSvk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=eN5e7NmfuqREUtmii16UNkV2mZpixMxf3y5LBNVPiy9QToGJgokDFn3F3fJ25uMV5
-	 LA8xhodewY3N+r1uWQx9lxWxRsyPNsdrVd2fdfIxD5+wEykWc5OEp4O6SbHBTEUPxw
-	 WlMpeBfkx5b/WUnmMrzycmWUPgluVFpNVbd31Pi8VlhXZNDpuE/md5EFElLyCevnR1
-	 tBAMEzNn5GfU69KRBQ4eeLHRZA9cbR7+YzU0PCUoR/r2ApIR1YM/52u6TB29LR3v97
-	 t0/cCcXY05+q58Df1YCPzYKcu7AriCFvg3QkqV49+hTDQHQxG1shDSlitJQDwejSR0
-	 MYeUhXtLgk5OQ==
+	b=pNH8IJ2ExjScZGhv1ZeG2zk/9uFCFQ0Gz16zN0Qdv6i9msQS+m1qDT4paAaXdwuU7
+	 0kXE5NauXRVqfesWExRLpYubtbXpc0+BeVyonCYjK2ClcQo1Rk9j2pyGEVMEPVTdFe
+	 cWxK1xgXtINsxCuHlMZOQSrqEQMhMjOd5l1h+XMgb6CkPfnauEUFNGhhUBTUIcHuzB
+	 Ve7EjQ5fFjM8+0XpvzY4EF6IOUFKGYNnQPQ4f35dSRuBCZKmWdQOrV2K5qCUJDc4Pv
+	 t0Bx554vYxlJhSBLj/kCp9HPOEaVUPreDrd2UpjPeFiX9v/R3m6eBVHzHQZoz8+diX
+	 g6ZtIRvjl64Xw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1E075D8C976;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2413FD8C968;
 	Sun, 18 Feb 2024 17:50:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,34 +52,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2-next] netlink: display information from missing type
- extack
+Subject: Re: [PATCH v3 iproute2] ifstat: convert sprintf to snprintf
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170827862611.25576.14730029553431490141.git-patchwork-notify@kernel.org>
+ <170827862614.25576.18140577673825813285.git-patchwork-notify@kernel.org>
 Date: Sun, 18 Feb 2024 17:50:26 +0000
-References: <20240210173244.6681-1-stephen@networkplumber.org>
-In-Reply-To: <20240210173244.6681-1-stephen@networkplumber.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org
+References: <20240214125659.2477-1-dkirjanov@suse.de>
+In-Reply-To: <20240214125659.2477-1-dkirjanov@suse.de>
+To: Denis Kirjanov <kirjanov@gmail.com>
+Cc: stephen@networkplumber.org, netdev@vger.kernel.org, dkirjanov@suse.de
 
 Hello:
 
 This patch was applied to iproute2/iproute2-next.git (main)
 by David Ahern <dsahern@kernel.org>:
 
-On Sat, 10 Feb 2024 09:32:31 -0800 you wrote:
-> The kernel will now send missing type information in error response.
-> Print it if present.
+On Wed, 14 Feb 2024 07:56:59 -0500 you wrote:
+> Use snprintf to print only valid data
 > 
-> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
-> ---
->  lib/libnetlink.c | 4 ++++
->  1 file changed, 4 insertions(+)
+> v2: adjust formatting
+> v3: fix the issue with a buffer length
+> 
+> Signed-off-by: Denis Kirjanov <dkirjanov@suse.de>
+> 
+> [...]
 
 Here is the summary with links:
-  - [iproute2-next] netlink: display information from missing type extack
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=7e646c80d757
+  - [v3,iproute2] ifstat: convert sprintf to snprintf
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=d2f1c3c9a8a3
 
 You are awesome, thank you!
 -- 
