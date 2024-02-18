@@ -1,114 +1,108 @@
-Return-Path: <netdev+bounces-72791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B06D85999E
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 22:47:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 910158599AA
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 23:07:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E57AC2816B7
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 21:47:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DEB31F212B4
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 22:07:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66FA974299;
-	Sun, 18 Feb 2024 21:47:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C980674E3F;
+	Sun, 18 Feb 2024 22:07:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QFAYK2mi"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="A4qtgmbz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECE4AEAD7;
-	Sun, 18 Feb 2024 21:47:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EF9374297;
+	Sun, 18 Feb 2024 22:07:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708292844; cv=none; b=V7bFo2p20KNMGorIF5N9DeYaK5/xYCcd/XFBRIITreyIJK7DRdmkxf59hPH2nmIcg1kelhqKukLsoraSHxZiO7EHCg0g7U2R5xJGl3sBzAM6G05hHUB8+zBoqnagVIyn/dXHVZi4JREV4MeasWZXUd/QUktSbv1C5PeCjGHUpOU=
+	t=1708294047; cv=none; b=MVUoMaR6nlDVLQ0LwBzWxjpdjzlj9q3anCc5wMxH15mzOiRJDviNpghCeFjTwi8l2Cbhm6eTQIe7BF9Nzq4bYW4xQT1gTBzQSzqhyOqzmzUapvCD+PdBrVlVON3tswLIh1QvxNawbCsLU+X9al8sG8W5l9Ge8t6iE7//9B2dgNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708292844; c=relaxed/simple;
-	bh=He296CGuCmElTiY1KTWvPzuztsoIaHP2KjB4JkUw2Rs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ioi260F44trRg2u7kVIZM3fLOS9rnqNzSa+NSayuurIEjtvoty2BHSHmz2O+o7YIdCrwuMI1RMLL6wDKZUf/27T121F6NkMSgYTDFKJz7q+GPlTS1zA0KPrZtp4UaH0SCdE1F/WeUtVw36DK7A95VpjY3Z0KzCQHUWS1/00BQwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QFAYK2mi; arc=none smtp.client-ip=209.85.215.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-5cdf76cde78so3080258a12.1;
-        Sun, 18 Feb 2024 13:47:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708292842; x=1708897642; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2h7w3PICpgc66DOd0GBlKCF5dayhoEba8xQNx0hBJWY=;
-        b=QFAYK2mi3NROshGtkgi2zYr4bWZzvWrcRK4kVVlcFJijJvUUK+J/fTx19zkztEcquj
-         IJOgTI00OQglpNwrxsG+epvY5ldH+uzltgbS7EvI6y+SYM2N/iUg5wXsz+iipTW42fjZ
-         u6fSKJbbO60UwHZGhDaz+MWotuhdwXmH8wqsBHbKZTQZp3tca+IV7AMXwy5MvX1TxWZJ
-         xYbuDE34XHz19yqp7TITQUjkyRufy07pzHfnY737HwlOwsYXH47llBNbmUq/u6dYTleG
-         1vQQkLkO0Tp97wVRR9skbY32OTMqv+W6osSFaci3h/XJLXksf1RMHdXfCgCU7FOnXT1p
-         4wrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708292842; x=1708897642;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2h7w3PICpgc66DOd0GBlKCF5dayhoEba8xQNx0hBJWY=;
-        b=hqyjJcOOrxPOkumJWN6XUh42gRtE4zFj2r/LJR1D9dEXeXCbS078xrJzeEPCz6bFE6
-         Rbde9DipI2AySfnOHup7RO9eHkbKFl+TWi2QNLJ6t1P8zwAlLh7ofrv97hIYSBmFl2XJ
-         v33yk+X06/4uJYHr+L6t4pNOJ1L/Ay9IQrv5U39D1BYwVXOaG4ItxvhtfHIGE9DUzbAu
-         cjbR+DOEHVwIzozVUD/wfNQ9rjkv+WZhCvTlgfTjLZs9LVI2jnV0nBavaF4CUd+0em1s
-         INaHX/73O9yX/svj7bKvqGN1mw8a+qtcC4B3KH3MDCsf/dlDOFZ9hY06UUC9+Kx/s8y/
-         KfyA==
-X-Forwarded-Encrypted: i=1; AJvYcCWVv2GBPt/bT1WbVdvaneNvv2bVsl9hwxFk+fIrILjHs5WPm3k9dsOxdmaT6frDZTMNDraVvBFwBihQ6MbugqlOteoOqnJWWQFXDdu3RhCowme7rnC97pR2t98UfFkRmKyvo++Ayc0ZhFXpfTdqomKBfdupff+GhSGKJdiuy2Lhmo87
-X-Gm-Message-State: AOJu0YzZ/iIYISkFGbTQWBktWuVenJ6me58qZH2n5Ea+sHApZ1J7z+US
-	M/FZOc3w+FOGXpWOngovVMxHjqaoAZT5jWO+AaCLRdsk/1jmSQz7
-X-Google-Smtp-Source: AGHT+IHHsrNNaqhzpWEb7ZSZlMvmO/EGN3DdEK1PReUEdPvWQ75O4Nwi52lCklFmN/BpftZW2qDLAw==
-X-Received: by 2002:a17:902:76ca:b0:1d9:b739:a5aa with SMTP id j10-20020a17090276ca00b001d9b739a5aamr9080407plt.42.1708292842210;
-        Sun, 18 Feb 2024 13:47:22 -0800 (PST)
-Received: from ?IPV6:2600:8802:b00:ba1:b1a2:78a5:4a29:e334? ([2600:8802:b00:ba1:b1a2:78a5:4a29:e334])
-        by smtp.gmail.com with ESMTPSA id lb14-20020a170902fa4e00b001d9558689cfsm3107629plb.111.2024.02.18.13.46.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 18 Feb 2024 13:47:20 -0800 (PST)
-Message-ID: <ce36b9ac-6a32-4b97-98e5-dde72ef2b99b@gmail.com>
-Date: Sun, 18 Feb 2024 13:46:37 -0800
+	s=arc-20240116; t=1708294047; c=relaxed/simple;
+	bh=e0yWxLc3AYNv/5zFp3fPm6gjPgJpcMpeFj9+grm07MI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jOGZH284DD43dxah3r8lb28BQRA+eT+gO2zvvnkf9SyvZ5ssQtzKFBQZlwPJ/XWU22il5y3eWF+tcdnwBlteT+1vc7u1tqRzoPhxBSRlXQfmjunTOOBtDeuDbYAWgyfEujBUV8HgLt+K2gjpEeFMXqnGytYXf7JFu6FP299JQtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=A4qtgmbz; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=NadklAa6Tnip8w2TUfxFFu3aktzUd6Kx6TcCLDek8NE=; b=A4qtgmbzFk7aBDbe/5E1HGAoLz
+	+VhQCph3UweeUHCROTXnLDt1OCD543Lw8LyR/FEpU8ocfQMox+OFHPxZZH2PZE3lh1/dEFxjfNl78
+	beRrqUd3jBgZvenJ8ekSn3vqA/9RNKWM67KhmRyceOr8PrlDbOmTD6l4pUQD178cUocM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rbpJU-00893B-FH; Sun, 18 Feb 2024 23:07:08 +0100
+Date: Sun, 18 Feb 2024 23:07:08 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Robert Marko <robimarko@gmail.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
+	Nipun Gupta <nipun.gupta@amd.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Puneet Gupta <puneet.gupta@amd.com>,
+	Abhijit Gangurde <abhijit.gangurde@amd.com>,
+	Umang Jain <umang.jain@ideasonboard.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next RFC PATCH 1/6] net: phy: add support for defining
+ multiple PHY IDs in PHY driver
+Message-ID: <5233847b-a94b-4cd2-b976-232755f209d5@lunn.ch>
+References: <20240218190034.15447-1-ansuelsmth@gmail.com>
+ <20240218190034.15447-2-ansuelsmth@gmail.com>
+ <ZdJbciylnw8+ve8V@shell.armlinux.org.uk>
+ <65d2613d.170a0220.2eb48.a510@mx.google.com>
+ <829f8c7d-c09b-4264-818a-3f7b047ec44f@lunn.ch>
+ <65d2682a.5d0a0220.3fef2.efe4@mx.google.com>
+ <ZdJpyGkFRiRufySw@shell.armlinux.org.uk>
+ <65d26c13.df0a0220.63f42.d8e6@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 02/12] net: dsa: constify the struct device_type usage
-To: "Ricardo B. Marliere" <ricardo@marliere.net>,
- Oliver Neukum <oneukum@suse.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, Roopa Prabhu <roopa@nvidia.com>,
- Nikolay Aleksandrov <razor@blackwall.org>,
- Loic Poulain <loic.poulain@linaro.org>,
- Sergey Ryazanov <ryazanov.s.a@gmail.com>,
- Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-kernel@vger.kernel.org, bridge@lists.linux.dev,
- linux-ppp@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-References: <20240217-device_cleanup-net-v1-0-1eb31fb689f7@marliere.net>
- <20240217-device_cleanup-net-v1-2-1eb31fb689f7@marliere.net>
-Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20240217-device_cleanup-net-v1-2-1eb31fb689f7@marliere.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <65d26c13.df0a0220.63f42.d8e6@mx.google.com>
 
-
-
-On 2/17/2024 12:13 PM, Ricardo B. Marliere wrote:
-> Since commit aed65af1cc2f ("drivers: make device_type const"), the driver
-> core can properly handle constant struct device_type. Move the dsa_type
-> variable to be a constant structure as well, placing it into read-only
-> memory which can not be modified at runtime.
+> With the allocated mdio_devic_id it would result in this snipped
 > 
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Signed-off-by: Ricardo B. Marliere <ricardo@marliere.net>
+> 	const struct mdio_device_id *driver_dev_id;
+> 	struct mdio_device_id *dev_id;
+> 	int err = 0;
+> 
+> 	phydev->drv = phydrv;
+> 	/* Fill the mdio_device_id for the PHY istance.
+> 	 * If PHY driver provide an array of PHYs, search the right one,
+> 	 * in the other case fill it with the phy_driver data.
+> 	 */
+> 	if (phy_driver_match(phydrv, phydev, &driver_dev_id) && driver_dev_id) {
+> 		/* If defined, overwrite the PHY driver dev name with a
+> 		 * more specific one from the matching dev_id.
+> 		 */
+> 		phydev->dev_id = driver_dev_id;
+> 		if (driver_dev_id->name)
+> 			drv->name = driver_dev_id->name;
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+What is drv here? You should not be changing the name within the
+driver structure, since that is shared by a number of devices.
+
+       Andrew
 
