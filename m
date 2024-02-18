@@ -1,119 +1,150 @@
-Return-Path: <netdev+bounces-72731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72732-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBC15859644
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 11:30:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CAF685967B
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 11:55:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70BD22847CC
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 10:30:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87FA21C20B59
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 10:55:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 030FA3CF71;
-	Sun, 18 Feb 2024 10:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EC9TbaFt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47AAF4EB46;
+	Sun, 18 Feb 2024 10:55:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pegase1.c-s.fr (pegase1.c-s.fr [93.17.236.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCA7F383B0;
-	Sun, 18 Feb 2024 10:30:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6A314D11D;
+	Sun, 18 Feb 2024 10:55:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.236.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708252226; cv=none; b=U9vtFT8DtMj3XFymEm/SgaTCX7ivVZwOtF9Jjg9SmnqT1wHPLZAeiWqPwdE1A1tOxoSNNfSYSNTwM/IoPKMiu9V3AhToY/+wUj81j8Cr+mhnUW4ui0KFn0TflEfn3s4GEvkGNyDDGcHAa+zJBStIjP6gcqcqpTeHT/PQ1+eG/Uw=
+	t=1708253723; cv=none; b=jyif8oQLUwKe2mM+rUY16tlE3y5PXcoxT5vz6SDPzRbhGDzRiLtpbfeHCYyGmmNh86mI+DtsWz/Z7E7PqCsWyAUWRw3ecDyKi3Cfofbx7g2kalPdrlQyG65/JeACAAdodLyrF2GjGrPQRiOGl6DkjaVKtlL34D60g0sn2wze6K0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708252226; c=relaxed/simple;
-	bh=3+SCX68+BR4ikcTOVUJ8dLGXtBO7YBQJrQoEZ0s5SlQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mNvW/yQb+DI2R7RKJjfVGe8sLp9j8l6jCP+4QqG7BPS1KHedZsQG3ZrfszREQkAHH30kveAWyM6ixnFX/wFMsMq+hXCNJkaIcxgLO+82Xyhk+lqyzgMWaAlpZzt7ug1eH2nRQRDoQ97OSkjYoSXqrBdq9PANSju3jj5aWL8TGqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EC9TbaFt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 606EBC43390;
-	Sun, 18 Feb 2024 10:30:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708252226;
-	bh=3+SCX68+BR4ikcTOVUJ8dLGXtBO7YBQJrQoEZ0s5SlQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=EC9TbaFtKL2cffq/Tnbi117BoptMRJgSL3M6ne1V4ew7Yk7Xo+gE5//ta/TYWCA8N
-	 I5gyesn/3Dq+YL1+Z20nFZXVwqI2FlC8I3+7tJMb9DKjMAYrdCfdCkgRFAhtBzvMk+
-	 85IDAWpXGd+lRqHSpFj8uiwA7yXutCFyHLJarla05FN6+dzMGNKsEEgTDE9uwEKC8E
-	 KH3pCYQzJosIkkiEQnpWi/tWWHByUXJYtxkSsHhbPokC2gDwG3ZzvBoQuJSmPhlgHi
-	 DIYEQAa5QKskn+DzQcawpP+S94RJJXmpBlOdNDORJf17Bezgb2Z90h9TjHbQpvmw2V
-	 MctjWI6PLI44w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 45BD5DC99F1;
-	Sun, 18 Feb 2024 10:30:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1708253723; c=relaxed/simple;
+	bh=EbBTO80WkRv7m3C0/eIYgeu1ZNHlQh49ZLc+XBBYCWQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TZGas89Dslzg7Np51it3DqvypFnoGtEcoKGB7CiEYBzYKlJN1q9pcN8Zvmxuq/eiLJhwjx6t/S5AwVNV13w4T6PJ7ChdXTRoD10TXCN5FxdsQZRSL+txvWG5tntrze2kMCom+vRfAOmX+E9coLQrmd7RefIDX7/ZBuDFqWHnja8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.236.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub3.si.c-s.fr [192.168.12.233])
+	by localhost (Postfix) with ESMTP id 4Td2cx1hvmz9v4J;
+	Sun, 18 Feb 2024 11:55:13 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+	by localhost (pegase1.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id oNLdMsMYWM-I; Sun, 18 Feb 2024 11:55:13 +0100 (CET)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase1.c-s.fr (Postfix) with ESMTP id 4Td2cx0nzTz9v4H;
+	Sun, 18 Feb 2024 11:55:13 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 133EC8B76C;
+	Sun, 18 Feb 2024 11:55:13 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id rSFuxJHSf4wJ; Sun, 18 Feb 2024 11:55:12 +0100 (CET)
+Received: from PO20335.idsi0.si.c-s.fr (unknown [192.168.232.5])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 3F9778B763;
+	Sun, 18 Feb 2024 11:55:12 +0100 (CET)
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
+	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Kees Cook <keescook@chromium.org>,
+	"linux-hardening @ vger . kernel . org" <linux-hardening@vger.kernel.org>
+Subject: [PATCH bpf-next 1/2] bpf: Take return from set_memory_ro() into account with bpf_prog_lock_ro()
+Date: Sun, 18 Feb 2024 11:55:01 +0100
+Message-ID: <135feeafe6fe8d412e90865622e9601403c42be5.1708253445.git.christophe.leroy@csgroup.eu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1708253703; l=2087; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=EbBTO80WkRv7m3C0/eIYgeu1ZNHlQh49ZLc+XBBYCWQ=; b=F8NxWRnHg/MwjNEFQ6M9LOolCSgQxtP3c3JmOchmjBXK4w3gNTQyvbbU8Dfk5LMKUUuWJdiXO gQxH9ILOKV4BiYc52c44ZK+GDQsbGG8QeTRKNZ0eeQFcfNep8r/rx1n
+X-Developer-Key: i=christophe.leroy@csgroup.eu; a=ed25519; pk=HIzTzUj91asvincQGOFx6+ZF5AoUuP9GdOtQChs7Mm0=
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 00/13] mptcp: misc. fixes for v6.8
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170825222628.22893.6012598424482602231.git-patchwork-notify@kernel.org>
-Date: Sun, 18 Feb 2024 10:30:26 +0000
-References: <20240215-upstream-net-20240215-misc-fixes-v1-0-8c01a55d8f6a@kernel.org>
-In-Reply-To: <20240215-upstream-net-20240215-misc-fixes-v1-0-8c01a55d8f6a@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- dcaratti@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- tanggeliang@kylinos.cn, stable@vger.kernel.org, borisp@nvidia.com,
- john.fastabend@gmail.com
 
-Hello:
+set_memory_ro() can fail, leaving memory unprotected.
 
-This series was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+Check its return and take it into account as an error.
 
-On Thu, 15 Feb 2024 19:25:27 +0100 you wrote:
-> This series includes 4 types of fixes:
-> 
-> Patches 1 and 2 force the path-managers not to allocate a new address
-> entry when dealing with the "special" ID 0, reserved to the address of
-> the initial subflow. These patches can be backported up to v5.19 and
-> v5.12 respectively.
-> 
-> [...]
+Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+---
+ include/linux/filter.h | 5 +++--
+ kernel/bpf/core.c      | 4 +++-
+ kernel/bpf/verifier.c  | 4 +++-
+ 3 files changed, 9 insertions(+), 4 deletions(-)
 
-Here is the summary with links:
-  - [net,01/13] mptcp: add needs_id for userspace appending addr
-    https://git.kernel.org/netdev/net/c/6c347be62ae9
-  - [net,02/13] mptcp: add needs_id for netlink appending addr
-    https://git.kernel.org/netdev/net/c/584f38942626
-  - [net,03/13] mptcp: fix lockless access in subflow ULP diag
-    https://git.kernel.org/netdev/net/c/b8adb69a7d29
-  - [net,04/13] mptcp: fix data races on local_id
-    https://git.kernel.org/netdev/net/c/a7cfe7766370
-  - [net,05/13] mptcp: fix data races on remote_id
-    https://git.kernel.org/netdev/net/c/967d3c27127e
-  - [net,06/13] mptcp: fix duplicate subflow creation
-    https://git.kernel.org/netdev/net/c/045e9d812868
-  - [net,07/13] selftests: mptcp: pm nl: also list skipped tests
-    https://git.kernel.org/netdev/net/c/d2a2547565a9
-  - [net,08/13] selftests: mptcp: pm nl: avoid error msg on older kernels
-    https://git.kernel.org/netdev/net/c/662f084f3396
-  - [net,09/13] selftests: mptcp: diag: fix bash warnings on older kernels
-    https://git.kernel.org/netdev/net/c/694bd45980a6
-  - [net,10/13] selftests: mptcp: simult flows: fix some subtest names
-    https://git.kernel.org/netdev/net/c/4d8e0dde0403
-  - [net,11/13] selftests: mptcp: userspace_pm: unique subtest names
-    https://git.kernel.org/netdev/net/c/2ef0d804c090
-  - [net,12/13] selftests: mptcp: diag: unique 'in use' subtest names
-    https://git.kernel.org/netdev/net/c/645c1dc965ef
-  - [net,13/13] selftests: mptcp: diag: unique 'cestab' subtest names
-    https://git.kernel.org/netdev/net/c/4103d8480866
-
-You are awesome, thank you!
+diff --git a/include/linux/filter.h b/include/linux/filter.h
+index fee070b9826e..fc0994dc5c72 100644
+--- a/include/linux/filter.h
++++ b/include/linux/filter.h
+@@ -881,14 +881,15 @@ bpf_ctx_narrow_access_offset(u32 off, u32 size, u32 size_default)
+ 
+ #define bpf_classic_proglen(fprog) (fprog->len * sizeof(fprog->filter[0]))
+ 
+-static inline void bpf_prog_lock_ro(struct bpf_prog *fp)
++static inline int __must_check bpf_prog_lock_ro(struct bpf_prog *fp)
+ {
+ #ifndef CONFIG_BPF_JIT_ALWAYS_ON
+ 	if (!fp->jited) {
+ 		set_vm_flush_reset_perms(fp);
+-		set_memory_ro((unsigned long)fp, fp->pages);
++		return set_memory_ro((unsigned long)fp, fp->pages);
+ 	}
+ #endif
++	return 0;
+ }
+ 
+ static inline void bpf_jit_binary_lock_ro(struct bpf_binary_header *hdr)
+diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+index 71c459a51d9e..c49619ef55d0 100644
+--- a/kernel/bpf/core.c
++++ b/kernel/bpf/core.c
+@@ -2392,7 +2392,9 @@ struct bpf_prog *bpf_prog_select_runtime(struct bpf_prog *fp, int *err)
+ 	}
+ 
+ finalize:
+-	bpf_prog_lock_ro(fp);
++	*err = bpf_prog_lock_ro(fp);
++	if (*err)
++		return fp;
+ 
+ 	/* The tail call compatibility check can only be done at
+ 	 * this late stage as we need to determine, if we deal
+diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+index c5d68a9d8acc..1f831a6b4bbc 100644
+--- a/kernel/bpf/verifier.c
++++ b/kernel/bpf/verifier.c
+@@ -19020,7 +19020,9 @@ static int jit_subprogs(struct bpf_verifier_env *env)
+ 	 * bpf_prog_load will add the kallsyms for the main program.
+ 	 */
+ 	for (i = 1; i < env->subprog_cnt; i++) {
+-		bpf_prog_lock_ro(func[i]);
++		err = bpf_prog_lock_ro(func[i]);
++		if (err)
++			goto out_free;
+ 		bpf_prog_kallsyms_add(func[i]);
+ 	}
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
