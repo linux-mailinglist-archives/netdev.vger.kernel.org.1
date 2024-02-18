@@ -1,236 +1,170 @@
-Return-Path: <netdev+bounces-72757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A6E6859815
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 18:10:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66D6085982C
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 18:32:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4100028280E
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 17:10:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDD332812F0
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 17:32:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33D7474E26;
-	Sun, 18 Feb 2024 17:07:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D28176EB56;
+	Sun, 18 Feb 2024 17:31:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="joiWyt3w"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hy1tUovI"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 878BA74E16;
-	Sun, 18 Feb 2024 17:07:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13E38335D8
+	for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 17:31:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708276071; cv=none; b=nY8XlV0a4R8FtZYFCIbrb2rw8C6WDY6iGpnwoXUA5YIv1CGF93Z63JZJxj2B6K3kW5zXUXrpCAnalmDyeVe9Leqfcmk/mysPNNorp25ukTPNRG2DaE/A1npgQRHPdqxvoNDpRpgMQSDg2FPr06RbQLRMdB2QtmL9Ps7MDC4eiq4=
+	t=1708277518; cv=none; b=l6fBXfq65KkHCMtRqtMggXzU3tWxA/nL0QNBzCcKlF4+/9Y0AqNAmvy9yW+MkulsFVcA/3P9Hgi64eLiRNBsY0uMEeQJ2WxZBD1NnGKczNs85oi1VHJm6GtmDaXV5iHWIyp2p44l0SGCf/12fxHS1lL7OTMWqY9pnLImY11vpBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708276071; c=relaxed/simple;
-	bh=RuYxKjCx1KM7jfq1OwKbVsYU1FZNAf3c6Gkohmi02zY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=GD+nAXUsapvWqfUrgFzl1e2xk5PE0FZX1iyOopFm4yaECj9w6Z27A6XCfbhba7XeGypSraHLkta1vJan/ONX5/u2FPwktPmv7I7ff4ITRuz7NW7Z1qY2nYcEHrU1p/H2+ntBqAh3Lc4IihmvOYzBJ0vuet2xWYsDWA1y1cs5CIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=joiWyt3w; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=Cc:To:In-Reply-To:References:Message-Id:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=K1/H/lO2Y/ArsDeyXeOvrW6auZKE79iZc+y+GzqiREI=; b=jo
-	iWyt3wNQkr0ba9NPQR49VGysSetZVYZl/Z3LSOWJ58Zi725VzyYwtoLdURcMQbR6gS0S9aDaKdLnR
-	zVUCRJPldpVlHgwlfMSB+g1dtn/SnH5h5jGh6HUJIhlbdMefBGTxfBXIPrm0zEz6t5c5xifrGZxOX
-	6lg+9b1oTRUq0m8=;
-Received: from c-76-156-36-110.hsd1.mn.comcast.net ([76.156.36.110] helo=thinkpad.home.lunn.ch)
-	by vps0.lunn.ch with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rbke2-0088HX-1c; Sun, 18 Feb 2024 18:08:02 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-Date: Sun, 18 Feb 2024 11:07:06 -0600
-Subject: [PATCH net-next v4 9/9] net: ethtool: eee: Remove legacy _u32 from
- keee
+	s=arc-20240116; t=1708277518; c=relaxed/simple;
+	bh=93+hCgmDYsJj3s1oLfv74p/ijjjqcRXJ0g5oa3HGDnY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kpJuYApowNwq44RzXrD0EpKbAy0eOVXW9jt6cbfMABYnR0dESRi4y3lRoA0kASdFRI9C206f5niwYYgUHEVRr16lUnxl3LPrAEjzf2pnuHznlGvcP4mgsKLwdo85ENXWcGti7tiSykVEMC6KLNJkcnLO3NFY43WWhyhOH5FpYyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hy1tUovI; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2d21e2b2245so27330961fa.0
+        for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 09:31:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708277515; x=1708882315; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XukI7iUOGfixb/AepjRX05CG00Un6vBhI4ipHZHzQ70=;
+        b=Hy1tUovIIHAZ/65tUXOMNsNlJwGVZa8Dk8ND8oVt8rxzYUauhYGbaIQ7YAnuoXj5wn
+         lkRsKWlIN0VKOuMelcOslOvZTE/oNa+pVS5Iytk/fszGvO2IeTUfGMC1NmV9CuMIxDdY
+         Rr/bV+HVXDo+t1iz7W0nmQP0zU7TH4HKch9LYQWchtoP/sve2gnyrftdHU9NImnoIv//
+         VhORBvhJ6Lo1bZtPlm4GC8pwYI/CVYkxbIamcgmWJshS3ePGjs6xpq1A0xyvSN0U0+n6
+         Y8D7ZqX3m80DcBNuAbHQCowvG+OzL9GqTV+HCm4fzKHzICI+5cCv6CZi+OMPt2SB2b3P
+         AASg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708277515; x=1708882315;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XukI7iUOGfixb/AepjRX05CG00Un6vBhI4ipHZHzQ70=;
+        b=MlYAJVt/l9aZcnC/XrdmH3NvmxWwXnhTItDsrAlNgd3MA+cgMMVmWqyKwTf8DZWrVQ
+         0XX4WTgvPxtZJDMI2saqm9u/cqDKKXzU+1elBEccSoL0mWCA31P8PZ7oawCdMfWz+VH+
+         0JenzC9+U+jce1bGY8lUZSX8sgT4Q7qOLpo3ypKkOOJCwCFQblOe97wImG3k20CeVq4g
+         8MpaHozCQIWDGwtSaaZlqcdCWT8JdT9SWUmqyLdzFZsq5ZD2Jp7kiprD7dskJhd+5Uvk
+         EOewEXOqX+wNlLbPyv5YezZDWqOqstRfAEpwTvKn5WGVUymZb7eacfKQNfO6qZT5gyJ/
+         Lvyw==
+X-Forwarded-Encrypted: i=1; AJvYcCVFlI3UguAG9JbcIcrFFsQnnQwicw2J3S4V0Hfuvv409SBcfhxX+pNxgxStXcb6vKVg+GuC3tf9JdiFq3xHp+Rf8Jl28ekx
+X-Gm-Message-State: AOJu0Yw+fFWzlEAlHMI/Ff7gb0aq/sQjuXDc19JnhW3DNbSs1PFrXeTX
+	X0xbFq4vmA2kJsKWkX/MEWM8Hld/7PbPq/goSA5htT63SF88ir3N
+X-Google-Smtp-Source: AGHT+IF0TRH4fUtPCB4+TVxXeV2cJsxh8kvr5VoKq4P7hDQ215Hha1ew83XcaxISu5BDv7t6XEoWbw==
+X-Received: by 2002:ac2:4c81:0:b0:511:acd2:e627 with SMTP id d1-20020ac24c81000000b00511acd2e627mr6041891lfl.67.1708277514853;
+        Sun, 18 Feb 2024 09:31:54 -0800 (PST)
+Received: from ?IPV6:2a01:c23:b9e5:d800:2cda:54d5:8742:3de1? (dynamic-2a01-0c23-b9e5-d800-2cda-54d5-8742-3de1.c23.pool.telefonica.de. [2a01:c23:b9e5:d800:2cda:54d5:8742:3de1])
+        by smtp.googlemail.com with ESMTPSA id g30-20020a056402321e00b0055c60ba9640sm1927105eda.77.2024.02.18.09.31.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 18 Feb 2024 09:31:54 -0800 (PST)
+Message-ID: <90952624-d473-45b1-8bae-8fc31d36213f@gmail.com>
+Date: Sun, 18 Feb 2024 18:31:53 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] tg3: copy only needed fields from
+ userspace-provided EEE data
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Pavan Chebbi <pavan.chebbi@broadcom.com>,
+ Michael Chan <mchan@broadcom.com>, Jakub Kicinski <kuba@kernel.org>,
+ David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <59bd00bf-7263-43d9-a438-c2930bfdb91c@gmail.com>
+ <14978af2-0b94-4677-b303-da7c690abcca@lunn.ch>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <14978af2-0b94-4677-b303-da7c690abcca@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240218-keee-u32-cleanup-v4-9-71f13b7c3e60@lunn.ch>
-References: <20240218-keee-u32-cleanup-v4-0-71f13b7c3e60@lunn.ch>
-In-Reply-To: <20240218-keee-u32-cleanup-v4-0-71f13b7c3e60@lunn.ch>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Ariel Elior <aelior@marvell.com>, 
- Manish Chopra <manishc@marvell.com>, 
- Jesse Brandeburg <jesse.brandeburg@intel.com>, 
- Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org, 
- Andrew Lunn <andrew@lunn.ch>
-X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5127; i=andrew@lunn.ch;
- h=from:subject:message-id; bh=RuYxKjCx1KM7jfq1OwKbVsYU1FZNAf3c6Gkohmi02zY=;
- b=owEBbQKS/ZANAwAKAea/DcumaUyEAcsmYgBl0jlBT9FVJM6jr1aNdxTyfnA2A/SCXlRGYnR35
- FjwQd/txRKJAjMEAAEKAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCZdI5QQAKCRDmvw3LpmlM
- hEmiD/45OjbJdmoKPe3LT4Pn6JzQpmCkgG+uMi3Q8A+XS780OsviI9D2SJBTB9tUt9bS9mBq6CB
- b24ihU5CFCSOgNYlaAjJ7V3HQvueqM1YQRhxtVrcY9dgxZqbMqdS1jM5kEA/atcffWugNjIpd9l
- sB4GvqWhsEFZVLofmmIf+g2pl1E4yGcR4E9PNsOm3hDxRPs7Y0044FEvCMeM1FaF9q8jGUb4eAY
- v1nh72ooROoPtZ0O9JSaSCTdoNrLxjLOD6Iod/1PBrkmn37qc0O6QEh26JFgCKTVgn5Hs7Ubi69
- Gt3fg6po+8nmeiL59eD155DwuyTqBLhoSs9vdonNpCuNhQBVtUU48esETVMGmShvbfKJo+NGV1x
- S5SeO5VE6ZrUGozQgl1lbANIzYRv9RjmChOh2WNK9aU329h2Pcm3YdkRgs+eB3sDUx2kixOZN2Q
- HrqPyMinxjko/SRQnr5G3RymMvvM2iGUSClC5iblmsiDlrc6dOgfdbuGjtOA4R/dfmS4JU9mGfC
- 2/P1LtxwPhpUYuLNQ8bP76NxN7Ox/sViWTiKs32UznzzZFQBeJNaTbiYCfIZ2Y6ul02AUHPupxO
- nCMK8OJbrS6VBrk0FRPJhgH/2OgrtRrNkb9L+I+LIror0v4DVw+lsopECstrrnryFvbYo/WadhE
- o2ewBq29LTRAYuQ==
-X-Developer-Key: i=andrew@lunn.ch; a=openpgp;
- fpr=61FB1025CB53263916F9E1B7E6BF0DCBA6694C84
 
-All MAC drivers have been converted to use the link mode members of
-keee. So remove the _u32 values, and the code in the ethtool core to
-convert the legacy _u32 values to link modes.
+On 18.02.2024 18:04, Andrew Lunn wrote:
+> On Sun, Feb 18, 2024 at 03:49:55PM +0100, Heiner Kallweit wrote:
+>> The current code overwrites fields in tp->eee with unchecked data from
+>> edata, e.g. the bitmap with supported modes. ethtool properly returns
+>> the received data from get_eee() call, but we have no guarantee that
+>> other users of the ioctl set_eee() interface behave properly too.
+>> Therefore copy only fields which are actually needed.
+>>
+>> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> 
+> This one needed some time for me to understand. I missed that when
+> programming the PHY to advertise, it is hard coded what it actually
+> advertises. So there is no need to copy the advertise linkmode from
+> edata.
+> 
+Especially as we have the following a few lines earlier:
 
-Signed-off-by: Andrew Lunn <andrew@lunn.ch>
----
- include/linux/ethtool.h |  3 ---
- net/ethtool/eee.c       | 31 ++++---------------------------
- net/ethtool/ioctl.c     | 29 ++++++++++-------------------
- 3 files changed, 14 insertions(+), 49 deletions(-)
+    if (!linkmode_equal(edata->advertised, tp->eee.advertised)) {
+                netdev_warn(tp->dev,
+                            "Direct manipulation of EEE advertisement is not supported\n");
+                return -EINVAL;
+        }
 
-diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-index b90c33607594..9901e563f706 100644
---- a/include/linux/ethtool.h
-+++ b/include/linux/ethtool.h
-@@ -226,9 +226,6 @@ struct ethtool_keee {
- 	__ETHTOOL_DECLARE_LINK_MODE_MASK(supported);
- 	__ETHTOOL_DECLARE_LINK_MODE_MASK(advertised);
- 	__ETHTOOL_DECLARE_LINK_MODE_MASK(lp_advertised);
--	u32	supported_u32;
--	u32	advertised_u32;
--	u32	lp_advertised_u32;
- 	u32	tx_lpi_timer;
- 	bool	tx_lpi_enabled;
- 	bool	eee_active;
-diff --git a/net/ethtool/eee.c b/net/ethtool/eee.c
-index db6faa18fe41..bf398973eb8a 100644
---- a/net/ethtool/eee.c
-+++ b/net/ethtool/eee.c
-@@ -4,9 +4,6 @@
- #include "common.h"
- #include "bitset.h"
- 
--#define EEE_MODES_COUNT \
--	(sizeof_field(struct ethtool_keee, supported_u32) * BITS_PER_BYTE)
--
- struct eee_req_info {
- 	struct ethnl_req_info		base;
- };
-@@ -41,15 +38,6 @@ static int eee_prepare_data(const struct ethnl_req_info *req_base,
- 	ret = dev->ethtool_ops->get_eee(dev, eee);
- 	ethnl_ops_complete(dev);
- 
--	if (!ret && !ethtool_eee_use_linkmodes(eee)) {
--		ethtool_convert_legacy_u32_to_link_mode(eee->supported,
--							eee->supported_u32);
--		ethtool_convert_legacy_u32_to_link_mode(eee->advertised,
--							eee->advertised_u32);
--		ethtool_convert_legacy_u32_to_link_mode(eee->lp_advertised,
--							eee->lp_advertised_u32);
--	}
--
- 	return ret;
- }
- 
-@@ -62,11 +50,6 @@ static int eee_reply_size(const struct ethnl_req_info *req_base,
- 	int len = 0;
- 	int ret;
- 
--	BUILD_BUG_ON(sizeof(eee->advertised_u32) * BITS_PER_BYTE !=
--		     EEE_MODES_COUNT);
--	BUILD_BUG_ON(sizeof(eee->lp_advertised_u32) * BITS_PER_BYTE !=
--		     EEE_MODES_COUNT);
--
- 	/* MODES_OURS */
- 	ret = ethnl_bitset_size(eee->advertised, eee->supported,
- 				__ETHTOOL_LINK_MODE_MASK_NBITS,
-@@ -154,16 +137,10 @@ ethnl_set_eee(struct ethnl_req_info *req_info, struct genl_info *info)
- 	if (ret < 0)
- 		return ret;
- 
--	if (ethtool_eee_use_linkmodes(&eee)) {
--		ret = ethnl_update_bitset(eee.advertised,
--					  __ETHTOOL_LINK_MODE_MASK_NBITS,
--					  tb[ETHTOOL_A_EEE_MODES_OURS],
--					  link_mode_names, info->extack, &mod);
--	} else {
--		ret = ethnl_update_bitset32(&eee.advertised_u32, EEE_MODES_COUNT,
--					    tb[ETHTOOL_A_EEE_MODES_OURS],
--					    link_mode_names, info->extack, &mod);
--	}
-+	ret = ethnl_update_bitset(eee.advertised,
-+				  __ETHTOOL_LINK_MODE_MASK_NBITS,
-+				  tb[ETHTOOL_A_EEE_MODES_OURS],
-+				  link_mode_names, info->extack, &mod);
- 	if (ret < 0)
- 		return ret;
- 	ethnl_update_bool(&eee.eee_enabled, tb[ETHTOOL_A_EEE_ENABLED], &mod);
-diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index 1763e8b697e1..5464f237d8dd 100644
---- a/net/ethtool/ioctl.c
-+++ b/net/ethtool/ioctl.c
-@@ -1513,9 +1513,6 @@ static void eee_to_keee(struct ethtool_keee *keee,
- {
- 	memset(keee, 0, sizeof(*keee));
- 
--	keee->supported_u32 = eee->supported;
--	keee->advertised_u32 = eee->advertised;
--	keee->lp_advertised_u32 = eee->lp_advertised;
- 	keee->eee_active = eee->eee_active;
- 	keee->eee_enabled = eee->eee_enabled;
- 	keee->tx_lpi_enabled = eee->tx_lpi_enabled;
-@@ -1532,6 +1529,8 @@ static void eee_to_keee(struct ethtool_keee *keee,
- static void keee_to_eee(struct ethtool_eee *eee,
- 			const struct ethtool_keee *keee)
- {
-+	bool overflow;
-+
- 	memset(eee, 0, sizeof(*eee));
- 
- 	eee->eee_active = keee->eee_active;
-@@ -1539,22 +1538,14 @@ static void keee_to_eee(struct ethtool_eee *eee,
- 	eee->tx_lpi_enabled = keee->tx_lpi_enabled;
- 	eee->tx_lpi_timer = keee->tx_lpi_timer;
- 
--	if (ethtool_eee_use_linkmodes(keee)) {
--		bool overflow;
--
--		overflow = !ethtool_convert_link_mode_to_legacy_u32(&eee->supported,
--								    keee->supported);
--		ethtool_convert_link_mode_to_legacy_u32(&eee->advertised,
--							keee->advertised);
--		ethtool_convert_link_mode_to_legacy_u32(&eee->lp_advertised,
--							keee->lp_advertised);
--		if (overflow)
--			pr_warn("Ethtool ioctl interface doesn't support passing EEE linkmodes beyond bit 32\n");
--	} else {
--		eee->supported = keee->supported_u32;
--		eee->advertised = keee->advertised_u32;
--		eee->lp_advertised = keee->lp_advertised_u32;
--	}
-+	overflow = !ethtool_convert_link_mode_to_legacy_u32(&eee->supported,
-+							    keee->supported);
-+	ethtool_convert_link_mode_to_legacy_u32(&eee->advertised,
-+						keee->advertised);
-+	ethtool_convert_link_mode_to_legacy_u32(&eee->lp_advertised,
-+						keee->lp_advertised);
-+	if (overflow)
-+		pr_warn("Ethtool ioctl interface doesn't support passing EEE linkmodes beyond bit 32\n");
- }
- 
- static int ethtool_get_eee(struct net_device *dev, char __user *useraddr)
-
--- 
-2.43.0
+> I suspect this driver is broken in that it does not wait for the
+> result of the auto-neg to enable/disable EEE in the hardware. But it
+> could be hiding somewhere in the code and i also missed that.
+> 
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> 
+>     Andrew
 
 
