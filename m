@@ -1,120 +1,173 @@
-Return-Path: <netdev+bounces-72708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F9EB85946B
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 04:50:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5547285949B
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 05:29:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD6FD1F220DD
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 03:50:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EACFD1F22C1E
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 04:29:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1457815D4;
-	Sun, 18 Feb 2024 03:49:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D19246BA;
+	Sun, 18 Feb 2024 04:29:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="SnDxKL27"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14F2215C0
-	for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 03:49:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4940E184F;
+	Sun, 18 Feb 2024 04:29:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708228198; cv=none; b=VTtBKmAYwNp4Oe18wnUHO7EUCdEoGTkaciI82hidmDtlBiN6biie/nkSs6CtjKbKflvmoE5m/8kLW/dsJkedowsUwRNHhvuegzLnY9Xf8dJMsFQ2PnMprbVwpEJ0T+BIOD4+BE2Zuvk2jf4dVBSKf9pdKJiQI5R0P6QV6FHZ+Ms=
+	t=1708230571; cv=none; b=RonNOwIsivME/iFsd9SWYlmFxJNYggzqWxCa5xfct9rP+0yN1RVXqVc6Zbfqnjl/pP3v8tXrvtCBGV9ajHUXccvZ2fEYFFdwZ8O/unUTjzHBWjsCYMs2ksT4ehKyybSUbVawp7dRiJTfePFB76RPteyUZ5ssSM7XA+Sq90tisB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708228198; c=relaxed/simple;
-	bh=WVnOmh2FPOOeQdG0uyG0taLtLGSBA6trvBtKJX7ma08=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=L+kH7JNaqJeVu2TeRIhRthHioAZpsZ3OBOYEGUXvmF05J82fpr2g3MOROK+cEDRHXI+xXOzGW0poxAuQ0Fz9cAHBYV5UJxr1EK4c0NTetgRMaaFE1riUFjuylUadzBPuxzYCm/DFmXtT12of/jvQXqVOKbdCL0XoCcxdu3T2Rdo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Tcs7j3Zrpz2Bcp1;
-	Sun, 18 Feb 2024 11:47:45 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id 74FA11A016B;
-	Sun, 18 Feb 2024 11:49:51 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Sun, 18 Feb
- 2024 11:49:50 +0800
-Subject: Re: [PATCH net-next] net: page_pool: fix recycle stats for system
- page_pool allocator
-To: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
-CC: Lorenzo Bianconi <lorenzo@kernel.org>, <netdev@vger.kernel.org>,
-	<kuba@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <hawk@kernel.org>, <ilias.apalodimas@linaro.org>,
-	<toke@redhat.com>, <aleksander.lobakin@intel.com>
-References: <87f572425e98faea3da45f76c3c68815c01a20ee.1708075412.git.lorenzo@kernel.org>
- <2f315c01-37ba-77e2-1d0f-568f453b3166@huawei.com>
- <ZdCR6i85oEvoxMzF@lore-desk>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <b9fba731-fe69-5eb6-8f9e-a477fe5cc124@huawei.com>
-Date: Sun, 18 Feb 2024 11:49:50 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	s=arc-20240116; t=1708230571; c=relaxed/simple;
+	bh=lLzvN+0UA7nYVUd9h0btrwR1+ARJGyAx88D7zo5odmM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=juWURbg6v7kcZHZpoFwTTbu60ng6cYrTJiqYln/9LrR+HBnC7/RR078wDQp36QYazPUUKP3eN+9NKqid0D4xPAavn9K26j/1qiGHxZ3Epqfr1PvvIiixCHsJnI1x5xHzV5bVz035DG2NDWJtSTyFMwn++RjeLByK8k8DuYSmE1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=SnDxKL27; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41I4R2Zf019929;
+	Sun, 18 Feb 2024 04:29:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=cwAA9VhFh41lHklFAVgJT+Qaw4CK5FsdcTXPz98BgOk=; b=Sn
+	DxKL27h+Z+Gs9DI0fMst5fvp20MESRBpdIW//17kQIoHpA4+xoQhk6+TsvwXi0+A
+	60JxHlyfZ/S02kDzzgf9/RbvnmjaPj55UssYHAT2vOATy28te6i1h1gjIwInuu7j
+	Vpn3x3QaZlAhCz1std74Vo6kC334T7PkZloVeNMqzond/rCuOb65TEdIwCYC+2lH
+	1exrSe3LDlc4jg5OpP4XRuaiLdNFNkrbi+t8wdFLJO8n3drw1qwhtw1GAc1Mrtgz
+	MSxU+foEZyoSPlsmELAgdVAnxTQEQ5vqCCbh+yJHb/9R/2oxmb20z3947dypGI+v
+	AoQHHaiLkr2Y/sqvJRbQ==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wam4q1cg5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 18 Feb 2024 04:29:15 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41I4TEFr018329
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 18 Feb 2024 04:29:14 GMT
+Received: from [10.216.61.130] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Sat, 17 Feb
+ 2024 20:29:08 -0800
+Message-ID: <d518dbc1-41aa-46f9-b549-c95a33b06ee0@quicinc.com>
+Date: Sun, 18 Feb 2024 09:59:03 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ZdCR6i85oEvoxMzF@lore-desk>
-Content-Type: text/plain; charset="windows-1252"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 2/8] clk: qcom: ipq5332: enable few nssnoc clocks in
+ driver probe
 Content-Language: en-US
+To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+CC: Andrew Lunn <andrew@lunn.ch>, Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Michael Turquette
+	<mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>, Rob Herring
+	<robh+dt@kernel.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Catalin Marinas
+	<catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <linux-clk@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>
+References: <20240122-ipq5332-nsscc-v4-0-19fa30019770@quicinc.com>
+ <20240122-ipq5332-nsscc-v4-2-19fa30019770@quicinc.com>
+ <7a69a68d-44c2-4589-b286-466d2f2a0809@lunn.ch>
+ <11fda059-3d8d-4030-922a-8fef16349a65@quicinc.com>
+ <17e2400e-6881-4e9e-90c2-9c4f77a0d41d@lunn.ch>
+ <8c9ee34c-a97b-4acf-a093-9ac2afc28d0e@quicinc.com>
+ <CAA8EJppe6aNf2WJ5BvaX8SPTbuaEwzRm74F8QKyFtbmnGQt=1w@mail.gmail.com>
+ <74f585c2-d220-4324-96eb-1a945fef9608@quicinc.com>
+ <CAA8EJppuNRB9fhjimg4SUR2PydX7-KLWSb9H-nC-oSMYVOME-Q@mail.gmail.com>
+From: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
+In-Reply-To: <CAA8EJppuNRB9fhjimg4SUR2PydX7-KLWSb9H-nC-oSMYVOME-Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemm500005.china.huawei.com (7.185.36.74)
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: wpntqkDePuxxvfTymCOCn_FH2diCd_32
+X-Proofpoint-GUID: wpntqkDePuxxvfTymCOCn_FH2diCd_32
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-18_02,2024-02-16_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 malwarescore=0 clxscore=1015 suspectscore=0 bulkscore=0
+ spamscore=0 phishscore=0 mlxscore=0 lowpriorityscore=0 adultscore=0
+ mlxlogscore=670 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2401310000 definitions=main-2402180031
 
-On 2024/2/17 19:00, Lorenzo Bianconi wrote:
->>>  #ifdef CONFIG_PAGE_POOL_STATS
->>> -	pool->recycle_stats = alloc_percpu(struct page_pool_recycle_stats);
->>> -	if (!pool->recycle_stats)
->>> -		return -ENOMEM;
->>> +	if (!(pool->p.flags & PP_FLAG_SYSTEM_POOL)) {
->>> +		pool->recycle_stats = alloc_percpu(struct page_pool_recycle_stats);
->>> +		if (!pool->recycle_stats)
->>> +			return -ENOMEM;
->>> +	} else {
->>> +		/* For system page pool instance we use a singular stats object
->>> +		 * instead of allocating a separate percpu variable for each
->>> +		 * (also percpu) page pool instance.
->>> +		 */
->>> +		pool->recycle_stats = &pp_system_recycle_stats;
+
+
+On 2/17/2024 10:15 PM, Dmitry Baryshkov wrote:
+> On Sat, 17 Feb 2024 at 17:45, Kathiravan Thirumoorthy
+> <quic_kathirav@quicinc.com> wrote:
 >>
->> Do we need to return -EINVAL here if page_pool_init() is called with
->> pool->p.flags & PP_FLAG_SYSTEM_POOL being true and cpuid being a valid
->> cpu?
-
-My fault, the above "cpuid being a valid cpu" should be "cpuid not being a
-valid cpu".
-In other word, do we need to protect user from calling page_pool_init()
-with PP_FLAG_SYSTEM_POOL flag and cpuid being -1?
-
-
->> If yes, it seems we may be able to use the cpuid to decide if we need
->> to allocate a new pool->recycle_stats without adding a new flag.
+>>
+>> <snip>
+>>
+>>>> Reason being, to access the NSSCC clocks, these GCC clocks
+>>>> (gcc_snoc_nssnoc_clk, gcc_snoc_nssnoc_1_clk, gcc_nssnoc_nsscc_clk)
+>>>> should be turned ON. But CCF disables these clocks as well due to the
+>>>> lack of consumer.
+>>>
+>>> This means that NSSCC is also a consumer of those clocks. Please fix
+>>> both DT and nsscc driver to handle NSSNOC clocks.
+>>
+>>
+>> Thanks Dmitry. I shall include these clocks in the NSSCC DT node and
+>> enable the same in the NSSCC driver probe.
 > 
-> for the current use-cases cpuid is set to a valid core id just for system
-> page_pool but in the future probably there will not be a 1:1 relation (e.g.
-> we would want to pin a per-cpu page_pool instance to a particular CPU?)
+> Or use them through pm_clk. This might be better, as the system
+> doesn't need these clocks if NSSCC is suspended.
 
-if it is a per-cpu page_pool instance, doesn't it run into the similar
-problem this patch is trying to fix?
+
+IPQ53XX SoC doesn't support the PM(suspend / resume) functionality, so 
+that, can I enable these clocks in NSSCC driver probe itself?
+
 
 > 
 >>
->> If no, the API for page_pool_create_percpu() seems a litte weird as it
->> relies on the user calling it correctly.
+>>>
+>>>>> Once you have actual drivers, this should solve itself, the drivers
+>>>>> will consume the clocks.
+>>>>
+>>>>
+>>>> Given that, NSSCC is being built as module, there is no issue in booting
+>>>> the kernel. But if you do insmod of the nsscc-ipq5332.ko, system will
+>>>> reset.
+>>>>
+>>>> Without the networking drivers, there is no need to install this module.
+>>>> And as you stated, once the drivers are available, there will be no issues.
+>>>>
+>>>> So can I explain the shortcomings of installing this module without the
+>>>> networking drivers in cover letter and drop this patch all together?
+>>>
+>>> No. Using allyesconfig or allmodconfig and installing the full modules
+>>> set should work.
+>>>
 >>
->> Also, do we need to enforce that page_pool_create_percpu() is only called
->> once for the same cpu? if no, we may have two page_pool instance sharing
->> the same stats.
+>>
+>> Okay, Got it. Thanks for the information.
+>>
+>> <snip>
 > 
-> do you mean for the same pp instance? I guess it is not allowed by the APIs.
-
-As above comment, if the user is passing a valid cpuid, the PP_FLAG_SYSTEM_POOL
-flag need to be set too? if yes, doesn't the new flag seems somewhat redundant
-here?
+> 
+> 
 
