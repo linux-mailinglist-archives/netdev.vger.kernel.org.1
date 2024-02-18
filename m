@@ -1,222 +1,132 @@
-Return-Path: <netdev+bounces-72743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94D3385979C
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 16:19:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E59B88597A6
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 16:40:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B99A41C20AFF
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 15:19:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93F5228154A
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 15:40:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 934A56D1B3;
-	Sun, 18 Feb 2024 15:19:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 473A86D1B2;
+	Sun, 18 Feb 2024 15:40:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Z0XxTgjq"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="lXRhXdkN";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="YKS1tbyq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D8E26BFDB
-	for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 15:19:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A22A56B82;
+	Sun, 18 Feb 2024 15:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708269588; cv=none; b=dH/nQDwKYIC8Q9sE9ZFpXQg9b0biyQNG9Zvi23JcQMgvOZICX3tM4h0Tlh8jnySnMfjdHTOP4Ig2mggDm4tgq060+YXRQ1MYE4NgQX6VMyY9N3o8wxVzLmyaX7GerzluP05rQOT2A+E2hmfMA4X8ujryE8jTwv9HPZ7+NKOTeRM=
+	t=1708270812; cv=none; b=RtI6kQdZ7zoAHw3dg44Ck5vC1yAxlKNFXA6TtNLWcIqrs0MXoJqsMwmy2pq5DvvgIijCM8wXNeLUgryGbPiL4z9ajeZfecNJY0PPATNWdySDB7/+4Y699kxCxCm0dit6LFG3Z1SFnL4P1U+mVVbKiC8u8rciKbPHA8Obq0IjIHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708269588; c=relaxed/simple;
-	bh=lYFHSwKGcbZg0KftqGMF5GiOnvyk1uaue8OvErSz/MI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AwJXLted7GPU07EzaqeT98GaRJHuByy7frj9TydWRjjaeHneUsAKOyqCTz8s6buOgh27NiWuZKqT1b3rh7VqISSDzO5+4zwo0N8vrBIaqLp/ZCmmaf4DtkQTtIlk85QKzP8plBSC10+CrCGspsWFLAoRtC9BXc5eluxvAhzGy60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Z0XxTgjq; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6e45c59fc6cso187460b3a.0
-        for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 07:19:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1708269586; x=1708874386; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eiWOUozWnezeYn8cXQvtDvCvh6gTYyUB/9KcoNgO2S8=;
-        b=Z0XxTgjqWyazp15zaW/ZnhQPP/vQUJ16DOZ1Hq0r+BT7AlgmbJ9FONeOG3yHNtb9PL
-         NY72Vj0zKPqaAgRpopK2+aqqkrQfRItybiUPkatXi9wwD13ZxQHcl8NYYoFU5Jp6RHdm
-         c0o9K96cAg54FH5HIBpabLJjAOkt0mQ2F2mQg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708269586; x=1708874386;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eiWOUozWnezeYn8cXQvtDvCvh6gTYyUB/9KcoNgO2S8=;
-        b=F/nBV+sNxZk2Z/0F0HaCpTICHH4MyqTnYLoBhgMMxuZDVOKxG2MRBJKAqDJERolJVt
-         rqFhVs7rlY3MXa13jgzDYuWBMWT5T2Vl5kt1GbYSLps7076UXB5rTEWA7vmkFvoNUBhY
-         0pys3AouSBQaQjDzG/fWmv0gDFcLVNcq3YwvyBjoCjFmtlMuiKjorQ7f5Yi4B28MrVax
-         +/ujJ+idmHmVnt7xWlcWNbi1GI88/NE1PT2Ju2j25apoppAZdBk5lh8M8LHzq41Tqtf3
-         9Jxq7ENaqyZjV7NE7bZsRzBAEMRdWwLASoFBLDq2KNtel0Z5N+g/qB66NWXa5E/2pyOs
-         AfHw==
-X-Forwarded-Encrypted: i=1; AJvYcCX0DF2Um5TPWDLnvv/yKdLiZUXP+hLy0l31+ZtqAi8wD8ABU8DJlztUW2flL5peKIOV0WpdnUk/PpGqqEayDnLZKBjETWnM
-X-Gm-Message-State: AOJu0YxRgC6+bLeyS2vDz5WBf1R2JWghOzbQzl0BkhWVYnerLaayVY9r
-	0Op+Ia5Yb6ZM4hy80BLkvwIu2hHwvFemYYDUE1Aj2tOndWSs5q1dCjRVN2NGbQ==
-X-Google-Smtp-Source: AGHT+IHQkmCTEZjB8VrcrwmYPHm1xqN+oDo5E9U8MtwdiC0lI+BGRPycjpyIHGY52kr+uXWivxarDw==
-X-Received: by 2002:aa7:8202:0:b0:6e1:dbd:e800 with SMTP id k2-20020aa78202000000b006e10dbde800mr9961775pfi.17.1708269585774;
-        Sun, 18 Feb 2024 07:19:45 -0800 (PST)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id r22-20020aa78456000000b006e24991dd5bsm2894532pfn.98.2024.02.18.07.19.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 Feb 2024 07:19:45 -0800 (PST)
-Date: Sun, 18 Feb 2024 07:19:44 -0800
-From: Kees Cook <keescook@chromium.org>
-To: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Puranjay Mohan <puranjay12@gmail.com>,
-	Zi Shen Lim <zlim.lnx@gmail.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Tiezhu Yang <yangtiezhu@loongson.cn>,
-	Hengqi Chen <hengqi.chen@gmail.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Johan Almbladh <johan.almbladh@anyfinetworks.com>,
-	Paul Burton <paulburton@kernel.org>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Helge Deller <deller@gmx.de>, Ilya Leoshkevich <iii@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andreas Larsson <andreas@gaisler.com>,
-	Wang YanQing <udknight@gmail.com>, David Ahern <dsahern@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>, bpf@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
-	linux-parisc@vger.kernel.org, linux-s390@vger.kernel.org,
-	sparclinux@vger.kernel.org, netdev@vger.kernel.org,
-	"linux-hardening @ vger . kernel . org" <linux-hardening@vger.kernel.org>
-Subject: Re: [PATCH bpf-next 2/2] bpf: Take return from set_memory_rox() into
- account with bpf_jit_binary_lock_ro()
-Message-ID: <202402180711.22F5C511E5@keescook>
-References: <135feeafe6fe8d412e90865622e9601403c42be5.1708253445.git.christophe.leroy@csgroup.eu>
- <ec35e06dbe8672a36415ebe2b9273277c2921977.1708253445.git.christophe.leroy@csgroup.eu>
+	s=arc-20240116; t=1708270812; c=relaxed/simple;
+	bh=6rUpqX4bUrq80t7K1JngTnzTStgOb4lJQguGBluapJs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=vF2QwG+BNyW1C+rsf7/po+EXAHc6CCQrcparAS7ehukvKZ83M+Haweewc2qPupdLfM+B56mqbdrVyGOwXEwhvwvr2EitohwbGEisC1SevqVmjDmPjmitS04BfO78+re6ICYPnXQBbdXyTHaom37VvhIeorbyszR+FnePQknzgUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=lXRhXdkN; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=YKS1tbyq; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1708270805;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NEJif3hMj92kb73ceaBTohocvuUtcBAZTK7BGKOZE+Q=;
+	b=lXRhXdkNdX+ISAqP2fFGBkuHzVWodImWzUguCT8cle1stmPgXETAOQYQyGh0kJsfbdVZlH
+	lP5umO5oA48ugDMs54GKgfUQ8rj+gJ6Wn4tqCvewsvNY2p04fJm3S4fbK3Mal/rqL9POof
+	/W0uQ8HUehEETD+zCL66+fWZAwmW2KXZzY7S1/8gFeUH1C3cz8vo/NOhBNhuMVzUgeGcaB
+	vOaxK6Pfwy15tPB8MDNvtNuheqMIAAwFzsFJtN0Kh/ggThzy498k0xZT0qhArITDZ1kBbO
+	chbcpG8ou749DBAoj1OkKZBvEH4tYO06y2Bbl73GLsDSpoq1TleMvx1Ftn9YUA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1708270805;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NEJif3hMj92kb73ceaBTohocvuUtcBAZTK7BGKOZE+Q=;
+	b=YKS1tbyq22HqyyPxlEs22q4Kv+dF6I+VqD5o5wqbJhV903xAPd2nf8NeyryEr09JsIxLak
+	Nxz6OGQ6PbMfdJDA==
+To: Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+ intel-wired-lan@lists.osuosl.org
+Cc: sasha.neftin@intel.com, richardcochran@gmail.com,
+ anthony.l.nguyen@intel.com, jesse.brandeburg@intel.com, Vinicius Costa
+ Gomes <vinicius.gomes@intel.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jeff Kirsher
+ <jeffrey.t.kirsher@intel.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [iwl-net v1 1/2] igc: Fix missing time sync events
+In-Reply-To: <20240217010455.58258-2-vinicius.gomes@intel.com>
+References: <20240217010455.58258-1-vinicius.gomes@intel.com>
+ <20240217010455.58258-2-vinicius.gomes@intel.com>
+Date: Sun, 18 Feb 2024 16:40:03 +0100
+Message-ID: <87y1bhok6k.fsf@kurt.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ec35e06dbe8672a36415ebe2b9273277c2921977.1708253445.git.christophe.leroy@csgroup.eu>
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-On Sun, Feb 18, 2024 at 11:55:02AM +0100, Christophe Leroy wrote:
-> set_memory_rox() can fail, leaving memory unprotected.
-> 
-> Check return and bail out when bpf_jit_binary_lock_ro() returns
-> and error.
-> 
-> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-> ---
-> Previous patch introduces a dependency on this patch because it modifies bpf_prog_lock_ro(), but they are independant.
-> It is possible to apply this patch as standalone by handling trivial conflict with unmodified bpf_prog_lock_ro().
-> ---
->  arch/arm/net/bpf_jit_32.c        | 25 ++++++++++++-------------
->  arch/arm64/net/bpf_jit_comp.c    | 21 +++++++++++++++------
->  arch/loongarch/net/bpf_jit.c     | 21 +++++++++++++++------
->  arch/mips/net/bpf_jit_comp.c     |  3 ++-
->  arch/parisc/net/bpf_jit_core.c   |  8 +++++++-
->  arch/s390/net/bpf_jit_comp.c     |  6 +++++-
->  arch/sparc/net/bpf_jit_comp_64.c |  6 +++++-
->  arch/x86/net/bpf_jit_comp32.c    |  3 +--
->  include/linux/filter.h           |  4 ++--
->  9 files changed, 64 insertions(+), 33 deletions(-)
-> 
-> diff --git a/arch/arm/net/bpf_jit_32.c b/arch/arm/net/bpf_jit_32.c
-> index 1d672457d02f..01516f83a95a 100644
-> --- a/arch/arm/net/bpf_jit_32.c
-> +++ b/arch/arm/net/bpf_jit_32.c
-> @@ -2222,28 +2222,21 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
->  	/* If building the body of the JITed code fails somehow,
->  	 * we fall back to the interpretation.
->  	 */
-> -	if (build_body(&ctx) < 0) {
-> -		image_ptr = NULL;
-> -		bpf_jit_binary_free(header);
-> -		prog = orig_prog;
-> -		goto out_imms;
-> -	}
-> +	if (build_body(&ctx) < 0)
-> +		goto out_free;
->  	build_epilogue(&ctx);
->  
->  	/* 3.) Extra pass to validate JITed Code */
-> -	if (validate_code(&ctx)) {
-> -		image_ptr = NULL;
-> -		bpf_jit_binary_free(header);
-> -		prog = orig_prog;
-> -		goto out_imms;
-> -	}
-> +	if (validate_code(&ctx))
-> +		goto out_free;
->  	flush_icache_range((u32)header, (u32)(ctx.target + ctx.idx));
->  
->  	if (bpf_jit_enable > 1)
->  		/* there are 2 passes here */
->  		bpf_jit_dump(prog->len, image_size, 2, ctx.target);
->  
-> -	bpf_jit_binary_lock_ro(header);
-> +	if (bpf_jit_binary_lock_ro(header))
-> +		goto out_free;
->  	prog->bpf_func = (void *)ctx.target;
->  	prog->jited = 1;
->  	prog->jited_len = image_size;
-> @@ -2260,5 +2253,11 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
->  		bpf_jit_prog_release_other(prog, prog == orig_prog ?
->  					   tmp : orig_prog);
->  	return prog;
-> +
-> +out_free:
-> +	image_ptr = NULL;
-> +	bpf_jit_binary_free(header);
-> +	prog = orig_prog;
-> +	goto out_imms;
+--=-=-=
+Content-Type: text/plain
 
-These gotos give me the creeps, but yes, it does appear to be in the
-style of the existing error handling.
+On Fri Feb 16 2024, Vinicius Costa Gomes wrote:
+> Fix "double" clearing of interrupts, which can cause external events
+> or timestamps to be missed.
+>
+> The IGC_TSIRC Time Sync Interrupt Cause register can be cleared in two
+> ways, by either reading it or by writing '1' into the specific cause
+> bit. This is documented in section 8.16.1.
+>
+> The following flow was used:
+>  1. read IGC_TSIRC into 'tsicr';
+>  2. handle the interrupts present in 'tsirc' and mark them in 'ack';
+>  3. write 'ack' into IGC_TSICR;
+>
+> As both (1) and (3) will clear the interrupt cause, if an interrupt
+> happens between (1) and (3) it will be ignored, causing events to be
+> missed.
+>
+> Remove the extra clear in (3).
+>
+> Fixes: 2c344ae24501 ("igc: Add support for TX timestamping")
+> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
 
-> [...]
-> diff --git a/arch/x86/net/bpf_jit_comp32.c b/arch/x86/net/bpf_jit_comp32.c
-> index b18ce19981ec..f2be1dcf3b24 100644
-> --- a/arch/x86/net/bpf_jit_comp32.c
-> +++ b/arch/x86/net/bpf_jit_comp32.c
-> @@ -2600,8 +2600,7 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
->  	if (bpf_jit_enable > 1)
->  		bpf_jit_dump(prog->len, proglen, pass + 1, image);
->  
-> -	if (image) {
-> -		bpf_jit_binary_lock_ro(header);
-> +	if (image && !bpf_jit_binary_lock_ro(header)) {
+No obvious issues found while testing.
 
-I find the "!" kind of hard to read the "inverted" logic (0 is success),
-so if this gets a revision, maybe do "== 0"?:
+Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
+Tested-by: Kurt Kanzenbach <kurt@linutronix.de> # Intel i225
 
-	if (image && bpf_jit_binary_lock_ro(header) == 0) {
+Thanks!
 
-But that's just me. So, regardless:
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
+-----BEGIN PGP SIGNATURE-----
 
--- 
-Kees Cook
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmXSJNMTHGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgqkID/9avd4FGLjcAGfKe3PWGU1PuFudMwS2
+Vz9yhldxyFlslH+r+ZfuTj4M86zxqisARzwRUMJnYeTL9cMsvNeJawndgmj4C95G
+eivrJ5Rb8hq7E3+9GYUa83MJSI6o10fl6/ITV2Aj2aia/tayNO+BE2OjedzCScRi
+b3euEN2EmD6kknJNSXj4aPMew4ZJHAjBxZBC6O1uHCGA8W17TVi/MsGUn0j4wmZj
+WcaLhjHVS+hWB+1GPDIc/zJiwb8/ngz5XMJEEd00CLqaSSyVxpJN3K6Vlh8DlSoJ
+SFw6m341bWupluxys8jNO6dV7cejuRMZER11EjY8FeU2BJzclnHDGGikLEvy9JEn
+fQyfuOx/9WlQmHS1paP4Tddq+vqOEn0rrHKrAxuKPn5kE4Opy2RNgLfTzsolKGMb
+zv5LPKqV17VdY5kx+6nh3/Ii2OksoyR/7BUquc+X0A33DE3sBfNe1TuYHpQ0PAqR
+soq9P0JH8GWySm69txSje5I2kcCVcrHIZPw6lXoRuFxhzUi9h/NCGMuRHYvt8fdo
+ll0lb2nB2DO2tRhhijN4ZvHPMtkAse5BLMNN6y6qzinOnt70VmSOi4uk5W2/lBQ/
+vkeT8pnbvLNxpSkx94tKDuFwgOBVScgzLXYCgav+5GWn9dSAFBVXJUWdlQak7gDO
+EtiRovM4mz0W/Q==
+=qF6P
+-----END PGP SIGNATURE-----
+--=-=-=--
 
