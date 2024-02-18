@@ -1,139 +1,106 @@
-Return-Path: <netdev+bounces-72704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF95F8593A0
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 00:49:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96AEA8593FE
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 03:12:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 118C91C20C26
-	for <lists+netdev@lfdr.de>; Sat, 17 Feb 2024 23:49:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 373AE1F21B08
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 02:12:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF0127FBD2;
-	Sat, 17 Feb 2024 23:48:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08813EA4;
+	Sun, 18 Feb 2024 02:12:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="CPzKeDAm"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="Qc4KDQxF"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8EDB14A86;
-	Sat, 17 Feb 2024 23:48:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 014CA15C0
+	for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 02:12:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708213734; cv=none; b=uTSNVvhH67K+uli1ofBBtQC3BLBQXFp1Y6C/nXXz3irFXqpU2gs48s2hS3V1ugZ1tlipvFeQ5NnC3X0g9dPtkywsMJisl/lXRD+gAyuLpGhrd8838LPeMZia7NWrlsJFg7kLUFAR7U8sLQPjYpg3r7qivO1ocyHWkBVatB/Fmjg=
+	t=1708222361; cv=none; b=l3ixsqlMsJoIzS7keNNxSv1IqMnd5NF2iNHFV8H67HwmhrirBNGSkbx6LLSHbdqb4g9EGg3/KBGyoZ5K1dkY1Z1ToUzl6DVMvEBHUlSwbEiROvctUfbwMxBNbT6wQFGTkcLZnSbBJtY8TovFZWKFTk3uh4z3hcTqIpJeFnSHcyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708213734; c=relaxed/simple;
-	bh=1g5oK+yNBXpoPw5N07d7muSFkpE6uSYQn/NJNDkMbAg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JVfeuBnyn9KRrD98uRK9whytyn1oHL99zffE/3LEBnrYFy0Y1/ow71p0SCbpFZ32ANJFBD3YJxC17v6Ma1HK0J+dDCv1cuMOvAo/m06ZHqbw02LtfRBEmKhePPSQ1MEosgnXXZ7wOj1QRrabC7oojC8qQW0A9nsWVj39xY9WpB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=CPzKeDAm; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=FMxvckYePbS1jnoZ5oG6Cm4EypY4Dw/pbZjxC0ZP4yU=; b=CPzKeDAmryQgULRVfeg9ZXkTij
-	sV5K4ExtKLQtMWkXBHzzTZujVOaGPUXXKbK1euewjW9lDjsFSr2E4PYT7u1SBA71pkRVI3/BqoQ8P
-	Yt5mKJuEZUeqa8K0hBbIQZ8PE6rcAY9Yy7FYlnkXwYiyuiFMNbNKcJjI+wuUfEVpT7gA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rbUPw-0085vH-Pp; Sun, 18 Feb 2024 00:48:24 +0100
-Date: Sun, 18 Feb 2024 00:48:24 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Michael Hennerich <michael.hennerich@analog.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Kevin Hilman <khilman@baylibre.com>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	UNGLinuxDriver@microchip.com, Peter Geis <pgwipeout@gmail.com>,
-	Frank <Frank.Sae@motor-comm.com>, Xu Liang <lxu@maxlinear.com>,
-	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
-	Andrei Botila <andrei.botila@oss.nxp.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Michal Simek <michal.simek@amd.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Wedson Almeida Filho <wedsonaf@gmail.com>,
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <benno.lossin@proton.me>,
-	Andreas Hindborg <a.hindborg@samsung.com>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Robert Marko <robimarko@gmail.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	David Epping <david.epping@missinglinkelectronics.com>,
-	Harini Katakam <harini.katakam@amd.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-amlogic@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, rust-for-linux@vger.kernel.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [net-next RFC PATCH 0/3] net: phy: detach PHY driver OPs from
- phy_driver struct
-Message-ID: <a8106d02-e3b0-4f23-8c76-52840493dff2@lunn.ch>
-References: <20240217194116.8565-1-ansuelsmth@gmail.com>
- <a804e21d-fe1d-41e8-90fd-64b260c9bcc7@lunn.ch>
- <65d140fb.5d0a0220.81be3.7138@mx.google.com>
+	s=arc-20240116; t=1708222361; c=relaxed/simple;
+	bh=9tkQ6ztc+FIsC9tnahmvOipvbwqXOtWa5lRD8Xz+7sg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=e7DF+4VnTHIJylNqUomr2WByaxUbUDtZheja+KCRTMMjj//0JPQRZN2JCfVSn7dpa7cIIZty1O1G6m53PMOz9XlEF+n5CoyaYkwxD/fpUDmF+eo8Av8TFw7ktyr1n5DoIUcReL6V1WOwCuABXl4bSXWLT0ILMfGXZK/a2Tcq3nY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=Qc4KDQxF; arc=none smtp.client-ip=209.85.215.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-5dbcfa0eb5dso2965359a12.3
+        for <netdev@vger.kernel.org>; Sat, 17 Feb 2024 18:12:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1708222359; x=1708827159; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/xYJJlqKaHO1pkncPtZXJXYEbaIAzOI1fFVt20ftCrw=;
+        b=Qc4KDQxFwbAS0af8uTL3Apu9V1S5UjAu/NoHa1acLjRvEaObBRj6eJ2u+7/3FSDpLQ
+         ImEJuzvAB/UNRW43tXC3z2ZUftA5CblLxMQeqBK7P5vGYqxdRvwRv85jN0AFuUJDwU+r
+         MUpBgCgjCzZ12SQ89U6f7QTDdG6Sq1O42YU2KDaYoozGQj29HTr6PbduQ4C2UNmTQY/J
+         bcO5kCEuRWOocs6z6REZol1/g14EXZAzDBA0MiHR0RGwqOqtUMeT1EMTQO8V4MbdW3mO
+         T3bVWEQiglQ9g4Q0AbC66DVw5mCpKQULZm9iJSAmrGnGGdhnV5OZKCnPm3zu4gYRUkv+
+         iFew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708222359; x=1708827159;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/xYJJlqKaHO1pkncPtZXJXYEbaIAzOI1fFVt20ftCrw=;
+        b=eeWKbwR5LpD4opFNWs3WIv5BHxFTvF23aoIWXX6iKAeH3/frrfaXMx149zL79rsYsG
+         bcKAWc9kgcmYJXFFsTtEohSHHxJ2dzfwTfGWvuLGvyLqn+UdALatpUzYDtefoOqs+hx+
+         w2QpQwejWZQfk6251+eFv6k0N52kJR/VsXjW+DJMk33G/cpmykxsJBr+XFtfq/nr5/uw
+         Xx3khNw3afm5zejrBwdEE5Aw+EhQKIGFh2yiVknkzuH3IPk4gGTUVMgJ+ibbmD4Wqa4W
+         PPgyk7EGZTYfMPxKG7LmEISwhaT6wIbASSyG+kLD1ev8QgZtXaXYVU/1lFU42nTtUGSW
+         1VCg==
+X-Forwarded-Encrypted: i=1; AJvYcCWk90jQsJEi+sWA8tMFDbzstCjpUPfObnTKDfb6+Nw0DrFLwnnUDSxZbDzJMlMmyrzysP45ZeevLhGOfvq/X/hmzLrHvT/5
+X-Gm-Message-State: AOJu0Yx6IrD5q/rmPyM0w8faotvFxJatrR+opdHCvuzcUr+CYnngmlzV
+	uWp8D6lsU+V6Dh5s4CiV/0HB6TFPkR02QWA7mUwJHebe+rOkPBmLaIHkOibCM7M=
+X-Google-Smtp-Source: AGHT+IGAjZZo/5b/mALKX6lQInelzixTc/kjkrQyfIAb0XUOF35zD515tWDY7c0DXDlJSVvT3CY5Lg==
+X-Received: by 2002:a17:903:1105:b0:1d9:8832:f800 with SMTP id n5-20020a170903110500b001d98832f800mr10146861plh.8.1708222359202;
+        Sat, 17 Feb 2024 18:12:39 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id v4-20020a170902b7c400b001dbcfa3dcdesm1356882plz.33.2024.02.17.18.12.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 17 Feb 2024 18:12:38 -0800 (PST)
+Date: Sat, 17 Feb 2024 18:12:37 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: David Laight <David.Laight@ACULAB.COM>
+Cc: 'Denis Kirjanov' <kirjanov@gmail.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, Denis Kirjanov <dkirjanov@suse.de>
+Subject: Re: [PATCH v3 iproute2] ifstat: convert sprintf to snprintf
+Message-ID: <20240217181237.449d2f59@hermes.local>
+In-Reply-To: <369729fa83564583acbb5c7903641867@AcuMS.aculab.com>
+References: <20240214125659.2477-1-dkirjanov@suse.de>
+	<369729fa83564583acbb5c7903641867@AcuMS.aculab.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <65d140fb.5d0a0220.81be3.7138@mx.google.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> Yes, it was done to limit the patch delta, if I had to account for the
-> tab for each new section we would be in the order of 2000+ changes I
-> think.
-> 
-> > >  64 files changed, 737 insertions(+), 291 deletions(-)
+On Sat, 17 Feb 2024 17:51:01 +0000
+David Laight <David.Laight@ACULAB.COM> wrote:
+
+> From: Denis Kirjanov
+> > Sent: 14 February 2024 12:57
 > > 
-> > These statistics are not good. If you had deleted more lines than you
-> > added, then maybe it might be an O.K. idea.
-> > 
-> > Sometimes KISS is best.
-> >
+> > Use snprintf to print only valid data  
 > 
-> Well IMHO these stats are a bit flawed, the additional code is really
-> just extra check if ops is defined and the new .ops variable in each
-> phy_driver.
+> ... to avoid potentially overflowed the temporary buffer.
 > 
-> If you check patch 2 and 3 you can already see some code is removed.
+> Also probably worth using scnprintf() to avoid another change
+> when snprintf() is removed (because the return value is dangerous).
+> 
 
-Yes, the problem is, it probably needs another 50 patches to remove
-all the duplication. I have to question, is that really going to
-happen? Are you going to keep working on this until every driver has
-its duplicates removed?
-
-It probably needs some tooling to help. Something which can decode the
-object file, and tell you which ops structures are identical. That can
-then guide you when editing all the PHY drivers.
-
-     Andrew
+No.
+Read the thread, return value is almost never used in iproute2
+and where it is, the checks are in place.
 
