@@ -1,58 +1,78 @@
-Return-Path: <netdev+bounces-72745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE6B58597C9
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 17:45:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 989FE859898
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 19:36:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62B062815E6
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 16:45:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C06551C20BE3
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 18:36:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8674B6E2C8;
-	Sun, 18 Feb 2024 16:45:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E0596D1AC;
+	Sun, 18 Feb 2024 18:35:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LUNQEHws"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gdawcmHJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A353456B82
-	for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 16:44:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3AB86341A;
+	Sun, 18 Feb 2024 18:35:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708274701; cv=none; b=vFDVWKNTAg87NY48Ak93ER1lOuuLp2C5cwWs9kNwnotPbRpzBHsbZEMK3O7/jfQHrizVi1beMAxbXcDQZS3uW7Uz+wohtwWfgpHFRhxqVM4YtHqcCl9ZKCjHU2xUA1xm/tYv+qjHQoFdsoceycrM6ZfZVOU37N2+F9EGtv4ZsIA=
+	t=1708281357; cv=none; b=W6hnesHSjSOww95oaCOO1P4AQdA+uxvdpugPOyOorfLmPXKL2c0u3SddM9isSYNmU6Hr4Ao/h3mvyZ2aQ4qs2l/LtCH+2m/3kbSZyIWf2WvWJYnA2QdQ+4g+5+PfQ01Q2dB6uK6huxJBkss66ToE2lsRpc5eVFHN4L0b/6tSVdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708274701; c=relaxed/simple;
-	bh=gS33TqvG8CRdDp2vJ6TOWYItc/Fu3Q5MJs2/8z5Bu9E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tp3b9qFeVfHTMQshf/FKzAGoI6PKHZUO9h3OUqgv/YdqdJAZYhdUeYWaXwHHEBBqISUenkZQKyfNQI9IZ28XgbWXaac1lA3vMryzQXStcgcKVZA2t1DIGRybOeZr0mLcOE9l+IS8w72LQXLtNFP5ytnIiiMXpXhAWIauVqzCwmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LUNQEHws; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=zRMqQh4DR544URfb7qfNyoYJQZbPzkp0u1iTv0wvWTQ=; b=LUNQEHwsIJ998jYiVYO77AQSVK
-	1oo2d0kWH0j+fclA/H5g23joMJmztEXr5HIPBz4I3QflwkNlASBKUbCcFCEUzDeBhvEUgoZYq38Jj
-	hd6Krs37xLesV8QV0D4oNo1s1WRIKQnpMCiFp4zstd0YKRzRduLuxzkFbyXsogna+HDw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rbkHf-0088EZ-3E; Sun, 18 Feb 2024 17:44:55 +0100
-Date: Sun, 18 Feb 2024 17:44:55 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, maciej.fijalkowski@intel.com,
-	netdev@vger.kernel.org, mengyuanlou@net-swift.com
-Subject: Re: [PATCH] net: txgbe: fix GPIO interrupt blocking
-Message-ID: <33eed490-7819-409e-8c79-b3c1e4c4fd66@lunn.ch>
-References: <20240206070824.17460-1-jiawenwu@trustnetic.com>
- <9259e4eb-8744-45cf-bdea-63bc376983a4@lunn.ch>
- <003801da6249$888e4210$99aac630$@trustnetic.com>
+	s=arc-20240116; t=1708281357; c=relaxed/simple;
+	bh=5fuux1HAirtBiYVp43TmFsANlPjwHWYFEx8MXM16p6k=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=it+V73VItZ60aThscE/OC4WhdPeX+PhnZ02ZI7p7LXdWWH1nAxAqg5VI8dzLqtgTfXRt8YwMbs+FVoXF23GGnsy3E/45eQz/l2hGb053lLooAMtYp4C3qg4677u7xMXJuKTzQaxCebeNjtdHQUZuX2yfmisGNCzcVxSSYtnbydU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gdawcmHJ; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-42ce63b1d30so40096361cf.3;
+        Sun, 18 Feb 2024 10:35:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708281354; x=1708886154; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rtlFK2N47ATXOiP1HgXvAlQ7VAuyaeK7nB3D2FRWvkg=;
+        b=gdawcmHJzaU3npzbZ9iGce4JBxkG0GxOfjtDXK8663kOMUiYKB1w1DXP+L1NZVCcwW
+         L1aZlXHt9b/P0LM0wowItyL4O55UsZh6+6vos3a8BQOQCKzwxY/xEWEWYC1ZfZ3VALCP
+         /Rv+FFpgvUigAVF8XxIWVNHprsPl2184zLVr+6dYIO1Odiem1PrzE6RlE4gKPjGY8PdC
+         KWs6k/3d1f2EJozq77WJNtyMPpZV4XXfYAgpWPaEHjX/dSO3/GZ2PbszxObhur89OQ6H
+         2clbms3LnOwgVsWKLnWiePjZcOK+Itkb75QtIIZZw3r8F32GZIM84PQ5ul5rzn9x0iVK
+         eXKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708281354; x=1708886154;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rtlFK2N47ATXOiP1HgXvAlQ7VAuyaeK7nB3D2FRWvkg=;
+        b=fQMJyFmEP0n+EKUHx5V0TLKi0Sf4IlDn9WZVTWfFDv4xkvI8r84z+xvuRse8BfEg+V
+         2W1LJB5ucOXvpH00Oq9Tpepkh/qKkHurp2A6lVn20nWY7uf4rtp0j94FwwtwYCoEOTzy
+         WQ0PC18ND1weCgOJag80EAX8a5BojWwPNKBl8pD0yTTbPRgfIJe7dpzU7PC+X3lhcGrz
+         9wa8DAe8F1TIDDwkMAiNd8jJfOBDI02MfHm9BCp+Dsyx/1pr/JoqvQzkhGrLLdqgqWG9
+         Tb1EM/iu04h67xEAyfhmmUlBjhOx1F8ZCTXNXIdINXkQdITfHVKDicQ2klQN8Brkrvav
+         +h+g==
+X-Forwarded-Encrypted: i=1; AJvYcCXpdJ2NZo5fuOKG7rKBiYwVpthdKZwDn69bS09xf3hdB+Jl89LlWHZIJVeglZbrONGlKtIn/FkXH3L/APYM08uj0VqD8/XtWk3fHdkv
+X-Gm-Message-State: AOJu0Yzs9xirdttn/3UTMQMPO8KhdJnwwfxQRArVNxp4jWh7yzK1TTYr
+	pjQtXyZFFL1jiF8BFFap3D40tqwy/x4FCZIaC02anHBBD5Z7Qe66
+X-Google-Smtp-Source: AGHT+IEsGtbyPHD9+xbewDdwoJ8fl023wuuWU2V8e7302Cwwd7xV+PRUpoDCmgLcjwR5VsR6WbToDw==
+X-Received: by 2002:a05:620a:1928:b0:787:54a5:9047 with SMTP id bj40-20020a05620a192800b0078754a59047mr4612171qkb.34.1708281354320;
+        Sun, 18 Feb 2024 10:35:54 -0800 (PST)
+Received: from localhost ([2601:8c:502:14f0:acdd:1182:de4a:7f88])
+        by smtp.gmail.com with ESMTPSA id c9-20020a05620a11a900b007859c6a3a7esm1764078qkk.105.2024.02.18.10.35.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 18 Feb 2024 10:35:53 -0800 (PST)
+Date: Sun, 18 Feb 2024 08:35:51 -0500
+From: Oliver Crumrine <ozlinuxc@gmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net: copy routing table more efficiently in
+ rt_dst_clone
+Message-ID: <xlabdyc4izitfdfpuoy2p2hi3abiq4mrrgizdqz45k7xeftbsg@ee6jgncdaqg7>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,136 +81,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <003801da6249$888e4210$99aac630$@trustnetic.com>
 
-On Sun, Feb 18, 2024 at 05:04:52PM +0800, Jiawen Wu wrote:
-> On Tue, Feb 6, 2024 11:29 PM, Andrew Lunn wrote:
-> > On Tue, Feb 06, 2024 at 03:08:24PM +0800, Jiawen Wu wrote:
-> > > GPIO interrupt is generated before MAC IRQ is enabled, it causes
-> > > subsequent GPIO interrupts that can no longer be reported if it is
-> > > not cleared in time. So clear GPIO interrupt status at the right
-> > > time.
-> > 
-> > This does not sound correct. Since this is an interrupt controller, it
-> > is a level interrupt. If its not cleared, as soon as the parent
-> > interrupt is re-enabled, is should cause another interrupt at the
-> > parent level. Servicing that interrupt, should case a descent to the
-> > child, which will service the interrupt, and atomically clear the
-> > interrupt status.
-> > 
-> > Is something wrong here, like you are using edge interrupts, not
-> > level?
-> 
-> Yes, it is edge interrupt.
+Instead of copying field-by-field, copy the entire struct at once. This
+should lead to a performance improvment in rt_dst_clone.
 
-So fix this first, use level interrupts.
+Signed-off-by: Oliver Crumrine <ozlinuxc@gmail.com>
+---
+ net/ipv4/route.c | 16 +---------------
+ 1 file changed, 1 insertion(+), 15 deletions(-)
 
-> > > And executing function txgbe_gpio_irq_ack() manually since
-> > > handle_nested_irq() does not call .irq_ack for irq_chip.
-> > 
-> > I don't know the interrupt code too well, so could you explain this in
-> > more detail. Your explanation sounds odd to me.
-> 
-> This is because I changed the interrupt controller in
-> https://git.kernel.org/netdev/net-next/c/aefd013624a1.
-> In the previous interrupt controller, .irq_ack in struct irq_chip is called
-> to clear the interrupt after the GPIO interrupt is handled. But I found
-> that in the current interrupt controller, this .irq_ack is not called. Maybe
-> I don't know enough about this interrupt code, I have to manually add
-> txgbe_gpio_irq_ack() to clear the interrupt in the handler.
+diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+index 16615d107cf0..ebb17c3a0dec 100644
+--- a/net/ipv4/route.c
++++ b/net/ipv4/route.c
+@@ -1664,22 +1664,8 @@ struct rtable *rt_dst_clone(struct net_device *dev, struct rtable *rt)
+ 			   rt->dst.flags);
+ 
+ 	if (new_rt) {
++		*new_rt = *rt;
+ 		new_rt->rt_genid = rt_genid_ipv4(dev_net(dev));
+-		new_rt->rt_flags = rt->rt_flags;
+-		new_rt->rt_type = rt->rt_type;
+-		new_rt->rt_is_input = rt->rt_is_input;
+-		new_rt->rt_iif = rt->rt_iif;
+-		new_rt->rt_pmtu = rt->rt_pmtu;
+-		new_rt->rt_mtu_locked = rt->rt_mtu_locked;
+-		new_rt->rt_gw_family = rt->rt_gw_family;
+-		if (rt->rt_gw_family == AF_INET)
+-			new_rt->rt_gw4 = rt->rt_gw4;
+-		else if (rt->rt_gw_family == AF_INET6)
+-			new_rt->rt_gw6 = rt->rt_gw6;
+-
+-		new_rt->dst.input = rt->dst.input;
+-		new_rt->dst.output = rt->dst.output;
+-		new_rt->dst.error = rt->dst.error;
+ 		new_rt->dst.lastuse = jiffies;
+ 		new_rt->dst.lwtstate = lwtstate_get(rt->dst.lwtstate);
+ 	}
+-- 
+2.43.0
 
-You should dig deeper into interrupts.
-[goes and digs]
-
-https://elixir.bootlin.com/linux/latest/source/include/linux/irq.h#L461
- * @irq_ack:		start of a new interrupt
-
-The comment makes it sound like irq_ack will be the first callback
-used when handling an interrupt.
-
-static inline void mask_ack_irq(struct irq_desc *desc)
-{
-        if (desc->irq_data.chip->irq_mask_ack) {
-                desc->irq_data.chip->irq_mask_ack(&desc->irq_data);
-                irq_state_set_masked(desc);
-        } else {
-                mask_irq(desc);
-                if (desc->irq_data.chip->irq_ack)
-                        desc->irq_data.chip->irq_ack(&desc->irq_data);
-        }
-}
-
-So the comment might be a little misleading. It will first mask the
-interrupt, and then ack it.
-
-/**
- *      handle_level_irq - Level type irq handler
- *      @desc:  the interrupt description structure for this irq
- *
- *      Level type interrupts are active as long as the hardware line has
- *      the active level. This may require to mask the interrupt and unmask
- *      it after the associated handler has acknowledged the device, so the
- *      interrupt line is back to inactive.
- */
-void handle_level_irq(struct irq_desc *desc)
-{
-        raw_spin_lock(&desc->lock);
-        mask_ack_irq(desc);
-
-So when handling a level interrupt, mask and then ack is the first
-thing done. And it is unconditional.
-
-edge interrupts are different:
-
-/**
- *      handle_edge_irq - edge type IRQ handler
- *      @desc:  the interrupt description structure for this irq
- *
- *      Interrupt occurs on the falling and/or rising edge of a hardware
- *      signal. The occurrence is latched into the irq controller hardware
- *      and must be acked in order to be reenabled. After the ack another
- *      interrupt can happen on the same source even before the first one
- *      is handled by the associated event handler. If this happens it
- *      might be necessary to disable (mask) the interrupt depending on the
- *      controller hardware. This requires to reenable the interrupt inside
- *      of the loop which handles the interrupts which have arrived while
- *      the handler was running. If all pending interrupts are handled, the
- *      loop is left.
- */
-void handle_edge_irq(struct irq_desc *desc)
-{
-        raw_spin_lock(&desc->lock);
-
-        desc->istate &= ~(IRQS_REPLAY | IRQS_WAITING);
-
-        if (!irq_may_run(desc)) {
-                desc->istate |= IRQS_PENDING;
-                mask_ack_irq(desc);
-                goto out_unlock;
-        }
-
-        /*
-         * If its disabled or no action available then mask it and get
-         * out of here.
-         */
-        if (irqd_irq_disabled(&desc->irq_data) || !desc->action) {
-                desc->istate |= IRQS_PENDING;
-                mask_ack_irq(desc);
-                goto out_unlock;
-        }
-
-       /* Start handling the irq */
-        desc->irq_data.chip->irq_ack(&desc->irq_data);
-
-So if the interrupt handler is already running, it will mask and ack
-it, but not handle it, since there is already a handler running.
-Otherwise it will ack the interrupt and then handle it. And it loops
-handling the interrupt while IRQS_PENDING is set, i.e. another
-interrupt has arrived while the handler was running.
-
-I would suggest you first get it using level interrupts, and then dig
-into how level interrupts are used, which do appear to be simpler than
-edge.
-
-	Andrew
 
