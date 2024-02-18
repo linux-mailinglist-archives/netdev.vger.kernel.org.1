@@ -1,131 +1,112 @@
-Return-Path: <netdev+bounces-72784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A7E9859941
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 21:34:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CE96859944
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 21:41:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CE2F1F21266
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 20:34:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C3341C20B1F
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 20:41:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AF3529405;
-	Sun, 18 Feb 2024 20:34:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33FD96EB78;
+	Sun, 18 Feb 2024 20:41:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="N6WJbVIn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HoUX0kco"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D84C51DFC6;
-	Sun, 18 Feb 2024 20:34:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BE1365BDB
+	for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 20:41:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708288482; cv=none; b=iRjOMDl3yi1U2fYzmV3TG6YbrKsEw9UFBu85eq7nnGfJMcjPaCiVI2TU6jLoul3XrhozuRY7r0SN/lyERxILVte2ZaoR2qYIyOvm8RqVIAwgjZBsSswHoEBiuDUBXANc7mFbFhTsITnWXRtlHpBXRsXnmdqUUO/ba5+plR4xuSU=
+	t=1708288875; cv=none; b=KfkhXOd4rqNuLdu11dvGHTBDrJRyfkmNmLJ/rRFhXxkRW3PDYdOiKL+r9PgytjagdF/I6BaRbwSwA4vZNQLXMOw+iyl7iPOsTdVNU2nCKJ1I2At1bvk6wzGejLf+HYrrEQzd0mrbuyaK0Klc9Zrd5VRSJUGccIx9/7nILOpYdR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708288482; c=relaxed/simple;
-	bh=VQonj/4n6YOIyDcqAu/3JWAnqoTmC0Luv7Gtzb6tJw8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=odoSTav3w96mYdOFg70EkWuUu7iM6lvMbOp8pCoR2hrbMQWQbYXVucL1YtL0gw298Sd9RNb08qA+TpfpAfHtDnIPkCMfKIph5EISi04mHytNhqW0dL5CQppALRnyqUeb0wA8dBv+uXUVME14CPILdeQ7vvxFB3iO2m7izjv4NqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=N6WJbVIn; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=/rftamFRRBAUT1z8uCrB/9+p1y/ghilxwuwlwd17RCE=; b=N6WJbVInqWOizdsWAtbf+qsW5M
-	1ERWmkSIvBU0SPEwRTnZFqGKGCcGu+nf/UfEYQGpshmc1xro50gvk4UAVt3amEIYEJyG5xptdC3h9
-	RFoP/pRHFn6Y8of7feDKeGrzGGU6eGkmIODW2KCP2d7RPiuGjSDm1S3xFhn+FgMvQpzH6QcqoUp6+
-	wb4s/KyKtWGQu8ZtWSVB69JJYFlxVi57bxTJcGq5kR9dhOYX77z5jmJ+xPlRchLln5LVYapU2VYlU
-	Syt4BMqzV/cGdePvc3KmLGY+rguAdZ/RXdz8MQS3NNyuxIKTyJ0QZcE2vXKTJ/UMEJGqaTPC2hUz7
-	ft4FlwjA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59058)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rbnrg-0003eJ-1o;
-	Sun, 18 Feb 2024 20:34:20 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rbnrc-0007i9-Ds; Sun, 18 Feb 2024 20:34:16 +0000
-Date: Sun, 18 Feb 2024 20:34:16 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Robert Marko <robimarko@gmail.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
-	Nipun Gupta <nipun.gupta@amd.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Puneet Gupta <puneet.gupta@amd.com>,
-	Abhijit Gangurde <abhijit.gangurde@amd.com>,
-	Umang Jain <umang.jain@ideasonboard.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next RFC PATCH 1/6] net: phy: add support for defining
- multiple PHY IDs in PHY driver
-Message-ID: <ZdJpyGkFRiRufySw@shell.armlinux.org.uk>
-References: <20240218190034.15447-1-ansuelsmth@gmail.com>
- <20240218190034.15447-2-ansuelsmth@gmail.com>
- <ZdJbciylnw8+ve8V@shell.armlinux.org.uk>
- <65d2613d.170a0220.2eb48.a510@mx.google.com>
- <829f8c7d-c09b-4264-818a-3f7b047ec44f@lunn.ch>
- <65d2682a.5d0a0220.3fef2.efe4@mx.google.com>
+	s=arc-20240116; t=1708288875; c=relaxed/simple;
+	bh=VomCIMguIfae0jMC4hNojAGYa2iIv1qvMX2kVJvTBNM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=A2HI8mHRtRpzTbFFfkrNno5DFswmH86MzLyb7QQJ42yG/d6ygI7pTTNbqALoty1aWNk8HbOUfT5iXcJrk7yeBsQGk+Fbji4pJBjq1lsB1iOAwpnqqEMYvn/hMS8tsgCQOkLmAgGMmS1qHzVcPHY0DMMtSyxVGb03kzySr8qMDLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HoUX0kco; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-50eac018059so5340796e87.0
+        for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 12:41:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708288871; x=1708893671; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3H4dvkKp/+4juaV0Ok4MP1DZkQEwym2PH6OcBeCk0GI=;
+        b=HoUX0kcohhwhsosrQMQKbcVy3uKYxDk8QKblCXm1UNHpNgxNuH/6/1Q2hJw3EXXoqw
+         gDG1SvBzQQJ+612KakaVcNIbJ6I0mh6DbqUuzwKKbGnY0isCFXCJgUZj22p3orveR2qW
+         SULysN2TW+GlKRT/mzwHtiiNpGYbss1ACoAWkaXoRavde+/dlGbiicDn570Gz8o7CuUz
+         +eXT0Xoi8z6xk6MSdAkH7AaZ6fIvvY/B7XaPvI1U5CGE3SgYWurNtnQU0XtehBTw2q8N
+         WUssY3jghe1p39YF9QXWN7644CAMa1WgweNxnp0gYrl5Pc3R4lBgXtBu8spBEqCHoU9x
+         qIYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708288871; x=1708893671;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3H4dvkKp/+4juaV0Ok4MP1DZkQEwym2PH6OcBeCk0GI=;
+        b=MqXeTC44sZ5HIQ9CIFar8zKvDd3eCDlp6Qdfq4234obhlOjq/jcoU75m69+3n+d5KL
+         FzZTj6LaUP/xJO7pkI4snMt3RKJoeYQZmycE/mGu8Od1ge5XjRd+fxJmKVEKywVVy6J7
+         AZNmvZRL4qbNOsDwtv4F4siBQ3C5hMZx87BBFGEoOzUgvtZh9etnN7/LD4mt9ylFSXPG
+         4JlrffppKgAQrdUYUvX71j/CKpKk6Fvh/Y8+zn8awwSdcFXmSSiX1cK+BjxU/91S+FS9
+         PhZfzRjvzwZN3rBxdsSo19LIhAL+0RY1TlLds+s1JczPa7GkXHTKgoJ3fiIf4IoDlv7A
+         onGA==
+X-Forwarded-Encrypted: i=1; AJvYcCX1SSI2p9L3vXvEC0TDab/Im/4gZ1PhIMpQHhfws3Vj8bKzj1KejEFgmVSl/awUeuLXt0PTMNo0v4D1yvZIkV0gpm9xVW+m
+X-Gm-Message-State: AOJu0YxOc6R7zEdGEfuL2TvZMZALs0/LjeuSV76sg+7Sf/gyA2cIIWIw
+	uKIR0/tvGUHphDNEmrRf208tV8ehq1wBR1b/bgSA8W7epbQCUXy8
+X-Google-Smtp-Source: AGHT+IGxkWHT+fof7X3ZuAGgzthet/yETgCl2NlyjCwu5JAXLrXZ7rnv06rlQgAFx1GGNJh1YWN+vg==
+X-Received: by 2002:a05:6512:220d:b0:512:ac4c:abf7 with SMTP id h13-20020a056512220d00b00512ac4cabf7mr1687985lfu.65.1708288871336;
+        Sun, 18 Feb 2024 12:41:11 -0800 (PST)
+Received: from mishin.sarov.local (95-37-3-243.dynamic.mts-nn.ru. [95.37.3.243])
+        by smtp.gmail.com with ESMTPSA id w9-20020a05651204c900b005119fdbac87sm643711lfq.289.2024.02.18.12.41.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 18 Feb 2024 12:41:10 -0800 (PST)
+From: Maks Mishin <maks.mishinfz@gmail.com>
+X-Google-Original-From: Maks Mishin <maks.mishinFZ@gmail.com>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: Maks Mishin <maks.mishinFZ@gmail.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH] m_tunnel_key: Add check for result hex2mem()
+Date: Sun, 18 Feb 2024 23:40:26 +0300
+Message-Id: <20240218204026.7273-1-maks.mishinFZ@gmail.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <65d2682a.5d0a0220.3fef2.efe4@mx.google.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Sun, Feb 18, 2024 at 09:27:22PM +0100, Christian Marangi wrote:
-> On Sun, Feb 18, 2024 at 09:10:30PM +0100, Andrew Lunn wrote:
-> > > > > +	phy_dev_id = (struct mdio_device_id *)&phydev->dev_id;
-> > > > 
-> > > > Why this cast? Try to write code that doesn't need casts.
-> > > > 
-> > > 
-> > > This cast is needed to keep the dev_id const in the phy_device struct so
-> > > that other are warned to not modify it and should only be handled by
-> > > phy_probe since it's the one that fills it.
-> > > 
-> > > Alternative is to drop const and drop the warning.
-> > 
-> > Can you propagate the const. Make phy_dev_id point to a const?
-> >
-> 
-> Mhh not following, I tried changing to const struct mdio_device_id *phy_dev_id
-> but that results in memcpy complain (dest is void * not const) and
-> writing in read-only for the single PHY part (the else part)
-> 
-> An alternative might be to make dev_id a pointer in struct phy_device
-> and dynamically allocate a mdio_device_id for the case of single PHY
-> (else case). That effectively remove the need of this cast but I would
-> love to skip checking for -ENOMEM (this is why i made that local)
-> 
-> If it's OK to dynamically allocate for the else case then I will make
-> this change. I just tested this implementation and works correctly with
-> not warning.
+Added check for hex2mem() result to report of error
+with incorrect args.
 
-Why do we need memcpy() etc - as I demonstrated in my proposal, it's
-not necessary if we introduce a mdio_device_id within struct phy_driver
-and we can just store a const pointer to the mdio_device_id that
-matched. That was very much an intentional decision in my proposal to
-make the code simple.
+Signed-off-by: Maks Mishin <maks.mishinFZ@gmail.com>
+---
+ tc/m_tunnel_key.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
+diff --git a/tc/m_tunnel_key.c b/tc/m_tunnel_key.c
+index ff699cc8..9bb5c2aa 100644
+--- a/tc/m_tunnel_key.c
++++ b/tc/m_tunnel_key.c
+@@ -575,7 +575,10 @@ static void tunnel_key_print_geneve_options(struct rtattr *attr)
+ 		data_len = RTA_PAYLOAD(tb[TCA_TUNNEL_KEY_ENC_OPT_GENEVE_DATA]);
+ 		hexstring_n2a(RTA_DATA(tb[TCA_TUNNEL_KEY_ENC_OPT_GENEVE_DATA]),
+ 			      data_len, data, sizeof(data));
+-		hex2mem(data, data_r, data_len);
++
++		if (hex2mem(data, data_r, data_len) < 0)
++			invarg("labels mask must be a hex string\n", data);
++
+ 		offset += data_len + 20;
+ 		rem -= data_len + 20;
+ 		i = RTA_DATA(attr) + offset;
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.30.2
+
 
