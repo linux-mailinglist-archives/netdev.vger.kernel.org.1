@@ -1,77 +1,52 @@
-Return-Path: <netdev+bounces-72781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72782-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B79E285992F
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 20:59:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3324F859939
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 21:10:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F30BD1C20EA4
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 19:59:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C018DB21172
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 20:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE96671B3B;
-	Sun, 18 Feb 2024 19:59:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 868DD71B4A;
+	Sun, 18 Feb 2024 20:10:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R9nm3XZ0"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xbyrq3Io"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 212D31D689;
-	Sun, 18 Feb 2024 19:59:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C76426F50A;
+	Sun, 18 Feb 2024 20:10:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708286357; cv=none; b=dbFRJeJp5X+jR4qwu/rXwzr/QX2dooquFDXaFWA7dpD9amIeQhLRBHDbGLBFC9DLo7xEwJeDXcpJOlzaFiubVM4u6NmVm52rByxVGa/9wNHHf6Ma9IxDUbleC1SGNtFNVgJZ+jvf/mylwfBzZq5ViVB0lRA0QrPdrE4yMlpYqr8=
+	t=1708287049; cv=none; b=uc/Ne8VuAiW3TOUkrnYyGlNV7ZZKs+JFPIIPmIyZEYJ+cmA6CbscBdufUH7cBTG6rDlvowDYAQNmqfctljfON7OIAKy67T0e5kiVPhk29gHyqzUA46FZdXarSKFCLDEdyBGHd1i+YUtQhHLg36PrXXllX3enoTaJM7ojZmBMhIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708286357; c=relaxed/simple;
-	bh=mtYVGYqrcZThi0f8kTrPi2RQIdlBdDSazGXV27N9Y/A=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=csKqGOAfwPuOnQEINDgPnfNtIkYdaepsJ0qOv0Nl4lhwRH1jCOF8huAWWtP+zpXMeYloYkhe59mEwWYpmOvmaEMb8ytU2i7DjnugMebrFnUhpQWcHRf25OHPzE7FGhbsCjGcjFO5m4tbJXN7dYh3wehaK8aIen78i5W6ThzMcAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R9nm3XZ0; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-41261233e61so3040995e9.0;
-        Sun, 18 Feb 2024 11:59:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708286354; x=1708891154; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=o1OJWHwsLe5Ksr9YLKIBrbQqjA4TyujMo1Gkhq9EkQ0=;
-        b=R9nm3XZ0FKsP+eJFftNeoYo7kNOHseTmLftW/a3bxKkZH3ZyozhPMUNVBsWEdC9p9H
-         rYi/S+mXwDzqlbBl9WPb/jycGo9/cv60oUUafvwbM3z7py8HBF+sGv1G/yp5uLFPZtCU
-         ugvxxXHOpX+pEEoObwqAqI8+xw8+lAdbgKC1WEBwyQ6xcGRT38uczap1kwROXLxUoZkv
-         952A3Jrdsg6vJfdrho0MUyn2ThniQMUioR6Zi60Hdlr25b0qDc/nqVRHw6A8jWo2l3Bm
-         /62cEV80yjc1EBQ1GF0l3yhR9Jr7dmw6hgqCrXaZZvPz1EAgseQEpohhPsYWJgD0+KdF
-         mVVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708286354; x=1708891154;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o1OJWHwsLe5Ksr9YLKIBrbQqjA4TyujMo1Gkhq9EkQ0=;
-        b=U9WLhVNMwyoSGs1tWy/30gOcae4uwD6NudsFeUAbK5zVZm+CiQZygjoB0KrAqP5qQh
-         ReA+YqYLz+XqI99ZRsL6W9kwA7mzAj9Gv01iHlp9OxlPPkf3bsMrIDWW4f7YaF4QVvlh
-         rOHUGoK8ZO2rqE1tXTW1oZBnBBTJtf3sOKcYqUGevvKfXWgHSGMdc8rI6WRJPYfdPEDh
-         0fBRKWjesQsymsdsWwUakeKahkBVD53Ip1F94yfZ6lz48ri/DEXOzqb6vntRhhiGbcKp
-         vMUPKNB6tiREy/87jwj1w2MQDu1WV4jT2tkx9wldmQ4s+11ZBS49rYFMGU6VE9l1behr
-         3fnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWbCcsCbrIDpzmJySq0AMmV23R1EdHdaqcbN62kCVaZvCEEQz6LnGKLT80Rh6ATJB1ILMOMwp033oYrlbal8CCFifjgQ7GbcUeXCpvaW5ELGMA1mSPMcAQ7Bf1Qaxv/5ogBuIkJ
-X-Gm-Message-State: AOJu0YzNDtW/oZXk3aSkOoMKB4hu4h9N5KCUm+LYT6YfAcC1JmJmGGKs
-	N1j/Pa0+dPVX7mOgIK1Z+Lfb0h9lrLKFNVfGAWLTarU+L0ycfp8T
-X-Google-Smtp-Source: AGHT+IGsD53MPPTmkciafnCOHdqyJw/fXy28ZlLmotusNidntZcAAn8ik0eUsF3bO+U0JObvC+/pLQ==
-X-Received: by 2002:a05:600c:4f8a:b0:412:4731:a5e9 with SMTP id n10-20020a05600c4f8a00b004124731a5e9mr5932473wmq.4.1708286354252;
-        Sun, 18 Feb 2024 11:59:14 -0800 (PST)
-Received: from Ansuel-XPS. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id u12-20020a05600c19cc00b0041061f094a2sm9261097wmq.11.2024.02.18.11.59.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 Feb 2024 11:59:13 -0800 (PST)
-Message-ID: <65d26191.050a0220.8ac8c.1e41@mx.google.com>
-X-Google-Original-Message-ID: <ZdJhkjb7kM462GYD@Ansuel-XPS.>
-Date: Sun, 18 Feb 2024 20:59:14 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	s=arc-20240116; t=1708287049; c=relaxed/simple;
+	bh=i+xWDdqTYFZ/AR5kqHImC82hQFi4jBPr+icERKIWjEY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iBnmmrz6hcnTkelkMNCyoEdiNp5y2ECjaws2JKP1bRmMVgFTvpgnTCpuEVvfQgRsTeDOTFgFQTfDSHrIP9+nzVbMYe9osduXl6+Y4GYu3uf5y61FXCyg6RC703iwio2SSoMiRYZCgAFWc7Yd/K41gpX3Rigg7BB2wi889Npamkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xbyrq3Io; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=cBNrlmPxjYQsSSYlAltbdkKldOD3v/VTfy5t8AAGGBI=; b=xbyrq3IoXdzl0gD7S8ZtWI42Dd
+	p/o2vtqtuCPgaugkWk0FRnimA81EuPcVN4Jwne5MU1xdbYr8IMbeAMFB7B3rqA1naDFN1kIXHDul/
+	Tf/QgbuDUP8qn+3nQgkais56rRwAeNVLK/Vjr0EfvgHz8YsgWd3+jmIU4e1EEq/UV3WA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rbnUd-0088nn-0A; Sun, 18 Feb 2024 21:10:31 +0100
+Date: Sun, 18 Feb 2024 21:10:30 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
@@ -86,10 +61,13 @@ Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	Abhijit Gangurde <abhijit.gangurde@amd.com>,
 	Umang Jain <umang.jain@ideasonboard.com>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [net-next RFC PATCH 2/6] net: phy: fill phy_id with C45 PHY
+Subject: Re: [net-next RFC PATCH 1/6] net: phy: add support for defining
+ multiple PHY IDs in PHY driver
+Message-ID: <829f8c7d-c09b-4264-818a-3f7b047ec44f@lunn.ch>
 References: <20240218190034.15447-1-ansuelsmth@gmail.com>
- <20240218190034.15447-3-ansuelsmth@gmail.com>
- <ZdJcArE5/hXb1xFe@shell.armlinux.org.uk>
+ <20240218190034.15447-2-ansuelsmth@gmail.com>
+ <ZdJbciylnw8+ve8V@shell.armlinux.org.uk>
+ <65d2613d.170a0220.2eb48.a510@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,24 +76,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZdJcArE5/hXb1xFe@shell.armlinux.org.uk>
+In-Reply-To: <65d2613d.170a0220.2eb48.a510@mx.google.com>
 
-On Sun, Feb 18, 2024 at 07:35:30PM +0000, Russell King (Oracle) wrote:
-> On Sun, Feb 18, 2024 at 08:00:28PM +0100, Christian Marangi wrote:
-> > With C45 PHYs that provide PHY ID in C45 Package regs, PHY device
-> > .phy_id is not filled.
+> > > +	phy_dev_id = (struct mdio_device_id *)&phydev->dev_id;
+> > 
+> > Why this cast? Try to write code that doesn't need casts.
+> > 
 > 
-> Intentionally so. Clause 45 PHYs don't have a single ID. Marvell
-> 88X3310 is a case in point - there are at least two different vendor
-> IDs in this PHY.
+> This cast is needed to keep the dev_id const in the phy_device struct so
+> that other are warned to not modify it and should only be handled by
+> phy_probe since it's the one that fills it.
 > 
-> Trying to squash Clause 45 PHY IDs down to a single identifier is
-> not sensible.
->
+> Alternative is to drop const and drop the warning.
 
-As said in the cover letter was something I notice and was curious if it
-was intentional or not. Thanks for the clarification, I will drop.
+Can you propagate the const. Make phy_dev_id point to a const?
 
--- 
-	Ansuel
+    Andrew
 
