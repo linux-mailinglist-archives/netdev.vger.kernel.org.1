@@ -1,79 +1,50 @@
-Return-Path: <netdev+bounces-72778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C8A6859920
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 20:45:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BBA8859921
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 20:50:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51285281332
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 19:45:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EE041C20BD3
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 19:50:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C196171B39;
-	Sun, 18 Feb 2024 19:45:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71C2B6F53E;
+	Sun, 18 Feb 2024 19:50:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ctixvzyz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s9yBWufz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 144091DFC6
-	for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 19:44:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A9041DFC6
+	for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 19:50:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708285500; cv=none; b=lTCybEgvZxViDxec96lHVK5yF6erYfyiiPDTQNxANnJeUlB2w0YAMCBgDMlXohWpvBkji18IVAtXsWhEPYFDHd5Na7+Jq0k4t93M0EtczG0rete1olHPfa+YtrksrmbUB6ZoBXZxBoYHF55zhHjpJrqAQVvugFgGiCUcdMMKQgw=
+	t=1708285824; cv=none; b=t5f/0YT1Sfl058dkl20edSNpeXRCvCYrRsl8WOiKMsB/XsalsPe9rPIeRHmsZY9qvClbvXoALAaal8T+R3zWnH2AZvSu3d3/hktQ+EAwcmIdUJrGYxGKcxHSP/WRkT6HGBi+pOUAUwiba1mDbm0YPPo6fA2/2rO4InYUYNKFSjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708285500; c=relaxed/simple;
-	bh=xkt6Xd6UJvj5puqV7PiGn//vK4ELNESN6wGXXd8GZ/s=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=h0oE6vcQ0ootYny16XWcupECW6wpzMnJdjbcDzzy01taxdw/oI4RrvFDbu5/Tw4d+NFv+P6IljJ1KFILQn407BSFkpzgn2ADIkyFMFTaM5mPL6ZjP5tddmC99fDe84XCBqnmuprpxDA3ZbS134+x8zsvCEWrRdQ67OmHo+p/rR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ctixvzyz; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-511976c126dso4406231e87.1
-        for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 11:44:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708285497; x=1708890297; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=VyFC7JUUQjWOVmKWSg3KBq9XqDvZ45VrIOOfaP/wzYI=;
-        b=ctixvzyzZZzVyKSCV8pO90rveccZVDNGLGhavskcre4epiIykHV/49rygqWvDx96Wk
-         6ItHGbAvlU1vqJplwEnkOgC50a6tl+fQqqpaFiD4h8KLBRHw/lmWlpgNOoH2s3v/mGtK
-         uyr4yrty4qI780QG5AGLNpDE/H8eDun8P3LLtKAcm26XKD8YccYDlzS9S8CJqnepeq1k
-         HdlTAya0Z4sIcZjddjTh1/+W8Zy5mFua9ufCeUH2rvCFHRZld8UidbI6gnRXB0bj99Bl
-         jskPT5MMqCniux+luAlUC8u4cL65eBEwjWdQKrhxtDGwWgc92Vw3uFzMKRqSF1ocbiEs
-         Zk+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708285497; x=1708890297;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VyFC7JUUQjWOVmKWSg3KBq9XqDvZ45VrIOOfaP/wzYI=;
-        b=fDOsc9VaKsQze1gwSdifqUUpoS0s7Np6THQxAvjn1U++o9AZBqbTCg3ZQGghWL5crZ
-         LU0SYHl68THzP6WT36YJhPzrV9dzPp24uhOdcLz3tneWYpOjBv69wAhBlxycPL7ugIlf
-         twJUX51+9eUfWdPkfugUDYB0YhWdBstYJUpbp7/7d427FEVODZ6T7r2S13i4gZiBc7jV
-         BvT8mjqIMxWBHHBMUmZGWHI6liTsMB08NiABITlZalWmLveLU2NVpITbTwmNcz8lKX8P
-         rVRFZzxsnW3KFh2afNYL/wGAfKE8DyNFUc/61ayszkHa/wdDqAd0dneM5KMrqQyp6xej
-         KYjA==
-X-Forwarded-Encrypted: i=1; AJvYcCVfEiuJuvwJDjRcsXRGkQmEzgwOXBNrRHf9QYm60jUeMDkujHzUETyOLmMrZSz3XlJ3UnVhA7vlzhZ9LnGqVKmW51IaDdSc
-X-Gm-Message-State: AOJu0YxFAktqUvACZlBzTnvtPaCeX9MB4aLwMMMZGQtrMl908VgJpK1u
-	LguHP8wdbckIvpPpzVvV1eQ1Sl4B/v000+6ncO0eDAiBVloK2xSB
-X-Google-Smtp-Source: AGHT+IFSi/dhL8BzAj6TLxy0irbuu/qQnUQRpC80djhvbp5fhrzJBCEitE9p/+D51kX3XSLqMq3XbQ==
-X-Received: by 2002:ac2:5e9e:0:b0:512:b555:17c4 with SMTP id b30-20020ac25e9e000000b00512b55517c4mr108539lfq.20.1708285496981;
-        Sun, 18 Feb 2024 11:44:56 -0800 (PST)
-Received: from mishin.sarov.local (95-37-3-243.dynamic.mts-nn.ru. [95.37.3.243])
-        by smtp.gmail.com with ESMTPSA id g10-20020a19e04a000000b00512a875fbd5sm520183lfj.137.2024.02.18.11.44.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 Feb 2024 11:44:56 -0800 (PST)
-From: Maks Mishin <maks.mishinfz@gmail.com>
-X-Google-Original-From: Maks Mishin <maks.mishinFZ@gmail.com>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: Maks Mishin <maks.mishinFZ@gmail.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH] m_ife: Remove unused value
-Date: Sun, 18 Feb 2024 22:44:13 +0300
-Message-Id: <20240218194413.31742-1-maks.mishinFZ@gmail.com>
-X-Mailer: git-send-email 2.30.2
+	s=arc-20240116; t=1708285824; c=relaxed/simple;
+	bh=Ftl6JVM2YUjhhD+GhbZFt/6u1IA+d49C+cY0bQ++IiQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=sy3tBT3GcGybylhiYA1/7wzv9ehO5OGbKy+ZIEFWHv7/NNcrS2EEUHVa1CuerXpg4WW/Ljpaknmv1KT9ak7enITyvs+AbMQaGBZucE+nRVZJggMA0zWXcdKTu+cT/PI9JUqwlRItGfsSa8GU9BfSxPah8n/JVeq5LbBOvNwyfjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s9yBWufz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A6BA3C43390;
+	Sun, 18 Feb 2024 19:50:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708285823;
+	bh=Ftl6JVM2YUjhhD+GhbZFt/6u1IA+d49C+cY0bQ++IiQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=s9yBWufzvokozXRKSOAlDR+bc+xgceVNxN+3JscTvdOpU93IHoAri5UlqPQf/eXdM
+	 E/Al7xodeVV46Q0ETP0Cc3tdfM7a/tw2qSydY1z7jlFvgwIegddlMk+N0g1viP2OCs
+	 cGdNlylvuqj/qPUgbaTu6pnNgXLn6ygRlQ9Itwll+zDUPxE0N4WU2JXJVzkL4dMvGM
+	 z6Mc9DXHv7i4LhwMCotOKxRDo3K3AnGHP9++9QEIeDZINnOiimfMmm/5OEkAhCpmIh
+	 83OTFb0Ew1WJTswDx+mJ43HmMmAbfa0EyhBvl419eXq5s/Ry62sswEoIGkPaHUk0MK
+	 6dBja7plp+PMQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8C9FAD8C97D;
+	Sun, 18 Feb 2024 19:50:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,36 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: ena: Remove ena_select_queue
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170828582357.19979.1305056638749819407.git-patchwork-notify@kernel.org>
+Date: Sun, 18 Feb 2024 19:50:23 +0000
+References: <20240215223104.3060289-1-kheib@redhat.com>
+In-Reply-To: <20240215223104.3060289-1-kheib@redhat.com>
+To: Kamal Heib <kheib@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ shayagr@amazon.com, darinzon@amazon.com, akiyano@amazon.com,
+ ndagan@amazon.com, saeedb@amazon.com
 
-The variable `has_optional` do not used after set the value.
-Found by RASU JSC.
+Hello:
 
-Signed-off-by: Maks Mishin <maks.mishinFZ@gmail.com>
----
- tc/m_ife.c | 2 --
- 1 file changed, 2 deletions(-)
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-diff --git a/tc/m_ife.c b/tc/m_ife.c
-index 162607ce..42621bec 100644
---- a/tc/m_ife.c
-+++ b/tc/m_ife.c
-@@ -291,7 +291,6 @@ static int print_ife(struct action_util *au, FILE *f, struct rtattr *arg)
- 	}
- 
- 	if (tb[TCA_IFE_DMAC]) {
--		has_optional = 1;
- 		print_string(PRINT_ANY, "dst", "dst %s ",
- 			     ll_addr_n2a(RTA_DATA(tb[TCA_IFE_DMAC]),
- 					 RTA_PAYLOAD(tb[TCA_IFE_DMAC]), 0, b2,
-@@ -299,7 +298,6 @@ static int print_ife(struct action_util *au, FILE *f, struct rtattr *arg)
- 	}
- 
- 	if (tb[TCA_IFE_SMAC]) {
--		has_optional = 1;
- 		print_string(PRINT_ANY, "src", "src %s ",
- 			     ll_addr_n2a(RTA_DATA(tb[TCA_IFE_SMAC]),
- 					 RTA_PAYLOAD(tb[TCA_IFE_SMAC]), 0, b2,
+On Thu, 15 Feb 2024 17:31:04 -0500 you wrote:
+> Avoid the following warnings by removing the ena_select_queue() function
+> and rely on the net core to do the queue selection, The issue happen
+> when an skb received from an interface with more queues than ena is
+> forwarded to the ena interface.
+> 
+> [ 1176.159959] eth0 selects TX queue 11, but real number of TX queues is 8
+> [ 1176.863976] eth0 selects TX queue 14, but real number of TX queues is 8
+> [ 1180.767877] eth0 selects TX queue 14, but real number of TX queues is 8
+> [ 1188.703742] eth0 selects TX queue 14, but real number of TX queues is 8
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] net: ena: Remove ena_select_queue
+    https://git.kernel.org/netdev/net-next/c/78e886ba2b54
+
+You are awesome, thank you!
 -- 
-2.30.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
