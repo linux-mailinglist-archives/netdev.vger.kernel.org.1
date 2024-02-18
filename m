@@ -1,127 +1,109 @@
-Return-Path: <netdev+bounces-72727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F26E5859594
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 09:18:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 633058595E3
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 10:06:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93FB41F21BE4
-	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 08:18:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74D2C281D74
+	for <lists+netdev@lfdr.de>; Sun, 18 Feb 2024 09:06:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B48A12B86;
-	Sun, 18 Feb 2024 08:18:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC46BF9D6;
+	Sun, 18 Feb 2024 09:06:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from ursule.remlab.net (vps-a2bccee9.vps.ovh.net [51.75.19.47])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B5EF4EB;
-	Sun, 18 Feb 2024 08:18:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.75.19.47
+Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75947538A
+	for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 09:06:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708244323; cv=none; b=STg3jJUU3uQA9FNfYMnx8rti2k8OquUZ+utQH9k4X2JnaMVmQTeo2QmP9Ug7WDWW/gw953pVVjM4P297GEk7RnO7YZvFA/pOL0tUVYJMwkqMMM5aNde1UJ203LYjQEOp/drChIjKFi95tngQMs2fz4w+z81SW662dS4aijytwVE=
+	t=1708247192; cv=none; b=Ezrv7xqZOdlpdrkbIxHyjfk6x0IiHt5hjbWy3WDiWgQthjT44VJ1aO9UI/7oTky35oD6t4sJU28OCCO7BDYcwXLAQ5Cme1W1gy/dxmXBkvkFjpdES4OHpHz2aVN4DjSUZoqUOw22+BcskmHq3q4EeH1FVsqQ3fIk0EwN5Q4yUiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708244323; c=relaxed/simple;
-	bh=N4ufLhqUZMGni7ljag9cL2yFnI4/1wwaxQxPHYTQSYg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eXDEDxV4XLamsp0HTUQax32SYrIgsRPi1bQBIe86igz43JMsZx9k50NrhLw2A//SLODTwxUXmnMOOQRy3zkZH+CHYBlpIAx5E4ajnpCi/F5tuXflu5pHJTfSSpW/QuAkOfWyqTyPfpiY8HwZz4fnhWD1l6qQ/yleWjw+rN0Yd2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=remlab.net; spf=pass smtp.mailfrom=remlab.net; arc=none smtp.client-ip=51.75.19.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=remlab.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=remlab.net
-Received: from basile.remlab.net (localhost [IPv6:::1])
-	by ursule.remlab.net (Postfix) with ESMTP id 28DD2C009A;
-	Sun, 18 Feb 2024 10:12:15 +0200 (EET)
-From: =?UTF-8?q?R=C3=A9mi=20Denis-Courmont?= <remi@remlab.net>
-To: courmisch@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCHv2 2/2] phonet/pep: fix racy skb_queue_empty() use
-Date: Sun, 18 Feb 2024 10:12:14 +0200
-Message-ID: <20240218081214.4806-2-remi@remlab.net>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1708247192; c=relaxed/simple;
+	bh=e94JmLflhLbx8fnZYNjhNMO2Y1z6sl3a6bW1WpUTMAs=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=I7ZWvanJpr2+FagpsZM0DYknwbJolKLIIoJ+WYsHXuF4I6INnVcPIQAMsPTrwPRGO44d4bGSm4FDvant9OzxoBvpcY3UyawnRuxayyd0nXrh8Q1Jnq3URbA7dtuFzD8ymFEB7f0Ig6MNLXFe8b5TPHpfAFC73x8TvmCLrU4ExAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.169.211.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas49t1708247093t112t10638
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [122.235.246.158])
+X-QQ-SSF:00400000000000F0FTF000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 2405816306851130360
+To: "'Andrew Lunn'" <andrew@lunn.ch>
+Cc: <davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<maciej.fijalkowski@intel.com>,
+	<netdev@vger.kernel.org>,
+	<mengyuanlou@net-swift.com>
+References: <20240206070824.17460-1-jiawenwu@trustnetic.com> <9259e4eb-8744-45cf-bdea-63bc376983a4@lunn.ch>
+In-Reply-To: <9259e4eb-8744-45cf-bdea-63bc376983a4@lunn.ch>
+Subject: RE: [PATCH] net: txgbe: fix GPIO interrupt blocking
+Date: Sun, 18 Feb 2024 17:04:52 +0800
+Message-ID: <003801da6249$888e4210$99aac630$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQKQWSrySMPq8PWl707TeSOritAirQH7beder5OPjaA=
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-From: Rémi Denis-Courmont <courmisch@gmail.com>
+On Tue, Feb 6, 2024 11:29 PM, Andrew Lunn wrote:
+> On Tue, Feb 06, 2024 at 03:08:24PM +0800, Jiawen Wu wrote:
+> > GPIO interrupt is generated before MAC IRQ is enabled, it causes
+> > subsequent GPIO interrupts that can no longer be reported if it is
+> > not cleared in time. So clear GPIO interrupt status at the right
+> > time.
+> 
+> This does not sound correct. Since this is an interrupt controller, it
+> is a level interrupt. If its not cleared, as soon as the parent
+> interrupt is re-enabled, is should cause another interrupt at the
+> parent level. Servicing that interrupt, should case a descent to the
+> child, which will service the interrupt, and atomically clear the
+> interrupt status.
+> 
+> Is something wrong here, like you are using edge interrupts, not
+> level?
 
-The receive queues are protected by their respective spin-lock, not
-the socket lock. This could lead to skb_peek() unexpectedly
-returning NULL or a pointer to an already dequeued socket buffer.
+Yes, it is edge interrupt.
 
-Fixes: 9641458d3ec4 ("Phonet: Pipe End Point for Phonet Pipes protocol")
-Signed-off-by: Rémi Denis-Courmont <courmisch@gmail.com>
----
- net/phonet/pep.c | 41 ++++++++++++++++++++++++++++++++---------
- 1 file changed, 32 insertions(+), 9 deletions(-)
+> 
+> > And executing function txgbe_gpio_irq_ack() manually since
+> > handle_nested_irq() does not call .irq_ack for irq_chip.
+> 
+> I don't know the interrupt code too well, so could you explain this in
+> more detail. Your explanation sounds odd to me.
 
-diff --git a/net/phonet/pep.c b/net/phonet/pep.c
-index faba31f2eff2..3dd5f52bc1b5 100644
---- a/net/phonet/pep.c
-+++ b/net/phonet/pep.c
-@@ -917,6 +917,37 @@ static int pep_sock_enable(struct sock *sk, struct sockaddr *addr, int len)
- 	return 0;
- }
- 
-+static unsigned int pep_first_packet_length(struct sock *sk)
-+{
-+	struct pep_sock *pn = pep_sk(sk);
-+	struct sk_buff_head *q;
-+	struct sk_buff *skb;
-+	unsigned int len = 0;
-+	bool found = false;
-+
-+	if (sock_flag(sk, SOCK_URGINLINE)) {
-+		q = &pn->ctrlreq_queue;
-+		spin_lock_bh(&q->lock);
-+		skb = skb_peek(q);
-+		if (skb) {
-+			len = skb->len;
-+			found = true;
-+		}
-+		spin_unlock_bh(&q->lock);
-+	}
-+
-+	if (likely(!found)) {
-+		q = &sk->sk_receive_queue;
-+		spin_lock_bh(&q->lock);
-+		skb = skb_peek(q);
-+		if (skb)
-+			len = skb->len;
-+		spin_unlock_bh(&q->lock);
-+	}
-+
-+	return len;
-+}
-+
- static int pep_ioctl(struct sock *sk, int cmd, int *karg)
- {
- 	struct pep_sock *pn = pep_sk(sk);
-@@ -929,15 +960,7 @@ static int pep_ioctl(struct sock *sk, int cmd, int *karg)
- 			break;
- 		}
- 
--		lock_sock(sk);
--		if (sock_flag(sk, SOCK_URGINLINE) &&
--		    !skb_queue_empty(&pn->ctrlreq_queue))
--			*karg = skb_peek(&pn->ctrlreq_queue)->len;
--		else if (!skb_queue_empty(&sk->sk_receive_queue))
--			*karg = skb_peek(&sk->sk_receive_queue)->len;
--		else
--			*karg = 0;
--		release_sock(sk);
-+		*karg = pep_first_packet_length(sk);
- 		ret = 0;
- 		break;
- 
--- 
-2.43.0
+This is because I changed the interrupt controller in
+https://git.kernel.org/netdev/net-next/c/aefd013624a1.
+In the previous interrupt controller, .irq_ack in struct irq_chip is called
+to clear the interrupt after the GPIO interrupt is handled. But I found
+that in the current interrupt controller, this .irq_ack is not called. Maybe
+I don't know enough about this interrupt code, I have to manually add
+txgbe_gpio_irq_ack() to clear the interrupt in the handler.
+
+> 
+> What is the big picture problem here? Do you have the PHY interrupt
+> connected to a GPIO and you are loosing PHY interrupts?
+
+No, PHY interrupt is connected to the LINK UP/DOWN filed in the MAC
+interrupt. The problem I encountered was that the GPIO interrupts were
+not cleaned up in time and could not continue to generate the next GPIO
+interrupt.
+
 
 
