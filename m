@@ -1,129 +1,164 @@
-Return-Path: <netdev+bounces-73052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB02485AB88
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 19:52:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6C8585AB9A
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 19:56:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DEA301C21ED2
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 18:52:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77A9EB21E98
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 18:56:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7877482EC;
-	Mon, 19 Feb 2024 18:52:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 437FE47A4D;
+	Mon, 19 Feb 2024 18:55:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OuZ1LbZd"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="cEJ6+gQ+"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5D344C93
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 18:52:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B2A94A3B;
+	Mon, 19 Feb 2024 18:55:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708368732; cv=none; b=CKOErIQTjNdUhRYjvVh1SYmh8n6CzZTAIk5WReN3+O3aEwYSZNhta2B80dp+DY3+x0d1DVfxsow2h+DKthDCTUyY9r0DvEINLojQpmX75cbkEJkECEBfiMPWV8PGAOZjZO76VKqOF30RtesGpwWsBmYp4otSfIcNfrhXd8oxwCg=
+	t=1708368956; cv=none; b=ccSooodnUTBkQka5SziYnQxC9NkvLkZIDtYZrQHEp++usyuTkxDsr517h/iXXezb+9EG71zer55q9EbEYL0if4vZT7Tlmxq2gLEfDmsgtILbtTyi5drk6Ty1e4aOgIsTZgni7ibD5P8d42autRBl7n68t17KCIX9R5eGfRwMCJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708368732; c=relaxed/simple;
-	bh=adFeI6iQIPSIG5gbGYxAui1bsv/pb6agfE1uD23Yq2U=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=OC2p2WFGfYYQ94Tr31TvNWsM43++oF6XRjXJp0meFcE9hVDGFZ457xCXgx/ukhXqgIczJHa1ZxZCDSF6xvsjx2CU8hU6RDML9MgsfaEQwRZYQ+j480m6T9jSK5wx2decIfME4URJHmS7NKZ3g4Gtp3DSNCbQ+BU7fahfQTWIi/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OuZ1LbZd; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708368729;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hSiLtRn1dHXbv4XxLONcqsZTvaAnMgcW65jKFt4NQe4=;
-	b=OuZ1LbZdxLnIYoAX/b2+IMpkNLLqevMpW6uM4sJUhnJ/OVZ6U09195VHmf4t7KjPSz7Rpi
-	iBSwjxfNXwu5hFAHVjlsf4ssZz9TbQoXRy3/ka6i0naXjwsTe1UCswaeCnhHsUgdvBqLuC
-	PIOQdQRK5aOkxW/JfD7pJBNPpvjYJ5U=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-226-QKZXI5vXPAygCNUx5dQIRQ-1; Mon, 19 Feb 2024 13:52:08 -0500
-X-MC-Unique: QKZXI5vXPAygCNUx5dQIRQ-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a2f71c9f5d2so274363766b.2
-        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 10:52:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708368727; x=1708973527;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hSiLtRn1dHXbv4XxLONcqsZTvaAnMgcW65jKFt4NQe4=;
-        b=Zz1ghdlrrtBr3YMzDHHrqPi/NwLTT1BvUPe9pp5mr4C8LLlUT0IHJdqhlq360EEXum
-         HpIH1RCwJs7qgafFlbfMX0iWRGWaACcMIFouxcuGqjs4il0bbTbzCDqDwGq2SC/ujP+X
-         yjfYJaeq7xSRMUz5DdVe0yYPTrNuP0sSAJWabZZ1un5l+00nYiHGv+2GnYRLql3dj900
-         Tw1g3v73O2KxFUUEjMN0VFKrfwn3EkLxHdiOI/W6AeNPOKhu3OSNhqoxD1xq/3HryCXj
-         Eyrwfsj3fnYnqscqRPCEHYu5dgQFjg1diA0O/PD+xLAR6MqBs6nIGLXPMX0Cjb0eDdX1
-         66NA==
-X-Forwarded-Encrypted: i=1; AJvYcCWeQEt31tgZV2bpwFBUzm5Z+5BWmTk4dP9oG2XoMacRYKE+kRgqwGB53F6qtPNlruS8psYUmBfIwxqsQJFWEYihnjggK6t9
-X-Gm-Message-State: AOJu0Yy5DtuCtrx2bdaj21TWsmJFvZsP1vn12n0HDJOGmy6jCD3hJ1ze
-	NoP5n+4osTROsYUzUkeRhozySD1lKBZS+t0QOv9/dLLRIoTCLTBlnRu9BSdBlyTMbprpN5aVIli
-	a/6msHB/b0UXdwJw/HaUfq0NKCLsZFKsxy0TbCxDHVWMouMr8G6lUyHhyt7Ussg==
-X-Received: by 2002:a17:906:3485:b0:a3e:b4af:def5 with SMTP id g5-20020a170906348500b00a3eb4afdef5mr1825498ejb.31.1708368726936;
-        Mon, 19 Feb 2024 10:52:06 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHgELklgy0YvniicQ0U5zqLoEKoEk4TmgmT3CDbzF3z9jnML3ol959N9niiDB45nAdaNROO3A==
-X-Received: by 2002:a17:906:3485:b0:a3e:b4af:def5 with SMTP id g5-20020a170906348500b00a3eb4afdef5mr1825485ejb.31.1708368726545;
-        Mon, 19 Feb 2024 10:52:06 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id x19-20020a170906135300b00a3e64652a68sm1948568ejb.75.2024.02.19.10.52.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Feb 2024 10:52:06 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id E021410F616A; Mon, 19 Feb 2024 19:52:05 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
- netdev@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next 0/3] Change BPF_TEST_RUN use the system page
- pool for live XDP frames
-In-Reply-To: <20240215132634.474055-1-toke@redhat.com>
-References: <20240215132634.474055-1-toke@redhat.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Mon, 19 Feb 2024 19:52:05 +0100
-Message-ID: <87wmr0b82y.fsf@toke.dk>
+	s=arc-20240116; t=1708368956; c=relaxed/simple;
+	bh=N5ZH9wqFWur86cVuVxvi/Pi+hCjhc8MpHYwaMvTmuzI=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TlfB+uwn2fJCrdX09dk238oNK+cSX7XSzu8XqW/XIuFlz/W9cUUfWqMKPvYdHKQSGKIjV16b0XTEPltlVgw4iZSIPBunc6SzP5Dnm1O1Gb9VxNOclZu8zpNPeG2HsYOey7qho+Wk+ILhCgFpn9bj3OXcTcJqwqlmMFvULHcME5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=cEJ6+gQ+; arc=none smtp.client-ip=52.119.213.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1708368954; x=1739904954;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=AYF3fJ3lQYdHvX4FbenRMpfXYf4i7AfH5JvlmkprmDk=;
+  b=cEJ6+gQ+FZptKUuB/jkouOlvMXJCPXgvQmai2DLmdvPuS3B1IiGyosVx
+   H8CP7gKfLy/dHx60AMT2LU8Uqcz1mbBRXnIWHKjh2Jm/x2CGdLie+MFTq
+   avuIYqbVot+soUFCi6XVb/myZNdPD4XwwzqK1AiSyAf9pcKOblyVXuafo
+   4=;
+X-IronPort-AV: E=Sophos;i="6.06,170,1705363200"; 
+   d="scan'208";a="185811561"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2024 18:55:50 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:4119]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.63.9:2525] with esmtp (Farcaster)
+ id 9b887880-2511-4018-a341-9f255bfa8211; Mon, 19 Feb 2024 18:55:49 +0000 (UTC)
+X-Farcaster-Flow-ID: 9b887880-2511-4018-a341-9f255bfa8211
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Mon, 19 Feb 2024 18:55:48 +0000
+Received: from 88665a182662.ant.amazon.com (10.94.72.56) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Mon, 19 Feb 2024 18:55:45 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <vschneid@redhat.com>
+CC: <bigeasy@linutronix.de>, <davem@davemloft.net>, <dccp@vger.kernel.org>,
+	<dsahern@kernel.org>, <edumazet@google.com>, <juri.lelli@redhat.com>,
+	<kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-rt-users@vger.kernel.org>, <mleitner@redhat.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <tglozar@redhat.com>,
+	<tglx@linutronix.de>, <kuniyu@amazon.com>
+Subject: Re: [PATCH v3 1/1] tcp/dcpp: Un-pin tw_timer
+Date: Mon, 19 Feb 2024 10:55:37 -0800
+Message-ID: <20240219185537.13666-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240219095729.2339914-2-vschneid@redhat.com>
+References: <20240219095729.2339914-2-vschneid@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D031UWC001.ant.amazon.com (10.13.139.241) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com> writes:
+From: Valentin Schneider <vschneid@redhat.com>
+Date: Mon, 19 Feb 2024 10:57:29 +0100
+> The TCP timewait timer is proving to be problematic for setups where scheduler
+> CPU isolation is achieved at runtime via cpusets (as opposed to statically via
+> isolcpus=domains).
+> 
+> What happens there is a CPU goes through tcp_time_wait(), arming the time_wait
+> timer, then gets isolated. TCP_TIMEWAIT_LEN later, the timer fires, causing
+> interference for the now-isolated CPU. This is conceptually similar to the issue
+> described in
+>   e02b93124855 ("workqueue: Unbind kworkers before sending them to exit()")
+> 
+> Keep softirqs disabled, but make the timer un-pinned and arm it *after* the
+> hashdance.
+> 
+> This introduces the following (non-fatal) race:
+> 
+>   CPU0                        CPU1
+>     allocates a tw
+>     insert it in hash table
+> 				finds the TW and removes it
+> 				(timer cancel does nothing)
+>     arms a TW timer, lasting
+> 
+> This partially reverts
+>   ed2e92394589 ("tcp/dccp: fix timewait races in timer handling")
+> and
+>   ec94c2696f0b ("tcp/dccp: avoid one atomic operation for timewait hashdance")
+> 
+> This also reinstores a comment from
+>   ec94c2696f0b ("tcp/dccp: avoid one atomic operation for timewait hashdance")
+> as inet_twsk_hashdance() had a "Step 1" and "Step 3" comment, but the "Step
+> 2" had gone missing.
+> 
+> Link: https://lore.kernel.org/all/ZPhpfMjSiHVjQkTk@localhost.localdomain/
+> Signed-off-by: Valentin Schneider <vschneid@redhat.com>
+> ---
+>  net/dccp/minisocks.c          | 16 +++++++---------
+>  net/ipv4/inet_timewait_sock.c | 20 +++++++++++++++-----
+>  net/ipv4/tcp_minisocks.c      | 16 +++++++---------
+>  3 files changed, 29 insertions(+), 23 deletions(-)
+> 
+> diff --git a/net/dccp/minisocks.c b/net/dccp/minisocks.c
+> index 64d805b27adde..2f0fad4255e36 100644
+> --- a/net/dccp/minisocks.c
+> +++ b/net/dccp/minisocks.c
+> @@ -53,16 +53,14 @@ void dccp_time_wait(struct sock *sk, int state, int timeo)
+>  		if (state == DCCP_TIME_WAIT)
+>  			timeo = DCCP_TIMEWAIT_LEN;
+>  
+> -		/* tw_timer is pinned, so we need to make sure BH are disabled
+> -		 * in following section, otherwise timer handler could run before
+> -		 * we complete the initialization.
+> -		 */
+> -		local_bh_disable();
+> -		inet_twsk_schedule(tw, timeo);
+> -		/* Linkage updates.
+> -		 * Note that access to tw after this point is illegal.
+> -		 */
+> +	       local_bh_disable();
 
-> Now that we have a system-wide page pool, we can use that for the live
-> frame mode of BPF_TEST_RUN (used by the XDP traffic generator), and
-> avoid the cost of creating a separate page pool instance for each
-> syscall invocation. See the individual patches for more details.
->
-> Toke H=C3=B8iland-J=C3=B8rgensen (3):
->   net: Register system page pool as an XDP memory model
->   bpf: test_run: Use system page pool for XDP live frame mode
->   bpf: test_run: Fix cacheline alignment of live XDP frame data
->     structures
->
->  include/linux/netdevice.h |   1 +
->  net/bpf/test_run.c        | 138 +++++++++++++++++++-------------------
->  net/core/dev.c            |  13 +++-
->  3 files changed, 81 insertions(+), 71 deletions(-)
+This line seems not correctly indented, same for TCP change.
 
-Hi maintainers
 
-This series is targeting net-next, but it's listed as delegate:bpf in
-patchwork[0]; is that a mistake? Do I need to do anything more to nudge it
-along?
 
--Toke
+> +
+> +		// Linkage updates
+>  		inet_twsk_hashdance(tw, sk, &dccp_hashinfo);
+> +		inet_twsk_schedule(tw, timeo);
+> +		// Access to tw after this point is illegal.
 
-[0] https://patchwork.kernel.org/project/netdevbpf/list/?series=3D826384
+Also please use /**/ style for these comments, same for TCP too.
 
+
+> +		inet_twsk_put(tw);
+> +
+>  		local_bh_enable();
+>  	} else {
+>  		/* Sorry, if we're out of memory, just CLOSE this
 
