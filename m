@@ -1,135 +1,91 @@
-Return-Path: <netdev+bounces-73035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4567485AA94
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 19:07:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B500585AAB9
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 19:16:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 975C5B21074
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 18:07:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 555881F21101
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 18:16:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6141947F6F;
-	Mon, 19 Feb 2024 18:07:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CB4E481CB;
+	Mon, 19 Feb 2024 18:16:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MdxeI+lL"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Mku2ja6U"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B780A47F79
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 18:07:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FEF4481AE
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 18:16:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708366068; cv=none; b=kMKd4Dmw5uafhL2bEWD0yUADjMGDr4TKAO6hQPKPO7/2jM0M/Ypvx0PWTGqKLzIwGSZAuDegijmDEn+s2NHFwkG93tfj6oClNfj08Gxz8Y3/rOmtYpyTLMxg/Da+/31GXJIN4uapOmREISK+TR/4HHCn0sEgtgy6imtSHG0dn1w=
+	t=1708366614; cv=none; b=op/OkDjwA/oLxo4OUtG/oCWE7mBLKkrR3vNI6Zjsk9IOMa9kGYyYfqOkDlNwli7B492OBFooCQ9FdNCOjkt32Vzr5s5TBBDCJiZoPLK1/RgaDueE/TqSsy5h3GMw8VpBivmj17DMConHT6uYpbLiqsYHIQ24gxe0IUH2DYnoScM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708366068; c=relaxed/simple;
-	bh=8w50HQN69W+dxNGUCfJSzrM0pHFu0tT/DRB09LY8iDs=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=OnVsV019NQr4WOdD9eMGrRCN5bdZBWVndhgMImfUT3obwUMzKool4/wrXfNUBlJSFeyB/bHyN7H80UUiyWjxh/y+XEt2asVlXQE9LYgSfPUreMf3vW8qHohmp07AyE9YCKj5DjQuiqZxdCyBIxb0oX7YJ24edzutBZTNGhF0A4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MdxeI+lL; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708366065;
+	s=arc-20240116; t=1708366614; c=relaxed/simple;
+	bh=ITrLrI260LHpVSBGrmyu/H/eYmCgrCP09fSGmRTleXE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qDg/RTe1N3d+sSfhAvR62kLZTUh6AkQkbSuIeRYpRefMePF6+Ig4O6MQ4IZvcoTCe1vuomn9+42KTYVGM/ObAOmD2ooHsdoehf/mfu7XDHQkmqM9tW+VgNUUKJ2qq4tfdntkE8qPSlDl5YWnCHNBjwty5dIhRQFGQL34e5MawVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Mku2ja6U; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 6E058C0009;
+	Mon, 19 Feb 2024 18:16:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1708366609;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=UxZruTsi4z1W1R1VnzgwDuw3nRP7dkhk8DSjg8EUWb0=;
-	b=MdxeI+lL81f6CR40p3PN31V2FuL2ugDqryK/sBPbxEFw0U2WTAB26wmwqSIYY/5p5HRkjM
-	RHNAmXk542KptlBTjwi5PHy6SmzdSaGDHYmYAUHwboqZerZGJFaJ73P5TUAY9Ez1feAqqd
-	EWWeTB8hqntdfWz0a1jdnKDO6ycxvB8=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-103-Y34eHeEeP9SPOG45eNSMbA-1; Mon, 19 Feb 2024 13:07:44 -0500
-X-MC-Unique: Y34eHeEeP9SPOG45eNSMbA-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40e354aaf56so10582965e9.1
-        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 10:07:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708366063; x=1708970863;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UxZruTsi4z1W1R1VnzgwDuw3nRP7dkhk8DSjg8EUWb0=;
-        b=jZCzx05cdONo88uHyeoomDBXVjWefCfCVUi23bsNBJauQG8vhbGN7tVefG17DW/mFS
-         +8Bbed/7oxxZGfT8RTZbQ6CsAHoOaRlu0CAuMi/FuRWAnVoHi8VdfujYXMy1NQhC59Dr
-         Wy/4oC+6mYKK1U5T+EVbA/RvmaqYL0+Ddsxpy0NZnZ6I4HSrshW+5/do2NQB+kyx0t1I
-         DO5Lxg+i8ov3vdgj+o0D9AHyYwsaFYd95zzYZuVZZvx2sOp/bAaoA6WYJiwNE7yaGsaq
-         klFqxytUm2XUJARAqwVxO8vQ4ej7Uph7Z8ld9ZqS0ePoI0ONwYHwlOswt5TWFvEFKnXH
-         CFUg==
-X-Gm-Message-State: AOJu0Yxk8quXMkPSsh0Bei8DdzDcUK5yzeK8+gQwUBA7Toq8Vam7Z38u
-	NuOME3oXijqFdq3oKb9+8bTTfMgQV+jIABflpzO7QCZ5mz+WgEXHHSOWGO6YUBCfL8CK4zmedeZ
-	AaI1caBW7SKPVG97XxQDEkzTHu/gfLK9fS1zF7l5OjN5d+iRkVWFH4Q==
-X-Received: by 2002:a05:6000:1d8e:b0:33d:3f2a:75bc with SMTP id bk14-20020a0560001d8e00b0033d3f2a75bcmr3495999wrb.2.1708366063121;
-        Mon, 19 Feb 2024 10:07:43 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEO6yyvoB77VuEP/uGPBn/im4MGTtDdsEpGGyXcK0cY6h6wR9S+UfxDdBeVabULrQz8nL7U3A==
-X-Received: by 2002:a05:6000:1d8e:b0:33d:3f2a:75bc with SMTP id bk14-20020a0560001d8e00b0033d3f2a75bcmr3495988wrb.2.1708366062793;
-        Mon, 19 Feb 2024 10:07:42 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-227-135.dyn.eolo.it. [146.241.227.135])
-        by smtp.gmail.com with ESMTPSA id f2-20020adfe902000000b0033cf24700e5sm10924915wrm.39.2024.02.19.10.07.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Feb 2024 10:07:42 -0800 (PST)
-Message-ID: <8c06807aff1be5f95c1321221f9616d692c9fa4e.camel@redhat.com>
-Subject: Re: [PATCH net] net: implement lockless setsockopt(SO_PEEK_OFF)
-From: Paolo Abeni <pabeni@redhat.com>
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>,  Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Daan De Meyer
- <daan.j.demeyer@gmail.com>,  Kuniyuki Iwashima <kuniyu@amazon.com>, Martin
- KaFai Lau <martin.lau@kernel.org>, David Ahern <dsahern@kernel.org>
-Date: Mon, 19 Feb 2024 19:07:36 +0100
-In-Reply-To: <20240219141220.908047-1-edumazet@google.com>
-References: <20240219141220.908047-1-edumazet@google.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+	 in-reply-to:in-reply-to:references:references;
+	bh=1kDjJIB3VfeqTO3f+6fEctV5vkZFJYMY6TvCtBICPhk=;
+	b=Mku2ja6UYNQHS4jXwS577X3RbI+m6wV9QfVDWvUBfAzPlEw3JTlC8ErkWvcAOUFbf598ap
+	tOfVAT/JLZwLyRJfl4wuYB8Oj+WMV5LIihi9U+mYTegyHd8h2784sXxY4Wl1AnDju8BuMd
+	R/nZS/zv1qTEqB5FYfUDlA3NpNt+e2usNwAT8xGieaxghTT9YIgqLpicEPvnWLBkJykaNw
+	9fjfEAiCbMlUY/kgXj5aMhk9+tbqNxLECN6pk03OY/qmgzJVVINsufjGva+/TXLhwbetZx
+	ZieMhr6XcZf4EUxYUddRA2+4ckVwRnNc+kLvImBl+GqSU3+ZGXjFxXZCyhKKsA==
+Date: Mon, 19 Feb 2024 19:16:47 +0100
+From: Herve Codina <herve.codina@bootlin.com>
+To: Simon Horman <horms@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Linus Walleij <linus.walleij@linaro.org>, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: wan: framer: remove children from struct
+ framer_ops kdoc
+Message-ID: <20240219191647.1e896e5f@bootlin.com>
+In-Reply-To: <20240219-framer-children-v1-1-169c1deddc70@kernel.org>
+References: <20240219-framer-children-v1-1-169c1deddc70@kernel.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
-On Mon, 2024-02-19 at 14:12 +0000, Eric Dumazet wrote:
-> syzbot reported a lockdep violation [1] involving af_unix
-> support of SO_PEEK_OFF.
->=20
-> Since SO_PEEK_OFF is inherently not thread safe (it uses a per-socket
-> sk_peek_off field), there is really no point to enforce a pointless
-> thread safety in the kernel.
->=20
-> After this patch :
->=20
-> - setsockopt(SO_PEEK_OFF) no longer acquires the socket lock.
->=20
-> - skb_consume_udp() no longer has to acquire the socket lock.
->=20
-> - af_unix no longer needs a special version of sk_set_peek_off(),
->   because it does not lock u->iolock anymore.
->=20
-> As a followup, we could replace prot->set_peek_off to be a boolean
-> and avoid an indirect call, since we always use sk_set_peek_off().
+Hi Simon,
 
-Only related to that mentioned possible follow-up: I'm trying to
-benchmarking the UDP change mentioned here:
+On Mon, 19 Feb 2024 17:45:48 +0000
+Simon Horman <horms@kernel.org> wrote:
 
-https://lore.kernel.org/netdev/725a92b4813242549f2316e6682d3312b5e658d8.cam=
-el@redhat.com/
+> Remove documentation of non-existent children field
+> from the Kernel doc for struct framer_ops.
+> 
+> Introduced by 82c944d05b1a ("net: wan: Add framer framework support")
+> 
+> Signed-off-by: Simon Horman <horms@kernel.org>
 
-and that it will require an udp specific set_peek_off() variant.
+Yes indeed.
 
-The indirect call in the control path should not be too bad, right?
+Acked-by: Herve Codina <herve.codina@bootlin.com>
 
-Thanks,
-
-Paolo
-
+Thanks for this patch.
+Best regards,
+Hervé
 
