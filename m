@@ -1,175 +1,567 @@
-Return-Path: <netdev+bounces-72892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A06485A0C0
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 11:16:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 401B785A0C7
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 11:17:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EF6E1C216EE
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 10:16:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F6762811E2
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 10:17:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4569825615;
-	Mon, 19 Feb 2024 10:16:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C077525610;
+	Mon, 19 Feb 2024 10:16:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="anFXOSDX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kRH+S3kI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6526428E26
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 10:16:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708337796; cv=none; b=esagPaTu/RH2r6ZtHtsT2ExDPPtZaJky7Bk4Rv5jQ2oNxWpVeI/U38546M8tHbEt2f/CI//c+XSECbboAErwy4ujJ0TAbZ2EZZc/wJoR5VQgoao3Enz99R1z57Tv8z80+HmvUemAPpVi5uPCzfDPZa5iZTMyF9OwzW5WpaT1zhY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708337796; c=relaxed/simple;
-	bh=ddrK06DYYlWFp/8o1bKXY+MqFFxKPduBG+KoHpQXtnQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MQZGYLKtz5z9d37kSjoW+o5zxp5SyeVqrV4VnnM54SsPsJGDSqE1b33brLK7nKbfc8RJ5E4hTKlJWbJCH/XzdhKg4V1dXqoSuGT2wB3cYcyRiy2cIRuHoIHQCmiZ42M32Lmwm7pXRoMGlY8rnJ3/z/CITvrxcYKGD+7mYJzJOdY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=anFXOSDX; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-563f675be29so3137385a12.0
-        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 02:16:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708337793; x=1708942593; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=g7Lad/UmGJgb5525hSE9P/XpX6hMriuonfy0h/btJ74=;
-        b=anFXOSDXGaWKLXnFw70c8JtAHphhOXV8mwldCzg6B5Dl9KCR0d8RKlZ011KBkzSyaR
-         P47lRKxSF5Q4SiA9GRq1VXWYUfNF8Wg7xOAjqfE/IJRHgodsVUADT21bFDbVRKfKyf2P
-         F7FpkvTuADJGExcOr6QWYFFuCAcP08Eib1g9Xn8O/rn00KehGmqu571SHwPS4o4uztus
-         o8aHWPEdELhEgUHaePyHvQbWHozYstDWq120i+v+1SAHZGCi344S1mb22sx8mtBTGEg/
-         3/iTvskGn4OuNjzRbiEsHgvq9fhi9JQC1WT7ifXXY+DvEGLoH7tNDNuP+yIlXiZ/eNLI
-         ni1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708337793; x=1708942593;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=g7Lad/UmGJgb5525hSE9P/XpX6hMriuonfy0h/btJ74=;
-        b=N79drSTRNal0rUo57NWewSbNWlUCaFqyWlVIDf6W9f0BdAFA9VexDQWwIO7bZl9RIL
-         Vd9p+kOQp6M79Jbv4eBs3TxZX28mHOXghKZ9ER5lWY95d4FWEDd0pEtyVusX5IqNBMBJ
-         UqmZJhaDHKTd8pMT/YLr+B1p0CNZc9tNnCkEWx3VKn8heCbEi3dW/Re6mM2seI+wyqgJ
-         hm3SPR0bsdRvAooXktscABIMdYRi/04Rl5Mmp/OdZsMWBmq9WIuagr2S5/G/hBNJkOgk
-         PNY8YnnUr9YTQ6hZAEDLS/TuNzPO1TmywdJap6UXnnv/fkJjeQ4QO36jP8wvD/5Cj4bH
-         TJug==
-X-Forwarded-Encrypted: i=1; AJvYcCUswvnmdb2Eh6N76dMehOc6tE8obu9WHcLe31Phx087jSe6iCG5SDQCqLlduveHdGQhZ/r58ZfjJpuF2yY21kDnt4tWXUmQ
-X-Gm-Message-State: AOJu0Yxtp0e9bzFtYRusvU3FEaZDRgq+98fuEnYyhv3AwJkacab5tjVS
-	UgE7ZCwEqocE7Z3ABRCk3zL6ZP7bHx4OeiOgOZXlp0efJW83wJKTaJAk2UNAAjs=
-X-Google-Smtp-Source: AGHT+IENa4i0UQzIyD/tV/wQnoCaQZIG2aVhQsRIDX2/LE6pQ6khHX1I6mzlZXGgqlAR3Yp8LR32Yg==
-X-Received: by 2002:a05:6402:214a:b0:563:bd95:4e8b with SMTP id bq10-20020a056402214a00b00563bd954e8bmr5758346edb.11.1708337792697;
-        Mon, 19 Feb 2024 02:16:32 -0800 (PST)
-Received: from [192.168.192.135] (078088045141.garwolin.vectranet.pl. [78.88.45.141])
-        by smtp.gmail.com with ESMTPSA id e18-20020a056402149200b00563c63e0a13sm2562753edv.49.2024.02.19.02.16.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Feb 2024 02:16:32 -0800 (PST)
-Message-ID: <85538095-9550-4b24-b147-bf765c296a01@linaro.org>
-Date: Mon, 19 Feb 2024 11:16:29 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91F8728DA0
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 10:16:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708337813; cv=fail; b=YfR8XFRklkT2o7MqWbETZBm0IlotGzDEOAN6ZAsq89ebbKeNefTNru6cUVnySS96UdQNp9YKWQzE7tsFG6zCdlVMuhRGwiurtckxYrd7270c030kikNHygZUPIbv/4rEoZkOT89nnKQQMCZydO0fyr7jkh1FF9xmMROcqtn5y1E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708337813; c=relaxed/simple;
+	bh=sBmr0YEu3f2P0YwA+ClGCqrc6beOy7hj8WP4XsJ4nII=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Ysvl5UEAd9oe8eChn8Mnt0Ehnz5anjmLeLiz2lu0IU88HE0w8zDm0ZmRVREGRQmN5juZpqRpbICCEVpp2/yJtMZVBDGjWhb5LlCdC9g6UBGBoN9prSRwfsI5D3UR9lD917sjTu2CsM/j733jw8uAIRO7o8SvcjbGpfZ7fHh+CMY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kRH+S3kI; arc=fail smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708337812; x=1739873812;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=sBmr0YEu3f2P0YwA+ClGCqrc6beOy7hj8WP4XsJ4nII=;
+  b=kRH+S3kIcwyG01Vp+rlyMtvp1A/fprjZJSFwJBVDNYtb7eJK6FLGcTW5
+   1kLe1VWf3NRqYDY55jUgsC0AZkVcLCWTZ8cO90LrS1zY9lAIX/XlbIj+m
+   zcjJ1XTl2/UziNR3NhGp2m4ZjYcnBHSi9Bi06kaY9Wn2HGO89Hl+lNb8N
+   MFOEAYILdULUasEo83aHFgVvA33q0kptOYJHsMsqdA3J4hUs2LsLiZxff
+   VeEbwup7k8+UXxF5uKYajm+DnE/BI35qhJ1pxUJa9N4w9FrWS8wIgp0Pw
+   mo2XFKPVl5CMhrMBy2wnEF2wqzb9TOdBtg6b7ztxbZp0YRcImRZ82ER/x
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10988"; a="6221975"
+X-IronPort-AV: E=Sophos;i="6.06,170,1705392000"; 
+   d="scan'208";a="6221975"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2024 02:16:51 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,170,1705392000"; 
+   d="scan'208";a="9052562"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 19 Feb 2024 02:16:50 -0800
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 19 Feb 2024 02:16:49 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 19 Feb 2024 02:16:49 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 19 Feb 2024 02:16:49 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=m5g7PMJCPO3PMb7FBHLnJjj9y1vO21v7YsOC+7Sh1u6ezm7Xw+LopqfjWdph9otcctOI9Df0xhijiGQT1bGYxkITdOiunbhqXgb6BO/3jW6cEaklfMu7Nzm4x0NvBgqWF5wLWFmOayZ3fki5ApnLm/U7C06r12sVdigpeUr4OAs8d3EOsrpDJdbAYj7x93QY+yEvWgSeKehVa6YorKj+hSVY4EVS9mAkgxZRBlo3F+RuRZ3f8C1/zBLWxkEZP2cRGoFghQDHqburheSVQP4aL1JhX/2Zraixxed4xVxyprGOEw2mB17Rl7C8/jClKgA4FpbadUt35RKBS0lq7RYJGw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Fx691YlFf1dEz0OOp/gbgn4h1qUfFeGV3Gd1ksAx1gM=;
+ b=hwCyC2sUx2Zt29Od77KBrtTYZf6qR/a+eaGNXa8JyxfhDwKdqmHV7C6oFz+8auetf5KvWZ4mKvkVcdECCFEoWXqz0QIMP1+Fz4rS6tFHZBAcxhNvXHb8gqmaBWn8MecfWWLCuijL0x4CrwElKjVteVRpJgih2yxoikVQVIQfCszx3EzDZxK7R0hab7asf2pMuvIZsRw63OrTHGC7Oq9zuvq+UQLb4HegvJzLM66HBFo9+7OoBQfI6gzrmEpovKtl9Dz3KdCZdIubf0vValsp4fGUD7QCI7d+qJ7OW9BC1V6/LhgB844f9M9NxVk9G39RNBjHbt5nk1MtU+jsby8aJQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BL1PR11MB5399.namprd11.prod.outlook.com (2603:10b6:208:318::12)
+ by MW4PR11MB6864.namprd11.prod.outlook.com (2603:10b6:303:21b::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.38; Mon, 19 Feb
+ 2024 10:16:46 +0000
+Received: from BL1PR11MB5399.namprd11.prod.outlook.com
+ ([fe80::4710:fe84:5d93:26a9]) by BL1PR11MB5399.namprd11.prod.outlook.com
+ ([fe80::4710:fe84:5d93:26a9%4]) with mapi id 15.20.7292.036; Mon, 19 Feb 2024
+ 10:16:46 +0000
+Message-ID: <d5ccaa1e-459e-4ac4-8c70-cfec02d62d11@intel.com>
+Date: Mon, 19 Feb 2024 11:16:42 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1 1/5] ice: Support 5 layer
+ topology
+To: <intel-wired-lan@lists.osuosl.org>
+CC: <netdev@vger.kernel.org>, <horms@kernel.org>,
+	<przemyslaw.kitszel@intel.com>, Raj Victor <victor.raj@intel.com>, "Michal
+ Wilczynski" <michal.wilczynski@intel.com>
+References: <20240219100555.7220-1-mateusz.polchlopek@intel.com>
+ <20240219100555.7220-2-mateusz.polchlopek@intel.com>
+Content-Language: pl
+From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Organization: Intel
+In-Reply-To: <20240219100555.7220-2-mateusz.polchlopek@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: WA2P291CA0041.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:1f::27) To BL1PR11MB5399.namprd11.prod.outlook.com
+ (2603:10b6:208:318::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/8] clk: qcom: ipq5332: enable few nssnoc clocks in
- driver probe
-Content-Language: en-US
-To: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>,
- Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Bjorn Andersson <andersson@kernel.org>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
- <sboyd@kernel.org>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Richard Cochran <richardcochran@gmail.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
- linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-References: <20240122-ipq5332-nsscc-v4-0-19fa30019770@quicinc.com>
- <20240122-ipq5332-nsscc-v4-2-19fa30019770@quicinc.com>
- <7a69a68d-44c2-4589-b286-466d2f2a0809@lunn.ch>
- <11fda059-3d8d-4030-922a-8fef16349a65@quicinc.com>
- <17e2400e-6881-4e9e-90c2-9c4f77a0d41d@lunn.ch>
- <8c9ee34c-a97b-4acf-a093-9ac2afc28d0e@quicinc.com>
- <CAA8EJppe6aNf2WJ5BvaX8SPTbuaEwzRm74F8QKyFtbmnGQt=1w@mail.gmail.com>
- <74f585c2-d220-4324-96eb-1a945fef9608@quicinc.com>
- <CAA8EJppuNRB9fhjimg4SUR2PydX7-KLWSb9H-nC-oSMYVOME-Q@mail.gmail.com>
- <d518dbc1-41aa-46f9-b549-c95a33b06ee0@quicinc.com>
-From: Konrad Dybcio <konrad.dybcio@linaro.org>
-Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
- 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
- izWDgYvmBE8=
-In-Reply-To: <d518dbc1-41aa-46f9-b549-c95a33b06ee0@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR11MB5399:EE_|MW4PR11MB6864:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6f075f22-b48e-49b1-4f52-08dc3133e083
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: rIpmEpela0FZTWlBpEeV5kDgG3lm0Le7MozDFFOzn7bUmyPX29YstEkmItlwUFARVYOKROP2JGiSFgfl9E7pSlzAbpdEYBg7z5sIbEYFPsmmcpIRehZ5Agewn5vTCnwXM7tZ9IT5NoQjYogAzj1CO+Z0XP4WyIgRJUxj3zlfqzIAdnOmW1lCllub+4wswGQqBI2O/wpzwYn612tSmMAwlHY/2+P5PgU0ijSBTZKcc/J2n5PP+PX7M1eNsC2peeuLVfMPudBOfmD2fAZmX3tNoTe15JvqUSF+UTSobra4R3Hf8mRnRvbAuXgpHFw/V6LCxbOEZ7BkGtcp8ocIKxVdwVP1eeZw8St/+jk64sysR4MLhvrBj6JsbILFdKdnnNA9hw2XouRk4Y5ays1AouK40fZrqL/VH+WRfxrssu2gQIb3MjHQxxCd7dMT21ncMLHWg2bo6qhwySDaNr7zwQA9nTNOnBn/v/2hHs72GAkY2iCGJUe4Ve9yusbHVB/NQxbylT4BpKqKz0k1S9P4WjOnyrMzqLt3JYuwgGeffrvr1YMXYN9JmLNTjtrw7YMJB/7S
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5399.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(346002)(366004)(136003)(396003)(230922051799003)(64100799003)(451199024)(1800799012)(186009)(5660300002)(30864003)(44832011)(2906002)(6512007)(107886003)(26005)(2616005)(36756003)(36916002)(478600001)(6506007)(6486002)(53546011)(38100700002)(82960400001)(83380400001)(6916009)(31696002)(86362001)(4326008)(8936002)(8676002)(66556008)(66476007)(66946007)(41300700001)(54906003)(6666004)(316002)(31686004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NCtkck1IR04xNUlnZlF5TmR6dUZGWmEyRnZjMVk2dTg2emN0bmF1Ky9hMlJh?=
+ =?utf-8?B?MzVMYkxyYUpXVlUrclhaMlNOYWp4ZTBmQjVWeWVIZkFzVkJKbnBrSEZVY1Zx?=
+ =?utf-8?B?Rm9sWkFPSXIzZy9yZ3JsSWhDeUxMd3hhcS92c001YWwyV1JqSnVJdVFuaEJ2?=
+ =?utf-8?B?d1ZJL2tJK2V5Z3JVRmJPOHNBU3AyNmhUSExxMVM4VnJyQVd1Nmt4RTJjVHB3?=
+ =?utf-8?B?NXdzOHNOR0pNU0VmY2UzZm12TnE4Y3lDMVduK3Y2ZGdFT0VpWXhneEFFVEtk?=
+ =?utf-8?B?MHUycVh6WnRueWZKZkxBTmdLYVdUVGU2T0h5L0RiejBuZWxQTjE4WTU0dTFv?=
+ =?utf-8?B?STBTK2lyRmoxdjYyMVd0c3krbTRiRk9EZGZMbFZ0RVllQm1zamxJdWhuQzc3?=
+ =?utf-8?B?R3o5d3BjNlVWRGdnSE8vOXZ2VTNkNjBXSUNwSVNiU1h5TEp6cHNsTVFHSkE1?=
+ =?utf-8?B?WFlRSzJPcjdST2IwUkkwTW9yZzZZRnRDMVp5L1JEWGRNdExLUVlnTmZaVEYw?=
+ =?utf-8?B?R05GZi9GMS9QV3FZZDZQaml2alVMa00xYmQ4Ulk0YzllNXhZdzhGcXVWYUN4?=
+ =?utf-8?B?TXFvU2FXKytxcUY2RjF0RzJVQ1owWHpOSTNJckg4b2FLd2xCRmIrNDRVUWZs?=
+ =?utf-8?B?UnNYVkVSUmtSMHR3WlRjb3g1and0RjFOZklSeVRETDdDMHFGbDlYRitaZGNm?=
+ =?utf-8?B?Sy9YaVBaN1l1NERZcFVHb2txY2Y2Wld0NG5WZi9aVnhHYS9qQmhjQk1IZUdT?=
+ =?utf-8?B?YzBaSTNaUmVaSDVCdEVETnR0alI0N3ZDbEppeTZ6UGZrd1NhUExTNkJaNDY5?=
+ =?utf-8?B?STNVRFNlZXMxT1MwNnRremFyTEFSOEhZRStyb1EyT1lXZ0pOME5DbVlZY2hM?=
+ =?utf-8?B?WXRKa1hZTDMrYitabVNYYUJOdW5VMExadDhXREsxV3NKZzM5eEkvTUsvb2pD?=
+ =?utf-8?B?dis1WHIweis0Y2FxVjg4WVErdjl6NnRlZ09SWnRsZ1pXQlJtTXZkWHFWV2Fh?=
+ =?utf-8?B?a3h5ZlJRcjVxQ2pKdEV4c2s2VlBUSlI1blk3QWVpUTBOQ0pSSTAvaktweTZ6?=
+ =?utf-8?B?MVdSQXBNcnBBVE5xQVNWYnJYYTU0dGlBdUk0TVBRZmlITjV6WVlyOGNiRFNi?=
+ =?utf-8?B?cDJJRCtuYU1RWXQ0c040aTdkL21KbUUvUlBjbTBXMEtzNUw1L1lrTGZtYjY5?=
+ =?utf-8?B?clF4OHhmU1R5MGZDRXZEd1J6UUZLbCtHeGRQbjRMeDNLNzFVYUY4UFArREQv?=
+ =?utf-8?B?YkdhVU55VEtoK2EyeGZLbXFPYXFNK0tVVzdUM2RWWU0yS2JaVk9jTEZlcG1U?=
+ =?utf-8?B?Mk9Dek5LQjRqSGhsR1IyZHMwcldnVm5KRjBucVNmOFNSVWJ6Y2l3bms4VGFC?=
+ =?utf-8?B?ZDc3bVZySWJtMjhwV0tHQUQ0OHlJRTJqYnh5YllpTEg2WUh3cEpuOGg3VDlZ?=
+ =?utf-8?B?MFgyYXpiWVRUclAxMkVkaDBpWTM1NDkvaU5YampmamdWSkVrMnZ3WVdPREJu?=
+ =?utf-8?B?SW9HVmhkV3dhdUtKYUY1TE53SzBMdmduZjFJODZ6S0NHYmxZL3lKMmhMMXlV?=
+ =?utf-8?B?MFhKZ0NiOHNqbkptSWRxbkp6Nlp3V2JzWHRNVFBvVjc3eHNJQ0o2eG0zdVp4?=
+ =?utf-8?B?RmFPOUFIM0NoS0ozV1UwVHQ1cDdlRlhlMm0vaE5QWFliTlAxYk5xV2QvYVJ5?=
+ =?utf-8?B?NzBHRmszSGsvWDZoWW1SNTlraGdHT21xR2M0TjBkcWR3aXFzRVl5aTFxSHlq?=
+ =?utf-8?B?VFVXVzhJR1RMTEdvRHZoQjRNdDZqcC9IQnprbk9UeUNMaWJ2RG5FT1Q0ZEo0?=
+ =?utf-8?B?M0hZeExYa3MrVEhqN2FUS2tSdnRydXhuQlkxUDd2QUs1NVg2bzlRUTFyRE9U?=
+ =?utf-8?B?VGZVaWZUR1RSRWRqQTFPeVlJTFp4ZlhlWkpFa2U1ZUhDaUFlR2tmWWpHRGhs?=
+ =?utf-8?B?NVVQd2F1WHloV0NaMVVoOHFULzMxV2pwOFA0ZlJKRTJaQzF2L25PdmIzT0RG?=
+ =?utf-8?B?eHF4V3BWVUFJeGJ1dUJESDNNdVdSTmFuOGgzK1pmNndUeGZTN0hTN1NRZkls?=
+ =?utf-8?B?c3NQQ25FVHpSZ2UvOXZici9XNDRLT1N1YkZGYlNmeEE3RFJRQWZpdG1pZE83?=
+ =?utf-8?B?Y29OK0xEREM2U1E0YnlNZFNGdnNUdkw4b2lIYUo5NWY0RlNPNVd5T2h1dG83?=
+ =?utf-8?B?Qmc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6f075f22-b48e-49b1-4f52-08dc3133e083
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5399.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2024 10:16:46.1330
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sFkLoxx6YywZh+HvH63MxN67pdx+4wBIGqujlUQnZEhG8AzYYwHnuvHLGu3jseuCudYIymfM4hgPUXTL69fIGB3Bn9ND33l/NHS4hYvdNNQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB6864
+X-OriginatorOrg: intel.com
 
-On 18.02.2024 05:29, Kathiravan Thirumoorthy wrote:
+On 2/19/2024 11:05 AM, Mateusz Polchlopek wrote:
+> From: Raj Victor <victor.raj@intel.com>
 > 
+> There is a performance issue when the number of VSIs are not multiple
+> of 8. This is caused due to the max children limitation per node(8) in
+> 9 layer topology. The BW credits are shared evenly among the children
+> by default. Assume one node has 8 children and the other has 1.
+> The parent of these nodes share the BW credit equally among them.
+> Apparently this causes a problem for the first node which has 8 children.
+> The 9th VM get more BW credits than the first 8 VMs.
 > 
-> On 2/17/2024 10:15 PM, Dmitry Baryshkov wrote:
->> On Sat, 17 Feb 2024 at 17:45, Kathiravan Thirumoorthy
->> <quic_kathirav@quicinc.com> wrote:
->>>
->>>
->>> <snip>
->>>
->>>>> Reason being, to access the NSSCC clocks, these GCC clocks
->>>>> (gcc_snoc_nssnoc_clk, gcc_snoc_nssnoc_1_clk, gcc_nssnoc_nsscc_clk)
->>>>> should be turned ON. But CCF disables these clocks as well due to the
->>>>> lack of consumer.
->>>>
->>>> This means that NSSCC is also a consumer of those clocks. Please fix
->>>> both DT and nsscc driver to handle NSSNOC clocks.
->>>
->>>
->>> Thanks Dmitry. I shall include these clocks in the NSSCC DT node and
->>> enable the same in the NSSCC driver probe.
->>
->> Or use them through pm_clk. This might be better, as the system
->> doesn't need these clocks if NSSCC is suspended.
+> Example:
 > 
+> 1) With 8 VM's:
+> for x in 0 1 2 3 4 5 6 7;
+> do taskset -c ${x} netperf -P0 -H 172.68.169.125 &  sleep .1 ; done
 > 
-> IPQ53XX SoC doesn't support the PM(suspend / resume) functionality, so that, can I enable these clocks in NSSCC driver probe itself?
+> tx_queue_0_packets: 23283027
+> tx_queue_1_packets: 23292289
+> tx_queue_2_packets: 23276136
+> tx_queue_3_packets: 23279828
+> tx_queue_4_packets: 23279828
+> tx_queue_5_packets: 23279333
+> tx_queue_6_packets: 23277745
+> tx_queue_7_packets: 23279950
+> tx_queue_8_packets: 0
+> 
+> 2) With 9 VM's:
+> for x in 0 1 2 3 4 5 6 7 8;
+> do taskset -c ${x} netperf -P0 -H 172.68.169.125 &  sleep .1 ; done
+> 
+> tx_queue_0_packets: 24163396
+> tx_queue_1_packets: 24164623
+> tx_queue_2_packets: 24163188
+> tx_queue_3_packets: 24163701
+> tx_queue_4_packets: 24163683
+> tx_queue_5_packets: 24164668
+> tx_queue_6_packets: 23327200
+> tx_queue_7_packets: 24163853
+> tx_queue_8_packets: 91101417
+> 
+> So on average queue 8 statistics show that 3.7 times more packets were
+> send there than to the other queues.
+> 
+> The FW starting with version 3.20, has increased the max number of
+> children per node by reducing the number of layers from 9 to 5. Reflect
+> this on driver side.
+> 
+> Signed-off-by: Raj Victor <victor.raj@intel.com>
+> Co-developed-by: Michal Wilczynski <michal.wilczynski@intel.com>
+> Signed-off-by: Michal Wilczynski <michal.wilczynski@intel.com>
+> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+> ---
+>   .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  23 ++
+>   drivers/net/ethernet/intel/ice/ice_common.c   |   5 +
+>   drivers/net/ethernet/intel/ice/ice_ddp.c      | 199 ++++++++++++++++++
+>   drivers/net/ethernet/intel/ice/ice_ddp.h      |   2 +
+>   drivers/net/ethernet/intel/ice/ice_sched.h    |   3 +
+>   drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+>   6 files changed, 233 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+> index b315c734455a..02102e937b30 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+> @@ -121,6 +121,7 @@ struct ice_aqc_list_caps_elem {
+>   #define ICE_AQC_CAPS_PCIE_RESET_AVOIDANCE		0x0076
+>   #define ICE_AQC_CAPS_POST_UPDATE_RESET_RESTRICT		0x0077
+>   #define ICE_AQC_CAPS_NVM_MGMT				0x0080
+> +#define ICE_AQC_CAPS_TX_SCHED_TOPO_COMP_MODE		0x0085
+>   #define ICE_AQC_CAPS_FW_LAG_SUPPORT			0x0092
+>   #define ICE_AQC_BIT_ROCEV2_LAG				0x01
+>   #define ICE_AQC_BIT_SRIOV_LAG				0x02
+> @@ -819,6 +820,23 @@ struct ice_aqc_get_topo {
+>   	__le32 addr_low;
+>   };
+>   
+> +/* Get/Set Tx Topology (indirect 0x0418/0x0417) */
+> +struct ice_aqc_get_set_tx_topo {
+> +	u8 set_flags;
+> +#define ICE_AQC_TX_TOPO_FLAGS_CORRER		BIT(0)
+> +#define ICE_AQC_TX_TOPO_FLAGS_SRC_RAM		BIT(1)
+> +#define ICE_AQC_TX_TOPO_FLAGS_LOAD_NEW		BIT(4)
+> +#define ICE_AQC_TX_TOPO_FLAGS_ISSUED		BIT(5)
+> +
+> +	u8 get_flags;
+> +#define ICE_AQC_TX_TOPO_GET_RAM		2
+> +
+> +	__le16 reserved1;
+> +	__le32 reserved2;
+> +	__le32 addr_high;
+> +	__le32 addr_low;
+> +};
+> +
+>   /* Update TSE (indirect 0x0403)
+>    * Get TSE (indirect 0x0404)
+>    * Add TSE (indirect 0x0401)
+> @@ -2547,6 +2565,7 @@ struct ice_aq_desc {
+>   		struct ice_aqc_get_link_topo get_link_topo;
+>   		struct ice_aqc_i2c read_write_i2c;
+>   		struct ice_aqc_read_i2c_resp read_i2c_resp;
+> +		struct ice_aqc_get_set_tx_topo get_set_tx_topo;
+>   	} params;
+>   };
+>   
+> @@ -2653,6 +2672,10 @@ enum ice_adminq_opc {
+>   	ice_aqc_opc_query_sched_res			= 0x0412,
+>   	ice_aqc_opc_remove_rl_profiles			= 0x0415,
+>   
+> +	/* tx topology commands */
+> +	ice_aqc_opc_set_tx_topo				= 0x0417,
+> +	ice_aqc_opc_get_tx_topo				= 0x0418,
+> +
+>   	/* PHY commands */
+>   	ice_aqc_opc_get_phy_caps			= 0x0600,
+>   	ice_aqc_opc_set_phy_cfg				= 0x0601,
+> diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+> index 090a2b8b5ff2..175091011251 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_common.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_common.c
+> @@ -1622,6 +1622,8 @@ ice_aq_send_cmd(struct ice_hw *hw, struct ice_aq_desc *desc, void *buf,
+>   	case ice_aqc_opc_set_port_params:
+>   	case ice_aqc_opc_get_vlan_mode_parameters:
+>   	case ice_aqc_opc_set_vlan_mode_parameters:
+> +	case ice_aqc_opc_set_tx_topo:
+> +	case ice_aqc_opc_get_tx_topo:
+>   	case ice_aqc_opc_add_recipe:
+>   	case ice_aqc_opc_recipe_to_profile:
+>   	case ice_aqc_opc_get_recipe:
+> @@ -2178,6 +2180,9 @@ ice_parse_common_caps(struct ice_hw *hw, struct ice_hw_common_caps *caps,
+>   		ice_debug(hw, ICE_DBG_INIT, "%s: sriov_lag = %u\n",
+>   			  prefix, caps->sriov_lag);
+>   		break;
+> +	case ICE_AQC_CAPS_TX_SCHED_TOPO_COMP_MODE:
+> +		caps->tx_sched_topo_comp_mode_en = (number == 1);
+> +		break;
+>   	default:
+>   		/* Not one of the recognized common capabilities */
+>   		found = false;
+> diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.c b/drivers/net/ethernet/intel/ice/ice_ddp.c
+> index 7532d11ad7f3..766437944774 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_ddp.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_ddp.c
+> @@ -4,6 +4,7 @@
+>   #include "ice_common.h"
+>   #include "ice.h"
+>   #include "ice_ddp.h"
+> +#include "ice_sched.h"
+>   
+>   /* For supporting double VLAN mode, it is necessary to enable or disable certain
+>    * boost tcam entries. The metadata labels names that match the following
+> @@ -2263,3 +2264,201 @@ enum ice_ddp_state ice_copy_and_init_pkg(struct ice_hw *hw, const u8 *buf,
+>   
+>   	return state;
+>   }
+> +
+> +/**
+> + * ice_get_set_tx_topo - get or set Tx topology
+> + * @hw: pointer to the HW struct
+> + * @buf: pointer to Tx topology buffer
+> + * @buf_size: buffer size
+> + * @cd: pointer to command details structure or NULL
+> + * @flags: pointer to descriptor flags
+> + * @set: 0-get, 1-set topology
+> + *
+> + * The function will get or set Tx topology
+> + */
+> +static int
+> +ice_get_set_tx_topo(struct ice_hw *hw, u8 *buf, u16 buf_size,
+> +		    struct ice_sq_cd *cd, u8 *flags, bool set)
+> +{
+> +	struct ice_aqc_get_set_tx_topo *cmd;
+> +	struct ice_aq_desc desc;
+> +	int status;
+> +
+> +	cmd = &desc.params.get_set_tx_topo;
+> +	if (set) {
+> +		ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_tx_topo);
+> +		cmd->set_flags = ICE_AQC_TX_TOPO_FLAGS_ISSUED;
+> +		/* requested to update a new topology, not a default topology */
+> +		if (buf)
+> +			cmd->set_flags |= ICE_AQC_TX_TOPO_FLAGS_SRC_RAM |
+> +					  ICE_AQC_TX_TOPO_FLAGS_LOAD_NEW;
+> +	} else {
+> +		ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_tx_topo);
+> +		cmd->get_flags = ICE_AQC_TX_TOPO_GET_RAM;
+> +	}
+> +	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
+> +	status = ice_aq_send_cmd(hw, &desc, buf, buf_size, cd);
+> +	if (status)
+> +		return status;
+> +	/* read the return flag values (first byte) for get operation */
+> +	if (!set && flags)
+> +		*flags = desc.params.get_set_tx_topo.set_flags;
+> +
+> +	return 0;
+> +}
+> +
+> +/**
+> + * ice_cfg_tx_topo - Initialize new Tx topology if available
+> + * @hw: pointer to the HW struct
+> + * @buf: pointer to Tx topology buffer
+> + * @len: buffer size
+> + *
+> + * The function will apply the new Tx topology from the package buffer
+> + * if available.
+> + */
+> +int ice_cfg_tx_topo(struct ice_hw *hw, u8 *buf, u32 len)
+> +{
+> +	u8 *current_topo, *new_topo = NULL;
+> +	struct ice_run_time_cfg_seg *seg;
+> +	struct ice_buf_hdr *section;
+> +	struct ice_pkg_hdr *pkg_hdr;
+> +	enum ice_ddp_state state;
+> +	u16 offset, size = 0;
+> +	u32 reg = 0;
+> +	int status;
+> +	u8 flags;
+> +
+> +	if (!buf || !len)
+> +		return -EINVAL;
+> +
+> +	/* Does FW support new Tx topology mode ? */
+> +	if (!hw->func_caps.common_cap.tx_sched_topo_comp_mode_en) {
+> +		ice_debug(hw, ICE_DBG_INIT, "FW doesn't support compatibility mode\n");
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+> +	current_topo = kzalloc(ICE_AQ_MAX_BUF_LEN, GFP_KERNEL);
+> +	if (!current_topo)
+> +		return -ENOMEM;
+> +
+> +	/* Get the current Tx topology */
+> +	status = ice_get_set_tx_topo(hw, current_topo, ICE_AQ_MAX_BUF_LEN, NULL,
+> +				     &flags, false);
+> +
+> +	kfree(current_topo);
+> +
+> +	if (status) {
+> +		ice_debug(hw, ICE_DBG_INIT, "Get current topology is failed\n");
+> +		return status;
+> +	}
+> +
+> +	/* Is default topology already applied ? */
+> +	if (!(flags & ICE_AQC_TX_TOPO_FLAGS_LOAD_NEW) &&
+> +	    hw->num_tx_sched_layers == ICE_SCHED_9_LAYERS) {
+> +		ice_debug(hw, ICE_DBG_INIT, "Default topology already applied\n");
+> +		return -EEXIST;
+> +	}
+> +
+> +	/* Is new topology already applied ? */
+> +	if ((flags & ICE_AQC_TX_TOPO_FLAGS_LOAD_NEW) &&
+> +	    hw->num_tx_sched_layers == ICE_SCHED_5_LAYERS) {
+> +		ice_debug(hw, ICE_DBG_INIT, "New topology already applied\n");
+> +		return -EEXIST;
+> +	}
+> +
+> +	/* Setting topology already issued? */
+> +	if (flags & ICE_AQC_TX_TOPO_FLAGS_ISSUED) {
+> +		ice_debug(hw, ICE_DBG_INIT, "Update Tx topology was done by another PF\n");
+> +		/* Add a small delay before exiting */
+> +		msleep(2000);
+> +		return -EEXIST;
+> +	}
+> +
+> +	/* Change the topology from new to default (5 to 9) */
+> +	if (!(flags & ICE_AQC_TX_TOPO_FLAGS_LOAD_NEW) &&
+> +	    hw->num_tx_sched_layers == ICE_SCHED_5_LAYERS) {
+> +		ice_debug(hw, ICE_DBG_INIT, "Change topology from 5 to 9 layers\n");
+> +		goto update_topo;
+> +	}
+> +
+> +	pkg_hdr = (struct ice_pkg_hdr *)buf;
+> +	state = ice_verify_pkg(pkg_hdr, len);
+> +	if (state) {
+> +		ice_debug(hw, ICE_DBG_INIT, "Failed to verify pkg (err: %d)\n",
+> +			  state);
+> +		return -EIO;
+> +	}
+> +
+> +	/* Find runtime configuration segment */
+> +	seg = (struct ice_run_time_cfg_seg *)
+> +	      ice_find_seg_in_pkg(hw, SEGMENT_TYPE_ICE_RUN_TIME_CFG, pkg_hdr);
+> +	if (!seg) {
+> +		ice_debug(hw, ICE_DBG_INIT, "5 layer topology segment is missing\n");
+> +		return -EIO;
+> +	}
+> +
+> +	if (le32_to_cpu(seg->buf_table.buf_count) < ICE_MIN_S_COUNT) {
+> +		ice_debug(hw, ICE_DBG_INIT, "5 layer topology segment count(%d) is wrong\n",
+> +			  seg->buf_table.buf_count);
+> +		return -EIO;
+> +	}
+> +
+> +	section = ice_pkg_val_buf(seg->buf_table.buf_array);
+> +	if (!section || le32_to_cpu(section->section_entry[0].type) !=
+> +		ICE_SID_TX_5_LAYER_TOPO) {
+> +		ice_debug(hw, ICE_DBG_INIT, "5 layer topology section type is wrong\n");
+> +		return -EIO;
+> +	}
+> +
+> +	size = le16_to_cpu(section->section_entry[0].size);
+> +	offset = le16_to_cpu(section->section_entry[0].offset);
+> +	if (size < ICE_MIN_S_SZ || size > ICE_MAX_S_SZ) {
+> +		ice_debug(hw, ICE_DBG_INIT, "5 layer topology section size is wrong\n");
+> +		return -EIO;
+> +	}
+> +
+> +	/* Make sure the section fits in the buffer */
+> +	if (offset + size > ICE_PKG_BUF_SIZE) {
+> +		ice_debug(hw, ICE_DBG_INIT, "5 layer topology buffer > 4K\n");
+> +		return -EIO;
+> +	}
+> +
+> +	/* Get the new topology buffer */
+> +	new_topo = ((u8 *)section) + offset;
+> +
+> +update_topo:
+> +	/* Acquire global lock to make sure that set topology issued
+> +	 * by one PF.
+> +	 */
+> +	status = ice_acquire_res(hw, ICE_GLOBAL_CFG_LOCK_RES_ID, ICE_RES_WRITE,
+> +				 ICE_GLOBAL_CFG_LOCK_TIMEOUT);
+> +	if (status) {
+> +		ice_debug(hw, ICE_DBG_INIT, "Failed to acquire global lock\n");
+> +		return status;
+> +	}
+> +
+> +	/* Check if reset was triggered already. */
+> +	reg = rd32(hw, GLGEN_RSTAT);
+> +	if (reg & GLGEN_RSTAT_DEVSTATE_M) {
+> +		/* Reset is in progress, re-init the HW again */
+> +		ice_debug(hw, ICE_DBG_INIT, "Reset is in progress. Layer topology might be applied already\n");
+> +		ice_check_reset(hw);
+> +		return 0;
+> +	}
+> +
+> +	/* Set new topology */
+> +	status = ice_get_set_tx_topo(hw, new_topo, size, NULL, NULL, true);
+> +	if (status) {
+> +		ice_debug(hw, ICE_DBG_INIT, "Failed setting Tx topology\n");
+> +		return status;
+> +	}
+> +
+> +	/* New topology is updated, delay 1 second before issuing the CORER */
+> +	msleep(1000);
+> +	ice_reset(hw, ICE_RESET_CORER);
+> +	/* CORER will clear the global lock, so no explicit call
+> +	 * required for release.
+> +	 */
+> +
+> +	return 0;
+> +}
+> diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.h b/drivers/net/ethernet/intel/ice/ice_ddp.h
+> index ff66c2ffb1a2..622543f08b43 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_ddp.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_ddp.h
+> @@ -454,4 +454,6 @@ u16 ice_pkg_buf_get_active_sections(struct ice_buf_build *bld);
+>   void *ice_pkg_enum_section(struct ice_seg *ice_seg, struct ice_pkg_enum *state,
+>   			   u32 sect_type);
+>   
+> +int ice_cfg_tx_topo(struct ice_hw *hw, u8 *buf, u32 len);
+> +
+>   #endif
+> diff --git a/drivers/net/ethernet/intel/ice/ice_sched.h b/drivers/net/ethernet/intel/ice/ice_sched.h
+> index 1aef05ea5a57..9baff6a857d8 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_sched.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_sched.h
+> @@ -6,6 +6,9 @@
+>   
+>   #include "ice_common.h"
+>   
+> +#define ICE_SCHED_5_LAYERS	5
+> +#define ICE_SCHED_9_LAYERS	9
+> +
+>   #define SCHED_NODE_NAME_MAX_LEN 32
+>   
+>   #define ICE_QGRP_LAYER_OFFSET	2
+> diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
+> index 657f97e2105f..f964f26664d0 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_type.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_type.h
+> @@ -296,6 +296,7 @@ struct ice_hw_common_caps {
+>   	bool pcie_reset_avoidance;
+>   	/* Post update reset restriction */
+>   	bool reset_restrict_support;
+> +	bool tx_sched_topo_comp_mode_en;
+>   };
+>   
+>   /* IEEE 1588 TIME_SYNC specific info */
 
-Surely the platform can s2idle..
-
-Konrad
+This is of course v4, not v1, sorry for the mistake in tag
+Mateusz
 
