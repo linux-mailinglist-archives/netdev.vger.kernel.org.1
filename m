@@ -1,269 +1,570 @@
-Return-Path: <netdev+bounces-72795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3380859A9A
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 03:03:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4428B859AAE
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 03:22:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F22B81C208E9
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 02:03:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 930361F2106B
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 02:22:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1408EDD;
-	Mon, 19 Feb 2024 02:03:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C5E9111E;
+	Mon, 19 Feb 2024 02:22:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="WQgZnbIr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eZl8GWRm"
 X-Original-To: netdev@vger.kernel.org
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B834810
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 02:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7FD81FB3;
+	Mon, 19 Feb 2024 02:22:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708308205; cv=none; b=Q7AmZQurJM7zeSd08+ueHoMF8TgFIBAjdxOt4WDjfucvoeAJR7yQ3accyIpkzsp08ZZjplgbu81UflAQ3EzbOWSir9HVZKgNB7sPVZbG0wEiuWIQFAiG7jX6FXrb/xB5eCTG3wxPCm5LMdY6TWA4x4jGR+oIq3rSN8Po7wYHrSc=
+	t=1708309326; cv=none; b=IOHS4KYT/fIBc4ix1Sukvk1Qn5IaQ0Q0vwWCI0cMM6zcI/Ta3csk/1hy9UaOesANZ3NvXb/1qOjykgetNwBTZeh5I7xLQPGA2LUBz7KIcHa14RxWNPJZJdaUR0kbB+evVMJosYK6H81fQQC1QuAJbA5DCfwVaDk8zlUOOS6AnEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708308205; c=relaxed/simple;
-	bh=Ipawxy6J+tJMkyBy62Dhgu8gHJrO1aWagg33b3e3l0Q=;
+	s=arc-20240116; t=1708309326; c=relaxed/simple;
+	bh=XM6BHUMrYiGJWWnHdlrLk6QnlNQ6a4vpycoEl/2Upak=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gBWhEwfmfomGwZ8vGx/yPvn1uFebr9bh5GIVzF+dCTWBW5gbkjlL7WQB2cZ9fgIvzhGVmsbFQLunvIHMY+rNIhxmliFNbpis19m+W2gX8fX6q08NytD4en9+du/rA0Gt8LRkgZA11O9OX41KBWrjfDtSEbhPUGu55sH6TQh8f9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au; spf=pass smtp.mailfrom=gandalf.ozlabs.org; dkim=pass (2048-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b=WQgZnbIr; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gandalf.ozlabs.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=gibson.dropbear.id.au; s=202312; t=1708308192;
-	bh=AqrMO8EraJBfPYvDNXHUjy7OXr7NkH/BzIlB54mMiBU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WQgZnbIrAxv8fteYUAgL5bqO0P0MoqhDxFZdfCHetqrVZkgWjW2mpfZrQm/OkbCx8
-	 3EEumLWD1cMzf3SixhW+MAf6G/mB3ZZhhAYo8ML2FKlnaS0CV13DWyHrA0A/S4Dxg+
-	 U/ZWWWF+nn9VZfVC7t9vcL9cMmdEFhwan5IByvcHPmOm08uIMDXvoo21Kv9+DrFKrN
-	 KNE+Nn3+HKjBAZzTdASijD47oQg22b/riOcXYmp8dUn4tDAE4HtxnSzu8iVADiWN+n
-	 qmKyr4sIX+jvlGxllpcA9IgG9B8mGRaXgDBXE+zDH60xDKFj+M216zyWrmWQQDZinj
-	 9u7as/w9I+zIw==
-Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
-	id 4TdQmc4kJ3z4wcV; Mon, 19 Feb 2024 13:03:12 +1100 (AEDT)
-Date: Mon, 19 Feb 2024 13:02:55 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Jon Maloy <jmaloy@redhat.com>
-Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	kuba@kernel.org, passt-dev@passt.top, sbrivio@redhat.com,
-	lvivier@redhat.com, dgibson@redhat.com, netdev@vger.kernel.org,
-	davem@davemloft.net
-Subject: Re: [PATCH v3] tcp: add support for SO_PEEK_OFF
-Message-ID: <ZdK2z4U1naf_T6IM@zatzit>
-References: <CANn89iL2FvTVYv6ym58=4L-K-kSan6R4PEv488ztyX4HsNquug@mail.gmail.com>
- <725a92b4813242549f2316e6682d3312b5e658d8.camel@redhat.com>
- <CANn89i+bc=OqkwpHy0F_FDSKCM7Hxr7p2hvxd3Fg7Z+TriPNTA@mail.gmail.com>
- <20687849-ec5c-9ce5-0a18-cc80f5b64816@redhat.com>
- <178b9f2dbb3c56fcfef46a97ea395bdd13ebfb59.camel@redhat.com>
- <CANn89iKXOZdT7_ww_Jytm4wMoXAe0=pqX+M_iVpNGaHqe_9o4Q@mail.gmail.com>
- <89f263be-3403-8404-69ed-313539d59669@redhat.com>
- <9cb12376da3f6cd316320b29f294cc84eaba6cfa.camel@redhat.com>
- <CANn89i+C_mQmTFsqKb3geRADET2ELWeZ=0QHdvuq+v+PKtW0AQ@mail.gmail.com>
- <6a9f5dec-eb0c-51ef-0911-7345f50e08f0@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=me0pyP1CDWr7tl/GmxuxPpRdEumVFw7EK6EuWzsnVua5R9mhefcnV1UFIXQ2EKNPJ6TY/6qGgk7KhwMz0A1Tdh9WIOjcOTINKO38Qsge6M32O+cxviKU9b8dYUVeJVlp3LbxHV3DiGkwD4XIpzkoVFyIui3j7BfO67HI/JyZZiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eZl8GWRm; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708309324; x=1739845324;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=XM6BHUMrYiGJWWnHdlrLk6QnlNQ6a4vpycoEl/2Upak=;
+  b=eZl8GWRmfjxtCrFwEWEt1Fbzwy6yRi3eOijQWoG1jdsJPynobp8ecFen
+   v5+RCQ+4jsXms0VHS+7mK8PyHvsaXErSjNBElaTZ6mCdXvz8vO1jhzy1n
+   JMsOnOkX5GmWVXBXVtfMEippmx+8Krd749j4i6xKLIGVwq/eEFhoclJQy
+   Qi+Xj++EBhg3Q+gRER2z0oYeOKP/wwUuLuMuBrqBrJAYAO9eHeKrf5gQ9
+   zvIUuKUcxTo0rCWxZ9Hd/kqfdx59v5Qvy4C1EXSNLxl6EX2Vb12mZ8CuO
+   vwBvR8mHHzWVD1znqO2LRXs2lSWCFO+bEc/oOHylQRC1sgsUo30GY6pAk
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10988"; a="27822091"
+X-IronPort-AV: E=Sophos;i="6.06,170,1705392000"; 
+   d="scan'208";a="27822091"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2024 18:22:03 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,170,1705392000"; 
+   d="scan'208";a="4509411"
+Received: from lkp-server02.sh.intel.com (HELO 3c78fa4d504c) ([10.239.97.151])
+  by fmviesa008.fm.intel.com with ESMTP; 18 Feb 2024 18:22:00 -0800
+Received: from kbuild by 3c78fa4d504c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rbtHw-0003RK-2L;
+	Mon, 19 Feb 2024 02:21:53 +0000
+Date: Mon, 19 Feb 2024 10:21:40 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jakub Kicinski <kuba@kernel.org>, shuah@kernel.org,
+	keescook@chromium.org
+Cc: oe-kbuild-all@lists.linux.dev, linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org, jakub@cloudflare.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [PATCH net-next 1/4] selftests: kselftest_harness: pass step via
+ shared memory
+Message-ID: <202402191034.76fuePpP-lkp@intel.com>
+References: <20240213154416.422739-2-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="bxTDMv+/z8aJpho7"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6a9f5dec-eb0c-51ef-0911-7345f50e08f0@redhat.com>
+In-Reply-To: <20240213154416.422739-2-kuba@kernel.org>
 
+Hi Jakub,
 
---bxTDMv+/z8aJpho7
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+kernel test robot noticed the following build errors:
 
-On Fri, Feb 16, 2024 at 05:13:34AM -0500, Jon Maloy wrote:
->=20
->=20
-> On 2024-02-16 04:21, Eric Dumazet wrote:
-> > On Fri, Feb 16, 2024 at 10:14=E2=80=AFAM Paolo Abeni<pabeni@redhat.com>=
-  wrote:
-> > > On Thu, 2024-02-15 at 17:24 -0500, Jon Maloy wrote:
-> > > > On 2024-02-15 12:46, Eric Dumazet wrote:
-> > > > > On Thu, Feb 15, 2024 at 6:41=E2=80=AFPM Paolo Abeni<pabeni@redhat=
-=2Ecom>  wrote:
-> > > > > > Note: please send text-only email to netdev.
-> > > > > >=20
-> > > > > > On Thu, 2024-02-15 at 10:11 -0500, Jon Maloy wrote:
-> > > > > > > I wonder if the following could be acceptable:
-> > > > > > >=20
-> > > > > > >    if (flags & MSG_PEEK)
-> > > > > > >           sk_peek_offset_fwd(sk, used);
-> > > > > > >    else if (peek_offset > 0)
-> > > > > > >          sk_peek_offset_bwd(sk, used);
-> > > > > > >=20
-> > > > > > >    peek_offset is already present in the data cache, and if i=
-t has the value
-> > > > > > >    zero it means either that that sk->sk_peek_off is unused (=
--1) or actually is zero.
-> > > > > > >    Either way, no rewind is needed in that case.
-> > > > > > I agree the above should avoid touching cold cachelines in the
-> > > > > > fastpath, and looks functionally correct to me.
-> > > > > >=20
-> > > > > > The last word is up to Eric :)
-> > > > > >=20
-> > > > > An actual patch seems needed.
-> > > > >=20
-> > > > > In the current form, local variable peek_offset is 0 when !MSG_PE=
-EK.
-> > > > >=20
-> > > > > So the "else if (peek_offset > 0)" would always be false.
-> > > > >=20
-> > > > Yes, of course. This wouldn't work unless we read sk->sk_peek_off a=
-t the
-> > > > beginning of the function.
-> > > > I will look at the other suggestions.
-> > > I *think* that moving sk_peek_off this way:
-> > >=20
-> > > ---
-> > > diff --git a/include/net/sock.h b/include/net/sock.h
-> > > index a9d99a9c583f..576a6a6abb03 100644
-> > > --- a/include/net/sock.h
-> > > +++ b/include/net/sock.h
-> > > @@ -413,7 +413,7 @@ struct sock {
-> > >          unsigned int            sk_napi_id;
-> > >   #endif
-> > >          int                     sk_rcvbuf;
-> > > -       int                     sk_disconnects;
-> > > +       int                     sk_peek_off;
-> > >=20
-> > >          struct sk_filter __rcu  *sk_filter;
-> > >          union {
-> > > @@ -439,7 +439,7 @@ struct sock {
-> > >                  struct rb_root  tcp_rtx_queue;
-> > >          };
-> > >          struct sk_buff_head     sk_write_queue;
-> > > -       __s32                   sk_peek_off;
-> > > +       int                     sk_disconnects;
-> > >          int                     sk_write_pending;
-> > >          __u32                   sk_dst_pending_confirm;
-> > >          u32                     sk_pacing_status; /* see enum sk_pac=
-ing */
-> > > ---
-> > >=20
-> > > should avoid problematic accesses,
-> > >=20
-> > > The relevant cachelines layout is as follow:
-> > >=20
-> > >                          /* --- cacheline 4 boundary (256 bytes) --- =
-*/
-> > >                  struct sk_buff *   tail;                 /*   256   =
-  8 */
-> > >          } sk_backlog;                                    /*   240   =
- 24 */
-> > >          int                        sk_forward_alloc;     /*   264   =
-  4 */
-> > >          u32                        sk_reserved_mem;      /*   268   =
-  4 */
-> > >          unsigned int               sk_ll_usec;           /*   272   =
-  4 */
-> > >          unsigned int               sk_napi_id;           /*   276   =
-  4 */
-> > >          int                        sk_rcvbuf;            /*   280   =
-  4 */
-> > >          int                        sk_disconnects;       /*   284   =
-  4 */
-> > >                                  // will become sk_peek_off
-> > >          struct sk_filter *         sk_filter;            /*   288   =
-  8 */
-> > >          union {
-> > >                  struct socket_wq * sk_wq;                /*   296   =
-  8 */
-> > >                  struct socket_wq * sk_wq_raw;            /*   296   =
-  8 */
-> > >          };                                               /*   296   =
-  8 */
-> > >          struct xfrm_policy *       sk_policy[2];         /*   304   =
- 16 */
-> > >          /* --- cacheline 5 boundary (320 bytes) --- */
-> > >=20
-> > >          //  ...
-> > >=20
-> > >          /* --- cacheline 6 boundary (384 bytes) --- */
-> > >          __s32                      sk_peek_off;          /*   384   =
-  4 */
-> > >                                  // will become sk_diconnects
-> > >          int                        sk_write_pending;     /*   388   =
-  4 */
-> > >          __u32                      sk_dst_pending_confirm; /*   392 =
-    4 */
-> > >          u32                        sk_pacing_status;     /*   396   =
-  4 */
-> > >          long int                   sk_sndtimeo;          /*   400   =
-  8 */
-> > >          struct timer_list          sk_timer;             /*   408   =
- 40 */
-> > >=20
-> > >          /* XXX last struct has 4 bytes of padding */
-> > >=20
-> > >          /* --- cacheline 7 boundary (448 bytes) --- */
-> > >=20
-> > > sk_peek_off will be in the same cachline of sk_forward_alloc /
-> > > sk_reserved_mem / backlog tail, that are already touched by the
-> > > tcp_recvmsg_locked() main loop.
-> > >=20
-> > > WDYT?
-> > I was about to send a similar change, also moving sk_rcvtimeo, and
-> > adding __cacheline_group_begin()/__cacheline_group_end
-> > annotations.
-> >=20
-> > I can finish this today.
-> >=20
-> There is also the following alternative:
->=20
-> if (flags & MSG_PEEK)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sk_peek_offset_fwd(sk, used);
-> else if (flags & MSG_TRUNC)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sk_peek_offset_bwd(sk, used);
->=20
-> This is the way we use it, and probably the typical usage.
-> It would force a user to drain the receive queue with MSG_TRUNC whenever =
-he
-> is using
-> MSG_PEEK_OFF, but I don't really see that as a limitation.
+[auto build test ERROR on net-next/main]
 
-I really don't like this, although it would certainly do what we need
-for passt/pasta.  SO_PEEK_OFF has established semantics for Unix
-sockets, which includes regular recv() adjusting the offset.  Having
-it behave subtlety differently for TCP seems like a very bad idea.
+url:    https://github.com/intel-lab-lkp/linux/commits/Jakub-Kicinski/selftests-kselftest_harness-pass-step-via-shared-memory/20240213-234644
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240213154416.422739-2-kuba%40kernel.org
+patch subject: [PATCH net-next 1/4] selftests: kselftest_harness: pass step via shared memory
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240219/202402191034.76fuePpP-lkp@intel.com/reproduce)
 
-> Anyway, if Paolo's suggestion solves the problem this shouldn't be
-> necessary.
->=20
-> ///jon
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202402191034.76fuePpP-lkp@intel.com/
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+All errors (new ones prefixed by >>):
 
---bxTDMv+/z8aJpho7
-Content-Type: application/pgp-signature; name="signature.asc"
+   In file included from fs_test.c:26:
+   fs_test.c: In function 'layout1_no_restriction':
+>> common.h:52:40: error: 'struct __test_metadata' has no member named 'step'
+      52 |                         _exit(_metadata->step); \
+         |                                        ^~
+   fs_test.c:403:1: note: in expansion of macro 'TEST_F_FORK'
+     403 | TEST_F_FORK(layout1, no_restriction)
+         | ^~~~~~~~~~~
+   common.h:58:34: error: 'struct __test_metadata' has no member named 'step'
+      58 |                         _metadata->step = 1; \
+         |                                  ^~
+   fs_test.c:403:1: note: in expansion of macro 'TEST_F_FORK'
+     403 | TEST_F_FORK(layout1, no_restriction)
+         | ^~~~~~~~~~~
+   common.h:71:34: error: 'struct __test_metadata' has no member named 'step'
+      71 |                         _metadata->step = WEXITSTATUS(status); \
+         |                                  ^~
+   fs_test.c:403:1: note: in expansion of macro 'TEST_F_FORK'
+     403 | TEST_F_FORK(layout1, no_restriction)
+         | ^~~~~~~~~~~
+   fs_test.c: In function 'layout1_inval':
+>> common.h:52:40: error: 'struct __test_metadata' has no member named 'step'
+      52 |                         _exit(_metadata->step); \
+         |                                        ^~
+   fs_test.c:426:1: note: in expansion of macro 'TEST_F_FORK'
+     426 | TEST_F_FORK(layout1, inval)
+         | ^~~~~~~~~~~
+   common.h:58:34: error: 'struct __test_metadata' has no member named 'step'
+      58 |                         _metadata->step = 1; \
+         |                                  ^~
+   fs_test.c:426:1: note: in expansion of macro 'TEST_F_FORK'
+     426 | TEST_F_FORK(layout1, inval)
+         | ^~~~~~~~~~~
+   common.h:71:34: error: 'struct __test_metadata' has no member named 'step'
+      71 |                         _metadata->step = WEXITSTATUS(status); \
+         |                                  ^~
+   fs_test.c:426:1: note: in expansion of macro 'TEST_F_FORK'
+     426 | TEST_F_FORK(layout1, inval)
+         | ^~~~~~~~~~~
+   fs_test.c: In function 'layout1_file_and_dir_access_rights':
+>> common.h:52:40: error: 'struct __test_metadata' has no member named 'step'
+      52 |                         _exit(_metadata->step); \
+         |                                        ^~
+   fs_test.c:548:1: note: in expansion of macro 'TEST_F_FORK'
+     548 | TEST_F_FORK(layout1, file_and_dir_access_rights)
+         | ^~~~~~~~~~~
+   common.h:58:34: error: 'struct __test_metadata' has no member named 'step'
+      58 |                         _metadata->step = 1; \
+         |                                  ^~
+   fs_test.c:548:1: note: in expansion of macro 'TEST_F_FORK'
+     548 | TEST_F_FORK(layout1, file_and_dir_access_rights)
+         | ^~~~~~~~~~~
+   common.h:71:34: error: 'struct __test_metadata' has no member named 'step'
+      71 |                         _metadata->step = WEXITSTATUS(status); \
+         |                                  ^~
+   fs_test.c:548:1: note: in expansion of macro 'TEST_F_FORK'
+     548 | TEST_F_FORK(layout1, file_and_dir_access_rights)
+         | ^~~~~~~~~~~
+   fs_test.c: In function 'layout0_ruleset_with_unknown_access':
+>> common.h:52:40: error: 'struct __test_metadata' has no member named 'step'
+      52 |                         _exit(_metadata->step); \
+         |                                        ^~
+   fs_test.c:592:1: note: in expansion of macro 'TEST_F_FORK'
+     592 | TEST_F_FORK(layout0, ruleset_with_unknown_access)
+         | ^~~~~~~~~~~
+   common.h:58:34: error: 'struct __test_metadata' has no member named 'step'
+      58 |                         _metadata->step = 1; \
+         |                                  ^~
+   fs_test.c:592:1: note: in expansion of macro 'TEST_F_FORK'
+     592 | TEST_F_FORK(layout0, ruleset_with_unknown_access)
+         | ^~~~~~~~~~~
+   common.h:71:34: error: 'struct __test_metadata' has no member named 'step'
+      71 |                         _metadata->step = WEXITSTATUS(status); \
+         |                                  ^~
+   fs_test.c:592:1: note: in expansion of macro 'TEST_F_FORK'
+     592 | TEST_F_FORK(layout0, ruleset_with_unknown_access)
+         | ^~~~~~~~~~~
+   fs_test.c: In function 'layout0_rule_with_unknown_access':
+>> common.h:52:40: error: 'struct __test_metadata' has no member named 'step'
+      52 |                         _exit(_metadata->step); \
+         |                                        ^~
+   fs_test.c:608:1: note: in expansion of macro 'TEST_F_FORK'
+     608 | TEST_F_FORK(layout0, rule_with_unknown_access)
+         | ^~~~~~~~~~~
+   common.h:58:34: error: 'struct __test_metadata' has no member named 'step'
+      58 |                         _metadata->step = 1; \
+         |                                  ^~
+   fs_test.c:608:1: note: in expansion of macro 'TEST_F_FORK'
+     608 | TEST_F_FORK(layout0, rule_with_unknown_access)
+         | ^~~~~~~~~~~
+   common.h:71:34: error: 'struct __test_metadata' has no member named 'step'
+      71 |                         _metadata->step = WEXITSTATUS(status); \
+         |                                  ^~
+   fs_test.c:608:1: note: in expansion of macro 'TEST_F_FORK'
+     608 | TEST_F_FORK(layout0, rule_with_unknown_access)
+         | ^~~~~~~~~~~
+   fs_test.c: In function 'layout1_rule_with_unhandled_access':
+>> common.h:52:40: error: 'struct __test_metadata' has no member named 'step'
+      52 |                         _exit(_metadata->step); \
+         |                                        ^~
+   fs_test.c:635:1: note: in expansion of macro 'TEST_F_FORK'
+     635 | TEST_F_FORK(layout1, rule_with_unhandled_access)
+         | ^~~~~~~~~~~
+   common.h:58:34: error: 'struct __test_metadata' has no member named 'step'
+      58 |                         _metadata->step = 1; \
+         |                                  ^~
+   fs_test.c:635:1: note: in expansion of macro 'TEST_F_FORK'
+     635 | TEST_F_FORK(layout1, rule_with_unhandled_access)
+         | ^~~~~~~~~~~
+   common.h:71:34: error: 'struct __test_metadata' has no member named 'step'
+      71 |                         _metadata->step = WEXITSTATUS(status); \
+         |                                  ^~
+   fs_test.c:635:1: note: in expansion of macro 'TEST_F_FORK'
+     635 | TEST_F_FORK(layout1, rule_with_unhandled_access)
+         | ^~~~~~~~~~~
+   fs_test.c: In function 'layout0_proc_nsfs':
+>> common.h:52:40: error: 'struct __test_metadata' has no member named 'step'
+      52 |                         _exit(_metadata->step); \
+         |                                        ^~
+   fs_test.c:741:1: note: in expansion of macro 'TEST_F_FORK'
+     741 | TEST_F_FORK(layout0, proc_nsfs)
+         | ^~~~~~~~~~~
+   common.h:58:34: error: 'struct __test_metadata' has no member named 'step'
+      58 |                         _metadata->step = 1; \
+         |                                  ^~
+   fs_test.c:741:1: note: in expansion of macro 'TEST_F_FORK'
+     741 | TEST_F_FORK(layout0, proc_nsfs)
+         | ^~~~~~~~~~~
+   common.h:71:34: error: 'struct __test_metadata' has no member named 'step'
+      71 |                         _metadata->step = WEXITSTATUS(status); \
+         |                                  ^~
+   fs_test.c:741:1: note: in expansion of macro 'TEST_F_FORK'
+     741 | TEST_F_FORK(layout0, proc_nsfs)
+         | ^~~~~~~~~~~
+   fs_test.c: In function 'layout0_unpriv':
+>> common.h:52:40: error: 'struct __test_metadata' has no member named 'step'
+      52 |                         _exit(_metadata->step); \
+         |                                        ^~
+   fs_test.c:790:1: note: in expansion of macro 'TEST_F_FORK'
+     790 | TEST_F_FORK(layout0, unpriv)
+         | ^~~~~~~~~~~
+   common.h:58:34: error: 'struct __test_metadata' has no member named 'step'
+      58 |                         _metadata->step = 1; \
+         |                                  ^~
+   fs_test.c:790:1: note: in expansion of macro 'TEST_F_FORK'
+     790 | TEST_F_FORK(layout0, unpriv)
+         | ^~~~~~~~~~~
+   common.h:71:34: error: 'struct __test_metadata' has no member named 'step'
+      71 |                         _metadata->step = WEXITSTATUS(status); \
+         |                                  ^~
+   fs_test.c:790:1: note: in expansion of macro 'TEST_F_FORK'
+     790 | TEST_F_FORK(layout0, unpriv)
+         | ^~~~~~~~~~~
+   fs_test.c: In function 'layout1_effective_access':
+>> common.h:52:40: error: 'struct __test_metadata' has no member named 'step'
+      52 |                         _exit(_metadata->step); \
+         |                                        ^~
+   fs_test.c:813:1: note: in expansion of macro 'TEST_F_FORK'
+     813 | TEST_F_FORK(layout1, effective_access)
+         | ^~~~~~~~~~~
+   common.h:58:34: error: 'struct __test_metadata' has no member named 'step'
+      58 |                         _metadata->step = 1; \
+         |                                  ^~
+   fs_test.c:813:1: note: in expansion of macro 'TEST_F_FORK'
+     813 | TEST_F_FORK(layout1, effective_access)
+         | ^~~~~~~~~~~
+   common.h:71:34: error: 'struct __test_metadata' has no member named 'step'
+      71 |                         _metadata->step = WEXITSTATUS(status); \
+         |                                  ^~
+   fs_test.c:813:1: note: in expansion of macro 'TEST_F_FORK'
+     813 | TEST_F_FORK(layout1, effective_access)
+         | ^~~~~~~~~~~
+   fs_test.c: In function 'layout1_unhandled_access':
+>> common.h:52:40: error: 'struct __test_metadata' has no member named 'step'
+      52 |                         _exit(_metadata->step); \
+         |                                        ^~
+   fs_test.c:871:1: note: in expansion of macro 'TEST_F_FORK'
+     871 | TEST_F_FORK(layout1, unhandled_access)
+         | ^~~~~~~~~~~
+   common.h:58:34: error: 'struct __test_metadata' has no member named 'step'
+      58 |                         _metadata->step = 1; \
+         |                                  ^~
+   fs_test.c:871:1: note: in expansion of macro 'TEST_F_FORK'
+     871 | TEST_F_FORK(layout1, unhandled_access)
+         | ^~~~~~~~~~~
+   common.h:71:34: error: 'struct __test_metadata' has no member named 'step'
+      71 |                         _metadata->step = WEXITSTATUS(status); \
+         |                                  ^~
+   fs_test.c:871:1: note: in expansion of macro 'TEST_F_FORK'
+     871 | TEST_F_FORK(layout1, unhandled_access)
+         | ^~~~~~~~~~~
+   fs_test.c: In function 'layout1_ruleset_overlap':
+>> common.h:52:40: error: 'struct __test_metadata' has no member named 'step'
+      52 |                         _exit(_metadata->step); \
+         |                                        ^~
+   fs_test.c:898:1: note: in expansion of macro 'TEST_F_FORK'
+     898 | TEST_F_FORK(layout1, ruleset_overlap)
+         | ^~~~~~~~~~~
+   common.h:58:34: error: 'struct __test_metadata' has no member named 'step'
+      58 |                         _metadata->step = 1; \
+         |                                  ^~
+   fs_test.c:898:1: note: in expansion of macro 'TEST_F_FORK'
+     898 | TEST_F_FORK(layout1, ruleset_overlap)
+         | ^~~~~~~~~~~
+   common.h:71:34: error: 'struct __test_metadata' has no member named 'step'
+      71 |                         _metadata->step = WEXITSTATUS(status); \
+         |                                  ^~
+   fs_test.c:898:1: note: in expansion of macro 'TEST_F_FORK'
+     898 | TEST_F_FORK(layout1, ruleset_overlap)
+         | ^~~~~~~~~~~
+   fs_test.c: In function 'layout1_layer_rule_unions':
+>> common.h:52:40: error: 'struct __test_metadata' has no member named 'step'
+      52 |                         _exit(_metadata->step); \
+         |                                        ^~
+   fs_test.c:939:1: note: in expansion of macro 'TEST_F_FORK'
+     939 | TEST_F_FORK(layout1, layer_rule_unions)
+         | ^~~~~~~~~~~
+   common.h:58:34: error: 'struct __test_metadata' has no member named 'step'
+      58 |                         _metadata->step = 1; \
+         |                                  ^~
+   fs_test.c:939:1: note: in expansion of macro 'TEST_F_FORK'
+     939 | TEST_F_FORK(layout1, layer_rule_unions)
+         | ^~~~~~~~~~~
+   common.h:71:34: error: 'struct __test_metadata' has no member named 'step'
+      71 |                         _metadata->step = WEXITSTATUS(status); \
+         |                                  ^~
+   fs_test.c:939:1: note: in expansion of macro 'TEST_F_FORK'
+     939 | TEST_F_FORK(layout1, layer_rule_unions)
+         | ^~~~~~~~~~~
+   fs_test.c: In function 'layout1_non_overlapping_accesses':
+>> common.h:52:40: error: 'struct __test_metadata' has no member named 'step'
+      52 |                         _exit(_metadata->step); \
+         |                                        ^~
+   fs_test.c:1046:1: note: in expansion of macro 'TEST_F_FORK'
+    1046 | TEST_F_FORK(layout1, non_overlapping_accesses)
+         | ^~~~~~~~~~~
+   common.h:58:34: error: 'struct __test_metadata' has no member named 'step'
+      58 |                         _metadata->step = 1; \
+         |                                  ^~
+   fs_test.c:1046:1: note: in expansion of macro 'TEST_F_FORK'
+    1046 | TEST_F_FORK(layout1, non_overlapping_accesses)
+         | ^~~~~~~~~~~
+   common.h:71:34: error: 'struct __test_metadata' has no member named 'step'
+      71 |                         _metadata->step = WEXITSTATUS(status); \
+         |                                  ^~
+   fs_test.c:1046:1: note: in expansion of macro 'TEST_F_FORK'
+    1046 | TEST_F_FORK(layout1, non_overlapping_accesses)
+         | ^~~~~~~~~~~
+   fs_test.c: In function 'layout1_interleaved_masked_accesses':
+>> common.h:52:40: error: 'struct __test_metadata' has no member named 'step'
+      52 |                         _exit(_metadata->step); \
+         |                                        ^~
+   fs_test.c:1095:1: note: in expansion of macro 'TEST_F_FORK'
+    1095 | TEST_F_FORK(layout1, interleaved_masked_accesses)
+         | ^~~~~~~~~~~
+   common.h:58:34: error: 'struct __test_metadata' has no member named 'step'
+      58 |                         _metadata->step = 1; \
+         |                                  ^~
+   fs_test.c:1095:1: note: in expansion of macro 'TEST_F_FORK'
+    1095 | TEST_F_FORK(layout1, interleaved_masked_accesses)
+         | ^~~~~~~~~~~
+   common.h:71:34: error: 'struct __test_metadata' has no member named 'step'
+      71 |                         _metadata->step = WEXITSTATUS(status); \
+         |                                  ^~
+   fs_test.c:1095:1: note: in expansion of macro 'TEST_F_FORK'
+    1095 | TEST_F_FORK(layout1, interleaved_masked_accesses)
+         | ^~~~~~~~~~~
+   fs_test.c: In function 'layout1_inherit_subset':
+>> common.h:52:40: error: 'struct __test_metadata' has no member named 'step'
+      52 |                         _exit(_metadata->step); \
+         |                                        ^~
+   fs_test.c:1280:1: note: in expansion of macro 'TEST_F_FORK'
+    1280 | TEST_F_FORK(layout1, inherit_subset)
+         | ^~~~~~~~~~~
+   common.h:58:34: error: 'struct __test_metadata' has no member named 'step'
+      58 |                         _metadata->step = 1; \
+         |                                  ^~
+   fs_test.c:1280:1: note: in expansion of macro 'TEST_F_FORK'
+    1280 | TEST_F_FORK(layout1, inherit_subset)
+         | ^~~~~~~~~~~
+   common.h:71:34: error: 'struct __test_metadata' has no member named 'step'
+      71 |                         _metadata->step = WEXITSTATUS(status); \
+         |                                  ^~
+   fs_test.c:1280:1: note: in expansion of macro 'TEST_F_FORK'
+    1280 | TEST_F_FORK(layout1, inherit_subset)
+         | ^~~~~~~~~~~
+   fs_test.c: In function 'layout1_inherit_superset':
+>> common.h:52:40: error: 'struct __test_metadata' has no member named 'step'
+      52 |                         _exit(_metadata->step); \
+         |                                        ^~
+   fs_test.c:1397:1: note: in expansion of macro 'TEST_F_FORK'
+    1397 | TEST_F_FORK(layout1, inherit_superset)
+         | ^~~~~~~~~~~
+   common.h:58:34: error: 'struct __test_metadata' has no member named 'step'
+      58 |                         _metadata->step = 1; \
+         |                                  ^~
+   fs_test.c:1397:1: note: in expansion of macro 'TEST_F_FORK'
+    1397 | TEST_F_FORK(layout1, inherit_superset)
+         | ^~~~~~~~~~~
+   common.h:71:34: error: 'struct __test_metadata' has no member named 'step'
+      71 |                         _metadata->step = WEXITSTATUS(status); \
+         |                                  ^~
+   fs_test.c:1397:1: note: in expansion of macro 'TEST_F_FORK'
+    1397 | TEST_F_FORK(layout1, inherit_superset)
+         | ^~~~~~~~~~~
+   fs_test.c: In function 'layout0_max_layers':
+>> common.h:52:40: error: 'struct __test_metadata' has no member named 'step'
+      52 |                         _exit(_metadata->step); \
+         |                                        ^~
+   fs_test.c:1434:1: note: in expansion of macro 'TEST_F_FORK'
+    1434 | TEST_F_FORK(layout0, max_layers)
+         | ^~~~~~~~~~~
+   common.h:58:34: error: 'struct __test_metadata' has no member named 'step'
+      58 |                         _metadata->step = 1; \
+         |                                  ^~
+   fs_test.c:1434:1: note: in expansion of macro 'TEST_F_FORK'
+    1434 | TEST_F_FORK(layout0, max_layers)
+         | ^~~~~~~~~~~
+   common.h:71:34: error: 'struct __test_metadata' has no member named 'step'
+      71 |                         _metadata->step = WEXITSTATUS(status); \
+         |                                  ^~
+   fs_test.c:1434:1: note: in expansion of macro 'TEST_F_FORK'
+    1434 | TEST_F_FORK(layout0, max_layers)
+         | ^~~~~~~~~~~
+   fs_test.c: In function 'layout1_empty_or_same_ruleset':
+>> common.h:52:40: error: 'struct __test_metadata' has no member named 'step'
+      52 |                         _exit(_metadata->step); \
+         |                                        ^~
+   fs_test.c:1458:1: note: in expansion of macro 'TEST_F_FORK'
+    1458 | TEST_F_FORK(layout1, empty_or_same_ruleset)
+         | ^~~~~~~~~~~
+   common.h:58:34: error: 'struct __test_metadata' has no member named 'step'
+      58 |                         _metadata->step = 1; \
+         |                                  ^~
+   fs_test.c:1458:1: note: in expansion of macro 'TEST_F_FORK'
+    1458 | TEST_F_FORK(layout1, empty_or_same_ruleset)
+         | ^~~~~~~~~~~
+   common.h:71:34: error: 'struct __test_metadata' has no member named 'step'
+      71 |                         _metadata->step = WEXITSTATUS(status); \
+         |                                  ^~
+   fs_test.c:1458:1: note: in expansion of macro 'TEST_F_FORK'
+    1458 | TEST_F_FORK(layout1, empty_or_same_ruleset)
+         | ^~~~~~~~~~~
+   fs_test.c: In function 'layout1_rule_on_mountpoint':
+>> common.h:52:40: error: 'struct __test_metadata' has no member named 'step'
+      52 |                         _exit(_metadata->step); \
+         |                                        ^~
+   fs_test.c:1492:1: note: in expansion of macro 'TEST_F_FORK'
+    1492 | TEST_F_FORK(layout1, rule_on_mountpoint)
+         | ^~~~~~~~~~~
+   common.h:58:34: error: 'struct __test_metadata' has no member named 'step'
+      58 |                         _metadata->step = 1; \
+         |                                  ^~
+   fs_test.c:1492:1: note: in expansion of macro 'TEST_F_FORK'
+    1492 | TEST_F_FORK(layout1, rule_on_mountpoint)
+         | ^~~~~~~~~~~
+   common.h:71:34: error: 'struct __test_metadata' has no member named 'step'
+      71 |                         _metadata->step = WEXITSTATUS(status); \
+         |                                  ^~
+   fs_test.c:1492:1: note: in expansion of macro 'TEST_F_FORK'
+    1492 | TEST_F_FORK(layout1, rule_on_mountpoint)
+         | ^~~~~~~~~~~
+   fs_test.c: In function 'layout1_rule_over_mountpoint':
+>> common.h:52:40: error: 'struct __test_metadata' has no member named 'step'
+      52 |                         _exit(_metadata->step); \
+         |                                        ^~
+   fs_test.c:1521:1: note: in expansion of macro 'TEST_F_FORK'
+    1521 | TEST_F_FORK(layout1, rule_over_mountpoint)
+         | ^~~~~~~~~~~
+   common.h:58:34: error: 'struct __test_metadata' has no member named 'step'
+      58 |                         _metadata->step = 1; \
+         |                                  ^~
+   fs_test.c:1521:1: note: in expansion of macro 'TEST_F_FORK'
+    1521 | TEST_F_FORK(layout1, rule_over_mountpoint)
+         | ^~~~~~~~~~~
+   common.h:71:34: error: 'struct __test_metadata' has no member named 'step'
+      71 |                         _metadata->step = WEXITSTATUS(status); \
+         |                                  ^~
+   fs_test.c:1521:1: note: in expansion of macro 'TEST_F_FORK'
+    1521 | TEST_F_FORK(layout1, rule_over_mountpoint)
+         | ^~~~~~~~~~~
+   fs_test.c: In function 'layout1_rule_over_root_allow_then_deny':
+   common.h:52:40: error: 'struct __test_metadata' has no member named 'step'
+      52 |                         _exit(_metadata->step); \
+         |                                        ^~
+   fs_test.c:1554:1: note: in expansion of macro 'TEST_F_FORK'
+    1554 | TEST_F_FORK(layout1, rule_over_root_allow_then_deny)
+         | ^~~~~~~~~~~
+   common.h:58:34: error: 'struct __test_metadata' has no member named 'step'
+      58 |                         _metadata->step = 1; \
+         |                                  ^~
+   fs_test.c:1554:1: note: in expansion of macro 'TEST_F_FORK'
+    1554 | TEST_F_FORK(layout1, rule_over_root_allow_then_deny)
+         | ^~~~~~~~~~~
+   common.h:71:34: error: 'struct __test_metadata' has no member named 'step'
+      71 |                         _metadata->step = WEXITSTATUS(status); \
+         |                                  ^~
+   fs_test.c:1554:1: note: in expansion of macro 'TEST_F_FORK'
+    1554 | TEST_F_FORK(layout1, rule_over_root_allow_then_deny)
+         | ^~~~~~~~~~~
+   fs_test.c: In function 'layout1_rule_over_root_deny':
+   common.h:52:40: error: 'struct __test_metadata' has no member named 'step'
+      52 |                         _exit(_metadata->step); \
+         |                                        ^~
+   fs_test.c:1584:1: note: in expansion of macro 'TEST_F_FORK'
+    1584 | TEST_F_FORK(layout1, rule_over_root_deny)
+         | ^~~~~~~~~~~
+   common.h:58:34: error: 'struct __test_metadata' has no member named 'step'
+      58 |                         _metadata->step = 1; \
+         |                                  ^~
+   fs_test.c:1584:1: note: in expansion of macro 'TEST_F_FORK'
+    1584 | TEST_F_FORK(layout1, rule_over_root_deny)
+         | ^~~~~~~~~~~
+   common.h:71:34: error: 'struct __test_metadata' has no member named 'step'
+      71 |                         _metadata->step = WEXITSTATUS(status); \
+         |                                  ^~
+   fs_test.c:1584:1: note: in expansion of macro 'TEST_F_FORK'
+    1584 | TEST_F_FORK(layout1, rule_over_root_deny)
+         | ^~~~~~~~~~~
+   fs_test.c: In function 'layout1_rule_inside_mount_ns':
+   common.h:52:40: error: 'struct __test_metadata' has no member named 'step'
+      52 |                         _exit(_metadata->step); \
+         |                                        ^~
+   fs_test.c:1604:1: note: in expansion of macro 'TEST_F_FORK'
+    1604 | TEST_F_FORK(layout1, rule_inside_mount_ns)
+         | ^~~~~~~~~~~
+   common.h:58:34: error: 'struct __test_metadata' has no member named 'step'
+      58 |                         _metadata->step = 1; \
+         |                                  ^~
+   fs_test.c:1604:1: note: in expansion of macro 'TEST_F_FORK'
+    1604 | TEST_F_FORK(layout1, rule_inside_mount_ns)
+         | ^~~~~~~~~~~
+   common.h:71:34: error: 'struct __test_metadata' has no member named 'step'
+      71 |                         _metadata->step = WEXITSTATUS(status); \
+         |                                  ^~
+   fs_test.c:1604:1: note: in expansion of macro 'TEST_F_FORK'
+    1604 | TEST_F_FORK(layout1, rule_inside_mount_ns)
+         | ^~~~~~~~~~~
+   fs_test.c: In function 'layout1_mount_and_pivot':
+   common.h:52:40: error: 'struct __test_metadata' has no member named 'step'
+      52 |                         _exit(_metadata->step); \
+         |                                        ^~
+   fs_test.c:1632:1: note: in expansion of macro 'TEST_F_FORK'
+    1632 | TEST_F_FORK(layout1, mount_and_pivot)
+         | ^~~~~~~~~~~
+   common.h:58:34: error: 'struct __test_metadata' has no member named 'step'
+      58 |                         _metadata->step = 1; \
+         |                                  ^~
+   fs_test.c:1632:1: note: in expansion of macro 'TEST_F_FORK'
+    1632 | TEST_F_FORK(layout1, mount_and_pivot)
+         | ^~~~~~~~~~~
+   common.h:71:34: error: 'struct __test_metadata' has no member named 'step'
+      71 |                         _metadata->step = WEXITSTATUS(status); \
+         |                                  ^~
+   fs_test.c:1632:1: note: in expansion of macro 'TEST_F_FORK'
+    1632 | TEST_F_FORK(layout1, mount_and_pivot)
+         | ^~~~~~~~~~~
+   fs_test.c: In function 'layout1_move_mount':
+   common.h:52:40: error: 'struct __test_metadata' has no member named 'step'
+      52 |                         _exit(_metadata->step); \
+         |                                        ^~
+   fs_test.c:1655:1: note: in expansion of macro 'TEST_F_FORK'
+    1655 | TEST_F_FORK(layout1, move_mount)
+         | ^~~~~~~~~~~
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEO+dNsU4E3yXUXRK2zQJF27ox2GcFAmXSts4ACgkQzQJF27ox
-2GdcWw/9Epp0+u3K9tIwTTqx8NhlfYTdvilcKd11V1AxORQrOvzczv4ku/Uu3bUl
-HCMgQsHtqBVl10gm9xBLI59GyGaqyrAdPfeVyd7aBN4PbR9E6A47x6yC1xW6JyhW
-5rnaN3j6+p5Db6M+MUTc6q48KRAko4P9tm0WGqE30ASO5+/nkoTLUMy4h5/p+xEX
-DRcHBItbKoDUf9RTBzlhpUAVdvvMFjmlqsFmLGqLxUPY3WxXrGctUaQURktFokoY
-3J6ZDj/RCB7ezgS5ntmeBgY0OExnGST/VVdUmeta93gyzOpO5DzjUtzxrwcPB+JM
-6sElQf0pShK+hdm4TsbbbDpV6HE2KKuRR/0l7tEg74O0mWlrrO/ci3RVO1L1T5GK
-DtNSLyEu6ss646e2MgqlPYFHGQSEXvqk8UizXtQqqiJrWAOSbk38viTZGSLCfcaz
-prp45npk4eL4kHuP+CfF3v7oCTA6X/ERYhTF+VukmpR/IW/MvtEfG/D56nONdveN
-sUhp9V5ktgT64nlPpJSheewGLHHXUnaNDFYxAP7490zrjuM0+ICh7JgMAu5ITFAs
-Ji+T7+HLLeuaWldFuVC5XorP0/07ijxQLRELVuEtEE2HOPN0OTPD+IsBCGO9WPu5
-G5+WncOG+4116J5VXfzReNpCLqyo03u+Gi2Igrey1ku8uMqh+I0=
-=56X0
------END PGP SIGNATURE-----
-
---bxTDMv+/z8aJpho7--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
