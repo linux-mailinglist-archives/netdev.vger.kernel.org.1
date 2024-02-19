@@ -1,197 +1,222 @@
-Return-Path: <netdev+bounces-73101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E66C685AD98
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 22:19:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0611685ADA1
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 22:23:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C38CB208CB
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 21:19:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5CCACB2132D
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 21:23:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 188C653E12;
-	Mon, 19 Feb 2024 21:19:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93DCE5466C;
+	Mon, 19 Feb 2024 21:23:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="SVmlgPhx"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HwpWR2z6"
 X-Original-To: netdev@vger.kernel.org
-Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01olkn2080.outbound.protection.outlook.com [40.92.52.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F9D1537F6;
-	Mon, 19 Feb 2024 21:19:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.52.80
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708377567; cv=fail; b=hQaerfmH5EYrN5gJjZjkOkMQx5AScwvpVlFf2k2Nxj2OTKmDhQwyolEVJiUq2U5zAEJIUgjfqlHQlwUBqXrMHnMiOmIsgL87ViZuyvmd9mxXiedmjjAjf748Y9LF5BIuTsVNDVtt3pc77L1fwliyKwgpQpHLxEqjX4CBbMbtpK8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708377567; c=relaxed/simple;
-	bh=kco784bwmc5IeJopfoeBo5L63hFZqY6r1OCM8F7x8nI=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=k2zfTe/KeKNU57eVov4HOsooN5oiLdi/0JEWuV3SxBp9nI4FcSyfaPzuWuDgGL/QRQO/jgdJ6rnYiHWX+jM3IUh6JyBkqawmTyyXdu3r+qc4pkrJ0V+73tXqGo10tG4yU7Oo9+9PcStfw56rb+5dddzmeCLHIr2j7QMP1B6ikoc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=SVmlgPhx; arc=fail smtp.client-ip=40.92.52.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Xq8DDHYg4aZVVxKtISkbC9gpOs4BPXzWRkNNd+gKcTfske5/HUBQnBmemDJcofi1hoAaN8fAExjfcdGmSR3dKutheh2qPkxSpe4FAgyNQcLAW0/SZAPzzBcDYLHBSOgfKQLAwduA4UKuHr5mkYge/YK1BS3uwzCU+fnpzXC9KgByGcPmWCwg7jlUqhyWGuirStA9NvQKYd5v//lvyasA/TNmTt0Yinr4M02ZUZnBDxP8yeyRY/gqH84qOsXuLw/7FKCNw9UwMu+4OeO31XRYoTcOQRup6cTfQysBde4hi8V+C1X+97dlWTengrdCb3sh+MGRC4/Lp3ou8bBIwvBAjg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0sT8j9X9QzdeXjh3yfdzJjkS1zIrRfvqxO4fRirQjDc=;
- b=bgrP0i5ckb5romT+dsBEumjWMVSIxnz3mM+DbUojqBvvzGeIKiDW005rxKkIzFETGwWzsWjKuqX5DULkB2eyb1wv0IiTKpqjOBwpNAWJf4MBcLvgrauij1Y44u0xMZLhMdMezcvYQaR6f0Ejpb91dUYSs9GWkxTzVQ/Lbq8ydrcm2DcHfh9wiIYkELZ6pSm+DBAHW0AbHrvv+MoiCBuRc9wh4amCXD1o49XUUJDx24VmoJd78zvBfs/Rdjpvbe2O53tX6k/ZB6BqWYtzr4671dODzipUQx6Wmu6uWiFTma1QmS0+Z9FcNiMpn88OjbZsX+aaOSIRl0AkmldaHUgT0Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0sT8j9X9QzdeXjh3yfdzJjkS1zIrRfvqxO4fRirQjDc=;
- b=SVmlgPhxnlC9VvmNfVzBjOsXE7j0Xz8BgjH3VQ9w9+zLfvqbG+e0PKa+FbB+Y7/uYQRS1IQ5n6OIj9J1uVLaPsL4l9MxDksxD+pdnZmao6tDBT9Kwx4jA/A6CJt3cPkLon8zSM2XhQb7QoXzAr5So/yRQEhVEkGdwL1GfTcGN2d0xBFXBQ05UZM8Og7edNN0PVYKhTwZiBMaNqMR+mRkfgZXgMBH00fhuoo7bzH/tw/EtDx3P9naysc6XTDuuZJ27KtbJb5B6q9tus32LGvDaZAzCHVH2RJbYhotiaQ7Vb30pBrCpOXmAZe3TB613irEeGiWwlOL66qKWRVtmKgHLA==
-Received: from SEZPR06MB6959.apcprd06.prod.outlook.com (2603:1096:101:1ed::14)
- by JH0PR06MB6478.apcprd06.prod.outlook.com (2603:1096:990:38::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.39; Mon, 19 Feb
- 2024 21:19:18 +0000
-Received: from SEZPR06MB6959.apcprd06.prod.outlook.com
- ([fe80::53da:a8a:83cb:b9ad]) by SEZPR06MB6959.apcprd06.prod.outlook.com
- ([fe80::53da:a8a:83cb:b9ad%4]) with mapi id 15.20.7292.036; Mon, 19 Feb 2024
- 21:19:18 +0000
-Message-ID:
- <SEZPR06MB6959E5BDA57AF61BFAB19FC096512@SEZPR06MB6959.apcprd06.prod.outlook.com>
-Date: Tue, 20 Feb 2024 05:19:12 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 3/6] net: hisilicon: add support for
- hisi_femac core on Hi3798MV200
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Yisen Zhuang <yisen.zhuang@huawei.com>,
- Salil Mehta <salil.mehta@huawei.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
-References: <20240220-net-v3-0-b68e5b75e765@outlook.com>
- <20240220-net-v3-3-b68e5b75e765@outlook.com>
- <29fc21f0-0e46-4d0f-8d4b-c4dbd1689c55@lunn.ch>
- <SEZPR06MB695901E7D4BEABE1B6F319D096512@SEZPR06MB6959.apcprd06.prod.outlook.com>
- <5572f4dd-dcf2-42ec-99c8-51bf4d1f28ba@lunn.ch>
-From: Yang Xiwen <forbidden405@outlook.com>
-In-Reply-To: <5572f4dd-dcf2-42ec-99c8-51bf4d1f28ba@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TMN:
- [CXaB7BYLAZOaw1zf/KE9djStwrsROBC8JBvU6JhTwlOrNu9h94YDbReGLIZhspA1W1mB1EtFya4=]
-X-ClientProxiedBy: TYXPR01CA0061.jpnprd01.prod.outlook.com
- (2603:1096:403:a::31) To SEZPR06MB6959.apcprd06.prod.outlook.com
- (2603:1096:101:1ed::14)
-X-Microsoft-Original-Message-ID:
- <0c2b947d-4683-4435-8000-09f26d1b1354@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F268753E03
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 21:23:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708377808; cv=none; b=MLaY82f9+EthIwoXGANKWz5tF6r9hKPHo6Qq05wDqqgw5EUsJmA38OZo+oashbWpnxYilvZ3a4w6WUbMXGHoQxC0j5DZ3ggKASBkP51+grlXrVtUE4HR0EwDpSySLIiuZcXlBYadUa8T4WMJ+kLCOUDuZB1xIZ9tlCHB7D77uPY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708377808; c=relaxed/simple;
+	bh=8xz+6XpDTd1vb3gFdfA/PynLF+pwhW660BuoCbdZBNQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DR7+r+yuPHH+UkScdDXtC3/v1Wc7drShjfFwxfz5B2GMk3Jlf4Tidzz/IfR4PiM7A7YnoIhocYOk1xDvm7lKt247bbSkn1dy1Y6AUgpdoFEGx6rXVjft5U91qXUCADy/2oPYVgLbYqoEmhNm2DWqm48zp2QOiKCrERaDSCVy1kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=HwpWR2z6; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4126a159fa6so7076455e9.0
+        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 13:23:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1708377804; x=1708982604; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=3Dp7g0ZZlHWDLtOm92Hg+KE1Fsd9aYHxUp8R+ILIVC8=;
+        b=HwpWR2z6YGeWngOoQfoVdNaKSRSqkzbRQtuFLlh9IJ8SV2N7gj/6vySmrcUuY1zGF3
+         eSvtvwnlf3y6F7FcDTXht/BVYsQ6BG3xdhG8Xw9pZzaAL+pWYBUB5DQ1q+jz0kbv3LKa
+         coiLo7Ai1jDDTSHLozFeWZFswKyFt3Zvih1N6t0yQxc/T5qiVbX0vYRjVcplMLmMQvHn
+         YngEjhzs2WSPiRCNC0feItvCGtPLIwolxGqZY77kBIv5m6xultIMXdqzeX64jEKrLr0r
+         ksGbYD4gKBbrfdLCB6/efrVZbWzvmG5tQe2E6LL1DOG+nEe7SKiDqTaHnxT+lNBeoz7B
+         QiNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708377804; x=1708982604;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3Dp7g0ZZlHWDLtOm92Hg+KE1Fsd9aYHxUp8R+ILIVC8=;
+        b=ffR9GfXc/Q/XalROoc/0rE6XaFoEPRy/BEeDJcx2U/jCodKWEQEuXsC6K8SDyrEBhW
+         g10g+DmkNDBeSAhvjskz42ZHasNipHmoK+OuvhidZHkuycj1Zx8FXlQ/brxiIIDv7c/s
+         QePTZBJN2AAEOgWBKdRLPu7KtlqMuLBvlo//mlB0wlr2ppX9xZG+7e1xpUEDJbNgyQeN
+         opISEHUWBS+/KBik7pZqZaMOemh/7PjhzB98+GvpteMEEI5AMV+dAUmrG5e5XLSI3tI+
+         vV2E8+DYTjsWcxKuhPd0PBY/9c/cYImjFzm5RsU13LsV+ykeqm+bfnaMv/c48+AcgrCf
+         7PlQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUCxIG3Fb+OMK+GqxmA5vOTv8kVVtvDGEUW9KLc4glb+oYJkG1nrSSsRuI+IJRKKRAL+fk6soJ/0VSevaFyNuLhLJMfGdYp
+X-Gm-Message-State: AOJu0YwKHxbus++xcTIju0P7c227SN80I0C/ZhWC1Qhl+m4vbYS3Tnkx
+	bNUh0NMDyPYkA+ZIjI6yZyEXyQa2whAKlXIg47++Gb/kFoCFt87N9OH87aMetps=
+X-Google-Smtp-Source: AGHT+IGMDWyCqdrf3limUzCDQCeqBmV2qO6/3JtbpjNeO7lE8mmXkQsNbh5abKcT5FIEPx2wqRSzUw==
+X-Received: by 2002:a7b:c408:0:b0:40f:ddc2:7260 with SMTP id k8-20020a7bc408000000b0040fddc27260mr9610955wmi.36.1708377804375;
+        Mon, 19 Feb 2024 13:23:24 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.222.116])
+        by smtp.gmail.com with ESMTPSA id je11-20020a05600c1f8b00b0040fdf5e6d40sm12549766wmb.20.2024.02.19.13.23.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Feb 2024 13:23:23 -0800 (PST)
+Message-ID: <a9c34206-0068-4bd1-9fae-8963ad00eb36@linaro.org>
+Date: Mon, 19 Feb 2024 22:23:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SEZPR06MB6959:EE_|JH0PR06MB6478:EE_
-X-MS-Office365-Filtering-Correlation-Id: 503d6f0d-1500-4bea-aa7b-08dc31906e48
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	lsb103ixgmtnI53jpYq3JasPdpKr39qzUOXXHPuxwvuP4Gaho+pBblWMyuAK7cIyQqCtQgMOvmLRsx8/e7QYnTm+hivDHNLqLFy4kSg2tujfH4ydDLaUORKYf0/KK9CuXHDXe8977FCiYj6QcxFqOeMFfJLuko15FkMGDJO/HVGXkSrcqu3My8I/p8Qp9VEADlhTcJVQ8+aRDgAmeI8h4vfCzTZRKZz6CeBxIrc4uVO1eFH8dRjXV7nSgSJMZzvaAa/NxS+vL0A/rRzkBUba5jZseC5jJYsjhkIT7y2IhnaHA/wKOrZKi/RLCOWoj1wjBcEX+uH42pHkuQDA2F0+Q3SGUAiX36WKOVw55q/RwMWxrtOukVIfMpek2bOIzdMLRad2hwWUaDLw9Ci5yXYilWL10f66R0WX8h/HmvCsIGIUYiZF3+EWcEvLATbOtnrU43ywtIbHTmqcWHArn3TzIyJHbg6bOkGLb6j+cYU8QCkl1VyWS+OEC4CPZp9UFn4Gq/C6JGO6C2V8MmDDT032g2sK3p9jo2MAvS9q/drbcVKto0gUFoz8b/c1P388llD/
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cGxjZS9zVzd2SVgrNDRIaTI3YmhmRWFUeXRWU0Y4WmYwTUVGYmhKVUFiTi9p?=
- =?utf-8?B?OG8zTTB4WW9mNmhrVk9ZSStZUXc1YjA2UjBPanp0cm9kVldGY0szaWo2Zkh4?=
- =?utf-8?B?TWlmaU5YK1Z1OHY5RVdjTnlVbXM5WkJqQjBXeWNjcHZNLzE3UWhOdGtDeWhi?=
- =?utf-8?B?WTZzTjM5QUVVS0JBampsUndVWjd1K2VEUzZPclVqVndNTmcvYjJDTnFTenRs?=
- =?utf-8?B?a1ExZTdacnp0enFnRGN2WWt2YXBTd0E2Q2NOUnBxS1lZNUhLRWZ5Z2RPMGFH?=
- =?utf-8?B?Yi9nM1RhVDZTQnpuWG1CL1cvbFhaUzVYNzhJakhiaWQwcGcwd0xhZ2dSWHp5?=
- =?utf-8?B?b3h6QVVmeThyejBRUFdmWkVBNlVGN0Fyd1o1THJNMmJxYk4xTFMxRmVsa3Bs?=
- =?utf-8?B?TEVtWFRjVTg5Qk16YVFWV0ZiK3lncGQzckJLTkYzSmI2aXFSSk9haTM1ZmJ1?=
- =?utf-8?B?aCtjTmVQYlpBRFJxYmNKdFVqTjNsNDcvM2VCTVRIdXR0UTlSMjQrUDYyckRp?=
- =?utf-8?B?Q29qaklMVE4xeHJBZjJiWGI3dzBNcG9sUHlVSCtMM002eUN6OEFSQnNhL3BK?=
- =?utf-8?B?TkRDbFNtSzl3QWl5S2R0U0xieDdRcTJBRlhpTzFEV1Z5M29GNHRkZWlPejY0?=
- =?utf-8?B?MEkvT0U4TjRhbUxMK1phVFp2NGJFSFNZYVRNSFRiZDdUaHJ2NGhZY1BwMkhu?=
- =?utf-8?B?Z0wyWTlYQmhXYjdnRzAyd3ZSVDMvRXorU3lYQXZMNXlOeXFoMm5NWnAvOElG?=
- =?utf-8?B?WUUrWkQ4ckJGdTgwdjNSeVR6ZmNUWFJDQWFWK3JoeU1MaW8xaWpGdEJJcWhy?=
- =?utf-8?B?dmdEblU3Z0hhNW5zMEhMekliazcyMEZ1NW83aWE0M2FKcUthTnJ1VHVTSjVM?=
- =?utf-8?B?RHY3elJOalVXQ0ZZbFZPaTlScWRYckt5QVpPTGRLWGVLdFZSSjlXNDhrOGlN?=
- =?utf-8?B?RVFjUG9KLzVaczVxNmpEd2NSaEtOSno0b2hZaTBtQzVtTHpYeUJqdWx5bytK?=
- =?utf-8?B?SVRtbWdCcEM5L29Bby8yZnpEdU5EWm9qSXRGbEdOWCtMS1F0R2FEVzA4VlRY?=
- =?utf-8?B?RnZEdWtmMTBqcTJrVkpKOUNORUtUVXIyVE9FRm9GMVlJVTlTK2Z1RjRlTXFQ?=
- =?utf-8?B?djJJYzJ4NkFMSVEyRVQ1TzFOcGtZVVE3RDNIQnUzdWgwQzZCQTQ1WFBFVGU0?=
- =?utf-8?B?d3dHWThkektJbGFkWWJKdytXTnVwcUk5ekl6K0NTeW1LcXV4RWRqYjJqbWR1?=
- =?utf-8?B?TFpKd2xJb0RvUkV0QUpLMTdXU2hnUTkvUFFnZ2ZmTENQYlYvc1VQYzVNNE0r?=
- =?utf-8?B?U3JnalZnaE1LeGQ5eFVrVTdVT1ZTL2RxZEphdGJ3N1dqN0tCdFg3b2EwS2lq?=
- =?utf-8?B?QURYSjg2MnFTbjdpbERBY1VzS0pQVmV0YmdiWkFDQ0RPa29STW9TTVUycDhR?=
- =?utf-8?B?U1psU2dvaDFwN3pWYVdlT0dDQzArc2d2enRtSnEwWUI0dU9EMkJEWEt3V2Zu?=
- =?utf-8?B?ZklPVlZhdzVUWHFKb3NrV1VsMXRTQ1BJVHlpQW0xclhOQVZCcHRwZmhhT2U0?=
- =?utf-8?B?UDc2UzBMM0NlK21neXlmOWJaSDdvUUVOUlFad2NCL00xZyt4ZHhieUJLNWNx?=
- =?utf-8?B?RWNZT3lqSnRIdzU1MUFhQnpuYnIrcUQrTkhZbDc3V1kvYnhmR3pLaE1sZktj?=
- =?utf-8?B?YnpDNC9LQkR0QUpheU8ycTN6R2Z1Z3pwUy9JbFNBTXI1dDgzVlJzdjh4Y012?=
- =?utf-8?Q?PsgUZbtKt51iKkEvrC4e6KI+0TRLaxun3lG+4rC?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 503d6f0d-1500-4bea-aa7b-08dc31906e48
-X-MS-Exchange-CrossTenant-AuthSource: SEZPR06MB6959.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2024 21:19:17.6391
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: JH0PR06MB6478
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 03/18] dt-bindings: regulator: describe the PMU module
+ of the QCA6390 package
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Mark Brown <broonie@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konrad.dybcio@linaro.org>, Liam Girdwood
+ <lgirdwood@gmail.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+ Saravana Kannan <saravanak@google.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>,
+ Neil Armstrong <neil.armstrong@linaro.org>,
+ Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>,
+ Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Abel Vesa <abel.vesa@linaro.org>, Manivannan Sadhasivam <mani@kernel.org>,
+ Lukas Wunner <lukas@wunner.de>,
+ Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
+ linux-pm@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+References: <20240216203215.40870-1-brgl@bgdev.pl>
+ <20240216203215.40870-4-brgl@bgdev.pl>
+ <ZdDVNbjv60G9YUNy@finisterre.sirena.org.uk>
+ <CAMRc=Mf9Sro4kM_Jn8_v=cyO5PxCp6AnBdeS9XspqVDGKdA_Dg@mail.gmail.com>
+ <7c1327c0-d0ea-4797-a5fa-5844ba46bf53@linaro.org>
+ <CAMRc=Me=3HhGc_yZuaEo1TsLbF2R=g+072185_PAh5GmAQ-M7w@mail.gmail.com>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <CAMRc=Me=3HhGc_yZuaEo1TsLbF2R=g+072185_PAh5GmAQ-M7w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 2/20/2024 5:05 AM, Andrew Lunn wrote:
-> On Tue, Feb 20, 2024 at 04:14:36AM +0800, Yang Xiwen wrote:
->> On 2/20/2024 4:03 AM, Andrew Lunn wrote:
->>>> Note it's unable to put the MDIO bus node outside of MAC controller
->>>> (i.e. at the same level in the parent bus node). Because we need to
->>>> control all clocks and resets in FEMAC driver due to the phy reset
->>>> procedure. So the clocks can't be assigned to MDIO bus device, which is
->>>> an essential resource for the MDIO bus to work.
->>> What PHY driver is being used? If there a specific PHY driver for this
->>> hardware? Does it implement soft reset?
->> I'm using generic PHY driver.
+On 19/02/2024 13:53, Bartosz Golaszewski wrote:
+> On Mon, Feb 19, 2024 at 8:32 AM Krzysztof Kozlowski
+> <krzysztof.kozlowski@linaro.org> wrote:
 >>
->> It implements IEEE C22 standard. So there is a soft reset in BMCR register.
+>> On 17/02/2024 19:32, Bartosz Golaszewski wrote:
+>>> On Sat, Feb 17, 2024 at 4:48 PM Mark Brown <broonie@kernel.org> wrote:
+>>>>
+>>>> On Fri, Feb 16, 2024 at 09:32:00PM +0100, Bartosz Golaszewski wrote:
+>>>>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>>>>
+>>>>> The QCA6390 package contains discreet modules for WLAN and Bluetooth. They
+>>>>> are powered by the Power Management Unit (PMU) that takes inputs from the
+>>>>> host and provides LDO outputs. This document describes this module.
+>>>>
+>>>> Please submit patches using subject lines reflecting the style for the
+>>>> subsystem, this makes it easier for people to identify relevant patches.
+>>>> Look at what existing commits in the area you're changing are doing and
+>>>> make sure your subject lines visually resemble what they're doing.
+>>>> There's no need to resubmit to fix this alone.
+>>>
+>>> Mark,
+>>>
+>>> This is quite vague, could you elaborate? I have no idea what is wrong
+>>> with this patch.
 >>
->>> I'm wondering if you can skip hardware reset of the PHY and only do a
->>> software reset.
->> There must be someone to deassert the hardware reset control signal for the
->> PHY. We can't rely on the boot loader to do that. And here even we choose to
->> skip the hardware reset procedure, the sequence of deasserting the reset
->> signals is also very important. (i.e. first PHY, then MAC and MACIF).
->> Opposite to the normal sequence. (we normally first register MAC driver, and
->> then PHY).
-> There are a few MACs which require the PHY to provide a clock to the
-> MAC before they can use their DMA engine. The PHY provides typically a
-> 25MHz clock, which is used to driver the DMA. So long as you don't
-> touch the DMA, you can access other parts of the MAC before the PHY is
-> generating the clock.
->
-> So it might be possible to take the MAC and MACIF out of reset, then
-> create the MDIO bus, probe the PHY, take it out of reset so its
-> generating the clock, and then complete the rest of the MAC setup.
+>> Use subject prefixes matching the subsystem. You can get them for
+>> example with `git log --oneline -- DIRECTORY_OR_FILE` on the directory
+>> your patch is touching.
+>>
+>> Best regards,
+>> Krzysztof
+>>
+> 
+> Yes, I always do. And for Documentation/devicetree/bindings/regulator/
+> the subjects are split 50:50 between "dt-bindings: regulator: ..." and
 
-It's not MAC which behaves wrongly, it's the MDIO bus. If we don't 
-follow the reset procedure properly. The MDIO bus fails to respond to 
-any write/read commands. But i believe MAC controller and PHY are still 
-working. I recalled that it can still transfer network packets, though 
-it fails to read PHY registers from MDIO bus so only 10Mbps is available 
-(And the phy id read out is always 0x0, normally it's 0x20669853).
+No, there are only ~54 "dt + regulator" ones and around 400 starting
+with "regulator" (Mark removes first prefix if it is not regulator:). So
+50 to 400 is not 50:50.
 
-Maybe during initialization, PHY sent some garbage to MDIO bus and 
-killed it.
 
->
-> 	Andrew
->
+> "regulator: dt-bindings: ...". For Documentation/devicetree/bindings/
+> it's overwhelmingly "dt-bindings: <subsystem>: ...". It's the first
+> time someone wants me to send a DT bindings patch without
+> "dt-bindings" coming first in the subject.
+> 
+> I mean: I can do it alright but it's not stated anywhere explicitly.
 
--- 
-Regards,
-Yang Xiwen
+Well, practice was kind of known and obvious, but it is also stated:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/tree/Documentation/devicetree/bindings/submitting-patches.rst?h=next-20240219#n18
+
+
+
+Best regards,
+Krzysztof
 
 
