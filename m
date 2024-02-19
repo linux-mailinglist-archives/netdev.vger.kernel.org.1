@@ -1,91 +1,129 @@
-Return-Path: <netdev+bounces-73066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8008985AC78
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 20:53:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C44A085AC96
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 20:57:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3FBD1C22EA9
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 19:53:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65847B22592
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 19:57:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5A8F50A6C;
-	Mon, 19 Feb 2024 19:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E95C351033;
+	Mon, 19 Feb 2024 19:57:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rbYo42fK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="odVmSVOQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8833252F68
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 19:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB8EE41A81;
+	Mon, 19 Feb 2024 19:57:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708372227; cv=none; b=oQy2YtAq3SZQhsXFVza8ytAm3nlX85B5PkyZyDRoDoJFW0zsR+Z6kryTo+zsW3XOsEZiY9GLBNplra2VAGUFRZ7xOD83LudQL3enlmR7DkFwIFfpu83cXYtm9zZpuU3MNoz7zjz2YNflY2aS5omwbdfJCqpgC2EXAno+1Mr3z6o=
+	t=1708372656; cv=none; b=YzvSvf8XoF4osvxTyQ4x4EWLHqv2MZfMdUW1Y/ni+yQocpOGP5D4aJ+RmGnGT0O1is3klh3VEsqEZ/6ceJq+yl6J2DhNEwz4OmSKv485aYuElJi23E+c38v580Ac25cXVt1UzbApnOlroaP6WzvpeDcv11ahPOmLvvyXkuowJ9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708372227; c=relaxed/simple;
-	bh=94IGITlXHiF+aijsxYv3GDTet1aY9nKbAumjN58saqo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NaBWom94ZvspDt10Hhb/i2ZkWSy7ahbIVuBmm3mXFuLwj6lvZVHxwSfCpGBsPKCl8AB4LM7LfE3qgxRSp6ror9bw9ssdcuZ3nLab50YOD2MOeydlYZ2n3+a24VMpg3m7SzvsoRuDG7kjS8wYAHTz2CH6TIXmZnieWHazIoxqtPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rbYo42fK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 12790C43141;
-	Mon, 19 Feb 2024 19:50:27 +0000 (UTC)
+	s=arc-20240116; t=1708372656; c=relaxed/simple;
+	bh=l6lMfvTk7CFPjhzUlulstlIJN8SObLPyb4ZjLiD1XlI=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=QJh0evQmQmnCR6WrKWbw1ZQ99p2LfXguUQ+ipkLJjRTq5lqD6V3hAghrePjCf5f0xqSuRIRwxNnNjQhNV3FQH71m5x2mNRsNJZN4V9jjiyfpo6QsbIHKPIszcMYtA1RYlRZIB1793AefD2OsaTj+H0vNei6iUmwQhmGJTAV6J/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=odVmSVOQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 95041C43394;
+	Mon, 19 Feb 2024 19:57:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708372227;
-	bh=94IGITlXHiF+aijsxYv3GDTet1aY9nKbAumjN58saqo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=rbYo42fKZ14FeYEailW2Rl++dTZQYrb070upcC8WBh+8tx4KCR4srAkpzPXrYIgo8
-	 7S37Me3zTbd84QdUK9je4XBnpfZZmZbKb/RWAo9rTHojm3M1OV9cLRa66PHdWOfLqk
-	 9cCPbeSDe24jWtgGEtkT89proy0Hdx7wG1F9cFoHtGoo0YazlzY1Zm6GfJXz6eoedD
-	 shpR5aNiuuk6Tn4zsTd3zVBD+u7ph54+c6PuR8meY+wRDvJbr/UxAYfmvlZL1LDuli
-	 0FgZdEH84TTCPCGY1eL90U7KFyZiT0k5OqV3N5/7dykjVWpJX9I8VXaidl/H/xjZSx
-	 4VTenHwwXqbPg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 01648D990D9;
-	Mon, 19 Feb 2024 19:50:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1708372656;
+	bh=l6lMfvTk7CFPjhzUlulstlIJN8SObLPyb4ZjLiD1XlI=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=odVmSVOQ9xVOvSw1kFwVc7nk/nwzBIHD0zf9sC5jwgljwZwW4wWwDxXfgSTmEpBv/
+	 i9E6Xlb2FrS2UsY8DF06/6tQFRFzefv/UucG7drHXo1Tj/tFLZzOvHytKab+Mp2lqc
+	 4srNL+7Hd5qxrdsV5SNp6zoAjK0rzF/i90xksKGDJI8uCJZYKN/o/sQ+nIP+riANM4
+	 45Bl041Eqit9SSySYdkBWP9FpaO39KJ3acu7T681PxCSe9rgwq7zW8FCusdz4xnKVe
+	 JwL4zkKdFYwC+iiUMZRVsmmAPatLlQ8Va2ZL0NhLtEWhnmGF4BTYvR/gom1IH6oGVo
+	 W4SaXQPQXGR1Q==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77BB1C48BC3;
+	Mon, 19 Feb 2024 19:57:36 +0000 (UTC)
+From: Yang Xiwen via B4 Relay <devnull+forbidden405.outlook.com@kernel.org>
+Subject: [PATCH net-next v3 0/6] net: hisi-femac: add support for
+ Hi3798MV200, remove unmaintained compatibles
+Date: Tue, 20 Feb 2024 03:57:35 +0800
+Message-Id: <20240220-net-v3-0-b68e5b75e765@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2] man: ip-link.8: add a note for gso_ipv4_max_size
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170837222700.28614.4209857023428754430.git-patchwork-notify@kernel.org>
-Date: Mon, 19 Feb 2024 19:50:27 +0000
-References: <76a426018ec585c7dc40148fc832746e119dae60.1708370164.git.lucien.xin@gmail.com>
-In-Reply-To: <76a426018ec585c7dc40148fc832746e119dae60.1708370164.git.lucien.xin@gmail.com>
-To: Xin Long <lucien.xin@gmail.com>
-Cc: netdev@vger.kernel.org, dsahern@gmail.com, stephen@networkplumber.org,
- pabeni@redhat.com, edumazet@google.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAK+y02UC/22MwQ7CIBAFf6XZsxhYa1s8+R/GA4WtJSoYiqSm6
+ b+L3Jp4fJk3s8BEwdIEp2qBQMlO1rs8DrsK9KjcjZg1eQNyrDmKhjmKTCrkHYlW13yA/HwFGux
+ cKhf4HRzNEa6ZjHaKPnxKPonCN6UkGGfElZEtaqOkPPt3fHh/32v/LIWEfyzMVid7U/ctb44at
+ 9a6rl+JlDGj2AAAAA==
+To: Yisen Zhuang <yisen.zhuang@huawei.com>, 
+ Salil Mehta <salil.mehta@huawei.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh+dt@kernel.org>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ devicetree@vger.kernel.org, Yang Xiwen <forbidden405@outlook.com>
+X-Mailer: b4 0.12.4
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1708372656; l=1754;
+ i=forbidden405@outlook.com; s=20230724; h=from:subject:message-id;
+ bh=l6lMfvTk7CFPjhzUlulstlIJN8SObLPyb4ZjLiD1XlI=;
+ b=fqSRDr03JWvB1/KlVujOqSKV65CXq15sxpgv7TgX9NJQp+SpzImaPyPjgTs1Pb8Z3cgMMWNch
+ p0NhfQxp3xmDfcr0OscchnD7tzCnpufT3HK+dKfqEURI1yrVaTypG/2
+X-Developer-Key: i=forbidden405@outlook.com; a=ed25519;
+ pk=qOD5jhp891/Xzc+H/PZ8LWVSWE3O/XCQnAg+5vdU2IU=
+X-Endpoint-Received:
+ by B4 Relay for forbidden405@outlook.com/20230724 with auth_id=67
+X-Original-From: Yang Xiwen <forbidden405@outlook.com>
+Reply-To: <forbidden405@outlook.com>
 
-Hello:
+Signed-off-by: Yang Xiwen <forbidden405@outlook.com>
+---
+Changes in v3:
+- rearrange patches to fix bot error. (Rob Herring)
+- rewrite commit logs (Andrew Lunn)
+- use clk_bulk_ APIs (Andrew Lunn)
+- fix uninitialization use of ret (assign to -ENODEV before goto) (Simon Horman)
+- Link to v2: https://lore.kernel.org/r/20240216-net-v2-0-89bd4b7065c2@outlook.com
 
-This patch was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
+Changes in v2:
+- replace email.
+- hisi-femac: s/BUS/MACIF (Andrew Lunn)
+- hisi-femac: add "hisilicon,hisi-femac" compatible since the driver
+  seems generic enough for various SoCs
+- hisi-femac-mdio: convert binding to YAML (Krzysztof Kozlowski)
+- rewrite commit logs (Krzysztof Kozlowski)
+- Link to v1: https://lore.kernel.org/r/20240216-net-v1-0-e0ad972cda99@outlook.com
 
-On Mon, 19 Feb 2024 14:16:04 -0500 you wrote:
-> As Paolo noticed, a skb->len check against gso_max_size was added in:
-> 
->   https://lore.kernel.org/netdev/20231219125331.4127498-1-edumazet@google.com/
-> 
-> gso_max_size needs to be set to a value greater than or equal to
-> gso_ipv4_max_size to make BIG TCP IPv4 work properly.
-> 
-> [...]
+---
+Yang Xiwen (6):
+      net: mdio: hisi-femac: make clock optional
+      dt-bindings: net: hisilicon-femac-mdio: convert to YAML
+      net: hisilicon: add support for hisi_femac core on Hi3798MV200
+      net: hisi_femac: remove unused compatible strings
+      dt-bindings: net: remove outdated hisilicon-femac
+      dt-bindings: net: add hisilicon,hisi-femac
 
-Here is the summary with links:
-  - [iproute2] man: ip-link.8: add a note for gso_ipv4_max_size
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=1d7f908103be
+ .../bindings/net/hisilicon,hisi-femac-mdio.yaml    |  48 +++++++++
+ .../bindings/net/hisilicon,hisi-femac.yaml         | 117 +++++++++++++++++++++
+ .../bindings/net/hisilicon-femac-mdio.txt          |  22 ----
+ .../devicetree/bindings/net/hisilicon-femac.txt    |  41 --------
+ drivers/net/ethernet/hisilicon/hisi_femac.c        |  81 ++++++++++----
+ drivers/net/mdio/mdio-hisi-femac.c                 |   2 +-
+ 6 files changed, 228 insertions(+), 83 deletions(-)
+---
+base-commit: 8d3dea210042f54b952b481838c1e7dfc4ec751d
+change-id: 20240216-net-9a208e17c40f
 
-You are awesome, thank you!
+Best regards,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Yang Xiwen <forbidden405@outlook.com>
 
 
