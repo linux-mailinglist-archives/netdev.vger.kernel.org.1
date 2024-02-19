@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-73018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A541985A9F3
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 18:27:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC52F85A9F4
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 18:27:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8A411C22BFB
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 17:27:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 940212894E6
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 17:27:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6977F44C8D;
-	Mon, 19 Feb 2024 17:26:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAF2547F52;
+	Mon, 19 Feb 2024 17:26:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="wK54awbR"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="BUIqyLia"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9650247A4D
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 17:26:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6094F47F50
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 17:26:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708363598; cv=none; b=UYoCsTt5TK+wERI0DgpATvoJkbh1FJdRyFKb6gisD0g7FR5Joik1QSpoMcKfPBLtUSOPpJjjUFYAxr35CGe3Jm4MFLUgWmH0wLzhOCilPXcEKK2ez25fuT3WKkuG9/SAAT0GbWLXWjHAbeVA90ylWJ4MnR4WzTswB9SxVJTc6Kk=
+	t=1708363601; cv=none; b=TB62lcF6PGsiX2d4T8cF/E8AgU5QgfVWiAQk5oA6nlKQ6tdUf9p6+IvjjjdXOPOsQ67A1v3unqVgIGRsT8LkXgvH4UI0+JyO+QV6iFvd49FcFvOTMCltSdMYUPtPkhq+8zecc8ggo22mp/RfwjFu6w1+VG7ontHazHSbnX7jvmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708363598; c=relaxed/simple;
-	bh=jKndwCTCAzjrCNl7/zG6rOf498cgyEExsuTgouFBll4=;
+	s=arc-20240116; t=1708363601; c=relaxed/simple;
+	bh=VRKk7yOlO8DXmg9hQG2w/9bbrZuBSTd+E6Guh7zsh2E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ajRL56pGEBZM68JtrBa/2vhVK+/ZVxP0siUFxdwn2aYMyxz/ukMz0pNs8UlfDKfxu+jMyUjQqGi+jBJbWB9EnHAUNWSHN3L6KntqiqfP4YNZDaTJX6LiFqf6ITBIsOwr661RBlc7e+vl4XlAn4I5/CtwHF09IXUqFhBOwynTl60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=wK54awbR; arc=none smtp.client-ip=209.85.208.180
+	 MIME-Version; b=Ub02EoDEOkjL7A1udo3ZWoQvTq+JzuspiACPo95kmW+Xq6Q7iEPcxoxAsIRXUp0maBCKY++/PD4GUXNrF65ojF1pOt0qzecB8pbff2B9eLqVmvj6EBffIzYITYF0Hjv82eT9SdX2ieWvt86S/gGWh1VSP6vRPAzhkQe+5+J3jS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=BUIqyLia; arc=none smtp.client-ip=209.85.167.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2d2305589a2so24701271fa.1
-        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 09:26:36 -0800 (PST)
+Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-3c0485fc8b8so3791203b6e.3
+        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 09:26:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708363595; x=1708968395; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708363599; x=1708968399; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=u5PryIoP66cTJV5dj10Xgw4cU+fKj9Ha6rspTNzKBT8=;
-        b=wK54awbR7MsgzIXYw67zMmV0WGIXSyV8AR2qVqkdCW2VNQRkOu072a9cdW4FPszqME
-         JR7Lp3K7HBHriMfH0EK+MOKGfpv+fMXtNgeKAI2kygUYy32c9QfkQvBcUwNEULD1dK3L
-         CUPR6+fFnMfoB1Utvo9+lt90U/aCdDyLqrQGRJC0X+kK0Q+qX/WXzEk4wm+CEHLySLwe
-         Eqdlq483QgZpOVO5ZwTZw7kgo31crrF1xMmNf/zAZzH2eqLhB7g/yJ5kb6JFyu1lk233
-         uiI95Q97cqlfcr83/sfMdBxaF458YO/paresfBI85uskcXWCUWbz6VMYXVZ4v9UMFjy+
-         aNgA==
+        bh=7FqBgwBflH6YWZwugnlqxLB4TkK+bo8pYTgy0Tzpf9g=;
+        b=BUIqyLiaK87yYxdUq2tlKrVZWLGIr2nvu6z9B0KAsGsNW8mhsyKLnr9CE5y4JPi+NU
+         zjLvrZ6UHJWzT09xi1u03MbTmsz/D1jhfXD/06mDalRYD5wh2KnSOpKWqnt1T1XNc/QI
+         yX1Hx8FVDzrLYDmihsm25t9+xehYqddqyCGZwy51GBhZNj7zJztCiBlXrCZPM8fW9D9H
+         1omq9LYUKS6FtUSz6IBXr4crYeExcZHO7Ud7iwqxPXGCXy8R90Uim9BZqdsAPNVPEhUY
+         FJeszmMpW/sjPn7GzTBm1s7vaR+GSeh14Lib2UFAw5nWWcLdCaYcIUa2FnhmP+aJnFuR
+         qEJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708363595; x=1708968395;
+        d=1e100.net; s=20230601; t=1708363599; x=1708968399;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=u5PryIoP66cTJV5dj10Xgw4cU+fKj9Ha6rspTNzKBT8=;
-        b=dICEcLtY6IjGC4+3/OVJqNsRyFHAJ03Lwna4V+bPilLiXpAX8lTpVDai0D3YUfoFqi
-         XkjGVcxcl9KxQ3KYN9nkI9sXYcEsSk9iCeHKb24Y/9ueZ2XoGLgmJPefZlHnqiZVOJzk
-         QCjFiFRwXeBPBPWwEetoFoCBSSrQkxRnCPq1d3jST2VHgeksppi3Svj0C/BWRnM4y6ah
-         owcD11OOIRrAnTSEO+9W8JlkIUAZpc1IvAWyLRS7WQjlxAcFznGtlFcoHBgpgBEITqGn
-         ZeFtc9AWaz/aInTMeeeCzNuE4jQ7yDf9fauE8WUn042t3/+m34wRRjwV4w4tdUpPJWNr
-         QmZA==
-X-Gm-Message-State: AOJu0Yw/3naq661uNb/UvwlCNow2gZ2oWne9Xt+HKVXXhoq07qc7jS8e
-	u9mTLj8//A0our3wgMnmqy4b23KTIY1dSf+/lO96K8FdqPF0s0tTOmOrRLaiaPGjjzppsbtMn2W
-	j
-X-Google-Smtp-Source: AGHT+IEzQihch9yCP9FJc3ygxQr+BsyNAKO2U/UCZ0ajlt1SLxipbyLPuClYZxy8uwlUeOWiujhDSQ==
-X-Received: by 2002:a05:651c:217:b0:2d2:4054:2fab with SMTP id y23-20020a05651c021700b002d240542fabmr1536251ljn.37.1708363594704;
-        Mon, 19 Feb 2024 09:26:34 -0800 (PST)
+        bh=7FqBgwBflH6YWZwugnlqxLB4TkK+bo8pYTgy0Tzpf9g=;
+        b=UvhHFnOSIbZcu56Eu0v1dsxsVl9N05vCMS2np4959XzxbRxVt3gjdyhpwFd4Zfvx0b
+         nO9P108NAmtXFhUsLj0sZGMJRknEtE7oPHTSsMs0rb9DfWeu9bjiebaxw0P+O8JWfod9
+         Sa3LAlHWwZggBm9x6uvi9wyocXdWObLfzU1fSn979R8V1cyYffkDEV5hz18FQAvDfEPY
+         Wpx6MdT7RgHXX3esVjS6n7kDZO4hIFm2KlDRYwQroY9uDU3bT+zl6oDCbMHH8AyrZzu9
+         HehoRsuRTjOQVWjCHPDzGTjhx7mUSoGxWl3HyUiL5cl0JosDT77pjFuH0ERcIR5UjgAy
+         trEw==
+X-Gm-Message-State: AOJu0YxNzZRiKmoM1oFGxpaXVcDUYZtt9PP7w+mUHiVEFPjUuLMSGyVB
+	Ht4k6M9RGtzxgrcKqHnh+1UC8ILtyWZ0tt7LgaoDzdaoDUGieXBUIshHFCUXwgifU7+Ml+dyTj5
+	s
+X-Google-Smtp-Source: AGHT+IF1spc64vDV0ybVKbrZ7Db0Y+UymsQr4fBAfYFFqnXN8UMmSOvnQKNGcWCPaU0SNHlkriyLjQ==
+X-Received: by 2002:a05:6871:289c:b0:21e:6066:a35c with SMTP id bq28-20020a056871289c00b0021e6066a35cmr12756415oac.6.1708363599474;
+        Mon, 19 Feb 2024 09:26:39 -0800 (PST)
 Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 14-20020a056000154e00b0033d10bd6612sm11132559wry.81.2024.02.19.09.26.33
+        by smtp.gmail.com with ESMTPSA id p7-20020a05622a13c700b0042c750bf876sm2737239qtk.43.2024.02.19.09.26.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Feb 2024 09:26:34 -0800 (PST)
+        Mon, 19 Feb 2024 09:26:39 -0800 (PST)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -79,9 +79,9 @@ Cc: kuba@kernel.org,
 	sdf@google.com,
 	lorenzo@kernel.org,
 	alessandromarcolini99@gmail.com
-Subject: [patch net-next 11/13] netlink: specs: devlink: add enum for fmsg-obj-value-type attribute values
-Date: Mon, 19 Feb 2024 18:26:26 +0100
-Message-ID: <20240219172628.71455-2-jiri@resnulli.us>
+Subject: [patch net-next 12/13] netlink: specs: devlink: add missing fmsg-obj-value-data attribute definitions
+Date: Mon, 19 Feb 2024 18:26:27 +0100
+Message-ID: <20240219172628.71455-3-jiri@resnulli.us>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20240219172628.71455-1-jiri@resnulli.us>
 References: <20240219172525.71406-1-jiri@resnulli.us>
@@ -96,55 +96,139 @@ Content-Transfer-Encoding: 8bit
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-For devlink fmsg object values, devlink relies on NLA_* values what
-are used internally in kernel to indicate which type the attribute is.
-This is not exposed over UAPI. Add devlink-param-type enum that defines
-these values as part of devlink yaml spec.
+Add missing fmsg-obj-value-data definition. Use newly introduced
+sub-message replace-attribute infrastructure to allow to process
+attribute type selected by fmsg-obj-value-type.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
- Documentation/netlink/specs/devlink.yaml | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ Documentation/netlink/specs/devlink.yaml | 89 ++++++++++++++++++++++--
+ 1 file changed, 85 insertions(+), 4 deletions(-)
 
 diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
-index df1afdf06068..fa4440141b05 100644
+index fa4440141b05..d2bc0e366d09 100644
 --- a/Documentation/netlink/specs/devlink.yaml
 +++ b/Documentation/netlink/specs/devlink.yaml
-@@ -218,6 +218,26 @@ definitions:
-         name: exception
-       -
-         name: control
-+  -
-+    type: enum
-+    name: fmsg-obj-value-type
-+    entries:
-+      -
-+        name: u8
-+        value: 1
-+      -
-+        name: u32
-+        value: 3
-+      -
-+        name: u64
-+      -
-+        name: flag
-+        value: 6
-+      -
-+        name: string
-+        value: 10
-+      -
-+        name: binary
- 
- attribute-sets:
-   -
-@@ -620,6 +640,7 @@ attribute-sets:
-       -
+@@ -641,13 +641,14 @@ attribute-sets:
          name: fmsg-obj-value-type
          type: u8
-+        enum: fmsg-obj-value-type
+         enum: fmsg-obj-value-type
+-
+-      # TODO: fill in the attributes in between
+-
++      -
++        name: fmsg-obj-value-data
++        type: sub-message
++        sub-message: dl-fmsg-obj-value-data-msg
++        selector: fmsg-obj-value-type
+       -
+         name: health-reporter
+         type: nest
+-        value: 114
+         nested-attributes: dl-health-reporter
+       -
+         name: health-reporter-name
+@@ -1226,6 +1227,10 @@ attribute-sets:
+         name: fmsg-nest-end
+       -
+         name: fmsg-obj-name
++      -
++        name: fmsg-obj-value-type
++      -
++        name: fmsg-obj-value-data
  
-       # TODO: fill in the attributes in between
+   -
+     name: dl-health-reporter
+@@ -1331,6 +1336,54 @@ attribute-sets:
+         name: param-value-data
+         type: flag
  
++  -
++    name: dl-fmsg-obj-value-data-u8-attrs
++    subset-of: devlink
++    attributes:
++      -
++        name: fmsg-obj-value-data
++        type: u8
++
++  -
++    name: dl-fmsg-obj-value-data-u32-attrs
++    subset-of: devlink
++    attributes:
++      -
++        name: fmsg-obj-value-data
++        type: u32
++
++  -
++    name: dl-fmsg-obj-value-data-u64-attrs
++    subset-of: devlink
++    attributes:
++      -
++        name: fmsg-obj-value-data
++        type: u64
++
++  -
++    name: dl-fmsg-obj-value-data-flag-attrs
++    subset-of: devlink
++    attributes:
++      -
++        name: fmsg-obj-value-data
++        type: flag
++
++  -
++    name: dl-fmsg-obj-value-data-string-attrs
++    subset-of: devlink
++    attributes:
++      -
++        name: fmsg-obj-value-data
++        type: string
++
++  -
++    name: dl-fmsg-obj-value-data-binary-attrs
++    subset-of: devlink
++    attributes:
++      -
++        name: fmsg-obj-value-data
++        type: binary
++
+ sub-messages:
+   -
+     name: dl-param-value-data-msg
+@@ -1356,6 +1409,34 @@ sub-messages:
+         attribute-set: dl-param-value-data-flag-attrs
+         attribute-replace: true
+ 
++  -
++    name: dl-fmsg-obj-value-data-msg
++    formats:
++      -
++        value: u8
++        attribute-set: dl-fmsg-obj-value-data-u8-attrs
++        attribute-replace: true
++      -
++        value: u32
++        attribute-set: dl-fmsg-obj-value-data-u32-attrs
++        attribute-replace: true
++      -
++        value: u64
++        attribute-set: dl-fmsg-obj-value-data-u64-attrs
++        attribute-replace: true
++      -
++        value: flag
++        attribute-set: dl-fmsg-obj-value-data-flag-attrs
++        attribute-replace: true
++      -
++        value: string
++        attribute-set: dl-fmsg-obj-value-data-string-attrs
++        attribute-replace: true
++      -
++        value: binary
++        attribute-set: dl-fmsg-obj-value-data-binary-attrs
++        attribute-replace: true
++
+ operations:
+   enum-model: directional
+   list:
 -- 
 2.43.2
 
