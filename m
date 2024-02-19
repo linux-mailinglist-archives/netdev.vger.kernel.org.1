@@ -1,136 +1,192 @@
-Return-Path: <netdev+bounces-73107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0A0085AE5A
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 23:24:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F063C85AE73
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 23:32:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A61151F22809
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 22:24:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52F822845D7
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 22:32:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 298A554F9D;
-	Mon, 19 Feb 2024 22:24:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8432D54F88;
+	Mon, 19 Feb 2024 22:32:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RvjxIlcb"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="UI4l7sN3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01olkn2031.outbound.protection.outlook.com [40.92.52.31])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F21A535CF
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 22:24:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708381452; cv=none; b=d/5BXpSjxLcB0Vs6KL956HspgRjMXE6pqO/8oZdmPXmIFZdaWI1hcMNhUFcSwP2e1RnBKQ4gDap6EpGZIk4E6j9W/DZfl417Y5c7aCp4coaHNcFCnjsSL4swTnfgdG0XUq+h6Jwnk6VmQhrELTaeQLs9JF91M9iTE3eCi2BK8eY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708381452; c=relaxed/simple;
-	bh=v8eeW/Xl6iE0eK3Nh7U4mdIheXn5540a7a9a3m0uDqE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=H40qzIY2cxMvLhFzLqiO3ifMt7zqYyjmUkdRHo+9uqtg+VJA6GpnUSHql55T0qQd7yNgTOCvFEsPNV883OEqlzxCEIA4mlMwrknrOi49A75jQrl6xvy3dbRbnzPzYPHXtQMrTYn3vyF0GEEDtRIJb+NGWfwDk5eYY3YHobNOhNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=RvjxIlcb; arc=none smtp.client-ip=209.85.219.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-dc6d8bd618eso4578913276.3
-        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 14:24:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708381449; x=1708986249; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=OzrnpRRkFvIZstOU4+rXZ++bwzZ4/ZEkkWA4xAuIZiQ=;
-        b=RvjxIlcbjvtnvHHz3lOt8NnaxRz5yp+ISytKd/h5gtRzFrxoa+2de0HeyyxJQf/umr
-         ziGFvW1wswHPX1aLn9Hs38Zl7Yj/gub+HYDzqGBNay1KS38YMs2bKh6VV6/77lK0CaON
-         +Er+u8TSOODVeJoTPcnKb7n/FKoo/LG19esJFivd+/BEHembdMQpHrieLutHhDLcHsGg
-         rBxTe8ALMIELmqPWAMKEj0lr5wYXun+Xq+rTk+9nALD6tcmNFdN23uD7fak8YYHx5iid
-         rdwzBAbRYSTIJRVR7LmUz/dTOMeJSMiI1iAAaPFLD6Yv3B09ki9ADrwXQ6C3gB0+/JmI
-         B8iQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708381449; x=1708986249;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OzrnpRRkFvIZstOU4+rXZ++bwzZ4/ZEkkWA4xAuIZiQ=;
-        b=SO8zK0nmdUq5v60FfE0BNIKW04pEuR3YxHTUca3NBBeeRNbhjzntTNe96UEHX2f8Bt
-         owitQ9Kk/YocVj2lIRhZtMKGDQPwm/zebwXjfJCsFkfF3QVj2EdxCSijtXOY3+9eViQp
-         rF1h59TawUf3XjjsCg/2NwiOcr8VGbj87i8vUC2/XdtD78P3MbnPY159CUYipQgotg5s
-         p66V70TfZBzjV+FvbGOJnLh3bTe9rHhT7rpinnxzII3RiWhOHZwzJ8ogTYwIlEUPDnQ1
-         Wpj5T8AikR8Azgf2pvF1E0bH+u6sPM/jP3bNK9PDZvLsgTP2Jv8VjQ+B6f1CQtvTPHe5
-         A+6g==
-X-Forwarded-Encrypted: i=1; AJvYcCXIc+UkA68SwOPYWEw2OcQ5OHPh98lYs22M0FFIvz8iRMCs5KBC2FQuZj1g0tLfHLL3B4BPj4WzD+Zq0R6RS6wIkcNzuhe2
-X-Gm-Message-State: AOJu0Yza6CRURDKm0NPvpAwe4I3jsuHN4lMyeXhVLQYIkTGMYBF5951M
-	rVUVWoNcmPVBjQNZ7FidqTY7qVR1uDPTi9MdXgefZyfgEBgOof0KWMLgRSyTjJMl/axkKpFJh3S
-	9AS4NAVQXI+MksyRbXqAd8uyw2S4fsE2khyxleQ==
-X-Google-Smtp-Source: AGHT+IGC2SHUpgIeiRanQrH9qLO1ovUw3m2HxObJFK2it7sg4bghpkXlhep6npR0xO7Xf+MsMOgjnP6VfQwj68oLYTw=
-X-Received: by 2002:a25:adc9:0:b0:dcd:63f8:ba32 with SMTP id
- d9-20020a25adc9000000b00dcd63f8ba32mr11579688ybe.65.1708381449555; Mon, 19
- Feb 2024 14:24:09 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6259620335;
+	Mon, 19 Feb 2024 22:32:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.52.31
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708381925; cv=fail; b=S+4K/ZRupF7j5clcckvQsftWJnVf2OtFP3dTBBRD/DOqdS9t/dqW23Jn2nBNEgz2iq5qiP2ubnSdUvuse+TMwFpnuPZROqK2akF0Rmrv6tVdFzDABhMxlAziuNIEOK3nSqkZ/Nneb1Ev+83lLfR+sKml1dyGB2cLuygeL4VkOf8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708381925; c=relaxed/simple;
+	bh=xUsebm1ec0UtYUswG+zt5OVp6dfKzoP5MFd+T7emom0=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=KJb7jLHLd37XKZYYmknZVnCtS4EFYcyPnc0283kSoqMDl71hq6Ea5LIQGJzMcjAibA6tSuLhPrOxOAk4bsGwthk/mddSN1nWJgwIMbyfvd1ibaoKvtm4EmJn9uaS9MOYejRNXn5GfKRek8Yrre+HHpMy3qaPAp6PrCXHrqQsA/8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=UI4l7sN3; arc=fail smtp.client-ip=40.92.52.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eulVKpdKw9oDi00xK0VscXkJbb8y00TYFOcZYqFWwBAOau4nU+s0yEHL11xxpDaHkhK682f+H2aH00fWgYaVm2URYCus27xufmAnu6MIQe2R3lYyUOQVCU/Stz/N61SXz36zD/E+XyYEdqwRniNcaeJZYZD+vfYhnjLOgoWgF045yIzOk1GmxqtiqCotjn1L/3xNg9EF6unrl27nhbe5sc+Bq0tJUZvjA5fPz2YD7Mo2YJw6G2sS9aw0rwKoc1VkXI89s3zxYH6BFiDO/3B66aTGx6BWbE9wwBArnWiU0ARWNHhmstYlDvFJP+pwNhyVXO8SbY6qk3MQ2ukAZpukeA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SpKl62wVKnisNKRcN0KJrKT8zc0WaNK7bdKvdebx3HI=;
+ b=YX2UGvM2qFeZWVTxLL1Jlro9Eta7MPovkWI+1NwSZDwepC1KJGMMRGVxZ43VIqUwoVl+vLUNWtZTK48taFPM9x21SaY/S3xt6HYL16jSxrIi5MBcqIabaS72Ku4p11+ZFLO1Bu2NV0+Pt541+t9T1Mm0yVLHnuYEcMTevsKz5zVFAbzbc48He5Miyn4zidD7t0FQouvRGn7F1yTaMTDyiCeNm4FcfLzZwrFUj3RslGUf4iXpqCjoMawuWCScVaRTJ0BQkVq2m06AW6fPKym+CEoyQs4Qw92KnzWHuwAQVn0d/JetdVj2ZgQJYdo0fw2kNutkaDncch6ylKvl2awXEQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SpKl62wVKnisNKRcN0KJrKT8zc0WaNK7bdKvdebx3HI=;
+ b=UI4l7sN3mAYlX6FoKA50FK0YKHIr0omYXg26vSsBunFXaOXGqybEtG6cnBy8tuscqmN3isee7O7lAosTqRxQMxPQbk1juMnX/6BjK+a0PIMCQ5V7q7HUprfWoKwEP0aRDUaKim1oj5F8Av69Qk7kc6uluR6cPtFfsaBcb0ONEbDPP3eOJ0zUR+PngctDBLiKf8jG+NBnwMN/HS1sXBRq98Cn4fFc+Wyuah4u+QBpA9PpI1x1aG0+pAt4W5hQ1zP19GQorMrblGvNGyWnD/5Y3tDlM/4r8Z8O+v17NlqD6u0fmNwl18CNlSy2dzkY9zpfsv67seGHiSm5lSlcWqkJPg==
+Received: from SEZPR06MB6959.apcprd06.prod.outlook.com (2603:1096:101:1ed::14)
+ by SEZPR06MB5958.apcprd06.prod.outlook.com (2603:1096:101:e5::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.38; Mon, 19 Feb
+ 2024 22:31:58 +0000
+Received: from SEZPR06MB6959.apcprd06.prod.outlook.com
+ ([fe80::53da:a8a:83cb:b9ad]) by SEZPR06MB6959.apcprd06.prod.outlook.com
+ ([fe80::53da:a8a:83cb:b9ad%4]) with mapi id 15.20.7292.036; Mon, 19 Feb 2024
+ 22:31:58 +0000
+Message-ID:
+ <SEZPR06MB695926ACA91530EB8642A30F96512@SEZPR06MB6959.apcprd06.prod.outlook.com>
+Date: Tue, 20 Feb 2024 06:31:51 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 3/6] net: hisilicon: add support for
+ hisi_femac core on Hi3798MV200
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Yisen Zhuang <yisen.zhuang@huawei.com>,
+ Salil Mehta <salil.mehta@huawei.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
+References: <20240220-net-v3-0-b68e5b75e765@outlook.com>
+ <20240220-net-v3-3-b68e5b75e765@outlook.com>
+ <29fc21f0-0e46-4d0f-8d4b-c4dbd1689c55@lunn.ch>
+ <SEZPR06MB695901E7D4BEABE1B6F319D096512@SEZPR06MB6959.apcprd06.prod.outlook.com>
+ <5572f4dd-dcf2-42ec-99c8-51bf4d1f28ba@lunn.ch>
+ <SEZPR06MB6959E5BDA57AF61BFAB19FC096512@SEZPR06MB6959.apcprd06.prod.outlook.com>
+ <0beab72d-2919-447f-88ff-fb7c92b28b61@lunn.ch>
+From: Yang Xiwen <forbidden405@outlook.com>
+In-Reply-To: <0beab72d-2919-447f-88ff-fb7c92b28b61@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TMN:
+ [haGMHqRo7V5+MPHwr5ctdGFuvHeNObt4OH1ItYxDtypP28DXPdKYJc69SrMlsuF34ISbms9uC8c=]
+X-ClientProxiedBy: TY2PR01CA0021.jpnprd01.prod.outlook.com
+ (2603:1096:404:a::33) To SEZPR06MB6959.apcprd06.prod.outlook.com
+ (2603:1096:101:1ed::14)
+X-Microsoft-Original-Message-ID:
+ <fd34e82f-8f0a-4c45-9be3-d6b1bfae152c@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240130-wcn3990-firmware-path-v1-0-826b93202964@linaro.org> <08c312f4-f3d3-4980-b998-b28026b5180f@quicinc.com>
-In-Reply-To: <08c312f4-f3d3-4980-b998-b28026b5180f@quicinc.com>
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Date: Tue, 20 Feb 2024 00:23:58 +0200
-Message-ID: <CAA8EJprXguHxzYxC2W_HQ8u4MExSWs0o71Lyp6OhpWNYXWw79w@mail.gmail.com>
-Subject: Re: [PATCH RFC 0/4] wifi: ath10k: support board-specific firmware overrides
-To: Jeff Johnson <quic_jjohnson@quicinc.com>, Kalle Valo <kvalo@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
-	ath10k@lists.infradead.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SEZPR06MB6959:EE_|SEZPR06MB5958:EE_
+X-MS-Office365-Filtering-Correlation-Id: e403f00d-d0cb-4d96-679d-08dc319a955c
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	aIXfUUPJMq6DDtBRfTz0bAkXMAbm4UG3YMCDlTJLBPDUDuQVomG/WFJde320tyt5MAY4dRK5Uhuh+cvUgM3vhgZj5d9tUxB4Z1uvEkSt4Ry6UGc+fgbj2MoUa23eZj5tQBJIkEyjZq3GLdnJmITWVQpCpEWLzfzq0qn75lTgKIGWdK1Gqs85E+it5RLdd/Dhz4MH/02U1ENrkhjKTD4ZnqWtZgTOBbfdvZnqC/pmMplXu061drV3Skwu5MAhDP5C1RYS0QfFzcKKHVZrDmcdslVysdq3uj4X7dsOkpPuER3iUwMkVW1xgCUaVy3Pm/SygNHaQJ+tUuWxzm0uT5I+KufEAiBf2sFzWzab0hcz64MnUgVES/Fof8WplpuyOKqneA7PerQo2M4RinNCWsL0COPSaBwJbpR3DSSG6q7NCzC313lPqlAerN+odtxv4t5FhfSm35RTT6Mzh+dUld0Qwrmu6r0gf0bOuv4XWSYo2MGMSwy4reUIWkv3LzguvoSPjsWeAdkimuqFGsdkMRFAF23B1sykkexzSE6ARrEGeOpfurx92l52cTTNdwGeMiJs
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?UGNNK0lPaFpid0tYUzhvbk40ZkZhb1Nhb2xJblIraWRFd3ZYb25ZU09ncXZN?=
+ =?utf-8?B?SXNZK3M2bVk2d3U1eVVvVnFTSEFjSG8xQ0xKcEYyamxvR3M2cXVVUDNYcy9Q?=
+ =?utf-8?B?aXY5R0lnaWprbDNVZkZwdVpLTVJvR0NuUjlnekdtemVBd2NSbEs3Rkt1VFE2?=
+ =?utf-8?B?RTh5VmFmTzBldGhDTUR5RkxPMnRPY3IxWkZnSnYwTXYyaWh6Tlg5eTBNaHRM?=
+ =?utf-8?B?b3lOUldwVTBLaHJsK2N3bStXUDl6b0Y1OVJHODBHVTVIVno1bldCaUFjZ2pO?=
+ =?utf-8?B?WWVGUlpLN1RKVDJ2WFE4MEZ0NW1FaHVlRlIybERWSDZKOFdmZEdUT25NYmRG?=
+ =?utf-8?B?VlZ4Y1hhZEIzSXgyc1R5RmcxeXpDRWswbHJzd3FhbXpybDhWU3hMd1BTcXZG?=
+ =?utf-8?B?ZEtvdFh5cGd4TUI1cVgvZ0lpNFhUOTRxbmxCV0d3aWVoUnZMV2toRVoxVUpW?=
+ =?utf-8?B?UHNjeUowblFFbTh2YVAyZDdHVHh1eGg1RTJQdDZCYUwzU2dGYjU5MkVjY3Nx?=
+ =?utf-8?B?NUkzb054d1BPS003cnEraFhPU0pIeTNHbVVTSUpjVll1ZHM5ZStpQnhEVnIw?=
+ =?utf-8?B?SlE1Mlp5SW5taU1yVkdFbUJOdEtrTmdyV253ZEZhbzlZYWxaQ1daNmVmQkxt?=
+ =?utf-8?B?MnE3R1lkQi9NeGZwaDlObEtjRk1hR2lGcUhPeDA1U1QvdS9aeUVqRC9TREhu?=
+ =?utf-8?B?TStGM1cwR00vM0hNTnd5UE01RnkzLzhpaGlubElUR3JxTUNtYWhtUkRuSjgv?=
+ =?utf-8?B?NE9XNEdkUUN1TDlPUWUvVUEvODVMU01qSkQrbUZLSlNtVCs4NHdVbnlwZnNL?=
+ =?utf-8?B?VjlaUzRwckNLZ2Vsa2VMcDV0SFMvcEY3TjZieHpqUXdPWXRURkFraUoxSW96?=
+ =?utf-8?B?VERvRThBRTRtYUhxczllKzR1S3oySFNmTFB2ditCdmpxNkhhOTY2U002U1ZB?=
+ =?utf-8?B?TThxcmJ0MlEyWElqWHFXR2FYUDA1aEppdWZoRmdDLzNQR3lsQndxRU5VV2dT?=
+ =?utf-8?B?RnV2cm05UDNyUm51NEhRNUFHM05nNXBiUFdFdExSSmpFcjBHUUF6TFkweVhS?=
+ =?utf-8?B?T2EvUUV4WDMwWTNFMnpSZDFIcHdLMStaVm16Y2Zqblo4Zmg5dGZZZXdia2R6?=
+ =?utf-8?B?SEE0Q2RKdTFxWk4rSWZiYTJNeEtycldmRnBEMm5xdTRUaFRxTG1JMXk1djQr?=
+ =?utf-8?B?emU2ckljV1g1aGhqdzVqMVc5VzZheUcvWk9xMzA0bXJXZnpueUhvellLV3BJ?=
+ =?utf-8?B?RllnWUxaY0EzSXFRNDRKZXhJR3B0OWxCZEt2YTJxYjdzSVlMQ01pdFIyN3lu?=
+ =?utf-8?B?T1dybno1MVBhN1dmcGl0dWxjb0t1OGZ1QWkvNjRmQ0Nwbk9ONXdLYm4rbTNa?=
+ =?utf-8?B?RXBaaTRuYjIrK2JTY2lxLzhQaE1KSlBnNkxMZ2xrc0dSNHh4OFBNZUNrS29B?=
+ =?utf-8?B?cVVKcElqcXJWeFkzMGRGQmpyaWhkTHlBdzg5VGdPMmxObEhkN1c1QmhpbVNP?=
+ =?utf-8?B?L1ZNYW5VQktxNm5BczdRa2xDbXl0alNwOG9YbUZyd1RVcVJYYnlFU093ZE1u?=
+ =?utf-8?B?NVZhVUVkd09UZEExUGt0eW5tYjVoWjdFL3Y5cktqZXpiQlVBK0szWkRzTi9L?=
+ =?utf-8?B?L2V3cnl4ZXl2UWRvaGt1TXVuVC9oNGhyVnpUdmRheSs1KzJCdjZ3RVhRL096?=
+ =?utf-8?B?d2lZNGdyUmR2NHluL3ZGUWhIUHVoL3pzMEZDRmI4SFE0ZWd4T2Z0emdmUzlJ?=
+ =?utf-8?Q?raDfM/gxWKia4ev1w8nv8b4sXZJEjuOB0HLPfJ6?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e403f00d-d0cb-4d96-679d-08dc319a955c
+X-MS-Exchange-CrossTenant-AuthSource: SEZPR06MB6959.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2024 22:31:58.1727
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZPR06MB5958
 
-On Mon, 12 Feb 2024 at 22:56, Jeff Johnson <quic_jjohnson@quicinc.com> wrote:
+On 2/20/2024 6:05 AM, Andrew Lunn wrote:
+>> It's not MAC which behaves wrongly, it's the MDIO bus. If we don't follow
+>> the reset procedure properly. The MDIO bus fails to respond to any
+>> write/read commands. But i believe MAC controller and PHY are still working.
+>> I recalled that it can still transfer network packets, though it fails to
+>> read PHY registers from MDIO bus so only 10Mbps is available (And the phy id
+>> read out is always 0x0, normally it's 0x20669853).
+>>
+>> Maybe during initialization, PHY sent some garbage to MDIO bus and killed
+>> it.
+> MDIO bus masters are really simple things, not much more than a shift
+> register. I find it hard to believe the MDIO bus master breaks because
+> of reset order. If the MDIO pins went to SoC pins, it would be simple
+> to prove, a bus-pirate or similar can capture the signals and sigrok
+> can decode MDIO.
 >
-> On 1/30/2024 8:38 AM, Dmitry Baryshkov wrote:
-> > On WCN3990 platforms actual firmware, wlanmdsp.mbn, is sideloaded to the
-> > modem DSP via the TQFTPserv. These MBN files are signed by the device
-> > vendor, can only be used with the particular SoC or device.
-> >
-> > Unfortunately different firmware versions come with different features.
-> > For example firmware for SDM845 doesn't use single-chan-info-per-channel
-> > feature, while firmware for QRB2210 / QRB4210 requires that feature.
-> >
-> > Allow board DT files to override the subdir of the fw dir used to lookup
-> > the firmware-N.bin file decribing corresponding WiFi firmware.
-> > For example, adding firmware-name = "qrb4210" property will make the
-> > driver look for the firmware-N.bin first in ath10k/WCN3990/hw1.0/qrb4210
-> > directory and then fallback to the default ath10k/WCN3990/hw1.0 dir.
-> >
-> > Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-> > ---
-> > Dmitry Baryshkov (4):
-> >       dt-bindings: net: wireless: ath10k: describe firmware-name property
-> >       wifi: ath10k: support board-specific firmware overrides
-> >       arm64: dts: qcom: qrb2210-rb1: add firmware-name qualifier to WiFi node
-> >       arm64: dts: qcom: qrb4210-rb1: add firmware-name qualifier to WiFi node
-> >
-> >  .../devicetree/bindings/net/wireless/qcom,ath10k.yaml         |  6 ++++++
-> >  arch/arm64/boot/dts/qcom/qrb2210-rb1.dts                      |  1 +
-> >  arch/arm64/boot/dts/qcom/qrb4210-rb2.dts                      |  1 +
-> >  drivers/net/wireless/ath/ath10k/core.c                        | 11 ++++++++++-
-> >  drivers/net/wireless/ath/ath10k/core.h                        |  2 ++
-> >  drivers/net/wireless/ath/ath10k/snoc.c                        |  3 +++
-> >  6 files changed, 23 insertions(+), 1 deletion(-)
-> > ---
-> > base-commit: 596764183be8ebb13352b281a442a1f1151c9b06
-> > change-id: 20240130-wcn3990-firmware-path-7a05a0cf8107
-> >
-> > Best regards,
-> This series looks OK to me, but would like Kalle to review as well
+> To me, its more likely the PHY side of the MDIO bus is broken somehow.
 
-Kalle, gracious ping. This is my proposal to fix the issue that we
-have discussed at some point, wlanmdsp.mbn for sdm845 and for qcm2290
-/ sm6115 have different features, resulting in kernel log being
-spammed on the RB1 / RB2 boards.
+The MDIO pins are not accessible from outside, only PHY pins are exported.
+
+Maybe. I've tried many different approaches before i sent this patch. 
+This is almost the only simple way i can implement to make it work. The 
+downstream is also not telling us why it is needed to disable MAC 
+controller before PHY reset. But it is mandatory. All i can do is to 
+guess, unless HiSilicon people can join this conversion and tell us why. 
+So the conclusion i got from trial and error is that MAC controller MUST 
+be disabled during PHY reset, no matter what the reason is. I hope we 
+can have the framework providing utilities for me to resolve this (e.g. 
+provide a custom callback for PHY reset, in mdio_device_reset() function).
+
+Also it's very strange that, if the PHY is reset in a wrong order, (i.e. 
+Now we can not operate MDIO bus), we have to do the PHY reset procedure 
+once again, simply resetting MAC does not work. So it might also be the 
+PHY which is broken (partially).
+
+>
+>     Andrew
+
 
 -- 
-With best wishes
-Dmitry
+Regards,
+Yang Xiwen
+
 
