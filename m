@@ -1,121 +1,172 @@
-Return-Path: <netdev+bounces-72813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F36AD859B65
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 05:26:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CCF1859B6A
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 05:38:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5EE19281F73
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 04:26:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5944D1C21340
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 04:38:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E926EB65A;
-	Mon, 19 Feb 2024 04:26:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B346AB65A;
+	Mon, 19 Feb 2024 04:38:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H7OReeQR"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="kO0cyQhW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71AB863B3;
-	Mon, 19 Feb 2024 04:26:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BA1D256D
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 04:38:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708316794; cv=none; b=CvlIRJH872HZIe0z/troDzzsmMxkS8Y4AWGvXb1GtEXAPOhOAohFB2ayvKMahcspG2M224eYLxvGn0xJ8qnbcYZSXxWjQ7JXga3lBMcsZjTnnvGty91iJIVSzRggWodYFcwPbdf1sGAyWuKl67HPaScR02mt1aF+HvwP3FdIgmc=
+	t=1708317511; cv=none; b=s5sZ7vmBzHfFFzAzTLKpF+LuVYCRXD8naP/7G9zymAhyZnpqICQzwlsTZcASUnIDhNJNnIxrImnCczgvOHSptnNePViUCjBMx8eeMbFmGsifYY94U3h96aMPolk5GgqrL9wPCJgAHhhYNeVI46idEF/zcYGAsYQzVPDovjlaucM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708316794; c=relaxed/simple;
-	bh=n9cVINVVeUQ7a6yT1OPSYHFXjTFZteQyoAsMJpuvlM0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=jotE2OxC3yH97zvCh3sHqfNUfxxfy1mII93BnD6DapCpUldQB2/KUEm1D22EbNdbV6ubib1CDBFOVctygZkuJAc8b9jgGHInyq1KKTRoRV8YNSPvhKSr2Tr+RwO9lGGjp6vENb46O3SWCwjlr/anmCbpeQWByisvuQpG0RvbFy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H7OReeQR; arc=none smtp.client-ip=209.85.167.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3c1404d05bfso2501589b6e.3;
-        Sun, 18 Feb 2024 20:26:33 -0800 (PST)
+	s=arc-20240116; t=1708317511; c=relaxed/simple;
+	bh=td3XHKzOYfsy3w1IqdcXYg1tWIZKPWdkADTw6WSAHSQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aPkYIXG9Oz/TZhWVW9yNKRk2f4yRbLc8UYl3yvrJrg4TDx84MHHMZAlgtHaWSq1a8Sp5cRt3dl0DjzIFDvd5MQH8nwMfuq7hiZvAfFjMZ7Ng/M6yIL6Lwf2sSH//nxc+KMIEoNZ12mdY0AHp6orM8+yHqvXH6DPNd+0gmSSRy+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=kO0cyQhW; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708316792; x=1708921592; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=N8jLBR+wUVXC8fLxBsadkCVVQvYdLsp9BAEZYoHcJYU=;
-        b=H7OReeQRzUHsLM0NEgv430iVBEIdMB+SODdpjD4eNDpJAT/SfeOZEc2hSFwOIJOr1s
-         ZM2mcJGVdWPI1BP6sIAcl/pRZTLjUOeRwfycgd3CzgAj60FeyBQHLhXEY+i92GfYOooe
-         51tDZJeLY+IxcLFvRzG1QsNrxndeLdaOclsdf2oaubrouaMskxmil6Kei1pLplwcXzq2
-         8VxrPt+ipr8dQEgeEmTSPABX000nsCihxIfx1oww9MktHbYm6XVKB9xdK4jkWPsRM1O7
-         RvA3Ee97UkXJLpnhtyWG6FCczX1sIllXF8ifEwt+4jN92zif4779R+/YQVB0sDzwMGyc
-         7AcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708316792; x=1708921592;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=N8jLBR+wUVXC8fLxBsadkCVVQvYdLsp9BAEZYoHcJYU=;
-        b=vi7qkaa7QZ4O+lIlJKR+jINXxt6jMntJHLW5phJqVgdKn1CUzCEc3ULN/DZ3VwTa/J
-         Dg3gu/FVWY81hs4hRn81+G9AIfm03ZX83RJLNuCeYHu+W0CZDkBWvCK6E1mZIzV7AcmB
-         JFBwl+z/PRIzHU0wHyjwAEfsLOrH5yYXjrItVFvM5MwN6P0TnKQQGnN6JrKZ0mYHKd4L
-         DUgPmrY5eemxiNAC6ybN+CKX0GzkLZ8LHa0hI6ewLzRrRejedScAoM2hCO/PDMAQvoL5
-         TTpPnZT1Xb/HexnXYy3+GMuAPnHlwb4XgZICgmz60pRMh0G0ylbPxTVXAtyl4ocdpLTB
-         9y2g==
-X-Forwarded-Encrypted: i=1; AJvYcCV1qm8+Q/lh36ywx+yEXMNoLhTglIH24rx47XMLK6fzs1d1BpjS9c246mk4qR3mUYbfHkEbAW+6EPfjH4b1HuT3SEQVkzOpOM9U3nfmn1yARFnDXa3Hxt5lFQcGv/gvVpGXExvF
-X-Gm-Message-State: AOJu0YzLyoSeNbcv+1Owo1rOusNz3K1pcBC/sYbSoM8OEsBwrQxVZ3Oq
-	grLdFOQMYjuL/T7eKinAWOKyjRwmkpWQnJuvDjPH+EFeoblk9bsE
-X-Google-Smtp-Source: AGHT+IHVqMRlOqIH4wgN0nkqEjo+7JQ69GvJzGhVRk3pRqPrLLuJuwnwpt/ksbnvzS/243FF8tU8MQ==
-X-Received: by 2002:a05:6808:17a3:b0:3c1:37d9:dc93 with SMTP id bg35-20020a05680817a300b003c137d9dc93mr13745293oib.10.1708316792302;
-        Sun, 18 Feb 2024 20:26:32 -0800 (PST)
-Received: from ?IPV6:2600:8802:b00:ba1:e814:598f:2d92:8806? ([2600:8802:b00:ba1:e814:598f:2d92:8806])
-        by smtp.gmail.com with ESMTPSA id s27-20020a056a00179b00b006e3cdae7e60sm2280327pfg.58.2024.02.18.20.26.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 18 Feb 2024 20:26:31 -0800 (PST)
-Message-ID: <6146eb3b-720a-4523-bcc7-8e2656aeafef@gmail.com>
-Date: Sun, 18 Feb 2024 20:26:29 -0800
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1708317510; x=1739853510;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=772WpN3uwR2PUEva/jUsgoeuH3Miw5bLuxSFobyRiQg=;
+  b=kO0cyQhWa+9VZO9hNEP0wd72YGrPpV7gsLUtl2CpHXiLQzYpeYUES5TE
+   I0ChuXu2Tr2nOgDlapus9ByDgw7AUeMTYRtfwcSebgHs1jpwb2RwXo1Kv
+   YLEtikGBxX4bo0Ot1IDepoGsbRmkBHMgHyH0mEz9CWmOvetTo3qNZjiXy
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.06,170,1705363200"; 
+   d="scan'208";a="66911682"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2024 04:38:28 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:26298]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.34.134:2525] with esmtp (Farcaster)
+ id 3b55a2a4-0f17-4d8b-a2ef-7ab370daddc1; Mon, 19 Feb 2024 04:38:28 +0000 (UTC)
+X-Farcaster-Flow-ID: 3b55a2a4-0f17-4d8b-a2ef-7ab370daddc1
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Mon, 19 Feb 2024 04:38:27 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.106.101.47) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.40;
+ Mon, 19 Feb 2024 04:38:24 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kerneljasonxing@gmail.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kernelxing@tencent.com>, <kuba@kernel.org>, <kuniyu@amazon.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v6 04/11] tcp: directly drop skb in cookie check for ipv6
+Date: Sun, 18 Feb 2024 20:38:15 -0800
+Message-ID: <20240219043815.98410-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240219032838.91723-5-kerneljasonxing@gmail.com>
+References: <20240219032838.91723-5-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next RFC PATCH 6/6] net: phy: bcm7xxx: rework phy_driver
- table to new multiple PHY ID format
-Content-Language: en-US
-To: Christian Marangi <ansuelsmth@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Florian Fainelli <florian.fainelli@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Robert Marko <robimarko@gmail.com>,
- "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
- Nipun Gupta <nipun.gupta@amd.com>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Puneet Gupta <puneet.gupta@amd.com>,
- Abhijit Gangurde <abhijit.gangurde@amd.com>,
- Umang Jain <umang.jain@ideasonboard.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240218190034.15447-1-ansuelsmth@gmail.com>
- <20240218190034.15447-7-ansuelsmth@gmail.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20240218190034.15447-7-ansuelsmth@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D037UWC002.ant.amazon.com (10.13.139.250) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Mon, 19 Feb 2024 11:28:31 +0800
+> From: Jason Xing <kernelxing@tencent.com>
+> 
+> Like previous patch does, only moving skb drop logical code to
+> cookie_v6_check() for later refinement.
+> 
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> --
+> v6
+> Link: https://lore.kernel.org/all/c987d2c79e4a4655166eb8eafef473384edb37fb.camel@redhat.com/
+> Link: https://lore.kernel.org/all/CAL+tcoAgSjwsmFnDh_Gs9ZgMi-y5awtVx+4VhJPNRADjo7LLSA@mail.gmail.com/
+> 1. take one case into consideration, behave like old days, or else it will trigger errors.
+> 
+> v5
+> Link: https://lore.kernel.org/netdev/CANn89iKz7=1q7e8KY57Dn3ED7O=RCOfLxoHQKO4eNXnZa1OPWg@mail.gmail.com/
+> 1. avoid duplication of these opt_skb tests/actions (Eric)
+> ---
+>  net/ipv6/syncookies.c | 4 ++++
+>  net/ipv6/tcp_ipv6.c   | 7 +++----
+>  2 files changed, 7 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/ipv6/syncookies.c b/net/ipv6/syncookies.c
+> index 6b9c69278819..ea0d9954a29f 100644
+> --- a/net/ipv6/syncookies.c
+> +++ b/net/ipv6/syncookies.c
+> @@ -177,6 +177,7 @@ struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
+>  	struct sock *ret = sk;
+>  	__u8 rcv_wscale;
+>  	int full_space;
+> +	SKB_DR(reason);
+>  
+>  	if (!READ_ONCE(net->ipv4.sysctl_tcp_syncookies) ||
+>  	    !th->ack || th->rst)
+> @@ -256,10 +257,13 @@ struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
+>  	ireq->ecn_ok &= cookie_ecn_ok(net, dst);
+>  
+>  	ret = tcp_get_cookie_sock(sk, skb, req, dst);
+> +	if (!ret)
+> +		goto out_drop;
+>  out:
+>  	return ret;
+>  out_free:
+>  	reqsk_free(req);
+>  out_drop:
+> +	kfree_skb_reason(skb, reason);
+>  	return NULL;
+>  }
+> diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+> index 57b25b1fc9d9..4cfeedfb871f 100644
+> --- a/net/ipv6/tcp_ipv6.c
+> +++ b/net/ipv6/tcp_ipv6.c
+> @@ -1653,12 +1653,11 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff *skb)
+>  	if (sk->sk_state == TCP_LISTEN) {
+>  		struct sock *nsk = tcp_v6_cookie_check(sk, skb);
+>  
+> -		if (!nsk)
+> -			goto discard;
+> -
+> -		if (nsk != sk) {
+> +		if (nsk && nsk != sk) {
+>  			if (tcp_child_process(sk, nsk, skb))
+>  				goto reset;
+> +		}
+> +		if (!nsk || nsk != sk) {
 
+!nsk is redundant, when nsk is NULL, nsk != sk is true.
 
-On 2/18/2024 11:00 AM, Christian Marangi wrote:
-> Rework bcm7xxx PHY driver table to new multiple PHY format
-> implementation to reduce code duplication and final size of the compiled
-> module.
+We can keep the original nsk != sk check and call tcp_child_process()
+only when nsk is not NULL:
 
-I like the idea of sharing as much code as possible and creating a 
-smaller module, however by changing the name, you are creating an 
-user-space ABI change, we rely upon the exact PHY name being shown under 
-/sys/class/mdio_bus/*/* and this change will break that.
-
-Thanks!
--- 
-Florian
+---8<---
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index 57b25b1fc9d9..0c180bb8187f 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -1653,11 +1653,8 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff *skb)
+ 	if (sk->sk_state == TCP_LISTEN) {
+ 		struct sock *nsk = tcp_v6_cookie_check(sk, skb);
+ 
+-		if (!nsk)
+-			goto discard;
+-
+ 		if (nsk != sk) {
+-			if (tcp_child_process(sk, nsk, skb))
++			if (nsk && tcp_child_process(sk, nsk, skb))
+ 				goto reset;
+ 			if (opt_skb)
+ 				__kfree_skb(opt_skb);
+---8<---
 
