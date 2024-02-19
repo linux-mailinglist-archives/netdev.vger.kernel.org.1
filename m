@@ -1,142 +1,80 @@
-Return-Path: <netdev+bounces-73085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38FDC85AD0A
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 21:23:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F174285AD2B
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 21:28:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 81CC5B259B2
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 20:23:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACD9A284874
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 20:28:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE87752F96;
-	Mon, 19 Feb 2024 20:23:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25F8E53398;
+	Mon, 19 Feb 2024 20:28:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="WEn22rq1";
-	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="Z+T0K58g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s+/PvT2B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.52])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E9BF52F68;
-	Mon, 19 Feb 2024 20:23:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708374202; cv=pass; b=JeUyBOkiTWU6j6/h32rD8/PFwdx99FhrpJ/9Wk/87PHM6CuntEgrVU5h44HQZ5cb97rgSaqZJ+FEHZKKcNKwuPpz+32Xqz2kjQCktoz9KEGwBlQ4ytA3dzVRJlo8KNcVvSBryJZXzlJO7IID8juBlJn+5ZgcjuLL8uaBd244RQc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708374202; c=relaxed/simple;
-	bh=ZuhFdCaK+/hgiNviU4bnJ7zFJnr9RLu0hrR9n4lzjH0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uyO90pXMRUQ6NYTuKTB8ZsrflQ1AQnXAAkvscOhZBQrJaCqOyJqDdkAEAOk7rMyEEUcOmYf+oLuRuA96wTQpXeH5jL9EMbDfcAHz/fHDrzx/MpbOJ7BRkueiPIWcSM3sJC/pnH2roxllDu1Zl5ldm0H1n88WHl0TbQv3x24LdV0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=WEn22rq1; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=Z+T0K58g; arc=pass smtp.client-ip=85.215.255.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
-ARC-Seal: i=1; a=rsa-sha256; t=1708374180; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=i2zrjEwGQoiH4Xfr25qGVanPOn9KQxxbzD01k1ejyo5gCIXevM6nC6gmnLpzFG5VHN
-    VpCEdCc9XI0NIDfzCrG5+09MMtN3++XsaKL1R85fkH3WxcdWD6t+GbiAz6Cy8FFRp+tB
-    DsJbQ+vOHZKILlvZ3ZYNfnabMZjkmOXkqiAFTDWeQuNSFFGGDRkq1N33K9/hhUyxl1Y4
-    2rKB5YrG2hsKf/Kha9VVRD0y1UMaQOcZ8lI5R4qg3nGJYD3AutPG42jombyS8WbdVGfn
-    wPhcUsaSOVOK+M6IHGodHheUGB0hSNN38/eAaWzZPxAZHUXd8hL2gZeDlq0NSzzRQwy4
-    eahw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1708374180;
-    s=strato-dkim-0002; d=strato.com;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=U/L0/LQ6ERPrB/20UgMbzGyW4YIbsTP70z/cZD3wTmU=;
-    b=P+yP8K+vbAHxbyrDeEvLF7dxpvEvHg9Bd+6f1cXAn2v1Uzp+lRhjtxXLX2za5h5MFg
-    uY7PjHxDYcONGMA6TRKqLnRfX+Urf3sL0aSI7OVeISmTWvymz3ZtrsBpQUCqWvdclQ7U
-    Kvplg48T/TZZAz6HJfSUnCT+Oa1pkFRaVwuNN+zhb+6scMMb9y659byOPPFGaI0lQlB9
-    G6WCXYAfz78fkz2hwKa531QzU9+U4bmyuxIkMRQ+M7mF0Eayg3LnsjuXwA4tAOsJR0hT
-    WlZmSNNoHI9OR9S7ePz2LfW+zulIj+jQ/s6SpiwHXEtGaj6Y65DAABmVtNnJdwt0bwMk
-    9g7A==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1708374180;
-    s=strato-dkim-0002; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=U/L0/LQ6ERPrB/20UgMbzGyW4YIbsTP70z/cZD3wTmU=;
-    b=WEn22rq1coR8yA5/9x6v1fkpjv6hz9fBcrk45/Dz5J34Cs61X6DicS3NYnAUe0r+Du
-    AvZAeN3n81OfzuxZtQMBwaVMjdxblUuzmGhwptMODkImkMWyyiaNrxeWROY2588bNGw5
-    h/IM4hbzvNgy10hG5XjQQ1pWV0kj6MwWqMLRbGiWuUChTXMF+Ko5PumLm+AlBm0M7NuU
-    T5Z+j5vSGYf7XhSZ120mt4lAbkGEhCwB+17pF+fp0UCd5Q/uZRoxHuc12els8LYsQMOE
-    Kn3HOY7pDhjrABM/B2UiVtm3rDHLLHt0XxLEvw77VE1OXboXz80d+46sqFGGN+P74MsO
-    gLvg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1708374180;
-    s=strato-dkim-0003; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=U/L0/LQ6ERPrB/20UgMbzGyW4YIbsTP70z/cZD3wTmU=;
-    b=Z+T0K58gmz4TiX/frKzvbtzsNkF+1WpbYxOVIhpsAXo2t74On1D8jFZZ7/Yyxob7HL
-    TEnK8YB871Gn99Cen3CQ==
-X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjG14FZxedJy6qgO1qCHSa1GLptZHusl129OHEdFq0USEbDdAnQ=="
-Received: from [IPV6:2a00:6020:4a8e:5000::90c]
-    by smtp.strato.de (RZmta 49.11.2 AUTH)
-    with ESMTPSA id K49f9c01JKN086H
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Mon, 19 Feb 2024 21:23:00 +0100 (CET)
-Message-ID: <a41ed65c-a916-424d-b4e7-9db65c015b50@hartkopp.net>
-Date: Mon, 19 Feb 2024 21:23:00 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D82524B1;
+	Mon, 19 Feb 2024 20:28:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708374537; cv=none; b=fOrPvRdWmAZAlduX5iGM9E4nimeLPS9W0FcnioJE4Me6glS3PGN8RtV6pjDOlxiz0FZk9kdRLMp6MDjmVStznI6BWsNXE7bcsMIQm5WCNoZO99bBpoQNeGppKj4AJWCXYnEYlf8a/zLBi3Xg4oP6OVTOHPLMjGODCR/TmaywTPs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708374537; c=relaxed/simple;
+	bh=Dfn0OfhWGIoYuprurDxmGKgCNS7+424UotfKzhkZg4Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=K2cF479I6hqLkp2Lc/FoJqrxAWQUaiI7D2HM+TzH1chq8eHtau4qhJFhGI+fKIY2HZi9ExLC7XpSLaoXrko7/N4G2+aSZVG1yeY2NBUrgHW0pjUfThnxevG6Org8Ia4xXNJGewynAb7mKnNDoQ+6qdjtMUVTq7R/bu0BpE78fNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s+/PvT2B; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12EA3C433F1;
+	Mon, 19 Feb 2024 20:28:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708374536;
+	bh=Dfn0OfhWGIoYuprurDxmGKgCNS7+424UotfKzhkZg4Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=s+/PvT2Bug/Wjruc1JbqZdGCxSNYQfT5D5hBlgNh4L8WjHGhMLJpj+nUG0AqqDFIT
+	 182gJTDnHhkJunNAjuam8328VXZzNUta2eij2PlHpRFyrN4ixe54t7lMw5mXexZG2Y
+	 tBYHpHahhartIVT9CiBLz+MDNcMuxwIEiF4l1/XRvfb/kY47cWNkvMnFx78tNTF5Z6
+	 2SkFm8DygF0uM9x8yNbS4vQH72S78C4d30Zc45fi3C3bhgH8fv1lrurgMi5vu1Pncz
+	 9XTshkwe++KllRYeqYS4meoRLB/71PwZmIL3xnvFC+ivlev9Lln+Dl28BgR5G5+oxl
+	 BQtWt6i369oCQ==
+Date: Mon, 19 Feb 2024 12:28:55 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Aaron Conole <aconole@redhat.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Pravin B
+ Shelar <pshelar@ovn.org>, dev@openvswitch.org, Ilya Maximets
+ <i.maximets@ovn.org>, Simon Horman <horms@ovn.org>, Eelco Chaudron
+ <echaudro@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [RFC 0/7] selftests: openvswitch: cleanups for running as
+ selftests
+Message-ID: <20240219122855.1f1ad0ac@kernel.org>
+In-Reply-To: <20240216152846.1850120-1-aconole@redhat.com>
+References: <20240216152846.1850120-1-aconole@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] can: raw: fix getsockopt() for new CAN_RAW_XL_VCID_OPTS
-Content-Language: en-US
-To: linux-can@vger.kernel.org
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>, netdev@vger.kernel.org,
- Simon Horman <horms@kernel.org>
-References: <20240219200021.12113-1-socketcan@hartkopp.net>
-From: Oliver Hartkopp <socketcan@hartkopp.net>
-In-Reply-To: <20240219200021.12113-1-socketcan@hartkopp.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-Sorry. Of course it is a [PATCH net-next] where the referenced commit 
-has been applied.
+On Fri, 16 Feb 2024 10:28:39 -0500 Aaron Conole wrote:
+> The series is a host of cleanups to the openvswitch selftest suite
+> which should be ready to run under the netdev selftest runners using
+> vng.  For now, the testing has been done with RW directories, but
+> additional testing will be done to try and keep it all as RO to be
+> more friendly.
 
-Best regards,
-Oliver
+Would it be an option to make the output go into a dir in /tmp/ 
+instead of in place, in the tree?
 
-On 2024-02-19 21:00, Oliver Hartkopp wrote:
-> The code for the CAN_RAW_XL_VCID_OPTS getsockopt() was incompletely adopted
-> from the CAN_RAW_FILTER getsockopt().
-> 
-> Add the missing put_user() and return statements.
-> 
-> Flagged by Smatch.
-> Fixes: c83c22ec1493 ("can: canxl: add virtual CAN network identifier support")
-> Reported-by: Simon Horman <horms@kernel.org>
-> Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
-> ---
->   net/can/raw.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/can/raw.c b/net/can/raw.c
-> index cb8e6f788af8..897ffc17d850 100644
-> --- a/net/can/raw.c
-> +++ b/net/can/raw.c
-> @@ -833,11 +833,13 @@ static int raw_getsockopt(struct socket *sock, int level, int optname,
->   			if (len > sizeof(ro->raw_vcid_opts))
->   				len = sizeof(ro->raw_vcid_opts);
->   			if (copy_to_user(optval, &ro->raw_vcid_opts, len))
->   				err = -EFAULT;
->   		}
-> -		break;
-> +		if (!err)
-> +			err = put_user(len, optlen);
-> +		return err;
->   
->   	case CAN_RAW_JOIN_FILTERS:
->   		if (len > sizeof(int))
->   			len = sizeof(int);
->   		val = &ro->join_filters;
+  mktemp -p /tmp/ -d ovs-test.XXXXXXXXX
+
+or such?
 
