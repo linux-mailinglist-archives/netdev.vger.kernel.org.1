@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-72805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A0AF859AFF
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 04:29:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B8CEB859B02
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 04:30:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD84FB2139F
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 03:29:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 022BDB21321
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 03:30:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC4244414;
-	Mon, 19 Feb 2024 03:29:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 254B05220;
+	Mon, 19 Feb 2024 03:29:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JpPGGGIQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SwMRtUjh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 505A65681
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 03:29:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B32E4524A
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 03:29:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708313370; cv=none; b=RHgmOwUeFRSNlUhFppO8lSQtOjbJzrzWec+OJiY1RF5bivZrpjJNEcMP/wsTBsuBzRO4BcdUd1KSkoIYB0OBLWzC99KSv9g5Bbmu233VdFK+csi5IDjkL/zZoDqUR6OWPBzbRWTn8edtWMrzl7GeGtpHkSoqy9zoYzYv5j6/LX0=
+	t=1708313379; cv=none; b=Zqz4p+Wogwsitn11oUqvjsM0CUd0N04M4KBQfJEloiLtD2S6M//Cwk525+9wOp7hE168Tac7Edy6SwaVGBXtpCCemqB8ip/ltdKP/bzSf11cR39soj5db6Jqe3ADF2vMhq3zVduL8HGipuWILA7ftp0n9GN2lGO/lzjewstt8+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708313370; c=relaxed/simple;
-	bh=KAj9xfwEGa6SjGm8x4hCEONlZ+giy8Ehdu/2/QOPKKM=;
+	s=arc-20240116; t=1708313379; c=relaxed/simple;
+	bh=OU2uwqIjOfTh+AmFOfGudPP/RW1PKWT8VrA1aJ85WeI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=X8KZMJ0eDlsBYS1a2/xiNzlvEamhM+AzQ3n59bqh2ODGi7jHgsM+jHeO+Ab7kaWtYimcue89uGsgzBofUzJQd8VKBg7sw+OyNzy5fV50pg8IGpzLplB6GqyFEI61btBEUdHnKXcnWuqgQ+jJGVldA3Mo2S8hU76j4eH17fuhaq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JpPGGGIQ; arc=none smtp.client-ip=209.85.216.49
+	 MIME-Version; b=PIYmXCfmKwNxyYIxgfmLV3jlc/r0W4Jd/EEqJi+u4QMtKQtrusO7VWfIcrHfVRL0q+K0qhPHhg03RJo3JbtOmuRdyUNhgUaqeJZY31f7AN2C+KQQ+sSli9jIQDfirZqaYmhrvWmQGHHKyWkeH4aTVDakCrN2d8j2pZcIGqVNePs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SwMRtUjh; arc=none smtp.client-ip=209.85.216.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-296a02b7104so2904829a91.2
-        for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 19:29:29 -0800 (PST)
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2995fa850ddso711018a91.0
+        for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 19:29:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708313368; x=1708918168; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1708313377; x=1708918177; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YM5U9V2XSZCs4Epf5JzjpuOVpIlEpgZgzWTMDM5kvdA=;
-        b=JpPGGGIQkcrH2qy4PBOIujgRXDjmBLsXJT7wSsin+QleDUAXchRyozTP6yQDPoxtcm
-         l8d0Slva3mgmGACQNa5ZZ4DkvOqMkdBytdjvGtz5mie6prQgEYTz8T6herjprCdbawis
-         yoZ2aWxT48mNQIGyXv/+LJyLGhRzIWuY7b67ja1WK6CayIRpmfFgZufYF7UkJz0MRLKj
-         +ABcyO17tDkJRWJNrxH0Z7xse/I7GL3M6JtDKMUV5LaAWS00vhVSAQ0lt0hTRMJ3qTLG
-         spm3FlZeTgeJIY5rcsvMTfI7Tbu7SXn+hcmOT0A9+iWKwjTRtSGUiNIuLkfo2B+JQvd6
-         Pfhg==
+        bh=3U8r7pHM6I/hcOWbq8mog8dHQKxp/aJ6JsR5ie6qaU0=;
+        b=SwMRtUjhTSYb9aYp8W8o8ysvY14VVx66QFQDNI+dHhLovbGS+dzps3jLDcNgn7jJwW
+         lFrldEXHL0HnoRWr6AGoiHrgBOUleTfeuYWe4C1zrO8bfM03J0B4+Oijq5jWJn9xOv3Q
+         DKZ+aQFbYnPHpLUj1khL6rQVtGd4/8RCcIq8aqjjEeCcBYPl7ggz4uyLZ6hmPF9gBhYL
+         fUOuz6YPmPmkUpYaTurKbZZPGJ5+AXSgIqskHYVMyLXIilR4J3h+0pFuY0VPEaW9LAQ8
+         7c9qjEFT+hbTmR3iTMzzBPobQPSHrzqO5lZ5ey+RHLhZSvCcDZ9gXKSFIZzGpDdmxXGo
+         I5/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708313368; x=1708918168;
+        d=1e100.net; s=20230601; t=1708313377; x=1708918177;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=YM5U9V2XSZCs4Epf5JzjpuOVpIlEpgZgzWTMDM5kvdA=;
-        b=sYQ29kcAYhpc49r5TwihrBYGeB++eiKcue5lsZTQp04gd6nZQs+bgyWCh/i/4Uo42y
-         RwDz2s7GAGvTzghtj3Dip+NQxUaXZkHT7kYhfY2s3p7Pltm2F4x28iOcsNU4gt4mrM5U
-         1j8Ya9OSYQ9YCNPT1WW1HRwOf36rmWdJcXcpBOsj83ctC3RxAVnYdQUEJr0akgcNn5a8
-         V8WzzBYD36l4m5sJY1a5BdKVbCdm+gDdqKx/G9qoyMJqwWJDx1t45/uwBeIKgnspY2o4
-         aOILr5/SnaRBAeN/harx6dtEwXCzA8mMYRpIcvojK8VtvByiKmJBiRkTwCcX+mIVeTqB
-         cy0g==
-X-Gm-Message-State: AOJu0Yz1Rb2y9136XSysOytmVM5Rl+FTR99sjIEs0iL8m3QiHU62fubZ
-	YQ/iGoc2xajdtXzbaG+MYaL64snJMdtK9jaAHN9EDA/JPnywsDMg
-X-Google-Smtp-Source: AGHT+IHdnymzjRJ3afiQDAFSWHg/nmgvu81cXO3WuTOIZwbSW5cYVRccFg7hAnRyf9EjEjZT+4H0eg==
-X-Received: by 2002:a17:90b:78c:b0:299:5401:89d2 with SMTP id l12-20020a17090b078c00b00299540189d2mr2915256pjz.45.1708313368647;
-        Sun, 18 Feb 2024 19:29:28 -0800 (PST)
+        bh=3U8r7pHM6I/hcOWbq8mog8dHQKxp/aJ6JsR5ie6qaU0=;
+        b=aynj+pPil9PJ8TuZ549ZrAf0PQI6dgca9RG9P23d6YFLhjRSgsL1zphTieVe/ZsFYb
+         cqsvHgXrXZkywV9z1rz/sq0PxQZE4RpWUSNMQ7Vfk/dgvcEQkuErBTnl7Nu1zMzTWGPf
+         qvpWxwXwIbvpHsph7GD6qgSEHPSNVRST8y9SjF2qD9Lflxiq9ArPK1vYKW3nZN/G0DD6
+         2zcaY38nADiHHkkHV2EOu3NxlWQEx9PhoJe/+3YV2SfeY9qex+8yjFjQYuWxpQ9W0Y35
+         v1JygJLs9w3mi245vZyE7ivIGEm20bMP12mVPEIBYnaln4eDdqGtlK6yZ0zt2XyzpvyR
+         aY5w==
+X-Gm-Message-State: AOJu0Yxgxzl2MggUVu6Y89WyRzdvwZRoNxJfZuU8C1KCJiUButSny2z0
+	ahRsGC5V63URYw1I3JYrMVoYC3f+LqGX0tS1h2uMSnuRN54g/5lt
+X-Google-Smtp-Source: AGHT+IFfcDj9wBsDRHfZcaVnJwwjCYeCvis5QbMt008g2yJCaJkCKAvDDnBIPHeuld2c4FAQIwJZNg==
+X-Received: by 2002:a17:90b:4388:b0:299:88b6:7d93 with SMTP id in8-20020a17090b438800b0029988b67d93mr3030406pjb.17.1708313371447;
+        Sun, 18 Feb 2024 19:29:31 -0800 (PST)
 Received: from KERNELXING-MB0.tencent.com ([43.132.141.20])
-        by smtp.gmail.com with ESMTPSA id cs16-20020a17090af51000b002992f49922csm3968921pjb.25.2024.02.18.19.29.26
+        by smtp.gmail.com with ESMTPSA id cs16-20020a17090af51000b002992f49922csm3968921pjb.25.2024.02.18.19.29.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 Feb 2024 19:29:28 -0800 (PST)
+        Sun, 18 Feb 2024 19:29:31 -0800 (PST)
 From: Jason Xing <kerneljasonxing@gmail.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -76,9 +76,9 @@ To: davem@davemloft.net,
 Cc: netdev@vger.kernel.org,
 	kerneljasonxing@gmail.com,
 	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next v6 06/11] tcp: introduce dropreasons in receive path
-Date: Mon, 19 Feb 2024 11:28:33 +0800
-Message-Id: <20240219032838.91723-7-kerneljasonxing@gmail.com>
+Subject: [PATCH net-next v6 07/11] tcp: add more specific possible drop reasons in tcp_rcv_synsent_state_process()
+Date: Mon, 19 Feb 2024 11:28:34 +0800
+Message-Id: <20240219032838.91723-8-kerneljasonxing@gmail.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20240219032838.91723-1-kerneljasonxing@gmail.com>
 References: <20240219032838.91723-1-kerneljasonxing@gmail.com>
@@ -92,72 +92,49 @@ Content-Transfer-Encoding: 8bit
 
 From: Jason Xing <kernelxing@tencent.com>
 
-Soon later patches can use these relatively more accurate
-reasons to recognise and find out the cause.
+This patch does two things:
+1) add two more new reasons
+2) only change the return value(1) to various drop reason values
+for the future use
+
+For now, we still cannot trace those two reasons. We'll implement the full
+function in the subsequent patch in this serie.
 
 Signed-off-by: Jason Xing <kernelxing@tencent.com>
---
-v5:
-Link: https://lore.kernel.org/netdev/3a495358-4c47-4a9f-b116-5f9c8b44e5ab@kernel.org/
-1. Use new name (TCP_ABORT_ON_DATA) for readability (David)
-2. change the title of this patch
 ---
- include/net/dropreason-core.h | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ net/ipv4/tcp_input.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-index 3c867384dead..402367bfa56f 100644
---- a/include/net/dropreason-core.h
-+++ b/include/net/dropreason-core.h
-@@ -30,6 +30,7 @@
- 	FN(TCP_AOFAILURE)		\
- 	FN(SOCKET_BACKLOG)		\
- 	FN(TCP_FLAGS)			\
-+	FN(TCP_ABORT_ON_DATA)	\
- 	FN(TCP_ZEROWINDOW)		\
- 	FN(TCP_OLD_DATA)		\
- 	FN(TCP_OVERWINDOW)		\
-@@ -37,6 +38,7 @@
- 	FN(TCP_RFC7323_PAWS)		\
- 	FN(TCP_OLD_SEQUENCE)		\
- 	FN(TCP_INVALID_SEQUENCE)	\
-+	FN(TCP_INVALID_ACK_SEQUENCE)	\
- 	FN(TCP_RESET)			\
- 	FN(TCP_INVALID_SYN)		\
- 	FN(TCP_CLOSE)			\
-@@ -204,6 +206,11 @@ enum skb_drop_reason {
- 	SKB_DROP_REASON_SOCKET_BACKLOG,
- 	/** @SKB_DROP_REASON_TCP_FLAGS: TCP flags invalid */
- 	SKB_DROP_REASON_TCP_FLAGS,
-+	/**
-+	 * @SKB_DROP_REASON_TCP_ABORT_ON_DATA: abort on data, corresponding to
-+	 * LINUX_MIB_TCPABORTONDATA
-+	 */
-+	SKB_DROP_REASON_TCP_ABORT_ON_DATA,
- 	/**
- 	 * @SKB_DROP_REASON_TCP_ZEROWINDOW: TCP receive window size is zero,
- 	 * see LINUX_MIB_TCPZEROWINDOWDROP
-@@ -228,13 +235,19 @@ enum skb_drop_reason {
- 	SKB_DROP_REASON_TCP_OFOMERGE,
- 	/**
- 	 * @SKB_DROP_REASON_TCP_RFC7323_PAWS: PAWS check, corresponding to
--	 * LINUX_MIB_PAWSESTABREJECTED
-+	 * LINUX_MIB_PAWSESTABREJECTED, LINUX_MIB_PAWSACTIVEREJECTED
- 	 */
- 	SKB_DROP_REASON_TCP_RFC7323_PAWS,
- 	/** @SKB_DROP_REASON_TCP_OLD_SEQUENCE: Old SEQ field (duplicate packet) */
- 	SKB_DROP_REASON_TCP_OLD_SEQUENCE,
- 	/** @SKB_DROP_REASON_TCP_INVALID_SEQUENCE: Not acceptable SEQ field */
- 	SKB_DROP_REASON_TCP_INVALID_SEQUENCE,
-+	/**
-+	 * @SKB_DROP_REASON_TCP_INVALID_ACK_SEQUENCE: Not acceptable ACK SEQ
-+	 * field. because of ack sequence is not in the window between snd_una
-+	 * and snd_nxt
-+	 */
-+	SKB_DROP_REASON_TCP_INVALID_ACK_SEQUENCE,
- 	/** @SKB_DROP_REASON_TCP_RESET: Invalid RST packet */
- 	SKB_DROP_REASON_TCP_RESET,
- 	/**
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 74c03f0a6c0c..83308cca1610 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -6361,6 +6361,7 @@ static int tcp_rcv_synsent_state_process(struct sock *sk, struct sk_buff *skb,
+ 				inet_csk_reset_xmit_timer(sk,
+ 						ICSK_TIME_RETRANS,
+ 						TCP_TIMEOUT_MIN, TCP_RTO_MAX);
++			SKB_DR_SET(reason, TCP_INVALID_ACK_SEQUENCE);
+ 			goto reset_and_undo;
+ 		}
+ 
+@@ -6369,6 +6370,7 @@ static int tcp_rcv_synsent_state_process(struct sock *sk, struct sk_buff *skb,
+ 			     tcp_time_stamp_ts(tp))) {
+ 			NET_INC_STATS(sock_net(sk),
+ 					LINUX_MIB_PAWSACTIVEREJECTED);
++			SKB_DR_SET(reason, TCP_RFC7323_PAWS);
+ 			goto reset_and_undo;
+ 		}
+ 
+@@ -6572,7 +6574,8 @@ static int tcp_rcv_synsent_state_process(struct sock *sk, struct sk_buff *skb,
+ reset_and_undo:
+ 	tcp_clear_options(&tp->rx_opt);
+ 	tp->rx_opt.mss_clamp = saved_clamp;
+-	return 1;
++	/* we can reuse/return @reason to its caller to handle the exception */
++	return reason;
+ }
+ 
+ static void tcp_rcv_synrecv_state_fastopen(struct sock *sk)
 -- 
 2.37.3
 
