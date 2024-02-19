@@ -1,216 +1,154 @@
-Return-Path: <netdev+bounces-72997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A29F885A99F
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 18:06:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 582B885A9AB
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 18:15:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32B871F23392
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 17:06:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B6DF1C236E2
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 17:15:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27DFF446A9;
-	Mon, 19 Feb 2024 17:06:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5E0541C84;
+	Mon, 19 Feb 2024 17:15:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FD7s3Hff"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="2yCuJf4J"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 582314439F
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 17:06:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4B43F8DA
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 17:15:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708362391; cv=none; b=QXRZOZGXutVBBMk64K7JqY/kXZATcYF7QlUmgenthu7hJh4kUscWnpbmWWal7+fYAnaDesIHtMrbjc55x9nJ4/SLPTZnO9+D7H10E9+RWnktgGR73i1xzS8bA+hgfXdP50Wl8qve7tVbjxgAwK3vkLFIH9czFTaOM733t7jrwck=
+	t=1708362921; cv=none; b=EwASjFBQBBFcQTteqSDoObbWYzXMGfkX5JQtz2soxc5HE1YjkttfqlEV++g1xj7jfIVfPar/6fHqhalULw817StBfTmC3q22bZb+7oIwrOOQzSzn29eHXhj1I9rw5/lD7ucf5iOZFs8nJ8gZOv3hiwOuGqR+vekLAaDrjtpCpEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708362391; c=relaxed/simple;
-	bh=fZ2d/O8CXx/zfhB3r9fEfF8ZYXaxYaSpaL7xiQcTgE4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rKVMJqRzpHA6+JC62JfSlSuL2+cHAaY4FkJq0WuvaFrULuBSgUmU1IXRcmdVGz2DjmmSjDd/RLo2Iu2w0Sf9vRv6BxIEggMkfTuavTNzL607vpgVy5H4MhFV1jEab/+8B1f/RPH7eV1U2vwI4h5T+64o9SvHy5DwBAVyNnSt2WE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FD7s3Hff; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708362388;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=S21g+iuM5V51KZv+tPhGk9U1eIXrbnWFmHjIoHqqoA8=;
-	b=FD7s3HffRumjvu46w2EKiIuPegsZdnhPngYg5ryhcUBG4j56MGCFYE5yZYighUi6Hl0l30
-	TsTuLbF3hGpilqxRN5Qs2OHrQR1NWdJ3qTVmpVS2KqzFkWC/2WDUDWNHgLpj3wybmzNbWk
-	sFt7YZjYy/ldCAwyTCDiuxmMJBjF2l8=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-687-_nrqxU57M7KIOQonqX4PUQ-1; Mon,
- 19 Feb 2024 12:06:17 -0500
-X-MC-Unique: _nrqxU57M7KIOQonqX4PUQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D59C01C0BA43;
-	Mon, 19 Feb 2024 17:06:16 +0000 (UTC)
-Received: from max-p1.redhat.com (unknown [10.39.208.27])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id DE7031C060B3;
-	Mon, 19 Feb 2024 17:06:13 +0000 (UTC)
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-To: mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	xieyongji@bytedance.com
-Cc: axboe@kernel.dk,
-	gregkh@linuxfoundation.org,
-	brauner@kernel.org,
-	lstoakes@gmail.com,
-	virtualization@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	david.marchand@redhat.com,
-	Maxime Coquelin <maxime.coquelin@redhat.com>
-Subject: [PATCH] vduse: implement DMA sync callbacks
-Date: Mon, 19 Feb 2024 18:06:06 +0100
-Message-ID: <20240219170606.587290-1-maxime.coquelin@redhat.com>
+	s=arc-20240116; t=1708362921; c=relaxed/simple;
+	bh=TXbmp6HJ7zcWc8R4bOuacZFxoKfqsIaHGvCJrA0QY5U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l9afXVUfNQi5uaqlN3j5u3XolRzPDfNGqLYZo/y6U2M3JoL5s4P1Rv9TBjJlH18fCXwJNE/Nj5w61IYVM+Zf9SKQT4XCJ5is/pDmcFpgIKO/IbA7DIJnKbmKymNCiRrUaTqyifrkeUpS8e3gITzm41319N8vNxdzraOBlq097XE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=2yCuJf4J; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a3d5e77cfbeso792105566b.0
+        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 09:15:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708362917; x=1708967717; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gV3wjQ4zA6Qt8y8Dc+hWx/Hk0gCmsgyAQmmxpl97FQA=;
+        b=2yCuJf4JgcgZLdxIKIrORI31Qb5IauX//01bmqW7wlBWc0AE7J+uHAF7O9w6bIHdaP
+         hRvw79gHNl8qfnZ8mIIA5eXQerxlbDCNiaB/1T3XH3WLnli65GSShUa222R0VoaoE/Nq
+         ipi66s5/ObvN1PS76MK0JqMZNr1GzsOqjxNzj6nAM74GLycdiXrmt/H2wVlPT19jWBt0
+         VOCV+qRf6ldom5FqHxn3hvZ5I2fGzmo822J3Wwl/vWweNDkulPN3hpqSKvOQdUDg0Pkk
+         5LBT2qkh0zePyeVX9mBFV9PG2aAw9uPmkElYw1nkEtBMNg2cAHga6Bp/m7UUbsytu5FY
+         1Jaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708362917; x=1708967717;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gV3wjQ4zA6Qt8y8Dc+hWx/Hk0gCmsgyAQmmxpl97FQA=;
+        b=mJfsyUOU2uhfJM7Wd0uJOpWBCShPXgBEuvkk7IixI4WlIfQhI7lv0ZS+tWdmeUc+VW
+         YIy6Cr5lei3JuhPK36AINmvkWq+O3ML//Umj38x09+L0JpzXkpcXb/j1oB0VOeevKzqT
+         ks+XaoH/wNY+BW/MrBoe3bfi8BmWMdsb+4KLf946j45rHCd60j5H2GmGlzcuAVWVe/PG
+         woJT3tZmOZlJapwnR6kVybDzO7AzgZhs7jpsLPao8YgVgBVgeW/OSib1Zn3m4h3zH2Fr
+         qXOoNF6jXgB7Xr9vaqE+WFlnEkBXyQdKf+rIkEBA2ZrPG7vazmvQ3zLnoYymFUg0a/OH
+         x2Ng==
+X-Forwarded-Encrypted: i=1; AJvYcCWfdAoB1iPd01xbDS8j6Av1bjg5rf09OoH1llaoocqWfdFDeCxa8leXFq1czhYtxwMfIULgAQK2QY4YMTQpzaMybajnYHxe
+X-Gm-Message-State: AOJu0YyezG0d9+By5OauW3ezoCyrBMh0TOiQDLGKoZ61m6iu1MZ+WbQv
+	K9y/9+ie+vuEC7E8ohhA4mjz0U/rp+eLq/jnAgTfxnC+CGjiEN2SZFcSJO+OB5Y=
+X-Google-Smtp-Source: AGHT+IF4rMbaI1FXxyl0+RFHp2+SjnFsMCU98DaaR35GvyDbT0D46kHdni2ArzHTlvliaFYchHpsng==
+X-Received: by 2002:a17:906:b84f:b0:a3e:961e:722c with SMTP id ga15-20020a170906b84f00b00a3e961e722cmr2567019ejb.1.1708362917172;
+        Mon, 19 Feb 2024 09:15:17 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id vg8-20020a170907d30800b00a3d2fe84ff9sm3141033ejc.36.2024.02.19.09.15.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Feb 2024 09:15:16 -0800 (PST)
+Date: Mon, 19 Feb 2024 18:15:13 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	horms@kernel.org, Lukasz Czapnik <lukasz.czapnik@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4 4/5] ice: Add
+ tx_scheduling_layers devlink param
+Message-ID: <ZdOMoX4gdQ18fRbr@nanopsycho>
+References: <20240219100555.7220-1-mateusz.polchlopek@intel.com>
+ <20240219100555.7220-5-mateusz.polchlopek@intel.com>
+ <ZdNLkJm2qr1kZCis@nanopsycho>
+ <48675853-2971-42a1-9596-73d1c4517085@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <48675853-2971-42a1-9596-73d1c4517085@intel.com>
 
-Since commit 295525e29a5b ("virtio_net: merge dma
-operations when filling mergeable buffers"), VDUSE device
-require support for DMA's .sync_single_for_cpu() operation
-as the memory is non-coherent between the device and CPU
-because of the use of a bounce buffer.
+Mon, Feb 19, 2024 at 02:33:54PM CET, przemyslaw.kitszel@intel.com wrote:
+>On 2/19/24 13:37, Jiri Pirko wrote:
+>> Mon, Feb 19, 2024 at 11:05:57AM CET, mateusz.polchlopek@intel.com wrote:
+>> > From: Lukasz Czapnik <lukasz.czapnik@intel.com>
+>> > 
+>> > It was observed that Tx performance was inconsistent across all queues
+>> > and/or VSIs and that it was directly connected to existing 9-layer
+>> > topology of the Tx scheduler.
+>> > 
+>> > Introduce new private devlink param - tx_scheduling_layers. This parameter
+>> > gives user flexibility to choose the 5-layer transmit scheduler topology
+>> > which helps to smooth out the transmit performance.
+>> > 
+>> > Allowed parameter values are 5 and 9.
+>> > 
+>> > Example usage:
+>> > 
+>> > Show:
+>> > devlink dev param show pci/0000:4b:00.0 name tx_scheduling_layers
+>> > pci/0000:4b:00.0:
+>> >   name tx_scheduling_layers type driver-specific
+>> >     values:
+>> >       cmode permanent value 9
+>> > 
+>> > Set:
+>> > devlink dev param set pci/0000:4b:00.0 name tx_scheduling_layers value 5
+>> > cmode permanent
+>> 
+>> This is kind of proprietary param similar to number of which were shot
+>
+>not sure if this is the same kind of param, but for sure proprietary one
+>
+>> down for mlx5 in past. Jakub?
+>
+>I'm not that familiar with the history/ies around mlx5, but this case is
+>somewhat different, at least for me:
+>we have a performance fix for the tree inside the FW/HW, while you
+>(IIRC) were about to introduce some nice and general abstraction layer,
+>which could be used by other HW vendors too, but instead it was mlx-only
 
-This patch implements both .sync_single_for_cpu() and
-.sync_single_for_device() callbacks, and also skip bounce
-buffer copies during DMA map and unmap operations if the
-DMA_ATTR_SKIP_CPU_SYNC attribute is set to avoid extra
-copies of the same buffer.
+Nope. Same thing. Vendor/device specific FW/HW knob. Nothing to
+abstract.
 
-Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
----
- drivers/vdpa/vdpa_user/iova_domain.c | 27 ++++++++++++++++++++++++---
- drivers/vdpa/vdpa_user/iova_domain.h |  8 ++++++++
- drivers/vdpa/vdpa_user/vduse_dev.c   | 22 ++++++++++++++++++++++
- 3 files changed, 54 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/vdpa/vdpa_user/iova_domain.c b/drivers/vdpa/vdpa_user/iova_domain.c
-index 5e4a77b9bae6..791d38d6284c 100644
---- a/drivers/vdpa/vdpa_user/iova_domain.c
-+++ b/drivers/vdpa/vdpa_user/iova_domain.c
-@@ -373,6 +373,26 @@ static void vduse_domain_free_iova(struct iova_domain *iovad,
- 	free_iova_fast(iovad, iova >> shift, iova_len);
- }
- 
-+void vduse_domain_sync_single_for_device(struct vduse_iova_domain *domain,
-+				      dma_addr_t dma_addr, size_t size,
-+				      enum dma_data_direction dir)
-+{
-+	read_lock(&domain->bounce_lock);
-+	if (dir == DMA_TO_DEVICE || dir == DMA_BIDIRECTIONAL)
-+		vduse_domain_bounce(domain, dma_addr, size, DMA_TO_DEVICE);
-+	read_unlock(&domain->bounce_lock);
-+}
-+
-+void vduse_domain_sync_single_for_cpu(struct vduse_iova_domain *domain,
-+				      dma_addr_t dma_addr, size_t size,
-+				      enum dma_data_direction dir)
-+{
-+	read_lock(&domain->bounce_lock);
-+	if (dir == DMA_FROM_DEVICE || dir == DMA_BIDIRECTIONAL)
-+		vduse_domain_bounce(domain, dma_addr, size, DMA_FROM_DEVICE);
-+	read_unlock(&domain->bounce_lock);
-+}
-+
- dma_addr_t vduse_domain_map_page(struct vduse_iova_domain *domain,
- 				 struct page *page, unsigned long offset,
- 				 size_t size, enum dma_data_direction dir,
-@@ -393,7 +413,8 @@ dma_addr_t vduse_domain_map_page(struct vduse_iova_domain *domain,
- 	if (vduse_domain_map_bounce_page(domain, (u64)iova, (u64)size, pa))
- 		goto err_unlock;
- 
--	if (dir == DMA_TO_DEVICE || dir == DMA_BIDIRECTIONAL)
-+	if (!(attrs & DMA_ATTR_SKIP_CPU_SYNC) &&
-+	    (dir == DMA_TO_DEVICE || dir == DMA_BIDIRECTIONAL))
- 		vduse_domain_bounce(domain, iova, size, DMA_TO_DEVICE);
- 
- 	read_unlock(&domain->bounce_lock);
-@@ -411,9 +432,9 @@ void vduse_domain_unmap_page(struct vduse_iova_domain *domain,
- 			     enum dma_data_direction dir, unsigned long attrs)
- {
- 	struct iova_domain *iovad = &domain->stream_iovad;
--
- 	read_lock(&domain->bounce_lock);
--	if (dir == DMA_FROM_DEVICE || dir == DMA_BIDIRECTIONAL)
-+	if (!(attrs & DMA_ATTR_SKIP_CPU_SYNC) &&
-+	    (dir == DMA_FROM_DEVICE || dir == DMA_BIDIRECTIONAL))
- 		vduse_domain_bounce(domain, dma_addr, size, DMA_FROM_DEVICE);
- 
- 	vduse_domain_unmap_bounce_page(domain, (u64)dma_addr, (u64)size);
-diff --git a/drivers/vdpa/vdpa_user/iova_domain.h b/drivers/vdpa/vdpa_user/iova_domain.h
-index 173e979b84a9..f92f22a7267d 100644
---- a/drivers/vdpa/vdpa_user/iova_domain.h
-+++ b/drivers/vdpa/vdpa_user/iova_domain.h
-@@ -44,6 +44,14 @@ int vduse_domain_set_map(struct vduse_iova_domain *domain,
- void vduse_domain_clear_map(struct vduse_iova_domain *domain,
- 			    struct vhost_iotlb *iotlb);
- 
-+void vduse_domain_sync_single_for_device(struct vduse_iova_domain *domain,
-+				      dma_addr_t dma_addr, size_t size,
-+				      enum dma_data_direction dir);
-+
-+void vduse_domain_sync_single_for_cpu(struct vduse_iova_domain *domain,
-+				      dma_addr_t dma_addr, size_t size,
-+				      enum dma_data_direction dir);
-+
- dma_addr_t vduse_domain_map_page(struct vduse_iova_domain *domain,
- 				 struct page *page, unsigned long offset,
- 				 size_t size, enum dma_data_direction dir,
-diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_user/vduse_dev.c
-index 1d24da79c399..75354ce186a1 100644
---- a/drivers/vdpa/vdpa_user/vduse_dev.c
-+++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-@@ -798,6 +798,26 @@ static const struct vdpa_config_ops vduse_vdpa_config_ops = {
- 	.free			= vduse_vdpa_free,
- };
- 
-+static void vduse_dev_sync_single_for_device(struct device *dev,
-+					     dma_addr_t dma_addr, size_t size,
-+					     enum dma_data_direction dir)
-+{
-+	struct vduse_dev *vdev = dev_to_vduse(dev);
-+	struct vduse_iova_domain *domain = vdev->domain;
-+
-+	vduse_domain_sync_single_for_device(domain, dma_addr, size, dir);
-+}
-+
-+static void vduse_dev_sync_single_for_cpu(struct device *dev,
-+					     dma_addr_t dma_addr, size_t size,
-+					     enum dma_data_direction dir)
-+{
-+	struct vduse_dev *vdev = dev_to_vduse(dev);
-+	struct vduse_iova_domain *domain = vdev->domain;
-+
-+	vduse_domain_sync_single_for_cpu(domain, dma_addr, size, dir);
-+}
-+
- static dma_addr_t vduse_dev_map_page(struct device *dev, struct page *page,
- 				     unsigned long offset, size_t size,
- 				     enum dma_data_direction dir,
-@@ -858,6 +878,8 @@ static size_t vduse_dev_max_mapping_size(struct device *dev)
- }
- 
- static const struct dma_map_ops vduse_dev_dma_ops = {
-+	.sync_single_for_device = vduse_dev_sync_single_for_device,
-+	.sync_single_for_cpu = vduse_dev_sync_single_for_cpu,
- 	.map_page = vduse_dev_map_page,
- 	.unmap_page = vduse_dev_unmap_page,
- 	.alloc = vduse_dev_alloc_coherent,
--- 
-2.43.0
-
+>
+>> 
+>> Also, given this is apparently nvconfig configuration, there could be
+>> probably more suitable to use some provisioning tool.
+>
+>TBH, we will want to add some other NVM related params, but that does
+>not justify yet another tool to configure PF. (And then there would be
+>a big debate if FW update should be moved there too for consistency).
+>
+>> This is related to the mlx5 misc driver.
+>> 
+>> Until be figure out the plan, this has my nack:
+>> 
+>> NAcked-by: Jiri Pirko <jiri@nvidia.com>
+>
+>IMO this is an easy case, but would like to hear from netdev maintainers
+>
+>
 
