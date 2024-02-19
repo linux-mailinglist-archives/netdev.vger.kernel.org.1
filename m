@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-73010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DD1F85A9E0
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 18:26:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D939085A9E1
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 18:26:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92A101C22998
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 17:26:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E5C0289498
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 17:26:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2697E45C04;
-	Mon, 19 Feb 2024 17:25:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43FF544C97;
+	Mon, 19 Feb 2024 17:25:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="1iwfo/R4"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="IqA17tyQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C99545974
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 17:25:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1663744C93
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 17:25:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708363542; cv=none; b=Rgz1Jc5x6YMLMtM78Y9I67b8SoBjMoNpMideXOrZcMQmvQR/ZNChCSoj7e6NYFBm3AIc3Pl+0B5cpSz882n/1btRySNDBD/LScEI2I4DtoQfT3sSwnNO0UhXKQQEHIspG/B32G7LRk2xBvqq0CPgmi9nhiyJOa1LjjUqupUPY2o=
+	t=1708363546; cv=none; b=MeAtBHBrXdKoyUukWd0JVp4loXWuEdM0J6+1Z35iuvsEo3VAJYSEt6WDr2L/b/M+svNqoh4IOxbDdCkX3vhFOweUnKkyJdBdq3dDTBG13rjEOnJfgpQ8V7BHcJRU9f2xoT/IE3/gTdZ30DmFRnZbsdToUcOfZoHiwyCDUAXSA88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708363542; c=relaxed/simple;
-	bh=lvSfM/i6wOhZcCTEXxaoYGvVxCN7p/ZUbuPR6CSRw/A=;
+	s=arc-20240116; t=1708363546; c=relaxed/simple;
+	bh=d0eb+U915M3GJ1QpP3eRMvvJkhiVcCy55exGLeOsQug=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Dn77ZLIM6A30kGd81ZBomBSl5V7HfrZsryopuEdkocAjiOJKenk/+khec0fECJ2B77HnUwyRfG9yOlV2GuI/8Gr3yr0yZ3z9z0ow1aDo83cZcf7ZAD81PqHp/UZOH8bU9DABZQzSEOpgKX+GsIrZydlYVnYjW9HGKizScYE3uLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=1iwfo/R4; arc=none smtp.client-ip=209.85.208.180
+	 MIME-Version; b=fyZN1dPkWcRklgrgKx9LQw8XfVftmcbf0S7nigabnH7U28ERt+w6F9JznowBdIbKlYMkW74Dq1vYEWQ2iHOxo6IrfgQiBFt0gAauECU4GjbRM4At4kGKQjAF/pNzTxU18wy8B5MqIvwXKmgMh0HjyX74smxCIw9AhFvZmwRqaT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=IqA17tyQ; arc=none smtp.client-ip=209.85.221.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2d1094b549cso67783701fa.3
-        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 09:25:40 -0800 (PST)
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-33d640e7b48so101157f8f.2
+        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 09:25:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708363539; x=1708968339; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708363542; x=1708968342; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jSoLiCYPAJ2jEwbCCH45PxOLjMDhrFfC7O2BBdy6iUE=;
-        b=1iwfo/R4fQHTw2XOzh5uqvDwk2H631S1w2EZP+1JO+f4/FORRPkEq1BRvRr6PCojj0
-         atWDE0Cz2dWhULPPkX9V6Lnq3pQLZw+6E8iE5+IUX1FFfUXogBoKdEYK2YLsn7tPukhV
-         I+D8jHPia6U+v44KPfLQsf0UjkDg8knS62SVE3y8ZPnjYxA4u7ZWtSry8KE94W6NqFd7
-         tur/+F5ci2Eavtcp+DMAeKTP7ZHR6/LyWx82MylKev+fdIUimDZNWLsk7B8hE8J2AEtx
-         LS8C5h7Xlbqe+5UB0GhsDkGMbAod2rg/G3rRR3/In8OUJPVYonMv6g56IWyUc9pZnmjW
-         yXLA==
+        bh=L6Oq8wW83mYv2l6m5dZRs9rPR7CIzDAECgxUbwAoQGs=;
+        b=IqA17tyQqqhCIGFqltowlZ25vmnRJmDvpngLKNtRv95L2Ye7nIceHr1X6JH6RybWSV
+         +rhwZR+fPjdp1RS/YKkp9lt9jRJAt4//K1FiZhVFQHK6cpZyPJTxhJd/IOEpPjeHLgVn
+         /FBrVUh6TxzA2HPD+/KGsanW1Wh+gBfu9DjH7pp5b9w5JeCO04+PsLapNwahLw141wvi
+         3ThEIokkFdnTt4g62h91d17dpmfJxwCMNKu9yDh4ebNyTUyNcGciaqJDyIhNjFBtoWXf
+         sEN7XR1vAGNpU7p8rCrR0QWfR76GHHUpgsM/eO2igeXkOQBlzvPxug3iKA0EmLZ0LQGu
+         dq6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708363539; x=1708968339;
+        d=1e100.net; s=20230601; t=1708363542; x=1708968342;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jSoLiCYPAJ2jEwbCCH45PxOLjMDhrFfC7O2BBdy6iUE=;
-        b=uq9fEu5gZyryE0bPWf/EYYtiYs8ixHM0HEfwdDH6D+WUccv03VOmnST/VZhP/5ldno
-         PKPGIxkTVHGHiOr8y+Ore3Ss7BY4orNFB52T6XiJdiEzAH6TpUYZsQZhSY3FV4Uh7gJv
-         LFVtilPlPyZ1W8sXmOx1tMVcUvzCqofcvc4v6o4sr0ieU72J1d8/bRfpf9dcm0ZQTccv
-         PCEeVTJufDQV8Oo78Hxvuquv5PqeLniEgEukxsZn61Z1Mo/goT8ra8TFMI+fPvda5DW0
-         sUty6h5KCwnbzFN9ZtecqLE0Rg+dqn3QLlOMpUIJ56R3+zed34vpvf5TsuHHa9b41pyv
-         WEPQ==
-X-Gm-Message-State: AOJu0Yw7XiugufbQ9hM3nYQf4QWquOcJnTPw5XAZgWOJmGsX9NFsDCxY
-	BdmDu+8TrNpAuntAl9t9Grh3BxJ5QiV3gTvNcufsJ80s8gqgHp6jU7iYUMtrFeHAkpkVJvdl0dl
-	4
-X-Google-Smtp-Source: AGHT+IFfK8oxV/mQ12ZeRx+Jw4cq/zmOwIIaXiFmkqFPuf0tiZz6ltjeBLW81coywvSpXjBWtbF6Fw==
-X-Received: by 2002:a2e:9685:0:b0:2d2:36bb:5abb with SMTP id q5-20020a2e9685000000b002d236bb5abbmr2976565lji.20.1708363538646;
-        Mon, 19 Feb 2024 09:25:38 -0800 (PST)
+        bh=L6Oq8wW83mYv2l6m5dZRs9rPR7CIzDAECgxUbwAoQGs=;
+        b=ed2CAFiGuNhy60sAGCYxshqRtN6FkvoHohB7dYl6nc/z64ziH2+X67zH/5NVEVrDKi
+         pvmhXdyvQOMpOX3uibvezyiZDxVpjKlyo/ifI5nCdJx3uBH98s6Ungba9ZBSHT4exCj4
+         BK79Hj6JWR9i7LieIIg4NOrm+GpxoWjz/gL2uyhsY/1ABOYtBiyBo6zmCBZHOprlN2kh
+         kDXODvhZR8dO9KkB65UuytXlBQ+eXXVSmN0OZkHMB/b6bNJD3jl4FzZrJp4yPNFQSaQm
+         I55/b32M7pFsItJS4lCgQSujj14SL3Izt2CpM9Q9QPQInDy9Iyft4unMRP6qJW5pOlNq
+         Jd+w==
+X-Gm-Message-State: AOJu0YwxrKbqWN1s3VF4feC8cerag1nxnUZ9pSddz7tBcukYnYH3Ipne
+	In5LGvpSMzj7cf380RPFB8U4cFZx7iEneQPuG9usrTVNkIU0c9QK44RgLGaFDJEsVtNHPBZZMOU
+	L
+X-Google-Smtp-Source: AGHT+IFM4NCSECoV+80IhSeH27lpFPrvZpbufRPDWjJ3iWabCnv/EgQtqiRZvIhSPUjtP9NrXaihaQ==
+X-Received: by 2002:a05:6000:110d:b0:33d:1ee9:3640 with SMTP id z13-20020a056000110d00b0033d1ee93640mr7029083wrw.17.1708363542287;
+        Mon, 19 Feb 2024 09:25:42 -0800 (PST)
 Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id i6-20020a05600c354600b004107686650esm12079906wmq.36.2024.02.19.09.25.37
+        by smtp.gmail.com with ESMTPSA id s8-20020adf9788000000b0033ae7d768b2sm10961517wrb.117.2024.02.19.09.25.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Feb 2024 09:25:38 -0800 (PST)
+        Mon, 19 Feb 2024 09:25:41 -0800 (PST)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -79,9 +79,9 @@ Cc: kuba@kernel.org,
 	sdf@google.com,
 	lorenzo@kernel.org,
 	alessandromarcolini99@gmail.com
-Subject: [patch net-next 03/13] tools: ynl: allow user to pass enum string instead of scalar value
-Date: Mon, 19 Feb 2024 18:25:19 +0100
-Message-ID: <20240219172525.71406-4-jiri@resnulli.us>
+Subject: [patch net-next 04/13] netlink: specs: allow sub-messages in genetlink-legacy
+Date: Mon, 19 Feb 2024 18:25:20 +0100
+Message-ID: <20240219172525.71406-5-jiri@resnulli.us>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20240219172525.71406-1-jiri@resnulli.us>
 References: <20240219172525.71406-1-jiri@resnulli.us>
@@ -95,73 +95,349 @@ Content-Transfer-Encoding: 8bit
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-During decoding of messages coming from kernel, attribute values are
-converted to enum names in case the attribute type is enum of bitfield32.
-
-However, when user constructs json message, he has to pass plain scalar
-values. See "state" "selector" and "value" attributes in following
-examples:
-
-$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/dpll.yaml --do pin-set --json '{"id": 0, "parent-device": {"parent-id": 0, "state": 1}}'
-$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/devlink.yaml --do port-set --json '{"bus-name": "pci", "dev-name": "0000:08:00.1", "port-index": 98304, "port-function": {"caps": {"selector": 1, "value": 1 }}}'
-
-Allow user to pass strings containing enum names, convert them to scalar
-values to be encoded into Netlink message:
-
-$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/dpll.yaml --do pin-set --json '{"id": 0, "parent-device": {"parent-id": 0, "state": "connected"}}'
-$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/devlink.yaml --do port-set --json '{"bus-name": "pci", "dev-name": "0000:08:00.1", "port-index": 98304, "port-function": {"caps": {"selector": ["roce-bit"], "value": ["roce-bit"] }}}'
+Currently sub-messages are only supported in netlink-raw template.
+To be able to utilize them in devlink spec, allow them in
+genetlink-legacy as well.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
- tools/net/ynl/lib/ynl.py | 21 +++++++++++++++++++--
- 1 file changed, 19 insertions(+), 2 deletions(-)
+ Documentation/netlink/genetlink-legacy.yaml   |  47 +++++++-
+ Documentation/netlink/netlink-raw.yaml        |   6 +-
+ .../netlink/genetlink-legacy.rst              | 101 ++++++++++++++++++
+ .../userspace-api/netlink/netlink-raw.rst     | 101 ------------------
+ 4 files changed, 148 insertions(+), 107 deletions(-)
 
-diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-index ccdb2f1e7379..d2ea1571d00c 100644
---- a/tools/net/ynl/lib/ynl.py
-+++ b/tools/net/ynl/lib/ynl.py
-@@ -438,6 +438,21 @@ class YnlFamily(SpecFamily):
-         self.sock.setsockopt(Netlink.SOL_NETLINK, Netlink.NETLINK_ADD_MEMBERSHIP,
-                              mcast_id)
+diff --git a/Documentation/netlink/genetlink-legacy.yaml b/Documentation/netlink/genetlink-legacy.yaml
+index 938703088306..6cb50e2cc021 100644
+--- a/Documentation/netlink/genetlink-legacy.yaml
++++ b/Documentation/netlink/genetlink-legacy.yaml
+@@ -200,7 +200,8 @@ properties:
+                 description: The netlink attribute type
+                 enum: [ unused, pad, flag, binary, bitfield32,
+                         uint, sint, u8, u16, u32, u64, s32, s64,
+-                        string, nest, array-nest, nest-type-value ]
++                        string, nest, array-nest, nest-type-value,
++                        sub-message ]
+               doc:
+                 description: Documentation of the attribute.
+                 type: string
+@@ -261,6 +262,15 @@ properties:
+               struct:
+                 description: Name of the struct type used for the attribute.
+                 type: string
++              sub-message:
++                description: |
++                  Name of the sub-message definition to use for the attribute.
++                type: string
++              selector:
++                description: |
++                  Name of the attribute to use for dynamic selection of sub-message
++                  format specifier.
++                type: string
+               # End genetlink-legacy
  
-+    def _get_scalar(self, attr_spec, value):
-+        try:
-+            return int(value)
-+        except (ValueError, TypeError) as e:
-+            if 'enum' not in attr_spec:
-+                raise e
-+        enum = self.consts[attr_spec['enum']]
-+        if enum.type == 'flags' or attr_spec.get('enum-as-flags', False):
-+            scalar = 0
-+            for single_value in value:
-+                scalar += enum.entries[single_value].user_value(as_flags = True)
-+            return scalar
-+        else:
-+            return enum.entries[value].user_value()
+       # Make sure name-prefix does not appear in subsets (subsets inherit naming)
+@@ -284,6 +294,41 @@ properties:
+             items:
+               required: [ type ]
+ 
++  sub-messages:
++    description: Definition of sub message attributes
++    type: array
++    items:
++      type: object
++      additionalProperties: False
++      required: [ name, formats ]
++      properties:
++        name:
++          description: Name of the sub-message definition
++          type: string
++        formats:
++          description: Dynamically selected format specifiers
++          type: array
++          items:
++            type: object
++            additionalProperties: False
++            required: [ value ]
++            properties:
++              value:
++                description: |
++                  Value to match for dynamic selection of sub-message format
++                  specifier.
++                type: string
++              fixed-header:
++                description: |
++                  Name of the struct definition to use as the fixed header
++                  for the sub message.
++                type: string
++              attribute-set:
++                description: |
++                  Name of the attribute space from which to resolve attributes
++                  in the sub message.
++                type: string
 +
-     def _add_attr(self, space, name, value, search_attrs):
-         try:
-             attr = self.attr_sets[space][name]
-@@ -474,7 +489,7 @@ class YnlFamily(SpecFamily):
-             else:
-                 raise Exception(f'Unknown type for binary attribute, value: {value}')
-         elif attr['type'] in NlAttr.type_formats or attr.is_auto_scalar:
--            scalar = int(value)
-+            scalar = self._get_scalar(attr, value)
-             if attr.is_auto_scalar:
-                 attr_type = attr["type"][0] + ('32' if scalar.bit_length() <= 32 else '64')
-             else:
-@@ -482,7 +497,9 @@ class YnlFamily(SpecFamily):
-             format = NlAttr.get_format(attr_type, attr.byte_order)
-             attr_payload = format.pack(scalar)
-         elif attr['type'] in "bitfield32":
--            attr_payload = struct.pack("II", int(value["value"]), int(value["selector"]))
-+            scalar_value = self._get_scalar(attr, value["value"])
-+            scalar_selector = self._get_scalar(attr, value["selector"])
-+            attr_payload = struct.pack("II", scalar_value, scalar_selector)
-         elif attr['type'] == 'sub-message':
-             msg_format = self._resolve_selector(attr, search_attrs)
-             attr_payload = b''
+   operations:
+     description: Operations supported by the protocol.
+     type: object
+diff --git a/Documentation/netlink/netlink-raw.yaml b/Documentation/netlink/netlink-raw.yaml
+index ac4e05415f2f..cc38b026c451 100644
+--- a/Documentation/netlink/netlink-raw.yaml
++++ b/Documentation/netlink/netlink-raw.yaml
+@@ -280,8 +280,6 @@ properties:
+               struct:
+                 description: Name of the struct type used for the attribute.
+                 type: string
+-              # End genetlink-legacy
+-              # Start netlink-raw
+               sub-message:
+                 description: |
+                   Name of the sub-message definition to use for the attribute.
+@@ -291,7 +289,7 @@ properties:
+                   Name of the attribute to use for dynamic selection of sub-message
+                   format specifier.
+                 type: string
+-              # End netlink-raw
++              # End genetlink-legacy
+ 
+       # Make sure name-prefix does not appear in subsets (subsets inherit naming)
+       dependencies:
+@@ -314,7 +312,6 @@ properties:
+             items:
+               required: [ type ]
+ 
+-  # Start netlink-raw
+   sub-messages:
+     description: Definition of sub message attributes
+     type: array
+@@ -349,7 +346,6 @@ properties:
+                   Name of the attribute space from which to resolve attributes
+                   in the sub message.
+                 type: string
+-  # End netlink-raw
+ 
+   operations:
+     description: Operations supported by the protocol.
+diff --git a/Documentation/userspace-api/netlink/genetlink-legacy.rst b/Documentation/userspace-api/netlink/genetlink-legacy.rst
+index 70a77387f6c4..7126b650090e 100644
+--- a/Documentation/userspace-api/netlink/genetlink-legacy.rst
++++ b/Documentation/userspace-api/netlink/genetlink-legacy.rst
+@@ -280,3 +280,104 @@ At the spec level we can define a ``dumps`` property for the ``do``,
+ perhaps with values of ``combine`` and ``multi-object`` depending
+ on how the parsing should be implemented (parse into a single reply
+ vs list of objects i.e. pretty much a dump).
++
++Sub-messages
++------------
++
++Several raw netlink families such as
++:doc:`rt_link<../../networking/netlink_spec/rt_link>` and
++:doc:`tc<../../networking/netlink_spec/tc>` use attribute nesting as an
++abstraction to carry module specific information.
++
++Conceptually it looks as follows::
++
++    [OUTER NEST OR MESSAGE LEVEL]
++      [GENERIC ATTR 1]
++      [GENERIC ATTR 2]
++      [GENERIC ATTR 3]
++      [GENERIC ATTR - wrapper]
++        [MODULE SPECIFIC ATTR 1]
++        [MODULE SPECIFIC ATTR 2]
++
++The ``GENERIC ATTRs`` at the outer level are defined in the core (or rt_link or
++core TC), while specific drivers, TC classifiers, qdiscs etc. can carry their
++own information wrapped in the ``GENERIC ATTR - wrapper``. Even though the
++example above shows attributes nesting inside the wrapper, the modules generally
++have full freedom to define the format of the nest. In practice the payload of
++the wrapper attr has very similar characteristics to a netlink message. It may
++contain a fixed header / structure, netlink attributes, or both. Because of
++those shared characteristics we refer to the payload of the wrapper attribute as
++a sub-message.
++
++A sub-message attribute uses the value of another attribute as a selector key to
++choose the right sub-message format. For example if the following attribute has
++already been decoded:
++
++.. code-block:: json
++
++  { "kind": "gre" }
++
++and we encounter the following attribute spec:
++
++.. code-block:: yaml
++
++  -
++    name: data
++    type: sub-message
++    sub-message: linkinfo-data-msg
++    selector: kind
++
++Then we look for a sub-message definition called ``linkinfo-data-msg`` and use
++the value of the ``kind`` attribute i.e. ``gre`` as the key to choose the
++correct format for the sub-message:
++
++.. code-block:: yaml
++
++  sub-messages:
++    name: linkinfo-data-msg
++    formats:
++      -
++        value: bridge
++        attribute-set: linkinfo-bridge-attrs
++      -
++        value: gre
++        attribute-set: linkinfo-gre-attrs
++      -
++        value: geneve
++        attribute-set: linkinfo-geneve-attrs
++
++This would decode the attribute value as a sub-message with the attribute-set
++called ``linkinfo-gre-attrs`` as the attribute space.
++
++A sub-message can have an optional ``fixed-header`` followed by zero or more
++attributes from an ``attribute-set``. For example the following
++``tc-options-msg`` sub-message defines message formats that use a mixture of
++``fixed-header``, ``attribute-set`` or both together:
++
++.. code-block:: yaml
++
++  sub-messages:
++    -
++      name: tc-options-msg
++      formats:
++        -
++          value: bfifo
++          fixed-header: tc-fifo-qopt
++        -
++          value: cake
++          attribute-set: tc-cake-attrs
++        -
++          value: netem
++          fixed-header: tc-netem-qopt
++          attribute-set: tc-netem-attrs
++
++Note that a selector attribute must appear in a netlink message before any
++sub-message attributes that depend on it.
++
++If an attribute such as ``kind`` is defined at more than one nest level, then a
++sub-message selector will be resolved using the value 'closest' to the selector.
++For example, if the same attribute name is defined in a nested ``attribute-set``
++alongside a sub-message selector and also in a top level ``attribute-set``, then
++the selector will be resolved using the value 'closest' to the selector. If the
++value is not present in the message at the same level as defined in the spec
++then this is an error.
+diff --git a/Documentation/userspace-api/netlink/netlink-raw.rst b/Documentation/userspace-api/netlink/netlink-raw.rst
+index 1990eea772d0..5fb8b7cd6558 100644
+--- a/Documentation/userspace-api/netlink/netlink-raw.rst
++++ b/Documentation/userspace-api/netlink/netlink-raw.rst
+@@ -58,107 +58,6 @@ group registration.
+         name: rtnlgrp-mctp-ifaddr
+         value: 34
+ 
+-Sub-messages
+-------------
+-
+-Several raw netlink families such as
+-:doc:`rt_link<../../networking/netlink_spec/rt_link>` and
+-:doc:`tc<../../networking/netlink_spec/tc>` use attribute nesting as an
+-abstraction to carry module specific information.
+-
+-Conceptually it looks as follows::
+-
+-    [OUTER NEST OR MESSAGE LEVEL]
+-      [GENERIC ATTR 1]
+-      [GENERIC ATTR 2]
+-      [GENERIC ATTR 3]
+-      [GENERIC ATTR - wrapper]
+-        [MODULE SPECIFIC ATTR 1]
+-        [MODULE SPECIFIC ATTR 2]
+-
+-The ``GENERIC ATTRs`` at the outer level are defined in the core (or rt_link or
+-core TC), while specific drivers, TC classifiers, qdiscs etc. can carry their
+-own information wrapped in the ``GENERIC ATTR - wrapper``. Even though the
+-example above shows attributes nesting inside the wrapper, the modules generally
+-have full freedom to define the format of the nest. In practice the payload of
+-the wrapper attr has very similar characteristics to a netlink message. It may
+-contain a fixed header / structure, netlink attributes, or both. Because of
+-those shared characteristics we refer to the payload of the wrapper attribute as
+-a sub-message.
+-
+-A sub-message attribute uses the value of another attribute as a selector key to
+-choose the right sub-message format. For example if the following attribute has
+-already been decoded:
+-
+-.. code-block:: json
+-
+-  { "kind": "gre" }
+-
+-and we encounter the following attribute spec:
+-
+-.. code-block:: yaml
+-
+-  -
+-    name: data
+-    type: sub-message
+-    sub-message: linkinfo-data-msg
+-    selector: kind
+-
+-Then we look for a sub-message definition called ``linkinfo-data-msg`` and use
+-the value of the ``kind`` attribute i.e. ``gre`` as the key to choose the
+-correct format for the sub-message:
+-
+-.. code-block:: yaml
+-
+-  sub-messages:
+-    name: linkinfo-data-msg
+-    formats:
+-      -
+-        value: bridge
+-        attribute-set: linkinfo-bridge-attrs
+-      -
+-        value: gre
+-        attribute-set: linkinfo-gre-attrs
+-      -
+-        value: geneve
+-        attribute-set: linkinfo-geneve-attrs
+-
+-This would decode the attribute value as a sub-message with the attribute-set
+-called ``linkinfo-gre-attrs`` as the attribute space.
+-
+-A sub-message can have an optional ``fixed-header`` followed by zero or more
+-attributes from an ``attribute-set``. For example the following
+-``tc-options-msg`` sub-message defines message formats that use a mixture of
+-``fixed-header``, ``attribute-set`` or both together:
+-
+-.. code-block:: yaml
+-
+-  sub-messages:
+-    -
+-      name: tc-options-msg
+-      formats:
+-        -
+-          value: bfifo
+-          fixed-header: tc-fifo-qopt
+-        -
+-          value: cake
+-          attribute-set: tc-cake-attrs
+-        -
+-          value: netem
+-          fixed-header: tc-netem-qopt
+-          attribute-set: tc-netem-attrs
+-
+-Note that a selector attribute must appear in a netlink message before any
+-sub-message attributes that depend on it.
+-
+-If an attribute such as ``kind`` is defined at more than one nest level, then a
+-sub-message selector will be resolved using the value 'closest' to the selector.
+-For example, if the same attribute name is defined in a nested ``attribute-set``
+-alongside a sub-message selector and also in a top level ``attribute-set``, then
+-the selector will be resolved using the value 'closest' to the selector. If the
+-value is not present in the message at the same level as defined in the spec
+-then this is an error.
+-
+ Nested struct definitions
+ -------------------------
+ 
 -- 
 2.43.2
 
