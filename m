@@ -1,79 +1,142 @@
-Return-Path: <netdev+bounces-73084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDF0B85AD04
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 21:20:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38FDC85AD0A
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 21:23:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D9D11F2583B
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 20:20:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 81CC5B259B2
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 20:23:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA928535D1;
-	Mon, 19 Feb 2024 20:20:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE87752F96;
+	Mon, 19 Feb 2024 20:23:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nJ/WFCn8"
+	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="WEn22rq1";
+	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="Z+T0K58g"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10D90535DE
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 20:20:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708374040; cv=none; b=a7+7hbfIqoTxOdiqDgcE3Qm7rO7Yt6moXG9Adg1vdxqtHBVcaK5CUWlSyzW4x7rUxm3r89Ent+fWiOxW9hyOOpXWLDW19a2Ued0QkFuEUgNjxwf+Ugx414gmugNsj0mVpDVyI6LNr2sR1QaqtESgx1PS2bV8izqxRxeMs2u90ek=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708374040; c=relaxed/simple;
-	bh=YROhBUjPOy5Wm8c9dWqzNXOWeMitIWi5M+foKSlKNF4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b7ATU3rM6+lLydil7xb7Ftu/zXSmUfSKuuVQCWmk/s0yq5qLyMGhFNRgF6/igBg39WHYfJ5UpSMhkaYEcdHxrNpAXMXeMIK6zWeRJfFmYh33+Mo4z/5l+N4YTy27s5URXZiMqjrlUduZ+1Xh+/rQ9o3R/kbLoLEqfG9xpyWXEFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nJ/WFCn8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEB4BC433C7;
-	Mon, 19 Feb 2024 20:20:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708374039;
-	bh=YROhBUjPOy5Wm8c9dWqzNXOWeMitIWi5M+foKSlKNF4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nJ/WFCn8DlPImTmyKlnUQYz/gHT/HaJK+gR8cvxzvFANT2HGGw4cNrODBrfsDNS8k
-	 Wtk4Orkcz3PSAp45l4akTYA0s2Ufs7fqzC3TvRBqCxRyPyiaAz8IiAnF40Cgv07FjF
-	 2R5B/Fnf/rEfFxK+wr6737GRAV0HnMf353C9/pzWjjbMfV8qDarH/65R1M6ruhPLyp
-	 QcOpy3gO3uXy+YfYUQU4hnVxPBtOFowJ3//PpjvNiFTu1fKtHvgPZPe5f6Ys0VfaqG
-	 FlpPaKkBPNZnib/X04mxZbjQqT9H0focilYJNcLBulKtDjq3rPTTcLPtikzgPwya+L
-	 Tkzw//fOQu75w==
-Date: Mon, 19 Feb 2024 12:20:38 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
- pabeni@redhat.com, davem@davemloft.net, edumazet@google.com
-Subject: Re: [patch net-next] devlink: fix port dump cmd type
-Message-ID: <20240219122038.5964400d@kernel.org>
-In-Reply-To: <20240219151343.GC40273@kernel.org>
-References: <20240216113147.50797-1-jiri@resnulli.us>
-	<20240219151343.GC40273@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E9BF52F68;
+	Mon, 19 Feb 2024 20:23:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708374202; cv=pass; b=JeUyBOkiTWU6j6/h32rD8/PFwdx99FhrpJ/9Wk/87PHM6CuntEgrVU5h44HQZ5cb97rgSaqZJ+FEHZKKcNKwuPpz+32Xqz2kjQCktoz9KEGwBlQ4ytA3dzVRJlo8KNcVvSBryJZXzlJO7IID8juBlJn+5ZgcjuLL8uaBd244RQc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708374202; c=relaxed/simple;
+	bh=ZuhFdCaK+/hgiNviU4bnJ7zFJnr9RLu0hrR9n4lzjH0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uyO90pXMRUQ6NYTuKTB8ZsrflQ1AQnXAAkvscOhZBQrJaCqOyJqDdkAEAOk7rMyEEUcOmYf+oLuRuA96wTQpXeH5jL9EMbDfcAHz/fHDrzx/MpbOJ7BRkueiPIWcSM3sJC/pnH2roxllDu1Zl5ldm0H1n88WHl0TbQv3x24LdV0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=WEn22rq1; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=Z+T0K58g; arc=pass smtp.client-ip=85.215.255.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
+ARC-Seal: i=1; a=rsa-sha256; t=1708374180; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=i2zrjEwGQoiH4Xfr25qGVanPOn9KQxxbzD01k1ejyo5gCIXevM6nC6gmnLpzFG5VHN
+    VpCEdCc9XI0NIDfzCrG5+09MMtN3++XsaKL1R85fkH3WxcdWD6t+GbiAz6Cy8FFRp+tB
+    DsJbQ+vOHZKILlvZ3ZYNfnabMZjkmOXkqiAFTDWeQuNSFFGGDRkq1N33K9/hhUyxl1Y4
+    2rKB5YrG2hsKf/Kha9VVRD0y1UMaQOcZ8lI5R4qg3nGJYD3AutPG42jombyS8WbdVGfn
+    wPhcUsaSOVOK+M6IHGodHheUGB0hSNN38/eAaWzZPxAZHUXd8hL2gZeDlq0NSzzRQwy4
+    eahw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1708374180;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=U/L0/LQ6ERPrB/20UgMbzGyW4YIbsTP70z/cZD3wTmU=;
+    b=P+yP8K+vbAHxbyrDeEvLF7dxpvEvHg9Bd+6f1cXAn2v1Uzp+lRhjtxXLX2za5h5MFg
+    uY7PjHxDYcONGMA6TRKqLnRfX+Urf3sL0aSI7OVeISmTWvymz3ZtrsBpQUCqWvdclQ7U
+    Kvplg48T/TZZAz6HJfSUnCT+Oa1pkFRaVwuNN+zhb+6scMMb9y659byOPPFGaI0lQlB9
+    G6WCXYAfz78fkz2hwKa531QzU9+U4bmyuxIkMRQ+M7mF0Eayg3LnsjuXwA4tAOsJR0hT
+    WlZmSNNoHI9OR9S7ePz2LfW+zulIj+jQ/s6SpiwHXEtGaj6Y65DAABmVtNnJdwt0bwMk
+    9g7A==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1708374180;
+    s=strato-dkim-0002; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=U/L0/LQ6ERPrB/20UgMbzGyW4YIbsTP70z/cZD3wTmU=;
+    b=WEn22rq1coR8yA5/9x6v1fkpjv6hz9fBcrk45/Dz5J34Cs61X6DicS3NYnAUe0r+Du
+    AvZAeN3n81OfzuxZtQMBwaVMjdxblUuzmGhwptMODkImkMWyyiaNrxeWROY2588bNGw5
+    h/IM4hbzvNgy10hG5XjQQ1pWV0kj6MwWqMLRbGiWuUChTXMF+Ko5PumLm+AlBm0M7NuU
+    T5Z+j5vSGYf7XhSZ120mt4lAbkGEhCwB+17pF+fp0UCd5Q/uZRoxHuc12els8LYsQMOE
+    Kn3HOY7pDhjrABM/B2UiVtm3rDHLLHt0XxLEvw77VE1OXboXz80d+46sqFGGN+P74MsO
+    gLvg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1708374180;
+    s=strato-dkim-0003; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=U/L0/LQ6ERPrB/20UgMbzGyW4YIbsTP70z/cZD3wTmU=;
+    b=Z+T0K58gmz4TiX/frKzvbtzsNkF+1WpbYxOVIhpsAXo2t74On1D8jFZZ7/Yyxob7HL
+    TEnK8YB871Gn99Cen3CQ==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjG14FZxedJy6qgO1qCHSa1GLptZHusl129OHEdFq0USEbDdAnQ=="
+Received: from [IPV6:2a00:6020:4a8e:5000::90c]
+    by smtp.strato.de (RZmta 49.11.2 AUTH)
+    with ESMTPSA id K49f9c01JKN086H
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Mon, 19 Feb 2024 21:23:00 +0100 (CET)
+Message-ID: <a41ed65c-a916-424d-b4e7-9db65c015b50@hartkopp.net>
+Date: Mon, 19 Feb 2024 21:23:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] can: raw: fix getsockopt() for new CAN_RAW_XL_VCID_OPTS
+Content-Language: en-US
+To: linux-can@vger.kernel.org
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, netdev@vger.kernel.org,
+ Simon Horman <horms@kernel.org>
+References: <20240219200021.12113-1-socketcan@hartkopp.net>
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+In-Reply-To: <20240219200021.12113-1-socketcan@hartkopp.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Mon, 19 Feb 2024 15:13:43 +0000 Simon Horman wrote:
-> > Fix it by filling cmd with value DEVLINK_CMD_PORT_NEW.
-> > 
-> > Skimmed through devlink userspace implementations, none of them cares
-> > about this cmd value. Only ynl, for which, this is actually a fix, as it
-> > expects doit and dumpit ops rsp_value to be the same.  
-> 
-> I guess that in theory unknown implementations could exist.
-> But, ok :)
+Sorry. Of course it is a [PATCH net-next] where the referenced commit 
+has been applied.
 
-I'd also prefer Fixes tag + net. YNL is user space, even if current YNL
-specs don't trigger it (I'm speculating that that's why you feel it's
-not a fix) someone may end up using YNL + YAML from 6.9 and expect it
-to work on 6.6 LTS.
--- 
-pw-bot: cr
+Best regards,
+Oliver
+
+On 2024-02-19 21:00, Oliver Hartkopp wrote:
+> The code for the CAN_RAW_XL_VCID_OPTS getsockopt() was incompletely adopted
+> from the CAN_RAW_FILTER getsockopt().
+> 
+> Add the missing put_user() and return statements.
+> 
+> Flagged by Smatch.
+> Fixes: c83c22ec1493 ("can: canxl: add virtual CAN network identifier support")
+> Reported-by: Simon Horman <horms@kernel.org>
+> Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
+> ---
+>   net/can/raw.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/can/raw.c b/net/can/raw.c
+> index cb8e6f788af8..897ffc17d850 100644
+> --- a/net/can/raw.c
+> +++ b/net/can/raw.c
+> @@ -833,11 +833,13 @@ static int raw_getsockopt(struct socket *sock, int level, int optname,
+>   			if (len > sizeof(ro->raw_vcid_opts))
+>   				len = sizeof(ro->raw_vcid_opts);
+>   			if (copy_to_user(optval, &ro->raw_vcid_opts, len))
+>   				err = -EFAULT;
+>   		}
+> -		break;
+> +		if (!err)
+> +			err = put_user(len, optlen);
+> +		return err;
+>   
+>   	case CAN_RAW_JOIN_FILTERS:
+>   		if (len > sizeof(int))
+>   			len = sizeof(int);
+>   		val = &ro->join_filters;
 
