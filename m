@@ -1,141 +1,217 @@
-Return-Path: <netdev+bounces-72952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC95E85A545
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 15:02:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D2AC85A55D
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 15:05:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E5CC1F21F73
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 14:02:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 829E81C2253A
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 14:05:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F72C36AF8;
-	Mon, 19 Feb 2024 14:02:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AAB737153;
+	Mon, 19 Feb 2024 14:04:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a1gL2Xyw"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="jUCOuyn9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out199-15.us.a.mail.aliyun.com (out199-15.us.a.mail.aliyun.com [47.90.199.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DE6931759
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 14:02:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CBD8381BD;
+	Mon, 19 Feb 2024 14:04:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=47.90.199.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708351360; cv=none; b=SwCAfcSxfjKW3QEbIbZXoK+56XfJfjx8MlZo3PgC+WJEKzLJpqNXKF7aSuzUmIpVsDjO8cjoRIXdY9MsXaJkEucg5aVk7oLxFBeQYh4YKx2vOl1lBnqDqjSxoZxQrqy/ZfDyJDpviWsBt5lR1NuKCiqsX/XHPLCRzg7iSQxy8T4=
+	t=1708351496; cv=none; b=A0nRmhDTqdX0Yz4KHimMmHKZXMIMZ4yjyQkZjOEQV3E+Tm72VNuh6jjUWZA66iBJV4NQt0VSgp6qXqXKO+X9BdnLdmIOnDffarjOw+CDLSB7M+aMu5hjS6j9pFiEfY2z4Iea3YYvUyfRCLxMSVaMIJRu3su8GA1UVCB1x8t3jSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708351360; c=relaxed/simple;
-	bh=HXMVypSHIEDdrhpYywFE6bDoQ2YgxnqcdLzy5pO8kBY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PtmoZcY2QHqW7bdWZbmkp/CjORMydqKm/4lKqfiw0fZZsp9rKQWcdmAq9TkEQUpWYbQpJ0rdtT6guvNQ8AiAW4j2BkuK/1eXM/vQlEMViPP0Q4Lh9aAtEI4Ufov3x5BoruPk/lkKWsqV5aePeIwgp1338Vc8eNXOg0Wm5OJNZ/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a1gL2Xyw; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-41265e39b8bso6926385e9.2
-        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 06:02:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708351357; x=1708956157; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wxQ2G2ZSMlMlBUzvWD0qotOMWCkfxBUg6tFE0Q+NBAg=;
-        b=a1gL2XywHBEJIXfho1Q4rrzZuRf5wLb2XxCF9WAyskzSJmS2vyoJxe2G4Q/8WwvBv5
-         bnHy/o07sdQ/05DNGRlMsHtLx0ruJcVjAQsljw0U3o/31hZhUHDc5BJGJYOxlTE2rNMp
-         NpcNHm/6VuMrC9PobcsAUzWyEfU1yO3WpxzVTfn1Tgi3Nsxr2xp1jyErf+87diPVTac+
-         HR9U+TbKuIJNU6CDe0pv55YPV1M0kDz9xlgme75JrsbfGn+aDIACR+mw+X+qzRXatkNj
-         Keaosx6CF3UCFZ/5xadXR3j0M42SfPFlUvW51n005YHPJUehSTXV2mxOJrNjSg9KdStb
-         RN5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708351357; x=1708956157;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wxQ2G2ZSMlMlBUzvWD0qotOMWCkfxBUg6tFE0Q+NBAg=;
-        b=JdQjieqGQMgTmAiWLqgQ1RPPbiwR5JUzPtCmI2aLRdFXY4+fFx/ESzGJGXcmGUtbxL
-         dxm8urJTVGZgmWVJklV5Ww5PdgAGA4nkdzIXiCEXdwad7Px8uMfuHc06YT6/wB7HFzGR
-         LWaRJPfmabt42a+Wqam0RSubJzy+Kuq81Ozoz56Td//KzKE8HCzX4UMco/NuDvoe5zCX
-         dl4TfpkEYVdwXuAW18+XBwaAmTyDvWRNlSh3YNqnXcE6UQhJn+A460jwIU8alU0GiXXr
-         D8x0voEwV4OntjfSED6dJKzjMctEIx4JtPDN7Wcej8GD4MLRsIcIBZhYik+gAM901hkh
-         KWrQ==
-X-Gm-Message-State: AOJu0Yx7NijYQnfOKD+pVs2+yfUq7SKwK1+6OAu7SSQOklJUkxcDFHUn
-	wTkRb2zlYLeV3opZJgmsHUfEXNp86K3hb5E1XFMjL1IZIbBUuaL1+BUwGo2oF6wvrV1NlTCBJGs
-	+umJMtCYa56Yq9TGeXJN9PjBsyKc=
-X-Google-Smtp-Source: AGHT+IG0gcUCtxL7Z4gNd7cfpII0Xf8aXmZ7ZkqInCUqEXJBx9c/1UNNdBvAZYqXWTz/r/+U2EdnhPJLIk8MpXvKaYI=
-X-Received: by 2002:a05:600c:4f49:b0:412:5652:1395 with SMTP id
- m9-20020a05600c4f4900b0041256521395mr4704433wmq.25.1708351356405; Mon, 19 Feb
- 2024 06:02:36 -0800 (PST)
+	s=arc-20240116; t=1708351496; c=relaxed/simple;
+	bh=zXE55Wn1vwBRvTQKi9WOqRZmT86viMgSf4go7Yu3bbg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=owAQlgxIHuzo3aggXv/2qIjGNDHTZnJZf/dR4p35y2/QYBHHZ7ipSlvj+qndX9rv5VA7rV8A2on0D5RO2cJzOcgDZ3H4dcoq0yxgmw6IwP5nlv2fxxCmOLZ1oofDkP/lbZ6ZCjI11PPawllKFU9NsDRu/W/VRvjDiQagWKSUUuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=jUCOuyn9; arc=none smtp.client-ip=47.90.199.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1708351474; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=BNkhxppDcbFezZ4gGJ8AqJVbJcBTfeeZ+zXUxQ8+TPE=;
+	b=jUCOuyn91MI2xA/eVE+GsD/JFOoJByBj0SaPY53TCHgq9g9L5cUwM0JoLersIFC7zh5Xhnok6v7lfxNBj38xhv8HnjT6SIJPsu0hSKgAFZFSzEirN7LV97QHCoMnswY5zkZ2JMwlUOL4VN19YSopr42jJyTjydorIGNDIuZn71s=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0W0tkCQI_1708351472;
+Received: from 30.221.128.181(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W0tkCQI_1708351472)
+          by smtp.aliyun-inc.com;
+          Mon, 19 Feb 2024 22:04:33 +0800
+Message-ID: <8a333c58-4a74-4a1c-9680-a0b9b4020a62@linux.alibaba.com>
+Date: Mon, 19 Feb 2024 22:04:32 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1BAA689A-D44E-4122-9AD8-25F6D024377E@ifi.uio.no>
- <CAA93jw6di-ypNHH0kz70mhYitT_wsbpZR4gMbSx7FEpSvHx3qg@mail.gmail.com>
- <B4827A61-6324-40BB-9BDE-3A87DEABB65C@ifi.uio.no> <CAA93jw5vFc6i8GebrXCXmtNaFU03=WkD6K83hgepLQzvHCj6Vg@mail.gmail.com>
- <CADVnQynGsNmPbXkdhy71AnpvfoBwhLi5qWwVJZQK5LiiA3V_rg@mail.gmail.com> <DE7C9FBC-8E67-408B-A1A3-3FE04FC71F51@ifi.uio.no>
-In-Reply-To: <DE7C9FBC-8E67-408B-A1A3-3FE04FC71F51@ifi.uio.no>
-From: Dave Taht <dave.taht@gmail.com>
-Date: Mon, 19 Feb 2024 09:02:24 -0500
-Message-ID: <CAA93jw6ycxsz4XvkE3F=MnLvFrBW66buNpCHOwPEn40x5JkpJw@mail.gmail.com>
-Subject: Re: [Bloat] Trying to *really* understand Linux pacing
-To: Michael Welzl <michawe@ifi.uio.no>
-Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>, bloat@lists.bufferbloat.net, 
-	BBR Development <bbr-dev@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-also your investigation showed me a probably bug in cake's
-gso-splitting. thanks!
-
-However, after capturing the how as you just have, deeper
-understanding the effects on the network itself of this stuff would be
-great.
-
-On Mon, Feb 19, 2024 at 8:54=E2=80=AFAM Michael Welzl via Bloat
-<bloat@lists.bufferbloat.net> wrote:
->
-> Dear all,
->
-> I=E2=80=99m now finally done updating the document, based on inputs from =
-various folks in this round - most notably Neal, who went to great lengths =
-to help me understand what I saw in my tests (thank you!).  Now the descrip=
-tion should be mostly correct (I hope) and pretty complete, and it also inc=
-ludes TSO / GSO.
->
-> Comments are still welcome if anyone sees a mistake or something:
-> https://docs.google.com/document/d/1-uXnPDcVBKmg5krkG5wYBgaA2yLSFK_kZa7xG=
-DWc7XU/edit?usp=3Dsharing
->
-> Several people have in the meanwhile told me that this is useful for the =
-community. I=E2=80=99m glad to hear that!  I really only started this for m=
-yself, just to understand what=E2=80=99s going on. Now I believe I do=E2=80=
-=A6 but hey, if this helps others too, this is great!   So, please feel fre=
-e to forward this.
->
-> Cheers,
-> Michael
->
->
-> On 7 Feb 2024, at 21:13, Neal Cardwell <ncardwell@google.com> wrote:
->
-> Thanks, Michael, for the nice doc! This is really nice for the Linux netw=
-orking community to have. I posted a few comments.
->
-> thanks,
-> neal
->
->
->
-> _______________________________________________
-> Bloat mailing list
-> Bloat@lists.bufferbloat.net
-> https://lists.bufferbloat.net/listinfo/bloat
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 00/15] net/smc: implement loopback-ism used by
+ SMC-D
+To: Alexandra Winter <wintera@linux.ibm.com>, wenjia@linux.ibm.com,
+ hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240111120036.109903-1-guwen@linux.alibaba.com>
+ <83b9d600-339c-4c9f-860d-ab4539a0ae6b@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <83b9d600-339c-4c9f-860d-ab4539a0ae6b@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
 
---=20
-40 years of net history, a couple songs:
-https://www.youtube.com/watch?v=3DD9RGX6QFm5E
-Dave T=C3=A4ht CSO, LibreQos
+On 2024/2/6 20:18, Alexandra Winter wrote:
+> 
+> 
+> On 11.01.24 13:00, Wen Gu wrote:
+>> This patch set acts as the second part of the new version of [1] (The first
+>> part can be referred from [2]), the updated things of this version are listed
+>> at the end.
+>>
+>> # Background
+>>
+>> SMC-D is now used in IBM z with ISM function to optimize network interconnect
+>> for intra-CPC communications. Inspired by this, we try to make SMC-D available
+>> on the non-s390 architecture through a software-implemented virtual ISM device,
+>> that is the loopback-ism device here, to accelerate inter-process or
+>> inter-containers communication within the same OS instance.
+> 
+> 
+> Hello Wen Gu,
+> 
+> thank you very much for this patchset. I have been looking at it a bit.
+> I installed in on a testserver, but did not yet excercise the loopback-ism device.
+> I want to continue investigations, but daily work interferes, so I thought I
+> send you some comments now. So this is not at all a code review, but some
+> thoughts and observations about the general concept.
+> 
+
+Thank you very much, Sandy.
+
+> 
+> In [1] there was a discussion about an abstraction layer between smc-d and the
+> ism devices.
+> I am not sure what you are proposing now, is it an smc-d feature or independent of smc?
+> In 3/15 you say it is part of the SMC module, but then it has its own device entry.
+> Didn't you want to use it for other things as well? Or is it an SMC-D only feature?
+> Is it a device (Config help: "kind of virtual device")? Or an SMC-D feature?
+> 
+
+This patchset aims to propose an SMC feature, which is SMC-D loopback. The main work
+to achieve this feature is to implement an Emulated-ISM, which is loopback-ism. The
+loopback-ism is a 'built-in' dummy device of SMC and only serves SMC.
+
+SMC-D protocol + 'built-in dummy device' (loopback-ism device) = SMC-D loopback feature.
+
+To provide the runtime switch and statistics of loopback-ism, I need to find a sysfs
+entry for it, since it doesn't belong to any class (e.g. pci_bus), I created an 'smc'
+entry under /sys/devices/virtual/ and put loopback-ism under it.
+
+The other SMC devices, such as RoCE, s390 ISM, virtio-ism will be in their own sysfs
+entry, not under the /sys/devices/*virtual*/smc/.
+
+The Config help is somewhat inaccurate. To be more precise, the SMC_LO config is used to
+configure whether to enable this built-in dummy device for intra-OS communication.
+
+> Will we have a class of ism devices (s390 ism, ism-loopback, virtio-ism)
+> That share common properties (internal API?)
+> and smc-d will work with any of those? > But they all can exist without smc ?! BTW: This is what we want for s390-ism.
+> The client-registration interface [2] is currently the way to achieve this.
+> But maybe we need a more general concept?
+> 
+
+I didn't mean to create a class to cover all the ISM devices. It is only for
+loopback-ism. Because loopback-ism can not be classified, so I create an entry
+under /sys/devices/virtual/.
+
+> Maybe first a preparation patchset that introduces a class/ism
+> Together with an improved API?
+> In case you want to use ISM devices for other purposes as well..
+> But then the whole picture of ism-loopback in one patchset (RFC?)
+> has its benefits as well.
+> 
+
+Sorry for causing, I didn't mean to create a class to cover all the ISM devices.
+They should be in their own sysfs entries (e.g. pci_bus), since they will be used
+out of SMC. Only loopback-ism belongs only to SMC.
+
+> 
+> Other points that I noticed:
+> 
+> Naming: smc loopback, ism-loopback, loopback-ism ?
+> 
+> config: why not tristate? Why under net/smc?
+> 
+
+'SMC-D loopback' or 'SMC loopback' is used to indicate the feature or capability.
+'loopback-ism' is the emulated-ISM device that 'SMC/SMC-D loopback' used.
+('ism-loopback' doesn't seem to appear in my patchset)
+If we all agree with these, I will check all the terms in the patch and unify them.
+
+SMC_LO is used to configure whether SMC is allowed to use loopback-ism (CONFIG_SMC_LO),
+it acts as a check in the code, so I defined it as a bool.
+And loopback-ism only serves SMC-D loopback, as a feature of SMC, so the implementation
+(net/smc/smc_loopback.{c|h}) is under net/smc.
+
+> /sys/devices/virtual/smc  does not initially show up in my installation!!!
+> root@t35lp50:/sys/devices/virtual/> ls
+> 3270/  bdi/  block/  graphics/  iommu/  mem/  memory_tiering/  misc/  net/  tty/  vc/  vtconsole/  workqueue/
+> root@t35lp50:/sys/devices/virtual/> ls smc/loopback-ism
+> active  dmb_copy  dmbs_cnt  dmb_type  subsystem@  uevent  xfer_bytes
+> root@t35lp50:/sys/devices/virtual/> ls
+> 3270/  bdi/  block/  graphics/  iommu/  mem/  memory_tiering/  misc/  net/  smc/  tty/  vc/  vtconsole/  workqueue/
+> Is that normal behaviour?
+> 
+
+/sys/devices/virtual/smc is created after SMC module initialization.
+During the SMC module initialization, smc_loopback_init() is called, and the
+/sys/devices/virtual/smc entry is created.
+
+> You introduced a class/smc
+> Maybe class/ism would be better?
+> The other smc interfaces do not show up in class/smc!! Not so good
+> 
+
+Sorry for causing, I didn't mean to create a class to cover all the ISM devices.
+They should be in their own sysfs entries (e.g. pci_bus), since they can be used
+out of SMC. But loopback-ism is a SMC 'built-in' dummy device, it belongs only
+to SMC and can't be classified to other entries.
+
+
+> Why doesn't it show in smc_rnics?
+> (Maybe some deficiency of smc_rnics?)
+> 
+smc_rnics can't be used on the arch other than s390.
+
+# ./smc_rnics  -a
+Error: s390/s390x supported only
+
+
+> But then it shows in other smc-tools:
+> root@t35lp50:/sys/> smcd device
+> FID  Type  PCI-ID        PCHID  InUse  #LGs  PNET-ID
+> 0000 0     loopback-ism  ffff   No        0
+> 0029 ISM   0000:00:00.0  07c1   No        0  NET1
+> Nice!
+> 
+
+Yes, this is did on patch 01/15.
+
+Best regards,
+Wen Gu
+
+> Kind regards
+> Sandy
+> 
+> 
+> [1] https://lore.kernel.org/lkml/e3819550-7b10-4f9c-7347-dcf1f97b8e6b@linux.alibaba.com/
+> [2] 89e7d2ba61b7 ("net/ism: Add new API for client registration")
 
