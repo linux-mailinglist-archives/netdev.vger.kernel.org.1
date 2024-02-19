@@ -1,117 +1,124 @@
-Return-Path: <netdev+bounces-72976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46ED785A7BA
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 16:44:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FDB285A7DE
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 16:54:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 794441C21431
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 15:44:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7B8F280E39
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 15:54:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74CB43A8F4;
-	Mon, 19 Feb 2024 15:44:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E5ED3B18D;
+	Mon, 19 Feb 2024 15:53:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ghd1fJnL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VFGY22TG"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF193984D;
-	Mon, 19 Feb 2024 15:44:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 708463A8F4;
+	Mon, 19 Feb 2024 15:53:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708357476; cv=none; b=Vbc3sTAuHDJEk73ctCpwxpcXMfDOn0PAoSbXXRCfwOJmsagoPMvhCK5m6Cw/vj7xXws8jN5Tt1Dct6fT20d4wSh5H1AfkTFmoxuAkjWfmJzaDyQhEhe0nt1FlGWNWQqAeK6FrSmTAOJwqcDyTTU1FDUm5fZVOTNcTiVETFl8YRA=
+	t=1708358032; cv=none; b=OL0d1sp357XfPeHnfvLY+r/wAUGUaLSUdzhcJMs4DjqdTN2cEmhErM9uuP+MqOhHsxxheuXa9KR5Qp9spMCdhEnwygly8dsn7ZXDuZTQTkCdtLdJgS22eVTqCjkwxXMHNtodxPz77WJnG1UICtkJgqAh3ljxB/CszQ2CsO0QQM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708357476; c=relaxed/simple;
-	bh=GvrzzQiSIp0fJMCOPW9fDjx5IN1hYWlflJ2j1cj5MBY=;
+	s=arc-20240116; t=1708358032; c=relaxed/simple;
+	bh=6G3GU8dr597vPaA7pZYko5goQ5rMTkG18ePAdSOWOM4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dw8fL6Diaftcm9JkLPtRgs/RheJchLKeQysejSL9ltuoVMU0Pk15MayMcsh/HofViKHp4p6FRNlM6MuqwrzDaoPXIsitnJ966f36KiIvRxR/UdtueeB7Ta8m1rm7tgOqkfpdTyjbHRwXaPGQVFR0ssLaGQK/H9ZKMxtzMsJc9oI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ghd1fJnL; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=pH5Y2yN2vdQCTWiEZvOwFMYMekr4MsvZg3ozDbgomZY=; b=gh
-	d1fJnLTEaw9+hSiCZeZFiCGvrExh3Yy5rk3LtUUqLb1yNIu3JiogpNRNRtLJ8SQPbI/OUuZ1AnqRg
-	O4dybcYLMWSF3XWe1Sd9M1MPZHb2lsx5WwBY6G4/CwYjoDB2yoOz80LRwi/xrdC0uTNmfx7oNHdAX
-	zwULkTfhY6WRTm4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rc5oo-008D3A-5R; Mon, 19 Feb 2024 16:44:34 +0100
-Date: Mon, 19 Feb 2024 16:44:34 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: =?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=kooeG/gh67FN6Uis6mN0q2eBARLNtjEN8EuC3wbctHIhOw9quI4KsHifPW3nmq6/UXaO55L7stJm9u3tfFwcypgt45d3cecPSlVjktrO3DPnf2KjWqyWqzhSTwPLKoMKFktWKQoTaYFecI+Z2YPr+cjWIsmKf+HIBz1o1dn94gE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VFGY22TG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C86ABC433C7;
+	Mon, 19 Feb 2024 15:53:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708358032;
+	bh=6G3GU8dr597vPaA7pZYko5goQ5rMTkG18ePAdSOWOM4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VFGY22TGcEBqLLImEFZ6ZwvPm2dUA6C3NhX9GH4dldBXTAiFz9DpLPFz9SMdhPDAc
+	 ihE9R2khzR2nXdAOFYSQbRrw48C3EjgwjG2ynEzBElVzf33sD1/ei9Y+I9O53PPMyL
+	 4ElLvBhN2IQAWHRo3hooBJ8hhpCphb4kn3f33hiRJ58MTn9GHv2xl6r6l+ftA7dzFZ
+	 6cqd0sbh6HjjfPGip77JfB7Ijae0CXK+NHxwIbr2qyAkt5mHGtpCOSN3Of96s82KTs
+	 HZGaBdBBE2kv1yJ5rBIhY1Lk0HBRqoOi4zLXLXVW98HJs2S/arpop5FzwJueRv3T7v
+	 DvyWcAAFGlmCQ==
+Date: Mon, 19 Feb 2024 15:53:46 +0000
+From: Simon Horman <horms@kernel.org>
+To: Yang Xiwen <forbidden405@outlook.com>
+Cc: Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Rob Herring <robh+dt@kernel.org>,
 	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
 	Conor Dooley <conor+dt@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Mark Brown <broonie@kernel.org>,
-	Frank Rowand <frowand.list@gmail.com>,
+	Yang Xiwen <forbidden405@foxmail.com>, Andrew Lunn <andrew@lunn.ch>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
-	Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v4 05/17] net: pse-pd: Introduce PSE types
- enumeration
-Message-ID: <11225a0d-bdc4-459c-9258-c9da217cc89e@lunn.ch>
-References: <20240215-feature_poe-v4-0-35bb4c23266c@bootlin.com>
- <20240215-feature_poe-v4-5-35bb4c23266c@bootlin.com>
- <20240215105846.6dd48886@kernel.org>
- <20240216104211.2c11d1cc@kmaincent-XPS-13-7390>
- <20240216173638.4bb12af2@kernel.org>
- <20240219160456.0b5e8de3@kmaincent-XPS-13-7390>
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH v2 1/6] net: hisilicon: add support for hisi_femac core
+ on Hi3798MV200
+Message-ID: <20240219155346.GE40273@kernel.org>
+References: <20240216-net-v2-0-89bd4b7065c2@outlook.com>
+ <20240216-net-v2-1-89bd4b7065c2@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240219160456.0b5e8de3@kmaincent-XPS-13-7390>
+In-Reply-To: <20240216-net-v2-1-89bd4b7065c2@outlook.com>
 
-On Mon, Feb 19, 2024 at 04:04:56PM +0100, Köry Maincent wrote:
-> On Fri, 16 Feb 2024 17:36:38 -0800
-> Jakub Kicinski <kuba@kernel.org> wrote:
-> > > > but why the separate header? Is it going to be used in other parts of
-> > > > uAPI than just in ethtool?    
-> > > 
-> > > We might use it in pse core if capabilities between PoE and PoDL differ but
-> > > I am not sure about it.
-> > > Do you prefer to move it to ethtool header and add prefix ETHTOOL_ to the
-> > > enum values?  
-> > 
-> > I don't know enough to have an opinion :) Whatever you end up doing,
-> > it's probably worth documenting the reason for the choice in the commit
-> > message?
-> 
-> Mmh, I am still not sure of the best choice on this. I think I will move it to
-> ethtool as you suggested.
+On Fri, Feb 16, 2024 at 06:02:00PM +0800, Yang Xiwen via B4 Relay wrote:
 
-kAPI is hard to change. So it is worth thinking about it.
+...
 
-Can you think of any possible kAPI not using ethtool netlink? Its not
-going to be ioctl. We generally don't export new things in /sysfs if
-we have netlink, etc.
+> @@ -826,15 +847,32 @@ static int hisi_femac_drv_probe(struct platform_device *pdev)
+>  						 priv->phy_reset_delays,
+>  						 DELAYS_NUM);
+>  		if (ret)
+> -			goto out_disable_clk;
+> +			goto out_free_netdev;
+>  		hisi_femac_phy_reset(priv);
+>  	}
+>  
+> +	// Register the optional MDIO bus
+> +	for_each_available_child_of_node(node, mdio_np) {
+> +		if (of_node_name_prefix(mdio_np, "mdio")) {
+> +			priv->mdio_pdev = of_platform_device_create(mdio_np, NULL, dev);
+> +			of_node_put(mdio_np);
+> +			if (!priv->mdio_pdev) {
+> +				dev_err(dev, "failed to register MDIO bus device\n");
+> +				goto out_free_netdev;
 
-So to me, it is only going to be used be the ethtool API, so i would
-follow the usual conventions for ethtool.
+Hi Yang Xiwen,
 
-   Andrew
+out_free_netdev will return ret.
+However, it seems that ret is uninitialised here.
+Perhaps it should be set to a negative error value?
+
+Flagged by Smatch.
+
+> +			}
+> +			mdio_registered = true;
+> +			break;
+> +		}
+> +	}
+> +
+> +	if (!mdio_registered)
+> +		dev_warn(dev, "MDIO subnode notfound. This is usually a bug.\n");
+> +
+>  	phy = of_phy_get_and_connect(ndev, node, hisi_femac_adjust_link);
+>  	if (!phy) {
+>  		dev_err(dev, "connect to PHY failed!\n");
+>  		ret = -ENODEV;
+> -		goto out_disable_clk;
+> +		goto out_unregister_mdio_bus;
+>  	}
+>  
+>  	phy_attached_print(phy, "phy_id=0x%.8lx, phy_mode=%s\n",
+
+...
 
