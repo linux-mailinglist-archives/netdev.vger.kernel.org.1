@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-72829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB1B1859D0A
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 08:35:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC185859D23
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 08:38:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6299A1F22C7B
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 07:35:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D10361C219A1
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 07:38:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C86C20DF0;
-	Mon, 19 Feb 2024 07:34:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE88210F0;
+	Mon, 19 Feb 2024 07:38:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vazxlQK+"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dIabnhJU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA52220B10
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 07:34:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7431A20B24
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 07:38:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708328086; cv=none; b=JrUeX2PEXFHYz3mjlKEuM04Q6ghcRWEpwH2E/jZDbkq+Ec0Bkv09qlQJblRlUySPJxi89Uif9JxZMEgPlddUyU0hA0rCOQoPGvs0Rqdh7ZKJLGwgK3uf1mmjxTRQDb/LBxBV6kGtavzTYIIwKLXEPGVQvrk2XFUiARyR5QCmHSM=
+	t=1708328302; cv=none; b=bC9fmZcTFRRBOxm6zGUY/eDIXPzy6BCC8VYtlTHQGTAI517Tdc2s0uck9QUm952y5iL9YZ5nVuKm6K43Z2U2liDbTbjgxVcJebrVh8LFyGg0VkROUa+OkqL9lcmd8InRxoTpCtww59nB94QxYwGRuVkOxh7v2x49Bp4HhgJnrCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708328086; c=relaxed/simple;
-	bh=wVr8phqPhAkF0b9oWovDQdPdxnbZUP9wWMXDE0q3O+E=;
+	s=arc-20240116; t=1708328302; c=relaxed/simple;
+	bh=sEpRq9avJFC2ktUz56c7VohDfJ6P5s2iicug6CLi7mQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fFQfHI+RlpHN6FYBnrfwna94cCzPa0llb+3bhtzbbbqpv2dUM/eoB9Y3Y9CqOL8RWiJkkEXtBILqXNdqrAKlnEIh4twpWyys8Ucjz86oh2aW4WNe/jpee7WebO1+58yJ65rNZoDiRLib2Efb9YKMrSkB67RtfMrQhkqEm9ExQt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=vazxlQK+; arc=none smtp.client-ip=209.85.167.43
+	 In-Reply-To:Content-Type; b=jayxftN8fl515N2daJDx9p2cexTnxXbhw1jxLMKoWBCY9qgEMgjB5fOl+I82SLF2riklyJG6G0yoOpGWb+0foE/0i8y7jWyFIo8e8+RckB/tt9olANvjJNLHbm59K29BZoS722N2Ok7UZd72GheHQNsJ5DMp5o3RDlqz3EWvKEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dIabnhJU; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-512acc1a881so993344e87.3
-        for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 23:34:43 -0800 (PST)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-41269c801eeso682755e9.2
+        for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 23:38:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708328082; x=1708932882; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1708328297; x=1708933097; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=xvLNrJJRwNsw7GHS06wt5yBCCTtq8TZaQZJgpC0CeaY=;
-        b=vazxlQK+vf2dY9nVGPG4nyEukjERdERKTFy7JDhvY14xeTW92TFLRN2dKu8QXVw60H
-         vi4K/rRfOtnzgi67LHqdLemXcdEtVaPS1hhy0nUMRXmIOZTWLPSrLL3DizKFl4kTJqSq
-         NcP1blHJJwx4CHuFteX3aqPOZroR6VMweO+I4kI6mECQ/vvvyLapyKtZqlWItYS1zu4x
-         7D4AEfV+Y0CvCT+PbOB6vdVxOB5bHRQsfoFbZiV/bFPPTNLfSV4UzQO0fEC7Sv3Ax0Uh
-         Dp/cjG9kXfeonf35FBVXyE/lVfKL8KDlyFVy6r2uo+2Z3ikmYdPof+vWVN0abEh+8tqb
-         4u2Q==
+        bh=+92+e6nKOYqvLoeXiLnezh7dMajbd0mDjTA//vjxt8w=;
+        b=dIabnhJU4nasSnYdydwqS1uzmL/TpBLSGhZojnb+h+9EwC9RiHc6djAmWcLVJdvXbS
+         SxOI0shglkMAtj8rQRHECMajkjLJENXmZnPTSk3wyIAJqRRGlyQpDoL9b5WhUjLk3MLD
+         LZr1qpvoJx1/m20y51QHxJT+3dNcGLtiPM1sfY60jfXp2Sr/0BSN+gqBt47WeNHd7Ams
+         BClUqGFvF9PFJeYxPiPxt/sX4KEeG4IdYU0sxFcFFdAU68S7eUaB4LyOobTjl4oMweBK
+         HPY8GO178MfSIRcaFi5HhnOxxK2H1Y/cxYYGghvR494Y3TjWv8paS1BGqE32KPk43zmf
+         NFow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708328082; x=1708932882;
+        d=1e100.net; s=20230601; t=1708328297; x=1708933097;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xvLNrJJRwNsw7GHS06wt5yBCCTtq8TZaQZJgpC0CeaY=;
-        b=gJSt9SS6poMkRZqB8fl2keW95SMBIMa11A50t28zeQEN2oGAV1rhQ715Orl2NugSPI
-         nqaR9BIcVBbKbECEDyNwpMkDL2zV2Vphaj/ghNbkIizd0YHs0s+Y5Gkrzx63RpequWl4
-         Rr6Py1iRxw4YYOShA3IMo+oYreP6hg6UtoLALvEmetfXDzJNDhv90NLfOrUDwBAGLCfp
-         rMTlEBQjJSN4zYPMlCOqE5vY8Ly72/19DlR0FU2qDHGNkAaYKTkZgvYPPWRg+Zyfg97Q
-         joa9hGr+8Pb84L2Tv4RS3o9CVr6/0l4PcIWKZd9tlRIVJ+1wdHvw3MVG5aQO7CVKyqyI
-         /FUg==
-X-Forwarded-Encrypted: i=1; AJvYcCVTE8c8MjSBuP1733C3jtgQlaqSew/78PmGwRMvHBgT+KWibhmT+PvNdKo0gvVIE2y7p2vZoFeytkdX132ZCJnymUuKQgEJ
-X-Gm-Message-State: AOJu0YwkPLN663Va2mecwRZBHtX/NUz06icSynVselRxDrDXWX2IHb2q
-	PIwQQleS3lpHVHLedfXdIU+E3IOB7FLpV0d79rtJGiQe3NfJb1670xC2aCGmRts=
-X-Google-Smtp-Source: AGHT+IHULjgckgRcgbc1CIDA7u2voVte9tOzxMYCJeWas52dwNJodaOuSWwS5Jl6p2X5XUL/pfqp6g==
-X-Received: by 2002:a05:6512:239a:b0:511:9706:58eb with SMTP id c26-20020a056512239a00b00511970658ebmr9246588lfv.1.1708328082040;
-        Sun, 18 Feb 2024 23:34:42 -0800 (PST)
+        bh=+92+e6nKOYqvLoeXiLnezh7dMajbd0mDjTA//vjxt8w=;
+        b=h2Z9m6/7hRODH7GtcNsStqakZGxndDm7ynhWvyieH8GMb5wJEd8nF1VC5NM1cAEj0z
+         efPelTmWaDOt2DpAA93h/gpoA14qglY4SFG2hR6Ar+947X3IYz9s11CoDLj2tLTSjIkN
+         PTNKeC5oZvnfM76xuBhIPLCmqTQwQS4XFB11RC+SQSgLH0sKAdRurKIz4RIwaZIWwRuw
+         NxBa+dhomB31TmKLM/Z+ms7pWgSbNdUK7ncGLrpZ5uMg/dcAz9bpJZPVN971CDCWLBs1
+         Nr8ukDuGmuR4jR+0+Gvlu+ig4FXOq9lb4fb6GbVqsZV1R3W+sesyKOBuTlSATizowZUK
+         6kcg==
+X-Forwarded-Encrypted: i=1; AJvYcCXuWZRUJxJr7pZxz6MEzfbDHPgLzQs5jaK8LgFdpHmMGqY3qZg191LANiv3o5VRdcMCVLKyXTcdg7T2/MLtEm/EFzh1svcE
+X-Gm-Message-State: AOJu0YzEamBmczToES+xbfuMdm1iWwfJC7Q3lq/+RVU0XTES7tdG5ggu
+	ea9Magyl/R8SzGci+c9zL/m0qnPJU48AFSRSKpKXrOBRWcyjwC2/2y2FFc1ITbc=
+X-Google-Smtp-Source: AGHT+IFHwh5BE/Abo7HfIokCLkBltQEQil9O9xuVzVqPQoF/TwU6Yzym4Un11vYNW0fWxXFJ9L97LA==
+X-Received: by 2002:a05:6000:144:b0:33b:279a:5cb1 with SMTP id r4-20020a056000014400b0033b279a5cb1mr7391045wrx.11.1708328296838;
+        Sun, 18 Feb 2024 23:38:16 -0800 (PST)
 Received: from [192.168.1.20] ([178.197.222.116])
-        by smtp.gmail.com with ESMTPSA id jv14-20020a05600c570e00b0040fe3147babsm10640011wmb.0.2024.02.18.23.34.38
+        by smtp.gmail.com with ESMTPSA id k3-20020a056000004300b0033b79d385f6sm9450013wrx.47.2024.02.18.23.38.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 18 Feb 2024 23:34:41 -0800 (PST)
-Message-ID: <e5adbea4-1706-46b1-9f45-6b3c3b5f0954@linaro.org>
-Date: Mon, 19 Feb 2024 08:34:38 +0100
+        Sun, 18 Feb 2024 23:38:16 -0800 (PST)
+Message-ID: <dcec7bac-410f-4063-aa45-da2cde7032bf@linaro.org>
+Date: Mon, 19 Feb 2024 08:38:12 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,8 +76,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 04/18] dt-bindings: net: bluetooth: qualcomm: describe
- regulators for QCA6390
+Subject: Re: [PATCH v5 06/18] dt-bindings: new: wireless: describe the ath12k
+ PCI module
 Content-Language: en-US
 To: Bartosz Golaszewski <brgl@bgdev.pl>, Marcel Holtmann
  <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
@@ -106,7 +106,7 @@ Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
  linux-pm@vger.kernel.org,
  Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 References: <20240216203215.40870-1-brgl@bgdev.pl>
- <20240216203215.40870-5-brgl@bgdev.pl>
+ <20240216203215.40870-7-brgl@bgdev.pl>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -152,23 +152,94 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240216203215.40870-5-brgl@bgdev.pl>
+In-Reply-To: <20240216203215.40870-7-brgl@bgdev.pl>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 16/02/2024 21:32, Bartosz Golaszewski wrote:
 > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > 
-> QCA6390 has a compatible listed in the bindings but is missing the
-> regulators description. Add the missing supply property and list the
-> required ones in the allOf section.
+> Add device-tree bindings for the ATH12K module found in the WCN7850
+> package.
 > 
 > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > ---
+>  .../net/wireless/qcom,ath12k-pci.yaml         | 103 ++++++++++++++++++
+>  1 file changed, 103 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/wireless/qcom,ath12k-pci.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/wireless/qcom,ath12k-pci.yaml b/Documentation/devicetree/bindings/net/wireless/qcom,ath12k-pci.yaml
+> new file mode 100644
+> index 000000000000..063c576b99a0
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/wireless/qcom,ath12k-pci.yaml
 
+This means there can be ath12k over AHB or some other bus, which would
+be quite different and not fit together in one schema file. It's that
+the case?
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> @@ -0,0 +1,103 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +# Copyright (c) 2024 Linaro Limited
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/wireless/qcom,ath12k-pci.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Qualcomm Technologies ath12k wireless devices (PCIe)
+> +
+> +maintainers:
+> +  - Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> +
+> +description: |
 
+Do not need '|' unless you need to preserve formatting.
+
+> +  Qualcomm Technologies IEEE 802.11ax PCIe devices
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - pci17cb,1107  # WCN7850
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  enable-gpios:
+> +    maxItems: 1
+> +    description: GPIO line enabling the WLAN module
+> +
+> +  vdd-supply:
+> +    description: VDD supply regulator handle
+> +
+> +  vddio-supply:
+> +    description: VDD_IO supply regulator handle
+> +
+> +  vddio1p2-supply:
+> +    description: VDD_IO_1P2 supply regulator handle
+> +
+> +  vddaon-supply:
+> +    description: VDD_AON supply regulator handle
+> +
+> +  vdddig-supply:
+> +    description: VDD_DIG supply regulator handle
+> +
+> +  vddrfa1p2-supply:
+> +    description: VDD_RFA_1P2 supply regulator handle
+> +
+> +  vddrfa1p8-supply:
+> +    description: VDD_PCIE_1P8 supply regulator handle
+> +
+> +  clocks:
+> +    maxItems: 1
+> +    description:
+> +      Reference clock phandle
+
+These three could be just:
+items:
+  - description: Reference clock
+
+(phandle is redundant in this context)
 
 Best regards,
 Krzysztof
