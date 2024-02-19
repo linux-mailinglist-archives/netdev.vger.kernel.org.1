@@ -1,187 +1,164 @@
-Return-Path: <netdev+bounces-73004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C22A85A9CB
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 18:20:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EC5185A9D4
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 18:22:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1730F1F2196E
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 17:20:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D0191C21FB0
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 17:22:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B28B446BD;
-	Mon, 19 Feb 2024 17:20:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2FA344C93;
+	Mon, 19 Feb 2024 17:22:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i9yRy1+N"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sL45fs6s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689792E834
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 17:20:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AA17446BD
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 17:22:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708363242; cv=none; b=Ca1giNHAYrQc7+8a1hG10pNTwuS+UCu52jlC0wfenBzEVcFfSGw7WhHItIss40O4oxbVQaoBN+t8Om2CBATt0ZNv1fT1QCEouCqB6lkKzILju2sZXvx9TPX2mUIVSVob3gA+OUxfx0vG8kyQSBT1SiHEcMpRUQBW6/jBImntsEE=
+	t=1708363328; cv=none; b=HL0Bj1xeEzK6Kl8o8m2nbVj9k2ZacDs/naAXFiCXDT57THaJytvnP2SbSq2oU5KupjTEJUHYZAos2gRRkEbcGmVUSg3jrhgif2q5tArNT+k5UCC+ulq9Ig6T80pZc1lW/m0Yu/QPzRupLNlQKRfjKPlPqk+W2iJQ0JUY+Fwy27c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708363242; c=relaxed/simple;
-	bh=QLBo4XJIX2BmEePgICTaISiFISeV90L6B7CMGqaM3ZU=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=oCoo1lwDl8jp9OUs3292tfq4Q8Yuyn7V5RE/AHlZdawtklnWeTrDIq5l59q0qz80LQ2xtOOwwZKOZDy6o+RJfup0+/PSoMDNkCY+fBFfuBcIlja9cvSKU7SzrFfEUw8j/UHkwBDiQBH0LX72h6H934rGgRojp1O1FlfEE0OD1qM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i9yRy1+N; arc=none smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-68ee2c0a237so29244806d6.1
-        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 09:20:41 -0800 (PST)
+	s=arc-20240116; t=1708363328; c=relaxed/simple;
+	bh=D4hbJX7uGV8vohd/O7pYTtYq3FdJW6tASIcFVTSogHk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dGYzngy6JhxlfvY8bE+2xJ5dY44aJhfIZ7ZMDQy5f56k67qnxGO4NIARmzb1yXRDNQCPXhwLBh1xyAiABTJyN5XbAmwrmoLnJB4zGLI7n+p3sxJ37TM7x2eAkswPjzX9JGGNQXpU/+mHhNzvTAGXI1/rNdG30G5aKcGJWeqpudA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sL45fs6s; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4126149228bso74175e9.0
+        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 09:22:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708363240; x=1708968040; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1708363324; x=1708968124; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DWrIOSPpNuwGFE4/WFpwq1pDBGTaZt8p00gZ298ZBiI=;
-        b=i9yRy1+NmhdXpDRTqqqTpwAzY9L2BooFHK5HbNcKw43D8eQaUeP6TS1sxvcRbCD+He
-         ywhl7vEKoVGpiUGTLFSB62qZDaSJbifapikYnj6DEjx1VRwE+V85jyagXYljhUb/Rczw
-         bUSsGMy1S/rb+vRB8FZnMbsRK14XNlQbaqW3TqXpSUGEX3ZWv/Lu1bGPjbE5OBZHx/cM
-         St8ycknCn02n7fRUKmUTNEYGkz7CDbvsUavHCL+7yuRymGKpmLcE/kjihf0mFGmpcbE/
-         cGlqjCqCiSkssibAK5rJYofuZYpndy0mOYi3mBbLyAO47+6GM5bCIQMB5lv3RfM8YeWn
-         R6Hg==
+        bh=TzE2ImKo71OrGpPwUdYL/4pHbPBLfbVgHi0cr9m3U8k=;
+        b=sL45fs6sLPjwI75d4uFu8XxABRB/V521bZaKwne7qpuU6wrVTEUIA4UD0hzj9EP1O8
+         B1KKCZt+3VgGoF7Eo2IK+Ni47YoRntvhkFlPY+A30st5Hr1LZsE870leOriwliLFM4QA
+         31E+8KBHTjFLEA+KJaLBmftERuQMO0lMH4rO1dbFlAFgXkw+cHn0FrNw8SCEU0nZGulC
+         SwhH+okvFFFS5sgOktS/IHc3YZD6XDQ/hCp7YNUskEC815Xaf5V69Ae0BrsidNm/K/am
+         V2+XY8s87cXVXfMS1wl6/JChlHQIJQT+srZdiZQmJw+uP/TycvNIHtGv37Skm41h4kit
+         Ly3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708363240; x=1708968040;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=DWrIOSPpNuwGFE4/WFpwq1pDBGTaZt8p00gZ298ZBiI=;
-        b=AOZNXqsktQFedE5mWJY0thtNukldzGSmXdm66FkJXHW2dj3lUNWZU4FVOxoolWmNad
-         rxKvZUjOf4d2SMQlYd51cQ57h5ovvdDYodT6ljQFTTPloGd1Ns6S62FS6gGplpfkdLgq
-         iCoxU9IZjc1L1k5n6fFmNuQMhEbyEJLa2Gc0F9QRIcVxDLUSdWawVOu0e6WJr90ZnKmm
-         3fcVmotClMmeCt+s6bdYnJcW+yy4Yby/0xCYy4A0gT0vUoXY0kn4vUdeGrkFavJ+uj9l
-         Ii+AMh3/x2u3rLtbMr4lUwiAmF7BbekVqP3SNCm5oYZ/2xlZm30+XvQLK8sxAHJvP9O3
-         YKvw==
-X-Forwarded-Encrypted: i=1; AJvYcCVS4uHH3SfTvqO45NfzF6mZkOj+u/1NFUYIEzLTrMu71ja3wEDywMvrdEwvcytRaV1xF27Ee+sGMt1FwRnIl24iPdtfzr3r
-X-Gm-Message-State: AOJu0YybTJw/UROZP/tXfzTAgMUZsCPEY/Bm33MYgD8xghGy5Wvp0f3z
-	1bE+gLOf62E6TLnQCnXt/xr5WLn6UECiDEQ6FsKT8mECNKIfvwWO
-X-Google-Smtp-Source: AGHT+IH+Lnbfv04NuloWyLPrA3PQLDK2LzEpz7XkuCZUsEdGnbz6UYvLQOLZG3xR+Y40Kc4ZOlsqSQ==
-X-Received: by 2002:a05:6214:451e:b0:68f:5d7f:6a8d with SMTP id oo30-20020a056214451e00b0068f5d7f6a8dmr8307448qvb.3.1708363240308;
-        Mon, 19 Feb 2024 09:20:40 -0800 (PST)
-Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
-        by smtp.gmail.com with ESMTPSA id og15-20020a056214428f00b0068f8a21a065sm245302qvb.13.2024.02.19.09.20.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Feb 2024 09:20:39 -0800 (PST)
-Date: Mon, 19 Feb 2024 12:20:39 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Eric Dumazet <edumazet@google.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org, 
- eric.dumazet@gmail.com, 
- Daan De Meyer <daan.j.demeyer@gmail.com>, 
- Kuniyuki Iwashima <kuniyu@amazon.com>, 
- Martin KaFai Lau <martin.lau@kernel.org>, 
- David Ahern <dsahern@kernel.org>
-Message-ID: <65d38de7959f9_1f98e529449@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CANn89iJ2Cv+u+KhEN66RqL=985khA4oAOrnJmrNEje5N2KNupg@mail.gmail.com>
-References: <20240219141220.908047-1-edumazet@google.com>
- <65d37cdc26e65_1f47ea29474@willemb.c.googlers.com.notmuch>
- <CANn89iJ2Cv+u+KhEN66RqL=985khA4oAOrnJmrNEje5N2KNupg@mail.gmail.com>
-Subject: Re: [PATCH net] net: implement lockless setsockopt(SO_PEEK_OFF)
+        d=1e100.net; s=20230601; t=1708363324; x=1708968124;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TzE2ImKo71OrGpPwUdYL/4pHbPBLfbVgHi0cr9m3U8k=;
+        b=oEwhhYFO+d2Qo44aAT2JV747DTDScvKoV5mxG+Z/WYKWxDxY1QSId5iX1x0w/L6W2Q
+         /hj26hSZe+B2TiXQa5CLlYy4nD3ilWjB25TzayXe0vJk5UkqHSPuvA2f9huFR/Znv9CZ
+         8zpfamW6tQM13e4Gk/PqQwT9ti18l9EXywcyyqrWlvbpoxrmYJa162Xn4TX0DNRntCPt
+         5jbChTmjlq4hHIsQl+O4T5jFWbAv87ZQZ09OpYEX0WaRNZ1oLKAO6uDlFJnbHvROLzTk
+         fmEtDN7606UISzxBdeSpilciN+Cho9gDnTeq3nAUOHgFxdAWoOBbnnxvLgRVK4x7MK47
+         OcFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWlTrwoIkG95ufauFnc398D+hVJGz2WUfEKiHPw7jsNq3ISdKQhTttRrzf5IuPVKNlKlNn5g+J02Qi0AX9HeJqWXSXIXH2N
+X-Gm-Message-State: AOJu0YyHBWhzXbdxss7y02r2bb2AsIsiu/HvP13lKBFVw9Ntfx3OhckR
+	qT22RwgK2VagHZxLu330TQmPYsrqNz8IotPRuwbe0JzBWz7v4GHiOdJ5WFuUk3QlIf83z5Uxhd+
+	0YxZcf5J2DER14o1gHzppG4FfFhFxwUX7g0bp
+X-Google-Smtp-Source: AGHT+IFtUO3gJmAv9pg3NVlt8jW79fOGFR/YkJjU3AyGWJK7/hjLBpWxiTYoMfGOwmlNssRqFlRN3PKW2DohJYoHKeM=
+X-Received: by 2002:a05:600c:c08:b0:412:68a7:913a with SMTP id
+ fm8-20020a05600c0c0800b0041268a7913amr116160wmb.4.1708363323800; Mon, 19 Feb
+ 2024 09:22:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+References: <20240215-upstream-net-20240215-misc-fixes-v1-0-8c01a55d8f6a@kernel.org>
+ <20240215-upstream-net-20240215-misc-fixes-v1-3-8c01a55d8f6a@kernel.org>
+In-Reply-To: <20240215-upstream-net-20240215-misc-fixes-v1-3-8c01a55d8f6a@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 19 Feb 2024 18:21:52 +0100
+Message-ID: <CANn89iJ=Oecw6OZDwmSYc9HJKQ_G32uN11L+oUcMu+TOD5Xiaw@mail.gmail.com>
+Subject: Re: [PATCH net 03/13] mptcp: fix lockless access in subflow ULP diag
+To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+	Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Davide Caratti <dcaratti@redhat.com>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	stable@vger.kernel.org, Boris Pismenny <borisp@nvidia.com>, 
+	John Fastabend <john.fastabend@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Eric Dumazet wrote:
-> On Mon, Feb 19, 2024 at 5:07=E2=80=AFPM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > Eric Dumazet wrote:
-> > > syzbot reported a lockdep violation [1] involving af_unix
-> > > support of SO_PEEK_OFF.
-> > >
-> > > Since SO_PEEK_OFF is inherently not thread safe (it uses a per-sock=
-et
-> > > sk_peek_off field), there is really no point to enforce a pointless=
+On Thu, Feb 15, 2024 at 7:25=E2=80=AFPM Matthieu Baerts (NGI0)
+<matttbe@kernel.org> wrote:
+>
+> From: Paolo Abeni <pabeni@redhat.com>
+>
+> Since the introduction of the subflow ULP diag interface, the
+> dump callback accessed all the subflow data with lockless.
+>
+> We need either to annotate all the read and write operation accordingly,
+> or acquire the subflow socket lock. Let's do latter, even if slower, to
+> avoid a diffstat havoc.
+>
+> Fixes: 5147dfb50832 ("mptcp: allow dumping subflow context to userspace")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> Reviewed-by: Mat Martineau <martineau@kernel.org>
+> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> ---
+> Notes:
+>   - This patch modifies the existing ULP API. No better solutions have
+>     been found for -net, and there is some similar prior art, see
+>     commit 0df48c26d841 ("tcp: add tcpi_bytes_acked to tcp_info").
+>
+>     Please also note that TLS ULP Diag has likely the same issue.
+> To: Boris Pismenny <borisp@nvidia.com>
+> To: John Fastabend <john.fastabend@gmail.com>
+> ---
+>  include/net/tcp.h  | 2 +-
+>  net/mptcp/diag.c   | 6 +++++-
+>  net/tls/tls_main.c | 2 +-
+>  3 files changed, 7 insertions(+), 3 deletions(-)
+>
+> diff --git a/include/net/tcp.h b/include/net/tcp.h
+> index dd78a1181031..f6eba9652d01 100644
+> --- a/include/net/tcp.h
+> +++ b/include/net/tcp.h
+> @@ -2506,7 +2506,7 @@ struct tcp_ulp_ops {
+>         /* cleanup ulp */
+>         void (*release)(struct sock *sk);
+>         /* diagnostic */
+> -       int (*get_info)(const struct sock *sk, struct sk_buff *skb);
+> +       int (*get_info)(struct sock *sk, struct sk_buff *skb);
+>         size_t (*get_info_size)(const struct sock *sk);
+>         /* clone ulp */
+>         void (*clone)(const struct request_sock *req, struct sock *newsk,
+> diff --git a/net/mptcp/diag.c b/net/mptcp/diag.c
+> index a536586742f2..e57c5f47f035 100644
+> --- a/net/mptcp/diag.c
+> +++ b/net/mptcp/diag.c
+> @@ -13,17 +13,19 @@
+>  #include <uapi/linux/mptcp.h>
+>  #include "protocol.h"
+>
+> -static int subflow_get_info(const struct sock *sk, struct sk_buff *skb)
+> +static int subflow_get_info(struct sock *sk, struct sk_buff *skb)
+>  {
+>         struct mptcp_subflow_context *sf;
+>         struct nlattr *start;
+>         u32 flags =3D 0;
+> +       bool slow;
+>         int err;
+>
+>         start =3D nla_nest_start_noflag(skb, INET_ULP_INFO_MPTCP);
+>         if (!start)
+>                 return -EMSGSIZE;
+>
+> +       slow =3D lock_sock_fast(sk);
+>         rcu_read_lock();
 
-> > > thread safety in the kernel.
-> >
-> > Would it be sufficient to just move the setsockopt, so that the
-> > socket lock is not taken, but iolock still is?
-> =
+I am afraid lockdep is not happy with this change.
 
-> Probably, if we focus on the lockdep issue rather than the general
-> SO_PEEK_OFF mechanism.
-> =
-
-> We could remove unix_set_peek_off() in net-next,
-> unless someone explains why keeping a locking on iolock is needed.
-
-Since calling SO_PEEK_OFF and recvmsg concurrently is inherently not
-thread-safe, fine to remove it all.
-
-All unix_set_peek_off does is an unconditional WRITE_ONCE.
-
-It's just not the smallest change to address this specific report.
-+1 on cleaning up more thoroughly in net-next.
-
-> >
-> > Agreed with the general principle that this whole interface is not
-> > thread safe. So agreed on simplifying. Doubly so for the (lockless)
-> > UDP path.
-> >
-> > sk_peek_offset(), sk_peek_offset_fwd() and sk_peek_offset_bwd() calls=
-
-> > currently all take place inside a single iolock critical section. If
-> > not taking iolock, perhaps it would be better if sk_peek_off is at
-> > least only read once in that critical section, rather than reread
-> > in sk_peek_offset_fwd() and sk_peek_offset_bwd()?
-> =
-
-> Note that for sk_peek_offset_bwd() operations, there is no prior read
-> of sk_peek_off,
-> since the caller does not use MSG_PEEK (only UDP does a read in an
-> attempt to avoid the lock...)
-> =
-
-> static inline int sk_peek_offset(const struct sock *sk, int flags)
-> {
->     if (unlikely(flags & MSG_PEEK))
->         return READ_ONCE(sk->sk_peek_off);
-> =
-
->     return 0;
-> }
-
-Good point, thanks.
-
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-> =
-
-> =
-
-> =
-
-> =
-
-> >
-> > >
-> > > After this patch :
-> > >
-> > > - setsockopt(SO_PEEK_OFF) no longer acquires the socket lock.
-> > >
-> > > - skb_consume_udp() no longer has to acquire the socket lock.
-> > >
-> > > - af_unix no longer needs a special version of sk_set_peek_off(),
-> > >   because it does not lock u->iolock anymore.
-> > >
-> > > As a followup, we could replace prot->set_peek_off to be a boolean
-> > > and avoid an indirect call, since we always use sk_set_peek_off().
-> >
-
-
+Paolo, we probably need the READ_ONCE() annotations after all.
 
