@@ -1,80 +1,95 @@
-Return-Path: <netdev+bounces-73086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F174285AD2B
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 21:28:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96FE485AD4E
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 21:40:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACD9A284874
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 20:28:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 448DC1F216EB
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 20:40:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25F8E53398;
-	Mon, 19 Feb 2024 20:28:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A20C852F98;
+	Mon, 19 Feb 2024 20:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s+/PvT2B"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZwGpWn7b"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D82524B1;
-	Mon, 19 Feb 2024 20:28:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 790432E40C;
+	Mon, 19 Feb 2024 20:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708374537; cv=none; b=fOrPvRdWmAZAlduX5iGM9E4nimeLPS9W0FcnioJE4Me6glS3PGN8RtV6pjDOlxiz0FZk9kdRLMp6MDjmVStznI6BWsNXE7bcsMIQm5WCNoZO99bBpoQNeGppKj4AJWCXYnEYlf8a/zLBi3Xg4oP6OVTOHPLMjGODCR/TmaywTPs=
+	t=1708375226; cv=none; b=g87uUdKlYs7TN+kPrk59Atf5mtOn+eqbQyLhVLi3T+70l6W8V6S4dalt7wkWCjKRsWw+CP9Oh0r4YO6CF2nWP6fftzPKMHoTnnx0a7+pDfK6Raf8d+7toiah2EQJjeErYOqFL36chNCgoO00MHxCR9MGbfGH2MaKGORDBk2lWP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708374537; c=relaxed/simple;
-	bh=Dfn0OfhWGIoYuprurDxmGKgCNS7+424UotfKzhkZg4Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K2cF479I6hqLkp2Lc/FoJqrxAWQUaiI7D2HM+TzH1chq8eHtau4qhJFhGI+fKIY2HZi9ExLC7XpSLaoXrko7/N4G2+aSZVG1yeY2NBUrgHW0pjUfThnxevG6Org8Ia4xXNJGewynAb7mKnNDoQ+6qdjtMUVTq7R/bu0BpE78fNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s+/PvT2B; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12EA3C433F1;
-	Mon, 19 Feb 2024 20:28:56 +0000 (UTC)
+	s=arc-20240116; t=1708375226; c=relaxed/simple;
+	bh=U7lK/QxgqZFx8nQ7+Dwc3ef1xihUvLtQ98Tcz07NpcA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=g7VZ+FycG7JAGmgLFs68R5TydgiouQsUnDf5Pes4TUD51ulbPPtG8BhklKBNhR0w5Rr2tSgsbesvL8dsj0EBk4wBfEE/KMOmME6NJWAHh8JcY7OxUnVPopoM2wcGZrvYmkHDxw6lSE/JHF4wBDnzq6S0/Zr//k3ZApH//S2hHDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZwGpWn7b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id F19E5C43390;
+	Mon, 19 Feb 2024 20:40:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708374536;
-	bh=Dfn0OfhWGIoYuprurDxmGKgCNS7+424UotfKzhkZg4Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=s+/PvT2Bug/Wjruc1JbqZdGCxSNYQfT5D5hBlgNh4L8WjHGhMLJpj+nUG0AqqDFIT
-	 182gJTDnHhkJunNAjuam8328VXZzNUta2eij2PlHpRFyrN4ixe54t7lMw5mXexZG2Y
-	 tBYHpHahhartIVT9CiBLz+MDNcMuxwIEiF4l1/XRvfb/kY47cWNkvMnFx78tNTF5Z6
-	 2SkFm8DygF0uM9x8yNbS4vQH72S78C4d30Zc45fi3C3bhgH8fv1lrurgMi5vu1Pncz
-	 9XTshkwe++KllRYeqYS4meoRLB/71PwZmIL3xnvFC+ivlev9Lln+Dl28BgR5G5+oxl
-	 BQtWt6i369oCQ==
-Date: Mon, 19 Feb 2024 12:28:55 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Aaron Conole <aconole@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Pravin B
- Shelar <pshelar@ovn.org>, dev@openvswitch.org, Ilya Maximets
- <i.maximets@ovn.org>, Simon Horman <horms@ovn.org>, Eelco Chaudron
- <echaudro@redhat.com>, Shuah Khan <shuah@kernel.org>,
- linux-kselftest@vger.kernel.org
-Subject: Re: [RFC 0/7] selftests: openvswitch: cleanups for running as
- selftests
-Message-ID: <20240219122855.1f1ad0ac@kernel.org>
-In-Reply-To: <20240216152846.1850120-1-aconole@redhat.com>
-References: <20240216152846.1850120-1-aconole@redhat.com>
+	s=k20201202; t=1708375226;
+	bh=U7lK/QxgqZFx8nQ7+Dwc3ef1xihUvLtQ98Tcz07NpcA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ZwGpWn7boXQqk3yRS7pifDZgzDdPUTbDEx4mH8TW1Qz0HzcaNtEvqCqBbJEmHs7pD
+	 79OCCfT4zjaL+Q4BygPgNf7QeAagIgdXuKmuaGkhPSWKYGRH9fw2B+K/sM6uXzcdnc
+	 0ZWwj5SSGCK8y3AJ2ZKGX026/L0n/iu7WtNGEYjQZKrikR1kNisgj9apMhdOHVHehe
+	 L5vAYzQImAdt3AU3rykRzbUQFRC07X9J5rbh/Zficri+7QcMaitqk5X57aCBMa1HSF
+	 x2I6779FbVuLbLdm6Q4VqlreQrbMY/aooKFLUhIGOq6IAt448Oi1+39LuP/kaT0Q9L
+	 2gLh0JK8oKcbw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D97D9D990D9;
+	Mon, 19 Feb 2024 20:40:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] page_pool: disable direct recycling based on
+ pool->cpuid on destroy
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170837522588.25032.4338620984116633204.git-patchwork-notify@kernel.org>
+Date: Mon, 19 Feb 2024 20:40:25 +0000
+References: <20240215113905.96817-1-aleksander.lobakin@intel.com>
+In-Reply-To: <20240215113905.96817-1-aleksander.lobakin@intel.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, lorenzo@kernel.org, toke@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Fri, 16 Feb 2024 10:28:39 -0500 Aaron Conole wrote:
-> The series is a host of cleanups to the openvswitch selftest suite
-> which should be ready to run under the netdev selftest runners using
-> vng.  For now, the testing has been done with RW directories, but
-> additional testing will be done to try and keep it all as RO to be
-> more friendly.
+Hello:
 
-Would it be an option to make the output go into a dir in /tmp/ 
-instead of in place, in the tree?
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-  mktemp -p /tmp/ -d ovs-test.XXXXXXXXX
+On Thu, 15 Feb 2024 12:39:05 +0100 you wrote:
+> Now that direct recycling is performed basing on pool->cpuid when set,
+> memory leaks are possible:
+> 
+> 1. A pool is destroyed.
+> 2. Alloc cache is emptied (it's done only once).
+> 3. pool->cpuid is still set.
+> 4. napi_pp_put_page() does direct recycling basing on pool->cpuid.
+> 5. Now alloc cache is not empty, but it won't ever be freed.
+> 
+> [...]
 
-or such?
+Here is the summary with links:
+  - [net-next] page_pool: disable direct recycling based on pool->cpuid on destroy
+    https://git.kernel.org/netdev/net-next/c/56ef27e3abe6
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
