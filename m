@@ -1,202 +1,184 @@
-Return-Path: <netdev+bounces-72978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43C5685A7EC
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 16:57:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 588D485A7FE
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 16:58:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 686EC1C21124
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 15:57:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 105C8282C56
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 15:58:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B050839AF9;
-	Mon, 19 Feb 2024 15:57:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 671A13C482;
+	Mon, 19 Feb 2024 15:58:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="cPfZGq1r"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bRZiDo9P"
 X-Original-To: netdev@vger.kernel.org
-Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01olkn2024.outbound.protection.outlook.com [40.92.52.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBEFF1DFE8;
-	Mon, 19 Feb 2024 15:56:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.52.24
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708358220; cv=fail; b=Y0ZECNK5x8NF1uRTyScdNrpIn0q8HmGfBZ29dnTxVECfBdWzBFWCrXuj6zG3Db4XXum/Qw7vHgJGPG/wz3X5l75NtZp2+0IuMcq9FIoNIKSVdLsjSkG+a0L0bh4kRdSdefFUnuOcTCVOvR9lqcWkbFxbIepdp8HrDmXXCb3C6zY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708358220; c=relaxed/simple;
-	bh=h/ZALkrNjBD+DN2kWgJXn5zPWQkyOBGEaDktEflveDA=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=G9MPp1vUoXK/ZrwADI61o2bb9LhLgbESyNZPCbX1h8dOKkZucewCSuRJ7lVP8BvnQ0iqxkqpcSkjahBqENCPkXRm4ToQfreUgT+YSKAphp/cnb6hsWQ+YHqsBE1J8O4Dm8dfliN6PAVJ4LMCQBH24mHsaGVKwOcMSBXdeXgYo/Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=cPfZGq1r; arc=fail smtp.client-ip=40.92.52.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JJ4y6XBSZVZsb2eSCQ40J0dHPIUVSBqTn5FEqZrwN/PsR1SBoQQEHhouG8O1xnGZ75r08T3WSpqH89vhillZYGAjDqwhGiSGJx5NbHmgRxVJmhHZjf3qAzrVpMA7qN9njWmID6S9wZfPWHAQL6VDyUa/RcT+sHO9GpMPMIrcR5iRzy6++cAbd/aT/mMsatBIcxJ1vUZZUPFlUkoEPYdsy30FpZgEs39VzxgyHFEgS6MY62ie7Bm7MjskCuZyiFo588LwEkiuWXWIvAH7FSePp7eomtBrLj423SjNxf7WWudSXVDbdwNcEZ2TAsfiGo+ibauDRERCad4PGC+i3tOaSw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=faohQmhY9PxliFMJJTev2O4hahpWTrxm6nbIV+473Qc=;
- b=HNwotOKZj9OT+Fgy7rwROGkwJp4Xdt/z+ZzVdKVnQ+SAc1TBPs22MpbKQBoxLLyrRUz710HCxK8vBc34gWZngrNeT8MvuKX6CnoO1Y6BWjmKwLhF5BcNV8U7FwQx5Q9Iczg+DSb0vB9keD/8vHMk360gIrjaIHe8h5NZW+WQavXLhdPuNDYLf2TiQoqiYJczPBsk4eab93d+VPLBcl50/jlAE6bWpshCXy2R7dybvdfhcmlI1ext38sJB9EWvkLwAJT4iYzmkfhUUvdXPOFFW5aWHk1qQo5h/GkLZbZiSNg3xKeoRaM5QYmIVAGg7DlEagiKzhFoQ2MG1i7AmAOxfw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=faohQmhY9PxliFMJJTev2O4hahpWTrxm6nbIV+473Qc=;
- b=cPfZGq1rLb1MhmG2vjwppHVcXfD//2bKznZr7AA4/QAyxi6krpOEpH4qW8U5C5eAwrWjfi//8834Fb618TCZdla97Drgq32Qt5FSm50kdrxpVoziEjGtSeO/IVH2GDbXlbutM+6wn2Nle28WITFrzlntogzLWKEzNFXhOd6oapfkFtFlvq+9mYJ1fzw3fhcgj89LyVHJXAL8AuM0mL6cADAw8SB3OBzpNdL67aA7xyhB9C37JszBZ+LyGCCPK8oMAYpNNL2pD3hnSOjDhye3QdgmishiS1llf+0HOsP1nLVTX/TO1oheDJHNNpuX4kTVhDUdr8pudIJ6L9seRvCu8w==
-Received: from KL1PR06MB6964.apcprd06.prod.outlook.com (2603:1096:820:121::11)
- by TYSPR06MB7483.apcprd06.prod.outlook.com (2603:1096:405:8e::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.31; Mon, 19 Feb
- 2024 15:56:53 +0000
-Received: from KL1PR06MB6964.apcprd06.prod.outlook.com
- ([fe80::c971:fdb5:84cd:dd71]) by KL1PR06MB6964.apcprd06.prod.outlook.com
- ([fe80::c971:fdb5:84cd:dd71%7]) with mapi id 15.20.7292.036; Mon, 19 Feb 2024
- 15:56:53 +0000
-Message-ID:
- <KL1PR06MB696494800980E97A1CBD449E96512@KL1PR06MB6964.apcprd06.prod.outlook.com>
-Date: Mon, 19 Feb 2024 23:56:42 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/6] net: hisilicon: add support for hisi_femac core on
- Hi3798MV200
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>
-Cc: Yisen Zhuang <yisen.zhuang@huawei.com>,
- Salil Mehta <salil.mehta@huawei.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Yang Xiwen <forbidden405@foxmail.com>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
-References: <20240216-net-v2-0-89bd4b7065c2@outlook.com>
- <20240216-net-v2-1-89bd4b7065c2@outlook.com>
- <20240219155346.GE40273@kernel.org>
-From: Yang Xiwen <forbidden405@outlook.com>
-In-Reply-To: <20240219155346.GE40273@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TMN:
- [GG01HwWAa1FZ6a0OKSswIQ0/hdkZcAZ0dNtUaxS2XADeYCKLuONZHdaNrpORaV65lP0waORTR7M=]
-X-ClientProxiedBy: TYAPR01CA0167.jpnprd01.prod.outlook.com
- (2603:1096:404:7e::35) To KL1PR06MB6964.apcprd06.prod.outlook.com
- (2603:1096:820:121::11)
-X-Microsoft-Original-Message-ID:
- <2790f5d0-16a1-4b29-af36-b5d621570bf4@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 970D53C09F;
+	Mon, 19 Feb 2024 15:58:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708358310; cv=none; b=s/zWtNYzFXhLJm8+4jTsIfJzfJKgAU+jiARm7aQn+07+ZdHJabP/E99+gARGgjwk27dAhKUxcwKjiT91G3vgJr8gBFdkfHyNTHk/0Qc29K5vg324bYwnUvHJR5crYIbwOihZ9NP01weYuJcmEaK6gFNUBROG26NFHSkC2qXg0rk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708358310; c=relaxed/simple;
+	bh=icU/jxR0DFDHz5XD9AAV7lcBtUbJa4K2a1BPr/lVQOg=;
+	h=Content-Type:Mime-Version:Date:Message-Id:Subject:From:To:
+	 References:In-Reply-To; b=rVuECbyUJPwIztrlHLTCB0q5GC56rVmqe2zx8r6Hjv2Q/LA5k/610EitvQYb2fyXo2t0QNiW0hUCyvTQHPDws5DQn4p1apiAgsoNerFd8NEcIUsBxBJanwRPPs0jH5XMM0oQTVcojqzOjDKb+bq32pRHJJDVrIHIZQP88OnzHgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bRZiDo9P; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a3eafbcb1c5so103413366b.0;
+        Mon, 19 Feb 2024 07:58:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708358307; x=1708963107; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:message-id:date:mime-version
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tiqLc5KdCmtjYQt/eIFsjHHh0iB3V/zgzPhPHivKtAs=;
+        b=bRZiDo9PXa9+VKDjKADljVQkf4cPFN6ym9XX5wiIKCHgX6kg/EpiHWUYiwTYKijb54
+         LItev2WCuyWWY18OKeyqcjybUqNjU+yp4W4ABb/hfC37Y84i8q4OeLb5lZLi5sU9MSH4
+         7cg+ZWqH2dN9ThbqN2+/VD05cUjnzHrHPu3o82Dg/HhVsjG0gsdFrlJJvFr2ctq6/RuL
+         lPlDBrypYSRIURvSXHpTjt1er6X0q1HUM+HuC0hljfphEkYOHkn3QU4aPd9SGJgEHKBd
+         +XXE3tWBMpTHN9zC2NQKpCzwn8kQRBeUD5SwEJhs0kCPjd7Jj+G3H76L56dK580YF30c
+         9bKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708358307; x=1708963107;
+        h=in-reply-to:references:to:from:subject:message-id:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tiqLc5KdCmtjYQt/eIFsjHHh0iB3V/zgzPhPHivKtAs=;
+        b=Z4EIHk1j/DhSfCAsOqRm95EX1S0ZkZSfWKSsdSHj+fPMFdqvNyjy+W2tkv7tr18iGK
+         1mr2DIFPasJAQJ4SUxR8vGUW33R+5oYhHLV0zoHULZqlypGr1NZ3/n26yTRJtaRnm+ce
+         u5d5uJKTiRBDS6rPUbZ84YYGxv0a85dt7d2K8BNGGX4evNVgArNRUoVsCJjb0LFglKx/
+         T11WgcTEgD1dva9YTXoT5HttctKcG3hL0+MvpnLtiEoOj9l0V5DXUE6vTB3VtpFzC/oA
+         hPM7lW+7XtEJDacgVG7JPN11tpqMNcYJY2Qlb2xmR4jqbI+6bFOLv0vXE1HU484DzjJK
+         X77g==
+X-Forwarded-Encrypted: i=1; AJvYcCX38WLLdJbhz3FOzPkjqIAFVVLKXvIY0TMpNDu1f8Ias4ldEMla6J5WOYXAko8WoaLeBiFD523ZEpEaJMNTNThrJGNC3QWA6xr+OzTRbOF42UFt2WlIQRFez3DpJENx3AzLJQgAU8T2zdinTIYGqgk9pp/JQX8VmCjVTL20Zhv24IjhEC8bc+PnXQ+g8dIGCY/2Xz+GImJpbMcqUwJWlNW5ERQFITaQV5V+ChjcF+hp+nA8suA+q58rLhifmhysVn5ifiIYCuieZ69CexbGWMMGUdtsaY41XXIPDhdCODXZJjBnenrN3MkXyWY6b1RAC4F/L7GlOlexPJEUUGyiNAoMNlc=
+X-Gm-Message-State: AOJu0Yz3zkXOK1pYz0UfPEWI69hknu4v9ioIbxNtTaqSR/rxlW6U5E0c
+	EYRYtTZPkCnvYap9jB7BB4ZZIYL5IKNGxZ+rH2mSY2aQyHeJO6N3
+X-Google-Smtp-Source: AGHT+IFtwqfaW9gJsxLy3j5F49CYy1xFjRlT0RRadI4Z0IOCUNhh1itGGGOPl5tKEJMCv67TBumOMw==
+X-Received: by 2002:a17:906:851:b0:a3d:80d7:d1e3 with SMTP id f17-20020a170906085100b00a3d80d7d1e3mr7428154ejd.77.1708358306585;
+        Mon, 19 Feb 2024 07:58:26 -0800 (PST)
+Received: from localhost (p200300e41f2d4600f22f74fffe1f3a53.dip0.t-ipconnect.de. [2003:e4:1f2d:4600:f22f:74ff:fe1f:3a53])
+        by smtp.gmail.com with ESMTPSA id rf23-20020a1709076a1700b00a3da5bf6aa5sm3076542ejc.211.2024.02.19.07.58.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Feb 2024 07:58:26 -0800 (PST)
+Content-Type: multipart/signed;
+ boundary=f0caf17c841197981a0b66a2ac604de0b745306e0ba899959bfe0165d31f;
+ micalg=pgp-sha256; protocol="application/pgp-signature"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: KL1PR06MB6964:EE_|TYSPR06MB7483:EE_
-X-MS-Office365-Filtering-Correlation-Id: 91be3064-3ca1-419c-a940-08dc316363e1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	PqG85d+RQcLo5jRizOrdcHhs+v4Gdl7eezqlgB8b4AAgBRxtYafE62H6G1ejm1Wd+c/Dl/G28XDSJRQS8NjmIJdfsHDWfYMpAf43xinKpCbwKBbq4p7iyjjujruuB1jEahoNkomhCwqVhdCXZUSSOl+JPtOUDPzR+i+24UBm4URjmosz4tPVFcAAAURQigh95PNzwYMqRt1ZEoi0Px6ex5TSQaaKupp2P2lvyHNkg6G6Vtm7M4CTnq/ySDA1YXntsx925PT0AFAFMngyuFdAVUpJRZcP66Qo5Up9plfuO+B6GzCRcO0P05KMFGAXc1y/DKPIbCrQa8+oVwqb389LYWBS2T9btFe+M6ypBcNnplHxXcBwVHaZ7tXohE3tbkWXhLQG5yC7Ffoi4yzFNRiPTVEDIebrtetVC9Y1WXs3mDookadNJ3Klc8q7euLzSp7WwoywnuaDGdKG3kk0c0r7beo3eCYn8YwGbUq081Nqcd4EXbdjh+02yb5/zA1SjBJlEB91VbSXOyZVdBk2TG1ZKqnAHg8x9M1lEEVIEcyLnjTcR9sJP+/20eU9buV4ezu/
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RzA1amdjU0NQZ01OMXkrbzFJZU4zalVDS2hBM0RHT3ZzcnZmelVMM0QyYWhF?=
- =?utf-8?B?dkZ5L2lsaU01R3lQekttalJNL3B5RjJ1TS9tN0ZqeWJxcG5kUmFtK3VWYW93?=
- =?utf-8?B?MTlWVVMwa1RpbE5pUVhpb0lWZ1BBUlBaUW1mSDNmUTJjcnV3V1I4Q24wenBC?=
- =?utf-8?B?ZG0wY3pKUUNvZlNKVjFkNWxSMTE2dXFLTm4xWUtSb3p1OThRdTIyUmh0Qm5y?=
- =?utf-8?B?U3UwcDlSU052dlRXWHErWlRLTTNlMzNTaHdhOGxiRk1ISlhZbUlubFNzMXVK?=
- =?utf-8?B?cEdCcjBzUE9zSzMyeFpmcGZEbWRFcE92bWwrSUw2VFBDazV4RUFyNjFIMWhx?=
- =?utf-8?B?VUgybGo2SnZSNm45YUswTGdCa1NCbEd0VjhJL1ptQlVLTXIwWjM1UzVYeVlh?=
- =?utf-8?B?dW1yckNrd1J0SDRSb1ZFYTRYdENFTEhMcXB2ZHlrUlVOcTZkTjFweHFCSmdo?=
- =?utf-8?B?alFYWFFYR015dk91LzZtZlhKWVh0RzdjMmlvVnJCUndxTXNZcVFacitTcjZO?=
- =?utf-8?B?WlZ4Kzc0bWcyVHFJcmc4amlHWlpPbkFsMTRCcVpmZXhmN2U2UE1sSU9hV0s1?=
- =?utf-8?B?ZEw4L3pFcUV2MU1oQ2ZNa2YyRE43MHJHRlhHWkJqMWJxazNId3dCcHVKNVls?=
- =?utf-8?B?NFlwbFB0UzFZNTJYMGwwcWR0OExQckRObElrVTdoS1N5Y1JaVUxrRWNCS3RJ?=
- =?utf-8?B?cEw1SkYyNlNlbDNhRWFBQkU4K2RqWlpxTWN5RjN2VDQyQzZ4RW9FVWFyaG8w?=
- =?utf-8?B?TEZLaW1sWHhVc3JNSUl0NWVNWlNGZ0lUclgvQTl6ZHpqZ3JKRWNHR1BzQ2NG?=
- =?utf-8?B?bkVsNy9tcWxNS1pGeDJkZ3RKSjhlL1Q1cGV0RlBWelUrKys1TU1hdy9MYzdi?=
- =?utf-8?B?N3NXY2xDdkVjMldQTTZqWEtoUUtQMS9WVWt3M3lVQUszZHBUMEJWY1hBOWJk?=
- =?utf-8?B?R0pSamdrODlCUUhlU2QxNkgrOXpFUHNvQ05ESjRnWWQwcUpTR0pTeHNPLzVT?=
- =?utf-8?B?UTJhZlF2VC9wcWhnZ3NFc3BDOHBWdzY0bm9PempFa1VQa2ZVRnNSdGQ2S0tT?=
- =?utf-8?B?TTRPMGx6QkpHbG15STlsRUxzazZNTmtCS1VMTUdPbXJHQjcycUNMVFNBRVN3?=
- =?utf-8?B?YldSSGZseDhUZlE1Uld2M282anE5aTBEcXJheDVUTC9WM1hCdnhkbnhZUkcz?=
- =?utf-8?B?SVIvTHYrVWw0N1o2QkhaOW5nRCtoSGZ2N2hnY3hMMm1WWnlVa0xYcmxVQStm?=
- =?utf-8?B?di82TXFwU0o1K3hPY3lLaHl4VENkamE5UHBSTEV5cG5XTTN6WGszYmdYaHYz?=
- =?utf-8?B?c21kSFFYQ0ZoRXF4eGxsYXl0enkvWE9sNVRPaWxxaGNyWEZVWCt1Q24wMUNY?=
- =?utf-8?B?NU1GUnNTTHpwQWJxMFMvQWJEVjQzQU53UTFiWElvdFp6TGo1ZmRxVEtkbWdu?=
- =?utf-8?B?YmtUOTRqa1h0bUN3YWZYdkRZMFI3aXBxUDFQMHVmN0NoSFljYXYyYXFSRmxJ?=
- =?utf-8?B?dkhpNGd2a1hHbnNQUzRjSDhXRGVzTTRVbEtidUNiZVhoU1p3MkxodXBEVWRq?=
- =?utf-8?B?aDFaZVI2SFpkeVQxeEtabEcxSnc5RGY5MXEzVmFWUFBiOFRRTWZwWURKRlo5?=
- =?utf-8?B?bmY5K1MwUWVNY3dVVHlLYnArQjUwSmxYbEhEcCtVOEMvV1dPMXA4YkxIOTg5?=
- =?utf-8?B?c0dWck01Z2FSRysvOXlQNEJwVUlzL25RaWtOR2I0citDS0pLcUxEWmxjM0tq?=
- =?utf-8?Q?6UAQwW2d+Mo90dy1IzgxWmVl9IM4xHsJCRNKXhx?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 91be3064-3ca1-419c-a940-08dc316363e1
-X-MS-Exchange-CrossTenant-AuthSource: KL1PR06MB6964.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2024 15:56:53.0192
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYSPR06MB7483
+Mime-Version: 1.0
+Date: Mon, 19 Feb 2024 16:58:25 +0100
+Message-Id: <CZ96H72GI4Z0.SZJBZXA1VXJZ@gmail.com>
+Subject: Re: [PATCH] phy: constify of_phandle_args in xlate
+From: "Thierry Reding" <thierry.reding@gmail.com>
+To: "Krzysztof Kozlowski" <krzysztof.kozlowski@linaro.org>, "Vinod Koul"
+ <vkoul@kernel.org>, "Kishon Vijay Abraham I" <kishon@kernel.org>,
+ "Chun-Kuang Hu" <chunkuang.hu@kernel.org>, "Philipp Zabel"
+ <p.zabel@pengutronix.de>, "Jonathan Hunter" <jonathanh@nvidia.com>,
+ "Laurent Pinchart" <laurent.pinchart@ideasonboard.com>, "Linus Walleij"
+ <linus.walleij@linaro.org>, <linux-phy@lists.infradead.org>,
+ <linux-arm-kernel@lists.infradead.org>, <linux-sunxi@lists.linux.dev>,
+ <linux-kernel@vger.kernel.org>, <linux-amlogic@lists.infradead.org>,
+ <netdev@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+ <linux-mediatek@lists.infradead.org>, <linux-arm-msm@vger.kernel.org>,
+ <linux-renesas-soc@vger.kernel.org>, <linux-rockchip@lists.infradead.org>,
+ <linux-samsung-soc@vger.kernel.org>,
+ <linux-stm32@st-md-mailman.stormreply.com>, <linux-tegra@vger.kernel.org>,
+ <linux-gpio@vger.kernel.org>
+X-Mailer: aerc 0.16.0-1-0-g560d6168f0ed-dirty
+References: <20240217093937.58234-1-krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20240217093937.58234-1-krzysztof.kozlowski@linaro.org>
 
-On 2/19/2024 11:53 PM, Simon Horman wrote:
-> On Fri, Feb 16, 2024 at 06:02:00PM +0800, Yang Xiwen via B4 Relay wrote:
->
-> ...
->
->> @@ -826,15 +847,32 @@ static int hisi_femac_drv_probe(struct platform_device *pdev)
->>   						 priv->phy_reset_delays,
->>   						 DELAYS_NUM);
->>   		if (ret)
->> -			goto out_disable_clk;
->> +			goto out_free_netdev;
->>   		hisi_femac_phy_reset(priv);
->>   	}
->>   
->> +	// Register the optional MDIO bus
->> +	for_each_available_child_of_node(node, mdio_np) {
->> +		if (of_node_name_prefix(mdio_np, "mdio")) {
->> +			priv->mdio_pdev = of_platform_device_create(mdio_np, NULL, dev);
->> +			of_node_put(mdio_np);
->> +			if (!priv->mdio_pdev) {
->> +				dev_err(dev, "failed to register MDIO bus device\n");
->> +				goto out_free_netdev;
-> Hi Yang Xiwen,
->
-> out_free_netdev will return ret.
-> However, it seems that ret is uninitialised here.
-> Perhaps it should be set to a negative error value?
-Oh, you are right. Will fix this in next version.
->
-> Flagged by Smatch.
->
->> +			}
->> +			mdio_registered = true;
->> +			break;
->> +		}
->> +	}
->> +
->> +	if (!mdio_registered)
->> +		dev_warn(dev, "MDIO subnode notfound. This is usually a bug.\n");
->> +
->>   	phy = of_phy_get_and_connect(ndev, node, hisi_femac_adjust_link);
->>   	if (!phy) {
->>   		dev_err(dev, "connect to PHY failed!\n");
->>   		ret = -ENODEV;
->> -		goto out_disable_clk;
->> +		goto out_unregister_mdio_bus;
->>   	}
->>   
->>   	phy_attached_print(phy, "phy_id=0x%.8lx, phy_mode=%s\n",
-> ...
+--f0caf17c841197981a0b66a2ac604de0b745306e0ba899959bfe0165d31f
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
 
+On Sat Feb 17, 2024 at 10:39 AM CET, Krzysztof Kozlowski wrote:
+> The xlate callbacks are supposed to translate of_phandle_args to proper
+> provider without modifying the of_phandle_args.  Make the argument
+> pointer to const for code safety and readability.
+>
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> ---
+>  drivers/phy/allwinner/phy-sun4i-usb.c              |  2 +-
+>  drivers/phy/amlogic/phy-meson-g12a-usb3-pcie.c     |  2 +-
+>  drivers/phy/broadcom/phy-bcm-sr-pcie.c             |  2 +-
+>  drivers/phy/broadcom/phy-bcm-sr-usb.c              |  2 +-
+>  drivers/phy/broadcom/phy-bcm63xx-usbh.c            |  2 +-
+>  drivers/phy/broadcom/phy-brcm-usb.c                |  2 +-
+>  drivers/phy/freescale/phy-fsl-imx8qm-lvds-phy.c    |  2 +-
+>  drivers/phy/freescale/phy-fsl-lynx-28g.c           |  2 +-
+>  drivers/phy/hisilicon/phy-histb-combphy.c          |  2 +-
+>  drivers/phy/intel/phy-intel-lgm-combo.c            |  2 +-
+>  drivers/phy/lantiq/phy-lantiq-vrx200-pcie.c        |  2 +-
+>  drivers/phy/marvell/phy-armada375-usb2.c           |  2 +-
+>  drivers/phy/marvell/phy-armada38x-comphy.c         |  2 +-
+>  drivers/phy/marvell/phy-berlin-sata.c              |  2 +-
+>  drivers/phy/marvell/phy-mvebu-a3700-comphy.c       |  2 +-
+>  drivers/phy/marvell/phy-mvebu-cp110-comphy.c       |  2 +-
+>  drivers/phy/mediatek/phy-mtk-mipi-csi-0-5.c        |  2 +-
+>  drivers/phy/mediatek/phy-mtk-tphy.c                |  2 +-
+>  drivers/phy/mediatek/phy-mtk-xsphy.c               |  2 +-
+>  drivers/phy/microchip/lan966x_serdes.c             |  2 +-
+>  drivers/phy/microchip/sparx5_serdes.c              |  2 +-
+>  drivers/phy/mscc/phy-ocelot-serdes.c               |  2 +-
+>  drivers/phy/phy-core.c                             |  8 ++++----
+>  drivers/phy/phy-xgene.c                            |  2 +-
+>  drivers/phy/qualcomm/phy-qcom-qmp-combo.c          |  2 +-
+>  drivers/phy/ralink/phy-mt7621-pci.c                |  2 +-
+>  drivers/phy/renesas/phy-rcar-gen2.c                |  2 +-
+>  drivers/phy/renesas/phy-rcar-gen3-usb2.c           |  2 +-
+>  drivers/phy/renesas/r8a779f0-ether-serdes.c        |  2 +-
+>  drivers/phy/rockchip/phy-rockchip-naneng-combphy.c |  2 +-
+>  drivers/phy/rockchip/phy-rockchip-pcie.c           |  2 +-
+>  drivers/phy/samsung/phy-exynos-mipi-video.c        |  2 +-
+>  drivers/phy/samsung/phy-exynos5-usbdrd.c           |  2 +-
+>  drivers/phy/samsung/phy-samsung-usb2.c             |  2 +-
+>  drivers/phy/socionext/phy-uniphier-usb2.c          |  2 +-
+>  drivers/phy/st/phy-miphy28lp.c                     |  2 +-
+>  drivers/phy/st/phy-spear1310-miphy.c               |  2 +-
+>  drivers/phy/st/phy-spear1340-miphy.c               |  2 +-
+>  drivers/phy/st/phy-stm32-usbphyc.c                 |  2 +-
+>  drivers/phy/tegra/xusb.c                           |  2 +-
+>  drivers/phy/ti/phy-am654-serdes.c                  |  2 +-
+>  drivers/phy/ti/phy-da8xx-usb.c                     |  2 +-
+>  drivers/phy/ti/phy-gmii-sel.c                      |  2 +-
+>  drivers/phy/xilinx/phy-zynqmp.c                    |  2 +-
+>  drivers/pinctrl/tegra/pinctrl-tegra-xusb.c         |  2 +-
+>  include/linux/phy/phy.h                            | 14 +++++++-------
+>  46 files changed, 55 insertions(+), 55 deletions(-)
 
--- 
-Regards,
-Yang Xiwen
+Makes sense:
 
+Acked-by: Thierry Reding <treding@nvidia.com>
+
+--f0caf17c841197981a0b66a2ac604de0b745306e0ba899959bfe0165d31f
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEiOrDCAFJzPfAjcif3SOs138+s6EFAmXTeqIACgkQ3SOs138+
+s6GdEBAAsZtqIRL7k6ZV5nu5N0juG6RO7Sm34o9+isHlbNUAhmDQeIXxdlWIF3qc
+ap2W/H4jLtQnrDaCtdFWa5oPx8Ud41AKoeOQRlZq6goHZemt2JbUyB5IzsMIL0KN
+FUGwvVEZdDnJbhe2+8YX0fN8WG4qpAYo7vrb1XsgP4RzGwgkwH64LbCOtoAoYtYl
+rOc7hn6eNJrIYlW1LaU37BApWV0KgdMiI1YSILAT5YJK24fYst7j//8UxyEQP4aO
+S+3uPr8/1K1JifAihpgqu7w5kyDcMW1ncoAamilKe2xDzz7wJ8wxtYcdypnwBSpd
+/+rhMybnEj2kgbDrSbY+LVlczSU6Wf/SEtZzB+DOCE4+CZrtFyMVsSgAeVXFT1n0
+L5vTh0182skHEAm97GXHwoQOmLND8wJJVZR+Sw1OApxEYI1Y8hTx33NrbA+5hiVq
+15m0Jq8NXvpd237p5obNfFNuDmK/BlMhlq3x+3/aWGqT+pRlavF1i0HP/wEV9YoC
+6zleWWkx9BAonksD76uhrk/LBnYnc3wb9O5B4KS6dp+tYE3ekIWauHxzhg4tpOcg
+FqcY6ObCs+Jjtplo4vtrTBR6A4jdvunJQcp4WqSO/5RkZd/ySVdSbpvCdK1yy/JM
+j7SSnUWV03IbkbGoBduin/a8YT84GAn3seVzxO0ik5dpZHGbAPM=
+=Z186
+-----END PGP SIGNATURE-----
+
+--f0caf17c841197981a0b66a2ac604de0b745306e0ba899959bfe0165d31f--
 
