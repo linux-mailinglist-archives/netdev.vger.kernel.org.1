@@ -1,104 +1,76 @@
-Return-Path: <netdev+bounces-72908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FAB585A147
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 11:47:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C58A85A16B
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 11:52:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41D6E1C21ADC
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 10:47:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F4AA1C221FB
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 10:52:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0E6028DBF;
-	Mon, 19 Feb 2024 10:47:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3714228DD1;
+	Mon, 19 Feb 2024 10:52:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ChvL16FM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BV0zLHHl"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36F3F225D6;
-	Mon, 19 Feb 2024 10:47:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0854C1C10;
+	Mon, 19 Feb 2024 10:52:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708339664; cv=none; b=GX712Bsbm4tQ7sBpeGVjTR6aBDBxOdYle9yVME+1Cfqb8NDQTell5OquzCzzMdkUPnC7Vv+7GcQdFuZ03DDM0F6S+pBUgRdjmPu4+oniKahrVNzAPC9FHcamiXRL6uCKObO5CH7o1KJoEqRsQwyo3aoWQWR2furySSpbetll9sw=
+	t=1708339961; cv=none; b=p8uSi6z7cvc/swQWR4Vi2lZJouL1Of/2k9IHmB1/5i+bRGD9OzcZggOrNI+BKnBIfwGBe+Byp3ezomE8AchQd7EGMZIU1C02CV5zCoFr0GsiZRlPpCeXBtx3N+hmneQkuPH5eKYDEBAZueCZWIdNpezSAXCzU066aNjnxVWc66Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708339664; c=relaxed/simple;
-	bh=IjD3KjlInPdC9j3gqlAjiWwXuf8HhsRsxG2eOie2kZg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=h+cm/igvze+usi60LfFrCz16CRBLZ23FTN/s2NOnkD3K71961Lh5SAG7Sghq5n+Pi3IYTVGRvfj1FHq0gKuh7eqFaflPUwMc22+IkSxlqEpAPkAOTx/qTPIp4rovmKAlx2GflgfFLi8DdyPbJkdC/7AWECT0DNRVMvfhD3BXQyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ChvL16FM; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 4B0D1C000F;
-	Mon, 19 Feb 2024 10:47:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1708339660;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6/8X8MqPF3pfDiFGXEDHHnwpDDYSllQCPO/MEgL1lXU=;
-	b=ChvL16FM29AidITMPbL97+0a2Snuu4mSkwT2AR92JDYr+LEynE1KRbqFNsVuCey8MD+Nyq
-	cQWGHhEfoF75UIQRIxWGaFrDAXCZVmK3oA4icyF2NNnUhNtQcrU+34ojHLrz/hjt6NOBSE
-	RFRsiWbt1KZPUrb5xZpz02cdlrVgWlamHTXGF39P0vhxv+KzAY6IorbEIClBDSomIh52zX
-	zcCtV4hqAS6CkXtiFoLOir8nu1LNYA/VDJ/n98UJALAaTyxzHMjfoC+9iRudkCHkjEgUAP
-	u2CYcIWqJg6+/pgAz2wsYWMjG9oKRtZh9ieSdo58WNv1/DTf8uRSjgVoGuSeSg==
-Date: Mon, 19 Feb 2024 11:47:37 +0100
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
- edumazet@google.com, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt
- <stefan@datenfreihafen.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, horms@kernel.org, linux-wpan@vger.kernel.org
- (open list:IEEE 802.15.4 SUBSYSTEM)
-Subject: Re: [PATCH net v2 2/7] net: fill in MODULE_DESCRIPTION()s for
- ieee802154/fakelb
-Message-ID: <20240219114737.79eb9ff6@xps-13>
-In-Reply-To: <20240214152741.670178-3-leitao@debian.org>
-References: <20240214152741.670178-1-leitao@debian.org>
-	<20240214152741.670178-3-leitao@debian.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1708339961; c=relaxed/simple;
+	bh=Q4NsvvYSuir97OFwMmHvNRy3c3JBCxlYJttiAWiO/xs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dILRw0nBrQN6ZFmstluOoRKvECEfFZWgd5dFiwL2Ce7hIKj2gONSGReCU7dvHGL6/eup5sujeO+i3Hl99abjlxe0JqzF6pLUe/Jovdg3EOa6VeInVgHJgUsr1BPypjc7bg++sZHUdNYrEB8uSZ4vG9HMKFg4liV8iSvcWUvcGIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BV0zLHHl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74408C433F1;
+	Mon, 19 Feb 2024 10:52:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708339960;
+	bh=Q4NsvvYSuir97OFwMmHvNRy3c3JBCxlYJttiAWiO/xs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BV0zLHHlb0odT0Raki8ppmoWy0b04lWRSANyB3IJV3PIkFEnw7P4U8M3lKyz+jiMU
+	 6Zb90NlIGbYBflGZpakkvh0oWcmCVG/JuXsG9Ue8BOik42Plq0EG5h+im9QUy8sT66
+	 epdVKGzH4DtI7y1rjrsvmNVasLr4TmCZe5Rxi2IMhe1OsB2pz67LeDQwMhnjIP9S7V
+	 U6WdLEPYm/AqXKZ8Zbi/vWZ2swE5HMyKcTDb/RhyV+OYMY305iS1uh0psL0caweCyf
+	 o/TCIDQlU+JcXtrTq4+1EjQJF71P/PQJ9Ns0HuvUN5rSBfYlFWOZ7caXbjo3zWU9CI
+	 FHpiKb2PZRC0Q==
+Date: Mon, 19 Feb 2024 10:52:36 +0000
+From: Simon Horman <horms@kernel.org>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Johannes Berg <johannes.berg@intel.com>, linux-kernel@vger.kernel.org,
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+	Johannes Berg <johannes@sipsolutions.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v1 1/1] wireless: Add KHZ_PER_GHZ to units.h and
+ reuse
+Message-ID: <20240219105236.GY40273@kernel.org>
+References: <20240215154136.630029-1-andriy.shevchenko@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240215154136.630029-1-andriy.shevchenko@linux.intel.com>
 
-Hi Breno,
+On Thu, Feb 15, 2024 at 05:41:36PM +0200, Andy Shevchenko wrote:
+> The KHZ_PER_GHZ might be used by others (with the name aligned
+> with similar constants). Define it in units.h and convert
+> wireless to use it.
+> 
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 
-leitao@debian.org wrote on Wed, 14 Feb 2024 07:27:36 -0800:
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-> W=3D1 builds now warn if module is built without a MODULE_DESCRIPTION().
-> Add descriptions to the IEEE 802.15.4 loopback driver.
-
-Acked-by: Miquel Raynal <miquel.raynal@bootlin.com>
-
->=20
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> ---
->  drivers/net/ieee802154/fakelb.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/drivers/net/ieee802154/fakelb.c b/drivers/net/ieee802154/fak=
-elb.c
-> index 35e55f198e05..2930141d7dd2 100644
-> --- a/drivers/net/ieee802154/fakelb.c
-> +++ b/drivers/net/ieee802154/fakelb.c
-> @@ -259,4 +259,5 @@ static __exit void fake_remove_module(void)
-> =20
->  module_init(fakelb_init_module);
->  module_exit(fake_remove_module);
-> +MODULE_DESCRIPTION("IEEE 802.15.4 loopback driver");
->  MODULE_LICENSE("GPL");
-
-
-Thanks,
-Miqu=C3=A8l
 
