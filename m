@@ -1,130 +1,97 @@
-Return-Path: <netdev+bounces-72960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79FE485A640
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 15:42:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A63CB85A681
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 15:54:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35ED3283C45
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 14:42:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 609CE283D83
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 14:54:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B42CE1EA90;
-	Mon, 19 Feb 2024 14:42:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9943837701;
+	Mon, 19 Feb 2024 14:54:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QSE3iKHm"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0q6JjzVg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC0E1E89E
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 14:42:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7C9E376EB;
+	Mon, 19 Feb 2024 14:54:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708353772; cv=none; b=UIls5czHHz/s9DiWBOmBPeX1ot5rsk+FgeqlbpCgoUxAxaFphdFOQ/fiqPzuXCLBW1iX+FhVswevAPEwolUxAApp4JuQlI6OL9KIH7fASDx4TlNh2AS3u0kp596zJ/oiVBk0CWXsBRJiXLyumeRLiTihBRu6FNb8aSUw8maBfoc=
+	t=1708354457; cv=none; b=SoInrIjDw0et4rSqTnsPderAmuoizvJ3E1jJgbv7vwWp1hiGbJAe+sF0UXRVXkxaAcKIx/boczKS68+I9dzvAytr3DE60DhY8AKGUrYXanVN6PDz6N2eex/8jYYDO9hB1fkqK+UkoWtp1i+1HKZyP1HIxuUjmiy2t9YPNsKY4Nw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708353772; c=relaxed/simple;
-	bh=pAQ36Mouu5LBU9w/qPkLQEX9p2kwmTFAJ2rFQbxWzyY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=M8P/KpOi9MFoUdjDYaittWQR5dV/opeoBVCBJXnf3UCiYQfBdrubCD1tJILDLtJjNN/Ut84aMULOxpSfkyLRRk1w5iEXL8yt8uf98aYhQhAfl+aZSx3i4RIzInTWI0Ng8UIRCWu791QjNmW0J/tMzEfGpTShFCGKJgpVC4sH2lE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QSE3iKHm; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-561f0f116ecso13742a12.0
-        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 06:42:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708353769; x=1708958569; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QK6TJ1NiFtkG4ibJWHZitNlZraEYM47hN7HesdXjSmk=;
-        b=QSE3iKHmoGpXseBVKAYWaMMwr41vY9ifkCHKdzm5WGSeedcwHNIL1QSLMtyn6dyUkm
-         SwYqRkY5iJU9X6PQnsQgQloOskR3MkfKDEJkRvWom61X34cVgH65ecqQ4HHUhVHHSteC
-         9b7MU9htDrwUXtF0edX1FZzmwduIJyDE+xA8SuN8A1Cq61wZznvsNJMwzn4f/+g3RqLg
-         KUHZY/hSeuWJjcX6jYzbQC3MLN0tzK9mrwV+wHTGHOxES9J6hOuUV92VIXGv2XRbFx+H
-         7cM5D/TgmqOZH//tsrWNwHSTPIuBRx1xnykvLlKcNnMDZ4KJnkOr3FK9nJ+J/+81ASXH
-         9jCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708353769; x=1708958569;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QK6TJ1NiFtkG4ibJWHZitNlZraEYM47hN7HesdXjSmk=;
-        b=PBiZXdwo41VUWZYWkuDoIml4HLBtgRI9X9IyaiLu1xwS5xoIAGqQiyvJwqj6Qjmhpc
-         CIonnpuXzTvy5gR2vXwOmHFrIIl0v7xN51KFxF/NJL0iODQ3TILq12V1xcFEAqebicKD
-         dRoWFupbku7CrLQK5YHAgPpWUrcB/sFqCzWeZafYuNgPM1P6D62w9cvsA6LaM/uxelm1
-         GuxOMLumwecPisDNL8uHggN5lHa5gvjp5REKCXbFJi71dTkpe5NERZYF7icBeqYzDlGs
-         FCeBnVUNdl9vqyTcCQ6rVAI0aPrRrEfYVOHQnfgSgRxWhc7SpDJAsAsnjfU4mJkmW5+8
-         TXrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVSVsAeN083gLXV2C5sawEgqVeDA2slIV6CKRqOrrOr9TwcMxwP4hgVJ8Cer4+0F/NP/uuI/3GBUlqURcBuemiu/IMKncaB
-X-Gm-Message-State: AOJu0YwBlzpNrSWocQmhO515LtapwsO42ev1vkXOPZPdmM0Kj8DG0qbW
-	KNvLs9LNni+jusqgTJVwoBQhjIxpk5tkGSjFK8NONO0Afde4Mitfx6ks9Jc8uB5F2V42qH3EEiD
-	i/+O2Z2QnkZM0H6I+S2s4xRdBivQ8KANJ+LMW
-X-Google-Smtp-Source: AGHT+IETr5Fg0KJAZlnaeDsbnQhKIQl70L4uyU1bEvQGzZr716e4ct6UKPj1TKwF25G19fVSf9HT3kKxRf0iELr+aGg=
-X-Received: by 2002:a50:a697:0:b0:563:ff57:b7e8 with SMTP id
- e23-20020a50a697000000b00563ff57b7e8mr298755edc.1.1708353768955; Mon, 19 Feb
- 2024 06:42:48 -0800 (PST)
+	s=arc-20240116; t=1708354457; c=relaxed/simple;
+	bh=NByqa5JR2sbTrM+lED8CMmGy7fktPgFCBzkQex3upck=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fcAhzwsIJPNdp1Ow9GTtYx757p2nKAt7yiKuTX7C+oUGwXdktWWoBaJtXO4oicv8ChVy5gd/Ut/ZbKv1W1QK5LDlTAEllSbee+zc/j9TX2SrTOK6zaAkxN9x38apuSWKmOdsX2n35HxiETz5C2bmlNgvgWvxX5QvwgLt+TpbEWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0q6JjzVg; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=1A2eoDTWMwIQFZSM+uBH2DkpzzVuHBOEOyCA7oEZ4xY=; b=0q6JjzVgLkl2r2kzkNIYOgzQhi
+	1O/QJsD412PmUpJx2B9C+HVEufUbi87WeWI7pmOmjyQOs0Uv5+4vziNKxpmTugxVLBfKsmVW7RcaC
+	d3hUlNgIQaeutXBpT2BfONiQuqKE0oDeypf1joMmT7DOVp8fZLUIB+XFMzpWzCdNhzkM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rc523-008CcE-W9; Mon, 19 Feb 2024 15:54:12 +0100
+Date: Mon, 19 Feb 2024 15:54:11 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Mark Brown <broonie@kernel.org>,
+	Frank Rowand <frowand.list@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v4 14/17] dt-bindings: net: pse-pd: Add bindings
+ for PD692x0 PSE controller
+Message-ID: <042ab32c-666e-44f7-8ba1-db9a82f351d1@lunn.ch>
+References: <20240215-feature_poe-v4-0-35bb4c23266c@bootlin.com>
+ <20240215-feature_poe-v4-14-35bb4c23266c@bootlin.com>
+ <ZdCjJcPbbBGYVtuo@pengutronix.de>
+ <20240219153840.507be7b3@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240219095729.2339914-1-vschneid@redhat.com> <20240219095729.2339914-2-vschneid@redhat.com>
-In-Reply-To: <20240219095729.2339914-2-vschneid@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 19 Feb 2024 15:42:37 +0100
-Message-ID: <CANn89i+3-zgAkWukFavu1wgf1XG+K9U4BhJWw7H+QKwsfYL4WA@mail.gmail.com>
-Subject: Re: [PATCH v3 1/1] tcp/dcpp: Un-pin tw_timer
-To: Valentin Schneider <vschneid@redhat.com>
-Cc: dccp@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-rt-users@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, mleitner@redhat.com, 
-	David Ahern <dsahern@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, 
-	Tomas Glozar <tglozar@redhat.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
-	Thomas Gleixner <tglx@linutronix.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240219153840.507be7b3@kmaincent-XPS-13-7390>
 
-On Mon, Feb 19, 2024 at 10:57=E2=80=AFAM Valentin Schneider <vschneid@redha=
-t.com> wrote:
->
-> The TCP timewait timer is proving to be problematic for setups where sche=
-duler
-> CPU isolation is achieved at runtime via cpusets (as opposed to staticall=
-y via
-> isolcpus=3Ddomains).
->
+> Mmh not sure we want to support broken cases that does not follow the spec.
+> Should we?
 
-...
+We should specify the properties a device following the spec should
+use. These are the common properties we expect all devices should be
+using.
 
->  void inet_twsk_deschedule_put(struct inet_timewait_sock *tw)
->  {
-> +       /* This can race with tcp_time_wait() and dccp_time_wait(), as th=
-e timer
-> +        * is armed /after/ adding it to the hashtables.
-> +        *
-> +        * If this is interleaved between inet_twsk_hashdance() and inet_=
-twsk_put(),
-> +        * then this is a no-op: the timer will still end up armed.
-> +        *
-> +        * Conversely, if this successfully deletes the timer, then we kn=
-ow we
-> +        * have already gone through {tcp,dcpp}_time_wait(), and we can s=
-afely
-> +        * call inet_twsk_kill().
-> +        */
->         if (del_timer_sync(&tw->tw_timer))
->                 inet_twsk_kill(tw);
+Broken devices can however have additional properties, defined in
+their own binding. And if we see a pattern for broken properties, we
+could pull them out into a -broken.yaml binding, which the broken
+devices could share. 
 
-I really do not think adding a comment will prevent races at netns dismantl=
-e.
-
-We need to make sure the timer is not rearmed, we want to be absolutely
-sure that after inet_twsk_purge() we have no pending timewait sockets,
-otherwise UAF will happen on the netns structures.
-
-I _think_ that you need timer_shutdown_sync() here, instead of del_timer_sy=
-nc()
+    Andrew
 
