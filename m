@@ -1,67 +1,71 @@
-Return-Path: <netdev+bounces-72885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2AB185A07E
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 11:05:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CF4485A0AA
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 11:13:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79CF41F24852
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 10:05:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9CBCFB21AE6
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 10:13:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23FC625567;
-	Mon, 19 Feb 2024 10:05:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08D9825574;
+	Mon, 19 Feb 2024 10:13:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hIqlK0/x"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZuOePoPs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9F3C22F13;
-	Mon, 19 Feb 2024 10:05:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE0DD2560F
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 10:13:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708337130; cv=none; b=VoEE4enWR486j1JxDr5+t7vfDjkOqx9V5qm5tjiXgvunFWWNI8AFJwNNie4mYag3Pgp1xeRMCmRB1Tu3kAkKN00HZv2FwOq9pQdH0QHlDGhq6dIks1nKy3qn+cTKqiJGjfEc7Ah5Dl6da8DqmXBezEeucWj2YL8tkQSBSfZeavA=
+	t=1708337606; cv=none; b=st4YD6VCdqHQoDQlj6FcWlDnPf4nQN+sgfNQgFlt8929CUJuXVjohmPwwvnvdyzx/3SwotWq6K8ds8AXzdeM+BSqbfN79jvOBMbWkDRV28UV4yIONQVs4ByWgvp3yY8nkM6bI61SkjMUS2z+PQmPoigIGtfwNSe3v5p9Ojez7B0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708337130; c=relaxed/simple;
-	bh=Wp1z8DD4y2npUVyApGi7Hca+cEHUY33+maH5kr1tQf8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=M5J0459LtIsBn5CrllFaKzjzjOuEYRcrwl4pxU+OeD3NcskIjR1gnmPYn/dObHNKJ0fajcAXs59iufV31XoXCWOiGluTIV51rX6BHlQMdrX6E8lPR8Ww6t8dVh3vWHq9KZU3wFB0exiaiM7fjiqFJ/dPkm0goPL7+QJPJKkB5Lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hIqlK0/x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C83B9C433F1;
-	Mon, 19 Feb 2024 10:05:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708337129;
-	bh=Wp1z8DD4y2npUVyApGi7Hca+cEHUY33+maH5kr1tQf8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hIqlK0/xwDm4hFEwUq+KvV91ubPAyFk5GkmJHR1wz7FaM7mmXgiGrgVUDFpwWgO+U
-	 /TyKtGUmQTVguqYNLMBBLlNCE2AhS7bpIDZlo2XgreH1+ZTaPl8AIfh3oyzKAw7nSz
-	 YJRiTIQN6azbWHt79KcQ5I02nL5llWFEUfPl6b4I0hSByeeBZYUAUKLSsWhChQ5D+e
-	 CFyGm0EOJY2bglrWukdKWfjQe85i958MchkOqaI0O6hM8EX/USA7WSLbVjrcsQWnRO
-	 rDYbZFIsQjY5JsTAwLjHjxKa8wiyZG6g03OSL2TEVe72D6jwAhUKeW/pYQcAe5F4Ak
-	 Twubf9Tg6Azlw==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>
-Cc: Zhu Yanjun <yanjun.zhu@linux.dev>,
-	Arnd Bergmann <arnd@arndb.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Yevgeny Kliteynik <kliteyn@nvidia.com>,
-	Alex Vesker <valex@nvidia.com>,
-	Hamdan Igbaria <hamdani@nvidia.com>,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] [v2] net/mlx5: fix possible stack overflows
-Date: Mon, 19 Feb 2024 11:04:56 +0100
-Message-Id: <20240219100506.648089-2-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240219100506.648089-1-arnd@kernel.org>
-References: <20240219100506.648089-1-arnd@kernel.org>
+	s=arc-20240116; t=1708337606; c=relaxed/simple;
+	bh=c+9i/Hpy+GGiqTCB/ogIjQDd+5p6PB4nAvRyyj069qU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Qbe2ylZvHfD3HXAqA78nMSl+RCL7yOwcQO6fvvm2qdDAnCkp9DiyOTkCPYrDCQaaTNPV2ZaQbNFfIE9tHdxiESwLsCHfwBKFNCAtj/ILAO1BL+S+fkyjgPF1QMiEbpKVx4gKAChf2+LmONtHz1G/VeJxjTN+E9QxxVASswLXhJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZuOePoPs; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708337605; x=1739873605;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=c+9i/Hpy+GGiqTCB/ogIjQDd+5p6PB4nAvRyyj069qU=;
+  b=ZuOePoPsWUDa3rDhn1qYRQqnir91yRUuN7Tj3/R29yjV+SoGjWp9fZ/q
+   76QMpu1wwo8V4bdZCyTTccavqSknyibsBsS/pQFGWG2Uewy/8utWuVEWf
+   nX8iipMq29D4eGjjK0UjqXnxWBJBgjg/JvcgGR5jn6B7ze+/wgv4U2D2P
+   db+AwCxYLtmnP9DT/ILkkgzH4USLanlwm9EtlPlTBymYt6/pJpjqf0bIL
+   AdtRUID93Bu2LLZOucYen9aH6PqPb84Pyeuemq9PYRzgR2F0/Qb/7qo5q
+   9Tis9LKUJslieYmDpN8fxOMsUWCZdAFeexVWdcwZrGu1AeJ1s/5uLzgSm
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10988"; a="27855997"
+X-IronPort-AV: E=Sophos;i="6.06,170,1705392000"; 
+   d="scan'208";a="27855997"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2024 02:13:24 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,170,1705392000"; 
+   d="scan'208";a="9123295"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orviesa004.jf.intel.com with ESMTP; 19 Feb 2024 02:13:22 -0800
+Received: from fedora.igk.intel.com (Metan_eth.igk.intel.com [10.123.220.124])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 6890D12429;
+	Mon, 19 Feb 2024 10:13:21 +0000 (GMT)
+From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	horms@kernel.org,
+	przemyslaw.kitszel@intel.com,
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Subject: [Intel-wired-lan] [PATCH iwl-next v4 0/5] ice: Support 5 layer Tx scheduler topology
+Date: Mon, 19 Feb 2024 05:05:50 -0500
+Message-Id: <20240219100555.7220-1-mateusz.polchlopek@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,336 +74,69 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Arnd Bergmann <arnd@arndb.de>
+For performance reasons there is a need to have support for selectable
+Tx scheduler topology. Currently firmware supports only the default
+9-layer and 5-layer topology. This patch series enables switch from
+default to 5-layer topology, if user decides to opt-in.
 
-A couple of debug functions use a 512 byte temporary buffer and call another
-function that has another buffer of the same size, which in turn exceeds the
-usual warning limit for excessive stack usage:
-
-drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c:1073:1: error: stack frame size (1448) exceeds limit (1024) in 'dr_dump_start' [-Werror,-Wframe-larger-than]
-dr_dump_start(struct seq_file *file, loff_t *pos)
-drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c:1009:1: error: stack frame size (1120) exceeds limit (1024) in 'dr_dump_domain' [-Werror,-Wframe-larger-than]
-dr_dump_domain(struct seq_file *file, struct mlx5dr_domain *dmn)
-drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c:705:1: error: stack frame size (1104) exceeds limit (1024) in 'dr_dump_matcher_rx_tx' [-Werror,-Wframe-larger-than]
-dr_dump_matcher_rx_tx(struct seq_file *file, bool is_rx,
-
-Rework these so that each of the various code paths only ever has one of
-these buffers in it, and exactly the functions that declare one have
-the 'noinline_for_stack' annotation that prevents them from all being
-inlined into the same caller.
-
-Fixes: 917d1e799ddf ("net/mlx5: DR, Change SWS usage to debug fs seq_file interface")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
-[v2] no changes, just based on patch 1/2 but can still be applied independently
----
- .../mellanox/mlx5/core/steering/dr_dbg.c      | 82 +++++++++----------
- 1 file changed, 41 insertions(+), 41 deletions(-)
+v4:
+- restored the initial way of passing firmware data to ice_cfg_tx_topo
+  function in ice_init_tx_topology function in ice_main.c file. In v2
+  and v3 version it was passed as const u8 parameter which caused kernel
+  crash. Because of this change I decided to drop all Reviewed-by tags.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c
-index be7a8481d7d2..eae04f66b8f4 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c
-@@ -205,12 +205,11 @@ dr_dump_hex_print(char hex[DR_HEX_SIZE], char *src, u32 size)
- }
- 
- static int
--dr_dump_rule_action_mem(struct seq_file *file, const u64 rule_id,
-+dr_dump_rule_action_mem(struct seq_file *file, char *buff, const u64 rule_id,
- 			struct mlx5dr_rule_action_member *action_mem)
- {
- 	struct mlx5dr_action *action = action_mem->action;
- 	const u64 action_id = DR_DBG_PTR_TO_ID(action);
--	char buff[MLX5DR_DEBUG_DUMP_BUFF_LENGTH];
- 	u64 hit_tbl_ptr, miss_tbl_ptr;
- 	u32 hit_tbl_id, miss_tbl_id;
- 	int ret;
-@@ -505,10 +504,9 @@ dr_dump_rule_action_mem(struct seq_file *file, const u64 rule_id,
- }
- 
- static int
--dr_dump_rule_mem(struct seq_file *file, struct mlx5dr_ste *ste,
-+dr_dump_rule_mem(struct seq_file *file, char *buff, struct mlx5dr_ste *ste,
- 		 bool is_rx, const u64 rule_id, u8 format_ver)
- {
--	char buff[MLX5DR_DEBUG_DUMP_BUFF_LENGTH];
- 	char hw_ste_dump[DR_HEX_SIZE];
- 	u32 mem_rec_type;
- 	int ret;
-@@ -540,7 +538,8 @@ dr_dump_rule_mem(struct seq_file *file, struct mlx5dr_ste *ste,
- }
- 
- static int
--dr_dump_rule_rx_tx(struct seq_file *file, struct mlx5dr_rule_rx_tx *rule_rx_tx,
-+dr_dump_rule_rx_tx(struct seq_file *file, char *buff,
-+		   struct mlx5dr_rule_rx_tx *rule_rx_tx,
- 		   bool is_rx, const u64 rule_id, u8 format_ver)
- {
- 	struct mlx5dr_ste *ste_arr[DR_RULE_MAX_STES + DR_ACTION_MAX_STES];
-@@ -551,7 +550,7 @@ dr_dump_rule_rx_tx(struct seq_file *file, struct mlx5dr_rule_rx_tx *rule_rx_tx,
- 		return 0;
- 
- 	while (i--) {
--		ret = dr_dump_rule_mem(file, ste_arr[i], is_rx, rule_id,
-+		ret = dr_dump_rule_mem(file, buff, ste_arr[i], is_rx, rule_id,
- 				       format_ver);
- 		if (ret < 0)
- 			return ret;
-@@ -560,7 +559,8 @@ dr_dump_rule_rx_tx(struct seq_file *file, struct mlx5dr_rule_rx_tx *rule_rx_tx,
- 	return 0;
- }
- 
--static int dr_dump_rule(struct seq_file *file, struct mlx5dr_rule *rule)
-+static noinline_for_stack int
-+dr_dump_rule(struct seq_file *file, struct mlx5dr_rule *rule)
- {
- 	struct mlx5dr_rule_action_member *action_mem;
- 	const u64 rule_id = DR_DBG_PTR_TO_ID(rule);
-@@ -584,19 +584,19 @@ static int dr_dump_rule(struct seq_file *file, struct mlx5dr_rule *rule)
- 		return ret;
- 
- 	if (rx->nic_matcher) {
--		ret = dr_dump_rule_rx_tx(file, rx, true, rule_id, format_ver);
-+		ret = dr_dump_rule_rx_tx(file, buff, rx, true, rule_id, format_ver);
- 		if (ret < 0)
- 			return ret;
- 	}
- 
- 	if (tx->nic_matcher) {
--		ret = dr_dump_rule_rx_tx(file, tx, false, rule_id, format_ver);
-+		ret = dr_dump_rule_rx_tx(file, buff, tx, false, rule_id, format_ver);
- 		if (ret < 0)
- 			return ret;
- 	}
- 
- 	list_for_each_entry(action_mem, &rule->rule_actions_list, list) {
--		ret = dr_dump_rule_action_mem(file, rule_id, action_mem);
-+		ret = dr_dump_rule_action_mem(file, buff, rule_id, action_mem);
- 		if (ret < 0)
- 			return ret;
- 	}
-@@ -605,10 +605,10 @@ static int dr_dump_rule(struct seq_file *file, struct mlx5dr_rule *rule)
- }
- 
- static int
--dr_dump_matcher_mask(struct seq_file *file, struct mlx5dr_match_param *mask,
-+dr_dump_matcher_mask(struct seq_file *file, char *buff,
-+		     struct mlx5dr_match_param *mask,
- 		     u8 criteria, const u64 matcher_id)
- {
--	char buff[MLX5DR_DEBUG_DUMP_BUFF_LENGTH];
- 	char dump[DR_HEX_SIZE];
- 	int ret;
- 
-@@ -706,10 +706,10 @@ dr_dump_matcher_mask(struct seq_file *file, struct mlx5dr_match_param *mask,
- }
- 
- static int
--dr_dump_matcher_builder(struct seq_file *file, struct mlx5dr_ste_build *builder,
-+dr_dump_matcher_builder(struct seq_file *file, char *buff,
-+			struct mlx5dr_ste_build *builder,
- 			u32 index, bool is_rx, const u64 matcher_id)
- {
--	char buff[MLX5DR_DEBUG_DUMP_BUFF_LENGTH];
- 	int ret;
- 
- 	memset(buff, 0, sizeof(buff));
-@@ -728,11 +728,10 @@ dr_dump_matcher_builder(struct seq_file *file, struct mlx5dr_ste_build *builder,
- }
- 
- static int
--dr_dump_matcher_rx_tx(struct seq_file *file, bool is_rx,
-+dr_dump_matcher_rx_tx(struct seq_file *file, char *buff, bool is_rx,
- 		      struct mlx5dr_matcher_rx_tx *matcher_rx_tx,
- 		      const u64 matcher_id)
- {
--	char buff[MLX5DR_DEBUG_DUMP_BUFF_LENGTH];
- 	enum dr_dump_rec_type rec_type;
- 	u64 s_icm_addr, e_icm_addr;
- 	int i, ret;
-@@ -758,7 +757,7 @@ dr_dump_matcher_rx_tx(struct seq_file *file, bool is_rx,
- 		return ret;
- 
- 	for (i = 0; i < matcher_rx_tx->num_of_builders; i++) {
--		ret = dr_dump_matcher_builder(file,
-+		ret = dr_dump_matcher_builder(file, buff,
- 					      &matcher_rx_tx->ste_builder[i],
- 					      i, is_rx, matcher_id);
- 		if (ret < 0)
-@@ -768,7 +767,7 @@ dr_dump_matcher_rx_tx(struct seq_file *file, bool is_rx,
- 	return 0;
- }
- 
--static int
-+static noinline_for_stack int
- dr_dump_matcher(struct seq_file *file, struct mlx5dr_matcher *matcher)
- {
- 	struct mlx5dr_matcher_rx_tx *rx = &matcher->rx;
-@@ -791,19 +790,19 @@ dr_dump_matcher(struct seq_file *file, struct mlx5dr_matcher *matcher)
- 	if (ret)
- 		return ret;
- 
--	ret = dr_dump_matcher_mask(file, &matcher->mask,
-+	ret = dr_dump_matcher_mask(file, buff, &matcher->mask,
- 				   matcher->match_criteria, matcher_id);
- 	if (ret < 0)
- 		return ret;
- 
- 	if (rx->nic_tbl) {
--		ret = dr_dump_matcher_rx_tx(file, true, rx, matcher_id);
-+		ret = dr_dump_matcher_rx_tx(file, buff, true, rx, matcher_id);
- 		if (ret < 0)
- 			return ret;
- 	}
- 
- 	if (tx->nic_tbl) {
--		ret = dr_dump_matcher_rx_tx(file, false, tx, matcher_id);
-+		ret = dr_dump_matcher_rx_tx(file, buff, false, tx, matcher_id);
- 		if (ret < 0)
- 			return ret;
- 	}
-@@ -831,11 +830,10 @@ dr_dump_matcher_all(struct seq_file *file, struct mlx5dr_matcher *matcher)
- }
- 
- static int
--dr_dump_table_rx_tx(struct seq_file *file, bool is_rx,
-+dr_dump_table_rx_tx(struct seq_file *file, char *buff, bool is_rx,
- 		    struct mlx5dr_table_rx_tx *table_rx_tx,
- 		    const u64 table_id)
- {
--	char buff[MLX5DR_DEBUG_DUMP_BUFF_LENGTH];
- 	enum dr_dump_rec_type rec_type;
- 	u64 s_icm_addr;
- 	int ret;
-@@ -858,7 +856,8 @@ dr_dump_table_rx_tx(struct seq_file *file, bool is_rx,
- 	return 0;
- }
- 
--static int dr_dump_table(struct seq_file *file, struct mlx5dr_table *table)
-+static noinline_for_stack int
-+dr_dump_table(struct seq_file *file, struct mlx5dr_table *table)
- {
- 	struct mlx5dr_table_rx_tx *rx = &table->rx;
- 	struct mlx5dr_table_rx_tx *tx = &table->tx;
-@@ -878,14 +877,14 @@ static int dr_dump_table(struct seq_file *file, struct mlx5dr_table *table)
- 		return ret;
- 
- 	if (rx->nic_dmn) {
--		ret = dr_dump_table_rx_tx(file, true, rx,
-+		ret = dr_dump_table_rx_tx(file, buff, true, rx,
- 					  DR_DBG_PTR_TO_ID(table));
- 		if (ret < 0)
- 			return ret;
- 	}
- 
- 	if (tx->nic_dmn) {
--		ret = dr_dump_table_rx_tx(file, false, tx,
-+		ret = dr_dump_table_rx_tx(file, buff, false, tx,
- 					  DR_DBG_PTR_TO_ID(table));
- 		if (ret < 0)
- 			return ret;
-@@ -911,10 +910,10 @@ static int dr_dump_table_all(struct seq_file *file, struct mlx5dr_table *tbl)
- }
- 
- static int
--dr_dump_send_ring(struct seq_file *file, struct mlx5dr_send_ring *ring,
-+dr_dump_send_ring(struct seq_file *file, char *buff,
-+		  struct mlx5dr_send_ring *ring,
- 		  const u64 domain_id)
- {
--	char buff[MLX5DR_DEBUG_DUMP_BUFF_LENGTH];
- 	int ret;
- 
- 	memset(buff, 0, sizeof(buff));
-@@ -933,13 +932,13 @@ dr_dump_send_ring(struct seq_file *file, struct mlx5dr_send_ring *ring,
- 	return 0;
- }
- 
--static noinline_for_stack int
-+static int
- dr_dump_domain_info_flex_parser(struct seq_file *file,
-+				char *buff,
- 				const char *flex_parser_name,
- 				const u8 flex_parser_value,
- 				const u64 domain_id)
- {
--	char buff[MLX5DR_DEBUG_DUMP_BUFF_LENGTH];
- 	int ret;
- 
- 	memset(buff, 0, sizeof(buff));
-@@ -957,11 +956,11 @@ dr_dump_domain_info_flex_parser(struct seq_file *file,
- 	return 0;
- }
- 
--static noinline_for_stack int
--dr_dump_domain_info_caps(struct seq_file *file, struct mlx5dr_cmd_caps *caps,
-+static int
-+dr_dump_domain_info_caps(struct seq_file *file, char *buff,
-+			 struct mlx5dr_cmd_caps *caps,
- 			 const u64 domain_id)
- {
--	char buff[MLX5DR_DEBUG_DUMP_BUFF_LENGTH];
- 	struct mlx5dr_cmd_vport_cap *vport_caps;
- 	unsigned long i, vports_num;
- 	int ret;
-@@ -1003,34 +1002,35 @@ dr_dump_domain_info_caps(struct seq_file *file, struct mlx5dr_cmd_caps *caps,
- }
- 
- static int
--dr_dump_domain_info(struct seq_file *file, struct mlx5dr_domain_info *info,
-+dr_dump_domain_info(struct seq_file *file, char *buff,
-+		    struct mlx5dr_domain_info *info,
- 		    const u64 domain_id)
- {
- 	int ret;
- 
--	ret = dr_dump_domain_info_caps(file, &info->caps, domain_id);
-+	ret = dr_dump_domain_info_caps(file, buff, &info->caps, domain_id);
- 	if (ret < 0)
- 		return ret;
- 
--	ret = dr_dump_domain_info_flex_parser(file, "icmp_dw0",
-+	ret = dr_dump_domain_info_flex_parser(file, buff, "icmp_dw0",
- 					      info->caps.flex_parser_id_icmp_dw0,
- 					      domain_id);
- 	if (ret < 0)
- 		return ret;
- 
--	ret = dr_dump_domain_info_flex_parser(file, "icmp_dw1",
-+	ret = dr_dump_domain_info_flex_parser(file, buff, "icmp_dw1",
- 					      info->caps.flex_parser_id_icmp_dw1,
- 					      domain_id);
- 	if (ret < 0)
- 		return ret;
- 
--	ret = dr_dump_domain_info_flex_parser(file, "icmpv6_dw0",
-+	ret = dr_dump_domain_info_flex_parser(file, buff, "icmpv6_dw0",
- 					      info->caps.flex_parser_id_icmpv6_dw0,
- 					      domain_id);
- 	if (ret < 0)
- 		return ret;
- 
--	ret = dr_dump_domain_info_flex_parser(file, "icmpv6_dw1",
-+	ret = dr_dump_domain_info_flex_parser(file, buff, "icmpv6_dw1",
- 					      info->caps.flex_parser_id_icmpv6_dw1,
- 					      domain_id);
- 	if (ret < 0)
-@@ -1067,12 +1067,12 @@ dr_dump_domain(struct seq_file *file, struct mlx5dr_domain *dmn)
- 	if (ret)
- 		return ret;
- 
--	ret = dr_dump_domain_info(file, &dmn->info, domain_id);
-+	ret = dr_dump_domain_info(file, buff, &dmn->info, domain_id);
- 	if (ret < 0)
- 		return ret;
- 
- 	if (dmn->info.supp_sw_steering) {
--		ret = dr_dump_send_ring(file, dmn->send_ring, domain_id);
-+		ret = dr_dump_send_ring(file, buff, dmn->send_ring, domain_id);
- 		if (ret < 0)
- 			return ret;
- 	}
+v3:
+- fixed documentation warnings
+https://lore.kernel.org/netdev/20231009090711.136777-1-mateusz.polchlopek@intel.com/
+
+v2:
+- updated documentation
+- reorder of variables list (default-init first)
+- comments changed to be more descriptive
+- added elseif's instead of few if's
+- returned error when ice_request_fw fails
+- ice_cfg_tx_topo() changed to take const u8 as parameter (get rid of copy
+  buffer)
+- renamed all "balance" occurences to the new one
+- prevent fail of ice_aq_read_nvm() function
+- unified variables names (int err instead of int status in few
+  functions)
+- some smaller fixes, typo fixes
+https://lore.kernel.org/netdev/20231006110212.96305-1-mateusz.polchlopek@intel.com/
+
+v1:
+https://lore.kernel.org/netdev/20230523174008.3585300-1-anthony.l.nguyen@intel.com/
+---
+
+Lukasz Czapnik (1):
+  ice: Add tx_scheduling_layers devlink param
+
+Michal Wilczynski (2):
+  ice: Enable switching default Tx scheduler topology
+  ice: Document tx_scheduling_layers parameter
+
+Raj Victor (2):
+  ice: Support 5 layer topology
+  ice: Adjust the VSI/Aggregator layers
+
+ Documentation/networking/devlink/ice.rst      |  41 ++++
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  31 +++
+ drivers/net/ethernet/intel/ice/ice_common.c   |   5 +
+ drivers/net/ethernet/intel/ice/ice_ddp.c      | 199 ++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_ddp.h      |   2 +
+ drivers/net/ethernet/intel/ice/ice_devlink.c  | 169 +++++++++++++++
+ .../net/ethernet/intel/ice/ice_fw_update.c    |   7 +-
+ .../net/ethernet/intel/ice/ice_fw_update.h    |   3 +
+ drivers/net/ethernet/intel/ice/ice_main.c     | 102 +++++++--
+ drivers/net/ethernet/intel/ice/ice_nvm.c      |   7 +-
+ drivers/net/ethernet/intel/ice/ice_nvm.h      |   3 +
+ drivers/net/ethernet/intel/ice/ice_sched.c    |  37 ++--
+ drivers/net/ethernet/intel/ice/ice_sched.h    |   3 +
+ drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+ 14 files changed, 565 insertions(+), 45 deletions(-)
+
 -- 
-2.39.2
+2.38.1
 
 
