@@ -1,126 +1,269 @@
-Return-Path: <netdev+bounces-72861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85FC6859F9C
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 10:23:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9930D85A000
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 10:42:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 330C41F2119D
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 09:23:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 503B5281222
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 09:42:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95FDD22F17;
-	Mon, 19 Feb 2024 09:22:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="K9v2V8BG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14C2224214;
+	Mon, 19 Feb 2024 09:42:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9737424B2C;
-	Mon, 19 Feb 2024 09:22:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 398BF23779
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 09:42:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708334557; cv=none; b=kSXXNztDq2mKbjlNnYdDiR1hT1CjApkCtoeF49eE4NeBKqKkggJjkEaUh8k9ERpzJP5ncZlUFqCXe56xyMVLblwVjRK7o/3XsuiNEFVamsVk0gLGxM3xHxbXmS4OrbH9WMzXHb1O2aP0CofKbMAmo3q5/1eDW/z8yazKV2+7CiY=
+	t=1708335724; cv=none; b=o3sXPPssoo6rKKsPQtnnCAUOQ2xLoIIpFZcqq9TADrsudl0RNgxI7tCLHx9YCFJPxfJUyI72+qNV0bK/iSAgrNs+S4hxgjS3BD7VKX4JiqqRA5N3ds1aFSmpziG5WFVgO8trEKfBpKSlqWGxfEti2+mxMxUMJwNWNBr4kGVnEiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708334557; c=relaxed/simple;
-	bh=O7jFalGLVz0Usog+xV7IsPPtI8rqcp1f1KiCelh/c9E=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tqEP3qvZANSHyp4IvsznAGTY1sIxJ2069MmR30ARCZrv+Ns4vy2QKceaoubwRV5kTDRYrrTQ0eTns7lk/5f8vgAxae0w3dKQiZ5bMEdu6sOy4KGMW1M5lyMJgo/qCl8fLhCMreXAoDC1Q+GlZnOqUAjBsiMhYomosOvRqp3vz0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=K9v2V8BG; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id F2556FF80E;
-	Mon, 19 Feb 2024 09:22:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1708334547;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6JJYLuBCOkfxTLbeT5DlIS6vVhI3AplaZr0S39SVoLc=;
-	b=K9v2V8BG3QduFJ0e3Uw3dCtS9hM2bn/TYvENJcI7ht1ALNz0gLx5AxCXxWAKxhNj7hM5PO
-	oFYsmddOq2qMVvTVgYIvnxHNxsy3I8G8OP+RaE337z4+ZbzrewUncvEBxjWUripbHcQplu
-	Zxo5UAcb2it3IpFrK7mV1iIzT2BrobYtXzO9D51ygVCFDbLOzCAL4Tfx3SrYATP4AV0Cvi
-	gvy4kDc/h6C3WMaasXvUsKtCG2EdgAe67CUs/dHViLh6G7azIWAy+wY9OsPQ8vwRoEPEMg
-	vqbX3QBQLvmttqzE1lAmhOB48zl4Uc37NX6No0Z4ZXx0zTU7Op+IsZDS5TDCZA==
-Date: Mon, 19 Feb 2024 10:22:24 +0100
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
- <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>, Mark Brown <broonie@kernel.org>,
- Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Heiner
- Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v4 11/17] dt-bindings: net: pse-pd: Add another
- way of describing several PSE PIs
-Message-ID: <20240219102224.50cf1010@kmaincent-XPS-13-7390>
-In-Reply-To: <0d7b5549-f56b-4693-878f-e513fbf5ca16@linaro.org>
-References: <20240215-feature_poe-v4-0-35bb4c23266c@bootlin.com>
-	<20240215-feature_poe-v4-11-35bb4c23266c@bootlin.com>
-	<0d7b5549-f56b-4693-878f-e513fbf5ca16@linaro.org>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1708335724; c=relaxed/simple;
+	bh=9Mwx3cn2u7xWh1QnsT9nUyOVoZDHnymR83qjl4tETZs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mH2sgIP+oH6xR6s1jPlpPdfjl7yvZ4CQ3yQlgciz5/L9nxIww6xfFIDnD1jXRzJbJoLIh/9UN1chNDvoqRe8pVzkBd9HcKcUNo4j0XyEX6CdwJwoCQpmN0Y9FUq1Tl/qsvJCbEfO7MIiHymsxZeq4bg31Fb1OvEKtosSBeTkv50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1rc09Z-0001Yn-CW; Mon, 19 Feb 2024 10:41:37 +0100
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1rc09X-001cN7-O7; Mon, 19 Feb 2024 10:41:35 +0100
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 661C0291669;
+	Mon, 19 Feb 2024 09:41:35 +0000 (UTC)
+Date: Mon, 19 Feb 2024 10:41:34 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	linux-can@vger.kernel.org, kernel@pengutronix.de, Oliver Hartkopp <socketcan@hartkopp.net>, 
+	Dan Carpenter <dan.carpenter@linaro.org>
+Subject: Re: [PATCH net-next 22/23] can: canxl: add virtual CAN network
+ identifier support
+Message-ID: <20240219-activist-smartly-87263f328a0c-mkl@pengutronix.de>
+References: <20240213113437.1884372-1-mkl@pengutronix.de>
+ <20240213113437.1884372-23-mkl@pengutronix.de>
+ <20240219083910.GR40273@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="2kutbo2fbwfxs45c"
+Content-Disposition: inline
+In-Reply-To: <20240219083910.GR40273@kernel.org>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+
+
+--2kutbo2fbwfxs45c
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
 
-On Sat, 17 Feb 2024 15:01:55 +0100
-Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org> wrote:
-
-> > -required:
-> > -  - "#pse-cells"
-> > +  pse_pis: =20
+On 19.02.2024 08:39:10, Simon Horman wrote:
+> +Dan Carpenter
 >=20
-> How did this appear here? Underscores are no allowed.
+> On Tue, Feb 13, 2024 at 12:25:25PM +0100, Marc Kleine-Budde wrote:
+> > From: Oliver Hartkopp <socketcan@hartkopp.net>
+> >=20
+> > CAN XL data frames contain an 8-bit virtual CAN network identifier (VCI=
+D).
+> > A VCID value of zero represents an 'untagged' CAN XL frame.
+> >=20
+> > To receive and send these optional VCIDs via CAN_RAW sockets a new sock=
+et
+> > option CAN_RAW_XL_VCID_OPTS is introduced to define/access VCID content:
+> >=20
+> > - tx: set the outgoing VCID value by the kernel (one fixed 8-bit value)
+> > - tx: pass through VCID values from the user space (e.g. for traffic re=
+play)
+> > - rx: apply VCID receive filter (value/mask) to be passed to the user s=
+pace
+> >=20
+> > With the 'tx pass through' option CAN_RAW_XL_VCID_TX_PASS all valid VCID
+> > values can be sent, e.g. to replay full qualified CAN XL traffic.
+> >=20
+> > The VCID value provided for the CAN_RAW_XL_VCID_TX_SET option will
+> > override the VCID value in the struct canxl_frame.prio defined for
+> > CAN_RAW_XL_VCID_TX_PASS when both flags are set.
+> >=20
+> > With a rx_vcid_mask of zero all possible VCID values (0x00 - 0xFF) are
+> > passed to the user space when the CAN_RAW_XL_VCID_RX_FILTER flag is set.
+> > Without this flag only untagged CAN XL frames (VCID =3D 0x00) are deliv=
+ered
+> > to the user space (default).
+> >=20
+> > The 8-bit VCID is stored inside the CAN XL prio element (only in CAN XL
+> > frames!) to not interfere with other CAN content or the CAN filters
+> > provided by the CAN_RAW sockets and kernel infrastruture.
+> >=20
+> > Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
+> > Link: https://lore.kernel.org/all/20240212213550.18516-1-socketcan@hart=
+kopp.net
+> > Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+>=20
+> Hi Oliver and Marc,
+>=20
+> I understand this pull-request has been accepted.
 
-Didn't know that, sorry.
-Indeed it is written in the dts-coding-style.rst, sorry for the error.
+ACK
+
+> But I noticed the problem described below which
+> seems worth bringing to your attention.
+
+Thanks Simon.
 
 >=20
-> > +    type: object =20
+> ...
+>=20
+> > @@ -786,6 +822,21 @@ static int raw_getsockopt(struct socket *sock, int=
+ level, int optname,
+> >  		val =3D &ro->xl_frames;
+> >  		break;
+> > =20
+> > +	case CAN_RAW_XL_VCID_OPTS:
+> > +		/* user space buffer to small for VCID opts? */
+> > +		if (len < sizeof(ro->raw_vcid_opts)) {
+> > +			/* return -ERANGE and needed space in optlen */
+> > +			err =3D -ERANGE;
+> > +			if (put_user(sizeof(ro->raw_vcid_opts), optlen))
+> > +				err =3D -EFAULT;
+> > +		} else {
+> > +			if (len > sizeof(ro->raw_vcid_opts))
+> > +				len =3D sizeof(ro->raw_vcid_opts);
+> > +			if (copy_to_user(optval, &ro->raw_vcid_opts, len))
+> > +				err =3D -EFAULT;
+> > +		}
+> > +		break;
+> > +
+> >  	case CAN_RAW_JOIN_FILTERS:
+> >  		if (len > sizeof(int))
+> >  			len =3D sizeof(int);
+>=20
+> At the end of the switch statement the following code is present:
 >=20
 >=20
-> Missing description.
-
-Ah indeed.
-
-> > +            items:
-> > +              enum:
-> > +                - "alternative-a"
-> > +                - "alternative-b" =20
+> 	if (put_user(len, optlen))
+> 		return -EFAULT;
+> 	if (copy_to_user(optval, val, len))
+> 		return -EFAULT;
+> 	return 0;
 >=20
-> No need for quotes.
+> And the call to copy_to_user() depends on val being set.
+>=20
+> It appears that for all other cases handled by the switch statement,
+> either val is set or the function returns. But neither is the
+> case for CAN_RAW_XL_VCID_OPTS which seems to mean that val may be used
+> uninitialised.
+>=20
+> Flagged by Smatch.
 
-Yes I saw that warning with yamllint up to date and have fixed it with for =
-the
-next version.
+And "err" is not evaluated, too.
 
-> I believe you did not test it, so I will skip reviewing the rest.
+Oliver, please send a fix and squash in this chance to reduce the scope
+of "err" to the cases where it's actually used.
 
-I tested it and did not face any error due to the underscore with
-"make DT_CHECKER_FLAGS=3D-m dt_binding_check DT_SCHEMA_FILES=3Dpse-controll=
-er.yaml"
-Did I miss something in the test options?
+diff --git a/net/can/raw.c b/net/can/raw.c
+index cb8e6f788af8..d4e27877c143 100644
+--- a/net/can/raw.c
++++ b/net/can/raw.c
+@@ -756,7 +756,6 @@ static int raw_getsockopt(struct socket *sock, int leve=
+l, int optname,
+         struct raw_sock *ro =3D raw_sk(sk);
+         int len;
+         void *val;
+-        int err =3D 0;
+=20
+         if (level !=3D SOL_CAN_RAW)
+                 return -EINVAL;
+@@ -766,7 +765,9 @@ static int raw_getsockopt(struct socket *sock, int leve=
+l, int optname,
+                 return -EINVAL;
+=20
+         switch (optname) {
+-        case CAN_RAW_FILTER:
++        case CAN_RAW_FILTER: {
++                int err =3D 0;
++
+                 lock_sock(sk);
+                 if (ro->count > 0) {
+                         int fsize =3D ro->count * sizeof(struct can_filter=
+);
+@@ -791,7 +792,7 @@ static int raw_getsockopt(struct socket *sock, int leve=
+l, int optname,
+                 if (!err)
+                         err =3D put_user(len, optlen);
+                 return err;
+-
++        }
+         case CAN_RAW_ERR_FILTER:
+                 if (len > sizeof(can_err_mask_t))
+                         len =3D sizeof(can_err_mask_t);
+@@ -822,7 +823,9 @@ static int raw_getsockopt(struct socket *sock, int leve=
+l, int optname,
+                 val =3D &ro->xl_frames;
+                 break;
+=20
+-        case CAN_RAW_XL_VCID_OPTS:
++        case CAN_RAW_XL_VCID_OPTS: {
++                int err =3D 0;
++
+                 /* user space buffer to small for VCID opts? */
+                 if (len < sizeof(ro->raw_vcid_opts)) {
+                         /* return -ERANGE and needed space in optlen */
+@@ -836,7 +839,7 @@ static int raw_getsockopt(struct socket *sock, int leve=
+l, int optname,
+                                 err =3D -EFAULT;
+                 }
+                 break;
+-
++        }
+         case CAN_RAW_JOIN_FILTERS:
+                 if (len > sizeof(int))
+                         len =3D sizeof(int);
 
-Regards,
+regards,
+Marc
+
 --=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--2kutbo2fbwfxs45c
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmXTIkkACgkQKDiiPnot
+vG8faQf/Y/rXZgKwoUCozsxwoMahVJCCxvCpazZmRg0RgW9DcpVLeiH1RtaAtS2F
+Z56hRXgY+s8ftbcw1iXjnEG3uGeJ9msdoyvbRFqraD4XjBxdBl0fduFeH4UumtZL
+ekEbWTrbkQ4AD7/ZJ8t/BK3q5XKgSjvUh0rbu7XT5wLWx7Re6ZTX+2NaIKiGqgvG
+3HC9W4nBVvakf+YUAyrQLvCNWk2Se3QpzyS41f33o7S+wVh/7GelcdFRWMd0LbSO
+xZWKzxwgZlJG7Nqs+tjQD+kdOgEvyE0BVlG5u5td0DEm00gLKcKcS/AmeJx194SY
+Fb6w+Xyg2RS0FIjgL30ErUew55roJg==
+=qEBn
+-----END PGP SIGNATURE-----
+
+--2kutbo2fbwfxs45c--
 
