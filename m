@@ -1,133 +1,77 @@
-Return-Path: <netdev+bounces-72864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96A1585A01B
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 10:47:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 798A785A01E
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 10:47:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37CCD1F21856
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 09:47:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC3DE1C210AF
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 09:47:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7780424A09;
-	Mon, 19 Feb 2024 09:47:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6164324A09;
+	Mon, 19 Feb 2024 09:47:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mUk3O+JO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A772376D;
-	Mon, 19 Feb 2024 09:47:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D6FC22098
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 09:47:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708336031; cv=none; b=n2x+ET1A6+oGyNi2DbUR2wO1Rus8vpsglJLJOTsAh7TCjAYBhRmUtyOAKQVDws2zwTvWogKvsd/2MSGznWVwwXwguOulNZbWUR5xHQ2k23QO4YN0H76r3cxqo3AuIHGtewFYFDnQugg8D7SZjzQNggUdp2AI8i3qCD3rxtb9TwM=
+	t=1708336076; cv=none; b=P6zEOoV7DGxo7LJdg1fluDxA3s+bnqOWFUJA2FuFUsVXfzuv1YxxUTZXkWqW7difJ4fgSY08IHo4QPNXBnR2Maq3LzAqqnDUywkjitro95Ja1Ul48xkaU83AxnxJt6oSdfUQsas8QxVGSUtddMse1/6QfzsnYSObKyU8wLekMu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708336031; c=relaxed/simple;
-	bh=m/4dznxbgBSFJZQTFF0vW86u26Oju2apBeu/wmtxlwk=;
+	s=arc-20240116; t=1708336076; c=relaxed/simple;
+	bh=AwVAwxNxN6glbYCODeigT0nwxRmDS3d1W1Tyy37Oabk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qKNhzCe6v4aU1TNEu3VJ1sOUVMnQaLSgfvGVTYuAQ20HdMlFt4jjXbAU5qJvnJ/tWS/rEn12lArLsk6LlabY4UVllIij3M+Z2pQMp69xX2PzD7RYfyDmvTOG3ah+aUF57wJ7bXfyj5qQw33PsTl9DXrdaHKX5qLlvG9s+ux/uGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5649f396269so412849a12.1;
-        Mon, 19 Feb 2024 01:47:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708336028; x=1708940828;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cqiQ7pV/qcZKf6d4gul+rJPooKYa9MwYrv6emu52dJ8=;
-        b=boT1KYGConn4hUHlhfZyhDioBktJwgGq5gXZgluR79EqMMYQamN8y4rF9+AH+rdWRo
-         Sna865LV1/8+14WYsPhdiOMj6b66YJN1wKpfcu7zp2Y5eLqz78PoPPvvKa4tXjGWyM0L
-         jx7vJGrLyxeARjdk4NdO8ErLSRZ39Xrtjl0DI8zrdx2kyiC1Y6yxXDzJBw40eUi96fgq
-         5nlF4oUNUVvkKBvSpvPMj+fVFIq6t4Hem2s9ftBdTbWawVq2v/uxMMqCCHR4QuYTFPjH
-         r03liGsif3fdyJ9Q7cPE8FFdNd998kpWrd3HyDu8H7SVOmlufwI5YlTushDe2gPXH7Eh
-         KBbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXc3E0bsh3yBfICJaBRXkZBMPgDQA3znTFuYDjkr/F3VEaHXVDiD+aMX71GYYsp6cLSEjUolkKXWunffpe4YeLdpd71HG1OnvQDlUiQ3AwVcIZ4RoRHUf3RUagxypy2SFKth7bR
-X-Gm-Message-State: AOJu0YxWguJtkIbs+EldYRS+04VbqxNG8Q0kBf9wtT5Z4BPFzOqjieLV
-	X0K13eHPfbcYtOL04NA/B8eXVtDrxaSx5VP9TVfZxgpZ9xbQKNHr
-X-Google-Smtp-Source: AGHT+IGrf2XT7kEij2cA5DQcyRl8OmqiUJYtyL1g3O7j/oOvVAnKImAftHzbHgSYZE3imIhHjh8dmA==
-X-Received: by 2002:a50:cb88:0:b0:563:d237:4e1c with SMTP id k8-20020a50cb88000000b00563d2374e1cmr8211176edi.8.1708336027759;
-        Mon, 19 Feb 2024 01:47:07 -0800 (PST)
-Received: from gmail.com (fwdproxy-lla-119.fbsv.net. [2a03:2880:30ff:77::face:b00c])
-        by smtp.gmail.com with ESMTPSA id i26-20020a50fc1a000000b005603dea632esm2543825edr.88.2024.02.19.01.47.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Feb 2024 01:47:07 -0800 (PST)
-Date: Mon, 19 Feb 2024 01:46:16 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-	Stephen Hemminger <stephen@networkplumber.org>, kuba@kernel.org,
-	davem@davemloft.net, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, horms@kernel.org,
-	Johannes Berg <johannes.berg@intel.com>
-Subject: Re: [PATCH net-next v2] net: sysfs: Do not create sysfs for non BQL
- device
-Message-ID: <ZdMjaCSKFSkAoDOS@gmail.com>
-References: <20240216094154.3263843-1-leitao@debian.org>
- <20240216092905.4e2d3c7c@hermes.local>
- <0e0ba573-1ae0-4a4b-8286-fdbc8dbe7639@gmail.com>
- <CANn89i+5F7d4i7Ds4V6TtkzzAjQjNQ8xOeoYqZr8tY6tWWmMEg@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=fegRWkVrS5ERC/Bcq1/LT9vK8tYflwsO9zQUQ4n9wHTCaVp9/OhPcPYClnFGA2eZ925EXakQOCNLbPUaSG0+npbKvxWURaw6x75mJf+p+bHFOGM2Sl5JUXkuRYEpqzOktNa03QmOXVfUGqr0b8JzKMkqEEczlqyXTLyCYwyD/gg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mUk3O+JO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40279C433F1;
+	Mon, 19 Feb 2024 09:47:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708336075;
+	bh=AwVAwxNxN6glbYCODeigT0nwxRmDS3d1W1Tyy37Oabk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mUk3O+JONHu2LCPpmRSAMe2e/Lh4tlk9VjzpLwjMNNxPTO0vvw0+UCIUC96lIYqwG
+	 57syxpvbaJr5kPae3esjJBe3la4FsZ/ENB0atfENzuxhh5/0hVQd0d/zkGHXT232KR
+	 yWC6zASWVfY21n4cgI9YIU0Uf5MvQqt9/yEPQUSo8N83JfyqXYuqZoclJnfhGKJAMz
+	 2lvp0DSQk0rnVzyPYNv5xfibQ2rL6ec1F3gCy8+CV1U/IM77q6FjCQ9kaTF14eSQVg
+	 j/jnZsvcioU7m6tCe0O+apc4c4XkfDGOp41tzg9goCdH/sDmWAt84HjXvzyO11mbO5
+	 mQgijAMjpUPgQ==
+Date: Mon, 19 Feb 2024 09:46:22 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jeremy Kerr <jk@codeconstruct.com.au>
+Cc: netdev@vger.kernel.org, Matt Johnston <matt@codeconstruct.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net] net: mctp: put sock on tag allocation failure
+Message-ID: <20240219094622.GU40273@kernel.org>
+References: <ce9b61e44d1cdae7797be0c5e3141baf582d23a0.1707983487.git.jk@codeconstruct.com.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89i+5F7d4i7Ds4V6TtkzzAjQjNQ8xOeoYqZr8tY6tWWmMEg@mail.gmail.com>
+In-Reply-To: <ce9b61e44d1cdae7797be0c5e3141baf582d23a0.1707983487.git.jk@codeconstruct.com.au>
 
-On Fri, Feb 16, 2024 at 07:45:37PM +0100, Eric Dumazet wrote:
-> On Fri, Feb 16, 2024 at 7:41 PM Florian Fainelli <f.fainelli@gmail.com> wrote:
-> >
-> > On 2/16/24 09:29, Stephen Hemminger wrote:
-> > > On Fri, 16 Feb 2024 01:41:52 -0800
-> > > Breno Leitao <leitao@debian.org> wrote:
-> > >
-> > >> +static bool netdev_uses_bql(const struct net_device *dev)
-> > >> +{
-> > >> +    if (dev->features & NETIF_F_LLTX ||
-> > >> +        dev->priv_flags & IFF_NO_QUEUE)
-> > >> +            return false;
-> > >> +
-> > >> +    return IS_ENABLED(CONFIG_BQL);
-> > >> +}
-> > >
-> > > Various compilers will warn about missing parens in that expression.
-> > > It is valid but mixing & and || can be bug trap.
-> > >
-> > >       if ((dev->features & NETIF_F_LLTX) || (dev->priv_flags & IFF_NO_QUEUE))
-> > >               return false;
-> > >
-> > > Not all drivers will be using bql, it requires driver to have that code.
-> > > So really it means driver could be using BQL.
-> > > Not sure if there is a way to find out if driver has the required BQL bits.
-> >
-> > There is not a feature flag to be keying off if that is what you are
-> > after, you would need to audit the drivers and see whether they make
-> > calls to netdev_tx_sent_queue(), netdev_tx_reset_queue(),
-> > netdev_tx_completed_queue().
-> >
-> > I suppose you might be able to programmatically extract that information
-> > by looking at whether a given driver object file has a reference to
-> > dql_{reset,avail,completed} or do that at the source level, whichever is
-> > easier.
+On Thu, Feb 15, 2024 at 03:53:08PM +0800, Jeremy Kerr wrote:
+> We may hold an extra reference on a socket if a tag allocation fails: we
+> optimistically allocate the sk_key, and take a ref there, but do not
+> drop if we end up not using the allocated key.
 > 
-> Note that the suggested patch does not change current functionality.
+> Ensure we're dropping the sock on this failure by doing a proper unref
+> rather than directly kfree()ing.
 > 
-> Traditionally, we had sysfs entries fpr BQL for all netdev, regardless of them
-> using BQL or not.
-> 
-> The patch seems to be a good first step.
+> Fixes: de8a6b15d965 ("net: mctp: add an explicit reference from a mctp_sk_key to sock")
+> Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
 
-Thanks Eric. I agree it solves the problem without creating a new
-feature flag, that could also be done, but maybe less important than
-this first step.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Hoping this is OK, I am planning to send a v2 adding the extra
-parenthesis as reported above. 
-
-Thanks
 
