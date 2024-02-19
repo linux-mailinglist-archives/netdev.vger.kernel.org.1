@@ -1,238 +1,182 @@
-Return-Path: <netdev+bounces-72916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A854385A1E7
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 12:25:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 97B3285A1FC
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 12:32:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 206FD1F2418D
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 11:25:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A2A41F23D63
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 11:32:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68A3E2C1A9;
-	Mon, 19 Feb 2024 11:25:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6533228E39;
+	Mon, 19 Feb 2024 11:32:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YUqWu/7e"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="YyF3YEdU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 411702C6B7;
-	Mon, 19 Feb 2024 11:25:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D2F2C6AA;
+	Mon, 19 Feb 2024 11:32:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708341904; cv=none; b=IB9qhXu9v6DgZGma7aOIcVA0qtAdPIti4+9vV43ZLZCpYrYfvWzmwSfe9uiZokSEacguCeIHJtHL5+2etkNcIb0ImBzrf0gWPEODzlc+7Y921mqiowHEV8xGeXgoJSIUHj5QcWdHrvqLuALd6SHV2ccqZ1f98lsd885YkZYhqA0=
+	t=1708342336; cv=none; b=b8lb/vNG1BYXK+1Ed1cLmYIZFP5bWx0Xy/Bue78LgXit0yhzR/vYfoWdoaM8cSBWA5HFYObYxslt+7b48UIMXyMYy5ptALQF6cB3F6ip3mB7ua9lb7T0hASBln6IiNxlHQJNp/JhYTE86eAdyEDNHHUwH1h0CjHRYrPFcFXiR30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708341904; c=relaxed/simple;
-	bh=aETPx+UEoh98nD+niGp17QKD+kbGd9GeyJaP2E+rREs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mTblOZaIQixwAx2/vqUUBsgblKSHOU9kQ1406Al2MH5omqC8OEu7KYRfFdD1w/jUQsBcGmTmUYOjgFBzYQHoZr8qrrgpEhEptzhX7pO9Ox5gI+dt0fM0xgfc8v2fjniPa8/RTnOeYYCcfuvNC+qkC3xqnmci2V5e7iVqLK2hMt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YUqWu/7e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B62EC433F1;
-	Mon, 19 Feb 2024 11:25:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708341903;
-	bh=aETPx+UEoh98nD+niGp17QKD+kbGd9GeyJaP2E+rREs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=YUqWu/7e+40CRhs1o9XqzX1LhOze8qQ1+y5p5T29nyM4KOuE4wp229o7zFIROzl/m
-	 DstaHJVJYmbLutL2CeEeJwWxiINLJ5Z30p4Bprh5dkjNn6OOpy0Yb0gDURpLn4Dyug
-	 JU1kQ2ltOaneFTEYX+e9hCYC0F/BBJOHihWMPs0u+yZ5hl5OvaWHa2IEDmnm9Whm+e
-	 VDscLtofUz1vPUlaSjsTR0YIu5yQgO4GGOKMRklxgr7XJhdEa/bgQrdWqtXBEZ76U7
-	 DKUggqOX+QHDS2h26Eig956WegBIQVmmUR3TYdYQ7GaP25i2aK2RhnrVWzX/UTOjYV
-	 QsifBRzlQDwUg==
-Message-ID: <52ff5e18-3616-478a-ab40-8f9a6f7f3e37@kernel.org>
-Date: Mon, 19 Feb 2024 13:24:58 +0200
+	s=arc-20240116; t=1708342336; c=relaxed/simple;
+	bh=GX1gehkvQcZqiJUoO8NQAFdj6CmJo/860fgT0JsK+xc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=X50V2oBZpqFkF5vrXZap3wiBlFZdhUA88O2UMNNI/PCTa0ynmEzHqkEhM0gVG2jCiZ2F/bWMJn+CxWUVvWGim+DCP5ls+o7Bc6cx6xQdQx9arnD2BIgOewYghlOPEWPhv0gtuUey0LMkY1sxZFql+QYnQz0o2xfDyFToW6rqrig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=YyF3YEdU; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41J8OEHj003549;
+	Mon, 19 Feb 2024 11:31:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2023-11-20; bh=v5j29fJ7l64OqdiJXkSFRWQ/MC7+s+gIo0U3PRJ4NMc=;
+ b=YyF3YEdUJlI/zvbUNqlTqrMOBAcQXC9OGdlHX7e7yELOTHI937sRzZODYODPwZBoNRgx
+ P2GKUZg5J1AUSxPPZTkaqnMWcMvec/zoFJotTipaOetUzE6baUbADzA//nQct/M2s76f
+ oQ62N74MX6IN2Hs9x691XIKe16YavW+w0l/KcUqKbZERameaIK2Zij/FKiUJjloYAckJ
+ rPii4UVjhgoAC2oGA5pg6NGCUmExLRC7xRySG/2Y6MGICH5aLxy/W0lGZ6LUSfDJCc+e
+ XjR/2foeOITChbMYgaYcbA/EbVukkCiwYi0w75iIHb0yBEQYMHSWnOh2LMW5jG6FFgzP qg== 
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3wamucux4g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 19 Feb 2024 11:31:52 +0000
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 41JAgSXA026745;
+	Mon, 19 Feb 2024 11:31:52 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3wak8613a1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 19 Feb 2024 11:31:52 +0000
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41JBVpdf035718;
+	Mon, 19 Feb 2024 11:31:51 GMT
+Received: from pkannoju-vm.us.oracle.com (dhcp-10-166-182-179.vpn.oracle.com [10.166.182.179])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3wak86137v-1;
+	Mon, 19 Feb 2024 11:31:51 +0000
+From: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
+To: j.vosburgh@gmail.com, andy@greyhouse.net, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: rajesh.sivaramasubramaniom@oracle.com, rama.nichanamatlu@oracle.com,
+        manjunath.b.patil@oracle.com,
+        Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
+Subject: [PATCH RFC] bonding: rate-limit bonding driver inspect messages
+Date: Mon, 19 Feb 2024 17:01:40 +0530
+Message-Id: <20240219113140.4308-1-praveen.kannoju@oracle.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] net: ethernet: ti: am65-cpts: Enable PTP RX
- HW timestamp using CPTS FIFO
-Content-Language: en-US
-To: Chintan Vankar <c-vankar@ti.com>, Dan Carpenter
- <dan.carpenter@linaro.org>, Siddharth Vadapalli <s-vadapalli@ti.com>,
- Richard Cochran <richardcochran@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- "David S. Miller" <davem@davemloft.net>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <20240215110953.3225099-1-c-vankar@ti.com>
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20240215110953.3225099-1-c-vankar@ti.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-19_08,2024-02-16_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 suspectscore=0
+ mlxscore=0 spamscore=0 mlxlogscore=999 phishscore=0 bulkscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2402190086
+X-Proofpoint-GUID: gsMGlaCbH5kmokcPbzOv_nYPMMHiTG0b
+X-Proofpoint-ORIG-GUID: gsMGlaCbH5kmokcPbzOv_nYPMMHiTG0b
 
+Through the routine bond_mii_monitor(), bonding driver inspects and commits the
+slave state changes. During the times when slave state change and failure in
+aqcuiring rtnl lock happen at the same time, the routine bond_mii_monitor()
+reschedules itself to come around after 1 msec to commit the new state.
 
+During this, it executes the routine bond_miimon_inspect() to re-inspect the
+state chane and prints the corresponding slave state on to the console. Hence
+we do see a message at every 1 msec till the rtnl lock is acquired and state
+chage is committed.
 
-On 15/02/2024 13:09, Chintan Vankar wrote:
-> CPTS module supports capturing timestamp for every packet it receives,
-> add a new function named "am65_cpts_rx_find_ts()" to get the timestamp
-> of received packets from CPTS FIFO.
-> 
-> Add another function named "am65_cpts_rx_timestamp()" which internally
-> calls "am65_cpts_rx_find_ts()" function and timestamps the received
-> PTP packets.
-> 
-> Signed-off-by: Chintan Vankar <c-vankar@ti.com>
-> ---
->  drivers/net/ethernet/ti/am65-cpts.c | 84 +++++++++++++++++++++--------
->  drivers/net/ethernet/ti/am65-cpts.h | 11 ++--
->  2 files changed, 67 insertions(+), 28 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/ti/am65-cpts.c b/drivers/net/ethernet/ti/am65-cpts.c
-> index c66618d91c28..92a3b40e60d6 100644
-> --- a/drivers/net/ethernet/ti/am65-cpts.c
-> +++ b/drivers/net/ethernet/ti/am65-cpts.c
-> @@ -859,29 +859,6 @@ static long am65_cpts_ts_work(struct ptp_clock_info *ptp)
->  	return delay;
->  }
->  
-> -/**
-> - * am65_cpts_rx_enable - enable rx timestamping
-> - * @cpts: cpts handle
-> - * @en: enable
-> - *
-> - * This functions enables rx packets timestamping. The CPTS can timestamp all
-> - * rx packets.
-> - */
-> -void am65_cpts_rx_enable(struct am65_cpts *cpts, bool en)
-> -{
-> -	u32 val;
-> -
-> -	mutex_lock(&cpts->ptp_clk_lock);
-> -	val = am65_cpts_read32(cpts, control);
-> -	if (en)
-> -		val |= AM65_CPTS_CONTROL_TSTAMP_EN;
-> -	else
-> -		val &= ~AM65_CPTS_CONTROL_TSTAMP_EN;
-> -	am65_cpts_write32(cpts, val, control);
-> -	mutex_unlock(&cpts->ptp_clk_lock);
-> -}
-> -EXPORT_SYMBOL_GPL(am65_cpts_rx_enable);
-> -
->  static int am65_skb_get_mtype_seqid(struct sk_buff *skb, u32 *mtype_seqid)
->  {
->  	unsigned int ptp_class = ptp_classify_raw(skb);
-> @@ -906,6 +883,67 @@ static int am65_skb_get_mtype_seqid(struct sk_buff *skb, u32 *mtype_seqid)
->  	return 1;
->  }
->  
-> +static u64 am65_cpts_find_rx_ts(struct am65_cpts *cpts, struct sk_buff *skb,
-> +				int ev_type, u32 skb_mtype_seqid)
-> +{
-> +	struct list_head *this, *next;
-> +	struct am65_cpts_event *event;
-> +	unsigned long flags;
-> +	u32 mtype_seqid;
-> +	u64 ns = 0;
-> +
-> +	am65_cpts_fifo_read(cpts);
+This patch doesn't change how bond functions. It only simply limits this kind
+of log flood.
 
-am65_cpts_fifo_read() is called from the CPTS interrupt handler and the
-event is popped out of the FIFO and pushed into an event list.
+v2: Use exising net_ratelimit() instead of introducing new rate-limit
+parameter.
 
-Doesn't this race with that interrupt handler?
-Can't you use that event list instead of reading cpts_fifo directly?
+v3: Commit message is modified to provide summary of the issue, because of
+which rate-limiting the bonding driver messages is needed.
 
-Something like am65_cpts_match_tx_ts()?
+Signed-off-by: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
+---
+ drivers/net/bonding/bond_main.c | 36 ++++++++++++++++++++----------------
+ 1 file changed, 20 insertions(+), 16 deletions(-)
 
-> +	spin_lock_irqsave(&cpts->lock, flags);
-> +	list_for_each_safe(this, next, &cpts->events) {
-> +		event = list_entry(this, struct am65_cpts_event, list);
-> +		if (time_after(jiffies, event->tmo)) {
-> +			list_del_init(&event->list);
-> +			list_add(&event->list, &cpts->pool);
-> +			continue;
-> +		}
-> +
-> +		mtype_seqid = event->event1 &
-> +			      (AM65_CPTS_EVENT_1_MESSAGE_TYPE_MASK |
-> +			       AM65_CPTS_EVENT_1_SEQUENCE_ID_MASK |
-> +			       AM65_CPTS_EVENT_1_EVENT_TYPE_MASK);
-> +
-> +		if (mtype_seqid == skb_mtype_seqid) {
-> +			ns = event->timestamp;
-> +			list_del_init(&event->list);
-> +			list_add(&event->list, &cpts->pool);
-> +			break;
-> +		}
-> +	}
-> +	spin_unlock_irqrestore(&cpts->lock, flags);
-> +
-> +	return ns;
-> +}
-> +
-> +void am65_cpts_rx_timestamp(struct am65_cpts *cpts, struct sk_buff *skb)
-> +{
-> +	struct am65_cpts_skb_cb_data *skb_cb = (struct am65_cpts_skb_cb_data *)skb->cb;
-> +	struct skb_shared_hwtstamps *ssh;
-> +	int ret;
-> +	u64 ns;
-> +
-> +	ret = am65_skb_get_mtype_seqid(skb, &skb_cb->skb_mtype_seqid);
-> +	if (!ret)
-> +		return; /* if not PTP class packet */
-> +
-> +	skb_cb->skb_mtype_seqid |= (AM65_CPTS_EV_RX << AM65_CPTS_EVENT_1_EVENT_TYPE_SHIFT);
-> +
-> +	dev_dbg(cpts->dev, "%s mtype seqid %08x\n", __func__, skb_cb->skb_mtype_seqid);
-> +
-> +	ns = am65_cpts_find_rx_ts(cpts, skb, AM65_CPTS_EV_RX, skb_cb->skb_mtype_seqid);
-> +	if (!ns)
-> +		return;
-> +
-> +	ssh = skb_hwtstamps(skb);
-> +	memset(ssh, 0, sizeof(*ssh));
-> +	ssh->hwtstamp = ns_to_ktime(ns);
-> +}
-> +EXPORT_SYMBOL_GPL(am65_cpts_rx_timestamp);
-> +
->  /**
->   * am65_cpts_tx_timestamp - save tx packet for timestamping
->   * @cpts: cpts handle
-> diff --git a/drivers/net/ethernet/ti/am65-cpts.h b/drivers/net/ethernet/ti/am65-cpts.h
-> index 6e14df0be113..6099d772799d 100644
-> --- a/drivers/net/ethernet/ti/am65-cpts.h
-> +++ b/drivers/net/ethernet/ti/am65-cpts.h
-> @@ -22,9 +22,9 @@ void am65_cpts_release(struct am65_cpts *cpts);
->  struct am65_cpts *am65_cpts_create(struct device *dev, void __iomem *regs,
->  				   struct device_node *node);
->  int am65_cpts_phc_index(struct am65_cpts *cpts);
-> +void am65_cpts_rx_timestamp(struct am65_cpts *cpts, struct sk_buff *skb);
->  void am65_cpts_tx_timestamp(struct am65_cpts *cpts, struct sk_buff *skb);
->  void am65_cpts_prep_tx_timestamp(struct am65_cpts *cpts, struct sk_buff *skb);
-> -void am65_cpts_rx_enable(struct am65_cpts *cpts, bool en);
->  u64 am65_cpts_ns_gettime(struct am65_cpts *cpts);
->  int am65_cpts_estf_enable(struct am65_cpts *cpts, int idx,
->  			  struct am65_cpts_estf_cfg *cfg);
-> @@ -48,17 +48,18 @@ static inline int am65_cpts_phc_index(struct am65_cpts *cpts)
->  	return -1;
->  }
->  
-> -static inline void am65_cpts_tx_timestamp(struct am65_cpts *cpts,
-> +static inline void am65_cpts_rx_timestamp(struct am65_cpts *cpts,
->  					  struct sk_buff *skb)
->  {
->  }
->  
-> -static inline void am65_cpts_prep_tx_timestamp(struct am65_cpts *cpts,
-> -					       struct sk_buff *skb)
-> +static inline void am65_cpts_tx_timestamp(struct am65_cpts *cpts,
-> +					  struct sk_buff *skb)
->  {
->  }
->  
-> -static inline void am65_cpts_rx_enable(struct am65_cpts *cpts, bool en)
-> +static inline void am65_cpts_prep_tx_timestamp(struct am65_cpts *cpts,
-> +					       struct sk_buff *skb)
->  {
->  }
->  
-
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 4e0600c..e92eba1 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -2610,12 +2610,13 @@ static int bond_miimon_inspect(struct bonding *bond)
+ 			commit++;
+ 			slave->delay = bond->params.downdelay;
+ 			if (slave->delay) {
+-				slave_info(bond->dev, slave->dev, "link status down for %sinterface, disabling it in %d ms\n",
+-					   (BOND_MODE(bond) ==
+-					    BOND_MODE_ACTIVEBACKUP) ?
+-					    (bond_is_active_slave(slave) ?
+-					     "active " : "backup ") : "",
+-					   bond->params.downdelay * bond->params.miimon);
++				if (net_ratelimit())
++					slave_info(bond->dev, slave->dev, "link status down for %sinterface, disabling it in %d ms\n",
++						   (BOND_MODE(bond) ==
++						   BOND_MODE_ACTIVEBACKUP) ?
++						   (bond_is_active_slave(slave) ?
++						   "active " : "backup ") : "",
++						   bond->params.downdelay * bond->params.miimon);
+ 			}
+ 			fallthrough;
+ 		case BOND_LINK_FAIL:
+@@ -2623,9 +2624,10 @@ static int bond_miimon_inspect(struct bonding *bond)
+ 				/* recovered before downdelay expired */
+ 				bond_propose_link_state(slave, BOND_LINK_UP);
+ 				slave->last_link_up = jiffies;
+-				slave_info(bond->dev, slave->dev, "link status up again after %d ms\n",
+-					   (bond->params.downdelay - slave->delay) *
+-					   bond->params.miimon);
++				if (net_ratelimit())
++					slave_info(bond->dev, slave->dev, "link status up again after %d ms\n",
++						   (bond->params.downdelay - slave->delay) *
++						   bond->params.miimon);
+ 				commit++;
+ 				continue;
+ 			}
+@@ -2648,18 +2650,20 @@ static int bond_miimon_inspect(struct bonding *bond)
+ 			slave->delay = bond->params.updelay;
+ 
+ 			if (slave->delay) {
+-				slave_info(bond->dev, slave->dev, "link status up, enabling it in %d ms\n",
+-					   ignore_updelay ? 0 :
+-					   bond->params.updelay *
+-					   bond->params.miimon);
++				if (net_ratelimit())
++					slave_info(bond->dev, slave->dev, "link status up, enabling it in %d ms\n",
++						   ignore_updelay ? 0 :
++						   bond->params.updelay *
++						   bond->params.miimon);
+ 			}
+ 			fallthrough;
+ 		case BOND_LINK_BACK:
+ 			if (!link_state) {
+ 				bond_propose_link_state(slave, BOND_LINK_DOWN);
+-				slave_info(bond->dev, slave->dev, "link status down again after %d ms\n",
+-					   (bond->params.updelay - slave->delay) *
+-					   bond->params.miimon);
++				if (net_ratelimit())
++					slave_info(bond->dev, slave->dev, "link status down again after %d ms\n",
++						   (bond->params.updelay - slave->delay) *
++						   bond->params.miimon);
+ 				commit++;
+ 				continue;
+ 			}
 -- 
-cheers,
--roger
+1.8.3.1
+
 
