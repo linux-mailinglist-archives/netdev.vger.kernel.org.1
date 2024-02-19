@@ -1,98 +1,75 @@
-Return-Path: <netdev+bounces-72986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0FD585A873
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 17:13:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 047CE85A87A
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 17:14:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 966AC1F22DF6
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 16:13:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 345161C20928
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 16:14:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CC313DBB8;
-	Mon, 19 Feb 2024 16:13:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F7F23A29A;
+	Mon, 19 Feb 2024 16:14:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aty07ZSW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HBgV9BYG"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC22B3CF53
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 16:13:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9C443B786;
+	Mon, 19 Feb 2024 16:14:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708359184; cv=none; b=VqxvHHgyLakAAxdZl9quCysVJ3XM7i8BBq8BJ7Zw0Q9nskd7tAatD/HifWbOkdNWnT6dxNzinQgKAfZjXrw4pRXszBBeXf5O74/9j3ilv6kYz0VpmBG1Uz9Jki1qwNmgTL1+h61CZ6x6GCubeHqzlI2DrjoZtnabMDQT0r1pTFU=
+	t=1708359262; cv=none; b=ewZAn11dOw7ysgQhQEJRNqiZwZvwkXDpO2UFj1osbPOhHnShfsbX1me0lyetrCEbQ+ggTe8eOdJP6VLPKgbUMz9gYhJwXnlzfBgJRrTvf4xvbK1KS27cmjuG1uHFh6LLz/kw+rm2oxg6nzsryZHPOzYSGD2+bXJECbLNyJl/jJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708359184; c=relaxed/simple;
-	bh=TEbeuKi1D4WwK34OueQCHICSRhZ5+jaTYtBPp4NOkog=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=rhfmwRuhcj2ZwAzIaFujxWKPNPd8ldOGljNo5jsTqKi8IwVJpiw2Z/OdI+763UKcyHYWP+hV2vOMCPhHV/oORy14oObdvzjGS/zxGd/gcWf1UtuPFZnbvLyoZhX4tAZFNmuzq9saRbZEqEQAhzZGo0Bc3QxDEFK5HMJL+5k1p3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aty07ZSW; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708359181;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Qw1Zo0E33/fdGs8X8g9v7Lf2Wcxxz6qcLyaGW55/s6Y=;
-	b=aty07ZSWO9iSsFwiFMq9mbSUUJjYmo0liNVPJKThzxNl8Wk1zrU7Vj9QCWG6jQ7IbwedX/
-	E4lS0HsK2ZBBAUA7O/Lb2a6JEC8GDXh3zfbwP9/Zp4Z3UBSoq25aCBnRp4W0Lgmbuy8Q64
-	SXaVnC+giDJQlgCe3Ca6cgpUYTNnwmc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-468-3bJK7h8bOYeO_1GkDHJOeg-1; Mon, 19 Feb 2024 11:12:52 -0500
-X-MC-Unique: 3bJK7h8bOYeO_1GkDHJOeg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B26D2882087;
-	Mon, 19 Feb 2024 16:12:51 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0EFA71121306;
-	Mon, 19 Feb 2024 16:12:48 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20240209105947.GF1516992@kernel.org>
-References: <20240209105947.GF1516992@kernel.org> <20240205225726.3104808-1-dhowells@redhat.com> <20240205225726.3104808-10-dhowells@redhat.com>
-To: Simon Horman <horms@kernel.org>
-Cc: dhowells@redhat.com, Steve French <smfrench@gmail.com>,
-    Jeff Layton <jlayton@kernel.org>,
-    Matthew Wilcox <willy@infradead.org>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Christian Brauner <christian@brauner.io>, netfs@lists.linux.dev,
-    linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-    linux-mm@kvack.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org, Steve French <sfrench@samba.org>,
-    Shyam Prasad N <nspmangalore@gmail.com>,
-    Rohith Surabattula <rohiths.msft@gmail.com>
-Subject: Re: [PATCH v5 09/12] cifs: Cut over to using netfslib
+	s=arc-20240116; t=1708359262; c=relaxed/simple;
+	bh=CjV/Q5tIGqEo2SgRvMzAGZhlSstVhiuysZf91I8p+VY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qfuK0OfQibaPVBJyXoSatPLxI5f1qxne2WDSYnbkBXETOjuc0x0Ej2rwbs11kkBPkV5mm7R1n/8AeMy7yc5q1TCCUFgKSkAFiWCdR4+PuTTM/LywcuvVfe6G5YAgzJf7fCOKQENoOIUrIy3ut5VR0RR987PrINRFRdfEMAQ1Gck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HBgV9BYG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C0CCC433F1;
+	Mon, 19 Feb 2024 16:14:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708359261;
+	bh=CjV/Q5tIGqEo2SgRvMzAGZhlSstVhiuysZf91I8p+VY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HBgV9BYGdv5+7+L1V+WdAYNwrx2x/X/1YIVY0S7LvqsrSpWXdIQaNG0UEixAqNv7y
+	 ZrnBihAWQI75HWzBI815Auh1vQxkPXbZycbFA/sCLa82/KzDj2S2u68ft8PY67AeDC
+	 Um5EEt1Yo3iFDyCDvEph8H/hUL8w35YRqQh++vTrffzhr+LtU7puJXmLIaI9mFAum7
+	 +vHl3u/c/IuNss4A4mxNpaecn/6cxWh7uiO/DJU9TxMYHcFeNm8Alw5Mqu3WxT21V4
+	 VOq7ud+x3rg45oWO3pa7/rA0D7HjVy7DIc08NQvkUgqiVM9NW8enssJ71bliSe1G0a
+	 Uc18LCe/igK5Q==
+Date: Mon, 19 Feb 2024 16:14:18 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, corbet@lwn.net, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net] docs: netdev: update the link to the CI repo
+Message-ID: <20240219161418.GG40273@kernel.org>
+References: <20240216161945.2208842-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <229304.1708359168.1@warthog.procyon.org.uk>
-Date: Mon, 19 Feb 2024 16:12:48 +0000
-Message-ID: <229305.1708359168@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240216161945.2208842-1-kuba@kernel.org>
 
-Simon Horman <horms@kernel.org> wrote:
+On Fri, Feb 16, 2024 at 08:19:45AM -0800, Jakub Kicinski wrote:
+> Netronome graciously transferred the original NIPA repo
+> to our new netdev umbrella org. Link to that instead of
+> my private fork.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-> Nit: this hunk would probably be better placed in the
->      patch at adds cifs_req_ops to fs/smb/client/file.c
+Although I no longer represent Netronome, I confirm that this is the case
+based on a discussion I had with Netronome to facilitate this move.
 
-I've moved that to the patch that adds cifs_req_ops.
+Thanks to Netronome for their help.
 
-David
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
