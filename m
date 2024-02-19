@@ -1,70 +1,72 @@
-Return-Path: <netdev+bounces-73007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CA4A85A9DD
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 18:26:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D87985A9DE
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 18:26:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DD9A1F2206F
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 17:26:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0D721C22998
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 17:26:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E332C44C98;
-	Mon, 19 Feb 2024 17:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AFA147F75;
+	Mon, 19 Feb 2024 17:25:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="rCGVgKmu"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="w6JTHxvE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AD5847F77
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 17:25:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59C304594E
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 17:25:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708363532; cv=none; b=Vr0FkAtJj3xBGULtxdoWcahSdQsOthJQHI32AzHbRITLOLv3SnHyoec4VbUsyji+bD3WrQ+HcOeOPz5nEGJNCrQMckc8JxS3Ku91mGoe8y23CjzhJPmOtEYO9MdA44XsDcm5Wgs3gUqEo4JcfMLqjCGkj6PPftzQRSd/1JObz8o=
+	t=1708363535; cv=none; b=ewEscbHVHfo5CJpBPdOSnFEV3xUE6Q/xDNNMTlo676WqFaUxXMktJo7kJUQIcjhb9wchU4mFBValK1wEwChwtGOrLtKAzJ9jgP1Vg5jLKE2qMXu2G0Vw120wCzgnI43wVjUDcspn0GXhn5nfRWp42Y+Wll4eXwyR2d6eWKHFGUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708363532; c=relaxed/simple;
-	bh=JyGVQNocAfXL6bIwVkart+6gGnvFOkzFkqhl4v3PG6A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bgTyh2NqeG6weC/CfKMCWqXyZ+eKQ65XlCxpNs7ALfmkfi+3++k8jQrNd6S6sZu+r4fEseXbJaLRRplToqwtiV3owo/nZZu4FIJTadQm13NfAc7u8dWWBnM+O4VDx3pqXQQtT+t4ypJdAKeK7GhrvcvK3yvEXpJ5v8+Ef/Vx5pU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=rCGVgKmu; arc=none smtp.client-ip=209.85.221.47
+	s=arc-20240116; t=1708363535; c=relaxed/simple;
+	bh=j8oL6u7LIz1kVWmjKRw4xt8aa5zLt1brU8S6+j9SIOg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=uQA8bqIE2LhO8U3nyp8PslRRsMkjca7g1do+CvVPkGIwYhWcfD1CcUIounywlCrNL3YgRZD5OaSZCx2eGqYCoiBKM17UooTo/jfnVsgTH8G+tkt1jKJLYfMP3FVGqpluoUC5eu963lgkKXTQzCRSLh8fOGnDlXtgwGSw9A645l8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=w6JTHxvE; arc=none smtp.client-ip=209.85.128.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-33d36736d4eso1315093f8f.1
-        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 09:25:29 -0800 (PST)
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-41242d2f73cso23136795e9.0
+        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 09:25:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708363528; x=1708968328; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=A6JeMIHTNrEuCOSfDgndLT6fFyyaJOMpzTAP3Ggk3Nw=;
-        b=rCGVgKmu320aXGMWizDa8OHLmjukolUkk47aDrgBrcOZA9X3KihmCVivhy8hViXFNl
-         WcedrODWXBaOnaysQh6SWbyAdhdYktjKzG6dibQmnngQKn696MiN8O4l0s1eGFqkCGTF
-         hXTu1jUvZtHyGjVSck5whqhr2Y1kchJu82nHbk0g97PEx6BquZEK4PobBBOpRs56/QMf
-         bee4Zq+6qZ4k/PohRCnGKxSCzlb5v/9sRlEh1hY0PLJViLbeEMBMf+y6Jq3iqGzG7hMt
-         GZfuqFgZjfhDo16yMFiqzF5X32RxiS2LbrUvEomrLbMiqYEzE2Wh/vGXqWuvYoWPaTMN
-         352g==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708363532; x=1708968332; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=s/QhDRwym0LVRokbBfusx2gFhFFv/dhMOJxMFuna4ss=;
+        b=w6JTHxvE30nvvyY2JzJ4Y+f75cWHdGjlDTGENIsD/Aj0CJU17hZhjgPDxFQOiBDhUQ
+         JnhvsqXtnIldO+U0LTRJGM9CQ8OFufZnkd1SzPcEeG0zqm6BFeCMLnPfE12f42N6IAAJ
+         eLFcADeWkVJvkHn2zgx/huU2fToF0qEq0g4d6Ndx0mGTcrXnz/aBepAAU1QQW+QSxhW/
+         +2rTH9yrAZfdLfsJgEo5vMYhfku1bTwD9eIkilTA8TQNsan9HYvz6gPrpLI589wfsXYw
+         j9h+HUKo3uIkKHue0siqdreNxu18M6B3hR9knkuJL0ugN4Gzq83paXwEVc3Succje87j
+         40uA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708363528; x=1708968328;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=A6JeMIHTNrEuCOSfDgndLT6fFyyaJOMpzTAP3Ggk3Nw=;
-        b=h29HJKtU5IRy7K5xNUvTGu7Wrmljfc1FlMIsLJP6a1je6LLxGQi065pmQV6InLwTCQ
-         SXp7xg+LDit686hdwJ1w1vgfed7VOWaFc6qBzraN9UAtWabEjH8zgHAkq9O2Nt068Usf
-         jowbtWs1iOg2b/jihXtpoSt6FTVdr+LiIebwxfGtfmaQDHW4hBYOMVUmYseIh9XHbRQg
-         SwLm242NEE6LeUlxhZEjXcjEmKjfIrk+ah7IcH7zUvffg32oLngEWewZXMKTXfYtM9ER
-         EPYj2wDiZwh98IR0S8seUDlkokLILVRIypy1ksIgHKJXv5As9g9LCfvGpAXvZ+5/U9j6
-         JhJw==
-X-Gm-Message-State: AOJu0YwzJ53eRbZysf/xTAxI4AMxfXn5l0BkRM4ZpZuIEG7tb/GXb2Xv
-	q0JEBbU81ksf9hJDwz4jEyXwdG3U0QjpWaKZwRH4DSq0sW2wem/D5S7eOKQAoi37D3lPO3lYAIe
-	h
-X-Google-Smtp-Source: AGHT+IFN3CXKSEGPkAtitvm4EmcE9v98twNdNRjOAK8GAvq7quT+J62U+m9nRjtZzqL4yeho8yV3IA==
-X-Received: by 2002:a5d:64c2:0:b0:33d:3098:c20 with SMTP id f2-20020a5d64c2000000b0033d30980c20mr5999967wri.2.1708363528375;
-        Mon, 19 Feb 2024 09:25:28 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708363532; x=1708968332;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=s/QhDRwym0LVRokbBfusx2gFhFFv/dhMOJxMFuna4ss=;
+        b=t81HT0i/KgfXdNuAR2joPFe98Zp1uI4as+/wMD4tkU0AfURCwX+zfbsaW2sxm7OVg+
+         +ZOfxftOlrJ9OCCIu6SjOwC39pr7e54vyadYT1OeC7HK9qoBJhrUWC3c5D7U3aTXJRqR
+         kPOMKyFftrxkAzJV/U/p56NqCX4GYTm4LhhAdIarAmwIsNTZdGITHwBrV3wpGhTd2MOY
+         /qVoPQ3LF0eneLBZ90dxq3Mf/2f+6W1zwHDs9gXlgE99+NFgiC/OrrRiAZ6x8JjzLCmf
+         lX5XvdqJ7Ib4UrGeFY8TnjBHF6KSBbtZJmTMS724j9AbexJwgBNoZ6A0ZtKNNpvd6D4A
+         r36w==
+X-Gm-Message-State: AOJu0Yzvo2CLfbIru7h1ovun1BOLBVw3mYgWRkd4DBBDfyg/mRgt4Y5V
+	wvHmq7oRLGCYWolja6vyyj4HctJE6JhwbfCo+L9D+BwqCTWeshuQzDALhP9gmKkkJBhS/A/vTqK
+	A
+X-Google-Smtp-Source: AGHT+IEKv4LObKlbx5807pgp95FujRxBeTiB9RE4GBrfd0kzVS05TgRINYh4QMMmeFPhxRnRv604Dw==
+X-Received: by 2002:a05:600c:1d04:b0:412:56ab:5bf6 with SMTP id l4-20020a05600c1d0400b0041256ab5bf6mr5233876wms.10.1708363531762;
+        Mon, 19 Feb 2024 09:25:31 -0800 (PST)
 Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id v15-20020a5d610f000000b0033d4cf751b2sm4239607wrt.33.2024.02.19.09.25.27
+        by smtp.gmail.com with ESMTPSA id z19-20020a7bc7d3000000b00411e1574f7fsm11825041wmk.44.2024.02.19.09.25.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Feb 2024 09:25:27 -0800 (PST)
+        Mon, 19 Feb 2024 09:25:31 -0800 (PST)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -77,10 +79,12 @@ Cc: kuba@kernel.org,
 	sdf@google.com,
 	lorenzo@kernel.org,
 	alessandromarcolini99@gmail.com
-Subject: [patch net-next 00/13] netlink: specs: devlink: add the rest of missing attribute definitions
-Date: Mon, 19 Feb 2024 18:25:16 +0100
-Message-ID: <20240219172525.71406-1-jiri@resnulli.us>
+Subject: [patch net-next 01/13] tools: ynl: allow user to specify flag attr with bool values
+Date: Mon, 19 Feb 2024 18:25:17 +0100
+Message-ID: <20240219172525.71406-2-jiri@resnulli.us>
 X-Mailer: git-send-email 2.43.2
+In-Reply-To: <20240219172525.71406-1-jiri@resnulli.us>
+References: <20240219172525.71406-1-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,110 +95,30 @@ Content-Transfer-Encoding: 8bit
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-This patchset is adding the missing definitions of devlink attributes.
+The flag attr presence in Netlink message indicates value "true",
+if it is missing in the message it means "false".
 
-It got a bit tricky, as the param and fmsg value attributes have
-different type according to a value of another attribute. Thankfully,
-the selector infrastructure was recently introduced to ynl. This
-patchset extends it a bit and uses it.
+Allow user to specify attrname with value "true"/"false"
+in json for flag attrs, treat "false" value properly.
 
-Another tricky bit was the fact that fmsg contains a list of attributes
-that go as a stream and can be present multiple times. Also, it is
-important to maintain the attribute position. For that, list output
-needed to be added.
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+---
+ tools/net/ynl/lib/ynl.py | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Also, nested devlink attributes definitions was added.
-
-Examples:
-$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/devlink.yaml \
-                              --dump param-get
-[{'bus-name': 'netdevsim',
-  'dev-name': 'netdevsim1',
-  'param': {'param-generic': True,
-            'param-name': 'max_macs',
-            'param-type': 'u32',
-            'param-values-list': {'param-value': [{'param-value-cmode': 'driverinit',
-                                                   'param-value-data': 32}]}}},
- {'bus-name': 'netdevsim',
-  'dev-name': 'netdevsim1',
-  'param': {'param-name': 'test1',
-            'param-type': 'flag',
-            'param-values-list': {'param-value': [{'param-value-cmode': 'driverinit',
-                                                   'param-value-data': True}]}}}]
-$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/devlink.yaml \
-                              --do param-set \
-			      --json '{"bus-name": "netdevsim", "dev-name": "netdevsim1", "param-name": "max_macs", "param-type": "u32", "param-value-data": 21, "param-value-cmode": "driverinit"}'
-$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/devlink.yaml \
-                              --do param-set \
-			      --json '{"bus-name": "netdevsim", "dev-name": "netdevsim1", "param-name": "test1", "param-type": "flag", "param-value-data": false, "param-value-cmode": "driverinit"}'
-
-$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/devlink.yaml \
-                              --dump health-reporter-dump-get --json '{"bus-name": "netdevsim", "dev-name": "netdevsim1", "health-reporter-name": "dummy"}'
-[{'fmsg': [{'fmsg-obj-nest-start': True},
-           {'fmsg-pair-nest-start': True},
-           {'fmsg-obj-name': 'test_bool'},
-           {'fmsg-obj-value-type': 'flag'},
-           {'fmsg-obj-value-data': True},
-           {'fmsg-nest-end': True},
-           {'fmsg-pair-nest-start': True},
-           {'fmsg-obj-name': 'test_u8'},
-           {'fmsg-obj-value-type': 'u8'},
-           {'fmsg-obj-value-data': 1},
-           {'fmsg-nest-end': True},
-           {'fmsg-pair-nest-start': True},
-           {'fmsg-obj-name': 'test_u32'},
-           {'fmsg-obj-value-type': 'u32'},
-           {'fmsg-obj-value-data': 3},
-.....
-           {'fmsg-nest-end': True}]}]
-
-$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/devlink.yaml \
-		              --do port-get \
-			      --json '{"bus-name": "pci", "dev-name": "0000:08:00.1", "port-index": 98304}'
-{'bus-name': 'pci',
- 'dev-name': '0000:08:00.1',
- 'port-controller-number': 0,
- 'port-flavour': 'pci_sf',
- 'port-function': {'caps': {'selector': {'roce-bit'}, 'value': {'roce-bit'}},
-                   'devlink': {'bus-name': 'auxiliary',
-                               'dev-name': 'mlx5_core.sf.2'},
-                   'hw-addr': b'\x00\x00\x00\x00\x00\x00',
-                   'opstate': 'attached',
-                   'state': 'active'},
- 'port-index': 98304,
- 'port-netdev-ifindex': 7,
- 'port-netdev-name': 'eth4',
- 'port-pci-pf-number': 1,
- 'port-pci-sf-number': 109,
- 'port-splittable': 0,
- 'port-type': 'eth'}
-
-Jiri Pirko (13):
-  tools: ynl: allow user to specify flag attr with bool values
-  tools: ynl: process all scalar types encoding in single elif statement
-  tools: ynl: allow user to pass enum string instead of scalar value
-  netlink: specs: allow sub-messages in genetlink-legacy
-  tools: ynl: allow attr in a subset to be of a different type
-  tools: ynl: introduce attribute-replace for sub-message
-  tools: ynl: add support for list in nested attribute
-  netlink: specs: devlink: add enum for param-type attribute values
-  netlink: specs: devlink: add missing param attribute definitions
-  netlink: specs: devlink: treat dl-fmsg attribute as list
-  netlink: specs: devlink: add enum for fmsg-obj-value-type attribute
-    values
-  netlink: specs: devlink: add missing fmsg-obj-value-data attribute
-    definitions
-  netlink: specs: devlink: add missing nested devlink definitions
-
- Documentation/netlink/genetlink-legacy.yaml   |  54 +++-
- Documentation/netlink/netlink-raw.yaml        |  10 +-
- Documentation/netlink/specs/devlink.yaml      | 260 +++++++++++++++++-
- .../netlink/genetlink-legacy.rst              | 126 +++++++++
- .../userspace-api/netlink/netlink-raw.rst     | 101 -------
- tools/net/ynl/lib/nlspec.py                   |   8 +
- tools/net/ynl/lib/ynl.py                      |  81 ++++--
- 7 files changed, 500 insertions(+), 140 deletions(-)
-
+diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+index f45ee5f29bed..108fe7eadd93 100644
+--- a/tools/net/ynl/lib/ynl.py
++++ b/tools/net/ynl/lib/ynl.py
+@@ -459,6 +459,8 @@ class YnlFamily(SpecFamily):
+                 attr_payload += self._add_attr(attr['nested-attributes'],
+                                                subname, subvalue, sub_attrs)
+         elif attr["type"] == 'flag':
++            if value == False:
++                return b''
+             attr_payload = b''
+         elif attr["type"] == 'string':
+             attr_payload = str(value).encode('ascii') + b'\x00'
 -- 
 2.43.2
 
