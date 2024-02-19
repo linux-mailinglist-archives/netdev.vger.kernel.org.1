@@ -1,104 +1,173 @@
-Return-Path: <netdev+bounces-72825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B5B8859CC9
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 08:25:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F922859CE0
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 08:31:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F04E1C21B0F
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 07:24:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E5C41F229E2
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 07:31:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8220A20B0E;
-	Mon, 19 Feb 2024 07:24:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD22B20B0C;
+	Mon, 19 Feb 2024 07:31:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rlN8+aqb"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mfZk95U7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55F9520B04;
-	Mon, 19 Feb 2024 07:24:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2682C200A8
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 07:31:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708327491; cv=none; b=tHqX41NNKzU9HT3ABz+QgrMYqb7cxk5mbI8yio4TffOvZ//sEesnK8zYfAHd4b0enOlZWTU07VDch4Cp2xf7Kd7gQ6IwNEfVYhoCL6bo1fV014JPUi5JEjxxLGSDDzpePiS4nK7G9Ch0ixjLMX9CCUZHWtwsVDw61XJdXvaesSg=
+	t=1708327896; cv=none; b=Mvckl9ljvJ6fpmJi7nUGupRyv7uwIqf3yBqDBOcTTeHZWVqmvES54O8ysrW/AM7bjJl+9ksJsAvuSNjGqQC47VvsofSNMipunXXl65ZJWjhr8TuGz5MyfH7I07zXtkhb35cWHGwwuxBf57UfcypSWrDqnkwEiDJzMicJ0vMWvKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708327491; c=relaxed/simple;
-	bh=pANYziPkYN/b41sQKhnbiBZpozUbx6Wr+HoOttPlSj0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FZ+YsYWsg8tff/bnQ/+m7x4DS5v0mpm74hCGeQRwjTUuwFoNTJa70PJgEGzD9ljb+CkSF3PCDRAetJXiwbqegfXmP8/VKsg+hY7/5Xwwr8KZcUNi7LBipweQl0BrynXbxbFeYMowYK9LqonNEBvsbuv68XKtzmhPmwg1UofS89A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rlN8+aqb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 427D2C433F1;
-	Mon, 19 Feb 2024 07:24:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708327490;
-	bh=pANYziPkYN/b41sQKhnbiBZpozUbx6Wr+HoOttPlSj0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rlN8+aqbEZYGeDZsH7bDpcuaZpeBdWXwBLzEp7k8FF7bvJSF7Z/9yjvmw+gRSx3y7
-	 Bo/KuI279uE9yt6ymu9PougfSn4NE15jJr7KmEpPz3cGoTR0v4iQS3Ao13gTjLg7Ds
-	 ubc3naEDqfbSIKI09IFHIYQ2N2KMtZjjbd2XgzZLyify2/k7DjUF3m0HJwOiqtrNZI
-	 cOej7DEGKNIFiQ+q/UYM48HcmA5AZvikWZUmWYso+9WFs+0wqIdl/pDVStC3bwBDGb
-	 szBpYboaRNHkMz5h0ucrNjimK/mzgAfkeKBLCts773kLK4fkTLsR+3U9B4nPmerAVw
-	 8N8E8+NabSonA==
-Date: Mon, 19 Feb 2024 09:24:45 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Bernard Metzler <bmt@zurich.ibm.com>
-Cc: jgg@ziepe.ca, linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-	syzbot+e7c51d3be3a5ddfa0d7a@syzkaller.appspotmail.com
-Subject: Re: [PATCH] RDMA/siw: Fix handling netdev going down event
-Message-ID: <20240219072445.GA14258@unreal>
-References: <20240215115524.126477-1-bmt@zurich.ibm.com>
+	s=arc-20240116; t=1708327896; c=relaxed/simple;
+	bh=dVkVGxmn/z6Lixs774LcaDI9FjXsi8mvLcDgfDzIp5U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AKzwH3JAlgJ7nfnKyYn7GJeDd9BhlwXyCTXsfzXdrD295j+rh7o8/C091eFo4oD85261c7fNyTAJIUWAhHqtdOZMX/v31AxKO0Tb/eDIUUwMhDYtDmvSBxvcsadm3F6R9QgRLGv5HB6EyoMJcmBX9q9EGl3mz5SlB8p6xMR2OUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=mfZk95U7; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2d23700df18so11036141fa.0
+        for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 23:31:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1708327893; x=1708932693; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=T+tWTOVPnxW5G/fKqZCE/v25MdOpXDjNepq6lPjyO6I=;
+        b=mfZk95U714INCJbpqzM9HxTDWAGoz9vlLidgDvZ7xgsOLFsA5UORYc6deGBXDQRr61
+         QwxudxZk04cma0GpRpOA3k4npksnljHfi+6d5m7jaA+Ru715nA5vvScZVj6tDapA9vpC
+         td00aFi0WAn82PnkVlfZ21Qho9G7GUOvcib237tGofYkGapzMKLhxrQs2w9Vu9wLHuY1
+         BhpuraolHzGGlU0j+pD7zvw+a0NCb8WmjRs/NxmurAUHN8urnro3VRErnXHoejwjKbkG
+         giFXqq/GRjHmMDDaSKo3BdWiFObu/VIx07L9h8shDZv8bjd8qJJ3i+VvO2DASFRY00Ci
+         XPCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708327893; x=1708932693;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=T+tWTOVPnxW5G/fKqZCE/v25MdOpXDjNepq6lPjyO6I=;
+        b=Ele+7uSv8IBwohhe3bZ4BEtRc9KANNmP+ONEjqARO7I8+CCN+3hwtXih6bYqDl8Cg1
+         WlKGp9fAuKKFJDT8Phbq3+IFnblhEKaRsXIgObmucFvW3ciOQNdK/pajVepqGbMx5tsu
+         kU5E2B0e50rI4ZucBXda/XLA4/siYyf4VILCLejv13wyXs3e0OVmfCy5gqEjGOnaIzUe
+         p/3g/HWAXGfIsU3VwRnTXqIkc7hdVh/mCj7asJvSlgSQZYBeAp0pGZ24YjhXAe2Yf+5r
+         hQVKKpUMhK1xNMLm8sYSr4IUdDMGEApmbWVrM3x9H4MkrS34KKfcX2GsHxQ3/RmiZvo9
+         9jBg==
+X-Forwarded-Encrypted: i=1; AJvYcCV4PQ8Fj0Hlni1DitBy31s7DRh3R8eweouFhRjSLx0gGWQNK9MjbamtSnY3nByqBovZCgv1Hb3u3kz69LuXjeaMg1DzilK5
+X-Gm-Message-State: AOJu0YxNSJMecsAozuc0Sc6/Hf1lCSJsV5AJloDALJxlLScjv7eWwhoS
+	e3dbtdib2HmMPKE+qTQY0HVqTc4lL4RL429Vw8kXisQh2I9jvB8maQ4vgNsoOHw=
+X-Google-Smtp-Source: AGHT+IGEWouTSR+78HoehfY93L9wSgm6vnzBhVTnfaJbSx7Upc3xQBeeScayKzwDzTpSqeqmVeZQvQ==
+X-Received: by 2002:a05:651c:509:b0:2d2:2ce1:1196 with SMTP id o9-20020a05651c050900b002d22ce11196mr5388899ljp.53.1708327893371;
+        Sun, 18 Feb 2024 23:31:33 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.222.116])
+        by smtp.gmail.com with ESMTPSA id f19-20020a05600c155300b00411ff030f06sm10764513wmg.9.2024.02.18.23.31.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 18 Feb 2024 23:31:32 -0800 (PST)
+Message-ID: <71e9a57e-8be3-4213-9822-45dfc5eb7ceb@linaro.org>
+Date: Mon, 19 Feb 2024 08:31:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240215115524.126477-1-bmt@zurich.ibm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 02/18] arm64: defconfig: enable ath12k as a module
+Content-Language: en-US
+To: Bartosz Golaszewski <brgl@bgdev.pl>, Marcel Holtmann
+ <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konrad.dybcio@linaro.org>, Liam Girdwood
+ <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Bjorn Helgaas <bhelgaas@google.com>, Saravana Kannan <saravanak@google.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>,
+ Neil Armstrong <neil.armstrong@linaro.org>,
+ Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>,
+ Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Abel Vesa <abel.vesa@linaro.org>, Manivannan Sadhasivam <mani@kernel.org>,
+ Lukas Wunner <lukas@wunner.de>,
+ Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
+ linux-pm@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+References: <20240216203215.40870-1-brgl@bgdev.pl>
+ <20240216203215.40870-3-brgl@bgdev.pl>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20240216203215.40870-3-brgl@bgdev.pl>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 15, 2024 at 12:55:24PM +0100, Bernard Metzler wrote:
-> siw uses the NETDEV_GOING_DOWN event to schedule work which
-> gracefully clears all related siw devices connections. This
-> fix avoids re-initiating and re-scheduling this work if still
-> pending from a previous invocation.
+On 16/02/2024 21:31, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > 
-> Fixes: bdcf26bf9b3a ("rdma/siw: network and RDMA core interface")
-> Reported-by: syzbot+e7c51d3be3a5ddfa0d7a@syzkaller.appspotmail.com
-> Signed-off-by: Bernard Metzler <bmt@zurich.ibm.com>
-> ---
->  drivers/infiniband/sw/siw/siw_main.c | 56 ++++++++++++++--------------
->  1 file changed, 28 insertions(+), 28 deletions(-)
+> Build the ath12k driver as a module for arm64 default config.
 
-It doesn't apply. I still think that you should simply delete this NETDEV_GOING_DOWN event.
+This we see from the diff. Please tell us "why", e.g. "Board foo with
+Qualcomm baz uses it."
 
-Thanks
+Also this should not be in these series. It only makes the
+power-sequencing patchset bigger, without any real reason.
 
-Grabbing thread from lore.kernel.org/all/20240215115524.126477-1-bmt%40zurich.ibm.com/t.mbox.gz
-Checking for newer revisions
-Grabbing search results from lore.kernel.org
-Analyzing 1 messages in the thread
-Checking attestation on all messages, may take a moment...
----
-  [PATCH] RDMA/siw: Fix handling netdev going down event
-    + Link: https://lore.kernel.org/r/20240215115524.126477-1-bmt@zurich.ibm.com
-    + Signed-off-by: Leon Romanovsky <leon@kernel.org>
-  ---
-  NOTE: install dkimpy for DKIM signature verification
----
-Total patches: 1
----
-Applying: RDMA/siw: Fix handling netdev going down event
-Patch failed at 0001 RDMA/siw: Fix handling netdev going down event
-When you have resolved this problem, run "git am --continue".
-If you prefer to skip this patch, run "git am --skip" instead.
-To restore the original branch and stop patching, run "git am --abort".
-error: patch failed: drivers/infiniband/sw/siw/siw_main.c:276
-error: drivers/infiniband/sw/siw/siw_main.c: patch does not apply
-hint: Use 'git am --show-current-patch=diff' to see the failed patch
 
-Thanks
+Best regards,
+Krzysztof
+
 
