@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-72871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B190985A044
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 10:54:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1405885A045
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 10:54:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 469F528254F
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 09:54:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5E232824F5
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 09:54:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0878C2555D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 205CE25569;
 	Mon, 19 Feb 2024 09:53:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="QqksZuhA"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="cQoaWQIb"
 X-Original-To: netdev@vger.kernel.org
 Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56AAD28DA7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C83C28DA4
 	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 09:53:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708336437; cv=none; b=UCvpaTaOWCIRzR28wTT+U8YgQj7efoZ6A31qqPPT46cIiTwO9jFlL9U/X4e1S4u4z55NblNWss/UFYlRqHcPduMgNaQNljaW5PhZ0xtSm1tFOXufMF9a1gBYIwmyZK/Rf0QmVhSPzBDymsniuUnQ42RBLCJMBSKY0gubvjWIlWc=
+	t=1708336438; cv=none; b=hpFFoSRH0N0cHKCK6/2ll9WxGwYwzr7EhWvNBXL7rtS7vOMQcdtSAync/I3dFXC9sEM7z1n4Y/hD1GlqkZjB0DsJiyaiKn9kJknNyWSJEkOtEakw30sl8wxohdCfEf1RVKUpYM7SRXDC7P1S9N86Ct/V4KHas8BNIjd+Fnr3aQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708336437; c=relaxed/simple;
-	bh=Jq/0cSqfhQWP1VE2kKkJKDYWA+Wh4NVj5n4TANbgzAw=;
+	s=arc-20240116; t=1708336438; c=relaxed/simple;
+	bh=STrb4clpKyUVleBIdDMYnZz1cjGAJfYxNNndHHSW6sQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=YldHrT89kWz5evMxC15jfxZWadyiwwbdjpgYrAJa86RVvfGWqFnJat9BDK8IRkKLFfc2ir4o0hum7j5rM4DdeBgs8PHt0WV5yAAvHumlcIQMaLqBi69LMgPoANCM9J1bG0HLUku2k9n62FshJybaGwhaSR+1WsR4egvuxmFFObE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=QqksZuhA; arc=none smtp.client-ip=203.29.241.158
+	 MIME-Version; b=mAg5TslAEgTJIObhUyE4Hb+7IgREVxWOk1dJDaG1XrTK058XSTEyBe3Pedx8zAcbRPvpMo4HVXPW3rzY95WiZ3XUu0r0a3MQNu0Cfw3mEwxmxi8h6Q+mE7gKasszVkR7Mzw3wyRsBdg6GrjRIkpMzATOl+FICahNoFGMez+1hL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=cQoaWQIb; arc=none smtp.client-ip=203.29.241.158
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
 Received: by codeconstruct.com.au (Postfix, from userid 10000)
-	id 3ED612024D; Mon, 19 Feb 2024 17:53:54 +0800 (AWST)
+	id 89B5D203C3; Mon, 19 Feb 2024 17:53:54 +0800 (AWST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=codeconstruct.com.au; s=2022a; t=1708336434;
-	bh=coYoiN4Mah75wcMV/k6LgaKkMxSeMiBcI/i2WXTDSaE=;
+	bh=L3zdzD40L8KYsQfay4ouHSREAYN/y5dVWQ1U3BjSl34=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=QqksZuhAH0OJCp9Uw2r0VAiAzrhQUyYjDuNe4eSefKJeCMqjbQefUsVk/lnoxeEAa
-	 sL90woIj4l6ybk4c+lA8PJ805vl77Fvlr+pSCq+EEfKjbGVYz8hap9Zqmg2bJYCSgy
-	 dSgNk0xBluZunMGLsrJtAXWu5NJ/Bv1tvDz6RQ/vWr3nN8z8lwRmoLsC1CF/faD1aM
-	 E0Pl23FG6xC+kHYtpLeLzCvo5+v5MfwQLQv5BBc7x24Ze1M1eA6lnYQ75jKtVyh47u
-	 qumIqaPQ4tHMSusx7OBsmL5rZ2GisfaN9Y1aMyf3weonsvKHoTmjycHIA44HGl9dSp
-	 5VMJUEgL3FI/w==
+	b=cQoaWQIbx+tiUWznb5OY4rhhuA+9/oTIb82P4LmUNz3CbbKY7fZuS8juwQ0Nnm9sK
+	 BfKiIou15adh567fJnd7/IzhbykFKG/R2uSGIAtB/wcmeO0Z5s/W2gK+22RZZKrIg4
+	 yf1omOhwHCHXCkvQ1+Odi5+kOzCVY5A7CcOIjkq2XPqmBvseJ2Jw8UiztM7CDy4Mex
+	 Vz58Dqh8CrzbOInVXx4/9try8sybKL/6KYw8pic00lbGB2UCD2t3KIZmeato9ODIXf
+	 udi28QmO1T+zGkpP4q7OrsRNtZuQ1U7JrwETsFYxNuQ4TC6JR1AtLlTC1TIyBmOdYT
+	 IG59ENRduQgSA==
 From: Jeremy Kerr <jk@codeconstruct.com.au>
 To: netdev@vger.kernel.org
 Cc: Matt Johnston <matt@codeconstruct.com.au>,
@@ -56,9 +56,9 @@ Cc: Matt Johnston <matt@codeconstruct.com.au>,
 	Liang Chen <liangchen.linux@gmail.com>,
 	Johannes Berg <johannes.berg@intel.com>,
 	Dan Carpenter <dan.carpenter@linaro.org>
-Subject: [PATCH net-next v2 02/11] net: mctp: Add some detail on the key allocation implementation
-Date: Mon, 19 Feb 2024 17:51:47 +0800
-Message-Id: <6c15e3040269608b59edb1e1c668ac8fac0e2b1f.1708335994.git.jk@codeconstruct.com.au>
+Subject: [PATCH net-next v2 03/11] net: mctp: make key lookups match the ANY address on either local or peer
+Date: Mon, 19 Feb 2024 17:51:48 +0800
+Message-Id: <b0bc81c41916f47a4a61cf028a57e0c4a45c2dfc.1708335994.git.jk@codeconstruct.com.au>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <cover.1708335994.git.jk@codeconstruct.com.au>
 References: <cover.1708335994.git.jk@codeconstruct.com.au>
@@ -70,69 +70,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-We could do with a little more comment on where MCTP_ADDR_ANY will match
-in the key allocations.
+We may have an ANY address in either the local or peer address of a
+sk_key, and may want to match on an incoming daddr or saddr being ANY.
 
+Do this by altering the conflicting-tag lookup to also accept ANY as
+the local/peer address.
+
+We don't want mctp_address_matches to match on the requested EID being
+ANY, as that is a specific lookup case on packet input.
+
+Reported-by: Eric Chuang <echuang@google.com>
+Reported-by: Anthony <anthonyhkf@google.com>
 Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
 ---
- net/mctp/route.c | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+ net/mctp/route.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
 diff --git a/net/mctp/route.c b/net/mctp/route.c
-index 37c5c3dd16f6..95f59508543b 100644
+index 95f59508543b..b7ec64cd8b40 100644
 --- a/net/mctp/route.c
 +++ b/net/mctp/route.c
-@@ -73,6 +73,40 @@ static struct mctp_sock *mctp_lookup_bind(struct net *net, struct sk_buff *skb)
- 	return NULL;
- }
+@@ -113,7 +113,7 @@ static bool mctp_key_match(struct mctp_sk_key *key, mctp_eid_t local,
+ 	if (!mctp_address_matches(key->local_addr, local))
+ 		return false;
  
-+/* A note on the key allocations.
-+ *
-+ * struct net->mctp.keys contains our set of currently-allocated keys for
-+ * MCTP tag management. The lookup tuple for these is the peer EID,
-+ * local EID and MCTP tag.
-+ *
-+ * In some cases, the peer EID may be MCTP_EID_ANY: for example, when a
-+ * broadcast message is sent, we may receive responses from any peer EID.
-+ * Because the broadcast dest address is equivalent to ANY, we create
-+ * a key with (local = local-eid, peer = ANY). This allows a match on the
-+ * incoming broadcast responses from any peer.
-+ *
-+ * We perform lookups when packets are received, and when tags are allocated
-+ * in two scenarios:
-+ *
-+ *  - when a packet is sent, with a locally-owned tag: we need to find an
-+ *    unused tag value for the (local, peer) EID pair.
-+ *
-+ *  - when a tag is manually allocated: we need to find an unused tag value
-+ *    for the peer EID, but don't have a specific local EID at that stage.
-+ *
-+ * in the latter case, on successful allocation, we end up with a tag with
-+ * (local = ANY, peer = peer-eid).
-+ *
-+ * So, the key set allows both a local EID of ANY, as well as a peer EID of
-+ * ANY in the lookup tuple. Both may be ANY if we prealloc for a broadcast.
-+ * The matching (in mctp_key_match()) during lookup allows the match value to
-+ * be ANY in either the dest or source addresses.
-+ *
-+ * When allocating (+ inserting) a tag, we need to check for conflicts amongst
-+ * the existing tag set. This requires macthing either exactly on the local
-+ * and peer addresses, or either being ANY.
-+ */
+-	if (key->peer_addr != peer)
++	if (!mctp_address_matches(key->peer_addr, peer))
+ 		return false;
+ 
+ 	if (key->tag != tag)
+@@ -672,8 +672,16 @@ struct mctp_sk_key *mctp_alloc_local_tag(struct mctp_sock *msk,
+ 		if (tmp->tag & MCTP_HDR_FLAG_TO)
+ 			continue;
+ 
+-		if (!(mctp_address_matches(tmp->peer_addr, peer) &&
+-		      mctp_address_matches(tmp->local_addr, local)))
++		/* Since we're avoiding conflicting entries, match peer and
++		 * local addresses, including with a wildcard on ANY. See
++		 * 'A note on key allocations' for background.
++		 */
++		if (peer != MCTP_ADDR_ANY &&
++		    !mctp_address_matches(tmp->peer_addr, peer))
++			continue;
 +
- static bool mctp_key_match(struct mctp_sk_key *key, mctp_eid_t local,
- 			   mctp_eid_t peer, u8 tag)
- {
-@@ -368,6 +402,9 @@ static int mctp_route_input(struct mctp_route *route, struct sk_buff *skb)
- 			 * key lookup to find the socket, but don't use this
- 			 * key for reassembly - we'll create a more specific
- 			 * one for future packets if required (ie, !EOM).
-+			 *
-+			 * this lookup requires key->peer to be MCTP_ADDR_ANY,
-+			 * it doesn't match just any key->peer.
- 			 */
- 			any_key = mctp_lookup_key(net, skb, MCTP_ADDR_ANY, &f);
- 			if (any_key) {
++		if (local != MCTP_ADDR_ANY &&
++		    !mctp_address_matches(tmp->local_addr, local))
+ 			continue;
+ 
+ 		spin_lock(&tmp->lock);
 -- 
 2.39.2
 
