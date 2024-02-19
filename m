@@ -1,87 +1,99 @@
-Return-Path: <netdev+bounces-73075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1894B85ACC1
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 21:04:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A2EC85ACC5
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 21:07:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7EE4288A21
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 20:03:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98794B21BAF
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 20:07:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34AA251C2C;
-	Mon, 19 Feb 2024 20:03:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3249551C4F;
+	Mon, 19 Feb 2024 20:07:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ZdAaJRaG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iEpsB0pG"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42F63171B1;
-	Mon, 19 Feb 2024 20:03:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0821D374DD;
+	Mon, 19 Feb 2024 20:07:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708373035; cv=none; b=k1MCSJLW8ZjVS+sidebay5OUMg8dhOgkT9Y8jgdgArEqjSveP4MJbD1U0Ao+uPLqhgcLD4Q/mZDNe4uHFy0cQaGsxngF+1bcQSnLwk1tvBkVtCNO645Jiiuokj0SLJcZNN5ad3cORzo1UgSPuHhjfkq0GqxeacKuV7KBsSsSPXg=
+	t=1708373225; cv=none; b=hwBHYhNxYtgG+/oMiY1TaD772BXt+nCaP8i3YES0F9sNyeOzKRh/OnbLyfZgVGXOZJ4in4BJzjof77jOmAzNE4cPMGLcQl2+K9dpqGzi4hDizQw1jxFFgqoJZn2QRUqcMwzF+vQgpFc8PCCE7jP7NWKPUpsAzgFwXQ0lSMLklW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708373035; c=relaxed/simple;
-	bh=Q6YX/nSHF4SXTGacODXfDERzSEGJdnmUdA5aLHPu76Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hphvVitcdkcLxp9in6NTC4G7T4mK7UE5MNfF7K5tEY0J67CDSqZSFTtZvhqoDgMHR+orA+B1hypg6/KU7Uoglk6v/JglFouwr5nCKkneNjalEB01W9tKrqeCd5HIFRFJ7cmVtFakhFqbVzEMLLNQM0qilMWIPRATayRnXdZEjNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ZdAaJRaG; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=b3vT0nj23S7kHYz1QGiFYSw/NcYxj4aBnJ8NurX22FU=; b=ZdAaJRaGQbRxNrO/+Xdsmr4dAx
-	WqYljqcOZJCp/xKXCpmOtEYHPB8XI1PqLcLPQvyXk6Oc2wm3xCkDWfLd2zInMBj8hBYIgKPLSgjkc
-	Wsv8Vcu0H/ojbimN41axCR0dSavCT2HpOJWOcgHfhR2dCh3/dQz/b52XotOJ1x2KxG2w=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rc9rd-008EF1-Bf; Mon, 19 Feb 2024 21:03:45 +0100
-Date: Mon, 19 Feb 2024 21:03:45 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: forbidden405@outlook.com
-Cc: Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v3 3/6] net: hisilicon: add support for
- hisi_femac core on Hi3798MV200
-Message-ID: <29fc21f0-0e46-4d0f-8d4b-c4dbd1689c55@lunn.ch>
-References: <20240220-net-v3-0-b68e5b75e765@outlook.com>
- <20240220-net-v3-3-b68e5b75e765@outlook.com>
+	s=arc-20240116; t=1708373225; c=relaxed/simple;
+	bh=YRkjhL1i/ZXfWAIelIA27ZJxiVv++KYXLYGIOkzBnoo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FOXNWRlprE0E03ZTnlfWIDFh+kbrTXSR0Zer+sSR5hSecOHcMF7b1vAOKGhj89S/c+ntiqKW2piv13dcMRf9SS38I59ACbGOclvnZ30I7EJAACGKPUZ07b8cbmVCjLwEm3FfZCmzpyhHO8TEZAqqijVsnFk+RiKBRfOqr1ih4F8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iEpsB0pG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C2CCC433F1;
+	Mon, 19 Feb 2024 20:07:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708373224;
+	bh=YRkjhL1i/ZXfWAIelIA27ZJxiVv++KYXLYGIOkzBnoo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=iEpsB0pGv+bHi4qBi15bwop7SMlsDjDxMGsUaQmYBJxGvtiv9hYv/mKNNViKHkQNa
+	 SlW4GeeQAZdkFOdj1WL8Zp+6vo7XVvYFMuNZIq5yePGNcuM5a0HHOkuJ9L1uGHwIsz
+	 nOyFaxRTaUycm7y06lSOka2nAV2mkyxA1rJyvoLFnERAW0n9ZLZdEcfdWtr10xdAy6
+	 hIsqNJfVEk1IFRxKgxPY1hwybVlfYGakWzkCiMaeWYzqpvmyenbpQQBBjvdhrww02F
+	 E3PoguqUc0nHfhoWP1fXuThNjNVWpyTes8i78zlXMEQrnlBujgKYe2wuY5qWjkz5kY
+	 dAx6Ev6vD9CxA==
+Date: Mon, 19 Feb 2024 12:07:03 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Boris Pismenny <borisp@nvidia.com>, John
+ Fastabend <john.fastabend@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Vakul Garg
+ <vakul.garg@nxp.com>, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net 3/5] tls: don't skip over different type records
+ from the rx_list
+Message-ID: <20240219120703.219ad3b2@kernel.org>
+In-Reply-To: <f00c0c0afa080c60f016df1471158c1caf983c34.1708007371.git.sd@queasysnail.net>
+References: <cover.1708007371.git.sd@queasysnail.net>
+	<f00c0c0afa080c60f016df1471158c1caf983c34.1708007371.git.sd@queasysnail.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240220-net-v3-3-b68e5b75e765@outlook.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> Note it's unable to put the MDIO bus node outside of MAC controller
-> (i.e. at the same level in the parent bus node). Because we need to
-> control all clocks and resets in FEMAC driver due to the phy reset
-> procedure. So the clocks can't be assigned to MDIO bus device, which is
-> an essential resource for the MDIO bus to work.
+On Thu, 15 Feb 2024 17:17:31 +0100 Sabrina Dubroca wrote:
+> @@ -1772,7 +1772,8 @@ static int process_rx_list(struct tls_sw_context_rx *ctx,
+>  			   u8 *control,
+>  			   size_t skip,
+>  			   size_t len,
+> -			   bool is_peek)
+> +			   bool is_peek,
+> +			   bool *more)
+>  {
+>  	struct sk_buff *skb = skb_peek(&ctx->rx_list);
+>  	struct tls_msg *tlm;
 
-What PHY driver is being used? If there a specific PHY driver for this
-hardware? Does it implement soft reset?
 
-I'm wondering if you can skip hardware reset of the PHY and only do a
-software reset.
+> @@ -1844,6 +1845,10 @@ static int process_rx_list(struct tls_sw_context_rx *ctx,
+>  
+>  out:
+>  	return copied ? : err;
+> +more:
+> +	if (more)
+> +		*more = true;
+> +	goto out;
 
-	Andrew
+Patches look correct, one small nit here -
+
+I don't have great ideas how to avoid the 7th argument completely but 
+I think it'd be a little cleaner if we either:
+ - passed in err as an output argument (some datagram code does that
+   IIRC), then function can always return copied directly, or 
+ - passed copied as an output argument, and then we can always return
+   err?
+I like the former a little better because we won't have to special case
+NULL for the "after async decryption" call sites.
 
