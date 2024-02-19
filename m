@@ -1,63 +1,51 @@
-Return-Path: <netdev+bounces-72855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59686859F51
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 10:09:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E043C859F5A
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 10:13:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ADB94B20BB9
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 09:09:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07232B207DC
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 09:13:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB3D0224DD;
-	Mon, 19 Feb 2024 09:09:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2986D22618;
+	Mon, 19 Feb 2024 09:13:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ivIsmRnB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35BCE23753;
-	Mon, 19 Feb 2024 09:09:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F18222309
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 09:13:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708333784; cv=none; b=l+M2eTMRpoJABbbHtSJ1NmqvxU0em0wg3ouepJqLKTCu5GGbMnHmTssGUxcmA7JEyubMMiP+SrLNNed1D7SPVq7Q5vJ8RaL+ASP6aFZyuYvVKfeCmTZBaH4FGPqPMPvg0WKeWKvwnOyABvePEmx7T4WQKkYHr7kybmQlY5Fr3sA=
+	t=1708334000; cv=none; b=JKzxQ/Nzewpcm4LmPo1NOh08Ls4EQ38rjGYH+fRIRgc8U65a8JEKGrmhIFrHSeDrCP32NkrSO83Z8LDykx09WSBx7nXB23n7DAedVyyod5MIcmndCJhsrjcVYq+mCuQGjS5Yd5rFR2OzK1KvBvSal49ecw5kfkxdlf2bbq4xC2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708333784; c=relaxed/simple;
-	bh=8GO7HUAvD6Rrp0yzSI3zo5R0DXtbIZ6zr38RYo10f1g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=egh+fAufxMDEuohRsxh6pkKev+DVTmpFPcyISgiCsm3rWiy1QGocnh5NqY8qDNzCZGF+3NNdozk6R5bnkBKpOonnkwFrAoJ+VP+XJW3BnzafjaQ5l9o9XFI8FmW2J4qT2rtA/RJ09cUI+xqS30rkokiBP1o2R09Q29OU8abV35w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: f3635d9b7d664e5fb2f8dfac401f0a01-20240219
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.35,REQID:b6738b5c-76ff-4ee4-b042-5681fba20d15,IP:10,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:-5
-X-CID-INFO: VERSION:1.1.35,REQID:b6738b5c-76ff-4ee4-b042-5681fba20d15,IP:10,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-5
-X-CID-META: VersionHash:5d391d7,CLOUDID:0bf78d80-4f93-4875-95e7-8c66ea833d57,B
-	ulkID:240219170936VZ9O9Y0O,BulkQuantity:0,Recheck:0,SF:64|66|24|17|19|44|1
-	02,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,CO
-	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_SNR
-X-UUID: f3635d9b7d664e5fb2f8dfac401f0a01-20240219
-Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw
-	(envelope-from <chentao@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 632622634; Mon, 19 Feb 2024 17:09:32 +0800
-Received: from mail.kylinos.cn (localhost [127.0.0.1])
-	by mail.kylinos.cn (NSMail) with SMTP id B4D1AE000EBC;
-	Mon, 19 Feb 2024 17:09:32 +0800 (CST)
-X-ns-mid: postfix-65D31ACC-659055207
-Received: from [172.20.15.254] (unknown [172.20.15.254])
-	by mail.kylinos.cn (NSMail) with ESMTPA id 11B54E000EBC;
-	Mon, 19 Feb 2024 17:09:31 +0800 (CST)
-Message-ID: <c7e92fee-42a0-43c3-8fab-cb0b3ab305ac@kylinos.cn>
-Date: Mon, 19 Feb 2024 17:09:30 +0800
+	s=arc-20240116; t=1708334000; c=relaxed/simple;
+	bh=xWaJJdjFnRhGZ3VNMuuZG7Ba+N/FWNKVU/aiYLc4ytU=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type; b=aROsU8JUWzfunMHTuNW7uC5vqspkEjCzxNdjk90ZeJB+G0TwvJVUeD+vCJgLTYZgkf7uJxhHpCbl4rf+0vuboc5rkCC93oq+rR501RUOyjIyMNcbeQwCbHOej1x9nuoicTAC86EZccx77DMvTnBFVKDa6FBk9g5FblWvEkqUBwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ivIsmRnB; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
+	:To:Subject:From:MIME-Version:Date:Message-ID:Sender:Reply-To:Cc:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=EwNgFjPiuDAGKQ51zDamn2zjxGqORtiKSFgMAae48L8=; b=ivIsmRnBuxWsVASOfg3lgiLDwU
+	6c0JyMCJWqkxfcrokxl/dwZ04GevfrxlBZN6EWUjXQBJFc/Xqj6QJg/kJ8DjsGpnVjBsr+tN3SCoi
+	tXlK+wGbUlo+84D8xiVNaI+W1pDD+deMjjlehDzFd8zMDxc6DrR2+YFqIS0/HvWebL+b2KSQDVmUY
+	A5AhubOaa55C9qdFBPmdwZ+wQvNV8PpVnKk9M2QW9kaDcWyjTlZvOTPvXEdxpqqKrxocpck/5ZgdK
+	JNMEot7KKYs+tTp8CPT2ThvtLGyH1Dw7MDLNQEPNHk6YmdFGh5iaJdDUpHGh+RaKgMY6CRuDbGpwl
+	rTwmttLw==;
+Received: from 124x35x135x198.ap124.ftth.ucom.ne.jp ([124.35.135.198] helo=[192.168.2.109])
+	by desiato.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rbzhv-00000001BNc-13Nd;
+	Mon, 19 Feb 2024 09:13:09 +0000
+Message-ID: <2f2b4550-8c66-4300-85b5-b9143cc7d918@infradead.org>
+Date: Mon, 19 Feb 2024 18:12:57 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,83 +53,57 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 5/6] tcp: Simplify the allocation of slab caches
 Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org,
- pabeni@redhat.com, jiri@resnulli.us, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240205072013.427639-1-chentao@kylinos.cn>
- <20240205072013.427639-6-chentao@kylinos.cn>
- <CANn89iLkWvum6wSqSya_K+1eqnFvp=L2WLW=kAYrZTF8Ei4b7g@mail.gmail.com>
-From: Kunwu Chan <chentao@kylinos.cn>
-In-Reply-To: <CANn89iLkWvum6wSqSya_K+1eqnFvp=L2WLW=kAYrZTF8Ei4b7g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+From: Geoff Levand <geoff@infradead.org>
+Subject: [PATCH v5 net] ps3/gelic: Fix SKB allocation
+To: sambat goson <sombat3960@gmail.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Thanks for your reply.
-On 2024/2/5 20:29, Eric Dumazet wrote:
-> On Mon, Feb 5, 2024 at 8:23=E2=80=AFAM Kunwu Chan <chentao@kylinos.cn> =
-wrote:
->>
->> Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
->> to simplify the creation of SLAB caches.
->> And change cache name from 'tcp_bind_bucket' to 'inet_bind_bucket',
->> 'tcp_bind2_bucket' to 'inet_bind2_bucket'.
->>
->> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
->> ---
->>   net/ipv4/tcp.c | 14 ++++----------
->>   1 file changed, 4 insertions(+), 10 deletions(-)
->>
->> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
->> index a1c6de385cce..2dc3dd4323c2 100644
->> --- a/net/ipv4/tcp.c
->> +++ b/net/ipv4/tcp.c
->> @@ -4697,17 +4697,11 @@ void __init tcp_init(void)
->>                              thash_entries, 21,  /* one slot per 2 MB*=
-/
->>                              0, 64 * 1024);
->>          tcp_hashinfo.bind_bucket_cachep =3D
->> -               kmem_cache_create("tcp_bind_bucket",
->> -                                 sizeof(struct inet_bind_bucket), 0,
->> -                                 SLAB_HWCACHE_ALIGN | SLAB_PANIC |
->> -                                 SLAB_ACCOUNT,
->> -                                 NULL);
->> +               KMEM_CACHE(inet_bind_bucket,
->> +                          SLAB_HWCACHE_ALIGN | SLAB_PANIC | SLAB_ACCO=
-UNT);
->=20
-> I would prefer we do not do this.
->=20
-> dccp is also using a kmem_cache_create() of "struct inet_bind_bucket"
-When i do my work, i found this too, so i just change the cache name in t=
-cp.
->=20
-> We want different caches for TCP and DCCP.
-For distinguishment, I'll delete this patch in next patch series.
->=20
->=20
->>          tcp_hashinfo.bind2_bucket_cachep =3D
->> -               kmem_cache_create("tcp_bind2_bucket",
->> -                                 sizeof(struct inet_bind2_bucket), 0,
->> -                                 SLAB_HWCACHE_ALIGN | SLAB_PANIC |
->> -                                 SLAB_ACCOUNT,
->> -                                 NULL);
->> +               KMEM_CACHE(inet_bind2_bucket,
->> +                          SLAB_HWCACHE_ALIGN | SLAB_PANIC | SLAB_ACCO=
-UNT);
->=20
-> Same here.
->=20
->>
->>          /* Size and allocate the main established and bind bucket
->>           * hash tables.
->> --
->> 2.39.2
->>
---=20
-Thanks,
-   Kunwu
+Commit 3ce4f9c3fbb3 ("net/ps3_gelic_net: Add gelic_descr structures") of
+6.8-rc1 had a copy-and-paste error where the pointer that holds the
+allocated SKB (struct gelic_descr.skb)  was set to NULL after the SKB was
+allocated. This resulted in a kernel panic when the SKB pointer was
+accessed.
 
+This fix moves the initialization of the gelic_descr to before the SKB
+is allocated.
+
+Reported-by: sambat goson <sombat3960@gmail.com>
+Fixes: 3ce4f9c3fbb3 ("net/ps3_gelic_net: Add gelic_descr structures")
+Signed-off-by: Geoff Levand <geoff@infradead.org>
+
+diff --git a/drivers/net/ethernet/toshiba/ps3_gelic_net.c b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
+index d5b75af163d3..28116891d2ce 100644
+--- a/drivers/net/ethernet/toshiba/ps3_gelic_net.c
++++ b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
+@@ -384,11 +384,6 @@ static int gelic_descr_prepare_rx(struct gelic_card *card,
+ 	if (gelic_descr_get_status(descr) !=  GELIC_DESCR_DMA_NOT_IN_USE)
+ 		dev_info(ctodev(card), "%s: ERROR status\n", __func__);
+ 
+-	descr->skb = netdev_alloc_skb(*card->netdev, rx_skb_size);
+-	if (!descr->skb) {
+-		descr->hw_regs.payload.dev_addr = 0; /* tell DMAC don't touch memory */
+-		return -ENOMEM;
+-	}
+ 	descr->hw_regs.dmac_cmd_status = 0;
+ 	descr->hw_regs.result_size = 0;
+ 	descr->hw_regs.valid_size = 0;
+@@ -397,6 +392,12 @@ static int gelic_descr_prepare_rx(struct gelic_card *card,
+ 	descr->hw_regs.payload.size = 0;
+ 	descr->skb = NULL;
+ 
++	descr->skb = netdev_alloc_skb(*card->netdev, rx_skb_size);
++	if (!descr->skb) {
++		descr->hw_regs.payload.dev_addr = 0; /* tell DMAC don't touch memory */
++		return -ENOMEM;
++	}
++
+ 	offset = ((unsigned long)descr->skb->data) &
+ 		(GELIC_NET_RXBUF_ALIGN - 1);
+ 	if (offset)
 
