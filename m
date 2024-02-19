@@ -1,152 +1,141 @@
-Return-Path: <netdev+bounces-72938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1E1185A47D
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 14:17:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B66F85A4A6
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 14:29:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20D3B1C22050
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 13:17:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0796280F92
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 13:29:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 811C93612C;
-	Mon, 19 Feb 2024 13:16:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E3AE36136;
+	Mon, 19 Feb 2024 13:29:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="kQoj3e8z"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 977EF36121
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 13:16:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA39536132;
+	Mon, 19 Feb 2024 13:29:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708348586; cv=none; b=Go7JCilU42FIIt2Mm+3mVQpd1S4LTVR6dsU8RgqJt3pQDeUE8Yt3kwJuOGu8MvBmi8WiqYJ4wQI+H78l7He0vtWqgijnJSMkT99kglsAOLzgBFwXb2RmJwDmv6rKAfhnHDssT9/h5NClMaXZTzlNss/IxcRPpZCGfxPHbgOTigA=
+	t=1708349385; cv=none; b=hD7VOzMgixgZ5p/GfMQxTU1kejpitECOTDfO8jvbyGjyd8NSe5bTazbzwrhnfs0cxgZzW1H3yLQ89CT2FENrrWIaA6WqU7Rnd7dyWRFxFcCwfG/fP8lxZcK1Q9HC909k6/vwGOE8w13TgpdwyS1fm4bed5maCFuWdWV2wDyw9L0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708348586; c=relaxed/simple;
-	bh=viLe7fGFuuP1eD4ZJQHWtFdibptfI/8RvafqbQAvd2U=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YaxeLiWsp1a7vzvCam/jlwyi4+EJ2DmFueJPq0ZpyRH+eqISajVdNhl/rud4FdFqpf25XR0qNpGbUirXO8jtOaiobUXkDJTL90nS5Q6QW8QhBUNNl0Xgrl6AQhDSK18XKoW28wGy5M05n372g2Oep7W47mEM9wnoaKMZz4Ru1Lo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rc3VJ-0000LF-2m; Mon, 19 Feb 2024 14:16:17 +0100
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rc3VG-001ey9-S4; Mon, 19 Feb 2024 14:16:14 +0100
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rc3VG-00FcnU-2Z;
-	Mon, 19 Feb 2024 14:16:14 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: [PATCH net-next v1 1/1] net: dsa: microchip: Add support for bridge port isolation
-Date: Mon, 19 Feb 2024 14:16:13 +0100
-Message-Id: <20240219131614.3724037-1-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1708349385; c=relaxed/simple;
+	bh=OQyFDUX5gbESQWUcHgynurH9W9y75J4IWsTxpX5PpzE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WPJDUcjOp/WF5f1qo9kaQxbe+HbiRh3/zCFpGi6EgIA26Y/hLWaBofhG7D3Q5sqmj9yFQ3X9m7qD9YIoEgWYCf8P84wjbqYaQKtjXB+bDhPu/yqbvzYuWJPS+YTGUgKdjU75VKFZAkWGSstI1wPtuRpHvYm1Qqa4DpCuMoatA+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=kQoj3e8z; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id C5AE4C0004;
+	Mon, 19 Feb 2024 13:29:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1708349380;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OQyFDUX5gbESQWUcHgynurH9W9y75J4IWsTxpX5PpzE=;
+	b=kQoj3e8zggZx2HUbzNGgWUvjl2tZdpNnjmi4YvhYNDGXFf1skWEjdAKvqJWKaoNj/BYILQ
+	xyVEfh1+5RIdu5fgIH6I41uVO9vbJSwEoj5EOUC2oEl/3QfMIpgyDWGTGfLP629NIEhrsI
+	49HDHeoae5n+S0zfOSAlI0rU1QwlOwTP0uomYquWROLogGyz++hr+sCAx27WKFQW73J654
+	vElGXZ4UaOzyORHSkQZHdnK7xKuJNX3UIxzstXU+HilraGFtZUaltQGJdBBCH/XjzUr5Vq
+	V+uSk9HBY1dYxv159NlYgR7c6QCmvC4eTeKO4ou8IiR1K2Z6HqrJqGCVLtrqgA==
+Date: Mon, 19 Feb 2024 14:29:36 +0100
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
+ kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Radu
+ Pirea <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh
+ <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
+ <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH RFC net-next v8 04/13] net: Change the API of PHY
+ default timestamp to MAC
+Message-ID: <20240219142936.62112d34@kmaincent-XPS-13-7390>
+In-Reply-To: <87jzn4gtlv.fsf@nvidia.com>
+References: <20240216-feature_ptp_netnext-v8-0-510f42f444fb@bootlin.com>
+	<20240216-feature_ptp_netnext-v8-4-510f42f444fb@bootlin.com>
+	<87jzn4gtlv.fsf@nvidia.com>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Implement bridge port isolation for KSZ switches. Enabling the isolation
-of switch ports from each other while maintaining connectivity with the
-CPU and other forwarding ports. For instance, to isolate swp1 and swp2
-from each other, use the following commands:
-- bridge link set dev swp1 isolated on
-- bridge link set dev swp2 isolated on
+On Fri, 16 Feb 2024 10:09:36 -0800
+Rahul Rameshbabu <rrameshbabu@nvidia.com> wrote:
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
- drivers/net/dsa/microchip/ksz_common.c | 16 +++++++++++-----
- drivers/net/dsa/microchip/ksz_common.h |  1 +
- 2 files changed, 12 insertions(+), 5 deletions(-)
+> On Fri, 16 Feb, 2024 16:52:22 +0100 Kory Maincent <kory.maincent@bootlin.=
+com>
+> wrote:
+> > Change the API to select MAC default time stamping instead of the PHY.
+> > Indeed the PHY is closer to the wire therefore theoretically it has less
+> > delay than the MAC timestamping but the reality is different. Due to lo=
+wer
+> > time stamping clock frequency, latency in the MDIO bus and no PHC hardw=
+are
+> > synchronization between different PHY, the PHY PTP is often less precise
+> > than the MAC. The exception is for PHY designed specially for PTP case =
+but
+> > these devices are not very widespread. For not breaking the compatibili=
+ty
+> > default_timestamp flag has been introduced in phy_device that is set by
+> > the phy driver to know we are using the old API behavior.
+> >
+> > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> > --- =20
+>=20
+> Overall, I agree with the motivation and reasoning behind the patch. It
+> takes dedicated effort to build a good phy timestamping mechanism, so
+> this approach is good. I do have a question though. In this patch if we
+> set the phy as the default timestamp mechanism, does that mean for even
+> non-PTP applications, the phy will be used for timestamping when
+> hardware timestamping is enabled? If so, I think this might need some
+> thought because there are timing applications in general when a
+> timestamp closest to the MAC layer would be best.
 
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 7cd37133ec05..10e4a14671e2 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -1926,7 +1926,8 @@ static void ksz_update_port_member(struct ksz_device *dev, int port)
- 		if (other_p->stp_state != BR_STATE_FORWARDING)
- 			continue;
- 
--		if (p->stp_state == BR_STATE_FORWARDING) {
-+		if (p->stp_state == BR_STATE_FORWARDING &&
-+		    !(p->isolated && other_p->isolated)) {
- 			val |= BIT(port);
- 			port_member |= BIT(i);
- 		}
-@@ -1946,7 +1947,8 @@ static void ksz_update_port_member(struct ksz_device *dev, int port)
- 			if (third_p->stp_state != BR_STATE_FORWARDING)
- 				continue;
- 			third_dp = dsa_to_port(ds, j);
--			if (dsa_port_bridge_same(other_dp, third_dp))
-+			if (dsa_port_bridge_same(other_dp, third_dp) &&
-+			    !(other_p->isolated && third_p->isolated))
- 				val |= BIT(j);
- 		}
- 
-@@ -2699,7 +2701,7 @@ static int ksz_port_pre_bridge_flags(struct dsa_switch *ds, int port,
- 				     struct switchdev_brport_flags flags,
- 				     struct netlink_ext_ack *extack)
- {
--	if (flags.mask & ~BR_LEARNING)
-+	if (flags.mask & ~(BR_LEARNING | BR_ISOLATED))
- 		return -EINVAL;
- 
- 	return 0;
-@@ -2712,8 +2714,12 @@ static int ksz_port_bridge_flags(struct dsa_switch *ds, int port,
- 	struct ksz_device *dev = ds->priv;
- 	struct ksz_port *p = &dev->ports[port];
- 
--	if (flags.mask & BR_LEARNING) {
--		p->learning = !!(flags.val & BR_LEARNING);
-+	if (flags.mask & (BR_LEARNING | BR_ISOLATED)) {
-+		if (flags.mask & BR_LEARNING)
-+			p->learning = !!(flags.val & BR_LEARNING);
-+
-+		if (flags.mask & BR_ISOLATED)
-+			p->isolated = !!(flags.val & BR_ISOLATED);
- 
- 		/* Make the change take effect immediately */
- 		ksz_port_stp_state_set(ds, port, p->stp_state);
-diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index a3f69a036fa9..fb76637596fc 100644
---- a/drivers/net/dsa/microchip/ksz_common.h
-+++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -111,6 +111,7 @@ struct ksz_switch_macaddr {
- struct ksz_port {
- 	bool remove_tag;		/* Remove Tag flag set, for ksz8795 only */
- 	bool learning;
-+	bool isolated;
- 	int stp_state;
- 	struct phy_device phydev;
- 
--- 
-2.39.2
+This patch comes from a request from Russell due to incompatibility between=
+ MAC
+and PHY timestamping when both were supported.
+https://lore.kernel.org/netdev/Y%2F4DZIDm1d74MuFJ@shell.armlinux.org.uk/
 
+His point was adding PTP support to a PHY driver would select timestamp fro=
+m it
+by default even if we had a better timestamp with the MAC which is often the
+case. This is an unwanted behavior.
+https://lore.kernel.org/netdev/Y%2F6Cxf6EAAg22GOL@shell.armlinux.org.uk/
+
+In fact, with the new support of NDOs hwtstamp and the
+dev_get/set_hwtstamp_phylib functions, alongside this series which make
+timestamp selectable, changing the default timestamp may be not necessary
+anymore.
+
+Russell any thought about it?=20
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
