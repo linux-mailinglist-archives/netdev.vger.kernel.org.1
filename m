@@ -1,141 +1,139 @@
-Return-Path: <netdev+bounces-72957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7B4985A622
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 15:38:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39ECC85A634
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 15:40:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A37862838D1
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 14:38:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CF081C21242
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 14:40:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FF8A1E526;
-	Mon, 19 Feb 2024 14:38:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91C6A1DDFA;
+	Mon, 19 Feb 2024 14:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hcJH9P9m"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vEilS1h7"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F5CD1DFE8;
-	Mon, 19 Feb 2024 14:38:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD558376F1
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 14:40:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708353528; cv=none; b=WHalSSriSEUMvvgX8D3xDhu1QuHkI1saSqn/Leu/cjmpYlvDD9NXjrLuXxW62HwRPqigYSZHbaoEul4Xs4pEfqmew2MBq13r+xSbb9tW+LKOW94VoSATiFtwzlY8ANMhvdkiYDTbeL27R+YASUibketRD6W/f6y/w23oiqJJ/C0=
+	t=1708353626; cv=none; b=s9gJu4FaISRdoIMzLhtqOE+6XaJ4oUSKeiMBN2U/ytVz69zl1a7gfAejKuTLzSVpqch6fI0+abnvcn5e4hhmiCRh1uGKGnCZDDUobahJv86nn/3+9l6WChMP/Zs87iCbBezKn4xzNIHfaDfpE1uCdU+BD44ougyCs0EDC806zno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708353528; c=relaxed/simple;
-	bh=V33FKlInx1KJB20TacJi7c48XX2d5TgiGJuyJLQhp3M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=khBoxxiFa4EdvC3v1SGgQ9ox3nkwJu8GZNQEGgardH8nciLIuN/NWszYdP+FBAw3UTU7orenYzXqBRtGYNQVPS+5h3juPEZ3cdIgckyKVJ5on1ycwLKgrgg71jpb/mtmyoPch9ST8hCGlWFU++9/OwU7Z8N++OjOx9fciii8Ypk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hcJH9P9m; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 38DE81BF20E;
-	Mon, 19 Feb 2024 14:38:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1708353524;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dlMyt/GJrB0JNCkR9mOHZ/+ThyT2C/+DYVpdAxe/hfA=;
-	b=hcJH9P9mEQdasxaR15/c5bbDhmL8Cr/KWh2ZitP7vTgc0Z2gT+VmaBJfxTCoXNLgIdmAXY
-	h3QyZ0CpfPfbQPrwxOQFWGtHCSbI4QU+yzptWL7C9R2zwHVLW6oXpFvE4Bp45eePioVmXo
-	ub2k0nPcu0dMPKiRFRgUrmmxhmfIw/2+tUXXRTVbL7g0h2ndfO/R41JP4Qm/rrej/HnC0S
-	YWbldHcqA3n4MRrOKQ7JOFcKE6/AKOq0GLa3yaPVkPHzUKPx9R9Gk1mi0xPQ8cp5dLWeFo
-	Uam0aGLjIoKPCFiaUtRWQsDcnEQYi0FWs/sxTl6TfEPK3wOW1K4Ep9Yr5CGfzw==
-Date: Mon, 19 Feb 2024 15:38:40 +0100
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
- <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Mark Brown <broonie@kernel.org>, Frank Rowand <frowand.list@gmail.com>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v4 14/17] dt-bindings: net: pse-pd: Add
- bindings for PD692x0 PSE controller
-Message-ID: <20240219153840.507be7b3@kmaincent-XPS-13-7390>
-In-Reply-To: <ZdCjJcPbbBGYVtuo@pengutronix.de>
-References: <20240215-feature_poe-v4-0-35bb4c23266c@bootlin.com>
-	<20240215-feature_poe-v4-14-35bb4c23266c@bootlin.com>
-	<ZdCjJcPbbBGYVtuo@pengutronix.de>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1708353626; c=relaxed/simple;
+	bh=GEr9Ds53Uzu0/Xgm3gZzLhsmzW6sTZh+frHwkQG4oGk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aMuQl87JIiMrN9kCPN/MKj/qbKIh6M4ioCcfqOK2gdISz/ucMx5i3mT3WikB+71Y0l0AT3B/qJhNoYu7NNkWXOCOwM+Jn0YooqwoD9eqq0R1+hhLzFvzfUv4e+XzaOXRDjx0m7a5ympWTFaHFs3uFGGZCH8/C1TBKW++q1g1pdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=vEilS1h7; arc=none smtp.client-ip=209.85.166.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-7c40863de70so183496139f.0
+        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 06:40:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1708353623; x=1708958423; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vsalqqX3MywWAyCbAuK4sPt5e/xrhQLoccZ7uYuQLjU=;
+        b=vEilS1h7cIsVlzTAV7p211rvJrFaBByfRmE+6/ifGEmv0lSJnpTUFJfnSUTgv24htu
+         Ma2iU9d2E5aVSFBKfej+Zangext9le2jzGqiinNquQve+76gIoKjqqAKUkxX7B8f8FRr
+         tvZPc+Zos1IG2cIb37ZKgxcrROvQ3YhjgDHEE7zqw9QvgXUNO1Dk2CQEhAaHGxkC2hWu
+         5SOQHVufkCUtguur/xWOw6S1BM78O9hZMCEoHweG5IEmEm41nmxp+hkSEzrUccgfb7Vk
+         OtpEfFYAd8KfFQT8fhOkkJQqaPTozTjZf7PIIDT0xY2M5Izu5fb0QMahnSkCfegX9NEx
+         1WrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708353623; x=1708958423;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vsalqqX3MywWAyCbAuK4sPt5e/xrhQLoccZ7uYuQLjU=;
+        b=IodXRTmyv3GhJXgMTfYI9VbWmkHjS6bNF5azCMH+CNy5abLNQCytyse8rcjb7CjABk
+         C61FRk4J5xN3ZsJJJ0bbHKy1ZXTHkJMb56/2FSRYB+aq0w3zVipprm82FhPTBU5zMVLA
+         PzspcMyUs5QkjLraWoXHARAW29027fVOsOxXng8UmoxJ7bwI5eJoG8+lrJvJdnyTVUr3
+         VhZgZ6tekuLsuCmXTtOlzlL+yPZWwVBIUD3j/p2Q7CPhJqgB5esIDh38S0883rSYm2E+
+         k9UsJ9+2llV7ZhQrtjtfkayRRcKmxSBxKjHoLUtTOMDcg9IkQF9VZyg/LGWvUviYkS+Y
+         ugOw==
+X-Forwarded-Encrypted: i=1; AJvYcCX35z6N9cQjer8lQdGa7jThK6CiAbQ24imxKU0oimNIHakoSmbVrHk1kC5nGLlG5BwwCv5k9qn0dItMeaQsQ/zWMNC40miV
+X-Gm-Message-State: AOJu0Yx0Z5RzWa8NTWIMbaWWX7QunX7Q6j2FEzvbLbcREcZhEsIho3ov
+	mZjChEYOkyRu/5l6S5caXq1P5GauXeWtrmYlQ9l5xjcaQ3aCpa+jTBlgccU98WA=
+X-Google-Smtp-Source: AGHT+IFWksxVy59pv8+2FIrIx+FqJEQMGlwFQrmwxp5iSTu8lWhtKF5A2wmRQrtorqaAGUA4FGNA4A==
+X-Received: by 2002:a6b:1547:0:b0:7c4:3218:c767 with SMTP id 68-20020a6b1547000000b007c43218c767mr15178437iov.11.1708353622778;
+        Mon, 19 Feb 2024 06:40:22 -0800 (PST)
+Received: from localhost.localdomain (c-98-61-227-136.hsd1.mn.comcast.net. [98.61.227.136])
+        by smtp.gmail.com with ESMTPSA id u8-20020a02b1c8000000b004741c8f34easm979144jah.56.2024.02.19.06.40.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Feb 2024 06:40:22 -0800 (PST)
+From: Alex Elder <elder@linaro.org>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: mka@chromium.org,
+	andersson@kernel.org,
+	quic_cpratapa@quicinc.com,
+	quic_avuyyuru@quicinc.com,
+	quic_jponduru@quicinc.com,
+	quic_subashab@quicinc.com,
+	elder@kernel.org,
+	netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v2] net: ipa: don't overrun IPA suspend interrupt registers
+Date: Mon, 19 Feb 2024 08:40:15 -0600
+Message-Id: <20240219144015.355462-1-elder@linaro.org>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Transfer-Encoding: 8bit
 
-On Sat, 17 Feb 2024 13:14:29 +0100
-Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+In newer hardware, IPA supports more than 32 endpoints.  Some
+registers--such as IPA interrupt registers--represent endpoints
+as bits in a 4-byte register, and such registers are repeated as
+needed to represent endpoints beyond the first 32.
 
-> On Thu, Feb 15, 2024 at 05:02:55PM +0100, Kory Maincent wrote:
-> > Add the PD692x0 I2C Power Sourcing Equipment controller device tree
-> > bindings documentation.
-> >=20
-> > This patch is sponsored by Dent Project <dentproject@linuxfoundation.or=
-g>.
-> >=20
-> > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> > --- =20
-> ...
-> > +        pse_pis {
-> > +          #address-cells =3D <1>;
-> > +          #size-cells =3D <0>;
-> > +
-> > +          pse_pi0: pse_pi@0 {
-> > +            reg =3D <0>;
-> > +            #pse-cells =3D <0>;
-> > +            pairset-names =3D "alternative-a", "alternative-b";
-> > +            pairsets =3D <&phys0>, <&phys1>;
-> > +          };
-> > +          pse_pi1: pse_pi@1 {
-> > +            reg =3D <1>;
-> > +            #pse-cells =3D <0>;
-> > +            pairset-names =3D "alternative-a";
-> > +            pairsets =3D <&phys2>; =20
->=20
-> According to latest discussions, PSE PI nodes will need some
-> additional, board specific, information:
-> - this controller do not implements polarity switching, we need to know
->   what polarity is implemented on this board. The 802.3 spec provide not
->   really consistent names for polarity configurations:
->   - Alternative A MDI-X
->   - Alternative A MDI
->   - Alternative B X
->   - Alternative B S
->   The board may implement one of polarity configurations per alternative
->   or have additional helpers to switch them without using PSE
->   controller.
->   Even if specification explicitly say:
->   "The PD shall be implemented to be insensitive to the polarity of the p=
-ower
->    supply and shall be able to operate per the PD Mode A column and the PD
->    Mode B column in Table 33=E2=80=9313"
->   it is possible to find reports like this:
->   https://community.ui.com/questions/M5-cant-take-reversed-power-polarity=
--/d834d9a8-579d-4f08-80b1-623806cc5070
+In ipa_interrupt_suspend_clear_all(), we clear all pending IPA
+suspend interrupts by reading all status register(s) and writing
+corresponding registers to clear interrupt conditions.
 
-Mmh not sure we want to support broken cases that does not follow the spec.
-Should we?
+Unfortunately the number of registers to read/write is calculated
+incorrectly, and as a result we access *many* more registers than
+intended.  This bug occurs only when the IPA hardware signals a
+SUSPEND interrupt, which happens when a packet is received for an
+endpoint (or its underlying GSI channel) that is suspended.  This
+situation is difficult to reproduce, but possible.
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Fix this by correctly computing the number of interrupt registers to
+read and write.  This is the only place in the code where registers
+that map endpoints or channels this way perform this calculation.
+
+Fixes: f298ba785e2d ("net: ipa: add a parameter to suspend registers")
+Signed-off-by: Alex Elder <elder@linaro.org>
+---
+v2: Added "net" tag to the subject and rebased.
+
+ drivers/net/ipa/ipa_interrupt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ipa/ipa_interrupt.c b/drivers/net/ipa/ipa_interrupt.c
+index 4bc05948f772d..a78c692f2d3c5 100644
+--- a/drivers/net/ipa/ipa_interrupt.c
++++ b/drivers/net/ipa/ipa_interrupt.c
+@@ -212,7 +212,7 @@ void ipa_interrupt_suspend_clear_all(struct ipa_interrupt *interrupt)
+ 	u32 unit_count;
+ 	u32 unit;
+ 
+-	unit_count = roundup(ipa->endpoint_count, 32);
++	unit_count = DIV_ROUND_UP(ipa->endpoint_count, 32);
+ 	for (unit = 0; unit < unit_count; unit++) {
+ 		const struct reg *reg;
+ 		u32 val;
+-- 
+2.40.1
+
 
