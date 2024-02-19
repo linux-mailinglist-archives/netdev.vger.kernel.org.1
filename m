@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-72969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72970-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20BE585A722
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 16:13:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FA2285A731
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 16:16:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C922B1F21392
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 15:13:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6161F1C212C5
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 15:16:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9684E38396;
-	Mon, 19 Feb 2024 15:13:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D956337704;
+	Mon, 19 Feb 2024 15:16:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hUsanN4y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jiHrWfZh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72AD338384
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 15:13:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B646E3984D
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 15:16:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708355627; cv=none; b=cfBsIZdQuM0DBMBC1NSiQ+iAUKv7F1ukBL7FLDoKkS9yaaiHr+Ny5DF8QlYNCDpEU+BwKZlIxbfL40lVXH+/wZ7ChTLjsiI18yZ5Xft4yGoWabet96lLjCe1qIVEWG6M7cVxtbUE2gquhfMCbXD3L7qfIqQgd7kLKl7fKXVm1Oc=
+	t=1708355801; cv=none; b=GQrYPbnySu6zEqisxniz4s+kxT1sHvirSoz2xtB6OjWJyNG1bPZUnwqrafUtzwuMaVPzonYtuYSydnYF2BoNaIoPA/S+Qxmaoj/4Cr+wetKLv7oqiSqu9gQ6B7YcyF9agKwlE7F4rpH6MbceqDqTpxBroT5h+STw3o0JSZCruZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708355627; c=relaxed/simple;
-	bh=mr1Fq8VNnq1VArTEap7T4LO/GJYjJ37FCNwtTTv/Ync=;
+	s=arc-20240116; t=1708355801; c=relaxed/simple;
+	bh=Kqf1k1OnKD+/fHJ/GoeK/SXlY+uPPpzpeTE2a4L5IIk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UKDbPzdVmTuzi95zri3lAVnFTH9++eL//SCPB6ZcLqUheRXLo3+SR8GDk6Yd3UdWYuP1idCeSicV3JzkLhklEgdzumrSNwY2HEM7OhvxP0XYVlbcMCdVOQ0w8OYwVNUQLtZH1eNSmVHUuV/2877Q9oD4RJdzWiiqK+UDHEtUHWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hUsanN4y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8093CC433C7;
-	Mon, 19 Feb 2024 15:13:45 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ic1iZXkFRJerzGytfrqlkZ83djJRvCrhmGSnjqq/1qGR8rPo86Pvnza9xM4zOF5lGsI4orWG9ZW2dvfckhBmmd0DISeKrPM8wzUoSqLkWS3uy8S43zG4kv8ilAd+UnfY9oTOM/HeSOJaz4AJ2Ip3kQ0TGx60rEzIzMCW2atEWP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jiHrWfZh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9826CC433C7;
+	Mon, 19 Feb 2024 15:16:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708355626;
-	bh=mr1Fq8VNnq1VArTEap7T4LO/GJYjJ37FCNwtTTv/Ync=;
+	s=k20201202; t=1708355801;
+	bh=Kqf1k1OnKD+/fHJ/GoeK/SXlY+uPPpzpeTE2a4L5IIk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hUsanN4yBrsUwekBi2YIKsBjdXZ0ygDsiT3ECA3rjLw2+Y2qc8J/LAdlStJJVhAvc
-	 fOBgySDpa7FSzCSIjZgxnwsLKHjmHVrcXoh8lyAblIoMrzmjmwYzFCMrZASmsIhGmD
-	 kkTiA36GwIa+FHi9RLeCVLQlwCo7TgZiwQycwjoEXWnqH2IRAuC4XLwscUWK7qyk9R
-	 Q5bstaee68AeA814RmUa/7WdfBizLyiN+2wkU7pZF6S359MqwY4QsnGjBo3V7xNTq5
-	 fpTav6C8FXpvR7I5oikPrXDc3BHCabKu8shIJv1ratLiM6iR5iXDB5C3s7AGHHKnlM
-	 cEQKt3NnfGEYg==
-Date: Mon, 19 Feb 2024 15:13:43 +0000
+	b=jiHrWfZhEn0Whacp+Gan0hp4xKM8R3HmDvN3bzFWm76eSL0f+EHMpP+p7hf6uMXjS
+	 MRqdPGrb+4a4lJW8opxo3O9l8nh30eNKUb4ibGfGKyZImml7Q0/KXRs6LacFnrZmMH
+	 0JkE7+fnqr0yKUO/r54WDI6CJaU8YgQiJsErZE8iYklrYnQAbXNBj2mRZ9RnbZLSjI
+	 DIOJn6otqBxnt+m++Abto1uq10UBflFJJKHtfYdDwjlDsEgnI2s0utX5lcZIxHslo5
+	 su/Qv5T9RT9Si9q3hvmByu/7F6pDmX4lxScFcVhdHW58YRe4yvRUYtKU31M2wPQ06d
+	 FSqGfBhvK0whw==
+Date: Mon, 19 Feb 2024 15:16:38 +0000
 From: Simon Horman <horms@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
-	davem@davemloft.net, edumazet@google.com
-Subject: Re: [patch net-next] devlink: fix port dump cmd type
-Message-ID: <20240219151343.GC40273@kernel.org>
-References: <20240216113147.50797-1-jiri@resnulli.us>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: skbuff: add overflow debug check to pull/push
+ helpers
+Message-ID: <20240219151638.GD40273@kernel.org>
+References: <20240216113700.23013-1-fw@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,29 +57,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240216113147.50797-1-jiri@resnulli.us>
+In-Reply-To: <20240216113700.23013-1-fw@strlen.de>
 
-On Fri, Feb 16, 2024 at 12:31:47PM +0100, Jiri Pirko wrote:
-> From: Jiri Pirko <jiri@nvidia.com>
+On Fri, Feb 16, 2024 at 12:36:57PM +0100, Florian Westphal wrote:
+> syzbot managed to trigger following splat:
+> BUG: KASAN: use-after-free in __skb_flow_dissect+0x4a3b/0x5e50
+> Read of size 1 at addr ffff888208a4000e by task a.out/2313
+> [..]
+>   __skb_flow_dissect+0x4a3b/0x5e50
+>   __skb_get_hash+0xb4/0x400
+>   ip_tunnel_xmit+0x77e/0x26f0
+>   ipip_tunnel_xmit+0x298/0x410
+>   ..
 > 
-> Unlike other commands, due to a c&p error, port dump fills-up cmd with
-> wrong value, different from port-get request cmd, port-get doit reply
-> and port notification.
+> Analysis shows that the skb has a valid ->head, but bogus ->data
+> pointer.
 > 
-> Fix it by filling cmd with value DEVLINK_CMD_PORT_NEW.
+> skb->data gets its bogus value via the neigh layer, which does:
 > 
-> Skimmed through devlink userspace implementations, none of them cares
-> about this cmd value. Only ynl, for which, this is actually a fix, as it
-> expects doit and dumpit ops rsp_value to be the same.
-
-I guess that in theory unknown implementations could exist.
-But, ok :)
-
+> 1556    __skb_pull(skb, skb_network_offset(skb));
 > 
-> Omit the fixes tag, even thought this is fix, better to target this for
-> next release.
+> ... and the skb was already dodgy at this point:
 > 
-> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+> skb_network_offset(skb) returns a negative value due to an
+> earlier overflow of skb->network_header (u16).  __skb_pull thus
+> "adjusts" skb->data by a huge offset, pointing outside skb->head
+> area.
+> 
+> Allow debug builds to splat when we try to pull/push more than
+> INT_MAX bytes.
+> 
+> After this, the syzkaller reproducer yields a more precise splat
+> before the flow dissector attempts to read off skb->data memory:
+> 
+> WARNING: CPU: 5 PID: 2313 at include/linux/skbuff.h:2653 neigh_connected_output+0x28e/0x400
+>   ip_finish_output2+0xb25/0xed0
+>   iptunnel_xmit+0x4ff/0x870
+>   ipgre_xmit+0x78e/0xbb0
+> 
+> Signed-off-by: Florian Westphal <fw@strlen.de>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
+
 
