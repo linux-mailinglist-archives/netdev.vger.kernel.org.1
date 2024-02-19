@@ -1,101 +1,158 @@
-Return-Path: <netdev+bounces-73098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 325CA85AD7E
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 21:55:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D179F85AD88
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 22:08:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D97D4283C9A
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 20:55:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D9B11F23DC9
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 21:08:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA194537E5;
-	Mon, 19 Feb 2024 20:55:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B4CA53E0E;
+	Mon, 19 Feb 2024 21:07:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="wZQgpTdg"
+	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="Ki5jJ4a0";
+	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="hpGTBR9W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mo4-p02-ob.smtp.rzone.de (mo4-p02-ob.smtp.rzone.de [85.215.255.84])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A99051C47
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 20:55:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708376102; cv=none; b=kq9O8hUKeCqo/CgN+FHt5OV+RrGaCoAI36J6eHYYmPhFODOMbnWLqG0oo3LJnkm0dY4duCPtPFPDKZuGk2EjmR1B3agre0RAo2eJuJ/adlLoVK921rCIK7zur4JvvD2zH4OjPARe9c70AOZE1+7dgrgitkQkmUgoNYGKPRVueBY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708376102; c=relaxed/simple;
-	bh=PRWFNSl5rdyh0LIam4lOCvZVzrH50yS0VHN/syfc6O0=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=QVaFOkKLFiYMIJ+Q/Tz6HyLWU6r06mBBotSaJXR8g62Qm+9qHJPhlXxzpvfKyziSq+PPjL/thK2cySPKOmSmpLJ089zipY+SNNyvJ5jn413eyzc6lEPbs/2WDdBhHuDjWdOaCwJPih/Dxv3T1I46d0i5svrUEw9U6m8LxF7kGW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=wZQgpTdg; arc=none smtp.client-ip=209.85.128.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-60853ad17f9so7549927b3.0
-        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 12:55:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1708376100; x=1708980900; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=PRWFNSl5rdyh0LIam4lOCvZVzrH50yS0VHN/syfc6O0=;
-        b=wZQgpTdg1IXJW+3pJz2pDeRelZJStxFfeYZwj1TCN3I9wndQLgPucomWofYrPaG3ye
-         +/i5OWWAQwr8w3FVbI4IQli6X+Y9dQ3lgZPko67X+9SlAG5U0R0Fa3g3zS5yVTkgRHc/
-         Sxa6Wj6TkMok77tlYPsMR6ptSswjiWksNxA/Bx879L2xSJDBetC2k2JeEbdptMOjbmh+
-         C2pVGUpE6qYSeOKe8OjSjNHGTc2EFqEOU1fJACWhjaWcM+vqfFpwm42cqDTvBitgmnZz
-         Rwlpb8/XaRaWmpJj5UX8gewFS0sfKbZO2WjGobr9/dMI0eshFakhNB9rDyc35HJA28po
-         YXiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708376100; x=1708980900;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=PRWFNSl5rdyh0LIam4lOCvZVzrH50yS0VHN/syfc6O0=;
-        b=EjSNhlR0DS2BuAbnXv2tEDx3VsksCW9FlaQx9gSeFVrsLtJiLXB1rqCwJ6LBe+f/Gk
-         IVnCX6Ys9Vu34lGQY8Yvs1JuOBjuO37JjE0ZCu1D9WC+Wvul562U8bT2vOkObUIXYuR5
-         NMylS9pzuvUHqFcF7XS2GGf9v8tajhaWYcv+UxDsaOj2xSN9TmzgRX5mKwtYy7rIybCo
-         IBliFnc5BpFbCh4nlFHhWRPeSwewRZaWrpP3hPlBFI+4gEKVT0BHkRxlo3DnJErJouc0
-         7EccGp5/QiTqoJ2gOxBegZTzOyn0zmm3of/UJrUZBcEx28KsDod9DlSmgZ0cELaWs5tT
-         MJpQ==
-X-Gm-Message-State: AOJu0YzbLUQK/T1WDNrMcyd2dc54pXFruzCjhliqD5zTE6MZECJqAwFl
-	DanKRfEhCmQFfWUQmo33tvHoOdZv5Zi2nBJlUGXBpkG1ULdHdwUFIWpHbqhnM4g5H9PS/g6jk0u
-	bU0yh5TDqqDDs/20Z+VYijecPG8Ys6NUc4W2SuolPiMYMPiZe9A==
-X-Google-Smtp-Source: AGHT+IEYs9O4Ab1yXvBQtfWhC5ZqPyatv9UEtkAwagoVjMYA+WQEKbhT/qSO3Lxx5Ueqx9uSy89tetRorYJ3R+zsRQo=
-X-Received: by 2002:a5b:18d:0:b0:dc6:e75d:d828 with SMTP id
- r13-20020a5b018d000000b00dc6e75dd828mr10375199ybl.18.1708376100043; Mon, 19
- Feb 2024 12:55:00 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C442A2E835;
+	Mon, 19 Feb 2024 21:07:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.84
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708376871; cv=pass; b=XzmhyyLLOnpOC4fCHhDCca0Ndh7rAN6lchE5uEp7e2vQm7eX1zFu90SB/JoAzDCTsriEVKnn/RabjYDehE7j5wNKSHXJaJTkaWLuyvDjbxhkcKkeN53PFaUvoY61pQSJbenb+kwCWjIJ7j1WdkT4OUL8ak/3ZuCgSUDlUfnaC8Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708376871; c=relaxed/simple;
+	bh=eNljqwevEksOUMlEebSE8qxQgsP5d/5/H18BupVK6+o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SA7JdWWPDe3dIZBnEQjGNziVVourjtuU0BHnPGjSL+91RoY602Pop7/rDLQSc3S/FI464lBPQ1j5kxkJganLcrpwj4OTbP/3puvQvIbh5cEINkjbG6KnAt16P2/iO5AL58sqU/AapRx4x8noX/xhXOVWIZmUWO6CSIVceWu2rJs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=Ki5jJ4a0; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=hpGTBR9W; arc=pass smtp.client-ip=85.215.255.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
+ARC-Seal: i=1; a=rsa-sha256; t=1708375067; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=RLoVMLhRCUjEZnzpW3aKBpfB2VpJwlSQuQFYGmFSmyOKvtye0tQjX13oiqK6acTNKZ
+    ARg0EctxXyRO3A/OqoQk8RwolS2Tpd4nG9CqsOoamSAKzW4Ya/Om1+/N5wD2Ta6mIDbp
+    kMcNa4tDkX54shueRnW3016MvLaxpXEDNW9Q+tg2jOypJ8ModkvXBt57P9L0K/oOz5/E
+    m3A2zZIeThrzGav1iC4qF9hXwL57U2nrdYsee0n9R17SqhZM/AdxhRoUlyQEVuMsfOas
+    Hpw5sQYiMXEqYXbNWSwFoQQsER0C61apF3cwgFejRn9slJnvMgwDO3gD4MG0t3nxRGD7
+    4AcQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1708375067;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=Fv4HUwoYJ78Ao5yyDcK+Lz6h+c9zEeTZIGoLl7li1Rw=;
+    b=iIxqFJrFnfjERZhfAjhFKwzM7bCpXWkvPNHxMVYWR21X+ZdAT/kAxtkQ4deYzBH30W
+    ciMwYWyemRU0vLfCI23ZKlI3kIBniPQGZc1/BHDNBpdP0LDKyHDIHmKs5Cn1PVo3ViRj
+    db0tX/cbyZnBh4NjuxQyyLVXDVPqbPVjsN/dLvsDcSAQjTTDjP6bOKr+ktwDbyRYrtzP
+    ulcLhJok15ZjfuaQx86hoMlkf4fBP9ppmaPoNIy+tdKAKxmedJms0n1Fx6OpmKOd9sKE
+    v2n6z5UQ+iGzt04Ei/WVO7w8ZZtSvSrtnvXfOrPhxVWQrWiulgGQX6OhW0fZEjydINJs
+    xyfw==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo02
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1708375067;
+    s=strato-dkim-0002; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=Fv4HUwoYJ78Ao5yyDcK+Lz6h+c9zEeTZIGoLl7li1Rw=;
+    b=Ki5jJ4a0ISlzbCYHqEjTRNXBFq1CXKzI/Padmw8s8rzprr5JAOab26Q86qI/7868Rk
+    lu0GmcOPWDvVXuNYRKkIkrO0ZskonOQ498yTWica2qgRuPV8R9A9dm9eRxSnqfT353RY
+    K566A8yiAkTC6MJ21ErjTt1zyf+6TJ1/YDHb9u15j/ZQT+o04sVnXrG8Oel1Q8sIxP2N
+    8y8AaRaM6WgOl4080G+kCj+x3z9XxEtn6PbS5nQANi8Bop6YNCimMmIOFk9CQbHnZZGA
+    USDsOiQRuw3WVMOKGtpHtIuU6p14gZUjmEA8qMZ8whdVIaX6TR55NAY7VDJUTMbtqBZ8
+    GwIg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1708375067;
+    s=strato-dkim-0003; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=Fv4HUwoYJ78Ao5yyDcK+Lz6h+c9zEeTZIGoLl7li1Rw=;
+    b=hpGTBR9WEO3/nloOvwsmULD0/vv6szH/ypkVJ0Qtir7LqLyWjkXUHGlvHY0rxwFGIQ
+    k2emtWXlYz0tO6oTAGCw==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjG14FZxedJy6qgO1qCHSa1GLptZHusl129OHEdFq0USEbDdAnQ=="
+Received: from [IPV6:2a00:6020:4a8e:5000::90c]
+    by smtp.strato.de (RZmta 49.11.2 AUTH)
+    with ESMTPSA id K49f9c01JKbk876
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Mon, 19 Feb 2024 21:37:46 +0100 (CET)
+Message-ID: <e9f2c716-51d3-4c03-a447-9fed357669c5@hartkopp.net>
+Date: Mon, 19 Feb 2024 21:37:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 19 Feb 2024 15:54:49 -0500
-Message-ID: <CAM0EoMm1Vff3hLrLEySnL=bfa6vr3BRJd7L+TjiN5zsAY_As1g@mail.gmail.com>
-Subject: CFS for Netdev Conf 0x18 open!
-To: people <people@netdevconf.info>
-Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>, Christie Geldart <christie@ambedia.com>, 
-	Kimberley Jeffries <kimberleyjeffries@gmail.com>, lwn@lwn.net, 
-	Lael Santos <lael.santos@expertisesolutions.com.br>, 
-	"board@netdevconf.org" <board@netdevconf.info>, linux-wireless <linux-wireless@vger.kernel.org>, 
-	netfilter-devel@vger.kernel.org, lartc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] can: softing: remove redundant NULL check
+Content-Language: en-US
+To: Simon Horman <horms@kernel.org>
+Cc: Daniil Dulov <d.dulov@aladdin.ru>, Wolfgang Grandegger
+ <wg@grandegger.com>, Marc Kleine-Budde <mkl@pengutronix.de>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Kurt Van Dijck <dev.kurt@vandijck-laurijssen.be>, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ lvc-project@linuxtesting.org
+References: <20240211150535.3529-1-d.dulov@aladdin.ru>
+ <20240216172701.GP40273@kernel.org>
+ <12cd0fd0-be86-4af0-8d6b-85d3a81edd2a@hartkopp.net>
+ <20240219170038.GH40273@kernel.org>
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+In-Reply-To: <20240219170038.GH40273@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-We are pleased to announce the opening of Call For Submissions(CFS)
-for Netdev conf 0x18.
-Netdev conf 0x18 is going to be a hybrid conference with the physical
-component being in Silicon Valley, .ca.usa
+Hi Simon,
 
-For overview of topics, submissions and requirements please visit:
-https://netdevconf.info/0x18/pages/submit-proposal.html
-For all submitted sessions, we employ a blind review process carried
-out by the Program Committee.
+On 2024-02-19 18:00, Simon Horman wrote:
+> On Fri, Feb 16, 2024 at 08:47:43PM +0100, Oliver Hartkopp wrote:
+>> Hi Simon,
+>>
+>> I have a general question on the "Fixes:" tag in this patch:
+>>
+>> On 16.02.24 18:27, Simon Horman wrote:
+>>> On Sun, Feb 11, 2024 at 07:05:35AM -0800, Daniil Dulov wrote:
+>>>> In this case dev cannot be NULL, so remove redundant check.
+>>>>
+>>>> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+>>>>
+>>>> Fixes: 03fd3cf5a179 ("can: add driver for Softing card")
+>>
+>> IMHO this is simply an improvement which is done by all patches applied to
+>> the kernel but it does not really "fix" anything from a functional
+>> standpoint.
+>>
+>> Shouldn't we either invent a new tag or better leave it out to not confuse
+>> the stable maintainers?
+> 
+> Hi Oliver,
+> 
+> sorry for missing that in my review.
+> 
+> Yes, I agree that this is probably not a fix, for which my
+> rule of thumb is something that addresses a user-visible problem.
+> So I agree it should not have a fixes tag.
+> 
+> I would suggest that we can just change the text to something that
+> has no tag. Something like:
+> 
+> ...
+> 
+> Introduced by 03fd3cf5a179 ("can: add driver for Softing card")
+> 
 
-Important dates:
-Closing of CFS: Mon, Apr 22nd, 2024.
-Notification by: Wed, May 1st, 2024.
-Conference dates: July 15th - 19th, 2024.
+Yes, but the "Introduced-by:" tag would be an optional tag for people 
+that like blaming others, right?
 
-Please take this opportunity to share your work and ideas with the community
+IMHO we should think about completely removing the "Fixes:" tag, when it 
+has no user-visible effect that might be a candidate for stable kernels. 
+It is common improvement work. And it has been so for years.
 
-cheers,
-jamal (on behalf of the Netdev Society)
+Best regards,
+Oliver
 
