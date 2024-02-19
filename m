@@ -1,74 +1,162 @@
-Return-Path: <netdev+bounces-72980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8834B85A806
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 17:00:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB7C885A833
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 17:08:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BAC8F1C21BFB
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 16:00:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02B7EB219E0
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 16:08:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50C653A260;
-	Mon, 19 Feb 2024 16:00:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="yoW9aPZt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 781BD3A267;
+	Mon, 19 Feb 2024 16:08:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 139533308A;
-	Mon, 19 Feb 2024 16:00:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 485083308A
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 16:08:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708358452; cv=none; b=o8sO9cpaMAItgVk36DZG5nwK0kfUuyDlpgjxvorr9dwHWy/rIA1MYqjGtwvIjJ0SXtYARgv5r9U70dsMwtzHFOhHAwWGUD9FiHD0YlHH1Jv4GecNi0XH0z8DTbBUxWql31SvMWGIoc8Jz1xr099zl6e7kL0XtcyCct+MlMYEJrY=
+	t=1708358898; cv=none; b=BgwUpYNn+QF9MtOAt6dxWDFpol1Mem/WdYfZPw13iHW7WypeOVmxz1xjpUlAbHKkEpH+aJAEw8QTQ9ebZ6XV24bwDUNWKYDHWRrmDoMvVbYJZ8H0somaMi+uCiO2jAxphPygKRVFCrXdISd52hEngi9n5FV400UTkIigPhXDQBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708358452; c=relaxed/simple;
-	bh=XrQRGn6VBlAeXKrkMPyzXVTh0fuJumVoCgYU7KdWSRs=;
+	s=arc-20240116; t=1708358898; c=relaxed/simple;
+	bh=5t4JB3wAVHCHNA7BJWB1aH8LGEeC36ChXJ5ADZLD5QE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aYr36uFW5EeAk5R1hkNXwDd0x+xRNRnFbVdDg0FiYgqAV/KEMd2sUS2kzUp0yO05OqRrZjbA6Q9XDo4mVsfuMU9/tP9HwHi4BSXprlfoYNyHrxd60gOKf7rZ8estkkrNABeN23NALgUpS1Wp9hT25a8z6ZxNywfPXTgXwcXQPh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=yoW9aPZt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B92AC433F1;
-	Mon, 19 Feb 2024 16:00:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1708358451;
-	bh=XrQRGn6VBlAeXKrkMPyzXVTh0fuJumVoCgYU7KdWSRs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=yoW9aPZtQgpBhlcHVIp/2CQKcryMe13IXxYVUuG2XtUEJAFYlAiGmyWYowy3omzN2
-	 DXWkZuu0XaMTSlaOTFd9oem712pAnUw+eC+vy8iL6aMmxDQGS9zd7gcGTtgq7fGtF5
-	 ZmFsCFcKP7i1tRYz6HJxhkH3LLNW8Orew8kkSXEw=
-Date: Mon, 19 Feb 2024 17:00:48 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Christoph Paasch <cpaasch@apple.com>
-Cc: stable@vger.kernel.org, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Mat Martineau <martineau@kernel.org>
-Subject: Re: [PATCH stable] mptcp: introduce explicit flag for first subflow
- disposal
-Message-ID: <2024021938-charbroil-riddance-30e5@gregkh>
-References: <20240129173829.62287-1-cpaasch@apple.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=crI24yEYSvpWoztunPAxNFl1EIhx9hRetP1rRJ0uM4Fd/oHnpVHlLGO+P7AYJKWiklysky4Jz5/xq+Z2UvfMvQsb96smxC3IEq/nnL2Uph+6mQgMwvV1hujzEqn5IkdQR1lC7ioJhOefDb/DYK4N54wPSc1XnFt3mT8TgJSwG/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rc6BH-0001n7-M6; Mon, 19 Feb 2024 17:07:47 +0100
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rc6BD-001gUj-U5; Mon, 19 Feb 2024 17:07:43 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rc6BD-00FvZo-2d;
+	Mon, 19 Feb 2024 17:07:43 +0100
+Date: Mon, 19 Feb 2024 17:07:43 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: =?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Mark Brown <broonie@kernel.org>,
+	Frank Rowand <frowand.list@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v3 14/17] dt-bindings: net: pse-pd: Add bindings
+ for PD692x0 PSE controller
+Message-ID: <ZdN8zypeUp0MmzcP@pengutronix.de>
+References: <20240208-feature_poe-v3-0-531d2674469e@bootlin.com>
+ <20240208-feature_poe-v3-14-531d2674469e@bootlin.com>
+ <20240209145727.GA3702230-robh@kernel.org>
+ <ZciUQqjM4Z8Tc6Db@pengutronix.de>
+ <618be4b1-c52c-4b8f-8818-1e4150867cad@lunn.ch>
+ <Zc3IrO_MXIdLXnEL@pengutronix.de>
+ <65099b67-b7dc-4d78-ba42-d550aae2c31e@lunn.ch>
+ <Zc8TAojumif1irE-@pengutronix.de>
+ <20240219153106.19e83213@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240129173829.62287-1-cpaasch@apple.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240219153106.19e83213@kmaincent-XPS-13-7390>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Mon, Jan 29, 2024 at 09:38:29AM -0800, Christoph Paasch wrote:
-> From: Paolo Abeni <pabeni@redhat.com>
+On Mon, Feb 19, 2024 at 03:31:06PM +0100, Köry Maincent wrote:
+> On Fri, 16 Feb 2024 08:47:14 +0100
+> Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+> > >
+> > > So, either somebody needs to understand 1000BaseT and can say the
+> > > proposed binding works, or we explicitly document the binding is
+> > > limited to 10BaseT and 100BaseT.  
+> > 
+> > I asked the internet and found the answer: Some PSE/PD implementations
+> > are not compatible with 1000BaseT.
+> > 
+> > See Figure 33–4—10BASE-T/100BASE-TX Endpoint PSE location overview.
+> > Alternative B show a variant where power is injected directly to pairs
+> > without using magnetics as it is done for Alternative A (phantom
+> > delivery - over magnetics).
+> > 
+> > So, we have following variants of 2 pairs PoE:
+> > +---------+---------------+-------------------+---------------------+--------------------+
+> > | Variant | Alternative   | Polarity          | Power Feeding Type  |
+> > Compatibility with | |         | (a/b)         | (Direct/Reverse)  |
+> > (Direct/Phantom)    | 1000BaseT          |
+> > +=========+===============+===================+=====================+====================+
+> > | 1       | a             | Direct            | Phantom             | Yes
+> >            |
+> > +---------+---------------+-------------------+---------------------+--------------------+
+> > | 2       | a             | Reverse           | Phantom             | Yes
+> >            |
+> > +---------+---------------+-------------------+---------------------+--------------------+
+> > | 3       | b             | Direct            | Phantom             | Yes
+> >            |
+> > +---------+---------------+-------------------+---------------------+--------------------+
+> > | 4       | b             | Reverse           | Phantom             | Yes
+> >            |
+> > +---------+---------------+-------------------+---------------------+--------------------+
+> > | 5       | b             | Direct            | Direct              | No
+> >            |
+> > +---------+---------------+-------------------+---------------------+--------------------+
+> > | 6       | b             | Reverse           | Direct              | No
+> >            |
+> > +---------+---------------+-------------------+---------------------+--------------------+
 > 
-> This is a partial backport of the upstram commit 39880bd808ad ("mptcp:
-> get rid of msk->subflow"). It's partial to avoid a long a complex
-> dependency chain not suitable for stable.
+> Maybe we could remove the polarity column on this table as it does not bring
+> more information. It is also already explained on the PI pinout alternatives
+> table.
+
+Ack. I'm still not sure if "Phantom" is correct description.
+
 > 
-> The only bit remaning from the original commit is the introduction of a
-> new field avoid a race at close time causing an UaF:
+> Also we should document that a 4pairs PSE supporting only 10/100BaseT (which
+> mean no magnetics on pinout AlternativeB) may not be compatible with a 4pairs
+> 1GBaseT PD.
 
-Thanks, now queued up!
+Ack. s/may not/is not/ :) and 4pairs PSE is not always compatible with
+PoE4 as well. I assume this  kind of knowledge we will get from PSE
+driver.
 
-greg k-h
+Regards,
+Oleksij
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
