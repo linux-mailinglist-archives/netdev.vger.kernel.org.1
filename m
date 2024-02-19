@@ -1,132 +1,166 @@
-Return-Path: <netdev+bounces-72836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4932E859E10
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 09:20:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0EF3859E1B
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 09:22:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 050B8280DC2
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 08:20:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 124981C217CB
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 08:22:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CEED20DFA;
-	Mon, 19 Feb 2024 08:20:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 011ED210FB;
+	Mon, 19 Feb 2024 08:22:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hy/SMU/X"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XVQ+9qpN"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBDAE210E1
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 08:20:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D43F210F0
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 08:22:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708330835; cv=none; b=K968o4pw9a0CsaUYakE8JGY3KIVgdZ1KKq/fa4Cw/MX/u3zdsmHXx4ErgL5H0uvadYWi7OMfSs504kawol4RNAnQTrO728e/r1uD9YwhZPUhuHtlqVChvQHKXxN5iIUVNQFD/nwLd2sdv/ql3PC5xbyK6BrckIeS532czXU/HOw=
+	t=1708330939; cv=none; b=sEqeUWyCMR+OoDMJjO5fG6ZNnGIBpWuRNodoDyMHU+EF98GhXzxUk80VT5ZKeo9w3FWMpZDfBEH8c3SpUo+IWgwdjNq68jf80iVdfI8yVSnBl6PJY490/Txm9SnqUlhudgLKsulm1KH1vD3eku/NfYvPoDqPZBViIkvP2S5PHXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708330835; c=relaxed/simple;
-	bh=OngStKLWA/FvchTmAXxNqAPV+uRdOnu6k2F2Sieq6q4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=eBr3FHGExLpeQi5kXi04K+QQpVz6dpr7O1Piimmq6Nt+gMsYGVFYLBf7RDwquv+9AxDaWK4BfI+wmNGa5Og0+6BfREWGgxjiHoo3goaxF3MexwNBjdC6AN6qD75oh4TXlvyDsdKEd16nhLkQpsJgSxm0RqBRLEBJfvmDzp846jU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=hy/SMU/X; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:To:Subject:MIME-Version:Date:Message-ID:Sender:
-	Reply-To:Cc:Content-ID:Content-Description;
-	bh=hJiOP12KV9zgjXzUPTwEbRnjiDrwo8oS8JXNvhn8qdw=; b=hy/SMU/XKPp9pBhUlHAVVbadgt
-	lPgwiEZFqltInppo02U2sRziizoSoq8YFJPtgcHSvSfTNjX8Xt2TSr4AUcqyL2FPI9UeVWVInEcps
-	BO4avB/FLKY+WUzxOSgaks4iwepX4bz+7wQQLojJ6uYtU3RO7c0MlQ3QoYK3P4EEmAouRigRPjSp9
-	TmfUqlYmFNkkU0DhXbD9nqLX8J4WR96L6Q5YdOZVDLZ5hIyHUsUlFfsNWIYMI09L80fvgKL/RIfXd
-	MQbDXx4Ilfu51Up+bwCp4r0xKDF5tELvIpJDa2T9+lBlAi6pOC81sYRFeGKdZ9DcgXYwXJmebwJL3
-	fqlOqcMg==;
-Received: from 124x35x135x198.ap124.ftth.ucom.ne.jp ([124.35.135.198] helo=[192.168.2.109])
-	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rbysz-0000000CJqI-3949;
-	Mon, 19 Feb 2024 08:20:26 +0000
-Message-ID: <92d9d2bd-14db-4782-ae3e-737459a8672d@infradead.org>
-Date: Mon, 19 Feb 2024 17:20:18 +0900
+	s=arc-20240116; t=1708330939; c=relaxed/simple;
+	bh=nGitsSxjPk+gBIGLQ3qxvow1rCE7hQe9MOGZfZ0PH3w=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=OiHeu/kKO3jwa8B32g+3/IHa2KMo7gnns+BkT4wC3+59npiGfMiS0s+v9wJ5c4gUiASg6BXbzfDwPzG1ReJ0GB55Ujw99S+HtAHW9lDZA6x/UcGi7WSFhYk380EXMxSFDuaVSDqIMmPpWKfH7w+gpPKDoa6LgxIYlae/kq/Vcu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=XVQ+9qpN; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a3e7ce7dac9so86705166b.1
+        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 00:22:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1708330936; x=1708935736; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=aJawKhMKgZfK3H+o45cb6KDvj97UBnzXFXRTiTe4vLc=;
+        b=XVQ+9qpNO0ZLMclvaqsjyCBzjEybdT5LcLfgNTuzZqzocLsDkkxRPAirEmzz7GW6LY
+         528MgiuGoTmbmRDtDJkKDyjTS6vO7OzqWOsMPimiofX/qRyYVFmDkidOCyhOZm5T681e
+         ePTj0IE4zOt94UQ6QZ1wNR/poKy5uQYdTclKEdud5gO6hUTl9n8o8vuwFfDXY3R9+nJj
+         cY98wHw0dSqGHZL8R7k6CgOtas85WlOhrZxxqHsMf+jGU89DdH83eSIz+3bZuiyh/AjN
+         2POLhXbjZii3nNWlRWnrC93BM56yrN1GcIKqoz3Htsh6ne7nK7VZnb8BRGq6Xte5YJYU
+         WP3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708330936; x=1708935736;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aJawKhMKgZfK3H+o45cb6KDvj97UBnzXFXRTiTe4vLc=;
+        b=wrCg8nq7NDdqJVojQ4/agx84rPt2HBCOlayDgYOU7Z7k2JXWGgGEum7yMnOQGvcC6q
+         wTglNkx6c0xzTJyN2DAC1HBNj0gsDiPuiXXIcJ/xcXhFGLrrC8KmcJT8AD+TxtHFc6Vx
+         U2v69kjdVU1TVqC9Y3xlTFJOywLOuKp40Xt9V9NdggNBXS8ZETMf4LGVq6vKFvurkjV9
+         Ul+ScFJCfcT7q5X8KtRNedwdzoYl80bbWSfDjt7c5eAJo7UNxIeE/Pn7bbopldWQqf/6
+         m75OcIY7DiPGB0hB9bM3ff72lgiK75LJgp1VIvw88MPsB2Lx2mSyIVXkesTj3ZoJv5ZS
+         QiVg==
+X-Forwarded-Encrypted: i=1; AJvYcCVno2g0Tse63lZHesUXoag+jXHDOWDBbMTwoDnL5r9NZVKbmVWqNQ0CWW9j1Vt47l8qQuVyESvnpEoC304Edgz55HMSS8VQ
+X-Gm-Message-State: AOJu0YzPEdxuNtEmzao1NgiCAMShpy6HlfR8AsVxityJmUycb/2Gogjd
+	0ze+ZU1loq19eu87n+ZETYqLe/ySgoqW5iOulcot31vpuVWGz3VngRj0ykn92qw=
+X-Google-Smtp-Source: AGHT+IGl/ITfmjq0RpjNkokRRLvKEhrU7NvfHwqSMU7MFfOC3zR13Xzxi+jsjB0P34SMxHIUAdW/cQ==
+X-Received: by 2002:a17:906:1388:b0:a3e:79f7:d218 with SMTP id f8-20020a170906138800b00a3e79f7d218mr2415837ejc.43.1708330936473;
+        Mon, 19 Feb 2024 00:22:16 -0800 (PST)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id y2-20020a170906470200b00a3d0dd84276sm2685297ejq.184.2024.02.19.00.22.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Feb 2024 00:22:16 -0800 (PST)
+Date: Mon, 19 Feb 2024 11:22:12 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: oe-kbuild@lists.linux.dev, Jeremy Kerr <jk@codeconstruct.com.au>,
+	netdev@vger.kernel.org
+Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Liang Chen <liangchen.linux@gmail.com>,
+	Johannes Berg <johannes.berg@intel.com>
+Subject: Re: [PATCH net-next 06/11] net: mctp: provide a more specific tag
+ allocation ioctl
+Message-ID: <95174361-e247-4792-866b-d77152659fd6@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 net] ps3/gelic: Fix SKB allocation
-To: Paolo Abeni <pabeni@redhat.com>, sambat goson <sombat3960@gmail.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <4a6ab7b8-0dcc-43b8-a647-9be2a767b06d@infradead.org>
- <125361c7ec88478e04595a53aacc406ef656f136.camel@redhat.com>
- <0b649004-4465-404f-b873-1013bb03a42d@infradead.org>
- <e3953200fb8f0e81f76e62e3cb397b31f9c864b3.camel@redhat.com>
-Content-Language: en-US
-From: Geoff Levand <geoff@infradead.org>
-In-Reply-To: <e3953200fb8f0e81f76e62e3cb397b31f9c864b3.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <424009ba3e320ae93eb6bd44ef5e474aa5c9221f.1708071380.git.jk@codeconstruct.com.au>
 
-On 2/16/24 19:06, Paolo Abeni wrote:
-> On Fri, 2024-02-16 at 18:37 +0900, Geoff Levand wrote:
->> On 2/13/24 21:07, Paolo Abeni wrote:
->>> On Sat, 2024-02-10 at 17:15 +0900, Geoff Levand wrote:
->>>> Commit 3ce4f9c3fbb3 ("net/ps3_gelic_net: Add gelic_descr structures") of
->>>> 6.8-rc1 did not allocate a network SKB for the gelic_descr, resulting in a
->>>> kernel panic when the SKB variable (struct gelic_descr.skb) was accessed.
->>>>
->>>> This fix changes the way the napi buffer and corresponding SKB are
->>>> allocated and managed.
->>>
->>> I think this is not what Jakub asked on v3.
->>>
->>> Isn't something alike the following enough to fix the NULL ptr deref?
->>>
->>> Thanks,
->>>
->>> Paolo
->>> ---
->>> diff --git a/drivers/net/ethernet/toshiba/ps3_gelic_net.c b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
->>> index d5b75af163d3..51ee6075653f 100644
->>> --- a/drivers/net/ethernet/toshiba/ps3_gelic_net.c
->>> +++ b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
->>> @@ -395,7 +395,6 @@ static int gelic_descr_prepare_rx(struct gelic_card *card,
->>>         descr->hw_regs.data_error = 0;
->>>         descr->hw_regs.payload.dev_addr = 0;
->>>         descr->hw_regs.payload.size = 0;
->>> -       descr->skb = NULL;
->>
->> The reason we set the SKB pointer to NULL here is so we can
->> detect if an SKB has been allocated or not.  If the SKB pointer
->> is not NULL, then we delete it.
->>
->> If we just let the SKB pointer be some random value then later
->> we will try to delete some random address.
-> 
-> Note that this specific 'skb = NULL' assignment happens just after a
-> successful allocation and just before unconditional dereference of such
-> ptr:
-> 
->         descr->skb = netdev_alloc_skb(*card->netdev, rx_skb_size);
->         if (!descr->skb) {
->                 descr->hw_regs.payload.dev_addr = 0; /* tell DMAC don't touch memory */
->                 return -ENOMEM;
->         }
-> 
->         descr->hw_regs.dmac_cmd_status = 0;
->         descr->hw_regs.result_size = 0;
->         descr->hw_regs.valid_size = 0;
->         descr->hw_regs.data_error = 0;
->         descr->hw_regs.payload.dev_addr = 0;
->         descr->hw_regs.payload.size = 0;
-> 	// XXX here skb is not NULL and valid 
->         descr->skb = NULL;
+Hi Jeremy,
 
-I see your point now.  I'll send out a fix-up patch that just
-moves the initialization of the descr to before the allocation
-of the SKB.  Thanks.
+kernel test robot noticed the following build warnings:
 
--Geoff
+url:    https://github.com/intel-lab-lkp/linux/commits/Jeremy-Kerr/net-mctp-avoid-confusion-over-local-peer-dest-source-addresses/20240216-163203
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/424009ba3e320ae93eb6bd44ef5e474aa5c9221f.1708071380.git.jk%40codeconstruct.com.au
+patch subject: [PATCH net-next 06/11] net: mctp: provide a more specific tag allocation ioctl
+config: parisc-randconfig-r081-20240218 (https://download.01.org/0day-ci/archive/20240218/202402181713.OQAPBmZC-lkp@intel.com/config)
+compiler: hppa-linux-gcc (GCC) 13.2.0
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+| Closes: https://lore.kernel.org/r/202402181713.OQAPBmZC-lkp@intel.com/
+
+smatch warnings:
+net/mctp/af_mctp.c:389 mctp_ioctl_tag_copy_from_user() warn: was && intended here instead of ||?
+
+vim +389 net/mctp/af_mctp.c
+
+28828bad95a357 Jeremy Kerr 2024-02-16  356  static int mctp_ioctl_tag_copy_from_user(unsigned long arg,
+28828bad95a357 Jeremy Kerr 2024-02-16  357  					 struct mctp_ioc_tag_ctl2 *ctl,
+28828bad95a357 Jeremy Kerr 2024-02-16  358  					 bool tagv2)
+28828bad95a357 Jeremy Kerr 2024-02-16  359  {
+28828bad95a357 Jeremy Kerr 2024-02-16  360  	struct mctp_ioc_tag_ctl ctl_compat;
+28828bad95a357 Jeremy Kerr 2024-02-16  361  	unsigned long size;
+28828bad95a357 Jeremy Kerr 2024-02-16  362  	void *ptr;
+28828bad95a357 Jeremy Kerr 2024-02-16  363  	int rc;
+28828bad95a357 Jeremy Kerr 2024-02-16  364  
+28828bad95a357 Jeremy Kerr 2024-02-16  365  	if (tagv2) {
+28828bad95a357 Jeremy Kerr 2024-02-16  366  		size = sizeof(*ctl);
+28828bad95a357 Jeremy Kerr 2024-02-16  367  		ptr = ctl;
+28828bad95a357 Jeremy Kerr 2024-02-16  368  	} else {
+28828bad95a357 Jeremy Kerr 2024-02-16  369  		size = sizeof(ctl_compat);
+28828bad95a357 Jeremy Kerr 2024-02-16  370  		ptr = &ctl_compat;
+28828bad95a357 Jeremy Kerr 2024-02-16  371  	}
+28828bad95a357 Jeremy Kerr 2024-02-16  372  
+28828bad95a357 Jeremy Kerr 2024-02-16  373  	rc = copy_from_user(ptr, (void __user *)arg, size);
+28828bad95a357 Jeremy Kerr 2024-02-16  374  	if (rc)
+28828bad95a357 Jeremy Kerr 2024-02-16  375  		return -EFAULT;
+28828bad95a357 Jeremy Kerr 2024-02-16  376  
+28828bad95a357 Jeremy Kerr 2024-02-16  377  	if (!tagv2) {
+28828bad95a357 Jeremy Kerr 2024-02-16  378  		/* compat, using defaults for new fields */
+28828bad95a357 Jeremy Kerr 2024-02-16  379  		ctl->net = MCTP_INITIAL_DEFAULT_NET;
+28828bad95a357 Jeremy Kerr 2024-02-16  380  		ctl->peer_addr = ctl_compat.peer_addr;
+28828bad95a357 Jeremy Kerr 2024-02-16  381  		ctl->local_addr = MCTP_ADDR_ANY;
+28828bad95a357 Jeremy Kerr 2024-02-16  382  		ctl->flags = ctl_compat.flags;
+28828bad95a357 Jeremy Kerr 2024-02-16  383  		ctl->tag = ctl_compat.tag;
+28828bad95a357 Jeremy Kerr 2024-02-16  384  	}
+28828bad95a357 Jeremy Kerr 2024-02-16  385  
+28828bad95a357 Jeremy Kerr 2024-02-16  386  	if (ctl->flags)
+28828bad95a357 Jeremy Kerr 2024-02-16  387  		return -EINVAL;
+28828bad95a357 Jeremy Kerr 2024-02-16  388  
+28828bad95a357 Jeremy Kerr 2024-02-16 @389  	if (!(ctl->local_addr != MCTP_ADDR_ANY ||
+28828bad95a357 Jeremy Kerr 2024-02-16  390  	      ctl->local_addr != MCTP_ADDR_NULL))
+28828bad95a357 Jeremy Kerr 2024-02-16  391  		return -EINVAL;
+
+Should be &&.  This function will always return -EINVAL.  I haven't
+looked at the context outside of this automatically generated email but
+it suggests a failure in our test process.
+
+28828bad95a357 Jeremy Kerr 2024-02-16  392  
+28828bad95a357 Jeremy Kerr 2024-02-16  393  	return 0;
+28828bad95a357 Jeremy Kerr 2024-02-16  394  }
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
+
 
