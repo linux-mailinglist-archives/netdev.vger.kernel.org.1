@@ -1,97 +1,158 @@
-Return-Path: <netdev+bounces-72955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72956-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBCD585A5ED
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 15:30:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7854685A5F0
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 15:31:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1D671F254DD
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 14:30:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 19135B22808
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 14:31:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C21CA1D684;
-	Mon, 19 Feb 2024 14:30:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A82B1DFFB;
+	Mon, 19 Feb 2024 14:31:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PnZuqt2t"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="U/s9u0OS"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 972051DDEC
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 14:30:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 090121DFE8;
+	Mon, 19 Feb 2024 14:31:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708353053; cv=none; b=p08xHpIVAbfdZKvC8o5XpMhcMWlId+ALIX4VhXYM12TZmBhJRsLdTV3LUaKO9jfMiMEBEaOWhYT+CN7IzxqMAxxQ68I7kCaZrJ/wm41PwDBXCdD7L9JOyzc8y6f0Xp4deDiY4rnVdJ1HWn4duCi2p0lmyW9YeqwKGRwzrNtWUVE=
+	t=1708353076; cv=none; b=tbQQDAvZ/fUmFIU2xrOVxxll6M2zabcs/jOeJ/JcU5SxpExFgYdURmpAPZ2qkWBM07gIKYz5gKfEDSVE4E7LbYwalxY9ijEEFRc2VYAaHjTIi2rcfgJ/Bjbt4NPWHnXgkVhxKP+4uH/RMxFvZ2y6PPInr7H84NkJ6dg41yGznII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708353053; c=relaxed/simple;
-	bh=3bEKY7PxvNQiJ306R7BB/FafCVonFi6t6OTnNTdAkY0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SlNfvN4NTejyTZx19Cq6e9zjmF+hhODBVmZFgAXnRfvwEjNwDQbpaSrZHKVV+S3E5Enl/rm+g2bbXuj1pPS2cU5hP6uJPpvRNnEd2iDiav/aAzTr/tCWLZUoOHo/wrc+e0BJP98VvPTfu5zi1lBB8KXNT5Wu9NG3mHxpoMUyQ5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PnZuqt2t; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=i/cN1QvSUO0qDU+HtuNP1v/fU6JA6R6yx8Vc9VVVxfc=; b=PnZuqt2totUMP/t8/6s8BMRSzd
-	Pg8fdxqVGRrH5X8yvXXKm1yWEL5fr81QiUiOf+figSWAR8xaedrNJHRkHqtKSf2eXDkqnjBdjZqJf
-	0inuYlohi4IlVt14TwQyNJMxiKLdWdzm9WU6/4kBP8p6MbQGzRhOmDzZp6bGID1m2l1g=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rc4fX-008CQS-5z; Mon, 19 Feb 2024 15:30:55 +0100
-Date: Mon, 19 Feb 2024 15:30:55 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Parthiban.Veerasooran@microchip.com
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, Steen.Hegelund@microchip.com,
-	netdev@vger.kernel.org, Horatiu.Vultur@microchip.com,
-	Woojung.Huh@microchip.com, Nicolas.Ferre@microchip.com,
-	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com,
-	Pier.Beruto@onsemi.com, Selvamani.Rajagopal@onsemi.com
-Subject: Re: [PATCH net-next v2 0/9] Add support for OPEN Alliance 10BASE-T1x
- MACPHY Serial Interface
-Message-ID: <e819bb00-f046-4f19-af83-2529f2141fa6@lunn.ch>
-References: <20231023154649.45931-1-Parthiban.Veerasooran@microchip.com>
- <1e6c9bf1-2c36-4574-bd52-5b88c48eb959@lunn.ch>
- <5e85c427-2f36-44cc-b022-a55ec8c2d1bd@microchip.com>
+	s=arc-20240116; t=1708353076; c=relaxed/simple;
+	bh=kCExhr7TI0B5O0k5tOI7V68szWpBz5xEoI5w1iUnUEw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JBeWwuyMX1gUxDV5jgs3x3jUSUCgxCf+Px3+uiUbph0SeHtR7JeB/2vcxagua89/CbJ8LzLt9lOTBJdM6n5t4QUVRpwlGwNDl8EtxPxbMY0HwYXod1qfiFHxk8GMFlDNbI1NriDt+vHbP2x+69lbb4mVTFAsscjIFOIhO3kYB7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=U/s9u0OS; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 2E40C1BF206;
+	Mon, 19 Feb 2024 14:31:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1708353072;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9h+OMrQCyhqHA7MCzpM0VlZZ6CwDDvEtHV/K94gz0WI=;
+	b=U/s9u0OSp/Z7R2FUlgP0FV/wusIZrolBvVwUWtIO4FxFiOGCiQTMv/8XnFtg5S6NqyIWls
+	zwzzQt1XSmq6BRxzXIZWCrE1Mn+nR6GJE1CpM4Mfjbsrwlq300d3xNFDglvo2dif8rchV+
+	bE75OAq8FhfduMysPMIFJJ77YSaynAKfxd30GD+0b1cOrBQB86OKMpZWQHr476u4qsYGlJ
+	ovL1G1kBYbNNJ1RkO0CvO2wOA5A1TXYCrqfB7sVXJbIaECwhCshHM8fD7VprqiA6yqQD3U
+	zfE7HMT1o0+nr1XRTfOqoHSTV535PlLcOm6JIluUhlpI+4bFOxV+0O0VJ9/3QA==
+Date: Mon, 19 Feb 2024 15:31:06 +0100
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh@kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jonathan
+ Corbet <corbet@lwn.net>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight
+ <russ.weight@linux.dev>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Mark Brown <broonie@kernel.org>, Frank Rowand <frowand.list@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, devicetree@vger.kernel.org, Dent Project
+ <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v3 14/17] dt-bindings: net: pse-pd: Add
+ bindings for PD692x0 PSE controller
+Message-ID: <20240219153106.19e83213@kmaincent-XPS-13-7390>
+In-Reply-To: <Zc8TAojumif1irE-@pengutronix.de>
+References: <20240208-feature_poe-v3-0-531d2674469e@bootlin.com>
+	<20240208-feature_poe-v3-14-531d2674469e@bootlin.com>
+	<20240209145727.GA3702230-robh@kernel.org>
+	<ZciUQqjM4Z8Tc6Db@pengutronix.de>
+	<618be4b1-c52c-4b8f-8818-1e4150867cad@lunn.ch>
+	<Zc3IrO_MXIdLXnEL@pengutronix.de>
+	<65099b67-b7dc-4d78-ba42-d550aae2c31e@lunn.ch>
+	<Zc8TAojumif1irE-@pengutronix.de>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5e85c427-2f36-44cc-b022-a55ec8c2d1bd@microchip.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-> Hi Andrew,
-> 
->  From Microchip side, we haven't stopped/postponed this framework 
-> development. We are already working on it. It is in the final stage now. 
-> We are doing internal reviews right now and we expect that in 3 weeks 
-> time frame in the mainline again. We will send a new version (v3) of 
-> this patch series soon.
+On Fri, 16 Feb 2024 08:47:14 +0100
+Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+> >
+> > So, either somebody needs to understand 1000BaseT and can say the
+> > proposed binding works, or we explicitly document the binding is
+> > limited to 10BaseT and 100BaseT. =20
+>=20
+> I asked the internet and found the answer: Some PSE/PD implementations
+> are not compatible with 1000BaseT.
+>=20
+> See Figure 33=E2=80=934=E2=80=9410BASE-T/100BASE-TX Endpoint PSE location=
+ overview.
+> Alternative B show a variant where power is injected directly to pairs
+> without using magnetics as it is done for Alternative A (phantom
+> delivery - over magnetics).
+>=20
+> So, we have following variants of 2 pairs PoE:
+> +---------+---------------+-------------------+---------------------+----=
+----------------+
+> | Variant | Alternative   | Polarity          | Power Feeding Type  |
+> Compatibility with | |         | (a/b)         | (Direct/Reverse)  |
+> (Direct/Phantom)    | 1000BaseT          |
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
+> | 1       | a             | Direct            | Phantom             | Yes
+>            |
+> +---------+---------------+-------------------+---------------------+----=
+----------------+
+> | 2       | a             | Reverse           | Phantom             | Yes
+>            |
+> +---------+---------------+-------------------+---------------------+----=
+----------------+
+> | 3       | b             | Direct            | Phantom             | Yes
+>            |
+> +---------+---------------+-------------------+---------------------+----=
+----------------+
+> | 4       | b             | Reverse           | Phantom             | Yes
+>            |
+> +---------+---------------+-------------------+---------------------+----=
+----------------+
+> | 5       | b             | Direct            | Direct              | No
+>            |
+> +---------+---------------+-------------------+---------------------+----=
+----------------+
+> | 6       | b             | Reverse           | Direct              | No
+>            |
+> +---------+---------------+-------------------+---------------------+----=
+----------------+
 
-Hi Parthiban
+Maybe we could remove the polarity column on this table as it does not bring
+more information. It is also already explained on the PI pinout alternatives
+table.
 
-It is good to here you are still working on it.
+Also we should document that a 4pairs PSE supporting only 10/100BaseT (which
+mean no magnetics on pinout AlternativeB) may not be compatible with a 4pai=
+rs
+1GBaseT PD.
 
-A have a few comments about how Linux mainline works. It tends to be
-very iterative. Cycles tend to be fast. You will probably get review
-comments within a couple of days of posting code. You often see
-developers posting a new version within a few days, maybe a week. If
-reviewers have asked for large changes, it can take longer, but
-general, the cycles are short.
+> For this case, it will be good if systems knows supported modes, so user
+> can get this information  directly. For example with ethtool
 
-When you say you need three weeks for internal review, that to me
-seems very slow. Is it so hard to get access to internal reviewers? Do
-you have a very formal review process? More waterfall than iterative
-development? I would suggest you try to keep your internal reviews
-fast and low overhead, because you will be doing it lots of times as
-we iterate the framework.
+Yes.
 
-	Andrew
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
