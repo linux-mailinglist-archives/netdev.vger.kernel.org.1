@@ -1,397 +1,180 @@
-Return-Path: <netdev+bounces-73078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82C5085ACE2
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 21:14:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CC5E85ACE5
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 21:15:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A410288FE0
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 20:14:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77A33B23655
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 20:15:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA62E535D0;
-	Mon, 19 Feb 2024 20:13:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83ACB535AA;
+	Mon, 19 Feb 2024 20:14:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gYv7tIA3"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="revfb3z5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01olkn2043.outbound.protection.outlook.com [40.92.52.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94AEB535BF
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 20:13:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708373633; cv=none; b=f2A2grIuJcVNW83yKKKW589bXeIP9TeBT2bLUSE2z+M8umBH/fQc3TuKNM9AUEs6VTtH36m1KKkM91W+QMiaQ4bTwbPlk0zEI+J2cL5O8YCWx17mmA2aeeQKHmMPftQErvqgiIFPHBjoRNZ8ab777uy/bberpU4mhW8ebwD/lOo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708373633; c=relaxed/simple;
-	bh=KciqEVc1JI/R4CyGsB/xQChlbDyFWSoBcqtng0+6BKk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RDuUI5Ik4AL0Nb5B6tAi4h72tFUTzhOe64IO147ynnDPognaz6Om1jO2/ey2syaukrOCHf047bCj/ZLeLinntx/dvJtiFX632b6KcEy7POgt+EIuA45wGd8l6CkSphv3HOKn5Y3KPyp1IagdY1vzG7RXAlVJkqHb3EOXOAWtgFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gYv7tIA3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5D16C43609;
-	Mon, 19 Feb 2024 20:13:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708373633;
-	bh=KciqEVc1JI/R4CyGsB/xQChlbDyFWSoBcqtng0+6BKk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gYv7tIA3Si/F5TVe4Jzni4prGyKSHlq3Bf/KVfQNEcjE/UVyN/H0P1mKeODUbiC+m
-	 OFnQ7JJoXuTcKCPIRYEzug5ZNCi4sEXGLAcpF1TFMJco8sOKFnfJM1yp4wDGTKcoKF
-	 R9uPajDZRC0OFsl9iax0jYaho8NRh5Em22IB5Xfj0yPcK6f8ISIGS0hQTv91LssmeH
-	 qHBVbloKQ247eDx6lkCw+r56rClaHs/VDoawcQsKKyoZkx3CZh3P1fzsvGRoqi6t4R
-	 /q9PYBKm34ozcQxBKdjS5tu54mPUflqwUFRxuB8kLWJ8XdJYnPQqSOwGH3QRxn0t0b
-	 IoIp3ANQwdtNw==
-Date: Mon, 19 Feb 2024 20:13:49 +0000
-From: Simon Horman <horms@kernel.org>
-To: Christian Hopps <chopps@chopps.org>
-Cc: devel@linux-ipsec.org, Steffen Klassert <steffen.klassert@secunet.com>,
-	netdev@vger.kernel.org, Christian Hopps <chopps@labn.net>
-Subject: Re: [PATCH ipsec-next v1 8/8] iptfs: impl: add new iptfs xfrm mode
- impl
-Message-ID: <20240219201349.GO40273@kernel.org>
-References: <20240219085735.1220113-1-chopps@chopps.org>
- <20240219085735.1220113-9-chopps@chopps.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBA7B524C0;
+	Mon, 19 Feb 2024 20:14:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.52.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708373695; cv=fail; b=owpCWd9pbpg8PjI4p1DSBPGPA1FSGtK465H8/Mp3TRYBjGN7ukl+5ER4ZRIcOsM3qPVoVVUw9qlByOrnvLQq1qfpsEi7ld2Ke75Ta/prNpxOgRCB96YHdu86KG5zfxm5O0eAa03CdAQXJLhNpliSg744xojth3eTGSFsNu+2+Vs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708373695; c=relaxed/simple;
+	bh=Ii/uElq++1l20Zs+vtHDVPN8ID8xPuNdGfEy1jPWgQA=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ut7oeYtD8jTTP2UtKKJR6I22zA4Kr1e9xOD9r/AwbPeOKTfIpeB58jgMTGjOI2E1fRn9JNl+Gm4NQn0JyldtY0n6YNv/D+ozILRIa841BG8Z/tynTIvcVKAcdp8CbiqhDtTVfybyhEB4drmD4tHb9UuRDynjiXAoET92vTXZbYk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=revfb3z5; arc=fail smtp.client-ip=40.92.52.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fGKKj8Ks3HOW0riEbd/qv477DIcDt5l0HOHCUYYexDrR7omgehPSX23E7zZ5WmHuxEoKeksMCR5aIT4NUZg7Ucx/nQKPsDwGusW+U86XlblsOx1LTEtyU67VVTNchG+YytyeB3qc2nTfCokM8HldHTFff2dLvjHbFPWdp0A+RhZQHZY+M3OD3zJaW7mDNe7/HBSBa91256+6ETcYT//2TLikw1PeYK3KWRL4mCwm/7/sNVySgEF8Ee5V5usOiPM8qcRsKyyHP8q5h7lbYEVyTzW2Y7zsn+hMTS8T13mtil1bi+ab/M1mfCWodvOFT3Jba1XwNt0N8Y3TFi/GnxX2BA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Jqf054I8NDFp650Vm0yCKqwF8EdiUoWxStggJGnXltU=;
+ b=U3f79ZL1Fo/0Rbm+O/p9diNv64WVnYrT6lXhEfoji59FVqRSAYYIPIBjEn3slwiovvbs7XGD0ogfpSdCJgzNcjvqK4g1qQ12CC4lU0vvj5jIeEVdOG9CFZ4XxZao7y2a55AXYPKVd3Ewkoq+nWfIdQUdiGOl9ZL9tY2VhVX41Nyw3RuyEcu3VoRvT11L7K350cfkHu8tmPiWS9nhw6K4F3K9dhRDaVhh4DZE0ai1idpJhZccPddlkXUI2MoQ++V0kLOQWutDlCPw4CiZgC3x0FdNUW5lVzW99SyYRLRFnMyP/L7+tPwVOWAoOHXw2AsfwHQv0gdpbhm6tuEKQ5UKgw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Jqf054I8NDFp650Vm0yCKqwF8EdiUoWxStggJGnXltU=;
+ b=revfb3z52MGnd5fsKi5owNOddWqM0faRBfXCySG7Dx0WFOJ4WYuIaqNkWVXYLE7FhIJM+hBVuWtjgGWPd4NL2s13xSg/ZUmyQJXjml5B3PrjMdZ+U66NL3BKajyoO3Jc94TeHdCgy1Bv1MEKVTnrWVZnU8OXOJP5fj/mPGKFJ7p9i9h7AFgIEx6wR51q5oyxREfrJNkl2ZsSLivYVMiYOIG63z1KAO0767xEKSE7foaFV5OewPuvs9t1KshgljZOwClSd9YW0f98MNgux6u5Pf+meN3GS5i/bKM+/aZ+q8vGovpOc/ti5/JjqFPZAu17rDcJ4g4hnUBrXX4+n8ojow==
+Received: from SEZPR06MB6959.apcprd06.prod.outlook.com (2603:1096:101:1ed::14)
+ by SEZPR06MB5761.apcprd06.prod.outlook.com (2603:1096:101:ad::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.38; Mon, 19 Feb
+ 2024 20:14:41 +0000
+Received: from SEZPR06MB6959.apcprd06.prod.outlook.com
+ ([fe80::53da:a8a:83cb:b9ad]) by SEZPR06MB6959.apcprd06.prod.outlook.com
+ ([fe80::53da:a8a:83cb:b9ad%4]) with mapi id 15.20.7292.036; Mon, 19 Feb 2024
+ 20:14:41 +0000
+Message-ID:
+ <SEZPR06MB695901E7D4BEABE1B6F319D096512@SEZPR06MB6959.apcprd06.prod.outlook.com>
+Date: Tue, 20 Feb 2024 04:14:36 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 3/6] net: hisilicon: add support for
+ hisi_femac core on Hi3798MV200
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Yisen Zhuang <yisen.zhuang@huawei.com>,
+ Salil Mehta <salil.mehta@huawei.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
+References: <20240220-net-v3-0-b68e5b75e765@outlook.com>
+ <20240220-net-v3-3-b68e5b75e765@outlook.com>
+ <29fc21f0-0e46-4d0f-8d4b-c4dbd1689c55@lunn.ch>
+From: Yang Xiwen <forbidden405@outlook.com>
+In-Reply-To: <29fc21f0-0e46-4d0f-8d4b-c4dbd1689c55@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TMN:
+ [q95owkX9adtiriSmXbCKArF60re7INXc7ujYAR7UTkBcOPNY4lsIJYmXIIfTBdioBmYWaP2YLDk=]
+X-ClientProxiedBy: TYCP301CA0042.JPNP301.PROD.OUTLOOK.COM
+ (2603:1096:400:380::10) To SEZPR06MB6959.apcprd06.prod.outlook.com
+ (2603:1096:101:1ed::14)
+X-Microsoft-Original-Message-ID:
+ <7590ea00-54a2-4e41-a25c-c15b3b180f72@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240219085735.1220113-9-chopps@chopps.org>
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SEZPR06MB6959:EE_|SEZPR06MB5761:EE_
+X-MS-Office365-Filtering-Correlation-Id: f50fb0d7-7ed0-4bf5-dc80-08dc31876730
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	kHcuP3IwTPWhKuATPRAILlwXnAX3WnG+VQOk01GdfCoazP2HKYX5GahRiupqqoREoLYDnRuq7BwG795FYfzPOll+hzPnwoU/1zIBCDQwc7Zuhtm8Y/1a78BAhdO0nQN+CnxV7MZjAoLX5StRNvcwC+x+NmFJfDNyAnMm7yxAhV3+vMul81WN0UMmRo653v987cXYHIKl2cO7ts6CaCPHWvrmibbgNA0PmupoxdRHhWYI9fsUCMRRg8dkhwbhmJYRIKMk3IphzgDiNBmSTWqQ2sNfAC4H3qOjoyCcWT+lmAOdTK8zOTv/vcOamSStlEL5drILvnv7WCYL4Eby3l0t5+gsX0Jzc3t4qPG9sYHgkSXnlWRWdnJzKl9dsH7L1mS1zWbWpj3GWaGiBgyP8cvjs7PWx9jZPt57En12pXRgHsR64FzETXVn9DWeEM2CWrlrpT613q6BVjnW5/AAUZaE6Z6ZrjzenhOO6Ig7OwEp0aUUjqqfdulRGIx6pu7/0Iv8c/3X5QjL53SpzhtJLaqf82r0vf+s+uSrJbuMxpggedRtn0e6sSZCWMUecOgbXkNg
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?aVhDbzlSdFJMczZLaVBBbFlUOXhvS3VraU1ERzJFYzhFTzFvdXhvQmJ4bWF6?=
+ =?utf-8?B?alZxdE0xN3NYWXRreHBtRWpyUGVtczYwYTZLak5rbG04emxWVW1LUnVUcXov?=
+ =?utf-8?B?YTk5eFVvcHhvTFlLVFIwMVJLVWROTnB3NXhQOEU3K2VhRTFDUmZGZXgxK211?=
+ =?utf-8?B?VFZUZXlBSW41WEVsNkpYTnQzMG5FcDJmYjRBOFhtcEhQY2xhTm9wTHZwUVFl?=
+ =?utf-8?B?anJLdE02VTNYaHc0TGMveXJLaEtMR0Y3UGF0eDdsN212Zmp5NmJVQXFvdllW?=
+ =?utf-8?B?dWFCcHJPVkdyQ0FRcTV2NlNkT3FiM25qUVI3N3RzYlBiVHRrNzg0dG1QN05a?=
+ =?utf-8?B?cUhsU1BYVmRaMnNYN1dNNzREZnQ1WXhqYlNobUVhb2tIeVZnOUlpRnJPMkU0?=
+ =?utf-8?B?a1JmSUppYzN6WnlwUVUwRFpPTkJZYkZYdExSMDBrZzR2SnI4MWxSajBqQUNQ?=
+ =?utf-8?B?UkNxSEM3d2xrOCtBYTJyZmFDcHJ3aEd4Mm1zWFhqN3JIWmVWQUZYK09ldTh1?=
+ =?utf-8?B?VE5BVGRuUlc1N1gwczUwdkViTGJoT1NWc3JGdm9kUzgyY2FJajVISFVIMFZM?=
+ =?utf-8?B?aXBGZ2dHZE1SOXIrN29JSyt3OHg5NnVTMmZ6WXdNTHphZUVFT0ZZWTVxU2Zk?=
+ =?utf-8?B?UW82TXJ3QTU3Njg4YWRVek9UV3dTQXZwT0pyaTBmZEx0VHN5MndYdnNhN2dV?=
+ =?utf-8?B?anRyMWtPS3JXTEIzQThXK055dmlNaE5pa1ErYlVleGh4UWs3QkpmaE9GcUJN?=
+ =?utf-8?B?ekkrVmdJWExPZ3o3Y2lCOGVzR2t4SHJhdU5nbGVKVERzN2RVc2ZGV25zS2Jw?=
+ =?utf-8?B?TUZ6M09SZy9PRjdIZndZV1Zsd1lHZlhSaUJ0Umw1MHFMWHI1NzI4RTNZRnpm?=
+ =?utf-8?B?c0NnYnZ4Q2N3ZURWTGJKcXBBaUNvTkhBKy9UU1VXbHp6L1F0S3gvejVhWk5D?=
+ =?utf-8?B?YVRtU0dHcGY4LzFBTjk4QTBENmlFdEx3NkdQZjBZRXFERjNUMHY3RjVuTjVK?=
+ =?utf-8?B?QmFhemxLV3YwTG15NlZIWkNDMmZMSE1qWkpYdk4rcGFmM0o0cjB3NFEvK2JI?=
+ =?utf-8?B?L0x3bytITWNTTEpZdEVoNUJiMVhDMjk0QXNudFgzU1FOZUhHb1RMOWh2MHNF?=
+ =?utf-8?B?T1M1NEw2YUNWV1Z0SzFLbzc4RUtGbHFpbFB0dWdDV0dzOVR1WWllajZHdXU5?=
+ =?utf-8?B?ZmFBVGpXTVZ4NHQybmFOM09sUkZZYzYvajY4alRkbmIybFlNQVBFeHZnVEdv?=
+ =?utf-8?B?bEQxY2wvdzE0L0RaSG9McWxybmZHSXpZOC85ZHZJTDhjWmpJR25GMEo2SjVD?=
+ =?utf-8?B?ZGZtQldlMVFqMFptcFp3eWtweEozdnYya0Jha2dMK3NzSEZwOXlHcVVZRHBN?=
+ =?utf-8?B?VnB4L0lRM01KeGNQMTIwam1XTFNZZmc0dUpLWnlPNjFzVVBtWXoyZHkwcVRa?=
+ =?utf-8?B?RzFLajkwT0dqaEozVFlMelZJTUpkMUtvQWdINElOd0pwTVp3eHhqZ3p2Wk1O?=
+ =?utf-8?B?U2JpMFhRVGt4WHk3TExaWGhpS0hHbVFJN3Q0OEcvZy8rQldkOXdjSUpNSGpU?=
+ =?utf-8?B?cnFnazJiRmExRE82dHlLMVYvYSs3MTJuZGhlcGVaQktVQUdaWm80VjB2aXkr?=
+ =?utf-8?B?QWpZYkhDeDhyZ3cyS3NVMERUZW82MHY2cUNEYlhqdW1qVEEzRlJ4NDc3Yklj?=
+ =?utf-8?B?Q29yZ05BTGVjbWxyR2pGWis5SnhVZ1NPQSt3Yk5GYWZSQnZCVDZvWHhTQVFK?=
+ =?utf-8?Q?vblmMdJS9GsZf7YWi6RHxIz1XFdIVwAxpqwkeij?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f50fb0d7-7ed0-4bf5-dc80-08dc31876730
+X-MS-Exchange-CrossTenant-AuthSource: SEZPR06MB6959.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2024 20:14:40.5708
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZPR06MB5761
 
-On Mon, Feb 19, 2024 at 03:57:35AM -0500, Christian Hopps wrote:
-> From: Christian Hopps <chopps@labn.net>
-> 
-> Add a new xfrm mode implementing AggFrag/IP-TFS from RFC9347.
-> 
-> This utilizes the new xfrm_mode_cbs to implement demand-driven IP-TFS
-> functionality. This functionality can be used to increase bandwidth
-> utilization through small packet aggregation, as well as help solve PMTU
-> issues through it's efficient use of fragmentation.
-> 
-> Link: https://www.rfc-editor.org/rfc/rfc9347.txt
-> 
-> Signed-off-by: Christian Hopps <chopps@labn.net>
+On 2/20/2024 4:03 AM, Andrew Lunn wrote:
+>> Note it's unable to put the MDIO bus node outside of MAC controller
+>> (i.e. at the same level in the parent bus node). Because we need to
+>> control all clocks and resets in FEMAC driver due to the phy reset
+>> procedure. So the clocks can't be assigned to MDIO bus device, which is
+>> an essential resource for the MDIO bus to work.
+> What PHY driver is being used? If there a specific PHY driver for this
+> hardware? Does it implement soft reset?
 
-...
+I'm using generic PHY driver.
 
-> diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
+It implements IEEE C22 standard. So there is a soft reset in BMCR register.
 
-...
+>
+> I'm wondering if you can skip hardware reset of the PHY and only do a
+> software reset.
 
-> +/**
-> + * skb_head_to_frag() - initialize a skb_frag_t based on skb head data
-> + * @skb: skb with the head data
-> + * @frag: frag to initialize
-> + */
-> +static void skb_head_to_frag(const struct sk_buff *skb, skb_frag_t *frag)
-> +{
-> +	struct page *page = virt_to_head_page(skb->data);
-> +	unsigned char *addr = (unsigned char *)page_address(page);
-> +
-> +	BUG_ON(!skb->head_frag);
+There must be someone to deassert the hardware reset control signal for 
+the PHY. We can't rely on the boot loader to do that. And here even we 
+choose to skip the hardware reset procedure, the sequence of deasserting 
+the reset signals is also very important. (i.e. first PHY, then MAC and 
+MACIF). Opposite to the normal sequence. (we normally first register MAC 
+driver, and then PHY).
 
-Is it strictly necessary to crash the Kernel here?
-Likewise, many other places in this patch.
+And it might be possible that boot loaders screw all the things up and 
+we are forced to do the hardware reset procedure in kernel.
 
-> +	skb_frag_fill_page_desc(frag, page, skb->data - addr, skb_headlen(skb));
-> +}
+>
+> 	Andrew
 
-...
 
-> +/**
-> + * skb_add_frags() - add a range of fragment references into an skb
-> + * @skb: skb to add references into
-> + * @walk: the walk to add referenced fragments from.
-> + * @offset: offset from beginning of original skb to start from.
-> + * @len: amount of data to add frag references to in @skb.
-> + *
-> + * skb_can_add_frags() should be called before this function to verify that the
-> + * destination @skb is compatible with the walk and has space in the array for
-> + * the to be added frag refrences.
+-- 
+Regards,
+Yang Xiwen
 
-nit: references
-
-> + *
-> + * Return: The number of bytes not added to @skb b/c we reached the end of the
-> + * walk before adding all of @len.
-> + */
-
-...
-
-> +/**
-> + * iptfs_reassem_done() - In-progress packet is aborted free the state.
-
-nit: This does not match the name of the function it documents.
-
-     Flagged by W=1 build with gcc-13.
-
-> + * @xtfs: xtfs state
-> + */
-> +static void iptfs_reassem_abort(struct xfrm_iptfs_data *xtfs)
-> +{
-> +	__iptfs_reassem_done(xtfs, true);
-> +}
-
-...
-
-> +/**
-> + * iptfs_input_ordered() - handle next in order IPTFS payload.
-> + * @x: xfrm state
-> + * @skb: current packet
-> + *
-> + * Process the IPTFS payload in `skb` and consume it afterwards.
-> + */
-> +static int iptfs_input_ordered(struct xfrm_state *x, struct sk_buff *skb)
-> +{
-> +	u8 hbytes[sizeof(struct ipv6hdr)];
-> +	struct ip_iptfs_cc_hdr iptcch;
-> +	struct skb_seq_state skbseq;
-> +	struct skb_frag_walk _fragwalk;
-> +	struct skb_frag_walk *fragwalk = NULL;
-> +	struct list_head sublist; /* rename this it's just a list */
-> +	struct sk_buff *first_skb, *defer, *next;
-> +	const unsigned char *old_mac;
-> +	struct xfrm_iptfs_data *xtfs;
-> +	struct ip_iptfs_hdr *ipth;
-> +	struct iphdr *iph;
-> +	struct net *net;
-> +	u32 remaining, first_iplen, iplen, iphlen, data, tail;
-> +	u32 blkoff, capturelen;
-> +	u64 seq;
-> +
-> +	xtfs = x->mode_data;
-> +	net = dev_net(skb->dev);
-> +	first_skb = NULL;
-> +	defer = NULL;
-> +
-> +	seq = __esp_seq(skb);
-> +
-> +	/* Large enough to hold both types of header */
-> +	ipth = (struct ip_iptfs_hdr *)&iptcch;
-> +
-> +	/* Save the old mac header if set */
-> +	old_mac = skb_mac_header_was_set(skb) ? skb_mac_header(skb) : NULL;
-> +
-> +	skb_prepare_seq_read(skb, 0, skb->len, &skbseq);
-> +
-> +	/* Get the IPTFS header and validate it */
-> +
-> +	if (skb_copy_bits_seq(&skbseq, 0, ipth, sizeof(*ipth))) {
-> +		XFRM_INC_STATS(net, LINUX_MIB_XFRMINBUFFERERROR);
-> +		goto done;
-> +	}
-> +	data = sizeof(*ipth);
-> +
-> +	trace_iptfs_egress_recv(skb, xtfs, htons(ipth->block_offset));
-
-Maybe this is backwards, because the argument to htons should be
-in host byte order, but the type of ipth->block_offset is __be16.
-
-Also, personally, i would suggest using be16_to_cpu as it better
-describes the types involved.
-
-This is flagged by Sparse along with some other problems.
-Please take care not to introduce new Sparse warnings.
-
-...
-
-> +static u32 __reorder_future_shifts(struct xfrm_iptfs_data *xtfs,
-> +				   struct sk_buff *inskb,
-> +				   struct list_head *list,
-> +				   struct list_head *freelist, u32 *fcount)
-> +{
-> +	const u32 nslots = xtfs->cfg.reorder_win_size + 1;
-> +	const u64 inseq = __esp_seq(inskb);
-> +	u32 savedlen = xtfs->w_savedlen;
-> +	u64 wantseq = xtfs->w_wantseq;
-> +	struct sk_buff *slot0 = NULL;
-> +	u64 last_drop_seq = xtfs->w_wantseq;
-> +	u64 distance, extra_drops, missed, s0seq;
-
-Missed is set but otherwise unused in this function.
-
-Flagged by W=1 build with clang-17.
-
-> +	u32 count = 0;
-> +	struct skb_wseq *wnext;
-> +	u32 beyond, shifting, slot;
-> +
-> +	BUG_ON(inseq <= wantseq);
-> +	distance = inseq - wantseq;
-> +	BUG_ON(distance <= nslots - 1);
-> +	beyond = distance - (nslots - 1);
-> +	missed = 0;
-> +
-> +	/* Handle future sequence number received.
-> +	 *
-> +	 * IMPORTANT: we are at least advancing w_wantseq (i.e., wantseq) by 1
-> +	 * b/c we are beyond the window boundary.
-> +	 *
-> +	 * We know we don't have the wantseq so that counts as a drop.
-> +	 */
-> +
-> +	/* ex: slot count is 4, array size is 3 savedlen is 2, slot 0 is the
-> +	 * missing sequence number.
-> +	 *
-> +	 * the final slot at savedlen (index savedlen - 1) is always occupied.
-> +	 *
-> +	 * beyond is "beyond array size" not savedlen.
-> +	 *
-> +	 *          +--------- array length (savedlen == 2)
-> +	 *          |   +----- array size (nslots - 1 == 3)
-> +	 *          |   |   +- window boundary (nslots == 4)
-> +	 *          V   V | V
-> +	 *                |
-> +	 *  0   1   2   3 |   slot number
-> +	 * ---  0   1   2 |   array index
-> +	 *     [b] [c] : :|   array
-> +	 *                |
-> +	 * "2" "3" "4" "5"|*6*  seq numbers
-> +	 *
-> +	 * We receive seq number 6
-> +	 * distance == 4 [inseq(6) - w_wantseq(2)]
-> +	 * newslot == distance
-> +	 * index == 3 [distance(4) - 1]
-> +	 * beyond == 1 [newslot(4) - lastslot((nslots(4) - 1))]
-> +	 * shifting == 1 [min(savedlen(2), beyond(1)]
-> +	 * slot0_skb == [b], and should match w_wantseq
-> +	 *
-> +	 *                +--- window boundary (nslots == 4)
-> +	 *  0   1   2   3 | 4   slot number
-> +	 * ---  0   1   2 | 3   array index
-> +	 *     [b] : : : :|     array
-> +	 * "2" "3" "4" "5" *6*  seq numbers
-> +	 *
-> +	 * We receive seq number 6
-> +	 * distance == 4 [inseq(6) - w_wantseq(2)]
-> +	 * newslot == distance
-> +	 * index == 3 [distance(4) - 1]
-> +	 * beyond == 1 [newslot(4) - lastslot((nslots(4) - 1))]
-> +	 * shifting == 1 [min(savedlen(1), beyond(1)]
-> +	 * slot0_skb == [b] and should match w_wantseq
-> +	 *
-> +	 *                +-- window boundary (nslots == 4)
-> +	 *  0   1   2   3 | 4   5   6   slot number
-> +	 * ---  0   1   2 | 3   4   5   array index
-> +	 *     [-] [c] : :|             array
-> +	 * "2" "3" "4" "5" "6" "7" *8*  seq numbers
-> +	 *
-> +	 * savedlen = 2, beyond = 3
-> +	 * iter 1: slot0 == NULL, missed++, lastdrop = 2 (2+1-1), slot0 = [-]
-> +	 * iter 2: slot0 == NULL, missed++, lastdrop = 3 (2+2-1), slot0 = [c]
-> +	 * 2 < 3, extra = 1 (3-2), missed += extra, lastdrop = 4 (2+2+1-1)
-> +	 *
-> +	 * We receive seq number 8
-> +	 * distance == 6 [inseq(8) - w_wantseq(2)]
-> +	 * newslot == distance
-> +	 * index == 5 [distance(6) - 1]
-> +	 * beyond == 3 [newslot(6) - lastslot((nslots(4) - 1))]
-> +	 * shifting == 2 [min(savedlen(2), beyond(3)]
-> +	 *
-> +	 * slot0_skb == NULL changed from [b] when "savedlen < beyond" is true.
-> +	 */
-> +
-> +	/* Now send any packets that are being shifted out of saved, and account
-> +	 * for missing packets that are exiting the window as we shift it.
-> +	 */
-> +
-> +	/* If savedlen > beyond we are shifting some, else all. */
-> +	shifting = min(savedlen, beyond);
-> +
-> +	/* slot0 is the buf that just shifted out and into slot0 */
-> +	slot0 = NULL;
-> +	s0seq = wantseq;
-> +	last_drop_seq = s0seq;
-> +	wnext = xtfs->w_saved;
-> +	for (slot = 1; slot <= shifting; slot++, wnext++) {
-> +		/* handle what was in slot0 before we occupy it */
-> +		if (!slot0) {
-> +			last_drop_seq = s0seq;
-> +			missed++;
-> +		} else {
-> +			list_add_tail(&slot0->list, list);
-> +			count++;
-> +		}
-> +		s0seq++;
-> +		slot0 = wnext->skb;
-> +		wnext->skb = NULL;
-> +	}
-> +
-> +	/* slot0 is now either NULL (in which case it's what we now are waiting
-> +	 * for, or a buf in which case we need to handle it like we received it;
-> +	 * however, we may be advancing past that buffer as well..
-> +	 */
-> +
-> +	/* Handle case where we need to shift more than we had saved, slot0 will
-> +	 * be NULL iff savedlen is 0, otherwise slot0 will always be
-> +	 * non-NULL b/c we shifted the final element, which is always set if
-> +	 * there is any saved, into slot0.
-> +	 */
-> +	if (savedlen < beyond) {
-> +		extra_drops = beyond - savedlen;
-> +		if (savedlen == 0) {
-> +			BUG_ON(slot0);
-> +			s0seq += extra_drops;
-> +			last_drop_seq = s0seq - 1;
-> +		} else {
-> +			extra_drops--; /* we aren't dropping what's in slot0 */
-> +			BUG_ON(!slot0);
-> +			list_add_tail(&slot0->list, list);
-> +			/* if extra_drops then we are going past this slot0
-> +			 * so we can safely advance last_drop_seq
-> +			 */
-> +			if (extra_drops)
-> +				last_drop_seq = s0seq + extra_drops;
-> +			s0seq += extra_drops + 1;
-> +			count++;
-> +		}
-> +		missed += extra_drops;
-> +		slot0 = NULL;
-> +		/* slot0 has had an empty slot pushed into it */
-> +	}
-> +	(void)last_drop_seq;	/* we want this for CC code */
-> +
-> +	/* Remove the entries */
-> +	__vec_shift(xtfs, beyond);
-> +
-> +	/* Advance want seq */
-> +	xtfs->w_wantseq += beyond;
-> +
-> +	/* Process drops here when implementing congestion control */
-> +
-> +	/* We've shifted. plug the packet in at the end. */
-> +	xtfs->w_savedlen = nslots - 1;
-> +	xtfs->w_saved[xtfs->w_savedlen - 1].skb = inskb;
-> +	iptfs_set_window_drop_times(xtfs, xtfs->w_savedlen - 1);
-> +
-> +	/* if we don't have a slot0 then we must wait for it */
-> +	if (!slot0)
-> +		return count;
-> +
-> +	/* If slot0, seq must match new want seq */
-> +	BUG_ON(xtfs->w_wantseq != __esp_seq(slot0));
-> +
-> +	/* slot0 is valid, treat like we received expected. */
-> +	count += __reorder_this(xtfs, slot0, list);
-> +	return count;
-> +}
-
-...
-
-> +/**
-> + * iptfs_get_mtu() - return the inner MTU for an IPTFS xfrm.
-
-nit: This does not match the name of the function it documents.
-
-> + * @x: xfrm state.
-> + * @outer_mtu: Outer MTU for the encapsulated packet.
-> + *
-> + * Return: Correct MTU taking in to account the encap overhead.
-> + */
-> +static u32 iptfs_get_inner_mtu(struct xfrm_state *x, int outer_mtu)
-
-...
 
