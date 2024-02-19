@@ -1,166 +1,125 @@
-Return-Path: <netdev+bounces-72837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0EF3859E1B
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 09:22:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5563D859E8D
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 09:39:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 124981C217CB
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 08:22:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D65041F21835
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 08:39:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 011ED210FB;
-	Mon, 19 Feb 2024 08:22:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CAAF208B9;
+	Mon, 19 Feb 2024 08:38:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XVQ+9qpN"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="lOda6qdC";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="51KM5Edp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D43F210F0
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 08:22:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6E2D225D4
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 08:38:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708330939; cv=none; b=sEqeUWyCMR+OoDMJjO5fG6ZNnGIBpWuRNodoDyMHU+EF98GhXzxUk80VT5ZKeo9w3FWMpZDfBEH8c3SpUo+IWgwdjNq68jf80iVdfI8yVSnBl6PJY490/Txm9SnqUlhudgLKsulm1KH1vD3eku/NfYvPoDqPZBViIkvP2S5PHXA=
+	t=1708331925; cv=none; b=i6/6s47eqw7ehi4qZr+i78U/1f649k9fMC7mOSDnHh0+WqpXNV6BrH0MwxlCMaE0zFbyPIiilQQM6ohOLJW+Erzme01nqGpj/YB0GgnnpIpKGbiVD9BHhiqZ7KQrLT0T3ygRnxsD5U2uwN05d7GIK2T2KOimyenfWnUtyIN/giI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708330939; c=relaxed/simple;
-	bh=nGitsSxjPk+gBIGLQ3qxvow1rCE7hQe9MOGZfZ0PH3w=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=OiHeu/kKO3jwa8B32g+3/IHa2KMo7gnns+BkT4wC3+59npiGfMiS0s+v9wJ5c4gUiASg6BXbzfDwPzG1ReJ0GB55Ujw99S+HtAHW9lDZA6x/UcGi7WSFhYk380EXMxSFDuaVSDqIMmPpWKfH7w+gpPKDoa6LgxIYlae/kq/Vcu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=XVQ+9qpN; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a3e7ce7dac9so86705166b.1
-        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 00:22:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708330936; x=1708935736; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aJawKhMKgZfK3H+o45cb6KDvj97UBnzXFXRTiTe4vLc=;
-        b=XVQ+9qpNO0ZLMclvaqsjyCBzjEybdT5LcLfgNTuzZqzocLsDkkxRPAirEmzz7GW6LY
-         528MgiuGoTmbmRDtDJkKDyjTS6vO7OzqWOsMPimiofX/qRyYVFmDkidOCyhOZm5T681e
-         ePTj0IE4zOt94UQ6QZ1wNR/poKy5uQYdTclKEdud5gO6hUTl9n8o8vuwFfDXY3R9+nJj
-         cY98wHw0dSqGHZL8R7k6CgOtas85WlOhrZxxqHsMf+jGU89DdH83eSIz+3bZuiyh/AjN
-         2POLhXbjZii3nNWlRWnrC93BM56yrN1GcIKqoz3Htsh6ne7nK7VZnb8BRGq6Xte5YJYU
-         WP3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708330936; x=1708935736;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aJawKhMKgZfK3H+o45cb6KDvj97UBnzXFXRTiTe4vLc=;
-        b=wrCg8nq7NDdqJVojQ4/agx84rPt2HBCOlayDgYOU7Z7k2JXWGgGEum7yMnOQGvcC6q
-         wTglNkx6c0xzTJyN2DAC1HBNj0gsDiPuiXXIcJ/xcXhFGLrrC8KmcJT8AD+TxtHFc6Vx
-         U2v69kjdVU1TVqC9Y3xlTFJOywLOuKp40Xt9V9NdggNBXS8ZETMf4LGVq6vKFvurkjV9
-         Ul+ScFJCfcT7q5X8KtRNedwdzoYl80bbWSfDjt7c5eAJo7UNxIeE/Pn7bbopldWQqf/6
-         m75OcIY7DiPGB0hB9bM3ff72lgiK75LJgp1VIvw88MPsB2Lx2mSyIVXkesTj3ZoJv5ZS
-         QiVg==
-X-Forwarded-Encrypted: i=1; AJvYcCVno2g0Tse63lZHesUXoag+jXHDOWDBbMTwoDnL5r9NZVKbmVWqNQ0CWW9j1Vt47l8qQuVyESvnpEoC304Edgz55HMSS8VQ
-X-Gm-Message-State: AOJu0YzPEdxuNtEmzao1NgiCAMShpy6HlfR8AsVxityJmUycb/2Gogjd
-	0ze+ZU1loq19eu87n+ZETYqLe/ySgoqW5iOulcot31vpuVWGz3VngRj0ykn92qw=
-X-Google-Smtp-Source: AGHT+IGl/ITfmjq0RpjNkokRRLvKEhrU7NvfHwqSMU7MFfOC3zR13Xzxi+jsjB0P34SMxHIUAdW/cQ==
-X-Received: by 2002:a17:906:1388:b0:a3e:79f7:d218 with SMTP id f8-20020a170906138800b00a3e79f7d218mr2415837ejc.43.1708330936473;
-        Mon, 19 Feb 2024 00:22:16 -0800 (PST)
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id y2-20020a170906470200b00a3d0dd84276sm2685297ejq.184.2024.02.19.00.22.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Feb 2024 00:22:16 -0800 (PST)
-Date: Mon, 19 Feb 2024 11:22:12 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev, Jeremy Kerr <jk@codeconstruct.com.au>,
-	netdev@vger.kernel.org
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev,
-	Matt Johnston <matt@codeconstruct.com.au>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Liang Chen <liangchen.linux@gmail.com>,
-	Johannes Berg <johannes.berg@intel.com>
-Subject: Re: [PATCH net-next 06/11] net: mctp: provide a more specific tag
- allocation ioctl
-Message-ID: <95174361-e247-4792-866b-d77152659fd6@moroto.mountain>
+	s=arc-20240116; t=1708331925; c=relaxed/simple;
+	bh=zx08zyV/W/+pOe6mtk2PYCJK7IbBCR6oK0nd5KZrmNo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=CkEN9mw6TDsLOGmxKaPkBW+XVUWEz3fJvr++r4IWgGTXjxYZVtafx7kiT2QFGbkNC1msV9KaQScC/TJ5n2Ik+6k9bP7c3mjqN/wCLK2SazHvAnSCvdZ9KCwQ6CINSVFZNMVLrOIVNkxd8t04T61jj/uuRse1Gm6JC3y4LO/z124=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=lOda6qdC; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=51KM5Edp; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1708331916;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zx08zyV/W/+pOe6mtk2PYCJK7IbBCR6oK0nd5KZrmNo=;
+	b=lOda6qdCzGaosLAUUd1NQQetdaPZLq+hL4Tk0jNFTBUOyThm9wCDwtdUhKaUR9tforhTkp
+	Hjx2dNIKECvjUSho3UzI8baiQZuJ3eeZ7HlITyrIY2KCIxbbLsw7o0n3Jw/+a1dUWEVhSq
+	Uf3JP3fg19nRvlkJcflnXzm2G8OXtar7+nr6pgawcXtWLYeEnax0hrdwzq1SwkvMIXOkhj
+	O7SMdsaRupz7qi10RtHwfj1gp66VflPEMOMWA0WQbxE7Hblgy50FWVQOTxgO0IfV7QrO6l
+	Y57nYTF/Kmftt9RG116qSYbtl85FrgyGK4cfbrkWv92QxGkK7e1N/Ds2hOUM/Q==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1708331916;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zx08zyV/W/+pOe6mtk2PYCJK7IbBCR6oK0nd5KZrmNo=;
+	b=51KM5EdpmV88DXV/1A1jVxmnd0MwxMQwWpTy+k+9JOY/9yTruuQFDu4U0vxemRAJZ5Rk3i
+	/p4x8+ozf3QGmPCQ==
+To: Ferenc Fejes <ferenc.fejes@ericsson.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>
+Cc: "vinicius.gomes@intel.com" <vinicius.gomes@intel.com>, "hawk@kernel.org"
+ <hawk@kernel.org>
+Subject: Re: igc: AF_PACKET and SO_TXTIME question
+In-Reply-To: <ea5f43e1c4c2403211f89ab014c88a7af4fe53ca.camel@ericsson.com>
+References: <bc2f28999c815b4562f7ce1ba477e7a9dc3af87d.camel@inf.elte.hu>
+ <87y1bn3xq6.fsf@kurt.kurt.home>
+ <8b782e8de9e6ae9206a0aad6d7d0e2d3c91f3470.camel@ericsson.com>
+ <ea5f43e1c4c2403211f89ab014c88a7af4fe53ca.camel@ericsson.com>
+Date: Mon, 19 Feb 2024 09:38:35 +0100
+Message-ID: <875xykalx0.fsf@kurt.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <424009ba3e320ae93eb6bd44ef5e474aa5c9221f.1708071380.git.jk@codeconstruct.com.au>
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-Hi Jeremy,
+--=-=-=
+Content-Type: text/plain
 
-kernel test robot noticed the following build warnings:
+Hi Ferenc,
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jeremy-Kerr/net-mctp-avoid-confusion-over-local-peer-dest-source-addresses/20240216-163203
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/424009ba3e320ae93eb6bd44ef5e474aa5c9221f.1708071380.git.jk%40codeconstruct.com.au
-patch subject: [PATCH net-next 06/11] net: mctp: provide a more specific tag allocation ioctl
-config: parisc-randconfig-r081-20240218 (https://download.01.org/0day-ci/archive/20240218/202402181713.OQAPBmZC-lkp@intel.com/config)
-compiler: hppa-linux-gcc (GCC) 13.2.0
+On Fri Feb 16 2024, Ferenc Fejes wrote:
+> We simply placed the ETF qdisc as the root qdisc and assumed that this
+> would enable offload on all TX queues. Apparently this is not the case.
+> According to the code, it was only enabled for queue 0. Another mistake
+> we made is we used multiq qdisc with skbedit queue_mapping without
+> bypass - which works since the tx action is executed.
+> However, with qdisc baypass, the TX queue selection for the packets
+> sent to the AF_PACKET socket looks like this
+>
+> tx_queue = cpu_id of task % num_tx_queues.
+>
+> With taskset, we were able to explicitly send packets to TX queue 0 in
+> the bypass case, and that essentially solved the problem.
+>
+> So we switched to mqprio and enabled offloading on all queues and with
+> that we always see the delayed packet transmission with launchtime
+> enabled.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202402181713.OQAPBmZC-lkp@intel.com/
+Glad it worked out. Thanks for sharing your solution!
 
-smatch warnings:
-net/mctp/af_mctp.c:389 mctp_ioctl_tag_copy_from_user() warn: was && intended here instead of ||?
+Thanks,
+Kurt
 
-vim +389 net/mctp/af_mctp.c
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-28828bad95a357 Jeremy Kerr 2024-02-16  356  static int mctp_ioctl_tag_copy_from_user(unsigned long arg,
-28828bad95a357 Jeremy Kerr 2024-02-16  357  					 struct mctp_ioc_tag_ctl2 *ctl,
-28828bad95a357 Jeremy Kerr 2024-02-16  358  					 bool tagv2)
-28828bad95a357 Jeremy Kerr 2024-02-16  359  {
-28828bad95a357 Jeremy Kerr 2024-02-16  360  	struct mctp_ioc_tag_ctl ctl_compat;
-28828bad95a357 Jeremy Kerr 2024-02-16  361  	unsigned long size;
-28828bad95a357 Jeremy Kerr 2024-02-16  362  	void *ptr;
-28828bad95a357 Jeremy Kerr 2024-02-16  363  	int rc;
-28828bad95a357 Jeremy Kerr 2024-02-16  364  
-28828bad95a357 Jeremy Kerr 2024-02-16  365  	if (tagv2) {
-28828bad95a357 Jeremy Kerr 2024-02-16  366  		size = sizeof(*ctl);
-28828bad95a357 Jeremy Kerr 2024-02-16  367  		ptr = ctl;
-28828bad95a357 Jeremy Kerr 2024-02-16  368  	} else {
-28828bad95a357 Jeremy Kerr 2024-02-16  369  		size = sizeof(ctl_compat);
-28828bad95a357 Jeremy Kerr 2024-02-16  370  		ptr = &ctl_compat;
-28828bad95a357 Jeremy Kerr 2024-02-16  371  	}
-28828bad95a357 Jeremy Kerr 2024-02-16  372  
-28828bad95a357 Jeremy Kerr 2024-02-16  373  	rc = copy_from_user(ptr, (void __user *)arg, size);
-28828bad95a357 Jeremy Kerr 2024-02-16  374  	if (rc)
-28828bad95a357 Jeremy Kerr 2024-02-16  375  		return -EFAULT;
-28828bad95a357 Jeremy Kerr 2024-02-16  376  
-28828bad95a357 Jeremy Kerr 2024-02-16  377  	if (!tagv2) {
-28828bad95a357 Jeremy Kerr 2024-02-16  378  		/* compat, using defaults for new fields */
-28828bad95a357 Jeremy Kerr 2024-02-16  379  		ctl->net = MCTP_INITIAL_DEFAULT_NET;
-28828bad95a357 Jeremy Kerr 2024-02-16  380  		ctl->peer_addr = ctl_compat.peer_addr;
-28828bad95a357 Jeremy Kerr 2024-02-16  381  		ctl->local_addr = MCTP_ADDR_ANY;
-28828bad95a357 Jeremy Kerr 2024-02-16  382  		ctl->flags = ctl_compat.flags;
-28828bad95a357 Jeremy Kerr 2024-02-16  383  		ctl->tag = ctl_compat.tag;
-28828bad95a357 Jeremy Kerr 2024-02-16  384  	}
-28828bad95a357 Jeremy Kerr 2024-02-16  385  
-28828bad95a357 Jeremy Kerr 2024-02-16  386  	if (ctl->flags)
-28828bad95a357 Jeremy Kerr 2024-02-16  387  		return -EINVAL;
-28828bad95a357 Jeremy Kerr 2024-02-16  388  
-28828bad95a357 Jeremy Kerr 2024-02-16 @389  	if (!(ctl->local_addr != MCTP_ADDR_ANY ||
-28828bad95a357 Jeremy Kerr 2024-02-16  390  	      ctl->local_addr != MCTP_ADDR_NULL))
-28828bad95a357 Jeremy Kerr 2024-02-16  391  		return -EINVAL;
+-----BEGIN PGP SIGNATURE-----
 
-Should be &&.  This function will always return -EINVAL.  I haven't
-looked at the context outside of this automatically generated email but
-it suggests a failure in our test process.
-
-28828bad95a357 Jeremy Kerr 2024-02-16  392  
-28828bad95a357 Jeremy Kerr 2024-02-16  393  	return 0;
-28828bad95a357 Jeremy Kerr 2024-02-16  394  }
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
-
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmXTE4sTHGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzghgxD/0S7kYTRMECz+VJFWvzg0QuWSmbXtWc
+/DBbz9qTASF8U3236SUHdF7BwBYDell9rhe9cOUsoNlvICo2t+3XQOwOdiiNDVsm
+FjQSoUHwF/uc4edrGNia4Br3mRGiugcS+qpuNkSJOjR+DOuCeSXbzNOY1KwXcb3U
+bHtPbOc4SAMsD/xueMcFG+XLICCjo9ny5kghkyf/kHPHrSXtPYy1eMMv5y62dAWY
+i3HlxPYcJS1oQvkHHzMl+wpcRn9WV+zts/LPa9I6CY1ZvO8sosrHkk4Sm92O7H7B
+QkrNAfLM1EfaJmzwf/G/ug11pq8h9cZuygHnZ7L6bciee1+p4NvFZLTXtunr4uyM
+dLrbjMbxqvsSzwAn9jkk1bFKGPcbkPzni591nCXsgxae46sfCXOiywivs2q6F3gT
+Ijy0QEgrevLpuB8GkdYCQ2j51VnPm7fFY298xnk6ngPbqeSuyEPoq/Ov7Ab5TGh+
+9HEkCxQMrg1ODR6buoz3Kk+YgTXD+CojJIYqhjStsCsvr1gM2VVI2Yvrcba5Bk68
+GZNKJrpHSrbboxG1amymNVBBG5j83EA8JPLQNzsGx/pNB33lwom40B4yysxrKw8x
+GfWCGuXuWwaEwuGHgGUMt78EmvOxZGkLzUOUXaUCMWnUOhiuzhHb6LYpqFfYnbx3
++hAqk07643E9kQ==
+=U/Lm
+-----END PGP SIGNATURE-----
+--=-=-=--
 
