@@ -1,137 +1,140 @@
-Return-Path: <netdev+bounces-72928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EDAD85A2FE
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 13:16:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4DE885A30C
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 13:19:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E91F31F235C7
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 12:16:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 893DE28741F
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 12:19:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C5622D79D;
-	Mon, 19 Feb 2024 12:16:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CAE12D638;
+	Mon, 19 Feb 2024 12:19:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CaIe+yC3"
 X-Original-To: netdev@vger.kernel.org
-Received: from air.basealt.ru (air.basealt.ru [194.107.17.39])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26A72D608
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 12:16:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C94272AD39
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 12:19:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708344965; cv=none; b=HLLvXdAWp6/UPw2pjoQ9k/sL1wuYK8ONrWDe3YG53y4JS9gJzLSpCwvlKON27x6564FkVYXv6cBoQLZlopHCmRyBnfjq6Spu3vCRkGVFqrfDQx7b9fVaQOp7QqoH4qxlYR+8+b+p1ekHEdN0eYGCub5U0e7s3CYapurrdAPdLAQ=
+	t=1708345178; cv=none; b=MVxScjS6mp4QNY/FyxdJJj/VEv3xVGAU25ooGv+1f0WgnqbvNZ/u81usTo/m/pR5RsjlY237hWVjBlqUYV5zUiyDFBazk42O32j8AirUUsjEgnizsiA2zqzRpmoVWH8NVKpn5P9wTPYA9GuXDutsDFuwPeoQj8pulIBgXdTvskc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708344965; c=relaxed/simple;
-	bh=YgcSrbwN4DXhEAb4hvzhEyKjxrXY64SnchQcmsPAYxg=;
+	s=arc-20240116; t=1708345178; c=relaxed/simple;
+	bh=XZhHjRkTj6nAHd5DH2JdWTq2TlG6374TlIGjtVi+DOg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ewRT2iFN1p+zii0E1RdqnkN5wjFG/sN91f8q1ln/OQMa+yuGbbgAFhUHHSYdkJAnkGjaRx5VJsT3E69HdJ4ccqsZMrQdHYL3sIh5qLvFiivjsU+ZkwxmNOb1WopT7ES9bNS2VJty2BwDKqmlLifpHdkosDN4wGzhuY4/PlOQoKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
-Received: by air.basealt.ru (Postfix, from userid 490)
-	id 3563F2F20253; Mon, 19 Feb 2024 12:15:59 +0000 (UTC)
-X-Spam-Level: 
-Received: from [10.88.144.178] (obninsk.basealt.ru [217.15.195.17])
-	by air.basealt.ru (Postfix) with ESMTPSA id 7B5EA2F2024C;
-	Mon, 19 Feb 2024 12:15:56 +0000 (UTC)
-Message-ID: <4462f60e-63eb-c566-818a-98523ca4d4ff@basealt.ru>
-Date: Mon, 19 Feb 2024 15:15:52 +0300
+	 In-Reply-To:Content-Type; b=qK326QHYznunHeJ7k4b6+THFp9oPdIloD4wOWuUTBTXWH+wmdpp6QlAdjG8HrCOB5z854sognoEdK6IDZto8NWud6Mr04gHksDjnQxzSgHWSZniNGTSNN5he5t+X/0eFK+r1DbjoiiqWb9ZdWkrpn5c8Fnd54ZmXjZJHUIeenuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CaIe+yC3; arc=none smtp.client-ip=95.215.58.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <99e3e994-ef6a-4339-abf2-cda62d24b1ce@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1708345173;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DkVT2jDCTEiEB3I4q1MvWvXu2gwGeHJQocWwFjbYXGE=;
+	b=CaIe+yC3VWWsIwDtdZDwlDmoJQpk6KwmTKHJjMIbgk2ALrL3MJOcJRTs0xk71hAcD0iHcs
+	rG4whUuljZj/jHmsTTZ0T6Pk/ZKRszUCWxxxHZ0EzOS7Isofz+m+i+9m2jq/REDPQQ3xss
+	45FxfJFgIskFkV4+58egD+GIeT71+/4=
+Date: Mon, 19 Feb 2024 20:19:23 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH] genetlink: fix potencial use-after-free and
- null-ptr-deref in genl_dumpit()
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, jiri@resnulli.us,
- jacob.e.keller@intel.com, johannes@sipsolutions.net, idosch@nvidia.com,
- David Lebrun <david.lebrun@uclouvain.be>,
- Pablo Neira Ayuso <pablo@netfilter.org>
-References: <20240215202309.29723-1-kovalev@altlinux.org>
- <20240219113240.GZ40273@kernel.org>
-From: kovalev@altlinux.org
-In-Reply-To: <20240219113240.GZ40273@kernel.org>
+Subject: Re: [PATCH] net/mlx5: fix possible stack overflows
+To: Hamdan Agbariya <hamdani@nvidia.com>, Arnd Bergmann <arnd@arndb.de>,
+ Arnd Bergmann <arnd@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Yevgeny Kliteynik <kliteyn@nvidia.com>,
+ Alex Vesker <valex@nvidia.com>, Netdev <netdev@vger.kernel.org>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20240213100848.458819-1-arnd@kernel.org>
+ <84874528-daea-424d-af63-b9b86835fae6@linux.dev>
+ <2ebe5a36-ce81-4d26-a12b-7affbd65c5e3@app.fastmail.com>
+ <11f40993-ec02-48b7-aec5-13ff7cddf665@linux.dev>
+ <DM6PR12MB45168A0957212864D8D53B80CE512@DM6PR12MB4516.namprd12.prod.outlook.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <DM6PR12MB45168A0957212864D8D53B80CE512@DM6PR12MB4516.namprd12.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-+ Pablo Neira Ayuso <pablo@netfilter.org>
-
-19.02.2024 14:32, Simon Horman wrote:
-> + Jiri Pirko <jiri@resnulli.us>
->    David Lebrun <david.lebrun@uclouvain.be>
->
-> On Thu, Feb 15, 2024 at 11:23:09PM +0300, kovalev@altlinux.org wrote:
->> From: Vasiliy Kovalev <kovalev@altlinux.org>
+在 2024/2/19 17:05, Hamdan Agbariya 写道:
+>> 在 2024/2/15 16:03, Arnd Bergmann 写道:
+>>> On Thu, Feb 15, 2024, at 01:18, Zhu Yanjun wrote:
+>>>> 在 2024/2/13 18:08, Arnd Bergmann 写道:
+>>>>>     static int
+>>>>> -dr_dump_rule_rx_tx(struct seq_file *file, struct mlx5dr_rule_rx_tx
+>>>>> *rule_rx_tx,
+>>>>> +dr_dump_rule_rx_tx(struct seq_file *file, char *buff,
+>>>>> +              struct mlx5dr_rule_rx_tx *rule_rx_tx,
+>>>>>                 bool is_rx, const u64 rule_id, u8 format_ver)
+>>>>>     {
+>>>>>      struct mlx5dr_ste *ste_arr[DR_RULE_MAX_STES +
+>>>>> DR_ACTION_MAX_STES]; @@ -533,7 +532,7 @@
+>> dr_dump_rule_rx_tx(struct seq_file *file, struct mlx5dr_rule_rx_tx
+>> *rule_rx_tx,
+>>>>>              return 0;
+>>>>>
+>>>>>      while (i--) {
+>>>>> -           ret = dr_dump_rule_mem(file, ste_arr[i], is_rx, rule_id,
+>>>> Before buff is reused, I am not sure whether buff should be firstly
+>>>> zeroed or not.
+>>> I don't see why it would, but if you want to zero it, that would be a
+>>> separate patch that is already needed on the existing code, which
+>>> never zeroes its buffers.
 >>
->> The pernet operations structure for the subsystem must be registered
->> before registering the generic netlink family.
+>> Sure. I agree with you. In the existing code, the buffers are not zeroed.
 >>
->> Fixes: 134e63756d5f ("genetlink: make netns aware")
-> Hi Vasiliy,
->
-> A Fixes tag implies that this is a bug fix.
-> So I think some explanation is warranted of what, user-visible,
-> problem this resolves.
->
-> In that case the patch should be targeted at net.
-> Which means it should be based on that tree and have a net annotation
-> in the subject
->
-> 	Subject: [PATCH net] ...
->
-> Alternatively, the Fixes tag should be dropped and some explanation
-> should be provided of why the structure needs to be registered before
-> the family.
->
-> In this case, if you wish to refer to the patch where the problem (but not
-> bug) was introduced you can use something like the following.
-> It is just the Fixes tag that has a special meaning.
->
-> 	Introduced in 134e63756d5f ("genetlink: make netns aware")
->
-> I think the above comments also apply to:
->
-> - [PATCH] ipv6: sr: fix possible use-after-free and null-ptr-deref
->    https://lore.kernel.org/all/20240215202717.29815-1-kovalev@altlinux.org/
->
-> - [PATCH] devlink: fix possible use-after-free and memory leaks in devlink_init()
->    https://lore.kernel.org/all/20240215203400.29976-1-kovalev@altlinux.org/
->
-> And as these patches seem to try to fix the same problem in different
-> places, all under Networking, I would suggest that if you do repost,
-> they are combined into a patch series (3 patches in the same series).
->
-> But I do wonder, how such an apparently fundamental problem has been
-> present for so long in what I assume to be well exercised code.
+>> But to a buffer which is used for several times, it is good to zero it before it is
+>> used again.
+>>
+>> Can you add a new commit with the following?
+>>
+>> 1). Zero the buffers in the existing code
+>>
+> 
+> No need to zero the buffers, as it does not have any necessity and it will only affect performance.
+> Thanks,
 
-Hi Simon,
+Sorry. I can not get your point. Can you explain why no need to zero the 
+buffers? Thanks in advance.
 
-The history of these changes began with the crash fix in the gtp module [1]
+> Hamdan
+> 
+> 
+> 
+> 
+>> 2). Add the zero functionality to your patch
 
-A solution to the problem was found [2] and Pablo Neruda Ayuso suggested 
-fixing similar
+If a buffer is used for many times, is it necessary to zero it before it 
+is used again?
 
-sections of code if they might have the same problem.
-
-I have sent patches, but do not have reproducers, relying on drawing 
-attention to the problem.
-
-
-[1] 
-https://lore.kernel.org/lkml/20240124101404.161655-1-kovalev@altlinux.org/T/
-
-[2] 
-https://lore.kernel.org/netdev/20240214162733.34214-1-kovalev@altlinux.org/T/#u
-
--- 
 Thanks,
-Vasiliy Kovalev
+Zhu Yanjun
+
+>>
+>>   From my perspective, it is good to the whole commit.
+>>
+>> Please Jason and Leon comment on this.
+>>
+>> Thanks,
+>>
+>> Zhu Yanjun
+>>
+>>>
+>>>       Arnd
 
 
