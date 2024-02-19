@@ -1,149 +1,175 @@
-Return-Path: <netdev+bounces-72891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88FDD85A0B9
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 11:15:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A06485A0C0
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 11:16:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 210541F21AF2
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 10:15:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EF6E1C216EE
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 10:16:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4EA025616;
-	Mon, 19 Feb 2024 10:15:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4569825615;
+	Mon, 19 Feb 2024 10:16:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bQll/n/o"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="anFXOSDX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39BC12560F
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 10:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6526428E26
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 10:16:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708337709; cv=none; b=XiAiZ7ALvWEpWpH7wQbzTuPfsqEHrlZzebzz+bLXQlu16l/iHPYAsI/LSA8qlzXP7UHKvodYcW6MLNa+KnA5XX4Fn8B2nUJ9N+SJV3SIj1Zf53nAyB2mXqjnJHxQiMC4BfUrrRmOLIjz8MMKXkBtDUJaMqaUEBqi+L+7prRUxC0=
+	t=1708337796; cv=none; b=esagPaTu/RH2r6ZtHtsT2ExDPPtZaJky7Bk4Rv5jQ2oNxWpVeI/U38546M8tHbEt2f/CI//c+XSECbboAErwy4ujJ0TAbZ2EZZc/wJoR5VQgoao3Enz99R1z57Tv8z80+HmvUemAPpVi5uPCzfDPZa5iZTMyF9OwzW5WpaT1zhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708337709; c=relaxed/simple;
-	bh=DT+HJ/MRBgBoch9D0gcN3G58vRVjIVWEk0CwB5FZWGk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=oHUdRuBOkgu94zo8+NDIQe7oJrSsSzAWpOjcbRPQGE4Bxn0y2feUb/deKxAynO9XZGsToQ542SWoxrualsJKgmTYBTuu2ZKowTklYjrXrBv/PiGG5RRV4el1I5Mt/K1yNsJNpQi4+HqtZ0abFZOQYAQLwdsPMqjJhjo+8T007Ig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bQll/n/o; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708337708; x=1739873708;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=DT+HJ/MRBgBoch9D0gcN3G58vRVjIVWEk0CwB5FZWGk=;
-  b=bQll/n/osvRqyTwZIDkoDwItSh2xUF+t6+yBJ0a1QZciFNKSOyTEqwqt
-   FuYTfiKTZIyKAN6g5i/mXCbfw2i5TGGH56PmfG7JEHx0+XPY0jDITWTwp
-   5NYZl9PY88+/uWTC+Re4/VK4EhlZ0CT+xgVNLK3cKkCp5/TboC8EyNLDb
-   q66g5+00jchl0Lzw0Mmgcvqc+c0hyK0O6Fyf0kvDYFXKP8JSZUc56Uw1Z
-   1Xg7aixXwWnSYaiL5mWL5Y+6dVXnT+Oaw4PZCcDC0ecIA2nevWYgBZThQ
-   6CTlhspJZScNbzUrsolUFb5CrxUrdEn6ofJzKtRdOHlgtyGixBzlOsel/
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10988"; a="2514760"
-X-IronPort-AV: E=Sophos;i="6.06,170,1705392000"; 
-   d="scan'208";a="2514760"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2024 02:15:08 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10988"; a="826984903"
-X-IronPort-AV: E=Sophos;i="6.06,170,1705392000"; 
-   d="scan'208";a="826984903"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orsmga001.jf.intel.com with ESMTP; 19 Feb 2024 02:15:05 -0800
-Received: from fedora.igk.intel.com (Metan_eth.igk.intel.com [10.123.220.124])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 84A2E135F0;
-	Mon, 19 Feb 2024 10:15:04 +0000 (GMT)
-From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	horms@kernel.org,
-	przemyslaw.kitszel@intel.com,
-	Michal Wilczynski <michal.wilczynski@intel.com>,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Subject: [Intel-wired-lan] [PATCH iwl-next v4 5/5] ice: Document tx_scheduling_layers parameter
-Date: Mon, 19 Feb 2024 05:05:59 -0500
-Message-Id: <20240219100555.7220-6-mateusz.polchlopek@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20240219100555.7220-1-mateusz.polchlopek@intel.com>
-References: <20240219100555.7220-1-mateusz.polchlopek@intel.com>
+	s=arc-20240116; t=1708337796; c=relaxed/simple;
+	bh=ddrK06DYYlWFp/8o1bKXY+MqFFxKPduBG+KoHpQXtnQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MQZGYLKtz5z9d37kSjoW+o5zxp5SyeVqrV4VnnM54SsPsJGDSqE1b33brLK7nKbfc8RJ5E4hTKlJWbJCH/XzdhKg4V1dXqoSuGT2wB3cYcyRiy2cIRuHoIHQCmiZ42M32Lmwm7pXRoMGlY8rnJ3/z/CITvrxcYKGD+7mYJzJOdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=anFXOSDX; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-563f675be29so3137385a12.0
+        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 02:16:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1708337793; x=1708942593; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=g7Lad/UmGJgb5525hSE9P/XpX6hMriuonfy0h/btJ74=;
+        b=anFXOSDXGaWKLXnFw70c8JtAHphhOXV8mwldCzg6B5Dl9KCR0d8RKlZ011KBkzSyaR
+         P47lRKxSF5Q4SiA9GRq1VXWYUfNF8Wg7xOAjqfE/IJRHgodsVUADT21bFDbVRKfKyf2P
+         F7FpkvTuADJGExcOr6QWYFFuCAcP08Eib1g9Xn8O/rn00KehGmqu571SHwPS4o4uztus
+         o8aHWPEdELhEgUHaePyHvQbWHozYstDWq120i+v+1SAHZGCi344S1mb22sx8mtBTGEg/
+         3/iTvskGn4OuNjzRbiEsHgvq9fhi9JQC1WT7ifXXY+DvEGLoH7tNDNuP+yIlXiZ/eNLI
+         ni1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708337793; x=1708942593;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=g7Lad/UmGJgb5525hSE9P/XpX6hMriuonfy0h/btJ74=;
+        b=N79drSTRNal0rUo57NWewSbNWlUCaFqyWlVIDf6W9f0BdAFA9VexDQWwIO7bZl9RIL
+         Vd9p+kOQp6M79Jbv4eBs3TxZX28mHOXghKZ9ER5lWY95d4FWEDd0pEtyVusX5IqNBMBJ
+         UqmZJhaDHKTd8pMT/YLr+B1p0CNZc9tNnCkEWx3VKn8heCbEi3dW/Re6mM2seI+wyqgJ
+         hm3SPR0bsdRvAooXktscABIMdYRi/04Rl5Mmp/OdZsMWBmq9WIuagr2S5/G/hBNJkOgk
+         PNY8YnnUr9YTQ6hZAEDLS/TuNzPO1TmywdJap6UXnnv/fkJjeQ4QO36jP8wvD/5Cj4bH
+         TJug==
+X-Forwarded-Encrypted: i=1; AJvYcCUswvnmdb2Eh6N76dMehOc6tE8obu9WHcLe31Phx087jSe6iCG5SDQCqLlduveHdGQhZ/r58ZfjJpuF2yY21kDnt4tWXUmQ
+X-Gm-Message-State: AOJu0Yxtp0e9bzFtYRusvU3FEaZDRgq+98fuEnYyhv3AwJkacab5tjVS
+	UgE7ZCwEqocE7Z3ABRCk3zL6ZP7bHx4OeiOgOZXlp0efJW83wJKTaJAk2UNAAjs=
+X-Google-Smtp-Source: AGHT+IENa4i0UQzIyD/tV/wQnoCaQZIG2aVhQsRIDX2/LE6pQ6khHX1I6mzlZXGgqlAR3Yp8LR32Yg==
+X-Received: by 2002:a05:6402:214a:b0:563:bd95:4e8b with SMTP id bq10-20020a056402214a00b00563bd954e8bmr5758346edb.11.1708337792697;
+        Mon, 19 Feb 2024 02:16:32 -0800 (PST)
+Received: from [192.168.192.135] (078088045141.garwolin.vectranet.pl. [78.88.45.141])
+        by smtp.gmail.com with ESMTPSA id e18-20020a056402149200b00563c63e0a13sm2562753edv.49.2024.02.19.02.16.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Feb 2024 02:16:32 -0800 (PST)
+Message-ID: <85538095-9550-4b24-b147-bf765c296a01@linaro.org>
+Date: Mon, 19 Feb 2024 11:16:29 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 2/8] clk: qcom: ipq5332: enable few nssnoc clocks in
+ driver probe
+Content-Language: en-US
+To: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>,
+ Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Bjorn Andersson <andersson@kernel.org>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
+ linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+References: <20240122-ipq5332-nsscc-v4-0-19fa30019770@quicinc.com>
+ <20240122-ipq5332-nsscc-v4-2-19fa30019770@quicinc.com>
+ <7a69a68d-44c2-4589-b286-466d2f2a0809@lunn.ch>
+ <11fda059-3d8d-4030-922a-8fef16349a65@quicinc.com>
+ <17e2400e-6881-4e9e-90c2-9c4f77a0d41d@lunn.ch>
+ <8c9ee34c-a97b-4acf-a093-9ac2afc28d0e@quicinc.com>
+ <CAA8EJppe6aNf2WJ5BvaX8SPTbuaEwzRm74F8QKyFtbmnGQt=1w@mail.gmail.com>
+ <74f585c2-d220-4324-96eb-1a945fef9608@quicinc.com>
+ <CAA8EJppuNRB9fhjimg4SUR2PydX7-KLWSb9H-nC-oSMYVOME-Q@mail.gmail.com>
+ <d518dbc1-41aa-46f9-b549-c95a33b06ee0@quicinc.com>
+From: Konrad Dybcio <konrad.dybcio@linaro.org>
+Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
+ 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
+ izWDgYvmBE8=
+In-Reply-To: <d518dbc1-41aa-46f9-b549-c95a33b06ee0@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Michal Wilczynski <michal.wilczynski@intel.com>
+On 18.02.2024 05:29, Kathiravan Thirumoorthy wrote:
+> 
+> 
+> On 2/17/2024 10:15 PM, Dmitry Baryshkov wrote:
+>> On Sat, 17 Feb 2024 at 17:45, Kathiravan Thirumoorthy
+>> <quic_kathirav@quicinc.com> wrote:
+>>>
+>>>
+>>> <snip>
+>>>
+>>>>> Reason being, to access the NSSCC clocks, these GCC clocks
+>>>>> (gcc_snoc_nssnoc_clk, gcc_snoc_nssnoc_1_clk, gcc_nssnoc_nsscc_clk)
+>>>>> should be turned ON. But CCF disables these clocks as well due to the
+>>>>> lack of consumer.
+>>>>
+>>>> This means that NSSCC is also a consumer of those clocks. Please fix
+>>>> both DT and nsscc driver to handle NSSNOC clocks.
+>>>
+>>>
+>>> Thanks Dmitry. I shall include these clocks in the NSSCC DT node and
+>>> enable the same in the NSSCC driver probe.
+>>
+>> Or use them through pm_clk. This might be better, as the system
+>> doesn't need these clocks if NSSCC is suspended.
+> 
+> 
+> IPQ53XX SoC doesn't support the PM(suspend / resume) functionality, so that, can I enable these clocks in NSSCC driver probe itself?
 
-New driver specific parameter 'tx_scheduling_layers' was introduced.
-Describe parameter in the documentation.
+Surely the platform can s2idle..
 
-Signed-off-by: Michal Wilczynski <michal.wilczynski@intel.com>
-Co-developed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
----
- Documentation/networking/devlink/ice.rst | 41 ++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
-
-diff --git a/Documentation/networking/devlink/ice.rst b/Documentation/networking/devlink/ice.rst
-index efc6be109dc3..1ae46dee0fd5 100644
---- a/Documentation/networking/devlink/ice.rst
-+++ b/Documentation/networking/devlink/ice.rst
-@@ -36,6 +36,47 @@ Parameters
-        The latter allows for bandwidth higher than external port speed
-        when looping back traffic between VFs. Works with 8x10G and 4x25G
-        cards.
-+   * - ``tx_scheduling_layers``
-+     - permanent
-+     - The ice hardware uses hierarchical scheduling for Tx with a fixed
-+       number of layers in the scheduling tree. Root node is representing a
-+       port, while all the leaves represents the queues. This way of
-+       configuring Tx scheduler allows features like DCB or devlink-rate
-+       (documented below) for fine-grained configuration how much BW is given
-+       to any given queue or group of queues, as scheduling parameters can be
-+       configured at any given layer of the tree. By default 9-layer tree
-+       topology was deemed best for most workloads, as it gives optimal
-+       performance to configurability ratio. However for some specific cases,
-+       this might not be the case. A great example would be sending traffic to
-+       queues that is not a multiple of 8. Since in 9-layer topology maximum
-+       number of children is limited to 8, the 9th queue has a different parent
-+       than the rest, and it's given more BW credits. This causes a problem
-+       when the system is sending traffic to 9 queues:
-+
-+       | tx_queue_0_packets: 24163396
-+       | tx_queue_1_packets: 24164623
-+       | tx_queue_2_packets: 24163188
-+       | tx_queue_3_packets: 24163701
-+       | tx_queue_4_packets: 24163683
-+       | tx_queue_5_packets: 24164668
-+       | tx_queue_6_packets: 23327200
-+       | tx_queue_7_packets: 24163853
-+       | tx_queue_8_packets: 91101417 < Too much traffic is sent to 9th
-+
-+       Sometimes this might be a big concern, so the idea is to empower the
-+       user to switch to 5-layer topology, enabling performance gains but
-+       sacrificing configurability for features like DCB and devlink-rate.
-+
-+       This parameter gives user flexibility to choose the 5-layer transmit
-+       scheduler topology. After switching parameter reboot is required for
-+       the feature to start working.
-+
-+       User could choose 9 (the default) or 5 as a value of parameter, e.g.:
-+       $ devlink dev param set pci/0000:16:00.0 name tx_scheduling_layers
-+       value 5 cmode permanent
-+
-+       And verify that value has been set:
-+       $ devlink dev param show pci/0000:16:00.0 name tx_scheduling_layers
- 
- Info versions
- =============
--- 
-2.38.1
-
+Konrad
 
