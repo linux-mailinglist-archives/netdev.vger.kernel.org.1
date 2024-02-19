@@ -1,74 +1,87 @@
-Return-Path: <netdev+bounces-73080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5ED285ACE7
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 21:15:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB19185ACEB
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 21:16:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7523E1F23D45
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 20:15:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0DB91C23E8C
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 20:16:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E41D50A7E;
-	Mon, 19 Feb 2024 20:15:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4972A535BB;
+	Mon, 19 Feb 2024 20:15:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VAfrnbQy"
+	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="SqjkG1t9";
+	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="p64tVpe9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.165])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 364FE535A4;
-	Mon, 19 Feb 2024 20:15:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708373724; cv=none; b=BJRHYP3YCAY/KwoB6sqKPYi+fvLiJh1z76xdNelcM1KKfXPkO7Frfurx650BhPVuio0WN8dNFFQeo3sfGqtqApwbgpQZuTk5OaFJQHXw/ZXbxoGso1JgaEo8THTi7Lub/l4t1rPczwzacAqLfFlD3W86cpfil0bdwLrRpP4re78=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708373724; c=relaxed/simple;
-	bh=1i5Z5tmkT3Ig7YFX38izakWgveapzbBQPWyZs2wxtg0=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B30DF53818;
+	Mon, 19 Feb 2024 20:15:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.165
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708373742; cv=pass; b=aj411x3BcjBZh9HzG+jO1wv6WnSAnqpW9ys8Aqz8yVcon21+eAbZWo5AfxYJtEG+XGVUFUZLmVjLNAwkrioF53cks6rdKEkKop7JcPLA5nM8KAZN1Q4A+Ixdk5kCZrowmqLLsx//erXjfEao2gpDwjrvtitULtKPtDLuJ/e/T1w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708373742; c=relaxed/simple;
+	bh=aHzupC5gYOA/lyzN5j2yFyKr70HX34y1FyZ90RCgONI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ajgbZvX7849DcbDXi5grajjimi70AzKHhO3k0Lf1hFNIsgC3ojVnY2lxi6E4bxzKXzt/6pvai66wjSm09aB24Nbs2u7sjzyBdARS5hesI6dh7rFGkRWGYmhf74d8qn/qTU1XyBWVsS+yr9jeyKTjBoIFU+oeVbSuobHLkorkVrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VAfrnbQy; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1d8aadc624dso36527655ad.0;
-        Mon, 19 Feb 2024 12:15:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708373721; x=1708978521; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=e/xxPCmI7O5Vn7789fiRXPJc1b6HMLkN+s1b1aXSSnc=;
-        b=VAfrnbQyOGDmy53TEjyhU/zSz0Ov0TxBJ2shtm6Qnri+6tu4On0v4+g/aQ1+m9ao+A
-         op0gCrHpb6HOSaE+lhqp7ajosE/vfFybv6qTqKUUei8SANt+/WOiqIiLzWDR1/GQ5AwX
-         unSKTw8V+Zb77J8CWXCamhwHadwkyEyzz0/WUdCaqDiVv3r4/BwqOD4QIOBLY8TyAEDf
-         bmhGSFqRryCnceEmjYD5GGH7j2pWQ0gGWOSxpIEgElU4XfVTZm0chOVMZeeEzbIbdDQU
-         lqfWy2ovxxFDCGMqeMP4EWtxb1pKPRJp/1bbuVx1i9TBXRLl+T56NeyFSNmIqes32vhB
-         wy/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708373721; x=1708978521;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=e/xxPCmI7O5Vn7789fiRXPJc1b6HMLkN+s1b1aXSSnc=;
-        b=V+u/9NUCxuXOr1k88XDawBn6rIsb7b6R/0CuDKCVBQK3jarbsb93tYcNLtUr++KQPT
-         rD4L0+EL9JQVmOiIvV+frP3aAUBGEi6Sfqo+AyEQ751wHMlI2wxII5dc25gUpNrdD+y1
-         0QENlgABm43Kq4av9S8S/d6iat2v5PXXvn/QmKtC6VCJHIqMEky7tAvsKbTPvO0OM/FM
-         hk8r+A2iRUWFc1VTIiCYYNrS9y/7+lNBt3wl91csqir0MstsFKNmUTTvHOis8+aL3miA
-         LTzO9VlludWR89tI3VpxM5/QopAtoIEOSRus5ByDPx6oFa3x2DCF5fSZrVgRkf1doT/K
-         Fq1A==
-X-Forwarded-Encrypted: i=1; AJvYcCUkaOAIRTJlBk6HLW5DhIO7ZoV7+sXza5CBFsoshGj2S5AbYsybNO9dDm/Dn1vYA+GVjmyH9iOY7jTKpxNNjnZ40StCRsAQcbaGx+H8jZA6maJFCsMkLZKy5ECrULSmYr45bcQ1
-X-Gm-Message-State: AOJu0YwQMC9YYZusi7H6sucDP4MJyeaIgBhLGqKfAodWzbafOqvKD79W
-	QZz7SOrqQEgiZYH3Wgf0wDtgnZAvjllB6YDXfXxSechsA0FJWUPt
-X-Google-Smtp-Source: AGHT+IEpO+GHLkKDBAojN5FR0yUgTMzo10k4wmvfWA//iAi00Ai6VbMt36aF+ksXmxrSrKDEZ39mfg==
-X-Received: by 2002:a17:902:b285:b0:1db:e089:7461 with SMTP id u5-20020a170902b28500b001dbe0897461mr4615033plr.31.1708373720938;
-        Mon, 19 Feb 2024 12:15:20 -0800 (PST)
-Received: from [10.230.29.214] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id jx7-20020a170903138700b001db68cf242asm4808036plb.49.2024.02.19.12.15.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Feb 2024 12:15:20 -0800 (PST)
-Message-ID: <a1f90d66-fee3-4c03-a04d-0d6c91ce5256@gmail.com>
-Date: Mon, 19 Feb 2024 12:15:14 -0800
+	 In-Reply-To:Content-Type; b=eFn6lajvwV5Be7LLQ31KAhNA7tzb6Qh7lNQlMfYcL3xPcdG9a0KVWy66DK2+5+pbk8WsTOd/3wXFCfMMTOTUWsEvnQx2bfTATzCVz7j9msoBw4Cmu4hda5KADn0NhC+6VRagJsKynPWN2H7cHVnIs8679zaPlaPbmrdcjhI4+9A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=SqjkG1t9; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=p64tVpe9; arc=pass smtp.client-ip=81.169.146.165
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
+ARC-Seal: i=1; a=rsa-sha256; t=1708373727; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=RpoR/vKnYmxDsLpntIjaWpXv9D5I68cPRMJkLXo62im717EZS+FW9bZqBsveUz8cYq
+    CSFrqLrvF57SH7DpzVzmPXtg66sbxD7kSGuIhhDlcN5wlJalveP/ecWEILn1Z/dNfNrP
+    ma84C1jzPqLgcWHzKonVjRkOv6cTyj8/P7iAfMKRO5KU8zFc07dk9LePBdAPyD7ZQ+ID
+    udD/ddMc+cKWVz98tTEhEYjG6WlORIZV1iviDOhQjw3lZvA28WT81TQsc2dKLvN6vtdU
+    rjQdtBFPIkgcYTYcLsgv+w6U7kYscMPq/mESKyQ6cXMeRNhHZOXatNT8xDvzpf/WDB61
+    Rinw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1708373727;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=CEZCINTGBTCcsox1nU55T0ngzd4ltlNj1PSCmMr9nDs=;
+    b=CFbO+ef4ZSxm2tq/nGObs7y7ndltYTe6tboiC+QfHh/8g1tXHNXr1pPRY/zuIkbhmn
+    LT9AvVZiLZ4SFL6CGe48duVeSxT8jLmDYlWJCF17wG8A2WqtAyYkFGOYx23qFZDWCM5W
+    K45sAWj5FUx7DIKRLeP3/KwQZY3MDvT1I7YdtLw8Xn4Xh/QF19Eg5uuT/ZC7gf3F9/pa
+    5K30QsEIdyGNDR6j34yd6oxfMxgqPQcKU/ZfTwyMusf59gzqxM9AevELEhYRR+pg+kB+
+    MIxzXWEqgjYUqLqp9lEZxPFefwMJAUpV6imM24guTJ1KJ2067pa383gVcbbnrM+tNitr
+    NJBw==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1708373727;
+    s=strato-dkim-0002; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=CEZCINTGBTCcsox1nU55T0ngzd4ltlNj1PSCmMr9nDs=;
+    b=SqjkG1t93/aoRU43WWTNS23p4r4Kv8rhUi+n67Bo409uq3dovPLpo2HaM9WyKEJHkW
+    pN+ialvIFa1lBAaYrpw4IvxXsdEVwBv4+DIHDorKkRdrvZxmr23fIkRmH5xZ0Sp18r6r
+    1l5MDFYbpZluDpWfuqYfypet6w+OW4VEhTxM0XCEK2AlJvWLINwbw/JSZKTyedCY0m64
+    TN13inEEbt3Wc7UzwYjwRQCngL5WR5x7Y4e8/gTJjBN1wsIP83idRUj+zdxrzalcx5m+
+    xD9g6xCEMQCBm2azQ+DEW3t2n8tS/W0jWlMPVGI1SF1hfoPm+MmBUTHQ3TGcDCzT4QeF
+    0o9A==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1708373727;
+    s=strato-dkim-0003; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=CEZCINTGBTCcsox1nU55T0ngzd4ltlNj1PSCmMr9nDs=;
+    b=p64tVpe9axLZrPcLgtGqSGLgVPRKuXZ71mT9B+L9nxH/+q6XbeG+ylpf8/s8WBFxKE
+    dJ4kXAEp5illLlOtZODg==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjG14FZxedJy6qgO1qCHSa1GLptZHusl129OHEdFq0USEbDdAnQ=="
+Received: from [IPV6:2a00:6020:4a8e:5000::90c]
+    by smtp.strato.de (RZmta 49.11.2 AUTH)
+    with ESMTPSA id K49f9c01JKFR85s
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Mon, 19 Feb 2024 21:15:27 +0100 (CET)
+Message-ID: <2828dbd5-9bea-4b2e-9a4f-ebd0582c8f73@hartkopp.net>
+Date: Mon, 19 Feb 2024 21:15:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,102 +89,154 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next RFC PATCH 6/6] net: phy: bcm7xxx: rework phy_driver
- table to new multiple PHY ID format
+Subject: Re: [PATCH net-next 22/23] can: canxl: add virtual CAN network
+ identifier support
+To: Marc Kleine-Budde <mkl@pengutronix.de>, Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ linux-can@vger.kernel.org, kernel@pengutronix.de,
+ Dan Carpenter <dan.carpenter@linaro.org>
+References: <20240213113437.1884372-1-mkl@pengutronix.de>
+ <20240213113437.1884372-23-mkl@pengutronix.de>
+ <20240219083910.GR40273@kernel.org>
+ <20240219-activist-smartly-87263f328a0c-mkl@pengutronix.de>
 Content-Language: en-US
-To: Christian Marangi <ansuelsmth@gmail.com>,
- Florian Fainelli <f.fainelli@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Robert Marko <robimarko@gmail.com>,
- "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>,
- Nipun Gupta <nipun.gupta@amd.com>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Puneet Gupta <puneet.gupta@amd.com>,
- Abhijit Gangurde <abhijit.gangurde@amd.com>,
- Umang Jain <umang.jain@ideasonboard.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240218190034.15447-1-ansuelsmth@gmail.com>
- <20240218190034.15447-7-ansuelsmth@gmail.com>
- <6146eb3b-720a-4523-bcc7-8e2656aeafef@gmail.com>
- <65d384ab.7b0a0220.15279.bf48@mx.google.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- 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
- HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <65d384ab.7b0a0220.15279.bf48@mx.google.com>
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+In-Reply-To: <20240219-activist-smartly-87263f328a0c-mkl@pengutronix.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
-On 2/19/2024 8:41 AM, Christian Marangi wrote:
-> On Sun, Feb 18, 2024 at 08:26:29PM -0800, Florian Fainelli wrote:
->>
->>
->> On 2/18/2024 11:00 AM, Christian Marangi wrote:
->>> Rework bcm7xxx PHY driver table to new multiple PHY format
->>> implementation to reduce code duplication and final size of the compiled
->>> module.
->>
->> I like the idea of sharing as much code as possible and creating a smaller
->> module, however by changing the name, you are creating an user-space ABI
->> change, we rely upon the exact PHY name being shown under
->> /sys/class/mdio_bus/*/* and this change will break that.
->>
+On 2024-02-19 10:41, Marc Kleine-Budde wrote:
+> On 19.02.2024 08:39:10, Simon Horman wrote:
+>> +Dan Carpenter
+
+(..)
+
+>> But I noticed the problem described below which
+>> seems worth bringing to your attention.
 > 
-> Thanks for putting this concern on the table but isn't that generated by
-> dev_set_name and PHY_ID_FMT? from bus->id and addr?
+> Thanks Simon.
 > 
-> Can't find reference of the name entry in sysfs. Am I missing something?
-> The name seems to be used only by logging to print info/err/warn.
+>>
+>> ...
+>>
+>>> @@ -786,6 +822,21 @@ static int raw_getsockopt(struct socket *sock, int level, int optname,
+>>>   		val = &ro->xl_frames;
+>>>   		break;
+>>>   
+>>> +	case CAN_RAW_XL_VCID_OPTS:
+>>> +		/* user space buffer to small for VCID opts? */
+>>> +		if (len < sizeof(ro->raw_vcid_opts)) {
+>>> +			/* return -ERANGE and needed space in optlen */
+>>> +			err = -ERANGE;
+>>> +			if (put_user(sizeof(ro->raw_vcid_opts), optlen))
+>>> +				err = -EFAULT;
+>>> +		} else {
+>>> +			if (len > sizeof(ro->raw_vcid_opts))
+>>> +				len = sizeof(ro->raw_vcid_opts);
+>>> +			if (copy_to_user(optval, &ro->raw_vcid_opts, len))
+>>> +				err = -EFAULT;
+>>> +		}
+>>> +		break;
+>>> +
+>>>   	case CAN_RAW_JOIN_FILTERS:
+>>>   		if (len > sizeof(int))
+>>>   			len = sizeof(int);
+>>
+>> At the end of the switch statement the following code is present:
+>>
+>>
+>> 	if (put_user(len, optlen))
+>> 		return -EFAULT;
+>> 	if (copy_to_user(optval, val, len))
+>> 		return -EFAULT;
+>> 	return 0;
+>>
+>> And the call to copy_to_user() depends on val being set.
+>>
+>> It appears that for all other cases handled by the switch statement,
+>> either val is set or the function returns. But neither is the
+>> case for CAN_RAW_XL_VCID_OPTS which seems to mean that val may be used
+>> uninitialised.
+>>
+>> Flagged by Smatch.
+> 
+> And "err" is not evaluated, too.
+> 
+> Oliver, please send a fix and squash in this chance to reduce the scope
+> of "err" to the cases where it's actually used.
 
-The name will appear under /sys/ like this:
+Hello Marc,
 
-ls -ls /sys/class/mdio_bus/unimac-mdio-0/unimac-mdio-0\:01/
-total 0
-      0 lrwxrwxrwx    1 root     root             0 Jan  4 21:27 
-attached_dev -> ../../../../net/eth0
-      0 lrwxrwxrwx    1 root     root             0 Jan  4 21:27 driver 
--> ../../../../../../../../bus/mdio_bus/drivers/Broadcom BCM7712
+the problem was an incomplete code adoption from another getsockopt() 
+function CAN_RAW_FILTER. No need to reduce the scope of err here as we 
+only have one sockopt function at a time.
 
-it might be OK to change the driver, but I can tell you this is going to 
-be breaking a number of our scripts here...
--- 
-Florian
+@Simon: Many thanks for catching this issue!!
+
+Patch: 
+https://lore.kernel.org/linux-can/20240219200021.12113-1-socketcan@hartkopp.net/
+
+Best regards,
+Oliver
+
+
+> 
+> diff --git a/net/can/raw.c b/net/can/raw.c
+> index cb8e6f788af8..d4e27877c143 100644
+> --- a/net/can/raw.c
+> +++ b/net/can/raw.c
+> @@ -756,7 +756,6 @@ static int raw_getsockopt(struct socket *sock, int level, int optname,
+>           struct raw_sock *ro = raw_sk(sk);
+>           int len;
+>           void *val;
+> -        int err = 0;
+>   
+>           if (level != SOL_CAN_RAW)
+>                   return -EINVAL;
+> @@ -766,7 +765,9 @@ static int raw_getsockopt(struct socket *sock, int level, int optname,
+>                   return -EINVAL;
+>   
+>           switch (optname) {
+> -        case CAN_RAW_FILTER:
+> +        case CAN_RAW_FILTER: {
+> +                int err = 0;
+> +
+>                   lock_sock(sk);
+>                   if (ro->count > 0) {
+>                           int fsize = ro->count * sizeof(struct can_filter);
+> @@ -791,7 +792,7 @@ static int raw_getsockopt(struct socket *sock, int level, int optname,
+>                   if (!err)
+>                           err = put_user(len, optlen);
+>                   return err;
+> -
+> +        }
+>           case CAN_RAW_ERR_FILTER:
+>                   if (len > sizeof(can_err_mask_t))
+>                           len = sizeof(can_err_mask_t);
+> @@ -822,7 +823,9 @@ static int raw_getsockopt(struct socket *sock, int level, int optname,
+>                   val = &ro->xl_frames;
+>                   break;
+>   
+> -        case CAN_RAW_XL_VCID_OPTS:
+> +        case CAN_RAW_XL_VCID_OPTS: {
+> +                int err = 0;
+> +
+>                   /* user space buffer to small for VCID opts? */
+>                   if (len < sizeof(ro->raw_vcid_opts)) {
+>                           /* return -ERANGE and needed space in optlen */
+> @@ -836,7 +839,7 @@ static int raw_getsockopt(struct socket *sock, int level, int optname,
+>                                   err = -EFAULT;
+>                   }
+>                   break;
+> -
+> +        }
+>           case CAN_RAW_JOIN_FILTERS:
+>                   if (len > sizeof(int))
+>                           len = sizeof(int);
+> 
+> regards,
+> Marc
+> 
 
