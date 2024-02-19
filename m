@@ -1,92 +1,89 @@
-Return-Path: <netdev+bounces-72858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A8F6859F83
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 10:20:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDDDC859F91
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 10:22:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCCA0283807
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 09:20:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C8DF1C206AA
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 09:22:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7249123779;
-	Mon, 19 Feb 2024 09:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C328522F0F;
+	Mon, 19 Feb 2024 09:22:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LVQ7lnoE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YVjO1g5q"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D9A424B24
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 09:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FB7322F0E
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 09:22:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708334425; cv=none; b=e30GhEyaiTdHJ/zrkNV2zWHiFfLyrNKi5A2CJuh2ZJALHM90/KJGDdluWK2AzBy2AIyPjN/Rc1NlJhN1pXf1WA2Q4uk6ZFTTRG3IgBLwr+UweE3qxCG1HjhR6OzkRfbkP+4VlPKhGkScDvS7EA8pnnWVQjAuymLWfn6d9+1HFv4=
+	t=1708334540; cv=none; b=lAm/OZsAJY/CSgRp3alA1CI5fdjBQFsVuY8LIX/uBmfA0bOsdBSWuHjioD6A2BvFm/x7WfbELuTvscMRqn+fRTXAru34J+o/jmCETxHL9v3BUCW+lnl95ELGUJA3JaBQu+2DFfbr5FyYr3DRT76jpT2kM/+TcGY8grc1zbukAAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708334425; c=relaxed/simple;
-	bh=y1IttFaIOOz99Mc1ci0EJMtJyi5V4DyFwTFsnnL/+bI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=GbRjN+06RDUwGF2qNzHRMjmzj7NC8spj30W6fAA7K7lXRtGz2/5I6EWjDDkw2RyZlUexe8kmOVOda9vI2UywBPd2hvI3fwM0sazyjIzvVSEcUJFu5nYfY7sanAHDGmRxyAxksZMkKr8reAuzQaXUs41y/nxASuQa+h4whcq6nlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LVQ7lnoE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2D90FC43399;
-	Mon, 19 Feb 2024 09:20:25 +0000 (UTC)
+	s=arc-20240116; t=1708334540; c=relaxed/simple;
+	bh=cqhT+74jMS/y3CvA29elHMcdXkWm7rk1p2NPRXtt7Jg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TMhFsZF0uepgBzDxw0gEnBGo1G5VCbY80McnOgvHRQHF6w4/CCYJPM1arIiCAmhaRQ3uNAzCSNcoDYdwxxgWyByVUF2+9t3evRkItNoZcK1wfArMMZEXIfwd7t3LILUQ9K+30NWuOYS/uPaj3t3DL8zHcw+mGbFr6agVQW/l/Iw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YVjO1g5q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B5CAC433C7;
+	Mon, 19 Feb 2024 09:22:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708334425;
-	bh=y1IttFaIOOz99Mc1ci0EJMtJyi5V4DyFwTFsnnL/+bI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LVQ7lnoEkFOjP5AC2rbCaG6DcKwWTdTOM7pOqCnIFkqKvZlUNdF5wUnbzrFcgydQF
-	 STNlVstPpF3cSQrp+9jAQI1LuqamTMEN83lePnKDUs18pkNrHnPRbgDoeMg+7GGVXW
-	 sSeh+sL7Rpqnc7d9/WXqc+QrRUScmdddVQHTYO9CEPRFigkmhBsdF4PNZ4VQvjbc1f
-	 H5f6g1MaISeY2+cBdmD9+W9ANukIsnHg4F906iYOjd1+GvrfjJE7B5JUb+xZhojwic
-	 R8YfGChafVpZmX5kzfentN1YP/G3yuV/xamIWg9EJrTOYkMT0N2UKE9zVWgUUMvj4n
-	 zFUVjN/6RrBSA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 14B87D990D8;
-	Mon, 19 Feb 2024 09:20:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1708334540;
+	bh=cqhT+74jMS/y3CvA29elHMcdXkWm7rk1p2NPRXtt7Jg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YVjO1g5qgZhdv5kKrgNWOVv9jQadckfvjZbQKGe8FI4Y7QUlkLA0W+jM1P56nCHu0
+	 XPNF7PNzlnaykbCFmUSMdmFVQMgWkgmDhcBzzAcvtwGbdMljPkUrXYCIT0iZb8EcGx
+	 u+du8QtWtY2hfuiutoHbY+977duM8+37Hv7dsezPQP3vwvDf5txqLRpCv8gRjsCH5R
+	 ZWtJ536c7lD/wllWWkpgPMGPoqnGPp716fsDGqM38NlLO6iMsQjq/4clZDmh4wLcgz
+	 Wdn0UL/QTFgqsS6W1qUAQS3NAwup9z6ErQx+jegpiTfadwHSzFcJmHIYJbO1SGYykl
+	 jZsJh7VhgzOxQ==
+Date: Mon, 19 Feb 2024 09:22:16 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Alan Brady <alan.brady@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH iwl-next v1 2/2] net: intel: implement modern PM ops
+ declarations
+Message-ID: <20240219092216.GT40273@kernel.org>
+References: <20240210220109.3179408-1-jesse.brandeburg@intel.com>
+ <20240210220109.3179408-3-jesse.brandeburg@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCHv2 net] selftests: bonding: set active slave to primary eth1
- specifically
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170833442507.21692.17278891729918402269.git-patchwork-notify@kernel.org>
-Date: Mon, 19 Feb 2024 09:20:25 +0000
-References: <20240215023325.3309817-1-liuhangbin@gmail.com>
-In-Reply-To: <20240215023325.3309817-1-liuhangbin@gmail.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, j.vosburgh@gmail.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, liali@redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240210220109.3179408-3-jesse.brandeburg@intel.com>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Thu, 15 Feb 2024 10:33:25 +0800 you wrote:
-> In bond priority testing, we set the primary interface to eth1 and add
-> eth0,1,2 to bond in serial. This is OK in normal times. But when in
-> debug kernel, the bridge port that eth0,1,2 connected would start
-> slowly (enter blocking, forwarding state), which caused the primary
-> interface down for a while after enslaving and active slave changed.
-> Here is a test log from Jakub's debug test[1].
+On Sat, Feb 10, 2024 at 02:01:09PM -0800, Jesse Brandeburg wrote:
+> Switch the Intel networking drivers to use the new power management ops
+> declaration formats and macros, which allows us to drop __maybe_unused,
+> as well as a bunch of ifdef checking CONFIG_PM.
 > 
-> [...]
+> This is safe to do because the compiler drops the unused functions,
+> verified by checking for any of the power management function symbols
+> being present in System.map for a build without CONFIG_PM.
+> 
+> If a driver has runtime PM, define the ops with pm_ptr(), and if the
+> driver has Simple PM, use pm_sleep_ptr(), as well as the new versions of
+> the macros for declaring the members of the pm_ops structs.
+> 
+> Checked with network-enabled allnoconfig, allyesconfig, allmodconfig on
+> x64_64.
+> 
+> Reviewed-by: Alan Brady <alan.brady@intel.com>
+> Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
 
-Here is the summary with links:
-  - [PATCHv2,net] selftests: bonding: set active slave to primary eth1 specifically
-    https://git.kernel.org/netdev/net/c/cd65c48d6692
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
