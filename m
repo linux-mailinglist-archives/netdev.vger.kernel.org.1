@@ -1,203 +1,318 @@
-Return-Path: <netdev+bounces-72962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 576BC85A6A3
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 15:57:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 44B5085A6A5
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 15:57:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B1EF6B23525
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 14:57:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9F055B23859
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 14:57:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E6F537714;
-	Mon, 19 Feb 2024 14:56:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68BA7383AC;
+	Mon, 19 Feb 2024 14:56:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="2KOTLnOO";
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="UGDgtJ/R"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a94Qu3zi"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8DB037704;
-	Mon, 19 Feb 2024 14:56:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E6FA37704
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 14:56:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708354608; cv=fail; b=LUK3NIuWNCxcAynnNitcxX/akqz+xW5tHEQmPyqIQ1lflOJzGkiKfkcyb+1xjzMArpFneWQILZ5BBg1xheGLsLXqny30UXu38em8aiWhVLgOmdHI1d9erp4T4sCkfe6LRFdHho5ERidEjyPDXsUSerJGRfPV+LvbnIQdzXjz2TM=
+	t=1708354616; cv=fail; b=YW9zQtY1pdeh9x/7sVYQNuvtEFRzqQ/UdyaITHIXtHDVe+cba3fWmpmpEzJXBipgZMUKtXcTSk7Lkc1JJt8mW/Bgh3h7X1b49bgb5Lairh7T7uw0qM5YKR7ze8pypHi+cJWP2LVUucQAD+qpkjKkX8tres9g5BAak0U6o8mCUh4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708354608; c=relaxed/simple;
-	bh=p2R3C6aXVaRxiUaQdl5j2ZOw/bc3dG0bKcxROJw7Sug=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=dZ1SNz0eI0mrJG3j7jhzETeW9u2qfOt38NDHZe8A/hZ3lSFL+dfSa26T8B0AApZzPTxmycJB7sbLftAbLVCLriwq9OFMBgkUMsalmS6kfrSTMt56XInWG+omcI/VW+7maoMJAJay2k2QGq3LqYDzamVnHyJ3snCgQYz5SH/H2O0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=2KOTLnOO; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=UGDgtJ/R; arc=fail smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+	s=arc-20240116; t=1708354616; c=relaxed/simple;
+	bh=XhpOuXCdbfXlQkjsXLBtbNzCqzsHfRGyr6CJxhtNXgQ=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=kPfUJfa6iVO1OGGtTPz2int+Ha2LA4XNHdqnCeH5gclYmtWjcieE7fFBdmBy8s4BB9IcWzFvHE930NXWTghbhWnZcxR4rtKmqCXS4Dbeq5R0AqZGIMagpD2HEA6T6y7It76g76NMN+ezrFIlQguF3dsX7VnIcbiNFg5hv0ExWA8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=a94Qu3zi; arc=fail smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1708354605; x=1739890605;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=p2R3C6aXVaRxiUaQdl5j2ZOw/bc3dG0bKcxROJw7Sug=;
-  b=2KOTLnOOfZa59siFE2MaKCLTdnA4nnhceJRTXkb7A3pXwPFZmvzljkjA
-   qFqpYGYNzRFpM24721tXPnRVsz1ZwejRWs08A1sSvGqSlKLzblhzAc/oV
-   doIjMEehh2a9jXtvQHlCCq697zkHPQ+1JD3nBkzqjxkx4h/sMfRn88Kkm
-   OgHhJCnhtP6mTntmoXIrrS+my5YhAsLORiJ/wih75/dckcJy2zKQZj/np
-   +4+pYL7uvFVAdg45xJ8O8gvvw5oo/NsOLEKACp5Dp/kf9HMg4raXnh2ps
-   c7J4Ks3va9qlvq3IDCPPVUx0iDMGJhvlfrxSz4mtBzA/y6xSemvklYe/j
-   w==;
-X-CSE-ConnectionGUID: UjEx9t+STcqRUJvg1jlafw==
-X-CSE-MsgGUID: iGG8BXwkSuehzQVHbYHQaw==
-X-IronPort-AV: E=Sophos;i="6.06,170,1705388400"; 
-   d="scan'208";a="17959971"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Feb 2024 07:56:44 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708354614; x=1739890614;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=XhpOuXCdbfXlQkjsXLBtbNzCqzsHfRGyr6CJxhtNXgQ=;
+  b=a94Qu3zi4MuSAeqriNhP18JYFRk9uZMuEKmTPVhP/c72YCysgWQH979O
+   LKWhrJ3ihLN3IiUpVkAOeSDjVcUuQzybfseoo2YBvXx88e0tvVtMkKUW/
+   Db5Cqc3bAC7w/5FhIusYUX0aEtoc68jWCpQNgDLUZ0Scc1lNZBg/E+E1U
+   fiVWVP/yKIWvzp9N+DtUOGIiQYQA4nafrl6pab9wQ/l8SQP8n1JxjW7SA
+   x/mrhb1igkJq9WYKskqU1676AwN2cry23kzvOzH+NpWXBmd+pURMyYq4/
+   ctGX4r541P/MeaoWvxM4pi2F+uQWSOm3QNutwkMCTDIydGpOG7IjXXCNB
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10989"; a="2579477"
+X-IronPort-AV: E=Sophos;i="6.06,170,1705392000"; 
+   d="scan'208";a="2579477"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Feb 2024 06:56:54 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,170,1705392000"; 
+   d="scan'208";a="42007235"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 19 Feb 2024 06:56:53 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 19 Feb 2024 07:56:29 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (10.10.215.250)
- by email.microchip.com (10.10.87.151) with Microsoft SMTP Server
+ 15.1.2507.35; Mon, 19 Feb 2024 06:56:53 -0800
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Mon, 19 Feb 2024 07:56:29 -0700
+ 15.1.2507.35; Mon, 19 Feb 2024 06:56:52 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 19 Feb 2024 06:56:52 -0800
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 19 Feb 2024 06:56:52 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LZ4yGswXkMVOH7YgsXDOSnMXZY6d2DY5w99FTtEjAre2+it/MR2iHZVPSQCrOcBzCrwtJ+laFIeGpFC4fm7WrRER5Vny6ckQ5kdmhxVx3aEyB4o9iYoinsfpDiP6xZlv9Qfqsep1N5neSPJH3SnKXkt7fG5ZXb/tAft68r4CmASbqdn4oeo1vcvHXsciM49HvS7UdJH349HT/HvPM6X4TdkjR7M6bR0+4cbUkTgVK/h7d5kquedAA39vYXKwN/pYxgq8/2s2XOp5beJN/4NUZqNCYVPNM2CYa4KqLtQzQen69OOovBhGnuetlOySbESico0yCxPUbijggOUeh9ovrg==
+ b=fok1gvT/HS2HPfSLwyQiDbJkOqMGPumYBtKiT4YRA9yFppQSn9qpDMWTmRDNgh1E2jNThF05TBH6usJKgQK2sDNRmkClkrbt2qGaRk2GNdIcl4nLLlVPfocBmX7ljSVFkiWdgoSyAAY2ZIckh/bTKGb3e3aojlK+KZiJAKxDGjZnCxdGZ7xhXFcAu268Np5PbN5wbZ76L/5Wi1rcC+hTUobjBU7/DAqp2jkVbk2Zw/bQ26ljpoLP/R16dKbcSD4x8t287DfHgFsysmRhPnz3lzq6mF+nCAa1NxUJddXd+927zPDGPVvf/G/0v8+IOapksdSI9JvhPlVEeQPKYxUKQg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=p2R3C6aXVaRxiUaQdl5j2ZOw/bc3dG0bKcxROJw7Sug=;
- b=oVV458UD9PLuE0+R19Bn+9KSp+aj/bGjQX9XvyptQynt0SXR8ivR41u3d6MALdcf6awjXqk6/QSC16Y/5AtZhclyeePdypKjIFRsGkwF3dDjVZrd8SBQ6ux45wfq0sgrWNvwAlH1jpeDKXcfGi87f5U4zQTC8KcS+4qjP1In0B11FUm3EjQ6ynP5owz+Ev/2VHAlMzoIEoZw/QLOKd1NewnT9CLaQEXAV8kctzoS5q88wccLXwf5zqNzZvg+ITKlnB17fc/d79M0yogOKHderGt5ZjH8GcRsD/gsou+AJ3UexJmalEoDfZXMPM06qRDTf2Blqn/udwdr38wyHhzyYw==
+ bh=4RNcdzZoT5I4OpJzXuLRtmsC1VfA0NDjN22IORD936c=;
+ b=fg0RwcafF0Mb3Zzt5wu8WOtZ+9R2Q4pz2RTLhiuav81ubLQilFhB1lryk/b5e7lU16y17paSyJgCrQ7EWVeW7riR65bs/V8/b/z7HEzatQflVMEgcvOr9icqNho2gDiL3yQMb2p17c0tB7JJbfo8atilj7nfQKN36erQd7CtDbwiHaw245LjfYeQm2XzzzgFP3sDwRzjYkgVqU+YRz4op/fmABdmbpx6NTez3znPoyBpE57hBPg+YgW8BQ7rnUg0DmL81xu+9TUPTKV5CozbclZogD4rWNxZalBqapojyWGXXlXya8AvTFkqbmtQvgLm6c7j7FQrz0vHaUrXOZooKw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=p2R3C6aXVaRxiUaQdl5j2ZOw/bc3dG0bKcxROJw7Sug=;
- b=UGDgtJ/RCgc8S3DHOZ7KoRZ6jX/WXPrY4VKhMLFpOo1jMtVOBlBvbQCuZvNVxmtc6Z/e1fB4wZLn7DKzy3y4WknMKLZuIjC4IdP5L1+kr2cBBv85I+e2ylzogR2DhdR/u4HB6jJVjRowmqUwO8uvDMWpPZmgpyk7sl1eH8S5zd+NEMqTtnIWBzerFMZuwe7gmwUWXgWrXJS8D5PxemGgV3w3GDjv/2Wm+e8FY+hDB2k/K6KnfaPovHG31N96Dy3tYWBJbjYj4TMr5HO2Q7kkG9elBGzwEvNlANgKngETsYdLiMRdtR3OXknJRvYu1QF2ytyLFb6rNoGwoBT/wy51Vw==
-Received: from PH7PR11MB8033.namprd11.prod.outlook.com (2603:10b6:510:246::12)
- by LV3PR11MB8482.namprd11.prod.outlook.com (2603:10b6:408:1bb::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.38; Mon, 19 Feb
- 2024 14:56:27 +0000
-Received: from PH7PR11MB8033.namprd11.prod.outlook.com
- ([fe80::a1ae:867c:66d4:123b]) by PH7PR11MB8033.namprd11.prod.outlook.com
- ([fe80::a1ae:867c:66d4:123b%7]) with mapi id 15.20.7292.036; Mon, 19 Feb 2024
- 14:56:27 +0000
-From: <Arun.Ramadoss@microchip.com>
-To: <andrew@lunn.ch>, <olteanv@gmail.com>, <davem@davemloft.net>,
-	<Woojung.Huh@microchip.com>, <pabeni@redhat.com>, <o.rempel@pengutronix.de>,
-	<edumazet@google.com>, <f.fainelli@gmail.com>, <kuba@kernel.org>
-CC: <kernel@pengutronix.de>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <UNGLinuxDriver@microchip.com>
-Subject: Re: [PATCH net-next v1 1/1] net: dsa: microchip: Add support for
- bridge port isolation
-Thread-Topic: [PATCH net-next v1 1/1] net: dsa: microchip: Add support for
- bridge port isolation
-Thread-Index: AQHaYzXcqCF1zuDuPUuSLDto36SDfbERwYiA
-Date: Mon, 19 Feb 2024 14:56:27 +0000
-Message-ID: <e0108e653754a552409b822f22004964e57a902d.camel@microchip.com>
-References: <20240219131614.3724037-1-o.rempel@pengutronix.de>
-In-Reply-To: <20240219131614.3724037-1-o.rempel@pengutronix.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.36.5-0ubuntu1 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH7PR11MB8033:EE_|LV3PR11MB8482:EE_
-x-ms-office365-filtering-correlation-id: 390cd023-ac04-4fa8-dbc4-08dc315af30d
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: my/B18BF+rfKl3t1pe2JHbR7F1XE7CcxQ/SoSPdKCL1arrYhG11rTHqP8kKouV0SHokEmXdClWvf7qRkk+BUNK+mzxVk0kDGBcH1adP4e908EBFmgtGp1DzefI/zIsExVUaB30X6s4i419yJJLJbEO+mRqRUQktE0YR5eSXtWbycCBYP1ZH4zc/bn9yT7ZiFt4HfLzs8o85zi4K40PGHXtGJF2HPvRCrboUnClJpPJn5i7lOxOvBFiwcidZAC/Dm4j/HE31wXchc+6yTN2KgffUJkLZlChYdox50E9Q0n36LXic9UkjnTe7EMA5PIp7yk5hzxk2cZym8w8K15V+UCQWmE2cVXQmEC2J5Mo4BXlI1OgrCpX2dsXamuMkW2AmQJPr8YqmEjASbK6tcrl3wO0bLxnMvc39SBlgNJABTdeFHNUFXob1g2+Ur10oW/i3+D80UEYSgVxIipgJjKMfSyy4Jq4K2ejFPQVwteaKRuApBIbaKlJVbMsVC/xEvFyZ7Q0CWzgR5ij4P6MJjJxPCNjYTeUtmuHN1U+r5C9yBT0qv7QL5VOjLSFEfUby8OSmTT5HADiXfIOaG5HQTVAB68F1mgZusv4rnDSQZtTn/fqsjdDk41XVIbxI9yJcBBolR
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR11MB8033.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?RFVyUHRRcWlGc0pzUlVnUUJlZ3c0SFlHUm50NGcyT2lUTHZ0R3FuekpEQVhF?=
- =?utf-8?B?RDluNnhDQ29oS2N4eUVUZThBclFZa2l2bTV5K2FJelhuMzgvdW13bVZRVFJM?=
- =?utf-8?B?OVdtblRoKzQ4WEtoRWVRM29sM2hWNG4rTHB2K3BNVGVwcGUvR09BYlhIb0lB?=
- =?utf-8?B?U3gxQmcxVEdFYStQbkNlNW41b1NJQkZWWHkwWGRQZDhrcHVlbHZ5c3QrSFlY?=
- =?utf-8?B?elNGbVFyaEduWGs5N3VKbzF5VU82bythaVZ4eFc5TGVmY215SFhzL1p5QTdl?=
- =?utf-8?B?U0NRMUtLS3FZTjFHYlhGTUVFNkpYemNmVWQ5ZlBpdndoK2U5RlRXeW9yZE5M?=
- =?utf-8?B?ajFuMy9uWDllUlJFclppb0FreUZlSGREZU43bWQweWFHek4rOGx5QUE5ZHU4?=
- =?utf-8?B?d2xSdjlEZlNDMmxQT1Zydit4aitiZWNlZ0tHMUpGMk0rcFIvSEwxY3ZZM3Mr?=
- =?utf-8?B?YUJ5aW1BNmIvc2lLR0NlMjRacXhVZHEvWWRVcUVWZmVuTEdmTkJRemc2ZmRw?=
- =?utf-8?B?bm9hUk8vREJKcGQvaUZjNExaNUswWjBpekl3RjFNdGhlWW5qaVR2T1pqM0FW?=
- =?utf-8?B?ck1KV3dPRU9CbCtueEppY1NnRnJvSVJINCtKMjZrZXFtcHNpZjZ2QWdySEdV?=
- =?utf-8?B?M3kxQ3pJSkVsOU1XZVRFbmI5M3FRZlQ2VVA0NEtEKzZqK3JTRVBUYnRDWE1X?=
- =?utf-8?B?Tm92QzJJVitlSWVKakhQUHBlMitTTlREZ2hSdFRkRVlFeEQ3VC9pTHpDOGtC?=
- =?utf-8?B?cXB3UzdQZ3pHN3hNak93aGRpenFmM1hycGNIK3dxQ1liVnJSTlBSOFJGZnNS?=
- =?utf-8?B?Y0VqRGdQU1ppbzBmdzdEMG5QUHdqNnV6ekU4SDZibVh6WnNsMlhHSmwyTTRk?=
- =?utf-8?B?YmJFbkZmaXYxZWhGSzBjRktEbTYweEZIRmdDTUZITDlEdysxa0JwdFJIWTQw?=
- =?utf-8?B?OU1XaUZlWlFrbktuTTN0b1EzTjgyaEtldklSRFFsTlp1ZmE2V0xWZXFEN1VY?=
- =?utf-8?B?d2FlT1RuYmZIcGJzeHFJbTZ3T0MvRkY3L09IT0hWRVo1dCtBcFBkck9Md1lP?=
- =?utf-8?B?b2VUREFvZkczaEVPM3ZRaW00dkdhRC9NejVyK0NVcUV2N2t2RW95VEpsRUNK?=
- =?utf-8?B?Y0xueEFMVEpvcnBRcEpPOWI2VFdrSWoyNC9oUDdBU1pTVk14eTJnTm1iaUF6?=
- =?utf-8?B?SW0zbWJKcFFBYmptUXVTVmNKUmZTVG1ZdEh3eHZ1RjFkWVdadlFRWkJSazF4?=
- =?utf-8?B?VlpReUIxN3ZtRWhFUjc0WklsWDV4YWpsMHlaUnBLN2VYcC9mcUY5MWQ1MEhw?=
- =?utf-8?B?NGt3Z1Z5aFozamx6WmREVHQ2VlIwNnZzbVVVQk1rK3kwbmIyVWV3NXI1cTla?=
- =?utf-8?B?TjFjK290ek9YeXZTM2J2SVEzOVZmdDVRWHYzRnEzVUt1ZDVPTW5xMk5INkw1?=
- =?utf-8?B?RWl0aHBEdDQ4UDRjSVMvK1dGNDFtNVNjNXFKeVBuOVpxUklzU3FkaVhNTmVK?=
- =?utf-8?B?dC9rMk1ielNPS0JZaXFFU3EyMnVNSW9sNVNPLzdtTzN5NmtXYW5Jb0pBMXVS?=
- =?utf-8?B?ZjVNaW5kZGd6UjNra05nRjFXeDQvejgyWExTTVN6aHZqWVNEaGZjK3krVkcz?=
- =?utf-8?B?UmtoemhPOWNBRi9udFg4U1FtLzBUZjlBRnFSNkJOWlNORDZqL21IaVRWdk1W?=
- =?utf-8?B?c0tnSjhwMjJ6TEdIbWFaMWlDUjZPK0p0cEk2ZTBrRDl5bkQ5SmNBZkRrRGR4?=
- =?utf-8?B?RjJndkhvOGg4Y2k0UGdGeHhibkZOcEcxRVpmeVpqWkpQQjBjUlRiR0RHZWhv?=
- =?utf-8?B?d2Fuaks2enovbjBUVkVjVTNjeEEva2JDWHJxSWwrNmJLUHIxTzBzRjh6OGpj?=
- =?utf-8?B?MUVrNmpxeDdqRWRibkFpUWh4dVZkZjdmakIvM1kraEYyVHZxUmFhbWN2SjZw?=
- =?utf-8?B?bGh0SDZVS1I5T01iRWRyMGJvVFNFQlg0bFJybXNzUEN0OGpwcSt1Q0hRdy9h?=
- =?utf-8?B?bUZtTnBqOG44TUFEai9VallJZkVWMjdFc29TcTNRa0YxeitZbkovNUcyV093?=
- =?utf-8?B?bHh0ZDI1OGxrVnpPaml4c0lRUEd3M21uaE1tT0thT21TRzc3bGVXblVReURX?=
- =?utf-8?B?SVBLQzJFNDdQWU1KL1FzNU9GOFZqL3dXUTBpUkV6RUh4aDhmTS9ldExxS1pj?=
- =?utf-8?B?RkE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <DEA3545F2D7D6C4D8D41F8F55AEC296B@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ SJ2PR11MB8537.namprd11.prod.outlook.com (2603:10b6:a03:56f::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7292.34; Mon, 19 Feb 2024 14:56:50 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::ccab:b5f4:e200:ee47]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::ccab:b5f4:e200:ee47%6]) with mapi id 15.20.7292.036; Mon, 19 Feb 2024
+ 14:56:50 +0000
+Date: Mon, 19 Feb 2024 15:56:39 +0100
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Pavel Vazharov <pavel@x3me.net>
+CC: Magnus Karlsson <magnus.karlsson@gmail.com>, Toke
+ =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@kernel.org>, Jakub Kicinski
+	<kuba@kernel.org>, <netdev@vger.kernel.org>
+Subject: Re: Need of advice for XDP sockets on top of the interfaces behind a
+ Linux bonding device
+Message-ID: <ZdNsJzWpho81ichG@boxer>
+References: <CAJEV1ig2Gyqb2MPHU+qN_G7XDVNZffU5HDm5VkoGev_QOe7bXg@mail.gmail.com>
+ <87r0hyzxbd.fsf@toke.dk>
+ <CAJ8uoz0bZjeJKJbCOfaogJZg2o5zoWNf3XjAF-4ZubpxDoQhcg@mail.gmail.com>
+ <CAJEV1ihnwDxkkeMtAkkkZpP5O-VMxVvJojLs6dMbeMYgsn7sGA@mail.gmail.com>
+ <ZcPTNpzGyqQI+DXw@boxer>
+ <CAJEV1ihMuP6Oq+=ubd05DReBXuLwmZLYFwO=ha2C995wBuWeLA@mail.gmail.com>
+ <CAJEV1igugU1SjcWnjYgoG0x_stExm0MyxwdFN0xycSb9sadkXw@mail.gmail.com>
+ <CAJEV1ijnUrJXOuGW5xnuCvMTtaC1VKhOXQ0_4iJnqR5Vco4yLg@mail.gmail.com>
+ <Zc+aN4rYKZKu3vKx@boxer>
+ <CAJEV1ij+fYUhXmscxk_tsgDppHFWZLuP_bc_gUhZPLMdi4qLQA@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <CAJEV1ij+fYUhXmscxk_tsgDppHFWZLuP_bc_gUhZPLMdi4qLQA@mail.gmail.com>
+X-ClientProxiedBy: DB8P191CA0021.EURP191.PROD.OUTLOOK.COM
+ (2603:10a6:10:130::31) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|SJ2PR11MB8537:EE_
+X-MS-Office365-Filtering-Correlation-Id: cb94ab72-aa52-4f57-c785-08dc315b006d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: MKgsXuwO6KvFlpRmMDkW/ti4z34Eh2UEQ1IYF/Z1xabHwMwlJna05ycLggbFldR53H26I/FHi6I/cVuRy0z+5+Qn36b4srid5CIZHYOINTr1Sv5f+2xK/bFHALWFqosXqxklOxzrTvfQgd6+TUCXEeCMoPrDWF+blbpl6fB2Xl9cRVxV/unT8kSw37Jud18Z7xsQPyhGqlZ2jIAZEAhhRI1wERqb2zQo+Zd45zm/X0MAJeyMqHasn16zQLK13iG88Tbzo7/GTj/Byhtnd1s3sl2tM1+hZizF4X2COujboqM+6JputawKbK9lPVuZ8zPsrlYg3zG6pfFjy6PGUAcFozsjI4dl0oGrdKrm4agGH1MS/HOZVilGW/6tUEwTCTglU9zE1vLanahK16+jVX1KrBnWSeUaZ1y6aYiR16gp7r8KnCX4KCotUR5vmLMz37RYNl7p3GOD/bq1abBOEcGJR53J9/Tp5cIBhZ1oRvwfEWtVMWVMlNUjWa5riHNBUZU4A3LAxwyYDr3wAnYwZkshzZdx6VEAgtmkN6pMjZbeN24=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?thYAAL8YeaIqMVFhNYnMzZ+fQfipSv2zGFKiCnpQgchjLwrA+JzshM5Y12sw?=
+ =?us-ascii?Q?+CA18UK99Zh1B06bxMCMqx/K1XENM2twyG20bor+tXmTTFTpuD4Et33xNfC3?=
+ =?us-ascii?Q?AmdeGv+ExhsLQDjRqC9+0j7rr3XxSm7FLHs65161E/iPp6prBgDyJyuob05n?=
+ =?us-ascii?Q?4MG7AXbZeAb1dcaHh0E5MhfzSUi5fkLVlqB6hYah2KA8uZXN+BN4jBx6MCeJ?=
+ =?us-ascii?Q?FRhssJeMTUZ13PIRg07pEubBgJJ8aGHAx26G/hf3Cz7sjB4s8m2lwR7GM8Zr?=
+ =?us-ascii?Q?W5WKBa/b3Js+quVevQL9HD8Q6Qu7XVEkitUJ3h6mGktXAky6KkglHWKyuH4I?=
+ =?us-ascii?Q?hxIipH2N2Xu40uSxsnsDFVmJ7D2u7YX47xySghimhaak8WOjiOG2eYI2AZUA?=
+ =?us-ascii?Q?0AuV1mQ61P4ARsQv3qPDxZUrbvexKxVEcc+WLByliRN9BCZdg29voQgiHbZc?=
+ =?us-ascii?Q?0fckuVULdVv0WZ9rKYKzmFpPsLDepfGU37pJCZyhMBaPYiFmQ9EpkmGnbziU?=
+ =?us-ascii?Q?c+DYmYW/1n4d/LCLvpq9wDSv3UvlJxjbK3QgrOuCdAjVlnupM8gdWeCzFocf?=
+ =?us-ascii?Q?I1XId0b7Y2IuJ62Hnr6VabvJiFEZaMStX6LMC8VZaoPKuxA5nS6Kc7DXMXnU?=
+ =?us-ascii?Q?0u7hK4prRHbFSyrq7zA1eushMBR1XaoTec1Mn0g+HhPf6KMP8OgFnWkYk8nM?=
+ =?us-ascii?Q?4pEj8wjB1CEtYRJ4j452uHY3pPN71GtMXqkvQe6uEA0AbPgCK89+GAQ2SI2j?=
+ =?us-ascii?Q?u65DExRIR4sYMnevzU9IulE8aBG72Lcn4EPHHwSrkOXG3WzVTXYrLbeFVjph?=
+ =?us-ascii?Q?xdoDiGGi2FqEwXSr7S7TqsgzWAUvkuACuKsJex8SYvF665gp9j3RiL42arA9?=
+ =?us-ascii?Q?QAb02xcPdtUisNp7LWO9zvoYbjp9XhAJvNl0+WQqTckfkdenwSA7zE1ORI+C?=
+ =?us-ascii?Q?OO4qYZGvsmhmfX7joX+39v49RcKOc+HE+zK92airWQBAwqLV3CXebbXosz01?=
+ =?us-ascii?Q?0qlWys2S3/8l0hpasX3VoKiClrRrI9x7nxXVVs055uNDvWEKBRZgzn+W1H/+?=
+ =?us-ascii?Q?ujlrcUusfFZSgWG9/N7+w6mYf8rM+gHTD93ia/N3Vcip7PEAcEMJGJT2JZNc?=
+ =?us-ascii?Q?E7QhQYtxnk5/owTjSx8EligECogdeh/uQ+1Ge+vetsZTyOjEyT6OHK5MBw+a?=
+ =?us-ascii?Q?NYxLgSShkXHvCCZofiP8lilHUwyBgvHnMzJmguzScpJ4+WnR1QZ5AmtQcV4F?=
+ =?us-ascii?Q?FeGOm6PlaRYysOYo7US2Y6DGlF+wmKCfbs5Ab8I3WV8UVD9OrIVa0i/zdgQd?=
+ =?us-ascii?Q?FSTiJ+tChOXDtfDGOhigVRfhXuYEQBCCuP/nEUaF+Q8UrAT3XRPGMsRfX1aA?=
+ =?us-ascii?Q?ChMXCVclIO+mRNFpOGU8bmH+89+mbUAnGrLZqZvnpAqPrDmgnk+ykFzS2zFP?=
+ =?us-ascii?Q?43ik3guUtZdO/CHDee3LYR+gx3oNfpxbnJ/MHNl2ZP4GYqtdZzRYBDZkhn4J?=
+ =?us-ascii?Q?4zhbC9awlmWPk0Ip7Eo8jP/sTf0LxRTIh7uGQOVkOZfCNbMsRUTwsR6jFner?=
+ =?us-ascii?Q?ACBqHzTzY1YBs68ixnA5sN3llOBPZybPw9lxIHhQvlwVKevGsEl1wqqMYL1L?=
+ =?us-ascii?Q?1g=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: cb94ab72-aa52-4f57-c785-08dc315b006d
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR11MB8033.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 390cd023-ac04-4fa8-dbc4-08dc315af30d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Feb 2024 14:56:27.3776
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2024 14:56:50.0059
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vm2itHuUWgypH341aU0Vg8s3qgfCTXLf9XrmkxjIjjjyxEUBUHrDbclU6lNFauHCMNzjzl/M/5ovcTXP9Dk7qgngqhY11+2eeADnqXemnP4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8482
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZO4601noSKKQx0oWFtwdNUQldegAXwU/boqwrrSjbP+dYbEt78seOufoUsWWPT/xdvFadzYzVieB6XPvHApMMYuwiv5IFx4g6QPJ0l+dm30=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8537
+X-OriginatorOrg: intel.com
 
-SGkgT2xla3NpaiwNCg0KT24gTW9uLCAyMDI0LTAyLTE5IGF0IDE0OjE2ICswMTAwLCBPbGVrc2lq
-IFJlbXBlbCB3cm90ZToNCj4gDQo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL25ldC9kc2EvbWljcm9j
-aGlwL2tzel9jb21tb24uYw0KPiBiL2RyaXZlcnMvbmV0L2RzYS9taWNyb2NoaXAva3N6X2NvbW1v
-bi5jDQo+IGluZGV4IDdjZDM3MTMzZWMwNS4uMTBlNGExNDY3MWUyIDEwMDY0NA0KPiAtLS0gYS9k
-cml2ZXJzL25ldC9kc2EvbWljcm9jaGlwL2tzel9jb21tb24uYw0KPiArKysgYi9kcml2ZXJzL25l
-dC9kc2EvbWljcm9jaGlwL2tzel9jb21tb24uYw0KPiBAQCAtMTkyNiw3ICsxOTI2LDggQEAgc3Rh
-dGljIHZvaWQga3N6X3VwZGF0ZV9wb3J0X21lbWJlcihzdHJ1Y3QNCj4ga3N6X2RldmljZSAqZGV2
-LCBpbnQgcG9ydCkNCj4gICAgICAgICAgICAgICAgIGlmIChvdGhlcl9wLT5zdHBfc3RhdGUgIT0g
-QlJfU1RBVEVfRk9SV0FSRElORykNCj4gICAgICAgICAgICAgICAgICAgICAgICAgY29udGludWU7
-DQo+IA0KPiAtICAgICAgICAgICAgICAgaWYgKHAtPnN0cF9zdGF0ZSA9PSBCUl9TVEFURV9GT1JX
-QVJESU5HKSB7DQo+ICsgICAgICAgICAgICAgICBpZiAocC0+c3RwX3N0YXRlID09IEJSX1NUQVRF
-X0ZPUldBUkRJTkcgJiYNCj4gKyAgICAgICAgICAgICAgICAgICAhKHAtPmlzb2xhdGVkICYmIG90
-aGVyX3AtPmlzb2xhdGVkKSkgew0KPiAgICAgICAgICAgICAgICAgICAgICAgICB2YWwgfD0gQklU
-KHBvcnQpOw0KPiAgICAgICAgICAgICAgICAgICAgICAgICBwb3J0X21lbWJlciB8PSBCSVQoaSk7
-DQo+ICAgICAgICAgICAgICAgICB9DQo+IEBAIC0xOTQ2LDcgKzE5NDcsOCBAQCBzdGF0aWMgdm9p
-ZCBrc3pfdXBkYXRlX3BvcnRfbWVtYmVyKHN0cnVjdA0KPiBrc3pfZGV2aWNlICpkZXYsIGludCBw
-b3J0KQ0KPiAgICAgICAgICAgICAgICAgICAgICAgICBpZiAodGhpcmRfcC0+c3RwX3N0YXRlICE9
-DQo+IEJSX1NUQVRFX0ZPUldBUkRJTkcpDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgY29udGludWU7DQo+ICAgICAgICAgICAgICAgICAgICAgICAgIHRoaXJkX2RwID0gZHNhX3Rv
-X3BvcnQoZHMsIGopOw0KPiAtICAgICAgICAgICAgICAgICAgICAgICBpZiAoZHNhX3BvcnRfYnJp
-ZGdlX3NhbWUob3RoZXJfZHAsIHRoaXJkX2RwKSkNCj4gKyAgICAgICAgICAgICAgICAgICAgICAg
-aWYgKGRzYV9wb3J0X2JyaWRnZV9zYW1lKG90aGVyX2RwLCB0aGlyZF9kcCkNCj4gJiYNCj4gKyAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICEob3RoZXJfcC0+aXNvbGF0ZWQgJiYgdGhpcmRfcC0N
-Cj4gPmlzb2xhdGVkKSkNCg0KUmV2aWV3ZWQgdy5yLnRvIHJlYWRhYmlsaXR5IGFuZCBtYWludGFp
-bmFiaWxpdHkuDQpibGFuayBsaW5lIGFuZCBjb21tZW50cyBhYm92ZSB0aGUgaWYgc3RhdGVtZW50
-IHdpbGwgYmUgZ29vZC4NCg0Kb3RoZXJ3aXNlDQpBY2tlZC1ieTogQXJ1biBSYW1hZG9zcyA8YXJ1
-bi5yYW1hZG9zc0BtaWNyb2NoaXAuY29tPg0KDQo=
+On Mon, Feb 19, 2024 at 03:45:24PM +0200, Pavel Vazharov wrote:
+
+[...]
+
+> > > We changed the setup and I did the tests with a single port, no
+> > > bonding involved.
+> > > The port was configured with 16 queues (and 16 XSK sockets bound to them).
+> > > I tested with about 100 Mbps of traffic to not break lots of users.
+> > > During the tests I observed the traffic on the real time graph on the
+> > > remote device port
+> > > connected to the server machine where the application was running in
+> > > L3 forward mode:
+> > > - with zero copy enabled the traffic to the server was about 100 Mbps
+> > > but the traffic
+> > > coming out of the server was about 50 Mbps (i.e. half of it).
+> > > - with no zero copy the traffic in both directions was the same - the
+> > > two graphs matched perfectly
+> > > Nothing else was changed during the both tests, only the ZC option.
+> > > Can I check some stats or something else for this testing scenario
+> > > which could be
+> > > used to reveal more info about the issue?
+> >
+> > FWIW I don't see this on my side. My guess would be that some of the
+> > queues stalled on ZC due to buggy enable/disable ring pair routines that I
+> > am (fingers crossed :)) fixing, or trying to fix in previous email. You
+> > could try something as simple as:
+> >
+> > $ watch -n 1 "ethtool -S eth_ixgbe | grep rx | grep bytes"
+> >
+> > and verify each of the queues that are supposed to receive traffic. Do the
+> > same thing with tx, similarly.
+> >
+> > >
+> > > > >
+> Thank you for the help.
+> 
+> I tried the given patch on kernel 6.7.5.
+> The bonding issue, that I described in the above e-mails, seems fixed.
+> I can no longer reproduce the issue with the malformed LACP messages.
+
+Awesome! I'll send a fix to lists then.
+
+> 
+> However, I tested again with traffic and the issue remains:
+> - when traffic is redirected to the machine and simply forwarded at L3
+> by our application only about 1/2 - 2/3 of it exits the machine
+> - disabling only the Zero Copy (and nothing else in the application)
+> fixes the issue
+> - another thing that I noticed is in the device stats - the Rx bytes
+> looks OK and the counters of every queue increase over the time (with
+> and without ZC)
+> ethtool -S eth4 | grep rx | grep bytes
+>      rx_bytes: 20061532582
+>      rx_bytes_nic: 27823942900
+>      rx_queue_0_bytes: 690230537
+>      rx_queue_1_bytes: 1051217950
+>      rx_queue_2_bytes: 1494877257
+>      rx_queue_3_bytes: 1989628734
+>      rx_queue_4_bytes: 894557655
+>      rx_queue_5_bytes: 1557310636
+>      rx_queue_6_bytes: 1459428265
+>      rx_queue_7_bytes: 1514067682
+>      rx_queue_8_bytes: 432567753
+>      rx_queue_9_bytes: 1251708768
+>      rx_queue_10_bytes: 1091840145
+>      rx_queue_11_bytes: 904127964
+>      rx_queue_12_bytes: 1241335871
+>      rx_queue_13_bytes: 2039939517
+>      rx_queue_14_bytes: 777819814
+>      rx_queue_15_bytes: 1670874034
+> 
+> - without ZC the Tx bytes also look OK
+> ethtool -S eth4 | grep tx | grep bytes
+>      tx_bytes: 24411467399
+>      tx_bytes_nic: 29600497994
+>      tx_queue_0_bytes: 1525672312
+>      tx_queue_1_bytes: 1527162996
+>      tx_queue_2_bytes: 1529701681
+>      tx_queue_3_bytes: 1526220338
+>      tx_queue_4_bytes: 1524403501
+>      tx_queue_5_bytes: 1523242084
+>      tx_queue_6_bytes: 1523543868
+>      tx_queue_7_bytes: 1525376190
+>      tx_queue_8_bytes: 1526844278
+>      tx_queue_9_bytes: 1523938842
+>      tx_queue_10_bytes: 1522663364
+>      tx_queue_11_bytes: 1527292259
+>      tx_queue_12_bytes: 1525206246
+>      tx_queue_13_bytes: 1526670255
+>      tx_queue_14_bytes: 1523266153
+>      tx_queue_15_bytes: 1530263032
+> 
+> - however with ZC enabled the Tx bytes stats don't look OK (some
+> queues are like doing nothing) - again it's exactly the same
+> application
+> The sum bytes increase much more than the sum of the per queue bytes.
+> ethtool -S eth4 | grep tx | grep bytes ; sleep 1 ; ethtool -S eth4 |
+> grep tx | grep bytes
+>      tx_bytes: 256022649
+>      tx_bytes_nic: 34961074621
+>      tx_queue_0_bytes: 372
+>      tx_queue_1_bytes: 0
+>      tx_queue_2_bytes: 0
+>      tx_queue_3_bytes: 0
+>      tx_queue_4_bytes: 9920
+>      tx_queue_5_bytes: 0
+>      tx_queue_6_bytes: 0
+>      tx_queue_7_bytes: 0
+>      tx_queue_8_bytes: 0
+>      tx_queue_9_bytes: 1364
+>      tx_queue_10_bytes: 0
+>      tx_queue_11_bytes: 0
+>      tx_queue_12_bytes: 1116
+>      tx_queue_13_bytes: 0
+>      tx_queue_14_bytes: 0
+>      tx_queue_15_bytes: 0
+
+Yeah here we are looking at Tx rings, not XDP rings that are used for ZC.
+XDP rings were acting like rings hidden from user, issue has been brought
+several times but currently I am not sure if we have some unified approach
+towards that. FWIW ixgbe currently doesn't expose them, sorry for
+misleading you.
+
+At this point nothing obvious comes to my mind but I can optimize Tx ZC
+path and then let's see where it will take us.
+
+> 
+>      tx_bytes: 257830280
+>      tx_bytes_nic: 34962912861
+>      tx_queue_0_bytes: 372
+>      tx_queue_1_bytes: 0
+>      tx_queue_2_bytes: 0
+>      tx_queue_3_bytes: 0
+>      tx_queue_4_bytes: 10044
+>      tx_queue_5_bytes: 0
+>      tx_queue_6_bytes: 0
+>      tx_queue_7_bytes: 0
+>      tx_queue_8_bytes: 0
+>      tx_queue_9_bytes: 1364
+>      tx_queue_10_bytes: 0
+>      tx_queue_11_bytes: 0
+>      tx_queue_12_bytes: 1116
+>      tx_queue_13_bytes: 0
+>      tx_queue_14_bytes: 0
+>      tx_queue_15_bytes: 0
 
