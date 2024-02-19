@@ -1,127 +1,155 @@
-Return-Path: <netdev+bounces-72832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6197D859DBD
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 09:02:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90BEE859DCA
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 09:03:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 028B3B2106D
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 08:02:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3DAA1C2216C
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 08:03:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23BF82421E;
-	Mon, 19 Feb 2024 07:57:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71D2E210FA;
+	Mon, 19 Feb 2024 08:01:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="VVl8JQpi"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="o7TGhRmT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com [209.85.222.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CC2824B24
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 07:57:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD6F8C8D6;
+	Mon, 19 Feb 2024 08:01:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708329431; cv=none; b=a84pUQoRO+XGLAinMIWE22nXK9vpZpNSVv7cKiTxzFnjgOwZm6iIcyQbxV3KDV5Sjh4jV7ZVh9dm5iNR6WLEjQuei5ZdnR6k9z5y45Rn4y/q6VH/obE3Eh2KjA9NdLDSGJyNCpK0jsQjUB72tX73M/pFr74ynR2tPSa64xu8bcg=
+	t=1708329668; cv=none; b=T9USjC//3nIGyYSFgi2nT0nfdQHzQRWA7byPRKVohtjsQOiOgOi9jRV05Fvo04fG3NckBvgvrHx6IRTU9KhravczRJlBuNy1+6uAJ4yUX2PmHqoD57l0NCsflEmNY6ntQSrGP90RwcJJbIsjlGI08/vGD6EOMfWjcBxTZpXOvPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708329431; c=relaxed/simple;
-	bh=Oey3ZN4EIWUJzNAo3Boteeg+KwnzJ3oRelbiZ+NcSGs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Fj3wAcZOPwGktE0u98fmDjZtntCgze0OiDJ7i+CFdxVek2mLXRpLvWGsxpiL0DgsdQiemFPrbIE5IrTU2iOL1DWJ0XF1VAb3TIj7CcXanRBDsnyOEHfKK5LdjWiX2xnL8PUwVFFoAiIYrUrf8Ec8c9Eepp0yCLSzNo038yyPCkA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=VVl8JQpi; arc=none smtp.client-ip=209.85.222.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-ua1-f52.google.com with SMTP id a1e0cc1a2514c-7d5fce59261so2632456241.3
-        for <netdev@vger.kernel.org>; Sun, 18 Feb 2024 23:57:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1708329428; x=1708934228; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Oey3ZN4EIWUJzNAo3Boteeg+KwnzJ3oRelbiZ+NcSGs=;
-        b=VVl8JQpietD6ymCw8P666kr9JYEJOP/6jeXxWYk9wcv7MiDlOZHDq7j78X8ip5RtIL
-         oGOg9zYfQV0Sd4wVp+AvOhyd1zR/usG2RKVc8dc9MV8tXFrH2CeZQ0YWWa9evUyQJQ/s
-         drcPWv7qhkki+1T1yyXOIwpaLakGZoChRSfvzccCuQY3XjVtz7jCXViDDBb1vrPa2K8Y
-         +EcJXvaxSF6pM2Uk9/oetGyr/zPuk4PGPok/1+mdFuioVNYGLnilS9zjbbOY1YFcZHCB
-         B15hP2Ev/V3gsUF7j4dhNYeKiiKrTNge27kTORfRqqI7x30iJgnGqpsogtpL9MH66rbC
-         tBxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708329428; x=1708934228;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Oey3ZN4EIWUJzNAo3Boteeg+KwnzJ3oRelbiZ+NcSGs=;
-        b=ObpV4x1RebxXiShuvn9UMiDsYsloGSUIRFJhH1w3Jswxx6RfxLpnAfTp7rBGOJtglG
-         +K9MsIgE2SE8yLjdkFBUWMfaaR2JECnBhLRkt0xdHSOQkYGlDvDlVpq/e/dAEqRKyXuH
-         RDrCdaR+NWuSP6XoCChyenRHREFo8miaHYaBNN2IXA5kmZcWffJUux8g3fEqJ+sraYsN
-         0jy84xbxz7KtZM73uJUXXCWAz+qlzCT5SlEnxYyZBv1K3idSaRpKmu1oxAR3VYA9z/X2
-         zJtIs8g04rOEQtGFu71s4ok6phhvi0uZcx3qr2QNC5qpM7BZwXiDr6t70o7hQrLH3jJ6
-         lH2A==
-X-Forwarded-Encrypted: i=1; AJvYcCX5kVeNuqV3wQMQnaAgQohZDtiqpmMmv4JJG4XZo0hKgimUDIpl8zzhmCKfZVyZsjK1E1dX5XSDdi0flHF/gfsDsrzT1eVB
-X-Gm-Message-State: AOJu0Yw9AoUbuB4exEGrsqVHu421/GpoYHmIuxZD2rWzQa4VFttMWN0a
-	wp26zGfihbZ3lyv1QTfmJpTaNkvLZlx8Vii/3egbipfhepY/c4f4n9jC8R3Iky4NcLufbF5CVT7
-	wpuON4YvWUkT/QVj5rE71BLOob9J5nHRUG5gxJA==
-X-Google-Smtp-Source: AGHT+IGkQijUvXHSNfPb2HxhHlZq4HKDdG92W7zvsTAzBpVd1PSmvpJBFeiTOYN7sqVAKs/Q5f+Y2wj1Qp78qPvhlpQ=
-X-Received: by 2002:a05:6102:409:b0:470:4cfa:c814 with SMTP id
- d9-20020a056102040900b004704cfac814mr2022895vsq.24.1708329428140; Sun, 18 Feb
- 2024 23:57:08 -0800 (PST)
+	s=arc-20240116; t=1708329668; c=relaxed/simple;
+	bh=rfQkQXfU5XnbLWnwEW1iiJydHy5t2btASLhVXbbDWdw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JCL5e4k/PDndPrrVCxwiGZ8nOxS8qneEgJA1VWAmcWhkLGGiIpJ37hv0m4Aq01ZzwI2aIcgHMr4Fx3qSWFdyEYbTL6xWIEJhLK76wutWob4NEcST9zzGVqJGd+7oTJZuz1iVrgCwVum+q0qweDOnc3KuVk8k+WeF2JHD6mwni3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=o7TGhRmT; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1708329666; x=1739865666;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=rfQkQXfU5XnbLWnwEW1iiJydHy5t2btASLhVXbbDWdw=;
+  b=o7TGhRmTYZF2XT1nrisU4e5Mrtwp+eCJl3uSf27mDp0B+DXo12k7bQBo
+   0UUcOevK6kjH8VSh31DX3wSjto74g3mtMw0Znh/WLtnykZ9DCD4ua1Q9P
+   PUxiiNyp80FxdgkQkrql+kkpmOCE6NVwXdS/SVp5t8BDs6yh5MhC6mF8S
+   r1oT4DGxDOvWwGQ634iojxBSWu9Vu+PTLru0TzakKc2H7GaJ1754q0ef8
+   FnkCr9Umkj1QG79So2lVMTAQnEvC+B83uA1kP4OXuDpxc1caKc89KAJJz
+   cYsg/mgY772jWw0ROygPPaQvvyGKwJSlOCsS0DwgInpOcfTDQXBPShzRc
+   Q==;
+X-CSE-ConnectionGUID: 0bIe6Jl+SMycL+aUC1NHPA==
+X-CSE-MsgGUID: XC9el0JIT7ONn6Wduk/pEg==
+X-IronPort-AV: E=Sophos;i="6.06,170,1705388400"; 
+   d="scan'208";a="247196761"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Feb 2024 01:00:59 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 19 Feb 2024 01:00:49 -0700
+Received: from DEN-DL-M31836.microsemi.net (10.10.85.11) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Mon, 19 Feb 2024 01:00:46 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <lars.povlsen@microchip.com>,
+	<Steen.Hegelund@microchip.com>, <daniel.machon@microchip.com>,
+	<UNGLinuxDriver@microchip.com>
+CC: <rmk+kernel@armlinux.org.uk>, <u.kleine-koenig@pengutronix.de>,
+	<yuehaibing@huawei.com>, <vladimir.oltean@nxp.com>,
+	<bjarni.jonasson@microchip.com>, <netdev@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>
+Subject: [PATCH net v3] net: sparx5: Add spinlock for frame transmission from CPU
+Date: Mon, 19 Feb 2024 09:00:43 +0100
+Message-ID: <20240219080043.1561014-1-horatiu.vultur@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240216203215.40870-1-brgl@bgdev.pl> <20240216203215.40870-3-brgl@bgdev.pl>
- <71e9a57e-8be3-4213-9822-45dfc5eb7ceb@linaro.org>
-In-Reply-To: <71e9a57e-8be3-4213-9822-45dfc5eb7ceb@linaro.org>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Mon, 19 Feb 2024 08:56:57 +0100
-Message-ID: <CAMRc=Md1PzoZFDWHWRufktmMiBE0Dp7eYhecpwuaS3AW-Y_g=w@mail.gmail.com>
-Subject: Re: [PATCH v5 02/18] arm64: defconfig: enable ath12k as a module
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Kalle Valo <kvalo@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konrad.dybcio@linaro.org>, Liam Girdwood <lgirdwood@gmail.com>, 
-	Mark Brown <broonie@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Saravana Kannan <saravanak@google.com>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>, 
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, 
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Mon, Feb 19, 2024 at 8:31=E2=80=AFAM Krzysztof Kozlowski
-<krzysztof.kozlowski@linaro.org> wrote:
->
-> On 16/02/2024 21:31, Bartosz Golaszewski wrote:
-> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >
-> > Build the ath12k driver as a module for arm64 default config.
->
-> This we see from the diff. Please tell us "why", e.g. "Board foo with
-> Qualcomm baz uses it."
->
-> Also this should not be in these series. It only makes the
-> power-sequencing patchset bigger, without any real reason.
->
->
-> Best regards,
-> Krzysztof
->
+Both registers used when doing manual injection or fdma injection are
+shared between all the net devices of the switch. It was noticed that
+when having two process which each of them trying to inject frames on
+different ethernet ports, that the HW started to behave strange, by
+sending out more frames then expected. When doing fdma injection it is
+required to set the frame in the DCB and then make sure that the next
+pointer of the last DCB is invalid. But because there is no locks for
+this, then easily this pointer between the DCB can be broken and then it
+would create a loop of DCBs. And that means that the HW will
+continuously transmit these frames in a loop. Until the SW will break
+this loop.
+Therefore to fix this issue, add a spin lock for when accessing the
+registers for manual or fdma injection.
 
-Got it, I will resend it separately.
+Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+Reviewed-by: Daniel Machon <daniel.machon@microchip.com>
+Fixes: f3cad2611a77 ("net: sparx5: add hostmode with phylink support")
+---
+v2->v3:
+- add missing fix tag as it is targeting net
+v1->v2:
+- target net instead of net-next
+---
+ drivers/net/ethernet/microchip/sparx5/sparx5_main.c   | 1 +
+ drivers/net/ethernet/microchip/sparx5/sparx5_main.h   | 1 +
+ drivers/net/ethernet/microchip/sparx5/sparx5_packet.c | 2 ++
+ 3 files changed, 4 insertions(+)
 
-Bart
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
+index d1f7fc8b1b71a..3c066b62e6894 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
+@@ -757,6 +757,7 @@ static int mchp_sparx5_probe(struct platform_device *pdev)
+ 	platform_set_drvdata(pdev, sparx5);
+ 	sparx5->pdev = pdev;
+ 	sparx5->dev = &pdev->dev;
++	spin_lock_init(&sparx5->tx_lock);
+ 
+ 	/* Do switch core reset if available */
+ 	reset = devm_reset_control_get_optional_shared(&pdev->dev, "switch");
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.h b/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
+index 6f565c0c0c3dc..316fed5f27355 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
+@@ -280,6 +280,7 @@ struct sparx5 {
+ 	int xtr_irq;
+ 	/* Frame DMA */
+ 	int fdma_irq;
++	spinlock_t tx_lock; /* lock for frame transmission */
+ 	struct sparx5_rx rx;
+ 	struct sparx5_tx tx;
+ 	/* PTP */
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c b/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c
+index 6db6ac6a3bbc2..ac7e1cffbcecf 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c
+@@ -244,10 +244,12 @@ netdev_tx_t sparx5_port_xmit_impl(struct sk_buff *skb, struct net_device *dev)
+ 	}
+ 
+ 	skb_tx_timestamp(skb);
++	spin_lock(&sparx5->tx_lock);
+ 	if (sparx5->fdma_irq > 0)
+ 		ret = sparx5_fdma_xmit(sparx5, ifh, skb);
+ 	else
+ 		ret = sparx5_inject(sparx5, ifh, skb, dev);
++	spin_unlock(&sparx5->tx_lock);
+ 
+ 	if (ret == -EBUSY)
+ 		goto busy;
+-- 
+2.34.1
+
 
