@@ -1,143 +1,241 @@
-Return-Path: <netdev+bounces-72852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96F2A859F38
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 10:07:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EF8B2859F45
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 10:09:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3719A1F22759
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 09:07:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64A6B1F21481
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 09:09:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEB1F2376D;
-	Mon, 19 Feb 2024 09:06:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5469D224E3;
+	Mon, 19 Feb 2024 09:08:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="XFFiFisl"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="DZBiokTQ";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="cEu3F6wK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAA6223772
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 09:06:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72C7222309;
+	Mon, 19 Feb 2024 09:08:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708333584; cv=none; b=VbG88ZCYa83lDzRx368SsA50FbErIHPQKNM/fpdGnvCK1WOun8bPPHr1LGSs4gRjhm4yhGwpamTrlhwbxgkiOD1pO4B2/119pXAc4OxysqTyR2NG655c+d7KVNeqlzAtQ7aqoG4icb1TldLxMdX9h3Er2nzQHC5SF6qa/BfHPWg=
+	t=1708333737; cv=none; b=gF69JPBpbvVEeI8lwciac4cNBXDAxmFGlD3Yl/ccQfhYYKlVq5dPsNK3raWEuYtlVJi211l0iO3ZUtlpUuoL9hqTJBrvlFQsWpHw9/k9UQzU+Iemvi3tmTSoXsVlx+AaOwWfpdoB+hjqRaZrRTrOpxue6xY5qCoeKXqFMKiwxz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708333584; c=relaxed/simple;
-	bh=vNA86siiVYo98e7OxqMMGWmjpnEWBdjaSnb8rCGzy2E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CL0dR7QtMmD50xioE1xQV3uN1n7Q/Ip3SgBiRakCj/YcR2X7Vw798g1eKnFrhMHeKHyi24Rd9pwuES4vmraVdJQb3IM5E4yMRLp1G+ikA+eGC5MGc444effnHuDvC5eHjpal4Vzy21dLZAvIP6EyUwjiKvHm6UYDRcG/UekaTHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=XFFiFisl; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2d21a68dd3bso34755271fa.1
-        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 01:06:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708333581; x=1708938381; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jGF7UvODRbTRcWLN9K5qWP6OVu/M2POJV7aO6clY4Ho=;
-        b=XFFiFislTwAvV355yGKqHz+KxoM75/lIK8+Bh+VVqi3sLiF1ehyQMljs8BP8tLKEiT
-         prigyT2+ZH72XFS9+QwqlTdfpmF+kKz/HU+puHiNXl5emBdcoWiJEm1O3GXasc/dTE2Q
-         nB4nraynxnuvT7JWzwAtqD0g+9oXFWcMjzF/J1mnLhW06z+LbV0WSZluc38qiZePeQo4
-         dTcjPaEZLWhiovR5GcPP0X+Ncc/piZiF72TxjZ8cZqimx3K3KuotV9szE8h1ySwfMm5i
-         +ZIHOUOL7IadkFFgfi8VwAsOX2k8W7nO/iOqIs/5TPrHSHfXbajzGpXW9XSAVHNoqHtm
-         Uieg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708333581; x=1708938381;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jGF7UvODRbTRcWLN9K5qWP6OVu/M2POJV7aO6clY4Ho=;
-        b=HdE/TYpzYTW6rl7yeWZNgUefkWQ/KN68gVRZMoFc6UlAqJtGxE9RJGX7WRM9oGOPxo
-         TzT6otfMJh0Bk2wmR28RZiUOq8TKNQ1UDc/2+HqVb+JkRXhKIBe5iHJHE7c1p0AkdY52
-         BqTJfU5ebeSmbSkoxb+wxiHAcbiBH0f47pYeAI0BTdPNe8atkCSP4ylqtYlQQDE1kewG
-         NdQFqEwARJm3VxMRPhvFcn5WCmgftd+ZJlIAGBSInyBt+apD0R7N1ck7LCjThav8ApaY
-         H2wWU9KHFgE3qTtxjLrHtyy3YWqS30gU/gFkYcoUN2TGzJJOuvVGUklaBKDEuqfqQHfS
-         8jBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV0daZ51r8AedHHpXrOkb934HRp6XOkewKB74huMUv7NTbKnH4W3XuuMrLWvceABpU2czOrefNXZO/y4e9r64UmZ9tKxVhF
-X-Gm-Message-State: AOJu0YwkW44xfrFViui+4t66YKHMAiWXY8W5iAMxFy34CaqdgxKr+eA/
-	VnkIAABbs6NvCHRiqTKsdCpjIj/KsWpOynpcYQy8S2dhlsDXs552TsUxsbkAVlQ=
-X-Google-Smtp-Source: AGHT+IEwOvxFmRZcL+F6DuZWGSdJRa8yr4JwlPXMX/9UC7iKJJyLeRQ69t7NWT4rk+eLq3Oq6uaV5A==
-X-Received: by 2002:a05:651c:509:b0:2d2:215e:157c with SMTP id o9-20020a05651c050900b002d2215e157cmr5261144ljp.7.1708333581016;
-        Mon, 19 Feb 2024 01:06:21 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id k4-20020a5d5184000000b0033b4f82b301sm9866724wrv.3.2024.02.19.01.06.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Feb 2024 01:06:20 -0800 (PST)
-Date: Mon, 19 Feb 2024 10:06:17 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: William Tu <witu@nvidia.com>, Jacob Keller <jacob.e.keller@intel.com>,
-	bodong@nvidia.com, jiri@nvidia.com, netdev@vger.kernel.org,
-	saeedm@nvidia.com,
-	"aleksander.lobakin@intel.com" <aleksander.lobakin@intel.com>
-Subject: Re: [RFC PATCH v3 net-next] Documentation: devlink: Add devlink-sd
-Message-ID: <ZdMaCfWRf9qpDSGR@nanopsycho>
-References: <dc9f44a8-857b-498a-8b8c-3445e4749366@nvidia.com>
- <20240131151726.1ddb9bc9@kernel.org>
- <Zbtu5alCZ-Exr2WU@nanopsycho>
- <20240201200041.241fd4c1@kernel.org>
- <Zbyd8Fbj8_WHP4WI@nanopsycho>
- <20240208172633.010b1c3f@kernel.org>
- <Zc4Pa4QWGQegN4mI@nanopsycho>
- <20240215175836.7d1a19e6@kernel.org>
- <Zc8XjcRLOH3TXHED@nanopsycho>
- <20240216184332.7b7fdba5@kernel.org>
+	s=arc-20240116; t=1708333737; c=relaxed/simple;
+	bh=+ZMPIvIwkppldENup3GEYut/raXsv5r8fa0cHqLSbv0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=k1CHWdp4/kG6C5k4KKQtAgWAYc9B/BEVd/VYEv/HgabxydiXp1M1TJ4xv7VgJCTdrUalaTNgKq0nqOJVjdKN4VS7xL2c3pAwJD1eRFerAzkdtv5b4VlMkwQElfWy3wD61K6hjNxGk0fZMThKHDvQjsgQcWF4eMMwcuW8SRwNWm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=DZBiokTQ; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=cEu3F6wK; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Florian Kauer <florian.kauer@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1708333733;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=CyuTyEUacN3pepSBJWL72y/0RunhnYpq37IXOd+sUdI=;
+	b=DZBiokTQDlOdztrlEBO0BdhvIfliISfFM5K/4igbF+EX0M5Mp/S53BDNd5VvTXiEMasiC+
+	1pefmKJK+6CZMS6Y0jjI5fLAfoPYLIdlKbqc239RxTpshpEr3JiGjXvtxKnO1gdNNuiFeN
+	/4rHIuIH/vToEnRmlN1KCZI94VpP8qeqK5W3rUcSGMFzlPiVDcl8XGqY6UyLuX8Rq/Vd6Y
+	NOSzYyxXxP2QooXTb1qGagaeOP6WCtrKISM/skhN1DwZudviNR5dtMOavYKqUZCbHLWGNf
+	4qUaTzsJOhkEJqTTtlCweMo+zOQAJRxQ/mR6D4FaFyyY3FobjVLEQdIRRcp1dg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1708333733;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=CyuTyEUacN3pepSBJWL72y/0RunhnYpq37IXOd+sUdI=;
+	b=cEu3F6wKVZE3xIS+G90z7VEP0pbOGI6Cah5j92ZjIX8P7r+WNCPCb+EsBK0mtFje58an/p
+	G0lCqcsKHNsJqlDA==
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Jithu Joseph <jithu.joseph@intel.com>,
+	Andre Guedes <andre.guedes@intel.com>,
+	Vedang Patel <vedang.patel@intel.com>
+Cc: Florian Kauer <florian.kauer@linutronix.de>,
+	kurt@linutronix.de,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH net 1/1] igc: avoid returning frame twice in XDP_REDIRECT
+Date: Mon, 19 Feb 2024 10:08:43 +0100
+Message-Id: <20240219090843.9307-1-florian.kauer@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240216184332.7b7fdba5@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-Sat, Feb 17, 2024 at 03:43:32AM CET, kuba@kernel.org wrote:
->On Fri, 16 Feb 2024 09:06:37 +0100 Jiri Pirko wrote:
->> >We disagree how things should be modeled, sort of in principle.
->> >I think it dates all the way back to your work on altnames.
->> >We had the same conversation on DPLL :(
->> >
->> >I prefer to give objects unique IDs and a bunch of optional identifying
->> >attributes, rather than trying to build some well organized hierarchy.
->> >The hierarchy often becomes an unnecessary constraint.  
->> 
->> Sure, no problem on having floating objects with ids and attributes.
->> But in case they relate to HW configuration, you need to somehow glue
->> them to a device eventually. This is what I'm missing how you envision
->> it. The lifetime of object and glue/unglue operations.
->
->My desired lifetime is that the object (shared pool) gets created when
->the first consumer (netdev) appears, and destroyed when the last one
->disappears. Just like you can configure huge rings on a NIC while its
+When a frame can not be transmitted in XDP_REDIRECT
+(e.g. due to a full queue), it is necessary to free
+it by calling xdp_return_frame_rx_napi.
 
-***
+However, this is the reponsibility of the caller of
+the ndo_xdp_xmit (see for example bq_xmit_all in
+kernel/bpf/devmap.c) and thus calling it inside
+igc_xdp_xmit (which is the ndo_xdp_xmit of the igc
+driver) as well will lead to memory corruption.
 
+In fact, bq_xmit_all expects that it can return all
+frames after the last successfully transmitted one.
+Therefore, break for the first not transmitted frame,
+but do not call xdp_return_frame_rx_napi in igc_xdp_xmit.
+This is equally implemented in other Intel drivers
+such as the igb.
 
->closed and that won't consume any memory, share pool shouldn't exist if
->all its consumers are closed.
->
->The tricky part is to come up with some way of saying that we want
->multiple netdevs to not only use a shared pool, but which ones should
->be sharing which pool, when the pools themselves don't get explicitly
->created. Right?
+There are two alternatives to this that were rejected:
+1. Return num_frames as all the frames would have been
+   transmitted and release them inside igc_xdp_xmit.
+   While it might work technically, it is not what
+   the return value is meant to repesent (i.e. the
+   number of SUCCESSFULLY transmitted packets).
+2. Rework kernel/bpf/devmap.c and all drivers to
+   support non-consecutively dropped packets.
+   Besides being complex, it likely has a negative
+   performance impact without a significant gain
+   since it is anyway unlikely that the next frame
+   can be transmitted if the previous one was dropped.
 
-Yeah, also, there is limitation of who can share with who.
+The memory corruption can be reproduced with
+the following script which leads to a kernel panic
+after a few seconds.  It basically generates more
+traffic than a i225 NIC can transmit and pushes it
+via XDP_REDIRECT from a virtual interface to the
+physical interface where frames get dropped.
 
->
->Gluing to the device is easier, IIUC, once the pool is create we can
->give it whatever attributes we want. devlink ID, bus/device, netdev,
->IOMMU domain, anything.
+   #!/bin/bash
+   INTERFACE=enp4s0
+   INTERFACE_IDX=`cat /sys/class/net/$INTERFACE/ifindex`
 
-I'm confused. Above (***) you say that the shared pool is created upon
-first netdev creation. Now you indicate the user creates it and then
-"binds" it to some object (like devlink).
+   sudo ip link add dev veth1 type veth peer name veth2
+   sudo ip link set up $INTERFACE
+   sudo ip link set up veth1
+   sudo ip link set up veth2
 
-So, do you think there should be 2 types of pools:
-1) implicit upon netdev creation
-2) explicit defined by the user?
+   cat << EOF > redirect.bpf.c
+
+   SEC("prog")
+   int redirect(struct xdp_md *ctx)
+   {
+       return bpf_redirect($INTERFACE_IDX, 0);
+   }
+
+   char _license[] SEC("license") = "GPL";
+   EOF
+   clang -O2 -g -Wall -target bpf -c redirect.bpf.c -o redirect.bpf.o
+   sudo ip link set veth2 xdp obj redirect.bpf.o
+
+   cat << EOF > pass.bpf.c
+
+   SEC("prog")
+   int pass(struct xdp_md *ctx)
+   {
+       return XDP_PASS;
+   }
+
+   char _license[] SEC("license") = "GPL";
+   EOF
+   clang -O2 -g -Wall -target bpf -c pass.bpf.c -o pass.bpf.o
+   sudo ip link set $INTERFACE xdp obj pass.bpf.o
+
+   cat << EOF > trafgen.cfg
+
+   {
+     /* Ethernet Header */
+     0xe8, 0x6a, 0x64, 0x41, 0xbf, 0x46,
+     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+     const16(ETH_P_IP),
+
+     /* IPv4 Header */
+     0b01000101, 0,   # IPv4 version, IHL, TOS
+     const16(1028),   # IPv4 total length (UDP length + 20 bytes (IP header))
+     const16(2),      # IPv4 ident
+     0b01000000, 0,   # IPv4 flags, fragmentation off
+     64,              # IPv4 TTL
+     17,              # Protocol UDP
+     csumip(14, 33),  # IPv4 checksum
+
+     /* UDP Header */
+     10,  0, 1, 1,    # IP Src - adapt as needed
+     10,  0, 1, 2,    # IP Dest - adapt as needed
+     const16(6666),   # UDP Src Port
+     const16(6666),   # UDP Dest Port
+     const16(1008),   # UDP length (UDP header 8 bytes + payload length)
+     csumudp(14, 34), # UDP checksum
+
+     /* Payload */
+     fill('W', 1000),
+   }
+   EOF
+
+   sudo trafgen -i trafgen.cfg -b3000MB -o veth1 --cpp
+
+Fixes: 4ff320361092 ("igc: Add support for XDP_REDIRECT action")
+Signed-off-by: Florian Kauer <florian.kauer@linutronix.de>
+---
+ drivers/net/ethernet/intel/igc/igc_main.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+index ba8d3fe186ae..81c21a893ede 100644
+--- a/drivers/net/ethernet/intel/igc/igc_main.c
++++ b/drivers/net/ethernet/intel/igc/igc_main.c
+@@ -6487,7 +6487,7 @@ static int igc_xdp_xmit(struct net_device *dev, int num_frames,
+ 	int cpu = smp_processor_id();
+ 	struct netdev_queue *nq;
+ 	struct igc_ring *ring;
+-	int i, drops;
++	int i, nxmit;
+ 
+ 	if (unlikely(!netif_carrier_ok(dev)))
+ 		return -ENETDOWN;
+@@ -6503,16 +6503,15 @@ static int igc_xdp_xmit(struct net_device *dev, int num_frames,
+ 	/* Avoid transmit queue timeout since we share it with the slow path */
+ 	txq_trans_cond_update(nq);
+ 
+-	drops = 0;
++	nxmit = 0;
+ 	for (i = 0; i < num_frames; i++) {
+ 		int err;
+ 		struct xdp_frame *xdpf = frames[i];
+ 
+ 		err = igc_xdp_init_tx_descriptor(ring, xdpf);
+-		if (err) {
+-			xdp_return_frame_rx_napi(xdpf);
+-			drops++;
+-		}
++		if (err)
++			break;
++		nxmit++;
+ 	}
+ 
+ 	if (flags & XDP_XMIT_FLUSH)
+@@ -6520,7 +6519,7 @@ static int igc_xdp_xmit(struct net_device *dev, int num_frames,
+ 
+ 	__netif_tx_unlock(nq);
+ 
+-	return num_frames - drops;
++	return nxmit;
+ }
+ 
+ static void igc_trigger_rxtxq_interrupt(struct igc_adapter *adapter,
+-- 
+2.39.2
 
 
