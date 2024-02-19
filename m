@@ -1,223 +1,126 @@
-Return-Path: <netdev+bounces-72860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D03DB859F94
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 10:22:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85FC6859F9C
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 10:23:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A0AC1F21243
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 09:22:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 330C41F2119D
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 09:23:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38E5223749;
-	Mon, 19 Feb 2024 09:22:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95FDD22F17;
+	Mon, 19 Feb 2024 09:22:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OVYPHXv2"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="K9v2V8BG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C11722F13
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 09:22:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9737424B2C;
+	Mon, 19 Feb 2024 09:22:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708334553; cv=none; b=qMX7v3J/HJM95xnmosTRH0iVSPK8dzeQBvrWOm3S9NExI4wj41AW02aACjbLhYbDciiVMDN/IIxxs2SJD8Z0yBCMYOkmTlyYenC2mf+NL1paGpSHpiuL3cepQq8e+uuJ9Q/UCtC4WR+q2xcRlx5FaF0xUmqetPcAfTBpZuZvbnQ=
+	t=1708334557; cv=none; b=kSXXNztDq2mKbjlNnYdDiR1hT1CjApkCtoeF49eE4NeBKqKkggJjkEaUh8k9ERpzJP5ncZlUFqCXe56xyMVLblwVjRK7o/3XsuiNEFVamsVk0gLGxM3xHxbXmS4OrbH9WMzXHb1O2aP0CofKbMAmo3q5/1eDW/z8yazKV2+7CiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708334553; c=relaxed/simple;
-	bh=jHvPNV9uRImzRG0O9mrSCOyCxKrfITzEMjQ0xEJ075c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ETmHX6SsoMbePGeolOa4EchjVrVbr1LDIMtAjCBJ5LJAFyx9b8Dfec6MzvYPGgy+gRvUqeLK4LqgowARFllDJm5367bXDg6Su3DbcT9LVpM0bZpSqnpjc3w73s3/n5KBgRSIn0wXBEZyFK3OMNgEhaq6ve8V96nSjYv3Am14HRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=OVYPHXv2; arc=none smtp.client-ip=209.85.219.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-dcbd1d4904dso4446614276.3
-        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 01:22:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708334550; x=1708939350; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=qZYTlm/0sq1vUrT38iiUN2NletxitEq6HPMC2WegY44=;
-        b=OVYPHXv2DN1j6gS1Q8BWWCiBctMdiDqRo1MyTcpmRP0F43CEoCDb27ZJN5wjWcN1RU
-         I5Ry4vzaF6qdRIvj6bG+pyvi7ZeM39rpFHeoWDemBLKc+J4s3/rT59fIK0eHJOrF7LAL
-         iSp6lU2N9VbDSrxmIgk/Xh3dmyk2EPSFqTp0l154JUL6/2KdHJtdBAH0zQtstz+x2y+7
-         AlgLx0tv7fT0FSV8VBeoQWjOfwdPRBcb3rus0RfCmPOQZFSCXWSSie5bUXiexe+PEnFA
-         +2NbVm9lB0g5qBODaV1y134p8QQ2Rd7yGY4ePKOqJFzYUb5ptxNd1WOFVFFIIFk1XLhb
-         jn5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708334550; x=1708939350;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qZYTlm/0sq1vUrT38iiUN2NletxitEq6HPMC2WegY44=;
-        b=DPwxF3cyHwDix1puf87laFp2PtoeJ0lVIaEzSJkMQOC2E5o0Qfxcl5kbGZfRGNykJD
-         ED+KhW2qcV0a9rMhu03aUbdK2oOnk+jSPYYHrfaF6Bp0jyKpqqof12c5mC1SInLRczZF
-         0aEpENTEer5RdxngqMGpxx742nCWBCAfmSqyusNfDTTFVY7apPCIX/xd99OA/O7b5tOO
-         FkF9Fn3qAioZ4OkZ1Aw32M3dTzq0SbNU5RvdqIHbh8e96rGeQoI3iLoOiZgGbRda7vaV
-         RkKqNLvVQehUEz0s8w0pLUX3E5O1fTn8vaK5OSRK0omAd35CvJuWH4ByimHoC8oZQkRR
-         q0Hg==
-X-Forwarded-Encrypted: i=1; AJvYcCUeo9ngN02A/E7OPW/B79zX7aRAYU6g3j3XpwnLUG2zeyiE2agTHMID6cRoMMU92zjHwvgq1yTMKHAnCGK49ElHYnqM7E6Y
-X-Gm-Message-State: AOJu0YzptzrbPaGqg8SZ36qwvgSDTgMpgt7OtyAM5lVRb8qJIRYB0K9y
-	wE0gBk8V/zw4CCpGHyKPz3GV3sjd6h1MuCk28TKKg3B4P1f/WcYx6gW+qgZ7leaMMLR2BVSzVtZ
-	tT9boMGpQ2/dRN4Q4rXXTP3FSH5P/bPipF5UbnA==
-X-Google-Smtp-Source: AGHT+IF+LL/RccnNnrVPV95NB7kYrHT+EoXkoik0+2tgdiu93HUqpLdT6cgixvw0en9NUQfCx5Dc17RlNM2cOSkIlm0=
-X-Received: by 2002:a25:b048:0:b0:dc7:4859:6f1 with SMTP id
- e8-20020a25b048000000b00dc7485906f1mr9761270ybj.33.1708334550133; Mon, 19 Feb
- 2024 01:22:30 -0800 (PST)
+	s=arc-20240116; t=1708334557; c=relaxed/simple;
+	bh=O7jFalGLVz0Usog+xV7IsPPtI8rqcp1f1KiCelh/c9E=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tqEP3qvZANSHyp4IvsznAGTY1sIxJ2069MmR30ARCZrv+Ns4vy2QKceaoubwRV5kTDRYrrTQ0eTns7lk/5f8vgAxae0w3dKQiZ5bMEdu6sOy4KGMW1M5lyMJgo/qCl8fLhCMreXAoDC1Q+GlZnOqUAjBsiMhYomosOvRqp3vz0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=K9v2V8BG; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id F2556FF80E;
+	Mon, 19 Feb 2024 09:22:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1708334547;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6JJYLuBCOkfxTLbeT5DlIS6vVhI3AplaZr0S39SVoLc=;
+	b=K9v2V8BG3QduFJ0e3Uw3dCtS9hM2bn/TYvENJcI7ht1ALNz0gLx5AxCXxWAKxhNj7hM5PO
+	oFYsmddOq2qMVvTVgYIvnxHNxsy3I8G8OP+RaE337z4+ZbzrewUncvEBxjWUripbHcQplu
+	Zxo5UAcb2it3IpFrK7mV1iIzT2BrobYtXzO9D51ygVCFDbLOzCAL4Tfx3SrYATP4AV0Cvi
+	gvy4kDc/h6C3WMaasXvUsKtCG2EdgAe67CUs/dHViLh6G7azIWAy+wY9OsPQ8vwRoEPEMg
+	vqbX3QBQLvmttqzE1lAmhOB48zl4Uc37NX6No0Z4ZXx0zTU7Op+IsZDS5TDCZA==
+Date: Mon, 19 Feb 2024 10:22:24 +0100
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
+ <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>, Mark Brown <broonie@kernel.org>,
+ Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v4 11/17] dt-bindings: net: pse-pd: Add another
+ way of describing several PSE PIs
+Message-ID: <20240219102224.50cf1010@kmaincent-XPS-13-7390>
+In-Reply-To: <0d7b5549-f56b-4693-878f-e513fbf5ca16@linaro.org>
+References: <20240215-feature_poe-v4-0-35bb4c23266c@bootlin.com>
+	<20240215-feature_poe-v4-11-35bb4c23266c@bootlin.com>
+	<0d7b5549-f56b-4693-878f-e513fbf5ca16@linaro.org>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240216203215.40870-1-brgl@bgdev.pl> <CAA8EJppt4-L1RyDeG=1SbbzkTDhLkGcmAbZQeY0S6wGnBbFbvw@mail.gmail.com>
- <e4cddd9f-9d76-43b7-9091-413f923d27f2@linaro.org>
-In-Reply-To: <e4cddd9f-9d76-43b7-9091-413f923d27f2@linaro.org>
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Date: Mon, 19 Feb 2024 11:22:18 +0200
-Message-ID: <CAA8EJpp6+2w65o2Bfcr44tE_ircMoON6hvGgyWfvFuh3HamoSQ@mail.gmail.com>
-Subject: Re: [PATCH v5 00/18] power: sequencing: implement the subsystem and
- add first users
-To: neil.armstrong@linaro.org
-Cc: Bartosz Golaszewski <brgl@bgdev.pl>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
-	Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Saravana Kannan <saravanak@google.com>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>, 
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Mon, 19 Feb 2024 at 10:14, Neil Armstrong <neil.armstrong@linaro.org> wrote:
->
-> On 18/02/2024 13:53, Dmitry Baryshkov wrote:
-> > On Fri, 16 Feb 2024 at 22:33, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
-> >>
-> >> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >>
-> >> First, I'd like to apologize for the somewhat chaotic previous iterations
-> >> of this series and improper versioning which was rightfully pointed out
-> >> to me. I figured that the scope changed so much that it didn't make sense
-> >> to consider previous submissions part of the same series as the original
-> >> RFC but others thought otherwise so this one becomes v5 and I'll keep the
-> >> versioning going forward.
-> >>
-> >> This is the summary of the work so far:
-> >>
-> >> v1: Original RFC:
-> >>
-> >> https://lore.kernel.org/lkml/20240104130123.37115-1-brgl@bgdev.pl/T/
-> >>
-> >> v2: First real patch series (should have been PATCH v2) adding what I
-> >>      referred to back then as PCI power sequencing:
-> >>
-> >> https://lore.kernel.org/linux-arm-kernel/2024021413-grumbling-unlivable-c145@gregkh/T/
-> >>
-> >> v3: RFC for the DT representation of the PMU supplying the WLAN and BT
-> >>      modules inside the QCA6391 package (was largely separate from the
-> >>      series but probably should have been called PATCH or RFC v3):
-> >>
-> >> https://lore.kernel.org/all/CAMRc=Mc+GNoi57eTQg71DXkQKjdaoAmCpB=h2ndEpGnmdhVV-Q@mail.gmail.com/T/
-> >>
-> >> v4: Second attempt at the full series with changed scope (introduction of
-> >>      the pwrseq subsystem, should have been RFC v4)
-> >>
-> >> https://lore.kernel.org/lkml/20240201155532.49707-1-brgl@bgdev.pl/T/
-> >>
-> >> ===
-> >>
-> >> With that out of the way, I'd like to get down to explaining the two
-> >> problems I'm trying to solve.
-> >>
-> >> Problem statement #1: Dynamic bus chicken-and-egg problem.
-> >>
-> >> Certain on-board PCI devices need to be powered up before they are can be
-> >> detected but their PCI drivers won't get bound until the device is
-> >> powered-up so enabling the relevant resources in the PCI device driver
-> >> itself is impossible.
-> >>
-> >> Problem statement #2: Sharing inter-dependent resources between devices.
-> >>
-> >> Certain devices that use separate drivers (often on different busses)
-> >> share resources (regulators, clocks, etc.). Typically these resources
-> >> are reference-counted but in some cases there are additional interactions
-> >> between them to consider, for example specific power-up sequence timings.
-> >>
-> >> ===
-> >>
-> >> The reason for tackling both of these problems in a single series is the
-> >> fact the the platform I'm working on - Qualcomm RB5 - deals with both and
-> >> both need to be addressed in order to enable WLAN and Bluetooth support
-> >> upstream.
-> >>
-> >> The on-board WLAN/BT package - QCA6391 - has a Power Management Unit that
-> >> takes inputs from the host and exposes LDO outputs consumed by the BT and
-> >> WLAN modules which can be powered-up and down independently. However
-> >> a delay of 100ms must be respected between enabling the BT- and
-> >> WLAN-enable GPIOs[*].
-> >>
-> >> ===
-> >>
-> >> This series is logically split into several sections. I'll go
-> >> patch-by-patch and explain each step.
-> >>
-> >> Patch 1/18:
-> >>
-> >> This is a commit taken from the list by Jonathan Cameron that adds
-> >> a __free() helper for OF nodes. Not strictly related to the series but
-> >> until said commit ends in next, I need to carry it with this series.
-> >>
-> >> Patch 2/18:
-> >>
-> >> This enables the ath12k PCI module in arm64 defconfig as Qualcomm sm8650
-> >> and sm8550 reference platforms use it in the WCN7850 module.
-> >>
-> >> Patches 3/18-6/18:
-> >>
-> >> These contain all relevant DT bindings changes. We add new documents for
-> >> the QCA6390 PMU and ATH12K devices as well as extend the bindings for the
-> >> Qualcomm Bluetooth and ATH11K modules with regulators used by them in
-> >> QCA6390.
-> >>
-> >> Patches 7/18-9/18:
-> >>
-> >> These contain changes to device-tree sources for the three platforms we
-> >> work with in this series. As the WCN7850 module doesn't require any
-> >> specific timings introducing dependencies between the Bluetooth and WLAN
-> >> modules, while the QCA6390 does, we take two different approaches to how
-> >> me model them in DT.
-> >>
-> >> For WCN7850 we hide the existence of the PMU as modeling it is simply not
-> >> necessary. The BT and WLAN devices on the device-tree are represented as
-> >> consuming the inputs (relevant to the functionality of each) of the PMU
-> >> directly.
-> >
-> > We are describing the hardware. From the hardware point of view, there
-> > is a PMU. I think at some point we would really like to describe all
-> > Qualcomm/Atheros WiFI+BT units using this PMU approach, including the
-> > older ath10k units present on RB3 (WCN3990) and db820c (QCA6174).
->
-> While I agree with older WiFi+BT units, I don't think it's needed for
-> WCN7850 since BT+WiFi are now designed to be fully independent and PMU is
-> transparent.
+On Sat, 17 Feb 2024 15:01:55 +0100
+Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org> wrote:
 
-I don't see any significant difference between WCN6750/WCN6855 and
-WCN7850 from the PMU / power up point of view. Could you please point
-me to the difference?
+> > -required:
+> > -  - "#pse-cells"
+> > +  pse_pis: =20
+>=20
+> How did this appear here? Underscores are no allowed.
 
--- 
-With best wishes
-Dmitry
+Didn't know that, sorry.
+Indeed it is written in the dts-coding-style.rst, sorry for the error.
+
+>=20
+> > +    type: object =20
+>=20
+>=20
+> Missing description.
+
+Ah indeed.
+
+> > +            items:
+> > +              enum:
+> > +                - "alternative-a"
+> > +                - "alternative-b" =20
+>=20
+> No need for quotes.
+
+Yes I saw that warning with yamllint up to date and have fixed it with for =
+the
+next version.
+
+> I believe you did not test it, so I will skip reviewing the rest.
+
+I tested it and did not face any error due to the underscore with
+"make DT_CHECKER_FLAGS=3D-m dt_binding_check DT_SCHEMA_FILES=3Dpse-controll=
+er.yaml"
+Did I miss something in the test options?
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
