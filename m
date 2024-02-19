@@ -1,116 +1,88 @@
-Return-Path: <netdev+bounces-72936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5568D85A3F1
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 13:55:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90CAE85A3F3
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 13:56:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0BD091F24630
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 12:55:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C32541C21478
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 12:56:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E096E2E847;
-	Mon, 19 Feb 2024 12:55:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11F6C3218B;
+	Mon, 19 Feb 2024 12:56:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="hVtVF45y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ca0qRuxR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B4802E844;
-	Mon, 19 Feb 2024 12:55:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E340F31A9D
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 12:56:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708347344; cv=none; b=DEdBhMbSyguCEYQ2j6LPkd/PCmPJW9CHFIFPT7kk7qFvGmXwySaLGtxofK4Yfl2xdvY3WCo4pmlmPf1Bu32IkV7OrVcbANlMsl95Q1Inar6vhPztCF3LXQ+bydpK1va/gOk8anWUGWfyoO2q734JXjKaNT15TIpy86sTG/9dLyA=
+	t=1708347369; cv=none; b=mzCgXnQOAPzu4vaEve8YqmC0TtRm3XjtTpSMh+ThztroioIr8VH1swIbBll8IrfDXSIlR+7XQVdxO+JgdWlyfRVbPGVgktMTqL20lUz+QhRrl616us+b+0vfyMyNmly8MnhJkTg9frbRraxGtENKqxA4zarK01v+1k1tNJRJ0fY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708347344; c=relaxed/simple;
-	bh=2eoTnZ/3sqpihyRo3EwafjNnuu63QfId39rcykL5KBY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mXoYM6xYf6sk5cntWnOBb96oagCiHSvZz1L8CgnyyiPRFiIaDQodUDphrIf31yHO6rIW3eGp9l0HXeK3WeCQjHekK2TNBiS0ji8QtMWT8gPOuMWuK05BDT2ZslIxhqO9K4TvCoZGzgur0qn2d9R8iSbYZTQV/FzQPEQAp6mkSKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=hVtVF45y; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41INnvMf020664;
-	Mon, 19 Feb 2024 04:55:29 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	from:to:cc:subject:date:message-id:mime-version:content-type; s=
-	pfpt0220; bh=+Fo9IVYowPyi1LncksOQzJGd5fMCzgpCmmcZhOyruV4=; b=hVt
-	VF45y+UPcGvY/Fk71esqTUeN89q4OnJEIDn+Hiqm+Wuv49jHVYkaFVcsDW1m/i+Z
-	SHxDhJkvilsRyxXlOVe0+Q7LJOLe9FAPMt58y1BTTer7qImWWsZPFn1oGSQXo/Qn
-	hzo6Z0JYqKCBUqNMytSuUSnnMAnizpeem1bExeYB5+8GF2LV7uuer9uLKG7LQhPW
-	zX4N4e5xlC99KJ/sFm1UOLKY79IglIIhHetJ/YjNCT9YIQh8h0q1vlqEkGrPAHB4
-	UryzXuzZHxqZkELHBy8YHyJk3BTuLga4bxGibMv8ogVzeICULVXK54Iy8RfYLMIt
-	nTGK7sjlA4yj28RihcA==
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3waw6jv83v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Mon, 19 Feb 2024 04:55:29 -0800 (PST)
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 19 Feb
- 2024 04:55:27 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Mon, 19 Feb 2024 04:55:27 -0800
-Received: from hyd1358.marvell.com (unknown [10.29.37.11])
-	by maili.marvell.com (Postfix) with ESMTP id CFC693F7060;
-	Mon, 19 Feb 2024 04:55:23 -0800 (PST)
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <sgoutham@marvell.com>, <lcherian@marvell.com>,
-        <gakula@marvell.com>, <hkelam@marvell.com>, <naveenm@marvell.com>,
-        <horms@kernel.org>, Subbaraya Sundeep <sbhatta@marvell.com>
-Subject: [PATCH net] octeontx2-af: Consider the action set by PF
-Date: Mon, 19 Feb 2024 18:25:14 +0530
-Message-ID: <1708347314-21624-1-git-send-email-sbhatta@marvell.com>
-X-Mailer: git-send-email 2.7.4
+	s=arc-20240116; t=1708347369; c=relaxed/simple;
+	bh=H2Aqh6odAsqKQXp5/rh/QR786iepyzHrG6Z5hFqfLqo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KgSgui3JO7UckPwU5D9a2NK7XQvfLgImYWt3/kFUSAejHn6ksyfQJCPm4jFwUrs/xpae0NoxNlL07O1Z1BoelVZHcqrTrC8yW//MJ58P3fzA+xf8YWOeTPyyPDcurNtRrFd3m7/IOS5E2SooNlXwlkbpboBhkMWA5A/TaZmdrNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ca0qRuxR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1411C43390;
+	Mon, 19 Feb 2024 12:56:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708347368;
+	bh=H2Aqh6odAsqKQXp5/rh/QR786iepyzHrG6Z5hFqfLqo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ca0qRuxRUsnvkr95YveCHh1NvRqe0UvuvdcnZM9ZRra/Eh9zbLvNMLSynCC+NfPX0
+	 rlh6sKdbIErU1mRr78AS7Qn55IVFiFEOJibAFQElcArL+FQkoHgD6uIC8Xt2nR51Dv
+	 oKBhnBRU0BPbu1oPJ0vIG1h8mu0M74lO9Nn4/G3xMWr3QQ21AkP8qqLFjYBfaUr6bu
+	 wT6iPazvIePXtSzQWb7A/Q8ruAr5UM2Lwg6VWcuBikk7oIjrylFmfiA6mrWrsaSFvZ
+	 08C5G6n22+XasZF36pvnmrfcUvDDbJAMM2IVEPeKoXAGqyo6JecSTH15ftG6KQJ3Cp
+	 GIdOo+Xt17vMA==
+Date: Mon, 19 Feb 2024 12:56:05 +0000
+From: Simon Horman <horms@kernel.org>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org
+Subject: Re: [RFC] netlink: check for NULL attribute in
+ nla_parse_nested_deprecated
+Message-ID: <20240219125605.GA40273@kernel.org>
+References: <20240216015257.10020-1-stephen@networkplumber.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-GUID: s9nlq-SDGdRonDmXlSg5blNdPpBJl9tW
-X-Proofpoint-ORIG-GUID: s9nlq-SDGdRonDmXlSg5blNdPpBJl9tW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-19_09,2024-02-19_01,2023-05-22_02
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240216015257.10020-1-stephen@networkplumber.org>
 
-AF reserves MCAM entries for each PF, VF present in the
-system and populates the entry with DMAC and action with
-default RSS so that basic packet I/O works. Since PF/VF is
-not aware of the RSS action installed by AF, AF only fixup
-the actions of the rules installed by PF/VF with corresponding
-default RSS action. This worked well for rules installed by
-PF/VF for features like RX VLAN offload and DMAC filters but
-rules involving action like drop/forward to queue are also
-getting modified by AF. Hence fix it by setting the default
-RSS action only if requested by PF/VF.
+On Thu, Feb 15, 2024 at 05:52:48PM -0800, Stephen Hemminger wrote:
+> Lots of code in network schedulers has the pattern:
+> 	if (!nla) {
+> 		NL_SET_ERR_MSG_MOD(extack, "missing attributes");
+> 		return -EINVAL;
+> 	}
+> 
+> 	err = nla_parse_nested_deprecated(tb, TCA_CSUM_MAX, nla, csum_policy,
+> 					  NULL);
+> 	if (err < 0)
+> 		return err;
+> 
+> The check for nla being NULL can be moved into nla_parse_nested_deprecated().
+> Which simplifies lots of places.
+> 
+> This is safer and won't break other places since:
+> 	err = nla_parse_nested_deprecated(tb, TCA_XXXX, NULL, some_policy, NULL);
+> would have crashed kernel because nla_parse_deprecated derefences the nla
+> argument before calling __nla_parse.
+> 
+> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 
-Fixes: 967db3529eca ("octeontx2-af: add support for multicast/promisc packet replication feature")
-Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Hi Stephen,
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-index e5d6156..516adb5 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-@@ -415,6 +415,10 @@ static void npc_fixup_vf_rule(struct rvu *rvu, struct npc_mcam *mcam,
- 			return;
- 	}
- 
-+	/* AF modifies given action iff PF/VF has requested for it */
-+	if ((entry->action & 0xFULL) != NIX_RX_ACTION_DEFAULT)
-+		return;
-+
- 	/* copy VF default entry action to the VF mcam entry */
- 	rx_action = npc_get_default_entry_action(rvu, mcam, blkaddr,
- 						 target_func);
--- 
-2.7.4
-
+this seems like a good approach to me.
+Would you also plan to update the schedules at some point?
 
