@@ -1,126 +1,104 @@
-Return-Path: <netdev+bounces-72907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8EAE85A140
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 11:46:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FAB585A147
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 11:47:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 623C41F2157B
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 10:46:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41D6E1C21ADC
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 10:47:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6811C25578;
-	Mon, 19 Feb 2024 10:46:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0E6028DBF;
+	Mon, 19 Feb 2024 10:47:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S88iPmBC"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ChvL16FM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40F8B1C10;
-	Mon, 19 Feb 2024 10:46:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36F3F225D6;
+	Mon, 19 Feb 2024 10:47:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708339596; cv=none; b=B55DHfw2AkPkk+xa79B0U+j9DAh5t1L6NPytAfKph9RFNQ2adQ4nvoXnKG851N6ZufLL8ttbrsu+vqQveA0AQdVD7KZi3ZUkB9E1ZcWzSRx2a9BJ1GkbLdp2uEz7gcj9RCHiFuEOohqV4CYxHetNeh2JhdrruAl1DOErb5CBCG4=
+	t=1708339664; cv=none; b=GX712Bsbm4tQ7sBpeGVjTR6aBDBxOdYle9yVME+1Cfqb8NDQTell5OquzCzzMdkUPnC7Vv+7GcQdFuZ03DDM0F6S+pBUgRdjmPu4+oniKahrVNzAPC9FHcamiXRL6uCKObO5CH7o1KJoEqRsQwyo3aoWQWR2furySSpbetll9sw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708339596; c=relaxed/simple;
-	bh=5XDPx675FUDjasxUQK3VEjkHE+gDS2SgWTJPoUGJWNo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GLRQNbLGhlowi8d7NFpsQ+m0u2Z+trRoNI7didZNTTSmix52E5AmQVtZPBV8a0id7vxJiZv6k3Q1U7SgOQGmgd2Uv5wfS2bBXPG7HE2XaLgyrxlnViTFxlKx4LsUF85qRt3xCGawPWVwF0FHY/mqmiOR/UXp7d9TrJH5EOB2210=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S88iPmBC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2C97C433C7;
-	Mon, 19 Feb 2024 10:46:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708339595;
-	bh=5XDPx675FUDjasxUQK3VEjkHE+gDS2SgWTJPoUGJWNo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=S88iPmBCTMreeRSofnpsvFuhqX5TDo0UzX1zEwIiHSQNvrFWsiM1jcXWLmXb4FLSJ
-	 M12o3uTAGqLlpM3sDKSJXihVF2LRBj+D/PpGpnhiSX4johOZeWARKWbfFGb2VbvhYE
-	 TxC42US/XCjGn+SwS537II+NbJQh9OJ+xtRqKmjH+IyrQXQO6+hQhbhh7R5CoO9Yf/
-	 u0PpYZ/+6QwdMGxTYKh9o1RL8UvlTIlVhiwPVhGmCLB3eigFkEBknmrYWAGOjeYw5Y
-	 gkF8xnsu4Pq6xdyGgk72bRRsZIu/UXzP6tmEL2uGhuGlRk2H+KzJu6P7O/l0N23zBH
-	 puw81h2zrEj1w==
-Date: Mon, 19 Feb 2024 10:46:31 +0000
-From: Simon Horman <horms@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	Breno Leitao <leitao@debian.org>, kuba@kernel.org,
-	davem@davemloft.net, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Johannes Berg <johannes.berg@intel.com>
-Subject: Re: [PATCH net-next v2] net: sysfs: Do not create sysfs for non BQL
- device
-Message-ID: <20240219104631.GX40273@kernel.org>
-References: <20240216094154.3263843-1-leitao@debian.org>
- <20240216092905.4e2d3c7c@hermes.local>
- <0e0ba573-1ae0-4a4b-8286-fdbc8dbe7639@gmail.com>
- <CANn89i+5F7d4i7Ds4V6TtkzzAjQjNQ8xOeoYqZr8tY6tWWmMEg@mail.gmail.com>
+	s=arc-20240116; t=1708339664; c=relaxed/simple;
+	bh=IjD3KjlInPdC9j3gqlAjiWwXuf8HhsRsxG2eOie2kZg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=h+cm/igvze+usi60LfFrCz16CRBLZ23FTN/s2NOnkD3K71961Lh5SAG7Sghq5n+Pi3IYTVGRvfj1FHq0gKuh7eqFaflPUwMc22+IkSxlqEpAPkAOTx/qTPIp4rovmKAlx2GflgfFLi8DdyPbJkdC/7AWECT0DNRVMvfhD3BXQyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ChvL16FM; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 4B0D1C000F;
+	Mon, 19 Feb 2024 10:47:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1708339660;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6/8X8MqPF3pfDiFGXEDHHnwpDDYSllQCPO/MEgL1lXU=;
+	b=ChvL16FM29AidITMPbL97+0a2Snuu4mSkwT2AR92JDYr+LEynE1KRbqFNsVuCey8MD+Nyq
+	cQWGHhEfoF75UIQRIxWGaFrDAXCZVmK3oA4icyF2NNnUhNtQcrU+34ojHLrz/hjt6NOBSE
+	RFRsiWbt1KZPUrb5xZpz02cdlrVgWlamHTXGF39P0vhxv+KzAY6IorbEIClBDSomIh52zX
+	zcCtV4hqAS6CkXtiFoLOir8nu1LNYA/VDJ/n98UJALAaTyxzHMjfoC+9iRudkCHkjEgUAP
+	u2CYcIWqJg6+/pgAz2wsYWMjG9oKRtZh9ieSdo58WNv1/DTf8uRSjgVoGuSeSg==
+Date: Mon, 19 Feb 2024 11:47:37 +0100
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
+ edumazet@google.com, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt
+ <stefan@datenfreihafen.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, horms@kernel.org, linux-wpan@vger.kernel.org
+ (open list:IEEE 802.15.4 SUBSYSTEM)
+Subject: Re: [PATCH net v2 2/7] net: fill in MODULE_DESCRIPTION()s for
+ ieee802154/fakelb
+Message-ID: <20240219114737.79eb9ff6@xps-13>
+In-Reply-To: <20240214152741.670178-3-leitao@debian.org>
+References: <20240214152741.670178-1-leitao@debian.org>
+	<20240214152741.670178-3-leitao@debian.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89i+5F7d4i7Ds4V6TtkzzAjQjNQ8xOeoYqZr8tY6tWWmMEg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
 
-On Fri, Feb 16, 2024 at 07:45:37PM +0100, Eric Dumazet wrote:
-> On Fri, Feb 16, 2024 at 7:41 PM Florian Fainelli <f.fainelli@gmail.com> wrote:
-> >
-> > On 2/16/24 09:29, Stephen Hemminger wrote:
-> > > On Fri, 16 Feb 2024 01:41:52 -0800
-> > > Breno Leitao <leitao@debian.org> wrote:
-> > >
-> > >> +static bool netdev_uses_bql(const struct net_device *dev)
-> > >> +{
-> > >> +    if (dev->features & NETIF_F_LLTX ||
-> > >> +        dev->priv_flags & IFF_NO_QUEUE)
-> > >> +            return false;
-> > >> +
-> > >> +    return IS_ENABLED(CONFIG_BQL);
-> > >> +}
-> > >
-> > > Various compilers will warn about missing parens in that expression.
-> > > It is valid but mixing & and || can be bug trap.
-> > >
-> > >       if ((dev->features & NETIF_F_LLTX) || (dev->priv_flags & IFF_NO_QUEUE))
-> > >               return false;
-> > >
-> > > Not all drivers will be using bql, it requires driver to have that code.
-> > > So really it means driver could be using BQL.
-> > > Not sure if there is a way to find out if driver has the required BQL bits.
-> >
-> > There is not a feature flag to be keying off if that is what you are
-> > after, you would need to audit the drivers and see whether they make
-> > calls to netdev_tx_sent_queue(), netdev_tx_reset_queue(),
-> > netdev_tx_completed_queue().
-> >
-> > I suppose you might be able to programmatically extract that information
-> > by looking at whether a given driver object file has a reference to
-> > dql_{reset,avail,completed} or do that at the source level, whichever is
-> > easier.
-> 
-> Note that the suggested patch does not change current functionality.
-> 
-> Traditionally, we had sysfs entries fpr BQL for all netdev, regardless of them
-> using BQL or not.
-> 
-> The patch seems to be a good first step.
-> 
-> If anyone wants to refine it further, this is great, but I suspect
-> very few users will benefit from
-> having less sysfs entries for real/physical devices....
-> 
+Hi Breno,
 
-From my point of view the main advantage in not having these entries
-would be that it is really a bit confusing for them to be there
-that don't use BQL. But I agree, that is (also) likely to benefit
-few users.
+leitao@debian.org wrote on Wed, 14 Feb 2024 07:27:36 -0800:
 
-In any case, I agree this is a good first step.
+> W=3D1 builds now warn if module is built without a MODULE_DESCRIPTION().
+> Add descriptions to the IEEE 802.15.4 loopback driver.
 
+Acked-by: Miquel Raynal <miquel.raynal@bootlin.com>
+
+>=20
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> ---
+>  drivers/net/ieee802154/fakelb.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/drivers/net/ieee802154/fakelb.c b/drivers/net/ieee802154/fak=
+elb.c
+> index 35e55f198e05..2930141d7dd2 100644
+> --- a/drivers/net/ieee802154/fakelb.c
+> +++ b/drivers/net/ieee802154/fakelb.c
+> @@ -259,4 +259,5 @@ static __exit void fake_remove_module(void)
+> =20
+>  module_init(fakelb_init_module);
+>  module_exit(fake_remove_module);
+> +MODULE_DESCRIPTION("IEEE 802.15.4 loopback driver");
+>  MODULE_LICENSE("GPL");
+
+
+Thanks,
+Miqu=C3=A8l
 
