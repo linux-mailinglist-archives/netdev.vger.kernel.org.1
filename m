@@ -1,119 +1,191 @@
-Return-Path: <netdev+bounces-73021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D6C885AA11
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 18:31:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4994F85AA1B
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 18:35:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7DD31F235A1
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 17:31:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C19111F2357E
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 17:35:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E8245961;
-	Mon, 19 Feb 2024 17:31:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F153345974;
+	Mon, 19 Feb 2024 17:35:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="I0jR+cCU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qnZR8Mf9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 605AD446C4
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 17:31:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF8E945953
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 17:35:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708363904; cv=none; b=gMbFt3w2QydaAik0xyUIbTl7WbvslJkArPuHLevS5fWXTelPMAGtmJSnQ+D16BXlnB3vfbXWX4XK4ffXAZw/tm9tYRsxZ1oAvVl0sMpfvoHmsuvtghdtuOIoL36+1XqR4Uehsz4s3/yIrKVhu0sGX939KiaZQfGynuGlAvPIx40=
+	t=1708364148; cv=none; b=r53lgnii7+bf0sQDwnOkVOCpFatLyDGd8wit+DxrdyFBBB7Gu8K1mbooUCqOlE/sUZIP/sFzSBShFh7FI+pH35VMhP9z9pH+YwYbTpD6A6EuH4+sQYil1hOnn8KXzN+VYq5O4XB0iXiq/mYPL9iT+KpXZw7Xt/CltL9t+da0/xc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708363904; c=relaxed/simple;
-	bh=6xZwkdVE9Gs5wwO6SEmNrW3a6thnWFWbmQAdicf1Kk4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uZLjHQlwL3wK1lcrSEeSf+jYsTlh3kfJoNOT08rOoYhIdSpvOzIG/wnWiGOjNrnZf3AX8p/PFBvgpNQbo7m6w/PdM/ySwHvRSupEj1jopZGBccl53Ki+bd+j3VNUWnB6Tb9Zi2Sg1Nax5XgwCubaCqnFDAhe5FSaGvDW9ZRN11I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=I0jR+cCU; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1db5212e2f6so32872125ad.1
-        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 09:31:42 -0800 (PST)
+	s=arc-20240116; t=1708364148; c=relaxed/simple;
+	bh=wJCpYntqq8nCglIkq88Zs9qTSRweYslEK0KjbQBa4Bg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UZWYJJ5SRuMudEx7V8fcQph2R3pKuJuIeey4+YBiTC2G7UJSGgiq3ddXGi52FoDNrErB7xFpTUNdz6hbp6flk0aW8+ZFmh+0qYTtdoMcu4VLjv8VQoHOcRg1Swm+jHmXH053h9gJkzmE6jWx/ezFT8d9xFxGrDWSw3oLcNlZakw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qnZR8Mf9; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-563dd5bd382so17969a12.1
+        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 09:35:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1708363901; x=1708968701; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1708364145; x=1708968945; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sUkEvIa4c12Idkw7v1U0P5buCnI3fCcq7Cm+xhDYKhw=;
-        b=I0jR+cCUDne+p3YZLoHqNJAnhwV4sA9CCZpkYaURRDPn/yqHHkdcDCKJAtAe60/TPz
-         XlGHMcE29v3Yi8q7VQoXXzL9BACYVJSdYXN9Lyox1QdUZrDdKpmeYv73RglxJmB2nbCN
-         fVIkLQiS34xwHPVLLoVuDcUaTg11yQvUWAt6ZhFaISBP9x0AUfJfVk1Njul0FYVERBQ/
-         vfwTO/qxrmMY3sOk6lBQnPf0MO6RnBn9rDxdvmIbLqAPpPKso2cGtJJyeyJdOxF9dpCP
-         6iwXe030lYkgJIAQ1dgsv7yF/KChTeASiNg87D0YRkRLl94wxZiBTQ8GLHxOk1yGA7ud
-         0Ykg==
+        bh=bpH+GG/JxRVKqFjHr33MFZWda+dSzZgj8Xxgn4JwPS8=;
+        b=qnZR8Mf9OXg9M88jTqacpGR0VokQ4cl6dxm4BrwfAqkIhovRA2gUuTEyZfLnhAEcFR
+         Mo9djPgblUq9mIGUmbSlFtdv61274wgtpdJo05I4wr109y9ULgiAGKw1GPFDscQ/38zk
+         YDJ9hkomHCkHZ9UMUWaCflYoPokfEpf/uw5+so3Jo4nbDk9YS8Uq4Ovzq2Bp2q3DGJOt
+         8E0azaZNDmTnNKhnMUTpG5osWaTJ0OT9q2jtAn+1o/OxJ63OsK6Vhgi54Wua6AZPXNWO
+         ABxCAfNG1ylw8P6sg6xGDNEeQqNm+Su0XA7/FuQ2lOuUtRynVGVJlqxFtcYP67f2bIVQ
+         FhgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708363901; x=1708968701;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1708364145; x=1708968945;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=sUkEvIa4c12Idkw7v1U0P5buCnI3fCcq7Cm+xhDYKhw=;
-        b=esNTGryq0nibulHNX/3DAwcZ6/RZSrnp7vSTX2MZekBjk52OC1namFSJHQNW6L87o/
-         tr5I0QT1QlaqhZrT/OpHgnHFL5x0xzvFHOxSVO5on3/5ri7GtIw43ylMzYI6mepoZEXI
-         R7ifBaXRwwK58ZLHYU4V7lRgouhYvZaAj0L7i24ocSc2M7olVVD4Vw36c8Ejri9HA+Ac
-         /5vLYaanbyhWtdhxLnBDZfcjR90J3FKGGbrrfOKVU6TLpKZ1Tu0stQ9/qPngF8CFSFNg
-         YeK0w68ZM/qHbKTO5u1B5YactYy/1GSknwfAQi8wH+LARVl5x1S2vSZsaSWmpcLU+wWt
-         2yew==
-X-Gm-Message-State: AOJu0YzqUeCt3PH3J4yxemfaPFlVmkj1SwblAFwiNTYy+sY7PpRdZ5sb
-	bDn7mEVyVo1s+clE1UBoW/bsgoUb24kHiTsvqedbz4HakAYjRwtoB+yRmho2pyVYxpSy8yh+S/T
-	t
-X-Google-Smtp-Source: AGHT+IEhgsprkih5C//JoTsIIcyTjF/GGyVptFRDvNq+nYPW2opL0B2KjpaScfT+T4WU4b5HMVWqYw==
-X-Received: by 2002:a17:903:120d:b0:1d7:836d:7b3f with SMTP id l13-20020a170903120d00b001d7836d7b3fmr16464265plh.9.1708363901590;
-        Mon, 19 Feb 2024 09:31:41 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id e18-20020a170902f1d200b001dbcf96004fsm4028309plc.148.2024.02.19.09.31.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Feb 2024 09:31:41 -0800 (PST)
-Date: Mon, 19 Feb 2024 09:31:39 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Maks Mishin <maks.mishinfz@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH] ipmaddr: Add check for result of sscanf
-Message-ID: <20240219093139.5d86c69c@hermes.local>
-In-Reply-To: <20240218204203.7564-1-maks.mishinFZ@gmail.com>
-References: <20240218204203.7564-1-maks.mishinFZ@gmail.com>
+        bh=bpH+GG/JxRVKqFjHr33MFZWda+dSzZgj8Xxgn4JwPS8=;
+        b=UgNHploZmlQlBQ1QH2rBwyBfYN3iTTx5AmrrMR3aLisZ5VcXDQQ6VAui6yGiiKDLDk
+         oky20jmCLaNwgSjsOx/khJ13jAe79yspV3cS3/hjliYBBzcCeI3DUk/Re5JsGf80mzQ0
+         VgBAcLNtFX2mRa/56lqqixEE9jbAyqWN0bj8dHdkd1kbe0n0a6sT1UE1ZvGy0XbLpPdn
+         jezqt4eCJycWS+7Jr29QuFezPEKB1P70q64FHZl17UN2DqPpnEwq+d7Xx/z9YZvpMKLF
+         noeOT+WyJFZ0KmVb3PQGBPLWYdyGMIjhGn6bvwawL0JPQ9MPC84nNiO2GjY4KrL533al
+         8jBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUTWoOkNzPjFlQPHbi65R7dLkyfCVDrPcKWcYyZaRwgY/o6oB+7E4uP0aJHQmrYh9Ha6dMTOYYYn43CZ84cy7CH2fO2degb
+X-Gm-Message-State: AOJu0Yyq5Gr66eDiVweJbI78VmiQIIqPaX2jNNOenNvfCAVTJ05CuTJX
+	OXEDTiybwS9EE0UQPs9dGUd7O8+IfzvNeGzhGnl9IclWkXvJRIZTfaRU+CAlhnXRsKCRNpyhvx1
+	c1xfXNc1Z0HCSoRpNi9MRsQM2A7j/KU2gC+ox
+X-Google-Smtp-Source: AGHT+IE99wN/PQYfiDNakz6zkMQR7kOEOngXX0T7gN2tvc5IjeQakHE9Z1BsxKNQN8jOzpCri2PXj7rsMGF+tGMHWj0=
+X-Received: by 2002:a50:a697:0:b0:563:ff57:b7e8 with SMTP id
+ e23-20020a50a697000000b00563ff57b7e8mr322644edc.1.1708364145075; Mon, 19 Feb
+ 2024 09:35:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240215-upstream-net-20240215-misc-fixes-v1-0-8c01a55d8f6a@kernel.org>
+ <20240215-upstream-net-20240215-misc-fixes-v1-3-8c01a55d8f6a@kernel.org> <CANn89iJ=Oecw6OZDwmSYc9HJKQ_G32uN11L+oUcMu+TOD5Xiaw@mail.gmail.com>
+In-Reply-To: <CANn89iJ=Oecw6OZDwmSYc9HJKQ_G32uN11L+oUcMu+TOD5Xiaw@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 19 Feb 2024 18:35:31 +0100
+Message-ID: <CANn89iJDypRXX-8S-UdqWgw73eOgt0+D74qUCLDkb0cRpFFXkg@mail.gmail.com>
+Subject: Re: [PATCH net 03/13] mptcp: fix lockless access in subflow ULP diag
+To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+	Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Davide Caratti <dcaratti@redhat.com>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	stable@vger.kernel.org, Boris Pismenny <borisp@nvidia.com>, 
+	John Fastabend <john.fastabend@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, 18 Feb 2024 23:42:03 +0300
-Maks Mishin <maks.mishinfz@gmail.com> wrote:
+On Mon, Feb 19, 2024 at 6:21=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Thu, Feb 15, 2024 at 7:25=E2=80=AFPM Matthieu Baerts (NGI0)
+> <matttbe@kernel.org> wrote:
+> >
+> > From: Paolo Abeni <pabeni@redhat.com>
+> >
+> > Since the introduction of the subflow ULP diag interface, the
+> > dump callback accessed all the subflow data with lockless.
+> >
+> > We need either to annotate all the read and write operation accordingly=
+,
+> > or acquire the subflow socket lock. Let's do latter, even if slower, to
+> > avoid a diffstat havoc.
+> >
+> > Fixes: 5147dfb50832 ("mptcp: allow dumping subflow context to userspace=
+")
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> > Reviewed-by: Mat Martineau <martineau@kernel.org>
+> > Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> > ---
+> > Notes:
+> >   - This patch modifies the existing ULP API. No better solutions have
+> >     been found for -net, and there is some similar prior art, see
+> >     commit 0df48c26d841 ("tcp: add tcpi_bytes_acked to tcp_info").
+> >
+> >     Please also note that TLS ULP Diag has likely the same issue.
+> > To: Boris Pismenny <borisp@nvidia.com>
+> > To: John Fastabend <john.fastabend@gmail.com>
+> > ---
+> >  include/net/tcp.h  | 2 +-
+> >  net/mptcp/diag.c   | 6 +++++-
+> >  net/tls/tls_main.c | 2 +-
+> >  3 files changed, 7 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/include/net/tcp.h b/include/net/tcp.h
+> > index dd78a1181031..f6eba9652d01 100644
+> > --- a/include/net/tcp.h
+> > +++ b/include/net/tcp.h
+> > @@ -2506,7 +2506,7 @@ struct tcp_ulp_ops {
+> >         /* cleanup ulp */
+> >         void (*release)(struct sock *sk);
+> >         /* diagnostic */
+> > -       int (*get_info)(const struct sock *sk, struct sk_buff *skb);
+> > +       int (*get_info)(struct sock *sk, struct sk_buff *skb);
+> >         size_t (*get_info_size)(const struct sock *sk);
+> >         /* clone ulp */
+> >         void (*clone)(const struct request_sock *req, struct sock *news=
+k,
+> > diff --git a/net/mptcp/diag.c b/net/mptcp/diag.c
+> > index a536586742f2..e57c5f47f035 100644
+> > --- a/net/mptcp/diag.c
+> > +++ b/net/mptcp/diag.c
+> > @@ -13,17 +13,19 @@
+> >  #include <uapi/linux/mptcp.h>
+> >  #include "protocol.h"
+> >
+> > -static int subflow_get_info(const struct sock *sk, struct sk_buff *skb=
+)
+> > +static int subflow_get_info(struct sock *sk, struct sk_buff *skb)
+> >  {
+> >         struct mptcp_subflow_context *sf;
+> >         struct nlattr *start;
+> >         u32 flags =3D 0;
+> > +       bool slow;
+> >         int err;
+> >
+> >         start =3D nla_nest_start_noflag(skb, INET_ULP_INFO_MPTCP);
+> >         if (!start)
+> >                 return -EMSGSIZE;
+> >
+> > +       slow =3D lock_sock_fast(sk);
+> >         rcu_read_lock();
+>
+> I am afraid lockdep is not happy with this change.
+>
+> Paolo, we probably need the READ_ONCE() annotations after all.
 
-> Added comparison of result sscanf with 2 to avoid
-> potential troubles with args of sscanf.
-> Found by RASU JSC.
-> 
-> Signed-off-by: Maks Mishin <maks.mishinFZ@gmail.com>
-> ---
->  ip/ipmaddr.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/ip/ipmaddr.c b/ip/ipmaddr.c
-> index 2418b303..00e91004 100644
-> --- a/ip/ipmaddr.c
-> +++ b/ip/ipmaddr.c
-> @@ -148,7 +148,9 @@ static void read_igmp(struct ma_info **result_p)
->  		if (buf[0] != '\t') {
->  			size_t len;
->  
-> -			sscanf(buf, "%d%s", &m.index, m.name);
-> +			if (sscanf(buf, "%d%s", &m.index, m.name) != 2)
-> +				return;
-> +
+Or perhaps something like the following would be enough.
 
-You didn't look at surrounding code.
-That will leak the file descriptor.
-Please review you patches more carefully.
+diff --git a/net/mptcp/diag.c b/net/mptcp/diag.c
+index 6ff6f14674aa2941bc04c680bacd9f79fc65060d..7017dd60659dc7133318c1c82e3=
+f429bea3a5d57
+100644
+--- a/net/mptcp/diag.c
++++ b/net/mptcp/diag.c
+@@ -21,6 +21,9 @@ static int subflow_get_info(struct sock *sk, struct
+sk_buff *skb)
+        bool slow;
+        int err;
 
-This is reading from kernel /proc/net/igmp. And the ABI for that is
-stable so not a serious concern. It would be good if this was available
-over better API like netlink, but few users get into the weed of multicast.
++       if (inet_sk_state_load(sk) =3D=3D TCP_LISTEN)
++               return 0;
++
+        start =3D nla_nest_start_noflag(skb, INET_ULP_INFO_MPTCP);
+        if (!start)
+                return -EMSGSIZE;
 
