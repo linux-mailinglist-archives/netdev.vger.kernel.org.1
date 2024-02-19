@@ -1,162 +1,131 @@
-Return-Path: <netdev+bounces-72982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB7C885A833
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 17:08:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80FAF85A831
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 17:08:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02B7EB219E0
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 16:08:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CC90282659
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 16:08:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 781BD3A267;
-	Mon, 19 Feb 2024 16:08:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C76738DF2;
+	Mon, 19 Feb 2024 16:07:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ya/d/9Q9"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 485083308A
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 16:08:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3AD03308A
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 16:07:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708358898; cv=none; b=BgwUpYNn+QF9MtOAt6dxWDFpol1Mem/WdYfZPw13iHW7WypeOVmxz1xjpUlAbHKkEpH+aJAEw8QTQ9ebZ6XV24bwDUNWKYDHWRrmDoMvVbYJZ8H0somaMi+uCiO2jAxphPygKRVFCrXdISd52hEngi9n5FV400UTkIigPhXDQBM=
+	t=1708358879; cv=none; b=MZk9RgCzECLx/qLzYNZA8evT+Z8wCS1mzG65RTY6BzYzkORP6UC8IzzxuES63Ci5VU/gAhYnYeFvFo09vJnWsfGNyWBniRxfPY2uRbK+/iYZ3Yn3Gk8U4GJYHlZEtst1fFcDQHF4NSFFyBoys4X8nbb2JptlgZj4G22UCO3dT+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708358898; c=relaxed/simple;
-	bh=5t4JB3wAVHCHNA7BJWB1aH8LGEeC36ChXJ5ADZLD5QE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=crI24yEYSvpWoztunPAxNFl1EIhx9hRetP1rRJ0uM4Fd/oHnpVHlLGO+P7AYJKWiklysky4Jz5/xq+Z2UvfMvQsb96smxC3IEq/nnL2Uph+6mQgMwvV1hujzEqn5IkdQR1lC7ioJhOefDb/DYK4N54wPSc1XnFt3mT8TgJSwG/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rc6BH-0001n7-M6; Mon, 19 Feb 2024 17:07:47 +0100
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rc6BD-001gUj-U5; Mon, 19 Feb 2024 17:07:43 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rc6BD-00FvZo-2d;
-	Mon, 19 Feb 2024 17:07:43 +0100
-Date: Mon, 19 Feb 2024 17:07:43 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: =?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Mark Brown <broonie@kernel.org>,
-	Frank Rowand <frowand.list@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
-	Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v3 14/17] dt-bindings: net: pse-pd: Add bindings
- for PD692x0 PSE controller
-Message-ID: <ZdN8zypeUp0MmzcP@pengutronix.de>
-References: <20240208-feature_poe-v3-0-531d2674469e@bootlin.com>
- <20240208-feature_poe-v3-14-531d2674469e@bootlin.com>
- <20240209145727.GA3702230-robh@kernel.org>
- <ZciUQqjM4Z8Tc6Db@pengutronix.de>
- <618be4b1-c52c-4b8f-8818-1e4150867cad@lunn.ch>
- <Zc3IrO_MXIdLXnEL@pengutronix.de>
- <65099b67-b7dc-4d78-ba42-d550aae2c31e@lunn.ch>
- <Zc8TAojumif1irE-@pengutronix.de>
- <20240219153106.19e83213@kmaincent-XPS-13-7390>
+	s=arc-20240116; t=1708358879; c=relaxed/simple;
+	bh=LuM9mLFIGwDaKdnRpn3DiSTV9EHQ64rg4mlk5753gek=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=GWL4yLGH1mLVB5ajKDP+yWMhL/nTwozyZgoRupF3H4nAhi9XyL3drCxQ4kCOuQSlJ05fimZKjVNYHX9Kd6q0d8KNP/5MGJPWF/kI8SLds2oDqfjpePLRbUsx9DQoFWKzj9RmZ4vLZ5Dv/dlCVHZ4NZ1pHLdbjyJe1fWiRr3cP98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ya/d/9Q9; arc=none smtp.client-ip=209.85.167.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-3c135913200so2128699b6e.1
+        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 08:07:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708358877; x=1708963677; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uUr3953C2VynJ5aW5PrN3XkZuS+MHQ+3fnTADm5SNH8=;
+        b=Ya/d/9Q9d+xuYsQ0fD5vGhaAEtsjPGgm905qO7/wn5eUr+Wu2rRo8gau2mnyUpb7FM
+         yKuv5o4hoUyVj1OXoW/GvuUtFplJYcESSQ8Ffc+Jnm7jTJcQr0sL53UUqi9JgJPJHlob
+         fCu3sZM8pljClHCX7zG3oJkAwu4ema2JzBYyr5RqD8hqJSKi3Bx7tGAELVyjWqaYkTfk
+         CXlOWQD1FyqUSXt3UEsbtQLXnK5nXQ6yTk+1D3lPDwhSm1MrTGIMsuPMC88Li9guA30t
+         dUZ0xAOhWJywuzNA7ImK6kyi5lezb3gsYTD31EbIUB78foPRg9+PJMryPOwd0Cp3GpIv
+         PzEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708358877; x=1708963677;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=uUr3953C2VynJ5aW5PrN3XkZuS+MHQ+3fnTADm5SNH8=;
+        b=afQs319cjnQadUUWw3uTqi3Qoq6xV0jARk39lR0SciuXUHSnT2WirmxBQMb9UUrAMR
+         Qqkz0y672Xr2H57ez/9YLfXjSqxPcGmulwAaU5h9DSf1OwsEwV7QYthxYuunJSZNgWhA
+         ngtUQnaGb9eMbnRWhUCFOnksuXUUst7vOt9RUhFL3QqMODdaPZKcmUMmpPWRI5DUrK/2
+         MVUbcZGwopV4G42qHcJuHenrC92qvKUZr6V/DJRoNifmiZfZCRXcDX36e2ErrrNOcJ5c
+         g8H4bAETB8vVlQ37JfkDjAh4fq/JohDnMZ5T0u7yzryjHqAkcla+YrykdxcvSF9ZzLqp
+         q+ow==
+X-Gm-Message-State: AOJu0YxS7LlZYZ6bRJeYFvJTzsjPw4/6OQpMktEjm9vuP86ezttEqMTL
+	bWKY11nloYW3JpPEX6y687SssMd/g1fbKiSU7vDb/SNp94XEvoaI
+X-Google-Smtp-Source: AGHT+IHbFrSMzr3U+S7YbFkH0wltYMBZt1er1QuU3uB3qp1KSeVW06m8nAVUtAEStcNx2QN+jZzk/A==
+X-Received: by 2002:a05:6808:11ca:b0:3c1:5a37:34b8 with SMTP id p10-20020a05680811ca00b003c15a3734b8mr3802157oiv.33.1708358876900;
+        Mon, 19 Feb 2024 08:07:56 -0800 (PST)
+Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
+        by smtp.gmail.com with ESMTPSA id mv9-20020a056214338900b0068ef3d21eacsm3359498qvb.52.2024.02.19.08.07.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Feb 2024 08:07:56 -0800 (PST)
+Date: Mon, 19 Feb 2024 11:07:56 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Eric Dumazet <edumazet@google.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, 
+ eric.dumazet@gmail.com, 
+ Eric Dumazet <edumazet@google.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Daan De Meyer <daan.j.demeyer@gmail.com>, 
+ Kuniyuki Iwashima <kuniyu@amazon.com>, 
+ Martin KaFai Lau <martin.lau@kernel.org>, 
+ David Ahern <dsahern@kernel.org>
+Message-ID: <65d37cdc26e65_1f47ea29474@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240219141220.908047-1-edumazet@google.com>
+References: <20240219141220.908047-1-edumazet@google.com>
+Subject: Re: [PATCH net] net: implement lockless setsockopt(SO_PEEK_OFF)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240219153106.19e83213@kmaincent-XPS-13-7390>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Feb 19, 2024 at 03:31:06PM +0100, Köry Maincent wrote:
-> On Fri, 16 Feb 2024 08:47:14 +0100
-> Oleksij Rempel <o.rempel@pengutronix.de> wrote:
-> > >
-> > > So, either somebody needs to understand 1000BaseT and can say the
-> > > proposed binding works, or we explicitly document the binding is
-> > > limited to 10BaseT and 100BaseT.  
-> > 
-> > I asked the internet and found the answer: Some PSE/PD implementations
-> > are not compatible with 1000BaseT.
-> > 
-> > See Figure 33–4—10BASE-T/100BASE-TX Endpoint PSE location overview.
-> > Alternative B show a variant where power is injected directly to pairs
-> > without using magnetics as it is done for Alternative A (phantom
-> > delivery - over magnetics).
-> > 
-> > So, we have following variants of 2 pairs PoE:
-> > +---------+---------------+-------------------+---------------------+--------------------+
-> > | Variant | Alternative   | Polarity          | Power Feeding Type  |
-> > Compatibility with | |         | (a/b)         | (Direct/Reverse)  |
-> > (Direct/Phantom)    | 1000BaseT          |
-> > +=========+===============+===================+=====================+====================+
-> > | 1       | a             | Direct            | Phantom             | Yes
-> >            |
-> > +---------+---------------+-------------------+---------------------+--------------------+
-> > | 2       | a             | Reverse           | Phantom             | Yes
-> >            |
-> > +---------+---------------+-------------------+---------------------+--------------------+
-> > | 3       | b             | Direct            | Phantom             | Yes
-> >            |
-> > +---------+---------------+-------------------+---------------------+--------------------+
-> > | 4       | b             | Reverse           | Phantom             | Yes
-> >            |
-> > +---------+---------------+-------------------+---------------------+--------------------+
-> > | 5       | b             | Direct            | Direct              | No
-> >            |
-> > +---------+---------------+-------------------+---------------------+--------------------+
-> > | 6       | b             | Reverse           | Direct              | No
-> >            |
-> > +---------+---------------+-------------------+---------------------+--------------------+
+Eric Dumazet wrote:
+> syzbot reported a lockdep violation [1] involving af_unix
+> support of SO_PEEK_OFF.
 > 
-> Maybe we could remove the polarity column on this table as it does not bring
-> more information. It is also already explained on the PI pinout alternatives
-> table.
+> Since SO_PEEK_OFF is inherently not thread safe (it uses a per-socket
+> sk_peek_off field), there is really no point to enforce a pointless
+> thread safety in the kernel.
 
-Ack. I'm still not sure if "Phantom" is correct description.
+Would it be sufficient to just move the setsockopt, so that the
+socket lock is not taken, but iolock still is?
+
+Agreed with the general principle that this whole interface is not
+thread safe. So agreed on simplifying. Doubly so for the (lockless)
+UDP path.
+
+sk_peek_offset(), sk_peek_offset_fwd() and sk_peek_offset_bwd() calls
+currently all take place inside a single iolock critical section. If
+not taking iolock, perhaps it would be better if sk_peek_off is at
+least only read once in that critical section, rather than reread
+in sk_peek_offset_fwd() and sk_peek_offset_bwd()?
 
 > 
-> Also we should document that a 4pairs PSE supporting only 10/100BaseT (which
-> mean no magnetics on pinout AlternativeB) may not be compatible with a 4pairs
-> 1GBaseT PD.
+> After this patch :
+> 
+> - setsockopt(SO_PEEK_OFF) no longer acquires the socket lock.
+> 
+> - skb_consume_udp() no longer has to acquire the socket lock.
+> 
+> - af_unix no longer needs a special version of sk_set_peek_off(),
+>   because it does not lock u->iolock anymore.
+> 
+> As a followup, we could replace prot->set_peek_off to be a boolean
+> and avoid an indirect call, since we always use sk_set_peek_off().
 
-Ack. s/may not/is not/ :) and 4pairs PSE is not always compatible with
-PoE4 as well. I assume this  kind of knowledge we will get from PSE
-driver.
-
-Regards,
-Oleksij
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
