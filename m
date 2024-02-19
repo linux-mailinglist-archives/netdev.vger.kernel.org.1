@@ -1,111 +1,85 @@
-Return-Path: <netdev+bounces-72968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-72969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B44E85A714
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 16:12:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20BE585A722
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 16:13:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E04B1C20E55
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 15:12:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C922B1F21392
+	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 15:13:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B70E53984D;
-	Mon, 19 Feb 2024 15:10:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9684E38396;
+	Mon, 19 Feb 2024 15:13:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PHeFqz1Q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hUsanN4y"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F20531DFE8
-	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 15:10:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72AD338384
+	for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 15:13:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708355456; cv=none; b=Ody9WeZPEBtgjyvPz5xwPzoPN81oGHJXEfvKKJqZ88G+iKXjbxDTwF5jKhalwNVLDOCsPhvWp/xWGpSUYMCirwzSreSqFZ/YMlTuWfSZ2gQBIcNts09tAXdTXyPrvGPm8O8V6UxKxZzlV3yXS/uSLafwCx3oOzJul18HxvzD1nM=
+	t=1708355627; cv=none; b=cfBsIZdQuM0DBMBC1NSiQ+iAUKv7F1ukBL7FLDoKkS9yaaiHr+Ny5DF8QlYNCDpEU+BwKZlIxbfL40lVXH+/wZ7ChTLjsiI18yZ5Xft4yGoWabet96lLjCe1qIVEWG6M7cVxtbUE2gquhfMCbXD3L7qfIqQgd7kLKl7fKXVm1Oc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708355456; c=relaxed/simple;
-	bh=o6fyOf6G7BhIiVO7M4QfgNflaD8M9HcGvUR8Y5llcxQ=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=rwjlUaSHc32csEGFDZfIYJ2gg6fsSwie/x9jaHUL0AhfHP+HRLzNxe/VoMvpAIizMykOLMBEOUcL7ikejw/Sp49t3Y9iev3Avuvrq08SWGxNwZoLTm93gnRr8gUJWa7WBmcQN6rVqBTNQUul5juDF/SUfVGqcYbiNVZbHcxLVqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PHeFqz1Q; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708355451;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KSqXWjK+LddXqIK8pJkcj8gOwnFmQLsFMFK0s1Et2YI=;
-	b=PHeFqz1QOKPIG+Cjl9/hzX5DZxxt6BpiPkRF7YpOCHdl9JS8Xe5W/GmWzr2CDqLXDBcqAF
-	kWywxkQ9K4YELKCj67rDDgt4T5xgq6K0M96I08BH3Xn9wWAQPGvSRmR0/GhXMnCy7eCvHO
-	Y9TuP3WfiDbKhRkFIxD5LejPTDPFQVs=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-25-H-vk5ZXBOuiyEmjzhFTpBQ-1; Mon, 19 Feb 2024 10:10:48 -0500
-X-MC-Unique: H-vk5ZXBOuiyEmjzhFTpBQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E7698881C87;
-	Mon, 19 Feb 2024 15:10:46 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 014748077;
-	Mon, 19 Feb 2024 15:10:44 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20240209105947.GF1516992@kernel.org>
-References: <20240209105947.GF1516992@kernel.org> <20240205225726.3104808-1-dhowells@redhat.com> <20240205225726.3104808-10-dhowells@redhat.com>
-To: Simon Horman <horms@kernel.org>
-Cc: dhowells@redhat.com, Steve French <smfrench@gmail.com>,
-    Jeff Layton <jlayton@kernel.org>,
-    Matthew Wilcox <willy@infradead.org>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Christian Brauner <christian@brauner.io>, netfs@lists.linux.dev,
-    linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-    linux-mm@kvack.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org, Steve French <sfrench@samba.org>,
-    Shyam Prasad N <nspmangalore@gmail.com>,
-    Rohith Surabattula <rohiths.msft@gmail.com>
-Subject: Re: [PATCH v5 09/12] cifs: Cut over to using netfslib
+	s=arc-20240116; t=1708355627; c=relaxed/simple;
+	bh=mr1Fq8VNnq1VArTEap7T4LO/GJYjJ37FCNwtTTv/Ync=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UKDbPzdVmTuzi95zri3lAVnFTH9++eL//SCPB6ZcLqUheRXLo3+SR8GDk6Yd3UdWYuP1idCeSicV3JzkLhklEgdzumrSNwY2HEM7OhvxP0XYVlbcMCdVOQ0w8OYwVNUQLtZH1eNSmVHUuV/2877Q9oD4RJdzWiiqK+UDHEtUHWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hUsanN4y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8093CC433C7;
+	Mon, 19 Feb 2024 15:13:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708355626;
+	bh=mr1Fq8VNnq1VArTEap7T4LO/GJYjJ37FCNwtTTv/Ync=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hUsanN4yBrsUwekBi2YIKsBjdXZ0ygDsiT3ECA3rjLw2+Y2qc8J/LAdlStJJVhAvc
+	 fOBgySDpa7FSzCSIjZgxnwsLKHjmHVrcXoh8lyAblIoMrzmjmwYzFCMrZASmsIhGmD
+	 kkTiA36GwIa+FHi9RLeCVLQlwCo7TgZiwQycwjoEXWnqH2IRAuC4XLwscUWK7qyk9R
+	 Q5bstaee68AeA814RmUa/7WdfBizLyiN+2wkU7pZF6S359MqwY4QsnGjBo3V7xNTq5
+	 fpTav6C8FXpvR7I5oikPrXDc3BHCabKu8shIJv1ratLiM6iR5iXDB5C3s7AGHHKnlM
+	 cEQKt3NnfGEYg==
+Date: Mon, 19 Feb 2024 15:13:43 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+	davem@davemloft.net, edumazet@google.com
+Subject: Re: [patch net-next] devlink: fix port dump cmd type
+Message-ID: <20240219151343.GC40273@kernel.org>
+References: <20240216113147.50797-1-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <140601.1708355444.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 19 Feb 2024 15:10:44 +0000
-Message-ID: <140602.1708355444@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240216113147.50797-1-jiri@resnulli.us>
 
-Simon Horman <horms@kernel.org> wrote:
+On Fri, Feb 16, 2024 at 12:31:47PM +0100, Jiri Pirko wrote:
+> From: Jiri Pirko <jiri@nvidia.com>
+> 
+> Unlike other commands, due to a c&p error, port dump fills-up cmd with
+> wrong value, different from port-get request cmd, port-get doit reply
+> and port notification.
+> 
+> Fix it by filling cmd with value DEVLINK_CMD_PORT_NEW.
+> 
+> Skimmed through devlink userspace implementations, none of them cares
+> about this cmd value. Only ynl, for which, this is actually a fix, as it
+> expects doit and dumpit ops rsp_value to be the same.
 
-> >  /* Functions related to files and directories */
-> > +extern const struct netfs_request_ops cifs_req_ops;
-> >  extern const struct file_operations cifs_file_ops;
-> >  extern const struct file_operations cifs_file_direct_ops; /* if direc=
-tio mnt */
-> >  extern const struct file_operations cifs_file_strict_ops; /* if stric=
-tio mnt */
-> =
+I guess that in theory unknown implementations could exist.
+But, ok :)
 
-> Nit: this hunk would probably be better placed in the
->      patch at adds cifs_req_ops to fs/smb/client/file.c
+> 
+> Omit the fixes tag, even thought this is fix, better to target this for
+> next release.
+> 
+> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 
-I'm not sure I understand what you mean.  Is there a bit missing between "=
-at"
-and "adds" in that?
-
-David
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
