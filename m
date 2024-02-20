@@ -1,107 +1,147 @@
-Return-Path: <netdev+bounces-73243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CA6D85B92D
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 11:36:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D4F185B943
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 11:40:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DB191F21BFD
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 10:36:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5352B284483
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 10:40:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEC5F5FDA7;
-	Tue, 20 Feb 2024 10:36:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF8B9627FF;
+	Tue, 20 Feb 2024 10:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Sy8Camel"
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD8D33EA88
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 10:36:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B335D744;
+	Tue, 20 Feb 2024 10:40:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708425389; cv=none; b=dX7TNvFiHbdO59dhhLsfY5iM8AVlBg8hhhfQlf1k2SyDllfoPJAunPkZfgxwqL2Qm3ATrCwclz4bJlc/ggK6V6Mj7Tcgyw4BcgTbA7jxhlu0GXQTf6+jy588NwGNeZuj9BFTETP8Af01PC9WfnpjaE/mCpOfTQb2R7r9jvFsVqA=
+	t=1708425636; cv=none; b=Xq1MjvTeTXYrF6Zui3/zk1aHcsSPJ594+V1JUNcOhxmBE4oA0NLMRKCS1yPnoKEGnMeuRzTgqN1YAfND9p2PJIjUKFjlFnrcNvdmUSPEkoUCQJRGTK2ptuOwWdTDIL6U+0knYv1ZHKiQlpHqWEEsOdEBrQjq2Pl1WomazJSTtI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708425389; c=relaxed/simple;
-	bh=b0fnN4tJo+dXZsnVc4JP8UP1L62OJmcOPerir6pVoxU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dbhFgv3ato0UaksPd3MENNAW4yktZNVFZFii6b464WB118c7nT/w/t5Kv1A7kE21Y+tBnbHU1NoMx6KTIn2xt1FPinYAeXn3rDMw6CMv1mxOWsH0GTAVJ73QACZi/euAVp0x6LQkUmntOW/kbU9hv9pp2RMBhdzqRBow58CAE3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.41.52] (port=35162 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1rcNTy-009sz4-1R; Tue, 20 Feb 2024 11:36:16 +0100
-Date: Tue, 20 Feb 2024 11:36:13 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: kovalev@altlinux.org
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, jiri@resnulli.us,
-	jacob.e.keller@intel.com, johannes@sipsolutions.net,
-	idosch@nvidia.com, horms@kernel.org, david.lebrun@uclouvain.be
-Subject: Re: [PATCH net ver.2] genetlink: fix possible use-after-free and
- null-ptr-deref in genl_dumpit()
-Message-ID: <ZdSAndRQxKGkV/EO@calendula>
-References: <20240220102512.104452-1-kovalev@altlinux.org>
+	s=arc-20240116; t=1708425636; c=relaxed/simple;
+	bh=wgEKPLuQhowA5lHKPh2DQgm6k4i0knYDD6ZvDFyTHNY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Q+SsyR+p0Dgw5zDUMR5T68Gn7eBkdgfFMqyL1AzCNooJKbcvxW2AkTwoA2V6dgZ6P/HT2KWgwZCTnFLSx3a/rM5gLbeah/pQXJk1tAS/uQZn/SSfOYWn+eocxn9SWLnT5XqJIeGmOk823UmlE6EQlqz+pqo2Ygm1g84T4aQTaYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Sy8Camel; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 59B2AFF809;
+	Tue, 20 Feb 2024 10:40:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1708425632;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ACLavhsVh+dltMk+C9yWyeUkFI9OfKzbdHBseD8xfZk=;
+	b=Sy8CamelugK8+m7lSC73XuxpD6fIj3LuUTyJBBO9DRk18f/sfwdN0E9xLru1XiKcNZzn61
+	pod84G04rz0E/l/ZlpJp3oYYnijEixCi1+ZYu4AvW1KRBKJ+MdOILZOpxP5j4X833UeW3S
+	vv+G3kf3rm64TTQnpNhJ9tUU8jZXIl4jci89P1RWQP6T+pn3ijru+/IncV/XEHvvjR74cy
+	SHeR1gzEx3AQ+QrYMdinFg1aZu/mbP5fRnIC9Rge5gkiExIDKmGH0n7B0t5Zri7v1ibyGF
+	9o1oHPe4PrVklFfimFlDb79aYTbMD+v6q+Kjpw6Gm/yrbbhGbOWr7UHsFCh6NQ==
+Date: Tue, 20 Feb 2024 11:40:29 +0100
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
+ <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Mark Brown <broonie@kernel.org>, Frank Rowand <frowand.list@gmail.com>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v4 14/17] dt-bindings: net: pse-pd: Add
+ bindings for PD692x0 PSE controller
+Message-ID: <20240220114029.6b1a445d@kmaincent-XPS-13-7390>
+In-Reply-To: <ZdCjJcPbbBGYVtuo@pengutronix.de>
+References: <20240215-feature_poe-v4-0-35bb4c23266c@bootlin.com>
+	<20240215-feature_poe-v4-14-35bb4c23266c@bootlin.com>
+	<ZdCjJcPbbBGYVtuo@pengutronix.de>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240220102512.104452-1-kovalev@altlinux.org>
-X-Spam-Score: -1.8 (-)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Tue, Feb 20, 2024 at 01:25:12PM +0300, kovalev@altlinux.org wrote:
-> From: Vasiliy Kovalev <kovalev@altlinux.org>
-> 
-> The pernet operations structure for the subsystem must be registered
-> before registering the generic netlink family.
+On Sat, 17 Feb 2024 13:14:29 +0100
+Oleksij Rempel <o.rempel@pengutronix.de> wrote:
 
-IIRC, you pointed to a syzbot report on genetlink similar to gtp.
+> On Thu, Feb 15, 2024 at 05:02:55PM +0100, Kory Maincent wrote:
+> > Add the PD692x0 I2C Power Sourcing Equipment controller device tree
+> > bindings documentation.
+> >=20
+> > This patch is sponsored by Dent Project <dentproject@linuxfoundation.or=
+g>.
+> >=20
+> > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> > --- =20
+> ...
+> > +        pse_pis {
+> > +          #address-cells =3D <1>;
+> > +          #size-cells =3D <0>;
+> > +
+> > +          pse_pi0: pse_pi@0 {
+> > +            reg =3D <0>;
+> > +            #pse-cells =3D <0>;
+> > +            pairset-names =3D "alternative-a", "alternative-b";
+> > +            pairsets =3D <&phys0>, <&phys1>;
+> > +          };
+> > +          pse_pi1: pse_pi@1 {
+> > +            reg =3D <1>;
+> > +            #pse-cells =3D <0>;
+> > +            pairset-names =3D "alternative-a";
+> > +            pairsets =3D <&phys2>; =20
+>=20
+> According to latest discussions, PSE PI nodes will need some
+> additional, board specific, information:
+> - this controller do not implements polarity switching, we need to know
+>   what polarity is implemented on this board. The 802.3 spec provide not
+>   really consistent names for polarity configurations:
+>   - Alternative A MDI-X
+>   - Alternative A MDI
+>   - Alternative B X
+>   - Alternative B S
+>   The board may implement one of polarity configurations per alternative
+>   or have additional helpers to switch them without using PSE
+>   controller.
+>   Even if specification explicitly say:
+>   "The PD shall be implemented to be insensitive to the polarity of the p=
+ower
+>    supply and shall be able to operate per the PD Mode A column and the PD
+>    Mode B column in Table 33=E2=80=9313"
+>   it is possible to find reports like this:
+>   https://community.ui.com/questions/M5-cant-take-reversed-power-polarity=
+-/d834d9a8-579d-4f08-80b1-623806cc5070
+>=20
+>   Probably this kind of property is a good fit:
+>   polarity-supported =3D "MDI-X", "MDI", "X", "S";
 
-Maybe add that tag here and get the robot to test this fix?
+This property should be on the PD side.
+Isn't it better to name it "polarity-provided" for each PSE PIs binding? Wh=
+at
+do you think?
+We agreed that it is mainly for ethtool to show the polarity of a PI, right?
 
-I'd suggest to describe the scenario, which is: There is a race that
-allows netlink dump and walking on pernet data while such pernet data
-is not yet set up.
-
-Thanks.
-
-> Introduced in commit 134e63756d5f ("genetlink: make netns aware")
-> Signed-off-by: Vasiliy Kovalev <kovalev@altlinux.org>
-> ---
->  net/netlink/genetlink.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/netlink/genetlink.c b/net/netlink/genetlink.c
-> index 8c7af02f845400..20a7d792dd52ec 100644
-> --- a/net/netlink/genetlink.c
-> +++ b/net/netlink/genetlink.c
-> @@ -1879,14 +1879,14 @@ static int __init genl_init(void)
->  {
->  	int err;
->  
-> -	err = genl_register_family(&genl_ctrl);
-> -	if (err < 0)
-> -		goto problem;
-> -
->  	err = register_pernet_subsys(&genl_pernet_ops);
->  	if (err)
->  		goto problem;
->  
-> +	err = genl_register_family(&genl_ctrl);
-> +	if (err < 0)
-> +		goto problem;
-> +
->  	return 0;
->  
->  problem:
-> -- 
-> 2.33.8
-> 
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
