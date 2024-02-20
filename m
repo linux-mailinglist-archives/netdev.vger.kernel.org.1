@@ -1,166 +1,116 @@
-Return-Path: <netdev+bounces-73283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DA5985BBF3
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 13:24:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90D9685BBF7
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 13:24:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0327F1F214E7
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 12:24:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B49A28223B
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 12:24:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B560367E83;
-	Tue, 20 Feb 2024 12:24:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26F6669968;
+	Tue, 20 Feb 2024 12:24:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B1Cit4uq"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DOy4gxPF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD69E67C70
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 12:24:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7337567C70
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 12:24:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708431877; cv=none; b=dm2w8l0+rGHFHLoAc84lMydcGu2KbTLsnpM8SWXKeT8DLP9wiz2oSglsyaecE5G+EE7x6pRIzWVS3s4SsIn9oIg++NGvPEUTgSZ2V7XVRBi0zc75FALjKAARy9Nq2SlzWCGxi5pzejsFbwYE17bAQMUp6vR9C7ZJTnCBy+ZcIk8=
+	t=1708431884; cv=none; b=poZl1UUfyELC7TodN/ziKCUvYuRSxMaFYwAcM2Jbzuw0Qga9I0fcRfhSiXnAFkEb5lAQLtI2G0UojSeJfAdAZtdU+ibHZmZ1mHmcAw5x3AGPZFssDbAm+iTmi4pGYmkkZ0d6sOrHLX0/AEbJZtMG/ga4BMQDAVwjG9bMAAZLqwo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708431877; c=relaxed/simple;
-	bh=dsiLJ11h741l5GbdJat1YmQ4KzPfYnGD2H8KwKTyIaQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oxf+Lpo6mIS/8KQWNDkJNqxvt1nw1alTDIUmRxI8CDl7d7k1ax3yQI3YVL7wlcWkccBuLiLfe0zuDoYM+2ypPiw/R7tdNe1XgP4TEmCXn3IDKhT6DTjHp5LPzhMfycTMLJvpgvYINKpmrhiBhDgMMsCehM2XAeninjDvNiRcBOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=B1Cit4uq; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708431876; x=1739967876;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=dsiLJ11h741l5GbdJat1YmQ4KzPfYnGD2H8KwKTyIaQ=;
-  b=B1Cit4uq/hIqf7bvIfG/6KMR7CKKHNqr6PsUNXHN/tDg5CdBiPPLG7qY
-   CGQeYUzfStJSnPufePf4zYUxY2YjTH7yLhZJf3PRTbWz13qFyaJ7VreUX
-   1o8WWafL7Om4gmFMtXUz+/QPRCjpTkTbfAO1lOXqAUjY3SR5Y71mqpPm2
-   yKAhgKXieO9WLdiV89ysuV/lxkF3SOuhiDs+p2Aph1a77QXiOhUEqTbO6
-   l82S6GxJpesX+Qo1ZjzDfyG4TaPZMfH+khrfZIVZuv9nbPQyBJvoUpYbP
-   qPW5z4m945MgayaZf/m+OE3pCfhDriOqzvh73nQp76+6EbIA2mNwhghZA
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10989"; a="13942158"
-X-IronPort-AV: E=Sophos;i="6.06,172,1705392000"; 
-   d="scan'208";a="13942158"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2024 04:24:36 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,172,1705392000"; 
-   d="scan'208";a="42258584"
-Received: from unknown (HELO mev-dev) ([10.237.112.144])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2024 04:24:33 -0800
-Date: Tue, 20 Feb 2024 13:24:29 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: wojciech.drewek@intel.com, marcin.szycik@intel.com,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	sridhar.samudrala@intel.com
-Subject: Re: [Intel-wired-lan] [iwl-next v1 1/2] ice: tc: check src_vsi in
- case of traffic from VF
-Message-ID: <ZdSZ/ZWKXidgHkAB@mev-dev>
-References: <20240220105950.6814-1-michal.swiatkowski@linux.intel.com>
- <20240220105950.6814-2-michal.swiatkowski@linux.intel.com>
- <30416589-7340-4ad3-8749-bef1f82743cb@molgen.mpg.de>
+	s=arc-20240116; t=1708431884; c=relaxed/simple;
+	bh=ynvPVYn//v4GPuorcOO+1zz4hDvB7L6MwFHXwoZCmeA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oxi9btMJYvATbm1uRnd3HqyGkiHP/cGdZbOHIWgPv1B2A+hAxrzuLSvX/zmhFMrpE4sXmh3KXMXZGnp1e39DFQJC5TVqP7cwqpgLPj3YZxg0dlb3zNnnGDOKJA+OCDI2maD8vWjmKMOen6LZdBrpLl7jbQq+vV4H0OiCli7ByBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=DOy4gxPF; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-563fe793e1cso5143699a12.3
+        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 04:24:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1708431881; x=1709036681; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8wYvXLfZ6v2cXKlzxrKeYwgODilmxfLPWWmiWnqKj1Q=;
+        b=DOy4gxPF9djF7LLq407JsHDdwTPUqL9eYa9JW8aFMCbgJeAkrgFKVXjiMoKEWvOJmh
+         hCf/FukbDN0MiJvl3qOnDPdd9rc0lzIPiodCSHBU4e7u2AIRswVM+OsLkRiUM2mZ/06Q
+         Ka0N54UrS5fwgU91ACHByeDximMqDaV8vtWuor5+6UjXzIM1o1jk5kBshN0R3gruhHxu
+         C2/71BsYWY7YJPtJbIX0xIBMduJn1n0XimhJvQVlEI8908c0Rc49bgqwZKDekSZ0URmI
+         rRkiIh8pRidaysIpo0LITsGZe0jg7VdytB5m501l1ImWXFzG4FMUgHnOJ6xGKCWsaARt
+         xLlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708431881; x=1709036681;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8wYvXLfZ6v2cXKlzxrKeYwgODilmxfLPWWmiWnqKj1Q=;
+        b=nRny2lMfLuqTVsbnv/NMlhRNPH4RF4neqH8WM35fsx67L5NUQ6Q6H8C75BGxEyCDC9
+         da3WCbSC6zo1yQxtRCjpbQQg2WsdTzrpv/OKfHtC78LGFp2mJTfvcyEO4zI104eRa1Bb
+         bG23Q1P7eVi2yWndhRyqmkz1VIWxwqOLSDhiJmFDelpICwikLVaETQpXKfTH1t+ByEkv
+         gTXWGR+SeajoO5tIvXE+VsdKYS3jqgCT3syU8JFOTygQvAFnYOgjA5oCddm/JvmaI5iX
+         m8TvAJqH+F133yHdTCP0MRaAeei10Wh5l5v7by/yhicw/L4l6hdT+oMzmKlI7YCv2MHy
+         806A==
+X-Gm-Message-State: AOJu0YwVOcxzR0DCQ1zPdPUp9hk/SH2m9AqMEJNh/smhvbkQebBkEN7o
+	pLAgeCMqmgWmkOAF/wBaIfTyYTDZ0RU3INPcwU1QD66zzxS0pFwPSaEIhUH3ksE=
+X-Google-Smtp-Source: AGHT+IElMje6XxucxdmJxoNwAgbzbb9WjAtnDF9oo2/9GaChU0TCt4nLOgnR4cQGPwiVT/NrFsrhcQ==
+X-Received: by 2002:a05:6402:148d:b0:564:901b:edee with SMTP id e13-20020a056402148d00b00564901bedeemr3107766edv.25.1708431880731;
+        Tue, 20 Feb 2024 04:24:40 -0800 (PST)
+Received: from gpeter-l.lan (host-92-18-74-232.as13285.net. [92.18.74.232])
+        by smtp.gmail.com with ESMTPSA id l8-20020a056402028800b00564427855b5sm2719852edv.44.2024.02.20.04.24.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Feb 2024 04:24:40 -0800 (PST)
+From: Peter Griffin <peter.griffin@linaro.org>
+To: jmaloy@redhat.com,
+	ying.xue@windriver.com,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net,
+	linux-kernel@vger.kernel.org,
+	kernel-team@android.com,
+	Peter Griffin <peter.griffin@linaro.org>
+Subject: [PATCH] tipc: fixup kerneldoc comment for struct tipc_node
+Date: Tue, 20 Feb 2024 12:24:36 +0000
+Message-ID: <20240220122436.485112-1-peter.griffin@linaro.org>
+X-Mailer: git-send-email 2.44.0.rc0.258.g7320e95886-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <30416589-7340-4ad3-8749-bef1f82743cb@molgen.mpg.de>
 
-On Tue, Feb 20, 2024 at 12:23:11PM +0100, Paul Menzel wrote:
-> Dear Michal,
-> 
-> 
-> Thank you for the patch.
->
+Fixes the following warnings
 
-Thanks for the review.
+linux/net/tipc/node.c:150: warning: Excess struct member 'inputq' description in 'tipc_node'
+linux/net/tipc/node.c:150: warning: Excess struct member 'namedq' description in 'tipc_node'
 
-> Am 20.02.24 um 11:59 schrieb Michal Swiatkowski:
-> > In case of traffic going from the VF (so ingress for port representor)
-> > there should be a check for source VSI. It is needed for hardware to not
-> > match packets from different port with filters added on other port.
-> 
-> … from different port*s* …?
-> 
+Signed-off-by: Peter Griffin <peter.griffin@linaro.org>
+---
+ net/tipc/node.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-Will fix it.
+diff --git a/net/tipc/node.c b/net/tipc/node.c
+index 3105abe97bb9..c1e890a82434 100644
+--- a/net/tipc/node.c
++++ b/net/tipc/node.c
+@@ -86,8 +86,6 @@ struct tipc_bclink_entry {
+  * @lock: rwlock governing access to structure
+  * @net: the applicable net namespace
+  * @hash: links to adjacent nodes in unsorted hash chain
+- * @inputq: pointer to input queue containing messages for msg event
+- * @namedq: pointer to name table input queue with name table messages
+  * @active_links: bearer ids of active links, used as index into links[] array
+  * @links: array containing references to all links to node
+  * @bc_entry: broadcast link entry
+-- 
+2.44.0.rc0.258.g7320e95886-goog
 
-> > It is only for "from VF" traffic, because other traffic direction
-> > doesn't have source VSI.
-> 
-> Do you have a test case to reproduce this?
->
-
-I can add tc fileter call in v2. In short, any redirect from VF0 to
-uplink should allow going packets only from VF0, but currently it is
-also matching traffic from other VFs (like VF1, VF2, etc.)
-
-> > Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> > Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-> > Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> > ---
-> >   drivers/net/ethernet/intel/ice/ice_tc_lib.c | 8 ++++++++
-> >   1 file changed, 8 insertions(+)
-> > 
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_tc_lib.c b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-> > index b890410a2bc0..49ed5fd7db10 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-> > +++ b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-> > @@ -28,6 +28,8 @@ ice_tc_count_lkups(u32 flags, struct ice_tc_flower_lyr_2_4_hdrs *headers,
-> >   	 * - ICE_TC_FLWR_FIELD_VLAN_TPID (present if specified)
-> >   	 * - Tunnel flag (present if tunnel)
-> >   	 */
-> > +	if (fltr->direction == ICE_ESWITCH_FLTR_EGRESS)
-> > +		lkups_cnt++;
-> 
-> Why does the count variable need to be incremented?
->
-AS you wrote belowe it is needed to add another lookup.
-
-> >   	if (flags & ICE_TC_FLWR_FIELD_TENANT_ID)
-> >   		lkups_cnt++;
-> > @@ -363,6 +365,11 @@ ice_tc_fill_rules(struct ice_hw *hw, u32 flags,
-> >   	/* Always add direction metadata */
-> >   	ice_rule_add_direction_metadata(&list[ICE_TC_METADATA_LKUP_IDX]);
-> > +	if (tc_fltr->direction == ICE_ESWITCH_FLTR_EGRESS) {
-> > +		ice_rule_add_src_vsi_metadata(&list[i]);
-> > +		i++;
-> > +	}
-> > +
-> >   	rule_info->tun_type = ice_sw_type_from_tunnel(tc_fltr->tunnel_type);
-> >   	if (tc_fltr->tunnel_type != TNL_LAST) {
-> >   		i = ice_tc_fill_tunnel_outer(flags, tc_fltr, list, i);
-> > @@ -820,6 +827,7 @@ ice_eswitch_add_tc_fltr(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr)
-> >   	/* specify the cookie as filter_rule_id */
-> >   	rule_info.fltr_rule_id = fltr->cookie;
-> > +	rule_info.src_vsi = vsi->idx;
-> 
-> Besides the comment above being redundant (as the code does exactly that),
-> the new line looks like to belong to the comment. Please excuse my
-> ignorance, but the commit message only talks about adding checks and not
-> overwriting the `src_vsi`. It’d be great, if you could elaborate.
->
-
-I will rephrase commit message to mark that it is not checking in code,
-but matching in hardware, thanks.
-
-> >   	ret = ice_add_adv_rule(hw, list, lkups_cnt, &rule_info, &rule_added);
-> >   	if (ret == -EEXIST) {
-> 
-> 
-> Kind regards,
-> 
-> Paul
 
