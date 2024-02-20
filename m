@@ -1,121 +1,101 @@
-Return-Path: <netdev+bounces-73376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80EBD85C319
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 18:56:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 289C585C33B
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 19:02:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2222FB24B20
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 17:56:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B92111F248D5
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 18:02:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C334B78665;
-	Tue, 20 Feb 2024 17:55:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5041A77650;
+	Tue, 20 Feb 2024 18:02:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="IO6VsUpf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h94aH8C1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2E7577A05
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 17:55:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815378F5D
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 18:02:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708451751; cv=none; b=Wkwc+ByWcLd/JOwiGViXnU9Ybtmty7nDGE3DohDa4aRTVGGnzATM9N5LbDRXPRZlvr/C0VfXg2KJzTLn4aG0pFRIa4yKwRaPxLd43Nu0k9yMhnMF62xrF46KPWwEzMDElY20BLW/wHOJFOkTCMRXtnbDcDkJuY4hbQJy95MuQKU=
+	t=1708452155; cv=none; b=GG0UxFlLM5vmvHcMHQIEInrUjTpr+t+Dypi5DKTNEVtMTgi6HdsBXO2K4frdf48P6+/zemgZmUFF8o/2RrZQYU0BR4W1PhhQFTsEo1AP7Hb68RAgE4ORSC/6lCuNN/hRGRisrB/U1I/GUA0ciHhnl1POSzt+weUcrmXIwgKTt28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708451751; c=relaxed/simple;
-	bh=hqb1KpK8idTkVHw05D9DaOecFdA77V8n0hYYGqZ4o2Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=qsUQN1CTyB76sfwuVnsClpyfwuq3bxvBdZAu2LMlbLLv1lH8sO7+je3eXjw3R3syBl502OcfdeRJhThz+IHbaJMagjB58082FMOl8caPHyXQ+4v3CWSFGcg8pR0yBOckCJl+zGqTv8YSETXlJqyiQD5YWmI0CCL2pTl0fvJYPY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=IO6VsUpf; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-563e6131140so5488501a12.2
-        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 09:55:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1708451748; x=1709056548; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cs7a6JxSri8UPMBfIFAC6zzBgd9E4B30piovcQly+DY=;
-        b=IO6VsUpfVdC8MenT19L0XGvhc72FARmcJPBnMmmthFdvbHdKXRVq+WWxpXN4SuwPRo
-         eAScsA7VkmTO7dzA0RzHXM/cewb1NE6T+mRZPam1B2vqXR5CFyvzMi2AADzmmxuO22PB
-         0li2nLbSp/IyA9XSPdPHvILKCldq+Rf4aRPMA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708451748; x=1709056548;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cs7a6JxSri8UPMBfIFAC6zzBgd9E4B30piovcQly+DY=;
-        b=Tdu/VROqr0kcyivIu6X3yl9FLaabd2t2uUAbIEr11wGYqLRZ8ULNNu9AGmc/bKJe2E
-         ZqNd6zR+or32HKwSaKWDqjo8F0g3PsLR4dpB7N1Hxhkgq1EeJyr2SMcOf0x9Y6AOCU8g
-         1DFLErOEBVHxvd9HMsGiCXKBjrYs6jAq8E5z0KYcR3cW/hqgPFAY2mDMMYvf2XzlDm0z
-         jLDvdzgZM/qsuW2rJYzoK64LLH5ufU3H5xdkFPnOWwbXiGJe3URgIsHPP8Q1Lxn/UT+J
-         /OOmtra1YwwsIq8Leh0yYXf7NOP0Av0H6GuzZ80l6R0X+2IH1SLf/zpFZH0acYk/f45r
-         5Juw==
-X-Forwarded-Encrypted: i=1; AJvYcCVtjaBun4ke6dcXvVXW+ABEtmjb0tszSfjAYw/NltcZjSujVu3G+/uW/TkPTVb3mZBYAQbmeesJLZ1HZsN3sjKIry1Gktsc
-X-Gm-Message-State: AOJu0Yy5epTwcRtPhzxahg7iOKJsmtKwqlmUwhrnqsSCTjAdC0CJKqFv
-	nKuUXWH/Hudc/bvIoWUG8bPTjnh9w2HF8+fE0aNF+ewlOKxFtDkf9RrKgIfrfmchl7PTEHsLG0n
-	ySAjKoQ==
-X-Google-Smtp-Source: AGHT+IE5PaYtgAmcC/JggxDszCk8XgeWbgcbMfQeiCkoT0Pye6gJqcWcBm2LyDudeeRNxjiJ2IFiKg==
-X-Received: by 2002:a17:906:29cf:b0:a3f:17fd:620c with SMTP id y15-20020a17090629cf00b00a3f17fd620cmr954351eje.27.1708451748114;
-        Tue, 20 Feb 2024 09:55:48 -0800 (PST)
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com. [209.85.208.41])
-        by smtp.gmail.com with ESMTPSA id u23-20020a170906c41700b00a3d81b90ffcsm4157102ejz.218.2024.02.20.09.55.46
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Feb 2024 09:55:47 -0800 (PST)
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-55c2cf644f3so7811115a12.1
-        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 09:55:46 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWKWjzSgetkySzm31d9gJO7nR3jT4UbacZ0os/qlqcY+jYsaOWPeuMZuNydquk0DnrDmQgRdtio8O3Va5HCAGMSqZQ+QSQK
-X-Received: by 2002:aa7:d393:0:b0:564:3d68:55f5 with SMTP id
- x19-20020aa7d393000000b005643d6855f5mr5518556edq.5.1708451746591; Tue, 20 Feb
- 2024 09:55:46 -0800 (PST)
+	s=arc-20240116; t=1708452155; c=relaxed/simple;
+	bh=nLGu6Nb4bFkyvkAMslpI2+BlJqsZtI8Bze9aXNjf0Jk=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=b8Wes5S0bB/J5Is16o3CEr3EJ9xYDHIfTe3uMmAc8pROyJdDKmPt35j7CEd7Ah3xicEsmTuN6X3MngsI9/elEd2a9g0c9nUcneCsFldp6rHyT/9ct++iRd5nV1ZKJ6vYFA2YPIt7QyyBKMub3JwwMgDm01TVQoXJaYjALTulCZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h94aH8C1; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708452152;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5YeqcILnxuh5l/4eD2MtYHXrzYLLCUoaxf6bJ3mGyrU=;
+	b=h94aH8C1XgZFsWoFXf+fxZOCAb8pvjSsUge3iYHfICRBlYKtHJHKlyJGU8qer2TZAQYYSm
+	9LZvXZihoM7Dg43P67egtr+KQhHCSwYRLDiRM6RA56mV3JbanGvMzE60XfGeikpUFfwJuB
+	ulOtk2Qj/g+ePhcMbYkNtbUbvPBamnM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-646-v2jcEkRlOfC-8UJMu6IJyQ-1; Tue, 20 Feb 2024 13:02:28 -0500
+X-MC-Unique: v2jcEkRlOfC-8UJMu6IJyQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0DBE1871A85;
+	Tue, 20 Feb 2024 18:02:28 +0000 (UTC)
+Received: from RHTPC1VM0NT (dhcp-17-72.bos.redhat.com [10.18.17.72])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 79953400D784;
+	Tue, 20 Feb 2024 18:02:27 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
+ Dumazet <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Pravin B
+ Shelar <pshelar@ovn.org>,  dev@openvswitch.org,  Ilya Maximets
+ <i.maximets@ovn.org>,  Simon Horman <horms@ovn.org>,  Eelco Chaudron
+ <echaudro@redhat.com>,  Shuah Khan <shuah@kernel.org>,
+  linux-kselftest@vger.kernel.org
+Subject: Re: [RFC 0/7] selftests: openvswitch: cleanups for running as
+ selftests
+References: <20240216152846.1850120-1-aconole@redhat.com>
+	<20240219122855.1f1ad0ac@kernel.org>
+Date: Tue, 20 Feb 2024 13:02:27 -0500
+In-Reply-To: <20240219122855.1f1ad0ac@kernel.org> (Jakub Kicinski's message of
+	"Mon, 19 Feb 2024 12:28:55 -0800")
+Message-ID: <f7th6i3dnf0.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.3 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240130091300.2968534-1-tj@kernel.org> <20240130091300.2968534-6-tj@kernel.org>
- <bckroyio6l2nt54refuord4pm6mqylt3adx6z2bg6iczxkbnyk@bb5447rqahj5>
-In-Reply-To: <bckroyio6l2nt54refuord4pm6mqylt3adx6z2bg6iczxkbnyk@bb5447rqahj5>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Tue, 20 Feb 2024 09:55:30 -0800
-X-Gmail-Original-Message-ID: <CAHk-=whqae-+7Q7wbtnEj7YmR8vsx6skTj6j-srV2Fz7cBZ2ag@mail.gmail.com>
-Message-ID: <CAHk-=whqae-+7Q7wbtnEj7YmR8vsx6skTj6j-srV2Fz7cBZ2ag@mail.gmail.com>
-Subject: Re: [PATCH 5/8] usb: core: hcd: Convert from tasklet to BH workqueue
-To: Tejun Heo <tj@kernel.org>, torvalds@linux-foundation.org, mpatocka@redhat.com, 
-	linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev, msnitzer@redhat.com, 
-	ignat@cloudflare.com, damien.lemoal@wdc.com, bob.liu@oracle.com, 
-	houtao1@huawei.com, peterz@infradead.org, mingo@kernel.org, 
-	netdev@vger.kernel.org, allen.lkml@gmail.com, kernel-team@meta.com, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Alan Stern <stern@rowland.harvard.edu>, 
-	linux-usb@vger.kernel.org, mchehab@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-On Tue, 20 Feb 2024 at 09:25, Davidlohr Bueso <dave@stgolabs.net> wrote:
+Jakub Kicinski <kuba@kernel.org> writes:
+
+> On Fri, 16 Feb 2024 10:28:39 -0500 Aaron Conole wrote:
+>> The series is a host of cleanups to the openvswitch selftest suite
+>> which should be ready to run under the netdev selftest runners using
+>> vng.  For now, the testing has been done with RW directories, but
+>> additional testing will be done to try and keep it all as RO to be
+>> more friendly.
 >
-> In the past this tasklet removal was held up by Mauro's device not properly
-> streaming - hopefully this no longer the case. Cc'ing.
+> Would it be an option to make the output go into a dir in /tmp/ 
+> instead of in place, in the tree?
 >
-> https://lore.kernel.org/all/20180216170450.yl5owfphuvltstnt@breakpoint.cc/
+>   mktemp -p /tmp/ -d ovs-test.XXXXXXXXX
 
-Oh, lovely - an actual use-case where the old tasklet code has known
-requirements.
+That's probably the best approach.  I'll switch to it.
 
-Mauro - the BH workqueue should provide the same kind of latency as
-the tasklets, and it would be good to validate early that yes, this
-workqueue conversion works well in practice. Since you have an actual
-real-life test-case, could you give it a try?
+> or such?
 
-You can find the work in
-
-   git://git.kernel.org/pub/scm/linux/kernel/git/tj/wq.git
-refs/heads/for-6.9-bh-conversions
-
-although it's possible that Tejun has a newer version in some other
-branch. Tejun - maybe point Mauro at something he can try out if you
-have updated the conversion since?
-
-                Linus
 
