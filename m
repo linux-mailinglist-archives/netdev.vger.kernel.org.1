@@ -1,215 +1,192 @@
-Return-Path: <netdev+bounces-73199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73200-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE9BB85B567
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:37:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D4BA85B56A
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:38:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D705B21E54
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:37:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8D2928208A
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:38:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1693E5D484;
-	Tue, 20 Feb 2024 08:37:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F8A05D75C;
+	Tue, 20 Feb 2024 08:37:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="WIErpTU5";
-	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="mC3lvYRb"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b="5Bb00git"
 X-Original-To: netdev@vger.kernel.org
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.164])
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2104.outbound.protection.outlook.com [40.107.101.104])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 476B85CDCE;
-	Tue, 20 Feb 2024 08:37:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.164
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B125D486;
+	Tue, 20 Feb 2024 08:37:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.104
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708418239; cv=pass; b=CAfKvOfmvcyfS03GSZWxtOF7GgKe/lnxv3mHEgWCXO3cyswSgW/yH+WO6KXnGhmbo6CY90x7HCf4f6LazrffhsJIbLcug85a0vC7unTV2YFfW336D4tv68xVYeM4BQTNKedV0ULSS3uwb3TUdZkBAijX30h4dFqoAjBE+I3KhCw=
+	t=1708418256; cv=fail; b=dqoASALBS6OthZEKy1NCEu8U/Oreaueg/pxnG669cSWzVtJr7U+U2dzJp+xHDjL9Nps9Ng6KlJfIeo2kiw7l6iIaoRZvXrdUYHW/wTx9PcWffZCxEyoar5mSPEl5iXBBUsUx+jUKEJJleahKAQ3a7StHXGxMe7HFENlbsPgcipQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708418239; c=relaxed/simple;
-	bh=WNkuwlB0kpCublS0QCB7/FlGjFYntxM/1P8ltw9FE7s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XlX+zrWp6GMiXGAK+75O3LMLFlXTWl2lAmwRprAr8/JGnVi65oTNBNDjRVFws0dJAQVU7CC1yVKtefDAEmIvY7X2dP+sBbpHQmb/uIYRoJgWXKVe/bW9mFXmLycxFvD0689haDz1qYwMPP8FP2WU2qaTeerUDRZTg7R5j8ja0vM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=WIErpTU5; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=mC3lvYRb; arc=pass smtp.client-ip=81.169.146.164
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
-ARC-Seal: i=1; a=rsa-sha256; t=1708418227; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=LMKmlxenTj/mMJMCGr9WHLEEkV+mxN/lAeAtuxCmO5m9192oZgLHbU/Eq9WboJNlrt
-    hN9c1Nc3OimQvTaUZpggjevquoB+/jdKN5x97AdSHwBM8RCgWnvdOXi0faBedX1lA2F7
-    kfdj2cEjZxYUld6u+34u+JlGVJbXUF4c8Nya4AQ2jZ5OeAcZrDL7x0ccfaTgAS6kjlk7
-    EtiDbxzFOYBgkVIXNGOe9FelsteM62fN/tjFWU7iUf0kUwBMOeyoyEhz2ICxpJoDdMtr
-    fSDq387V0uMv56cScHGU5NqfJ6Nx2dMvzHC89RB6W1pWOCWDQpumla/pyltOPnbAIvdk
-    bMdw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1708418227;
-    s=strato-dkim-0002; d=strato.com;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=w1+N5nmOtWnLi94k+DWY1OzXI8lNh2fy9ZiJf7+zafE=;
-    b=fZ48uNEltlyqFLk1b7JzRT1cmuN9qLvxRM9eIJRzPIufVRrnKNzizPgDMkCpf6R+kM
-    YcO+0S8pk7cvH4F1DYqO24N7X6gJ5GYWU76rkEhbjLTePM2fcO3+sxqVV1kap3ZwoNMK
-    NAETU1huAlVgpRNtqjzwPMMsvPs5v8e/klEcFc8R+oZppwHFtIMBVFBry2FmmH91facH
-    7t3zcjhpJEBodr3KVKxekQZbIPfcBopYoyMnOFpNjqS/H5HhXCMgdfEc6LQZvl5NWv/i
-    pWlOzYf032M3qhdiq/y2VgxZWh4zELapiR6QcvnYvfe48VKhEND+1W+QV1yiLBRFz2HD
-    X97Q==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1708418227;
-    s=strato-dkim-0002; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=w1+N5nmOtWnLi94k+DWY1OzXI8lNh2fy9ZiJf7+zafE=;
-    b=WIErpTU5iAFrUm1K22oAC9AX8DUdqIbxJRtqcIRBL2LBo2g/TI1zgOOWAZY/dRBMf1
-    42DaoxDTRrhvIZX0FNP+LXoy1BCQFOtEkBdxOEMNLewLX1/yksUuHgCcYIHa6pESeIUm
-    TOm9kIguJpEI2pWk6UnYkpzXf4S6X85BvKZciUbz9dGJkhKEgL4nUZrANNZXTJNfx2Xs
-    wrjl+JMI2VcvLPlC7dhavLM4nTirYhDuSFSZRJmQz40zyE94BM2HkptoWggAS2Z/Jkb9
-    e+NgtIKsU94oTM5deTIn09l7tdw83dgUZ0WMzoQaIWVXs/uMMkvGB2o00tI4LSZvVTnl
-    +X+Q==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1708418227;
-    s=strato-dkim-0003; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=w1+N5nmOtWnLi94k+DWY1OzXI8lNh2fy9ZiJf7+zafE=;
-    b=mC3lvYRbUErbjlzaGOifUO836b2jR58LKy4+KJ6NFJiheVqc2gZAAEHfbVQkdX7BJk
-    E/CP/h+VhcLCMIvUr1Bg==
-X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjG14FZxedJy6qgO1qCHSa1GLptZHusl129OHEdFr0UTaMxFv7GMj7FQ8pbj4LdEENz42GQ=="
-Received: from [IPV6:2a00:6020:4a8e:5010:df30:9f26:ac40:e6a6]
-    by smtp.strato.de (RZmta 49.11.2 AUTH)
-    with ESMTPSA id K49f9c01K8b691B
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Tue, 20 Feb 2024 09:37:06 +0100 (CET)
-Message-ID: <785e60d5-a73e-4f5f-ada0-a9d1891e9c75@hartkopp.net>
-Date: Tue, 20 Feb 2024 09:37:01 +0100
+	s=arc-20240116; t=1708418256; c=relaxed/simple;
+	bh=HOO57Gzu61/FAkjjB5M1Sf2CRzGCCMM4uBcr8gsCFXw=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=oou3eAEz4cHd+wz3wFfwpUpdf4GnANWty73l7nmBGEkKS6UyJNn4A67qHfBLgxuIWZYuuXc4g4nAMHXgntOfda4HiUPa0LFHTPh/jZ3w3s5aYCbqsPWSX6alhvuJUdyL5AEsamHwlcDm3kCOXTm/BfvjNQMwKD2wzlktV1WJ1Uw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=fail (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b=5Bb00git reason="key not found in DNS"; arc=fail smtp.client-ip=40.107.101.104
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nVEvSBa8qiDj9ski9eQcgYWBheO+ltErQTWc8huW/xXPxrF9KDnxLjti6BVAiq/+ggwosCPcCH+TF8EnvGYw6EHzwjJ/CGcb9Wr1v5OqEqvbNIpXkA47ihVJ0x3htzfd1IdnVUzi3q/IjG5rTTNGofzn5w1G1g0pSLiYeO0HyT0UpJLofdAsol0dvtPld+4ngi6+0lA9tRXKwsnLCsEha7jqiddlh7nJEa9CWFZZug92iOxMiHzxUWS/ESBR/CF7XC2gnbAInEOpITsBrJdaweoG4YeDZckcgVsu+BoSE5t6/IfwhZGZUZIicDyFfFR0Yul5+632E3z1hCQ5BlLfCQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iEG25FcoNrcfvRfxmMd0yKJAqmwtq7AU1GJN2x7KD5Q=;
+ b=lT80xg6I4SIZKKCKU0/u4+VRDkFeurW8oRrwI/Jsi3uP1EA9pwmfj1PRK7M2vb9ihbT5a39Om0hlu4zSJ0sopnHmgH6TuX4dYzcmAMLQmwOOgrnQf7u4JMKuj/2Tdn1M6/JesU6/nRYG/xNwchphomvqUaCvJt13eTolzUt7m3I2hh+XAjG6VPPMZW/KAVzGfRGkyGViFrDBcYsQtpprkZH4shZ9p6TOwBXyKsDeO/YTQVpHBQ+2pbbaoVsBVeTr+muUkyxV0vRrd9pPG64EgSWHmG3LpECZZpLI7u4S+/XAv9GkdBJ9949CjXy3DYrgG+AzYKqKwSUD/MCSbQncTA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=amperemail.onmicrosoft.com; dkim=pass
+ header.d=amperemail.onmicrosoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amperemail.onmicrosoft.com; s=selector1-amperemail-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iEG25FcoNrcfvRfxmMd0yKJAqmwtq7AU1GJN2x7KD5Q=;
+ b=5Bb00gitDYXQ9Ca6zF9udPBg7P7bdKIu5rEqz8PtXedSmE402Gs8rbNWGidVABxrXq5eaJRpEI3rO87T9It3YMzZ6xofdttln21Txj6+BxUzWlRBNZw2Ey1nIGkfmVCCBxv1Yh7dxeYGofNzDcBbuh7xJPdu5kP86I7PD7x7JvI=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amperemail.onmicrosoft.com;
+Received: from PH0PR01MB7975.prod.exchangelabs.com (2603:10b6:510:26d::15) by
+ CH0PR01MB6905.prod.exchangelabs.com (2603:10b6:610:102::11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7292.38; Tue, 20 Feb 2024 08:37:28 +0000
+Received: from PH0PR01MB7975.prod.exchangelabs.com ([fe80::91c:92f:45a5:e68a])
+ by PH0PR01MB7975.prod.exchangelabs.com ([fe80::91c:92f:45a5:e68a%6]) with
+ mapi id 15.20.7292.029; Tue, 20 Feb 2024 08:37:28 +0000
+Message-ID: <c2bd73b6-b21f-4ad8-a176-eec677bc6cf3@amperemail.onmicrosoft.com>
+Date: Tue, 20 Feb 2024 16:37:18 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: skbuff: allocate the fclone in the current NUMA node
+To: Eric Dumazet <edumazet@google.com>
+Cc: Huang Shijie <shijie@os.amperecomputing.com>, kuba@kernel.org,
+ patches@amperecomputing.com, davem@davemloft.net, horms@kernel.org,
+ ast@kernel.org, dhowells@redhat.com, linyunsheng@huawei.com,
+ aleksander.lobakin@intel.com, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, cl@os.amperecomputing.com
+References: <20240220021804.9541-1-shijie@os.amperecomputing.com>
+ <CANn89iJoHDzfYfhcwVvR4m7DiVG-UfFNqm+D1WD-2wjOttk6ew@mail.gmail.com>
+ <bea860f8-a196-4dff-a655-4da920e2ebfa@amperemail.onmicrosoft.com>
+ <CANn89i+1uMAL_025rNc3C1Ut-E5S8Nat6KhKEzcFeC1xxcFWaA@mail.gmail.com>
+From: Shijie Huang <shijie@amperemail.onmicrosoft.com>
+In-Reply-To: <CANn89i+1uMAL_025rNc3C1Ut-E5S8Nat6KhKEzcFeC1xxcFWaA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: CH3P221CA0020.NAMP221.PROD.OUTLOOK.COM
+ (2603:10b6:610:1e7::17) To PH0PR01MB7975.prod.exchangelabs.com
+ (2603:10b6:510:26d::15)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] can: raw: raw_getsockopt(): reduce scope of err
-To: Eric Dumazet <edumazet@google.com>, Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-can@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240220-raw-setsockopt-v1-1-7d34cb1377fc@pengutronix.de>
- <CANn89iL7N-1zvBBLoz0qhCApVJRF1LKu=jSyC0yz-wHa3JLGNg@mail.gmail.com>
-Content-Language: en-US
-From: Oliver Hartkopp <socketcan@hartkopp.net>
-In-Reply-To: <CANn89iL7N-1zvBBLoz0qhCApVJRF1LKu=jSyC0yz-wHa3JLGNg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR01MB7975:EE_|CH0PR01MB6905:EE_
+X-MS-Office365-Filtering-Correlation-Id: 47e25453-0f5a-4658-af1f-08dc31ef2be9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	4yR5meek4TdIZcpnJMSC+lcEd/mJi/N//ytHjG/V+TFPgSe4/jk90CeAqXdACuE6tmDEMUhP1Erm/Y09FGrH0UxmbIxen+An0BUKTf36m5PmNa2+rWQgB60Hmdb5h32t4PALr0AH/awR8oLWyupNFQGzJdRYWpaaVQORygEDvO+IEnsW3LzqiK8RhSzKiNF/gzbBJtJhcm4DeRyiVPKr6lZ4RwI5tpQFKlPF/qwPxJyIGYUOB+n622u6Xn9UEwmYTcGGSJtkkdjosD55uWYD9qwKloCVsy4m0C3qZSq/U+pMnDeq1peA0H74rJUjHEeluwVXDbg5hikFbe5aXdTcji3zy1bJcpW4m2bTAIfhvKzlba03BoLjiMz4ba1nCEooGWs/MNbn/iHnUbNP2k2RplEX0bJNidvwUVJlshjr9hk6U8P+FhXUnUuEabboUWDSFQQnDxTIL6G7o+mIg9Kq7YbLANBvwzb1qOyEFJMnbtoY6TRJqcSSrbaGe0G520zbGcfi/WMDYwRQjJ17sAQkiwR9YMMKAu3/5cawywM1qaw=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR01MB7975.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?ajJVOHoxTld4SXNkaGpsTm03a1lGS0dDVkxPdG5MZ0Qwdm9UWERJekpPNUhK?=
+ =?utf-8?B?ODYxYUxDWDhtSDJXSVo5alFMdkpZc2prK25LVzFUMFN3Yi9Qd2tiakhUQ1kr?=
+ =?utf-8?B?WkJJN0kwSkNUR0ZJMlFIS0ZPcFY0R05vbTFBRG5uNHI3S1lxVkF0eis2SGJV?=
+ =?utf-8?B?UjlNRjFvMkUvUDI1UTVrRlFsOVJEK0oyN0VxL1JQSlJycGg0MGJOMWJGalo1?=
+ =?utf-8?B?cUJaTFZwd2hzNVpvdXN2WTZLL2xYMU9RTldGaU1FSW1BcEFhNFV5ckhndHhk?=
+ =?utf-8?B?OEdKdGNIWFB1WThmSmlZMnQ1R1hnaGJvOVFTVWtOYWtvSDY0NGRZOEVWVUg0?=
+ =?utf-8?B?OEJONHowbGFiMzFVYzJrMkpNVUxxUFpHTEVnVUFCbU5ScmZSZmVXRkxHWXdI?=
+ =?utf-8?B?R2JwSEkwcTZQcFFEalgzYVlIVXFmQWV4YnpSTjVXbmN1dXhKc1h5ZGRiSkoz?=
+ =?utf-8?B?NG5zcURuM3p4aXo5elBiYWJ0M3JhNjNmbE5zcUxWeXBDY0lNR3VpN0hSd1Ux?=
+ =?utf-8?B?TUMwOElGVWFERHorNXl6OW5ubk9SV3k4RkJlSjRHNW9FMUhUaHBENXZCeksw?=
+ =?utf-8?B?MGc4bnNQRFdGc1V4Tko0a2hpK3MzcnJlM2dva2hNY0gyb3hyek8rUlVab3Uy?=
+ =?utf-8?B?eWRCNUlqWjhsZG5ML0tLVDhPYk5aVHV5N0tzSzF1S20ybHdCRENqc2wrYzE5?=
+ =?utf-8?B?bU9pWjRwNmNDalN2QytpNlBlUUZCRGdqRnE1UW52d1o5NFRmN0laMDFTU2Fs?=
+ =?utf-8?B?QSszdy8yM3dkRFk3WHp3VnBIc1NVQU1ySit5YWM0RHdWOXUwdThiVzZIVnlz?=
+ =?utf-8?B?U0VUQWk5MWxIV24vMkJ3SkNoT0NDc1dPTGtDTlpTWEdWczg1Uk91clF2Mmdi?=
+ =?utf-8?B?LzBGc3NsS2lCbHRHSGdBWTBUR0F2Sjk0THZ0dVJoV3Exbm1QS1RuY2wyY2Iy?=
+ =?utf-8?B?N1FFbWtNbDlGN0t5UkM2K1pzU0tiMUtGY2tINU1IUUU1bE12bUhTczFxbll3?=
+ =?utf-8?B?QjdzY0NBQlQra1YxQTRiSU5DdkZGZnh3emVubXVxZXcyUmlINjZaMTJwVWxC?=
+ =?utf-8?B?cjM0R2I2c1RIWjRNdVJRdmphUGFRSGNqNXRIKzUwYjFxVm01SmFvQWZTQlQz?=
+ =?utf-8?B?eXdYMjkyZlRHUEJQcnBPK2Z3M3BYL3NWdmdiOUNsdk1KVXltTjNvV1p0bnZz?=
+ =?utf-8?B?aXIyYVlBa3ErbDRpWkZ0L3hHVjEzak5BY0psYmY1MXlQR3R4bmtyTmgwVW1o?=
+ =?utf-8?B?UVNtczNKM3FLanhYU00xR3RNdVJHNDVQc3dXSVpBUG9TWGNtajRpRm5ZdTl0?=
+ =?utf-8?B?R0tOVnVNcUJnMFd3cEU0SXA3cVRCQUdUNTEzckRVK2hWRndySnQ3VzV1ZStz?=
+ =?utf-8?B?OXRlVGh0RW54c1NsblRtSHNqSzB4enB0UzN6eGlVdHJlQURmK3lldG90aS80?=
+ =?utf-8?B?TmJZY1poMU0zd3d2QWttWU0xaEw1cmU5VFRpQnQ4TnFnOG5KQWp0am00MGdo?=
+ =?utf-8?B?NnIrcEJSeHdLSk1LWVBaajUybDRFcVNjWUhubk51UG9SMm90S21YQTVaWWpr?=
+ =?utf-8?B?eXMxWUF6RkhRSFYzYmpuVnJ1MEVLWFVWbHdlbEMxeFl3WGxGMUxoaXU1TGQ0?=
+ =?utf-8?B?QkdmNWNHYlpOOTlpV1ptdHNlT3ZiZ0VrT2tuSGZ1cC9yNHNnWHJRczF0Z2Jv?=
+ =?utf-8?B?SGR0ZUZlVnhBT2FsQ3I2UTFGenU1NDhVcTBvU1d1Z1dsd2pLY0M1djRYZ0xE?=
+ =?utf-8?B?THFuRHE5S210N1RrV3BNTE4yeDE0ZW4yb2xUNlhCT1U4VEowSlZDU0p1N043?=
+ =?utf-8?B?T1JGTVFRQitoMVBBaEVqT3lTU1loUmIzb0MxNHhYUWNaLy9rZVhWSnczd1JH?=
+ =?utf-8?B?K2duL2VuTFNWbGphanp4RVQ1RW52c05SdTBoM2ZvTkt5TmxIMGF3WmdsWDJS?=
+ =?utf-8?B?dmtiMzJLZDgxTjY2eHppYlR0V3pROC92bzg0bnlsQXM0RUNBOEtNb2Z1QUNV?=
+ =?utf-8?B?Y1hWWGFHUElQYnRjcEcxb2xUb2xGTzRUNUhlbTI4dGh4VHhVb1pwYXJ2UjVU?=
+ =?utf-8?B?UUJ1Mmw2c3hIYTdzbG9iQlBHNUVxNk5TRkFzY0RUeSt4VkFTd0t6VUR5cVZ1?=
+ =?utf-8?B?alJSeEdhZ0pQcFRjWHFLVGp0RXlvRERCR04zRWIyYllDS1dCUHRaTHNTejMr?=
+ =?utf-8?B?NlE9PQ==?=
+X-OriginatorOrg: amperemail.onmicrosoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 47e25453-0f5a-4658-af1f-08dc31ef2be9
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR01MB7975.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2024 08:37:28.5897
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6YwmD1l5N40Mer2iMLmpZ/lFsPWqaBpTNj5QMnn3QqdXsbTwF9wbZtKO3NuDFGYAbsGgjjXIpr1Nu6pk1sYcmYVpyjkQOxuCS+bGjE+mJVS0WAy8vp0FUc8vw7Dq0tv6
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR01MB6905
 
 
+在 2024/2/20 16:17, Eric Dumazet 写道:
+> On Tue, Feb 20, 2024 at 7:26 AM Shijie Huang
+> <shijie@amperemail.onmicrosoft.com> wrote:
+>>
+>> 在 2024/2/20 13:32, Eric Dumazet 写道:
+>>> On Tue, Feb 20, 2024 at 3:18 AM Huang Shijie
+>>> <shijie@os.amperecomputing.com> wrote:
+>>>> The current code passes NUMA_NO_NODE to __alloc_skb(), we found
+>>>> it may creates fclone SKB in remote NUMA node.
+>>> This is intended (WAI)
+>> Okay. thanks a lot.
+>>
+>> It seems I should fix the issue in other code, not the networking.
+>>
+>>> What about the NUMA policies of the current thread ?
+>> We use "numactl -m 0" for memcached, the NUMA policy should allocate
+>> fclone in
+>>
+>> node 0, but we can see many fclones were allocated in node 1.
+>>
+>> We have enough memory to allocate these fclones in node 0.
+>>
+>>> Has NUMA_NO_NODE behavior changed recently?
+>> I guess not.
+>>> What means : "it may creates" ? Please be more specific.
+>> When we use the memcached for testing in NUMA, there are maybe 20% ~ 30%
+>> fclones were allocated in
+>>
+>> remote NUMA node.
+> Interesting, how was it measured exactly ?
 
-On 2024-02-20 09:25, Eric Dumazet wrote:
-> On Tue, Feb 20, 2024 at 9:16 AM Marc Kleine-Budde <mkl@pengutronix.de> wrote:
->>
->> Reduce the scope of the variable "err" to the individual cases. This
->> is to avoid the mistake of setting "err" in the mistaken belief that
->> it will be evaluated later.
->>
->> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
->> ---
->>   net/can/raw.c | 12 ++++++++----
->>   1 file changed, 8 insertions(+), 4 deletions(-)
->>
->> diff --git a/net/can/raw.c b/net/can/raw.c
->> index 897ffc17d850..2bb3eab98af0 100644
->> --- a/net/can/raw.c
->> +++ b/net/can/raw.c
->> @@ -756,7 +756,6 @@ static int raw_getsockopt(struct socket *sock, int level, int optname,
->>          struct raw_sock *ro = raw_sk(sk);
->>          int len;
->>          void *val;
->> -       int err = 0;
->>
->>          if (level != SOL_CAN_RAW)
->>                  return -EINVAL;
->> @@ -766,7 +765,9 @@ static int raw_getsockopt(struct socket *sock, int level, int optname,
->>                  return -EINVAL;
->>
->>          switch (optname) {
->> -       case CAN_RAW_FILTER:
->> +       case CAN_RAW_FILTER: {
->> +               int err = 0;
->> +
->>                  lock_sock(sk);
->>                  if (ro->count > 0) {
->>                          int fsize = ro->count * sizeof(struct can_filter);
->> @@ -791,7 +792,7 @@ static int raw_getsockopt(struct socket *sock, int level, int optname,
->>                  if (!err)
->>                          err = put_user(len, optlen);
->>                  return err;
->> -
->> +       }
->>          case CAN_RAW_ERR_FILTER:
->>                  if (len > sizeof(can_err_mask_t))
->>                          len = sizeof(can_err_mask_t);
->> @@ -822,7 +823,9 @@ static int raw_getsockopt(struct socket *sock, int level, int optname,
->>                  val = &ro->xl_frames;
->>                  break;
->>
->> -       case CAN_RAW_XL_VCID_OPTS:
->> +       case CAN_RAW_XL_VCID_OPTS: {
->> +               int err = 0;
->> +
->>                  /* user space buffer to small for VCID opts? */
->>                  if (len < sizeof(ro->raw_vcid_opts)) {
->>                          /* return -ERANGE and needed space in optlen */
->> @@ -839,6 +842,7 @@ static int raw_getsockopt(struct socket *sock, int level, int optname,
->>                          err = put_user(len, optlen);
->>                  return err;
->>
->> +       }
->>          case CAN_RAW_JOIN_FILTERS:
->>                  if (len > sizeof(int))
->>                          len = sizeof(int);
->>
->> ---
->> base-commit: c8fba5d6df5e476aa791db4f1f014dad2bb5e904
->> change-id: 20240220-raw-setsockopt-f6e173cdbbbb
-> 
-> What is the target tree ?
-> 
-> In net-next tree, syzbot complained about a bug added in
-> 
-> commit c83c22ec1493c0b7cc77327bedbd387e295872b6
-> Author: Oliver Hartkopp <socketcan@hartkopp.net>
-> Date:   Mon Feb 12 22:35:50 2024 +0100
-> 
->      can: canxl: add virtual CAN network identifier support
-> 
-> Patch to fix the issue has not been sent yet ?
+I created a private patch to record the status for each fclone allocation.
 
-The patch with the fix has been sent yesterday and Marc applied it to 
-his linux-can-next tree for a pull request to net-next.
 
-https://lore.kernel.org/linux-can/20240220-mobility-thigh-8ddfb02bfab9-mkl@pengutronix.de/T/#t
+> Are you using SLUB or SLAB ?
 
-Best regards,
-Oliver
+I think I use SLUB. (CONFIG_SLUB=y, 
+CONFIG_SLAB_MERGE_DEFAULT=y,CONFIG_SLUB_CPU_PARTIAL=y)
 
-> 
-> diff --git a/net/can/raw.c b/net/can/raw.c
-> index cb8e6f788af84ac65830399baac6d1cf3d093e08..897ffc17d850670003e5cf3402477e8fc201f61e
-> 100644
-> --- a/net/can/raw.c
-> +++ b/net/can/raw.c
-> @@ -835,7 +835,9 @@ static int raw_getsockopt(struct socket *sock, int
-> level, int optname,
->                          if (copy_to_user(optval, &ro->raw_vcid_opts, len))
->                                  err = -EFAULT;
->                  }
-> -               break;
-> +               if (!err)
-> +                       err = put_user(len, optlen);
-> +               return err;
-> 
->          case CAN_RAW_JOIN_FILTERS:
->                  if (len > sizeof(int))
-> 
+
+Thanks
+
+Huang Shijie
+
 
