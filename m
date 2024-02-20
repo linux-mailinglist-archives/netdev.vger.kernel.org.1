@@ -1,99 +1,105 @@
-Return-Path: <netdev+bounces-73203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF91585B58E
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:40:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFB4385B590
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:40:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2DC61C212C3
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:40:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2CE01C214E1
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:40:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF6D75D46F;
-	Tue, 20 Feb 2024 08:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 062C85CDF6;
+	Tue, 20 Feb 2024 08:40:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kZorPSc3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rm5E89nk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A818A5D462;
-	Tue, 20 Feb 2024 08:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E4A5A110;
+	Tue, 20 Feb 2024 08:40:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708418428; cv=none; b=gS5EHutCzGOr++CRWIZ6Xnhl0t0H5RREdUHmHgAslz/R26OTHgazboFHd7coCEDa3w2R8VeEaFHrSrUH2gfdKuzVs48CJcu2YDImbVAfjKVzbgHIu/qxFyuhJt20L0uZvlByRgqs3x+v95+hZKv8O8liBmnO61sj6XK49uenlsI=
+	t=1708418438; cv=none; b=TGWLIoqKL6pEA95qlGKGrP+Rx92ylKLlJXhmc10mwomBtwu4oLkTl7+aw7ldFb6k9y3NJkswWPOfktvlWJgLZ5cpdZeQnMfwQBMj6h0WARyvMjGco3xy4S+CvaODivf5ZhZ23CdB232lTCy7CYe6/jQjM5wZmzY1D1gq3fds9R8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708418428; c=relaxed/simple;
-	bh=HLOlmpHG1kZkcB4qdxThMT87TdWuTnbWHGjkYOlMYAI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=R6VhJKQQn1mJE0R2FNLNZxCtLIsegdabg3XxL7Ow2wmBeEGQM7jOl2uwclzKSO2gbWUCyVLv2443GvOgTpD+5IIti93n2Mco9xcMOFRJRlVQERkeqbVXMh3+YYMfM9A3GI7NMKVfWoe6d5LdFsJj6Zg043+rIRfT30UjNmmY8UU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kZorPSc3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 292AEC43390;
-	Tue, 20 Feb 2024 08:40:28 +0000 (UTC)
+	s=arc-20240116; t=1708418438; c=relaxed/simple;
+	bh=2fx/Ssc/6vEiZR2sY8kt9a8iCnW1DDxkpIcLwL+vJD0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EzGnNbI8zgljtds1/sIjNrRT+E8ArprRYIkuxnua+MMUG9J6Xlo6gImkLR3+D/ptYuAV4QGLzL6yI38FAPn85FddYU7dIWSq189fFuaFRM05npFyx44BUaIetZwPvuDc960Zs7l0cRg8JLBo/hNFef0hWT2S0ZkD1evVh60Zm4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rm5E89nk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22661C433F1;
+	Tue, 20 Feb 2024 08:40:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708418428;
-	bh=HLOlmpHG1kZkcB4qdxThMT87TdWuTnbWHGjkYOlMYAI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kZorPSc3doIkz9twbLj8iD5DqotbpJrRJ4CImKdbZN1Km1bH39bb2ZeX0eDOg+K4H
-	 8ISLG/j0JuCWLz/gblaZ3HnEXFu5crFpM6TdwRJNA2P9qP34HNMD4e1ykgArQaAlmt
-	 4cxkimRZgW/kwx9JHGy01OJiykETEQiUqOVo9JvEgPA5bqyTEM/4IgD1nAz7uDDGcG
-	 XtvfZJK5BgGaFqjo7a+J+qiqFcVSKKG/YbhaedcTx/pdUq60MzuxW/AcWt2d+OJ2Jg
-	 rb3KJQ5U32bd71E252ALN7wWZCMMIQC2oB42QnNA5+DnpMZ/FqCrgHCEgaGzCQ3+cn
-	 8kLPhU3+L109Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 111CAC04E32;
-	Tue, 20 Feb 2024 08:40:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1708418438;
+	bh=2fx/Ssc/6vEiZR2sY8kt9a8iCnW1DDxkpIcLwL+vJD0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Rm5E89nk2HRkQ+bEY1H7+DJvYFtC3dJbpxGpqVWX+4Ny0wLO5Prw9x2nDYKfJt6Nh
+	 KKGaYZaWtJK0vUcr8XiY7jGdYlym4yokpKTacZsi6iTSQnp3ZVeaglRhWGaiqHY/dn
+	 OfeikerJ0R0kNihtneUZsYRl2Pc5dY0V9Qu/th/5JltuzhvduD69mhBjVVofCwk0+h
+	 ZHXjUsY6LlX43AEpGQjKGYccoLtJhwijsPqGAglKv9vCcWDSKphwIeHrMlBL3judIH
+	 daRhGV+86OFsy/xOM2TsUdTufdpjZSHs5v1w+zqXnLw/mstRPRDKcwLAilQDJqRU/f
+	 NtjQIUEl/wpfg==
+Date: Tue, 20 Feb 2024 08:40:33 +0000
+From: Simon Horman <horms@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
+	edumazet@google.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stephen@networkplumber.org,
+	f.fainelli@gmail.com, Johannes Berg <johannes.berg@intel.com>,
+	Martin KaFai Lau <martin.lau@kernel.org>
+Subject: Re: [PATCH net-next v3] net: sysfs: Do not create sysfs for non BQL
+ device
+Message-ID: <20240220084033.GR40273@kernel.org>
+References: <20240219104238.3782658-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v8 0/2] Abstract page from net stack
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170841842806.28167.12571319635937974620.git-patchwork-notify@kernel.org>
-Date: Tue, 20 Feb 2024 08:40:28 +0000
-References: <20240214223405.1972973-1-almasrymina@google.com>
-In-Reply-To: <20240214223405.1972973-1-almasrymina@google.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, jgg@nvidia.com,
- christian.koenig@amd.com, shakeelb@google.com, linyunsheng@huawei.com,
- willemdebruijn.kernel@gmail.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240219104238.3782658-1-leitao@debian.org>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Wed, 14 Feb 2024 14:34:01 -0800 you wrote:
-> Changes in v8:
-> - Moved back skb_add_rx_frag_netmem to .c file (Paolo).
-> - Applied Paolo's Acked-by.
+On Mon, Feb 19, 2024 at 02:42:36AM -0800, Breno Leitao wrote:
+> Creation of sysfs entries is expensive, mainly for workloads that
+> constantly creates netdev and netns often.
 > 
-> -----------
+> Do not create BQL sysfs entries for devices that don't need,
+> basically those that do not have a real queue, i.e, devices that has
+> NETIF_F_LLTX and IFF_NO_QUEUE, such as `lo` interface.
 > 
-> Changes in v7;
-> - Addressed comments from Paolo.
->   - Moved skb_add_rx_frag* to header file.
->   - Moved kcmsock.c check.
+> This will remove the /sys/class/net/eth0/queues/tx-X/byte_queue_limits/
+> directory for these devices.
 > 
-> [...]
+> In the example below, eth0 has the `byte_queue_limits` directory but not
+> `lo`.
+> 
+> 	# ls /sys/class/net/lo/queues/tx-0/
+> 	traffic_class  tx_maxrate  tx_timeout  xps_cpus  xps_rxqs
+> 
+> 	# ls /sys/class/net/eth0/queues/tx-0/byte_queue_limits/
+> 	hold_time  inflight  limit  limit_max  limit_min
+> 
+> This also removes the #ifdefs, since we can also use netdev_uses_bql() to
+> check if the config is enabled. (as suggested by Jakub).
+> 
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-Here is the summary with links:
-  - [net-next,v8,1/2] net: introduce abstraction for network memory
-    https://git.kernel.org/netdev/net-next/c/18ddbf5cf0e7
-  - [net-next,v8,2/2] net: add netmem to skb_frag_t
-    https://git.kernel.org/netdev/net-next/c/21d2e6737c97
+Thanks Breno,
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+I like that this removes sysfs entries for devices for which they do not
+act on.  Although I understand it is not a complete solution - still not
+all devices that have these entries use BQL - I think a key value there is
+to alleviate potential confusion for users.  And as such, this is a step in
+the right direction.
 
+I also like that some #ifdefs disappear.
 
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+...
 
