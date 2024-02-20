@@ -1,130 +1,127 @@
-Return-Path: <netdev+bounces-73133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACD8D85B173
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 04:31:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DBB985B182
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 04:36:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BFC5281E45
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 03:31:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8FDD1F21606
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 03:36:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7445256B8A;
-	Tue, 20 Feb 2024 03:29:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8293C4596C;
+	Tue, 20 Feb 2024 03:36:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jpd0a0yn"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="lvw5rR0n"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50BD756B85
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 03:29:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E74A481B3;
+	Tue, 20 Feb 2024 03:36:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708399794; cv=none; b=R9P/bfgPi7b2m3L/DUPeM8gZjfLkDzzVCItAnEcPkEnzpJ2mH3GLm+Zjzj+esolxJrGpBrSRcU5/1nfhcl/iQebNapNTCf2QZiulLJsd0M+Bkyk2T30WaAkTPZfW34I/smMMZbfkP5Os8fR15IN0gLMFy7KMGPMnu80BQNq1HSc=
+	t=1708400193; cv=none; b=O1FGLSjZBG/Eddq2YUfRT7SZ8dYxW3MpfoOejz0DTFhw58yREymPjp/4S1YIakM8LO9pw1I7A7QMQVxjAEGHyf0wU23Xpt70twjoiz8lAWfjQG0G1Gw14OZWfH481lSoUY0fKYRS+Chr32gghFzOgvJg3adEw3UbeGXFPC8XFNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708399794; c=relaxed/simple;
-	bh=Asbp0e0UT3h4Yq0AtejhBzjhgbz71HzZ/BSbV/Zutn0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EXQ78PDSgPPME8+lyAJ3UMkeNaczaVr03CZaXCl7P/pczGdxQjQOCbYodf4lTK7MOpjbVY1TSH7u6qpJL7ktkhRLU/tkHH2cMTtdIwTNtFzj0JTsMZuJLZ7UIf8aB/LNa573r7GDHRtKeucFNvYI+Vi60obBXs+LBLBzQLkUXlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jpd0a0yn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6214C433F1;
-	Tue, 20 Feb 2024 03:29:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708399793;
-	bh=Asbp0e0UT3h4Yq0AtejhBzjhgbz71HzZ/BSbV/Zutn0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jpd0a0ynFncAbblajTYdCTWozMgy0Bye93tJ60mhKmUPI3lFvRWKRlE5OM5cd3Ema
-	 uOldeDnDPUp0uN2K4XbEoaMC1u7IerUtr3ySoY4QGxV2gmzM+wfW6TTwwXXhy1XyGR
-	 KvMW3C5VIwDIWnWfawRMo16EQC1HBSIYP1csnHfCDR2MxFCw7I1Q5QGKsu77gOA9SQ
-	 jv7Cq1vQh24jzyVvA9q8YgjY0qJByTznq5YvMOslcHe2gkkF0kck/DJ+sfsDTQIh6Q
-	 qi5rea6++5fWgGKahX8k33UiDS/isHIuku+27HryZFTsDtfrsuKRf/yUo667LD0hTQ
-	 BSQBNkJDMzEtA==
-From: Saeed Mahameed <saeed@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>,
-	netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>
-Subject: [net 10/10] net/mlx5e: Switch to using _bh variant of of spinlock API in port timestamping NAPI poll context
-Date: Mon, 19 Feb 2024 19:29:48 -0800
-Message-ID: <20240220032948.35305-5-saeed@kernel.org>
-X-Mailer: git-send-email 2.43.2
-In-Reply-To: <20240219182320.8914-1-saeed@kernel.org>
-References: <20240219182320.8914-1-saeed@kernel.org>
+	s=arc-20240116; t=1708400193; c=relaxed/simple;
+	bh=aShSRLt3GevXA1Qx62ev9VFaOPlhkE/c4BBllw9Klyk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=frhOjJLnGhZfE63jOzgnu1tx7LxvJ1NoTi4EDRGq7c+1lT+pWgASbxkVmYXe7SnPr1V1j96fWral5Ljsg90zcbCCgjAmeb05PiqhK2U64b8yvarRz/rPuY/21TTKjFYv41smVwiAuDwPVTAPxkA1nLkXAVijAVhbXRPpo+UgTCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=lvw5rR0n; arc=none smtp.client-ip=115.124.30.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1708400182; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=R/VW+J0LluQWcqmcYIaT+iX59/8UWwxw0zPEseH7/1A=;
+	b=lvw5rR0nMV6BCpc2t3XXBrlKqbWk+WjYzGO2FrdY4o1GAN44lcWIpGTT1NVtKLEpNydcGcC12t/2W37HCH3MeSI0yUdN/YRaTQW54k8jWppOuiuIasdliJkmnE4z6xGDmLhpNnfxi+iJMo4+p80tugyDHW0sfaz3fPrFhbARNhk=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0W0v7u33_1708400180;
+Received: from 30.221.128.233(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W0v7u33_1708400180)
+          by smtp.aliyun-inc.com;
+          Tue, 20 Feb 2024 11:36:21 +0800
+Message-ID: <58f36cb7-7427-4ed7-9a8e-baaacdd774cb@linux.alibaba.com>
+Date: Tue, 20 Feb 2024 11:36:20 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 14/15] net/smc: introduce loopback-ism DMB data
+ copy control
+To: Wenjia Zhang <wenjia@linux.ibm.com>, wintera@linux.ibm.com,
+ hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, jaka@linux.ibm.com, Gerd Bayer <gbayer@linux.ibm.com>
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240111120036.109903-1-guwen@linux.alibaba.com>
+ <20240111120036.109903-15-guwen@linux.alibaba.com>
+ <b3b71f26-239f-49c9-98e8-7eba2c4ecf69@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <b3b71f26-239f-49c9-98e8-7eba2c4ecf69@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 
-The NAPI poll context is a softirq context. Do not use normal spinlock API
-in this context to prevent concurrency issues.
 
-Fixes: 3178308ad4ca ("net/mlx5e: Make tx_port_ts logic resilient to out-of-order CQEs")
-Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
-CC: Vadim Fedorenko <vadfed@meta.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+On 2024/2/16 22:25, Wenjia Zhang wrote:
+> 
+> 
+> On 11.01.24 13:00, Wen Gu wrote:
+>> This provides a way to {get|set} whether loopback-ism device supports
+>> merging sndbuf with peer DMB to eliminate data copies between them.
+>>
+>> echo 0 > /sys/devices/virtual/smc/loopback-ism/dmb_copy # support
+>> echo 1 > /sys/devices/virtual/smc/loopback-ism/dmb_copy # not support
+>>
+> Besides the same confusing as Niklas already mentioned, the name of the option looks not clear enough to what it means. 
+> What about:
+> echo 1 > /sys/devices/virtual/smc/loopback-ism/nocopy_support # merge mode
+> echo 0 > /sys/devices/virtual/smc/loopback-ism/nocopy_support # copy mode
+>
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
-index 078f56a3cbb2..ca05b3252a1b 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
-@@ -42,9 +42,9 @@ mlx5e_ptp_port_ts_cqe_list_add(struct mlx5e_ptp_port_ts_cqe_list *list, u8 metad
- 
- 	WARN_ON_ONCE(tracker->inuse);
- 	tracker->inuse = true;
--	spin_lock(&list->tracker_list_lock);
-+	spin_lock_bh(&list->tracker_list_lock);
- 	list_add_tail(&tracker->entry, &list->tracker_list_head);
--	spin_unlock(&list->tracker_list_lock);
-+	spin_unlock_bh(&list->tracker_list_lock);
- }
- 
- static void
-@@ -54,9 +54,9 @@ mlx5e_ptp_port_ts_cqe_list_remove(struct mlx5e_ptp_port_ts_cqe_list *list, u8 me
- 
- 	WARN_ON_ONCE(!tracker->inuse);
- 	tracker->inuse = false;
--	spin_lock(&list->tracker_list_lock);
-+	spin_lock_bh(&list->tracker_list_lock);
- 	list_del(&tracker->entry);
--	spin_unlock(&list->tracker_list_lock);
-+	spin_unlock_bh(&list->tracker_list_lock);
- }
- 
- void mlx5e_ptpsq_track_metadata(struct mlx5e_ptpsq *ptpsq, u8 metadata)
-@@ -155,7 +155,7 @@ static void mlx5e_ptpsq_mark_ts_cqes_undelivered(struct mlx5e_ptpsq *ptpsq,
- 	struct mlx5e_ptp_metadata_map *metadata_map = &ptpsq->metadata_map;
- 	struct mlx5e_ptp_port_ts_cqe_tracker *pos, *n;
- 
--	spin_lock(&cqe_list->tracker_list_lock);
-+	spin_lock_bh(&cqe_list->tracker_list_lock);
- 	list_for_each_entry_safe(pos, n, &cqe_list->tracker_list_head, entry) {
- 		struct sk_buff *skb =
- 			mlx5e_ptp_metadata_map_lookup(metadata_map, pos->metadata_id);
-@@ -170,7 +170,7 @@ static void mlx5e_ptpsq_mark_ts_cqes_undelivered(struct mlx5e_ptpsq *ptpsq,
- 		pos->inuse = false;
- 		list_del(&pos->entry);
- 	}
--	spin_unlock(&cqe_list->tracker_list_lock);
-+	spin_unlock_bh(&cqe_list->tracker_list_lock);
- }
- 
- #define PTP_WQE_CTR2IDX(val) ((val) & ptpsq->ts_cqe_ctr_mask)
--- 
-2.43.2
+OK, if we decide to keep the knobs, I will improve the name. Thanks!
 
+>> The settings take effect after re-activating loopback-ism by:
+>>
+>> echo 0 > /sys/devices/virtual/smc/loopback-ism/active
+>> echo 1 > /sys/devices/virtual/smc/loopback-ism/active
+>>
+>> After this, the link group related to loopback-ism will be flushed and
+>> the sndbufs of subsequent connections will be merged or not merged with
+>> peer DMB.
+>>
+>> The motivation of this control is that the bandwidth will be highly
+>> improved when sndbuf and DMB are merged, but when virtually contiguous
+>> DMB is provided and merged with sndbuf, it will be concurrently accessed
+>> on Tx and Rx, then there will be a bottleneck caused by lock contention
+>> of find_vmap_area when there are many CPUs and CONFIG_HARDENED_USERCOPY
+>> is set (see link below). So an option is provided.
+>>
+>> Link: https://lore.kernel.org/all/238e63cd-e0e8-4fbf-852f-bc4d5bc35d5a@linux.alibaba.com/
+>> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+>> ---
+> We tried some simple workloads, and the performance of the no-copy case was remarkable. Thus, we're wondering if it is 
+> necessary to have the tunable setting in this loopback case? Or rather, why do we need the copy option? Is that because 
+> of the bottleneck caused by using the combination of the no-copy and virtually contiguours DMA? Or at least let no-copy 
+> as the default one.
+
+Yes, it is because the bottleneck caused by using the combination of the no-copy
+and virtual-DMB. If we have to use virtual-DMB and CONFIG_HARDENED_USERCOPY is
+set, then we may be forced to use copy mode in many CPUs environment, to get the
+good latency performance (the bandwidth performance still drop because of copy mode).
+
+But if we agree that physical-DMB is acceptable (it costs 1 physical buffer per conn side
+in loopback-ism no-copy mode, same as what sndbuf costs when using s390 ISM), then
+there is no such performance issue and the two knobs can be removed. (see also the reply
+for 13/15 patch [1]).
+
+[1] https://lore.kernel.org/netdev/442061eb-107a-421d-bc2e-13c8defb0f7b@linux.alibaba.com/
+
+Thanks!
 
