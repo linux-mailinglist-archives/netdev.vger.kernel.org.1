@@ -1,114 +1,87 @@
-Return-Path: <netdev+bounces-73224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 090D085B715
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 10:18:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F5B285B71B
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 10:18:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5871D287C36
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:18:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B21E61C24037
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:18:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12D3C5FEE8;
-	Tue, 20 Feb 2024 09:17:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E1F5F480;
+	Tue, 20 Feb 2024 09:17:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fXlFU53k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MINPxiDQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D6FB6026A;
-	Tue, 20 Feb 2024 09:17:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDFA260DDF;
+	Tue, 20 Feb 2024 09:17:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708420662; cv=none; b=P48tCuD91ILpBZwp/RxB1L9511bHc8uW0/P/scxoCZzNGg4fZmuryKLo+Q4covjveFTCC3RzIHQRgPiQfQV7ReGyjzry+CrT8uOYLR0Myh2qGuuE6PgKbF2BT14A42XvaLG2JdCnfI6YIMyF2vIP8i4BzJQH50kp3vGyFdoThiU=
+	t=1708420677; cv=none; b=c0wVq3YcmgDMqcbW6xcUhNyTXUKDSc65KUzuuXf+i2aSraPUKOdwVOIigNCD7vBM7tkSlCJWFdXc2ysreG9KIgBVARXPGTCeYU+8sb/0CcA+QxQgwc4hqvNL1cujguAmkkkS/RMy+3vyu6CdcK90sBGYNbNjfAKo6ACVZeAmwPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708420662; c=relaxed/simple;
-	bh=Y4+kw5fSFQQlDkOZRhwRC0+QUSv5CfeWWx9wRZnsPNA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=dbrUeza8ImDyirRv55eAHvzgzrpkhFOho2xx4KFbxg90TlWNYNNcWDkhn9TUx3Em3YMSFATEAnlCsbolIO+W1ZsxTrMYW5aRdgvNIMnE9M4ZgBzxnyNcgH/QUbTQ65/tiQgSGh/hiYXYQRtvlHJYJfYP8Dj13I6hIKUSukrda8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fXlFU53k; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4126ac0c32eso8689645e9.1;
-        Tue, 20 Feb 2024 01:17:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708420658; x=1709025458; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=yZrwGhtv9s0VvylEijnGbReSc1OyaTC/p8gufQFjhr0=;
-        b=fXlFU53kI8ptXEVD3AlWhtLcMUkCnJnchwSfZe9zRwet872/UjdccJ6QDHTIhRUPa6
-         S4TyZqsnlsmsi85Ikdc8eAM5oDLshfKkKBQntOpnkLNPXQ4hbrALz8XpL36OGaf12yGO
-         LympI4qKW7vbB52v3OjNBF9KfBahR/c2nvxYp/OVZXHBouxCqbQg6N1IBU8ZYv3aK2Wy
-         P+1PRmJg0DFYAduZphio3drkXbnEdzZTBhEG4KAvcycmb6V9vlIEncyqa1n2+Zoj6U9f
-         gOWwgCyX4THi+WQ1AiFi3FAFKNA2eRxUMJ4OF8SfqKmqPzsp7qC9DUNedf0yX2k4aAOc
-         t6jQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708420658; x=1709025458;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yZrwGhtv9s0VvylEijnGbReSc1OyaTC/p8gufQFjhr0=;
-        b=MTpl6Gq/UjkUlziKE+tgWl4RuLYI9BvRWxzwAFwL7kvpTd1Oteh1JAMWyo9AT3IpBo
-         rMmF5H4YH0+I1gm8uMorUrkO5xhaXywwB9Qa0RMG/PZ17Z7ByNs8fDVmu2+WMhYYTQAW
-         TDYJNDvqpgjBDrHUcK71yODaORCWTsdw0vHmwZQbRyXCnIpmhr/5UQZN6dNRKTs0w2EU
-         Egds5ZzCaymICI5ebd7ZC4DyCfo4tv+EKWbg6TrxMXqwOSIS1hfv8RHsWY+1oiBt5Yzg
-         UU35NRrB55Dc7vyAWWL2jXIoC2v3PMHrAUcrs+VG57TDLnFOvnVGqRqV3WatD2gks8m0
-         eSYA==
-X-Forwarded-Encrypted: i=1; AJvYcCVTy/5MvmefyAN5ThNdC0nmCSiSisW7DSPRGtp/j7Yzb6ujDf2LWulkH9G3GWxK8IYbD92w5lM9u3KapFsCiLPkWO30O0Z70HO1aqf0LkjVA6Qq+F7D2zOhSviEzduUtaoqhnzI
-X-Gm-Message-State: AOJu0Yw0e6AIH9IfynhaFDC8SiCW1hVsxx0ISt93S4sg2mT8rlZoKKXZ
-	CfGLo3mI8f5eQHdqeIJHFUyQoxa+FM1nqcoeU19h2keqOhVo2rk/
-X-Google-Smtp-Source: AGHT+IFheKiyGbQ/0yz9kwl8fvcJsLXeq6xjON82DDfxSrN5tD+ZPojaj04MFISzpmZU5qn/ENxqRg==
-X-Received: by 2002:a05:600c:4a29:b0:412:f24:5732 with SMTP id c41-20020a05600c4a2900b004120f245732mr11426030wmp.37.1708420658575;
-        Tue, 20 Feb 2024 01:17:38 -0800 (PST)
-Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
-        by smtp.gmail.com with ESMTPSA id m12-20020a5d4a0c000000b0033b60bad2fcsm12748356wrq.113.2024.02.20.01.17.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Feb 2024 01:17:38 -0800 (PST)
-From: Colin Ian King <colin.i.king@gmail.com>
-To: Bryan Whitehead <bryan.whitehead@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH][next] net: microchip: lan743x: Fix spelling mistake "erro" -> "error"
-Date: Tue, 20 Feb 2024 09:17:37 +0000
-Message-Id: <20240220091737.2676984-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1708420677; c=relaxed/simple;
+	bh=9LsdSu2OdnC/3DuAFj0k0VOgM/ft+uowjXfSoCMDeyQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sz8/FsABhufOlFc//MGUtetJMnIA1tPVzkvqw2rS/LXgxRAlHVPexQi4omS/nCmLi316KgbSid36IOog/+dPgU4++KMTXckibiTvOn20txm6QOqHuFYBQnsvabScOB0v6p2/867KAeb77AwGKf1o/nwLwNCfw2DAIwD9ddJDEe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MINPxiDQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B8DDC43390;
+	Tue, 20 Feb 2024 09:17:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708420677;
+	bh=9LsdSu2OdnC/3DuAFj0k0VOgM/ft+uowjXfSoCMDeyQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=MINPxiDQYOYFuRySK3zZze7Q8hIG1Lzme3urvPukljmaG9Lpx7m2LNA/rgFPInNqT
+	 erVdx5zZThUNE7qXKgQjx4RVTj9D/moILrahgPOY8uriQyaIYrST4XGPacvdPR9+1/
+	 YZDmqF3yu6OTRXKDPkOkbXKDYZVCKoTSOovMbJF05PpuFd7KkesD6mwVoofakPN1zn
+	 sD4VANrlUvoC/4sBtXovBbeTTpYyatuDqCUamGmH/zbFsNk2KGEJhthnmAum9HG2e9
+	 uxRQAeugK2P+9HojUTPMpNruQG8sfj9/UTzoRywLQPuKj7vvQWwt3uHcW+v+9DvhNv
+	 QRJQQqmeho/Dw==
+Message-ID: <04d72b93-a423-4574-a98e-f8915a949415@kernel.org>
+Date: Tue, 20 Feb 2024 10:17:53 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net-next 1/2] net: Reference bpf_redirect_info via
+ task_struct on PREEMPT_RT.
+Content-Language: en-US
+To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20240213145923.2552753-1-bigeasy@linutronix.de>
+ <20240213145923.2552753-2-bigeasy@linutronix.de>
+ <66d9ee60-fbe3-4444-b98d-887845d4c187@kernel.org>
+ <20240214121921.VJJ2bCBE@linutronix.de> <87y1bndvsx.fsf@toke.dk>
+ <20240214142827.3vV2WhIA@linutronix.de> <87le7ndo4z.fsf@toke.dk>
+ <20240214163607.RjjT5bO_@linutronix.de> <87jzn5cw90.fsf@toke.dk>
+ <20240216165737.oIFG5g-U@linutronix.de> <87ttm4b7mh.fsf@toke.dk>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <87ttm4b7mh.fsf@toke.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-There is a spelling mistake in a netif_err message. Fix it.
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
- drivers/net/ethernet/microchip/lan743x_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
-index 45e209a7d083..bd8aa83b47e5 100644
---- a/drivers/net/ethernet/microchip/lan743x_main.c
-+++ b/drivers/net/ethernet/microchip/lan743x_main.c
-@@ -1196,7 +1196,7 @@ static int lan743x_sgmii_config(struct lan743x_adapter *adapter)
- 	ret = lan743x_is_sgmii_2_5G_mode(adapter, &status);
- 	if (ret < 0) {
- 		netif_err(adapter, drv, adapter->netdev,
--			  "erro %d SGMII get mode failed\n", ret);
-+			  "error %d SGMII get mode failed\n", ret);
- 		return ret;
- 	}
- 
--- 
-2.39.2
+On 19/02/2024 20.01, Toke Høiland-Jørgensen wrote:
+> may be simpler to use pktgen, and at 10G rates that shouldn't become a
+> bottleneck either. The pktgen_sample03_burst_single_flow.sh script in
+> samples/pktgen in the kernel source tree is fine for this usage.
 
+Example of running script:
+  ./pktgen_sample03_burst_single_flow.sh -vi mlx5p1 -d 198.18.1.1 -m 
+ec:0d:9a:db:11:c4 -t 12
+
+Notice the last parameter, which is number threads to start.
+If you have a ixgbe NIC driver, then I recommend -t 2 even if you have 
+more CPUs.
+
+--Jesper
 
