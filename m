@@ -1,161 +1,187 @@
-Return-Path: <netdev+bounces-73437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BF6285C6B3
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 22:04:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5464C85C862
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 22:21:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15DC1283A7F
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 21:04:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8AEA6B210C8
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 21:21:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C88E151CE8;
-	Tue, 20 Feb 2024 21:03:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CA8D151CFF;
+	Tue, 20 Feb 2024 21:21:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ULk+RhD7"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kJ6oHUQB"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F19B152DF9
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 21:03:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4600D14A4E6
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 21:21:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708463037; cv=none; b=JRWktyjMvU4U65WBK5d4YKbdNEjtt8DefUAA7PyQV7z4mghwa0nkWWKIInYhc2ybe0nLZ2LvTZPCVLGN0y9ZyJ6DrhDNktNvD0fJ0AC7Kr84zqMtTqDePRUrCOdUObgFpfmH3m17oV6Q0DbjII7QozmSH2CKAQw0cvHpwqiHb90=
+	t=1708464073; cv=none; b=ABqAe1gspvpLMLs4vCo6kbxG6wc/oXqArMGclw+AW8eKTTIX2Gpt1RdBG6QRN4dFKPHmbr9JP25Y3gpCOPTKiI1gxARFoFZ57zIm48nHkUp/klRfsaCkQaTPOrreRa2ptzgwwR+AVaL5zIZM8UtU7CXxJNVRjLRlqlWx4gFNPt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708463037; c=relaxed/simple;
-	bh=yFzbobEZz1Ejk+C4hN4SD4uxZslKPofrmu/6I7dSQg4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HKTHLOSjaOpIQo/YIzOL4lMcTGtZ6CiiIam9XYVymzc+UwPElaNKBjmhV0i7rfm9fgFwS81UtFER3yQRxzRyoaME7Ud5+FecVjpjyxwPp76aQ9WAOWg+ZtIuSzs0yF0xLwrRpN21nidpMeMKZOYLoOsI0MYD9GjKOJp1fPjxPTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ULk+RhD7; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708463031;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9Cx1B6cH8M4WwsZid+9jIkWUL8B6BHRlRdPrxUHWq74=;
-	b=ULk+RhD7OCsoEmArRML5uzqjsMXbjZuZq+IdvH7er7QtYxFwgnJDrFJsOkNoHdXszx0ARC
-	maKq/aXnH3xzmNM/1hiQgNsYZpU/aBxZK7J9epWkckJtp3ptjtKpwcuOS2uMKcmUrH6dUy
-	3ybaVDA2Yyjq/sRVQVWcGGQH4J+gKEo=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-652-gP-_dnYWMwuwxQudGsc6CQ-1; Tue, 20 Feb 2024 16:03:49 -0500
-X-MC-Unique: gP-_dnYWMwuwxQudGsc6CQ-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-564902d757bso1377408a12.1
-        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 13:03:49 -0800 (PST)
+	s=arc-20240116; t=1708464073; c=relaxed/simple;
+	bh=QIb79S8dEXh8LFbr/l1y4IqwiNhKYcYdvIOdGbZPR10=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=opaRIZuipo7cLgld8PB2Zjgyqyn/09uVdD1WxswUaaN0QJrBpKnXzu/Fp2Iq3/01aqpNrJ0qGBoA8o2khNbQQQKJeIV0bYBXz1zq4NIfbGVFLzLItmNs5/bwpM4qDUg2lccmvVvDzIGxJe/oRnOopk8Zcqx3jVftfwFqoVTs2lg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=kJ6oHUQB; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-512bde3d197so2484819e87.0
+        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 13:21:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1708464069; x=1709068869; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=aewqZFQqAR8f8P67ZzKs5ZfSe1DqicHVEuGcz5XnehA=;
+        b=kJ6oHUQBobYzdU7nmQFkM3o1PTzoD/1gWwOCvaCiuaShekcaWW64iGJ+G9nrY2rEXR
+         ty/VqImKjaPAXIHGh2hBywNFMUNF37eHSug1XHzVLgjEuUPekwwFHi70nlxVG97wMkg/
+         bq2pXuDPqDRpW+M4DRfa28qEVuwOVDtOvfgzl9ZKQAyxbnHpK0dxu2/pXFU1zwhFfArn
+         IV/xkFys5PLZw2jigIjJCYO/DoTEXCkVImGCVNfGn7SAims0skOmVCLUvgVcn3LRdSxf
+         kg/K6oybXpR6nWqv1J9MO5bZGveHi56Hr9fJ+/e0AVRuBXvjK+ot0MI1492XMKc69zwQ
+         kEuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708463028; x=1709067828;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9Cx1B6cH8M4WwsZid+9jIkWUL8B6BHRlRdPrxUHWq74=;
-        b=OPpTp4qLypVOQKfRSCefTa0LpxiuDPMH5cCzjYKFp6bYvvsVa86SyxK35BUrOCgCcb
-         YMR0wSdmcRsx8B0UxW9CK788rLM/sTXTQIlhN0HFFZWrDTHmzeBVCEy8lKbnAel0IEd+
-         FeGVD6xLN7ZVKGw30BQqYbyFWB47FsxFQWl89saID34BCRV6TS4wSLf1L1ub6LEgONJ+
-         a34W5PcvAU3GXVNP/QbCeeeFBQBaY5LbRIm+1GN8U5+XBS6Ko2zTGki6kKYSfpbjp7Tf
-         K1ynoK964rr3WVQGuZZdrV64EVEtBlcx646g6l7zNtrryfEB0cM6+lS5F/q69/eIQ6gB
-         e1UQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXde2/Gv0iCUj7bz0PsPgvBQeuPxBLTdDwW0GtuRIvGLPoe3j0dvtv3tP3z3s+Gm+xE+z7oqueKuzNcx4IZQPra7ZsBsJK/
-X-Gm-Message-State: AOJu0YxiAAtUIMOPCnj/gnHFSEMkV6zFjjQ0LGjL91ro+5EFTi07JF7x
-	eRnmGBYVpQpYqOWI41f5emSD87LhMhBFr5/twluVoVRFG+K2PAHTsf/Lim1tuXUUufzSBUQZWtg
-	51qZ3QdAUdiKBM3zXGnMgzAUvU/egobw79r8t0GTplEvxj522IZ3CRw==
-X-Received: by 2002:a05:6402:1801:b0:564:7007:e14c with SMTP id g1-20020a056402180100b005647007e14cmr5349840edy.22.1708463028748;
-        Tue, 20 Feb 2024 13:03:48 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF5BIwE4aBq1el+YWIDllK4swwpI2BtcI/vhibgBqxmx+4xoGKaTodyN0sy/hQFFO/BQtXUDA==
-X-Received: by 2002:a05:6402:1801:b0:564:7007:e14c with SMTP id g1-20020a056402180100b005647007e14cmr5349836edy.22.1708463028551;
-        Tue, 20 Feb 2024 13:03:48 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id ew14-20020a056402538e00b005602346c3f5sm3983025edb.79.2024.02.20.13.03.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Feb 2024 13:03:48 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 1F90210F63F4; Tue, 20 Feb 2024 22:03:45 +0100 (CET)
-From: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Cc: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v2 4/4] page pool: Remove init_callback parameter
-Date: Tue, 20 Feb 2024 22:03:41 +0100
-Message-ID: <20240220210342.40267-5-toke@redhat.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240220210342.40267-1-toke@redhat.com>
-References: <20240220210342.40267-1-toke@redhat.com>
+        d=1e100.net; s=20230601; t=1708464069; x=1709068869;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aewqZFQqAR8f8P67ZzKs5ZfSe1DqicHVEuGcz5XnehA=;
+        b=qdw4Su71mYdwBQd8u5ljLTQh8mup5+ngO4hJHlYjhEcGvc+KUksh7W84D4hP1RYSeE
+         YWDSJ0F2D7Fuc1MMgBTVdGxFt3y9W698juIZ3dRxnlsf9IPQdDRJF/HFvvkFwWvRIJrA
+         BuocHMsIDcymYQyH5T0IE1fXD8iE0HaBn63ZQtQ2avrJS6qfSe89c3jVW295aQNxrsMg
+         9mKFxLI8/ir8xFgWIx+bECRIbzRbt1wMva2uIIeinSpjGAaXVIPce+miyCrV80ZPmNm3
+         T7H5hUOkQ4047mNr/j2Qd/DN/FuQLI6qiUIg/IC6eizbCAV/ebsJQydIeSuee0dru95h
+         LIYA==
+X-Forwarded-Encrypted: i=1; AJvYcCXBFsQ0t7HShm0Ziza60wf/6N2E6MH8aBaKjAtmjo6LHYUEJBVQxClaEqRQ09bgJ7GcOV4kMg3dqJCpJzOdkXyEezS/4YqK
+X-Gm-Message-State: AOJu0YwHSrXeGEm6NryugqGGOh3dJokbiUeIiCuG1NS0fvdqC0min99k
+	r0tslZrWpx/v49B6oLdXkABn92xIRP7L3b6xAujzlGCCdub5wpIhzmk/sQtsSbE=
+X-Google-Smtp-Source: AGHT+IE7oxGB2v2CxKN0KBUsYoVrLWeS67J9KHU2sgtn9zhSwTZSLaGf6S53k3pQEILvmz2pBWcsQg==
+X-Received: by 2002:a05:6512:48b:b0:512:b85e:9831 with SMTP id v11-20020a056512048b00b00512b85e9831mr3472902lfq.36.1708464069273;
+        Tue, 20 Feb 2024 13:21:09 -0800 (PST)
+Received: from [192.168.192.135] (078088045141.garwolin.vectranet.pl. [78.88.45.141])
+        by smtp.gmail.com with ESMTPSA id q23-20020ac24a77000000b00512b25729bdsm972840lfp.31.2024.02.20.13.21.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Feb 2024 13:21:08 -0800 (PST)
+Message-ID: <17bbd9ae-0282-430e-947b-e6fb08c53af7@linaro.org>
+Date: Tue, 20 Feb 2024 22:21:04 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 14/18] PCI/pwrctl: add a power control driver for
+ WCN7850
+To: Mark Brown <broonie@kernel.org>, Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>,
+ Bjorn Andersson <andersson@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Bjorn Helgaas <bhelgaas@google.com>, Saravana Kannan <saravanak@google.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>,
+ Neil Armstrong <neil.armstrong@linaro.org>,
+ Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>,
+ Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Abel Vesa <abel.vesa@linaro.org>, Manivannan Sadhasivam <mani@kernel.org>,
+ Lukas Wunner <lukas@wunner.de>,
+ Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
+ linux-pm@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+References: <20240216203215.40870-1-brgl@bgdev.pl>
+ <20240216203215.40870-15-brgl@bgdev.pl>
+ <d5d603dc-ec66-4e21-aa41-3b25557f1fb7@sirena.org.uk>
+ <CAMRc=MeUjKPS3ANE6=7WZ3kbbGAdyE8HeXFN=75Jp-pVyBaWrQ@mail.gmail.com>
+ <ea08a286-ff53-4d58-ae41-38cca151508c@sirena.org.uk>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@linaro.org>
+Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
+ 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
+ izWDgYvmBE8=
+In-Reply-To: <ea08a286-ff53-4d58-ae41-38cca151508c@sirena.org.uk>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The only user of the init_callback parameter to page pool was the
-BPF_TEST_RUN code. Since that has now been moved to use a different
-scheme, we can get rid of the init callback entirely.
+On 20.02.2024 13:47, Mark Brown wrote:
+> On Tue, Feb 20, 2024 at 12:22:42PM +0100, Bartosz Golaszewski wrote:
+>> On Mon, Feb 19, 2024 at 6:50 PM Mark Brown <broonie@kernel.org> wrote:
+>>> On Fri, Feb 16, 2024 at 09:32:11PM +0100, Bartosz Golaszewski wrote:
+> 
+>>>> +static struct pci_pwrctl_wcn7850_vreg pci_pwrctl_wcn7850_vregs[] = {
+>>>> +     {
+>>>> +             .name = "vdd",
+>>>> +             .load_uA = 16000,
+>>>> +     },
+> 
+>>> I know a bunch of the QC stuff includes these load numbers but are they
+>>> actually doing anything constructive?  It keeps coming up that they're
+>>> causing a bunch of work and it's not clear that they have any great
+>>> effect on modern systems.
+> 
+>> Yes, we have what is called a high-power mode and a low-power mode in
+>> regulators and these values are used to determine which one to use.
+> 
+> Are you *sure* this actually happens (and that the regulators don't
+> figure it out by themselves), especially given that the consumers are
+> just specifying the load once rather than varying it dynamically at
+> runtime which is supposed to be the use case for this API?  This API is
+> intended to be used dynamically, if the regulator always needs to be in
+> a particular mode just configure that statically.
 
-Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
----
- include/net/page_pool/types.h | 4 ----
- net/core/page_pool.c          | 4 ----
- 2 files changed, 8 deletions(-)
+*AFAIU*
 
-diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
-index 3828396ae60c..2f5975ab2cd0 100644
---- a/include/net/page_pool/types.h
-+++ b/include/net/page_pool/types.h
-@@ -69,9 +69,6 @@ struct page_pool_params {
- 	);
- 	struct_group_tagged(page_pool_params_slow, slow,
- 		struct net_device *netdev;
--/* private: used by test code only */
--		void (*init_callback)(struct page *page, void *arg);
--		void *init_arg;
- 	);
- };
- 
-@@ -129,7 +126,6 @@ struct page_pool {
- 	struct page_pool_params_fast p;
- 
- 	int cpuid;
--	bool has_init_callback;
- 
- 	long frag_users;
- 	struct page *frag_page;
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 89c835fcf094..fd054b6f773a 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -217,8 +217,6 @@ static int page_pool_init(struct page_pool *pool,
- 		 */
- 	}
- 
--	pool->has_init_callback = !!pool->slow.init_callback;
--
- #ifdef CONFIG_PAGE_POOL_STATS
- 	pool->recycle_stats = alloc_percpu(struct page_pool_recycle_stats);
- 	if (!pool->recycle_stats)
-@@ -428,8 +426,6 @@ static void page_pool_set_pp_info(struct page_pool *pool,
- 	 * the overhead is negligible.
- 	 */
- 	page_pool_fragment_page(page, 1);
--	if (pool->has_init_callback)
--		pool->slow.init_callback(page, pool->slow.init_arg);
- }
- 
- static void page_pool_clear_pp_info(struct page *page)
--- 
-2.43.0
+The regulators aggregate the requested current (there may be
+multiple consumers) and then it's decided if it's high enough
+to jump into HPM.
+
+Konrad
 
 
