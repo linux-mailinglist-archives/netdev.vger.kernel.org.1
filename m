@@ -1,87 +1,131 @@
-Return-Path: <netdev+bounces-73269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 417DD85BA71
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 12:24:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA7BA85BA76
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 12:25:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F14DB287CA9
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 11:24:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08EA11C248E0
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 11:25:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7495069948;
-	Tue, 20 Feb 2024 11:22:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dBOlosSS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B4C3664AB;
+	Tue, 20 Feb 2024 11:23:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44DE567E87;
-	Tue, 20 Feb 2024 11:22:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E34D69D0A
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 11:23:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708428178; cv=none; b=NGU4OkbA2ARCUIM896fbxzDypD3haArqPFWUeu2lrarppZeBDAGe/Gl9bfVuqkOd/yTZnqJNWSunxblxz577YBMK2oSAEHyiZVYL37YKvr3bJ2S5iyCL/AgX9VJ4Rf6MVJ3kWOXl3XHmGiHGlwDGZY2hUSQojECK7mcqWjc/8q4=
+	t=1708428229; cv=none; b=hT/x4kA7qH6kV8uXEulqAPUWOu72vwe6ysWR7EgLmas6yVk2j6gtdX7+/5+7Ve8NLr0iclfHRY+fXX4LL5Eglhs43YFwusvLv01QdDfhNWMBli2bqfxHSLUtn5sQ+M5VQocp1YwFq40vyOm06JYVNq3vzSsQHUnu/lQVJ/LydFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708428178; c=relaxed/simple;
-	bh=ED0MxV9yoOK/Gkmdu1PKQmEBmEUPAd0+iNMpb1o5864=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IyW2jWvSQgBBw96q7IEC8vtfUv2tUXoHvykaEsi1EUt9XXt5w+r+4yBZzRM3E6z4NCcrVKHHwsWXXjzqy1PndjmIgBg7LNChAty7se4mjmPoiLbF96pAVV7PSGaDpBIgbaPhix6D7cHd9KG9y68pLzLClTCS8lT9kvSOkql6kAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dBOlosSS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEF5DC433C7;
-	Tue, 20 Feb 2024 11:22:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708428177;
-	bh=ED0MxV9yoOK/Gkmdu1PKQmEBmEUPAd0+iNMpb1o5864=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dBOlosSSYD1yaUR6b+Ytt4zuKa3GFEKjteGD4XMNis+7WLkI23mMF6K1qwD63Uj+Q
-	 Mpz9oD7BItkJkRlDT6dyPsT6P1YyBufDq2XWfHXqHkDGXDBZJSyg+Rg/o4cBxvh5kB
-	 E9vbY5svKNtGmeKSTJWpnblZl9oYZUn5n1a348bH1f/YQFw27fVx3u3QM+Nr43pj8o
-	 TOj/agVBPdtjtM0mBmPXqH6W7u4EAwlD6tfimKPPhxSLgUkYu4eFoe1C8UixZCFxZK
-	 AVWl4EwrfqdcEsdqLI/doeaq2hMGGiLIO1svyEz5TA+EXsgHWNCo/bKtAoWgp8NeNT
-	 01bCIib1byItA==
-Date: Tue, 20 Feb 2024 11:22:51 +0000
-From: Simon Horman <horms@kernel.org>
-To: "Ricardo B. Marliere" <ricardo@marliere.net>
-Cc: Oliver Neukum <oneukum@suse.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Roopa Prabhu <roopa@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>, netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bridge@lists.linux.dev, linux-ppp@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH 12/12] net: hso: constify the struct device_type usage
-Message-ID: <20240220112251.GY40273@kernel.org>
-References: <20240217-device_cleanup-net-v1-0-1eb31fb689f7@marliere.net>
- <20240217-device_cleanup-net-v1-12-1eb31fb689f7@marliere.net>
+	s=arc-20240116; t=1708428229; c=relaxed/simple;
+	bh=RDAWUbcFO2uB6AAumf8DkaVI5yCeJDZhMn8JqVBY7pQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=obgqsE1oNbrikY1FkF7XaUwseCzJf20tGbBwnjpIU0ybqLPqS0horsR0KqHvFJKYw/77ltuaoZfi+FcDF3zcHEQ023nRGdqcW7xE7T4LvSt4GDyc4hUFUBsy+zNQdOo1IaMd66IJ02cqxoTbmcUhp7iXVxqDxqoGRiJxM6+ay00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.34] (g34.guest.molgen.mpg.de [141.14.220.34])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id BA81C61E5FE01;
+	Tue, 20 Feb 2024 12:23:11 +0100 (CET)
+Message-ID: <30416589-7340-4ad3-8749-bef1f82743cb@molgen.mpg.de>
+Date: Tue, 20 Feb 2024 12:23:11 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240217-device_cleanup-net-v1-12-1eb31fb689f7@marliere.net>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [iwl-next v1 1/2] ice: tc: check src_vsi in
+ case of traffic from VF
+Content-Language: en-US
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: wojciech.drewek@intel.com, marcin.szycik@intel.com,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ Jedrzej Jagielski <jedrzej.jagielski@intel.com>, sridhar.samudrala@intel.com
+References: <20240220105950.6814-1-michal.swiatkowski@linux.intel.com>
+ <20240220105950.6814-2-michal.swiatkowski@linux.intel.com>
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20240220105950.6814-2-michal.swiatkowski@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Sat, Feb 17, 2024 at 05:13:34PM -0300, Ricardo B. Marliere wrote:
-> Since commit aed65af1cc2f ("drivers: make device_type const"), the driver
-> core can properly handle constant struct device_type. Move the hso_type
-> variable to be a constant structure as well, placing it into read-only
-> memory which can not be modified at runtime.
+Dear Michal,
+
+
+Thank you for the patch.
+
+Am 20.02.24 um 11:59 schrieb Michal Swiatkowski:
+> In case of traffic going from the VF (so ingress for port representor)
+> there should be a check for source VSI. It is needed for hardware to not
+> match packets from different port with filters added on other port.
+
+… from different port*s* …?
+
+> It is only for "from VF" traffic, because other traffic direction
+> doesn't have source VSI.
+
+Do you have a test case to reproduce this?
+
+> Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+> Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
+> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> ---
+>   drivers/net/ethernet/intel/ice/ice_tc_lib.c | 8 ++++++++
+>   1 file changed, 8 insertions(+)
 > 
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Signed-off-by: Ricardo B. Marliere <ricardo@marliere.net>
+> diff --git a/drivers/net/ethernet/intel/ice/ice_tc_lib.c b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
+> index b890410a2bc0..49ed5fd7db10 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_tc_lib.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
+> @@ -28,6 +28,8 @@ ice_tc_count_lkups(u32 flags, struct ice_tc_flower_lyr_2_4_hdrs *headers,
+>   	 * - ICE_TC_FLWR_FIELD_VLAN_TPID (present if specified)
+>   	 * - Tunnel flag (present if tunnel)
+>   	 */
+> +	if (fltr->direction == ICE_ESWITCH_FLTR_EGRESS)
+> +		lkups_cnt++;
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Why does the count variable need to be incremented?
 
+>   	if (flags & ICE_TC_FLWR_FIELD_TENANT_ID)
+>   		lkups_cnt++;
+> @@ -363,6 +365,11 @@ ice_tc_fill_rules(struct ice_hw *hw, u32 flags,
+>   	/* Always add direction metadata */
+>   	ice_rule_add_direction_metadata(&list[ICE_TC_METADATA_LKUP_IDX]);
+>   
+> +	if (tc_fltr->direction == ICE_ESWITCH_FLTR_EGRESS) {
+> +		ice_rule_add_src_vsi_metadata(&list[i]);
+> +		i++;
+> +	}
+> +
+>   	rule_info->tun_type = ice_sw_type_from_tunnel(tc_fltr->tunnel_type);
+>   	if (tc_fltr->tunnel_type != TNL_LAST) {
+>   		i = ice_tc_fill_tunnel_outer(flags, tc_fltr, list, i);
+> @@ -820,6 +827,7 @@ ice_eswitch_add_tc_fltr(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr)
+>   
+>   	/* specify the cookie as filter_rule_id */
+>   	rule_info.fltr_rule_id = fltr->cookie;
+> +	rule_info.src_vsi = vsi->idx;
+
+Besides the comment above being redundant (as the code does exactly 
+that), the new line looks like to belong to the comment. Please excuse 
+my ignorance, but the commit message only talks about adding checks and 
+not overwriting the `src_vsi`. It’d be great, if you could elaborate.
+
+>   	ret = ice_add_adv_rule(hw, list, lkups_cnt, &rule_info, &rule_added);
+>   	if (ret == -EEXIST) {
+
+
+Kind regards,
+
+Paul
 
