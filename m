@@ -1,132 +1,241 @@
-Return-Path: <netdev+bounces-73276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00E2585BB68
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 13:06:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F37F85BB70
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 13:08:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B19422846C0
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 12:06:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4915F1C21495
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 12:08:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7940567C68;
-	Tue, 20 Feb 2024 12:06:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8101B67C5C;
+	Tue, 20 Feb 2024 12:08:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IsU1gpx6"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="SH8qRCrK";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ns8J1nrG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CA5467C45;
-	Tue, 20 Feb 2024 12:06:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC57365BA3;
+	Tue, 20 Feb 2024 12:08:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708430808; cv=none; b=JL9Y9KesD0NvEJDCwSigXDiL+jrgsXOk/yB+520B4dKqpkxRXcl44lb/e/3Hwf5F8h+jEXnolV2BHt9ok+tzD0Vk0iwpK2blmIoCyq4uYuI6XrGEtsN04VPyRruagv7H29abocGTCXfxZ/aU02XFW2IkNlxtg2UPFONJ3//nbu4=
+	t=1708430907; cv=none; b=k9J7UaEKUPo26rEAha4k9iTRThve98kUSUbABGWc0SvPMz5h4119Ob1104KB58bykBYUMP+eJkFKkKjufLivtNteRxxGbNpF9wPymhtQJPtqY9p2ocoA8+q100AtUi7RyhbxZk8BF98LqMPqexccK1D8OJZyaXMDLckwV+FnAR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708430808; c=relaxed/simple;
-	bh=g7OWh2V1T0jWuCWOpLghLxY/l/z2kpl8hgQUF80BDLk=;
+	s=arc-20240116; t=1708430907; c=relaxed/simple;
+	bh=eXY31aS7tDneSxtFXr5YzEj99wWYH1MvJhblgs5aKZU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q4EryJtKNeuugjNf9lVSNJUNm0OYIbPNxhBMOTNRrIrlhyfF/3DV3WrJMS6GWBXTah/Kb0nzzo+69u5Q4z4rcdpM9QStjxnWh/ariS5SdXHndObtAwjaHpPRU8oaWVPn3sCo0rB6e6AU5yZ0o3kNos89KlCb4lZZfbQB91cEqx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IsU1gpx6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C2E0C433C7;
-	Tue, 20 Feb 2024 12:06:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708430807;
-	bh=g7OWh2V1T0jWuCWOpLghLxY/l/z2kpl8hgQUF80BDLk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IsU1gpx6BLHMdxvwzV2splWpbqoYa6PWyr4iVc0LZEQTV6AUeKVxCp7HM0rvMoTRs
-	 JXhqKr4qcuCtMvQx9mO7FcroqUtYg4XPI9KC0azUZI1Ftea729VOTL59xrSQKsJqM6
-	 GwVZLjjaNiLgDxk7hxB2QTzw5Shxg6QkjWyasn59ei5xf2cPcIqN/x30PaBuQRB0zf
-	 KazOn5NIGF2ZJIr+mRvp+UDjviLAR+o2Om3voD9dgke7DPyohmDaK/jMCQOOyJV77r
-	 WyW630lB2Lmvf3mMoVt6jD5xweAjYAshlQVDV2KkDWSGKJDeH9vR2eh//bv3zOsGhv
-	 5eorKcz+qy36w==
-Date: Tue, 20 Feb 2024 12:06:43 +0000
-From: Simon Horman <horms@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ariel Elior <aelior@marvell.com>,
-	Manish Chopra <manishc@marvell.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>, linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org
-Subject: Re: [PATCH net-next v4 4/9] net: ethernet: ixgbe: Convert EEE to use
- linkmodes
-Message-ID: <20240220120643.GZ40273@kernel.org>
-References: <20240218-keee-u32-cleanup-v4-0-71f13b7c3e60@lunn.ch>
- <20240218-keee-u32-cleanup-v4-4-71f13b7c3e60@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=EeVBrmiibAvnvMU8h02Az1Yp3p1fSlfEW0kAlyYg1LmdCWVgNiFANlKdSIVN3G7i6IFGfvUVLMn0GEzUxpbLUX9E564S/4T4fWdPi6014YUmiY2v7239Mr80ElYNQva+l7UPBh5OQHRY17VvmkZm1JBrzn4IwaLmhv+pdYmSta4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=SH8qRCrK; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ns8J1nrG; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Tue, 20 Feb 2024 13:08:21 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1708430902;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7YPGgO9EwUSk5pK6JrCSvWMD884EPlE3OA4jdXqzQ0w=;
+	b=SH8qRCrK4QpZO17wL3NlIvik1USa/2In7q21TYxBpu3TaTOWA7KGlcuxoWKdAMFOz8PC86
+	1lTfleyTOucmMFWBkOafbnzDROJ0eoFSjb4dYBhfkaPZ5GAgkcYxyXq4dEu5gPv7FzHlAj
+	W1IEmGLKwFRVREZV7aFF/OWjQBAeFFm61rfNVH5QZLF6Fufz/sip3u5hf2kyX1cNqCRhHI
+	u/VyuW9XBy58BT14E6Kfy0hOLfg8s6nlE8WkL/GU90hmjUlTzkUB6gm0fgQaLmvrnahk1f
+	d30ahWDV5ZtPyvhgrL96mOqMNIUA0NhQK+Ohg1vv7zVBqXKVnImbXmQ34dKD3Q==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1708430902;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7YPGgO9EwUSk5pK6JrCSvWMD884EPlE3OA4jdXqzQ0w=;
+	b=ns8J1nrGsPMNXSApN4oD5x3W5hxDYvzll/29uKoUmbHUSswYqzYecZ8HrJfaX4KohLx07i
+	9xMIJTiIQNqHnCDw==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	bpf@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH RFC net-next 1/2] net: Reference bpf_redirect_info via
+ task_struct on PREEMPT_RT.
+Message-ID: <20240220120821.1Tbz6IeI@linutronix.de>
+References: <87y1bndvsx.fsf@toke.dk>
+ <20240214142827.3vV2WhIA@linutronix.de>
+ <87le7ndo4z.fsf@toke.dk>
+ <20240214163607.RjjT5bO_@linutronix.de>
+ <87jzn5cw90.fsf@toke.dk>
+ <20240216165737.oIFG5g-U@linutronix.de>
+ <87ttm4b7mh.fsf@toke.dk>
+ <04d72b93-a423-4574-a98e-f8915a949415@kernel.org>
+ <20240220101741.PZwhANsA@linutronix.de>
+ <0b1c8247-ccfb-4228-bd64-53583329aaa7@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240218-keee-u32-cleanup-v4-4-71f13b7c3e60@lunn.ch>
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <0b1c8247-ccfb-4228-bd64-53583329aaa7@kernel.org>
 
-On Sun, Feb 18, 2024 at 11:07:01AM -0600, Andrew Lunn wrote:
-> Convert the tables to make use of ETHTOOL link mode bits, rather than
-> the old u32 SUPPORTED speeds. Make use of the linkmode helps to set
-> bits and compare linkmodes. As a result, the _u32 members of keee are
-> no longer used, a step towards removing them.
-> 
-> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
-> ---
->  drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c | 48 ++++++++++++------------
->  1 file changed, 25 insertions(+), 23 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+On 2024-02-20 11:42:57 [+0100], Jesper Dangaard Brouer wrote:
+> This seems low...
+> Have you remembered to disable Ethernet flow-control?
 
-...
+No but one side says:
+| i40e 0000:3d:00.1 eno2np1: NIC Link is Up, 10 Gbps Full Duplex, Flow Cont=
+rol: None
 
-> @@ -3436,28 +3437,29 @@ ixgbe_get_eee_fw(struct ixgbe_adapter *adapter, struct ethtool_keee *edata)
->  	if (rc)
->  		return rc;
->  
-> -	edata->lp_advertised_u32 = 0;
->  	for (i = 0; i < ARRAY_SIZE(ixgbe_lp_map); ++i) {
->  		if (info[0] & ixgbe_lp_map[i].lp_advertised)
-> -			edata->lp_advertised_u32 |= ixgbe_lp_map[i].mac_speed;
-> +			linkmode_set_bit(ixgbe_lp_map[i].link_mode,
-> +					 edata->lp_advertised);
->  	}
->  
-> -	edata->supported_u32 = 0;
->  	for (i = 0; i < ARRAY_SIZE(ixgbe_ls_map); ++i) {
->  		if (hw->phy.eee_speeds_supported & ixgbe_ls_map[i].mac_speed)
-> -			edata->supported_u32 |= ixgbe_ls_map[i].supported;
-> +			linkmode_set_bit(ixgbe_lp_map[i].link_mode,
-> +					 edata->lp_advertised);
+but I did this
 
-Hi Andrew,
+>  # ethtool -A ixgbe1 rx off tx off
+>  # ethtool -A i40e2 rx off tx off
 
-should this be edata->supported rather than edata->lp_advertised?
+and it didn't change much.
 
->  	}
->  
-> -	edata->advertised_u32 = 0;
->  	for (i = 0; i < ARRAY_SIZE(ixgbe_ls_map); ++i) {
->  		if (hw->phy.eee_speeds_advertised & ixgbe_ls_map[i].mac_speed)
-> -			edata->advertised_u32 |= ixgbe_ls_map[i].supported;
-> +			linkmode_set_bit(ixgbe_lp_map[i].link_mode,
-> +					 edata->advertised);
->  	}
->  
-> -	edata->eee_enabled = !!edata->advertised_u32;
-> +	edata->eee_enabled = !linkmode_empty(edata->advertised);
->  	edata->tx_lpi_enabled = edata->eee_enabled;
-> -	if (edata->advertised_u32 & edata->lp_advertised_u32)
-> -		edata->eee_active = true;
-> +
-> +	linkmode_and(common, edata->advertised, edata->lp_advertised);
-> +	edata->eee_active = !linkmode_empty(common);
->  
->  	return 0;
->  }
+>=20
+> > | Summary                 8,436,294 rx/s                  0 err/s
+>=20
+> You want to see the "extended" info via cmdline (or Ctrl+\)
+>=20
+>  # xdp-bench drop -e eth1
+>=20
+>=20
+> >=20
+> > with "-t 8 -b 64". I started with 2 and then increased until rx/s was
+> > falling again. I have ixgbe on the sending side and i40e on the
+>=20
+> With ixgbe on the sending side, my testlab shows I need -t 2.
+>=20
+> With -t 2 :
+> Summary                14,678,170 rx/s                  0 err/s
+>   receive total        14,678,170 pkt/s        14,678,170 drop/s         0
+> error/s
+>     cpu:1              14,678,170 pkt/s        14,678,170 drop/s         0
+> error/s
+>   xdp_exception                 0 hit/s
+>=20
+> with -t 4:
+>=20
+> Summary                10,255,385 rx/s                  0 err/s
+>   receive total        10,255,385 pkt/s        10,255,385 drop/s         0
+> error/s
+>     cpu:1              10,255,385 pkt/s        10,255,385 drop/s         0
+> error/s
+>   xdp_exception                 0 hit/s
+>=20
+> > receiving side. I tried to receive on ixgbe but this ended with -ENOMEM
+> > | # xdp-bench drop eth1
+> > | Failed to attach XDP program: Cannot allocate memory
+> >=20
+> > This is v6.8-rc5 on both sides. Let me see where this is coming from=E2=
+=80=A6
+> >=20
+>=20
+> Another pitfall with ixgbe is that it does a full link reset when
+> adding/removing XDP prog on device.  This can be annoying if connected
+> back-to-back, because "remote" pktgen will stop on link reset.
 
-...
+so I replaced nr_cpu_ids with 64 and bootet maxcpus=3D64 so that I can run
+xdp-bench on the ixbe.
+
+so. i40 send, ixgbe receive.
+
+-t 2
+
+| Summary                 2,348,800 rx/s                  0 err/s
+|   receive total         2,348,800 pkt/s         2,348,800 drop/s         =
+       0 error/s
+|     cpu:0               2,348,800 pkt/s         2,348,800 drop/s         =
+       0 error/s
+|   xdp_exception                 0 hit/s
+
+-t 4
+| Summary                 4,158,199 rx/s                  0 err/s
+|   receive total         4,158,199 pkt/s         4,158,199 drop/s         =
+       0 error/s
+|     cpu:0               4,158,199 pkt/s         4,158,199 drop/s         =
+       0 error/s
+|   xdp_exception                 0 hit/s
+
+-t 8
+| Summary                 5,612,861 rx/s                  0 err/s       =20
+|   receive total         5,612,861 pkt/s         5,612,861 drop/s         =
+       0 error/s     =20
+|     cpu:0               5,612,861 pkt/s         5,612,861 drop/s         =
+       0 error/s     =20
+|   xdp_exception                 0 hit/s       =20
+
+going higher makes the rate drop. With 8 it floats between 5,5=E2=80=A6 5,7=
+=E2=80=A6
+
+Doing "ethtool -G eno2np1 tx 4096 rx 4096" on the i40 makes it worse,
+using the default 512/512 gets the numbers from above, going below 256
+makes it worse.
+
+receiving on i40, sending on ixgbe:
+
+-t 2
+|Summary                 3,042,957 rx/s                  0 err/s
+|  receive total         3,042,957 pkt/s         3,042,957 drop/s          =
+      0 error/s
+|    cpu:60              3,042,957 pkt/s         3,042,957 drop/s          =
+      0 error/s
+|  xdp_exception                 0 hit/s
+
+-t 4
+|Summary                 5,442,166 rx/s                  0 err/s
+|  receive total         5,442,166 pkt/s         5,442,166 drop/s          =
+      0 error/s
+|    cpu:60              5,442,166 pkt/s         5,442,166 drop/s          =
+      0 error/s
+|  xdp_exception                 0 hit/s
+
+
+-t 6
+| Summary                 7,023,406 rx/s                  0 err/s
+|   receive total         7,023,406 pkt/s         7,023,406 drop/s         =
+       0 error/s
+|     cpu:60              7,023,406 pkt/s         7,023,406 drop/s         =
+       0 error/s
+|   xdp_exception                 0 hit/s
+
+
+-t 8
+| Summary                 7,540,915 rx/s                  0 err/s
+|   receive total         7,540,915 pkt/s         7,540,915 drop/s         =
+       0 error/s
+|     cpu:60              7,540,915 pkt/s         7,540,915 drop/s         =
+       0 error/s
+|   xdp_exception                 0 hit/s
+
+-t 10
+|Summary                 7,699,143 rx/s                  0 err/s
+|  receive total         7,699,143 pkt/s         7,699,143 drop/s          =
+      0 error/s
+|    cpu:60              7,699,143 pkt/s         7,699,143 drop/s          =
+      0 error/s
+|  xdp_exception                 0 hit/s
+
+-t 18
+| Summary                 7,784,946 rx/s                  0 err/s
+|   receive total         7,784,946 pkt/s         7,784,946 drop/s         =
+       0 error/s
+|     cpu:60              7,784,946 pkt/s         7,784,946 drop/s         =
+       0 error/s
+|   xdp_exception                 0 hit/s
+
+after t18 it drop down to 2,=E2=80=A6
+Now I got worse than before since -t8 says 7,5=E2=80=A6 and it did 8,4 in t=
+he
+morning. Do you have maybe a .config for me in case I did not enable the
+performance switch?
+
+> --Jesper
+
+Sebastian
 
