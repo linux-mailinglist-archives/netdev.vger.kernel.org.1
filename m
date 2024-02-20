@@ -1,136 +1,145 @@
-Return-Path: <netdev+bounces-73226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AB2785B72B
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 10:20:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A944585B72F
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 10:21:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E005B26BBC
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:20:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3ABEC1F25EF3
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:21:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 031945F579;
-	Tue, 20 Feb 2024 09:19:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58CDA5F477;
+	Tue, 20 Feb 2024 09:21:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="lQFRjvtM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ewe15Khs"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06AEF5F48B;
-	Tue, 20 Feb 2024 09:19:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88F785DF2B
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 09:21:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708420795; cv=none; b=SilOFOdhnNKP40P5XMFLjrZohN0RB+SPVA0ujWaMdtC+zqd27xy+TdFauXLZ21D7Hcd1Bd7+YO29+AIedusv/RBlG4Tbn6636cN9G3pq9WQQPF+Y6fvHaHjGiroGHR/6a79xW5AtzbB0trrP5QAraYK/LoSGN/Kj0oSf/ckLwm8=
+	t=1708420864; cv=none; b=UBXZUFIUnbYTTDfiGndjwxRsnukNQyft7P6ZaBIZyQqMIj2EMH8WO2k0aTKGoEHMbbUME87lvYVXn8bbhYD5UVxj5IPQi7ymoRKed5NAW4qEWZNcISUN1xQ7s5fd05auskrriJ3HMWp6jH6FZr3yosf2hItBm/6ngNx1M1dpwco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708420795; c=relaxed/simple;
-	bh=bwT3c4fTnCDe05dvq1l/DYWXthS7YYkrWruFJpPD8tc=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=lNv7a7ALQpKd3j74bftWH2f5RlDUnK0y8wxXK7q1relj9r54k99CFV8i/e1nqUmZKUhRhk9IXQaKpmZ48usVS7NdxNvxvq+uJWaE6Zl6zSXBZEZX9kYK0YBia9DKp5PKdO1dvvHIMtY6H+F5v66zKDBfvV4/GcP+4n5U5Q9K4JU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=lQFRjvtM; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=pnB5JW9TLOshndb6+kfruCaB3IU6xVBqoQ1BTt8gcAY=; b=lQFRjvtM2mkLsBg5Xqe+eZ07n6
-	Bgw+WRmbTlgGAfjMwbv/1RP1wa13H0Mj8G+FNxXb8a89ejwXhAZaING9OMZhnGj1Svx6yFUpcMKwT
-	x25yPhIrrj3r2aAbS6yjGS8LMRT/u8l1xKfnMGB4N+Ek10FMkFyt5a6AEfeyAosQaddc5C2Ow9ug+
-	lFn2Q51kUpSlvJuHt0IC1PeL44DbUYUGEakvSBOfsN11Zz+nrLx1qOfNWlLEBnXpW4e6zIFTFuQlz
-	KYzn6XYuvw7ypx25tGD+DM4l3gsgzk4TCOzZzlBEN7Kq7prKpYWwpbrZ3D+Q/YXgIbE7uEfRmRUYR
-	ojRFTuFA==;
-Received: from sslproxy04.your-server.de ([78.46.152.42])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rcMHv-000NpA-HC; Tue, 20 Feb 2024 10:19:43 +0100
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy04.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rcMHu-000Dqw-Vd; Tue, 20 Feb 2024 10:19:43 +0100
-Subject: Re: [PATCH net-next 0/3] Change BPF_TEST_RUN use the system page pool
- for live XDP frames
-To: Paolo Abeni <pabeni@redhat.com>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vu?=
- =?UTF-8?Q?sen?= <toke@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20240215132634.474055-1-toke@redhat.com> <87wmr0b82y.fsf@toke.dk>
- <631d6b12-fb5c-3074-3770-d6927aea393d@iogearbox.net>
- <b5a062465f9afe36106fe1d624b2e9e129bea0f4.camel@redhat.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <9b211443-a6a1-981c-b2a8-42ec0e876fba@iogearbox.net>
-Date: Tue, 20 Feb 2024 10:19:42 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1708420864; c=relaxed/simple;
+	bh=y1I4lTWwMTia1vum2loHj23cfAeVFH7AFIJDi2XeCcQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VhyJCIm6qaud68ZlFkVozEDFk3RBs0ujRiANqC/w+hsiYzSVAcvL0YWa9RJ4wxZTZWRrbzDhxfWDzi2T0Gr1mYIkQL5BM8g+y82/RZhsFRAIx/PBdTHra1fh3axtJArfoy23RVpk5tG5jboBtubMe+75byYhBrTnQ5azhHnfKLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ewe15Khs; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-512c4442095so585355e87.2
+        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 01:21:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708420861; x=1709025661; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fdhB/OebAUjm/AFv0XF6TY7b9nkZEns3B+QEhrz2u2s=;
+        b=ewe15Khs0WgdPKvCv04FslogBOrRftG9nHjvtKSRNUL6+BZu9v8zYgOzhFRTw/moJ8
+         oDsVew0onkgYmfVDOyPN/FWkxCSz2tpLbqKwVGNQ3A4tojuC9w+2EQAZ0UMULZK8kInR
+         aAxtL0urDuHp+nh4f3aZDDNSHHRANsU2PN/OF7ZWtpGAXIENqysc2j4qY+AAV4avxyGH
+         7OQgAtybHFCebKx2LUmgwjed6c3NLVQ7rmUfaBY94xyWH2IaghWfpTgJh/pRquhRC7Q+
+         /WqsYPBHxN3eRzu5A9+dL0eV3kpeE4v6erhbtLHBUYuwPJ+vcsiCGRm9/MUiiiUxYKe6
+         BhvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708420861; x=1709025661;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fdhB/OebAUjm/AFv0XF6TY7b9nkZEns3B+QEhrz2u2s=;
+        b=J//olePwLkSIbAkNWrS+Ba19jAf+cDnzxoYfD4qJ9jOu846SJmRb4OMcJTBAlx9wz+
+         V8W85mvTBu3GBNJwdEjOjvu7MjQXc96fihcrSfbTtymGyKfMDGX7ttwj9UIO2fiMUyAH
+         eSZCWsbBLZMdwjc77bKvAt3Js222HBzp2B20GnDXUo3RGcluhZMV9/AS5wrk/BEovVR4
+         rsWO8PXkpilo1VOOsKsl3eEfCGiuJnAAmW4L9QGsZqqJl79qowyyACd4ep5T45dHVOVn
+         nuN11f1eWDiaKsbQDB5aj4ysBoEi3UQlUk7EPE2NMI8YeOdOwjB8p7ZJxDlvyLw7fnnY
+         UNZg==
+X-Forwarded-Encrypted: i=1; AJvYcCXCQyhKw05GkZbRL1A3Ow4vnxgFTp9u3pA0IvQy99Ursdr2tIRC7qEhnOnnLBx0j3rvL8tvsayI2RUXLo9lwYLA4Cx0UW4E
+X-Gm-Message-State: AOJu0YzGUbLONXyDnlUz0798PmpCS1+pBXAM8N36FvPQmnvXu8OkcwIW
+	JIXom4ZHb71Omc6449Livvh7XgvFUSfkEAvcju5DuN9sXZGejbciBbQEdSqV
+X-Google-Smtp-Source: AGHT+IFENXQ2/kIvaynag/3ye0EYbZr1RqBX2LzSkz1tqwcz87hMFLb+HYFe/A4uzUmPS1D8iGWrkA==
+X-Received: by 2002:a19:655d:0:b0:512:ab03:f4 with SMTP id c29-20020a19655d000000b00512ab0300f4mr4763035lfj.37.1708420860434;
+        Tue, 20 Feb 2024 01:21:00 -0800 (PST)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id x28-20020ac25ddc000000b00512a3f5322fsm1151146lfq.8.2024.02.20.01.20.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Feb 2024 01:21:00 -0800 (PST)
+Date: Tue, 20 Feb 2024 12:20:56 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Kurt Kanzenbach <kurt@linutronix.de>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Rohan G Thomas <rohan.g.thomas@intel.com>, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net] net: stmmac: Fix EST offset for dwmac 5.10
+Message-ID: <mmjrlyzhegve5u3s3lhw4hmhooxixn3pwxkkdikxgxno4teqyz@rtetljwg6ffg>
+References: <20240220-stmmac_est-v1-1-c41f9ae2e7b7@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <b5a062465f9afe36106fe1d624b2e9e129bea0f4.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27190/Mon Feb 19 10:24:27 2024)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240220-stmmac_est-v1-1-c41f9ae2e7b7@linutronix.de>
 
-On 2/20/24 10:03 AM, Paolo Abeni wrote:
-> On Tue, 2024-02-20 at 09:39 +0100, Daniel Borkmann wrote:
->> On 2/19/24 7:52 PM, Toke Høiland-Jørgensen wrote:
->>> Toke Høiland-Jørgensen <toke@redhat.com> writes:
->>>
->>>> Now that we have a system-wide page pool, we can use that for the live
->>>> frame mode of BPF_TEST_RUN (used by the XDP traffic generator), and
->>>> avoid the cost of creating a separate page pool instance for each
->>>> syscall invocation. See the individual patches for more details.
->>>>
->>>> Toke Høiland-Jørgensen (3):
->>>>     net: Register system page pool as an XDP memory model
->>>>     bpf: test_run: Use system page pool for XDP live frame mode
->>>>     bpf: test_run: Fix cacheline alignment of live XDP frame data
->>>>       structures
->>>>
->>>>    include/linux/netdevice.h |   1 +
->>>>    net/bpf/test_run.c        | 138 +++++++++++++++++++-------------------
->>>>    net/core/dev.c            |  13 +++-
->>>>    3 files changed, 81 insertions(+), 71 deletions(-)
->>>
->>> Hi maintainers
->>>
->>> This series is targeting net-next, but it's listed as delegate:bpf in
->>> patchwork[0]; is that a mistake? Do I need to do anything more to nudge it
->>> along?
->>
->> I moved it over to netdev, it would be good next time if there are dependencies
->> which are in net-next but not yet bpf-next to clearly state them given from this
->> series the majority touches the bpf test infra code.
-> 
-> This series apparently causes bpf self-tests failures:
-> 
-> https://github.com/kernel-patches/bpf/actions/runs/7929088890/job/21648828278
-> 
-> I'm unsure if that is blocking, or just a CI glitch.
-> 
-> The series LGTM, but I think it would be better if someone from the
-> ebpf team could also have a look.
+Hi Kurt
 
-The CI was not able to apply the patches, so this looks unrelated :
+On Tue, Feb 20, 2024 at 09:22:46AM +0100, Kurt Kanzenbach wrote:
+> Fix EST offset for dwmac 5.10.
+> 
+> Currently configuring Qbv doesn't work as expected. The schedule is
+> configured, but never confirmed:
+> 
+> |[  128.250219] imx-dwmac 428a0000.ethernet eth1: configured EST
+> 
+> The reason seems to be the refactoring of the EST code which set the wrong
+> EST offset for the dwmac 5.10. After fixing this it works as before:
+> 
+> |[  106.359577] imx-dwmac 428a0000.ethernet eth1: configured EST
+> |[  128.430715] imx-dwmac 428a0000.ethernet eth1: EST: SWOL has been switched
+> 
+> Tested on imx93.
+> 
+> Fixes: c3f3b97238f6 ("net: stmmac: Refactor EST implementation")
+> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/hwif.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+> index 1bd34b2a47e8..29367105df54 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+> @@ -224,7 +224,7 @@ static const struct stmmac_hwif_entry {
+>  		.regs = {
+>  			.ptp_off = PTP_GMAC4_OFFSET,
+>  			.mmc_off = MMC_GMAC4_OFFSET,
+> -			.est_off = EST_XGMAC_OFFSET,
+> +			.est_off = EST_GMAC4_OFFSET,
 
-Cmd('git') failed due to: exit code(128)
-   cmdline: git am --3way
-   stdout: 'Applying: net: Register system page pool as an XDP memory model
-Patch failed at 0001 net: Register system page pool as an XDP memory model
-When you have resolved this problem, run "git am --continue".
-If you prefer to skip this patch, run "git am --skip" instead.
-To restore the original branch and stop patching, run "git am --abort".'
-   stderr: 'error: sha1 information is lacking or useless (include/linux/netdevice.h).
-error: could not build fake ancestor
-hint: Use 'git am --show-current-patch=diff' to see the failed patch'
+Unfortunate c&p typo indeed. Thanks for fixing it!
+Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+
+-Serge(y)
+
+>  		},
+>  		.desc = &dwmac4_desc_ops,
+>  		.dma = &dwmac410_dma_ops,
+> 
+> ---
+> base-commit: 40b9385dd8e6a0515e1c9cd06a277483556b7286
+> change-id: 20240220-stmmac_est-ea6884f9ba3c
+> 
+> Best regards,
+> -- 
+> Kurt Kanzenbach <kurt@linutronix.de>
+> 
+> 
 
