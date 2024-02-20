@@ -1,128 +1,140 @@
-Return-Path: <netdev+bounces-73182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00F5985B472
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:06:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D51885B49A
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:11:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0EC5281BFA
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:06:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 593E42823C0
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:11:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A066C5BAF8;
-	Tue, 20 Feb 2024 08:06:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEEC25C03D;
+	Tue, 20 Feb 2024 08:11:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m5q4Vg87"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="UzPkOK9S"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7632F5C5FD;
-	Tue, 20 Feb 2024 08:06:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24AA15BAF7
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 08:11:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708416390; cv=none; b=gIETTIMXgU3YK146QyMfYyZvP4bsqasx2xKmSuAJZhHgA6PQ8ty3oqf1QZU3YPEojeAVTJj7zsp6Yb+1ThJF3GjhNcyCvajPbpVsO7+E8pdc1ToEc7x1PoWgPPMj5swIkYXKiWp30+6mRSD5nEfJPVrJGqO+a0LWwopQ1X2AEuE=
+	t=1708416662; cv=none; b=NF2LMiXn8BVg5wxBgI5qWYEY27vW/ZE3/QC5zul8MsQ1JSwWZ7ZMcIdJm83txi/omgccCmFown14b5iUvjRTKWvtkIyOzsAZS46pIhEdjoVPByKcvq48W9jkxGg0a0ETjuzjGzVYC62Kmnp4P0yn8t+mAPrDMK3ZcdTaSm5nAIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708416390; c=relaxed/simple;
-	bh=oWpAKlAuGH6pCkTNf8skez1OA5APeMMN1elQviqEXlk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oz/AC8otDJ4IAoGPkcOaoBuPNHRbrEav/wjG+nGmTI9DSGxGMhej67CklmHAbyzTirRIJtBIijHC76f6o8GFGYRAGcvrbZFTQtSRUneoA5b7f1TXcZe9p4Gfl0licRJ7Dr+NZLyy7caaXHIKqGJ+nLEW+AyHA4kSuDYNLtU6zBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m5q4Vg87; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 005EAC433F1;
-	Tue, 20 Feb 2024 08:06:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708416389;
-	bh=oWpAKlAuGH6pCkTNf8skez1OA5APeMMN1elQviqEXlk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=m5q4Vg87Tc8+FYUf2vrQQ7O2SQcXeWpPaW8snYXaMmwNff63GeIJFN0XXXPr2tQqG
-	 uwf7/ZY9LrTJsRfwbFQ0Wa3o/2BDZjOHqQLydbr6njgyXGwapQY+1frep8EKPsvDYD
-	 qSgGIcd8hz4OGFMolWO3wYKuNcUnhWcK+QXGb9AweVAPWDiQlK0GaE3b6++M8Vp4ei
-	 tndl7soZ354BH9GG05ni2K82cE/wqkNkLgC5WMOZbDkNFLvTnGP4fCfZ3sd4S/KYHD
-	 XMAhnAtS163L8YeiQXw1H0C+qNKbk+D3/aWR3xKHHl5y6TQYAsngpXinyNYbsjI3Kj
-	 Rfqfqw73sVzgQ==
-Date: Tue, 20 Feb 2024 08:06:24 +0000
-From: Simon Horman <horms@kernel.org>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	Zhu Yanjun <yanjun.zhu@linux.dev>, Arnd Bergmann <arnd@arndb.de>,
+	s=arc-20240116; t=1708416662; c=relaxed/simple;
+	bh=T9EwXJqCkGNWNhDPMZf1uaNk7G1DJs3s0eDFQKSfOfI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uKKy5XC0zVOiP+OB/7AdrsBwkXLsoy+9IbMJKYa7NXCtNSU9Jeo+ffRrfp/+AHDs0zzpKnYIcSYTJ6c9Pk08xyGOIjb6vB2B5NzWmnfNV73vHgo5j7AGmasp1z3lj9vmt4ZRVBwjOPyDpnAEE6hfzgk/q18H0yzoT2udJeEPo1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=UzPkOK9S; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+Received: by codeconstruct.com.au (Postfix, from userid 10000)
+	id 291EA201C4; Tue, 20 Feb 2024 16:10:59 +0800 (AWST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=codeconstruct.com.au; s=2022a; t=1708416659;
+	bh=vrGtsY0rQGA/ofVK3j9p4tcFMAw7x9tuYCk7m9RZd/M=;
+	h=From:To:Cc:Subject:Date;
+	b=UzPkOK9SDbyAmoyM13fWYsrSVJVz6z2CHiUTtM6q10MM6kLCDsnzwkPgpQ1dejqPR
+	 MSRpPANwZJKpeV0qDFAK84WjCIYcSw5wNNYCSSVFh4SSqBdv8pu9EYHPS9OkFjjjGy
+	 T4z4q2OyoSEwAJ3Fhi+8fsbkLEsbGZSLuQGzTDBXRNIboqX10OxKI30pfpYkNE0MGd
+	 SemzjzZMzHU3c+2P9HQ82iZ0azzNNjDe44XrAbR9V1Cng6DqFR/IY8EEYYGr/t/hd/
+	 uHHw92p4pJiLRarNd2hZQA0S7EF7KAyR+0fFB+IAnijak9I5WDZY8Fr6gIjDEcNj5a
+	 cZJlnV5Ju0QKw==
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: netdev@vger.kernel.org
+Cc: Matt Johnston <matt@codeconstruct.com.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Yevgeny Kliteynik <kliteyn@nvidia.com>,
-	Alex Vesker <valex@nvidia.com>, Hamdan Igbaria <hamdani@nvidia.com>,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] [v2] net/mlx5: fix possible stack overflows
-Message-ID: <20240220080624.GQ40273@kernel.org>
-References: <20240219100506.648089-1-arnd@kernel.org>
- <20240219100506.648089-2-arnd@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH net-next v2] net: mctp: take ownership of skb in mctp_local_output
+Date: Tue, 20 Feb 2024 16:10:53 +0800
+Message-Id: <20240220081053.1439104-1-jk@codeconstruct.com.au>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240219100506.648089-2-arnd@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Feb 19, 2024 at 11:04:56AM +0100, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> A couple of debug functions use a 512 byte temporary buffer and call another
-> function that has another buffer of the same size, which in turn exceeds the
-> usual warning limit for excessive stack usage:
-> 
-> drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c:1073:1: error: stack frame size (1448) exceeds limit (1024) in 'dr_dump_start' [-Werror,-Wframe-larger-than]
-> dr_dump_start(struct seq_file *file, loff_t *pos)
-> drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c:1009:1: error: stack frame size (1120) exceeds limit (1024) in 'dr_dump_domain' [-Werror,-Wframe-larger-than]
-> dr_dump_domain(struct seq_file *file, struct mlx5dr_domain *dmn)
-> drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c:705:1: error: stack frame size (1104) exceeds limit (1024) in 'dr_dump_matcher_rx_tx' [-Werror,-Wframe-larger-than]
-> dr_dump_matcher_rx_tx(struct seq_file *file, bool is_rx,
-> 
-> Rework these so that each of the various code paths only ever has one of
-> these buffers in it, and exactly the functions that declare one have
-> the 'noinline_for_stack' annotation that prevents them from all being
-> inlined into the same caller.
-> 
-> Fixes: 917d1e799ddf ("net/mlx5: DR, Change SWS usage to debug fs seq_file interface")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
-> [v2] no changes, just based on patch 1/2 but can still be applied independently
-> ---
->  .../mellanox/mlx5/core/steering/dr_dbg.c      | 82 +++++++++----------
->  1 file changed, 41 insertions(+), 41 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c
-> index be7a8481d7d2..eae04f66b8f4 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c
-> @@ -205,12 +205,11 @@ dr_dump_hex_print(char hex[DR_HEX_SIZE], char *src, u32 size)
->  }
->  
->  static int
-> -dr_dump_rule_action_mem(struct seq_file *file, const u64 rule_id,
-> +dr_dump_rule_action_mem(struct seq_file *file, char *buff, const u64 rule_id,
->  			struct mlx5dr_rule_action_member *action_mem)
->  {
->  	struct mlx5dr_action *action = action_mem->action;
->  	const u64 action_id = DR_DBG_PTR_TO_ID(action);
-> -	char buff[MLX5DR_DEBUG_DUMP_BUFF_LENGTH];
->  	u64 hit_tbl_ptr, miss_tbl_ptr;
->  	u32 hit_tbl_id, miss_tbl_id;
->  	int ret;
+Currently, mctp_local_output only takes ownership of skb on success, and
+we may leak an skb if mctp_local_output fails in specific states; the
+skb ownership isn't transferred until the actual output routing occurs.
 
-Hi Arnd,
+Instead, make mctp_local_output free the skb on all error paths up to
+the route action, so it always consumes the passed skb.
 
-With patch 1/2 in place this code goes on as:
+Fixes: 833ef3b91de6 ("mctp: Populate socket implementation")
+Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
 
-	switch (action->action_type) {
-	case DR_ACTION_TYP_DROP:
-		memset(buff, 0, sizeof(buff));
+---
+v2:
+ - retain EINVAL return code in !rt && !ifindex case. Based on feedback
+   from Simon Horman <horms@kernel.org>.
+---
+ include/net/mctp.h |  1 +
+ net/mctp/route.c   | 10 ++++++++--
+ 2 files changed, 9 insertions(+), 2 deletions(-)
 
-buff is now a char * rather than an array of char.
-siceof(buff) doesn't seem right here anymore.
+diff --git a/include/net/mctp.h b/include/net/mctp.h
+index da86e106c91d..2bff5f47ce82 100644
+--- a/include/net/mctp.h
++++ b/include/net/mctp.h
+@@ -249,6 +249,7 @@ struct mctp_route {
+ struct mctp_route *mctp_route_lookup(struct net *net, unsigned int dnet,
+ 				     mctp_eid_t daddr);
+ 
++/* always takes ownership of skb */
+ int mctp_local_output(struct sock *sk, struct mctp_route *rt,
+ 		      struct sk_buff *skb, mctp_eid_t daddr, u8 req_tag);
+ 
+diff --git a/net/mctp/route.c b/net/mctp/route.c
+index 7a47a58aa54b..d0c43812bec3 100644
+--- a/net/mctp/route.c
++++ b/net/mctp/route.c
+@@ -888,7 +888,7 @@ int mctp_local_output(struct sock *sk, struct mctp_route *rt,
+ 		dev = dev_get_by_index_rcu(sock_net(sk), cb->ifindex);
+ 		if (!dev) {
+ 			rcu_read_unlock();
+-			return rc;
++			goto out_free;
+ 		}
+ 		rt->dev = __mctp_dev_get(dev);
+ 		rcu_read_unlock();
+@@ -903,7 +903,8 @@ int mctp_local_output(struct sock *sk, struct mctp_route *rt,
+ 		rt->mtu = 0;
+ 
+ 	} else {
+-		return -EINVAL;
++		rc = -EINVAL;
++		goto out_free;
+ 	}
+ 
+ 	spin_lock_irqsave(&rt->dev->addrs_lock, flags);
+@@ -966,12 +967,17 @@ int mctp_local_output(struct sock *sk, struct mctp_route *rt,
+ 		rc = mctp_do_fragment_route(rt, skb, mtu, tag);
+ 	}
+ 
++	/* route output functions consume the skb, even on error */
++	skb = NULL;
++
+ out_release:
+ 	if (!ext_rt)
+ 		mctp_route_release(rt);
+ 
+ 	mctp_dev_put(tmp_rt.dev);
+ 
++out_free:
++	kfree_skb(skb);
+ 	return rc;
+ }
+ 
+-- 
+2.39.2
 
-Flagged by Coccinelle.
 
