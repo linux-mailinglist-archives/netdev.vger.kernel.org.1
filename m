@@ -1,218 +1,147 @@
-Return-Path: <netdev+bounces-73317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D80085BDED
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 14:57:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE93A85BE48
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 15:11:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42D5F1C20C58
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 13:57:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D5BE1F2471B
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 14:11:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C52101C8;
-	Tue, 20 Feb 2024 13:57:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33FFA6D1C6;
+	Tue, 20 Feb 2024 14:10:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cm+Ya5Ji"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114D369E12
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 13:57:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4E0F6A8D4;
+	Tue, 20 Feb 2024 14:10:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708437469; cv=none; b=dIzcKEsB8zwZ1SDZ+BIbV/Y5aqHrn31cWMENRTk+9huugtqlUXhCnUM0FIPJsFh0nL038tvxQYDRG1bg9E6pgkgRWThlLmHa+sTl7kuvevYASF6aYMUrpR8DoSpetJiEKycCLCEQyFhqjRW5jJl1EOcb8tfFESY62YPidi3zs9w=
+	t=1708438221; cv=none; b=SfCJvjhmEv/24NHtse3Whxp91YKtEkfvI9tfGWcTETxAeWlx13cPwrBLn+JzYrdPkFxe1Y9eL5Edr7TT1bYP0P67GzjV6EH9tg6MO+zGqSbuyOTZR4hju9pU96yK7d+z0LoWEtwJ9FZ2zY8KmqIW/gNdbmD7jrMfqYuviI/jSU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708437469; c=relaxed/simple;
-	bh=hYUBCifs0Tq6fri0k313BzJozBVj90K+5w/Iaw0h60c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tOPaBRoE0iIZPcgLLrnWcvILQRDuKk+YnDZT9EU+wA2Wwf9UlnWUn7YaP3tTYSaK+8g35lM0nE9g/5v3g1m68BWnRoEMpFOnj02FqATMEbejBmtLuotS18WpDkex0Ibrs/cX63k1iSflcgJ+WFUGlSv6vC1sEK1c8c5JvYuvzEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1rcQcy-00050A-Po; Tue, 20 Feb 2024 14:57:44 +0100
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Florian Westphal <fw@strlen.de>,
-	syzbot+bfde3bef047a81b8fde6@syzkaller.appspotmail.com
-Subject: [PATCH net v2] net: ip_tunnel: prevent perpetual headroom growth
-Date: Tue, 20 Feb 2024 14:56:02 +0100
-Message-ID: <20240220135606.4939-1-fw@strlen.de>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1708438221; c=relaxed/simple;
+	bh=g7ySRq9wVICEx9Nd4Soq3zjb4oVL4tzga3/RC80p8tc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HSMnk5cBN3q5JBkBNX0jfyxO3YEmsc09CgcPtfnWMVziXxLS+IO++VFiq3TNRNLLGEMUpDBOvpDFGWQzLDOcw7vZlwErcmx9BLnVofAkIBvCLa0KeU+/RxRYITylSSDGN+sr7pRw9eoFufjju3G/xdmaWEWoox0tZIW5wPPKgQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cm+Ya5Ji; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5179AC433F1;
+	Tue, 20 Feb 2024 14:10:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708438220;
+	bh=g7ySRq9wVICEx9Nd4Soq3zjb4oVL4tzga3/RC80p8tc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cm+Ya5Ji9GWuHNAxfrcQd6I2ujiAInEXe/P3+PNGgSDevGXudNsGp2V/3RLHBAkOb
+	 Ba9WTxCWVLl5wNyIFI4isq41BwQY+vRFVznQv40iE2Mz4cXSOSaEEuPFNrBM9mP7Ll
+	 gBEkLKc7/vdpkvoOL2rNssVDZ9ummVyHIwQnQLEWcnBBcItGLQv9h+mYGWVHx0rI0z
+	 4u3MnFOxXyv/m2m3D4ZxSbmZmOyZB3oeeOUualsoBByc0Op1jKoXwTfyE2/kLi8W9p
+	 WV0cx5GH2DGpGrV4Zsnd6iOd2lLEsTSdXMln0WEGAqKiD6c0CEkl5McDMxQDvMGKU9
+	 4UF370a9im90A==
+Date: Tue, 20 Feb 2024 14:10:10 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Alex Elder <elder@linaro.org>,
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Abel Vesa <abel.vesa@linaro.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Lukas Wunner <lukas@wunner.de>,
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-wireless@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
+	linux-pm@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v5 09/18] arm64: dts: qcom: qrb5165-rb5: model the PMU of
+ the QCA6391
+Message-ID: <4586127e-d224-48cd-9e56-a06a4a9d46bc@sirena.org.uk>
+References: <20240216203215.40870-1-brgl@bgdev.pl>
+ <20240216203215.40870-10-brgl@bgdev.pl>
+ <48164f18-34d0-4053-a416-2bb63aaae74b@sirena.org.uk>
+ <CAMRc=Md7ymMTmF1OkydewF5C32jDNy0V+su7pcJPHKto6VLjLg@mail.gmail.com>
+ <8e392aed-b5f7-486b-b5c0-5568e13796ec@sirena.org.uk>
+ <CAMRc=MeAXEyV47nDO_WPQqEQxSYFWTrwVPAtLghkfONj56FGVA@mail.gmail.com>
+ <5a3f5e1b-8162-4619-a10b-d4711afe533b@sirena.org.uk>
+ <CAMRc=MdTub4u0dm5PgTQPnYPuR=SRnh=ympEZqo_UyrQDrQw6w@mail.gmail.com>
+ <f72723f3-f5c5-4c16-a257-e5f57c4f9e73@sirena.org.uk>
+ <CAMRc=McFCauVwpATbVqCOtpyP_buKQDiN0OdZP9EfXmc3CgSUA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="p0M6Ter5LD+PPlml"
+Content-Disposition: inline
+In-Reply-To: <CAMRc=McFCauVwpATbVqCOtpyP_buKQDiN0OdZP9EfXmc3CgSUA@mail.gmail.com>
+X-Cookie: E = MC ** 2 +- 3db
 
-syzkaller triggered following kasan splat:
-BUG: KASAN: use-after-free in __skb_flow_dissect+0x19d1/0x7a50 net/core/flow_dissector.c:1170
-Read of size 1 at addr ffff88812fb4000e by task syz-executor183/5191
-[..]
- kasan_report+0xda/0x110 mm/kasan/report.c:588
- __skb_flow_dissect+0x19d1/0x7a50 net/core/flow_dissector.c:1170
- skb_flow_dissect_flow_keys include/linux/skbuff.h:1514 [inline]
- ___skb_get_hash net/core/flow_dissector.c:1791 [inline]
- __skb_get_hash+0xc7/0x540 net/core/flow_dissector.c:1856
- skb_get_hash include/linux/skbuff.h:1556 [inline]
- ip_tunnel_xmit+0x1855/0x33c0 net/ipv4/ip_tunnel.c:748
- ipip_tunnel_xmit+0x3cc/0x4e0 net/ipv4/ipip.c:308
- __netdev_start_xmit include/linux/netdevice.h:4940 [inline]
- netdev_start_xmit include/linux/netdevice.h:4954 [inline]
- xmit_one net/core/dev.c:3548 [inline]
- dev_hard_start_xmit+0x13d/0x6d0 net/core/dev.c:3564
- __dev_queue_xmit+0x7c1/0x3d60 net/core/dev.c:4349
- dev_queue_xmit include/linux/netdevice.h:3134 [inline]
- neigh_connected_output+0x42c/0x5d0 net/core/neighbour.c:1592
- ...
- ip_finish_output2+0x833/0x2550 net/ipv4/ip_output.c:235
- ip_finish_output+0x31/0x310 net/ipv4/ip_output.c:323
- ..
- iptunnel_xmit+0x5b4/0x9b0 net/ipv4/ip_tunnel_core.c:82
- ip_tunnel_xmit+0x1dbc/0x33c0 net/ipv4/ip_tunnel.c:831
- ipgre_xmit+0x4a1/0x980 net/ipv4/ip_gre.c:665
- __netdev_start_xmit include/linux/netdevice.h:4940 [inline]
- netdev_start_xmit include/linux/netdevice.h:4954 [inline]
- xmit_one net/core/dev.c:3548 [inline]
- dev_hard_start_xmit+0x13d/0x6d0 net/core/dev.c:3564
- ...
 
-The splat occurs because skb->data points past skb->head allocated area.
-This is because neigh layer does:
-  __skb_pull(skb, skb_network_offset(skb));
+--p0M6Ter5LD+PPlml
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-... but skb_network_offset() returns a negative offset and __skb_pull()
-arg is unsigned.  IOW, we skb->data gets "adjusted" by a huge value.
+On Tue, Feb 20, 2024 at 02:51:25PM +0100, Bartosz Golaszewski wrote:
+> On Tue, Feb 20, 2024 at 2:48=E2=80=AFPM Mark Brown <broonie@kernel.org> w=
+rote:
 
-The negative value is returned because skb->head and skb->data distance is
-more than 64k and skb->network_header (u16) has wrapped around.
+> > It is generally a bad sign if there is a voltage range specified on a
+> > regulator that's not got any indication that the voltage is going to be
+> > actively managed, especially in situations like with several of the
+> > supplies the DT was specifying where there are clear indications that
+> > the supply is intended to be fixed voltage (or cases where every single
+> > supply has a voltage range which would be highly unusual).  Looking at
+> > the consumers might provide an explanation for such unusual and likely
+> > incorrect constraints, and the lack of any consumers in conjunction with
+> > other warning signs reenforces those warning signs.
 
-The bug is in the ip_tunnel infrastructure, which can cause
-dev->needed_headroom to increment ad infinitum.
+> What do you recommend? No values at all in these regulators as it's
+> the PMU which will manage those on its own once powered up by the host
+> PMIC?
 
-The syzkaller reproducer consists of packets getting routed via a gre
-tunnel, and route of gre encapsulated packets pointing at another (ipip)
-tunnel.  The ipip encapsulation finds gre0 as next output device.
+Unless something is actively going to change the voltages at runtime
+or Linux needs to set a specific voltage (in which case minimum and
+maximum should be identical) there should be nothing specified.
 
-This results in the following pattern:
+--p0M6Ter5LD+PPlml
+Content-Type: application/pgp-signature; name="signature.asc"
 
-1). First packet is to be sent out via gre0.
-Route lookup found an output device, ipip0.
+-----BEGIN PGP SIGNATURE-----
 
-2).
-ip_tunnel_xmit for gre0 bumps gre0->needed_headroom based on the future
-output device, rt.dev->needed_headroom (ipip0).
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXUssEACgkQJNaLcl1U
+h9A0+wf/dGVyaWOokSvLac7cy6ae2h/0zXhHIFK5iPDauJFh4S4DJ+qgYNXMraAH
+Qv+OqeeDPmQZXSaVoSyeKyMhkn1i3MkxEeeUu3X4+RghPyRlA6UtcRYaXStSG0+U
+dHZFqeoyVrQ4SnZhGRbLOIsO/dvjGtc7wQSglhml5ppRwEd8ma5IJhghT5PMiKf5
+OqfbYKGn23QiTY6VqzzN13jC//ei6do3rutMY3EJ4U1wVR0mh27NHPRaZ04OVuyI
+OBHICQ95FB+Rfd3rxNd9oquHi7GAzVnGBoYpyIgiswvNVuv0wEkkjBgKVq3rFPmk
+Rj3zpctth3R9C7ObzByJhLuNcuzoPQ==
+=pG1x
+-----END PGP SIGNATURE-----
 
-3).
-ip output / start_xmit moves skb on to ipip0. which runs the same
-code path again (xmit recursion).
-
-4).
-Routing step for the post-gre0-encap packet finds gre0 as output device
-to use for ipip0 encapsulated packet.
-
-tunl0->needed_headroom is then incremented based on the (already bumped)
-gre0 device headroom.
-
-This repeats for every future packet:
-
-gre0->needed_headroom gets inflated because previous packets' ipip0 step
-incremented rt->dev (gre0) headroom, and ipip0 incremented because gre0
-needed_headroom was increased.
-
-For each subsequent packet, gre/ipip0->needed_headroom grows until
-post-expand-head reallocations result in a skb->head/data distance of
-more than 64k.
-
-Once that happens, skb->network_header (u16) wraps around when
-pskb_expand_head tries to make sure that skb_network_offset() is unchanged
-after the headroom expansion/reallocation.
-
-After this skb_network_offset(skb) returns a different (and negative)
-result post headroom expansion.
-
-The next trip to neigh layer (or anything else that would __skb_pull the
-network header) makes skb->data point to a memory location outside
-skb->head area.
-
-v2: Cap the needed_headroom update to an arbitarily chosen upperlimit to
-prevent perpetual increase instead of dropping the headroom increment
-completely.
-
-Reported-and-tested-by: syzbot+bfde3bef047a81b8fde6@syzkaller.appspotmail.com
-Closes: https://groups.google.com/g/syzkaller-bugs/c/fL9G6GtWskY/m/VKk_PR5FBAAJ
-Fixes: 243aad830e8a ("ip_gre: include route header_len in max_headroom calculation")
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- net/ipv4/ip_tunnel.c | 28 +++++++++++++++++++++-------
- 1 file changed, 21 insertions(+), 7 deletions(-)
-
-diff --git a/net/ipv4/ip_tunnel.c b/net/ipv4/ip_tunnel.c
-index a4513ffb66cb..1b6981de3f29 100644
---- a/net/ipv4/ip_tunnel.c
-+++ b/net/ipv4/ip_tunnel.c
-@@ -554,6 +554,20 @@ static int tnl_update_pmtu(struct net_device *dev, struct sk_buff *skb,
- 	return 0;
- }
- 
-+static void ip_tunnel_adj_headroom(struct net_device *dev, unsigned int headroom)
-+{
-+	/* we must cap headroom to some upperlimit, else pskb_expand_head
-+	 * will overflow header offsets in skb_headers_offset_update().
-+	 */
-+	static const unsigned int max_allowed = 512;
-+
-+	if (headroom > max_allowed)
-+		headroom = max_allowed;
-+
-+	if (headroom > READ_ONCE(dev->needed_headroom))
-+		WRITE_ONCE(dev->needed_headroom, headroom);
-+}
-+
- void ip_md_tunnel_xmit(struct sk_buff *skb, struct net_device *dev,
- 		       u8 proto, int tunnel_hlen)
- {
-@@ -632,13 +646,13 @@ void ip_md_tunnel_xmit(struct sk_buff *skb, struct net_device *dev,
- 	}
- 
- 	headroom += LL_RESERVED_SPACE(rt->dst.dev) + rt->dst.header_len;
--	if (headroom > READ_ONCE(dev->needed_headroom))
--		WRITE_ONCE(dev->needed_headroom, headroom);
--
--	if (skb_cow_head(skb, READ_ONCE(dev->needed_headroom))) {
-+	if (skb_cow_head(skb, headroom)) {
- 		ip_rt_put(rt);
- 		goto tx_dropped;
- 	}
-+
-+	ip_tunnel_adj_headroom(dev, headroom);
-+
- 	iptunnel_xmit(NULL, rt, skb, fl4.saddr, fl4.daddr, proto, tos, ttl,
- 		      df, !net_eq(tunnel->net, dev_net(dev)));
- 	return;
-@@ -818,16 +832,16 @@ void ip_tunnel_xmit(struct sk_buff *skb, struct net_device *dev,
- 
- 	max_headroom = LL_RESERVED_SPACE(rt->dst.dev) + sizeof(struct iphdr)
- 			+ rt->dst.header_len + ip_encap_hlen(&tunnel->encap);
--	if (max_headroom > READ_ONCE(dev->needed_headroom))
--		WRITE_ONCE(dev->needed_headroom, max_headroom);
- 
--	if (skb_cow_head(skb, READ_ONCE(dev->needed_headroom))) {
-+	if (skb_cow_head(skb, max_headroom)) {
- 		ip_rt_put(rt);
- 		DEV_STATS_INC(dev, tx_dropped);
- 		kfree_skb(skb);
- 		return;
- 	}
- 
-+	ip_tunnel_adj_headroom(dev, max_headroom);
-+
- 	iptunnel_xmit(NULL, rt, skb, fl4.saddr, fl4.daddr, protocol, tos, ttl,
- 		      df, !net_eq(tunnel->net, dev_net(dev)));
- 	return;
--- 
-2.43.0
-
+--p0M6Ter5LD+PPlml--
 
