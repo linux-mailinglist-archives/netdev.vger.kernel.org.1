@@ -1,137 +1,109 @@
-Return-Path: <netdev+bounces-73287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90A5F85BC5A
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 13:39:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5D5E85BC70
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 13:44:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31EA9B23379
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 12:39:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 710B01F242FD
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 12:44:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBD5F69950;
-	Tue, 20 Feb 2024 12:39:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00FE567C74;
+	Tue, 20 Feb 2024 12:44:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rzZm8mUW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IkccN2Kd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEA3E67E95;
-	Tue, 20 Feb 2024 12:39:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D7AF8F4A
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 12:44:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708432769; cv=none; b=pnD5mTL30gqNThJNzt87AxdONDTCqOxXBjajJ0RHNT22kkHnKB0XaKXcJ7fm7+pDGKXd88Hz96GqdcTr2x1n1SoU8tcR5dA0XGV66yCjIyrZCSxkVpifPlWK9KsgZlfiZYwO+likvpeD0eHDbk5RCUhIpa4oG9wdPh/gIEMEIgY=
+	t=1708433041; cv=none; b=T6KXeTQftdHIljuur96QprLWXToSdnd077z09prJOwj20Ch6DRJrbx7Q4Rx0PL5uQ85+siaTPgqU5jzWRT+PX09ESXPW+qmZlKYE76koX7GUHa6WYijU/JS1ZdqMZ3Q9NrCG1+qIzsDaGh+OuAOyRP3hvCAF/yMBf1wdlQIH9Dw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708432769; c=relaxed/simple;
-	bh=zaRvBdCErfnTGRRy1hJDAaFwvmR35DTVIeIkU5YZ8ec=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a8tv56Ce8dmZAhZrBKowrB+6k5MrWjKWyrckZocJPtAERBHCipXXv6Qnin/OyMBGEt6QIG2qzAFlBnMGno1H+TKWDYZcpXjoekj08EJsfLOWvvE45DgUbjOFsR1qszDkDFDLd8Y1z5pIUGuZ7aRO4pYLaou+/4RpXXZehEDISCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rzZm8mUW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C578FC433F1;
-	Tue, 20 Feb 2024 12:39:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708432769;
-	bh=zaRvBdCErfnTGRRy1hJDAaFwvmR35DTVIeIkU5YZ8ec=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rzZm8mUWfLWVPAhjMB5ui51kgxlP9xkCOMONOR0ogWf89KCxuVO+kJbk+KdnLjF5D
-	 TKoeUzJPAKDFjHcCIRZkr3g9G0u5t/tXUNs5awpZUaczYJlP6/HRdg70FscwWWNxPO
-	 UvpeQ4y6A0Z5fB6svIAtv2q0fZJ8yeCRIyMHKzv6b1udlQFiVJq/OfCN3DC5hFxd7Y
-	 kUhh++iQhYoYD87Ap3WHCF900Pnu1+0EqL/hiAXxBfq7Nh1toa/j87W5MPytjozLEI
-	 LifVXEMXp7KzlIiJJw3G3e5dYDeb3og75TQpO89Kz56VIo2nCobToOkmlnhgcgJjH4
-	 /ugMfTe9PHkVQ==
-Date: Tue, 20 Feb 2024 12:39:24 +0000
-From: Simon Horman <horms@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ariel Elior <aelior@marvell.com>,
-	Manish Chopra <manishc@marvell.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>, linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org
-Subject: Re: [PATCH net-next v4 2/9] net: usb: ax88179_178a: Use linkmode
- helpers for EEE
-Message-ID: <20240220123924.GA40273@kernel.org>
-References: <20240218-keee-u32-cleanup-v4-0-71f13b7c3e60@lunn.ch>
- <20240218-keee-u32-cleanup-v4-2-71f13b7c3e60@lunn.ch>
+	s=arc-20240116; t=1708433041; c=relaxed/simple;
+	bh=HtPSG6BPy7ZaiiV7z1bz04I8EL1Dj5VtB2yFVdU/H3Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EfTnMcMyCP9LgcK9NcOjgD3w4WRtVxhrYLfhZN09GMsbDJEqZAiQa5gVftE9SkYDsYeJsiSy1siEoIcoVBe0G6e+JQ5N4CTvkBtpGbJi5OXRvIP3swcuDpFgssI7QCBGt3sCwDtIyUWDJcHSNHJzK3jwjSlpS+zQsM/HAuQj/Yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IkccN2Kd; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-561f0f116ecso24802a12.0
+        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 04:44:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1708433038; x=1709037838; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HtPSG6BPy7ZaiiV7z1bz04I8EL1Dj5VtB2yFVdU/H3Q=;
+        b=IkccN2KdPM0C2GvTUbr71sI6SKUucHitvGa5rsTi8HD9GpIsLVB790pM2DdFqSvq1h
+         OjO02tw6dHkNQJQkBg6XzCFI/PnUbhCTIrwt/MTlW1ImWT8dCriArVxbogi4KSLAK9oP
+         ++WoVeMS2vRReD+MwTYY6+dHmmCQSMQA6nTjc8m1TohQAPhKup+fiaMMu+5K+vsOofY6
+         ODJa9TUeQSQSq7NWNvll0HwrjUXJIKmZ5TESTnCuxryJIX3I/QXggnk2tKxgOqcIdmcq
+         Aj/ist1fgMQwBr5iHZUujKD0XVYNU7bxEsadKLbwUQWJmVseqlKzJeKWU3rWkkO2JoEk
+         RW7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708433038; x=1709037838;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HtPSG6BPy7ZaiiV7z1bz04I8EL1Dj5VtB2yFVdU/H3Q=;
+        b=BFgNYM9K6oVKDHWYlqNKmZiVzX+CebsaT3aNTLomclna2H9E3o+cQsw+UtSZCLoI0H
+         pcSVsZL0NYwHY02oMy/QSXYyUZdU4dCNYuynV/h2wsvgwyvqsCE3HtsGywpYTydwcr28
+         3JmcwdmFa3DQOtmF75hNKhDRVMUf8+FGIE8GOhHlppom0PyKgjIzceMf1MYq2lpPys13
+         zRqptT1GfhCpL/Ws+GUC9rYpTbgC0gglIpGt4IGQdXi1UvvFAf95Ah2XOxljuhbcDoFL
+         lV8NiceQQGub1RU6e+tOqm13kPoffIVsamfOb8P2WKyiUp5xI66MOs8imuTOkM0XG21I
+         GxMw==
+X-Gm-Message-State: AOJu0YxNGKzeXn+dFZP3JEr0Pc34yUsJwyvxl9BAmTS1cSsf6MZ7/1dg
+	SWNHfQDzA0or0cOm5Ac1Om9ZYHUHuTdDf6wrKU5rU07zNilQU2DJLTPDvsx5VSorJxiJDqiXZev
+	IfxbZBnncpmgwcJOF2JCyCoboIL8ckuWLM0OQ
+X-Google-Smtp-Source: AGHT+IEEuWARbmQ9MRMb1yaaz9J2AjADSSxYUOkNHtNhr42IoYqeXhS8wAyjOsvH4XyAnDzGJ2W1iRC/Slk0OFFx09k=
+X-Received: by 2002:a50:d696:0:b0:560:e82e:2cc4 with SMTP id
+ r22-20020a50d696000000b00560e82e2cc4mr374629edi.3.1708433038351; Tue, 20 Feb
+ 2024 04:43:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240218-keee-u32-cleanup-v4-2-71f13b7c3e60@lunn.ch>
+References: <67ab679c15fbf49fa05b3ffe05d91c47ab84f147.1708426665.git.pabeni@redhat.com>
+In-Reply-To: <67ab679c15fbf49fa05b3ffe05d91c47ab84f147.1708426665.git.pabeni@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 20 Feb 2024 13:43:43 +0100
+Message-ID: <CANn89iLQ1Sz7=sYMr=4r66-ZjHfnG5REi4uvitewfQrC7jrdZQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] udp: add local "peek offset enabled" flag
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Feb 18, 2024 at 11:06:59AM -0600, Andrew Lunn wrote:
-> Make use of the existing linkmode helpers for converting PHY EEE
-> register values into links modes, now that ethtool_keee uses link
-> modes, rather than u32 values.
-> 
-> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+On Tue, Feb 20, 2024 at 12:00=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
+>
+> We want to re-organize the struct sock layout. The sk_peek_off
+> field location is problematic, as most protocols want it in the
+> RX read area, while UDP wants it on a cacheline different from
+> sk_receive_queue.
+>
+> Create a local (inside udp_sock) copy of the 'peek offset is enabled'
+> flag and place it inside the same cacheline of reader_queue.
+>
+> Check such flag before reading sk_peek_off. This will save potential
+> false sharing and cache misses in the fast-path.
+>
+> Tested under UDP flood with small packets. The struct sock layout
+> update causes a 4% performance drop, and this patch restores completely
+> the original tput.
+>
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 > ---
->  drivers/net/usb/ax88179_178a.c | 9 ++++-----
->  1 file changed, 4 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/usb/ax88179_178a.c b/drivers/net/usb/ax88179_178a.c
-> index d6168eaa286f..d4bf9865d87b 100644
-> --- a/drivers/net/usb/ax88179_178a.c
-> +++ b/drivers/net/usb/ax88179_178a.c
-> @@ -676,21 +676,21 @@ ax88179_ethtool_get_eee(struct usbnet *dev, struct ethtool_keee *data)
->  					    MDIO_MMD_PCS);
->  	if (val < 0)
->  		return val;
-> -	data->supported_u32 = mmd_eee_cap_to_ethtool_sup_t(val);
-> +	mii_eee_cap1_mod_linkmode_t(data->supported, val);
->  
->  	/* Get advertisement EEE */
->  	val = ax88179_phy_read_mmd_indirect(dev, MDIO_AN_EEE_ADV,
->  					    MDIO_MMD_AN);
->  	if (val < 0)
->  		return val;
-> -	data->advertised_u32 = mmd_eee_adv_to_ethtool_adv_t(val);
-> +	mii_eee_cap1_mod_linkmode_t(data->advertised, val);
->  
->  	/* Get LP advertisement EEE */
->  	val = ax88179_phy_read_mmd_indirect(dev, MDIO_AN_EEE_LPABLE,
->  					    MDIO_MMD_AN);
->  	if (val < 0)
->  		return val;
-> -	data->lp_advertised_u32 = mmd_eee_adv_to_ethtool_adv_t(val);
-> +	mii_eee_cap1_mod_linkmode_t(data->lp_advertised, val);
->  
->  	return 0;
->  }
-> @@ -698,7 +698,7 @@ ax88179_ethtool_get_eee(struct usbnet *dev, struct ethtool_keee *data)
->  static int
->  ax88179_ethtool_set_eee(struct usbnet *dev, struct ethtool_keee *data)
->  {
-> -	u16 tmp16 = ethtool_adv_to_mmd_eee_adv_t(data->advertised_u32);
-> +	u16 tmp16 = linkmode_to_mii_eee_cap1_t(data->advertised);
->  
->  	return ax88179_phy_write_mmd_indirect(dev, MDIO_AN_EEE_ADV,
->  					      MDIO_MMD_AN, tmp16);
-> @@ -1663,7 +1663,6 @@ static int ax88179_reset(struct usbnet *dev)
->  	ax88179_disable_eee(dev);
->  
->  	ax88179_ethtool_get_eee(dev, &eee_data);
-> -	eee_data.advertised_u32 = 0;
 
-Hi Andrew,
-
-could you clarify why advertised no longer needs to be cleared?
-
->  	ax88179_ethtool_set_eee(dev, &eee_data);
->  
->  	/* Restart autoneg */
-> 
-> -- 
-> 2.43.0
-> 
-> 
+SGTM, thanks !
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
