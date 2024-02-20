@@ -1,67 +1,66 @@
-Return-Path: <netdev+bounces-73461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA30A85CBAA
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 00:03:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B81385CBAB
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 00:04:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E22F284444
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 23:03:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3F742844A9
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 23:04:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEF4F15444E;
-	Tue, 20 Feb 2024 23:03:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0648154425;
+	Tue, 20 Feb 2024 23:03:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ZjI+5gVz"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="VOQ+uxc2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 022146BB28
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 23:03:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01E7D154451
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 23:03:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708470228; cv=none; b=OBOPbtVqjazRQhfIul4Tp+YyAEeUPq94MXr8ksjV8lxC0Xfh0OCi7NDZ6jSVah7hrkgxEBIpxLg3N7vlY6kIfFpP3fSF2TRXOxNOSHXY61yjoKkNsBAJGdQmQjm6/pxdZA+n91mc0LKe0xZqiXYf9mGtVAZdjzuHcL0AsYhTLak=
+	t=1708470230; cv=none; b=X1o8oKG55Fg2OTlN5pqS+qLn2InQUu5/lNoTOaEfxxoZVga2Q61F4JJnyAIwzJ27cosieHUOH9/Drf7dBMxrAm2K/TCZRG5eNE8tpiHrD73Rrs6QRi+i9oe6FFHFsn5zAVGLJlyFIObS+ITEXy1tZonovc/g5AT2656h0ReDyjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708470228; c=relaxed/simple;
-	bh=6GOt6H7SVTo94hFbm5zwOTF6m/HL36b0p4tigFqlCFE=;
+	s=arc-20240116; t=1708470230; c=relaxed/simple;
+	bh=83jvQWLr+RIzQzUjbF9p3mmiEuFqDFxbmXC1E8gBMgc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fhjRUelTQM6s6Rm66xo9IPpBsUkor6NUELSyZYL+xiIsm6REXrFf02d/AM5W5za8OeDGNyX5unkPdKEpfKHczJYUPUhYMZ9u9jUr4zVuWpbXp/0I4g0cmKeCHi8FjOVTbOCiUKpA6IPfkqYwfaCl97qWWmJsBDss0WD1umAOX20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ZjI+5gVz; arc=none smtp.client-ip=209.85.222.180
+	 MIME-Version:Content-Type; b=CfpCXhvNgrC2jg9KrxJVRH0+qsRkFqTOrxuzA3UqGgc8JBhiNRBZNTpqqN3F9xZXr6X1TJ9khyB9YICKzXzDMj5b1eoEU//OsyN0jm+3iYlpykqR4FpJiPYi8JOw6G365ZX2Frwlf2wNwXv6wzvXc2AD2DqBH2SRq+kc+uHYoLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=VOQ+uxc2; arc=none smtp.client-ip=209.85.160.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-787225a2addso291262685a.0
-        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 15:03:46 -0800 (PST)
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-42e169c4b64so6724061cf.3
+        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 15:03:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1708470226; x=1709075026; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1708470228; x=1709075028; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=boRa4w80Rwfxs/xjAoWVdjWsR4PWhA/YHrv6U+4Dt/0=;
-        b=ZjI+5gVzrPLfnTPy0M2GOfUs5r5xmS2T/lgeKVcRg+5SJWlMs2wG7KbRdokZYnzQys
-         dSWN4shf1q73m2NrYmGijdPRaTITNAQvXS51fZrzd44csQFuY2QN6nOASQrrKQp1Mx4N
-         zL3jwluvJOa3fvIkHtt54J4M3wD6At6kSd3N4=
+        bh=6WyRf9jwWeNC4faVJoWo4gm1KHgOsq4tQdgKAuC8NY4=;
+        b=VOQ+uxc2MB5vMTCLK3QuBlWdylFqCWt1PVKV7Vv8Flqh5BTo4W4Wl6mc9UPvwcMMwG
+         DQifVM8txhXdLjivpBUZ9a0VJlU6DfcQXan4mLromN2O4Gd5m5fOcI1FyEkFe27gtwCS
+         ZDSo+vMMCzoPbgabWlb5o3s0HkMoa7/EZtfBo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708470226; x=1709075026;
+        d=1e100.net; s=20230601; t=1708470228; x=1709075028;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=boRa4w80Rwfxs/xjAoWVdjWsR4PWhA/YHrv6U+4Dt/0=;
-        b=lF0WosL6buy+sc6dZoJoDI+A6pZm9fQEV0v78f8ujP7BhHd+gMZTbEfAwSQ6bhvqLD
-         lmX594NB6tCb6O96rfbpKG5UYZjWjVpUeM3nN1SyXGgg++l3Hm0JQ7urW1OU2t4EYY8V
-         1EBHL1jH5ChFoXJqTXCidWiIYjhtA4J9WvawzBjSREbYvtsiaWuCHX/5AKofw3qsGrbx
-         n8YrWL0DXBsuB49cU5sCNeJsVTwptpujHw7qCKtwXV8aevkk1Vqm00HEDiTD/XwqAR5n
-         IRJ91o2GMB/t46OWJv9oG9YsO81Idf/ap14Q3eCHyX6Kyf4cQ16DRYs4K9gNnK2lrv4I
-         5zHg==
-X-Gm-Message-State: AOJu0YwBb9oc2Kd/PRVmiZAY4RE7A51IM8k9wvENsMfOUHJL3qoNW5IZ
-	3PiKGq4ndVD98p6TLeuSQw3XwKXKWWj+cHxneDBTBtT49+HwI6jIfma92AEuyovaL8GJiebUDOc
-	=
-X-Google-Smtp-Source: AGHT+IHPznZts7lvEiYvPYCCfkU6Yq+dEL7zaVA1+y+dRCU8pKyW2YIk2rcQjzFfz3N51+VGv/6eCA==
-X-Received: by 2002:a05:620a:22a3:b0:787:80f1:3a91 with SMTP id p3-20020a05620a22a300b0078780f13a91mr1505710qkh.61.1708470225522;
-        Tue, 20 Feb 2024 15:03:45 -0800 (PST)
+        bh=6WyRf9jwWeNC4faVJoWo4gm1KHgOsq4tQdgKAuC8NY4=;
+        b=cOp5+tLIw8hmGW6rsoP3XbVF9WMHRkgYCIAMxMrzsVHpVE4bvelXUYMbP7VNPEvH0i
+         B52LMwIMff9s0+rGMhPGr5iIwc80nReG4oQkbalE1u2zsCxuhLqq+R2V866wkbi6K7V1
+         077VzgHQjEMQCRFDf6SbRKqzYGCCG/QQc01pXEkJE485U8w/p5jcMM6lG18WGlWyWE/V
+         8UGgCxemyn0lObL535hwgtyBmCy7cEpjhNWdTYijJagpBj1EVs+pmZVSiVP81s7pVTk+
+         MhgrsiLneSVEc2QfRedsyoL19jSSPLrg8MygO68AZbYyWybUE6cOVZhCA5BzCcgKCQkx
+         sRwA==
+X-Gm-Message-State: AOJu0YxPY543GVqFKGA0YOu9D6AwMaVcb46ljwrK10VCmFeUA6j+2W/V
+	cRUFm1pq+VOyGZzd4pyHmJFZqGb9Ikj5SusYaHHITMWJkXKcW+I5bjH/2gRTeQ==
+X-Google-Smtp-Source: AGHT+IF7DPXArz27uW7t+esUEY0te8CWn5t6Xus0dru/ItRdjbSiWdicPGEd99ZCfUNyAT9QnUJ8YQ==
+X-Received: by 2002:a05:622a:4ce:b0:42c:2d67:b7d6 with SMTP id q14-20020a05622a04ce00b0042c2d67b7d6mr21660215qtx.66.1708470227525;
+        Tue, 20 Feb 2024 15:03:47 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id g10-20020ae9e10a000000b00785d7dda9easm3797966qkm.28.2024.02.20.15.03.44
+        by smtp.gmail.com with ESMTPSA id g10-20020ae9e10a000000b00785d7dda9easm3797966qkm.28.2024.02.20.15.03.45
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 20 Feb 2024 15:03:45 -0800 (PST)
+        Tue, 20 Feb 2024 15:03:46 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -69,11 +68,10 @@ Cc: netdev@vger.kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com,
-	Ajit Khaparde <ajit.khaparde@broadcom.com>
-Subject: [PATCH net-next 02/10] bnxt_en: Explicitly specify P5 completion rings to reserve
-Date: Tue, 20 Feb 2024 15:03:09 -0800
-Message-Id: <20240220230317.96341-3-michael.chan@broadcom.com>
+	andrew.gospodarek@broadcom.com
+Subject: [PATCH net-next 03/10] bnxt_en: Improve RSS context reservation infrastructure
+Date: Tue, 20 Feb 2024 15:03:10 -0800
+Message-Id: <20240220230317.96341-4-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20240220230317.96341-1-michael.chan@broadcom.com>
 References: <20240220230317.96341-1-michael.chan@broadcom.com>
@@ -84,120 +82,214 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000f03c3c0611d838db"
+	boundary="0000000000000e88ff0611d83904"
 
---000000000000f03c3c0611d838db
+--0000000000000e88ff0611d83904
 Content-Transfer-Encoding: 8bit
 
-The current code assumes that every RX ring group and every TX ring
-requires a completion ring on P5_PLUS chips.  Now that we have the
-bnxt_hw_rings structure, add the cp_p5 field so that it can
-be explicitly specified.  This makes the logic more clear.
+From: Pavan Chebbi <pavan.chebbi@broadcom.com>
 
-Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Add RSS context fields to struct bnxt_hw_rings and struct bnxt_hw_resc.
+With these, we can now specific the exact number of RSS contexts to
+reserve and store the reserved value.  The original code relies on
+other resources to infer the number of RSS contexts to reserve and the
+reserved value is not stored.  This improved infrastructure will make
+the RSS context accounting more complete and is needed by later
+patches.
+
+Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 19 ++++++++++++-------
- drivers/net/ethernet/broadcom/bnxt/bnxt.h |  1 +
- 2 files changed, 13 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 57 ++++++++++++++---------
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h |  2 +
+ 2 files changed, 36 insertions(+), 23 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 4a30eff0791b..4f3d2b1c9989 100644
+index 4f3d2b1c9989..e6fad2a8b817 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -7114,7 +7114,7 @@ __bnxt_hwrm_reserve_pf_rings(struct bnxt *bp, struct bnxt_hw_rings *hwr)
- 		enables |= hwr->stat ? FUNC_CFG_REQ_ENABLES_NUM_STAT_CTXS : 0;
- 		if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS) {
+@@ -7043,6 +7043,7 @@ static int bnxt_hwrm_get_rings(struct bnxt *bp)
+ 		hw_resc->resv_hw_ring_grps =
+ 			le32_to_cpu(resp->alloc_hw_ring_grps);
+ 		hw_resc->resv_vnics = le16_to_cpu(resp->alloc_vnics);
++		hw_resc->resv_rsscos_ctxs = le16_to_cpu(resp->alloc_rsscos_ctx);
+ 		cp = le16_to_cpu(resp->alloc_cmpl_rings);
+ 		stats = le16_to_cpu(resp->alloc_stat_ctx);
+ 		hw_resc->resv_irqs = cp;
+@@ -7116,32 +7117,23 @@ __bnxt_hwrm_reserve_pf_rings(struct bnxt *bp, struct bnxt_hw_rings *hwr)
  			enables |= hwr->cp ? FUNC_CFG_REQ_ENABLES_NUM_MSIX : 0;
--			enables |= hwr->tx + hwr->grp ?
-+			enables |= hwr->cp_p5 ?
+ 			enables |= hwr->cp_p5 ?
  				   FUNC_CFG_REQ_ENABLES_NUM_CMPL_RINGS : 0;
- 			enables |= hwr->rx ?
- 				   FUNC_CFG_REQ_ENABLES_NUM_RSSCOS_CTXS : 0;
-@@ -7131,7 +7131,7 @@ __bnxt_hwrm_reserve_pf_rings(struct bnxt *bp, struct bnxt_hw_rings *hwr)
- 		if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS) {
- 			u16 rss_ctx = bnxt_get_nr_rss_ctxs(bp, hwr->grp);
- 
--			req->num_cmpl_rings = cpu_to_le16(hwr->tx + hwr->grp);
-+			req->num_cmpl_rings = cpu_to_le16(hwr->cp_p5);
- 			req->num_msix = cpu_to_le16(hwr->cp);
- 			req->num_rsscos_ctxs = cpu_to_le16(rss_ctx);
+-			enables |= hwr->rx ?
+-				   FUNC_CFG_REQ_ENABLES_NUM_RSSCOS_CTXS : 0;
  		} else {
-@@ -7164,7 +7164,7 @@ __bnxt_hwrm_reserve_vf_rings(struct bnxt *bp, struct bnxt_hw_rings *hwr)
+ 			enables |= hwr->cp ?
+ 				   FUNC_CFG_REQ_ENABLES_NUM_CMPL_RINGS : 0;
+ 			enables |= hwr->grp ?
+-				   FUNC_CFG_REQ_ENABLES_NUM_HW_RING_GRPS |
+-				   FUNC_CFG_REQ_ENABLES_NUM_RSSCOS_CTXS : 0;
++				   FUNC_CFG_REQ_ENABLES_NUM_HW_RING_GRPS : 0;
+ 		}
+ 		enables |= hwr->vnic ? FUNC_CFG_REQ_ENABLES_NUM_VNICS : 0;
+-
++		enables |= hwr->rss_ctx ? FUNC_CFG_REQ_ENABLES_NUM_RSSCOS_CTXS :
++					  0;
+ 		req->num_rx_rings = cpu_to_le16(hwr->rx);
++		req->num_rsscos_ctxs = cpu_to_le16(hwr->rss_ctx);
+ 		if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS) {
+-			u16 rss_ctx = bnxt_get_nr_rss_ctxs(bp, hwr->grp);
+-
+ 			req->num_cmpl_rings = cpu_to_le16(hwr->cp_p5);
+ 			req->num_msix = cpu_to_le16(hwr->cp);
+-			req->num_rsscos_ctxs = cpu_to_le16(rss_ctx);
+ 		} else {
+ 			req->num_cmpl_rings = cpu_to_le16(hwr->cp);
+ 			req->num_hw_ring_grps = cpu_to_le16(hwr->grp);
+-			req->num_rsscos_ctxs = cpu_to_le16(1);
+-			if (!(bp->rss_cap & BNXT_RSS_CAP_NEW_RSS_CAP) &&
+-			    bnxt_rfs_supported(bp))
+-				req->num_rsscos_ctxs =
+-					cpu_to_le16(hwr->grp + 1);
+ 		}
+ 		req->num_stat_ctxs = cpu_to_le16(hwr->stat);
+ 		req->num_vnics = cpu_to_le16(hwr->vnic);
+@@ -7163,6 +7155,7 @@ __bnxt_hwrm_reserve_vf_rings(struct bnxt *bp, struct bnxt_hw_rings *hwr)
+ 	enables |= hwr->rx ? FUNC_VF_CFG_REQ_ENABLES_NUM_RX_RINGS |
  			     FUNC_VF_CFG_REQ_ENABLES_NUM_RSSCOS_CTXS : 0;
  	enables |= hwr->stat ? FUNC_VF_CFG_REQ_ENABLES_NUM_STAT_CTXS : 0;
++	enables |= hwr->rss_ctx ? FUNC_VF_CFG_REQ_ENABLES_NUM_RSSCOS_CTXS : 0;
  	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS) {
--		enables |= hwr->tx + hwr->grp ?
-+		enables |= hwr->cp_p5 ?
+ 		enables |= hwr->cp_p5 ?
  			   FUNC_VF_CFG_REQ_ENABLES_NUM_CMPL_RINGS : 0;
- 	} else {
- 		enables |= hwr->cp ? FUNC_VF_CFG_REQ_ENABLES_NUM_CMPL_RINGS : 0;
-@@ -7180,7 +7180,7 @@ __bnxt_hwrm_reserve_vf_rings(struct bnxt *bp, struct bnxt_hw_rings *hwr)
+@@ -7177,15 +7170,12 @@ __bnxt_hwrm_reserve_vf_rings(struct bnxt *bp, struct bnxt_hw_rings *hwr)
+ 	req->num_l2_ctxs = cpu_to_le16(BNXT_VF_MAX_L2_CTX);
+ 	req->num_tx_rings = cpu_to_le16(hwr->tx);
+ 	req->num_rx_rings = cpu_to_le16(hwr->rx);
++	req->num_rsscos_ctxs = cpu_to_le16(hwr->rss_ctx);
  	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS) {
- 		u16 rss_ctx = bnxt_get_nr_rss_ctxs(bp, hwr->grp);
- 
--		req->num_cmpl_rings = cpu_to_le16(hwr->tx + hwr->grp);
-+		req->num_cmpl_rings = cpu_to_le16(hwr->cp_p5);
- 		req->num_rsscos_ctxs = cpu_to_le16(rss_ctx);
+-		u16 rss_ctx = bnxt_get_nr_rss_ctxs(bp, hwr->grp);
+-
+ 		req->num_cmpl_rings = cpu_to_le16(hwr->cp_p5);
+-		req->num_rsscos_ctxs = cpu_to_le16(rss_ctx);
  	} else {
  		req->num_cmpl_rings = cpu_to_le16(hwr->cp);
-@@ -7350,6 +7350,8 @@ static void bnxt_copy_reserved_rings(struct bnxt *bp, struct bnxt_hw_rings *hwr)
- 	if (BNXT_NEW_RM(bp)) {
- 		hwr->rx = hw_resc->resv_rx_rings;
- 		hwr->cp = hw_resc->resv_irqs;
-+		if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS)
-+			hwr->cp_p5 = hw_resc->resv_cp_rings;
+ 		req->num_hw_ring_grps = cpu_to_le16(hwr->grp);
+-		req->num_rsscos_ctxs = cpu_to_le16(BNXT_VF_MAX_RSS_CTX);
+ 	}
+ 	req->num_stat_ctxs = cpu_to_le16(hwr->stat);
+ 	req->num_vnics = cpu_to_le16(hwr->vnic);
+@@ -7289,6 +7279,20 @@ static int bnxt_get_func_stat_ctxs(struct bnxt *bp)
+ 	return cp + ulp_stat;
+ }
+ 
++static int bnxt_get_total_rss_ctxs(struct bnxt *bp, struct bnxt_hw_rings *hwr)
++{
++	if (!hwr->grp)
++		return 0;
++	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS)
++		return bnxt_get_nr_rss_ctxs(bp, hwr->grp);
++
++	if (BNXT_VF(bp))
++		return BNXT_VF_MAX_RSS_CTX;
++	if (!(bp->rss_cap & BNXT_RSS_CAP_NEW_RSS_CAP) && bnxt_rfs_supported(bp))
++		return hwr->grp + 1;
++	return 1;
++}
++
+ /* Check if a default RSS map needs to be setup.  This function is only
+  * used on older firmware that does not require reserving RX rings.
+  */
+@@ -7355,6 +7359,7 @@ static void bnxt_copy_reserved_rings(struct bnxt *bp, struct bnxt_hw_rings *hwr)
  		hwr->grp = hw_resc->resv_hw_ring_grps;
  		hwr->vnic = hw_resc->resv_vnics;
  		hwr->stat = hw_resc->resv_stat_ctxs;
-@@ -7359,7 +7361,7 @@ static void bnxt_copy_reserved_rings(struct bnxt *bp, struct bnxt_hw_rings *hwr)
- static bool bnxt_rings_ok(struct bnxt *bp, struct bnxt_hw_rings *hwr)
- {
- 	return hwr->tx && hwr->rx && hwr->cp && hwr->grp && hwr->vnic &&
--	       hwr->stat;
-+	       hwr->stat && (hwr->cp_p5 || !(bp->flags & BNXT_FLAG_CHIP_P5_PLUS));
++		hwr->rss_ctx = hw_resc->resv_rsscos_ctxs;
+ 	}
  }
  
- static int __bnxt_reserve_rings(struct bnxt *bp)
-@@ -7378,8 +7380,9 @@ static int __bnxt_reserve_rings(struct bnxt *bp)
- 	hwr.vnic = 1;
- 	if (bp->flags & BNXT_FLAG_SHARED_RINGS)
- 		sh = true;
--	if ((bp->flags & BNXT_FLAG_RFS) &&
--	    !(bp->flags & BNXT_FLAG_CHIP_P5_PLUS))
-+	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS)
-+		hwr.cp_p5 = hwr.rx + hwr.tx;
-+	else if (bp->flags & BNXT_FLAG_RFS)
- 		hwr.vnic = hwr.rx + 1;
+@@ -7387,6 +7392,7 @@ static int __bnxt_reserve_rings(struct bnxt *bp)
  	if (bp->flags & BNXT_FLAG_AGG_RINGS)
  		hwr.rx <<= 1;
-@@ -13326,6 +13329,8 @@ int bnxt_check_rings(struct bnxt *bp, int tx, int rx, bool sh, int tcs,
- 		hwr.cp += bnxt_get_ulp_msix_num(bp);
- 		hwr.stat += bnxt_get_ulp_stat_ctxs(bp);
- 	}
-+	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS)
-+		hwr.cp_p5 = hwr.tx + rx;
- 	return bnxt_hwrm_check_rings(bp, &hwr);
- }
+ 	hwr.grp = bp->rx_nr_rings;
++	hwr.rss_ctx = bnxt_get_total_rss_ctxs(bp, &hwr);
+ 	hwr.stat = bnxt_get_func_stat_ctxs(bp);
  
+ 	rc = bnxt_hwrm_reserve_rings(bp, &hwr);
+@@ -11210,6 +11216,7 @@ static void bnxt_clear_reservations(struct bnxt *bp, bool fw_reset)
+ 	hw_resc->resv_rx_rings = 0;
+ 	hw_resc->resv_hw_ring_grps = 0;
+ 	hw_resc->resv_vnics = 0;
++	hw_resc->resv_rsscos_ctxs = 0;
+ 	if (!fw_reset) {
+ 		bp->tx_nr_rings = 0;
+ 		bp->rx_nr_rings = 0;
+@@ -12340,6 +12347,7 @@ static bool bnxt_rfs_capable(struct bnxt *bp)
+ 	struct bnxt_hw_rings hwr = {0};
+ 	int max_vnics, max_rss_ctxs;
+ 
++	hwr.rss_ctx = 1;
+ 	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS)
+ 		return bnxt_rfs_supported(bp);
+ 	if (!(bp->flags & BNXT_FLAG_MSIX_CAP) || !bnxt_can_reserve_rings(bp) || !bp->rx_nr_rings)
+@@ -12349,10 +12357,10 @@ static bool bnxt_rfs_capable(struct bnxt *bp)
+ 	max_vnics = bnxt_get_max_func_vnics(bp);
+ 	max_rss_ctxs = bnxt_get_max_func_rss_ctxs(bp);
+ 
+-	/* RSS contexts not a limiting factor */
+-	if (bp->rss_cap & BNXT_RSS_CAP_NEW_RSS_CAP)
+-		max_rss_ctxs = max_vnics;
+-	if (hwr.vnic > max_vnics || hwr.vnic > max_rss_ctxs) {
++	if (!(bp->rss_cap & BNXT_RSS_CAP_NEW_RSS_CAP))
++		hwr.rss_ctx = hwr.vnic;
++
++	if (hwr.vnic > max_vnics || hwr.rss_ctx > max_rss_ctxs) {
+ 		if (bp->rx_nr_rings > 1)
+ 			netdev_warn(bp->dev,
+ 				    "Not enough resources to support NTUPLE filters, enough resources for up to %d rx rings\n",
+@@ -12363,15 +12371,18 @@ static bool bnxt_rfs_capable(struct bnxt *bp)
+ 	if (!BNXT_NEW_RM(bp))
+ 		return true;
+ 
+-	if (hwr.vnic == bp->hw_resc.resv_vnics)
++	if (hwr.vnic == bp->hw_resc.resv_vnics &&
++	    hwr.rss_ctx <= bp->hw_resc.resv_rsscos_ctxs)
+ 		return true;
+ 
+ 	bnxt_hwrm_reserve_rings(bp, &hwr);
+-	if (hwr.vnic <= bp->hw_resc.resv_vnics)
++	if (hwr.vnic <= bp->hw_resc.resv_vnics &&
++	    hwr.rss_ctx <= bp->hw_resc.resv_rsscos_ctxs)
+ 		return true;
+ 
+ 	netdev_warn(bp->dev, "Unable to reserve resources to support NTUPLE filters.\n");
+ 	hwr.vnic = 1;
++	hwr.rss_ctx = 0;
+ 	bnxt_hwrm_reserve_rings(bp, &hwr);
+ 	return false;
+ }
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index bb3b31f8d02f..681a579afcc2 100644
+index 681a579afcc2..4ff090981809 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -1259,6 +1259,7 @@ struct bnxt_hw_rings {
- 	int rx;
- 	int grp;
- 	int cp;
-+	int cp_p5;
+@@ -1262,11 +1262,13 @@ struct bnxt_hw_rings {
+ 	int cp_p5;
  	int stat;
  	int vnic;
++	int rss_ctx;
  };
+ 
+ struct bnxt_hw_resc {
+ 	u16	min_rsscos_ctxs;
+ 	u16	max_rsscos_ctxs;
++	u16	resv_rsscos_ctxs;
+ 	u16	min_cp_rings;
+ 	u16	max_cp_rings;
+ 	u16	resv_cp_rings;
 -- 
 2.30.1
 
 
---000000000000f03c3c0611d838db
+--0000000000000e88ff0611d83904
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -268,14 +360,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIF4B1apS8s2EuIDZkj1tmilPKkGot7G5
-56x4Lo/RPlu4MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDIy
-MDIzMDM0NlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIDb7AKR6RIsjfuX+aeGUG8mr0KEPwser
+pV+o8wjN8lEqMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDIy
+MDIzMDM0OFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQCoGJdvTbtrciJWtzaqn0d4GAhPIPaW2W+7lFbvKSrubcW6HtyN
-+GdpmdVy61r0muXAYBeYHvgmbm4eD4LIi6qX3uM61+EESISkKRjgWAIWcg57QKgoMqIcXMHCj2z3
-fCVUWbZdz8XgriUswSh5/NZ51EVps9jGKAgyj2kEsP4x8xG4LhFTmi6jQ+jljZPUMI8894mYrVT4
-NQOA3q6ku+n4SXU6yui/AtknF9Y3ikhAYK7zPC2Jue3bRhKwIZy+QJER8+qdVpc14WT5mXqnlyGw
-0cM8N1fx5UK+UDQwuo/HsFx/6zBY6logxPV3NNV+yE6Ug6NYQZfow6x1E0eGEGuA
---000000000000f03c3c0611d838db--
+ATANBgkqhkiG9w0BAQEFAASCAQA9ab+EuOxQpnA2dO2IKPCgNnMSy1NvUh70yvcnH2O0/qaTclwO
+9QWIaeSjBrDwT/+SxdvjupAmWddP5erRfBzdg6YVo5vxumP0k1oAC/LCzuRKmijlAFhYrOJaoREF
+59cnaroTEYdbPJvsO/Wb5TfSHC87/EKe8Ky0+34Rk31bP0O+H2HVHRiq+8L4cK+Grsv9C5+R0ZTg
+rrOKvVEYRw6RM4e8xm40YInuhbdfKKuaAGeyQNIse3oxHkQ8F1o8euZzBjyIYAFoGKtR4uk1y3Xu
+SlOX0DXuAXf8hsxlFPsfy+Gu2XZIXNcrpISb82kfaYxCsDXRPiIFjkXXIGpgbHYO
+--0000000000000e88ff0611d83904--
 
