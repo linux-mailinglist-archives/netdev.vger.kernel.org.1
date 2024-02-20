@@ -1,67 +1,88 @@
-Return-Path: <netdev+bounces-73421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83DB585C519
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 20:45:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2393A85C52A
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 20:51:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2585FB24345
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 19:45:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A52751F216C0
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 19:51:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AA7914A4D9;
-	Tue, 20 Feb 2024 19:45:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 506CA14A0BF;
+	Tue, 20 Feb 2024 19:51:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="DufjJbr4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X/73DrKu"
 X-Original-To: netdev@vger.kernel.org
-Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8524137C41;
-	Tue, 20 Feb 2024 19:45:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83B6B1474A8;
+	Tue, 20 Feb 2024 19:51:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708458307; cv=none; b=ZiLWIUPNvPFpsb0Jqzw/gOWaPTd0bQSjQkoHFAdOj0lQdmIdWsdBUKz87cWs2PLOSq0BLlbB3bI36N/ZdbfFeYVIFWLH8BNsU/NGHK5hsOy6Ghf5HQVY2ZazaVFpOfJbzXSvikv2dOAwuBG2eblNz1QHPY7NIACYAuOkeoudGDo=
+	t=1708458694; cv=none; b=JI8+w7XB334FJSpN8N0/f5pn2BpxiIHfB2SYhS5miE6UeT3QlrmBjVoyDasuxqy7F5Me7pJJaqw/CoBanfh8apeYE+LyMFYZlJb3Sk4G8F6/VC+FeF5p2SWtewcBsWuhk84zg9wGbTMW/QfVARhTiY2TNDBsA8ZGb/9Hq0o7NyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708458307; c=relaxed/simple;
-	bh=Mwj0/typD3aTrSkrgEntFoxq41yM+vCVAdUetDPy270=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PF7T06jlGZpFbNoe5NX9Q3u70jeTccB99h5QMNhEtsX0SZ2lhwXfYNHKwHqF0x3yIjhIBOn//PzNOxLgZaDIGeuIdQgt8FcnHiurxCKPilWKV9cVs9rEYTvuR9/gd8hLccd4wYdcwIn3MAJtCpxHJN9W8KcmNauuB2Gd4xiYkYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=DufjJbr4; arc=none smtp.client-ip=139.165.32.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
-Received: from localhost.localdomain (125.179-65-87.adsl-dyn.isp.belgacom.be [87.65.179.125])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id D9330200BE69;
-	Tue, 20 Feb 2024 20:44:57 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be D9330200BE69
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1708458298;
-	bh=Pe9EOigSbPGpF/JFfAS5gTarqG/9sPOHJ5Ve/ZtXLhA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DufjJbr4Mb6yBTitQ8EZjumKp4w2/Pw+Yk+/JobeoAwKGXo/7nWVlb6DlnU5NVxcz
-	 YpsqLHgfBZvq8iM2Ymz5PJpUfhsFpO5Y0CQbW4NiqmkpMd7yB0j+FrM6aIiNKmz/W+
-	 aqaZ55z2obxZjIcPBVnz6t8+Nc3YXnXaZA+4H4KhGYOScqEAQ+swSDR8183982q4b4
-	 3HVAIcxe9AQ4+IH23UvM0z4JqXZLRqmOFEYwVmIYegtuysVgRfcC5PaJ3CAnAEfET1
-	 shPYohahtlZuHvB7TkEfMqf3gb33qj9wQ+UKCpbnqsihdRZpYVvEyDaa3eMYRIWxMI
-	 lEjnr94y5EzXQ==
-From: Justin Iurman <justin.iurman@uliege.be>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org,
-	justin.iurman@uliege.be
-Subject: [PATCH net-next 3/3] net: exthdrs: ioam6: send trace event
-Date: Tue, 20 Feb 2024 20:44:44 +0100
-Message-Id: <20240220194444.36127-4-justin.iurman@uliege.be>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240220194444.36127-1-justin.iurman@uliege.be>
-References: <20240220194444.36127-1-justin.iurman@uliege.be>
+	s=arc-20240116; t=1708458694; c=relaxed/simple;
+	bh=LX/Iy62jTtUBwefaPKs2N8vsxbkh+ynCHbcWGUHwJQc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=ZsMA4r95agQuaUh8AyuwdMEseFKb0xqJ0eQIQQb5iqrreRli5AdnXABubY0xKsgnMDH9UviEvD7JPUxEdH81Ka9euoe24g6tb/oVltzQLdFbDlH8hrak+TUmkpTfU/z+DjyGc1t/pppNlBpgJKPMLmIlp0k0sJfIqzVE5JLXZ34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X/73DrKu; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-410e820a4feso39202005e9.1;
+        Tue, 20 Feb 2024 11:51:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708458691; x=1709063491; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ilrcf9FIzNhryRpiM1gMnDk2mj28uZPifSV6of9OdPY=;
+        b=X/73DrKuwRIpzU2+2mgq/TK0op+H9qAOP3pK/TGHbic6yWo1JMT803ephmOLTT6+y2
+         Lginz4Dt9a40GUn4Ih+V+EtRzkq333tqeF3H/J6kFJ5BI70Lw22N022aE1ghsULv7DU8
+         4s/PPhSuuJOVJ70VrBFBjaulkZGQvIICgf89Ge3Po0NnLuWcTTpvb96m4yBOm9BKYOnH
+         3iUJSz9zhLvjKtaCTCbVpF6yBtVVsa1U7lbXczZoyW+t+E7shipjZKscIUNJ2B/a6qQt
+         xUvB6DdlQGrVtMnOwpTyDg77+AH+V8yGJawNASuwsmm07bT7JGzmsbL8FMFEhBnH0E4O
+         +7PA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708458691; x=1709063491;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ilrcf9FIzNhryRpiM1gMnDk2mj28uZPifSV6of9OdPY=;
+        b=r40+yMUaizWLjEkDH6esbBgOCqo45ZxcRroEq7ZWC8N8AQtPw1J8DjGsA0te/gI0eR
+         eDw6rc4cHhCgD2WKI+aShSE3NRixTRQJ2xBY5oQ+3Ww1u4W2Z4jXkbAOvlIGew78NpnC
+         fQ1DRyJwcYf8wh8j60q80lmrY+H6WvSq1HtpXOdocXJyOuoNxM7yYzTp/IQ3KLsop5F7
+         5sKp/IFdTFF2WlbWx5BLnS4oRBbaQvz9saf6TZFrOAsEqdJzIfRUJPyORT/Vvz7LLquD
+         3X/6/qc+1+AVKqmOyuU65BIJMryOmBUlFd2LTZG0w29MG/10bu5HPAW3R/3RhJxJYxOc
+         S/zA==
+X-Forwarded-Encrypted: i=1; AJvYcCWCH7tjD4OUbFa0eUVN++0Dy0XDpPz26mEcsZ8pr+fZNNePX3AADyry4jkUvNyZRiwFZ4vxxArq/FiOImtcnAPCtGe6cWyNmBMyOcwsy7OISLEBSi6hzZDBIuCd6JYOQNilU+Dm
+X-Gm-Message-State: AOJu0YxxDAISMAqr2eD/egKklbst3u+To31jBBpqs0OdGMfHAcFoSpLP
+	t+m3UwT9C21rYSq3kBkQK+uHR5WlYdX9Qqjtb6vf3R9oaCORNv7n
+X-Google-Smtp-Source: AGHT+IHDFUk+dwyav1PP0LVsLhyXp1LnmbfhGA0Rm6MLUWBnLcbZLFrjnhkMS702tdxRLlsskSCh8A==
+X-Received: by 2002:a05:600c:19c7:b0:412:5296:9737 with SMTP id u7-20020a05600c19c700b0041252969737mr11719504wmq.12.1708458690689;
+        Tue, 20 Feb 2024 11:51:30 -0800 (PST)
+Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.googlemail.com with ESMTPSA id fs14-20020a05600c3f8e00b00411a595d56bsm15494853wmb.14.2024.02.20.11.51.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Feb 2024 11:51:30 -0800 (PST)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Robert Marko <robimarko@gmail.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [net-next RFC PATCH v2 0/3] net: phy: support multi PHY in phy_driver Was: net: phy: detach PHY driver OPs from phy_driver struct
+Date: Tue, 20 Feb 2024 20:50:47 +0100
+Message-ID: <20240220195103.15809-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,41 +91,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If we're processing an IOAM Pre-allocated Trace Option-Type (the only
-one supported currently), and if we're the destination, then send the
-trace as an ioam6 event to the multicast group. This way, user space
-apps will be able to collect IOAM data (for a trace, it only makes sense
-to send events if we're the destination).
+This is an alternative implementation of "net: phy: detach PHY driver OPs
+from phy_driver struct" with the same object in mind.
+v2 is used to keep track of the similar attempts but this is the 3rd try
+to accomplish the same object.
 
-Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
----
- net/ipv6/exthdrs.c | 5 +++++
- 1 file changed, 5 insertions(+)
+As was pointed out in the previous series, deatching OPs is a way too big
+change (although IMHO needed, but I understand the problem with downstream
+and ugly code). As suggested and was already an idea discussed privately,
+a more easier approach is introduce an alternative way in phy_driver
+struct to declare PHY with the use of an array of IDs.
 
-diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
-index 4952ae792450..d1f96a28e190 100644
---- a/net/ipv6/exthdrs.c
-+++ b/net/ipv6/exthdrs.c
-@@ -50,6 +50,7 @@
- #endif
- #include <net/rpl.h>
- #include <linux/ioam6.h>
-+#include <linux/ioam6_genl.h>
- #include <net/ioam6.h>
- #include <net/dst_metadata.h>
- 
-@@ -944,6 +945,10 @@ static bool ipv6_hop_ioam(struct sk_buff *skb, int optoff)
- 			ip6_route_input(skb);
- 
- 		ioam6_fill_trace_data(skb, ns, trace, true);
-+
-+		if (skb_dst(skb)->dev->flags & IFF_LOOPBACK)
-+			ioam6_event(IOAM6_EVENT_TRACE, dev_net(skb->dev),
-+				    GFP_ATOMIC, (void *)trace, hdr->opt_len-2);
- 		break;
- 	default:
- 		break;
+The second attempt to this had a fundamental problem, as pointed out by
+Florian, it did cause an ABI change in sysfs. This was caused by the fact
+that sysfs entry are created dased on the first name the PHY driver is
+registreted and changing the dev name after (although wrong) also doesn't
+update the sysfs name.
+
+The only solution to this problem is to register one driver for each PHY
+ID like it's done currently.
+
+This was the case for attempt 1 (detached OPs) and is implemented here in
+the 3rd attempt.
+
+To accomplish this, the mdiodrv has to be moved in a separate struct and
+defined for each PHY the phy_driver supports (this is already the case
+for each phy_driver struct). With this change, we can keep the current
+phy_driver struct and support defining multi PHY.
+
+Each PHY will be registered as a separate driver, (even if they are defined
+in the same phy_driver struct) permitting to register it directly
+with the right name.
+
+For single PHY implementation, the phy_driver is internally converted to
+.ids implementation by dynamically allocating the table with only one
+entry.
+
+This is needed to handle the move of mdiodrv from the phy_driver struct
+to a more specific one for each PHY ID.
+
+Changes v2:
+- Drop c45 patch
+- Complete rework to handle specifi names for PHYs (no ABI
+  regression)
+
+Christian Marangi (3):
+  net: phy: add support for defining multiple PHY IDs in PHY driver
+  net: phy: aquantia: group common OPs for PHYs where possible
+  net: phy: bcm7xxx: rework phy_driver table to new multiple PHY ID
+    format
+
+ drivers/net/phy/aquantia/aquantia_main.c | 170 +++++++++--------------
+ drivers/net/phy/bcm7xxx.c                | 140 +++++++++++--------
+ drivers/net/phy/phy_device.c             | 127 ++++++++++++-----
+ include/linux/phy.h                      |  38 ++++-
+ 4 files changed, 275 insertions(+), 200 deletions(-)
+
 -- 
-2.34.1
+2.43.0
 
 
