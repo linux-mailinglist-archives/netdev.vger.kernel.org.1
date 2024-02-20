@@ -1,162 +1,141 @@
-Return-Path: <netdev+bounces-73185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BBEC85B4B5
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:16:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA93E85B4BD
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:17:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DD1D2B20CFA
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:16:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97739282B35
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:17:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B4A15C8E1;
-	Tue, 20 Feb 2024 08:16:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E55BF5C022;
+	Tue, 20 Feb 2024 08:17:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zH1iL5/T"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AC875BAEA
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 08:16:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3767C5C8E5
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 08:17:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708416989; cv=none; b=dFGjqfDLUybrwzw43qww4X/IggjR0aroq/rxT+DnfbAAWT95t+I3QRdeh5NcF42OQJ4Oy+zWH5FrBuoHHnvwQ4xRW+85qJz7aZ3cAK7w1bvvsL52FGVvoUN3SHwyrMUOyhlophYCRjtsXQ5gabbJOEPqv+nz5kvd/pg+NBJIb1k=
+	t=1708417067; cv=none; b=rn+ul5o8PFSey5B2RW56qT7uLAny1mxMfDqLB4yuQY1za9PUGoZqtLcILrZcc6J71hOTkINgEd9ULAzX5rMCYRM994kuF3/94MNyjbpKMjAvmVaREwSFvJY7ddO59SLOv5qx6B9yjlRruRudQEpSjK6VqJs7okjd7oErD0zfyWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708416989; c=relaxed/simple;
-	bh=g1EHi/WqOcNNnaGmzLYGdEE0tjJO8ATGZtEws8+sO2M=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=E0za+D7w07fuN1GvyEKZ55U2CYwiKsuMkiFvkZJ0mVraYxIdkoZjSuTO0ctxYDmR+AZTNtTFEpY9OrzWkzgltm8eW7KLX6LV+dC0WgIGj4vsAus5C7YmP6qycYEzb1hf/0c5F8hT5dfeq1ChEBy0U4li16Av7xLbsK88WLF04Tk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rcLIe-0003za-J2
-	for netdev@vger.kernel.org; Tue, 20 Feb 2024 09:16:24 +0100
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rcLIe-001o56-5Z
-	for netdev@vger.kernel.org; Tue, 20 Feb 2024 09:16:24 +0100
-Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id D66FD292E2A
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 08:16:23 +0000 (UTC)
-Received: from hardanger.blackshift.org (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id ACA61292E21;
-	Tue, 20 Feb 2024 08:16:21 +0000 (UTC)
-Received: from [172.20.34.65] (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id aa76ddf2;
-	Tue, 20 Feb 2024 08:16:21 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-Date: Tue, 20 Feb 2024 09:16:16 +0100
-Subject: [PATCH] can: raw: raw_getsockopt(): reduce scope of err
+	s=arc-20240116; t=1708417067; c=relaxed/simple;
+	bh=Qd2bc9p3BETBeBMkON8EJ73T7BHaExPE2Gw630in5/M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=h1tK4o4XQN9+GzdbvBklCqlYmrjzkua/5biTUJTQhw+2e1mEoC1Lwbk9p8bG5gKJGw/T8NUuESKv9i4bp6Q+pXzqQTs1Mb2gr4ClD4KxozFrkiEltJQphKZ7++P4+EFXxUxB6IwaMwKOcHMaXvtxCFj20I/QXM/IGGskcGsG9gg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zH1iL5/T; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-564d311513bso2080a12.0
+        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 00:17:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1708417064; x=1709021864; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Qd2bc9p3BETBeBMkON8EJ73T7BHaExPE2Gw630in5/M=;
+        b=zH1iL5/TbJlKxpEXUFdfxrp2JjpkjWQizb4XIeeGXSMxdx4yiVDAilzdi+MlPM3wTY
+         tPnq/fWiFAqdTlUN3tA/Zu6OYvap+2fxyp22biIaWV9XVhfnpjVmpXIStFTuUDMXydd3
+         7YVmNrr8kiWEZAhigSeoONYKiD3Kh2tVlUGEHiaqTDNcbpRF9MHIGZRjvEySI2ynkqO3
+         wspDkAEiKBBK2ZeVSobTS4JiVdonbBpAlk/VRzl6hgmGdPNEwbO5+u4WXxa+Fmg+xzse
+         1Bzx7jZnUPJf7qP4kiXbCIyQW0KhYhKRaXchJie085NxUn8MiXpCq5Kj7ZkR4866Z+1z
+         Qzuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708417064; x=1709021864;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Qd2bc9p3BETBeBMkON8EJ73T7BHaExPE2Gw630in5/M=;
+        b=NQ3dQTgcg/vthmrIyxaJ9bMUhTny0mspYQQ0qNZEUI8B94DMSCQe1w43IRTgiNVpBO
+         r4kKIGwkn0G4T5s5nDJ425zYNCr6ywd0zTRpVpbWV0AYjYyTjrYj4dUebBxcNCokQQSL
+         UJ4Po3/CjCj9rwTQX0+J6yfj5bmHSFp/ssLLpzD4Sr+Frd2hESZ8UGc2scccqF3MI34j
+         E3R709qM/2yialrSx+R2e3uAMlrbHHGr4PWy9F4NtViJuXuhYiCUz2OJ28nfMr/Q9tFf
+         1bhUTQl/8etZrWv4ANjDq70oDney/1z6qeiXVL3DpqgjTkwbQeymflLimAdZ3r3G8S22
+         necg==
+X-Forwarded-Encrypted: i=1; AJvYcCWJXgghS5K1sSnTKzZshgmwcOi7iaTfQc6+S+F7e2YZS9M/pJTsRkj7rKFzlRuzF7/kRxVYkz9CRHGl1IsVscyxnhY39AXK
+X-Gm-Message-State: AOJu0YwCx1fRzSnOrpnGu+dBlmF8eF2j3aiGvggGUREoKgYRkNIFJk4P
+	m2KDKAkBrSPbieSt/jq2k2EJLgK1hWd7jEZwxgryKcoaw0yXvbc8VfZIomMwk8cFh2n0AQ0IdSG
+	6ip+SeNrKGIUvIT05q/bkiwxisg418TYo4CIa
+X-Google-Smtp-Source: AGHT+IF7mcc0zAtM5wQsOXVRxbbUAtJ7J8aj1cbos7ooAnQRgO4HWzdE0dzG+o2uIegVOiiz9LNmx7IsZMeguCmVlis=
+X-Received: by 2002:a50:9f8a:0:b0:562:deb:df00 with SMTP id
+ c10-20020a509f8a000000b005620debdf00mr359956edf.4.1708417064290; Tue, 20 Feb
+ 2024 00:17:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240220-raw-setsockopt-v1-1-7d34cb1377fc@pengutronix.de>
-X-B4-Tracking: v=1; b=H4sIAM9f1GUC/x2MQQqAIBAAvxJ7TrAtCvpKdDDbaglUXKkg/HvS3
- OYw84JQZBIYqxciXSzsXZGmrsAexu2keC0OqLHTiFpFcyuhJN6ePiS19dQMrV2XApQoRNr4+Yf
- TnPMHDt2Qr2AAAAA=
-To: Oliver Hartkopp <socketcan@hartkopp.net>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Marc Kleine-Budde <mkl@pengutronix.de>
-X-Mailer: b4 0.14-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2005; i=mkl@pengutronix.de;
- h=from:subject:message-id; bh=g1EHi/WqOcNNnaGmzLYGdEE0tjJO8ATGZtEws8+sO2M=;
- b=owEBbQGS/pANAwAKASg4oj56LbxvAcsmYgBl1F/Se2ksHfZe5EBj6QKPxoRNOdr4xE3O2uvaf
- MoZfkIDpPiJATMEAAEKAB0WIQRQQLqG4LYE3Sm8Pl8oOKI+ei28bwUCZdRf0gAKCRAoOKI+ei28
- bw12B/9VO1K8vR6SVTcAv/NKuk7fv9U6p4KoxoZRXV9l6BbMgaALSKomtAGh+77Opq5qFvmnF+t
- IMe0UCYYuiX52ijD/EsPtSOC6Z0x4tkezqYRStZBxl58888eFAC07sXpIEnkL8c81HisIAQZyo6
- L+Aqxt/cSZxOxJzZYWYJRjqZXpVGMnZQ8ykZw56VZteXejA3VmeBOkvakuGhC+wYe39ChdsxTuJ
- pgtZqPvvrfbym6f0QmZpfedFW6ulKffRlTUKulqT8079Sg1Nf6PkhZJH9QCnqzF1TyfJivJ9l2q
- WUiORXtLx0BJlD6t03nYNZug4ieMRDXFby+BORCSs3ylo7jm
-X-Developer-Key: i=mkl@pengutronix.de; a=openpgp;
- fpr=C1400BA0B3989E6FBC7D5B5C2B5EE211C58AEA54
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+References: <20240220021804.9541-1-shijie@os.amperecomputing.com>
+ <CANn89iJoHDzfYfhcwVvR4m7DiVG-UfFNqm+D1WD-2wjOttk6ew@mail.gmail.com> <bea860f8-a196-4dff-a655-4da920e2ebfa@amperemail.onmicrosoft.com>
+In-Reply-To: <bea860f8-a196-4dff-a655-4da920e2ebfa@amperemail.onmicrosoft.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 20 Feb 2024 09:17:30 +0100
+Message-ID: <CANn89i+1uMAL_025rNc3C1Ut-E5S8Nat6KhKEzcFeC1xxcFWaA@mail.gmail.com>
+Subject: Re: [PATCH] net: skbuff: allocate the fclone in the current NUMA node
+To: Shijie Huang <shijie@amperemail.onmicrosoft.com>
+Cc: Huang Shijie <shijie@os.amperecomputing.com>, kuba@kernel.org, 
+	patches@amperecomputing.com, davem@davemloft.net, horms@kernel.org, 
+	ast@kernel.org, dhowells@redhat.com, linyunsheng@huawei.com, 
+	aleksander.lobakin@intel.com, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, cl@os.amperecomputing.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Reduce the scope of the variable "err" to the individual cases. This
-is to avoid the mistake of setting "err" in the mistaken belief that
-it will be evaluated later.
+On Tue, Feb 20, 2024 at 7:26=E2=80=AFAM Shijie Huang
+<shijie@amperemail.onmicrosoft.com> wrote:
+>
+>
+> =E5=9C=A8 2024/2/20 13:32, Eric Dumazet =E5=86=99=E9=81=93:
+> > On Tue, Feb 20, 2024 at 3:18=E2=80=AFAM Huang Shijie
+> > <shijie@os.amperecomputing.com> wrote:
+> >> The current code passes NUMA_NO_NODE to __alloc_skb(), we found
+> >> it may creates fclone SKB in remote NUMA node.
+> > This is intended (WAI)
+>
+> Okay. thanks a lot.
+>
+> It seems I should fix the issue in other code, not the networking.
+>
+> >
+> > What about the NUMA policies of the current thread ?
+>
+> We use "numactl -m 0" for memcached, the NUMA policy should allocate
+> fclone in
+>
+> node 0, but we can see many fclones were allocated in node 1.
+>
+> We have enough memory to allocate these fclones in node 0.
+>
+> >
+> > Has NUMA_NO_NODE behavior changed recently?
+> I guess not.
+> >
+> > What means : "it may creates" ? Please be more specific.
+>
+> When we use the memcached for testing in NUMA, there are maybe 20% ~ 30%
+> fclones were allocated in
+>
+> remote NUMA node.
 
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- net/can/raw.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+Interesting, how was it measured exactly ?
+Are you using SLUB or SLAB ?
 
-diff --git a/net/can/raw.c b/net/can/raw.c
-index 897ffc17d850..2bb3eab98af0 100644
---- a/net/can/raw.c
-+++ b/net/can/raw.c
-@@ -756,7 +756,6 @@ static int raw_getsockopt(struct socket *sock, int level, int optname,
- 	struct raw_sock *ro = raw_sk(sk);
- 	int len;
- 	void *val;
--	int err = 0;
- 
- 	if (level != SOL_CAN_RAW)
- 		return -EINVAL;
-@@ -766,7 +765,9 @@ static int raw_getsockopt(struct socket *sock, int level, int optname,
- 		return -EINVAL;
- 
- 	switch (optname) {
--	case CAN_RAW_FILTER:
-+	case CAN_RAW_FILTER: {
-+		int err = 0;
-+
- 		lock_sock(sk);
- 		if (ro->count > 0) {
- 			int fsize = ro->count * sizeof(struct can_filter);
-@@ -791,7 +792,7 @@ static int raw_getsockopt(struct socket *sock, int level, int optname,
- 		if (!err)
- 			err = put_user(len, optlen);
- 		return err;
--
-+	}
- 	case CAN_RAW_ERR_FILTER:
- 		if (len > sizeof(can_err_mask_t))
- 			len = sizeof(can_err_mask_t);
-@@ -822,7 +823,9 @@ static int raw_getsockopt(struct socket *sock, int level, int optname,
- 		val = &ro->xl_frames;
- 		break;
- 
--	case CAN_RAW_XL_VCID_OPTS:
-+	case CAN_RAW_XL_VCID_OPTS: {
-+		int err = 0;
-+
- 		/* user space buffer to small for VCID opts? */
- 		if (len < sizeof(ro->raw_vcid_opts)) {
- 			/* return -ERANGE and needed space in optlen */
-@@ -839,6 +842,7 @@ static int raw_getsockopt(struct socket *sock, int level, int optname,
- 			err = put_user(len, optlen);
- 		return err;
- 
-+	}
- 	case CAN_RAW_JOIN_FILTERS:
- 		if (len > sizeof(int))
- 			len = sizeof(int);
+>
+> After this patch, all the fclones are allocated correctly.
 
----
-base-commit: c8fba5d6df5e476aa791db4f1f014dad2bb5e904
-change-id: 20240220-raw-setsockopt-f6e173cdbbbb
+Note that skbs for TCP have three memory components (or more for large pack=
+ets)
 
-Best regards,
--- 
-Marc Kleine-Budde <mkl@pengutronix.de>
+sk_buff
+skb->head
+page frags (see sk_page_frag_refill() for non zero copy payload)
 
-
+The payload should be following NUMA policy of current thread, that is
+really what matters.
 
