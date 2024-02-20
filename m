@@ -1,109 +1,317 @@
-Return-Path: <netdev+bounces-73177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48B3285B41D
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:42:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7EB285B434
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:48:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B4CD1C20F1A
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 07:42:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D3EB1F2252F
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 07:48:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6ED05A4DE;
-	Tue, 20 Feb 2024 07:42:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D80605C5E2;
+	Tue, 20 Feb 2024 07:47:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="eovrHKOM"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="bfQ14+bL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B91EA5A782
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 07:42:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4857C5BAFA;
+	Tue, 20 Feb 2024 07:47:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708414939; cv=none; b=kkJyBfn7nkb5FNPO5enN2Ftyb744/JCNqLsdobz8HEZKoWR39zj3FV2hk2aFniarXKKmOxO73wKLXWj1cgcJi3rSmMtVaqNBAhbif45oYlQXcYmlg6NEhRZjKQ9qX4LoHAo31gO4w+AVpf6ynMgR9yfFQ5+GWXPByC+feGOy3Ps=
+	t=1708415262; cv=none; b=Ee1eDiO+63nmGTcrfBXqa03BumfD/di176IjFraBT8Deyc5g6cpynTLtdK0KfDbY2zYeaXLeAHTY8HPodc9p7hVDgxA1l/9Iqb+/ZFLpNvmO9SUqmmWnUBRq5+MjhVuyl/kht1aaVG7wQv4l2xicXLr96JuoZh2LGpOIOI5gh4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708414939; c=relaxed/simple;
-	bh=J+zYeJqlBPHTPRgTIQeAJ3oMn+ZUCupZUdoOVGZTVfQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r1WTsVKJuZjVXl2ZhwzsvbH3+9BlWkvD6yt4y0LyiZGiCYkvmg7D4G3U+NVcbZrjOfz9Y+wF/6399RQPMD/UpBfqdKgvOjD94YrdwLxmKHQQ4Ggr0Hhzqu1j/q38twWcgWFDTLlkZcBorsJjt+fY4hmWaKYo5bbSZa8EgkoPSxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=eovrHKOM; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3394bec856fso3485461f8f.0
-        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 23:42:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708414936; x=1709019736; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=S/DSDybLrVzjdRAvVymD3Q0Ne4EDeLAq0j34Q0JPJ4k=;
-        b=eovrHKOMJ5iG26eYNPQ3Fe7bmpCh7M3iyZbzugTftiWgYNcne8itRAK6640cDimi2+
-         wcYLqLHujj7t0t1FrejMskaHcI2h9LLNIh+Mz1nv+uFrm0CuAjBNvCEY8IwErhu4vS7P
-         kTWm0CPll6TynXI66swCEcBA8+2rjeR+QimVOLF/YcaQlNuO7ozSagSH+bxD9sixbUaN
-         5XdNDZOOOzadmbOfuZPIPjsWOr5IpnBfgrQR7yLQC1N7FY/uGc/yS1FspVgXtyPQZcdP
-         hGcFIIQCPROvfcsNpVtVUzfhW5qyHSR3G/NlnUD0zqK5QWPPfnjNY9SFxYYe3X/iS2gq
-         AgRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708414936; x=1709019736;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=S/DSDybLrVzjdRAvVymD3Q0Ne4EDeLAq0j34Q0JPJ4k=;
-        b=jT3x2utSvIoSz+uSMFq9LzUWdBu4uQjA//oP+Jga/S6vSzj38mkZbl+dFJ50ku9ISR
-         M6e8pXd65JwtK+T0M3XdGY8Iip8fjDqnBuH1aaTJMx9W61w/N6NivQ7RFm6crrWUdfjy
-         As3Tm8UO1uFs119NMM4h45/xS+Be0kvlgyDenO1wAXYKjEQgYJ15Y99noHGj/Nep6GEB
-         eIlb+bKBaIgYvR84yE4aqmM7qGVwbseh/OLOXWdGQ1SRLMeiTfuYGEADtZYxCXJHDVYy
-         AH4LBmoxhk4ozM1pvPIROQ/3bYL/+G2rf9SJZV8PV7aM6du650T0OZ1knk21EY2BIZq9
-         DlZg==
-X-Forwarded-Encrypted: i=1; AJvYcCWwBk0OuG3njXFTAee8stLw6oru+ZRxkZXqbhG+yBkTBjoI/VNBzcRiBDapT1mNcaot8Cf2rKlfCK/xQwjaFZka/ythd6f9
-X-Gm-Message-State: AOJu0YzsbiOFYDariX4s6fFr+pXNf6IVWWTmh2AmpQHeBNwz6DUXEsp7
-	rVQyiZM6t74FQl1AKRObGcB43QMrMK4Bd04du+X/VlPwbTNxGOfdf+kdg673zig=
-X-Google-Smtp-Source: AGHT+IFmDYiXbAq+GZXsPe1Qqz/I0j0cFa7FpMBW/qXFUFi9HXyoGcuYe24+kqL4Q7z4/yKCsn75ng==
-X-Received: by 2002:a5d:588a:0:b0:33d:3b83:c08 with SMTP id n10-20020a5d588a000000b0033d3b830c08mr6570251wrf.23.1708414935867;
-        Mon, 19 Feb 2024 23:42:15 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ba1-20020a0560001c0100b0033d67bdce97sm1376016wrb.84.2024.02.19.23.42.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Feb 2024 23:42:15 -0800 (PST)
-Date: Tue, 20 Feb 2024 08:42:12 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	pabeni@redhat.com, davem@davemloft.net, edumazet@google.com
-Subject: Re: [patch net-next] devlink: fix port dump cmd type
-Message-ID: <ZdRX1KhTJju1PpQP@nanopsycho>
-References: <20240216113147.50797-1-jiri@resnulli.us>
- <20240219151343.GC40273@kernel.org>
- <20240219122038.5964400d@kernel.org>
+	s=arc-20240116; t=1708415262; c=relaxed/simple;
+	bh=RFsXVlxOZJUTfN9EVsu5hd1DhPX3ZJKWJ/lBaekLx8w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=jgYr6a5EEOmY9Nzfpo4WmQDtbS1OYwAPTQ/T7aasPmUUdF/vcbyDYqZfyLfrDZ/tfVPfa14D4pi3K6wFBEUpcDKgZVPAlbFP6nYf/Wru9FampjXISIubZB5xoD4bAvNQOs/tQQheVJD+JUI3Aq2l0ZchOvZrubbmQ1FvOCyeGUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=bfQ14+bL; arc=none smtp.client-ip=115.124.30.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1708415256; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=bnMt8FcyxluEOoMRGW7COyabNWUHt06Ggj96huHAMzk=;
+	b=bfQ14+bLqyJhwdsQN7PLFAMy47PKO5CP63cXAOVupmDfK/Doognhpzz6x+J+uDOGBtEkXKShvWSlXeG/jo01QkZWv/stHosQHRCwmAlwfhC09GCiP9m5il1tGpSccwiPgLHxSNLaDp3Wp+2PpbZpmh6FgNFNqnM/b8iwwKK1hBQ=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R591e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=hsiangkao@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0W0w6wCb_1708415254;
+Received: from 30.97.48.246(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0W0w6wCb_1708415254)
+          by smtp.aliyun-inc.com;
+          Tue, 20 Feb 2024 15:47:35 +0800
+Message-ID: <9eb94a85-2d52-4f2c-8b9e-fde419717bd1@linux.alibaba.com>
+Date: Tue, 20 Feb 2024 15:47:34 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240219122038.5964400d@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [syzbot] [erofs?] KMSAN: uninit-value in z_erofs_lz4_decompress
+ (3)
+To: syzbot <syzbot+88ad8b0517a9d3bb9dc8@syzkaller.appspotmail.com>,
+ chao@kernel.org, huyue2@coolpad.com, jefflexu@linux.alibaba.com,
+ linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+ xiang@kernel.org, netdev@vger.kernel.org
+References: <0000000000001123250611cb110a@google.com>
+From: Gao Xiang <hsiangkao@linux.alibaba.com>
+In-Reply-To: <0000000000001123250611cb110a@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Mon, Feb 19, 2024 at 09:20:38PM CET, kuba@kernel.org wrote:
->On Mon, 19 Feb 2024 15:13:43 +0000 Simon Horman wrote:
->> > Fix it by filling cmd with value DEVLINK_CMD_PORT_NEW.
->> > 
->> > Skimmed through devlink userspace implementations, none of them cares
->> > about this cmd value. Only ynl, for which, this is actually a fix, as it
->> > expects doit and dumpit ops rsp_value to be the same.  
->> 
->> I guess that in theory unknown implementations could exist.
->> But, ok :)
->
->I'd also prefer Fixes tag + net. YNL is user space, even if current YNL
->specs don't trigger it (I'm speculating that that's why you feel it's
->not a fix) someone may end up using YNL + YAML from 6.9 and expect it
->to work on 6.6 LTS.
+(+add -netdev)
 
-As you wish.
+On 2024/2/20 15:22, syzbot wrote:
+> Hello,
+> 
+> syzbot tried to test the proposed patch but the build/boot failed:
+> 
+> le Layout Driver Registering...
 
->-- 
->pw-bot: cr
+...
+
+> [   29.540501][    T1] null_blk: disk nullb0 created
+> [   29.545733][    T1] null_blk: module loaded
+> [   29.551941][    T1] Guest personality initialized and is inactive
+> [   29.560955][    T1] VMCI host device registered (name=vmci, major=10, minor=118)
+> [   29.569840][    T1] Initialized host personality
+> [   29.575750][    T1] usbcore: registered new interface driver rtsx_usb
+> [   29.585633][    T1] usbcore: registered new interface driver viperboard
+> [   29.594432][    T1] usbcore: registered new interface driver dln2
+> [   29.602202][    T1] usbcore: registered new interface driver pn533_usb
+> [   29.616932][    T1] nfcsim 0.2 initialized
+> [   29.622086][    T1] usbcore: registered new interface driver port100
+> [   29.629914][    T1] usbcore: registered new interface driver nfcmrvl
+> [   29.648231][    T1] Loading iSCSI transport class v2.0-870.
+> [   29.684669][    T1] virtio_scsi virtio0: 1/0/0 default/read/poll queues
+> [   29.731303][    T1] scsi host0: Virtio SCSI HBA
+> [   30.283396][    T1] st: Version 20160209, fixed bufsize 32768, s/g segs 256
+> [   30.301725][   T72] scsi 0:0:1:0: Direct-Access     Google   PersistentDisk   1    PQ: 0 ANSI: 6
+> [   30.344813][    T1] Rounding down aligned max_sectors from 4294967295 to 4294967288
+> [   30.362347][    T1] db_root: cannot open: /etc/target
+> [   30.395006][    T1] =====================================================
+> [   30.395260][    T1] BUG: KMSAN: use-after-free in __list_del_entry_valid_or_report+0x19e/0x490
+> [   30.395432][    T1]  __list_del_entry_valid_or_report+0x19e/0x490
+> [   30.395596][    T1]  stack_depot_save_flags+0x3e7/0x7b0
+> [   30.395700][    T1]  stack_depot_save+0x12/0x20
+> [   30.395793][    T1]  ref_tracker_alloc+0x215/0x700
+> [   30.395890][    T1]  netdev_queue_update_kobjects+0x256/0x870
+> [   30.396031][    T1]  netdev_register_kobject+0x41e/0x520
+
+It seems it got some similar boot-failure issue:
+https://lore.kernel.org/r/00000000000036e27e0610890a65@google.com
+https://lore.kernel.org/r/000000000000bacd1706107232cd@google.com
+
+before I tend to verify a resolved duplicated report:
+https://syzkaller.appspot.com/bug?extid=6c746eea496f34b3161d
+
+Thanks,
+Gao Xiang
+
+> [   30.396149][    T1]  register_netdevice+0x198f/0x2170
+> [   30.396264][    T1]  bond_create+0x138/0x2a0
+> [   30.396406][    T1]  bonding_init+0x1a7/0x2d0
+> [   30.396505][    T1]  do_one_initcall+0x216/0x960
+> [   30.396640][    T1]  do_initcall_level+0x140/0x350
+> [   30.396748][    T1]  do_initcalls+0xf0/0x1d0
+> [   30.396848][    T1]  do_basic_setup+0x22/0x30
+> [   30.396959][    T1]  kernel_init_freeable+0x300/0x4b0
+> [   30.397071][    T1]  kernel_init+0x2f/0x7e0
+> [   30.397189][    T1]  ret_from_fork+0x66/0x80
+> [   30.397216][    T1]  ret_from_fork_asm+0x11/0x20
+> [   30.397216][    T1]
+> [   30.397216][    T1] Uninit was created at:
+> [   30.397216][    T1]  free_unref_page_prepare+0xc1/0xad0
+> [   30.397216][    T1]  free_unref_page+0x58/0x6d0
+> [   30.397216][    T1]  __free_pages+0xb1/0x1f0
+> [   30.397216][    T1]  thread_stack_free_rcu+0x97/0xb0
+> [   30.397216][    T1]  rcu_core+0xa3c/0x1df0
+> [   30.397216][    T1]  rcu_core_si+0x12/0x20
+> [   30.397216][    T1]  __do_softirq+0x1b7/0x7c3
+> [   30.397216][    T1]
+> [   30.397216][    T1] CPU: 1 PID: 1 Comm: swapper/0 Not tainted 6.8.0-rc5-syzkaller-gb401b621758e #0
+> [   30.397216][    T1] Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
+> [   30.397216][    T1] =====================================================
+> [   30.397216][    T1] Disabling lock debugging due to kernel taint
+> [   30.397216][    T1] Kernel panic - not syncing: kmsan.panic set ...
+> [   30.397216][    T1] CPU: 1 PID: 1 Comm: swapper/0 Tainted: G    B              6.8.0-rc5-syzkaller-gb401b621758e #0
+> [   30.397216][    T1] Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
+> [   30.397216][    T1] Call Trace:
+> [   30.397216][    T1]  <TASK>
+> [   30.397216][    T1]  dump_stack_lvl+0x1bf/0x240
+> [   30.397216][    T1]  dump_stack+0x1e/0x20
+> [   30.397216][    T1]  panic+0x4de/0xc90
+> [   30.397216][    T1]  kmsan_report+0x2d0/0x2d0
+> [   30.397216][    T1]  ? kmsan_get_metadata+0x146/0x1c0
+> [   30.397216][    T1]  ? __msan_warning+0x96/0x110
+> [   30.397216][    T1]  ? __list_del_entry_valid_or_report+0x19e/0x490
+> [   30.397216][    T1]  ? stack_depot_save_flags+0x3e7/0x7b0
+> [   30.397216][    T1]  ? stack_depot_save+0x12/0x20
+> [   30.397216][    T1]  ? ref_tracker_alloc+0x215/0x700
+> [   30.397216][    T1]  ? netdev_queue_update_kobjects+0x256/0x870
+> [   30.397216][    T1]  ? netdev_register_kobject+0x41e/0x520
+> [   30.397216][    T1]  ? register_netdevice+0x198f/0x2170
+> [   30.397216][    T1]  ? bond_create+0x138/0x2a0
+> [   30.397216][    T1]  ? bonding_init+0x1a7/0x2d0
+> [   30.397216][    T1]  ? do_one_initcall+0x216/0x960
+> [   30.397216][    T1]  ? do_initcall_level+0x140/0x350
+> [   30.397216][    T1]  ? do_initcalls+0xf0/0x1d0
+> [   30.397216][    T1]  ? do_basic_setup+0x22/0x30
+> [   30.397216][    T1]  ? kernel_init_freeable+0x300/0x4b0
+> [   30.397216][    T1]  ? kernel_init+0x2f/0x7e0
+> [   30.397216][    T1]  ? ret_from_fork+0x66/0x80
+> [   30.397216][    T1]  ? ret_from_fork_asm+0x11/0x20
+> [   30.397216][    T1]  ? kmsan_get_shadow_origin_ptr+0x4d/0xa0
+> [   30.397216][    T1]  ? kmsan_get_metadata+0x146/0x1c0
+> [   30.397216][    T1]  ? kmsan_get_metadata+0x146/0x1c0
+> [   30.397216][    T1]  ? kmsan_get_metadata+0x146/0x1c0
+> [   30.397216][    T1]  ? kmsan_get_shadow_origin_ptr+0x4d/0xa0
+> [   30.397216][    T1]  ? _raw_spin_lock_irqsave+0x35/0xc0
+> [   30.397216][    T1]  ? filter_irq_stacks+0x60/0x1a0
+> [   30.397216][    T1]  ? stack_depot_save_flags+0x2c/0x7b0
+> [   30.397216][    T1]  ? kmsan_get_metadata+0x146/0x1c0
+> [   30.397216][    T1]  ? kmsan_get_metadata+0x146/0x1c0
+> [   30.397216][    T1]  ? kmsan_get_metadata+0x146/0x1c0
+> [   30.397216][    T1]  ? kmsan_get_shadow_origin_ptr+0x4d/0xa0
+> [   30.397216][    T1]  __msan_warning+0x96/0x110
+> [   30.397216][    T1]  __list_del_entry_valid_or_report+0x19e/0x490
+> [   30.397216][    T1]  stack_depot_save_flags+0x3e7/0x7b0
+> [   30.397216][    T1]  stack_depot_save+0x12/0x20
+> [   30.397216][    T1]  ref_tracker_alloc+0x215/0x700
+> [   30.397216][    T1]  ? netdev_queue_update_kobjects+0x256/0x870
+> [   30.397216][    T1]  ? netdev_register_kobject+0x41e/0x520
+> [   30.397216][    T1]  ? register_netdevice+0x198f/0x2170
+> [   30.397216][    T1]  ? bond_create+0x138/0x2a0
+> [   30.397216][    T1]  ? bonding_init+0x1a7/0x2d0
+> [   30.397216][    T1]  ? do_one_initcall+0x216/0x960
+> [   30.397216][    T1]  ? do_initcall_level+0x140/0x350
+> [   30.397216][    T1]  ? do_initcalls+0xf0/0x1d0
+> [   30.397216][    T1]  ? do_basic_setup+0x22/0x30
+> [   30.397216][    T1]  ? kernel_init_freeable+0x300/0x4b0
+> [   30.397216][    T1]  ? kernel_init+0x2f/0x7e0
+> [   30.397216][    T1]  ? ret_from_fork+0x66/0x80
+> [   30.397216][    T1]  ? ret_from_fork_asm+0x11/0x20
+> [   30.397216][    T1]  ? kmsan_internal_unpoison_memory+0x14/0x20
+> [   30.397216][    T1]  netdev_queue_update_kobjects+0x256/0x870
+> [   30.397216][    T1]  netdev_register_kobject+0x41e/0x520
+> [   30.397216][    T1]  register_netdevice+0x198f/0x2170
+> [   30.397216][    T1]  ? kmsan_get_shadow_origin_ptr+0x4d/0xa0
+> [   30.397216][    T1]  bond_create+0x138/0x2a0
+> [   30.397216][    T1]  ? kmsan_get_shadow_origin_ptr+0x4d/0xa0
+> [   30.397216][    T1]  bonding_init+0x1a7/0x2d0
+> [   30.397216][    T1]  ? spi_dln2_driver_init+0x40/0x40
+> [   30.397216][    T1]  do_one_initcall+0x216/0x960
+> [   30.397216][    T1]  ? spi_dln2_driver_init+0x40/0x40
+> [   30.397216][    T1]  ? kmsan_get_metadata+0xb0/0x1c0
+> [   30.397216][    T1]  ? kmsan_get_shadow_origin_ptr+0x4d/0xa0
+> [   30.397216][    T1]  ? filter_irq_stacks+0x60/0x1a0
+> [   30.397216][    T1]  ? stack_depot_save_flags+0x2c/0x7b0
+> [   30.407722][    T1]  ? skip_spaces+0x8f/0xc0
+> [   30.407722][    T1]  ? kmsan_get_metadata+0x146/0x1c0
+> [   30.407922][    T1]  ? kmsan_get_metadata+0x146/0x1c0
+> [   30.407922][    T1]  ? kmsan_get_shadow_origin_ptr+0x4d/0xa0
+> [   30.407922][    T1]  ? kmsan_get_metadata+0x146/0x1c0
+> [   30.407922][    T1]  ? kmsan_get_shadow_origin_ptr+0x4d/0xa0
+> [   30.407922][    T1]  ? parse_args+0x1511/0x15e0
+> [   30.407922][    T1]  ? kmsan_get_metadata+0x146/0x1c0
+> [   30.407922][    T1]  ? kmsan_get_shadow_origin_ptr+0x4d/0xa0
+> [   30.407922][    T1]  ? spi_dln2_driver_init+0x40/0x40
+> [   30.408958][    T1]  do_initcall_level+0x140/0x350
+> [   30.408958][    T1]  do_initcalls+0xf0/0x1d0
+> [   30.408958][    T1]  ? arch_cpuhp_init_parallel_bringup+0xe0/0xe0
+> [   30.408958][    T1]  do_basic_setup+0x22/0x30
+> [   30.408958][    T1]  kernel_init_freeable+0x300/0x4b0
+> [   30.408958][    T1]  ? rest_init+0x260/0x260
+> [   30.408958][    T1]  kernel_init+0x2f/0x7e0
+> [   30.408958][    T1]  ? rest_init+0x260/0x260
+> [   30.408958][    T1]  ret_from_fork+0x66/0x80
+> [   30.409978][    T1]  ? rest_init+0x260/0x260
+> [   30.409978][    T1]  ret_from_fork_asm+0x11/0x20
+> [   30.409978][    T1]  </TASK>
+> [   30.409978][    T1] Kernel Offset: disabled
+> 
+> 
+> syzkaller build log:
+> go env (err=<nil>)
+> GO111MODULE='auto'
+> GOARCH='amd64'
+> GOBIN=''
+> GOCACHE='/syzkaller/.cache/go-build'
+> GOENV='/syzkaller/.config/go/env'
+> GOEXE=''
+> GOEXPERIMENT=''
+> GOFLAGS=''
+> GOHOSTARCH='amd64'
+> GOHOSTOS='linux'
+> GOINSECURE=''
+> GOMODCACHE='/syzkaller/jobs-2/linux/gopath/pkg/mod'
+> GONOPROXY=''
+> GONOSUMDB=''
+> GOOS='linux'
+> GOPATH='/syzkaller/jobs-2/linux/gopath'
+> GOPRIVATE=''
+> GOPROXY='https://proxy.golang.org,direct'
+> GOROOT='/usr/local/go'
+> GOSUMDB='sum.golang.org'
+> GOTMPDIR=''
+> GOTOOLCHAIN='auto'
+> GOTOOLDIR='/usr/local/go/pkg/tool/linux_amd64'
+> GOVCS=''
+> GOVERSION='go1.21.4'
+> GCCGO='gccgo'
+> GOAMD64='v1'
+> AR='ar'
+> CC='gcc'
+> CXX='g++'
+> CGO_ENABLED='1'
+> GOMOD='/syzkaller/jobs-2/linux/gopath/src/github.com/google/syzkaller/go.mod'
+> GOWORK=''
+> CGO_CFLAGS='-O2 -g'
+> CGO_CPPFLAGS=''
+> CGO_CXXFLAGS='-O2 -g'
+> CGO_FFLAGS='-O2 -g'
+> CGO_LDFLAGS='-O2 -g'
+> PKG_CONFIG='pkg-config'
+> GOGCCFLAGS='-fPIC -m64 -pthread -Wl,--no-gc-sections -fmessage-length=0 -ffile-prefix-map=/tmp/go-build1804868575=/tmp/go-build -gno-record-gcc-switches'
+> 
+> git status (err=<nil>)
+> HEAD detached at 373b66cd2
+> nothing to commit, working tree clean
+> 
+> 
+> tput: No value for $TERM and no -T specified
+> tput: No value for $TERM and no -T specified
+> Makefile:32: run command via tools/syz-env for best compatibility, see:
+> Makefile:33: https://github.com/google/syzkaller/blob/master/docs/contributing.md#using-syz-env
+> go list -f '{{.Stale}}' ./sys/syz-sysgen | grep -q false || go install ./sys/syz-sysgen
+> make .descriptions
+> tput: No value for $TERM and no -T specified
+> tput: No value for $TERM and no -T specified
+> bin/syz-sysgen
+> touch .descriptions
+> GOOS=linux GOARCH=amd64 go build "-ldflags=-s -w -X github.com/google/syzkaller/prog.GitRevision=373b66cd2ba1fd05c72d0bbe16141fb287fe2eb3 -X 'github.com/google/syzkaller/prog.gitRevisionDate=20240130-131205'" "-tags=syz_target syz_os_linux syz_arch_amd64 " -o ./bin/linux_amd64/syz-fuzzer github.com/google/syzkaller/syz-fuzzer
+> GOOS=linux GOARCH=amd64 go build "-ldflags=-s -w -X github.com/google/syzkaller/prog.GitRevision=373b66cd2ba1fd05c72d0bbe16141fb287fe2eb3 -X 'github.com/google/syzkaller/prog.gitRevisionDate=20240130-131205'" "-tags=syz_target syz_os_linux syz_arch_amd64 " -o ./bin/linux_amd64/syz-execprog github.com/google/syzkaller/tools/syz-execprog
+> GOOS=linux GOARCH=amd64 go build "-ldflags=-s -w -X github.com/google/syzkaller/prog.GitRevision=373b66cd2ba1fd05c72d0bbe16141fb287fe2eb3 -X 'github.com/google/syzkaller/prog.gitRevisionDate=20240130-131205'" "-tags=syz_target syz_os_linux syz_arch_amd64 " -o ./bin/linux_amd64/syz-stress github.com/google/syzkaller/tools/syz-stress
+> mkdir -p ./bin/linux_amd64
+> gcc -o ./bin/linux_amd64/syz-executor executor/executor.cc \
+> 	-m64 -O2 -pthread -Wall -Werror -Wparentheses -Wunused-const-variable -Wframe-larger-than=16384 -Wno-stringop-overflow -Wno-array-bounds -Wno-format-overflow -Wno-unused-but-set-variable -Wno-unused-command-line-argument -static-pie -fpermissive -w -DGOOS_linux=1 -DGOARCH_amd64=1 \
+> 	-DHOSTGOOS_linux=1 -DGIT_REVISION=\"373b66cd2ba1fd05c72d0bbe16141fb287fe2eb3\"
+> 
+> 
+> Error text is too large and was truncated, full error text is at:
+> https://syzkaller.appspot.com/x/error.txt?x=12579b34180000
+> 
+> 
+> Tested on:
+> 
+> commit:         b401b621 Linux 6.8-rc5
+> git tree:       upstream
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=d33318d4e4a0d226
+> dashboard link: https://syzkaller.appspot.com/bug?extid=88ad8b0517a9d3bb9dc8
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> 
+> Note: no patches were applied.
 
