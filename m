@@ -1,117 +1,126 @@
-Return-Path: <netdev+bounces-73175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9627C85B3FD
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:29:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07ED285B40C
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:32:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5392C2852F2
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 07:29:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DD771C2384A
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 07:32:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 195965A4FE;
-	Tue, 20 Feb 2024 07:29:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F6845B5AA;
+	Tue, 20 Feb 2024 07:31:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="vzBrAV67"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78F845A4E2
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 07:29:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5169057313
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 07:31:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708414155; cv=none; b=o+gBbpjDGIPh6pt3ftOCo4PztWwEqagZxcpPOweWgmvECcRw2v8uJY589KR7cFgZYUt9DWmbEUnCWp7EEV9BSTlHfpYDG8tneBE1FDkQOrnaUtv3eVqwFBvpy//qVu3JSfsnT2oRyVr4L4P1DuocFl3AKGKn6IRROT7y2Jw16NQ=
+	t=1708414289; cv=none; b=rB2r7Fb5TftYfPyep/Hz5PNFrcJ3E1wC52HleiHNyr61JPhxho1J9jaIf+f6VG4705h0rtZ+KB+BYBuJI8yv5JdXd2ndpXbSpUdW+98cYqJm/h9uH82boAEzaJ40qZC+70QNxSnOhyN+0GuGp4HvPavSKDzBUdHh3FSb6+MJJ1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708414155; c=relaxed/simple;
-	bh=IyeOKe4EYMljhTftugqUBFw3+gslq/tRAk6Y72OMvZI=;
+	s=arc-20240116; t=1708414289; c=relaxed/simple;
+	bh=9Kb9gEGCekFk/72r8vF1EovTGgvXBHyoOMoRfzDVtyI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CjcFkuk2hyE1PbKbIvhEXcYYmh+rAKCL/vYE1vzb65C/SJ7patOo2ZiNCOs+FCXp1VLZxKZYgaKBAx3pFNspJFzJzKdzjJPUF+Ssg/1CNDLtGR8F50268UgYNo6/8xqN6U9yyQK7aRDYvlSsnFkosjmXxalKqVK9hDXC+h6sYxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rcKYr-0006bM-7w; Tue, 20 Feb 2024 08:29:05 +0100
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rcKYq-001ncM-29; Tue, 20 Feb 2024 08:29:04 +0100
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id AF097292DBA;
-	Tue, 20 Feb 2024 07:29:03 +0000 (UTC)
-Date: Tue, 20 Feb 2024 08:29:02 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Oliver Hartkopp <socketcan@hartkopp.net>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	davem@davemloft.net, kuba@kernel.org, linux-can@vger.kernel.org, 
-	kernel@pengutronix.de, Dan Carpenter <dan.carpenter@linaro.org>
-Subject: Re: [PATCH net-next 22/23] can: canxl: add virtual CAN network
- identifier support
-Message-ID: <20240220-kelp-footprint-2a26c121409f-mkl@pengutronix.de>
-References: <20240213113437.1884372-1-mkl@pengutronix.de>
- <20240213113437.1884372-23-mkl@pengutronix.de>
- <20240219083910.GR40273@kernel.org>
- <20240219-activist-smartly-87263f328a0c-mkl@pengutronix.de>
- <2828dbd5-9bea-4b2e-9a4f-ebd0582c8f73@hartkopp.net>
+	 Content-Type:Content-Disposition:In-Reply-To; b=nTAppVUMGNv0CuRaOA+Fac5sB7897xnStjeCAGa8KVC+mBo4FbgcqfqohKSHvY16K04XZYntf+wnGBsUxB6+hKkACbTqwg4J5QWd8LE0tyPkViDp/fJqThgZdg/ZzKZyTefAGJH+ugwMPKf6EQoMX49A7KuNo84pV8Koqb+35aM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=vzBrAV67; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a3e6f79e83dso264162866b.2
+        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 23:31:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708414286; x=1709019086; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=w74UEPbIDRayApcomN3I+g9HHKF6DaXSBkGLYHaZSPQ=;
+        b=vzBrAV67RNAGBM2b6yBwAMCGS9eATSAuVTSO8pQROA4vEzvFGxSGyht/qnV1C9RcJd
+         eqaiEpfwE/9meR+3BQ2Mm/B04HX+mU91gSIWgjDSD1d3rM+8h2f/6WVMEqAW+MfW0mpk
+         s8s6ZQVyr9QFaOM0Vp/yISLimCjOPpe8WYsNKNFPa6f3SQaFjYV3YsWevcBmkMTIOS4g
+         r4aWiBiR5bTAgCUfFq2Mt8K1PsXHVL6CDYdiMHOTxAP4emzr4lJqVqdRF+TF9iN7h4cx
+         prvkAFDFJCGuNlvcptSjWtpc1nHcckeOZyCAqoMYvBMvvqfczuF4ba6QvisCLxyN5ng6
+         NE2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708414286; x=1709019086;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=w74UEPbIDRayApcomN3I+g9HHKF6DaXSBkGLYHaZSPQ=;
+        b=otiC1Ho1z1AFZWxwdjExFmVL65Yp7ovr41I8v3adWtgW1kdoctdP7hj3bm5zsGteJm
+         C/dAYowW/e23Jaes1NHmR3MMGZISl0A9VTqZ3DtThWJKfFKcZNZ8oHdu9lciG6UQIQYs
+         iWsQDgmTsWUSjlJ2U5tTGGZd1W/EYRjHnhRW8YIlKGl/yuKYEdCKz4BZ+mZ7bSO8E+Qa
+         wa3zjUODTO89lep0sxP3Gj3A/6eEj2p5kH/ZSoP58WW/b1saPMnFur4gDN5lUK/8CLtJ
+         +BJrZb4CxL0jF9+mTahVtjR/DXTKjoKNxz9ymZVEVZC62gRezAOeOp5IQXniXz+fwNoy
+         7BNA==
+X-Gm-Message-State: AOJu0Yy3SHdL+F5+0obv3qd/yzY8IyusXn67onmx9JTv/DdnBVQN5K0n
+	CnHxNl68cANQ7KJun1c0GybBhcnFd4OjDIYkQQg0ShQVfiQWe6pug0qqcWfel5k=
+X-Google-Smtp-Source: AGHT+IHO+ZI4119yEs8dTE1PUGk0PRLvxgVDOCRGlt7qWTQCsgOyJJIaPjQUzj98NLMxo6Z8DNpTtw==
+X-Received: by 2002:a17:906:2c0d:b0:a3e:7b6a:baa6 with SMTP id e13-20020a1709062c0d00b00a3e7b6abaa6mr3622423ejh.49.1708414286626;
+        Mon, 19 Feb 2024 23:31:26 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id lj8-20020a170907188800b00a3dd52e758bsm3652239ejc.100.2024.02.19.23.31.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Feb 2024 23:31:26 -0800 (PST)
+Date: Tue, 20 Feb 2024 08:31:23 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, jacob.e.keller@intel.com,
+	swarupkotikalapudi@gmail.com, donald.hunter@gmail.com,
+	sdf@google.com, lorenzo@kernel.org, alessandromarcolini99@gmail.com
+Subject: Re: [patch net-next 06/13] tools: ynl: introduce attribute-replace
+ for sub-message
+Message-ID: <ZdRVS6mHLBQVwSMN@nanopsycho>
+References: <20240219172525.71406-1-jiri@resnulli.us>
+ <20240219172525.71406-7-jiri@resnulli.us>
+ <20240219145204.48298295@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="wl3ar4whl6jp2zgi"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2828dbd5-9bea-4b2e-9a4f-ebd0582c8f73@hartkopp.net>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20240219145204.48298295@kernel.org>
 
+Mon, Feb 19, 2024 at 11:52:04PM CET, kuba@kernel.org wrote:
+>On Mon, 19 Feb 2024 18:25:22 +0100 Jiri Pirko wrote:
+>> For devlink param, param-value-data attr is used by kernel to fill
+>> different attribute type according to param-type attribute value.
+>> 
+>> Currently the sub-message feature allows spec to embed custom message
+>> selected by another attribute. The sub-message is then nested inside the
+>> attr of sub-message type.
+>> 
+>> Benefit from the sub-message feature and extend it. Introduce
+>> attribute-replace spec flag by which the spec indicates that ynl should
+>> consider sub-message as not nested in the original attribute, but rather
+>> to consider the original attribute as the sub-message right away.
+>
+>The "type agnostic" / generic style of devlink params and fmsg
+>are contrary to YNL's direction and goals. YNL abstracts parsing
 
---wl3ar4whl6jp2zgi
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+True, but that's what we have. Similar to what we have in TC where
+sub-messages are present, that is also against ynl's direction and
+goals.
 
-On 19.02.2024 21:15:19, Oliver Hartkopp wrote:
-> the problem was an incomplete code adoption from another getsockopt()
-> function CAN_RAW_FILTER. No need to reduce the scope of err here as we on=
-ly
-> have one sockopt function at a time.
+>and typing using external spec. devlink params and fmsg go in a
+>different direction where all information is carried by netlink values
+>and netlink typing is just to create "JSON-like" formatting.
 
-The idea behind reducing the scope is that a future new sockopt does not
-set err and think that it will be evaluated later.
+Only fmsg, not params.
 
-Marc
+>These are incompatible ideas, and combining these two abstractions
+>in one library provides little value - devlink CLI already has an
+>implementation for fmsg and params. YNL doesn't have to cover
+>everything.
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---wl3ar4whl6jp2zgi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmXUVLwACgkQKDiiPnot
-vG9EyQf+PEpH9eVaVxBLhJF29xNXRj4OAPmWWz7ijQxxXLfuPE2n89MXwjrgJt/G
-iDdndJ6VThGni1tGMlBUzO6bRk/dMhfRiUHRAu8sLfWtSWV53mN6CXKMvi9EZUEa
-ScKa4V7NrpLqdQSOAZ3OGtitl2ujD1nRBceK2WWdwkjNdJhDI150uebpJv2W3BCH
-3E4XPetBEvXd8x45mN22yBM1+1cTBj9EGgFTOqBGqUtN9Mxrwq+Vf0d7AL4KI6/M
-2IYdVFjhL+NcibqkeaArvWVosLv/r5ETb4Pf2Le5DeHA+nfUk7d3ZgySL1kg+1Qn
-WE2ga6uhELu35DVHaoTZ5oyO6b36pw==
-=oq8v
------END PGP SIGNATURE-----
-
---wl3ar4whl6jp2zgi--
+True. In this patchset, I'm just using the existing sub-message
+infrastructure with a bit of extension. The json-like thing of fmsg is
+ignored, I don't try to reconstruct json from netlink message of fmsg.
 
