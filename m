@@ -1,261 +1,300 @@
-Return-Path: <netdev+bounces-73321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F7B085BEC3
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 15:29:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91EB885BEC9
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 15:30:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16F9A286243
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 14:29:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC3E9B2324F
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 14:30:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33EBB6BB50;
-	Tue, 20 Feb 2024 14:28:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEF0037147;
+	Tue, 20 Feb 2024 14:30:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jJgEeFBh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lzU+m4yF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 327276DCE4;
-	Tue, 20 Feb 2024 14:28:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708439325; cv=none; b=aPAVWis+Ad3W6ZFKzHiB33B/5rTTW3kLgBwXhV5N/bcW+vfSi2jXitZGW9gQVK/NJtUWovJe7+tzK4JMmzWpJol2cvj9RXG/L/NnCskTbIibUJW1vmzrbK3zV2zgfM1druaY1Dy7txjsf2Tm3m6Pukka3jOGdQf6cC4wfHRE30I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708439325; c=relaxed/simple;
-	bh=FL3M7xKJ14hnC6urx1eoKV1vZUT3l8eiXsraM73jfXA=;
-	h=Content-Type:Mime-Version:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=bQ2oQ0Vy8UzEIuP14j/3M3MsGxhgJcnj2GlZa9Mqg3Qiz7B8SBvA99oud5N+3QSuKqnf4CjUx3D06ecI4s91JOOplzd/one86bx2Xn9ClXC/dsqvVxYnTV6VRUE2KR6UJ02TEuoYeclJtE8hFQzrosU0GGIiR5wfn/0BAnHuUiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jJgEeFBh; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a3e706f50beso312150566b.0;
-        Tue, 20 Feb 2024 06:28:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708439321; x=1709044121; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=vz5RzTNhpTPMTVMz3nxEsmiIaAzAhCmMLP53qUjHq3g=;
-        b=jJgEeFBhxVfMx46rd78x/YQUO+MtlbFzkg1HZUIq19ko/BiQAcQVyYTJ+z5PlksNc1
-         5+z+9it+iesgjksJ0RGALBycLkj/LbYeJNDZ2ZYa0xXAsddeBXueG0XqAgmO3Ta5lnck
-         Fc7A/ou4t7R5zu8nT+H851UA0mSGISjFxjFdpx23ZTEPyhP8tjGJGHGvaDmzH9LdnTRy
-         v5Vh3K/m5FHo//JokUTRGWGMcUYwYXnGY3mKJewgiuCVJjy0fUprLJUKPhMQZlxAVmrC
-         HPliNBrmXis0oMCNNFjkcszQKyXW0opwsWWwcSWKkIY8/iIB2PsbVfLlt8RTrg3eb3+x
-         /yHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708439321; x=1709044121;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vz5RzTNhpTPMTVMz3nxEsmiIaAzAhCmMLP53qUjHq3g=;
-        b=V2eORr3AmKHBQU3XA/oCt61bovkOXx7IDMk6Pjm71L679UfPgtKSvvl6O+/VnFK9sp
-         79RWXtduSztAFeT5bNcWm/ZEV2i4oldbB39Tg06U2RubP9ifvKUhprZKhdZjxy9Rj9ul
-         hm+Uk9ie4zrhhjZKqsT7QWKkUGrpFYrMsV5LpduVB451eSsKPNLj7fQjA7F3e9M56JWf
-         38T70DS9Nd0j2S59ZgVZUk+7bNoMJv2vW5Yg0REvPrTCWeJKyhSE1oFoTLan59Pd0ZBe
-         0GA877Sbsmlr1CMJ7nz6eiSLgG79sOpvxQRdEBhQGWU1KUL4VIGzB8IXk6jXg2CDHx1S
-         Yp8w==
-X-Forwarded-Encrypted: i=1; AJvYcCWlCu88GLelYDd8dNpAkS+9Zz9bc/NjsbzcikyKzsFBnJQBKnyvUbk5GW5RcTiJe6M/mNP8HuRMRCSesOjHiuIjiP15kLx0GT+l73yYA4hfGIQ1RvpbqeCvwrB/Op3Fuh3QuRtRfgVlp5s0WTyr09XPaphZKX0dmiwAUxHQlIvsMrU=
-X-Gm-Message-State: AOJu0YzbKOG+1OSbU+v0XGJAeEPm8i5ohH/Ft2pmMzYuFDcVIW1VAMvE
-	Sr42f7IV9WquYbFgqpfhoQCRtu95CJK2N2053ZEDOdPWX3qr3Viz
-X-Google-Smtp-Source: AGHT+IFqSZIGLTjK5nMNqJ0mC/A+H31d6ZqUqt7xA4Zv5XlbR7MTAcjYaOiWvzrP3SvxWDabVUin/A==
-X-Received: by 2002:a17:906:b0c:b0:a3e:5b7f:6d31 with SMTP id u12-20020a1709060b0c00b00a3e5b7f6d31mr4677754ejg.5.1708439320970;
-        Tue, 20 Feb 2024 06:28:40 -0800 (PST)
-Received: from localhost (p200300e41f2d4600f22f74fffe1f3a53.dip0.t-ipconnect.de. [2003:e4:1f2d:4600:f22f:74ff:fe1f:3a53])
-        by smtp.gmail.com with ESMTPSA id vi10-20020a170907d40a00b00a3e7713dcbesm2523386ejc.39.2024.02.20.06.28.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Feb 2024 06:28:40 -0800 (PST)
-Content-Type: multipart/signed;
- boundary=54d881cc30ca662a73cfdacbec92cecca394f1f83ef4012a7b29e0247a47;
- micalg=pgp-sha256; protocol="application/pgp-signature"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09C731CD23
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 14:30:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708439417; cv=fail; b=WCNSLzop79urj5J/b4JWrsu79kf/Yh+JFWf4B0fnmtNvdN2zNnccdKy4e+dOiEfD1dJC8iNrtxK6T/MpbHLc1wUw8ULiA6brdAFlqw6oC31D5a78U/PQ7TpAsl5gmZbVPBlJkl8Fe7l02jN824JatGg2VI//5VAgtohzlDeiACs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708439417; c=relaxed/simple;
+	bh=om0SIpsxlFDaDmefr5C5bg7YeDlHTAuRJGVcsVBYh20=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=YAUZ5Mw/UUrhIijt6ZYZvO2ybMEUniwN+uowhJiUq91sP+SFsHqhbLrDMkpk3WXh11b230fKRFfb1aJck02+K/gR/JTNAvEfVfnSyw+ZvK6XfHoVk0v2jXurX9Ka5plOB+Owr6k5HcZsF7/luZPaM+2QDQBC2MrmFYrZJKNBSrU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lzU+m4yF; arc=fail smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708439416; x=1739975416;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=om0SIpsxlFDaDmefr5C5bg7YeDlHTAuRJGVcsVBYh20=;
+  b=lzU+m4yFNeyJLeD7i45GIomXznD7wwxfFpbM40X0RW375Le5uQedv1yO
+   7T6C1GcW0EmvlkfbIloInxiarb4wGQ8ANGeHZHi5X5aziS9JkN3dFKiXw
+   CxG+CIdXronORWCF9VWBj+71JGzcIS6IN6wSaiAT7X8nz8gKSbLs2r01k
+   gBqI8gzmbkRF1Ki0uCxWmuEj7ZMayIEYLBFwgvQOTn0UgfpXGUAzBPs0E
+   DY/uT4ptpsxWb/m04KRnMF/ggzZ8Ci/K0vH9WU2Rf7P4aChELA9PwqMV7
+   M0p09glP4HxdvBmSbK6ivcO5uhCEqGFO6OEWO4qwoNNMq48/UNR2PtfY3
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10989"; a="27988700"
+X-IronPort-AV: E=Sophos;i="6.06,172,1705392000"; 
+   d="scan'208";a="27988700"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2024 06:30:15 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,172,1705392000"; 
+   d="scan'208";a="9450750"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orviesa004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Feb 2024 06:30:15 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 20 Feb 2024 06:30:14 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Tue, 20 Feb 2024 06:30:14 -0800
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.41) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 20 Feb 2024 06:30:14 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hbIZY+yuQGZktWroeBLolFFydNYVtNsQRJKruiIOCkIFwk3pAM7hYTeawJIJv32GIdaMNkW0kOeyEs/kc8LwvhFjX6fomgafESZ9Gkw+UKWL7hj3CaTHZneBwlL3Qyh06wsCIsvIY6TTaG1GqOi3vLyC9NtOOKBlEcIsy46HcMghGPgJmwe65u9+4TvOJ4xtS9JJqwB6HLxQmK/IFYMz1WHRPnTBAh4dg9NdlKs6xNhqKyc+kG/aSaXgZI4jFW3Zjadt2NavLs5i0zYCSh+v6EfQg5HQ4ZGGP4bL/hAATxvR+UbNi/cBP250eRBQRF3sNYC4XBMHa2iLEKhRodeBzA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dwySLOjhKGTuB7x7K/GSqTqhmAiNkNS30tdC3IBYD7s=;
+ b=nKbjZ7O3/kxyvXClG+4hISj1G+FqhTn6Vh7+vSm1fdZX+HTtNNABYitIcPwBHJCFI0nKATmyqCa4D87lqB7JOCZhRmr/VUTzSItFfxzN3tSKcf7QH0pSZX9jmsjBDSN2VoeDsv6bgZJDYpO0ZxU94vUuLwinWT+dYPBFhtceHiDBf6R0UKpjDmZGGxPnAt+uNZpHusGvEw/7/DktqWObZ5yOSBkleCM1mSR8z5luFAB0aycNmUd9WPHxxaew+M6gvDHJPzObYNl87a5iJ2pG5/LHxUJYEi3Hu2NEK6R0vtwH15y7HJcS8j8IFTCDinhg/0U/mrwv6OzgBHFCZOmZvA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by MW3PR11MB4746.namprd11.prod.outlook.com (2603:10b6:303:5f::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.39; Tue, 20 Feb
+ 2024 14:30:12 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::93d9:a6b2:cf4c:9dd2]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::93d9:a6b2:cf4c:9dd2%5]) with mapi id 15.20.7292.036; Tue, 20 Feb 2024
+ 14:30:12 +0000
+Message-ID: <22caac00-7a4e-4bc3-969e-fa3655fd9a93@intel.com>
+Date: Tue, 20 Feb 2024 15:30:07 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 01/10 iwl-next] idpf: implement virtchnl transaction
+ manager
+Content-Language: en-US
+To: Alan Brady <alan.brady@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<willemdebruijn.kernel@gmail.com>, <przemyslaw.kitszel@intel.com>,
+	<igor.bagnucki@intel.com>, Joshua Hay <joshua.a.hay@intel.com>
+References: <20240206033804.1198416-1-alan.brady@intel.com>
+ <20240206033804.1198416-2-alan.brady@intel.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <20240206033804.1198416-2-alan.brady@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DB9PR02CA0007.eurprd02.prod.outlook.com
+ (2603:10a6:10:1d9::12) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Date: Tue, 20 Feb 2024 15:28:39 +0100
-Message-Id: <CZ9Z70HO2C7J.398BRNM8NBIG1@gmail.com>
-Cc: "Alexandre Torgue" <alexandre.torgue@foss.st.com>, "Jose Abreu"
- <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, <netdev@vger.kernel.org>,
- <linux-stm32@st-md-mailman.stormreply.com>,
- <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
- <linux-tegra@vger.kernel.org>, "Thierry Reding" <treding@nvidia.com>
-Subject: Re: [PATCH net-next v3 3/3] net: stmmac: Configure AXI on Tegra234
- MGBE
-From: "Thierry Reding" <thierry.reding@gmail.com>
-To: "Serge Semin" <fancer.lancer@gmail.com>
-X-Mailer: aerc 0.16.0-1-0-g560d6168f0ed-dirty
-References: <20240219-stmmac-axi-config-v3-0-fca7f046e6ee@nvidia.com>
- <20240219-stmmac-axi-config-v3-3-fca7f046e6ee@nvidia.com>
- <xne2i6jwqaptsrd2hjdahxbscysgtj7iabqendyjb75fnrjc5z@js7n7qngtzym>
-In-Reply-To: <xne2i6jwqaptsrd2hjdahxbscysgtj7iabqendyjb75fnrjc5z@js7n7qngtzym>
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|MW3PR11MB4746:EE_
+X-MS-Office365-Filtering-Correlation-Id: 64fe720c-53e5-43c9-96ea-08dc32207261
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 4gygkDpzB1XsEBDznKHWNH1RmZ7nlODMVAaMFeSUWO6+JnIA9qbDzuPvwBIGdwq0jsId47PiJSRDZjYFz1nuGaJ9DMUsZf8/PkFsCtEcrkudeZradBEb2U1pO/EGYYcrV0OkP+/AtCSvabYWpez4tnH6mrtswpjT/gWhKzDcveBJ6X67G1OdpQlwub3OCG2pmPnWJsx3q5UhLTixOI9ywYO/1QofCMRU7uK1FPQN+WzwQ1URLI3VKPT116c71wLdOjdcHGlEHx24Ld4n9GqOqbxdRHejW9wQVyIBgRNC3SMWf4FNO0H9IzdhIZyp743WSx6BxcvFSEnhMRBY62VBjNMCUHjRMQwH/yNQbo9MHXLbs1c1bl8Ntm0tQQFL4VrEVzTGd77PPQuNQDeBnKwLgsRh/i/LhqZZH5WIOYsJK8lx/TmVJ4Kh5kEE9z3wI1ul36EOJKI5SGWN1SkRvlWq+ZfHMFQPvQnHnWZF4UM5Y4sHOV0T/hmMvIhRzBThDpp6c54f/lO5pqhJxLQf5Excv48lb58XiSC3VctuLzEUAY0=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?S2lnclllUDR0YVBuZC9YVnY4d2NtZVA4Y2o5cXExbS8yMjBvZEZNQmxOSHdU?=
+ =?utf-8?B?cS92SmVxV3pzVXRjWXRFZ1ZmZnNNY3hCNTFCbEdtdGJKK1cxSTlsWDJrelFm?=
+ =?utf-8?B?U0lWR2wzc2pQK2w0bVA1Y25LcnVUQytINmEvY3Bodm5iUTZXK2loU1ExT1NX?=
+ =?utf-8?B?SnNFallBVDNuZm9XOWh6VVJ6eXNTd1d5T3pCY3JaWFhxQjJkTlNrVUFhVUsy?=
+ =?utf-8?B?Vjh6WllFNDA3ZVNueGoxQVVzdHRnUitxYjF3dHY2b0R4NEFYdGR6ekdSMTZh?=
+ =?utf-8?B?KzNoMGs5VGtmZng3TUZON0FTYU1PSkdsVXVPZ1JlMVh1MDRSaWYySGNjeHhO?=
+ =?utf-8?B?UmJVRGxLakxLMUoxVFdKWk42cFFXOFc2NTlIUXAybzZYOEJzYncvOWxyS1NT?=
+ =?utf-8?B?WUI3WFhtc09heFY4MGI0QTJ3NUtaY0d1bXl3amxGN2NKMHBrQytzT3dqWXBs?=
+ =?utf-8?B?S3RUdEQ1NElqS2dHWlVIWFNBV09KQWNJTnkxTW15L1FQTlhYWEQwQitpdHFj?=
+ =?utf-8?B?VnprSnhUQldhMnlCTXd1T1p0ekFJN0FSZmoydktjVEVGMkdYekVIa2VHVVZE?=
+ =?utf-8?B?WjdkMi9MWlNlVTBqR2ZSWVk2RmFaWVIxdFl3alZQK1Zhc3hGNWlNenRrODBZ?=
+ =?utf-8?B?L2dGNVNtbm5EdDlIVWo4YVVLaFg3My9YYXBCbEJ4ZW1kY0M5WGZhYmR3K2Fm?=
+ =?utf-8?B?N3ZEN2FKYmtQSXh6ZHh5bjN6TEt5VDgwVFdKdkVRcWpHZXRxVG9VaTlxOGFI?=
+ =?utf-8?B?Wm9rQjIxMHZ1YnExS2V3NzlFTkxWU210eEtMVTVZdGErSmg1aTlPTlllYWVm?=
+ =?utf-8?B?SGJHaU9uazNwdjVWY0NRTmgxRWNlOTcxOTh3NG00RDNyQmFmVEtCRFIzemRR?=
+ =?utf-8?B?dnJodUVjUkhJenF6WHVXVnhUdlI3bUxUYlVZdjJaUFpsMkdiY1h1dXQrTnJj?=
+ =?utf-8?B?NEFuNjhXUy9YVmJteGMxM2VxU0dtRTdlajFGZHRId3VpV1FmNmFlYmkxc3F2?=
+ =?utf-8?B?UWtaajN1cng5ekJnMnhySVhMUVF6dWs1N0V6ZlNSUThBOC9RWWFpbVpMWUtF?=
+ =?utf-8?B?VURCZWhoYVhxc3p1bk5iczMxaFVVNW5VRTRrOXVUeGxHYWwvRG9DYy80OVh3?=
+ =?utf-8?B?T28yYXdUOG1VSVdOdTBVSEVOTzlJMi9NTE5EK3NpMW91MlZoalhhNG90U2gy?=
+ =?utf-8?B?a1JKQVg1djEwSnlDNThzcDErbCtWSnlwLzFqRW5CU2VMYjBxTW1zbXJVd0xS?=
+ =?utf-8?B?bnRtK0F6QkpheVRxWjJjaitaQTMxK1NoU1l4djlkTUM2V2NRVG9mUU4wbGJ4?=
+ =?utf-8?B?ZjNpNlRWc1dZMndMT3p6OWZQQ05vSVhuYzEvUDBWbU1RZW4wL2tuZitSN3lB?=
+ =?utf-8?B?anZ5S1FUMGZmWUpGYWxBalhWQnFheWJXenBOQzJoTFVTdWlITkhpb1dsMGdV?=
+ =?utf-8?B?cjZSMG9pTk8vaDJRTEhrVFhtL3dSWFZDdjduSzhaQlR2WnRaaU1RV1BUcGpq?=
+ =?utf-8?B?Z1JadWsvbGlENVFjcHArc09TR2VIN20xaDRkMEFMMTRWZkdObUdXY28rOGdI?=
+ =?utf-8?B?aDJvdTU2M1BPRmxPT0VOWkZmQmJxcktDU2ZWeVVsWWpzeVRyWkpkK0dvY29J?=
+ =?utf-8?B?Ukg0eDJwUkJRaG5QSEV5aHkwdVo3MmQxdnpmSFMrS2RZakpMcG4vRHJRMjNq?=
+ =?utf-8?B?dTBGcHFiaGV0VE5odWtxbWE3bXF5cEJFUFFVTzRWc0ZCZnNNQlVtMWNkZ2hN?=
+ =?utf-8?B?bVg1UXpRbFMvRWhpY1U2QTcvaXhQazMxVCsydkZtZzBPUkFXMDFmWW44TG96?=
+ =?utf-8?B?MU5QMnZhS0c5NnNmd0VGcGEva1h4QjdnU2dWanNqbVlNN0lkSWYyaThlQ0hR?=
+ =?utf-8?B?b2RsU2VkUE45d0NabTBsY0RzNUdoTUc1cUY4eGhCcXljTms5a2c0bFRHKzgw?=
+ =?utf-8?B?SUVvREVnK2JmTnVoSzF1bzJhQm1qOUp1cTZ0MkhXNVc2aVpqV3RubjlxdHND?=
+ =?utf-8?B?ZFJNaEppLzd2UmdWNlVJZGZzUHFQTUg4YTJwWFREdW84UnZVenc2aWh6Y3d6?=
+ =?utf-8?B?UllNM2dzYkppTGJzNW1wWm92S0dpRWgxWmxnZVR5QnVWUDJISHhxdU81cVdV?=
+ =?utf-8?B?b2ttWUR6aUtkZVZtSURXcm9HdVA1dVArU2tPSUZucmJ6RjIzSmRIUkVaWXZn?=
+ =?utf-8?B?cXc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 64fe720c-53e5-43c9-96ea-08dc32207261
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2024 14:30:12.2897
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NZGFC94Qr3OFUu0PNKBZ/X/aXHcEdnLwHFMCe1JS2lTEFKtDvh/Y7zXCf3suuSoVwvudAkBRESlo3ik4BKlyvDD/nCEwxnFVuBvJQvc2DZ8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4746
+X-OriginatorOrg: intel.com
 
---54d881cc30ca662a73cfdacbec92cecca394f1f83ef4012a7b29e0247a47
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
+From: Alan Brady <alan.brady@intel.com>
+Date: Mon, 5 Feb 2024 19:37:55 -0800
 
-On Mon Feb 19, 2024 at 7:32 PM CET, Serge Semin wrote:
-> On Mon, Feb 19, 2024 at 05:46:06PM +0100, Thierry Reding wrote:
-> > From: Thierry Reding <treding@nvidia.com>
-> >=20
-> > Allow the device to use bursts and increase the maximum number of
-> > outstanding requests to improve performance. Measurements show an
-> > increase in throughput of around 5x on a 1 Gbps link.
-> >=20
-> > Signed-off-by: Thierry Reding <treding@nvidia.com>
-> > ---
-> >  drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c | 9 +++++++++
-> >  1 file changed, 9 insertions(+)
-> >=20
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c b/driver=
-s/net/ethernet/stmicro/stmmac/dwmac-tegra.c
-> > index bab57d1675df..b6bfa48f279d 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
-> > @@ -199,6 +199,12 @@ static void mgbe_uphy_lane_bringup_serdes_down(str=
-uct net_device *ndev, void *mg
-> >  	writel(value, mgbe->xpcs + XPCS_WRAP_UPHY_RX_CONTROL);
-> >  }
-> > =20
-> > +static const struct stmmac_axi tegra234_mgbe_axi =3D {
-> > +	.axi_wr_osr_lmt =3D 63,
-> > +	.axi_rd_osr_lmt =3D 63,
-> > +	.axi_blen =3D { 256, },
-> > +};
-> > +
-> >  static int tegra_mgbe_probe(struct platform_device *pdev)
-> >  {
-> >  	struct plat_stmmacenet_data *plat;
-> > @@ -284,6 +290,9 @@ static int tegra_mgbe_probe(struct platform_device =
-*pdev)
-> >  	if (err < 0)
-> >  		goto disable_clks;
-> > =20
-> > +	/* setup default AXI configuration */
-> > +	res.axi =3D &tegra234_mgbe_axi;
-> > +
-> >  	plat =3D devm_stmmac_probe_config_dt(pdev, &res);
-> >  	if (IS_ERR(plat)) {
-> >  		err =3D PTR_ERR(plat);
->
-> Let's get back to the v2 discussion:
->
-> On Mon Feb 5, 2024 at 1:44 AM CET, Serge Semin wrote:
-> > The entire series can be converted to just a few lines of change:
-> >     plat =3D devm_stmmac_probe_config_dt(pdev, res.mac);
-> >     if (IS_ERR(plat)) {
-> >             err =3D PTR_ERR(plat);
-> >             goto disable_clks;
-> >     }
-> > +
-> > +   if (IS_ERR_OR_NULL(plat->axi)) {
-> > +           plat->axi =3D devm_kzalloc(&pdev->dev, sizeof(*axi), GFP_KE=
-RNEL);
-> > +           if (!plat->axi) {
-> > +                   ret =3D -ENOMEM;
-> > +                   goto disable_clks;
-> > +           }
-> > +   } /* else memset plat->axi with zeros if you wish */
-> > +
-> > +   plat->axi->axi_wr_osr_lmt =3D 63;
-> > +   plat->axi->axi_rd_osr_lmt =3D 63;
-> > +   plat->axi->axi_blen[0] =3D 256;
-> > =20
-> >     plat->has_xgmac =3D 1;
-> >     plat->flags |=3D STMMAC_FLAG_TSO_EN;
-> >     plat->pmt =3D 1;
-> >
-> > Please don't overcomplicate the already overcomplicated driver with a
-> > functionality which can be reached by the default one. In this case
-> > the easiest way is to let the generic code work and then
-> > override/replace/fix/etc the retrieved values. Thus there won't be
-> > need in adding the redundant functionality and keep the generic
-> > DT-platform code a bit simpler to read.
->
-> You responded with:
->
-> On Tue, Feb 13, 2024 at 04:51:34PM +0100, Thierry Reding wrote:
-> > I'm not sure I understand how this is overcomplicating things. The code
-> > is pretty much unchanged, except that the AXI configuration can now hav=
-e
-> > driver-specified defaults before the DT is parsed. Perhaps I need to ad=
-d
-> > comments to make that a bit clearer?
-> >=20
-> > While your version is certainly simpler it has the drawback that it no
-> > longer allows the platform defaults to be overridden in device tree. I
-> > would prefer if the defaults can be derived from the compatible string
-> > but if need be for those defaults to still be overridable from device
-> > tree.
->
-> Currently available functionality is easier to read and understand: by
-> default the data is retrieved from the DT, if no AXI DT-node found you
-> can allocate/create your own AXI-configs, if there is AXI DT-node you
-> can fix it up in whatever way your wish. Thus the default behavior is
-> straightforward. You on the contrary suggest to add an additional
-> field to the resources structure which would need to be merged in with
-> the data retrieved from DT. It makes the stmmac_axi_setup() method and
-> the entire logic more complex and thus harder to comprehend.
+> This starts refactoring how virtchnl messages are handled by adding a
+> transaction manager (idpf_vc_xn_manager).
 
-I suppose that's subjective. Being able to let the driver provide
-defaults that can then be overridden by values from DT doesn't seem like
-a very exotic (or complicated) feature to me. We do that elsewhere all
-the time. Do the comments that I added in this version not sufficiently
-explain what's going on?
+[...]
 
-> The driver is already overwhelmed with flags and private/platform data
-> fixing the code here and there (see plat_stmmacenet_data, it's a
-> madness). So please justify in more details why do you need one more
-> complexity added instead of:
-> 1. overriding the AXI-configs retrieved from DT,
+> +/**
+> + * idpf_vc_xn_exec - Perform a send/recv virtchnl transaction
+> + * @adapter: driver specific private structure with vcxn_mngr
+> + * @params: parameters for this particular transaction including
+> + *   -vc_op: virtchannel operation to send
+> + *   -send_buf: kvec iov for send buf and len
+> + *   -recv_buf: kvec iov for recv buf and len (ignored if NULL)
+> + *   -timeout_ms: timeout waiting for a reply (milliseconds)
+> + *   -async: don't wait for message reply, will lose caller context
+> + *   -async_handler: callback to handle async replies
+> + *
+> + * @returns >= 0 for success, the size of the initial reply (may or may not be
+> + * >= @recv_buf.iov_len, but we never overflow @@recv_buf_iov_base). < 0 for
+> + * error.
+> + */
+> +static ssize_t idpf_vc_xn_exec(struct idpf_adapter *adapter,
+> +			       struct idpf_vc_xn_params params)
 
-Again, overriding the AXI configs read from DT doesn't keep the current
-default behaviour of DT being the final authority. That's a policy that
-should remain intact. This patch (series) is about allowing the driver
-to override the AXI defaults with something that's sensible based on
-the compatible string. The current defaults, for example, cause the GBE
-on Tegra devices to run at around 100 Mbps even on a 1 Gbps link.
+Why do you pass @params by value, i.e. whole 56 bytes per each function
+call instead of passing it by pointer -> 8 bytes per call?
 
-> 2. updating DT on your platform
+> +{
+> +	struct kvec *send_buf = &params.send_buf;
+> +	struct idpf_vc_xn *xn;
+> +	ssize_t retval;
+> +	u16 cookie;
+> +
+> +	xn = idpf_vc_xn_pop_free(&adapter->vcxn_mngr);
+> +	/* no free transactions available */
+> +	if (!xn)
+> +		return -ENOSPC;
+> +
+> +	idpf_vc_xn_lock(xn);
+> +	if (xn->state == IDPF_VC_XN_SHUTDOWN) {
+> +		retval = -ENXIO;
+> +		goto only_unlock;
+> +	} else if (xn->state != IDPF_VC_XN_IDLE) {
+> +		/* We're just going to clobber this transaction even though
+> +		 * it's not IDLE. If we don't reuse it we could theoretically
+> +		 * eventually leak all the free transactions and not be able to
+> +		 * send any messages. At least this way we make an attempt to
+> +		 * remain functional even though something really bad is
+> +		 * happening that's corrupting what was supposed to be free
+> +		 * transactions.
+> +		 */
+> +		WARN_ONCE(1, "There should only be idle transactions in free list (idx %d op %d)\n",
+> +			  xn->idx, xn->vc_op);
+> +	}
+> +
+> +	xn->reply = params.recv_buf;
+> +	xn->reply_sz = 0;
+> +	xn->state = params.async ? IDPF_VC_XN_ASYNC : IDPF_VC_XN_WAITING;
+> +	xn->vc_op = params.vc_op;
+> +	xn->async_handler = params.async_handler;
+> +	idpf_vc_xn_unlock(xn);
+> +
+> +	if (!params.async)
+> +		reinit_completion(&xn->completed);
+> +	cookie = FIELD_PREP(IDPF_VC_XN_SALT_M, xn->salt) |
+> +		 FIELD_PREP(IDPF_VC_XN_IDX_M, xn->idx);
+> +
+> +	retval = idpf_send_mb_msg(adapter, params.vc_op,
+> +				  send_buf->iov_len, send_buf->iov_base,
+> +				  cookie);
+> +	if (retval) {
+> +		idpf_vc_xn_lock(xn);
+> +		goto release_and_unlock;
+> +	}
+> +
+> +	if (params.async)
+> +		return 0;
+> +
+> +	wait_for_completion_timeout(&xn->completed,
+> +				    msecs_to_jiffies(params.timeout_ms));
+> +
+> +	/* No need to check the return value; we check the final state of the
+> +	 * transaction below. It's possible the transaction actually gets more
+> +	 * timeout than specified if we get preempted here but after
+> +	 * wait_for_completion_timeout returns. This should be non-issue
+> +	 * however.
+> +	 */
+> +	idpf_vc_xn_lock(xn);
+> +	switch (xn->state) {
+> +	case IDPF_VC_XN_SHUTDOWN:
+> +		retval = -ENXIO;
+> +		goto only_unlock;
+> +	case IDPF_VC_XN_WAITING:
+> +		dev_notice_ratelimited(&adapter->pdev->dev, "Transaction timed-out (op %d, %dms)\n",
+> +				       params.vc_op, params.timeout_ms);
+> +		retval = -ETIME;
+> +		break;
+> +	case IDPF_VC_XN_COMPLETED_SUCCESS:
+> +		retval = xn->reply_sz;
+> +		break;
+> +	case IDPF_VC_XN_COMPLETED_FAILED:
+> +		dev_notice_ratelimited(&adapter->pdev->dev, "Transaction failed (op %d)\n",
+> +				       params.vc_op);
+> +		retval = -EIO;
+> +		break;
+> +	default:
+> +		/* Invalid state. */
+> +		WARN_ON_ONCE(1);
+> +		retval = -EIO;
+> +		break;
+> +	}
+> +
+> +release_and_unlock:
+> +	idpf_vc_xn_push_free(&adapter->vcxn_mngr, xn);
+> +	/* If we receive a VC reply after here, it will be dropped. */
+> +only_unlock:
+> +	idpf_vc_xn_unlock(xn);
+> +
+> +	return retval;
+> +}
 
-That's one possibility and was in fact the first variant I used, but it
-has a few drawbacks. For example, it means that I need to create the AXI
-node just to make the device functional, but if possible it's better to
-derive all necessary information from the compatible string. Having this
-in a separate AXI configuration node is duplicating information that's
-already implied by the compatible string.
+[...]
 
-Also, on Tegra we have a few instances of this device that are all
-configured the same way. Since the AXI configuration node is supposed to
-be a child of the Ethernet controller node, we end up having to
-duplicate even more information.
-
-Thierry
-
---54d881cc30ca662a73cfdacbec92cecca394f1f83ef4012a7b29e0247a47
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEiOrDCAFJzPfAjcif3SOs138+s6EFAmXUtxgACgkQ3SOs138+
-s6FwXw/+NI5f4NQaxXMdNTZw4i9JMgVZR8IurQ/Weei3I0HDz7t17hwB+g3eRjuk
-6XhD92hL3YpUuV6Ii96Wfb0JrtL5j651COCXyaRxaGU/vRvtYJvwEmpRLKEds35H
-6oARkoy40FoDUKKbnsrVT81ERAKSZgVNyAIFWM3byS4ez3R6Kp+Lf9BiRjkVlvbo
-KWdb1KfGC+EOCv2WIVFZA2R4OH1H4AmOp2cJa/PWha3+FW66aj9Xdgena7wu4KiJ
-R/Q+gmFK3uPG6pBO3O2+HF1SkI8ECAW73rX90qzw/3Ie0i5yPaqPo8yxmLI29AhM
-mPY7vq8hGnCTKiYwvy4je86ajKD/zrjiaxCNlgl155dk3Q+2iYNgDXcFlIb0au9Q
-AK6Mu8AAxrVkp14t94gpkZvb5EnUKYQO1OtZKiv+jmKXYyoaESSlmw9kvmySifJY
-T6aNUw91fFA5eiRu59oHnjbz2WIt+/yLTgJyVZURT+4E8Ajvs6v4kLVvv5hGp5d7
-E5gU8XQGnWcCFlDT0ojxQXV55arCHXuP85ijD+sqFJhjBAcysNBRgEHLH0lHs6/W
-NmO8VFLECjL0932LLbhiZV4XrP9ou4wSP4Hz576nGLMlJRmNAlOepaOO8XYFyOuc
-J/afiFERL2IogN5FYu075zt3Tg2/4jXPJMOJE1BQMPNwPAirrbo=
-=1yTl
------END PGP SIGNATURE-----
-
---54d881cc30ca662a73cfdacbec92cecca394f1f83ef4012a7b29e0247a47--
+Thanks,
+Olek
 
