@@ -1,101 +1,117 @@
-Return-Path: <netdev+bounces-73174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A457A85B3FA
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:28:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9627C85B3FD
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:29:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D726F1C236FE
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 07:28:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5392C2852F2
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 07:29:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA86E5A4E2;
-	Tue, 20 Feb 2024 07:28:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="aA+SA4lY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 195965A4FE;
+	Tue, 20 Feb 2024 07:29:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C90D5A4DE
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 07:28:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78F845A4E2
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 07:29:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708414103; cv=none; b=CA5cbDxNG8yu6C/c2p6Az1j/kCWMmc1AW4eIwIccptZesz1lyJOlQ9RnAKHuIL4GBfSfcLUvAs2HVpHzB+Ib4XM3+hUC/Ta/1E1Q6Xk1JcYhWVSuF7k5jg4TNaZMC6VhdJY7VEseD65QZcNH+BtUUJH/njLMnEHo+1gk9QSW210=
+	t=1708414155; cv=none; b=o+gBbpjDGIPh6pt3ftOCo4PztWwEqagZxcpPOweWgmvECcRw2v8uJY589KR7cFgZYUt9DWmbEUnCWp7EEV9BSTlHfpYDG8tneBE1FDkQOrnaUtv3eVqwFBvpy//qVu3JSfsnT2oRyVr4L4P1DuocFl3AKGKn6IRROT7y2Jw16NQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708414103; c=relaxed/simple;
-	bh=QBT+F+XDubAN6hJsUKjyVdLjQrZJB9NORNepdQfTyY0=;
+	s=arc-20240116; t=1708414155; c=relaxed/simple;
+	bh=IyeOKe4EYMljhTftugqUBFw3+gslq/tRAk6Y72OMvZI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WHU/1rabXTYWkxt8F5lYwv+YTYogwH38fcejcSSzNKpfG+2WndIhphEzJbOZmMwDuKruv+3GttVBbKnrG3OcJ/COhJipGNgebUFj9Nywae4sRbkjK7PM47extAh8DsxQtUxKfzG7SgEdHOoahg2MgDccx89i+THCbcxjsnFuMEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=aA+SA4lY; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a3e3a09cd79so227902566b.3
-        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 23:28:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708414100; x=1709018900; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QBT+F+XDubAN6hJsUKjyVdLjQrZJB9NORNepdQfTyY0=;
-        b=aA+SA4lYz/0p82OgPiWzrs+n3AMIykKiUlaLpspQhND7+RpojsK07npZ7nS+kj0EHM
-         NZqTdjTTZS/n4u0VmX9kDNpcp4TRkNAMiuRjpxOmH6j8Bhj8pvPaLTKdCZK0c+4lT9wX
-         Jw8o4/cjwl34Rt/Fwo5U4G0EOp7VYeWnFGNCQcNiPf+8bRolZWMcEdeTRBKfcF2x89fd
-         iQ1XONJMAVCFkm5kF2mFeJ4GpqdCURHcjqUar/oWOdj0DcU3WnzNdrfcqq3RXA9Te1nh
-         vXfAUTgdMCiQytSu4DhR1pGc36BZpmM1SiaBJSFYWvIFHYHE3HVBWD/bqvtG/JRr/ktn
-         0K0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708414100; x=1709018900;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QBT+F+XDubAN6hJsUKjyVdLjQrZJB9NORNepdQfTyY0=;
-        b=nbVlUXE41G0ZhrIdhH2a0mIJk4oqwHZGYdemlEc1lMQVmh9jG8cn1o4TkhTTlVjo7D
-         Ho1AAQE3MRv4yYg2jAiDqGY1pW17X6GGfjRmSzC3CBJMSeumyWvRjpUlhzPWy+cH9qe+
-         7lnqKGRR3bXObxIXqSCg1PBnPk1u2p/dp9LXRT2o2r/cAn/+ZveGQ0112wQ1W4ELZD7j
-         Wtl38M5bJDDv6Dg6+3q650bQmC3ByiR+fdL/ievBQsybUpoWEJsoEB3MkvLfu34QSKkP
-         KcgHVv5yJ3rjyA+cZvTbzD7bgxP6tyeYpH2JNq+h9+Ii2G0bRJqyvsrYvoj6L2vH98n+
-         yVNg==
-X-Gm-Message-State: AOJu0YxGnCcwehWmgh+nMnXCpTKe1pnfqs18r+cxNYIF2YPVTDr7leYG
-	svDAnY90WZ/LaHvW9m2qRSWfs/Z/36w0yINRCLHk0fQoZOd5GF/FlmioOi2auxU=
-X-Google-Smtp-Source: AGHT+IErGUqXQPhOpK0QueE6npEtpqScOcGzDFqV1k0zUJPZi6xnmzxNlA7bILNX+qCMdY5J6nm9Yw==
-X-Received: by 2002:a17:906:694b:b0:a3d:590:195e with SMTP id c11-20020a170906694b00b00a3d0590195emr12713865ejs.4.1708414100578;
-        Mon, 19 Feb 2024 23:28:20 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id gz7-20020a170906f2c700b00a3ebe808fe7sm1267504ejb.115.2024.02.19.23.28.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Feb 2024 23:28:20 -0800 (PST)
-Date: Tue, 20 Feb 2024 08:28:17 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	edumazet@google.com, jacob.e.keller@intel.com,
-	swarupkotikalapudi@gmail.com, donald.hunter@gmail.com,
-	sdf@google.com, lorenzo@kernel.org, alessandromarcolini99@gmail.com
-Subject: Re: [patch net-next 04/13] netlink: specs: allow sub-messages in
- genetlink-legacy
-Message-ID: <ZdRUkXPuoM2-PWkB@nanopsycho>
-References: <20240219172525.71406-1-jiri@resnulli.us>
- <20240219172525.71406-5-jiri@resnulli.us>
- <20240219125118.27eaf888@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=CjcFkuk2hyE1PbKbIvhEXcYYmh+rAKCL/vYE1vzb65C/SJ7patOo2ZiNCOs+FCXp1VLZxKZYgaKBAx3pFNspJFzJzKdzjJPUF+Ssg/1CNDLtGR8F50268UgYNo6/8xqN6U9yyQK7aRDYvlSsnFkosjmXxalKqVK9hDXC+h6sYxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1rcKYr-0006bM-7w; Tue, 20 Feb 2024 08:29:05 +0100
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1rcKYq-001ncM-29; Tue, 20 Feb 2024 08:29:04 +0100
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id AF097292DBA;
+	Tue, 20 Feb 2024 07:29:03 +0000 (UTC)
+Date: Tue, 20 Feb 2024 08:29:02 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Oliver Hartkopp <socketcan@hartkopp.net>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	davem@davemloft.net, kuba@kernel.org, linux-can@vger.kernel.org, 
+	kernel@pengutronix.de, Dan Carpenter <dan.carpenter@linaro.org>
+Subject: Re: [PATCH net-next 22/23] can: canxl: add virtual CAN network
+ identifier support
+Message-ID: <20240220-kelp-footprint-2a26c121409f-mkl@pengutronix.de>
+References: <20240213113437.1884372-1-mkl@pengutronix.de>
+ <20240213113437.1884372-23-mkl@pengutronix.de>
+ <20240219083910.GR40273@kernel.org>
+ <20240219-activist-smartly-87263f328a0c-mkl@pengutronix.de>
+ <2828dbd5-9bea-4b2e-9a4f-ebd0582c8f73@hartkopp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="wl3ar4whl6jp2zgi"
 Content-Disposition: inline
-In-Reply-To: <20240219125118.27eaf888@kernel.org>
+In-Reply-To: <2828dbd5-9bea-4b2e-9a4f-ebd0582c8f73@hartkopp.net>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Mon, Feb 19, 2024 at 09:51:18PM CET, kuba@kernel.org wrote:
->On Mon, 19 Feb 2024 18:25:20 +0100 Jiri Pirko wrote:
->> Currently sub-messages are only supported in netlink-raw template.
->> To be able to utilize them in devlink spec, allow them in
->> genetlink-legacy as well.
->
->Why missing in the commit message.
 
-Sure.
+--wl3ar4whl6jp2zgi
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On 19.02.2024 21:15:19, Oliver Hartkopp wrote:
+> the problem was an incomplete code adoption from another getsockopt()
+> function CAN_RAW_FILTER. No need to reduce the scope of err here as we on=
+ly
+> have one sockopt function at a time.
+
+The idea behind reducing the scope is that a future new sockopt does not
+set err and think that it will be evaluated later.
+
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--wl3ar4whl6jp2zgi
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmXUVLwACgkQKDiiPnot
+vG9EyQf+PEpH9eVaVxBLhJF29xNXRj4OAPmWWz7ijQxxXLfuPE2n89MXwjrgJt/G
+iDdndJ6VThGni1tGMlBUzO6bRk/dMhfRiUHRAu8sLfWtSWV53mN6CXKMvi9EZUEa
+ScKa4V7NrpLqdQSOAZ3OGtitl2ujD1nRBceK2WWdwkjNdJhDI150uebpJv2W3BCH
+3E4XPetBEvXd8x45mN22yBM1+1cTBj9EGgFTOqBGqUtN9Mxrwq+Vf0d7AL4KI6/M
+2IYdVFjhL+NcibqkeaArvWVosLv/r5ETb4Pf2Le5DeHA+nfUk7d3ZgySL1kg+1Qn
+WE2ga6uhELu35DVHaoTZ5oyO6b36pw==
+=oq8v
+-----END PGP SIGNATURE-----
+
+--wl3ar4whl6jp2zgi--
 
