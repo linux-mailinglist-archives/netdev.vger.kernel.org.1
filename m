@@ -1,169 +1,113 @@
-Return-Path: <netdev+bounces-73124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8020185B0D2
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 03:21:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 020BA85B0EF
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 03:45:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2C081C21A15
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 02:21:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B07B1F21C84
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 02:45:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C60FE3E485;
-	Tue, 20 Feb 2024 02:21:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4475A2E40C;
+	Tue, 20 Feb 2024 02:45:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="CYmB1hw9"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ZkIVs5tG"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E2944C73
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 02:21:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ECE02C1B9;
+	Tue, 20 Feb 2024 02:45:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708395673; cv=none; b=FeUoN6oAQjB9QAR7+iKV+//wet6Jvt8PQiT83DzaeHf9koTVOcH40be/EiHQNBOK2ZtttVBCsp9Facyo5lvzqvKHWSNduEnrs0IzGMC/o8nPUorlwHL6C9ORZqitqykzLfP0XzLRA/D523vjyUhdadMo76odsVJxyOzMc6HTvoY=
+	t=1708397127; cv=none; b=agtaWy4XMX4Bzrhsz0fp6SgYlR6SSRvlFV384JqufQZ/pvnOb8DR5mu1Y3xgbvfhdXdIKXqdrj5lgMT3VbLX2jeWq61zSTppQ/kR/NI1UBlW7nYAapk27BGkhVIr1k2MVOJBP6jCSGoo+uT+8vN1455AV/stHBo8cs4eDDqyX7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708395673; c=relaxed/simple;
-	bh=1Vg3XtZsHz7xeUwpf5ALcIMT+nY0hjFYNYxbxGPzNTY=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=hkfzwF40nXnrSGv01wyraJdB63PRlKrRYxNYpTsdX/Xg5csxB4XYA0dFNNAjeGC94Y6xb30PNPoZs5cqrtFUacLExrf1YnKdoXzrnoz0NvOJGtbUx4lkXaXEdnI/XFcR37JzOJHkC/mpf6DhfpcAPGgsiXNDEQ4xg9bXlrc2YFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=CYmB1hw9; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-Received: from pecola.lan (unknown [159.196.93.152])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 0F80020016;
-	Tue, 20 Feb 2024 10:21:08 +0800 (AWST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1708395668;
-	bh=X0oe+TQL6bjUZqVJCZRSUSH2FrXbI7m5DQWzdB1pw+Y=;
-	h=Subject:From:To:Date:In-Reply-To:References;
-	b=CYmB1hw9eMyJqR96qfv3TYXyLt/MtIwxmTeGWIqhRNtOkwvo1wL47yvFet0gY+gyP
-	 +L+sVJSIiNIvoahH/WgxY8c884f3wylwjDwIRAOKG56krnrv9itqXUzQSrE30BfyGy
-	 wmKnnRoKhP09cK1tMqyntUJElLCTjkZY8FEJLSYPc0+O9QHqXqjZTl+71X5Ia++z4b
-	 58w97lYwCTThNYSscy5sKR2jNBY+NCUqqRCyPCnF+4pZKSjr6DflPG8nCaVnJkl3ju
-	 DuZfKcJKasJWra1wPok42fqiH5BZCtnX5ITNOyPi4/ICLVTTnWjzbp6hoCj6+fKU8g
-	 bR9fksWTB7VHw==
-Message-ID: <202197c5a0b755c155828ef406d6250611815678.camel@codeconstruct.com.au>
-Subject: Re: MCTP - Socket Queue Behavior
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: "Ramaiah, DharmaBhushan" <Dharma.Ramaiah@dell.com>, 
-	"netdev@vger.kernel.org"
-	 <netdev@vger.kernel.org>, "matt@codeconstruct.com.au"
-	 <matt@codeconstruct.com.au>
-Date: Tue, 20 Feb 2024 10:21:07 +0800
-In-Reply-To: <SJ0PR19MB4415F935BD23A6D96794ABE687512@SJ0PR19MB4415.namprd19.prod.outlook.com>
-References: 
-	<SJ0PR19MB4415F935BD23A6D96794ABE687512@SJ0PR19MB4415.namprd19.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+	s=arc-20240116; t=1708397127; c=relaxed/simple;
+	bh=BgI8KUUZGcJShWv42a+S7WU6a7VTrR2A3Zt6fAujEFo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EAI5T1ZGjJWAgk/sBCTBtsRTTXXcLSvCcGpdHlbE8NYJy2gJEM1AzN60YvNMuqrR+v86by7Do1CkOqaA+24eZDKf8yiQ8m6lje2Mngu2XXF1F18gD15Xlhv0FFeUxsdJvuHUgQ7TTqcZdknuFCkMTZUwI25BGqfbSsax/98D0DM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ZkIVs5tG; arc=none smtp.client-ip=115.124.30.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1708397121; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=epsRxanowU+Rvzj769kG7rng4wSLzPgisiNp8zQ07Ng=;
+	b=ZkIVs5tGRFpppVsmALZXF27NoJ9/Ezzs32Sii20jvWdKDKD5UOPqiuOM+Rk0AOSYQ9CKIGSoumvcqFNktl8d5Xs3ay9Z2KREsR9Ob/pWhBNA7PcgiN0XoKGhwtrPMWjzv2DbltBUzG5mkghuYL2LsVaxjBJxrnWMyFVuQcXGW8g=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R611e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0W0v2plx_1708397119;
+Received: from 30.221.128.233(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W0v2plx_1708397119)
+          by smtp.aliyun-inc.com;
+          Tue, 20 Feb 2024 10:45:21 +0800
+Message-ID: <cac6192e-85d8-4289-b5af-bc8143e76004@linux.alibaba.com>
+Date: Tue, 20 Feb 2024 10:45:19 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-
-Hi Dharma,
-
-> Linux implementation of MCTP uses socket for communication with MCTP
-> capable EP's. Socket calls can be made ASYNC by using fcntl. I have a
-> query based on ASYNC properties of the MCTP socket.
-
-Some of your questions aren't really specific to non-blocking sockets;
-it seems like you're assuming that the blocking send case will wait for
-a response before returning; that's not the case, as sendmsg() will
-complete once the outgoing message is queued (more on what that means
-below).
-
-So, you still have the following case, still using a blocking socket:
-
-  sendmsg(message1)
-  sendmsg(message2)
-
-  recvmsg() -> reply 1
-  recvmsg() -> reply 2
-
-- as it's entirely possible to have multiple messages in flight - either
-  as queued skbs, or having being sent to the remote endpoint.
-
-> 1. Does kernel internally maintain queue, for the ASYNC requests?
-
-There is no difference between blocking or non-blocking mode in the
-queueing implementation. There is no MCTP-protocol-specific queue for
-sent messages.
-
-(the blocking/nonblocking mode may affect how we wait to allocate a
-skb, but it doesn't sound like that's what you're asking here)
-
-However, once a message is packetised (possibly being fragmented into
-multiple packets), those those *packets* may be queued to the device by
-the netdev core. The transport device driver may have its own queues as
-well.
-
-In the case where you have multiple concurrent sendmsg() calls
-(typically through separate threads, and either on one or multiple
-sockets), it may be possible for packets belonging to two messages to be
-interleaved on the wire. That scenario is well-supported by the MCTP
-protocol through the packet tag mechanism.
-
-> a. If so, what is the queue depth (can one send multiple requests
-> without waiting for the response=20
-
-The device queue depth depends on a few things, but has no impact on
-ordering of requests to responses. It's certainly possible to have
-multiple requests in flight at any one time: just call sendmsg()
-multiple times, even in blocking mode.
-
-(the practical limit for pending messages is 8, limited by the number of
-MCTP tag values for any (remote-EID, local-EID, tag) tuple)
-
-> and expect reply in order of requests)?
-
-We have no control over reply ordering. It's entirely possible that
-replies are sent out of sequence by the remote endpoint:
-
-  local application          remote endpoint
-
-  sendmsg(message 1)
-  sendmsg(message 2)
-                             receives message 1
-                             receives message 2
-                             sends a reply 2 to message 2
-                             sends a reply 1 to message 1
-  recvmsg() -> reply 2
-  recvmsg() -> reply 1
-
-So if a userspace application sends multiple messages concurrently, it
-must have some mechanism to correlate the incoming replies with the
-original request state. All of the upper-layer protocols that I have
-seen have facilities for this (Instance ID in MCTP Control protocol,
-Command Slot Index in NVMe-MI, Instance ID in PLDM, ...)
-
-(You could also use the MCTP tags to achieve this correlation, but there
-are very likely better ways in the upper-layer protocol)
-
-> b. Does the Kernel maintain queue per socket connection?
-
-MCTP is datagram-oriented, there is no "connection".
-
-In terms of per-socket queues: there is the incoming socket queue
-that holds received messages that are waiting for userspace to dequeue
-via recvmsg() (or similar). However, there is nothing MCTP-specific
-about this, it's all generic socket code.
-
-> 2. Is FASYNC a mechanism for handling asynchronous events associated
-> with a file descriptor and it doesn't provide parallelism for
-> multiple send operation?
-
-The non-blocking socket interfaces (FASYNC, O_NONBLOCK, MSG_DONTWAIT)
-are mostly unrelated to whether your application sends multiple messages
-at once. It's entirely possible to have multiple messages in flight
-while using the blocking interfaces.
-
-Cheers,
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 09/15] net/smc: introduce loopback-ism statistics
+ attributes
+To: Wenjia Zhang <wenjia@linux.ibm.com>, wintera@linux.ibm.com,
+ hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240111120036.109903-1-guwen@linux.alibaba.com>
+ <20240111120036.109903-10-guwen@linux.alibaba.com>
+ <417a1b7c-4136-4f96-a614-9fd976dc884d@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <417a1b7c-4136-4f96-a614-9fd976dc884d@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 
-Jeremy
+
+On 2024/2/16 22:24, Wenjia Zhang wrote:
+> 
+> 
+> On 11.01.24 13:00, Wen Gu wrote:
+>> This introduces some statistics attributes of loopback-ism. They can be
+>> read from /sys/devices/virtual/smc/loopback-ism/{xfer_tytes|dmbs_cnt}.
+>>
+>> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+>> ---
+>>   net/smc/smc_loopback.c | 74 ++++++++++++++++++++++++++++++++++++++++++
+>>   net/smc/smc_loopback.h | 22 +++++++++++++
+>>   2 files changed, 96 insertions(+)
+>>
+> 
+> I've read the comments from Jiri and your answer. I can understand your thought. However, from the perspective of the 
+> end user, it makes more sense to integetrate the stats info into 'smcd stats'. Otherwise, it would make users confused 
+> to find out with which tool to check which statisic infornation. Sure, some improvement of the smc-tools is also needed
+
+Thank you Wenjia.
+
+Let's draw an analogy with RDMA devices, which is used in SMC-R. If we want
+to check the RNIC status or statistics, we may use rdma statistic command, or
+ibv_devinfo command, or check file under /sys/class/infiniband/mlx5_0. These
+provide details or attributes related to *devices*.
+
+Since s390 ISM can be used out of SMC, I guess it also has its own way (other
+than smc-tools) to check the statistic?
+
+What we can see in smcr stats or smcd stats command is about statistic or
+status of SMC *protocol* layer, such as DMB status, Tx/Rx, connections, fallbacks.
+
+If we put the underlying devices's statistics into smc-tools, should we also
+put RNIC statistics or s390 ISM statistics into smcr stat or smcd stat? and
+for each futures device that can be used by SMC-R/SMC-D, should we update them
+into smcr stat and smcd stat? And the attributes of each devices may be different,
+should we add entries in smcd stat for each of them?
+
+After considering the above things, I believe that the details of the underlying
+device should not be exposed to smc(smc-tools). What do you think?
+
+Thanks!
 
