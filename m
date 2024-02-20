@@ -1,93 +1,152 @@
-Return-Path: <netdev+bounces-73230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D19285B7E6
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 10:44:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE1B285B819
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 10:49:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F8281C214B3
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:44:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 943B51F21CD4
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:49:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA6DD60DF8;
-	Tue, 20 Feb 2024 09:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C327160DF8;
+	Tue, 20 Feb 2024 09:45:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lu8I+9Ne"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="hnEuLAHn";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="uuKrjn6d"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 853AA679E1
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 09:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29BE366B51
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 09:45:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708422028; cv=none; b=iVfLyjop+VIdvvVxl507a3uKRzQZ0lK3ex91jxs22rAnUghCfxhDJjD7b5A2d9usVLq1fOuqbO/QoIH14TMdrAlFB4ca6NGJoz4HUnYThACqvpjiOURJQRcPNOsOVd0EJ/jaBLocYhSpwJTKPahDpuCXj4++0Z/85RNAfCE97xk=
+	t=1708422302; cv=none; b=fj4/pW3ArZk45tIVml0LDfNemRuNkPrvKwdKj0aUAIvTCahP/K8JBDGHSJv+2zbRtOomrHwsJOU1nQvQjfkpPWuzjO2MATk9GFNwAhWYykacOuWBluJLOayp/1o2qm8F0yQv29meRdg8nMyCFZNifoAEVro9IHaFsCGFsj2o0hU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708422028; c=relaxed/simple;
-	bh=y1Kk4cbnXSzWjtqFO9pXcacE8/TOAElqXqD0aWcDxjU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Qp/avM0PyGbrKJ7wLjyvvphxXI073TaVLkn8y7QMMnLtJei+GEuhCnG1kFCzff7IorNr+K9BjPuMM+bu2V9FTdXxkjFC/NymMFrxS4kfTbIONoXQO8CX/s8EAItJmpE3VsV6GCIHGvNuR/h9QexIbpWCe3elGqsgALsgyU7HOHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lu8I+9Ne; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2DB60C433B2;
-	Tue, 20 Feb 2024 09:40:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708422028;
-	bh=y1Kk4cbnXSzWjtqFO9pXcacE8/TOAElqXqD0aWcDxjU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Lu8I+9Ne93jD99ObxRkQ8a1jtcr4DwSbPJvL6nkUBtn89l/hQ02AXTMp2jNkgBHQ6
-	 a+zMhNq3tvFeAoCWgCrBeYmlZFaye0OuFCRl0FxGTC5H/cNufZAyXYjIXHrlVC/reN
-	 laEwE4pBJ/frNl4EspD/7f3lTPnThlAqiJH4McFQrzCUuz4juIakILOobZfiq9/1yC
-	 IMeXwUpJsDDYWilby+JhrcCTR9Tr46aUZ/C1ZTV9MciG9SLXyquiTgEGe03sMb75m5
-	 3VwK6Oz0ziljq9RzbfWutcPRkeY4bpbgKatd6EXZSiKx3kdVTcpW2nmuYgdQLLqSPc
-	 KW1qNQ6LHnxiQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 169C4D84BBB;
-	Tue, 20 Feb 2024 09:40:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1708422302; c=relaxed/simple;
+	bh=sGjk30z9P5FxvC2x9h3mWXSO2M2G1WdWaveL9jmSnmw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=c9bfJ12gWy2Aq5nZ9Z8EOMutSrB44TijLes5b0F3BTrdCeIjGWzsGXOG31nE0LFj9CfPRwWDbDO27lrIJGIuTSnisjyYen/ItST2UTbz7bT/Psf6T1yWUdvUxGRR4MuFWyiYYLYDi88dHDNRUuZb5DRBIRNAXOc2TeHDvN5IM0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=hnEuLAHn; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=uuKrjn6d; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1708422299;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0IOZw6hyqiMqx4EefUlP36lkvuV/22XmEQa54rFkuug=;
+	b=hnEuLAHnE35zRzIKCohcn8gnB/h12LULynfKsxpr97CogKyO26g5Z+AwjtoBLtne01WvW1
+	W0wP9Idd+jr74lq8ogajkpHodAmursLOqj8+vkqPAGDrUo98RcZ7Hxy+Gl35hQbeBzJP5m
+	5cQmhW/HdZhi47TAF7kbjyU1p9Kpl4A502wLvIaTC9rm5ES/g0gIpNLSrb9xiojIJkdrhB
+	5kTXcLXdPlWAxpd9Dw83qv7/KiNUVr/Ym7WHB1TAfr6sq3MvBFsLLgeG3KsF+5BiYPPFGK
+	EX46b6+LL8Kp9h/Hj+zdsbq9kKcs3V5Xvu9zglOH6qn3SWJEXG3pUBiKOMI7bg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1708422299;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0IOZw6hyqiMqx4EefUlP36lkvuV/22XmEQa54rFkuug=;
+	b=uuKrjn6dTnGMOlTvKs6676TlXRz1fM26Uzpz5QUWhv2bNCeL/A/Y+8EZuxjhEXVtefHfAW
+	/NtYsJlYYV2jdLAQ==
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Rohan G Thomas
+ <rohan.g.thomas@intel.com>, Sebastian Andrzej Siewior
+ <bigeasy@linutronix.de>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net] net: stmmac: Fix EST offset for dwmac 5.10
+In-Reply-To: <mmjrlyzhegve5u3s3lhw4hmhooxixn3pwxkkdikxgxno4teqyz@rtetljwg6ffg>
+References: <20240220-stmmac_est-v1-1-c41f9ae2e7b7@linutronix.de>
+ <mmjrlyzhegve5u3s3lhw4hmhooxixn3pwxkkdikxgxno4teqyz@rtetljwg6ffg>
+Date: Tue, 20 Feb 2024 10:44:57 +0100
+Message-ID: <87ttm3wjty.fsf@kurt.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] ipv6: sr: fix possible use-after-free and null-ptr-deref
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170842202807.17965.17736912621512483731.git-patchwork-notify@kernel.org>
-Date: Tue, 20 Feb 2024 09:40:28 +0000
-References: <20240215202717.29815-1-kovalev@altlinux.org>
-In-Reply-To: <20240215202717.29815-1-kovalev@altlinux.org>
-To: None <kovalev@altlinux.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- david.lebrun@uclouvain.be
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-Hello:
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+On Tue Feb 20 2024, Serge Semin wrote:
+> Hi Kurt
+>
+> On Tue, Feb 20, 2024 at 09:22:46AM +0100, Kurt Kanzenbach wrote:
+>> Fix EST offset for dwmac 5.10.
+>>=20
+>> Currently configuring Qbv doesn't work as expected. The schedule is
+>> configured, but never confirmed:
+>>=20
+>> |[  128.250219] imx-dwmac 428a0000.ethernet eth1: configured EST
+>>=20
+>> The reason seems to be the refactoring of the EST code which set the wro=
+ng
+>> EST offset for the dwmac 5.10. After fixing this it works as before:
+>>=20
+>> |[  106.359577] imx-dwmac 428a0000.ethernet eth1: configured EST
+>> |[  128.430715] imx-dwmac 428a0000.ethernet eth1: EST: SWOL has been swi=
+tched
+>>=20
+>> Tested on imx93.
+>>=20
+>> Fixes: c3f3b97238f6 ("net: stmmac: Refactor EST implementation")
+>> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+>> ---
+>>  drivers/net/ethernet/stmicro/stmmac/hwif.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>=20
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/et=
+hernet/stmicro/stmmac/hwif.c
+>> index 1bd34b2a47e8..29367105df54 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+>> @@ -224,7 +224,7 @@ static const struct stmmac_hwif_entry {
+>>  		.regs =3D {
+>>  			.ptp_off =3D PTP_GMAC4_OFFSET,
+>>  			.mmc_off =3D MMC_GMAC4_OFFSET,
+>> -			.est_off =3D EST_XGMAC_OFFSET,
+>> +			.est_off =3D EST_GMAC4_OFFSET,
+>
+> Unfortunate c&p typo indeed. Thanks for fixing it!
 
-On Thu, 15 Feb 2024 23:27:17 +0300 you wrote:
-> From: Vasiliy Kovalev <kovalev@altlinux.org>
-> 
-> The pernet operations structure for the subsystem must be registered
-> before registering the generic netlink family.
-> 
-> Fixes: 915d7e5e5930 ("ipv6: sr: add code base for control plane support of SR-IPv6")
-> Signed-off-by: Vasiliy Kovalev <kovalev@altlinux.org>
-> 
-> [...]
+No problem. I was just wondering why the confirmation message doesn't
+show up after updating to v6.8-RT :-).
 
-Here is the summary with links:
-  - ipv6: sr: fix possible use-after-free and null-ptr-deref
-    https://git.kernel.org/netdev/net/c/5559cea2d5aa
+Thanks,
+Kurt
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmXUdJkTHGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgkDMEACpywx0fzS87yvO1q6df6W3FbGVVYuB
+Ius17j0DnWupFElYtSbJvmOjHI9wI2j1aOBSbqSOdTTxEsYR2XWvfmlgH57WOfBB
+oz4JPnfjV8P3rb6nlXcqOeWlultJg2ee7P4/P9kbDeEkSRb6KOArkjBxkQT99oLS
+wNaqPjboXyO50ZDR2lrZqjjQWCSg8uHKt70vMfxCOra/ENiMRM/oNBb1ZQj02XcP
+5rN3bKJGiwuyjFvLZUmWnvmI9KYRErEHtuoN+SThdPZzvLATJQxMM0b4YT53wUHf
+5ATVgFvF/slTVh8OR5b/9K9Io17hpESubQN293JVK7Ja2kNMjmahvZaS3LvXlJu0
+e9QqVHQsMgHdhp0QrBCalGvRY8wow4bJ+41IaJdGYSsoqOJBFEYNCj/EWjTdovz7
+uQ0qeNJaaAz82ZGF4816jVrFY3b/nkTm/eI4YzFnl6IKTiRkxvDbm7/ER0XWel+e
+huh420Nt7km7Xcs8t0pSYur2hE8YH/lh595iW7032llm4SuxpdDDKlgVYmVtoXUW
+/lQLtrLiaXYEDE3HjmBrCQb14Wbc4WL2cdgqcakKfHRrWvezXICvcFGsHhCUMPDu
+VGNXo8iO9bWdmuzwDHe/Yt1Ujq/8ZQsP2C0/2PZYejdXBNQJuzhypdur8WTFqul8
+GKydbDv/RnY8Bg==
+=08hW
+-----END PGP SIGNATURE-----
+--=-=-=--
 
