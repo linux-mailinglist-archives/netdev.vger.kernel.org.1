@@ -1,224 +1,291 @@
-Return-Path: <netdev+bounces-73273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED03485BB49
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 13:00:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AD8085BB63
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 13:06:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A46A2282482
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 12:00:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A74451F21B5B
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 12:06:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6014267C59;
-	Tue, 20 Feb 2024 12:00:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B552D67C4B;
+	Tue, 20 Feb 2024 12:06:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="G3HImeI5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XF09oky4"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR01-HE1-obe.outbound.protection.outlook.com (mail-he1eur01on2071.outbound.protection.outlook.com [40.107.13.71])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C63967C7B;
-	Tue, 20 Feb 2024 12:00:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.13.71
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708430441; cv=fail; b=QWb2NglN1e+w4NBLW6RFYX3sWFOIKjIhCai6iig/rqOvmJJeJ6EbLySlL0FgtvS/t5JikMi0fJKsmYGKGKEoi72Eh6khHgOdxty0LDJyAlrtyhtidGG0i8NcPw42OV8yWD9pMeVsgnyQmBiCe1+T3nk0KPHMPXZLMDIgHdzrYxg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708430441; c=relaxed/simple;
-	bh=hBJYtvzCqK4bjtjNskkAyjPrNCbW87eKF+Joa4yX2AA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=Lk7dR4FoyfXY6HOmZK3EuHPQtf0CAAlKB4qH7vdm+nBkh7ocriSxw3OzHKWUCsUy9pYZaOY/1T75Hfj9dAaWxTMltzqs95EDJ/tLbPi0OZphkIM7a4j8p+PfXjlzctCKisb3bRht63BE/PMSxvTAGnKSbEt/krX0XVN8fxqBZu4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=axis.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=G3HImeI5; arc=fail smtp.client-ip=40.107.13.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=axis.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AOfnnk0Rn3Lr4+DmRVuZOuq0GyL59GF4xxwv6t0q91dyEKLNytruOaCK8UWaiSVSkzjJ//tbY0E7MGkKnXeRryD88vBvr8mOADLIFPi7Y1VtbCcS6V3IgogHDO/5Owqu7EMmvmuydPtMDFafCnEMW38zL2DV3MULh0f0nIgKoV7nvjUdKdIu1NFziLJrSi9RYxfGpx0WkxtmrQ2dw0ISzkht4Ea3mU1CAxtfznvL4UZEkV7I184AZk66o8F5qgG7yifA1GT3rFYU+uTe2Oo/ZNllO9CASOT+EghE6fvyK8LA+4JjAIGmJqrg31bT2sCy5jJDWgqOYRFrCsYBjnS0sw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qzzdcudvdkHNgi4N8pigKYmK//NqwWyKzJKnYOQOFw0=;
- b=SVn1AlX3aaKT2+ofGlnsYNs8ZqHgpTQWrdhuUhNc7N6FWRa2aq9P143jBTB34LbZ1Z0PO+YvqRwCDvgrcWxDlg1mI8OMMLiti7einQpHOahq0C6vSN1FMXbsCVMBh10ow4eNDtShAVwXTh5Y1mdGw2Z7GoSlHO19Mt1BeWjvMZSy9QS4MT0FNvm3TXtnPwR7q1i+D13zL/TyVRZrxnp75Lh3PJTjtWuO8W4INaNcCUN/PxhbYmp4NkWleDGtwwFTn3qn64z92Dk0TpJF2fJbhND9fkXxhE8g0RUkGuEWPgnVHJVNPH7CRw1rCJh58BaRt2I/8fywPQrYJo2kO+/Cbg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
- 195.60.68.100) smtp.rcpttodomain=davemloft.net smtp.mailfrom=axis.com;
- dmarc=fail (p=none sp=none pct=100) action=none header.from=axis.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qzzdcudvdkHNgi4N8pigKYmK//NqwWyKzJKnYOQOFw0=;
- b=G3HImeI5iuJLz5Bi/rz2WbCv4/5s/2m9zRHR1v03wX5gCMrvsXKGLjujdwRsjXsuepzHQU9yj/8Hcb06iMC0Y+8JHGreNSgykQ9hrSKR+3FGchtROyaQpIgVN+Ypuw7/BRpkjD9bYnikJCLbGRu5jmhY05woT1Ra+OCqa4xno1I=
-Received: from AS9PR06CA0282.eurprd06.prod.outlook.com (2603:10a6:20b:45a::26)
- by PAXPR02MB7213.eurprd02.prod.outlook.com (2603:10a6:102:1bd::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.39; Tue, 20 Feb
- 2024 12:00:34 +0000
-Received: from AM3PEPF0000A78F.eurprd04.prod.outlook.com
- (2603:10a6:20b:45a:cafe::b7) by AS9PR06CA0282.outlook.office365.com
- (2603:10a6:20b:45a::26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.38 via Frontend
- Transport; Tue, 20 Feb 2024 12:00:34 +0000
-X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 195.60.68.100)
- smtp.mailfrom=axis.com; dkim=none (message not signed)
- header.d=none;dmarc=fail action=none header.from=axis.com;
-Received-SPF: Fail (protection.outlook.com: domain of axis.com does not
- designate 195.60.68.100 as permitted sender) receiver=protection.outlook.com;
- client-ip=195.60.68.100; helo=mail.axis.com;
-Received: from mail.axis.com (195.60.68.100) by
- AM3PEPF0000A78F.mail.protection.outlook.com (10.167.16.118) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7292.25 via Frontend Transport; Tue, 20 Feb 2024 12:00:33 +0000
-Received: from SE-MAIL21W.axis.com (10.20.40.16) by se-mail02w.axis.com
- (10.20.40.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Tue, 20 Feb
- 2024 13:00:33 +0100
-Received: from se-mail01w.axis.com (10.20.40.7) by SE-MAIL21W.axis.com
- (10.20.40.16) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Tue, 20 Feb
- 2024 13:00:33 +0100
-Received: from se-intmail01x.se.axis.com (10.0.5.60) by se-mail01w.axis.com
- (10.20.40.7) with Microsoft SMTP Server id 15.1.2375.34 via Frontend
- Transport; Tue, 20 Feb 2024 13:00:33 +0100
-Received: from pc55637-2337.se.axis.com (pc55637-2337.se.axis.com [10.88.4.11])
-	by se-intmail01x.se.axis.com (Postfix) with ESMTP id 2265314AC1;
-	Tue, 20 Feb 2024 13:00:33 +0100 (CET)
-Received: by pc55637-2337.se.axis.com (Postfix, from userid 363)
-	id 1E5C8236949A; Tue, 20 Feb 2024 13:00:33 +0100 (CET)
-From: Jesper Nilsson <jesper.nilsson@axis.com>
-Date: Tue, 20 Feb 2024 13:00:22 +0100
-Subject: [PATCH v2] net: stmmac: mmc_core: Drop interrupt registers from
- stats
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB54667C4F
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 12:06:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708430787; cv=none; b=h9rBsBAJV38Uq3NFjyrlViU1ROyhiea+ksag/Uj+aHJdSmAK8Ki5r6YCD6GFKtvn2Oko6H0TQr6AGINq2YkWROWMK+HH11JS0PKhtLib9AqH8eNOgnH+3Hq7aVYjfUVssOo8uqWfER5iKFEoXiowp1YRpruVuYSSPl++/h5UcQ0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708430787; c=relaxed/simple;
+	bh=NFi+j3hA9WEesenlgGCRFiz11TTrlXk4sHYqy5xFwkY=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Z21C5lrzYuFq6Nty7Y6FBq4OBnkMjMt/fHkLKIzcgCHHfwMAq38BFHqltv3o0a/d0ZBq0oP/5IWJpWC+0CSKZAsZuj/YwC7pd4x9s3lbpg8jqM+gsupL5/msokPFFFfNpsWiv6Q2JbgUKt409w3LaSU5WFs2Ht/I3fW0Leidht4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XF09oky4; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708430784;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=Lg1u0aMGipJlSQmuc4KE0d4NV/J0ImutHRAnFZXMs00=;
+	b=XF09oky4ywD20TeLKLrP4bKNIdnnefIRIT5k85g0IpEBytw619r3+pTKC+XELauGjJ7d8r
+	SenxNCEox9ab9fM/g8ykyCcXCJTZYbauSiU/GC/RTcpYtuMdQb2+rlDqmZpDwSNV6rfqRp
+	xic9O1+EL2YDHLqRF0h7M3VZE8dVGdE=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-517-xEEaiTwRNByXDKYmVF_z0g-1; Tue, 20 Feb 2024 07:06:22 -0500
+X-MC-Unique: xEEaiTwRNByXDKYmVF_z0g-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-33d3757a367so125505f8f.0
+        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 04:06:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708430781; x=1709035581;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Lg1u0aMGipJlSQmuc4KE0d4NV/J0ImutHRAnFZXMs00=;
+        b=YN9PxBHq9vMtdtlP0MyvT9eMXvOpuRVoGIOViqlCnZpgG2jni0GyLl3wZutYZYkNKo
+         v3OAqtbuJjQnThtOVCJaWKn4OVebXv7lx9MtMQbgBbwKYcJxlsXAHXk56Hr4ISMrRhIu
+         OKucBm90zs6+YzxH/pZmAz01n3iLFeFtkaSXK3HlTToSTncj94BYH9HyvNbGowkwfNsR
+         +Bw0ldPBGVrvHkMPhsqLHXCorRgh5BcSoWiWWDoflEnLfdWqHd4rXa+gFDC2dTSxo/uD
+         iRRT/ZjoFscWMS0aKEQpIQhIo9uhem0NcSy/Q4b59OsyjiVrw+kiYjIYW4fF57onhUqK
+         eK7A==
+X-Forwarded-Encrypted: i=1; AJvYcCU2URTEc0iWw5z9lV8EwcQQSIRCGoW/0jZ2lsi6x3p/HGLCpI/RKtZ5MUboIkA6AxjEvHjQRiglvwl0ASEICEJrwK+1hl8I
+X-Gm-Message-State: AOJu0YynchH13KOfPrkE6I5CR454yNnMxjZKY3K7bMnOmhvmLbtCol13
+	/q6nCG5lMtBUl/PCyikdlDZhfma9rvhYKpAV2EfZR6ORF3MegUmoe8wsj3NrYNI8RcyzQf3VYHx
+	nskv6VSvyux+HBbMxeeIQ4izvQT07DTQ12USAI7nJ3yaQqzMvbmfv8A==
+X-Received: by 2002:a05:6000:1f09:b0:33b:88a0:a1e9 with SMTP id bv9-20020a0560001f0900b0033b88a0a1e9mr7513937wrb.4.1708430781155;
+        Tue, 20 Feb 2024 04:06:21 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHwkkldF9nLAmzQ5qy8YbLC9JjxLkvvE163fZt2XGXn/e0lUYfb+iVacFr4DVRZLfIlkEzsKw==
+X-Received: by 2002:a05:6000:1f09:b0:33b:88a0:a1e9 with SMTP id bv9-20020a0560001f0900b0033b88a0a1e9mr7513913wrb.4.1708430780715;
+        Tue, 20 Feb 2024 04:06:20 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-230-79.dyn.eolo.it. [146.241.230.79])
+        by smtp.gmail.com with ESMTPSA id k14-20020a5d428e000000b0033ce5b3390esm13313351wrq.38.2024.02.20.04.06.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Feb 2024 04:06:20 -0800 (PST)
+Message-ID: <82046b6cf70823e8c17e102c8233f1cb219bb9f5.camel@redhat.com>
+Subject: Re: [PATCH v1 net-next 03/16] af_unix: Link struct unix_edge when
+ queuing skb.
+From: Paolo Abeni <pabeni@redhat.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, "David S. Miller"
+	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	 <kuba@kernel.org>
+Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Date: Tue, 20 Feb 2024 13:06:18 +0100
+In-Reply-To: <20240203030058.60750-4-kuniyu@amazon.com>
+References: <20240203030058.60750-1-kuniyu@amazon.com>
+	 <20240203030058.60750-4-kuniyu@amazon.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20240220-stmmac_stats-v2-1-0a78863bec70@axis.com>
-X-B4-Tracking: v=1; b=H4sIAFWU1GUC/3XMQQrCMBCF4auUWRvJpGkUV95DioRmYmeRVjKhV
- Ervbuze5f/gfRsIZSaBW7NBpoWF56mGOTUwjH56keJQG4w2Vht0SkpKfnhK8UUUtZ3DYJ0OmqB
- e3pkirwf36GuPLGXOn0Nf8Lf+gRZUqC7addFbh2283v3Kch7mBP2+719HGxKTpwAAAA==
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
-	<joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>
-CC: <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<kernel@axis.com>, Jesper Nilsson <jesper.nilsson@axis.com>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1708430433; l=3666;
- i=jesper.nilsson@axis.com; s=20240216; h=from:subject:message-id;
- bh=hBJYtvzCqK4bjtjNskkAyjPrNCbW87eKF+Joa4yX2AA=;
- b=iiesv1bp0is9dBFTNZZGyIE6OLENAt4pTnbzaEuncAR8hAQMVAGSQMVzg2nva7X55AEu4roew
- 30a4X5PIGN6AWUWKhqsCUmCaVzbPLRQq+g6KVPZ+Enp+zaXzbP3GWmz
-X-Developer-Key: i=jesper.nilsson@axis.com; a=ed25519;
- pk=RDobTFVrTaE8iMP112Wk0CDiLdcV7I+OkaCECzhr/bI=
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM3PEPF0000A78F:EE_|PAXPR02MB7213:EE_
-X-MS-Office365-Filtering-Correlation-Id: ec25a5f5-4f43-4896-931c-08dc320b8afb
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	rdpyOHJUWVgtuYB273Zk0GCVxknZziDIaIbU/q1sHQwVZ3JWm9FkDW3HS0bkFhBWPsG9qO2uZFgQTfHC8YHjJmTJsavrwCZZcCIKtiuOyzy2/qBAVUJ8UCKUM9/kaoHzmba3G9V7RvJv0WwOwB2XzOG+PfhCLPo6d6hH+NK1+K6vRaf2I6W/WnLP1TjDcOIyLIERb9IgeBSVbKD3dODICYzlH2kNiCfQ0bWTOqpkLLtK9OX2O7qPbjhNWaCyHfKjXQGwE59OWBJ6e/QzV+kdYm7JRL2fwFunv5IPfu7fPfoUdTpjm6K4+lwQaa20mCTE5zSCSCEd5CfYUQGXy1C1w/5kMijkCHUX/B7HiB3HUoScQY0Fh2oE11HBTtu5pqeH7eQiqrCAm/NfuyqehZMjhM+fF4IB3Y34H2Shkzag5ZjugVWx56Zsl9WvyRG9Bv7rnfD2jGn7ZyY/q+N0mfMiMifFRLywM4tKgXHmTgyINZs+u/HtdVHwPO9QkHGzlgxkoXl94AawHfpBg/esh54VJi7jIwqVLckC9L7mj/pnUrgM5Y4awze4YScN6aq73MeJmQsXbTVcE39tRipVzDe54TD6t016y4bbyvjxiNGyAkOdBVEgjIJwRcGV/3iLhTjKO/ol44L5sI+Ww12dTEFwWw==
-X-Forefront-Antispam-Report:
-	CIP:195.60.68.100;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.axis.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(40470700004)(46966006);DIR:OUT;SFP:1101;
-X-OriginatorOrg: axis.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2024 12:00:33.7227
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ec25a5f5-4f43-4896-931c-08dc320b8afb
-X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=78703d3c-b907-432f-b066-88f7af9ca3af;Ip=[195.60.68.100];Helo=[mail.axis.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AM3PEPF0000A78F.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR02MB7213
 
-The MMC IPC interrupt status and interrupt mask registers are
-of little use as Ethernet statistics, but incrementing counters
-based on the current interrupt and interrupt mask registers
-makes them actively misleading.
+On Fri, 2024-02-02 at 19:00 -0800, Kuniyuki Iwashima wrote:
+> Just before queuing skb with inflight fds, we call scm_stat_add(),
+> which is a good place to set up the preallocated struct unix_edge
+> in UNIXCB(skb).fp->edges.
+>=20
+> Then, we call unix_add_edges() and construct the directed graph
+> as follows:
+>=20
+>   1. Set the inflight socket's unix_vertex to unix_edge.predecessor
+>   2. Set the receiver's unix_vertex to unix_edge.successor
+>   3. Link unix_edge.entry to the inflight socket's unix_vertex.edges
+>   4. Link inflight socket's unix_vertex.entry to unix_unvisited_vertices.
+>=20
+> Let's say we pass the fd of AF_UNIX socket A to B and the fd of B
+> to C.  The graph looks like this:
+>=20
+>   +-------------------------+
+>   | unix_unvisited_vertices | <------------------------.
+>   +-------------------------+                          |
+>   +                                                    |
+>   |   +-------------+                +-------------+   |            +----=
+---------+
+>   |   | unix_sock A |                | unix_sock B |   |            | uni=
+x_sock C |
+>   |   +-------------+                +-------------+   |            +----=
+---------+
+>   |   | unix_vertex | <----.  .----> | unix_vertex | <-|--.  .----> | uni=
+x_vertex |
+>   |   | +-----------+      |  |      | +-----------+   |  |  |      | +--=
+---------+
+>   `-> | |   entry   | +------------> | |   entry   | +-'  |  |      | |  =
+ entry   |
+>       | |-----------|      |  |      | |-----------|      |  |      | |--=
+---------|
+>       | |   edges   | <-.  |  |      | |   edges   | <-.  |  |      | |  =
+ edges   |
+>       +-+-----------+   |  |  |      +-+-----------+   |  |  |      +-+--=
+---------+
+>                         |  |  |                        |  |  |
+>   .---------------------'  |  |  .---------------------'  |  |
+>   |                        |  |  |                        |  |
+>   |   +-------------+      |  |  |   +-------------+      |  |
+>   |   |  unix_edge  |      |  |  |   |  unix_edge  |      |  |
+>   |   +-------------+      |  |  |   +-------------+      |  |
+>   `-> |    entry    |      |  |  `-> |    entry    |      |  |
+>       |-------------|      |  |      |-------------|      |  |
+>       | predecessor | +----'  |      | predecessor | +----'  |
+>       |-------------|         |      |-------------|         |
+>       |  successor  | +-------'      |  successor  | +-------'
+>       +-------------+                +-------------+
+>=20
+> Henceforth, we denote such a graph as A -> B (-> C).
+>=20
+> Now, we can express all inflight fd graphs that do not contain
+> embryo sockets.  The following two patches will support the
+> particular case.
+>=20
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
+>  include/net/af_unix.h |  2 ++
+>  include/net/scm.h     |  1 +
+>  net/core/scm.c        |  2 ++
+>  net/unix/af_unix.c    |  8 +++++--
+>  net/unix/garbage.c    | 56 ++++++++++++++++++++++++++++++++++++++++++-
+>  5 files changed, 66 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/include/net/af_unix.h b/include/net/af_unix.h
+> index cab9dfb666f3..54d62467a70b 100644
+> --- a/include/net/af_unix.h
+> +++ b/include/net/af_unix.h
+> @@ -23,6 +23,8 @@ extern unsigned int unix_tot_inflight;
+>  void unix_inflight(struct user_struct *user, struct file *fp);
+>  void unix_notinflight(struct user_struct *user, struct file *fp);
+>  void unix_init_vertex(struct unix_sock *u);
+> +void unix_add_edges(struct scm_fp_list *fpl, struct unix_sock *receiver)=
+;
+> +void unix_del_edges(struct scm_fp_list *fpl);
+>  int unix_alloc_edges(struct scm_fp_list *fpl);
+>  void unix_free_edges(struct scm_fp_list *fpl);
+>  void unix_gc(void);
+> diff --git a/include/net/scm.h b/include/net/scm.h
+> index a1142dee086c..7d807fe466a3 100644
+> --- a/include/net/scm.h
+> +++ b/include/net/scm.h
+> @@ -32,6 +32,7 @@ struct scm_fp_list {
+>  	short			count_unix;
+>  	short			max;
+>  #ifdef CONFIG_UNIX
+> +	bool			inflight;
+>  	struct unix_edge	*edges;
+>  #endif
+>  	struct user_struct	*user;
+> diff --git a/net/core/scm.c b/net/core/scm.c
+> index 8661524ed6e5..d141c00eb116 100644
+> --- a/net/core/scm.c
+> +++ b/net/core/scm.c
+> @@ -87,6 +87,7 @@ static int scm_fp_copy(struct cmsghdr *cmsg, struct scm=
+_fp_list **fplp)
+>  		*fplp =3D fpl;
+>  		fpl->count =3D 0;
+>  		fpl->count_unix =3D 0;
+> +		fpl->inflight =3D false;
+>  		fpl->edges =3D NULL;
+>  		fpl->max =3D SCM_MAX_FD;
+>  		fpl->user =3D NULL;
+> @@ -378,6 +379,7 @@ struct scm_fp_list *scm_fp_dup(struct scm_fp_list *fp=
+l)
+>  		for (i =3D 0; i < fpl->count; i++)
+>  			get_file(fpl->fp[i]);
+> =20
+> +		new_fpl->inflight =3D false;
+>  		new_fpl->edges =3D NULL;
+>  		new_fpl->max =3D new_fpl->count;
+>  		new_fpl->user =3D get_uid(fpl->user);
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index 0391f66546a6..ea7bac18a781 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -1956,8 +1956,10 @@ static void scm_stat_add(struct sock *sk, struct s=
+k_buff *skb)
+>  	struct scm_fp_list *fp =3D UNIXCB(skb).fp;
+>  	struct unix_sock *u =3D unix_sk(sk);
+> =20
+> -	if (unlikely(fp && fp->count))
+> +	if (unlikely(fp && fp->count)) {
+>  		atomic_add(fp->count, &u->scm_stat.nr_fds);
+> +		unix_add_edges(fp, u);
+> +	}
+>  }
+> =20
+>  static void scm_stat_del(struct sock *sk, struct sk_buff *skb)
+> @@ -1965,8 +1967,10 @@ static void scm_stat_del(struct sock *sk, struct s=
+k_buff *skb)
+>  	struct scm_fp_list *fp =3D UNIXCB(skb).fp;
+>  	struct unix_sock *u =3D unix_sk(sk);
+> =20
+> -	if (unlikely(fp && fp->count))
+> +	if (unlikely(fp && fp->count)) {
+>  		atomic_sub(fp->count, &u->scm_stat.nr_fds);
+> +		unix_del_edges(fp);
+> +	}
+>  }
+> =20
+>  /*
+> diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+> index 6a3572e43b9f..572ac0994c69 100644
+> --- a/net/unix/garbage.c
+> +++ b/net/unix/garbage.c
+> @@ -110,6 +110,58 @@ void unix_init_vertex(struct unix_sock *u)
+>  	INIT_LIST_HEAD(&vertex->entry);
+>  }
+> =20
+> +DEFINE_SPINLOCK(unix_gc_lock);
+> +static LIST_HEAD(unix_unvisited_vertices);
+> +
+> +void unix_add_edges(struct scm_fp_list *fpl, struct unix_sock *receiver)
+> +{
+> +	int i =3D 0, j =3D 0;
+> +
+> +	spin_lock(&unix_gc_lock);
+> +
+> +	while (i < fpl->count_unix) {
+> +		struct unix_sock *inflight =3D unix_get_socket(fpl->fp[j++]);
+> +		struct unix_edge *edge;
+> +
+> +		if (!inflight)
+> +			continue;
+> +
+> +		edge =3D fpl->edges + i++;
+> +		edge->predecessor =3D &inflight->vertex;
+> +		edge->successor =3D &receiver->vertex;
+> +
+> +		if (!edge->predecessor->out_degree++)
+> +			list_add_tail(&edge->predecessor->entry, &unix_unvisited_vertices);
+> +
+> +		INIT_LIST_HEAD(&edge->entry);
 
-For example, if the interrupt mask is set to 0x08420842,
-the current code will increment by that amount each iteration,
-leading to the following sequence of nonsense:
+Here  'edge->predecessor->entry' and 'edge->entry' refer to different
+object types right ? edge vs vertices. Perhaps using different field
+names could clarify the code a bit?=20
 
-mmc_rx_ipc_intr_mask: 969816526
-mmc_rx_ipc_intr_mask: 1108361744
+Also the edge->entry initialization just before the list_add_tail below
+looks strange/suspect. Perhaps it would be better to the init at
+allocation time?
 
-These registers have been included in the Ethernet statistics
-since the first version of MMC back in 2011 (commit 1c901a46d57).
-That commit also mentions the MMC interrupts as
-"something to add later (if actually useful)".
+Thanks!
 
-If the registers are actually useful, they should probably
-be part of the Ethernet register dump instead of statistics,
-but for now, drop the counters for mmc_rx_ipc_intr and
-mmc_rx_ipc_intr_mask completely.
-
-Signed-off-by: Jesper Nilsson <jesper.nilsson@axis.com>
----
-Changes in v2:
-- Drop the misleading registers completely
-- Link to v1: https://lore.kernel.org/r/20240216-stmmac_stats-v1-1-7065fa4613f8@axis.com
----
- drivers/net/ethernet/stmicro/stmmac/mmc.h            | 3 ---
- drivers/net/ethernet/stmicro/stmmac/mmc_core.c       | 3 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c | 2 --
- 3 files changed, 8 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/mmc.h b/drivers/net/ethernet/stmicro/stmmac/mmc.h
-index a0c05925883e..8cfba817491b 100644
---- a/drivers/net/ethernet/stmicro/stmmac/mmc.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/mmc.h
-@@ -78,9 +78,6 @@ struct stmmac_counters {
- 	unsigned int mmc_rx_fifo_overflow;
- 	unsigned int mmc_rx_vlan_frames_gb;
- 	unsigned int mmc_rx_watchdog_error;
--	/* IPC */
--	unsigned int mmc_rx_ipc_intr_mask;
--	unsigned int mmc_rx_ipc_intr;
- 	/* IPv4 */
- 	unsigned int mmc_rx_ipv4_gd;
- 	unsigned int mmc_rx_ipv4_hderr;
-diff --git a/drivers/net/ethernet/stmicro/stmmac/mmc_core.c b/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
-index 6a7c1d325c46..ab3b7770f62d 100644
---- a/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
-@@ -279,9 +279,6 @@ static void dwmac_mmc_read(void __iomem *mmcaddr, struct stmmac_counters *mmc)
- 	mmc->mmc_rx_fifo_overflow += readl(mmcaddr + MMC_RX_FIFO_OVERFLOW);
- 	mmc->mmc_rx_vlan_frames_gb += readl(mmcaddr + MMC_RX_VLAN_FRAMES_GB);
- 	mmc->mmc_rx_watchdog_error += readl(mmcaddr + MMC_RX_WATCHDOG_ERROR);
--	/* IPC */
--	mmc->mmc_rx_ipc_intr_mask += readl(mmcaddr + MMC_RX_IPC_INTR_MASK);
--	mmc->mmc_rx_ipc_intr += readl(mmcaddr + MMC_RX_IPC_INTR);
- 	/* IPv4 */
- 	mmc->mmc_rx_ipv4_gd += readl(mmcaddr + MMC_RX_IPV4_GD);
- 	mmc->mmc_rx_ipv4_hderr += readl(mmcaddr + MMC_RX_IPV4_HDERR);
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-index f628411ae4ae..28accdc98282 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-@@ -236,8 +236,6 @@ static const struct stmmac_stats stmmac_mmc[] = {
- 	STMMAC_MMC_STAT(mmc_rx_fifo_overflow),
- 	STMMAC_MMC_STAT(mmc_rx_vlan_frames_gb),
- 	STMMAC_MMC_STAT(mmc_rx_watchdog_error),
--	STMMAC_MMC_STAT(mmc_rx_ipc_intr_mask),
--	STMMAC_MMC_STAT(mmc_rx_ipc_intr),
- 	STMMAC_MMC_STAT(mmc_rx_ipv4_gd),
- 	STMMAC_MMC_STAT(mmc_rx_ipv4_hderr),
- 	STMMAC_MMC_STAT(mmc_rx_ipv4_nopay),
-
----
-base-commit: 0dd3ee31125508cd67f7e7172247f05b7fd1753a
-change-id: 20240216-stmmac_stats-e3561d460d0e
-
-Best regards,
--- 
-
-/^JN - Jesper Nilsson
--- 
-               Jesper Nilsson -- jesper.nilsson@axis.com
+Paolo
 
 
