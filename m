@@ -1,68 +1,50 @@
-Return-Path: <netdev+bounces-73253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 693FC85B9CA
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 12:00:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49B0885B9CC
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 12:00:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F0AC9B25C24
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 11:00:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8162B25C2B
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 11:00:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8929D65BA1;
-	Tue, 20 Feb 2024 11:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABEBD65BD7;
+	Tue, 20 Feb 2024 11:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EGemfxHt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wt3mXf1I"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B169364CF5
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 11:00:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8227065BCD;
+	Tue, 20 Feb 2024 11:00:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708426824; cv=none; b=IN103RAIbJdhq9ayGxYivnGwoH1Jfd83n/2jCz36O0A8HRVyaSEhzVeTcCBWRm5mvCluMOsboh3EmFjEiYX1pRo5G48h2gd2sSBv2Cn1OjxkwrFnSPkOfBwZET78MhVUoRARnDFyBRfxsXN9EraYY/KagjQP251B3ebVq2Nz0z4=
+	t=1708426827; cv=none; b=HYYyLzBS/uNLK2i0V35dVDIY/MI9ZXcsS3RPEywojDz/HP4RnF7beJgKaiNtm3Nz/f+Cfj6GAJot7nl6zluae1u2Q+06x38VyZpblKmgWHdeUp5mt9uIymfZvqUWCt2rskOpIB35ocQOmXsOokATiMHJ6zHKlz6ClGr6CZL9va0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708426824; c=relaxed/simple;
-	bh=XsIpv13rz/lT3C5Yk1rY4ipXRcYViObkYE3X8tyh7PA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bcv7m2ghKSJXRMg1y9BQuz66xK3QMvK5rxg1XcU91FwyYmIFGBwaSgxSMtECzA5GS8vMBPjw2eJ+85BWiS0PV7N2STPciSeP/mS8n0XzmPZNHUGNys+Q37q4mjFsNeUI84Ltfu5A/JAxn+qKIecwsPCyMcZL3U4QsDU8GTn+owc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EGemfxHt; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708426821;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=muSp0AC8ZRqk0qQ4C7RjpCavTHloAFHD5hoY2Acwh9o=;
-	b=EGemfxHtlqm7WtTqHrwIXljuzXLz8z70fJqDP5spojWx8+iKhshN9fzSp1dVS0lMh2IrqT
-	qFSrHod3GAcla0bXqFx/Qlrjg/1b68HBfe7J90oS5+99Kwbjp9TdeVTOEMyC/TKcsfMvap
-	Lbd2qYcperLhs6+neqjQdX0c8V3Uz+s=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-401-GEPawzbhNMm8bIsoFzeYEw-1; Tue,
- 20 Feb 2024 06:00:12 -0500
-X-MC-Unique: GEPawzbhNMm8bIsoFzeYEw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 068DA3CBD509;
-	Tue, 20 Feb 2024 11:00:12 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.225.74])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B4E3A492BC6;
-	Tue, 20 Feb 2024 11:00:10 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next] udp: add local "peek offset enabled" flag
-Date: Tue, 20 Feb 2024 12:00:01 +0100
-Message-ID: <67ab679c15fbf49fa05b3ffe05d91c47ab84f147.1708426665.git.pabeni@redhat.com>
+	s=arc-20240116; t=1708426827; c=relaxed/simple;
+	bh=bgILqxP4ntwO1OngAu+cvlttV/KeKYAEDPGg12EbbUw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=psvGF7xEdd5EMj4MtJNqBhZG9htNT4TvX4NeHoZG29uX0iGGlRcZNMpPMkhmoDceanTRqMRNNmZAk+KNNxZfmShbNv+fyEdrYLs7N3+hk71/mj8TzI+yJVwwSaFloK4ksMclKZgZZCEsLVgzmuG+FcK1U4Q7X0lFVn8M+USA8MA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wt3mXf1I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 21379C43399;
+	Tue, 20 Feb 2024 11:00:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708426827;
+	bh=bgILqxP4ntwO1OngAu+cvlttV/KeKYAEDPGg12EbbUw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Wt3mXf1IbUJSUAkLXD5PyIXuTNGYLNl2KhWGkseHKAO384eKe3cqkiirLaM9ekZOx
+	 8BpIolrcCGZdLCDF5x02vWyw8tFx0HMNJaN9uGfc7AG/KkykqlgDZdjPe4I5qO7jft
+	 VUq0pbl/cFkDZYKP5Wm/c+ahTCBYqwVHQ69/84xK+jTd3SAls9WRMSYeiLXmm1ojqr
+	 pVetB0zPDPHkWHYUnuxNkNCusb0BOfYE9C8xgq+3n7Q4uX61aYvzo0G7yvga8I3GZT
+	 OKi7ZPWZX7nk+yVncPo1ofNYXpIwm22Y3y4D4UrQiKLAU3FPzr2g4G9/my4wX+bJaC
+	 Yyl4JBUgeARMw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0150CC04E32;
+	Tue, 20 Feb 2024 11:00:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,99 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+Subject: Re: [PATCH net] docs: netdev: update the link to the CI repo
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170842682699.31830.17528906722029277540.git-patchwork-notify@kernel.org>
+Date: Tue, 20 Feb 2024 11:00:26 +0000
+References: <20240216161945.2208842-1-kuba@kernel.org>
+In-Reply-To: <20240216161945.2208842-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, corbet@lwn.net, linux-doc@vger.kernel.org
 
-We want to re-organize the struct sock layout. The sk_peek_off
-field location is problematic, as most protocols want it in the
-RX read area, while UDP wants it on a cacheline different from
-sk_receive_queue.
+Hello:
 
-Create a local (inside udp_sock) copy of the 'peek offset is enabled'
-flag and place it inside the same cacheline of reader_queue.
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Check such flag before reading sk_peek_off. This will save potential
-false sharing and cache misses in the fast-path.
+On Fri, 16 Feb 2024 08:19:45 -0800 you wrote:
+> Netronome graciously transferred the original NIPA repo
+> to our new netdev umbrella org. Link to that instead of
+> my private fork.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: corbet@lwn.net
+> CC: linux-doc@vger.kernel.org
+> 
+> [...]
 
-Tested under UDP flood with small packets. The struct sock layout
-update causes a 4% performance drop, and this patch restores completely
-the original tput.
+Here is the summary with links:
+  - [net] docs: netdev: update the link to the CI repo
+    https://git.kernel.org/netdev/net/c/23f9c2c066e7
 
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
----
- include/linux/udp.h | 10 ++++++++++
- net/ipv4/af_inet.c  |  2 +-
- net/ipv4/udp.c      |  2 +-
- net/ipv6/af_inet6.c |  2 +-
- 4 files changed, 13 insertions(+), 3 deletions(-)
-
-diff --git a/include/linux/udp.h b/include/linux/udp.h
-index d04188714dca..3748e82b627b 100644
---- a/include/linux/udp.h
-+++ b/include/linux/udp.h
-@@ -92,6 +92,9 @@ struct udp_sock {
- 
- 	/* This fields follows rcvbuf value, and is touched by udp_recvmsg */
- 	int		forward_threshold;
-+
-+	/* Cache friendly copy of sk->sk_peek_off >= 0 */
-+	bool		peeking_with_offset;
- };
- 
- #define udp_test_bit(nr, sk)			\
-@@ -109,6 +112,13 @@ struct udp_sock {
- 
- #define udp_sk(ptr) container_of_const(ptr, struct udp_sock, inet.sk)
- 
-+static inline int udp_set_peek_off(struct sock *sk, int val)
-+{
-+	sk_set_peek_off(sk, val);
-+	WRITE_ONCE(udp_sk(sk)->peeking_with_offset, val >= 0);
-+	return 0;
-+}
-+
- static inline void udp_set_no_check6_tx(struct sock *sk, bool val)
- {
- 	udp_assign_bit(NO_CHECK6_TX, sk, val);
-diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
-index ad278009e469..5daebdcbca32 100644
---- a/net/ipv4/af_inet.c
-+++ b/net/ipv4/af_inet.c
-@@ -1103,7 +1103,7 @@ const struct proto_ops inet_dgram_ops = {
- 	.recvmsg	   = inet_recvmsg,
- 	.mmap		   = sock_no_mmap,
- 	.splice_eof	   = inet_splice_eof,
--	.set_peek_off	   = sk_set_peek_off,
-+	.set_peek_off	   = udp_set_peek_off,
- #ifdef CONFIG_COMPAT
- 	.compat_ioctl	   = inet_compat_ioctl,
- #endif
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index f631b0a21af4..38cce7cc51f6 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -1589,7 +1589,7 @@ int udp_init_sock(struct sock *sk)
- 
- void skb_consume_udp(struct sock *sk, struct sk_buff *skb, int len)
- {
--	if (unlikely(READ_ONCE(sk->sk_peek_off) >= 0)) {
-+	if (unlikely(READ_ONCE(udp_sk(sk)->peeking_with_offset))) {
- 		bool slow = lock_sock_fast(sk);
- 
- 		sk_peek_offset_bwd(sk, len);
-diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
-index 959bfd9f6344..b90d46533cdc 100644
---- a/net/ipv6/af_inet6.c
-+++ b/net/ipv6/af_inet6.c
-@@ -736,7 +736,7 @@ const struct proto_ops inet6_dgram_ops = {
- 	.recvmsg	   = inet6_recvmsg,		/* retpoline's sake */
- 	.read_skb	   = udp_read_skb,
- 	.mmap		   = sock_no_mmap,
--	.set_peek_off	   = sk_set_peek_off,
-+	.set_peek_off	   = udp_set_peek_off,
- #ifdef CONFIG_COMPAT
- 	.compat_ioctl	   = inet6_compat_ioctl,
- #endif
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
