@@ -1,108 +1,152 @@
-Return-Path: <netdev+bounces-73234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9987485B881
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 11:04:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D551A85B88C
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 11:07:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC8C01C218F8
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 10:04:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC962B220E8
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 10:06:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1563760881;
-	Tue, 20 Feb 2024 10:04:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BF9C60DE7;
+	Tue, 20 Feb 2024 10:06:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fnWbcsa3"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Rg2YbmIL"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8E1B5D725;
-	Tue, 20 Feb 2024 10:04:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ADE65FDC5
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 10:06:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708423490; cv=none; b=luTCn5X6Cv6pJ6TkqhdJaysN2xR3DX6KP2ON2u38eswdm21d/PnFp0YThYCXTsQAStfdePqe6QGE/je7QwR4a/oE19H33xuRENNMPd8a/7JiERhHni4k7XJ2pfYMfkyxAVty4BJJ9KI/EN6Qr0Z2s9+3OJC80pj2aonBABBeAmI=
+	t=1708423596; cv=none; b=a9t66DYOXDEhecwk0kqduL3ofP/t8dgi9gloex6MjkOn/j8is8abEMvjBlqeWGnmkWhsvgreP5eIBG6W6rKfd3+K6EpokK0YSJGmHJc/Rc2jU9E2/JlqSg0kmdRDnugKXdaISlYmj4rj44gCsi+X5I1x/rS/XhIwciHauo5f3ao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708423490; c=relaxed/simple;
-	bh=g150G+kg+E+6/Sxn9+hi28SRHRZCgESL7xat3l+beq0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NSBa4WB9uz6hhxMb2RGkh9uiPQsm7Ub60rqhU1/W+x8wkliparekNRSavf+8CC5A/OG95633mFlBNd0FrA7bXvTfKuHCK5uesQ9wnO+qMtFFDsoDTES02Lq/2qoQmxxSlLiXTT2WevMMlHFhPpFsDgcNMKc2fKT/NGHGGYQ81ok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fnWbcsa3; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 1EBC9FF804;
-	Tue, 20 Feb 2024 10:04:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1708423480;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=g150G+kg+E+6/Sxn9+hi28SRHRZCgESL7xat3l+beq0=;
-	b=fnWbcsa3/8NtmxWPQLq/Zl+v1rrd5cYZROyVextY4szpev01ATeoNkpx5PW1glxlT0YyPn
-	BQgiLJJ8PcPopuznTvsy2KFJJ+ilzLse1Li1Q1YF/RdshpBRtCAt43bwSSLdSWCG1nDOjA
-	Uu1xigF3ORVHMkiWwpEp9R6HbWNk0VeI+Pg5q4S9D0d6FrmgxdBay3WgfSRr4G1et8fwYE
-	xn8rLL+m1PGZ8qBkUv940jJ+EACbNAifiPB/6x7JS0bgnm6aIrGkR3uZJEdRyAKsrgxO6+
-	11Y7T7+pKRDZy+AuObr3XMg1CRVzG2D8Z8OMKwkqm4WnIZk35lQXcY3oV/t14w==
-Date: Tue, 20 Feb 2024 11:04:38 +0100
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Alexander Aring <aahringo@redhat.com>
-Cc: Bo Liu <liubo03@inspur.com>, alex.aring@gmail.com,
- stefan@datenfreihafen.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linux-wpan@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: ieee802154: at86rf230: convert to use maple tree
- register cache
-Message-ID: <20240220110438.247e2746@xps-13>
-In-Reply-To: <CAK-6q+jnZOkSAM8_BQH=CaQhfCQwm0P+segZ+0E6oLeX=BhLHQ@mail.gmail.com>
-References: <20240202064512.39259-1-liubo03@inspur.com>
-	<20240202085547.46c81c96@xps-13>
-	<CAK-6q+jnZOkSAM8_BQH=CaQhfCQwm0P+segZ+0E6oLeX=BhLHQ@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1708423596; c=relaxed/simple;
+	bh=hq3+lF7NLnI6kOtYOQqyTEkM6SP70LuIzPOkdTwzKL4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BXYFRORWDKUMH0uNXnGuodyUbrv42ZamDweKGvkPjQJzLV/Im5y4TEKeYJfSLmftv2mRrE+2CA34Ia1DxmDwVmp8u9qRwdiPyiBBbZxOzP9Hp9cDyXT8DpkW5yy5fZuilyJWfI6FUU2iP8UJxooQmRkLCBjD8GrMTcZApCtGedI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Rg2YbmIL; arc=none smtp.client-ip=209.85.208.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2d0a4e1789cso62834731fa.3
+        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 02:06:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1708423592; x=1709028392; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OkchbsZxGOhljr94oe0JbGL0thIi/eckxczpaAhfho4=;
+        b=Rg2YbmILeBLbWPB7W+3h2LLUYYf+qecOQWD4U+9NchEYCohmfxZ4fBq52E7gljkqeQ
+         7ZBNOi9W1b/B5WInKdniu7da3OelPWaZaaWaycj/rVuunJIJkfEzDDNF0aAcj7MfH+PX
+         f6fwK/R9MtvSGFvo3o/PdMMxMIv1sR+6R4ml6czMvkgQzlUZjaS8gn5q+r4WxnhX2e4n
+         GMhAYZq8c9sWFhlORt2kmo9+agKpssgVqMXPFPHv93qF6lG7NOKF9yf/hl5S4QVjv1Jh
+         GtWCSEnEuLZg37A9SXVt4FERbLIiVd8ja9ft+P7dz8F5emZzlKlwZtKFNRJV6G5/Lppd
+         +GSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708423592; x=1709028392;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OkchbsZxGOhljr94oe0JbGL0thIi/eckxczpaAhfho4=;
+        b=GIV9CH9I3yJgwRDDTglT9vi+ew9sX0f3qcHLKoxPjyQuVt1iMhAXxt6ykowXDXYF7f
+         y6iXA/vvZck4yGpdyJkGNVTofRg0ehFdOXeZnQ2uX5aL99SN6e2oyvWAP/WDQK09SIS+
+         Zl76OaI/2vG0jiphvn6Um4i4UlU/iasvfCowqnKVaO6MLomQmomDG5hYICr8+AjJ8o3/
+         k1BHILXPzH8+fNL4w/cFY3S/gMNRUF4MmfbBF3+PdtFLCfxKk7wPSGFokD4NgRIFVx78
+         ZfFqxZW/cU42McNuoi6lBynQ/TTFJRzTeGw5n9ToYO8UDoCK/29gcA/dKZpsck2eDpaZ
+         hYfA==
+X-Forwarded-Encrypted: i=1; AJvYcCUQOQDsGP0SdaKD6Xg8gDcsR2nKIruNIeneBHRSggjAqTEbrBUvYw+UZvOxsgx2pjwM1LcIlujiWq6qrxAcpiim9HsN3teY
+X-Gm-Message-State: AOJu0YysVgU624XkqvOGdCM0loJejJzMSzeLTuwdjhdQZs23Lj2D/y2D
+	dwuMMVs4DHCb5liexzf8LyYZtmXDnsJrGFD8KOWjfs4ZxU0QCEsgLnB3DeP+1hA=
+X-Google-Smtp-Source: AGHT+IEKfiYlW6oMAe4WVdRoHVpic4US6QNAohcexgMfawSDVCg00TcQ3jPEsIUlcJJs8NsgqrGwiw==
+X-Received: by 2002:a2e:80ca:0:b0:2d2:2dec:8f5b with SMTP id r10-20020a2e80ca000000b002d22dec8f5bmr5492256ljg.30.1708423592566;
+        Tue, 20 Feb 2024 02:06:32 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.222.116])
+        by smtp.gmail.com with ESMTPSA id az19-20020adfe193000000b0033d6ff7f9edsm839756wrb.95.2024.02.20.02.06.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Feb 2024 02:06:32 -0800 (PST)
+Message-ID: <81506f26-d7c3-4b65-b47a-ca3ea3e4b5d6@linaro.org>
+Date: Tue, 20 Feb 2024 11:06:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] dt-bindings: net: wireless: qcom: Update maintainers
+Content-Language: en-US
+To: Jeff Johnson <quic_jjohnson@quicinc.com>, Kalle Valo <kvalo@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>
+Cc: Jeff Johnson <jjohnson@kernel.org>, ath10k@lists.infradead.org,
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ath11k@lists.infradead.org
+References: <20240217-ath1xk-maintainer-v1-1-9f7ff5fb6bf4@quicinc.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20240217-ath1xk-maintainer-v1-1-9f7ff5fb6bf4@quicinc.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
+Content-Transfer-Encoding: 7bit
 
-Hi,
+On 17/02/2024 22:30, Jeff Johnson wrote:
+> Add Jeff Johnson as a maintainer of the qcom,ath1*k.yaml files.
+> 
+> Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
+> ---
 
-aahringo@redhat.com wrote on Mon, 5 Feb 2024 14:42:09 -0500:
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-> Hi,
->=20
-> On Fri, Feb 2, 2024 at 2:56=E2=80=AFAM Miquel Raynal <miquel.raynal@bootl=
-in.com> wrote:
-> >
-> > Hi Bo,
-> >
-> > liubo03@inspur.com wrote on Fri, 2 Feb 2024 01:45:12 -0500:
-> > =20
-> > > The maple tree register cache is based on a much more modern data str=
-ucture
-> > > than the rbtree cache and makes optimisation choices which are probab=
-ly
-> > > more appropriate for modern systems than those made by the rbtree cac=
-he. =20
-> >
-> > What are the real intended benefits? Shall we expect any drawbacks?
-> > =20
->=20
-> I doubt it has really any benefits, only the slowpath is using regmap
-> to set some registers. Maybe if you change phy setting frequently it
-> might have an impact, but this isn't even a path considered to run
-> fast.
+Best regards,
+Krzysztof
 
-Ok, then let's take the series I guess. For the three patches:
-
-Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
-
-Thanks,
-Miqu=C3=A8l
 
