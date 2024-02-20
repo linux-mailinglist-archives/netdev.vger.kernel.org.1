@@ -1,286 +1,134 @@
-Return-Path: <netdev+bounces-73427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5723185C530
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 20:52:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B623A85C577
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 21:06:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C09AB1F232B5
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 19:52:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70D74282721
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 20:06:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E300214C5AA;
-	Tue, 20 Feb 2024 19:51:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 376E914A4DF;
+	Tue, 20 Feb 2024 20:05:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CHdaNa0y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YdT+XJIf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0648014A4F4;
-	Tue, 20 Feb 2024 19:51:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D82A77656;
+	Tue, 20 Feb 2024 20:05:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708458697; cv=none; b=hv8nG5Q0Lo1ChHBxujXMO19MQuOmWdGLgLUpw/tt5koY8MzUV2Y/PNL31g0XQymK4TrguICQX7SAKWZE6eamTrRsLs3vYhz2pgwOGrIPhFvFGDNEPS7Ml45raL7R87CzS/DY8brIsmv2KZjGb+DkJ1GPkxwGrMDXpfYm1ouZVlU=
+	t=1708459546; cv=none; b=AUMg7vq4jOqLCB1SGc/dcAWNa6mtoYN+i3eQxIBXd9lXzkgYascT+Z6PBcNSmn1HO5JA0OclzB6vILHvnaU2IjTR0ojMgsj25NeCPZPOVfReTuCeGPmzIn38adMyfF1eQBUQt+VYY7UJSwkNKsK4XXeQJrR3OgzwuVOjceckSVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708458697; c=relaxed/simple;
-	bh=qm4J52zhk5u0MtOFjSjMJaCZJdPHiRD6eD1ZnGm+OIY=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=J2XFSkXntTSR2nAr2+Qh+PBWAduAaM5aaMnCiFH55z35hFOe2erGtGXXx3CUoG91Z/dnqGpiMFUmojVYGVlmxUZHoprNnpb/0O9hP66JMrS9Fi48vAjNG23jQpKdMloIruyrIN3/SA+l4kClTcGzGOITokM56rTuGeHnD+gu5GQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CHdaNa0y; arc=none smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1708459546; c=relaxed/simple;
+	bh=0TezNLJVdcLshluzbqu/T/BkOu7/M8fDbBUUIqa/jb8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mTUoW3JwQguugWvcwbVNlKZzkjOv6+6yddfqaFatW9fzVDDsLw4feOHGJW1rKEJFpqNlZhmKm2dxGTzWiOP3b4OjY6Rd6fF2Xy0qqpEl/acPRvDbIOnhEZsoyWP5N6mhWPYsyIywZDhCubftJrrdwtdPaP5evXRMX1xYzbTgD2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YdT+XJIf; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2d22b8c6e0dso44297291fa.2;
-        Tue, 20 Feb 2024 11:51:35 -0800 (PST)
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6e457fab0e2so1446807b3a.0;
+        Tue, 20 Feb 2024 12:05:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708458694; x=1709063494; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20230601; t=1708459544; x=1709064344; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=jh2L6RcGiFdKCx7zZiu22h0FVnPxtlYVoTMnMq0TsIY=;
-        b=CHdaNa0yR9+h484haJUUQBi5AbzmS1u9pwNzwmQXfGQZ3uonhe9Zv5hsCRK2eGvtiH
-         OCwXQY4L6/OA/yCQAeR2uxW4HyHVVVzI8LRzz7VooTwl+2oIPV+HlqiYO3ilwPmPfaHx
-         WQIVMTF2C1Cd0NDrxlyNvCZMUYGBFxuKipmb783rRzcYWEnIs29Q1b3n+iWhfqVE2tqV
-         AM8+0GwSe+fp6Mfp1oIzYpqQQJCeFXNBVJVx6P082EdLYdT36Q4gBxwDhhE/qObHdZn8
-         T0stanRsqrrlajxdbp5QfspgHbNSLgR7pN/IcaMRbCCby8RZj/FM5UuhtDdOwwfS2Gno
-         og7Q==
+        bh=gW7vTF8rfNG49dpSnGO33E9gPKbjVpE73uaPhoG4koU=;
+        b=YdT+XJIf28doaeYvH/+zLfrVjH2v3Hk3UbNeYiHnTvod8/Mhofon9+YpK84o8aPW0M
+         4nhnHCfW68qsfFa/SpF5nBFNrkymFFHRqqhd0zLzJod0ndtryRuNTFBSbA5TxXWn7Ql1
+         jT2jxA1fs1EnkjsRk8Lu8i2oU448jsQ02QZL2jBy6fophdzQRh/UMOlRaJhsFaVxyRnY
+         j+sSYBnaKrlJLeh3DAiHSz2o+9aQwWjJ4JOrjWKvbNVJUdWrs0+yL1nwK9SppmqXBYZ6
+         cEcOkjmizAgSCrqI8FuCy8CyZlb6LWHRtLQ0VbpBBt/L3GK3DWCNC/PDv69XK74OPfh8
+         dPOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708458694; x=1709063494;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1708459544; x=1709064344;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jh2L6RcGiFdKCx7zZiu22h0FVnPxtlYVoTMnMq0TsIY=;
-        b=FKo53wLRddiGpY4K95FfnfkPFb8CSLxK5GZa8pnNm4aTY2SrxBjbmJ6DbXyuw5EXsO
-         H4HGL3rSZPzl2JZAKlXgRlZhra50dcxJp8fpkLU6hmkeJjLijUykEIGwUioFIwStHndq
-         p7Z5QCe7uXs9LRQy0Lg7Qlsj1TF6nrwaAD/PI4QiY8c6/phh0K7jnk5lmSELWxAW3o9q
-         B3QlZcakak1q2EbW3GFUchhs/XlOVUbA74uaj5srHd5YCh9McIhUKy+qjePx6IKZKEp7
-         7OjCNB14evr5clr+UyB7kF5dD0FnPPbH+o2WZ8jxBli4uFuONS+e0RMPcUn3FTQTeysO
-         O2CA==
-X-Forwarded-Encrypted: i=1; AJvYcCVQzNpGkNAfCDRty2Dzup1d9WUz+bA7HwjILayHPqJWyRaPYgFJ/hiuJzy9lxt9MngAZMstpEzBe3qraY8gvZJghiOUC+sEUF/v5FLwhIBHNpVTrXmo5cglYUAlzR0uEZ9MXvA+
-X-Gm-Message-State: AOJu0YwSzzFCYwRuyv1x1R9loIj+LK12thovZn+N1E66xA90tWjlQj6r
-	pYKa1vSQ232JYoQ8q5Bz3TwiiYk57Ke5SXkwHfLLpt6Z3oToM0yD
-X-Google-Smtp-Source: AGHT+IE0uB67JIW5GgBoh+sWq5kdhOomUj2tauYSPRIJ1xo33wjPZfkuNU9PbDI3HaFeWna9el6yvw==
-X-Received: by 2002:a05:651c:102c:b0:2d2:3a60:e6bb with SMTP id w12-20020a05651c102c00b002d23a60e6bbmr4288545ljm.52.1708458694171;
-        Tue, 20 Feb 2024 11:51:34 -0800 (PST)
-Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.googlemail.com with ESMTPSA id fs14-20020a05600c3f8e00b00411a595d56bsm15494853wmb.14.2024.02.20.11.51.32
+        bh=gW7vTF8rfNG49dpSnGO33E9gPKbjVpE73uaPhoG4koU=;
+        b=pKhsj5LU7xXHn0P+S5SyhAzVew+2JDd4ZJQzvh485axSzTSR8i7JHo6SwFnwef2s+T
+         XzHlGhM00l0VeGZee8eA000lUs5i4r+leWIBRyheTn6ZBhbm99WENKHrqBsspy+XiIx2
+         9quKGNHrZNQKJiZgJSKL3MQAmEBuqKQGL/DzgKaZgjrn/L8WTxSRJz+IjCwjVjd1XA1Y
+         KQoD4aqmxGbA3/nwC0j0VNAoXuJ2FlgM3IOrnfjztjRO42Obuzg9DLR5+ZKPd0vIUa1J
+         HxxlyEyi47qmWBo1cysw/KrWvisIly9FG0w2GDOpgWLxLtVyFhgWHVwn0j/6ZiKAfWo7
+         Wvdw==
+X-Forwarded-Encrypted: i=1; AJvYcCWJKapHy9z8N9XwoTBzhxJeS2btCphWdwsheBWunTe+5mTkKQuATAs560Xkb9cWZ69If9xSrRJIrKa89FJjg8smynw6qNWfNiBFM90fqyV20wTkAyPFTW4snSK4JDAzGr9JWx2C
+X-Gm-Message-State: AOJu0Yyr6emtFTeMcVUkitgFgaMvbFERoTtkMjUlWpAEuQIFQy7Mpy0y
+	DotbSymIocX9eJgiPeVLEcD8KxSTeDS65oqDOJz1A+hPQPiGxhXR
+X-Google-Smtp-Source: AGHT+IEFpe+TQnBO6E2Zo9LcH0NoW7qj2OoD0B8VMDIQsbL3NhuZGX/D86CD8PdMSwC3kb5ysijS/A==
+X-Received: by 2002:a05:6a00:93a5:b0:6e4:69ea:1f6d with SMTP id ka37-20020a056a0093a500b006e469ea1f6dmr6952335pfb.5.1708459543718;
+        Tue, 20 Feb 2024 12:05:43 -0800 (PST)
+Received: from localhost (dhcp-141-239-158-86.hawaiiantel.net. [141.239.158.86])
+        by smtp.gmail.com with ESMTPSA id s12-20020aa7828c000000b006e0651ec05csm7283639pfm.43.2024.02.20.12.05.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Feb 2024 11:51:33 -0800 (PST)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Robert Marko <robimarko@gmail.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [net-next RFC PATCH v2 3/3] net: phy: bcm7xxx: rework phy_driver table to new multiple PHY ID format
-Date: Tue, 20 Feb 2024 20:50:50 +0100
-Message-ID: <20240220195103.15809-4-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240220195103.15809-1-ansuelsmth@gmail.com>
-References: <20240220195103.15809-1-ansuelsmth@gmail.com>
+        Tue, 20 Feb 2024 12:05:43 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Tue, 20 Feb 2024 10:05:42 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Mike Snitzer <snitzer@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	Mikulas Patocka <mpatocka@redhat.com>, linux-kernel@vger.kernel.org,
+	dm-devel@lists.linux.dev, msnitzer@redhat.com, ignat@cloudflare.com,
+	damien.lemoal@wdc.com, bob.liu@oracle.com, houtao1@huawei.com,
+	peterz@infradead.org, mingo@kernel.org, netdev@vger.kernel.org,
+	allen.lkml@gmail.com, kernel-team@meta.com,
+	Alasdair Kergon <agk@redhat.com>
+Subject: Re: [PATCH 8/8] dm-verity: Convert from tasklet to BH workqueue
+Message-ID: <ZdUGFqLCpWez42Js@slm.duckdns.org>
+References: <20240130091300.2968534-1-tj@kernel.org>
+ <20240130091300.2968534-9-tj@kernel.org>
+ <c2539f87-b4fe-ac7d-64d9-cbf8db929c7@redhat.com>
+ <Zbq8cE3Y2ZL6dl8r@slm.duckdns.org>
+ <CAHk-=wjMz_1mb+WJsPhfp5VBNrM=o8f-x2=6UW2eK5n4DHff9g@mail.gmail.com>
+ <ZbrgCPEolPJNfg1x@slm.duckdns.org>
+ <ZbrjhJFMttj8lh3X@redhat.com>
+ <ZdUBHQQEN5-9AHBe@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZdUBHQQEN5-9AHBe@redhat.com>
 
-Rework bcm7xxx PHY driver table to new multiple PHY format
-implementation to reduce code duplication and final size of the compiled
-module.
+Hello, Mike.
 
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
- drivers/net/phy/bcm7xxx.c | 140 ++++++++++++++++++++++----------------
- 1 file changed, 82 insertions(+), 58 deletions(-)
+On Tue, Feb 20, 2024 at 02:44:29PM -0500, Mike Snitzer wrote:
+> I'm not sure where things stand with the 6.9 workqueue changes to add
+> BH workqueue.  I had a look at your various branches and I'm not
+> seeing where you might have staged any conversion patches (like this
+> dm-verity one).
 
-diff --git a/drivers/net/phy/bcm7xxx.c b/drivers/net/phy/bcm7xxx.c
-index 97638ba7ae85..6ff09c92f7fa 100644
---- a/drivers/net/phy/bcm7xxx.c
-+++ b/drivers/net/phy/bcm7xxx.c
-@@ -845,16 +845,6 @@ static int bcm7xxx_28nm_probe(struct phy_device *phydev)
- 	.phy_id		= (_oui),					\
- 	.phy_id_mask	= 0xfffffff0,					\
- 	.name		= _name,					\
--	/* PHY_GBIT_FEATURES */						\
--	.flags		= PHY_IS_INTERNAL,				\
--	.config_init	= bcm7xxx_28nm_config_init,			\
--	.resume		= bcm7xxx_28nm_resume,				\
--	.get_tunable	= bcm7xxx_28nm_get_tunable,			\
--	.set_tunable	= bcm7xxx_28nm_set_tunable,			\
--	.get_sset_count	= bcm_phy_get_sset_count,			\
--	.get_strings	= bcm_phy_get_strings,				\
--	.get_stats	= bcm7xxx_28nm_get_phy_stats,			\
--	.probe		= bcm7xxx_28nm_probe,				\
- }
- 
- #define BCM7XXX_28NM_EPHY(_oui, _name)					\
-@@ -862,16 +852,6 @@ static int bcm7xxx_28nm_probe(struct phy_device *phydev)
- 	.phy_id		= (_oui),					\
- 	.phy_id_mask	= 0xfffffff0,					\
- 	.name		= _name,					\
--	/* PHY_BASIC_FEATURES */					\
--	.flags		= PHY_IS_INTERNAL,				\
--	.config_init	= bcm7xxx_28nm_ephy_config_init,		\
--	.resume		= bcm7xxx_28nm_ephy_resume,			\
--	.get_sset_count	= bcm_phy_get_sset_count,			\
--	.get_strings	= bcm_phy_get_strings,				\
--	.get_stats	= bcm7xxx_28nm_get_phy_stats,			\
--	.probe		= bcm7xxx_28nm_probe,				\
--	.read_mmd	= bcm7xxx_28nm_ephy_read_mmd,			\
--	.write_mmd	= bcm7xxx_28nm_ephy_write_mmd,			\
- }
- 
- #define BCM7XXX_40NM_EPHY(_oui, _name)					\
-@@ -879,12 +859,6 @@ static int bcm7xxx_28nm_probe(struct phy_device *phydev)
- 	.phy_id         = (_oui),					\
- 	.phy_id_mask    = 0xfffffff0,					\
- 	.name           = _name,					\
--	/* PHY_BASIC_FEATURES */					\
--	.flags          = PHY_IS_INTERNAL,				\
--	.soft_reset	= genphy_soft_reset,				\
--	.config_init    = bcm7xxx_config_init,				\
--	.suspend        = bcm7xxx_suspend,				\
--	.resume         = bcm7xxx_config_init,				\
- }
- 
- #define BCM7XXX_16NM_EPHY(_oui, _name)					\
-@@ -892,41 +866,91 @@ static int bcm7xxx_28nm_probe(struct phy_device *phydev)
- 	.phy_id		= (_oui),					\
- 	.phy_id_mask	= 0xfffffff0,					\
- 	.name		= _name,					\
--	/* PHY_BASIC_FEATURES */					\
--	.flags		= PHY_IS_INTERNAL,				\
--	.get_sset_count	= bcm_phy_get_sset_count,			\
--	.get_strings	= bcm_phy_get_strings,				\
--	.get_stats	= bcm7xxx_28nm_get_phy_stats,			\
--	.probe		= bcm7xxx_28nm_probe,				\
--	.config_init	= bcm7xxx_16nm_ephy_config_init,		\
--	.config_aneg	= genphy_config_aneg,				\
--	.read_status	= genphy_read_status,				\
--	.resume		= bcm7xxx_16nm_ephy_resume,			\
- }
- 
- static struct phy_driver bcm7xxx_driver[] = {
--	BCM7XXX_28NM_EPHY(PHY_ID_BCM72113, "Broadcom BCM72113"),
--	BCM7XXX_28NM_EPHY(PHY_ID_BCM72116, "Broadcom BCM72116"),
--	BCM7XXX_16NM_EPHY(PHY_ID_BCM72165, "Broadcom BCM72165"),
--	BCM7XXX_28NM_GPHY(PHY_ID_BCM7250, "Broadcom BCM7250"),
--	BCM7XXX_28NM_EPHY(PHY_ID_BCM7255, "Broadcom BCM7255"),
--	BCM7XXX_28NM_EPHY(PHY_ID_BCM7260, "Broadcom BCM7260"),
--	BCM7XXX_28NM_EPHY(PHY_ID_BCM7268, "Broadcom BCM7268"),
--	BCM7XXX_28NM_EPHY(PHY_ID_BCM7271, "Broadcom BCM7271"),
--	BCM7XXX_28NM_GPHY(PHY_ID_BCM7278, "Broadcom BCM7278"),
--	BCM7XXX_28NM_GPHY(PHY_ID_BCM7364, "Broadcom BCM7364"),
--	BCM7XXX_28NM_GPHY(PHY_ID_BCM7366, "Broadcom BCM7366"),
--	BCM7XXX_16NM_EPHY(PHY_ID_BCM74165, "Broadcom BCM74165"),
--	BCM7XXX_28NM_GPHY(PHY_ID_BCM74371, "Broadcom BCM74371"),
--	BCM7XXX_28NM_GPHY(PHY_ID_BCM7439, "Broadcom BCM7439"),
--	BCM7XXX_28NM_GPHY(PHY_ID_BCM7439_2, "Broadcom BCM7439 (2)"),
--	BCM7XXX_28NM_GPHY(PHY_ID_BCM7445, "Broadcom BCM7445"),
--	BCM7XXX_40NM_EPHY(PHY_ID_BCM7346, "Broadcom BCM7346"),
--	BCM7XXX_40NM_EPHY(PHY_ID_BCM7362, "Broadcom BCM7362"),
--	BCM7XXX_40NM_EPHY(PHY_ID_BCM7425, "Broadcom BCM7425"),
--	BCM7XXX_40NM_EPHY(PHY_ID_BCM7429, "Broadcom BCM7429"),
--	BCM7XXX_40NM_EPHY(PHY_ID_BCM7435, "Broadcom BCM7435"),
--	BCM7XXX_16NM_EPHY(PHY_ID_BCM7712, "Broadcom BCM7712"),
-+{
-+	.name		= "Broadcom BCM7XXX 16NM EPHY",
-+	.ids		= (struct phy_driver_id []){
-+		BCM7XXX_16NM_EPHY(PHY_ID_BCM72165, "Broadcom BCM72165"),
-+		BCM7XXX_16NM_EPHY(PHY_ID_BCM74165, "Broadcom BCM74165"),
-+		BCM7XXX_16NM_EPHY(PHY_ID_BCM7712, "Broadcom BCM7712"),
-+	},
-+	.ids_count	= 3,
-+	/* PHY_BASIC_FEATURES */
-+	.flags		= PHY_IS_INTERNAL,
-+	.get_sset_count	= bcm_phy_get_sset_count,
-+	.get_strings	= bcm_phy_get_strings,
-+	.get_stats	= bcm7xxx_28nm_get_phy_stats,
-+	.probe		= bcm7xxx_28nm_probe,
-+	.config_init	= bcm7xxx_16nm_ephy_config_init,
-+	.config_aneg	= genphy_config_aneg,
-+	.read_status	= genphy_read_status,
-+	.resume		= bcm7xxx_16nm_ephy_resume,
-+},
-+{
-+	.name		= "Broadcom BCM7XXX 28NM GPHY",
-+	.ids		= (struct phy_driver_id []){
-+		BCM7XXX_28NM_GPHY(PHY_ID_BCM7250, "Broadcom BCM7250"),
-+		BCM7XXX_28NM_GPHY(PHY_ID_BCM7278, "Broadcom BCM7278"),
-+		BCM7XXX_28NM_GPHY(PHY_ID_BCM7364, "Broadcom BCM7364"),
-+		BCM7XXX_28NM_GPHY(PHY_ID_BCM7366, "Broadcom BCM7366"),
-+		BCM7XXX_28NM_GPHY(PHY_ID_BCM74371, "Broadcom BCM74371"),
-+		BCM7XXX_28NM_GPHY(PHY_ID_BCM7439, "Broadcom BCM7439"),
-+		BCM7XXX_28NM_GPHY(PHY_ID_BCM7439_2, "Broadcom BCM7439 (2)"),
-+		BCM7XXX_28NM_GPHY(PHY_ID_BCM7445, "Broadcom BCM7445"),
-+	},
-+	.ids_count	= 8,
-+	/* PHY_GBIT_FEATURES */
-+	.flags		= PHY_IS_INTERNAL,
-+	.config_init	= bcm7xxx_28nm_config_init,
-+	.resume		= bcm7xxx_28nm_resume,
-+	.get_tunable	= bcm7xxx_28nm_get_tunable,
-+	.set_tunable	= bcm7xxx_28nm_set_tunable,
-+	.get_sset_count	= bcm_phy_get_sset_count,
-+	.get_strings	= bcm_phy_get_strings,
-+	.get_stats	= bcm7xxx_28nm_get_phy_stats,
-+	.probe		= bcm7xxx_28nm_probe,
-+},
-+{
-+	.name		= "Broadcom BCM7XXX 28NM EPHY",
-+	.ids		= (struct phy_driver_id []){
-+		BCM7XXX_28NM_EPHY(PHY_ID_BCM72113, "Broadcom BCM72113"),
-+		BCM7XXX_28NM_EPHY(PHY_ID_BCM72116, "Broadcom BCM72116"),
-+		BCM7XXX_28NM_EPHY(PHY_ID_BCM7255, "Broadcom BCM7255"),
-+		BCM7XXX_28NM_EPHY(PHY_ID_BCM7260, "Broadcom BCM7260"),
-+		BCM7XXX_28NM_EPHY(PHY_ID_BCM7268, "Broadcom BCM7268"),
-+		BCM7XXX_28NM_EPHY(PHY_ID_BCM7271, "Broadcom BCM7271"),
-+	},
-+	.ids_count	= 6,
-+	/* PHY_BASIC_FEATURES */
-+	.flags		= PHY_IS_INTERNAL,
-+	.config_init	= bcm7xxx_28nm_ephy_config_init,
-+	.resume		= bcm7xxx_28nm_ephy_resume,
-+	.get_sset_count	= bcm_phy_get_sset_count,
-+	.get_strings	= bcm_phy_get_strings,
-+	.get_stats	= bcm7xxx_28nm_get_phy_stats,
-+	.probe		= bcm7xxx_28nm_probe,
-+	.read_mmd	= bcm7xxx_28nm_ephy_read_mmd,
-+	.write_mmd	= bcm7xxx_28nm_ephy_write_mmd,
-+},
-+{
-+	.name		= "Broadcom BCM7XXX 40NM EPHY",
-+	.ids		= (struct phy_driver_id []){
-+		BCM7XXX_40NM_EPHY(PHY_ID_BCM7346, "Broadcom BCM7346"),
-+		BCM7XXX_40NM_EPHY(PHY_ID_BCM7362, "Broadcom BCM7362"),
-+		BCM7XXX_40NM_EPHY(PHY_ID_BCM7425, "Broadcom BCM7425"),
-+		BCM7XXX_40NM_EPHY(PHY_ID_BCM7429, "Broadcom BCM7429"),
-+		BCM7XXX_40NM_EPHY(PHY_ID_BCM7435, "Broadcom BCM7435"),
-+	},
-+	.ids_count	= 5,
-+	/* PHY_BASIC_FEATURES */
-+	.flags          = PHY_IS_INTERNAL,
-+	.soft_reset	= genphy_soft_reset,
-+	.config_init    = bcm7xxx_config_init,
-+	.suspend        = bcm7xxx_suspend,
-+	.resume         = bcm7xxx_config_init,
-+},
- };
- 
- static struct mdio_device_id __maybe_unused bcm7xxx_tbl[] = {
+Yeah, the branch is for-6.9-bh-conversions in the wq tree but I haven't
+queued the DM patches yet. Wanted to make sure the perf signal from TCP
+conversion is okay first. FWIW, while Eric still has concerns, the initial
+test didn't show any appreciable regression with production memcache
+workload on our side.
+
+> I just staged various unrelated dm-verity and dm-crypt 6.8 fixes from
+> Mikulas that I'll be sending to Linus later this week (for v6.8-rc6).
+> Those changes required rebasing 'dm-6.9' because of conflicts, here is
+> the dm-6.9 branch:
+> https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/log/?h=dm-6.9
+> 
+> So we'll definitely need to rebase your changes on dm-6.9 to convert
+> dm-crypt and dm-verity over to your BH workqueue.  Are you OK with
+> doing that or would you prefer I merge some 6.9 workqueue branch that
+> you have into dm-6.9? And then Mikulas and I work to make the required
+> DM target conversion changes?
+
+Oh, if you don't mind, it'd be best if you could pull wq/for-6.9 into dm-6.9
+and do the conversions there.
+
+Thank you.
+
 -- 
-2.43.0
-
+tejun
 
