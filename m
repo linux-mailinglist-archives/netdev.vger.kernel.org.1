@@ -1,218 +1,146 @@
-Return-Path: <netdev+bounces-73416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28BC685C4E7
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 20:34:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 71FE785C4ED
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 20:36:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4964A1C21F21
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 19:34:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A334D1C21A96
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 19:36:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ECB076C89;
-	Tue, 20 Feb 2024 19:34:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCADF13AA2E;
+	Tue, 20 Feb 2024 19:36:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W4ak81ii"
+	dkim=pass (2048-bit key) header.d=stgolabs.net header.i=@stgolabs.net header.b="bCLKgtoF"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from seashell.cherry.relay.mailchannels.net (seashell.cherry.relay.mailchannels.net [23.83.223.162])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B64F3137C51
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 19:33:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708457642; cv=none; b=LbUNB9uFC4+9LIiM/AtPIjWikNy9nTKuT2zX6Gf2UISDmYyb2mVKMW0wqSew39lIV0ykUhrTpppSLLoc2jvdDfLW9rArS0uA/MaUOlD0dgM5tMJamRS58Rr8O7UbiLa4uVebhUqg7escSECpigYlcQ6hmqdQLs0jIFpCDTXY06o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708457642; c=relaxed/simple;
-	bh=MSsWNZbrSA8jmwOTwY01KkTTLNM6KGirzTg57mM/DHc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=bMWbyxg3AUbE56we4dHdMUnnHoh2g4+tqrXMcA1RJGe3QDAtZoHK9u1pVLJhO2yKCCE6u9fFwP0+dbvBymbOqzQYDNft1y94AQ4VNqaJPN8+Ea6HJeAh9pTiATCCr2tNxcVomVvcRuwd7hzchn9hVogs02MoiB38Dt6jsXee2CQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W4ak81ii; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708457638;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A7D436135;
+	Tue, 20 Feb 2024 19:36:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.223.162
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708457788; cv=pass; b=PB9xUArCO9iHwDNjz13Z5v04Bc4hZh6wcKdnVzbf2ELCxxS4cPronmLtk2o8QG36x67sJlUKIKqfCQIyYlW41MhBbqiKF69FeBq9GglPkoRQtxyXLFUfUGcmZFNLI4Ax69/Pt3XoWQhDY9q0cgJmC1yiPyWprISulrFmAeNXcgk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708457788; c=relaxed/simple;
+	bh=hJt/IYVb0eRDuwpPuHvdH7KdNxea+aTwmt9C56h0Cws=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vh5pcxiizzsEAGDEkuvSL4wyEseVGCv1Z8JMLvneAPH68dXPWGrC1mb1TGAi4NFUtnb+xPcNa5caay0u8L2bsSYvU5I58elAkVoBpSywYXC9ZEOURlED4jK73iuZhqrGy8rRR1RSt28x19rV0/A0MPUf7TYpADbUPxuX6kXmSts=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stgolabs.net; spf=pass smtp.mailfrom=stgolabs.net; dkim=pass (2048-bit key) header.d=stgolabs.net header.i=@stgolabs.net header.b=bCLKgtoF; arc=pass smtp.client-ip=23.83.223.162
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stgolabs.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stgolabs.net
+X-Sender-Id: dreamhost|x-authsender|dave@stgolabs.net
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+	by relay.mailchannels.net (Postfix) with ESMTP id 795DBC2827;
+	Tue, 20 Feb 2024 19:36:19 +0000 (UTC)
+Received: from pdx1-sub0-mail-a209.dreamhost.com (unknown [127.0.0.6])
+	(Authenticated sender: dreamhost)
+	by relay.mailchannels.net (Postfix) with ESMTPA id B5A33C3498;
+	Tue, 20 Feb 2024 19:36:18 +0000 (UTC)
+ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1708457778; a=rsa-sha256;
+	cv=none;
+	b=rq8hwytgf7mfKXDi/jrMKsK0qeveLAg+21O1J0OqhR26kVBhVXZpEGmDShPL2sbwzfNo6h
+	TOij+q/41S3xbwvyQmMUZWWwKl79hgkJLCDytUeNkr4uxA3GoOIz+Tf6KsXRh/6cSwGXGZ
+	/n7dR7MpEmHeReoGt6od0xgWFfWyUyTKdF7/8Mlkckg8Pz3f3hQTIYNnb8oWQsKzcugKYE
+	zWY+VjWD9g/y3Z214qhJDNj1k3/r5Tt8O1qhRLuxCfy5nNGqFNVVGA9we6+8j/v2uUFCk4
+	wHBkbz+6txUL6d/cZlFMdvj6NB/tsJ4Hu8Y1DoSUzTFqBsJcy/HQ2dAro1VWGw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+	s=arc-2022; t=1708457778;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=d2+K9SYZnDq2b2vxFoXzss6f5L3wcHVChuNq2JQkC0k=;
-	b=W4ak81iiUroQCB+SEnxHqZc8n2HvxeZ0BW0QS+R25uazlr4Us9p5HAqGDAuXV1h4/hE3j2
-	Etx7L69lE0/Npnk12Zfxvvs7OHuofy7BNKuCDs6HxTc20Ru9PnNcxcCewV/sxqQxbA4lMu
-	IYUpCZ4L0i0oKGPiUybCVP3yISzqKVE=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-516-cmSz0x-FP2aKsLGGCPPIZA-1; Tue, 20 Feb 2024 14:33:56 -0500
-X-MC-Unique: cmSz0x-FP2aKsLGGCPPIZA-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a30f9374db7so698554266b.0
-        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 11:33:56 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708457635; x=1709062435;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=d2+K9SYZnDq2b2vxFoXzss6f5L3wcHVChuNq2JQkC0k=;
-        b=FUHqjHtRcRG6D3IBpmhqFK7o0nrbdTDreBFWU6tkMEOd4SZJVYJiR7YmfcT9SXEMsa
-         dbeq3BNevjtpcfGW/Opy85oPeoleJ2O6GQreFkW+Lsa40XEDP5fwpwD95kflHyPsQYhW
-         ew7XGVd2qCSuW+nSUl60N1omOmwTzBjKPPsyY44m3FaTFdBGKUqtqeSEwDjKlfvPZCPR
-         dxmhyLVTEA8tiGB6Y0ktaQIWTzHfcYlIwG9eszY3diOu1xLubEVFlcSA53uFDRXBHYPT
-         r6lVW3+3nyyEoVaTGxr8jeecV02oo4gOfH6w20vO2c+vXsjC89S16bY1t80bRZ5ezZgY
-         ok3g==
-X-Forwarded-Encrypted: i=1; AJvYcCWC5Iv0KU5qpXnswzJpYw/6wzq+ARHWus5sIyk7cd+8Y+xAu9MoI6/CArf+e2jAfexOQEE7C/vpsY0KsUcwO6dHxWCqtQWv
-X-Gm-Message-State: AOJu0YxZczHz/ao9sVpdtb8VcvsRjztUH16uweCCRNr8QIddEv9ETNsu
-	asRimMLLaEhQ4GP5Y4saLXqfOJoVTDLFiKVef9I3BMda9H8vXhVGIPYq4vgqkD9wc8l92ddrdod
-	mKysOFlesD0Sy2Bn/4dq5jXF8t5jogyrna0TrZ6rz1zUz6usHJNdETQ==
-X-Received: by 2002:a17:907:7ea9:b0:a3e:b57f:2b8a with SMTP id qb41-20020a1709077ea900b00a3eb57f2b8amr6030605ejc.10.1708457635381;
-        Tue, 20 Feb 2024 11:33:55 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGbxIJ1yuGOFI6iLmW9ulpsaRCDfsBBUAz1piwEm4OhcKvAQVntnoQjtfgklYIhoIN0YmrB+Q==
-X-Received: by 2002:a17:907:7ea9:b0:a3e:b57f:2b8a with SMTP id qb41-20020a1709077ea900b00a3eb57f2b8amr6030569ejc.10.1708457635000;
-        Tue, 20 Feb 2024 11:33:55 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id pk27-20020a170906d7bb00b00a3ee20b00d0sm1254310ejb.4.2024.02.20.11.33.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Feb 2024 11:33:53 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 4E1A010F63D2; Tue, 20 Feb 2024 20:33:53 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>, Daniel Borkmann <daniel@iogearbox.net>,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
- <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, KP
- Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
- <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard
- Brouer <hawk@kernel.org>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, Eric Dumazet
- <edumazet@google.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 2/3] bpf: test_run: Use system page pool for
- XDP live frame mode
-In-Reply-To: <83e7faeb4a241a00053fc71dbb18d1dbc7c0fac6.camel@redhat.com>
-References: <20240215132634.474055-1-toke@redhat.com>
- <20240215132634.474055-3-toke@redhat.com>
- <59c022bf-4cc4-850f-f8ab-3b8aab36f958@iogearbox.net>
- <e73b7562e4333d3295eaf6d08bc1c6219c2541e5.camel@redhat.com>
- <87frxn1dnq.fsf@toke.dk>
- <83e7faeb4a241a00053fc71dbb18d1dbc7c0fac6.camel@redhat.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Tue, 20 Feb 2024 20:33:53 +0100
-Message-ID: <877ciz0w2m.fsf@toke.dk>
+	 in-reply-to:in-reply-to:references:references:dkim-signature;
+	bh=hJt/IYVb0eRDuwpPuHvdH7KdNxea+aTwmt9C56h0Cws=;
+	b=5+WwerzT6sexvjUn0gTAv/2v9cuIVnWsu4m7u04KPJQNZNiTO+oqugObIxEwNEQY+bU6fF
+	R01G+Kb7dtW6+uXHYrlzbKMtWHJ8vMPq6EpBOArjSr7OWtQZ2pCMPvjl8J4mQC2hx+hpwb
+	0pcCAbJ1mAARqW8m6LCRWqhmcSGZFuRW3gGUusvSlKeCZdOiGbvsE34J9VZDmivr9Ff6OJ
+	3KuabrbMYstSyB6R9I7IsFO3h9iWiOSPAqCNY4+SqIpFF49BcwLBKEVZpo+0LsrkVZp38n
+	NXh5a8C268Cohfyu2wttF45L4Xas/g49ul8i9S2pVTPFxw363AevUfl8FF+TKQ==
+ARC-Authentication-Results: i=1;
+	rspamd-6bdc45795d-cxkcq;
+	auth=pass smtp.auth=dreamhost smtp.mailfrom=dave@stgolabs.net
+X-Sender-Id: dreamhost|x-authsender|dave@stgolabs.net
+X-MC-Relay: Neutral
+X-MailChannels-SenderId: dreamhost|x-authsender|dave@stgolabs.net
+X-MailChannels-Auth-Id: dreamhost
+X-Tank-Keen: 21cbfddf12f86fe0_1708457779192_187779232
+X-MC-Loop-Signature: 1708457779192:1768560798
+X-MC-Ingress-Time: 1708457779192
+Received: from pdx1-sub0-mail-a209.dreamhost.com (pop.dreamhost.com
+ [64.90.62.162])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
+	by 100.127.149.162 (trex/6.9.2);
+	Tue, 20 Feb 2024 19:36:19 +0000
+Received: from offworld (ip72-199-50-187.sd.sd.cox.net [72.199.50.187])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: dave@stgolabs.net)
+	by pdx1-sub0-mail-a209.dreamhost.com (Postfix) with ESMTPSA id 4TfV5F37s1zKk;
+	Tue, 20 Feb 2024 11:36:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=stgolabs.net;
+	s=dreamhost; t=1708457778;
+	bh=hJt/IYVb0eRDuwpPuHvdH7KdNxea+aTwmt9C56h0Cws=;
+	h=Date:From:To:Cc:Subject:Content-Type;
+	b=bCLKgtoFrIDxE9TulzKX03YtzRwqsgpaiO1i9BXGIp+M/aijYBAeHDzbbNlnPTFyc
+	 ejaeFhjJd/gZ7Cdex0mXbkKVupxsDRzUyRQfjUFr4a+TS9h85+ECcC0H8pO18k8uIO
+	 n70U1MC5zJ7leo2cLL5eCevDb2kcBF+KXkdk7N2r+uAyWDj4anHZheabv8ot3oWU2g
+	 2skaS3Y9t+PA+jyqDxj9kc8s/6SB6r6MnCR8wcc9xqDEnQpZIshjC77ywO5yv0tG/A
+	 VBCyvesPDEDOfUr+GoumHVd47XY3MrRVlMCopA/GxdHrGfbBklxsCikci5TlS3T+P0
+	 Q/tNRI2Y7uAJA==
+Date: Tue, 20 Feb 2024 11:36:14 -0800
+From: Davidlohr Bueso <dave@stgolabs.net>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Tejun Heo <tj@kernel.org>, mpatocka@redhat.com,
+	linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev,
+	msnitzer@redhat.com, ignat@cloudflare.com, damien.lemoal@wdc.com,
+	bob.liu@oracle.com, houtao1@huawei.com, peterz@infradead.org,
+	mingo@kernel.org, netdev@vger.kernel.org, allen.lkml@gmail.com,
+	kernel-team@meta.com,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Alan Stern <stern@rowland.harvard.edu>, linux-usb@vger.kernel.org,
+	mchehab@kernel.org
+Subject: Re: [PATCH 5/8] usb: core: hcd: Convert from tasklet to BH workqueue
+Message-ID: <20240220193614.b2rbzxmbobp3cbv2@offworld>
+Mail-Followup-To: Linus Torvalds <torvalds@linux-foundation.org>,
+	Tejun Heo <tj@kernel.org>, mpatocka@redhat.com,
+	linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev,
+	msnitzer@redhat.com, ignat@cloudflare.com, damien.lemoal@wdc.com,
+	bob.liu@oracle.com, houtao1@huawei.com, peterz@infradead.org,
+	mingo@kernel.org, netdev@vger.kernel.org, allen.lkml@gmail.com,
+	kernel-team@meta.com,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Alan Stern <stern@rowland.harvard.edu>, linux-usb@vger.kernel.org,
+	mchehab@kernel.org
+References: <20240130091300.2968534-1-tj@kernel.org>
+ <20240130091300.2968534-6-tj@kernel.org>
+ <bckroyio6l2nt54refuord4pm6mqylt3adx6z2bg6iczxkbnyk@bb5447rqahj5>
+ <CAHk-=whqae-+7Q7wbtnEj7YmR8vsx6skTj6j-srV2Fz7cBZ2ag@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <CAHk-=whqae-+7Q7wbtnEj7YmR8vsx6skTj6j-srV2Fz7cBZ2ag@mail.gmail.com>
+User-Agent: NeoMutt/20220429
 
-Paolo Abeni <pabeni@redhat.com> writes:
+On Tue, 20 Feb 2024, Linus Torvalds wrote:
 
-> On Tue, 2024-02-20 at 14:14 +0100, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->> Paolo Abeni <pabeni@redhat.com> writes:
->>=20
->> > On Tue, 2024-02-20 at 10:06 +0100, Daniel Borkmann wrote:
->> > > On 2/15/24 2:26 PM, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->> > > > The BPF_TEST_RUN code in XDP live frame mode creates a new page po=
-ol
->> > > > each time it is called and uses that to allocate the frames used f=
-or the
->> > > > XDP run. This works well if the syscall is used with a high repeti=
-tions
->> > > > number, as it allows for efficient page recycling. However, if use=
-d with
->> > > > a small number of repetitions, the overhead of creating and tearin=
-g down
->> > > > the page pool is significant, and can even lead to system stalls i=
-f the
->> > > > syscall is called in a tight loop.
->> > > >=20
->> > > > Now that we have a persistent system page pool instance, it becomes
->> > > > pretty straight forward to change the test_run code to use it. The=
- only
->> > > > wrinkle is that we can no longer rely on a custom page init callba=
-ck
->> > > > from page_pool itself; instead, we change the test_run code to wri=
-te a
->> > > > random cookie value to the beginning of the page as an indicator t=
-hat
->> > > > the page has been initialised and can be re-used without copying t=
-he
->> > > > initial data again.
->> > > >=20
->> > > > Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
->> > >=20
->> > > [...]
->> > > > -
->> > > >   	/* We create a 'fake' RXQ referencing the original dev, but wit=
-h an
->> > > >   	 * xdp_mem_info pointing to our page_pool
->> > > >   	 */
->> > > >   	xdp_rxq_info_reg(&xdp->rxq, orig_ctx->rxq->dev, 0, 0);
->> > > > -	xdp->rxq.mem.type =3D MEM_TYPE_PAGE_POOL;
->> > > > -	xdp->rxq.mem.id =3D pp->xdp_mem_id;
->> > > > +	xdp->rxq.mem.type =3D MEM_TYPE_PAGE_POOL; /* mem id is set per-f=
-rame below */
->> > > >   	xdp->dev =3D orig_ctx->rxq->dev;
->> > > >   	xdp->orig_ctx =3D orig_ctx;
->> > > >=20=20=20
->> > > > +	/* We need a random cookie for each run as pages can stick around
->> > > > +	 * between runs in the system page pool
->> > > > +	 */
->> > > > +	get_random_bytes(&xdp->cookie, sizeof(xdp->cookie));
->> > > > +
->> > >=20
->> > > So the assumption is that there is only a tiny chance of collisions =
-with
->> > > users outside of xdp test_run. If they do collide however, you'd lea=
-k data.
->> >=20
->> > Good point. @Toke: what is the worst-case thing that could happen in
->> > case a page is recycled from another pool's user?
->> >=20
->> > could we possibly end-up matching the cookie for a page containing
->> > 'random' orig_ctx/ctx, so that bpf program later tries to access
->> > equally random ptrs?
->>=20
->> Well, yes, if there's a collision in the cookie value we'll end up
->> basically dereferencing garbage pointer values, with all the badness
->> that ensues (most likely just a crash, but system compromise is probably
->> also possible in such a case).
->>=20
->> A 64-bit value is probably too small to be resistant against random
->> collisions in a "protect global data across the internet" type scenario
->> (for instance, a 64-bit cryptographic key is considered weak). However,
->> in this case the collision domain is only for the lifetime of the
->> running system, and each cookie value only stays valid for the duration
->> of a single syscall (seconds, at most), so I figured it was acceptable.
->>=20
->> We could exclude all-zeros as a valid cookie value (and also anything
->> that looks as a valid pointer), but that only removes a few of the
->> possible random collision values, so if we're really worried about
->> random collisions of 64-bit numbers, I think a better approach would be
->> to just make the cookie a 128-bit value instead. I can respin with that
->> if you prefer? :)
->
-> I must admit that merging a code that will allow trashing the kernel -
-> even with a very low probability - is quite scaring to me.
->
-> How much relevant is the recycle case optimization? Could removing
-> completely that optimization be considered?
+>Mauro - the BH workqueue should provide the same kind of latency as
+>the tasklets, and it would be good to validate early that yes, this
+>workqueue conversion works well in practice. Since you have an actual
+>real-life test-case, could you give it a try?
 
-Did a quick test of this, and skipping the recycling eats ~12.5%
-performance, so I don't think getting rid of it is a good solution.
+In general I think it's worth pointing out that future conversions should
+still aim for an equivalent in task context, and now with disable/enable_work
+a lot opens up for regular wq conversions. If users/maintainers shout about
+latency, then use BH wq.
 
-However, increasing the cookie size to 128 bits makes no performance
-difference (everything stays in the same cache lines). If we do that,
-the collision probability enters "won't happen before the heat death of
-the universe" territory, so I don't think there's any real concern that
-this will happen.
-
-I'll respin with the bigger cookie size (and add that patch Olek
-suggested to remove the init callback from the page pool code).
-
--Toke
-
+Thanks,
+Davidlohr
 
