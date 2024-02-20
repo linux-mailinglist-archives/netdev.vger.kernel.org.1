@@ -1,164 +1,194 @@
-Return-Path: <netdev+bounces-73285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFAA185BC0F
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 13:27:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C30A85BC1C
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 13:28:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E83C1C20B4E
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 12:27:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB1F31F231EC
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 12:28:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E32B66996B;
-	Tue, 20 Feb 2024 12:27:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9460A60867;
+	Tue, 20 Feb 2024 12:28:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WPSM3YHc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA43767C62
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 12:27:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB062692E6;
+	Tue, 20 Feb 2024 12:28:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708432032; cv=none; b=M1vypZWDsp+XGLbNZ0ZVtJF+FwriQI0Fq0qK+RzIH+eWE4g3g5Y45GAq3XcWmFVtVXuAVVrej7TkqncqisKV+LlVCVFbtYB2cG6eVRut50bFqJm7gmyjpY9Q3yrC52DYydVrnEnuxhJp+GFiE2EwfzzDCSVH5CbUL8gsWo6Hdm8=
+	t=1708432131; cv=none; b=sRSlEdFCm2b8tN0YFht36WECPUkuDua5TR++l/sXFOtCym7sD+VOh3DKH1kBMIiQLWTetCdlT+YjjAyKbP98VC8LfN6kNgde5xSvwtGpFlnS8q73cm2Yv6LOOXYObpYBGJL09LnE7rvyVah32gYeFt340OOHyGlcYQ0RxeDKcIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708432032; c=relaxed/simple;
-	bh=6ZB4CanqgJUkj2DwoUXmNrC8k6WO23uMtpwBInue2bw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FgGk2A89g7elcoagZxRVnDHLRJwWOmHpxjf2eMmSzfbZzB9nsyZj8G4ICAbMpx1kH8xgt0FU9jMwuEWmeNnl0FWPU6UMUlHjrQt+UxEcjnAhMBmz/AdsQOeXOg8ZnA82NFGg9UTlRUNbg4ck4+Dhn4tSk0XJuzUdQfPoXpuMGnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.34] (g34.guest.molgen.mpg.de [141.14.220.34])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 5C16E61E5FE01;
-	Tue, 20 Feb 2024 13:26:35 +0100 (CET)
-Message-ID: <dc03726a-d59b-47a1-b394-7a435f8aee1a@molgen.mpg.de>
-Date: Tue, 20 Feb 2024 13:26:34 +0100
+	s=arc-20240116; t=1708432131; c=relaxed/simple;
+	bh=r8QqN47qRi91jsH0wIkGa3g4GltqYUwA5TqWyyelcXI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=u2zAuNtG2TwfeNpirNu0nKOznYnVmSSKkjzhXzTl9m2usl3DPLo/F8luLx0FqGgJbJufQQcimhyj2DMzI/QhzrAd13KjomSwjMAnJ+iwsZfkeS7wKZzET5YhzQaKd+IZr4RLd0E9nChl86mjxNGgqANz8CIV1qOnMm+wPRxkAfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WPSM3YHc; arc=none smtp.client-ip=209.85.222.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-7d6a85586e3so2545770241.2;
+        Tue, 20 Feb 2024 04:28:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708432129; x=1709036929; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3aiQTzceFpJVhyzyIE+RmD0TpAMXT5KcbC8jdpGnhkc=;
+        b=WPSM3YHckS+UX6Rthh8SWyXdb1SGIhvZhDGXxqE96lMq4opo15++/TVatAwXKHOTbH
+         nv7ktcpldhWYUputrZI9OD9Jq8C8+uEgeWLI9otavwqJnC9itMAhX0/YTvImuW6J+7Ab
+         wuHJUh3Xg0zjCOJBmuTwBaYyzm0f/35I7RbMswrGpE4d/5YfSCzyQVD+Wg9cMb8DJGKJ
+         O+MdcVDVMHbvaUUhEveFwitc7WhdsZ+MosGc27+/HOs9ZHgLvKX4N/hJs+hP/A1LnMIy
+         WqkZAylJatOxEyvZzEwydM5/8xcbpW69CuqimQebuJozBmaY5duY/q4C97JxgTPSCjmo
+         VvVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708432129; x=1709036929;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3aiQTzceFpJVhyzyIE+RmD0TpAMXT5KcbC8jdpGnhkc=;
+        b=Be4SECqH1UUQxyFeyeujh23ugf1eyJpqUcwN+2aAORDEuhpeeXYNUx+w8nyrNtvETF
+         orM7ZUWnk8u6xprXMJATHvCAAGa40O5yvSkMeOIGoCiqs9wlbnwvKSX+PD6/lyZ/rnRd
+         m4SIP7P+yy0Kd1InQb1UL6R0lRrnS2UewsHjJYMbVwRju5AURGftZDa5x3Epq5mqFWTJ
+         2zoHeEJuYPcUn6znKSy0HMyRCs6zuYH1owy4qC1ycCxVA1yrk0V/ZF6xRw6+6TQ3Cx3d
+         kDq7qRUgX10odiCj5q3M5etp8i4pDN9UrYEKxBPZLsZ0IFPF41agDldJv6V+ilLyVk1L
+         czjw==
+X-Forwarded-Encrypted: i=1; AJvYcCVbfT6MSXYd5BHBCSBt2x4rr+MZbub0TCHYkHKMTF+wo52KB88vP/qjg/8H9CR7UEdRAnqKDm7VVx8c6fg0eifs5L93Pr98A5WaxjDoNQwsQWhjrXEeqaTfktEY6r5zA1/cd+Kt
+X-Gm-Message-State: AOJu0Yx897ZRzuapYprZaSAkdkRsZxtI2L6ygpIdHNMaG3gsTRg32oXs
+	m8dozkQPRUAwhH5fznClTX3M97F8Wu22xwL1nfL9i5Pj77Wrofbh4KdeyHLDTItIasFOr7z0i9I
+	xat82X8betmkqXNlwRpSikHstzY0=
+X-Google-Smtp-Source: AGHT+IHwF30bfGk9916HJb5yDfWumiVA0uNVSaYeMQ5DCb40KQGNw9eOj8D8lwggmW3cnt65RSM9JA16qoblaYVbCz4=
+X-Received: by 2002:a1f:e207:0:b0:4cb:fc25:7caa with SMTP id
+ z7-20020a1fe207000000b004cbfc257caamr4078533vkg.14.1708432128652; Tue, 20 Feb
+ 2024 04:28:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [iwl-next v1 2/2] ice: tc: allow ip_proto
- matching
-Content-Language: en-US
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, wojciech.drewek@intel.com,
- marcin.szycik@intel.com, netdev@vger.kernel.org,
- Jedrzej Jagielski <jedrzej.jagielski@intel.com>, sridhar.samudrala@intel.com
-References: <20240220105950.6814-1-michal.swiatkowski@linux.intel.com>
- <20240220105950.6814-3-michal.swiatkowski@linux.intel.com>
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20240220105950.6814-3-michal.swiatkowski@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240213220331.239031-1-paweldembicki@gmail.com>
+ <20240213220331.239031-3-paweldembicki@gmail.com> <6db0fd10-556d-47ec-b15a-d03e805b2621@gmail.com>
+ <CAJN1Kkz9NPMuoKsm4XdmGS=Y9=SkYM-_EZhqxBojfGZycegtjw@mail.gmail.com> <20240215000427.jdivtxc5jxolmi5q@skbuf>
+In-Reply-To: <20240215000427.jdivtxc5jxolmi5q@skbuf>
+From: =?UTF-8?Q?Pawe=C5=82_Dembicki?= <paweldembicki@gmail.com>
+Date: Tue, 20 Feb 2024 13:28:37 +0100
+Message-ID: <CAJN1Kkwzz_Q7LdWCJ3gGdHw+OdQxq2+_5Aacq0fvHaE9SOog1w@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 02/15] net: dsa: vsc73xx: convert to PHYLINK
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org, linus.walleij@linaro.org, 
+	Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Claudiu Manoil <claudiu.manoil@nxp.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
+	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Dear Michal,
+czw., 15 lut 2024 o 01:04 Vladimir Oltean <olteanv@gmail.com> napisa=C5=82(=
+a):
+>
+> On Wed, Feb 14, 2024 at 01:56:10PM +0100, Pawe=C5=82 Dembicki wrote:
+> > =C5=9Br., 14 lut 2024 o 00:19 Florian Fainelli <f.fainelli@gmail.com> n=
+apisa=C5=82(a):
+> > >
+> > > On 2/13/24 14:03, Pawel Dembicki wrote:
+> > > > This patch replaces the adjust_link api with the phylink apis that =
+provide
+> > > > equivalent functionality.
+> > > >
+> > > > The remaining functionality from the adjust_link is now covered in =
+the
+> > > > phylink_mac_link_* and phylink_mac_config.
+> > > >
+> > > > Removes:
+> > > > .adjust_link
+> > > > Adds:
+> > > > .phylink_mac_config
+> > > > .phylink_mac_link_up
+> > > > .phylink_mac_link_down
+> > >
+> > > The implementation of phylink_mac_link_down() strictly mimics what ha=
+d
+> > > been done by adjust_link() in the phydev->link =3D=3D 0 case, but it =
+really
+> > > makes me wonder whether some bits do not logically belong to
+> > > phylink_mac_link_up(), like "Accept packets again" for instance.
+> > >
+> > > Are we certain there was not an assumption before that we would get
+> > > adjust_link() called first with phydev->link =3D 0, and then phydev->=
+link
+> > > =3D1 and that this specific sequence would program things just the wa=
+y we
+> > > want?
+> >
+> > Yes, it was the simplest conversion possible, without any improvements.
+> >
+> > Some part is implementation of datasheet (description of ARBEMPTY regis=
+ter):
+> >
+> >         /* Discard packets */
+> >         vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ARBITER, 0,
+> >                             VSC73XX_ARBDISC, BIT(port), BIT(port));
+> >
+> >         /* Wait until queue is empty */
+> >         ret =3D read_poll_timeout(vsc73xx_read, err, err < 0 || (val & =
+BIT(port)),
+> >                                 1000, 10000, false, vsc, VSC73XX_BLOCK_=
+ARBITER,
+> >                                 0, VSC73XX_ARBEMPTY, &val);
+> >         if (ret)
+> >                 dev_err(vsc->dev,
+> >                         "timeout waiting for block arbiter\n");
+> >         else if (err < 0)
+> >                 dev_err(vsc->dev, "error reading arbiter\n");
+> >
+> >         /* Put this port into reset */
+> >         vsc73xx_write(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_MAC_CFG,
+> >                       VSC73XX_MAC_CFG_RESET);
+> >
+> >
+> > I agree that VSC73XX_ARBDISC should be moved to phylink_mac_link_up.
+>
+> FWIW, ocelot_phylink_mac_link_down() also calls ocelot_port_flush()
+> which is more or less the same procedure for a different piece of hw.
+>
+> By re-reading the commit message of eb4733d7cffc ("net: dsa: felix:
+> implement port flushing on .phylink_mac_link_down"), I can find a good
+> reason to flush the port on link down and not on link up. With flow
+> control enabled, packets would remain in the queue system until there's
+> link again if not flushed there, otherwise.
+>
+> Pawe=C5=82, maybe it is simply the case that you should move the procedur=
+e
+> from the datasheet into a more clearly named sub-function?
+>
 
+I will try to do it more clearly.
 
-Thank you for the patch. Some minor nits from my side.
+> > Other things could be optimised and it needs more care. (eg. This
+> > implementation doesn't disable phy when the interface goes down.) I
+> > plan to tweak it after the driver becomes usable. Please let me know
+> > if it should be fixed in this patch.
+>
+> What do you mean by disabling the PHY when the interface goes down,
+> exactly? Down as in administratively down, aka "ip link set swp0 down",
+> not when the link drops?
+>
 
-Am 20.02.24 um 11:59 schrieb Michal Swiatkowski:
-> Add new matching type. There is no encap version of ip_proto field.
+I should be more precise.
 
-Excuse my ignorance, I do not understand the second sentence. Is an 
-encap version going to be added?
+> That's a thing for the PHY driver to handle, by implementing .suspend()
+> and .resume(), I guess?
+>
 
-> Use it in the same lookup type as for TTL. In hardware it have the same
+Yes, exactly.
 
-s/have/has/
+> What driver do the internal PHYs use?
 
-> protocol ID, but different offset.
-> 
-> Example command to add filter with ip_proto:
-> $tc filter add dev eth10 ingress protocol ip flower ip_proto icmp \
->   skip_sw action mirred egress redirect dev eth0
-> 
-> Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> ---
->   drivers/net/ethernet/intel/ice/ice_tc_lib.c | 17 +++++++++++++++--
->   drivers/net/ethernet/intel/ice/ice_tc_lib.h |  1 +
->   2 files changed, 16 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_tc_lib.c b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-> index 49ed5fd7db10..f7c0f62fb730 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-> @@ -78,7 +78,8 @@ ice_tc_count_lkups(u32 flags, struct ice_tc_flower_lyr_2_4_hdrs *headers,
->   		     ICE_TC_FLWR_FIELD_DEST_IPV6 | ICE_TC_FLWR_FIELD_SRC_IPV6))
->   		lkups_cnt++;
->   
-> -	if (flags & (ICE_TC_FLWR_FIELD_IP_TOS | ICE_TC_FLWR_FIELD_IP_TTL))
-> +	if (flags & (ICE_TC_FLWR_FIELD_IP_TOS | ICE_TC_FLWR_FIELD_IP_TTL |
-> +		     ICE_TC_FLWR_FIELD_IP_PROTO))
-
-Should this be sorted? (Also below).
-
->   		lkups_cnt++;
->   
->   	/* are L2TPv3 options specified? */
-> @@ -530,7 +531,8 @@ ice_tc_fill_rules(struct ice_hw *hw, u32 flags,
->   	}
->   
->   	if (headers->l2_key.n_proto == htons(ETH_P_IP) &&
-> -	    (flags & (ICE_TC_FLWR_FIELD_IP_TOS | ICE_TC_FLWR_FIELD_IP_TTL))) {
-> +	    (flags & (ICE_TC_FLWR_FIELD_IP_TOS | ICE_TC_FLWR_FIELD_IP_TTL |
-> +		      ICE_TC_FLWR_FIELD_IP_PROTO))) {
->   		list[i].type = ice_proto_type_from_ipv4(inner);
->   
->   		if (flags & ICE_TC_FLWR_FIELD_IP_TOS) {
-> @@ -545,6 +547,13 @@ ice_tc_fill_rules(struct ice_hw *hw, u32 flags,
->   				headers->l3_mask.ttl;
->   		}
->   
-> +		if (flags & ICE_TC_FLWR_FIELD_IP_PROTO) {
-> +			list[i].h_u.ipv4_hdr.protocol =
-> +				headers->l3_key.ip_proto;
-> +			list[i].m_u.ipv4_hdr.protocol =
-> +				headers->l3_mask.ip_proto;
-
-(Strange to break the line each time, but seems to be the surrounding 
-coding style.)
-
-> +		}
-> +
->   		i++;
->   	}
->   
-> @@ -1515,7 +1524,11 @@ ice_parse_cls_flower(struct net_device *filter_dev, struct ice_vsi *vsi,
->   
->   		headers->l2_key.n_proto = cpu_to_be16(n_proto_key);
->   		headers->l2_mask.n_proto = cpu_to_be16(n_proto_mask);
-> +
-> +		if (match.key->ip_proto)
-> +			fltr->flags |= ICE_TC_FLWR_FIELD_IP_PROTO;
->   		headers->l3_key.ip_proto = match.key->ip_proto;
-> +		headers->l3_mask.ip_proto = match.mask->ip_proto;
->   	}
->   
->   	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_ETH_ADDRS)) {
-> diff --git a/drivers/net/ethernet/intel/ice/ice_tc_lib.h b/drivers/net/ethernet/intel/ice/ice_tc_lib.h
-> index 65d387163a46..856f371d0687 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_tc_lib.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_tc_lib.h
-> @@ -34,6 +34,7 @@
->   #define ICE_TC_FLWR_FIELD_VLAN_PRIO		BIT(27)
->   #define ICE_TC_FLWR_FIELD_CVLAN_PRIO		BIT(28)
->   #define ICE_TC_FLWR_FIELD_VLAN_TPID		BIT(29)
-> +#define ICE_TC_FLWR_FIELD_IP_PROTO		BIT(30)
->   
->   #define ICE_TC_FLOWER_MASK_32   0xFFFFFFFF
->   
-
-
-Kind regards,
-
-Paul
+It is a PHY Vitesse VSC7385 from vitesse.c.
 
