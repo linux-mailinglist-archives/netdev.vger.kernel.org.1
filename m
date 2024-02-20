@@ -1,105 +1,123 @@
-Return-Path: <netdev+bounces-73204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFB4385B590
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:40:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FE8F85B5A7
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:42:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2CE01C214E1
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:40:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 428F81C22D2B
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:42:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 062C85CDF6;
-	Tue, 20 Feb 2024 08:40:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rm5E89nk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDEF85D46F;
+	Tue, 20 Feb 2024 08:42:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E4A5A110;
-	Tue, 20 Feb 2024 08:40:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FFD95F469
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 08:42:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708418438; cv=none; b=TGWLIoqKL6pEA95qlGKGrP+Rx92ylKLlJXhmc10mwomBtwu4oLkTl7+aw7ldFb6k9y3NJkswWPOfktvlWJgLZ5cpdZeQnMfwQBMj6h0WARyvMjGco3xy4S+CvaODivf5ZhZ23CdB232lTCy7CYe6/jQjM5wZmzY1D1gq3fds9R8=
+	t=1708418554; cv=none; b=a3V4ZXA1k/NJ4koAMw3oAL7BQuTjThN/E/olRED66eCXXS5uEkayzpl/QsD52YTZjuKSTHD0p3wKBuuhwulWDAIX5/rwSei1yaJqkqYs6OzYoe9TEeDclf0t9AaGSWyGPyS1Nlgmw0HV60e2/9NQbiCQPeUIVbNWtnB3i3SIVZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708418438; c=relaxed/simple;
-	bh=2fx/Ssc/6vEiZR2sY8kt9a8iCnW1DDxkpIcLwL+vJD0=;
+	s=arc-20240116; t=1708418554; c=relaxed/simple;
+	bh=5i2yVe3YvLkbc1bjl/rywBySn9/ebqlo3gBQ6m35U8k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EzGnNbI8zgljtds1/sIjNrRT+E8ArprRYIkuxnua+MMUG9J6Xlo6gImkLR3+D/ptYuAV4QGLzL6yI38FAPn85FddYU7dIWSq189fFuaFRM05npFyx44BUaIetZwPvuDc960Zs7l0cRg8JLBo/hNFef0hWT2S0ZkD1evVh60Zm4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rm5E89nk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22661C433F1;
-	Tue, 20 Feb 2024 08:40:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708418438;
-	bh=2fx/Ssc/6vEiZR2sY8kt9a8iCnW1DDxkpIcLwL+vJD0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Rm5E89nk2HRkQ+bEY1H7+DJvYFtC3dJbpxGpqVWX+4Ny0wLO5Prw9x2nDYKfJt6Nh
-	 KKGaYZaWtJK0vUcr8XiY7jGdYlym4yokpKTacZsi6iTSQnp3ZVeaglRhWGaiqHY/dn
-	 OfeikerJ0R0kNihtneUZsYRl2Pc5dY0V9Qu/th/5JltuzhvduD69mhBjVVofCwk0+h
-	 ZHXjUsY6LlX43AEpGQjKGYccoLtJhwijsPqGAglKv9vCcWDSKphwIeHrMlBL3judIH
-	 daRhGV+86OFsy/xOM2TsUdTufdpjZSHs5v1w+zqXnLw/mstRPRDKcwLAilQDJqRU/f
-	 NtjQIUEl/wpfg==
-Date: Tue, 20 Feb 2024 08:40:33 +0000
-From: Simon Horman <horms@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
-	edumazet@google.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stephen@networkplumber.org,
-	f.fainelli@gmail.com, Johannes Berg <johannes.berg@intel.com>,
-	Martin KaFai Lau <martin.lau@kernel.org>
-Subject: Re: [PATCH net-next v3] net: sysfs: Do not create sysfs for non BQL
- device
-Message-ID: <20240220084033.GR40273@kernel.org>
-References: <20240219104238.3782658-1-leitao@debian.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=soiQM3GLZoSwS8mx8ESk6Ks/4ICjNq7MU+UG/BewWgQO06p6bQbUqBcr6I+9OE5bDkKfMC3LPrA5fEpbsGOkeJAIsVx4HVPhhcnYhCgUhEmghg3ZP04FVA6ZpG4W3MSaJ/nQxDQx1yfzI78fBggjYSmkTIP/u1A0p84+v4eXrMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1rcLhn-0000H0-23; Tue, 20 Feb 2024 09:42:23 +0100
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1rcLhm-001oB5-CU; Tue, 20 Feb 2024 09:42:22 +0100
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 0A7C1292ECA;
+	Tue, 20 Feb 2024 08:42:22 +0000 (UTC)
+Date: Tue, 20 Feb 2024 09:42:21 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Vincent Mailhol <vincent.mailhol@gmail.com>
+Cc: Oliver Hartkopp <socketcan@hartkopp.net>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] can: raw: raw_getsockopt(): reduce scope of err
+Message-ID: <20240220-tremor-suspend-36bc012b061c-mkl@pengutronix.de>
+References: <20240220-raw-setsockopt-v1-1-7d34cb1377fc@pengutronix.de>
+ <CAMZ6RqKPUUrgfVpdu4y=mGUFjNTbfH7q46ZwcMwOn6zEwfHnZg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="g4vopqhpjlyktekh"
 Content-Disposition: inline
-In-Reply-To: <20240219104238.3782658-1-leitao@debian.org>
+In-Reply-To: <CAMZ6RqKPUUrgfVpdu4y=mGUFjNTbfH7q46ZwcMwOn6zEwfHnZg@mail.gmail.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Mon, Feb 19, 2024 at 02:42:36AM -0800, Breno Leitao wrote:
-> Creation of sysfs entries is expensive, mainly for workloads that
-> constantly creates netdev and netns often.
-> 
-> Do not create BQL sysfs entries for devices that don't need,
-> basically those that do not have a real queue, i.e, devices that has
-> NETIF_F_LLTX and IFF_NO_QUEUE, such as `lo` interface.
-> 
-> This will remove the /sys/class/net/eth0/queues/tx-X/byte_queue_limits/
-> directory for these devices.
-> 
-> In the example below, eth0 has the `byte_queue_limits` directory but not
-> `lo`.
-> 
-> 	# ls /sys/class/net/lo/queues/tx-0/
-> 	traffic_class  tx_maxrate  tx_timeout  xps_cpus  xps_rxqs
-> 
-> 	# ls /sys/class/net/eth0/queues/tx-0/byte_queue_limits/
-> 	hold_time  inflight  limit  limit_max  limit_min
-> 
-> This also removes the #ifdefs, since we can also use netdev_uses_bql() to
-> check if the config is enabled. (as suggested by Jakub).
-> 
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-Thanks Breno,
+--g4vopqhpjlyktekh
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I like that this removes sysfs entries for devices for which they do not
-act on.  Although I understand it is not a complete solution - still not
-all devices that have these entries use BQL - I think a key value there is
-to alleviate potential confusion for users.  And as such, this is a step in
-the right direction.
+On 20.02.2024 17:27:05, Vincent Mailhol wrote:
+> On Tue. 20 Feb. 2024 at 17:16, Marc Kleine-Budde <mkl@pengutronix.de> wro=
+te:
+> > Reduce the scope of the variable "err" to the individual cases. This
+> > is to avoid the mistake of setting "err" in the mistaken belief that
+> > it will be evaluated later.
+> >
+> > Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+>=20
+> One nitpick to remove a newline, but aside from that:
+>=20
+> Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+>=20
+> (as usual, I do not mind if the nitpick gets resolved while applying).
 
-I also like that some #ifdefs disappear.
+Thanks for the review, fixed that while applying.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+regards,
+Marc
 
-...
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--g4vopqhpjlyktekh
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmXUZeoACgkQKDiiPnot
+vG/JKwf9Fjdu8IgIhXwRaJizysOl76e9n79st3d0kq2yQau5Hlgw6sjOW2IoGlkS
+TAk1YnxkerpQSjjJ1i550qZ+kmAXFPl8Lp3DHfddcIciQYqiTxUc0iTGo/XxEQRv
+hxPguYeMJAsYFEqh5lGXCjxcm3sbIzkUZ5Lb2lbAPukVLa9w9gYeO4dYl+EwUwam
+RWlIAeOOfjOo0QCUTauv/o4P6dwjuV5dzZCI1lv/DD5G76fCblJYnIwsmoyMKrgz
+NFeNLpixKfv0vAPrvl67GvuJEw0YGWJJMFbu2K9i/Pu6+2BIprqPgRwB7PA5yJES
+GBx7BoEa5YKFglY59+KRtBNthNfX4w==
+=boQJ
+-----END PGP SIGNATURE-----
+
+--g4vopqhpjlyktekh--
 
