@@ -1,97 +1,89 @@
-Return-Path: <netdev+bounces-73338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73339-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4365985BF3C
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 15:59:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BE6285BF5D
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 16:02:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E222B20DDF
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 14:59:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBA042823FF
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 15:02:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EE8A6BB38;
-	Tue, 20 Feb 2024 14:59:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0CEC71B59;
+	Tue, 20 Feb 2024 15:00:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lLGJ3WHx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xl5Xrye8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B28F67E91
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 14:59:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 876506931F;
+	Tue, 20 Feb 2024 15:00:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708441183; cv=none; b=kxay2nsjJVQ6h4Ss/tK7OM7JyzazVmtQqOcz4HcY2AoFr4ToA545WX3s6uQ6Zrj8LWOjte++yiSA/0UKWSLsDt+HMj2daI7CI1OtycUUZDE7xUjNQZSleSj4Rhjt9V4c65N1M++WIH9A2ME2dvfqRtqOULVH5pNWwqYi8++BjLY=
+	t=1708441255; cv=none; b=ECEzOSFuCXcbwOs4uPVq3mNrZTZip6NXDGFC8OYCs+7I0TxsHhB5Ls64T7hkM0iviOWf0FvxmUQYUbBIW4HbjUBKB1lz+xpby/gRFhpIl2Z27OJgSfvCVf4mPTw8zYSfp3+d0xvC3pZjBXJ81bEIMqHf+ul1nGomRwyzPG19dKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708441183; c=relaxed/simple;
-	bh=Vl8sRftmVCAC+0ik4/WZAg9S0fv7UNvmWT1ZfD0nRrE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DU8bV7yX2RmJfAkvSc2CAww2C8887mmEOST8Rmm951FbC5QHLxyYiyhxnUgtQN4onl7Oo7t8qCMBvHqHiB59aZyEOBeXGQf8JZsSd1f19qKNhwqOehH9mclRMS9tnUrg5RBWDt4OWDgW+81cucdtKk9DvOf+/8cM9+2HfoRTLnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lLGJ3WHx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B422EC433C7;
-	Tue, 20 Feb 2024 14:59:42 +0000 (UTC)
+	s=arc-20240116; t=1708441255; c=relaxed/simple;
+	bh=t0kh6fT7xYxfjYlEKpkM6AOETmzHo7MjScDoq365xG4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=noeXdjSMxKITRhZ098YvpNSUwj/1sDyYJKR8ofxbV8KAOq9/1X4Geihcp1d51yJ40qU4K3phb7NBbn3kirABxM1P19S2/WGeTw9cqG/ozkY49EqzOLmSmusX68RCOn/1FRirz1HHf4JVnYIgP0WH1f5oJwJm9qV9rf20M7ldRWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xl5Xrye8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5071AC433F1;
+	Tue, 20 Feb 2024 15:00:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708441183;
-	bh=Vl8sRftmVCAC+0ik4/WZAg9S0fv7UNvmWT1ZfD0nRrE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lLGJ3WHxzpNDBV3ojyZQqGl0Uyrp2J6Ex5QBIC4TCvtwisrXtwPPWVxJZOZqGhWA4
-	 nO+apD1StgdrGlgEvWOaneTzEihR4KcsN9jcylWGvJZWxp+ykwnDYtv0TLlv9wB7qi
-	 eIG7/n2uGVjnjbYRyMT/+og7VbaihCts5VmUNHqY/LAnd2T8Y2OasI4hKiNQDdcUtc
-	 2J2Xz7+nBQpwqKkkSSpMy5V4x7QFTEyhaqmWE6z49j+f5CaIUx18k77u/9LOUf0d/Y
-	 pVXHIcFQm2yg4BiXhEnKhyOBUU8cl+e6/B89uAG0xAuN2GqWDpYtT5jxn87bwW5Fd0
-	 lQ0FgawSVtf3w==
-Date: Tue, 20 Feb 2024 06:59:41 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Petr =?UTF-8?B?VGVzYcWZw61r?= <petr@tesarici.cz>, Christian Stewart
- <christian@aperture.us>
-Cc: Marc Haber <mh+netdev@zugschlus.de>, Florian Fainelli
- <f.fainelli@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- alexandre.torgue@foss.st.com, Jose Abreu <joabreu@synopsys.com>, Chen-Yu
- Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel
- Holland <samuel@sholland.org>, Jisheng Zhang <jszhang@kernel.org>,
- netdev@vger.kernel.org
-Subject: Re: stmmac on Banana PI CPU stalls since Linux 6.6
-Message-ID: <20240220065941.6efa100f@kernel.org>
-In-Reply-To: <20240219204421.2f6019c1@meshulam.tesarici.cz>
-References: <8efb36c2-a696-4de7-b3d7-2238d4ab5ebb@lunn.ch>
-	<ZbKiBKj7Ljkx6NCO@torres.zugschlus.de>
-	<229642a6-3bbb-4ec8-9240-7b8e3dc57345@lunn.ch>
-	<99682651-06b4-4c69-b693-a0a06947b2ca@gmail.com>
-	<20240126085122.21e0a8a2@meshulam.tesarici.cz>
-	<ZbOPXAFfWujlk20q@torres.zugschlus.de>
-	<20240126121028.2463aa68@meshulam.tesarici.cz>
-	<ZcFBL6tCPMtmcc7c@torres.zugschlus.de>
-	<0ba9eb60-9634-4378-8cbb-aea40b947142@gmail.com>
-	<20240206092351.59b10030@meshulam.tesarici.cz>
-	<ZcoL0MseDC69s2_P@torres.zugschlus.de>
-	<CA+h8R2okfaYn-=toQPCkQUEZ6oLuwfjZ0ZZ-zRiN9A2fBFmzHQ@mail.gmail.com>
-	<20240219204421.2f6019c1@meshulam.tesarici.cz>
+	s=k20201202; t=1708441255;
+	bh=t0kh6fT7xYxfjYlEKpkM6AOETmzHo7MjScDoq365xG4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Xl5Xrye8FtH7cnrdC7jAssSPoehu+/m2GxRMNDtkrhAkjT+5dEsCWjtUhaWDXmvMI
+	 ruOmg+0SePgiidCxNnbMVP3k/v453nd3uTMajSeeusA/xwk2fJUgeRld0JRTX37n/Y
+	 +tIB0MaarLeH+F8D17aEFyTVerbDAvvbRdxEM03VLlawukPs5MrB+iom2/dlZcpl+h
+	 bpTW2KEokm1pmKvgJWPly6i5jF++JwOa9KeU6KHBge2OuemX686I90JYK6czEPyNwK
+	 Dw+xr+GxacmF9F3UfLcOnTkxyrijFi6RirbNhn2SxZYj8fO7g+tD2fI+jhCeB3e56R
+	 MhoOppnCs/qgA==
+Date: Tue, 20 Feb 2024 15:00:50 +0000
+From: Simon Horman <horms@kernel.org>
+To: Siddharth Vadapalli <s-vadapalli@ti.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, xiaoning.wang@nxp.com, wei.fang@nxp.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, srk@ti.com
+Subject: Re: [PATCH net] net: phy: realtek: Fix rtl8211f_config_init() for
+ RTL8211F(D)(I)-VD-CG PHY
+Message-ID: <20240220150050.GO40273@kernel.org>
+References: <20240220070007.968762-1-s-vadapalli@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240220070007.968762-1-s-vadapalli@ti.com>
 
-On Mon, 19 Feb 2024 20:44:21 +0100 Petr Tesa=C5=99=C3=ADk wrote:
-> If you're running a 6.7 stable kernel, my patch has just been added to
-> the 6.7-stable tree.
->=20
-> https://git.kernel.org/pub/scm/linux/kernel/git/stable/stable-queue.git/t=
-ree/queue-6.7/net-stmmac-protect-updates-of-64-bit-statistics-counters.patch
->=20
-> However, lockdep has reported an issue with it:
->=20
-> https://lore.kernel.org/lkml/ea1567d9-ce66-45e6-8168-ac40a47d1821@roeck-u=
-s.net/
->=20
-> This new report has not yet been properly understood, but FWIW I've
-> been running stable with my patch for over a month now.
+On Tue, Feb 20, 2024 at 12:30:07PM +0530, Siddharth Vadapalli wrote:
+> Commit bb726b753f75 ("net: phy: realtek: add support for
+> RTL8211F(D)(I)-VD-CG") extended support of the driver from the existing
+> support for RTL8211F(D)(I)-CG PHY to the newer RTL8211F(D)(I)-VD-CG PHY.
+> 
+> While that commit indicated that the RTL8211F_PHYCR2 register is not
+> supported by the "VD-CG" PHY model and therefore updated the corresponding
+> section in rtl8211f_config_init() to be invoked conditionally, the call to
+> "genphy_soft_reset()" was left as-is, when it should have also been invoked
+> conditionally. This is because the call to "genphy_soft_reset()" was first
+> introduced by the commit 0a4355c2b7f8 ("net: phy: realtek: add dt property
+> to disable CLKOUT clock") since the RTL8211F guide indicates that a PHY
+> reset should be issued after setting bits in the PHYCR2 register.
+> 
+> As the PHYCR2 register is not applicable to the "VD-CG" PHY model, fix the
+> rtl8211f_config_init() function by invoking "genphy_soft_reset()"
+> conditionally based on the presence of the "PHYCR2" register.
+> 
+> Fixes: bb726b753f75 ("net: phy: realtek: add support for RTL8211F(D)(I)-VD-CG")
+> Signed-off-by: Siddharth Vadapalli <s-vadapalli@ti.com>
 
-Christian got an actual soft lockup, not just a lockdep warning, tho.
-Christian, could you run the stack trace thru scripts/decode_stacktrace
-and tell us which loop it's stuck on?
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
