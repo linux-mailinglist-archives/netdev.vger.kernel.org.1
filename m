@@ -1,191 +1,272 @@
-Return-Path: <netdev+bounces-73371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E7FE85C2E1
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 18:42:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EC3085C2EE
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 18:45:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6BCB2832EB
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 17:42:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED8EC1F236F4
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 17:45:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF4B576C9F;
-	Tue, 20 Feb 2024 17:42:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7875176C83;
+	Tue, 20 Feb 2024 17:45:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dkw4TaiB"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="i/w3m9O4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09DC776C87
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 17:42:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF01176C73
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 17:44:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708450943; cv=none; b=duj4JanvbTThUTraj8Ljl0wrxIQb0uBGfYUyIfi0QRhFm1TloX7r903Pt9L2S6f69Rb24Z/ZaRmT8Jy5NTBT0tPrgsLB4PWgwkswxuqY0w6jJAHRKa1iMPWgxS7bIJLbVvAVXJTJ4xT+g4aM8sC3okj/KHQiZFcGEex4Xnem6nc=
+	t=1708451100; cv=none; b=jN0wH1rOy5QqQQaQ1mxBIkZB981R8EQiG2/b3gS1AVTl2aScinHW0UPDF510cUfRJ7bWvDQZk1dZKXWIec0Bu7AD52LzKVK25lrSoMj8vv6zOCbJu8OrVoU3dgVPbzUBZqSQB0VM6MVHgzVrj9BWBfhecKjbDcbxSyGlKOHKch4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708450943; c=relaxed/simple;
-	bh=KsGetTIeNCwPy9T3TXvb79TqSxh6hZ5zwMqXPAhLBo0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GsimNdmND9IPWUse25pcWEQQRRgTTKAfP/HdUc1+x1rSZcH16D40wIP+vrjkI3TNo0sRBK5LjtFA74NsHs1Vn9ZPiN7hyvlrkR6pE5guSmL1mO25ihW6CcOZEfurglqyPISMO5bCRQ22P0Vw/n2qHIjjtMhO5Om5yBsQBsqGeg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dkw4TaiB; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-563dd5bd382so299a12.1
-        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 09:42:21 -0800 (PST)
+	s=arc-20240116; t=1708451100; c=relaxed/simple;
+	bh=Mv85M2vKAnRH9TBgBNSu5X7KLNhmiN05SLAr2z4ZJhk=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SCEkcjwiPir51REBpHQQQAvHWs6uUKfobCbLOQ7F5fTJASiBezsV+M0BHScxxQ3o7B93bX3P0vNG7PdBkCjDzB/ZV754EaNYm3HYLQ6BUksBTbv76DIVFYQLSXWRq4Nk8PV6lWhUR3bZ8/vjZ7zFpt9mM4tuh8A8izoP82TzBRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=i/w3m9O4; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708450940; x=1709055740; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f/lV2yT0XcPBxNziflgu8BgOBo4JwQg4+0+ip6n/qMc=;
-        b=dkw4TaiBt0jTx1sScgE3CXdY0vZNZ66g0Le7xoIkWwNHAMnp+Zk01RzbVdqv0cvAPZ
-         Uvi4K+JQ0p2/ZSoN1nvFoHJPkJsycW3rlLFsMCIG8LOEP+Ljl2pgD8ALGryG0PePhudN
-         lw8/XD3xUndOsCLXMAE4tg8DNJCez0ao7PLRtG2lRxLMNCq7qaRsEzheq6Uot8jH6793
-         6yDwUrbS6Ty38YokU1FHDf9PYjphoQCslaxnhNAhS7Ya1bb23KXKmydYpeN99DGoG6l1
-         ACJ74NWBRPk+EEPHXWaXpK8YhEAJIZQK6cuMWHOx63OynvR7OoBaxDWAWs2yDE/JKqE7
-         u3PQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708450940; x=1709055740;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=f/lV2yT0XcPBxNziflgu8BgOBo4JwQg4+0+ip6n/qMc=;
-        b=IQ4QsKy8Vp353S8qJ9ztLzLfPhp1ZX9znyMlVuUKjdd645RYYTo++jQ5fYqqrp3VRk
-         pgyyL4JufQUKOkrVDYcBa+Fw/aQMguOzVs1Ub4O4T4q0kw1EkQ4ERx9a15d7zy0cBuu5
-         qGE5TMlMHtAyIlMrnNnOD/EM3mdKq21vUfZ4a2cQ7/tID5Flwws3z0IQonZVPLSlhu/1
-         VJxn97IgV346i6QaDsmDPfEAbYd9CluuiXC3OrHv2z2a/H/Jic+5gmx7ZK3tWo9eW2w3
-         GZB4RE6qeSGLeCi9otrMW1WoJqP5As1yEPzs4LdM0x5V8Mx/Itoq3UIBWzV448zBdJ1O
-         FUvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVyq9VgFhdnpye8zo4+FoyGnuvFxoDxkPQ4SDz2RGr1ZwvVBhZhmFPnQgaocJwBEpERYYYQ22nnr64VUEjta2gks7OIjUBr
-X-Gm-Message-State: AOJu0YxtPixS7CxT9fWI/LGRkJr1/BcPs1SM2FGpaS5B1I0U2Fmieno6
-	czOQ/FIK/gdth91/ObsKMAvGWVm7aExPfwdvKa+mk8egBUuZmFOlV78QVh40JyfF7trkflAtGJs
-	VStEApUUXCGg5mBFpm86BAwj4Cu3IwW+cX1Tp
-X-Google-Smtp-Source: AGHT+IHGXwWT64hjLb9fg/atQAcjLhox7pc5R0CyDbDgdqq6PJR3HMNvD9Qc9cnsWlbpK/SaFamI+pKapmqHaukDwaA=
-X-Received: by 2002:a50:cd57:0:b0:55f:8851:d03b with SMTP id
- d23-20020a50cd57000000b0055f8851d03bmr487118edj.5.1708450940072; Tue, 20 Feb
- 2024 09:42:20 -0800 (PST)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1708451099; x=1739987099;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=YvHfmRzvRteNr0osG5pTUa2xBnXltD2WqefdifAZbVI=;
+  b=i/w3m9O4IK4kDO5dJ7Exes6k7hC6boCj+8Hgqyqj+G43IhlSPSOOsUGm
+   MFICKM0rBMKDRwITIOMYGrtFyvx+EBgSs7R/e00YmaH+vMgoWc520cwc1
+   pbeG4tvPk+N+0lVcTCcuntukBhZMek103lYiOGT4WPUpnhY94OWMBNfcP
+   Q=;
+X-IronPort-AV: E=Sophos;i="6.06,174,1705363200"; 
+   d="scan'208";a="705549001"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2024 17:44:50 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:38849]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.0.120:2525] with esmtp (Farcaster)
+ id c3c5bbaa-a469-4bef-9680-9f742d0c289b; Tue, 20 Feb 2024 17:44:49 +0000 (UTC)
+X-Farcaster-Flow-ID: c3c5bbaa-a469-4bef-9680-9f742d0c289b
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Tue, 20 Feb 2024 17:44:48 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.100.27) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Tue, 20 Feb 2024 17:44:46 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <pabeni@redhat.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH v2 net-next 03/14] af_unix: Link struct unix_edge when queuing skb.
+Date: Tue, 20 Feb 2024 09:44:37 -0800
+Message-ID: <20240220174437.47356-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <6aa8669ebc0b5a9b17f0a3256820560f8ba8e73a.camel@redhat.com>
+References: <6aa8669ebc0b5a9b17f0a3256820560f8ba8e73a.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240219095729.2339914-1-vschneid@redhat.com> <20240219095729.2339914-2-vschneid@redhat.com>
- <CANn89i+3-zgAkWukFavu1wgf1XG+K9U4BhJWw7H+QKwsfYL4WA@mail.gmail.com> <xhsmho7cbf33q.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
-In-Reply-To: <xhsmho7cbf33q.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 20 Feb 2024 18:42:06 +0100
-Message-ID: <CANn89iJpwUpAROOq7+ttwTMCZu0=XhS4dgwcs44t-gb7-_ejRg@mail.gmail.com>
-Subject: Re: [PATCH v3 1/1] tcp/dcpp: Un-pin tw_timer
-To: Valentin Schneider <vschneid@redhat.com>
-Cc: dccp@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-rt-users@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, mleitner@redhat.com, 
-	David Ahern <dsahern@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, 
-	Tomas Glozar <tglozar@redhat.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
-	Thomas Gleixner <tglx@linutronix.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D040UWB003.ant.amazon.com (10.13.138.8) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Tue, Feb 20, 2024 at 6:38=E2=80=AFPM Valentin Schneider <vschneid@redhat=
-.com> wrote:
->
-> On 19/02/24 15:42, Eric Dumazet wrote:
-> > On Mon, Feb 19, 2024 at 10:57=E2=80=AFAM Valentin Schneider <vschneid@r=
-edhat.com> wrote:
-> >>
-> >> The TCP timewait timer is proving to be problematic for setups where s=
-cheduler
-> >> CPU isolation is achieved at runtime via cpusets (as opposed to static=
-ally via
-> >> isolcpus=3Ddomains).
-> >>
-> >
-> > ...
-> >
-> >>  void inet_twsk_deschedule_put(struct inet_timewait_sock *tw)
-> >>  {
-> >> +       /* This can race with tcp_time_wait() and dccp_time_wait(), as=
- the timer
-> >> +        * is armed /after/ adding it to the hashtables.
-> >> +        *
-> >> +        * If this is interleaved between inet_twsk_hashdance() and in=
-et_twsk_put(),
-> >> +        * then this is a no-op: the timer will still end up armed.
-> >> +        *
-> >> +        * Conversely, if this successfully deletes the timer, then we=
- know we
-> >> +        * have already gone through {tcp,dcpp}_time_wait(), and we ca=
-n safely
-> >> +        * call inet_twsk_kill().
-> >> +        */
-> >>         if (del_timer_sync(&tw->tw_timer))
-> >>                 inet_twsk_kill(tw);
-> >
-> > I really do not think adding a comment will prevent races at netns dism=
-antle.
-> >
-> > We need to make sure the timer is not rearmed, we want to be absolutely
-> > sure that after inet_twsk_purge() we have no pending timewait sockets,
-> > otherwise UAF will happen on the netns structures.
-> >
-> > I _think_ that you need timer_shutdown_sync() here, instead of del_time=
-r_sync()
->
-> Hm so that would indeed prevent a concurrent inet_twsk_schedule() from
-> re-arming the timer, but in case the calls are interleaved like so:
->
->                              tcp_time_wait()
->                                inet_twsk_hashdance()
->   inet_twsk_deschedule_put()
->     timer_shutdown_sync()
->                                inet_twsk_schedule()
->
-> inet_twsk_hashdance() will have left the refcounts including a count for
-> the timer, and we won't arm the timer to clear it via the timer callback
-> (via inet_twsk_kill()) - the patch in its current form relies on the time=
-r
-> being re-armed for that.
->
-> I don't know if there's a cleaner way to do this, but we could catch that
-> in inet_twsk_schedule() and issue the inet_twsk_kill() directly if we can
-> tell the timer has been shutdown:
-> ---
-> diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.=
-c
-> index 61a053fbd329c..c272da5046bb4 100644
-> --- a/net/ipv4/inet_timewait_sock.c
-> +++ b/net/ipv4/inet_timewait_sock.c
-> @@ -227,7 +227,7 @@ void inet_twsk_deschedule_put(struct inet_timewait_so=
-ck *tw)
->          * have already gone through {tcp,dcpp}_time_wait(), and we can s=
-afely
->          * call inet_twsk_kill().
->          */
-> -       if (del_timer_sync(&tw->tw_timer))
-> +       if (timer_shutdown_sync(&tw->tw_timer))
->                 inet_twsk_kill(tw);
->         inet_twsk_put(tw);
->  }
-> @@ -267,6 +267,10 @@ void __inet_twsk_schedule(struct inet_timewait_sock =
-*tw, int timeo, bool rearm)
->                                                      LINUX_MIB_TIMEWAITED=
-);
->                 BUG_ON(mod_timer(&tw->tw_timer, jiffies + timeo));
+From: Paolo Abeni <pabeni@redhat.com>
+Date: Tue, 20 Feb 2024 13:11:09 +0100
+> On Fri, 2024-02-16 at 13:05 -0800, Kuniyuki Iwashima wrote:
+> > Just before queuing skb with inflight fds, we call scm_stat_add(),
+> > which is a good place to set up the preallocated struct unix_edge
+> > in UNIXCB(skb).fp->edges.
+> > 
+> > Then, we call unix_add_edges() and construct the directed graph
+> > as follows:
+> > 
+> >   1. Set the inflight socket's unix_vertex to unix_edge.predecessor
+> >   2. Set the receiver's unix_vertex to unix_edge.successor
+> >   3. Link unix_edge.entry to the inflight socket's unix_vertex.edges
+> >   4. Link inflight socket's unix_vertex.entry to unix_unvisited_vertices.
+> > 
+> > Let's say we pass the fd of AF_UNIX socket A to B and the fd of B
+> > to C.  The graph looks like this:
+> > 
+> >   +-------------------------+
+> >   | unix_unvisited_vertices | <------------------------.
+> >   +-------------------------+                          |
+> >   +                                                    |
+> >   |   +-------------+                +-------------+   |            +-------------+
+> >   |   | unix_sock A |                | unix_sock B |   |            | unix_sock C |
+> >   |   +-------------+                +-------------+   |            +-------------+
+> >   |   | unix_vertex | <----.  .----> | unix_vertex | <-|--.  .----> | unix_vertex |
+> >   |   | +-----------+      |  |      | +-----------+   |  |  |      | +-----------+
+> >   `-> | |   entry   | +------------> | |   entry   | +-'  |  |      | |   entry   |
+> >       | |-----------|      |  |      | |-----------|      |  |      | |-----------|
+> >       | |   edges   | <-.  |  |      | |   edges   | <-.  |  |      | |   edges   |
+> >       +-+-----------+   |  |  |      +-+-----------+   |  |  |      +-+-----------+
+> >                         |  |  |                        |  |  |
+> >   .---------------------'  |  |  .---------------------'  |  |
+> >   |                        |  |  |                        |  |
+> >   |   +-------------+      |  |  |   +-------------+      |  |
+> >   |   |  unix_edge  |      |  |  |   |  unix_edge  |      |  |
+> >   |   +-------------+      |  |  |   +-------------+      |  |
+> >   `-> |    entry    |      |  |  `-> |    entry    |      |  |
+> >       |-------------|      |  |      |-------------|      |  |
+> >       | predecessor | +----'  |      | predecessor | +----'  |
+> >       |-------------|         |      |-------------|         |
+> >       |  successor  | +-------'      |  successor  | +-------'
+> >       +-------------+                +-------------+
+> > 
+> > Henceforth, we denote such a graph as A -> B (-> C).
+> > 
+> > Now, we can express all inflight fd graphs that do not contain
+> > embryo sockets.  The following two patches will support the
+> > particular case.
+> > 
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > ---
+> >  include/net/af_unix.h |  2 ++
+> >  include/net/scm.h     |  1 +
+> >  net/core/scm.c        |  2 ++
+> >  net/unix/af_unix.c    |  8 +++++--
+> >  net/unix/garbage.c    | 55 ++++++++++++++++++++++++++++++++++++++++++-
+> >  5 files changed, 65 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/include/net/af_unix.h b/include/net/af_unix.h
+> > index cab9dfb666f3..54d62467a70b 100644
+> > --- a/include/net/af_unix.h
+> > +++ b/include/net/af_unix.h
+> > @@ -23,6 +23,8 @@ extern unsigned int unix_tot_inflight;
+> >  void unix_inflight(struct user_struct *user, struct file *fp);
+> >  void unix_notinflight(struct user_struct *user, struct file *fp);
+> >  void unix_init_vertex(struct unix_sock *u);
+> > +void unix_add_edges(struct scm_fp_list *fpl, struct unix_sock *receiver);
+> > +void unix_del_edges(struct scm_fp_list *fpl);
+> >  int unix_alloc_edges(struct scm_fp_list *fpl);
+> >  void unix_free_edges(struct scm_fp_list *fpl);
+> >  void unix_gc(void);
+> > diff --git a/include/net/scm.h b/include/net/scm.h
+> > index a1142dee086c..7d807fe466a3 100644
+> > --- a/include/net/scm.h
+> > +++ b/include/net/scm.h
+> > @@ -32,6 +32,7 @@ struct scm_fp_list {
+> >  	short			count_unix;
+> >  	short			max;
+> >  #ifdef CONFIG_UNIX
+> > +	bool			inflight;
+> >  	struct unix_edge	*edges;
+> >  #endif
+> >  	struct user_struct	*user;
+> > diff --git a/net/core/scm.c b/net/core/scm.c
+> > index bc75b6927222..cad0c153ac93 100644
+> > --- a/net/core/scm.c
+> > +++ b/net/core/scm.c
+> > @@ -88,6 +88,7 @@ static int scm_fp_copy(struct cmsghdr *cmsg, struct scm_fp_list **fplp)
+> >  		fpl->count = 0;
+> >  		fpl->count_unix = 0;
+> >  #if IS_ENABLED(CONFIG_UNIX)
+> > +		fpl->inflight = false;
+> >  		fpl->edges = NULL;
+> >  #endif
+> >  		fpl->max = SCM_MAX_FD;
+> > @@ -381,6 +382,7 @@ struct scm_fp_list *scm_fp_dup(struct scm_fp_list *fpl)
+> >  			get_file(fpl->fp[i]);
+> >  
+> >  #if IS_ENABLED(CONFIG_UNIX)
+> > +		new_fpl->inflight = false;
+> >  		new_fpl->edges = NULL;
+> >  #endif
+> >  		new_fpl->max = new_fpl->count;
+> > diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> > index 0391f66546a6..ea7bac18a781 100644
+> > --- a/net/unix/af_unix.c
+> > +++ b/net/unix/af_unix.c
+> > @@ -1956,8 +1956,10 @@ static void scm_stat_add(struct sock *sk, struct sk_buff *skb)
+> >  	struct scm_fp_list *fp = UNIXCB(skb).fp;
+> >  	struct unix_sock *u = unix_sk(sk);
+> >  
+> > -	if (unlikely(fp && fp->count))
+> > +	if (unlikely(fp && fp->count)) {
+> >  		atomic_add(fp->count, &u->scm_stat.nr_fds);
+> > +		unix_add_edges(fp, u);
+> > +	}
+> >  }
+> >  
+> >  static void scm_stat_del(struct sock *sk, struct sk_buff *skb)
+> > @@ -1965,8 +1967,10 @@ static void scm_stat_del(struct sock *sk, struct sk_buff *skb)
+> >  	struct scm_fp_list *fp = UNIXCB(skb).fp;
+> >  	struct unix_sock *u = unix_sk(sk);
+> >  
+> > -	if (unlikely(fp && fp->count))
+> > +	if (unlikely(fp && fp->count)) {
+> >  		atomic_sub(fp->count, &u->scm_stat.nr_fds);
+> > +		unix_del_edges(fp);
+> > +	}
+> >  }
+> >  
+> >  /*
+> > diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+> > index ec998c7d6b4c..353416f38738 100644
+> > --- a/net/unix/garbage.c
+> > +++ b/net/unix/garbage.c
+> > @@ -109,6 +109,57 @@ void unix_init_vertex(struct unix_sock *u)
+> >  	INIT_LIST_HEAD(&vertex->edges);
+> >  }
+> >  
+> > +DEFINE_SPINLOCK(unix_gc_lock);
+> > +static LIST_HEAD(unix_unvisited_vertices);
+> > +
+> > +void unix_add_edges(struct scm_fp_list *fpl, struct unix_sock *receiver)
+> > +{
+> > +	int i = 0, j = 0;
+> > +
+> > +	spin_lock(&unix_gc_lock);
+> > +
+> > +	while (i < fpl->count_unix) {
+> > +		struct unix_sock *inflight = unix_get_socket(fpl->fp[j++]);
+> > +		struct unix_edge *edge;
+> > +
+> > +		if (!inflight)
+> > +			continue;
+> > +
+> > +		edge = fpl->edges + i++;
+> > +		edge->predecessor = &inflight->vertex;
+> > +		edge->successor = &receiver->vertex;
+> > +
+> > +		if (!edge->predecessor->out_degree++)
+> > +			list_add_tail(&edge->predecessor->entry, &unix_unvisited_vertices);
+> > +
+> > +		list_add_tail(&edge->entry, &edge->predecessor->edges);
+> 
+> Note that I confusingly replied to the previous revision of this patch,
+> but I think the points still stand.
+> 
+> 		INIT_LIST_HEAD(&edge->entry);	
+> 
+> disappeared from the above, but I can't find where it landed?!? 
 
-Would not a shutdown timer return a wrong mod_timer() value here ?
+Sorry, I forgot to mention this change in the coverletter.
 
-Instead of BUG_ON(), simply release the refcount ?
+Initially, I placed INIT_LIST_HEAD() in unix_alloc_edges(), but in v1,
+I moved it to unix_add_edges(), and later I noticed it's unnecessary
+in the first place because edge->entry is not used as head of a list,
+so I removed it completely in v2.
 
 
->                 refcount_inc(&tw->tw_dr->tw_refcount);
-> +
-> +               /* XXX timer got shutdown */
-> +               if (!tw->tw_timer.function)
-> +                       inet_twsk_kill(tw);
->         } else {
->                 mod_timer_pending(&tw->tw_timer, jiffies + timeo);
->         }
->
+From: Paolo Abeni <pabeni@redhat.com>
+Date: Tue, 20 Feb 2024 13:06:18 +0100
+> Here  'edge->predecessor->entry' and 'edge->entry' refer to different
+> object types right ? edge vs vertices. Perhaps using different field
+> names could clarify the code a bit? 
+
+Regarding the name of edge->entry, I agree a diffrent name would be
+easy to understand.  I'll rename it to edge->vertex_entry unless there
+is a better name :)
+
+Thanks!
 
