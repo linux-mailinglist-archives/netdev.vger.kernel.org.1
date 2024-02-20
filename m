@@ -1,131 +1,185 @@
-Return-Path: <netdev+bounces-73300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2692485BCD7
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 14:07:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18CC585BCEA
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 14:14:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5EFB1F22E72
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 13:07:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CA1B1F2427D
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 13:14:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E76A269E1B;
-	Tue, 20 Feb 2024 13:07:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A342B6A00B;
+	Tue, 20 Feb 2024 13:14:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ojKrj4cO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="djPvcnSl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C045269D0B;
-	Tue, 20 Feb 2024 13:07:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3D4A5A7A8
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 13:14:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708434460; cv=none; b=b7cpL575ZgslamE+f+czdYIAfVflaW3pEeub5DiPEu0Wf1TTUaiCVEXl070y21WIM150LOWdDDoIMg/xyhLzejiUS4OsHkVNTAHjN+oU1dKJLHg63gBhHUJvKJKDnWd1bLOSZSw9JgRObYKtzcmvhLdIdTfvyaC2RFPxRXalcyY=
+	t=1708434848; cv=none; b=ANTSN7ryrvPZOEHtGoMa3S6F6hMPsTpFBiH+g+zZCyqQMkdzk9pP680e78xDL/ED2at4jWs1V0fXP491WnjmGHKyNi39IngJpEwjVRmAhjxnxN7Yr+oY6uRurLjrJfV0btUYazcZw72uMiLaZLl5/QywvygkePmOAPHL25tDOdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708434460; c=relaxed/simple;
-	bh=ehswDltK3/4NFo3wnSiDCuhI7Mpdtyxc0vlD7vfoB6E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pklBNPlqnIG7l3sIvmJilkQgdYkjWhLtSl/QPODx7h7AYQyWKsfZ2NJRawFlsghtUyoe9tRYyU2CHeXdc9LFD8gcdbhoxUhGBYtpju5cGZUnXEnXTQGI6+PucMgrce3ljRMOYluhkrfw6yiOxeQFWOxig15U5/+ZpN1SvIkPesI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ojKrj4cO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8D70C433C7;
-	Tue, 20 Feb 2024 13:07:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708434460;
-	bh=ehswDltK3/4NFo3wnSiDCuhI7Mpdtyxc0vlD7vfoB6E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ojKrj4cO7lNYmywHneIX4t4r7Lws02ZhWpIwyKPHHxdOYDe8F2Fc8kfam1bDLEleb
-	 AsoBgNjuNRe8UUvvNh4wyMTUaRkTTz+awpZEWwqUEZjgHsdgvZRvdgvsqpp5Xehs+e
-	 Y3iWNo0hwKX6AySrVePYFUXsTB/Cj+Qpc/sO2RTfAM3o+SZLVm9tWcAgtSlrPJwDqI
-	 KP5ly5tyvfiQe2oH8ihoVlq+PTIvhTydpCYgxEH/I5y2I4gqmFyiynmpgfc9Y+Mo1H
-	 ES9hkMt+Bbh3Zv4UrCogSwVv+i08b1huUYTPeWuAq2yDrkI9qLeaaiBHRtli9F0AAK
-	 UACD0b9YmbeAw==
-Date: Tue, 20 Feb 2024 13:07:35 +0000
-From: Simon Horman <horms@kernel.org>
-To: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
-Cc: j.vosburgh@gmail.com, andy@greyhouse.net, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	rajesh.sivaramasubramaniom@oracle.com, rama.nichanamatlu@oracle.com,
-	manjunath.b.patil@oracle.com
-Subject: Re: [PATCH net-next v4] bonding: rate-limit bonding driver inspect
- messages
-Message-ID: <20240220130735.GI40273@kernel.org>
-References: <20240220050437.5623-1-praveen.kannoju@oracle.com>
+	s=arc-20240116; t=1708434848; c=relaxed/simple;
+	bh=9P+qGZ09vKP1bVu9xDA/zAFHdQr1RJe/fY/2APMl9sI=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Kb8UG2yy7kOgkJgF8pQUqeDYq+HmKlqbQQHO3iFlJzqfABOapXuBMSZXuFQddo+8omkBJnWXEC38s+uJoeA8mdpQqXra7hZgv3ss2FJIPuaUaFvcMs5Z1T01l+nf49kjqt7+SrtKjK5c5YAatEiY4nihLCbfuJwGc1uLFN6PBy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=djPvcnSl; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708434845;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kpefqOp0oZS0+OYDrex40+aBinTmwsqS3fR+A5/fHEk=;
+	b=djPvcnSl77Z5CHjIavLO0frOklYYLtJgfX8kV2MJUtvXhr/E+f0JzKxxw1OIT6xH9fyCCk
+	ShCtCWcPmhVPDJRuL/HL06KlEBI69LLf2UeMAOhaHTi6vKB8ainGmB1GVGJjsZZOQ/Uw8Z
+	w5wY7KR8EESjZeYdZcuygYJjWCd8JLM=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-265-5hkP352eMh2_IvOmDQpa8A-1; Tue, 20 Feb 2024 08:14:04 -0500
+X-MC-Unique: 5hkP352eMh2_IvOmDQpa8A-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-512bad7d985so1880481e87.0
+        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 05:14:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708434843; x=1709039643;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kpefqOp0oZS0+OYDrex40+aBinTmwsqS3fR+A5/fHEk=;
+        b=fCurRe9+mprQLCm029tGIMR2XXB/hqZzhUZBTwCa9pxZlQ7bazALtQ7bA0OqLGo0XW
+         w3SmYgPiDBP8p80e/jCdgkcWfdHMpYMRK6TDNhDioABAryqQO5nhIdKXqI1XVr+oE8o3
+         lmfQGHDzkaBFK4kO2kId2TpJoCoxzRxOtmxpkt/rEk7kFNBXRQ4uh63O1zavLxU5Syy8
+         /gxSxiceLaMLj+vFUpIPHqb0SzrXiy2XytFVwf49yn6U87EcgE+lzbI9EPTnHgP97V8C
+         ZfsvniIQ/AKUEh1ClGLy7X5YXACL71otVRJ/AmEmIUvTWHn+k4qb+zjlAzBkKh3cLhze
+         O/5g==
+X-Forwarded-Encrypted: i=1; AJvYcCUFQ8IoPizrRLkVxcfC0ZGFAzG0YcHVXJ3oJSKndHt3ueHs5uruFJJlrs3h/wEtR2MXJQvaGkOG7EcG1k22vF2wzUf/mK80
+X-Gm-Message-State: AOJu0Yx8rNGzulFawpfPkA4uPl2PPHhHj0GyRalN9iOL+ZzSQSryygvq
+	n+tBLBAjdeEWcuyKMkg+K/Zdclsg7SIPp5QjxW+D2LXA0QOg3oPiF7RF0ndGo6q1kk3VrUkZhc0
+	JGK0UGkgKD19b6Ur9D3yIKWs+Qal2Gf7/Zki/hvNSaVm455flGkMmFw==
+X-Received: by 2002:a05:6512:1244:b0:512:bf7e:ca25 with SMTP id fb4-20020a056512124400b00512bf7eca25mr2175364lfb.20.1708434842763;
+        Tue, 20 Feb 2024 05:14:02 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH8GOsb9PCUAoG+xTokA/O/bJ8lqnvFxihET48bAH7rH5bSJopZDtx4usFA3e5/XmG7h0DGbQ==
+X-Received: by 2002:a05:6512:1244:b0:512:bf7e:ca25 with SMTP id fb4-20020a056512124400b00512bf7eca25mr2175339lfb.20.1708434842396;
+        Tue, 20 Feb 2024 05:14:02 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id f16-20020a17090624d000b00a3efce660c2sm561653ejb.198.2024.02.20.05.14.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Feb 2024 05:14:02 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 83DF410F6365; Tue, 20 Feb 2024 14:14:01 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>, Daniel Borkmann <daniel@iogearbox.net>,
+ Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
+ <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, KP
+ Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard
+ Brouer <hawk@kernel.org>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, Eric Dumazet
+ <edumazet@google.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 2/3] bpf: test_run: Use system page pool for
+ XDP live frame mode
+In-Reply-To: <e73b7562e4333d3295eaf6d08bc1c6219c2541e5.camel@redhat.com>
+References: <20240215132634.474055-1-toke@redhat.com>
+ <20240215132634.474055-3-toke@redhat.com>
+ <59c022bf-4cc4-850f-f8ab-3b8aab36f958@iogearbox.net>
+ <e73b7562e4333d3295eaf6d08bc1c6219c2541e5.camel@redhat.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Tue, 20 Feb 2024 14:14:01 +0100
+Message-ID: <87frxn1dnq.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240220050437.5623-1-praveen.kannoju@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 20, 2024 at 10:34:37AM +0530, Praveen Kumar Kannoju wrote:
-> Through the routine bond_mii_monitor(), bonding driver inspects and commits
-> the slave state changes. During the times when slave state change and
-> failure in aqcuiring rtnl lock happen at the same time, the routine
-> bond_mii_monitor() reschedules itself to come around after 1 msec to commit
-> the new state.
-> 
-> During this, it executes the routine bond_miimon_inspect() to re-inspect
-> the state chane and prints the corresponding slave state on to the console.
-> Hence we do see a message at every 1 msec till the rtnl lock is acquired
-> and state chage is committed.
-> 
-> This patch doesn't change how bond functions. It only simply limits this
-> kind of log flood.
-> 
-> Signed-off-by: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
-> ---
-> v4:
->   - Rectification in the patch subject and versioning details.
-> v3: https://lore.kernel.org/lkml/20240219133721.4567-1-praveen.kannoju@oracle.com/
->   - Commit message is modified to provide summary of the issue, because of
->     which rate-limiting the bonding driver messages is needed.
-> v2: https://lore.kernel.org/lkml/20240215172554.4211-1-praveen.kannoju@oracle.com/
->   - Use exising net_ratelimit() instead of introducing new rate-limit
->     parameter.
-> v1: https://lore.kernel.org/lkml/20240214044245.33170-1-praveen.kannoju@oracle.com/
-> ---
->  drivers/net/bonding/bond_main.c | 36 ++++++++++++++++++++----------------
->  1 file changed, 20 insertions(+), 16 deletions(-)
-> 
-> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-> index 4e0600c..e92eba1 100644
-> --- a/drivers/net/bonding/bond_main.c
-> +++ b/drivers/net/bonding/bond_main.c
-> @@ -2610,12 +2610,13 @@ static int bond_miimon_inspect(struct bonding *bond)
->  			commit++;
->  			slave->delay = bond->params.downdelay;
->  			if (slave->delay) {
-> -				slave_info(bond->dev, slave->dev, "link status down for %sinterface, disabling it in %d ms\n",
-> -					   (BOND_MODE(bond) ==
-> -					    BOND_MODE_ACTIVEBACKUP) ?
-> -					    (bond_is_active_slave(slave) ?
-> -					     "active " : "backup ") : "",
-> -					   bond->params.downdelay * bond->params.miimon);
-> +				if (net_ratelimit())
-> +					slave_info(bond->dev, slave->dev, "link status down for %sinterface, disabling it in %d ms\n",
-> +						   (BOND_MODE(bond) ==
-> +						   BOND_MODE_ACTIVEBACKUP) ?
-> +						   (bond_is_active_slave(slave) ?
-> +						   "active " : "backup ") : "",
-> +						   bond->params.downdelay * bond->params.miimon);
->  			}
+Paolo Abeni <pabeni@redhat.com> writes:
 
-Hi Praveen,
+> On Tue, 2024-02-20 at 10:06 +0100, Daniel Borkmann wrote:
+>> On 2/15/24 2:26 PM, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>> > The BPF_TEST_RUN code in XDP live frame mode creates a new page pool
+>> > each time it is called and uses that to allocate the frames used for t=
+he
+>> > XDP run. This works well if the syscall is used with a high repetitions
+>> > number, as it allows for efficient page recycling. However, if used wi=
+th
+>> > a small number of repetitions, the overhead of creating and tearing do=
+wn
+>> > the page pool is significant, and can even lead to system stalls if the
+>> > syscall is called in a tight loop.
+>> >=20
+>> > Now that we have a persistent system page pool instance, it becomes
+>> > pretty straight forward to change the test_run code to use it. The only
+>> > wrinkle is that we can no longer rely on a custom page init callback
+>> > from page_pool itself; instead, we change the test_run code to write a
+>> > random cookie value to the beginning of the page as an indicator that
+>> > the page has been initialised and can be re-used without copying the
+>> > initial data again.
+>> >=20
+>> > Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+>>=20
+>> [...]
+>> > -
+>> >   	/* We create a 'fake' RXQ referencing the original dev, but with an
+>> >   	 * xdp_mem_info pointing to our page_pool
+>> >   	 */
+>> >   	xdp_rxq_info_reg(&xdp->rxq, orig_ctx->rxq->dev, 0, 0);
+>> > -	xdp->rxq.mem.type =3D MEM_TYPE_PAGE_POOL;
+>> > -	xdp->rxq.mem.id =3D pp->xdp_mem_id;
+>> > +	xdp->rxq.mem.type =3D MEM_TYPE_PAGE_POOL; /* mem id is set per-frame=
+ below */
+>> >   	xdp->dev =3D orig_ctx->rxq->dev;
+>> >   	xdp->orig_ctx =3D orig_ctx;
+>> >=20=20=20
+>> > +	/* We need a random cookie for each run as pages can stick around
+>> > +	 * between runs in the system page pool
+>> > +	 */
+>> > +	get_random_bytes(&xdp->cookie, sizeof(xdp->cookie));
+>> > +
+>>=20
+>> So the assumption is that there is only a tiny chance of collisions with
+>> users outside of xdp test_run. If they do collide however, you'd leak da=
+ta.
+>
+> Good point. @Toke: what is the worst-case thing that could happen in
+> case a page is recycled from another pool's user?
+>
+> could we possibly end-up matching the cookie for a page containing
+> 'random' orig_ctx/ctx, so that bpf program later tries to access
+> equally random ptrs?
 
-As this is used several times I think that it would be worth introducing
-a slave_info_ratelimit() helper. That is  assuming slave_info() is still used
-without a rate limit. If not, you could just add net_ratelimit directly
-to slave_info().
+Well, yes, if there's a collision in the cookie value we'll end up
+basically dereferencing garbage pointer values, with all the badness
+that ensues (most likely just a crash, but system compromise is probably
+also possible in such a case).
 
-If none of this is desirable for some reason, then could you consider
-reducing indentation somehow. f.e.:
+A 64-bit value is probably too small to be resistant against random
+collisions in a "protect global data across the internet" type scenario
+(for instance, a 64-bit cryptographic key is considered weak). However,
+in this case the collision domain is only for the lifetime of the
+running system, and each cookie value only stays valid for the duration
+of a single syscall (seconds, at most), so I figured it was acceptable.
 
-		if (slave->delayi && net_ratelimit())
-			slave_info(...
+We could exclude all-zeros as a valid cookie value (and also anything
+that looks as a valid pointer), but that only removes a few of the
+possible random collision values, so if we're really worried about
+random collisions of 64-bit numbers, I think a better approach would be
+to just make the cookie a 128-bit value instead. I can respin with that
+if you prefer? :)
+
+-Toke
+
 
