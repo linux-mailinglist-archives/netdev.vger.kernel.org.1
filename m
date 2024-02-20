@@ -1,147 +1,142 @@
-Return-Path: <netdev+bounces-73244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D4F185B943
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 11:40:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9D2485B956
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 11:43:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5352B284483
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 10:40:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 183DB282674
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 10:43:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF8B9627FF;
-	Tue, 20 Feb 2024 10:40:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C6BA6166E;
+	Tue, 20 Feb 2024 10:43:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Sy8Camel"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a+4/430e"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B335D744;
-	Tue, 20 Feb 2024 10:40:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 747E43EA88;
+	Tue, 20 Feb 2024 10:43:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708425636; cv=none; b=Xq1MjvTeTXYrF6Zui3/zk1aHcsSPJ594+V1JUNcOhxmBE4oA0NLMRKCS1yPnoKEGnMeuRzTgqN1YAfND9p2PJIjUKFjlFnrcNvdmUSPEkoUCQJRGTK2ptuOwWdTDIL6U+0knYv1ZHKiQlpHqWEEsOdEBrQjq2Pl1WomazJSTtI4=
+	t=1708425783; cv=none; b=LsHnCi6JlPaz0y31sKZ6gqOlKD1IaytLSGBUsWgqnKydHvgot0qIa540NnlFF2WTNIGfu4QFlziw5BR42QE6pRJsf+pLieaLnFz6SGW9qa5uTYjXER95toc5PYULJJZMvK9GLTOHJKZAc0N0VCOWBjZEalMYS/OhH5d/1iV6u6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708425636; c=relaxed/simple;
-	bh=wgEKPLuQhowA5lHKPh2DQgm6k4i0knYDD6ZvDFyTHNY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q+SsyR+p0Dgw5zDUMR5T68Gn7eBkdgfFMqyL1AzCNooJKbcvxW2AkTwoA2V6dgZ6P/HT2KWgwZCTnFLSx3a/rM5gLbeah/pQXJk1tAS/uQZn/SSfOYWn+eocxn9SWLnT5XqJIeGmOk823UmlE6EQlqz+pqo2Ygm1g84T4aQTaYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Sy8Camel; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 59B2AFF809;
-	Tue, 20 Feb 2024 10:40:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1708425632;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ACLavhsVh+dltMk+C9yWyeUkFI9OfKzbdHBseD8xfZk=;
-	b=Sy8CamelugK8+m7lSC73XuxpD6fIj3LuUTyJBBO9DRk18f/sfwdN0E9xLru1XiKcNZzn61
-	pod84G04rz0E/l/ZlpJp3oYYnijEixCi1+ZYu4AvW1KRBKJ+MdOILZOpxP5j4X833UeW3S
-	vv+G3kf3rm64TTQnpNhJ9tUU8jZXIl4jci89P1RWQP6T+pn3ijru+/IncV/XEHvvjR74cy
-	SHeR1gzEx3AQ+QrYMdinFg1aZu/mbP5fRnIC9Rge5gkiExIDKmGH0n7B0t5Zri7v1ibyGF
-	9o1oHPe4PrVklFfimFlDb79aYTbMD+v6q+Kjpw6Gm/yrbbhGbOWr7UHsFCh6NQ==
-Date: Tue, 20 Feb 2024 11:40:29 +0100
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
- <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Mark Brown <broonie@kernel.org>, Frank Rowand <frowand.list@gmail.com>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v4 14/17] dt-bindings: net: pse-pd: Add
- bindings for PD692x0 PSE controller
-Message-ID: <20240220114029.6b1a445d@kmaincent-XPS-13-7390>
-In-Reply-To: <ZdCjJcPbbBGYVtuo@pengutronix.de>
-References: <20240215-feature_poe-v4-0-35bb4c23266c@bootlin.com>
-	<20240215-feature_poe-v4-14-35bb4c23266c@bootlin.com>
-	<ZdCjJcPbbBGYVtuo@pengutronix.de>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1708425783; c=relaxed/simple;
+	bh=KN/9eAsuetSnf1YuKZN74PDoEk4+o0nerLs+2e8yZPI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JLdxE4HNH6AJw1nqEjpDbYEXZ1sbXF577Jb5RYud1MCs9OVCZ8rZy2+vvXMynTFeSXyL/d7oTynRJvgo0EBbVKxylbhWE1WOD5j74fWzeJLjDXxmf62Ucr/70fBMRMb+CJ5KG+IaCCwqOQvCLFIXpSsE+5yL9mNMxcmhNSjGJVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a+4/430e; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CE66C433C7;
+	Tue, 20 Feb 2024 10:43:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708425782;
+	bh=KN/9eAsuetSnf1YuKZN74PDoEk4+o0nerLs+2e8yZPI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=a+4/430eZDxmfKGa3jFXyElOroI2LT61/iEsQicEw/czIXo097yQbHPUngAWwdI0w
+	 W69qqkzFxu+pIPzRF0UcaqtBrlP3p9Fi+FxaV1d0peQk48+3T3gndymN4btydDDGQQ
+	 MUZd1BCXhNupQqBylfWlwEzXD+d9yz+bR5KRd1EvXuVkcuRAGS3aSArphIxADIQ5i3
+	 sMAWgM81x34qJeOuvQ/LsR9BXRGHi2S43/kG0E/c5DqiATyyHWFO5tGxOv0prHofuL
+	 De2f7LzsObrMkG7z+7oShdb4ohUuwreXwx7VGIA763arifZtVfS6A9njQA9STRYB2q
+	 6vZ1ATIJKSbxw==
+Message-ID: <0b1c8247-ccfb-4228-bd64-53583329aaa7@kernel.org>
+Date: Tue, 20 Feb 2024 11:42:57 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net-next 1/2] net: Reference bpf_redirect_info via
+ task_struct on PREEMPT_RT.
+Content-Language: en-US
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <66d9ee60-fbe3-4444-b98d-887845d4c187@kernel.org>
+ <20240214121921.VJJ2bCBE@linutronix.de> <87y1bndvsx.fsf@toke.dk>
+ <20240214142827.3vV2WhIA@linutronix.de> <87le7ndo4z.fsf@toke.dk>
+ <20240214163607.RjjT5bO_@linutronix.de> <87jzn5cw90.fsf@toke.dk>
+ <20240216165737.oIFG5g-U@linutronix.de> <87ttm4b7mh.fsf@toke.dk>
+ <04d72b93-a423-4574-a98e-f8915a949415@kernel.org>
+ <20240220101741.PZwhANsA@linutronix.de>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20240220101741.PZwhANsA@linutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Sat, 17 Feb 2024 13:14:29 +0100
-Oleksij Rempel <o.rempel@pengutronix.de> wrote:
 
-> On Thu, Feb 15, 2024 at 05:02:55PM +0100, Kory Maincent wrote:
-> > Add the PD692x0 I2C Power Sourcing Equipment controller device tree
-> > bindings documentation.
-> >=20
-> > This patch is sponsored by Dent Project <dentproject@linuxfoundation.or=
-g>.
-> >=20
-> > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> > --- =20
-> ...
-> > +        pse_pis {
-> > +          #address-cells =3D <1>;
-> > +          #size-cells =3D <0>;
-> > +
-> > +          pse_pi0: pse_pi@0 {
-> > +            reg =3D <0>;
-> > +            #pse-cells =3D <0>;
-> > +            pairset-names =3D "alternative-a", "alternative-b";
-> > +            pairsets =3D <&phys0>, <&phys1>;
-> > +          };
-> > +          pse_pi1: pse_pi@1 {
-> > +            reg =3D <1>;
-> > +            #pse-cells =3D <0>;
-> > +            pairset-names =3D "alternative-a";
-> > +            pairsets =3D <&phys2>; =20
->=20
-> According to latest discussions, PSE PI nodes will need some
-> additional, board specific, information:
-> - this controller do not implements polarity switching, we need to know
->   what polarity is implemented on this board. The 802.3 spec provide not
->   really consistent names for polarity configurations:
->   - Alternative A MDI-X
->   - Alternative A MDI
->   - Alternative B X
->   - Alternative B S
->   The board may implement one of polarity configurations per alternative
->   or have additional helpers to switch them without using PSE
->   controller.
->   Even if specification explicitly say:
->   "The PD shall be implemented to be insensitive to the polarity of the p=
-ower
->    supply and shall be able to operate per the PD Mode A column and the PD
->    Mode B column in Table 33=E2=80=9313"
->   it is possible to find reports like this:
->   https://community.ui.com/questions/M5-cant-take-reversed-power-polarity=
--/d834d9a8-579d-4f08-80b1-623806cc5070
->=20
->   Probably this kind of property is a good fit:
->   polarity-supported =3D "MDI-X", "MDI", "X", "S";
 
-This property should be on the PD side.
-Isn't it better to name it "polarity-provided" for each PSE PIs binding? Wh=
-at
-do you think?
-We agreed that it is mainly for ethtool to show the polarity of a PI, right?
+On 20/02/2024 11.17, Sebastian Andrzej Siewior wrote:
+> On 2024-02-20 10:17:53 [+0100], Jesper Dangaard Brouer wrote:
+>>
+>>
+>> On 19/02/2024 20.01, Toke Høiland-Jørgensen wrote:
+>>> may be simpler to use pktgen, and at 10G rates that shouldn't become a
+>>> bottleneck either. The pktgen_sample03_burst_single_flow.sh script in
+>>> samples/pktgen in the kernel source tree is fine for this usage.
+>>
+>> Example of running script:
+>>   ./pktgen_sample03_burst_single_flow.sh -vi mlx5p1 -d 198.18.1.1 -m
+>> ec:0d:9a:db:11:c4 -t 12
+>>
+>> Notice the last parameter, which is number threads to start.
+>> If you have a ixgbe NIC driver, then I recommend -t 2 even if you have more
+>> CPUs.
+> 
+> I get
+> | Summary                 8,435,690 rx/s                  0 err/s
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+This seems low...
+Have you remembered to disable Ethernet flow-control?
+
+  # ethtool -A ixgbe1 rx off tx off
+  # ethtool -A i40e2 rx off tx off
+
+
+> | Summary                 8,436,294 rx/s                  0 err/s
+
+You want to see the "extended" info via cmdline (or Ctrl+\)
+
+  # xdp-bench drop -e eth1
+
+
+> 
+> with "-t 8 -b 64". I started with 2 and then increased until rx/s was
+> falling again. I have ixgbe on the sending side and i40e on the
+
+With ixgbe on the sending side, my testlab shows I need -t 2.
+
+With -t 2 :
+Summary                14,678,170 rx/s                  0 err/s
+   receive total        14,678,170 pkt/s        14,678,170 drop/s 
+         0 error/s
+     cpu:1              14,678,170 pkt/s        14,678,170 drop/s 
+         0 error/s
+   xdp_exception                 0 hit/s
+
+with -t 4:
+
+Summary                10,255,385 rx/s                  0 err/s
+   receive total        10,255,385 pkt/s        10,255,385 drop/s 
+         0 error/s
+     cpu:1              10,255,385 pkt/s        10,255,385 drop/s 
+         0 error/s
+   xdp_exception                 0 hit/s
+
+> receiving side. I tried to receive on ixgbe but this ended with -ENOMEM
+> | # xdp-bench drop eth1
+> | Failed to attach XDP program: Cannot allocate memory
+> 
+> This is v6.8-rc5 on both sides. Let me see where this is coming from…
+> 
+
+Another pitfall with ixgbe is that it does a full link reset when
+adding/removing XDP prog on device.  This can be annoying if connected
+back-to-back, because "remote" pktgen will stop on link reset.
+
+--Jesper
 
