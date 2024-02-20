@@ -1,223 +1,213 @@
-Return-Path: <netdev+bounces-73143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68B7085B2E0
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 07:26:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8C9D85B2EF
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 07:31:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C6031C21A2C
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 06:26:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EE2A286D17
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 06:31:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E4405914E;
-	Tue, 20 Feb 2024 06:26:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FC4E1DDFC;
+	Tue, 20 Feb 2024 06:31:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b="praZsGUg"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="gGQmBhZa"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2100.outbound.protection.outlook.com [40.107.236.100])
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C71FD59143;
-	Tue, 20 Feb 2024 06:26:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.100
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708410376; cv=fail; b=Hol75iUSAN74/yOFmYCZoDBORlD9JhE648ZNoDfktArTxrgjPF5LzRLrMfVtPuj9mdMQFqmgod/tkBprXmh7m+G935kBA1ypdeet/cs8fCmbwcOPCyjp+XFUN2p0cr2/9EncsM3jojy+KgLMsMf2yNQhZSYRSa8j48CVnn54xgA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708410376; c=relaxed/simple;
-	bh=n6HYHZyqeYVoDTwqSjaUwblYqzUcrH1o+66WCkN5vIA=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=nLU3dEJ2IMnqZciKhXrLP3epYOIJU42Gh+qRC5TxLnrc6fnHOJjA1J3FzUQVepAIa7tf+GgmOhMDcJoYMOHTr8BOnyxxQ6pwEM4uFtbxveQLqAWGEjURZjUCAU7VSnJXVTbjIoKZs6RHZ+2AKbFcBxclLhpGqOsMZGdX1Z+5Asc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=fail (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b=praZsGUg reason="key not found in DNS"; arc=fail smtp.client-ip=40.107.236.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UUwF5Cti+MoL/xkC9OprrezyZISjrGKTTNpdIin7Z5Zg/P6c4CTNmsRUHQthlq72siBYu2dq/VF+SLSFraEiFjzimXKgj0Sdoy1DymF6yV/+k5aRQ5djF8qiGV+PW3id66VVp2Tt7OXXcvoCSyeNlUlpX5ccVlKuBmOeu5C3wHisHUEMHHxv1BX2jBYo6qk5I8zErQHpkdekSBVERk1mjTCk7K5mHH8T0/NoH7ghqo/eb+Z9fCRO0daytG5dGYSYZ4zni6moUIMG1VdRXYuexLysanhzekzhF+2dLhmZhmYpiscEGooaSp9hN/GEgv+bfE4qIr3eAXui2buQHJSZ6Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=W3P/qavSTBHEr6qtlUj+jGAP1Xoz0gjLAgQH9psku2E=;
- b=GHU5NJ68AHx5TSAKqXuTm55UZuqSVvHmkG3FEG00cjBVNpRHbLU9elxPqWi/aavhYp6TBLYE2fsRN4UT/xaEzUSGFmkniMR6pQ8EqF1EpHND3cwEYmKl2VPC1Zv3L8msclHDelbVR+GkCm2vhTCiaeEbjHn+CJbI2ap+JsMB2cV3y2sczB4RguNvoAiHIXygQx5Db05+RN0F95eZ+TQ0hPGuRIFxM6FdkSFkMrSGqdUPv9diTikveoUfNcYOjXUXtwvUKQ4tkf1+faRiEANmENfMIjmrv8xrVkgMQO+wjZNSYc8EiGDuk2+XBUfyoXrSfLuuw3+ZzVYbp9oBIdG2Vw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=amperemail.onmicrosoft.com; dkim=pass
- header.d=amperemail.onmicrosoft.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6208A17740
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 06:31:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708410678; cv=none; b=o6iDDUawbtIxYkzZ5gq152bKfQa+Lr35Q+2VA8mc2BnO5Dy3iL1k0K3g0rz4+mfNNXdgBZXTEc/FhTytRfdWwoTzC3fiaeCl6vT5gfgZx+Hz0V5AXg30X8V2ZzI9X0u/BNPGCWC6aLEAEVp3I7a1TbqlQ3I88dpx9kdTeST51dE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708410678; c=relaxed/simple;
+	bh=R6Zhfa5I3cBJOYPLOma72yszCyzV5+QDltINN2T/1wI=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=bHX48or2IlP47PB3kM+EHh6j2q1zPufHeU95C2muz7fhtZZWm60H537dS1Ubfv//sJTuKj7iHtGuRhC9+KIo7kvF6r5u2EE/MKTt59znItE7S9p7BIclfBZ61X4RRPnpi0jUbsw/hnEgkMS6gf6neH4w8h3baQtrXOQ/c2xvYyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=gGQmBhZa; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+Received: from pecola.lan (unknown [159.196.93.152])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 412732009F;
+	Tue, 20 Feb 2024 14:31:13 +0800 (AWST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amperemail.onmicrosoft.com; s=selector1-amperemail-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=W3P/qavSTBHEr6qtlUj+jGAP1Xoz0gjLAgQH9psku2E=;
- b=praZsGUghtLO3YAIpjSqjqDhqAf5Y6FDUUtLagr+lORhgKWiyt6ZyQoQGZTThl5ZawLzNXRhS0lRjlKtdiCQezYCSLbl2175rbOVWz65gvBBK5Dvvsm7Opb03tIxFwYR2gVI5/USLDvc496b0+8smKasxE5HoPsPh9jIQv9eByg=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amperemail.onmicrosoft.com;
-Received: from PH0PR01MB7975.prod.exchangelabs.com (2603:10b6:510:26d::15) by
- CO1PR01MB7307.prod.exchangelabs.com (2603:10b6:303:156::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7292.39; Tue, 20 Feb 2024 06:26:10 +0000
-Received: from PH0PR01MB7975.prod.exchangelabs.com ([fe80::91c:92f:45a5:e68a])
- by PH0PR01MB7975.prod.exchangelabs.com ([fe80::91c:92f:45a5:e68a%6]) with
- mapi id 15.20.7292.029; Tue, 20 Feb 2024 06:26:10 +0000
-Message-ID: <bea860f8-a196-4dff-a655-4da920e2ebfa@amperemail.onmicrosoft.com>
-Date: Tue, 20 Feb 2024 14:26:01 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: skbuff: allocate the fclone in the current NUMA node
-To: Eric Dumazet <edumazet@google.com>,
- Huang Shijie <shijie@os.amperecomputing.com>
-Cc: kuba@kernel.org, patches@amperecomputing.com, davem@davemloft.net,
- horms@kernel.org, ast@kernel.org, dhowells@redhat.com,
- linyunsheng@huawei.com, aleksander.lobakin@intel.com,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- cl@os.amperecomputing.com
-References: <20240220021804.9541-1-shijie@os.amperecomputing.com>
- <CANn89iJoHDzfYfhcwVvR4m7DiVG-UfFNqm+D1WD-2wjOttk6ew@mail.gmail.com>
-From: Shijie Huang <shijie@amperemail.onmicrosoft.com>
-In-Reply-To: <CANn89iJoHDzfYfhcwVvR4m7DiVG-UfFNqm+D1WD-2wjOttk6ew@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: CY8PR22CA0004.namprd22.prod.outlook.com
- (2603:10b6:930:45::12) To PH0PR01MB7975.prod.exchangelabs.com
- (2603:10b6:510:26d::15)
+	d=codeconstruct.com.au; s=2022a; t=1708410673;
+	bh=Me9rxM5N3iWUmwjHi0jz3vpuny1zY7rRWXQ2K4zUS/M=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=gGQmBhZaYiobSGgTPrCfZWfI1IkJ0Y9cEUgGzakhYs0vBbi1yiXoALIBnvMcHxJda
+	 3k3ywLEW75AmJFzhyn/jxLA/tvKa+RQfuvnNBapgGE7Mb7gHVQHwg2Yo1E00xmBchV
+	 qru2oX27jEJw4cpU0A0tErLSB8JZKFRZ29CmlRWsLLTOx1iaUKqTHBDY/wiG3i8x2t
+	 mek8Lcp4Qdu8pGwvZDAaJTRUfZaSLuW2avERXAIpV3aH/F9v2j+ljeE2EIrgYu1Jai
+	 pMX58nF0GG5QlTBtst6zr0cPkxhNiZXBa4SVVQXRygpFEgvIJa4UVqnLilpmTT0HpO
+	 fYrR596UeSReg==
+Message-ID: <fbf0f5f5216fb53ee17041d61abc81aaff04553b.camel@codeconstruct.com.au>
+Subject: Re: MCTP - Socket Queue Behavior
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: "Ramaiah, DharmaBhushan" <Dharma.Ramaiah@dell.com>, 
+	"netdev@vger.kernel.org"
+	 <netdev@vger.kernel.org>, "matt@codeconstruct.com.au"
+	 <matt@codeconstruct.com.au>
+Cc: "Rahiman, Shinose" <Shinose.Rahiman@dell.com>
+Date: Tue, 20 Feb 2024 14:31:12 +0800
+In-Reply-To: <SJ0PR19MB4415EA14FC114942FC79953587502@SJ0PR19MB4415.namprd19.prod.outlook.com>
+References: 
+	<SJ0PR19MB4415F935BD23A6D96794ABE687512@SJ0PR19MB4415.namprd19.prod.outlook.com>
+	 <202197c5a0b755c155828ef406d6250611815678.camel@codeconstruct.com.au>
+	 <SJ0PR19MB4415EA14FC114942FC79953587502@SJ0PR19MB4415.namprd19.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR01MB7975:EE_|CO1PR01MB7307:EE_
-X-MS-Office365-Filtering-Correlation-Id: 00191e14-3875-40b0-c28a-08dc31dcd407
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	8AkEJ68j1JIIHXSSQRHyvdoGyh2kBVZoQ+ZIlPOH0dWBHlnnthuHcA5b7yZF26JijMDpjdraFxc1UEZnQZM0O4aKyaGSpOcRvQebz8Yb+dIsvayUyJHd+ri7x1L5xoiTxodxwy46ZoDTvIxhkPliHkIYSWfs7mtLlMy/2pClRA+IfAQ88kUa9UNnZPKqYY420MJrqQMT9jR4bS1vhGGbN1FyAnpaSz5ANNHDbZjWgoozK6BIbSbWk6dh5q53e217spPHwJlB4fIklkiVqCTxItIeTRQqOo63JQ/7MnnxqUiZasdIKmvgVkupoCJIlPrKZsoisxBZCJ8FlDOx4VK/vFrGF2k8lS9Ijd6Jridxk+ShTnIRXBYxmD8FHHVHWYcxV+NxDH+/sxAAowSe7rLr9rkqhedsnwjgWmYfyPDegZFgxMCqCSpXvYaLrXhd01puZnYyTiThJ8HPvItNw6H9IYDd7irUi8K36F3i8PmiWpCc1A4RkTtxm3Yx/2rk50//RwwMUIXkJQSKP2ElqQGmNX0rCXW55fsro4qB9r/HuNI=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR01MB7975.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?aGVJWm5kVnp5TVQrRmI4S3BzZ0dmMUprR09peGRKQ3ZmbHdZeUJSdGgrS3d6?=
- =?utf-8?B?akNUUXJCWFVTUmwyMHVIZGpoQ2F3Q2x0ZDRlTDkyUmtOWklubTVsUlpyQVoy?=
- =?utf-8?B?MHAzZHlpYlo4UllZRDNzbjc4bmYvbGk1MmhxY3dCbWtmQnNwOHVaYVIxcnBm?=
- =?utf-8?B?N0xLU2lUNm5tS1MwdXNSZTZqcG1Cb3lPWmhBdzZvRmpURkEwWThyb2cyVzlu?=
- =?utf-8?B?MVZPWGlDMmFOOGhiemtsQmdQUWpUb3pVdkdNRktmYnRRVXFoVS90TTZZdXZ2?=
- =?utf-8?B?UE9GNmU0alY0Q2JHVGFRYzlzUkVHWnJiZjVhNGV3TGRnZjJzSC9nV25RZ3Nv?=
- =?utf-8?B?QzhDRms5ck1PTXU3NlZxa0JoVVVrR2l0OTFwT3lXNEFqK0dPVkFFeGdVcUlI?=
- =?utf-8?B?Qm9MMXB6UmcwS1hzNzBUVUk0QnkvVGFqQnZyTThPSkhXN20wb0lUem56NFF3?=
- =?utf-8?B?WUxQY1liSGdqeFdLWTFjR09YRkU2RSswK1lQSlB4VVJ6dUMvb3YzOUVPK0xG?=
- =?utf-8?B?cDcwWWhiMGZtK1BYWjI0eXFvVkE2YktLWHNVdVdDZXA0Um1QSENZZ2tTWEVm?=
- =?utf-8?B?TkJBcG10TllVdGxxcmVIMHhpdkNDdDBNT1haOWpua2Jqa3hCbFB3KzlibjVL?=
- =?utf-8?B?SzBFVkd2SmR4c1paMDZIMlI2Ri8xUTRMakdjL2Y3OVBFRnNUVS9TUHdSL3Bm?=
- =?utf-8?B?Z2VvU2xUZWFrcWtQN09tbHpTQk1RMUREYnQ2VmtlK1pRcTl6T0JHSGhPZU9C?=
- =?utf-8?B?RFlXNUFuMWFwcFJrNnRBb1hBZm9LeG0wL1l3WmZoVUNYMWRFb0M1eDRMOFVR?=
- =?utf-8?B?NldVbWdncTBTRDFqQ245ZTVwR1R2bENZczNPbmxSY3k4UE9LZEV5Tm9HVTZn?=
- =?utf-8?B?ZDUvckxjajZNdTFKcXU1dE1OMDQ5eWowTm80S2Qzd2l5Mm1FV3VIWWptaDFG?=
- =?utf-8?B?ZWlhOWtrenZLZ1pxeldLY0Z2VWxHLzg2WFVEVkMrUDBMQml5dHdTeGJHMjR1?=
- =?utf-8?B?eE8xeEk0UDU2d2gwNXR3SmhjbkJlaGg5aUUvTUtvdHNTY2RFQTNkQU5OWFpw?=
- =?utf-8?B?V2xsSlUxWFR3UGxIVmQxOHJmODU0NjRlM3h5MVZKWnlsQW1SOVpZK1hldTY5?=
- =?utf-8?B?Y2JVMjhUcTZibUExbnBNSWE2Nmc2UjJ2d1F5ckNUbnFlZEZvcnZZa0ZUdTJC?=
- =?utf-8?B?ZGJYaHY2T2ZjRXFBUzNsRGhPWE40a3g3QVBROXpnSnZUOWtKRlMyV0VHZVdh?=
- =?utf-8?B?SXZCQ1hIdDlRRFJjSmI5ZTB0bmhSUnZpb3AzYm9WaUVLYTg4RjdqaThQMmZ3?=
- =?utf-8?B?blVPSi94N0hBTVpKSVpPWGVNSVUzN1dGelpseUlsdTdqcnZXU3hMZythcnNQ?=
- =?utf-8?B?VTdnYTFseDVqenlVMmh3T0x2UHNyNGNPUGtmaDJ1eXdOZldHTngvTG1BSVBG?=
- =?utf-8?B?bmFVUVJEU2VObStNZjhwRHpEbHpZeUFUMjgxSVhWZDl4R250VEJwVEFySTJn?=
- =?utf-8?B?M1d0NDJhMnFOVmtINC9yQTYxYlEzUE1VVXR0YkdlOGpaT0pQY002UUxHQWhw?=
- =?utf-8?B?VHNZM1EzVkJ0SytHNzRCVHljZklnMFFwbGgzRFhBTjJrUHRUMFh1RnN3MFpx?=
- =?utf-8?B?aXVLWkY4UFgrQ2ttUnEvTXZJTzFCVEd5OFA1QWl3MmRnQXhJcno5cUFmSXdh?=
- =?utf-8?B?ajlUZ3ZqcEswOXNENW1HSDJRcy9qRUJOQUlkc1NqS0p1VmVsSDc4MjF0TE1q?=
- =?utf-8?B?UldRSlB0cXJpWGs2aW5BdkFyRDJHSWg3NHVXY3Vkem1QK1g1NFAxN1FUZ3dt?=
- =?utf-8?B?RXFmWHEzSSsrZ2YvSmZzdFFRQSt5SHE5cTVSS2FhNXoyc01xOXVPNkRmQnFz?=
- =?utf-8?B?ZEZJSGNWNUVoUjQwSkJHL3k0L04xM05JcXpsRU1HVFJQNzk2N3hZcEk3MFRB?=
- =?utf-8?B?M3FLcGdaT01jWm9Wdm8rRzhyYUl2TGk5bEN5YWJxQnpodURPb0RNZzBXSHNX?=
- =?utf-8?B?YUF0TGp6b2E4OWJOY3ZYdGs0RU5PVytURjJuWE9helZLNXhpMDZJZ1c5czMr?=
- =?utf-8?B?L0I5NzhremZ6N3V1NFJQRU1nY0J6YXRXd1A4VWNIRndsMXFiVlhDVFZ6NURx?=
- =?utf-8?B?Y0Fjd29WSGFhYTVNWllCd0IvNVRhSElJeXJGdUM0SVU1bmdSVHIvN0pGOWQ1?=
- =?utf-8?B?eFE9PQ==?=
-X-OriginatorOrg: amperemail.onmicrosoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 00191e14-3875-40b0-c28a-08dc31dcd407
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR01MB7975.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2024 06:26:10.2091
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BoILI5Nz9J2E7CHVmRwWSdnSoX4tUbpRkvRFWP2EgbjFvpHMvR4C7wewrUytW00Lb3rYb/m/6AQAvaErpeu6C5lqfM6so+5HiffvLZnJXFsM6cHT3Jlna0sRFcvOzCBJ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR01MB7307
+
+Hi Dharma,
+
+> Thanks for the reply. I have few additional queries.
+
+Sure, answers inline.
+
+> > We have no control over reply ordering. It's entirely possible that
+> > replies are
+> > sent out of sequence by the remote endpoint:
+> >=20
+> > =C2=A0 local application=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 remote endpoint
+> >=20
+> > =C2=A0 sendmsg(message 1)
+> > =C2=A0 sendmsg(message 2)
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 receives message 1
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 receives message 2
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 sends a reply 2 to message 2
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 sends a reply 1 to message 1
+> > =C2=A0 recvmsg() -> reply 2
+> > =C2=A0 recvmsg() -> reply 1
+> >=20
+>=20
+> Based on the above explanation I understand that the sendto allocates
+> the skb (based on the blocking/nonblocking mode). mctp_i2c_tx_thread,
+> dequeues the skb and transmits the message. And also sendto can
+> interleave the messages on the wire with different message tag. My
+> query here regarding the bus lock.
+>=20
+> 1. Is the bus lock taken for the entire duration of sendto and
+> revcfrom (as indicated in one of the previous threads).
+
+To be more precise: the i2c bus lock is not held for that entire
+duration. The lock will be acquired when the first packet of the message
+is transmitted by the i2c transport driver (which may be after the
+sendmsg() has returned) until its reply is received (which may be before
+recvmsg() is called).
 
 
-在 2024/2/20 13:32, Eric Dumazet 写道:
-> On Tue, Feb 20, 2024 at 3:18 AM Huang Shijie
-> <shijie@os.amperecomputing.com> wrote:
->> The current code passes NUMA_NO_NODE to __alloc_skb(), we found
->> it may creates fclone SKB in remote NUMA node.
-> This is intended (WAI)
+> Assume a case where we have a two EP's (x and y) on I2C bus #1 and
+> these EP's are on different segments.
 
-Okay. thanks a lot.
+I assume that by "different segments" you mean that they are on
+different downstream channels of an i2c multiplexer. Let me know if not.
 
-It seems I should fix the issue in other code, not the networking.
+> In this case, shoudn't the bus be locked for the entire duration till
+> we receive the reply or else remote EP might drop the packet as the
+> MUX is switched.
 
->
-> What about the NUMA policies of the current thread ?
+Yes, that's what is implemented.
 
-We use "numactl -m 0" for memcached, the NUMA policy should allocate 
-fclone in
+However, I don't think "locking the bus" reflects what you're intending
+there: Further packets can be sent, provided that they are on that same
+multiplexer channel; current use of the bus lock does not prevent that
+(that's how fragmented messages are possible; we need to be able to
+transmit the second and subsequent packets).
 
-node 0, but we can see many fclones were allocated in node 1.
+To oversimplify it a little: holding the bus lock just prevents i2c
+accesses that may change the multiplexer state.
 
-We have enough memory to allocate these fclones in node 0.
+From your diagram:
 
->
-> Has NUMA_NO_NODE behavior changed recently?
-I guess not.
->
-> What means : "it may creates" ? Please be more specific.
+>=C2=A0 Local application=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0remote endpoint
+>=C2=A0 Userspace=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 Kernel Space
+>=20
+> sendmsg(msg1)<epX, i2cbus-1, seg1>
+> sendmsg(msg2)<epY, i2cbus-1, seg2>
 
-When we use the memcached for testing in NUMA, there are maybe 20% ~ 30% 
-fclones were allocated in
+Note that "i2cbus-1, seg1" / "i2cbus-1, seg2" is not how Linux
+represents those. You would have something like the following devices in
+Linux:
 
-remote NUMA node.
+ [bus: i2c1]: the hardware i2c controller
+  |
+  `-[dev: 1-00xx] i2c mux
+     |
+     |-[bus: i2c2]: mux downstream channel 1
+     |  |
+     |  `- endpoint x
+     |
+     `-[bus: i2c3]: mux downstream channel 2
+        |
+        `- endpoint y
 
-After this patch, all the fclones are allocated correctly.
+Then, the MCTP interfaces are attached to one individual bus, so you'd
+have the following MCTP interfaces, each corresponding to one of those
+Linux i2c devices:
+
+  mctpi2c2: connectivity to endpoint X, via i2c2 (then through i2c1)
+  mctpi2c3: connectivity to endpoint Y, via i2c3 (then through i2c1)
+
+- where each of those mctpi2cX interfaces holds it own lock on the bus
+when waiting on a reply from a device on that segment.
+
+(you could also have a mctpi2c1, if you have MCTP devices directly
+connected to i2c1)
+
+> Also today, MCTP provides no mechanism to advertise if the remote EP
+> can handle more than one request at a time. Ability to handle
+> multiple messages is purely based on the device capability. In these
+> cases shouldn't Kernel provide a way to lock the bus till the
+> response is obtained?
+
+Not via that mechanism, no. I think you might be unnecessarily combining
+MCTP message concurrency with i2c bus concurrency.
+
+An implementation where we attempt to serialise messages to one
+particular endpoint would depend on what actual requirements we have on
+that endpoint. For example:
+
+ - is it unable to handle multiple messages of a specific type?
+ - is it unable to handle multiple messages of *any* type?
+ - is it unable to handle incoming responses when a request is pending?
+=20
+So we'd need a pretty solid use-case to design a solution here; we have
+not needed this with any endpoint so far. In your case, I would take a
+guess that you could implement this just by limiting the outstanding
+messages in userspace.
+
+Further, using the i2c bus lock is the wrong mechanism for serialisation
+here; we would want this at the MCTP core, likely as part of the tag
+allocation process. That would allow serialisation of messages without
+dependence on the specifics of the transport implementation (obviously,
+the serial and i3c MCTP transport drivers do not have i2c bus locking!)
+
+Cheers,
 
 
->> So use numa_node_id() to limit the allocation to current NUMA node.
-> We prefer the allocation to succeed, instead of failing if the current
-> NUMA node has no available memory.
-
-Got it.
-
-
-Thanks
-
-Huang Shijie
-
->
-> Please check:
->
-> grep . /sys/devices/system/node/node*/numastat
->
-> Are you going to change ~700 uses of  NUMA_NO_NODE in the kernel ?
->
-> Just curious.
->
->> Signed-off-by: Huang Shijie <shijie@os.amperecomputing.com>
->> ---
->>   include/linux/skbuff.h | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
->> index 2dde34c29203..ebc42b2604ad 100644
->> --- a/include/linux/skbuff.h
->> +++ b/include/linux/skbuff.h
->> @@ -1343,7 +1343,7 @@ static inline bool skb_fclone_busy(const struct sock *sk,
->>   static inline struct sk_buff *alloc_skb_fclone(unsigned int size,
->>                                                 gfp_t priority)
->>   {
->> -       return __alloc_skb(size, priority, SKB_ALLOC_FCLONE, NUMA_NO_NODE);
->> +       return __alloc_skb(size, priority, SKB_ALLOC_FCLONE, numa_node_id());
->>   }
->>
->>   struct sk_buff *skb_morph(struct sk_buff *dst, struct sk_buff *src);
->> --
->> 2.40.1
->>
+Jeremy
 
