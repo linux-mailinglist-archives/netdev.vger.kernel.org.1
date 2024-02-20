@@ -1,254 +1,147 @@
-Return-Path: <netdev+bounces-73297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B81E85BCAE
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 13:57:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAB4885BCC8
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 14:02:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B76311F21AC8
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 12:57:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85E3728112A
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 13:02:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A49A69DF7;
-	Tue, 20 Feb 2024 12:57:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C8AA69E06;
+	Tue, 20 Feb 2024 13:02:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NHi/uIdD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ho0S/pca"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533BB433CB;
-	Tue, 20 Feb 2024 12:57:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78F8669DFF
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 13:02:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708433847; cv=none; b=ZPI5dxly4ELtVtxF+efMCVZna0+bfrAWqNcs6OaENzQMjapMKATshDkVGzsPng6JN7jdwHKPjRud/QLBz81g7zEcGpdpzNbnv0nftHovc5T0CF16qyNSmAUB/PCeZqa5uF5hv+CxQivpaiA7/e3YDoeu0O/TMtjwDra4rshHBuQ=
+	t=1708434132; cv=none; b=uaJPJqlkM1VIuJ4+HSZBk3TUfYryfZt6GtvCkGGRoEsGkRjOjCL6zq36CwUoOqty0ceKwuZ6x0xn2POH+axzZRWCc1uBQaOGjVeT6ZpX8Mn/mLAjoJJAkHCFGuOXb55mtVaQqxpIiDzpVzkKWAdJT/VfQhS18U6GCw2V46ERbck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708433847; c=relaxed/simple;
-	bh=Aylt2HMUIRu9SENrr44UxuHWTJuCgWFIjcaLzz4UPZY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZqjcPZPJ4ALVWDrHJHeHg0kPk+5EA0nJ49tYoCqtrekp6nipaGXIgRXHhY6GYS8MQl145I++bPY7GunPDSv/A47PI7NJAH3bshmDo/kUC5Ezh0lyKzgYchwTkRh35lBnH2SyVkapYawu6dbW9WCqORjUj2XPCNohnzjweAcSOO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NHi/uIdD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F20E5C433F1;
-	Tue, 20 Feb 2024 12:57:25 +0000 (UTC)
+	s=arc-20240116; t=1708434132; c=relaxed/simple;
+	bh=K4sWBSLWkN98NZHfv/IhFKshYSSGFh5pV20k4Ab3Big=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EtGEGjNtr8kH0up4UfMgYis+T5DRp2U7O5JaLebHlgwYLNsSEp8oMGj0Z1JZ/IWiJ++ILUg2n5P2lxxzo56sOeP/lrMzVOc4VwMG8tW/bDymXwJqE0ZMAoR+h5vHSQbZvqE3Z/+L1Kt6ClW6mQro1Jc5NBne4hEiEfpazh2dnXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ho0S/pca; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7D90C433C7;
+	Tue, 20 Feb 2024 13:02:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708433847;
-	bh=Aylt2HMUIRu9SENrr44UxuHWTJuCgWFIjcaLzz4UPZY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=NHi/uIdDXX6yQnMstGcidaReoZeGBEx58jsGv7A6bOC9/lUVdK1l1uscrRHwiNag0
-	 QKcekgP2/yNrBbf5DV4M37/gw2jWd38oxfE8dvKghbZLLrLjWK6vxVIlP6kDmyZxUc
-	 x1Z5Qf+Nf/4mXt3ZoUS23AaiiDjnjRE6HxI/3cg3WZGWkTk0ByiziUHkeDXXQVS2+M
-	 +an8lxIoRKRgIeEDhfDNfEhfKckNYnMLCzC3l/h3rMwGvjmImO3Y3nAkLd4ugaDHoE
-	 4G2hvKaETWLC8sbJagvQz7R7Q4enJihDURNn3zBYgbQW5ck8x4h2nvmrwSGIF61UHo
-	 daZygsUs3F60A==
-Message-ID: <07620deb-2b96-4bcc-a045-480568a27c58@kernel.org>
-Date: Tue, 20 Feb 2024 13:57:24 +0100
+	s=k20201202; t=1708434131;
+	bh=K4sWBSLWkN98NZHfv/IhFKshYSSGFh5pV20k4Ab3Big=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ho0S/pca4wR8j4DAgV7+LGI+Cg1eQqHVTfP5ty2IbDllS1ZpjQkvHmNwnr+diFOn4
+	 1IF+QXIadRdVmz+FU4mF9YsGHl/zSZ+gUKJCP+2Sc4CDI5PLpBmJ4COgjJRbu4B9SK
+	 Wz9mpAminFyIYMOjsIpsUPASmVTL9wcZk3aib/WoVMunxI2q8i1hEMMI/gcFMvATmb
+	 AKwI++kQlFN3O744vC8QRJHyHk8DQm43enuZmv7VAIU3vnpr6eHq53znl0FuMx6LLz
+	 TYCXq7ZrZSHVgg5mZa8nk7P0/RwSrr6PVjKzYGmhHm4vRoZPMh0IjUgjN49eDdgPPb
+	 KEHHS8gTaGHHw==
+Date: Tue, 20 Feb 2024 13:02:06 +0000
+From: Simon Horman <horms@kernel.org>
+To: kovalev@altlinux.org
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, jiri@resnulli.us,
+	jacob.e.keller@intel.com, johannes@sipsolutions.net,
+	idosch@nvidia.com, David Lebrun <david.lebrun@uclouvain.be>,
+	Pablo Neira Ayuso <pablo@netfilter.org>
+Subject: Re: [PATCH] genetlink: fix potencial use-after-free and
+ null-ptr-deref in genl_dumpit()
+Message-ID: <20240220130206.GH40273@kernel.org>
+References: <20240215202309.29723-1-kovalev@altlinux.org>
+ <20240219113240.GZ40273@kernel.org>
+ <4462f60e-63eb-c566-818a-98523ca4d4ff@basealt.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC net-next 1/2] net: Reference bpf_redirect_info via
- task_struct on PREEMPT_RT.
-Content-Language: en-US
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <87y1bndvsx.fsf@toke.dk> <20240214142827.3vV2WhIA@linutronix.de>
- <87le7ndo4z.fsf@toke.dk> <20240214163607.RjjT5bO_@linutronix.de>
- <87jzn5cw90.fsf@toke.dk> <20240216165737.oIFG5g-U@linutronix.de>
- <87ttm4b7mh.fsf@toke.dk> <04d72b93-a423-4574-a98e-f8915a949415@kernel.org>
- <20240220101741.PZwhANsA@linutronix.de>
- <0b1c8247-ccfb-4228-bd64-53583329aaa7@kernel.org>
- <20240220120821.1Tbz6IeI@linutronix.de>
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20240220120821.1Tbz6IeI@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4462f60e-63eb-c566-818a-98523ca4d4ff@basealt.ru>
 
-
-
-On 20/02/2024 13.08, Sebastian Andrzej Siewior wrote:
-> On 2024-02-20 11:42:57 [+0100], Jesper Dangaard Brouer wrote:
->> This seems low...
->> Have you remembered to disable Ethernet flow-control?
+On Mon, Feb 19, 2024 at 03:15:52PM +0300, kovalev@altlinux.org wrote:
+> + Pablo Neira Ayuso <pablo@netfilter.org>
 > 
-> No but one side says:
-> | i40e 0000:3d:00.1 eno2np1: NIC Link is Up, 10 Gbps Full Duplex, Flow Control: None
+> 19.02.2024 14:32, Simon Horman wrote:
+> > + Jiri Pirko <jiri@resnulli.us>
+> >    David Lebrun <david.lebrun@uclouvain.be>
+> > 
+> > On Thu, Feb 15, 2024 at 11:23:09PM +0300, kovalev@altlinux.org wrote:
+> > > From: Vasiliy Kovalev <kovalev@altlinux.org>
+> > > 
+> > > The pernet operations structure for the subsystem must be registered
+> > > before registering the generic netlink family.
+> > > 
+> > > Fixes: 134e63756d5f ("genetlink: make netns aware")
+> > Hi Vasiliy,
+> > 
+> > A Fixes tag implies that this is a bug fix.
+> > So I think some explanation is warranted of what, user-visible,
+> > problem this resolves.
+> > 
+> > In that case the patch should be targeted at net.
+> > Which means it should be based on that tree and have a net annotation
+> > in the subject
+> > 
+> > 	Subject: [PATCH net] ...
+> > 
+> > Alternatively, the Fixes tag should be dropped and some explanation
+> > should be provided of why the structure needs to be registered before
+> > the family.
+> > 
+> > In this case, if you wish to refer to the patch where the problem (but not
+> > bug) was introduced you can use something like the following.
+> > It is just the Fixes tag that has a special meaning.
+> > 
+> > 	Introduced in 134e63756d5f ("genetlink: make netns aware")
+> > 
+> > I think the above comments also apply to:
+> > 
+> > - [PATCH] ipv6: sr: fix possible use-after-free and null-ptr-deref
+> >    https://lore.kernel.org/all/20240215202717.29815-1-kovalev@altlinux.org/
+> > 
+> > - [PATCH] devlink: fix possible use-after-free and memory leaks in devlink_init()
+> >    https://lore.kernel.org/all/20240215203400.29976-1-kovalev@altlinux.org/
+> > 
+> > And as these patches seem to try to fix the same problem in different
+> > places, all under Networking, I would suggest that if you do repost,
+> > they are combined into a patch series (3 patches in the same series).
+> > 
+> > But I do wonder, how such an apparently fundamental problem has been
+> > present for so long in what I assume to be well exercised code.
 > 
-> but I did this
+> Hi Simon,
 > 
->>   # ethtool -A ixgbe1 rx off tx off
->>   # ethtool -A i40e2 rx off tx off
+> The history of these changes began with the crash fix in the gtp module [1]
 > 
-> and it didn't change much.
+> A solution to the problem was found [2] and Pablo Neruda Ayuso suggested
+> fixing similar
 > 
->>
->>> | Summary                 8,436,294 rx/s                  0 err/s
->>
->> You want to see the "extended" info via cmdline (or Ctrl+\)
->>
->>   # xdp-bench drop -e eth1
->>
->>
->>>
->>> with "-t 8 -b 64". I started with 2 and then increased until rx/s was
->>> falling again. I have ixgbe on the sending side and i40e on the
->>
->> With ixgbe on the sending side, my testlab shows I need -t 2.
->>
->> With -t 2 :
->> Summary                14,678,170 rx/s                  0 err/s
->>    receive total        14,678,170 pkt/s        14,678,170 drop/s         0
->> error/s
->>      cpu:1              14,678,170 pkt/s        14,678,170 drop/s         0
->> error/s
->>    xdp_exception                 0 hit/s
->>
->> with -t 4:
->>
->> Summary                10,255,385 rx/s                  0 err/s
->>    receive total        10,255,385 pkt/s        10,255,385 drop/s         0
->> error/s
->>      cpu:1              10,255,385 pkt/s        10,255,385 drop/s         0
->> error/s
->>    xdp_exception                 0 hit/s
->>
->>> receiving side. I tried to receive on ixgbe but this ended with -ENOMEM
->>> | # xdp-bench drop eth1
->>> | Failed to attach XDP program: Cannot allocate memory
->>>
->>> This is v6.8-rc5 on both sides. Let me see where this is coming from…
->>>
->>
->> Another pitfall with ixgbe is that it does a full link reset when
->> adding/removing XDP prog on device.  This can be annoying if connected
->> back-to-back, because "remote" pktgen will stop on link reset.
+> sections of code if they might have the same problem.
 > 
-> so I replaced nr_cpu_ids with 64 and bootet maxcpus=64 so that I can run
-> xdp-bench on the ixgbe.
-> 
+> I have sent patches, but do not have reproducers, relying on drawing
+> attention to the problem.
 
-Yes, ixgbe HW have limited TX queues, and XDP tries to allocate a
-hardware TX queue for every CPU in the system.  So, I guess you have too
-many CPUs in your system - lol.
+Thanks Vasiliy,
 
-Other drivers have a fallback to a locked XDP TX path, so this is also
-something to lookout for in the machine with i40e.
+I think it would be worth adding some text along those lines to
+the commit messages for the patches you have posted.
 
-> so. i40 send, ixgbe receive.
-> 
-> -t 2
-> 
-> | Summary                 2,348,800 rx/s                  0 err/s
-> |   receive total         2,348,800 pkt/s         2,348,800 drop/s                0 error/s
-> |     cpu:0               2,348,800 pkt/s         2,348,800 drop/s                0 error/s
-> |   xdp_exception                 0 hit/s
->
-
-This is way too low, with i40e sending.
-
-On my system with only -t 1 my i40e driver can send with approx 15Mpps:
-
-  Ethtool(i40e2) stat:  15028585 (  15,028,585) <= tx-0.packets /sec
-  Ethtool(i40e2) stat:  15028589 (  15,028,589) <= tx_packets /sec
-
-
-> -t 4
-> | Summary                 4,158,199 rx/s                  0 err/s
-> |   receive total         4,158,199 pkt/s         4,158,199 drop/s                0 error/s
-> |     cpu:0               4,158,199 pkt/s         4,158,199 drop/s                0 error/s
-> |   xdp_exception                 0 hit/s
-> 
-
-Do notice that this is all hitting CPU:0
-(this is by design from pktgen_sample03_burst_single_flow.sh)
-
-
-> -t 8
-> | Summary                 5,612,861 rx/s                  0 err/s
-> |   receive total         5,612,861 pkt/s         5,612,861 drop/s                0 error/s
-> |     cpu:0               5,612,861 pkt/s         5,612,861 drop/s                0 error/s
-> |   xdp_exception                 0 hit/s
-> 
-> going higher makes the rate drop. With 8 it floats between 5,5… 5,7…
-> 
-
-At -t 8 we seem to have hit limit on RX side, which also seems too low.
-
-I recommend checking what speeds packet generator is sending with.
-I use this tool: ethtool_stats.pl
- 
-https://github.com/netoptimizer/network-testing/blob/master/bin/ethtool_stats.pl
-
-What we are basically asking: Make sure packet generator is not the
-limiting factor in your tests.
-As we need to make sure DUT (Device Under Test) is being overloaded
-100%.  I often also check (via per record) that DUT don't have idle CPU
-cycles (yes, this can easily happen... and happens when we hit a limit
-in hardware either NIC or PCIe slot)
-
-
-> Doing "ethtool -G eno2np1 tx 4096 rx 4096" on the i40 makes it worse,
-> using the default 512/512 gets the numbers from above, going below 256
-> makes it worse.
-> 
-> receiving on i40, sending on ixgbe:
-> 
-> -t 2
-> |Summary                 3,042,957 rx/s                  0 err/s
-> |  receive total         3,042,957 pkt/s         3,042,957 drop/s                0 error/s
-> |    cpu:60              3,042,957 pkt/s         3,042,957 drop/s                0 error/s
-> |  xdp_exception                 0 hit/s
-> 
-> -t 4
-> |Summary                 5,442,166 rx/s                  0 err/s
-> |  receive total         5,442,166 pkt/s         5,442,166 drop/s                0 error/s
-> |    cpu:60              5,442,166 pkt/s         5,442,166 drop/s                0 error/s
-> |  xdp_exception                 0 hit/s
 > 
 > 
-> -t 6
-> | Summary                 7,023,406 rx/s                  0 err/s
-> |   receive total         7,023,406 pkt/s         7,023,406 drop/s                0 error/s
-> |     cpu:60              7,023,406 pkt/s         7,023,406 drop/s                0 error/s
-> |   xdp_exception                 0 hit/s
+> [1]
+> https://lore.kernel.org/lkml/20240124101404.161655-1-kovalev@altlinux.org/T/
 > 
+> [2] https://lore.kernel.org/netdev/20240214162733.34214-1-kovalev@altlinux.org/T/#u
 > 
-> -t 8
-> | Summary                 7,540,915 rx/s                  0 err/s
-> |   receive total         7,540,915 pkt/s         7,540,915 drop/s                0 error/s
-> |     cpu:60              7,540,915 pkt/s         7,540,915 drop/s                0 error/s
-> |   xdp_exception                 0 hit/s
+> -- 
+> Thanks,
+> Vasiliy Kovalev
 > 
-> -t 10
-> |Summary                 7,699,143 rx/s                  0 err/s
-> |  receive total         7,699,143 pkt/s         7,699,143 drop/s                0 error/s
-> |    cpu:60              7,699,143 pkt/s         7,699,143 drop/s                0 error/s
-> |  xdp_exception                 0 hit/s
-> 
-
-At this level, if you can verify that CPU:60 is 100% loaded, and packet
-generator is sending more than rx number, then it could work as a valid
-experiment.
-
-> -t 18
-> | Summary                 7,784,946 rx/s                  0 err/s
-> |   receive total         7,784,946 pkt/s         7,784,946 drop/s                0 error/s
-> |     cpu:60              7,784,946 pkt/s         7,784,946 drop/s                0 error/s
-> |   xdp_exception                 0 hit/s
-> 
-> after t18 it drop down to 2,…
-> Now I got worse than before since -t8 says 7,5… and it did 8,4 in the
-> morning. Do you have maybe a .config for me in case I did not enable the
-> performance switch?
-> 
-
-I would look for root-cause with perf record +
-  perf report --sort cpu,comm,dso,symbol --no-children
-
-
---Jesper
 
