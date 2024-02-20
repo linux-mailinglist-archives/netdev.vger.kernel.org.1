@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-73442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9661385CA28
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 22:45:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6018685CA29
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 22:45:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2CC2283280
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 21:45:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 001B81F22EE4
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 21:45:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC07D152DE3;
-	Tue, 20 Feb 2024 21:44:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70A8C152DF0;
+	Tue, 20 Feb 2024 21:44:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XbFpp+0A"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NAQeD4LL"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08957151CDC
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BC6C151CF0
 	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 21:44:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708465496; cv=none; b=qtZ+h89bDipHD3mhJiBVcEYrOKRApWJahIqg1pCKG1um0vC6hw104S1pjjjtkL4EfrUmgP1HGvxma0kTUo9+8DE906TTLhrPYnzREW3ZVJoRVAqhiHSycynkyo6VHNbaFPQBwoSJ63+QKTyTtz0P+oK/g9Vn8LGjulljXUmPsAs=
+	t=1708465497; cv=none; b=c36pVglhx2Fk650XXM+qT3X3ns9UAdjNHDRsSDS4w0KqxfcepR4aT/uzv6/Qcp2RDrX6x+5eadYDk1MT+BWlYhP9PDUsCnSDuWrq+9BVQTRR6A8cv0Xkj2kGugtQ0yrGBq0HpcaPDb8LFC+2PNGoCpYRGMzT449xYFUoGubYy80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708465496; c=relaxed/simple;
-	bh=QzkhvaUfSkVMM9Giq4huKXwZH0F7Bdlq/e8/ksV+7iY=;
+	s=arc-20240116; t=1708465497; c=relaxed/simple;
+	bh=3km5UB3DZsACt/MNbitE174G1LoN6YbLXLs5gLQw1/Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HQ9v6boXt3N9+hZxMLktEzfxCeenYEMx16sb8WFuf+M/zMjjrpL5jsR9lUnpE261PYDXXNSy1ox2eQUx4kLEiz6hv/d+ecY1d7gAzCZp5x4YeiL3lRjMjex43LCNzds5quqsDFk5h1+C8qxYmtnnpEO7Sd+MUYHHdpjrzaQ4FEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XbFpp+0A; arc=none smtp.client-ip=198.175.65.20
+	 MIME-Version; b=TTozyCUDX3Vk2817ZLqoV+iwKwtJFMzVqveaFgmqTAxmi4bK+GGRCYgIA7vtjTSsy15q1q1R/XdA2x+9DZQtfhUpOKOtvut9PDCQp5UgHbWWxzBiylcSwnbiLVSh829+e0KEbhLzH/2INlVvVxS21zkHOZhixtek1rrpAHTstmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NAQeD4LL; arc=none smtp.client-ip=198.175.65.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,22 +36,22 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1708465496; x=1740001496;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=QzkhvaUfSkVMM9Giq4huKXwZH0F7Bdlq/e8/ksV+7iY=;
-  b=XbFpp+0A8lZYCXDyrpXWY60PvOHfY1aqCGTtMa6h8xwQWgAL8nygS9rE
-   xttnzmSl1Gb8xGJJmkv3caOufbI0n0GjvrSZug0numLLBP/Ht8tx6oiUV
-   nzbaMAY6WTF0Pgk0ecJlYknlM2bWf4M4LdPrv2p6hNmJYsVOFZwTxChlj
-   ZpOKTsjyP493EJ5x9mzNAWRg+EsTmZh19pcbcpD60jTSsSTH/bS7qQm/3
-   TXliEyLqa+eJFK0MoysEJByJa5ZOexy/zkHTmAFjE3xkMVRAtR97TZNHh
-   lWOxVGVqonADCiSDavPb8WVrsrDprEReeN5yiZqFLoSp+/UuoO45VF3XN
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10990"; a="2472714"
+  bh=3km5UB3DZsACt/MNbitE174G1LoN6YbLXLs5gLQw1/Q=;
+  b=NAQeD4LL2ha5BHp7npVLBAp3CULnjeinrj2Ran/ZvGSkgUdXnKo8rE67
+   41DUerBciii/6vDWJ4rir9AguVVZfwgSZqwXj8fKmmr4msx6z/kYU8nPR
+   BNavrWY6w7+d9aH5aws9yWT8QtewhZkz115gwdWaYKxLUb32e3+s/+Xin
+   wyynDUfp6dKd9ETFyHFu9pXlLgP4CNDq44JDqy4MJ2TA0nBSHMAIy4Adm
+   fQFZYbCv8t9oaReTlnqfEWR4EEPbSxVKdbrS9nCk+H1qKbgd2ql24yYC0
+   5M603dFHjcfChEfmpc6PsgjE83/gJqBwvv47UZJaoXIVwsekBiwS/RIR+
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10990"; a="2472720"
 X-IronPort-AV: E=Sophos;i="6.06,174,1705392000"; 
-   d="scan'208";a="2472714"
+   d="scan'208";a="2472720"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
   by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2024 13:44:53 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,174,1705392000"; 
-   d="scan'208";a="9614933"
+   d="scan'208";a="9614936"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa005.jf.intel.com with ESMTP; 20 Feb 2024 13:44:53 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -60,16 +60,15 @@ To: davem@davemloft.net,
 	pabeni@redhat.com,
 	edumazet@google.com,
 	netdev@vger.kernel.org
-Cc: Yochai Hagvi <yochai.hagvi@intel.com>,
+Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
 	anthony.l.nguyen@intel.com,
 	vadim.fedorenko@linux.dev,
 	jiri@resnulli.us,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Sunitha Mekala <sunithax.d.mekala@intel.com>
-Subject: [PATCH net 1/6] ice: fix connection state of DPLL and out pin
-Date: Tue, 20 Feb 2024 13:44:37 -0800
-Message-ID: <20240220214444.1039759-2-anthony.l.nguyen@intel.com>
+	Alan Brady <alan.brady@intel.com>,
+	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+Subject: [PATCH net 2/6] ice: fix dpll input pin phase_adjust value updates
+Date: Tue, 20 Feb 2024 13:44:38 -0800
+Message-ID: <20240220214444.1039759-3-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20240220214444.1039759-1-anthony.l.nguyen@intel.com>
 References: <20240220214444.1039759-1-anthony.l.nguyen@intel.com>
@@ -81,142 +80,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Yochai Hagvi <yochai.hagvi@intel.com>
+From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 
-Fix the connection state between source DPLL and output pin, updating the
-attribute 'state' of 'parent_device'. Previously, the connection state
-was broken, and didn't reflect the correct state.
+The value of phase_adjust for input pin shall be updated in
+ice_dpll_pin_state_update(..). Fix by adding proper argument to the
+firmware query function call - a pin's struct field pointer where the
+phase_adjust value during driver runtime is stored.
 
-When 'state_on_dpll_set' is called with the value
-'DPLL_PIN_STATE_CONNECTED' (1), the output pin will switch to the given
-DPLL, and the state of the given DPLL will be set to connected.
-E.g.:
-	--do pin-set --json '{"id":2, "parent-device":{"parent-id":1,
-						       "state": 1 }}'
-This command will connect DPLL device with id 1 to output pin with id 2.
+Previously the phase_adjust used to misinform user about actual
+phase_adjust value. I.e., if phase_adjust was set to a non zero value and
+if driver was reloaded, the user would see the value equal 0, which is
+not correct - the actual value is equal to value set before driver reload.
 
-When 'state_on_dpll_set' is called with the value
-'DPLL_PIN_STATE_DISCONNECTED' (2) and the given DPLL is currently
-connected, then the output pin will be disabled.
-E.g:
-	--do pin-set --json '{"id":2, "parent-device":{"parent-id":1,
-						       "state": 2 }}'
-This command will disable output pin with id 2 if DPLL device with ID 1 is
-connected to it; otherwise, the command is ignored.
-
-Fixes: d7999f5ea64b ("ice: implement dpll interface to control cgu")
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Signed-off-by: Yochai Hagvi <yochai.hagvi@intel.com>
-Tested-by: Sunitha Mekala <sunithax.d.mekala@intel.com> (A Contingent worker at Intel)
+Fixes: 90e1c90750d7 ("ice: dpll: implement phase related callbacks")
+Reviewed-by: Alan Brady <alan.brady@intel.com>
+Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_dpll.c | 43 +++++++++++++++++------
- 1 file changed, 32 insertions(+), 11 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_dpll.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
-index b9c5eced6326..9c0d739be1e9 100644
+index 9c0d739be1e9..2beaeb9c336d 100644
 --- a/drivers/net/ethernet/intel/ice/ice_dpll.c
 +++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
-@@ -254,6 +254,7 @@ ice_dpll_output_frequency_get(const struct dpll_pin *pin, void *pin_priv,
-  * ice_dpll_pin_enable - enable a pin on dplls
-  * @hw: board private hw structure
-  * @pin: pointer to a pin
-+ * @dpll_idx: dpll index to connect to output pin
-  * @pin_type: type of pin being enabled
-  * @extack: error reporting
-  *
-@@ -266,7 +267,7 @@ ice_dpll_output_frequency_get(const struct dpll_pin *pin, void *pin_priv,
-  */
- static int
- ice_dpll_pin_enable(struct ice_hw *hw, struct ice_dpll_pin *pin,
--		    enum ice_dpll_pin_type pin_type,
-+		    u8 dpll_idx, enum ice_dpll_pin_type pin_type,
- 		    struct netlink_ext_ack *extack)
- {
- 	u8 flags = 0;
-@@ -280,10 +281,12 @@ ice_dpll_pin_enable(struct ice_hw *hw, struct ice_dpll_pin *pin,
- 		ret = ice_aq_set_input_pin_cfg(hw, pin->idx, 0, flags, 0, 0);
- 		break;
- 	case ICE_DPLL_PIN_TYPE_OUTPUT:
-+		flags = ICE_AQC_SET_CGU_OUT_CFG_UPDATE_SRC_SEL;
- 		if (pin->flags[0] & ICE_AQC_GET_CGU_OUT_CFG_ESYNC_EN)
- 			flags |= ICE_AQC_SET_CGU_OUT_CFG_ESYNC_EN;
- 		flags |= ICE_AQC_SET_CGU_OUT_CFG_OUT_EN;
--		ret = ice_aq_set_output_pin_cfg(hw, pin->idx, flags, 0, 0, 0);
-+		ret = ice_aq_set_output_pin_cfg(hw, pin->idx, flags, dpll_idx,
-+						0, 0);
- 		break;
- 	default:
- 		return -EINVAL;
-@@ -398,14 +401,27 @@ ice_dpll_pin_state_update(struct ice_pf *pf, struct ice_dpll_pin *pin,
- 		break;
- 	case ICE_DPLL_PIN_TYPE_OUTPUT:
- 		ret = ice_aq_get_output_pin_cfg(&pf->hw, pin->idx,
--						&pin->flags[0], NULL,
-+						&pin->flags[0], &parent,
- 						&pin->freq, NULL);
+@@ -373,7 +373,7 @@ ice_dpll_pin_state_update(struct ice_pf *pf, struct ice_dpll_pin *pin,
+ 	case ICE_DPLL_PIN_TYPE_INPUT:
+ 		ret = ice_aq_get_input_pin_cfg(&pf->hw, pin->idx, NULL, NULL,
+ 					       NULL, &pin->flags[0],
+-					       &pin->freq, NULL);
++					       &pin->freq, &pin->phase_adjust);
  		if (ret)
  			goto err;
--		if (ICE_AQC_SET_CGU_OUT_CFG_OUT_EN & pin->flags[0])
--			pin->state[0] = DPLL_PIN_STATE_CONNECTED;
--		else
--			pin->state[0] = DPLL_PIN_STATE_DISCONNECTED;
-+
-+		parent &= ICE_AQC_GET_CGU_OUT_CFG_DPLL_SRC_SEL;
-+		if (ICE_AQC_SET_CGU_OUT_CFG_OUT_EN & pin->flags[0]) {
-+			pin->state[pf->dplls.eec.dpll_idx] =
-+				parent == pf->dplls.eec.dpll_idx ?
-+				DPLL_PIN_STATE_CONNECTED :
-+				DPLL_PIN_STATE_DISCONNECTED;
-+			pin->state[pf->dplls.pps.dpll_idx] =
-+				parent == pf->dplls.pps.dpll_idx ?
-+				DPLL_PIN_STATE_CONNECTED :
-+				DPLL_PIN_STATE_DISCONNECTED;
-+		} else {
-+			pin->state[pf->dplls.eec.dpll_idx] =
-+				DPLL_PIN_STATE_DISCONNECTED;
-+			pin->state[pf->dplls.pps.dpll_idx] =
-+				DPLL_PIN_STATE_DISCONNECTED;
-+		}
- 		break;
- 	case ICE_DPLL_PIN_TYPE_RCLK_INPUT:
- 		for (parent = 0; parent < pf->dplls.rclk.num_parents;
-@@ -570,7 +586,8 @@ ice_dpll_pin_state_set(const struct dpll_pin *pin, void *pin_priv,
- 
- 	mutex_lock(&pf->dplls.lock);
- 	if (enable)
--		ret = ice_dpll_pin_enable(&pf->hw, p, pin_type, extack);
-+		ret = ice_dpll_pin_enable(&pf->hw, p, d->dpll_idx, pin_type,
-+					  extack);
- 	else
- 		ret = ice_dpll_pin_disable(&pf->hw, p, pin_type, extack);
- 	if (!ret)
-@@ -603,6 +620,11 @@ ice_dpll_output_state_set(const struct dpll_pin *pin, void *pin_priv,
- 			  struct netlink_ext_ack *extack)
- {
- 	bool enable = state == DPLL_PIN_STATE_CONNECTED;
-+	struct ice_dpll_pin *p = pin_priv;
-+	struct ice_dpll *d = dpll_priv;
-+
-+	if (!enable && p->state[d->dpll_idx] == DPLL_PIN_STATE_DISCONNECTED)
-+		return 0;
- 
- 	return ice_dpll_pin_state_set(pin, pin_priv, dpll, dpll_priv, enable,
- 				      extack, ICE_DPLL_PIN_TYPE_OUTPUT);
-@@ -669,10 +691,9 @@ ice_dpll_pin_state_get(const struct dpll_pin *pin, void *pin_priv,
- 	ret = ice_dpll_pin_state_update(pf, p, pin_type, extack);
- 	if (ret)
- 		goto unlock;
--	if (pin_type == ICE_DPLL_PIN_TYPE_INPUT)
-+	if (pin_type == ICE_DPLL_PIN_TYPE_INPUT ||
-+	    pin_type == ICE_DPLL_PIN_TYPE_OUTPUT)
- 		*state = p->state[d->dpll_idx];
--	else if (pin_type == ICE_DPLL_PIN_TYPE_OUTPUT)
--		*state = p->state[0];
- 	ret = 0;
- unlock:
- 	mutex_unlock(&pf->dplls.lock);
+ 		if (ICE_AQC_GET_CGU_IN_CFG_FLG2_INPUT_EN & pin->flags[0]) {
 -- 
 2.41.0
 
