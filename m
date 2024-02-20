@@ -1,167 +1,170 @@
-Return-Path: <netdev+bounces-73323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A750685BECB
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 15:31:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50A9485BED2
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 15:32:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC1301C21446
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 14:31:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD7572836A6
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 14:32:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB2FC266A7;
-	Tue, 20 Feb 2024 14:31:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4499F56757;
+	Tue, 20 Feb 2024 14:32:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="gz9WjqWY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E9B8111BB
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 14:31:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3809266A7
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 14:32:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708439483; cv=none; b=kGupL69OzBNdC+/M9C4e9+2Ipo+ifHCNuCyjMjLF0IevBBEcsP5c+HQ/oEKDRS6nWqAYw0XTgZQDzUIwyvFmmY8m8Anliz3X1oVxgO2orPKK4CxALxzaVWOcrATVCbflSBm756Iy08RWFck2v8S6ORt/H0el+DyBvqvuL/+TtL4=
+	t=1708439570; cv=none; b=Ohnpjze7zo+JQEirl+WEJzwXlbJ47OTYlE/hQCu5ToNUFOZ88wEiNPdLyr0kNz/ovUluocXQXO7Iy+Dil4W8zxvY0dnnvLTA76XayJCaCH4ceiCNNoBoIWwS/6AL4dotxEifQWqEXd+9gbp9uX3+Kcs7iH4D1jcV0kEsM8wCpDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708439483; c=relaxed/simple;
-	bh=1Ku617Ug3TIkXzoKRdJUDcauPiB6tB464nbm+/XGfiI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Cs7fdsHF55LYnjdmUOvzDxH7o7NXOKFz01a4jMnp1SC8VywTjAjEuRclf8NqD4coUWqkiuqcqmSVmEKRwgzks48KVAHSoGt6XzzlfHzXS+JmZIrIRmN53jf4vrUf//OSQtBgpkFlIDrvWvSVUp+PyOJJ8kpTUI8A257qarQ+f/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7c414467bc2so463993939f.0
-        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 06:31:22 -0800 (PST)
+	s=arc-20240116; t=1708439570; c=relaxed/simple;
+	bh=kCNTrCnbUX+6caHN5dUEmhVTDAmtyLkcVI9+CAoWb5c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aHYSnumnrPpEKCbkELw0eLPF+lI18sy3k46nZwoGQhumEX1+zERq6gISWSPwAnS+7tbh/upSeB3tiFAq07bLWYpVMdGqb6nLe1w7Phxf6t2DoROVAMl0J4+2jIRW8Egz/UW9kevnNSgVbUtqv67HM8S3l+cBK9/uTpYvva/gVjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=gz9WjqWY; arc=none smtp.client-ip=209.85.219.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-d9b9adaf291so3664178276.1
+        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 06:32:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1708439566; x=1709044366; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=na87No466PCveheqbbJ0wWNcE5MYUk2g/mycC7sjbJI=;
+        b=gz9WjqWYJx8hMlu8jV+R0gKJbz2J68Dy8HlenaEqxjbLrh2pxptZ93UlpaxCVXl7mh
+         rV8MnJOhRZU104hA3To20CsOBcuVmX7vSKfDoEE49rho/K7653I67ruq9gi1t+qtvVlO
+         vD6d0pzfeYwyraz9UpJh5uSmUvaE/0+ubqPHLXMxDNb6+plR7cmPRGwDS6bz0/OEO4HO
+         RYOM/ucfFOlFqU+WtWIwhxpHbIx4hJwog3nI1pyTDUqV1bYKy03h4L3KFG3ot5mQm8o5
+         RJkF24ZSyVRSv5aHIrS8i/u45JQt4XamXUkYDWwfHfm8PtXSXhPgbS1rUaprFHpY2FxQ
+         C32w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708439481; x=1709044281;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rK+JD4sM6GkbtXUauvK2wy7q/mG6x0dPYQMJQoe+q9A=;
-        b=Mxl2IPDnr6RYDBbLeLRVHvhr7L//3GVAVvE0ilhTnJhglaDc+vKo49QxTeUmcjNeGm
-         pF/Elo2eecC2MBSLu9vRbhr8gnhOzI+5dxSdt777kkBqAhQGDb7eaG1xB5nrF5FGz7QG
-         nVw19ynB9trNMSf54PQmcPholNECpAjTuSFdB9icIvPb6U3+TDCdByr+8jZ1njT2Ixkq
-         UQehjxq+4xdsW1fpPxVfEQDhz+CwA3QSsCg+V4R/5CPZ2KRHoVtTBiSp6K4UFn76m2bO
-         vk1wWhTuvWx6NfaTCfzk99v22+2eqMeE7Vn0brf9KdYgQF04FtHfhxNv8HJAUvxghUs6
-         AniA==
-X-Forwarded-Encrypted: i=1; AJvYcCXOTWQn6UlFoQ7Vb0jLFn7Zp4aueqfA8NrYAhjlnpxFsU4jMavF5SE5BMQYY5GfOOTchJnHEbt/EZ2Yzu66Cw3qOzKdP6Uw
-X-Gm-Message-State: AOJu0Yya849yclFKJ61hJB5jgaCQEzJRIiG7T9oRumOnvi1s2isovOpo
-	JvtCUR5wkQmm2FPALQiWIvToY9nXzhaRPthRPUaGe85GXMmeox5vmnmr1FfVVmOD7mquN8I/Kz2
-	/v6aUGkGut8g2W/gCDb6vCsBOgMV7PZN7+nXq4G1UnNYzA5JprkvXvyA=
-X-Google-Smtp-Source: AGHT+IF78DcUKnNEHE/PHVeiSh2vVF1cahGnv8yWxefMMlQtm0HPEhjwGlPPR/jtz2ThXvoCK8+95NwASrmw1mlSaPprqr8t94Fd
+        d=1e100.net; s=20230601; t=1708439566; x=1709044366;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=na87No466PCveheqbbJ0wWNcE5MYUk2g/mycC7sjbJI=;
+        b=DMp/Mfavz385j0JS3SaZEyPN8taKR79IiWCVqIROfkO/yinNPjepdZoAEJV0ie3wBI
+         4crfSM1OiHC6HBha60ndNXQwDAxmVExaAf+0G7L9ayiiBJVdBkeKFci7TUJJ4g4grCLj
+         kirB2SnqvYXUvkubYMaVUoQ/GZHZmwKjIIwuYGYz//UdnYtDdkWgyGgW0xPaFUQE7/h+
+         8Sd625bFTNTCsZfj6YORur7FbOXhwVetgaygU4KYT81o0CQYhhxNTT8KCJePw2v//Ams
+         nWJzck67j1sSftoSvvO+3+7eOuJDRUSnjauY0ZINKGzCxwRkUDVIRITsPy14aKhvpt/Z
+         tltw==
+X-Forwarded-Encrypted: i=1; AJvYcCW/IbqX5xcxM9CnreBhySD63lPsVUmWCTQee+pF5SHTgaHV8mwi6TxsIfEaBGVg3tq9Jd/AnB4kiy3qU3nPQBpmihyQxEpX
+X-Gm-Message-State: AOJu0YzhDU45kNOhP9uOpJjYLstp+4sC8MVvZ4XHh3RnAf4Zn/g8Vs29
+	KWMMBpJoQFojgFE4FGjRJfy24JSRsMAKETdh/RQ1wC6XolMQr59jgLgSWS5WGOTTdyUk0LEz034
+	A7leeT2WolqUvcadXHil+yL6LsB8wJGGJeyLk
+X-Google-Smtp-Source: AGHT+IF9m8pTdX30xf2s3g1yw9ciPjyf8alqHyHoeFgb0KZVxBtoVPFwQwyT4qgY69/ktYZCBhosED8OKlWr3UQHtDw=
+X-Received: by 2002:a05:6902:e13:b0:dcc:a446:551 with SMTP id
+ df19-20020a0569020e1300b00dcca4460551mr13799589ybb.52.1708439566366; Tue, 20
+ Feb 2024 06:32:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:4708:b0:473:dcbe:bb58 with SMTP id
- cs8-20020a056638470800b00473dcbebb58mr302126jab.4.1708439481496; Tue, 20 Feb
- 2024 06:31:21 -0800 (PST)
-Date: Tue, 20 Feb 2024 06:31:21 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000006a393d0611d11073@google.com>
-Subject: [syzbot] [netfilter?] KMSAN: uninit-value in __nla_validate_parse (3)
-From: syzbot <syzbot+3f497b07aa3baf2fb4d0@syzkaller.appspotmail.com>
-To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
-	fw@strlen.de, kadlec@netfilter.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
-	syzkaller-bugs@googlegroups.com
+References: <20240218194413.31742-1-maks.mishinFZ@gmail.com> <20240219095921.64594de5@hermes.local>
+In-Reply-To: <20240219095921.64594de5@hermes.local>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Tue, 20 Feb 2024 09:32:35 -0500
+Message-ID: <CAM0EoM=S0dcaFv-poo78PP+3KfZ=EFK51bWhdbpyMwz8MJxMug@mail.gmail.com>
+Subject: Re: [PATCH] m_ife: Remove unused value
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: Maks Mishin <maks.mishinfz@gmail.com>, netdev@vger.kernel.org, 
+	Jamal Hadi Salim <hadi@mojatatu.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Mon, Feb 19, 2024 at 12:59=E2=80=AFPM Stephen Hemminger
+<stephen@networkplumber.org> wrote:
+>
+> On Sun, 18 Feb 2024 22:44:13 +0300
+> Maks Mishin <maks.mishinfz@gmail.com> wrote:
+>
+> > The variable `has_optional` do not used after set the value.
+> > Found by RASU JSC.
+> >
+> > Signed-off-by: Maks Mishin <maks.mishinFZ@gmail.com>
+>
+> Yes, it is set after used.
+> The flag should be removed all together and fold the newline into
+> previous clause?
+>
+> And since the if clauses are now single statement, the code style
+> from checkpatch wants braces to be removed.
+>
+>
+> Something like this:
+>
 
-syzbot found the following issue on:
+Yes, this looks better.
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
 
-HEAD commit:    c1ca10ceffbb Merge tag 'scsi-fixes' of git://git.kernel.or..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1120c23c180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e3dd779fba027968
-dashboard link: https://syzkaller.appspot.com/bug?extid=3f497b07aa3baf2fb4d0
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+cheers,
+jamal
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/83d019f0ac47/disk-c1ca10ce.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/49e05dd7a23d/vmlinux-c1ca10ce.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/68ec9fa2d33d/bzImage-c1ca10ce.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3f497b07aa3baf2fb4d0@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: uninit-value in nla_validate_range_unsigned lib/nlattr.c:222 [inline]
-BUG: KMSAN: uninit-value in nla_validate_int_range lib/nlattr.c:336 [inline]
-BUG: KMSAN: uninit-value in validate_nla lib/nlattr.c:575 [inline]
-BUG: KMSAN: uninit-value in __nla_validate_parse+0x2e20/0x45c0 lib/nlattr.c:631
- nla_validate_range_unsigned lib/nlattr.c:222 [inline]
- nla_validate_int_range lib/nlattr.c:336 [inline]
- validate_nla lib/nlattr.c:575 [inline]
- __nla_validate_parse+0x2e20/0x45c0 lib/nlattr.c:631
- __nla_parse+0x5f/0x70 lib/nlattr.c:728
- nla_parse_deprecated include/net/netlink.h:703 [inline]
- nfnetlink_rcv_msg+0x723/0xde0 net/netfilter/nfnetlink.c:275
- netlink_rcv_skb+0x371/0x650 net/netlink/af_netlink.c:2543
- nfnetlink_rcv+0x372/0x4950 net/netfilter/nfnetlink.c:659
- netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
- netlink_unicast+0xf49/0x1250 net/netlink/af_netlink.c:1367
- netlink_sendmsg+0x1238/0x13d0 net/netlink/af_netlink.c:1908
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
- ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
- __sys_sendmsg net/socket.c:2667 [inline]
- __do_sys_sendmsg net/socket.c:2676 [inline]
- __se_sys_sendmsg net/socket.c:2674 [inline]
- __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-
-Uninit was created at:
- slab_post_alloc_hook mm/slub.c:3819 [inline]
- slab_alloc_node mm/slub.c:3860 [inline]
- kmem_cache_alloc_node+0x5cb/0xbc0 mm/slub.c:3903
- kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:560
- __alloc_skb+0x352/0x790 net/core/skbuff.c:651
- alloc_skb include/linux/skbuff.h:1296 [inline]
- netlink_alloc_large_skb net/netlink/af_netlink.c:1213 [inline]
- netlink_sendmsg+0xb34/0x13d0 net/netlink/af_netlink.c:1883
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
- ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
- __sys_sendmsg net/socket.c:2667 [inline]
- __do_sys_sendmsg net/socket.c:2676 [inline]
- __se_sys_sendmsg net/socket.c:2674 [inline]
- __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-
-CPU: 1 PID: 6771 Comm: syz-executor.0 Not tainted 6.8.0-rc4-syzkaller-00331-gc1ca10ceffbb #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
-=====================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+> diff --git a/tc/m_ife.c b/tc/m_ife.c
+> index 162607ce7415..fce5af784e39 100644
+> --- a/tc/m_ife.c
+> +++ b/tc/m_ife.c
+> @@ -219,7 +219,6 @@ static int print_ife(struct action_util *au, FILE *f,=
+ struct rtattr *arg)
+>         __u32 mmark =3D 0;
+>         __u16 mtcindex =3D 0;
+>         __u32 mprio =3D 0;
+> -       int has_optional =3D 0;
+>         SPRINT_BUF(b2);
+>
+>         print_string(PRINT_ANY, "kind", "%s ", "ife");
+> @@ -240,12 +239,9 @@ static int print_ife(struct action_util *au, FILE *f=
+, struct rtattr *arg)
+>
+>         if (tb[TCA_IFE_TYPE]) {
+>                 ife_type =3D rta_getattr_u16(tb[TCA_IFE_TYPE]);
+> -               has_optional =3D 1;
+>                 print_0xhex(PRINT_ANY, "type", "type %#llX ", ife_type);
+> -       }
+> -
+> -       if (has_optional)
+>                 print_string(PRINT_FP, NULL, "%s\t", _SL_);
+> +       }
+>
+>         if (tb[TCA_IFE_METALST]) {
+>                 struct rtattr *metalist[IFE_META_MAX + 1];
+> @@ -290,21 +286,17 @@ static int print_ife(struct action_util *au, FILE *=
+f, struct rtattr *arg)
+>
+>         }
+>
+> -       if (tb[TCA_IFE_DMAC]) {
+> -               has_optional =3D 1;
+> +       if (tb[TCA_IFE_DMAC])
+>                 print_string(PRINT_ANY, "dst", "dst %s ",
+>                              ll_addr_n2a(RTA_DATA(tb[TCA_IFE_DMAC]),
+>                                          RTA_PAYLOAD(tb[TCA_IFE_DMAC]), 0=
+, b2,
+>                                          sizeof(b2)));
+> -       }
+>
+> -       if (tb[TCA_IFE_SMAC]) {
+> -               has_optional =3D 1;
+> +       if (tb[TCA_IFE_SMAC])
+>                 print_string(PRINT_ANY, "src", "src %s ",
+>                              ll_addr_n2a(RTA_DATA(tb[TCA_IFE_SMAC]),
+>                                          RTA_PAYLOAD(tb[TCA_IFE_SMAC]), 0=
+, b2,
+>                                          sizeof(b2)));
+> -       }
+>
+>         print_nl();
+>         print_uint(PRINT_ANY, "index", "\t index %u", p->index);
+>
 
