@@ -1,187 +1,212 @@
-Return-Path: <netdev+bounces-73139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8673A85B20E
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 06:05:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 211DD85B219
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 06:08:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1034E1F23F6B
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 05:05:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 979CF1F23F4B
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 05:08:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA595482D1;
-	Tue, 20 Feb 2024 05:04:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20A0B482DF;
+	Tue, 20 Feb 2024 05:08:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="E5BQ5Ip7"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="GO/vQvx9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A99A21E484;
-	Tue, 20 Feb 2024 05:04:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79145481B3;
+	Tue, 20 Feb 2024 05:08:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708405499; cv=none; b=RBfjw3D19HwvzbS10or4LGiCmdBhv8JsHELpYi5+nIrhzDUxgOzDy6KSz5TihXMxKkZFG3dTNblaHlJLXM9OWiTCf6rwk5rg8YNnDvPqrFJsU4NJN0Tvv5xUNRT7Rl25gXA1jyapwVSkXMGiVsdFAAz2LXU36Tex/emL8m0fe5A=
+	t=1708405699; cv=none; b=l6h1NatCkCAWqNIwKsaPsZQpJ1zGnYwtyZ+kHULBc+Ny1Xrv9MbKgJ6Eyn99eNXpNlXsHpnFcp8Vief55yY9jLjSVT5fh++6f2hRbi3cQ6hrml78a9MjmPITWCfspuXEYIUMbfI1IFUcrK7LarV9Q82Ag1YcHaC6F92IUCCLfVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708405499; c=relaxed/simple;
-	bh=fXxgjBeMehCHVmqIjXPL1DbttgIUptEZZ1Iy4U+8o5w=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UYtU+5H/sR2mtk3r1rTat/LCbon+dXG4BmcTLAjC10yhggTZ+wNtc6BfmaJaLf7mZnHCFSKN8+HJaAMkg9z4AR5auJWn/1JlE/KiMOADtQWGsipjfwFYdRAo5FCoz76Ei5l55dBD4oU/WJERwd9H4Oqyazzww4VqZVjnSbDsX+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=E5BQ5Ip7; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41JMx8Vt027989;
-	Tue, 20 Feb 2024 05:04:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2023-11-20; bh=i29RdQt0ru/t4rJdnI7IzaMDbTWdBR2QUiUDt+zMPiM=;
- b=E5BQ5Ip7hFePuaHGkT0HghcwEHhF8nX4cGhptqrTIh9cL/m3m75jKbHsJzi3VtJ7cT4X
- Ci1zbQhZtOAtk9UfnuO4uRuiiSQsidX2jHVtWk12uoxk5c45H8lQiM/uaymrzagP0ary
- ziyVD8cM82qoKHY+1JtUrR6icCMeQFtqsATyCaN1JGiPW7NXpBRIKa4jd1jfDw4GfdbH
- WZeRj15pj64I+WdKd+hly/ys7d233gtmUDXzJdzwQa4mEuNnyuCTAX8qJsnYQul4p62P
- qLdl87dusp2yoF2V3rMUVUKequZMGA76SQOarO8UFMAfm2IAhLmJTvjUldvtTA2Av1/i 6g== 
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3wakk3wrh6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 20 Feb 2024 05:04:47 +0000
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 41K3aUxK039804;
-	Tue, 20 Feb 2024 05:04:46 GMT
+	s=arc-20240116; t=1708405699; c=relaxed/simple;
+	bh=OOQts34tAdzeELzHw+Ngbf4pg4xCendhnsfyqCJ9JAc=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=MkMUUU7uU+olz8E1rF7/ywYwz7kx2Z9osuFgSA/BXZUwoomK49zUIcxOFB8fIGr2Ovh//81cXrbVI8pagSWHCCUgmaOSNCs1a6yr8Dlzj7aaZZoQSxLq4rJJna7bu1ooVQ2CroIpKOV6rQrBGlpbACKHeEPPSEyY8RkhcWcijA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=GO/vQvx9; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41K4kSDM024893;
+	Tue, 20 Feb 2024 05:07:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	from:to:cc:subject:date:message-id; s=qcppdkim1; bh=MhtlekRsepEl
+	CIsKwt+ETmTkwwxR1cINhfvJXfVw7aU=; b=GO/vQvx9SXK9PrwyrPdfLbcOwIni
+	lA9MXRxuS6GRGBo/DIQtGgGCxWE4P30cLD0iqU0N44f312Ic1LphWfh4U7x1Igho
+	LqQ7JEBgIIWwR/PzbbOTbe+DuBpNU6p4Eym4DTlQHNKAtqMhgmrxMN8u/rhb7hNC
+	MR1v3j9MlLWkjGaq8N7nED3+6SwEN0gZIoDnYuJPywmcajaLBAhCtJikWwfZphwn
+	S1Kotu8NKnQHFq0wR9SCks4acE/WUwymoKBFQR4m6SxDO/hRXJKwfbbURfRN8zpt
+	wtbyH7zSHOBzRRlar/fStSCxW9p09p13TUMhYNuyASfYTuiBYLUv9qAkHA==
+Received: from apblrppmta02.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wcnbd80x4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 20 Feb 2024 05:07:53 +0000 (GMT)
+Received: from pps.filterd (APBLRPPMTA02.qualcomm.com [127.0.0.1])
+	by APBLRPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 41K56ZaB032676;
+	Tue, 20 Feb 2024 05:07:48 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3wak86q9q9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 20 Feb 2024 05:04:46 +0000
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41K54jst035830;
-	Tue, 20 Feb 2024 05:04:46 GMT
-Received: from pkannoju-vm.us.oracle.com (dhcp-10-76-34-55.vpn.oracle.com [10.76.34.55])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3wak86q9mh-1;
-	Tue, 20 Feb 2024 05:04:45 +0000
-From: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
-To: j.vosburgh@gmail.com, andy@greyhouse.net, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: rajesh.sivaramasubramaniom@oracle.com, rama.nichanamatlu@oracle.com,
-        manjunath.b.patil@oracle.com,
-        Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
-Subject: [PATCH net-next v4] bonding: rate-limit bonding driver inspect messages
-Date: Tue, 20 Feb 2024 10:34:37 +0530
-Message-Id: <20240220050437.5623-1-praveen.kannoju@oracle.com>
-X-Mailer: git-send-email 2.31.1
+	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 3wanvkbfmx-1;
+	Tue, 20 Feb 2024 05:07:48 +0000
+Received: from APBLRPPMTA02.qualcomm.com (APBLRPPMTA02.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41K57mlP000910;
+	Tue, 20 Feb 2024 05:07:48 GMT
+Received: from hu-maiyas-hyd.qualcomm.com (hu-snehshah-hyd.qualcomm.com [10.147.246.35])
+	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 41K57mPg000907;
+	Tue, 20 Feb 2024 05:07:48 +0000
+Received: by hu-maiyas-hyd.qualcomm.com (Postfix, from userid 2319345)
+	id 454B15013A6; Tue, 20 Feb 2024 10:37:47 +0530 (+0530)
+From: Sneh Shah <quic_snehshah@quicinc.com>
+To: Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Jose Abreu <joabreu@synopsys.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Cc: Sneh Shah <quic_snehshah@quicinc.com>, kernel@quicinc.com,
+        Andrew Halaney <ahalaney@redhat.com>
+Subject: [PATCH net-next v5] net: stmmac: dwmac-qcom-ethqos: Add support for 2.5G SGMII
+Date: Tue, 20 Feb 2024 10:37:35 +0530
+Message-Id: <20240220050735.29507-1-quic_snehshah@quicinc.com>
+X-Mailer: git-send-email 2.17.1
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: gxu3sjaCAaaVmTgWOtimBZ76QZLeF7Zl
+X-Proofpoint-ORIG-GUID: gxu3sjaCAaaVmTgWOtimBZ76QZLeF7Zl
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-20_04,2024-02-19_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 clxscore=1011
+ priorityscore=1501 malwarescore=0 bulkscore=0 impostorscore=0 mlxscore=0
+ lowpriorityscore=0 phishscore=0 suspectscore=0 adultscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2401310000
+ definitions=main-2402200034
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-20_04,2024-02-19_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 phishscore=0
- suspectscore=0 mlxscore=0 bulkscore=0 spamscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402200034
-X-Proofpoint-ORIG-GUID: TzsS8evtmGIZrMK21syrIm33RdAaKBgc
-X-Proofpoint-GUID: TzsS8evtmGIZrMK21syrIm33RdAaKBgc
 
-Through the routine bond_mii_monitor(), bonding driver inspects and commits
-the slave state changes. During the times when slave state change and
-failure in aqcuiring rtnl lock happen at the same time, the routine
-bond_mii_monitor() reschedules itself to come around after 1 msec to commit
-the new state.
+Serdes phy needs to operate at 2500 mode for 2.5G speed and 1000
+mode for 1G/100M/10M speed.
+Added changes to configure serdes phy and mac based on link speed.
+Changing serdes phy speed involves multiple register writes for
+serdes block. To avoid redundant write operations only update serdes
+phy when new speed is different.
+For 2500 speed MAC PCS autoneg needs to disabled. Added changes to
+disable MAC PCS autoneg if ANE parameter is not set.
 
-During this, it executes the routine bond_miimon_inspect() to re-inspect
-the state chane and prints the corresponding slave state on to the console.
-Hence we do see a message at every 1 msec till the rtnl lock is acquired
-and state chage is committed.
-
-This patch doesn't change how bond functions. It only simply limits this
-kind of log flood.
-
-Signed-off-by: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
+Signed-off-by: Sneh Shah <quic_snehshah@quicinc.com>
 ---
-v4:
-  - Rectification in the patch subject and versioning details.
-v3: https://lore.kernel.org/lkml/20240219133721.4567-1-praveen.kannoju@oracle.com/
-  - Commit message is modified to provide summary of the issue, because of
-    which rate-limiting the bonding driver messages is needed.
-v2: https://lore.kernel.org/lkml/20240215172554.4211-1-praveen.kannoju@oracle.com/
-  - Use exising net_ratelimit() instead of introducing new rate-limit
-    parameter.
-v1: https://lore.kernel.org/lkml/20240214044245.33170-1-praveen.kannoju@oracle.com/
+v5 changelog:
+- Updated commit message with more details on MAC PCS autoneg disable
+v4 changelog:
+- Made cosmetic changes
+v3 changelog:
+- updated commit message
 ---
- drivers/net/bonding/bond_main.c | 36 ++++++++++++++++++++----------------
- 1 file changed, 20 insertions(+), 16 deletions(-)
+v2 changelog:
+- updated stmmac_pcs_ane to support autoneg disable
+- Update serdes speed to 1000 for 100M and 10M also---
+---
+ .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 26 +++++++++++++++++++
+ .../net/ethernet/stmicro/stmmac/stmmac_pcs.h  |  2 ++
+ 2 files changed, 28 insertions(+)
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 4e0600c..e92eba1 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -2610,12 +2610,13 @@ static int bond_miimon_inspect(struct bonding *bond)
- 			commit++;
- 			slave->delay = bond->params.downdelay;
- 			if (slave->delay) {
--				slave_info(bond->dev, slave->dev, "link status down for %sinterface, disabling it in %d ms\n",
--					   (BOND_MODE(bond) ==
--					    BOND_MODE_ACTIVEBACKUP) ?
--					    (bond_is_active_slave(slave) ?
--					     "active " : "backup ") : "",
--					   bond->params.downdelay * bond->params.miimon);
-+				if (net_ratelimit())
-+					slave_info(bond->dev, slave->dev, "link status down for %sinterface, disabling it in %d ms\n",
-+						   (BOND_MODE(bond) ==
-+						   BOND_MODE_ACTIVEBACKUP) ?
-+						   (bond_is_active_slave(slave) ?
-+						   "active " : "backup ") : "",
-+						   bond->params.downdelay * bond->params.miimon);
- 			}
- 			fallthrough;
- 		case BOND_LINK_FAIL:
-@@ -2623,9 +2624,10 @@ static int bond_miimon_inspect(struct bonding *bond)
- 				/* recovered before downdelay expired */
- 				bond_propose_link_state(slave, BOND_LINK_UP);
- 				slave->last_link_up = jiffies;
--				slave_info(bond->dev, slave->dev, "link status up again after %d ms\n",
--					   (bond->params.downdelay - slave->delay) *
--					   bond->params.miimon);
-+				if (net_ratelimit())
-+					slave_info(bond->dev, slave->dev, "link status up again after %d ms\n",
-+						   (bond->params.downdelay - slave->delay) *
-+						   bond->params.miimon);
- 				commit++;
- 				continue;
- 			}
-@@ -2648,18 +2650,20 @@ static int bond_miimon_inspect(struct bonding *bond)
- 			slave->delay = bond->params.updelay;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+index 31631e3f89d0..6bbdbb7bef44 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+@@ -106,6 +106,7 @@ struct qcom_ethqos {
+ 	struct clk *link_clk;
+ 	struct phy *serdes_phy;
+ 	unsigned int speed;
++	int serdes_speed;
+ 	phy_interface_t phy_mode;
  
- 			if (slave->delay) {
--				slave_info(bond->dev, slave->dev, "link status up, enabling it in %d ms\n",
--					   ignore_updelay ? 0 :
--					   bond->params.updelay *
--					   bond->params.miimon);
-+				if (net_ratelimit())
-+					slave_info(bond->dev, slave->dev, "link status up, enabling it in %d ms\n",
-+						   ignore_updelay ? 0 :
-+						   bond->params.updelay *
-+						   bond->params.miimon);
- 			}
- 			fallthrough;
- 		case BOND_LINK_BACK:
- 			if (!link_state) {
- 				bond_propose_link_state(slave, BOND_LINK_DOWN);
--				slave_info(bond->dev, slave->dev, "link status down again after %d ms\n",
--					   (bond->params.updelay - slave->delay) *
--					   bond->params.miimon);
-+				if (net_ratelimit())
-+					slave_info(bond->dev, slave->dev, "link status down again after %d ms\n",
-+						   (bond->params.updelay - slave->delay) *
-+						   bond->params.miimon);
- 				commit++;
- 				continue;
- 			}
+ 	const struct ethqos_emac_por *por;
+@@ -606,19 +607,39 @@ static int ethqos_configure_rgmii(struct qcom_ethqos *ethqos)
+  */
+ static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
+ {
++	struct net_device *dev = platform_get_drvdata(ethqos->pdev);
++	struct stmmac_priv *priv = netdev_priv(dev);
+ 	int val;
+ 
+ 	val = readl(ethqos->mac_base + MAC_CTRL_REG);
+ 
+ 	switch (ethqos->speed) {
++	case SPEED_2500:
++		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
++		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
++			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
++			      RGMII_IO_MACRO_CONFIG2);
++		if (ethqos->serdes_speed != SPEED_2500)
++			phy_set_speed(ethqos->serdes_phy, SPEED_2500);
++		ethqos->serdes_speed = SPEED_2500;
++		stmmac_pcs_ctrl_ane(priv, priv->ioaddr, 0, 0, 0);
++		break;
+ 	case SPEED_1000:
+ 		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
+ 		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
+ 			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
+ 			      RGMII_IO_MACRO_CONFIG2);
++		if (ethqos->serdes_speed != SPEED_1000)
++			phy_set_speed(ethqos->serdes_phy, SPEED_1000);
++		ethqos->serdes_speed = SPEED_1000;
++		stmmac_pcs_ctrl_ane(priv, priv->ioaddr, 1, 0, 0);
+ 		break;
+ 	case SPEED_100:
+ 		val |= ETHQOS_MAC_CTRL_PORT_SEL | ETHQOS_MAC_CTRL_SPEED_MODE;
++		if (ethqos->serdes_speed != SPEED_1000)
++			phy_set_speed(ethqos->serdes_phy, SPEED_1000);
++		ethqos->serdes_speed = SPEED_1000;
++		stmmac_pcs_ctrl_ane(priv, priv->ioaddr, 1, 0, 0);
+ 		break;
+ 	case SPEED_10:
+ 		val |= ETHQOS_MAC_CTRL_PORT_SEL;
+@@ -627,6 +648,10 @@ static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
+ 			      FIELD_PREP(RGMII_CONFIG_SGMII_CLK_DVDR,
+ 					 SGMII_10M_RX_CLK_DVDR),
+ 			      RGMII_IO_MACRO_CONFIG);
++		if (ethqos->serdes_speed != SPEED_1000)
++			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
++		ethqos->serdes_speed = SPEED_1000;
++		stmmac_pcs_ctrl_ane(priv, priv->ioaddr, 1, 0, 0);
+ 		break;
+ 	}
+ 
+@@ -799,6 +824,7 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
+ 				     "Failed to get serdes phy\n");
+ 
+ 	ethqos->speed = SPEED_1000;
++	ethqos->serdes_speed = SPEED_1000;
+ 	ethqos_update_link_clk(ethqos, SPEED_1000);
+ 	ethqos_set_func_clk_en(ethqos);
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
+index aefc121464b5..13a30e6df4c1 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
+@@ -110,6 +110,8 @@ static inline void dwmac_ctrl_ane(void __iomem *ioaddr, u32 reg, bool ane,
+ 	/* Enable and restart the Auto-Negotiation */
+ 	if (ane)
+ 		value |= GMAC_AN_CTRL_ANE | GMAC_AN_CTRL_RAN;
++	else
++		value &= ~GMAC_AN_CTRL_ANE;
+ 
+ 	/* In case of MAC-2-MAC connection, block is configured to operate
+ 	 * according to MAC conf register.
 -- 
-1.8.3.1
+2.17.1
 
 
