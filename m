@@ -1,149 +1,218 @@
-Return-Path: <netdev+bounces-73316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D502785BDDE
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 14:56:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D80085BDED
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 14:57:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 768D0B23EBF
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 13:56:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42D5F1C20C58
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 13:57:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BB176A358;
-	Tue, 20 Feb 2024 13:55:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hr9Oo1/j"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C52101C8;
+	Tue, 20 Feb 2024 13:57:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF42B6A351;
-	Tue, 20 Feb 2024 13:55:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114D369E12
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 13:57:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708437318; cv=none; b=MSS783cWrFGip1Msd3LGb86g29HI3Mg3ijVZ8Kxow4jkyV0UQ30BuxaFqwO/eTk5lfFe+u7U9IVKb7ZNCoUuXBfQRxiI53ncAgF8d7AA78q6FbM3LNh3Joc73nKlFwWmCbcTtH+8lQrpvfzpNOqXPGkgk2LV9UneCwLiFw2fv3w=
+	t=1708437469; cv=none; b=dIzcKEsB8zwZ1SDZ+BIbV/Y5aqHrn31cWMENRTk+9huugtqlUXhCnUM0FIPJsFh0nL038tvxQYDRG1bg9E6pgkgRWThlLmHa+sTl7kuvevYASF6aYMUrpR8DoSpetJiEKycCLCEQyFhqjRW5jJl1EOcb8tfFESY62YPidi3zs9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708437318; c=relaxed/simple;
-	bh=8YnGjvzKa113QUkH5s6sw06FvhJW/phsnrHheYilx8c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sSI8GUkE/qNuCOcjxRqD63Cj0fPc6DYV0idQ58P3vzto/RVdp9ExGgQxkkLHDsTm8uDrpB3bh3cOFqlK3Q2MPvE5GoiIaYXK8PXXh63q6h0IYsNRwCQFKV8Jd/HlQte3LTYyvT8OE6JpTvxKtXrMqtIq3p8/6xoysojjIyRhJXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hr9Oo1/j; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69139C433C7;
-	Tue, 20 Feb 2024 13:55:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708437317;
-	bh=8YnGjvzKa113QUkH5s6sw06FvhJW/phsnrHheYilx8c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hr9Oo1/j4JEobgRky8HGIzxdyV4q3xownd5IQWW36y9N4d1D8PAGUv47/9RUt8JvD
-	 5krmDY3Rt5Wks6psU1BSYZCjaNfQL3MBpTak2amSuE4CM4R95MRXubOg8bPX0x/4Ug
-	 BQkY5xF3B91AdXuodd8nGjsLdCIoinY3J7P9JJTPR+u8GiBrkygDiBhExpIm9REd19
-	 Td1bkmwV5PVknDul2hwkGmbsHMYvsYbTdB7BS6Q9CNlRVEOBMvQmzfAJU6RCN638io
-	 cZa0F/mzqeCtT9DM6s9X+RG69H6iFFVSTYL354xPsAr0Q4AIwJKz2MZc8nDtZ0eAvk
-	 DORZb/gj2YDXg==
-Date: Tue, 20 Feb 2024 13:55:12 +0000
-From: Simon Horman <horms@kernel.org>
-To: forbidden405@outlook.com
-Cc: Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v3 3/6] net: hisilicon: add support for
- hisi_femac core on Hi3798MV200
-Message-ID: <20240220135512.GN40273@kernel.org>
-References: <20240220-net-v3-0-b68e5b75e765@outlook.com>
- <20240220-net-v3-3-b68e5b75e765@outlook.com>
+	s=arc-20240116; t=1708437469; c=relaxed/simple;
+	bh=hYUBCifs0Tq6fri0k313BzJozBVj90K+5w/Iaw0h60c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tOPaBRoE0iIZPcgLLrnWcvILQRDuKk+YnDZT9EU+wA2Wwf9UlnWUn7YaP3tTYSaK+8g35lM0nE9g/5v3g1m68BWnRoEMpFOnj02FqATMEbejBmtLuotS18WpDkex0Ibrs/cX63k1iSflcgJ+WFUGlSv6vC1sEK1c8c5JvYuvzEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@breakpoint.cc>)
+	id 1rcQcy-00050A-Po; Tue, 20 Feb 2024 14:57:44 +0100
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Florian Westphal <fw@strlen.de>,
+	syzbot+bfde3bef047a81b8fde6@syzkaller.appspotmail.com
+Subject: [PATCH net v2] net: ip_tunnel: prevent perpetual headroom growth
+Date: Tue, 20 Feb 2024 14:56:02 +0100
+Message-ID: <20240220135606.4939-1-fw@strlen.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240220-net-v3-3-b68e5b75e765@outlook.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Feb 20, 2024 at 03:57:38AM +0800, Yang Xiwen via B4 Relay wrote:
-> From: Yang Xiwen <forbidden405@outlook.com>
-> 
-> Register the sub MDIO bus if it is found. Also implement the internal
-> PHY reset procedure as needed.
-> 
-> Note it's unable to put the MDIO bus node outside of MAC controller
-> (i.e. at the same level in the parent bus node). Because we need to
-> control all clocks and resets in FEMAC driver due to the phy reset
-> procedure. So the clocks can't be assigned to MDIO bus device, which is
-> an essential resource for the MDIO bus to work.
-> 
-> No backward compatibility is maintained since the only existing
-> user(Hi3516DV300) has not received any updates from HiSilicon for about
-> 8 years already. And till today, no mainline dts for this SoC is found.
-> It seems unlikely that there are still existing mainline Hi3516DV300
-> users. The effort to maintain the old binding seems gain a little.
-> 
-> Signed-off-by: Yang Xiwen <forbidden405@outlook.com>
-> ---
->  drivers/net/ethernet/hisilicon/hisi_femac.c | 77 +++++++++++++++++++++++------
->  1 file changed, 61 insertions(+), 16 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/hisilicon/hisi_femac.c b/drivers/net/ethernet/hisilicon/hisi_femac.c
+syzkaller triggered following kasan splat:
+BUG: KASAN: use-after-free in __skb_flow_dissect+0x19d1/0x7a50 net/core/flow_dissector.c:1170
+Read of size 1 at addr ffff88812fb4000e by task syz-executor183/5191
+[..]
+ kasan_report+0xda/0x110 mm/kasan/report.c:588
+ __skb_flow_dissect+0x19d1/0x7a50 net/core/flow_dissector.c:1170
+ skb_flow_dissect_flow_keys include/linux/skbuff.h:1514 [inline]
+ ___skb_get_hash net/core/flow_dissector.c:1791 [inline]
+ __skb_get_hash+0xc7/0x540 net/core/flow_dissector.c:1856
+ skb_get_hash include/linux/skbuff.h:1556 [inline]
+ ip_tunnel_xmit+0x1855/0x33c0 net/ipv4/ip_tunnel.c:748
+ ipip_tunnel_xmit+0x3cc/0x4e0 net/ipv4/ipip.c:308
+ __netdev_start_xmit include/linux/netdevice.h:4940 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4954 [inline]
+ xmit_one net/core/dev.c:3548 [inline]
+ dev_hard_start_xmit+0x13d/0x6d0 net/core/dev.c:3564
+ __dev_queue_xmit+0x7c1/0x3d60 net/core/dev.c:4349
+ dev_queue_xmit include/linux/netdevice.h:3134 [inline]
+ neigh_connected_output+0x42c/0x5d0 net/core/neighbour.c:1592
+ ...
+ ip_finish_output2+0x833/0x2550 net/ipv4/ip_output.c:235
+ ip_finish_output+0x31/0x310 net/ipv4/ip_output.c:323
+ ..
+ iptunnel_xmit+0x5b4/0x9b0 net/ipv4/ip_tunnel_core.c:82
+ ip_tunnel_xmit+0x1dbc/0x33c0 net/ipv4/ip_tunnel.c:831
+ ipgre_xmit+0x4a1/0x980 net/ipv4/ip_gre.c:665
+ __netdev_start_xmit include/linux/netdevice.h:4940 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4954 [inline]
+ xmit_one net/core/dev.c:3548 [inline]
+ dev_hard_start_xmit+0x13d/0x6d0 net/core/dev.c:3564
+ ...
 
-...
+The splat occurs because skb->data points past skb->head allocated area.
+This is because neigh layer does:
+  __skb_pull(skb, skb_network_offset(skb));
 
-> @@ -826,15 +844,34 @@ static int hisi_femac_drv_probe(struct platform_device *pdev)
->  						 priv->phy_reset_delays,
->  						 DELAYS_NUM);
->  		if (ret)
-> -			goto out_disable_clk;
-> +			goto out_free_netdev;
->  		hisi_femac_phy_reset(priv);
->  	}
->  
-> +	// Register the optional MDIO bus
-> +	for_each_available_child_of_node(node, mdio_np) {
-> +		if (of_node_name_prefix(mdio_np, "mdio")) {
-> +			priv->mdio_pdev = of_platform_device_create(mdio_np, NULL, dev);
-> +			of_node_put(mdio_np);
-> +			if (!priv->mdio_pdev) {
-> +				dev_err(dev, "failed to register MDIO bus device\n");
-> +				ret = -ENODEV;
-> +				goto out_free_netdev;
-> +			}
-> +			mdio_registered = true;
-> +			break;
-> +		}
-> +		of_node_put(mdio_np);
+... but skb_network_offset() returns a negative offset and __skb_pull()
+arg is unsigned.  IOW, we skb->data gets "adjusted" by a huge value.
 
-Sorry for not noticing this earlier.
+The negative value is returned because skb->head and skb->data distance is
+more than 64k and skb->network_header (u16) has wrapped around.
 
-I think that of_node_put() only needs to be called in the
-case of terminating the loop (via break, goto, return, etc...).
-But should not be called otherwise (when the loop cycles) as
-for_each_available_child_of_node() calls of_node_put().
+The bug is in the ip_tunnel infrastructure, which can cause
+dev->needed_headroom to increment ad infinitum.
 
-Flagged by Coccinelle.
+The syzkaller reproducer consists of packets getting routed via a gre
+tunnel, and route of gre encapsulated packets pointing at another (ipip)
+tunnel.  The ipip encapsulation finds gre0 as next output device.
 
-> +	}
-> +
-> +	if (!mdio_registered)
-> +		dev_warn(dev, "MDIO subnode not found. This is usually a bug.\n");
-> +
->  	phy = of_phy_get_and_connect(ndev, node, hisi_femac_adjust_link);
->  	if (!phy) {
->  		dev_err(dev, "connect to PHY failed!\n");
->  		ret = -ENODEV;
-> -		goto out_disable_clk;
-> +		goto out_unregister_mdio_bus;
->  	}
->  
->  	phy_attached_print(phy, "phy_id=0x%.8lx, phy_mode=%s\n",
+This results in the following pattern:
 
-...
+1). First packet is to be sent out via gre0.
+Route lookup found an output device, ipip0.
+
+2).
+ip_tunnel_xmit for gre0 bumps gre0->needed_headroom based on the future
+output device, rt.dev->needed_headroom (ipip0).
+
+3).
+ip output / start_xmit moves skb on to ipip0. which runs the same
+code path again (xmit recursion).
+
+4).
+Routing step for the post-gre0-encap packet finds gre0 as output device
+to use for ipip0 encapsulated packet.
+
+tunl0->needed_headroom is then incremented based on the (already bumped)
+gre0 device headroom.
+
+This repeats for every future packet:
+
+gre0->needed_headroom gets inflated because previous packets' ipip0 step
+incremented rt->dev (gre0) headroom, and ipip0 incremented because gre0
+needed_headroom was increased.
+
+For each subsequent packet, gre/ipip0->needed_headroom grows until
+post-expand-head reallocations result in a skb->head/data distance of
+more than 64k.
+
+Once that happens, skb->network_header (u16) wraps around when
+pskb_expand_head tries to make sure that skb_network_offset() is unchanged
+after the headroom expansion/reallocation.
+
+After this skb_network_offset(skb) returns a different (and negative)
+result post headroom expansion.
+
+The next trip to neigh layer (or anything else that would __skb_pull the
+network header) makes skb->data point to a memory location outside
+skb->head area.
+
+v2: Cap the needed_headroom update to an arbitarily chosen upperlimit to
+prevent perpetual increase instead of dropping the headroom increment
+completely.
+
+Reported-and-tested-by: syzbot+bfde3bef047a81b8fde6@syzkaller.appspotmail.com
+Closes: https://groups.google.com/g/syzkaller-bugs/c/fL9G6GtWskY/m/VKk_PR5FBAAJ
+Fixes: 243aad830e8a ("ip_gre: include route header_len in max_headroom calculation")
+Signed-off-by: Florian Westphal <fw@strlen.de>
+---
+ net/ipv4/ip_tunnel.c | 28 +++++++++++++++++++++-------
+ 1 file changed, 21 insertions(+), 7 deletions(-)
+
+diff --git a/net/ipv4/ip_tunnel.c b/net/ipv4/ip_tunnel.c
+index a4513ffb66cb..1b6981de3f29 100644
+--- a/net/ipv4/ip_tunnel.c
++++ b/net/ipv4/ip_tunnel.c
+@@ -554,6 +554,20 @@ static int tnl_update_pmtu(struct net_device *dev, struct sk_buff *skb,
+ 	return 0;
+ }
+ 
++static void ip_tunnel_adj_headroom(struct net_device *dev, unsigned int headroom)
++{
++	/* we must cap headroom to some upperlimit, else pskb_expand_head
++	 * will overflow header offsets in skb_headers_offset_update().
++	 */
++	static const unsigned int max_allowed = 512;
++
++	if (headroom > max_allowed)
++		headroom = max_allowed;
++
++	if (headroom > READ_ONCE(dev->needed_headroom))
++		WRITE_ONCE(dev->needed_headroom, headroom);
++}
++
+ void ip_md_tunnel_xmit(struct sk_buff *skb, struct net_device *dev,
+ 		       u8 proto, int tunnel_hlen)
+ {
+@@ -632,13 +646,13 @@ void ip_md_tunnel_xmit(struct sk_buff *skb, struct net_device *dev,
+ 	}
+ 
+ 	headroom += LL_RESERVED_SPACE(rt->dst.dev) + rt->dst.header_len;
+-	if (headroom > READ_ONCE(dev->needed_headroom))
+-		WRITE_ONCE(dev->needed_headroom, headroom);
+-
+-	if (skb_cow_head(skb, READ_ONCE(dev->needed_headroom))) {
++	if (skb_cow_head(skb, headroom)) {
+ 		ip_rt_put(rt);
+ 		goto tx_dropped;
+ 	}
++
++	ip_tunnel_adj_headroom(dev, headroom);
++
+ 	iptunnel_xmit(NULL, rt, skb, fl4.saddr, fl4.daddr, proto, tos, ttl,
+ 		      df, !net_eq(tunnel->net, dev_net(dev)));
+ 	return;
+@@ -818,16 +832,16 @@ void ip_tunnel_xmit(struct sk_buff *skb, struct net_device *dev,
+ 
+ 	max_headroom = LL_RESERVED_SPACE(rt->dst.dev) + sizeof(struct iphdr)
+ 			+ rt->dst.header_len + ip_encap_hlen(&tunnel->encap);
+-	if (max_headroom > READ_ONCE(dev->needed_headroom))
+-		WRITE_ONCE(dev->needed_headroom, max_headroom);
+ 
+-	if (skb_cow_head(skb, READ_ONCE(dev->needed_headroom))) {
++	if (skb_cow_head(skb, max_headroom)) {
+ 		ip_rt_put(rt);
+ 		DEV_STATS_INC(dev, tx_dropped);
+ 		kfree_skb(skb);
+ 		return;
+ 	}
+ 
++	ip_tunnel_adj_headroom(dev, max_headroom);
++
+ 	iptunnel_xmit(NULL, rt, skb, fl4.saddr, fl4.daddr, protocol, tos, ttl,
+ 		      df, !net_eq(tunnel->net, dev_net(dev)));
+ 	return;
+-- 
+2.43.0
+
 
