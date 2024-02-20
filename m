@@ -1,58 +1,57 @@
-Return-Path: <netdev+bounces-73339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BE6285BF5D
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 16:02:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C06085BF7E
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 16:09:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBA042823FF
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 15:02:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C24BB20E39
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 15:09:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0CEC71B59;
-	Tue, 20 Feb 2024 15:00:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FBAC74E01;
+	Tue, 20 Feb 2024 15:09:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xl5Xrye8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SlYab9eJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 876506931F;
-	Tue, 20 Feb 2024 15:00:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79EB2745F8
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 15:09:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708441255; cv=none; b=ECEzOSFuCXcbwOs4uPVq3mNrZTZip6NXDGFC8OYCs+7I0TxsHhB5Ls64T7hkM0iviOWf0FvxmUQYUbBIW4HbjUBKB1lz+xpby/gRFhpIl2Z27OJgSfvCVf4mPTw8zYSfp3+d0xvC3pZjBXJ81bEIMqHf+ul1nGomRwyzPG19dKI=
+	t=1708441777; cv=none; b=W6WFL8PfsMOqMQm4tWyWSTp4hXMvHgSDwlxOps4O+J/wEdgb4pnpPUKT4an9HacyTFzM0VkGSvt3eMTqK0ulhx1NB6A5C8LBUxiErfOgg3ojfc6dselm/xeGFcxsfR0FeNYD/5fMaC7IlmSev2erIxWkhqspgUfk/lEAwg6wc7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708441255; c=relaxed/simple;
-	bh=t0kh6fT7xYxfjYlEKpkM6AOETmzHo7MjScDoq365xG4=;
+	s=arc-20240116; t=1708441777; c=relaxed/simple;
+	bh=I8b8ggHlPnPeNRhnW2YzffNa4rX5cdXDVl/VGsL3GIc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=noeXdjSMxKITRhZ098YvpNSUwj/1sDyYJKR8ofxbV8KAOq9/1X4Geihcp1d51yJ40qU4K3phb7NBbn3kirABxM1P19S2/WGeTw9cqG/ozkY49EqzOLmSmusX68RCOn/1FRirz1HHf4JVnYIgP0WH1f5oJwJm9qV9rf20M7ldRWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xl5Xrye8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5071AC433F1;
-	Tue, 20 Feb 2024 15:00:52 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=hVRsDr8LsgePgYn8bagOpp+szB1akQsWLnlw/F971XhbFKiCkOYzIQuRyUztYx+kRWVaxO0k1nhu4yJYYFQXVGQwKZPnsxn6IHmxfYXfdxhA0TxLxY+VnUOHS9ejlF+3YItADO1nkYJHmUDJHtheR0MvkS1btfVnrez5rbWGhSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SlYab9eJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7303C433C7;
+	Tue, 20 Feb 2024 15:09:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708441255;
-	bh=t0kh6fT7xYxfjYlEKpkM6AOETmzHo7MjScDoq365xG4=;
+	s=k20201202; t=1708441777;
+	bh=I8b8ggHlPnPeNRhnW2YzffNa4rX5cdXDVl/VGsL3GIc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Xl5Xrye8FtH7cnrdC7jAssSPoehu+/m2GxRMNDtkrhAkjT+5dEsCWjtUhaWDXmvMI
-	 ruOmg+0SePgiidCxNnbMVP3k/v453nd3uTMajSeeusA/xwk2fJUgeRld0JRTX37n/Y
-	 +tIB0MaarLeH+F8D17aEFyTVerbDAvvbRdxEM03VLlawukPs5MrB+iom2/dlZcpl+h
-	 bpTW2KEokm1pmKvgJWPly6i5jF++JwOa9KeU6KHBge2OuemX686I90JYK6czEPyNwK
-	 Dw+xr+GxacmF9F3UfLcOnTkxyrijFi6RirbNhn2SxZYj8fO7g+tD2fI+jhCeB3e56R
-	 MhoOppnCs/qgA==
-Date: Tue, 20 Feb 2024 15:00:50 +0000
+	b=SlYab9eJZ2VDM6UfuJQI+rmdvuM/e2Hm3ixYtTkbecI/QJ/1lP9h7Ewpoy2DppxZn
+	 ap7eWib9WjI9Q+o3TCPllV2fbAVdNfxIDtDBZ9sVSmQxYZ3PvPljzYbYRJSmzyFylZ
+	 TBEncURXo5TQ0GI9iM4OQD8veqYMC/XvXD553jdaonQCmRChg1SVS6Y7fk8C9t0vyS
+	 CTBKJLpztmbHRNj/l8epHEJyNOmUsxt8hXQ45ARvA3H0WXOVoblRKsmNIWxLpbYK8s
+	 zwjK14V9dFDw8yUURGEKD228BlZymT3uDLEbE19pCKpqKRZWewHEDysKjAiJHEok8D
+	 pmjNWbuOf+NVQ==
+Date: Tue, 20 Feb 2024 15:09:33 +0000
 From: Simon Horman <horms@kernel.org>
-To: Siddharth Vadapalli <s-vadapalli@ti.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, xiaoning.wang@nxp.com, wei.fang@nxp.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, srk@ti.com
-Subject: Re: [PATCH net] net: phy: realtek: Fix rtl8211f_config_init() for
- RTL8211F(D)(I)-VD-CG PHY
-Message-ID: <20240220150050.GO40273@kernel.org>
-References: <20240220070007.968762-1-s-vadapalli@ti.com>
+To: Jeremy Kerr <jk@codeconstruct.com.au>
+Cc: netdev@vger.kernel.org, Matt Johnston <matt@codeconstruct.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v2] net: mctp: take ownership of skb in
+ mctp_local_output
+Message-ID: <20240220150933.GP40273@kernel.org>
+References: <20240220081053.1439104-1-jk@codeconstruct.com.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,28 +60,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240220070007.968762-1-s-vadapalli@ti.com>
+In-Reply-To: <20240220081053.1439104-1-jk@codeconstruct.com.au>
 
-On Tue, Feb 20, 2024 at 12:30:07PM +0530, Siddharth Vadapalli wrote:
-> Commit bb726b753f75 ("net: phy: realtek: add support for
-> RTL8211F(D)(I)-VD-CG") extended support of the driver from the existing
-> support for RTL8211F(D)(I)-CG PHY to the newer RTL8211F(D)(I)-VD-CG PHY.
+On Tue, Feb 20, 2024 at 04:10:53PM +0800, Jeremy Kerr wrote:
+> Currently, mctp_local_output only takes ownership of skb on success, and
+> we may leak an skb if mctp_local_output fails in specific states; the
+> skb ownership isn't transferred until the actual output routing occurs.
 > 
-> While that commit indicated that the RTL8211F_PHYCR2 register is not
-> supported by the "VD-CG" PHY model and therefore updated the corresponding
-> section in rtl8211f_config_init() to be invoked conditionally, the call to
-> "genphy_soft_reset()" was left as-is, when it should have also been invoked
-> conditionally. This is because the call to "genphy_soft_reset()" was first
-> introduced by the commit 0a4355c2b7f8 ("net: phy: realtek: add dt property
-> to disable CLKOUT clock") since the RTL8211F guide indicates that a PHY
-> reset should be issued after setting bits in the PHYCR2 register.
+> Instead, make mctp_local_output free the skb on all error paths up to
+> the route action, so it always consumes the passed skb.
 > 
-> As the PHYCR2 register is not applicable to the "VD-CG" PHY model, fix the
-> rtl8211f_config_init() function by invoking "genphy_soft_reset()"
-> conditionally based on the presence of the "PHYCR2" register.
+> Fixes: 833ef3b91de6 ("mctp: Populate socket implementation")
+> Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
 > 
-> Fixes: bb726b753f75 ("net: phy: realtek: add support for RTL8211F(D)(I)-VD-CG")
-> Signed-off-by: Siddharth Vadapalli <s-vadapalli@ti.com>
+> ---
+> v2:
+>  - retain EINVAL return code in !rt && !ifindex case. Based on feedback
+>    from Simon Horman <horms@kernel.org>.
+
+Hi Jeremy,
+
+Thanks for the update.
+This one looks good to me.
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
