@@ -1,113 +1,109 @@
-Return-Path: <netdev+bounces-73190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D807A85B4FC
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:25:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 48B3285B41D
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:42:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 151FB1C226CC
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:25:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B4CD1C20F1A
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 07:42:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5074E5C609;
-	Tue, 20 Feb 2024 08:25:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6ED05A4DE;
+	Tue, 20 Feb 2024 07:42:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="eovrHKOM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF1AA5C8EA;
-	Tue, 20 Feb 2024 08:24:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B91EA5A782
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 07:42:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708417505; cv=none; b=eiyGjFac044jPM7vsgvUMsLHTu/EuN200kjBzTWThvHw0Y3FubBb07WMbKggIbUaeeWTnz1mMI8ca3V38Gwo2382TVLwhOfkkf9PPxDL9OpaLWaDrknLW3bBebPa070wlpueomBQe8jDX4tp8ZivuvX2RC+T4PUou2Qmzy6Q6no=
+	t=1708414939; cv=none; b=kkJyBfn7nkb5FNPO5enN2Ftyb744/JCNqLsdobz8HEZKoWR39zj3FV2hk2aFniarXKKmOxO73wKLXWj1cgcJi3rSmMtVaqNBAhbif45oYlQXcYmlg6NEhRZjKQ9qX4LoHAo31gO4w+AVpf6ynMgR9yfFQ5+GWXPByC+feGOy3Ps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708417505; c=relaxed/simple;
-	bh=+w+mRN6Xuei5AS2KampiNpZLGpy3MvgpnukzVAOQA24=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=scK/xk9GiduNw4p577SS93QHTtIBGfvXAzcEov+XNAzcqyQ5fQ2TqAgyOHSQVSfRrImoiFtqNHHEvBFP2tJBMUmqG1MRArdHqvJz+Hm0wTMuc87DgRuencHiROi5tNC35dBCn6S0T/JUU/DJyI7OC2OB4baNi+qybXvQxPTECOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: e76ac4262ba44dd3adedc0eb3e9b2ca8-20240220
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.35,REQID:db588860-89b4-42ab-9066-b37eb2441484,IP:10,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:-5
-X-CID-INFO: VERSION:1.1.35,REQID:db588860-89b4-42ab-9066-b37eb2441484,IP:10,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-5
-X-CID-META: VersionHash:5d391d7,CLOUDID:b6121884-8d4f-477b-89d2-1e3bdbef96d1,B
-	ulkID:240220153658NWT9W1ND,BulkQuantity:0,Recheck:0,SF:17|19|44|66|38|24|1
-	02,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,CO
-	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
-X-UUID: e76ac4262ba44dd3adedc0eb3e9b2ca8-20240220
-Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw
-	(envelope-from <chentao@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 2003651422; Tue, 20 Feb 2024 15:36:56 +0800
-Received: from mail.kylinos.cn (localhost [127.0.0.1])
-	by mail.kylinos.cn (NSMail) with SMTP id D0490E000EBC;
-	Tue, 20 Feb 2024 15:36:55 +0800 (CST)
-X-ns-mid: postfix-65D45697-68413322
-Received: from kernel.. (unknown [172.20.15.254])
-	by mail.kylinos.cn (NSMail) with ESMTPA id 187D8E000EBD;
-	Tue, 20 Feb 2024 15:36:55 +0800 (CST)
-From: Kunwu Chan <chentao@kylinos.cn>
-To: davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	jiri@resnulli.us,
-	Kunwu Chan <chentao@kylinos.cn>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Subject: [PATCH net-next v2 5/5] ipv6: Simplify the allocation of slab caches
-Date: Tue, 20 Feb 2024 15:36:46 +0800
-Message-Id: <20240220073646.102033-6-chentao@kylinos.cn>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240220073646.102033-1-chentao@kylinos.cn>
-References: <20240220073646.102033-1-chentao@kylinos.cn>
+	s=arc-20240116; t=1708414939; c=relaxed/simple;
+	bh=J+zYeJqlBPHTPRgTIQeAJ3oMn+ZUCupZUdoOVGZTVfQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r1WTsVKJuZjVXl2ZhwzsvbH3+9BlWkvD6yt4y0LyiZGiCYkvmg7D4G3U+NVcbZrjOfz9Y+wF/6399RQPMD/UpBfqdKgvOjD94YrdwLxmKHQQ4Ggr0Hhzqu1j/q38twWcgWFDTLlkZcBorsJjt+fY4hmWaKYo5bbSZa8EgkoPSxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=eovrHKOM; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3394bec856fso3485461f8f.0
+        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 23:42:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708414936; x=1709019736; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=S/DSDybLrVzjdRAvVymD3Q0Ne4EDeLAq0j34Q0JPJ4k=;
+        b=eovrHKOMJ5iG26eYNPQ3Fe7bmpCh7M3iyZbzugTftiWgYNcne8itRAK6640cDimi2+
+         wcYLqLHujj7t0t1FrejMskaHcI2h9LLNIh+Mz1nv+uFrm0CuAjBNvCEY8IwErhu4vS7P
+         kTWm0CPll6TynXI66swCEcBA8+2rjeR+QimVOLF/YcaQlNuO7ozSagSH+bxD9sixbUaN
+         5XdNDZOOOzadmbOfuZPIPjsWOr5IpnBfgrQR7yLQC1N7FY/uGc/yS1FspVgXtyPQZcdP
+         hGcFIIQCPROvfcsNpVtVUzfhW5qyHSR3G/NlnUD0zqK5QWPPfnjNY9SFxYYe3X/iS2gq
+         AgRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708414936; x=1709019736;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=S/DSDybLrVzjdRAvVymD3Q0Ne4EDeLAq0j34Q0JPJ4k=;
+        b=jT3x2utSvIoSz+uSMFq9LzUWdBu4uQjA//oP+Jga/S6vSzj38mkZbl+dFJ50ku9ISR
+         M6e8pXd65JwtK+T0M3XdGY8Iip8fjDqnBuH1aaTJMx9W61w/N6NivQ7RFm6crrWUdfjy
+         As3Tm8UO1uFs119NMM4h45/xS+Be0kvlgyDenO1wAXYKjEQgYJ15Y99noHGj/Nep6GEB
+         eIlb+bKBaIgYvR84yE4aqmM7qGVwbseh/OLOXWdGQ1SRLMeiTfuYGEADtZYxCXJHDVYy
+         AH4LBmoxhk4ozM1pvPIROQ/3bYL/+G2rf9SJZV8PV7aM6du650T0OZ1knk21EY2BIZq9
+         DlZg==
+X-Forwarded-Encrypted: i=1; AJvYcCWwBk0OuG3njXFTAee8stLw6oru+ZRxkZXqbhG+yBkTBjoI/VNBzcRiBDapT1mNcaot8Cf2rKlfCK/xQwjaFZka/ythd6f9
+X-Gm-Message-State: AOJu0YzsbiOFYDariX4s6fFr+pXNf6IVWWTmh2AmpQHeBNwz6DUXEsp7
+	rVQyiZM6t74FQl1AKRObGcB43QMrMK4Bd04du+X/VlPwbTNxGOfdf+kdg673zig=
+X-Google-Smtp-Source: AGHT+IFmDYiXbAq+GZXsPe1Qqz/I0j0cFa7FpMBW/qXFUFi9HXyoGcuYe24+kqL4Q7z4/yKCsn75ng==
+X-Received: by 2002:a5d:588a:0:b0:33d:3b83:c08 with SMTP id n10-20020a5d588a000000b0033d3b830c08mr6570251wrf.23.1708414935867;
+        Mon, 19 Feb 2024 23:42:15 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ba1-20020a0560001c0100b0033d67bdce97sm1376016wrb.84.2024.02.19.23.42.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Feb 2024 23:42:15 -0800 (PST)
+Date: Tue, 20 Feb 2024 08:42:12 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	pabeni@redhat.com, davem@davemloft.net, edumazet@google.com
+Subject: Re: [patch net-next] devlink: fix port dump cmd type
+Message-ID: <ZdRX1KhTJju1PpQP@nanopsycho>
+References: <20240216113147.50797-1-jiri@resnulli.us>
+ <20240219151343.GC40273@kernel.org>
+ <20240219122038.5964400d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240219122038.5964400d@kernel.org>
 
-Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
-to simplify the creation of SLAB caches.
+Mon, Feb 19, 2024 at 09:20:38PM CET, kuba@kernel.org wrote:
+>On Mon, 19 Feb 2024 15:13:43 +0000 Simon Horman wrote:
+>> > Fix it by filling cmd with value DEVLINK_CMD_PORT_NEW.
+>> > 
+>> > Skimmed through devlink userspace implementations, none of them cares
+>> > about this cmd value. Only ynl, for which, this is actually a fix, as it
+>> > expects doit and dumpit ops rsp_value to be the same.  
+>> 
+>> I guess that in theory unknown implementations could exist.
+>> But, ok :)
+>
+>I'd also prefer Fixes tag + net. YNL is user space, even if current YNL
+>specs don't trigger it (I'm speculating that that's why you feel it's
+>not a fix) someone may end up using YNL + YAML from 6.9 and expect it
+>to work on 6.6 LTS.
 
-Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
----
- net/ipv6/ip6_fib.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+As you wish.
 
-diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-index 4fc2cae0d116..25d7e6d45e6a 100644
---- a/net/ipv6/ip6_fib.c
-+++ b/net/ipv6/ip6_fib.c
-@@ -2444,10 +2444,8 @@ int __init fib6_init(void)
- {
- 	int ret =3D -ENOMEM;
-=20
--	fib6_node_kmem =3D kmem_cache_create("fib6_nodes",
--					   sizeof(struct fib6_node), 0,
--					   SLAB_HWCACHE_ALIGN | SLAB_ACCOUNT,
--					   NULL);
-+	fib6_node_kmem =3D KMEM_CACHE(fib6_node,
-+				    SLAB_HWCACHE_ALIGN | SLAB_ACCOUNT);
- 	if (!fib6_node_kmem)
- 		goto out;
-=20
---=20
-2.39.2
-
+>-- 
+>pw-bot: cr
 
