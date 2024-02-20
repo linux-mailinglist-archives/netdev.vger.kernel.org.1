@@ -1,70 +1,47 @@
-Return-Path: <netdev+bounces-73136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D02185B198
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 04:45:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADC5185B1B6
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 04:52:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81A451C219C9
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 03:45:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AC2D1F21983
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 03:52:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 085051C2E;
-	Tue, 20 Feb 2024 03:45:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7855E54FA0;
+	Tue, 20 Feb 2024 03:52:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="QMKgEzCE"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="EI+SvDv3"
 X-Original-To: netdev@vger.kernel.org
-Received: from omta34.uswest2.a.cloudfilter.net (omta34.uswest2.a.cloudfilter.net [35.89.44.33])
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 257B353E07
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 03:45:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.89.44.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF81B51037;
+	Tue, 20 Feb 2024 03:52:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708400711; cv=none; b=smacFhDw61E770aIqNuR1JIeXnaF3bSlZIOW4MT83yoioJaQ6wkTyJam8UqzpLfRQNseMlpt1MjXmuqgE6/rnnL5IbL26TNuZ/lu4MrTpkJQlwA4LEqVr3YW1q9I8Qkb7n9iq6AUwrSZZFbdCbK/fwc9sej/7i+RCR5xzwvQIWU=
+	t=1708401131; cv=none; b=frF8CXnNz1Yo8nqkPeDRSb8vT3qYfSCa8m93AeNjJm+LrGW7rRPb0Et67iuDdeagDtbVkw5uTqy/5T1JhYz8dWAuwwiRv4waCi9fvVZ7xIdxmSZxPkSzncibTa/ZSnM6ebUeEbEtvRG3bv3QZC2PwvPbW3WAEGUtmVXdjpz3syk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708400711; c=relaxed/simple;
-	bh=OcPCIZy7nXuy5ziO0susXqNVG47xVgOrCSXAibeuhFE=;
+	s=arc-20240116; t=1708401131; c=relaxed/simple;
+	bh=0aZtum7GpJTK5e070oGcznr1ZLszEjCXaTCDzai2tQ4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WUyhGP/r6z776yYlEG3oB2XbpeLGvQgW2aN3IMmymxJTMGhSsRT/T3BnTibgnbF/VSzxRdPI8nssXb11RkbaAM3KdQP/PG73TgcbG8p0EvacaCvPb7SPpncy/bKh4K/n8KhGsbjj0j32BAJZ4X/PX1jjXkPckkPDXrCeSZHutPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=QMKgEzCE; arc=none smtp.client-ip=35.89.44.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
-Received: from eig-obgw-6001a.ext.cloudfilter.net ([10.0.30.140])
-	by cmsmtp with ESMTPS
-	id cEmIrlhqipUFLcH48r2kwv; Tue, 20 Feb 2024 03:45:08 +0000
-Received: from gator4166.hostgator.com ([108.167.133.22])
-	by cmsmtp with ESMTPS
-	id cH47rZsJCFgIvcH48reGMA; Tue, 20 Feb 2024 03:45:08 +0000
-X-Authority-Analysis: v=2.4 cv=ba3IU/PB c=1 sm=1 tr=0 ts=65d42044
- a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=VhncohosazJxI00KdYJ/5A==:17
- a=IkcTkHD0fZMA:10 a=k7vzHIieQBIA:10 a=wYkD_t78qR0A:10 a=VwQbUJbxAAAA:8
- a=7CQSdrXTAAAA:8 a=3_uRt0xjAAAA:8 a=cm27Pg_UAAAA:8 a=hWMQpYRtAAAA:8
- a=FOH2dFAWAAAA:8 a=pGLkceISAAAA:8 a=1XWaLZrsAAAA:8 a=yjU-xTemAAAA:8
- a=eDVy6FjPjR8uDmFmMbsA:9 a=QEXdDO2ut3YA:10 a=AjGcO6oz07-iQ99wixmX:22
- a=a-qgeE7W1pNrGK8U0ZQC:22 a=z1SuboXgGPGzQ8_2mWib:22 a=xmb-EsYY8bH0VWELuYED:22
- a=KCsI-UfzjElwHeZNREa_:22 a=i3VuKzQdj-NEYjvDI-p3:22 a=SwQY0DHxSCHDbjv2szoi:22
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=h1njW/efThCJFEqzUeXvd51T+cMl3qjxmrwE87+THD0=; b=QMKgEzCE0INN/Ug+cnk4Rb96bG
-	TutBBXmI/CslUDUjom0yyYT6CfL/lzWkvLUeNKnAOtao0VaZRNONBhTYS4lAcXQHLJPUTo9XbkXN/
-	aiABwQOHhgKbTVx/ZtwOOCUmvZh6xPtuGV/mPU2XNxGt9AnSt/8Yd0Ed8ATy7Lqyh5lmX0EV2jWcL
-	gz8Ets25CCkNXomnGH/kcd22rQ2TpLcTkVpJ6VEpsfJGdeAwA9NHbsdUbzUTCl909843x7HmS2TtM
-	V9HmTy41ddkY+2IDEy+CEbyziMrPtRy5cHiYhbYy1P3vPp934o4ZePWX34CzfxH5o1I/PHBSrtoA2
-	R+wYPAVA==;
-Received: from [201.172.172.225] (port=37524 helo=[192.168.15.10])
-	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96.2)
-	(envelope-from <gustavo@embeddedor.com>)
-	id 1rcH43-001sze-2s;
-	Mon, 19 Feb 2024 21:45:03 -0600
-Message-ID: <afc55d46-111e-4536-a885-c5902f993002@embeddedor.com>
-Date: Mon, 19 Feb 2024 21:45:00 -0600
+	 In-Reply-To:Content-Type; b=c5ANijdoTE3XrnjsxdVOKjDvVZLa/giLBAdMlJ6mbKSVMFY6y/gKAKNBZfhr9WLy4km+MCVVTNeOFLBKS7HmwlSXPX9bNVENwOwM04cDa2O5+pw47htEn7yaJocOMH0sVghFBXSN2wYNOHqUcQqg/792GKpTsRku/4Q8hfCVt+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=EI+SvDv3; arc=none smtp.client-ip=115.124.30.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1708401124; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=fU4Qo0bzDFl5Fs696AJax4gvvhphfr2U/1MPyEfkvTM=;
+	b=EI+SvDv3MNO1zYrvt6pCD7d+MG1b0g/8LmvsQ3JqicwNPnzN27fE7d5JBDYl3xpvC2zmmO1ifTNn9EnBY50Eo5M4GVvv4nGlZmTplQsoht0MCz+ZFKiBE56iuGQHc9G/lZfaCDGkCgA7NKFx/FP6uulQ0PzBKAdIHfzF4p03Ky4=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0W0vCOJs_1708401122;
+Received: from 30.221.128.233(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W0vCOJs_1708401122)
+          by smtp.aliyun-inc.com;
+          Tue, 20 Feb 2024 11:52:04 +0800
+Message-ID: <375c613e-a7ee-4ef0-8d41-3f87ae8cccea@linux.alibaba.com>
+Date: Tue, 20 Feb 2024 11:52:02 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,434 +49,249 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] bpf: Replace bpf_lpm_trie_key 0-length array with
- flexible array
-Content-Language: en-US
-To: Kees Cook <keescook@chromium.org>, Daniel Borkmann <daniel@iogearbox.net>
-Cc: Mark Rutland <mark.rutland@arm.com>, Alexei Starovoitov <ast@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
- Haowen Bai <baihaowen@meizu.com>, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Yonghong Song <yonghong.song@linux.dev>,
- Jonathan Corbet <corbet@lwn.net>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Joanne Koong <joannelkoong@gmail.com>, Yafang Shao <laoar.shao@gmail.com>,
- Kui-Feng Lee <kuifeng@meta.com>, Anton Protopopov <aspsk@isovalent.com>,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- netdev@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <20240219234121.make.373-kees@kernel.org>
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-In-Reply-To: <20240219234121.make.373-kees@kernel.org>
+Subject: Re: [PATCH net-next 00/15] net/smc: implement loopback-ism used by
+ SMC-D
+To: Wenjia Zhang <wenjia@linux.ibm.com>, wintera@linux.ibm.com,
+ hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, jaka@linux.ibm.com, Gerd Bayer <gbayer@linux.ibm.com>
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240111120036.109903-1-guwen@linux.alibaba.com>
+ <76b53c2d-5596-44da-b759-e5e94571d401@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <76b53c2d-5596-44da-b759-e5e94571d401@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 201.172.172.225
-X-Source-L: No
-X-Exim-ID: 1rcH43-001sze-2s
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: ([192.168.15.10]) [201.172.172.225]:37524
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 2
-X-Org: HG=hgshared;ORG=hostgator;
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
-X-CMAE-Envelope: MS4xfH9+6tCBO/GuDwybxyg6Py1tX3wPvETBaWts78/oRfvmK4EmjcR78PBrSbojAUtq+7UL43/YtrrJCe6YF5ZxprOog/exiE3uez5PXqyW4S+BWcUXrkHT
- J9dzABHRv7NzGcembnjXX6zfFVxEi052wcAFDfVSFd2HPLkx2vVMo0fhEAcPhnMVjN7Y5dK9tSku0q4u2I/F8+m1WdHe/FtqL4A=
+Content-Transfer-Encoding: 8bit
 
 
 
-On 2/19/24 17:41, Kees Cook wrote:
-> Replace deprecated 0-length array in struct bpf_lpm_trie_key with
-> flexible array. Found with GCC 13:
+On 2024/2/16 22:09, Wenjia Zhang wrote:
 > 
-> ../kernel/bpf/lpm_trie.c:207:51: warning: array subscript i is outside array bounds of 'const __u8[0]' {aka 'const unsigned char[]'} [-Warray-bounds=]
->    207 |                                        *(__be16 *)&key->data[i]);
->        |                                                   ^~~~~~~~~~~~~
-> ../include/uapi/linux/swab.h:102:54: note: in definition of macro '__swab16'
->    102 | #define __swab16(x) (__u16)__builtin_bswap16((__u16)(x))
->        |                                                      ^
-> ../include/linux/byteorder/generic.h:97:21: note: in expansion of macro '__be16_to_cpu'
->     97 | #define be16_to_cpu __be16_to_cpu
->        |                     ^~~~~~~~~~~~~
-> ../kernel/bpf/lpm_trie.c:206:28: note: in expansion of macro 'be16_to_cpu'
->    206 |                 u16 diff = be16_to_cpu(*(__be16 *)&node->data[i]
-> ^
->        |                            ^~~~~~~~~~~
-> In file included from ../include/linux/bpf.h:7:
-> ../include/uapi/linux/bpf.h:82:17: note: while referencing 'data'
->     82 |         __u8    data[0];        /* Arbitrary size */
->        |                 ^~~~
 > 
-> And found at run-time under CONFIG_FORTIFY_SOURCE:
+> On 11.01.24 13:00, Wen Gu wrote:
+>> This patch set acts as the second part of the new version of [1] (The first
+>> part can be referred from [2]), the updated things of this version are listed
+>> at the end.
+>>
+>> # Background
+>>
+>> SMC-D is now used in IBM z with ISM function to optimize network interconnect
+>> for intra-CPC communications. Inspired by this, we try to make SMC-D available
+>> on the non-s390 architecture through a software-implemented virtual ISM device,
+>> that is the loopback-ism device here, to accelerate inter-process or
+>> inter-containers communication within the same OS instance.
+>>
+>> # Design
+>>
+>> This patch set includes 3 parts:
+>>
+>>   - Patch #1-#2: some prepare work for loopback-ism.
+>>   - Patch #3-#9: implement loopback-ism device.
+>>   - Patch #10-#15: memory copy optimization for loopback scenario.
+>>
+>> The loopback-ism device is designed as a ISMv2 device and not be limited to
+>> a specific net namespace, ends of both inter-process connection (1/1' in diagram
+>> below) or inter-container connection (2/2' in diagram below) can find the same
+>> available loopback-ism and choose it during the CLC handshake.
+>>
+>>   Container 1 (ns1)                              Container 2 (ns2)
+>>   +-----------------------------------------+    +-------------------------+
+>>   | +-------+      +-------+      +-------+ |    |        +-------+        |
+>>   | | App A |      | App B |      | App C | |    |        | App D |<-+     |
+>>   | +-------+      +---^---+      +-------+ |    |        +-------+  |(2') |
+>>   |     |127.0.0.1 (1')|             |192.168.0.11       192.168.0.12|     |
+>>   |  (1)|   +--------+ | +--------+  |(2)   |    | +--------+   +--------+ |
+>>   |     `-->|   lo   |-` |  eth0  |<-`      |    | |   lo   |   |  eth0  | |
+>>   +---------+--|---^-+---+-----|--+---------+    +-+--------+---+-^------+-+
+>>                |   |           |                                  |
+>>   Kernel       |   |           |                                  |
+>>   +----+-------v---+-----------v----------------------------------+---+----+
+>>   |    |                            TCP                               |    |
+>>   |    |                                                              |    |
+>>   |    +--------------------------------------------------------------+    |
+>>   |                                                                        |
+>>   |                           +--------------+                             |
+>>   |                           | smc loopback |                             |
+>>   +---------------------------+--------------+-----------------------------+
+>>
+>> loopback-ism device creates DMBs (shared memory) for each connection peer.
+>> Since data transfer occurs within the same kernel, the sndbuf of each peer
+>> is only a descriptor and point to the same memory region as peer DMB, so that
+>> the data copy from sndbuf to peer DMB can be avoided in loopback-ism case.
+>>
+>>   Container 1 (ns1)                              Container 2 (ns2)
+>>   +-----------------------------------------+    +-------------------------+
+>>   | +-------+                               |    |        +-------+        |
+>>   | | App C |-----+                         |    |        | App D |        |
+>>   | +-------+     |                         |    |        +-^-----+        |
+>>   |               |                         |    |          |              |
+>>   |           (2) |                         |    |     (2') |              |
+>>   |               |                         |    |          |              |
+>>   +---------------|-------------------------+    +----------|--------------+
+>>                   |                                         |
+>>   Kernel          |                                         |
+>>   +---------------|-----------------------------------------|--------------+
+>>   | +--------+ +--v-----+                           +--------+ +--------+  |
+>>   | |dmb_desc| |snd_desc|                           |dmb_desc| |snd_desc|  |
+>>   | +-----|--+ +--|-----+                           +-----|--+ +--------+  |
+>>   | +-----|--+    |                                 +-----|--+             |
+>>   | | DMB C  |    +---------------------------------| DMB D  |             |
+>>   | +--------+                                      +--------+             |
+>>   |                                                                        |
+>>   |                           +--------------+                             |
+>>   |                           | smc loopback |                             |
+>>   +---------------------------+--------------+-----------------------------+
+>>
+>> # Benchmark Test
+>>
+>>   * Test environments:
+>>        - VM with Intel Xeon Platinum 8 core 2.50GHz, 16 GiB mem.
+>>        - SMC sndbuf/DMB size 1MB.
+>>        - /sys/devices/virtual/smc/loopback-ism/dmb_copy is set to default 0,
+>>          which means sndbuf and DMB are merged and no data copied between them.
+>>        - /sys/devices/virtual/smc/loopback-ism/dmb_type is set to default 0,
+>>          which means DMB is physically contiguous buffer.
+>>
+>>   * Test object:
+>>        - TCP: run on TCP loopback.
+>>        - SMC lo: run on SMC loopback device.
+>>
+>> 1. ipc-benchmark (see [3])
+>>
+>>   - ./<foo> -c 1000000 -s 100
+>>
+>>                              TCP                  SMC-lo
+>> Message
+>> rate (msg/s)              80636                  149515(+85.42%)
+>>
+>> 2. sockperf
+>>
+>>   - serv: <smc_run> taskset -c <cpu> sockperf sr --tcp
+>>   - clnt: <smc_run> taskset -c <cpu> sockperf { tp | pp } --tcp --msg-size={ 64000 for tp | 14 for pp } -i 127.0.0.1 
+>> -t 30
+>>
+>>                              TCP                  SMC-lo
+>> Bandwidth(MBps)         4909.36                 8197.57(+66.98%)
+>> Latency(us)               6.098                   3.383(-44.52%)
+>>
+>> 3. nginx/wrk
+>>
+>>   - serv: <smc_run> nginx
+>>   - clnt: <smc_run> wrk -t 8 -c 1000 -d 30 http://127.0.0.1:80
+>>
+>>                             TCP                   SMC-lo
+>> Requests/s           181685.74                246447.77(+35.65%)
+>>
+>> 4. redis-benchmark
+>>
+>>   - serv: <smc_run> redis-server
+>>   - clnt: <smc_run> redis-benchmark -h 127.0.0.1 -q -t set,get -n 400000 -c 200 -d 1024
+>>
+>>                             TCP                   SMC-lo
+>> GET(Requests/s)       85855.34                118553.64(+38.09%)
+>> SET(Requests/s)       86824.40                125944.58(+45.06%)
+>>
+>>
+>> Change log:
+>>
+>> v1->RFC:
+>> - Patch #9: merge rx_bytes and tx_bytes as xfer_bytes statistics:
+>>    /sys/devices/virtual/smc/loopback-ism/xfer_bytes
+>> - Patch #10: add support_dmb_nocopy operation to check if SMC-D device supports
+>>    merging sndbuf with peer DMB.
+>> - Patch #13 & #14: introduce loopback-ism device control of DMB memory type and
+>>    control of whether to merge sndbuf and DMB. They can be respectively set by:
+>>    /sys/devices/virtual/smc/loopback-ism/dmb_type
+>>    /sys/devices/virtual/smc/loopback-ism/dmb_copy
+>>    The motivation for these two control is that a performance bottleneck was
+>>    found when using vzalloced DMB and sndbuf is merged with DMB, and there are
+>>    many CPUs and CONFIG_HARDENED_USERCOPY is set [4]. The bottleneck is caused
+>>    by the lock contention in vmap_area_lock [5] which is involved in memcpy_from_msg()
+>>    or memcpy_to_msg(). Currently, Uladzislau Rezki is working on mitigating the
+>>    vmap lock contention [6]. It has significant effects, but using virtual memory
+>>    still has additional overhead compared to using physical memory.
+>>    So this new version provides controls of dmb_type and dmb_copy to suit
+>>    different scenarios.
+>> - Some minor changes and comments improvements.
+>>
+>> RFC->old version([1]):
+>> Link: https://lore.kernel.org/netdev/1702214654-32069-1-git-send-email-guwen@linux.alibaba.com/
+>> - Patch #1: improve the loopback-ism dump, it shows as follows now:
+>>    # smcd d
+>>    FID  Type  PCI-ID        PCHID  InUse  #LGs  PNET-ID
+>>    0000 0     loopback-ism  ffff   No        0
+>> - Patch #3: introduce the smc_ism_set_v2_capable() helper and set
+>>    smc_ism_v2_capable when ISMv2 or virtual ISM is registered,
+>>    regardless of whether there is already a device in smcd device list.
+>> - Patch #3: loopback-ism will be added into /sys/devices/virtual/smc/loopback-ism/.
+>> - Patch #8: introduce the runtime switch /sys/devices/virtual/smc/loopback-ism/active
+>>    to activate or deactivate the loopback-ism.
+>> - Patch #9: introduce the statistics of loopback-ism by
+>>    /sys/devices/virtual/smc/loopback-ism/{{tx|rx}_tytes|dmbs_cnt}.
+>> - Some minor changes and comments improvements.
+>>
+>> [1] https://lore.kernel.org/netdev/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
+>> [2] https://lore.kernel.org/netdev/20231219142616.80697-1-guwen@linux.alibaba.com/
+>> [3] https://github.com/goldsborough/ipc-bench
+>> [4] https://lore.kernel.org/all/3189e342-c38f-6076-b730-19a6efd732a5@linux.alibaba.com/
+>> [5] https://lore.kernel.org/all/238e63cd-e0e8-4fbf-852f-bc4d5bc35d5a@linux.alibaba.com/
+>> [6] https://lore.kernel.org/all/20240102184633.748113-1-urezki@gmail.com/
+>>
+>> Wen Gu (15):
+>>    net/smc: improve SMC-D device dump for virtual ISM
+>>    net/smc: decouple specialized struct from SMC-D DMB registration
+>>    net/smc: introduce virtual ISM device loopback-ism
+>>    net/smc: implement ID-related operations of loopback-ism
+>>    net/smc: implement some unsupported operations of loopback-ism
+>>    net/smc: implement DMB-related operations of loopback-ism
+>>    net/smc: register loopback-ism into SMC-D device list
+>>    net/smc: introduce loopback-ism runtime switch
+>>    net/smc: introduce loopback-ism statistics attributes
+>>    net/smc: add operations to merge sndbuf with peer DMB
+>>    net/smc: attach or detach ghost sndbuf to peer DMB
+>>    net/smc: adapt cursor update when sndbuf and peer DMB are merged
+>>    net/smc: introduce loopback-ism DMB type control
+>>    net/smc: introduce loopback-ism DMB data copy control
+>>    net/smc: implement DMB-merged operations of loopback-ism
+>>
+>>   drivers/s390/net/ism_drv.c |   2 +-
+>>   include/net/smc.h          |   7 +-
+>>   net/smc/Kconfig            |  13 +
+>>   net/smc/Makefile           |   2 +-
+>>   net/smc/af_smc.c           |  28 +-
+>>   net/smc/smc_cdc.c          |  58 ++-
+>>   net/smc/smc_cdc.h          |   1 +
+>>   net/smc/smc_core.c         |  61 +++-
+>>   net/smc/smc_core.h         |   1 +
+>>   net/smc/smc_ism.c          |  71 +++-
+>>   net/smc/smc_ism.h          |   5 +
+>>   net/smc/smc_loopback.c     | 718 +++++++++++++++++++++++++++++++++++++
+>>   net/smc/smc_loopback.h     |  88 +++++
+>>   13 files changed, 1026 insertions(+), 29 deletions(-)
+>>   create mode 100644 net/smc/smc_loopback.c
+>>   create mode 100644 net/smc/smc_loopback.h
+>>
+> Hi Wen,
 > 
->    UBSAN: array-index-out-of-bounds in kernel/bpf/lpm_trie.c:218:49
->    index 0 is out of range for type '__u8 [*]'
+> Thank you for the patience again!
 > 
-> Changing struct bpf_lpm_trie_key is difficult since has been used by
-> userspace. For example, in Cilium:
+> You can find the comments under the corresponding patches respectively.
+> About the file hierarchy in sysfs and the names, we still have some thoughts. We need to investigate a bit more time on it.
 > 
-> 	struct egress_gw_policy_key {
-> 	        struct bpf_lpm_trie_key lpm_key;
-> 	        __u32 saddr;
-> 	        __u32 daddr;
-> 	};
-> 
-> While direct references to the "data" member haven't been found, there
-> are static initializers what include the final member. For example,
-> the "{}" here:
-> 
->          struct egress_gw_policy_key in_key = {
->                  .lpm_key = { 32 + 24, {} },
->                  .saddr   = CLIENT_IP,
->                  .daddr   = EXTERNAL_SVC_IP & 0Xffffff,
->          };
-> 
-> To avoid the build time and run time warnings seen with a 0-sized
-> trailing array for struct bpf_lpm_trie_key, introduce a new struct
-> that correctly uses a flexible array for the trailing bytes,
-> struct bpf_lpm_trie_key_u8. As part of this, include the "header"
-> portion (which is just the "prefixlen" member), so it can be used
-> by anything building a bpf_lpr_trie_key that has trailing members that
-> aren't a u8 flexible array (like the self-test[1]), which is named
-> struct bpf_lpm_trie_key_hdr.
 
-Yep, this `_hdr` tagged struct adds flexibility (no pun intended :p)
-to flexible structures currently nested in the middle of other
-structs. We can just use the header members grouped together in the
-`_hdr` struct, and avoid embedding the flexible-array member. :)
+Hi Wenjia and Gerd,
 
-> 
-> Adjust the kernel code to use struct bpf_lpm_trie_key_u8 through-out,
-> and for the selftest to use struct bpf_lpm_trie_key_hdr. Add a comment
-> to the UAPI header directing folks to the two new options.
-> 
-> Link: https://lore.kernel.org/all/202206281009.4332AA33@keescook/ [1]
-> Reported-by: Mark Rutland <mark.rutland@arm.com>
-> Closes: https://paste.debian.net/hidden/ca500597/
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+Thank you very much!
 
-Acked-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+I answered each comment you left. You can find my thoughts about sysfs and
+knobs there. Looking forward to your further reply. Thanks!
 
-Thanks!
--- 
-Gustavo
+Best regards,
+Wen Gu
 
-> ---
-> v3- create a new pair of structs -- leave old struct alone
-> v2- https://lore.kernel.org/lkml/20240216235536.it.234-kees@kernel.org/
-> v1- https://lore.kernel.org/lkml/20230204183241.never.481-kees@kernel.org/
-> Cc: Daniel Borkmann <daniel@iogearbox.net>
-> Cc: Alexei Starovoitov <ast@kernel.org>
-> Cc: Andrii Nakryiko <andrii@kernel.org>
-> Cc: Martin KaFai Lau <martin.lau@linux.dev>
-> Cc: Song Liu <song@kernel.org>
-> Cc: Yonghong Song <yhs@fb.com>
-> Cc: John Fastabend <john.fastabend@gmail.com>
-> Cc: KP Singh <kpsingh@kernel.org>
-> Cc: Stanislav Fomichev <sdf@google.com>
-> Cc: Hao Luo <haoluo@google.com>
-> Cc: Jiri Olsa <jolsa@kernel.org>
-> Cc: Mykola Lysenko <mykolal@fb.com>
-> Cc: Shuah Khan <shuah@kernel.org>
-> Cc: Haowen Bai <baihaowen@meizu.com>
-> Cc: bpf@vger.kernel.org
-> Cc: linux-kselftest@vger.kernel.org
-> ---
->   Documentation/bpf/map_lpm_trie.rst            |  2 +-
->   include/uapi/linux/bpf.h                      | 14 ++++++++++++-
->   kernel/bpf/lpm_trie.c                         | 20 +++++++++----------
->   samples/bpf/map_perf_test_user.c              |  2 +-
->   samples/bpf/xdp_router_ipv4_user.c            |  2 +-
->   tools/include/uapi/linux/bpf.h                | 14 ++++++++++++-
->   .../selftests/bpf/progs/map_ptr_kern.c        |  2 +-
->   tools/testing/selftests/bpf/test_lpm_map.c    | 18 ++++++++---------
->   8 files changed, 49 insertions(+), 25 deletions(-)
-> 
-> diff --git a/Documentation/bpf/map_lpm_trie.rst b/Documentation/bpf/map_lpm_trie.rst
-> index 74d64a30f500..f9cd579496c9 100644
-> --- a/Documentation/bpf/map_lpm_trie.rst
-> +++ b/Documentation/bpf/map_lpm_trie.rst
-> @@ -17,7 +17,7 @@ significant byte.
->   
->   LPM tries may be created with a maximum prefix length that is a multiple
->   of 8, in the range from 8 to 2048. The key used for lookup and update
-> -operations is a ``struct bpf_lpm_trie_key``, extended by
-> +operations is a ``struct bpf_lpm_trie_key_u8``, extended by
->   ``max_prefixlen/8`` bytes.
->   
->   - For IPv4 addresses the data length is 4 bytes
-> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> index 754e68ca8744..c5a46d12076e 100644
-> --- a/include/uapi/linux/bpf.h
-> +++ b/include/uapi/linux/bpf.h
-> @@ -77,12 +77,24 @@ struct bpf_insn {
->   	__s32	imm;		/* signed immediate constant */
->   };
->   
-> -/* Key of an a BPF_MAP_TYPE_LPM_TRIE entry */
-> +/* Deprecated: use struct bpf_lpm_trie_key_u8 (when the "data" member is needed for
-> + * byte access) or struct bpf_lpm_trie_key_hdr (when using an alternative type for
-> + * the trailing flexible array member) instead.
-> + */
->   struct bpf_lpm_trie_key {
->   	__u32	prefixlen;	/* up to 32 for AF_INET, 128 for AF_INET6 */
->   	__u8	data[0];	/* Arbitrary size */
->   };
->   
-> +/* Key of an a BPF_MAP_TYPE_LPM_TRIE entry, with trailing byte array. */
-> +struct bpf_lpm_trie_key_u8 {
-> +	__struct_group(bpf_lpm_trie_key_hdr, hdr, /* no attrs */,
-> +		/* up to 32 for AF_INET, 128 for AF_INET6 */
-> +		__u32	prefixlen;
-> +	);
-> +	__u8	data[];		/* Arbitrary size */
-> +};
-> +
->   struct bpf_cgroup_storage_key {
->   	__u64	cgroup_inode_id;	/* cgroup inode id */
->   	__u32	attach_type;		/* program attach type (enum bpf_attach_type) */
-> diff --git a/kernel/bpf/lpm_trie.c b/kernel/bpf/lpm_trie.c
-> index b32be680da6c..050fe1ebf0f7 100644
-> --- a/kernel/bpf/lpm_trie.c
-> +++ b/kernel/bpf/lpm_trie.c
-> @@ -164,13 +164,13 @@ static inline int extract_bit(const u8 *data, size_t index)
->    */
->   static size_t longest_prefix_match(const struct lpm_trie *trie,
->   				   const struct lpm_trie_node *node,
-> -				   const struct bpf_lpm_trie_key *key)
-> +				   const struct bpf_lpm_trie_key_u8 *key)
->   {
->   	u32 limit = min(node->prefixlen, key->prefixlen);
->   	u32 prefixlen = 0, i = 0;
->   
->   	BUILD_BUG_ON(offsetof(struct lpm_trie_node, data) % sizeof(u32));
-> -	BUILD_BUG_ON(offsetof(struct bpf_lpm_trie_key, data) % sizeof(u32));
-> +	BUILD_BUG_ON(offsetof(struct bpf_lpm_trie_key_u8, data) % sizeof(u32));
->   
->   #if defined(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS) && defined(CONFIG_64BIT)
->   
-> @@ -229,7 +229,7 @@ static void *trie_lookup_elem(struct bpf_map *map, void *_key)
->   {
->   	struct lpm_trie *trie = container_of(map, struct lpm_trie, map);
->   	struct lpm_trie_node *node, *found = NULL;
-> -	struct bpf_lpm_trie_key *key = _key;
-> +	struct bpf_lpm_trie_key_u8 *key = _key;
->   
->   	if (key->prefixlen > trie->max_prefixlen)
->   		return NULL;
-> @@ -309,7 +309,7 @@ static long trie_update_elem(struct bpf_map *map,
->   	struct lpm_trie *trie = container_of(map, struct lpm_trie, map);
->   	struct lpm_trie_node *node, *im_node = NULL, *new_node = NULL;
->   	struct lpm_trie_node __rcu **slot;
-> -	struct bpf_lpm_trie_key *key = _key;
-> +	struct bpf_lpm_trie_key_u8 *key = _key;
->   	unsigned long irq_flags;
->   	unsigned int next_bit;
->   	size_t matchlen = 0;
-> @@ -437,7 +437,7 @@ static long trie_update_elem(struct bpf_map *map,
->   static long trie_delete_elem(struct bpf_map *map, void *_key)
->   {
->   	struct lpm_trie *trie = container_of(map, struct lpm_trie, map);
-> -	struct bpf_lpm_trie_key *key = _key;
-> +	struct bpf_lpm_trie_key_u8 *key = _key;
->   	struct lpm_trie_node __rcu **trim, **trim2;
->   	struct lpm_trie_node *node, *parent;
->   	unsigned long irq_flags;
-> @@ -536,7 +536,7 @@ static long trie_delete_elem(struct bpf_map *map, void *_key)
->   				 sizeof(struct lpm_trie_node))
->   #define LPM_VAL_SIZE_MIN	1
->   
-> -#define LPM_KEY_SIZE(X)		(sizeof(struct bpf_lpm_trie_key) + (X))
-> +#define LPM_KEY_SIZE(X)		(sizeof(struct bpf_lpm_trie_key_u8) + (X))
->   #define LPM_KEY_SIZE_MAX	LPM_KEY_SIZE(LPM_DATA_SIZE_MAX)
->   #define LPM_KEY_SIZE_MIN	LPM_KEY_SIZE(LPM_DATA_SIZE_MIN)
->   
-> @@ -565,7 +565,7 @@ static struct bpf_map *trie_alloc(union bpf_attr *attr)
->   	/* copy mandatory map attributes */
->   	bpf_map_init_from_attr(&trie->map, attr);
->   	trie->data_size = attr->key_size -
-> -			  offsetof(struct bpf_lpm_trie_key, data);
-> +			  offsetof(struct bpf_lpm_trie_key_u8, data);
->   	trie->max_prefixlen = trie->data_size * 8;
->   
->   	spin_lock_init(&trie->lock);
-> @@ -616,7 +616,7 @@ static int trie_get_next_key(struct bpf_map *map, void *_key, void *_next_key)
->   {
->   	struct lpm_trie_node *node, *next_node = NULL, *parent, *search_root;
->   	struct lpm_trie *trie = container_of(map, struct lpm_trie, map);
-> -	struct bpf_lpm_trie_key *key = _key, *next_key = _next_key;
-> +	struct bpf_lpm_trie_key_u8 *key = _key, *next_key = _next_key;
->   	struct lpm_trie_node **node_stack = NULL;
->   	int err = 0, stack_ptr = -1;
->   	unsigned int next_bit;
-> @@ -703,7 +703,7 @@ static int trie_get_next_key(struct bpf_map *map, void *_key, void *_next_key)
->   	}
->   do_copy:
->   	next_key->prefixlen = next_node->prefixlen;
-> -	memcpy((void *)next_key + offsetof(struct bpf_lpm_trie_key, data),
-> +	memcpy((void *)next_key + offsetof(struct bpf_lpm_trie_key_u8, data),
->   	       next_node->data, trie->data_size);
->   free_stack:
->   	kfree(node_stack);
-> @@ -715,7 +715,7 @@ static int trie_check_btf(const struct bpf_map *map,
->   			  const struct btf_type *key_type,
->   			  const struct btf_type *value_type)
->   {
-> -	/* Keys must have struct bpf_lpm_trie_key embedded. */
-> +	/* Keys must have struct bpf_lpm_trie_key_u8 embedded. */
->   	return BTF_INFO_KIND(key_type->info) != BTF_KIND_STRUCT ?
->   	       -EINVAL : 0;
->   }
-> diff --git a/samples/bpf/map_perf_test_user.c b/samples/bpf/map_perf_test_user.c
-> index d2fbcf963cdf..07ff471ed6ae 100644
-> --- a/samples/bpf/map_perf_test_user.c
-> +++ b/samples/bpf/map_perf_test_user.c
-> @@ -370,7 +370,7 @@ static void run_perf_test(int tasks)
->   
->   static void fill_lpm_trie(void)
->   {
-> -	struct bpf_lpm_trie_key *key;
-> +	struct bpf_lpm_trie_key_u8 *key;
->   	unsigned long value = 0;
->   	unsigned int i;
->   	int r;
-> diff --git a/samples/bpf/xdp_router_ipv4_user.c b/samples/bpf/xdp_router_ipv4_user.c
-> index 9d41db09c480..266fdd0b025d 100644
-> --- a/samples/bpf/xdp_router_ipv4_user.c
-> +++ b/samples/bpf/xdp_router_ipv4_user.c
-> @@ -91,7 +91,7 @@ static int recv_msg(struct sockaddr_nl sock_addr, int sock)
->   static void read_route(struct nlmsghdr *nh, int nll)
->   {
->   	char dsts[24], gws[24], ifs[16], dsts_len[24], metrics[24];
-> -	struct bpf_lpm_trie_key *prefix_key;
-> +	struct bpf_lpm_trie_key_u8 *prefix_key;
->   	struct rtattr *rt_attr;
->   	struct rtmsg *rt_msg;
->   	int rtm_family;
-> diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
-> index 7f24d898efbb..c55244bf1a20 100644
-> --- a/tools/include/uapi/linux/bpf.h
-> +++ b/tools/include/uapi/linux/bpf.h
-> @@ -77,12 +77,24 @@ struct bpf_insn {
->   	__s32	imm;		/* signed immediate constant */
->   };
->   
-> -/* Key of an a BPF_MAP_TYPE_LPM_TRIE entry */
-> +/* Deprecated: use struct bpf_lpm_trie_key_u8 (when the "data" member is needed for
-> + * byte access) or struct bpf_lpm_trie_key_hdr (when using an alternative type for
-> + * the trailing flexible array member) instead.
-> + */
->   struct bpf_lpm_trie_key {
->   	__u32	prefixlen;	/* up to 32 for AF_INET, 128 for AF_INET6 */
->   	__u8	data[0];	/* Arbitrary size */
->   };
->   
-> +/* Key of an a BPF_MAP_TYPE_LPM_TRIE entry, with trailing byte array. */
-> +struct bpf_lpm_trie_key_u8 {
-> +	__struct_group(bpf_lpm_trie_key_hdr, hdr, /* no attrs */,
-> +		/* up to 32 for AF_INET, 128 for AF_INET6 */
-> +		__u32	prefixlen;
-> +	);
-> +	__u8	data[];		/* Arbitrary size */
-> +};
-> +
->   struct bpf_cgroup_storage_key {
->   	__u64	cgroup_inode_id;	/* cgroup inode id */
->   	__u32	attach_type;		/* program attach type (enum bpf_attach_type) */
-> diff --git a/tools/testing/selftests/bpf/progs/map_ptr_kern.c b/tools/testing/selftests/bpf/progs/map_ptr_kern.c
-> index 3325da17ec81..efaf622c28dd 100644
-> --- a/tools/testing/selftests/bpf/progs/map_ptr_kern.c
-> +++ b/tools/testing/selftests/bpf/progs/map_ptr_kern.c
-> @@ -316,7 +316,7 @@ struct lpm_trie {
->   } __attribute__((preserve_access_index));
->   
->   struct lpm_key {
-> -	struct bpf_lpm_trie_key trie_key;
-> +	struct bpf_lpm_trie_key_hdr trie_key;
->   	__u32 data;
->   };
->   
-> diff --git a/tools/testing/selftests/bpf/test_lpm_map.c b/tools/testing/selftests/bpf/test_lpm_map.c
-> index c028d621c744..d98c72dc563e 100644
-> --- a/tools/testing/selftests/bpf/test_lpm_map.c
-> +++ b/tools/testing/selftests/bpf/test_lpm_map.c
-> @@ -211,7 +211,7 @@ static void test_lpm_map(int keysize)
->   	volatile size_t n_matches, n_matches_after_delete;
->   	size_t i, j, n_nodes, n_lookups;
->   	struct tlpm_node *t, *list = NULL;
-> -	struct bpf_lpm_trie_key *key;
-> +	struct bpf_lpm_trie_key_u8 *key;
->   	uint8_t *data, *value;
->   	int r, map;
->   
-> @@ -331,8 +331,8 @@ static void test_lpm_map(int keysize)
->   static void test_lpm_ipaddr(void)
->   {
->   	LIBBPF_OPTS(bpf_map_create_opts, opts, .map_flags = BPF_F_NO_PREALLOC);
-> -	struct bpf_lpm_trie_key *key_ipv4;
-> -	struct bpf_lpm_trie_key *key_ipv6;
-> +	struct bpf_lpm_trie_key_u8 *key_ipv4;
-> +	struct bpf_lpm_trie_key_u8 *key_ipv6;
->   	size_t key_size_ipv4;
->   	size_t key_size_ipv6;
->   	int map_fd_ipv4;
-> @@ -423,7 +423,7 @@ static void test_lpm_ipaddr(void)
->   static void test_lpm_delete(void)
->   {
->   	LIBBPF_OPTS(bpf_map_create_opts, opts, .map_flags = BPF_F_NO_PREALLOC);
-> -	struct bpf_lpm_trie_key *key;
-> +	struct bpf_lpm_trie_key_u8 *key;
->   	size_t key_size;
->   	int map_fd;
->   	__u64 value;
-> @@ -532,7 +532,7 @@ static void test_lpm_delete(void)
->   static void test_lpm_get_next_key(void)
->   {
->   	LIBBPF_OPTS(bpf_map_create_opts, opts, .map_flags = BPF_F_NO_PREALLOC);
-> -	struct bpf_lpm_trie_key *key_p, *next_key_p;
-> +	struct bpf_lpm_trie_key_u8 *key_p, *next_key_p;
->   	size_t key_size;
->   	__u32 value = 0;
->   	int map_fd;
-> @@ -693,9 +693,9 @@ static void *lpm_test_command(void *arg)
->   {
->   	int i, j, ret, iter, key_size;
->   	struct lpm_mt_test_info *info = arg;
-> -	struct bpf_lpm_trie_key *key_p;
-> +	struct bpf_lpm_trie_key_u8 *key_p;
->   
-> -	key_size = sizeof(struct bpf_lpm_trie_key) + sizeof(__u32);
-> +	key_size = sizeof(*key_p) + sizeof(__u32);
->   	key_p = alloca(key_size);
->   	for (iter = 0; iter < info->iter; iter++)
->   		for (i = 0; i < MAX_TEST_KEYS; i++) {
-> @@ -717,7 +717,7 @@ static void *lpm_test_command(void *arg)
->   				ret = bpf_map_lookup_elem(info->map_fd, key_p, &value);
->   				assert(ret == 0 || errno == ENOENT);
->   			} else {
-> -				struct bpf_lpm_trie_key *next_key_p = alloca(key_size);
-> +				struct bpf_lpm_trie_key_u8 *next_key_p = alloca(key_size);
->   				ret = bpf_map_get_next_key(info->map_fd, key_p, next_key_p);
->   				assert(ret == 0 || errno == ENOENT || errno == ENOMEM);
->   			}
-> @@ -752,7 +752,7 @@ static void test_lpm_multi_thread(void)
->   
->   	/* create a trie */
->   	value_size = sizeof(__u32);
-> -	key_size = sizeof(struct bpf_lpm_trie_key) + value_size;
-> +	key_size = sizeof(struct bpf_lpm_trie_key_hdr) + value_size;
->   	map_fd = bpf_map_create(BPF_MAP_TYPE_LPM_TRIE, NULL, key_size, value_size, 100, &opts);
->   
->   	/* create 4 threads to test update, delete, lookup and get_next_key */
+> Thanks,
+> Gerd & Wenjia
 
