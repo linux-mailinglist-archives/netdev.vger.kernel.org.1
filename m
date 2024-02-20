@@ -1,162 +1,207 @@
-Return-Path: <netdev+bounces-73357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73358-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D7EB85C122
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 17:23:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B20D885C144
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 17:26:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 517931F22247
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 16:23:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7E4B1C22850
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 16:26:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55C1779944;
-	Tue, 20 Feb 2024 16:20:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA01176906;
+	Tue, 20 Feb 2024 16:23:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="QIRKyTj8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iVZl+3vb"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5FDE76408;
-	Tue, 20 Feb 2024 16:20:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708446040; cv=none; b=GomqaNvUapRm6vccni10ZzboKHZ2ABZXw33YY8bb2rbt2RFRLNtMjz6pDF44AMMiNKxSGsp5QYdp6LYSUSOTuoOK1JoXE7eaZQKDzrEvte8BGZbftPJKYCNoQkOTOpxb7FIirbpJWFNpfeHR6hW5GujHuZkzjnm5b5wARA0IelM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708446040; c=relaxed/simple;
-	bh=8YQv7aLTPzzKaJ7jlQ5Sre4GQB/b020Pt6fSgtcM+TE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HGjOrXBGhdwMo5p4715CRlUoPoRVED6XpHlPnfAC2QYeVDaE6Q5G3KJ5kSJDEiqwfAYLKqm2nzdNJpFcUbaYxxQ4CwP9GVEiLhdZlvIT097MqBJWU74xuYAAhzg/qhMqxtwe9RZC3Rd5xmq+C7kgHnDEJTgrwAIM5xHITiIcGdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=QIRKyTj8; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 02E04240004;
-	Tue, 20 Feb 2024 16:20:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1708446035;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pXos02wI1NevLoKIn6UfDZ/DT2LVCxm0HsQrNIoS9qw=;
-	b=QIRKyTj8c5fpAGiYJiASyDw9WoF4XtF3FZAOmveqKKYIkasIzidfU3JLHPT8/T0CCqli53
-	s5q+RtSlnAko+igLmKgeVSTe1InW/gAuXXU6osKRWw1D7zjFLjZHBCsaYtt9+iiS2RFNkc
-	XDKrd29uZEvN5CINymsS4Zn1pCw6dvf4VEEW4od3YFhqEvnJdoY62vYj9KMssIr2j5Q0VC
-	NLn6VW/lc6vmI0E+Q3QLLYHwztna+ZFZZ5xVZu3W6WRINwqrbiZcyt94wPc9OIGpg/Qgqk
-	JLLZ0DGExukFlycsPkRXfSLuH+CuGkTrEhhBx0F5FwkovvFw9jfH21NzYhyOUg==
-Date: Tue, 20 Feb 2024 17:20:33 +0100
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Rahul Rameshbabu <rrameshbabu@nvidia.com>, Florian Fainelli
- <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Richard Cochran
- <richardcochran@gmail.com>, Radu Pirea <radu-nicolae.pirea@oss.nxp.com>,
- Jay Vosburgh <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>,
- Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea
- <claudiu.beznea@tuxon.dev>, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
- Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
- Oltean <vladimir.oltean@nxp.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH RFC net-next v8 04/13] net: Change the API of PHY
- default timestamp to MAC
-Message-ID: <20240220172033.556f321f@kmaincent-XPS-13-7390>
-In-Reply-To: <ZdN9pPf3wXwE/9nX@shell.armlinux.org.uk>
-References: <20240216-feature_ptp_netnext-v8-0-510f42f444fb@bootlin.com>
-	<20240216-feature_ptp_netnext-v8-4-510f42f444fb@bootlin.com>
-	<87jzn4gtlv.fsf@nvidia.com>
-	<20240219142936.62112d34@kmaincent-XPS-13-7390>
-	<ZdN9pPf3wXwE/9nX@shell.armlinux.org.uk>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB408762FF
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 16:23:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708446202; cv=fail; b=JSrRa7ekONT8BH/qNiPwXQ9TRxwYguz6gSvi08kMFopxFFEIyVtJK+JEaCyX9oM3DPMrln0x1cAUmqBhhnPPGJ3EWASa4fQRxcaj4bNbqBZaWqddjTv3YU5sRsod2kl52OEJetXgDbx8T4UREsWyvFIselSIBT4jcmrH7iXbzRs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708446202; c=relaxed/simple;
+	bh=rW+EkcCIBlDcQ2lPl8+loh1BgdMD2KMkno7FmwEzT2w=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=CxHOYcWR4MYpCv0qqmzVPD/1HZQ3kWGE/j8nEMYMH3er3ZDr0mpl4wJwvyJQsW7HsjxfPjXwEQ4eUB4pCs3C5VS5gwkEbZ59wlMHEsU7Sj0+832x+3Gdt+SVJ+ucHzyjuFAcmpULtEg7FbXBorSY+2yqt8T5hLCAiLaqDdSsLOw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iVZl+3vb; arc=fail smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708446200; x=1739982200;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=rW+EkcCIBlDcQ2lPl8+loh1BgdMD2KMkno7FmwEzT2w=;
+  b=iVZl+3vb3x0S57xf0WS3HQKNBOccB5A+6ECAZEF6BVZa66RTYREShBVb
+   dTNAnGoHHdlOAZOWTAnSdEFEq9m55RKHy/6xpp0Hy0vDI3YFFZJeD98Do
+   nZ+dnY0I94IBxhXrYaawwTVTqBYatWt3+D6Hc/TxfLL0VeDK89DHEgp0e
+   FxQajqp4W34VMrJD2d+mPg/2Yf5r0Zew2b6wk7StT0Uv1jDcmzAQ2Kgk6
+   YhNCLqGAXB3AYf35FXXTC0Ji6D6GsYZ1RQYoLeSr6ih+5WYLlHdRcssnp
+   0GD9DwIx+kloljn490yDxmdKTrMKX5ub0AaJwYGDmn0V2o8/OsSY74U3/
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10990"; a="13182322"
+X-IronPort-AV: E=Sophos;i="6.06,174,1705392000"; 
+   d="scan'208";a="13182322"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2024 08:23:20 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10990"; a="827177435"
+X-IronPort-AV: E=Sophos;i="6.06,174,1705392000"; 
+   d="scan'208";a="827177435"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Feb 2024 08:23:19 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 20 Feb 2024 08:23:19 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Tue, 20 Feb 2024 08:23:19 -0800
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.100)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 20 Feb 2024 08:23:19 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eMSuvZPcpbGXV9HNHL8ovpLFgQa2R+b2i07WvE+Bftlm2ZumCAyLm0Hwksg0Na22sCsHtCxGYrtHNb5LBas1G6F/DnfT2edfVKHHGTY7nPPYdg3EsuT313iZ2YjK6zoeQj2v04x/R9oVb7qTBQakxSg7hLfh1zMQFgSiV5js18XoNCHBS5Tqhk5BStwKjgn5CVYHwsWkl6NXe5BhgBtOukK7jvcvcMswb6E15Cu6iCIkhiFrti++pecAm2RqMsecoMbcnDI2RYYiLEoPm/ycLkDT5TbVqWF1o3pKrnn3GhtRL1DMIgCUActroYwHYHGJxOsOVdar+3IcY0D5ErVluw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NZIjkpvLwGiDOaR16WFijiqmeUJ4cwGPc3+msnyBZcU=;
+ b=Vv8e8pJh2lRAXvVnw4kF7EW0AG+1/mUWtcaM429Ubei1XSWB79Aku/oMto8EJLqApS/ZrVi0Y/OuEWDqHTeDrWVs+mWduFTs1croDkZNkGPBCgK0WdD6i8693nvihGehvsJwDMR3HtikEIOJmkXXaqKPUIJwWpAr/bJ6naxkA7/OZkfs7UldSwEV1YqHdmR500I1Gt9huvzmt1I5D3VC63iFzbquQXeqV51n95/0QdgghjUxKE5KFQhZ9GR35sC2PFTmkd6KUtG+NEt41rLYbrQNLiXbu1HXA79Ga6qP/0f0HSB4TsyP74lEslgsbc/rn6nxXpicqWxYWfKS88vaCw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5186.namprd11.prod.outlook.com (2603:10b6:303:9b::24)
+ by PH0PR11MB4902.namprd11.prod.outlook.com (2603:10b6:510:37::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.39; Tue, 20 Feb
+ 2024 16:23:16 +0000
+Received: from CO1PR11MB5186.namprd11.prod.outlook.com
+ ([fe80::a8a4:121e:2b2c:7037]) by CO1PR11MB5186.namprd11.prod.outlook.com
+ ([fe80::a8a4:121e:2b2c:7037%4]) with mapi id 15.20.7316.018; Tue, 20 Feb 2024
+ 16:23:15 +0000
+Message-ID: <8e7c3649-c0e5-4660-9068-336518cd07a8@intel.com>
+Date: Tue, 20 Feb 2024 08:23:13 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 01/10 iwl-next] idpf: implement virtchnl transaction
+ manager
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<willemdebruijn.kernel@gmail.com>, <przemyslaw.kitszel@intel.com>,
+	<igor.bagnucki@intel.com>, Joshua Hay <joshua.a.hay@intel.com>
+References: <20240206033804.1198416-1-alan.brady@intel.com>
+ <20240206033804.1198416-2-alan.brady@intel.com>
+ <22caac00-7a4e-4bc3-969e-fa3655fd9a93@intel.com>
+Content-Language: en-US
+From: Alan Brady <alan.brady@intel.com>
+In-Reply-To: <22caac00-7a4e-4bc3-969e-fa3655fd9a93@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4P223CA0007.NAMP223.PROD.OUTLOOK.COM
+ (2603:10b6:303:80::12) To CO1PR11MB5186.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::24)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5186:EE_|PH0PR11MB4902:EE_
+X-MS-Office365-Filtering-Correlation-Id: 81dcf42d-eccc-4e24-5b19-08dc32303daa
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: KGiSGLC45Qy6vW9VIMR5AXSpEdbq6casnJtZmjZheH1bP3gEeng+Yd49dYVwJXW3Ezo6pxKgvIIL4XD93VVkp6vMbkJba7XBwTzG7ks07XD+h1YyBECUmgLhDuwRv4dVHRVQMkf07ftfIVdon7weDTRUGS4ll2MQEZ5+4+4n5569TsMCaXpO891AHWLx5wHyiAx0FgKbB8NqX2DjoRRIb5nwM8SnRjteEIX0Hm/qLvSog/rxoS8MgUaGmrbxjC3UFEbylZrjpbBsa8T7/mhY48OT1c1U/JRZW40iMSpmjlOg1qa9h7Ub/KsL0JUgeOnTnnQI/48+ZJ2Hent5ZMSbNZ4W1+EzWBzrUtzqnjmuwB1pshgB1G71IEEhUc+nQG+BnR0cHMSKs0LLHprbYz1jrYWZIG9uTlcaryp335wIXabS25fqgxBmRWnAm6s73MoYumYClPVAt8F/n5ufw5SUkR4ovp9AH3XLg0qudzEaIoGtpeEMg4K+70d3/f3lb2qaepcvQN+xwjWn0aEWBX1brLtfw0jsI81NnDkTFzhi7fA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5186.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dmpKck14MW5Pb2N2S2FKajJOaWg2SWp2dEF5SFh2ODV1U1NSd3NpUlliZkti?=
+ =?utf-8?B?RVZ1LzBDMXZyVjZKTWNZK1BsY3BEcjlrYWpldWpQanBNTWdYUVJ6ajVzb0dG?=
+ =?utf-8?B?bzVTWWQ3UW5yUTMrbHBrTHRFbUkrMDRkdUdCOHVORnpGUG5MZjZZWHVqajY5?=
+ =?utf-8?B?ZG5WbDAxZnZCdVB6R1VZVkkwc25iaXRZcGtZUUFDWHFZQ21DQzF6aDZZeEZT?=
+ =?utf-8?B?NG1JdTk3Y09RemJmbjlJdlB0czYrZXNBYXVhNklMZ2F0b205OUw0RzUyazJk?=
+ =?utf-8?B?UnBHSm5jZzA0ZXdrUmZSWWoxdGxDaldGNktDQTY3dm0vaTdOZzJtWW5OYXNG?=
+ =?utf-8?B?N3lwcVJCWmY3THI0U2RjY1lJeS9BVW90b3RzZjM1OVlsU2ZtNmh2cmh4YW0r?=
+ =?utf-8?B?Z2gwMmdkSm5xak9iaCszY29QMW80SDB0R21NL2pnQkVoOVNOUUVrUC9FNFg1?=
+ =?utf-8?B?cTBSSFJBbmdQci9jcWlXTnhXUkExZ2xqNDA5WlBVRzZPZmRSZnJtNHY1SUMv?=
+ =?utf-8?B?eGZ6aDVIWFFkWW50cTJqY2ZsSTB3b2Urend6T2REZTZMS0ZDY1MveTM3MUF2?=
+ =?utf-8?B?d2VkaTJZTERDQlVMb2xrRWtUelROUEdGOThJZ3lHaU1tVC85akN2NFZnMGZ6?=
+ =?utf-8?B?enpkMEZ4SWxzRzd0TjdUUEF6SkExZWN3MUdPUVNibG1uQ2t0aU5IV29WWkQ3?=
+ =?utf-8?B?TzJzc2RiK3U1TEp5NFpzSGJJZ0JoeVpyQ3hYWENFc3U4Rk1teEtOeU10bzBG?=
+ =?utf-8?B?WkF4Q2VKZCtrc0NtMHpRbTNyVk5BRDhiWURsM21xbk5NY0FpMTZYRmdpcFNI?=
+ =?utf-8?B?aDMvM05BSGJDRWRhRFIyWlhoNnhLWUQ5a2ZnVzJGbE1Ib3JucW10UEMwVHdN?=
+ =?utf-8?B?ZllFWjRiZ1ZaaUFDZGpPMHRhWVRVeXBQSUJXRHA0bCtiZ3duOVdzVC8vaXEw?=
+ =?utf-8?B?NSs3cWUxT3F6K2hIS1hOdi9kWXU0TXBsYjJvK0NQUDBSL2FWd01Fc3F2QUhu?=
+ =?utf-8?B?Mjc4dE96YktQaElncDNBUGNNaXFuMDRPVFVpZFA3TkFydHI3VlI1YlZnTnhK?=
+ =?utf-8?B?VzR1OVBmY05ZNVNIVC8yd3lNTTRUU25vcU05c3RlWGwxQ1VOSnBSRkxOTlhV?=
+ =?utf-8?B?VGNtazZuZEJ1dmRvOXpobmxsck1BS0lVeURTUlEyM1U0bk53bEdnMExIZUIr?=
+ =?utf-8?B?L0x0NWUxOThsUVhPR2xGV3JBazJwVjg4OGFQenhPaUl2SW51YktSWTlTWi9Y?=
+ =?utf-8?B?VWtObkR4bk1JUGFLRmJydXVHSjh3L1BFV1pTUkNBM3hWS0UwUlZFWldCd25W?=
+ =?utf-8?B?TzlubHgrSnlKdG54LzlmNlpUNUNPcnN3Yk96b1JGRmk2clJjRkVlRCt3Smpi?=
+ =?utf-8?B?SFRQK1puSVkvUm1tQlVHUUJYbE1uM0FsUE5hTk96VDBkZkd6RnRrS3BWdVZK?=
+ =?utf-8?B?a1VnYWg5NUtHVlYrTUJucnN0ZmlNQ3dyV2ZkRG9HamtZQ2p0S3lKN1RZU1Bj?=
+ =?utf-8?B?dXhxSUQxaU5aNTR3OFRjeElCalo3bVhjME5PaVRLMjJPYStiUmczWGZRYkMv?=
+ =?utf-8?B?dUo0REZ3b3JMVFJnNmRyTmo2K1dNL3RXZnRhL2gzVUZPQW82eEFHc2hYQTRY?=
+ =?utf-8?B?Tmp0Y3RlNTJJa2FZblgyRVNWOE11TzVZZ1pTd0tsTWlqcUhSWXpUNVBDckF5?=
+ =?utf-8?B?MTFYbEV5UytUYkRMaG0xTXRZVTRZbDRoT2xmaW9LZGFLRUNZdXlrc0NvTjBs?=
+ =?utf-8?B?cWN6VWZxT1hzWU5nTHg0U2F3d0xQM2RvL2xmOElRVlROMXcwUDJlNWtxZFA5?=
+ =?utf-8?B?T1VkSFJ0bTBYRGlPakhoZHBIMUlNRnl1K3F3UmcvaW03SjhQelJqYTV0dU4x?=
+ =?utf-8?B?ZkQ3MUlucnI2a05aQlRuczV2ckJBaG1hbHlFdnlEMmE1cG9YWHJWZngvZktJ?=
+ =?utf-8?B?Z25PNm1nSTMvcE1XYnZxQnVOZEx5VkF3Tldpc0V4eWc5VWpjTno4RDZWb2tW?=
+ =?utf-8?B?Y0pHR2RCdFZLS2MvVTh3akFoeVc1OEJ0MjNqM2xnSlNINTFFUG12WU9WeDZP?=
+ =?utf-8?B?MVA3QlpwMlBpQ1Q4ZTMvK0pDUndNeUZxTlEyZGh6UlM1YjBoVDJRd1BUeVRQ?=
+ =?utf-8?Q?ufB1qefaOO+6Jd+aVp2uLB50Q?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 81dcf42d-eccc-4e24-5b19-08dc32303daa
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5186.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2024 16:23:15.5330
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: taZl8UdNS+FjXiincyOJUggWCguBVrjIbclHhp707n/sYJM314fXsTS0cMgUa82w/a98oQaMc7uuEn8YZHiyLA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4902
+X-OriginatorOrg: intel.com
 
-On Mon, 19 Feb 2024 16:11:16 +0000
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+On 2/20/2024 6:30 AM, Alexander Lobakin wrote:
+> From: Alan Brady <alan.brady@intel.com>
+> Date: Mon, 5 Feb 2024 19:37:55 -0800
+> 
+>> This starts refactoring how virtchnl messages are handled by adding a
+>> transaction manager (idpf_vc_xn_manager).
+> 
+> [...]
+> 
+>> +/**
+>> + * idpf_vc_xn_exec - Perform a send/recv virtchnl transaction
+>> + * @adapter: driver specific private structure with vcxn_mngr
+>> + * @params: parameters for this particular transaction including
+>> + *   -vc_op: virtchannel operation to send
+>> + *   -send_buf: kvec iov for send buf and len
+>> + *   -recv_buf: kvec iov for recv buf and len (ignored if NULL)
+>> + *   -timeout_ms: timeout waiting for a reply (milliseconds)
+>> + *   -async: don't wait for message reply, will lose caller context
+>> + *   -async_handler: callback to handle async replies
+>> + *
+>> + * @returns >= 0 for success, the size of the initial reply (may or may not be
+>> + * >= @recv_buf.iov_len, but we never overflow @@recv_buf_iov_base). < 0 for
+>> + * error.
+>> + */
+>> +static ssize_t idpf_vc_xn_exec(struct idpf_adapter *adapter,
+>> +			       struct idpf_vc_xn_params params)
+> 
+> Why do you pass @params by value, i.e. whole 56 bytes per each function
+> call instead of passing it by pointer -> 8 bytes per call?
+> 
 
-> On Mon, Feb 19, 2024 at 02:29:36PM +0100, K=C3=B6ry Maincent wrote:
-> > On Fri, 16 Feb 2024 10:09:36 -0800
-> > Rahul Rameshbabu <rrameshbabu@nvidia.com> wrote:
-> >  =20
-> > > On Fri, 16 Feb, 2024 16:52:22 +0100 Kory Maincent
-> > > <kory.maincent@bootlin.com> wrote: =20
-> > > > Change the API to select MAC default time stamping instead of the P=
-HY.
-> > > > Indeed the PHY is closer to the wire therefore theoretically it has=
- less
-> > > > delay than the MAC timestamping but the reality is different. Due to
-> > > > lower time stamping clock frequency, latency in the MDIO bus and no=
- PHC
-> > > > hardware synchronization between different PHY, the PHY PTP is often
-> > > > less precise than the MAC. The exception is for PHY designed specia=
-lly
-> > > > for PTP case but these devices are not very widespread. For not
-> > > > breaking the compatibility default_timestamp flag has been introduc=
-ed
-> > > > in phy_device that is set by the phy driver to know we are using the
-> > > > old API behavior.
-> > > >
-> > > > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> > > > ---   =20
-> > >=20
-> > > Overall, I agree with the motivation and reasoning behind the patch. =
-It
-> > > takes dedicated effort to build a good phy timestamping mechanism, so
-> > > this approach is good. I do have a question though. In this patch if =
-we
-> > > set the phy as the default timestamp mechanism, does that mean for ev=
-en
-> > > non-PTP applications, the phy will be used for timestamping when
-> > > hardware timestamping is enabled? If so, I think this might need some
-> > > thought because there are timing applications in general when a
-> > > timestamp closest to the MAC layer would be best. =20
-> >=20
-> > This patch comes from a request from Russell due to incompatibility bet=
-ween
-> > MAC and PHY timestamping when both were supported.
-> > https://lore.kernel.org/netdev/Y%2F4DZIDm1d74MuFJ@shell.armlinux.org.uk/
-> >=20
-> > His point was adding PTP support to a PHY driver would select timestamp
-> > from it by default even if we had a better timestamp with the MAC which=
- is
-> > often the case. This is an unwanted behavior.
-> > https://lore.kernel.org/netdev/Y%2F6Cxf6EAAg22GOL@shell.armlinux.org.uk/
-> >=20
-> > In fact, with the new support of NDOs hwtstamp and the
-> > dev_get/set_hwtstamp_phylib functions, alongside this series which make
-> > timestamp selectable, changing the default timestamp may be not necessa=
-ry
-> > anymore.
-> >=20
-> > Russell any thought about it?  =20
->=20
-> My position remains: in the case of Marvell PP2 network driver with a
-> Marvell PHY, when we add PTP support for the Marvell PHYs (I have
-> patches for it for years) then we must _not_ regress the existing
-> setup where the PP2 timestamps are the default.
+Not for any particularly good reason. I will fix thanks.
 
-Yes, that's what I thought.
-About the Marvell PHYs PTP support I have a few fixes on it, but we will
-talk about it when this series gets merged.
-
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
 
