@@ -1,210 +1,466 @@
-Return-Path: <netdev+bounces-73473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E0EC85CBE6
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 00:17:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 67D7385CBE9
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 00:17:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3F9B1F2304B
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 23:17:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D35A91F23041
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 23:17:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 600ED154BE7;
-	Tue, 20 Feb 2024 23:17:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 741A515444E;
+	Tue, 20 Feb 2024 23:17:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=seco.com header.i=@seco.com header.b="NHm6o83I";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=seco.com header.i=@seco.com header.b="NSo5lqrI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NE5szozN"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2134.outbound.protection.outlook.com [40.107.20.134])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02CB7154451;
-	Tue, 20 Feb 2024 23:17:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.134
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708471040; cv=fail; b=gLrfzIBcmQZz16+t7bffPP73ZOyCV5EHTGR0CbIV4kJZc6wNJAt79s3uQA7bnvx1XSd4hcK1DIRKQ4mT5GtCNruHALS1Fasb3EhH16q+HpDM2F3ME/2u3+RJ31eafeDUp/n7kFWLNlLhf6lV11+Bx2vaj57Ne5dMfX5mEjVBGgg=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708471040; c=relaxed/simple;
-	bh=ZksUlpzB3Skb+6Q6PPYcwt3Gz5U0cJlc6HUVqpiLPL8=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=t+Tbu0Y1LgzYSv6Ccx5go1RurmectPla3JJ4TQcfeaTa2XeyGSJlwq+O2hWV0KG0vka7JJfDLFg97yyJeb8CIXeyOXdLTe3/sMwQln+7u81XX8Gqy5+Pw14zSuIZ1CF4JGLrncSYIjsp5KhmUVGLqWOC8tc/aPeu0VfDUKKnVCs=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=seco.com; spf=pass smtp.mailfrom=seco.com; dkim=pass (2048-bit key) header.d=seco.com header.i=@seco.com header.b=NHm6o83I; dkim=fail (2048-bit key) header.d=seco.com header.i=@seco.com header.b=NSo5lqrI reason="signature verification failed"; arc=fail smtp.client-ip=40.107.20.134
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=seco.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seco.com
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=pass;
- b=MaILBgTlWc0hHtPshbmQ+XBJn0W8Ql9YHrWH03T37u51GlRNYU2tAuOk9fFF06FYqqOOPOZWbOZojakhfB0TC+XKd9CiJKMWWgQlzHt7FLlNiFnVNmctteozN5cML5bUPG+PLC5cCr3rt/BQjnaqzLxd+899XI7iaM07p26COB86tuNAdiuCglkRw5IOIVCs4qFpSrBvb07ed/1Z1elmFEtIfYTyg0WA3Pv8RFnBCgpFnzu0Iugjpswo6tGxs6LXBDHR7SmDb2P98E4MtdF6bu2hWoNiz1fjE4ANKqmeEUNiRdnYb1yQLNceMkW37W0V2F39DqEi9uAIamDtyPpJiA==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZksUlpzB3Skb+6Q6PPYcwt3Gz5U0cJlc6HUVqpiLPL8=;
- b=RPbuSTbIQAaVgy9Zspo6TdtZdk+3CoSgTF4O3gbelschLngskJHCMgFAeU39BsqOGivYEAq8h4cdvTqcEBQQo97HOJbA4p9M8JFN0vb3RhiBOfYC0Xgzyxw1HYZgWerJuv9hP0yh9oSCsTecTqzfMIyWZdPgrWkGtjehxTWfsB4c4B/DvMEtfN0B9qcVwB7+KlJHv9MhIsBgNSmPPDTSiwmFKonWdB6nm76CEQpJSsw+13nT0GOI2+0icj4sjoLnGpXTVCPpHOTLXezzLfsHHg+41XEkgn4dDBYmaBtHa+cYtlpQt/g54G59ISAJ5YRAExBWBWNkzFi4uc/h/SATDg==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 20.160.56.82) smtp.rcpttodomain=armlinux.org.uk smtp.mailfrom=seco.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=seco.com;
- dkim=pass (signature was verified) header.d=seco.com; arc=pass (0 oda=1
- ltdi=1 spf=[1,1,smtp.mailfrom=seco.com] dkim=[1,1,header.d=seco.com]
- dmarc=[1,1,header.from=seco.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=seco.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZksUlpzB3Skb+6Q6PPYcwt3Gz5U0cJlc6HUVqpiLPL8=;
- b=NHm6o83IJ6/MqZdKX12Ws4UFcMiC9vk/6o176R30aR7zDchfEvAfxH0sbnqT9mBwdFVtIapzhGASFepm0uPOGzcBemUrThdKOGDbYrjwXTVvfyr86igkh8rHSZldlbRTnn43/EZ1oLVwftUBRHRnS2z+TtD+fvTTUsYpTpQbTrKcnWJSR1FVRs7mAP9LDXJLdNMYYEQmeVdX4c/yA4zpyeyKhW0rXEpTZBvplWOj7Q1HqS8KM+lqKlA1HCqqxKokvRoy+Iw661Nre8JYq3/AR6B92ZoUATNnTs5X6i1iw/pZyIYuZljOiAlbvSTGtMbkbUbbxm51xtgKqBlxJo9SSg==
-Received: from AS4P189CA0057.EURP189.PROD.OUTLOOK.COM (2603:10a6:20b:659::6)
- by DB8PR03MB6267.eurprd03.prod.outlook.com (2603:10a6:10:132::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.39; Tue, 20 Feb
- 2024 23:17:14 +0000
-Received: from AM2PEPF0001C717.eurprd05.prod.outlook.com
- (2603:10a6:20b:659:cafe::9e) by AS4P189CA0057.outlook.office365.com
- (2603:10a6:20b:659::6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.39 via Frontend
- Transport; Tue, 20 Feb 2024 23:17:14 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 20.160.56.82)
- smtp.mailfrom=seco.com; dkim=pass (signature was verified)
- header.d=seco.com;dmarc=pass action=none header.from=seco.com;
-Received-SPF: Pass (protection.outlook.com: domain of seco.com designates
- 20.160.56.82 as permitted sender) receiver=protection.outlook.com;
- client-ip=20.160.56.82; helo=repost-eu.tmcas.trendmicro.com; pr=C
-Received: from repost-eu.tmcas.trendmicro.com (20.160.56.82) by
- AM2PEPF0001C717.mail.protection.outlook.com (10.167.16.187) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7292.25 via Frontend Transport; Tue, 20 Feb 2024 23:17:14 +0000
-Received: from outmta (unknown [192.168.82.135])
-	by repost-eu.tmcas.trendmicro.com (Trend Micro CAS) with ESMTP id 0FF1520080F8A;
-	Tue, 20 Feb 2024 23:17:14 +0000 (UTC)
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (unknown [104.47.14.50])
-	by repre.tmcas.trendmicro.com (Trend Micro CAS) with ESMTPS id 41FE02008006E;
-	Tue, 20 Feb 2024 23:17:09 +0000 (UTC)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UinJiybBUGTB5ODoAgLtLl/AEqa2+oNnyvi8VpTz1a1hGhPxEHDrg5eaMArQT2Y1mD5xsMvFabZ2jV2iV/VeMCJyf9blRDqVTZgeZifIHxf6p+nkK/csVjF4rET5EpbDNKuLjNlW/FwQxLP5IFRYiTmRZc3jR3DNDzn92jSYNPWyT9tY0O4fe/8+vaBSbS4OCStEyuKclmyTLTD2lq5PVJLeaKduHcJGMU+6npW4u5/qUK4dyzUfsc5EZIct0nxG9+MuRfnVZjgHAGvvN5C84fmukK8oHbYIzigf8QZ/GJ61dFHKmlVRsJb2iaNuJT8jKL9FMRilarI5kMdYtMA59g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jiFPZYnfngAWZL9TnT/gDAJVgnTvVA22bA6HxPDBuPc=;
- b=WebVo4pZLqTaOZjQv9MGEXeEKHkh3R/OW6EORmYD4gorwxS5/Za56T7Ozz6fxFA2JxjORn1OBYB7Wm+g4oLtKSQHcOkfksuO2vLFlMYffiWNs2/4iJvxO89GGCmvaTy9/2Je3bGRGz5dMn0FobadTLRHsTO98PHxxBe9ZoB4UjAoeRHBS3HCBXe+c0fnPfWz57hMuip51zFdmh0YQ0ZCpZLvNcWTGp3Ic0EHmGivSjuVGvvqSJIwJ1GPfLpq9/0ZW23gJnDAL4GsZxqFpsBF0t/iW1W3nmXBlcVoffdYxlduM+ogtsJgOkv5y2NwIGn+KtXKXRZuj//dO1UWzeCpUQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=seco.com; dmarc=pass action=none header.from=seco.com;
- dkim=pass header.d=seco.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=seco.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jiFPZYnfngAWZL9TnT/gDAJVgnTvVA22bA6HxPDBuPc=;
- b=NSo5lqrI7FE54s3ZD/mII28MSzRikD3cYV5phxVQLiJ4TSY5up+rIqJXQpJsWE3qeG+YHdeY7ZLeiNGnBhgV83Gxb5XrAeDVumRH8s1I/9Ux89oPWacWMW7xqjIK3pRDOUqw0zro1/+GZ5v/umgVIAmOALDnSFq6yb23xzpfqJ31igbJS2ZtCDgn1AaJfMcUE3NVctKA4PtVDMPF8TAVVDifJ82DY4/mEhTMVVeO9kDhnoG/uFf0UX+X9CIB9SMi3y2VROu1r0QQtt5/1M/HTXLvw0QK9bJamkoDSM2TfBALr2fzsF2nezutst86MQQ+PwY5i1ZPPqra1f+OKVP4tg==
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=seco.com;
-Received: from DB9PR03MB8847.eurprd03.prod.outlook.com (2603:10a6:10:3dd::13)
- by VI0PR03MB10567.eurprd03.prod.outlook.com (2603:10a6:800:209::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.38; Tue, 20 Feb
- 2024 23:17:06 +0000
-Received: from DB9PR03MB8847.eurprd03.prod.outlook.com
- ([fe80::9529:5f9c:1795:a94c]) by DB9PR03MB8847.eurprd03.prod.outlook.com
- ([fe80::9529:5f9c:1795:a94c%7]) with mapi id 15.20.7292.036; Tue, 20 Feb 2024
- 23:17:06 +0000
-Message-ID: <bce5cff4-c1a5-4d71-b6cd-a89c55a628ba@seco.com>
-Date: Tue, 20 Feb 2024 18:17:02 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] arm64: ls1046ardb: Replace XGMII with 10GBASE-R phy mode
-Content-Language: en-US
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: zachary.goldstein@concurrent-rt.com, Shawn Guo <shawnguo@kernel.org>,
- Madalin Bucur <madalin.bucur@nxp.com>, Li Yang <leoyang.li@nxp.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, linux-arm-kernel@lists.infradead.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240220145037.kf3avnykjif24kkr@skbuf>
- <191b4477-7b4b-47eb-bb3e-0e4d08b3b32e@seco.com>
- <20240220223706.o7wc5r57omkmgtgh@skbuf>
- <e39c811e-ad9d-4e90-8710-629b822944e0@seco.com>
- <20240220230656.cefvrh6avji2elrd@skbuf>
-From: Sean Anderson <sean.anderson@seco.com>
-In-Reply-To: <20240220230656.cefvrh6avji2elrd@skbuf>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: MN2PR03CA0025.namprd03.prod.outlook.com
- (2603:10b6:208:23a::30) To DB9PR03MB8847.eurprd03.prod.outlook.com
- (2603:10a6:10:3dd::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E1A3154431
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 23:17:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708471064; cv=none; b=b7HCtWiSw8Pm1O3e6gVkcUHuQ88eHYvPtwlJ/ceaZvzzDGmCUAsLbdIJXqlNNClryPuOrMgDf2IbylBBxnscKMJHxPh+N/nu/GZRym2/RisVxaELrQugl1Ax42lBt5vfKqhYb4HoZoIXMbZi/yM+GVhYipqjkdiYRBn4dXGJC+c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708471064; c=relaxed/simple;
+	bh=rLt2N4qD6L6RlGXQyss0vOroeT+miPoL8jbOXfsCIvc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bhbNziYvtZvTxuWzwgtBnTO0gL3w8DGCVqJldlLK23NF32Okn4X2ao2zUcMRmeFsvOFe3sLWnbSObVunc4E0wv5R9DRdLMtCx1BNPkBcB2xLL2TOuEgAZcTS6k4cexjZ3Z8zKksBJlxQAQ0YSzX0RsrJv7HVQ3d4Qd8tdbj18Gk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NE5szozN; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708471062; x=1740007062;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=rLt2N4qD6L6RlGXQyss0vOroeT+miPoL8jbOXfsCIvc=;
+  b=NE5szozNFmKfY94thzeafKj1oR8FoMrIumZXFYwpLxP3lB800vC2b8MC
+   IGSXK0ddarWz/KdojZvBb5HG7l1USYdCgJLd2KV2Z+/wkOBYiyKopN5DZ
+   nLyqzm2i3FPhtYLO/eVTlF8ImgG0mQJc6Nr7UStvz6rlLcEZVb0ieJD+L
+   Hbh48YPM+Z6290LHCFynq1u2pmIWSaCJwI/STe35bWfaBSCuGNfoDerMp
+   seeYfW4ZszXHWuW3Y4mdl7wDlOww6bqGcMkRdlopA2yRo1WrUJ5UfAu92
+   FBM+gql6w6SKDpA9j/WCG9WYknl3RUGyA1Wq/LHsCJ4Kq7+MIZDVt+8XW
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10990"; a="5560983"
+X-IronPort-AV: E=Sophos;i="6.06,174,1705392000"; 
+   d="scan'208";a="5560983"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2024 15:17:31 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10990"; a="913165830"
+X-IronPort-AV: E=Sophos;i="6.06,174,1705392000"; 
+   d="scan'208";a="913165830"
+Received: from jbrandeb-coyote30.jf.intel.com ([10.166.29.19])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2024 15:17:30 -0800
+From: Jesse Brandeburg <jesse.brandeburg@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	netdev@vger.kernel.org,
+	Robert Elliott <elliott@hpe.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Subject: [PATCH iwl-net v1] ice: fix NULL pointer access during resume
+Date: Tue, 20 Feb 2024 15:17:20 -0800
+Message-Id: <20240220231720.14836-1-jesse.brandeburg@intel.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-TrafficTypeDiagnostic:
-	DB9PR03MB8847:EE_|VI0PR03MB10567:EE_|AM2PEPF0001C717:EE_|DB8PR03MB6267:EE_
-X-MS-Office365-Filtering-Correlation-Id: 89554108-ccef-4284-38b3-08dc326a12c3
-X-TrendMicro-CAS-OUT-LOOP-IDENTIFIER: 656f966764b7fb185830381c646b41a1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted: BCL:0;
-X-Microsoft-Antispam-Message-Info-Original:
- hTnI0TsgT1h2u+ONx/DovGfM1kduG9bbc6EM4QlO0fxgy9oi7QvJH6G1z3wbMjwbiJjIdXSnv0Ot3ssQG0MNn7phNbSl5pP24y6HzFIdg59SymyEYdYBSfAH8H74AzHoD15obpdiPIAJ/w75eTWS7ArUYPPuKsl9dOJHShumXdk1Xy6qXNOR6jZ+sEqdGew/OPhoVI5lUF6M8Q1JccfFbiqYkxMiF1FuAd5NTm9onJFwOmZwpOTAy0Ae8bqVKaRcGTcY4UMczDSCCZRR5deo2apbpj+pd5Fl/q6ZRZULeB1qkQsG4S1QGQJ7QeYPgBvq0uMRT76XJPFOHJjwevWdM2Ae6k1mVrJEmaX++ayMSCJ0WwYoCAuQBXWZOGv8mfnH8W47ORjcE9wdU7mdCwtKs32Hno+ov98qo3jPR3S3HWWpPZ5/k+w6crJmyDyXmN5DPWHW+snOrWQxpW8w8845dC0XAfZjFTEMNu7rX2Av0nzXjfUlvm/SJtvnQcpuJwWHEmmwQfHVvPmzw4C/MF/gqIFWrKaxA/vSB/8RCwpWBjG5Ef0j+xrFxFFIcPTcoAHRMjUw5qI/EM7jwd79XRLLo+f5SUVea1xa/fsXi8oV3yV0wCH128pfiD3dYsyKq8ZP
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR03MB8847.eurprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(38350700005);DIR:OUT;SFP:1102;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR03MB10567
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- AM2PEPF0001C717.eurprd05.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	a53f7387-582e-47be-6cc5-08dc326a0deb
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	flf3nXYRbX9JaYgzyBKXD+2p5JYINok2c4WXh73bUGqaICz5HxQONZvC/T8r8OnnWul0Fe/bW/kzswJ+KRvLKVqzYfoCGLkCUycjGEiWVPMX1GBLhLuKvZ/35H/hMLlGED7jHlCpHvGvY44ERhWZwr+JZkjLhfHNHuON9730CDiwn0RNg4kDNbrLyeOqnDyAdH5yd4/89racBucGPIqKijk+UO1g6Z8ws8Ee1BlmPdd9KMFG9MMmiZMUxhAuSkv+pTAnWyr88vRcVWti92yaCBqkZgO+0v+srO9ir6X8J8EELZ61k9yzqmrcxYq4dR6QujWneX2STbDfpXt3aBzJGAlkvt5vYrN3YWQq0vmOEC3R/19Xq5CROWcrhDMOFE/im/nNiU0mM9AdXUH+hLN1jQW6EX+xWjExpJ634zyrup3qmeKeVkRiCZ/OMABRGdC/39vKZ+jPeEq7JoW0iNc2Ggd0jxYUYUAIJXIeYzJ4mgWQw508gCl654orHlNU6PwrYbB3wKhyfov90fCTf4nc0kKyIxXHjqhG0V+zSzTRq2HDBcT5vDt+ZP4Yw6Fiw0AdZWvFwUgnN6/ohZpnl0DFKxieUk6Bb9eDGdfikWPw/SqyxMYHaOOlvtlSbZ0md5vhYtucFtPfIZOhUMm1uX2PB4RZIQEMH0P3nI4mC8VsPog=
-X-Forefront-Antispam-Report:
-	CIP:20.160.56.82;CTRY:NL;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:repost-eu.tmcas.trendmicro.com;PTR:repost-eu.tmcas.trendmicro.com;CAT:NONE;SFS:(13230031)(36860700004)(46966006)(40470700004);DIR:OUT;SFP:1102;
-X-OriginatorOrg: seco.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2024 23:17:14.2005
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 89554108-ccef-4284-38b3-08dc326a12c3
-X-MS-Exchange-CrossTenant-Id: bebe97c3-6438-442e-ade3-ff17aa50e733
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=bebe97c3-6438-442e-ade3-ff17aa50e733;Ip=[20.160.56.82];Helo=[repost-eu.tmcas.trendmicro.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AM2PEPF0001C717.eurprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR03MB6267
+Content-Transfer-Encoding: 8bit
 
-On 2/20/24 18:06, Vladimir Oltean wrote:
-> On Tue, Feb 20, 2024 at 05:52:36PM -0500, Sean Anderson wrote:
->> With SGMII and XFI, the PCS sits on the MAC's MDIO bus. So for SGMII and
->> XFI if we don't have any labels we can just assume the PCS handle is for
->> the right PCS. But for QSGMII the PCSs sit on another MAC's MDIO bus. So
->> we need to tell the MAC where to find the PCS. This means we need to
->> supply multiple PCSs to the MAC
->
-> So how did the other Layerscape devices with the same SerDes, PCS and
-> mEMAC manage to get by and support QSGMII without listing all possible
-> PCSes in pcs-handle-names? :-/ DPAA2 has the exact same situation with
-> the QSGMII PCS situated on the internal bus of another DPMAC.
+The ice_suspend/ice_resume cycle was not updated when refactoring was
+done to the init path and I suspect this allowed a bug to creep in where
+the driver was not correctly reinitialized during resume.
 
-I'm not familiar with them.
+I was able to test against 6.1.77 kernel and that ice driver works fine
+for suspend/resume with no panic.
 
-With DPAA we used to just try to configure the QSGMII PCSs on every
-MAC's MDIO bus. This worked out since if you enabled all the MACs, the
-right one would eventually configure the PCSs. But it also meant you
-couldn't determine the link status (since you didn't know where your PCS
-was).
+Instead of tearing down interrupts and freeing a bunch of memory during
+suspend, just begin an internal reset event, which takes care of all the
+correct steps during suspend.  Likewise during resume we'll just let the
+reset complete and the driver comes right back to life. This mirrors the
+behavior of other suspend/resume code in drivers like fm10k.
 
-> It is unnecessary and buggy complexity, and it will only have to become
-> worse when I add support for C73 backplane autoneg in lynx-pcs and the
-> fman_memac driver, because I will need yet another PCS handle, this time
-> not even one that represents a phy-mode in particular, but a PCS handle
-> for C73 (with C73, the autoneg process determines the dynamic phy-mode).
+Older kernel commits were made to this driver and to the i40e driver to
+try to fix "disk" or hibernate suspend events with many CPUs. The PM
+subsystem was updated since then but the drivers kept the old flows.
+Testing with rtcwake -m [disk | mem] -s 10 - passes but my system won't
+hibernate due to too much RAM, not enough swap.
 
-There are multiple physical PCSs there must also be multiple PCS
-devices. Otherwise your software and hardware will get out of sync.
+The code is slightly refactored during this change in order to share a
+common "prep" path between suspend and the pci error handler functions
+which all do the same thing, so introduce ice_quiesce_before_reset().
 
-If you don't want the complexity, then don't design hardware with multiple
-PCSs connected to the same MAC.
+While doing all this and compile testing I ran across the pm.h changes
+to get rid of compilation problems when CONFIG_PM=n etc, so those small
+changes are included here as well.
 
---Sean
+PANIC from 6.8.0-rc1:
 
-[Embedded World 2024, SECO SpA]<https://www.messe-ticket.de/Nuernberg/embed=
-dedworld2024/Register/ew24517689>
+[1026674.915596] PM: suspend exit
+[1026675.664697] ice 0000:17:00.1: PTP reset successful
+[1026675.664707] ice 0000:17:00.1: 2755 msecs passed between update to cached PHC time
+[1026675.667660] ice 0000:b1:00.0: PTP reset successful
+[1026675.675944] ice 0000:b1:00.0: 2832 msecs passed between update to cached PHC time
+[1026677.137733] ixgbe 0000:31:00.0 ens787: NIC Link is Up 1 Gbps, Flow Control: None
+[1026677.190201] BUG: kernel NULL pointer dereference, address: 0000000000000010
+[1026677.192753] ice 0000:17:00.0: PTP reset successful
+[1026677.192764] ice 0000:17:00.0: 4548 msecs passed between update to cached PHC time
+[1026677.197928] #PF: supervisor read access in kernel mode
+[1026677.197933] #PF: error_code(0x0000) - not-present page
+[1026677.197937] PGD 1557a7067 P4D 0
+[1026677.212133] ice 0000:b1:00.1: PTP reset successful
+[1026677.212143] ice 0000:b1:00.1: 4344 msecs passed between update to cached PHC time
+[1026677.212575]
+[1026677.243142] Oops: 0000 [#1] PREEMPT SMP NOPTI
+[1026677.247918] CPU: 23 PID: 42790 Comm: kworker/23:0 Kdump: loaded Tainted: G        W          6.8.0-rc1+ #1
+[1026677.257989] Hardware name: Intel Corporation M50CYP2SBSTD/M50CYP2SBSTD, BIOS SE5C620.86B.01.01.0005.2202160810 02/16/2022
+[1026677.269367] Workqueue: ice ice_service_task [ice]
+[1026677.274592] RIP: 0010:ice_vsi_rebuild_set_coalesce+0x130/0x1e0 [ice]
+[1026677.281421] Code: 0f 84 3a ff ff ff 41 0f b7 74 ec 02 66 89 b0 22 02 00 00 81 e6 ff 1f 00 00 e8 ec fd ff ff e9 35 ff ff ff 48 8b 43 30 49 63 ed <41> 0f b7 34 24 41 83 c5 01 48 8b 3c e8 66 89 b7 aa 02 00 00 81 e6
+[1026677.300877] RSP: 0018:ff3be62a6399bcc0 EFLAGS: 00010202
+[1026677.306556] RAX: ff28691e28980828 RBX: ff28691e41099828 RCX: 0000000000188000
+[1026677.314148] RDX: 0000000000000000 RSI: 0000000000000010 RDI: ff28691e41099828
+[1026677.321730] RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+[1026677.329311] R10: 0000000000000007 R11: ffffffffffffffc0 R12: 0000000000000010
+[1026677.336896] R13: 0000000000000000 R14: 0000000000000000 R15: ff28691e0eaa81a0
+[1026677.344472] FS:  0000000000000000(0000) GS:ff28693cbffc0000(0000) knlGS:0000000000000000
+[1026677.353000] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[1026677.359195] CR2: 0000000000000010 CR3: 0000000128df4001 CR4: 0000000000771ef0
+[1026677.366779] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[1026677.374369] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[1026677.381952] PKRU: 55555554
+[1026677.385116] Call Trace:
+[1026677.388023]  <TASK>
+[1026677.390589]  ? __die+0x20/0x70
+[1026677.394105]  ? page_fault_oops+0x82/0x160
+[1026677.398576]  ? do_user_addr_fault+0x65/0x6a0
+[1026677.403307]  ? exc_page_fault+0x6a/0x150
+[1026677.407694]  ? asm_exc_page_fault+0x22/0x30
+[1026677.412349]  ? ice_vsi_rebuild_set_coalesce+0x130/0x1e0 [ice]
+[1026677.418614]  ice_vsi_rebuild+0x34b/0x3c0 [ice]
+[1026677.423583]  ice_vsi_rebuild_by_type+0x76/0x180 [ice]
+[1026677.429147]  ice_rebuild+0x18b/0x520 [ice]
+[1026677.433746]  ? delay_tsc+0x8f/0xc0
+[1026677.437630]  ice_do_reset+0xa3/0x190 [ice]
+[1026677.442231]  ice_service_task+0x26/0x440 [ice]
+[1026677.447180]  process_one_work+0x174/0x340
+[1026677.451669]  worker_thread+0x27e/0x390
+[1026677.455890]  ? __pfx_worker_thread+0x10/0x10
+[1026677.460627]  kthread+0xee/0x120
+[1026677.464235]  ? __pfx_kthread+0x10/0x10
+[1026677.468445]  ret_from_fork+0x2d/0x50
+[1026677.472476]  ? __pfx_kthread+0x10/0x10
+[1026677.476671]  ret_from_fork_asm+0x1b/0x30
+[1026677.481050]  </TASK>
+
+Fixes: 5b246e533d01 ("ice: split probe into smaller functions")
+Reported-by: Robert Elliott <elliott@hpe.com>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+---
+NOTE:
+Requires Amritha's patch:
+https://patchwork.ozlabs.org/project/intel-wired-lan/patch/170785373072.3325.9129916579186572531.stgit@anambiarhost.jf.intel.com/
+to be applied before this will pass testing cleanly.
+
+Checkpatch warns on no "Closes:" but this was reported on a private
+list, so there is nothing to close.
+
+Testing Hints: 'rtcwake -m mem -s 10' should result in a 10 second sleep
+and wake, with the interface fully functional afterward. Please also
+test that magic packet wake can be enabled on an adapter that supports
+it, and that the magic packet wakes the system.
+---
+ drivers/net/ethernet/intel/ice/ice_main.c | 179 +++-------------------
+ 1 file changed, 25 insertions(+), 154 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index dd4a9bc0dfdc..2a16b4475d29 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -5385,84 +5385,15 @@ static void ice_shutdown(struct pci_dev *pdev)
+ 	}
+ }
+ 
+-#ifdef CONFIG_PM
+-/**
+- * ice_prepare_for_shutdown - prep for PCI shutdown
+- * @pf: board private structure
+- *
+- * Inform or close all dependent features in prep for PCI device shutdown
+- */
+-static void ice_prepare_for_shutdown(struct ice_pf *pf)
+-{
+-	struct ice_hw *hw = &pf->hw;
+-	u32 v;
+-
+-	/* Notify VFs of impending reset */
+-	if (ice_check_sq_alive(hw, &hw->mailboxq))
+-		ice_vc_notify_reset(pf);
+-
+-	dev_dbg(ice_pf_to_dev(pf), "Tearing down internal switch for shutdown\n");
+-
+-	/* disable the VSIs and their queues that are not already DOWN */
+-	ice_pf_dis_all_vsi(pf, false);
+-
+-	ice_for_each_vsi(pf, v)
+-		if (pf->vsi[v])
+-			pf->vsi[v]->vsi_num = 0;
+-
+-	ice_shutdown_all_ctrlq(hw);
+-}
+-
+-/**
+- * ice_reinit_interrupt_scheme - Reinitialize interrupt scheme
+- * @pf: board private structure to reinitialize
+- *
+- * This routine reinitialize interrupt scheme that was cleared during
+- * power management suspend callback.
+- *
+- * This should be called during resume routine to re-allocate the q_vectors
+- * and reacquire interrupts.
+- */
+-static int ice_reinit_interrupt_scheme(struct ice_pf *pf)
++static int ice_quiesce_before_reset(struct ice_pf *pf)
+ {
+-	struct device *dev = ice_pf_to_dev(pf);
+-	int ret, v;
+-
+-	/* Since we clear MSIX flag during suspend, we need to
+-	 * set it back during resume...
+-	 */
+-
+-	ret = ice_init_interrupt_scheme(pf);
+-	if (ret) {
+-		dev_err(dev, "Failed to re-initialize interrupt %d\n", ret);
+-		return ret;
+-	}
+-
+-	/* Remap vectors and rings, after successful re-init interrupts */
+-	ice_for_each_vsi(pf, v) {
+-		if (!pf->vsi[v])
+-			continue;
++	int ret = ice_service_task_stop(pf);
+ 
+-		ret = ice_vsi_alloc_q_vectors(pf->vsi[v]);
+-		if (ret)
+-			goto err_reinit;
+-		ice_vsi_map_rings_to_vectors(pf->vsi[v]);
+-	}
+-
+-	ret = ice_req_irq_msix_misc(pf);
+-	if (ret) {
+-		dev_err(dev, "Setting up misc vector failed after device suspend %d\n",
+-			ret);
+-		goto err_reinit;
++	if (!test_bit(ICE_PREPARED_FOR_RESET, pf->state)) {
++		set_bit(ICE_PFR_REQ, pf->state);
++		ice_prepare_for_reset(pf, ICE_RESET_PFR);
+ 	}
+ 
+-	return 0;
+-
+-err_reinit:
+-	while (v--)
+-		if (pf->vsi[v])
+-			ice_vsi_free_q_vectors(pf->vsi[v]);
+-
+ 	return ret;
+ }
+ 
+@@ -5473,66 +5404,29 @@ static int ice_reinit_interrupt_scheme(struct ice_pf *pf)
+  * Power Management callback to quiesce the device and prepare
+  * for D3 transition.
+  */
+-static int __maybe_unused ice_suspend(struct device *dev)
++static int ice_suspend(struct device *dev)
+ {
+ 	struct pci_dev *pdev = to_pci_dev(dev);
+ 	struct ice_pf *pf;
+-	int disabled, v;
+ 
+ 	pf = pci_get_drvdata(pdev);
+ 
+ 	if (!ice_pf_state_is_nominal(pf)) {
+-		dev_err(dev, "Device is not ready, no need to suspend it\n");
++		dev_err(dev, "Device is not ready for suspend.\n");
+ 		return -EBUSY;
+ 	}
+ 
+-	/* Stop watchdog tasks until resume completion.
+-	 * Even though it is most likely that the service task is
+-	 * disabled if the device is suspended or down, the service task's
+-	 * state is controlled by a different state bit, and we should
+-	 * store and honor whatever state that bit is in at this point.
+-	 */
+-	disabled = ice_service_task_stop(pf);
+-
+-	ice_unplug_aux_dev(pf);
+-
+-	/* Already suspended?, then there is nothing to do */
+-	if (test_and_set_bit(ICE_SUSPENDED, pf->state)) {
+-		if (!disabled)
+-			ice_service_task_restart(pf);
+-		return 0;
+-	}
+-
+-	if (test_bit(ICE_DOWN, pf->state) ||
+-	    ice_is_reset_in_progress(pf->state)) {
+-		dev_err(dev, "can't suspend device in reset or already down\n");
+-		if (!disabled)
+-			ice_service_task_restart(pf);
+-		return 0;
+-	}
++	/* Stop watchdog tasks until resume completion */
++	ice_quiesce_before_reset(pf);
++	set_bit(ICE_SUSPENDED, pf->state);
+ 
+ 	ice_setup_mc_magic_wake(pf);
+-
+-	ice_prepare_for_shutdown(pf);
+-
+ 	ice_set_wake(pf);
+ 
+-	/* Free vectors, clear the interrupt scheme and release IRQs
+-	 * for proper hibernation, especially with large number of CPUs.
+-	 * Otherwise hibernation might fail when mapping all the vectors back
+-	 * to CPU0.
+-	 */
+-	ice_free_irq_msix_misc(pf);
+-	ice_for_each_vsi(pf, v) {
+-		if (!pf->vsi[v])
+-			continue;
+-		ice_vsi_free_q_vectors(pf->vsi[v]);
+-	}
+-	ice_clear_interrupt_scheme(pf);
+-
+ 	pci_save_state(pdev);
+ 	pci_wake_from_d3(pdev, pf->wol_ena);
+ 	pci_set_power_state(pdev, PCI_D3hot);
++
+ 	return 0;
+ }
+ 
+@@ -5540,10 +5434,9 @@ static int __maybe_unused ice_suspend(struct device *dev)
+  * ice_resume - PM callback for waking up from D3
+  * @dev: generic device information structure
+  */
+-static int __maybe_unused ice_resume(struct device *dev)
++static int ice_resume(struct device *dev)
+ {
+ 	struct pci_dev *pdev = to_pci_dev(dev);
+-	enum ice_reset_req reset_type;
+ 	struct ice_pf *pf;
+ 	struct ice_hw *hw;
+ 	int ret;
+@@ -5566,32 +5459,24 @@ static int __maybe_unused ice_resume(struct device *dev)
+ 
+ 	pf->wakeup_reason = rd32(hw, PFPM_WUS);
+ 	ice_print_wake_reason(pf);
+-
+-	/* We cleared the interrupt scheme when we suspended, so we need to
+-	 * restore it now to resume device functionality.
+-	 */
+-	ret = ice_reinit_interrupt_scheme(pf);
+-	if (ret)
+-		dev_err(dev, "Cannot restore interrupt scheme: %d\n", ret);
++	pci_wake_from_d3(pdev, false);
+ 
+ 	clear_bit(ICE_DOWN, pf->state);
+-	/* Now perform PF reset and rebuild */
+-	reset_type = ICE_RESET_PFR;
+-	/* re-enable service task for reset, but allow reset to schedule it */
+ 	clear_bit(ICE_SERVICE_DIS, pf->state);
++	clear_bit(ICE_SUSPENDED, pf->state);
+ 
+-	if (ice_schedule_reset(pf, reset_type))
+-		dev_err(dev, "Reset during resume failed.\n");
++	/* force a reset, but it may already have been scheduled in
++	 * ice_suspend, but either way the reset will execute
++	 * once the service task is restarted
++	 */
++	ice_schedule_reset(pf, ICE_RESET_PFR);
+ 
+-	clear_bit(ICE_SUSPENDED, pf->state);
+ 	ice_service_task_restart(pf);
+-
+ 	/* Restart the service task */
+ 	mod_timer(&pf->serv_tmr, round_jiffies(jiffies + pf->serv_tmr_period));
+ 
+ 	return 0;
+ }
+-#endif /* CONFIG_PM */
+ 
+ /**
+  * ice_pci_err_detected - warning that PCI error has been detected
+@@ -5612,14 +5497,8 @@ ice_pci_err_detected(struct pci_dev *pdev, pci_channel_state_t err)
+ 		return PCI_ERS_RESULT_DISCONNECT;
+ 	}
+ 
+-	if (!test_bit(ICE_SUSPENDED, pf->state)) {
+-		ice_service_task_stop(pf);
+-
+-		if (!test_bit(ICE_PREPARED_FOR_RESET, pf->state)) {
+-			set_bit(ICE_PFR_REQ, pf->state);
+-			ice_prepare_for_reset(pf, ICE_RESET_PFR);
+-		}
+-	}
++	if (!test_bit(ICE_SUSPENDED, pf->state))
++		ice_quiesce_before_reset(pf);
+ 
+ 	return PCI_ERS_RESULT_NEED_RESET;
+ }
+@@ -5698,14 +5577,8 @@ static void ice_pci_err_reset_prepare(struct pci_dev *pdev)
+ {
+ 	struct ice_pf *pf = pci_get_drvdata(pdev);
+ 
+-	if (!test_bit(ICE_SUSPENDED, pf->state)) {
+-		ice_service_task_stop(pf);
+-
+-		if (!test_bit(ICE_PREPARED_FOR_RESET, pf->state)) {
+-			set_bit(ICE_PFR_REQ, pf->state);
+-			ice_prepare_for_reset(pf, ICE_RESET_PFR);
+-		}
+-	}
++	if (!test_bit(ICE_SUSPENDED, pf->state))
++		ice_quiesce_before_reset(pf);
+ }
+ 
+ /**
+@@ -5761,7 +5634,7 @@ static const struct pci_device_id ice_pci_tbl[] = {
+ };
+ MODULE_DEVICE_TABLE(pci, ice_pci_tbl);
+ 
+-static __maybe_unused SIMPLE_DEV_PM_OPS(ice_pm_ops, ice_suspend, ice_resume);
++static DEFINE_SIMPLE_DEV_PM_OPS(ice_pm_ops, ice_suspend, ice_resume);
+ 
+ static const struct pci_error_handlers ice_pci_err_handler = {
+ 	.error_detected = ice_pci_err_detected,
+@@ -5776,9 +5649,7 @@ static struct pci_driver ice_driver = {
+ 	.id_table = ice_pci_tbl,
+ 	.probe = ice_probe,
+ 	.remove = ice_remove,
+-#ifdef CONFIG_PM
+-	.driver.pm = &ice_pm_ops,
+-#endif /* CONFIG_PM */
++	.driver.pm = pm_sleep_ptr(&ice_pm_ops),
+ 	.shutdown = ice_shutdown,
+ 	.sriov_configure = ice_sriov_configure,
+ 	.sriov_get_vf_total_msix = ice_sriov_get_vf_total_msix,
+
+base-commit: 23f9c2c066e7e5052406fb8f04a115d3d0260b22
+-- 
+2.39.3
+
 
