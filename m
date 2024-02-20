@@ -1,207 +1,220 @@
-Return-Path: <netdev+bounces-73358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B20D885C144
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 17:26:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6B3C85C171
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 17:31:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7E4B1C22850
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 16:26:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 881841F22C5A
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 16:31:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA01176906;
-	Tue, 20 Feb 2024 16:23:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C8DD76052;
+	Tue, 20 Feb 2024 16:31:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iVZl+3vb"
+	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="dV1G+xSW";
+	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="MTearm4t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB408762FF
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 16:23:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91CF376400;
+	Tue, 20 Feb 2024 16:31:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.52
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708446202; cv=fail; b=JSrRa7ekONT8BH/qNiPwXQ9TRxwYguz6gSvi08kMFopxFFEIyVtJK+JEaCyX9oM3DPMrln0x1cAUmqBhhnPPGJ3EWASa4fQRxcaj4bNbqBZaWqddjTv3YU5sRsod2kl52OEJetXgDbx8T4UREsWyvFIselSIBT4jcmrH7iXbzRs=
+	t=1708446691; cv=pass; b=N/swzJ4MEF5q35I1H85fdbygqtQJs/9XWABhcWT4ItlJu5SJl3Zo41PIQ20y3cyTjrHvSyQE0vbwuUumU4s6wU6yGH9bBHeQIFz3xDDzaJeHLDeN6n2WXrTHkWq66KnJH2XZ5Jn6FsJIAXeJHOW8E9MljhxU0bTbxbtMGFSQLmg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708446202; c=relaxed/simple;
-	bh=rW+EkcCIBlDcQ2lPl8+loh1BgdMD2KMkno7FmwEzT2w=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=CxHOYcWR4MYpCv0qqmzVPD/1HZQ3kWGE/j8nEMYMH3er3ZDr0mpl4wJwvyJQsW7HsjxfPjXwEQ4eUB4pCs3C5VS5gwkEbZ59wlMHEsU7Sj0+832x+3Gdt+SVJ+ucHzyjuFAcmpULtEg7FbXBorSY+2yqt8T5hLCAiLaqDdSsLOw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iVZl+3vb; arc=fail smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708446200; x=1739982200;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=rW+EkcCIBlDcQ2lPl8+loh1BgdMD2KMkno7FmwEzT2w=;
-  b=iVZl+3vb3x0S57xf0WS3HQKNBOccB5A+6ECAZEF6BVZa66RTYREShBVb
-   dTNAnGoHHdlOAZOWTAnSdEFEq9m55RKHy/6xpp0Hy0vDI3YFFZJeD98Do
-   nZ+dnY0I94IBxhXrYaawwTVTqBYatWt3+D6Hc/TxfLL0VeDK89DHEgp0e
-   FxQajqp4W34VMrJD2d+mPg/2Yf5r0Zew2b6wk7StT0Uv1jDcmzAQ2Kgk6
-   YhNCLqGAXB3AYf35FXXTC0Ji6D6GsYZ1RQYoLeSr6ih+5WYLlHdRcssnp
-   0GD9DwIx+kloljn490yDxmdKTrMKX5ub0AaJwYGDmn0V2o8/OsSY74U3/
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10990"; a="13182322"
-X-IronPort-AV: E=Sophos;i="6.06,174,1705392000"; 
-   d="scan'208";a="13182322"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2024 08:23:20 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10990"; a="827177435"
-X-IronPort-AV: E=Sophos;i="6.06,174,1705392000"; 
-   d="scan'208";a="827177435"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Feb 2024 08:23:19 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 20 Feb 2024 08:23:19 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 20 Feb 2024 08:23:19 -0800
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.100)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 20 Feb 2024 08:23:19 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eMSuvZPcpbGXV9HNHL8ovpLFgQa2R+b2i07WvE+Bftlm2ZumCAyLm0Hwksg0Na22sCsHtCxGYrtHNb5LBas1G6F/DnfT2edfVKHHGTY7nPPYdg3EsuT313iZ2YjK6zoeQj2v04x/R9oVb7qTBQakxSg7hLfh1zMQFgSiV5js18XoNCHBS5Tqhk5BStwKjgn5CVYHwsWkl6NXe5BhgBtOukK7jvcvcMswb6E15Cu6iCIkhiFrti++pecAm2RqMsecoMbcnDI2RYYiLEoPm/ycLkDT5TbVqWF1o3pKrnn3GhtRL1DMIgCUActroYwHYHGJxOsOVdar+3IcY0D5ErVluw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NZIjkpvLwGiDOaR16WFijiqmeUJ4cwGPc3+msnyBZcU=;
- b=Vv8e8pJh2lRAXvVnw4kF7EW0AG+1/mUWtcaM429Ubei1XSWB79Aku/oMto8EJLqApS/ZrVi0Y/OuEWDqHTeDrWVs+mWduFTs1croDkZNkGPBCgK0WdD6i8693nvihGehvsJwDMR3HtikEIOJmkXXaqKPUIJwWpAr/bJ6naxkA7/OZkfs7UldSwEV1YqHdmR500I1Gt9huvzmt1I5D3VC63iFzbquQXeqV51n95/0QdgghjUxKE5KFQhZ9GR35sC2PFTmkd6KUtG+NEt41rLYbrQNLiXbu1HXA79Ga6qP/0f0HSB4TsyP74lEslgsbc/rn6nxXpicqWxYWfKS88vaCw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5186.namprd11.prod.outlook.com (2603:10b6:303:9b::24)
- by PH0PR11MB4902.namprd11.prod.outlook.com (2603:10b6:510:37::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.39; Tue, 20 Feb
- 2024 16:23:16 +0000
-Received: from CO1PR11MB5186.namprd11.prod.outlook.com
- ([fe80::a8a4:121e:2b2c:7037]) by CO1PR11MB5186.namprd11.prod.outlook.com
- ([fe80::a8a4:121e:2b2c:7037%4]) with mapi id 15.20.7316.018; Tue, 20 Feb 2024
- 16:23:15 +0000
-Message-ID: <8e7c3649-c0e5-4660-9068-336518cd07a8@intel.com>
-Date: Tue, 20 Feb 2024 08:23:13 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 01/10 iwl-next] idpf: implement virtchnl transaction
- manager
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<willemdebruijn.kernel@gmail.com>, <przemyslaw.kitszel@intel.com>,
-	<igor.bagnucki@intel.com>, Joshua Hay <joshua.a.hay@intel.com>
-References: <20240206033804.1198416-1-alan.brady@intel.com>
- <20240206033804.1198416-2-alan.brady@intel.com>
- <22caac00-7a4e-4bc3-969e-fa3655fd9a93@intel.com>
-Content-Language: en-US
-From: Alan Brady <alan.brady@intel.com>
-In-Reply-To: <22caac00-7a4e-4bc3-969e-fa3655fd9a93@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4P223CA0007.NAMP223.PROD.OUTLOOK.COM
- (2603:10b6:303:80::12) To CO1PR11MB5186.namprd11.prod.outlook.com
- (2603:10b6:303:9b::24)
+	s=arc-20240116; t=1708446691; c=relaxed/simple;
+	bh=JfXxUzJKdWucwiW6KqUT8QQj8m/lBfDj1aZ0eKXWlSQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=HyZEVeLuqCdH/QLAj0iwm6fLHOsJvNGcq0yoDCyPIGdfc6wxMyCmfqVJAvVVKQQCWkhVxxi8NxPKI66Z0HxxsJqiL4HRVI8jk5IIv40t/TNfoTRazautj8KJEjdvjPYAGH1OITrBAnUl8iBdV4o9d+iRNp/dtqT18O+cMpsijcw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=dV1G+xSW; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=MTearm4t; arc=pass smtp.client-ip=85.215.255.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
+ARC-Seal: i=1; a=rsa-sha256; t=1708446504; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=EK6NIu1NIJIeE2JwZYUHU2ft9fAIPY77VfvKcp6BvzCA5Nn29nwVYlsVf95tOf6Tep
+    xC66Dn5RifW1zHv9pNN8ZLWUNnDHQxdvr5hq1tKmCzUO7EjsymNQe7IwfDcz340Olsb0
+    xBbCnJ/ZRyQ2rmx0hfW8M5r/RZ3nMdXWpNKktMJa/VcBEljJhY4SJPJHsy6W/2lw3ep7
+    39VuGd+Jb3jHxvnNGuCl12HZ6FrrrlH/7pTp5vio6s85A8rr1IwsIP9hQUL2tNXtQUw+
+    W57Nb5xhXYVc7porhTGaXalAGaI9q5nGK3Ro96ntUEWfULtqm/Ezy3huYGqSIK6DyWLk
+    /BLg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1708446504;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:From:References:To:Subject:Date:Message-ID:Cc:Date:From:
+    Subject:Sender;
+    bh=Xc85nduGOgJ1ntImtZqeF0SSc77OQIEvmm0jwvVa6cU=;
+    b=VrzYpAf5RrDvwZhxur2dOzdtCSUJDIixjTR1Z6GzA2FJo/XeKUtcDsaNIMLAxQ1sgn
+    ajx6sWDSpflH9PKwNBF9jmgKN+inDns5d4GgOLt8JPjr+WEuau1AjQhgPy/UpS4fzcMu
+    RgwXif4pJctEzbqVpfcqwe6KNoXFivF2TNNJZ3R7EkE24pE08uAQgcSqJ4pIOziK5hsf
+    uuOcXEt3dTsUDIOai4VpMpbw9DL+sWyJyJGZVMFxJl4iaZ2zHbSzmeJksbTA3aIhyxPk
+    DxQtaDWlDygUR9JNgzlwaxGF0NjA+6vhIQIqTLuVG7NqXiD9qdPJvRB0OI9omUKRVAcf
+    0Osg==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1708446504;
+    s=strato-dkim-0002; d=hartkopp.net;
+    h=In-Reply-To:From:References:To:Subject:Date:Message-ID:Cc:Date:From:
+    Subject:Sender;
+    bh=Xc85nduGOgJ1ntImtZqeF0SSc77OQIEvmm0jwvVa6cU=;
+    b=dV1G+xSWBk96Hf/98BZsIyIBYNXyGetyivnkylvuwuuf++a1ygKZ+ewMnrm9vqTeGc
+    ABMFMQWys1VjG77g0oSLfaafWdNl98jJWxpYBM9hKXPRDHyyF62lojTcKs7mIhd3FnY/
+    YBAcJeCXj5F4NYWjmdqMlS3ZQJB4CnUFttfrxjeMMU+97912hDQCk5yhsZOqOEo8Mi0j
+    JsLnbkzpqS4ZX4T5jtkFWI8WY+yLOjw0+cAZQz6yVnKDVoqoD29Mw9uy7M0GZJA5rvYk
+    s7CFGtQ+lo08qR95tU+6R+K3cwJvXJlheBHC57Xnx+XuBGFhdEr5r6SW1XVatPEzY7ln
+    XQVw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1708446504;
+    s=strato-dkim-0003; d=hartkopp.net;
+    h=In-Reply-To:From:References:To:Subject:Date:Message-ID:Cc:Date:From:
+    Subject:Sender;
+    bh=Xc85nduGOgJ1ntImtZqeF0SSc77OQIEvmm0jwvVa6cU=;
+    b=MTearm4tUl+3nkaXgSKDg57scvgRf8l0ObBLozZl6J4zA8xPyteU6WaeKRfd9XhXg1
+    uUQToEr+qXXy87EC/dBg==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjG14FZxedJy6qgO1qCHSa1GLptZHusl129OHEdFq0USEbDdAnQ=="
+Received: from [IPV6:2a00:6020:4a8e:5000::90c]
+    by smtp.strato.de (RZmta 49.11.2 AUTH)
+    with ESMTPSA id K49f9c01KGSOBGx
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Tue, 20 Feb 2024 17:28:24 +0100 (CET)
+Message-ID: <9a98f3f1-6a39-4b05-b100-93be1361fd76@hartkopp.net>
+Date: Tue, 20 Feb 2024 17:28:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5186:EE_|PH0PR11MB4902:EE_
-X-MS-Office365-Filtering-Correlation-Id: 81dcf42d-eccc-4e24-5b19-08dc32303daa
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: KGiSGLC45Qy6vW9VIMR5AXSpEdbq6casnJtZmjZheH1bP3gEeng+Yd49dYVwJXW3Ezo6pxKgvIIL4XD93VVkp6vMbkJba7XBwTzG7ks07XD+h1YyBECUmgLhDuwRv4dVHRVQMkf07ftfIVdon7weDTRUGS4ll2MQEZ5+4+4n5569TsMCaXpO891AHWLx5wHyiAx0FgKbB8NqX2DjoRRIb5nwM8SnRjteEIX0Hm/qLvSog/rxoS8MgUaGmrbxjC3UFEbylZrjpbBsa8T7/mhY48OT1c1U/JRZW40iMSpmjlOg1qa9h7Ub/KsL0JUgeOnTnnQI/48+ZJ2Hent5ZMSbNZ4W1+EzWBzrUtzqnjmuwB1pshgB1G71IEEhUc+nQG+BnR0cHMSKs0LLHprbYz1jrYWZIG9uTlcaryp335wIXabS25fqgxBmRWnAm6s73MoYumYClPVAt8F/n5ufw5SUkR4ovp9AH3XLg0qudzEaIoGtpeEMg4K+70d3/f3lb2qaepcvQN+xwjWn0aEWBX1brLtfw0jsI81NnDkTFzhi7fA=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5186.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dmpKck14MW5Pb2N2S2FKajJOaWg2SWp2dEF5SFh2ODV1U1NSd3NpUlliZkti?=
- =?utf-8?B?RVZ1LzBDMXZyVjZKTWNZK1BsY3BEcjlrYWpldWpQanBNTWdYUVJ6ajVzb0dG?=
- =?utf-8?B?bzVTWWQ3UW5yUTMrbHBrTHRFbUkrMDRkdUdCOHVORnpGUG5MZjZZWHVqajY5?=
- =?utf-8?B?ZG5WbDAxZnZCdVB6R1VZVkkwc25iaXRZcGtZUUFDWHFZQ21DQzF6aDZZeEZT?=
- =?utf-8?B?NG1JdTk3Y09RemJmbjlJdlB0czYrZXNBYXVhNklMZ2F0b205OUw0RzUyazJk?=
- =?utf-8?B?UnBHSm5jZzA0ZXdrUmZSWWoxdGxDaldGNktDQTY3dm0vaTdOZzJtWW5OYXNG?=
- =?utf-8?B?N3lwcVJCWmY3THI0U2RjY1lJeS9BVW90b3RzZjM1OVlsU2ZtNmh2cmh4YW0r?=
- =?utf-8?B?Z2gwMmdkSm5xak9iaCszY29QMW80SDB0R21NL2pnQkVoOVNOUUVrUC9FNFg1?=
- =?utf-8?B?cTBSSFJBbmdQci9jcWlXTnhXUkExZ2xqNDA5WlBVRzZPZmRSZnJtNHY1SUMv?=
- =?utf-8?B?eGZ6aDVIWFFkWW50cTJqY2ZsSTB3b2Urend6T2REZTZMS0ZDY1MveTM3MUF2?=
- =?utf-8?B?d2VkaTJZTERDQlVMb2xrRWtUelROUEdGOThJZ3lHaU1tVC85akN2NFZnMGZ6?=
- =?utf-8?B?enpkMEZ4SWxzRzd0TjdUUEF6SkExZWN3MUdPUVNibG1uQ2t0aU5IV29WWkQ3?=
- =?utf-8?B?TzJzc2RiK3U1TEp5NFpzSGJJZ0JoeVpyQ3hYWENFc3U4Rk1teEtOeU10bzBG?=
- =?utf-8?B?WkF4Q2VKZCtrc0NtMHpRbTNyVk5BRDhiWURsM21xbk5NY0FpMTZYRmdpcFNI?=
- =?utf-8?B?aDMvM05BSGJDRWRhRFIyWlhoNnhLWUQ5a2ZnVzJGbE1Ib3JucW10UEMwVHdN?=
- =?utf-8?B?ZllFWjRiZ1ZaaUFDZGpPMHRhWVRVeXBQSUJXRHA0bCtiZ3duOVdzVC8vaXEw?=
- =?utf-8?B?NSs3cWUxT3F6K2hIS1hOdi9kWXU0TXBsYjJvK0NQUDBSL2FWd01Fc3F2QUhu?=
- =?utf-8?B?Mjc4dE96YktQaElncDNBUGNNaXFuMDRPVFVpZFA3TkFydHI3VlI1YlZnTnhK?=
- =?utf-8?B?VzR1OVBmY05ZNVNIVC8yd3lNTTRUU25vcU05c3RlWGwxQ1VOSnBSRkxOTlhV?=
- =?utf-8?B?VGNtazZuZEJ1dmRvOXpobmxsck1BS0lVeURTUlEyM1U0bk53bEdnMExIZUIr?=
- =?utf-8?B?L0x0NWUxOThsUVhPR2xGV3JBazJwVjg4OGFQenhPaUl2SW51YktSWTlTWi9Y?=
- =?utf-8?B?VWtObkR4bk1JUGFLRmJydXVHSjh3L1BFV1pTUkNBM3hWS0UwUlZFWldCd25W?=
- =?utf-8?B?TzlubHgrSnlKdG54LzlmNlpUNUNPcnN3Yk96b1JGRmk2clJjRkVlRCt3Smpi?=
- =?utf-8?B?SFRQK1puSVkvUm1tQlVHUUJYbE1uM0FsUE5hTk96VDBkZkd6RnRrS3BWdVZK?=
- =?utf-8?B?a1VnYWg5NUtHVlYrTUJucnN0ZmlNQ3dyV2ZkRG9HamtZQ2p0S3lKN1RZU1Bj?=
- =?utf-8?B?dXhxSUQxaU5aNTR3OFRjeElCalo3bVhjME5PaVRLMjJPYStiUmczWGZRYkMv?=
- =?utf-8?B?dUo0REZ3b3JMVFJnNmRyTmo2K1dNL3RXZnRhL2gzVUZPQW82eEFHc2hYQTRY?=
- =?utf-8?B?Tmp0Y3RlNTJJa2FZblgyRVNWOE11TzVZZ1pTd0tsTWlqcUhSWXpUNVBDckF5?=
- =?utf-8?B?MTFYbEV5UytUYkRMaG0xTXRZVTRZbDRoT2xmaW9LZGFLRUNZdXlrc0NvTjBs?=
- =?utf-8?B?cWN6VWZxT1hzWU5nTHg0U2F3d0xQM2RvL2xmOElRVlROMXcwUDJlNWtxZFA5?=
- =?utf-8?B?T1VkSFJ0bTBYRGlPakhoZHBIMUlNRnl1K3F3UmcvaW03SjhQelJqYTV0dU4x?=
- =?utf-8?B?ZkQ3MUlucnI2a05aQlRuczV2ckJBaG1hbHlFdnlEMmE1cG9YWHJWZngvZktJ?=
- =?utf-8?B?Z25PNm1nSTMvcE1XYnZxQnVOZEx5VkF3Tldpc0V4eWc5VWpjTno4RDZWb2tW?=
- =?utf-8?B?Y0pHR2RCdFZLS2MvVTh3akFoeVc1OEJ0MjNqM2xnSlNINTFFUG12WU9WeDZP?=
- =?utf-8?B?MVA3QlpwMlBpQ1Q4ZTMvK0pDUndNeUZxTlEyZGh6UlM1YjBoVDJRd1BUeVRQ?=
- =?utf-8?Q?ufB1qefaOO+6Jd+aVp2uLB50Q?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 81dcf42d-eccc-4e24-5b19-08dc32303daa
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5186.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2024 16:23:15.5330
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: taZl8UdNS+FjXiincyOJUggWCguBVrjIbclHhp707n/sYJM314fXsTS0cMgUa82w/a98oQaMc7uuEn8YZHiyLA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4902
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [syzbot] [mm?] [hardening?] BUG: bad usercopy in raw_getsockopt
+To: syzbot <syzbot+0c35af046fa98c893c84@syzkaller.appspotmail.com>,
+ akpm@linux-foundation.org, gustavoars@kernel.org, keescook@chromium.org,
+ linux-hardening@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+References: <00000000000038b6700611d207b3@google.com>
+Content-Language: en-US
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+In-Reply-To: <00000000000038b6700611d207b3@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 2/20/2024 6:30 AM, Alexander Lobakin wrote:
-> From: Alan Brady <alan.brady@intel.com>
-> Date: Mon, 5 Feb 2024 19:37:55 -0800
-> 
->> This starts refactoring how virtchnl messages are handled by adding a
->> transaction manager (idpf_vc_xn_manager).
-> 
-> [...]
-> 
->> +/**
->> + * idpf_vc_xn_exec - Perform a send/recv virtchnl transaction
->> + * @adapter: driver specific private structure with vcxn_mngr
->> + * @params: parameters for this particular transaction including
->> + *   -vc_op: virtchannel operation to send
->> + *   -send_buf: kvec iov for send buf and len
->> + *   -recv_buf: kvec iov for recv buf and len (ignored if NULL)
->> + *   -timeout_ms: timeout waiting for a reply (milliseconds)
->> + *   -async: don't wait for message reply, will lose caller context
->> + *   -async_handler: callback to handle async replies
->> + *
->> + * @returns >= 0 for success, the size of the initial reply (may or may not be
->> + * >= @recv_buf.iov_len, but we never overflow @@recv_buf_iov_base). < 0 for
->> + * error.
->> + */
->> +static ssize_t idpf_vc_xn_exec(struct idpf_adapter *adapter,
->> +			       struct idpf_vc_xn_params params)
-> 
-> Why do you pass @params by value, i.e. whole 56 bytes per each function
-> call instead of passing it by pointer -> 8 bytes per call?
-> 
+The issue has already been fixed with the next commit in net-next:
 
-Not for any particularly good reason. I will fix thanks.
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=c8fba5d6df5e476aa791db4f1f014dad2bb5e904
 
+Sorry for the effort - but really good to see, that the problem has been 
+catched automatically. Good job!
+
+Best regards,
+Oliver
+
+On 2024-02-20 16:40, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    74293ea1c4db net: sysfs: Do not create sysfs for non BQL d..
+> git tree:       net-next
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=13dcc4b4180000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=970c7b6c80a096da
+> dashboard link: https://syzkaller.appspot.com/bug?extid=0c35af046fa98c893c84
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10f38cf8180000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=136d41c2180000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/9bca2f6e074e/disk-74293ea1.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/611a08387d8f/vmlinux-74293ea1.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/78c388071345/bzImage-74293ea1.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+0c35af046fa98c893c84@syzkaller.appspotmail.com
+> 
+> usercopy: Kernel memory exposure attempt detected from null address (offset 0, size 4)!
+> ------------[ cut here ]------------
+> kernel BUG at mm/usercopy.c:102!
+> invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
+> CPU: 1 PID: 5070 Comm: syz-executor201 Not tainted 6.8.0-rc4-syzkaller-01053-g74293ea1c4db #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
+> RIP: 0010:usercopy_abort+0x84/0x90 mm/usercopy.c:102
+> Code: 49 89 ce 48 c7 c3 40 db b7 8b 48 0f 44 de 48 c7 c7 e0 d9 b7 8b 4c 89 de 48 89 c1 41 52 41 56 53 e8 01 c5 60 09 48 83 c4 18 90 <0f> 0b 66 2e 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90 90 90 90 90
+> RSP: 0018:ffffc90003a3fc50 EFLAGS: 00010296
+> RAX: 0000000000000057 RBX: ffffffff8bb7db20 RCX: b071ef5fcc834300
+> RDX: 0000000000000000 RSI: 0000000080000000 RDI: 0000000000000000
+> RBP: ffffffffffffffff R08: ffffffff81753e6c R09: 1ffff92000747f28
+> R10: dffffc0000000000 R11: fffff52000747f29 R12: 0000000000000001
+> R13: 0000000000000004 R14: 0000000000000000 R15: 0000000000000000
+> FS:  0000555555f8e380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000000020001480 CR3: 000000001f404000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>   <TASK>
+>   __check_object_size+0x601/0xa00
+>   check_object_size include/linux/thread_info.h:215 [inline]
+>   check_copy_size include/linux/thread_info.h:251 [inline]
+>   copy_to_user include/linux/uaccess.h:190 [inline]
+>   raw_getsockopt+0x37a/0x490 net/can/raw.c:852
+>   do_sock_getsockopt+0x373/0x850 net/socket.c:2373
+>   __sys_getsockopt+0x270/0x330 net/socket.c:2402
+>   __do_sys_getsockopt net/socket.c:2412 [inline]
+>   __se_sys_getsockopt net/socket.c:2409 [inline]
+>   __x64_sys_getsockopt+0xb5/0xd0 net/socket.c:2409
+>   do_syscall_64+0xf9/0x240
+>   entry_SYSCALL_64_after_hwframe+0x6f/0x77
+> RIP: 0033:0x7f21bfe782a9
+> Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007ffcdfc8f038 EFLAGS: 00000246 ORIG_RAX: 0000000000000037
+> RAX: ffffffffffffffda RBX: 00007ffcdfc8f208 RCX: 00007f21bfe782a9
+> RDX: 0000000000000008 RSI: 0000000000000065 RDI: 0000000000000003
+> RBP: 00007f21bfeeb610 R08: 0000000020001480 R09: 00007ffcdfc8f208
+> R10: 0000000020001440 R11: 0000000000000246 R12: 0000000000000001
+> R13: 00007ffcdfc8f1f8 R14: 0000000000000001 R15: 0000000000000001
+>   </TASK>
+> Modules linked in:
+> ---[ end trace 0000000000000000 ]---
+> RIP: 0010:usercopy_abort+0x84/0x90 mm/usercopy.c:102
+> Code: 49 89 ce 48 c7 c3 40 db b7 8b 48 0f 44 de 48 c7 c7 e0 d9 b7 8b 4c 89 de 48 89 c1 41 52 41 56 53 e8 01 c5 60 09 48 83 c4 18 90 <0f> 0b 66 2e 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90 90 90 90 90
+> RSP: 0018:ffffc90003a3fc50 EFLAGS: 00010296
+> RAX: 0000000000000057 RBX: ffffffff8bb7db20 RCX: b071ef5fcc834300
+> RDX: 0000000000000000 RSI: 0000000080000000 RDI: 0000000000000000
+> RBP: ffffffffffffffff R08: ffffffff81753e6c R09: 1ffff92000747f28
+> R10: dffffc0000000000 R11: fffff52000747f29 R12: 0000000000000001
+> R13: 0000000000000004 R14: 0000000000000000 R15: 0000000000000000
+> FS:  0000555555f8e380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000000020001480 CR3: 000000001f404000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> 
+> 
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+> 
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> 
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+> 
+> If you want syzbot to run the reproducer, reply with:
+> #syz test: git://repo/address.git branch-or-commit-hash
+> If you attach or paste a git patch, syzbot will apply it before testing.
+> 
+> If you want to overwrite report's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+> 
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
+> 
+> If you want to undo deduplication, reply with:
+> #syz undup
+> 
 
