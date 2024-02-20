@@ -1,85 +1,128 @@
-Return-Path: <netdev+bounces-73179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31F8A85B43C
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:52:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1154385B43D
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:52:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A972C2843E1
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 07:52:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99926284421
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 07:52:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A4945BAD5;
-	Tue, 20 Feb 2024 07:51:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F9CD5BAD2;
+	Tue, 20 Feb 2024 07:52:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="bGNhB0lB"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="BEN2Mfv1"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6E25B697
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 07:51:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9FE5A4CE
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 07:52:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708415517; cv=none; b=hnfO3tNQIYf1E34CpuYRqs+u+Rud7Hvf5SJMhy2GFA/6Ijyzr3Rx0NGTcSRi7Am1eKeSLCf6nWadQ5DDk4CR3pd+kUaHmO8K6F0N/qw0vsZM2u1cItmoh7YGPr6ClQkD37W40E/vou2I8OlDKywkGodB0MoaGJd0eq/UmAO7CcM=
+	t=1708415572; cv=none; b=JkQDYEWOLlDgZGvSecrCc+bdI7OUS6O+sDDm62G/YiGAvoH8fC9oECw+CNZMzj2I21IorcFNA8Aglor8Sv9X4WRri+xWJWsqbCxOg6CarK09o/ggSv2/NS7WUR4/UNEwawyiNUSJBfwOWDsratcWJsyh3fUbDlZ66hEVIaygz2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708415517; c=relaxed/simple;
-	bh=STlFEk58iPnqTEPgUbO9JRua3s7ziMI8L3+HEHjxfeo=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=oyJvQk88BehYYJs0MIkCZOGi7k13P1Jke0z7Q4I1vYgK1Uj7ibJ0FH/PleVkuky4px3+DX8CAbghwYxTlhV65XGW1UMgklQ5XDhOQrfw49vzEUuj4bzonUwnizEAo1m+RPhQAlaHJGYVvJypL2Za5ChVuL0c2lC5/1wCAi5esXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=bGNhB0lB; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-Received: from pecola.lan (unknown [159.196.93.152])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 683032009F;
-	Tue, 20 Feb 2024 15:51:52 +0800 (AWST)
+	s=arc-20240116; t=1708415572; c=relaxed/simple;
+	bh=EhUdmAG2+uRv/nvyJQxfBOTiJMdMb+pIsF7h7RGoD80=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jftPDGF6PfmjmslL6gWYLtalid94/6wKen8uIg2P08WI2QsngliH9djy1PCnQf79iMQgQbzTOpTzkqMZYeOrdiZtCFHP5HCxEvTYrCaEDxqZ3MbnV1M7aQ7pgad55Y/s+J7QJNcyTgj92NN69Z1LCWziumNqOYTCpQgzcHI5yZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=BEN2Mfv1; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3394b892691so2794583f8f.1
+        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 23:52:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1708415513;
-	bh=STlFEk58iPnqTEPgUbO9JRua3s7ziMI8L3+HEHjxfeo=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=bGNhB0lBohzFSL2zG0LcwNUNBPKbqPWZLedM92EuytuEF1cNzRB7PuCT6XH4urCXv
-	 KWAI5/kF6DDS0rw0ZDnG/5+pEvSCQTWiYi25F3rOgIH/FfCjRljak8FCkOU+oCODSa
-	 9Vrxo2nYDukoJP1V1SRs8BzLOCQppe//dCcvUDkbnnR9HSVg6Kche6JF1KzxbHf1yI
-	 dEsdaf8Fi6unZ9mh7WgcfnHNOU9tDOB1m6/xXIYEhL2yR8ngiyxxsLAY43gxBR4AvS
-	 6D3jP90EiR8pSvsyL8erlQvNnE/3vUL7J6VgxA3SDUfld1axsEKNcZLAqRTsTm+MzO
-	 o2t/TYzYTTj4w==
-Message-ID: <7c940ae800544aabd92be1fa9e2cd49e3fc50360.camel@codeconstruct.com.au>
-Subject: Re: [PATCH net] net: mctp: take ownership of skb in
- mctp_local_output
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, Matt Johnston <matt@codeconstruct.com.au>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>
-Date: Tue, 20 Feb 2024 15:51:52 +0800
-In-Reply-To: <20240219095247.GV40273@kernel.org>
-References: 
-	<f05c0c62d33fda70c7443287b2769d3eb1b3356c.1707983334.git.jk@codeconstruct.com.au>
-	 <20240219095247.GV40273@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708415569; x=1709020369; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Na8+xfRYHv7a/Vq5NlGv9jubLXm4jSl6ydxMd/DV+kA=;
+        b=BEN2Mfv11NtrH4jbFqDSnCRyCuGc7cUxOhFyru3pVab8PERXp3iDdPNKU/+r35jEZA
+         MLT/cBrIBeSgiuGx1DEff/De3SUcX2DOwIzWRfxhaa4Cq5f/IFd408JPquhT3HQvpVc7
+         FS7UiQkYezURcIz5/Vcmy2HArQEgvPIVMyd6ODwI9PjcbOaPti9BcHAaFQiYyaDiCKDP
+         fm6d3zRSVQwdzWT0tCEHZypVXjeClmfN9am3GdzolTLE2rYj7Kov4Pffq/6i5StYjPcz
+         Qdr34rErZAj+GDZ7JpW9S7Anxma30ZcFd9LbuyhdFlDEvSeX2M9siCMZYhQLsiUlY0H/
+         ANHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708415569; x=1709020369;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Na8+xfRYHv7a/Vq5NlGv9jubLXm4jSl6ydxMd/DV+kA=;
+        b=MdSL/jS5zyvKHcI9Ru7rs4Qfq0DEq3W99gJrXhr+I2rPzjmNJA5k5jC2lB8nDD6Few
+         rDtJYnnNHZC/cctISa45+Gn+7GqaGw/F/tXsTy+QWjMNV14O9IZdprWrHvdnzsdhRs5h
+         tSRYl2ud4arU6D2rZKqRtcLuIhTVVo7vffoBuvIX4lIVZgO4bJ0byEJ+YkP+U3Yhx+bY
+         PSRXb51ptr8xpfWZLSN4Cq3srF6IOszT9ph/6KhC2ryYTjd1vCvS8jq9oDRhoj5kVNCP
+         sZVPh8523yrTePRFsRQlpR3A+172719sVaP/Q5DeLNeL8XCv7g2gF2wfkNBDlPYhgs8Z
+         76Lg==
+X-Gm-Message-State: AOJu0YyQlronnBkYURLWxoVAeGjKKTupotScZa/GbxAN4AV5Cl4C72kr
+	1CIU8mluDFXWB+UEKCXhby0f4DMnQXgdmfJv1eHoZLHBAjsYkxtAV5XWPWRdqNY4uN2qh3+C5xM
+	h
+X-Google-Smtp-Source: AGHT+IHGTZfsrGmyOMqWkQteTCPMWPZPnoE+IIrUbQ8nqnCPv3knk5sX0rk/73VzUzpDRQMCiwWT0Q==
+X-Received: by 2002:a5d:588a:0:b0:33d:3b83:c08 with SMTP id n10-20020a5d588a000000b0033d3b830c08mr6599734wrf.23.1708415569116;
+        Mon, 19 Feb 2024 23:52:49 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id bj29-20020a0560001e1d00b0033d5c454f03sm3796040wrb.114.2024.02.19.23.52.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Feb 2024 23:52:48 -0800 (PST)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	horms@kernel.org
+Subject: [patch net] devlink: fix port dump cmd type
+Date: Tue, 20 Feb 2024 08:52:45 +0100
+Message-ID: <20240220075245.75416-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hi Simon,
-> Previously this path returned -EINVAL. Now it will return rc.
-> But by my reading rc is set to -ENODEV here.
-> Should that be addressed?
+From: Jiri Pirko <jiri@nvidia.com>
 
-Yes! While ENODEV is kind-of suitable here, but it would be better to
-not change that case. I will send a v2 soon.
+Unlike other commands, due to a c&p error, port dump fills-up cmd with
+wrong value, different from port-get request cmd, port-get doit reply
+and port notification.
 
-Thanks for the review.
+Fix it by filling cmd with value DEVLINK_CMD_PORT_NEW.
 
-Cheers,
+Skimmed through devlink userspace implementations, none of them cares
+about this cmd value. Only ynl, for which, this is actually a fix, as it
+expects doit and dumpit ops rsp_value to be the same.
 
+Omit the fixes tag, even thought this is fix, better to target this for
+next release.
 
-Jeremy
+Fixes: bfcd3a466172 ("Introduce devlink infrastructure")
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+---
+v1->v2:
+- target net and add fixes tag
+---
+ net/devlink/port.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/devlink/port.c b/net/devlink/port.c
+index 78592912f657..4b2d46ccfe48 100644
+--- a/net/devlink/port.c
++++ b/net/devlink/port.c
+@@ -583,7 +583,7 @@ devlink_nl_port_get_dump_one(struct sk_buff *msg, struct devlink *devlink,
+ 
+ 	xa_for_each_start(&devlink->ports, port_index, devlink_port, state->idx) {
+ 		err = devlink_nl_port_fill(msg, devlink_port,
+-					   DEVLINK_CMD_NEW,
++					   DEVLINK_CMD_PORT_NEW,
+ 					   NETLINK_CB(cb->skb).portid,
+ 					   cb->nlh->nlmsg_seq, flags,
+ 					   cb->extack);
+-- 
+2.43.2
+
 
