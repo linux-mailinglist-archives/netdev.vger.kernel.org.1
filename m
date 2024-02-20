@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-73354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01CFB85C0CC
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 17:11:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9747685C0CD
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 17:11:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB91428417E
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 16:11:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52A13283FDA
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 16:11:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDBBB763E5;
-	Tue, 20 Feb 2024 16:11:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA12F76405;
+	Tue, 20 Feb 2024 16:11:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EEBjy4eJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a2bJ9i37"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9289762FD
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 16:11:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95EFB763FE
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 16:11:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708445478; cv=none; b=ocnJGI4u1F3ghvxtXczGF3zlJcN9/ea8jEemoVKMGJoWYbl2ucM6anWuo0LekjGOFCdmCR4Ad1j9Q277zgc5zFEsWwBMzBCF1QbK5kNDTG37UXaIKhY0a7gCCDhy9auO2pCtBVQ21tfRTc2gl5NJ9THejb+++VkAyxm230TgVG0=
+	t=1708445479; cv=none; b=tAxwSyhuD7REQYiOM4N3t/ywxfiP8WPX62RELpTDqeOpnYy/nroRQVTZYZZUQYmcFf2Ww7NS3s8QTufExWKki0EMuKj2osLnMvC+Pr7K/t1IJXAaMRMLd2AlI6Ei74uU5QRe2jgkj8amFDiMoshV/btjzENTwLn5bBA7/VJPx+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708445478; c=relaxed/simple;
-	bh=BkRoByV+nAICi8CId3r6ZBlADUfuNfb9jDo7SCrPZXA=;
+	s=arc-20240116; t=1708445479; c=relaxed/simple;
+	bh=KVaDRMn8RBuzqzbMJ/irHhUoeaqF+eKRBP1Xpo+5kaw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ehDAFj+mdZWDddsi3AtLV19YQGkwXGyyAjAO0OkNMal5dCw4IX7plXiGAmdioPkZ5YSUBSsl04muA7W8NdLgY1C3f7XDDKERvnOIRboIQI7uG2L6ahRusApOchCcziLKk8Hrqv7ZynP7tYBODSDwaExDrjcT6sHQ6R8gvA6a1F0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EEBjy4eJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09E18C43390;
+	 MIME-Version; b=bTO9TVxspdCNgs15whZoBusS2wMsHdPOJEyLa0m6QQKBwanriXgWXxjBvN8LWD18PmNwPZujbqVnru8ktQfPHyXH8VZHcc3h0Uh1j0jGN3ipC/osK0USdBqJZw7zviYmCtZHU+lVC3FMplsqT7KaZQf2i4ROAYksINPA1qjkKD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a2bJ9i37; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BBC1C433F1;
 	Tue, 20 Feb 2024 16:11:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1708445478;
-	bh=BkRoByV+nAICi8CId3r6ZBlADUfuNfb9jDo7SCrPZXA=;
+	bh=KVaDRMn8RBuzqzbMJ/irHhUoeaqF+eKRBP1Xpo+5kaw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EEBjy4eJ0fNphXNM6P5jsrDsfeG9xnYY16J00M6FYVV4A0aZytXkKqFFHwE2Ypbyi
-	 q6NKSAXwPqnd5AZ17gVlacWHffrBBYZ6bvsdF+na+c5+LZe6lhVyJiCLe3qWzWyquo
-	 GkQtlhAUPyiAaZsWvIuG+PRcQTEEWcg92ZFXFf4AxQvcipcvjNdiqGXJuJ7kOHfcSl
-	 Sq8I00sfdT6cV1feIjxiHrgBPfVW0Cn+li//WQTxV5zvTEf3QROetseeRecBwDgo+W
-	 +NzS73WFUAotIjJPfud5AoDZub5lmGox8DzyvfV7+Bu7MO0j+AvOlEx0wg3HZmw/+B
-	 bOrW7SnX8VnDg==
+	b=a2bJ9i37cmRJegXslsw0J3tfvgznVqPHvK5Kr7Rn/1yE+8rSodG4B7pifCGJeL7YP
+	 A//XW0uKnwYZqtiwi5e7NVyXbsEcJs4K9dQu92sc+sOjTcID27ngv7WNMCdgu4IhOi
+	 LHhAe7oob0p6+QSi5UAvPCCIQGLZfv+fevhUg0F2lh2k9/Tf1cVyPUMqR4sHjkF/mb
+	 c/1Bwp+eZ64zdyRXdNUx1V8ZbyBcaHYYjyvOaBfsiUDJwBEGu/Ge5Neqasjbi6iNBo
+	 R882bJ+XNJ2Lx0Jmfxe7Va6+PoHx3o0QuwoLQuZDHcGtP00DJnxwWxkFZSFCFXR98g
+	 RMWsJF6BPIuCw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -51,9 +51,9 @@ Cc: netdev@vger.kernel.org,
 	nicolas.dichtel@6wind.com,
 	willemb@google.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net v2 1/2] tools: ynl: make sure we always pass yarg to mnl_cb_run
-Date: Tue, 20 Feb 2024 08:11:11 -0800
-Message-ID: <20240220161112.2735195-2-kuba@kernel.org>
+Subject: [PATCH net v2 2/2] tools: ynl: don't leak mcast_groups on init error
+Date: Tue, 20 Feb 2024 08:11:12 -0800
+Message-ID: <20240220161112.2735195-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240220161112.2735195-1-kuba@kernel.org>
 References: <20240220161112.2735195-1-kuba@kernel.org>
@@ -65,76 +65,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-There is one common error handler in ynl - ynl_cb_error().
-It expects priv to be a pointer to struct ynl_parse_arg AKA yarg.
-To avoid potential crashes if we encounter a stray NLMSG_ERROR
-always pass yarg as priv (or a struct which has it as the first
-member).
-
-ynl_cb_null() has a similar problem directly - it expects yarg
-but priv passed by the caller is ys.
-
-Found by code inspection.
+Make sure to free the already-parsed mcast_groups if
+we don't get an ack from the kernel when reading family info.
+This is part of the ynl_sock_create() error path, so we won't
+get a call to ynl_sock_destroy() to free them later.
 
 Fixes: 86878f14d71a ("tools: ynl: user space helpers")
 Acked-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-Further cleanup to enforce the types in net-next..
----
 CC: nicolas.dichtel@6wind.com
 CC: willemb@google.com
 ---
- tools/net/ynl/lib/ynl.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ tools/net/ynl/lib/ynl.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/tools/net/ynl/lib/ynl.c b/tools/net/ynl/lib/ynl.c
-index c82a7f41b31c..9e41c8c0cc99 100644
+index 9e41c8c0cc99..6e6d474c8366 100644
 --- a/tools/net/ynl/lib/ynl.c
 +++ b/tools/net/ynl/lib/ynl.c
-@@ -466,6 +466,8 @@ ynl_gemsg_start_dump(struct ynl_sock *ys, __u32 id, __u8 cmd, __u8 version)
- 
- int ynl_recv_ack(struct ynl_sock *ys, int ret)
- {
-+	struct ynl_parse_arg yarg = { .ys = ys, };
-+
- 	if (!ret) {
- 		yerr(ys, YNL_ERROR_EXPECT_ACK,
- 		     "Expecting an ACK but nothing received");
-@@ -478,7 +480,7 @@ int ynl_recv_ack(struct ynl_sock *ys, int ret)
- 		return ret;
+@@ -588,7 +588,13 @@ static int ynl_sock_read_family(struct ynl_sock *ys, const char *family_name)
+ 		return err;
  	}
- 	return mnl_cb_run(ys->rx_buf, ret, ys->seq, ys->portid,
--			  ynl_cb_null, ys);
-+			  ynl_cb_null, &yarg);
- }
  
- int ynl_cb_null(const struct nlmsghdr *nlh, void *data)
-@@ -741,11 +743,14 @@ static int ynl_ntf_parse(struct ynl_sock *ys, const struct nlmsghdr *nlh)
- 
- static int ynl_ntf_trampoline(const struct nlmsghdr *nlh, void *data)
- {
--	return ynl_ntf_parse((struct ynl_sock *)data, nlh);
-+	struct ynl_parse_arg *yarg = data;
+-	return ynl_recv_ack(ys, err);
++	err = ynl_recv_ack(ys, err);
++	if (err < 0) {
++		free(ys->mcast_groups);
++		return err;
++	}
 +
-+	return ynl_ntf_parse(yarg->ys, nlh);
++	return 0;
  }
  
- int ynl_ntf_check(struct ynl_sock *ys)
- {
-+	struct ynl_parse_arg yarg = { .ys = ys, };
- 	ssize_t len;
- 	int err;
- 
-@@ -767,7 +772,7 @@ int ynl_ntf_check(struct ynl_sock *ys)
- 			return len;
- 
- 		err = mnl_cb_run2(ys->rx_buf, len, ys->seq, ys->portid,
--				  ynl_ntf_trampoline, ys,
-+				  ynl_ntf_trampoline, &yarg,
- 				  ynl_cb_array, NLMSG_MIN_TYPE);
- 		if (err < 0)
- 			return err;
+ struct ynl_sock *
 -- 
 2.43.0
 
