@@ -1,115 +1,99 @@
-Return-Path: <netdev+bounces-73202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7007085B58B
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:40:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF91585B58E
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:40:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2BE5B2286E
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:40:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2DC61C212C3
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:40:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7161E5CDC4;
-	Tue, 20 Feb 2024 08:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF6D75D46F;
+	Tue, 20 Feb 2024 08:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="bqOT/xcQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kZorPSc3"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8F52E3E8;
-	Tue, 20 Feb 2024 08:40:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A818A5D462;
+	Tue, 20 Feb 2024 08:40:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708418403; cv=none; b=TPJATRVrxnUBycp78yDV1cyNYIE/CoSvUec3vHD/VHLMuAKX3vSK4tEEt1b5fnfpBT1ZzMJSjJKW/xCgRMHNBzdcCqBRwL9WLsVEr7RPBp1x+c/i+sy18wAE97Qq8VkO07Hs2mnS2xBYK//C74yeB0FYguD0anU3IPkEZ4C2pzI=
+	t=1708418428; cv=none; b=gS5EHutCzGOr++CRWIZ6Xnhl0t0H5RREdUHmHgAslz/R26OTHgazboFHd7coCEDa3w2R8VeEaFHrSrUH2gfdKuzVs48CJcu2YDImbVAfjKVzbgHIu/qxFyuhJt20L0uZvlByRgqs3x+v95+hZKv8O8liBmnO61sj6XK49uenlsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708418403; c=relaxed/simple;
-	bh=i2VLmiDs1HDaUbO7Q8ttxsa2e646Y7vLygvMNHBlik0=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=Cq6ukRTI64I+sEWyy5mPwVeuD/IxA5HCVGNCcXpX4NBCILkvqCYbTWDWAnJ+8WHgRqnr6guASb8KiTpaAzJEN8SNMsfsEIHXGgDY1hu7DR6TfI2LVTsEzGQiF6sJmWTmygES1T5s14W7Rd4UhRSjwjftDWKASMbRicIc2lKKNVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=bqOT/xcQ; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=xGUrxgHVXxNC3GiUUaEHTNUllWnhZ7+xy6iEdGOWVl4=; b=bqOT/xcQY7jTWUTHDliC0AJ5Vf
-	1KDsQGPw1ARCEpQXGHaM58TzSHRznwANmOgoiLZnQfCZeERbM9NJYBZcK8K8g5yFXyayreiX9a//N
-	HAstKpFctUthI1Q7Pl1vCClwp2j81cyZpf7cNP0D3gSJAL3nuhJoTGd5evR2sF7XOBCuxV4NMr86X
-	2jlOyUF+CNVD1udm8689/pqG7VpJCD76A5yTqGFpSo1I8zhrEzVM6VvY40Tefv02eKtulMS8gq5zK
-	9/lgvH5/VK28y/2qvuRD0thHxvY/Xi9OxfWmW4FfWZCMkjd0wOa4H4OJyXvF+fUD13M0Ta7hLu+q3
-	8e/vA6vA==;
-Received: from sslproxy07.your-server.de ([78.47.199.104])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rcLfI-000IZ5-Fb; Tue, 20 Feb 2024 09:39:48 +0100
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rcLfH-00043q-34;
-	Tue, 20 Feb 2024 09:39:47 +0100
-Subject: Re: [PATCH net-next 0/3] Change BPF_TEST_RUN use the system page pool
- for live XDP frames
-To: =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20240215132634.474055-1-toke@redhat.com> <87wmr0b82y.fsf@toke.dk>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <631d6b12-fb5c-3074-3770-d6927aea393d@iogearbox.net>
-Date: Tue, 20 Feb 2024 09:39:47 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1708418428; c=relaxed/simple;
+	bh=HLOlmpHG1kZkcB4qdxThMT87TdWuTnbWHGjkYOlMYAI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=R6VhJKQQn1mJE0R2FNLNZxCtLIsegdabg3XxL7Ow2wmBeEGQM7jOl2uwclzKSO2gbWUCyVLv2443GvOgTpD+5IIti93n2Mco9xcMOFRJRlVQERkeqbVXMh3+YYMfM9A3GI7NMKVfWoe6d5LdFsJj6Zg043+rIRfT30UjNmmY8UU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kZorPSc3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 292AEC43390;
+	Tue, 20 Feb 2024 08:40:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708418428;
+	bh=HLOlmpHG1kZkcB4qdxThMT87TdWuTnbWHGjkYOlMYAI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=kZorPSc3doIkz9twbLj8iD5DqotbpJrRJ4CImKdbZN1Km1bH39bb2ZeX0eDOg+K4H
+	 8ISLG/j0JuCWLz/gblaZ3HnEXFu5crFpM6TdwRJNA2P9qP34HNMD4e1ykgArQaAlmt
+	 4cxkimRZgW/kwx9JHGy01OJiykETEQiUqOVo9JvEgPA5bqyTEM/4IgD1nAz7uDDGcG
+	 XtvfZJK5BgGaFqjo7a+J+qiqFcVSKKG/YbhaedcTx/pdUq60MzuxW/AcWt2d+OJ2Jg
+	 rb3KJQ5U32bd71E252ALN7wWZCMMIQC2oB42QnNA5+DnpMZ/FqCrgHCEgaGzCQ3+cn
+	 8kLPhU3+L109Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 111CAC04E32;
+	Tue, 20 Feb 2024 08:40:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <87wmr0b82y.fsf@toke.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27190/Mon Feb 19 10:24:27 2024)
+Subject: Re: [PATCH net-next v8 0/2] Abstract page from net stack
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170841842806.28167.12571319635937974620.git-patchwork-notify@kernel.org>
+Date: Tue, 20 Feb 2024 08:40:28 +0000
+References: <20240214223405.1972973-1-almasrymina@google.com>
+In-Reply-To: <20240214223405.1972973-1-almasrymina@google.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, jgg@nvidia.com,
+ christian.koenig@amd.com, shakeelb@google.com, linyunsheng@huawei.com,
+ willemdebruijn.kernel@gmail.com
 
-On 2/19/24 7:52 PM, Toke Høiland-Jørgensen wrote:
-> Toke Høiland-Jørgensen <toke@redhat.com> writes:
-> 
->> Now that we have a system-wide page pool, we can use that for the live
->> frame mode of BPF_TEST_RUN (used by the XDP traffic generator), and
->> avoid the cost of creating a separate page pool instance for each
->> syscall invocation. See the individual patches for more details.
->>
->> Toke Høiland-Jørgensen (3):
->>    net: Register system page pool as an XDP memory model
->>    bpf: test_run: Use system page pool for XDP live frame mode
->>    bpf: test_run: Fix cacheline alignment of live XDP frame data
->>      structures
->>
->>   include/linux/netdevice.h |   1 +
->>   net/bpf/test_run.c        | 138 +++++++++++++++++++-------------------
->>   net/core/dev.c            |  13 +++-
->>   3 files changed, 81 insertions(+), 71 deletions(-)
-> 
-> Hi maintainers
-> 
-> This series is targeting net-next, but it's listed as delegate:bpf in
-> patchwork[0]; is that a mistake? Do I need to do anything more to nudge it
-> along?
+Hello:
 
-I moved it over to netdev, it would be good next time if there are dependencies
-which are in net-next but not yet bpf-next to clearly state them given from this
-series the majority touches the bpf test infra code.
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-> -Toke
+On Wed, 14 Feb 2024 14:34:01 -0800 you wrote:
+> Changes in v8:
+> - Moved back skb_add_rx_frag_netmem to .c file (Paolo).
+> - Applied Paolo's Acked-by.
 > 
-> [0] https://patchwork.kernel.org/project/netdevbpf/list/?series=826384
+> -----------
+> 
+> Changes in v7;
+> - Addressed comments from Paolo.
+>   - Moved skb_add_rx_frag* to header file.
+>   - Moved kcmsock.c check.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v8,1/2] net: introduce abstraction for network memory
+    https://git.kernel.org/netdev/net-next/c/18ddbf5cf0e7
+  - [net-next,v8,2/2] net: add netmem to skb_frag_t
+    https://git.kernel.org/netdev/net-next/c/21d2e6737c97
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
