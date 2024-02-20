@@ -1,96 +1,175 @@
-Return-Path: <netdev+bounces-73308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AF2A85BD37
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 14:32:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87E0985BD52
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 14:38:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8E221F22D30
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 13:32:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A92BC1C224BD
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 13:38:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 362A16A32B;
-	Tue, 20 Feb 2024 13:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6CFE6A348;
+	Tue, 20 Feb 2024 13:38:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YJsUQi5K"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="OewB+TF4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com [209.85.222.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 053C069E05;
-	Tue, 20 Feb 2024 13:32:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B7C96A337
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 13:38:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708435924; cv=none; b=eHszwRqhqKzTLrbA1a7GIUuHOdo1uY5HtPTs06Hqs0BWje54iUNT7ez3fdhKAnYij4wdNYr3ygR5XQOYhQu9jeOde9fNZtjD2exWejdFFsfOGvIKmTjYayfWYlwJ5N+yiwFq6UIYm9Sx24Gzs6czc/gt7FthaiKStJXtPfWLGj4=
+	t=1708436327; cv=none; b=j2KA+edNUhmEORjykd2zLie7SXxrZNVV4kdb2sMCCPQK1KyN95ZAnAHmSB/qansLqeVWeXRUEknJCwNksdm6kpnSL5MawVPYuaI6618WxtVtYGBEih3IA1vwnbGrsi1rYGaptlL0tzohq23trcxJanX/O/4AyslZxPx3SkiK0oQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708435924; c=relaxed/simple;
-	bh=kSbCNkvZKv7xzsaEeoxDKEEwm8/5FhdatiejKc2BuLY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X/406Q+uawDsH3A5BmKl9aBbuHGcaAt70JqCpsUJNvHslu25JrEKV/6m+tfI+NIsZgJZAIy42KpxpDrTSWLSdFL5llwneZm58gsd5bKX6T9gRmXirD+HHadkQqOdMyl05HqOGvjy/tm4CH++wEn/KKomTw+xfA3wSMQdDrxYg14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YJsUQi5K; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 556E2C433C7;
-	Tue, 20 Feb 2024 13:32:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708435923;
-	bh=kSbCNkvZKv7xzsaEeoxDKEEwm8/5FhdatiejKc2BuLY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YJsUQi5KCSO8MtsgHZ+Vn/m7BcHINEuYM5ToUiaFq7kh2KQMRPea4IFD5yzNstNiD
-	 1rIrxcgdE21DiDSY+Q2JJxcDATS0zp9n2BOMTPLWHFRlbsXLbHaaqN5dvJRaiDArc7
-	 v/X9MUp8DeIQZnjEpz/WW9n9i2tUrPb1ZFwv+vbErFChi21tJp2tWkJtX7HBup9UZQ
-	 IRBcqjs1VlPXekQrY3dUUtseVwFyj5b9J8dvDyM/KdT59kDx5Z9w6ypWLA4FsSESQH
-	 3j7QwtZUDUGkVZR1WWGjNCetelLouTz+eg5OLO2Ij0xwNRIa3n6pZCBufJmoXudWHV
-	 3xQ463OyS0adQ==
-Date: Tue, 20 Feb 2024 13:31:58 +0000
-From: Simon Horman <horms@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Steve French <smfrench@gmail.com>, Jeff Layton <jlayton@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Christian Brauner <christian@brauner.io>, netfs@lists.linux.dev,
-	linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Steve French <sfrench@samba.org>,
-	Shyam Prasad N <nspmangalore@gmail.com>,
-	Rohith Surabattula <rohiths.msft@gmail.com>
-Subject: Re: [PATCH v5 09/12] cifs: Cut over to using netfslib
-Message-ID: <20240220133158.GL40273@kernel.org>
-References: <20240209105947.GF1516992@kernel.org>
- <20240205225726.3104808-1-dhowells@redhat.com>
- <20240205225726.3104808-10-dhowells@redhat.com>
- <140602.1708355444@warthog.procyon.org.uk>
+	s=arc-20240116; t=1708436327; c=relaxed/simple;
+	bh=4WZOopDoEYKpAtwPm5C0A71TU5vL9M5eFHgg+NZQj4w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SKqzDGI5PJY76vXwjdUnWV2zwEuAiOrV0xKsCb48pdbC1F6Pszdl+ZcYniDGwRluTJ3WaS18Vv41nHnWoMiGY4KH8aatG1+BLSlcqI3D3MH1SLfcZJXEACkiuKiqkqCQ9RTQSedDbJVv0AVZ2IoCjA0hfW8iHzB4V8uwL8j2O5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=OewB+TF4; arc=none smtp.client-ip=209.85.222.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-7d5cbc4a585so1379685241.3
+        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 05:38:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1708436325; x=1709041125; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jYWyO9WtNhHDsuk1E/qE9QTBsr5s/M0F3rpI0kzs3Ro=;
+        b=OewB+TF498dZFsT/KuZm7ufWPtOwybPSt3hEHvRNDqzwE7m9wAi8x+gaS0uUgHnfud
+         8/SW6nylrrsqUBhU0ZtsB6TOqazdzg62hNqvxA2aDSVb+b77OgymP+ZBePaiu/lQf7U7
+         CwM0Tv81mVdcqbZyXnn918TFP5SeE5NjqsvlqSPxxPVcyfd9MCVU07zWyaKebJnBfi+r
+         3XjsPR6g4dCr8qTZVwmFGb2k1W6EqgX9wFpMpydW/d1Ctd6HSMfKItoj+uOqE7WpE3pA
+         gerrJlMLDgdfzRCMVtKLS8OUfDTGb7H9E+JgXoL9v/qxxi4fb/zZQ394shf/+HJurLEU
+         Yrag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708436325; x=1709041125;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jYWyO9WtNhHDsuk1E/qE9QTBsr5s/M0F3rpI0kzs3Ro=;
+        b=Foadrj2iK8XQNdF5iihFijmlcEk/66afXT6D9eJiF/eA16ZAzCHJ/rwBNRgFjb/QUD
+         E/PDw888B30Mb7EAE5OlejDV2HbK+ohl5NzGL+405KrwUAbPLj1hKJAbPcj9vVNamwYJ
+         LnPGOA4+WGtkePGj/wREGxqaRz2lsT7LODh9auTrYV2mJt8mlwY4/0w7YIt7iJ0vbHbk
+         YBbfsH/DKTyBbilMubBMj7EseK7h4BF1SmVphQoeqVNXMAfzuOeXQvTSEdTj4QVPmlKH
+         QefbkXjJJOMrbvoplcQ/FnJFrkeX3z72fS4n/JQUy3bh7k/Qc5a84elSPYdvo+74mP7a
+         NzXw==
+X-Forwarded-Encrypted: i=1; AJvYcCWp2MKmOx7wt4VN6Srm4elX9MeSOHQvE6vf+YuuPjF4yBuTshrL3K1f0o2hzhmFc6l7oWYxslL7aqOcdgqqRwS44XlCOyQs
+X-Gm-Message-State: AOJu0YxYGCQddzR7tYlAMhlQ0LHX8Fgn16/yoZ1Yym5D6WHyjuuU9b3X
+	Pn69+F59KUkc7wJ0mz8kNVRGYnHFaTbNGCUrM5Wjb0+Urh7aMsi88rDHqT9LpV1tZJB8slzsqLN
+	pRsOEnioMsj6qzeuSpv53Edx/xFmW2ftRonlszw==
+X-Google-Smtp-Source: AGHT+IHez508i8rKwFXJLq+MmlnYcRFhCJXklYpkOKtPALfYGVznxIgsQEekDscIKGhR2FGP8107Do5jDZq7aOpexmY=
+X-Received: by 2002:a67:fbcb:0:b0:470:3ece:b431 with SMTP id
+ o11-20020a67fbcb000000b004703eceb431mr5233751vsr.4.1708436324939; Tue, 20 Feb
+ 2024 05:38:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <140602.1708355444@warthog.procyon.org.uk>
+References: <20240216203215.40870-1-brgl@bgdev.pl> <20240216203215.40870-10-brgl@bgdev.pl>
+ <48164f18-34d0-4053-a416-2bb63aaae74b@sirena.org.uk> <CAMRc=Md7ymMTmF1OkydewF5C32jDNy0V+su7pcJPHKto6VLjLg@mail.gmail.com>
+ <8e392aed-b5f7-486b-b5c0-5568e13796ec@sirena.org.uk> <CAMRc=MeAXEyV47nDO_WPQqEQxSYFWTrwVPAtLghkfONj56FGVA@mail.gmail.com>
+ <5a3f5e1b-8162-4619-a10b-d4711afe533b@sirena.org.uk>
+In-Reply-To: <5a3f5e1b-8162-4619-a10b-d4711afe533b@sirena.org.uk>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Tue, 20 Feb 2024 14:38:33 +0100
+Message-ID: <CAMRc=MdTub4u0dm5PgTQPnYPuR=SRnh=ympEZqo_UyrQDrQw6w@mail.gmail.com>
+Subject: Re: [PATCH v5 09/18] arm64: dts: qcom: qrb5165-rb5: model the PMU of
+ the QCA6391
+To: Mark Brown <broonie@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Kalle Valo <kvalo@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konrad.dybcio@linaro.org>, Liam Girdwood <lgirdwood@gmail.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Saravana Kannan <saravanak@google.com>, 
+	Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>, 
+	Neil Armstrong <neil.armstrong@linaro.org>, Marek Szyprowski <m.szyprowski@samsung.com>, 
+	Alex Elder <elder@linaro.org>, Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
+	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, 
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 19, 2024 at 03:10:44PM +0000, David Howells wrote:
-> Simon Horman <horms@kernel.org> wrote:
-> 
-> > >  /* Functions related to files and directories */
-> > > +extern const struct netfs_request_ops cifs_req_ops;
-> > >  extern const struct file_operations cifs_file_ops;
-> > >  extern const struct file_operations cifs_file_direct_ops; /* if directio mnt */
-> > >  extern const struct file_operations cifs_file_strict_ops; /* if strictio mnt */
-> > 
-> > Nit: this hunk would probably be better placed in the
-> >      patch at adds cifs_req_ops to fs/smb/client/file.c
-> 
-> I'm not sure I understand what you mean.  Is there a bit missing between "at"
-> and "adds" in that?
+On Tue, Feb 20, 2024 at 2:31=E2=80=AFPM Mark Brown <broonie@kernel.org> wro=
+te:
+>
+> On Tue, Feb 20, 2024 at 12:16:10PM +0100, Bartosz Golaszewski wrote:
+> > On Mon, Feb 19, 2024 at 8:59=E2=80=AFPM Mark Brown <broonie@kernel.org>=
+ wrote:
+> > > On Mon, Feb 19, 2024 at 07:48:20PM +0100, Bartosz Golaszewski wrote:
+>
+> > > > No, the users don't request any regulators (or rather: software
+> > > > representations thereof) because - as per the cover letter - no
+> > > > regulators are created by the PMU driver. This is what is physicall=
+y
+> > > > on the board - as the schematics and the datasheet define it. I too=
+k
+>
+> > > The above makes no sense.  How can constraints be "what is physically=
+ on
+> > > the board", particularly variable constrants when there isn't even a
+> > > consumer?  What values are you taking from which documentation?
+>
+> > The operating conditions for PMU outputs. I took them from a
+> > confidential datasheet. There's a table for input constraints and
+> > possible output values.
+>
+> That sounds like you're just putting the maximum range of voltages that
+> the PMU can output in there.  This is a fundamental misunderstanding of
+> what the constraints are for, the constraints exist to specify what is
+> safe on a specific board which will in essentially all cases be much
+> more restricted.  The regulator driver should describe whatever the PMU
+> can support by itself, the constraints whatever is actually safe and
+> functional on the specific board.
+>
 
-Sorry, "patch that adds".
+Ok, got it. Yeah I misunderstood that, but I think it's maybe the
+second or third time I'm adding a regulators node myself to DT. I'll
+change that.
 
-What I meant is, the declaration of cifs_req_ops and it's definition
-seem to appear in different patches of this series. And it might
-make sense if they were both in the same patch. But given that
-both are present by the end of the series it is more cosmetic
-than anything else.
+> > And what do you mean by there not being any consumers? The WLAN and BT
+> > *are* the consumers.
+>
+> There are no drivers that bind to the regulators and vary the voltages
+> at runtime.
+>
 
+Even with the above misunderstanding clarified: so what? DT is the
+representation of hardware. There's nothing that obligates us to model
+DT sources in drivers 1:1.
+
+> > > > the values from the docs verbatim. In C, we create a power sequenci=
+ng
+> > > > provider which doesn't use the regulator framework at all.
+>
+> > > For something that doesn't use the regulator framework at all what
+> > > appears to be a provider in patch 16 ("power: pwrseq: add a driver fo=
+r
+> > > the QCA6390 PMU module") seems to have a lot of regualtor API calls?
+>
+> > This driver is a power sequencing *provider* but also a regulator
+> > *consumer*. It gets regulators from the host and exposes a power
+> > sequencer to *its* consumers (WLAN and BT). On DT it exposes
+> > regulators (LDO outputs of the PMU) but we don't instantiate them in
+> > C.
+>
+> Right, which sounds a lot like being a user of the regualtor framework.
+
+Ok, I meant "user" as a regulator provider but maybe I wasn't clear enough.
+
+Bart
 
