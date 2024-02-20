@@ -1,122 +1,131 @@
-Return-Path: <netdev+bounces-73299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ACD585BCD2
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 14:04:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2692485BCD7
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 14:07:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3098A1F21948
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 13:04:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5EFB1F22E72
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 13:07:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AD0C69E17;
-	Tue, 20 Feb 2024 13:04:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E76A269E1B;
+	Tue, 20 Feb 2024 13:07:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="J+9j8m+L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ojKrj4cO"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35156692E9;
-	Tue, 20 Feb 2024 13:04:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C045269D0B;
+	Tue, 20 Feb 2024 13:07:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708434279; cv=none; b=kRsBTNf+dm8xeCnKSaO+p05VBSLNQ7CIZMqymIA5F9pIYmeoHCafW8OOTPNWvGZHEoPSsqK9kMqv0t+YKr1oAP8ktk2ax+eQFV92KtTCJedxQ+16f/2J5wgzYuLDuzH3wdmEddXTd4FBg6ri52D4oMETNJ3oiiy1BmNRrIGyUj4=
+	t=1708434460; cv=none; b=b7cpL575ZgslamE+f+czdYIAfVflaW3pEeub5DiPEu0Wf1TTUaiCVEXl070y21WIM150LOWdDDoIMg/xyhLzejiUS4OsHkVNTAHjN+oU1dKJLHg63gBhHUJvKJKDnWd1bLOSZSw9JgRObYKtzcmvhLdIdTfvyaC2RFPxRXalcyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708434279; c=relaxed/simple;
-	bh=qw68cbvWVCDaSiCaFt0mqKtZsY5Hg/JPm2WM1pvSFcQ=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=VOqne1tSn3QKqNUjtc8rvNBBZgXKhprtqdEngelHHYlVh71MMXcsKQjRTkkSAccESjK1/aNzwzI/YfP4IC/JR63cnu3Sn+qkKXMmTljWAhwtnsIw94XV8a3uALNFmUto8AFZsTON0pQPqxMmePbxHKnKYq5wlfmu8DqjB8UJv9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=J+9j8m+L; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=dXPxbG3jp1RJ38PIYIcqm3sOHazDTTUmnZEfZczc+no=; b=J+9j8m+LB244AtFelsGKWdhTNN
-	9L8bbYJv5f63E2hZ7/ucVvO0sEY8v0If6gLAhbBhkGZkrOk+k6vB8HhSDsCSw4/HM35vUw6GsiW5M
-	4vvb5Nfu1Bw0rl3r3S2JQ8ARdg+AvW4YVY7QDXIrchoo2sZUgAxoWRXLRGQ4WlqQL2PwVIcw/0Tgs
-	Q0WWNNGdh1V1iqSZv/dFDAk+EE4Pdps4KPa9ixVY0tNMCB7nEf2B1E+IrThu1AGUHqszV5+AYck2J
-	ERZbMFphlC5m6zbv84D80ZcdySqgo8hFtprKA4AjFZqDx7IKMvAbLxp4CDxns/mnPgtst2+ZP2xHe
-	iITyA5xg==;
-Received: from sslproxy04.your-server.de ([78.46.152.42])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rcPLa-000Lm0-3s; Tue, 20 Feb 2024 13:35:42 +0100
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy04.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rcPLZ-000QAW-J4; Tue, 20 Feb 2024 13:35:41 +0100
-Subject: Re: [PATCH net-next 0/3] Change BPF_TEST_RUN use the system page pool
- for live XDP frames
-To: =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20240215132634.474055-1-toke@redhat.com> <87wmr0b82y.fsf@toke.dk>
- <631d6b12-fb5c-3074-3770-d6927aea393d@iogearbox.net> <87o7cbbcqj.fsf@toke.dk>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <c888b60a-0be5-8e7c-0fa0-8039e691406a@iogearbox.net>
-Date: Tue, 20 Feb 2024 13:35:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1708434460; c=relaxed/simple;
+	bh=ehswDltK3/4NFo3wnSiDCuhI7Mpdtyxc0vlD7vfoB6E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pklBNPlqnIG7l3sIvmJilkQgdYkjWhLtSl/QPODx7h7AYQyWKsfZ2NJRawFlsghtUyoe9tRYyU2CHeXdc9LFD8gcdbhoxUhGBYtpju5cGZUnXEnXTQGI6+PucMgrce3ljRMOYluhkrfw6yiOxeQFWOxig15U5/+ZpN1SvIkPesI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ojKrj4cO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8D70C433C7;
+	Tue, 20 Feb 2024 13:07:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708434460;
+	bh=ehswDltK3/4NFo3wnSiDCuhI7Mpdtyxc0vlD7vfoB6E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ojKrj4cO7lNYmywHneIX4t4r7Lws02ZhWpIwyKPHHxdOYDe8F2Fc8kfam1bDLEleb
+	 AsoBgNjuNRe8UUvvNh4wyMTUaRkTTz+awpZEWwqUEZjgHsdgvZRvdgvsqpp5Xehs+e
+	 Y3iWNo0hwKX6AySrVePYFUXsTB/Cj+Qpc/sO2RTfAM3o+SZLVm9tWcAgtSlrPJwDqI
+	 KP5ly5tyvfiQe2oH8ihoVlq+PTIvhTydpCYgxEH/I5y2I4gqmFyiynmpgfc9Y+Mo1H
+	 ES9hkMt+Bbh3Zv4UrCogSwVv+i08b1huUYTPeWuAq2yDrkI9qLeaaiBHRtli9F0AAK
+	 UACD0b9YmbeAw==
+Date: Tue, 20 Feb 2024 13:07:35 +0000
+From: Simon Horman <horms@kernel.org>
+To: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
+Cc: j.vosburgh@gmail.com, andy@greyhouse.net, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	rajesh.sivaramasubramaniom@oracle.com, rama.nichanamatlu@oracle.com,
+	manjunath.b.patil@oracle.com
+Subject: Re: [PATCH net-next v4] bonding: rate-limit bonding driver inspect
+ messages
+Message-ID: <20240220130735.GI40273@kernel.org>
+References: <20240220050437.5623-1-praveen.kannoju@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <87o7cbbcqj.fsf@toke.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27191/Tue Feb 20 10:25:13 2024)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240220050437.5623-1-praveen.kannoju@oracle.com>
 
-On 2/20/24 12:23 PM, Toke Høiland-Jørgensen wrote:
-> Daniel Borkmann <daniel@iogearbox.net> writes:
->> On 2/19/24 7:52 PM, Toke Høiland-Jørgensen wrote:
->>> Toke Høiland-Jørgensen <toke@redhat.com> writes:
->>>
->>>> Now that we have a system-wide page pool, we can use that for the live
->>>> frame mode of BPF_TEST_RUN (used by the XDP traffic generator), and
->>>> avoid the cost of creating a separate page pool instance for each
->>>> syscall invocation. See the individual patches for more details.
->>>>
->>>> Toke Høiland-Jørgensen (3):
->>>>     net: Register system page pool as an XDP memory model
->>>>     bpf: test_run: Use system page pool for XDP live frame mode
->>>>     bpf: test_run: Fix cacheline alignment of live XDP frame data
->>>>       structures
->>>>
->>>>    include/linux/netdevice.h |   1 +
->>>>    net/bpf/test_run.c        | 138 +++++++++++++++++++-------------------
->>>>    net/core/dev.c            |  13 +++-
->>>>    3 files changed, 81 insertions(+), 71 deletions(-)
->>>
->>> Hi maintainers
->>>
->>> This series is targeting net-next, but it's listed as delegate:bpf in
->>> patchwork[0]; is that a mistake? Do I need to do anything more to nudge it
->>> along?
->>
->> I moved it over to netdev, it would be good next time if there are dependencies
->> which are in net-next but not yet bpf-next to clearly state them given from this
->> series the majority touches the bpf test infra code.
+On Tue, Feb 20, 2024 at 10:34:37AM +0530, Praveen Kumar Kannoju wrote:
+> Through the routine bond_mii_monitor(), bonding driver inspects and commits
+> the slave state changes. During the times when slave state change and
+> failure in aqcuiring rtnl lock happen at the same time, the routine
+> bond_mii_monitor() reschedules itself to come around after 1 msec to commit
+> the new state.
 > 
-> Right, I thought that was what I was doing by targeting them at net-next
-> (in the subject). What's the proper way to do this, then, just noting it
-> in the cover letter? :)
+> During this, it executes the routine bond_miimon_inspect() to re-inspect
+> the state chane and prints the corresponding slave state on to the console.
+> Hence we do see a message at every 1 msec till the rtnl lock is acquired
+> and state chage is committed.
+> 
+> This patch doesn't change how bond functions. It only simply limits this
+> kind of log flood.
+> 
+> Signed-off-by: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
+> ---
+> v4:
+>   - Rectification in the patch subject and versioning details.
+> v3: https://lore.kernel.org/lkml/20240219133721.4567-1-praveen.kannoju@oracle.com/
+>   - Commit message is modified to provide summary of the issue, because of
+>     which rate-limiting the bonding driver messages is needed.
+> v2: https://lore.kernel.org/lkml/20240215172554.4211-1-praveen.kannoju@oracle.com/
+>   - Use exising net_ratelimit() instead of introducing new rate-limit
+>     parameter.
+> v1: https://lore.kernel.org/lkml/20240214044245.33170-1-praveen.kannoju@oracle.com/
+> ---
+>  drivers/net/bonding/bond_main.c | 36 ++++++++++++++++++++----------------
+>  1 file changed, 20 insertions(+), 16 deletions(-)
+> 
+> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+> index 4e0600c..e92eba1 100644
+> --- a/drivers/net/bonding/bond_main.c
+> +++ b/drivers/net/bonding/bond_main.c
+> @@ -2610,12 +2610,13 @@ static int bond_miimon_inspect(struct bonding *bond)
+>  			commit++;
+>  			slave->delay = bond->params.downdelay;
+>  			if (slave->delay) {
+> -				slave_info(bond->dev, slave->dev, "link status down for %sinterface, disabling it in %d ms\n",
+> -					   (BOND_MODE(bond) ==
+> -					    BOND_MODE_ACTIVEBACKUP) ?
+> -					    (bond_is_active_slave(slave) ?
+> -					     "active " : "backup ") : "",
+> -					   bond->params.downdelay * bond->params.miimon);
+> +				if (net_ratelimit())
+> +					slave_info(bond->dev, slave->dev, "link status down for %sinterface, disabling it in %d ms\n",
+> +						   (BOND_MODE(bond) ==
+> +						   BOND_MODE_ACTIVEBACKUP) ?
+> +						   (bond_is_active_slave(slave) ?
+> +						   "active " : "backup ") : "",
+> +						   bond->params.downdelay * bond->params.miimon);
+>  			}
 
-An explicit lore link to the series this depends on would be best.
+Hi Praveen,
 
-Thanks,
-Daniel
+As this is used several times I think that it would be worth introducing
+a slave_info_ratelimit() helper. That is  assuming slave_info() is still used
+without a rate limit. If not, you could just add net_ratelimit directly
+to slave_info().
+
+If none of this is desirable for some reason, then could you consider
+reducing indentation somehow. f.e.:
+
+		if (slave->delayi && net_ratelimit())
+			slave_info(...
 
