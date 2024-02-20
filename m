@@ -1,115 +1,107 @@
-Return-Path: <netdev+bounces-73242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BA2285B92C
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 11:36:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CA6D85B92D
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 11:36:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36CEC1F2118A
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 10:36:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DB191F21BFD
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 10:36:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C70B36351C;
-	Tue, 20 Feb 2024 10:35:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ApxIDerl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEC5F5FDA7;
+	Tue, 20 Feb 2024 10:36:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FD9162178
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 10:35:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD8D33EA88
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 10:36:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708425332; cv=none; b=Lx7laTjRMMl1gvTnmZJ2sq5KTmXvDK+cJhZ0rfwhsuAR1Ikt6o5jAORUZKvlg65pNOBO26GGYhT7hJLRkbQ/3F5VK0YyXpWX+mXGSafoILUW7FWwWbXToS+nRv1Ddwk8Wf0TCVcyDRsMILl1QM2ifhSqMJ3bKJGENFPQ3pNFBNU=
+	t=1708425389; cv=none; b=dX7TNvFiHbdO59dhhLsfY5iM8AVlBg8hhhfQlf1k2SyDllfoPJAunPkZfgxwqL2Qm3ATrCwclz4bJlc/ggK6V6Mj7Tcgyw4BcgTbA7jxhlu0GXQTf6+jy588NwGNeZuj9BFTETP8Af01PC9WfnpjaE/mCpOfTQb2R7r9jvFsVqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708425332; c=relaxed/simple;
-	bh=HEvXUMThvUIqnt0LiI+bBVgaUe3iN2uphGAvjHQ1fog=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=kMIX7mpLJV7PkfpSTRJFVcrN1ObX1B+5QQWc8b6h6X+h8I576S69vXjQXEeKjrT4Bf6dtiokhPNnOrJsrkVv03anGSRIiNR0arTiXNho3HrZ4mS0vhCMm3PjuF4fD4h3NbSe6CpWkAcdJLp+t1I1AfevG0kNxRqSPXtKv/JNpZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ApxIDerl; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708425330;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=svGjrbyynWHu4RkuCMOXvlEyLxwGmnZthB0JJWKitFw=;
-	b=ApxIDerl4f1KrlZS9r0ysxkcaIy8ske5+VWIfAoL/vfgf55aBlMHKqe6NXzQXfkOaAyeeq
-	79CcqxJKItjQ+ogEVqS0WIl16mtDj/CiTIdtrhMy4pg0wp2MxHdmHHxqj0lFakg2TKXqSr
-	GfYWHik9o/0KAID59qgNTEWoBSRO6Hs=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-36-El1YA-VmOemMflwWPxauPA-1; Tue, 20 Feb 2024 05:35:25 -0500
-X-MC-Unique: El1YA-VmOemMflwWPxauPA-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0D93C106D020;
-	Tue, 20 Feb 2024 10:35:25 +0000 (UTC)
-Received: from tpad.localdomain (unknown [10.96.133.2])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id D4979492BC6;
-	Tue, 20 Feb 2024 10:35:24 +0000 (UTC)
-Received: by tpad.localdomain (Postfix, from userid 1000)
-	id 3E04540194B36; Tue, 20 Feb 2024 07:35:04 -0300 (-03)
-Date: Tue, 20 Feb 2024 07:35:04 -0300
-From: Marcelo Tosatti <mtosatti@redhat.com>
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Valentin Schneider <vschneid@redhat.com>
-Subject: [PATCH] net/core/dev.c: enable timestamp static key if CPU isolation
- is configured
-Message-ID: <ZdSAWAwUxc5R46NH@tpad>
+	s=arc-20240116; t=1708425389; c=relaxed/simple;
+	bh=b0fnN4tJo+dXZsnVc4JP8UP1L62OJmcOPerir6pVoxU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dbhFgv3ato0UaksPd3MENNAW4yktZNVFZFii6b464WB118c7nT/w/t5Kv1A7kE21Y+tBnbHU1NoMx6KTIn2xt1FPinYAeXn3rDMw6CMv1mxOWsH0GTAVJ73QACZi/euAVp0x6LQkUmntOW/kbU9hv9pp2RMBhdzqRBow58CAE3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.41.52] (port=35162 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1rcNTy-009sz4-1R; Tue, 20 Feb 2024 11:36:16 +0100
+Date: Tue, 20 Feb 2024 11:36:13 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: kovalev@altlinux.org
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, jiri@resnulli.us,
+	jacob.e.keller@intel.com, johannes@sipsolutions.net,
+	idosch@nvidia.com, horms@kernel.org, david.lebrun@uclouvain.be
+Subject: Re: [PATCH net ver.2] genetlink: fix possible use-after-free and
+ null-ptr-deref in genl_dumpit()
+Message-ID: <ZdSAndRQxKGkV/EO@calendula>
+References: <20240220102512.104452-1-kovalev@altlinux.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+In-Reply-To: <20240220102512.104452-1-kovalev@altlinux.org>
+X-Spam-Score: -1.8 (-)
 
-For systems that use CPU isolation (via nohz_full), creating or destroying
-a socket with  timestamping (SOF_TIMESTAMPING_OPT_TX_SWHW) might cause a
-static key to be enabled/disabled. This in turn causes undesired 
-IPIs to isolated CPUs.
+On Tue, Feb 20, 2024 at 01:25:12PM +0300, kovalev@altlinux.org wrote:
+> From: Vasiliy Kovalev <kovalev@altlinux.org>
+> 
+> The pernet operations structure for the subsystem must be registered
+> before registering the generic netlink family.
 
-So enable the static key unconditionally, if CPU isolation is enabled,
-thus avoiding the IPIs.
+IIRC, you pointed to a syzbot report on genetlink similar to gtp.
 
-Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
+Maybe add that tag here and get the robot to test this fix?
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 0d548431f3fa..cc9a77b4aa4e 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -153,6 +153,7 @@
- #include <linux/prandom.h>
- #include <linux/once_lite.h>
- #include <net/netdev_rx_queue.h>
-+#include <linux/sched/isolation.h>
- 
- #include "dev.h"
- #include "net-sysfs.h"
-@@ -11601,3 +11602,14 @@ static int __init net_dev_init(void)
- }
- 
- subsys_initcall(net_dev_init);
-+
-+static int __init net_dev_late_init(void)
-+{
-+	/* avoid static key IPIs to isolated CPUs */
-+	if (housekeeping_enabled(HK_TYPE_MISC))
-+		net_enable_timestamp();
-+
-+	return 0;
-+}
-+
-+late_initcall(net_dev_late_init);
+I'd suggest to describe the scenario, which is: There is a race that
+allows netlink dump and walking on pernet data while such pernet data
+is not yet set up.
 
+Thanks.
+
+> Introduced in commit 134e63756d5f ("genetlink: make netns aware")
+> Signed-off-by: Vasiliy Kovalev <kovalev@altlinux.org>
+> ---
+>  net/netlink/genetlink.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/netlink/genetlink.c b/net/netlink/genetlink.c
+> index 8c7af02f845400..20a7d792dd52ec 100644
+> --- a/net/netlink/genetlink.c
+> +++ b/net/netlink/genetlink.c
+> @@ -1879,14 +1879,14 @@ static int __init genl_init(void)
+>  {
+>  	int err;
+>  
+> -	err = genl_register_family(&genl_ctrl);
+> -	if (err < 0)
+> -		goto problem;
+> -
+>  	err = register_pernet_subsys(&genl_pernet_ops);
+>  	if (err)
+>  		goto problem;
+>  
+> +	err = genl_register_family(&genl_ctrl);
+> +	if (err < 0)
+> +		goto problem;
+> +
+>  	return 0;
+>  
+>  problem:
+> -- 
+> 2.33.8
+> 
 
