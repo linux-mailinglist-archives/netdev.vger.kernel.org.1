@@ -1,258 +1,148 @@
-Return-Path: <netdev+bounces-73313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86FFA85BD7E
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 14:47:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3876585BD87
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 14:49:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F311D1F24857
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 13:47:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E94492860F7
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 13:49:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF03B6A345;
-	Tue, 20 Feb 2024 13:47:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 100626A35A;
+	Tue, 20 Feb 2024 13:48:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iDDbGueg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kzgo/kMY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78B5569DFF
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 13:47:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708436868; cv=fail; b=OYKRTsTFRWrpUPrxyLYTk631o/Bu6jbRrokkiWZ3Aviv6s8wvNP19VxDXBrPTz5RItwgPV71HF+yCoba+ZdwN6i3jbnL+R4vby8pGI5aUpikUg5kdbnv5acqtLNbnq7qG703d+Yu57RI5aZTlzd/5/rgjPbVPyQmd8ARTl1P+DM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708436868; c=relaxed/simple;
-	bh=BpdOrENj2Kv/IYMbFXcWBldt3q8g2Tx1Jc9q3+LE0jg=;
-	h=Message-ID:Date:Subject:From:To:CC:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ebSAdFWBZGHp3xevhKG08H+A2/dAHNf9nBoDfVpklj6xuZbElG9hLh+aLN7fVh3+4JHuiuHKVNw4nDFY1h5VFMgtSlAQnHzEoDF9ZTBlnYQVfSwWdLtmwa6mD1Y87/AuPTF2yUvim3XoVJ38nJAHCRAzIID4BKx2qe+cFEQvpmA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iDDbGueg; arc=fail smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708436866; x=1739972866;
-  h=message-id:date:subject:from:to:cc:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=BpdOrENj2Kv/IYMbFXcWBldt3q8g2Tx1Jc9q3+LE0jg=;
-  b=iDDbGuegddYavvImmWFGwoUN7zcbfAXynakc8IrWUDav//JiNem8p152
-   Yz7y3KCS8YIMegWfV2VD02Baat+OFV6IudvqFc3hDTTCl2TAQGU3nx8Du
-   JPIa09PejO7uhAVoIHZYg7oyTMjSgUrxKGLXL0QXfPjIgPGlLh/o0hEf5
-   ePR8FVrc/2xAB/uhTkZn3LI8NPL5IigCOJcj6qo+PGQSfFHsKgPho4jMw
-   BfsmpSgjOcHpmdab0hoU76yiAuubLYHhQJi7SUXi4Dulcj7+rHgrjowAw
-   9jakp/jGDaXt2MtJgdlKl7Dq3vpZtYwkNQR/TdKwtjWRBSeSOqYWIc2yr
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10989"; a="19974356"
-X-IronPort-AV: E=Sophos;i="6.06,172,1705392000"; 
-   d="scan'208";a="19974356"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2024 05:47:45 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,172,1705392000"; 
-   d="scan'208";a="9426787"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Feb 2024 05:47:46 -0800
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 20 Feb 2024 05:47:44 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 20 Feb 2024 05:47:44 -0800
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 20 Feb 2024 05:47:44 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MDAu05UdNEK7eG7gTrUlLWbllWfVkvvbAn9AbfJIZgCI+Hq8AuWiqBg0xhG0yi/Dn69xG3ME7km6bdjRZMyK0CEcuYzgpniehHyK6hJZjSkNYOqLo/LpPkgCsbvqrs6kJPeSb7kWMvELfgUCCpG32MH9BmQiL/5INSvaefWCgm7AXU+PV7ojkYT4vEUEQjtXS8qJ+i9TmEL3+KyeDbFN29q7y+zMOuDqANbm1Ez6AbVp/eRGHYIEpOvEedr+hP5XCgjH85tCSFKDmBGIJuO1TwAx6VKsLbRh/aTO7bf65k1EXL7HJQ9+mGEuCNmjMCyF7mykZ+AZTufVMgF344Q0cA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Drkt7ZzDMI9RiNHr4ADtYEhRttccwf8j9UIKhKRnBV4=;
- b=MmGXGBWwj2isc6MR32fxB+qhhUybl7EcCfpxJ7jKajRZHeIdSPJxXd0hEqRVxiQxYtXbllb41nHxKT3VS0YizPSPGhbnyzIaPHBpIewTbBllmmUToe8DNffERIeqHnSPmXWr1U1bAbAbkyABl1e3BWFzGnQVXMceuf/K4Fza9HmhRfcv4oEJgGe76/TSUeBba5vC2MPSbBt4JBS5VWuYb0wBeW2aNPHHNbsQvdytvTKx/sR3zzamv1lRYTTg6gNzOj9D/7+eGW/FsXS6O/r89kKQT0pp0K9+wSXl/1T/5fYX5dh1tN0UiRokfXEbK4k4DENns/wgGHEQDP3E7pqIzQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by MN0PR11MB6087.namprd11.prod.outlook.com (2603:10b6:208:3cd::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.39; Tue, 20 Feb
- 2024 13:47:42 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::93d9:a6b2:cf4c:9dd2]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::93d9:a6b2:cf4c:9dd2%5]) with mapi id 15.20.7292.036; Tue, 20 Feb 2024
- 13:47:42 +0000
-Message-ID: <ff4ce794-3c0d-43a9-a991-91aadd44760b@intel.com>
-Date: Tue, 20 Feb 2024 14:47:36 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH v4 00/10 iwl-next] idpf: refactor
- virtchnl messages
-Content-Language: en-US
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: Alan Brady <alan.brady@intel.com>
-CC: <netdev@vger.kernel.org>, <willemdebruijn.kernel@gmail.com>,
-	<intel-wired-lan@lists.osuosl.org>, <igor.bagnucki@intel.com>,
-	<przemyslaw.kitszel@intel.com>
-References: <20240206033804.1198416-1-alan.brady@intel.com>
- <08e761c6-d79a-4a64-a61a-9536dd247322@intel.com>
- <04033c1e-c3f8-4f05-8c88-f0cd642e8c55@intel.com>
-In-Reply-To: <04033c1e-c3f8-4f05-8c88-f0cd642e8c55@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DUZPR01CA0072.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:3c2::10) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9AA06A8A2;
+	Tue, 20 Feb 2024 13:48:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708436933; cv=none; b=qk4R1MkPq3EP5Z8v1TKQjOvO/YKlOqWARYtlYhF8YWa7FPsCmHhEcGSGdNgHfWlKV5W4Lg2oFfjdN8/64sCegeo2TgyLpEUM8QRGnTrALmhhzi+yj1GTOrP4fSFV2oOK4nk2+42hJgLW3sN8/tbjf0GwILHlIRZeXtc3YNwWxH4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708436933; c=relaxed/simple;
+	bh=YC8rgxMYsXiObwoLfeP5CLE6j1/Tcmi0OcU5mPnZIww=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EuLz/4X7Nmaj9TpWE/FQndyhcEZTMQ3v9qR+Ge5Y+M0UlQvGvTJczOu3fYtkXBm9Wdcad9DV7oPvlxXJGhOmPHngE7H7bdK0Uu313HPHQUFR9cTOSqGzRErgQlfyF/03khxFGRwbUd/Sw5AtIXHey9EevXDC9+4jkquGLIUV9a8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kzgo/kMY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5FBDC433C7;
+	Tue, 20 Feb 2024 13:48:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708436933;
+	bh=YC8rgxMYsXiObwoLfeP5CLE6j1/Tcmi0OcU5mPnZIww=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Kzgo/kMY6kB8e16x373X+nZBYRtZPWjbszF/D10p4CrIs0z1D+/0cZouLeQB91n2j
+	 Gqy/BbAgiAHBMGPwPdGFVDf+u3kZgkwlW08V2RE/dLN2F4bEnxEmLXXZ8E4BV/si12
+	 1Bqf7tscKk+MgaQXW3tGv0Igcn2yO1AEvI58V7Bq/D2AQ0jY9LZh3udQPlnEwFC0hD
+	 CbHrl3JULRp6TrqbQH9VQcyAjoG4CJtWq9LkjxSDf9EoE9wqjWcD+fSFJwgPEcZvgL
+	 EW9IyDQgJPN1weelAN2llqQOZ9zLb5reAZvuQWF+aeLgGbd2BcvleXJ5gFGLeJBJiB
+	 0jDjiI4KxrkVw==
+Date: Tue, 20 Feb 2024 13:48:42 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Alex Elder <elder@linaro.org>,
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Abel Vesa <abel.vesa@linaro.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Lukas Wunner <lukas@wunner.de>,
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-wireless@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
+	linux-pm@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v5 09/18] arm64: dts: qcom: qrb5165-rb5: model the PMU of
+ the QCA6391
+Message-ID: <f72723f3-f5c5-4c16-a257-e5f57c4f9e73@sirena.org.uk>
+References: <20240216203215.40870-1-brgl@bgdev.pl>
+ <20240216203215.40870-10-brgl@bgdev.pl>
+ <48164f18-34d0-4053-a416-2bb63aaae74b@sirena.org.uk>
+ <CAMRc=Md7ymMTmF1OkydewF5C32jDNy0V+su7pcJPHKto6VLjLg@mail.gmail.com>
+ <8e392aed-b5f7-486b-b5c0-5568e13796ec@sirena.org.uk>
+ <CAMRc=MeAXEyV47nDO_WPQqEQxSYFWTrwVPAtLghkfONj56FGVA@mail.gmail.com>
+ <5a3f5e1b-8162-4619-a10b-d4711afe533b@sirena.org.uk>
+ <CAMRc=MdTub4u0dm5PgTQPnYPuR=SRnh=ympEZqo_UyrQDrQw6w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|MN0PR11MB6087:EE_
-X-MS-Office365-Filtering-Correlation-Id: 770d5c4c-5f4d-4f1a-09d6-08dc321a826e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Rlj6Wyh3IXPmcK7P/wmgMR/BKdxMlmz/Gwz2lngFZv05J7vtMVykxp56jQ0G93EO3mNxV2GQwrI3Vqkl+y2BIvGSL7qdNsRHBMf66Gmzl5cDZPvSWpWh7w20swZ47tckdfaM7hixmtZ36Oau4mcnVMRKlRUq2ZmR5CbEoYR3cBocS+qrBugmt0KPY3DuEedE4SQei9XA/3Zgp4bSac9OONGFoLE+ci3Pd/pMoMYXNwtVPfVEECbWYQQ/ZdK9z/O7flL84+vKoRtelDuEhQL9iTGo6/SP26QJqmtRVUxp5E+8R7oV0HQV0/czcBEVOVJlwhlXRQfvTs9vLuV373CU7bS/1TTHIkcga1cQEZyfPoG0TZjxbZ7Sr6xSM0mbYWj7CyUbFLyK/kXTtZrF0Lsn9/nPVpjKmI8U2MTO8qtGe7RSRyGaWKog2SSzIkV7Z5t0iq7NIhF3xrJ/HHPpcj03CITxpaaqwZsbieLuQnuDYC7k+c/FH86Zg3u/TU9dOVoBLW4FLogysklgMF5tDsuZ1S3a5OGe+r9R1yxEMmVOYDVzeIFfgdcZgLdp4PF4Wc4N
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(230273577357003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UTY4NXhkREJaVVFSUHg0d2JwYTlzOTVLejhwVVBUY2dJVUQwYzl1MzRSamJH?=
- =?utf-8?B?S3Brd2JEYmRKQmlZRzFQK24vaTUzdU9EYlZ1SmJVZXZPakxvOFNhQVZIRGRs?=
- =?utf-8?B?cU5CQ0ZaMHJVaE1oQzR5THVwM1djbTlFN0lIbm8xc2NaOGpFNEFFbVVPVUNB?=
- =?utf-8?B?cUJBMXN5M3F3NkdRbTMvZWVHbUhPcHlIL0Q3V0dKUVloYkFrQ3YyY3RaU1lq?=
- =?utf-8?B?ZDkreTZkRmZma1RLR3dsWjhNakdFSllQNVNNcmgzdTg4SjdkdUkrd1M5azJ0?=
- =?utf-8?B?QVBOYnpTZlBYbFV3TFU5THhKS3NYd3daZE5DQ2Y3UFg4T0xFMXlra0FwOTF5?=
- =?utf-8?B?cDZ4czhRQVBvcUFXWDR5MjVGT1VTVjh4VWVzcEZRTFE3Qm9pTTNUSGZkQmRj?=
- =?utf-8?B?cFIvRGZzOFRaRFZsdVhOS2JYM0RwcEFkOTJTQUlMSWtJSmdxcGhlOEZKWDRQ?=
- =?utf-8?B?NTFBSXRKU3NkT2o5YmJQN3E2ZDRIOUErYm4yMEsvZlZMY1YwYWpuWFVZbUI5?=
- =?utf-8?B?Q2hDaTV2RUNGQmRSeG1rS0J3ak1lQjNVQ3NYT2EwbWVucGtmMzRWQVorZ0Zl?=
- =?utf-8?B?M1BocEZnSHJ2Z0kvNnpkNFhSRC9GTHZrSnpaV3R3cXVOL3BVRGpwQ1czZHZK?=
- =?utf-8?B?QU5GU05JdlhMcG5LQng1ek02cXhOTUdBd3dTd0VUWjBHV0FTUFUzQ091U1dp?=
- =?utf-8?B?bnRhbDVzeUlHN3VCcDlkKzFRNTFxS3ZkM2QreWtSbUU0RTQzK2lJT1hZQjhG?=
- =?utf-8?B?QmFJdkduV3lCQ0tqMTNKU0UwT3YrckVUeWVGNnorT2FYRksxRDVCajlyeWtz?=
- =?utf-8?B?NHJWWmlMdjR6ZjNFUDJrdnhvVTFvY1Q3dUJPcURvV2F3OE15Qy8wS2lNOWhM?=
- =?utf-8?B?SUd3Uy9UQWwxWlFYVDBIVFQ3Nk5VaUlJMjdUVzhJY2ljQXBmN0NEWkJwcWZX?=
- =?utf-8?B?VnBMYTNRU21QMXZVQ2dDS2N0d3M1UTVVQklVcEZWcytyWTBiK1ozUUtSWlVp?=
- =?utf-8?B?dzZmR3dTWnREN3ROc0RJSVphR3Q3aThkakVJRFNRREVOWHFDNExpak56eDFV?=
- =?utf-8?B?SGk4U0VUbng3aEZmNERBd3Z1YktuREVCaTBvdGQ3dytNeWlIVkFvaEdLaFNw?=
- =?utf-8?B?SEFhdTJQQ3A0UXdrNW84WS94eXQ2bEF4dW5GWmVVOThYaWRtS0JWVkFaRXA5?=
- =?utf-8?B?MWJqS3NBUyt1L1M5Rm1PM29Hak5GMDFzc09lSG1Ib3ZsR3ovdWxudk9pQStJ?=
- =?utf-8?B?UWtMdEtnK2N2dEpKSHZ1MXp0a3N6WFZHMG13cUNTc204cDk2SXY5YWhoaWhG?=
- =?utf-8?B?Y3hMczNiWmNyMmZ6NDVYbktMSWtxR2FtdzJaN1l4Ty82ZTh1bXM1WWk1dWg5?=
- =?utf-8?B?dk0vSE5Gd2tSUTVCNmpPdk4xUzRhUmVxaXhPUGEyL2ozeHJGZG5OVjNxYW90?=
- =?utf-8?B?aG9telN1T3BMejc3UE5PZlErcnRTRGZnYk50QVR0d0U3bTBGTmNqSTJMVnoy?=
- =?utf-8?B?ZzM3QWMxMnExek12VGZPZ3RXU21QUG1iT3pxcE93NXpHWVFYbWdDV2ZDanl3?=
- =?utf-8?B?RmVOWnd6RUlpRjVHVDFqU0pVcFZJRXlNL216bTdlcVc5Z21EWGlJVEw2UTNo?=
- =?utf-8?B?SCtHUzljNUIyeWsyeXRzSEg2Z0NaQzk1R0hUQXlWZDEzbVFGWU01ekNBM1Vi?=
- =?utf-8?B?U3ZmVEp1VXAyMDgvTk9tV0h6M2FqN0RzOEFXWWtsZUVZTGZjVUlDWVgycmdr?=
- =?utf-8?B?QlUyM3EvUnhlWVJteFJNU1RUNFB1c3ZrNVdna1NETmtsUGs5bjdJOGFLb0Vn?=
- =?utf-8?B?a25HZHlWb0NPRlpqWTVCUitFQ1Mxc3pnaUYrbklFaWNCMldFQkVVYmRPTlJL?=
- =?utf-8?B?Q0lpWVkzYjcvNFREODY4MzFYNDZRMngxRWdBSWJXWlNBY2c4TEMwRlZIQjJN?=
- =?utf-8?B?WGF6azBWOU9BbUZYSE9CRHZTV2ZCTndHZnJkdDNndzdnVjNJMzQ0elJ4d1F4?=
- =?utf-8?B?VmprWjJxMUYzaXIvcm03RjUrbDVrTGlmd002RnNSRzc4NkVCWksrVjgrY3l3?=
- =?utf-8?B?a292WTRwSWh6cHBPYzIvbEIrSFJmd3poWHliK2laV3pkNTVuV0V0VmlrLzIr?=
- =?utf-8?B?SytXTXNXcWpmWlNEdDJ0UXg3ZTN1NnZSbVVLeVROSzk0ZFdKcW44TGpsTFJJ?=
- =?utf-8?B?c0E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 770d5c4c-5f4d-4f1a-09d6-08dc321a826e
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2024 13:47:42.1429
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YA6AW4/62c6frODwPWjgjvVVIBz+DS0GHEpyw7trO36FGZwFJ05IVZLUuqamaAHvI54IXUNmGBmM8zZXn87q2YMgZkYZ5KcHEIh58jKZcT8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR11MB6087
-X-OriginatorOrg: intel.com
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="TzIdp7BUtsKYDYnZ"
+Content-Disposition: inline
+In-Reply-To: <CAMRc=MdTub4u0dm5PgTQPnYPuR=SRnh=ympEZqo_UyrQDrQw6w@mail.gmail.com>
+X-Cookie: E = MC ** 2 +- 3db
 
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Date: Wed, 14 Feb 2024 15:49:51 +0100
 
-> From: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Date: Tue, 6 Feb 2024 18:02:33 +0100
-> 
->> From: Alan Brady <alan.brady@intel.com>
->> Date: Mon, 5 Feb 2024 19:37:54 -0800
->>
->>> The motivation for this series has two primary goals. We want to enable
->>> support of multiple simultaneous messages and make the channel more
->>> robust. The way it works right now, the driver can only send and receive
->>> a single message at a time and if something goes really wrong, it can
->>> lead to data corruption and strange bugs.
->>
->> This works better than v3.
->> For the basic scenarios:
->>
->> Tested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> 
-> Sorry I'm reverting my tag.
-> After the series, the CP segfaults on each rmmod idpf:
-> 
-> root@mev-imc:/usr/bin/cplane# cp_pim_mdd_handler: MDD interrupt detected
-> cp_pim_mdd_event_handler: reg = 40
-> Jan  1 00:27:57 mev-imc local0.warn LanCP[190]: cp_pim_mdd_handler: MDD
-> interrupt detected
-> cp_pim_mdd_event_handler: reg = 1
-> Jan  1 00:28:54 mev-imc local0.warn LanCP[190]: [hma_create_vport/4257]
-> WARNING: RSS is configured on 1st contiguous num of queuJan  1 00:28:54
-> mev-imc local0.warn LanCP[190]: [hma_create_vport/4257] WARNING: RSS is
-> configured on 1st contiguous num of queuJan  1 00:28:55 mev-imc
-> local0.warn LanCP[190]: [hma_create_vport/4257] WARNING: RSS is
-> configured on 1st contiguous num of queues= 16 start Qid= 34
-> Jan  1 00:28:55 mev-imc local0.warn LanCP[190]: [hma_create_vport/4257]
-> WARNING: RSS is configured on 1st contiguous num of queu16 start Qid= 640
-> Jan  1 00:28:55 mev-imc local0.err LanCP[190]:
-> [cp_del_node_rxbuff_lst/4179] ERR: Resource list is empty, so nothing to
-> delete here
-> Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
-> [cp_uninit_vsi_tc_q_region/222] ERR: Failed to init vsi LUT on vsi 1.
-> Jan  1 00::08 mev-imc local0.err LanCP[190]:
-> [cp_uninit_vsi_fxp_config/1101] ERR: cp_uninit_vsi_rss_config() failed
-> on vsi (1).
-> Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
-> [cp_uninit_vsi_tc_q_region/222] ERR: Failed to init vsi LUT on vsi 6.
-> Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
-> [cp_uninit_vsi_rss_config/340] ERR: faininit_vsi_rss_config() failed on
-> vsi (6).
-> Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
-> [cp_uninit_vsi_tc_q_region/222] ERR: Failed to init vsi LUT on vsi 7.
-> Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
-> [cp_uninit_vsi_rss_config/340] ERR: failed to remove vsi (7)'s queue
-> regions.
-> Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
-> [cp_uninit_vsi_fxp_config/1101] ERR: cp_uninit_vo init vsi LUT on vsi 8.
-> Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
-> [cp_uninit_vsi_rss_config/340] ERR: failed to remove vsi (8)'s queue
-> regions.
-> Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
-> [cp_uninit_vsi_fxp_config/1101] ERR: cp_uninit_vsi_rss_config() failed
-> on vsi (8).
-> Jan  1 00:29:08 mev-imc local0.err LanCP[190]:
-> [cp_uninit_vsi_tc_q_region/222] ERR: Failed to init vsi LUT on vsi 1.
-> Jan  1 00::08 mev-imc local0.err LanCP[190]:
-> [cp_uninit_vsi_fxp_config/1101] ERR: cp_uninit_vsi_rss_config() failed
-> on vsi (1).
-> 
-> [1]+  Segmentation fault      ./imccp 0000:00:01.6 0 cp_init.cfg
-> 
-> Only restarting the CP helps -- restarting the imccp daemon makes it
-> immediately crash again.
-> 
-> This should be dropped from the next-queue until it's fixed.
+--TzIdp7BUtsKYDYnZ
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The latest firmware works with this series -- the problem was there,
-the series only revealed it.
+On Tue, Feb 20, 2024 at 02:38:33PM +0100, Bartosz Golaszewski wrote:
+> On Tue, Feb 20, 2024 at 2:31=E2=80=AFPM Mark Brown <broonie@kernel.org> w=
+rote:
+> > On Tue, Feb 20, 2024 at 12:16:10PM +0100, Bartosz Golaszewski wrote:
 
-Tested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> > > And what do you mean by there not being any consumers? The WLAN and BT
+> > > *are* the consumers.
 
-Can be taken back to Tony's tree.
+> > There are no drivers that bind to the regulators and vary the voltages
+> > at runtime.
 
-Thanks,
-Olek
+> Even with the above misunderstanding clarified: so what? DT is the
+> representation of hardware. There's nothing that obligates us to model
+> DT sources in drivers 1:1.
+
+It is generally a bad sign if there is a voltage range specified on a
+regulator that's not got any indication that the voltage is going to be
+actively managed, especially in situations like with several of the
+supplies the DT was specifying where there are clear indications that
+the supply is intended to be fixed voltage (or cases where every single
+supply has a voltage range which would be highly unusual).  Looking at
+the consumers might provide an explanation for such unusual and likely
+incorrect constraints, and the lack of any consumers in conjunction with=20
+other warning signs reenforces those warning signs.
+
+--TzIdp7BUtsKYDYnZ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEyBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXUrboACgkQJNaLcl1U
+h9AUegf4sL0ibn2WhQVo2jE/mB56ayVY4daCFJmLey10o3xzG6j5CHdfj7ZENBPk
+kozPN2BW9C/e0Er+hMKCtTgvm7nJUfVKNcxMd73sXUj44E9Bx57GVOwlBzREZd0w
+O1taO3DNZOTQqwGEaYjjeX9Rac+LU0m0+s/PHv5SbgO7ZlvvHUX0u2sEhyM4Sopl
+NZ1NA+cK9TLOo3ZZjtH5EF8sXMtvRaZr01MwXp+2fljFIkJLx84wdv1oVmOR0I8r
+vobnh7aFX0dyCHgCD1cWqm/QqR0Um0Fc9utXOXTByvvR6L4VlYZvCXnmgvw9Hn1O
+4UdINenyan4K1XpHuoZicZYZbwpU
+=v6IJ
+-----END PGP SIGNATURE-----
+
+--TzIdp7BUtsKYDYnZ--
 
