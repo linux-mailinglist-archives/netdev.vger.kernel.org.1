@@ -1,123 +1,101 @@
-Return-Path: <netdev+bounces-73169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A900685B3C8
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:19:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A4EE85B3E3
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:24:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC50A1C2243C
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 07:19:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA4A72840BF
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 07:24:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC7FC5A4C7;
-	Tue, 20 Feb 2024 07:19:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D6675A4CB;
+	Tue, 20 Feb 2024 07:24:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="TvXaKTq7"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="iV4P2u5n"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29FC05A110;
-	Tue, 20 Feb 2024 07:19:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8D175B674
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 07:24:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708413558; cv=none; b=FYalkARt2uCe46L5Y0GbjKgT4wBtnJIgF2gJFzXdZ6IHMbpRkADc5wKHkphAmerY7Muj7thB9MU7jTY2Ndo0ROuLtROneF5Q5qQ9n2TFk3T3bvJDeooC+Iw3A1u2Jrn5XkQ4e7YALaOYQrgrQ0RZhrjCwk9tKzKgdN5H6q/u57k=
+	t=1708413859; cv=none; b=gZqTMhXnAue0CceVGbubL7Z21tvxbqi6Rb/KOH0vya7VbxAk2mbkdW+aQA+7JH7BJqbjt/DbdMZmkb9GJ0tx5xBJbi7pnMpc3D/mCHDzmLyWbDjsvV0IVd1/sr2rlcF66zDPuH59G7apW/7qLADOEe6cD3PfBBKB9JnrJLl1g4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708413558; c=relaxed/simple;
-	bh=S9XetiB1kCGvDGsBJEicmEP9gLUMjlR4V0Egs8d7+co=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hGkPegf3Kyo2QzK5Xk1YNJDlvHvXSbjfjkd8zpkHxdouR9kCPvVy6NKh18t8PM0IbvskGnUN5ueinZVu2nBTJINHXTRqninuXHb9ev824W29NcRqEcQ2p9Gwmt81DhtQawNtDDBlPlHY8pXXiEwpXJKwT/dy+fFMje2uEWcOthI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=TvXaKTq7; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1708413554; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=0d8HScRQIx6W+ruLqSv3M+jMj6lFLshZVIqZSQ4AXqQ=;
-	b=TvXaKTq7eny4+YEHY1Xt+yDME2e2p+wWOoOUCWufEjntpAgHiESPDOSWC/qYxVg6NEDV3pcxw7b7yTBqCgnMzlWD+wR0XgpTYY/BNb+BcUOpAJmWH+Y4h51qLNafAaeU/e/ttgnB3n4uw/UgxCPoj9stpKRz5uMo6AvEJGoDLyk=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R551e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W0w1yEa_1708413552;
-Received: from 30.221.148.206(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0W0w1yEa_1708413552)
-          by smtp.aliyun-inc.com;
-          Tue, 20 Feb 2024 15:19:13 +0800
-Message-ID: <53654d84-9fe3-4a8d-98ba-ab052df91852@linux.alibaba.com>
-Date: Tue, 20 Feb 2024 15:19:11 +0800
+	s=arc-20240116; t=1708413859; c=relaxed/simple;
+	bh=7DqyzSMdbCs5p2alD3N3AzlsCQXfYjqSbhC5sVY8TUc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eZqjDLFGRHAlDD3/ILRLulvEC6RClU3zBLLouCQHZG6UbvCV2pASh9p1/0sjRmPYy4atPAQF6K6JO9FYoeFYSUdv/j3I84Xu2K6RG88iPl1wuFJKpc9D4ZtGQqgUin+PLRGmI1vlgGyNJv3VO3ib1Kh9Edrzc+7/liE/QssnChU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=iV4P2u5n; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3392b045e0aso3197057f8f.2
+        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 23:24:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708413855; x=1709018655; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5zjrHuQblrwOTIdPLNps+P25zUWumEJHV4pnVL74VHg=;
+        b=iV4P2u5n2dpXOE95fdeRQj8GzCeWvLXvU8wIK5DZHsZR+T5WghEU0I6LOyJkXvu7zX
+         JJZQtyga1vzjIQ3d5uX7LXD6j7en8ww1wrgJ+UGaDBGZMIMhLiiwp6K357X/+bKoZ56Q
+         x+nrVI9znclHombcx4axha8IAPCQ57Vo88CabQJ7UpxK4SchEv9oEdjxX4ZoOTZVWOjX
+         LrovUq+KjfsklNdBvsXwjpuzYh38FoL1B8qDt9YXyDj66Ivhklge7j8tVJRlxf5NnZJt
+         9/FFpbU++6U8iw5/izYj1qaDyzMCGf+yUziyufS6F4aisWtmVB2BAQOQlRefMpBOBxMB
+         bTyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708413855; x=1709018655;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5zjrHuQblrwOTIdPLNps+P25zUWumEJHV4pnVL74VHg=;
+        b=SCtKVSFpHxcoRNvTCs5MUDA5two+ndnhEeLmkKKjfAY8SJx2KumoYoRJGd1qgkdoxd
+         1GJrwIRMio+Om8EQ++d0QlUwZ8YzXzc2m1I5fYr216Q4RTuwV78uFwrI5SINkWTuYh+Q
+         6OVWJMbPMxcTeGT8zHZfQ0F/WL6ZqKuxq+onufahaETt8W+QWooN8u1lgXB6QSoeQr9E
+         +S8fltvaLIzBxyz/glAjQLpNiRS/OSz76Gis4IP2u1rGKrz1mYlaX4YJK8I80oyo3msG
+         l2t73kgUTpqb7NvxjIWBCZYcfqFfLArov0rPgUnjUmTKvHTwx6g5SMP8OSxNGhAFUAvZ
+         Hq1Q==
+X-Gm-Message-State: AOJu0YwY4SbBYdFtfwMk65P5xyA2PsEuLgLCIxysPfYSdRE0N/l4u1q4
+	GmbmMB6jEZQ1VKQ8i206kvLyDYYR0ZfyyrRiNvt1Z83Bmn1zhx04AFUhGVjVCSg=
+X-Google-Smtp-Source: AGHT+IGxaC4HbRZT/t6vzb5n2I5SFlJXoZSuwgC/rIgDUklfAABIE7gO0xUCbEX/AAJ1GY/vNSktBQ==
+X-Received: by 2002:adf:fd48:0:b0:33d:1f9f:afa with SMTP id h8-20020adffd48000000b0033d1f9f0afamr7804262wrs.30.1708413855024;
+        Mon, 19 Feb 2024 23:24:15 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ck4-20020a5d5e84000000b0033d3f0eee9dsm7133758wrb.27.2024.02.19.23.24.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Feb 2024 23:24:14 -0800 (PST)
+Date: Tue, 20 Feb 2024 08:24:11 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, jacob.e.keller@intel.com,
+	swarupkotikalapudi@gmail.com, donald.hunter@gmail.com,
+	sdf@google.com, lorenzo@kernel.org, alessandromarcolini99@gmail.com
+Subject: Re: [patch net-next 01/13] tools: ynl: allow user to specify flag
+ attr with bool values
+Message-ID: <ZdRTm8cX5uDp16uv@nanopsycho>
+References: <20240219172525.71406-1-jiri@resnulli.us>
+ <20240219172525.71406-2-jiri@resnulli.us>
+ <20240219124222.37cd47d0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC nf-next v5 0/2] netfilter: bpf: support prog update
-Content-Language: en-US
-To: Quentin Deslandes <qde@naccy.de>, pablo@netfilter.org,
- kadlec@netfilter.org, fw@strlen.de
-Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, coreteam@netfilter.org,
- netfilter-devel@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, ast@kernel.org
-References: <1704175877-28298-1-git-send-email-alibuda@linux.alibaba.com>
- <70114fff-43bd-4e27-9abf-45345624042c@naccy.de>
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <70114fff-43bd-4e27-9abf-45345624042c@naccy.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240219124222.37cd47d0@kernel.org>
 
-
-
-On 2/15/24 12:10 AM, Quentin Deslandes wrote:
-> On 2024-01-02 07:11, D. Wythe wrote:
->> From: "D. Wythe" <alibuda@linux.alibaba.com>
->>
->> This patches attempt to implements updating of progs within
->> bpf netfilter link, allowing user update their ebpf netfilter
->> prog in hot update manner.
->>
->> Besides, a corresponding test case has been added to verify
->> whether the update works.
->> --
->> v1:
->> 1. remove unnecessary context, access the prog directly via rcu.
->> 2. remove synchronize_rcu(), dealloc the nf_link via kfree_rcu.
->> 3. check the dead flag during the update.
->> --
->> v1->v2:
->> 1. remove unnecessary nf_prog, accessing nf_link->link.prog in direct.
->> --
->> v2->v3:
->> 1. access nf_link->link.prog via rcu_dereference_raw to avoid warning.
->> --
->> v3->v4:
->> 1. remove mutex for link update, as it is unnecessary and can be replaced
->> by atomic operations.
->> --
->> v4->v5:
->> 1. fix error retval check on cmpxhcg
->>
->> D. Wythe (2):
->>    netfilter: bpf: support prog update
->>    selftests/bpf: Add netfilter link prog update test
->>
->>   net/netfilter/nf_bpf_link.c                        | 50 ++++++++-----
->>   .../bpf/prog_tests/netfilter_link_update_prog.c    | 83 ++++++++++++++++++++++
->>   .../bpf/progs/test_netfilter_link_update_prog.c    | 24 +++++++
->>   3 files changed, 141 insertions(+), 16 deletions(-)
->>   create mode 100644 tools/testing/selftests/bpf/prog_tests/netfilter_link_update_prog.c
->>   create mode 100644 tools/testing/selftests/bpf/progs/test_netfilter_link_update_prog.c
->>
-> It seems this patch has been forgotten, hopefully this answer
-> will give it more visibility.
+Mon, Feb 19, 2024 at 09:42:22PM CET, kuba@kernel.org wrote:
+>On Mon, 19 Feb 2024 18:25:17 +0100 Jiri Pirko wrote:
+>>          elif attr["type"] == 'flag':
+>> +            if value == False:
+>> +                return b''
 >
-> I've applied this change on 6.8.0-rc4 and tested BPF_LINK_UPDATE
-> with bpfilter and everything seems alright.
->
-> Thanks,
-> Quentin
+>how about "if value:" ? It could also be null / None or some other
+>"false" object.
 
-Thanks for your testing. I will send  out a formal version soon.
-
-Best wishes,
-D. Wythe
-
+Sure, why not.
 
