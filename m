@@ -1,119 +1,136 @@
-Return-Path: <netdev+bounces-73382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76BA985C385
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 19:19:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C71285C3AF
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 19:40:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8B411C20961
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 18:19:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D9811C21D60
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 18:40:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72EDB78B48;
-	Tue, 20 Feb 2024 18:19:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F5FA77A01;
+	Tue, 20 Feb 2024 18:40:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gQd5iT9a"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=david-bauer.net header.i=@david-bauer.net header.b="NtPGukj/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from perseus.uberspace.de (perseus.uberspace.de [95.143.172.134])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED36C78693;
-	Tue, 20 Feb 2024 18:19:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C443669D01
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 18:40:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.172.134
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708453144; cv=none; b=TAOUwjBf+b16KMYq2K+RImCtx9HLq7jHB/UvAuAKLxN7SBjRodHkBjnXTFvHuA7G9ntaQa/UTVDnix3sApuVMaq1JHNbcqImED0/qelcElG2DXdZXJGdXihzPjZevxKZuSM+61wNPiwnQcfK0sFJPE9QOZHMly6xenjkYbJnhIM=
+	t=1708454444; cv=none; b=hbSsPu3yDC5W4C6g2fVjGmW/8lsmiw1MKc4liLRcEc7yYSAsZ8jCOU3GxFvPeupV6ktyDdkZTAssBGoXPHzJVqWDm81lf4Sd8qq3sxNbcXFazSixKzHNfuvlmCiSvHFG22TL0hTO2lpV3xe2CphIatIeCmDbjPP4WQUPHYs77QA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708453144; c=relaxed/simple;
-	bh=PvYo74uoWhD41ohw8yNS2GUG6/U1gKH18FXvHsCmIKg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MDwwHqpY31H+L84jHn1xz9mp88oOiyDlgXI1IzCYYgFYe7aa6mEMANg+TS36rIZ8VVwfmW4njB3ukqudXY/7w8AC54UQQTGaLUXjCRgwhYBDnYuez5rRCsw9VyatyA90+qth2nMCcjnV3MW6tGZg3wg3PhPYA67PvvGCO4yehI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gQd5iT9a; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6e471caaa71so1239708b3a.2;
-        Tue, 20 Feb 2024 10:19:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708453142; x=1709057942; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qFTpHAv0pmcOCj6fTcaqcOduTWlWxRQydUJGeHzrVhA=;
-        b=gQd5iT9acfCqGPOwI2HsPvERlOItk+chb9lEMLI9kz3jRL+Nol+I+ke8yq2Ila6PKH
-         IAK45mLOgttviJ/inxu2PKdNXHvX/DnkYjiWwZKep8tE0aNpvidq7eC9YMptoX44LpSa
-         XrfHbvmEJRq/IgXFyJZ+oV1WmZ5gWoAOrcT3aCIVb2U3eZ8jzPcuhEw3F1IuA3Y+KGYq
-         1u6QaY4eAhhbBwYV+B/x8a2nqwD8acQ+rKTRFezoD9e1QcYpLVXN6SdcKEAPZ3A3Z0Nb
-         90yKFGxa/5LDI90vrgNAXfDxlN6J1IOUoL9/Pg5+5xYOcrI/gTnZjZRorEvYIOIWLcdv
-         4GmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708453142; x=1709057942;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qFTpHAv0pmcOCj6fTcaqcOduTWlWxRQydUJGeHzrVhA=;
-        b=vSqhDxyrw/Viei237C/yRue9anMo5rLTRUwwV0PLXrqW+H4k1hTpBsmipH5Ys2MPek
-         hMZMcrbyo46LEHl1J0Yzoz+DO10SALtAs0S218O8axkwYISE8iKNwimWZ1IV3gv4vNJD
-         DfHWFIhWOl9LHvA9oAypHMeMitwQuLnX812wJjIjOMhZuQ8tomYF3AAH5I8q/msS0JRX
-         v7kRp1GDtTMybXCNDHRQxdPfHns0FpoQvruOKn8eOAdvcnZ6/2xnTU9VM8zdsxNIfatq
-         KoXC8vCSTIU58BRXqM8S+NKRRaS3uR86b/c2jagIBlk5m5CdGR3rC2toDtLO0wpYjo2Q
-         SDog==
-X-Forwarded-Encrypted: i=1; AJvYcCWuL/rkonYQGJcgcwq7ViZxrBuB00+ebAh5XHfMPnTuuWyB0i9Zvs4ovN+/zVtvo7Pin+YFITPZcvifJY26C6vfuIYke6TP7wtqHq7s5YEmpPanqLaKZrb46HSPqZhfsYfZfwXSMOuzrMKVluyyWUw+6dI3hG8Q3lxe3ejko9pM
-X-Gm-Message-State: AOJu0YyBaZURL0iYCKUGvvw9igJMoDXeOumAqjRHAw0NKUwp6m1H8ble
-	2EXvF7IBsF0IqcjXAnisa3Cu9Btm1yfGUMavool7xoYzrKGgt2Ns
-X-Google-Smtp-Source: AGHT+IHctzEbCJ0zIC/W29fqRusdFNSQJRt7P7ntp+/eb2LVdwQ/FleSZOrJXKKIk+UeThHSav1Bbg==
-X-Received: by 2002:a05:6a20:c890:b0:19b:a07a:344d with SMTP id hb16-20020a056a20c89000b0019ba07a344dmr15658884pzb.7.1708453142076;
-        Tue, 20 Feb 2024 10:19:02 -0800 (PST)
-Received: from localhost (dhcp-141-239-158-86.hawaiiantel.net. [141.239.158.86])
-        by smtp.gmail.com with ESMTPSA id r8-20020a62e408000000b006e3a4766c7esm5984542pfh.68.2024.02.20.10.19.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Feb 2024 10:19:01 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Tue, 20 Feb 2024 08:19:00 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: mpatocka@redhat.com, linux-kernel@vger.kernel.org,
-	dm-devel@lists.linux.dev, msnitzer@redhat.com, ignat@cloudflare.com,
-	damien.lemoal@wdc.com, bob.liu@oracle.com, houtao1@huawei.com,
-	peterz@infradead.org, mingo@kernel.org, netdev@vger.kernel.org,
-	allen.lkml@gmail.com, kernel-team@meta.com,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Alan Stern <stern@rowland.harvard.edu>, linux-usb@vger.kernel.org,
-	mchehab@kernel.org
-Subject: Re: [PATCH 5/8] usb: core: hcd: Convert from tasklet to BH workqueue
-Message-ID: <ZdTtFFRC7dmiS2wL@slm.duckdns.org>
-References: <20240130091300.2968534-1-tj@kernel.org>
- <20240130091300.2968534-6-tj@kernel.org>
- <bckroyio6l2nt54refuord4pm6mqylt3adx6z2bg6iczxkbnyk@bb5447rqahj5>
- <CAHk-=whqae-+7Q7wbtnEj7YmR8vsx6skTj6j-srV2Fz7cBZ2ag@mail.gmail.com>
+	s=arc-20240116; t=1708454444; c=relaxed/simple;
+	bh=KM9+4FhHbHX+pS0ZI/qGWFokcPU4isB+jXFDR0HQI0Q=;
+	h=Message-ID:Date:MIME-Version:From:To:Cc:Subject:Content-Type; b=ezkM70uYh11GONvdoOnaENkZXDQizwrLcXPTsSxT7xuIIC4S1yaZCIuvma7IBgUFcyxQ/QDOUD0cc4fkPY5GcX71/tvH8Zc6K4xSwcTpeuR4BRiDSC8kIr7OwlYJUOyQb8nYJUW0gfzmdmsQXVIwItSrWe3ugpTaCIfkUE9DEUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=david-bauer.net; spf=pass smtp.mailfrom=david-bauer.net; dkim=fail (0-bit key) header.d=david-bauer.net header.i=@david-bauer.net header.b=NtPGukj/ reason="key not found in DNS"; arc=none smtp.client-ip=95.143.172.134
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=david-bauer.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=david-bauer.net
+Received: (qmail 3011 invoked by uid 988); 20 Feb 2024 18:33:55 -0000
+Authentication-Results: perseus.uberspace.de;
+	auth=pass (plain)
+Received: from unknown (HELO unkown) (::1)
+	by perseus.uberspace.de (Haraka/3.0.1) with ESMTPSA; Tue, 20 Feb 2024 19:33:55 +0100
+Message-ID: <15ee0cc7-9252-466b-8ce7-5225d605dde8@david-bauer.net>
+Date: Tue, 20 Feb 2024 19:33:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHk-=whqae-+7Q7wbtnEj7YmR8vsx6skTj6j-srV2Fz7cBZ2ag@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+From: David Bauer <mail@david-bauer.net>
+To: Ido Schimmel <idosch@nvidia.com>, Amit Cohen <amcohen@nvidia.com>
+Cc: netdev@vger.kernel.org
+Subject: VxLAN learning creating broadcast FDB entry
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Bar: ---
+X-Rspamd-Report: BAYES_HAM(-2.999491) XM_UA_NO_VERSION(0.01) MIME_GOOD(-0.1)
+X-Rspamd-Score: -3.089491
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=david-bauer.net; s=uberspace;
+	h=from;
+	bh=KM9+4FhHbHX+pS0ZI/qGWFokcPU4isB+jXFDR0HQI0Q=;
+	b=NtPGukj/NYeJqrUyK9YwJweWuKWhbAdCbwOMyf/qVNBRKyXIvWCCiHC5XlMV1iXgdxcsGppT+l
+	+uui0hR+vuYeDLoLIh1PnLN2HoCvscYnKWI1Uw63JwLi9U4siTQNxTVLXSViJxFvnW6uWffQDqiP
+	45KWqtiwt9GBNXPAade/2PROuFldyD/hcYx44KeZCF6YHqJBMkVjEp2EAIGboJFeYDwQgcT5QaNO
+	c4jtUbjHTPXWTcMtIARgtf4tSx7qy0nVWGwqdgTse1VyIiQ0oejdjIvUFgpIKX0LciXhpd1dhjMh
+	kZoQHgkuQY0RABar5gUQR/mULCydvaN394KYDCJ60VFNfOite0PXFNzmq9bRRc19+6d4vQghYKMv
+	jgoMXPeMtSvlzrCEsjE/bxMwQhxKAXjhONFi529Cf/xDwG+vWwmGoA6P8OmvI/8di1jQpjMIlaP5
+	pTxizq4hKGOqmIyOETV+nQiLLzoILIEKjFF5JpHREEBhv27cZdb+dK4CGbni9sNu7bqCvLjg079A
+	rLp8+x5go7tomE1ss9gUUwF2osGBAJu1a+to45aIuVX1nTwOmnExISLjZhRzQ4ho8GPAsQQROmYB
+	eeN7t1QtzdClgwZMK84o2AwUpGMRj0MFGPjUS8nnhmUJ/ltCm+z5NS3xZub8kCZFe/3NKkKuRHXG
+	4=
 
-Hello,
+Hi,
 
-On Tue, Feb 20, 2024 at 09:55:30AM -0800, Linus Torvalds wrote:
->    git://git.kernel.org/pub/scm/linux/kernel/git/tj/wq.git
-> refs/heads/for-6.9-bh-conversions
-> 
-> although it's possible that Tejun has a newer version in some other
-> branch. Tejun - maybe point Mauro at something he can try out if you
-> have updated the conversion since?
+we are using a VxLAN overlay Network to encapsulate batman-adv Layer 2 
+Routing. This distance-vector protocol relies on originator messages 
+broadcasted to all adjacent nodes in a fixed interval.
 
-Just pushed out the following branch for testing.
+Over the course of the last couple weeks, I've discovered the nodes of 
+this network to lose connection to all adjacent nodes except for one, 
+which retained connectivity to all the others.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/tj/wq.git for-6.9-bh-conversions-test
+So there's a Node A which has connection to nodes [B,C,D] but [B,C,D] 
+have no connection to each other, despite being in the same Layer 2 
+network which contains the Layer2 Domain encapsulated in VxLAN.
 
-It's the same branch but combined with the current linus#master to avoid the
-rc1 wonkiness.
+After some digging, I've found out the VxLAN forwarding database on 
+nodes [B,C,D] contains an entry for the broadcast address of Node A 
+while Node A does not contain this entry:
 
-Thanks.
+$ bridge fdb show dev vx_mesh_other | grep dst
+00:00:00:00:00:00 dst ff02::15c via eth0 self permanent
+72:de:3c:0b:30:5c dst fe80::70de:3cff:fe0b:305c via eth0 self
+66:e8:61:a3:e9:ec dst fe80::64e8:61ff:fea3:e9ec via eth0 self
+ff:ff:ff:ff:ff:ff dst fe80::dc12:d5ff:fe33:e194 via eth0 self
+fa:64:ce:3e:7b:24 dst fe80::f864:ceff:fe3e:7b24 via eth0 self
+[...]
 
--- 
-tejun
+I've looked into the VxLAN code and discovered the snooping code creates 
+FDB entries regardless whether the source-address read is a multicast 
+address.
+
+When reading the specification in RFC7348, chapter 4 suggests
+
+ > Here, the association of VM's MAC to VTEP's IP address
+ > is discovered via source-address learning.  Multicast
+ > is used for carrying unknown destination, broadcast,
+ > and multicast frames.
+
+I understand this as multicast addresses should not be learned. However, 
+by sending a VxLAN frame which contains the broadcast address as the 
+encapsulated source-address to a Linux machine, the Kernel creates an 
+entry for the broadcast address and the IPv6 source-address the VxLAN 
+packet was encapsulated in.
+
+This subsequently breaks broadcast operation within the VxLAN with all 
+broadcast traffic being directed to a single node. So a node within the 
+overlay network can break said network this way.
+
+Is this behavior of the Linux kernel intended and in accordance with the 
+specification or shall we avoid learning group Ethernet addresses in the 
+FDB?
+
+I've applied a patch which avoids learning such addresses in vxlan_snoop 
+and it mitigates this behavior for me. Shall i send such a patch 
+upstream? [0][1]
+
+I see vxlan_fdb_update_create already disallows creating such an entry, 
+but only if NLM_F_REPLACE is set, which it is not in the call-path from 
+vxlan_snoop.
+
+[0] https://github.com/freifunk-gluon/gluon/issues/3191
+[1] https://github.com/freifunk-gluon/gluon/pull/3192
+
+Best
+David
 
