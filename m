@@ -1,220 +1,115 @@
-Return-Path: <netdev+bounces-73201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98A8B85B575
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:38:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7007085B58B
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:40:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD94A1C226F0
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:38:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2BE5B2286E
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:40:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80E4F5D46F;
-	Tue, 20 Feb 2024 08:38:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7161E5CDC4;
+	Tue, 20 Feb 2024 08:40:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="bqOT/xcQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C17805D464
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 08:38:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8F52E3E8;
+	Tue, 20 Feb 2024 08:40:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708418286; cv=none; b=u396I+IZs9o1xDYVWHPL683bMw/UrptM7tdar/6lynbH4qlSBjw4e1FHWmRilCThCwvWPcNEZ6FQKnRNwLlMHmpMUjR7+GJgievFVzteE8aaSPq/KJWcMw6zASFOPHEexpRq0bBqMIs+siCOPueJ+lDBheljDVU8Xbd+jebQ2Wk=
+	t=1708418403; cv=none; b=TPJATRVrxnUBycp78yDV1cyNYIE/CoSvUec3vHD/VHLMuAKX3vSK4tEEt1b5fnfpBT1ZzMJSjJKW/xCgRMHNBzdcCqBRwL9WLsVEr7RPBp1x+c/i+sy18wAE97Qq8VkO07Hs2mnS2xBYK//C74yeB0FYguD0anU3IPkEZ4C2pzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708418286; c=relaxed/simple;
-	bh=NUciA/1lTB1+Cosdgukk0rXblvpwTvsdBUdByBkfkeY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YSitabNCXtJs3SNVGGsGE/mWJSeJTjICI9TwoTBYe7R+L6gg8G2y2rlMDTLmFG+JkBxaa4+gf3KOHEQF5JUxsyUfOyesrGLHE0M2WToTrEpiy20GGxOB4Qe4RXWraWSjUyKlhbHJ/w4V5OUax3ibCdL8cJi8FXBqPC4AITfdwjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rcLdM-0007fA-JR; Tue, 20 Feb 2024 09:37:48 +0100
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	s=arc-20240116; t=1708418403; c=relaxed/simple;
+	bh=i2VLmiDs1HDaUbO7Q8ttxsa2e646Y7vLygvMNHBlik0=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=Cq6ukRTI64I+sEWyy5mPwVeuD/IxA5HCVGNCcXpX4NBCILkvqCYbTWDWAnJ+8WHgRqnr6guASb8KiTpaAzJEN8SNMsfsEIHXGgDY1hu7DR6TfI2LVTsEzGQiF6sJmWTmygES1T5s14W7Rd4UhRSjwjftDWKASMbRicIc2lKKNVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=bqOT/xcQ; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=xGUrxgHVXxNC3GiUUaEHTNUllWnhZ7+xy6iEdGOWVl4=; b=bqOT/xcQY7jTWUTHDliC0AJ5Vf
+	1KDsQGPw1ARCEpQXGHaM58TzSHRznwANmOgoiLZnQfCZeERbM9NJYBZcK8K8g5yFXyayreiX9a//N
+	HAstKpFctUthI1Q7Pl1vCClwp2j81cyZpf7cNP0D3gSJAL3nuhJoTGd5evR2sF7XOBCuxV4NMr86X
+	2jlOyUF+CNVD1udm8689/pqG7VpJCD76A5yTqGFpSo1I8zhrEzVM6VvY40Tefv02eKtulMS8gq5zK
+	9/lgvH5/VK28y/2qvuRD0thHxvY/Xi9OxfWmW4FfWZCMkjd0wOa4H4OJyXvF+fUD13M0Ta7hLu+q3
+	8e/vA6vA==;
+Received: from sslproxy07.your-server.de ([78.47.199.104])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rcLdL-001oAB-Ai; Tue, 20 Feb 2024 09:37:47 +0100
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 005FC292EAA;
-	Tue, 20 Feb 2024 08:37:46 +0000 (UTC)
-Date: Tue, 20 Feb 2024 09:37:46 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Oliver Hartkopp <socketcan@hartkopp.net>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] can: raw: raw_getsockopt(): reduce scope of err
-Message-ID: <20240220-twig-dean-11e4f07f52b6-mkl@pengutronix.de>
-References: <20240220-raw-setsockopt-v1-1-7d34cb1377fc@pengutronix.de>
- <CANn89iL7N-1zvBBLoz0qhCApVJRF1LKu=jSyC0yz-wHa3JLGNg@mail.gmail.com>
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rcLfI-000IZ5-Fb; Tue, 20 Feb 2024 09:39:48 +0100
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rcLfH-00043q-34;
+	Tue, 20 Feb 2024 09:39:47 +0100
+Subject: Re: [PATCH net-next 0/3] Change BPF_TEST_RUN use the system page pool
+ for live XDP frames
+To: =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <20240215132634.474055-1-toke@redhat.com> <87wmr0b82y.fsf@toke.dk>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <631d6b12-fb5c-3074-3770-d6927aea393d@iogearbox.net>
+Date: Tue, 20 Feb 2024 09:39:47 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="stun4zbvotcra547"
-Content-Disposition: inline
-In-Reply-To: <CANn89iL7N-1zvBBLoz0qhCApVJRF1LKu=jSyC0yz-wHa3JLGNg@mail.gmail.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <87wmr0b82y.fsf@toke.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27190/Mon Feb 19 10:24:27 2024)
 
+On 2/19/24 7:52 PM, Toke Høiland-Jørgensen wrote:
+> Toke Høiland-Jørgensen <toke@redhat.com> writes:
+> 
+>> Now that we have a system-wide page pool, we can use that for the live
+>> frame mode of BPF_TEST_RUN (used by the XDP traffic generator), and
+>> avoid the cost of creating a separate page pool instance for each
+>> syscall invocation. See the individual patches for more details.
+>>
+>> Toke Høiland-Jørgensen (3):
+>>    net: Register system page pool as an XDP memory model
+>>    bpf: test_run: Use system page pool for XDP live frame mode
+>>    bpf: test_run: Fix cacheline alignment of live XDP frame data
+>>      structures
+>>
+>>   include/linux/netdevice.h |   1 +
+>>   net/bpf/test_run.c        | 138 +++++++++++++++++++-------------------
+>>   net/core/dev.c            |  13 +++-
+>>   3 files changed, 81 insertions(+), 71 deletions(-)
+> 
+> Hi maintainers
+> 
+> This series is targeting net-next, but it's listed as delegate:bpf in
+> patchwork[0]; is that a mistake? Do I need to do anything more to nudge it
+> along?
 
---stun4zbvotcra547
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I moved it over to netdev, it would be good next time if there are dependencies
+which are in net-next but not yet bpf-next to clearly state them given from this
+series the majority touches the bpf test infra code.
 
-On 20.02.2024 09:25:58, Eric Dumazet wrote:
-> On Tue, Feb 20, 2024 at 9:16=E2=80=AFAM Marc Kleine-Budde <mkl@pengutroni=
-x.de> wrote:
-> >
-> > Reduce the scope of the variable "err" to the individual cases. This
-> > is to avoid the mistake of setting "err" in the mistaken belief that
-> > it will be evaluated later.
-> >
-> > Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-> > ---
-> >  net/can/raw.c | 12 ++++++++----
-> >  1 file changed, 8 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/net/can/raw.c b/net/can/raw.c
-> > index 897ffc17d850..2bb3eab98af0 100644
-> > --- a/net/can/raw.c
-> > +++ b/net/can/raw.c
-> > @@ -756,7 +756,6 @@ static int raw_getsockopt(struct socket *sock, int =
-level, int optname,
-> >         struct raw_sock *ro =3D raw_sk(sk);
-> >         int len;
-> >         void *val;
-> > -       int err =3D 0;
-> >
-> >         if (level !=3D SOL_CAN_RAW)
-> >                 return -EINVAL;
-> > @@ -766,7 +765,9 @@ static int raw_getsockopt(struct socket *sock, int =
-level, int optname,
-> >                 return -EINVAL;
-> >
-> >         switch (optname) {
-> > -       case CAN_RAW_FILTER:
-> > +       case CAN_RAW_FILTER: {
-> > +               int err =3D 0;
-> > +
-> >                 lock_sock(sk);
-> >                 if (ro->count > 0) {
-> >                         int fsize =3D ro->count * sizeof(struct can_fil=
-ter);
-> > @@ -791,7 +792,7 @@ static int raw_getsockopt(struct socket *sock, int =
-level, int optname,
-> >                 if (!err)
-> >                         err =3D put_user(len, optlen);
-> >                 return err;
-> > -
-> > +       }
-> >         case CAN_RAW_ERR_FILTER:
-> >                 if (len > sizeof(can_err_mask_t))
-> >                         len =3D sizeof(can_err_mask_t);
-> > @@ -822,7 +823,9 @@ static int raw_getsockopt(struct socket *sock, int =
-level, int optname,
-> >                 val =3D &ro->xl_frames;
-> >                 break;
-> >
-> > -       case CAN_RAW_XL_VCID_OPTS:
-> > +       case CAN_RAW_XL_VCID_OPTS: {
-> > +               int err =3D 0;
-> > +
-> >                 /* user space buffer to small for VCID opts? */
-> >                 if (len < sizeof(ro->raw_vcid_opts)) {
-> >                         /* return -ERANGE and needed space in optlen */
-> > @@ -839,6 +842,7 @@ static int raw_getsockopt(struct socket *sock, int =
-level, int optname,
-> >                         err =3D put_user(len, optlen);
-> >                 return err;
-> >
-> > +       }
-> >         case CAN_RAW_JOIN_FILTERS:
-> >                 if (len > sizeof(int))
-> >                         len =3D sizeof(int);
-> >
-> > ---
-> > base-commit: c8fba5d6df5e476aa791db4f1f014dad2bb5e904
-> > change-id: 20240220-raw-setsockopt-f6e173cdbbbb
->=20
-> What is the target tree ?
-
-Sorry I have to fine tune my b4 setup, this targets net-next. And
-depends on https://lore.kernel.org/all/20240219200021.12113-1-socketcan@har=
-tkopp.net/
-
-> In net-next tree, syzbot complained about a bug added in
->=20
-> commit c83c22ec1493c0b7cc77327bedbd387e295872b6
-> Author: Oliver Hartkopp <socketcan@hartkopp.net>
-> Date:   Mon Feb 12 22:35:50 2024 +0100
->=20
->     can: canxl: add virtual CAN network identifier support
->=20
-> Patch to fix the issue has not been sent yet ?
->=20
-> diff --git a/net/can/raw.c b/net/can/raw.c
-> index cb8e6f788af84ac65830399baac6d1cf3d093e08..897ffc17d850670003e5cf340=
-2477e8fc201f61e
-> 100644
-> --- a/net/can/raw.c
-> +++ b/net/can/raw.c
-> @@ -835,7 +835,9 @@ static int raw_getsockopt(struct socket *sock, int
-> level, int optname,
->                         if (copy_to_user(optval, &ro->raw_vcid_opts, len))
->                                 err =3D -EFAULT;
->                 }
-> -               break;
-> +               if (!err)
-> +                       err =3D put_user(len, optlen);
-> +               return err;
->=20
->         case CAN_RAW_JOIN_FILTERS:
->                 if (len > sizeof(int))
->
-
-The above mentioned patch fixes the issue introduced in c83c22ec1493
-("can: canxl: add virtual CAN network identifier support").
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---stun4zbvotcra547
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmXUZNcACgkQKDiiPnot
-vG89EAf/SUME5QqEm+81Zh004IMgC8KZ4Nhv0diZXK1WVCy7XzQ/1dDkmS4A35Gp
-o0zsuz/+tu35EPSt7/XoqaLlV5zwcxSNk+pmq9EdVq7hcX8dz4VujINdLQ+qlDv+
-Fy+4V7vG3A9J0js5fS8bei1AjlByT34X+YPQ/CkVrzcU6DyxqdO2OVPJg+ZvP023
-YiCrSjlvZpUkhNTd34Npqrk7lec14eEmStRa8Zo5Z01v3iZJxVGLnbVpRknZbujp
-cES/ejGfhxjnC159oaijrhAKYd/mTB9OM5vxKWJO67SQTOGqmkWp9GfSHobSY+E2
-4QyUFbHMiTh695ynSGk7qqT2cr/bzQ==
-=Vdbz
------END PGP SIGNATURE-----
-
---stun4zbvotcra547--
+> -Toke
+> 
+> [0] https://patchwork.kernel.org/project/netdevbpf/list/?series=826384
 
