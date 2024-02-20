@@ -1,145 +1,206 @@
-Return-Path: <netdev+bounces-73227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A944585B72F
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 10:21:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7ADD85B74F
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 10:27:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3ABEC1F25EF3
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:21:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 325FC284642
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:27:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58CDA5F477;
-	Tue, 20 Feb 2024 09:21:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ewe15Khs"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EF3A5FDA7;
+	Tue, 20 Feb 2024 09:27:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bg1.exmail.qq.com (bg1.exmail.qq.com [114.132.124.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88F785DF2B
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 09:21:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D045FB9E
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 09:27:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.132.124.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708420864; cv=none; b=UBXZUFIUnbYTTDfiGndjwxRsnukNQyft7P6ZaBIZyQqMIj2EMH8WO2k0aTKGoEHMbbUME87lvYVXn8bbhYD5UVxj5IPQi7ymoRKed5NAW4qEWZNcISUN1xQ7s5fd05auskrriJ3HMWp6jH6FZr3yosf2hItBm/6ngNx1M1dpwco=
+	t=1708421230; cv=none; b=b4v7OYbFrnXK7agcXt9gFla1py2nmE3zvQy3MdCfaAyxL09JOS33auYOc9+06Okm0yuTqmgQ4pk7//5XIqSrcQ9bQWhNZ1luE2K5NeuTzIPdkjEUSUHn4YLF9tEwz6DxB2nLwqrGgEhppbTLcQRTmyb/38MidDD3Ry4dme1+t90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708420864; c=relaxed/simple;
-	bh=y1I4lTWwMTia1vum2loHj23cfAeVFH7AFIJDi2XeCcQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VhyJCIm6qaud68ZlFkVozEDFk3RBs0ujRiANqC/w+hsiYzSVAcvL0YWa9RJ4wxZTZWRrbzDhxfWDzi2T0Gr1mYIkQL5BM8g+y82/RZhsFRAIx/PBdTHra1fh3axtJArfoy23RVpk5tG5jboBtubMe+75byYhBrTnQ5azhHnfKLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ewe15Khs; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-512c4442095so585355e87.2
-        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 01:21:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708420861; x=1709025661; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fdhB/OebAUjm/AFv0XF6TY7b9nkZEns3B+QEhrz2u2s=;
-        b=ewe15Khs0WgdPKvCv04FslogBOrRftG9nHjvtKSRNUL6+BZu9v8zYgOzhFRTw/moJ8
-         oDsVew0onkgYmfVDOyPN/FWkxCSz2tpLbqKwVGNQ3A4tojuC9w+2EQAZ0UMULZK8kInR
-         aAxtL0urDuHp+nh4f3aZDDNSHHRANsU2PN/OF7ZWtpGAXIENqysc2j4qY+AAV4avxyGH
-         7OQgAtybHFCebKx2LUmgwjed6c3NLVQ7rmUfaBY94xyWH2IaghWfpTgJh/pRquhRC7Q+
-         /WqsYPBHxN3eRzu5A9+dL0eV3kpeE4v6erhbtLHBUYuwPJ+vcsiCGRm9/MUiiiUxYKe6
-         BhvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708420861; x=1709025661;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fdhB/OebAUjm/AFv0XF6TY7b9nkZEns3B+QEhrz2u2s=;
-        b=J//olePwLkSIbAkNWrS+Ba19jAf+cDnzxoYfD4qJ9jOu846SJmRb4OMcJTBAlx9wz+
-         V8W85mvTBu3GBNJwdEjOjvu7MjQXc96fihcrSfbTtymGyKfMDGX7ttwj9UIO2fiMUyAH
-         eSZCWsbBLZMdwjc77bKvAt3Js222HBzp2B20GnDXUo3RGcluhZMV9/AS5wrk/BEovVR4
-         rsWO8PXkpilo1VOOsKsl3eEfCGiuJnAAmW4L9QGsZqqJl79qowyyACd4ep5T45dHVOVn
-         nuN11f1eWDiaKsbQDB5aj4ysBoEi3UQlUk7EPE2NMI8YeOdOwjB8p7ZJxDlvyLw7fnnY
-         UNZg==
-X-Forwarded-Encrypted: i=1; AJvYcCXCQyhKw05GkZbRL1A3Ow4vnxgFTp9u3pA0IvQy99Ursdr2tIRC7qEhnOnnLBx0j3rvL8tvsayI2RUXLo9lwYLA4Cx0UW4E
-X-Gm-Message-State: AOJu0YzGUbLONXyDnlUz0798PmpCS1+pBXAM8N36FvPQmnvXu8OkcwIW
-	JIXom4ZHb71Omc6449Livvh7XgvFUSfkEAvcju5DuN9sXZGejbciBbQEdSqV
-X-Google-Smtp-Source: AGHT+IFENXQ2/kIvaynag/3ye0EYbZr1RqBX2LzSkz1tqwcz87hMFLb+HYFe/A4uzUmPS1D8iGWrkA==
-X-Received: by 2002:a19:655d:0:b0:512:ab03:f4 with SMTP id c29-20020a19655d000000b00512ab0300f4mr4763035lfj.37.1708420860434;
-        Tue, 20 Feb 2024 01:21:00 -0800 (PST)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id x28-20020ac25ddc000000b00512a3f5322fsm1151146lfq.8.2024.02.20.01.20.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Feb 2024 01:21:00 -0800 (PST)
-Date: Tue, 20 Feb 2024 12:20:56 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Kurt Kanzenbach <kurt@linutronix.de>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Rohan G Thomas <rohan.g.thomas@intel.com>, 
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net] net: stmmac: Fix EST offset for dwmac 5.10
-Message-ID: <mmjrlyzhegve5u3s3lhw4hmhooxixn3pwxkkdikxgxno4teqyz@rtetljwg6ffg>
-References: <20240220-stmmac_est-v1-1-c41f9ae2e7b7@linutronix.de>
+	s=arc-20240116; t=1708421230; c=relaxed/simple;
+	bh=0vAZ754tu9q2lFBPcL5SE9WFsK9Exg1X8XUv1ggGoNw=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=lQi1PgE9u9lYLx3ixN1HvEQoWHJhpFOYpZbprP3+YCh8GSg1oplJ6gijGrp/dn9cnN8ZTxJ+FV6mamH7PO8ZKaAoWVK0pHt8poRlOunWf3/5RVH2YRkEOqRwS3XGkO7YI/3DSPj0rR6z8MYEWLUxHjSUp9IPCqCU2vaHnJvrOXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=114.132.124.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas12t1708421127t877t41188
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [115.192.112.158])
+X-QQ-SSF:00400000000000F0FTF000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 4819387268812499297
+To: "'Andrew Lunn'" <andrew@lunn.ch>
+Cc: <davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<maciej.fijalkowski@intel.com>,
+	<netdev@vger.kernel.org>,
+	<mengyuanlou@net-swift.com>
+References: <20240206070824.17460-1-jiawenwu@trustnetic.com> <9259e4eb-8744-45cf-bdea-63bc376983a4@lunn.ch> <003801da6249$888e4210$99aac630$@trustnetic.com> <33eed490-7819-409e-8c79-b3c1e4c4fd66@lunn.ch>
+In-Reply-To: <33eed490-7819-409e-8c79-b3c1e4c4fd66@lunn.ch>
+Subject: RE: [PATCH] net: txgbe: fix GPIO interrupt blocking
+Date: Tue, 20 Feb 2024 17:25:26 +0800
+Message-ID: <00e301da63de$bd53db90$37fb92b0$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240220-stmmac_est-v1-1-c41f9ae2e7b7@linutronix.de>
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQKQWSrySMPq8PWl707TeSOritAirQH7bedeAP/Pp5gCVYvqAa98F4fw
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-Hi Kurt
+On Mon, Feb 19, 2024 12:45 AM, Andrew Lunn wrote:
+> On Sun, Feb 18, 2024 at 05:04:52PM +0800, Jiawen Wu wrote:
+> > On Tue, Feb 6, 2024 11:29 PM, Andrew Lunn wrote:
+> > > On Tue, Feb 06, 2024 at 03:08:24PM +0800, Jiawen Wu wrote:
+> > > > GPIO interrupt is generated before MAC IRQ is enabled, it causes
+> > > > subsequent GPIO interrupts that can no longer be reported if it is
+> > > > not cleared in time. So clear GPIO interrupt status at the right
+> > > > time.
+> > >
+> > > This does not sound correct. Since this is an interrupt controller, it
+> > > is a level interrupt. If its not cleared, as soon as the parent
+> > > interrupt is re-enabled, is should cause another interrupt at the
+> > > parent level. Servicing that interrupt, should case a descent to the
+> > > child, which will service the interrupt, and atomically clear the
+> > > interrupt status.
+> > >
+> > > Is something wrong here, like you are using edge interrupts, not
+> > > level?
+> >
+> > Yes, it is edge interrupt.
+> 
+> So fix this first, use level interrupts.
 
-On Tue, Feb 20, 2024 at 09:22:46AM +0100, Kurt Kanzenbach wrote:
-> Fix EST offset for dwmac 5.10.
-> 
-> Currently configuring Qbv doesn't work as expected. The schedule is
-> configured, but never confirmed:
-> 
-> |[  128.250219] imx-dwmac 428a0000.ethernet eth1: configured EST
-> 
-> The reason seems to be the refactoring of the EST code which set the wrong
-> EST offset for the dwmac 5.10. After fixing this it works as before:
-> 
-> |[  106.359577] imx-dwmac 428a0000.ethernet eth1: configured EST
-> |[  128.430715] imx-dwmac 428a0000.ethernet eth1: EST: SWOL has been switched
-> 
-> Tested on imx93.
-> 
-> Fixes: c3f3b97238f6 ("net: stmmac: Refactor EST implementation")
-> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/hwif.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
-> index 1bd34b2a47e8..29367105df54 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
-> @@ -224,7 +224,7 @@ static const struct stmmac_hwif_entry {
->  		.regs = {
->  			.ptp_off = PTP_GMAC4_OFFSET,
->  			.mmc_off = MMC_GMAC4_OFFSET,
-> -			.est_off = EST_XGMAC_OFFSET,
-> +			.est_off = EST_GMAC4_OFFSET,
+I have a question here.
 
-Unfortunate c&p typo indeed. Thanks for fixing it!
-Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+I've been setting the interrupt type in chip->irq_set_type. The 'type' is
+passed as IRQ_TYPE_EDGE_BOTH. Then I config GPIO registers based on
+this type, and use edge interrupts. Who decides this type? Can I change
+it at will?
 
--Serge(y)
+> 
+> > > > And executing function txgbe_gpio_irq_ack() manually since
+> > > > handle_nested_irq() does not call .irq_ack for irq_chip.
+> > >
+> > > I don't know the interrupt code too well, so could you explain this in
+> > > more detail. Your explanation sounds odd to me.
+> >
+> > This is because I changed the interrupt controller in
+> > https://git.kernel.org/netdev/net-next/c/aefd013624a1.
+> > In the previous interrupt controller, .irq_ack in struct irq_chip is called
+> > to clear the interrupt after the GPIO interrupt is handled. But I found
+> > that in the current interrupt controller, this .irq_ack is not called. Maybe
+> > I don't know enough about this interrupt code, I have to manually add
+> > txgbe_gpio_irq_ack() to clear the interrupt in the handler.
+> 
+> You should dig deeper into interrupts.
+> [goes and digs]
+> 
+> https://elixir.bootlin.com/linux/latest/source/include/linux/irq.h#L461
+>  * @irq_ack:		start of a new interrupt
+> 
+> The comment makes it sound like irq_ack will be the first callback
+> used when handling an interrupt.
+> 
+> static inline void mask_ack_irq(struct irq_desc *desc)
+> {
+>         if (desc->irq_data.chip->irq_mask_ack) {
+>                 desc->irq_data.chip->irq_mask_ack(&desc->irq_data);
+>                 irq_state_set_masked(desc);
+>         } else {
+>                 mask_irq(desc);
+>                 if (desc->irq_data.chip->irq_ack)
+>                         desc->irq_data.chip->irq_ack(&desc->irq_data);
+>         }
+> }
+> 
+> So the comment might be a little misleading. It will first mask the
+> interrupt, and then ack it.
+> 
+> /**
+>  *      handle_level_irq - Level type irq handler
+>  *      @desc:  the interrupt description structure for this irq
+>  *
+>  *      Level type interrupts are active as long as the hardware line has
+>  *      the active level. This may require to mask the interrupt and unmask
+>  *      it after the associated handler has acknowledged the device, so the
+>  *      interrupt line is back to inactive.
+>  */
+> void handle_level_irq(struct irq_desc *desc)
+> {
+>         raw_spin_lock(&desc->lock);
+>         mask_ack_irq(desc);
+> 
+> So when handling a level interrupt, mask and then ack is the first
+> thing done. And it is unconditional.
+> 
+> edge interrupts are different:
+> 
+> /**
+>  *      handle_edge_irq - edge type IRQ handler
+>  *      @desc:  the interrupt description structure for this irq
+>  *
+>  *      Interrupt occurs on the falling and/or rising edge of a hardware
+>  *      signal. The occurrence is latched into the irq controller hardware
+>  *      and must be acked in order to be reenabled. After the ack another
+>  *      interrupt can happen on the same source even before the first one
+>  *      is handled by the associated event handler. If this happens it
+>  *      might be necessary to disable (mask) the interrupt depending on the
+>  *      controller hardware. This requires to reenable the interrupt inside
+>  *      of the loop which handles the interrupts which have arrived while
+>  *      the handler was running. If all pending interrupts are handled, the
+>  *      loop is left.
+>  */
+> void handle_edge_irq(struct irq_desc *desc)
+> {
+>         raw_spin_lock(&desc->lock);
+> 
+>         desc->istate &= ~(IRQS_REPLAY | IRQS_WAITING);
+> 
+>         if (!irq_may_run(desc)) {
+>                 desc->istate |= IRQS_PENDING;
+>                 mask_ack_irq(desc);
+>                 goto out_unlock;
+>         }
+> 
+>         /*
+>          * If its disabled or no action available then mask it and get
+>          * out of here.
+>          */
+>         if (irqd_irq_disabled(&desc->irq_data) || !desc->action) {
+>                 desc->istate |= IRQS_PENDING;
+>                 mask_ack_irq(desc);
+>                 goto out_unlock;
+>         }
+> 
+>        /* Start handling the irq */
+>         desc->irq_data.chip->irq_ack(&desc->irq_data);
+> 
+> So if the interrupt handler is already running, it will mask and ack
+> it, but not handle it, since there is already a handler running.
+> Otherwise it will ack the interrupt and then handle it. And it loops
+> handling the interrupt while IRQS_PENDING is set, i.e. another
+> interrupt has arrived while the handler was running.
+> 
+> I would suggest you first get it using level interrupts, and then dig
+> into how level interrupts are used, which do appear to be simpler than
+> edge.
+> 
+> 	Andrew
+> 
 
->  		},
->  		.desc = &dwmac4_desc_ops,
->  		.dma = &dwmac410_dma_ops,
-> 
-> ---
-> base-commit: 40b9385dd8e6a0515e1c9cd06a277483556b7286
-> change-id: 20240220-stmmac_est-ea6884f9ba3c
-> 
-> Best regards,
-> -- 
-> Kurt Kanzenbach <kurt@linutronix.de>
-> 
-> 
 
