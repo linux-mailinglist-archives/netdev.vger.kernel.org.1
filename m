@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-73463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA09C85CBAC
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 00:04:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFD0A85CBAD
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 00:04:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 463191F22BE7
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 23:04:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74A82284449
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 23:04:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23F99154BF0;
-	Tue, 20 Feb 2024 23:03:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A916154BFC;
+	Tue, 20 Feb 2024 23:03:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="P0M4Dftl"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="FxIj7TI5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72DC66BB28
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 23:03:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4468154BEB
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 23:03:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708470232; cv=none; b=gr7z4wHIclNg2XpYsKA35dbPzMOBTBi1EKmJPS4XgTfD5EY+Xj61fpOoA2qaQARsRBsh9M4Wj7XU1YoAT7IqGjEoxQHlaoSbfLE8o62gLdXsIpBH0vblZnG9l4ipXepn43Dx/Ip3dOHiMsi5P8knbyakbfASDu36Lna+sFuy61A=
+	t=1708470233; cv=none; b=lRVYXk8v8+omjPXfBgBbyw9FEIn9JZcLtuAkVBCLvIXTQ0Xj9Z7FWgxOFEalGZiZiwvj9TbCjX97aS+XhC+yTkcc4syTR5leU5cP9mOU8hvzbBFUx5oP0DoPXoNkiMLpf6CQ3AuHgyRhO1yQ7mGi7rxJnEwuSz+xVKhVGHmp43E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708470232; c=relaxed/simple;
-	bh=NtBRVeCYJcmsQJCib9PwFJX9JAQb2gYlB1qos6zxaFY=;
+	s=arc-20240116; t=1708470233; c=relaxed/simple;
+	bh=K2ZxQGOKFoVwBigXBNNB0oarH2oloNtEBTIfumQRd6U=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q2hCVL7Glexcz6+INYj0BjZM2f08e+hH+EG9gRBwRSV9DanLh5NG5htWmKz108DH/lp71YtfE0cpZiS0u9gACprZ/QIlMzkoFV0OgwdlHcST7IFFNSP9EEvoAVxHGVLD3f5zVrCZ8WgWBWlZrALO6SF4B3dJX0QA91kdKoXRiAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=P0M4Dftl; arc=none smtp.client-ip=209.85.160.175
+	 MIME-Version:Content-Type; b=gQWWcKZXCCx4+PCizPUPYQwe85iltSejtDgtVvtbPzRjekBhALnR9IHryHXCt6xWPI/oylolLLywmqsUecnHWaiqPEmPO2Fm0KD3IGNS8KaUHTOunrK5T2CMCY13FzQGN+GUWxRNIj0R6A7irc6y5HM/KqWOrpXtynCoLqjJ8i4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=FxIj7TI5; arc=none smtp.client-ip=209.85.219.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-42a4516ec46so63796221cf.0
-        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 15:03:50 -0800 (PST)
+Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-dcbc6a6808fso6345040276.2
+        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 15:03:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1708470229; x=1709075029; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1708470231; x=1709075031; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=URqzSXs7hnPwCNK5ifvP8Gh9oaT8HqiFZnjoaBsyYsc=;
-        b=P0M4DftlP1WMsvmH3qCbnhX2IqhDNt+1kGnyBioRAJAJS/KhRq+lUKctSFl53Cm6Kp
-         m1cgm3SwHq50B+HkkSeRKF22qm2Qmx9YXE2zvUxiXLyVg2BoAC9XbgPuiPuKqJWnuY+P
-         n4s0bgSspuDxTz7+bOvnqaJjXqD+XH0rk4E7o=
+        bh=7/Fc9vmsbXajGioCEefOFYBTI6iVy3rXK2F9RPnhsUc=;
+        b=FxIj7TI5XncFGW2tOKHCvEjcdD7cZHb1wsMdKHKp4VT+LwdKuQ/wiCIhYkSlJhK88e
+         XegI9ZPj3Aokzggpf2BHpiyNCKM6qmbUDkgJmLlUys3ishY34GSHA40/kNsxHgjKWdOK
+         Mw5H8tKg8gTYkM1SigdMlSXMDgxXDK+/eKKxo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708470229; x=1709075029;
+        d=1e100.net; s=20230601; t=1708470231; x=1709075031;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=URqzSXs7hnPwCNK5ifvP8Gh9oaT8HqiFZnjoaBsyYsc=;
-        b=G0G9544bfSHxD3X2dg8fEIsYwajwEw3i1EeCr0Jk7wu5dd4UR+cLzanw3+pieygiuz
-         5OWqe1Uc+fXVoYZ55gVj8Qm9eqjYH7B4SH2sJ7VrVvxVlYuyf3Ropb/imUTZlMOSqxfz
-         nd1qzKLuMLWNa9TJ7o+1MqJlI+0lD7Lbo8ao4T6+MG5EVWZQmXMDQXpFN3azjDjeNShj
-         Btf1TNjw4ss5TKHUf1N4AC3uCr7sg3r2ae52biWEhaayvP+59UEd4IZpSukvogXYeecP
-         SfdHeZ4bnbjNx61y5qZX/xXe83wNwjSbAcjHr3+6EMRa7+lqQR/dYYAy0SSINNSDYYet
-         9gbA==
-X-Gm-Message-State: AOJu0YyrK5wu6OKJksgm1N2yx5BKfiVz2zCGVJJj2pGGDS+tXCVJpcGH
-	j4x8BtRJsLhyEY7Ubk96N5Zxa/s9itDb1H1pMitSfWVGXb0BuFqLTEAl7X74ZA==
-X-Google-Smtp-Source: AGHT+IFYiVWarQl0XhvTAm3cdAbIk52Ls4GzgX2nW6YjxygA+J5K2PjEUrUCBSSsSbAQU0+G405NhQ==
-X-Received: by 2002:a05:622a:15d3:b0:42d:adb9:a72f with SMTP id d19-20020a05622a15d300b0042dadb9a72fmr34344005qty.20.1708470229195;
-        Tue, 20 Feb 2024 15:03:49 -0800 (PST)
+        bh=7/Fc9vmsbXajGioCEefOFYBTI6iVy3rXK2F9RPnhsUc=;
+        b=tjsJb+Y0ztTPXceAkkNIOHozL4l60q0KuEJZNPUPvpiaJCyvRh6Cb25foQ3/a2JOFl
+         NHNqbNcxTvHu8tqHCjRdv6CofrqJVlx8bclF2oeZYiddayMmGAgyjCG8hQvzUiLqGXap
+         XaNuHWtnR9njYVR1JJPjFDq/D8YbEyTIHSbQN0oJnXEBaFhINLWhNu2rVlHBZEL5OK/c
+         orxDL41MnRKThyxUbRT5ft7/tNavndNHAiBsaBbuk+0SB51ZnlWGHadAsWuEBX8CHrZJ
+         yDO5KIPo6UMizw3OCOLPXDY/pzTmsIiQ06V9d7TU2vOPMkwNLl7lpz/6ChsmK91QwNWS
+         AskQ==
+X-Gm-Message-State: AOJu0Yx5zk9ExtWzTSKM+bClK3oCvWZ8bkgbq3Q7Ys/0BI283CIFz8xZ
+	GiF4i7NTWwI6FDAXk7GUH64HUmCraZwRaXQxEZK2jvB26aIFO+OwaHVsjUxGzw==
+X-Google-Smtp-Source: AGHT+IG62W1YD046gVtxD3mo77GAi29pMW0jLBKtMXZtOQtkVT+Aidn4r1ByHLaeRlDBUHpXsYwgJQ==
+X-Received: by 2002:a25:8247:0:b0:dcd:38f9:f78 with SMTP id d7-20020a258247000000b00dcd38f90f78mr15547722ybn.29.1708470230689;
+        Tue, 20 Feb 2024 15:03:50 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id g10-20020ae9e10a000000b00785d7dda9easm3797966qkm.28.2024.02.20.15.03.47
+        by smtp.gmail.com with ESMTPSA id g10-20020ae9e10a000000b00785d7dda9easm3797966qkm.28.2024.02.20.15.03.49
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 20 Feb 2024 15:03:48 -0800 (PST)
+        Tue, 20 Feb 2024 15:03:50 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -69,10 +69,10 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com,
-	Somnath Kotur <somnath.kotur@broadcom.com>
-Subject: [PATCH net-next 04/10] bnxt_en: Check additional resources in bnxt_check_rings()
-Date: Tue, 20 Feb 2024 15:03:11 -0800
-Message-Id: <20240220230317.96341-5-michael.chan@broadcom.com>
+	Venkat Duvvuru <venkatkumar.duvvuru@broadcom.com>
+Subject: [PATCH net-next 05/10] bnxt_en: Add bnxt_get_total_vnics() to calculate number of VNICs
+Date: Tue, 20 Feb 2024 15:03:12 -0800
+Message-Id: <20240220230317.96341-6-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20240220230317.96341-1-michael.chan@broadcom.com>
 References: <20240220230317.96341-1-michael.chan@broadcom.com>
@@ -83,46 +83,99 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000263e990611d8392a"
+	boundary="0000000000003ca3ce0611d83959"
 
---000000000000263e990611d8392a
+--0000000000003ca3ce0611d83959
 Content-Transfer-Encoding: 8bit
 
-bnxt_check_rings() is called to check if we have enough resource
-assets to satisfy the new number of ethtool channels.  If the asset
-test fails, the ethtool operation will fail gracefully.  Otherwise
-we will proceed and commit to use the new number of channels.  If it
-fails to allocate any resources, the chip will fail to come up.
+From: Venkat Duvvuru <venkatkumar.duvvuru@broadcom.com>
 
-For completeness, check all possible resources before committing to
-the new settings.  Add the missing ring group and RSS context asset
-tests in bnxt_check_rings().
+Refactor the code by adding a new function to calculate the number of
+required VNICs.  This is used in multiple places when reserving or
+checking resources.
 
 Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+Signed-off-by: Venkat Duvvuru <venkatkumar.duvvuru@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 28 ++++++++++++++---------
+ 1 file changed, 17 insertions(+), 11 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index e6fad2a8b817..71ac165dfb52 100644
+index 71ac165dfb52..95af3cd7dba0 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -13339,6 +13339,8 @@ int bnxt_check_rings(struct bnxt *bp, int tx, int rx, bool sh, int tcs,
- 	if (BNXT_NEW_RM(bp)) {
- 		hwr.cp += bnxt_get_ulp_msix_num(bp);
- 		hwr.stat += bnxt_get_ulp_stat_ctxs(bp);
-+		hwr.grp = rx;
-+		hwr.rss_ctx = bnxt_get_total_rss_ctxs(bp, &hwr);
+@@ -7308,13 +7308,22 @@ static void bnxt_check_rss_tbl_no_rmgr(struct bnxt *bp)
  	}
+ }
+ 
++static int bnxt_get_total_vnics(struct bnxt *bp, int rx_rings)
++{
++	if (bp->flags & BNXT_FLAG_RFS) {
++		if (!(bp->flags & BNXT_FLAG_CHIP_P5_PLUS))
++			return rx_rings + 1;
++	}
++	return 1;
++}
++
+ static bool bnxt_need_reserve_rings(struct bnxt *bp)
+ {
+ 	struct bnxt_hw_resc *hw_resc = &bp->hw_resc;
+ 	int cp = bnxt_cp_rings_in_use(bp);
+ 	int nq = bnxt_nq_rings_in_use(bp);
+ 	int rx = bp->rx_nr_rings, stat;
+-	int vnic = 1, grp = rx;
++	int vnic, grp = rx;
+ 
+ 	if (hw_resc->resv_tx_rings != bp->tx_nr_rings &&
+ 	    bp->hwrm_spec_code >= 0x10601)
+@@ -7329,9 +7338,9 @@ static bool bnxt_need_reserve_rings(struct bnxt *bp)
+ 		bnxt_check_rss_tbl_no_rmgr(bp);
+ 		return false;
+ 	}
+-	if ((bp->flags & BNXT_FLAG_RFS) &&
+-	    !(bp->flags & BNXT_FLAG_CHIP_P5_PLUS))
+-		vnic = rx + 1;
++
++	vnic = bnxt_get_total_vnics(bp, rx);
++
+ 	if (bp->flags & BNXT_FLAG_AGG_RINGS)
+ 		rx <<= 1;
+ 	stat = bnxt_get_func_stat_ctxs(bp);
+@@ -7382,13 +7391,13 @@ static int __bnxt_reserve_rings(struct bnxt *bp)
+ 	hwr.cp = bnxt_nq_rings_in_use(bp);
+ 	hwr.tx = bp->tx_nr_rings;
+ 	hwr.rx = bp->rx_nr_rings;
+-	hwr.vnic = 1;
+ 	if (bp->flags & BNXT_FLAG_SHARED_RINGS)
+ 		sh = true;
  	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS)
- 		hwr.cp_p5 = hwr.tx + rx;
+ 		hwr.cp_p5 = hwr.rx + hwr.tx;
+-	else if (bp->flags & BNXT_FLAG_RFS)
+-		hwr.vnic = hwr.rx + 1;
++
++	hwr.vnic = bnxt_get_total_vnics(bp, hwr.rx);
++
+ 	if (bp->flags & BNXT_FLAG_AGG_RINGS)
+ 		hwr.rx <<= 1;
+ 	hwr.grp = bp->rx_nr_rings;
+@@ -13326,10 +13335,7 @@ int bnxt_check_rings(struct bnxt *bp, int tx, int rx, bool sh, int tcs,
+ 	if (max_tx < hwr.tx)
+ 		return -ENOMEM;
+ 
+-	hwr.vnic = 1;
+-	if ((bp->flags & (BNXT_FLAG_RFS | BNXT_FLAG_CHIP_P5_PLUS)) ==
+-	    BNXT_FLAG_RFS)
+-		hwr.vnic += rx;
++	hwr.vnic = bnxt_get_total_vnics(bp, rx);
+ 
+ 	tx_cp = __bnxt_num_tx_to_cp(bp, hwr.tx, tx_sets, tx_xdp);
+ 	hwr.cp = sh ? max_t(int, tx_cp, rx) : tx_cp + rx;
 -- 
 2.30.1
 
 
---000000000000263e990611d8392a
+--0000000000003ca3ce0611d83959
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -193,14 +246,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIO3EmODwfCwH2XJ01rBcoy56LRtYJBFL
-i8FCzNs1sFhfMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDIy
-MDIzMDM0OVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEILFob1dq1f+V93ZqPesmsT5UclLazag3
+jnRDPBUJ5PIRMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDIy
+MDIzMDM1MVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQCL4s83UfzWDD6x3uYZvVkDqkdujcGNXEoGcT/NLYDQWlePJIDz
-zrjTscpJ6Y/2fNGthp+WuUnKsqOTEevN4nYvT9r9EhTLVPkURKVFFdg3hP9SQj6svmD+yZ8K93b2
-RpsGm7jGDglFvoqV1QlViazgJ5TLh2uOgJkutWXsQ+XWMAbJUsWBN26SB+ARzj55vAlk+zzEUC92
-T7U7vMHYH+i9sLVGL0x3X/q2rrOl9WVNW6TRn7SAg5ii3yj+k22EQuXrgbnYOnFhqp/pqk/upq8i
-H4kfvob8MFP9WHzcVD62/QN2SBascwsrgBNXaxqvSJIEsDBoxoC2JBOhfUEmwQja
---000000000000263e990611d8392a--
+ATANBgkqhkiG9w0BAQEFAASCAQAx5DGbOtHZICuj1g+8w4wlDMjq2hrpOO27DSxsNdmJFXe25/AK
+8DfM2wWYr8AST+C5tcjTjzqJar0cvKy7oHKaCjbONgdlIAP7LMntPDUf+oNe2YbIAx5ZYLgeZZ4s
+ub/2fUQmZ5B7tUy0yU2+oSrMdmOUNqBzqbiNeoK3HcPayv8jWXBSQZlaWrmxKHgh2dYzYyRwFfxF
+TpJQqkZF+QwGuFgJxkQctLdPhhXRc7OsQ+PcIcgnbZNqJVsX3r7RWNsDWoyrn81DLi+JAoBNoGqR
+bVv9Fh4whRMc/3PLCczmdMULA+e9YgimWCtoKk8z/RB6JADFX1VamD8T8RASjouK
+--0000000000003ca3ce0611d83959--
 
