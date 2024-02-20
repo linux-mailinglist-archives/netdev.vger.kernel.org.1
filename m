@@ -1,136 +1,202 @@
-Return-Path: <netdev+bounces-73383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C71285C3AF
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 19:40:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FBB685C3BF
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 19:42:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D9811C21D60
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 18:40:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEF4E1F210FC
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 18:42:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F5FA77A01;
-	Tue, 20 Feb 2024 18:40:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1A5912AAFC;
+	Tue, 20 Feb 2024 18:42:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=david-bauer.net header.i=@david-bauer.net header.b="NtPGukj/"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="i0Cc23g/"
 X-Original-To: netdev@vger.kernel.org
-Received: from perseus.uberspace.de (perseus.uberspace.de [95.143.172.134])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C443669D01
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 18:40:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.172.134
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 500D012AAC1;
+	Tue, 20 Feb 2024 18:42:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708454444; cv=none; b=hbSsPu3yDC5W4C6g2fVjGmW/8lsmiw1MKc4liLRcEc7yYSAsZ8jCOU3GxFvPeupV6ktyDdkZTAssBGoXPHzJVqWDm81lf4Sd8qq3sxNbcXFazSixKzHNfuvlmCiSvHFG22TL0hTO2lpV3xe2CphIatIeCmDbjPP4WQUPHYs77QA=
+	t=1708454548; cv=none; b=Ri+Nrio/pUiXIEXMuAKBPJBP8CqKrd8qJj983yOHvJCRtu+fLcYcexbREdPfl867CfMaeS7P4bJMm9MnEfs6OSLIrZ3QNtHwVTy6Ssh9lcJwCZEtvsj9jHcnrfP5j38UZOX09LpvG+dY7mU0NOX8uzGRClnaK34klsjF58GwoWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708454444; c=relaxed/simple;
-	bh=KM9+4FhHbHX+pS0ZI/qGWFokcPU4isB+jXFDR0HQI0Q=;
-	h=Message-ID:Date:MIME-Version:From:To:Cc:Subject:Content-Type; b=ezkM70uYh11GONvdoOnaENkZXDQizwrLcXPTsSxT7xuIIC4S1yaZCIuvma7IBgUFcyxQ/QDOUD0cc4fkPY5GcX71/tvH8Zc6K4xSwcTpeuR4BRiDSC8kIr7OwlYJUOyQb8nYJUW0gfzmdmsQXVIwItSrWe3ugpTaCIfkUE9DEUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=david-bauer.net; spf=pass smtp.mailfrom=david-bauer.net; dkim=fail (0-bit key) header.d=david-bauer.net header.i=@david-bauer.net header.b=NtPGukj/ reason="key not found in DNS"; arc=none smtp.client-ip=95.143.172.134
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=david-bauer.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=david-bauer.net
-Received: (qmail 3011 invoked by uid 988); 20 Feb 2024 18:33:55 -0000
-Authentication-Results: perseus.uberspace.de;
-	auth=pass (plain)
-Received: from unknown (HELO unkown) (::1)
-	by perseus.uberspace.de (Haraka/3.0.1) with ESMTPSA; Tue, 20 Feb 2024 19:33:55 +0100
-Message-ID: <15ee0cc7-9252-466b-8ce7-5225d605dde8@david-bauer.net>
-Date: Tue, 20 Feb 2024 19:33:54 +0100
+	s=arc-20240116; t=1708454548; c=relaxed/simple;
+	bh=+pVfYEr7XO3DpYpotTiexUm+b8VWYPRpkEbdDmREHlk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=APC5+4j+lrIlUy/Pzs6qnpsDXNtfQGdOgaVhYxwjXFWO7z78Ls+Bxa3ERVkMtzbBs3mPmWbUWnlDpgLqoPsI4Hw+ZP6L94oIStKYMP1ZbHrLHZ2KhQGz+gZL3cjSE1r11OYL+Di36kE7xxSB8CdicMhpW5rqG6RJ2N4FUB3cHVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=i0Cc23g/; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 7DF4160002;
+	Tue, 20 Feb 2024 18:42:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1708454542;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=xTQHv/xPrWj4xRmZLf6OLY/oIhHbsC3f4zK2ZbIN5Es=;
+	b=i0Cc23g/2GRDjwry00mzOVZ89XR3vRiy0m4NW6UpbOt+5HqmYI0Idc5NwAhYSWRy81pOE9
+	Wpwa6cIgwqyAEnEpdfDfjpP8MQd+vvAI0zdgEGLcwPZBem68GzpiVrBYCf6pijPzZVhBEc
+	Tlz99UPRjijz/YzfzmhvDXfkduYd48UItkxlL5rTYx8Y0noDcDoZLDMg2Vaygh4q35IH1U
+	kKTNgxSgD6Em3Hi/KOkypeoQIHpapGUBCcCW+J9WmYeMiF2E6VST92RyfB3z+2RVOtgzuj
+	Zt5iqRMrMhG1mr7SfgPV4QYsDV6o47xScTLHlM8J67UyQnyUq4AdSs3YWCvrWg==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
+	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	mwojtas@chromium.org
+Subject: [PATCH net-next v8 00/13] Introduce PHY listing and link_topology tracking
+Date: Tue, 20 Feb 2024 19:42:03 +0100
+Message-ID: <20240220184217.3689988-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-From: David Bauer <mail@david-bauer.net>
-To: Ido Schimmel <idosch@nvidia.com>, Amit Cohen <amcohen@nvidia.com>
-Cc: netdev@vger.kernel.org
-Subject: VxLAN learning creating broadcast FDB entry
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Bar: ---
-X-Rspamd-Report: BAYES_HAM(-2.999491) XM_UA_NO_VERSION(0.01) MIME_GOOD(-0.1)
-X-Rspamd-Score: -3.089491
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=david-bauer.net; s=uberspace;
-	h=from;
-	bh=KM9+4FhHbHX+pS0ZI/qGWFokcPU4isB+jXFDR0HQI0Q=;
-	b=NtPGukj/NYeJqrUyK9YwJweWuKWhbAdCbwOMyf/qVNBRKyXIvWCCiHC5XlMV1iXgdxcsGppT+l
-	+uui0hR+vuYeDLoLIh1PnLN2HoCvscYnKWI1Uw63JwLi9U4siTQNxTVLXSViJxFvnW6uWffQDqiP
-	45KWqtiwt9GBNXPAade/2PROuFldyD/hcYx44KeZCF6YHqJBMkVjEp2EAIGboJFeYDwQgcT5QaNO
-	c4jtUbjHTPXWTcMtIARgtf4tSx7qy0nVWGwqdgTse1VyIiQ0oejdjIvUFgpIKX0LciXhpd1dhjMh
-	kZoQHgkuQY0RABar5gUQR/mULCydvaN394KYDCJ60VFNfOite0PXFNzmq9bRRc19+6d4vQghYKMv
-	jgoMXPeMtSvlzrCEsjE/bxMwQhxKAXjhONFi529Cf/xDwG+vWwmGoA6P8OmvI/8di1jQpjMIlaP5
-	pTxizq4hKGOqmIyOETV+nQiLLzoILIEKjFF5JpHREEBhv27cZdb+dK4CGbni9sNu7bqCvLjg079A
-	rLp8+x5go7tomE1ss9gUUwF2osGBAJu1a+to45aIuVX1nTwOmnExISLjZhRzQ4ho8GPAsQQROmYB
-	eeN7t1QtzdClgwZMK84o2AwUpGMRj0MFGPjUS8nnhmUJ/ltCm+z5NS3xZub8kCZFe/3NKkKuRHXG
-	4=
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hi,
+Hello everyone,
 
-we are using a VxLAN overlay Network to encapsulate batman-adv Layer 2 
-Routing. This distance-vector protocol relies on originator messages 
-broadcasted to all adjacent nodes in a fixed interval.
+This is V8 for the link topology addition, allowing to track all PHYs
+that are linked to netdevices. V8 is merely V7 rebased on net-next with
+a few basic adaptations due to the at803x driver split. I'm leaving the
+V7 explanations below still.
 
-Over the course of the last couple weeks, I've discovered the nodes of 
-this network to lose connection to all adjacent nodes except for one, 
-which retained connectivity to all the others.
+In V7 was introduced the protection of the main internal API
+entrypoints (link_topo_init/cleanup, link_topo_add/del_phy) by
+IS_REACHABLE(CONFIG_PHYLIB).
 
-So there's a Node A which has connection to nodes [B,C,D] but [B,C,D] 
-have no connection to each other, despite being in the same Layer 2 
-network which contains the Layer2 Domain encapsulated in VxLAN.
+That's restrictive, but it looks difficult to do otherwise while still keep the
+data structure opaque and not add dependency clutter with PHYLIB.
 
-After some digging, I've found out the VxLAN forwarding database on 
-nodes [B,C,D] contains an entry for the broadcast address of Node A 
-while Node A does not contain this entry:
+As you can tell, I'm unsure about this, so please don't hesitate to
+comment on that part :)
 
-$ bridge fdb show dev vx_mesh_other | grep dst
-00:00:00:00:00:00 dst ff02::15c via eth0 self permanent
-72:de:3c:0b:30:5c dst fe80::70de:3cff:fe0b:305c via eth0 self
-66:e8:61:a3:e9:ec dst fe80::64e8:61ff:fea3:e9ec via eth0 self
-ff:ff:ff:ff:ff:ff dst fe80::dc12:d5ff:fe33:e194 via eth0 self
-fa:64:ce:3e:7b:24 dst fe80::f864:ceff:fe3e:7b24 via eth0 self
-[...]
+The other changes are very minor, the only one is a call to netdev_put
+in the .done() netlink callback.
 
-I've looked into the VxLAN code and discovered the snooping code creates 
-FDB entries regardless whether the source-address read is a multicast 
-address.
+As a remainder, here's what the PHY listings would look like :
+ - eth0 has a 88x3310 acting as media converter, and an SFP module with
+   an embedded 88e1111 PHY
+ - eth2 has a 88e1510 PHY
 
-When reading the specification in RFC7348, chapter 4 suggests
+# ethtool --show-phys *
 
- > Here, the association of VM's MAC to VTEP's IP address
- > is discovered via source-address learning.  Multicast
- > is used for carrying unknown destination, broadcast,
- > and multicast frames.
+PHY for eth0:
+PHY index: 1
+Driver name: mv88x3310
+PHY device name: f212a600.mdio-mii:00
+Downstream SFP bus name: sfp-eth0
+PHY id: 0
+Upstream type: MAC
 
-I understand this as multicast addresses should not be learned. However, 
-by sending a VxLAN frame which contains the broadcast address as the 
-encapsulated source-address to a Linux machine, the Kernel creates an 
-entry for the broadcast address and the IPv6 source-address the VxLAN 
-packet was encapsulated in.
+PHY for eth0:
+PHY index: 2
+Driver name: Marvell 88E1111
+PHY device name: i2c:sfp-eth0:16
+PHY id: 21040322
+Upstream type: PHY
+Upstream PHY index: 1
+Upstream SFP name: sfp-eth0
 
-This subsequently breaks broadcast operation within the VxLAN with all 
-broadcast traffic being directed to a single node. So a node within the 
-overlay network can break said network this way.
+PHY for eth2:
+PHY index: 1
+Driver name: Marvell 88E1510
+PHY device name: f212a200.mdio-mii:00
+PHY id: 21040593
+Upstream type: MAC
 
-Is this behavior of the Linux kernel intended and in accordance with the 
-specification or shall we avoid learning group Ethernet addresses in the 
-FDB?
+Ethtool patches : https://github.com/minimaxwell/ethtool/tree/link-topo-v6
 
-I've applied a patch which avoids learning such addresses in vxlan_snoop 
-and it mitigates this behavior for me. Shall i send such a patch 
-upstream? [0][1]
+Link to V7: https://lore.kernel.org/netdev/20240213150431.1796171-1-maxime.chevallier@bootlin.com/
+Link to V6: https://lore.kernel.org/netdev/20240126183851.2081418-1-maxime.chevallier@bootlin.com/
+Link to V5: https://lore.kernel.org/netdev/20231221180047.1924733-1-maxime.chevallier@bootlin.com/
+Link to V4: https://lore.kernel.org/netdev/20231215171237.1152563-1-maxime.chevallier@bootlin.com/
+Link to V3: https://lore.kernel.org/netdev/20231201163704.1306431-1-maxime.chevallier@bootlin.com/
+Link to V2: https://lore.kernel.org/netdev/20231117162323.626979-1-maxime.chevallier@bootlin.com/
+Link to V1: https://lore.kernel.org/netdev/20230907092407.647139-1-maxime.chevallier@bootlin.com/
 
-I see vxlan_fdb_update_create already disallows creating such an entry, 
-but only if NLM_F_REPLACE is set, which it is not in the call-path from 
-vxlan_snoop.
+Maxime Chevallier (13):
+  net: phy: Introduce ethernet link topology representation
+  net: sfp: pass the phy_device when disconnecting an sfp module's PHY
+  net: phy: add helpers to handle sfp phy connect/disconnect
+  net: sfp: Add helper to return the SFP bus name
+  net: ethtool: Allow passing a phy index for some commands
+  netlink: specs: add phy-index as a header parameter
+  net: ethtool: Introduce a command to list PHYs on an interface
+  netlink: specs: add ethnl PHY_GET command set
+  net: ethtool: plca: Target the command to the requested PHY
+  net: ethtool: pse-pd: Target the command to the requested PHY
+  net: ethtool: cable-test: Target the command to the requested PHY
+  net: ethtool: strset: Allow querying phy stats by index
+  Documentation: networking: document phy_link_topology
 
-[0] https://github.com/freifunk-gluon/gluon/issues/3191
-[1] https://github.com/freifunk-gluon/gluon/pull/3192
+ Documentation/netlink/specs/ethtool.yaml      |  62 ++++
+ Documentation/networking/ethtool-netlink.rst  |  46 +++
+ Documentation/networking/index.rst            |   1 +
+ .../networking/phy-link-topology.rst          | 121 +++++++
+ MAINTAINERS                                   |   2 +
+ drivers/net/phy/Makefile                      |   2 +-
+ drivers/net/phy/marvell-88x2222.c             |   2 +
+ drivers/net/phy/marvell.c                     |   2 +
+ drivers/net/phy/marvell10g.c                  |   2 +
+ drivers/net/phy/phy_device.c                  |  55 ++++
+ drivers/net/phy/phy_link_topology.c           | 105 +++++++
+ drivers/net/phy/phylink.c                     |   3 +-
+ drivers/net/phy/qcom/at803x.c                 |   2 +
+ drivers/net/phy/qcom/qca807x.c                |   2 +
+ drivers/net/phy/sfp-bus.c                     |  15 +-
+ include/linux/netdevice.h                     |   4 +-
+ include/linux/phy.h                           |   6 +
+ include/linux/phy_link_topology.h             |  72 +++++
+ include/linux/phy_link_topology_core.h        |  25 ++
+ include/linux/sfp.h                           |   8 +-
+ include/uapi/linux/ethtool.h                  |  16 +
+ include/uapi/linux/ethtool_netlink.h          |  21 ++
+ net/core/dev.c                                |   9 +
+ net/ethtool/Makefile                          |   2 +-
+ net/ethtool/cabletest.c                       |  16 +-
+ net/ethtool/netlink.c                         |  53 +++-
+ net/ethtool/netlink.h                         |  10 +
+ net/ethtool/phy.c                             | 297 ++++++++++++++++++
+ net/ethtool/plca.c                            |  19 +-
+ net/ethtool/pse-pd.c                          |  13 +-
+ net/ethtool/strset.c                          |  17 +-
+ 31 files changed, 967 insertions(+), 43 deletions(-)
+ create mode 100644 Documentation/networking/phy-link-topology.rst
+ create mode 100644 drivers/net/phy/phy_link_topology.c
+ create mode 100644 include/linux/phy_link_topology.h
+ create mode 100644 include/linux/phy_link_topology_core.h
+ create mode 100644 net/ethtool/phy.c
 
-Best
-David
+-- 
+2.43.2
+
 
