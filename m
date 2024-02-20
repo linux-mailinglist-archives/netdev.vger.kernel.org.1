@@ -1,237 +1,203 @@
-Return-Path: <netdev+bounces-73117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B79AC85AFDF
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 00:45:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D7A485B03C
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 02:07:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A18F1F21EB5
-	for <lists+netdev@lfdr.de>; Mon, 19 Feb 2024 23:45:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 15E941F225F8
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 01:07:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEDFB58208;
-	Mon, 19 Feb 2024 23:45:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B622107B3;
+	Tue, 20 Feb 2024 01:07:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="djz+7muT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VYFnSlji"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22CAD56B7F;
-	Mon, 19 Feb 2024 23:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 581DDDDB6
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 01:07:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708386308; cv=none; b=NZquHmKhIW6MhQBqqMm89JpQou+7fwhdAcEYiSJ+DSh0lhBmuwSGCsDlfRfgzQXkxMEIpKcuMmu611ac5al4EpTYVdkKJ7j1vtmuNgmeFsQJgfFpD/UzEFdeNPFO0KJKP/mn3xVsAcoHYRQmcQ0LR6JbfrX7NU3XVRdXR70VIrk=
+	t=1708391253; cv=none; b=lZc+uTvMHJ11ZiAT7fHzon/mvkWtZcO4YtqpohL7S4X+Am9CnGqWqYCmohhhv2H0PSvWmOMp3REcYD0eaGBccI18i5eafbg6CF8WE9DoGPCE5aRJb4ZJb6VmZnUXBPbEXqcuTjKFJ1SXvFnrnn332wVrhuSf4us4vlB/D3hIt8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708386308; c=relaxed/simple;
-	bh=lFFtbhACJmztPPpr3pxi0hEjHTFow84caBqcjZJj8og=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=iLvAHebfgHeX/4rhocx7R/BNH6FZ/DN9KFGzYiNni77JMbTSnzmXUOlZpSuYBvlYpdRqSnox/CSezgzTgoc/tkfmfJ2SBu00WuAOigKUCoPk8fAOn88OxBbV86izbVsl293sG377znlGGZhxp4NMKBc0/6UzwUpOxNFcyaFG5fU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=djz+7muT; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1dba94f9201so29530575ad.0;
-        Mon, 19 Feb 2024 15:45:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708386306; x=1708991106; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4HwRlWfaCNPwM9GD0tDSwVZojM3ImHfFlaKA9xUSN8o=;
-        b=djz+7muTDp/Fg5r40hkyvSNKb1zzNATD1hpFaSjv57aU4L1ZMcnSmVoWycXmpT19Ig
-         wt7k1uZQ6b9by/Q5GNDJjhLOZVOCLLFMCXA8ZBbFXHMDFen6nriSHNCc+ttIEdz2NmyY
-         yaDPK1s2eCray7HQujq1cgoTLlz91JlZs2FGmTkfHh60z66J9QeKBIaySSNHA9TbP4DH
-         WyZ6RwaeEBgupgUj1gbkJG2K1NyNFJ7JYHlO2hQkDWtoOGJ4yt2VnLnso1LKZCAo0eUy
-         Sn5Qmba8CTOFRDPjecFbNcN3mSOV0Auhb/M63iW/GrA594gZcsac2AVaAq2JqPBtdClH
-         Bw1Q==
+	s=arc-20240116; t=1708391253; c=relaxed/simple;
+	bh=W7mIHh5rHh4vdMHkIbDHj/R9F9JPJqAdn6+RySJC+54=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MagTybFa+8EWsMgEI7buhYXfMXLCQg/NKZGO1R1WI7Z56VeAL8ZldyxPbnZ3OWUSPgg66mocZHcHyuR5drdrL/QplwNRvyiv56XXdI8m0aZyq1xabtF1MeV4lIkKfOw4W782DNObJsPPZYkFAzqazlSfD+K11u88VKC8W/Uz9kk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VYFnSlji; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708391250;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bN+xRkF6So+ejO9INBzpCuxH/ICgnLXLsxP9bDXIKL0=;
+	b=VYFnSljiJ4OdQyTzwg/wyeRH8f8/9kmxN7f0KzEbVNM+HVkrWYkQ2+9foeW6NV/v/g3TD4
+	WNJEOwWCqAbRtxkhCiwF8sgLdsD/RYd9ftVV/kI4tZy1I0QmXrigWrgKt0irJ0C4KIwY08
+	X9C2WrECu8WjgPQY4zRu9iInhdoYEqU=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-445-VuvXYt_OO_GH_aIaqFwQfQ-1; Mon, 19 Feb 2024 20:07:27 -0500
+X-MC-Unique: VuvXYt_OO_GH_aIaqFwQfQ-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2d22e40a544so14498171fa.0
+        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 17:07:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708386306; x=1708991106;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1708391246; x=1708996046;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4HwRlWfaCNPwM9GD0tDSwVZojM3ImHfFlaKA9xUSN8o=;
-        b=fHp7I/wwQpjaY/g1gzQV5IMX24BOD1RqxLY4sfA4XvRBxbyaD5sW7121jGe8HnPvzw
-         3ccrWEn9x557gDoXLIOEOaoj1CvUCyN5hsWcKOlJGyeHlp5lRyNTm5sElItqqkrpjllh
-         XKYnxGwhBPKUpX1BuHmFDZtlwC610oL5RGtDtHdwBf5xWyOaloyfRSq4Pwv4N1i7xp6X
-         bfthe8ZAh3cs/n0+K2HrvB4j6ZXfYhtJLLD4D4LPS6U6PUqxomFvi8bwnWZlizestFun
-         Kcfymk4ON3FgSXW2ZUmIHyppk1NeBxP+ZBxvCSl770Ew5RFzN3VSX9tLz+0dpRHACY05
-         Ri7A==
-X-Forwarded-Encrypted: i=1; AJvYcCXJRwcYi8zNk9hXXgQ1Ww0mPu6tWHO72UxsU/lw16qScne7h6Jdwthzb1tp6yTlEwil6UBNHn/kraXkuNfoDD+DA0GhpZ3pTVjKGEdHm1o2iTp3xIT/4C1rHrfy5TU4RGCNWece29/BYQ==
-X-Gm-Message-State: AOJu0YzfDRV4Qh3b1qm+XwQtVcYbqQs+Xl5KsJnc+2Rgd5qnXyV3Na+A
-	Z94MOHATiH6XGcIDFWS8Qb0sXuLsB48jjXE5UeZM5BtOJja/8N/rt4kenWTzhsM=
-X-Google-Smtp-Source: AGHT+IGqnWwAjyCSoltIVO84hnuEhpGtrjqY10JbapIt9XKWcr/SbDKXvxDVFKvIFfU9XF9iAGy4qQ==
-X-Received: by 2002:a17:902:b944:b0:1d9:893f:cd06 with SMTP id h4-20020a170902b94400b001d9893fcd06mr12525368pls.60.1708386305530;
-        Mon, 19 Feb 2024 15:45:05 -0800 (PST)
-Received: from tresc054937.tre-sc.gov.br ([2804:c:204:200:2be:43ff:febc:c2fb])
-        by smtp.gmail.com with ESMTPSA id h4-20020a170902eec400b001db7ed7ac34sm4903477plb.297.2024.02.19.15.45.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Feb 2024 15:45:04 -0800 (PST)
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Mon, 19 Feb 2024 20:44:42 -0300
-Subject: [PATCH net-next v4 3/3] net: dsa: realtek: support reset
- controller
+        bh=bN+xRkF6So+ejO9INBzpCuxH/ICgnLXLsxP9bDXIKL0=;
+        b=FBVoY06y0x2nBPZp8WJDVgy5dxEcMloh+X3AZxbefL8EJMjneHRlz3hqGczU7E8+p7
+         xNYg41hPd2FPrJbzH+KRLEQBfR/3n2CtjeEhoQndRpP8degYPSP+VJeARgzOMZx65rQP
+         /YBdJlqLG/Li6zLczyIk01RsdM9iJwxLXcFMIB/KS5IINrw/t8aphbLZMZEJ/J5DsWcm
+         bbVZTVg4I9LbloPbMJybPvcISX2+nwa4KZyrZV8EDyfFwCfTxAwsTuLHD1R7XOiag2ak
+         LyWF4hQzGHb9Kd7jMh2yiJLyQPeJr1MXG5+gYlJ9JceYkjpI25ck3gAtDu4/RrK9MBlv
+         HzCA==
+X-Forwarded-Encrypted: i=1; AJvYcCVdR7d/00pB6A7wjiO5dIgSKnmv5LWme7xCHSWlkIyloMEMORJqd/OcxZq2+n78x6gepdxB5MIM7fUv9G/uzv4FRTA5iotR
+X-Gm-Message-State: AOJu0YzKFn5D1mdhDXwVee/x7VwKIGpiz01DOux30ci9LBHJN9A7U8KU
+	kBwZC4Yv4M+U1WrKfGZV4ZwvCo+WJxT0+eKg33IZl0a5+cQ2KhqssRhbAH0qWCbTWC6nxhjFSfO
+	Wr6S29UfXnh/MkWSS6252K/GjR6GlXxvkwjYZDN0GP/pSsmAudt7BXgCv94e7AyJ69nVBkUdRVP
+	YXeslIpIdH+SnyJDdcPQMHm+8sEMGL
+X-Received: by 2002:a2e:3e1a:0:b0:2d2:39a5:d190 with SMTP id l26-20020a2e3e1a000000b002d239a5d190mr3791526lja.1.1708391246133;
+        Mon, 19 Feb 2024 17:07:26 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG1kIyPveHUOVWMZmCgVFi1xnalj/6PCfA0yBeOAHEpQlJnohIRvG+RGA4f3rHPjY22pVoOoBYS1nqilt7dOXQ=
+X-Received: by 2002:a2e:3e1a:0:b0:2d2:39a5:d190 with SMTP id
+ l26-20020a2e3e1a000000b002d239a5d190mr3791512lja.1.1708391245809; Mon, 19 Feb
+ 2024 17:07:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240219-realtek-reset-v4-3-858b82a29503@gmail.com>
-References: <20240219-realtek-reset-v4-0-858b82a29503@gmail.com>
-In-Reply-To: <20240219-realtek-reset-v4-0-858b82a29503@gmail.com>
-To: Linus Walleij <linus.walleij@linaro.org>, 
- =?utf-8?q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
- Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
- Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh+dt@kernel.org>, 
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
- Conor Dooley <conor+dt@kernel.org>, Philipp Zabel <p.zabel@pengutronix.de>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Luiz Angelo Daros de Luca <luizluca@gmail.com>
-X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4280; i=luizluca@gmail.com;
- h=from:subject:message-id; bh=lFFtbhACJmztPPpr3pxi0hEjHTFow84caBqcjZJj8og=;
- b=owEBbQGS/pANAwAIAbsR27rRBztWAcsmYgBl0+ft1uzi91WMpRJ3ECBz5sXwj5Hc/Mhg4KxC1
- KliBUhSIwKJATMEAAEIAB0WIQQRByhHhc1bOhL6L/i7Edu60Qc7VgUCZdPn7QAKCRC7Edu60Qc7
- VueGB/4k7dGr5BUWCt+XUMcKX+WhyEhLtmzbmJ3IJ/MRp94Fn0aSfzon/UmfQ7CuFbKXFZHCje5
- ro/vvNzWM1G74FKhdQs0mI64GlBfsO1XV29tikEEaMzfEQEOIKVybAi0AqA8g7plQCfG3ZN8hIZ
- LLdhFstkENlRyjqUcwHkE0KLTyFuYUv2nrk3FZztwuQXQjZ4DbE/jRyPQyWeaGTL9ntG7w8qwui
- PbNKSdX0KWILvEh8UCOghaMrYBE3NBCldf1hNphLYJNNj0rS2mky80N6bZLGs3NghGX59a+wG+Q
- AL3cZR3aRGKUgsnKmicYNyLHAJYXkhxwDx2lJ+sAlpyhuone
-X-Developer-Key: i=luizluca@gmail.com; a=openpgp;
- fpr=1107284785CD5B3A12FA2FF8BB11DBBAD1073B56
+References: <20240213152414.3703-1-n.zhandarovich@fintech.ru>
+In-Reply-To: <20240213152414.3703-1-n.zhandarovich@fintech.ru>
+From: Alexander Aring <aahringo@redhat.com>
+Date: Mon, 19 Feb 2024 20:07:14 -0500
+Message-ID: <CAK-6q+j52utmO8K_h=3LqDYmXqsqFC6MKRPUM+q=1Q30c7nEMg@mail.gmail.com>
+Subject: Re: [PATCH wpan] mac802154: fix uninit-value issue in ieee802154_header_create()
+To: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, 
+	Miquel Raynal <miquel.raynal@bootlin.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	linux-wpan@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com, 
+	syzbot+60a66d44892b66b56545@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add support for resetting the device using a reset controller,
-complementing the existing GPIO reset functionality (reset-gpios).
+Hi,
 
-Although the reset is optional and the driver performs a soft reset
-during setup, if the initial reset pin state was asserted, the driver
-will not detect the device until the reset is deasserted.
+On Tue, Feb 13, 2024 at 10:24=E2=80=AFAM Nikita Zhandarovich
+<n.zhandarovich@fintech.ru> wrote:
+>
+> Syzkaller with KMSAN reported [1] a problem with uninitialized value
+> access in ieee802154_header_create().
+>
+> The issue arises from a weird combination of cb->secen =3D=3D 1 and
+> cb->secen_override =3D=3D 0, while other required security parameters
+> are not found enabled in mac802154_set_header_security().
+>
 
-Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
----
- drivers/net/dsa/realtek/realtek.h |  2 ++
- drivers/net/dsa/realtek/rtl83xx.c | 46 ++++++++++++++++++++++++++++++++++-----
- drivers/net/dsa/realtek/rtl83xx.h |  2 ++
- 3 files changed, 45 insertions(+), 5 deletions(-)
+In case of cb->secen is 1 and cb->secen_override is 0
+mac802154_set_header_security() should depend on the
+ieee802154_llsec_params params.
 
-diff --git a/drivers/net/dsa/realtek/realtek.h b/drivers/net/dsa/realtek/realtek.h
-index b80bfde1ad04..e0b1aa01337b 100644
---- a/drivers/net/dsa/realtek/realtek.h
-+++ b/drivers/net/dsa/realtek/realtek.h
-@@ -12,6 +12,7 @@
- #include <linux/platform_device.h>
- #include <linux/gpio/consumer.h>
- #include <net/dsa.h>
-+#include <linux/reset.h>
- 
- #define REALTEK_HW_STOP_DELAY		25	/* msecs */
- #define REALTEK_HW_START_DELAY		100	/* msecs */
-@@ -48,6 +49,7 @@ struct rtl8366_vlan_4k {
- 
- struct realtek_priv {
- 	struct device		*dev;
-+	struct reset_control    *reset_ctl;
- 	struct gpio_desc	*reset;
- 	struct gpio_desc	*mdc;
- 	struct gpio_desc	*mdio;
-diff --git a/drivers/net/dsa/realtek/rtl83xx.c b/drivers/net/dsa/realtek/rtl83xx.c
-index 801873754df2..8262ec5032a4 100644
---- a/drivers/net/dsa/realtek/rtl83xx.c
-+++ b/drivers/net/dsa/realtek/rtl83xx.c
-@@ -184,6 +184,13 @@ rtl83xx_probe(struct device *dev,
- 						    "realtek,disable-leds");
- 
- 	/* TODO: if power is software controlled, set up any regulators here */
-+	priv->reset_ctl = devm_reset_control_get_optional(dev, NULL);
-+	if (IS_ERR(priv->reset_ctl)) {
-+		ret = PTR_ERR(priv->reset_ctl);
-+		dev_err_probe(dev, ret, "failed to get reset control\n");
-+		return ERR_CAST(priv->reset_ctl);
-+	}
-+
- 	priv->reset = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_LOW);
- 	if (IS_ERR(priv->reset)) {
- 		dev_err(dev, "failed to get RESET GPIO\n");
-@@ -192,11 +199,11 @@ rtl83xx_probe(struct device *dev,
- 
- 	dev_set_drvdata(dev, priv);
- 
--	if (priv->reset) {
--		gpiod_set_value(priv->reset, 1);
-+	if (priv->reset_ctl || priv->reset) {
-+		rtl83xx_reset_assert(priv);
- 		dev_dbg(dev, "asserted RESET\n");
- 		msleep(REALTEK_HW_STOP_DELAY);
--		gpiod_set_value(priv->reset, 0);
-+		rtl83xx_reset_deassert(priv);
- 		msleep(REALTEK_HW_START_DELAY);
- 		dev_dbg(dev, "deasserted RESET\n");
- 	}
-@@ -292,11 +299,40 @@ EXPORT_SYMBOL_NS_GPL(rtl83xx_shutdown, REALTEK_DSA);
- void rtl83xx_remove(struct realtek_priv *priv)
- {
- 	/* leave the device reset asserted */
--	if (priv->reset)
--		gpiod_set_value(priv->reset, 1);
-+	rtl83xx_reset_assert(priv);
- }
- EXPORT_SYMBOL_NS_GPL(rtl83xx_remove, REALTEK_DSA);
- 
-+void rtl83xx_reset_assert(struct realtek_priv *priv)
-+{
-+	int ret;
-+
-+	ret = reset_control_assert(priv->reset_ctl);
-+	if (!ret)
-+		return;
-+
-+	dev_warn(priv->dev,
-+		 "Failed to assert the switch reset control: %pe\n",
-+		 ERR_PTR(ret));
-+
-+	gpiod_set_value(priv->reset, true);
-+}
-+
-+void rtl83xx_reset_deassert(struct realtek_priv *priv)
-+{
-+	int ret;
-+
-+	ret = reset_control_deassert(priv->reset_ctl);
-+	if (!ret)
-+		return;
-+
-+	dev_warn(priv->dev,
-+		 "Failed to deassert the switch reset control: %pe\n",
-+		 ERR_PTR(ret));
-+
-+	gpiod_set_value(priv->reset, false);
-+}
-+
- MODULE_AUTHOR("Luiz Angelo Daros de Luca <luizluca@gmail.com>");
- MODULE_AUTHOR("Linus Walleij <linus.walleij@linaro.org>");
- MODULE_DESCRIPTION("Realtek DSA switches common module");
-diff --git a/drivers/net/dsa/realtek/rtl83xx.h b/drivers/net/dsa/realtek/rtl83xx.h
-index 0ddff33df6b0..c8a0ff8fd75e 100644
---- a/drivers/net/dsa/realtek/rtl83xx.h
-+++ b/drivers/net/dsa/realtek/rtl83xx.h
-@@ -18,5 +18,7 @@ int rtl83xx_register_switch(struct realtek_priv *priv);
- void rtl83xx_unregister_switch(struct realtek_priv *priv);
- void rtl83xx_shutdown(struct realtek_priv *priv);
- void rtl83xx_remove(struct realtek_priv *priv);
-+void rtl83xx_reset_assert(struct realtek_priv *priv);
-+void rtl83xx_reset_deassert(struct realtek_priv *priv);
- 
- #endif /* _RTL83XX_H */
+As [0] WPAN_SECURITY_DEFAULT signals this behaviour.
 
--- 
-2.43.0
+> Ideally such case is expected to be caught by starting check at the
+> beginning of mac802154_set_header_security():
+>
+>         if (!params.enabled && cb->secen_override && cb->secen)
+>                 return -EINVAL;
+>
+> However, since secen_override is zero, the function in question
+> passes this check and returns with success early, without having
+> set values to ieee802154_sechdr fields such as key_id_mode. This in
+> turn leads to uninitialized access of such values in
+> ieee802154_hdr_push_sechdr() and other places.
+>
+> Fix this problem by only checking for secen value and presence of
+> security parameters (and ignoring secen_override). Exit early with
+> error if necessary requirements are not met.
+>
+> [1]
+> BUG: KMSAN: uninit-value in ieee802154_hdr_push_sechdr net/ieee802154/hea=
+der_ops.c:54 [inline]
+> BUG: KMSAN: uninit-value in ieee802154_hdr_push+0x971/0xb90 net/ieee80215=
+4/header_ops.c:108
+>  ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:54 [inline]
+>  ieee802154_hdr_push+0x971/0xb90 net/ieee802154/header_ops.c:108
+>  ieee802154_header_create+0x9c0/0xc00 net/mac802154/iface.c:396
+>  wpan_dev_hard_header include/net/cfg802154.h:494 [inline]
+>  dgram_sendmsg+0xd1d/0x1500 net/ieee802154/socket.c:677
+>  ieee802154_sock_sendmsg+0x91/0xc0 net/ieee802154/socket.c:96
+>  sock_sendmsg_nosec net/socket.c:730 [inline]
+>  __sock_sendmsg net/socket.c:745 [inline]
+>  ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
+>  ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
+>  __sys_sendmsg net/socket.c:2667 [inline]
+>  __do_sys_sendmsg net/socket.c:2676 [inline]
+>  __se_sys_sendmsg net/socket.c:2674 [inline]
+>  __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
+>  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>  do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x63/0x6b
+>
+> Local variable hdr created at:
+>  ieee802154_header_create+0x4e/0xc00 net/mac802154/iface.c:360
+>  wpan_dev_hard_header include/net/cfg802154.h:494 [inline]
+>  dgram_sendmsg+0xd1d/0x1500 net/ieee802154/socket.c:677
+>
+> Fixes: f30be4d53cad ("mac802154: integrate llsec with wpan devices")
+> Reported-and-tested-by: syzbot+60a66d44892b66b56545@syzkaller.appspotmail=
+.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3D60a66d44892b66b56545
+> Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+> ---
+> P.S. Link to previous similar discussion:
+> https://lore.kernel.org/all/tencent_1C04CA8D66ADC45608D89687B4020B2A8706@=
+qq.com/
+> P.P.S. This issue may affect stable versions, at least up to 6.1.
+>
+>  net/mac802154/iface.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+> index c0e2da5072be..ad799d349625 100644
+> --- a/net/mac802154/iface.c
+> +++ b/net/mac802154/iface.c
+> @@ -328,7 +328,7 @@ static int mac802154_set_header_security(struct ieee8=
+02154_sub_if_data *sdata,
+>
+>         mac802154_llsec_get_params(&sdata->sec, &params);
+>
+> -       if (!params.enabled && cb->secen_override && cb->secen)
+> +       if (!params.enabled && cb->secen)
+>                 return -EINVAL;
+>         if (!params.enabled ||
+>             (cb->secen_override && !cb->secen) ||
+>
+
+I think there is just a missing check if (!cb->secen_override) then
+use whatever mac802154_llsec_get_params() says and ignore
+secen_enabled.
+
+Also I think that we don't init those socket parameters to any value
+at [1] so it's completely random what values are at socket creation.
+
+- Alex
+
+[0] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree=
+/net/ieee802154/socket.c?h=3Dv6.8-rc5#n911
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree=
+/net/ieee802154/socket.c?h=3Dv6.8-rc5#n474
 
 
