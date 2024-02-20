@@ -1,297 +1,386 @@
-Return-Path: <netdev+bounces-73137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADC5185B1B6
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 04:52:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB0EE85B200
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 05:52:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AC2D1F21983
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 03:52:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2BCC283D41
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 04:52:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7855E54FA0;
-	Tue, 20 Feb 2024 03:52:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 185E0481B3;
+	Tue, 20 Feb 2024 04:51:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="EI+SvDv3"
+	dkim=pass (2048-bit key) header.d=dell.com header.i=@dell.com header.b="cXsthoVA"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+Received: from mx0a-00154904.pphosted.com (mx0a-00154904.pphosted.com [148.163.133.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF81B51037;
-	Tue, 20 Feb 2024 03:52:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708401131; cv=none; b=frF8CXnNz1Yo8nqkPeDRSb8vT3qYfSCa8m93AeNjJm+LrGW7rRPb0Et67iuDdeagDtbVkw5uTqy/5T1JhYz8dWAuwwiRv4waCi9fvVZ7xIdxmSZxPkSzncibTa/ZSnM6ebUeEbEtvRG3bv3QZC2PwvPbW3WAEGUtmVXdjpz3syk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708401131; c=relaxed/simple;
-	bh=0aZtum7GpJTK5e070oGcznr1ZLszEjCXaTCDzai2tQ4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c5ANijdoTE3XrnjsxdVOKjDvVZLa/giLBAdMlJ6mbKSVMFY6y/gKAKNBZfhr9WLy4km+MCVVTNeOFLBKS7HmwlSXPX9bNVENwOwM04cDa2O5+pw47htEn7yaJocOMH0sVghFBXSN2wYNOHqUcQqg/792GKpTsRku/4Q8hfCVt+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=EI+SvDv3; arc=none smtp.client-ip=115.124.30.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1708401124; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=fU4Qo0bzDFl5Fs696AJax4gvvhphfr2U/1MPyEfkvTM=;
-	b=EI+SvDv3MNO1zYrvt6pCD7d+MG1b0g/8LmvsQ3JqicwNPnzN27fE7d5JBDYl3xpvC2zmmO1ifTNn9EnBY50Eo5M4GVvv4nGlZmTplQsoht0MCz+ZFKiBE56iuGQHc9G/lZfaCDGkCgA7NKFx/FP6uulQ0PzBKAdIHfzF4p03Ky4=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0W0vCOJs_1708401122;
-Received: from 30.221.128.233(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W0vCOJs_1708401122)
-          by smtp.aliyun-inc.com;
-          Tue, 20 Feb 2024 11:52:04 +0800
-Message-ID: <375c613e-a7ee-4ef0-8d41-3f87ae8cccea@linux.alibaba.com>
-Date: Tue, 20 Feb 2024 11:52:02 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45D5A42A90
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 04:51:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.133.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708404719; cv=fail; b=ahnbkA8dyzXenG278SfUM+CPXZprmeDMtkLv78Fm3k9AxsqT8uw874WINKGXVXw3gkGQGqXbou6q2VXQiMEqSGwtXMMhotjTrK7mIvrX5X07WMZUXilFlZxE1bUo+ea5/h4C1fJy/BpkEWWoY0MR1PlLf0oU0teIxIg1kgXgepQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708404719; c=relaxed/simple;
+	bh=c7odLWNxblK1vWDu7cXt4ALqeY5SRRWI8MuIQ9VQqeY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=W1JDRmmi9k0VDiAsDvK4skQyf3oCRtVoSV/3QDMQeVthx+tj/OKbL/1cV+985Da5Ut7UNFGbKzdPJ3BShWSDXICNhy0ejMmTQk+w0tFiQoTJxz/q9mh0qtWLChB35UpCkSs3TLHONGClGNfa/tmLEESDvLroj9fwCjoQMxVTr2g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=dell.com; spf=pass smtp.mailfrom=dell.com; dkim=pass (2048-bit key) header.d=dell.com header.i=@dell.com header.b=cXsthoVA; arc=fail smtp.client-ip=148.163.133.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=dell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dell.com
+Received: from pps.filterd (m0170389.ppops.net [127.0.0.1])
+	by mx0a-00154904.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41K1LgqT010746;
+	Mon, 19 Feb 2024 23:51:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dell.com; h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=smtpout1;
+ bh=VR7fB4flwau9Bnb05Q4iwwMv/ndmv7GA9c9ISS6NdZE=;
+ b=cXsthoVA6kI9vDKlW9V8V6gPAwSF90oFupbU5LcKot2lJc0cXKgpqAxpq0SS3Mb+9bIS
+ jgXAyoXNuR5665wxzrbpElt6rvvo8VezW+9LO1E5moYINIH4LJhY1Pnuh685NWWqmq+g
+ zvlqAgx82uPZ3UdcLbX7UCJDJnDFiP7QDY42vQH3LIfwnHTWeXwc2/gFyzW3nJ9Jyzq9
+ zXH/0VohP1R6M5u5Ol0aQHrxhZ1dQsGblIoTOHJxAhKmNcQ5n32tGPRDohI9+c30CiyF
+ ygAu4V1AAAf46rwx8DwWCH6WmuD0ycXBo8HeYwexE4rqSMjBqhR8tWTKVvk3jj3JfWoY 4A== 
+Received: from mx0a-00154901.pphosted.com (mx0a-00154901.pphosted.com [67.231.149.39])
+	by mx0a-00154904.pphosted.com (PPS) with ESMTPS id 3waspqb01m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 19 Feb 2024 23:51:27 -0500
+Received: from pps.filterd (m0134746.ppops.net [127.0.0.1])
+	by mx0a-00154901.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41K3VnKa010021;
+	Mon, 19 Feb 2024 23:51:27 -0500
+Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2169.outbound.protection.outlook.com [104.47.57.169])
+	by mx0a-00154901.pphosted.com (PPS) with ESMTPS id 3wcm8ggqva-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 19 Feb 2024 23:51:26 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PqgRXvVb0YyqEt8F46rXHHQC02Wwi0ShVbeQnT6b3bUWKDYKJ0OKGvD5xeV3qVG2NLrGdH1gSEcWaIjDTZNB2TJAJAPtJMdtU/3OQIyB0ZihVJzNx5b36kxJkPHlT11jYn59IWG0WYuVhjtSe+sCA11G9dwrHhg04cupjK3acCxbvXqKfdjW+dviJFsQOGFTEspHLE7CM8PAs1V975wTtxy/gdTSAE1Foy2Wq6sT7EjN6nQul4gsZ+Bqqv9RPjq14+iCdC0Kv6aZDjqg84RRFY/dU6aUAIfboSCRtuBEvgeldOkdn7AIAWeVfUkpeR3KNy0R1x8rAenwsASGPNKvBA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VR7fB4flwau9Bnb05Q4iwwMv/ndmv7GA9c9ISS6NdZE=;
+ b=FrqAgwgKQbTAmSWalCGhkFQq5R3IY1VIkVxJTBxp88SOw09+t0BHA210ZrpHCPAo9UQ742MeCGfcg+T2uEuncQcwVP5m5Nde0lO9+cy/Yhcw3gcTwv0aaQL1nh3zO9zHOC+MbfIlpaj4nlp3rah7wld0BuCzvfqCaPoXLjEQTJpvmjKpQBgEncqOk5a+gr26A9X5ozGKqM819N8tiOFP2V/4+mm8e0PN58pVWYNpLWNC94TF1z171KmPxegGPOeNf9RZvac/lsAHbEIWMi0kVT8EpfjZOtNXFDtIispi8rYk2eHPo2UZ0sRbyFiOlmw50mTJ7fbhQ93F7Xgz/6cpQQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=dell.com; dmarc=pass action=none header.from=dell.com;
+ dkim=pass header.d=dell.com; arc=none
+Received: from SJ0PR19MB4415.namprd19.prod.outlook.com (2603:10b6:a03:286::17)
+ by MN2PR19MB3917.namprd19.prod.outlook.com (2603:10b6:208:1e3::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.39; Tue, 20 Feb
+ 2024 04:51:23 +0000
+Received: from SJ0PR19MB4415.namprd19.prod.outlook.com
+ ([fe80::5707:d1a7:932a:1f45]) by SJ0PR19MB4415.namprd19.prod.outlook.com
+ ([fe80::5707:d1a7:932a:1f45%4]) with mapi id 15.20.7292.036; Tue, 20 Feb 2024
+ 04:51:23 +0000
+From: "Ramaiah, DharmaBhushan" <Dharma.Ramaiah@dell.com>
+To: Jeremy Kerr <jk@codeconstruct.com.au>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "matt@codeconstruct.com.au"
+	<matt@codeconstruct.com.au>
+CC: "Rahiman, Shinose" <Shinose.Rahiman@dell.com>
+Subject: RE: MCTP - Socket Queue Behavior
+Thread-Topic: MCTP - Socket Queue Behavior
+Thread-Index: AdpjPln1K8p7U6IuQcSvYKsg8BomjQAZRv2AAAG16IA=
+Date: Tue, 20 Feb 2024 04:51:23 +0000
+Message-ID: 
+ <SJ0PR19MB4415EA14FC114942FC79953587502@SJ0PR19MB4415.namprd19.prod.outlook.com>
+References: 
+ <SJ0PR19MB4415F935BD23A6D96794ABE687512@SJ0PR19MB4415.namprd19.prod.outlook.com>
+ <202197c5a0b755c155828ef406d6250611815678.camel@codeconstruct.com.au>
+In-Reply-To: 
+ <202197c5a0b755c155828ef406d6250611815678.camel@codeconstruct.com.au>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: 
+ MSIP_Label_73dd1fcc-24d7-4f55-9dc2-c1518f171327_ActionId=e1cb5420-f23b-4591-84a7-f0ac7fbae0f0;MSIP_Label_73dd1fcc-24d7-4f55-9dc2-c1518f171327_ContentBits=0;MSIP_Label_73dd1fcc-24d7-4f55-9dc2-c1518f171327_Enabled=true;MSIP_Label_73dd1fcc-24d7-4f55-9dc2-c1518f171327_Method=Standard;MSIP_Label_73dd1fcc-24d7-4f55-9dc2-c1518f171327_Name=No
+ Protection (Label Only) - Internal
+ Use;MSIP_Label_73dd1fcc-24d7-4f55-9dc2-c1518f171327_SetDate=2024-02-20T03:10:05Z;MSIP_Label_73dd1fcc-24d7-4f55-9dc2-c1518f171327_SiteId=945c199a-83a2-4e80-9f8c-5a91be5752dd;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ0PR19MB4415:EE_|MN2PR19MB3917:EE_
+x-ms-office365-filtering-correlation-id: 9df4b427-c88b-4cb2-1811-08dc31cf966d
+x-exotenant: 2khUwGVqB6N9v58KS13ncyUmMJd8q4
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ kQIa6kk9YLrfUj4U1o+7gcfKEVetl5ssHlrunXtyevNNkr4qBk7JL9vTHVGIVoIqY8vgEyvaKDGDnQEt6gicJZKiqqy852DljW0Fig39G7x2HJ64d8Jc/uQtuYH1WIGQ57TMyuAAkHbcYL3CtjsNJgx0ccAd39z9j+y68CxhZBF3PUFSxjQTR//5hkOLcfb4sc0XDbwIFgVOgEcNHQPCGEM+Haey2zHha1JRx32CUb534UhGLZCXv+7BlT2MIX00A8NNLRsk4jEmEPx8333xCrcMmB0OuH49xI5yQN3TeWIXr7HUggHfxkjWJX0DvhcwhICXPmEbXb2paKkitiaqqGHOuQTORx7xcEEtzCfJyJzNd4wqnHPSFtxRQkIZB5zS2NgGGhF+u0MEVQGTUl+lMuWpRxmfDCJUzB9YSFh+Wkd8eoeXeL/wB4ASTspkEgzdOCGyf6jw09vdioX5NgBE3LSKHOSiHfsVhdIQsz1A06yc21SDFcRCO0MJjJdH8iZ5uHNUl/YwV02RNVjgQ/X9McbVe6YyceVkf82xrR+WFq6iUg24enb0XLBe4oc8OU/d1Zis7uiIAQENldZGyI9//do6oxEjDlU1xdc1H69OWEuUTyc3W3twJ7XlS5KIBnJu
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR19MB4415.namprd19.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(230273577357003)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?utf-7?B?elM1QWdRbnA5dWZQNGVKbXNuaGlMdWw1QzMyaDVrcTFUSW94Zk9kUmczZmdU?=
+ =?utf-7?B?MEVMVENJQ0FKZE5uUEpUL2NlTm0wT3grLUladSstOVRYaXdTS2l1YkhBRkRJ?=
+ =?utf-7?B?QWV4cHFlS2FRaFA3Zm8zU3dkUGNTaWFFTGx1cXpJUHFtY1ZFeUYzaWhmKy1q?=
+ =?utf-7?B?TEhKKy05QnRLT0Q0S2xEMDZtMGZ1RkY0amlLTE0zZUdhZFRMVWZlc3VmclRL?=
+ =?utf-7?B?WlB6aTlGWEVpWUNUV3BBSDVpV2c4Tk1qcFZiMWVQVFoxbWVLSzllRDkzQUVx?=
+ =?utf-7?B?d1YxQXFLS1R1cWF1RlhFbVdjVnpKTGRLREdVWjJxWHAweUlFUW5xN2NTeFBn?=
+ =?utf-7?B?ZklHKy1LcnZESm5UY080MnNQcm1FTXlYc09aRjdoVSstRDNFT3ZYSlNuRFVa?=
+ =?utf-7?B?aXRKa082aFZvSjNyYkVMS0FhbW9SKy1mNUFtT08xU1ZCKy1YUmt1UWN6UkN5?=
+ =?utf-7?B?TUJvVFNUN2Roek53UGx5blF5S0cySXY5d0t0MEZub0xmTDE0WVhvUXBsR1dO?=
+ =?utf-7?B?VWZKajBpei8xVGJsaU1MTUdPYTV4cDF2Zlh6dUMrLWFpcWw4a3FTZlIya0pH?=
+ =?utf-7?B?Nk9tS1BXZSstTjBjbUZlelU4OU41TkV6TDVEc0tCRjg5alZzbHpUbE1UV2F3?=
+ =?utf-7?B?bW5YOFRFaUJ6dHdVV3Y5aFB5ck1WQVpZT0EyZ2hHYUkyTSstQXk4OS9KV2k0?=
+ =?utf-7?B?cE81b2dGM0d1aW5XTTRhKy1kTjFKMSstNmZMQTA3UFNrSXhwMmxGKy11TE8x?=
+ =?utf-7?B?WVZPbEFqcW5JdlpsNHVkVjVpdEZDdTdUaCstbDRacEx4emIzQ044ZW9HRSst?=
+ =?utf-7?B?eXA4eHYzREV4WVV4eU9oS1VYdGVWL2YxZjAxaHQ2RHpRT2dSbVpMcDViTHhh?=
+ =?utf-7?B?UnpuL25uUjRyeGhwQkJEcEdlaU4zUE42aEJPQzNJdENyZUZwQnNnR3VMSjZt?=
+ =?utf-7?B?bWh3Ky01Ky1DSU5laFBkb2txZTZMU25QazFneTZKUGwyc0xKKy1ld0lVcjhM?=
+ =?utf-7?B?eEhhMVE3TjFGcW9RblA5UVlkcTdIY2Nab09uSUxtWXFVL3BRWlM4ZldzcjFP?=
+ =?utf-7?B?b0xYUjBRNVNZcUkwbmZPOUNMSElTc1BDUERTbVh2N0lnc0tjUFNlY2lkWlI5?=
+ =?utf-7?B?dnUrLWd1eEYrLUR0eXZnVkVjQmdYSWFFa0FGUkZLNjVTZTQzdzBCNnV1U0FI?=
+ =?utf-7?B?Tko4NEV1TVpJN2hlOHBIc054V3hZUU1qNmJpc2pMSTREYVQ5S3d2YWY1ZG5I?=
+ =?utf-7?B?L1dSVzlobkh1RmZiKy1NZnNvMXdoQWZSajFwaEV1WGZrWDdzN1BsKy12eWow?=
+ =?utf-7?B?cUVMMWhLaHBvU3V3Q2JzcHQ2bTBoMnVzVDd2Y3dka1pKQ2FGNndwUystNzQx?=
+ =?utf-7?B?ak1PVzNWR1Z1STg0dkh4S1lsS3NtVFBVUVRFRklCZkt4ampRS2J3NVhqUXRO?=
+ =?utf-7?B?aDMxSk5hL254SkZHSHVBaXVjUDRoVDNBUE4rLVA2M3RjTmJrVkc5MUhRQ3p5?=
+ =?utf-7?B?T1lQeDNtb3hIeUR5c21LdFc0Qlk0bFVJQ3RwWHAxa01PMkF1L1ZETEM4MnpT?=
+ =?utf-7?B?MHplUDlZY1lDU3F4WDlPdEcvYXdLSGNXNTVZNllqbHlTdjdqWG5LSXZHSjNi?=
+ =?utf-7?B?U3FmS0RHdzJmcTNPUmZ0eE5jTVNvUDIvQzBtb29ZV2F6OFcwTU1sQkd2cERm?=
+ =?utf-7?B?bnF5MW9LdlBGcW85cFNrWjgzYystTzI0SFM4WmRWcGE0VTF2MzJLRGVaWnVK?=
+ =?utf-7?B?WVpDbTJPMUlLejJmdXo5ZVp1Wk1ncVc2VkpDVlBOZEw0L0VTUDVNU3E2a21i?=
+ =?utf-7?B?cktqWm5xSTVxR3ZFQUpPVlJZVExPRDRtNm01dlk0b2hnTHFJVTZXbVVZaEoz?=
+ =?utf-7?B?WWdjRExiVE8xMHdjTU9pcU5GNzhYcG4rLTFzeEd6ankweWhsNVZzNXRJakhX?=
+ =?utf-7?B?czRDRVJ5TmlJWmxOTmpUTmluWFVrTHhmWGZ1dGRaZjN3aGtSWE1MRGh0Ky1S?=
+ =?utf-7?B?Sk9CRjJpR3ppMzRHeFJMbHlSNDdxSlhKTzA2dTZOWUs1TkFIL3lCZmVKUTR1?=
+ =?utf-7?B?VHdTWjF4WDFLdzhBUnVZNUZyUWVadmZ2M2pUbUw2bXllWEpYdU5ONlVXeEdC?=
+ =?utf-7?B?U21PYkI2R0VBeTYxVzdrNWs4WVNoQ0t3a1VHNUR5ejdUcE1Qd0tPZW9kWkI=?=
+ =?utf-7?B?Ky0wQkpoRms5MQ==?=
+Content-Type: text/plain; charset="utf-7"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 00/15] net/smc: implement loopback-ism used by
- SMC-D
-To: Wenjia Zhang <wenjia@linux.ibm.com>, wintera@linux.ibm.com,
- hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, jaka@linux.ibm.com, Gerd Bayer <gbayer@linux.ibm.com>
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240111120036.109903-1-guwen@linux.alibaba.com>
- <76b53c2d-5596-44da-b759-e5e94571d401@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <76b53c2d-5596-44da-b759-e5e94571d401@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: Dell.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ0PR19MB4415.namprd19.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9df4b427-c88b-4cb2-1811-08dc31cf966d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Feb 2024 04:51:23.1380
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 945c199a-83a2-4e80-9f8c-5a91be5752dd
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: hluNbNaSFKQL9ZLqJWRZHyqnF1oKBSBGSvDRpuBtUNSRxT6Xfgg5YGej3KubDF5j+jopni/6DHdhFQPIibFQZg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR19MB3917
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-20_03,2024-02-19_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ priorityscore=1501 impostorscore=0 phishscore=0 clxscore=1015 mlxscore=0
+ spamscore=0 malwarescore=0 adultscore=0 bulkscore=0 lowpriorityscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2402200031
+X-Proofpoint-ORIG-GUID: X0eZT-oZsRLxxr800qWimkwc8xuBYNVY
+X-Proofpoint-GUID: X0eZT-oZsRLxxr800qWimkwc8xuBYNVY
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1015 priorityscore=1501
+ spamscore=0 mlxlogscore=999 adultscore=0 impostorscore=0 phishscore=0
+ mlxscore=0 suspectscore=0 malwarescore=0 lowpriorityscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2402200031
+
+Hi Jeremy,
+
+Thanks for the reply. I have few additional queries.
 
 
+Internal Use - Confidential
++AD4- -----Original Message-----
++AD4- From: Jeremy Kerr +ADw-jk+AEA-codeconstruct.com.au+AD4-
++AD4- Sent: 20 February 2024 07:51
++AD4- To: Ramaiah, DharmaBhushan +ADw-Dharma+AF8-Ramaiah+AEA-Dell.com+AD4AO=
+w-
++AD4- netdev+AEA-vger.kernel.org+ADs- matt+AEA-codeconstruct.com.au
++AD4- Subject: Re: MCTP - Socket Queue Behavior
++AD4-
++AD4-
++AD4- +AFs-EXTERNAL EMAIL+AF0-
++AD4-
++AD4- Hi Dharma,
++AD4-
++AD4- +AD4- Linux implementation of MCTP uses socket for communication with=
+ MCTP
++AD4- +AD4- capable EP's. Socket calls can be made ASYNC by using fcntl. I =
+have a
++AD4- +AD4- query based on ASYNC properties of the MCTP socket.
++AD4-
++AD4- Some of your questions aren't really specific to non-blocking sockets=
++ADs- it seems
++AD4- like you're assuming that the blocking send case will wait for a resp=
+onse before
++AD4- returning+ADs- that's not the case, as sendmsg() will complete once t=
+he outgoing
++AD4- message is queued (more on what that means below).
++AD4-
++AD4- So, you still have the following case, still using a blocking socket:
++AD4-
++AD4-   sendmsg(message1)
++AD4-   sendmsg(message2)
++AD4-
++AD4-   recvmsg() -+AD4- reply 1
++AD4-   recvmsg() -+AD4- reply 2
++AD4-
++AD4- - as it's entirely possible to have multiple messages in flight - eit=
+her
++AD4-   as queued skbs, or having being sent to the remote endpoint.
++AD4-
++AD4- +AD4- 1. Does kernel internally maintain queue, for the ASYNC request=
+s?
++AD4-
++AD4- There is no difference between blocking or non-blocking mode in the q=
+ueueing
++AD4- implementation. There is no MCTP-protocol-specific queue for sent mes=
+sages.
++AD4-
++AD4- (the blocking/nonblocking mode may affect how we wait to allocate a s=
+kb, but
++AD4- it doesn't sound like that's what you're asking here)
++AD4-
++AD4- However, once a message is packetised (possibly being fragmented into
++AD4- multiple packets), those those +ACo-packets+ACo- may be queued to the=
+ device by the
++AD4- netdev core. The transport device driver may have its own queues as w=
+ell.
++AD4-
++AD4- In the case where you have multiple concurrent sendmsg() calls (typic=
+ally
++AD4- through separate threads, and either on one or multiple sockets), it =
+may be
++AD4- possible for packets belonging to two messages to be interleaved on t=
+he wire.
++AD4- That scenario is well-supported by the MCTP protocol through the pack=
+et tag
++AD4- mechanism.
++AD4-
++AD4- +AD4- a. If so, what is the queue depth (can one send multiple reques=
+ts
++AD4- +AD4- without waiting for the response
++AD4-
++AD4- The device queue depth depends on a few things, but has no impact on
++AD4- ordering of requests to responses. It's certainly possible to have mu=
+ltiple
++AD4- requests in flight at any one time: just call sendmsg() multiple time=
+s, even in
++AD4- blocking mode.
++AD4-
++AD4- (the practical limit for pending messages is 8, limited by the number=
+ of MCTP
++AD4- tag values for any (remote-EID, local-EID, tag) tuple)
++AD4-
++AD4- +AD4- and expect reply in order of requests)?
++AD4-
++AD4- We have no control over reply ordering. It's entirely possible that r=
+eplies are
++AD4- sent out of sequence by the remote endpoint:
++AD4-
++AD4-   local application          remote endpoint
++AD4-
++AD4-   sendmsg(message 1)
++AD4-   sendmsg(message 2)
++AD4-                              receives message 1
++AD4-                              receives message 2
++AD4-                              sends a reply 2 to message 2
++AD4-                              sends a reply 1 to message 1
++AD4-   recvmsg() -+AD4- reply 2
++AD4-   recvmsg() -+AD4- reply 1
++AD4-
 
-On 2024/2/16 22:09, Wenjia Zhang wrote:
-> 
-> 
-> On 11.01.24 13:00, Wen Gu wrote:
->> This patch set acts as the second part of the new version of [1] (The first
->> part can be referred from [2]), the updated things of this version are listed
->> at the end.
->>
->> # Background
->>
->> SMC-D is now used in IBM z with ISM function to optimize network interconnect
->> for intra-CPC communications. Inspired by this, we try to make SMC-D available
->> on the non-s390 architecture through a software-implemented virtual ISM device,
->> that is the loopback-ism device here, to accelerate inter-process or
->> inter-containers communication within the same OS instance.
->>
->> # Design
->>
->> This patch set includes 3 parts:
->>
->>   - Patch #1-#2: some prepare work for loopback-ism.
->>   - Patch #3-#9: implement loopback-ism device.
->>   - Patch #10-#15: memory copy optimization for loopback scenario.
->>
->> The loopback-ism device is designed as a ISMv2 device and not be limited to
->> a specific net namespace, ends of both inter-process connection (1/1' in diagram
->> below) or inter-container connection (2/2' in diagram below) can find the same
->> available loopback-ism and choose it during the CLC handshake.
->>
->>   Container 1 (ns1)                              Container 2 (ns2)
->>   +-----------------------------------------+    +-------------------------+
->>   | +-------+      +-------+      +-------+ |    |        +-------+        |
->>   | | App A |      | App B |      | App C | |    |        | App D |<-+     |
->>   | +-------+      +---^---+      +-------+ |    |        +-------+  |(2') |
->>   |     |127.0.0.1 (1')|             |192.168.0.11       192.168.0.12|     |
->>   |  (1)|   +--------+ | +--------+  |(2)   |    | +--------+   +--------+ |
->>   |     `-->|   lo   |-` |  eth0  |<-`      |    | |   lo   |   |  eth0  | |
->>   +---------+--|---^-+---+-----|--+---------+    +-+--------+---+-^------+-+
->>                |   |           |                                  |
->>   Kernel       |   |           |                                  |
->>   +----+-------v---+-----------v----------------------------------+---+----+
->>   |    |                            TCP                               |    |
->>   |    |                                                              |    |
->>   |    +--------------------------------------------------------------+    |
->>   |                                                                        |
->>   |                           +--------------+                             |
->>   |                           | smc loopback |                             |
->>   +---------------------------+--------------+-----------------------------+
->>
->> loopback-ism device creates DMBs (shared memory) for each connection peer.
->> Since data transfer occurs within the same kernel, the sndbuf of each peer
->> is only a descriptor and point to the same memory region as peer DMB, so that
->> the data copy from sndbuf to peer DMB can be avoided in loopback-ism case.
->>
->>   Container 1 (ns1)                              Container 2 (ns2)
->>   +-----------------------------------------+    +-------------------------+
->>   | +-------+                               |    |        +-------+        |
->>   | | App C |-----+                         |    |        | App D |        |
->>   | +-------+     |                         |    |        +-^-----+        |
->>   |               |                         |    |          |              |
->>   |           (2) |                         |    |     (2') |              |
->>   |               |                         |    |          |              |
->>   +---------------|-------------------------+    +----------|--------------+
->>                   |                                         |
->>   Kernel          |                                         |
->>   +---------------|-----------------------------------------|--------------+
->>   | +--------+ +--v-----+                           +--------+ +--------+  |
->>   | |dmb_desc| |snd_desc|                           |dmb_desc| |snd_desc|  |
->>   | +-----|--+ +--|-----+                           +-----|--+ +--------+  |
->>   | +-----|--+    |                                 +-----|--+             |
->>   | | DMB C  |    +---------------------------------| DMB D  |             |
->>   | +--------+                                      +--------+             |
->>   |                                                                        |
->>   |                           +--------------+                             |
->>   |                           | smc loopback |                             |
->>   +---------------------------+--------------+-----------------------------+
->>
->> # Benchmark Test
->>
->>   * Test environments:
->>        - VM with Intel Xeon Platinum 8 core 2.50GHz, 16 GiB mem.
->>        - SMC sndbuf/DMB size 1MB.
->>        - /sys/devices/virtual/smc/loopback-ism/dmb_copy is set to default 0,
->>          which means sndbuf and DMB are merged and no data copied between them.
->>        - /sys/devices/virtual/smc/loopback-ism/dmb_type is set to default 0,
->>          which means DMB is physically contiguous buffer.
->>
->>   * Test object:
->>        - TCP: run on TCP loopback.
->>        - SMC lo: run on SMC loopback device.
->>
->> 1. ipc-benchmark (see [3])
->>
->>   - ./<foo> -c 1000000 -s 100
->>
->>                              TCP                  SMC-lo
->> Message
->> rate (msg/s)              80636                  149515(+85.42%)
->>
->> 2. sockperf
->>
->>   - serv: <smc_run> taskset -c <cpu> sockperf sr --tcp
->>   - clnt: <smc_run> taskset -c <cpu> sockperf { tp | pp } --tcp --msg-size={ 64000 for tp | 14 for pp } -i 127.0.0.1 
->> -t 30
->>
->>                              TCP                  SMC-lo
->> Bandwidth(MBps)         4909.36                 8197.57(+66.98%)
->> Latency(us)               6.098                   3.383(-44.52%)
->>
->> 3. nginx/wrk
->>
->>   - serv: <smc_run> nginx
->>   - clnt: <smc_run> wrk -t 8 -c 1000 -d 30 http://127.0.0.1:80
->>
->>                             TCP                   SMC-lo
->> Requests/s           181685.74                246447.77(+35.65%)
->>
->> 4. redis-benchmark
->>
->>   - serv: <smc_run> redis-server
->>   - clnt: <smc_run> redis-benchmark -h 127.0.0.1 -q -t set,get -n 400000 -c 200 -d 1024
->>
->>                             TCP                   SMC-lo
->> GET(Requests/s)       85855.34                118553.64(+38.09%)
->> SET(Requests/s)       86824.40                125944.58(+45.06%)
->>
->>
->> Change log:
->>
->> v1->RFC:
->> - Patch #9: merge rx_bytes and tx_bytes as xfer_bytes statistics:
->>    /sys/devices/virtual/smc/loopback-ism/xfer_bytes
->> - Patch #10: add support_dmb_nocopy operation to check if SMC-D device supports
->>    merging sndbuf with peer DMB.
->> - Patch #13 & #14: introduce loopback-ism device control of DMB memory type and
->>    control of whether to merge sndbuf and DMB. They can be respectively set by:
->>    /sys/devices/virtual/smc/loopback-ism/dmb_type
->>    /sys/devices/virtual/smc/loopback-ism/dmb_copy
->>    The motivation for these two control is that a performance bottleneck was
->>    found when using vzalloced DMB and sndbuf is merged with DMB, and there are
->>    many CPUs and CONFIG_HARDENED_USERCOPY is set [4]. The bottleneck is caused
->>    by the lock contention in vmap_area_lock [5] which is involved in memcpy_from_msg()
->>    or memcpy_to_msg(). Currently, Uladzislau Rezki is working on mitigating the
->>    vmap lock contention [6]. It has significant effects, but using virtual memory
->>    still has additional overhead compared to using physical memory.
->>    So this new version provides controls of dmb_type and dmb_copy to suit
->>    different scenarios.
->> - Some minor changes and comments improvements.
->>
->> RFC->old version([1]):
->> Link: https://lore.kernel.org/netdev/1702214654-32069-1-git-send-email-guwen@linux.alibaba.com/
->> - Patch #1: improve the loopback-ism dump, it shows as follows now:
->>    # smcd d
->>    FID  Type  PCI-ID        PCHID  InUse  #LGs  PNET-ID
->>    0000 0     loopback-ism  ffff   No        0
->> - Patch #3: introduce the smc_ism_set_v2_capable() helper and set
->>    smc_ism_v2_capable when ISMv2 or virtual ISM is registered,
->>    regardless of whether there is already a device in smcd device list.
->> - Patch #3: loopback-ism will be added into /sys/devices/virtual/smc/loopback-ism/.
->> - Patch #8: introduce the runtime switch /sys/devices/virtual/smc/loopback-ism/active
->>    to activate or deactivate the loopback-ism.
->> - Patch #9: introduce the statistics of loopback-ism by
->>    /sys/devices/virtual/smc/loopback-ism/{{tx|rx}_tytes|dmbs_cnt}.
->> - Some minor changes and comments improvements.
->>
->> [1] https://lore.kernel.org/netdev/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
->> [2] https://lore.kernel.org/netdev/20231219142616.80697-1-guwen@linux.alibaba.com/
->> [3] https://github.com/goldsborough/ipc-bench
->> [4] https://lore.kernel.org/all/3189e342-c38f-6076-b730-19a6efd732a5@linux.alibaba.com/
->> [5] https://lore.kernel.org/all/238e63cd-e0e8-4fbf-852f-bc4d5bc35d5a@linux.alibaba.com/
->> [6] https://lore.kernel.org/all/20240102184633.748113-1-urezki@gmail.com/
->>
->> Wen Gu (15):
->>    net/smc: improve SMC-D device dump for virtual ISM
->>    net/smc: decouple specialized struct from SMC-D DMB registration
->>    net/smc: introduce virtual ISM device loopback-ism
->>    net/smc: implement ID-related operations of loopback-ism
->>    net/smc: implement some unsupported operations of loopback-ism
->>    net/smc: implement DMB-related operations of loopback-ism
->>    net/smc: register loopback-ism into SMC-D device list
->>    net/smc: introduce loopback-ism runtime switch
->>    net/smc: introduce loopback-ism statistics attributes
->>    net/smc: add operations to merge sndbuf with peer DMB
->>    net/smc: attach or detach ghost sndbuf to peer DMB
->>    net/smc: adapt cursor update when sndbuf and peer DMB are merged
->>    net/smc: introduce loopback-ism DMB type control
->>    net/smc: introduce loopback-ism DMB data copy control
->>    net/smc: implement DMB-merged operations of loopback-ism
->>
->>   drivers/s390/net/ism_drv.c |   2 +-
->>   include/net/smc.h          |   7 +-
->>   net/smc/Kconfig            |  13 +
->>   net/smc/Makefile           |   2 +-
->>   net/smc/af_smc.c           |  28 +-
->>   net/smc/smc_cdc.c          |  58 ++-
->>   net/smc/smc_cdc.h          |   1 +
->>   net/smc/smc_core.c         |  61 +++-
->>   net/smc/smc_core.h         |   1 +
->>   net/smc/smc_ism.c          |  71 +++-
->>   net/smc/smc_ism.h          |   5 +
->>   net/smc/smc_loopback.c     | 718 +++++++++++++++++++++++++++++++++++++
->>   net/smc/smc_loopback.h     |  88 +++++
->>   13 files changed, 1026 insertions(+), 29 deletions(-)
->>   create mode 100644 net/smc/smc_loopback.c
->>   create mode 100644 net/smc/smc_loopback.h
->>
-> Hi Wen,
-> 
-> Thank you for the patience again!
-> 
-> You can find the comments under the corresponding patches respectively.
-> About the file hierarchy in sysfs and the names, we still have some thoughts. We need to investigate a bit more time on it.
-> 
+Based on the above explanation I understand that the sendto allocates the s=
+kb (based on the blocking/nonblocking mode). mctp+AF8-i2c+AF8-tx+AF8-thread=
+, dequeues the skb and transmits the message. And also sendto can interleav=
+e the messages on the wire with different message tag. My query here regard=
+ing the bus lock.
 
-Hi Wenjia and Gerd,
+1. Is the bus lock taken for the entire duration of sendto and revcfrom (as=
+ indicated in one of the previous threads).  Assume a case where we have a =
+two EP's (x and y) on I2C bus +ACM-1 and these EP's are on different segmen=
+ts. In this case, shoudn't the bus be locked for the entire duration till w=
+e receive the reply or else remote EP might drop the packet as the MUX is s=
+witched.
 
-Thank you very much!
+                         Local application                                 =
+                   remote endpoint
 
-I answered each comment you left. You can find my thoughts about sysfs and
-knobs there. Looking forward to your further reply. Thanks!
+                Userspace                             Kernel Space
 
-Best regards,
-Wen Gu
+sendmsg(msg1)+ADw-ep - x, i2cbus -1, seg1+AD4-
+sendmsg(msg2)+ADw-ep -y, i2cbus - 1, seg2+AD4-
 
-> Thanks,
-> Gerd & Wenjia
+                                               lock(bus)
+                                                                           =
+    send(msg1)
+                                                                receive(msg=
+1)
+                                                                           =
+                                         sendreply(msg1)
+                                                                           =
+    unlock(bus)
+recvmsg(msg1)  +ADw-- Reply                                    lockbus(bus)
+                                                                           =
+     send(msg1)
+                                                                receive(msg=
+1)
+                                                                           =
+                                         sendreply(msg1)
+                                                                           =
+    unlock(bus)
+recvmsg(msg2)  +ADw-- Reply
+
+Also today, MCTP provides no mechanism to advertise if the remote EP can ha=
+ndle more than one request at a time. Ability to handle multiple messages i=
+s purely based on the device capability. In these cases shouldn't Kernel pr=
+ovide a way to lock the bus till the response is obtained?
+Please let me know if I am missing something.
+
++AD4- So if a userspace application sends multiple messages concurrently, i=
+t must
++AD4- have some mechanism to correlate the incoming replies with the origin=
+al
++AD4- request state. All of the upper-layer protocols that I have seen have=
+ facilities
++AD4- for this (Instance ID in MCTP Control protocol, Command Slot Index in=
+ NVMe-
++AD4- MI, Instance ID in PLDM, ...)
++AD4-
++AD4- (You could also use the MCTP tags to achieve this correlation, but th=
+ere are
++AD4- very likely better ways in the upper-layer protocol)
++AD4-
+
+
++AD4- +AD4- b. Does the Kernel maintain queue per socket connection?
++AD4-
++AD4- MCTP is datagram-oriented, there is no +ACI-connection+ACI-.
++AD4-
++AD4- In terms of per-socket queues: there is the incoming socket queue tha=
+t holds
++AD4- received messages that are waiting for userspace to dequeue via recvm=
+sg() (or
++AD4- similar). However, there is nothing MCTP-specific about this, it's al=
+l generic
++AD4- socket code.
++AD4-
++AD4- +AD4- 2. Is FASYNC a mechanism for handling asynchronous events assoc=
+iated
++AD4- +AD4- with a file descriptor and it doesn't provide parallelism for m=
+ultiple
++AD4- +AD4- send operation?
++AD4-
++AD4- The non-blocking socket interfaces (FASYNC, O+AF8-NONBLOCK, MSG+AF8-D=
+ONTWAIT)
++AD4- are mostly unrelated to whether your application sends multiple messa=
+ges at
++AD4- once. It's entirely possible to have multiple messages in flight whil=
+e using the
++AD4- blocking interfaces.
++AD4-
++AD4- Cheers,
++AD4-
++AD4-
++AD4- Jeremy
 
