@@ -1,151 +1,121 @@
-Return-Path: <netdev+bounces-73375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21B9885C30E
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 18:54:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 80EBD85C319
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 18:56:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F6C9B2142E
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 17:54:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2222FB24B20
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 17:56:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 617177867A;
-	Tue, 20 Feb 2024 17:54:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C334B78665;
+	Tue, 20 Feb 2024 17:55:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="dqDmFqmf"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="IO6VsUpf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CB037764B
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 17:53:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2E7577A05
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 17:55:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708451641; cv=none; b=bYU2foPeCtqDju0nJGT4RoIO5jLf3IqPWLwkmK20WODUftQRlv4Ga13aKQhjBnhxovO4i6oMZ28NK7FO1VwV4/LN7XTmIa5luMg5NoxeIQTcn2B+CVTJYCB5wTQhnXGLS8CgJSHOAT+VQU8QpUXuZV5C3EESO7ojfgIfWu0qyZI=
+	t=1708451751; cv=none; b=Wkwc+ByWcLd/JOwiGViXnU9Ybtmty7nDGE3DohDa4aRTVGGnzATM9N5LbDRXPRZlvr/C0VfXg2KJzTLn4aG0pFRIa4yKwRaPxLd43Nu0k9yMhnMF62xrF46KPWwEzMDElY20BLW/wHOJFOkTCMRXtnbDcDkJuY4hbQJy95MuQKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708451641; c=relaxed/simple;
-	bh=d38oaY+K+spNFRP/qOIWiTuNObZ5xOckG4uBJUP/Mnw=;
+	s=arc-20240116; t=1708451751; c=relaxed/simple;
+	bh=hqb1KpK8idTkVHw05D9DaOecFdA77V8n0hYYGqZ4o2Y=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pL10BaAffLdRyZDrBqV0uZYVxWx+91Puw3rAhRPFE+pM+BkKHDzhiS3sAWkHyn+AQTV9L5SrsABjSgaGOknGF9cx6AMaqkXSer7c6XhC+lkSNbCh7HybuMdH2sUYWCpyp6xkghV1CDj0lNWc3wExQD+mfR7lO9mlLl+WNvPnkwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=dqDmFqmf; arc=none smtp.client-ip=209.85.217.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-4706beefb70so685273137.0
-        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 09:53:59 -0800 (PST)
+	 To:Content-Type; b=qsUQN1CTyB76sfwuVnsClpyfwuq3bxvBdZAu2LMlbLLv1lH8sO7+je3eXjw3R3syBl502OcfdeRJhThz+IHbaJMagjB58082FMOl8caPHyXQ+4v3CWSFGcg8pR0yBOckCJl+zGqTv8YSETXlJqyiQD5YWmI0CCL2pTl0fvJYPY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=IO6VsUpf; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-563e6131140so5488501a12.2
+        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 09:55:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1708451638; x=1709056438; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4DriMqP4qiEsOx9DUXcwZZJ3R+6NkNBQrlsXuZW2fRw=;
-        b=dqDmFqmf/boXSO3XLftzEpiYyOHCamaX0F53wcY4GQpiuQW/2vzcNdtROqhIDlmaNi
-         41o8Nq1nyOrvoLTIL/A3cIMQYXmTq2Cjxsvyk3NK7hnVBlMFTjhSAGVAurwdgztdwqeW
-         jVt2HdNK35jY7M80Pawdx8zCXwTpkxi3BoUuVDYfpb+UCAn6zAOXbk1Rfe/IksHmfhmQ
-         oXt/2Ch2k7erVEf5RIDIoaIW8yY1cCjQYXfObTdvxtwV8chIeWUY5YmCQak9EDtS7KxH
-         haS60yiEvpExLTaT/E7j/g0EV7s1tdqQxtTdRgSV6FL8RIUCHzQTPmYA/1Xdy57iHOop
-         P2gA==
+        d=linux-foundation.org; s=google; t=1708451748; x=1709056548; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cs7a6JxSri8UPMBfIFAC6zzBgd9E4B30piovcQly+DY=;
+        b=IO6VsUpfVdC8MenT19L0XGvhc72FARmcJPBnMmmthFdvbHdKXRVq+WWxpXN4SuwPRo
+         eAScsA7VkmTO7dzA0RzHXM/cewb1NE6T+mRZPam1B2vqXR5CFyvzMi2AADzmmxuO22PB
+         0li2nLbSp/IyA9XSPdPHvILKCldq+Rf4aRPMA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708451638; x=1709056438;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4DriMqP4qiEsOx9DUXcwZZJ3R+6NkNBQrlsXuZW2fRw=;
-        b=rC9GkGtdiFP4dAMssq/uQWAN/4Z80LX2wy68GqwlEL2thc/W8/aLkPfPyCjsrI48+8
-         PubXj5V2BgrEsQkMerBGj7SGz6j548WSOcBCsYCbGCKZF/BlA62AK+gBrS/fc0fJI22a
-         QDGLj7xw0dbWlTYWoRlceAdHRKAENbdy3WuOG847hnMVVxvLnKEDp86DAOqBoWj02CCA
-         YJyQ51Q9M0WM/S+usTf96Xpzzy7vsIIu+PH4OKkNlOcXsrWMp+8Ixj7ZHKLnPcljj1jz
-         hOP0k+bZ4V5p3DsLgCrYM+NurySu/Pq5VK5VKndaG0GPc2uANfC4AOJjh34/Jc7kkZ7x
-         oAzg==
-X-Forwarded-Encrypted: i=1; AJvYcCVD5bwb6Z3Wpw1qK/j46XA0go8j9akvMOnIlWW3Sg4q9o94W9NKSoKJOsr3XTNlJMHkUD9HQ7ZaU9m4MbPYP8ekma2CRMoz
-X-Gm-Message-State: AOJu0Yxr+C32QD5i/hhWQb9dL7BEmlyckNNDNDlH9YBIScGwL1uasAnI
-	V9uSQPRr2d2064kpxcE5PLL2WkNhSAJFOByEaF+AuJnLH/B1VsOPchE9U1aRPqckpDePpwlVFBC
-	s1npcDBhbnHlavGrBzdws3jywe1/tOBP5JM8AeQ==
-X-Google-Smtp-Source: AGHT+IEAXD4s0vfCLOf3dGv178kSWMvcITercQToZ5Xpgu/ylirbyvBE31sO5fq4v2ZZE2g252F6KNSh/laLzVqmd+s=
-X-Received: by 2002:a05:6102:2436:b0:470:51da:3adc with SMTP id
- l22-20020a056102243600b0047051da3adcmr4445513vsi.10.1708451638124; Tue, 20
- Feb 2024 09:53:58 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708451748; x=1709056548;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cs7a6JxSri8UPMBfIFAC6zzBgd9E4B30piovcQly+DY=;
+        b=Tdu/VROqr0kcyivIu6X3yl9FLaabd2t2uUAbIEr11wGYqLRZ8ULNNu9AGmc/bKJe2E
+         ZqNd6zR+or32HKwSaKWDqjo8F0g3PsLR4dpB7N1Hxhkgq1EeJyr2SMcOf0x9Y6AOCU8g
+         1DFLErOEBVHxvd9HMsGiCXKBjrYs6jAq8E5z0KYcR3cW/hqgPFAY2mDMMYvf2XzlDm0z
+         jLDvdzgZM/qsuW2rJYzoK64LLH5ufU3H5xdkFPnOWwbXiGJe3URgIsHPP8Q1Lxn/UT+J
+         /OOmtra1YwwsIq8Leh0yYXf7NOP0Av0H6GuzZ80l6R0X+2IH1SLf/zpFZH0acYk/f45r
+         5Juw==
+X-Forwarded-Encrypted: i=1; AJvYcCVtjaBun4ke6dcXvVXW+ABEtmjb0tszSfjAYw/NltcZjSujVu3G+/uW/TkPTVb3mZBYAQbmeesJLZ1HZsN3sjKIry1Gktsc
+X-Gm-Message-State: AOJu0Yy5epTwcRtPhzxahg7iOKJsmtKwqlmUwhrnqsSCTjAdC0CJKqFv
+	nKuUXWH/Hudc/bvIoWUG8bPTjnh9w2HF8+fE0aNF+ewlOKxFtDkf9RrKgIfrfmchl7PTEHsLG0n
+	ySAjKoQ==
+X-Google-Smtp-Source: AGHT+IE5PaYtgAmcC/JggxDszCk8XgeWbgcbMfQeiCkoT0Pye6gJqcWcBm2LyDudeeRNxjiJ2IFiKg==
+X-Received: by 2002:a17:906:29cf:b0:a3f:17fd:620c with SMTP id y15-20020a17090629cf00b00a3f17fd620cmr954351eje.27.1708451748114;
+        Tue, 20 Feb 2024 09:55:48 -0800 (PST)
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com. [209.85.208.41])
+        by smtp.gmail.com with ESMTPSA id u23-20020a170906c41700b00a3d81b90ffcsm4157102ejz.218.2024.02.20.09.55.46
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Feb 2024 09:55:47 -0800 (PST)
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-55c2cf644f3so7811115a12.1
+        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 09:55:46 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWKWjzSgetkySzm31d9gJO7nR3jT4UbacZ0os/qlqcY+jYsaOWPeuMZuNydquk0DnrDmQgRdtio8O3Va5HCAGMSqZQ+QSQK
+X-Received: by 2002:aa7:d393:0:b0:564:3d68:55f5 with SMTP id
+ x19-20020aa7d393000000b005643d6855f5mr5518556edq.5.1708451746591; Tue, 20 Feb
+ 2024 09:55:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240216203215.40870-1-brgl@bgdev.pl> <20240216203215.40870-10-brgl@bgdev.pl>
- <48164f18-34d0-4053-a416-2bb63aaae74b@sirena.org.uk> <CAMRc=Md7ymMTmF1OkydewF5C32jDNy0V+su7pcJPHKto6VLjLg@mail.gmail.com>
- <8e392aed-b5f7-486b-b5c0-5568e13796ec@sirena.org.uk> <CAMRc=MeAXEyV47nDO_WPQqEQxSYFWTrwVPAtLghkfONj56FGVA@mail.gmail.com>
- <CAA8EJppzkuH=YTAHuJ3Og2RLHB93PSas004UDvpqepYbGepVPg@mail.gmail.com>
-In-Reply-To: <CAA8EJppzkuH=YTAHuJ3Og2RLHB93PSas004UDvpqepYbGepVPg@mail.gmail.com>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Tue, 20 Feb 2024 18:53:46 +0100
-Message-ID: <CAMRc=MfXkG1bqGrtFWpoZo3fTY49TvU3sHOnX-zc2kjUiRfp3w@mail.gmail.com>
-Subject: Re: [PATCH v5 09/18] arm64: dts: qcom: qrb5165-rb5: model the PMU of
- the QCA6391
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Cc: Mark Brown <broonie@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
-	Liam Girdwood <lgirdwood@gmail.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Saravana Kannan <saravanak@google.com>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>, 
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+References: <20240130091300.2968534-1-tj@kernel.org> <20240130091300.2968534-6-tj@kernel.org>
+ <bckroyio6l2nt54refuord4pm6mqylt3adx6z2bg6iczxkbnyk@bb5447rqahj5>
+In-Reply-To: <bckroyio6l2nt54refuord4pm6mqylt3adx6z2bg6iczxkbnyk@bb5447rqahj5>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Tue, 20 Feb 2024 09:55:30 -0800
+X-Gmail-Original-Message-ID: <CAHk-=whqae-+7Q7wbtnEj7YmR8vsx6skTj6j-srV2Fz7cBZ2ag@mail.gmail.com>
+Message-ID: <CAHk-=whqae-+7Q7wbtnEj7YmR8vsx6skTj6j-srV2Fz7cBZ2ag@mail.gmail.com>
+Subject: Re: [PATCH 5/8] usb: core: hcd: Convert from tasklet to BH workqueue
+To: Tejun Heo <tj@kernel.org>, torvalds@linux-foundation.org, mpatocka@redhat.com, 
+	linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev, msnitzer@redhat.com, 
+	ignat@cloudflare.com, damien.lemoal@wdc.com, bob.liu@oracle.com, 
+	houtao1@huawei.com, peterz@infradead.org, mingo@kernel.org, 
+	netdev@vger.kernel.org, allen.lkml@gmail.com, kernel-team@meta.com, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Alan Stern <stern@rowland.harvard.edu>, 
+	linux-usb@vger.kernel.org, mchehab@kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 20, 2024 at 5:30=E2=80=AFPM Dmitry Baryshkov
-<dmitry.baryshkov@linaro.org> wrote:
+On Tue, 20 Feb 2024 at 09:25, Davidlohr Bueso <dave@stgolabs.net> wrote:
 >
-> On Tue, 20 Feb 2024 at 13:16, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
-> >
-> > On Mon, Feb 19, 2024 at 8:59=E2=80=AFPM Mark Brown <broonie@kernel.org>=
- wrote:
-> > >
-> > > On Mon, Feb 19, 2024 at 07:48:20PM +0100, Bartosz Golaszewski wrote:
-> > > > On Mon, Feb 19, 2024 at 7:03=E2=80=AFPM Mark Brown <broonie@kernel.=
-org> wrote:
-> > > > > On Fri, Feb 16, 2024 at 09:32:06PM +0100, Bartosz Golaszewski wro=
-te:
-> > >
-> > > > > > +                     vreg_pmu_aon_0p59: ldo1 {
-> > > > > > +                             regulator-name =3D "vreg_pmu_aon_=
-0p59";
-> > > > > > +                             regulator-min-microvolt =3D <5400=
-00>;
-> > > > > > +                             regulator-max-microvolt =3D <8400=
-00>;
-> > > > > > +                     };
-> > >
-> > > > > That's a *very* wide voltage range for a supply that's got a name=
- ending
-> >
-> > Because it's an error, it should have been 640000. Thanks for spotting =
-it.
+> In the past this tasklet removal was held up by Mauro's device not properly
+> streaming - hopefully this no longer the case. Cc'ing.
 >
-> According to the datasheet, VDD08_PMU_AON_O goes up to 0.85V then down
-> to 0.59V, which is the working voltage.
->
+> https://lore.kernel.org/all/20180216170450.yl5owfphuvltstnt@breakpoint.cc/
 
-Hmm indeed this is what figure 3.4 says but table 3-2 says the maximum is 0=
-.64V.
+Oh, lovely - an actual use-case where the old tasklet code has known
+requirements.
 
-> VDD08_PMU_RFA_CMN is normally at 0.8V, but goes to 0.4V during sleep.
->
+Mauro - the BH workqueue should provide the same kind of latency as
+the tasklets, and it would be good to validate early that yes, this
+workqueue conversion works well in practice. Since you have an actual
+real-life test-case, could you give it a try?
 
-Again figure 3.4 and table 3-2 disagree unless I'm missing something.
+You can find the work in
 
-Bart
+   git://git.kernel.org/pub/scm/linux/kernel/git/tj/wq.git
+refs/heads/for-6.9-bh-conversions
 
-[snip]
+although it's possible that Tejun has a newer version in some other
+branch. Tejun - maybe point Mauro at something he can try out if you
+have updated the conversion since?
+
+                Linus
 
