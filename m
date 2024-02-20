@@ -1,140 +1,128 @@
-Return-Path: <netdev+bounces-73183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D51885B49A
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:11:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBF4F85B49F
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:12:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 593E42823C0
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:11:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D76291C21E4B
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:12:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEEC25C03D;
-	Tue, 20 Feb 2024 08:11:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCF705C609;
+	Tue, 20 Feb 2024 08:12:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="UzPkOK9S"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="kdqW2l0L";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="jXqLLpIS"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24AA15BAF7
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 08:11:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE34C5C5EF;
+	Tue, 20 Feb 2024 08:12:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708416662; cv=none; b=NF2LMiXn8BVg5wxBgI5qWYEY27vW/ZE3/QC5zul8MsQ1JSwWZ7ZMcIdJm83txi/omgccCmFown14b5iUvjRTKWvtkIyOzsAZS46pIhEdjoVPByKcvq48W9jkxGg0a0ETjuzjGzVYC62Kmnp4P0yn8t+mAPrDMK3ZcdTaSm5nAIs=
+	t=1708416737; cv=none; b=e8YubkOUc57L0qvAFtdkVTXSJRQaSua6q1jzYRRpt5QZ7a6nkvVmecNPbDBpYHZGwr99qyeyz2EwDsyCEKr0o5+DnqGf4ysLV5yUxYKyjPxNsm8Qabx5r/7t20dlUlNQnxTsu+hsta8+RFH0nmnfv23NSIaGpMKg4HBIEaJeKQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708416662; c=relaxed/simple;
-	bh=T9EwXJqCkGNWNhDPMZf1uaNk7G1DJs3s0eDFQKSfOfI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uKKy5XC0zVOiP+OB/7AdrsBwkXLsoy+9IbMJKYa7NXCtNSU9Jeo+ffRrfp/+AHDs0zzpKnYIcSYTJ6c9Pk08xyGOIjb6vB2B5NzWmnfNV73vHgo5j7AGmasp1z3lj9vmt4ZRVBwjOPyDpnAEE6hfzgk/q18H0yzoT2udJeEPo1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=UzPkOK9S; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-Received: by codeconstruct.com.au (Postfix, from userid 10000)
-	id 291EA201C4; Tue, 20 Feb 2024 16:10:59 +0800 (AWST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1708416659;
-	bh=vrGtsY0rQGA/ofVK3j9p4tcFMAw7x9tuYCk7m9RZd/M=;
-	h=From:To:Cc:Subject:Date;
-	b=UzPkOK9SDbyAmoyM13fWYsrSVJVz6z2CHiUTtM6q10MM6kLCDsnzwkPgpQ1dejqPR
-	 MSRpPANwZJKpeV0qDFAK84WjCIYcSw5wNNYCSSVFh4SSqBdv8pu9EYHPS9OkFjjjGy
-	 T4z4q2OyoSEwAJ3Fhi+8fsbkLEsbGZSLuQGzTDBXRNIboqX10OxKI30pfpYkNE0MGd
-	 SemzjzZMzHU3c+2P9HQ82iZ0azzNNjDe44XrAbR9V1Cng6DqFR/IY8EEYYGr/t/hd/
-	 uHHw92p4pJiLRarNd2hZQA0S7EF7KAyR+0fFB+IAnijak9I5WDZY8Fr6gIjDEcNj5a
-	 cZJlnV5Ju0QKw==
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: netdev@vger.kernel.org
-Cc: Matt Johnston <matt@codeconstruct.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next v2] net: mctp: take ownership of skb in mctp_local_output
-Date: Tue, 20 Feb 2024 16:10:53 +0800
-Message-Id: <20240220081053.1439104-1-jk@codeconstruct.com.au>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1708416737; c=relaxed/simple;
+	bh=6fhWeR1skHIaeVT56IgW7/ZRjTOHRdJQKKLKOdXi/44=;
+	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
+	 Subject:Content-Type; b=s3AP3Kun/cYF2FAYJqsn33P3l50gvjB61Ayf+EKICxvMO9K+1cV182w0jJ+HYKB/azmpkoyzv4vX+544Vu0d/OhEUwL49gfSVMuiNNrSodAU1amOJWI36X/kx3hDShi8fJQebmwdtVMjIFM+wTbBHlM7r6fTx3XxGqF/Ecu/nKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=kdqW2l0L; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=jXqLLpIS; arc=none smtp.client-ip=64.147.123.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.west.internal (Postfix) with ESMTP id 4485C320030E;
+	Tue, 20 Feb 2024 03:12:13 -0500 (EST)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Tue, 20 Feb 2024 03:12:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm3; t=1708416732; x=1708503132; bh=g86RjqfeIk
+	2lRMsjMG7R0Z/s1eUewX0ypn7zMKPtPqI=; b=kdqW2l0Lc++8tT/GjBVik33QGN
+	e2PFW5lEGTQza7J9d17OGfQ6d3/VVptas0D2fv8EyY76DRizj68Io4qM3zAVceBB
+	cCqMEqlNvrpIB++E+N7XoLl4N5kJeUzoteM12HY9RPWVZ9/z12F3gq54RUtL4B5o
+	rKi2u09+610i5/6WcBr6CSlH4IvYubOvA36YPkhMAlEBAtJGQCRb1w140FDHRuWk
+	Jf+zAOu6rSquKZfTLklAV0mWWQR3nuM1xWVk2vJhbhhZi3OQK/HPUAs1Y4s8McQ4
+	TIfHf9948RVmQmxvI/Taru9FR81jYUfb/P9y5geMyoYFCRvr2bCpqGEm/H+w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm1; t=1708416732; x=1708503132; bh=g86RjqfeIk2lRMsjMG7R0Z/s1eUe
+	wX0ypn7zMKPtPqI=; b=jXqLLpIS0CkK2gAg23OyzdabR2hyYGs+OkeYGw1JNsPA
+	BjS+6ja4HS4w8stEX8RSvEnvVh9qDDLpkAuk4Y+o//iyfc+MQqSXfR0veeZA+MKZ
+	gSyN5lic5E5X6j+aUT22jm1JbsXbaO3kM/rYHPj2004tL/Vw4GVu55DxYTszs40c
+	mPg238JDaaLStUeFY+ylWjcmxp6LNt5i1RDhCDsBvwejsvx2mZ+5BYRHLvUHQM/5
+	eWJZRl/8J7Id9dvHrABCqgp2ZCpVf3B3be5lWVuldSR9pDplp/8n8gQ9d+FEmH1h
+	Q3z6ZlBXpMe0gef228xhW/GqmXsRHOEGCDL1JQ95HQ==
+X-ME-Sender: <xms:3F7UZQ3Ep8tV3mn_tyP6sd-cGLrnVksGUkBnd6CRAklUjE1xMr4lPg>
+    <xme:3F7UZbFDhLouqjhWwwnNct9pT9BOQSmr5kaI2LdkycEnVzvRoLJwlfk7MmvoOy4rZ
+    WExLeJChgMgI_oELRk>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrvdelgdduudejucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
+    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
+    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
+    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hrnhgusegrrhhnuggsrdguvg
+X-ME-Proxy: <xmx:3F7UZY4wrhvlN0vfsmYjtHJwsIOjDlo7RVwtgF4LSHS9T_UvCl_4BA>
+    <xmx:3F7UZZ2slXQjUiICjN91hlV0KGr8x17uC2_Fi98Ry4Gb6134N2I5tQ>
+    <xmx:3F7UZTFRz59Vv4xEWcsbQIfyYo-7qKKahXR2hCtQbqbzIHgZDC_N0Q>
+    <xmx:3F7UZTEuaXMZKp-AE2gpgBms1oH4ARs4ikFOt7LCTmwOaQephVo4zw>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 818BAB6008D; Tue, 20 Feb 2024 03:12:12 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.11.0-alpha0-153-g7e3bb84806-fm-20240215.007-g7e3bb848
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Message-Id: <726459a9-c549-4fec-9a4d-61ae1da04f0a@app.fastmail.com>
+In-Reply-To: <20240220080624.GQ40273@kernel.org>
+References: <20240219100506.648089-1-arnd@kernel.org>
+ <20240219100506.648089-2-arnd@kernel.org> <20240220080624.GQ40273@kernel.org>
+Date: Tue, 20 Feb 2024 09:11:51 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Simon Horman" <horms@kernel.org>, "Arnd Bergmann" <arnd@kernel.org>
+Cc: "Saeed Mahameed" <saeedm@nvidia.com>, "Leon Romanovsky" <leon@kernel.org>,
+ "Zhu Yanjun" <yanjun.zhu@linux.dev>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Yevgeny Kliteynik" <kliteyn@nvidia.com>,
+ "Alex Vesker" <valex@nvidia.com>, "Hamdan Igbaria" <hamdani@nvidia.com>,
+ Netdev <netdev@vger.kernel.org>, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] [v2] net/mlx5: fix possible stack overflows
+Content-Type: text/plain
 
-Currently, mctp_local_output only takes ownership of skb on success, and
-we may leak an skb if mctp_local_output fails in specific states; the
-skb ownership isn't transferred until the actual output routing occurs.
+On Tue, Feb 20, 2024, at 09:06, Simon Horman wrote:
+> On Mon, Feb 19, 2024 at 11:04:56AM +0100, Arnd Bergmann wrote:
 
-Instead, make mctp_local_output free the skb on all error paths up to
-the route action, so it always consumes the passed skb.
+> Hi Arnd,
+>
+> With patch 1/2 in place this code goes on as:
+>
+> 	switch (action->action_type) {
+> 	case DR_ACTION_TYP_DROP:
+> 		memset(buff, 0, sizeof(buff));
+>
+> buff is now a char * rather than an array of char.
+> siceof(buff) doesn't seem right here anymore.
+>
+> Flagged by Coccinelle.
 
-Fixes: 833ef3b91de6 ("mctp: Populate socket implementation")
-Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
+Rihgt, that would be bad. It sounds like we won't use patch 1/2
+after all though, so I think it's going to be fine after all.
+If the mlx5 maintainers still want both patches, I'll rework
+it to use the fixed size.
 
----
-v2:
- - retain EINVAL return code in !rt && !ifindex case. Based on feedback
-   from Simon Horman <horms@kernel.org>.
----
- include/net/mctp.h |  1 +
- net/mctp/route.c   | 10 ++++++++--
- 2 files changed, 9 insertions(+), 2 deletions(-)
-
-diff --git a/include/net/mctp.h b/include/net/mctp.h
-index da86e106c91d..2bff5f47ce82 100644
---- a/include/net/mctp.h
-+++ b/include/net/mctp.h
-@@ -249,6 +249,7 @@ struct mctp_route {
- struct mctp_route *mctp_route_lookup(struct net *net, unsigned int dnet,
- 				     mctp_eid_t daddr);
- 
-+/* always takes ownership of skb */
- int mctp_local_output(struct sock *sk, struct mctp_route *rt,
- 		      struct sk_buff *skb, mctp_eid_t daddr, u8 req_tag);
- 
-diff --git a/net/mctp/route.c b/net/mctp/route.c
-index 7a47a58aa54b..d0c43812bec3 100644
---- a/net/mctp/route.c
-+++ b/net/mctp/route.c
-@@ -888,7 +888,7 @@ int mctp_local_output(struct sock *sk, struct mctp_route *rt,
- 		dev = dev_get_by_index_rcu(sock_net(sk), cb->ifindex);
- 		if (!dev) {
- 			rcu_read_unlock();
--			return rc;
-+			goto out_free;
- 		}
- 		rt->dev = __mctp_dev_get(dev);
- 		rcu_read_unlock();
-@@ -903,7 +903,8 @@ int mctp_local_output(struct sock *sk, struct mctp_route *rt,
- 		rt->mtu = 0;
- 
- 	} else {
--		return -EINVAL;
-+		rc = -EINVAL;
-+		goto out_free;
- 	}
- 
- 	spin_lock_irqsave(&rt->dev->addrs_lock, flags);
-@@ -966,12 +967,17 @@ int mctp_local_output(struct sock *sk, struct mctp_route *rt,
- 		rc = mctp_do_fragment_route(rt, skb, mtu, tag);
- 	}
- 
-+	/* route output functions consume the skb, even on error */
-+	skb = NULL;
-+
- out_release:
- 	if (!ext_rt)
- 		mctp_route_release(rt);
- 
- 	mctp_dev_put(tmp_rt.dev);
- 
-+out_free:
-+	kfree_skb(skb);
- 	return rc;
- }
- 
--- 
-2.39.2
-
+     Arnd
 
