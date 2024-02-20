@@ -1,212 +1,141 @@
-Return-Path: <netdev+bounces-73140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 211DD85B219
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 06:08:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A77A85B247
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 06:32:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 979CF1F23F4B
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 05:08:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D488F282C0F
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 05:32:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20A0B482DF;
-	Tue, 20 Feb 2024 05:08:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A690D56B85;
+	Tue, 20 Feb 2024 05:32:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="GO/vQvx9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lSqx05cC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79145481B3;
-	Tue, 20 Feb 2024 05:08:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFB6A56B6E
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 05:32:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708405699; cv=none; b=l6h1NatCkCAWqNIwKsaPsZQpJ1zGnYwtyZ+kHULBc+Ny1Xrv9MbKgJ6Eyn99eNXpNlXsHpnFcp8Vief55yY9jLjSVT5fh++6f2hRbi3cQ6hrml78a9MjmPITWCfspuXEYIUMbfI1IFUcrK7LarV9Q82Ag1YcHaC6F92IUCCLfVQ=
+	t=1708407152; cv=none; b=rKYJYcusDspfURblDjehE7MXOm5YBS9aWxkpHTB/98dZgkWSI9y3SC6hwGE02weeL1JsAGQV8/rarAs/x3ZuQYCVzV9/qoFMEUTexmTkL33nYQO60QjRyCJuXPuoYNJbiHVXZvDFLz1SadFawRiX/Rv+QKQ6m2ou93UQDvCPkn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708405699; c=relaxed/simple;
-	bh=OOQts34tAdzeELzHw+Ngbf4pg4xCendhnsfyqCJ9JAc=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=MkMUUU7uU+olz8E1rF7/ywYwz7kx2Z9osuFgSA/BXZUwoomK49zUIcxOFB8fIGr2Ovh//81cXrbVI8pagSWHCCUgmaOSNCs1a6yr8Dlzj7aaZZoQSxLq4rJJna7bu1ooVQ2CroIpKOV6rQrBGlpbACKHeEPPSEyY8RkhcWcijA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=GO/vQvx9; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41K4kSDM024893;
-	Tue, 20 Feb 2024 05:07:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:to:cc:subject:date:message-id; s=qcppdkim1; bh=MhtlekRsepEl
-	CIsKwt+ETmTkwwxR1cINhfvJXfVw7aU=; b=GO/vQvx9SXK9PrwyrPdfLbcOwIni
-	lA9MXRxuS6GRGBo/DIQtGgGCxWE4P30cLD0iqU0N44f312Ic1LphWfh4U7x1Igho
-	LqQ7JEBgIIWwR/PzbbOTbe+DuBpNU6p4Eym4DTlQHNKAtqMhgmrxMN8u/rhb7hNC
-	MR1v3j9MlLWkjGaq8N7nED3+6SwEN0gZIoDnYuJPywmcajaLBAhCtJikWwfZphwn
-	S1Kotu8NKnQHFq0wR9SCks4acE/WUwymoKBFQR4m6SxDO/hRXJKwfbbURfRN8zpt
-	wtbyH7zSHOBzRRlar/fStSCxW9p09p13TUMhYNuyASfYTuiBYLUv9qAkHA==
-Received: from apblrppmta02.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wcnbd80x4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 20 Feb 2024 05:07:53 +0000 (GMT)
-Received: from pps.filterd (APBLRPPMTA02.qualcomm.com [127.0.0.1])
-	by APBLRPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 41K56ZaB032676;
-	Tue, 20 Feb 2024 05:07:48 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 3wanvkbfmx-1;
-	Tue, 20 Feb 2024 05:07:48 +0000
-Received: from APBLRPPMTA02.qualcomm.com (APBLRPPMTA02.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41K57mlP000910;
-	Tue, 20 Feb 2024 05:07:48 GMT
-Received: from hu-maiyas-hyd.qualcomm.com (hu-snehshah-hyd.qualcomm.com [10.147.246.35])
-	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 41K57mPg000907;
-	Tue, 20 Feb 2024 05:07:48 +0000
-Received: by hu-maiyas-hyd.qualcomm.com (Postfix, from userid 2319345)
-	id 454B15013A6; Tue, 20 Feb 2024 10:37:47 +0530 (+0530)
-From: Sneh Shah <quic_snehshah@quicinc.com>
-To: Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Cc: Sneh Shah <quic_snehshah@quicinc.com>, kernel@quicinc.com,
-        Andrew Halaney <ahalaney@redhat.com>
-Subject: [PATCH net-next v5] net: stmmac: dwmac-qcom-ethqos: Add support for 2.5G SGMII
-Date: Tue, 20 Feb 2024 10:37:35 +0530
-Message-Id: <20240220050735.29507-1-quic_snehshah@quicinc.com>
-X-Mailer: git-send-email 2.17.1
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: gxu3sjaCAaaVmTgWOtimBZ76QZLeF7Zl
-X-Proofpoint-ORIG-GUID: gxu3sjaCAaaVmTgWOtimBZ76QZLeF7Zl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-20_04,2024-02-19_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 clxscore=1011
- priorityscore=1501 malwarescore=0 bulkscore=0 impostorscore=0 mlxscore=0
- lowpriorityscore=0 phishscore=0 suspectscore=0 adultscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2401310000
- definitions=main-2402200034
+	s=arc-20240116; t=1708407152; c=relaxed/simple;
+	bh=pPHyangQzCJjkuuFPVNawzn4jxC6YKYTBAaLQLQKe0s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qf8B+CNVrkXexn2AYhEfJKPvitH5SjJXNXzApCePrAGJRDlzKZO17xtZ+iX/W80J7VIyxmMtn4g9nFJZAocT3s/XytqjZEvv1p/EBt7xUjD5iO+Jo4qeK9uJAc246950eqQB4vdZIXoh+RIYyOU+g5rp9w3zYQzy4AQpKcFdp6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lSqx05cC; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-561f0f116ecso20581a12.0
+        for <netdev@vger.kernel.org>; Mon, 19 Feb 2024 21:32:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1708407149; x=1709011949; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D3+XfROI6UN39rRUotWgXtf+nheeE0Tx9oupQKB8Px8=;
+        b=lSqx05cCZZ/1yDRVeOkLyRQTLxTuf7nupp2TLOfTQKpPrSRBi98ZeLr+DQT9+uijha
+         6mjUG3pTTfCjfngF8q7eEsTFNYPb4tpbBTnae9FQ0H4UzIrUVmlvOdK0LFoHFOkA2R/y
+         Nd7LGZRBsUCuguKgA3pGo+xXSs4FCwXvt/CxR05S+GWgj0xXjDggFLPyGKeqlJNozkRv
+         w8fOsi6FWRtAOZBEtg+EHPeZ5CmoA+GAEPfZIscRcZd6ahZlJoHhQDUODQg4iXVe67nC
+         2+6mXSXY3zAdTWuGthQi3prG0bmQLW/LfX+lzCSvsYFmSL585DaaxsX74bsOzZimf3o9
+         EvXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708407149; x=1709011949;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=D3+XfROI6UN39rRUotWgXtf+nheeE0Tx9oupQKB8Px8=;
+        b=TyHkqz1tlSxUoM1+Niwh2hULot53DytKzlULoBdm1V4fwJD9qCs5SH8VLG4EJpr+N/
+         HmlidF2VRS+D/O1ugtatgqosl7ZK4msIwFJUTnqCTpHYo2CIXGmYWtPsYUHpOg94LMju
+         dxXaa+MzLUBayPmaIJ/0LzZM3zj4UcrWQ5qBFEimbCzJw2v4WbdEL2yFN7Rd8+bHVQtm
+         VjTr4KbA+F934hUbR8PYYnSBS8Mhkqbd6Jfustaf/Fkkobx9jDNDLH5DH9e9beAy41w8
+         p4mzhwJxOWqcVrbJ/ZU5gElkzJqjXQvLs0Lr76LTCZHh/fcUVznpbMRxGTnktgCXGfFI
+         v54A==
+X-Forwarded-Encrypted: i=1; AJvYcCWQ5sUWpaOsH2wAzZy31OcpqybZM/ElcUGVX25aM4Ir5OV/7ec49SCrSHjSUiSFxfhLJFVsYFIzzfXcEQLtrG9r4v1gt+OV
+X-Gm-Message-State: AOJu0YwKS/2DOqyRDKESU0Byz1s5SPuOAbSbPr/dH0DP6DxH6z7Xlm3q
+	ldR+Wd4eBEaYBETICd/aakDeaMDfJzK/Uf3bqNblDHB97yRQHLL3cH4PHAPxKjTLI8apKp6yf+M
+	CsLcertvxTexGdIeORnEAqWRO0Cr1X6SgEhwu
+X-Google-Smtp-Source: AGHT+IHWMys5PT/uTDQr26DhAulCFOmCycvpdp6mCZ3KVNl6GWqbqFr8UJrKPplZ89ESB5vmph8bk/x4zOxTMOHTgEQ=
+X-Received: by 2002:a50:aa91:0:b0:561:a93:49af with SMTP id
+ q17-20020a50aa91000000b005610a9349afmr361020edc.7.1708407148864; Mon, 19 Feb
+ 2024 21:32:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20240220021804.9541-1-shijie@os.amperecomputing.com>
+In-Reply-To: <20240220021804.9541-1-shijie@os.amperecomputing.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 20 Feb 2024 06:32:15 +0100
+Message-ID: <CANn89iJoHDzfYfhcwVvR4m7DiVG-UfFNqm+D1WD-2wjOttk6ew@mail.gmail.com>
+Subject: Re: [PATCH] net: skbuff: allocate the fclone in the current NUMA node
+To: Huang Shijie <shijie@os.amperecomputing.com>
+Cc: kuba@kernel.org, patches@amperecomputing.com, davem@davemloft.net, 
+	horms@kernel.org, ast@kernel.org, dhowells@redhat.com, linyunsheng@huawei.com, 
+	aleksander.lobakin@intel.com, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, cl@os.amperecomputing.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Serdes phy needs to operate at 2500 mode for 2.5G speed and 1000
-mode for 1G/100M/10M speed.
-Added changes to configure serdes phy and mac based on link speed.
-Changing serdes phy speed involves multiple register writes for
-serdes block. To avoid redundant write operations only update serdes
-phy when new speed is different.
-For 2500 speed MAC PCS autoneg needs to disabled. Added changes to
-disable MAC PCS autoneg if ANE parameter is not set.
+On Tue, Feb 20, 2024 at 3:18=E2=80=AFAM Huang Shijie
+<shijie@os.amperecomputing.com> wrote:
+>
+> The current code passes NUMA_NO_NODE to __alloc_skb(), we found
+> it may creates fclone SKB in remote NUMA node.
 
-Signed-off-by: Sneh Shah <quic_snehshah@quicinc.com>
----
-v5 changelog:
-- Updated commit message with more details on MAC PCS autoneg disable
-v4 changelog:
-- Made cosmetic changes
-v3 changelog:
-- updated commit message
----
-v2 changelog:
-- updated stmmac_pcs_ane to support autoneg disable
-- Update serdes speed to 1000 for 100M and 10M also---
----
- .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 26 +++++++++++++++++++
- .../net/ethernet/stmicro/stmmac/stmmac_pcs.h  |  2 ++
- 2 files changed, 28 insertions(+)
+This is intended (WAI)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index 31631e3f89d0..6bbdbb7bef44 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-@@ -106,6 +106,7 @@ struct qcom_ethqos {
- 	struct clk *link_clk;
- 	struct phy *serdes_phy;
- 	unsigned int speed;
-+	int serdes_speed;
- 	phy_interface_t phy_mode;
- 
- 	const struct ethqos_emac_por *por;
-@@ -606,19 +607,39 @@ static int ethqos_configure_rgmii(struct qcom_ethqos *ethqos)
-  */
- static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
- {
-+	struct net_device *dev = platform_get_drvdata(ethqos->pdev);
-+	struct stmmac_priv *priv = netdev_priv(dev);
- 	int val;
- 
- 	val = readl(ethqos->mac_base + MAC_CTRL_REG);
- 
- 	switch (ethqos->speed) {
-+	case SPEED_2500:
-+		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
-+		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
-+			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
-+			      RGMII_IO_MACRO_CONFIG2);
-+		if (ethqos->serdes_speed != SPEED_2500)
-+			phy_set_speed(ethqos->serdes_phy, SPEED_2500);
-+		ethqos->serdes_speed = SPEED_2500;
-+		stmmac_pcs_ctrl_ane(priv, priv->ioaddr, 0, 0, 0);
-+		break;
- 	case SPEED_1000:
- 		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
- 		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
- 			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
- 			      RGMII_IO_MACRO_CONFIG2);
-+		if (ethqos->serdes_speed != SPEED_1000)
-+			phy_set_speed(ethqos->serdes_phy, SPEED_1000);
-+		ethqos->serdes_speed = SPEED_1000;
-+		stmmac_pcs_ctrl_ane(priv, priv->ioaddr, 1, 0, 0);
- 		break;
- 	case SPEED_100:
- 		val |= ETHQOS_MAC_CTRL_PORT_SEL | ETHQOS_MAC_CTRL_SPEED_MODE;
-+		if (ethqos->serdes_speed != SPEED_1000)
-+			phy_set_speed(ethqos->serdes_phy, SPEED_1000);
-+		ethqos->serdes_speed = SPEED_1000;
-+		stmmac_pcs_ctrl_ane(priv, priv->ioaddr, 1, 0, 0);
- 		break;
- 	case SPEED_10:
- 		val |= ETHQOS_MAC_CTRL_PORT_SEL;
-@@ -627,6 +648,10 @@ static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
- 			      FIELD_PREP(RGMII_CONFIG_SGMII_CLK_DVDR,
- 					 SGMII_10M_RX_CLK_DVDR),
- 			      RGMII_IO_MACRO_CONFIG);
-+		if (ethqos->serdes_speed != SPEED_1000)
-+			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
-+		ethqos->serdes_speed = SPEED_1000;
-+		stmmac_pcs_ctrl_ane(priv, priv->ioaddr, 1, 0, 0);
- 		break;
- 	}
- 
-@@ -799,6 +824,7 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
- 				     "Failed to get serdes phy\n");
- 
- 	ethqos->speed = SPEED_1000;
-+	ethqos->serdes_speed = SPEED_1000;
- 	ethqos_update_link_clk(ethqos, SPEED_1000);
- 	ethqos_set_func_clk_en(ethqos);
- 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
-index aefc121464b5..13a30e6df4c1 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
-@@ -110,6 +110,8 @@ static inline void dwmac_ctrl_ane(void __iomem *ioaddr, u32 reg, bool ane,
- 	/* Enable and restart the Auto-Negotiation */
- 	if (ane)
- 		value |= GMAC_AN_CTRL_ANE | GMAC_AN_CTRL_RAN;
-+	else
-+		value &= ~GMAC_AN_CTRL_ANE;
- 
- 	/* In case of MAC-2-MAC connection, block is configured to operate
- 	 * according to MAC conf register.
--- 
-2.17.1
+What about the NUMA policies of the current thread ?
 
+Has NUMA_NO_NODE behavior changed recently?
+
+What means : "it may creates" ? Please be more specific.
+
+>
+> So use numa_node_id() to limit the allocation to current NUMA node.
+
+We prefer the allocation to succeed, instead of failing if the current
+NUMA node has no available memory.
+
+Please check:
+
+grep . /sys/devices/system/node/node*/numastat
+
+Are you going to change ~700 uses of  NUMA_NO_NODE in the kernel ?
+
+Just curious.
+
+>
+> Signed-off-by: Huang Shijie <shijie@os.amperecomputing.com>
+> ---
+>  include/linux/skbuff.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> index 2dde34c29203..ebc42b2604ad 100644
+> --- a/include/linux/skbuff.h
+> +++ b/include/linux/skbuff.h
+> @@ -1343,7 +1343,7 @@ static inline bool skb_fclone_busy(const struct soc=
+k *sk,
+>  static inline struct sk_buff *alloc_skb_fclone(unsigned int size,
+>                                                gfp_t priority)
+>  {
+> -       return __alloc_skb(size, priority, SKB_ALLOC_FCLONE, NUMA_NO_NODE=
+);
+> +       return __alloc_skb(size, priority, SKB_ALLOC_FCLONE, numa_node_id=
+());
+>  }
+>
+>  struct sk_buff *skb_morph(struct sk_buff *dst, struct sk_buff *src);
+> --
+> 2.40.1
+>
 
