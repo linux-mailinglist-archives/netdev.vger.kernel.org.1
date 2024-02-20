@@ -1,395 +1,249 @@
-Return-Path: <netdev+bounces-73361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16C0385C1A0
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 17:45:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FF6085C1AE
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 17:48:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DDB21F23693
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 16:45:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E8D21C23CC5
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 16:48:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C322A7640E;
-	Tue, 20 Feb 2024 16:45:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87CEF762E0;
+	Tue, 20 Feb 2024 16:48:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dell.com header.i=@dell.com header.b="xaMUtqwS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cPLs82sY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00154904.pphosted.com (mx0a-00154904.pphosted.com [148.163.133.20])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85AED2599
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 16:45:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.133.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28B5369D01
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 16:48:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708447529; cv=fail; b=e8wz1FxuSEGrTgoCF38IiC0wX9XC34afHuua0uPuvMYlSOUerjyZfQo8UB0csFhSgTstzN6kImonPoMUrxM2H3WtGAL1gHdtmfmZ9WtCzw90IUkVqxOwgIKFvl57U1HZtCrY055r/3+hHdrgYF+ZikfgZjX1v5GVqV281RpjSD4=
+	t=1708447716; cv=fail; b=aReu2nU0fP6KpO4W0D29yity9gBHtgugV9vhfE6ZKFBaQORyDQfklPHSz0fDluunaGGz4Wni0N25nC/Xbi9m33SvicOuEK0ctEy4Wgt9zv0c6rXynO0epgUl0Mm1k41Hqdtujwn8fYgyJpjcGbLa7BtMprlgy7gQYqlK83gEG3c=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708447529; c=relaxed/simple;
-	bh=8cfi/MEfHQXCbMwHsIsCskGgwRQAvk6AB4V+LuFrb2Q=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=mWNItr9xyt3b5JegOVZzz6ZPSvOAMCrM6KjNlU1I+lsiaDYs/TjZrRPjT393HxWBc4lehDIdUjQ2MDAksgKBHe1oymaG7uE2ZP/e2L5cYzAqu4M9i/2uqr4V4zsdP8EMPs8Tvgd6OGKC50guOhjky4iTiK9D+lYeeB2+r0oRbBI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=dell.com; spf=pass smtp.mailfrom=dell.com; dkim=pass (2048-bit key) header.d=dell.com header.i=@dell.com header.b=xaMUtqwS; arc=fail smtp.client-ip=148.163.133.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=dell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dell.com
-Received: from pps.filterd (m0170391.ppops.net [127.0.0.1])
-	by mx0a-00154904.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41KBCLXo010235;
-	Tue, 20 Feb 2024 11:45:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dell.com; h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=smtpout1;
- bh=7saOoYDaXj6UAnUra9N7F4a3AAFWV2/3mruzN+aJ1Bg=;
- b=xaMUtqwSS5NFHq212EE7ayfc5tBDsi41UDKjoASBAeaipIcoHo4NnM7yyNj4jWALcgXO
- yGPdQkr6yIIZFHjkMr1gZM4NK5lxoCepelGI+9mFWrGX0GAFfAvDiIQFT+qADYsRMx3T
- W7ePpLpTQG5sf67hp4l7UV3+jotfUkqY+W35C/YZn3FsUb5PF8xeuieS3d1fmjhQXnAH
- cg6VKaBJHCWXu/AC+ALIgzSah7YvWrLbQ3TRrQAWpQrNxwPP85e1AgXTUMphmB8a9n9h
- ankt91kzMXryLcQedWyJD8Pp+kvYnCRKO3rBle3ZB4lYHhBvaCM3SOY+11xQmkzo2PeK PA== 
-Received: from mx0a-00154901.pphosted.com (mx0a-00154901.pphosted.com [67.231.149.39])
-	by mx0a-00154904.pphosted.com (PPS) with ESMTPS id 3waru2x99s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 20 Feb 2024 11:45:16 -0500
-Received: from pps.filterd (m0133268.ppops.net [127.0.0.1])
-	by mx0a-00154901.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41KGZWew031610;
-	Tue, 20 Feb 2024 11:45:16 -0500
-Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2041.outbound.protection.outlook.com [104.47.66.41])
-	by mx0a-00154901.pphosted.com (PPS) with ESMTPS id 3wcyqt05cw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 20 Feb 2024 11:45:15 -0500
+	s=arc-20240116; t=1708447716; c=relaxed/simple;
+	bh=BIb77ijXhShpUaEwMcsnySsSevZtjBfuySvaiD3TU34=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=koNEfegcGdBCvyGNej0dvarhytQKHNiHE35M7hs2noeh+lUxnkVbtGOFvvHHgvgeK9mHZnGD1VLdc6n7eRMymGoVa135y8CcZFlnwg9JQz80jdMhjT+L5B1Nm6dtWC6zPieYAnBYNpmeK60x2xHuD8e7GPjXDon+utT69A/lCyY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cPLs82sY; arc=fail smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708447715; x=1739983715;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=BIb77ijXhShpUaEwMcsnySsSevZtjBfuySvaiD3TU34=;
+  b=cPLs82sYDJPYkj9i4oN5tR3PgEfhGFtM2Lzq4IxsfGXXi5hyfWbnL7hr
+   ZHejLRM4R2rcIho6yUK2pFYdoLrtCsR+FJZ6k8WPMk/PrNE8YBErEWOmb
+   sn2kZ9R2eZoudefCsXyyGaHtQxN78uODiG13+u6j7KpdsEn6GA5wrYEJL
+   5GPfnOTz+35MEfBE9U0Q/MB3uFU4Mr9mytkUIRWZuA99Amh0ujpyJzNxm
+   itDoP62fpYXXpVI9WHetXLAVb3sxY4GFWaES6GCPN6E2DTVXV2nDL70Ht
+   wrLGt+wrUyRpjyzfxRt8+/ObCP4CmnsLnZ3S4r0QbIvad1H6hbkNZ1lmV
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10990"; a="2432933"
+X-IronPort-AV: E=Sophos;i="6.06,174,1705392000"; 
+   d="scan'208";a="2432933"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2024 08:48:34 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,174,1705392000"; 
+   d="scan'208";a="5053767"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmviesa006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Feb 2024 08:48:33 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 20 Feb 2024 08:48:32 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Tue, 20 Feb 2024 08:48:32 -0800
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.40) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 20 Feb 2024 08:48:32 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OCuESZyEs44/yZFHaBiv27sZ+/m/Um1zgt76fTHC8bFTMiXsjzJO8y8S6kMxkKlP1Io201NbQoZuoUZ3vPkNWOB8OrC5cZbQwC//EQFu7s0/phyaYO/pk8RJHBdghV5z9wiqiK/X9BI2HdmJY+KoA3J5pr11uGGNzryRMp4uexadzyG86vmGtsdHMBP/ppd1LXqgbE4sm6IYBlA4L4vKf/YUsROSol05fP4kSUDRhtcElHSKVyQKpqrP8wyRV4RaTJ9NSgH9/kr6LBXlgn/eRTH+Fb3PqC/7zFc5YV6F7aw0O0pTsU4Rj61GYQkQXW+6aW4kgzryCMCYbWwH863pKw==
+ b=bPi+Fs5maFpzdjjvHdKGocPKAfS7kgt+HXiJXNerUWyviQs0gPwleeaTiWwyaEJ972DVzixbuuCOZrz6xHGuk6aJuCaNl4VK7aFM5zHpyOkEY/Fg/ceZnzGV7N6X8+Ej28WH82pyFSdFXnO59FXzQZFeBLI3RRhpHPOm2+jP+w8FUCTDE9sxOjhEepNRBzq22v/+KKQ524wRlQysj4GJyjMitrpkV4aHF7JHmrF69RxX8wauu4kZlMT1BpF+DmdCQ49t0yNgqn/C7hgLH2t9jJ8DPLLMj/0/KZAS1vo53d88sPkvQqy7isbaohw/VUxk6DfqZ/EGPdbOd/2jlu4lqw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7saOoYDaXj6UAnUra9N7F4a3AAFWV2/3mruzN+aJ1Bg=;
- b=gw75qEUf0g4+iUBIwFKHzlmfII2fXSK7TXtM1oyDCVmY+8abIT4KnSXVnAzlvBPKoeeFuWI9OsxYbhM7Q77ulEm54fBuR15/Wzoql88sSwYnLFJG/mwJZEcFbMQhY+qzPYgpOPobl5fQd9NB+nWNAAWicDUIVdzucj7s3GO4rPm2qPzO17a8hOoSWn9DCTEU8VsF6FsEah5rhlxYOIwTS9kT7VLOWQe+rfm67345wpug0yihYwDU6t7NVw6mgqV1E3QV4o71jL6RQJFtEm30m6ZM8fk8uomwqPHSe0ldT2ySeJTHGuk+cm6pgBqBaHzx7+D2tGvy4bee1UH6tc56LQ==
+ bh=vanvrWGFbmQr2cRXzxyWrBrrZEWhBgu4rSzsacF3vHo=;
+ b=frgitYgOq+SWtlZsH7bCRnc07rrp72HuNmFaCjJDGlhkzF1SOki7XdP8ap/GhmU1XG8YQnaMHL8dG5cFoyg3bUiGlNUWAWZhaQP0H8om7y76G774agE969VEYNoY1nmCmsIa9fE7TrbbdJXtI4w42fQxRcG2hsJpop9dwUJ42oYRq/z31yKUMABTrEh48KK/LXBJRwWFW5NJGP+urOtXV9evh5lHVewB5pcjHxeQJi0rmfLtnTzeeCBwfMiPEAw70/zF7vRi3LkjIu/veDuthuA0uSnFoIuTYeeJKpRcSGW0C89QXTiuVBKe0XW1FLgwhOXm6wEo0C/kKZYJq46oBA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=dell.com; dmarc=pass action=none header.from=dell.com;
- dkim=pass header.d=dell.com; arc=none
-Received: from BLAPR19MB4404.namprd19.prod.outlook.com (2603:10b6:208:293::15)
- by SJ0PR19MB4747.namprd19.prod.outlook.com (2603:10b6:a03:2e3::22) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB4914.namprd11.prod.outlook.com (2603:10b6:303:90::24)
+ by SJ2PR11MB7574.namprd11.prod.outlook.com (2603:10b6:a03:4ca::17) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.39; Tue, 20 Feb
- 2024 16:45:11 +0000
-Received: from BLAPR19MB4404.namprd19.prod.outlook.com
- ([fe80::c551:a720:e1cf:f530]) by BLAPR19MB4404.namprd19.prod.outlook.com
- ([fe80::c551:a720:e1cf:f530%7]) with mapi id 15.20.7292.036; Tue, 20 Feb 2024
- 16:45:11 +0000
-From: "Ramaiah, DharmaBhushan" <Dharma.Ramaiah@dell.com>
-To: Jeremy Kerr <jk@codeconstruct.com.au>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "matt@codeconstruct.com.au"
-	<matt@codeconstruct.com.au>
-CC: "Rahiman, Shinose" <Shinose.Rahiman@dell.com>
-Subject: RE: MCTP - Socket Queue Behavior
-Thread-Topic: MCTP - Socket Queue Behavior
-Thread-Index: AdpjPln1K8p7U6IuQcSvYKsg8BomjQAZRv2AAAG16IAABwYDAAAUyJNw
-Date: Tue, 20 Feb 2024 16:45:11 +0000
-Message-ID: 
- <BLAPR19MB4404FF0A3217D54558D1E85587502@BLAPR19MB4404.namprd19.prod.outlook.com>
-References: 
- <SJ0PR19MB4415F935BD23A6D96794ABE687512@SJ0PR19MB4415.namprd19.prod.outlook.com>
-	 <202197c5a0b755c155828ef406d6250611815678.camel@codeconstruct.com.au>
-	 <SJ0PR19MB4415EA14FC114942FC79953587502@SJ0PR19MB4415.namprd19.prod.outlook.com>
- <fbf0f5f5216fb53ee17041d61abc81aaff04553b.camel@codeconstruct.com.au>
-In-Reply-To: 
- <fbf0f5f5216fb53ee17041d61abc81aaff04553b.camel@codeconstruct.com.au>
-Accept-Language: en-US
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.38; Tue, 20 Feb
+ 2024 16:48:30 +0000
+Received: from CO1PR11MB4914.namprd11.prod.outlook.com
+ ([fe80::50f4:1fc8:bfc1:706c]) by CO1PR11MB4914.namprd11.prod.outlook.com
+ ([fe80::50f4:1fc8:bfc1:706c%2]) with mapi id 15.20.7292.036; Tue, 20 Feb 2024
+ 16:48:30 +0000
+Message-ID: <823fdfe2-7c8c-4440-bc6a-3896c542f0e4@intel.com>
+Date: Tue, 20 Feb 2024 08:48:28 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next v1 1/2] igb: simplify pci ops declaration
+To: Simon Horman <horms@kernel.org>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>, Alan Brady
+	<alan.brady@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20240210220109.3179408-1-jesse.brandeburg@intel.com>
+ <20240210220109.3179408-2-jesse.brandeburg@intel.com>
+ <20240219091542.GS40273@kernel.org>
 Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: 
- MSIP_Label_73dd1fcc-24d7-4f55-9dc2-c1518f171327_ActionId=9ede9acb-34a4-4834-b921-e60b68cf4367;MSIP_Label_73dd1fcc-24d7-4f55-9dc2-c1518f171327_ContentBits=0;MSIP_Label_73dd1fcc-24d7-4f55-9dc2-c1518f171327_Enabled=true;MSIP_Label_73dd1fcc-24d7-4f55-9dc2-c1518f171327_Method=Standard;MSIP_Label_73dd1fcc-24d7-4f55-9dc2-c1518f171327_Name=No
- Protection (Label Only) - Internal
- Use;MSIP_Label_73dd1fcc-24d7-4f55-9dc2-c1518f171327_SetDate=2024-02-20T16:26:17Z;MSIP_Label_73dd1fcc-24d7-4f55-9dc2-c1518f171327_SiteId=945c199a-83a2-4e80-9f8c-5a91be5752dd;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BLAPR19MB4404:EE_|SJ0PR19MB4747:EE_
-x-ms-office365-filtering-correlation-id: eb2fba7d-809d-4887-9877-08dc32334e04
-x-exotenant: 2khUwGVqB6N9v58KS13ncyUmMJd8q4
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 
- k/9EwU7c3RIJQt8SvQCXOB8QFBD72VTkAaW0mVQawyDRKH02A0gDdNvMyP59Gyi99Tsl7rz+pdLr1z4fHw0KY+qUD4zFo2857Ju9+/MjWiKkR2T8bp5qlkBj0Kt8xYbEJGb1o+p15RQM+qc26xe9/u7R4okALwz0a7D+D0V1YxchDYbktjFyOjqwRa9ZZT/75oPTYKeJbjGhktobDuurxwfm3thUMUUu35K+WkPeslRdHUPk/ImbyZfzoXKTKi2wAkEU+YWgtEJnJ8QWiB0np+N3LRumQN36H4OsyEfQRHSWca04/1Zrz2bbfxCkP/WQZeUrqvkkNd2ezIHsyv3s8m4XMXWhHM8R21vMHvnI11c9WG1ecwpwIBi1VwtgheZTQJn393dLWjUtPLoQ0UvSGmAjPM8gNM4iYJO3UINzlwxL/G33p6qwlROuuPLwY+suUjtsbR0kTFHyxKHnQIGjqeaeND/gBDGXl1gDokwbgyjuXBAuJxaeOGdhF/ooqzA3aiRa6n1kdGFJDQgR8o6oYfoye86ULU8f1ynPDcaZHYB0okuvsvuB7nq69w4MTK7ixSnpX5l4XpY1hw94gK2FIy4X0ijsMCC33O1xPKKf2ctUuB0194vkCfhC9E6SN06p
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BLAPR19MB4404.namprd19.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(230273577357003)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?utf-7?B?dDRoMU9wYWtObktmVXRHdUhiWW1yLzh5ZE5zVistYXRYQnMwaGkzc3dQN3cv?=
- =?utf-7?B?WXFIOVBWSkU4WTUxTVduSFFvZFNER3NrV1dJcmJrMmdtWk1UVTRMSjcwajI=?=
- =?utf-7?B?Ky1uZXVqVnJ3NmFpdTBESlZZQlJUKy01YW9xSkI3ZGdDU3pudjVUSHV6Y3JR?=
- =?utf-7?B?QldEcGxiSlphTFBkY3ZSMlA3V0NHcFZUbkpoT2pqMDlneWVna3lUOUVsTXFz?=
- =?utf-7?B?aFowL2RydzNvTUI1NEVML2VFRVhkMGFmcHkvV0RRT09qckdoZVFiNTIxa29K?=
- =?utf-7?B?WVA0YjRXQXNDbEFDODBmc2RBMHJEU2FsOG1rMCstMGtZNEZWZzgzalkycFZj?=
- =?utf-7?B?OXM1bnJXbC9heDkwN2JKVlZSMzRoYjFob1NIT2NJY2lyU2VJQWZ0UjlGcnY3?=
- =?utf-7?B?VnFWQTFmc01lNkQ5YXdiLzhYaHlYaHRKUTM5QzdHSW0vZU5kdUlaZmZ0SERN?=
- =?utf-7?B?UHJ6RXo4TVlrN0FVdUxxVUNNSistL1AwS29QMWFrbWFPVDFKd0tJTFVHYlND?=
- =?utf-7?B?V2VPbXBKeS96bVR0VzUxVk5pUkEvZzFZUjdZZHpaTFNySktPQ3Y3TnA3Tnl6?=
- =?utf-7?B?OGJLRlp1VystVWloSi8yeDVxM1pMYndReFRUQ2s3TGFxZTRtWXViZ0VtUHQy?=
- =?utf-7?B?ZVFzN1F1ZlE0V2J4bXhqQnBtZXVVcDdZT25IM3NKemV0STgrLVZJTG9mZmJm?=
- =?utf-7?B?blVpZmlUbmJRanF2YSstanY4N1JnUTlsMGdFa2k1dG1kZkdXdmFkT29GL1V0?=
- =?utf-7?B?d2NhTnFCRmhVRzBYZ21mUW00TkJFZFhlZFluSlF2MTR1Mkw3UEF1MmViMUxD?=
- =?utf-7?B?VUtrbU9NOE8vUGQrLVpIOXRDdUJNYlNRWVhqOG5XYkpjSDRaTEYvMXM3cnNp?=
- =?utf-7?B?Qmg0THF1aGVvYjJmc2xlUWJKWlY0SEZveUtvbm5rNWpnbkN2U216Q2JNNist?=
- =?utf-7?B?L2pEcTRnU0dmTDRwNDNVbWg3VldaNk1UNWRwZjJkdjFqSGhKcG9qdmhaS0h6?=
- =?utf-7?B?cTEzV3A4dEcwMElES2dUMWlkOWxWMEROandjZm9aVWt3WEhQbDBYL0dvSWtM?=
- =?utf-7?B?WUkvSDgzWVpmUXFmNystZ29ZWXJoL09qZFhkY1VqNjdiODNKQmpvcDFRYkdD?=
- =?utf-7?B?b0dOQzZEUEJsbHlua05pSSstN05JWkRMZ01KamZQRmJ5WHBJaVNUU2x0aHpj?=
- =?utf-7?B?REJ5WDRpR1FYa1ltUUFOQ2xnR2lHYUxKQ1FFZW1tQklYb3M4U0M5OXNpSHA=?=
- =?utf-7?B?Ky02Z2cxTHVWKy16ZTFTWlhYcndtUVV1RnZJQmNpMk9tL0h5dTQ5MTRjZXhl?=
- =?utf-7?B?VXVMcTJGTnNMWTU1bjd2ZWlHY1pIRVpIWFhhRnpOZzhaTmUwODF5OFZQUGVR?=
- =?utf-7?B?L01lYnB2cFJnKy1Nc0U1c3YvamYzVDBFajloMzNCZ1R6MERBMEpnbThZYmVl?=
- =?utf-7?B?Q2JkVXd5T2tKSFd6T0MyWktFZE5RUkFVMXNlZUJuTDF1MWp3bGdrTVo4UUlk?=
- =?utf-7?B?UEplTmRnQ1RYektmNHRsdmtLQ3NRNEo0cDdMcHJhT2x0YUozSTh5L0EydzRB?=
- =?utf-7?B?RXAwbUQwQUUzRG54T05wODg2bnlmZVlHMXRyZmE1M1BndUg2TWxmNmhwcEs4?=
- =?utf-7?B?MjdTZ1kxSk5XRFRUbUtmd3NuNWR1eW92bXFmOTkzZVZsb3NOd3l5Qmd0RDFz?=
- =?utf-7?B?eHNyWTFjWkxHKy1HWVVRemc4MHZ5N1Bjd1ZNSVM5RkVmZXhsaTJkbkg2WkNJ?=
- =?utf-7?B?ck9qM0ZNUzBjMDhTVVQ0cm9EKy1XcDRQb0pyM3ZMRUlCODF4VzE5NTM5MTNu?=
- =?utf-7?B?SUFrcXk5VjkzcE5iSHpZdnA5RVZmYWN5V09RblNxS0Z3YkdpTWVvREhvd0Fp?=
- =?utf-7?B?ZUkxbGNWODg5L2RtRkJXejRQQUVwTlJXUVVuaC9lRWVvanFWelNoa3BtcERL?=
- =?utf-7?B?RkJiY01mbzMvYTNqTkhyZk1odWpGZElvTnVTMDZUaHZZTFhObHYwUXQvUjJl?=
- =?utf-7?B?VDhRVE0yc1RoQ09TalQwVDg1VTcrLU1nYWFWVTkwbkRkQjY0RURQQVlYTUdi?=
- =?utf-7?B?bllxSGNBWmJNQWtUYjJubnduVkJ4blFWYnM5TldmbGp4YmM1enNoN0hMTW45?=
- =?utf-7?B?MkJWeGtTNTBZdGRGTDBIZ2RPTlQrLXJGdmJ2UVdNYkhzTDd3WkVTY21UaTFE?=
- =?utf-7?B?YWhWVDBEUFNLQlB6c2FpRE5UaGFRd1pabGJ0Uy84NUY5TjQ5ZnZpTTZrQ2c=?=
- =?utf-7?B?K0FEMC0=?=
-Content-Type: text/plain; charset="utf-7"
-Content-Transfer-Encoding: quoted-printable
+From: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Autocrypt: addr=jesse.brandeburg@intel.com; keydata=
+ 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
+ /fnLfll98Nhx
+In-Reply-To: <20240219091542.GS40273@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR04CA0345.namprd04.prod.outlook.com
+ (2603:10b6:303:8a::20) To CO1PR11MB4914.namprd11.prod.outlook.com
+ (2603:10b6:303:90::24)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Dell.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB4914:EE_|SJ2PR11MB7574:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6e9d1adf-4927-4256-679b-08dc3233c4a6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: CTfeXTU5ZiVr3vHVmLVl3oi9a89deSPWVEBnHs85hwMPgr0xFlWAehcH4qB+h0YB4n9B5t4ntQb5f8WqTND27aoGOGjLz4KXDtT+hqx/a3ir3GWLSjI/hQdUq9qxhp1YFduGtwoXK0ijnShy340ui3gQkAlJsR8ySqppFqTSMwuGs0m1b4YpaiNUQNPeYUgIy49vkZSx10z1Jwdqe5+m7hiGdkk/5fvwznjUACbG4kjfvJPzS+iQtFz6PT6xD4RGeCWmC2KAL6g96imSRaqcgljUTwF59Em+HY3Ri1xKpkz8Nwkgkv+dpjipFYEqrlBH0C8NKdGNE28e/LKy40FlRkynJkW6os4D4wcPYr7/uSYp0VKtOsJdXbcRTpSt8JASkva9l+NBGWpnjaBPXyuIznhJ9VyT9qqz4GFUOes4mKl0LJsehvTnCY6VBb2xwLRRwZNt6r4vCdlGw9TiARS08wF7qYKnG0OMbOt/XZ/NUbtdSmcRdxgd0jKs7ziLS2m19Vb6TmiYOKWB2D1tgZKfkKgOpHCPMOIuwbxhz+00z2Y=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB4914.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Mk9DeFU0MW5vL1c1bmpWd1J3bk1VTU1NUnViT2d4Vm5hbmtXNndyeHJ1M25n?=
+ =?utf-8?B?OE5uUk1IRndIRTU5K0ttS1RheDErTEZkNG1UUlhkSzArUHRWcWRCYi9naElZ?=
+ =?utf-8?B?dUt2bVZVM0pOcFZrRzgxR1hSbXdHYkJXQ0RGZWlmTGlUTU5ZSFZ2N25LOS90?=
+ =?utf-8?B?VUpHUEZFY1lHT2lMM0dwYUgyVnNOMHpDamZ6RTQ1N0Fic0RvRzVIY0RoYzgr?=
+ =?utf-8?B?NFFiNHVIUTQ0M0hMU0tBejNXZ0NRa1gyeU1aTHBtaGFRbVdNcmJ2MEVxYmlh?=
+ =?utf-8?B?ekxsdFBXeDdFcGFTdFN5eEVPZll2a3RXVjJmUi9yN3lDS1hTVlJKTU1yVm9I?=
+ =?utf-8?B?bjk5NUhTYjQrMkFXRkI5M3g2WUpEekk2NkFlZWxuRnFIY3lyeUZIN3hhNW94?=
+ =?utf-8?B?TTlicFF6TUE4ZjhHNTVnMG4xY0hSY1JMWUJNdGZNK0NJNzJjaVBKYjRMOHB1?=
+ =?utf-8?B?ZDVkaDhrL3B0SEtYbDdGaHdUMDJLamhFeWNldWt4R21LM1dUMGJGcnAyVzJ3?=
+ =?utf-8?B?Ry9iTnlKbUJqOUN5cXhZQVZIdGkyZzdRa1dVSVhxaVdYVWFUbmtFdWNVRTRS?=
+ =?utf-8?B?RThqcWdTbmZTNzJhVEFXRWdEM21rbTcramdQTnpEMnlLY1kwc0JURjlYVnAw?=
+ =?utf-8?B?bklkeHZ5OER2VDUyUWllVGxIMG11TFdMd0dVakx1Y3A1QWRvZjdEWEN0a3lE?=
+ =?utf-8?B?WVFhTEZZOGNxQkszNE5qaUtzYmNnOW80SFlSWTl0L25EaENFcENMSVg5TFg1?=
+ =?utf-8?B?ZnRUTE9oZStka2VNWjM3V0VVOG8rVEJmYVdzS3N4R3VLakNEeWUzSjcrT0l4?=
+ =?utf-8?B?cGJWY285U3F2RXZRajV1a2hSQUlNMUpBV1FibnEwMHE1U25YMzJReWlJSjVX?=
+ =?utf-8?B?QWpNa2JYM2V2RXdqNzJLNy9XZ0YxN1pDV2FqMWc4TFhyekMxcnVoSElYSlph?=
+ =?utf-8?B?a3Fqa1RtZTRkcGlSK2dBbUp0cUx1eWFoeE5RY2NtMUgzSHlKQTZHeTZkdDlQ?=
+ =?utf-8?B?WXpaclZBQUMxbkQ5RitybHFBOFVmR25zdGExQ05ZQUpXRXhPM2hWUzE4NzVX?=
+ =?utf-8?B?ZHg2ZUNWbnNJOWRBRXZJVXlTQm01WWUyUTNpK3p2L2xiWldkRytMUTBmRjRr?=
+ =?utf-8?B?cmxlZGJ5OFc0Y2tYbThXMWRhTFVCWmNwQWRpTUVJUlkvOHVDWWdQZDlINkJs?=
+ =?utf-8?B?TFNHdUxKZWZMeW5tYWdJSlZPdTFZWDVSL1JTUHJLNDgxZDg2Ymk1SDdjeXZp?=
+ =?utf-8?B?ZmZlUld2dW0yY3VDSmlKdHRGZU9GaDNrYW9YdnFiVlE4cmUwRFRNNHJqU2J6?=
+ =?utf-8?B?Vnl5YzJiNjVGRS9FOTY2cWQyQ0g4M1JnbTBrSW03RkxBT001dXI0ZjcrU284?=
+ =?utf-8?B?ZjducFp6YW9SWHQyVWFUdEx2ZTZta204c0NGNTdHUzZ0V1VreDZEQUl3cHBj?=
+ =?utf-8?B?WEFOU240ZnJIU3JqcUwrS2tuWXAvWjR6Rk45Q20rQUxPZGNrMENrRkxBU0JF?=
+ =?utf-8?B?bEMxK1ZrelgzQTNYQWZkWVl1ZGlPTElzUUViVFUwYnY1bGRPdFhDblBubjVJ?=
+ =?utf-8?B?VXA3NHRXR0ZVNCtCdWZrajZJMEFleW0wcndpQ0JnSmxxR3RxTlY2SW1vWEE0?=
+ =?utf-8?B?aTJHUXlaMlhFV1V5dWpDQ3dVZnArM01uT2tKM3BxWG9XYWFrK0x5c3BYYzFh?=
+ =?utf-8?B?MnlBOEF2cWlLT0pYaXdNcEtXclFjZVZxVkhFU2p6YkdOd0QvL2pkRm16K2Ny?=
+ =?utf-8?B?TGNTWUp6UTl3bWM4T0FNeGs0ZkkvUGFBcEhBNEtyZkdwWFYwSmpMVktLbzRI?=
+ =?utf-8?B?bi9zY1JoeVhOWWVsM003dkNHR1pYS3R3TzZiblVQdGFwSnJDRjB1S09XdnMr?=
+ =?utf-8?B?ZEU4SitYVngrczV3SjJFMktNbHR1djFmWEVwWWNsamg2ZDZhUE0wR25sUkJ6?=
+ =?utf-8?B?Y01kU3NYb1ZkZUdHVVlyQ0lldnBpMmk2K2QyRXloSUN5bzRDY0RZQU1DTkh2?=
+ =?utf-8?B?MnkrZzliSFlieDRRdUNpU2ZqZTRJM0JxNGtkTEk3dkI3UXVJTnpHMDFVa0hE?=
+ =?utf-8?B?ZEF3eWUvbHBnc05JRVEvRWZSaHJhYUp2ZUtXNDJ2ZzBhQXdxb0FwVFJ6aVFK?=
+ =?utf-8?B?WUFyTHQ5WmVrUU85Qm1haXZBWUhpQlhqVFRhcytERGlMcS95UWxvSUllT3lY?=
+ =?utf-8?B?ZFE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6e9d1adf-4927-4256-679b-08dc3233c4a6
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB4914.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BLAPR19MB4404.namprd19.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eb2fba7d-809d-4887-9877-08dc32334e04
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Feb 2024 16:45:11.3131
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2024 16:48:30.4700
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 945c199a-83a2-4e80-9f8c-5a91be5752dd
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: GLctycWm0AMenhMJ18BOf93ScnGCFQS7JoL0IOTO/5n/rRq5JKxAmhmcyrVTeatwmHCz3sa6XwIu0VXXovcVVg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR19MB4747
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-20_06,2024-02-20_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
- mlxscore=0 lowpriorityscore=0 clxscore=1015 priorityscore=1501 bulkscore=0
- adultscore=0 mlxlogscore=999 impostorscore=0 malwarescore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
- definitions=main-2402200120
-X-Proofpoint-ORIG-GUID: figu17crJeViv2YfdZpay6TDgbf8vy-C
-X-Proofpoint-GUID: figu17crJeViv2YfdZpay6TDgbf8vy-C
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 impostorscore=0 suspectscore=0
- priorityscore=1501 clxscore=1015 malwarescore=0 lowpriorityscore=0
- bulkscore=0 mlxscore=0 spamscore=0 adultscore=0 mlxlogscore=999
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402200120
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 02oNdJuOghn/Zu7GP+qFjBeoZ2NV0JHd1So4efQ1iXPwi11uPOAE13Hfb4Yo7QYp9gKDPF00HG+wrDfth8yt8iiRogo0qL4PJTYAvKxgjz8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB7574
+X-OriginatorOrg: intel.com
 
-Jeremy,
+On 2/19/2024 1:15 AM, Simon Horman wrote:
+> On Sat, Feb 10, 2024 at 02:01:08PM -0800, Jesse Brandeburg wrote:
+>> The igb driver was pre-declaring tons of functions just so that it could
+>> have an early declaration of the pci_driver struct.
+>>
+>> Delete a bunch of the declarations and move the struct to the bottom of the
+>> file, after all the functions are declared.
+>>
+>> Reviewed-by: Alan Brady <alan.brady@intel.com>
+>> Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
 
-Few more queries inline.
-
-Regards,
-Dharma
+>> -	.probe    = igb_probe,
+>> -	.remove   = igb_remove,
+>> -#ifdef CONFIG_PM
+>> -	.driver.pm = &igb_pm_ops,
+>> -#endif
+>> -	.shutdown = igb_shutdown,
 
 
-Internal Use - Confidential
-+AD4- -----Original Message-----
-+AD4- From: Jeremy Kerr +ADw-jk+AEA-codeconstruct.com.au+AD4-
-+AD4- Sent: 20 February 2024 12:01
-+AD4- To: Ramaiah, DharmaBhushan +ADw-Dharma+AF8-Ramaiah+AEA-Dell.com+AD4AO=
-w-
-+AD4- netdev+AEA-vger.kernel.org+ADs- matt+AEA-codeconstruct.com.au
-+AD4- Cc: Rahiman, Shinose +ADw-Shinose+AF8-Rahiman+AEA-Dell.com+AD4-
-+AD4- Subject: Re: MCTP - Socket Queue Behavior
-+AD4-
-+AD4-
-+AD4- +AFs-EXTERNAL EMAIL+AF0-
-+AD4-
-+AD4- Hi Dharma,
-+AD4-
-+AD4- +AD4- Thanks for the reply. I have few additional queries.
-+AD4-
-+AD4- Sure, answers inline.
-+AD4-
-+AD4- +AD4- +AD4- We have no control over reply ordering. It's entirely pos=
-sible that
-+AD4- +AD4- +AD4- replies are sent out of sequence by the remote endpoint:
-+AD4- +AD4- +AD4-
-+AD4- +AD4- +AD4-   local application          remote endpoint
-+AD4- +AD4- +AD4-
-+AD4- +AD4- +AD4-   sendmsg(message 1)
-+AD4- +AD4- +AD4-   sendmsg(message 2)
-+AD4- +AD4- +AD4-                              receives message 1
-+AD4- +AD4- +AD4-                              receives message 2
-+AD4- +AD4- +AD4-                              sends a reply 2 to message 2
-+AD4- +AD4- +AD4-                              sends a reply 1 to message 1
-+AD4- +AD4- +AD4-   recvmsg() -+AD4- reply 2
-+AD4- +AD4- +AD4-   recvmsg() -+AD4- reply 1
-+AD4- +AD4- +AD4-
-+AD4- +AD4-
-+AD4- +AD4- Based on the above explanation I understand that the sendto all=
-ocates
-+AD4- +AD4- the skb (based on the blocking/nonblocking mode). mctp+AF8-i2c+=
-AF8-tx+AF8-thread,
-+AD4- +AD4- dequeues the skb and transmits the message. And also sendto can
-+AD4- +AD4- interleave the messages on the wire with different message tag.=
- My
-+AD4- +AD4- query here regarding the bus lock.
-+AD4- +AD4-
-+AD4- +AD4- 1. Is the bus lock taken for the entire duration of sendto and
-+AD4- +AD4- revcfrom (as indicated in one of the previous threads).
-+AD4-
-+AD4- To be more precise: the i2c bus lock is not held for that entire dura=
-tion. The
-+AD4- lock will be acquired when the first packet of the message is transmi=
-tted by the
-+AD4- i2c transport driver (which may be after the
-+AD4- sendmsg() has returned) until its reply is received (which may be bef=
-ore
-+AD4- recvmsg() is called).
-+AD4-
-From what I understand from the above bus is locked from the point request =
-is picked up for transmission from SKB till response of the packet is recei=
-ved. If this is case, then messages shall not be interleaved even if multip=
-le application calls multiple sends.
+>> +	.probe    = igb_probe,
+>> +	.remove   = igb_remove,
+>> +	.driver.pm = &igb_pm_ops,
+> 
+> Hi Jesse,
+> 
+> the line above causes a build failure if CONFIG_PM is not set.
 
-+AD4-
-+AD4- +AD4- Assume a case where we have a two EP's (x and y) on I2C bus +AC=
-M-1 and
-+AD4- +AD4- these EP's are on different segments.
-+AD4-
-+AD4- I assume that by +ACI-different segments+ACI- you mean that they are =
-on different
-+AD4- downstream channels of an i2c multiplexer. Let me know if not.
-+AD4-
-Yes this is what I meant.
+Hi Simon, thanks!
 
-+AD4- +AD4- In this case, shoudn't the bus be locked for the entire duratio=
-n till
-+AD4- +AD4- we receive the reply or else remote EP might drop the packet as=
- the
-+AD4- +AD4- MUX is switched.
-+AD4-
-+AD4- Yes, that's what is implemented.
-+AD4-
-+AD4- However, I don't think +ACI-locking the bus+ACI- reflects what you're=
- intending
-+AD4- there: Further packets can be sent, provided that they are on that sa=
-me
-+AD4- multiplexer channel+ADs- current use of the bus lock does not prevent=
- that (that's
-+AD4- how fragmented messages are possible+ADs- we need to be able to trans=
-mit the
-+AD4- second and subsequent packets).
-+AD4-
-+AD4- To oversimplify it a little: holding the bus lock just prevents i2c a=
-ccesses that
-+AD4- may change the multiplexer state.
-+AD4-
-+AD4- From your diagram:
-+AD4-
-+AD4- +AD4-  Local application                                  remote endp=
-oint
-+AD4- +AD4-  Userspace                           Kernel Space
-+AD4- +AD4-
-+AD4- +AD4- sendmsg(msg1)+ADw-epX, i2cbus-1, seg1+AD4-
-+AD4- +AD4- sendmsg(msg2)+ADw-epY, i2cbus-1, seg2+AD4-
-+AD4-
-+AD4- Note that +ACI-i2cbus-1, seg1+ACI- / +ACI-i2cbus-1, seg2+ACI- is not =
-how Linux represents those.
-+AD4- You would have something like the following devices in
-+AD4- Linux:
-+AD4-
-+AD4-  +AFs-bus: i2c1+AF0-: the hardware i2c controller
-+AD4-   +AHw-
-+AD4-   +AGA--+AFs-dev: 1-00xx+AF0- i2c mux
-+AD4-      +AHw-
-+AD4-      +AHw--+AFs-bus: i2c2+AF0-: mux downstream channel 1
-+AD4-      +AHw-  +AHw-
-+AD4-      +AHw-  +AGA-- endpoint x
-+AD4-      +AHw-
-+AD4-      +AGA--+AFs-bus: i2c3+AF0-: mux downstream channel 2
-+AD4-         +AHw-
-+AD4-         +AGA-- endpoint y
-+AD4-
-+AD4- Then, the MCTP interfaces are attached to one individual bus, so you'=
-d have
-+AD4- the following MCTP interfaces, each corresponding to one of those Lin=
-ux i2c
-+AD4- devices:
-+AD4-
-+AD4-   mctpi2c2: connectivity to endpoint X, via i2c2 (then through i2c1)
-+AD4-   mctpi2c3: connectivity to endpoint Y, via i2c3 (then through i2c1)
-+AD4-
-+AD4- - where each of those mctpi2cX interfaces holds it own lock on the bu=
-s when
-+AD4- waiting on a reply from a device on that segment.
-+AD4-
-+AD4- (you could also have a mctpi2c1, if you have MCTP devices directly co=
-nnected
-+AD4- to i2c1)
-+AD4-
-Since the locking mechanism is implemented by the transport driver (I2C Dri=
-ver), topology aware I2C driver can lock the other subsegments.  E.g. if a =
-transaction is initiated on the EP X, I2C driver can lock down stream chann=
-el 1. Please do correct me if the understanding is correct.
+Yeah I missed that, but do we care since patch 2/2 then fixes it?
 
-+AD4- +AD4- Also today, MCTP provides no mechanism to advertise if the remo=
-te EP
-+AD4- +AD4- can handle more than one request at a time. Ability to handle m=
-ultiple
-+AD4- +AD4- messages is purely based on the device capability. In these cas=
-es
-+AD4- +AD4- shouldn't Kernel provide a way to lock the bus till the respons=
-e is
-+AD4- +AD4- obtained?
-+AD4-
-+AD4- Not via that mechanism, no. I think you might be unnecessarily combin=
-ing
-+AD4- MCTP message concurrency with i2c bus concurrency.
-+AD4-
-+AD4- An implementation where we attempt to serialise messages to one parti=
-cular
-+AD4- endpoint would depend on what actual requirements we have on that
-+AD4- endpoint. For example:
-+AD4-
-+AD4-  - is it unable to handle multiple messages of a specific type?
-+AD4-  - is it unable to handle multiple messages of +ACo-any+ACo- type?
-+AD4-  - is it unable to handle incoming responses when a request is pendin=
-g?
-+AD4-
-+AD4- So we'd need a pretty solid use-case to design a solution here+ADs- w=
-e have not
-+AD4- needed this with any endpoint so far. In your case, I would take a gu=
-ess that
-+AD4- you could implement this just by limiting the outstanding messages in
-+AD4- userspace.
-+AD4-
-We have seen a few devices which can handle only one request at a time and =
-not sequencing the command properly can through the EP into a bad state.  A=
-nd yes this can be controlled in the userspace. Currently we are exploring =
-design options based on what is supported in the Kernel.
 
-+AD4- Further, using the i2c bus lock is the wrong mechanism for serialisat=
-ion here+ADs-
-+AD4- we would want this at the MCTP core, likely as part of the tag alloca=
-tion
-+AD4- process. That would allow serialisation of messages without dependenc=
-e on
-+AD4- the specifics of the transport implementation (obviously, the serial =
-and i3c
-+AD4- MCTP transport drivers do not have i2c bus locking+ACE-)
-+AD4-
-
-Serialization at MCTP core can solve multiple MCTP requests. But if the sam=
-e bus is shared with Non MCTP devices, bus lock must be from the time reque=
-st is sent out to reply received.
-
-+AD4- Cheers,
-+AD4-
-+AD4-
-+AD4- Jeremy
 
