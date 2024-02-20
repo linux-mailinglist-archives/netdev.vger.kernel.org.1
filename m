@@ -1,48 +1,73 @@
-Return-Path: <netdev+bounces-73245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9D2485B956
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 11:43:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C5E385B96A
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 11:45:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 183DB282674
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 10:43:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3CCE9B21017
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 10:45:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C6BA6166E;
-	Tue, 20 Feb 2024 10:43:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEF99626C6;
+	Tue, 20 Feb 2024 10:44:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a+4/430e"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VsRA3HRR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 747E43EA88;
-	Tue, 20 Feb 2024 10:43:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41BD4629F3
+	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 10:44:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708425783; cv=none; b=LsHnCi6JlPaz0y31sKZ6gqOlKD1IaytLSGBUsWgqnKydHvgot0qIa540NnlFF2WTNIGfu4QFlziw5BR42QE6pRJsf+pLieaLnFz6SGW9qa5uTYjXER95toc5PYULJJZMvK9GLTOHJKZAc0N0VCOWBjZEalMYS/OhH5d/1iV6u6s=
+	t=1708425896; cv=none; b=tq6UsK1yaFhdqMXTK07tVbVyUTCf/TO1Js9vbc2CZs+6jp/q0RF6CS8mxbHxeISxHxJT7a0XWceejRBBj51ZjqAQWwVxW+y3ZFVNjzEnhxFkZ0DIW3b+OjeitPtEnW3W00SnshEp3BSUaMgiAS/bvgIPukR2PJt0Yy1CHmewaUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708425783; c=relaxed/simple;
-	bh=KN/9eAsuetSnf1YuKZN74PDoEk4+o0nerLs+2e8yZPI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JLdxE4HNH6AJw1nqEjpDbYEXZ1sbXF577Jb5RYud1MCs9OVCZ8rZy2+vvXMynTFeSXyL/d7oTynRJvgo0EBbVKxylbhWE1WOD5j74fWzeJLjDXxmf62Ucr/70fBMRMb+CJ5KG+IaCCwqOQvCLFIXpSsE+5yL9mNMxcmhNSjGJVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a+4/430e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CE66C433C7;
-	Tue, 20 Feb 2024 10:43:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708425782;
-	bh=KN/9eAsuetSnf1YuKZN74PDoEk4+o0nerLs+2e8yZPI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=a+4/430eZDxmfKGa3jFXyElOroI2LT61/iEsQicEw/czIXo097yQbHPUngAWwdI0w
-	 W69qqkzFxu+pIPzRF0UcaqtBrlP3p9Fi+FxaV1d0peQk48+3T3gndymN4btydDDGQQ
-	 MUZd1BCXhNupQqBylfWlwEzXD+d9yz+bR5KRd1EvXuVkcuRAGS3aSArphIxADIQ5i3
-	 sMAWgM81x34qJeOuvQ/LsR9BXRGHi2S43/kG0E/c5DqiATyyHWFO5tGxOv0prHofuL
-	 De2f7LzsObrMkG7z+7oShdb4ohUuwreXwx7VGIA763arifZtVfS6A9njQA9STRYB2q
-	 6vZ1ATIJKSbxw==
-Message-ID: <0b1c8247-ccfb-4228-bd64-53583329aaa7@kernel.org>
-Date: Tue, 20 Feb 2024 11:42:57 +0100
+	s=arc-20240116; t=1708425896; c=relaxed/simple;
+	bh=s/PV7qpElskRhq3eT3h1D21HJQdHFMmJsk5re13pDkk=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type; b=lL2rxcMF+5jrfg4bYJ1E105xI8FDeAR8pQRPp9+JesEKCeV/n98EVgiJdsvS1mG3GQS0KtW3fYnqAOuSn1AD5xvSG6VLqP4E5MlwjNXXT8skW+GvskDMbusT0sxSrjAmo6mY9IWsnk4/V3UlZh6upI8Sn1v/j4fPcWWspntbfpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VsRA3HRR; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4126d65ace3so4898265e9.3
+        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 02:44:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708425893; x=1709030693; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:to:subject:from
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6EkMGp94bzxo7V76A298vKS1z4S2mO5MpTKzBFFfqeQ=;
+        b=VsRA3HRRfF6+wD97Q32FmjJ8DnokYKhRfokMZHxRDTCqZXNhS4TYDAwBtMUZrREUEc
+         sGH+2OsXk2ThHZ2bsokTSd35MazupLQYjYlmNaFSBbvOqXJx1LUvRxAYrHtDolRIHo0K
+         owd/d81uGskcdGK/qTopghGoCI0BlOYOv9DynIlyJs0nxB2XNewpgdeaJFctVxYVSXdx
+         RQ5tBjfp4os1mM1J/7Q8UiFSfbOh0EfD6BrF5nDvvClbOptPmiVDrJ5Dw4czQbMYYvei
+         Yk0JFDNGQ58xj1AhCGSz0xIu5zkEHSHIWG17+udH5QFqaBTvxzksKiK+6lKldEJsrPXO
+         4WwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708425893; x=1709030693;
+        h=content-transfer-encoding:content-language:to:subject:from
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=6EkMGp94bzxo7V76A298vKS1z4S2mO5MpTKzBFFfqeQ=;
+        b=qpumNLZyPzTCH4MLh8iQjLJYiXt+xjsqW3qlMCURC9GiuW363vC55/rKVWoPk2BtLN
+         inII7mdYfZiU+TZuVP8wuQ1KwXvRRvz1/8xRiLB6BOMiKxp3RbcKDEZsFKRjFG1e1Ipj
+         KkgndCM0eI6/epV1yn0tcQnIfOZIG+QtLPXWW6QFW6/KQV7sfe/ZspyUqhDkJUNhur5x
+         bKD2DiYS2sAzP4SYOQfsXSqeLXtpESsui0b7hUYnjnHNzTOvzv2EBp8XQnhzyGaL+9an
+         /91plJvuJ82Y9VBs3sNz8L0FoPJ7GQ7e9iryc5/xjRUUW2TS9yXmNSlWPkmgqjaXo5KW
+         sFRA==
+X-Gm-Message-State: AOJu0Ywp0ivBE9IHfipwiij/eMna5JVHlkvJxMxJeMLCEbS0pqLwap50
+	zQ+04lgrifEgJuM0NYhTvCjbdB9I5WGkmtInkEaUByqzZJeiF+PeIQQuSKIA7S9f85oB
+X-Google-Smtp-Source: AGHT+IEwtKIYQapcHoVxayzpONMz4pMQB2vP7/5vlbQN/PHP5hxeRCZGFpb6FSUH0IBUgFmBYC3ncw==
+X-Received: by 2002:a05:600c:45d3:b0:410:2d72:63b3 with SMTP id s19-20020a05600c45d300b004102d7263b3mr10666453wmo.23.1708425893500;
+        Tue, 20 Feb 2024 02:44:53 -0800 (PST)
+Received: from [192.168.123.152] ([185.239.72.23])
+        by smtp.gmail.com with ESMTPSA id s10-20020a05600c044a00b004122fbf9253sm13970788wmb.39.2024.02.20.02.44.52
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Feb 2024 02:44:53 -0800 (PST)
+Message-ID: <a8824d0f-07d3-4cb1-9d0c-18e0f91919cd@gmail.com>
+Date: Tue, 20 Feb 2024 10:44:51 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,93 +75,24 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC net-next 1/2] net: Reference bpf_redirect_info via
- task_struct on PREEMPT_RT.
-Content-Language: en-US
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <66d9ee60-fbe3-4444-b98d-887845d4c187@kernel.org>
- <20240214121921.VJJ2bCBE@linutronix.de> <87y1bndvsx.fsf@toke.dk>
- <20240214142827.3vV2WhIA@linutronix.de> <87le7ndo4z.fsf@toke.dk>
- <20240214163607.RjjT5bO_@linutronix.de> <87jzn5cw90.fsf@toke.dk>
- <20240216165737.oIFG5g-U@linutronix.de> <87ttm4b7mh.fsf@toke.dk>
- <04d72b93-a423-4574-a98e-f8915a949415@kernel.org>
- <20240220101741.PZwhANsA@linutronix.de>
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20240220101741.PZwhANsA@linutronix.de>
+From: John G <ijohnyyh@gmail.com>
+Subject: Galaxy note 3 9005
+To: netdev@vger.kernel.org
+Content-Language: en-GB
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+Hi Manty, I am sorry if this is not the correct email address but it's 
+the only one I have found.
 
 
-On 20/02/2024 11.17, Sebastian Andrzej Siewior wrote:
-> On 2024-02-20 10:17:53 [+0100], Jesper Dangaard Brouer wrote:
->>
->>
->> On 19/02/2024 20.01, Toke Høiland-Jørgensen wrote:
->>> may be simpler to use pktgen, and at 10G rates that shouldn't become a
->>> bottleneck either. The pktgen_sample03_burst_single_flow.sh script in
->>> samples/pktgen in the kernel source tree is fine for this usage.
->>
->> Example of running script:
->>   ./pktgen_sample03_burst_single_flow.sh -vi mlx5p1 -d 198.18.1.1 -m
->> ec:0d:9a:db:11:c4 -t 12
->>
->> Notice the last parameter, which is number threads to start.
->> If you have a ixgbe NIC driver, then I recommend -t 2 even if you have more
->> CPUs.
-> 
-> I get
-> | Summary                 8,435,690 rx/s                  0 err/s
+I am using Crdroid on my Galaxy note 3, I believe you are the 
+maintainer  however after any version update starting from 7.31 webview 
+fails. Is there a fix for this or a work around?
 
-This seems low...
-Have you remembered to disable Ethernet flow-control?
-
-  # ethtool -A ixgbe1 rx off tx off
-  # ethtool -A i40e2 rx off tx off
+I believe you are called Santiago García Mantiñán Nickname manty.
 
 
-> | Summary                 8,436,294 rx/s                  0 err/s
+Best wishes John.
 
-You want to see the "extended" info via cmdline (or Ctrl+\)
-
-  # xdp-bench drop -e eth1
-
-
-> 
-> with "-t 8 -b 64". I started with 2 and then increased until rx/s was
-> falling again. I have ixgbe on the sending side and i40e on the
-
-With ixgbe on the sending side, my testlab shows I need -t 2.
-
-With -t 2 :
-Summary                14,678,170 rx/s                  0 err/s
-   receive total        14,678,170 pkt/s        14,678,170 drop/s 
-         0 error/s
-     cpu:1              14,678,170 pkt/s        14,678,170 drop/s 
-         0 error/s
-   xdp_exception                 0 hit/s
-
-with -t 4:
-
-Summary                10,255,385 rx/s                  0 err/s
-   receive total        10,255,385 pkt/s        10,255,385 drop/s 
-         0 error/s
-     cpu:1              10,255,385 pkt/s        10,255,385 drop/s 
-         0 error/s
-   xdp_exception                 0 hit/s
-
-> receiving side. I tried to receive on ixgbe but this ended with -ENOMEM
-> | # xdp-bench drop eth1
-> | Failed to attach XDP program: Cannot allocate memory
-> 
-> This is v6.8-rc5 on both sides. Let me see where this is coming from…
-> 
-
-Another pitfall with ixgbe is that it does a full link reset when
-adding/removing XDP prog on device.  This can be annoying if connected
-back-to-back, because "remote" pktgen will stop on link reset.
-
---Jesper
 
