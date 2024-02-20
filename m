@@ -1,241 +1,183 @@
-Return-Path: <netdev+bounces-73187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82FFF85B4C9
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:19:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB7E385B4E8
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 09:22:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DD05282A3F
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:19:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C0BB1C20ECC
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 08:22:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31B8D5C60B;
-	Tue, 20 Feb 2024 08:19:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DB605CDEA;
+	Tue, 20 Feb 2024 08:21:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="P5fxi12v"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="VxI8K2E0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2053.outbound.protection.outlook.com [40.107.95.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 650E25C5F2
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 08:19:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708417173; cv=none; b=BNtkd+q1rNAoq9oMoP6N5V/TOgLWFdqnGZXUzctNx8NUaVnO4/Mi5ISsHNF3eOSOeUo4/o5XUWsa8w0AAyXBzp43tvsN2xuKzA6uUhzhxQzZSTeau7ltH1byXNqQhzGvgodhYiDdJZj+IQLiU2H6ZfWKEc/THcO5x+GZe/FGlio=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708417173; c=relaxed/simple;
-	bh=ne6OIwC6Q4m/gonKfOP4zmqIeEWDkyxVyw9N1NHAagk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fCkwLHK+SZBP0lY3dYMEGmb+F5nQtmPhDqOka9+UaWtxhKrMIEV92TdNFV5eq8YDq0mZRqz2br6PLdR4sTbWU/BGVUrWmh/YyqH/FT6xKwlvUFQQfrEFX3JuYqMtSudVS7z7Rm2kDVa+QtOaoUSvnB61HGW4ozkYYJv4C9noJj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=P5fxi12v; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-511976c126dso6276376e87.1
-        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 00:19:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1708417169; x=1709021969; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HEziOHGiSIYIXSE2DKbMAoSccSRuJEWP3yua6RmUOog=;
-        b=P5fxi12vffvrIuvZB5sK08Fgaf/rRiFBMC9c1zposmptaMRna4tQ6mPCgMwtDNc3zX
-         uRrCqrkKMBzVf8GYV3e5XH5Gs7qXxbrmjQui+y2TRb58xQXZgygCiSfp+yvGvwrQAVZn
-         E62u32woJfva/G2fbh/aitCXYQq/J5535NdWM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708417169; x=1709021969;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HEziOHGiSIYIXSE2DKbMAoSccSRuJEWP3yua6RmUOog=;
-        b=pU7wG8p3e7gUSOpDVZfov0NRyL4YsoKmx8DTNdWnlPSoYDBPf+fy79QxeKBWOKiDhJ
-         /2gmb882zLB6tY5VJ2TdINJwmNfeE990AOys8OTWORvmEnGFJMhaY1ChtKEldd8PrCwK
-         x2RfrU28N4+YV2ZNd5rUwjeGLE5bH6Ea1PMg4rxC20Lna6ESZKI/LzeMkEO4jcsYppMa
-         sfeBUDHlwU9nUeHfYHonLzlGNqMY2k/jbFXgBTytGlscvafXTfk73RaX0/mp3MiI6lc5
-         ZmH6VyETZdsY2DorW+Wh5naymId8r2WBtxKvX4Wg1xncuS0TIGXgPOdc3wl0XQNUl0Uk
-         OI+A==
-X-Forwarded-Encrypted: i=1; AJvYcCUbWuhFxJjd1IcaP3yR5E+yLvwVT7p5cawgXozxur0Jjm48xSWg5U3pdKwNZleU3+OsZZYFRpXLbQ9VK1SbaWsozAs+8lq1
-X-Gm-Message-State: AOJu0YxSTo5wChzdg04UCDwCBoiCrqjFiyeGI7BwtB6h82T2bdL2UviD
-	HLk63yE6tiTn5duVtgzdq3XPw3bkeddJHBlXGOtgrugfxx0mVLbPOueeR3Fl6j5M6ZTcb05JxYi
-	0lcB9b8+KZcYYzRE99sEg6EaxX0IB+117mM68
-X-Google-Smtp-Source: AGHT+IH5S9JhEAnlJW7wIUwPtqanO9wDlNvoGLQj6j/XUzV5A9r+YECp/Wu75hdzg56OEU7YxiSCvUVTZMQ1bRnLxMU=
-X-Received: by 2002:a05:6512:3b89:b0:512:b3a3:4adc with SMTP id
- g9-20020a0565123b8900b00512b3a34adcmr3730322lfv.0.1708417169550; Tue, 20 Feb
- 2024 00:19:29 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A6035C912;
+	Tue, 20 Feb 2024 08:21:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708417307; cv=fail; b=WFXLH9BH/9TndIk4aVbvpQ2aVDMKSUE52HbnX6gYrAJljbr1TPX7pRU8gG8XM/sZPCRPmAaEf85NZcoExbDWwSNPaetl8N5bne9ky2j2aRCnDLOKtQIv/WhIN8uvtcqI50fMWPWJDWVB48OD/QdmX2Ago1OtomkkjQr3vhVXyKc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708417307; c=relaxed/simple;
+	bh=vMN4BDenooxF4F9jTIU5k0jR/3Bxi8eybTqWsF0fNHg=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=DJ2uUv5j2xyfTwgPfjpWH8zTD0SlqrwN3HpDZJhGbuhV3vLmp1HY2ptR+VgbAWnrIMZiqI1IE8sl1HK6L71ESHKaslV7ZpE4/ZqaNhKZNGU49Uh/vOLkSyblotINdOgFRqjq2BF1LfMprdaKfb21H8e1oG5gInFYWjkzhn8ZXEw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=VxI8K2E0; arc=fail smtp.client-ip=40.107.95.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gYSoImGktxinhyMmQc0Y/1UGdnbAEM1CyzkYYj9NRvXmdnBtQuz5Q4/auT9dqEV8QHvnCVNvIzs08Nr4d5nPNmVo9WLFWq8QWS8WThUz6fBTWLRHyzg7nIiLxTHDowdys7QXsBgJVWm6VggFn3B42N3SPGn5DY1no5GeFSZtyy+6bZfMIRtnuI1i9kUBzPJqY2MQ0/FVKLdfIM5yuEMs4xet07SG6ABS6IjeKgQlDy7vJyCMYjpjBnL9VXlwgPpVFeN2yVg9yJx/2z4miHHTdtMcit3GqB6wU11485qyeWlvYpz323BJSVhKnz6O2XJYD9Fb/l/nbfh/lJ1eaHIIUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hJyVz2MVEaZcX1HnFZWy8YVOvUv2Bsi/G/yQUcrtozQ=;
+ b=TgrhnQ15d7AjMekqhyq01rkacW1Doh0QJ/gecr0lLLQR9w6G+MKv1aXwP0lj4jBxEUQ/FtD2GMXv9jG8vRKOYtPCzLeLVWv9bN3WDk/dInHGx/4FoDjSE1KHvI6/PihDTaqsOe4Nm/V+q5FiDvQcLBqRDwuxJAXDFGOxAOfAm2DGI4Ycem3vs4kg0pwzOz+b3LfQYR2AWy/z462ifxGr7K5mkYLvuLGDb0sovzR+noro4AkYk6tSiT3BF+VQBBH9tfg8wjg9qoqrMLys3ePLo8kmJaGq+4SMwx392A5FE4Hq59aE+DQ4jE3NW9CEWGw318p+MZFfOY6OtgPthSczVA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hJyVz2MVEaZcX1HnFZWy8YVOvUv2Bsi/G/yQUcrtozQ=;
+ b=VxI8K2E08LXa63GUmuhyNYq/QMXUJtWQCx6zaTvxZRwmr1ko+I1+RfU1wwx+thn8Rf1zHfJRxtAUBKJcZChEvSuGYU6GyHCOh+j4nzLXBWEK10pL6BNBoS4Jw0xpd7gjv3PsFgN9POIxDdqOYBf9uDrxvxma1/2xP8z7DPTTXKAlsvWf4QROZ3GT24w7SJhuC+fFuFxDSg3ELckpONN30gtYRNveKyBVukM6tYUz3sYL3XK/JdIdrvnmdCSm/xvQKq/TNQz/PlOm2lWvDHxjIp/0AX2gMN67hVQVkAZPq+4euVCJAkJJAh9z0EfOfMU3y983+DPqUIMR6U5Besv2Mw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from IA0PR12MB8086.namprd12.prod.outlook.com (2603:10b6:208:403::7)
+ by DS0PR12MB7970.namprd12.prod.outlook.com (2603:10b6:8:149::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.20; Tue, 20 Feb
+ 2024 08:21:42 +0000
+Received: from IA0PR12MB8086.namprd12.prod.outlook.com
+ ([fe80::9987:3f37:9a25:b0e7]) by IA0PR12MB8086.namprd12.prod.outlook.com
+ ([fe80::9987:3f37:9a25:b0e7%2]) with mapi id 15.20.7316.018; Tue, 20 Feb 2024
+ 08:21:42 +0000
+Message-ID: <461d3ede-5d34-449e-8115-1c4558ae31a2@nvidia.com>
+Date: Tue, 20 Feb 2024 10:21:34 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] [v2] net/mlx5: fix possible stack overflows
+To: Arnd Bergmann <arnd@arndb.de>, Simon Horman <horms@kernel.org>,
+ Arnd Bergmann <arnd@kernel.org>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Zhu Yanjun <yanjun.zhu@linux.dev>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Alex Vesker <valex@nvidia.com>,
+ Hamdan Igbaria <hamdani@nvidia.com>, Netdev <netdev@vger.kernel.org>,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240219100506.648089-1-arnd@kernel.org>
+ <20240219100506.648089-2-arnd@kernel.org> <20240220080624.GQ40273@kernel.org>
+ <726459a9-c549-4fec-9a4d-61ae1da04f0a@app.fastmail.com>
+Content-Language: en-US
+From: Yevgeny Kliteynik <kliteyn@nvidia.com>
+In-Reply-To: <726459a9-c549-4fec-9a4d-61ae1da04f0a@app.fastmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO2P123CA0080.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:138::13) To IA0PR12MB8086.namprd12.prod.outlook.com
+ (2603:10b6:208:403::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240126063500.2684087-1-wenst@chromium.org> <20240126063500.2684087-2-wenst@chromium.org>
- <74b9f249-fcb4-4338-bf7b-8477de6c935c@linaro.org> <CAGXv+5Hu+KsTBd1JtnKcaE3qUzPhHbunoVaH2++yfNopHtFf4g@mail.gmail.com>
- <21568334-b21f-429e-81cd-5ce77accaf3c@linaro.org> <CAGXv+5HxXzjigN3Bp96vkv71WfTJ1S2b7Wgafc4GxLmhu6+jMg@mail.gmail.com>
- <a4324473-e0c6-4d53-8de0-03b69480e40b@linaro.org> <CAGXv+5HAqmUizXztMH_nY6e+6oQh01hCtxEJXKtCn3_74-sOsQ@mail.gmail.com>
- <78241d63-3b9d-4c04-9ea5-11b45eac6f00@linaro.org> <20240130223856.GA2538998-robh@kernel.org>
- <CAGXv+5FwaNe7oesGwZ=yR0Pg82tEzEF3B0zjoex4qw+6zsSYbQ@mail.gmail.com> <CAPDyKFofy24N7ymzTF7wiADc17Tw9FiNTYMnbxgoioMBwDKVhA@mail.gmail.com>
-In-Reply-To: <CAPDyKFofy24N7ymzTF7wiADc17Tw9FiNTYMnbxgoioMBwDKVhA@mail.gmail.com>
-From: Chen-Yu Tsai <wenst@chromium.org>
-Date: Tue, 20 Feb 2024 16:19:18 +0800
-Message-ID: <CAGXv+5Fvdp__Razz_nxcedCV_P=Wbj=F_a6=s4V4SbW4RooueA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] dt-bindings: net: bluetooth: Add MediaTek MT7921S
- SDIO Bluetooth
-To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Sean Wang <sean.wang@mediatek.com>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-mediatek@lists.infradead.org, 
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA0PR12MB8086:EE_|DS0PR12MB7970:EE_
+X-MS-Office365-Filtering-Correlation-Id: c5e3c035-ca24-40c3-6e1d-08dc31ecf812
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	v6klzMVMvoXLEQC1wVVU1ua7fT2PhYfTyOIBK6lMYraq9MfJxbcBZl8EGp3HzFzzk14lQmXk+4NlDDRQ4V9Hh+J8yT7S4mucy9HylKiusFGpn0cVRvroAh4ZakYqVoQuuJeLLf98LnlyT7VAjwE+6CQA1PwAWqUvUFNihH1yrDGfy/ILqUezVT3RJjCrI2YXIYCDRGAybllgvxsf7/II9l4+3Mvjn/C0jt/ljDucuyj6SUGJ3U5N6NFSs162znIDl2rUXg57YSmG6FqqDdsKWphW14L42o6iOMrltjVopjeIn7ED/ms9LtEdUlA7Zlu6urtXXlXEFF6ngAIWdqoJGtbhfgBDqhR+IcIb5KZZA7GxNZ9dDBwDiTzssXhtivor8JL4SmFiXzffzl9WSmjP2wuuZxe1Xlx4p5bgsLigE49+vzceYQtXNmXgEBwM5lkLttZ0/RWL/E87tcVoKYU+EsJKrtUe9B3f4jRp0gOAbfFZVXdH4s8i6YQti6snm4J8t/zJ6fF0HRoKvX3sb4oCRxEtsl+Bkm9f29Xrm/EpZLcrsdsLRT7bnUk0nvksPFrQ
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA0PR12MB8086.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(230273577357003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?cWFGaXNUUDVwVjNHbW5SYzFnSm5FOGxCb2lqOG5pVk5aaUJURlJtYU03RVZE?=
+ =?utf-8?B?bkJzS3RoSFhPMkRleHZmanNBSGVjNEpZRUpoNzYvUFhTUlVCRG8vNlh4Smd1?=
+ =?utf-8?B?QkhhTE5JOWJnSWRSUzBMWFREUE02bUlFdVZucDE1c0FaVGRzMFVuKzJWVmlM?=
+ =?utf-8?B?TU4rdE1FdzI2T1IyR2V2Y0laMEsyak9PcHdBMllLM3FwQm4yczJ3OS9Oek9V?=
+ =?utf-8?B?WDlXV0VsR09GZFA0NTY5R1A3cDhhcHQwTFZackMzTmFMUGtwNENYZ3o0V0hL?=
+ =?utf-8?B?UHdIZXRzdC9ERTU2OHlNVVlBNVJIZmdlaEhTUHFSdk5nZHNNSmtXdmEzeEpn?=
+ =?utf-8?B?NFZ6Umc4Z1hwMThTblorcCtKeEh4ZW5oakFiSUI2T2Q2eGpHUVFCL3VPaWdn?=
+ =?utf-8?B?RmlEcWJxMldTbDB4ZlF5cXg5OWMwMVhoQzg5RzR3RGlPWG1jYnVyNW1xTTk2?=
+ =?utf-8?B?ZzB0WUUxcTcrOWRDY0FuVkY4eWk5bnVwNFJHdWpBQ2lDcldZTE5pWUFtUXRz?=
+ =?utf-8?B?TXRidVZBT2lqYm85eklRbU8xN1ZMOVBXQWEwcE9uN2I4TEU4c2ExdVExWS9n?=
+ =?utf-8?B?Q0kvYzFlajVDNG0yZTByUEpmVi9FMC9vbzN5R0V0YWlyZElCQnNRZlZ0WCt6?=
+ =?utf-8?B?c3FVY2dMMnZpZGZzUGJGT1JydjNSZ2sxdEpqdUh4ZmZuNVVycFgrb0hzSlp5?=
+ =?utf-8?B?czRaTzl0ZndtSWJMTDVLbGVkTm1MQTFHYUtTeUtaQkNyQnVLa3NQb1p0MnZt?=
+ =?utf-8?B?MTRJTnU5VFI3UlJxRFNGSUNlaHlyVHRuK0h5alFScy83c2ZXUmh1dEpvOWRm?=
+ =?utf-8?B?QlNOdXJnVUxVWEQ2MVNCMEtPRDhoMVdzdEJQMmJSRlJjK1JkOEZjcXBoekRW?=
+ =?utf-8?B?Q2NaeTFyeENneWZDcVlzeXJHWTBvT3dDZXdldmJmUHptQUNQVDNsQUxOUVMw?=
+ =?utf-8?B?RmxSenpoY0VTSlRoRUN2a2Z1aWZvOWsyNW5LeHo2amtGcDJQKzI1TC81YTBH?=
+ =?utf-8?B?bWZTTkNDMWgySW9xTXkzbWtvL0kxM05GWjkyN1JGWG5Fbld4eEhhQ2dKb0c3?=
+ =?utf-8?B?L3JpcldXZUIydGp4eFRXaFVxMnV4STRTZVB4QTVJbmZPanNuRVhUWlZ3WWxt?=
+ =?utf-8?B?K2JaRDlFRXJZNTg1TzVpKzE1L0kxaDREZ0E5K2F6OVNQQjdiNVpwa2pRV0FS?=
+ =?utf-8?B?dkRXMzNyWThneUtYRktacTMyRlhvSVVnQjdvNVVTc3ExbGR2TnpYQTYwZ1Vw?=
+ =?utf-8?B?a3hCcVVFTnBTTVdnQnpVS1hReGk5YkZxRGVaWGthb3lDcTdYSU9JSEtIVkM2?=
+ =?utf-8?B?TUVUN05iSWRDWEZvZXloZzJnVDUvc1ZaN1ZBTmIxeXhBbEdlR3ZDTTZ4NXpZ?=
+ =?utf-8?B?QlVFcGpWZDFIUk9RUk5WZGs3NW1VZFhJa2ZPWWtFNjQ2Q21QOGMrZnpubFJt?=
+ =?utf-8?B?RGVBYmJ3enM1UUdPWjBIck9Xak00QUd1bS9ycU9WMWJkT3ljUGpaRHAwREo4?=
+ =?utf-8?B?YkY2cTRqTTFFcjViaGcvMzh0cjJod3R0alpsK3N3OXhWWjJFdWVtSjhkNXZ0?=
+ =?utf-8?B?aGtqQ0lUcWdJaWFhZC9QRFVpcFV0SnZBbmFnaUpYaG1VL2oxcVBnSnRrYnRp?=
+ =?utf-8?B?Y3RlZjlqVytXblAzMTJ0T2E3a0liQmJRNGQyTXhhbnhRVjdwZDNFYVNZUExM?=
+ =?utf-8?B?emdhcEFsOURKVTluL2ZEeWJtcHdyeVlNckRGc3RzUURZSE9vaFNvNTZFNGxa?=
+ =?utf-8?B?V2tJSnBzU3ZnVGFzUlBYYVFUbzJOQXJzNkRzQ0g4SzJFVC9yTGZyN0tmcjNF?=
+ =?utf-8?B?WWFnNjVUM1NrcDNyQ3haN0UxbTNLVVF4dWRYTWNCaU54RVREYjdST0xGQm1D?=
+ =?utf-8?B?c24zdVU3TlNRdlpwMDlrb21lUFRqQzJ5QlcyLy9HTDJmcTRMNEQrOUYxbDdN?=
+ =?utf-8?B?OTVGY1c1dTU3aVBaNzMwQU04UFRITURSYkNLQzk1UlYzV0l0WnEvUFFDbUpO?=
+ =?utf-8?B?VVFSZmRWRlJkNHg3M1FaOGs5d1FxTE5VUlJaWDBYMTBOYzhRUEFydUVaK0o3?=
+ =?utf-8?B?QjhCQlJyNEt5SCsxdHpHSkE1UTB1d3VseEt2ZlhxMmthdnlWUkJ1VFhmTU9X?=
+ =?utf-8?Q?80kwo/26zNkJvpTDNflzvPWbF?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c5e3c035-ca24-40c3-6e1d-08dc31ecf812
+X-MS-Exchange-CrossTenant-AuthSource: IA0PR12MB8086.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2024 08:21:42.5547
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +D0hMwyA0sTFJ3TN0qcaoukaAZ/XHBpjT4kqt2sUvi+hx3fZaBs3I0ckA0+p4aaD6lggUPKsixGgLxRBbIvs/Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7970
 
-On Tue, Feb 6, 2024 at 1:50=E2=80=AFAM Ulf Hansson <ulf.hansson@linaro.org>=
- wrote:
->
-> On Wed, 31 Jan 2024 at 04:39, Chen-Yu Tsai <wenst@chromium.org> wrote:
-> >
-> > (+CC Ulf Hansson)
-> >
-> > On Wed, Jan 31, 2024 at 6:38=E2=80=AFAM Rob Herring <robh@kernel.org> w=
-rote:
-> > >
-> > > On Tue, Jan 30, 2024 at 05:25:38PM +0100, Krzysztof Kozlowski wrote:
-> > > > On 30/01/2024 08:47, Chen-Yu Tsai wrote:
-> > > > > On Tue, Jan 30, 2024 at 3:37=E2=80=AFPM Krzysztof Kozlowski
-> > > > > <krzysztof.kozlowski@linaro.org> wrote:
-> > > > >>
-> > > > >> On 30/01/2024 04:32, Chen-Yu Tsai wrote:
-> > > > >>> On Mon, Jan 29, 2024 at 3:34=E2=80=AFPM Krzysztof Kozlowski
-> > > > >>> <krzysztof.kozlowski@linaro.org> wrote:
-> > > > >>>>
-> > > > >>>> On 29/01/2024 04:38, Chen-Yu Tsai wrote:
-> > > > >>>>
-> > > > >>>>>>> +allOf:
-> > > > >>>>>>> +  - $ref: bluetooth-controller.yaml#
-> > > > >>>>>>> +
-> > > > >>>>>>> +properties:
-> > > > >>>>>>> +  compatible:
-> > > > >>>>>>> +    enum:
-> > > > >>>>>>> +      - mediatek,mt7921s-bluetooth
-> > > > >>>>>>
-> > > > >>>>>> Can it be also WiFi on separate bus? How many device nodes d=
-o you need
-> > > > >>>>>> for this device?
-> > > > >>>>>
-> > > > >>>>> For the "S" variant, WiFi is also on SDIO. For the other two =
-variants,
-> > > > >>>>> "U" and "E", WiFi goes over USB and PCIe respectively. On bot=
-h those
-> > > > >>>>> variants, Bluetooth can either go over USB or UART. That is w=
-hat I
-> > > > >>>>> gathered from the pinouts. There are a dozen GPIO pins which =
-don't
-> > > > >>>>> have detailed descriptions though. If you want a comprehensiv=
-e
-> > > > >>>>> binding of the whole chip and all its variants, I suggest we =
-ask
-> > > > >>>>> MediaTek to provide it instead. My goal with the binding is t=
-o document
-> > > > >>>>> existing usage and allow me to upstream new device trees.
-> > > > >>>>>
-> > > > >>>>> For now we only need the Bluetooth node. The WiFi part is per=
-fectly
-> > > > >>>>> detectable, and the driver doesn't seem to need the WiFi rese=
-t pin.
-> > > > >>>>> The Bluetooth driver only uses its reset pin to reset a hung =
-controller.
-> > > > >>>>
-> > > > >>>> Then suffix "bluetooth" seems redundant.
-> > > > >>>
-> > > > >>> I think keeping the suffix makes more sense though. The chip is=
- a two
-> > > > >>> function piece, and this only targets one of the functions. Als=
-o, the
-> > > > >>
-> > > > >> That's why I asked and you said there is only one interface: SDI=
-O.
-> > > > >
-> > > > > There's only one interface, SDIO, but two SDIO functions. The two
-> > > > > functions, if both were to be described in the device tree, would
-> > > > > be two separate nodes. We just don't have any use for the WiFi on=
-e
-> > > > > right now. Does that make sense to keep the suffix?
-> > > >
-> > > > Number of functions does not really matter. Number of interfaces on=
- the
-> > > > bus would matter. Why would you have two separate nodes for the sam=
-e
-> > > > SDIO interface? Or do you want to say there are two interfaces?
-> >
-> > There is only one external interface. I don't know how the functions
-> > are stitched together internally.
-> >
-> > It could be that the separate functions have nothing in common other
-> > than sharing a standard external SDIO interface. Each function can be
-> > individually controlled, and operations for different functions are
-> > directed internally to the corresponding core.
-> >
-> > > Right, one device at 2 addresses on a bus should be a node with 2 "re=
-g"
-> > > entries, not 2 nodes with 1 "reg" address each.
-> >
-> > AFAICU that's not what the MMC controller binding, which I quote below,
-> > says. It implies that each SDIO function shall be a separate node under
-> > the MMC controller node.
->
-> Yes, that's what we decided to go with, a long time ago. At least in
-> this particular case, I think it makes sense, as each function
-> (child-node) may also describe additional resources routed to each
-> function.
->
-> A typical description could be for a WiFi-Bluetooth combo-chip, where
-> each function may have its own clocks, irqs and regulators being
-> routed.
+On 20-Feb-24 10:11, Arnd Bergmann wrote:
+> External email: Use caution opening links or attachments
+> 
+> 
+> On Tue, Feb 20, 2024, at 09:06, Simon Horman wrote:
+>> On Mon, Feb 19, 2024 at 11:04:56AM +0100, Arnd Bergmann wrote:
+> 
+>> Hi Arnd,
+>>
+>> With patch 1/2 in place this code goes on as:
+>>
+>>        switch (action->action_type) {
+>>        case DR_ACTION_TYP_DROP:
+>>                memset(buff, 0, sizeof(buff));
+>>
+>> buff is now a char * rather than an array of char.
+>> siceof(buff) doesn't seem right here anymore.
+>>
+>> Flagged by Coccinelle.
+> 
+> Rihgt, that would be bad. It sounds like we won't use patch 1/2
+> after all though, so I think it's going to be fine after all.
+> If the mlx5 maintainers still want both patches, I'll rework
+> it to use the fixed size.
 
-Rob, Krzysztof, does that help you understand why the binding and example
-are written with bluetooth being one node and WiFi (should it ever be added=
-)
-being a separate node? It is based on the existing MMC controller bindings.
+No need for the first patch, so only the stack frame limit
+fix is needed.
 
-ChenYu
+Thanks,
 
+-- YK
 
-> >
-> >
-> > patternProperties:
-> >   "^.*@[0-9]+$":
-> >     type: object
-> >     description: |
-> >       On embedded systems the cards connected to a host may need
-> >       additional properties. These can be specified in subnodes to the
-> >       host controller node. The subnodes are identified by the
-> >       standard \'reg\' property. Which information exactly can be
-> >       specified depends on the bindings for the SDIO function driver
-> >       for the subnode, as specified by the compatible string.
-> >
-> >     properties:
-> >       compatible:
-> >         description: |
-> >           Name of SDIO function following generic names recommended
-> >           practice
-> >
-> >       reg:
-> >         items:
-> >           - minimum: 0
-> >             maximum: 7
-> >             description:
-> >               Must contain the SDIO function number of the function thi=
-s
-> >               subnode describes. A value of 0 denotes the memory SD
-> >               function, values from 1 to 7 denote the SDIO functions.
-> >
-> >
-> > ChenYu
->
-> Kind regards
-> Uffe
+>       Arnd
+
 
