@@ -1,147 +1,122 @@
-Return-Path: <netdev+bounces-73298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAB4885BCC8
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 14:02:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7ACD585BCD2
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 14:04:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85E3728112A
-	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 13:02:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3098A1F21948
+	for <lists+netdev@lfdr.de>; Tue, 20 Feb 2024 13:04:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C8AA69E06;
-	Tue, 20 Feb 2024 13:02:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AD0C69E17;
+	Tue, 20 Feb 2024 13:04:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ho0S/pca"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="J+9j8m+L"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78F8669DFF
-	for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 13:02:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35156692E9;
+	Tue, 20 Feb 2024 13:04:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708434132; cv=none; b=uaJPJqlkM1VIuJ4+HSZBk3TUfYryfZt6GtvCkGGRoEsGkRjOjCL6zq36CwUoOqty0ceKwuZ6x0xn2POH+axzZRWCc1uBQaOGjVeT6ZpX8Mn/mLAjoJJAkHCFGuOXb55mtVaQqxpIiDzpVzkKWAdJT/VfQhS18U6GCw2V46ERbck=
+	t=1708434279; cv=none; b=kRsBTNf+dm8xeCnKSaO+p05VBSLNQ7CIZMqymIA5F9pIYmeoHCafW8OOTPNWvGZHEoPSsqK9kMqv0t+YKr1oAP8ktk2ax+eQFV92KtTCJedxQ+16f/2J5wgzYuLDuzH3wdmEddXTd4FBg6ri52D4oMETNJ3oiiy1BmNRrIGyUj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708434132; c=relaxed/simple;
-	bh=K4sWBSLWkN98NZHfv/IhFKshYSSGFh5pV20k4Ab3Big=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EtGEGjNtr8kH0up4UfMgYis+T5DRp2U7O5JaLebHlgwYLNsSEp8oMGj0Z1JZ/IWiJ++ILUg2n5P2lxxzo56sOeP/lrMzVOc4VwMG8tW/bDymXwJqE0ZMAoR+h5vHSQbZvqE3Z/+L1Kt6ClW6mQro1Jc5NBne4hEiEfpazh2dnXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ho0S/pca; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7D90C433C7;
-	Tue, 20 Feb 2024 13:02:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708434131;
-	bh=K4sWBSLWkN98NZHfv/IhFKshYSSGFh5pV20k4Ab3Big=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ho0S/pca4wR8j4DAgV7+LGI+Cg1eQqHVTfP5ty2IbDllS1ZpjQkvHmNwnr+diFOn4
-	 1IF+QXIadRdVmz+FU4mF9YsGHl/zSZ+gUKJCP+2Sc4CDI5PLpBmJ4COgjJRbu4B9SK
-	 Wz9mpAminFyIYMOjsIpsUPASmVTL9wcZk3aib/WoVMunxI2q8i1hEMMI/gcFMvATmb
-	 AKwI++kQlFN3O744vC8QRJHyHk8DQm43enuZmv7VAIU3vnpr6eHq53znl0FuMx6LLz
-	 TYCXq7ZrZSHVgg5mZa8nk7P0/RwSrr6PVjKzYGmhHm4vRoZPMh0IjUgjN49eDdgPPb
-	 KEHHS8gTaGHHw==
-Date: Tue, 20 Feb 2024 13:02:06 +0000
-From: Simon Horman <horms@kernel.org>
-To: kovalev@altlinux.org
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, jiri@resnulli.us,
-	jacob.e.keller@intel.com, johannes@sipsolutions.net,
-	idosch@nvidia.com, David Lebrun <david.lebrun@uclouvain.be>,
-	Pablo Neira Ayuso <pablo@netfilter.org>
-Subject: Re: [PATCH] genetlink: fix potencial use-after-free and
- null-ptr-deref in genl_dumpit()
-Message-ID: <20240220130206.GH40273@kernel.org>
-References: <20240215202309.29723-1-kovalev@altlinux.org>
- <20240219113240.GZ40273@kernel.org>
- <4462f60e-63eb-c566-818a-98523ca4d4ff@basealt.ru>
+	s=arc-20240116; t=1708434279; c=relaxed/simple;
+	bh=qw68cbvWVCDaSiCaFt0mqKtZsY5Hg/JPm2WM1pvSFcQ=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=VOqne1tSn3QKqNUjtc8rvNBBZgXKhprtqdEngelHHYlVh71MMXcsKQjRTkkSAccESjK1/aNzwzI/YfP4IC/JR63cnu3Sn+qkKXMmTljWAhwtnsIw94XV8a3uALNFmUto8AFZsTON0pQPqxMmePbxHKnKYq5wlfmu8DqjB8UJv9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=J+9j8m+L; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=dXPxbG3jp1RJ38PIYIcqm3sOHazDTTUmnZEfZczc+no=; b=J+9j8m+LB244AtFelsGKWdhTNN
+	9L8bbYJv5f63E2hZ7/ucVvO0sEY8v0If6gLAhbBhkGZkrOk+k6vB8HhSDsCSw4/HM35vUw6GsiW5M
+	4vvb5Nfu1Bw0rl3r3S2JQ8ARdg+AvW4YVY7QDXIrchoo2sZUgAxoWRXLRGQ4WlqQL2PwVIcw/0Tgs
+	Q0WWNNGdh1V1iqSZv/dFDAk+EE4Pdps4KPa9ixVY0tNMCB7nEf2B1E+IrThu1AGUHqszV5+AYck2J
+	ERZbMFphlC5m6zbv84D80ZcdySqgo8hFtprKA4AjFZqDx7IKMvAbLxp4CDxns/mnPgtst2+ZP2xHe
+	iITyA5xg==;
+Received: from sslproxy04.your-server.de ([78.46.152.42])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rcPLa-000Lm0-3s; Tue, 20 Feb 2024 13:35:42 +0100
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy04.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rcPLZ-000QAW-J4; Tue, 20 Feb 2024 13:35:41 +0100
+Subject: Re: [PATCH net-next 0/3] Change BPF_TEST_RUN use the system page pool
+ for live XDP frames
+To: =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <20240215132634.474055-1-toke@redhat.com> <87wmr0b82y.fsf@toke.dk>
+ <631d6b12-fb5c-3074-3770-d6927aea393d@iogearbox.net> <87o7cbbcqj.fsf@toke.dk>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <c888b60a-0be5-8e7c-0fa0-8039e691406a@iogearbox.net>
+Date: Tue, 20 Feb 2024 13:35:41 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4462f60e-63eb-c566-818a-98523ca4d4ff@basealt.ru>
+In-Reply-To: <87o7cbbcqj.fsf@toke.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27191/Tue Feb 20 10:25:13 2024)
 
-On Mon, Feb 19, 2024 at 03:15:52PM +0300, kovalev@altlinux.org wrote:
-> + Pablo Neira Ayuso <pablo@netfilter.org>
+On 2/20/24 12:23 PM, Toke Høiland-Jørgensen wrote:
+> Daniel Borkmann <daniel@iogearbox.net> writes:
+>> On 2/19/24 7:52 PM, Toke Høiland-Jørgensen wrote:
+>>> Toke Høiland-Jørgensen <toke@redhat.com> writes:
+>>>
+>>>> Now that we have a system-wide page pool, we can use that for the live
+>>>> frame mode of BPF_TEST_RUN (used by the XDP traffic generator), and
+>>>> avoid the cost of creating a separate page pool instance for each
+>>>> syscall invocation. See the individual patches for more details.
+>>>>
+>>>> Toke Høiland-Jørgensen (3):
+>>>>     net: Register system page pool as an XDP memory model
+>>>>     bpf: test_run: Use system page pool for XDP live frame mode
+>>>>     bpf: test_run: Fix cacheline alignment of live XDP frame data
+>>>>       structures
+>>>>
+>>>>    include/linux/netdevice.h |   1 +
+>>>>    net/bpf/test_run.c        | 138 +++++++++++++++++++-------------------
+>>>>    net/core/dev.c            |  13 +++-
+>>>>    3 files changed, 81 insertions(+), 71 deletions(-)
+>>>
+>>> Hi maintainers
+>>>
+>>> This series is targeting net-next, but it's listed as delegate:bpf in
+>>> patchwork[0]; is that a mistake? Do I need to do anything more to nudge it
+>>> along?
+>>
+>> I moved it over to netdev, it would be good next time if there are dependencies
+>> which are in net-next but not yet bpf-next to clearly state them given from this
+>> series the majority touches the bpf test infra code.
 > 
-> 19.02.2024 14:32, Simon Horman wrote:
-> > + Jiri Pirko <jiri@resnulli.us>
-> >    David Lebrun <david.lebrun@uclouvain.be>
-> > 
-> > On Thu, Feb 15, 2024 at 11:23:09PM +0300, kovalev@altlinux.org wrote:
-> > > From: Vasiliy Kovalev <kovalev@altlinux.org>
-> > > 
-> > > The pernet operations structure for the subsystem must be registered
-> > > before registering the generic netlink family.
-> > > 
-> > > Fixes: 134e63756d5f ("genetlink: make netns aware")
-> > Hi Vasiliy,
-> > 
-> > A Fixes tag implies that this is a bug fix.
-> > So I think some explanation is warranted of what, user-visible,
-> > problem this resolves.
-> > 
-> > In that case the patch should be targeted at net.
-> > Which means it should be based on that tree and have a net annotation
-> > in the subject
-> > 
-> > 	Subject: [PATCH net] ...
-> > 
-> > Alternatively, the Fixes tag should be dropped and some explanation
-> > should be provided of why the structure needs to be registered before
-> > the family.
-> > 
-> > In this case, if you wish to refer to the patch where the problem (but not
-> > bug) was introduced you can use something like the following.
-> > It is just the Fixes tag that has a special meaning.
-> > 
-> > 	Introduced in 134e63756d5f ("genetlink: make netns aware")
-> > 
-> > I think the above comments also apply to:
-> > 
-> > - [PATCH] ipv6: sr: fix possible use-after-free and null-ptr-deref
-> >    https://lore.kernel.org/all/20240215202717.29815-1-kovalev@altlinux.org/
-> > 
-> > - [PATCH] devlink: fix possible use-after-free and memory leaks in devlink_init()
-> >    https://lore.kernel.org/all/20240215203400.29976-1-kovalev@altlinux.org/
-> > 
-> > And as these patches seem to try to fix the same problem in different
-> > places, all under Networking, I would suggest that if you do repost,
-> > they are combined into a patch series (3 patches in the same series).
-> > 
-> > But I do wonder, how such an apparently fundamental problem has been
-> > present for so long in what I assume to be well exercised code.
-> 
-> Hi Simon,
-> 
-> The history of these changes began with the crash fix in the gtp module [1]
-> 
-> A solution to the problem was found [2] and Pablo Neruda Ayuso suggested
-> fixing similar
-> 
-> sections of code if they might have the same problem.
-> 
-> I have sent patches, but do not have reproducers, relying on drawing
-> attention to the problem.
+> Right, I thought that was what I was doing by targeting them at net-next
+> (in the subject). What's the proper way to do this, then, just noting it
+> in the cover letter? :)
 
-Thanks Vasiliy,
+An explicit lore link to the series this depends on would be best.
 
-I think it would be worth adding some text along those lines to
-the commit messages for the patches you have posted.
-
-> 
-> 
-> [1]
-> https://lore.kernel.org/lkml/20240124101404.161655-1-kovalev@altlinux.org/T/
-> 
-> [2] https://lore.kernel.org/netdev/20240214162733.34214-1-kovalev@altlinux.org/T/#u
-> 
-> -- 
-> Thanks,
-> Vasiliy Kovalev
-> 
+Thanks,
+Daniel
 
