@@ -1,110 +1,132 @@
-Return-Path: <netdev+bounces-73631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E99485D665
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:03:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8E3D85D662
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:03:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 367E01F234D9
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:03:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94E61284A36
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:03:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EBEC3C493;
-	Wed, 21 Feb 2024 11:03:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 216033E49B;
+	Wed, 21 Feb 2024 11:02:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="Yf2NLxY2";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="KJkzAJj7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from fhigh3-smtp.messagingengine.com (fhigh3-smtp.messagingengine.com [103.168.172.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD6A73F9FC
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 11:03:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38BBC442A;
+	Wed, 21 Feb 2024 11:02:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708513388; cv=none; b=s1IqBCy1Xi55MLnO4BKfIF5F4jVLn9V9yeEIRIeirXGtNMkyP9YQ7dn4AJipYpxldlQHKC654tGCmh3UKFFRUtJgE3Cr+M5gaWxQgCovMf6B7FAM6a/Syjf6xXy5JKvBvE5bg8IO6ZqBknBU/H4Wvp7sch8ivDk/KksqBvFdz44=
+	t=1708513377; cv=none; b=HCGbxcGxLtYCpX5ehzYxi9FCpl5yAzTSP+90BpF4D2pomhq20R4qy0eJbit0xDPACqeo32UGObGWf89Gg700JoFLDk1JFucEShWb6nHMCj/31enUqDSmVo/YhoohEaOwYWrF+z8l7aSUKpNuR5aToDdhxA3T9g7zwOHC9RooSeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708513388; c=relaxed/simple;
-	bh=hzKpJNmqdYB6rJp/PVbzorPoAgTGtcePE9lYF2JzCfo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JzoZmV/NMj1oWArqTBKL2uc2Twbep0zJvrKNII6m3zknL0BKw10IB75v2bLaYo3v63sjCUciNbNwMo8EhIsjdnF0qjdXfFMiKSR7n7Ck5dgxO1tc9Prp0ngTp9KP9GGzDqoyJc2J5E71qJNHDStiY18TI+kFmhWUnBjGIIJiMvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.34] (g34.guest.molgen.mpg.de [141.14.220.34])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 5CC8D61E5FE01;
-	Wed, 21 Feb 2024 12:02:08 +0100 (CET)
-Message-ID: <ed0d4411-e120-4366-8640-145e6f66684d@molgen.mpg.de>
-Date: Wed, 21 Feb 2024 12:02:07 +0100
+	s=arc-20240116; t=1708513377; c=relaxed/simple;
+	bh=3cN1wXi39HONLLKZYBRPqTC48Hlqm0y4561gFlEXCRg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f0nTGdD9X7iZLTIKMlcBvl/1NDY1wFi2BmavDy0+j3prmZ1bHzIsRx1JREHq30WzMx0c1DMQig70KgMbDOccU0qTgDj70nfAI8kGucVnpVzh8tsK3ngAXxRptSPxru/Z+2Hh8jyNU4FRfcLM0anV+5debfjZBJlrGnde9ryUgPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com; spf=pass smtp.mailfrom=kroah.com; dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b=Yf2NLxY2; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=KJkzAJj7; arc=none smtp.client-ip=103.168.172.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+	by mailfhigh.nyi.internal (Postfix) with ESMTP id 4386D1140084;
+	Wed, 21 Feb 2024 06:02:54 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute1.internal (MEProxy); Wed, 21 Feb 2024 06:02:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm1; t=1708513374; x=1708599774; bh=TqPp38CEZy
+	o9GYo4UCO4UrQnY17peGWNRC+vB/dGlJw=; b=Yf2NLxY2KRIy14FvkZyehMDKZH
+	jfr2xkq2OAn49/7OTwdHgv113asarlCVv367UUZl7rq3r0HBiAD5UVQT9esebLS7
+	Yj9sMO0FXqA/2rV2foPOme20UHXGZjs0ozkSkrhFkJi3fHehU2Ju68lDf40bjbQw
+	m844XMA5TKHSQi1YvGSm7NHCmm1pZ7CRyFPuP5Um/624/mEfOknerlwUxn74u67K
+	LvcUQicTLPxfWX/2G7920lQ7pVROZsktkQz42nyof1hETzzu4NvJVZWJr96ceiOx
+	wpzf/OuDKrggX7hABdTpjDbDFAHf3kUTpVOZOVcZEIjSRUAnrh0QNaKQw/tQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm1; t=1708513374; x=1708599774; bh=TqPp38CEZyo9GYo4UCO4UrQnY17p
+	eGWNRC+vB/dGlJw=; b=KJkzAJj73S5isbzbmAWwuD3Tkh5Pb6wX6tDk7PUfKnvK
+	afPWyW6jwUT4z2ezS0XHpco3YsTstz9GoFmwYxQgPGWxMMt6bXurBQfOcA+rq2+B
+	t8kUsikkbj2xkKj9rSZnY4fv/5mUsOYZAZMOpkTitdl85oXMvVNQ1+pb7nsdMPf3
+	ZOu8eV/iHphcfRJBThp0Az4lkuXYpJu4+/xDRjEeMHG1a1FU2BmQ6cVoTqEjUhXt
+	Vk9ekdKzz/1kMvogqrWnlXos9Ta+ftxBDgreczaRe3v3uSyGK84PXOQlnCkBmYo1
+	fnpqgtcnwJMwzujdDHuWExHB21Xsd5QDuZJQOd6c1Q==
+X-ME-Sender: <xms:XNjVZfZJTYDexUDsCHKA_YxdPy1cOmCsnT-vYwtf87zL5sFL5SfFQQ>
+    <xme:XNjVZeadGdzPFyMt9BgtBx0UvAUTLrzuwyiMqKF098vfpynYJt1n_Yc8A7gGqKWwQ
+    ywMPFx706GrDw>
+X-ME-Received: <xmr:XNjVZR83LbZxb_FFfw3ONq7RstvxpT30ME7bVUlBFtBmEF_Mm6LMUM5vanRL2p9OowU89GI50hmkTUXCcEQShL3ab-hojrcFzg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrfedvgddvgecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefirhgvghcu
+    mffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeegheeuhe
+    fgtdeluddtleekfeegjeetgeeikeehfeduieffvddufeefleevtddtvdenucffohhmrghi
+    nhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
+    hmrghilhhfrhhomhepghhrvghgsehkrhhorghhrdgtohhm
+X-ME-Proxy: <xmx:XNjVZVq-PSjRmOWm6r1IV4fIOUx1_sSB4ZGEdrs-vfyBVUk27dEbfQ>
+    <xmx:XNjVZaqsil6cFXgXwdgX7f9nif1xExwTx6PcJeIb2kujZKE2yM15FQ>
+    <xmx:XNjVZbTcyvG0hOfiqcu9xQcDlhefipOxXRmfW-J0qtVEwz8vumuhPg>
+    <xmx:XtjVZerMKIfqFu_jvTFNqYroevMIip3MvMVNO6buoMowXJFffg5vSw>
+Feedback-ID: i787e41f1:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 21 Feb 2024 06:02:52 -0500 (EST)
+Date: Wed, 21 Feb 2024 12:02:50 +0100
+From: Greg KH <greg@kroah.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: stable@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>,
+	Jakub Kicinski <kuba@kernel.org>, Doug Berger <opendmb@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	"open list:BROADCOM GENET ETHERNET DRIVER" <bcm-kernel-feedback-list@broadcom.com>,
+	"open list:BROADCOM GENET ETHERNET DRIVER" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH stable 5.4 v3] net: bcmgenet: Fix EEE implementation
+Message-ID: <2024022142-jailer-unburned-2080@gregkh>
+References: <20240212014859.3860032-1-florian.fainelli@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1 1/2] igb: simplify pci ops
- declaration
-Content-Language: en-US
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>, Alan Brady <alan.brady@intel.com>,
- Jakub Kicinski <kuba@kernel.org>, intel-wired-lan@lists.osuosl.org,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
-References: <20240210220109.3179408-1-jesse.brandeburg@intel.com>
- <20240210220109.3179408-2-jesse.brandeburg@intel.com>
- <20240219091542.GS40273@kernel.org>
- <823fdfe2-7c8c-4440-bc6a-3896c542f0e4@intel.com>
- <20240221103525.GC352018@kernel.org>
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20240221103525.GC352018@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240212014859.3860032-1-florian.fainelli@broadcom.com>
 
-Dear Jesse, dear Simon,
-
-
-Am 21.02.24 um 11:35 schrieb Simon Horman:
-> On Tue, Feb 20, 2024 at 08:48:28AM -0800, Jesse Brandeburg wrote:
->> On 2/19/2024 1:15 AM, Simon Horman wrote:
->>> On Sat, Feb 10, 2024 at 02:01:08PM -0800, Jesse Brandeburg wrote:
->>>> The igb driver was pre-declaring tons of functions just so that it could
->>>> have an early declaration of the pci_driver struct.
->>>>
->>>> Delete a bunch of the declarations and move the struct to the bottom of the
->>>> file, after all the functions are declared.
->>>>
->>>> Reviewed-by: Alan Brady <alan.brady@intel.com>
->>>> Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
->>
->>>> -	.probe    = igb_probe,
->>>> -	.remove   = igb_remove,
->>>> -#ifdef CONFIG_PM
->>>> -	.driver.pm = &igb_pm_ops,
->>>> -#endif
->>>> -	.shutdown = igb_shutdown,
->>
->>
->>>> +	.probe    = igb_probe,
->>>> +	.remove   = igb_remove,
->>>> +	.driver.pm = &igb_pm_ops,
-
->>> the line above causes a build failure if CONFIG_PM is not set.
-
->> Yeah I missed that, but do we care since patch 2/2 then fixes it?
+On Sun, Feb 11, 2024 at 05:48:57PM -0800, Florian Fainelli wrote:
+> commit a9f31047baca57d47440c879cf259b86f900260c upstream
 > 
-> Right. TBH I wrote the above before noticing 2/2.
-> And I guess it is not a big deal either way.
+> We had a number of short comings:
+> 
+> - EEE must be re-evaluated whenever the state machine detects a link
+>   change as wight be switching from a link partner with EEE
+>   enabled/disabled
+> 
+> - tx_lpi_enabled controls whether EEE should be enabled/disabled for the
+>   transmit path, which applies to the TBUF block
+> 
+> - We do not need to forcibly enable EEE upon system resume, as the PHY
+>   state machine will trigger a link event that will do that, too
+> 
+> Fixes: 6ef398ea60d9 ("net: bcmgenet: add EEE support")
+> Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> Link: https://lore.kernel.org/r/20230606214348.2408018-1-florian.fainelli@broadcom.com
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> Changes in v2:
+> 
+> - removed Changed-id
 
-In my opinion, to ease bisecting, each commit should build, so if a 
-build failure can be avoided, it’d be great if you could fix this before 
-committing.
+All now queued up, thanks.
 
-
-Kind regards,
-
-Paul
+greg k-h
 
