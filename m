@@ -1,517 +1,217 @@
-Return-Path: <netdev+bounces-73827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53B7C85EBCA
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 23:26:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A817E85EBCD
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 23:30:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 770F11C21B27
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 22:26:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3BBD1C20F13
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 22:30:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A153D12A155;
-	Wed, 21 Feb 2024 22:26:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D45F612AAD1;
+	Wed, 21 Feb 2024 22:30:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ALJlKaZV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h+FDW94D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77AD412882D
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 22:26:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708554393; cv=none; b=KjSbwuGhiJXuYePfoqKGVFxbPqI4zw98PbhZUmeQg9daKzaqQGSmuWGvGUu4zHhw3JVD/kxt96j43J58BGXKlSdYs4LboOx8ZJDfB4YskudQUd3sT1H/QRezNosxgeSJxqy4Of33j1+M4tR4d2Xr8FIWjggwyZBQn+11CyN6OMg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708554393; c=relaxed/simple;
-	bh=pa5Z+uBclcJYOCWRkd6dTXtdqIPb2r/DIN+9qv6jtwA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cl9um4auRE2THkbAVTourwtuQpS3SUTwQWBo0Q+1sY4k3JCdwd0OyISEVXxuZYUXSo9qcdR+DhdT1B1uafyF+PkKb48Rn6tFygOA33+VuvVkxPLdVsBkH14Rf5V6ozoQ/b7xkgGBZClTzWVKiVFZYbyA5NfZCQV9ieAwZJ44Q5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=ALJlKaZV; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2999329dfe7so875911a91.0
-        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 14:26:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1708554390; x=1709159190; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=txLjvpHfcPOAvCzm7tKc5Hfer4Q6fREWgHUslS9S6CQ=;
-        b=ALJlKaZVS+n3oB5MBz34SMv5ReUepMpJ+d8MhqXAZTquKiIgHUGk/OXxMXbiQ5TQTp
-         tdECYybI/g/EjSrXRxhSkyM9fpXI27S5sSR6BKFkQV/EIOmjVwqKYyOmfEI51OK/D3Vd
-         nrmMc/xWXVeEBlV6Krz5CpsIHinmbOIViIKQc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708554390; x=1709159190;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=txLjvpHfcPOAvCzm7tKc5Hfer4Q6fREWgHUslS9S6CQ=;
-        b=cnZIxs/ySPRdvFwL/Cng0sPGp7kkJrr/w878M7G8xjv9cwxVtHW032kw+iWPSmUDMK
-         A7re6YmlkeesYIpwqAL2ACaD0+ygiyzkYqcAdeO55p5EZ3Mdgvfwc7cAsZHmsx10zksY
-         vErDuo3rw290TybyiMsuBKYQ3n/kpTMVmaQBvveiVl/YZlaZHfdnC0VNdLzGqnmGOdSN
-         HaW1spUsi1boP9uCi6gmY1IMBqiOUpEZRSw0BezHvmKBYm1jVvJdcsjJTyWB0EOI2KvO
-         1TCCLiNmu8st2xbfyoPDGWW/r9BdEOCs9Bz/0jXMnNmQECI4uHjvnzuWEb4oKC1/wtSA
-         dLmg==
-X-Forwarded-Encrypted: i=1; AJvYcCU+Pyf0KtqGa0tlMjMs3h7uyhO8dbO7+ol8dHUz2+4YwUekDGPSuZwVal527Z6MosmB2E/uGqKS9b+AydeYuqfq0toCo9/n
-X-Gm-Message-State: AOJu0YzPaGYSN0sVB8+D7x1Ull6u4qT/AYCp30aYNTcwInx8hokd1YEs
-	++xnmdOP9vrRWdwHJHF6LqE4Cbi8l2JzKRihdAfAn7gHq1IWsX1eCwPjL3vBgg==
-X-Google-Smtp-Source: AGHT+IGytaguiXQtK8wcOjRkgmULUvEBIplkQejyh1KNf+4mEtK/wORPc9qyNGllCijctS2N7q2e7A==
-X-Received: by 2002:a17:90b:33d1:b0:299:592a:7d19 with SMTP id lk17-20020a17090b33d100b00299592a7d19mr11324202pjb.3.1708554389672;
-        Wed, 21 Feb 2024 14:26:29 -0800 (PST)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id bv12-20020a17090af18c00b0029940c35ee4sm10160970pjb.57.2024.02.21.14.26.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Feb 2024 14:26:29 -0800 (PST)
-From: Kees Cook <keescook@chromium.org>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Kees Cook <keescook@chromium.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	"Gustavo A . R . Silva" <gustavoars@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yhs@fb.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Haowen Bai <baihaowen@meizu.com>,
-	bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Jonathan Corbet <corbet@lwn.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Joanne Koong <joannelkoong@gmail.com>,
-	Yafang Shao <laoar.shao@gmail.com>,
-	Kui-Feng Lee <kuifeng@meta.com>,
-	Anton Protopopov <aspsk@isovalent.com>,
-	linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH v5] bpf: Replace bpf_lpm_trie_key 0-length array with flexible array
-Date: Wed, 21 Feb 2024 14:26:20 -0800
-Message-Id: <20240221222613.do.428-kees@kernel.org>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EA1612AADF
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 22:29:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708554615; cv=fail; b=bFraXpC7teL/CAYCYuxkBS+XMAX7MRGeaC9E59IRUieUh4srVFy1A9wgKD/oB3Wkvk05x9X+uJ+gJHLDsIkulkx1mh5S36YxE+kMfKsNKgzpFdgIQRRQHNKTRweEWDXltZpkgP72g/FQHYrGZAwzzRHm073kelv/M2DmdRg9rrw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708554615; c=relaxed/simple;
+	bh=jedJ763H+n2zAH/YrGQgy+sG3IBGIVybsDMgEQtmjEU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=U1c8gSo1VUq6zVbQ58+MxR1Aqp8zk+g7/P8L8ogi/QEZowNpJKasGnUM8VLNmgBRyl774khPjr7CPljtp5IgIYVAttGCOfyJLMRKDCvgG3k1PxJwmJW6Yuv/q2pfa4jGBIc3cV2YiQiMn0lyn4rcR1vNS7+FjViE4KoSjxtRLSE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h+FDW94D; arc=fail smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708554599; x=1740090599;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=jedJ763H+n2zAH/YrGQgy+sG3IBGIVybsDMgEQtmjEU=;
+  b=h+FDW94DG7vSUcvhwO8RpshwJ4IXA9aCT19PJ0lq6HM9pT8+6E3fD4qO
+   9P4UhcOBUoned6mgflUUrxXzjSAV0J9KbtcYgy12vjjcNXznl2jkVmi9/
+   3ank/llmk1JIdrwfyLqbA8Q557mPrFbTbp4ylIhlz0bmoSVGJRWaUNw0E
+   eI0W6f1fl/YAk6i79gCcBoFOkuQ5CdYhitU2ah+G7wh8Cg7TcOwmOcsYy
+   ErCQyOVIa+r1Ys170l42/S2mNugu0lPRkM0SaP34Mamc9sdrpBN9Sc0vF
+   oU4Qf/wXi5bHb14TivvbSM3aK+yp4WflHPjdKU+grhfaZ1Htn3bdCy0cJ
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10991"; a="2608259"
+X-IronPort-AV: E=Sophos;i="6.06,176,1705392000"; 
+   d="scan'208";a="2608259"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2024 14:29:47 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10991"; a="913388283"
+X-IronPort-AV: E=Sophos;i="6.06,176,1705392000"; 
+   d="scan'208";a="913388283"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmsmga002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 21 Feb 2024 14:29:29 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 21 Feb 2024 14:29:28 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 21 Feb 2024 14:29:27 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 21 Feb 2024 14:29:27 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 21 Feb 2024 14:29:24 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=g2lVN8Ss97HRFENz0BGI4oUOtveD275K7XgoEclx6cPrNHIIMV9iuCBEy8/93J7vh5wKKomxfvBuTyX+gH33hoU14UAC9I6zKUSiopBVrEVeG7Bl8A1L0B0gGDhHY9rQHWm01wZGii1XNApfRUyI69JST6YEVLgrk0EEzJHzCzfxBe0O9UoazjavCtmrHpjxb82FZ+gitAa7kebkjESX/usGz45P14IeKccbAub4oRTwohY03x0f7T56o1wrQi/9tyxkOoI10a69Z+PlU6OeRdxIpAfwSTn+68oTBPwDXhGts/l7dYpdsnQnDJqzb+BJV2tNPnhkpT5KOQi2MQq0+Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dPBJynopR5c9zE5Vk4aH27gd0dplLoxS6ZGUOXGlWkg=;
+ b=MsYLB/Ny5/Xhf5k3ZUcJLOVxlq4t7QSm3fsYwg+RTgInCt0GOyTQGImem7R14/aFhaNMa3Ppe+VNpT7iU2xp55xKyOTitZ+7nJz9Ud9O4zhNB+WqCXqwad+cFSlzII6qK5ae/YxKiqlcBynSclZjgasDO5Ok1/Y2mJo4mgdv19C3v/sYhvKXATVmmVEKq8bV2CgKn67letpN+7vZFkgpU2N1fxIBkxIUWd08DMC95hIie0eQZOuhnzzymaFxb5l3S5GEmkI2WTUNKBM28Lp6MBQGOAJYojnZ9Q/z+6W7t4BI8e0zhGsUi+DAdwn7EFp9R0il826yikgFp1OaVUirJQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by BL1PR11MB5271.namprd11.prod.outlook.com (2603:10b6:208:31a::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.22; Wed, 21 Feb
+ 2024 22:29:23 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::b383:e86d:874:245a]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::b383:e86d:874:245a%5]) with mapi id 15.20.7339.007; Wed, 21 Feb 2024
+ 22:29:23 +0000
+From: "Keller, Jacob E" <jacob.e.keller@intel.com>
+To: Jiri Pirko <jiri@resnulli.us>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+	<pabeni@redhat.com>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "swarupkotikalapudi@gmail.com"
+	<swarupkotikalapudi@gmail.com>, "donald.hunter@gmail.com"
+	<donald.hunter@gmail.com>, "sdf@google.com" <sdf@google.com>,
+	"lorenzo@kernel.org" <lorenzo@kernel.org>, "alessandromarcolini99@gmail.com"
+	<alessandromarcolini99@gmail.com>
+Subject: RE: [patch net-next v2 0/3] tools: ynl: couple of cmdline
+ enhancements
+Thread-Topic: [patch net-next v2 0/3] tools: ynl: couple of cmdline
+ enhancements
+Thread-Index: AQHaZN5HLbveXnfUIU69FZv/DjU6jLEVYPVg
+Date: Wed, 21 Feb 2024 22:29:22 +0000
+Message-ID: <CO1PR11MB508993726E942F2638B1A0C2D6572@CO1PR11MB5089.namprd11.prod.outlook.com>
+References: <20240221155415.158174-1-jiri@resnulli.us>
+In-Reply-To: <20240221155415.158174-1-jiri@resnulli.us>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CO1PR11MB5089:EE_|BL1PR11MB5271:EE_
+x-ms-office365-filtering-correlation-id: 53881cc1-8d2c-46be-5e81-08dc332c8dc8
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: EkIGuT1kvJenVg3ZB8Eabeh5dEU4NEK/qPR+Eb/fV3yHmkYX6Tz3ZEn1DYXKgQq/poJiUxzcZXU3SobC1aPd9NGfgfYxKcY9nZzlgn45pZUA8/05PFYjU7H/0zvpW85m88gfcZP9GHettO2tX5SzYjyeTl6MjEjcr/gopiW6dbSPVpENHm/7s0Zkmy9JewXWishVQYHfGhPW7BMySqbVSa3CYDs4lmCXhAUuulkwZqeMHwwqbDDhoQz/4zyUOEMC5+F0ljvwOTiQJp5ZSgVArLUw8i7iVa/EHrcD8fWCxQ0Bq4peMshYtCCQFJd0m/eFM3sNWvvB2cSrHOTyrdOwD0ikBK9o6eYdRW8H+M0eNG5cgMph5aQ3YA5aqNKUbsrFYwoGw3mRLjz+3yqiAjYq3SJH0XMGmnCJTFtpVUMXWXqdfy0Wp/BJw2FBySM/ZX3KdJIRlIbxAES9f7rCJtUBPo+BnfSgMCXdtprr4RN20gDu/kPulqs9OpPvdXdzU4uwR9DKgtM2IiL5MNRls/1VRJCaq2hvy2Jtm4TeqnU71w7Lmrdtq32W8lD76MW5w6LS3R3yepEcYnnu6+9rIM10cIOJnpxVwhx5OL6tzJV50WQ=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?V3pAgNm3693tqfunYiQt9G5thkvV4pLO0pBB/hUoL2uf2pYSgIRV7qIhRxEO?=
+ =?us-ascii?Q?Ajh5KDMb0XNJcaLl0/1k9+wkBmwooppK7a2QJ1AwxNO9MxLyf3f6c1RImp+O?=
+ =?us-ascii?Q?fQRu5dTqkSB3dzsOBHSmpkP//synkzWo7IdtT/PHov8HWCZoTuACnzdtG6WX?=
+ =?us-ascii?Q?uSx2ABh84ZfiWtOaawKIpfuKh++1aiTVVN8ibEuz1+IW0dHS2ginc1112GHC?=
+ =?us-ascii?Q?xFLZdXIgSMB49gsoV1efueZDgHW+QkQtfxcd4ISSECHjEqBh/GEDqV6qbhiv?=
+ =?us-ascii?Q?7I7q0EMe1IXOMxGdD+8PiY8p78QwDQ32aCNmfRX7An698vkixmiD5zCdNj7v?=
+ =?us-ascii?Q?35ObPmIrf6STP+9LbCFR1B8n6N6Qq2IkCfWwNlAryOYmpHnZ1jr2CFNsDFDu?=
+ =?us-ascii?Q?8ozl5mmuZSrCSU6LX0SfheM1UwP86ZQJApzaRqCpoRzxiTolmFWrg9odQ0l4?=
+ =?us-ascii?Q?qtsD0f2fi2EMghK48ToQNBcahWpKwd2seRgdcYzcOrQtB6LMmOElZNhmgFV7?=
+ =?us-ascii?Q?4Er+NEXWQ7k2BIJP1u6dLr/ngULyBlUDx59x6nLIt6Q+4HIKY/2S8BEnthmh?=
+ =?us-ascii?Q?l996LFk/CtnleW3UijeZmoKoEztxBapfd1Q22HjoZHv1w5khdkGQwFzW9y+G?=
+ =?us-ascii?Q?YHjr1AXQrkwJ0/0bo5EOpguwkWfpl+7VxfryP47Wqw7EFTDDFyfpKKO5ge1h?=
+ =?us-ascii?Q?IuHo4ICg+ThUrpgBg0lJEyR6j3k1ZoHue0mO9N52zdMBW/jQpX81z5W33i/W?=
+ =?us-ascii?Q?9Sx0sBH28RBly8rPwjoFu0Z3nTnIbO0xM6N4Wny3aBu2RA1hWbjkrXsT1xrB?=
+ =?us-ascii?Q?NgXlKB5ST4adLQCqberwvkbGa2D0JSdJ0p4GhSvWlPdyqmO/jIAOhCyq7cRu?=
+ =?us-ascii?Q?3sdT6dNQ0bksYK/OCmI0E9WaGKdD3vOGgW4FDyNwL4xf82NlLtZRWz1SyxyH?=
+ =?us-ascii?Q?T+r+ZAwv+6nwzyC4I9u1luW2rPf2BXm//tBRLqRyuEySlYzPGYtdqzcaHfgi?=
+ =?us-ascii?Q?RO+rZSvIemg/CPejJdvtf5+Z28YWVvcmyayO9pU+U5WfBgIoAhNSX9z/bNfk?=
+ =?us-ascii?Q?h5tZ/l+xunR2luMxtRxg1SLc39iQ363cJOnWeUsDdzFun7+1dh3vIHHFHhDD?=
+ =?us-ascii?Q?jEhXFXobF2r6rbK8EO3FQFXVxxbN7bpn968IAn8Kghmas6FaV8ytyh0bU2NH?=
+ =?us-ascii?Q?p1H9FELws6UJZsv7sqYhp7l4777LV4k50h7zN6C5TK6HLxP/7rpReohMVA33?=
+ =?us-ascii?Q?p6gx/iBz6ccwqwStlCp+akLRyJqb1Fuw8+9JBQRgbXPe0mDoMwlnpgrTzt+5?=
+ =?us-ascii?Q?AfDOJh9iaWcjoOtBoHnEydDWzdw1GTVoy/+2HMafBiQfbMw4MXW/oxWMXw2C?=
+ =?us-ascii?Q?AU7lSriDpw1y4sA32VhnFbzi+PLXO/WvGFLltToJOgTDBCu7+j9XgkKloult?=
+ =?us-ascii?Q?V0j19wgooVFmPHkOLo6OrSrEAFYzNg7PJPw/SRjCSY8eM5fdOsY/D3O13Bzs?=
+ =?us-ascii?Q?wO14oic9dlD+8Z6fiZrRliQNOs4fFkaKy9WHJfbnYxxPSneCjfcUI/J4xrY1?=
+ =?us-ascii?Q?9mtUmMiBtp49FLuYAiiOj75dnIMTgeeLqgEi4VYE?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=16148; i=keescook@chromium.org;
- h=from:subject:message-id; bh=pa5Z+uBclcJYOCWRkd6dTXtdqIPb2r/DIN+9qv6jtwA=;
- b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBl1niM+qLE1sZgSeQZN/Ffj4YsvYlFuKYV30O/C
- OZh0IfH4RCJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZdZ4jAAKCRCJcvTf3G3A
- Jvn5D/4jUWz2+YQ2yHEV7LdUqn8Aky5FBZumDSi0QgUlZ4ikQratuBkPAEt9cEzT3v5tMiOJUUT
- YvwSzhXBxWYK5WB26+C8rt48IOeX2yXkiE3DrGJ74WR9vCWCUHHLwgA2cbI7yRywO+ojsmhnLXj
- VpWH0QbUUwKFiO6hUUQ3zEmb3hTSJLv2UI58nKRexMSqvQ6BTrIAGtb0HZw00FwoMJ3HmTACZ0x
- JSpuy/7cHEWn1mB1aj2ZyEW+TEH2IErpU2bzBDwNd8o0/TLcknUi2XcySlJkEmADdbAitxvMWjH
- TD2zoxvYWylEgrMx/UZuUduBHyK+5OVl/1EKBnHJW+bC9l68//MlOfi31eyR34OTZxauPJ8jRrl
- ars0eD/vn8pob9LPLiykapI4xi3gZUbY1d9hOfhiO4NhsAAOitgHqDUPRUccZyzVczWfAeZe89a
- ZYRHVEOQ9f+1oMXd3uRpc6UpxzbADOQ7yJsjnbny4PblgYu30qtfC2udURWge3Q0awm6slvLGms
- va8o65JywW/Ny11VQA4yimFVmtU32j2R2XmX9fa+N6eKLobfS+1Bk3MLD6lLA4FYNQkS7LakvXZ
- RRCzfXmfC6RgcrY5EjlEsZ7Ll93XB+i5EEACY8B0ddpB2mHPEcImumli3GJCRW7sSlag5cEz1Fr
- lyJduz mpgBm2OaQ==
-X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 53881cc1-8d2c-46be-5e81-08dc332c8dc8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Feb 2024 22:29:22.9645
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: V8KN0Mk+dAy2ITTFJrXOg113GV2u9X1nJQGcxwBz7x0eXTYT7IijUYuSa3nBVVYHwaZBLu2lC8jGzkFHoBLYIBpZU7G8N0MIp8bQYmDHtvQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB5271
+X-OriginatorOrg: intel.com
 
-Replace deprecated 0-length array in struct bpf_lpm_trie_key with
-flexible array. Found with GCC 13:
 
-../kernel/bpf/lpm_trie.c:207:51: warning: array subscript i is outside array bounds of 'const __u8[0]' {aka 'const unsigned char[]'} [-Warray-bounds=]
-  207 |                                        *(__be16 *)&key->data[i]);
-      |                                                   ^~~~~~~~~~~~~
-../include/uapi/linux/swab.h:102:54: note: in definition of macro '__swab16'
-  102 | #define __swab16(x) (__u16)__builtin_bswap16((__u16)(x))
-      |                                                      ^
-../include/linux/byteorder/generic.h:97:21: note: in expansion of macro '__be16_to_cpu'
-   97 | #define be16_to_cpu __be16_to_cpu
-      |                     ^~~~~~~~~~~~~
-../kernel/bpf/lpm_trie.c:206:28: note: in expansion of macro 'be16_to_cpu'
-  206 |                 u16 diff = be16_to_cpu(*(__be16 *)&node->data[i]
-^
-      |                            ^~~~~~~~~~~
-In file included from ../include/linux/bpf.h:7:
-../include/uapi/linux/bpf.h:82:17: note: while referencing 'data'
-   82 |         __u8    data[0];        /* Arbitrary size */
-      |                 ^~~~
 
-And found at run-time under CONFIG_FORTIFY_SOURCE:
+> -----Original Message-----
+> From: Jiri Pirko <jiri@resnulli.us>
+> Sent: Wednesday, February 21, 2024 7:54 AM
+> To: netdev@vger.kernel.org
+> Cc: kuba@kernel.org; pabeni@redhat.com; davem@davemloft.net;
+> edumazet@google.com; Keller, Jacob E <jacob.e.keller@intel.com>;
+> swarupkotikalapudi@gmail.com; donald.hunter@gmail.com; sdf@google.com;
+> lorenzo@kernel.org; alessandromarcolini99@gmail.com
+> Subject: [patch net-next v2 0/3] tools: ynl: couple of cmdline enhancemen=
+ts
+>=20
+> From: Jiri Pirko <jiri@nvidia.com>
+>=20
+> This is part of the original "netlink: specs: devlink: add the rest of
+> missing attribute definitions" set which was rejected [1]. These three
+> patches enhances the cmdline user comfort, allowing to pass flag
+> attribute with bool values and enum names instead of scalars.
+>=20
+> [1] https://lore.kernel.org/all/20240220181004.639af931@kernel.org/
+>=20
 
-  UBSAN: array-index-out-of-bounds in kernel/bpf/lpm_trie.c:218:49
-  index 0 is out of range for type '__u8 [*]'
+This series looks straight forward to me.
 
-Changing struct bpf_lpm_trie_key is difficult since has been used by
-userspace. For example, in Cilium:
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 
-	struct egress_gw_policy_key {
-	        struct bpf_lpm_trie_key lpm_key;
-	        __u32 saddr;
-	        __u32 daddr;
-	};
-
-While direct references to the "data" member haven't been found, there
-are static initializers what include the final member. For example,
-the "{}" here:
-
-        struct egress_gw_policy_key in_key = {
-                .lpm_key = { 32 + 24, {} },
-                .saddr   = CLIENT_IP,
-                .daddr   = EXTERNAL_SVC_IP & 0Xffffff,
-        };
-
-To avoid the build time and run time warnings seen with a 0-sized
-trailing array for struct bpf_lpm_trie_key, introduce a new struct
-that correctly uses a flexible array for the trailing bytes,
-struct bpf_lpm_trie_key_u8. As part of this, include the "header"
-portion (which is just the "prefixlen" member), so it can be used
-by anything building a bpf_lpr_trie_key that has trailing members that
-aren't a u8 flexible array (like the self-test[1]), which is named
-struct bpf_lpm_trie_key_hdr.
-
-Unfortunately, C++ refuses to parse the __struct_group() helper, so
-it is not possible to define struct bpf_lpm_trie_key_hdr directly in
-struct bpf_lpm_trie_key_u8, so we must open-code the union directly.
-
-Adjust the kernel code to use struct bpf_lpm_trie_key_u8 through-out,
-and for the selftest to use struct bpf_lpm_trie_key_hdr. Add a comment
-to the UAPI header directing folks to the two new options.
-
-Link: https://lore.kernel.org/all/202206281009.4332AA33@keescook/ [1]
-Reported-by: Mark Rutland <mark.rutland@arm.com>
-Closes: https://paste.debian.net/hidden/ca500597/
-Acked-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
-Cc: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Alexei Starovoitov <ast@kernel.org>
-Cc: Andrii Nakryiko <andrii@kernel.org>
-Cc: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Song Liu <song@kernel.org>
-Cc: Yonghong Song <yhs@fb.com>
-Cc: John Fastabend <john.fastabend@gmail.com>
-Cc: KP Singh <kpsingh@kernel.org>
-Cc: Stanislav Fomichev <sdf@google.com>
-Cc: Hao Luo <haoluo@google.com>
-Cc: Jiri Olsa <jolsa@kernel.org>
-Cc: Mykola Lysenko <mykolal@fb.com>
-Cc: Shuah Khan <shuah@kernel.org>
-Cc: Haowen Bai <baihaowen@meizu.com>
-Cc: bpf@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org
-v5- remove __struct_group() usage, which C++ appears to be allergic to.
-v4- https://lore.kernel.org/lkml/20240220185421.it.949-kees@kernel.org/
-v3- https://lore.kernel.org/lkml/20240219234121.make.373-kees@kernel.org/
-v2- https://lore.kernel.org/lkml/20240216235536.it.234-kees@kernel.org/
-v1- https://lore.kernel.org/lkml/20230204183241.never.481-kees@kernel.org/
----
- Documentation/bpf/map_lpm_trie.rst            |  2 +-
- include/uapi/linux/bpf.h                      | 19 +++++++++++++++++-
- kernel/bpf/lpm_trie.c                         | 20 +++++++++----------
- samples/bpf/map_perf_test_user.c              |  2 +-
- samples/bpf/xdp_router_ipv4_user.c            |  2 +-
- tools/include/uapi/linux/bpf.h                | 15 +++++++++++++-
- .../selftests/bpf/progs/map_ptr_kern.c        |  2 +-
- tools/testing/selftests/bpf/test_lpm_map.c    | 18 ++++++++---------
- 8 files changed, 55 insertions(+), 25 deletions(-)
-
-diff --git a/Documentation/bpf/map_lpm_trie.rst b/Documentation/bpf/map_lpm_trie.rst
-index 74d64a30f500..f9cd579496c9 100644
---- a/Documentation/bpf/map_lpm_trie.rst
-+++ b/Documentation/bpf/map_lpm_trie.rst
-@@ -17,7 +17,7 @@ significant byte.
- 
- LPM tries may be created with a maximum prefix length that is a multiple
- of 8, in the range from 8 to 2048. The key used for lookup and update
--operations is a ``struct bpf_lpm_trie_key``, extended by
-+operations is a ``struct bpf_lpm_trie_key_u8``, extended by
- ``max_prefixlen/8`` bytes.
- 
- - For IPv4 addresses the data length is 4 bytes
-diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-index 754e68ca8744..2241d894f952 100644
---- a/include/uapi/linux/bpf.h
-+++ b/include/uapi/linux/bpf.h
-@@ -77,12 +77,29 @@ struct bpf_insn {
- 	__s32	imm;		/* signed immediate constant */
- };
- 
--/* Key of an a BPF_MAP_TYPE_LPM_TRIE entry */
-+/* Deprecated: use struct bpf_lpm_trie_key_u8 (when the "data" member is needed for
-+ * byte access) or struct bpf_lpm_trie_key_hdr (when using an alternative type for
-+ * the trailing flexible array member) instead.
-+ */
- struct bpf_lpm_trie_key {
- 	__u32	prefixlen;	/* up to 32 for AF_INET, 128 for AF_INET6 */
- 	__u8	data[0];	/* Arbitrary size */
- };
- 
-+/* Header for bpf_lpm_trie_key structs */
-+struct bpf_lpm_trie_key_hdr {
-+	__u32	prefixlen;
-+};
-+
-+/* Key of an a BPF_MAP_TYPE_LPM_TRIE entry, with trailing byte array. */
-+struct bpf_lpm_trie_key_u8 {
-+	union {
-+		struct bpf_lpm_trie_key_hdr	hdr;
-+		__u32				prefixlen;
-+	};
-+	__u8	data[];		/* Arbitrary size */
-+};
-+
- struct bpf_cgroup_storage_key {
- 	__u64	cgroup_inode_id;	/* cgroup inode id */
- 	__u32	attach_type;		/* program attach type (enum bpf_attach_type) */
-diff --git a/kernel/bpf/lpm_trie.c b/kernel/bpf/lpm_trie.c
-index b32be680da6c..050fe1ebf0f7 100644
---- a/kernel/bpf/lpm_trie.c
-+++ b/kernel/bpf/lpm_trie.c
-@@ -164,13 +164,13 @@ static inline int extract_bit(const u8 *data, size_t index)
-  */
- static size_t longest_prefix_match(const struct lpm_trie *trie,
- 				   const struct lpm_trie_node *node,
--				   const struct bpf_lpm_trie_key *key)
-+				   const struct bpf_lpm_trie_key_u8 *key)
- {
- 	u32 limit = min(node->prefixlen, key->prefixlen);
- 	u32 prefixlen = 0, i = 0;
- 
- 	BUILD_BUG_ON(offsetof(struct lpm_trie_node, data) % sizeof(u32));
--	BUILD_BUG_ON(offsetof(struct bpf_lpm_trie_key, data) % sizeof(u32));
-+	BUILD_BUG_ON(offsetof(struct bpf_lpm_trie_key_u8, data) % sizeof(u32));
- 
- #if defined(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS) && defined(CONFIG_64BIT)
- 
-@@ -229,7 +229,7 @@ static void *trie_lookup_elem(struct bpf_map *map, void *_key)
- {
- 	struct lpm_trie *trie = container_of(map, struct lpm_trie, map);
- 	struct lpm_trie_node *node, *found = NULL;
--	struct bpf_lpm_trie_key *key = _key;
-+	struct bpf_lpm_trie_key_u8 *key = _key;
- 
- 	if (key->prefixlen > trie->max_prefixlen)
- 		return NULL;
-@@ -309,7 +309,7 @@ static long trie_update_elem(struct bpf_map *map,
- 	struct lpm_trie *trie = container_of(map, struct lpm_trie, map);
- 	struct lpm_trie_node *node, *im_node = NULL, *new_node = NULL;
- 	struct lpm_trie_node __rcu **slot;
--	struct bpf_lpm_trie_key *key = _key;
-+	struct bpf_lpm_trie_key_u8 *key = _key;
- 	unsigned long irq_flags;
- 	unsigned int next_bit;
- 	size_t matchlen = 0;
-@@ -437,7 +437,7 @@ static long trie_update_elem(struct bpf_map *map,
- static long trie_delete_elem(struct bpf_map *map, void *_key)
- {
- 	struct lpm_trie *trie = container_of(map, struct lpm_trie, map);
--	struct bpf_lpm_trie_key *key = _key;
-+	struct bpf_lpm_trie_key_u8 *key = _key;
- 	struct lpm_trie_node __rcu **trim, **trim2;
- 	struct lpm_trie_node *node, *parent;
- 	unsigned long irq_flags;
-@@ -536,7 +536,7 @@ static long trie_delete_elem(struct bpf_map *map, void *_key)
- 				 sizeof(struct lpm_trie_node))
- #define LPM_VAL_SIZE_MIN	1
- 
--#define LPM_KEY_SIZE(X)		(sizeof(struct bpf_lpm_trie_key) + (X))
-+#define LPM_KEY_SIZE(X)		(sizeof(struct bpf_lpm_trie_key_u8) + (X))
- #define LPM_KEY_SIZE_MAX	LPM_KEY_SIZE(LPM_DATA_SIZE_MAX)
- #define LPM_KEY_SIZE_MIN	LPM_KEY_SIZE(LPM_DATA_SIZE_MIN)
- 
-@@ -565,7 +565,7 @@ static struct bpf_map *trie_alloc(union bpf_attr *attr)
- 	/* copy mandatory map attributes */
- 	bpf_map_init_from_attr(&trie->map, attr);
- 	trie->data_size = attr->key_size -
--			  offsetof(struct bpf_lpm_trie_key, data);
-+			  offsetof(struct bpf_lpm_trie_key_u8, data);
- 	trie->max_prefixlen = trie->data_size * 8;
- 
- 	spin_lock_init(&trie->lock);
-@@ -616,7 +616,7 @@ static int trie_get_next_key(struct bpf_map *map, void *_key, void *_next_key)
- {
- 	struct lpm_trie_node *node, *next_node = NULL, *parent, *search_root;
- 	struct lpm_trie *trie = container_of(map, struct lpm_trie, map);
--	struct bpf_lpm_trie_key *key = _key, *next_key = _next_key;
-+	struct bpf_lpm_trie_key_u8 *key = _key, *next_key = _next_key;
- 	struct lpm_trie_node **node_stack = NULL;
- 	int err = 0, stack_ptr = -1;
- 	unsigned int next_bit;
-@@ -703,7 +703,7 @@ static int trie_get_next_key(struct bpf_map *map, void *_key, void *_next_key)
- 	}
- do_copy:
- 	next_key->prefixlen = next_node->prefixlen;
--	memcpy((void *)next_key + offsetof(struct bpf_lpm_trie_key, data),
-+	memcpy((void *)next_key + offsetof(struct bpf_lpm_trie_key_u8, data),
- 	       next_node->data, trie->data_size);
- free_stack:
- 	kfree(node_stack);
-@@ -715,7 +715,7 @@ static int trie_check_btf(const struct bpf_map *map,
- 			  const struct btf_type *key_type,
- 			  const struct btf_type *value_type)
- {
--	/* Keys must have struct bpf_lpm_trie_key embedded. */
-+	/* Keys must have struct bpf_lpm_trie_key_u8 embedded. */
- 	return BTF_INFO_KIND(key_type->info) != BTF_KIND_STRUCT ?
- 	       -EINVAL : 0;
- }
-diff --git a/samples/bpf/map_perf_test_user.c b/samples/bpf/map_perf_test_user.c
-index d2fbcf963cdf..07ff471ed6ae 100644
---- a/samples/bpf/map_perf_test_user.c
-+++ b/samples/bpf/map_perf_test_user.c
-@@ -370,7 +370,7 @@ static void run_perf_test(int tasks)
- 
- static void fill_lpm_trie(void)
- {
--	struct bpf_lpm_trie_key *key;
-+	struct bpf_lpm_trie_key_u8 *key;
- 	unsigned long value = 0;
- 	unsigned int i;
- 	int r;
-diff --git a/samples/bpf/xdp_router_ipv4_user.c b/samples/bpf/xdp_router_ipv4_user.c
-index 9d41db09c480..266fdd0b025d 100644
---- a/samples/bpf/xdp_router_ipv4_user.c
-+++ b/samples/bpf/xdp_router_ipv4_user.c
-@@ -91,7 +91,7 @@ static int recv_msg(struct sockaddr_nl sock_addr, int sock)
- static void read_route(struct nlmsghdr *nh, int nll)
- {
- 	char dsts[24], gws[24], ifs[16], dsts_len[24], metrics[24];
--	struct bpf_lpm_trie_key *prefix_key;
-+	struct bpf_lpm_trie_key_u8 *prefix_key;
- 	struct rtattr *rt_attr;
- 	struct rtmsg *rt_msg;
- 	int rtm_family;
-diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
-index 7f24d898efbb..76b1b41c0dce 100644
---- a/tools/include/uapi/linux/bpf.h
-+++ b/tools/include/uapi/linux/bpf.h
-@@ -8,6 +8,7 @@
- #ifndef _UAPI__LINUX_BPF_H__
- #define _UAPI__LINUX_BPF_H__
- 
-+#include <linux/stddef.h>
- #include <linux/types.h>
- #include <linux/bpf_common.h>
- 
-@@ -77,12 +78,24 @@ struct bpf_insn {
- 	__s32	imm;		/* signed immediate constant */
- };
- 
--/* Key of an a BPF_MAP_TYPE_LPM_TRIE entry */
-+/* Deprecated: use struct bpf_lpm_trie_key_u8 (when the "data" member is needed for
-+ * byte access) or struct bpf_lpm_trie_key_hdr (when using an alternative type for
-+ * the trailing flexible array member) instead.
-+ */
- struct bpf_lpm_trie_key {
- 	__u32	prefixlen;	/* up to 32 for AF_INET, 128 for AF_INET6 */
- 	__u8	data[0];	/* Arbitrary size */
- };
- 
-+/* Key of an a BPF_MAP_TYPE_LPM_TRIE entry, with trailing byte array. */
-+struct bpf_lpm_trie_key_u8 {
-+	__struct_group(bpf_lpm_trie_key_hdr, hdr, /* no attrs */,
-+		/* up to 32 for AF_INET, 128 for AF_INET6 */
-+		__u32	prefixlen;
-+	);
-+	__u8	data[];		/* Arbitrary size */
-+};
-+
- struct bpf_cgroup_storage_key {
- 	__u64	cgroup_inode_id;	/* cgroup inode id */
- 	__u32	attach_type;		/* program attach type (enum bpf_attach_type) */
-diff --git a/tools/testing/selftests/bpf/progs/map_ptr_kern.c b/tools/testing/selftests/bpf/progs/map_ptr_kern.c
-index 3325da17ec81..efaf622c28dd 100644
---- a/tools/testing/selftests/bpf/progs/map_ptr_kern.c
-+++ b/tools/testing/selftests/bpf/progs/map_ptr_kern.c
-@@ -316,7 +316,7 @@ struct lpm_trie {
- } __attribute__((preserve_access_index));
- 
- struct lpm_key {
--	struct bpf_lpm_trie_key trie_key;
-+	struct bpf_lpm_trie_key_hdr trie_key;
- 	__u32 data;
- };
- 
-diff --git a/tools/testing/selftests/bpf/test_lpm_map.c b/tools/testing/selftests/bpf/test_lpm_map.c
-index c028d621c744..d98c72dc563e 100644
---- a/tools/testing/selftests/bpf/test_lpm_map.c
-+++ b/tools/testing/selftests/bpf/test_lpm_map.c
-@@ -211,7 +211,7 @@ static void test_lpm_map(int keysize)
- 	volatile size_t n_matches, n_matches_after_delete;
- 	size_t i, j, n_nodes, n_lookups;
- 	struct tlpm_node *t, *list = NULL;
--	struct bpf_lpm_trie_key *key;
-+	struct bpf_lpm_trie_key_u8 *key;
- 	uint8_t *data, *value;
- 	int r, map;
- 
-@@ -331,8 +331,8 @@ static void test_lpm_map(int keysize)
- static void test_lpm_ipaddr(void)
- {
- 	LIBBPF_OPTS(bpf_map_create_opts, opts, .map_flags = BPF_F_NO_PREALLOC);
--	struct bpf_lpm_trie_key *key_ipv4;
--	struct bpf_lpm_trie_key *key_ipv6;
-+	struct bpf_lpm_trie_key_u8 *key_ipv4;
-+	struct bpf_lpm_trie_key_u8 *key_ipv6;
- 	size_t key_size_ipv4;
- 	size_t key_size_ipv6;
- 	int map_fd_ipv4;
-@@ -423,7 +423,7 @@ static void test_lpm_ipaddr(void)
- static void test_lpm_delete(void)
- {
- 	LIBBPF_OPTS(bpf_map_create_opts, opts, .map_flags = BPF_F_NO_PREALLOC);
--	struct bpf_lpm_trie_key *key;
-+	struct bpf_lpm_trie_key_u8 *key;
- 	size_t key_size;
- 	int map_fd;
- 	__u64 value;
-@@ -532,7 +532,7 @@ static void test_lpm_delete(void)
- static void test_lpm_get_next_key(void)
- {
- 	LIBBPF_OPTS(bpf_map_create_opts, opts, .map_flags = BPF_F_NO_PREALLOC);
--	struct bpf_lpm_trie_key *key_p, *next_key_p;
-+	struct bpf_lpm_trie_key_u8 *key_p, *next_key_p;
- 	size_t key_size;
- 	__u32 value = 0;
- 	int map_fd;
-@@ -693,9 +693,9 @@ static void *lpm_test_command(void *arg)
- {
- 	int i, j, ret, iter, key_size;
- 	struct lpm_mt_test_info *info = arg;
--	struct bpf_lpm_trie_key *key_p;
-+	struct bpf_lpm_trie_key_u8 *key_p;
- 
--	key_size = sizeof(struct bpf_lpm_trie_key) + sizeof(__u32);
-+	key_size = sizeof(*key_p) + sizeof(__u32);
- 	key_p = alloca(key_size);
- 	for (iter = 0; iter < info->iter; iter++)
- 		for (i = 0; i < MAX_TEST_KEYS; i++) {
-@@ -717,7 +717,7 @@ static void *lpm_test_command(void *arg)
- 				ret = bpf_map_lookup_elem(info->map_fd, key_p, &value);
- 				assert(ret == 0 || errno == ENOENT);
- 			} else {
--				struct bpf_lpm_trie_key *next_key_p = alloca(key_size);
-+				struct bpf_lpm_trie_key_u8 *next_key_p = alloca(key_size);
- 				ret = bpf_map_get_next_key(info->map_fd, key_p, next_key_p);
- 				assert(ret == 0 || errno == ENOENT || errno == ENOMEM);
- 			}
-@@ -752,7 +752,7 @@ static void test_lpm_multi_thread(void)
- 
- 	/* create a trie */
- 	value_size = sizeof(__u32);
--	key_size = sizeof(struct bpf_lpm_trie_key) + value_size;
-+	key_size = sizeof(struct bpf_lpm_trie_key_hdr) + value_size;
- 	map_fd = bpf_map_create(BPF_MAP_TYPE_LPM_TRIE, NULL, key_size, value_size, 100, &opts);
- 
- 	/* create 4 threads to test update, delete, lookup and get_next_key */
--- 
-2.34.1
+> ---
+> v1->v2:
+> - only first 3 patches left, the rest it cut out
+> - see changelog of individual patches
+>=20
+> Jiri Pirko (3):
+>   tools: ynl: allow user to specify flag attr with bool values
+>   tools: ynl: process all scalar types encoding in single elif statement
+>   tools: ynl: allow user to pass enum string instead of scalar value
+>=20
+>  tools/net/ynl/lib/ynl.py | 39 ++++++++++++++++++++++++++++++---------
+>  1 file changed, 30 insertions(+), 9 deletions(-)
+>=20
+> --
+> 2.43.2
 
 
