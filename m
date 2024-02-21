@@ -1,90 +1,88 @@
-Return-Path: <netdev+bounces-73798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 544BB85E719
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 20:18:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF13D85E725
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 20:21:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01DF91F2209F
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 19:18:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E73C288903
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 19:21:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2293985C47;
-	Wed, 21 Feb 2024 19:17:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD0A285C51;
+	Wed, 21 Feb 2024 19:21:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ZMOoE3vL"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="MHDKAmz1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE93585954
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 19:17:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C3161EB26
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 19:21:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708543078; cv=none; b=dSAblMlXiYKxXT6w6U4vioEGoGMhgZAEj5FRjzQQ9Yh2x8d9Ryeb+TQRgunSn9QAxjWcCftByeV8oXAQa0MQjTKEXl6lF2ObLaYJOm4XqXPohfiu7qsQmGxwRNplUTaKP2Z4r+gwrX9gTjqN/b4Deth2TpOdkVBII/kGJn7aGVY=
+	t=1708543287; cv=none; b=ak5QyrgsaKI7jNcUi4TTG/Xk3oakOB+hrtIeSXkZ/P9TKXs8LfZaSk0e2NABz9axmWEnGs03swg/G6pkyLPo5cQnU861Di9YUeDmFTBj5oP7Ai5kfjqB9lxXib+vMe3mSEClqeTWDciYDA+uiv41NRbu2jDeHWgzrGB4jrOYZv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708543078; c=relaxed/simple;
-	bh=M0FDvNe5gdx4GV6MSGP6C/r0ckrzasd1+5u7VS+D/BA=;
+	s=arc-20240116; t=1708543287; c=relaxed/simple;
+	bh=HdMlqULDtWlIMNZNUW7ZLf3uCtFoVG1nSKFK9mt9pBE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DOILaKpg2GCyo1VQRfSDGvy2okn6VITJfXievzCjCil3miJ8wN4f6xxwaGiVvV5KtyQIq1Hk6C68kaTEOIib5UAjnRfSQmWn9fGIDF6Wjj+vhDEIzLd20vpndCd5UfnGEv3UCtwYDl0UtlSvnTf2/FVxJjKoTijuvywsTlZd/YU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ZMOoE3vL; arc=none smtp.client-ip=209.85.214.169
+	 Content-Type:Content-Disposition:In-Reply-To; b=qrxPfrzK+ubonCLpFBRP7/CNMzMQMYai3c9Ta7LWIl48q4xc0hwgeqZyTU01AzoEYB0XFP0yoyeRJ13fWF/pP6UkabJbIYnGzZ/BZDjL3BDuqVI26bEJggNO4KlFiDnudCQabKOMjUbyhoiAkiuK/vqcQ5EGLnZuWdYJB4kP4CA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=MHDKAmz1; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1d746ce7d13so49117305ad.0
-        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 11:17:56 -0800 (PST)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1dc139ed11fso981425ad.0
+        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 11:21:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1708543076; x=1709147876; darn=vger.kernel.org;
+        d=fastly.com; s=google; t=1708543286; x=1709148086; darn=vger.kernel.org;
         h=user-agent:in-reply-to:content-disposition:mime-version:references
          :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xPyGME1+D4Rx5RWLjxT2dahKKgtER+x9+Q9YDDK3GZ8=;
-        b=ZMOoE3vL80Ynwz2ejJBBIbOsOmXSZcJJ7PjQrw2q4tyf8FCHLvgVYqKJjSr+svi30K
-         s6oxbob2r0lxbnWcTKWCcCI+tseFhnxQ6+y3LdjVHNPDbsRMMJ0HqMLLFb/BToWchOdS
-         HqLjXCJ+3LjPj9x4yJDcDODaTCzHUCPTFuKmM=
+        bh=pXnITZvZmNDkzIIUT13S2TkCGR7EbwncViIWo1TLK1U=;
+        b=MHDKAmz1/Yb+kd13xNWPObHRCX0F6NVs2stJpkhXl0fDqbEtzcHn/HuVTi7+HrFQH4
+         bRcQLbg1fu5khTIZwPdVGGlMgc0T5XJlXi6SmYT8amLqWITTQWrfPIhnCYAYOFzPIu+9
+         MBjSgKMmhOceS8hq9G6I4bp5GqYBUYxI/mUb8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708543076; x=1709147876;
+        d=1e100.net; s=20230601; t=1708543286; x=1709148086;
         h=user-agent:in-reply-to:content-disposition:mime-version:references
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xPyGME1+D4Rx5RWLjxT2dahKKgtER+x9+Q9YDDK3GZ8=;
-        b=SiuWwBk6PHXzDGPqnfno6hSzeiSvjCFVP7+HPeDJVfzoVEwZJXLXhAbrtT01MhzpSw
-         scoyL/lBf0v+rGo0TeRSiXVImL7JhOrm1hMu1OnRRDb6H33FSLzsIg4ppSOxnQ3yrATC
-         6XyFbWs8X2wKjm91oG+nd9O+5nSO5ruARNej7AIIc3hz6OF6F+QvlC/ZjemX3a/WQot2
-         dZKOeHRk7S9DsX26mg3sn6QQereUkR9AfAwXa4HX22nxlJXplxG9p7F8O78VfxvAdORy
-         3C+Bx5h5UNTbsMe+ehK4WHzX4AjvfB1+atAbbcYXDErNM5+8GQ+rhAqMdKnNgi1vGKTJ
-         DlBQ==
-X-Gm-Message-State: AOJu0YyQi5lGnbCyKntLx/XoWrzMPEeTbTfNWZCgo2rQpMmxP9wcyWjH
-	JL2vf3wr3XwvLMvVpdSF2IQZwQeQC4b9pUtsAZkbCXog4FEfow600ID8qWeLD1FC3cgRg2Xc57K
-	r
-X-Google-Smtp-Source: AGHT+IHQ43TQqS81oq7BxL4LKPXRytHQQhnbBClXNRp3eXg0/eCkjOfuROs7YtvYUWtReCcYtmoQVg==
-X-Received: by 2002:a17:903:1ca:b0:1db:aab5:1db5 with SMTP id e10-20020a17090301ca00b001dbaab51db5mr19811932plh.42.1708543076046;
-        Wed, 21 Feb 2024 11:17:56 -0800 (PST)
+        bh=pXnITZvZmNDkzIIUT13S2TkCGR7EbwncViIWo1TLK1U=;
+        b=p7+CmQFzwLjmyuCdzfYtzPTQrlFS5t12XqtC7FF1RRuClt3y+RKmIU+3tDngy4DeFH
+         iK7xMFX8idxbU3Yzb+M0c4d1HBGT2BNlB+2u8WZURO193GwcqCcnA9Ud/hzQlZJLjKQ0
+         YOe+uHh80NvuDStlpic3jbD3VelJjUq03Ytwk2Cjlq+MbUDUecnTqURID22S+/itFm03
+         0N+ElwIOo9Vl8knD0uWpzXQcgDq/EPCKzBukxid/QDJj9t/lk5YeaAWHghtvBBxkrZvP
+         LU9ZafQ+XN1Kk6CYNfhK0l+XRyCMBkjGk+HGrpMd8lrVImsePJI1yK3Wt2WI4MeTMgQW
+         hF0A==
+X-Gm-Message-State: AOJu0Yy+nRLqmYzrz6I9tjjCAFgDGByclf0+mlsYKogOfd8L4fQAUK+3
+	5rMZdM9u6k1r+eP2Mi/hVi5wrBymQ0wwGcusaPHxGT5uSkQcsx/zaQxRftGrJokD22+dAfckc8Z
+	F
+X-Google-Smtp-Source: AGHT+IGtN7O8EGpAOM8aCGfwjiEkAjhIsJvLzLczA2g8N3YOnpuTvrMrg8bQvLaQGzKdYPvc7EB71w==
+X-Received: by 2002:a17:902:e805:b0:1dc:1db2:f60d with SMTP id u5-20020a170902e80500b001dc1db2f60dmr606057plg.2.1708543285751;
+        Wed, 21 Feb 2024 11:21:25 -0800 (PST)
 Received: from fastly.com (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id bj11-20020a170902850b00b001dc3916853csm1143816plb.73.2024.02.21.11.17.54
+        by smtp.gmail.com with ESMTPSA id kg3-20020a170903060300b001dbbd4ee1f6sm8441720plb.11.2024.02.21.11.21.24
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 21 Feb 2024 11:17:55 -0800 (PST)
-Date: Wed, 21 Feb 2024 11:17:53 -0800
+        Wed, 21 Feb 2024 11:21:25 -0800 (PST)
+Date: Wed, 21 Feb 2024 11:21:23 -0800
 From: Joe Damato <jdamato@fastly.com>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Amritha Nambiar <amritha.nambiar@intel.com>,
-	Larysa Zaremba <larysa.zaremba@intel.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
 	Alexei Starovoitov <ast@kernel.org>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Subject: Re: [PATCH net-next 1/2] netdev-genl: Add ifname for queue and NAPI
- APIs
-Message-ID: <20240221191752.GA68788@fastly.com>
+	Amritha Nambiar <amritha.nambiar@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Larysa Zaremba <larysa.zaremba@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Stanislav Fomichev <sdf@google.com>,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [PATCH net-next 0/2] Expose netdev name in netdev netlink APIs
+Message-ID: <20240221192122.GB68788@fastly.com>
 References: <1708531057-67392-1-git-send-email-jdamato@fastly.com>
- <1708531057-67392-2-git-send-email-jdamato@fastly.com>
- <20240221111220.4e6b6170@kernel.org>
+ <20240221110952.43c0ae6e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,21 +91,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240221111220.4e6b6170@kernel.org>
+In-Reply-To: <20240221110952.43c0ae6e@kernel.org>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 
-On Wed, Feb 21, 2024 at 11:12:20AM -0800, Jakub Kicinski wrote:
-> On Wed, 21 Feb 2024 07:57:29 -0800 Joe Damato wrote:
-> >  	if (GENL_REQ_ATTR_CHECK(info, NETDEV_A_QUEUE_ID) ||
-> >  	    GENL_REQ_ATTR_CHECK(info, NETDEV_A_QUEUE_TYPE) ||
-> > -	    GENL_REQ_ATTR_CHECK(info, NETDEV_A_QUEUE_IFINDEX))
-> > +	    GENL_REQ_ATTR_CHECK(info, NETDEV_A_QUEUE_IFINDEX) ||
-> > +	    GENL_REQ_ATTR_CHECK(info, NETDEV_A_QUEUE_IFNAME))
+On Wed, Feb 21, 2024 at 11:09:52AM -0800, Jakub Kicinski wrote:
+> On Wed, 21 Feb 2024 07:57:28 -0800 Joe Damato wrote:
+> > Greetings:
+> > 
+> > The netdev netlink APIs currently provide the ifindex of a device
+> > associated with the NIC queue or NAPI when the netlink API is used. In
+> > order for user applications to map this back to a human readable device
+> > name, user applications must issue a subsequent ioctl (SIOCGIFNAME) in
+> > order to map an ifindex back to a device name.
 > 
-> This means user always has to provide both ifindex and ifname,
-> right?
+> To be clear, if_indextoname() is doing it, right? I wanted to be sure
+> the concern is really number of syscalls, not the difficulty in getting
+> the name.
 
-That's right. I'm OK with omitting this requirement, though. I feel like to
-your earlier point on name changes, maybe ifindex is enough as far as
-required params go.
+It seemed a bit odd to me to require the user to hit different APIs -- one
+to get the ifindex and then another to get the name. I didn't realize you
+had intentionally left the name out, though.
+
+> > This patch set adds ifname to the API so that when queue or NAPI
+> > information is retrieved, the human readable string is included. The netdev
+> > netlink YAML spec has been updated to include this field, as well.
+> > 
+> > This saves the subsequent call to ioctl and makes the netlink information
+> > more user friendly. Applications might use this information in conjunction
+> > with SO_INCOMING_NAPI_ID to map NAPI IDs to specific NICs with application
+> > specific configuration (e.g. NUMA zone and CPU layout information).
+> 
+> For context, the reason why I left the names out is that they can change
+> at any moment, but primarily because there are also altnames now:
+> 
+> 2: eth0:
+> [...]
+>     altname enp2s0np0
+> 
+> Most of the APIs try to accept altnames as well as the "main" name.
+> If we propagate the name we'll step back into the rtnetlink naming
+> mess :(
+
+OK, I see. I didn't realize this was a thing. I suppose what you are saying
+is that we wouldn't want to expose names at all and stick with ifindexes
+only, is that right?
 
