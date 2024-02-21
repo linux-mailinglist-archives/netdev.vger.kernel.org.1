@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-73581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E97885D396
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 10:31:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09EEE85D39B
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 10:31:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFA6B1C21AD4
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 09:31:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98B9EB22078
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 09:31:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4891C405FE;
-	Wed, 21 Feb 2024 09:28:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B3C94206E;
+	Wed, 21 Feb 2024 09:28:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D6FVsTD4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q9pFYzKQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6862040BED
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 09:28:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBBD741235
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 09:28:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708507706; cv=none; b=hTZ/eLvQjbt4Jg606+V8ywPW/LnD1USTB60LCMiFA90UFB1wH2SUKfWG94L9DfmQYT5eSxvD9C0fdgeXD8FcL6MjK4pCC+TD8aMcfwAWiKOb2Qx+Cpz0ko+f19jGoVVEFnEWP0OBwJTw7GoCbX2tEP/xO7xUd+wCD4n6xS5e5p8=
+	t=1708507710; cv=none; b=s+fWx+UOPtn+SbROT5rQ1lD5y9cOfcnVEDdWpJO7MkBg0ItPswvRibIJy5P4uWYiC+bY5TKNPRsUlXbEdLqA8UnRxQf8M0WqoJeG82G/idaV1vsWlgKrL3puqLZliHX2+sW/wQLQdfz3qjYDqx332r9BjHf5QkKMJhctNz1QNhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708507706; c=relaxed/simple;
-	bh=qMDq4bdbhpPxmFVNu5BAuMHikajNGQCbrs05AJS2Hgg=;
+	s=arc-20240116; t=1708507710; c=relaxed/simple;
+	bh=Mu+X+yYW4cvmC9NQvhPl5vvHTK1CoiY4aafGL8tDBao=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=sGnvArgcKVMewygydny6uqF8WIW47hWRI0nf8ee4tYXM2WyR4oXTAt/Vsf7e7Wnhs8DKA9c1Fzswg0CZkVC0XPpJhbgE6DiphLifZzEkwsF1RL2VGLGnQv/gcmqxjaCFrDOQl6uS3gzKpP0ls+g0RaK8Fk2J4kBRaXC2ieRbqNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--davidgow.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D6FVsTD4; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=ZKU9C8ts17MjiDZgSRJSkgk8sL93qiYNjKwytS314lz5njw5W/+X1qVqlLEcplo8G5fMXRhQzpiL6IugF8TJpkIslRW36r08Znn0CVLggqoVP09zOC3BS/rT79Zld2q7g2kzq6PG2e+kqc4uFG2To8hGHwZEY2beZOiFToVE0Og=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--davidgow.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q9pFYzKQ; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--davidgow.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6047a047f58so104742817b3.3
-        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 01:28:24 -0800 (PST)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5f38d676cecso89311427b3.0
+        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 01:28:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708507703; x=1709112503; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1708507708; x=1709112508; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6oh8w0yc8LvH1yvSHI8zU+2R7q+ewyvFM42Am6pdhYA=;
-        b=D6FVsTD4raEeATxpVZ6Qcyn+x0avEjJx8xgJvJ/z4iE0JjaKunjA/Z82BKNy+FzkR2
-         lp+3qO5dhnzsfc/dM+z2pECqaOjIQ8xuKlLxZGEjL601epK+6DDd3REFZfSGOt+D/HZM
-         QrcMdWaNT/FVPNhZzCaV7aYI3WB+sPL2iR3DZG4z/wBKBkUExn9I09KyWYjc1rEAjpLG
-         kauIplsgkQBLM8u9xwfvIXKs7VSVVqvEg0N0sOMlCRsSrHY+jA3+sukTBOcT88jfJ9ma
-         2xW1OkO6ZTe6kq8rb096JA8P0VnVHqwLbFWTDc2NCFK2vAaUykNlfA4u9AFqM0ob82Px
-         oggw==
+        bh=l+N/x8q0XM6q/oxl++oFE/zLIduvg/H3kbNqGrSm6L0=;
+        b=q9pFYzKQA6kltZmFbrzdKjQhTTjCVsENKULtAAj/is4cgaEBuvUDnYYrgrPATdGfB4
+         B5Izv6MUwuUJKl8ix+oHSB+9Nw+86DsOuPgccNKWV2pQ1UU1aRfLgtg4E8b90VNoCCKy
+         d7XE4OZcNf+5/3lL35N9TygGamSl6fDjeFX2mQYhPl4B8Dletz4oaSgrB9296lEPkcXY
+         sJ7UaiDAy8j1lvsSqqD8h84HPlnsMJ6pfpPEq3hrqI0dnrJAzY/ZQgR6bJ8do1phyOXO
+         257g9vZ1ZsDgd8wngEQP7Fimbkj58R5r9iMN1WDcE+juk6m2yIy+3qnnYreQC153EZsU
+         GEgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708507703; x=1709112503;
+        d=1e100.net; s=20230601; t=1708507708; x=1709112508;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6oh8w0yc8LvH1yvSHI8zU+2R7q+ewyvFM42Am6pdhYA=;
-        b=AZUaqEU3X6qEb4LyTb89o/HZa6KSm1tORNypDXmu1XC5lm9ZsCtdiwJS+2B1agfIcT
-         erBQwe6VIhBpxnaCI6Dq3jwMmQNhku0ezkqiBn22UyB9DAvy1r7N0t7ViRHaXtAsfBLa
-         Vwpk5rynbx4nIxJ7RQEhB01QShtJrAFJBnRu1fu6ZTWyDwcX+lg6EGlSl27ppvFYxmR3
-         rQJws845CPecAqMn9oQwEiKdvA2Qu+BwGRtv9t45T+4SulkzMLJWl1Le/D8AWhwd7VTQ
-         m4Hu7LayJgOfldWpGB1RRUXmweTDxXLKvh9ZdyYOxS6dC6Y9zC7NBYJ6tZJnRwbl2Bo1
-         1eRg==
-X-Forwarded-Encrypted: i=1; AJvYcCUM30ZjVCLQYsCBdBOxrErjebnNQ1bpIzUJrHvLgnKi6T5o8omxE9FbsUXg3ExssAW8ce72pl51Pge4E2WdY/PyO/dz/eRo
-X-Gm-Message-State: AOJu0Yzwwd1Jx74RZS7Yc9HMhlpeHqYoNIaeNgf2ztOMWRgKQSg/cyXb
-	ffZB96taw7tYO/nfW/qRVjT8Y6Fj37iaOTLm/k9x65QOd6u+zGkWqpWo4jMnZUUzw4qyWF3XY/o
-	YQiMgDHUlsg==
-X-Google-Smtp-Source: AGHT+IHAVxan3IBdGfT14ZlxAMIfrkzUxv01ETxOcEryam+Wji8MbAhrWelAxlNmlmHCaTgl78twQW5eAT/4hw==
+        bh=l+N/x8q0XM6q/oxl++oFE/zLIduvg/H3kbNqGrSm6L0=;
+        b=HUVCF/00EnfwznWQF5FMQEajKZg8GlcbzHYj9T3oTeU/9PKKch3vlJS7FwxeafNVxZ
+         QGTzAHrkJvClKePQ/7MQuYuXfW7pqpq+n3Vvy9PfWfUveKD8YD4FAj5zPAjbvseevKKN
+         83v7Jlw30O93VCixvtitH7ESxs8/Nz69AcsmxvulNNSMkbRhe2EjBrxzhjODUjcQY48U
+         YUDFc46L6hQI6Uzw+3B8PHQeGCA9bbJwx16fQgV8aSbmiCy9YSeuPHlDQd9Hd714T3LI
+         SVuwGa7AuyTU2ORAHhqOgzB7wCTKobZiLWJClsfKWqW1OwJV3a/I6422FAGri4Qz7Jys
+         NtBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUxsmQDsEMDaNIqR6OiG81XW5mNh+hU7p0ZI+j+QeOhSOM2NuQrU0WBekfoaMv2AQwHv5QELtT3tObfx039Hl9bMu4ADlfo
+X-Gm-Message-State: AOJu0Yy/3gg5rhVXSrSkyS1Qy63roULjaIuZT6E5vNBYDNa3qxH725tU
+	yew9+WnHZVCWdr963Js5O4n+fmrOmzLC0I6n5pjf6rdJ6EGONvGvD2WXhNjvWGjj0V5DPJlXCGq
+	O3Pjys6QmSg==
+X-Google-Smtp-Source: AGHT+IGujiTgGmrs6aB7MYtXNm4zgRA3Zr4vV9toQOw9f+upbD+oRsb+6ooQYjPHHocWRD49vELQV317edlmfg==
 X-Received: from slicestar.c.googlers.com ([fda3:e722:ac3:cc00:4f:4b78:c0a8:20a1])
- (user=davidgow job=sendgmr) by 2002:a0d:e8c4:0:b0:607:cd11:5464 with SMTP id
- r187-20020a0de8c4000000b00607cd115464mr4264994ywe.9.1708507703514; Wed, 21
- Feb 2024 01:28:23 -0800 (PST)
-Date: Wed, 21 Feb 2024 17:27:18 +0800
+ (user=davidgow job=sendgmr) by 2002:a05:6902:1081:b0:dc2:2e5c:a21d with SMTP
+ id v1-20020a056902108100b00dc22e5ca21dmr5584522ybu.6.1708507707855; Wed, 21
+ Feb 2024 01:28:27 -0800 (PST)
+Date: Wed, 21 Feb 2024 17:27:19 +0800
 In-Reply-To: <20240221092728.1281499-1-davidgow@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240221092728.1281499-1-davidgow@google.com>
 X-Mailer: git-send-email 2.44.0.rc0.258.g7320e95886-goog
-Message-ID: <20240221092728.1281499-6-davidgow@google.com>
-Subject: [PATCH 5/9] rtc: test: Fix invalid format specifier.
+Message-ID: <20240221092728.1281499-7-davidgow@google.com>
+Subject: [PATCH 6/9] net: test: Fix printf format specifier in skb_segment
+ kunit test
 From: David Gow <davidgow@google.com>
 To: Linus Torvalds <torvalds@linux-foundation.org>, Shuah Khan <skhan@linuxfoundation.org>, 
 	Guenter Roeck <linux@roeck-us.net>, Rae Moar <rmoar@google.com>, 
@@ -95,30 +96,33 @@ Cc: David Gow <davidgow@google.com>, Brendan Higgins <brendan.higgins@linux.dev>
 	linux-hardening@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-'days' is a s64 (from div_s64), and so should use a %lld specifier.
+KUNIT_FAIL() accepts a printf-style format string, but previously did
+not let gcc validate it with the __printf() attribute. The use of %lld
+for the result of PTR_ERR() is not correct.
 
-This was found by extending KUnit's assertion macros to use gcc's
-__printf attribute.
+Instead, use %pe and pass the actual error pointer. printk() will format
+it correctly (and give a symbolic name rather than a number if
+available, which should make the output more readable, too).
 
-Fixes: 1d1bb12a8b18 ("rtc: Improve performance of rtc_time64_to_tm(). Add tests.")
+Fixes: b3098d32ed6e ("net: add skb_segment kunit test")
 Signed-off-by: David Gow <davidgow@google.com>
 ---
- drivers/rtc/lib_test.c | 2 +-
+ net/core/gso_test.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/rtc/lib_test.c b/drivers/rtc/lib_test.c
-index d5caf36c56cd..225c859d6da5 100644
---- a/drivers/rtc/lib_test.c
-+++ b/drivers/rtc/lib_test.c
-@@ -54,7 +54,7 @@ static void rtc_time64_to_tm_test_date_range(struct kunit *test)
+diff --git a/net/core/gso_test.c b/net/core/gso_test.c
+index 4c2e77bd12f4..358c44680d91 100644
+--- a/net/core/gso_test.c
++++ b/net/core/gso_test.c
+@@ -225,7 +225,7 @@ static void gso_test_func(struct kunit *test)
  
- 		days = div_s64(secs, 86400);
- 
--		#define FAIL_MSG "%d/%02d/%02d (%2d) : %ld", \
-+		#define FAIL_MSG "%d/%02d/%02d (%2d) : %lld", \
- 			year, month, mday, yday, days
- 
- 		KUNIT_ASSERT_EQ_MSG(test, year - 1900, result.tm_year, FAIL_MSG);
+ 	segs = skb_segment(skb, features);
+ 	if (IS_ERR(segs)) {
+-		KUNIT_FAIL(test, "segs error %lld", PTR_ERR(segs));
++		KUNIT_FAIL(test, "segs error %pe", segs);
+ 		goto free_gso_skb;
+ 	} else if (!segs) {
+ 		KUNIT_FAIL(test, "no segments");
 -- 
 2.44.0.rc0.258.g7320e95886-goog
 
