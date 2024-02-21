@@ -1,221 +1,247 @@
-Return-Path: <netdev+bounces-73760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4E6185E387
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 17:40:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0118185E3AA
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 17:45:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C5D11F233A3
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 16:40:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B505B2236A
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 16:45:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A071839E0;
-	Wed, 21 Feb 2024 16:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7659B82D9E;
+	Wed, 21 Feb 2024 16:45:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="nxtdSMGu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="elKCfJhJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8636E1C20;
-	Wed, 21 Feb 2024 16:40:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BE7E7F7D7
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 16:45:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708533631; cv=none; b=RNCWtSRif23ZoZTN/nzgxHWUVMF2SC7dCdohrXb7SXUuwdilFhb9cRepdaGgF1k2wHw4vy2IIRGBHIMXO6F0iZov1S61WasAo4sawDAUMr0RG5ZoLhlo0u88GpeUr5R19VW+3oRSEueP0VHQLn3lqmBuNjaMIdZdRROIlCegLh4=
+	t=1708533943; cv=none; b=JM6gy441vPWWF2jRgV+wOYa/Z7DBk6AqwjZACharHogFgZl3LdrtlScbuDmWyPG6BmOIR7hBFGYdA7iRqlovGSOmyUOVUPL+WUaS1JAK8WCpgkQG3eBfTb4bfFB3/FvKVWyL5GYmRoGD8zSFDqfRVIxUEt1EX8/ssCltWE3A0YY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708533631; c=relaxed/simple;
-	bh=45I0J5biXwYLiUaf/PmqF1jvW/5x55RLPKwzjIKpH4I=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=cv1d4b7OiKxi8I++gZCzaLjaVyNnVOiHssqAUoJZSw8KH0AqrrY4AX+rpZvd+WMvVOspuyottxqI8e8lLaOwdnFFyhFsHtcMqQe0Nn0wBM94lFZ4sKnqt0d7YNK4bdDzNVjjkwb3F2m4TSQtpUwoZyHyXMY6fevY5zccHkuR/b8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=nxtdSMGu; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=iE/w7zcXxXdaU9PL76g2DzI65P5Qvx6HEpMubn6cjls=; b=nxtdSMGuBsIvBlcGsFV4q/QyMF
-	TgOVPrStsVJMCkxFJBEqMlQSHAzM+REezZFM0xOLRHPRXVSajD7AuVxjN89Gx8zV8VfQaROCuWJ9A
-	hsKvkN0wOOFwEAN6pFc8y73S6NAYPyvKNlCWQfSndtOWsQDCCadb/MAydty5bhz/Zq3BFJxoh0CIR
-	a2Ne48t1iTcE2roNaY1NWfiRbYJf8DdWNP79eI3L97P88sN1qdZL9NnF8z2INf8oE+Saj3QB2dpB0
-	ENlP8JXP2KoHERxkPQL1sRIBscnF0jK0so1z2Qi3PdIX6N417a9CoXAIjTLRVkK9YA2p0bewcxPbd
-	9aLoNtDA==;
-Received: from sslproxy07.your-server.de ([78.47.199.104])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rcpdW-0007PB-Iw; Wed, 21 Feb 2024 17:39:58 +0100
-Received: from [178.197.249.13] (helo=linux.home)
-	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rcpdU-0005ll-2a;
-	Wed, 21 Feb 2024 17:39:56 +0100
-Subject: Re: [PATCH v4] bpf: Replace bpf_lpm_trie_key 0-length array with
- flexible array
-To: Kees Cook <keescook@chromium.org>
-Cc: Mark Rutland <mark.rutland@arm.com>,
- "Gustavo A . R . Silva" <gustavoars@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
- Haowen Bai <baihaowen@meizu.com>, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Yonghong Song <yonghong.song@linux.dev>,
- Jonathan Corbet <corbet@lwn.net>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Joanne Koong <joannelkoong@gmail.com>, Yafang Shao <laoar.shao@gmail.com>,
- Kui-Feng Lee <kuifeng@meta.com>, Anton Protopopov <aspsk@isovalent.com>,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- netdev@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <20240220185421.it.949-kees@kernel.org>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <da75b2bf-0d14-6ed5-91c2-dfeba9ad55c4@iogearbox.net>
-Date: Wed, 21 Feb 2024 17:39:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1708533943; c=relaxed/simple;
+	bh=PiK6GLh5Bbli9ksKDaj+Hoj+StNAExwyesgIoPSxmmY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=p2M+Fu7YhunNAcQpTANa5VrdXu3q83WETKBYoPJilSsaVDGS3gNBzK/9hvHYyxtZVJVQ0042J954ZYkt2sG4X0LzmTd+7RzLA5c85bRaJtJZN+v+TsBekpzf63+730DmQoCy66UpPZqH/39CuMmzbyLWysHo+fCvroLlMfckmCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=elKCfJhJ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708533940;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9Aa0856KKiSIs4J8EHY0Puegx6vd1lMlKDsy7EPPIWE=;
+	b=elKCfJhJvtkdvzHSnMhHCm5ZbQ7ETgHv6zFrD0pxg5FRAQL/bfFl/1HltozLVqfX7ctOOx
+	lbbSTlYIuroKfKckfUNAzcZnzIKS/pSPJMImXkZbs6Okctu8qgFgvc+xkIGz0nRss0Gf1E
+	/5vCKsgpMF16Il8N0DkIYZaaZARyGN8=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-124-0XQUgEnKMKSAg0xrWe5OQg-1; Wed, 21 Feb 2024 11:45:39 -0500
+X-MC-Unique: 0XQUgEnKMKSAg0xrWe5OQg-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40e4478a3afso34012005e9.1
+        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 08:45:39 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708533938; x=1709138738;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9Aa0856KKiSIs4J8EHY0Puegx6vd1lMlKDsy7EPPIWE=;
+        b=ZLRhhMlPw/VZNNCAcNNrEgnfhHRoudgV+V1v+WpfWZ/wRghNp/Vlcp9rwdvDM11KiP
+         Y7fUFEKCgKHZjEWPFJpmF08/gJVaUFyN+BTBF2U/mh30bIogoMxr9RCS+G5qTfj3TtpN
+         rVBhFxUGefnZB01PECBrIO/r5VEFjxRpuEkTa4nXn11ckioDWb960mPhl5aOoPvlaBCa
+         BLjOvM9kKsastN5AibjZcbASaMA0+bZ9DVjjpo572YhyQOCHdnDaeHWAHyPepK3aFXaz
+         o8xqS5Gyuez6vntCLztz2nygIXrjVPm8efs3lJs55+lqSw1HGz4abNxqd5VOJ5oexdyd
+         ddOw==
+X-Forwarded-Encrypted: i=1; AJvYcCWeKmBhXr/m69HFV7p4rlWX5xFqE5qSl9hkSboNsuHOotSaGXRFmwyxrjRBQJi4+Hkv4+Qj6tROWgT60Lqf7Y5PgwqtBeVi
+X-Gm-Message-State: AOJu0Yw0yOCpgIuFrNP3pM918qb7Oh5Y01Al5MWjHTBx6aDddf124zJq
+	J8EOJ4J9Ucw+EIX1k074Cl4OoBRTZJ0X+Z6Azqq5T5UMb6Fm219jFPw1pg+PB0qeKrhzDAgMx4I
+	0VlNzi5xIqOmjGzZZEIIY/NBOWukWoKH3IKp/+uxqHifkk75IsA3bwQ==
+X-Received: by 2002:a05:600c:444a:b0:411:c8a7:7b09 with SMTP id v10-20020a05600c444a00b00411c8a77b09mr32785wmn.10.1708533938252;
+        Wed, 21 Feb 2024 08:45:38 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGWNC9F/v+b8Zz5OO/sN9jdb2v+iFDyGNJnulQT9iuh/19ax1wa9bZTXvgr4iAAWnO9GFiDvA==
+X-Received: by 2002:a05:600c:444a:b0:411:c8a7:7b09 with SMTP id v10-20020a05600c444a00b00411c8a77b09mr32762wmn.10.1708533937888;
+        Wed, 21 Feb 2024 08:45:37 -0800 (PST)
+Received: from vschneid-thinkpadt14sgen2i.remote.csb (213-44-141-166.abo.bbox.fr. [213.44.141.166])
+        by smtp.gmail.com with ESMTPSA id ay17-20020a05600c1e1100b004127876647fsm1867978wmb.41.2024.02.21.08.45.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Feb 2024 08:45:37 -0800 (PST)
+From: Valentin Schneider <vschneid@redhat.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: dccp@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rt-users@vger.kernel.org, "David S.
+ Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, mleitner@redhat.com, David Ahern
+ <dsahern@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, Tomas Glozar
+ <tglozar@redhat.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH v3 1/1] tcp/dcpp: Un-pin tw_timer
+In-Reply-To: <CANn89iJpwUpAROOq7+ttwTMCZu0=XhS4dgwcs44t-gb7-_ejRg@mail.gmail.com>
+References: <20240219095729.2339914-1-vschneid@redhat.com>
+ <20240219095729.2339914-2-vschneid@redhat.com>
+ <CANn89i+3-zgAkWukFavu1wgf1XG+K9U4BhJWw7H+QKwsfYL4WA@mail.gmail.com>
+ <xhsmho7cbf33q.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+ <CANn89iJpwUpAROOq7+ttwTMCZu0=XhS4dgwcs44t-gb7-_ejRg@mail.gmail.com>
+Date: Wed, 21 Feb 2024 17:45:36 +0100
+Message-ID: <xhsmhjzmxg40f.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240220185421.it.949-kees@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27192/Wed Feb 21 10:23:23 2024)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 2/20/24 7:54 PM, Kees Cook wrote:
-> Replace deprecated 0-length array in struct bpf_lpm_trie_key with
-> flexible array. Found with GCC 13:
-> 
-> ../kernel/bpf/lpm_trie.c:207:51: warning: array subscript i is outside array bounds of 'const __u8[0]' {aka 'const unsigned char[]'} [-Warray-bounds=]
->    207 |                                        *(__be16 *)&key->data[i]);
->        |                                                   ^~~~~~~~~~~~~
-> ../include/uapi/linux/swab.h:102:54: note: in definition of macro '__swab16'
->    102 | #define __swab16(x) (__u16)__builtin_bswap16((__u16)(x))
->        |                                                      ^
-> ../include/linux/byteorder/generic.h:97:21: note: in expansion of macro '__be16_to_cpu'
->     97 | #define be16_to_cpu __be16_to_cpu
->        |                     ^~~~~~~~~~~~~
-> ../kernel/bpf/lpm_trie.c:206:28: note: in expansion of macro 'be16_to_cpu'
->    206 |                 u16 diff = be16_to_cpu(*(__be16 *)&node->data[i]
-> ^
->        |                            ^~~~~~~~~~~
-> In file included from ../include/linux/bpf.h:7:
-> ../include/uapi/linux/bpf.h:82:17: note: while referencing 'data'
->     82 |         __u8    data[0];        /* Arbitrary size */
->        |                 ^~~~
-> 
-> And found at run-time under CONFIG_FORTIFY_SOURCE:
-> 
->    UBSAN: array-index-out-of-bounds in kernel/bpf/lpm_trie.c:218:49
->    index 0 is out of range for type '__u8 [*]'
-> 
-> Changing struct bpf_lpm_trie_key is difficult since has been used by
-> userspace. For example, in Cilium:
-> 
-> 	struct egress_gw_policy_key {
-> 	        struct bpf_lpm_trie_key lpm_key;
-> 	        __u32 saddr;
-> 	        __u32 daddr;
-> 	};
-> 
-> While direct references to the "data" member haven't been found, there
-> are static initializers what include the final member. For example,
-> the "{}" here:
-> 
->          struct egress_gw_policy_key in_key = {
->                  .lpm_key = { 32 + 24, {} },
->                  .saddr   = CLIENT_IP,
->                  .daddr   = EXTERNAL_SVC_IP & 0Xffffff,
->          };
-> 
-> To avoid the build time and run time warnings seen with a 0-sized
-> trailing array for struct bpf_lpm_trie_key, introduce a new struct
-> that correctly uses a flexible array for the trailing bytes,
-> struct bpf_lpm_trie_key_u8. As part of this, include the "header"
-> portion (which is just the "prefixlen" member), so it can be used
-> by anything building a bpf_lpr_trie_key that has trailing members that
-> aren't a u8 flexible array (like the self-test[1]), which is named
-> struct bpf_lpm_trie_key_hdr.
-> 
-> Adjust the kernel code to use struct bpf_lpm_trie_key_u8 through-out,
-> and for the selftest to use struct bpf_lpm_trie_key_hdr. Add a comment
-> to the UAPI header directing folks to the two new options.
-> 
-> Link: https://lore.kernel.org/all/202206281009.4332AA33@keescook/ [1]
-> Reported-by: Mark Rutland <mark.rutland@arm.com>
-> Closes: https://paste.debian.net/hidden/ca500597/
-> Acked-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-[...]
+On 20/02/24 18:42, Eric Dumazet wrote:
+> On Tue, Feb 20, 2024 at 6:38=E2=80=AFPM Valentin Schneider <vschneid@redh=
+at.com> wrote:
+>> Hm so that would indeed prevent a concurrent inet_twsk_schedule() from
+>> re-arming the timer, but in case the calls are interleaved like so:
+>>
+>>                              tcp_time_wait()
+>>                                inet_twsk_hashdance()
+>>   inet_twsk_deschedule_put()
+>>     timer_shutdown_sync()
+>>                                inet_twsk_schedule()
+>>
+>> inet_twsk_hashdance() will have left the refcounts including a count for
+>> the timer, and we won't arm the timer to clear it via the timer callback
+>> (via inet_twsk_kill()) - the patch in its current form relies on the tim=
+er
+>> being re-armed for that.
+>>
+>> I don't know if there's a cleaner way to do this, but we could catch that
+>> in inet_twsk_schedule() and issue the inet_twsk_kill() directly if we can
+>> tell the timer has been shutdown:
+>> ---
+>> diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock=
+.c
+>> index 61a053fbd329c..c272da5046bb4 100644
+>> --- a/net/ipv4/inet_timewait_sock.c
+>> +++ b/net/ipv4/inet_timewait_sock.c
+>> @@ -227,7 +227,7 @@ void inet_twsk_deschedule_put(struct inet_timewait_s=
+ock *tw)
+>>          * have already gone through {tcp,dcpp}_time_wait(), and we can =
+safely
+>>          * call inet_twsk_kill().
+>>          */
+>> -       if (del_timer_sync(&tw->tw_timer))
+>> +       if (timer_shutdown_sync(&tw->tw_timer))
+>>                 inet_twsk_kill(tw);
+>>         inet_twsk_put(tw);
+>>  }
+>> @@ -267,6 +267,10 @@ void __inet_twsk_schedule(struct inet_timewait_sock=
+ *tw, int timeo, bool rearm)
+>>                                                      LINUX_MIB_TIMEWAITE=
+D);
+>>                 BUG_ON(mod_timer(&tw->tw_timer, jiffies + timeo));
+>
+> Would not a shutdown timer return a wrong mod_timer() value here ?
+>
+> Instead of BUG_ON(), simply release the refcount ?
+>
 
-The build in BPF CI is still broken, did you try to build selftests?
+Unfortunately a shutdown timer would return the same as a non-shutdown one:
 
-   https://github.com/kernel-patches/bpf/actions/runs/7978647641
+ * Return:
+ * * %0 - The timer was inactive and started or was in shutdown
+ *	  state and the operation was discarded
 
-   [...]
-     GEN-SKEL [test_progs] linked_funcs.skel.h
-     LINK-BPF [test_progs] test_usdt.bpf.o
-     GEN-SKEL [test_progs-no_alu32] profiler1.skel.h
-     GEN-SKEL [test_progs] test_usdt.skel.h
-   In file included from /tmp/work/bpf/bpf/tools/include/uapi/linux/bpf.h:11,
-                    from test_cpp.cpp:4:
-   /tmp/work/bpf/bpf/tools/include/uapi/linux/bpf.h:92:17: error: ‘struct bpf_lpm_trie_key_u8::<unnamed union>::bpf_lpm_trie_key_hdr’ invalid; an anonymous union may only have public non-static data members [-fpermissive]
-      92 |  __struct_group(bpf_lpm_trie_key_hdr, hdr, /* no attrs */,
-         |                 ^~~~~~~~~~~~~~~~~~~~
-   /tmp/work/bpf/bpf/tools/include/uapi/linux/stddef.h:29:10: note: in definition of macro ‘__struct_group’
-      29 |   struct TAG { MEMBERS } ATTRS NAME; \
-         |          ^~~
-     BINARY   bench
-   make: *** [Makefile:703: /tmp/work/bpf/bpf/tools/testing/selftests/bpf/test_cpp] Error 1
-   make: *** Waiting for unfinished jobs....
-   make: Leaving directory '/tmp/work/bpf/bpf/tools/testing/selftests/bpf'
-   Error: Process completed with exit code 2.
+and now that you've pointed this out, I realize it's racy to check the
+state of the timer after the mod_timer():
 
-> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> index 754e68ca8744..31e9bdd4641e 100644
-> --- a/include/uapi/linux/bpf.h
-> +++ b/include/uapi/linux/bpf.h
-> @@ -8,6 +8,7 @@
->   #ifndef _UAPI__LINUX_BPF_H__
->   #define _UAPI__LINUX_BPF_H__
->   
-> +#include <linux/stddef.h>
->   #include <linux/types.h>
->   #include <linux/bpf_common.h>
->   
-> @@ -77,12 +78,24 @@ struct bpf_insn {
->   	__s32	imm;		/* signed immediate constant */
->   };
->   
-> -/* Key of an a BPF_MAP_TYPE_LPM_TRIE entry */
-> +/* Deprecated: use struct bpf_lpm_trie_key_u8 (when the "data" member is needed for
-> + * byte access) or struct bpf_lpm_trie_key_hdr (when using an alternative type for
-> + * the trailing flexible array member) instead.
-> + */
->   struct bpf_lpm_trie_key {
->   	__u32	prefixlen;	/* up to 32 for AF_INET, 128 for AF_INET6 */
->   	__u8	data[0];	/* Arbitrary size */
->   };
->   
-> +/* Key of an a BPF_MAP_TYPE_LPM_TRIE entry, with trailing byte array. */
-> +struct bpf_lpm_trie_key_u8 {
-> +	__struct_group(bpf_lpm_trie_key_hdr, hdr, /* no attrs */,
-> +		/* up to 32 for AF_INET, 128 for AF_INET6 */
-> +		__u32	prefixlen;
-> +	);
-> +	__u8	data[];		/* Arbitrary size */
-> +};
-> +
->   struct bpf_cgroup_storage_key {
->   	__u64	cgroup_inode_id;	/* cgroup inode id */
->   	__u32	attach_type;		/* program attach type (enum bpf_attach_type) */
+  BUG_ON(mod_timer(&tw->tw_timer, jiffies + timeo));
+                                                        inet_twsk_deschedul=
+e_put()
+                                                          timer_shutdown_sy=
+nc()
+                                                          inet_twsk_kill()
+  if (!tw->tw_timer.function)
+    inet_twsk_kill()
+
+
+I've looked into messing about with the return values of mod_timer() to get
+the info that the timer was shutdown, but the only justification for this
+is that here we rely on the timer_base lock to serialize
+inet_twsk_schedule() vs inet_twsk_deschedule_put().
+
+AFAICT the alternative is adding local serialization like so, which I'm not
+the biggest fan of but couldn't think of a neater approach:
+---
+diff --git a/include/net/inet_timewait_sock.h b/include/net/inet_timewait_s=
+ock.h
+index f28da08a37b4e..39bb0c148d4ee 100644
+--- a/include/net/inet_timewait_sock.h
++++ b/include/net/inet_timewait_sock.h
+@@ -75,6 +75,7 @@ struct inet_timewait_sock {
+ 	struct timer_list	tw_timer;
+ 	struct inet_bind_bucket	*tw_tb;
+ 	struct inet_bind2_bucket	*tw_tb2;
++	struct spinlock      tw_timer_lock;
+ };
+ #define tw_tclass tw_tos
+=20
+diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.c
+index 61a053fbd329c..2471516f9c61d 100644
+--- a/net/ipv4/inet_timewait_sock.c
++++ b/net/ipv4/inet_timewait_sock.c
+@@ -193,6 +193,7 @@ struct inet_timewait_sock *inet_twsk_alloc(const struct=
+ sock *sk,
+ 		atomic64_set(&tw->tw_cookie, atomic64_read(&sk->sk_cookie));
+ 		twsk_net_set(tw, sock_net(sk));
+ 		timer_setup(&tw->tw_timer, tw_timer_handler, 0);
++		spin_lock_init(&tw->tw_timer_lock);
+ 		/*
+ 		 * Because we use RCU lookups, we should not set tw_refcnt
+ 		 * to a non null value before everything is setup for this
+@@ -227,8 +228,11 @@ void inet_twsk_deschedule_put(struct inet_timewait_soc=
+k *tw)
+ 	 * have already gone through {tcp,dcpp}_time_wait(), and we can safely
+ 	 * call inet_twsk_kill().
+ 	 */
+-	if (del_timer_sync(&tw->tw_timer))
++	spin_lock(&tw->tw_timer_lock);
++	if (timer_shutdown_sync(&tw->tw_timer))
+ 		inet_twsk_kill(tw);
++	spin_unlock(&tw->tw_timer_lock);
++
+ 	inet_twsk_put(tw);
+ }
+ EXPORT_SYMBOL(inet_twsk_deschedule_put);
+@@ -262,11 +266,25 @@ void __inet_twsk_schedule(struct inet_timewait_sock *=
+tw, int timeo, bool rearm)
+=20
+ 	if (!rearm) {
+ 		bool kill =3D timeo <=3D 4*HZ;
++		bool pending;
+=20
+ 		__NET_INC_STATS(twsk_net(tw), kill ? LINUX_MIB_TIMEWAITKILLED :
+ 						     LINUX_MIB_TIMEWAITED);
++		spin_lock(&tw->tw_timer_lock);
+ 		BUG_ON(mod_timer(&tw->tw_timer, jiffies + timeo));
++		pending =3D timer_pending(&tw->tw_timer);
+ 		refcount_inc(&tw->tw_dr->tw_refcount);
++
++		/*
++		 * If the timer didn't become pending under tw_timer_lock, then
++		 * it means it has been shutdown by inet_twsk_deschedule_put()
++		 * prior to this invocation. All that remains is to clean up the
++		 * timewait.
++		 */
++		if (!pending)
++			inet_twsk_kill(tw);
++
++		spin_unlock(&tw->tw_timer_lock);
+ 	} else {
+ 		mod_timer_pending(&tw->tw_timer, jiffies + timeo);
+ 	}
+
 
