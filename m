@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-73673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D7EC85D845
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 13:50:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0382285D844
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 13:50:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FA1E1C21F92
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:50:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34CA11C20E21
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:50:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D45B269946;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D451569945;
 	Wed, 21 Feb 2024 12:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UdUde/Ay"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dI3BYS4P"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A68536931B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A680D657AC
 	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 12:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708519827; cv=none; b=EM/y9JC3Z4ME6rdO9LUOQmeirdh0AmDwmaoWCDy9S8W0Yx3xvKLRoAvt6A9L2JhAZjpK2X/WTCXgGiwQxKNSe9ZSA7Zby0eaNpJAwH+1MDodlld+ZZKR6HkFuxzjUs4lKNIHa/TqEqe8PA1XLG3Rq3P6J6OODS1DoBQK272kDLI=
+	t=1708519827; cv=none; b=bwQ7argHJQbieWMPnW283AQdOFfVZHZLro2e3CRLBUzrNCK48KvnR4hQgbnBX2wm6qt7FxHrTYDZcru49CV3Kl6ivNsKUqGsaCTZ6GcCdgHA6+KZ9u7OCWD5LoHvOLfzdP5mnIIOyZhDlY/m0BebMRplKJDTyWoDdF+MxvHaTrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708519827; c=relaxed/simple;
-	bh=ewJpZ2nMUOKqPE+DlEznF/WGnHZNW/crdyWx1I0J+/s=;
+	bh=+so7R9P99YaPVqLGEU+p7gfax/8fd6mveellPkgrEYM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Wko0iq8tZB1vxy9R0NkMxE/tbOeYXHt6YCG0EWUAs+nJcbo0gswAZUMtqaZCdglSNVQKCS7W2jBU2oj2rxj+8W738O3AfVMLbmvhiTLanTobUpGKkmGGADFn4MZRAeje2OMkaKdz6N8avpgweKkSE1Uli9wWii2rHhNN76MWABw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UdUde/Ay; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 41F39C43394;
+	 In-Reply-To:To:Cc; b=LVYCekogBsBVvm6La1g0RXLISLd6Jws+JHg4d8Cn/8MIRINfzKsQcHz1Dimn5obHeGQChiJhaYB3BsM1G/1AO9B87tbqviIMQxYdM+Xti3bL0+jfnIK1Aj5Y5PfA3Cdy79p2N+vRv+X8zANOA5meoN2uRo9aLx4AMlMaO6PKwr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dI3BYS4P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3A0FEC433C7;
 	Wed, 21 Feb 2024 12:50:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1708519827;
-	bh=ewJpZ2nMUOKqPE+DlEznF/WGnHZNW/crdyWx1I0J+/s=;
+	bh=+so7R9P99YaPVqLGEU+p7gfax/8fd6mveellPkgrEYM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=UdUde/AyaXvPD7vKnTeDu8ooL3x1X7+Otr364jQGPRCRy9kPRcIZ622Dh4zIFtQaF
-	 xBOz/72jtxQJNW+runv+H2K2bFtMBq7oZhhzZSlqa5d5E2wMcni+GbohuXnWDjrlxG
-	 8IEurWA60E2/GYR4mK3gjaXZqcbnYZCUyaCWFKRyfbvo6Efe7JohfWLfTh90bc3qb9
-	 Hh8FH78KcbLO2k2qC9OIRiN7vP/djCOhZuhpUJLlv0pGDV9z7D3jsgcE4yx853TCAj
-	 lFW925QSFXcOjVKSizFQ+byvtx/Oc8GqCMhtCrz17zJ0t/Tqj5OFE/QFSLHW23lfGj
-	 ACTxpLkVf/a8Q==
+	b=dI3BYS4P2FjcgbVmr1hpuD6w49BQfQXjQfgCT0cwYdMNYYRnxDX5nrao1HzlEA32g
+	 Ql+3j5nSyOtQU/youPCehrkY/pU1gaUFf5bnYYfx59hJgmfE1k4vvKJ7aR1oZMFWbu
+	 f+FEBOY+7ucQ+2bYcIKx5JtB3zz3btRj705TMWVdEy1U+4Fz0j4UHSD7k1zTSst3Z1
+	 g2zr2RPrKBq4vS2RjFkehUKmDYvVusRoYHmAsdASGqFHyqgYa2uDHybuAv1FMfuZFQ
+	 81hmZxaTh98TqBKu2G2LUC4D+s950texTvwZd43NsNaB3TxuZs1n6reMcnNlwDAA5a
+	 EeKPoy4jBtOWA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 227BED84BBC;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 19A5DC00446;
 	Wed, 21 Feb 2024 12:50:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,38 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] MAINTAINERS: Add framer headers to NETWORKING
- [GENERAL]
+Subject: Re: [PATCH v1 net] af_unix: Drop oob_skb ref before purging queue in GC.
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170851982713.28838.5644868110027134439.git-patchwork-notify@kernel.org>
+ <170851982710.28838.13826338277536240420.git-patchwork-notify@kernel.org>
 Date: Wed, 21 Feb 2024 12:50:27 +0000
-References: <20240219-framer-maintainer-v1-1-b95e92985c4d@kernel.org>
-In-Reply-To: <20240219-framer-maintainer-v1-1-b95e92985c4d@kernel.org>
-To: Simon Horman <horms@kernel.org>
+References: <20240219174657.6047-1-kuniyu@amazon.com>
+In-Reply-To: <20240219174657.6047-1-kuniyu@amazon.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, linus.walleij@linaro.org, christophe.leroy@csgroup.eu,
- herve.codina@bootlin.com, netdev@vger.kernel.org
+ pabeni@redhat.com, kuni1840@gmail.com, netdev@vger.kernel.org,
+ syzbot+ecab4d36f920c3574bf9@syzkaller.appspotmail.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Mon, 19 Feb 2024 17:55:31 +0000 you wrote:
-> The cited commit [1] added framer support under drivers/net/wan,
-> which is covered by NETWORKING [GENERAL]. And it is implied
-> that framer-provider.h and framer.h, which were also added
-> buy the same patch, are also maintained as part of NETWORKING [GENERAL].
+On Mon, 19 Feb 2024 09:46:57 -0800 you wrote:
+> syzbot reported another task hung in __unix_gc().  [0]
 > 
-> Make this explicit by adding these files to the corresponding
-> section in MAINTAINERS.
+> The current while loop assumes that all of the left candidates
+> have oob_skb and calling kfree_skb(oob_skb) releases the remaining
+> candidates.
+> 
+> However, I missed a case that oob_skb has self-referencing fd and
+> another fd and the latter sk is placed before the former in the
+> candidate list.  Then, the while loop never proceeds, resulting
+> the task hung.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] MAINTAINERS: Add framer headers to NETWORKING [GENERAL]
-    https://git.kernel.org/netdev/net/c/14dec56fdd4c
+  - [v1,net] af_unix: Drop oob_skb ref before purging queue in GC.
+    https://git.kernel.org/netdev/net/c/aa82ac51d633
 
 You are awesome, thank you!
 -- 
