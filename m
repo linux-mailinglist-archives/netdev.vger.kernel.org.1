@@ -1,47 +1,104 @@
-Return-Path: <netdev+bounces-73685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 399AC85D93D
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 14:16:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D26385DA19
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 14:27:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6F41282B23
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 13:16:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D689AB26795
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 13:27:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C5EE78B63;
-	Wed, 21 Feb 2024 13:15:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47CC17C6E5;
+	Wed, 21 Feb 2024 13:25:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y1LvHDmD"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF6878B60;
-	Wed, 21 Feb 2024 13:15:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F4D762C1;
+	Wed, 21 Feb 2024 13:25:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708521355; cv=none; b=LZ6eCFlO+9SdULiFQAzN/dyiKqb+ZWb4cJ7wag5Gp76JGexSTEH+QNgBOQbfmCrfgDECS6cgVmxZ7IDxeR3kzWBmoLGcNS3tk4NnrKh8/dDR7TzpeldSeMxuARNwiOsw+liZwm7yO36wLGD0QGVQ8a7rabgTcH2xwNk5ir2m2Dc=
+	t=1708521932; cv=none; b=c3zhOI5onkEJB06GrkE5h/wOfV1ykG4A0oID8H70Lhf1jqXeL84dXxSrKLwbhH4QzVlE03pRIqU566Loi1OcAWOr7nwZrRfHlMt9qp09s7BpwZDxmNPXihgSzUyEkua4Y19+nPnDPuDFlGmLm9xKLvdYV/xWBM+YrIPP2HdgFbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708521355; c=relaxed/simple;
-	bh=csrTnXvV6MEZd5krHl41/o+frbx1m3T+Us2ZFrByfR4=;
+	s=arc-20240116; t=1708521932; c=relaxed/simple;
+	bh=Awv2ya/dCmyXIz+PUwM1HeJ90+1RVeiqxObGWE0hzLY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=flWWgFq0um5TMYOU8B8HH8NoZqu/iKuXNt5VQU63MSnubljHQoiaqWTYaJIX8/nCqtW7mNJcqCemdHXlLRDxWt2Y0pamPeSqFxYudFr3fGVepwyOp+/PQTYrIlUBgSpXI+mHuSJPjvcVc4NFiL7/u2Uw5lxdTC/Z17WY5vSSLMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1rcmRu-0004dD-P4; Wed, 21 Feb 2024 14:15:46 +0100
-Date: Wed, 21 Feb 2024 14:15:46 +0100
-From: Florian Westphal <fw@strlen.de>
-To: syzbot <syzbot+99d15fcdb0132a1e1a82@syzkaller.appspotmail.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
-	fw@strlen.de, horms@kernel.org, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] WARNING in mpls_gso_segment
-Message-ID: <20240221131546.GE15988@breakpoint.cc>
-References: <00000000000043b1310611e388aa@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=b/YKcn8fD7cpaVmMd2hedUF7LL4ydXYgl6zeVzUqNHYUQl9xDO+4gEpdIythX9PA51lpIx8+vZssTbtro/1OgIgqx/V0JOd/pSHgg/hAsk1gf8oWq/71VqbyW74oI/Qt70VzPA7DKHIwhMsmVAL9OM8tOyiKWH1w1bEY9YK9ISA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y1LvHDmD; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2997a9f4d61so2615130a91.3;
+        Wed, 21 Feb 2024 05:25:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708521929; x=1709126729; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OI7tqbj6mWKb61MysMY2DivYivNGwAjWTxPQEZuJVHY=;
+        b=Y1LvHDmD+j9EJUHYcVk/3g7FWLgNLMLl8nz+xHgs18O9Be0EngqZsn3/XrOvN0EBOb
+         5Qyj3WntFZPlRmW1CcjsccFJguyw5u2lcF/WaV2GnRxu8hndChR/a0+EjGbmoJrsvZmd
+         fEWOEb+Oa5+J0jBA3EV91bVZZXQkxGnHFjUQJ0XzyMputWn0rJeptGVP60S6ndZwy6vY
+         0/Pl4neVEHTVqwhS2hnQTIRuftU+BdoLYqVmfp9NVKVj9W3snL/Q/C+1xgcNU0qFB5o/
+         KWzJ++546+pSZ2rEwdCWVZLnqI6ZSowWJewRKnCYr4cuKUOQyPPbZAmbz9PS6vstJDWw
+         BbFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708521929; x=1709126729;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OI7tqbj6mWKb61MysMY2DivYivNGwAjWTxPQEZuJVHY=;
+        b=CHlFagmO5Xtst1d6lN3IzEmx2axZbkKifysUDAS1ViKtk8En7AIH0HUDZ+ncz51Pit
+         itp35h3Tvykou1kTVL+FM6yc2lWcW9bqm8kSPLDvjDavoc4aXovYFj6TEbwvIZfVJPlN
+         KVXJBfajOntaQ9s7TCneAU312uSNfAUDsapuVtjUlD7YOjtSZfOl9+YY1zTBBtSC6k/3
+         cc3E9Y0qQZr8L9oyNupZ/3V+lfMVHpaR/6r6FukcE85EHEd7mg+TTgwYZBKPtDV4y8rb
+         Mac7cAcZOb/9yUL4AaW98tkPstPRUx+KkGpAUOuaA3wdz+iJQTqfBJHCD0oSLtCz6NVG
+         9D/A==
+X-Forwarded-Encrypted: i=1; AJvYcCVKlZ170aEBx72/zlaq6hL/y3MbzJileHXEFIIgM6ivrHTl8OmlP5aUTL7f3+K+x+LnpiTyVTVy9zuqVQV93qav90+psSWDg8V0uVhkD713SCjHGQQPprVlODYV55dxcJbYdQIT1k/xtjyBAKwVxyXILqyQ9/+bbXhRVVPsLWF79U7bkBpwcoVPBSIF6LW/wvS0ixQvs+4eXPsoqVjrEIdHPbxJuNztMi6/Vyg+TRiA0TVOY0HR9RwcpRR9QjdYU4Qh
+X-Gm-Message-State: AOJu0YwjQjenJThJJzPA7SF1BlqBuy1gmuqV2NKvkDOIsBHqQPtU1btl
+	fEltS9y+4FPnMljIvemibqO60VyAfXsFEkNbL643e8QSoM0njbIk
+X-Google-Smtp-Source: AGHT+IHg9MoLpqgIlSHX+Evp1yAd6u93J1yLlc8YUipHUrY6efz32qYsKutsv5edzLysx+zDmmo/rg==
+X-Received: by 2002:a17:90a:dd82:b0:299:5186:1989 with SMTP id l2-20020a17090add8200b0029951861989mr10159029pjv.37.1708521929579;
+        Wed, 21 Feb 2024 05:25:29 -0800 (PST)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id ds15-20020a17090b08cf00b002992cf08af0sm1359109pjb.23.2024.02.21.05.25.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Feb 2024 05:25:28 -0800 (PST)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date: Wed, 21 Feb 2024 05:25:27 -0800
+From: Guenter Roeck <linux@roeck-us.net>
+To: David Gow <davidgow@google.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	Shuah Khan <skhan@linuxfoundation.org>, Rae Moar <rmoar@google.com>,
+	Matthew Auld <matthew.auld@intel.com>,
+	Arunpravin Paneer Selvam <arunpravin.paneerselvam@amd.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Kees Cook <keescook@chromium.org>,
+	=?iso-8859-1?Q?Ma=EDra?= Canal <mcanal@igalia.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Matthew Brost <matthew.brost@intel.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Florian Westphal <fw@strlen.de>,
+	Cassio Neri <cassio.neri@gmail.com>,
+	Javier Martinez Canillas <javierm@redhat.com>,
+	Arthur Grillo <arthur.grillo@usp.br>,
+	Brendan Higgins <brendan.higgins@linux.dev>,
+	Daniel Latypov <dlatypov@google.com>,
+	Stephen Boyd <sboyd@kernel.org>, David Airlie <airlied@gmail.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+	intel-xe@lists.freedesktop.org, linux-rtc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com,
+	linux-hardening@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 1/9] kunit: test: Log the correct filter string in
+ executor_test
+Message-ID: <8cfc6a3e-e618-4ddd-adca-4d6bf81a5e17@roeck-us.net>
+References: <20240221092728.1281499-1-davidgow@google.com>
+ <20240221092728.1281499-2-davidgow@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,83 +107,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <00000000000043b1310611e388aa@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20240221092728.1281499-2-davidgow@google.com>
 
-syzbot <syzbot+99d15fcdb0132a1e1a82@syzkaller.appspotmail.com> wrote:
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1536462c180000
+On Wed, Feb 21, 2024 at 05:27:14PM +0800, David Gow wrote:
+> KUnit's executor_test logs the filter string in KUNIT_ASSERT_EQ_MSG(),
+> but passed a random character from the filter, rather than the whole
+> string.
 > 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/adbf5d8e38d7/disk-49344462.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/0f8e3fb78410/vmlinux-49344462.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/682f4814bf23/bzImage-49344462.xz
+> This was found by annotating KUNIT_ASSERT_EQ_MSG() to let gcc validate
+> the format string.
 > 
-> The issue was bisected to:
+> Fixes: 76066f93f1df ("kunit: add tests for filtering attributes")
+> Signed-off-by: David Gow <davidgow@google.com>
+
+Tested-by: Guenter Roeck <linux@roeck-us.net>
+
+> ---
+>  lib/kunit/executor_test.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> commit 219eee9c0d16f1b754a8b85275854ab17df0850a
-> Author: Florian Westphal <fw@strlen.de>
-> Date:   Fri Feb 16 11:36:57 2024 +0000
+> diff --git a/lib/kunit/executor_test.c b/lib/kunit/executor_test.c
+> index 22d4ee86dbed..3f7f967e3688 100644
+> --- a/lib/kunit/executor_test.c
+> +++ b/lib/kunit/executor_test.c
+> @@ -129,7 +129,7 @@ static void parse_filter_attr_test(struct kunit *test)
+>  			GFP_KERNEL);
+>  	for (j = 0; j < filter_count; j++) {
+>  		parsed_filters[j] = kunit_next_attr_filter(&filter, &err);
+> -		KUNIT_ASSERT_EQ_MSG(test, err, 0, "failed to parse filter '%s'", filters[j]);
+> +		KUNIT_ASSERT_EQ_MSG(test, err, 0, "failed to parse filter from '%s'", filters);
+>  	}
+>  
+>  	KUNIT_EXPECT_STREQ(test, kunit_attr_filter_name(parsed_filters[0]), "speed");
+> -- 
+> 2.44.0.rc0.258.g7320e95886-goog
 > 
->     net: skbuff: add overflow debug check to pull/push helpers
-> 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13262752180000
-> final oops:     https://syzkaller.appspot.com/x/report.txt?x=10a62752180000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=17262752180000
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+99d15fcdb0132a1e1a82@syzkaller.appspotmail.com
-> Fixes: 219eee9c0d16 ("net: skbuff: add overflow debug check to pull/push helpers")
-> 
-> ------------[ cut here ]------------
-> WARNING: CPU: 0 PID: 5068 at include/linux/skbuff.h:2723 pskb_may_pull_reason include/linux/skbuff.h:2723 [inline]
-> WARNING: CPU: 0 PID: 5068 at include/linux/skbuff.h:2723 pskb_may_pull include/linux/skbuff.h:2739 [inline]
-> WARNING: CPU: 0 PID: 5068 at include/linux/skbuff.h:2723 mpls_gso_segment+0x773/0xaa0 net/mpls/mpls_gso.c:34
-
-Two possible solutions:
-
-1.)
-
-diff --git a/net/mpls/mpls_gso.c b/net/mpls/mpls_gso.c
-index 533d082f0701..43801b78dd64 100644
---- a/net/mpls/mpls_gso.c
-+++ b/net/mpls/mpls_gso.c
-@@ -25,12 +25,13 @@ static struct sk_buff *mpls_gso_segment(struct sk_buff *skb,
-        netdev_features_t mpls_features;
-        u16 mac_len = skb->mac_len;
-        __be16 mpls_protocol;
--       unsigned int mpls_hlen;
-+       int mpls_hlen;
- 
-        skb_reset_network_header(skb);
-        mpls_hlen = skb_inner_network_header(skb) - skb_network_header(skb);
--       if (unlikely(!mpls_hlen || mpls_hlen % MPLS_HLEN))
-+       if (unlikely(mpls_hlen <= 0 || mpls_hlen % MPLS_HLEN))
-                goto out;
-+
-        if (unlikely(!pskb_may_pull(skb, mpls_hlen)))
-                goto out;
-
-(or a variation thereof).
-
-2) revert the pskb_may_pull_reason change added in 219eee9c0d16f1b754a8 to
-make it tolerant to "negative" (huge) may-pull requests again.
-
-With above repro, skb_inner_network_header() yields 0, skb_network_header()
-returns 108, so we "pskb_may_pull(skb, -108)))" which now triggers
-DEBUG_NET_WARN_ON_ONCE() check.
-
-Before blamed commit, this would make pskb_may_pull hit:
-
-        if (unlikely(len > skb->len))
-                return SKB_DROP_REASON_PKT_TOO_SMALL;
-
-and mpls_gso_segment takes the 'goto out' label.
-
-So question is really if we should fix this in mpls_gso (and possible others
-that try to pull negative numbers...) or if we should legalize this, either by
-adding explicit if (unlikely(len > INT_MAX)) test to pskb_may_pull_reason or
-by adding a comment that negative 'len' numbers are expected to be caught by
-the check vs. skb->len.
-
-Opinions?
 
