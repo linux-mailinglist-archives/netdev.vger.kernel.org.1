@@ -1,109 +1,126 @@
-Return-Path: <netdev+bounces-73666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 113D285D7A0
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 13:05:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30D6985D7B9
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 13:12:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF1A028368B
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:05:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6D66B22A55
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:12:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64A4D4D58A;
-	Wed, 21 Feb 2024 12:04:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6E5A4EB5B;
+	Wed, 21 Feb 2024 12:12:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xn9j6f+B"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J0/SbFSn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C3B04D9E8
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 12:04:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4907E523D;
+	Wed, 21 Feb 2024 12:12:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708517091; cv=none; b=n9sMn4ZtS+B8kht0Q0IDNZSmXdH/FNsJBdX6yBuyTC/Ayf4iz/TR4BoWb0YSM/cQVBYE7Y/ec2crD/UHn5lnk5h3V3U7lCwcYlxOyHjL3TwQXuJzXhlTADhKy1TOFj2y8/07qN+/Y6DXv61OtUPrC7+ykadWVqxUbecKl0OY+r4=
+	t=1708517535; cv=none; b=hMsv7oe1PsOxP95m53is9YWPkVn5KHGEblyVvVJZxWGhYw+QB06iKqw/qeV1NjZ2f1TlcgO4uMY48RFSo72ZPn3QlL9Xjr7uuaId6c2yTRZ+jPTDemCeQMo7qo45kR/lZcaTLqCxirFleV/gueHNF8HVmB7DF9lQFeWOK9WX5p0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708517091; c=relaxed/simple;
-	bh=Z5u3RNJb/cKelaTMB4kaA0pCleueUlDUjANoZSfT+g0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qipEPfJvqSTeTnWDR9ESPMMMApG+6oeFyeoXMR5Q3ire23P2zRBKZoBXn0wQzGMKDyONCPjB0/PsAIAxc2ONX8fSQmwkv8OPcv8NKH3H3HKSktGpkWXz9KE1nHxmqpfWlGZlO6+AIwIcgAb4p7Ftuu/VxW4jenjD/yehJt6ccxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xn9j6f+B; arc=none smtp.client-ip=209.85.167.52
+	s=arc-20240116; t=1708517535; c=relaxed/simple;
+	bh=+N00AKpZ7J2ODw+foLQY6q9YlapQF1eaDkMorrMhEEg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BT4FDcYlwq1ifhsJ88/viT2qZ2bRB8qmcHJDkCBYPPIQNxVHwKMJ/uyN+XjGObr9ZlWXxK+kpwT0hZSc2/bs/9L81UUBXThXMsdLXIr5PUO95qrDL9JguZ+h5ipt6RmtLvhTbUesHvHputQxfIpAHQEgXCK91qscjhahfeQ36JQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J0/SbFSn; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-50e4e36c09cso2687892e87.1
-        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 04:04:49 -0800 (PST)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1dc1ff3ba1aso12622645ad.3;
+        Wed, 21 Feb 2024 04:12:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708517088; x=1709121888; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=DJqXdZDzlXcpVVvEM1biI7hIBvEUs7rSrTCVlhQwBc8=;
-        b=Xn9j6f+BiYVButnxa26ID2Vj/eDQ5Ea97DddFO3VwuhhfejBXTs4r3vVG9AP0dL5id
-         s9W67cDu1J74qHskLgrZpa07eu5m9BGZugCUDf7eizruoUt17UOt1fPJ+8j2w6NjnlPn
-         1G2qjp7Ga94nIkZbnj+5Wi8KstcngeaohiVXwtr25Pfo3TpdprACFpPAAsCj4jrlCvIO
-         sBvceYAKSHkyO4pERAUL85eg1RjmWfSB72XB8anw1yuXuzOzDhy7JZjnUGtzez7yn7xE
-         SmIcui6TT+B+rSj6PI/f6LyV8uMUyNVDjaJ7nd4Am5Ujq952p3oVGMbz48sd/XvVZiqN
-         pNRA==
+        d=gmail.com; s=20230601; t=1708517533; x=1709122333; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=H8qbWRcjaBqAixK335JcZcC9lTsg4DX0lD6Zkn6qa+g=;
+        b=J0/SbFSnyf0TMrBbU9UN4dwkugqGnitxVi9oGD4vivTWUyYw5nJi1HGGYlPjgUQ7Ol
+         m5WyNKY+3k/bc8k4AE3z6BvapSVtCFgy0i64YrB0Z7yfRuB6wUNT6exbegQUXEgiNzpA
+         /p7DPKXswpNAEFxe2HPWA4tKacAXiQWTGFlrpN1awiSA8SBOnC78oa8tA/Wx/Y6RHvO9
+         GtMitwsBky/S6loQHM2Bg1xzaW2Qufk8Z4irRrDNrcgyaZEzkndsNg6PQcyn4DD30OKT
+         hEyyHfZ/3A0J7hVjgVDiVFll0814iIo9mNvKX1hCh7L3kdN4hUhYLpJ1n+gumNhA5zkS
+         g6og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708517088; x=1709121888;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DJqXdZDzlXcpVVvEM1biI7hIBvEUs7rSrTCVlhQwBc8=;
-        b=HZOaCH+CGUU4RhUXI60oEUo68johuD6njYV44icudlOVGfXfZUcArOAL5o4zYHeL5p
-         DDWuLHyYsFZds4pVA49tK5dAq3bnFK4/i9PJue4UaO5p1je/paGVZkQNPk+DxfxPHPyO
-         TAPec3f2wSKNuGxIF8+xKOeUsFDU5c3o+mFOoCXfDZML8sQVA9bjf2amxPAPIqPMTHBk
-         JEqpal00EeJMn7VuvnFr3jwX7Ou/opMOduCYwZAID9mI6dawXAJR+gSt1qXxbroa3Ayj
-         FgsaDuuHZUkODcqmTMzAN0qx1kNVtV8z+6hJd9FmxLVCglNBTf7osQhh29C1MrRB1bFk
-         G7CQ==
-X-Gm-Message-State: AOJu0Yxch8bYYvdoeFk3OQfr5sIiaNsvjGmQ4b0zE/sa9TXK9ujpm8YR
-	eQ0UKsdDBJfuvJuNFkwQ+ZyTwrInE0u7jEyOldT4vLdH/ccD+J35
-X-Google-Smtp-Source: AGHT+IFHQTLFm7wDl4eirKUuUBoxWuCFqNnMj1EIvw40LkOeTHCtzGHtUgPoO7fqVaoQjq/rjaQklw==
-X-Received: by 2002:ac2:4d09:0:b0:512:b25e:571a with SMTP id r9-20020ac24d09000000b00512b25e571amr4636257lfi.3.1708517087354;
-        Wed, 21 Feb 2024 04:04:47 -0800 (PST)
-Received: from localhost.localdomain ([83.217.200.104])
-        by smtp.gmail.com with ESMTPSA id d6-20020a05651221c600b00512cf8c11fesm278002lft.79.2024.02.21.04.04.46
+        d=1e100.net; s=20230601; t=1708517533; x=1709122333;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=H8qbWRcjaBqAixK335JcZcC9lTsg4DX0lD6Zkn6qa+g=;
+        b=PtMkxg73vvBXBbiicEht9ZF7qG7FY0uHLHsF6ZWkCh6q6MeQlymcpjGXXbtru1MnZP
+         rDn+CEkx05aY4r/dNpBF4EUo+xNg8TEDMabbxWzyLLfmfoAbOzIov9I9gGnzYtNCDK+p
+         s5yhFL2Z4ulKTVa69xWvaCnR/lFDgtvNm7sqz3WFUXUqfVsdhM65/ymLVVb2hWYlMDvN
+         ODpwnA6nemLf6N3jDyx3KimYPH9NvGEW6zD5n7b7mcWCR7QBSPgIArDj69HnTDcZX2/8
+         5oGSttBdu4PVAImRdKCmIbEhatdpH2fAMPDPOtLm47m+Pza+zogEzkl8LAswcaYClaqF
+         ypMg==
+X-Forwarded-Encrypted: i=1; AJvYcCVP+P8YkcPkvNbsz7mcEeNEnZg3pKnw8PnZ0HV8aYPufSbVBmxu5+k4kykefq2zO0hRE6IYL6Reeyd9bHuzi4RTsYF0oNfzjqjG7UrrZ95tU19Drl4BCjcztt1q19egDVuC9dN2
+X-Gm-Message-State: AOJu0Yw/PRLDxsxIFU4YMHyItJkC3Kn4ra8E+3LkxfPyht2T4wD8iELY
+	94H1SWkTx7kKmp/SBA3O7ZImwSO3Po2Olfw0MqDKPbWl0Bxdjkn1
+X-Google-Smtp-Source: AGHT+IHtcbcaPU1cuzHOPpHw6dBbxnjuILLkDnjB8c1TjMSfrMiGMelmDTm4Gws0oMtZ/UzhOe/WyQ==
+X-Received: by 2002:a17:902:8501:b0:1dc:791:9941 with SMTP id bj1-20020a170902850100b001dc07919941mr5795930plb.65.1708517533456;
+        Wed, 21 Feb 2024 04:12:13 -0800 (PST)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id kr7-20020a170903080700b001d74502d261sm7941572plb.115.2024.02.21.04.12.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Feb 2024 04:04:46 -0800 (PST)
-From: Denis Kirjanov <kirjanov@gmail.com>
-X-Google-Original-From: Denis Kirjanov <dkirjanov@suse.de>
-To: stephen@networkplumber.org
-Cc: netdev@vger.kernel.org,
-	Denis Kirjanov <dkirjanov@suse.de>
-Subject: [PATCH iproute2] ifstat: handle unlink return value
-Date: Wed, 21 Feb 2024 07:04:24 -0500
-Message-Id: <20240221120424.3221-1-dkirjanov@suse.de>
-X-Mailer: git-send-email 2.30.2
+        Wed, 21 Feb 2024 04:12:12 -0800 (PST)
+Date: Wed, 21 Feb 2024 20:12:07 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
+Cc: j.vosburgh@gmail.com, andy@greyhouse.net, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	rajesh.sivaramasubramaniom@oracle.com, rama.nichanamatlu@oracle.com,
+	manjunath.b.patil@oracle.com
+Subject: Re: [PATCH net-next v6] bonding: rate-limit bonding driver inspect
+ messages
+Message-ID: <ZdXol6g4Jxx0VM_0@Laptop-X1>
+References: <20240221082752.4660-1-praveen.kannoju@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240221082752.4660-1-praveen.kannoju@oracle.com>
 
-Print an error message if we can't remove the history file
+On Wed, Feb 21, 2024 at 01:57:52PM +0530, Praveen Kumar Kannoju wrote:
+> Through the routine bond_mii_monitor(), bonding driver inspects and commits
+> the slave state changes. During the times when slave state change and
+> failure in aqcuiring rtnl lock happen at the same time, the routine
+> bond_mii_monitor() reschedules itself to come around after 1 msec to commit
+> the new state.
+> 
+> During this, it executes the routine bond_miimon_inspect() to re-inspect
+> the state chane and prints the corresponding slave state on to the console.
+> Hence we do see a message at every 1 msec till the rtnl lock is acquired
+> and state chage is committed.
+> 
+> This patch doesn't change how bond functions. It only simply limits this
+> kind of log flood.
+> 
+> Signed-off-by: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
+> ---
+> v6: 
+>   - Minor space additions addressed. 
+> v5: https://lore.kernel.org/all/20240221050809.4372-1-praveen.kannoju@oracle.com/
+>   - Redundant indentation addressed.
+> v4: https://lore.kernel.org/all/20240220050437.5623-1-praveen.kannoju@oracle.com/
+>   - Rectification in the patch subject and versioning details.
+> v3: https://lore.kernel.org/lkml/20240219133721.4567-1-praveen.kannoju@oracle.com/
+>   - Commit message is modified to provide summary of the issue, because of
+>     which rate-limiting the bonding driver messages is needed.
+> v2: https://lore.kernel.org/lkml/20240215172554.4211-1-praveen.kannoju@oracle.com/
+>   - Use exising net_ratelimit() instead of introducing new rate-limit
+>     parameter.
+> v1: https://lore.kernel.org/lkml/20240214044245.33170-1-praveen.kannoju@oracle.com/
+> ---
 
-Signed-off-by: Denis Kirjanov <dkirjanov@suse.de>
----
- misc/ifstat.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Thanks for your patient update.
 
-diff --git a/misc/ifstat.c b/misc/ifstat.c
-index 18171a2c..5dede111 100644
---- a/misc/ifstat.c
-+++ b/misc/ifstat.c
-@@ -938,7 +938,9 @@ int main(int argc, char *argv[])
- 				 getuid());
- 
- 	if (reset_history)
--		unlink(hist_name);
-+		if (unlink(hist_name) < 0)
-+			fprintf(stderr, "Cannot remove history file \"%s\": %s\n",
-+				hist_name, strerror(errno));
- 
- 	if (!ignore_history || !no_update) {
- 		struct stat stb;
--- 
-2.30.2
-
+Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
 
