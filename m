@@ -1,121 +1,171 @@
-Return-Path: <netdev+bounces-73847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C7D985ED71
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 00:52:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C25FA85EC94
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 00:12:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74564B2296C
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 23:52:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32FAC1F22FC4
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 23:12:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 455FF12E1FC;
-	Wed, 21 Feb 2024 23:50:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5941B81752;
+	Wed, 21 Feb 2024 23:12:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KDCTFdyW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tq/aAW3U"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C204B12DD9C;
-	Wed, 21 Feb 2024 23:50:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C8921E520
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 23:12:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708559455; cv=none; b=fOZk3WkQvHqPgRdn+suyaNOKV5mPWvg9MoTVVL3rUOs5kCQMgZUSTXqXDRcMsZw8b0AxhuYoBoxrilcMGACa2Naqif5ADk/enU6iP1Fg4eyXBD45cFY/HYgXalgZ5mjc5hFlWSnMvDaVOgazk095sMaeVNbWnJaIHemHz/fiA+o=
+	t=1708557135; cv=none; b=HCUIReZk+k+SX7+04L6y4O3kZxrTx6H7ERyjax8SGvLzneDmFIQJiuBVTToJ04SdLJah9EySPsbKPeVf2kERpukD38aJs2HopjcvqsXWYXJdnQViJvVkfIQ2vLVQ8y262zZWWVDSSIn30aWMwtERh0anBCNg3WbdgQ49PvWHjcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708559455; c=relaxed/simple;
-	bh=+F3FwsNuYJcoRogLHWj8TN7/aBSkjTsDrn3YDdVqzlc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b37lzxELEV4gGm3AmIQhyzfJLfBqDYmx1824ea6eejIEVpaW72VVw37qjuVA4m9NF+IclxMlO6oML9dedhy4EHeO+GKUMAL3htqdhSYpH/VOk0354LN81sl4rjLGAV5PRop36cxPf6qNha/AfNBKmryIFJOJwmtDB6XqqhkVnUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KDCTFdyW; arc=none smtp.client-ip=209.85.219.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6861538916cso7183486d6.3;
-        Wed, 21 Feb 2024 15:50:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708559453; x=1709164253; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wpJsXHNvgeU4dal1ulrv4/ExFJIkJaSEOuwbJ3BtDq0=;
-        b=KDCTFdyWTOM3KcN45woaSZm/r0Cf35QpbzrPJHaet3dWIeoUxnaCQP56K+ec58+Dx+
-         W4XjHjXQA6vZmMZUb8ptRh7kHfDJVjVT4QDRjh4q9fHQ+Ng5NXr+fxd/Hi4Pm+pDkSLn
-         FkvT24xf2yrRIjlIMVETTMws7g1mYZRVSdPe85WK230GGalZBNkpxhZVSBNE+YOs5gAb
-         2iznKxq/sAy0mQFpbtl7oQoXDrpSkgGMI3tXGnw2Uj0zX06m3APqzO/B0wdeDNBWq+bT
-         C8pB4jup2O7HynGMY3K6jco+1CucUpwPXZ2PD4od+1gOXgyw6+NVVAKeWTWxhwz98b4T
-         4TuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708559453; x=1709164253;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wpJsXHNvgeU4dal1ulrv4/ExFJIkJaSEOuwbJ3BtDq0=;
-        b=Vo7o2qvbwAY8Vxc/GBAM9fmP6x0DQcbiZ1UQffpJN53A4wgq5DMkysBuFRXbD96MjB
-         vakDC1NRaPLhgINo3mT0C6SJ573MymJPayZGAS1SiyjHD6VRVNnA0vb/xsgi6SKI1M74
-         mYy0WF8r078x934h3Uj032QFE6R0DCuElBGSykpFEUP+M/0gBzbon8Gq+/BExjKdPFg1
-         y/1OFpbWwVcnKH9rdN8FMuKXwZbE5vxeYxL1dz3jNG90GfaeAdeeBSi/ks9JCp3e0cJ6
-         mcUr4XL5CWWGj7QS5AzlwoaydAumRcD/SukiJCR1oq7YsbvsF/opf4j+o26nQBdejhDg
-         00aA==
-X-Forwarded-Encrypted: i=1; AJvYcCXuJJQtyn7IM4yjGMjEc/3wbx/el/M6zdTcP1oA6a1yoq0kMeTNLILpj3XWvpx7EtArRvjVCCQQ/EhSwIfhqwnEal1pRxyfIbXIeG4e
-X-Gm-Message-State: AOJu0Yw0zW5sNzL2VARhutyzBCStlgZkokR4kXKuaQJvT29tnw7UG666
-	haSglEegzCt5ozCrKDLWUSOx9rA3qw40ECwKeuSYiN9Bm+D/FqTwM8GldTLt
-X-Google-Smtp-Source: AGHT+IHIQaHZ33MBLelZ3bpytnTaDUICJ6MtwXYD6PAZ8osX4cb4angP51aQftIcJeEIVibbxXBrPg==
-X-Received: by 2002:ad4:5aa7:0:b0:68f:4a94:8d45 with SMTP id u7-20020ad45aa7000000b0068f4a948d45mr16659977qvg.11.1708559452634;
-        Wed, 21 Feb 2024 15:50:52 -0800 (PST)
-Received: from localhost ([2601:8c:502:14f0:acdd:1182:de4a:7f88])
-        by smtp.gmail.com with ESMTPSA id pf1-20020a056214498100b0068f5a02ed6dsm4906104qvb.145.2024.02.21.15.50.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Feb 2024 15:50:52 -0800 (PST)
-Date: Wed, 21 Feb 2024 13:50:50 -0500
-From: Oliver Crumrine <ozlinuxc@gmail.com>
-To: dsahern@kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: copy routing table more efficiently in
- rt_dst_clone
-Message-ID: <psfmabpw6p3fk5jk3iuuhv4eiolmtvteiydgoxowk35jxpdslu@pcuzmfyxkm6s>
-References: <xlabdyc4izitfdfpuoy2p2hi3abiq4mrrgizdqz45k7xeftbsg@ee6jgncdaqg7>
- <8afe7956-8f29-49e8-a59f-7e6b4136fa1d@kernel.org>
+	s=arc-20240116; t=1708557135; c=relaxed/simple;
+	bh=6m4bwN+S2zI58BgI16wRaaTZzktmvtgYYmiPNXQ77lA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oI4s2hLTlZt3rcySPwW/5Hqgal2CROQ6D74HX2iMLJ0DY/42jkQzcfx6lpP0U/KV9pfu8y6aQHfStm18m+0gTpL3ch/hCi8K+rfU5Naxbg67W6LRMyN7ASDsgExB9pfrA2u8/0GnjIGiq/NjbkgIyhFJYs92YSmZUvWLFb2DdgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tq/aAW3U; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55067C433C7;
+	Wed, 21 Feb 2024 23:12:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708557134;
+	bh=6m4bwN+S2zI58BgI16wRaaTZzktmvtgYYmiPNXQ77lA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Tq/aAW3UKYAeAxvOGXeJCSJbkeGY99NQIWyN4EktdhGBN3BGb4+VuLIDy3TSNk4BP
+	 awYtGHheHVI+SrWoDlxcYyKr/6vdXW535Fwsz3jcRL8zxvlLkIqC9SnrD3BO+3ujFU
+	 Yvo1YJwdJxbDCLj8yn8T1HLEN9LCtCwElI4KCRFTK7hURofydgB87QvP4LtonuheXZ
+	 hjrprKIg2f31gp65C4lYN01DZ/j7nDsiA3QfGiEcjn/qdAkg43u+9fh4KLpsBQoaFv
+	 uBIBJ6eFfGu+5YFl9XIcRf8AcxzngqaRrplIjX4yQaE7DfcrQt2yXvNzsROF/IDfF7
+	 Po9Z1TY/2YJ7Q==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	lorenzo@kernel.org,
+	toke@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	syzbot+039399a9b96297ddedca@syzkaller.appspotmail.com
+Subject: [PATCH net 1/2] net: veth: clear GRO when clearing XDP even when down
+Date: Wed, 21 Feb 2024 15:12:10 -0800
+Message-ID: <20240221231211.3478896-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8afe7956-8f29-49e8-a59f-7e6b4136fa1d@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Feb 20, 2024 at 07:44:24PM -0700, David Ahern wrote:
-Hi David,
+veth sets NETIF_F_GRO automatically when XDP is enabled,
+because both features use the same NAPI machinery.
 
-You are correct that rtable is a container of dst_entry, and the
-previous code copied not only the fields of rtable but also the fields
-of dst_entry. However, the *new_rt = *rt line not only copies the fields
-of rtable, but also the fields of dst_entry. 
+The logic to clear NETIF_F_GRO sits in veth_disable_xdp() which
+is called both on ndo_stop and when XDP is turned off.
+To avoid the flag from being cleared when the device is brought
+down, the clearing is skipped when IFF_UP is not set.
+Bringing the device down should indeed not modify its features.
 
-I have demonstrated this by generating a random number and putting it in
-the "expired" field of the dst_entry that is part of rt, and the printing
-the random number that was generated. After the copy, I printed the
-expired field of the dst_entry that is part of new_rt and the numbers
-matched. This proves that not only the fields that were part of rtable
-were copied but also the fields of dst_entry.
+Unfortunately, this means that clearing is also skipped when
+XDP is disabled _while_ the device is down. And there's nothing
+on the open path to bring the device features back into sync.
+IOW if user enables XDP, disables it and then brings the device
+up we'll end up with a stray GRO flag set but no NAPI instances.
 
-Thanks,
-Oliver
-> On 2/18/24 6:35 AM, Oliver Crumrine wrote:
-> > diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-> > index 16615d107cf0..ebb17c3a0dec 100644
-> > --- a/net/ipv4/route.c
-> > +++ b/net/ipv4/route.c
-> > @@ -1664,22 +1664,8 @@ struct rtable *rt_dst_clone(struct net_device *dev, struct rtable *rt)
-> >  			   rt->dst.flags);
-> >  
-> >  	if (new_rt) {
-> > +		*new_rt = *rt;
-> 
-> rtable is a container of dst_entry, so this is copying those fields as well.
-> 
-> pw-bot: reject
-> 
+We don't depend on the GRO flag on the datapath, so the datapath
+won't crash. We will crash (or hang), however, next time features
+are sync'ed (either by user via ethtool or peer changing its config).
+The GRO flag will go away, and veth will try to disable the NAPIs.
+But the open path never created them since XDP was off, the GRO flag
+was a stray. If NAPI was initialized before we'll hang in napi_disable().
+If it never was we'll crash trying to stop uninitialized hrtimer.
+
+Move the GRO flag updates to the XDP enable / disable paths,
+instead of mixing them with the ndo_open / ndo_close paths.
+
+Fixes: d3256efd8e8b ("veth: allow enabling NAPI even without XDP")
+Reported-by: Thomas Gleixner <tglx@linutronix.de>
+Reported-by: syzbot+039399a9b96297ddedca@syzkaller.appspotmail.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ drivers/net/veth.c | 35 +++++++++++++++++------------------
+ 1 file changed, 17 insertions(+), 18 deletions(-)
+
+diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+index 578e36ea1589..a786be805709 100644
+--- a/drivers/net/veth.c
++++ b/drivers/net/veth.c
+@@ -1208,14 +1208,6 @@ static int veth_enable_xdp(struct net_device *dev)
+ 				veth_disable_xdp_range(dev, 0, dev->real_num_rx_queues, true);
+ 				return err;
+ 			}
+-
+-			if (!veth_gro_requested(dev)) {
+-				/* user-space did not require GRO, but adding XDP
+-				 * is supposed to get GRO working
+-				 */
+-				dev->features |= NETIF_F_GRO;
+-				netdev_features_change(dev);
+-			}
+ 		}
+ 	}
+ 
+@@ -1235,18 +1227,9 @@ static void veth_disable_xdp(struct net_device *dev)
+ 	for (i = 0; i < dev->real_num_rx_queues; i++)
+ 		rcu_assign_pointer(priv->rq[i].xdp_prog, NULL);
+ 
+-	if (!netif_running(dev) || !veth_gro_requested(dev)) {
++	if (!netif_running(dev) || !veth_gro_requested(dev))
+ 		veth_napi_del(dev);
+ 
+-		/* if user-space did not require GRO, since adding XDP
+-		 * enabled it, clear it now
+-		 */
+-		if (!veth_gro_requested(dev) && netif_running(dev)) {
+-			dev->features &= ~NETIF_F_GRO;
+-			netdev_features_change(dev);
+-		}
+-	}
+-
+ 	veth_disable_xdp_range(dev, 0, dev->real_num_rx_queues, false);
+ }
+ 
+@@ -1654,6 +1637,14 @@ static int veth_xdp_set(struct net_device *dev, struct bpf_prog *prog,
+ 		}
+ 
+ 		if (!old_prog) {
++			if (!veth_gro_requested(dev)) {
++				/* user-space did not require GRO, but adding
++				 * XDP is supposed to get GRO working
++				 */
++				dev->features |= NETIF_F_GRO;
++				netdev_features_change(dev);
++			}
++
+ 			peer->hw_features &= ~NETIF_F_GSO_SOFTWARE;
+ 			peer->max_mtu = max_mtu;
+ 		}
+@@ -1669,6 +1660,14 @@ static int veth_xdp_set(struct net_device *dev, struct bpf_prog *prog,
+ 			if (dev->flags & IFF_UP)
+ 				veth_disable_xdp(dev);
+ 
++			/* if user-space did not require GRO, since adding XDP
++			 * enabled it, clear it now
++			 */
++			if (!veth_gro_requested(dev)) {
++				dev->features &= ~NETIF_F_GRO;
++				netdev_features_change(dev);
++			}
++
+ 			if (peer) {
+ 				peer->hw_features |= NETIF_F_GSO_SOFTWARE;
+ 				peer->max_mtu = ETH_MAX_MTU;
+-- 
+2.43.0
+
 
