@@ -1,146 +1,133 @@
-Return-Path: <netdev+bounces-73773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE18785E49D
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 18:32:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F48685E4DD
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 18:46:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 599321F2503D
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 17:32:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16A841F23DF3
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 17:46:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36B3783A11;
-	Wed, 21 Feb 2024 17:32:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20B5583CDB;
+	Wed, 21 Feb 2024 17:46:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mtw3UB1e"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W6mqhk0E"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D282F81737
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 17:32:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F14007BB00
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 17:46:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708536760; cv=none; b=mT8+JBEFXmdbTNnAeHfKvYIaVcSOmdjPl7K3VnRqA3RIzwYPf51eEAtcf/Z+3R0sv/ewlPLf78nZjQUMH+b/unw4ZbTZLlEt6E+ZrRKSBj9HEiq8bfmR/JMdXBzjmrGMO+BrnFUG0HIf42JlwHlhhMpSA1GukDKh6QPwgibtSR8=
+	t=1708537590; cv=none; b=atBUvu8xQp+1mIaOGotkkM/pfkLO/hq/2muU+zzjHLQJQU3u4isfdrzRVos9VtWbYShFnWx3aGyD2yjBCTCM4MdzVPv1zIMQV/pwHk7F76xgryzcgVUY6y6Pt07wS3d/cUZRh5aet8zXdOK0U8l2hadX4M4P2Bpzl7ND4ySNJ80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708536760; c=relaxed/simple;
-	bh=JwdwM9J2OLTx3o/tPJIcLuRjEyhF3j3cRwoLtdYcuiU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aCgelo39yICzltxY1fBaxyenGGB3VrFgI7d6tXXyV5SvpBfHvN01GgsSoQL/kPirf1MM2TyEWufBjy3puVJDTyHZJtYh92KKOaJdEQqonWuxef1TEne9TTR/UrHQKss0OFZglSnUd7G9qgfdSEhehbRDbUv2rmXHmil1ceK7WE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Mtw3UB1e; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708536756;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fd0K12ppmMHd+McfZDDjz5bojEcZl56vE7eqAs6MGJo=;
-	b=Mtw3UB1eo2FJmNNRwohzvnFjffrQ7ywmYTCvU0I9zuTKDA//WowARW2QU/irIc78HpJdSu
-	MeMfvPqczPplarZhswuGGZ4b5iHW+T8CZYxUOFFI3FQkMpDn7Kl7GHwl/sAPhnUP8PyPjd
-	L3ISg5n6Epgco+WnfrWtUsYODMlVf+4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-364-frhRAqf4OT6cLekrpXaGXg-1; Wed, 21 Feb 2024 12:32:34 -0500
-X-MC-Unique: frhRAqf4OT6cLekrpXaGXg-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40fb505c97aso4437155e9.3
-        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 09:32:34 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708536753; x=1709141553;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fd0K12ppmMHd+McfZDDjz5bojEcZl56vE7eqAs6MGJo=;
-        b=mlyNAUU1Zbikf4/7hHgihJ6ZvCh+Jw4RwcXaX8lp0cdyoPCWu9Sa0jAsINn13SSgc3
-         0SloxZMsgVvLadyz9CXLdsEBGx0BpxHzHKdWfZ3u+mXMSjCXWUEtk2lf1ogg6U2Hbu8N
-         WfqvFmwDWUG6E4ju2RaglgvdIWsFx6M5CxdoN6I+3vF1yaRNR5Q2RuUI+DuSUHTLVomU
-         GOc/oOUVurMGuU1BmTNXqmp6M/w0S9ySozCSdJGYS7NOgAYHB4Mgzmm4xizH+OylMnUl
-         q9x1/h+uL6QHYN12hnsqICj/8N38KJ/J5R5ggQmPGl7qU7nFjKzwnIoaTeds6Nktudws
-         uUqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVCF7MTv0szVejZp75rEmN2jCjtkvtPAbvgI+N/6uLQm2WwfBH+YBqCOMwSt2VpAXrPw7nqVs9r/hWuWbVsSma1hoI1U2fm
-X-Gm-Message-State: AOJu0Yylfa6Lf/5+tl5pJlN5sfl19hWSVfdYDKKrC0ABPoXHQgXzWUFS
-	t3kQNv75us3O70XF/2sze0wrBIn4isnEf7cE7EUFxr4HKkw3D+URdnp9XSlNc3GEa9dnjJMRigr
-	0+aSXl6dlkVNh9axH5kwpvwUkMLkrtG6O1PcI8xXi6t+jWeHuxBNfUg==
-X-Received: by 2002:adf:f0d0:0:b0:33d:174e:4813 with SMTP id x16-20020adff0d0000000b0033d174e4813mr11354139wro.23.1708536753546;
-        Wed, 21 Feb 2024 09:32:33 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHdnkLEMCWa5DR8DAqERAk6cUsWMVC+2IfGQSKzzLHWdb7GXG9EFarqvM0LisScIuXJNvtxJg==
-X-Received: by 2002:adf:f0d0:0:b0:33d:174e:4813 with SMTP id x16-20020adff0d0000000b0033d174e4813mr11354118wro.23.1708536753199;
-        Wed, 21 Feb 2024 09:32:33 -0800 (PST)
-Received: from [192.168.1.131] ([193.177.210.50])
-        by smtp.gmail.com with ESMTPSA id q4-20020adfab04000000b0033cf637eea2sm17684985wrc.29.2024.02.21.09.32.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Feb 2024 09:32:32 -0800 (PST)
-Message-ID: <4bba621b-3680-4c70-b10c-39787c7c0ce1@redhat.com>
-Date: Wed, 21 Feb 2024 18:32:27 +0100
+	s=arc-20240116; t=1708537590; c=relaxed/simple;
+	bh=08b+Vo67o6SmoB7++Gm/1GoSVDkHKmrdybkawQNPv0M=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=D49qoUoD2OPvczaRsuH8rCXGLJ0ag4Xtk1exgqti5uPXsC/rV1rsDgQs29ifySHAW6z1mm0TKk/QC43uX4sCyA7RRvmvtV9hWHY/FetNg8azvxNsF0RQ6Ht0KE3oVP6nDyhzyWJDQq+fu8wDT3h6a/8Z3we11Kki117pxYVbst8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W6mqhk0E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42776C433A6;
+	Wed, 21 Feb 2024 17:46:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708537589;
+	bh=08b+Vo67o6SmoB7++Gm/1GoSVDkHKmrdybkawQNPv0M=;
+	h=From:Date:Subject:To:Cc:From;
+	b=W6mqhk0E2fqFmRDkv4SmKqDnsrWdQ+XnKNmevMhJRmDJt2s4lvSb9gACGDSAbkCXQ
+	 zqZZrspFK5rxlaBl7UTx9UVRpykou5gnm5pZMuP/Zs7dpseZSm7S3uHaHaudZw/Jy7
+	 V/6G9M93ErOgPrPtn+WN/HTLGlGshqYZbR/ss0wWjBW4WhdP2jZWdKwU3ta+itH7tK
+	 xIIwv+wM+cCW9H3n9vLWjGISZOeXGsnuVs2RwYUB7zb30TDd+CPb1IUjU+ZIbAFRtf
+	 IMvBxx4JHoN0HQY5hUGLn47JWkgP03elIhfa+05rrcp5JNWTbzcsb8V4oUodOrBQOO
+	 XPspKgseABGqw==
+From: Simon Horman <horms@kernel.org>
+Date: Wed, 21 Feb 2024 17:46:21 +0000
+Subject: [PATCH net-next] ps3/gelic: minor Kernel Doc corrections
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [ovs-dev] [RFC 3/7] selftests: openvswitch: use non-graceful
- kills when needed
-Content-Language: en-US
-To: Aaron Conole <aconole@redhat.com>, netdev@vger.kernel.org
-Cc: dev@openvswitch.org, Ilya Maximets <i.maximets@ovn.org>,
- Eric Dumazet <edumazet@google.com>, linux-kselftest@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>
-References: <20240216152846.1850120-1-aconole@redhat.com>
- <20240216152846.1850120-4-aconole@redhat.com>
-From: Adrian Moreno <amorenoz@redhat.com>
-In-Reply-To: <20240216152846.1850120-4-aconole@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240221-ps3-gelic-kdoc-v1-1-7629216d1340@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAOw21mUC/x3MQQqAIBBA0avErBuoKci6SrQwnWwoLDQikO6et
+ HyL/xNEDsIRhiJB4FuiHD6jLgswq/aOUWw2UEVtRVTjGRt0vIvBzR4GiZRVSve6m1vI0Rl4kec
+ fjuD5Qs/PBdP7fiwThxJqAAAA
+To: Geoff Levand <geoff@infradead.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Michael Ellerman <mpe@ellerman.id.au>, 
+ Nicholas Piggin <npiggin@gmail.com>, 
+ Christophe Leroy <christophe.leroy@csgroup.eu>, 
+ "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, 
+ "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>, netdev@vger.kernel.org, 
+ linuxppc-dev@lists.ozlabs.org
+X-Mailer: b4 0.12.3
 
+* Update the Kernel Doc for gelic_descr_set_tx_cmdstat()
+  and gelic_net_setup_netdev() so that documented name
+  and the actual name of the function match.
 
+* Move define of GELIC_ALIGN() so that it is no longer
+  between gelic_alloc_card_net() and it's Kernel Doc.
 
-On 2/16/24 16:28, Aaron Conole wrote:
-> Normally a spawned process under OVS is given a SIGTERM when the test
-> ends as part of cleanup.  However, in case the process is still lingering
-> for some reason, we also send a SIGKILL to force it down faster.
-> 
-> Signed-off-by: Aaron Conole <aconole@redhat.com>
-> ---
->   tools/testing/selftests/net/openvswitch/openvswitch.sh | 6 ++++--
->   1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> index a5dbde482ba4..678a72ad47c1 100755
-> --- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> +++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-> @@ -91,7 +91,8 @@ ovs_add_if () {
->   		python3 $ovs_base/ovs-dpctl.py add-if \
->   		    -u "$2" "$3" >$ovs_dir/$3.out 2>$ovs_dir/$3.err &
->   		pid=$!
-> -		on_exit "ovs_sbx $1 kill -TERM $pid 2>/dev/null"
-> +		on_exit "ovs_sbx $1 kill --timeout 1000 TERM \
-> +                                        --timeout 1000 KILL $pid 2>/dev/null"
->   	fi
->   }
->   
+* Document netdev parameter of gelic_alloc_card_net()
+  in a way consistent to the documentation of other netdev parameters
+  in this file.
 
-AFAIK, this will immediately send TERM, then wait 1s, send TERM again, wait 1s 
-then send KILL. Is that what you intended? To avoid the double TERM you could:
+Addresses the following warnings flagged by ./scripts/kernel-doc -none:
 
-kill --timeout 1000 KILL --signal TERM $pid
+  .../ps3_gelic_net.c:711: warning: expecting prototype for gelic_net_set_txdescr_cmdstat(). Prototype was for gelic_descr_set_tx_cmdstat() instead
+  .../ps3_gelic_net.c:1474: warning: expecting prototype for gelic_ether_setup_netdev(). Prototype was for gelic_net_setup_netdev() instead
+  .../ps3_gelic_net.c:1528: warning: expecting prototype for gelic_alloc_card_net(). Prototype was for GELIC_ALIGN() instead
+  .../ps3_gelic_net.c:1531: warning: Function parameter or struct member 'netdev' not described in 'gelic_alloc_card_net'
 
---
-Adrián Moreno
+Signed-off-by: Simon Horman <horms@kernel.org>
+---
+ drivers/net/ethernet/toshiba/ps3_gelic_net.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-> @@ -108,7 +109,8 @@ ovs_netns_spawn_daemon() {
->   	info "spawning cmd: $*"
->   	ip netns exec $netns $*  >> $ovs_dir/stdout  2>> $ovs_dir/stderr &
->   	pid=$!
-> -	ovs_sbx "$sbx" on_exit "kill -TERM $pid 2>/dev/null"
-> +	ovs_sbx "$sbx" on_exit "kill --timeout 1000 TERM \
-> +                                    --timeout 1000 KILL $pid 2>/dev/null"
->   }
->   
->   ovs_add_netns_and_veths () {
+diff --git a/drivers/net/ethernet/toshiba/ps3_gelic_net.c b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
+index d5b75af163d3..12b96ca66877 100644
+--- a/drivers/net/ethernet/toshiba/ps3_gelic_net.c
++++ b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
+@@ -698,7 +698,7 @@ gelic_card_get_next_tx_descr(struct gelic_card *card)
+ }
+ 
+ /**
+- * gelic_net_set_txdescr_cmdstat - sets the tx descriptor command field
++ * gelic_descr_set_tx_cmdstat - sets the tx descriptor command field
+  * @descr: descriptor structure to fill out
+  * @skb: packet to consider
+  *
+@@ -1461,7 +1461,7 @@ static void gelic_ether_setup_netdev_ops(struct net_device *netdev,
+ }
+ 
+ /**
+- * gelic_ether_setup_netdev - initialization of net_device
++ * gelic_net_setup_netdev - initialization of net_device
+  * @netdev: net_device structure
+  * @card: card structure
+  *
+@@ -1518,14 +1518,16 @@ int gelic_net_setup_netdev(struct net_device *netdev, struct gelic_card *card)
+ 	return 0;
+ }
+ 
++#define GELIC_ALIGN (32)
++
+ /**
+  * gelic_alloc_card_net - allocates net_device and card structure
++ * @netdev: interface device structure
+  *
+  * returns the card structure or NULL in case of errors
+  *
+  * the card and net_device structures are linked to each other
+  */
+-#define GELIC_ALIGN (32)
+ static struct gelic_card *gelic_alloc_card_net(struct net_device **netdev)
+ {
+ 	struct gelic_card *card;
 
 
