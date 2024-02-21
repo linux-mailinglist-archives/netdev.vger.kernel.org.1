@@ -1,102 +1,224 @@
-Return-Path: <netdev+bounces-73746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85BB685E18E
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 16:41:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D16385E1DC
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 16:49:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E899284573
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 15:41:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A5811F22802
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 15:49:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9265B80629;
-	Wed, 21 Feb 2024 15:41:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3187B80BE1;
+	Wed, 21 Feb 2024 15:49:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pIz92E/z"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="Uo9b62mG"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDF174F8AB
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 15:41:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37ED33A1A2
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 15:49:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708530082; cv=none; b=O+d0oG7YObgDFTgC0pd4RxOtN7zvz1vpLkEAI7/3yBSRchIi1p6l6JEavIRtY9arM7jZEPvVquXt7WokCwnH4IenQENb8GkF3yTSoiK3hx4Coqm3hhjQbQiLjzyebRH16mPTNaxgOrbmEGWk6oowN7Wx0fpuW3/KzYBOseJyauI=
+	t=1708530590; cv=none; b=LiuHU3lqxQH+R69xLjkdxVGfqDU9ImySv4lXkrvsX7CqqM8qkzPhp6VzJZP28w/cR/WKiFhJJWmu3NEkVQLHzc6odZai2ESKNjzXPoattWFvBC96SvNUsHiWOYvqvffjVVqN7ALUNG3GRdA7LiIIQZfhw31fXYri91wyFAkc2B0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708530082; c=relaxed/simple;
-	bh=iC/8RO1TBZVhZEvv1XKNeECF3fCYsqvXMGYUH+ajqsc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RMs6b03vZBCcOLCxTYO/BMx9gFV2Ax/1pRLyTIKbIXZWL652792YjHHqaYPjcVtDnCIR57pjRW4KzoeaaAMNFHMWGoITnnDF6aWQnMueilpv+kG1aD1095Z3ukeB8pzHVPR03TYDq5XINq0pnY2EL4TbqjadA8alxPfVC/Jm4gs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pIz92E/z; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=GvG0RSRaZqDia7OUqoLQ0ErZrf6V4r0bG22t9ZizR8M=; b=pIz92E/zrlbMKgokofL3uqnhPE
-	mYYNrcxgNXE0eFQo/Tc+LnvlcxGvgK68gfgN5YApMF7FrAa8angPTIYH3sCt8SG1aEXQFb2Xbvhz9
-	4m0hqhMFGEQOLkXCwiCiciptQ3vqd7pIEUnfkJyfHyUFvotPS54tm6fp8FBkm7MvoQkA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rcoir-008NVO-Ix; Wed, 21 Feb 2024 16:41:25 +0100
-Date: Wed, 21 Feb 2024 16:41:25 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Russell King - ARM Linux <linux@armlinux.org.uk>,
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	David Miller <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next] ethtool: ignore unused/unreliable fields in
- set_eee op
-Message-ID: <7472bddc-86ad-45fb-8337-4ee21ea7a941@lunn.ch>
-References: <4806ef46-a162-4782-8c15-17e12ad88de7@gmail.com>
+	s=arc-20240116; t=1708530590; c=relaxed/simple;
+	bh=OrAXqg8G4bMev0Hn4tGa3WDTsAxqPNXZWs/8AjY+XdU=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=gyljwWsNO7x3O7M2Ar+u0MkuoBcYOP1QBGgmDLTFug0pJ5XJdyJwXjtByom86rTklRGTcatAStm1DLrTVBuSqLDhvVpdbzYe4Y7QPeLUqpMFZ2iDDoeB+Kw2TmZ5/VK4i/3K5xpOJRs8o1o7YDMIBiC8A8hygoEGbLXkfrCoR4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=Uo9b62mG; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id CBB7640C9D
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 15:49:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1708530578;
+	bh=WGNYfSNQTh19goOzHyiLxZdYWOcX+I0Fp1z5zFe70r8=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID;
+	b=Uo9b62mGurlXLnDmdU9f5uhkdHP6G8pjyKRAg29iDJpj/claPFfk6vlc+Wu63Y3Ld
+	 tzCDXkuTVji9mJWstV/loGlhJkD9Pok0fpUzFD43HorrvJnHcoht+orwLHTgOU8L5j
+	 SShUwhw2xi8CupfAciAWxAGa13/mXRa0LV8Rt4ilLQoZLnAKirCIIE4prubBgHPsrE
+	 NYYogsRv+ec2AekX8qPt7X304YyaLWv+rorweDfeyC4Zze42RogrRjH+XkLkfpTAin
+	 91pGCBTh/EaPM7eEXbS4SVIT/YSxFZn+gQt2PP67Rpsa74tosDWX1PZRR4Gk2nb/IO
+	 QDD/yo+POGiAA==
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2998dd791afso2838710a91.1
+        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 07:49:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708530577; x=1709135377;
+        h=message-id:date:content-transfer-encoding:content-id:mime-version
+         :comments:references:in-reply-to:subject:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WGNYfSNQTh19goOzHyiLxZdYWOcX+I0Fp1z5zFe70r8=;
+        b=kfcbcd08dxdbFa/fUR6XdOp1gOCkBFYO+4sAoUVNIaXB58bqM30zCdMwnKLatV5C4b
+         QznQVl5rvq5GbcYMMIDXH32PpAbx/dczWZaNh7wym5JjtEctYZiOCiY2UykAY4NTL7/L
+         qRHss79mjecOmSWO+XMQB7Nalkru4wckxVUb4sVVgsB+4x4uZ+4xby/isSIgsdmOxZKJ
+         6iwzP5B4g/a9uIOta54z2U/yJ5H+aA0VTetZImWXrnEhl1IMU4xYnZ/eFQyDkpP1J2hn
+         ZJEFRY+vumzFafzh8ph3RwWsu1CTEX7W8N5+VjzLxcEjlb3FfdhhcC+zH9SaKFazQ1Hw
+         wINA==
+X-Forwarded-Encrypted: i=1; AJvYcCU1/cOffA0k6ZkLm3Uxgk8iJpABTbGstzbDHtTE6fW0bD+8MQpTBXgztqohSnwxh6ICJVVa2el/KyAEuqulxCx9Nujccm6K
+X-Gm-Message-State: AOJu0YwfuRp6B7V08rFtwc4ILjdKV+nsjmXtr/kPYNuH3d8o0cA7eX+G
+	8l/V5/k0E7kEbdTelnADmJSCZ0LoxRBRKw7i4k62EqfKIqMZ+AchcbSmHn6RAwpFkR4ZQKv1Rc+
+	11KRVgDCVmSxX8Q0jRHy5P+8N5R4l81HBlTK9IxXkC3Y3a9kHTXWHu/Ca5TvSjaOajClr0w==
+X-Received: by 2002:a17:90a:3482:b0:299:3990:4e11 with SMTP id p2-20020a17090a348200b0029939904e11mr13049878pjb.34.1708530577474;
+        Wed, 21 Feb 2024 07:49:37 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGKsZ7CC/ov1NYWAU3H+jSsNO7zKzi0int6CRZ3wTWthcM19jkflIkqy/TgGvLmivXMt/b9mA==
+X-Received: by 2002:a17:90a:3482:b0:299:3990:4e11 with SMTP id p2-20020a17090a348200b0029939904e11mr13049857pjb.34.1708530577133;
+        Wed, 21 Feb 2024 07:49:37 -0800 (PST)
+Received: from famine.localdomain ([50.125.80.253])
+        by smtp.gmail.com with ESMTPSA id si11-20020a17090b528b00b00296d9c4d5f0sm1978109pjb.10.2024.02.21.07.49.36
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 21 Feb 2024 07:49:36 -0800 (PST)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id 436895FF14; Wed, 21 Feb 2024 07:49:36 -0800 (PST)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id 3C3689FAAA;
+	Wed, 21 Feb 2024 07:49:36 -0800 (PST)
+From: Jay Vosburgh <jay.vosburgh@canonical.com>
+To: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
+cc: andy@greyhouse.net, davem@davemloft.net, edumazet@google.com,
+    kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org, rajesh.sivaramasubramaniom@oracle.com,
+    rama.nichanamatlu@oracle.com, manjunath.b.patil@oracle.com
+Subject: Re: [PATCH net-next v6] bonding: rate-limit bonding driver inspect messages
+In-reply-to: <20240221082752.4660-1-praveen.kannoju@oracle.com>
+References: <20240221082752.4660-1-praveen.kannoju@oracle.com>
+Comments: In-reply-to Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
+   message dated "Wed, 21 Feb 2024 13:57:52 +0530."
+X-Mailer: MH-E 8.6+git; nmh 1.6; Emacs 29.0.50
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4806ef46-a162-4782-8c15-17e12ad88de7@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <32545.1708530576.1@famine>
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 21 Feb 2024 07:49:36 -0800
+Message-ID: <32546.1708530576@famine>
 
-On Wed, Feb 21, 2024 at 08:24:40AM +0100, Heiner Kallweit wrote:
-> This function is used with the set_eee() ethtool operation. Certain
-> fields of struct ethtool_keee() are relevant only for the get_eee()
-> operation. In addition, in case of the ioctl interface, we have no
-> guarantee that userspace sends sane values in struct ethtool_eee.
-> Therefore explicitly ignore all fields not needed for set_eee().
-> This protects from drivers trying to use unchecked and unreliable
-> data, relying on specific userspace behavior.
-> 
-> Note: Such unsafe driver behavior has been found and fixed in the
-> tg3 driver.
-> 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> ---
->  net/ethtool/ioctl.c | 7 -------
->  1 file changed, 7 deletions(-)
-> 
-> diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-> index 1763e8b69..ff28c113b 100644
-> --- a/net/ethtool/ioctl.c
-> +++ b/net/ethtool/ioctl.c
-> @@ -1513,20 +1513,13 @@ static void eee_to_keee(struct ethtool_keee *keee,
->  {
->  	memset(keee, 0, sizeof(*keee));
->  
-> -	keee->supported_u32 = eee->supported;
->  	keee->advertised_u32 = eee->advertised;
-> -	keee->lp_advertised_u32 = eee->lp_advertised;
+Praveen Kumar Kannoju <praveen.kannoju@oracle.com> wrote:
 
-This overlaps with the last patch in my series, which removes all the
-_u32 members from keee. They are no longer used at the end of my
-series. I added this removal patch because i kept missing a _u32, and
-i wanted the compiler to tell me.
+>Through the routine bond_mii_monitor(), bonding driver inspects and commi=
+ts
+>the slave state changes. During the times when slave state change and
+>failure in aqcuiring rtnl lock happen at the same time, the routine
+>bond_mii_monitor() reschedules itself to come around after 1 msec to comm=
+it
+>the new state.
+>
+>During this, it executes the routine bond_miimon_inspect() to re-inspect
+>the state chane and prints the corresponding slave state on to the consol=
+e.
+>Hence we do see a message at every 1 msec till the rtnl lock is acquired
+>and state chage is committed.
+>
+>This patch doesn't change how bond functions. It only simply limits this
+>kind of log flood.
+>
+>Signed-off-by: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
 
-	Andrew
+Acked-by: Jay Vosburgh <jay.vosburgh@canonical.com>
+
+
+>---
+>v6: =
+
+>  - Minor space additions addressed. =
+
+>v5: https://lore.kernel.org/all/20240221050809.4372-1-praveen.kannoju@ora=
+cle.com/
+>  - Redundant indentation addressed.
+>v4: https://lore.kernel.org/all/20240220050437.5623-1-praveen.kannoju@ora=
+cle.com/
+>  - Rectification in the patch subject and versioning details.
+>v3: https://lore.kernel.org/lkml/20240219133721.4567-1-praveen.kannoju@or=
+acle.com/
+>  - Commit message is modified to provide summary of the issue, because o=
+f
+>    which rate-limiting the bonding driver messages is needed.
+>v2: https://lore.kernel.org/lkml/20240215172554.4211-1-praveen.kannoju@or=
+acle.com/
+>  - Use exising net_ratelimit() instead of introducing new rate-limit
+>    parameter.
+>v1: https://lore.kernel.org/lkml/20240214044245.33170-1-praveen.kannoju@o=
+racle.com/
+>---
+> drivers/net/bonding/bond_main.c | 18 ++++++++++--------
+> 1 file changed, 10 insertions(+), 8 deletions(-)
+>
+>diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_m=
+ain.c
+>index 4e0600c..51fdb79 100644
+>--- a/drivers/net/bonding/bond_main.c
+>+++ b/drivers/net/bonding/bond_main.c
+>@@ -2609,7 +2609,7 @@ static int bond_miimon_inspect(struct bonding *bond=
+)
+> 			bond_propose_link_state(slave, BOND_LINK_FAIL);
+> 			commit++;
+> 			slave->delay =3D bond->params.downdelay;
+>-			if (slave->delay) {
+>+			if (slave->delay && net_ratelimit()) {
+> 				slave_info(bond->dev, slave->dev, "link status down for %sinterface,=
+ disabling it in %d ms\n",
+> 					   (BOND_MODE(bond) =3D=3D
+> 					    BOND_MODE_ACTIVEBACKUP) ?
+>@@ -2623,9 +2623,10 @@ static int bond_miimon_inspect(struct bonding *bon=
+d)
+> 				/* recovered before downdelay expired */
+> 				bond_propose_link_state(slave, BOND_LINK_UP);
+> 				slave->last_link_up =3D jiffies;
+>-				slave_info(bond->dev, slave->dev, "link status up again after %d ms\=
+n",
+>-					   (bond->params.downdelay - slave->delay) *
+>-					   bond->params.miimon);
+>+				if (net_ratelimit())
+>+					slave_info(bond->dev, slave->dev, "link status up again after %d ms=
+\n",
+>+						   (bond->params.downdelay - slave->delay) *
+>+						   bond->params.miimon);
+> 				commit++;
+> 				continue;
+> 			}
+>@@ -2647,7 +2648,7 @@ static int bond_miimon_inspect(struct bonding *bond=
+)
+> 			commit++;
+> 			slave->delay =3D bond->params.updelay;
+> =
+
+>-			if (slave->delay) {
+>+			if (slave->delay && net_ratelimit()) {
+> 				slave_info(bond->dev, slave->dev, "link status up, enabling it in %d=
+ ms\n",
+> 					   ignore_updelay ? 0 :
+> 					   bond->params.updelay *
+>@@ -2657,9 +2658,10 @@ static int bond_miimon_inspect(struct bonding *bon=
+d)
+> 		case BOND_LINK_BACK:
+> 			if (!link_state) {
+> 				bond_propose_link_state(slave, BOND_LINK_DOWN);
+>-				slave_info(bond->dev, slave->dev, "link status down again after %d m=
+s\n",
+>-					   (bond->params.updelay - slave->delay) *
+>-					   bond->params.miimon);
+>+				if (net_ratelimit())
+>+					slave_info(bond->dev, slave->dev, "link status down again after %d =
+ms\n",
+>+						   (bond->params.updelay - slave->delay) *
+>+						   bond->params.miimon);
+> 				commit++;
+> 				continue;
+> 			}
+>-- =
+
+>1.8.3.1
+>
+>
 
