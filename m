@@ -1,91 +1,126 @@
-Return-Path: <netdev+bounces-73835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC22385EBE7
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 23:40:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8492B85EBEC
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 23:44:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 468BF28506E
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 22:40:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 112D1B2399A
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 22:44:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F132D3C470;
-	Wed, 21 Feb 2024 22:40:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rf0vFPSy"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 766EC7F7F1;
+	Wed, 21 Feb 2024 22:44:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD7DB3BB37
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 22:40:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C8A3BB53
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 22:44:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.86.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708555227; cv=none; b=JSxM9H8X+/o07MPUEjIjGyXHay/jJ5QckeqmiQwNjHVcmwR/82CRdnz3UWG2yIYESUPAeL3Pt/UySAXLGJeIXnp9NQaUQWM7nylIBR9jtWqq8l0xGr5smJDfLGjt48xcOT+qjDmIH+hGp2ESYG60zzwVixcK13c3FjdUayxJicY=
+	t=1708555484; cv=none; b=P0qSOHX99tUCXZ9l3qdsGkwONfpAjR3Aw0d/oAtWeNQMoNS7hzdXY2umaBfe1Pd9ads4Qzpnsmo89W/C1nOUK4jWb+ciC3RLjEHFhUotauGnMMIKV6c3qZ8u6otp3cvuEZTmpQqGNJScNlOnx4vFVEht9yjGwGwuVE/z6wp9Guc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708555227; c=relaxed/simple;
-	bh=Id+aOBIfOJHwZ8AUWPHmj2p+YQSIsIzK+yrQWfkOusM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=a3pmJ4cs1EvdWPYug3CjLKcJgppPOf6dRUXPfEvd0SHAag7tNNGG7JyJSMKSvcqBWTr31ZwAHv65eJsYr9i4GYVf8tEsc4p0CJDR+XAG76JjGvZTAtOslh3zmTWmX5F2b1pn/XpaN2vn1wuy4On859MvfVyBrgGVGfy/i4Z831s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rf0vFPSy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3DBD0C43390;
-	Wed, 21 Feb 2024 22:40:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708555227;
-	bh=Id+aOBIfOJHwZ8AUWPHmj2p+YQSIsIzK+yrQWfkOusM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Rf0vFPSy6eVehCufvWjgt5OL3esK9QTnL3q9PDXq45NqmOxZrK1lVLgSqYkyf8Ki+
-	 ocWSec1BDRwK010Aw1FIqmAgNSB87QYCOrqAquuT6AZxWRCCi5Y+NszvQ38uk4Y0QE
-	 N4PNJ4E7a8fmF5iP+uyKnt3etJmiNX0Ju/y8hH9YqKADZ94Iut2kuvu7iPBlx7jHhX
-	 wQkYigrUf7y36w9g+DroWCXI+Q/4llLh8FZLft6rt+kLy3FcI4yl5GmioMjjB0efeM
-	 g1pnBlHegjZvdhFFyn4+YBt/hYKlcO1FahWkdHVFMqB6gyJMAuLVNXx2PGuhpXuHhe
-	 ZjRgBWcloFhvg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 261EAC00446;
-	Wed, 21 Feb 2024 22:40:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1708555484; c=relaxed/simple;
+	bh=ynCx5dbHJXM1OpyJSTDx7N02mIROGTc1mkWbCs5RUpo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=SkiYV5eJSWhFXLY9rZnL52WCiQunZdKtD0Tu/+Ue/VPQ4AUhZiWXQl8VCJRqAjno4jZoyoaQ0im7jm+muVjv8DsowEA5IsLSFdeosV/sgzKTd5Q3XLpQpEI38EwQFpo7YXgPQnvfwxbnwnwwkss7tdHp1Bx1l2IlF+I+D4Eg0lA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.86.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-65-DfNQ66gKM92OtrzTRaJzOg-1; Wed, 21 Feb 2024 22:44:33 +0000
+X-MC-Unique: DfNQ66gKM92OtrzTRaJzOg-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 21 Feb
+ 2024 22:44:32 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Wed, 21 Feb 2024 22:44:32 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Marc Kleine-Budde' <mkl@pengutronix.de>, Oliver Hartkopp
+	<socketcan@hartkopp.net>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: "linux-can@vger.kernel.org" <linux-can@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH] can: raw: raw_getsockopt(): reduce scope of err
+Thread-Topic: [PATCH] can: raw: raw_getsockopt(): reduce scope of err
+Thread-Index: AQHaY9Ug246GnPh9DUCq0NoOfILROLEVZS4g
+Date: Wed, 21 Feb 2024 22:44:32 +0000
+Message-ID: <7bb0474bad834a7c9f810c70e959ef12@AcuMS.aculab.com>
+References: <20240220-raw-setsockopt-v1-1-7d34cb1377fc@pengutronix.de>
+In-Reply-To: <20240220-raw-setsockopt-v1-1-7d34cb1377fc@pengutronix.de>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: phy: mxl-gpy: fill in possible_interfaces for
- GPY21x chipset
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170855522715.2434.359995649688728546.git-patchwork-notify@kernel.org>
-Date: Wed, 21 Feb 2024 22:40:27 +0000
-References: <20240216054435.22380-1-Raju.Lakkaraju@microchip.com>
-In-Reply-To: <20240216054435.22380-1-Raju.Lakkaraju@microchip.com>
-To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, UNGLinuxDriver@microchip.com,
- lxu@maxlinear.com, andrew@lunn.ch, linux@armlinux.org.uk, kuba@kernel.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri, 16 Feb 2024 11:14:35 +0530 you wrote:
-> Fill in the possible_interfaces member.
-> GPY21x phys support the SGMII and 2500base-X interfaces
-> 
-> Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-> ---
->  drivers/net/phy/mxl-gpy.c | 20 ++++++++++++++------
->  1 file changed, 14 insertions(+), 6 deletions(-)
-
-Here is the summary with links:
-  - [net-next] net: phy: mxl-gpy: fill in possible_interfaces for GPY21x chipset
-    https://git.kernel.org/netdev/net-next/c/59f95f5da813
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+RnJvbTogTWFyYyBLbGVpbmUtQnVkZGUNCj4gU2VudDogMjAgRmVicnVhcnkgMjAyNCAwODoxNg0K
+PiANCj4gUmVkdWNlIHRoZSBzY29wZSBvZiB0aGUgdmFyaWFibGUgImVyciIgdG8gdGhlIGluZGl2
+aWR1YWwgY2FzZXMuIFRoaXMNCj4gaXMgdG8gYXZvaWQgdGhlIG1pc3Rha2Ugb2Ygc2V0dGluZyAi
+ZXJyIiBpbiB0aGUgbWlzdGFrZW4gYmVsaWVmIHRoYXQNCj4gaXQgd2lsbCBiZSBldmFsdWF0ZWQg
+bGF0ZXIuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBNYXJjIEtsZWluZS1CdWRkZSA8bWtsQHBlbmd1
+dHJvbml4LmRlPg0KPiAtLS0NCj4gIG5ldC9jYW4vcmF3LmMgfCAxMiArKysrKysrKy0tLS0NCj4g
+IDEgZmlsZSBjaGFuZ2VkLCA4IGluc2VydGlvbnMoKyksIDQgZGVsZXRpb25zKC0pDQo+IA0KPiBk
+aWZmIC0tZ2l0IGEvbmV0L2Nhbi9yYXcuYyBiL25ldC9jYW4vcmF3LmMNCj4gaW5kZXggODk3ZmZj
+MTdkODUwLi4yYmIzZWFiOThhZjAgMTAwNjQ0DQo+IC0tLSBhL25ldC9jYW4vcmF3LmMNCj4gKysr
+IGIvbmV0L2Nhbi9yYXcuYw0KPiBAQCAtNzU2LDcgKzc1Niw2IEBAIHN0YXRpYyBpbnQgcmF3X2dl
+dHNvY2tvcHQoc3RydWN0IHNvY2tldCAqc29jaywgaW50IGxldmVsLCBpbnQgb3B0bmFtZSwNCj4g
+IAlzdHJ1Y3QgcmF3X3NvY2sgKnJvID0gcmF3X3NrKHNrKTsNCj4gIAlpbnQgbGVuOw0KPiAgCXZv
+aWQgKnZhbDsNCj4gLQlpbnQgZXJyID0gMDsNCj4gDQo+ICAJaWYgKGxldmVsICE9IFNPTF9DQU5f
+UkFXKQ0KPiAgCQlyZXR1cm4gLUVJTlZBTDsNCj4gQEAgLTc2Niw3ICs3NjUsOSBAQCBzdGF0aWMg
+aW50IHJhd19nZXRzb2Nrb3B0KHN0cnVjdCBzb2NrZXQgKnNvY2ssIGludCBsZXZlbCwgaW50IG9w
+dG5hbWUsDQo+ICAJCXJldHVybiAtRUlOVkFMOw0KPiANCj4gIAlzd2l0Y2ggKG9wdG5hbWUpIHsN
+Cj4gLQljYXNlIENBTl9SQVdfRklMVEVSOg0KPiArCWNhc2UgQ0FOX1JBV19GSUxURVI6IHsNCj4g
+KwkJaW50IGVyciA9IDA7DQo+ICsNCj4gIAkJbG9ja19zb2NrKHNrKTsNCj4gIAkJaWYgKHJvLT5j
+b3VudCA+IDApIHsNCj4gIAkJCWludCBmc2l6ZSA9IHJvLT5jb3VudCAqIHNpemVvZihzdHJ1Y3Qg
+Y2FuX2ZpbHRlcik7DQo+IEBAIC03OTEsNyArNzkyLDcgQEAgc3RhdGljIGludCByYXdfZ2V0c29j
+a29wdChzdHJ1Y3Qgc29ja2V0ICpzb2NrLCBpbnQgbGV2ZWwsIGludCBvcHRuYW1lLA0KPiAgCQlp
+ZiAoIWVycikNCj4gIAkJCWVyciA9IHB1dF91c2VyKGxlbiwgb3B0bGVuKTsNCj4gIAkJcmV0dXJu
+IGVycjsNCj4gLQ0KPiArCX0NCj4gIAljYXNlIENBTl9SQVdfRVJSX0ZJTFRFUjoNCj4gIAkJaWYg
+KGxlbiA+IHNpemVvZihjYW5fZXJyX21hc2tfdCkpDQo+ICAJCQlsZW4gPSBzaXplb2YoY2FuX2Vy
+cl9tYXNrX3QpOw0KPiBAQCAtODIyLDcgKzgyMyw5IEBAIHN0YXRpYyBpbnQgcmF3X2dldHNvY2tv
+cHQoc3RydWN0IHNvY2tldCAqc29jaywgaW50IGxldmVsLCBpbnQgb3B0bmFtZSwNCj4gIAkJdmFs
+ID0gJnJvLT54bF9mcmFtZXM7DQo+ICAJCWJyZWFrOw0KPiANCj4gLQljYXNlIENBTl9SQVdfWExf
+VkNJRF9PUFRTOg0KPiArCWNhc2UgQ0FOX1JBV19YTF9WQ0lEX09QVFM6IHsNCj4gKwkJaW50IGVy
+ciA9IDA7DQo+ICsNCj4gIAkJLyogdXNlciBzcGFjZSBidWZmZXIgdG8gc21hbGwgZm9yIFZDSUQg
+b3B0cz8gKi8NCj4gIAkJaWYgKGxlbiA8IHNpemVvZihyby0+cmF3X3ZjaWRfb3B0cykpIHsNCj4g
+IAkJCS8qIHJldHVybiAtRVJBTkdFIGFuZCBuZWVkZWQgc3BhY2UgaW4gb3B0bGVuICovDQo+IEBA
+IC04MzksNiArODQyLDcgQEAgc3RhdGljIGludCByYXdfZ2V0c29ja29wdChzdHJ1Y3Qgc29ja2V0
+ICpzb2NrLCBpbnQgbGV2ZWwsIGludCBvcHRuYW1lLA0KPiAgCQkJZXJyID0gcHV0X3VzZXIobGVu
+LCBvcHRsZW4pOw0KPiAgCQlyZXR1cm4gZXJyOw0KPiANCj4gKwl9DQo+ICAJY2FzZSBDQU5fUkFX
+X0pPSU5fRklMVEVSUzoNCj4gIAkJaWYgKGxlbiA+IHNpemVvZihpbnQpKQ0KPiAgCQkJbGVuID0g
+c2l6ZW9mKGludCk7DQoNCkknZCBiZSB2ZXJ5IHRlbXB0ZWQgdG8gY2hhbmdlIHRoZSBjb2RlIHNv
+IHRoYXQgdGhlcmUgaXMgb25seSBvbmUNCnB1dF91c2VyKGxlbiwgb3B0bGVuKSByaWdodCBhdCB0
+aGUgYm90dG9tLg0KDQpJZiB0aGUgY29kZSBpcyBvYmV5aW5nIHRoZSBub3JtYWwgJ3J1bGVzJyBm
+b3IgZ2V0c29ja29wdCgpIHRoZSBmdW5jdGlvbg0KY2FuIGFjdHVhbGx5IHJldHVybiB0aGUgbGVu
+Z3RoIG9yIGFuIGVycm9yIGFuZCB0aGUgY2FsbGVyIGNhbiBzb3J0DQpvdXQgd2hhdCB0byBkbyB3
+aXRoIHRoZSBkYXRhLg0KVGhhdCBtYWtlcyB0aGUgY2hhbmdlcyByZXF1aXJlZCB0byBpbXBsZW1l
+bnQga2VybmVsX2dldHNvY2tvcHQoKQ0KYSBsb3Qgc2ltcGxlci4NCkkgZGlkIHN0YXJ0IHdyaXRp
+bmcgYSBwYXRjaHNldCB0byBkbyB0aGF0LCBidXQgc29tZSBvZiB0aGUgY29kZQ0KaXMgZW50aXJl
+bHkgYnJhaW4tZGVhZC4NCkJ1dCBpdCB3b3VsZCBjZXJ0YWlubHkgbWFrZSBzZW5zZSBmb3IgdGhl
+ICdvcHRsZW4nIHBhcmFtZXRlciB0bw0KYmUgYSBrZXJuZWwgYWRkcmVzcyBhbmQgaGF2ZSBiZWVu
+IHZhbGlkYXRlZCB0byBiZSAnc2FuZScgKGVnIHBvc2l0aXZlKQ0KYW5kIGhhdmUgdGhlIHN5c2Nh
+bGwgd3JhcHBlciBkbyB0aGUgdXNlciBjb3BpZXMuDQpJdCBjYW4ndCBiZSBkb25lIGZvciB0aGUg
+YnVmZmVyIChpbiBhbGwgY2FzZXMpIGJlY2F1c2UgdGhlIHVzZXINCnN1cHBsaWVkIGxlbmd0aCBp
+c24ndCBhbHdheXMgdGhlIGJ1ZmZlciBsZW5ndGguDQpCdXQgdGhlIGxlbmd0aCBmaWVsZCBpcyBk
+ZWZpbmVkIHRvIGJlIGFuIGludGVnZXIuDQoNCglEYXZpZA0KDQotDQpSZWdpc3RlcmVkIEFkZHJl
+c3MgTGFrZXNpZGUsIEJyYW1sZXkgUm9hZCwgTW91bnQgRmFybSwgTWlsdG9uIEtleW5lcywgTUsx
+IDFQVCwgVUsNClJlZ2lzdHJhdGlvbiBObzogMTM5NzM4NiAoV2FsZXMpDQo=
 
 
