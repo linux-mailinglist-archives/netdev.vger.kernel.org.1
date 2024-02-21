@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-73513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD0F485CD99
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 02:56:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DED885CDA0
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 02:59:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 64EFBB222AD
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 01:56:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 870E4B23354
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 01:59:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1CF1468F;
-	Wed, 21 Feb 2024 01:55:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4C6C3C29;
+	Wed, 21 Feb 2024 01:59:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dLU5yQHg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dLHXMH1W"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E38D23C9
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 01:55:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8104C4694
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 01:59:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708480558; cv=none; b=HQNuB308ILsIwLhW4KvYUk33r8r3ltMWFJ4BpYYK1fKcYlQl52WePpKMrnEJCqDcUXGQqC+51k7E0PA9cqrLmAmBjR5ap4On5QJrLNEbMNGXkq9It4eqM+g6vc14/88FfpdIwJcS+4fdnB04T2hgMpPUjYyLLSe9DlCc+gvBCt4=
+	t=1708480760; cv=none; b=Sk6+cy5A5tHSZAZy2zod0mcwtTRIZ1YAZq4xzuoe+fQ2ph6JZP3x9p+l/f1UbZVxF3xe/Pc5ZNOuWJRHT+Vm6JgQRZ0/BhS43SS6u6pHVScCnxUGGbzdTEY20omPZgE+wn41pPSPe6iW7CmV0/GtgwxT4kcQJuXW1IjS81JsVWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708480558; c=relaxed/simple;
-	bh=dn9hViBCYl+szJewJxHU7ZzVHEhe2Z7JJ/8C4/boLyM=;
+	s=arc-20240116; t=1708480760; c=relaxed/simple;
+	bh=D/WXMWe5i2zSbMKJxik9pdTuExGIduD+BswJJ/xibMQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qAp5sZIyOhEiFrP4AUm9y5n+9QCOMPGrSjwLD2O97ka1W77qb7UhywKLMliylM3fCLcikseHm2eECyGld+gGIQ8xan/Wsi/FZpkhsfpTZI33J5dok3TF6NhD1BJPTWorRXaNEo1k5huLi5eL9jwsTTy0X1ca42lzpV3thEhSRp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dLU5yQHg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C09EC433F1;
-	Wed, 21 Feb 2024 01:55:57 +0000 (UTC)
+	 MIME-Version:Content-Type; b=GFblv3oHmxw5zZEugXc2Onpw3rvTFamCDNksrAlcG08wckmkbvtL1CcCk42ksUJN3QBcKApUfGziES8i5d0YHS3vOBeIuRcINL7CdaltHB3Ur9fI+lnQFDQR03DWMlA36OCwH0G2o+pTH0S4ojj7nJo1QLn2gLwsFqDdBpTURXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dLHXMH1W; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50D93C433C7;
+	Wed, 21 Feb 2024 01:59:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708480558;
-	bh=dn9hViBCYl+szJewJxHU7ZzVHEhe2Z7JJ/8C4/boLyM=;
+	s=k20201202; t=1708480760;
+	bh=D/WXMWe5i2zSbMKJxik9pdTuExGIduD+BswJJ/xibMQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dLU5yQHgaoodI/2gy9N6HTnAtGlD11sEWMBmtgYtGXzSAD4V71cIPW7GLFyCjMrYt
-	 QlokpsvoxeFQZrCAISyoZDjG/Dh3I6xBqqtsZiCsNryDCrLOu583YPH5AKQXAXobaS
-	 HOCJ/xZCXRvE0ABUerwZjyc2PEE4lsOOTuHRlbBKr1JeFJLlw7J8/78YLAsy7t2pPp
-	 aY7TOHpd1/b4bxYRieGpbvXnoVvd95+A9iR6LdsoJ4QCDPuGaqEFeAWSY2tRkjaMgu
-	 U3mmYZOANg134Lt+5+u4ZQx818HzLCesfpO55r1ubAig3Rw0k3a1jX3B9ZQVqa6Wxc
-	 W5ECyorsvNemA==
-Date: Tue, 20 Feb 2024 17:55:56 -0800
+	b=dLHXMH1WZLNBQZGoxVPyL9mYMRfN4dc1Dh65KysiubEPeU6++TKiRaKMCgjoexW+t
+	 FNb99ZgK/oGrqWAl3sTNrkHGhk4v/aNmyj1TKpCnHt5yvccndvqIrHeV+Tz9HQjSpD
+	 qj192gVDUFfPHepQPWJsuaIK38izD6HSvpt5eEnBDoWPtZg3q1GMGp9hg/ib27Ziwn
+	 k9AuMLarpRd9COq+2WOa3Kaf88AbHJlsVyda4KoZDNbjPa2MTVst3WSPXI4HdqY6Nr
+	 5HzN8Bu/q2Fvvk8iFeRFaNC6yXBHuMTlI9v/LpmFF1fEWZvpjyU52TmKeTyHokgKtL
+	 g/WI6lAnlRFWQ==
+Date: Tue, 20 Feb 2024 17:59:18 -0800
 From: Jakub Kicinski <kuba@kernel.org>
 To: Jiri Pirko <jiri@resnulli.us>
 Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
@@ -50,12 +50,12 @@ Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
  lorenzo@kernel.org, alessandromarcolini99@gmail.com
 Subject: Re: [patch net-next 03/13] tools: ynl: allow user to pass enum
  string instead of scalar value
-Message-ID: <20240220175556.2a8a4ef9@kernel.org>
-In-Reply-To: <ZdRT2qb2ArAjaCWI@nanopsycho>
+Message-ID: <20240220175918.73026870@kernel.org>
+In-Reply-To: <ZdRUfZMRvjMlDqtX@nanopsycho>
 References: <20240219172525.71406-1-jiri@resnulli.us>
 	<20240219172525.71406-4-jiri@resnulli.us>
-	<20240219124914.4e43e531@kernel.org>
-	<ZdRT2qb2ArAjaCWI@nanopsycho>
+	<20240219125100.538ce0f8@kernel.org>
+	<ZdRUfZMRvjMlDqtX@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,11 +65,24 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 20 Feb 2024 08:25:14 +0100 Jiri Pirko wrote:
-> >It'd be cleaner to make it more symmetric with _decode_enum(), and call
-> >it _encode_enum().  
+On Tue, 20 Feb 2024 08:27:57 +0100 Jiri Pirko wrote:
+> >If the user mistakenly passes a single value for a flag, rather than 
+> >a set, this is going to generate a hard to understand error.
+> >How about we check isinstance(, str) and handle that directly,
+> >whether a flag or not.  
 > 
-> That is misleading name, as it does not have to be enum.
+> Yeah, I was thinking about that as well. But as the flag output is
+> always list, here we expect also always list. I can either do what you
+> suggest of Errout with some sane message in case of the variable is not
+> a list. I didn't find ynl to be particularly forgiving in case of input
+> and error messages, that is why I didn't bother here.
 
-It's a variant of a encode function using enum metadata.
+It's not the same thing, but (without looking at the code IIRC)
+for multi-attr we do accept both a list and direct value.
+Here we don't have to be lenient in what we accept.
+Clear error message would be good enough.
+
+Some of the sharp edges in Python YNL are because I very much
+anticipated the pyroute2 maintainer to do a proper implementation, 
+and this tool was just a very crude PoC :D
 
