@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-73619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 342F185D63D
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:00:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DD1385D63E
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:00:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9537EB248C5
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:00:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E39DE1F24324
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:00:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9C203FE31;
-	Wed, 21 Feb 2024 10:59:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 259F23FE54;
+	Wed, 21 Feb 2024 10:59:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QZT6XksT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zK4qTV+8"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5677C3FE20
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 10:59:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5BD83FE2B
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 10:59:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708513166; cv=none; b=qbTe4tyyh7H8ztenn/Z+DiDgYbKCRO6mZ1S36gfoDw43EgTKxzCIYKnt61/Q+IwSWbhvMLo4dTlLgsJJsKpnNrzoOa/DMnlJjfEHIiykS/c+kyPaLChz1dNq5QMnJxq/pCYoNd7Ht23z4t+p7e5Z9pZxWXmCzgdYnCBI/yKGkWk=
+	t=1708513168; cv=none; b=lU34G6lHCOC1yD5nU/BQ80kdJt/1KaQ7sQ6GJez3XgjWvthnRbUTvm7ZpxvRlq66wyDHojn6aLtDwE0Tf3IAe4j/DT9tbkb+ukKY8E5x36n5j9S2B1up1WBAEphDXJZ6wMbKRbBI/GjiO64irc+7SO05n3Y8BoSGTD9Jp3I25Ag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708513166; c=relaxed/simple;
-	bh=tiuFNpcOy1HKDWRPdENapP7XWeP0Jl4WNHII1P3GGCI=;
+	s=arc-20240116; t=1708513168; c=relaxed/simple;
+	bh=50FSsLCtdQT36IUbIb7fJa7pTpPKrsCIdh9e2uFhczU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=h9iO81OqMy3AGFCT21xA/E42z6JNHLomquoruUHm/JNU0KzA0q3v3ltXeG+pI6J9pon1mDjf/4otgBKiNomPd2ePZTcSATmvmz831PAh8CF/1wCW7FK6eC0X2HqsB1rNAqzM+MlGirna2z3qmWzu/2idsY8zFteCt4gS56iZnNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QZT6XksT; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=GOOWnvZT8+0nAMdDSBkUO7tRYu02luIUoCWbyfm/nTxXJjmb5oAV2jSI8RzMogfiOD1ioy1iPJznKknhD7bzaOHrCDpzD6vJWC5TKkvezXB46XqxBGLFakiZrxbvnCuVHknb0U5uGJPrfU3s0jnof4ZviDZek3K0QXK4IKPmSG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zK4qTV+8; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dcc05887ee9so7642487276.1
-        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 02:59:25 -0800 (PST)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc657e9bdc4so8265180276.0
+        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 02:59:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708513164; x=1709117964; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1708513166; x=1709117966; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+vLbi3EHpUUv8uJrMTv76Jg3K5tYbpl2ruddz9ZyCjY=;
-        b=QZT6XksToJG7XfhiObq5h19qLBJ8ttCVEp7r8rKFq1mLDt+Ce1lqz2+ZaxGjD7Nk9R
-         S3ofr6mJCsGpaZztp+E5rxJ+tfJpb0kNuYRXnU27qJgo3QqpCszfdYpNCT7u5uroKF69
-         42nTHBiMuKvRAgl9yaahE9X1hA7ZFfX4AzemGWigV+BxoOl5SbNoG0VbGoJOey9WZ493
-         cFfpkhd5W2lC7FZlRw3nv1mmnBl9Hz+OnL4+7WSrZN6tWkB4XnxipDaR89mrO3hJO5Gp
-         HPITE/rk6ZT8NWEDk8tZbYFpSfAeTEtlJ16opx377/jZFxFTMhcq8YD0ZKV9e/Mvqc8m
-         T1NQ==
+        bh=BlnokSDHjEfyEFlKuGf7qGXhR75G4pFSMX8ID5YcrYQ=;
+        b=zK4qTV+8KKpoYX1lYTjGO5/NP2WQ9i5yhAUFfSHRxi4CBI0QPfSt2uaiR0ZD4CymZM
+         cnNj1I71i3kb0RmhWGQ2jNlZKbNuiMkBh3Vkuupdte211Bm5Yzrv/in9EdRJosiUOYXr
+         3Ej2YPhUfR0O4dgWftGEa4IT4p4p2Y3nm1+H73tRGqPs0tqeVi/Yae8TqZP0V8+eMGzj
+         RjhcwADLuP5LLQZP5SJF2m/SiABe3f8/P5aYdmW7uCRJF/hElmy57LMQQiCYFaCQXUP1
+         BvpWTOJHANOsSg23o/2L8pIVzJvrsv9ZGZCnq4iGOjcs26i8UC2+o0/JerFZQ7izTxxK
+         TJ1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708513164; x=1709117964;
+        d=1e100.net; s=20230601; t=1708513166; x=1709117966;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+vLbi3EHpUUv8uJrMTv76Jg3K5tYbpl2ruddz9ZyCjY=;
-        b=uN7K3qj+7ZtPVElN30UjnhT8l0Hy03EX/Hiue1qhFjxD5iskEjwhqb5dOifAsIRnE7
-         2Zf1+JNDlUvKv2Qaqsiw4GnRgGqpYlVTuTdnQaL7bWvgy/L3QleFguu/ImQdLhyJ0Ynu
-         uy+AK/f5c15VlyWjuOlpENIBh49/4zZUZpFbARf1/iq6WG4gCaB/S3C0ywkHkl5lgCLF
-         87weE5OuPGliiHExoaXbueCSlcU+eubZw/IbbtjGh+p4bzJoMPiWEyUgQ4d9H8C6DYvC
-         vmR+pRM/houI0Lb/YXdr+gfpKs0BqS2sycDovhXuHZyM+7QP2ZDQVgYpTjNrptjXuTwd
-         STBQ==
-X-Gm-Message-State: AOJu0Yw4JGPL+rn9fzzaU0zyAxu8fWmy7T/lFizJYp2I7HCJVqKOkpMX
-	xdikbWDTzEJvQNCrWf33V8tcSpabvsgCysveL0k71aUlVdHVkjy5bBsGeDHWjsfwGOghDQDsLJe
-	6FE3RgXjbqA==
-X-Google-Smtp-Source: AGHT+IGCigqNWx6eduA/9cMwNtHg2XjtLJvDk/fiQ3g/HmzgU4xhJgT2zLBSi3rpM/NooqwvyRB3gTZTnxbg1g==
+        bh=BlnokSDHjEfyEFlKuGf7qGXhR75G4pFSMX8ID5YcrYQ=;
+        b=rxL2F5EFP4Do12XKv/SLb1hnvG+AVDxWdDirMHyN+UaZ1qDrxvZF3fZc6lOrPRht39
+         /G/B6pf9sk9HGRxKXB41FC6vZSUf/5jjZ2KlKjAOE94jsnuE6xKrO5d67tFUAMtw8ESs
+         2pCdWoHO17EBHoEscDkZ92YB7Ttm7vjB4f2AHb1Isy66fgVvHqpbUyCgPVXBnpuKCunS
+         3BfPJIFU52Z/HVx4nggAJXE9se9TK85XkLayzmCYWpaRIXoPpVzu3H68qYa98rq2r99f
+         /y0iMzeP0SPOC02HOBQl2KmBPgioBJOucfoVt+tbOJZQIrdE7bwG9hYv/XFMlW15NJc7
+         Y1bA==
+X-Gm-Message-State: AOJu0YxqGsHJhnI2cS1qfEIL3xTc6uFey3o6SpNkgtlzvlRQPQFbOK7h
+	w8sk1tCGTSCYTNRoO5RqE9b7+A4+CV7MmDkR+Evb+LNK3bzr3PqRtAXdRGEZ0dv0BsN/m3gjmbs
+	6ZLTNdtWX7Q==
+X-Google-Smtp-Source: AGHT+IHVYIpT8SuuO/jgqQVGI7/RZc3QCVFRp2ivQalYZyGUk1jSB5mhDtIIB4yGTMyir4GP+GCl0HX6jK+YCg==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:b18d:0:b0:dc7:82ba:ba6e with SMTP id
- h13-20020a25b18d000000b00dc782baba6emr678009ybj.7.1708513164334; Wed, 21 Feb
- 2024 02:59:24 -0800 (PST)
-Date: Wed, 21 Feb 2024 10:59:06 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1081:b0:dc6:e823:9edb with SMTP
+ id v1-20020a056902108100b00dc6e8239edbmr1024288ybu.12.1708513165802; Wed, 21
+ Feb 2024 02:59:25 -0800 (PST)
+Date: Wed, 21 Feb 2024 10:59:07 +0000
 In-Reply-To: <20240221105915.829140-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,103 +73,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240221105915.829140-1-edumazet@google.com>
 X-Mailer: git-send-email 2.44.0.rc0.258.g7320e95886-goog
-Message-ID: <20240221105915.829140-5-edumazet@google.com>
-Subject: [PATCH net-next 04/13] ipv6: use xarray iterator to implement inet6_dump_ifinfo()
+Message-ID: <20240221105915.829140-6-edumazet@google.com>
+Subject: [PATCH net-next 05/13] netlink: fix netlink_diag_dump() return value
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Ido Schimmel <idosch@nvidia.com>
+	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Prepare inet6_dump_ifinfo() to run with RCU protection
-instead of RTNL and use for_each_netdev_dump() interface.
+__netlink_diag_dump() returns 1 if the dump is not complete,
+zero if no error occurred.
 
-Also properly return 0 at the end of a dump, avoiding
-an extra recvmsg() system call and RTNL acquisition.
+If err variable is zero, this means the dump is complete:
+We should not return skb->len in this case, but 0.
 
-Note that RTNL-less dumps need core changes, yet to come.
+This allows NLMSG_DONE to be appended to the skb.
+User space does not have to call us again only to get NLMSG_DONE.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Ido Schimmel <idosch@nvidia.com>
 ---
- net/ipv6/addrconf.c | 46 +++++++++++++++++++--------------------------
- 1 file changed, 19 insertions(+), 27 deletions(-)
+ net/netlink/diag.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index df3c6feea74e2d95144140eceb6df5cef2dce1f4..8994ddc6c859e6bc68303e6e61663baf330aee00 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -6117,50 +6117,42 @@ static int inet6_valid_dump_ifinfo(const struct nlmsghdr *nlh,
- static int inet6_dump_ifinfo(struct sk_buff *skb, struct netlink_callback *cb)
- {
- 	struct net *net = sock_net(skb->sk);
--	int h, s_h;
--	int idx = 0, s_idx;
-+	struct {
-+		unsigned long ifindex;
-+	} *ctx = (void *)cb->ctx;
- 	struct net_device *dev;
- 	struct inet6_dev *idev;
--	struct hlist_head *head;
-+	int err;
- 
- 	/* only requests using strict checking can pass data to
- 	 * influence the dump
- 	 */
- 	if (cb->strict_check) {
--		int err = inet6_valid_dump_ifinfo(cb->nlh, cb->extack);
-+		err = inet6_valid_dump_ifinfo(cb->nlh, cb->extack);
- 
- 		if (err < 0)
- 			return err;
+diff --git a/net/netlink/diag.c b/net/netlink/diag.c
+index e12c90d5f6ad29446ea1990c88c19bcb0ee856c3..61981e01fd6ff189dcb46a06a4d265cf6029b840 100644
+--- a/net/netlink/diag.c
++++ b/net/netlink/diag.c
+@@ -207,7 +207,7 @@ static int netlink_diag_dump(struct sk_buff *skb, struct netlink_callback *cb)
+ 		err = __netlink_diag_dump(skb, cb, req->sdiag_protocol, s_num);
  	}
  
--	s_h = cb->args[0];
--	s_idx = cb->args[1];
--
-+	err = 0;
- 	rcu_read_lock();
--	for (h = s_h; h < NETDEV_HASHENTRIES; h++, s_idx = 0) {
--		idx = 0;
--		head = &net->dev_index_head[h];
--		hlist_for_each_entry_rcu(dev, head, index_hlist) {
--			if (idx < s_idx)
--				goto cont;
--			idev = __in6_dev_get(dev);
--			if (!idev)
--				goto cont;
--			if (inet6_fill_ifinfo(skb, idev,
--					      NETLINK_CB(cb->skb).portid,
--					      cb->nlh->nlmsg_seq,
--					      RTM_NEWLINK, NLM_F_MULTI) < 0)
--				goto out;
--cont:
--			idx++;
-+	for_each_netdev_dump(net, dev, ctx->ifindex) {
-+		idev = __in6_dev_get(dev);
-+		if (!idev)
-+			continue;
-+		err = inet6_fill_ifinfo(skb, idev,
-+					NETLINK_CB(cb->skb).portid,
-+					cb->nlh->nlmsg_seq,
-+					RTM_NEWLINK, NLM_F_MULTI);
-+		if (err < 0) {
-+			if (likely(skb->len))
-+				err = skb->len;
-+			break;
- 		}
- 	}
--out:
- 	rcu_read_unlock();
--	cb->args[1] = idx;
--	cb->args[0] = h;
- 
--	return skb->len;
-+	return err;
+-	return err < 0 ? err : skb->len;
++	return err <= 0 ? err : skb->len;
  }
  
- void inet6_ifinfo_notify(int event, struct inet6_dev *idev)
+ static int netlink_diag_dump_done(struct netlink_callback *cb)
 -- 
 2.44.0.rc0.258.g7320e95886-goog
 
