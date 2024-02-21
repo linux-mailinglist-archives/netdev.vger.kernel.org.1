@@ -1,130 +1,137 @@
-Return-Path: <netdev+bounces-73823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B471985EB37
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 22:46:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E636685EB7F
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 23:01:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DD6F282459
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 21:46:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23BA21C213F4
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 22:01:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FF32126F0F;
-	Wed, 21 Feb 2024 21:46:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27A35128386;
+	Wed, 21 Feb 2024 22:01:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BrML/Wl7"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="bpj48WmF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D7B14A1D;
-	Wed, 21 Feb 2024 21:46:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AF261272CB
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 22:01:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708551987; cv=none; b=Hw1x8YtKJrgkkls6xRuLVVUc9fjmK0FB9R7/g+MP4MIjt6p/zoTtLLtI+QxME+LVdjtqSgUeHEcNXXKRqjm40HpCGaJJ8Di+iZnXPYt5FZ5QylTcOp9UVekuAvwpcMF+2Hx0OhEFeds9u0GvDA/8f6JOPIu11z6sU/LW/JcVff0=
+	t=1708552874; cv=none; b=YOrHVZ+HXOTgEBdet4yLSbRzhmJEk6upKfRX20Zs0XA1H7ynThGNZQbufaQ95MWq2yVPtokDpW8lD0XVn0uiba/oFit50xqZJc2KEakurHNPWEtm1uvntRm97tMh4DH4xQg9fpsEc+ov+EILcPfXpnVHji+ZSJVplgodoCv10Qk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708551987; c=relaxed/simple;
-	bh=leo9okhKBaTR0GDpOuoa10LU3SThMLpEnLrULNmIs+o=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=KPNfmdfYJyyW5jE6A8Egath8ryodQrHlRPrEw567k7qAmrkrF1nAj1Zql3xMvDJ2LgLXriqHBqpgulsn2EnTFVBodR38w6Ua+tsiY6Lre9h4rG0Jo3Zja/coboybD5h+eNEbqt0kMljk6s7NfPJYJK34iQhSg3nAHxuC7++1Qos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BrML/Wl7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6A29C433F1;
-	Wed, 21 Feb 2024 21:46:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708551986;
-	bh=leo9okhKBaTR0GDpOuoa10LU3SThMLpEnLrULNmIs+o=;
-	h=From:Date:Subject:To:Cc:From;
-	b=BrML/Wl7vTXK6gRt5ngkvHhM8Zu5In5gYTawYmzzns0JtFYCQoQm6prGPimEGlTp6
-	 AD6gVp0I4wt+lNjotFMN+N0pD95H9/hSCNDFG2/eTD3gM67CD5Yeio3JO5fMPP4knz
-	 OF5bBC8ZIIFjqa4WcanSlNx7zicYxhQPfrYdmhb8veg+Hpa7ZjmC3Mhcj8OO8q1ufi
-	 UwnambY1azv1Xb28D9wsIlEfALgl1GwY/wyuISdHUximCv42eHAqyHB5wIgQC9zZLn
-	 lWaz5ltfSle+i0QDLvBDBZR0BmESIl4zC9rHBzkV9QKgjBzv+S90inJBkIhv4Q/dQD
-	 zVIXMqrsTh3gw==
-From: Nathan Chancellor <nathan@kernel.org>
-Date: Wed, 21 Feb 2024 14:46:21 -0700
-Subject: [PATCH net] xfrm: Avoid clang fortify warning in
- copy_to_user_tmpl()
+	s=arc-20240116; t=1708552874; c=relaxed/simple;
+	bh=wqGWw9nOiid78rmVoNJpLAKogw9OxxtIINANjebVuns=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=L9iK25DnO/OIZ8iSuvsef6QP4QrQe/jab1XeE4mFCgVTJIw3DmyWF1zckgAgTowHt2oMij9Ijgxy3aW+gr5QDcFPOQR9WVcOPPAdAmclQwQUOf35jQ6sZGsnfXicKd9w4htDpsNMQOp2mE0MKnfa1Skuu5RkX2k7/Y4gRnfFMjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=bpj48WmF; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1dc0d11d1b7so27338795ad.2
+        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 14:01:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1708552871; x=1709157671; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=k+6LHH2NPUzYokJHyaMeg6P0BHjKGeB4TbkarefmniY=;
+        b=bpj48WmFS/Iv/Pl0hg7lOS8zJgnv0NSStFCNmbJ6KEpuG46kTUN/691glGTo/3Ussp
+         p+NO4+VI9TFFxK1I1IpwAumuQPpNmQosA0O5VcsIoRgOfll/Zs90O7tq42+7asod3qYo
+         QfauMBovnb/+K04a39tMMdP5sPWShkQq8NrPA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708552871; x=1709157671;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=k+6LHH2NPUzYokJHyaMeg6P0BHjKGeB4TbkarefmniY=;
+        b=dKKbMKiITzUzpS9gYqqxjzLSCuRyAdWFYLK9AnFdywn7jCdmVjwo+AGty0S+QSVxkz
+         YjckJ4D5i7+bxzyav85IGZcjGC06ott1+oh4I3mmPcr7v1IFyxAV+yzIyidCedn2KUn6
+         gSqC1EAXEnwXTCt0SofJVsJ42oiX3vqb8wIbjTaC0Am7ElsL99rIAhhp8GFVbOLbEYwm
+         fiN6R61CGaKISvig/gd1USA2Bey9pMdYJwmEDihgF2UiPYTP52CZuWCU6fFuwA06ETBi
+         5yr1z0eUk1Rel8WeUqqUko7x1+R9wa+QRzQr2ehUkoZHirBZRjMATx4aMENME2Fen3qH
+         pv8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVrENrqkSr49WO58BIEP+2ko7CFwIkdZvNYt620hEWSx8dIRd93VJNK1Xon80u8Pw0Da+oPDec/8bYsPR0oehaIRIkpqjXY
+X-Gm-Message-State: AOJu0Yw4fJljOQNo321TAbjipKUyHEAD4JBr38CizWSlL/cVF/WLPTLT
+	JH6qlc4TKIyTL9wLcX0UIjubOVHsPEo5BTgBCxnMK5vG1x8THed/8aXfRwFLXQ==
+X-Google-Smtp-Source: AGHT+IEf5eKUQSWm+opFfaiF5eBQJmg0AXhYyA+h2y9jNbW7sOQuiyq0AM8mKQQVx25bJ6R/7Y4UCw==
+X-Received: by 2002:a17:902:f70f:b0:1dc:4b04:13d4 with SMTP id h15-20020a170902f70f00b001dc4b0413d4mr60269plo.8.1708552870628;
+        Wed, 21 Feb 2024 14:01:10 -0800 (PST)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id k4-20020a170902e90400b001dbba4c8289sm8533989pld.202.2024.02.21.14.01.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Feb 2024 14:01:10 -0800 (PST)
+Date: Wed, 21 Feb 2024 14:01:09 -0800
+From: Kees Cook <keescook@chromium.org>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+	"Gustavo A . R . Silva" <gustavoars@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yhs@fb.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
+	Haowen Bai <baihaowen@meizu.com>, bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Jonathan Corbet <corbet@lwn.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Joanne Koong <joannelkoong@gmail.com>,
+	Yafang Shao <laoar.shao@gmail.com>, Kui-Feng Lee <kuifeng@meta.com>,
+	Anton Protopopov <aspsk@isovalent.com>,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	netdev@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v4] bpf: Replace bpf_lpm_trie_key 0-length array with
+ flexible array
+Message-ID: <202402211347.2AF2EC4621@keescook>
+References: <20240220185421.it.949-kees@kernel.org>
+ <da75b2bf-0d14-6ed5-91c2-dfeba9ad55c4@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240221-xfrm-avoid-clang-fortify-warning-copy_to_user_tmpl-v1-1-254a788ab8ba@kernel.org>
-X-B4-Tracking: v=1; b=H4sIACxv1mUC/x3NQQqDMBCF4avIrDswia56lVKCxkk7oElIUquId
- +/Q5QeP/51QuQhXuHcnFN6kSooKc+vAv8f4YpRZDZbsQNYa3ENZcdySzOgXHWBIpUk48DuWKGq
- f8uFach8tu7bmBQfyk6GJqOceNJwLB9n/pw+I3OB5XT/6XTGmiQAAAA==
-To: steffen.klassert@secunet.com, herbert@gondor.apana.org.au, 
- davem@davemloft.net
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
- morbo@google.com, justinstitt@google.com, keescook@chromium.org, 
- netdev@vger.kernel.org, llvm@lists.linux.dev, patches@lists.linux.dev, 
- stable@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>
-X-Mailer: b4 0.14-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2264; i=nathan@kernel.org;
- h=from:subject:message-id; bh=leo9okhKBaTR0GDpOuoa10LU3SThMLpEnLrULNmIs+o=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDKnX8g39NsbKLClpzlhxvdGKaVqfjcSDSU/O5udu28Sy3
- +oNa/fVjlIWBjEuBlkxRZbqx6rHDQ3nnGW8cWoSzBxWJpAhDFycAjCRJfcZGc69fpYy54us44cZ
- RwIvvtD8rMKdd0gsdIX36sKM1GKTbHOGP3y3v3od2+m5LV2Za83SVq6L7owTnj/rNHq9MZ7/8Vm
- TOnYA
-X-Developer-Key: i=nathan@kernel.org; a=openpgp;
- fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <da75b2bf-0d14-6ed5-91c2-dfeba9ad55c4@iogearbox.net>
 
-After a couple recent changes in LLVM, there is a warning (or error with
-CONFIG_WERROR=y or W=e) from the compile time fortify source routines,
-specifically the memset() in copy_to_user_tmpl().
+On Wed, Feb 21, 2024 at 05:39:55PM +0100, Daniel Borkmann wrote:
+> The build in BPF CI is still broken, did you try to build selftests?
 
-  In file included from net/xfrm/xfrm_user.c:14:
-  ...
-  include/linux/fortify-string.h:438:4: error: call to '__write_overflow_field' declared with 'warning' attribute: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror,-Wattribute-warning]
-    438 |                         __write_overflow_field(p_size_field, size);
-        |                         ^
-  1 error generated.
+Okay, I give up. How is a mortal supposed to build these?
 
-While ->xfrm_nr has been validated against XFRM_MAX_DEPTH when its value
-is first assigned in copy_templates() by calling validate_tmpl() first
-(so there should not be any issue in practice), LLVM/clang cannot really
-deduce that across the boundaries of these functions. Without that
-knowledge, it cannot assume that the loop stops before i is greater than
-XFRM_MAX_DEPTH, which would indeed result a stack buffer overflow in the
-memset().
+If I try to follow what I see in
+https://github.com/libbpf/ci/blob/main/build-selftests/build_selftests.sh
+I just get more and more kinds of errors:
 
-To make the bounds of ->xfrm_nr clear to the compiler and add additional
-defense in case copy_to_user_tmpl() is ever used in a path where
-->xfrm_nr has not been properly validated against XFRM_MAX_DEPTH first,
-add an explicit bound check and early return, which clears up the
-warning.
+In file included from progs/cb_refs.c:5:
+progs/../bpf_testmod/bpf_testmod_kfunc.h:29:8: error: redefinition of 'prog_test_pass1'
+   29 | struct prog_test_pass1 {
+      |        ^
+/srv/code/tools/testing/selftests/bpf/tools/include/vmlinux.h:106850:8: note: previous definition is
+ here
+ 106850 | struct prog_test_pass1 {
+        |        ^
 
-Cc: stable@vger.kernel.org
-Link: https://github.com/ClangBuiltLinux/linux/issues/1985
-Signed-off-by: Nathan Chancellor <nathan@kernel.org>
----
- net/xfrm/xfrm_user.c | 3 +++
- 1 file changed, 3 insertions(+)
+Messing around with deleting vmlinux.h seems to get me further, but later:
 
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index f037be190bae..912c1189ba41 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -2017,6 +2017,9 @@ static int copy_to_user_tmpl(struct xfrm_policy *xp, struct sk_buff *skb)
- 	if (xp->xfrm_nr == 0)
- 		return 0;
- 
-+	if (xp->xfrm_nr > XFRM_MAX_DEPTH)
-+		return -ENOBUFS;
-+
- 	for (i = 0; i < xp->xfrm_nr; i++) {
- 		struct xfrm_user_tmpl *up = &vec[i];
- 		struct xfrm_tmpl *kp = &xp->xfrm_vec[i];
+/srv/code/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c: In function 'bpf_testmod_ops_is_valid_access':
+/srv/code/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c:535:16: error: implicit declaration of function 'bpf_tracing_btf_ctx_access' [-Werror=implicit-function-declaration]
+  535 |         return bpf_tracing_btf_ctx_access(off, size, type, prog, info);
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~
 
----
-base-commit: 14dec56fdd4c70a0ebe40077368e367421ea6fef
-change-id: 20240221-xfrm-avoid-clang-fortify-warning-copy_to_user_tmpl-40cb10b003e3
+and then I'm stuck. It looks like the build isn't actually using
+KBUILD_OUTPUT for finding includes. If I try to add -I flags to the
+Makefile I just drown in new errors.
 
-Best regards,
 -- 
-Nathan Chancellor <nathan@kernel.org>
-
+Kees Cook
 
