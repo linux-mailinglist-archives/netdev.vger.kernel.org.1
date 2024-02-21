@@ -1,179 +1,143 @@
-Return-Path: <netdev+bounces-73782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6ECAC85E5FE
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 19:29:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A47085E610
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 19:32:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24445285EB0
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 18:29:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACF5D1F25689
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 18:32:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7116A85288;
-	Wed, 21 Feb 2024 18:28:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6755984FD8;
+	Wed, 21 Feb 2024 18:32:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PKoaqBO5"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Jt0Cd1zb"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE9C183CD8
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 18:28:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 993DE85275
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 18:32:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708540139; cv=none; b=rFUq/4FtgpgvofKySttI7iU0gxc9PId+NanKbfoFrmbZqxMgX8OUr/J/lwhOyuPhJ06PBCxkWnZQ5rLbEdlFlxUtivqXbuZCb6gPpDx3y1pD6K9SgukVdcXAuLsBWF1vVOCEuN0BNluGzonipjMA8gl2n08J6mFHTZ4hFHtB8pE=
+	t=1708540356; cv=none; b=V0tEzFptWli3STR77fwVaPCzC24Q6ilusRXccMvCQhaq5cI/WMJJN/veQE0n8Wvt1nRONf27iXQqudT7hO2SAWEpAowlp4FYyr9yrSjNy8ZYZEG9ngo2ufoAWgHfdFsPVumfuKarAg3/8lOULFU+Oz8iGn7nnIbyeiL7MI00ybc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708540139; c=relaxed/simple;
-	bh=WW7HccMmnxlLe5+R36X1kn/6bBjyn6Mj3hjctIdKLy4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tao/7qLBy00hONEkd/r+fQlTfWKWYOnN8BTZi5tLbmkukGSEoyvetiQ+fWpYpRjbekxUQNngtayqKtT02xp9IObJzjLdStfB/e96FHIWk9cs0RnSvZTuzQdf1VhLaL9r/alEldfHRHqb/6z1X9fEg2B7mON11AwvZKXA94Vni6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PKoaqBO5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708540136;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fl61rMDVYKSFPNkJ2EAe4MRHeQ5aYKO1cplhSodx/a8=;
-	b=PKoaqBO5hj9c+lmWDJ+7zoZoPvNtZ6e7JIUr00wYD9+d0ggAmrF5trXajDvRA0KjwqeKKd
-	B6wPCw+ryzGb/iGo+T+wDOAVndG1OF0n7z3NpfyyRLiUKyHGTe4904F3eLQzcNBIUHg840
-	Wnln04GgJsLVCtCtZ8PX+15DeDnmGZ4=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-343-MNS3RZvkPyy8RhrW1HJf-w-1; Wed, 21 Feb 2024 13:28:54 -0500
-X-MC-Unique: MNS3RZvkPyy8RhrW1HJf-w-1
-Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2d24452f743so22754911fa.0
-        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 10:28:53 -0800 (PST)
+	s=arc-20240116; t=1708540356; c=relaxed/simple;
+	bh=huu2hWz+NSGDR1cCL7Z963qagQlNiSvksrY9h0TiL/I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TuOgPBf4duYS79f+r1T0wuD7m1gM40ieF2hUqBWnwvk9a3OccJbnoXCC+8h47i+V0SXwJrIiAQ/ITyCMM4dLZM/F7rNu/NrR1KgIMCENm10iDtPx/5u+5i2vhwsNALHhB2XqgB6kfU0sKufho815tFvzK9bL5A71CHqSsp36UEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Jt0Cd1zb; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-41275f1b45aso6949675e9.3
+        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 10:32:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1708540353; x=1709145153; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kdCNHUB8NlhEWaYuHhsXiudAInPYTn2vq7tNOUbWmbI=;
+        b=Jt0Cd1zblFmKyzbK1yXyjzWBD6MThIh03wyhxTP89KIffyhvFElQn0DHY3zJeg37nh
+         ab56GpXNvN/mIlcV6uI+d5tVTJ8Acm/MxWTzqD6S3ZSo/jh00YfvyRVcVU5sqSQYJZLD
+         YOxtxRJ5jmT5dOBXP32fdlJut82WvLBRCt6EFLbqN3uyeURPYdUg3VvI73DiVRMJ+PWj
+         vasgxBYxD0rdqv6XZsFYdXU5CyDAmOACO+Q4Y64T5xFFu8jGV8UGVibf/nzgqRTslnoB
+         t9sSVlfdILEWaskUba4oyTxHZkYfyUg3XlaSge1iXoWlxRopSC6rnuSOPK6Me3HeWCBV
+         nIrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708540131; x=1709144931;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fl61rMDVYKSFPNkJ2EAe4MRHeQ5aYKO1cplhSodx/a8=;
-        b=F+RlPLuGvOLsK1lxO7Ufe34DVywKQuL5+5A2uEgULi33dUyB7+NJRk41AQ33X2JOzQ
-         pLAk2GZU0H1bx7mAOq0a2ztUVgseFWQOM46K6NS1XsuhK6XSSnRi6eJNQotaOvJOyfup
-         85tl4DiRZquaVwta1fWsHHg9eYGWWcLljOZ5/NFdRzLstww4gxTMRG1LeqX5VSZD7DOJ
-         qiJy5UfF/XYtcJZPsN3gYRzmfBSyc3Eg4lx7xPXG4BzGzQiOUbRQcunCsw0/f0h3RYll
-         W4jgdAU6eFyAaQFMb9EF9fwrmtMkeUqyDcuySdf5M0WACGAZ/Ga5Cu3NnSGBla0k0AKW
-         ewJw==
-X-Forwarded-Encrypted: i=1; AJvYcCUXg5EVGeX5LyIEmYsJiv0yW0Fe4F7W34LzLp+iivRjekJ0aZLCnnuEZV0iyBa4oo6qDE7m13JJOCGlg8QCzwWs/enlz91/
-X-Gm-Message-State: AOJu0YxJeuyX6ty2LXyet22rV5Nu1vDmr/07AJTCIpODTI5AYQOdo2p1
-	tOYCijHV8gB5oS3ak6ZOcH7lRqtkMeTP/VbUH9BhVSyAC6DTfE5dPbHK0yjfFQYzELPaM2Ac3Ib
-	v21h3RWDOJsqKW/KYPuALCiLmeZMSCpBURaoQEdBS7O5Hl5/dxetdYRyYV5eFqH6Bxb9h8cwDO3
-	NhIxr5L3fqy9QS5wScGLzkKCT45FEQs7s5ihPQ
-X-Received: by 2002:a2e:9b52:0:b0:2d2:44cb:b0a3 with SMTP id o18-20020a2e9b52000000b002d244cbb0a3mr4236270ljj.48.1708540131394;
-        Wed, 21 Feb 2024 10:28:51 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHH0Sp3pU7Tk9xr1Tr8/pddQaszA+lFG9scEelev2TBKiavPn7plzTtgEk+wdbqpEADlBK1v+sfcNRS+b8JxDQ=
-X-Received: by 2002:a2e:9b52:0:b0:2d2:44cb:b0a3 with SMTP id
- o18-20020a2e9b52000000b002d244cbb0a3mr4236250ljj.48.1708540131061; Wed, 21
- Feb 2024 10:28:51 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708540353; x=1709145153;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kdCNHUB8NlhEWaYuHhsXiudAInPYTn2vq7tNOUbWmbI=;
+        b=asZ71l9CJ87bHDVuRl3LV1a+roIqgO/QDVNViUT7FaxnTQz8T2IDAaMOOUQnAqYRkT
+         mfMDLZaSHjVsT/dw9ovKF3DWGNZS3qaxtngZA3NOfIbY+gTHM5LAfMbdwDeAC7DsenE6
+         FC6YSSqJv7xIjkl/R6WEilDRHhDH1ezJJGsI0pYVLC6chAya/Xj4qwitGw2KUHZes2Fk
+         TzyZ8uzN4h31Xw7LLeMFJXiTKhv/l9lto8uDk+uMHytClqNJWl+HDq1i3wk2V1Pj2VqW
+         o7tdsQ0rJypkcASL8I90ESvlB+yMBnsWDIcTMyrhL5+eyL869qOHX0X6TjVYC9fUqREt
+         tx5A==
+X-Forwarded-Encrypted: i=1; AJvYcCWmQTD1y0M2q9r9n8HPkjsCdv5DR5xWIKeiOiDY2PVdlCgScSeM1LyoKrRdXH0F5cNtjnn96gdBuwmL3iY5sn3ELVdviTQq
+X-Gm-Message-State: AOJu0Yx12nOyEOWcZS7jaeCxW3oyRGkzpHmdPZ1OIvv6voQxyAHkG0+J
+	ZT/6MQpMiN41lmduVxA8tu6Rzct41ERI7qzULLnN8ovTYRhjdyOumVIdGASKkS8=
+X-Google-Smtp-Source: AGHT+IGjjh41J8R6w1HgLCzLEhL+yAFtNJQ8Did+W2yZkuwwHAhhY4N1gRhnvSo6GKC5QbcXWFhzlA==
+X-Received: by 2002:a05:6000:809:b0:33d:1656:21fa with SMTP id bt9-20020a056000080900b0033d165621famr19010789wrb.24.1708540352842;
+        Wed, 21 Feb 2024 10:32:32 -0800 (PST)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id bx14-20020a5d5b0e000000b0033d6bd4eab9sm6552101wrb.1.2024.02.21.10.32.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Feb 2024 10:32:32 -0800 (PST)
+Date: Wed, 21 Feb 2024 21:32:27 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Simon Horman <horms@kernel.org>, Geoff Levand <geoff@infradead.org>
+Cc: Geoff Levand <geoff@infradead.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Jeff Garzik <jeff@garzik.org>, netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net] ps3/gelic: Fix possible NULL pointer dereference
+Message-ID: <d8cfc517-f597-420b-a164-1d33f3117b93@moroto.mountain>
+References: <20240221-ps3-gelic-null-deref-v1-1-f4fe159c7cb0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240201233400.3394996-1-cleech@redhat.com>
-In-Reply-To: <20240201233400.3394996-1-cleech@redhat.com>
-From: Chris Leech <cleech@redhat.com>
-Date: Wed, 21 Feb 2024 10:28:40 -0800
-Message-ID: <CAPnfmXKMHXZw6SbPv36QcSpH_ZsWJ5iH+edR_tBWW4TBRYU_3w@mail.gmail.com>
-Subject: Re: [PATCH v5 0/4] UIO_MEM_DMA_COHERENT for cnic/bnx2/bnx2x
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Nilesh Javali <njavali@marvell.com>
-Cc: Christoph Hellwig <hch@lst.de>, John Meneghini <jmeneghi@redhat.com>, Lee Duncan <lduncan@suse.com>, 
-	Mike Christie <michael.christie@oracle.com>, Hannes Reinecke <hare@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	GR-QLogic-Storage-Upstream@marvell.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240221-ps3-gelic-null-deref-v1-1-f4fe159c7cb0@kernel.org>
 
-I think all the feedback on these has been addressed, so I'm asking
-once more if these UIO additions can be considered for inclusion.
+This driver is PPC so I have never looked at the code before.  I noticed
+another issue that was introduced last December in commit 3ce4f9c3fbb3
+("net/ps3_gelic_net: Add gelic_descr structures").
 
-Thanks,
-- Chris
+net/ethernet/toshiba/ps3_gelic_net.c
+   375  static int gelic_descr_prepare_rx(struct gelic_card *card,
+   376                                    struct gelic_descr *descr)
+   377  {
+   378          static const unsigned int rx_skb_size =
+   379                  ALIGN(GELIC_NET_MAX_FRAME, GELIC_NET_RXBUF_ALIGN) +
+   380                  GELIC_NET_RXBUF_ALIGN - 1;
+   381          dma_addr_t cpu_addr;
+   382          int offset;
+   383  
+   384          if (gelic_descr_get_status(descr) !=  GELIC_DESCR_DMA_NOT_IN_USE)
+   385                  dev_info(ctodev(card), "%s: ERROR status\n", __func__);
+   386  
+   387          descr->skb = netdev_alloc_skb(*card->netdev, rx_skb_size);
+   388          if (!descr->skb) {
+   389                  descr->hw_regs.payload.dev_addr = 0; /* tell DMAC don't touch memory */
+   390                  return -ENOMEM;
+   391          }
+   392          descr->hw_regs.dmac_cmd_status = 0;
+   393          descr->hw_regs.result_size = 0;
+   394          descr->hw_regs.valid_size = 0;
+   395          descr->hw_regs.data_error = 0;
+   396          descr->hw_regs.payload.dev_addr = 0;
+   397          descr->hw_regs.payload.size = 0;
+   398          descr->skb = NULL;
+                ^^^^^^^^^^^^^^^^^^
+NULL
 
-On Thu, Feb 1, 2024 at 3:34=E2=80=AFPM Chris Leech <cleech@redhat.com> wrot=
-e:
->
-> During bnx2i iSCSI testing we ran into page refcounting issues in the
-> uio mmaps exported from cnic to the iscsiuio process, and bisected back
-> to the removal of the __GFP_COMP flag from dma_alloc_coherent calls.
->
-> The cnic uio interface also has issues running with an iommu enabled,
-> which these changes correct.
->
-> In order to fix these drivers to be able to mmap dma coherent memory via
-> a uio device, introduce a new uio mmap type backed by dma_mmap_coherent.
->
-> While I understand some complaints about how these drivers have been
-> structured, I also don't like letting support bitrot when there's a
-> reasonable alternative to re-architecting an existing driver. I believe
-> this to be the most sane way to restore these drivers to functioning
-> properly.
->
-> There are two other uio drivers which are mmaping dma_alloc_coherent
-> memory as UIO_MEM_PHYS, uio_dmem_genirq and uio_pruss.
-> These drivers are converted in the later patches of this series.
->
-> v5:
-> - convert uio_pruss and uio_dmem_genirq
-> - added dev_warn and comment about not adding more users
-> - put some PAGE_ALIGNs back in cnic to keep checks in
->   uio_mmap_dma_coherent matched with uio_mmap_physical.
-> - dropped the Fixes trailer
-> v4:
-> - re-introduce the dma_device member to uio_map,
->   it needs to be passed to dma_mmap_coherent somehow
-> - drop patch 3 to focus only on the uio interface,
->   explicit page alignment isn't needed
-> - re-add the v1 mail recipients,
->   this isn't something to be handled through linux-scsi
-> v3 (Nilesh Javali <njavali@marvell.com>):
-> - fix warnings reported by kernel test robot
->   and added base commit
-> v2 (Nilesh Javali <njavali@marvell.com>):
-> - expose only the dma_addr within uio and cnic.
-> - Cleanup newly added unions comprising virtual_addr
->   and struct device
->
-> previous threads:
-> v1: https://lore.kernel.org/all/20230929170023.1020032-1-cleech@redhat.co=
-m/
-> attempt at an alternative change: https://lore.kernel.org/all/20231219055=
-514.12324-1-njavali@marvell.com/
-> v2: https://lore.kernel.org/all/20240103091137.27142-1-njavali@marvell.co=
-m/
-> v3: https://lore.kernel.org/all/20240109121458.26475-1-njavali@marvell.co=
-m/
-> v4: https://lore.kernel.org/all/20240131191732.3247996-1-cleech@redhat.co=
-m/
->
-> Chris Leech (4):
->   uio: introduce UIO_MEM_DMA_COHERENT type
->   cnic,bnx2,bnx2x: use UIO_MEM_DMA_COHERENT
->   uio_pruss: UIO_MEM_DMA_COHERENT conversion
->   uio_dmem_genirq: UIO_MEM_DMA_COHERENT conversion
->
->  drivers/net/ethernet/broadcom/bnx2.c          |  1 +
->  .../net/ethernet/broadcom/bnx2x/bnx2x_main.c  |  2 +
->  drivers/net/ethernet/broadcom/cnic.c          | 25 ++++++----
->  drivers/net/ethernet/broadcom/cnic.h          |  1 +
->  drivers/net/ethernet/broadcom/cnic_if.h       |  1 +
->  drivers/uio/uio.c                             | 47 +++++++++++++++++++
->  drivers/uio/uio_dmem_genirq.c                 | 22 ++++-----
->  drivers/uio/uio_pruss.c                       |  6 ++-
->  include/linux/uio_driver.h                    |  8 ++++
->  9 files changed, 89 insertions(+), 24 deletions(-)
->
->
-> base-commit: 861c0981648f5b64c86fd028ee622096eb7af05a
-> --
-> 2.43.0
->
+   399  
+   400          offset = ((unsigned long)descr->skb->data) &
+                                         ^^^^^^^^^^^^
+Dereferenced here.
+
+   401                  (GELIC_NET_RXBUF_ALIGN - 1);
+   402          if (offset)
+   403                  skb_reserve(descr->skb, GELIC_NET_RXBUF_ALIGN - offset);
+   404          /* io-mmu-map the skb */
+   405          cpu_addr = dma_map_single(ctodev(card), descr->skb->data,
+   406                                    GELIC_NET_MAX_FRAME, DMA_FROM_DEVICE);
+
+regards,
+dan carpenter
 
 
