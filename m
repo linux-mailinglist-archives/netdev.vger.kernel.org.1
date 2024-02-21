@@ -1,81 +1,80 @@
-Return-Path: <netdev+bounces-73502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 384B585CD22
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 01:53:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8268585CD24
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 01:53:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72CA71C22832
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 00:53:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BA0B28698D
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 00:53:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 169E01FD7;
-	Wed, 21 Feb 2024 00:52:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07AC81C33;
+	Wed, 21 Feb 2024 00:52:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="KsyUGATl"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="nLeHnXDS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B676101C2
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 00:52:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75F514A2E
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 00:52:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708476731; cv=none; b=T+dSsCL+xe8w3Ja8WdFR9ks3oxrpEaY0HtW1d0kScpqCdmow6I4czOR4zUPXc0RgpqoF3sfBtFdYpuSOoYDZPRfutGAHaugq33bLLAx/AVrhN7A2cqfkWr/dkYRPtPGyptis+KNflFAGXtwZkB89OeM63J9HP4WY77MO8KuROqE=
+	t=1708476757; cv=none; b=AbpnAnrmP3TwqQfJL9AkzqaIZBp/H0MjxwXjiL3pGuJy/vyRLDN4jjhsHR4Pvgm4oFEwVtiuH//ZvzTzp2GGu2Lx97gBBZyz3uJqE9mJb5ORTIT+Teg0iOtNuZh1p9gDysq4uSCEaCxaaT37vTzSgMkW5t/+ux7vzm7F3HWhCg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708476731; c=relaxed/simple;
-	bh=9WK94qUvGMIRtk5etx9mPVS0NZhg+Y0iswprAI7O23g=;
+	s=arc-20240116; t=1708476757; c=relaxed/simple;
+	bh=J92N7oppbKokaymoordlHfEGYpccRePizL+hh7TZ1dg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OFxM/hzuAQdKcVarG8kvMxJAoavDdMbgfRS2cug39LxTY77ol4oIQqnddbYx6eZB2/XcuwZ4JjcHiWkvMvJzYMY6sFFG0hADzo8js713wnP/Dnw2y8ev1aIrHKRl9LKyc8sU//tLai01kw0YdPtS9G3txADCYkBXSTzj92AhoKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=KsyUGATl; arc=none smtp.client-ip=209.85.210.177
+	 Content-Type:Content-Disposition:In-Reply-To; b=Klh/orqqf9OZ0BbwLBzXoUAnEGxcqJlXteF6rpO2K+1qn5QNneJRob6hJzvkcw41v8hghN1ay9+Ep+nerqZEOwMSvalf3JILdV8h1Pa4zcg8yxeq+iEpggIrgEEJ9fZr3rzeIjd8Bz4xh5ynHerGXasrSZEX1Xg7Sz62JH3sYik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=nLeHnXDS; arc=none smtp.client-ip=209.85.167.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-6e3ffafa708so3093347b3a.1
-        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 16:52:09 -0800 (PST)
+Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3c15d1bd5b1so1934327b6e.1
+        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 16:52:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1708476729; x=1709081529; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1708476755; x=1709081555; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2lCsz+v1VYXLr/Jnw9QhtpXgqVzJI761uB6BfnSGSFk=;
-        b=KsyUGATlaZzXszYjBLJulj5f/Z7Kazsm0oYKerlLwdKMzYN9Fl5TRD6KwUgKRocFgc
-         CcGRHHqp4eWDVzOhXFwtg+NG8Yq+yaXGs0N4Q+jIm2wEC36QIQEz5KKe8+PbsjqgF+RH
-         7+29cTGKNw37BA5olsmu+o7MYnPHrkP8oeAXw=
+        bh=R+X3D1ev8b07YP6AkHk335qZFq2tm6Peno4gQaQD+cI=;
+        b=nLeHnXDSkzY9OXSC2jWJtHHRiimsg/sJcZdHgcUYmA5dHoJT586otcHXeGWqXqjr4f
+         ijDM2RHzxgZDdjyL7NYFnVKZxnh2cpNsc+n4+VAwelNtbyQbGr8vwfBA33Zz32vCdWix
+         rOMbdsDUdXEzGH7XbVr2MlNsFHI4q6p+8geCA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708476729; x=1709081529;
+        d=1e100.net; s=20230601; t=1708476755; x=1709081555;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2lCsz+v1VYXLr/Jnw9QhtpXgqVzJI761uB6BfnSGSFk=;
-        b=OUplxbbZNg6DmcNMD5XxvLFjDWxOazsfFWnFDozeBHJakNyzSlqLXSi3m71Fc2A4iY
-         5dF977oSAvdPoAoD9b7cSSxXkqa6ODfuGq7ctvb+0CIsFv8Wis9QczoIm7+UPMTMy9aQ
-         45qHUTb/mRfmMeBAxz08geyvB6AD7QJVuDAvx0gaMMYK7a9dtpcsd8u2/jUPqEda4Qka
-         UqSBFRhvDgoqtzq96V4Dn/AFpOjpC+GqyUB0ZUkGc5huJQZS8KkeQlaTYs0cpRyLPmPc
-         bcJXLLk9zESPywdL3z4epvZZBy5jWT2Sqaoxu+7hKOZnCYfE2cWeTSgDKrDJ+YZj1F0g
-         +fMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWHUBFrXb4UQAmFTLziS/WqIk8upnFuwXiGNlfh7vbe4iaR0AdeicHVzJj3zuXM4UkLRUbxvuqQkWM5bhyn5uEuKhWMkguA
-X-Gm-Message-State: AOJu0YxcVaI7CNNXh0ebGab0MXnFAb/F7LmkY65VVH5RcgbksddF9KGi
-	LgYZz3hMd4HcwtS/m6wM8ixazdu4KhUPYGS9mwkSossnWQMKTm3ayogiuddJqca7k0U+h7VDpqs
-	=
-X-Google-Smtp-Source: AGHT+IGDKq1WFUbJKN04lJUQbFzZp5Vh6ABFfgeZYdhAWawTlpOMDmSDbq+YYY1nfxnYxMDPBoRY+w==
-X-Received: by 2002:a05:6a00:22cc:b0:6e4:5a51:80f9 with SMTP id f12-20020a056a0022cc00b006e45a5180f9mr11536963pfj.22.1708476728817;
-        Tue, 20 Feb 2024 16:52:08 -0800 (PST)
+        bh=R+X3D1ev8b07YP6AkHk335qZFq2tm6Peno4gQaQD+cI=;
+        b=lnB4mu283cQyArc1uo4viudSptgFlf1Z9LyijbG2xe+Ytbc80xBk1hWyrrKTF2ovvK
+         SRZRRH/e8AgG1cJ5YYtHsfc875D1Pd8UuQF0bp+Ykxq0M5gHftrzNicO/DE+Y29D6vIE
+         dMbrJpOHijsBdUQkxipY6qHr6pPht3Jnu5UW8QVLSuAMWdy4ZNbsexuGavDStrwuARsP
+         TnTFFUCSFIsHu4+B5u3eblstIUjPfTkoFqLdTPJNqibFL2AZUunNv08xSpqFvi44Th3v
+         i7FJsy9x39itm7AARVCekkY4U1+x1L8CFR4bFqDV1B1+JdH+knzspOptczf7mJtQCGs7
+         DYnw==
+X-Forwarded-Encrypted: i=1; AJvYcCVIFPAKJ+ClmnULXu6e7Y6gWNoVbg+WuS+4FeZ9LfC5+ZhZZ3LiwPjvJB3tiHNkr1XV7fWRbTebsefZukOKvRx9yEiIh7k7
+X-Gm-Message-State: AOJu0Yw8PofBt3Dsq+951CfaYQC0Ly2AxLeQDSFii2AjxOmWThgF6s7M
+	Huv7DvI2uXMjVpji36cNKAcaDsTgUfHi2HxbWjWwWH3gIdqwMtZqXRMmQTeoNA==
+X-Google-Smtp-Source: AGHT+IHQovIj/E8PPhTSxpkjPpb9Wj6cTXiVUJOisMr+S4qxc/4l1FXONqKBXYMEfc0hZP57LGgaUg==
+X-Received: by 2002:a05:6808:f08:b0:3c1:57a1:bb87 with SMTP id m8-20020a0568080f0800b003c157a1bb87mr7875013oiw.19.1708476755611;
+        Tue, 20 Feb 2024 16:52:35 -0800 (PST)
 Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id c11-20020aa781cb000000b006e11455bebbsm7431202pfn.84.2024.02.20.16.52.08
+        by smtp.gmail.com with ESMTPSA id du22-20020a056a002b5600b006e45d5f0645sm5211431pfb.101.2024.02.20.16.52.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Feb 2024 16:52:08 -0800 (PST)
-Date: Tue, 20 Feb 2024 16:52:07 -0800
+        Tue, 20 Feb 2024 16:52:35 -0800 (PST)
+Date: Tue, 20 Feb 2024 16:52:34 -0800
 From: Kees Cook <keescook@chromium.org>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
 	pabeni@redhat.com, shuah@kernel.org,
 	linux-kselftest@vger.kernel.org, mic@digikod.net,
 	linux-security-module@vger.kernel.org, jakub@cloudflare.com
-Subject: Re: [PATCH net-next v3 10/11] selftests: kselftest_harness: support
- using xfail
-Message-ID: <202402201651.7C25039529@keescook>
+Subject: Re: [PATCH net-next v3 09/11] selftests: kselftest_harness: let PASS
+ / FAIL provide diagnostic
+Message-ID: <202402201652.599B4134C@keescook>
 References: <20240220192235.2953484-1-kuba@kernel.org>
- <20240220192235.2953484-11-kuba@kernel.org>
+ <20240220192235.2953484-10-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,25 +83,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240220192235.2953484-11-kuba@kernel.org>
+In-Reply-To: <20240220192235.2953484-10-kuba@kernel.org>
 
-On Tue, Feb 20, 2024 at 11:22:34AM -0800, Jakub Kicinski wrote:
-> Currently some tests report skip for things they expect to fail
-> e.g. when given combination of parameters is known to be unsupported.
-> This is confusing because in an ideal test environment and fully
-> featured kernel no tests should be skipped.
-> 
-> Selftest summary line already includes xfail and xpass counters,
-> e.g.:
-> 
-> but there's no way to use it from within the harness.
-> 
-> Add a new per-fixture+variant combination list of test cases
-> we expect to fail.
+On Tue, Feb 20, 2024 at 11:22:33AM -0800, Jakub Kicinski wrote:
+> Switch to printing KTAP line for PASS / FAIL with ksft_test_result_code(),
+> this gives us the ability to report diagnostic messages.
 > 
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-
-Thanks for this implementation; this will work nicely. :)
 
 Reviewed-by: Kees Cook <keescook@chromium.org>
 
