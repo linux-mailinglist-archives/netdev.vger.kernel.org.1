@@ -1,70 +1,72 @@
-Return-Path: <netdev+bounces-73749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 359A585E204
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 16:54:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EBFF285E203
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 16:54:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6210A1C244A4
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 15:54:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D3ED1C244F7
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 15:54:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C90CF811FF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A5D680C04;
 	Wed, 21 Feb 2024 15:54:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="A9XUZnpi"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="U2ydPz8f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55C2E8121A
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 15:54:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D75DA81730
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 15:54:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708530869; cv=none; b=C3Kt6+XQG5ZRHMb3bjGWN/8KNMTUnwFqwiCU37Tp2BSTpsvO83YugPXeM+AKNqb0NIGv7lBJ+fu9LBVnrabRY3vj+ptcYNegbZuCt6j9Dzbd4ZLAgJVV5LrQss67PRM5ZR4aODurFSzoxY7WKJBwjNx9i0wEdR4vegBy6IDCMrI=
+	t=1708530869; cv=none; b=Fgt/Sooi/qo6QAUaabn8XvJaaJH6ko1WJKFduQIhV9ZAuLlypQORvQpnB1KwQCePrF8lhtKjz8kjB53d+4CMCjA1seHWtEll1KkWRObQpvnWrWk3sdMhNxZlisIS2PFV63ZWCL/e4gH80/DrcdLxAESRXn1EuAJuUmrC0d8FdBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708530869; c=relaxed/simple;
-	bh=O+aq8a5ceJTd/FaDjAHD7wHhU59iT5y1rwcLzh2IAvI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S6P0vq2gxv+p8jrgDASBUR9OjdFy9UbkVhLaN7p7HSSiicNDFAnQGztCVnUqrAFTsrWhPbkEt1BAGwuSV6bylHKkLLwx85SzUIp9SIhDI8pdC1VyuOiZ/cX4p49JVhW8IuYScqsgOT1g4giEmur49bAWESW/b6V5uBDPJtVP9iQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=A9XUZnpi; arc=none smtp.client-ip=209.85.221.42
+	bh=z4dV5sMV14/n4ROoaWN7EHCC9FKFvm0O8lvWXYfFGC0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=WGL9dXh0FLoaLAt2BvWs/vW8vH+p+fg9PV8HwANuS4eM6BsQZeuqnOB043Cr1ozkZ+mLenToKVV2z/Pgs0MBH4qiIx8t/EFD3IOdU5EdcXYqVX+nFuN4Q5j0tfrffPNeplGCj/7EMTliwlGg8Yd/hV2CmnA06SSKKicqOMsZacI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=U2ydPz8f; arc=none smtp.client-ip=209.85.128.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-33d26da3e15so2972609f8f.1
-        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 07:54:22 -0800 (PST)
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-412698ac6f9so17916135e9.0
+        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 07:54:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708530858; x=1709135658; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=qpZY8+ihvYkY3PuoF5Mv6rfPsZc34NG30IyNAi4E5mw=;
-        b=A9XUZnpijBMeNrUwkEvjokn7nZ47fYb5uwfSnBpx4MzLUQ4X3g0YU4KWIwondgV0Tz
-         ZquWCqJHRql3nsA2T/ya5YqBTDw9xKh7rABv8lZMgtBTuPfX1JOcRgiRDdv28JAmqQ+z
-         FdA0pEcZycrzHNO3doq0WjdoHE1crRzvO3/sdUX8lm2c/3bXpBvCIM3lrxEUHnQfOAcT
-         KsKPoKFxCOmWQ6luyWjNe80ULEOCJpJ9sENK0/7ikXu49t6QYtca5CErJayROgHUtgQt
-         tdfIKYF1xqbU80nzUG3r2iqfCe7rEx3XO83Mw5fO+wEIWKwSNLsjfmzyJOsuYf/dmDeJ
-         b7uA==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708530861; x=1709135661; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Igz3Pm9IcLbKinmSkAsWb32QhBDY2If+O3AZdxzSZ90=;
+        b=U2ydPz8fYPNXqddctig4pg7nAo3DncZwszFrSldFzWD2dLBbkvgv5DVklC+mR2I18k
+         NhGcdfcQNfkhc83jeY5lngQkvdp26Jq1Gyiy3hkjh4RtaYsSEa5/Yx6hTI0hX/eO8WHc
+         inb4s+6U7ZXZ/Q6ATxN+EnjLpR3BcvU9IlFb1q04nJZLPlBk6O/AR5cXMMLbgXgaGD5E
+         cE5r6rKH2gB3FENKWPb4vM8kxxrfNGi6Um1mR+Bo7aYqnn7xczEPAWPY1aTWT+jez5Bo
+         d7s09AxXlVAnRpRbzo5Vosqufzw1tKedzAXSxN3s/Ymr+9WZhudkMKQfg114sUJ6SK2D
+         5qRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708530858; x=1709135658;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qpZY8+ihvYkY3PuoF5Mv6rfPsZc34NG30IyNAi4E5mw=;
-        b=NcZ1bA+OhtEtIKgbT940d40cHTv9EO4DiFWx2qoE2as08RYyFDJ67O8DGhtSHNY3v4
-         3BhYebPdE577QZvelLSFIvO7U/j5qRluA3FW9Ll8E8TrzDM6byknbw+aYaaW47Rr8KPv
-         NCfAvHyZAbHRGWlj6JtweJHgD42KLynjr7oi+ramWs9blJs17YA+zISaR3PzwWsfNPIc
-         hDBhzGrTssyRmxKgQABd1UZp2cfEXYoQuLRfiRXY4TSiNKwHnIGI2NJ1gP6+XEUnM72f
-         M43gVpDSXZtXEjjDqHHMHKCvinS/O0Qk7X/cR+l1TwJJrUhgLhihDwKpP1KAccLxnMWI
-         YprA==
-X-Gm-Message-State: AOJu0Ywd2Uang3k/qCKblFZQ96Dg+FA4J1FfSwdhy8yUmgoIFRft+YxV
-	zkoR/TbiHSIcY4H4AfJzuA7eXxvBGKb9TBcFKH6TLTCcXSbMdSVy3Auq83hMGXkkJx+6lLCbIuv
-	5
-X-Google-Smtp-Source: AGHT+IGZqHucnecGfNo85ED8mJXjBKB4/STjY3Woyq0Cs92WKpt3s6qiPFQT2lMqBJqR+lsoaNE9Eg==
-X-Received: by 2002:adf:e508:0:b0:33d:61c7:9b2c with SMTP id j8-20020adfe508000000b0033d61c79b2cmr6109570wrm.34.1708530858230;
-        Wed, 21 Feb 2024 07:54:18 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708530861; x=1709135661;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Igz3Pm9IcLbKinmSkAsWb32QhBDY2If+O3AZdxzSZ90=;
+        b=iktpxLdedF79MeT3Mu224i9NnqI0q1hRei2hUlyVxEHYkiF68zX2JGfiZExhuiSgA2
+         x3K5VD0N/s2nOFbd+RsZ2K+QfwrUVU828d7IUj6eosKB8yD3TMPnAXUu9Y0MkfcgoHir
+         0I/eC+chGNlzj5m7XkXmF5Na6fa6HmnJWfp/+CgBMBXoCirPikIuzux923WmwQLoGNC+
+         8zmqodpXZPalB2Xs89u5VgeSIyYlPM9bdM1ijXMOwh86ONe83y1+Tj1RD78bQgJonaLf
+         c3QPnBDk2Pj7y5X4ng8xtiue7R/8xG7CP/6ewh+6N5lDBd7Vlz4GbD9pg1I1rmepb66u
+         XGHQ==
+X-Gm-Message-State: AOJu0YxilaB88D0VIRS2nQxc19A4WQdZc2Z8hp3FOqtKjk0M3j5j8v4o
+	OJcKzck37j5+jaVlcuUz6Sfo7CPcJTQNAzPGw7pb5aRxBIPNAggV854WwMS31RNUxWns2jzSFTq
+	k
+X-Google-Smtp-Source: AGHT+IFs1lOHVLamzh8hZ6S0WRRREXlRQPIE5BYgc2No7bVlk1H3WMeJqMe9Gr+mGn9iCCbbdqjbrg==
+X-Received: by 2002:a05:600c:444a:b0:412:73f5:3aa5 with SMTP id v10-20020a05600c444a00b0041273f53aa5mr2623606wmn.16.1708530861707;
+        Wed, 21 Feb 2024 07:54:21 -0800 (PST)
 Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id d2-20020adfef82000000b0033b75b39aebsm17318127wro.11.2024.02.21.07.54.17
+        by smtp.gmail.com with ESMTPSA id b7-20020a05600c11c700b00411c3c2fc55sm18115234wmi.45.2024.02.21.07.54.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Feb 2024 07:54:17 -0800 (PST)
+        Wed, 21 Feb 2024 07:54:21 -0800 (PST)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -77,10 +79,12 @@ Cc: kuba@kernel.org,
 	sdf@google.com,
 	lorenzo@kernel.org,
 	alessandromarcolini99@gmail.com
-Subject: [patch net-next v2 0/3] tools: ynl: couple of cmdline enhancements
-Date: Wed, 21 Feb 2024 16:54:12 +0100
-Message-ID: <20240221155415.158174-1-jiri@resnulli.us>
+Subject: [patch net-next v2 1/3] tools: ynl: allow user to specify flag attr with bool values
+Date: Wed, 21 Feb 2024 16:54:13 +0100
+Message-ID: <20240221155415.158174-2-jiri@resnulli.us>
 X-Mailer: git-send-email 2.43.2
+In-Reply-To: <20240221155415.158174-1-jiri@resnulli.us>
+References: <20240221155415.158174-1-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,26 +95,33 @@ Content-Transfer-Encoding: 8bit
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-This is part of the original "netlink: specs: devlink: add the rest of
-missing attribute definitions" set which was rejected [1]. These three
-patches enhances the cmdline user comfort, allowing to pass flag
-attribute with bool values and enum names instead of scalars.
+The flag attr presence in Netlink message indicates value "true",
+if it is missing in the message it means "false".
 
-[1] https://lore.kernel.org/all/20240220181004.639af931@kernel.org/
+Allow user to specify attrname with value "true"/"false"
+in json for flag attrs, treat "false" value properly.
 
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
 v1->v2:
-- only first 3 patches left, the rest it cut out
-- see changelog of individual patches
+- accept other values than "False"
+---
+ tools/net/ynl/lib/ynl.py | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Jiri Pirko (3):
-  tools: ynl: allow user to specify flag attr with bool values
-  tools: ynl: process all scalar types encoding in single elif statement
-  tools: ynl: allow user to pass enum string instead of scalar value
-
- tools/net/ynl/lib/ynl.py | 39 ++++++++++++++++++++++++++++++---------
- 1 file changed, 30 insertions(+), 9 deletions(-)
-
+diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+index f45ee5f29bed..4a44840bab68 100644
+--- a/tools/net/ynl/lib/ynl.py
++++ b/tools/net/ynl/lib/ynl.py
+@@ -459,6 +459,8 @@ class YnlFamily(SpecFamily):
+                 attr_payload += self._add_attr(attr['nested-attributes'],
+                                                subname, subvalue, sub_attrs)
+         elif attr["type"] == 'flag':
++            if not value:
++                return b''
+             attr_payload = b''
+         elif attr["type"] == 'string':
+             attr_payload = str(value).encode('ascii') + b'\x00'
 -- 
 2.43.2
 
