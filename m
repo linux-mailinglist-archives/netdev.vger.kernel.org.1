@@ -1,93 +1,61 @@
-Return-Path: <netdev+bounces-73601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA28385D553
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:20:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E9DB85D55B
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:22:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23BCE1F228AE
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 10:20:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22218286F88
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 10:22:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D36D3D57F;
-	Wed, 21 Feb 2024 10:20:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ED383D98E;
+	Wed, 21 Feb 2024 10:21:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="uorW3VS5";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="qT70EC1s";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Z4kYwUEL";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="vIC4n8//"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ACDJmluh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD68E3C493;
-	Wed, 21 Feb 2024 10:20:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD533D970;
+	Wed, 21 Feb 2024 10:21:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708510807; cv=none; b=LKwjK4mS2kuMDAfYkef/Tu/kNw/WCxFfpYG6AFby/+YC5GNtDmfQ34AqYG76U4wYPVS3mISo/C0HpkosOOKmFWzmlxz8d83Q4rqC+EoCDWj+Cg2RD3xf1S3x+mDenWAR5gdVf43yrEcZLop8KW2NF6aM8PJmizraokZ9kRFfffc=
+	t=1708510916; cv=none; b=sOaL+Pp34ZKyRm2XF89aKyLnNejvLeV9KY+eLkekY8vj23K5h4F3UJwLJf7DWxXe2ILgY9T2CHKaJIFyO9ufnfuwWFA22mIUM0+to9xD4AJZ2cEL7M8EyBYDRkXzOt7W1LaP1njK5SxOsR+tFyVt0uX50S/5i132/lNL5Ipb8II=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708510807; c=relaxed/simple;
-	bh=ZWZGKUDl6RZGBEdoSWzt3+EqUDhpEXpPugj6iZGn7m8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=AjaPJWTBRO5RmQx2u8JbVP+pxknQdpysSav3NmilQoaHhzcXbzwyTYlWVfG85DyCWulCQxfsMkFBq6jp3joen+zZtrljjCAIKxPF3lLwfSTgxMf2rHZZspn3Es+g6hUHR3SY2QVW8eifC52ykRYgVkoszEaJpIVAD5bKE00LotI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=uorW3VS5; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=qT70EC1s; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Z4kYwUEL; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=vIC4n8//; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [10.150.64.98])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id E653B21E3B;
-	Wed, 21 Feb 2024 10:20:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1708510804; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sJXFVArpT3O61MOA5anWtuT7A38MsNK9KzOtcIoD6Ao=;
-	b=uorW3VS5DCOUlb7azuHT4M+blSdNcOUpc48hfNEG149gyWotAqolFzcFAwJxlREA1ftbjc
-	7IRVex1gqg0mMoD1yZYjRd/sz2AgGQQ3MYaK+Gf5aNUhcZxVB4aSM1c/tsMibm7PwgtZAv
-	qSJ9z0y1Je/fRc0YIRLtkly3KW+KoKA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1708510804;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sJXFVArpT3O61MOA5anWtuT7A38MsNK9KzOtcIoD6Ao=;
-	b=qT70EC1sNhhoRPqRfYuQ1khz5WBhOCrd65cHo/v5zwsjRrkYMc+atY+kWyitbFzJJru0RZ
-	UrLqkdYjHkb7+MBw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1708510803; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sJXFVArpT3O61MOA5anWtuT7A38MsNK9KzOtcIoD6Ao=;
-	b=Z4kYwUELR9X4cfjksi0vYVuqY1Q0pDLUvgMsMh7Q9t0lq77wX/iAqnhgEZdfonrXZR4guW
-	8+ohv1D6NYGojvwOJ6O9dK476eH3/IYpjfntUAZMiMrzPymUFBUdE3nHEHMVXs3b7Jt8oK
-	ab0PGbfs69dg8gX0BbCkbRZZZhEH8h4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1708510803;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sJXFVArpT3O61MOA5anWtuT7A38MsNK9KzOtcIoD6Ao=;
-	b=vIC4n8//yEE6lEa50Cpcho9qZqz4Mv90jkCDL8TIt+B4O3fxBegosXdXoR3dmm+4fueuL1
-	FcdKpHv3QIPfWLAg==
-Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id 647F0139D1;
-	Wed, 21 Feb 2024 10:20:03 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap2.dmz-prg2.suse.org with ESMTPSA
-	id bYu0FFPO1WUlFAAAn2gu4w
-	(envelope-from <dkirjanov@suse.de>); Wed, 21 Feb 2024 10:20:03 +0000
-Message-ID: <6fd57afc-f88c-41b1-b31b-f96579145827@suse.de>
-Date: Wed, 21 Feb 2024 13:20:02 +0300
+	s=arc-20240116; t=1708510916; c=relaxed/simple;
+	bh=zLzzvJfbVa6ODHn00Dyc4JUBC3zDKDHRQgbVtNkryF0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MSBEwP77//24wNP0GrBt14XiFgyR6b4Lwd5cdiD2lAEkNDIA/Ls38b9+iE6ihw6/YNlSU8srw3IwJM+Nrl/MZI8CV1JNgLF4dX+Pnt8IWkRostRvRUUxnBq2NhxWHkAW08V9Si3J+rdGf5wUSjswkmX93Bjc6eU3FMmvUZa4iSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ACDJmluh; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708510914; x=1740046914;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=zLzzvJfbVa6ODHn00Dyc4JUBC3zDKDHRQgbVtNkryF0=;
+  b=ACDJmluhI/oB5lXEt1f3U9r+69PaaY4MEeN4rLmaT1lc4rbFsDX1pguT
+   NWyL8xz6cDO6zSiN1j9YoQN2lIUKtSmlpp4mBSy83sTYvtnCCd9RIXSfK
+   ifE25/9O+ycDYLiAED2lqo6cBKKFLeGAaSzKDfmMM9fwFYn6p3y2zKvit
+   esDu1CqNosKOnLxtdt3nme6OXi98siT8XNwLGGNlh4bkR5z1bQhavlBdK
+   mlRUddk/cX9PZubOjnI+tNouJIM5vxBeEi0LzNA3+yDGKL4dbA0NyP9f9
+   h/V2wwgXJfBamFTr/EqQECSZtRyAGrDMN5gXLXvyXrwiWBcAz9V7OwPTF
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10990"; a="3141145"
+X-IronPort-AV: E=Sophos;i="6.06,175,1705392000"; 
+   d="scan'208";a="3141145"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2024 02:21:53 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,175,1705392000"; 
+   d="scan'208";a="9717365"
+Received: from conorwoo-mobl1.ger.corp.intel.com (HELO [10.252.22.137]) ([10.252.22.137])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2024 02:21:47 -0800
+Message-ID: <391b3603-52bc-4b07-9a50-7261971ee39f@intel.com>
+Date: Wed, 21 Feb 2024 10:21:42 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,161 +63,151 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v1] net: ipv6: hop tlv ext hdr parsing
-To: Richard Gobert <richardbgobert@gmail.com>, davem@davemloft.net,
- dsahern@kernel.org, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <9b82bb29-9316-4dfd-8c56-f8a294713c16@gmail.com>
-Content-Language: en-US
-From: Denis Kirjanov <dkirjanov@suse.de>
-In-Reply-To: <9b82bb29-9316-4dfd-8c56-f8a294713c16@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH 7/9] drm: tests: Fix invalid printf format specifiers in
+ KUnit tests
+To: David Gow <davidgow@google.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ Shuah Khan <skhan@linuxfoundation.org>, Guenter Roeck <linux@roeck-us.net>,
+ Rae Moar <rmoar@google.com>,
+ Arunpravin Paneer Selvam <arunpravin.paneerselvam@amd.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Kees Cook <keescook@chromium.org>, =?UTF-8?Q?Ma=C3=ADra_Canal?=
+ <mcanal@igalia.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Matthew Brost <matthew.brost@intel.com>,
+ Willem de Bruijn <willemb@google.com>, Florian Westphal <fw@strlen.de>,
+ Cassio Neri <cassio.neri@gmail.com>,
+ Javier Martinez Canillas <javierm@redhat.com>,
+ Arthur Grillo <arthur.grillo@usp.br>
+Cc: Brendan Higgins <brendan.higgins@linux.dev>,
+ Daniel Latypov <dlatypov@google.com>, Stephen Boyd <sboyd@kernel.org>,
+ David Airlie <airlied@gmail.com>, Maxime Ripard <mripard@kernel.org>,
+ "David S . Miller" <davem@davemloft.net>, dri-devel@lists.freedesktop.org,
+ linux-kernel@vger.kernel.org, intel-xe@lists.freedesktop.org,
+ linux-rtc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ kunit-dev@googlegroups.com, linux-hardening@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240221092728.1281499-1-davidgow@google.com>
+ <20240221092728.1281499-8-davidgow@google.com>
+Content-Language: en-GB
+From: Matthew Auld <matthew.auld@intel.com>
+In-Reply-To: <20240221092728.1281499-8-davidgow@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Authentication-Results: smtp-out1.suse.de;
-	none
-X-Spamd-Result: default: False [-3.09 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 XM_UA_NO_VERSION(0.01)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 BAYES_HAM(-3.00)[100.00%];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 RCPT_COUNT_SEVEN(0.00)[8];
-	 FREEMAIL_TO(0.00)[gmail.com,davemloft.net,kernel.org,google.com,redhat.com,vger.kernel.org];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 RCVD_TLS_ALL(0.00)[];
-	 MID_RHS_MATCH_FROM(0.00)[]
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spam-Score: -3.09
 
-
-
-On 2/21/24 13:03, Richard Gobert wrote:
-> This patch introduces 'hop_tlv_hdr' and 'hop_calipso_hdr' structs, in
-> order to access fields in a readable way in "ip6_parse_tlv".
+On 21/02/2024 09:27, David Gow wrote:
+> The drm_buddy_test's alloc_contiguous test used a u64 for the page size,
+> which was then updated to be an 'unsigned long' to avoid 64-bit
+> multiplication division helpers.
 > 
-> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
+> However, the variable is logged by some KUNIT_ASSERT_EQ_MSG() using the
+> '%d' or '%llu' format specifiers, the former of which is always wrong,
+> and the latter is no longer correct now that ps is no longer a u64. Fix
+> these to all use '%lu'.
+> 
+> Also, drm_mm_test calls KUNIT_FAIL() with an empty string as the
+> message. gcc warns if a printf format string is empty (apparently), so
+> give these some more detailed error messages, which should be more
+> useful anyway.
+> 
+> Fixes: a64056bb5a32 ("drm/tests/drm_buddy: add alloc_contiguous test")
+> Fixes: fca7526b7d89 ("drm/tests/drm_buddy: fix build failure on 32-bit targets")
+> Fixes: fc8d29e298cf ("drm: selftest: convert drm_mm selftest to KUnit")
+> Signed-off-by: David Gow <davidgow@google.com>
 > ---
->  include/net/ipv6.h | 16 ++++++++++++++++
->  net/ipv6/exthdrs.c | 30 +++++++++++++++++-------------
->  2 files changed, 33 insertions(+), 13 deletions(-)
+>   drivers/gpu/drm/tests/drm_buddy_test.c | 14 +++++++-------
+>   drivers/gpu/drm/tests/drm_mm_test.c    |  6 +++---
+>   2 files changed, 10 insertions(+), 10 deletions(-)
 > 
-> diff --git a/include/net/ipv6.h b/include/net/ipv6.h
-> index cf25ea21d770..61677946ed46 100644
-> --- a/include/net/ipv6.h
-> +++ b/include/net/ipv6.h
-> @@ -151,6 +151,22 @@ struct frag_hdr {
->  	__be32	identification;
->  };
->  
-> +struct hop_tlv_hdr {
-> +	u8	tlv_type;
-> +	u8	tlv_len;
-> +};
-> +
-> +/* CALIPSO RFC 5570 */
-> +struct hop_calipso_hdr {
-> +	u8	tlv_type;
-> +	u8	tlv_len;
-> +	u32	domain_interpretation;
-> +	u8	cmpt_len;
-> +	u8	sens_lvl;
-> +	u16	checksum;
-> +	u64	cmpt_bitmap;
-> +} __packed;
-> +
->  /*
->   * Jumbo payload option, as described in RFC 2675 2.
->   */
-> diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
-> index 4952ae792450..5db624299da4 100644
-> --- a/net/ipv6/exthdrs.c
-> +++ b/net/ipv6/exthdrs.c
-> @@ -114,7 +114,7 @@ static bool ip6_parse_tlv(bool hopbyhop,
->  			  struct sk_buff *skb,
->  			  int max_count)
->  {
-> -	int len = (skb_transport_header(skb)[1] + 1) << 3;
-> +	int len = ipv6_optlen((struct ipv6_opt_hdr *)skb_transport_header(skb));
->  	const unsigned char *nh = skb_network_header(skb);
->  	int off = skb_network_header_len(skb);
->  	bool disallow_unknowns = false;
-> @@ -890,15 +890,16 @@ static inline struct net *ipv6_skb_net(struct sk_buff *skb)
->  
->  static bool ipv6_hop_ra(struct sk_buff *skb, int optoff)
->  {
-> -	const unsigned char *nh = skb_network_header(skb);
-> +	struct hop_tlv_hdr *tlv_hdr =
-You've forgotten to contstify your struct here and below
+> diff --git a/drivers/gpu/drm/tests/drm_buddy_test.c b/drivers/gpu/drm/tests/drm_buddy_test.c
+> index 8a464f7f4c61..3dbfa3078449 100644
+> --- a/drivers/gpu/drm/tests/drm_buddy_test.c
+> +++ b/drivers/gpu/drm/tests/drm_buddy_test.c
+> @@ -55,30 +55,30 @@ static void drm_test_buddy_alloc_contiguous(struct kunit *test)
+>   		KUNIT_ASSERT_FALSE_MSG(test,
+>   				       drm_buddy_alloc_blocks(&mm, 0, mm_size,
+>   							      ps, ps, list, 0),
+> -				       "buddy_alloc hit an error size=%d\n",
+> +				       "buddy_alloc hit an error size=%lu\n",
+>   				       ps);
+>   	} while (++i < n_pages);
+>   
+>   	KUNIT_ASSERT_TRUE_MSG(test, drm_buddy_alloc_blocks(&mm, 0, mm_size,
+>   							   3 * ps, ps, &allocated,
+>   							   DRM_BUDDY_CONTIGUOUS_ALLOCATION),
+> -			       "buddy_alloc didn't error size=%d\n", 3 * ps);
+> +			       "buddy_alloc didn't error size=%lu\n", 3 * ps);
+>   
+>   	drm_buddy_free_list(&mm, &middle);
+>   	KUNIT_ASSERT_TRUE_MSG(test, drm_buddy_alloc_blocks(&mm, 0, mm_size,
+>   							   3 * ps, ps, &allocated,
+>   							   DRM_BUDDY_CONTIGUOUS_ALLOCATION),
+> -			       "buddy_alloc didn't error size=%llu\n", 3 * ps);
+> +			       "buddy_alloc didn't error size=%lu\n", 3 * ps);
+>   	KUNIT_ASSERT_TRUE_MSG(test, drm_buddy_alloc_blocks(&mm, 0, mm_size,
+>   							   2 * ps, ps, &allocated,
+>   							   DRM_BUDDY_CONTIGUOUS_ALLOCATION),
+> -			       "buddy_alloc didn't error size=%llu\n", 2 * ps);
+> +			       "buddy_alloc didn't error size=%lu\n", 2 * ps);
+>   
+>   	drm_buddy_free_list(&mm, &right);
+>   	KUNIT_ASSERT_TRUE_MSG(test, drm_buddy_alloc_blocks(&mm, 0, mm_size,
+>   							   3 * ps, ps, &allocated,
+>   							   DRM_BUDDY_CONTIGUOUS_ALLOCATION),
+> -			       "buddy_alloc didn't error size=%llu\n", 3 * ps);
+> +			       "buddy_alloc didn't error size=%lu\n", 3 * ps);
+>   	/*
+>   	 * At this point we should have enough contiguous space for 2 blocks,
+>   	 * however they are never buddies (since we freed middle and right) so
+> @@ -87,13 +87,13 @@ static void drm_test_buddy_alloc_contiguous(struct kunit *test)
+>   	KUNIT_ASSERT_FALSE_MSG(test, drm_buddy_alloc_blocks(&mm, 0, mm_size,
+>   							    2 * ps, ps, &allocated,
+>   							    DRM_BUDDY_CONTIGUOUS_ALLOCATION),
+> -			       "buddy_alloc hit an error size=%d\n", 2 * ps);
+> +			       "buddy_alloc hit an error size=%lu\n", 2 * ps);
+>   
+>   	drm_buddy_free_list(&mm, &left);
+>   	KUNIT_ASSERT_FALSE_MSG(test, drm_buddy_alloc_blocks(&mm, 0, mm_size,
+>   							    3 * ps, ps, &allocated,
+>   							    DRM_BUDDY_CONTIGUOUS_ALLOCATION),
+> -			       "buddy_alloc hit an error size=%d\n", 3 * ps);
+> +			       "buddy_alloc hit an error size=%lu\n", 3 * ps);
 
-> +		(struct hop_tlv_hdr *)(skb_network_header(skb) + optoff);
->  
-> -	if (nh[optoff + 1] == 2) {
-> +	if (tlv_hdr->tlv_len == 2) {
->  		IP6CB(skb)->flags |= IP6SKB_ROUTERALERT;
-> -		memcpy(&IP6CB(skb)->ra, nh + optoff + 2, sizeof(IP6CB(skb)->ra));
-> +		memcpy(&IP6CB(skb)->ra, tlv_hdr + 1, sizeof(IP6CB(skb)->ra));
->  		return true;
->  	}
->  	net_dbg_ratelimited("ipv6_hop_ra: wrong RA length %d\n",
-> -			    nh[optoff + 1]);
-> +			    tlv_hdr->tlv_len);
->  	kfree_skb_reason(skb, SKB_DROP_REASON_IP_INHDR);
->  	return false;
->  }
-> @@ -961,18 +962,20 @@ static bool ipv6_hop_ioam(struct sk_buff *skb, int optoff)
->  
->  static bool ipv6_hop_jumbo(struct sk_buff *skb, int optoff)
->  {
-> -	const unsigned char *nh = skb_network_header(skb);
-> +	int tlv_off = offsetof(struct hop_jumbo_hdr, tlv_type);
-> +	struct hop_jumbo_hdr *jumbo_hdr = (struct hop_jumbo_hdr *)
+There was also a fix for this in: 335126937753 ("drm/tests/drm_buddy: 
+fix 32b build"), but there everything was made u32.
 
-> +		(skb_network_header(skb) + optoff - tlv_off);
->  	SKB_DR(reason);
->  	u32 pkt_len;
->  
-> -	if (nh[optoff + 1] != 4 || (optoff & 3) != 2) {
-> +	if (jumbo_hdr->tlv_len != 4 || (optoff & 3) != 2) {
->  		net_dbg_ratelimited("ipv6_hop_jumbo: wrong jumbo opt length/alignment %d\n",
-> -				    nh[optoff+1]);
-> +				    jumbo_hdr->tlv_len);
->  		SKB_DR_SET(reason, IP_INHDR);
->  		goto drop;
->  	}
->  
-> -	pkt_len = ntohl(*(__be32 *)(nh + optoff + 2));
-> +	pkt_len = ntohl(jumbo_hdr->jumbo_payload_len);
->  	if (pkt_len <= IPV6_MAXPLEN) {
->  		icmpv6_param_prob_reason(skb, ICMPV6_HDR_FIELD, optoff + 2,
->  					 SKB_DROP_REASON_IP_INHDR);
-> @@ -1004,15 +1007,16 @@ static bool ipv6_hop_jumbo(struct sk_buff *skb, int optoff)
->  
->  static bool ipv6_hop_calipso(struct sk_buff *skb, int optoff)
->  {
-> -	const unsigned char *nh = skb_network_header(skb);
-> +	struct hop_calipso_hdr *calipso_hdr =
-> +		(struct hop_calipso_hdr *)(skb_network_header(skb) + optoff);
->  
-> -	if (nh[optoff + 1] < 8)
-> +	if (calipso_hdr->tlv_len < 8)
->  		goto drop;
->  
-> -	if (nh[optoff + 6] * 4 + 8 > nh[optoff + 1])
-> +	if (calipso_hdr->cmpt_len * 4 + 8 > calipso_hdr->tlv_len)
->  		goto drop;
->  
-> -	if (!calipso_validate(skb, nh + optoff))
-> +	if (!calipso_validate(skb, (const unsigned char *)calipso_hdr))
->  		goto drop;
->  
->  	return true;
+Reviewed-by: Matthew Auld <matthew.auld@intel.com>
+
+>   
+>   	total = 0;
+>   	list_for_each_entry(block, &allocated, link)
+> diff --git a/drivers/gpu/drm/tests/drm_mm_test.c b/drivers/gpu/drm/tests/drm_mm_test.c
+> index 1eb0c304f960..f37c0d765865 100644
+> --- a/drivers/gpu/drm/tests/drm_mm_test.c
+> +++ b/drivers/gpu/drm/tests/drm_mm_test.c
+> @@ -157,7 +157,7 @@ static void drm_test_mm_init(struct kunit *test)
+>   
+>   	/* After creation, it should all be one massive hole */
+>   	if (!assert_one_hole(test, &mm, 0, size)) {
+> -		KUNIT_FAIL(test, "");
+> +		KUNIT_FAIL(test, "mm not one hole on creation");
+>   		goto out;
+>   	}
+>   
+> @@ -171,14 +171,14 @@ static void drm_test_mm_init(struct kunit *test)
+>   
+>   	/* After filling the range entirely, there should be no holes */
+>   	if (!assert_no_holes(test, &mm)) {
+> -		KUNIT_FAIL(test, "");
+> +		KUNIT_FAIL(test, "mm has holes when filled");
+>   		goto out;
+>   	}
+>   
+>   	/* And then after emptying it again, the massive hole should be back */
+>   	drm_mm_remove_node(&tmp);
+>   	if (!assert_one_hole(test, &mm, 0, size)) {
+> -		KUNIT_FAIL(test, "");
+> +		KUNIT_FAIL(test, "mm does not have single hole after emptying");
+>   		goto out;
+>   	}
+>   
 
