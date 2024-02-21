@@ -1,93 +1,143 @@
-Return-Path: <netdev+bounces-73656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB7EB85D6FC
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:32:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2DB985D738
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:40:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8010A1F22D23
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:32:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D49481C2141B
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:40:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54CE3481C6;
-	Wed, 21 Feb 2024 11:30:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZeEmx1Lt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C8EE45945;
+	Wed, 21 Feb 2024 11:37:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DE3C481AD;
-	Wed, 21 Feb 2024 11:30:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DEEB40C04;
+	Wed, 21 Feb 2024 11:37:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708515029; cv=none; b=amLlAiQFQDjYWzaGD5sY3s3k0OMA2m3r5XTkSyjfO6v+NTl8rN2JvXljYrn++cyKyc6WFGUjO1Qvv4KROLsuETFv3vss5ra4/MgJZ5Eq5p6UmYuVpGEdX6WTYa9vguqGv2XbLCDj6JsgEbcvHYVifx5il3KCUm806M8QXUsUfAo=
+	t=1708515449; cv=none; b=Vp6FPHxWgwov8BLkZtg9nOKUhFPHSNd3osbkB0ZU6XBIPpZYSW88ORchZapLzUE07Z7KhBj+Lr9w+db8BgXzEfnTh69teCqn30+5ATMyIP0nCNG+LyD23dhfGIKgepTY9antlAEHK1efpyjR2j5UQuErk5zaTN/zgVVrw5vbQuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708515029; c=relaxed/simple;
-	bh=q8iei6SJEoGcWw/7HaWMNBq0PFhJeMnbU+3HGyo+ceU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=KZF9PfNWEbVDTSvVxLYRVnDBEJAKLwy87sqi7AtTJXWxFBtCuoZ6raQ3xH3VaPQECSmRTe2+rzanJkOzECHfEa1oShQv2loD7r8DLLnxgXFpNRi02Jq5yH9jtK1pLZKA4nrxMsDhMSAu2NmZYEfYxPpRIOkDhmdyzFmiozCaS78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZeEmx1Lt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A0B9CC43399;
-	Wed, 21 Feb 2024 11:30:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708515028;
-	bh=q8iei6SJEoGcWw/7HaWMNBq0PFhJeMnbU+3HGyo+ceU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZeEmx1Lt17ZmCBXIfLwYqoPlVRUzxDYqKjGqccNA04uP1GTpLAD61F3H+j6XkjqYf
-	 FkyXVH2bd58gZrvlKbylH7s4u94MtXf6YDfSrStFxru2WNchKMkLiHrXxxZRNgcR8F
-	 tGILumeBvBz73LOvgcMwjMhEyitrglC54HlPaDJ915GIKcd9SavTIYaF/lxL6g7Qc1
-	 P5nGdQWWnm8o1YaPLUyBOjGn5BWBJzCSXVO2QZ0vF46q8XIgfu+ShBhfp01IHz9Y2F
-	 OP9/OG7i+2ZWIg78InbXBBEaM24Vuq/6HfIQ5qav/bXWbsDwXiuF1x0LWX5jktN30K
-	 nA1pNuTHQEvtg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8E25FD84BBC;
-	Wed, 21 Feb 2024 11:30:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1708515449; c=relaxed/simple;
+	bh=UDbteaw/i+JCOAl6Fun2vw1m/RM/qsD67b3kyaqjNr8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=spQqVdE2kvtLHYBOusIZQk9Y8mHlJIW1lahYO2QLpzk1akDZ8RoeJc48I0UBsK1MjctcXt/uApRtsFW7LahGszyEVXjdlDykz3tm36clr10LXU7phva1j/kfGQXEB12Y3N6/9spYBs/HcYSJvm3nKDsjSXju4SFpJ4Qlf1hT9mk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4TfvJc0MqXz1FKbt;
+	Wed, 21 Feb 2024 19:32:32 +0800 (CST)
+Received: from kwepemd500002.china.huawei.com (unknown [7.221.188.104])
+	by mail.maildlp.com (Postfix) with ESMTPS id C51BA18005F;
+	Wed, 21 Feb 2024 19:37:23 +0800 (CST)
+Received: from kwepemd200011.china.huawei.com (7.221.188.251) by
+ kwepemd500002.china.huawei.com (7.221.188.104) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Wed, 21 Feb 2024 19:37:23 +0800
+Received: from dggpemm500008.china.huawei.com (7.185.36.136) by
+ kwepemd200011.china.huawei.com (7.221.188.251) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1258.28; Wed, 21 Feb 2024 19:37:23 +0800
+Received: from dggpemm500008.china.huawei.com ([7.185.36.136]) by
+ dggpemm500008.china.huawei.com ([7.185.36.136]) with mapi id 15.01.2507.035;
+ Wed, 21 Feb 2024 19:37:22 +0800
+From: wangyunjian <wangyunjian@huawei.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "virtualization@lists.linux.dev"
+	<virtualization@lists.linux.dev>, xudingke <xudingke@huawei.com>,
+	"mst@redhat.com" <mst@redhat.com>, "willemdebruijn.kernel@gmail.com"
+	<willemdebruijn.kernel@gmail.com>, "jasowang@redhat.com"
+	<jasowang@redhat.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>, "magnus.karlsson@intel.com"
+	<magnus.karlsson@intel.com>
+Subject: RE: [PATCH net-next 1/2] xsk: Remove non-zero 'dma_page' check in
+ xp_assign_dev
+Thread-Topic: [PATCH net-next 1/2] xsk: Remove non-zero 'dma_page' check in
+ xp_assign_dev
+Thread-Index: AQHaTqj5aHEEh4wXi06uw11VbniHk7EUM/IAgAChCpA=
+Date: Wed, 21 Feb 2024 11:37:22 +0000
+Message-ID: <0fce8b64808f4c6faa0eb60e44687c36@huawei.com>
+References: <1706089058-1364-1-git-send-email-wangyunjian@huawei.com>
+ <1708509152.9501102-1-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <1708509152.9501102-1-xuanzhuo@linux.alibaba.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net/dummy: Move stats allocation to core
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170851502857.15341.15517644108152469413.git-patchwork-notify@kernel.org>
-Date: Wed, 21 Feb 2024 11:30:28 +0000
-References: <20240219134328.1066787-1-leitao@debian.org>
-In-Reply-To: <20240219134328.1066787-1-leitao@debian.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- horms@kernel.org
 
-Hello:
+> -----Original Message-----
+> From: Xuan Zhuo [mailto:xuanzhuo@linux.alibaba.com]
+> Sent: Wednesday, February 21, 2024 5:53 PM
+> To: wangyunjian <wangyunjian@huawei.com>
+> Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org;
+> kvm@vger.kernel.org; virtualization@lists.linux.dev; xudingke
+> <xudingke@huawei.com>; wangyunjian <wangyunjian@huawei.com>;
+> mst@redhat.com; willemdebruijn.kernel@gmail.com; jasowang@redhat.com;
+> kuba@kernel.org; davem@davemloft.net; magnus.karlsson@intel.com
+> Subject: Re: [PATCH net-next 1/2] xsk: Remove non-zero 'dma_page' check i=
+n
+> xp_assign_dev
+>=20
+> On Wed, 24 Jan 2024 17:37:38 +0800, Yunjian Wang
+> <wangyunjian@huawei.com> wrote:
+> > Now dma mappings are used by the physical NICs. However the vNIC maybe
+> > do not need them. So remove non-zero 'dma_page' check in
+> > xp_assign_dev.
+>=20
+> Could you tell me which one nic can work with AF_XDP without DMA?
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+TUN will support AF_XDP Tx zero-copy, which does not require DMA mappings.
 
-On Mon, 19 Feb 2024 05:43:28 -0800 you wrote:
-> With commit 34d21de99cea9 ("net: Move {l,t,d}stats allocation to core and
-> convert veth & vrf"), stats allocation could be done on net core instead
-> of this driver.
-> 
-> With this new approach, the driver doesn't have to bother with error
-> handling (allocation failure checking, making sure free happens in the
-> right spot, etc). This is core responsibility now.
-> 
-> [...]
+Thanks
 
-Here is the summary with links:
-  - [net-next] net/dummy: Move stats allocation to core
-    https://git.kernel.org/netdev/net-next/c/a381690dd842
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+>=20
+> Thanks.
+>=20
+>=20
+> >
+> > Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
+> > ---
+> >  net/xdp/xsk_buff_pool.c | 7 -------
+> >  1 file changed, 7 deletions(-)
+> >
+> > diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c index
+> > 28711cc44ced..939b6e7b59ff 100644
+> > --- a/net/xdp/xsk_buff_pool.c
+> > +++ b/net/xdp/xsk_buff_pool.c
+> > @@ -219,16 +219,9 @@ int xp_assign_dev(struct xsk_buff_pool *pool,
+> >  	if (err)
+> >  		goto err_unreg_pool;
+> >
+> > -	if (!pool->dma_pages) {
+> > -		WARN(1, "Driver did not DMA map zero-copy buffers");
+> > -		err =3D -EINVAL;
+> > -		goto err_unreg_xsk;
+> > -	}
+> >  	pool->umem->zc =3D true;
+> >  	return 0;
+> >
+> > -err_unreg_xsk:
+> > -	xp_disable_drv_zc(pool);
+> >  err_unreg_pool:
+> >  	if (!force_zc)
+> >  		err =3D 0; /* fallback to copy mode */
+> > --
+> > 2.33.0
+> >
+> >
 
