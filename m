@@ -1,136 +1,99 @@
-Return-Path: <netdev+bounces-73716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6021885E019
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 15:43:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3248185E01D
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 15:43:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1C38B28626
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 14:42:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D16F81F24EF3
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 14:43:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A48E880628;
-	Wed, 21 Feb 2024 14:41:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95FE57C0B8;
+	Wed, 21 Feb 2024 14:42:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ED+Is0Rs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bMxPfnUU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 713017FBBE;
-	Wed, 21 Feb 2024 14:41:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13737C098
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 14:42:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708526498; cv=none; b=JwjPJxwegBMNv2hbVjuCq9GrxJhLjr++06qlJ6UfH26N16EhvB4JmEy1saoY5M8TTUpoSHSY7zxwHQhgz49lXSnWmbDi7Mzn/YKOmK+B01zly6nEkfl5E9Y21MRed+QDDj/C8Dh/UJriYIJVUw79p9qDauybDonyDtQtRmGZd8Y=
+	t=1708526547; cv=none; b=PeSB9a9+kdMsr6N4wWrjcv0cohAuD7wjnMk95nY6crkxCKCS/tABmZ02Dsqj+N6D1Kz4p07aUcKI4YEIVDNwRRueKV+LWrCD3ZKvuUmPGrvjks4zYS3fIKOhfR3uIIo9e1yEcMkQBXkrkQsTkJsTC8Ic6kBeihcPXw/a/QwwiwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708526498; c=relaxed/simple;
-	bh=LMvwRVWrGpntZKffwPjxzABB0GbvgGzy15uoz5ce5Ck=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LkhP6ia6rA3vTKCvmREOd6z+HZPnCudA2g2827wvEpcFGS2uwk5yPmTkUCDY9KzWO/K1njzKJeZxnfZiR0AoulB4/35aHougV3DHwsjGwGGr4lowWvX6cCf8yUzeSuTAgBcZKH3SRIksWKs4ELQYqydX300ManRJOF1ace3joos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ED+Is0Rs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F34BC43399;
-	Wed, 21 Feb 2024 14:41:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708526498;
-	bh=LMvwRVWrGpntZKffwPjxzABB0GbvgGzy15uoz5ce5Ck=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ED+Is0RsdeVe2u1XRn9CptJaFKbYvAoA7zlpphH6RpmngRFblgD0fcKmbWmWRw+9R
-	 duuhOW191XM9FtLrmaayiakgjT+3nAHjaQldSiZwQkh+cKNrVAlNHy9qqp8nzN3y+s
-	 OcQm7CbEJNg5qelau0b6Ac6FSN4XjhYP5E+UhNBrfCu7/XqFFv1E+r1S02F/w4YvK9
-	 tS9WwvcDbrhuwqJTsltEGwo7mmmO0c6s1+Vdojn1SWXnM/06GMXfZXGNVUaGw33/2u
-	 LauqDeHtD4tNOLfxsEezzvnOBJJI6C9IYochwhRRUIDmeflWyKyZGnk20lZBAK3iRF
-	 E5wLxaGuUwsew==
-Date: Wed, 21 Feb 2024 07:41:35 -0700
-From: Rob Herring <robh@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Kory Maincent <kory.maincent@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Mark Brown <broonie@kernel.org>,
-	Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
-	Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v4 14/17] dt-bindings: net: pse-pd: Add bindings
- for PD692x0 PSE controller
-Message-ID: <20240221144135.GB2779189-robh@kernel.org>
-References: <20240215-feature_poe-v4-0-35bb4c23266c@bootlin.com>
- <20240215-feature_poe-v4-14-35bb4c23266c@bootlin.com>
- <ZdCjJcPbbBGYVtuo@pengutronix.de>
+	s=arc-20240116; t=1708526547; c=relaxed/simple;
+	bh=gFSz4L+aI0Gu8pUuZtJXXMWlr821tG1RaZ8uUQEGGMo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Gb/DlNwzB+rD5eYc5gbR/NvHk7PXbYN0DlRk3ayAKf/ToM2FV2QoRjtSQ7X3n/hpga6lW6utsrLsuJ4OwOiCErS4lE0GvoyuOjzEV+lapMgDn6BJC+ZhsMsf7LV6LmJPdbdUFCT1nZjNYCuQvkg1FOQM99K0YCo5ZHNymSMjFHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bMxPfnUU; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5650c27e352so5256a12.0
+        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 06:42:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1708526544; x=1709131344; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gFSz4L+aI0Gu8pUuZtJXXMWlr821tG1RaZ8uUQEGGMo=;
+        b=bMxPfnUURc6uuJvANabw+3/V2moudaIJe/zJUHu0rtjM3ZfkADUE+Ni+1pQve+d/bS
+         Sj6rB4kKrp+1S+cSw3Y8NqMbrX9gXxKA4FHzi/fLdfGCdUyvQ7yGyFVvl5FYVhBQr1pv
+         zQTxOWFkH0MB4f8Bh97Gl6dA3kpC9qHA9E9eOIOLzeAiInmSXxyFDE664f0daVZQqrRU
+         XeKljyfkaZYEbDAS8vl944mTLcQ2y882tRx9pM/z4MyniOzVOZ9FBp+o/iu/TqzO9Ew+
+         8Ct1SxBq/i7mG1VVusGtx29u8lnsxi2BMO6ynNlF4KKTF5worTugi/vesVUFFE5+DIt2
+         cAXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708526544; x=1709131344;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gFSz4L+aI0Gu8pUuZtJXXMWlr821tG1RaZ8uUQEGGMo=;
+        b=UVHXngaBeP4oC+p2WYrgXNO75a0yubgpuWwOeXhNkDjOBg3LTr85yRBmcwZtb3ECii
+         dXytdYZ5I5c/M9LzWrBsE4/gs7yFTLLJr5nHqmNpMTtRr3Zcic4nhbScD9nzXpHyC7ma
+         sUipUtMB96ItXyWWCvMmRnhYaPxmlf4nJnjD6VvaYJ/RL6vwvEozxVAGBIoA2F/L8e0h
+         C4TXDJ4jlo9Za+1lKbsOdUMHrn/bNOz+/NaLup9/wgdVrUEAxk/kOH9TYdv/dWaBHyWH
+         TLrbeB4z3CHoQ+MLwpN9p5RSWl6DyEedKOrRX9a/KU6hSm/GFoQI1yMZbK3ax4Yo23K+
+         MtQA==
+X-Forwarded-Encrypted: i=1; AJvYcCW4+uL9//zhg3QllWUjIujdHI7tgrk6v67uafQfXDDOcmNq9XucI0ZtYruwPaikWJuq1nYyeXPEYsXqw/qorBpXDPtA0vN6
+X-Gm-Message-State: AOJu0Yy66befG4BGv+HyS4RBHMutef65f1sqXMoA/Y83jha7ldsRFlm+
+	xQfTOAtj3ZuAm45AeRr9qw8V9qZDm82kNHxwWcwDcTn1BOaHnhAkCq+5XYT6aQLxLCGLnTeEJdm
+	P/thxJbArYDMVQWt2iXyy/8HJdm6AcPW7UXiP
+X-Google-Smtp-Source: AGHT+IHk8Jm2n0dCP4T6QpyCSNvoGJjSVoha0b246PUzY7nlFEp9vsec4maWmqM0VyfSkBjYm4/eCqfxdXAXqTAozoQ=
+X-Received: by 2002:a50:9f04:0:b0:562:9d2:8857 with SMTP id
+ b4-20020a509f04000000b0056209d28857mr188654edf.6.1708526543966; Wed, 21 Feb
+ 2024 06:42:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZdCjJcPbbBGYVtuo@pengutronix.de>
+References: <20240221025732.68157-1-kerneljasonxing@gmail.com> <20240221025732.68157-10-kerneljasonxing@gmail.com>
+In-Reply-To: <20240221025732.68157-10-kerneljasonxing@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 21 Feb 2024 15:42:10 +0100
+Message-ID: <CANn89i+Uikp=NvB7SVQpYnX-2FqJrH3hWw3sV0XpVcC55MiNUg@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 09/11] tcp: make the dropreason really work
+ when calling tcp_rcv_state_process()
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	dsahern@kernel.org, kuniyu@amazon.com, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Feb 17, 2024 at 01:14:29PM +0100, Oleksij Rempel wrote:
-> On Thu, Feb 15, 2024 at 05:02:55PM +0100, Kory Maincent wrote:
-> > Add the PD692x0 I2C Power Sourcing Equipment controller device tree
-> > bindings documentation.
-> > 
-> > This patch is sponsored by Dent Project <dentproject@linuxfoundation.org>.
-> > 
-> > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> > ---
-> ...
-> > +        pse_pis {
-> > +          #address-cells = <1>;
-> > +          #size-cells = <0>;
-> > +
-> > +          pse_pi0: pse_pi@0 {
-> > +            reg = <0>;
-> > +            #pse-cells = <0>;
-> > +            pairset-names = "alternative-a", "alternative-b";
-> > +            pairsets = <&phys0>, <&phys1>;
-> > +          };
-> > +          pse_pi1: pse_pi@1 {
-> > +            reg = <1>;
-> > +            #pse-cells = <0>;
-> > +            pairset-names = "alternative-a";
-> > +            pairsets = <&phys2>;
-> 
-> According to latest discussions, PSE PI nodes will need some
-> additional, board specific, information:
-> - this controller do not implements polarity switching, we need to know
->   what polarity is implemented on this board. The 802.3 spec provide not
->   really consistent names for polarity configurations:
->   - Alternative A MDI-X
->   - Alternative A MDI
->   - Alternative B X
->   - Alternative B S
->   The board may implement one of polarity configurations per alternative
->   or have additional helpers to switch them without using PSE
->   controller.
->   Even if specification explicitly say:
->   "The PD shall be implemented to be insensitive to the polarity of the power
->    supply and shall be able to operate per the PD Mode A column and the PD
->    Mode B column in Table 33–13"
->   it is possible to find reports like this:
->   https://community.ui.com/questions/M5-cant-take-reversed-power-polarity-/d834d9a8-579d-4f08-80b1-623806cc5070
-> 
->   Probably this kind of property is a good fit:
->   polarity-supported = "MDI-X", "MDI", "X", "S";
+On Wed, Feb 21, 2024 at 3:58=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
+>
+> From: Jason Xing <kernelxing@tencent.com>
+>
+> Update three callers including both ipv4 and ipv6 and let the dropreason
+> mechanism work in reality.
+>
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
 
-Where does that live? Looks like a property of the consumers defined in 
-the provider. Generally, that's not the right way for DT. I'll say it 
-again, I think you should be expanding #pse-cells (>1), not getting rid 
-of them (==0).
-
-Rob
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
