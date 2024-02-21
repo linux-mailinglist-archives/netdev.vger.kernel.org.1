@@ -1,102 +1,172 @@
-Return-Path: <netdev+bounces-73487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E6DC85CCF4
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 01:49:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD11785CCFC
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 01:50:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4F8E286782
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 00:49:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF8BF1C20D6C
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 00:50:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F8B6187F;
-	Wed, 21 Feb 2024 00:49:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D54E317D5;
+	Wed, 21 Feb 2024 00:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="PEo0tGgy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JFtIOsfw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A806E23DE
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 00:49:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D025D23DE
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 00:50:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708476569; cv=none; b=hDkb6+1wpHC6f9b99YW2k4V/2w+UC9eBtbob0R8tAQawFrdU5f8z4VQJ8tuAdidj16qoD3IxodV5/LdAP3UDhBQOzV800jF6ujG+p8bmhGyDPOGhc+CECLWnPIFEnhoBO00VH8ow6uTRwQ55LUkESqp6TRzfkWUOZ086sq5DUkw=
+	t=1708476627; cv=none; b=fkq+nP5Wl6W0VH0nxyAO5r7gWuHJNjnukwNYhg3t5K/YFPl/IOd9Q2Cg/SecYi5QOy8NQgKH1hbiQ15ldA7sH7RsVjVuzj5GIwjNs+SUU3TvW00EX6RTDFOQE72m8wMnZ6vNgjfThcxWHyQMyv9hpBldJZw4QZ8t+NFz/ZaRtCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708476569; c=relaxed/simple;
-	bh=cIRuw18MgK3s3QPYG5bF8HaUdZMx7uHI+euu6IBW8e4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bhYVqsdz+c5yz0NDKQBvW5iyQKrrRj0QfJA05LlCZ5p00WX1iwCmTJuM5ygi02e0vHMmu/xlKiFaiTzgmsPHHI8iSLBFBkqcGYFlo5N/+cRCwsuOK4wYhUicPnntEkmLMW8rUc3y4j6reLLaDNaPSlID2OPhpGz6svU9PG0/StA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=PEo0tGgy; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1dc139ed11fso10421995ad.0
-        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 16:49:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1708476567; x=1709081367; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=l6iZPQkJ9eVozTwMvVtiCWD1JWn1A/ViHwX542hh6CA=;
-        b=PEo0tGgy8iKWLybFGwoJXcTltbGU1p3TqNEKJWGiLDhDlDgH9lkOtyG1WDia8JuaWn
-         wYyDFYqOJHMABYWB2qmfvsNovoNoZ2Mk1kBNMcWffnb2WUtIwSZwMUbOsjBw3tThctWW
-         ibYukAqdeBTArIYb9VgX8sEf/vXlZnbxss/G0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708476567; x=1709081367;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l6iZPQkJ9eVozTwMvVtiCWD1JWn1A/ViHwX542hh6CA=;
-        b=ZtwXWr8+5A5ODjrulxgBhpycXWVnylll1S/LZ8X6rfgOeFvB4KXb83UcT8Mv8IN47q
-         se3OY6sJkiH79uxXmIpvljyCKLeyaBzYtPi/itv2kcnbP6jlXLNJt9z5V+jKQnNHd7fo
-         2V0v4dPTaxZQaIK0xyzMsXG0jBT105CkPCTEBjbTuoLRn+52iw6xZpw2IDT81GrtKxNX
-         1BykCssq7ffsYwEtsn4zb86xFYmB7OewpvnrpAzo933cQNEoK0Sh3BdbjTYcF9BM2Ko9
-         h2g8eN1z4z9j2ZBuKYqvjPaViEl5cehcW2w6kWkSAfrHbNWWK9f6egbSVCFouEGetJZW
-         Iq1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUbUg4+jtkR5D+Fe8/q/88nQxqSZpRtSXVWhmMOmkdCTcplnYTqHoSvW6thVSOSSBum0mdPnMGNdHwnlwI8HHyayU38zwcY
-X-Gm-Message-State: AOJu0YzquV+wXapfz+Q4NoKuyEudyGfBD9u615fiGReWr9hwLwxD21El
-	UYiUwjpJ/hdFc+1Jhdgr1Y/CmayZ00+1x/oi5qWrTBcR15MPxFF+/DxPkiOhLg==
-X-Google-Smtp-Source: AGHT+IGrH8eYOJ+QTDt/PHAS3tq4N8QvcVgEEHaffSlr+I8HL+Yj6EPAOIVXls/P99vM+K5FbSBvRA==
-X-Received: by 2002:a17:903:183:b0:1dc:2ee5:3f3a with SMTP id z3-20020a170903018300b001dc2ee53f3amr608581plg.0.1708476566981;
-        Tue, 20 Feb 2024 16:49:26 -0800 (PST)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id s2-20020a632c02000000b005dc98d9114bsm7242084pgs.43.2024.02.20.16.49.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Feb 2024 16:49:26 -0800 (PST)
-Date: Tue, 20 Feb 2024 16:49:25 -0800
-From: Kees Cook <keescook@chromium.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, shuah@kernel.org,
-	linux-kselftest@vger.kernel.org, mic@digikod.net,
-	linux-security-module@vger.kernel.org, jakub@cloudflare.com
-Subject: Re: [PATCH net-next v3 05/11] selftests: kselftest_harness: use exit
- code to store skip
-Message-ID: <202402201649.C83025144D@keescook>
-References: <20240220192235.2953484-1-kuba@kernel.org>
- <20240220192235.2953484-6-kuba@kernel.org>
+	s=arc-20240116; t=1708476627; c=relaxed/simple;
+	bh=b3K6fKvWYQ/SjUrArgoOKBdVwFRSn6xScwQTXGpC9rs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uxq0NTYcf3j0T1ZmkqSGxejZ/ylNGOhZSs5LBYD0sZdrpEG51rjzleyvyqV4nqKf4JVH+YOnticsD9dJ5czhaVBbtrPjY9ZtkE/80K3GZ11D2x8HeZjLUKKyxqu9GBBu1hItCOAGuevyXWrGQ0b9G4xg4nsQSH5diiF05omYsto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JFtIOsfw; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708476626; x=1740012626;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=b3K6fKvWYQ/SjUrArgoOKBdVwFRSn6xScwQTXGpC9rs=;
+  b=JFtIOsfwyJJbzpfEJEal0mYLusI7W5YkPdq2oYSv2+hQnU/49T65PHqC
+   sx+bpYm5yb9dLyzpRNU7MwZ5cX3Wk9mEVMwsYJvBIXb9ByUIlUV3ZIGOn
+   2/0wzHyHjPh3A/TtQyVCIwxiq6rDE5Flgpdh/i21Ye6Qc2ISmZm1egz8Z
+   AwDXeV4QELby63x+utdlQs7QGPnDNEfDFBEmugZIQ7cPI/B4atwVvuJyO
+   KfHoMwqM1FzW8SlD/oaoQSVlH3knRNznlyWoZdNJU7V/2QHPesaZ4QVJa
+   CzhN5sYCKP9w3mjUvz4mwpN4fW23Em6+HcFak5UvJzjNN85EYJBsuyOij
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10990"; a="2500692"
+X-IronPort-AV: E=Sophos;i="6.06,174,1705392000"; 
+   d="scan'208";a="2500692"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Feb 2024 16:50:25 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,174,1705392000"; 
+   d="scan'208";a="9550825"
+Received: from dev1-atbrady.jf.intel.com ([10.166.241.35])
+  by fmviesa004.fm.intel.com with ESMTP; 20 Feb 2024 16:50:25 -0800
+From: Alan Brady <alan.brady@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Alan Brady <alan.brady@intel.com>
+Subject: [PATCH v5 00/10 iwl-next] idpf: refactor virtchnl messages
+Date: Tue, 20 Feb 2024 16:49:39 -0800
+Message-ID: <20240221004949.2561972-1-alan.brady@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240220192235.2953484-6-kuba@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Feb 20, 2024 at 11:22:29AM -0800, Jakub Kicinski wrote:
-> We always use skip in combination with exit_code being 0
-> (KSFT_PASS). This are basic KSFT / KTAP semantics.
-> Store the right KSFT_* code in exit_code directly.
-> 
-> This makes it easier to support tests reporting other
-> extended KSFT_* codes like XFAIL / XPASS.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+The motivation for this series has two primary goals. We want to enable
+support of multiple simultaneous messages and make the channel more
+robust. The way it works right now, the driver can only send and receive
+a single message at a time and if something goes really wrong, it can
+lead to data corruption and strange bugs.
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
+This works by conceptualizing a send and receive as a "virtchnl
+transaction" (idpf_vc_xn) and introducing a "transaction manager"
+(idpf_vc_xn_manager). The vcxn_mngr will init a ring of transactions
+from which the driver will pop from a bitmap of free transactions to
+track in-flight messages. Instead of needing to handle a complicated
+send/recv for every a message, the driver now just needs to fill out a
+xn_params struct and hand it over to idpf_vc_xn_exec which will take
+care of all the messy bits. Once a message is sent and receives a reply,
+we leverage the completion API to signal the received buffer is ready to
+be used (assuming success, or an error code otherwise).
+
+At a low-level, this implements the "sw cookie" field of the virtchnl
+message descriptor to enable this. We have 16 bits we can put whatever
+we want and the recipient is required to apply the same cookie to the
+reply for that message.  We use the first 8 bits as an index into the
+array of transactions to enable fast lookups and we use the second 8
+bits as a salt to make sure each cookie is unique for that message. As
+transactions are received in arbitrary order, it's possible to reuse a
+transaction index and the salt guards against index conflicts to make
+certain the lookup is correct. As a primitive example, say index 1 is
+used with salt 1. The message times out without receiving a reply so
+index 1 is renewed to be ready for a new transaction, we report the
+timeout, and send the message again. Since index 1 is free to be used
+again now, index 1 is again sent but now salt is 2. This time we do get
+a reply, however it could be that the reply is _actually_ for the
+previous send index 1 with salt 1.  Without the salt we would have no
+way of knowing for sure if it's the correct reply, but with we will know
+for certain.
+
+Through this conversion we also get several other benefits. We can now
+more appropriately handle asynchronously sent messages by providing
+space for a callback to be defined. This notably allows us to handle MAC
+filter failures better; previously we could potentially have stale,
+failed filters in our list, which shouldn't really have a major impact
+but is obviously not correct. I also managed to remove fairly
+significant more lines than I added which is a win in my book.
+
+Additionally, this converts some variables to use auto-variables where
+appropriate. This makes the alloc paths much cleaner and less prone to
+memory leaks. We also fix a few virtchnl related bugs while we're here.
+
+---
+v1 -> v2:
+    - don't take spin_lock in idpf_vc_xn_init, it's not needed
+    - fix set but unused error on payload_size var in idpf_recv_mb_msg
+    - prefer bitmap_fill and bitmap_zero if not setting an explicit
+      range per documention
+    - remove a couple unnecessary casts in idpf_send_get_stats_msg and
+      idpf_send_get_rx_ptype_msg
+    - split patch 4/6 such that the added functionality for MAC filters
+      is separate
+v2 -> v3:
+    - fix 'mac' -> 'MAC' in async handler error messages
+    - fix size_t format specifier in async handler error message
+    - change some variables to use auto-variables instead
+v3 -> v4:
+    - revert changes to idpf_send_mb_msg that were introduced in v3,
+      this will be addressed in future patch
+    - tweak idpf_recv_mb_msg refactoring to avoid bailing out of the
+      while loop when there are more messages to process and add comment
+      in idpf_vc_xn_forward_reply about ENXIO
+    - include some minor fixes to lower level ctrlq that seem like good
+      candidates to add here
+    - include fix to prevent deinit uninitialized vc core
+    - remove idpf_send_dealloc_vectors_msg error
+v4 -> v5:
+    - change signature on idpf_vc_xn_exec to accept a pointer @params
+      argument instead of passing by value, also make it const
+---
+
+Alan Brady (10):
+  idpf: implement virtchnl transaction manager
+  idpf: refactor vport virtchnl messages
+  idpf: refactor queue related virtchnl messages
+  idpf: refactor remaining virtchnl messages
+  idpf: add async_handler for MAC filter messages
+  idpf: refactor idpf_recv_mb_msg
+  idpf: cleanup virtchnl cruft
+  idpf: prevent deinit uninitialized virtchnl core
+  idpf: fix minor controlq issues
+  idpf: remove dealloc vector msg err in idpf_intr_rel
+
+ drivers/net/ethernet/intel/idpf/idpf.h        |  194 +-
+ .../net/ethernet/intel/idpf/idpf_controlq.c   |    7 +-
+ .../ethernet/intel/idpf/idpf_controlq_api.h   |    5 +
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    |   38 +-
+ drivers/net/ethernet/intel/idpf/idpf_main.c   |    3 +-
+ drivers/net/ethernet/intel/idpf/idpf_vf_dev.c |    2 +-
+ .../net/ethernet/intel/idpf/idpf_virtchnl.c   | 2175 ++++++++---------
+ 7 files changed, 1096 insertions(+), 1328 deletions(-)
 
 -- 
-Kees Cook
+2.43.0
+
 
