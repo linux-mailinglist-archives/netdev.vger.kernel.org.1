@@ -1,215 +1,163 @@
-Return-Path: <netdev+bounces-73558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29B7B85D106
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 08:13:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BBB685D119
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 08:18:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C9E31C2228A
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 07:13:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0BFF11F27650
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 07:18:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 411C13A8D8;
-	Wed, 21 Feb 2024 07:13:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F7773A8C6;
+	Wed, 21 Feb 2024 07:18:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="SJYYSDnV";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="e25tMU+J"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BiASDH47"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FBA43A292
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 07:13:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85E839879;
+	Wed, 21 Feb 2024 07:18:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708499633; cv=none; b=N4zaSzhC6gQMn2rFK998eboHmt2dtAEAVJ0ToN9wcj1MLXV796goN2xLufrzVYC1ABKCwBCbBG8vmY4dgzlWuRXf3oyDLx4HUoxWSL+Vo+q3DdiUkCu048gm1LhVuvPCkJ5pH77KY8TLeiqZHOD6j5HzcStCFiYGRIDabPFn9S4=
+	t=1708499920; cv=none; b=BNluWrTr6iGYKx/MuDGBrgYP1Pn3rHBa/soKfF/sOpV7b09QOfZrZVOmKgvUxs7SmCKucyncl3zkdarIzwCuxT9C77Q0TpsoeX9d8x2wQQ/qaG9qtqhAWwVpMVv6p8RW/cfta44bDtSoeD7xmBlTqBFev/ZAccZJt3ZuSyLf81U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708499633; c=relaxed/simple;
-	bh=V6OAAh8E3hWBEVCNm+YVeTHl0XUS7Eqw/f5BMcSLOmA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=dh/6N2xfvd3QPVtIW2lSbEhdYbzzJYpvHm3uzKuNWmimBbkynSvb5AGcMosfq+6U1quMI/1TO5RU7Rd9l5mrHkf0ePZiy/dB6NlL3FwngknlsQ8XzYwEevVe287lg5n8VDSA3m3gFRVBxAOKVApoGUDv2KWx6a1oZH/Wexeiz3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=SJYYSDnV; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=e25tMU+J; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1708499628;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K/yVmx8E5CijuRxL13UstFMZnoj0im2T78P0TqUZOZE=;
-	b=SJYYSDnVoNYNb7IQ97RAdlmPh9pN/8H0nM460Md0OsKxQ5RUWKzI8diqnvlzYLHooSBPoU
-	TOZr6rEN0BLsie4dJVOwU7MH25pJVA1F8FgnEPXcggEZgF9MyEFx5w5609t4DwsFLRgL6X
-	dq8TwzHdyaIVQlsiBvR/GzBCKVI820jDWyNoUthUp2NNgKpE1BGuBtIw7tiH6tX/PZ1g3z
-	5MWjy51NWr7V3/Zhq952iaXWe1psO/MK2ewbJoJQt0LowGFZ62Sebtm/MeezTUZvpwCANQ
-	5OIGlUK4AGzwj0KusOLskC4VvA2se8JG5E1NWFVhdeCFhJNVM9sTzfIZX0bL5g==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1708499628;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K/yVmx8E5CijuRxL13UstFMZnoj0im2T78P0TqUZOZE=;
-	b=e25tMU+J1lJV+KsT3Y5rkEztmzWb0A3o0Pk4nEB5OSHjhb6q3ZwMxlHSXRPED6gfvhB9cl
-	VeyJSaLAwHQsFCAQ==
-To: Stanislav Fomichev <sdf@google.com>, Maciej Fijalkowski
- <maciej.fijalkowski@intel.com>
-Cc: Serge Semin <fancer.lancer@gmail.com>, netdev@vger.kernel.org, Sebastian
- Andrzej Siewior <bigeasy@linutronix.de>, Song Yoong Siang
- <yoong.siang.song@intel.com>, Alexei Starovoitov <ast@kernel.org>
-Subject: Re: stmmac and XDP/ZC issue
-In-Reply-To: <CAKH8qBs+TBRHhx0ZqMABCsGZ8sbXtSZMeFuP73-=hY69Wpfn8g@mail.gmail.com>
-References: <87r0h7wg8u.fsf@kurt.kurt.home>
- <7dnkkpc5rv6bvreaxa7v4sx4kftjvv4vna4zqk4bihfcx5a3nb@suv6nsve6is4>
- <ZdS6d0RNeICJjO+q@boxer>
- <CAKH8qBs+TBRHhx0ZqMABCsGZ8sbXtSZMeFuP73-=hY69Wpfn8g@mail.gmail.com>
-Date: Wed, 21 Feb 2024 08:13:47 +0100
-Message-ID: <87ttm25lxw.fsf@kurt.kurt.home>
+	s=arc-20240116; t=1708499920; c=relaxed/simple;
+	bh=X6Cq+RW0HDSyeBS3C6pwEfX3WHpgDSCQAseO5Swl1dA=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=cKXtc9df4/lH1FAL6k/+Vqdiqu5IzIP9Y/R7s9jGBK4BMQCC0GywAcW61ljkZD4Ls61Lp7dyA5DuYH44IqZqp2qXm0bW5rMoAkKnATkH7S7OSWrE07ugoqdZBM9FFyaWU29Yit3CQ6RGMh3YsbvxJ5R1jgamDm9Adtxpmgg5CLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BiASDH47; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6e486abf3a5so702023b3a.0;
+        Tue, 20 Feb 2024 23:18:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708499918; x=1709104718; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vh6UXdERl+gUl9cBq4S+KjIngsWFhxQy1ohOrIZDnMw=;
+        b=BiASDH47jvZkJ0z52bxcHNEpXdseRGf2OkI4M/G9EnDKIjEWrXtaRd+NWijJNpBmxf
+         x5BHcRRzmwPq/dzRmhWb8tv5iVTkWiMdJA1S2nrp1fBPyp6mVN0rKnb8skO0P7IM3dru
+         wPIOWqEKypah3dx7hckfQLwFH4KloObmXI69q6OHG+BVyk2Gy5094pDBX3qnx5B2x4cc
+         oMR6UT5wD9Uz9SiRKH48eLuMqsHeVaqUYO3dB8a3QgsTraL5+brTitI+8iTiml1+80O9
+         6hbYVqXPJBEv6oIR0SBzpGyrDImpEQMsglAXxh26N9FJ89mnlCOd0qB96ixHdZMc6aTL
+         kNQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708499918; x=1709104718;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=vh6UXdERl+gUl9cBq4S+KjIngsWFhxQy1ohOrIZDnMw=;
+        b=kZaEhT01vhKL/0O5nJSs/QxEdaupsUO/r71TfBgTuLQnpbH9Cs6lURWpD93QAG1Ss/
+         Q9nsGEinN0k5wVAOInWq9TzZcr6fTLg5kmUbDNbufCGymFL4TggTIh6VvSk8VGPoxcMe
+         hLbMTlOtWirNPPZO7yfAuL1zg5bHUrZOJJ2i/bvBV2mP6NI2OIsmZoxcCNrkfTmD9jC+
+         +AmpGWprY/cj58ksr0uPIs3ioa0lc3remohP+pq7RJXA3qsnTL1n89I1l2pfJry7csBz
+         dxJ2JGum3jlLrBU3DaSBXG/XLl/AAo7TJLjiAAWhT3za/gmITWFcL3Fc41MBPb5wi4X8
+         xkLg==
+X-Forwarded-Encrypted: i=1; AJvYcCWoG+TC0zSXXWDilnVmKZhwkTEZgi3U0gRKaNFim8MHF+3F1CK6gjFGtxD18ynQKIXCpxnnwcdROg4EkmLWolVE3hQ10EetEk7injq0L+SnH7jCaA2iwa5HmfrS95ORGaf2v4RnFAAyI2L0AdvvXMkQjT4adpnAhg2n
+X-Gm-Message-State: AOJu0Yz3NKJsDDzKchmB58HMV9p6WzBpr16D6k1tKSBFyA9XKcnWo0ui
+	+xVOWEj+j5mh5HIy1mYB6G+LqYhTjOO4NdtDM4bFgcgm4PfKkfUr
+X-Google-Smtp-Source: AGHT+IEsDwnkEgqxa8FKaQSFlLHTLHQYY7+7eWZBn1A6weVllWR2ITEMm/gF7mdKILPGjLUPblDM+Q==
+X-Received: by 2002:a05:6a00:2d89:b0:6e4:8d1d:7770 with SMTP id fb9-20020a056a002d8900b006e48d1d7770mr1622981pfb.3.1708499917882;
+        Tue, 20 Feb 2024 23:18:37 -0800 (PST)
+Received: from localhost ([98.97.113.214])
+        by smtp.gmail.com with ESMTPSA id v2-20020a62a502000000b006e4362d0d8csm6156788pfm.36.2024.02.20.23.18.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Feb 2024 23:18:36 -0800 (PST)
+Date: Tue, 20 Feb 2024 23:18:35 -0800
+From: John Fastabend <john.fastabend@gmail.com>
+To: Shigeru Yoshida <syoshida@redhat.com>, 
+ john.fastabend@gmail.com, 
+ jakub@cloudflare.com
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ netdev@vger.kernel.org, 
+ bpf@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Shigeru Yoshida <syoshida@redhat.com>, 
+ syzbot+fd7b34375c1c8ce29c93@syzkaller.appspotmail.com
+Message-ID: <65d5a3cbac150_5fc5920879@john.notmuch>
+In-Reply-To: <20240218150933.6004-1-syoshida@redhat.com>
+References: <20240218150933.6004-1-syoshida@redhat.com>
+Subject: RE: [PATCH bpf] bpf, sockmap: Fix NULL pointer dereference in
+ sk_psock_verdict_data_ready()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
---=-=-=
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Shigeru Yoshida wrote:
+> syzbot reported the following NULL pointer dereference issue [1]:
+> 
+> BUG: kernel NULL pointer dereference, address: 0000000000000000
+> ...
+> RIP: 0010:0x0
+> ...
+> Call Trace:
+>  <TASK>
+>  sk_psock_verdict_data_ready+0x232/0x340 net/core/skmsg.c:1230
+>  unix_stream_sendmsg+0x9b4/0x1230 net/unix/af_unix.c:2293
+>  sock_sendmsg_nosec net/socket.c:730 [inline]
+>  __sock_sendmsg+0x221/0x270 net/socket.c:745
+>  ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
+>  ___sys_sendmsg net/socket.c:2638 [inline]
+>  __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
+>  do_syscall_64+0xf9/0x240
+>  entry_SYSCALL_64_after_hwframe+0x6f/0x77
+> 
+> If sk_psock_verdict_data_ready() and sk_psock_stop_verdict() are called
+> concurrently, psock->saved_data_ready can be NULL, causing the above issue.
+> 
+> This patch fixes this issue by calling the appropriate data ready function
+> using the sk_psock_data_ready() helper and protecting it from concurrency
+> with sk->sk_callback_lock.
+> 
+> Fixes: 6df7f764cd3c ("bpf, sockmap: Wake up polling after data copy")
+> Reported-and-tested-by: syzbot+fd7b34375c1c8ce29c93@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=fd7b34375c1c8ce29c93 [1]
+> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+> ---
 
-On Tue Feb 20 2024, Stanislav Fomichev wrote:
-> On Tue, Feb 20, 2024 at 6:43=E2=80=AFAM Maciej Fijalkowski
-> <maciej.fijalkowski@intel.com> wrote:
->>
->> On Tue, Feb 20, 2024 at 04:18:54PM +0300, Serge Semin wrote:
->> > Hi Kurt
->> >
->> > On Tue, Feb 20, 2024 at 12:02:25PM +0100, Kurt Kanzenbach wrote:
->> > > Hello netdev community,
->> > >
->> > > after updating to v6.8 kernel I've encountered an issue in the stmmac
->> > > driver.
->> > >
->> > > I have an application which makes use of XDP zero-copy sockets. It w=
-orks
->> > > on v6.7. On v6.8 it results in the stack trace shown below. The prog=
-ram
->> > > counter points to:
->> > >
->> > >  - ./include/net/xdp_sock.h:192 and
->> > >  - ./drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:2681
->> > >
->> > > It seems to be caused by the XDP meta data patches. This one in
->> > > particular 1347b419318d ("net: stmmac: Add Tx HWTS support to XDP ZC=
-").
->> > >
->> > > To reproduce:
->> > >
->> > >  - Hardware: imx93
->> > >  - Run ptp4l/phc2sys
->> > >  - Configure Qbv, Rx steering, NAPI threading
->> > >  - Run my application using XDP/ZC on queue 1
->> > >
->> > > Any idea what might be the issue here?
->> > >
->> > > Thanks,
->> > > Kurt
->> > >
->> > > Stack trace:
->> > >
->> > > |[  169.248150] imx-dwmac 428a0000.ethernet eth1: configured EST
->> > > |[  191.820913] imx-dwmac 428a0000.ethernet eth1: EST: SWOL has been=
- switched
->> > > |[  226.039166] imx-dwmac 428a0000.ethernet eth1: entered promiscuou=
-s mode
->> > > |[  226.203262] imx-dwmac 428a0000.ethernet eth1: Register MEM_TYPE_=
-PAGE_POOL RxQ-0
->> > > |[  226.203753] imx-dwmac 428a0000.ethernet eth1: Register MEM_TYPE_=
-PAGE_POOL RxQ-1
->> > > |[  226.303337] imx-dwmac 428a0000.ethernet eth1: Register MEM_TYPE_=
-XSK_BUFF_POOL RxQ-1
->> > > |[  255.822584] Unable to handle kernel NULL pointer dereference at =
-virtual address 0000000000000000
->> > > |[  255.822602] Mem abort info:
->> > > |[  255.822604]   ESR =3D 0x0000000096000044
->> > > |[  255.822608]   EC =3D 0x25: DABT (current EL), IL =3D 32 bits
->> > > |[  255.822613]   SET =3D 0, FnV =3D 0
->> > > |[  255.822616]   EA =3D 0, S1PTW =3D 0
->> > > |[  255.822618]   FSC =3D 0x04: level 0 translation fault
->> > > |[  255.822622] Data abort info:
->> > > |[  255.822624]   ISV =3D 0, ISS =3D 0x00000044, ISS2 =3D 0x00000000
->> > > |[  255.822627]   CM =3D 0, WnR =3D 1, TnD =3D 0, TagAccess =3D 0
->> > > |[  255.822630]   GCS =3D 0, Overlay =3D 0, DirtyBit =3D 0, Xs =3D 0
->> > > |[  255.822634] user pgtable: 4k pages, 48-bit VAs, pgdp=3D000000008=
-5fe1000
->> > > |[  255.822638] [0000000000000000] pgd=3D0000000000000000, p4d=3D000=
-0000000000000
->> > > |[  255.822650] Internal error: Oops: 0000000096000044 [#1] PREEMPT_=
-RT SMP
->> > > |[  255.822655] Modules linked in:
->> > > |[  255.822660] CPU: 0 PID: 751 Comm: napi/eth1-261 Not tainted 6.8.=
-0-rc4-rt4-00100-g9c63d995ca19 #8
->> > > |[  255.822666] Hardware name: NXP i.MX93 11X11 EVK board (DT)
->> > > |[  255.822669] pstate: 60400009 (nZCv daif +PAN -UAO -TCO -DIT -SSB=
-S BTYPE=3D--)
->> > > |[  255.822674] pc : stmmac_tx_clean.constprop.0+0x848/0xc38
->> > > |[  255.822690] lr : stmmac_tx_clean.constprop.0+0x844/0xc38
->> > > |[  255.822696] sp : ffff800085ec3bc0
->> > > |[  255.822698] x29: ffff800085ec3bc0 x28: ffff000005b609e0 x27: 000=
-0000000000001
->> > > |[  255.822706] x26: 0000000000000000 x25: ffff000005b60ae0 x24: 000=
-0000000000001
->> > > |[  255.822712] x23: 0000000000000001 x22: ffff000005b649e0 x21: 000=
-0000000000000
->> > > |[  255.822719] x20: 0000000000000020 x19: ffff800085291030 x18: 000=
-0000000000000
->> > > |[  255.822725] x17: ffff7ffffc51c000 x16: ffff800080000000 x15: 000=
-0000000000008
->> > > |[  255.822732] x14: ffff80008369b880 x13: 0000000000000000 x12: 000=
-0000000008507
->> > > |[  255.822738] x11: 0000000000000040 x10: 0000000000000a70 x9 : fff=
-f800080e32f84
->> > > |[  255.822745] x8 : 0000000000000000 x7 : 0000000000000000 x6 : 000=
-0000000003ff0
->> > > |[  255.822751] x5 : 0000000000003c40 x4 : ffff000005b60000 x3 : 000=
-0000000000000
->> > > |[  255.822757] x2 : 0000000000000000 x1 : 0000000000000000 x0 : 000=
-0000000000000
->> > > |[  255.822764] Call trace:
->> > > |[  255.822766]  stmmac_tx_clean.constprop.0+0x848/0xc38
->>
->> Shouldn't xsk_tx_metadata_complete() be called only when corresponding
->> buf_type is STMMAC_TXBUF_T_XSK_TX?
->
-> +1. I'm assuming Serge isn't enabling it explicitly, so none of the
-> metadata stuff should trigger in this case.
+By ensuring order of ops on teardown we should never have a loop here. Also
+this aligns with strp usage that also uses sk_callback_lock. Thanks. I
+suspect we haven't seen it because when this is being used we never remove
+socks from the map before the socket is released.
 
-The only other user of xsk_tx_metadata_complete() in mlx5 guards it with
-xp_tx_metadata_enabled(). Seems like that's missing in stmmac?
+Acked-by: John Fastabend <john.fastabend@gmail.com>
 
-Thanks,
-Kurt
+>  net/core/skmsg.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+> index 93ecfceac1bc..4d75ef9d24bf 100644
+> --- a/net/core/skmsg.c
+> +++ b/net/core/skmsg.c
+> @@ -1226,8 +1226,11 @@ static void sk_psock_verdict_data_ready(struct sock *sk)
+>  
+>  		rcu_read_lock();
+>  		psock = sk_psock(sk);
+> -		if (psock)
+> -			psock->saved_data_ready(sk);
+> +		if (psock) {
+> +			read_lock_bh(&sk->sk_callback_lock);
+> +			sk_psock_data_ready(sk, psock);
+> +			read_unlock_bh(&sk->sk_callback_lock);
+> +		}
+>  		rcu_read_unlock();
+>  	}
+>  }
+> -- 
+> 2.43.0
+> 
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmXVoqsTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgqgAEACZV1hcTE285nj/3KoZLbDuDoTGKEdw
-lIksYCBg+QJxWev+FzwUmNdE+a9aZEWxEuzws0/jK84kGzcZ1uVVDaQdfDs1eSiN
-F7GOQ+Lh599bBceg89UZUrfuyxzOoZICsQ5lRi6Lw5G0REA7KxDdOxpIJEwBAGUr
-3huLvtNYVLBc08qfpKt/hcoecIdTdCPELFJ3ZFzvLs9hNvJ0oObyq2gsw95uUt3Z
-anSXwuOgDQb7/pTK6+8dpfpOvRzycgomxZkR+GFLCh4nveU3T7C6NojmO091FmD3
-FrliI0G/ZYRCjIKKBeX1OFZgkAGpKzNOPtHnqeiJsUcvoaENtPOlXJ6Fee6Ij3Tl
-5SM4FctGLkJPkwYI4C9qNkvd8hIvXUNaOFyCf7EPW0zOuKBzR5APp2cBdqwVWzof
-pxHhDXDvRdKjfxa6/d+eKsVxr9ASAYDFjC7PbiQO7rjobozKpGUThsNn8MPVv3zc
-+wElQROuFltBJBt2+7vNOI04e2cXYJPg3eMCtCfpyhgpnWdKDEZUOQk0LtuUV4d7
-6TdMB0QMsobOW1mPDaOUDtT8GKvyaQHgjcqsQ4DecLYK42QpP2miDQyOeUeA7i84
-+vo/6csCiIjz3e1js4i5WxJ2h+q2ke2TveFYzrJGTMkfoNFKnqtThT3qiezsRvWj
-y13vP4BGu5F3xw==
-=Y0hi
------END PGP SIGNATURE-----
---=-=-=--
 
