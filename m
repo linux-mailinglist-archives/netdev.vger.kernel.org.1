@@ -1,144 +1,146 @@
-Return-Path: <netdev+bounces-73662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C45BE85D75E
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:48:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE5CD85D76F
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:51:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D2C0283D2C
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:48:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B27FB21574
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:51:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D369B482E2;
-	Wed, 21 Feb 2024 11:47:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC1343C493;
+	Wed, 21 Feb 2024 11:51:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P9/EZGah"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uZb+Yv0b"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8339446DB
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 11:47:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96DD947F48;
+	Wed, 21 Feb 2024 11:51:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708516068; cv=none; b=HMhVX06fegRPZONWP+rq5ATDIJwfjGr6dwRoPzkQdX8RvGMwEWEMkct2x0pfOejTlV3qbztQpeXfPazhn2kQE4sO+A6AXxGFMX/x1KRugxCNxz6OObGlQQkIGQVrqiWI2anPkr8cFoDTiAph8+WRUIR0nsFm/Kp0Ahvzn63nt2k=
+	t=1708516280; cv=none; b=hRN9nGOgZOyBbfH5LzTnc7LdVugLDyOpedLImZt6eqUpN0bFrtMbru2C8zYzwaCQFKdii3Tekv17I5FZAuLXsvp6toVIpOwGKyMM5TwP/0gssY1Jy/LMfpjAsrYN8PR/ADMuu+Z3MCi1x756PzqnxacMyhfpuASgHkG4ifaBbxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708516068; c=relaxed/simple;
-	bh=JBY/mQDw97iHpPVXUG6l2AiWrlYst7bhafK07ofrkEI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pE8HsYlQ/bOmseFCAWu+NMHzfE5iAPwlyVBXyHfLuSLZRtipelk6NATZf3qDo//k0ppLUb3kBFYBzYBJ+692gu4XUi0WTgXiDAMTuoLsF6OODid+dVrEgSc3R/QGZ7/n26aNkhAwfy15hQA2SkodXRFlKSv5nLBnV00EFvhdqjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P9/EZGah; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708516052;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XYtHO8q8zxUSZSdp33YY0/GjFEJNFZGA2uUDD/K00Mg=;
-	b=P9/EZGahEDbOjzdODTvVyW5J+1O6QctMdJfDev+dkbAFRHCeU3vx81K/Sx7VYBw1BQEAsY
-	t4rOL9iN6texcwy/bp9jS0sW3xi6nu4wjq7DnyH7NlqTBhnCQv64n7bFQRxGpVDJHXx193
-	+UU7+gfqyvwi6ahKrTeCPT18d24sSus=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-444-l1e2WZA9PjmHEE1vlZXNnA-1; Wed, 21 Feb 2024 06:47:29 -0500
-X-MC-Unique: l1e2WZA9PjmHEE1vlZXNnA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5638785A588;
-	Wed, 21 Feb 2024 11:47:28 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.224.94])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 87354C08496;
-	Wed, 21 Feb 2024 11:47:26 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	mptcp@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net 2/2] selftests: mptcp: explicitly trigger the listener diag code-path
-Date: Wed, 21 Feb 2024 12:46:59 +0100
-Message-ID: <1116d80f808ea870f3f77fe927dbd6c622d062ae.1708515908.git.pabeni@redhat.com>
-In-Reply-To: <cover.1708515908.git.pabeni@redhat.com>
-References: <cover.1708515908.git.pabeni@redhat.com>
+	s=arc-20240116; t=1708516280; c=relaxed/simple;
+	bh=PcS6hrHc4zM3aNBPZPl5peXB3J4AeyjwDc6kvcBzBVo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ExMV64Y5LaOd/3aSYkGN6INzXlOrfS6MoRsAuUbm7QvCzwtTbntlLTFXWqITnQqb5y7oK4BBDniICighP7WLDvFtxglpUapAyK+fzedJybiRSLhewCd+T9aMdG2oZoh4W8TdDxMmEqIgHLIzFlGlTYOwygPDICP3/atmekp9yQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uZb+Yv0b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 187B7C433C7;
+	Wed, 21 Feb 2024 11:51:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708516280;
+	bh=PcS6hrHc4zM3aNBPZPl5peXB3J4AeyjwDc6kvcBzBVo=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=uZb+Yv0bze9K9b2m2pBnmcCDMN3xiz2UfuqObd0Up/Gdbx5IMdRUoNWz1Lm8OuPez
+	 1K+2ShszHJAUT5gCfZj/KWuin1wCNA/NWbFE4oemNykMg6/DKJXX9HKiKKCW8l/dv7
+	 AHYkmHA2Nz/dzbD6byic6sjOhORt3wyzPJQsfgNO+VswUpcWc412gSeytiRlOAnjBI
+	 TaotDw4XLV9dSk/HdTb/FrOCaqCayokCknrp+KeUtr8pr/hhE9HrH/opvuxlJUWq7X
+	 lHaFy/wnHzjyWFDVhqxsWEsgFfRkclhIHbPDf+UXA2HFnhOfLB6bCryLkDNjPO+qx7
+	 /L2AYRXW7nuNA==
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2d0bc402c8eso61756111fa.1;
+        Wed, 21 Feb 2024 03:51:20 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXKBdXj+yGfamHNRdXA0hVc/vqFwbQyTXxKJxtv/01x4sbGNe4j6+1/rzXwTlrGnK/043T9S5i6xb2L0nsq0yfUMvLgY7FiyPpaX3fQleKRF47bklI87kK78K4SJrIoCnnun3KxN81WP017DjqvlzePR3HiWUemqV8XcxyCNVI7dSrdn2PacIX+cw/GRmto/ltNViwc63PaZ8gObz6xpp/xaJxRcp/0
+X-Gm-Message-State: AOJu0Yy4/Bl8cPgbWv34zyk6X5LBPVlopNCs2hndnX524CQ9Dp15GhwN
+	Mbi+pcGusfJOoSbnSs7ws854Mlq1/Oy1wZPV3yRlAU9pdaIeCClfvxZRmKq/G7DB21yO5Ro87OA
+	SOnbYyJiNHedIFdplD6eLyvAtg7Y=
+X-Google-Smtp-Source: AGHT+IHKfswrSkZE04vm5563ZxASZgoT8zgTtXA+jAEWbIfCeJAq2Y75jiBuERvfVz9U4iCwNVgOA46fnzcgwpMpBwM=
+X-Received: by 2002:a2e:b747:0:b0:2d2:3a32:259a with SMTP id
+ k7-20020a2eb747000000b002d23a32259amr2976534ljo.13.1708516278633; Wed, 21 Feb
+ 2024 03:51:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+References: <20240131104851.2311358-1-john.g.garry@oracle.com>
+ <CAK7LNATDMjzmgpBHZFTOJCkTCqpLPq8jEjdrwzEZ3uu7WMG7jg@mail.gmail.com>
+ <23c67ffc-64a5-4e19-8fbd-ecb9bfe9d3ff@oracle.com> <CAK7LNASfTW+OMk1cJJWb4E6P+=k0FEsm_=6FDfDF_mTrxJCSMQ@mail.gmail.com>
+ <3e2c2def-e7d6-458f-81b3-ab666b41ad21@oracle.com> <fb8d24cb-b5c4-41be-abf4-33bda08a1059@oracle.com>
+In-Reply-To: <fb8d24cb-b5c4-41be-abf4-33bda08a1059@oracle.com>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Wed, 21 Feb 2024 20:50:42 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAQ_r5yUjNpOppLkDBQ12sDxBYQTvRZGn1ng8D1POfZr_A@mail.gmail.com>
+Message-ID: <CAK7LNAQ_r5yUjNpOppLkDBQ12sDxBYQTvRZGn1ng8D1POfZr_A@mail.gmail.com>
+Subject: Re: [PATCH RFC 0/4] Introduce uts_release
+To: John Garry <john.g.garry@oracle.com>
+Cc: mcgrof@kernel.org, russ.weight@linux.dev, gregkh@linuxfoundation.org, 
+	rafael@kernel.org, rostedt@goodmis.org, mhiramat@kernel.org, 
+	mathieu.desnoyers@efficios.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, keescook@chromium.org, nathan@kernel.org, 
+	nicolas@fjasle.eu, linux-kernel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The mptcp diag interface already experienced a few locking bugs
-that lockdep and appropriate coverage have detected in advance.
+On Wed, Feb 21, 2024 at 6:01=E2=80=AFPM John Garry <john.g.garry@oracle.com=
+> wrote:
+>
+> On 08/02/2024 10:08, John Garry wrote:
+> > On 05/02/2024 23:10, Masahiro Yamada wrote:
+> >>>> I think what you can contribute are:
+> >>>>
+> >>>>    - Explore the UTS_RELEASE users, and check if you can get rid of =
+it.
+> >>> Unfortunately I expect resistance for this. I also expect places like=
+ FW
+> >>> loader it is necessary. And when this is used in sysfs, people will s=
+ay
+> >>> that it is part of the ABI now.
+> >>>
+> >>> How about I send the patch to update to use init_uts_ns and mention a=
+lso
+> >>> that it would be better to not use at all, if possible? I can cc you.
+> >>
+> >> OK.
+> >>
+> >>
+> >> As I mentioned in the previous reply, the replacement is safe
+> >> for builtin code.
+> >>
+> >> When you touch modular code, please pay a little more care,
+> >> because UTS_RELEASE and init_utsname()->release
+> >> may differ when CONFIG_MODVERSIONS=3Dy.
+> >>
+> >
+> > Are you saying that we may have a different release version kernel and
+> > module built with CONFIG_MODVERSIONS=3Dy, and the module was using
+> > UTS_RELEASE for something? That something may be like setting some info
+> > in a sysfs file, like in this example:
+> >
+> > static ssize_t target_core_item_version_show(struct config_item *item,
+> >          char *page)
+> > {
+> >      return sprintf(page, "Target Engine Core ConfigFS Infrastructure %=
+s"
+> >          " on %s/%s on "UTS_RELEASE"\n", TARGET_CORE_VERSION,
+> >          utsname()->sysname, utsname()->machine);
+> > }
+> >
+> > And the intention is to use the module codebase release version and not
+> > the kernel codebase release version. Hence utsname() is used for
+> > .sysname and .machine, but not .release .
+>
+> Hi Masahiro,
+>
+> Can you comment on whether I am right about CONFIG_MODVERSIONS, above?
+>
+> Thanks,
+> John
 
-Let's add a test-case triggering the relevant code path, to prevent
-similar issues in the future.
 
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
----
- tools/testing/selftests/net/mptcp/diag.sh | 30 +++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
 
-diff --git a/tools/testing/selftests/net/mptcp/diag.sh b/tools/testing/selftests/net/mptcp/diag.sh
-index 60a7009ce1b5..3ab584b38566 100755
---- a/tools/testing/selftests/net/mptcp/diag.sh
-+++ b/tools/testing/selftests/net/mptcp/diag.sh
-@@ -81,6 +81,21 @@ chk_msk_nr()
- 	__chk_msk_nr "grep -c token:" "$@"
- }
- 
-+chk_listener_nr()
-+{
-+	local expected=$1
-+	local msg="$2"
-+
-+	if [ $expected -gt 0 ] && \
-+	   ! mptcp_lib_kallsyms_has "mptcp_diag_dump_listeners"; then
-+		printf "%-50s%s\n" "$msg - mptcp" "[ skip ]"
-+		mptcp_lib_result_skip "many listener sockets"
-+	else
-+		__chk_nr "ss -inmlHMON $ns | wc -l" "$expected" "$msg - mptcp"
-+	fi
-+	__chk_nr "ss -inmlHtON $ns | wc -l" "$expected" "$msg - subflows"
-+}
-+
- wait_msk_nr()
- {
- 	local condition="grep -c token:"
-@@ -279,5 +294,20 @@ flush_pids
- chk_msk_inuse 0 "many->0"
- chk_msk_cestab 0 "many->0"
- 
-+chk_listener_nr 0 "no listener sockets"
-+NR_SERVERS=100
-+for I in $(seq 1 $NR_SERVERS); do
-+	ip netns exec $ns ./mptcp_connect -p $((I + 20001)) -l 0.0.0.0 2>&1 >/dev/null &
-+	mptcp_lib_wait_local_port_listen $ns $((I + 20001))
-+done
-+
-+chk_listener_nr $NR_SERVERS "many listener sockets"
-+
-+# gracefull termination
-+for I in $(seq 1 $NR_SERVERS); do
-+	echo a | ip netns exec $ns ./mptcp_connect -p $((I + 20001)) 127.0.0.1 2>&1 >/dev/null
-+done
-+flush_pids
-+
- mptcp_lib_result_print_all_tap
- exit $ret
--- 
-2.43.0
+Your understanding about CONFIG_MODVERSIONS is correct.
 
+
+
+
+--=20
+Best Regards
+Masahiro Yamada
 
