@@ -1,257 +1,278 @@
-Return-Path: <netdev+bounces-73608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 381E185D5EB
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:44:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09DB185D5F3
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:45:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9173CB217FA
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 10:44:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7527A1F24155
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 10:45:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70FF136B18;
-	Wed, 21 Feb 2024 10:44:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD7E33DBBA;
+	Wed, 21 Feb 2024 10:45:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ZnPn4NeV";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="jkDVTNMj"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="I8pyMAlR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2070.outbound.protection.outlook.com [40.107.95.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 554402E637;
-	Wed, 21 Feb 2024 10:44:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFF40381A8;
+	Wed, 21 Feb 2024 10:45:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.70
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708512265; cv=fail; b=lScymQVdJA/z4DuDQdsalpn2shaAnVtatxirTw2QmrcP9f1oktiWk84z28SuzDasRK1D4U9GAKHvaIYTCymYE8B89jIiQAZd1+s3vr2Y7BffJibQG9B+iGYlOteMLVJcYI2bUbE8RlyLuKqCRB9MDuj6vPXmAzdpYsDhZrC0xPk=
+	t=1708512318; cv=fail; b=rX8+CHP1v5K0+lnSzporZL4lV8rSaOFXSeC7vZ1GTn6Y6Si68FF57dsldJUpMgtHDiP6gIQOomp1DoJOk7UvweOHhVt9Zw1vKAvmoN1xVRwdoWK9b5nkV+dlwm42CRI+/gI/FuRINpMYwaWHkWJ+E32QP0OM3iyz0sSFKuWymfs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708512265; c=relaxed/simple;
-	bh=GtAoxXwKpJt+4prnWytYYXuIfa+tAgKU7tiv4zUOGbk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=SYHxdlvw/2HZ4W7M1llCIkXNiBYoD8SHDF0EGB8x4knRtWI5CmNEePHC2AAml9H9SiDfMWjgWbZncJku7zvQKt5P1JnNgtoAU5JL0pI3qRR+D8+2bC4KX8DsBLqSuvT+kJqzelTR18adOa8Vd8Wli6h2f5kP6fsWXLkp+IEqO2o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=ZnPn4NeV; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=jkDVTNMj; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41L9i3L1019713;
-	Wed, 21 Feb 2024 10:44:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2023-11-20;
- bh=/FZkRIT5Hdv5nCekNuPpJOz3Y/Vyd8B7iMqjacDZLtA=;
- b=ZnPn4NeVe3iv7fDpf119/tq4ssWD9N+B4IzY43LeR03dH/V7f4DlmLpy/L6dIvBehybv
- WGCqLdPYVOaz7g+22cf/tCI4UnOpx6Y92Bjbu+pTg3BmjT8YURU07vt3MIkidAPV7Wxg
- 1gB0kp0IvdmdSOct6BrzDIy4GsLLHruU/OfZ1gDLECqWvvq6L7lAQNw5JROyNoYIShW8
- bGso4QYDe4MFPEHzJ89YUfQwOMBOhXc6xQGRZrrNYrHOp/m5FXSQZZFHytozx3/PKzJd
- /KlLcnKsyYtidjfY2LloKpX4t97b4kiA+CRSYBcyiArTCg/DlZAErussYTQOx3NBkIbX bQ== 
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3wamud1gn9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 21 Feb 2024 10:44:13 +0000
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 41LA56N7032495;
-	Wed, 21 Feb 2024 10:44:13 GMT
-Received: from nam04-dm6-obe.outbound.protection.outlook.com (mail-dm6nam04lp2040.outbound.protection.outlook.com [104.47.73.40])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3wak88trsy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 21 Feb 2024 10:44:13 +0000
+	s=arc-20240116; t=1708512318; c=relaxed/simple;
+	bh=Qgx2pkfCAGE9qrdCEIExV6dWOStupx4KTxBmJl2cQN4=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=CJd68pWO8Y6wigerD6e53fmm6etxzgqNGz33TlDqqQhR0pcV7drkccIayFD7m0NDWuuY62hxyPZ6f9vo5bSGSBMGjoe6l+F7F+NFt4/8Nu6sSuTq20NRWzbyIpl97qUa08zu7iV7a6FsL3STx5rD1mD2Krz0eayifg6xpQnxNK4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=I8pyMAlR; arc=fail smtp.client-ip=40.107.95.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=P7oLX2FWgw4GfXO1y73PGOeWwJhxTTeBrM7zjBv4KI1JLmKnt2aSDq+z5XO/8qXhCvA9tCe6uXL8IRnfZB/fejtxpeWf5C5u7/NT1kloaKpIZZ2QjoRZS5jfxSJV9aHPdg8d14I9UycRtBisnuS6WVyBetTo2b3tYHT6MjVRcVymuwTGjn0VUB2sN9FOZbPvLvEY04iH/oQmFbBSnT3kPbaF74p19I5yMANljlpO/wQ1wJ3N8wwZcLehBRxRJ5yN/izeSHUNVv4KD6FxMjzu1hM1pL5ZseYTtFHohya1oMK10JJo3zkOQi+hGCfVuVeu3SVGEefbEGHMmQST/jG/Hg==
+ b=HXTOBG4SOlzWTAx0cvbN8SvBgRet3Nfp03tcHib9dGKoDCh59iBvOFVqgCQoxMNr6IDWjk3/uaMbUWnLzqvPc0D/fM2cYyLWtSbJoSyB9snYwReHUrNoBcxBGb4vXg/KhYECJcwBP9TVrJPKIzIztTVmlVT1R1oq0rK46CFR0V8GNd9ozZ+1kOHTwwE5lZI9K/m94C1vTydCXDG3QLc4TxD2qHD9i4pXVxwU2S2p17lX12ozsXTGpXTdCzhgF88DIqY6tEbyaCBY4VWQqAa7yVoJffEBNPhfF/AUdPY1ZVAm56P45k4YWTVXFZzKuAF9EGTH7bVCAvg1UvgExkXV9w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/FZkRIT5Hdv5nCekNuPpJOz3Y/Vyd8B7iMqjacDZLtA=;
- b=NHCBJBzWq6m6V6L0JVOVIs+vSsyCaq5aX2zg8lnjgSurPcmI62bZtCz0mOxQ88Lf7jgwUkGMWI5pRyMMEMPFXPWYwWesCPLznvEqd+cgrh0R2ObYe2Z432+IV+//t9jj3DuFKqGbny2WH++7+0100VVpUKkMDpDf9RvQ6yknJi/v/CZRjDfvzwu5Ii17l3NCnihtF4SDzvBWKLM/rXyXtszHWtgK+ZZY0WsLWp0YXd96Jqtczlw9a+XUUrEOC1PMT5hPWJ1d/7pugFf1xmJADR1wFwfFRu+zg/9cQygeVeu0dmjv7Ayc7mpsXI4MFURevH0Y2qBqlolITaWmXpQPXw==
+ bh=ECEiAhgJe4uEd3KUV8RzIDtJSySEvaPuh0AYo5xLhS0=;
+ b=aQeAYRrPMf+LLnsor1hFZ0u87bPh7h8QXUjOU/ZOqBAo+BF+0a4vCwFsOjRfEtqN84D+am8jwYhxwU06ZcqwnJK+CHFqQprWZOnCJKwNmbtOeqbQhOLRKIZ1IFTicWzEdRceTPXqxciPFUh5Ms+A9xXqmzKT6w872UgvHh403tScVslrnanwS9pEta/7Chyqd6mXKZ0CfvnRTMxkgkP4Y9JSzTk8vLeWOpT1NkbXU5alhuJlC2URqbRQRWUOaJ3HeWz78xxKea9Cc7FE41AMs77t81ygESEVd1dnpW2PZpiJHXxIcfWPLzTPpqlJmO1jgZgld75aaxc8ljzayW+AUQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/FZkRIT5Hdv5nCekNuPpJOz3Y/Vyd8B7iMqjacDZLtA=;
- b=jkDVTNMjRqWiWovE8xJKz3CC15XpDFSC1QCULjtnJ1a0IbznnJhipD/UAA3MOUAh/Y8s1QsqoD0MtZQ5FEAtP7jcG3ZrE4vwxJxGfbiOQYfqQmwLNbgd4777TwMTyyC/sZhZPS7XP76kOSsIBQlSuYVUrhnk1KYeA6bzaGAQmqY=
-Received: from SA1PR10MB6445.namprd10.prod.outlook.com (2603:10b6:806:29d::6)
- by BN0PR10MB5272.namprd10.prod.outlook.com (2603:10b6:408:124::24) with
+ bh=ECEiAhgJe4uEd3KUV8RzIDtJSySEvaPuh0AYo5xLhS0=;
+ b=I8pyMAlR7ZEEP0yCTqhrnCK8jpWUCFVMifEiECVxj6FSbdZDhL/vIikdCXefUeMYCF8TdsdBEMcNFW4IIRel1VvjTwYM2jSFo8yZ/9BdsZlZkRshn/PLYJhVbvhzJShmy8+qDduHd+z3L/h3wjnKuOxsaNt3tiZetVaTqHQ2dRI=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
+ by MN2PR12MB4583.namprd12.prod.outlook.com (2603:10b6:208:26e::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.21; Wed, 21 Feb
- 2024 10:44:11 +0000
-Received: from SA1PR10MB6445.namprd10.prod.outlook.com
- ([fe80::f51a:7f6d:973d:c219]) by SA1PR10MB6445.namprd10.prod.outlook.com
- ([fe80::f51a:7f6d:973d:c219%4]) with mapi id 15.20.7292.028; Wed, 21 Feb 2024
- 10:44:10 +0000
-From: Praveen Kannoju <praveen.kannoju@oracle.com>
-To: Simon Horman <horms@kernel.org>
-CC: "j.vosburgh@gmail.com" <j.vosburgh@gmail.com>,
-        "andy@greyhouse.net"
-	<andy@greyhouse.net>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "kuba@kernel.org"
-	<kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Rajesh
- Sivaramasubramaniom <rajesh.sivaramasubramaniom@oracle.com>,
-        Rama
- Nichanamatlu <rama.nichanamatlu@oracle.com>,
-        Manjunath Patil
-	<manjunath.b.patil@oracle.com>
-Subject: RE: [PATCH net-next v6] bonding: rate-limit bonding driver inspect
- messages
-Thread-Topic: [PATCH net-next v6] bonding: rate-limit bonding driver inspect
- messages
-Thread-Index: AQHaZJ/z/dX/Wg+OFkqAMns3Aqcnw7EUmxOAgAABAFA=
-Date: Wed, 21 Feb 2024 10:44:10 +0000
-Message-ID: 
- <SA1PR10MB6445FD1C1390E0D7186896E78C572@SA1PR10MB6445.namprd10.prod.outlook.com>
-References: <20240221082752.4660-1-praveen.kannoju@oracle.com>
- <20240221103853.GD352018@kernel.org>
-In-Reply-To: <20240221103853.GD352018@kernel.org>
-Accept-Language: en-US
+ 2024 10:45:13 +0000
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::e1fb:4123:48b1:653]) by PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::e1fb:4123:48b1:653%4]) with mapi id 15.20.7316.018; Wed, 21 Feb 2024
+ 10:45:13 +0000
+Message-ID: <65fc62ec-269a-4225-9252-127531179bb0@amd.com>
+Date: Wed, 21 Feb 2024 11:45:01 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 7/9] drm: tests: Fix invalid printf format specifiers in
+ KUnit tests
 Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR10MB6445:EE_|BN0PR10MB5272:EE_
-x-ms-office365-filtering-correlation-id: dd7adae8-b311-4c67-e90c-08dc32ca0995
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 
- attlVRVkFLgZs3sSrCoiFbGGLJi9AdofVdNaEtuLH8NfrDy5wCeOElYGLFCWrWBGNIt7FnapLDgP4Hto1r7L56Pffwsu/GeH1hJxJ9K4aMNibPhcOYP2NruxGJ8brf83DNuYfJz4shgmfS80xFVElwMlF1aKsgR4ARELyeXJ2odW2tdap1xrDy4i551Tn8+HfnjQWFgFMeML/PfTiScG/RU/kOZ3XxsH4gcJhgpnpV8K3zXHA/y89aXz1khgsBQ0dHKjj+8/Uu8eQg56EINaQpp8slMYt0YsoSd6S9ne6jNG5Aur36sPf/U5fy/Df4ia2I5iJKS+00X6WymlNZdpvJ2Rg6Emm4O1FoXFs/t37g1j800f9HCBqvwgE9DfjjMN6LLM3ciZJXO8q4M80/CHMojIe9rZ5XvvuQm+kSCRG1aglmXsnbxDWYRrza+57QQQ9UgVcQzj2DEMJ51GWGFkC1I1LP+K9OgKr8curfQU6Vgks5F+eVusHtvQLegcVU9pPaD6npWwJ78CvE8dE2XT7Z5EdtOjcwFHZuMvMHbI40JpvOsk1+CgVhVToPO3CEAvGPQfFXH5/h6a2cdzu1vjs6ls44IsONwHkqF45FRM010=
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR10MB6445.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?us-ascii?Q?wo6heOpgrlUbloT8bQSVvLSzjjRCRApOh+kSgPOF2ZmECfyF4E8B6c14fOXe?=
- =?us-ascii?Q?bD6P72r8FPMF6EchnkCTtEwOPG45VGHzIwOtteDndYQrfgmszj7191yi9r4i?=
- =?us-ascii?Q?HwPJcOaGrZJW6diaclhDftoSV3IvSGD9tK6F04RzuOXWhp+rI6vruvGmLo5H?=
- =?us-ascii?Q?2Ik1SIdxLtxzltG0vBHuDN4yXevagVGoy4LC7IQZ8e0yr0o0QXckseIoH9NZ?=
- =?us-ascii?Q?1FtlF7C6bYYcS4BBM8nKSBTb1iIjcCyZPTNOJ4T/zl8NgWVMveUQOJ1Puu2u?=
- =?us-ascii?Q?9QxGte9g8b+6zLDmjF7whsrxvUce9X95nCqHzPt8QSmP0q/nxLfN+1mJdPmz?=
- =?us-ascii?Q?MiqTnRvSbVFs2ceVw0i5CQLCTSwybbg3HKsTEcVStpeJb9exwtGaJXB5XR6k?=
- =?us-ascii?Q?/SIJY7IzIof6Sk272K3PEAuU4KPT8h4A8KlrUxYrno13bi0wOcgo34QXIGqC?=
- =?us-ascii?Q?lv+x1qt0qTJOes2ILVi+vvS9q9cTEUjyUqC5RTyKiwDl4LqAoC82Q8Wt2+Yb?=
- =?us-ascii?Q?TmmLZt9ZdH1xAAWxxkKUjHJceKCVOmg7rU9c0shsR5EG+4aTxGX0d8hfok5o?=
- =?us-ascii?Q?oRBup0ZQhxf+XHsu07m9TBt09lBBfILQzdqVafEVWds7NZJtrAWdXoOuY9cH?=
- =?us-ascii?Q?47flTCYE1ZRQ3jZQF2JpM2KwVYvKP1vuJUADtHp6CtB8A/WN7qs2c2U+Hl4p?=
- =?us-ascii?Q?AYFqP+Vd9wwvKx4rYpSPYpN1Rz1I0CF+jbE+rtz7+9JSktWZIgNY2HzPSTkh?=
- =?us-ascii?Q?4JzOmmD9JrL5TghXabYS/y1SHolrTQxuiXNHLlC9/33oE4mBnf+qWcoy12WG?=
- =?us-ascii?Q?W/y7X1oDYg46e10py0hATcpj6WeK9cgQ95SrPGqBAj8K7FTrzsivUedDVzom?=
- =?us-ascii?Q?AJ/7h/Z/fjwB9hEFWYO3EVrihQT2mwQdOY1cRvrrMiv2D+uefSpJL4o65Hlp?=
- =?us-ascii?Q?NjO1WDyuskTUBoWG96EZ2L40HCq8kSFGJLy6Y+VZGleeLe1wlLTtT4TDGXV2?=
- =?us-ascii?Q?kppeAC5FIILGqvZm6ATKD/Ka7jCHAchV31ZjVHC9L0CBEqxYngxngwI5ZZBW?=
- =?us-ascii?Q?Js3mS4OJfbERCD3xxiuFkr8vBzaTs4CXkSLp3Sf43O3pdf6ZVZ12KrM7nGmx?=
- =?us-ascii?Q?7/O+c9/2ygf7nVKz1i+//xRTytXrkxo1QXbYQMPdmKYeZEQKnVllI8MTnb3L?=
- =?us-ascii?Q?r3RXeNQ3ArQ07xyyT1FsmlBdCrfDh9FT+btWu/UzsfVhETI5Q/Dt95KVTQbA?=
- =?us-ascii?Q?0EBcY56Zj6WJLeHSEeIM2Oelm8PvoBtKJev8TJvOxKbKFjJkGD9mV/Axokmr?=
- =?us-ascii?Q?SxgOpM/DkI0jimEjJ39f9z17v1KJRh10IFS2EBeGTLdx5kSFe4an0rO05WrV?=
- =?us-ascii?Q?aMuoVv7AXu4bKKUXrd1v0wRlFswBS5WgxU01pq7AEFkvoXuT4WCW+8fhTs0m?=
- =?us-ascii?Q?bYZKU1sEfawTqNJ5zFE2ULZd45WQ+S2ZA8jgmWYUkQW8hmYX0VLgi6ErIPj0?=
- =?us-ascii?Q?o1bINV3uw5LnJfTjcnLghSNGr9nOU1jxUFq1Dep+l8TpNrMvPYrXdn/U9wM/?=
- =?us-ascii?Q?plwr0D/6rmJufOhTLo+S5CPLs3GiSakHGhckp8HrO4EbXJvjHqcb6kWfx5J1?=
- =?us-ascii?Q?Kg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+To: David Gow <davidgow@google.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ Shuah Khan <skhan@linuxfoundation.org>, Guenter Roeck <linux@roeck-us.net>,
+ Rae Moar <rmoar@google.com>, Matthew Auld <matthew.auld@intel.com>,
+ Arunpravin Paneer Selvam <arunpravin.paneerselvam@amd.com>,
+ Kees Cook <keescook@chromium.org>, =?UTF-8?Q?Ma=C3=ADra_Canal?=
+ <mcanal@igalia.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Matthew Brost <matthew.brost@intel.com>,
+ Willem de Bruijn <willemb@google.com>, Florian Westphal <fw@strlen.de>,
+ Cassio Neri <cassio.neri@gmail.com>,
+ Javier Martinez Canillas <javierm@redhat.com>,
+ Arthur Grillo <arthur.grillo@usp.br>
+Cc: Brendan Higgins <brendan.higgins@linux.dev>,
+ Daniel Latypov <dlatypov@google.com>, Stephen Boyd <sboyd@kernel.org>,
+ David Airlie <airlied@gmail.com>, Maxime Ripard <mripard@kernel.org>,
+ "David S . Miller" <davem@davemloft.net>, dri-devel@lists.freedesktop.org,
+ linux-kernel@vger.kernel.org, intel-xe@lists.freedesktop.org,
+ linux-rtc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ kunit-dev@googlegroups.com, linux-hardening@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240221092728.1281499-1-davidgow@google.com>
+ <20240221092728.1281499-8-davidgow@google.com>
+From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
+In-Reply-To: <20240221092728.1281499-8-davidgow@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR2P281CA0069.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:9a::10) To PH7PR12MB5685.namprd12.prod.outlook.com
+ (2603:10b6:510:13c::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	mM825wEfbCNJOCBWZ1owrHGG4JdMfkMUskJ0eTlpf/Ru1LcVugbxqo5mdpV+ADv+K8yJNG+lot/LkgsR3Dui9jwCenvJk70N1wUHLuqzStbVZ+URBACxjwnsw5kAGNo7Ttx59rFoWrbP4gkkHv9Gd4p1G9xNNkEraf7d7HP+TUaECzN6lStVJ+YsCQUfGE5Y7Sj/x/3kcZS2VVKqaPxJVKq1nRVp3/9BcSe4fmmdYfAe2QVZ1bbQpib61M/jl5IVnlQw6LCwjcEA2l4kpwzUaizZYl9YGNmAZDmIv4FkhKFPEtqB3bH+Pg9C5uXyp4jXjK211Hnd+tMpBGGi4adudH9i0ha+ki8wZPdqWHfABhCdbIVcLCtKUILru+s01R2yLGSCi38xaNk1xXjdpfJVeYahcHSV/dN5wqoQT839vrJwvs4YSMpw5AedRoLhBxgiZwK2ODJp2/pQlTRENKnppaO70gJNq6uKP2tk1hcGkXy3/lzCNXM78A3/z3ysPL7UygRjU6Uxyu7RGD+JkUe1wXv/qO8rMjA2FYVeFTKotCjXW1CJQq22FirTcffVbSzp0w+vSKG7u7hfYblSSpgw8HnYVsZ30hVdGZWBfHJ1FLY=
-X-OriginatorOrg: oracle.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|MN2PR12MB4583:EE_
+X-MS-Office365-Filtering-Correlation-Id: b8132ef7-3e94-4e72-cb29-08dc32ca2ee0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	ZV4h/p1sF7zUqURY+Tg+nYZLQ5MKTbiKGPZzrvnZb9J0fO3pc8rOFtUk+gF6YdBltFeCOwmXieYjLJxkcRjsDi7erMRi5802TcOOTHBEDQVetrJxecNFq/p3i/Uoaczc9FD5UuXvQ6EA2Fz4X8U+qtjD/p7jvMFZdCu+mbLr8qN09JRXXnsLt3peGCJeGEq16uzblkw1jiK8vzePMCzY7DaB2dRfNVgNFzeH3PfMdS1ROpiME7avSO4FNYTo7OWxCRYC/2refA0R2OnH6Awt8ax5SH2WbR1oBctDOGHOiT4HBXkaozs/ybIxXK4x4m3kxp52Gtpsc8au9wI3X03f3d22Doo8C57s91LpGBZO1vDeEbuYckcTjwyC2XO6b4VBdx/BOdji9+j1ybcXbx/5CIZwrz0dczwKGQ2t5LYHGWX0ArLeee67bZ2vnIHEWVgKFYM33cGskkm4hrv071MOdkwv42gD7m9Ouf6e9YSXKQuZctQjBfkF/QghNMPcjPiSwVg7qtkiSCik5BMVpPVuw1VjrBZb6MGAsfwHLiJgKf2cHPBNs1VMXakiwf/R1jtFn1/+lja9UXziPdbQiVtyIm8ppzbIEGR3xB0lMRHtyUo=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(921011);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?V01Day9PSmIzbW9JdmNtclZHMVhwcnBPQWJ5aTdjeFlLZUVRU21ZYWtmTkpZ?=
+ =?utf-8?B?dk8zcW1XVWRqNmVldVBuamFucjNyUjg4emt0SVhhSzBXZEp4QUthQTQvYUwr?=
+ =?utf-8?B?cDlQUVJPdHVWRDlFVEpEd29Vb3l0MVYwd0RWTnhWWDEvY3V1OVBuMkQ0bWRp?=
+ =?utf-8?B?SHhQWWtiTk5uRk5kSUNDSzVhem96VkFkT2JnYlA1SUgrMGlCQWN6bHFZanZ0?=
+ =?utf-8?B?R0Z6MGxsTk5xUXpZMHNmUFhhTXJhTzM4VE9zSHVJaGlKZ1dDamx3OXJNYk5v?=
+ =?utf-8?B?Q2UrV3ZtaFRJbzV2N0tlVG1PQXVydE9kdWowb3o4Q3pGQ21lY1dPM0hidU5l?=
+ =?utf-8?B?TThKcEZwSHE3Um5TVkZQYk5QR0MzaTFoRDVJWXNLQkhFT2d6S0xHOFFEUXhH?=
+ =?utf-8?B?WXk5ZGY5amFNaVM4c1VlcnV2REFIU1dsdlRKVEdjcysvRWRRNkVKK25RcFdU?=
+ =?utf-8?B?VXpjeEt1dU5HZkYzV2JVUWx4dFhIajMwTVhvSEdPUGlQdnNEemE1elVQWUFt?=
+ =?utf-8?B?S0QzWUJ3UXppWEpQd1duWTdtMEhiUWgya3djTld2ZW5BSGNIVDUvYkQyS28y?=
+ =?utf-8?B?SENuS3hiRGtaWnJ4cHBnM3QxR0VBb3FzbWxiVlJrS0hQOVFOSGMxOGYyeTNr?=
+ =?utf-8?B?MjcyOWtNMUk4ODBRakZwWVFBQW9oc1ZtMGd5QmRpRTRrbHhvaWtUa0xOY0dv?=
+ =?utf-8?B?dlZkTDd2MTFBYTJsdDZQT2o3U3daZFF1UmhKZlJyMHZaMTMzNXBYclh5dXJt?=
+ =?utf-8?B?byt4Zlp1cmR3bkhHeXBudkdLdXFLRjJMVjA4T3FxUzFXT1NzTWdMWmRRMWM2?=
+ =?utf-8?B?MlRZeEhrUTN0aVlrWHcybWZkRmdDaDRvd2xvMTRlWGtYc0E0QjlDRFMyVE1Y?=
+ =?utf-8?B?ZktIMWRCUjVqcDVYTVkrS1UrRGwrOVZkMEttVmZ2bDhOZC9LS1pwdjd3Q0t3?=
+ =?utf-8?B?dEREMUpPaGdrbFV6c2ZsN09xQVJiQnpWWHpoVE5TN0VQMmplMHBNV09UZHZi?=
+ =?utf-8?B?K1BvWlh1WndxWCtBMGVRbVlOVEx2ejlRclRwcXB3WS9mNXhYK1pHM0Y3SGN4?=
+ =?utf-8?B?REpUeFpYL2tqYmtFSVp2dlF5L3JMbU5PVmtQdkR5WGZZaWhMa0NtTFowS054?=
+ =?utf-8?B?Z1d0NUwrRG51dVA0eVM1Wm5WcExLMlM3WWJTNjZHdEN3QmtYbEpxQS9yMXBM?=
+ =?utf-8?B?ZEdYVHRXbVp3ZkpXSEdCU3ZJMER3VnBOTnM3Z3JDeW4rT25YTU9UTG8ydkZU?=
+ =?utf-8?B?azdGVlZxNHQ5VjVWaW5LS0ZrSWhMNGx3QnhHb0ZnL2J5bmx3NFNqRzQwSThh?=
+ =?utf-8?B?cFpoQjNSYzFaclRFQWhTSmtYbWRxQzZxbUxhZmFwQnNoTk5tajNUVjdiYTda?=
+ =?utf-8?B?eWVkZG9xeDBkd2RXa3B5cEpMQ3dmTFZzdnRINTBNTEpneVJBalhlbVNmZSti?=
+ =?utf-8?B?NVN1cVcwWHU1MnhDWDZHa1llV25lcnRSMmM1MER5Z3NNZTVlYWRMV2V2YUQ5?=
+ =?utf-8?B?ajluUGx5N1VLcElhWkFRYUtZZjIyYWhxZ3MxZTVxdktIZ0lWNlJYVGdxQUda?=
+ =?utf-8?B?VEJKejVTNTFBdVJaeHhQdnhlUFJRQk5LcFVnZDlkMFNsZG9zOTRTVjhsdUxJ?=
+ =?utf-8?B?YTgzaC9CM21QaHRvb0JmNEJPbm15SHdiUGZkQ25zbUFyTityQ1RSdTd5VXZR?=
+ =?utf-8?B?dlk3WUxFMzhrVG8yTWx3M01OTlVQaXl3TTdlUG90Nml1L2pnRVAwQklpUEkz?=
+ =?utf-8?B?OG05OEdCUUQvSzVCQWE3UzlJSTM5d1gyODVueXhkb0hIekk4cEk2MC95QjNq?=
+ =?utf-8?B?Yi9XN281ZFJiZ05NT2JPUlFoK3FkM09NdXN6SWJEQzhiRVhPYjZXS05TRkxk?=
+ =?utf-8?B?Q09sMEQzaDhtRWxOYk5DcTR2YmZFUmFvanVtZU5JYWpqdkdyak9wejNHWllQ?=
+ =?utf-8?B?NlYxNXdhUURHaDZJdmIwWG40WUFWVXpTbXRzUHdSeFB5UTJiR1RCSlc3UjRl?=
+ =?utf-8?B?eVB4UEcrcnZNWHJPUWFheEFnMWczdUdHOWdNS2pJeUNRWVh1emhLaTgxOWNY?=
+ =?utf-8?B?YUtSaGFZUlJKYkY2dWdvRGlqemZjT3NtcUx6d2V5SlhnWkxHK0VPQXZSVUh1?=
+ =?utf-8?Q?FjrZRoxx5dhaAl5JqbsWSccvl?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b8132ef7-3e94-4e72-cb29-08dc32ca2ee0
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR10MB6445.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dd7adae8-b311-4c67-e90c-08dc32ca0995
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Feb 2024 10:44:10.5216
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Feb 2024 10:45:13.3431
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: SydhAKUZG31jCqtMqyxlT0KYcnLOPfdeGVd8Gc+DDSpngdv0/UeJeHQRb2KLmK6CaxTqvvfDNJjjxW773xeLEMROxFbLGC1FLW1KqbIFYh8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR10MB5272
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-20_06,2024-02-21_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 phishscore=0 malwarescore=0
- bulkscore=0 adultscore=0 suspectscore=0 spamscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
- definitions=main-2402210082
-X-Proofpoint-GUID: eLbW7RwgHcBzy_RVYItpjkw2_FzSeGuM
-X-Proofpoint-ORIG-GUID: eLbW7RwgHcBzy_RVYItpjkw2_FzSeGuM
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: AU9DDliXe7JpWfvgO5QVRQ6+uJKJ0c0l/ejOh1gBfG+7uPwW3b3ZLWsCrb9hbfVe
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4583
 
-> -----Original Message-----
-> From: Simon Horman <horms@kernel.org>
-> Sent: 21 February 2024 04:09 PM
-> To: Praveen Kannoju <praveen.kannoju@oracle.com>
-> Cc: j.vosburgh@gmail.com; andy@greyhouse.net; davem@davemloft.net; edumaz=
-et@google.com; kuba@kernel.org;
-> pabeni@redhat.com; netdev@vger.kernel.org; linux-kernel@vger.kernel.org; =
-Rajesh Sivaramasubramaniom
-> <rajesh.sivaramasubramaniom@oracle.com>; Rama Nichanamatlu <rama.nichanam=
-atlu@oracle.com>; Manjunath Patil
-> <manjunath.b.patil@oracle.com>
-> Subject: Re: [PATCH net-next v6] bonding: rate-limit bonding driver inspe=
-ct messages
->=20
-> On Wed, Feb 21, 2024 at 01:57:52PM +0530, Praveen Kumar Kannoju wrote:
-> > Through the routine bond_mii_monitor(), bonding driver inspects and
-> > commits the slave state changes. During the times when slave state
-> > change and failure in aqcuiring rtnl lock happen at the same time, the
-> > routine
-> > bond_mii_monitor() reschedules itself to come around after 1 msec to
-> > commit the new state.
-> >
-> > During this, it executes the routine bond_miimon_inspect() to
-> > re-inspect the state chane and prints the corresponding slave state on =
-to the console.
-> > Hence we do see a message at every 1 msec till the rtnl lock is
-> > acquired and state chage is committed.
-> >
-> > This patch doesn't change how bond functions. It only simply limits
-> > this kind of log flood.
-> >
-> > Signed-off-by: Praveen Kumar Kannoju <praveen.kannoju@oracle.com>
-> > ---
-> > v6:
-> >   - Minor space additions addressed.
-> > v5: https://lore.kernel.org/all/20240221050809.4372-1-praveen.kannoju@o=
-racle.com/
-> >   - Redundant indentation addressed.
-> > v4: https://lore.kernel.org/all/20240220050437.5623-1-praveen.kannoju@o=
-racle.com/
-> >   - Rectification in the patch subject and versioning details.
-> > v3: https://lore.kernel.org/lkml/20240219133721.4567-1-praveen.kannoju@=
-oracle.com/
-> >   - Commit message is modified to provide summary of the issue, because=
- of
-> >     which rate-limiting the bonding driver messages is needed.
-> > v2: https://lore.kernel.org/lkml/20240215172554.4211-1-praveen.kannoju@=
-oracle.com/
-> >   - Use exising net_ratelimit() instead of introducing new rate-limit
-> >     parameter.
-> > v1:
-> > https://lore.kernel.org/lkml/20240214044245.33170-1-praveen.kannoju@or
-> > acle.com/
-> > ---
-> >  drivers/net/bonding/bond_main.c | 18 ++++++++++--------
-> >  1 file changed, 10 insertions(+), 8 deletions(-)
->=20
-> Hi Praveen,
->=20
-> Thanks for addressing my review of v4.
-> This version looks good to me.
->=20
-> Reviewed-by: Simon Horman <horms@kernel.org>
->=20
-> ...
+Am 21.02.24 um 10:27 schrieb David Gow:
+> The drm_buddy_test's alloc_contiguous test used a u64 for the page size,
+> which was then updated to be an 'unsigned long' to avoid 64-bit
+> multiplication division helpers.
+>
+> However, the variable is logged by some KUNIT_ASSERT_EQ_MSG() using the
+> '%d' or '%llu' format specifiers, the former of which is always wrong,
+> and the latter is no longer correct now that ps is no longer a u64. Fix
+> these to all use '%lu'.
+>
+> Also, drm_mm_test calls KUNIT_FAIL() with an empty string as the
+> message. gcc warns if a printf format string is empty (apparently), so
+> give these some more detailed error messages, which should be more
+> useful anyway.
+>
+> Fixes: a64056bb5a32 ("drm/tests/drm_buddy: add alloc_contiguous test")
+> Fixes: fca7526b7d89 ("drm/tests/drm_buddy: fix build failure on 32-bit targets")
+> Fixes: fc8d29e298cf ("drm: selftest: convert drm_mm selftest to KUnit")
+> Signed-off-by: David Gow <davidgow@google.com>
 
-Thank you for the review, Simon, Hangbin and Jay.
+Acked-by: Christian König <christian.koenig@amd.com>
 
--
-Praveen.
+Ping me if you want this patch pushed upstream through the DRM tree.
+
+Christian.
+
+> ---
+>   drivers/gpu/drm/tests/drm_buddy_test.c | 14 +++++++-------
+>   drivers/gpu/drm/tests/drm_mm_test.c    |  6 +++---
+>   2 files changed, 10 insertions(+), 10 deletions(-)
+>
+> diff --git a/drivers/gpu/drm/tests/drm_buddy_test.c b/drivers/gpu/drm/tests/drm_buddy_test.c
+> index 8a464f7f4c61..3dbfa3078449 100644
+> --- a/drivers/gpu/drm/tests/drm_buddy_test.c
+> +++ b/drivers/gpu/drm/tests/drm_buddy_test.c
+> @@ -55,30 +55,30 @@ static void drm_test_buddy_alloc_contiguous(struct kunit *test)
+>   		KUNIT_ASSERT_FALSE_MSG(test,
+>   				       drm_buddy_alloc_blocks(&mm, 0, mm_size,
+>   							      ps, ps, list, 0),
+> -				       "buddy_alloc hit an error size=%d\n",
+> +				       "buddy_alloc hit an error size=%lu\n",
+>   				       ps);
+>   	} while (++i < n_pages);
+>   
+>   	KUNIT_ASSERT_TRUE_MSG(test, drm_buddy_alloc_blocks(&mm, 0, mm_size,
+>   							   3 * ps, ps, &allocated,
+>   							   DRM_BUDDY_CONTIGUOUS_ALLOCATION),
+> -			       "buddy_alloc didn't error size=%d\n", 3 * ps);
+> +			       "buddy_alloc didn't error size=%lu\n", 3 * ps);
+>   
+>   	drm_buddy_free_list(&mm, &middle);
+>   	KUNIT_ASSERT_TRUE_MSG(test, drm_buddy_alloc_blocks(&mm, 0, mm_size,
+>   							   3 * ps, ps, &allocated,
+>   							   DRM_BUDDY_CONTIGUOUS_ALLOCATION),
+> -			       "buddy_alloc didn't error size=%llu\n", 3 * ps);
+> +			       "buddy_alloc didn't error size=%lu\n", 3 * ps);
+>   	KUNIT_ASSERT_TRUE_MSG(test, drm_buddy_alloc_blocks(&mm, 0, mm_size,
+>   							   2 * ps, ps, &allocated,
+>   							   DRM_BUDDY_CONTIGUOUS_ALLOCATION),
+> -			       "buddy_alloc didn't error size=%llu\n", 2 * ps);
+> +			       "buddy_alloc didn't error size=%lu\n", 2 * ps);
+>   
+>   	drm_buddy_free_list(&mm, &right);
+>   	KUNIT_ASSERT_TRUE_MSG(test, drm_buddy_alloc_blocks(&mm, 0, mm_size,
+>   							   3 * ps, ps, &allocated,
+>   							   DRM_BUDDY_CONTIGUOUS_ALLOCATION),
+> -			       "buddy_alloc didn't error size=%llu\n", 3 * ps);
+> +			       "buddy_alloc didn't error size=%lu\n", 3 * ps);
+>   	/*
+>   	 * At this point we should have enough contiguous space for 2 blocks,
+>   	 * however they are never buddies (since we freed middle and right) so
+> @@ -87,13 +87,13 @@ static void drm_test_buddy_alloc_contiguous(struct kunit *test)
+>   	KUNIT_ASSERT_FALSE_MSG(test, drm_buddy_alloc_blocks(&mm, 0, mm_size,
+>   							    2 * ps, ps, &allocated,
+>   							    DRM_BUDDY_CONTIGUOUS_ALLOCATION),
+> -			       "buddy_alloc hit an error size=%d\n", 2 * ps);
+> +			       "buddy_alloc hit an error size=%lu\n", 2 * ps);
+>   
+>   	drm_buddy_free_list(&mm, &left);
+>   	KUNIT_ASSERT_FALSE_MSG(test, drm_buddy_alloc_blocks(&mm, 0, mm_size,
+>   							    3 * ps, ps, &allocated,
+>   							    DRM_BUDDY_CONTIGUOUS_ALLOCATION),
+> -			       "buddy_alloc hit an error size=%d\n", 3 * ps);
+> +			       "buddy_alloc hit an error size=%lu\n", 3 * ps);
+>   
+>   	total = 0;
+>   	list_for_each_entry(block, &allocated, link)
+> diff --git a/drivers/gpu/drm/tests/drm_mm_test.c b/drivers/gpu/drm/tests/drm_mm_test.c
+> index 1eb0c304f960..f37c0d765865 100644
+> --- a/drivers/gpu/drm/tests/drm_mm_test.c
+> +++ b/drivers/gpu/drm/tests/drm_mm_test.c
+> @@ -157,7 +157,7 @@ static void drm_test_mm_init(struct kunit *test)
+>   
+>   	/* After creation, it should all be one massive hole */
+>   	if (!assert_one_hole(test, &mm, 0, size)) {
+> -		KUNIT_FAIL(test, "");
+> +		KUNIT_FAIL(test, "mm not one hole on creation");
+>   		goto out;
+>   	}
+>   
+> @@ -171,14 +171,14 @@ static void drm_test_mm_init(struct kunit *test)
+>   
+>   	/* After filling the range entirely, there should be no holes */
+>   	if (!assert_no_holes(test, &mm)) {
+> -		KUNIT_FAIL(test, "");
+> +		KUNIT_FAIL(test, "mm has holes when filled");
+>   		goto out;
+>   	}
+>   
+>   	/* And then after emptying it again, the massive hole should be back */
+>   	drm_mm_remove_node(&tmp);
+>   	if (!assert_one_hole(test, &mm, 0, size)) {
+> -		KUNIT_FAIL(test, "");
+> +		KUNIT_FAIL(test, "mm does not have single hole after emptying");
+>   		goto out;
+>   	}
+>   
+
 
