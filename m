@@ -1,143 +1,154 @@
-Return-Path: <netdev+bounces-73733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E80E085E0CF
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 16:19:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F08485E0F1
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 16:24:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7073C1F26FB2
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 15:19:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A334A1F221D6
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 15:24:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43FE580BEE;
-	Wed, 21 Feb 2024 15:19:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD04F80616;
+	Wed, 21 Feb 2024 15:24:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dnZcM2Sa"
+	dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b="N/eabdjO"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mta-64-225.siemens.flowmailer.net (mta-64-225.siemens.flowmailer.net [185.136.64.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9818D8061A
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 15:19:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10ACE80602
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 15:24:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708528768; cv=none; b=oePW/0qsIYVZMXHp4BwD3rnwu9jfG0oKuMPXOMA6Bf4F+QMjmbZNrtKzls2ZjmnZmRxYNi6gtz39r4IoodD3FsJjsq9uSr/o92tuWakUAZVrEEUZk+D9jIrWPpap4LyPRpYqo9xaEz529gf/qUZbG96TGl8KgALAqtqxv4cUQEM=
+	t=1708529075; cv=none; b=mBDWKXkzG1k0yjJHDDy/I5A6Ai9LVV7QkUFqIHiFm6ZzwuPo64FZRPxaKIxiD8XifWdRVaT9DwWo6rB/T60K6u7FsC82loUUHPPjyRJuh5WAvHepey7EeFgQW9HFAe7KzyX9Rb6Q0Hb2fPWF/RtthdkQkXOhHgcKdKjALbyZPu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708528768; c=relaxed/simple;
-	bh=aqrE+ffOCBnSJ/q2JwD2my87yIyHGcBKd1rdKGerNU8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=RDKeXIeeh/ZuFPpiZVRpx3i/hmdRBWU5aWHOI+7+/UrokO80s9F3TCmAuA/VJ3EYSIUsVviqb8ewYIPu+6/SjXwI26V3b3o+t/7rITP2/l8JOiI4MGT1N1l4dGYmjkTKwiNNO2tziy0uwlPKifgNg6jOACF1XdcR6hOOQ3TIwCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dnZcM2Sa; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708528765;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=AD0dqliRQF6GMDe72qQKbpcVxfavw6j6tqjQOUIDgdU=;
-	b=dnZcM2SaECH5zAfNtAWEyeIUt8U+SIA/9xt09Q4FhcNOp1I1vew/BO+esI8j71H7jegeiC
-	Z1k9Us99l/NIHKZuEGNrkIyfddTEXdWgt3Db2nOJoNzOW4tpm5xaKHbMNj5mHpkLARptGQ
-	ok/ZWgOdnTHYC5bjnIe+trQjNK9KPSU=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-672-kSkjI34INq6rzgDLy3ZkBQ-1; Wed, 21 Feb 2024 10:19:23 -0500
-X-MC-Unique: kSkjI34INq6rzgDLy3ZkBQ-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33d86aedbffso31152f8f.1
-        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 07:19:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708528762; x=1709133562;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AD0dqliRQF6GMDe72qQKbpcVxfavw6j6tqjQOUIDgdU=;
-        b=PfmNwQCr6lhue9Y6skatnQHGTFsfenglx/CvnRiyOYy1FzHgqdpsUyofPc4zbhYkWH
-         emInlLr1Al6DEAosOs9sEoXVNKlxfm6ZhQe0jwFmv8EvAeT3vxsY37pClA8uJ0wwgPvT
-         GsY0LLdSZ0C+G+Kce/t6YoEhtuKi3IiYylDqBSNmnLUPGNAqiZZhHvKLPLbdbohtyKyJ
-         MD+GczGYpGq/jY2jrmlVsLQ3H1G6/qG7+tP0gzImYyyHvrxC7ztTry0WnPzUW5+m1wqc
-         5m1aNoNI4IaDYMR/D4juDKc0WLveSo88D991BC2qQIGivLO0GZXdupDg4nDka+YyJNuO
-         ErqA==
-X-Gm-Message-State: AOJu0Yy2yYslyNq8Yir8Rqst7mHKty1kPgxmQeBWC86+Y/m/LdREe8g4
-	cQ1nP4IIIXwbGmk3da7vuK237Eacr/o8R5IhV2Y4R/jhVVXbnW7ayEzONHK2a/eYsIjjmuM9n5G
-	KyFEaKXCNMDLMzKxuj+8i2csQ6XCUOGNsyFLys0IuytrcfjjzoC5Rhdntw/bxTxeJ9BYNn1xhPg
-	5NY21ctvHc4IT/YR4AWXzUpJlLoGxtdlUYGN8=
-X-Received: by 2002:a05:6000:702:b0:33d:5803:1934 with SMTP id bs2-20020a056000070200b0033d58031934mr6469312wrb.5.1708528762028;
-        Wed, 21 Feb 2024 07:19:22 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEhjo8T9vOGB1bgW4e83glaOl4doSfkw2/URnCXCpSnJFJNR4dfcmlzTeyQ9sEtS10XAp2Hjw==
-X-Received: by 2002:a05:6000:702:b0:33d:5803:1934 with SMTP id bs2-20020a056000070200b0033d58031934mr6469281wrb.5.1708528761565;
-        Wed, 21 Feb 2024 07:19:21 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-230-226.dyn.eolo.it. [146.241.230.226])
-        by smtp.gmail.com with ESMTPSA id by15-20020a056000098f00b0033d7920fe09sm2898575wrb.2.2024.02.21.07.19.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Feb 2024 07:19:20 -0800 (PST)
-Message-ID: <90f9d3056554c9b318baacc5000b1ae02b59d8f4.camel@redhat.com>
-Subject: Re: [PATCH net 2/2] selftests: mptcp: explicitly trigger the
- listener diag code-path
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Matthieu Baerts <matttbe@kernel.org>, Mat Martineau
- <martineau@kernel.org>,  Geliang Tang <geliang@kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>,
- mptcp@lists.linux.dev,  linux-kernel@vger.kernel.org
-Date: Wed, 21 Feb 2024 16:19:19 +0100
-In-Reply-To: <1116d80f808ea870f3f77fe927dbd6c622d062ae.1708515908.git.pabeni@redhat.com>
-References: <cover.1708515908.git.pabeni@redhat.com>
-	 <1116d80f808ea870f3f77fe927dbd6c622d062ae.1708515908.git.pabeni@redhat.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+	s=arc-20240116; t=1708529075; c=relaxed/simple;
+	bh=xbSJySuLz+kUWt/a4hSL5ok5Gu+9XGsWi2p/iYqZpk4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MQ3GNlCbExy5prIWUIx86tNAXxg63KN54aeB/9PjESg6xfo6CGZjOkua9N6koj5jeCYHa9zzMfmeoHUP9+ayWOh90pwBDPlqnEomnIuSykYkCAHQWhSVbzjPEahMr5Jja9AElss/y/7HuJlCor6fe9AD59serUJFVHtV27nGVFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b=N/eabdjO; arc=none smtp.client-ip=185.136.64.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
+Received: by mta-64-225.siemens.flowmailer.net with ESMTPSA id 20240221152425f583a9e12b8aa14b54
+        for <netdev@vger.kernel.org>;
+        Wed, 21 Feb 2024 16:24:25 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
+ d=siemens.com; i=diogo.ivo@siemens.com;
+ h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc;
+ bh=4somyZElZcPHvwR2g6Lf1q6jrCP6R7JaWxuo2W+uI58=;
+ b=N/eabdjO7BahFVDEmBRrkOIi3G8+WgmtROHqivaOeyV+MijgW4p1QlYdMIV25zq22tZ6PX
+ mFuYrvw3V5+tc7YJvByJ53J1eJfTz5bgZRdE5dhTMiFnpxMKbnG5qB0+4LDSSwuzScwE1BAe
+ 0D0rMp+ooTKjmwfZH9RJtHJEvg+sM=;
+From: Diogo Ivo <diogo.ivo@siemens.com>
+To: danishanwar@ti.com,
+	rogerq@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew@lunn.ch,
+	dan.carpenter@linaro.org,
+	jacob.e.keller@intel.com,
+	robh@kernel.org,
+	robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org,
+	vigneshr@ti.com,
+	wsa+renesas@sang-engineering.com,
+	hkallweit1@gmail.com,
+	arnd@arndb.de,
+	vladimir.oltean@nxp.com,
+	linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org
+Cc: Diogo Ivo <diogo.ivo@siemens.com>,
+	jan.kiszka@siemens.com
+Subject: [PATCH net-next v3 00/10] Support ICSSG-based Ethernet on AM65x SR1.0 devices
+Date: Wed, 21 Feb 2024 15:24:06 +0000
+Message-ID: <20240221152421.112324-1-diogo.ivo@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Flowmailer-Platform: Siemens
+Feedback-ID: 519:519-1320519:519-21489:flowmailer
 
-On Wed, 2024-02-21 at 12:46 +0100, Paolo Abeni wrote:
-> The mptcp diag interface already experienced a few locking bugs
-> that lockdep and appropriate coverage have detected in advance.
->=20
-> Let's add a test-case triggering the relevant code path, to prevent
-> similar issues in the future.
->=20
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> ---
->  tools/testing/selftests/net/mptcp/diag.sh | 30 +++++++++++++++++++++++
->  1 file changed, 30 insertions(+)
->=20
-> diff --git a/tools/testing/selftests/net/mptcp/diag.sh b/tools/testing/se=
-lftests/net/mptcp/diag.sh
-> index 60a7009ce1b5..3ab584b38566 100755
-> --- a/tools/testing/selftests/net/mptcp/diag.sh
-> +++ b/tools/testing/selftests/net/mptcp/diag.sh
-> @@ -81,6 +81,21 @@ chk_msk_nr()
->  	__chk_msk_nr "grep -c token:" "$@"
->  }
-> =20
-> +chk_listener_nr()
-> +{
-> +	local expected=3D$1
-> +	local msg=3D"$2"
-> +
-> +	if [ $expected -gt 0 ] && \
-> +	   ! mptcp_lib_kallsyms_has "mptcp_diag_dump_listeners"; then
-> +		printf "%-50s%s\n" "$msg - mptcp" "[ skip ]"
-> +		mptcp_lib_result_skip "many listener sockets"
+Hello,
 
-I was too hasty and this is too fragile/requires debug. A v2 with
-something more reliable is needed. Given this is not going to land into
-this week PR, we will probably send it with a burst with other fixes.
+This series extends the current ICSSG-based Ethernet driver to support
+AM65x Silicon Revision 1.0 devices.
 
-Thanks,
+Notable differences between the Silicon Revisions are that there is
+no TX core in SR1.0 with this being handled by the firmware, requiring
+extra DMA channels to manage communication with the firmware (with the
+firmware being different as well) and in the packet classifier.
 
-Paolo
+The motivation behind it is that a significant number of Siemens
+devices containing SR1.0 silicon have been deployed in the field
+and need to be supported and updated to newer kernel versions
+without losing functionality.
+
+This series is based on TI's 5.10 SDK [1].
+
+The second version of this patch series can be found in [2].
+
+The main changes in this version are the introduction of a separate
+driver for SR1.0 with its own Kconfig symbol and the refactoring of
+functions that can be shared across Silicon Revisions into a common
+location. A more detailed description of the changes can be found
+in each commit's message.
+
+Importantly, in its current form the driver has two problems:
+ - Setting the link to 100Mbit/s and half duplex results in slower than
+   expected speeds. We have identified that this comes from
+   icssg_rgmii_get_fullduplex() misreporting a full duplex connection
+   and thus we send the wrong command to the firmware.
+
+ - When using 3 TX channels we observe a timeout on TX queue 0. We have
+   made no real progress on this front in identifying the root cause.
+
+For both of these topics help from someone more familiar with the hardware
+would be greatly appreciated so that we can support these features rather
+than disable them in the final driver version.
+
+[1]: https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/tree/?h=ti-linux-5.10.y
+[2]: https://lore.kernel.org/netdev/20240117161602.153233-1-diogo.ivo@siemens.com/
+
+Diogo Ivo (10):
+  dt-bindings: net: Add support for AM65x SR1.0 in ICSSG
+  eth: Move IPv4/IPv6 multicast address bases to their own symbols
+  net: ti: icssg-prueth: Move common functions into a separate file
+  net: ti: icssg-prueth: Add SR1.0-specific configuration bits
+  net: ti: icssg-prueth: Add SR1.0-specific description bits
+  net: ti: icssg-prueth: Adjust IPG configuration for SR1.0
+  net: ti: icssg-prueth: Adjust the number of TX channels for SR1.0
+  net: ti: icssg-prueth: Add functions to configure SR1.0 packet
+    classifier
+  net: ti: icssg-prueth: Modify common functions for SR1.0
+  net: ti: icssg-prueth: Add ICSSG Ethernet driver for AM65x SR1.0
+    platforms
+
+ .../bindings/net/ti,icssg-prueth.yaml         |   35 +-
+ drivers/net/ethernet/ti/Kconfig               |   15 +
+ drivers/net/ethernet/ti/Makefile              |    9 +
+ .../net/ethernet/ti/icssg/icssg_classifier.c  |  113 +-
+ drivers/net/ethernet/ti/icssg/icssg_common.c  | 1222 +++++++++++++++++
+ drivers/net/ethernet/ti/icssg/icssg_config.c  |   14 +-
+ drivers/net/ethernet/ti/icssg/icssg_config.h  |   56 +
+ drivers/net/ethernet/ti/icssg/icssg_ethtool.c |   10 +
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c  | 1189 +---------------
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h  |   77 +-
+ .../net/ethernet/ti/icssg/icssg_prueth_sr1.c  | 1173 ++++++++++++++++
+ include/linux/etherdevice.h                   |   12 +-
+ 12 files changed, 2716 insertions(+), 1209 deletions(-)
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_common.c
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
+
+-- 
+2.43.2
 
 
