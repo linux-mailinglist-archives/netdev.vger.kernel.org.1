@@ -1,136 +1,105 @@
-Return-Path: <netdev+bounces-73659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BA0085D74E
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:42:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EA2A85D749
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:42:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D96BD283D6A
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:42:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5AD4DB2454D
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:42:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B9C845C10;
-	Wed, 21 Feb 2024 11:41:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D29444C84;
+	Wed, 21 Feb 2024 11:41:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="QneGEIeJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hvt1SH4u"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01FB241740;
-	Wed, 21 Feb 2024 11:41:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC934122C
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 11:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708515715; cv=none; b=f/UQwkx2bgxr3KTlROXLdBvgxIhuuRLmF9NpsCP3SloQJxm+5emztHDyUropgaC6HhdftW5b8arlf2QjtGzvu/JCHu6Z2/SZfhza/s4/PtBSIA8PL3lpOBU8YFHD11Qayn+uaur4F4YbA4kZp7SA3MgS0GhWpXDJftV4PM/wvnQ=
+	t=1708515666; cv=none; b=XnBcgIf3t+bevo6koXKSzqCW3z8FFz9/bZv0qVwKB9680KeV9/rZDUPmevWOPY7FHwSbfRr5M2ppoBwxw+dhkCXPsCA3jD9n4TERoqP03NdxG/BQ7j+Nl9hnEmeh9o5JKhhpmj9TbdBcbS25+fL79ClK4HSa9UiSqJo0plrXOFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708515715; c=relaxed/simple;
-	bh=ILaW+tmU19Hc2hM6tJl9+D6rdU+hAvnyjOgyR8UveG4=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=s9GOvm3q4lrM9YxKr7ScWzKrCAuWDhKBUeV+EeJa/etDzXBA8fDgTVkzRPk7O56GJMzRUcxp0qT3ID7Fun6zO+42V5xQ6xDqXFcN2PG5wrUmtE6Qd1AmGcBb87GOVs7cMAQx9DZyO0mbxR9V6zqWA3WQhx54dZNMdbNbBfDmlE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=QneGEIeJ; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1708515709; h=Message-ID:Subject:Date:From:To;
-	bh=0phsHgifgaYaoJTCL91u0y1uTS0FvlbXLUwQ30Yr5i8=;
-	b=QneGEIeJXIpMpaLXE6ZxGwFfr1l0qipg0DZzqwX2RD3yNtbDjcLG6RLa4jzJKxsGQXpfm0cJ3S0/mWvPyEvciRLImyCOaHAK+Ahmo0//g5U4JoBhfhfiW3LLW/VOwE31+zAOaLB6x3800StsQOA1H925x48wem+s05/ymdyWOvI=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0W0zjbGX_1708515708;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W0zjbGX_1708515708)
-          by smtp.aliyun-inc.com;
-          Wed, 21 Feb 2024 19:41:49 +0800
-Message-ID: <1708515555.2820647-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: RE: [PATCH net-next 1/2] xsk: Remove non-zero 'dma_page' check in xp_assign_dev
-Date: Wed, 21 Feb 2024 19:39:15 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: wangyunjian <wangyunjian@huawei.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
- xudingke <xudingke@huawei.com>,
- "mst@redhat.com" <mst@redhat.com>,
- "willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>,
- "jasowang@redhat.com" <jasowang@redhat.com>,
- "kuba@kernel.org" <kuba@kernel.org>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "magnus.karlsson@intel.com" <magnus.karlsson@intel.com>
-References: <1706089058-1364-1-git-send-email-wangyunjian@huawei.com>
- <1708509152.9501102-1-xuanzhuo@linux.alibaba.com>
- <0fce8b64808f4c6faa0eb60e44687c36@huawei.com>
-In-Reply-To: <0fce8b64808f4c6faa0eb60e44687c36@huawei.com>
+	s=arc-20240116; t=1708515666; c=relaxed/simple;
+	bh=GAeJayqA2HREeeBrER39skthm7UFJclmqPVb47TF4Pw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qNq4L83CakmiKpbpVaRTcAsuhYxyGUE7GdUaMpXJbmGiKywVUd2g4SXK6gFSn18nLVb5XTGZTtpagzBPhx0rEUktvzKX97Y87+kVj+eKfDfmxtth2EkDJxK+wX5hS8WXTGc2/WxYjRr0GQKkf5VsgmmKWG+BNJiJrcNXN3vfwRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hvt1SH4u; arc=none smtp.client-ip=209.85.160.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-21f2f813e3bso575291fac.0
+        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 03:41:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708515664; x=1709120464; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=GAeJayqA2HREeeBrER39skthm7UFJclmqPVb47TF4Pw=;
+        b=Hvt1SH4uqLxuGBlXvcW1qvpArjGabzDzcUZov2QOjIP8iT8cukwxS6P+m+nP1uSAi4
+         LEpPcP3eFhB8b+plH/yMvY2I/7ow8yK8+IolCfgE2D3rayOowoKbySJ8uRLyk8W8aGF9
+         NXDFAv0vQ8DnqxCJwOuEwYZuVhnVryuoy7zCAzpBNNmkqjgdecUTFoVyawmktO1PQWnW
+         dUeBX2KLGfP2eTZt7EHdiso3aTb/Ijry3kQBTJJW10VEzRtu7ZpLU75u5ztrzIKd90pl
+         uphZOBdLrx4bxTyQM3Rgfugz4A8tqFqRDf+GMxlc8/APlDvz8IY/0P0d/9Lb4qYh+jxl
+         ggtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708515664; x=1709120464;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GAeJayqA2HREeeBrER39skthm7UFJclmqPVb47TF4Pw=;
+        b=XdA26BHbyr3U3HamAdzSZc60VmDC0UW48/3saJJduXhcPBDatmMOLd8LYTg9iwJllx
+         4CicEkE+LtFZAW4HLWZSxkXyZTAJp1NG6+FtGMquoWsSr5qGFfF7IMTUwB/ABCKbvyvA
+         hVK5d92E+2LcHoc/MEh7w6Dxu3oYf02wS4l1O8Am4jv+obYOmvgmceBtz26ZlRozorSz
+         +0LhyaC6DQYHLV7pIg9dn6si5UG87mlrw2OT9sDejVqNKNXSCy54pJ/+1i+Ys2pSzNR6
+         tIght2L1tKqTW+TB3HXqeGTs+Hf21Q8w5EChu+hUl7ifn55Glh2Ie8qEydvjVJkdkwAy
+         zYsg==
+X-Forwarded-Encrypted: i=1; AJvYcCXcwI3nKlnl8PvcUqdUy7eCz58BzSlpIOqwCgGakHhGIp862eF3h75+z2zJQiqQ2AHoYcRttzvVA7ZzoazZly2coMCVpIed
+X-Gm-Message-State: AOJu0YyEM/Avd4tUw3BvxjO7z/YXAtb1YHISoE9ugP202BfJMyTprpJh
+	+EwJNUISjTVIzEDxotlMCXTPVtoCd8f5Nz2v4tnA52dm4xm6EYWjUrol+bavMjcdOyHh2xcllIT
+	Zi0uUw4v1QOZ65rQAT4xLU9tOVWk=
+X-Google-Smtp-Source: AGHT+IFcp6i0Hn1yWYZtyhTKnO5+ynGB7WwP0tkBHPTT1x3cpzZbNw4KbI30JLBLRzXhbHhKgw8YkuZ+0Rw9D2tDOl0=
+X-Received: by 2002:a05:6870:e389:b0:21e:6c0d:41c8 with SMTP id
+ x9-20020a056870e38900b0021e6c0d41c8mr5776740oad.16.1708515663665; Wed, 21 Feb
+ 2024 03:41:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20240219172525.71406-1-jiri@resnulli.us> <20240219172525.71406-4-jiri@resnulli.us>
+ <20240219125100.538ce0f8@kernel.org> <ZdRUfZMRvjMlDqtX@nanopsycho> <20240220175918.73026870@kernel.org>
+In-Reply-To: <20240220175918.73026870@kernel.org>
+From: Donald Hunter <donald.hunter@gmail.com>
+Date: Wed, 21 Feb 2024 11:40:52 +0000
+Message-ID: <CAD4GDZyx9eVcGorgOgdSinM_pGRNhqqLCNX-SAvdZAXqTCy+KQ@mail.gmail.com>
+Subject: Re: [patch net-next 03/13] tools: ynl: allow user to pass enum string
+ instead of scalar value
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, pabeni@redhat.com, 
+	davem@davemloft.net, edumazet@google.com, jacob.e.keller@intel.com, 
+	swarupkotikalapudi@gmail.com, sdf@google.com, lorenzo@kernel.org, 
+	alessandromarcolini99@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 21 Feb 2024 11:37:22 +0000, wangyunjian <wangyunjian@huawei.com> wrote:
-> > -----Original Message-----
-> > From: Xuan Zhuo [mailto:xuanzhuo@linux.alibaba.com]
-> > Sent: Wednesday, February 21, 2024 5:53 PM
-> > To: wangyunjian <wangyunjian@huawei.com>
-> > Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org;
-> > kvm@vger.kernel.org; virtualization@lists.linux.dev; xudingke
-> > <xudingke@huawei.com>; wangyunjian <wangyunjian@huawei.com>;
-> > mst@redhat.com; willemdebruijn.kernel@gmail.com; jasowang@redhat.com;
-> > kuba@kernel.org; davem@davemloft.net; magnus.karlsson@intel.com
-> > Subject: Re: [PATCH net-next 1/2] xsk: Remove non-zero 'dma_page' check in
-> > xp_assign_dev
-> >
-> > On Wed, 24 Jan 2024 17:37:38 +0800, Yunjian Wang
-> > <wangyunjian@huawei.com> wrote:
-> > > Now dma mappings are used by the physical NICs. However the vNIC maybe
-> > > do not need them. So remove non-zero 'dma_page' check in
-> > > xp_assign_dev.
-> >
-> > Could you tell me which one nic can work with AF_XDP without DMA?
+On Wed, 21 Feb 2024 at 01:59, Jakub Kicinski <kuba@kernel.org> wrote:
 >
-> TUN will support AF_XDP Tx zero-copy, which does not require DMA mappings.
+> Some of the sharp edges in Python YNL are because I very much
+> anticipated the pyroute2 maintainer to do a proper implementation,
+> and this tool was just a very crude PoC :D
 
+Hah yeah, I looked at pyroute2 a while back and thought there was a
+bit of an impedance mismatch between the dynamic schema driven
+approach of ynl and the declarative / procedural code in iproute2. I
+think a code generator would be the way to target iproute2.
 
-Great. Though I do not know how it works, but I think a new option or feature
-is better.
+https://github.com/svinota/pyroute2/blob/34d0768f89fd232126c49e2f7c94e6da6582795b/pyroute2/netlink/rtnl/rtmsg.py#L102-L139
 
-Thanks.
-
-
->
-> Thanks
->
-> >
-> > Thanks.
-> >
-> >
-> > >
-> > > Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
-> > > ---
-> > >  net/xdp/xsk_buff_pool.c | 7 -------
-> > >  1 file changed, 7 deletions(-)
-> > >
-> > > diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c index
-> > > 28711cc44ced..939b6e7b59ff 100644
-> > > --- a/net/xdp/xsk_buff_pool.c
-> > > +++ b/net/xdp/xsk_buff_pool.c
-> > > @@ -219,16 +219,9 @@ int xp_assign_dev(struct xsk_buff_pool *pool,
-> > >  	if (err)
-> > >  		goto err_unreg_pool;
-> > >
-> > > -	if (!pool->dma_pages) {
-> > > -		WARN(1, "Driver did not DMA map zero-copy buffers");
-> > > -		err = -EINVAL;
-> > > -		goto err_unreg_xsk;
-> > > -	}
-> > >  	pool->umem->zc = true;
-> > >  	return 0;
-> > >
-> > > -err_unreg_xsk:
-> > > -	xp_disable_drv_zc(pool);
-> > >  err_unreg_pool:
-> > >  	if (!force_zc)
-> > >  		err = 0; /* fallback to copy mode */
-> > > --
-> > > 2.33.0
-> > >
-> > >
+I find ynl to be a very useful tool when writing and testing spec
+files and have been happy to contribute to it for that purpose. I
+think we have started to remove some of the sharp edges, but there is
+more to do :-)
 
