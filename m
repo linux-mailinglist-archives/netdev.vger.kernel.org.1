@@ -1,188 +1,86 @@
-Return-Path: <netdev+bounces-73551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73557-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF08C85D067
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 07:23:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C9CB85D0BA
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 07:56:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6FDE5B21210
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 06:23:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90FEFB24526
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 06:56:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C67D63C060;
-	Wed, 21 Feb 2024 06:21:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DC98364BC;
+	Wed, 21 Feb 2024 06:56:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EbJoYeOv"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF64D3AC26
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 06:21:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C39ED3611B
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 06:56:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708496485; cv=none; b=urN1kdoJssRRE4CwpITTDdLJiFKGLkFiX1ZAeOsySSXpJRuBXH7L1C4inwksTjselEiSDa641Cfo45wweAm/019OKPGrSIT9epRrsE2BTa/ATazxOwwZ1NvST7AihIROHLnCqei8rCU/biNB3dBHTzeAsj3xfouQ6mG9DWSSFoQ=
+	t=1708498562; cv=none; b=IPtnr5Tp5OAwPjKTxNCe2vG2v7A0pFwy+2YM6m0FeB2ajPzYDKhv/P8R6ttvi2ogOjPATffejdPJ/Td/hdAS4rKlUkLMZxdubQP+kMlum4cI1CWRIF/rwA7gAckDCGaahwQ9PK1os3cKXIFiUIS2R9nD3XR8yM/pXbEtlRu4kTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708496485; c=relaxed/simple;
-	bh=V4cfKVDLC+fhR2Mehz0xn+9Mu9FWD2amC3utiRxvDhg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GPz+Q8OYLUqSL/Pi4hFMgXrm1JeGiOrCDFNPPRaysMJrmsF1oO/bVzs3+d35FxZh/b0NjsxTKX95gE2KjzgBSFucsVCk6RIG5WJmvvK4cYyxyNy831ZNWk6ojnHxZJ2YUXGKkVw5Dm4KlDot6okaoaj6q+bM6mLLC6rTk8smKkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rcfyh-00010W-4b; Wed, 21 Feb 2024 07:21:11 +0100
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rcfye-001zFM-Qc; Wed, 21 Feb 2024 07:21:08 +0100
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rcfye-003Gaw-2K;
-	Wed, 21 Feb 2024 07:21:08 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Wei Fang <wei.fang@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	NXP Linux Team <linux-imx@nxp.com>
-Subject: [PATCH net-next v5 8/8] net: fec: Fixup EEE
-Date: Wed, 21 Feb 2024 07:21:07 +0100
-Message-Id: <20240221062107.778661-9-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240221062107.778661-1-o.rempel@pengutronix.de>
-References: <20240221062107.778661-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1708498562; c=relaxed/simple;
+	bh=aAti4nMOwlYQnYODZYrZMH9XvmSJIK8VSux0OUhyCwo=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=aPHTRPz1xsj5nXFBD2/pIxBhJ+nTQpTAlc4NNLYPaA8h7tFgfvYwJzDn5VM1I5O+vBg3sh9ND1reVgElksOkLGgesP9T0btS8EavgmpPlBUFcBZOXOlnGMBIx61RHG67V3cagtMuKFFF2XzHzDoym1RMYt6tBpZZ3pDz0lhq+k8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EbJoYeOv; arc=none smtp.client-ip=209.85.219.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-dcbf82cdf05so315312276.2
+        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 22:56:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708498559; x=1709103359; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=aAti4nMOwlYQnYODZYrZMH9XvmSJIK8VSux0OUhyCwo=;
+        b=EbJoYeOvMQybZgVk8p6jjN9sMPe++YvzMYka3g8UkNOnSoKx+OHgnpcx5C8SEf6keQ
+         KRS2/IAcunyv47+ntUTdLwjAzHHDUOCOh7sKk20EyUzI2ccfX7c79kuy+hVF2UjgU6lv
+         C8tvXppZ8MQea41djOPnbE2fTBT4F6YPyi2GKE/1lZpfK2nx5J/j5XUONqRDxFRXsYbY
+         cbFVnv5X9Mj41Jnj2tYJdPeDi95FaFQTqFrnD5ka3Jb21ZvkMzdeJlok9whstVshV7m4
+         160g6exCNxVsuuyfRmuvTtiLlb9fkuibaTs72bTRBN3a3wCm0nQXJC5sgD7q63hHWAOy
+         MoZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708498559; x=1709103359;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=aAti4nMOwlYQnYODZYrZMH9XvmSJIK8VSux0OUhyCwo=;
+        b=ruAHQUf9X19L3Fuairt7lSxH+d2c279439UF5U1+EzjQLfkvFV/LLKD2boxgzGjrXP
+         gZjsvpAnkHbBcsVjgvBWenOG2wLKCwGDWwtkWUldmcdTQJrEtciASXlrb5aTkf5E0Mo8
+         ap8I6mkm7QRRUTwH7Ss8jqLUhyyzQ8Anae21U4xIg/eyeZWzszLUDIndm0VXLXLokjqD
+         LiI2Ug6xUrH+rxO1MRpuz4PuFj9d+NIiwzcSLmeoj8zNsbPq7CNxK0RIsIgDbL/z5ybP
+         Uc4kn94X5ptyrXaJoVWLDGZmIvpi3/SfESQ9uc/I9RrlRzepCHOvlAxxuZAz+eL9sJ1U
+         bYEQ==
+X-Gm-Message-State: AOJu0YzsTM26SYeBvVTfg4/gGBMsBGJzTQw7yEnLX3lTATYXd6dRQNmL
+	3g3hv4PYW17Cgy/hz7u6xtE64PwgivAiNthM51J/aWsI8UmNckmTFRMoW8IePA01WfRgwgSK/7W
+	h/tT6ijVqTcykm8/l/P2C0vS48ODdsxRLYSkrn3lwILU=
+X-Google-Smtp-Source: AGHT+IFffq2/j7dkzsOnoRIrd91RzjG8LQ3BiWPTaViz4eLeuOqy/Rj2ueLVZ200WroNMdXQVXuWXbyPjBE+bFBJvOg=
+X-Received: by 2002:a05:6902:563:b0:dc7:32ae:f0a with SMTP id
+ a3-20020a056902056300b00dc732ae0f0amr15947507ybt.65.1708498559622; Tue, 20
+ Feb 2024 22:55:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+From: Kamran <kamiykamkar@gmail.com>
+Date: Tue, 20 Feb 2024 22:55:49 -0800
+Message-ID: <CAOb+SpYRmDpLYS2yePXs82PiuEqORXZuUVqFCWzYYtFp_7pfaQ@mail.gmail.com>
+Subject: SO_ORIGINAL_DST socket option when doing redirect from nat table's
+ OUTPUT chain
+To: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-From: Andrew Lunn <andrew@lunn.ch>
+Is SO_ORIGINAL_DST socket option set while redirecting traffic from
+nat table's OUTPUT chain?
+I am redirecting the outbound traffic of applications to a local proxy
+server to first do some inspections in it, then redirect to the
+original destination. But i get some error about there is no
+SO_ORIGINAL_DST socket option.
 
-The enabling/disabling of EEE in the MAC should happen as a result of
-auto negotiation. So move the enable/disable into
-fec_enet_adjust_link() which gets called by phylib when there is a
-change in link status.
-
-fec_enet_set_eee() now just stores away the LPI timer value.
-Everything else is passed to phylib, so it can correctly setup the
-PHY.
-
-fec_enet_get_eee() relies on phylib doing most of the work,
-the MAC driver just adds the LPI timer value.
-
-Call phy_support_eee() if the quirk is present to indicate the MAC
-actually supports EEE.
-
-Signed-off-by: Andrew Lunn <andrew@lunn.ch>
-Tested-by: Oleksij Rempel <o.rempel@pengutronix.de> (On iMX8MP debix)
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
-v2: Only call fec_enet_eee_mode_set for those that support EEE
-v7: update against kernel v6.8-rc4
----
- drivers/net/ethernet/freescale/fec_main.c | 23 +++++------------------
- 1 file changed, 5 insertions(+), 18 deletions(-)
-
-diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-index a2c786550342..d7693fdf640d 100644
---- a/drivers/net/ethernet/freescale/fec_main.c
-+++ b/drivers/net/ethernet/freescale/fec_main.c
-@@ -2033,13 +2033,8 @@ static int fec_enet_eee_mode_set(struct net_device *ndev, bool enable)
- 	struct fec_enet_private *fep = netdev_priv(ndev);
- 	struct ethtool_keee *p = &fep->eee;
- 	unsigned int sleep_cycle, wake_cycle;
--	int ret = 0;
- 
- 	if (enable) {
--		ret = phy_init_eee(ndev->phydev, false);
--		if (ret)
--			return ret;
--
- 		sleep_cycle = fec_enet_us_to_tx_cycle(ndev, p->tx_lpi_timer);
- 		wake_cycle = sleep_cycle;
- 	} else {
-@@ -2047,8 +2042,6 @@ static int fec_enet_eee_mode_set(struct net_device *ndev, bool enable)
- 		wake_cycle = 0;
- 	}
- 
--	p->tx_lpi_enabled = enable;
--
- 	writel(sleep_cycle, fep->hwp + FEC_LPI_SLEEP);
- 	writel(wake_cycle, fep->hwp + FEC_LPI_WAKE);
- 
-@@ -2094,6 +2087,8 @@ static void fec_enet_adjust_link(struct net_device *ndev)
- 			netif_tx_unlock_bh(ndev);
- 			napi_enable(&fep->napi);
- 		}
-+		if (fep->quirks & FEC_QUIRK_HAS_EEE)
-+			fec_enet_eee_mode_set(ndev, phy_dev->enable_tx_lpi);
- 	} else {
- 		if (fep->link) {
- 			netif_stop_queue(ndev);
-@@ -2453,6 +2448,9 @@ static int fec_enet_mii_probe(struct net_device *ndev)
- 	else
- 		phy_set_max_speed(phy_dev, 100);
- 
-+	if (fep->quirks & FEC_QUIRK_HAS_EEE)
-+		phy_support_eee(phy_dev);
-+
- 	fep->link = 0;
- 	fep->full_duplex = 0;
- 
-@@ -3172,7 +3170,6 @@ fec_enet_get_eee(struct net_device *ndev, struct ethtool_keee *edata)
- 		return -ENETDOWN;
- 
- 	edata->tx_lpi_timer = p->tx_lpi_timer;
--	edata->tx_lpi_enabled = p->tx_lpi_enabled;
- 
- 	return phy_ethtool_get_eee(ndev->phydev, edata);
- }
-@@ -3182,7 +3179,6 @@ fec_enet_set_eee(struct net_device *ndev, struct ethtool_keee *edata)
- {
- 	struct fec_enet_private *fep = netdev_priv(ndev);
- 	struct ethtool_keee *p = &fep->eee;
--	int ret = 0;
- 
- 	if (!(fep->quirks & FEC_QUIRK_HAS_EEE))
- 		return -EOPNOTSUPP;
-@@ -3192,15 +3188,6 @@ fec_enet_set_eee(struct net_device *ndev, struct ethtool_keee *edata)
- 
- 	p->tx_lpi_timer = edata->tx_lpi_timer;
- 
--	if (!edata->eee_enabled || !edata->tx_lpi_enabled ||
--	    !edata->tx_lpi_timer)
--		ret = fec_enet_eee_mode_set(ndev, false);
--	else
--		ret = fec_enet_eee_mode_set(ndev, true);
--
--	if (ret)
--		return ret;
--
- 	return phy_ethtool_set_eee(ndev->phydev, edata);
- }
- 
--- 
-2.39.2
-
+Thanks for looking into this.
 
