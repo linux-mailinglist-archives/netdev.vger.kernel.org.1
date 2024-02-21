@@ -1,78 +1,81 @@
-Return-Path: <netdev+bounces-73576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 382D585D374
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 10:28:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 573BD85D37D
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 10:28:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D23C1F235BB
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 09:28:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 008961F23994
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 09:28:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FBAB3D0DA;
-	Wed, 21 Feb 2024 09:28:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E18F03D569;
+	Wed, 21 Feb 2024 09:28:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KGrfOqHQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tjt4n3eJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D5B83D0C5
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 09:28:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 296613D556
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 09:28:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708507683; cv=none; b=kh0NlpFmMmAFuw9BnyUQwfrOyU7xWSrU8zmKuZCJxZP69unOawk5nRvSU9xTtpqu33/Bow6vL7ngmHRpADAo94j4ZoI8BidgbLVR8YJ7IQytGxzch4aGquGaTtXPNRcWg27TAf9l0aKaCNT2HWXy5hoZjBGUQ2zjS7Kxth4ib20=
+	t=1708507687; cv=none; b=NrO0qignqGmiaHz9FDQwB7R1D8fHPS+nwdxXG0kHaRd8gubgtQxqUYck+DNh6C+F2ftn08D89ZGZmb9DQwiZlCFX9Z8FzCOwBwDHSn37UKGGNVMOkWTPEgFq3rvXTwALJAbOSUw64wp+mnCuLYk2bOBCZYaw4wFV8XxYPDjRmM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708507683; c=relaxed/simple;
-	bh=rqOJUF9M6mrQc8dXD7M61zFQtSxp3b+ZbBeG2t6aQ78=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ZKLvD1rMdzyVRJMuPsyZ0q2QlQBwJKBL1M6Nb308czwVrwWo1zGKg4uM0VgvyfPvc38zzwDd1zaJtdSEow0PK2DejN+mmiZ2cybNRW+6wzY4XjFA39Il2fnwAw+PHzTLNIxX9+gSr44q0r0H+NH2hwL2DXxp21h8Q4zE9irvOXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--davidgow.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KGrfOqHQ; arc=none smtp.client-ip=209.85.219.202
+	s=arc-20240116; t=1708507687; c=relaxed/simple;
+	bh=oHmG0+uAlgPHog1/cM3f+yE6TgqouD3e0qjE2/guiC8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=bVydQgzviBfQgig1sh9m0evD4XTF9sQHHEMocheKG2zg7Ka5jNVsXVHLDKnTX+/RxknLKoWeBzDsMLtMoXecZalFuf4PnzesXzoB9jRGz+0Visb/5nqJe/A4zJl9Q7STr9nNYMYPUDGRFzJHN5qUCwQbLAGOdxPVMgYDTsh7u7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--davidgow.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tjt4n3eJ; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--davidgow.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dce775fa8adso931706276.1
-        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 01:28:01 -0800 (PST)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-607e56f7200so55192357b3.2
+        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 01:28:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708507680; x=1709112480; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=eT/uH0qZq3eqCfd94wgAJ0+lZ7IXzMci6RxxltQCKcU=;
-        b=KGrfOqHQz28RK8t77rt5ggx03KxOwAFzkpedVpi5057cKMpApzJygU4Zjxbktz584G
-         pzqxZcplfxBJKKStCROql6+LlpHjEulo+NwsaS66AWIcNfNiFyMXg72DJHI9kAxkAwpD
-         pjgwbVfBhM7xVRkBB1bdlqUIWkkb3TJ/O88666LvBVWwzVGcOB6BXvfjx/RZxCNLi7jJ
-         84ETuusGPKXg2Zwn0kK6WPg1CW5dpLKKbr9Hcs66so2YNmPhh2EjamJsxJ/rTIP2q8qX
-         IoDqNKMITG2fR3csA4vkehNX+mQssYD3GEGKCsIWfnTZsCL4qeqqTBJZZ9P3ix5CPaJO
-         tScg==
+        d=google.com; s=20230601; t=1708507685; x=1709112485; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xu+inTe2LF3ynuuv7W7Ho6VSuZooh3VEfNa1s4AiQic=;
+        b=tjt4n3eJokRHzTY63qkAIPpMP+w8B503sAGRac2GqoBgdZvlfguvV+WA4ImnDeylDn
+         BE/pE/bJGWedcv2VC7gxC33KaDf9ngF2esnpaGcEetHogxg+d79pLQXZUYDU6FrokN3D
+         A0Dmssb/FQ+M4ouk5mU2CgpG6aEuji6sRsyFwG+w3Yj4Ml+LRIx3H+1ULNtv/CulMefZ
+         Df0LCpeZQic2QnwqQIhSlbYcLxxet1+vpLfWeeptddEWoYZh1ZbHgQQJcg29arLq4I94
+         khCo22xZb62JYbPhHNK9Tnl6r4iejJco6NqmVACUz+HTFZWnnoccQwtbJ/FGa9BAtfuk
+         3beg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708507680; x=1709112480;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eT/uH0qZq3eqCfd94wgAJ0+lZ7IXzMci6RxxltQCKcU=;
-        b=UqQgSl1gtKzB/urKjk81VbonWHkAo1lvv4AUTq5xx956ZNp5fsES2pWk5nnGMnFNc2
-         G8hijLHjFF3Xt61hdTpSdK5HCLjjRCX5pj8cCev/FyS9teaDeIJDJuG6uk8Qs2vmTkgv
-         MqcCZsb33bEEMLal8mGGmBsfr9qpUnYXuVR474qPlc38Zck3RHBdo7gKYeb1c+ezpJPc
-         0Z0GJeFfDjBiWKJd22bUZrmSuBexAla3cchGxRL+n8tq5M7NM2V5gp4a5e30tOzA23iU
-         N9vRJcwxFFc1Ud6ABI9oJ8bzbcxeNfu06bAf8kXemWS/hh5tNjfwkdGWFdmI932pRWxn
-         6j9g==
-X-Forwarded-Encrypted: i=1; AJvYcCX9A5sjSN0wX1bUh3BVd9VUmaVNptx5/OCa1Ld0lQFBhBooc06PD1oMX+eZ41ZDl61LoYYd4CrgjilgEdVIOuY0LhlUzUFS
-X-Gm-Message-State: AOJu0YxHAl03VBPnB0qQb2IOvV0OTvtKpBeDP0UJqYxnjlfELCnM+1+X
-	uoqYYP5t94xsG8PO5+7hvygbowKKrFZ8zRMA9an6KPRFaLN5VjDV7NsJNBNXI5KU0xRxsbb9sI8
-	ksY/3eCGyYg==
-X-Google-Smtp-Source: AGHT+IGgpxMwkWEuztRpScY6gpG7tiyfC6FQuhNT36WOurGMxJcdy1PSlvVZEYKt9//gZI89E5vnji5S6AEFRQ==
+        d=1e100.net; s=20230601; t=1708507685; x=1709112485;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xu+inTe2LF3ynuuv7W7Ho6VSuZooh3VEfNa1s4AiQic=;
+        b=j+5jj+82zhVoO+dYzOYOxhGwZ/gIY+oIQg03mVypeiJuanvfyyCcHSxpqDuZF0rNjf
+         qNhWIu/49lwZtzZ8XurBvy2YWpm3bj0NnXF9k9qqRrblR+7XCIj32wVXWd7DR7zFsuI2
+         47MSL7AvWCbFkMQHHZ+l2GCXbVDb/PwqUlrlXeTk2Ku0Jp2gqMm605zOBzuaB6GLLW12
+         YJ45OX9Aj1SzxJ/t+HU/04Kvn91mu/XL2ZlOvYpqEP69VEpFDOTkt2x1XXpq0zYShJQj
+         jcPKLGD/LdIe8xTTwsTMyrkw/QVfU1/avT1G1nvVN90kvWhDFy/MDLhYLqiY/q15yemD
+         GChQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXEPGNtMlM38Fso0hZZSanuxjulR9rjUftjg5bo7/MEbMLGYFEKri4vQLDLqavC7ta9DuiULKan+s7cbfr8cKFQmOoCUxOv
+X-Gm-Message-State: AOJu0YxhCOVxBwgJ24D322Lnw18RfG2oqkQgRQBPGT4BGyIdXsnaTScv
+	ia4aWdkURIqA3wFiufUd2Xz9vyHO/BjRQPHSi5vzJO5AuwVNvoLLokQTCLZ7idtqth5ug+P/NEL
+	6j1Q8aFMPyw==
+X-Google-Smtp-Source: AGHT+IFRWRv9O0ZJFWIQABWXYSjWTv0ZUYrlwMd+3gPavDYER8N+pRX59ZNK2IiQ8Dvkd5y8wLfb4lO8UUdSxw==
 X-Received: from slicestar.c.googlers.com ([fda3:e722:ac3:cc00:4f:4b78:c0a8:20a1])
- (user=davidgow job=sendgmr) by 2002:a05:6902:188f:b0:dc6:dfc6:4207 with SMTP
- id cj15-20020a056902188f00b00dc6dfc64207mr4738387ybb.10.1708507680618; Wed,
- 21 Feb 2024 01:28:00 -0800 (PST)
-Date: Wed, 21 Feb 2024 17:27:13 +0800
+ (user=davidgow job=sendgmr) by 2002:a05:6902:1005:b0:dc7:59d9:7b46 with SMTP
+ id w5-20020a056902100500b00dc759d97b46mr624383ybt.3.1708507685189; Wed, 21
+ Feb 2024 01:28:05 -0800 (PST)
+Date: Wed, 21 Feb 2024 17:27:14 +0800
+In-Reply-To: <20240221092728.1281499-1-davidgow@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20240221092728.1281499-1-davidgow@google.com>
 X-Mailer: git-send-email 2.44.0.rc0.258.g7320e95886-goog
-Message-ID: <20240221092728.1281499-1-davidgow@google.com>
-Subject: [PATCH 0/9] kunit: Fix printf format specifier issues in KUnit assertions
+Message-ID: <20240221092728.1281499-2-davidgow@google.com>
+Subject: [PATCH 1/9] kunit: test: Log the correct filter string in executor_test
 From: David Gow <davidgow@google.com>
 To: Linus Torvalds <torvalds@linux-foundation.org>, Shuah Khan <skhan@linuxfoundation.org>, 
 	Guenter Roeck <linux@roeck-us.net>, Rae Moar <rmoar@google.com>, 
@@ -92,65 +95,32 @@ Cc: David Gow <davidgow@google.com>, Brendan Higgins <brendan.higgins@linux.dev>
 	linux-hardening@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-KUnit has several macros which accept a log message, which can contain
-printf format specifiers. Some of these (the explicit log macros)
-already use the __printf() gcc attribute to ensure the format specifiers
-are valid, but those which could fail the test, and hence used
-__kunit_do_failed_assertion() behind the scenes, did not.
+KUnit's executor_test logs the filter string in KUNIT_ASSERT_EQ_MSG(),
+but passed a random character from the filter, rather than the whole
+string.
 
-These include:
-- KUNIT_EXPECT_*_MSG()
-- KUNIT_ASSERT_*_MSG()
-- KUNIT_FAIL()
+This was found by annotating KUNIT_ASSERT_EQ_MSG() to let gcc validate
+the format string.
 
-This series adds the __printf() attribute, and fixes all of the issues
-uncovered. (Or, at least, all of those I could find with an x86_64
-allyesconfig, and the default KUnit config on a number of other
-architectures. Please test!)
+Fixes: 76066f93f1df ("kunit: add tests for filtering attributes")
+Signed-off-by: David Gow <davidgow@google.com>
+---
+ lib/kunit/executor_test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The issues in question basically take the following forms:
-- int / long / long long confusion: typically a type being updated, but
-  the format string not.
-- Use of integer format specifiers (%d/%u/%li/etc) for types like size_t
-  or pointer differences (technically ptrdiff_t), which would only work
-  on some architectures.
-- Use of integer format specifiers in combination with PTR_ERR(), where
-  %pe would make more sense.
-- Use of empty messages which, whilst technically not incorrect, are not
-  useful and trigger a gcc warning.
-
-We'd like to get these (or equivalent) in for 6.9 if possible, so please
-do take a look if possible.
-
-Thanks,
--- David
-
-Reported-by: Linus Torvalds <torvalds@linux-foundation.org>
-Closes: https://lore.kernel.org/linux-kselftest/CAHk-=wgJMOquDO5f8ShH1f4rzZwzApNVCw643m5-Yj+BfsFstA@mail.gmail.com/
-
-David Gow (9):
-  kunit: test: Log the correct filter string in executor_test
-  lib/cmdline: Fix an invalid format specifier in an assertion msg
-  lib: memcpy_kunit: Fix an invalid format specifier in an assertion msg
-  time: test: Fix incorrect format specifier
-  rtc: test: Fix invalid format specifier.
-  net: test: Fix printf format specifier in skb_segment kunit test
-  drm: tests: Fix invalid printf format specifiers in KUnit tests
-  drm/xe/tests: Fix printf format specifiers in xe_migrate test
-  kunit: Annotate _MSG assertion variants with gnu printf specifiers
-
- drivers/gpu/drm/tests/drm_buddy_test.c | 14 +++++++-------
- drivers/gpu/drm/tests/drm_mm_test.c    |  6 +++---
- drivers/gpu/drm/xe/tests/xe_migrate.c  |  8 ++++----
- drivers/rtc/lib_test.c                 |  2 +-
- include/kunit/test.h                   | 12 ++++++------
- kernel/time/time_test.c                |  2 +-
- lib/cmdline_kunit.c                    |  2 +-
- lib/kunit/executor_test.c              |  2 +-
- lib/memcpy_kunit.c                     |  4 ++--
- net/core/gso_test.c                    |  2 +-
- 10 files changed, 27 insertions(+), 27 deletions(-)
-
+diff --git a/lib/kunit/executor_test.c b/lib/kunit/executor_test.c
+index 22d4ee86dbed..3f7f967e3688 100644
+--- a/lib/kunit/executor_test.c
++++ b/lib/kunit/executor_test.c
+@@ -129,7 +129,7 @@ static void parse_filter_attr_test(struct kunit *test)
+ 			GFP_KERNEL);
+ 	for (j = 0; j < filter_count; j++) {
+ 		parsed_filters[j] = kunit_next_attr_filter(&filter, &err);
+-		KUNIT_ASSERT_EQ_MSG(test, err, 0, "failed to parse filter '%s'", filters[j]);
++		KUNIT_ASSERT_EQ_MSG(test, err, 0, "failed to parse filter from '%s'", filters);
+ 	}
+ 
+ 	KUNIT_EXPECT_STREQ(test, kunit_attr_filter_name(parsed_filters[0]), "speed");
 -- 
 2.44.0.rc0.258.g7320e95886-goog
 
