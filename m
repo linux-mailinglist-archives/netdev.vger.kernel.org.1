@@ -1,109 +1,155 @@
-Return-Path: <netdev+bounces-73779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E236285E552
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 19:15:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43CCD85E5D1
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 19:25:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 956A12839F3
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 18:15:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDA7A285E86
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 18:25:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44B1585261;
-	Wed, 21 Feb 2024 18:15:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DAC38563A;
+	Wed, 21 Feb 2024 18:22:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VKVGS3F7"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="EkwVhY9G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B709B42A8B
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 18:15:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C32E68562D
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 18:22:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708539312; cv=none; b=G892pi03GVwipSWQZYN16zkv2C+0gUEt9lZ89x6cUjqDBNFj8Ylf8pmGBK3x0uzuJ3ybz7iobZnVifa7wHnTi0jABU4DGWiHIqTuHDwT6KZDzWCs81xjaKgJPIG1xB2m/2XgoC0WxKmbhIQvCwKyREaWP6Qdid+UfMMIo2ce2YE=
+	t=1708539765; cv=none; b=U7v7WDn6TYwx1upvkaOC/RRBFsF3Kxibp/x/ywHubcBldPuAGqASoc66AnCANqbBT9L5hRrBfD/gnILV9+X/XhvbCcJMt6IUXL7hxtFtBA37vMz8p4oOHRsdSdcc5Cwg1JbgBCLwFBIjKQRaAbGjUbqx+sh7GsrRaO9roz3Rnc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708539312; c=relaxed/simple;
-	bh=RmcFLeHl7HfDkogBM5T7IDqcnGg14lRaslWi8venEzk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NuJuvVwX2Aaq35lvVaoiEzP2I5Br5drcwKhqTq3/lNiFhO3xfVGTbh8itBrREHH9UkBAqpwh1T3LQpkVATRxYj+Ogf415WhOot++ChY/iV3tD9wwNJpkwkbcjKuk3fYCogAZRdzS7FbpAWqqlJ/u8WD1aob3eBaU6+XFlLLb/BM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VKVGS3F7; arc=none smtp.client-ip=209.85.160.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-206689895bfso4361819fac.1
-        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 10:15:10 -0800 (PST)
+	s=arc-20240116; t=1708539765; c=relaxed/simple;
+	bh=EriAXYtWwS8Hk4l8xRlROSDp2wDGrhlyMRyCErH6xfQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dnti/PhL2qF6WXy/y47D02Gr0tZCnC2iB7bLBIo5++Z8K/fxOtXGN0tNXANZ42BYADIwaDJGXwoXuf6uhBF6qDeKr4H2aNC4ImxNTYvojksNTL7t3pIOHfhh3O2xofLMPUCVjanHPj18kiC3vdsA68jFclP54qRE8n5auBkY19Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=EkwVhY9G; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-41275f1b45aso6881265e9.3
+        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 10:22:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708539310; x=1709144110; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=RmcFLeHl7HfDkogBM5T7IDqcnGg14lRaslWi8venEzk=;
-        b=VKVGS3F7P1b4Ch+X2F0IhGHtIGvgz3ldqhk4TjaubRXdWI5b9WcK/9VTHiPPWH06Nq
-         BrDtG3+137tcuQIRMn5cSMEVHFT2ArzG2KNgMQqmLA2FOrH+leP7ZSd5rhD7rPUzsqmZ
-         TzlHs7kAKXhff+/yS37sR0cg0Ku43nu9E0vwtM/Kx4/RISIyPkJNOptlbgOEWo9vpRAw
-         2Ibk64Efh5vVbKobdWa6QfNcy0kmi3nwxglHgktfPG8U6t/zBVq4hj6uG41If9kmNBof
-         9jK5jAIl++1hMOCDSEasNWCTJfGoPlZXB+fklgVK8AYwIRmYbmDUrpWI7jvIUQKfGHHP
-         PrRg==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708539761; x=1709144561; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Sxza/sj4eN2dhcXgIfKmMLV43QJtvnpBq1Dsu79/oM8=;
+        b=EkwVhY9G5eiWD17UkJ5aiXy6xxg5W2P9AvHVGEgA5S93YEwNMNazdGhKMFd+tIaVab
+         /ac1OPAJDxYUD1EeU38gWiN6otVVJkAoq3JmDfQQyU6HFdV2iHsVRGtFO+Kh2QbnvB8c
+         jSi26wsehTYK3beS1Mqk79yxuaOgWddDMrFGDXicJf6v6uaZ3iGXzo5gLj8pL5EpAZQE
+         curJL6Kd2UZBynQIFlcXcrko1g2x73u86Z31CcMn3wlCNZk7A3INrrvY2YJz9IoUqwxw
+         BwCWBZpKfZHDvpMMVSftRfJx/s8w1UyOlTjvCXsa3qVSQ9/doDly4CbkGdjWDvdPr4TH
+         RjjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708539310; x=1709144110;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RmcFLeHl7HfDkogBM5T7IDqcnGg14lRaslWi8venEzk=;
-        b=LZTFkfoDiiwuZKIIdVyehw6S4aEeEJO49xWvaROTJdrrCb8rgTPjsrrIn6VREqHps0
-         FQIaIVOhrI47DSv12Hzjbp9HTSCKMG/yfAkMeAeAQ0F4jDTGUnaY6doVAcZ/0HvG6lLr
-         YLds5A16c03wIQG2tqt/hC/JbSMLGp9xFgXqpC83Yrz/m4i04NbJ04xRL8XR7BRfQDrP
-         myf2N5mlRwKwMwXwj82Xe0KmeCZ1VUvjeEWuK40vnpjyGOP+09WeozRi9xuILntaMRFZ
-         GU3LEakc9lTSdDsrY/+whuvDUoJyvgO4JfJGdqj0+uWvMz75al60BQWxYBCnxNToC9Du
-         yhww==
-X-Gm-Message-State: AOJu0YzPMqoNvjxnX4+oQo4JnM2IhEjsniJTqa22ttdYfGdmf7HztZj4
-	jVO3o2PkiR9F49jo8shBh+BhWmIMKqm+6YcQQlSIBdIwHb9znRNkNWxDusracNidauAXfrJPvEi
-	+ul1ni5p1plstOFmu+AZz7hdk/hs=
-X-Google-Smtp-Source: AGHT+IFsDKJPcGOvLwMwq+QwuiIW6N2A2igZH2arDOM2nksGdP24OLRTOSODsz7z2bV8oLKk4U3ydkinuU0YjQNNtik=
-X-Received: by 2002:a05:6870:ac1f:b0:21e:7ad8:dce8 with SMTP id
- kw31-20020a056870ac1f00b0021e7ad8dce8mr14818557oab.23.1708539308664; Wed, 21
- Feb 2024 10:15:08 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708539761; x=1709144561;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Sxza/sj4eN2dhcXgIfKmMLV43QJtvnpBq1Dsu79/oM8=;
+        b=mbArlfwiosHDoJXJQ2K6WcRsu2pg0bAmP9kjEaP9PWNNU5h3q4FaWQWLj0IgZm6MK1
+         /rOTBaONaHljEmjwVYeiMQZ6J0ucSPElqj5MMiYOS6u7r5iAzdnVq8bYNCtZVH8PPjaf
+         1rSk10sHrt7io95jxN7yq8EHBj+Sdoap5ZbXhRj2lc3Ja6VwbqQDeWKp79qAgqXtuP20
+         6LoZVdkHNFTA80XBOcw9y+BAMSXZu962DIQCQ2P+zXU6QYkQOjFBzkmryMkT7Lx9HQCu
+         TNXkTt6m/XJWEu8sfmj/sgUfxDLLAqXho9fFL0tcw5Yc2IaHxhUSDPHNfY8eF1xdqNHZ
+         KH+w==
+X-Forwarded-Encrypted: i=1; AJvYcCXx01H9n4VyItA2VpZ8zZt4b68K4xEyW3n7sw8neoZoxnbe2wLGP+v0LS2A02oYZUrWP5gXVTlEWy+59AmOBprQ0TLvBBFs
+X-Gm-Message-State: AOJu0Yx6XIlKhOKi8LliC/A3zg6BBrg59QgJGd7BKiP9SOZhgqzLyWGt
+	mSGNGD39i2JZkXyfWMLTCGooxulX96MjFX9rnBY3FHRwCu0UnLj+fEFLRLiX4xs=
+X-Google-Smtp-Source: AGHT+IF7ZT0YuYYtLVSNjTpUwDdZ+nR47AWk+WxYU52Fr+mbZaT8NcjZPuvSRACpD9gkBzBB0MaWqA==
+X-Received: by 2002:a05:600c:19cd:b0:411:d273:90e2 with SMTP id u13-20020a05600c19cd00b00411d27390e2mr16855758wmq.3.1708539760834;
+        Wed, 21 Feb 2024 10:22:40 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id k25-20020a05600c0b5900b00410dd253008sm3297807wmr.42.2024.02.21.10.22.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Feb 2024 10:22:40 -0800 (PST)
+Date: Wed, 21 Feb 2024 19:22:37 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, eric.dumazet@gmail.com
+Subject: Re: [PATCH net-next 12/13] rtnetlink: make rtnl_fill_link_ifmap()
+ RCU ready
+Message-ID: <ZdY_bci2rMpjKusw@nanopsycho>
+References: <20240221105915.829140-1-edumazet@google.com>
+ <20240221105915.829140-13-edumazet@google.com>
+ <ZdYes3iPqzf0FCTf@nanopsycho>
+ <CANn89i+CvOVkaiXuO5vgggHdzVP17Yzw1WaiH93-fjf2cqnN_A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240221155415.158174-1-jiri@resnulli.us> <20240221155415.158174-4-jiri@resnulli.us>
-In-Reply-To: <20240221155415.158174-4-jiri@resnulli.us>
-From: Donald Hunter <donald.hunter@gmail.com>
-Date: Wed, 21 Feb 2024 18:14:57 +0000
-Message-ID: <CAD4GDZxhVs6hmYGR7+6u1TOa0JMF_89VnOjobUAdgM6yU9Z4VA@mail.gmail.com>
-Subject: Re: [patch net-next v2 3/3] tools: ynl: allow user to pass enum
- string instead of scalar value
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com, 
-	davem@davemloft.net, edumazet@google.com, jacob.e.keller@intel.com, 
-	swarupkotikalapudi@gmail.com, sdf@google.com, lorenzo@kernel.org, 
-	alessandromarcolini99@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89i+CvOVkaiXuO5vgggHdzVP17Yzw1WaiH93-fjf2cqnN_A@mail.gmail.com>
 
-On Wed, 21 Feb 2024 at 15:54, Jiri Pirko <jiri@resnulli.us> wrote:
+Wed, Feb 21, 2024 at 06:15:11PM CET, edumazet@google.com wrote:
+>On Wed, Feb 21, 2024 at 5:03 PM Jiri Pirko <jiri@resnulli.us> wrote:
+>>
+>> Wed, Feb 21, 2024 at 11:59:14AM CET, edumazet@google.com wrote:
+>> >Use READ_ONCE() to read the following device fields:
+>> >
+>> >       dev->mem_start
+>> >       dev->mem_end
+>> >       dev->base_addr
+>> >       dev->irq
+>> >       dev->dma
+>> >       dev->if_port
+>> >
+>> >Provide IFLA_MAP attribute only if at least one of these fields
+>> >is not zero. This saves some space in the output skb for most devices.
+>> >
+>> >Signed-off-by: Eric Dumazet <edumazet@google.com>
+>> >---
+>> > net/core/rtnetlink.c | 26 ++++++++++++++------------
+>> > 1 file changed, 14 insertions(+), 12 deletions(-)
+>> >
+>> >diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+>> >index 1b26dfa5668d22fb2e30ceefbf143e98df13ae29..b91ec216c593aaebf97ea69aa0d2d265ab61c098 100644
+>> >--- a/net/core/rtnetlink.c
+>> >+++ b/net/core/rtnetlink.c
+>> >@@ -1455,19 +1455,21 @@ static noinline_for_stack int rtnl_fill_vf(struct sk_buff *skb,
+>> >       return 0;
+>> > }
+>> >
+>> >-static int rtnl_fill_link_ifmap(struct sk_buff *skb, struct net_device *dev)
+>> >+static int rtnl_fill_link_ifmap(struct sk_buff *skb,
+>> >+                              const struct net_device *dev)
+>> > {
+>> >       struct rtnl_link_ifmap map;
+>> >
+>> >       memset(&map, 0, sizeof(map));
+>> >-      map.mem_start   = dev->mem_start;
+>> >-      map.mem_end     = dev->mem_end;
+>> >-      map.base_addr   = dev->base_addr;
+>> >-      map.irq         = dev->irq;
+>> >-      map.dma         = dev->dma;
+>> >-      map.port        = dev->if_port;
+>> >-
+>> >-      if (nla_put_64bit(skb, IFLA_MAP, sizeof(map), &map, IFLA_PAD))
+>> >+      map.mem_start = READ_ONCE(dev->mem_start);
+>> >+      map.mem_end   = READ_ONCE(dev->mem_end);
+>> >+      map.base_addr = READ_ONCE(dev->base_addr);
+>> >+      map.irq       = READ_ONCE(dev->irq);
+>> >+      map.dma       = READ_ONCE(dev->dma);
+>> >+      map.port      = READ_ONCE(dev->if_port);
+>> >+      /* Only report non zero information. */
+>> >+      if (memchr_inv(&map, 0, sizeof(map)) &&
+>>
+>> This check(optimization) is unrelated to the rest of the patch, correct?
+>> If yes, could it be a separate patch?
 >
-> From: Jiri Pirko <jiri@nvidia.com>
+>Sure thing. BTW, do you know which tool is using this ?
 >
-> During decoding of messages coming from kernel, attribute values are
-> converted to enum names in case the attribute type is enum of bitfield32.
->
-> However, when user constructs json message, he has to pass plain scalar
-> values. See "state" "selector" and "value" attributes in following
-> examples:
->
-> $ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/dpll.yaml --do pin-set --json '{"id": 0, "parent-device": {"parent-id": 0, "state": 1}}'
-> $ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/devlink.yaml --do port-set --json '{"bus-name": "pci", "dev-name": "0000:08:00.1", "port-index": 98304, "port-function": {"caps": {"selector": 1, "value": 1 }}}'
->
-> Allow user to pass strings containing enum names, convert them to scalar
-> values to be encoded into Netlink message:
->
-> $ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/dpll.yaml --do pin-set --json '{"id": 0, "parent-device": {"parent-id": 0, "state": "connected"}}'
-> $ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/devlink.yaml --do port-set --json '{"bus-name": "pci", "dev-name": "0000:08:00.1", "port-index": 98304, "port-function": {"caps": {"selector": ["roce-bit"], "value": ["roce-bit"] }}}'
->
-> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+>I could not find IFLA_MAP being used in iproute2 or ethtool.
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+No clue. Never spotted it.
 
