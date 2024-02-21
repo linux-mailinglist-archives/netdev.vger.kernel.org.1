@@ -1,307 +1,409 @@
-Return-Path: <netdev+bounces-73701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 446DA85DCF8
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 15:00:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E4A5585DCFC
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 15:00:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B087BB28767
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 14:00:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 42644B25A52
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 14:00:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABD8C7CF29;
-	Wed, 21 Feb 2024 13:59:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bNqbJGxB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 834107C092;
+	Wed, 21 Feb 2024 13:59:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 061F078B4B;
-	Wed, 21 Feb 2024 13:59:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6616F7BB19
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 13:59:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708523988; cv=none; b=laRj59f55wcW8p/dPlx2w1ZJXYkZ1xjhXBsY5GCShfORwPVRecvBQrRAoGVr1YnVRdhDnbO7wvW36OcexmwhUjiGH/jf4NaZmRGry6UrpFmC4gJZeqlsXudgGaYiVAm20688CV30mE08Tz27n7djSKC/1FThRdAzakIeOuxlLCM=
+	t=1708523997; cv=none; b=X5hY+ToItKwKdZxAbNj4Yz+SujeCshHXyniXsBYA5rgQlsHOkCRZTQRBUDAKcdRt+94+Fc0jdV5gz1Uy/GjLBtvMypHDZMN3PJJz1fSTF//Jli1cULk8jzz9dsza/gE5HGoUFELX+OnbtSHbRSFEjdpvt2V5uSh2+Lly4o6xneI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708523988; c=relaxed/simple;
-	bh=SnPLHbpo/441VAamU2FvPSSpEtFvKMwOMzEK2EmKY1E=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=hF/sIxbthoSxv5YuAamVz3SklWZPfhhJco/2AcPl7pyj6hI9OW3xdyBf1Q+V/hltQFThyMUXpH0ZxzlQSxKqDHCRHN5oStBaJKH3gXhXl2fNkWgaQ4O/D4cadu5eMRPfxDHzDi0JXIYpeB0HspMtoy0zgYztiAYqAaeYWQ/yvOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bNqbJGxB; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1d934c8f8f7so62499855ad.2;
-        Wed, 21 Feb 2024 05:59:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708523986; x=1709128786; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=aaHNU3TsVz9YPg3zJxPm9tj9UZPGWWuZNDbw2aB5JJI=;
-        b=bNqbJGxBBjZN1lfkbB55cKKnmGFeuFnPwUjnThjb/c0lTPe51WFxGma4f83JONlSoi
-         GutNnwNb88Uirh0lx7yhwI/p92mpJpaZM49fuaqLcpwe3aUTybiM7ZIRWSCipCLRRJYt
-         W6AmdYBQTKhqIfyFP78YeOWT3J1F93yCVB4gQOXej3x70ZUVWL2vxlZ2lpAQZ/hn5Bp9
-         IEleDim6hCJWpp0+PzAI/fzccmtdc4aK+Q5I5a0kBhz6JgcYwe3Y3BSe1qOaqXONZcNJ
-         4j2IYGSW86FXIHjM3GiJP4MMRVkBnd38WmkAPoDLuBQrgp8d2NUEXgNvsZLyn/qWTRSa
-         armA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708523986; x=1709128786;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=aaHNU3TsVz9YPg3zJxPm9tj9UZPGWWuZNDbw2aB5JJI=;
-        b=LLjj+MUNTajSvS0W6l3t2QrQwJ7P73LBnMoMhAfWV/TmBzI4NxRPUCTF1nxJRQk5Cj
-         NGqMcVTv6Xn08qfVSeV2rsU3Kq9wlFe2eB9+1o2HUyBiZ4sKi9/x4fKaHoaRMnIpn92X
-         ipAhmuaOAr9U7NcPqz8BpiWLNisUHKaLjJspRfciMhDJ3GJmBBxiKqUVT1/3/u0mZLI6
-         kOW0qJVKQujm1R8kHMJXolwYqWS2fVFUpIBY7urjGx0X8Yb8YzVymk5xNDRU0DpUG6rf
-         I2iP1C/Hi9xFT2OxzfW7+W+8BDYgPJB69ggo++YDyKJGILHHfNTtfFmb3a65MUDLh7X4
-         tWsw==
-X-Forwarded-Encrypted: i=1; AJvYcCXFj4QGccxMfGMHWR+0x3nLdyKbioNZb4sBrPKzVi2p/UpQTRdrV6MkgJ/w28Q+WKEsQmkLeNP6yJZimjhQz0hXI0iJunng9+yRTYrGvW1yOU257+OqRaScsWPem/GUmFa9X7DDaVDbqw5JXv+WvXqIBAT//70AwCdLyokYx2CtZysTGEyl
-X-Gm-Message-State: AOJu0Ywn+Wv/LueSDv47i3tQ9k9NrcSJxrIK4/QftgpUoydnlVo8fsuy
-	RackIcFhamTej88llNmjNudRWxmzz9cBsHjAvy2A9R2cDxzSiUc7Su58r65L9x525Y1ehdh3beq
-	LEhwD1SQd69OgZKao5e3NilrBa/1z09xA
-X-Google-Smtp-Source: AGHT+IGA7OlFHoL29A1Ks5gKGBoCCdoRecUcAoF52pJ9S32niGcrcIP8xX/JRmbCOc1hnGaycyULN1xJHu503jPkYSQ=
-X-Received: by 2002:a17:903:32cc:b0:1dc:157e:456a with SMTP id
- i12-20020a17090332cc00b001dc157e456amr5645861plr.49.1708523986187; Wed, 21
- Feb 2024 05:59:46 -0800 (PST)
+	s=arc-20240116; t=1708523997; c=relaxed/simple;
+	bh=2OeP1aRgsHSl4o5ZkmAM6xrCN4HXlOAk3pJkB0LAvy4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 In-Reply-To:Content-Type:Content-Disposition; b=kt3DaFjKtFm1Gr+Gkk0NtapReSoBOV7NBohWjyA3RqvhBSKb0/YLlFhbrYjZCskzUqd5FpEX7wdrfI0VcMEvyftXbmJGf9T3EU+F2UeeSud5fZsG394IRQ0htLo0EzQT4HH4R1vMP17X5f08vgSd8l4jh2+60aJvVmMmFDHG0fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-690-O8-1ApXqN6akXVLrirnvUQ-1; Wed,
+ 21 Feb 2024 08:59:43 -0500
+X-MC-Unique: O8-1ApXqN6akXVLrirnvUQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 202B629ABA1C;
+	Wed, 21 Feb 2024 13:59:43 +0000 (UTC)
+Received: from hog (unknown [10.39.192.26])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8CD6448B;
+	Wed, 21 Feb 2024 13:59:41 +0000 (UTC)
+Date: Wed, 21 Feb 2024 14:59:40 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Boris Pismenny <borisp@nvidia.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, Vakul Garg <vakul.garg@nxp.com>,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net 3/5] tls: don't skip over different type records from
+ the rx_list
+Message-ID: <ZdYBzKcmIorAO47N@hog>
+References: <cover.1708007371.git.sd@queasysnail.net>
+ <f00c0c0afa080c60f016df1471158c1caf983c34.1708007371.git.sd@queasysnail.net>
+ <20240219120703.219ad3b2@kernel.org>
+ <ZdPgAjFobWzrg_qY@hog>
+ <20240220175053.16324f4d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: xingwei lee <xrivendell7@gmail.com>
-Date: Wed, 21 Feb 2024 21:59:35 +0800
-Message-ID: <CABOYnLzFYHSnvTyS6zGa-udNX55+izqkOt2sB9WDqUcEGW6n8w@mail.gmail.com>
-Subject: Re: [syzbot] [netfilter?] KMSAN: uninit-value in __nla_validate_parse (3)
-To: syzbot+3f497b07aa3baf2fb4d0@syzkaller.appspotmail.com
-Cc: coreteam@netfilter.org, davem@davemloft.net, 
-	Eric Dumazet <edumazet@google.com>, fw@strlen.de, kadlec@netfilter.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20240220175053.16324f4d@kernel.org>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Hello, I reproduced this bug in the syzbot dashboard and upstream linux.
+2024-02-20, 17:50:53 -0800, Jakub Kicinski wrote:
+> On Tue, 20 Feb 2024 00:10:58 +0100 Sabrina Dubroca wrote:
+> > 2024-02-19, 12:07:03 -0800, Jakub Kicinski wrote:
+> > > On Thu, 15 Feb 2024 17:17:31 +0100 Sabrina Dubroca wrote: =20
+> > > > @@ -1772,7 +1772,8 @@ static int process_rx_list(struct tls_sw_cont=
+ext_rx *ctx,
+> > > >  =09=09=09   u8 *control,
+> > > >  =09=09=09   size_t skip,
+> > > >  =09=09=09   size_t len,
+> > > > -=09=09=09   bool is_peek)
+> > > > +=09=09=09   bool is_peek,
+> > > > +=09=09=09   bool *more)
+> > > >  {
+> > > >  =09struct sk_buff *skb =3D skb_peek(&ctx->rx_list);
+> > > >  =09struct tls_msg *tlm; =20
+> > >=20
+> > > > @@ -1844,6 +1845,10 @@ static int process_rx_list(struct tls_sw_con=
+text_rx *ctx,
+> > > > =20
+> > > >  out:
+> > > >  =09return copied ? : err;
+> > > > +more:
+> > > > +=09if (more)
+> > > > +=09=09*more =3D true;
+> > > > +=09goto out; =20
+> > >=20
+> > > Patches look correct, one small nit here -
+> > >=20
+> > > I don't have great ideas how to avoid the 7th argument completely but=
+  =20
+> >=20
+> > I hesitated between this patch and a variant combining is_peek and
+> > more into a single u8 *flags, but that felt a bit messy (or does that
+> > fall into what you describe as "not [having] great ideas"? :))
+>=20
+> I guess it saves a register, it seems a bit better but then it's a
+> truly in/out argument :)
 
-If you fix this issue, please add the following tag to the commit:
-Reported-by: xingwei lee <xrivendell7@gmail.com>
+We already do that with darg all over the receive code, so it
+shouldn't be too confusing to readers. It can be named flags_inout if
+you think that would help, or have a comment like above tls_decrypt_sg.
 
-I use the same config with syzbot dashboard.
-kernel version: c1ca10ceffbb289ed02feaf005bc9ee6095b4507
-kernel config: https://syzkaller.appspot.com/text?tag=KernelConfig&x=e3dd779fba027968
-with KMSAN enabled
-compiler: Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> > > I think it'd be a little cleaner if we either:
+> > >  - passed in err as an output argument (some datagram code does that
+> > >    IIRC), then function can always return copied directly, or  =20
+> >=20
+> > (yes, __skb_wait_for_more_packets, __skb_try_recv_datagram, and their
+> > variants)
+> >=20
+> > >  - passed copied as an output argument, and then we can always return
+> > >    err? =20
+> >=20
+> > Aren't those 2 options adding an 8th argument?
+>=20
+> No, no, still 7, if we separate copied from err - checking err < 0
+> is enough to know that we need to exit.
 
-[  254.423842][ T8047] =====================================================
-[  254.430576][ T8047] BUG: KMSAN: uninit-value in
-__nla_validate_parse+0x3d62/0x4f90
-[  254.434357][ T8047]  __nla_validate_parse+0x3d62/0x4f90
-[  254.437054][ T8047]  __nla_parse+0x6a/0x80
-[  254.439556][ T8047]  nfnetlink_rcv_msg+0x74c/0xed0
-[  254.444928][ T8047]  netlink_rcv_skb+0x58f/0x6d0
-[  254.447359][ T8047]  nfnetlink_rcv+0x3e8/0x4d10
-[  254.449893][ T8047]  netlink_unicast+0x107c/0x13e0
-[  254.452371][ T8047]  netlink_sendmsg+0x132c/0x1540
-[  254.454791][ T8047]  ____sys_sendmsg+0xa5b/0xe70
-[  254.456975][ T8047]  ___sys_sendmsg+0x2a7/0x3f0
-[  254.459423][ T8047]  __x64_sys_sendmsg+0x342/0x510
-[  254.461514][ T8047]  do_syscall_64+0xcf/0x1e0
-[  254.463345][ T8047]  entry_SYSCALL_64_after_hwframe+0x63/0x6b
-[  254.465643][ T8047]
-[  254.466539][ T8047] Uninit was created at:
-[  254.468194][ T8047]  kmem_cache_alloc_node+0x5cb/0xbc0
-[  254.470272][ T8047]  kmalloc_reserve+0x14d/0x500
-[  254.471882][ T8047]  __alloc_skb+0x385/0x820
-[  254.473385][ T8047]  netlink_sendmsg+0xbd6/0x1540
-[  254.475011][ T8047]  ____sys_sendmsg+0xa5b/0xe70
-[  254.476534][ T8047]  ___sys_sendmsg+0x2a7/0x3f0
-[  254.478039][ T8047]  __x64_sys_sendmsg+0x342/0x510
-[  254.479628][ T8047]  do_syscall_64+0xcf/0x1e0
-[  254.480995][ T8047]  entry_SYSCALL_64_after_hwframe+0x63/0x6b
-[  254.482719][ T8047]
+Right, I realized that you probably meant something like that as I was
+going to bed last night.
 
+It's not exactly enough, since tls_record_content_type will return 0
+on a content type mismatch. We'll have to translate that into an
+"error". I think it would be a bit nicer to set err=3D1 and then check
+err !=3D 0 in tls_sw_recvmsg (we can document that in a comment above
+process_rx_list) rather than making up a fake errno. See diff [1].
 
-=* repro.c =*
-#define _GNU_SOURCE
+Or we could swap the 0/1 returns from tls_record_content_type and
+switch the err <=3D 0 tests to err !=3D 0 after the existing calls, then
+process_rx_list doesn't have a weird special case [2].
 
-#include <dirent.h>
-#include <endian.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <signal.h>
-#include <stdarg.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/prctl.h>
-#include <sys/stat.h>
-#include <sys/syscall.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <time.h>
-#include <unistd.h>
-
-static void sleep_ms(uint64_t ms) {
-  usleep(ms * 1000);
-}
-
-static uint64_t current_time_ms(void) {
-  struct timespec ts;
-  if (clock_gettime(CLOCK_MONOTONIC, &ts))
-    exit(1);
-  return (uint64_t)ts.tv_sec * 1000 + (uint64_t)ts.tv_nsec / 1000000;
-}
-
-#define BITMASK(bf_off, bf_len) (((1ull << (bf_len)) - 1) << (bf_off))
-#define STORE_BY_BITMASK(type, htobe, addr, val, bf_off, bf_len)     \
-  *(type*)(addr) =                                                   \
-      htobe((htobe(*(type*)(addr)) & ~BITMASK((bf_off), (bf_len))) | \
-            (((type)(val) << (bf_off)) & BITMASK((bf_off), (bf_len))))
-
-static bool write_file(const char* file, const char* what, ...) {
-  char buf[1024];
-  va_list args;
-  va_start(args, what);
-  vsnprintf(buf, sizeof(buf), what, args);
-  va_end(args);
-  buf[sizeof(buf) - 1] = 0;
-  int len = strlen(buf);
-  int fd = open(file, O_WRONLY | O_CLOEXEC);
-  if (fd == -1)
-    return false;
-  if (write(fd, buf, len) != len) {
-    int err = errno;
-    close(fd);
-    errno = err;
-    return false;
-  }
-  close(fd);
-  return true;
-}
-
-static void kill_and_wait(int pid, int* status) {
-  kill(-pid, SIGKILL);
-  kill(pid, SIGKILL);
-  for (int i = 0; i < 100; i++) {
-    if (waitpid(-1, status, WNOHANG | __WALL) == pid)
-      return;
-    usleep(1000);
-  }
-  DIR* dir = opendir("/sys/fs/fuse/connections");
-  if (dir) {
-    for (;;) {
-      struct dirent* ent = readdir(dir);
-      if (!ent)
-        break;
-      if (strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0)
-        continue;
-      char abort[300];
-      snprintf(abort, sizeof(abort), "/sys/fs/fuse/connections/%s/abort",
-               ent->d_name);
-      int fd = open(abort, O_WRONLY);
-      if (fd == -1) {
-        continue;
-      }
-      if (write(fd, abort, 1) < 0) {
-      }
-      close(fd);
-    }
-    closedir(dir);
-  } else {
-  }
-  while (waitpid(-1, status, __WALL) != pid) {
-  }
-}
-
-static void setup_test() {
-  prctl(PR_SET_PDEATHSIG, SIGKILL, 0, 0, 0);
-  setpgrp();
-  write_file("/proc/self/oom_score_adj", "1000");
-}
-
-static void execute_one(void);
-
-#define WAIT_FLAGS __WALL
-
-static void loop(void) {
-  int iter = 0;
-  for (;; iter++) {
-    int pid = fork();
-    if (pid < 0)
-      exit(1);
-    if (pid == 0) {
-      setup_test();
-      execute_one();
-      exit(0);
-    }
-    int status = 0;
-    uint64_t start = current_time_ms();
-    for (;;) {
-      if (waitpid(-1, &status, WNOHANG | WAIT_FLAGS) == pid)
-        break;
-      sleep_ms(1);
-      if (current_time_ms() - start < 5000)
-        continue;
-      kill_and_wait(pid, &status);
-      break;
-    }
-  }
-}
-
-uint64_t r[1] = {0xffffffffffffffff};
-
-void execute_one(void) {
-  intptr_t res = 0;
-  res = syscall(__NR_socket, /*domain=*/0x10ul, /*type=*/3ul, /*proto=*/0xc);
-  if (res != -1)
-    r[0] = res;
-  *(uint64_t*)0x20000080 = 0;
-  *(uint32_t*)0x20000088 = 0;
-  *(uint64_t*)0x20000090 = 0x20000040;
-  *(uint64_t*)0x20000040 = 0x20000100;
-  *(uint32_t*)0x20000100 = 0x18;
-  *(uint8_t*)0x20000104 = 0;
-  *(uint8_t*)0x20000105 = 0xb;
-  *(uint16_t*)0x20000106 = 0x401;
-  *(uint32_t*)0x20000108 = 0;
-  *(uint32_t*)0x2000010c = 0;
-  *(uint8_t*)0x20000110 = 0;
-  *(uint8_t*)0x20000111 = 0;
-  *(uint16_t*)0x20000112 = htobe16(0);
-  *(uint16_t*)0x20000114 = 4;
-  STORE_BY_BITMASK(uint16_t, , 0x20000116, 2, 0, 14);
-  STORE_BY_BITMASK(uint16_t, , 0x20000117, 0, 6, 1);
-  STORE_BY_BITMASK(uint16_t, , 0x20000117, 1, 7, 1);
-  *(uint64_t*)0x20000048 = 0x18;
-  *(uint64_t*)0x20000098 = 1;
-  *(uint64_t*)0x200000a0 = 0;
-  *(uint64_t*)0x200000a8 = 0;
-  *(uint32_t*)0x200000b0 = 0;
-  syscall(__NR_sendmsg, /*fd=*/r[0], /*msg=*/0x20000080ul, /*f=*/0ul);
-}
-int main(void) {
-  syscall(__NR_mmap, /*addr=*/0x1ffff000ul, /*len=*/0x1000ul, /*prot=*/0ul,
-          /*flags=*/0x32ul, /*fd=*/-1, /*offset=*/0ul);
-  syscall(__NR_mmap, /*addr=*/0x20000000ul, /*len=*/0x1000000ul, /*prot=*/7ul,
-          /*flags=*/0x32ul, /*fd=*/-1, /*offset=*/0ul);
-  syscall(__NR_mmap, /*addr=*/0x21000000ul, /*len=*/0x1000ul, /*prot=*/0ul,
-          /*flags=*/0x32ul, /*fd=*/-1, /*offset=*/0ul);
-  loop();
-  return 0;
-}
-
-=* repro.txt =*
-r0 = socket$nl_netfilter(0x10, 0x3, 0xc)
-sendmsg$IPCTNL_MSG_CT_NEW(r0, &(0x7f0000000080)={0x0, 0x0,
-&(0x7f0000000040)={&(0x7f0000000100)={0x18, 0x0, 0xb, 0x401, 0x0, 0x0,
-{}, [@CTA_TUPLE_REPLY={0x4}]}, 0x18}}, 0x0)
+What do you think?
 
 
-and see also in
-https://gist.github.com/xrivendell7/fe97316e8a66f8d81109a158a3225bc0
+> Differently put, perhaps, my preference is to pass an existing entity
+> (err or copied), rather that conjure new concept (more) on one end and
+> interpret it on the other.
+>=20
+> > I tend to find ">=3D 0 on success, otherwise errno" more readable,
+> > probably because that's a very common pattern (either for recvmsg
+> > style of cases, or all the ERR_PTR type situations).
+>=20
+> Right it definitely is a good pattern. I think passing copied via
+> argument would give us those semantics still?
 
-I hope it helps.
-Best regards!
-xingwei Lee
+For recvmsg sure, but not for process_rx_list.
+
+> > > I like the former a little better because we won't have to special ca=
+se
+> > > NULL for the "after async decryption" call sites. =20
+> >=20
+> > We could also pass &rx_more every time and not check for NULL.
+> >=20
+> > What do you want to clean up more specifically? The number of
+> > arguments, the backwards goto, the NULL check before setting *more,
+> > something else/all of the above?
+>=20
+> Not compiled, but what I had in mind was something along the lines of:
+
+copied is a ssize_t (but ret isn't), so the change gets a bit uglier :(
+
+
+------------ 8< ------------
+
+[1] fix by setting err=3D1 in process_rx_list
+
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index 43dd0d82b6ed..711504614da7 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -1766,13 +1766,19 @@ static void tls_rx_rec_done(struct tls_sw_context_r=
+x *ctx)
+  * decrypted records into the buffer provided by caller zero copy is not
+  * true. Further, the records are removed from the rx_list if it is not a =
+peek
+  * case and the record has been consumed completely.
++ *
++ * Return:
++ *  - 0 if len bytes were copied
++ *  - 1 if < len bytes were copied due to a record type mismatch
++ *  - <0 if an error occurred
+  */
+ static int process_rx_list(struct tls_sw_context_rx *ctx,
+ =09=09=09   struct msghdr *msg,
+ =09=09=09   u8 *control,
+ =09=09=09   size_t skip,
+ =09=09=09   size_t len,
+-=09=09=09   bool is_peek)
++=09=09=09   bool is_peek,
++=09=09=09   ssize_t *out_copied)
+ {
+ =09struct sk_buff *skb =3D skb_peek(&ctx->rx_list);
+ =09struct tls_msg *tlm;
+@@ -1802,8 +1808,11 @@ static int process_rx_list(struct tls_sw_context_rx =
+*ctx,
+ =09=09tlm =3D tls_msg(skb);
+=20
+ =09=09err =3D tls_record_content_type(msg, tlm, control);
+-=09=09if (err <=3D 0)
++=09=09if (err <=3D 0) {
++=09=09=09if (err =3D=3D 0)
++=09=09=09=09err =3D 1;
+ =09=09=09goto out;
++=09=09}
+=20
+ =09=09err =3D skb_copy_datagram_msg(skb, rxm->offset + skip,
+ =09=09=09=09=09    msg, chunk);
+@@ -1843,7 +1852,8 @@ static int process_rx_list(struct tls_sw_context_rx *=
+ctx,
+ =09err =3D 0;
+=20
+ out:
+-=09return copied ? : err;
++=09*out_copied =3D copied;
++=09return err;
+ }
+=20
+ static bool
+@@ -1966,11 +1976,10 @@ int tls_sw_recvmsg(struct sock *sk,
+ =09=09goto end;
+=20
+ =09/* Process pending decrypted records. It must be non-zero-copy */
+-=09err =3D process_rx_list(ctx, msg, &control, 0, len, is_peek);
+-=09if (err < 0)
++=09err =3D process_rx_list(ctx, msg, &control, 0, len, is_peek, &copied);
++=09if (err !=3D 0)
+ =09=09goto end;
+=20
+-=09copied =3D err;
+ =09if (len <=3D copied || (copied && control !=3D TLS_RECORD_TYPE_DATA))
+ =09=09goto end;
+=20
+@@ -2114,6 +2123,7 @@ int tls_sw_recvmsg(struct sock *sk,
+=20
+ recv_end:
+ =09if (async) {
++=09=09ssize_t ret2;
+ =09=09int ret;
+=20
+ =09=09/* Wait for all previously submitted records to be decrypted */
+@@ -2130,10 +2140,10 @@ int tls_sw_recvmsg(struct sock *sk,
+ =09=09/* Drain records from the rx_list & copy if required */
+ =09=09if (is_peek || is_kvec)
+ =09=09=09err =3D process_rx_list(ctx, msg, &control, copied,
+-=09=09=09=09=09      decrypted, is_peek);
++=09=09=09=09=09      decrypted, is_peek, &ret2);
+ =09=09else
+ =09=09=09err =3D process_rx_list(ctx, msg, &control, 0,
+-=09=09=09=09=09      async_copy_bytes, is_peek);
++=09=09=09=09=09      async_copy_bytes, is_peek, &ret2);
+ =09}
+=20
+ =09copied +=3D decrypted;
+
+
+------------ 8< ------------
+
+[2] fixing the bug by changing tls_record_content_type as well
+
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index 43dd0d82b6ed..3da62ba97945 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -1734,6 +1734,11 @@ int decrypt_skb(struct sock *sk, struct scatterlist =
+*sgout)
+ =09return tls_decrypt_sg(sk, NULL, sgout, &darg);
+ }
+=20
++/* Return:
++ *  - 0 on success
++ *  - 1 if the record's type doesn't match the value in control
++ *  - <0 if an error occurred
++ */
+ static int tls_record_content_type(struct msghdr *msg, struct tls_msg *tlm=
+,
+ =09=09=09=09   u8 *control)
+ {
+@@ -1751,10 +1756,10 @@ static int tls_record_content_type(struct msghdr *m=
+sg, struct tls_msg *tlm,
+ =09=09=09=09return -EIO;
+ =09=09}
+ =09} else if (*control !=3D tlm->control) {
+-=09=09return 0;
++=09=09return 1;
+ =09}
+=20
+-=09return 1;
++=09return 0;
+ }
+=20
+ static void tls_rx_rec_done(struct tls_sw_context_rx *ctx)
+@@ -1766,13 +1771,19 @@ static void tls_rx_rec_done(struct tls_sw_context_r=
+x *ctx)
+  * decrypted records into the buffer provided by caller zero copy is not
+  * true. Further, the records are removed from the rx_list if it is not a =
+peek
+  * case and the record has been consumed completely.
++ *
++ * Return:
++ *  - 0 if len bytes were copied
++ *  - 1 if < len bytes were copied due to a record type mismatch
++ *  - <0 if an error occurred
+  */
+ static int process_rx_list(struct tls_sw_context_rx *ctx,
+ =09=09=09   struct msghdr *msg,
+ =09=09=09   u8 *control,
+ =09=09=09   size_t skip,
+ =09=09=09   size_t len,
+-=09=09=09   bool is_peek)
++=09=09=09   bool is_peek,
++=09=09=09   ssize_t *out_copied)
+ {
+ =09struct sk_buff *skb =3D skb_peek(&ctx->rx_list);
+ =09struct tls_msg *tlm;
+@@ -1784,7 +1795,7 @@ static int process_rx_list(struct tls_sw_context_rx *=
+ctx,
+ =09=09tlm =3D tls_msg(skb);
+=20
+ =09=09err =3D tls_record_content_type(msg, tlm, control);
+-=09=09if (err <=3D 0)
++=09=09if (err !=3D 0)
+ =09=09=09goto out;
+=20
+ =09=09if (skip < rxm->full_len)
+@@ -1802,7 +1813,7 @@ static int process_rx_list(struct tls_sw_context_rx *=
+ctx,
+ =09=09tlm =3D tls_msg(skb);
+=20
+ =09=09err =3D tls_record_content_type(msg, tlm, control);
+-=09=09if (err <=3D 0)
++=09=09if (err !=3D 0)
+ =09=09=09goto out;
+=20
+ =09=09err =3D skb_copy_datagram_msg(skb, rxm->offset + skip,
+@@ -1843,7 +1854,8 @@ static int process_rx_list(struct tls_sw_context_rx *=
+ctx,
+ =09err =3D 0;
+=20
+ out:
+-=09return copied ? : err;
++=09*out_copied =3D copied;
++=09return err;
+ }
+=20
+ static bool
+@@ -1966,11 +1978,10 @@ int tls_sw_recvmsg(struct sock *sk,
+ =09=09goto end;
+=20
+ =09/* Process pending decrypted records. It must be non-zero-copy */
+-=09err =3D process_rx_list(ctx, msg, &control, 0, len, is_peek);
+-=09if (err < 0)
++=09err =3D process_rx_list(ctx, msg, &control, 0, len, is_peek, &copied);
++=09if (err !=3D 0)
+ =09=09goto end;
+=20
+-=09copied =3D err;
+ =09if (len <=3D copied || (copied && control !=3D TLS_RECORD_TYPE_DATA))
+ =09=09goto end;
+=20
+@@ -2032,7 +2043,7 @@ int tls_sw_recvmsg(struct sock *sk,
+ =09=09 * For tls1.3, we disable async.
+ =09=09 */
+ =09=09err =3D tls_record_content_type(msg, tls_msg(darg.skb), &control);
+-=09=09if (err <=3D 0) {
++=09=09if (err !=3D 0) {
+ =09=09=09DEBUG_NET_WARN_ON_ONCE(darg.zc);
+ =09=09=09tls_rx_rec_done(ctx);
+ put_on_rx_list_err:
+@@ -2114,6 +2125,7 @@ int tls_sw_recvmsg(struct sock *sk,
+=20
+ recv_end:
+ =09if (async) {
++=09=09ssize_t ret2;
+ =09=09int ret;
+=20
+ =09=09/* Wait for all previously submitted records to be decrypted */
+@@ -2130,10 +2142,10 @@ int tls_sw_recvmsg(struct sock *sk,
+ =09=09/* Drain records from the rx_list & copy if required */
+ =09=09if (is_peek || is_kvec)
+ =09=09=09err =3D process_rx_list(ctx, msg, &control, copied,
+-=09=09=09=09=09      decrypted, is_peek);
++=09=09=09=09=09      decrypted, is_peek, &ret2);
+ =09=09else
+ =09=09=09err =3D process_rx_list(ctx, msg, &control, 0,
+-=09=09=09=09=09      async_copy_bytes, is_peek);
++=09=09=09=09=09      async_copy_bytes, is_peek, &ret2);
+ =09}
+=20
+ =09copied +=3D decrypted;
+
+--=20
+Sabrina
+
 
