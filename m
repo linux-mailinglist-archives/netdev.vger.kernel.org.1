@@ -1,99 +1,115 @@
-Return-Path: <netdev+bounces-73717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3248185E01D
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 15:43:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1F1B85E01F
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 15:44:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D16F81F24EF3
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 14:43:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F29F01C221B3
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 14:44:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95FE57C0B8;
-	Wed, 21 Feb 2024 14:42:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CAC43D393;
+	Wed, 21 Feb 2024 14:43:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bMxPfnUU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rh+r5COi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13737C098
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 14:42:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90EAA35;
+	Wed, 21 Feb 2024 14:43:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708526547; cv=none; b=PeSB9a9+kdMsr6N4wWrjcv0cohAuD7wjnMk95nY6crkxCKCS/tABmZ02Dsqj+N6D1Kz4p07aUcKI4YEIVDNwRRueKV+LWrCD3ZKvuUmPGrvjks4zYS3fIKOhfR3uIIo9e1yEcMkQBXkrkQsTkJsTC8Ic6kBeihcPXw/a/QwwiwY=
+	t=1708526599; cv=none; b=EvHjHYumj/hBpNJGN45smsg5gM+pNAWNh81TRCzaKaBKoxYcQRco9TGykoZTPPRQ0dB1X5VOebCn5YjhHVLizKvfysr2Um1Fjz749ROkJTdq8tOGBVIyeAJXvw5LHCM/GklxxpjpGDiYmcqVKzr6ZNEncXyJk8yjN9wtkNLKwdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708526547; c=relaxed/simple;
-	bh=gFSz4L+aI0Gu8pUuZtJXXMWlr821tG1RaZ8uUQEGGMo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Gb/DlNwzB+rD5eYc5gbR/NvHk7PXbYN0DlRk3ayAKf/ToM2FV2QoRjtSQ7X3n/hpga6lW6utsrLsuJ4OwOiCErS4lE0GvoyuOjzEV+lapMgDn6BJC+ZhsMsf7LV6LmJPdbdUFCT1nZjNYCuQvkg1FOQM99K0YCo5ZHNymSMjFHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bMxPfnUU; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5650c27e352so5256a12.0
-        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 06:42:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708526544; x=1709131344; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gFSz4L+aI0Gu8pUuZtJXXMWlr821tG1RaZ8uUQEGGMo=;
-        b=bMxPfnUURc6uuJvANabw+3/V2moudaIJe/zJUHu0rtjM3ZfkADUE+Ni+1pQve+d/bS
-         Sj6rB4kKrp+1S+cSw3Y8NqMbrX9gXxKA4FHzi/fLdfGCdUyvQ7yGyFVvl5FYVhBQr1pv
-         zQTxOWFkH0MB4f8Bh97Gl6dA3kpC9qHA9E9eOIOLzeAiInmSXxyFDE664f0daVZQqrRU
-         XeKljyfkaZYEbDAS8vl944mTLcQ2y882tRx9pM/z4MyniOzVOZ9FBp+o/iu/TqzO9Ew+
-         8Ct1SxBq/i7mG1VVusGtx29u8lnsxi2BMO6ynNlF4KKTF5worTugi/vesVUFFE5+DIt2
-         cAXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708526544; x=1709131344;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gFSz4L+aI0Gu8pUuZtJXXMWlr821tG1RaZ8uUQEGGMo=;
-        b=UVHXngaBeP4oC+p2WYrgXNO75a0yubgpuWwOeXhNkDjOBg3LTr85yRBmcwZtb3ECii
-         dXytdYZ5I5c/M9LzWrBsE4/gs7yFTLLJr5nHqmNpMTtRr3Zcic4nhbScD9nzXpHyC7ma
-         sUipUtMB96ItXyWWCvMmRnhYaPxmlf4nJnjD6VvaYJ/RL6vwvEozxVAGBIoA2F/L8e0h
-         C4TXDJ4jlo9Za+1lKbsOdUMHrn/bNOz+/NaLup9/wgdVrUEAxk/kOH9TYdv/dWaBHyWH
-         TLrbeB4z3CHoQ+MLwpN9p5RSWl6DyEedKOrRX9a/KU6hSm/GFoQI1yMZbK3ax4Yo23K+
-         MtQA==
-X-Forwarded-Encrypted: i=1; AJvYcCW4+uL9//zhg3QllWUjIujdHI7tgrk6v67uafQfXDDOcmNq9XucI0ZtYruwPaikWJuq1nYyeXPEYsXqw/qorBpXDPtA0vN6
-X-Gm-Message-State: AOJu0Yy66befG4BGv+HyS4RBHMutef65f1sqXMoA/Y83jha7ldsRFlm+
-	xQfTOAtj3ZuAm45AeRr9qw8V9qZDm82kNHxwWcwDcTn1BOaHnhAkCq+5XYT6aQLxLCGLnTeEJdm
-	P/thxJbArYDMVQWt2iXyy/8HJdm6AcPW7UXiP
-X-Google-Smtp-Source: AGHT+IHk8Jm2n0dCP4T6QpyCSNvoGJjSVoha0b246PUzY7nlFEp9vsec4maWmqM0VyfSkBjYm4/eCqfxdXAXqTAozoQ=
-X-Received: by 2002:a50:9f04:0:b0:562:9d2:8857 with SMTP id
- b4-20020a509f04000000b0056209d28857mr188654edf.6.1708526543966; Wed, 21 Feb
- 2024 06:42:23 -0800 (PST)
+	s=arc-20240116; t=1708526599; c=relaxed/simple;
+	bh=g208PeeCjQUWdSouRHCJy7e/n13eV/bEbILTkdMsC/I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rknCaXbKmmO7KPcKsRwbahqZ9SAK70V8DCFqzsgqPdR4qLArVY5NODJDbAhapaQfdT2VDn5IwWU/GIqaM3mkPQI1SRWFBvKHA31PxtW2/T1u2MCHcKWgxrgXu6DWfEN5tS37bzDiwFlicL2lT6WUOiRYnzVInB2iX4yjHkjDR2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rh+r5COi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2C1CC433C7;
+	Wed, 21 Feb 2024 14:43:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708526599;
+	bh=g208PeeCjQUWdSouRHCJy7e/n13eV/bEbILTkdMsC/I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Rh+r5COiXiaZ9Iekc6LC3gHFLFBKC1QJ3rAQqRz6ONSqWQA9MOLhwj/y5s3Q9wiaN
+	 7f3B/2r2Mj4y23i/Mx5gHNK1EqORnkFR1qYRl3oXr9ssXFDlxR5BJsmuE2bVD+eXDr
+	 ZiokHNwKTPOxP/4Wd64aCvZkOaWxu1FszTI5jEEPJAsBMbglO1D0HObG47VdcmPUr/
+	 RAoaq54aWhHeqInoPutDmld/VNpRUORUs19PvxqQrhtkwoutI869XarNwZZha6rZUW
+	 ZOvzla4wlgb0Sce10X6uetYMnGCZs3EHXzrr7cflnmgi93/fq9l0dUnEmH2ndHyxrW
+	 KVr1bLKYNgUaw==
+Date: Wed, 21 Feb 2024 14:43:16 +0000
+From: Simon Horman <horms@kernel.org>
+To: Tom Parkin <tparkin@katalix.com>
+Cc: netdev@vger.kernel.org, David Howells <dhowells@redhat.com>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net] l2tp: pass correct message length to ip6_append_data
+Message-ID: <20240221144316.GA722610@kernel.org>
+References: <20240220122156.43131-1-tparkin@katalix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240221025732.68157-1-kerneljasonxing@gmail.com> <20240221025732.68157-10-kerneljasonxing@gmail.com>
-In-Reply-To: <20240221025732.68157-10-kerneljasonxing@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 21 Feb 2024 15:42:10 +0100
-Message-ID: <CANn89i+Uikp=NvB7SVQpYnX-2FqJrH3hWw3sV0XpVcC55MiNUg@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 09/11] tcp: make the dropreason really work
- when calling tcp_rcv_state_process()
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	dsahern@kernel.org, kuniyu@amazon.com, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240220122156.43131-1-tparkin@katalix.com>
 
-On Wed, Feb 21, 2024 at 3:58=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> From: Jason Xing <kernelxing@tencent.com>
->
-> Update three callers including both ipv4 and ipv6 and let the dropreason
-> mechanism work in reality.
->
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+On Tue, Feb 20, 2024 at 12:21:56PM +0000, Tom Parkin wrote:
+> l2tp_ip6_sendmsg needs to avoid accounting for the transport header
+> twice when splicing more data into an already partially-occupied skbuff.
+> 
+> To manage this, we check whether the skbuff contains data using
+> skb_queue_empty when deciding how much data to append using
+> ip6_append_data.
+> 
+> However, the code which performed the calculation was incorrect:
+> 
+>      ulen = len + skb_queue_empty(&sk->sk_write_queue) ? transhdrlen : 0;
+> 
+> ...due to C operator precedence, this ends up setting ulen to
+> transhdrlen for messages with a non-zero length, which results in
+> corrupted packets on the wire.
+> 
+> Add parentheses to correct the calculation in line with the original
+> intent.
+> 
+> Fixes: 9d4c75800f61 ("ipv4, ipv6: Fix handling of transhdrlen in __ip{,6}_append_data()")
+> Cc: David Howells <dhowells@redhat.com>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Tom Parkin <tparkin@katalix.com>
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+> ---
+> This issue was uncovered by Debian build-testing for the
+> golang-github-katalix-go-l2tp package[1].
+> 
+> It seems 9d4c75800f61 has been backported to the linux-6.1.y stable
+> kernel (and possibly others), so I think this fix will also need
+> backporting.
+> 
+> The bug is currently seen on at least Debian Bookworm, Ubuntu Jammy, and 
+> Debian testing/unstable.
+
+In that case perhaps this is appropriate - citing the patch that 9d4c75800f61
+tried to fix?
+
+	Fixes: a32e0eec7042 ("l2tp: introduce L2TPv3 IP encapsulation support for IPv6")
+
+
+> 
+> Unfortunately tests using "ip l2tp" and which focus on dataplane
+> transport will not uncover this bug: it's necessary to send a packet
+> using an L2TPIP6 socket opened by userspace, and to verify the packet on
+> the wire.  The l2tp-ktest[2] test suite has been extended to cover this.
+> 
+> [1]. https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1063746
+> [2]. https://github.com/katalix/l2tp-ktest
+
+...
 
