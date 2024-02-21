@@ -1,133 +1,138 @@
-Return-Path: <netdev+bounces-73774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F48685E4DD
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 18:46:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1581D85E4F2
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 18:54:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16A841F23DF3
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 17:46:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BAEF1C23A0F
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 17:54:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20B5583CDB;
-	Wed, 21 Feb 2024 17:46:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0762B84A20;
+	Wed, 21 Feb 2024 17:54:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W6mqhk0E"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t09f8tuz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F14007BB00
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 17:46:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1DF583CD2;
+	Wed, 21 Feb 2024 17:54:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708537590; cv=none; b=atBUvu8xQp+1mIaOGotkkM/pfkLO/hq/2muU+zzjHLQJQU3u4isfdrzRVos9VtWbYShFnWx3aGyD2yjBCTCM4MdzVPv1zIMQV/pwHk7F76xgryzcgVUY6y6Pt07wS3d/cUZRh5aet8zXdOK0U8l2hadX4M4P2Bpzl7ND4ySNJ80=
+	t=1708538042; cv=none; b=fcC321waLWgV1TOMKPYAyr6lG0/Jpz7vMnIx/39QWagNxPuHRpXi2wxoh3vlJc03GD6oSloFLgjyaLcINBklR3Tc1TkfakUxWhmBq8UtJF2bTU2VUfkOFBUKgAcGELjaIohqukD1SIDHjvkxcZi5EvGzT0qta/S9pZFSzINuCCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708537590; c=relaxed/simple;
-	bh=08b+Vo67o6SmoB7++Gm/1GoSVDkHKmrdybkawQNPv0M=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=D49qoUoD2OPvczaRsuH8rCXGLJ0ag4Xtk1exgqti5uPXsC/rV1rsDgQs29ifySHAW6z1mm0TKk/QC43uX4sCyA7RRvmvtV9hWHY/FetNg8azvxNsF0RQ6Ht0KE3oVP6nDyhzyWJDQq+fu8wDT3h6a/8Z3we11Kki117pxYVbst8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W6mqhk0E; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42776C433A6;
-	Wed, 21 Feb 2024 17:46:27 +0000 (UTC)
+	s=arc-20240116; t=1708538042; c=relaxed/simple;
+	bh=XeaEaox6hE414P2S4pbvJ+ZOuxNVhudeaZWZheWvRYA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sAmBJ9mcEAwA6R+ihv+V2E3/eQBL+ha2Iuv91cjnyFuZB18whV4aShca37L1Cav17sOYc1tzg71Ek+hYOlrijFLwrK/K52kQK44tTFOUIBuUxmTZRyShKKp+w3p4m1dkAqSZzeh49hEmiRLCi2DIZOvn8nGgyrXQzQCWL7GOCSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t09f8tuz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A994FC433F1;
+	Wed, 21 Feb 2024 17:53:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708537589;
-	bh=08b+Vo67o6SmoB7++Gm/1GoSVDkHKmrdybkawQNPv0M=;
-	h=From:Date:Subject:To:Cc:From;
-	b=W6mqhk0E2fqFmRDkv4SmKqDnsrWdQ+XnKNmevMhJRmDJt2s4lvSb9gACGDSAbkCXQ
-	 zqZZrspFK5rxlaBl7UTx9UVRpykou5gnm5pZMuP/Zs7dpseZSm7S3uHaHaudZw/Jy7
-	 V/6G9M93ErOgPrPtn+WN/HTLGlGshqYZbR/ss0wWjBW4WhdP2jZWdKwU3ta+itH7tK
-	 xIIwv+wM+cCW9H3n9vLWjGISZOeXGsnuVs2RwYUB7zb30TDd+CPb1IUjU+ZIbAFRtf
-	 IMvBxx4JHoN0HQY5hUGLn47JWkgP03elIhfa+05rrcp5JNWTbzcsb8V4oUodOrBQOO
-	 XPspKgseABGqw==
+	s=k20201202; t=1708538042;
+	bh=XeaEaox6hE414P2S4pbvJ+ZOuxNVhudeaZWZheWvRYA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=t09f8tuzAWJq6UCSVXCEQMPo05RoClwUY8pUeIT3kTczagizzFUOerJFiGTlxkyP/
+	 16PbsN0U5Z6+PeO5ZF1vYdUeEmNuRNucMsNAIQ4nC0nW1hfV9b3WzZDiI96pBaAUUL
+	 TB2dcc515UzctMgxxklA07ZCykG7cuT+h3VRkv86c8I5shQV4d+Y41z9+bqkGIIWSi
+	 OxhHABbiMlFeik3hxi8zbA7gBOynqJh5LeGZisdimKM5wF8qo6FHHpCumHLm8bKKLD
+	 nQUWZVoCHwsUvxbDdOJ0mgj/Mk2JrQO+OeBnsFQTjvo7RI+8kTWduqfLk9ZZc5Ra1B
+	 pEJUx9OoZ91Mw==
+Date: Wed, 21 Feb 2024 17:53:57 +0000
 From: Simon Horman <horms@kernel.org>
-Date: Wed, 21 Feb 2024 17:46:21 +0000
-Subject: [PATCH net-next] ps3/gelic: minor Kernel Doc corrections
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next v2 1/1] net: dsa: microchip: Add support for
+ bridge port isolation
+Message-ID: <20240221175357.GE722610@kernel.org>
+References: <20240221093429.802077-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240221-ps3-gelic-kdoc-v1-1-7629216d1340@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAOw21mUC/x3MQQqAIBBA0avErBuoKci6SrQwnWwoLDQikO6et
- HyL/xNEDsIRhiJB4FuiHD6jLgswq/aOUWw2UEVtRVTjGRt0vIvBzR4GiZRVSve6m1vI0Rl4kec
- fjuD5Qs/PBdP7fiwThxJqAAAA
-To: Geoff Levand <geoff@infradead.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Michael Ellerman <mpe@ellerman.id.au>, 
- Nicholas Piggin <npiggin@gmail.com>, 
- Christophe Leroy <christophe.leroy@csgroup.eu>, 
- "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, 
- "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>, netdev@vger.kernel.org, 
- linuxppc-dev@lists.ozlabs.org
-X-Mailer: b4 0.12.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240221093429.802077-1-o.rempel@pengutronix.de>
 
-* Update the Kernel Doc for gelic_descr_set_tx_cmdstat()
-  and gelic_net_setup_netdev() so that documented name
-  and the actual name of the function match.
+On Wed, Feb 21, 2024 at 10:34:29AM +0100, Oleksij Rempel wrote:
+> Implement bridge port isolation for KSZ switches. Enabling the isolation
+> of switch ports from each other while maintaining connectivity with the
+> CPU and other forwarding ports. For instance, to isolate swp1 and swp2
+> from each other, use the following commands:
+> - bridge link set dev swp1 isolated on
+> - bridge link set dev swp2 isolated on
+> 
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> Acked-by: Arun Ramadoss <arun.ramadoss@microchip.com>
+> ---
+> changes v2:
+> - add comments and new lines
+> 
+>  drivers/net/dsa/microchip/ksz_common.c | 55 +++++++++++++++++++++++---
+>  drivers/net/dsa/microchip/ksz_common.h |  1 +
+>  2 files changed, 51 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+> index 7cd37133ec05..efe54c9492e8 100644
+> --- a/drivers/net/dsa/microchip/ksz_common.c
+> +++ b/drivers/net/dsa/microchip/ksz_common.c
+> @@ -1898,6 +1898,29 @@ static void ksz_get_strings(struct dsa_switch *ds, int port,
+>  	}
+>  }
+>  
+> +/**
+> + * ksz_adjust_port_member - Adjust port forwarding rules based on STP state and
+> + *			    isolation settings.
+> + * @dev: A pointer to the struct ksz_device representing the device.
+> + * @port: The port number to adjust.
+> +
+> + * This function dynamically adjusts the port membership configuration for a
+> + * specified port and other device ports, based on Spanning Tree Protocol (STP)
+> + * states and port isolation settings. Each port, including the CPU port, has a
+> + * membership register, represented as a bitfield, where each bit corresponds
+> + * to a port number. A set bit indicates permission to forward frames to that
+> + * port. This function iterates over all ports, updating the membership register
+> + * to reflect current forwarding permissions:
+> + *
+> + * 1. Forwards frames only to ports that are part of the same bridge group and
+> + *    in the BR_STATE_FORWARDING state.
+> + * 2. Takes into account the isolation status of ports; ports in the
+> + *    BR_STATE_FORWARDING state with BR_ISOLATED configuration will not forward
+> + *    frames to each other, even if they are in the same bridge group.
+> + * 3. Ensures that the CPU port is included in the membership based on its
+> + *    upstream port configuration, allowing for management and control traffic
+> + *    to flow as required.
+> + */
+>  static void ksz_update_port_member(struct ksz_device *dev, int port)
 
-* Move define of GELIC_ALIGN() so that it is no longer
-  between gelic_alloc_card_net() and it's Kernel Doc.
+...
 
-* Document netdev parameter of gelic_alloc_card_net()
-  in a way consistent to the documentation of other netdev parameters
-  in this file.
+Hi Oleksij,
 
-Addresses the following warnings flagged by ./scripts/kernel-doc -none:
+I haven't looked over this patch closely.
+But it does seem to have some Kernel doc problems.
 
-  .../ps3_gelic_net.c:711: warning: expecting prototype for gelic_net_set_txdescr_cmdstat(). Prototype was for gelic_descr_set_tx_cmdstat() instead
-  .../ps3_gelic_net.c:1474: warning: expecting prototype for gelic_ether_setup_netdev(). Prototype was for gelic_net_setup_netdev() instead
-  .../ps3_gelic_net.c:1528: warning: expecting prototype for gelic_alloc_card_net(). Prototype was for GELIC_ALIGN() instead
-  .../ps3_gelic_net.c:1531: warning: Function parameter or struct member 'netdev' not described in 'gelic_alloc_card_net'
+  .../ksz_common.c:1905: warning: bad line:
+  .../ksz_common.c:1924: warning: expecting prototype for ksz_adjust_port_member(). Prototype was for ksz_update_port_member() instead
 
-Signed-off-by: Simon Horman <horms@kernel.org>
----
- drivers/net/ethernet/toshiba/ps3_gelic_net.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+You can observe these by running ./scripts/kernel-doc -none
 
-diff --git a/drivers/net/ethernet/toshiba/ps3_gelic_net.c b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
-index d5b75af163d3..12b96ca66877 100644
---- a/drivers/net/ethernet/toshiba/ps3_gelic_net.c
-+++ b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
-@@ -698,7 +698,7 @@ gelic_card_get_next_tx_descr(struct gelic_card *card)
- }
- 
- /**
-- * gelic_net_set_txdescr_cmdstat - sets the tx descriptor command field
-+ * gelic_descr_set_tx_cmdstat - sets the tx descriptor command field
-  * @descr: descriptor structure to fill out
-  * @skb: packet to consider
-  *
-@@ -1461,7 +1461,7 @@ static void gelic_ether_setup_netdev_ops(struct net_device *netdev,
- }
- 
- /**
-- * gelic_ether_setup_netdev - initialization of net_device
-+ * gelic_net_setup_netdev - initialization of net_device
-  * @netdev: net_device structure
-  * @card: card structure
-  *
-@@ -1518,14 +1518,16 @@ int gelic_net_setup_netdev(struct net_device *netdev, struct gelic_card *card)
- 	return 0;
- }
- 
-+#define GELIC_ALIGN (32)
-+
- /**
-  * gelic_alloc_card_net - allocates net_device and card structure
-+ * @netdev: interface device structure
-  *
-  * returns the card structure or NULL in case of errors
-  *
-  * the card and net_device structures are linked to each other
-  */
--#define GELIC_ALIGN (32)
- static struct gelic_card *gelic_alloc_card_net(struct net_device **netdev)
- {
- 	struct gelic_card *card;
+I'm going to flag this as Changes Requested in patchwork
+as typically this kind of problem gets flagged by bots sooner or later.
+
+pw-bot: changes-requested
 
 
