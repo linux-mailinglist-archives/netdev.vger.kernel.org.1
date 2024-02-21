@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-73627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 584C885D647
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:01:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9659A85D648
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:01:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4696FB232E7
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:01:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 226101F240E8
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:01:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31DB41776;
-	Wed, 21 Feb 2024 10:59:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 677793E494;
+	Wed, 21 Feb 2024 10:59:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g5ho4xaE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NpOwCMTe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10D0B3FB22
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 10:59:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2F594177B
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 10:59:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708513179; cv=none; b=jGsXqpo03aPKTs3WWRGLax1ryJzMUgRTtxlMuIn8e3CMOngJIrwxLj9E0lYSLy1JCoCHMQoRoOwrHo9HMUlD9UtqztWIT4vOlfPUU/++IAmGYlu4zGusn8IPSYJ1WAXw0c11bduMeGv9cgEkzlmPoIu71bjcJ1RdHRIoPEHEhTk=
+	t=1708513181; cv=none; b=CKLwyWXPyQxXsg3d9u1XuE6Kq5G+IPZRpey9fqAUwZweb6xW904V6r2j0LFUWf2LmeAn2DhyNWn8B9WfkhOHWyeL32Uj5fB5KjiZwWrBarPDB/dm+hCtmjPZOSFGv8JB9oB/WoWvIat0nwZrrmcHd2ZRyEaXCRpYl8nt43uJvHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708513179; c=relaxed/simple;
-	bh=vOLe3bg0tRXIFmKpzHwgXmIPPTfHKKHk3L3/HNjTD28=;
+	s=arc-20240116; t=1708513181; c=relaxed/simple;
+	bh=MCmeJUN9MGwXSLJpYrOsUpVJmNc9pnUbftUQ4SscTsE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=t9zAIdPszaTcd0VInaePEm5iSsorWUfhqEZRzJ+l+vOJD3kVZn1G1tLYJW3hBAbugcV0jPLasKVtPkimLel7Dl9bTf0OmZiIL/bKWKBpHFKWmNPUAOKhD5gLL3TeO6oH9vfsXhAMk6SnvNG/+8tjiMQ82WTwxw6UMfKcHnwfyBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g5ho4xaE; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=MQ1DDA7NqtcuQwe/s9pFsbShESdzpaOnu7bEA3SyYsNJa/Uyx91KGJTP8QGtjrZXx6QIFxlT4lZ2IaI0Qxj9XBqspUeZGWKwIBkycWR8urNuF3yOYnzJonxx1v8BXRdghqUjQFFQ84yoS3OSQFSFnXG/UBtSHIv739RC79iX6Wk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NpOwCMTe; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6dbdcfd39so938505276.2
-        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 02:59:37 -0800 (PST)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-607cd6c11d7so95432397b3.0
+        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 02:59:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708513177; x=1709117977; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1708513179; x=1709117979; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7sVU0GIN3o9YbvdKGN4zAa6quKptpEydRku+6jdZ/QI=;
-        b=g5ho4xaE7T+vxiuBCEP3nPgjqOlIcVb56XSXBLJawGP//NZe44f2PSk1536pfAjYSL
-         baV9VqNDIR8drwVjbI+la0pEZbycsiQ1GTtNX+NzWfkWMYO8Z95kjcO+85f3+Pkxy859
-         HtZQQriuGFdW36aN2oJLjm/s971o2HXo4X2dBdjXldg9P2kHlBbLEobDmOvUNTXMF11H
-         Ac+BrPT2tF7hlVC5QXYvkn4AN8qWqFBCMFNFW41mgQaRybWPAx16PZOx6TNI5e4/lx3+
-         Sot+HPe4SM4tEM1X8Q4QzcDtSC0EwtziQnK3zsC14OvtH80nj2xEJfM7Z/Ftm6xD7vF0
-         wgHQ==
+        bh=JsZx506jUftdWvgOdSZWW4VlpaXV+yZD55s1/BJrbnQ=;
+        b=NpOwCMTeR5fFVPBQ0M0R4nzFztRwRIDFsKGwFHo82j9aSEcV61/JpdPdd48Ud2fLQ8
+         MIjg4ejKD13j32P64cbiWvs9u74WxdgmzA+Lo8wwUxE6WsF/UJRFKv83qfA1OyPdeXgT
+         vSTlUe1uooYxNINryy5tLk57gaa9Zsr1R/YQWK6GxOPCYCqec9q+jEtL/Snpvs5kn20L
+         nL5Kh7upqo/ZQa5AJgN2hNI6Q2/7jb+zOUdj9fOrgLgoZ4oyIsX/RlmqpwvWAZd6J6v3
+         m8hxvZmYZGvWmNdzLyfJgMYLnNUMRe/SpRXBCUOyl7eUZkcQJquhFpzMk2yH5+nIyiE8
+         jVPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708513177; x=1709117977;
+        d=1e100.net; s=20230601; t=1708513179; x=1709117979;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7sVU0GIN3o9YbvdKGN4zAa6quKptpEydRku+6jdZ/QI=;
-        b=gBQX7DIq+wjhB/8jyXtIrDmA5CYTJwgrl1Vkn9PV7RvTWo3uV2xWhsCJY0Wo8tOm/y
-         28Vjx1HJfpN1qFYFrc4jxRuIvjLOwV0f7UgYCMMioHGztxLTrdKAm+/JuZBS+4WWH+QW
-         8BS665++QvWRDV/96bfeGdHykRuKcRiYTyeIbq17Dmp0icHfq0iGNoCFWHkCc2Q1BTWk
-         h7fIwkPIjb6ep6Sz9j6l+Ygt7GY+MP9UAfvGntS2OGgy5aIIg2xp8OzmP4V2uSdTeYtq
-         b8xF+DrGy+YUSTSYW85lARSoBQ6FBo5wFfuLeNPUaM5Jr4oTjSmwU7IlT75Krg5EfIaw
-         DSwg==
-X-Gm-Message-State: AOJu0Yz3lm8l0R35by1iijc1sK7fW165XfxAH9Oktng3mW+Z4PqTGkhB
-	DMACZhi7YScgoMCd+SpvXsZqV7IIuwM/dLczDM9X+n6/zVIfPZc64oSZznFVITwPXAC8ZzP8StM
-	bY9f5++oL8w==
-X-Google-Smtp-Source: AGHT+IGA8Xl2wHNAOn24MgSj6nut2crct/U6FS9WFAEhRs7znk0upBrqT8Jw7f2lrhnMhrlz9YjpJHvQlLxldA==
+        bh=JsZx506jUftdWvgOdSZWW4VlpaXV+yZD55s1/BJrbnQ=;
+        b=e90a2GynMLoyf2sebvD9tGRWR3Jv80I+7LJwLk5zwIdmb1wurb+gmuslS6xDf1xkBo
+         YHCEpoeyi9pvrUG4T1keoODVtWsvh5WrUNfKi/d8eBp63qD+nxHBseLw3f6tIY4FFxZe
+         iAH8T1V8TFhAAQikQHTaaeJxGxZ5BtIsWiCkjr3KBwy1y1gmnSADY4PJP0dQ1by0AF3X
+         GmmCx5hKDspNvhRE+BgcQOLlGKCj9cSidIQzo3DUuQkR53E3TQy//7FNmAh/+j52FCSt
+         eOtRQZ1BACUK46sq16D4hM3cqpnWRyeHztuhzja9zBFv2pJv5C1Wl9s/KgVQEHTqus6m
+         Lxpw==
+X-Gm-Message-State: AOJu0Ywcd1gCenbf5XjhS+T/VoDxrgy0UDr8I+RLA3at+E1uhLpkY106
+	sWjb/o3ja+JKeNTFwpkasHc2DyMB7OAKe4By1JBakF4QV+n2J6mrjzDdRAdXrsDxYUm7i6MJzQB
+	SczOdmxAaYw==
+X-Google-Smtp-Source: AGHT+IHaobFhgwK0ONJnsENU/GI2getCTTb5SWhfzHgfWH7B8kIrr5mfFLAfggoiIzIQAjTBpAJzgpLIeSjXMw==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:1209:b0:dc6:9e4a:f950 with SMTP
- id s9-20020a056902120900b00dc69e4af950mr4489487ybu.3.1708513177138; Wed, 21
- Feb 2024 02:59:37 -0800 (PST)
-Date: Wed, 21 Feb 2024 10:59:14 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1001:b0:dcc:79ab:e522 with SMTP
+ id w1-20020a056902100100b00dcc79abe522mr731229ybt.11.1708513178881; Wed, 21
+ Feb 2024 02:59:38 -0800 (PST)
+Date: Wed, 21 Feb 2024 10:59:15 +0000
 In-Reply-To: <20240221105915.829140-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240221105915.829140-1-edumazet@google.com>
 X-Mailer: git-send-email 2.44.0.rc0.258.g7320e95886-goog
-Message-ID: <20240221105915.829140-13-edumazet@google.com>
-Subject: [PATCH net-next 12/13] rtnetlink: make rtnl_fill_link_ifmap() RCU ready
+Message-ID: <20240221105915.829140-14-edumazet@google.com>
+Subject: [PATCH net-next 13/13] rtnetlink: provide RCU protection to rtnl_fill_prop_list()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -82,78 +82,51 @@ Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Use READ_ONCE() to read the following device fields:
+We want to be able to run rtnl_fill_ifinfo() under RCU protection
+instead of RTNL in the future.
 
-	dev->mem_start
-	dev->mem_end
-	dev->base_addr
-	dev->irq
-	dev->dma
-	dev->if_port
-
-Provide IFLA_MAP attribute only if at least one of these fields
-is not zero. This saves some space in the output skb for most devices.
+dev->name_node items are already rcu protected.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/core/rtnetlink.c | 26 ++++++++++++++------------
- 1 file changed, 14 insertions(+), 12 deletions(-)
+ net/core/rtnetlink.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
 diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index 1b26dfa5668d22fb2e30ceefbf143e98df13ae29..b91ec216c593aaebf97ea69aa0d2d265ab61c098 100644
+index b91ec216c593aaebf97ea69aa0d2d265ab61c098..59b64febb244b51969651bb37740a799376ad35f 100644
 --- a/net/core/rtnetlink.c
 +++ b/net/core/rtnetlink.c
-@@ -1455,19 +1455,21 @@ static noinline_for_stack int rtnl_fill_vf(struct sk_buff *skb,
- 	return 0;
+@@ -1700,7 +1700,7 @@ static int rtnl_fill_alt_ifnames(struct sk_buff *skb,
+ 	struct netdev_name_node *name_node;
+ 	int count = 0;
+ 
+-	list_for_each_entry(name_node, &dev->name_node->list, list) {
++	list_for_each_entry_rcu(name_node, &dev->name_node->list, list) {
+ 		if (nla_put_string(skb, IFLA_ALT_IFNAME, name_node->name))
+ 			return -EMSGSIZE;
+ 		count++;
+@@ -1708,6 +1708,7 @@ static int rtnl_fill_alt_ifnames(struct sk_buff *skb,
+ 	return count;
  }
  
--static int rtnl_fill_link_ifmap(struct sk_buff *skb, struct net_device *dev)
-+static int rtnl_fill_link_ifmap(struct sk_buff *skb,
-+				const struct net_device *dev)
++/* RCU protected. */
+ static int rtnl_fill_prop_list(struct sk_buff *skb,
+ 			       const struct net_device *dev)
  {
- 	struct rtnl_link_ifmap map;
- 
- 	memset(&map, 0, sizeof(map));
--	map.mem_start   = dev->mem_start;
--	map.mem_end     = dev->mem_end;
--	map.base_addr   = dev->base_addr;
--	map.irq         = dev->irq;
--	map.dma         = dev->dma;
--	map.port        = dev->if_port;
--
--	if (nla_put_64bit(skb, IFLA_MAP, sizeof(map), &map, IFLA_PAD))
-+	map.mem_start = READ_ONCE(dev->mem_start);
-+	map.mem_end   = READ_ONCE(dev->mem_end);
-+	map.base_addr = READ_ONCE(dev->base_addr);
-+	map.irq       = READ_ONCE(dev->irq);
-+	map.dma       = READ_ONCE(dev->dma);
-+	map.port      = READ_ONCE(dev->if_port);
-+	/* Only report non zero information. */
-+	if (memchr_inv(&map, 0, sizeof(map)) &&
-+	    nla_put_64bit(skb, IFLA_MAP, sizeof(map), &map, IFLA_PAD))
- 		return -EMSGSIZE;
- 
- 	return 0;
-@@ -1875,9 +1877,6 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb,
- 			goto nla_put_failure;
- 	}
- 
--	if (rtnl_fill_link_ifmap(skb, dev))
--		goto nla_put_failure;
--
- 	if (dev->addr_len) {
- 		if (nla_put(skb, IFLA_ADDRESS, dev->addr_len, dev->dev_addr) ||
- 		    nla_put(skb, IFLA_BROADCAST, dev->addr_len, dev->broadcast))
-@@ -1927,6 +1926,9 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb,
- 	rcu_read_lock();
- 	if (rtnl_fill_link_af(skb, dev, ext_filter_mask))
+@@ -1928,11 +1929,9 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb,
  		goto nla_put_failure_rcu;
-+	if (rtnl_fill_link_ifmap(skb, dev))
-+		goto nla_put_failure_rcu;
-+
- 	rcu_read_unlock();
- 
+ 	if (rtnl_fill_link_ifmap(skb, dev))
+ 		goto nla_put_failure_rcu;
+-
+-	rcu_read_unlock();
+-
  	if (rtnl_fill_prop_list(skb, dev))
+-		goto nla_put_failure;
++		goto nla_put_failure_rcu;
++	rcu_read_unlock();
+ 
+ 	if (dev->dev.parent &&
+ 	    nla_put_string(skb, IFLA_PARENT_DEV_NAME,
 -- 
 2.44.0.rc0.258.g7320e95886-goog
 
