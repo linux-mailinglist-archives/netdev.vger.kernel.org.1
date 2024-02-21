@@ -1,172 +1,163 @@
-Return-Path: <netdev+bounces-73726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B225385E08F
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 16:08:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DA5985E0B0
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 16:13:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37096B21AC2
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 15:08:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A18B31C21E2A
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 15:13:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D80B180634;
-	Wed, 21 Feb 2024 15:06:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD41A7FBC8;
+	Wed, 21 Feb 2024 15:12:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="npwKnKWw"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02A438003D
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 15:06:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9964B7BB10
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 15:12:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708528017; cv=none; b=sQfLweI/2FW8XX3zG57sGzV19LvLBjALBpgrgQdwofLXlsSGmYMlSbs8FdABfk2Up2Z2UmPJCBvB+rVnk/VDASBAOtiAta24KNJPd3rMJKXhnY0njuyIhPX0e5EAllzBkLd6mIeAVaIh4saGLGl/t6d6q1LOPyC9CfZ0huhD0Qo=
+	t=1708528358; cv=none; b=tHd2VxMYchQdPheFB0Q5/1GIgJPnzlQ+t+wJsjIOfH/VW1RdVbzJvsNXTIJSnx6+2BaBuzOQ+aW6I7AwKTyONXzbbag11lfuj7JhKQfaw7Hr44bvOQaVULawiW23vD8+RwMuSntoe7kz0nhuK6m0K6f0HPba99CcRv4LPCBwM38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708528017; c=relaxed/simple;
-	bh=VKs5SC9Um/6jmiJHZEARbnapbryfD+Cwve6zqW4sFCw=;
+	s=arc-20240116; t=1708528358; c=relaxed/simple;
+	bh=TurS9elRInFmzV749W25UWwE5TG1K0gljLIxURsNYT8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GzAvrDJw7kfaEbcT8yN4/rurokUorTqYTJFSrqaVCIOn9K3J8Ip4n4lv4G24k2K8z9JQQ1kuIG8K2SCGfoM/Do7zYQaDYZ5Lx5mpB1wwg8z4L4VK175Db9swoglJnwTaaLUJU96NmBHyeRfm/QRL62YwCgMTzlG4BPKmfTQdFAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rcoB2-0005mi-2V; Wed, 21 Feb 2024 16:06:28 +0100
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rcoAz-0023lz-EZ; Wed, 21 Feb 2024 16:06:25 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rcoAz-001Ke2-15;
-	Wed, 21 Feb 2024 16:06:25 +0100
-Date: Wed, 21 Feb 2024 16:06:25 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Rob Herring <robh@kernel.org>
-Cc: Kory Maincent <kory.maincent@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Mark Brown <broonie@kernel.org>,
-	Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
-	Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v4 14/17] dt-bindings: net: pse-pd: Add bindings
- for PD692x0 PSE controller
-Message-ID: <ZdYRccm7-TXcRp_v@pengutronix.de>
-References: <20240215-feature_poe-v4-0-35bb4c23266c@bootlin.com>
- <20240215-feature_poe-v4-14-35bb4c23266c@bootlin.com>
- <ZdCjJcPbbBGYVtuo@pengutronix.de>
- <20240221144135.GB2779189-robh@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=rVlbfWQUbZuGQmxo2ZekQ0/YrqdyvuIs40R95TQZC773q0L7u8fAfTNnaKWv3F7CqjaLHHwVGXnZwuZa7y1g7rTQUEdo2KakBB062ppG7OOH2FA3N/BSlks4Y9/sB5NHSPkEcd+nC04+JEcX2QG2ehnOLyq464Oz1cGpGiKi+cQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=npwKnKWw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5360AC433F1;
+	Wed, 21 Feb 2024 15:12:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708528358;
+	bh=TurS9elRInFmzV749W25UWwE5TG1K0gljLIxURsNYT8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=npwKnKWwHd43xMxB46q12xS7o0STS38bB9rXuxFTYzy9Rc/xEKOQun+BMqR+TBWun
+	 dQEXlo1ITTGGO7K7Ps+7Tpbm1NnRI6rEu5QQPwAxmTnBiFPYVRXwfbqCZyGR+byUqs
+	 YzNNHyhPJVsRYNGXFLgrGIBIk76bkIhmnUiOvTlFVMyDHJ+VK0HGpynwvxIQn+2ZWP
+	 hEsAowr/348ZiYUnJB2p5pF4JO7kCc5yQtYSr7BLsfEGWMXNyNn39kuP4x7QgN4obM
+	 wkKwzqCTJmViaPnQ3nIrMVCqWF83xbVKVmuwUyhy+MQ+rscZ+mXp5i7wo3MvPQrsoK
+	 cqYcXWZetx2fA==
+Date: Wed, 21 Feb 2024 15:12:35 +0000
+From: Simon Horman <horms@kernel.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org,
+	syzbot+bfde3bef047a81b8fde6@syzkaller.appspotmail.com
+Subject: Re: [PATCH net v2] net: ip_tunnel: prevent perpetual headroom growth
+Message-ID: <20240221151235.GB722610@kernel.org>
+References: <20240220135606.4939-1-fw@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240221144135.GB2779189-robh@kernel.org>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20240220135606.4939-1-fw@strlen.de>
 
-On Wed, Feb 21, 2024 at 07:41:35AM -0700, Rob Herring wrote:
-> On Sat, Feb 17, 2024 at 01:14:29PM +0100, Oleksij Rempel wrote:
-> > On Thu, Feb 15, 2024 at 05:02:55PM +0100, Kory Maincent wrote:
-> > > Add the PD692x0 I2C Power Sourcing Equipment controller device tree
-> > > bindings documentation.
-> > > 
-> > > This patch is sponsored by Dent Project <dentproject@linuxfoundation.org>.
-> > > 
-> > > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> > > ---
-> > ...
-> > > +        pse_pis {
-> > > +          #address-cells = <1>;
-> > > +          #size-cells = <0>;
-> > > +
-> > > +          pse_pi0: pse_pi@0 {
-> > > +            reg = <0>;
-> > > +            #pse-cells = <0>;
-> > > +            pairset-names = "alternative-a", "alternative-b";
-> > > +            pairsets = <&phys0>, <&phys1>;
-> > > +          };
-> > > +          pse_pi1: pse_pi@1 {
-> > > +            reg = <1>;
-> > > +            #pse-cells = <0>;
-> > > +            pairset-names = "alternative-a";
-> > > +            pairsets = <&phys2>;
-> > 
-> > According to latest discussions, PSE PI nodes will need some
-> > additional, board specific, information:
-> > - this controller do not implements polarity switching, we need to know
-> >   what polarity is implemented on this board. The 802.3 spec provide not
-> >   really consistent names for polarity configurations:
-> >   - Alternative A MDI-X
-> >   - Alternative A MDI
-> >   - Alternative B X
-> >   - Alternative B S
-> >   The board may implement one of polarity configurations per alternative
-> >   or have additional helpers to switch them without using PSE
-> >   controller.
-> >   Even if specification explicitly say:
-> >   "The PD shall be implemented to be insensitive to the polarity of the power
-> >    supply and shall be able to operate per the PD Mode A column and the PD
-> >    Mode B column in Table 33–13"
-> >   it is possible to find reports like this:
-> >   https://community.ui.com/questions/M5-cant-take-reversed-power-polarity-/d834d9a8-579d-4f08-80b1-623806cc5070
-> > 
-> >   Probably this kind of property is a good fit:
-> >   polarity-supported = "MDI-X", "MDI", "X", "S";
+On Tue, Feb 20, 2024 at 02:56:02PM +0100, Florian Westphal wrote:
+> syzkaller triggered following kasan splat:
+> BUG: KASAN: use-after-free in __skb_flow_dissect+0x19d1/0x7a50 net/core/flow_dissector.c:1170
+> Read of size 1 at addr ffff88812fb4000e by task syz-executor183/5191
+> [..]
+>  kasan_report+0xda/0x110 mm/kasan/report.c:588
+>  __skb_flow_dissect+0x19d1/0x7a50 net/core/flow_dissector.c:1170
+>  skb_flow_dissect_flow_keys include/linux/skbuff.h:1514 [inline]
+>  ___skb_get_hash net/core/flow_dissector.c:1791 [inline]
+>  __skb_get_hash+0xc7/0x540 net/core/flow_dissector.c:1856
+>  skb_get_hash include/linux/skbuff.h:1556 [inline]
+>  ip_tunnel_xmit+0x1855/0x33c0 net/ipv4/ip_tunnel.c:748
+>  ipip_tunnel_xmit+0x3cc/0x4e0 net/ipv4/ipip.c:308
+>  __netdev_start_xmit include/linux/netdevice.h:4940 [inline]
+>  netdev_start_xmit include/linux/netdevice.h:4954 [inline]
+>  xmit_one net/core/dev.c:3548 [inline]
+>  dev_hard_start_xmit+0x13d/0x6d0 net/core/dev.c:3564
+>  __dev_queue_xmit+0x7c1/0x3d60 net/core/dev.c:4349
+>  dev_queue_xmit include/linux/netdevice.h:3134 [inline]
+>  neigh_connected_output+0x42c/0x5d0 net/core/neighbour.c:1592
+>  ...
+>  ip_finish_output2+0x833/0x2550 net/ipv4/ip_output.c:235
+>  ip_finish_output+0x31/0x310 net/ipv4/ip_output.c:323
+>  ..
+>  iptunnel_xmit+0x5b4/0x9b0 net/ipv4/ip_tunnel_core.c:82
+>  ip_tunnel_xmit+0x1dbc/0x33c0 net/ipv4/ip_tunnel.c:831
+>  ipgre_xmit+0x4a1/0x980 net/ipv4/ip_gre.c:665
+>  __netdev_start_xmit include/linux/netdevice.h:4940 [inline]
+>  netdev_start_xmit include/linux/netdevice.h:4954 [inline]
+>  xmit_one net/core/dev.c:3548 [inline]
+>  dev_hard_start_xmit+0x13d/0x6d0 net/core/dev.c:3564
+>  ...
 > 
-> Where does that live? Looks like a property of the consumers defined in 
-> the provider. Generally, that's not the right way for DT. 
+> The splat occurs because skb->data points past skb->head allocated area.
+> This is because neigh layer does:
+>   __skb_pull(skb, skb_network_offset(skb));
+> 
+> ... but skb_network_offset() returns a negative offset and __skb_pull()
+> arg is unsigned.  IOW, we skb->data gets "adjusted" by a huge value.
+> 
+> The negative value is returned because skb->head and skb->data distance is
+> more than 64k and skb->network_header (u16) has wrapped around.
+> 
+> The bug is in the ip_tunnel infrastructure, which can cause
+> dev->needed_headroom to increment ad infinitum.
+> 
+> The syzkaller reproducer consists of packets getting routed via a gre
+> tunnel, and route of gre encapsulated packets pointing at another (ipip)
+> tunnel.  The ipip encapsulation finds gre0 as next output device.
+> 
+> This results in the following pattern:
+> 
+> 1). First packet is to be sent out via gre0.
+> Route lookup found an output device, ipip0.
+> 
+> 2).
+> ip_tunnel_xmit for gre0 bumps gre0->needed_headroom based on the future
+> output device, rt.dev->needed_headroom (ipip0).
+> 
+> 3).
+> ip output / start_xmit moves skb on to ipip0. which runs the same
+> code path again (xmit recursion).
+> 
+> 4).
+> Routing step for the post-gre0-encap packet finds gre0 as output device
+> to use for ipip0 encapsulated packet.
+> 
+> tunl0->needed_headroom is then incremented based on the (already bumped)
+> gre0 device headroom.
+> 
+> This repeats for every future packet:
+> 
+> gre0->needed_headroom gets inflated because previous packets' ipip0 step
+> incremented rt->dev (gre0) headroom, and ipip0 incremented because gre0
+> needed_headroom was increased.
+> 
+> For each subsequent packet, gre/ipip0->needed_headroom grows until
+> post-expand-head reallocations result in a skb->head/data distance of
+> more than 64k.
+> 
+> Once that happens, skb->network_header (u16) wraps around when
+> pskb_expand_head tries to make sure that skb_network_offset() is unchanged
+> after the headroom expansion/reallocation.
+> 
+> After this skb_network_offset(skb) returns a different (and negative)
+> result post headroom expansion.
+> 
+> The next trip to neigh layer (or anything else that would __skb_pull the
+> network header) makes skb->data point to a memory location outside
+> skb->head area.
+> 
+> v2: Cap the needed_headroom update to an arbitarily chosen upperlimit to
+> prevent perpetual increase instead of dropping the headroom increment
+> completely.
+> 
+> Reported-and-tested-by: syzbot+bfde3bef047a81b8fde6@syzkaller.appspotmail.com
+> Closes: https://groups.google.com/g/syzkaller-bugs/c/fL9G6GtWskY/m/VKk_PR5FBAAJ
+> Fixes: 243aad830e8a ("ip_gre: include route header_len in max_headroom calculation")
+> Signed-off-by: Florian Westphal <fw@strlen.de>
 
-This is property of PSE PI (Power Interface)
-
-                                             Ethernet PHY --\
-PSE (provider) ----> PSE PI (consumer of multiple PSE's) ----> Physial port
-
-
-PSE - provides power lines.
-PSE PI - switches (or not) power lines in different configurations. This
-is different part of the board/system. PSE PI can have combination or
-one of following configurations: "MDI-X", "MDI", "X", "S";
-This is not something what PSE actually do. PSE PI and PSE are described
-in IEEE802.3 specification.
-
-> I'll say it 
-> again, I think you should be expanding #pse-cells (>1), not getting rid 
-> of them (==0).
-
-Did you took time to read my last explanation? Sorry for making it long
-description, this topic is a bit complex.
-
-Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Reviewed-by: Simon Horman <horms@kernel.org>
 
