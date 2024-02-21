@@ -1,163 +1,203 @@
-Return-Path: <netdev+bounces-73727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DA5985E0B0
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 16:13:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C31E185E0BD
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 16:16:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A18B31C21E2A
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 15:13:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E069D1C21951
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 15:16:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD41A7FBC8;
-	Wed, 21 Feb 2024 15:12:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00C5980028;
+	Wed, 21 Feb 2024 15:16:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="npwKnKWw"
+	dkim=pass (2048-bit key) header.d=naccy.de header.i=@naccy.de header.b="WDYofK1A";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="RwI96EHB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from wflow7-smtp.messagingengine.com (wflow7-smtp.messagingengine.com [64.147.123.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9964B7BB10
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 15:12:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 567FF7BB01
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 15:16:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708528358; cv=none; b=tHd2VxMYchQdPheFB0Q5/1GIgJPnzlQ+t+wJsjIOfH/VW1RdVbzJvsNXTIJSnx6+2BaBuzOQ+aW6I7AwKTyONXzbbag11lfuj7JhKQfaw7Hr44bvOQaVULawiW23vD8+RwMuSntoe7kz0nhuK6m0K6f0HPba99CcRv4LPCBwM38=
+	t=1708528597; cv=none; b=HguKGzoPKn0+1tlXI8zVINg6w1vO10ZJEjldpJXmkw4IoR8WRp/61OOe6feV5wiqSWOHgjbdC2IBmWNX3OegdhW8w7Br+Uy/KL4mDq5h0IAL2J15GP3fw0tikcGOdir5reiIwdA466F0xNnXVK6DYJ4p+S3nA7YumGTYSlgxDuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708528358; c=relaxed/simple;
-	bh=TurS9elRInFmzV749W25UWwE5TG1K0gljLIxURsNYT8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rVlbfWQUbZuGQmxo2ZekQ0/YrqdyvuIs40R95TQZC773q0L7u8fAfTNnaKWv3F7CqjaLHHwVGXnZwuZa7y1g7rTQUEdo2KakBB062ppG7OOH2FA3N/BSlks4Y9/sB5NHSPkEcd+nC04+JEcX2QG2ehnOLyq464Oz1cGpGiKi+cQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=npwKnKWw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5360AC433F1;
-	Wed, 21 Feb 2024 15:12:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708528358;
-	bh=TurS9elRInFmzV749W25UWwE5TG1K0gljLIxURsNYT8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=npwKnKWwHd43xMxB46q12xS7o0STS38bB9rXuxFTYzy9Rc/xEKOQun+BMqR+TBWun
-	 dQEXlo1ITTGGO7K7Ps+7Tpbm1NnRI6rEu5QQPwAxmTnBiFPYVRXwfbqCZyGR+byUqs
-	 YzNNHyhPJVsRYNGXFLgrGIBIk76bkIhmnUiOvTlFVMyDHJ+VK0HGpynwvxIQn+2ZWP
-	 hEsAowr/348ZiYUnJB2p5pF4JO7kCc5yQtYSr7BLsfEGWMXNyNn39kuP4x7QgN4obM
-	 wkKwzqCTJmViaPnQ3nIrMVCqWF83xbVKVmuwUyhy+MQ+rscZ+mXp5i7wo3MvPQrsoK
-	 cqYcXWZetx2fA==
-Date: Wed, 21 Feb 2024 15:12:35 +0000
-From: Simon Horman <horms@kernel.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org,
-	syzbot+bfde3bef047a81b8fde6@syzkaller.appspotmail.com
-Subject: Re: [PATCH net v2] net: ip_tunnel: prevent perpetual headroom growth
-Message-ID: <20240221151235.GB722610@kernel.org>
-References: <20240220135606.4939-1-fw@strlen.de>
+	s=arc-20240116; t=1708528597; c=relaxed/simple;
+	bh=sxGL5WM3JZI8i3sLLcDoNXJ/ieo+oveYBplS55pU8D4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=o1RLZNK6auWnT33YUhkVK7RevrQUvYLLqGKgvRzGQP8q1usz5mvehsT376H9HcaYVvwKZO4A7V6XXIj8lE/o+YK/ctOvvAzqbwaHm/i9ia0lJISwGGPeAn9BGx2aJQaijdvhq5nqGoQoRZk13WvC4zh1ucsxNcwptMPJnwmCIG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=naccy.de; spf=pass smtp.mailfrom=naccy.de; dkim=pass (2048-bit key) header.d=naccy.de header.i=@naccy.de header.b=WDYofK1A; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=RwI96EHB; arc=none smtp.client-ip=64.147.123.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=naccy.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=naccy.de
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+	by mailflow.west.internal (Postfix) with ESMTP id 763692CC02C4;
+	Wed, 21 Feb 2024 10:16:32 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute4.internal (MEProxy); Wed, 21 Feb 2024 10:16:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=naccy.de; h=cc
+	:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm2; t=1708528591; x=1708532191; bh=8Zlrvc+guY3yLzJcN2KR1
+	Bz3CRNwoN3738UVPHkwXa4=; b=WDYofK1AXnUvwx9A/reX3Y1N1q6StDVhm4e0U
+	z5WrO/xvKCe1v70hKpQfuwLumB9pWBnjVDaIq3qo5ULMV+JzhGqMPu6+0Vd0sfzU
+	0TBQu2Z7d2JUSvqI5XFbyRcdHIj9jXSO0+R4nGSCh4q2sfklFwZnpeEU7+Wa+f1C
+	k0Ztc2SFcQTtZ3fSLE3GHa2agoMowLN68y7IwD7my4NZuIRQIN3UccFA5JE4PyAB
+	KzLud5xaLa5+etpWQJx0x1GxgY76gM5yfsXaQs0Mzzoo4PyemzQHs1Cqe/oa6YJL
+	y6NQJ4015igLy0kNtTrD8S0IF1R2Z5J8riWUyV8QfcXrXy8kA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm1; t=1708528591; x=1708532191; bh=8Zlrvc+guY3yLzJcN2KR1Bz3CRNw
+	oN3738UVPHkwXa4=; b=RwI96EHBjBDEIrQUtNdfkh2MnsxR2OPBohqo5OVCUcxM
+	R97x+yxSKzhOAwjPe7Vg8H6Zl5PJqVGSGQnKgtwWa9Np0Z9GW3YuuqXJZGcSZmF5
+	EAEHZEQ6ZfGO5fejG10zP5f8Py5hE5TRLbNJVVk/cVsXIavT0u1LNRbS9z4gnDgn
+	tH48nglVpDHMl3OCSJYNAG8Bkcv0jP72dqullsFGKJiiwVKyzE4XidGe3+vJ6bpx
+	/ss88FSdW6ywWB9CrbHR4Le2TvG8HrqKr9E/5+HpIAWgW+Q6vqmhj5qkWApacyIP
+	Av+3AytijN1Uug7rg8O1y0RS02lBocy7cjOcHts0YQ==
+X-ME-Sender: <xms:zxPWZd9QtPETzs3eb91AGo8q8Fu-Q8o-65kcZjnyQ1OkxbLrkF9yJQ>
+    <xme:zxPWZRvl-CG3PtbvkZgwWVjfX2cH9F05LFEw9VNaOVp1lraFOZ61T09sPHoAVgJgO
+    u9p58fLwF-tLM-CUFE>
+X-ME-Received: <xmr:zxPWZbAmFKtgUX4xBw4lAvLkRXGf3NTBBmKeIjlHd8hnhlMmeA9zx7Mo0-q27fMi33ZMcjncq7QD3A3Am_dGle8hh3Jpm4QTgrHXm-gADw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrfedvgdejgecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpefsuhgvnhhtihhn
+    ucffvghslhgrnhguvghsuceoqhguvgesnhgrtggthidruggvqeenucggtffrrghtthgvrh
+    hnpefhffeiiedvieehgeeljedtueeijeelgfffjeefheehhfehffeifeegudfhheeihfen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehquggvse
+    hnrggttgihrdguvg
+X-ME-Proxy: <xmx:zxPWZRcFeoHzG4x1v-6ml1rFIRzzzzrvdUWGg0L8SOayVfXd7Ty8uQ>
+    <xmx:zxPWZSOZ_qBYugwIqybtnh187ezQdIJSnfnF-suYA8-z79CadLVbWQ>
+    <xmx:zxPWZTlCJ1ExAAhO5YjiX_uthw2CiZYi4FfDTGWshMVHIbJfqSURIg>
+    <xmx:zxPWZeCr47c-rg3CwbS5THdSX3dDN6jPP4sdYcePoyhm3FP8-Gx8LMweyiiBzNPb>
+Feedback-ID: i14194934:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 21 Feb 2024 10:16:30 -0500 (EST)
+From: Quentin Deslandes <qde@naccy.de>
+To: netdev@vger.kernel.org
+Cc: David Ahern <dsahern@gmail.com>,
+	Martin KaFai Lau <martin.lau@kernel.org>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	kernel-team@meta.com,
+	Matthieu Baerts <matttbe@kernel.org>,
+	Quentin Deslandes <qde@naccy.de>
+Subject: [PATCH iproute2 v9 0/3] ss: pretty-printing BPF socket-local storage
+Date: Wed, 21 Feb 2024 16:16:18 +0100
+Message-ID: <20240221151621.166623-1-qde@naccy.de>
+X-Mailer: git-send-email 2.43.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240220135606.4939-1-fw@strlen.de>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Feb 20, 2024 at 02:56:02PM +0100, Florian Westphal wrote:
-> syzkaller triggered following kasan splat:
-> BUG: KASAN: use-after-free in __skb_flow_dissect+0x19d1/0x7a50 net/core/flow_dissector.c:1170
-> Read of size 1 at addr ffff88812fb4000e by task syz-executor183/5191
-> [..]
->  kasan_report+0xda/0x110 mm/kasan/report.c:588
->  __skb_flow_dissect+0x19d1/0x7a50 net/core/flow_dissector.c:1170
->  skb_flow_dissect_flow_keys include/linux/skbuff.h:1514 [inline]
->  ___skb_get_hash net/core/flow_dissector.c:1791 [inline]
->  __skb_get_hash+0xc7/0x540 net/core/flow_dissector.c:1856
->  skb_get_hash include/linux/skbuff.h:1556 [inline]
->  ip_tunnel_xmit+0x1855/0x33c0 net/ipv4/ip_tunnel.c:748
->  ipip_tunnel_xmit+0x3cc/0x4e0 net/ipv4/ipip.c:308
->  __netdev_start_xmit include/linux/netdevice.h:4940 [inline]
->  netdev_start_xmit include/linux/netdevice.h:4954 [inline]
->  xmit_one net/core/dev.c:3548 [inline]
->  dev_hard_start_xmit+0x13d/0x6d0 net/core/dev.c:3564
->  __dev_queue_xmit+0x7c1/0x3d60 net/core/dev.c:4349
->  dev_queue_xmit include/linux/netdevice.h:3134 [inline]
->  neigh_connected_output+0x42c/0x5d0 net/core/neighbour.c:1592
->  ...
->  ip_finish_output2+0x833/0x2550 net/ipv4/ip_output.c:235
->  ip_finish_output+0x31/0x310 net/ipv4/ip_output.c:323
->  ..
->  iptunnel_xmit+0x5b4/0x9b0 net/ipv4/ip_tunnel_core.c:82
->  ip_tunnel_xmit+0x1dbc/0x33c0 net/ipv4/ip_tunnel.c:831
->  ipgre_xmit+0x4a1/0x980 net/ipv4/ip_gre.c:665
->  __netdev_start_xmit include/linux/netdevice.h:4940 [inline]
->  netdev_start_xmit include/linux/netdevice.h:4954 [inline]
->  xmit_one net/core/dev.c:3548 [inline]
->  dev_hard_start_xmit+0x13d/0x6d0 net/core/dev.c:3564
->  ...
-> 
-> The splat occurs because skb->data points past skb->head allocated area.
-> This is because neigh layer does:
->   __skb_pull(skb, skb_network_offset(skb));
-> 
-> ... but skb_network_offset() returns a negative offset and __skb_pull()
-> arg is unsigned.  IOW, we skb->data gets "adjusted" by a huge value.
-> 
-> The negative value is returned because skb->head and skb->data distance is
-> more than 64k and skb->network_header (u16) has wrapped around.
-> 
-> The bug is in the ip_tunnel infrastructure, which can cause
-> dev->needed_headroom to increment ad infinitum.
-> 
-> The syzkaller reproducer consists of packets getting routed via a gre
-> tunnel, and route of gre encapsulated packets pointing at another (ipip)
-> tunnel.  The ipip encapsulation finds gre0 as next output device.
-> 
-> This results in the following pattern:
-> 
-> 1). First packet is to be sent out via gre0.
-> Route lookup found an output device, ipip0.
-> 
-> 2).
-> ip_tunnel_xmit for gre0 bumps gre0->needed_headroom based on the future
-> output device, rt.dev->needed_headroom (ipip0).
-> 
-> 3).
-> ip output / start_xmit moves skb on to ipip0. which runs the same
-> code path again (xmit recursion).
-> 
-> 4).
-> Routing step for the post-gre0-encap packet finds gre0 as output device
-> to use for ipip0 encapsulated packet.
-> 
-> tunl0->needed_headroom is then incremented based on the (already bumped)
-> gre0 device headroom.
-> 
-> This repeats for every future packet:
-> 
-> gre0->needed_headroom gets inflated because previous packets' ipip0 step
-> incremented rt->dev (gre0) headroom, and ipip0 incremented because gre0
-> needed_headroom was increased.
-> 
-> For each subsequent packet, gre/ipip0->needed_headroom grows until
-> post-expand-head reallocations result in a skb->head/data distance of
-> more than 64k.
-> 
-> Once that happens, skb->network_header (u16) wraps around when
-> pskb_expand_head tries to make sure that skb_network_offset() is unchanged
-> after the headroom expansion/reallocation.
-> 
-> After this skb_network_offset(skb) returns a different (and negative)
-> result post headroom expansion.
-> 
-> The next trip to neigh layer (or anything else that would __skb_pull the
-> network header) makes skb->data point to a memory location outside
-> skb->head area.
-> 
-> v2: Cap the needed_headroom update to an arbitarily chosen upperlimit to
-> prevent perpetual increase instead of dropping the headroom increment
-> completely.
-> 
-> Reported-and-tested-by: syzbot+bfde3bef047a81b8fde6@syzkaller.appspotmail.com
-> Closes: https://groups.google.com/g/syzkaller-bugs/c/fL9G6GtWskY/m/VKk_PR5FBAAJ
-> Fixes: 243aad830e8a ("ip_gre: include route header_len in max_headroom calculation")
-> Signed-off-by: Florian Westphal <fw@strlen.de>
+BPF allows programs to store socket-specific data using
+BPF_MAP_TYPE_SK_STORAGE maps. The data is attached to the socket itself,
+and Martin added INET_DIAG_REQ_SK_BPF_STORAGES, so it can be fetched
+using the INET_DIAG mechanism.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Currently, ss doesn't request the socket-local data, this patch aims to
+fix this.
+
+The first patch requests the socket-local data for the requested map ID
+(--bpf-map-id=) or all the maps (--bpf-maps). It then prints the map_id
+in COL_EXT.
+
+Patch #2 uses libbpf and BTF to pretty print the map's content, like
+`bpftool map dump` would do.
+
+Patch #3 updates ss' man page to explain new options.
+
+While I think it makes sense for ss to provide the socket-local storage
+content for the sockets, it's difficult to conciliate the column-based
+output of ss and having readable socket-local data. Hence, the
+socket-local data is printed in a readable fashion over multiple lines
+under its socket statistics, independently of the column-based approach.
+
+Here is an example of ss' output with --bpf-maps:
+[...]
+ESTAB                  340116             0 [...]
+    map_id: 114 [
+        (struct my_sk_storage){
+            .field_hh = (char)3,
+            (union){
+                .a = (int)17,
+                .b = (int)17,
+            },
+        }
+    ]
+
+Changed this series to an RFC as the merging window for net-next is
+closed.
+
+Changes from v8:
+* Remove usage of libbpf_bpf_map_type_str() which requires libbpf-1.0+
+  and provide very little added value (David).
+* Use ENABLE_BPF_SKSTORAGE_SUPPORT to gate the BPF socket-local storage
+  support, instead of HAVE_LIBBPF. iproute2 depends on libbpf-0.1, but
+  this change needs libbpf-0.5+. If the requirements are not met, ss can
+  still be compiled and used without BPF socket-local storage support, but
+  a warning will be printed at compile time.
+Changes from v7:
+* Fix comment format and checkpatch warnings (Stephen, David).
+* Replaced Co-authored-by with Co-developed-by + Signed-off-by for
+  Martin's contribution on patch #1 to follow checkpatch requirements,
+  with Martin's approval.
+Changes from v6:
+* Remove column dedicated to BPF socket-local storage (COL_SKSTOR),
+  use COL_EXT instead (Matthieu).
+Changes from v5:
+* Add support for --oneline when printing socket-local data.
+* Use \t to indent instead of "  " to be consistent with other columns.
+* Removed Martin's ack on patch #2 due to amount of lines changed.
+Changes from v4:
+* Fix return code for 2 calls.
+* Fix issue when inet_show_netlink() retries a request.
+* BPF dump object is created in bpf_map_opts_load_info().
+Changes from v3:
+* Minor refactoring to reduce number of HAVE_LIBBF usage.
+* Update ss' man page.
+* btf_dump structure created to print the socket-local data is cached
+  in bpf_map_opts. Creation of the btf_dump structure is performed if
+  needed, before printing the data.
+* If a map can't be pretty-printed, print its ID and a message instead
+  of skipping it.
+* If show_all=true, send an empty message to the kernel to retrieve all
+  the maps (as Martin suggested).
+Changes from v2:
+* bpf_map_opts_is_enabled is not inline anymore.
+* Add more #ifdef HAVE_LIBBPF to prevent compilation error if
+  libbpf support is disabled.
+* Fix erroneous usage of args instead of _args in vout().
+* Add missing btf__free() and close(fd).
+Changes from v1:
+* Remove the first patch from the series (fix) and submit it separately.
+* Remove double allocation of struct rtattr.
+* Close BPF map FDs on exit.
+* If bpf_map_get_fd_by_id() fails with ENOENT, print an error message
+  and continue to the next map ID.
+* Fix typo in new command line option documentation.
+* Only use bpf_map_info.btf_value_type_id and ignore
+  bpf_map_info.btf_vmlinux_value_type_id (unused for socket-local storage).
+* Use btf_dump__dump_type_data() instead of manually using BTF to
+  pretty-print socket-local storage data. This change alone divides the size
+  of the patch series by 2.
+
+Quentin Deslandes (3):
+  ss: add support for BPF socket-local storage
+  ss: pretty-print BPF socket-local storage
+  ss: update man page to document --bpf-maps and --bpf-map-id=
+
+ man/man8/ss.8 |   6 +
+ misc/ss.c     | 410 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 407 insertions(+), 9 deletions(-)
+
+--
+2.43.1
 
