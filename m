@@ -1,177 +1,134 @@
-Return-Path: <netdev+bounces-73639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FC5885D6C7
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:25:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C6D685D6DC
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:30:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3F25282138
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:25:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14A87282F58
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:30:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 981943FE20;
-	Wed, 21 Feb 2024 11:24:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="rEBzP5gE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CD1945954;
+	Wed, 21 Feb 2024 11:30:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01olkn2049.outbound.protection.outlook.com [40.92.52.49])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68FD40BE6;
-	Wed, 21 Feb 2024 11:24:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.52.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708514698; cv=fail; b=l3au+NkNfSVD9AhCTsvOnD6iQENNlQXm3QcS8P7qxN/X4UQDGg4VKLk4F54aHMz+mgljHiitRku54H6v5qldetup3/EqNDP3ydKprwbaQNqbXzzHDhFjJv4t8hNR7PC8GJrg5eix6Cplo08kpr/N67I14BvJ+KEixej3/6rRxTQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708514698; c=relaxed/simple;
-	bh=s1zCU9hFe6fNBld2Hv30H4O9KkRWu7toirzNoI4pXGA=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Lv3MMXYjV9uNtQNDaT6Rovf7O3ZL3b21yv4q8cUWddMDPnvyRZ9xMOkLC710EPqmtrh2c8rRtr0OjxX3gbH0QZtaN+HyZkykLAIg01PUtciokS0LoxnCNBEK8gXJdCePQnQG6XQbnHJrgoE1+OC1Dtvy+QnRtiTuy0pHoek9LKg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=rEBzP5gE; arc=fail smtp.client-ip=40.92.52.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CHYc18w/GbMebgIo9I5FB2QarYntsRt+gDaZ+ZrvApLGkN5TOnWwQTPBHjn2VSl33SHV8A8LVWkvjEi6ToH3BLXcFGfM+Lm+pkiAmpbEFMQcgnah9Qzepk1GpZtB5v3O6I6Fiy4jSeAZ8ZNF5o28qDmE4bsNReWilAo/JLon+fXafMxPLsmx/pIR/NMsRHOR+AYuDI4J44bmz6Z4km/AEA8GRpYWQdgt+6eSqyKZrBixyMtkshBC3TECAmfKfJgWoNCBJwUp5veeImFEJcnFaaA+nkIRIf7/7iYPFJjMdbj8KiIFAK0r7lLAym5/v+PtBcPjF5TPWn3L4PrcrdWimw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xwf6kiFo3yKo7CQhSIjVxA76NVHf06mErL986OUhM7Y=;
- b=TJTsb3dMERXTw9+RsiAtAv0yJJCssZUGNTB6JAEU4xwMqS+UI4eAJhesvGj2++ycrZPaTQ2E68Fz4twiZk+o5P2HC5zSedLnH45uAdaadhSFf7XJXR/GYRok2W+1DE8fBMOqbaHF2YFga9wj366L1c1b3C4VsQ/zGWMO3ffi5fnUdpMsT1Od0l3Zkvt6EMdEB7R/GE9HbUFvc3QomjMelWatyh4P54Lcqgzy4eLMXbWIB7VzROJHYD/Wpu1ZlS/Skk8VVBqlNLmRTh7d/2Jy+j58zl7nNRg4JuS/KkTiqIEPxOfxF4bs3uY7q5qmIFzVxdwrRSDxwes43aA+bsnZbw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xwf6kiFo3yKo7CQhSIjVxA76NVHf06mErL986OUhM7Y=;
- b=rEBzP5gEKm2awxLPmUZeok3jYUWEvBq6XH2J4+J1I2emD/GnbLeYbgTx5D6/l8gMhZwdeahPudlJISgFr9odtpUpEvXKRh/tWKQq7FiRWqhNLHX2UhIH79Pk/14uScNh0p90fsWXr0Wg3xfu45NoKSNmfc0iTF2YMY0AcVeMWV8cicSqEtkhcIPSxN6z4paULr0sXHMTlrHZeRPowXMYDi3DeuV90TyFl8elf0Xmkoteu8bzVCdt1lxobMqgxuw1W0NChL7kJQegGDZofvZ7pv1xJNWsf8PfS3orjt5R0FT3HsgY4OfBlFWUHt7vR2ry3kgxcSCfzey60yqqnH7YVw==
-Received: from SEZPR06MB6959.apcprd06.prod.outlook.com (2603:1096:101:1ed::14)
- by TYZPR06MB6192.apcprd06.prod.outlook.com (2603:1096:400:332::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.41; Wed, 21 Feb
- 2024 11:24:51 +0000
-Received: from SEZPR06MB6959.apcprd06.prod.outlook.com
- ([fe80::53da:a8a:83cb:b9ad]) by SEZPR06MB6959.apcprd06.prod.outlook.com
- ([fe80::53da:a8a:83cb:b9ad%4]) with mapi id 15.20.7292.036; Wed, 21 Feb 2024
- 11:24:51 +0000
-Message-ID:
- <SEZPR06MB69593804E2F62586EF6841B096572@SEZPR06MB6959.apcprd06.prod.outlook.com>
-Date: Wed, 21 Feb 2024 19:24:44 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 2/6] dt-bindings: net: hisilicon-femac-mdio:
- convert to YAML
-Content-Language: en-US
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
- Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
- <salil.mehta@huawei.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org
-References: <20240220-net-v3-0-b68e5b75e765@outlook.com>
- <20240220-net-v3-2-b68e5b75e765@outlook.com>
- <174b9bf7-fcdb-48e3-a6d6-5d2ea96fce58@linaro.org>
-From: Yang Xiwen <forbidden405@outlook.com>
-In-Reply-To: <174b9bf7-fcdb-48e3-a6d6-5d2ea96fce58@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TMN: [fxUeDnxd+Xf+blW2wxyl3UE5I7R5/ko7lee/nkQvrHXm+gJypEYmuJCPmRKG6st9]
-X-ClientProxiedBy: TYCP301CA0082.JPNP301.PROD.OUTLOOK.COM
- (2603:1096:405:7b::20) To SEZPR06MB6959.apcprd06.prod.outlook.com
- (2603:1096:101:1ed::14)
-X-Microsoft-Original-Message-ID:
- <9db93186-1c20-4d2d-83e6-826839bd38d6@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB703FE5F;
+	Wed, 21 Feb 2024 11:29:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708515007; cv=none; b=eWOSLyzLpJEfGIEaWmNj1XAf1VZMQkd8BXLoRMJSJNwOtBW8EFypUybgQVzf6S4SDfTdKaeZofr4ZX1LVz4galCppLbW2cfYAhtSECjkpEgw4fJVF0mEIvErLknJ+DU/AoCn4G4dMKhSPRPgisX4xodnP7ELBRxytgBxguaOAv0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708515007; c=relaxed/simple;
+	bh=+BHc1OAdUgXjf5xunuA0CoXPKMUSdOst/gul8MZDbwc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Tpqqjj7/QgLrkpZhzx1GhKSJeuMJAXNkJpsqMRjdHCzT2J2GkzO7OhoOA9e2SGQMGElVqPJtWFnb0Nmxo7D0C/ZIyURvR7eVQOdL2crTskUDMiPT6Lflv65rENqW8AatPF3YGHs1zp9obiJyOZA502bQoJWZy2WcRA7qcXQJWNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@breakpoint.cc>)
+	id 1rckn7-0003rh-NT; Wed, 21 Feb 2024 12:29:33 +0100
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	<netfilter-devel@vger.kernel.org>
+Subject: [PATCH net-next 00/12] netfilter updates for net-next
+Date: Wed, 21 Feb 2024 12:26:02 +0100
+Message-ID: <20240221112637.5396-1-fw@strlen.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SEZPR06MB6959:EE_|TYZPR06MB6192:EE_
-X-MS-Office365-Filtering-Correlation-Id: 44aea263-54ff-419d-a179-08dc32cfb87e
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	q3+8M46jYdnfHOtEA0myfmwBwl3r4jZbFbIgHKrxka1AP1KO7zgE0zuI/WIJ7e6orQBEu2j08FQn7aJTPbrEjUnti7/FP6u10x+qXMttMyXbUQltKrRnvFreldsHaue0kGBQwmAYXmcCWrnX/u4kJ0Y05joSukgv08AFF6Hm5iWaZALIAZeYFKFa62uUsC4pIjOI1GhtgunOI+Zab1zaV80h3UlsTQKGiYOZwFyGr/3rBWTp5fW121GHhhrxGbkYpIk6sP7+oZxGeY/y+0+yWBo9YI4ffd76mIJVhln6guOtKf2KLAqImyNGl3muoemqYsDN5FeHR8O7emaIrgZTyujkw7021nuvXIJ9K6Awqyb2/89uVWsLi5Isg0S4nwV6Q1qn8hsSTjUzaWR/xblzFp1Gny+c1GgJ/kx9XcTDWeODSpHZMkS02KZNsv5s7Hy+pz7Ui4MwuPOwgA8lYbRnDhRrgNtouqhfPY+QRlKRiRTcRiMkE+ZJOPlVm3zqc2AvRtyF2uf6TCiPktOALbl4LIBmV3nItlUkzfFT0v9dwa4tyWZxYOZBP9ghEzBuWrn1
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?TVZHZ2w1RkMxTGxTcFY2bnZaQm5HTFgyem9Ocm10VUE2OXFxeGlTTllpdC85?=
- =?utf-8?B?VmNxNWtFSFAvcWtWSWxtVENpemFMak8yWmRIVlRYNEFpZWgzZ2w5eWg3ZkJ1?=
- =?utf-8?B?K24xZEtIWmdka3Q5MkY2RzVMUTRwYUdZWDJjZDYrRWNDVDl2Q1Nkb3NnSWxU?=
- =?utf-8?B?TU9Hazd0ZlNUYURxSWVBa0ovd2NCUFV2TWw5VkwzT3hsdi9QVE5iemxVbm1Q?=
- =?utf-8?B?SmU4YWtPWWJBcXo2Rkp3S1VHZjQ4Q1hEVTFEUUViclcvNmxKazNldUVXOTVC?=
- =?utf-8?B?bVI2SllLbHhsQ01GWXNyVWovZXFLcFNNVjF1bDBJZ0NodzEvUmc0S3BZdTNU?=
- =?utf-8?B?dk9WR3hraDMwam54c1IwTEU3SS9XVVpBUitvSXp1eUV3dlQ4TXdQVWdsWmVy?=
- =?utf-8?B?Rkkza1RJdnI3d3NwKytVajROejNBa25pSEozTm5taGdSeHNRTXhTWGtvWHJZ?=
- =?utf-8?B?WlUyalR3LzZLV0hjZnJWZER0QkF6VFEwRW5ITHE5MzcwV0pxNEVpZjlKQ2dS?=
- =?utf-8?B?dm5WaUlCM2E3RzZrdU92b3Mzbkp0M2RmUldGRTA0d1ZVZWc3OW9LNEk1T0pm?=
- =?utf-8?B?c0FxSy9IekZxeWVZNHlpdUdJdThFcEpqQzUvS3hpUUhHTE90SENGU0JWUGRn?=
- =?utf-8?B?ZjUvOHVPZFdFeWtXcnp6eFgyT0E4WUxJOHpPN3VCVU9rS28yVTl3WnVNakFj?=
- =?utf-8?B?ZnNNalEvODR3T2Vlbndpc0ZqWk1hRHJHQTRkM0hiMFRicWNYT2dXOEZmOGVp?=
- =?utf-8?B?clV2eUZEWjFYVVRiY1FTYUJyTXVwTkZhMndFWkpqaXBoMU12OTlHOUJqb0J5?=
- =?utf-8?B?RkVWbjd3NlVOK2x3Mks3WlBGSmhXNDNmcWNLRVAxa3orazh2OEMrcGdvckdN?=
- =?utf-8?B?SW1iaVpjQ1RJejRlRlhJOW15QkRwcHB2RjU2K0I0cjl3S2UrTENtaVp0MnNJ?=
- =?utf-8?B?U0tuMHFOTXNENWY0VzVsdWx2T2tjRkxwOHU5ZzhraUMwd0NWR25PdkxBZVl0?=
- =?utf-8?B?U0dVYVdKbldDMUJnMmtYWFFoOXBsZVpGeGV0TlVSSlFEZ3grdXZZWEo0elNP?=
- =?utf-8?B?aFFLZjVsclFCRDVzYU5ZNXBpQ1pIdCtWSC9ST3VxK0UvWlJRUm5KWjVrSjlt?=
- =?utf-8?B?TEFZQkVWbGNRZG9ZK0JyajJwQVVFNGQ2bldlc05Sako4Y3B6OWFISVk4cHFw?=
- =?utf-8?B?MTQ0czRBMUxhdmN1OUpzVTl6amkxOXpIQlV1bExUTFp1TzVzVGJ4Wlg2OXVo?=
- =?utf-8?B?YmFNeXJpMmM1NnppK243dCsrejltVXpDSDJmWkdSdWt2Wk1QRG05c3MxTit5?=
- =?utf-8?B?RG9pS210bm5EeHV1MyszT0N2bE9xOEVSWmM2Tmd5TDJhbXl6VXV6Q01SQm41?=
- =?utf-8?B?SnFOaUx5Qk4rZ2xPcTlIVTlMUEN1SWxvVFNTQWt6Q1RPK25ZQU92OWRlcWVx?=
- =?utf-8?B?VHF4blZUcXF0WkdDakIyL244cXFEWFBUMGdtRmFiYUNwbmdSRXVlNWFiejJP?=
- =?utf-8?B?OVlZNFcya0VoREcvUmZRbHZlRnFWZXdvTmF5dCtkZTZJZ3R4aEZqcWJxMEU5?=
- =?utf-8?B?Yi9mOHFYcVdjZFNVbXlZQTdqOVAzckEvNGlJKzN5cS85M3gzMjQ1dWxKM3R3?=
- =?utf-8?B?QUh5ZFJnck9FZzQ0MWh0aUxoLzB2R3RDdlBoMHk5UWxnT21ZTG41UkQ5TURk?=
- =?utf-8?B?clpCbWZ4N2xsWVhzYXNMUklBeERTekpJbTcrTHhnQ3hSNHVMWEErYmtVU2dJ?=
- =?utf-8?Q?19PZzCKCM5+rP7vOaZ31Ru8CNPZUWxtWjE3gdT+?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 44aea263-54ff-419d-a179-08dc32cfb87e
-X-MS-Exchange-CrossTenant-AuthSource: SEZPR06MB6959.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Feb 2024 11:24:51.6171
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR06MB6192
+Content-Transfer-Encoding: 8bit
 
-On 2/21/2024 4:12 PM, Krzysztof Kozlowski wrote:
-> On 19/02/2024 20:57, Yang Xiwen via B4 Relay wrote:
->> From: Yang Xiwen <forbidden405@outlook.com>
->>
->> Also mark the clock optional
-> Why? Your commit msg must provide rationale. Clocks are rarely optional
-> signals, so this looks wrong.
+This pull request contains updates for your *net-next* tree:
 
+1. Prefer KMEM_CACHE() macro to create kmem caches, from Kunwu Chan.
 
-Well. I don't know too much about the hardware either. I think the clock 
-can be either shared with MAC controller or completely non-existent in 
-hardware.
+Patches 2 and 3 consolidate nf_log NULL checks and introduces
+extra boundary checks on family and type to make it clear that no out
+of bounds access will happen.  No in-tree user currently passes such
+values, but thats not clear from looking at the function.
+From Pablo Neira Ayuso.
 
+Patch 4, also from Pablo, gets rid of unneeded conditional in
+nft_osf init function.
 
-But from the driver side, the clock must be stripped from MDIO bus node. 
-The clocks must be controlled entirely within MAC controller driver. Do 
-I need to mention it in this commit too?
+Patch 5, from myself, fixes erroneous Kconfig dependencies that
+came in an earlier net-next pull request. This should get rid
+of the xtables related build failure reports.
 
+Patches 6 to 10 are an update to nftables' concatenated-ranges
+set type to speed up element insertions.  This series also
+compacts a few data structures and cleans up a few oddities such
+as reliance on ZERO_SIZE_PTR when asking to allocate a set with
+no elements. From myself.
 
-Actually I've never seen anything like "MDIO bus clock" in the 
-datasheet. The MDIO bus and MAC controller are activated simultaneously. 
-So I think removing this clock entirely is also acceptable.
+Patches 11 moves the nf_reinject function from the netfilter core
+(vmlinux) into the nfnetlink_queue backend, the only location where
+this is called from. Also from myself.
 
+Patch 12, from Kees Cook, switches xtables' compat layer to use
+unsafe_memcpy because xt_entry_target cannot easily get converted
+to a real flexible array (its UAPI and used inside other structs).
 
->
-> Best regards,
-> Krzysztof
->
+The following changes since commit b0117d136bb9e4a1facb7ce354e0580dde876f6b:
 
--- 
-Regards,
-Yang Xiwen
+  Merge branch 'net-constify-device_type' (2024-02-21 09:45:24 +0000)
 
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git tags/nf-next-24-02-21
+
+for you to fetch changes up to 26f4dac11775a1ca24e2605cb30e828d4dbdea93:
+
+  netfilter: x_tables: Use unsafe_memcpy() for 0-sized destination (2024-02-21 12:03:22 +0100)
+
+----------------------------------------------------------------
+netfilter pr 2024-21-02
+
+----------------------------------------------------------------
+Florian Westphal (7):
+      netfilter: xtables: fix up kconfig dependencies
+      netfilter: nft_set_pipapo: constify lookup fn args where possible
+      netfilter: nft_set_pipapo: do not rely on ZERO_SIZE_PTR
+      netfilter: nft_set_pipapo: shrink data structures
+      netfilter: nft_set_pipapo: speed up bulk element insertions
+      netfilter: nft_set_pipapo: use GFP_KERNEL for insertions
+      netfilter: move nf_reinject into nfnetlink_queue modules
+
+Kees Cook (1):
+      netfilter: x_tables: Use unsafe_memcpy() for 0-sized destination
+
+Kunwu Chan (1):
+      netfilter: expect: Simplify the allocation of slab caches in nf_conntrack_expect_init
+
+Pablo Neira Ayuso (3):
+      netfilter: nf_log: consolidate check for NULL logger in lookup function
+      netfilter: nf_log: validate nf_logger_find_get()
+      netfilter: nft_osf: simplify init path
+
+ include/linux/netfilter.h           |   1 -
+ include/net/netfilter/nf_queue.h    |   1 -
+ net/ipv4/netfilter/Kconfig          |   3 +-
+ net/netfilter/nf_conntrack_expect.c |   4 +-
+ net/netfilter/nf_log.c              |   9 +-
+ net/netfilter/nf_queue.c            | 106 --------------------
+ net/netfilter/nfnetlink_queue.c     | 142 ++++++++++++++++++++++++++
+ net/netfilter/nft_osf.c             |  11 +-
+ net/netfilter/nft_set_pipapo.c      | 193 ++++++++++++++++++++++++++----------
+ net/netfilter/nft_set_pipapo.h      |  37 +++----
+ net/netfilter/nft_set_pipapo_avx2.c |  59 ++++++-----
+ net/netfilter/utils.c               |  37 -------
+ net/netfilter/x_tables.c            |   3 +-
+ 13 files changed, 346 insertions(+), 260 deletions(-)
 
