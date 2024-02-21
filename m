@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-73829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 342C285EBD0
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1BBA85EBD1
 	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 23:30:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E103328364D
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 22:30:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DA121C227DB
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 22:30:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 990EE12AADE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB75712BE9E;
 	Wed, 21 Feb 2024 22:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XwMQgj3u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AaoCCqzN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACDB345C10;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCAE269318;
 	Wed, 21 Feb 2024 22:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708554629; cv=none; b=sEs+tE1BJuGKobY2Y4N8Vx3vtgDcOViMViRCQ6wbjMkvoccn04c5hV4HiQzDu1iiJaUa4zu2zcx+i8ov8uds6sXGxNgiGtKssVlnf/Q2Dd+/ts1lanehrJ713jxqVNrpbALWDWnt32ORJL0HW02m8fqkkgH2DO0NPuMsuc//yqk=
+	t=1708554630; cv=none; b=sAHvN4u4m9hniESHZs88LJuMHiE1athXGzxeSrcneJI1KsZ0q+bhkGi81ecuX8FdjIm0lmYT8eOiliPNFUKKsYuN0BjhPJlm+tQiTxJOlzjb3kNLtaLgd6PgDlvRFU0SU49p+imek8fq1mnkZ+gFgkfVLqV/GjKqZipiK4uagik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708554629; c=relaxed/simple;
-	bh=UGvpYdwhKfNdL4uFNxnChzkqEIgJJ4MA7/7ZqJJmEcU=;
+	s=arc-20240116; t=1708554630; c=relaxed/simple;
+	bh=OT7EOi/ourfNVtCJMunc3Vcywb1aP07ZDVjFhX6VFOI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=aNv4sAvx92dw75ogWQUxSOCn9XjJyyQyVNMathsxdtpSt7qtufRO66C6ZLGxDfCxAJYV11cL87B6eh9qEgQkJC6pLb5Xj2VjGzW4ZiyRW0I0Nge9nf89C2FIcTsTPIuLC5dPvmSOzyVTsSl43nNeJbOZGDdvBQ3/ElnQ8gsrkH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XwMQgj3u; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2CB06C43399;
+	 In-Reply-To:To:Cc; b=Mw+gRrh+mSV5D2Fjc5rorllKgyT9P+7xEsRXkE3dQpN8cbzCqO8qQ+WPLWs4d1OmBQaKff1d3bPt3mdViR76yBoZGm56Vt/BD/BbrmAez9+TBOyayY8rBxp9nogjK01X6JUWA7+es9q67McRJBfRvn0+aGR5QYoPC0YETkncAik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AaoCCqzN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 35E49C433A6;
 	Wed, 21 Feb 2024 22:30:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1708554629;
-	bh=UGvpYdwhKfNdL4uFNxnChzkqEIgJJ4MA7/7ZqJJmEcU=;
+	bh=OT7EOi/ourfNVtCJMunc3Vcywb1aP07ZDVjFhX6VFOI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XwMQgj3ugaoZiaZ+qc/o+3eo932wc6zvFjg0lOlX5fuL7cnZe8mHvc7rSWSwrKvu8
-	 KdbM9OodmU/IlkvNnnB7vNaFciA1/BFplgtA2Iy8bgyq9Nx0/+seKLVAN8rEuloqbh
-	 QvzD8DTRnw5r2w7xJFQXkuZ72sJAYT+ycPjyyEhVx461X+F0MTWlVwb2JkQFIpb1rx
-	 PtDbk0FqhqGJH+hWCV9y0N8ccpYeqR43EkeKXEtI26lwEqi/gPgQOCTI9CVxPo3Hhy
-	 zKU08jw+OYxJKm08Uk1covjJPS71NQJlopE0kUse/+MnjePlgEq+YJY/CMsSv4LlJY
-	 QgCPIywCMfApw==
+	b=AaoCCqzNI/fZmqRVXFGH6nfYvlCKzDu/oi16Ru3I4J3K87KKsb/Gw7iRw3R0/nEd/
+	 GnrE3Cv9EF7HjiOZvQOQr3cBCH/qMiJVNrjeeoXEiqX32VqtUDcHOK2Qdw76MAVLos
+	 FBzGS0BFL7pviE2d2Nie27Gma/lSXFQs/F4BOhfgnYd2J2aZLMgzcbVTeNSdLECyuD
+	 CiTFupC73iF00Hw7hMnj65TYZpvx6DQxIYQIFwB2qC8cHimWGpop1E1/OEMrUluw2M
+	 fLtgQZK9pMhWqlPASUmEhO0vHIt06DXG/Lt4P09SnFjkHZYbQzyx3cy8L7PhwliR+Q
+	 P4Hw1ek4HJPug==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 11C91D84BC0;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1A50BC00446;
 	Wed, 21 Feb 2024 22:30:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,46 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/5] tls: fixes for record type handling with PEEK
+Subject: Re: [PATCH ver.2] gtp: fix use-after-free and null-ptr-deref in
+ gtp_genl_dump_pdp()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170855462906.28356.14505768197240352814.git-patchwork-notify@kernel.org>
+ <170855462910.28356.12191334633977961990.git-patchwork-notify@kernel.org>
 Date: Wed, 21 Feb 2024 22:30:29 +0000
-References: <cover.1708007371.git.sd@queasysnail.net>
-In-Reply-To: <cover.1708007371.git.sd@queasysnail.net>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, borisp@nvidia.com, john.fastabend@gmail.com,
- kuba@kernel.org, davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- shuah@kernel.org, vakul.garg@nxp.com, linux-kselftest@vger.kernel.org
+References: <20240214162733.34214-1-kovalev@altlinux.org>
+In-Reply-To: <20240214162733.34214-1-kovalev@altlinux.org>
+To: None <kovalev@altlinux.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, edumazet@google.com,
+ pablo@netfilter.org, laforge@gnumonks.org, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, nickel@altlinux.org,
+ oficerovas@altlinux.org, dutyrok@altlinux.org, stable@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 15 Feb 2024 17:17:28 +0100 you wrote:
-> There are multiple bugs in tls_sw_recvmsg's handling of record types
-> when MSG_PEEK flag is used, which can lead to incorrectly merging two
-> records:
->  - consecutive non-DATA records shouldn't be merged, even if they're
->    the same type (partly handled by the test at the end of the main
->    loop)
->  - records of the same type (even DATA) shouldn't be merged if one
->    record of a different type comes in between
+On Wed, 14 Feb 2024 19:27:33 +0300 you wrote:
+> From: Vasiliy Kovalev <kovalev@altlinux.org>
+> 
+> The gtp_net_ops pernet operations structure for the subsystem must be
+> registered before registering the generic netlink family.
+> 
+> Syzkaller hit 'general protection fault in gtp_genl_dump_pdp' bug:
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/5] tls: break out of main loop when PEEK gets a non-data record
-    https://git.kernel.org/netdev/net/c/10f41d0710fc
-  - [net,2/5] tls: stop recv() if initial process_rx_list gave us non-DATA
-    https://git.kernel.org/netdev/net/c/fdfbaec5923d
-  - [net,3/5] tls: don't skip over different type records from the rx_list
-    https://git.kernel.org/netdev/net/c/ec823bf3a479
-  - [net,4/5] selftests: tls: add test for merging of same-type control messages
-    https://git.kernel.org/netdev/net/c/7b2a4c2a623a
-  - [net,5/5] selftests: tls: add test for peeking past a record of a different type
-    https://git.kernel.org/netdev/net/c/2bf6172632e1
+  - [ver.2] gtp: fix use-after-free and null-ptr-deref in gtp_genl_dump_pdp()
+    https://git.kernel.org/netdev/net/c/136cfaca2256
 
 You are awesome, thank you!
 -- 
