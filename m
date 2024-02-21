@@ -1,153 +1,152 @@
-Return-Path: <netdev+bounces-73725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46E2C85E074
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 16:04:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AAF585E0B8
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 16:15:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C88C91F24865
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 15:04:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19A48282814
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 15:15:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7399C7FBB9;
-	Wed, 21 Feb 2024 15:04:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B023B7BB10;
+	Wed, 21 Feb 2024 15:15:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZoA6nDhx"
+	dkim=pass (2048-bit key) header.d=softline.com header.i=@softline.com header.b="iJ458szd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail03.softline.ru (mail03.softline.ru [185.31.132.229])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D27E138398;
-	Wed, 21 Feb 2024 15:04:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 085877BB01;
+	Wed, 21 Feb 2024 15:15:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.31.132.229
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708527842; cv=none; b=kaqNQ58dYjH9L1alGNGFAt396VQz7RozFJMg/b2e1gjKeTR3q/LxP5+UGaMx0VEjUl4AxQJyGM4i0XPYauAHXRkgdUZ8Urvq37BE00kcoi59NFhHo2W38wBpoWc0+4zGm1yovHO7TXjOomIN+1Kr3GalrQV4hE0Y2KTBeZZ8h2M=
+	t=1708528532; cv=none; b=GnmKMLtGjNCuLqZt3dqtvYpR8d/1KJtVG1M7UVfQenljH/pNpxEhL5x7CRnG3SiKihdmSZ9niM+a1ZpX7RfaQI8Vq7Bp1UoKHfUkyAOgY8o+QGD/SxP7P976k5OiIzClrNbICv4LZHZDmb2slVWdPpSA66IUSPrdFiPKSmk3rz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708527842; c=relaxed/simple;
-	bh=k0YKRdcXLv7T6Y/xtVvaPhBbS5q+kGmG8nilLb4h+RM=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=bClQcKKRH8aog0h/oGsdcD7YSn/ipVWib7Yowg58HyYNGymE9Xuz+HlMpLfHgp7U/fb+JgHu1EtRGBWhRmNOmqT+ad3zc+/FrvnFL51nIVVj7L2OdOTpKG5M8OzL7yQKUIVEoLWzDVyMP8/hIqBxzd7yTgKebk5B3qI4DtYPyM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZoA6nDhx; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-78725b62cf2so325089185a.1;
-        Wed, 21 Feb 2024 07:04:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708527839; x=1709132639; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8pSFKbDD0hHRKl9KpChoMfKBPYL3gXyV4FEuLeI7tSI=;
-        b=ZoA6nDhxJk2x/4YztFdkWvP9DW1XWqS7yAlH2ffZCbx2lZRvR8O0r9pJqPSmFZfAYf
-         CTCPMk1yOYqfd2qXEpmapnHUYIQAavAiydo/Nz92Z8psuvb/EAXAjf72c76XsfVo4nCi
-         /wXgpnBUivk4vmlorXiCtCnGWejb4pHr4Fv9fvics8RxYb85QYN1z/RU71kTLp6UOdqz
-         C5mlui/IMwNZbD4EYFJAV1UtHQCN/UP7u+wlUoLDhe+I2TnRbZ1U+XpFn388c1ilH+vt
-         EoRwKnsRKVp+qbL9mhz6HmJDcU6bulLGkLYS8ztr+u7k7SiFl5+gkM52eBvWS7UKd7Dz
-         dGvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708527839; x=1709132639;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=8pSFKbDD0hHRKl9KpChoMfKBPYL3gXyV4FEuLeI7tSI=;
-        b=aNLSwGkCyEExsFpwU1bupbCojSrOYhPShxXHefnrSGmBGE9yoXcRvaH6R6Nsh+UM23
-         oFbl/8kxALJkqbwI22msVVSEhJ/Z9RL+d+swMkbdl1pZnTt0ll8IGsk8qWJRI61+YF/8
-         KjT5xgFrwDdxtVeBwNi2slgA4jx68PfHZIiezkapDHx2RBKy9sIamLLACfu3qTh3pLCK
-         /12NC9HGKSsbf21sTDj0TTuup/4eHpmxOqTxDb+Zp69gjIKiSbr/r03R+PWMuuhkTNS1
-         sYXtP/mib98zWdcxL+eosoiLd+qJ1ouh1V2a0dWM1Xd+0Dx+Cw0aZKY7l/iIbq2pSNIL
-         FEkA==
-X-Forwarded-Encrypted: i=1; AJvYcCWXyZ74xd/jkQ8apP6OwM0x3dYNUN1I4nBQZ7kxQUaU+bINC4hDPqnKbA0ihalXqmpx/TahlNKSz6ghWA5r+r475c0QTZqr3CwidQVp
-X-Gm-Message-State: AOJu0YwJArH2LhrDG1SS5l6PUjA0hHYQ86nJgwaa0KI9v15txb6F8V+k
-	06it3YyfAqQv4aXZbTAu819FkRgNRWxQs12EZy7jFfy5jlAl8AvfhHDeNSRv
-X-Google-Smtp-Source: AGHT+IH63gtd8yjx7ZG5d5Ka7XZEN4srWldxBljYBBHyYU3jY3K5r3913jDT7+5S75z4g8aq6t5jsA==
-X-Received: by 2002:a05:620a:c16:b0:787:2275:3aa1 with SMTP id l22-20020a05620a0c1600b0078722753aa1mr18098886qki.10.1708527839421;
-        Wed, 21 Feb 2024 07:03:59 -0800 (PST)
-Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
-        by smtp.gmail.com with ESMTPSA id qs21-20020a05620a395500b00787388490d3sm4369591qkn.89.2024.02.21.07.03.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Feb 2024 07:03:58 -0800 (PST)
-Date: Wed, 21 Feb 2024 10:03:58 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: wangyunjian <wangyunjian@huawei.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- "jasowang@redhat.com" <jasowang@redhat.com>, 
- "kuba@kernel.org" <kuba@kernel.org>, 
- "davem@davemloft.net" <davem@davemloft.net>, 
- Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
- xudingke <xudingke@huawei.com>
-Message-ID: <65d610de7cd07_2824ff29494@willemb.c.googlers.com.notmuch>
-In-Reply-To: <3f175a5ef4e34a0394ae584a0b84523e@huawei.com>
-References: <1708398727-46308-1-git-send-email-wangyunjian@huawei.com>
- <65d4cc4b88e56_23483829431@willemb.c.googlers.com.notmuch>
- <3f175a5ef4e34a0394ae584a0b84523e@huawei.com>
-Subject: RE: [PATCH net] tun: Fix xdp_rxq_info's queue_index when detaching
+	s=arc-20240116; t=1708528532; c=relaxed/simple;
+	bh=U6LTfCt0Y1XPyuR94BitQJbK5CnBSk/B7Nw6HVJH6Fg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=IfFySxVgwAoYcvtib+br9reenCN7mrgFZytxKw17ZbKOfYkMu44+HmXrgbJVkIyze8KOm4nb9FyEDcqHgEiD/k8ThEoBhZkPxnUGnfoGOCsjLV4A11pgsUDnuRG6gA0cwl0RZ1e2ow4NZEuSK+D3toZRIcOhlWbjZmRcjwaKWXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=softline.com; spf=pass smtp.mailfrom=softline.com; dkim=pass (2048-bit key) header.d=softline.com header.i=@softline.com header.b=iJ458szd; arc=none smtp.client-ip=185.31.132.229
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=softline.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=softline.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=softline.com;
+	s=relay; t=1708527753;
+	bh=U6LTfCt0Y1XPyuR94BitQJbK5CnBSk/B7Nw6HVJH6Fg=;
+	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
+	b=iJ458szdbaR+GPmssPMBH5c6BF5E5yqynzPs5+eCZ8CSMon/y7GdMI6Wu+/Qwh1gm
+	 wLavdwgy5yUdMd+HZHzeAJXbGk3bBMeqGVZaQL33LBg0+fOfwQShGmWdqoAb/jM5VS
+	 8TtVloFxvYDOJMuoElqdmB2FXpn5ZzHXjvHqcgUH64nIVwLlDRCDqGftrXpCrx/Cuu
+	 8OnObgmVubqIDuwGRxs/vwCCkI4R+aLmolRf9L2Y27LVxmZMqHnNbsBHS/1SHojV1A
+	 zaLpQ1ZjY3p1nhX1DSa56ImQDnsyQOVmeP0Pq3skGYYhCAnEZt5msOFrnMO2p4vVGp
+	 CE75AzeJDnIQg==
+X-AuditID: 0a02150b-b13ff700000026cc-8e-65d61088c3be
+From: "Antipov, Dmitriy" <Dmitriy.Antipov@softline.com>
+To: "dmantipov@yandex.ru" <dmantipov@yandex.ru>, "guwen@linux.alibaba.com"
+	<guwen@linux.alibaba.com>, "wenjia@linux.ibm.com" <wenjia@linux.ibm.com>
+CC: "lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>,
+	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "jaka@linux.ibm.com"
+	<jaka@linux.ibm.com>
+Subject: Re: [lvc-project] [PATCH] [RFC] net: smc: fix fasync leak in
+ smc_release()
+Thread-Topic: [lvc-project] [PATCH] [RFC] net: smc: fix fasync leak in
+ smc_release()
+Thread-Index: AQHaZNb+eL3YMOb6v02FhrfSeOr3xw==
+Date: Wed, 21 Feb 2024 15:02:32 +0000
+Message-ID: <659c7821842fca97513624b713ced72ab970cdfc.camel@softline.com>
+References: <20240221051608.43241-1-dmantipov@yandex.ru>
+	 <819353f3-f5f9-4a15-96a1-4f3a7fd6b33e@linux.alibaba.com>
+In-Reply-To: <819353f3-f5f9-4a15-96a1-4f3a7fd6b33e@linux.alibaba.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <3DFFCC98B65EA848ABDAAC7BA160D4F7@softline.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
 
-wangyunjian wrote:
-> 
-> 
-> > -----Original Message-----
-> > From: Willem de Bruijn [mailto:willemdebruijn.kernel@gmail.com]
-> > Sent: Tuesday, February 20, 2024 11:59 PM
-> > To: wangyunjian <wangyunjian@huawei.com>;
-> > willemdebruijn.kernel@gmail.com; jasowang@redhat.com; kuba@kernel.org;
-> > davem@davemloft.net
-> > Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org;
-> > brouer@redhat.com; xudingke <xudingke@huawei.com>; wangyunjian
-> > <wangyunjian@huawei.com>
-> > Subject: Re: [PATCH net] tun: Fix xdp_rxq_info's queue_index when detaching
-> > 
-> > Yunjian Wang wrote:
-> > > When a queue(tfile) is detached, we only update tfile's queue_index,
-> > > but do not update xdp_rxq_info's queue_index. This patch fixes it.
-> > >
-> > > Fixes: 8bf5c4ee1889 ("tun: setup xdp_rxq_info")
-> > > Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
-> > > ---
-> > >  drivers/net/tun.c | 1 +
-> > >  1 file changed, 1 insertion(+)
-> > >
-> > > diff --git a/drivers/net/tun.c b/drivers/net/tun.c index
-> > > bc80fc1d576e..be37235af55d 100644
-> > > --- a/drivers/net/tun.c
-> > > +++ b/drivers/net/tun.c
-> > > @@ -652,6 +652,7 @@ static void __tun_detach(struct tun_file *tfile, bool
-> > clean)
-> > >  				   tun->tfiles[tun->numqueues - 1]);
-> > >  		ntfile = rtnl_dereference(tun->tfiles[index]);
-> > >  		ntfile->queue_index = index;
-> > > +		ntfile->xdp_rxq.queue_index = index;
-> > >  		rcu_assign_pointer(tun->tfiles[tun->numqueues - 1],
-> > >  				   NULL);
-> > 
-> > Does it matter that this value is stale when undetached?
-> 
-> Yes, the detach tfile'queue_index is not important because the re-attach will update.
-> But this patch is to fix the 'ntfile'(that replaces the detach tfile)'s queue_index, it is wrong.
-
-Oh yes. This looks correct to me. Let's cc: the author of the patch listed as Fixed too.
-
-> 
-> Thanks
-> > 
-> > It is replaced in tun_attach if previously attached:
-> > 
-> > 		/* Re-attach detached tfile, updating XDP queue_index */
-> >                 WARN_ON(!xdp_rxq_info_is_reg(&tfile->xdp_rxq));
-> > 
-> >                 if (tfile->xdp_rxq.queue_index    != tfile->queue_index)
-> >                         tfile->xdp_rxq.queue_index = tfile->queue_index;
-
-
+T24gV2VkLCAyMDI0LTAyLTIxIGF0IDIxOjA5ICswODAwLCBXZW4gR3Ugd3JvdGU6DQoNCj4gMS4g
+b24gPSAxOyBpb2N0bChzb2NrLCBGSU9BU1lOQywgJm9uKSwgYSBmYXN5bmMgZW50cnkgaXMgYWRk
+ZWQgdG8NCj4gICAgIHNtYy0+c2suc2tfc29ja2V0LT53cS5mYXN5bmNfbGlzdDsNCj4gDQo+IDIu
+IFRoZW4gZmFsbGJhY2sgaGFwcGVuZCwgYW5kIHN3YXBwZWQgdGhlIHNvY2tldDoNCj4gICAgIHNt
+Yy0+Y2xjc29jay0+ZmlsZSA9IHNtYy0+c2suc2tfc29ja2V0LT5maWxlOw0KPiAgICAgc21jLT5j
+bGNzb2NrLT5maWxlLT5wcml2YXRlX2RhdGEgPSBzbWMtPmNsY3NvY2s7DQo+ICAgICBzbWMtPmNs
+Y3NvY2stPndxLmZhc3luY19saXN0ID0gc21jLT5zay5za19zb2NrZXQtPndxLmZhc3luY19saXN0
+Ow0KPiAgICAgc21jLT5zay5za19zb2NrZXQtPndxLmZhc3luY19saXN0ID0gTlVMTDsNCj4gDQo+
+IDMuIG9uID0gMDsgaW9jdGwoc29jaywgRklPQVNZTkMsICZvbiksIHRoZSBmYXN5bmMgZW50cnkg
+aXMgcmVtb3ZlZA0KPiAgICAgZnJvbSBzbWMtPmNsY3NvY2stPndxLmZhc3luY19saXN0LA0KPiAo
+SXMgdGhlcmUgYSByYWNlIGJldHdlZW4gMiBhbmQgMyA/KQ0KDQoxKSBJSVVDIHllcy4gVGhlIGZv
+bGxvd2luZyBzZXF1ZW5jZSBmcm9tIHNtY19zd2l0Y2hfdG9fZmFsbGJhY2soKToNCg0Kc21jLT5j
+bGNzb2NrLT5maWxlID0gc21jLT5zay5za19zb2NrZXQtPmZpbGU7DQpzbWMtPmNsY3NvY2stPmZp
+bGUtPnByaXZhdGVfZGF0YSA9IHNtYy0+Y2xjc29jazsNCg0KaXMgZXhlY3V0ZWQgd2l0aCBsb2Nr
+ZWQgc21jLT5zay5za19zb2NrZXQgYnV0IHVubG9ja2VkIHNtYy0+Y2xjc29jay4NClRoaXMgd2F5
+LA0KDQpzdHJ1Y3Qgc29ja2V0ICpzb2NrID0gZmlscC0+cHJpdmF0ZV9kYXRhOw0KDQppbiBzb2Nr
+X2Zhc3luYygpIGludHJvZHVjZXMgYW4gdW5kZWZpbmVkIGJlaGF2aW9yIChiZWNhdXNlIGFuDQph
+Y3R1YWwgdmFsdWUgb2YgJ3ByaXZhdGVfZGF0YScgaXMgdW5wcmVkaWN0YWJsZSkuIFNvIHRoZXJl
+IGFyZQ0KdHdvIHBvc3NpYmxlIHNjZW5hcmlvcy4gV2hlbg0KDQpvbiA9IDE7IGlvY3RsKHNvY2ss
+IEZJT0FTWU5DLCAmb24pOw0Kb24gPSAwOyBpb2N0bChzb2NrLCBGSU9BU1lOQywgJm9uKTsNCg0K
+YWN0dWFsbHkgbW9kaWZpZXMgZmFzeW5jIGxpc3Qgb2YgdGhlIHNhbWUgc29ja2V0LCB0aGlzIHdv
+cmtzIGFzDQpleHBlY3RlZC4gSWYga2VybmVsIHNvY2tldHMgYmVoaW5kICdzb2NrJyBnZXRzIHN3
+YXBwZWQgYmV0d2Vlbg0KY2FsbHMgdG8gaW9jdGwoKSwgZmFzeW5jIGxpc3Qgb2YgdGhlIGZpcnN0
+IHNvY2tldCBoYXMgYW4gZW50cnkNCndoaWNoIGNhbid0IGJlIHJlbW92ZWQgYnkgdGhlIHNlY29u
+ZCBpb2N0bCgpLiANCg0KDQo+IDQuIFRoZW4gY2xvc2UgdGhlIGZpbGUsIF9fZnB1dCgpIGNhbGxz
+IGZpbGUtPmZfb3AtPmZhc3luYygtMSwgZmlsZSwgMCksDQo+ICAgICB0aGVuIHNvY2tfZmFzeW5j
+KCkgY2FsbHMgZmFzeW5jX2hlbHBlcihmZCwgZmlscCwgb24sICZ3cS0+ZmFzeW5jX2xpc3QpDQo+
+ICAgICBhbmQgZmFzeW5jX3JlbW92ZV9lbnRyeSgpIHJlbW92ZXMgZW50cmllcyBpbiBzbWMtPmNs
+Y3NvY2stPndxLmZhc3luY19saXN0Lg0KPiAgICAgTm93IHNtYy0+Y2xjc29jay0+d3EuZmFzeW5j
+X2xpc3QgaXMgZW1wdHkuDQoNCjIpIE5vLiBJbiB0aGUgc2Vjb25kIChiYWQpIHNjZW5hcmlvIGZy
+b20gdGhlIGFib3ZlLCBhbiBhdHRlbXB0IHRvIHJlbW92ZQ0KZmFzeW5jIGVudHJ5IGZyb20gc21j
+LT5jbGNzb2NrLT53cS5mYXN5bmNfbGlzdCBhbHdheXMgZmFpbHMgYmVjYXVzZQ0KZmFzeW5jIGVu
+dHJ5IHdhcyBhY3R1YWxseSBsaW5rZWQgdG8gc21jLT5zay5za19zb2NrZXQtPndxLmZhc3luY19s
+aXN0Lg0KDQpOb3RlIHNvY2tfZmFzeW5jKCkgZG9lc24ndCBjaGVjayB0aGUgdmFsdWUgcmV0dXJu
+ZWQgZnJvbSBmYXN5bmNfaGVscGVyKCkuDQpIb3cgZHVtYi4NCg0KPiA1LiBfX2ZwdXQoKSBjYWxs
+cyBmaWxlLT5mX29wLT5yZWxlYXNlKGlub2RlLCBmaWxlKSwgdGhlbiBzb2NrX2Nsb3NlIGNhbGxz
+DQo+ICAgICBfX3NvY2tfcmVsZWFzZSwgdGhlbiBvcHMtPnJlbGVhc2UgY2FsbHMgc21jX3JlbGVh
+c2UoKSwgYW5kIF9fc21jX3JlbGVhc2UoKQ0KPiAgICAgY2FsbHMgc21jX3Jlc3RvcmVfZmFsbGJh
+Y2tfY2hhbmdlcygpIHRvIHJlc3RvcmUgc29ja2V0Og0KPiAgICAgaWYgKHNtYy0+Y2xjc29jay0+
+ZmlsZSkgeyAvKiBub24tYWNjZXB0ZWQgc29ja2V0cyBoYXZlIG5vIGZpbGUgeWV0ICovDQo+ICAg
+ICAgICAgIHNtYy0+Y2xjc29jay0+ZmlsZS0+cHJpdmF0ZV9kYXRhID0gc21jLT5zay5za19zb2Nr
+ZXQ7DQo+ICAgICAgICAgIHNtYy0+Y2xjc29jay0+ZmlsZSA9IE5VTEw7DQo+ICAgICAgICAgIHNt
+Y19mYmFja19yZXN0b3JlX2NhbGxiYWNrcyhzbWMpOw0KPiAgICAgfQ0KDQozKSBZZXMuIEFuZCBp
+dCdzIHRvbyBsYXRlIGJlY2F1c2UgX19mcHV0KCkgY2FsbHMgZmlsZS0+Zl9vcC0+ZmFzeW5jKC0x
+LCAuLi4sDQowKSBfYmVmb3JlXyBmaWxlLT5mX29wLT5yZWxlYXNlKCkuIFNvIGV2ZW4gaWYgeW91
+IGhhdmUgc29ja2V0cyBzd2FwcGVkIGJhY2ssDQpubyBvbmUgd2lsbCB0YWtlIGNhcmUgYWJvdXQg
+ZnJlZWluZyBmYXN5bmMgbGlzdC4NCg0KDQo+IDYuIFRoZW4gYmFjayB0byBfX3NvY2tfcmVsZWFz
+ZSwgY2hlY2sgaWYgc29jay0+d3EuZmFzeW5jX2xpc3QgKHRoYXQgaXMNCj4gICAgIHNtYy0+c2su
+c2tfc29ja2V0LT53cS5mYXN5bmNfbGlzdCkgaXMgZW1wdHkgYW5kIGl0IGlzIGVtcHR5Lg0KDQo0
+KSBOby4gSXQncyBub3QgZW1wdHkgYmVjYXVzZSBhbiBhdHRlbXB0IHRvIHJlbW92ZSBmYXN5bmMg
+ZW50cnkgaGFzIGZhaWxlZA0KYXQgWzJdIGp1c3QgYmVjYXVzZSBpdCB3YXMgbWFkZSBhZ2FpbnN0
+IHRoZSB3cm9uZyBzb2NrZXQuIA0KDQoNCkZvciB5b3VyIGNvbnZlbmllbmNlLCB0aGVyZSBpcyBh
+IGh1bWFuLXJlYWRhYmxlIHJlcHJvZHVjZXIgbG9vc2VseSBtb2RlbGVkDQphcm91bmQgdGhlIG9u
+ZSBnZW5lcmF0ZWQgYnkgc3l6a2FsbGVyLiBZb3UgY2FuIHRyeSBpdCBvbiBhbnkgc3lzdGVtIHJ1
+bm5pbmcNCnJlY2VudGx5IGVub3VnaCBrZXJuZWwgd2l0aCBDT05GSUdfU01DIGVuYWJsZWQgKHJv
+b3QgaXMgbm90IHJlcXVpcmVkKSwgYW5kDQpyZWNlaXZpbmcgYSBmZXcgKG9yIG1heSBiZSBhIGxv
+dCBvZikgIl9fc29ja19yZWxlYXNlOiBmYXN5bmMgbGlzdCBub3QgZW1wdHkiDQptZXNzYWdlcyBj
+bGVhcmx5IGluZGljYXRlcyBhbiBpc3N1ZS4gTk9URTogdGhpcyBzaG91bGRuJ3QgY3Jhc2ggdGhl
+IHN5c3RlbQ0KYW5kL29yIG1ha2UgaXQgdW51c2FibGUsIGJ1dCByZW1lbWJlciB0aGF0IGVhY2gg
+bWVzc2FnZSBjb21lcyB3aXRoIGEgc21hbGwNCmtlcm5lbCBtZW1vcnkgbGVhay4NCg0KRG1pdHJ5
+DQoNCiNpbmNsdWRlIDxzaWduYWwuaD4NCiNpbmNsdWRlIDx1bmlzdGQuaD4NCiNpbmNsdWRlIDxw
+dGhyZWFkLmg+DQojaW5jbHVkZSA8c3lzL2lvY3RsLmg+DQojaW5jbHVkZSA8c3lzL3NvY2tldC5o
+Pg0KDQppbnQgc29jazsNCg0Kdm9pZCAqDQpsb29wMCAodm9pZCAqYXJnKQ0Kew0KICBzdHJ1Y3Qg
+bXNnaGRyIG1zZyA9IHsgMCB9Ow0KDQogIHdoaWxlICgxKQ0KICAgIHsNCiAgICAgIHNvY2sgPSBz
+b2NrZXQgKEFGX1NNQywgU09DS19TVFJFQU0sIDApOw0KICAgICAgc2VuZG1zZyAoc29jaywgJm1z
+ZywgTVNHX0ZBU1RPUEVOKTsNCiAgICAgIGNsb3NlIChzb2NrKTsNCiAgICB9DQogIHJldHVybiBO
+VUxMOw0KfQ0KDQp2b2lkICoNCmxvb3AxICh2b2lkICphcmcpDQp7DQogIGludCBvbjsNCg0KICB3
+aGlsZSAoMSkNCiAgICB7DQogICAgICBvbiA9IDE7DQogICAgICBpb2N0bCAoc29jaywgRklPQVNZ
+TkMsICZvbik7DQogICAgICBvbiA9IDA7DQogICAgICBpb2N0bCAoc29jaywgRklPQVNZTkMsICZv
+bik7DQogICAgfQ0KDQogIHJldHVybiBOVUxMOw0KfQ0KDQppbnQNCm1haW4gKGludCBhcmdjLCBj
+aGFyICphcmd2W10pDQp7DQogIHB0aHJlYWRfdCBhLCBiOw0KICBzdHJ1Y3Qgc2lnYWN0aW9uIHNh
+ID0geyAwIH07DQoNCiAgc2Euc2FfaGFuZGxlciA9IFNJR19JR047DQogIHNpZ2FjdGlvbiAoU0lH
+SU8sICZzYSwgTlVMTCk7DQoNCiAgcHRocmVhZF9jcmVhdGUgKCZhLCBOVUxMLCBsb29wMCwgTlVM
+TCk7DQogIHB0aHJlYWRfY3JlYXRlICgmYiwgTlVMTCwgbG9vcDEsIE5VTEwpOw0KDQogIHBhdXNl
+ICgpOw0KDQogIHB0aHJlYWRfam9pbiAoYSwgTlVMTCk7DQogIHB0aHJlYWRfam9pbiAoYiwgTlVM
+TCk7DQoNCiAgcmV0dXJuIDA7DQp9DQoNCg0K
 
