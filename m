@@ -1,63 +1,62 @@
-Return-Path: <netdev+bounces-73511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C14585CD80
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 02:33:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E78085CD90
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 02:50:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30D42284F23
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 01:33:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FAC5285553
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 01:50:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFF6220E4;
-	Wed, 21 Feb 2024 01:33:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D0383FE0;
+	Wed, 21 Feb 2024 01:50:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NE4jAFzY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MW4/EGGp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC4A51FDD
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 01:33:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF8D317D5;
+	Wed, 21 Feb 2024 01:50:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708479191; cv=none; b=toKL83NsFO5Wc8YQxDEVcG693gX7IDwwjOREsMpA3XiJnGgRmKyAd6UxlKf/8WwhZ8mhoXFE6GRiueVc6JWa4cAJotvkkInPgW5FG4tBOKVTbiXWYR53bxLqaEiKgBM6Ha2ENokEwKpLRHMxjpzGoNP7fh8aCcwjI1ConfsxYb4=
+	t=1708480255; cv=none; b=YIK2rAG064n+u3VGsKigUrlLEM37bG7+F+5oVpbBKvzaad3vImxL9rWnAbAXhwU7sYl1KV8qmEqfapzKzku2RhY+dkcWouxT+pU3QG44kjTAd+iuXK7nB1XEEzq6Zmh4+H+OA+xqZDI3QCI3lwg0l6Hb4zYtyHM/x0jNAnOd4d4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708479191; c=relaxed/simple;
-	bh=2l4v5kObcwc//nC/L3WyqZtbDpuqWzhajLRoZOtbl8M=;
+	s=arc-20240116; t=1708480255; c=relaxed/simple;
+	bh=VTY6GLJgQzc7n965NSmu5mOJ+wfMjdFW7l8tdFghMKo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Jlc5jNoGh8TA6avb36WFZkOyguCtYsI2/O/qikPxP510YTsWU3xcR4t9UNFKjUhW+7E9TNvR1zbw9aPWoMOh2B8Kb24PKnQzaT0MNUSRQYsLQytsuDzItgjpRmq+uvMqAP28PYRuAb1vwDz/O3D7ofV3ouB1277wk6hxRVsNvTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NE4jAFzY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3A74C433F1;
-	Wed, 21 Feb 2024 01:33:10 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Csy27N+xKhDe0qH1uK8OcXXNsZiAAWyxVA1bsnIXxr7qWx6L+EiAElaHMuPx6c8Ew96bdCaU9pUgzB3ypQE3k1/eT/rlI/twwIcF/DNccugaCLwBbCf2jEncahRtXam0fYe0O3VS7ziiFvgazKd4PqEkuMo3ZtP0RLkCXelJpQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MW4/EGGp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F3D0C433C7;
+	Wed, 21 Feb 2024 01:50:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708479191;
-	bh=2l4v5kObcwc//nC/L3WyqZtbDpuqWzhajLRoZOtbl8M=;
+	s=k20201202; t=1708480254;
+	bh=VTY6GLJgQzc7n965NSmu5mOJ+wfMjdFW7l8tdFghMKo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NE4jAFzYxyiom6hld5RWeM8oyYntOPHnXXANt/eNrG6gSapErzg98zyjfasPPfiC6
-	 r0sAz0Mbq6CSaPDndsi9KF0pyEsS3G75xR3/J3Gzs9KZeTpSrk4KLIn8AzDImIhRgS
-	 LHSUsCYoDtNlt8wmJBOv2vYmJSnQ3P3yVZN0Mrzay6XJDvGQQ6Nvp1Ndlq+zKnSLpT
-	 eaW9LhWb6RHMqCnXrxf1ibTG+t5wH0edP8amwLZJqN4gAU6cSEko/MJFpcuFnn9BKj
-	 IHrYWZOS5ojLAkJQ2yheOKaa7p5MO4uspW1ZpBfUmys6mmbxSxsALsdC4n2vNevg5M
-	 Pon1KMNVjW8Cw==
-Date: Tue, 20 Feb 2024 17:33:09 -0800
+	b=MW4/EGGpRUOlxB/9AV5/eY5TjaHNRnG3lRSQWYhcUpRdcAsoEnVRQHD6C2GUlkG/c
+	 dqtMIhy8ee1FJeqOvSl6QPyP3B7tdMBZmnsQYUg5/nZrTohX3JYGsbRZp1keQUdAS7
+	 JqdMuXSkNaws+YuG0eMglGAIvighf/Q0BepuJLgB8rziByULoxz+pgTh6sVMGO4uqf
+	 Z+NwJ66dm5ouLWkojUrsnqqR8litXDhxS5/9+Yshbu714HBLAgsh2B2CoPSJgw3wB+
+	 ryKfe4LZgLJ0YQwohqJQhPg97Q/rV/cujqcRS2GXnByPBohruxi4E9QXJ3ZZnRjbrP
+	 odDgW5hZdI+1g==
+Date: Tue, 20 Feb 2024 17:50:53 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Tariq Toukan <ttoukan.linux@gmail.com>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>
-Cc: Saeed Mahameed <saeed@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
- <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>,
- netdev@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>, Gal Pressman
- <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>
-Subject: Re: [net-next V3 15/15] Documentation: networking: Add description
- for multi-pf netdev
-Message-ID: <20240220173309.4abef5af@kernel.org>
-In-Reply-To: <f3e1a1c2-f757-4150-a633-d4da63bacdcd@gmail.com>
-References: <20240215030814.451812-1-saeed@kernel.org>
-	<20240215030814.451812-16-saeed@kernel.org>
-	<20240215212353.3d6d17c4@kernel.org>
-	<f3e1a1c2-f757-4150-a633-d4da63bacdcd@gmail.com>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Boris Pismenny <borisp@nvidia.com>, John
+ Fastabend <john.fastabend@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Vakul Garg
+ <vakul.garg@nxp.com>, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net 3/5] tls: don't skip over different type records
+ from the rx_list
+Message-ID: <20240220175053.16324f4d@kernel.org>
+In-Reply-To: <ZdPgAjFobWzrg_qY@hog>
+References: <cover.1708007371.git.sd@queasysnail.net>
+	<f00c0c0afa080c60f016df1471158c1caf983c34.1708007371.git.sd@queasysnail.net>
+	<20240219120703.219ad3b2@kernel.org>
+	<ZdPgAjFobWzrg_qY@hog>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,75 +66,125 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 19 Feb 2024 17:26:36 +0200 Tariq Toukan wrote:
-> > There are multiple devlink instances, right?  
-> 
-> Right.
-
-Just to be clear I'm asking you questions about things which need to 
-be covered by the doc :)
-
-> > In that case we should call out that there may be more than one.
-> >   
-> 
-> We are combining the PFs in the netdev level.
-> I did not focus on the parts that we do not touch.
-
-Sure but one of the goals here is to drive convergence.
-So if another vendor is on the fence let's nudge them towards the same
-decision.
-
-> That's why I didn't mention the sysfs for example, until you asked.
-> 
-> For example, irqns for the two PFs are still reachable as they used to, 
-> under two distinct paths:
-> ll /sys/bus/pci/devices/0000\:08\:00.0/msi_irqs/
-> ll /sys/bus/pci/devices/0000\:09\:00.0/msi_irqs/
-> 
-> >> +Currently the sysfs is kept untouched, letting the netdev sysfs point to its primary PF.
-> >> +Enhancing sysfs to reflect the actual topology is to be discussed and contributed separately.  
+On Tue, 20 Feb 2024 00:10:58 +0100 Sabrina Dubroca wrote:
+> 2024-02-19, 12:07:03 -0800, Jakub Kicinski wrote:
+> > On Thu, 15 Feb 2024 17:17:31 +0100 Sabrina Dubroca wrote:  
+> > > @@ -1772,7 +1772,8 @@ static int process_rx_list(struct tls_sw_context_rx *ctx,
+> > >  			   u8 *control,
+> > >  			   size_t skip,
+> > >  			   size_t len,
+> > > -			   bool is_peek)
+> > > +			   bool is_peek,
+> > > +			   bool *more)
+> > >  {
+> > >  	struct sk_buff *skb = skb_peek(&ctx->rx_list);
+> > >  	struct tls_msg *tlm;  
 > > 
-> > I don't anticipate it to be particularly hard, let's not merge
-> > half-baked code and force users to grow workarounds that are hard
-> > to remove.
+> > > @@ -1844,6 +1845,10 @@ static int process_rx_list(struct tls_sw_context_rx *ctx,
+> > >  
+> > >  out:
+> > >  	return copied ? : err;
+> > > +more:
+> > > +	if (more)
+> > > +		*more = true;
+> > > +	goto out;  
+> > 
+> > Patches look correct, one small nit here -
+> > 
+> > I don't have great ideas how to avoid the 7th argument completely but   
 > 
-> Changing sysfs to expose queues from multiple PFs under one path might 
-> be misleading and break backward compatibility. IMO it should come as an 
-> extension to the existing entries.
+> I hesitated between this patch and a variant combining is_peek and
+> more into a single u8 *flags, but that felt a bit messy (or does that
+> fall into what you describe as "not [having] great ideas"? :))
 
-I don't know what "multiple PFs under one path" means, links in VFs are
-one to one, right? :)
+I guess it saves a register, it seems a bit better but then it's a
+truly in/out argument :)
 
-> Anyway, the interesting info exposed in sysfs is now available through 
-> the netdev genl.
-
-Right, that's true.
-
-Greg, we have a feature here where a single device of class net has
-multiple "bus parents". We used to have one attr under class net
-(device) which is a link to the bus parent. Now we either need to add
-more or not bother with the linking of the whole device. Is there any
-precedent / preference for solving this from the device model
-perspective?
-
-> Now, is this sysfs part integral to the feature? IMO, no. This in-driver 
-> feature is large enough to be completed in stages and not as a one shot.
-
-It's not a question of size and/or implementing everything.
-What I want to make sure is that you surveyed the known user space
-implementations sufficiently to know what looks at those links,
-and perhaps ethtool -i.
-Perhaps the answer is indeed "nothing much will care" and given
-we can link IRQs correctly we put that as a conclusion in the doc.
-
-Saying "sysfs is coming soon" is not adding much information :(
-
-> > Also could you add examples of how the queue and napis look when listed
-> > via the netdev genl on these devices?
-> >   
+> > I think it'd be a little cleaner if we either:
+> >  - passed in err as an output argument (some datagram code does that
+> >    IIRC), then function can always return copied directly, or   
 > 
-> Sure. Example for a 24-cores system:
+> (yes, __skb_wait_for_more_packets, __skb_try_recv_datagram, and their
+> variants)
+> 
+> >  - passed copied as an output argument, and then we can always return
+> >    err?  
+> 
+> Aren't those 2 options adding an 8th argument?
 
-Could you reconfigure to 5 channels to make the output asymmetric and
-shorter and include the example in the doc?
+No, no, still 7, if we separate copied from err - checking err < 0
+is enough to know that we need to exit.
+
+Differently put, perhaps, my preference is to pass an existing entity
+(err or copied), rather that conjure new concept (more) on one end and
+interpret it on the other.
+
+> I tend to find ">= 0 on success, otherwise errno" more readable,
+> probably because that's a very common pattern (either for recvmsg
+> style of cases, or all the ERR_PTR type situations).
+
+Right it definitely is a good pattern. I think passing copied via
+argument would give us those semantics still?
+
+> > I like the former a little better because we won't have to special case
+> > NULL for the "after async decryption" call sites.  
+> 
+> We could also pass &rx_more every time and not check for NULL.
+> 
+> What do you want to clean up more specifically? The number of
+> arguments, the backwards goto, the NULL check before setting *more,
+> something else/all of the above?
+
+Not compiled, but what I had in mind was something along the lines of:
+
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index 9fbc70200cd0..6e6e6d89b173 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -1772,7 +1772,8 @@ static int process_rx_list(struct tls_sw_context_rx *ctx,
+ 			   u8 *control,
+ 			   size_t skip,
+ 			   size_t len,
+-			   bool is_peek)
++			   bool is_peek,
++			   int *out_copied)
+ {
+ 	struct sk_buff *skb = skb_peek(&ctx->rx_list);
+ 	struct tls_msg *tlm;
+@@ -1843,7 +1844,8 @@ static int process_rx_list(struct tls_sw_context_rx *ctx,
+ 	err = 0;
+ 
+ out:
+-	return copied ? : err;
++	*out_copied = copied;
++	return err;
+ }
+ 
+ static bool
+@@ -1966,11 +1968,10 @@ int tls_sw_recvmsg(struct sock *sk,
+ 		goto end;
+ 
+ 	/* Process pending decrypted records. It must be non-zero-copy */
+-	err = process_rx_list(ctx, msg, &control, 0, len, is_peek);
++	err = process_rx_list(ctx, msg, &control, 0, len, is_peek, &copied);
+ 	if (err < 0)
+ 		goto end;
+ 
+-	copied = err;
+ 	if (len <= copied)
+ 		goto end;
+ 
+@@ -2128,10 +2129,10 @@ int tls_sw_recvmsg(struct sock *sk,
+ 		/* Drain records from the rx_list & copy if required */
+ 		if (is_peek || is_kvec)
+ 			err = process_rx_list(ctx, msg, &control, copied,
+-					      decrypted, is_peek);
++					      decrypted, is_peek, &ret);
+ 		else
+ 			err = process_rx_list(ctx, msg, &control, 0,
+-					      async_copy_bytes, is_peek);
++					      async_copy_bytes, is_peek, &ret);
+ 	}
+ 
+ 	copied += decrypted;
 
