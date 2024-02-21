@@ -1,130 +1,121 @@
-Return-Path: <netdev+bounces-73763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E51C085E3D1
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 17:57:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6FEF85E46E
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 18:20:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 22CE61C2154B
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 16:57:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D1B61F25D12
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 17:20:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ECC280C03;
-	Wed, 21 Feb 2024 16:57:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E13BF81203;
+	Wed, 21 Feb 2024 17:20:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G6y2XApx"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="AL3HI6es";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="PaWGoSbo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65AE97FBC4;
-	Wed, 21 Feb 2024 16:57:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FB175B5D1
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 17:20:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708534621; cv=none; b=qXhanSMZXCEG0EzDk9s9wxXDBjfH/uqbOrtL3k3pZFjPEhHKX1NQW+a2z7HdGwlm0Eb52W47eMLFAjatHRpd+JzSalZ2X6fMf8qivlZcmdGwBxi+42idHFXfCY9vZVXKyGpQ8ZkdSUZ1y6IEJb/X4TsRCf8PipT55mjAgX+IuQI=
+	t=1708536042; cv=none; b=VCL0GdBuZgKMqckNYCi/psUt1WqsYzLGP/brFohnTetpDGTmdt49d1oFyd2yb9szZKjKBijHJG9ZKWCLonrRjSww5ubKpKAKHnC99CqEi952bs3Qx6KPv+JNCCuQvhseH/lg6/FRlUlCxgaNVUjsTrxAFadzEWWWmXyqQdjdSGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708534621; c=relaxed/simple;
-	bh=fKXceB0Gk5Qi2BTh8FnrZ+MT+hE3FOYlCf2QUIU2XXQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=FCs5+dJlzdF7G83G8MKneF405apamR9cipsdX344vJkUwA9kUmMQTGIKoRh3yJ50X7W3R4pwC8AbdbTSOL+hbarskB7HorbrvqhsLC8WAYEydpS+UDHJpn9RlOE4BL8RYh0AFtZf9G68fguU3znm0P3AIceu1aukiwTxZ1/eXJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G6y2XApx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2284BC433F1;
-	Wed, 21 Feb 2024 16:56:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708534620;
-	bh=fKXceB0Gk5Qi2BTh8FnrZ+MT+hE3FOYlCf2QUIU2XXQ=;
-	h=From:Date:Subject:To:Cc:From;
-	b=G6y2XApxOSs9SZl79EQohPRj/X5MpyJELyXCc2UtgTxkX488zdh7HWdDR+lyX0unX
-	 CUJ3F7ZZbY3Vx2bdoT0jpYzMKE1H9IUANbSkmtC/wtbJFE8gw5IkjPu/GucJ+ibf6Y
-	 88tDFcattShPJ7M6gdeISV3hDqCuzLs2iKAmubTOYAxlgjmAHL/Ure//BNYZT+JXVD
-	 ugZUI3LvAbt5KssDhcPEKqu2br9DI5l/QW1EVY8L8rhcEEHlMg48HzlCALNApQfYyt
-	 gpH+W9lLfViXuIrXKtO70sqLRd5E8bI/RFu4RbsPzbktT1Gd1Ec0M0V2ZPWQjOfv8F
-	 NCve65P6JPhpA==
-From: Simon Horman <horms@kernel.org>
-Date: Wed, 21 Feb 2024 16:56:47 +0000
-Subject: [PATCH RFC net] ps3/gelic: Fix possible NULL pointer dereference
+	s=arc-20240116; t=1708536042; c=relaxed/simple;
+	bh=87NB9LOg/lVHveENm6X5t18JhykctIBHamucYdnKsjQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GgxQGr7y2MXvGCBmTByLccXdbHDTvKkmp8Mib7SLDtyPyWafOzvuC9jFsyNr+THFzqrMB/ba1aU/H9g4KoZCqGbfieIsqmY3Y8yX4fnPg3yA9quvowB+0ND+aPEiJk3vBVCVV/1C7/gNU6ETA6PsmGrkcnfmIA3dIG1FYl6mT68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=AL3HI6es; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=PaWGoSbo; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1708536039;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=kW+6XifLDpjBf1ZdMQv80B5XX4hd9J7fUKsnZeDNQWg=;
+	b=AL3HI6esNgy0yF0+K2KO4LnjOU3tNWPX55wNp2uIGycLpGiyyXZeQVLAtp5VoJj25eThRi
+	mGhfeZkejeATgeTde8syT59yUAg/gox6pL/B7xrKEfZK/+ZrRT8b8OUPeuF2tai2CimwUm
+	/Jd6fYlYtdYnDaT+MYEzBZeE+ZSB3IeWOc0bF+fNYoi8dJOjIq7krCGRJ/oUAHS/PH/RrS
+	j2eALphtGqLq2Hze+eHvIZKliBZikps0rNzYoydljP5LJUIM8qg9xrKseB1Am3jtm7W6+F
+	7HYSrpFvE57eW5L7CZ5aavfN+ZxZd/f8Mb00bJe+Q7wVGzIlAaxJVT2J2tjPpw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1708536039;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=kW+6XifLDpjBf1ZdMQv80B5XX4hd9J7fUKsnZeDNQWg=;
+	b=PaWGoSbotLhNJoi9xcCv6mMg+M8G3bOc/xsO5REJ5ZQ7K85oCxMdXftlcOfy9rvAz5+k5c
+	kKDM3891gZkYYsCA==
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Wander Lairson Costa <wander@redhat.com>,
+	Yan Zhai <yan@cloudflare.com>
+Subject: [PATCH v2 net-next 0/3] net: Provide SMP threads for backlog NAPI
+Date: Wed, 21 Feb 2024 18:00:10 +0100
+Message-ID: <20240221172032.78737-1-bigeasy@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240221-ps3-gelic-null-deref-v1-1-f4fe159c7cb0@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAE4r1mUC/x2MQQqDMBQFrxL+2g9JWkTcCh7ArXRhk6d+CFESW
- wri3RtczsDMSRlJkKlVJyV8JcsWC5hKkVunuIDFFyar7VNba3jPD14QxHH8hMAeCTM32ji42jS
- Tf1NJ9yLld29HGvpORRz0uq4/qOxVpW8AAAA=
-To: Geoff Levand <geoff@infradead.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Michael Ellerman <mpe@ellerman.id.au>, 
- Nicholas Piggin <npiggin@gmail.com>, 
- Christophe Leroy <christophe.leroy@csgroup.eu>, 
- "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, 
- "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>, Jeff Garzik <jeff@garzik.org>, 
- Dan Carpenter <dan.carpenter@linaro.org>, netdev@vger.kernel.org, 
- linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
-X-Mailer: b4 0.12.3
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Fix possible NULL pointer dereference in gelic_card_release_tx_chain()
+The RPS code and "deferred skb free" both send IPI/ function call
+to a remote CPU in which a softirq is raised. This leads to a warning on
+PREEMPT_RT because raising softiqrs from function call led to undesired
+behaviour in the past. I had duct tape in RT for the "deferred skb free"
+and Wander Lairson Costa reported the RPS case.
 
-The cited commit introduced a netdev variable to
-gelic_card_release_tx_chain() which is set unconditionally on each
-iteration of a for loop.
+This series only provides support for SMP threads for backlog NAPI, I
+did not attach a patch to make it default and remove the IPI related
+code to avoid confusion. I can post it for reference it asked.
 
-It is set to the value of tx_chain->tail->skb->dev.  However, in some
-cases it is assumed that tx_chain->tail->skb may be NULL. And if that
-occurs, setting netdev will cause a NULl pointer dereference.
+The RedHat performance team was so kind to provide some testing here.
+The series (with the IPI code removed) has been tested and no regression
+vs without the series has been found. For testing iperf3 was used on 25G
+interface, provided by mlx5, ix40e or ice driver and RPS was enabled. I
+can provide the individual test results if needed.
 
-Given the age of this code I do wonder if this can occur in practice.
-But to be on the safe side this patch assumes that it can and aims to
-avoid the dereference in the case where tx_chain->tail->skb may be NULL.
+Changes:
+- v1=E2=80=A6v2 https://lore.kernel.org/all/20230929162121.1822900-1-bigeas=
+y@linutronix.de/
 
-Flagged by Smatch.
-Compile tested only.
+  - Patch #1 is new. It ensures that NAPI_STATE_SCHED_THREADED is always
+    set (instead conditional based on task state) and the smboot thread
+    logic relies on this bit now. In v1 NAPI_STATE_SCHED was used but is
+    racy.
 
-Fixes: 589866f9f1cb ("PS3: gelic: Add support for dual network interface")
-Signed-off-by: Simon Horman <horms@kernel.org>
----
- drivers/net/ethernet/toshiba/ps3_gelic_net.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+  - The defer list clean up is split out and also relies on
+    NAPI_STATE_SCHED_THREADED. This fixes a different race.
 
-diff --git a/drivers/net/ethernet/toshiba/ps3_gelic_net.c b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
-index d5b75af163d3..f03489799f5d 100644
---- a/drivers/net/ethernet/toshiba/ps3_gelic_net.c
-+++ b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
-@@ -549,14 +549,13 @@ static void gelic_card_release_tx_chain(struct gelic_card *card, int stop)
- {
- 	struct gelic_descr_chain *tx_chain;
- 	enum gelic_descr_dma_status status;
--	struct net_device *netdev;
- 	int release = 0;
- 
- 	for (tx_chain = &card->tx_chain;
- 	     tx_chain->head != tx_chain->tail && tx_chain->tail;
- 	     tx_chain->tail = tx_chain->tail->next) {
- 		status = gelic_descr_get_status(tx_chain->tail);
--		netdev = tx_chain->tail->skb->dev;
-+
- 		switch (status) {
- 		case GELIC_DESCR_DMA_RESPONSE_ERROR:
- 		case GELIC_DESCR_DMA_PROTECTION_ERROR:
-@@ -566,11 +565,14 @@ static void gelic_card_release_tx_chain(struct gelic_card *card, int stop)
- 					 "%s: forcing end of tx descriptor " \
- 					 "with status %x\n",
- 					 __func__, status);
--			netdev->stats.tx_dropped++;
-+			tx_chain->tail->skb->dev->stats.tx_dropped++;
- 			break;
- 
- 		case GELIC_DESCR_DMA_COMPLETE:
- 			if (tx_chain->tail->skb) {
-+				struct net_device *netdev;
-+
-+				netdev = tx_chain->tail->skb->dev;
- 				netdev->stats.tx_packets++;
- 				netdev->stats.tx_bytes +=
- 					tx_chain->tail->skb->len;
+- RFC=E2=80=A6v1 https://lore.kernel.org/all/20230814093528.117342-1-bigeas=
+y@linutronix.de/
+
+   - Patch #2 has been removed. Removing the warning is still an option.
+
+   - There are two patches in the series:
+     - Patch #1 always creates backlog threads
+     - Patch #2 creates the backlog threads if requested at boot time,
+       mandatory on PREEMPT_RT.
+     So it is either or and I wanted to show how both look like.
+
+   - The kernel test robot reported a performance regression with
+     loopback (stress-ng --udp X --udp-ops Y) against the RFC version.
+     The regression is now avoided by using local-NAPI if backlog
+     processing is requested on the local CPU.
+
+Sebastian
 
 
