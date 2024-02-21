@@ -1,82 +1,134 @@
-Return-Path: <netdev+bounces-73770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2EF585E489
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 18:28:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94E8685E492
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 18:30:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2ECC4B23563
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 17:28:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EF4CFB236ED
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 17:30:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6147F83CB2;
-	Wed, 21 Feb 2024 17:28:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFB6A83CB2;
+	Wed, 21 Feb 2024 17:30:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jkNrUne+"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="Wbi6jkdu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DCF283CAC
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 17:28:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA53182D8F;
+	Wed, 21 Feb 2024 17:30:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708536508; cv=none; b=S75zIjb5UJ+f0pTirfYoJdv/t8KDO3xfdqnuysJmI5+e7ag5ccyg0Jn5TQGaqtWCku5/W7pH6DsErKxBcuW7XDTTgL1WFqVH5i+r1fRSdDKONnrtvKv2oOpK46pi1MQZSkogWXQwRQicxupgi5yiAcyO68kBPAVWYAhBOG2WGiU=
+	t=1708536644; cv=none; b=g8LuG/gwI0UnIy0ilNShZucZOzd53i864m5apw6Iwm1kmUAalgWUoscs91wZTDXzzgI4UOVZ3eaHjC6cJasNRRRqet+iNh4UgGTCUMaiBMZ+v4Dgdje6YCkrp5hrtPo1bpELVUbhYNmXXTzefIWyjN8Vi78Zu+nqhZbhe6TBMbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708536508; c=relaxed/simple;
-	bh=JsYoEPqCzKzzp+mPDcCyqpgbdQJnkUADUqYdmI9vhhY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lSZL2rL1T2URl13WHI1Ri0ZBHUvdZ5LCWmr7uI3JiVjupHqOKjke5mmKQKe7jTNfS7eMJIM4BHIpF7bBvnFMICzvejzYuPc5SyKAclSU0gOm3AqRpw1UEdNDFFZGZmm7aIegPoOQ4Tc74WYQeF57ECxlRhRVm3GGoQ2sxpjVdL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jkNrUne+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E26BC433C7;
-	Wed, 21 Feb 2024 17:28:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708536507;
-	bh=JsYoEPqCzKzzp+mPDcCyqpgbdQJnkUADUqYdmI9vhhY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jkNrUne+lx1G9zpE+DCe7MZMCA/0FfKzKAhF1fojydiIelQ0AktutRVgB4Vb80soh
-	 1l3s0m1Gwab7Y5XMWef3sIHjQMuc5A56tnvpiODLakxxlv10woaxxibT9MKAhqxrMj
-	 P0SW3chMdwUzChP1irXXPdeAH5+40FqE36udCNHW9Svoq+Cm82ftkRiqXrhyc1jO4f
-	 dWluQA2nAqp3oN4qqdKpRMOaPdOQ0hGDZhK75enf+ugBt4rzGLRzz9I7V8qeh6KPjd
-	 DESlsMYYDBrzZQcMK100L/Y9F2c0K6hjpOVOb1z2RTIvGadcpUY8GyJOQYS96de9y4
-	 wf+penMecYTvQ==
-Date: Wed, 21 Feb 2024 17:28:24 +0000
-From: Simon Horman <horms@kernel.org>
-To: Geoff Levand <geoff@infradead.org>
-Cc: sambat goson <sombat3960@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH v6 net] ps3/gelic: Fix SKB allocation
-Message-ID: <20240221172824.GD722610@kernel.org>
-References: <52f5f716-adec-48bf-aa68-76078190c56f@infradead.org>
+	s=arc-20240116; t=1708536644; c=relaxed/simple;
+	bh=VVJKBus/4hY3nazwz3pZiLEtUFESTJ1fNiTVxhfAPy8=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=fM4QWwqusHPWuR64guH1A3efrUEKvGoTV2hf6QwWhtIbxyKJHSPtHI05wGN/01WX9XHMqAW3TMUZb2G7/YuSUCq7YBaJuDq1fKeXXX3cBVKaGrWc4zqaNoOM36K7kw/Yf0I5dnPBBKypgX/rwJDMwALkOVQAqThqrS5eQX/mM38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=Wbi6jkdu; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=I87YIZpurdfl8CTcBVVyeB1j4NeBVQcdCIaP0A3iopg=; b=Wbi6jkduFDxsAg3gq98PHpUcSq
+	aPM+WXH/eyj6E6cMlenpE90+cdly1BVWqZB6ONVaiY8julWfqqoG3pUFl+AvtS7xqybQALkdyiCOo
+	CrpduV0kwBnHP7w1Gvgch5neon/t/NXjK/tlNZVS07pUouiNswnCxjD9E1yMqrgCouzrEvUQrPdPC
+	PvmbhlVxxThM7yvKKISOPzDuh4Z7w3ewE/LNdN/HqMkOSRwqdey/VluqZaJhG70tBSln8j4TL4IKe
+	J8K250ppqDuGsZv87Q1bPknz68dtbZaAutZ01j6/Cxg/QAuaRWMs3tl9BP+p1AMPgMLRbm2StSITl
+	Fns2ykmw==;
+Received: from sslproxy01.your-server.de ([78.46.139.224])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rcqQU-000DLL-Kx; Wed, 21 Feb 2024 18:30:34 +0100
+Received: from [178.197.249.13] (helo=linux.home)
+	by sslproxy01.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rcqQT-003ehV-20;
+	Wed, 21 Feb 2024 18:30:33 +0100
+Subject: Re: [PATCH bpf-next 1/2] bpf: Take return from set_memory_ro() into
+ account with bpf_prog_lock_ro()
+To: Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Hengqi Chen <hengqi.chen@gmail.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Kees Cook <keescook@chromium.org>,
+ "linux-hardening @ vger . kernel . org" <linux-hardening@vger.kernel.org>
+References: <135feeafe6fe8d412e90865622e9601403c42be5.1708253445.git.christophe.leroy@csgroup.eu>
+ <CAEyhmHT8H3AXyOKMc3eQSdM2+1UDETJDPyEQ0-AEb6E8pt9LTg@mail.gmail.com>
+ <4d53e0f9-cfee-4877-8b56-9f258c8325f6@csgroup.eu>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <2abc14fc-a19e-8205-c54f-a87c11ebd5be@iogearbox.net>
+Date: Wed, 21 Feb 2024 18:30:32 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <52f5f716-adec-48bf-aa68-76078190c56f@infradead.org>
+In-Reply-To: <4d53e0f9-cfee-4877-8b56-9f258c8325f6@csgroup.eu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27192/Wed Feb 21 10:23:23 2024)
 
-On Wed, Feb 21, 2024 at 11:27:29AM +0900, Geoff Levand wrote:
-> Commit 3ce4f9c3fbb3 ("net/ps3_gelic_net: Add gelic_descr structures") of
-> 6.8-rc1 had a copy-and-paste error where the pointer that holds the
-> allocated SKB (struct gelic_descr.skb)  was set to NULL after the SKB was
-> allocated. This resulted in a kernel panic when the SKB pointer was
-> accessed.
+On 2/19/24 7:39 AM, Christophe Leroy wrote:
 > 
-> This fix moves the initialization of the gelic_descr to before the SKB
-> is allocated.
 > 
-> Reported-by: sambat goson <sombat3960@gmail.com>
-> Fixes: 3ce4f9c3fbb3 ("net/ps3_gelic_net: Add gelic_descr structures")
-> Signed-off-by: Geoff Levand <geoff@infradead.org>
+> Le 19/02/2024 à 02:40, Hengqi Chen a écrit :
+>> [Vous ne recevez pas souvent de courriers de hengqi.chen@gmail.com. Découvrez pourquoi ceci est important à https://aka.ms/LearnAboutSenderIdentification ]
+>>
+>> Hello Christophe,
+>>
+>> On Sun, Feb 18, 2024 at 6:55 PM Christophe Leroy
+>> <christophe.leroy@csgroup.eu> wrote:
+>>>
+>>> set_memory_ro() can fail, leaving memory unprotected.
+>>>
+>>> Check its return and take it into account as an error.
+>>>
+>>
+>> I don't see a cover letter for this series, could you describe how
+>> set_memory_ro() could fail.
+>> (Most callsites of set_memory_ro() didn't check the return values)
+> 
+> Yeah, there is no cover letter because as explained in patch 2 the two
+> patches are autonomous. The only reason why I sent it as a series is
+> because the patches both modify include/linux/filter.h in two places
+> that are too close to each other.
+> 
+> I should have added a link to https://github.com/KSPP/linux/issues/7
+> See that link for detailed explanation.
+> 
+> If we take powerpc as an exemple, set_memory_ro() is a frontend to
+> change_memory_attr(). When you look at change_memory_attr() you see it
+> can return -EINVAL in two cases. Then it calls
+> apply_to_existing_page_range(). When you go down the road you see you
+> can get -EINVAL or -ENOMEM from that function or its callees.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+By that logic, don't you have the same issue when undoing all of this?
+E.g. take arch_protect_bpf_trampoline() / arch_unprotect_bpf_trampoline()
+which is not covered in here, but what happens if you set it first to ro
+and later the setting back to rw fails? How would the error path there
+look like? It's something you cannot recover.
 
+Thanks,
+Daniel
 
