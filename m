@@ -1,247 +1,177 @@
-Return-Path: <netdev+bounces-73761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0118185E3AA
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 17:45:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9C7B85E3BF
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 17:52:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B505B2236A
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 16:45:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73B64283C86
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 16:51:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7659B82D9E;
-	Wed, 21 Feb 2024 16:45:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 015FE81725;
+	Wed, 21 Feb 2024 16:51:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="elKCfJhJ"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="TtIh+KFN";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="o7eS6y4Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BE7E7F7D7
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 16:45:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF9BE7FBC4;
+	Wed, 21 Feb 2024 16:51:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708533943; cv=none; b=JM6gy441vPWWF2jRgV+wOYa/Z7DBk6AqwjZACharHogFgZl3LdrtlScbuDmWyPG6BmOIR7hBFGYdA7iRqlovGSOmyUOVUPL+WUaS1JAK8WCpgkQG3eBfTb4bfFB3/FvKVWyL5GYmRoGD8zSFDqfRVIxUEt1EX8/ssCltWE3A0YY=
+	t=1708534314; cv=none; b=YUC/cke21QQ4GnqVwIVNv+DHpmosemKUivEOtckGsc9EJd7BNSA7947pmE+ojSxdqL0/43KzQFzUvDrb0JJkSgK63MR4nJY4/C6KpYVE6kOYppQSa0BqdtF0TEQyQMeWB1a1WfJ9KxGoDP7X4jUeKxcVQQadc4eWfJIkCOiMekc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708533943; c=relaxed/simple;
-	bh=PiK6GLh5Bbli9ksKDaj+Hoj+StNAExwyesgIoPSxmmY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=p2M+Fu7YhunNAcQpTANa5VrdXu3q83WETKBYoPJilSsaVDGS3gNBzK/9hvHYyxtZVJVQ0042J954ZYkt2sG4X0LzmTd+7RzLA5c85bRaJtJZN+v+TsBekpzf63+730DmQoCy66UpPZqH/39CuMmzbyLWysHo+fCvroLlMfckmCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=elKCfJhJ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708533940;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9Aa0856KKiSIs4J8EHY0Puegx6vd1lMlKDsy7EPPIWE=;
-	b=elKCfJhJvtkdvzHSnMhHCm5ZbQ7ETgHv6zFrD0pxg5FRAQL/bfFl/1HltozLVqfX7ctOOx
-	lbbSTlYIuroKfKckfUNAzcZnzIKS/pSPJMImXkZbs6Okctu8qgFgvc+xkIGz0nRss0Gf1E
-	/5vCKsgpMF16Il8N0DkIYZaaZARyGN8=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-124-0XQUgEnKMKSAg0xrWe5OQg-1; Wed, 21 Feb 2024 11:45:39 -0500
-X-MC-Unique: 0XQUgEnKMKSAg0xrWe5OQg-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40e4478a3afso34012005e9.1
-        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 08:45:39 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708533938; x=1709138738;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9Aa0856KKiSIs4J8EHY0Puegx6vd1lMlKDsy7EPPIWE=;
-        b=ZLRhhMlPw/VZNNCAcNNrEgnfhHRoudgV+V1v+WpfWZ/wRghNp/Vlcp9rwdvDM11KiP
-         Y7fUFEKCgKHZjEWPFJpmF08/gJVaUFyN+BTBF2U/mh30bIogoMxr9RCS+G5qTfj3TtpN
-         rVBhFxUGefnZB01PECBrIO/r5VEFjxRpuEkTa4nXn11ckioDWb960mPhl5aOoPvlaBCa
-         BLjOvM9kKsastN5AibjZcbASaMA0+bZ9DVjjpo572YhyQOCHdnDaeHWAHyPepK3aFXaz
-         o8xqS5Gyuez6vntCLztz2nygIXrjVPm8efs3lJs55+lqSw1HGz4abNxqd5VOJ5oexdyd
-         ddOw==
-X-Forwarded-Encrypted: i=1; AJvYcCWeKmBhXr/m69HFV7p4rlWX5xFqE5qSl9hkSboNsuHOotSaGXRFmwyxrjRBQJi4+Hkv4+Qj6tROWgT60Lqf7Y5PgwqtBeVi
-X-Gm-Message-State: AOJu0Yw0yOCpgIuFrNP3pM918qb7Oh5Y01Al5MWjHTBx6aDddf124zJq
-	J8EOJ4J9Ucw+EIX1k074Cl4OoBRTZJ0X+Z6Azqq5T5UMb6Fm219jFPw1pg+PB0qeKrhzDAgMx4I
-	0VlNzi5xIqOmjGzZZEIIY/NBOWukWoKH3IKp/+uxqHifkk75IsA3bwQ==
-X-Received: by 2002:a05:600c:444a:b0:411:c8a7:7b09 with SMTP id v10-20020a05600c444a00b00411c8a77b09mr32785wmn.10.1708533938252;
-        Wed, 21 Feb 2024 08:45:38 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGWNC9F/v+b8Zz5OO/sN9jdb2v+iFDyGNJnulQT9iuh/19ax1wa9bZTXvgr4iAAWnO9GFiDvA==
-X-Received: by 2002:a05:600c:444a:b0:411:c8a7:7b09 with SMTP id v10-20020a05600c444a00b00411c8a77b09mr32762wmn.10.1708533937888;
-        Wed, 21 Feb 2024 08:45:37 -0800 (PST)
-Received: from vschneid-thinkpadt14sgen2i.remote.csb (213-44-141-166.abo.bbox.fr. [213.44.141.166])
-        by smtp.gmail.com with ESMTPSA id ay17-20020a05600c1e1100b004127876647fsm1867978wmb.41.2024.02.21.08.45.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Feb 2024 08:45:37 -0800 (PST)
-From: Valentin Schneider <vschneid@redhat.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: dccp@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-rt-users@vger.kernel.org, "David S.
- Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, mleitner@redhat.com, David Ahern
- <dsahern@kernel.org>, Juri Lelli <juri.lelli@redhat.com>, Tomas Glozar
- <tglozar@redhat.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH v3 1/1] tcp/dcpp: Un-pin tw_timer
-In-Reply-To: <CANn89iJpwUpAROOq7+ttwTMCZu0=XhS4dgwcs44t-gb7-_ejRg@mail.gmail.com>
-References: <20240219095729.2339914-1-vschneid@redhat.com>
- <20240219095729.2339914-2-vschneid@redhat.com>
- <CANn89i+3-zgAkWukFavu1wgf1XG+K9U4BhJWw7H+QKwsfYL4WA@mail.gmail.com>
- <xhsmho7cbf33q.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
- <CANn89iJpwUpAROOq7+ttwTMCZu0=XhS4dgwcs44t-gb7-_ejRg@mail.gmail.com>
-Date: Wed, 21 Feb 2024 17:45:36 +0100
-Message-ID: <xhsmhjzmxg40f.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+	s=arc-20240116; t=1708534314; c=relaxed/simple;
+	bh=2B3cm4x5f3k4huErcoSt8JiDBfGjHHMnN6/fCcegqYs=;
+	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
+	 Subject:Content-Type; b=T5SGrV7WiKz/1K6YpxUSxt0uwMcZjGX0fPljYCgftxpxkNefy0vnZuvuFREnI2vgp1c2wa4w2IpSBq2a48x3npZrExrnbouBy8gw9VKH0r3J9RdB5bAiBbve1t6lDCUc7xC9LdtJwUwRlHj5G9Hu9gmAKhjyeE66ckQCF0/AJMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=TtIh+KFN; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=o7eS6y4Y; arc=none smtp.client-ip=64.147.123.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.west.internal (Postfix) with ESMTP id 2EC6632000EB;
+	Wed, 21 Feb 2024 11:51:51 -0500 (EST)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Wed, 21 Feb 2024 11:51:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm3; t=1708534310; x=1708620710; bh=eSn5xhAHi3
+	xo/ygEBFEx2vlBfX3dDaFRWNt84Lii+ww=; b=TtIh+KFNlcpoiMVT9JYs3TJ82h
+	FCPBXrrg3YbThVJJaZP9ySk8dVkOATUzjT4qnlHVg07WHCKj93DD6iU5rUoJKQy2
+	AhnzsMWsvgIueFXt7FrzCvOQLoXFUovcf6wBgI1urfXhHfHnpVQWWWOEufO68dPM
+	SF9Iikry56Gz3JEORdnvVEa7oyw4RuEsj7NyXLCglnOkT6H3HiJAF2V/uFh/Qpha
+	1YOS/fvEjVzNAmFD3AWGHap8UPkq3kDkmRgvIvkYz8hK73Nb3GugB1dEJUvGEAr+
+	9QU0BHVXKpF/3d/e3IMLMgQMXN9B5qyQf8YnKr8QSu0KzsnzwANMKhjGKb1A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm1; t=1708534310; x=1708620710; bh=eSn5xhAHi3xo/ygEBFEx2vlBfX3d
+	DaFRWNt84Lii+ww=; b=o7eS6y4YROWJ2CBZaF1INj2TnQmpqx8/fP7QHjbujumf
+	7soDq96w8g3sXP4J4LMHom6ve8eCk41rWRnn4KuBBbiB+W3tAtTaLKtf+Uf7uxkn
+	zBhcvuRrHxlE1vgSM7oC6TE+VYkpxnM2//tUJYhU44a2ipaSi2OwtQLxd5M0onQi
+	stzcbznVgY3E91cm8elsgYSj3X7dVBbdLfS3pG6WTovxrxUR6Z/RQ52DDX4fXYub
+	+EKF1erBq1+a9aWOJByCiWbHTw1Ik6kOFWKtN6/WEcA4uz47xI9Ag2fg2o8bLUuv
+	uAXM0XC2BCpXlFPXJ+fdQmGfqVDrfi38Ati6ag+sGg==
+X-ME-Sender: <xms:JirWZVbWPmJ9GNOOm_mJMPP9tUZqS6uudq54rVXLlkpqAr08Z4ff7Q>
+    <xme:JirWZcaikLxuDlV1YYA5JAiLjcV7LWq1PKjhJ9sy1CYkB46cbQtb3DqNZzuo6aHRk
+    UT01lcWwO5p3jpQ_1I>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrfedvgdelfecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdetrhhn
+    ugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtth
+    gvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedtkeet
+    ffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrh
+    hnugesrghrnhgusgdruggv
+X-ME-Proxy: <xmx:JirWZX-Ku_VetAJ_2sUwnZ9Wq4npbouy_ACHghyDpFEYtX5ixKtpdA>
+    <xmx:JirWZTp-PzPCT53yTxPuvkUkyyOEAAcEFkyEyiaMi9muM6h-UbIq8w>
+    <xmx:JirWZQqfLMOrKjLVENli9pmFvsvLwyVWzvPoPtM7jCdJ7kWPDKjD_g>
+    <xmx:JirWZccQ7nQC7MV1qyCI0qDnpPB668qnfr5xxsbjSIVTppK9fVfXYQ>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 45CEFB6008D; Wed, 21 Feb 2024 11:51:50 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.11.0-alpha0-153-g7e3bb84806-fm-20240215.007-g7e3bb848
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Message-Id: <211c9e57-ed0b-4945-9194-ad776bc386bd@app.fastmail.com>
+In-Reply-To: 
+ <CA+G9fYtNbgy7C0bFhsptk9HfE-kxPf+gEpviL4=o1YePoY8xSw@mail.gmail.com>
+References: 
+ <CA+G9fYtNbgy7C0bFhsptk9HfE-kxPf+gEpviL4=o1YePoY8xSw@mail.gmail.com>
+Date: Wed, 21 Feb 2024 17:51:23 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Naresh Kamboju" <naresh.kamboju@linaro.org>,
+ "open list" <linux-kernel@vger.kernel.org>, Netdev <netdev@vger.kernel.org>,
+ lkft-triage@lists.linaro.org
+Cc: "Kees Cook" <keescook@chromium.org>, "Hao Luo" <haoluo@google.com>,
+ "Miguel Ojeda" <ojeda@kernel.org>, "Nathan Chancellor" <nathan@kernel.org>,
+ "Peter Zijlstra" <peterz@infradead.org>,
+ "Justin Stitt" <justinstitt@google.com>
+Subject: Re: x86: fortify-string.h:63:33: error: '__builtin_memcmp' specified bound
+ exceeds maximum object size
+Content-Type: text/plain
 
-On 20/02/24 18:42, Eric Dumazet wrote:
-> On Tue, Feb 20, 2024 at 6:38=E2=80=AFPM Valentin Schneider <vschneid@redh=
-at.com> wrote:
->> Hm so that would indeed prevent a concurrent inet_twsk_schedule() from
->> re-arming the timer, but in case the calls are interleaved like so:
->>
->>                              tcp_time_wait()
->>                                inet_twsk_hashdance()
->>   inet_twsk_deschedule_put()
->>     timer_shutdown_sync()
->>                                inet_twsk_schedule()
->>
->> inet_twsk_hashdance() will have left the refcounts including a count for
->> the timer, and we won't arm the timer to clear it via the timer callback
->> (via inet_twsk_kill()) - the patch in its current form relies on the tim=
-er
->> being re-armed for that.
->>
->> I don't know if there's a cleaner way to do this, but we could catch that
->> in inet_twsk_schedule() and issue the inet_twsk_kill() directly if we can
->> tell the timer has been shutdown:
->> ---
->> diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock=
-.c
->> index 61a053fbd329c..c272da5046bb4 100644
->> --- a/net/ipv4/inet_timewait_sock.c
->> +++ b/net/ipv4/inet_timewait_sock.c
->> @@ -227,7 +227,7 @@ void inet_twsk_deschedule_put(struct inet_timewait_s=
-ock *tw)
->>          * have already gone through {tcp,dcpp}_time_wait(), and we can =
-safely
->>          * call inet_twsk_kill().
->>          */
->> -       if (del_timer_sync(&tw->tw_timer))
->> +       if (timer_shutdown_sync(&tw->tw_timer))
->>                 inet_twsk_kill(tw);
->>         inet_twsk_put(tw);
->>  }
->> @@ -267,6 +267,10 @@ void __inet_twsk_schedule(struct inet_timewait_sock=
- *tw, int timeo, bool rearm)
->>                                                      LINUX_MIB_TIMEWAITE=
-D);
->>                 BUG_ON(mod_timer(&tw->tw_timer, jiffies + timeo));
+On Wed, Feb 21, 2024, at 16:32, Naresh Kamboju wrote:
+> The x86 / i386 compilations encountered errors due to additional Kconfigs
+> incorporated from the selftests/net/*/config in the Linux next version.
+> The issue first appeared with the next-20240213 tag. This problem affects
+> the Linux next branch, but not the mainline Linus master branch.
 >
-> Would not a shutdown timer return a wrong mod_timer() value here ?
+> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
 >
-> Instead of BUG_ON(), simply release the refcount ?
+> The bisection points to the following commit id,
+> # first bad commit: [64259ce2a20ce2dcc585a2cb83d1366fb04a6008] ubsan:
+> reintroduce signed overflow sanitizer
 >
+> Build errors:
+> -------------
+> In function 'memcmp',
+>     inlined from 'nft_pipapo_insert' at
+> /builds/linux/net/netfilter/nft_set_pipapo.c:1258:7:
+> /builds/linux/include/linux/fortify-string.h:63:33: error:
+> '__builtin_memcmp' specified bound 18446744071562067968 exceeds
+> maximum object size 9223372036854775807 [-Werror=stringop-overread]
+>    63 | #define __underlying_memcmp     __builtin_memcmp
+>       |                                 ^
+> /builds/linux/include/linux/fortify-string.h:655:16: note: in
+> expansion of macro '__underlying_memcmp'
+>   655 |         return __underlying_memcmp(p, q, size);
+>       |                ^~~~~~~~~~~~~~~~~~~
+> cc1: all warnings being treated as errors
 
-Unfortunately a shutdown timer would return the same as a non-shutdown one:
+The size 18446744071562067968 is equal to (u64)INT_MIN, so something
+goes wrong with the length conversion when a negative length
+might be passed into memcmp().
 
- * Return:
- * * %0 - The timer was inactive and started or was in shutdown
- *	  state and the operation was discarded
+I don't see any relevant changes to this file that
+are likely causes, but these warnings are sometimes
+sensitive to compiler optimization, so it's possible that
+some unrelated change such as 7395dfacfff6 ("netfilter:
+nf_tables: use timestamp to check for set element timeout")
+just changed the inlining behavior in a way such that
+either a warning is now detected when it was previously
+hidden and the compiler now sees more about the
+state, or it seems less about the state and can no longer
+prove that this does not happen.
 
-and now that you've pointed this out, I realize it's racy to check the
-state of the timer after the mod_timer():
+I have so far not seen the same issue in randconfig builds
+on today's linux-next with gcc-13.2.0, but I would guess
+that a patch like
 
-  BUG_ON(mod_timer(&tw->tw_timer, jiffies + timeo));
-                                                        inet_twsk_deschedul=
-e_put()
-                                                          timer_shutdown_sy=
-nc()
-                                                          inet_twsk_kill()
-  if (!tw->tw_timer.function)
-    inet_twsk_kill()
-
-
-I've looked into messing about with the return values of mod_timer() to get
-the info that the timer was shutdown, but the only justification for this
-is that here we rely on the timer_base lock to serialize
-inet_twsk_schedule() vs inet_twsk_deschedule_put().
-
-AFAICT the alternative is adding local serialization like so, which I'm not
-the biggest fan of but couldn't think of a neater approach:
----
-diff --git a/include/net/inet_timewait_sock.h b/include/net/inet_timewait_s=
-ock.h
-index f28da08a37b4e..39bb0c148d4ee 100644
---- a/include/net/inet_timewait_sock.h
-+++ b/include/net/inet_timewait_sock.h
-@@ -75,6 +75,7 @@ struct inet_timewait_sock {
- 	struct timer_list	tw_timer;
- 	struct inet_bind_bucket	*tw_tb;
- 	struct inet_bind2_bucket	*tw_tb2;
-+	struct spinlock      tw_timer_lock;
- };
- #define tw_tclass tw_tos
-=20
-diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.c
-index 61a053fbd329c..2471516f9c61d 100644
---- a/net/ipv4/inet_timewait_sock.c
-+++ b/net/ipv4/inet_timewait_sock.c
-@@ -193,6 +193,7 @@ struct inet_timewait_sock *inet_twsk_alloc(const struct=
- sock *sk,
- 		atomic64_set(&tw->tw_cookie, atomic64_read(&sk->sk_cookie));
- 		twsk_net_set(tw, sock_net(sk));
- 		timer_setup(&tw->tw_timer, tw_timer_handler, 0);
-+		spin_lock_init(&tw->tw_timer_lock);
- 		/*
- 		 * Because we use RCU lookups, we should not set tw_refcnt
- 		 * to a non null value before everything is setup for this
-@@ -227,8 +228,11 @@ void inet_twsk_deschedule_put(struct inet_timewait_soc=
-k *tw)
- 	 * have already gone through {tcp,dcpp}_time_wait(), and we can safely
- 	 * call inet_twsk_kill().
- 	 */
--	if (del_timer_sync(&tw->tw_timer))
-+	spin_lock(&tw->tw_timer_lock);
-+	if (timer_shutdown_sync(&tw->tw_timer))
- 		inet_twsk_kill(tw);
-+	spin_unlock(&tw->tw_timer_lock);
+diff --git a/net/netfilter/nft_set_pipapo.c b/net/netfilter/nft_set_pipapo.c
+index aa1d9e93a9a0..c284522f64c4 100644
+--- a/net/netfilter/nft_set_pipapo.c
++++ b/net/netfilter/nft_set_pipapo.c
+@@ -1252,11 +1252,12 @@ static int nft_pipapo_insert(const struct net *net, const struct nft_set *set,
+        start_p = start;
+        end_p = end;
+        nft_pipapo_for_each_field(f, i, m) {
++               unsigned length = f->groups / NFT_PIPAPO_GROUPS_PER_BYTE(f);
 +
- 	inet_twsk_put(tw);
- }
- EXPORT_SYMBOL(inet_twsk_deschedule_put);
-@@ -262,11 +266,25 @@ void __inet_twsk_schedule(struct inet_timewait_sock *=
-tw, int timeo, bool rearm)
-=20
- 	if (!rearm) {
- 		bool kill =3D timeo <=3D 4*HZ;
-+		bool pending;
-=20
- 		__NET_INC_STATS(twsk_net(tw), kill ? LINUX_MIB_TIMEWAITKILLED :
- 						     LINUX_MIB_TIMEWAITED);
-+		spin_lock(&tw->tw_timer_lock);
- 		BUG_ON(mod_timer(&tw->tw_timer, jiffies + timeo));
-+		pending =3D timer_pending(&tw->tw_timer);
- 		refcount_inc(&tw->tw_dr->tw_refcount);
-+
-+		/*
-+		 * If the timer didn't become pending under tw_timer_lock, then
-+		 * it means it has been shutdown by inet_twsk_deschedule_put()
-+		 * prior to this invocation. All that remains is to clean up the
-+		 * timewait.
-+		 */
-+		if (!pending)
-+			inet_twsk_kill(tw);
-+
-+		spin_unlock(&tw->tw_timer_lock);
- 	} else {
- 		mod_timer_pending(&tw->tw_timer, jiffies + timeo);
- 	}
+                if (f->rules >= (unsigned long)NFT_PIPAPO_RULE0_MAX)
+                        return -ENOSPC;
+ 
+-               if (memcmp(start_p, end_p,
+-                          f->groups / NFT_PIPAPO_GROUPS_PER_BYTE(f)) > 0)
++               if (memcmp(start_p, end_p, length)) > 0)
+                        return -EINVAL;
+ 
+                start_p += NFT_PIPAPO_GROUPS_PADDED_SIZE(f);
 
+
+will hide the issue again.
+
+     Arnd
 
