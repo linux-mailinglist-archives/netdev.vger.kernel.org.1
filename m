@@ -1,162 +1,130 @@
-Return-Path: <netdev+bounces-73713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6CC785DFE8
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 15:38:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A299D85E00C
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 15:42:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D447FB253F2
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 14:38:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05C79B278E3
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 14:41:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 549787F7FF;
-	Wed, 21 Feb 2024 14:38:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1B0C80052;
+	Wed, 21 Feb 2024 14:40:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="WnL6F42n";
-	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="289aKcgA"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Y6yTi2qQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.164])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E9467FBA1;
-	Wed, 21 Feb 2024 14:38:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.164
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708526303; cv=pass; b=cVgkAyz79VOKDaMYsIj69tfEW80TMWldVsLXCz/xs0l/L4RxWAcd4Jc1T+2CbjBC8Kod3eAucJgNpaPE5olY2eihSW1ZoM+/eh3KUiHQASbzyl51G9IezKFjE+tYBOG1qPqC/I360GcnOaF/qnrwGl7mBDrUxmZMHvvwZPLMOtA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708526303; c=relaxed/simple;
-	bh=Yk/f5XifWhGXBDB2dBIer/YPFVx1NYJczki/GIL9pm0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qdoSV3F8MLcyd2CSxCFLnrcKPuCj1RTlILi2EEDo2VU0LBPMPpbN+LJ2JrrnCQuw2fyhB5OOR6lmXFEJ3c0E2Sr2EG4wtNbGN78dJr44FljkPnOSh5E84XYCc7r30p3IBH6LALzisZRCKbDFYBVhS/Cq9jK7z1Tll1HJLGKOyc0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=WnL6F42n; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=289aKcgA; arc=pass smtp.client-ip=81.169.146.164
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
-ARC-Seal: i=1; a=rsa-sha256; t=1708526292; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=gNd+zI5sqYXi782KQQG4i1gGlvtRSk28pUr3JFmuDlexdios7wHWgWJIfkY0B9oajU
-    TgTbHERDZlJ/nUvEKhg/NOA+T/0+kLbxC/H22KUofiyaq2cGDLEoKH0uChdTWcSOnKcD
-    fSrNgQ6snVlEiD4MXQpX6Ts+am+v7E/5p7pj8ozCE/3HiGapGSqRcqAnOrBsbjLy24l0
-    C5R/7PxaD6a9j4ZNYtX29yFucUHvJH88AW8doyLXLixu1+9N0h/SstlxCCfnmpSZrAOp
-    s3+EWlHFo6dQTghxgvadj5Ce9cjz1J2prW/RCoBxG4Q08WIbne21MIsoEyBm2gho2QRW
-    WOSg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1708526292;
-    s=strato-dkim-0002; d=strato.com;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=Kiw7sAnsh6n8rHnUUwg+xTvudXCU4yvOhcAFDzbeABU=;
-    b=NIuR+50Zkn29+Oa3MK4HHaSwXfaNRqu0Q42AiesvueB9shP/SG2z/03A4E119II9Xt
-    lflucqynIdCO4Bifb6uIKtoUYDBNxTXIWsL19F89SouOF9kIiuD+au+WeHDx8UFMQzyE
-    njoJO5LERpwzXFK+I2TmdipR7UJ/Iz4ECcFo9ysveq6afLFdJJ53O4CRiWssY8miveHF
-    AGlDWvLPdzxgrJsJ8RCK8sEfvGctJwsmn8J+/C+Qed3xr185Fsx4QgaUTDZN6TDyQ5gf
-    Bf4Y56lC/pn+V3GzUfSrPYI1bYAuJiOWo1m2CQKAuo/41Ngoi902RoZUYQFTU75sPKUU
-    rOfw==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1708526292;
-    s=strato-dkim-0002; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=Kiw7sAnsh6n8rHnUUwg+xTvudXCU4yvOhcAFDzbeABU=;
-    b=WnL6F42nnKSH9gbtQ8gDzo/AZlSBr2Q+RKA5xDVelJ6+q6S5NEr2x2M5M6tFDJmFUo
-    Pixlc6Crv7fEt+NEadCcxXc1yMAdY5VX76RPGD5y6U7zwkmDUyzl/NeL52U9lciPdiVh
-    +++tfv7RSvBgWZeq+hBebdH1aZKuVWFctrP/DJ6lO1XLlxURdsOgJN864YJMkI0IYSnm
-    ktiF37yhp7eKFsePnYX6x6bPCq7NNVgJSj6k1eviexAkloJJd0jQZKabDfs3ksF3ffW8
-    eaudYRgfepkVsKxZAu7YkqhGe07oD9QxLstMxArwk8vIbzTyi/+KyPFt2NYUANTGmywz
-    umKg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1708526292;
-    s=strato-dkim-0003; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=Kiw7sAnsh6n8rHnUUwg+xTvudXCU4yvOhcAFDzbeABU=;
-    b=289aKcgAEnQjjLtvnkekJnaI8uOOwebsrVObWbyZDmU6iRbTFa8p9dQ+PAqthEVZb7
-    ku5nnBe4jpuuV0D+yUBA==
-X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjG14FZxedJy6qgO1qCHSa1GLptZHusl129OHEdFr0USEbHoO0g=="
-Received: from [IPV6:2a00:6020:4a8e:5010::923]
-    by smtp.strato.de (RZmta 49.11.2 AUTH)
-    with ESMTPSA id K49f9c01LEcCELB
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Wed, 21 Feb 2024 15:38:12 +0100 (CET)
-Message-ID: <d4b3bc0b-95e3-470e-9993-a9f01a18364f@hartkopp.net>
-Date: Wed, 21 Feb 2024 15:38:06 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 582307EF03;
+	Wed, 21 Feb 2024 14:40:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708526421; cv=none; b=ejwueMlJyPtzNaCQZRtVb8PhYG7OABXAOFeUhpa8EIeijEWeFCVg/Gta7o2+DzcVOKrLvCZ1yQrflAlkepnuv/uDu3rm2wsjgMu0xlU4E+RgH5o09gm+9/O9Gfwik8LCiViuKNlq/7BltD1+vLbzoQniu1b/cQuQCzFU8FXxdiY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708526421; c=relaxed/simple;
+	bh=Vtj87ir413FfelSjrCQhZpK5ETcv5wHwL+6tPtbC/Uc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CgPb+phhpu8x/yCZhkwYs2ZBe3hfrdZ5qVR/YE6SK4o4o86rSFrYZolB3mqnNAEmbXlJ3pxKGtBNszAIK5pA/Q4QgcfLsB34KGgVnJ8Mk+66/fCjUi5IcNES0mipFcDpGarY8JhMJ3WVaVd8xMDsUt/CqUF37QZhleRSNlNJHwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Y6yTi2qQ; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 44BA0C0005;
+	Wed, 21 Feb 2024 14:40:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1708526411;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tQm0Ki+vp+Zu8t/KqaIVW4arTM7ikJLGwDxFBBM8zRM=;
+	b=Y6yTi2qQeizuS5QqtOVYt2nD/gLX1NBZSTTyeKh7qGJlx0SKp7Qbuom3BsiBfoyXIm1XBU
+	89mGEKUeZo4PW7DXVu4VwkwHCZw81uvIl29JXXoe0nHedMk8bJWz/sMy+jMywiEaMSX6fU
+	2R6XzTWuRfhe5/+FyRpfGc4dUN3LM82he24bmlACxF62NwzNTY65tL8eLSq9xR8ZflZcvF
+	CXlqQ3azgASB6cZVNqsNtM0hzKIXEVikJzc1ThwlDphHdccIDb2nCAb/XrRJ5Mk4kZop0Y
+	EO7Yns5A+Mti/OkLhpsNfzuzY94H0OB3oNUb2x5+VjgAaLV/xPyGlZvt92gHDw==
+Date: Wed, 21 Feb 2024 15:40:06 +0100
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
+ <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>, Mark Brown <broonie@kernel.org>,
+ Frank Rowand <frowand.list@gmail.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v4 05/17] net: pse-pd: Introduce PSE types
+ enumeration
+Message-ID: <20240221154006.7ad2d66d@kmaincent-XPS-13-7390>
+In-Reply-To: <11225a0d-bdc4-459c-9258-c9da217cc89e@lunn.ch>
+References: <20240215-feature_poe-v4-0-35bb4c23266c@bootlin.com>
+	<20240215-feature_poe-v4-5-35bb4c23266c@bootlin.com>
+	<20240215105846.6dd48886@kernel.org>
+	<20240216104211.2c11d1cc@kmaincent-XPS-13-7390>
+	<20240216173638.4bb12af2@kernel.org>
+	<20240219160456.0b5e8de3@kmaincent-XPS-13-7390>
+	<11225a0d-bdc4-459c-9258-c9da217cc89e@lunn.ch>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] can: netlink: Fix TDCO calculation using the old data
- bittiming
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>,
- Maxime Jayat <maxime.jayat@mobile-devices.fr>,
- Wolfgang Grandegger <wg@grandegger.com>, linux-can@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <40579c18-63c0-43a4-8d4c-f3a6c1c0b417@munic.io>
- <CAMZ6Rq+10m=yQ9Cc9gZQegwD=6iCU=s1r78+ogJ4PV0f5_s+tQ@mail.gmail.com>
- <54afa5e8-fb5e-4d90-8897-8f3c5a684418@hartkopp.net>
- <20240221-garden-petted-789304a1b1a5-mkl@pengutronix.de>
-Content-Language: en-US
-From: Oliver Hartkopp <socketcan@hartkopp.net>
-In-Reply-To: <20240221-garden-petted-789304a1b1a5-mkl@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Hello Marc,
+On Mon, 19 Feb 2024 16:44:34 +0100
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-On 21.02.24 15:24, Marc Kleine-Budde wrote:
-> On 21.02.2024 15:14:02, Oliver Hartkopp wrote:
->> I have an old PCAN USB adapter (Classical CAN) which uses the pcan_usb
->> driver and wanted to set a 50kbit/s bitrate:
->>
->> ip link set can0 up txqueuelen 500 type can bitrate 50000 sjw 4
->>
->> First it complained about the SJW having a higher value than some phase-seg
->> value which was 2.
->>
->> Error: sjw: 4 greater than phase-seg2: 2.
->>
->> I always thought the driver automatically adapts the SJW value to the
->> highest possible and SJW=4 could always be set. Did this change at a certain
->> point?
-> 
-> Yes, that changed with b5a3d0864ee7 ("can: bittiming: can_sjw_check():
-> check that SJW is not longer than either Phase Buffer Segment")
-> 
-> See discussion in https://lore.kernel.org/all/20220907103845.3929288-3-mkl@pengutronix.de/
+> On Mon, Feb 19, 2024 at 04:04:56PM +0100, K=C3=B6ry Maincent wrote:
+> > On Fri, 16 Feb 2024 17:36:38 -0800
+> > Jakub Kicinski <kuba@kernel.org> wrote: =20
+> > > > > but why the separate header? Is it going to be used in other part=
+s of
+> > > > > uAPI than just in ethtool?     =20
+> > > >=20
+> > > > We might use it in pse core if capabilities between PoE and PoDL di=
+ffer
+> > > > but I am not sure about it.
+> > > > Do you prefer to move it to ethtool header and add prefix ETHTOOL_ =
+to
+> > > > the enum values?   =20
+> > >=20
+> > > I don't know enough to have an opinion :) Whatever you end up doing,
+> > > it's probably worth documenting the reason for the choice in the comm=
+it
+> > > message? =20
+> >=20
+> > Mmh, I am still not sure of the best choice on this. I think I will mov=
+e it
+> > to ethtool as you suggested. =20
+>=20
+> kAPI is hard to change. So it is worth thinking about it.
+>=20
+> Can you think of any possible kAPI not using ethtool netlink? Its not
+> going to be ioctl. We generally don't export new things in /sysfs if
+> we have netlink, etc.
+>=20
+> So to me, it is only going to be used be the ethtool API, so i would
+> follow the usual conventions for ethtool.
 
-Ok, thanks.
+Oops sorry forgot to reply to you.
+Indeed I reached to the same conclusion on my side.
 
->> Anyway, then I reduced the given SJW value and the ip command did not give
->> any error message.
->>
->> But finally there was not CAN traffic possible with my "always working
->> setup".
->>
->> I'm running 6.8.0-rc4-00433-g92a355464776 from Linus' tree.
->>
->> Reverting this patch fixed my issue.
-> 
-> But what has the tdco calculation to do with non CAN-FD controllers?
-
-Hm, I was using a Debian 6.1 kernel in between, which worked.
-
-Then I booted my 6.8.0-rc4-00433-g92a355464776 again, reverted the patch 
-and loaded the changed can-dev module by hand - which then also worked.
-
-To double check now I was unloading the patched version and using the 
-can-dev from /lib/modules again, also works ¯\_(ツ)_/¯
-
-So, I'll have to make more investigations what really went wrong here.
-I also was astonished about such CAN FD dependency.
-
-Will come back with more info about my experienced issue.
-So far please drop my blame for this patch.
-
-Best regards,
-Oliver
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
