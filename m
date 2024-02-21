@@ -1,172 +1,135 @@
-Return-Path: <netdev+bounces-73756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20D8A85E297
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 17:06:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4DF385E2E3
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 17:18:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 52DECB21B47
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 16:06:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74EB1B22DE1
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 16:18:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6EFA81736;
-	Wed, 21 Feb 2024 16:03:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="JPfLPTXM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAFB980BE1;
+	Wed, 21 Feb 2024 16:18:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18D4785C48
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 16:03:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2235D446D9;
+	Wed, 21 Feb 2024 16:18:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708531386; cv=none; b=qtpeNDAS9A3qQ02OkdwUyFrJFmL+sKMXpNcDd+Zhuj+7+BU6k2Di/qBq4g+KlOCWGfPuBxlmrwzNYnzsHDji6KLO9iM+jkPX+RZ30VtgEDsVTnLRg1lj2rWaPjO/BOEszbP52YS6a75hAMNHzwfiJ+GGTVcbSTaZy677/Dn8vlE=
+	t=1708532288; cv=none; b=UZuFggm8Nhatr06MlmOyVu4lfkRjXSnNt2t1G9xmrhyr7dB1vHHxVfetVv1kM71T6nxa6rKYsEPpBSrqrfVwUHeTwmvLg1+C7jOVHRY3mSdNWkqYluVK3xRQrZqLttENhpvRfPIFK+mhFgzWDLTHNgNwJIX0pVf/qUHryqX/qKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708531386; c=relaxed/simple;
-	bh=dgKPJgYUdNC4HjonLKTL0MnIIXxZ8wVCNFRZsaKzi8o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pngw/Xn9s5h4kpLI+qS/PIinMPr8+oUvNWYxcee2qAUcd7eqdy7Rc8KPBBi+Jj/dH0OBp0/aivnXqd9MlhAnWLflNefiSbUsHmVNQ23hcI8YFGzdQ3AtgxKDGZKijFshmt32dpbiNfJEEUHSBnpwQq0DAKJB8apG00atecKO7QE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=JPfLPTXM; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-41241f64c6bso5514485e9.0
-        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 08:03:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708531383; x=1709136183; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NAyrJ3ysjOKEMv6LdT65oPM2L+c5vBxXeZNYGq9IWlM=;
-        b=JPfLPTXMuGZntUA9CW/Un/0aSzIJtdsr7E241b7mEKpFj+WQMJqoG9QzUYnu4kau/M
-         VNx2te4sAtgVhubepaMaKMb7QYVIP49i0QM7mkdOTzlnLHRhO8v6uRZfwyNtWwT8LIRf
-         MfYWYPK9FOw2HaBW4eICSiHhdGvictavsFVRB7eh2X+V0dykK1syIbDuET9UJ+NDMfYu
-         0ds5aVmpVfD0yuHHW1CWh1syGNgncwjeVgcoEY0YG0QetJ+0/zu6JilTgHSaG40HZBnI
-         jtU3FJ8U38h6r7SDFHTI0lOEgdBW2XmCasofHt/OOnpH9shqdgPug+DbBMxPrVyco8Cl
-         srRQ==
+	s=arc-20240116; t=1708532288; c=relaxed/simple;
+	bh=/kpFXS2EwZl6WC5jy5PmXQiF+/eQUFkgRYhkxKfh0kE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=k/kC6FL56p3PLsKZXbg+sfADq0awWBbcw1pCY1ng4rfnqy4aPYmvHGLNBt3p6IETgNAiYNZKWwMxujmVBHbMttleWbUkNxsh1V/V4y7DyxZDpIDBe5STV5IXVuBiKCOg5wcPrVUVgrovw/M2I9FcVdq+xiidv7g+krRVDHvm4Kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2d21cdbc85bso10916511fa.2;
+        Wed, 21 Feb 2024 08:18:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708531383; x=1709136183;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NAyrJ3ysjOKEMv6LdT65oPM2L+c5vBxXeZNYGq9IWlM=;
-        b=GIkPi1zi1yQRPfbbAjDf0eTVcSfjhtI4njRD7HMSzMZDgcP3PmAfnws/geoyracF+l
-         fSIVy0C0Igz2sl9xttdxyce41BAGXbDblu+vaS4qHeRdHd8zfz6mSuXSeuXiszblyVYT
-         hGQch+NRypu+Ag0h6ERNm3YQHT8BMUHIDoLE3iEIGkX8/l1QSLUvilQURSwTXbzGcRpL
-         5ripLrkuPqsrJnzuRrbxx441LKS8bIxu+iNyiCobNWX3mgWD+oLCwSFMaB7PHTY3N2H9
-         UvetpH23odMK/Y7lVQm0cUUk5JP1yZ5D7TRx9gpaoF4/58XYE6PeyRkqBWJx/9Nnhd46
-         clfw==
-X-Forwarded-Encrypted: i=1; AJvYcCW3zT4BrcJtWrXp/nfXZGqWtngaTjFG6n38n3+tIaNJZgI2EqcPrQc7Ub6Qfrq+6w3IqcsfwadmB/3ODu95yZMn0KOilwR0
-X-Gm-Message-State: AOJu0YybQrDcgx1D1MPXnRFDRDkYpaac1cYn97LjjPta1F9EKVX6Q8sx
-	QGxab9aZUZbVVLHOR+EZKFZktUVVsUR5BMl74v0JAEN6F5v7Mx77JR1SwN2qodY=
-X-Google-Smtp-Source: AGHT+IG4DqJrPLByFyqwe4P1waoeLsQpCYIS9pcst8tLvktOHRLaeDPeYFHYT4Kwigg8jiA24CbBNA==
-X-Received: by 2002:a5d:5222:0:b0:33d:63c0:3b7f with SMTP id i2-20020a5d5222000000b0033d63c03b7fmr3703675wra.42.1708531383312;
-        Wed, 21 Feb 2024 08:03:03 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id bx14-20020a5d5b0e000000b0033d6bd4eab9sm6171198wrb.1.2024.02.21.08.03.02
+        d=1e100.net; s=20230601; t=1708532285; x=1709137085;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9Sihn+OQP2RXoSGGMUwVUZ2ON16ouXq3GovfkSaPw3Y=;
+        b=WsxQmUFHcBzBi+Iz9i+0KUWpWu6LEsOFcazJUHVooXa9oywIZ/5mC3vznvngobOGgn
+         2+e357V1BD6WNPmJmWVlPE/MmR+/MNNOtfUNeXXfs9sdEhQ9u3GnVrusqY/i4i7VM/lS
+         OoJVfBesLNs2bzsTEBFfDD25951HyuSXKT4/4uKRz/ovwSI9PLA3Fs5/XFkKeUQpCJbE
+         RVFEPAL8QUDRw6KxNO0HFG63NSihVslUMKWqiyd4trG+7haTuFwKdDwxZmiylweYqphC
+         vm/SnLr8Yqm9TxK8YB3oblynaO+EuNfTnZBs5RllWrU2nqcOKtjgsISdWwe7ilR/PmP0
+         Fnng==
+X-Forwarded-Encrypted: i=1; AJvYcCVIjMKFDMBwiOBjENwVu9tAypW2sLnhFPzCGwUekTu8iMynViDn7d3ibFqC4SVBGejKttRKNVAYzLiB19aMBNMdELU6a4voXx6MzFqp
+X-Gm-Message-State: AOJu0YzX7yw2Q4QyeudY56vOdcQhK8BT/azlKvU67B7GV8yUw+DA4K60
+	OHMYC+twHXs+pL4vHPoxS/uEju7rj9PYuY7ampYW83bfvtrDQ9clsuLjsbHErQ0=
+X-Google-Smtp-Source: AGHT+IHt4rZ/meSl1g3jJEI+lEUS+n3f2D8JDvU7nz30+XQJU73eFFId6Dc8DKReF9u/kRtR9m3oBw==
+X-Received: by 2002:a2e:9201:0:b0:2d2:37ff:f54a with SMTP id k1-20020a2e9201000000b002d237fff54amr6803294ljg.41.1708532284991;
+        Wed, 21 Feb 2024 08:18:04 -0800 (PST)
+Received: from localhost (fwdproxy-lla-004.fbsv.net. [2a03:2880:30ff:4::face:b00c])
+        by smtp.gmail.com with ESMTPSA id u6-20020aa7d546000000b0056503299e26sm557848edr.88.2024.02.21.08.18.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Feb 2024 08:03:02 -0800 (PST)
-Date: Wed, 21 Feb 2024 17:02:59 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next 12/13] rtnetlink: make rtnl_fill_link_ifmap()
- RCU ready
-Message-ID: <ZdYes3iPqzf0FCTf@nanopsycho>
-References: <20240221105915.829140-1-edumazet@google.com>
- <20240221105915.829140-13-edumazet@google.com>
+        Wed, 21 Feb 2024 08:18:04 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+To: kuba@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	David Ahern <dsahern@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	horms@kernel.org
+Subject: [PATCH net-next] ipv6/sit: Do not allocate stats in the driver
+Date: Wed, 21 Feb 2024 08:17:32 -0800
+Message-Id: <20240221161732.3026127-1-leitao@debian.org>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240221105915.829140-13-edumazet@google.com>
+Content-Transfer-Encoding: 8bit
 
-Wed, Feb 21, 2024 at 11:59:14AM CET, edumazet@google.com wrote:
->Use READ_ONCE() to read the following device fields:
->
->	dev->mem_start
->	dev->mem_end
->	dev->base_addr
->	dev->irq
->	dev->dma
->	dev->if_port
->
->Provide IFLA_MAP attribute only if at least one of these fields
->is not zero. This saves some space in the output skb for most devices.
->
->Signed-off-by: Eric Dumazet <edumazet@google.com>
->---
-> net/core/rtnetlink.c | 26 ++++++++++++++------------
-> 1 file changed, 14 insertions(+), 12 deletions(-)
->
->diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
->index 1b26dfa5668d22fb2e30ceefbf143e98df13ae29..b91ec216c593aaebf97ea69aa0d2d265ab61c098 100644
->--- a/net/core/rtnetlink.c
->+++ b/net/core/rtnetlink.c
->@@ -1455,19 +1455,21 @@ static noinline_for_stack int rtnl_fill_vf(struct sk_buff *skb,
-> 	return 0;
-> }
-> 
->-static int rtnl_fill_link_ifmap(struct sk_buff *skb, struct net_device *dev)
->+static int rtnl_fill_link_ifmap(struct sk_buff *skb,
->+				const struct net_device *dev)
-> {
-> 	struct rtnl_link_ifmap map;
-> 
-> 	memset(&map, 0, sizeof(map));
->-	map.mem_start   = dev->mem_start;
->-	map.mem_end     = dev->mem_end;
->-	map.base_addr   = dev->base_addr;
->-	map.irq         = dev->irq;
->-	map.dma         = dev->dma;
->-	map.port        = dev->if_port;
->-
->-	if (nla_put_64bit(skb, IFLA_MAP, sizeof(map), &map, IFLA_PAD))
->+	map.mem_start = READ_ONCE(dev->mem_start);
->+	map.mem_end   = READ_ONCE(dev->mem_end);
->+	map.base_addr = READ_ONCE(dev->base_addr);
->+	map.irq       = READ_ONCE(dev->irq);
->+	map.dma       = READ_ONCE(dev->dma);
->+	map.port      = READ_ONCE(dev->if_port);
->+	/* Only report non zero information. */
->+	if (memchr_inv(&map, 0, sizeof(map)) &&
+With commit 34d21de99cea9 ("net: Move {l,t,d}stats allocation to core and
+convert veth & vrf"), stats allocation could be done on net core
+instead of this driver.
 
-This check(optimization) is unrelated to the rest of the patch, correct?
-If yes, could it be a separate patch?
+With this new approach, the driver doesn't have to bother with error
+handling (allocation failure checking, making sure free happens in the
+right spot, etc). This is core responsibility now.
 
+Remove the allocation in the ipv6/sit driver and leverage the network
+core allocation.
 
->+	    nla_put_64bit(skb, IFLA_MAP, sizeof(map), &map, IFLA_PAD))
-> 		return -EMSGSIZE;
-> 
-> 	return 0;
->@@ -1875,9 +1877,6 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb,
-> 			goto nla_put_failure;
-> 	}
-> 
->-	if (rtnl_fill_link_ifmap(skb, dev))
->-		goto nla_put_failure;
->-
-> 	if (dev->addr_len) {
-> 		if (nla_put(skb, IFLA_ADDRESS, dev->addr_len, dev->dev_addr) ||
-> 		    nla_put(skb, IFLA_BROADCAST, dev->addr_len, dev->broadcast))
->@@ -1927,6 +1926,9 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb,
-> 	rcu_read_lock();
-> 	if (rtnl_fill_link_af(skb, dev, ext_filter_mask))
-> 		goto nla_put_failure_rcu;
->+	if (rtnl_fill_link_ifmap(skb, dev))
->+		goto nla_put_failure_rcu;
->+
-> 	rcu_read_unlock();
-> 
-> 	if (rtnl_fill_prop_list(skb, dev))
->-- 
->2.44.0.rc0.258.g7320e95886-goog
->
->
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ net/ipv6/sit.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
+
+diff --git a/net/ipv6/sit.c b/net/ipv6/sit.c
+index ed3a44aa1e9d..5ad01480854d 100644
+--- a/net/ipv6/sit.c
++++ b/net/ipv6/sit.c
+@@ -1408,7 +1408,6 @@ static void ipip6_dev_free(struct net_device *dev)
+ 	struct ip_tunnel *tunnel = netdev_priv(dev);
+ 
+ 	dst_cache_destroy(&tunnel->dst_cache);
+-	free_percpu(dev->tstats);
+ }
+ 
+ #define SIT_FEATURES (NETIF_F_SG	   | \
+@@ -1437,6 +1436,8 @@ static void ipip6_tunnel_setup(struct net_device *dev)
+ 	dev->features		|= NETIF_F_LLTX;
+ 	dev->features		|= SIT_FEATURES;
+ 	dev->hw_features	|= SIT_FEATURES;
++	dev->pcpu_stat_type	= NETDEV_PCPU_STAT_TSTATS;
++
+ }
+ 
+ static int ipip6_tunnel_init(struct net_device *dev)
+@@ -1449,16 +1450,11 @@ static int ipip6_tunnel_init(struct net_device *dev)
+ 	strcpy(tunnel->parms.name, dev->name);
+ 
+ 	ipip6_tunnel_bind_dev(dev);
+-	dev->tstats = netdev_alloc_pcpu_stats(struct pcpu_sw_netstats);
+-	if (!dev->tstats)
+-		return -ENOMEM;
+ 
+ 	err = dst_cache_init(&tunnel->dst_cache, GFP_KERNEL);
+-	if (err) {
+-		free_percpu(dev->tstats);
+-		dev->tstats = NULL;
++	if (err)
+ 		return err;
+-	}
++
+ 	netdev_hold(dev, &tunnel->dev_tracker, GFP_KERNEL);
+ 	netdev_lockdep_set_classes(dev);
+ 	return 0;
+-- 
+2.39.3
+
 
