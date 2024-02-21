@@ -1,141 +1,138 @@
-Return-Path: <netdev+bounces-73706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73708-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4745885DF17
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 15:24:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49FD685DFA9
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 15:30:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F29F2283888
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 14:24:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B7691C2304B
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 14:30:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAE5C78B60;
-	Wed, 21 Feb 2024 14:24:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D623865198;
+	Wed, 21 Feb 2024 14:30:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U9L9uYjZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D94D69E00
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 14:24:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 483AB76905;
+	Wed, 21 Feb 2024 14:30:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708525474; cv=none; b=lh40WPG3crxmEZXa+exMFwshK7KeolIrCAO3VqgO7sNZgzDCrPsSr9QKDtFtd1hqSkIhuPG02AapzM1teh+TB75JHTQM038iIS4RDGilVS7YnInGv7m3jORgZ3BzPzn1rTQUBwHLorBKxt9ZG4WHxEPRkoaEP1PHUKXpw/Lzsng=
+	t=1708525821; cv=none; b=G3+jSfWmH1Mw40ngTWs11rN0kOosC/WClsPywxgqxSQcRyu+Qi8UZoWDq+cCHLAaY9V8azmJsNdGrJLYjSj9xSNVgpsA5SDIh1DZSvtuUKYsia3xmzVQcTSTPR1DE9FTQYb05iU9p18Bfwe/22+hr8I497hkR6DAetbGNpFnytg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708525474; c=relaxed/simple;
-	bh=MSnOGaCDM31EFc3ia7dnG7DavW3wwAsIGBdVyjSyggQ=;
+	s=arc-20240116; t=1708525821; c=relaxed/simple;
+	bh=AnVfYPg9QLlMiSY5zHzUg1A2vSHWhrEptn7kKIChBoo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mcZyRxmh/D23qM26AltIzwaYg9/zpqvhu+1fWm/cD0yGy/YaxyXN2xmZRwwBKkE5szXLzWQgIxuwkeNRGzuwOheGjQrQKCxWbKoX4UfUEriy2L+wyrw8cOO9DRSCY4mwGs+hv5tLv72omBVfLrs+EUmsjKohU3Y5toPT/+aMYuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rcnWL-0004zf-Tl; Wed, 21 Feb 2024 15:24:25 +0100
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rcnWL-0023cE-AD; Wed, 21 Feb 2024 15:24:25 +0100
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id EC589294BAD;
-	Wed, 21 Feb 2024 14:24:24 +0000 (UTC)
-Date: Wed, 21 Feb 2024 15:24:24 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Oliver Hartkopp <socketcan@hartkopp.net>
-Cc: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>, 
-	Maxime Jayat <maxime.jayat@mobile-devices.fr>, Wolfgang Grandegger <wg@grandegger.com>, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] can: netlink: Fix TDCO calculation using the old data
- bittiming
-Message-ID: <20240221-garden-petted-789304a1b1a5-mkl@pengutronix.de>
-References: <40579c18-63c0-43a4-8d4c-f3a6c1c0b417@munic.io>
- <CAMZ6Rq+10m=yQ9Cc9gZQegwD=6iCU=s1r78+ogJ4PV0f5_s+tQ@mail.gmail.com>
- <54afa5e8-fb5e-4d90-8897-8f3c5a684418@hartkopp.net>
+	 Content-Type:Content-Disposition:In-Reply-To; b=tIu4QEk4LdHQmawwWuF1pvJjnMv5hjBVwjiXTUE2tnqJDiZvPfHfqG9f6uXCErkAX0uVmCznfYcWs60lZZg8IXJJ//xAqh/ebXKrOBgp/csPOLZPVmzMixUWeOaT7wQY+SbEgc70SANjjMyfPmrg2PGjDz4X/b75vfRlX+9OV3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U9L9uYjZ; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708525820; x=1740061820;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=AnVfYPg9QLlMiSY5zHzUg1A2vSHWhrEptn7kKIChBoo=;
+  b=U9L9uYjZPZvNCgxys9fQ+5kAb01R42X7dD0t2OKiFMXnGX7WoNzqN5jN
+   wMwWEqGkPHiG2B+zT98X/8XY7B3i0natMZxIsfyoalx0CAcax5EY/LPfz
+   Yte5ExO61GyXZaNmVPtntcbtuqrNWSQ/E63efPCxVmkHuk1zRgibv+ubw
+   A4e+4gC4RXAnMZTiSMdanWq2P3dvMXzGpt1S29MPBd8UrFEWFYBiJv6sm
+   qyg7AmYa6yMzl4JiWGc6uVN/bXnEv3OEYznzfdrfBCYd+lTBIQ0P151VL
+   UA+3Xns4Ko0JOUd1VraFRKOBefbHkLuHbtmoqGMJVh8ahe3EhrIVTGbRT
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10990"; a="2549601"
+X-IronPort-AV: E=Sophos;i="6.06,175,1705392000"; 
+   d="scan'208";a="2549601"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2024 06:30:20 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10990"; a="913314388"
+X-IronPort-AV: E=Sophos;i="6.06,175,1705392000"; 
+   d="scan'208";a="913314388"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by fmsmga002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2024 06:30:15 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.97)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1rcnbv-00000006N3D-3zA2;
+	Wed, 21 Feb 2024 16:30:11 +0200
+Date: Wed, 21 Feb 2024 16:30:11 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: Yury Norov <yury.norov@gmail.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew@lunn.ch>,
+	Mark Brown <broonie@kernel.org>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v3 RESEND 3/6] bitmap: Make bitmap_onto() available to
+ users
+Message-ID: <ZdYI81yKNisoLR7Y@smile.fi.intel.com>
+References: <20240212075646.19114-4-herve.codina@bootlin.com>
+ <ZcoOpPb9HfXOYmAr@smile.fi.intel.com>
+ <20240212143753.620ddd6e@bootlin.com>
+ <ZcokwpMb6SFWhLBB@smile.fi.intel.com>
+ <20240212152022.75b10268@bootlin.com>
+ <Zcos9F3ZCX5c936p@smile.fi.intel.com>
+ <Zcptyd/AWrDD3EAL@yury-ThinkPad>
+ <20240215184612.438bd4f2@bootlin.com>
+ <Zc5jQ3zR51MDIovB@smile.fi.intel.com>
+ <20240221144431.149c3a16@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="inlfg5asntdkuyns"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <54afa5e8-fb5e-4d90-8897-8f3c5a684418@hartkopp.net>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20240221144431.149c3a16@bootlin.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+
+On Wed, Feb 21, 2024 at 02:44:31PM +0100, Herve Codina wrote:
+> On Thu, 15 Feb 2024 21:17:23 +0200
+> Andy Shevchenko <andriy.shevchenko@linux.intel.com> wrote:
+
+[...]
+
+> > > Now what's the plan ?
+> > > Andy, do you want to send a v2 of this patch or may I get the patch, modify it
+> > > according to reviews already present in v1 and integrate it in my current
+> > > series ?  
+> > 
+> > I would like to do that, but under pile of different things.
+> > I would try my best but if you have enough time and motivation feel free
+> > to take over, address the comments and integrate in your series.
+> > 
+> > I dunno what to do with bitmap_onto(), perhaps in a separate patch we can
+> > replace it with bitmap_scatter() (IIUC) with explanation that the former
+> > 1) uses atomic ops while being non-atomic as a whole, and b) having quite
+> > hard to get documentation. At least that's how I see it, I mean that I would
+> > like to leave bitmap_onto() alone and address it separately.
+> 
+> I will take the Andy's bitmap_{scatter,gather}() patch in my next iteration.
+> And use bitmap_{scatter,gather}() in my code.
+
+Thank you and sorry that I have no time to finish that. I will be happy to help
+reviewing if you Cc me.
+
+> For bitmap_onto() replacement, nothing will be done in my next iteration as
+> it is out of this series scope.
+
+I agree on this. This will be a separate logical change related to NUMA with
+explanation and replacement of all callers at once.
+
+-- 
+With Best Regards,
+Andy Shevchenko
 
 
---inlfg5asntdkuyns
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On 21.02.2024 15:14:02, Oliver Hartkopp wrote:
-> I have an old PCAN USB adapter (Classical CAN) which uses the pcan_usb
-> driver and wanted to set a 50kbit/s bitrate:
->=20
-> ip link set can0 up txqueuelen 500 type can bitrate 50000 sjw 4
->=20
-> First it complained about the SJW having a higher value than some phase-s=
-eg
-> value which was 2.
->=20
-> Error: sjw: 4 greater than phase-seg2: 2.
->=20
-> I always thought the driver automatically adapts the SJW value to the
-> highest possible and SJW=3D4 could always be set. Did this change at a ce=
-rtain
-> point?
-
-Yes, that changed with b5a3d0864ee7 ("can: bittiming: can_sjw_check():
-check that SJW is not longer than either Phase Buffer Segment")
-
-See discussion in https://lore.kernel.org/all/20220907103845.3929288-3-mkl@=
-pengutronix.de/
-
-> Anyway, then I reduced the given SJW value and the ip command did not give
-> any error message.
->=20
-> But finally there was not CAN traffic possible with my "always working
-> setup".
->=20
-> I'm running 6.8.0-rc4-00433-g92a355464776 from Linus' tree.
->=20
-> Reverting this patch fixed my issue.
-
-But what has the tdco calculation to do with non CAN-FD controllers?
-
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---inlfg5asntdkuyns
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmXWB5UACgkQKDiiPnot
-vG8Sogf9GDTH+r+dpvL4+IwbOEdFwI4awCIUJ/mrGD+zql/rNCPxYWz6liDuKOJk
-DnXqOSuPPBoDorLLWf58H/1pgwCu4Lo+TaJ9x1igrKpt0lFxBJ7a7FO0tcjFeE2N
-jjlSukRzehY2Iqo4oL+y3ZdwQoeqFFCj/dNVISpZWDGDA3YieAyVQ2lsbd6TJVb1
-Ft5eKJzNNNfuh+8uGkPQ0j9QYu7ptyTZorAKiZy5ucJYl+sRd22vXU2crIIByBtK
-YuRclqXEm1aG45kQmNZB9tJsnXxFZHcFXdhnmxtrwpi23S67Fbk0DPPW0+U5mpW3
-6g/I9/+HvqmGm5L1CKz+3PKQ7Wjt3g==
-=7CLS
------END PGP SIGNATURE-----
-
---inlfg5asntdkuyns--
 
