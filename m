@@ -1,101 +1,103 @@
-Return-Path: <netdev+bounces-73604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F36C085D5A0
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:34:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 122BE85D5AF
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:35:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7AC21B22672
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 10:34:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C2381C21A9A
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 10:35:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A833A5224;
-	Wed, 21 Feb 2024 10:34:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GzL5mMQG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 149AE7F8;
+	Wed, 21 Feb 2024 10:35:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA903D7A;
-	Wed, 21 Feb 2024 10:34:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8BA5443F
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 10:35:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708511651; cv=none; b=V5MzZ2vfIqm2ybeoD7cS+ziOYhqVLmBwHoaLdI5yNs3PjTkMtGreF5Sk5MOHB6pjlsMXkqWBVkbj3DkQDgwu5WEpECHvZCxNMTO+MZrW1ma3MqCbF/kFFEQJ543PwUSX18PducUy9cxY4bzGcDprLmOBx/a6GlT6NDl6VE0FApg=
+	t=1708511737; cv=none; b=gsaqA7lWL08nlu9pAmwCcVs5uq19kdTLwVUGcrYEGf8CN/V8hiHI3L2hpaDLmJydkjrpZSFWMwrwY1Z7RUctD7Mm6lZmL0vc/ezWxt/C6ZHpgyPhMvphCDWCloJnZKbiCh9Hr1qmCSpw2LUn/dmJqxMIWBwLBGOMagnam6mXbSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708511651; c=relaxed/simple;
-	bh=GSkRDVfIjVHsNcttujsc8mwyn+uCTaExgB7via05rEQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V1EnAEXO98je051i4HkP/gBfSM6bjXph0X8lnU7gPJ5I+XF93zVcTaDb3AfS6srm+V1Jksm7k117xqd7d3Iu7i0hZjBJF97oV9wQ/Zjw5LirySZXFobpp3z4B9wtD7zEs73iElOWvpzkK0Fw/+lMk/x++l9CE7WRYKLB9xmvTC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GzL5mMQG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F246C433C7;
-	Wed, 21 Feb 2024 10:34:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708511649;
-	bh=GSkRDVfIjVHsNcttujsc8mwyn+uCTaExgB7via05rEQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GzL5mMQGlp3PbrQ1Ylw+OfIq2MwK/jgW/Ue4fLsAvRD0qZiFZfzcuPHdPINZOm2IY
-	 yJDr3Zi4Mn1N2ymLbIACJl28nC7w5Irs33HlUkxp/3j7R5yOhdBQFSyT9AdaebQHww
-	 RzrsPHLzNDg32aE8jHTB/aDQviPD9kfqtwcx44aXwhoZ9HsdJmplamD6GYfTHaHI4f
-	 q6v9XtJY0t/NUNCOFAA8Buwdn/RzN7L9HRmyjv3F02SJJDBDjGRDDmVN+Ky4rJez6W
-	 5MvwyrAyTYD61XejjCg9+HGVSXXo7575dscdSnD4LmLvPlSRNJ1XML9XCujb/0YbJp
-	 NtYp6wXM+Z6Kg==
-Date: Wed, 21 Feb 2024 10:34:04 +0000
-From: Simon Horman <horms@kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Arnd Bergmann <arnd@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Zhu Yanjun <yanjun.zhu@linux.dev>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Yevgeny Kliteynik <kliteyn@nvidia.com>,
-	Alex Vesker <valex@nvidia.com>, Hamdan Igbaria <hamdani@nvidia.com>,
-	Netdev <netdev@vger.kernel.org>, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] [v2] net/mlx5: fix possible stack overflows
-Message-ID: <20240221103404.GB352018@kernel.org>
-References: <20240219100506.648089-1-arnd@kernel.org>
- <20240219100506.648089-2-arnd@kernel.org>
- <20240220080624.GQ40273@kernel.org>
- <726459a9-c549-4fec-9a4d-61ae1da04f0a@app.fastmail.com>
+	s=arc-20240116; t=1708511737; c=relaxed/simple;
+	bh=LLGEvBkjPI6PfzYpSJ+GbWmjrMg85JwaG1WSFU6uT5A=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XSzYnNOLEUFYHwX04bpmLNE4s0wpMJDCyUDJO0DJ5OjrRunLnspNhgY8ykjUSx5fd8nY9Xp6ftwKQCPg++aXXTm1KK4+R4ujPRNNRFnYU8vtiJO7vILNvpg94NNxWZP+S1qBesXr9IfOevvjjQ5Eog2tQ71b3xl+BE9JTiYpZQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.108.46])
+	by gateway (Coremail) with SMTP id _____8CxifD00dVl8scPAA--.41333S3;
+	Wed, 21 Feb 2024 18:35:32 +0800 (CST)
+Received: from localhost.localdomain (unknown [112.20.108.46])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxTs3y0dVlJss9AA--.26964S2;
+	Wed, 21 Feb 2024 18:35:31 +0800 (CST)
+From: Yanteng Si <siyanteng@loongson.cn>
+To: andrew@lunn.ch,
+	alexandre.torgue@foss.st.com
+Cc: joabreu@synopsys.com,
+	davem@davemloft.net,
+	horms@kernel.org,
+	fancer.lancer@gmail.com,
+	netdev@vger.kernel.org,
+	Yanteng Si <siyanteng@loongson.cn>
+Subject: [PATCH net-next] net: stmmac: fix typo in comment
+Date: Wed, 21 Feb 2024 18:35:14 +0800
+Message-Id: <20240221103514.968815-1-siyanteng@loongson.cn>
+X-Mailer: git-send-email 2.31.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <726459a9-c549-4fec-9a4d-61ae1da04f0a@app.fastmail.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8AxTs3y0dVlJss9AA--.26964S2
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj9xXoWruFyUXr1DuFWfZr1rKw13KFX_yoWDXFg_WF
+	4a9F17Xw4YkF4Fyw45GFy5ur4F9rn8Wr109rn8Ka4a9ayjqwn8X3s5ury0qrn5Ww4fZF1D
+	ur1xtFn7A3s2qosvyTuYvTs0mTUanT9S1TB71UUUUjUqnTZGkaVYY2UrUUUUj1kv1TuYvT
+	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
+	cSsGvfJTRUUUb3AYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
+	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVWUCVW8JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	WUJVW8JwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6r4UJVWxJr1ln4kS14v26r1Y6r17M2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
+	xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r12
+	6r1DMcIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
+	vIr41l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_
+	Jrv_JF1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1V
+	AY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAI
+	cVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42
+	IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIev
+	Ja73UjIFyTuYvjxU466zUUUUU
 
-On Tue, Feb 20, 2024 at 09:11:51AM +0100, Arnd Bergmann wrote:
-> On Tue, Feb 20, 2024, at 09:06, Simon Horman wrote:
-> > On Mon, Feb 19, 2024 at 11:04:56AM +0100, Arnd Bergmann wrote:
-> 
-> > Hi Arnd,
-> >
-> > With patch 1/2 in place this code goes on as:
-> >
-> > 	switch (action->action_type) {
-> > 	case DR_ACTION_TYP_DROP:
-> > 		memset(buff, 0, sizeof(buff));
-> >
-> > buff is now a char * rather than an array of char.
-> > siceof(buff) doesn't seem right here anymore.
-> >
-> > Flagged by Coccinelle.
-> 
-> Rihgt, that would be bad. It sounds like we won't use patch 1/2
-> after all though, so I think it's going to be fine after all.
-> If the mlx5 maintainers still want both patches, I'll rework
-> it to use the fixed size.
+This is just a trivial fix for a typo in a comment, no functional
+changes.
 
-Ack. I agree that this patch is fine if 1/2 is dropped.
+Fixes: 48863ce5940f ("stmmac: add DMA support for GMAC 4.xx")
+Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+---
+In fact, it was discovered during the review of the Loongson
+driver patch.:)
 
-If that is the case feel free to add.
+ drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.h b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.h
+index 358e7dcb6a9a..9d640ba5c323 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.h
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.h
+@@ -92,7 +92,7 @@
+ #define DMA_TBS_FTOV			BIT(0)
+ #define DMA_TBS_DEF_FTOS		(DMA_TBS_FTOS | DMA_TBS_FTOV)
+ 
+-/* Following DMA defines are chanels oriented */
++/* Following DMA defines are channels oriented */
+ #define DMA_CHAN_BASE_ADDR		0x00001100
+ #define DMA_CHAN_BASE_OFFSET		0x80
+ 
+-- 
+2.31.4
 
 
