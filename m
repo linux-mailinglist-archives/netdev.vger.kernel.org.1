@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-73636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2991585D6B8
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:20:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA44F85D6B5
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:20:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3C1FEB23CBD
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67D611F22701
 	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:20:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 849CC3FE46;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84CE83FE48;
 	Wed, 21 Feb 2024 11:20:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HQ1Dodlp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a/UoZhvf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6097C3FE2B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 609A63FE2C
 	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 11:20:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708514427; cv=none; b=V9iX2a1W6Oh+SpRjmXmrSt5mBDu9QIPe+F46onvQc9bC5D7uViaDA1gNxKhLi3Y/0kRvDeCDh0pfdG9On7gO9D4797Zj9MoRRBPiUm8hiHvbht65NYgo/LxSZTj5qPOjF28YqyMJ3fyDcIAt/c2qFfv4iuxSJMi0w9rbBnmF2Dk=
+	t=1708514427; cv=none; b=FNKha0N/rq9tEZ9i279CMtU3/f65vp4RuILByE656mICKoFe31S/QszRmX4I8nvkK2tJbgryxPuQk9/zoSvCej+am1DULJJms04n41Fw/qj7XAxsoFhv2uP6N7KearJcYaSknQWpif5UFNKmL/jIcyh1vuXjIoLDWdi/1zaOeBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708514427; c=relaxed/simple;
-	bh=1qqCSB+opoMr208oH2KsSYGNHZ5TdvPBR71NtHGBNRs=;
+	bh=O+Kbo8DS6jLgDFs0FCpP9uf9LZXUvOEYXnT7/EVUZXk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=HJ19sBNDzdxSY/+2cgO6cWVNyHdr+pxOgCUyiDI6dxBZoB0GVOmHplxexkyzebhbNzm6uTn7brW8wiyRpRe02QsOOl7XDxQsqpsOzPzs6RT01C7kuQ2fNHeB1uuyqQ/cTPm8qaYtLJ5bfCmNulp22bZKf2QKoNKCY+I/GS2Uw0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HQ1Dodlp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id ED8A3C43330;
+	 In-Reply-To:To:Cc; b=GZ7EOJOOaUOXtcgxnVNBfLA1uAWtMWvdL/IUI2QhOcBjsrawooFmlOPb94m6DLKXcxDZUxxJH26FKbGl5fc8xJFt97Ib5PoT1qJE50fh5VIlU9V+WBwulGo/wr0dU1M7xP7zrKK7IwoJmWk6OlL4f+E/3t2v111RFJs4oHC5XlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a/UoZhvf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E3E4DC433A6;
 	Wed, 21 Feb 2024 11:20:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1708514427;
-	bh=1qqCSB+opoMr208oH2KsSYGNHZ5TdvPBR71NtHGBNRs=;
+	bh=O+Kbo8DS6jLgDFs0FCpP9uf9LZXUvOEYXnT7/EVUZXk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=HQ1Dodlpuas8Bq4RiVsmqd/3eGg9VFg5Jt3d/0rw31OTYSUkXgJocqBHB/7LlL8ru
-	 DgMyV31XpSZMnEpcsad92lqC1l52dT1CFme7qE5acLxJatuHh4pqUyZYYZOS1VWO3v
-	 5lEJczSyfzwitiGZschTRY3F28l3PJxw3tq5nJWs7GxadMXg54LHXlrR1+AxrIsvhC
-	 hZXKkz9NqT4FkE1RlcCvAuMFy+sXVupf61KumPBznevlLimg8nkglBsS3psHmkTSWz
-	 J7rmQlGSdSdg+O2mPkiKlQpGyulhapHuvL8B62T+3dr6heUy2JrTA+r/IMBrSTsBxn
-	 3nBw15H+z4nKA==
+	b=a/UoZhvftc/k7/KS6y1gk+wwhvpx+CrhWwYin8opRd73w7pQtDkQkpiDuWNgCaGlb
+	 XBoT2/4Aa0cj3jmXORnNhdHnh8j2SnX1wB+svkQtiLCvhQKVvqKZw0gfj1f4BTcdLf
+	 1TXnzoeLLPm38cesYhBvjomTlDEnABf3KkjQjTCf+K9n4zIZT7Nus9TMmbLtsqFfa7
+	 on3mL/D0Yca9pMjIBYlNfpl2KHS3Y2iLuDurwpHatqIdn1+ZHhsdc0lQqqPzW74kDJ
+	 AqynNehV5dGXyWhMjpNffzA69IjItSBRBOwoDOKTWLOxXuvyusnGAEMl4kdFWviTwv
+	 y/8sl9tUcmlCg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D8FB9C00446;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CF654C04E32;
 	Wed, 21 Feb 2024 11:20:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,34 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] tg3: simplify tg3_phy_autoneg_cfg
+Subject: Re: [PATCH net-next] tg3: copy only needed fields from userspace-provided
+ EEE data
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170851442688.9417.3437899430933653376.git-patchwork-notify@kernel.org>
+ <170851442684.9417.11313982323041176544.git-patchwork-notify@kernel.org>
 Date: Wed, 21 Feb 2024 11:20:26 +0000
-References: <9fcf20f5-7763-4bde-8ed8-fc81722ad509@gmail.com>
-In-Reply-To: <9fcf20f5-7763-4bde-8ed8-fc81722ad509@gmail.com>
+References: <59bd00bf-7263-43d9-a438-c2930bfdb91c@gmail.com>
+In-Reply-To: <59bd00bf-7263-43d9-a438-c2930bfdb91c@gmail.com>
 To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: pavan.chebbi@broadcom.com, mchan@broadcom.com, pabeni@redhat.com,
- edumazet@google.com, kuba@kernel.org, davem@davemloft.net, andrew@lunn.ch,
- netdev@vger.kernel.org
+Cc: pavan.chebbi@broadcom.com, mchan@broadcom.com, kuba@kernel.org,
+ davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, andrew@lunn.ch,
+ linux@armlinux.org.uk, netdev@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Sun, 18 Feb 2024 19:04:42 +0100 you wrote:
-> Make use of ethtool_adv_to_mmd_eee_adv_t() to simplify the code.
+On Sun, 18 Feb 2024 15:49:55 +0100 you wrote:
+> The current code overwrites fields in tp->eee with unchecked data from
+> edata, e.g. the bitmap with supported modes. ethtool properly returns
+> the received data from get_eee() call, but we have no guarantee that
+> other users of the ioctl set_eee() interface behave properly too.
+> Therefore copy only fields which are actually needed.
 > 
 > Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> ---
->  drivers/net/ethernet/broadcom/tg3.c | 17 ++++-------------
->  1 file changed, 4 insertions(+), 13 deletions(-)
+> 
+> [...]
 
 Here is the summary with links:
-  - [net-next] tg3: simplify tg3_phy_autoneg_cfg
-    https://git.kernel.org/netdev/net-next/c/ebb0346a117f
+  - [net-next] tg3: copy only needed fields from userspace-provided EEE data
+    https://git.kernel.org/netdev/net-next/c/8306ee08c0ff
 
 You are awesome, thank you!
 -- 
