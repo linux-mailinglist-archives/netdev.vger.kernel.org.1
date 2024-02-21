@@ -1,102 +1,113 @@
-Return-Path: <netdev+bounces-73797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DC3A85E70C
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 20:14:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 544BB85E719
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 20:18:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FD561C24BDF
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 19:14:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01DF91F2209F
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 19:18:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A037A85C44;
-	Wed, 21 Feb 2024 19:14:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2293985C47;
+	Wed, 21 Feb 2024 19:17:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V7OB+AfS"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ZMOoE3vL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7826879DD6;
-	Wed, 21 Feb 2024 19:14:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE93585954
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 19:17:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708542886; cv=none; b=kezLqcJ8DTNKsfm82371whpfkZ1BKUH6puHo6ABIB6qQe3OUpG8NeKiO+bN7oxjwACiTdwtNZFvb27984hPJsLGmtvSsRIxHUZ4DrTj39YexQZv23KcuWlfeBB9IPQht30tW9HFJ8OEJ+nd4WLmD0QkoCWjStKRv562rdnMRYXU=
+	t=1708543078; cv=none; b=dSAblMlXiYKxXT6w6U4vioEGoGMhgZAEj5FRjzQQ9Yh2x8d9Ryeb+TQRgunSn9QAxjWcCftByeV8oXAQa0MQjTKEXl6lF2ObLaYJOm4XqXPohfiu7qsQmGxwRNplUTaKP2Z4r+gwrX9gTjqN/b4Deth2TpOdkVBII/kGJn7aGVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708542886; c=relaxed/simple;
-	bh=zANAkyf/heA22WD+nmjgPqi08fXUW0P+IVVOqNNtubA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hn24maG7WxReQEQkflnN8SnaDqofxXYG/Xe9Q9FpwmlX8z1DUCxaSjyYN9i/sgFFNtSXiSyqxVcj/n2sG8SMGywmnXRVqGjVm0zAbFhUEa2nIjwRNUnyCzJCt2mNmo1ZVw4CZrzMCV7pASCNDAASaP6Df/MWQ/G7UabTrp5wBOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V7OB+AfS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 531C6C433C7;
-	Wed, 21 Feb 2024 19:14:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708542886;
-	bh=zANAkyf/heA22WD+nmjgPqi08fXUW0P+IVVOqNNtubA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=V7OB+AfS59fqaEHtD8jj4h2KNB++Nc3OAxOOfEdNmy+xWmUA0pUhHNguKCuo2KRoN
-	 S98aOeDVxf7fO5hNCY+3IIfHnYxDCPJTdqMQoz+ygT7m6W4Znloqpou9U1KjTyyNeC
-	 VofqSex0omZ0Ckp5qqG+b4P0lZpF5GF0UBno6aL62wroJGFDtXPJiEA8Hmng4q42lZ
-	 zrHbAS1CCyGiDSG8zypJKpc+FJwZfrpzs/POauHvuBLb4Cw2AEK4vqg/0aFW8h7RTK
-	 q2+FwFj2All3X9xTTFB0oBkzpp480TVjJCyIR/6NSnug7psjNOoJ/ZQ30UAx5pSQ+0
-	 7iPrOndB5aO2A==
-Date: Wed, 21 Feb 2024 11:14:44 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: Russell King <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose
- Abreu <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, Maxime
- Chevallier <maxime.chevallier@bootlin.com>, Miquel Raynal
- <miquel.raynal@bootlin.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org,
- Clark Wang <xiaoning.wang@nxp.com>
-Subject: Re: [PATCH net-next v4 5/7] net: stmmac: Signal to PHY/PCS drivers
- to keep RX clock on
-Message-ID: <20240221111444.22fce1f7@kernel.org>
-In-Reply-To: <20240221-rxc_bugfix-v4-5-4883ee1cc7b1@bootlin.com>
-References: <20240221-rxc_bugfix-v4-0-4883ee1cc7b1@bootlin.com>
-	<20240221-rxc_bugfix-v4-5-4883ee1cc7b1@bootlin.com>
+	s=arc-20240116; t=1708543078; c=relaxed/simple;
+	bh=M0FDvNe5gdx4GV6MSGP6C/r0ckrzasd1+5u7VS+D/BA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DOILaKpg2GCyo1VQRfSDGvy2okn6VITJfXievzCjCil3miJ8wN4f6xxwaGiVvV5KtyQIq1Hk6C68kaTEOIib5UAjnRfSQmWn9fGIDF6Wjj+vhDEIzLd20vpndCd5UfnGEv3UCtwYDl0UtlSvnTf2/FVxJjKoTijuvywsTlZd/YU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ZMOoE3vL; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1d746ce7d13so49117305ad.0
+        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 11:17:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1708543076; x=1709147876; darn=vger.kernel.org;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xPyGME1+D4Rx5RWLjxT2dahKKgtER+x9+Q9YDDK3GZ8=;
+        b=ZMOoE3vL80Ynwz2ejJBBIbOsOmXSZcJJ7PjQrw2q4tyf8FCHLvgVYqKJjSr+svi30K
+         s6oxbob2r0lxbnWcTKWCcCI+tseFhnxQ6+y3LdjVHNPDbsRMMJ0HqMLLFb/BToWchOdS
+         HqLjXCJ+3LjPj9x4yJDcDODaTCzHUCPTFuKmM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708543076; x=1709147876;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xPyGME1+D4Rx5RWLjxT2dahKKgtER+x9+Q9YDDK3GZ8=;
+        b=SiuWwBk6PHXzDGPqnfno6hSzeiSvjCFVP7+HPeDJVfzoVEwZJXLXhAbrtT01MhzpSw
+         scoyL/lBf0v+rGo0TeRSiXVImL7JhOrm1hMu1OnRRDb6H33FSLzsIg4ppSOxnQ3yrATC
+         6XyFbWs8X2wKjm91oG+nd9O+5nSO5ruARNej7AIIc3hz6OF6F+QvlC/ZjemX3a/WQot2
+         dZKOeHRk7S9DsX26mg3sn6QQereUkR9AfAwXa4HX22nxlJXplxG9p7F8O78VfxvAdORy
+         3C+Bx5h5UNTbsMe+ehK4WHzX4AjvfB1+atAbbcYXDErNM5+8GQ+rhAqMdKnNgi1vGKTJ
+         DlBQ==
+X-Gm-Message-State: AOJu0YyQi5lGnbCyKntLx/XoWrzMPEeTbTfNWZCgo2rQpMmxP9wcyWjH
+	JL2vf3wr3XwvLMvVpdSF2IQZwQeQC4b9pUtsAZkbCXog4FEfow600ID8qWeLD1FC3cgRg2Xc57K
+	r
+X-Google-Smtp-Source: AGHT+IHQ43TQqS81oq7BxL4LKPXRytHQQhnbBClXNRp3eXg0/eCkjOfuROs7YtvYUWtReCcYtmoQVg==
+X-Received: by 2002:a17:903:1ca:b0:1db:aab5:1db5 with SMTP id e10-20020a17090301ca00b001dbaab51db5mr19811932plh.42.1708543076046;
+        Wed, 21 Feb 2024 11:17:56 -0800 (PST)
+Received: from fastly.com (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id bj11-20020a170902850b00b001dc3916853csm1143816plb.73.2024.02.21.11.17.54
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 21 Feb 2024 11:17:55 -0800 (PST)
+Date: Wed, 21 Feb 2024 11:17:53 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Amritha Nambiar <amritha.nambiar@intel.com>,
+	Larysa Zaremba <larysa.zaremba@intel.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Subject: Re: [PATCH net-next 1/2] netdev-genl: Add ifname for queue and NAPI
+ APIs
+Message-ID: <20240221191752.GA68788@fastly.com>
+References: <1708531057-67392-1-git-send-email-jdamato@fastly.com>
+ <1708531057-67392-2-git-send-email-jdamato@fastly.com>
+ <20240221111220.4e6b6170@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240221111220.4e6b6170@kernel.org>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 
-On Wed, 21 Feb 2024 14:04:22 +0100 Romain Gantois wrote:
-> There is a reocurring issue with stmmac controllers where the MAC fails to
-> initialize its hardware if an RX clock signal isn't provided on the MAC/P=
-HY
-> link.
->=20
-> This causes issues when PHY or PCS devices either go into suspend while
-> cutting the RX clock or do not bring the clock signal up early enough for
-> the MAC to initialize successfully.
->=20
-> Set the mac_requires_rxc flag in the stmmac phylink config so that PHY/PCS
-> drivers know to keep the RX clock up at all times.
->=20
-> Reported-by: Clark Wang <xiaoning.wang@nxp.com>
-> Link: https://lore.kernel.org/all/20230202081559.3553637-1-xiaoning.wang@=
-nxp.com/
-> Reported-by: Cl=C3=A9ment L=C3=A9ger <clement.leger@bootlin.com>
-> Link: https://lore.kernel.org/linux-arm-kernel/20230116103926.276869-4-cl=
-ement.leger@bootlin.com/
-> Suggested-by: Russell King <linux@armlinux.org.uk>
-> Signed-off-by: Romain Gantois <romain.gantois@bootlin.com>
+On Wed, Feb 21, 2024 at 11:12:20AM -0800, Jakub Kicinski wrote:
+> On Wed, 21 Feb 2024 07:57:29 -0800 Joe Damato wrote:
+> >  	if (GENL_REQ_ATTR_CHECK(info, NETDEV_A_QUEUE_ID) ||
+> >  	    GENL_REQ_ATTR_CHECK(info, NETDEV_A_QUEUE_TYPE) ||
+> > -	    GENL_REQ_ATTR_CHECK(info, NETDEV_A_QUEUE_IFINDEX))
+> > +	    GENL_REQ_ATTR_CHECK(info, NETDEV_A_QUEUE_IFINDEX) ||
+> > +	    GENL_REQ_ATTR_CHECK(info, NETDEV_A_QUEUE_IFNAME))
+> 
+> This means user always has to provide both ifindex and ifname,
+> right?
 
-breaks allmodconfig:
-
-ERROR: modpost: "phylink_pcs_pre_init" [drivers/net/ethernet/stmicro/stmmac=
-/stmmac.ko] undefined!
---=20
-pw-bot: cr
+That's right. I'm OK with omitting this requirement, though. I feel like to
+your earlier point on name changes, maybe ifindex is enough as far as
+required params go.
 
