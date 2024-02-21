@@ -1,580 +1,307 @@
-Return-Path: <netdev+bounces-73700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8851185DC05
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 14:48:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 446DA85DCF8
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 15:00:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC0C01C21679
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 13:48:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B087BB28767
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 14:00:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0D8278B73;
-	Wed, 21 Feb 2024 13:48:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABD8C7CF29;
+	Wed, 21 Feb 2024 13:59:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C1hjxwvb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bNqbJGxB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB30B7BB10
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 13:48:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 061F078B4B;
+	Wed, 21 Feb 2024 13:59:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708523293; cv=none; b=fAVK6wj2Nu5USynCDUxUGYj2OQABhQQPTSGxVhMQnsjwx6HMXANvcNTAjWNA/bhVjN8nUmo5Nw0oBj9HQT257upZDoJAlr4ValCRpR7PNvrwTUNIrkI0vNxIxUQH+dgkRg2xux4FWmGXBGt58C8o4BFG0oGyhMZZ+v8aLWKtK2o=
+	t=1708523988; cv=none; b=laRj59f55wcW8p/dPlx2w1ZJXYkZ1xjhXBsY5GCShfORwPVRecvBQrRAoGVr1YnVRdhDnbO7wvW36OcexmwhUjiGH/jf4NaZmRGry6UrpFmC4gJZeqlsXudgGaYiVAm20688CV30mE08Tz27n7djSKC/1FThRdAzakIeOuxlLCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708523293; c=relaxed/simple;
-	bh=vq69fT6+/WihvalsMFtywInQJ7V7agm6rI0XKbuYCUc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LsSn45G2LX4wtcFHRSlPLHE6mPGUczt1xtCyE6wlfftxKjzQnFRTirxkzUvwpDeaieIXcGqm3KSUwHkPyeWBFzC7vuS+NvbFfXVUBdywbwN3da+dDkGkt1b1slccuq4MQx9kKftjPAsBtXU/8qCy/dmYTnVKFcZkofYLn6wrkJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C1hjxwvb; arc=none smtp.client-ip=209.85.208.174
+	s=arc-20240116; t=1708523988; c=relaxed/simple;
+	bh=SnPLHbpo/441VAamU2FvPSSpEtFvKMwOMzEK2EmKY1E=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=hF/sIxbthoSxv5YuAamVz3SklWZPfhhJco/2AcPl7pyj6hI9OW3xdyBf1Q+V/hltQFThyMUXpH0ZxzlQSxKqDHCRHN5oStBaJKH3gXhXl2fNkWgaQ4O/D4cadu5eMRPfxDHzDi0JXIYpeB0HspMtoy0zgYztiAYqAaeYWQ/yvOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bNqbJGxB; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2d2305589a2so7645341fa.1
-        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 05:48:09 -0800 (PST)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1d934c8f8f7so62499855ad.2;
+        Wed, 21 Feb 2024 05:59:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708523288; x=1709128088; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=+8KY0qwjDSJIXfOQTdVwfBHL6DHWPgKxSTh/MtU/pGw=;
-        b=C1hjxwvbhcwX0oTY0KxAasaKGmdBjbm7KkXMsGOPq05da/43/6tBxd2GUxPhzM5+Ww
-         Gu/L2yTHmXMy0i2acWaHbGn+lNNoCN8rAxTXa9SNe3hJ5yOP3PhqNXpyIWJGjoNe9PVG
-         vmpzajw5Q9IBCS5S8Tu8A8KkklRZlA6mGiJL36JujZ9/aJ7hvZk1SPSkoZjE6HYrTa9j
-         i8N2TYqYPQ1XxJ5n9nEG/eWRuACR2VJB2IKe9xZkDxS33v1dT/OOcsADh6gVQT9wBoWo
-         8eeHrcTXLiaBMb15GlWtdtdVBVvXkWCSjxsHBivuWql2S83yMCPwvyUxayR/z443kERA
-         h2Jw==
+        d=gmail.com; s=20230601; t=1708523986; x=1709128786; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=aaHNU3TsVz9YPg3zJxPm9tj9UZPGWWuZNDbw2aB5JJI=;
+        b=bNqbJGxBBjZN1lfkbB55cKKnmGFeuFnPwUjnThjb/c0lTPe51WFxGma4f83JONlSoi
+         GutNnwNb88Uirh0lx7yhwI/p92mpJpaZM49fuaqLcpwe3aUTybiM7ZIRWSCipCLRRJYt
+         W6AmdYBQTKhqIfyFP78YeOWT3J1F93yCVB4gQOXej3x70ZUVWL2vxlZ2lpAQZ/hn5Bp9
+         IEleDim6hCJWpp0+PzAI/fzccmtdc4aK+Q5I5a0kBhz6JgcYwe3Y3BSe1qOaqXONZcNJ
+         4j2IYGSW86FXIHjM3GiJP4MMRVkBnd38WmkAPoDLuBQrgp8d2NUEXgNvsZLyn/qWTRSa
+         armA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708523288; x=1709128088;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+8KY0qwjDSJIXfOQTdVwfBHL6DHWPgKxSTh/MtU/pGw=;
-        b=qb4lLuqKEQyb1+WrxGZwkXPDQPueUeCNe8GGIHhONwEyjGBIWz9I1BjKaxScnu2g36
-         r7KocfPBNkAFVcqpqsVhvwyWN7QFelRbxlLoNH7znLe8flDRCF5YQ8ohBWyX7X6KYXj+
-         K8kyJhfepyS8mQc7Wqc1Hg3n+yt9kC0fOdvpafpYOZUz1/VzUtwDGtLRXqMDj/4scKz8
-         KPd3GKgioMQNVi7aTLf6BF0N6JAy29PLkGsLY6YgXW1Xs1JcWqC2HZfxSmmJGTHl9cfu
-         RgvGmF6vXwF8sHt3A4gUWhcP9dMkh0kPrqgzfkwLGskiFTiiWJ/oEHdDqSkpd2wvtgHy
-         LySQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUZRSenqwT/jCWQeD0nM3JtMgO2Cd/bEaeX3CoFwB8wv08rFMUpg1UA5NTdrXlA0C8DG78nFIKj9ZKwr0AFdTY6RdVUw+1q
-X-Gm-Message-State: AOJu0Yx8xVEHFfZylTbVobSYaIgFAftRwxzNBhjPfitlJ70Tm5G4haAS
-	sdBLor/j9pb/0Zpc8g+xeFgn0ZBeMsHyow9ZWc8Dep0HaX0soQh3
-X-Google-Smtp-Source: AGHT+IHQY4RM/cXZNPr6ldI9R2KeFYISsCxuL66SVVZhQa1nxaMc1skhcjtc7flMfdurYni7/FSoRg==
-X-Received: by 2002:a2e:bea0:0:b0:2d2:4b27:d2eb with SMTP id a32-20020a2ebea0000000b002d24b27d2ebmr3586503ljr.12.1708523287611;
-        Wed, 21 Feb 2024 05:48:07 -0800 (PST)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id c21-20020a2e9495000000b002d0a82800fcsm1866500ljh.82.2024.02.21.05.48.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Feb 2024 05:48:07 -0800 (PST)
-Date: Wed, 21 Feb 2024 16:48:04 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
-	chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn, 
-	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
-Subject: Re: [PATCH net-next v8 01/11] net: stmmac: Add multi-channel support
-Message-ID: <yzs6eqx2swdhaegxxcbijhtb5tkhkvvyvso2perkessv5swq47@ywmea5xswsug>
-References: <cover.1706601050.git.siyanteng@loongson.cn>
- <a2f467fd7e3cecc7dc4cc0bfd2968f371cd40888.1706601050.git.siyanteng@loongson.cn>
- <bhnrczwm2numoce3olexw4ope7svz6uktk44ozefxyeqrof4um@7vkl2fr6uexc>
- <673510eb-21a8-47ca-b910-476b9b09e2bf@loongson.cn>
+        d=1e100.net; s=20230601; t=1708523986; x=1709128786;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=aaHNU3TsVz9YPg3zJxPm9tj9UZPGWWuZNDbw2aB5JJI=;
+        b=LLjj+MUNTajSvS0W6l3t2QrQwJ7P73LBnMoMhAfWV/TmBzI4NxRPUCTF1nxJRQk5Cj
+         NGqMcVTv6Xn08qfVSeV2rsU3Kq9wlFe2eB9+1o2HUyBiZ4sKi9/x4fKaHoaRMnIpn92X
+         ipAhmuaOAr9U7NcPqz8BpiWLNisUHKaLjJspRfciMhDJ3GJmBBxiKqUVT1/3/u0mZLI6
+         kOW0qJVKQujm1R8kHMJXolwYqWS2fVFUpIBY7urjGx0X8Yb8YzVymk5xNDRU0DpUG6rf
+         I2iP1C/Hi9xFT2OxzfW7+W+8BDYgPJB69ggo++YDyKJGILHHfNTtfFmb3a65MUDLh7X4
+         tWsw==
+X-Forwarded-Encrypted: i=1; AJvYcCXFj4QGccxMfGMHWR+0x3nLdyKbioNZb4sBrPKzVi2p/UpQTRdrV6MkgJ/w28Q+WKEsQmkLeNP6yJZimjhQz0hXI0iJunng9+yRTYrGvW1yOU257+OqRaScsWPem/GUmFa9X7DDaVDbqw5JXv+WvXqIBAT//70AwCdLyokYx2CtZysTGEyl
+X-Gm-Message-State: AOJu0Ywn+Wv/LueSDv47i3tQ9k9NrcSJxrIK4/QftgpUoydnlVo8fsuy
+	RackIcFhamTej88llNmjNudRWxmzz9cBsHjAvy2A9R2cDxzSiUc7Su58r65L9x525Y1ehdh3beq
+	LEhwD1SQd69OgZKao5e3NilrBa/1z09xA
+X-Google-Smtp-Source: AGHT+IGA7OlFHoL29A1Ks5gKGBoCCdoRecUcAoF52pJ9S32niGcrcIP8xX/JRmbCOc1hnGaycyULN1xJHu503jPkYSQ=
+X-Received: by 2002:a17:903:32cc:b0:1dc:157e:456a with SMTP id
+ i12-20020a17090332cc00b001dc157e456amr5645861plr.49.1708523986187; Wed, 21
+ Feb 2024 05:59:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <673510eb-21a8-47ca-b910-476b9b09e2bf@loongson.cn>
+From: xingwei lee <xrivendell7@gmail.com>
+Date: Wed, 21 Feb 2024 21:59:35 +0800
+Message-ID: <CABOYnLzFYHSnvTyS6zGa-udNX55+izqkOt2sB9WDqUcEGW6n8w@mail.gmail.com>
+Subject: Re: [syzbot] [netfilter?] KMSAN: uninit-value in __nla_validate_parse (3)
+To: syzbot+3f497b07aa3baf2fb4d0@syzkaller.appspotmail.com
+Cc: coreteam@netfilter.org, davem@davemloft.net, 
+	Eric Dumazet <edumazet@google.com>, fw@strlen.de, kadlec@netfilter.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Yanteng
+Hello, I reproduced this bug in the syzbot dashboard and upstream linux.
 
-On Mon, Feb 19, 2024 at 07:02:24PM +0800, Yanteng Si wrote:
-> Hi Serge
-> 
-> 在 2024/2/5 07:28, Serge Semin 写道:
-> > On Tue, Jan 30, 2024 at 04:43:21PM +0800, Yanteng Si wrote:
-> > > DW GMAC v3.x multi-channels feature is implemented as multiple
-> > > sets of the same CSRs. Here is only preliminary support, it will
-> > > be useful for the driver further evolution and for the users
-> > > having multi-channel DWGMAC v3.x devices.
-> > > 
-> > > Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
-> > > Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
-> > > Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
-> > > ---
-> > >   .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |  2 +-
-> > >   .../ethernet/stmicro/stmmac/dwmac1000_dma.c   | 36 ++++++++++---------
-> > >   .../net/ethernet/stmicro/stmmac/dwmac_dma.h   | 19 +++++++++-
-> > >   .../net/ethernet/stmicro/stmmac/dwmac_lib.c   | 32 ++++++++---------
-> > >   drivers/net/ethernet/stmicro/stmmac/hwif.h    |  2 +-
-> > >   .../net/ethernet/stmicro/stmmac/stmmac_main.c |  6 ++--
-> > >   6 files changed, 58 insertions(+), 39 deletions(-)
-> > > 
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-> > > index 137741b94122..7cdfa0bdb93a 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-> > > @@ -395,7 +395,7 @@ static void sun8i_dwmac_dma_start_tx(struct stmmac_priv *priv,
-> > >   	writel(v, ioaddr + EMAC_TX_CTL1);
-> > >   }
-> > > -static void sun8i_dwmac_enable_dma_transmission(void __iomem *ioaddr)
-> > > +static void sun8i_dwmac_enable_dma_transmission(void __iomem *ioaddr, u32 chan)
-> > >   {
-> > >   	u32 v;
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-> > > index daf79cdbd3ec..5f7b82ad3ec2 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-> > > @@ -70,15 +70,18 @@ static void dwmac1000_dma_axi(void __iomem *ioaddr, struct stmmac_axi *axi)
-> > >   	writel(value, ioaddr + DMA_AXI_BUS_MODE);
-> > >   }
-> > > -static void dwmac1000_dma_init(void __iomem *ioaddr,
-> > > -			       struct stmmac_dma_cfg *dma_cfg, int atds)
-> > > +static void dwmac1000_dma_init_channel(struct stmmac_priv *priv,
-> > > +				       void __iomem *ioaddr,
-> > > +				       struct stmmac_dma_cfg *dma_cfg, u32 chan)
-> > >   {
-> > > -	u32 value = readl(ioaddr + DMA_BUS_MODE);
-> > > +	u32 value;
-> > >   	int txpbl = dma_cfg->txpbl ?: dma_cfg->pbl;
-> > >   	int rxpbl = dma_cfg->rxpbl ?: dma_cfg->pbl;
-> > Reverse xmas tree please.
-> > 
-> > > -	/*
-> > > -	 * Set the DMA PBL (Programmable Burst Length) mode.
-> > > +	/* common channel control register config */
-> > Redundant comment. Please drop.
-> > 
-> > > +	value = readl(ioaddr + DMA_CHAN_BUS_MODE(chan));
-> > > +
-> > > +	/* Set the DMA PBL (Programmable Burst Length) mode.
-> > >   	 *
-> > >   	 * Note: before stmmac core 3.50 this mode bit was 4xPBL, and
-> > >   	 * post 3.5 mode bit acts as 8*PBL.
-> > > @@ -98,16 +101,15 @@ static void dwmac1000_dma_init(void __iomem *ioaddr,
-> > >   	if (dma_cfg->mixed_burst)
-> > >   		value |= DMA_BUS_MODE_MB;
-> > > -	if (atds)
-> > > -		value |= DMA_BUS_MODE_ATDS;
-> > > +	value |= DMA_BUS_MODE_ATDS;
-> > No, just convert the stmmac_dma_ops.dma_init_channel() to accepting
-> > the atds flag as I suggested in v7:
-> > https://lore.kernel.org/netdev/vxcfrxtbfu4pya56m22icnizsyjzqqha5blzb7zpexqcur56uh@uv6vsjf77npa/
-> > 
-> > In order to simplify this patch you can provide the
-> > stmmac_dma_ops.dma_init_channel() and
-> > stmmac_dma_ops.enable_dma_transmission() prototype updates in a
-> > pre-requisite/preparation patch.
-> 
-> Sorry to keep you waiting for so long, I finally got the machine again.
-> Regarding atds, is this how it is implemented?
-> 
-> On the basis of applying PATCH v8:
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-> b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-> index 0323f0a5049c..ce99f4a1b320 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-> @@ -72,7 +72,8 @@ static void dwmac1000_dma_axi(void __iomem *ioaddr, struct
-> stmmac_axi *axi)
-> 
->  static void dwmac1000_dma_init_channel(struct stmmac_priv *priv,
->                         void __iomem *ioaddr,
-> -                       struct stmmac_dma_cfg *dma_cfg, u32 chan)
-> +                       struct stmmac_dma_cfg *dma_cfg,
-> +                       int atds, u32 chan)
->  {
->      u32 value;
->      int txpbl = dma_cfg->txpbl ?: dma_cfg->pbl;
-> @@ -101,7 +102,8 @@ static void dwmac1000_dma_init_channel(struct
-> stmmac_priv *priv,
->      if (dma_cfg->mixed_burst)
->          value |= DMA_BUS_MODE_MB;
-> 
-> -    value |= DMA_BUS_MODE_ATDS;
-> +    if (atds)
-> +        value |= DMA_BUS_MODE_ATDS;
-> 
->      if (dma_cfg->aal)
->          value |= DMA_BUS_MODE_AAL;
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
-> b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
-> index 84d3a8551b03..8a79c154b553 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
-> @@ -117,7 +117,8 @@ static void dwmac4_dma_init_tx_chan(struct stmmac_priv
-> *priv,
-> 
->  static void dwmac4_dma_init_channel(struct stmmac_priv *priv,
->                      void __iomem *ioaddr,
-> -                    struct stmmac_dma_cfg *dma_cfg, u32 chan)
-> +                    struct stmmac_dma_cfg *dma_cfg,
-> +                                    int atds, u32 chan)
->  {
->      const struct dwmac4_addrs *dwmac4_addrs = priv->plat->dwmac4_addrs;
->      u32 value;
-> @@ -135,7 +136,8 @@ static void dwmac4_dma_init_channel(struct stmmac_priv
-> *priv,
-> 
->  static void dwmac410_dma_init_channel(struct stmmac_priv *priv,
->                        void __iomem *ioaddr,
-> -                      struct stmmac_dma_cfg *dma_cfg, u32 chan)
-> +                      struct stmmac_dma_cfg *dma_cfg,
-> +                                      int atds, u32 chan)
->  {
->      const struct dwmac4_addrs *dwmac4_addrs = priv->plat->dwmac4_addrs;
->      u32 value;
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-> b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-> index dd2ab6185c40..d1627b2e50c8 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-> @@ -35,7 +35,8 @@ static void dwxgmac2_dma_init(void __iomem *ioaddr,
-> 
->  static void dwxgmac2_dma_init_chan(struct stmmac_priv *priv,
->                     void __iomem *ioaddr,
-> -                   struct stmmac_dma_cfg *dma_cfg, u32 chan)
-> +                   struct stmmac_dma_cfg *dma_cfg,
-> +                                   int atds, u32 chan)
->  {
->      u32 value = readl(ioaddr + XGMAC_DMA_CH_CONTROL(chan));
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h
-> b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-> index b0db38396171..fb27ad0e97e8 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-> @@ -178,7 +178,7 @@ struct stmmac_dma_ops {
->      void (*init)(void __iomem *ioaddr, struct stmmac_dma_cfg *dma_cfg,
->               int atds);
->      void (*init_chan)(struct stmmac_priv *priv, void __iomem *ioaddr,
-> -              struct stmmac_dma_cfg *dma_cfg, u32 chan);
-> +              struct stmmac_dma_cfg *dma_cfg, int atds, u32 chan);
->      void (*init_rx_chan)(struct stmmac_priv *priv, void __iomem *ioaddr,
->                   struct stmmac_dma_cfg *dma_cfg,
->                   dma_addr_t phy, u32 chan);
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 3eed202d1f1c..8705e04913d1 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -3039,7 +3039,7 @@ static int stmmac_init_dma_engine(struct stmmac_priv
-> *priv)
-> 
->      /* DMA CSR Channel configuration */
->      for (chan = 0; chan < dma_csr_ch; chan++) {
-> -        stmmac_init_chan(priv, priv->ioaddr, priv->plat->dma_cfg, chan);
-> +        stmmac_init_chan(priv, priv->ioaddr, priv->plat->dma_cfg, atds,
-> chan);
->          stmmac_disable_dma_irq(priv, priv->ioaddr, chan, 1, 1);
->      }
-> 
-> @@ -6963,6 +6963,7 @@ int stmmac_xdp_open(struct net_device *dev)
->      u32 buf_size;
->      bool sph_en;
->      u32 chan;
-> +     int atds;
->      int ret;
-> 
->      ret = alloc_dma_desc_resources(priv, &priv->dma_conf);
-> @@ -6981,9 +6982,12 @@ int stmmac_xdp_open(struct net_device *dev)
-> 
->      stmmac_reset_queues_param(priv);
-> 
-> +    if (priv->extend_desc && (priv->mode == STMMAC_RING_MODE))
-> +        atds = 1;
-> +
->      /* DMA CSR Channel configuration */
->      for (chan = 0; chan < dma_csr_ch; chan++) {
-> -        stmmac_init_chan(priv, priv->ioaddr, priv->plat->dma_cfg, chan);
-> +        stmmac_init_chan(priv, priv->ioaddr, priv->plat->dma_cfg, atds,
-> chan);
->          stmmac_disable_dma_irq(priv, priv->ioaddr, chan, 1, 1);
->      }
+If you fix this issue, please add the following tag to the commit:
+Reported-by: xingwei lee <xrivendell7@gmail.com>
 
-Looking more thoroughly at this part I suggest to act a bit
-differently. Let's move the atds flag to the stmmac_dma_cfg structure.
-Alternate Descriptor Size (ATDS) is a part of the DMA-configs together
-with the PBL, ALL, AEME, etc so the structure is the most suitable
-place for it. Here is what should be done for that:
-1. Add stmmac_dma_cfg::atds boolean field.
-2. Drop atds argument from the stmmac_dma_ops::init() callback and use
-the stmmac_dma_cfg::atds field in the callback implementations.
-3. Alter stmmac_init_dma_engine() to updating the dma_cfg->atds field
-instead of the local variable.
+I use the same config with syzbot dashboard.
+kernel version: c1ca10ceffbb289ed02feaf005bc9ee6095b4507
+kernel config: https://syzkaller.appspot.com/text?tag=KernelConfig&x=e3dd779fba027968
+with KMSAN enabled
+compiler: Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-Please implement that update in a pre-requisite/preparation patch.
+[  254.423842][ T8047] =====================================================
+[  254.430576][ T8047] BUG: KMSAN: uninit-value in
+__nla_validate_parse+0x3d62/0x4f90
+[  254.434357][ T8047]  __nla_validate_parse+0x3d62/0x4f90
+[  254.437054][ T8047]  __nla_parse+0x6a/0x80
+[  254.439556][ T8047]  nfnetlink_rcv_msg+0x74c/0xed0
+[  254.444928][ T8047]  netlink_rcv_skb+0x58f/0x6d0
+[  254.447359][ T8047]  nfnetlink_rcv+0x3e8/0x4d10
+[  254.449893][ T8047]  netlink_unicast+0x107c/0x13e0
+[  254.452371][ T8047]  netlink_sendmsg+0x132c/0x1540
+[  254.454791][ T8047]  ____sys_sendmsg+0xa5b/0xe70
+[  254.456975][ T8047]  ___sys_sendmsg+0x2a7/0x3f0
+[  254.459423][ T8047]  __x64_sys_sendmsg+0x342/0x510
+[  254.461514][ T8047]  do_syscall_64+0xcf/0x1e0
+[  254.463345][ T8047]  entry_SYSCALL_64_after_hwframe+0x63/0x6b
+[  254.465643][ T8047]
+[  254.466539][ T8047] Uninit was created at:
+[  254.468194][ T8047]  kmem_cache_alloc_node+0x5cb/0xbc0
+[  254.470272][ T8047]  kmalloc_reserve+0x14d/0x500
+[  254.471882][ T8047]  __alloc_skb+0x385/0x820
+[  254.473385][ T8047]  netlink_sendmsg+0xbd6/0x1540
+[  254.475011][ T8047]  ____sys_sendmsg+0xa5b/0xe70
+[  254.476534][ T8047]  ___sys_sendmsg+0x2a7/0x3f0
+[  254.478039][ T8047]  __x64_sys_sendmsg+0x342/0x510
+[  254.479628][ T8047]  do_syscall_64+0xcf/0x1e0
+[  254.480995][ T8047]  entry_SYSCALL_64_after_hwframe+0x63/0x6b
+[  254.482719][ T8047]
 
-After that you can freely use the stmmac_dma_cfg::atds field in the
-stmmac_init_chan() method too.
 
--Serge(y)
+=* repro.c =*
+#define _GNU_SOURCE
 
-> 
-> 
-> Thanks,
-> 
-> Yanteng
-> 
-> > 
-> > >   	if (dma_cfg->aal)
-> > >   		value |= DMA_BUS_MODE_AAL;
-> > > -	writel(value, ioaddr + DMA_BUS_MODE);
-> > > +	writel(value, ioaddr + DMA_CHAN_BUS_MODE(chan));
-> > >   	/* Mask interrupts by writing to CSR7 */
-> > > -	writel(DMA_INTR_DEFAULT_MASK, ioaddr + DMA_INTR_ENA);
-> > > +	writel(DMA_INTR_DEFAULT_MASK, ioaddr + DMA_CHAN_INTR_ENA(chan));
-> > >   }
-> > >   static void dwmac1000_dma_init_rx(struct stmmac_priv *priv,
-> > > @@ -116,7 +118,7 @@ static void dwmac1000_dma_init_rx(struct stmmac_priv *priv,
-> > >   				  dma_addr_t dma_rx_phy, u32 chan)
-> > >   {
-> > >   	/* RX descriptor base address list must be written into DMA CSR3 */
-> > > -	writel(lower_32_bits(dma_rx_phy), ioaddr + DMA_RCV_BASE_ADDR);
-> > > +	writel(lower_32_bits(dma_rx_phy), ioaddr + DMA_CHAN_RCV_BASE_ADDR(chan));
-> > >   }
-> > >   static void dwmac1000_dma_init_tx(struct stmmac_priv *priv,
-> > > @@ -125,7 +127,7 @@ static void dwmac1000_dma_init_tx(struct stmmac_priv *priv,
-> > >   				  dma_addr_t dma_tx_phy, u32 chan)
-> > >   {
-> > >   	/* TX descriptor base address list must be written into DMA CSR4 */
-> > > -	writel(lower_32_bits(dma_tx_phy), ioaddr + DMA_TX_BASE_ADDR);
-> > > +	writel(lower_32_bits(dma_tx_phy), ioaddr + DMA_CHAN_TX_BASE_ADDR(chan));
-> > >   }
-> > >   static u32 dwmac1000_configure_fc(u32 csr6, int rxfifosz)
-> > > @@ -153,7 +155,7 @@ static void dwmac1000_dma_operation_mode_rx(struct stmmac_priv *priv,
-> > >   					    void __iomem *ioaddr, int mode,
-> > >   					    u32 channel, int fifosz, u8 qmode)
-> > >   {
-> > > -	u32 csr6 = readl(ioaddr + DMA_CONTROL);
-> > > +	u32 csr6 = readl(ioaddr + DMA_CHAN_CONTROL(channel));
-> > >   	if (mode == SF_DMA_MODE) {
-> > >   		pr_debug("GMAC: enable RX store and forward mode\n");
-> > > @@ -175,14 +177,14 @@ static void dwmac1000_dma_operation_mode_rx(struct stmmac_priv *priv,
-> > >   	/* Configure flow control based on rx fifo size */
-> > >   	csr6 = dwmac1000_configure_fc(csr6, fifosz);
-> > > -	writel(csr6, ioaddr + DMA_CONTROL);
-> > > +	writel(csr6, ioaddr + DMA_CHAN_CONTROL(channel));
-> > >   }
-> > >   static void dwmac1000_dma_operation_mode_tx(struct stmmac_priv *priv,
-> > >   					    void __iomem *ioaddr, int mode,
-> > >   					    u32 channel, int fifosz, u8 qmode)
-> > >   {
-> > > -	u32 csr6 = readl(ioaddr + DMA_CONTROL);
-> > > +	u32 csr6 = readl(ioaddr + DMA_CHAN_CONTROL(channel));
-> > >   	if (mode == SF_DMA_MODE) {
-> > >   		pr_debug("GMAC: enable TX store and forward mode\n");
-> > > @@ -209,7 +211,7 @@ static void dwmac1000_dma_operation_mode_tx(struct stmmac_priv *priv,
-> > >   			csr6 |= DMA_CONTROL_TTC_256;
-> > >   	}
-> > > -	writel(csr6, ioaddr + DMA_CONTROL);
-> > > +	writel(csr6, ioaddr + DMA_CHAN_CONTROL(channel));
-> > >   }
-> > >   static void dwmac1000_dump_dma_regs(struct stmmac_priv *priv,
-> > > @@ -271,12 +273,12 @@ static int dwmac1000_get_hw_feature(void __iomem *ioaddr,
-> > >   static void dwmac1000_rx_watchdog(struct stmmac_priv *priv,
-> > >   				  void __iomem *ioaddr, u32 riwt, u32 queue)
-> > >   {
-> > > -	writel(riwt, ioaddr + DMA_RX_WATCHDOG);
-> > > +	writel(riwt, ioaddr + DMA_CHAN_RX_WATCHDOG(queue));
-> > >   }
-> > >   const struct stmmac_dma_ops dwmac1000_dma_ops = {
-> > >   	.reset = dwmac_dma_reset,
-> > > -	.init = dwmac1000_dma_init,
-> > > +	.init_chan = dwmac1000_dma_init_channel,
-> > >   	.init_rx_chan = dwmac1000_dma_init_rx,
-> > >   	.init_tx_chan = dwmac1000_dma_init_tx,
-> > >   	.axi = dwmac1000_dma_axi,
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
-> > > index 72672391675f..593be79c46e1 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
-> > > @@ -148,11 +148,14 @@
-> > >   					 DMA_STATUS_TI | \
-> > >   					 DMA_STATUS_MSK_COMMON)
-> > > +/* Following DMA defines are chanels oriented */    \
-> > > +#define DMA_CHAN_OFFSET			0x100   |-------------+
-> > > +                                                    /              |
-> >                                                                        |
-> > Please move all of these ---------------------------------------------+-------------------------+
-> > to being defined just below the DMA_MISSED_FRAME_CTR macros definition.                         |
-> > The point is to keep a coherency between dwmac_dma.h and dwmac4_dma.h.                          |
-> > The later header file has first generic DMA-related macros defined                              |
-> > (CSR addresses and flags) and then the channel-specific ones (CSR                               |
-> > addresses and flags). Since in case of the DW GMAC v3.x the                                     |
-> > multi-channels are implemented as a copy of all the DMA CSRs let's                              |
-> > preserve the logic of having all CSR address defined first, then the                            |
-> > CSR flags.                                                                                      |
-> >                                                                                                  |
-> > >   #define NUM_DWMAC100_DMA_REGS	9                                                       |
-> > >   #define NUM_DWMAC1000_DMA_REGS	23                                                      |
-> > >   #define NUM_DWMAC4_DMA_REGS	27                                                              |
-> > >                                                                                                |
-> > > -void dwmac_enable_dma_transmission(void __iomem *ioaddr);                                    |
-> > > +void dwmac_enable_dma_transmission(void __iomem *ioaddr, u32 chan);                          |
-> > >   void dwmac_enable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,                    |
-> > >   			  u32 chan, bool rx, bool tx);                                          |
-> > >   void dwmac_disable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,                   |
-> > > @@ -169,4 +172,18 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,  |
-> > >   			struct stmmac_extra_stats *x, u32 chan, u32 dir);                       |
-> > >   int dwmac_dma_reset(void __iomem *ioaddr);                                                   |
-> > >                                                                                                |
-> >                                                                                                  |
-> > > +static inline u32 dma_chan_base_addr(u32 base, u32 chan)                                  \  |
-> > > +{                                                                                          | |
-> > > +	return base + chan * DMA_CHAN_OFFSET;                                                 | |
-> > > +}                                                                                          | |
-> > > +                                                                                           | |
-> > > +#define DMA_CHAN_XMT_POLL_DEMAND(chan)	dma_chan_base_addr(DMA_XMT_POLL_DEMAND, chan) | |
-> > > +#define DMA_CHAN_INTR_ENA(chan)		dma_chan_base_addr(DMA_INTR_ENA, chan)        | |
-> > > +#define DMA_CHAN_CONTROL(chan)		dma_chan_base_addr(DMA_CONTROL, chan)         | |
-> > > +#define DMA_CHAN_STATUS(chan)		dma_chan_base_addr(DMA_STATUS, chan)          |-+
-> > > +#define DMA_CHAN_BUS_MODE(chan)		dma_chan_base_addr(DMA_BUS_MODE, chan)        |
-> > > +#define DMA_CHAN_RCV_BASE_ADDR(chan)	dma_chan_base_addr(DMA_RCV_BASE_ADDR, chan)           |
-> > > +#define DMA_CHAN_TX_BASE_ADDR(chan)	dma_chan_base_addr(DMA_TX_BASE_ADDR, chan)            |
-> > > +#define DMA_CHAN_RX_WATCHDOG(chan)	dma_chan_base_addr(DMA_RX_WATCHDOG, chan)             |
-> > > +                                                                                           /
-> > >   #endif /* __DWMAC_DMA_H__ */
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-> > > index 7907d62d3437..b37368137810 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-> > > @@ -28,65 +28,65 @@ int dwmac_dma_reset(void __iomem *ioaddr)
-> > >   }
-> > >   /* CSR1 enables the transmit DMA to check for new descriptor */
-> > > -void dwmac_enable_dma_transmission(void __iomem *ioaddr)
-> > > +void dwmac_enable_dma_transmission(void __iomem *ioaddr, u32 chan)
-> > >   {
-> > > -	writel(1, ioaddr + DMA_XMT_POLL_DEMAND);
-> > > +	writel(1, ioaddr + DMA_CHAN_XMT_POLL_DEMAND(chan));
-> > >   }
-> > >   void dwmac_enable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
-> > >   			  u32 chan, bool rx, bool tx)
-> > >   {
-> > > -	u32 value = readl(ioaddr + DMA_INTR_ENA);
-> > > +	u32 value = readl(ioaddr + DMA_CHAN_INTR_ENA(chan));
-> > >   	if (rx)
-> > >   		value |= DMA_INTR_DEFAULT_RX;
-> > >   	if (tx)
-> > >   		value |= DMA_INTR_DEFAULT_TX;
-> > > -	writel(value, ioaddr + DMA_INTR_ENA);
-> > > +	writel(value, ioaddr + DMA_CHAN_INTR_ENA(chan));
-> > >   }
-> > >   void dwmac_disable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
-> > >   			   u32 chan, bool rx, bool tx)
-> > >   {
-> > > -	u32 value = readl(ioaddr + DMA_INTR_ENA);
-> > > +	u32 value = readl(ioaddr + DMA_CHAN_INTR_ENA(chan));
-> > >   	if (rx)
-> > >   		value &= ~DMA_INTR_DEFAULT_RX;
-> > >   	if (tx)
-> > >   		value &= ~DMA_INTR_DEFAULT_TX;
-> > > -	writel(value, ioaddr + DMA_INTR_ENA);
-> > > +	writel(value, ioaddr + DMA_CHAN_INTR_ENA(chan));
-> > >   }
-> > >   void dwmac_dma_start_tx(struct stmmac_priv *priv, void __iomem *ioaddr,
-> > >   			u32 chan)
-> > >   {
-> > > -	u32 value = readl(ioaddr + DMA_CONTROL);
-> > > +	u32 value = readl(ioaddr + DMA_CHAN_CONTROL(chan));
-> > >   	value |= DMA_CONTROL_ST;
-> > > -	writel(value, ioaddr + DMA_CONTROL);
-> > > +	writel(value, ioaddr + DMA_CHAN_CONTROL(chan));
-> > >   }
-> > >   void dwmac_dma_stop_tx(struct stmmac_priv *priv, void __iomem *ioaddr, u32 chan)
-> > >   {
-> > > -	u32 value = readl(ioaddr + DMA_CONTROL);
-> > > +	u32 value = readl(ioaddr + DMA_CHAN_CONTROL(chan));
-> > >   	value &= ~DMA_CONTROL_ST;
-> > > -	writel(value, ioaddr + DMA_CONTROL);
-> > > +	writel(value, ioaddr + DMA_CHAN_CONTROL(chan));
-> > >   }
-> > >   void dwmac_dma_start_rx(struct stmmac_priv *priv, void __iomem *ioaddr,
-> > >   			u32 chan)
-> > >   {
-> > > -	u32 value = readl(ioaddr + DMA_CONTROL);
-> > > +	u32 value = readl(ioaddr + DMA_CHAN_CONTROL(chan));
-> > >   	value |= DMA_CONTROL_SR;
-> > > -	writel(value, ioaddr + DMA_CONTROL);
-> > > +	writel(value, ioaddr + DMA_CHAN_CONTROL(chan));
-> > >   }
-> > >   void dwmac_dma_stop_rx(struct stmmac_priv *priv, void __iomem *ioaddr, u32 chan)
-> > >   {
-> > > -	u32 value = readl(ioaddr + DMA_CONTROL);
-> > > +	u32 value = readl(ioaddr + DMA_CHAN_CONTROL(chan));
-> > >   	value &= ~DMA_CONTROL_SR;
-> > > -	writel(value, ioaddr + DMA_CONTROL);
-> > > +	writel(value, ioaddr + DMA_CHAN_CONTROL(chan));
-> > >   }
-> > >   #ifdef DWMAC_DMA_DEBUG
-> > > @@ -166,7 +166,7 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
-> > >   	struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[chan];
-> > >   	int ret = 0;
-> > >   	/* read the status register (CSR5) */
-> > > -	u32 intr_status = readl(ioaddr + DMA_STATUS);
-> > > +	u32 intr_status = readl(ioaddr + DMA_CHAN_STATUS(chan));
-> > >   #ifdef DWMAC_DMA_DEBUG
-> > >   	/* Enable it to monitor DMA rx/tx status in case of critical problems */
-> > > @@ -236,7 +236,7 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
-> > >   		pr_warn("%s: unexpected status %08x\n", __func__, intr_status);
-> > >   	/* Clear the interrupt by writing a logic 1 to the CSR5[15-0] */
-> > > -	writel((intr_status & 0x1ffff), ioaddr + DMA_STATUS);
-> > > +	writel((intr_status & 0x7ffff), ioaddr + DMA_CHAN_STATUS(chan));
-> > Isn't the mask change going to be implemented in the framework of the
-> > Loongson-specific DMA-interrupt handler in some of the further patches?
-> > 
-> > 
-> > I'll get back to reviewing the series tomorrow (later today)...
-> > 
-> > -Serge(y)
-> > 
-> > >   	return ret;
-> > >   }
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-> > > index 7be04b54738b..b0db38396171 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-> > > @@ -198,7 +198,7 @@ struct stmmac_dma_ops {
-> > >   	/* To track extra statistic (if supported) */
-> > >   	void (*dma_diagnostic_fr)(struct stmmac_extra_stats *x,
-> > >   				  void __iomem *ioaddr);
-> > > -	void (*enable_dma_transmission) (void __iomem *ioaddr);
-> > > +	void (*enable_dma_transmission)(void __iomem *ioaddr, u32 chan);
-> > >   	void (*enable_dma_irq)(struct stmmac_priv *priv, void __iomem *ioaddr,
-> > >   			       u32 chan, bool rx, bool tx);
-> > >   	void (*disable_dma_irq)(struct stmmac_priv *priv, void __iomem *ioaddr,
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > index b334eb16da23..5617b40abbe4 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > @@ -2558,7 +2558,7 @@ static bool stmmac_xdp_xmit_zc(struct stmmac_priv *priv, u32 queue, u32 budget)
-> > >   				       true, priv->mode, true, true,
-> > >   				       xdp_desc.len);
-> > > -		stmmac_enable_dma_transmission(priv, priv->ioaddr);
-> > > +		stmmac_enable_dma_transmission(priv, priv->ioaddr, queue);
-> > >   		xsk_tx_metadata_to_compl(meta,
-> > >   					 &tx_q->tx_skbuff_dma[entry].xsk_meta);
-> > > @@ -4706,7 +4706,7 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
-> > >   	netdev_tx_sent_queue(netdev_get_tx_queue(dev, queue), skb->len);
-> > > -	stmmac_enable_dma_transmission(priv, priv->ioaddr);
-> > > +	stmmac_enable_dma_transmission(priv, priv->ioaddr, queue);
-> > >   	stmmac_flush_tx_descriptors(priv, queue);
-> > >   	stmmac_tx_timer_arm(priv, queue);
-> > > @@ -4926,7 +4926,7 @@ static int stmmac_xdp_xmit_xdpf(struct stmmac_priv *priv, int queue,
-> > >   		u64_stats_update_end_irqrestore(&txq_stats->syncp, flags);
-> > >   	}
-> > > -	stmmac_enable_dma_transmission(priv, priv->ioaddr);
-> > > +	stmmac_enable_dma_transmission(priv, priv->ioaddr, queue);
-> > >   	entry = STMMAC_GET_ENTRY(entry, priv->dma_conf.dma_tx_size);
-> > >   	tx_q->cur_tx = entry;
-> > > -- 
-> > > 2.31.4
-> > > 
-> 
+#include <dirent.h>
+#include <endian.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/prctl.h>
+#include <sys/stat.h>
+#include <sys/syscall.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <time.h>
+#include <unistd.h>
+
+static void sleep_ms(uint64_t ms) {
+  usleep(ms * 1000);
+}
+
+static uint64_t current_time_ms(void) {
+  struct timespec ts;
+  if (clock_gettime(CLOCK_MONOTONIC, &ts))
+    exit(1);
+  return (uint64_t)ts.tv_sec * 1000 + (uint64_t)ts.tv_nsec / 1000000;
+}
+
+#define BITMASK(bf_off, bf_len) (((1ull << (bf_len)) - 1) << (bf_off))
+#define STORE_BY_BITMASK(type, htobe, addr, val, bf_off, bf_len)     \
+  *(type*)(addr) =                                                   \
+      htobe((htobe(*(type*)(addr)) & ~BITMASK((bf_off), (bf_len))) | \
+            (((type)(val) << (bf_off)) & BITMASK((bf_off), (bf_len))))
+
+static bool write_file(const char* file, const char* what, ...) {
+  char buf[1024];
+  va_list args;
+  va_start(args, what);
+  vsnprintf(buf, sizeof(buf), what, args);
+  va_end(args);
+  buf[sizeof(buf) - 1] = 0;
+  int len = strlen(buf);
+  int fd = open(file, O_WRONLY | O_CLOEXEC);
+  if (fd == -1)
+    return false;
+  if (write(fd, buf, len) != len) {
+    int err = errno;
+    close(fd);
+    errno = err;
+    return false;
+  }
+  close(fd);
+  return true;
+}
+
+static void kill_and_wait(int pid, int* status) {
+  kill(-pid, SIGKILL);
+  kill(pid, SIGKILL);
+  for (int i = 0; i < 100; i++) {
+    if (waitpid(-1, status, WNOHANG | __WALL) == pid)
+      return;
+    usleep(1000);
+  }
+  DIR* dir = opendir("/sys/fs/fuse/connections");
+  if (dir) {
+    for (;;) {
+      struct dirent* ent = readdir(dir);
+      if (!ent)
+        break;
+      if (strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0)
+        continue;
+      char abort[300];
+      snprintf(abort, sizeof(abort), "/sys/fs/fuse/connections/%s/abort",
+               ent->d_name);
+      int fd = open(abort, O_WRONLY);
+      if (fd == -1) {
+        continue;
+      }
+      if (write(fd, abort, 1) < 0) {
+      }
+      close(fd);
+    }
+    closedir(dir);
+  } else {
+  }
+  while (waitpid(-1, status, __WALL) != pid) {
+  }
+}
+
+static void setup_test() {
+  prctl(PR_SET_PDEATHSIG, SIGKILL, 0, 0, 0);
+  setpgrp();
+  write_file("/proc/self/oom_score_adj", "1000");
+}
+
+static void execute_one(void);
+
+#define WAIT_FLAGS __WALL
+
+static void loop(void) {
+  int iter = 0;
+  for (;; iter++) {
+    int pid = fork();
+    if (pid < 0)
+      exit(1);
+    if (pid == 0) {
+      setup_test();
+      execute_one();
+      exit(0);
+    }
+    int status = 0;
+    uint64_t start = current_time_ms();
+    for (;;) {
+      if (waitpid(-1, &status, WNOHANG | WAIT_FLAGS) == pid)
+        break;
+      sleep_ms(1);
+      if (current_time_ms() - start < 5000)
+        continue;
+      kill_and_wait(pid, &status);
+      break;
+    }
+  }
+}
+
+uint64_t r[1] = {0xffffffffffffffff};
+
+void execute_one(void) {
+  intptr_t res = 0;
+  res = syscall(__NR_socket, /*domain=*/0x10ul, /*type=*/3ul, /*proto=*/0xc);
+  if (res != -1)
+    r[0] = res;
+  *(uint64_t*)0x20000080 = 0;
+  *(uint32_t*)0x20000088 = 0;
+  *(uint64_t*)0x20000090 = 0x20000040;
+  *(uint64_t*)0x20000040 = 0x20000100;
+  *(uint32_t*)0x20000100 = 0x18;
+  *(uint8_t*)0x20000104 = 0;
+  *(uint8_t*)0x20000105 = 0xb;
+  *(uint16_t*)0x20000106 = 0x401;
+  *(uint32_t*)0x20000108 = 0;
+  *(uint32_t*)0x2000010c = 0;
+  *(uint8_t*)0x20000110 = 0;
+  *(uint8_t*)0x20000111 = 0;
+  *(uint16_t*)0x20000112 = htobe16(0);
+  *(uint16_t*)0x20000114 = 4;
+  STORE_BY_BITMASK(uint16_t, , 0x20000116, 2, 0, 14);
+  STORE_BY_BITMASK(uint16_t, , 0x20000117, 0, 6, 1);
+  STORE_BY_BITMASK(uint16_t, , 0x20000117, 1, 7, 1);
+  *(uint64_t*)0x20000048 = 0x18;
+  *(uint64_t*)0x20000098 = 1;
+  *(uint64_t*)0x200000a0 = 0;
+  *(uint64_t*)0x200000a8 = 0;
+  *(uint32_t*)0x200000b0 = 0;
+  syscall(__NR_sendmsg, /*fd=*/r[0], /*msg=*/0x20000080ul, /*f=*/0ul);
+}
+int main(void) {
+  syscall(__NR_mmap, /*addr=*/0x1ffff000ul, /*len=*/0x1000ul, /*prot=*/0ul,
+          /*flags=*/0x32ul, /*fd=*/-1, /*offset=*/0ul);
+  syscall(__NR_mmap, /*addr=*/0x20000000ul, /*len=*/0x1000000ul, /*prot=*/7ul,
+          /*flags=*/0x32ul, /*fd=*/-1, /*offset=*/0ul);
+  syscall(__NR_mmap, /*addr=*/0x21000000ul, /*len=*/0x1000ul, /*prot=*/0ul,
+          /*flags=*/0x32ul, /*fd=*/-1, /*offset=*/0ul);
+  loop();
+  return 0;
+}
+
+=* repro.txt =*
+r0 = socket$nl_netfilter(0x10, 0x3, 0xc)
+sendmsg$IPCTNL_MSG_CT_NEW(r0, &(0x7f0000000080)={0x0, 0x0,
+&(0x7f0000000040)={&(0x7f0000000100)={0x18, 0x0, 0xb, 0x401, 0x0, 0x0,
+{}, [@CTA_TUPLE_REPLY={0x4}]}, 0x18}}, 0x0)
+
+
+and see also in
+https://gist.github.com/xrivendell7/fe97316e8a66f8d81109a158a3225bc0
+
+I hope it helps.
+Best regards!
+xingwei Lee
 
