@@ -1,73 +1,67 @@
-Return-Path: <netdev+bounces-73547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73548-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39B0B85CFDC
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 06:42:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADFB885D064
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 07:22:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3809282A5D
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 05:42:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DED91F20593
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 06:22:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38FED39AF1;
-	Wed, 21 Feb 2024 05:42:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="AU8WSuWs"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8995E3B2AD;
+	Wed, 21 Feb 2024 06:21:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5FB15A5;
-	Wed, 21 Feb 2024 05:42:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B976D3A8CA
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 06:21:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708494130; cv=none; b=XI8jd8jq+dBwzKcHj+X2gLUFgIFxwmQadpPMTAoZgZW3PE+7t/pwKNxnY33oU9Q0UCR9o7V1dC/fBCcGmKwQdEdAcmmxjlXB9Q3DdruP+EloFnu96lGf8rWqvcSPmIAuXkhdpYat4R2ZjQYXPFm7fQUvOqi3poW7CmuHbqo5uyE=
+	t=1708496484; cv=none; b=flkCosTg+KT3ILaAOoGgQoZSBnavHA+WWPDsyM7hlxrtPnB6iKK7D0eYRLGJQH2Oq7j0e9S3RkB09zDuFNZH+Anvoah+b3/Sx1q0TPrFuwqXRsvQSz1Fa1BFE/hW+lLnAV4RJUwduF9PxUnSMlAe1JzryPleq2ZEWNl9u6WqaDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708494130; c=relaxed/simple;
-	bh=cGaSLMlLu7obgGVEplEAZ5ydNe3Gim/TosgoGlQ22y8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b9NZ3SmUPGc9kVlo7ptEBUctfG32WGlU/RdhxlE56eXDvjeLY82EnofgTmaroam1S/PkcycuWAUFOy8mWv/4+4OV8+5lPWKIEClx44sNZ3/a/xNAwuEmpWWuvdcAmYKUKRqu8IS0q2e2eCZ9IJRc/mavKszrgH3Lvz3iNaeE8zo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=AU8WSuWs; arc=none smtp.client-ip=99.78.197.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1708494129; x=1740030129;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=nCb56l2vj0YcNG57jkT1YQ6JqSPECiwfE7fb1NQs81g=;
-  b=AU8WSuWsi/NRLuor6onCW2LI1c8Bi+CQfI4a+RfGr+33gCHgiP5sqcsr
-   EmQxuqf0W554ey/fQzHg6zLUQi44I9oUG4uEtFpXHBhrn+hXxCu9G+lDe
-   MthdiQZkH0HTvsSkaHlhzwCTQacgbe+1gGEboD7xRo//DdkKGnDhHXP9B
-   o=;
-X-IronPort-AV: E=Sophos;i="6.06,174,1705363200"; 
-   d="scan'208";a="274736649"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2024 05:42:07 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:29998]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.63.151:2525] with esmtp (Farcaster)
- id 1cf9b7cc-9ac7-4cda-a4e5-9730db8a2576; Wed, 21 Feb 2024 05:42:06 +0000 (UTC)
-X-Farcaster-Flow-ID: 1cf9b7cc-9ac7-4cda-a4e5-9730db8a2576
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Wed, 21 Feb 2024 05:42:05 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.119.137.44) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.40;
- Wed, 21 Feb 2024 05:42:03 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <pengfei.xu@intel.com>
-CC: <davem@davemloft.net>, <dumazet@google.com>, <kuba@kernel.org>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
-	<lkp@intel.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [Syzkaller & bisect] There is BUG: soft lockup after sendmsg syscall in v6.8-rc4
-Date: Tue, 20 Feb 2024 21:41:54 -0800
-Message-ID: <20240221054154.51749-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <ZdVgLbuAYGKoDzpS@xpf.sh.intel.com>
-References: <ZdVgLbuAYGKoDzpS@xpf.sh.intel.com>
+	s=arc-20240116; t=1708496484; c=relaxed/simple;
+	bh=yN0gnhhNqJ9ljcOBuWhNBG4H257Qk6a92TjbG7m+Ts4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OeOwElhhrk/h026qQ+yfCZWtf+PAGrXh2Goskf4EmAh5C9rPGhnzGprNUC1aSYvoKJCj6hmrxnqtav7p+YxMsgSc5wNlWU4MVGvIAU92o/4ry8sF3LKXxVEj4XwgFFY2hlYf6kQa694rfgtplF3olcRdhO7kR5S0OP+ReTvmRg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rcfyh-00010O-4Z; Wed, 21 Feb 2024 07:21:11 +0100
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rcfye-001zF8-Jz; Wed, 21 Feb 2024 07:21:08 +0100
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rcfye-003GZc-1m;
+	Wed, 21 Feb 2024 07:21:08 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Wei Fang <wei.fang@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	NXP Linux Team <linux-imx@nxp.com>
+Subject: [PATCH net-next v5 0/8] net: ethernet: Rework EEE
+Date: Wed, 21 Feb 2024 07:20:59 +0100
+Message-Id: <20240221062107.778661-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,35 +69,76 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D035UWA003.ant.amazon.com (10.13.139.86) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-From: Pengfei Xu <pengfei.xu@intel.com>
-Date: Wed, 21 Feb 2024 10:30:05 +0800
-> Hi Kuniyuki Iwashima and kernel experts,
-> 
-> Greeting!
-> There is BUG: soft lockup after sendmsg syscall in v6.8-rc4 in guest.
-> 
-> All detailed info: https://github.com/xupengfe/syzkaller_logs/tree/main/240220_161242_softlockup
-> Syzkaller reproduced code: https://github.com/xupengfe/syzkaller_logs/blob/main/240220_161242_softlockup/repro.c
-> Syzkaller syscall reproduced steps: https://github.com/xupengfe/syzkaller_logs/blob/main/240220_161242_softlockup/repro.prog
-> Kconfig(need make olddefconfig): https://github.com/xupengfe/syzkaller_logs/blob/main/240220_161242_softlockup/kconfig_origin
-> Bisect info: https://github.com/xupengfe/syzkaller_logs/blob/main/240220_161242_softlockup/bisect_info.log
-> v6.8-rc4 issue dmesg: https://github.com/xupengfe/syzkaller_logs/blob/main/240220_161242_softlockup/841c35169323cd833294798e58b9bf63fa4fa1de_dmesg.log
-> bzImage_v6.8-rc4: https://github.com/xupengfe/syzkaller_logs/raw/main/240220_161242_softlockup/bzImage_v6.8-rc4.tar.gz
-> 
-> Bisected and found first bad commit:
-> "
-> 1279f9d9dec2 af_unix: Call kfree_skb() for dead unix_(sk)->oob_skb in GC.
-> "
+Hello all,
 
-Thanks for the report.
+with Andrew's permission I'll continue mainlining this patches:
 
-I think syzbot reported the same issue.
-https://syzkaller.appspot.com/bug?extid=ecab4d36f920c3574bf9
+==============================================================
 
-Could you try this patch ?
-https://lore.kernel.org/netdev/20240219174657.6047-1-kuniyu@amazon.com/
+Most MAC drivers get EEE wrong. The API to the PHY is not very
+obvious, which is probably why. Rework the API, pushing most of the
+EEE handling into phylib core, leaving the MAC drivers to just
+enable/disable support for EEE in there change_link call back.
+
+MAC drivers are now expect to indicate to phylib if they support
+EEE. This will allow future patches to configure the PHY to advertise
+no EEE link modes when EEE is not supported. The information could
+also be used to enable SmartEEE if the PHY supports it.
+
+With these changes, the uAPI configuration eee_enable becomes a global
+on/off. tx-lpi must also be enabled before EEE is enabled. This fits
+the discussion here:
+
+https://lore.kernel.org/netdev/af880ce8-a7b8-138e-1ab9-8c89e662eecf@gmail.com/T/
+
+This patchset puts in place all the infrastructure, and converts one
+MAC driver to the new API. Following patchsets will convert other MAC
+drivers, extend support into phylink, and when all MAC drivers are
+converted to the new scheme, clean up some unneeded code.
+
+v5:
+--
+Rebase against latest netdev-next
+Use keee instead of eee struct
+
+v4
+--
+Only convert one MAC driver
+Drop all phylink code
+Conform to the uAPI discision.
+
+v3
+--
+Rework phylink code to add a new callback.
+Rework function to indicate clock should be stopped during LPI
+
+Andrew Lunn (7):
+  net: phy: Add phydev->enable_tx_lpi to simplify adjust link callbacks
+  net: phy: Add helper to set EEE Clock stop enable bit
+  net: phy: Keep track of EEE configuration
+  net: phy: Immediately call adjust_link if only tx_lpi_enabled changes
+  net: phy: Add phy_support_eee() indicating MAC support EEE
+  net: fec: Move fec_enet_eee_mode_set() and helper earlier
+  net: fec: Fixup EEE
+
+Russell King (1):
+  net: add helpers for EEE configuration
+
+ drivers/net/ethernet/freescale/fec_main.c | 84 ++++++++++-------------
+ drivers/net/phy/phy-c45.c                 | 11 ++-
+ drivers/net/phy/phy.c                     | 55 ++++++++++++++-
+ drivers/net/phy/phy_device.c              | 18 +++++
+ include/linux/phy.h                       |  9 ++-
+ include/net/eee.h                         | 38 ++++++++++
+ 6 files changed, 160 insertions(+), 55 deletions(-)
+ create mode 100644 include/net/eee.h
+
+-- 
+2.39.2
+
 
