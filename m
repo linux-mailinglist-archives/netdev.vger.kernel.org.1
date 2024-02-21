@@ -1,113 +1,80 @@
-Return-Path: <netdev+bounces-73523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD21E85CE24
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 03:40:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A36E985CE32
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 03:44:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CA871F24A60
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 02:40:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5EB09B211DF
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 02:44:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA1D525619;
-	Wed, 21 Feb 2024 02:40:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44B9B249E4;
+	Wed, 21 Feb 2024 02:44:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H/6HpPzn"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53F362554B;
-	Wed, 21 Feb 2024 02:40:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D5C12F36;
+	Wed, 21 Feb 2024 02:44:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708483215; cv=none; b=mhjASLOaMXQsG2R/mkmaxXvL+aL8ykLkHRsxjXJwHZJP3pNcQk1VOVw/+2xXU51JnKFR4JkHylLPrwhVAtokef4DhXo0aZJV9XzdZImGE7hb51/R3kxmpdxrLh9ToNbAgue93DFRx7xaTyKrz6Sr10JHm8Jn/tNkTJhbDYMC9X8=
+	t=1708483466; cv=none; b=BmvWfEfzZW2hQBf/TWpKQlfLvrDQa677MzBPwTcWx1xBP+HaRQZhqbaesD8nNCJnETndUi3jZKsltIlI7z4WFXwlsdjNWhHY2L/IsJxpe3/aJGHefbhxKYbt9Ru7UB3TgvB92w869qasiIqVRG3rUQvongfyhvHRz8MTiNJ93SE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708483215; c=relaxed/simple;
-	bh=huQBhc4YHl3eGuZLk1rpaJes8758crbomsUCrYGNCLA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=sHRZD6l3Vca/WPTHEk8VMfpr4Zj8ygAhG0skaXQ5uBG+va3ihdrjX+4iE7N4HLovblCxnDKN8d/gWKzdsV8kCagv34UnAWxZB7riIvckIonI4YnC7oU9bplLWm+lfDLEfAyvqYY6T1jdi4Ex+nrG1IKWfXLcErHMK1k3eFP1IeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4TfgRs0SvXz1h0LC;
-	Wed, 21 Feb 2024 10:38:01 +0800 (CST)
-Received: from kwepemd100002.china.huawei.com (unknown [7.221.188.184])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6C784140157;
-	Wed, 21 Feb 2024 10:40:09 +0800 (CST)
-Received: from kwepemd100010.china.huawei.com (7.221.188.107) by
- kwepemd100002.china.huawei.com (7.221.188.184) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Wed, 21 Feb 2024 10:40:09 +0800
-Received: from dggpemm500008.china.huawei.com (7.185.36.136) by
- kwepemd100010.china.huawei.com (7.221.188.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1258.28; Wed, 21 Feb 2024 10:40:08 +0800
-Received: from dggpemm500008.china.huawei.com ([7.185.36.136]) by
- dggpemm500008.china.huawei.com ([7.185.36.136]) with mapi id 15.01.2507.035;
- Wed, 21 Feb 2024 10:40:08 +0800
-From: wangyunjian <wangyunjian@huawei.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "jasowang@redhat.com"
-	<jasowang@redhat.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, xudingke
-	<xudingke@huawei.com>
-Subject: RE: [PATCH net] tun: Fix xdp_rxq_info's queue_index when detaching
-Thread-Topic: [PATCH net] tun: Fix xdp_rxq_info's queue_index when detaching
-Thread-Index: AQHaY6qX2CBy+Itti0yhEsLiFpBp4LES3gaAgAE1xQA=
-Date: Wed, 21 Feb 2024 02:40:08 +0000
-Message-ID: <3f175a5ef4e34a0394ae584a0b84523e@huawei.com>
-References: <1708398727-46308-1-git-send-email-wangyunjian@huawei.com>
- <65d4cc4b88e56_23483829431@willemb.c.googlers.com.notmuch>
-In-Reply-To: <65d4cc4b88e56_23483829431@willemb.c.googlers.com.notmuch>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1708483466; c=relaxed/simple;
+	bh=8a1OrPvpvJAvQeZbo8+FjNLm+ecYqk/MacrjDuZM+Tw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Sml68nq0kTwJ2962ivh0r+4yTSEBcs3hZcIdlgkAg4qXbzD25SFtKgaTsePX2fAQTu9QxFXB7iB3dMtbwa1ukp2Dj3p6MVQdJDhwcwukzTuG6nQOt73sWkVcqwCHsXxVW1mXp0smOKAa/bvPpXpCfvbMEw2d0MOKUftug6lcvsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H/6HpPzn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49149C433C7;
+	Wed, 21 Feb 2024 02:44:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708483465;
+	bh=8a1OrPvpvJAvQeZbo8+FjNLm+ecYqk/MacrjDuZM+Tw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=H/6HpPzn2pbHe6jrtJIyM/fQDgqYAcGhrA6eayhy4AkhH+lD3bNTWLk3Um3Y9ol/r
+	 2So1twZPhhU3gEXHjO/651aihjO9eBgLvLIXcTv8LH0tYqgP7ORkSRMSJeFBE3vdsv
+	 cSSABiJ0lfBlOKT7/DoYGq7Mj6Vw4lWXrzPyx6K0GjIFJctV2F+cyzxUDkbZy1PL2g
+	 CiMvafFmCxOnlSbzw0u7wbXG9fpy+xXVlRbrq+YR/vJsc5y//EKiOuXxhAC85To9DC
+	 pKnThz7B8X8ZYWsUdE//XJxWupmdjyMtm9cmrOCDEOQ1UNuiHyQ2fsUzUYpLvxQl7s
+	 iqhbj8q348ejw==
+Message-ID: <8afe7956-8f29-49e8-a59f-7e6b4136fa1d@kernel.org>
+Date: Tue, 20 Feb 2024 19:44:24 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: copy routing table more efficiently in
+ rt_dst_clone
+Content-Language: en-US
+To: Oliver Crumrine <ozlinuxc@gmail.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <xlabdyc4izitfdfpuoy2p2hi3abiq4mrrgizdqz45k7xeftbsg@ee6jgncdaqg7>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <xlabdyc4izitfdfpuoy2p2hi3abiq4mrrgizdqz45k7xeftbsg@ee6jgncdaqg7>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogV2lsbGVtIGRlIEJydWlq
-biBbbWFpbHRvOndpbGxlbWRlYnJ1aWpuLmtlcm5lbEBnbWFpbC5jb21dDQo+IFNlbnQ6IFR1ZXNk
-YXksIEZlYnJ1YXJ5IDIwLCAyMDI0IDExOjU5IFBNDQo+IFRvOiB3YW5neXVuamlhbiA8d2FuZ3l1
-bmppYW5AaHVhd2VpLmNvbT47DQo+IHdpbGxlbWRlYnJ1aWpuLmtlcm5lbEBnbWFpbC5jb207IGph
-c293YW5nQHJlZGhhdC5jb207IGt1YmFAa2VybmVsLm9yZzsNCj4gZGF2ZW1AZGF2ZW1sb2Z0Lm5l
-dA0KPiBDYzogbmV0ZGV2QHZnZXIua2VybmVsLm9yZzsgbGludXgta2VybmVsQHZnZXIua2VybmVs
-Lm9yZzsNCj4gYnJvdWVyQHJlZGhhdC5jb207IHh1ZGluZ2tlIDx4dWRpbmdrZUBodWF3ZWkuY29t
-Pjsgd2FuZ3l1bmppYW4NCj4gPHdhbmd5dW5qaWFuQGh1YXdlaS5jb20+DQo+IFN1YmplY3Q6IFJl
-OiBbUEFUQ0ggbmV0XSB0dW46IEZpeCB4ZHBfcnhxX2luZm8ncyBxdWV1ZV9pbmRleCB3aGVuIGRl
-dGFjaGluZw0KPiANCj4gWXVuamlhbiBXYW5nIHdyb3RlOg0KPiA+IFdoZW4gYSBxdWV1ZSh0Zmls
-ZSkgaXMgZGV0YWNoZWQsIHdlIG9ubHkgdXBkYXRlIHRmaWxlJ3MgcXVldWVfaW5kZXgsDQo+ID4g
-YnV0IGRvIG5vdCB1cGRhdGUgeGRwX3J4cV9pbmZvJ3MgcXVldWVfaW5kZXguIFRoaXMgcGF0Y2gg
-Zml4ZXMgaXQuDQo+ID4NCj4gPiBGaXhlczogOGJmNWM0ZWUxODg5ICgidHVuOiBzZXR1cCB4ZHBf
-cnhxX2luZm8iKQ0KPiA+IFNpZ25lZC1vZmYtYnk6IFl1bmppYW4gV2FuZyA8d2FuZ3l1bmppYW5A
-aHVhd2VpLmNvbT4NCj4gPiAtLS0NCj4gPiAgZHJpdmVycy9uZXQvdHVuLmMgfCAxICsNCj4gPiAg
-MSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvZHJp
-dmVycy9uZXQvdHVuLmMgYi9kcml2ZXJzL25ldC90dW4uYyBpbmRleA0KPiA+IGJjODBmYzFkNTc2
-ZS4uYmUzNzIzNWFmNTVkIDEwMDY0NA0KPiA+IC0tLSBhL2RyaXZlcnMvbmV0L3R1bi5jDQo+ID4g
-KysrIGIvZHJpdmVycy9uZXQvdHVuLmMNCj4gPiBAQCAtNjUyLDYgKzY1Miw3IEBAIHN0YXRpYyB2
-b2lkIF9fdHVuX2RldGFjaChzdHJ1Y3QgdHVuX2ZpbGUgKnRmaWxlLCBib29sDQo+IGNsZWFuKQ0K
-PiA+ICAJCQkJICAgdHVuLT50ZmlsZXNbdHVuLT5udW1xdWV1ZXMgLSAxXSk7DQo+ID4gIAkJbnRm
-aWxlID0gcnRubF9kZXJlZmVyZW5jZSh0dW4tPnRmaWxlc1tpbmRleF0pOw0KPiA+ICAJCW50Zmls
-ZS0+cXVldWVfaW5kZXggPSBpbmRleDsNCj4gPiArCQludGZpbGUtPnhkcF9yeHEucXVldWVfaW5k
-ZXggPSBpbmRleDsNCj4gPiAgCQlyY3VfYXNzaWduX3BvaW50ZXIodHVuLT50ZmlsZXNbdHVuLT5u
-dW1xdWV1ZXMgLSAxXSwNCj4gPiAgCQkJCSAgIE5VTEwpOw0KPiANCj4gRG9lcyBpdCBtYXR0ZXIg
-dGhhdCB0aGlzIHZhbHVlIGlzIHN0YWxlIHdoZW4gdW5kZXRhY2hlZD8NCg0KWWVzLCB0aGUgZGV0
-YWNoIHRmaWxlJ3F1ZXVlX2luZGV4IGlzIG5vdCBpbXBvcnRhbnQgYmVjYXVzZSB0aGUgcmUtYXR0
-YWNoIHdpbGwgdXBkYXRlLg0KQnV0IHRoaXMgcGF0Y2ggaXMgdG8gZml4IHRoZSAnbnRmaWxlJyh0
-aGF0IHJlcGxhY2VzIHRoZSBkZXRhY2ggdGZpbGUpJ3MgcXVldWVfaW5kZXgsIGl0IGlzIHdyb25n
-Lg0KDQpUaGFua3MNCj4gDQo+IEl0IGlzIHJlcGxhY2VkIGluIHR1bl9hdHRhY2ggaWYgcHJldmlv
-dXNseSBhdHRhY2hlZDoNCj4gDQo+IAkJLyogUmUtYXR0YWNoIGRldGFjaGVkIHRmaWxlLCB1cGRh
-dGluZyBYRFAgcXVldWVfaW5kZXggKi8NCj4gICAgICAgICAgICAgICAgIFdBUk5fT04oIXhkcF9y
-eHFfaW5mb19pc19yZWcoJnRmaWxlLT54ZHBfcnhxKSk7DQo+IA0KPiAgICAgICAgICAgICAgICAg
-aWYgKHRmaWxlLT54ZHBfcnhxLnF1ZXVlX2luZGV4ICAgICE9IHRmaWxlLT5xdWV1ZV9pbmRleCkN
-Cj4gICAgICAgICAgICAgICAgICAgICAgICAgdGZpbGUtPnhkcF9yeHEucXVldWVfaW5kZXggPSB0
-ZmlsZS0+cXVldWVfaW5kZXg7DQo=
+On 2/18/24 6:35 AM, Oliver Crumrine wrote:
+> diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+> index 16615d107cf0..ebb17c3a0dec 100644
+> --- a/net/ipv4/route.c
+> +++ b/net/ipv4/route.c
+> @@ -1664,22 +1664,8 @@ struct rtable *rt_dst_clone(struct net_device *dev, struct rtable *rt)
+>  			   rt->dst.flags);
+>  
+>  	if (new_rt) {
+> +		*new_rt = *rt;
+
+rtable is a container of dst_entry, so this is copying those fields as well.
+
+pw-bot: reject
+
 
