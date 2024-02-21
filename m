@@ -1,194 +1,298 @@
-Return-Path: <netdev+bounces-73719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5986985E022
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 15:44:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FDB485E02A
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 15:46:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DCE528B186
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 14:44:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C5271C2130B
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 14:46:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA3F7E764;
-	Wed, 21 Feb 2024 14:44:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OQQ60MSY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19F6F7F47A;
+	Wed, 21 Feb 2024 14:46:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pegase1.c-s.fr (pegase1.c-s.fr [93.17.236.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 234133D393
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 14:44:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE1477FBA2;
+	Wed, 21 Feb 2024 14:45:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.236.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708526669; cv=none; b=LWJrHuJGhV9mwwoMR/lxPgKY1EhzrkXXstRy/GxffC1HpQM0+ejzZ8qhu5Jnly8dfOmPfz6Fp2sLb8LEWxuDjd0jVgVzILIJ8Rvn3B2lVxZamRlh2Eav/Ln+2MJlTZex4oLbQoJa6xT7FvXqbDcATtrzhKYqEErF2bdV5pbyBKY=
+	t=1708526762; cv=none; b=WZGvrP5YHxX5MYzVv3q3F2JIttoCDaT2IHCQX2uXq+NYocbIhqxEz3mC9OkzeyvL9Qem6DEcRI0xI9ojkfhAkNBuF0anCf8Ou8uU8SIxyQ510Jx2Z3O4CjVwGOUNF5Ab938ep94G6AGcZSbSNdYYVNGuEKPIygh7PCoAoRd0HSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708526669; c=relaxed/simple;
-	bh=g7u+DKzUlMMWdhzCCS5PCR/BztnqGnebUS7TQuexJmM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Vp41YKiT/PWTqpafEWGcd/uKpBYq9gl/ZS//yDMRuCJAl77InVQ9+6k4tpl3pkC+tkUyAdEJZtz/NGACMoRv3uMTr5eGWaOPRo6E7AVqGNuVzAqHXh41z5jm4z04+TyMZymb90v4u/sUHWuC3oJPoP3s9s/63+PVLhIcJw2PCjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OQQ60MSY; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-410acf9e776so64755e9.1
-        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 06:44:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708526666; x=1709131466; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MtdfXyTJZ9cnwrutt1Q746VnioNBSzYvrI+ZmsrAU1k=;
-        b=OQQ60MSY3CylmfdnYbOH2voXFtZDYpdf/wYAPEKaIslCzTy5VmWHeYqqTGNcy/NkiC
-         4OrY66bRDU2CnstyWZnm9Dw2FkCSBghGuhpKP1laNriZAe9IA1Li2ZxKcY5jgOMRxGaw
-         KX4v7yxoTDpHLcVWR6SeZosaXrVj+FmWN0l4HX3JiQxY+zqPMdNgcyxNwccp+R5Ux8X+
-         E8RqQ5HHj26FVzhtgG0KG/ljkYQvMAzQPoYL7AndCcy6BpVT4TL2gMU+nEROINWdpVyo
-         02MaErAX9xxyKmhM0FxQ3dqe0VikBUV13ivGB/R4VdN3yd7v7gE6lEsFYaRyCiWLMQ/l
-         GUzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708526666; x=1709131466;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MtdfXyTJZ9cnwrutt1Q746VnioNBSzYvrI+ZmsrAU1k=;
-        b=YLiv0J3RnMVj+/T0lj35LQ68mJ3TE45TSotkMppqK0S3io3ZUIyees1WRDIE7/eYdB
-         3OXdUsBgnLp+SUZSHJV5giOqJH5ylu3vm3KTCv0U8Rq8HbpUOM7Fqn5q7+X2OcPagnIr
-         5f4SDgR3d7q+FrtvxuNO7UNUfZrMz1g8wjGJbxWebOq+bNcxrIi8KKkgk9uzznpkLqbg
-         QWTY9ZrWqpQxddhBCut2qfMZ7XaSoxR8Bgjo2Ff8OBUONbpXIDnnkgWo/WNY5GCmT6dw
-         qm+q4NofOx+aL+SnW2LNwxmc1vYiPLyGzzAIhfv46V9i7cc03PoJe9EcdPOvdn+Dhj/4
-         c1yw==
-X-Forwarded-Encrypted: i=1; AJvYcCXDFlnGvc/MDTyJHGIjre/AbGRUGv59vLkcUUNfZRxYnk0ex0hoIt+kwr8Fqh+r49bGHPuX3tKsIbeU4c8gAGHHRAOrKTlc
-X-Gm-Message-State: AOJu0Yzlxq60BbVhnVXqRJOiy8zW3nf9sMzqRQGPN1BbrP6fZSkKK9Wx
-	x5jWQNkHH/5RDEmcEFHL8xHTrHy+rikVuvnCCUhyxOR/HSkMNf6DDG1PXYNZQz2Ze2/v0HHZAZA
-	0zmtW3aEsxSxFrauWsNuf0Jewnm9Sfvkq0Fvw
-X-Google-Smtp-Source: AGHT+IG6iuKuFBiEG6wgOYcOmYEz+rtDWG7quWS51dAzvsiL+EhfaOSBS+JFSoL7ekcVmH7oXQj1NRhN1nomn5SUcsY=
-X-Received: by 2002:a05:600c:3d08:b0:412:766a:3ba5 with SMTP id
- bh8-20020a05600c3d0800b00412766a3ba5mr114980wmb.6.1708526666209; Wed, 21 Feb
- 2024 06:44:26 -0800 (PST)
+	s=arc-20240116; t=1708526762; c=relaxed/simple;
+	bh=px5R6j4CfBD6L+NyH1bzxUD/SxQ6vZa1DBOK9wlHvDM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZUpHSKMjWVeXNbEA9U0abFJh8TIOPXnDsAKqXNk2JstyOf58zfuOztGDnc2mGDh4s5bbi6fQtIwwY9F95o7JRKHhQGVricCXgRQHcdjYkszFQ6qRbh843+jqi1k+WuDs1gooH0HM2XqJapAnpa2unugskMIQsmqrbGtj2IywGok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.236.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub3.si.c-s.fr [192.168.12.233])
+	by localhost (Postfix) with ESMTP id 4Tfzbg5LQ0z9txb;
+	Wed, 21 Feb 2024 15:45:51 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+	by localhost (pegase1.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id hANmYnw3DOMc; Wed, 21 Feb 2024 15:45:51 +0100 (CET)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase1.c-s.fr (Postfix) with ESMTP id 4Tfzbg4Rs7z9tFS;
+	Wed, 21 Feb 2024 15:45:51 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 8DED38B76D;
+	Wed, 21 Feb 2024 15:45:51 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id 4ZYUsQVw3Cpp; Wed, 21 Feb 2024 15:45:51 +0100 (CET)
+Received: from PO20335.idsi0.si.c-s.fr (unknown [172.25.230.108])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 398788B768;
+	Wed, 21 Feb 2024 15:45:51 +0100 (CET)
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+To: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kees Cook <keescook@chromium.org>
+Subject: [PATCH bpf-next v2] bpf: Check return from set_memory_rox() and friends
+Date: Wed, 21 Feb 2024 15:45:19 +0100
+Message-ID: <883c5a268483a89ab13ed630210328a926f16e5b.1708526584.git.christophe.leroy@csgroup.eu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240221025732.68157-1-kerneljasonxing@gmail.com> <20240221025732.68157-11-kerneljasonxing@gmail.com>
-In-Reply-To: <20240221025732.68157-11-kerneljasonxing@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 21 Feb 2024 15:44:15 +0100
-Message-ID: <CANn89iKmaZZSnk5+CCtSH43jeUgRWNQPV4cjc0vpWNT7nHnQQg@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 10/11] tcp: make dropreason in
- tcp_child_process() work
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	dsahern@kernel.org, kuniyu@amazon.com, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1708526720; l=7152; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=px5R6j4CfBD6L+NyH1bzxUD/SxQ6vZa1DBOK9wlHvDM=; b=5fyB6RbnqOSvhWk+nkpg1uqyuXjHfBWovHDcw9RzvTxBWVm802UGzWAm2DpZ2bZ9CHAAOxwGW 8Y4dIkxnweyCBz/O5h2TCcoI8fqwp689VQh4Vjvlh2ppNALjSkFKCaR
+X-Developer-Key: i=christophe.leroy@csgroup.eu; a=ed25519; pk=HIzTzUj91asvincQGOFx6+ZF5AoUuP9GdOtQChs7Mm0=
+Content-Transfer-Encoding: 8bit
 
-On Wed, Feb 21, 2024 at 3:58=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> From: Jason Xing <kernelxing@tencent.com>
->
-> It's time to let it work right now. We've already prepared for this:)
->
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> --
-> v7
-> Link: https://lore.kernel.org/all/20240219043815.98410-1-kuniyu@amazon.co=
-m/
-> 1. adjust the related part of code only since patch [04/11] is changed.
-> ---
->  net/ipv4/tcp_ipv4.c | 16 ++++++++++------
->  net/ipv6/tcp_ipv6.c | 20 +++++++++++++-------
->  2 files changed, 23 insertions(+), 13 deletions(-)
->
-> diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-> index c79e25549972..c886c671fae9 100644
-> --- a/net/ipv4/tcp_ipv4.c
-> +++ b/net/ipv4/tcp_ipv4.c
-> @@ -1917,7 +1917,8 @@ int tcp_v4_do_rcv(struct sock *sk, struct sk_buff *=
-skb)
->                 if (!nsk)
->                         return 0;
->                 if (nsk !=3D sk) {
-> -                       if (tcp_child_process(sk, nsk, skb)) {
-> +                       reason =3D tcp_child_process(sk, nsk, skb);
-> +                       if (reason) {
->                                 rsk =3D nsk;
->                                 goto reset;
->                         }
-> @@ -2276,12 +2277,15 @@ int tcp_v4_rcv(struct sk_buff *skb)
->                 if (nsk =3D=3D sk) {
->                         reqsk_put(req);
->                         tcp_v4_restore_cb(skb);
-> -               } else if (tcp_child_process(sk, nsk, skb)) {
-> -                       tcp_v4_send_reset(nsk, skb);
-> -                       goto discard_and_relse;
->                 } else {
-> -                       sock_put(sk);
-> -                       return 0;
-> +                       drop_reason =3D tcp_child_process(sk, nsk, skb);
-> +                       if (drop_reason) {
-> +                               tcp_v4_send_reset(nsk, skb);
-> +                               goto discard_and_relse;
-> +                       } else {
+arch_protect_bpf_trampoline() and alloc_new_pack() call
+set_memory_rox() which can fail, leading to unprotected memory.
 
-No need for else after a goto (or a return)
+Take into account return from set_memory_XX() functions and add
+__must_check flag to arch_protect_bpf_trampoline().
 
-> +                               sock_put(sk);
-> +                               return 0;
-> +                       }
->                 }
->         }
->
-> diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-> index 4f8464e04b7f..f260c28e5b18 100644
-> --- a/net/ipv6/tcp_ipv6.c
-> +++ b/net/ipv6/tcp_ipv6.c
-> @@ -1654,8 +1654,11 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff =
-*skb)
->                 struct sock *nsk =3D tcp_v6_cookie_check(sk, skb);
->
->                 if (nsk !=3D sk) {
-> -                       if (nsk && tcp_child_process(sk, nsk, skb))
-> -                               goto reset;
-> +                       if (nsk) {
-> +                               reason =3D tcp_child_process(sk, nsk, skb=
-);
-> +                               if (reason)
-> +                                       goto reset;
-> +                       }
->                         if (opt_skb)
->                                 __kfree_skb(opt_skb);
->                         return 0;
-> @@ -1854,12 +1857,15 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_=
-buff *skb)
->                 if (nsk =3D=3D sk) {
->                         reqsk_put(req);
->                         tcp_v6_restore_cb(skb);
-> -               } else if (tcp_child_process(sk, nsk, skb)) {
-> -                       tcp_v6_send_reset(nsk, skb);
-> -                       goto discard_and_relse;
->                 } else {
-> -                       sock_put(sk);
-> -                       return 0;
-> +                       drop_reason =3D tcp_child_process(sk, nsk, skb);
-> +                       if (drop_reason) {
-> +                               tcp_v6_send_reset(nsk, skb);
-> +                               goto discard_and_relse;
-> +                       } else {
+Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+Reviewed-by: Kees Cook <keescook@chromium.org>
+---
+v2:
+- Move list_add_tail(&pack->list, &pack_list) at the end of alloc_new_pack()
+- Split 2 lines that are reported longer than 80 chars by BPF patchwork's checkpatch report.
+---
+ arch/x86/net/bpf_jit_comp.c    |  6 ++++--
+ include/linux/bpf.h            |  4 ++--
+ kernel/bpf/bpf_struct_ops.c    |  9 +++++++--
+ kernel/bpf/core.c              | 29 ++++++++++++++++++++++-------
+ kernel/bpf/trampoline.c        | 18 ++++++++++++------
+ net/bpf/bpf_dummy_struct_ops.c |  4 +++-
+ 6 files changed, 50 insertions(+), 20 deletions(-)
 
+diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
+index e1390d1e331b..128c8ec9164e 100644
+--- a/arch/x86/net/bpf_jit_comp.c
++++ b/arch/x86/net/bpf_jit_comp.c
+@@ -2780,12 +2780,14 @@ void arch_free_bpf_trampoline(void *image, unsigned int size)
+ 	bpf_prog_pack_free(image, size);
+ }
+ 
+-void arch_protect_bpf_trampoline(void *image, unsigned int size)
++int arch_protect_bpf_trampoline(void *image, unsigned int size)
+ {
++	return 0;
+ }
+ 
+-void arch_unprotect_bpf_trampoline(void *image, unsigned int size)
++int arch_unprotect_bpf_trampoline(void *image, unsigned int size)
+ {
++	return 0;
+ }
+ 
+ int arch_prepare_bpf_trampoline(struct bpf_tramp_image *im, void *image, void *image_end,
+diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+index b86bd15a051d..bb2723c264df 100644
+--- a/include/linux/bpf.h
++++ b/include/linux/bpf.h
+@@ -1116,8 +1116,8 @@ int arch_prepare_bpf_trampoline(struct bpf_tramp_image *im, void *image, void *i
+ 				void *func_addr);
+ void *arch_alloc_bpf_trampoline(unsigned int size);
+ void arch_free_bpf_trampoline(void *image, unsigned int size);
+-void arch_protect_bpf_trampoline(void *image, unsigned int size);
+-void arch_unprotect_bpf_trampoline(void *image, unsigned int size);
++int __must_check arch_protect_bpf_trampoline(void *image, unsigned int size);
++int arch_unprotect_bpf_trampoline(void *image, unsigned int size);
+ int arch_bpf_trampoline_size(const struct btf_func_model *m, u32 flags,
+ 			     struct bpf_tramp_links *tlinks, void *func_addr);
+ 
+diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
+index 0decd862dfe0..d920afb0dd60 100644
+--- a/kernel/bpf/bpf_struct_ops.c
++++ b/kernel/bpf/bpf_struct_ops.c
+@@ -488,7 +488,9 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
+ 			if (err)
+ 				goto reset_unlock;
+ 		}
+-		arch_protect_bpf_trampoline(st_map->image, PAGE_SIZE);
++		err = arch_protect_bpf_trampoline(st_map->image, PAGE_SIZE);
++		if (err)
++			goto reset_unlock;
+ 		/* Let bpf_link handle registration & unregistration.
+ 		 *
+ 		 * Pair with smp_load_acquire() during lookup_elem().
+@@ -497,7 +499,10 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
+ 		goto unlock;
+ 	}
+ 
+-	arch_protect_bpf_trampoline(st_map->image, PAGE_SIZE);
++	err = arch_protect_bpf_trampoline(st_map->image, PAGE_SIZE);
++	if (err)
++		goto reset_unlock;
++
+ 	err = st_ops->reg(kdata);
+ 	if (likely(!err)) {
+ 		/* This refcnt increment on the map here after
+diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+index c49619ef55d0..eb2256ba6daf 100644
+--- a/kernel/bpf/core.c
++++ b/kernel/bpf/core.c
+@@ -898,23 +898,31 @@ static LIST_HEAD(pack_list);
+ static struct bpf_prog_pack *alloc_new_pack(bpf_jit_fill_hole_t bpf_fill_ill_insns)
+ {
+ 	struct bpf_prog_pack *pack;
++	int err;
+ 
+ 	pack = kzalloc(struct_size(pack, bitmap, BITS_TO_LONGS(BPF_PROG_CHUNK_COUNT)),
+ 		       GFP_KERNEL);
+ 	if (!pack)
+ 		return NULL;
+ 	pack->ptr = bpf_jit_alloc_exec(BPF_PROG_PACK_SIZE);
+-	if (!pack->ptr) {
+-		kfree(pack);
+-		return NULL;
+-	}
++	if (!pack->ptr)
++		goto out;
+ 	bpf_fill_ill_insns(pack->ptr, BPF_PROG_PACK_SIZE);
+ 	bitmap_zero(pack->bitmap, BPF_PROG_PACK_SIZE / BPF_PROG_CHUNK_SIZE);
+-	list_add_tail(&pack->list, &pack_list);
+ 
+ 	set_vm_flush_reset_perms(pack->ptr);
+-	set_memory_rox((unsigned long)pack->ptr, BPF_PROG_PACK_SIZE / PAGE_SIZE);
++	err = set_memory_rox((unsigned long)pack->ptr,
++			     BPF_PROG_PACK_SIZE / PAGE_SIZE);
++	if (err)
++		goto out_free;
++	list_add_tail(&pack->list, &pack_list);
+ 	return pack;
++
++out_free:
++	bpf_jit_free_exec(pack->ptr);
++out:
++	kfree(pack);
++	return NULL;
+ }
+ 
+ void *bpf_prog_pack_alloc(u32 size, bpf_jit_fill_hole_t bpf_fill_ill_insns)
+@@ -929,9 +937,16 @@ void *bpf_prog_pack_alloc(u32 size, bpf_jit_fill_hole_t bpf_fill_ill_insns)
+ 		size = round_up(size, PAGE_SIZE);
+ 		ptr = bpf_jit_alloc_exec(size);
+ 		if (ptr) {
++			int err;
++
+ 			bpf_fill_ill_insns(ptr, size);
+ 			set_vm_flush_reset_perms(ptr);
+-			set_memory_rox((unsigned long)ptr, size / PAGE_SIZE);
++			err = set_memory_rox((unsigned long)ptr,
++					     size / PAGE_SIZE);
++			if (err) {
++				bpf_jit_free_exec(ptr);
++				ptr = NULL;
++			}
+ 		}
+ 		goto out;
+ 	}
+diff --git a/kernel/bpf/trampoline.c b/kernel/bpf/trampoline.c
+index d382f5ebe06c..6e64ac9083b6 100644
+--- a/kernel/bpf/trampoline.c
++++ b/kernel/bpf/trampoline.c
+@@ -456,7 +456,9 @@ static int bpf_trampoline_update(struct bpf_trampoline *tr, bool lock_direct_mut
+ 	if (err < 0)
+ 		goto out_free;
+ 
+-	arch_protect_bpf_trampoline(im->image, im->size);
++	err = arch_protect_bpf_trampoline(im->image, im->size);
++	if (err)
++		goto out_free;
+ 
+ 	WARN_ON(tr->cur_image && total == 0);
+ 	if (tr->cur_image)
+@@ -1072,17 +1074,21 @@ void __weak arch_free_bpf_trampoline(void *image, unsigned int size)
+ 	bpf_jit_free_exec(image);
+ }
+ 
+-void __weak arch_protect_bpf_trampoline(void *image, unsigned int size)
++int __weak arch_protect_bpf_trampoline(void *image, unsigned int size)
+ {
+ 	WARN_ON_ONCE(size > PAGE_SIZE);
+-	set_memory_rox((long)image, 1);
++	return set_memory_rox((long)image, 1);
+ }
+ 
+-void __weak arch_unprotect_bpf_trampoline(void *image, unsigned int size)
++int __weak arch_unprotect_bpf_trampoline(void *image, unsigned int size)
+ {
++	int err;
+ 	WARN_ON_ONCE(size > PAGE_SIZE);
+-	set_memory_nx((long)image, 1);
+-	set_memory_rw((long)image, 1);
++
++	err = set_memory_nx((long)image, 1);
++	if (err)
++		return err;
++	return set_memory_rw((long)image, 1);
+ }
+ 
+ int __weak arch_bpf_trampoline_size(const struct btf_func_model *m, u32 flags,
+diff --git a/net/bpf/bpf_dummy_struct_ops.c b/net/bpf/bpf_dummy_struct_ops.c
+index 02de71719aed..2aaecd8931fc 100644
+--- a/net/bpf/bpf_dummy_struct_ops.c
++++ b/net/bpf/bpf_dummy_struct_ops.c
+@@ -137,7 +137,9 @@ int bpf_struct_ops_test_run(struct bpf_prog *prog, const union bpf_attr *kattr,
+ 	if (err < 0)
+ 		goto out;
+ 
+-	arch_protect_bpf_trampoline(image, PAGE_SIZE);
++	err = arch_protect_bpf_trampoline(image, PAGE_SIZE);
++	if (err)
++		goto out;
+ 	prog_ret = dummy_ops_call_op(image, args);
+ 
+ 	err = dummy_ops_copy_args(args);
+-- 
+2.43.0
 
- Same here
-
-> +                               sock_put(sk);
-> +                               return 0;
-> +                       }
->                 }
->         }
->
-> --
-> 2.37.3
->
 
