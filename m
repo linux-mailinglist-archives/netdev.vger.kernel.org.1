@@ -1,62 +1,60 @@
-Return-Path: <netdev+bounces-73775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1581D85E4F2
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 18:54:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D45385E513
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 18:58:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BAEF1C23A0F
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 17:54:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED85F284885
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 17:58:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0762B84A20;
-	Wed, 21 Feb 2024 17:54:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C15F84FD3;
+	Wed, 21 Feb 2024 17:58:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t09f8tuz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LbTDMqnG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1DF583CD2;
-	Wed, 21 Feb 2024 17:54:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFCD183CBC;
+	Wed, 21 Feb 2024 17:58:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708538042; cv=none; b=fcC321waLWgV1TOMKPYAyr6lG0/Jpz7vMnIx/39QWagNxPuHRpXi2wxoh3vlJc03GD6oSloFLgjyaLcINBklR3Tc1TkfakUxWhmBq8UtJF2bTU2VUfkOFBUKgAcGELjaIohqukD1SIDHjvkxcZi5EvGzT0qta/S9pZFSzINuCCs=
+	t=1708538292; cv=none; b=e+zqCOI0aq/oz5RwsUHfh0AAyJnLblIcj24cUVLsSG5bLpUUiWHoN1iXCGeuTBmzZaA2tuiJq9dX4OUo1z1JHgzfqsbhQKDbVQRlzS4Vb0iMh+usEHHWdbfowVnR+0MaL7LAt5nGSpCJ6SIF8xHrFu7igni7yAwQRgTfXH8DF+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708538042; c=relaxed/simple;
-	bh=XeaEaox6hE414P2S4pbvJ+ZOuxNVhudeaZWZheWvRYA=;
+	s=arc-20240116; t=1708538292; c=relaxed/simple;
+	bh=uomZG9MXqS7kF7JKnSlsE7LuoDTKmetN2P1DLvWOsoc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sAmBJ9mcEAwA6R+ihv+V2E3/eQBL+ha2Iuv91cjnyFuZB18whV4aShca37L1Cav17sOYc1tzg71Ek+hYOlrijFLwrK/K52kQK44tTFOUIBuUxmTZRyShKKp+w3p4m1dkAqSZzeh49hEmiRLCi2DIZOvn8nGgyrXQzQCWL7GOCSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t09f8tuz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A994FC433F1;
-	Wed, 21 Feb 2024 17:53:59 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=KH3aQERgFkwoMMUHHinfr2cELfiqId25llREKa7SGdDyxPnPauvt0P6YPL5RDOgwM5CoZCxY/eZZb7cAN0K3MXSSyP/mNW0eslvDOhImAF/F7nPqKNMaNkWjt5mkUpQd/CIrMl8jidjQrj7DuaZ3aDUZw/WLCTYQ/V0DFRKG760=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LbTDMqnG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56C86C43390;
+	Wed, 21 Feb 2024 17:58:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708538042;
-	bh=XeaEaox6hE414P2S4pbvJ+ZOuxNVhudeaZWZheWvRYA=;
+	s=k20201202; t=1708538291;
+	bh=uomZG9MXqS7kF7JKnSlsE7LuoDTKmetN2P1DLvWOsoc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=t09f8tuzAWJq6UCSVXCEQMPo05RoClwUY8pUeIT3kTczagizzFUOerJFiGTlxkyP/
-	 16PbsN0U5Z6+PeO5ZF1vYdUeEmNuRNucMsNAIQ4nC0nW1hfV9b3WzZDiI96pBaAUUL
-	 TB2dcc515UzctMgxxklA07ZCykG7cuT+h3VRkv86c8I5shQV4d+Y41z9+bqkGIIWSi
-	 OxhHABbiMlFeik3hxi8zbA7gBOynqJh5LeGZisdimKM5wF8qo6FHHpCumHLm8bKKLD
-	 nQUWZVoCHwsUvxbDdOJ0mgj/Mk2JrQO+OeBnsFQTjvo7RI+8kTWduqfLk9ZZc5Ra1B
-	 pEJUx9OoZ91Mw==
-Date: Wed, 21 Feb 2024 17:53:57 +0000
+	b=LbTDMqnGoJCQvaOcSc00W+PWA5mW2Er7l4McOB67qjWMWp/dHov8ax11GP9yv635w
+	 jgjRMJ1ZGwotqQe4QBp3u63W3n9uR81QdeHl1Jv9W3XWXOzMWQkFwnq2SBrKOdpNLs
+	 VAsALdvjH8BYugCYatTJpPMDISIlZwFb0CzfZXaFZ4u1ccZ4HeZJxoIRrq9RvpKEkJ
+	 x8rsqawRZcV3gnkV85rv4K7FdVEsM6A5mfAGWieNCMHRVr3+zdhOt2sTzLH8y3ocLA
+	 9+Wjin2DIOse2oF24RFPu1mF6MNWEosrtHvKapHTx5i0T3QDlLXUOE/4Z4KgH5bQUC
+	 9QLRGwjkNwEaQ==
+Date: Wed, 21 Feb 2024 17:58:07 +0000
 From: Simon Horman <horms@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: Veerasenareddy Burru <vburru@marvell.com>,
+	Sathesh Edara <sedara@marvell.com>,
+	Shinas Rasheed <srasheed@marvell.com>,
+	Satananda Burla <sburla@marvell.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next v2 1/1] net: dsa: microchip: Add support for
- bridge port isolation
-Message-ID: <20240221175357.GE722610@kernel.org>
-References: <20240221093429.802077-1-o.rempel@pengutronix.de>
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] [net-next] octeon_ep_vf: Improve help text grammar
+Message-ID: <20240221175807.GF722610@kernel.org>
+References: <b3b97462c3d9eba2ec03dd6d597e63bf49a7365a.1708512706.git.geert+renesas@glider.be>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,74 +63,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240221093429.802077-1-o.rempel@pengutronix.de>
+In-Reply-To: <b3b97462c3d9eba2ec03dd6d597e63bf49a7365a.1708512706.git.geert+renesas@glider.be>
 
-On Wed, Feb 21, 2024 at 10:34:29AM +0100, Oleksij Rempel wrote:
-> Implement bridge port isolation for KSZ switches. Enabling the isolation
-> of switch ports from each other while maintaining connectivity with the
-> CPU and other forwarding ports. For instance, to isolate swp1 and swp2
-> from each other, use the following commands:
-> - bridge link set dev swp1 isolated on
-> - bridge link set dev swp2 isolated on
+On Wed, Feb 21, 2024 at 11:52:41AM +0100, Geert Uytterhoeven wrote:
+> Add missing articles.
+> Fix plural vs. singular.
+> Fix present vs. future.
 > 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> Acked-by: Arun Ramadoss <arun.ramadoss@microchip.com>
-> ---
-> changes v2:
-> - add comments and new lines
-> 
->  drivers/net/dsa/microchip/ksz_common.c | 55 +++++++++++++++++++++++---
->  drivers/net/dsa/microchip/ksz_common.h |  1 +
->  2 files changed, 51 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-> index 7cd37133ec05..efe54c9492e8 100644
-> --- a/drivers/net/dsa/microchip/ksz_common.c
-> +++ b/drivers/net/dsa/microchip/ksz_common.c
-> @@ -1898,6 +1898,29 @@ static void ksz_get_strings(struct dsa_switch *ds, int port,
->  	}
->  }
->  
-> +/**
-> + * ksz_adjust_port_member - Adjust port forwarding rules based on STP state and
-> + *			    isolation settings.
-> + * @dev: A pointer to the struct ksz_device representing the device.
-> + * @port: The port number to adjust.
-> +
-> + * This function dynamically adjusts the port membership configuration for a
-> + * specified port and other device ports, based on Spanning Tree Protocol (STP)
-> + * states and port isolation settings. Each port, including the CPU port, has a
-> + * membership register, represented as a bitfield, where each bit corresponds
-> + * to a port number. A set bit indicates permission to forward frames to that
-> + * port. This function iterates over all ports, updating the membership register
-> + * to reflect current forwarding permissions:
-> + *
-> + * 1. Forwards frames only to ports that are part of the same bridge group and
-> + *    in the BR_STATE_FORWARDING state.
-> + * 2. Takes into account the isolation status of ports; ports in the
-> + *    BR_STATE_FORWARDING state with BR_ISOLATED configuration will not forward
-> + *    frames to each other, even if they are in the same bridge group.
-> + * 3. Ensures that the CPU port is included in the membership based on its
-> + *    upstream port configuration, allowing for management and control traffic
-> + *    to flow as required.
-> + */
->  static void ksz_update_port_member(struct ksz_device *dev, int port)
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-...
-
-Hi Oleksij,
-
-I haven't looked over this patch closely.
-But it does seem to have some Kernel doc problems.
-
-  .../ksz_common.c:1905: warning: bad line:
-  .../ksz_common.c:1924: warning: expecting prototype for ksz_adjust_port_member(). Prototype was for ksz_update_port_member() instead
-
-You can observe these by running ./scripts/kernel-doc -none
-
-I'm going to flag this as Changes Requested in patchwork
-as typically this kind of problem gets flagged by bots sooner or later.
-
-pw-bot: changes-requested
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
