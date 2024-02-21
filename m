@@ -1,210 +1,149 @@
-Return-Path: <netdev+bounces-73769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70A6E85E476
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 18:21:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0BEF85E448
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 18:16:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBD5B1F25BF6
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 17:21:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3F68B2161E
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 17:16:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76FFF84052;
-	Wed, 21 Feb 2024 17:20:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4F9C83A1F;
+	Wed, 21 Feb 2024 17:15:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="cc5UHLb2";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="aUz2KXhL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LgKCQcl7"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FDD583CDA
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 17:20:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A90D80BE5
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 17:15:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708536051; cv=none; b=q7mz7TIPw4NG4OzJn7ri4sJG2yD4ohoiM50iHBk7LfvMDLAz63NLMyiPhF3izxaXGStozUQHksxEPKgVN/EDO9Eg4xLwDkEyM+pDmSCcI9vPpcT8ISLCzOLPx2kRcZVnUws5AF1fJCt2a05arucCwq49waGzZpCi4G6fGLaP2kw=
+	t=1708535728; cv=none; b=u+JrC2fpb2NCJdgNu4DTmg/+ma0xRzpOzkWFtVZTNovGrUVVVENOaUSpCUyUBeT1nBcRBWiMzoPj2yKoq2qp6UTtLBLqbjN4g6TtVnLQfX2XiOt6s9OcJAR94upO6a69ur7xxjdub3MYGqoXkMgZqi0lR+Gm2foRPQ+fz8OjRI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708536051; c=relaxed/simple;
-	bh=qAOeTSjxeSQCA1oBQM8EN8bFxkJINALiZnOqHj50VlQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=N9LlDclxHylED7p+KixZDxBJiRidkP58a1MvF29Duhg1gdqQl5PAlvwGUQw9V/wfC4vj6znW+SLzLlxPW1u4/xw/v0JaScdw0nRsb5aU8VI++AmMAMk6XS+k2OkwNUy+WLtZeyqNQnY6QH1D6JyCI9FwQxN3xAmrrwZQBVtgu14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=cc5UHLb2; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=aUz2KXhL; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1708536048;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zDB1CiIXO9rUHoMEEsXqI3Z0Cu5hb1cEq0hsvZbp0Ck=;
-	b=cc5UHLb2kw34+2893gdgvFLHNRcpe5Dpjnz0ikOQ3z/L5W2ItdG1dI4nCj/kjRisD38vqT
-	pH5GUg2V7ARQXm19EO8Azv4du1tDm/qdRLfh5BH8Z93oiOKHI/D5zYFTGvJgvdy4hH41FF
-	VZPaK0VziFZqZzUXoz5usiaY99T/W2icCCo7DIatBXRWhhaZ949pMVaUsYx1d/l8hh8FPQ
-	GFYKzy6pFd26Sdf+KkD0gLxsda/Ob/gDtoSEBbveAzxayHtXuHNqzInlLdHxdJjftqjB57
-	v5baeziKvOlSVaXkn9khu7p7VFkJyKTCOuw8Z5HsuMoh45imfZtaov9TT/8tfg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1708536048;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zDB1CiIXO9rUHoMEEsXqI3Z0Cu5hb1cEq0hsvZbp0Ck=;
-	b=aUz2KXhL15HoC0h126aDbeNzq0fKhkANI6V86UCmc8BF0sg/60XUS20sI9P4Q2HxTxCD3Z
-	J0AFbLA+6IJe0+DA==
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Wander Lairson Costa <wander@redhat.com>,
-	Yan Zhai <yan@cloudflare.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: [PATCH v2 net-next 3/3] net: Use backlog-NAPI to clean up the defer_list.
-Date: Wed, 21 Feb 2024 18:00:13 +0100
-Message-ID: <20240221172032.78737-4-bigeasy@linutronix.de>
-In-Reply-To: <20240221172032.78737-1-bigeasy@linutronix.de>
-References: <20240221172032.78737-1-bigeasy@linutronix.de>
+	s=arc-20240116; t=1708535728; c=relaxed/simple;
+	bh=V4FucYCLdRJ4fRfrhfFwWH/KsbOk4o/3OH55/PTmdNg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Su0yD95FiF9ri/ZMVDAOzsObSu3F7G/jgtyS3QkDTUlAvXhLLlzMnnBJpU3LheCN3uGe0uZGIzvqtsXHCiDSbhahq9sodJ+D9Bnz1/ZYWPtCLpaIzwo/yvP9P08QvGgPEGLOliU+6YjN50PqZhSsw/3NuULhZgfAETNDX3SCs/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LgKCQcl7; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-564e4477b7cso13890a12.1
+        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 09:15:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1708535725; x=1709140525; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7PdWSX7ZdwxbSQz6qVesoZ+BsTQkY/zgtt4zLFqnttc=;
+        b=LgKCQcl7GL84nLFji37b1BV++M/kkrUfju3J6VZx/H/CQBtULukdGehMuGRjaw+7Sw
+         M2ugEIZO/t1Tn+yfluaZkG3OHeEaZXcJcanyjIcQJPMoplxD+ss+kOIvtIqmpa7j01df
+         HoR4LIipOu9sy8B6RERumrVE7+EtBx/Qd86ksS6nP6Pag4REGRdx/E4Y0TnbwXlomFET
+         LPvAY6568hdRDlQmtu8cNYUA/3MStYJuhiuiJnmPTbwO6mjWf/ScTdgegvGnsgWmT3OS
+         fJ6bnjKabNx//bzrZ479ol1sBCajYJERWoWdXQkH1AAEq2REzST/1ZhouWUwkQ9/IKxu
+         23Aw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708535725; x=1709140525;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7PdWSX7ZdwxbSQz6qVesoZ+BsTQkY/zgtt4zLFqnttc=;
+        b=gsv+6SCe21XAaEIpnO0OfZaHg1J/8CU3WTMhh8Ft3rL81ygvkm0QObsuUAAqeGmHGq
+         Gzfhe9/CzodcEgGGsNnnxWSzpYfpAd8/717Aip60csxcsv8ut72giegiE+0lE4GQrgYm
+         lB+osdWHjiIIpAPsN8l5qSpwJTp2FfzBUYmBhPlHd3a7TgEwwR3SjybJISW1lcLtBzG4
+         uyD2nyc4Lxg7oKcpTAnkPGL7idcwLu0iQ0UZl3k1oQOmI/FbaLRH0YH0zRX/DcM5M3YG
+         02Ccmwp0b/cStLIMc8ByK/5Fdrlu8JG3XYwHBDQqOQzJicajRbd/yA2PPe358xWoJFbq
+         bFSw==
+X-Forwarded-Encrypted: i=1; AJvYcCXsyisK4A0fGal83vlCGmrQ0vzw+6Jmcp3ni/32014u4OfUOla9KCHZC5UH0nmzXHyi3sNrYbYwsKLM+hw0u235jgsltcDg
+X-Gm-Message-State: AOJu0YxhYq6iL3HXr8NrCg050YcAWqVO//u5VPNATpSiMeLIBQgEeMCm
+	eGxFheVU5ul+AefYn7c07gDkRG0Y7lHjTKIsjl8rh9tvfbtpGYWwK5KvW+LAFWdduUodK9WIE9y
+	F09k/S956y1hjK+ohio55euzjEiRxrXWtRs23
+X-Google-Smtp-Source: AGHT+IHz7zUcpoWDPdu3wExBB7CAp0UWx01q7OwFlzjipVr6Ilj7BAhFigxwmoPBzR7FOrEMwdRbhy+bUDhIeLHRQq0=
+X-Received: by 2002:a50:9f04:0:b0:562:9d2:8857 with SMTP id
+ b4-20020a509f04000000b0056209d28857mr227985edf.6.1708535724913; Wed, 21 Feb
+ 2024 09:15:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20240221105915.829140-1-edumazet@google.com> <20240221105915.829140-13-edumazet@google.com>
+ <ZdYes3iPqzf0FCTf@nanopsycho>
+In-Reply-To: <ZdYes3iPqzf0FCTf@nanopsycho>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 21 Feb 2024 18:15:11 +0100
+Message-ID: <CANn89i+CvOVkaiXuO5vgggHdzVP17Yzw1WaiH93-fjf2cqnN_A@mail.gmail.com>
+Subject: Re: [PATCH net-next 12/13] rtnetlink: make rtnl_fill_link_ifmap() RCU ready
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-The defer_list is a per-CPU list which is used to free skbs outside of
-the socket lock and on the CPU on which they have been allocated.
-The list is processed during NAPI callbacks so ideally the list is
-cleaned up.
-Should the amount of skbs on the list exceed a certain water mark then
-the softirq is triggered remotely on the target CPU by invoking a remote
-function call. The raise of the softirqs via a remote function call
-leads to waking the ksoftirqd on PREEMPT_RT which is undesired.
-The backlog-NAPI threads already provide the infrastructure which can be
-utilized to perform the cleanup of the defer_list.
+On Wed, Feb 21, 2024 at 5:03=E2=80=AFPM Jiri Pirko <jiri@resnulli.us> wrote=
+:
+>
+> Wed, Feb 21, 2024 at 11:59:14AM CET, edumazet@google.com wrote:
+> >Use READ_ONCE() to read the following device fields:
+> >
+> >       dev->mem_start
+> >       dev->mem_end
+> >       dev->base_addr
+> >       dev->irq
+> >       dev->dma
+> >       dev->if_port
+> >
+> >Provide IFLA_MAP attribute only if at least one of these fields
+> >is not zero. This saves some space in the output skb for most devices.
+> >
+> >Signed-off-by: Eric Dumazet <edumazet@google.com>
+> >---
+> > net/core/rtnetlink.c | 26 ++++++++++++++------------
+> > 1 file changed, 14 insertions(+), 12 deletions(-)
+> >
+> >diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+> >index 1b26dfa5668d22fb2e30ceefbf143e98df13ae29..b91ec216c593aaebf97ea69a=
+a0d2d265ab61c098 100644
+> >--- a/net/core/rtnetlink.c
+> >+++ b/net/core/rtnetlink.c
+> >@@ -1455,19 +1455,21 @@ static noinline_for_stack int rtnl_fill_vf(struc=
+t sk_buff *skb,
+> >       return 0;
+> > }
+> >
+> >-static int rtnl_fill_link_ifmap(struct sk_buff *skb, struct net_device =
+*dev)
+> >+static int rtnl_fill_link_ifmap(struct sk_buff *skb,
+> >+                              const struct net_device *dev)
+> > {
+> >       struct rtnl_link_ifmap map;
+> >
+> >       memset(&map, 0, sizeof(map));
+> >-      map.mem_start   =3D dev->mem_start;
+> >-      map.mem_end     =3D dev->mem_end;
+> >-      map.base_addr   =3D dev->base_addr;
+> >-      map.irq         =3D dev->irq;
+> >-      map.dma         =3D dev->dma;
+> >-      map.port        =3D dev->if_port;
+> >-
+> >-      if (nla_put_64bit(skb, IFLA_MAP, sizeof(map), &map, IFLA_PAD))
+> >+      map.mem_start =3D READ_ONCE(dev->mem_start);
+> >+      map.mem_end   =3D READ_ONCE(dev->mem_end);
+> >+      map.base_addr =3D READ_ONCE(dev->base_addr);
+> >+      map.irq       =3D READ_ONCE(dev->irq);
+> >+      map.dma       =3D READ_ONCE(dev->dma);
+> >+      map.port      =3D READ_ONCE(dev->if_port);
+> >+      /* Only report non zero information. */
+> >+      if (memchr_inv(&map, 0, sizeof(map)) &&
+>
+> This check(optimization) is unrelated to the rest of the patch, correct?
+> If yes, could it be a separate patch?
 
-The NAPI state is updated with the input_pkt_queue.lock acquired. It
-order not to break the state, it is needed to also wake the backlog-NAPI
-thread with the lock held. This requires to acquire the use the lock in
-rps_lock_irq*() if the backlog-NAPI threads are used even with RPS
-disabled.
+Sure thing. BTW, do you know which tool is using this ?
 
-Move the logic of remotely starting softirqs to clean up the defer_list
-into kick_defer_list_purge(). Make sure a lock is held in
-rps_lock_irq*() if backlog-NAPI threads are used. Schedule backlog-NAPI
-for defer_list cleanup if backlog-NAPI is available.
-
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
- include/linux/netdevice.h |  1 +
- net/core/dev.c            | 28 ++++++++++++++++++++++++----
- net/core/skbuff.c         |  4 ++--
- 3 files changed, 27 insertions(+), 6 deletions(-)
-
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index f07c8374f29cb..0a7390f011be0 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -3368,6 +3368,7 @@ static inline void dev_xmit_recursion_dec(void)
- 	__this_cpu_dec(softnet_data.xmit.recursion);
- }
-=20
-+void kick_defer_list_purge(unsigned int cpu);
- void __netif_schedule(struct Qdisc *q);
- void netif_schedule_queue(struct netdev_queue *txq);
-=20
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 6aa3547c03a4f..8b228861f29af 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -225,7 +225,7 @@ static bool use_backlog_threads(void)
- static inline void rps_lock_irqsave(struct softnet_data *sd,
- 				    unsigned long *flags)
- {
--	if (IS_ENABLED(CONFIG_RPS))
-+	if (IS_ENABLED(CONFIG_RPS) || use_backlog_threads())
- 		spin_lock_irqsave(&sd->input_pkt_queue.lock, *flags);
- 	else if (!IS_ENABLED(CONFIG_PREEMPT_RT))
- 		local_irq_save(*flags);
-@@ -233,7 +233,7 @@ static inline void rps_lock_irqsave(struct softnet_data=
- *sd,
-=20
- static inline void rps_lock_irq_disable(struct softnet_data *sd)
- {
--	if (IS_ENABLED(CONFIG_RPS))
-+	if (IS_ENABLED(CONFIG_RPS) || use_backlog_threads())
- 		spin_lock_irq(&sd->input_pkt_queue.lock);
- 	else if (!IS_ENABLED(CONFIG_PREEMPT_RT))
- 		local_irq_disable();
-@@ -242,7 +242,7 @@ static inline void rps_lock_irq_disable(struct softnet_=
-data *sd)
- static inline void rps_unlock_irq_restore(struct softnet_data *sd,
- 					  unsigned long *flags)
- {
--	if (IS_ENABLED(CONFIG_RPS))
-+	if (IS_ENABLED(CONFIG_RPS) || use_backlog_threads())
- 		spin_unlock_irqrestore(&sd->input_pkt_queue.lock, *flags);
- 	else if (!IS_ENABLED(CONFIG_PREEMPT_RT))
- 		local_irq_restore(*flags);
-@@ -250,7 +250,7 @@ static inline void rps_unlock_irq_restore(struct softne=
-t_data *sd,
-=20
- static inline void rps_unlock_irq_enable(struct softnet_data *sd)
- {
--	if (IS_ENABLED(CONFIG_RPS))
-+	if (IS_ENABLED(CONFIG_RPS) || use_backlog_threads())
- 		spin_unlock_irq(&sd->input_pkt_queue.lock);
- 	else if (!IS_ENABLED(CONFIG_PREEMPT_RT))
- 		local_irq_enable();
-@@ -4735,6 +4735,26 @@ static void napi_schedule_rps(struct softnet_data *s=
-d)
- 	__napi_schedule_irqoff(&mysd->backlog);
- }
-=20
-+void kick_defer_list_purge(unsigned int cpu)
-+{
-+	struct softnet_data *sd;
-+	unsigned long flags;
-+
-+	sd =3D &per_cpu(softnet_data, cpu);
-+
-+	if (use_backlog_threads()) {
-+		rps_lock_irqsave(sd, &flags);
-+
-+		if (!__test_and_set_bit(NAPI_STATE_SCHED, &sd->backlog.state))
-+			napi_schedule_rps(sd);
-+
-+		rps_unlock_irq_restore(sd, &flags);
-+
-+	} else if (!cmpxchg(&sd->defer_ipi_scheduled, 0, 1)) {
-+		smp_call_function_single_async(cpu, &sd->defer_csd);
-+	}
-+}
-+
- #ifdef CONFIG_NET_FLOW_LIMIT
- int netdev_flow_limit_table_len __read_mostly =3D (1 << 12);
- #endif
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index b9de3ee65ae64..427387ffd3c8a 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -7034,8 +7034,8 @@ nodefer:	__kfree_skb(skb);
- 	/* Make sure to trigger NET_RX_SOFTIRQ on the remote CPU
- 	 * if we are unlucky enough (this seems very unlikely).
- 	 */
--	if (unlikely(kick) && !cmpxchg(&sd->defer_ipi_scheduled, 0, 1))
--		smp_call_function_single_async(cpu, &sd->defer_csd);
-+	if (unlikely(kick))
-+		kick_defer_list_purge(cpu);
- }
-=20
- static void skb_splice_csum_page(struct sk_buff *skb, struct page *page,
---=20
-2.43.0
-
+I could not find IFLA_MAP being used in iproute2 or ethtool.
 
