@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-73637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA44F85D6B5
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:20:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7DA385D6B4
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:20:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67D611F22701
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:20:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 932E6284ED8
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:20:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84CE83FE48;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1394B3FB3B;
 	Wed, 21 Feb 2024 11:20:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a/UoZhvf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GsLmS2tf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 609A63FE2C
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 11:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0B0D3F9C9;
+	Wed, 21 Feb 2024 11:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708514427; cv=none; b=FNKha0N/rq9tEZ9i279CMtU3/f65vp4RuILByE656mICKoFe31S/QszRmX4I8nvkK2tJbgryxPuQk9/zoSvCej+am1DULJJms04n41Fw/qj7XAxsoFhv2uP6N7KearJcYaSknQWpif5UFNKmL/jIcyh1vuXjIoLDWdi/1zaOeBU=
+	t=1708514427; cv=none; b=lnH4quAfNqUeYFDfkDQoQYGU+mIzb1B1yX/rtWjgvS8JB+MJ4JLfFq0//CsRBFy3MEU+ct4OV4urqDxdKjaQyiEmyYJMUob71c3LSIT6jGC18jBP/iJFdnK15cjMttvlkbri6DnXA8IanMdblg7OZ7CpBkBgI1Au+BhC2Q3nK5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708514427; c=relaxed/simple;
-	bh=O+Kbo8DS6jLgDFs0FCpP9uf9LZXUvOEYXnT7/EVUZXk=;
+	bh=eQJjn+fyis4zmfVOr9+w1bUQCmIi1pyHsjNzhxVRHws=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=GZ7EOJOOaUOXtcgxnVNBfLA1uAWtMWvdL/IUI2QhOcBjsrawooFmlOPb94m6DLKXcxDZUxxJH26FKbGl5fc8xJFt97Ib5PoT1qJE50fh5VIlU9V+WBwulGo/wr0dU1M7xP7zrKK7IwoJmWk6OlL4f+E/3t2v111RFJs4oHC5XlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a/UoZhvf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E3E4DC433A6;
+	 In-Reply-To:To:Cc; b=IETNqB0wsO9yq6dZqAanKFxqqJcwg8OA0/M8HRQreoSDlxqK8wL0usinFmeFfN7rzsvFJqP2BnQghV6ix4/deZMdhSo7dDi/uU1c54nC7sx3GMI38NZzjqDEgXMQe+/yxieyy5Ltm+qdyk3Q+934cORrZi0ADIoNKKjGQFR3OBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GsLmS2tf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 65309C43390;
 	Wed, 21 Feb 2024 11:20:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708514427;
-	bh=O+Kbo8DS6jLgDFs0FCpP9uf9LZXUvOEYXnT7/EVUZXk=;
+	s=k20201202; t=1708514426;
+	bh=eQJjn+fyis4zmfVOr9+w1bUQCmIi1pyHsjNzhxVRHws=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=a/UoZhvftc/k7/KS6y1gk+wwhvpx+CrhWwYin8opRd73w7pQtDkQkpiDuWNgCaGlb
-	 XBoT2/4Aa0cj3jmXORnNhdHnh8j2SnX1wB+svkQtiLCvhQKVvqKZw0gfj1f4BTcdLf
-	 1TXnzoeLLPm38cesYhBvjomTlDEnABf3KkjQjTCf+K9n4zIZT7Nus9TMmbLtsqFfa7
-	 on3mL/D0Yca9pMjIBYlNfpl2KHS3Y2iLuDurwpHatqIdn1+ZHhsdc0lQqqPzW74kDJ
-	 AqynNehV5dGXyWhMjpNffzA69IjItSBRBOwoDOKTWLOxXuvyusnGAEMl4kdFWviTwv
-	 y/8sl9tUcmlCg==
+	b=GsLmS2tfbwHxWhQ+pUHFHK7sIpRm2j9a0hX4RCzSk6ngnFHSjHYfGAbHBKyEUv2Gy
+	 63T8plMEg61Ij7wh9Ay/q5JcSlplivX2fjL5oIAGdEYl67l5G/JnCKWkfEoZk66L/T
+	 l14TWqEeFmutOmca1LhZwEl4ZBzkcp4Txoa5st6N5HwYzm4X/ZZMw79L59ffJ8YKQa
+	 SPbUZnZqS2s8K2fzK941QiDVWtmzxsaH0qeoBxmc/DuJ6vo57+kc7GXDc6757aCvhh
+	 Iog+vk8TBkylyb4WzAjX8+FDnPiJhK83VT33kREPvYU+anD0pg3nn8xQwN7f1uodpS
+	 gfg6hJfRosb4g==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CF654C04E32;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4AAD3C00446;
 	Wed, 21 Feb 2024 11:20:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,38 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] tg3: copy only needed fields from userspace-provided
- EEE data
+Subject: Re: [PATCH net] octeontx2-af: Consider the action set by PF
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170851442684.9417.11313982323041176544.git-patchwork-notify@kernel.org>
+ <170851442630.9417.4575929978290134315.git-patchwork-notify@kernel.org>
 Date: Wed, 21 Feb 2024 11:20:26 +0000
-References: <59bd00bf-7263-43d9-a438-c2930bfdb91c@gmail.com>
-In-Reply-To: <59bd00bf-7263-43d9-a438-c2930bfdb91c@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: pavan.chebbi@broadcom.com, mchan@broadcom.com, kuba@kernel.org,
- davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, andrew@lunn.ch,
- linux@armlinux.org.uk, netdev@vger.kernel.org
+References: <1708347314-21624-1-git-send-email-sbhatta@marvell.com>
+In-Reply-To: <1708347314-21624-1-git-send-email-sbhatta@marvell.com>
+To: Subbaraya Sundeep <sbhatta@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
+ hkelam@marvell.com, naveenm@marvell.com, horms@kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Sun, 18 Feb 2024 15:49:55 +0100 you wrote:
-> The current code overwrites fields in tp->eee with unchecked data from
-> edata, e.g. the bitmap with supported modes. ethtool properly returns
-> the received data from get_eee() call, but we have no guarantee that
-> other users of the ioctl set_eee() interface behave properly too.
-> Therefore copy only fields which are actually needed.
-> 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+On Mon, 19 Feb 2024 18:25:14 +0530 you wrote:
+> AF reserves MCAM entries for each PF, VF present in the
+> system and populates the entry with DMAC and action with
+> default RSS so that basic packet I/O works. Since PF/VF is
+> not aware of the RSS action installed by AF, AF only fixup
+> the actions of the rules installed by PF/VF with corresponding
+> default RSS action. This worked well for rules installed by
+> PF/VF for features like RX VLAN offload and DMAC filters but
+> rules involving action like drop/forward to queue are also
+> getting modified by AF. Hence fix it by setting the default
+> RSS action only if requested by PF/VF.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] tg3: copy only needed fields from userspace-provided EEE data
-    https://git.kernel.org/netdev/net-next/c/8306ee08c0ff
+  - [net] octeontx2-af: Consider the action set by PF
+    https://git.kernel.org/netdev/net/c/3b1ae9b71c2a
 
 You are awesome, thank you!
 -- 
