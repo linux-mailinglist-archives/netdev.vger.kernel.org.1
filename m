@@ -1,107 +1,98 @@
-Return-Path: <netdev+bounces-73786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F4EE85E689
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 19:43:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9472F85E68E
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 19:45:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5ADDE288DEC
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 18:43:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50675282795
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 18:45:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0EA585642;
-	Wed, 21 Feb 2024 18:43:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C95D385276;
+	Wed, 21 Feb 2024 18:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qgVy4ts7"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C00C85275
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 18:43:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A598082D97
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 18:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708540982; cv=none; b=Ce9HIt27FSnNDPpCCaDYr2m29vQbZTll20zYwfZANw9I5lAm0OeYenQ4P+FLykWRxbOpnk4KyMKNzKsjHbVGP7ygaIiiD1j+CmiJrjKxr9xD2OQOPXGK8AkV9fTwXCTNiHgRHtX5pdnVcWhhCXegCDKRIVVsBVFXFgrJ6mAgyKo=
+	t=1708541106; cv=none; b=m5XkMBlwmHQdffwfpdrl30H2CajaCyfwfkG9eIParXGM9Cc25o8x6/74tI3RJT8+BkD37rB9l/Z8Jq9923gJQ0DAl7RtaZmdcQc0QM/R0gem/Nzb2WZ9CCxLb+Y+pyXIooK7U44CJrBcOH/JWopKlaPhsqV1dL0npQKiD/L6wYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708540982; c=relaxed/simple;
-	bh=oVNuU9YKrLoRRfSZIlaOBQOx2be/Q856y3oTYpDUt0M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=odfjBIzCNwyIVKWeb5LlfWAEr6NMdBYjX7TbaFILr9rgGjvxUsdZp50sR99zNhTQv+eu956H09yB+9vTKEiLwkcbaWtynqSUleQtZw7g2B03GYR/zMpE51b8xbCmro9Rw6c0e5Hpj7jwiQ4ABNJL+/4JE7d8hcaJWzN9j1qJHxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-594-GLvlNxMfNvqvC1La6uR5dg-1; Wed, 21 Feb 2024 13:42:55 -0500
-X-MC-Unique: GLvlNxMfNvqvC1La6uR5dg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A7C188F5DA2;
-	Wed, 21 Feb 2024 18:42:39 +0000 (UTC)
-Received: from hog (unknown [10.39.192.26])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4AF521C06710;
-	Wed, 21 Feb 2024 18:42:38 +0000 (UTC)
-Date: Wed, 21 Feb 2024 19:42:37 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Boris Pismenny <borisp@nvidia.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, Vakul Garg <vakul.garg@nxp.com>,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net 3/5] tls: don't skip over different type records from
- the rx_list
-Message-ID: <ZdZEHTbRF_8aVzmu@hog>
-References: <cover.1708007371.git.sd@queasysnail.net>
- <f00c0c0afa080c60f016df1471158c1caf983c34.1708007371.git.sd@queasysnail.net>
- <20240219120703.219ad3b2@kernel.org>
- <ZdPgAjFobWzrg_qY@hog>
- <20240220175053.16324f4d@kernel.org>
- <ZdYBzKcmIorAO47N@hog>
- <20240221103330.2ae35871@kernel.org>
+	s=arc-20240116; t=1708541106; c=relaxed/simple;
+	bh=fnyhnQ6/5aUd3bsKNeZLVmArtImRok1AlLWxA7S3IT4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=b8Hmb0pExeprtCK9/pDbgRAwfZr4n401ahuib1IAYfp+5FPFdThR6d19goTy29FiEJVMskpFwLprLGp7x08NalBBD27zmqtFQEp8RLgmu4sbcH01NViazYTa7K0A5Ec4Pe++DqWevvAXD6mOm8+6BITo27IrjYGrhOhwRLbURrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qgVy4ts7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 179FAC433F1;
+	Wed, 21 Feb 2024 18:45:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708541106;
+	bh=fnyhnQ6/5aUd3bsKNeZLVmArtImRok1AlLWxA7S3IT4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qgVy4ts70GAFTpSHZq3RCVs8Eo6AENNorDlL9Werumc9b1qEhyKShEcBu4csoOivk
+	 s7pTF+A/Zmz9iRc8jNSRL7tZ+xC+AGvKHm6gGwNMETrT9nxCt0uUGPdslEN6A2HnEz
+	 VP2cMH2WEeHzzshLDuaNqGaFBLVnn6BEkxUWGIWlQJtC4C1QDSP3iNHZlPpnmtakGJ
+	 +RcsKc+2Y4+jsD13xf3COp50T3z0xhsNSsIyIfbwJJljlWT3jBnfN/Di6xoxK/5MKK
+	 Xg8S5bu9lx08Xk5S20yJ1c9u1M8LF3lh7fDyPBrIkXwQY/GAFDoKloLfxSfBupS8ia
+	 eADRUkLWRJM8w==
+Date: Wed, 21 Feb 2024 10:45:05 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, jacob.e.keller@intel.com,
+ swarupkotikalapudi@gmail.com, donald.hunter@gmail.com, sdf@google.com,
+ lorenzo@kernel.org, alessandromarcolini99@gmail.com
+Subject: Re: [patch net-next 06/13] tools: ynl: introduce attribute-replace
+ for sub-message
+Message-ID: <20240221104505.23938b01@kernel.org>
+In-Reply-To: <ZdXxDZIAM5iLlO55@nanopsycho>
+References: <20240219172525.71406-1-jiri@resnulli.us>
+	<20240219172525.71406-7-jiri@resnulli.us>
+	<20240219145204.48298295@kernel.org>
+	<ZdRVS6mHLBQVwSMN@nanopsycho>
+	<20240220181004.639af931@kernel.org>
+	<ZdXxDZIAM5iLlO55@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240221103330.2ae35871@kernel.org>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-2024-02-21, 10:33:30 -0800, Jakub Kicinski wrote:
-> On Wed, 21 Feb 2024 14:59:40 +0100 Sabrina Dubroca wrote:
-> > It's not exactly enough, since tls_record_content_type will return 0
-> > on a content type mismatch. We'll have to translate that into an
-> > "error".=20
->=20
-> Ugh, that's unpleasant.
->=20
-> > I think it would be a bit nicer to set err=3D1 and then check
-> > err !=3D 0 in tls_sw_recvmsg (we can document that in a comment above
-> > process_rx_list) rather than making up a fake errno. See diff [1].
-> >=20
-> > Or we could swap the 0/1 returns from tls_record_content_type and
-> > switch the err <=3D 0 tests to err !=3D 0 after the existing calls, the=
-n
-> > process_rx_list doesn't have a weird special case [2].
-> >=20
-> > What do you think?
->=20
-> I missed the error =3D 1 case, sorry. No strong preference, then.
-> Checking for error =3D 1 will be as special as the new rx_more
-> flag. Should I apply this version as is, then?
+On Wed, 21 Feb 2024 13:48:13 +0100 Jiri Pirko wrote:
+> >But TC and ip-link are raw netlink, meaning genetlink-legacy remains
+> >fairly straightforward. BTW since we currently have full parity in C
+> >code gen adding this series will break build for tools/net/ynl.
+> >
+> >Plus ip-link is a really high value target. I had been pondering how 
+> >to solve it myself. There's probably a hundred different implementations
+> >out there of container management systems which spawn veths using odd
+> >hacks because "netlink is scary". Once I find the time to finish
+> >rtnetlink codegen we can replace all  the unholy libbpf netlink hacks
+> >with ynl, too.
+> >
+> >So at this stage I'd really like to focus YNL on language coverage
+> >(adding more codegens), packaging and usability polish, not extending
+> >the spec definitions to cover not-so-often used corner cases.
+> >Especially those which will barely benefit because they are in
+> >themselves built to be an abstraction.  
+> 
+> That leaves devlink.yaml incomplete, which I'm not happy about. It is a
+> legacy, it should be covered by genetlink-legacy I believe.
+> 
+> To undestand you correctly, should I wait until codegen for raw netlink
+> is done and then to rebase-repost this? Or do you say this will never be
+> acceptable?
 
-If you're ok with that version, sure. Thanks.
-
---=20
-Sabrina
-
+It'd definitely not acceptable before the rtnetlink C codegen is
+complete, and at least two other code gens for genetlink-legacy.
+At that point we can reconsider complicating the schema further.
 
