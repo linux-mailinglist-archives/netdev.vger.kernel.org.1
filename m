@@ -1,52 +1,50 @@
-Return-Path: <netdev+bounces-73654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0456C85D6F9
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:31:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8713E85D6F4
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:31:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B202928272F
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:31:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C5401F22908
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:31:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB11247F58;
-	Wed, 21 Feb 2024 11:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17FA845BFE;
+	Wed, 21 Feb 2024 11:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GN7LOEsn"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D01F46BA0;
-	Wed, 21 Feb 2024 11:30:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E84AE405EB
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 11:30:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708515028; cv=none; b=QiE+8xSXWgxdRxbge5a7iy35XG52ukWRvL9T0u+yrp98qcM5EgE2vJ0Ca8I9Ki7FAyRblWo0PzqLABd+njo10Q8SGV8sGHLAB7eE9cTSkE11QjG1JwjYbQvUSrR92SuCAS61SOSFE//iDeS1s5AQsTmiMAu5i6UdllxPoRo6Yjo=
+	t=1708515027; cv=none; b=P+iSqqCqUjnNTTwVaTCJlIz3+XkvFuChkQvfeWsr7FMC2KJUIZO09excGw6JmA2mZepM31AeEZHehtF/6pXrsgjG4RNwpWSFtQBS0Kg4xF3QGIxFe5PqeJfTKJh2BnNCRQ913f4MDCo3vAu9iHwLCQhm2NmgETVidkNzlGZF5rM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708515028; c=relaxed/simple;
-	bh=kk/YmLYwpFj1XkvDyAbSSRxNFtibe4c4yxnIs0kOqjo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JcUD8RaqqjX7WGxlQs1fxP12t2aI0dTUJYesLqgT3UShhCb3uwlYPoqURp0QG/cED92h/csv4ddeKleTffRCFFYjXBeX+9PxIHIsa+svk4b5peGMOlpaLxWBpftOQIxZOww3QqSfYEtJF/Azb3oR55U4gEhNLe2U5t3j3CruQaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1rcknu-0003vi-RH; Wed, 21 Feb 2024 12:30:22 +0100
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	<netfilter-devel@vger.kernel.org>,
-	Kees Cook <keescook@chromium.org>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next 12/12] netfilter: x_tables: Use unsafe_memcpy() for 0-sized destination
-Date: Wed, 21 Feb 2024 12:26:14 +0100
-Message-ID: <20240221112637.5396-13-fw@strlen.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240221112637.5396-1-fw@strlen.de>
-References: <20240221112637.5396-1-fw@strlen.de>
+	s=arc-20240116; t=1708515027; c=relaxed/simple;
+	bh=ZBq0h7tgOSSSNR7Ehu4pQcBsQwLbLZ/cHx4GR18DrbM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=j/DBffdK9K9NuisHHhYJfs7Bert29YKkC9YTmvIPVGfWBL5+idRAIxcm61XIL7rr9nFmyNanS0wsb7sXszzLaTt2R+1DZ6A8S72LOLvOJD0vYUumB8jT6ijBWALcWTl1IdKAiYqM3d1pC7t9K8PmSn/DRG/2fXBGPYM3nZl2c2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GN7LOEsn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9C519C43390;
+	Wed, 21 Feb 2024 11:30:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708515026;
+	bh=ZBq0h7tgOSSSNR7Ehu4pQcBsQwLbLZ/cHx4GR18DrbM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=GN7LOEsnlCRwcBXxciORAzJtC/e6qU4MBslPFwpv+l+qEGvHVVJTNTbH85PdDpB7J
+	 8YrB1Ld/5d+hDl8LwjunjTmyhcLtDxloS9P39NfdNIdrsb5EPipdzn3R8tNEq8zvj3
+	 SPMPr/pESkYBlEM0vbdKZl1CaApA3aA9i8ZWYV6/+MCdogT039NAeyuNw7lziOU2Cq
+	 sl6LUkZ8te5oCkei+kDs8quJ/oJiUSaaqZLc96FAAzBOnKB2uxJMAHBnKaKsUoZxN0
+	 WOW1M6PuML8z9gwkM90l4DfETNWQAC2+pi+zgarwtD4qeV47yVydZsCFSZqO5jshmc
+	 x7NxDdUhKcIAA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 851FFC04E32;
+	Wed, 21 Feb 2024 11:30:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,39 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: implement lockless setsockopt(SO_PEEK_OFF)
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170851502654.15341.9370041553811583230.git-patchwork-notify@kernel.org>
+Date: Wed, 21 Feb 2024 11:30:26 +0000
+References: <20240219141220.908047-1-edumazet@google.com>
+In-Reply-To: <20240219141220.908047-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ willemdebruijn.kernel@gmail.com, daan.j.demeyer@gmail.com, kuniyu@amazon.com,
+ martin.lau@kernel.org, dsahern@kernel.org
 
-From: Kees Cook <keescook@chromium.org>
+Hello:
 
-The struct xt_entry_target fake flexible array has not be converted to a
-true flexible array, which is mainly blocked by it being both UAPI and
-used in the middle of other structures. In order to properly check for
-0-sized destinations in memcpy(), an exception must be made for the one
-place where it is still a destination. Since memcpy() was already
-skipping checks for 0-sized destinations, using unsafe_memcpy() is no
-change in behavior.
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Signed-off-by: Kees Cook <keescook@chromium.org>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- net/netfilter/x_tables.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On Mon, 19 Feb 2024 14:12:20 +0000 you wrote:
+> syzbot reported a lockdep violation [1] involving af_unix
+> support of SO_PEEK_OFF.
+> 
+> Since SO_PEEK_OFF is inherently not thread safe (it uses a per-socket
+> sk_peek_off field), there is really no point to enforce a pointless
+> thread safety in the kernel.
+> 
+> [...]
 
-diff --git a/net/netfilter/x_tables.c b/net/netfilter/x_tables.c
-index 21624d68314f..da5d929c7c85 100644
---- a/net/netfilter/x_tables.c
-+++ b/net/netfilter/x_tables.c
-@@ -1142,7 +1142,8 @@ void xt_compat_target_from_user(struct xt_entry_target *t, void **dstptr,
- 	if (target->compat_from_user)
- 		target->compat_from_user(t->data, ct->data);
- 	else
--		memcpy(t->data, ct->data, tsize - sizeof(*ct));
-+		unsafe_memcpy(t->data, ct->data, tsize - sizeof(*ct),
-+			      /* UAPI 0-sized destination */);
- 
- 	tsize += off;
- 	t->u.user.target_size = tsize;
+Here is the summary with links:
+  - [net] net: implement lockless setsockopt(SO_PEEK_OFF)
+    https://git.kernel.org/netdev/net/c/56667da7399e
+
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
