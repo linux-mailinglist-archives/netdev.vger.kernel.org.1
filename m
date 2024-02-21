@@ -1,80 +1,82 @@
-Return-Path: <netdev+bounces-73524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A36E985CE32
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 03:44:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C682E85CE43
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 03:46:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5EB09B211DF
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 02:44:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55E29B24381
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 02:46:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44B9B249E4;
-	Wed, 21 Feb 2024 02:44:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FCDD273FE;
+	Wed, 21 Feb 2024 02:46:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H/6HpPzn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lXeStNoq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D5C12F36;
-	Wed, 21 Feb 2024 02:44:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B44A25632
+	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 02:46:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708483466; cv=none; b=BmvWfEfzZW2hQBf/TWpKQlfLvrDQa677MzBPwTcWx1xBP+HaRQZhqbaesD8nNCJnETndUi3jZKsltIlI7z4WFXwlsdjNWhHY2L/IsJxpe3/aJGHefbhxKYbt9Ru7UB3TgvB92w869qasiIqVRG3rUQvongfyhvHRz8MTiNJ93SE=
+	t=1708483579; cv=none; b=cAoyJWnM3M3mLfBcXWvp1eD6hpJNVoihkoMbJC0kHT3l0Mx5ARKsjl9MNC06KluwfHZvwLmEflKFbAaruLyVWPpsi7ZEDeuI5wyrtObtt+1iDauMpc3or9miMQq15Ji4njHb6knsKSa/rNa1TinsaquurJGVEmKZMxtZzOOpBrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708483466; c=relaxed/simple;
-	bh=8a1OrPvpvJAvQeZbo8+FjNLm+ecYqk/MacrjDuZM+Tw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Sml68nq0kTwJ2962ivh0r+4yTSEBcs3hZcIdlgkAg4qXbzD25SFtKgaTsePX2fAQTu9QxFXB7iB3dMtbwa1ukp2Dj3p6MVQdJDhwcwukzTuG6nQOt73sWkVcqwCHsXxVW1mXp0smOKAa/bvPpXpCfvbMEw2d0MOKUftug6lcvsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H/6HpPzn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49149C433C7;
-	Wed, 21 Feb 2024 02:44:25 +0000 (UTC)
+	s=arc-20240116; t=1708483579; c=relaxed/simple;
+	bh=lVpbdrw/HexuWFCjV9W4x4ULV7iuXn41S//m1jxg52c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sVIKNk64qG1q5326oBg4Y1tKVpYL8YL96mBVYlUwtzIsIxKeB3Xlc0CUQhQyeIdULEtMyOOYF5PQtKa8Er4WKVoahMozqR+9TS3qL4TOCb+9AuczKby6J233qo0TmOdEQrgE6sDRMCCDSaUaw/ZU2Lm7ePcvUEY3yxr81nrwihU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lXeStNoq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91024C433F1;
+	Wed, 21 Feb 2024 02:46:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708483465;
-	bh=8a1OrPvpvJAvQeZbo8+FjNLm+ecYqk/MacrjDuZM+Tw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=H/6HpPzn2pbHe6jrtJIyM/fQDgqYAcGhrA6eayhy4AkhH+lD3bNTWLk3Um3Y9ol/r
-	 2So1twZPhhU3gEXHjO/651aihjO9eBgLvLIXcTv8LH0tYqgP7ORkSRMSJeFBE3vdsv
-	 cSSABiJ0lfBlOKT7/DoYGq7Mj6Vw4lWXrzPyx6K0GjIFJctV2F+cyzxUDkbZy1PL2g
-	 CiMvafFmCxOnlSbzw0u7wbXG9fpy+xXVlRbrq+YR/vJsc5y//EKiOuXxhAC85To9DC
-	 pKnThz7B8X8ZYWsUdE//XJxWupmdjyMtm9cmrOCDEOQ1UNuiHyQ2fsUzUYpLvxQl7s
-	 iqhbj8q348ejw==
-Message-ID: <8afe7956-8f29-49e8-a59f-7e6b4136fa1d@kernel.org>
-Date: Tue, 20 Feb 2024 19:44:24 -0700
+	s=k20201202; t=1708483579;
+	bh=lVpbdrw/HexuWFCjV9W4x4ULV7iuXn41S//m1jxg52c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lXeStNoqEsr+zCoKEdRMCRx4X1CGH8E+C24j/l+g5BEWoGcr1SzJdXz43XpQ2VgZ2
+	 rTEbFtaWUhEIRZQ5YkudMiWTmqIDHQdYvBQ+P6VMP8a08PAHJr3w/1vmp3meAje1F8
+	 7LSybDZY31fKILM+2lwDU74iOLnPWIBpoEk8iNy9e1ADbB41bKo8ujMhY7w15I9/yf
+	 6H4qSRoZPtWgVRUVubFbPPWcKpH5/fEgY2dFEskGC9QyQDqc8pjP/GEj/u85svCoYd
+	 hToj4D+VRz0fff0cwsuj0QgNB5khirjYPq17DaLW4BGLxy454/0QigjSc1vf0s7dvY
+	 vX3HoixkOrHtA==
+Date: Tue, 20 Feb 2024 18:46:17 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, Saeed Mahameed
+ <saeedm@nvidia.com>, netdev@vger.kernel.org, Tariq Toukan
+ <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, Leon Romanovsky
+ <leonro@nvidia.com>
+Subject: Re: [net 08/10] net/mlx5e: RSS, Unconfigure RXFH after changing
+ channels number
+Message-ID: <20240220184617.41b7de4f@kernel.org>
+In-Reply-To: <20240220032948.35305-3-saeed@kernel.org>
+References: <20240219182320.8914-1-saeed@kernel.org>
+	<20240220032948.35305-3-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: copy routing table more efficiently in
- rt_dst_clone
-Content-Language: en-US
-To: Oliver Crumrine <ozlinuxc@gmail.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <xlabdyc4izitfdfpuoy2p2hi3abiq4mrrgizdqz45k7xeftbsg@ee6jgncdaqg7>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <xlabdyc4izitfdfpuoy2p2hi3abiq4mrrgizdqz45k7xeftbsg@ee6jgncdaqg7>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 2/18/24 6:35 AM, Oliver Crumrine wrote:
-> diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-> index 16615d107cf0..ebb17c3a0dec 100644
-> --- a/net/ipv4/route.c
-> +++ b/net/ipv4/route.c
-> @@ -1664,22 +1664,8 @@ struct rtable *rt_dst_clone(struct net_device *dev, struct rtable *rt)
->  			   rt->dst.flags);
->  
->  	if (new_rt) {
-> +		*new_rt = *rt;
+On Mon, 19 Feb 2024 19:29:46 -0800 Saeed Mahameed wrote:
+> +	/* Changing the channels number can affect the size of the RXFH indir table.
+> +	 * Therefore, if the RXFH was previously configured,
+> +	 * unconfigure it to ensure that the RXFH is reverted to a uniform table.
+> +	 */
+> +	rxfh_configured = netif_is_rxfh_configured(priv->netdev);
+> +	if (rxfh_configured)
+> +		priv->netdev->priv_flags &= ~IFF_RXFH_CONFIGURED;
 
-rtable is a container of dst_entry, so this is copying those fields as well.
+The sole purpose of this flag is to prevent drivers from resetting
+configuration set by the user. The user can:
 
-pw-bot: reject
+	ethtool -X $ifc default
 
+if they no longer care.
 
