@@ -1,134 +1,276 @@
-Return-Path: <netdev+bounces-73540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CA7B85CE6D
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 03:58:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A600185CE91
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 04:08:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C48071F23031
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 02:58:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8FBF1C2214C
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 03:08:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 756A42E632;
-	Wed, 21 Feb 2024 02:58:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 447962BAE7;
+	Wed, 21 Feb 2024 03:08:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f/0bbvJt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FAzwHWOq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A51D38FBA
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 02:58:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 420612837E;
+	Wed, 21 Feb 2024 03:08:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708484303; cv=none; b=eSndfmzosCq5ZUuZgRt+TQfgMgTfFJCyQ+N2r6Enwo1i90gqhoLnyw9mHLmqovb6/KzebTN3bTnZp5LkzniulvnXuAuppzogf6iBibGzhEDMLOffwDF2MBmvX8yY95YzHbeJw6sqas44o49XOpLNgXNwS2GIM25JLCY5RTc5vI4=
+	t=1708484905; cv=none; b=d/8g8G1z21j5bxZg7UzbqtWhNMNRqRm7Ok1SzzOzH/uCoZZOorlV/3CYFm2rI21nmVTBIAjdnZUc/S+U+Za+F4g7mMDSKXNKRPIOvcXsAKnOVZtCgHz0lBT1mdM0H4r/Gmm5lK4FbFyNqOCPsC/XQz166hB/A9W9PYZ0pJXK26A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708484303; c=relaxed/simple;
-	bh=UHHLE49iooiHY4vjPey6O8XYNle73cZCqSAhyE+EDP0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Vx9yfsYPKJ/YQ8hRdWPM8APLfMaN38ZqEksvfn9uHuY9ZczH4M7k6j7trWEYIjj6HkZ5wSfrewmRe2ucF/yt+aGoxnrzgZ603gKhGvU9+p7Ja7mh8/hBWpsztzSd+eguOQ5hji9N7xsS5YPzrsy7IZny9vobxENso/TsiW9BfgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f/0bbvJt; arc=none smtp.client-ip=209.85.216.42
+	s=arc-20240116; t=1708484905; c=relaxed/simple;
+	bh=8lqJfcyvyjZieFF6DBZsOMf4b5DXXe651nYq3W8rqcE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Y7ib+QbHzHKq2uXauYgRhitLjdLT2OZISD1JwRN82lFj91rTK8PEVfs/QFTKCoYEao/n3lA3pK3OqIAbHFhqk+4aXwaXsZlVJTiORzQRblITWxjbpuFlbeP5Sp0KyEFEdkp+U/u3yYPIDS91sjXjqnh1YvEk9C96aPGZGBxaE84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FAzwHWOq; arc=none smtp.client-ip=209.85.208.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-29938dcb711so2836005a91.0
-        for <netdev@vger.kernel.org>; Tue, 20 Feb 2024 18:58:21 -0800 (PST)
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2d1094b549cso89657821fa.3;
+        Tue, 20 Feb 2024 19:08:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708484301; x=1709089101; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1708484901; x=1709089701; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QQKphae6rZS2OgxQEvHNL6uRp2pRDqwCrN9aul+Noo8=;
-        b=f/0bbvJtMFYXX+xIJEWMO7TFG64CyiNfyPdAeVwiubryn9L/2slQzvwmMhVrgsDTE4
-         4WTGvSaaPxK5Tve/dbe/nfKvYP2eMtjsXpDjRzMBjvZv3bR9A3qMLiPE8VoGnTNxhjiq
-         EQ/ubsJ4Z7CvJHsxwz15p2i5liU2UICz5kZMzVaPSNqUcKbkP+aMfe2pk5HjIzDU2fqi
-         6sRLO35GCJlZfEkmFS/S/cuITXgK3g80HlJoVZl4UssOA0oMtzJdN5xebxk1j28dcKVp
-         2DZpN+oeyH+ViQCbiKEelNIKmfCDaVNcNvbbmMK0zd5VH7EQhkqug7T3iB+EwHqLSZxz
-         RJFw==
+        bh=RGUN520xlcUh9uCFJJBmFsnsOTyBRFjezJMbMofVdcY=;
+        b=FAzwHWOqhO1jCdIItUpvb54GBgQ32zT37wVY/hsl/Z+UGZ3yqjc8Sfnwd6RZOCJCtF
+         xOvK3ChkyMpuH72D1+eQM+Aw/IAH7+FVjBnFlLzHzwcjnFravs3nBp/oMXyaQks/IeBR
+         G6nHTZMckVkgdCm1+e7VCgBJbTKyMMxXfomR63I9zcI5QHL+aHkIH/+vLt6tijEh+KHl
+         CvSNBSeua61/+PeTXVr8aoPJwYbTJHdjDozz4JSGhAffpi6VrFWvFbO+Jcz6A754c8y5
+         dsDN2uY7W8gibuDQzd+kVlgXUBmPSqgFHYuRqgnMlEwGkhPcwp9whDs4ZmRR9MLQcfYm
+         mayg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708484301; x=1709089101;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1708484901; x=1709089701;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QQKphae6rZS2OgxQEvHNL6uRp2pRDqwCrN9aul+Noo8=;
-        b=lpcjgQAtk93D89ig+HY5VsWERt+Vr5p6YuSVaO1lvRJJF6s7kNBpa0Ba/LqdIrD7ff
-         aKM8V/UoVMzDOJbmKXIbagqmtJlu0FN3VBQXKBzEtLaRNss/KK3EDSZ/DHsnI4qik7oW
-         Z3sFyWPcAKidfG8qNyLJDj4zl7nzCb6LeglJEYeL1n2fxeeokG0knXwmOEYwL1ALxBjv
-         jnWrc8RDu9ggFUWr/AFz61Cor6d3iH6NbY9igGi8PFMWIS2z69D3O8B6uq1W4Okb0IGB
-         hgKD+jJLK14Y6hBn2PZoTsiCbg/2IT1gIXH0LMmFRwMVTv4SHBwa4BL80uvGArVUsrU9
-         QbzA==
-X-Gm-Message-State: AOJu0YziMbdRoaJXBmJLy81WibVxsM4vayBR8aAAFcEfV+gAx2ZAWFlG
-	R/b0YILw4fSNj5trQUpbt2aHN5JZE36oVuZa0jL6d4vPLoax77jO
-X-Google-Smtp-Source: AGHT+IEdUv5ClSAAp3qFpgg4nSzCstuUT0LmRw5VqQ5Tl1FE2TD3+QO4U63QIx7wZUIskSN0OQxcoA==
-X-Received: by 2002:a17:90a:dc0a:b0:299:33c5:9583 with SMTP id i10-20020a17090adc0a00b0029933c59583mr10433204pjv.14.1708484301538;
-        Tue, 20 Feb 2024 18:58:21 -0800 (PST)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.24])
-        by smtp.gmail.com with ESMTPSA id pv14-20020a17090b3c8e00b0029454cca5c3sm426467pjb.39.2024.02.20.18.58.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Feb 2024 18:58:21 -0800 (PST)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	dsahern@kernel.org,
-	kuniyu@amazon.com
-Cc: netdev@vger.kernel.org,
-	kerneljasonxing@gmail.com,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next v7 11/11] tcp: get rid of NOT_SPECIFIED reason in tcp_v4/6_do_rcv
-Date: Wed, 21 Feb 2024 10:57:31 +0800
-Message-Id: <20240221025732.68157-12-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240221025732.68157-1-kerneljasonxing@gmail.com>
-References: <20240221025732.68157-1-kerneljasonxing@gmail.com>
+        bh=RGUN520xlcUh9uCFJJBmFsnsOTyBRFjezJMbMofVdcY=;
+        b=Ig1ddPm6X21iGb1amW1jF2JzaBgylWV8OaxvUio/tQRGY3oS+Tlt8DDuSHrfBZ7EAV
+         z4TTuR3QaeZwS6pFCAigByE0Qd64iNvaYUVl8mXHMjmDV4GyksXtLw9VYE3r23LL5K8L
+         7d9Ti19B9jD8bxJl3O/LUig5P+7MczxCZxZmMyzYvV0xdbUsqM2CTzoPiso1S8P46gDv
+         hcVFXts6KsZ9Utx7r0V3eJDKFawf7KUX1miyF0btRlr6nn8DWIpiorAAYKi5WHUAaORf
+         cFWBRxWrzp2DoaLv26lE/UjvkG3qZNiNDEKm/sU5ffsmnbOlrskqBMWoowethwkTj8ab
+         mjJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXWJtw7Yf8XdbHaOtC28O05P8VV0GxDqCva7fzR5u1L6huLaE6Py8kqtwiByN/d2HPzFE+l3jtnn/hbVS5gbd5zjORhKveHasYjY8PTpIXk5NPY0bA6ImRwwILwuRN9NmpcU4UX
+X-Gm-Message-State: AOJu0YzDGWsMdDIfykG9+8uvcEH2dWPh9yCWQWAIOVZYkuKsV5EIDgu/
+	Prs4uEFDO0Y+ofanbO6S0ULG3HdkQyCQYfLvQg1AI1lF5ZdDw4xqmE1NyLmqK1P9Om4E7maMend
+	5cs67MojqnuutflqSNi7QGacIseo=
+X-Google-Smtp-Source: AGHT+IEAlyiWvnV4yyV2t2lBDCZmGBokZGDeKd3W0024yiIivwOFyTymK2CxBuCR/t4IxjbwE9LuYd6ETC49PPINoJI=
+X-Received: by 2002:a2e:8950:0:b0:2d1:26f0:8167 with SMTP id
+ b16-20020a2e8950000000b002d126f08167mr11558186ljk.35.1708484901033; Tue, 20
+ Feb 2024 19:08:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <ZdVgLbuAYGKoDzpS@xpf.sh.intel.com>
+In-Reply-To: <ZdVgLbuAYGKoDzpS@xpf.sh.intel.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 21 Feb 2024 11:07:44 +0800
+Message-ID: <CAL+tcoB_NeHpgrg7_HngiResOPhNCBTpDTJsjYsccXZMFA7VGw@mail.gmail.com>
+Subject: Re: [Syzkaller & bisect] There is BUG: soft lockup after sendmsg
+ syscall in v6.8-rc4
+To: Pengfei Xu <pengfei.xu@intel.com>
+Cc: kuniyu@amazon.com, davem@davemloft.net, dumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, kuni1840@gmail.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, lkp@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Jason Xing <kernelxing@tencent.com>
+On Wed, Feb 21, 2024 at 10:35=E2=80=AFAM Pengfei Xu <pengfei.xu@intel.com> =
+wrote:
+>
+> Hi Kuniyuki Iwashima and kernel experts,
+>
+> Greeting!
+> There is BUG: soft lockup after sendmsg syscall in v6.8-rc4 in guest.
+>
+> All detailed info: https://github.com/xupengfe/syzkaller_logs/tree/main/2=
+40220_161242_softlockup
+> Syzkaller reproduced code: https://github.com/xupengfe/syzkaller_logs/blo=
+b/main/240220_161242_softlockup/repro.c
+> Syzkaller syscall reproduced steps: https://github.com/xupengfe/syzkaller=
+_logs/blob/main/240220_161242_softlockup/repro.prog
+> Kconfig(need make olddefconfig): https://github.com/xupengfe/syzkaller_lo=
+gs/blob/main/240220_161242_softlockup/kconfig_origin
+> Bisect info: https://github.com/xupengfe/syzkaller_logs/blob/main/240220_=
+161242_softlockup/bisect_info.log
+> v6.8-rc4 issue dmesg: https://github.com/xupengfe/syzkaller_logs/blob/mai=
+n/240220_161242_softlockup/841c35169323cd833294798e58b9bf63fa4fa1de_dmesg.l=
+og
+> bzImage_v6.8-rc4: https://github.com/xupengfe/syzkaller_logs/raw/main/240=
+220_161242_softlockup/bzImage_v6.8-rc4.tar.gz
+>
+> Bisected and found first bad commit:
+> "
+> 1279f9d9dec2 af_unix: Call kfree_skb() for dead unix_(sk)->oob_skb in GC.
+> "
+>
+> After reverted above commit on top of v6.8-rc4 kernel, this issue was gon=
+e.
+>
+> Syzkaller repro.report: https://github.com/xupengfe/syzkaller_logs/blob/m=
+ain/240220_161242_softlockup/repro.report
+> "
+> watchdog: BUG: soft lockup - CPU#0 stuck for 26s! [gdbus:349]
+> Modules linked in:
+> irq event stamp: 25162
+> hardirqs last  enabled at (25161): [<ffffffff855dff2e>] irqentry_exit+0x3=
+e/0xa0 kernel/entry/common.c:351
+> hardirqs last disabled at (25162): [<ffffffff855dded4>] sysvec_apic_timer=
+_interrupt+0x14/0xc0 arch/x86/kernel/apic/apic.c:1076
+> softirqs last  enabled at (25140): [<ffffffff8127fcc8>] invoke_softirq ke=
+rnel/softirq.c:427 [inline]
+> softirqs last  enabled at (25140): [<ffffffff8127fcc8>] __irq_exit_rcu+0x=
+a8/0x110 kernel/softirq.c:632
+> softirqs last disabled at (25135): [<ffffffff8127fcc8>] invoke_softirq ke=
+rnel/softirq.c:427 [inline]
+> softirqs last disabled at (25135): [<ffffffff8127fcc8>] __irq_exit_rcu+0x=
+a8/0x110 kernel/softirq.c:632
+> CPU: 0 PID: 349 Comm: gdbus Not tainted 6.8.0-rc4-2024-02-12-intel-next-e=
+92619743fcb+ #1
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-=
+gd239552ce722-prebuilt.qemu.org 04/01/2014
+> RIP: 0010:__sanitizer_cov_trace_pc+0x38/0x70 kernel/kcov.c:207
+> Code: 65 8b 05 73 89 a0 7e 48 89 e5 48 8b 75 08 a9 00 01 ff 00 74 0f f6 c=
+4 01 74 35 8b 82 e4 1d 00 00 85 c0 74 2b 8b 82 c0 1d 00 00 <83> f8 02 75 20=
+ 48 8b 8a c8 1d 00 00 8b 92 c4 1d 00 00 48 8b 01 48
+> RSP: 0018:ffff88800b48f7b0 EFLAGS: 00000246
+> RAX: 0000000000000000 RBX: ffff888013018000 RCX: 1ffffffff12150bb
+> RDX: ffff888011ab8000 RSI: ffffffff8515e235 RDI: ffff888013018770
+> RBP: ffff88800b48f7b0 R08: 0000000000000001 R09: fffffbfff120f86e
+> R10: ffffffff8907c377 R11: 0000000000000001 R12: ffff888013018000
+> R13: dffffc0000000000 R14: ffff888013018630 R15: ffff88800b48f840
+> FS:  0000000000000000(0000) GS:ffff88806ca00000(0000) knlGS:0000000000000=
+000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007fffcc5fd648 CR3: 0000000006c82000 CR4: 0000000000750ef0
+> PKRU: 55555554
+> Call Trace:
+>  <IRQ>
+>  </IRQ>
+>  <TASK>
+>  unix_gc+0x465/0xfd0 net/unix/garbage.c:319
+>  unix_release_sock+0xb8c/0xe80 net/unix/af_unix.c:683
+>  unix_release+0x9c/0x100 net/unix/af_unix.c:1064
+>  __sock_release+0xb6/0x280 net/socket.c:659
+>  sock_close+0x27/0x40 net/socket.c:1421
+>  __fput+0x284/0xb70 fs/file_table.c:376
+>  ____fput+0x1f/0x30 fs/file_table.c:404
+>  task_work_run+0x19d/0x2b0 kernel/task_work.c:180
+>  exit_task_work include/linux/task_work.h:38 [inline]
+>  do_exit+0xb51/0x28c0 kernel/exit.c:871
+>  do_group_exit+0xe5/0x2c0 kernel/exit.c:1020
+>  get_signal+0x2715/0x27d0 kernel/signal.c:2893
+>  arch_do_signal_or_restart+0x8e/0x7e0 arch/x86/kernel/signal.c:311
+>  exit_to_user_mode_loop kernel/entry/common.c:105 [inline]
+>  exit_to_user_mode_prepare include/linux/entry-common.h:328 [inline]
+>  __syscall_exit_to_user_mode_work kernel/entry/common.c:201 [inline]
+>  syscall_exit_to_user_mode+0x129/0x190 kernel/entry/common.c:212
+>  do_syscall_64+0x82/0x150 arch/x86/entry/common.c:89
+>  entry_SYSCALL_64_after_hwframe+0x6e/0x76
+> RIP: 0033:0x7fe8f8b4296f
+> Code: Unable to access opcode bytes at 0x7fe8f8b42945.
+> RSP: 002b:00007fe8d7dff9c0 EFLAGS: 00000293 ORIG_RAX: 0000000000000007
+> RAX: fffffffffffffdfc RBX: 00007fe8f8f73071 RCX: 00007fe8f8b4296f
+> RDX: 00000000ffffffff RSI: 0000000000000002 RDI: 00007fe8a801f3f0
+> RBP: 00007fe8a801f3f0 R08: 0000000000000000 R09: 00007fe8d7dff850
+> R10: 00007ffec9196080 R11: 0000000000000293 R12: 0000000000000002
+> R13: 0000000000000002 R14: 00007fe8d7dffa30 R15: 00007fe8a801c4c0
+>  </TASK>
+> "
 
-Finally we can drop this obscure reason in receive path  because
-we replaced with many other more accurate reasons before.
+Hello, did you try this one:
 
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
---
-v5:
-1. change the misspelled word in the title
----
- net/ipv4/tcp_ipv4.c | 1 -
- net/ipv6/tcp_ipv6.c | 1 -
- 2 files changed, 2 deletions(-)
+commit 25236c91b5ab4a26a56ba2e79b8060cf4e047839
+Author: Kuniyuki Iwashima <kuniyu@amazon.com>
+Date:   Fri Feb 9 14:04:53 2024 -0800
 
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index c886c671fae9..82e63f6af34b 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -1907,7 +1907,6 @@ int tcp_v4_do_rcv(struct sock *sk, struct sk_buff *skb)
- 		return 0;
- 	}
- 
--	reason = SKB_DROP_REASON_NOT_SPECIFIED;
- 	if (tcp_checksum_complete(skb))
- 		goto csum_err;
- 
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index f260c28e5b18..56c3a3bf1323 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -1623,7 +1623,6 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff *skb)
- 	if (np->rxopt.all)
- 		opt_skb = skb_clone_and_charge_r(skb, sk);
- 
--	reason = SKB_DROP_REASON_NOT_SPECIFIED;
- 	if (sk->sk_state == TCP_ESTABLISHED) { /* Fast path */
- 		struct dst_entry *dst;
- 
--- 
-2.37.3
+    af_unix: Fix task hung while purging oob_skb in GC.
 
+    syzbot reported a task hung; at the same time, GC was looping infinitel=
+y
+    in list_for_each_entry_safe() for OOB skb.  [0]
+
+    syzbot demonstrated that the list_for_each_entry_safe() was not actuall=
+y
+    safe in this case.
+
+    A single skb could have references for multiple sockets.  If we free su=
+ch
+    a skb in the list_for_each_entry_safe(), the current and next sockets c=
+ould
+    be unlinked in a single iteration.
+
+It should work, I think :)
+
+Thanks,
+Jason
+
+>
+> Thanks!
+>
+> ---
+>
+> If you don't need the following environment to reproduce the problem or i=
+f you
+> already have one reproduced environment, please ignore the following info=
+rmation.
+>
+> How to reproduce:
+> git clone https://gitlab.com/xupengfe/repro_vm_env.git
+> cd repro_vm_env
+> tar -xvf repro_vm_env.tar.gz
+> cd repro_vm_env; ./start3.sh  // it needs qemu-system-x86_64 and I used v=
+7.1.0
+>   // start3.sh will load bzImage_2241ab53cbb5cdb08a6b2d4688feb13971058f65=
+ v6.2-rc5 kernel
+>   // You could change the bzImage_xxx as you want
+>   // Maybe you need to remove line "-drive if=3Dpflash,format=3Draw,reado=
+nly=3Don,file=3D./OVMF_CODE.fd \" for different qemu version
+> You could use below command to log in, there is no password for root.
+> ssh -p 10023 root@localhost
+>
+> After login vm(virtual machine) successfully, you could transfer reproduc=
+ed
+> binary to the vm by below way, and reproduce the problem in vm:
+> gcc -pthread -o repro repro.c
+> scp -P 10023 repro root@localhost:/root/
+>
+> Get the bzImage for target kernel:
+> Please use target kconfig and copy it to kernel_src/.config
+> make olddefconfig
+> make -jx bzImage           //x should equal or less than cpu num your pc =
+has
+>
+> Fill the bzImage file into above start3.sh to load the target kernel in v=
+m.
+>
+>
+> Tips:
+> If you already have qemu-system-x86_64, please ignore below info.
+> If you want to install qemu v7.1.0 version:
+> git clone https://github.com/qemu/qemu.git
+> cd qemu
+> git checkout -f v7.1.0
+> mkdir build
+> cd build
+> yum install -y ninja-build.x86_64
+> yum -y install libslirp-devel.x86_64
+> ../configure --target-list=3Dx86_64-softmmu --enable-kvm --enable-vnc --e=
+nable-gtk --enable-sdl --enable-usb-redir --enable-slirp
+> make
+> make install
+>
+> Best Regards,
+> Thanks!
+>
 
