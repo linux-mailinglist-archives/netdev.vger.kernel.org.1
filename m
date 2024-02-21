@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-73674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B33C85D846
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 13:50:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89E5A85D847
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 13:50:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C006C1F237EB
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:50:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F344DB23B77
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 12:50:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8E0E6996E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE6A369973;
 	Wed, 21 Feb 2024 12:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XWB0S1YR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p7AizsU3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B610669964
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 12:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B60B969962;
+	Wed, 21 Feb 2024 12:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708519828; cv=none; b=rmzfjPFY2mtMcPPCT3BcQ80IfYFRNrxu8ZEHVkp7Q99WU10IkCAb+jOfbxZ4V+EVogvsdW3C9V1Q4VPIt6pnDSRzeeZLVziaUHlwrKOQijVr5wE/Q4CtttDsxwWKtNGRVzmtB1rVhcNry6gTUKtSYX+cSDJ+wN8pXZN8bwPhFkk=
+	t=1708519828; cv=none; b=VPTW729ypJyVcclZtn14OI0pbTwp6p+OYWPSs31MfG0Cu69ya3ujZQdTRnlfpoDFh8HE8zpl+QKlOnDFhLsYYUAHLXwuySPVFMyrz5KTp4V2Ero6B4/HCSnBZ28k2f0m+nqfyAjxJgoI2KUVsWFeMhLQ0XWD6Xu17XNHTX7TwGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708519828; c=relaxed/simple;
-	bh=DOD2XiU1aU0w4S1PkZMnWfhoGnP0BW/dqetAjjeFTFo=;
+	bh=lneanaRetTbUaTbA8++ZJ4eDAzcd2jVVU7VARp/KLiU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=dx9tAeTCsXBP9sQqd3Kxz9XNRzZzgbWd0kOWhZUPLDqWVbJaGjN2YYYxSRm0G2fHdQ6Z58a6cCYM3X2NGOOWnJ0XpDeHzmxizC4Z1M8HIPGnwglz6H2wfEcRZR3LeV95zrPSVbLIOzVUHugam5NXQnJVEl2WcNAshKQcsjxO4BE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XWB0S1YR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 70104C43394;
+	 In-Reply-To:To:Cc; b=iXjbYDm6ShCGnO79vjCgIWJFoAF0rbLWIYPodgFMqdmi0lkBHopvnohpU9htd061Aw2DPdb9LC2YtyKJBd6s5QZm/zeTL4uZ9qV67tHZq2TXK7zIcHWtXd6waBZuu8RUt5/K86HM1WaHxgrb+IAQtK1t6zPSDATXWvMH3SHflt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p7AizsU3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 66718C433C7;
 	Wed, 21 Feb 2024 12:50:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1708519828;
-	bh=DOD2XiU1aU0w4S1PkZMnWfhoGnP0BW/dqetAjjeFTFo=;
+	bh=lneanaRetTbUaTbA8++ZJ4eDAzcd2jVVU7VARp/KLiU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XWB0S1YRi5LD4lN6Pz0bzRDx3hmM6hu8eg75mmMQyha/CaTSypahCkA1wMH/YTacH
-	 jKo1xVlRSQRcCeYTUUfrYNW/ibK7JEmgW9UJppx94LQP03pgP/eMnqD1Gby13lYfQ8
-	 4mRttLhshG76XSD6XMzeqqT6j8/AZ8zdRhfg0K+vU0uZyyGgcK9G4dKG30CYWcKXG1
-	 C7zXrFsA94te/uipEdkLBuVlCVmQnW5mJrRO6UjqJGqr4u3Hp186f3HmCeuFsz9a79
-	 igw7sOn1Z4teY0+4eCFDshr6PzlWANp1B2oohT4Xdqi5Z7ziuL0+6soxzLnPaaA4y6
-	 mq+JaR4u5NLZQ==
+	b=p7AizsU3m0/ttH4fdkRVVd6AK6OjGF2qD7+hn3ev9qGanGp9zOcljDj7i2hbzT52i
+	 C8reG/21e3XccBL1rFpQQHDJUzltG6fwnt7foKlvMUO4DemBGImBm6Np3whEzKUk0s
+	 rfBHURcUXbJpW+Gld/8YfORl/ur+HsFPDyUHyL+NoMYECGc/EovWhk9Kc65VGBVmM4
+	 w19OqhyVv8OXLkwuuWQ7Ztu9BfHlbZ+4t9OZlg6+/yjihd6vpiPJL4TK+ad7kzb5XD
+	 ybVpWgAv6J3MSwbn/PC+sAi7Fso5s+9ruTuykIKU+haeUTlhqidOEleqj2BMZ3BtL4
+	 TMFlUuMMcs9Dg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5BFBBD84BBC;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 53E20C00446;
 	Wed, 21 Feb 2024 12:50:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,37 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: wan: framer: remove children from struct
- framer_ops kdoc
+Subject: Re: [PATCH net-next v2 0/3] Rework GENET MDIO controller clocking
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170851982837.28838.18333445705347848775.git-patchwork-notify@kernel.org>
+ <170851982833.28838.11670954342538332576.git-patchwork-notify@kernel.org>
 Date: Wed, 21 Feb 2024 12:50:28 +0000
-References: <20240219-framer-children-v1-1-169c1deddc70@kernel.org>
-In-Reply-To: <20240219-framer-children-v1-1-169c1deddc70@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, linus.walleij@linaro.org, christophe.leroy@csgroup.eu,
- herve.codina@bootlin.com, netdev@vger.kernel.org
+References: <20240219204053.471825-1-florian.fainelli@broadcom.com>
+In-Reply-To: <20240219204053.471825-1-florian.fainelli@broadcom.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: netdev@vger.kernel.org, opendmb@gmail.com,
+ bcm-kernel-feedback-list@broadcom.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, linux-kernel@vger.kernel.org,
+ justin.chen@broadcom.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Mon, 19 Feb 2024 17:45:48 +0000 you wrote:
-> Remove documentation of non-existent children field
-> from the Kernel doc for struct framer_ops.
-> 
-> Introduced by 82c944d05b1a ("net: wan: Add framer framework support")
-> 
-> Signed-off-by: Simon Horman <horms@kernel.org>
+On Mon, 19 Feb 2024 12:40:50 -0800 you wrote:
+> This patch series reworks the way that we manage the GENET MDIO
+> controller clocks around I/O accesses. During testing with a fully
+> modular build where bcmgenet, mdio-bcm-unimac, and the Broadcom PHY
+> driver (broadcom) are all loaded as modules, with no particular care
+> being taken to order them to mimize deferred probing the following bus
+> error was obtained:
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: wan: framer: remove children from struct framer_ops kdoc
-    https://git.kernel.org/netdev/net-next/c/78b88ef392c1
+  - [net-next,v2,1/3] net: mdio: mdio-bcm-unimac: Manage clock around I/O accesses
+    https://git.kernel.org/netdev/net-next/c/ee975351cf0c
+  - [net-next,v2,2/3] net: bcmgenet: Pass "main" clock down to the MDIO driver
+    https://git.kernel.org/netdev/net-next/c/ee2b4cf8b281
+  - [net-next,v2,3/3] Revert "net: bcmgenet: Ensure MDIO unregistration has clocks enabled"
+    https://git.kernel.org/netdev/net-next/c/ba0b78371c46
 
 You are awesome, thank you!
 -- 
