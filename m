@@ -1,213 +1,91 @@
-Return-Path: <netdev+bounces-73602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E9DB85D55B
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:22:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3D2085D582
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 11:29:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22218286F88
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 10:22:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D49B11C21169
+	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 10:29:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ED383D98E;
-	Wed, 21 Feb 2024 10:21:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B9C63DB97;
+	Wed, 21 Feb 2024 10:28:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ACDJmluh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lc35IEzy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD533D970;
-	Wed, 21 Feb 2024 10:21:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0033B3DB89;
+	Wed, 21 Feb 2024 10:28:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708510916; cv=none; b=sOaL+Pp34ZKyRm2XF89aKyLnNejvLeV9KY+eLkekY8vj23K5h4F3UJwLJf7DWxXe2ILgY9T2CHKaJIFyO9ufnfuwWFA22mIUM0+to9xD4AJZ2cEL7M8EyBYDRkXzOt7W1LaP1njK5SxOsR+tFyVt0uX50S/5i132/lNL5Ipb8II=
+	t=1708511337; cv=none; b=Zlbgvco5fRSdq6mSbOkpCnqzL+H+nLoqFQ0KYD+XDn65IW8OF+yg/bOLY0AtjpQKTW6gwizGVKyBeNI3LqpcMZfIvhlAj5CCx9AJy3SP1VvLHBggBbD6UD/jZU1gdaeEqqvbwrZNoeWWd5EMILkH5fchBQkjHDUcBUbeCA834rc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708510916; c=relaxed/simple;
-	bh=zLzzvJfbVa6ODHn00Dyc4JUBC3zDKDHRQgbVtNkryF0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MSBEwP77//24wNP0GrBt14XiFgyR6b4Lwd5cdiD2lAEkNDIA/Ls38b9+iE6ihw6/YNlSU8srw3IwJM+Nrl/MZI8CV1JNgLF4dX+Pnt8IWkRostRvRUUxnBq2NhxWHkAW08V9Si3J+rdGf5wUSjswkmX93Bjc6eU3FMmvUZa4iSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ACDJmluh; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708510914; x=1740046914;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=zLzzvJfbVa6ODHn00Dyc4JUBC3zDKDHRQgbVtNkryF0=;
-  b=ACDJmluhI/oB5lXEt1f3U9r+69PaaY4MEeN4rLmaT1lc4rbFsDX1pguT
-   NWyL8xz6cDO6zSiN1j9YoQN2lIUKtSmlpp4mBSy83sTYvtnCCd9RIXSfK
-   ifE25/9O+ycDYLiAED2lqo6cBKKFLeGAaSzKDfmMM9fwFYn6p3y2zKvit
-   esDu1CqNosKOnLxtdt3nme6OXi98siT8XNwLGGNlh4bkR5z1bQhavlBdK
-   mlRUddk/cX9PZubOjnI+tNouJIM5vxBeEi0LzNA3+yDGKL4dbA0NyP9f9
-   h/V2wwgXJfBamFTr/EqQECSZtRyAGrDMN5gXLXvyXrwiWBcAz9V7OwPTF
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10990"; a="3141145"
-X-IronPort-AV: E=Sophos;i="6.06,175,1705392000"; 
-   d="scan'208";a="3141145"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2024 02:21:53 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,175,1705392000"; 
-   d="scan'208";a="9717365"
-Received: from conorwoo-mobl1.ger.corp.intel.com (HELO [10.252.22.137]) ([10.252.22.137])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2024 02:21:47 -0800
-Message-ID: <391b3603-52bc-4b07-9a50-7261971ee39f@intel.com>
-Date: Wed, 21 Feb 2024 10:21:42 +0000
+	s=arc-20240116; t=1708511337; c=relaxed/simple;
+	bh=bm8u3iY6apdYKRPco8f0Nqv9EVlR63UHDnzkoz1yF1o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D5ptmHwiPo++aWh4nMGB6mTVDN5tiH+hBFE0Q/FhnFa6vCVQa///vka2sE8cGXCt3pK1TKSEMvYPIWs3KlF81AkPl6mrF3UEl7q4pVnO+MZJtMShFcX0YrDtpms171Yexh6vnJWCq/jhgZ0HTILjHn6n7vZ+LbsB4vOcVVrmJJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lc35IEzy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D54EFC43390;
+	Wed, 21 Feb 2024 10:28:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708511336;
+	bh=bm8u3iY6apdYKRPco8f0Nqv9EVlR63UHDnzkoz1yF1o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Lc35IEzyuobZxeZsjUNEzNQrHDqnOznMP+hUeZWXxQEKxj2NiOKeaQStwwLOW9oSZ
+	 GhjZ3wFVTd7CMEjyXU7qgnaqWw2j+wDWJUI7Vxstd4VtThzts68zAmgVIl6tWWRU1I
+	 0HKaWvo7q/ZPCUKTvPV/gyfPTeo/X9fwJAU8o+//Rv9wo6yD96YCwS3VHs4f8Ax7b/
+	 +qzXuC1tWvRLgYabMF5H48suClus9mAINrjd8bn+shErQKu2frfTGy9Ruvc85QTqwr
+	 Cj63MOFxT5MwvSb3XMgibxqhgAIlGUQHpVWkF61Dwd6h9fFraBn3aBL9vN/+tY+R5M
+	 3nF62OYp9W7RA==
+Date: Wed, 21 Feb 2024 10:28:51 +0000
+From: Simon Horman <horms@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Ariel Elior <aelior@marvell.com>,
+	Manish Chopra <manishc@marvell.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>, linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org
+Subject: Re: [PATCH net-next v4 3/9] net: qlogic: qede: Use linkmode helpers
+ for EEE
+Message-ID: <20240221102851.GA352018@kernel.org>
+References: <20240218-keee-u32-cleanup-v4-0-71f13b7c3e60@lunn.ch>
+ <20240218-keee-u32-cleanup-v4-3-71f13b7c3e60@lunn.ch>
+ <20240220124405.GB40273@kernel.org>
+ <a52361ef-66ab-41bd-b245-ccd26fcbd957@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 7/9] drm: tests: Fix invalid printf format specifiers in
- KUnit tests
-To: David Gow <davidgow@google.com>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- Shuah Khan <skhan@linuxfoundation.org>, Guenter Roeck <linux@roeck-us.net>,
- Rae Moar <rmoar@google.com>,
- Arunpravin Paneer Selvam <arunpravin.paneerselvam@amd.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Kees Cook <keescook@chromium.org>, =?UTF-8?Q?Ma=C3=ADra_Canal?=
- <mcanal@igalia.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Matthew Brost <matthew.brost@intel.com>,
- Willem de Bruijn <willemb@google.com>, Florian Westphal <fw@strlen.de>,
- Cassio Neri <cassio.neri@gmail.com>,
- Javier Martinez Canillas <javierm@redhat.com>,
- Arthur Grillo <arthur.grillo@usp.br>
-Cc: Brendan Higgins <brendan.higgins@linux.dev>,
- Daniel Latypov <dlatypov@google.com>, Stephen Boyd <sboyd@kernel.org>,
- David Airlie <airlied@gmail.com>, Maxime Ripard <mripard@kernel.org>,
- "David S . Miller" <davem@davemloft.net>, dri-devel@lists.freedesktop.org,
- linux-kernel@vger.kernel.org, intel-xe@lists.freedesktop.org,
- linux-rtc@vger.kernel.org, linux-kselftest@vger.kernel.org,
- kunit-dev@googlegroups.com, linux-hardening@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240221092728.1281499-1-davidgow@google.com>
- <20240221092728.1281499-8-davidgow@google.com>
-Content-Language: en-GB
-From: Matthew Auld <matthew.auld@intel.com>
-In-Reply-To: <20240221092728.1281499-8-davidgow@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a52361ef-66ab-41bd-b245-ccd26fcbd957@lunn.ch>
 
-On 21/02/2024 09:27, David Gow wrote:
-> The drm_buddy_test's alloc_contiguous test used a u64 for the page size,
-> which was then updated to be an 'unsigned long' to avoid 64-bit
-> multiplication division helpers.
+On Tue, Feb 20, 2024 at 03:45:28PM +0100, Andrew Lunn wrote:
+> > > +	unsupp = linkmode_andnot(tmp, edata->advertised, supported);
+> > 
+> > nit: Given the types involved, I might have written this as:
+> > 
+> > 	unsupp = !!linkmode_andnot(tmp, edata->advertised, supported);
 > 
-> However, the variable is logged by some KUNIT_ASSERT_EQ_MSG() using the
-> '%d' or '%llu' format specifiers, the former of which is always wrong,
-> and the latter is no longer correct now that ps is no longer a u64. Fix
-> these to all use '%lu'.
+> linkmode_andnot() calls bitmap_andnot():
 > 
-> Also, drm_mm_test calls KUNIT_FAIL() with an empty string as the
-> message. gcc warns if a printf format string is empty (apparently), so
-> give these some more detailed error messages, which should be more
-> useful anyway.
+> static inline bool bitmap_andnot(unsigned long *dst, const unsigned long *src1,
+> 			const unsigned long *src2, unsigned int nbits)
 > 
-> Fixes: a64056bb5a32 ("drm/tests/drm_buddy: add alloc_contiguous test")
-> Fixes: fca7526b7d89 ("drm/tests/drm_buddy: fix build failure on 32-bit targets")
-> Fixes: fc8d29e298cf ("drm: selftest: convert drm_mm selftest to KUnit")
-> Signed-off-by: David Gow <davidgow@google.com>
-> ---
->   drivers/gpu/drm/tests/drm_buddy_test.c | 14 +++++++-------
->   drivers/gpu/drm/tests/drm_mm_test.c    |  6 +++---
->   2 files changed, 10 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/gpu/drm/tests/drm_buddy_test.c b/drivers/gpu/drm/tests/drm_buddy_test.c
-> index 8a464f7f4c61..3dbfa3078449 100644
-> --- a/drivers/gpu/drm/tests/drm_buddy_test.c
-> +++ b/drivers/gpu/drm/tests/drm_buddy_test.c
-> @@ -55,30 +55,30 @@ static void drm_test_buddy_alloc_contiguous(struct kunit *test)
->   		KUNIT_ASSERT_FALSE_MSG(test,
->   				       drm_buddy_alloc_blocks(&mm, 0, mm_size,
->   							      ps, ps, list, 0),
-> -				       "buddy_alloc hit an error size=%d\n",
-> +				       "buddy_alloc hit an error size=%lu\n",
->   				       ps);
->   	} while (++i < n_pages);
->   
->   	KUNIT_ASSERT_TRUE_MSG(test, drm_buddy_alloc_blocks(&mm, 0, mm_size,
->   							   3 * ps, ps, &allocated,
->   							   DRM_BUDDY_CONTIGUOUS_ALLOCATION),
-> -			       "buddy_alloc didn't error size=%d\n", 3 * ps);
-> +			       "buddy_alloc didn't error size=%lu\n", 3 * ps);
->   
->   	drm_buddy_free_list(&mm, &middle);
->   	KUNIT_ASSERT_TRUE_MSG(test, drm_buddy_alloc_blocks(&mm, 0, mm_size,
->   							   3 * ps, ps, &allocated,
->   							   DRM_BUDDY_CONTIGUOUS_ALLOCATION),
-> -			       "buddy_alloc didn't error size=%llu\n", 3 * ps);
-> +			       "buddy_alloc didn't error size=%lu\n", 3 * ps);
->   	KUNIT_ASSERT_TRUE_MSG(test, drm_buddy_alloc_blocks(&mm, 0, mm_size,
->   							   2 * ps, ps, &allocated,
->   							   DRM_BUDDY_CONTIGUOUS_ALLOCATION),
-> -			       "buddy_alloc didn't error size=%llu\n", 2 * ps);
-> +			       "buddy_alloc didn't error size=%lu\n", 2 * ps);
->   
->   	drm_buddy_free_list(&mm, &right);
->   	KUNIT_ASSERT_TRUE_MSG(test, drm_buddy_alloc_blocks(&mm, 0, mm_size,
->   							   3 * ps, ps, &allocated,
->   							   DRM_BUDDY_CONTIGUOUS_ALLOCATION),
-> -			       "buddy_alloc didn't error size=%llu\n", 3 * ps);
-> +			       "buddy_alloc didn't error size=%lu\n", 3 * ps);
->   	/*
->   	 * At this point we should have enough contiguous space for 2 blocks,
->   	 * however they are never buddies (since we freed middle and right) so
-> @@ -87,13 +87,13 @@ static void drm_test_buddy_alloc_contiguous(struct kunit *test)
->   	KUNIT_ASSERT_FALSE_MSG(test, drm_buddy_alloc_blocks(&mm, 0, mm_size,
->   							    2 * ps, ps, &allocated,
->   							    DRM_BUDDY_CONTIGUOUS_ALLOCATION),
-> -			       "buddy_alloc hit an error size=%d\n", 2 * ps);
-> +			       "buddy_alloc hit an error size=%lu\n", 2 * ps);
->   
->   	drm_buddy_free_list(&mm, &left);
->   	KUNIT_ASSERT_FALSE_MSG(test, drm_buddy_alloc_blocks(&mm, 0, mm_size,
->   							    3 * ps, ps, &allocated,
->   							    DRM_BUDDY_CONTIGUOUS_ALLOCATION),
-> -			       "buddy_alloc hit an error size=%d\n", 3 * ps);
-> +			       "buddy_alloc hit an error size=%lu\n", 3 * ps);
+> It already returns a bool, so there is no need to force an int to bool
+> conversion using !!.
 
-There was also a fix for this in: 335126937753 ("drm/tests/drm_buddy: 
-fix 32b build"), but there everything was made u32.
-
-Reviewed-by: Matthew Auld <matthew.auld@intel.com>
-
->   
->   	total = 0;
->   	list_for_each_entry(block, &allocated, link)
-> diff --git a/drivers/gpu/drm/tests/drm_mm_test.c b/drivers/gpu/drm/tests/drm_mm_test.c
-> index 1eb0c304f960..f37c0d765865 100644
-> --- a/drivers/gpu/drm/tests/drm_mm_test.c
-> +++ b/drivers/gpu/drm/tests/drm_mm_test.c
-> @@ -157,7 +157,7 @@ static void drm_test_mm_init(struct kunit *test)
->   
->   	/* After creation, it should all be one massive hole */
->   	if (!assert_one_hole(test, &mm, 0, size)) {
-> -		KUNIT_FAIL(test, "");
-> +		KUNIT_FAIL(test, "mm not one hole on creation");
->   		goto out;
->   	}
->   
-> @@ -171,14 +171,14 @@ static void drm_test_mm_init(struct kunit *test)
->   
->   	/* After filling the range entirely, there should be no holes */
->   	if (!assert_no_holes(test, &mm)) {
-> -		KUNIT_FAIL(test, "");
-> +		KUNIT_FAIL(test, "mm has holes when filled");
->   		goto out;
->   	}
->   
->   	/* And then after emptying it again, the massive hole should be back */
->   	drm_mm_remove_node(&tmp);
->   	if (!assert_one_hole(test, &mm, 0, size)) {
-> -		KUNIT_FAIL(test, "");
-> +		KUNIT_FAIL(test, "mm does not have single hole after emptying");
->   		goto out;
->   	}
->   
+Good point, sorry for missing that.
+I assume there is a reason that the return type of
+linkmode_andnot is not bool.
 
