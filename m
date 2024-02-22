@@ -1,123 +1,101 @@
-Return-Path: <netdev+bounces-73884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 298FE85F0BA
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 06:09:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D084485F0BB
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 06:11:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC153B23C52
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 05:09:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 440BCB23AA2
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 05:11:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 928177490;
-	Thu, 22 Feb 2024 05:08:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBC776D39;
+	Thu, 22 Feb 2024 05:11:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="mMo6qVO3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="inhKv/ym"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AEF279F9
-	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 05:08:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2FEE5CB5;
+	Thu, 22 Feb 2024 05:11:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708578530; cv=none; b=KHLCJ0AURoGxtq0CJELgoDAanuTciwPvAWjtkWrP44F3QPnmfTh4WY3CjCDojsoVGIqYsVmUgUwvysTUof4MnLayzktz83szErfvP9Up+rMekmbq6oReRLMOZSQKuDfbHF3Yx8PWC9Iga5iZneT1LfBdjj4K0q1eWVV/UP+qswA=
+	t=1708578689; cv=none; b=TlZqJSlFFILBZml/mVg6461FVWz+JfdjjAiJFiY0SaGsdZ/5PEZ7fKk5XV/o/zLdsGlFwT6NAS1dl0ajrZqTBKE9/IXATcz5cghltJnsoQLl/911FsnNybnkgB+acJNfYY80MBeLanvmBI5MuekZZXh1LerEOUJNzPfAkr+Lyyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708578530; c=relaxed/simple;
-	bh=CurFviOw4itoUtMNe+SZx2bpR/RLLa/WZSwhPDY8PZY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ThI60OrnOtDlOOE4urF70l+cNqcB6FAmTx9w901AvbH1eV5EwrlYaIy20uY23P08mJn6M2XwVfBJA0jMozqmZhiV15ZIE5vqaUDs2AUMhAs6g8Z8sT4tQbJmO7yK/3yVp2Zjy9UEiPgMKJGM+Hsb+3tFbpSJhDau+btAd54WkNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=mMo6qVO3; arc=none smtp.client-ip=209.85.166.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-36517cfd690so4013275ab.2
-        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 21:08:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1708578526; x=1709183326; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t9USVVGat00F5jJQj+wUn/U8TMoSCdZw7GREj2Omev8=;
-        b=mMo6qVO36xYJ5Y9UGefp9ARdKc9hlY5/RhFCK10CBbyutb7ukHh7yOcbFhduokx+of
-         JZ5VJNU7sD0xrLyu/hZ4wYQHoHTTEUVyeIzsO/MY1ffVhZ+Rm90bfTnJykUSbyzxnxp+
-         W19Dwu+RvNkYN7aBApzrm93PPqYssOuKYItXBR05e/voLkKETK4NOxQ5mkWjlalBUwGi
-         5NXZ9yp232wCzSRr5MxwAaKUr9ZVfuHuO30Yuvqig33yZTT/QGCSwhTSgc/1192TB0rf
-         LEFgNwrKiu3z2bHnrykToqR+kegkADcFjHwYW+S38bWOHAJiyIU1IMxJk33lVK8CmGzq
-         Ug3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708578526; x=1709183326;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=t9USVVGat00F5jJQj+wUn/U8TMoSCdZw7GREj2Omev8=;
-        b=eMpKRqjEUja1gAG8bhWRCmpNpU0oKDDwJV3JejC0D+Zcdq96/vZy5DP8smgwhR1nbJ
-         W3sQBCfrug0YQrMv/bJdCn5tZ21shhNGI2X/u9f8HEfLq4mV5PCqcs33cjCXNNlJYdEL
-         LJ3RQsM3JGGGUaMCNMzWBGYd/DQ78KEazKbPoTxfjT5zkbHcgYMdPcj7Rej82H02XXTJ
-         wlooEaf08yg1zeARJrdS+WSGvFElflzKTQvzLcCgri8ONkXf+ETXGjrk1bkoKE+oatM5
-         FyYeAUrpb+7gMPbdFrhRBcJ9J90cflpTc3/08FK3dmUswVdUpu4vBZTqH4Ja7uRogKv4
-         cmcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWkbEzIXb5IKSJZvXsx7v7FC+f307q6VxoLMvbuAZj4TROPikCxCwoo/QmKNmvrXMvT07T5v9R2YCFf4iRc8Q8OtX8YGg74
-X-Gm-Message-State: AOJu0YwC5JCBzpIz3ODAJ1HsQCQf9Zupj6SAELsJt5+JaNBczwy3eSN9
-	3BdWm0pGfBhXJ+yZu8IACEN6lfb41IULMT+dnwgXFAGbyvClLDg/gd/Exql0YII=
-X-Google-Smtp-Source: AGHT+IFKR4PUttuWoh69U5XDCWvToR6hffbetROxwoSdmdrykF8LZrcVc3cVwgwQm+Lggo+rPa6Xzw==
-X-Received: by 2002:a92:ce03:0:b0:364:ff2d:8989 with SMTP id b3-20020a92ce03000000b00364ff2d8989mr17030890ilo.31.1708578526531;
-        Wed, 21 Feb 2024 21:08:46 -0800 (PST)
-Received: from localhost (fwdproxy-prn-118.fbsv.net. [2a03:2880:ff:76::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 6-20020a631946000000b005dc4806ad7dsm9376754pgz.40.2024.02.21.21.08.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Feb 2024 21:08:46 -0800 (PST)
-From: David Wei <dw@davidwei.uk>
-To: Jakub Kicinski <kuba@kernel.org>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	maciek@machnikowski.net,
-	horms@kernel.org,
-	netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next v13 4/4] netdevsim: fix rtnetlink.sh selftest
-Date: Wed, 21 Feb 2024 21:08:40 -0800
-Message-Id: <20240222050840.362799-5-dw@davidwei.uk>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20240222050840.362799-1-dw@davidwei.uk>
-References: <20240222050840.362799-1-dw@davidwei.uk>
+	s=arc-20240116; t=1708578689; c=relaxed/simple;
+	bh=m3go9PyXkUEaWcrp2di/xWPzCxW/M2MoaEZgItIDZJk=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=Z3Ob4Dkau3tcBy6rSdwyvD5j4PqQHJUhJxhC5OenGQVe8GJvduqT68R3ix5J1ltgjQVvXXE/h3Uxj0KANcq05OwgaA7MWQtpzBvvQ9h8/tf7oOLhQJ7ADHOsgnUEAcXZOBpIsaI/I+SCo4AR4+6fogyxxNYVBiKJlTLmpydQPec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=inhKv/ym; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 020D9C433F1;
+	Thu, 22 Feb 2024 05:11:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708578689;
+	bh=m3go9PyXkUEaWcrp2di/xWPzCxW/M2MoaEZgItIDZJk=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=inhKv/ymSz9YT7XMzN+wxtGu6stgBOPiSURtbbU4dPY2ZZwZAwjKfJyDFrdHB30MP
+	 ITRdfcNj2+dVWd1RkmN0SaV4tj0xlnaLplzbiyjbobG6XoLFFCIYXjiUHLWdIBQzht
+	 GHFcehyHsjaaCPKyydOG+xzRD31Cqfg72hfI4dxpNJRVa6lV3A4T9HjHgfWUfEaPNp
+	 B37ue+hOJWofjbTLIyu6sY6speTW3JtPXdHVr9yLA7z3KyRZUK95s6hcHiCNC9Jasy
+	 DQToMHIAIDBDaiRFtgaJ+3uLV545TznrTjjjX/aOi/rsXULxj/XNk5OPFsUFtfO06c
+	 Dgjl0+uKOi55w==
+From: Kalle Valo <kvalo@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jeff Johnson <quic_jjohnson@quicinc.com>,  Karthikeyan Periyasamy
+ <quic_periyasa@quicinc.com>,  <netdev@vger.kernel.org>,
+  <linux-wireless@vger.kernel.org>
+Subject: Re: pull-request: wireless-next-2024-02-20
+References: <20240220165842.917CDC433F1@smtp.kernel.org>
+	<20240221143531.56942c6e@kernel.org>
+	<2dbb3ca4-78fd-4125-b13f-4ad440923291@quicinc.com>
+	<b25a5783-a9ca-4356-ae17-bbda1340b522@quicinc.com>
+	<20240221172521.4dcb382c@kernel.org>
+Date: Thu, 22 Feb 2024 07:11:25 +0200
+In-Reply-To: <20240221172521.4dcb382c@kernel.org> (Jakub Kicinski's message of
+	"Wed, 21 Feb 2024 17:25:21 -0800")
+Message-ID: <875xyhaxs2.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-I cleared IFF_NOARP flag from netdevsim dev->flags in order to support
-skb forwarding. This breaks the rtnetlink.sh selftest
-kci_test_ipsec_offload() test because ipsec does not connect to peers it
-cannot transmit to.
+Jakub Kicinski <kuba@kernel.org> writes:
 
-Fix the issue by adding a neigh entry manually. ipsec_offload test now
-successfully pass.
+> On Wed, 21 Feb 2024 17:18:41 -0800 Jeff Johnson wrote:
+>> > definitely a flaw in 6db6e70a17f6 ("wifi: ath12k: Introduce the
+>> > container for mac80211 hw")
+>> > 
+>> > my setup is using gcc which isn't flagging this :(
+>> > 
+>> > Karthikeyan, can you submit a patch?
+>>
+>> I see this was already fixed by:
+>> 04edb5dc68f4 ("wifi: ath12k: Fix uninitialized use of ret in
+>> ath12k_mac_allocate()")
+>
+> In wireless-next? Could you do a quick follow up PR so that
+> it gets into net-next before the warning propagates into more
+> of the networking sub-trees?
 
-Signed-off-by: David Wei <dw@davidwei.uk>
----
- tools/testing/selftests/net/rtnetlink.sh | 2 ++
- 1 file changed, 2 insertions(+)
+The fix is in ath-next but I'll pull ath-next into wireless-next and
+then send a wireless-next pull request. So you should have the pull
+request in few hours.
 
-diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
-index 874a2952aa8e..bdf6f10d0558 100755
---- a/tools/testing/selftests/net/rtnetlink.sh
-+++ b/tools/testing/selftests/net/rtnetlink.sh
-@@ -801,6 +801,8 @@ kci_test_ipsec_offload()
- 		end_test "FAIL: ipsec_offload SA offload missing from list output"
- 	fi
- 
-+	# we didn't create a peer, make sure we can Tx
-+	ip neigh add $dstip dev $dev lladdr 00:11:22:33:44:55
- 	# use ping to exercise the Tx path
- 	ping -I $dev -c 3 -W 1 -i 0 $dstip >/dev/null
- 
+Sorry about this, I somehow understood this was a W=1 warning and didn't
+prioritise the fix. After re-reading the commit message I can't
+understand why I made that assumption, my bad.
+
+What worries me is that the kbuild bot didn't warn this at all (or I
+missed that as well). Is it using older clang version or what?
+
 -- 
-2.39.3
+https://patchwork.kernel.org/project/linux-wireless/list/
 
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
