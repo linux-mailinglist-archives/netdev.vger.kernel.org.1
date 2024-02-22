@@ -1,152 +1,198 @@
-Return-Path: <netdev+bounces-74078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7AC185FD4D
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 16:57:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07B5585FD4F
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 16:58:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B33CB292FB
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 15:57:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 297281C22599
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 15:58:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85FE81509B7;
-	Thu, 22 Feb 2024 15:55:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O3OjonsX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 983D214F9F6;
+	Thu, 22 Feb 2024 15:56:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA9DB1509B4
-	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 15:55:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F397D153515;
+	Thu, 22 Feb 2024 15:56:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708617351; cv=none; b=grpkSdp0eXj95xbYQizyReulw74vWyHL9D0UnE+piwNNaZSkYGQZi8KugZkqjrm+O/bv7ckb+i1wwr9iTy2iOfTp+Matzk5+nDc5Dzh0CBNpqCqlwWWcJsHTe1uEzrW6trp7lN7N4tafATXmy4z6XpDa52Vnx2mYeDsduIwa8Hs=
+	t=1708617363; cv=none; b=A6MXKV4fnRczMpHS0KFuiLhsqSblOB/5crhQWxFLaMtvyd/1gQMEG+bcs6BN1krNOiO7f3X+WstCIEYRwtTSdR1tfqiPKbFq+VsuzFUAJI2mwGnJM16VySIDNQHWcV8j90v46P6GR3akpcXDh1bmSsujrm84h4qO8IUBNh9KlUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708617351; c=relaxed/simple;
-	bh=ijZPoz6pdkVhBIWUQ1Z7G31qdRzJQyymyc9vzcNoj4s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MJZ9LzUES7cyjnmzE75oOBappSTggPEmneKocodiEotjKXJ5FRyuu+Q7ZGOkyURuPo5EeNTUB2T2vARSvLjduzDqc2GthyzJ0mfuIG3ZbtxgWJsDSjNyCfg8seQjMVgMKwGkT32bcoZzmgwYhHjPLGd2Zb8NrQGfHg07kWwtiZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=O3OjonsX; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5648d92919dso2940610a12.1
-        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 07:55:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708617348; x=1709222148; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZeSilmFM4w0WXRaHhUUgxSElEXw+W+iS41h1tgRKpEM=;
-        b=O3OjonsXJxSCQ5CX7obrr+OLEVek+kGPDXejy8ta26Gn7+Nm0giffzix49GYEMdVD5
-         Ouc2bUzA4AVXnqNx1qMqTn5UahSL1p8AiN3DmzywhNIlk0xn5gKAzDIdYK6GcQIlSJBF
-         p4tl6x40EOTro+t2CqrtDB6EYEERLC2O21a3U/dThvJcaKP+SvkWF9KIYqPmusgXrRT+
-         1NNzPn3XfvOEcaMCcOU4Y5JF3KxZfya33clW0ceWwne2JQUfslq1icoIKoRsutlAjnj6
-         +AmAFx421EqVQqDAQinL/F6bjjxvBpqX3Bf/ByVoO34wGawX87fJ3xTkIo+uA7MAtqwJ
-         71Ag==
+	s=arc-20240116; t=1708617363; c=relaxed/simple;
+	bh=qekAwkVXRT0p765cTKHpZhLkRGZcg5DoBS8NZlj4/fQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KmjD1AGAk4/n2zW5vgqZHJY8y1JTlOwb7/jd894pGcCkjbv7zW0rlATF9Of9eE6ZpXaHaBoVzh7Cv58fbqChsIvdXWxMATErFP44yjbj565mYK5eJ3JRdaqB55jiTHwOm12MM7dzgGBHk+aIvcrX8TYvQ6b+7BWAqqke9qXoixw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.161.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-5a0333a9779so159387eaf.0;
+        Thu, 22 Feb 2024 07:56:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708617348; x=1709222148;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZeSilmFM4w0WXRaHhUUgxSElEXw+W+iS41h1tgRKpEM=;
-        b=vP8Rx7QEDmSQv7Uu4Jo7oYSWM1WAEiAQmNa/D2cDWQvVQxy8rSa/Sgh19cgntYzN0g
-         BfS5LQsJni8PBSZn3EVnKogPTaVErMIIoXxT7bIHHDJlgwgE311aFs/7T6zOoIqlyF2O
-         r61q81UdOU46Pva6syFWIRK9GZFqGPUz+TYY9ey5Szwr5VYYSMuyCAxiBq5qAyQoM/RT
-         bx7/OVmCzpLkGfHTf21J46MiAAVTOp0EZOUjpBvHDOwjO44UwI32jQTTUF93Jt6sSg9J
-         PoVxfvkpJjicu2FC2ayPaqI7dxdBM8LR0M1+bDHV6CP+lswJyXi054jc8RFFU8F9baOK
-         z8iQ==
-X-Gm-Message-State: AOJu0Yxig73kMlM2VsVVrL2QngBvx2ZaPpxHKTaplmIZgrI8S/GbMB/T
-	bHG49twrGO6ozn6rKkbgyiaF95jchSZZGUYlbSHYceJcTlGNE7KSO2ke++DXP8w=
-X-Google-Smtp-Source: AGHT+IEXxdb3RypXN2d9UU5riPU4UheBctxTq9a+zr1lCbmad4Gp1ZkM3sRQzXGw91hlqnxuZiPxfQ==
-X-Received: by 2002:aa7:d993:0:b0:564:7962:4545 with SMTP id u19-20020aa7d993000000b0056479624545mr7789865eds.15.1708617347978;
-        Thu, 22 Feb 2024 07:55:47 -0800 (PST)
-Received: from [192.168.1.20] ([178.197.222.116])
-        by smtp.gmail.com with ESMTPSA id s1-20020a056402164100b00563f918c76asm5623671edx.52.2024.02.22.07.55.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Feb 2024 07:55:47 -0800 (PST)
-Message-ID: <80c03432-0814-4df9-ae6f-25e9f621a13f@linaro.org>
-Date: Thu, 22 Feb 2024 16:55:45 +0100
+        d=1e100.net; s=20230601; t=1708617361; x=1709222161;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DYKeigyDj9ApN01MPpIfl3j1OhPomWEtCdaROd3NttE=;
+        b=seCMLmNCakrqJyR46ynDvGcpQ+73Tfm7I5vRkIYLojpFOCX4PXY7gN3IC2r6g4vueM
+         p+Rc/IaE43wZU18uHaMMqKacqVhkjWxkgS7B8DsPS87qtSI8+TFkPUMenelaOWYr8M5n
+         b34/umx2i4tKa+4Tmu+JfJITyXGd0FE0Q4vhIjzS8+gd1K/XqgGgP53DOrtFYTNozxko
+         iP+XtVi+hsnEAd9Ir7xpdqW/G+YS3zWzRNYIb/2b2gbOSyasL9wDEYhI8dlXeKjnavbe
+         Ir3C/cGuCKI4uLjydSbDZ2KwWrvi63hZpgqfUvx7Yly4NFW+Je2Z1nskk+emeEB8mY5j
+         RVoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXNL7ngwX4H002Z4Vaiv/hOHkhwhhDbWuwWyM7kSKt1AYmOBCujhLLx8+d2yaElax2yCy9oiE9IYxqrujuRv4Fj2YbFAX2s5RLwqqDDYVgQfgCG3I/51pwSQ1fDIIBDiOc=
+X-Gm-Message-State: AOJu0YwsL+tK/HDAPVUTpSs2EYubDWXojomAWhv4emShdG8rCP+Xe5Ov
+	nwgkf2wPV5CCCEpxpWbqVaBBA2wHvQUf36TgkvLEI3PdV4YsixD6Ucn0/H1g4EB0Hjm7SV8IKhe
+	YxXIR9jd+cqcegbbjN21ZK2cn2+8=
+X-Google-Smtp-Source: AGHT+IHNCebX0O58A6uvn/u7rKrX23Ky5jxA2e9YamBjTNSVjxvlbDgEBby00BKuKAkODBgMhdQw23R9+eAzcMKUXvE=
+X-Received: by 2002:a05:6820:134d:b0:59f:881f:9318 with SMTP id
+ b13-20020a056820134d00b0059f881f9318mr26634599oow.0.1708617360984; Thu, 22
+ Feb 2024 07:56:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 4/4] dt-bindings: net: cdns,macb: Deprecate
- magic-packet property
-Content-Language: en-US
-To: Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
- nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- linux@armlinux.org.uk, vadim.fedorenko@linux.dev, andrew@lunn.ch
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, git@amd.com
-References: <20240222153848.2374782-1-vineeth.karumanchi@amd.com>
- <20240222153848.2374782-5-vineeth.karumanchi@amd.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240222153848.2374782-5-vineeth.karumanchi@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240212161615.161935-1-stanislaw.gruszka@linux.intel.com>
+ <20240212161615.161935-3-stanislaw.gruszka@linux.intel.com>
+ <CAJZ5v0hTsXjre_StGizrmUx1JUkzKr9K9KLiHrsvicivMO2Odw@mail.gmail.com> <ZddshlCHwsDTFSYL@linux.intel.com>
+In-Reply-To: <ZddshlCHwsDTFSYL@linux.intel.com>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Thu, 22 Feb 2024 16:55:49 +0100
+Message-ID: <CAJZ5v0goAi7S5LQYsqs6ja=ouPX_QN6OYxNvLb5oTj=VMS2ZCA@mail.gmail.com>
+Subject: Re: [PATCH v4 2/3] thermal: netlink: Add genetlink bind/unbind notifications
+To: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>, linux-pm@vger.kernel.org, 
+	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, 
+	Ricardo Neri <ricardo.neri-calderon@linux.intel.com>, 
+	Daniel Lezcano <daniel.lezcano@linaro.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jiri Pirko <jiri@resnulli.us>, Johannes Berg <johannes@sipsolutions.net>, 
+	Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 22/02/2024 16:38, Vineeth Karumanchi wrote:
-> WOL modes such as magic-packet should be an OS policy.
-> Leverage MACB_CAPS_WOL on supported devices to advertise
-> supported modes through ethtool. Use ethtool to activate
-> the required mode.
-> 
-> Suggested-by: Andrew Lunn <andrew@lunn.ch>
+On Thu, Feb 22, 2024 at 4:47=E2=80=AFPM Stanislaw Gruszka
+<stanislaw.gruszka@linux.intel.com> wrote:
+>
+> On Tue, Feb 13, 2024 at 02:24:56PM +0100, Rafael J. Wysocki wrote:
+> > On Mon, Feb 12, 2024 at 5:16=E2=80=AFPM Stanislaw Gruszka
+> > <stanislaw.gruszka@linux.intel.com> wrote:
+> > >
+> > > Introduce a new feature to the thermal netlink framework, enabling th=
+e
+> > > registration of sub drivers to receive events via a notifier mechanis=
+m.
+> > > Specifically, implement genetlink family bind and unbind callbacks to=
+ send
+> > > BIND and UNBIND events.
+> > >
+> > > The primary purpose of this enhancement is to facilitate the tracking=
+ of
+> > > user-space consumers by the intel_hif driver.
+> >
+> > This should be intel_hfi.  Or better, Intel HFI.
+>
+> Will change in next revision.
+>
+> > > By leveraging these
+> > > notifications, the driver can determine when consumers are present
+> > > or absent.
+> > >
+> > > Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> > > Signed-off-by: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
+> > > ---
+> > >  drivers/thermal/thermal_netlink.c | 40 +++++++++++++++++++++++++++--=
+--
+> > >  drivers/thermal/thermal_netlink.h | 26 ++++++++++++++++++++
+> > >  2 files changed, 61 insertions(+), 5 deletions(-)
+> > >
+> > > diff --git a/drivers/thermal/thermal_netlink.c b/drivers/thermal/ther=
+mal_netlink.c
+> > > index 76a231a29654..86c7653a9530 100644
+> > > --- a/drivers/thermal/thermal_netlink.c
+> > > +++ b/drivers/thermal/thermal_netlink.c
+> > > @@ -7,17 +7,13 @@
+> > >   * Generic netlink for thermal management framework
+> > >   */
+> > >  #include <linux/module.h>
+> > > +#include <linux/notifier.h>
+> > >  #include <linux/kernel.h>
+> > >  #include <net/genetlink.h>
+> > >  #include <uapi/linux/thermal.h>
+> > >
+> > >  #include "thermal_core.h"
+> > >
+> > > -enum thermal_genl_multicast_groups {
+> > > -       THERMAL_GENL_SAMPLING_GROUP =3D 0,
+> > > -       THERMAL_GENL_EVENT_GROUP =3D 1,
+> > > -};
+> > > -
+> > >  static const struct genl_multicast_group thermal_genl_mcgrps[] =3D {
+> >
+> > There are enough characters per code line to spell "multicast_groups"
+> > here (and analogously below).
+>
+> Not sure what you mean, change thermal_genl_mcgrps to thermal_genl_multic=
+ast_groups ?
+>
+> I could change that, but it's not really related to the changes in this p=
+atch,
+> so perhaps in separate patch.
+>
+> Additionally "mcgrps" are more consistent with genl_family fields i.e:
+>
+>       .mcgrps         =3D thermal_genl_mcgrps,
+>       .n_mcgrps       =3D ARRAY_SIZE(thermal_genl_mcgrps),
 
-Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+OK, never mind.
 
-Best regards,
-Krzysztof
+> > >         [THERMAL_GENL_SAMPLING_GROUP] =3D { .name =3D THERMAL_GENL_SA=
+MPLING_GROUP_NAME, },
+> > >         [THERMAL_GENL_EVENT_GROUP]  =3D { .name =3D THERMAL_GENL_EVEN=
+T_GROUP_NAME,  },
+> > > @@ -75,6 +71,7 @@ struct param {
+> > >  typedef int (*cb_t)(struct param *);
+> > >
+> > >  static struct genl_family thermal_gnl_family;
+> > > +static BLOCKING_NOTIFIER_HEAD(thermal_gnl_chain);
+> >
+> > thermal_genl_chain ?
+> >
+> > It would be more consistent with the rest of the naming.
+>
+> Ok, will change. Additionally in separate patch thermal_gnl_family for co=
+nsistency.
+>
+> > >  static int thermal_group_has_listeners(enum thermal_genl_multicast_g=
+roups group)
+> > >  {
+> > > @@ -645,6 +642,27 @@ static int thermal_genl_cmd_doit(struct sk_buff =
+*skb,
+> > >         return ret;
+> > >  }
+> > >
+> > > +static int thermal_genl_bind(int mcgrp)
+> > > +{
+> > > +       struct thermal_genl_notify n =3D { .mcgrp =3D mcgrp };
+> > > +
+> > > +       if (WARN_ON_ONCE(mcgrp > THERMAL_GENL_MAX_GROUP))
+> > > +               return -EINVAL;
+> >
+> > pr_warn_once() would be better IMO.  At least it would not crash the
+> > kernel configured with "panic on warn".
+>
+> "panic on warn" is generic WARN_* issue at any place where WARN_* are use=
+d.
+> And I would say, crash is desired behaviour for those who use the option
+> to catch bugs. And mcgrp bigger than THERMAL_GENL_MAX_GROUP is definitely
+> a bug. Additionally pr_warn_once() does not print call trace, so I think
+> WARN_ON_ONCE() is more proper. But if really you prefer pr_warn_once()
+> I can change.
 
+Fair enough.
 
