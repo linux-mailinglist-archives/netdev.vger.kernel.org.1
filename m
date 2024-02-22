@@ -1,61 +1,83 @@
-Return-Path: <netdev+bounces-73996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E883485F945
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 14:14:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A7CE85F959
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 14:15:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A88F41F238D8
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 13:14:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3C372861A7
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 13:15:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4AB3131720;
-	Thu, 22 Feb 2024 13:13:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D04C612EBCC;
+	Thu, 22 Feb 2024 13:15:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OAeTY3fS"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="qsVls3vY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89AC712FF95;
-	Thu, 22 Feb 2024 13:13:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6A276214C
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 13:15:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708607623; cv=none; b=YjHn3DqxCZ2xjQju6PqyiMM/zzYz1bZJi9ggTx+FLuyQN3gB85NCGOMR4yNbBiBkgSCWF29jn6c/ADB15iQ4SMkm180Dc5K2sYH+gM/Cn7cOUYhp1ddSiBPMR7qBGnyGRqB0o9NcpCso2/s/I/uS1B857N9TBv8JxChT8cg9yb8=
+	t=1708607702; cv=none; b=TydHO4+XF2qUmeNjXIceWKV5hkZde3Xnp2/KMzhD7hd0IUrkhB8+1Nl4GtSgPbfZP2kLnO3Z8YH1iY1fnviuQlwLP0V2ziVlWKNVQpHJDHXIb7aJMyQc7VV0ri0S/ZcuX81stn5C4BLkhrtE3a2ntE5l1w1SH3KLjoJz2zCm9Vk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708607623; c=relaxed/simple;
-	bh=6OzfR5St32D1ssiPndCMGGUD7Z7DoQf2u0dqtnL026Q=;
+	s=arc-20240116; t=1708607702; c=relaxed/simple;
+	bh=gi0gnozRmuNzB3u/EMMpy0UnG9ygFbqKTFrXNYVRtk8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mY8bUIncS9L3Y7a1UxHytBU0PT8kQQRymiWAWp3gALPRMCHuUtlQh8FOEDx8zbtwco5EmvX3yjN8GqdH22IoBk91NsUvoYd0hQ0yLl5Qj5yc20lr19ofPZ/EmY0NNFCyS66dI3C9FNUqMZxQMoRnfx6F9wyGRQQ7GB3+Za6rPDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OAeTY3fS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1C78C433F1;
-	Thu, 22 Feb 2024 13:13:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708607623;
-	bh=6OzfR5St32D1ssiPndCMGGUD7Z7DoQf2u0dqtnL026Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OAeTY3fS/OcZeu4gttXoRy4eOkX7GsE7tkpmuOObXKBrKxsP1cLy0sSdOOmEdJwLt
-	 bBio7Khp5uxXWBSTmNPmu+KWattjJtUwz9GaLqf83TJF6WQTwR+r6nyFnCGhTGB9e+
-	 D/eH69N/XwQmFyyswnQeF98uEnS/xoQ2YvUE+4HThieiyNzAubRL0qJ7175AizmlLw
-	 lpxjV3Ho5kv8TIhemS9HkrjVVWzuNu6ArvMTU8oLj6m+DKiOmRu74kgRiQGo8JSD0Y
-	 3fREI6cO1lkdXAA9av0+DeI0VMcvVbsz3ciIghVmjUynl5x6vlAlwnZsI6VVHppm7P
-	 N/Otv6CbOTTOw==
-Date: Thu, 22 Feb 2024 13:13:38 +0000
-From: Simon Horman <horms@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	mptcp@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 2/2] selftests: mptcp: explicitly trigger the
- listener diag code-path
-Message-ID: <20240222131338.GA960874@kernel.org>
-References: <cover.1708515908.git.pabeni@redhat.com>
- <1116d80f808ea870f3f77fe927dbd6c622d062ae.1708515908.git.pabeni@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=dNycqsjEjyFptcucOD8PVmWs1w0O8IFOoGpewFzt/xQHXnE6C1cBoZgzDCD2fFf2Dte2RREE2YDkFZfP/wNSbt2u6tpNFTDZEfAB3bzmX4EIo9SqP9E+b+15hJpbO2dD/Yx+ZJSaF+xlznGM+6l1y2uK1nLbtsIwn7/EVSYpXfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=qsVls3vY; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-33d6f1f17e5so1807623f8f.3
+        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 05:15:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708607699; x=1709212499; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wo6KBK9AMn4uvjyM064+qKzhZg5uFvU3B4Qrcwm+BlM=;
+        b=qsVls3vYMv57tpVfcgv6eacSK4EBEZ75CXVHcOWIQNs1sKAuXJIbs/dYQZOFKJuMqM
+         cVFy2W7JOI1cR8FPcgKdQol9wGPJeJ6ALKnPXnP8iX80zdlZSV1eDG6vK/YD13y/2iKo
+         g0hS6aVPBDETtDxsjgbQakryo0bh290zcJ7C+PXUFI31pR41plc8Gs3hl2tgoz56VBc7
+         J6ds4ow+wr8l+vVzQUfmVMu0snj34qqi86TK2FKocjEMeVnLHUFFLynnj7r24dxKlIp1
+         SG/EZHjkpryMA0D4oxHbkyBa/TrcpSYTDJxNR/BNnriQIaKByPdF+XAKinRiabw5giAl
+         17og==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708607699; x=1709212499;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Wo6KBK9AMn4uvjyM064+qKzhZg5uFvU3B4Qrcwm+BlM=;
+        b=Cdn+91yBFzpMnUVM18NHV8Ee8iNqu2nXAxM/JQXL9CCPTycQmO587fCX+sDBCnxjgs
+         NSTPo3Nm9rqZIjpsBu6qlcsMRM/Pydg0X8a9B3LudxhakvOtpPjjO4Tikvk4JdN5RRcL
+         G4yLxu1f0yCtZHcQLNXfZFAYNsoL8t+lwwoicO+PRHiYuqDEol0CgV87E2a9UzJq3JMM
+         BZt0VfNcfaMAKLMW6VTqKF46DgryNGm3yZ6OUwSbbJqj77p78594o5rNt0UxqwAwqTQ/
+         tc387EbudHTX7xEb7QXLUAQ9ymKgwYYShSWnBQoml+Cskr79Vw/pFCx2d/g24EXVO4mi
+         zT2g==
+X-Gm-Message-State: AOJu0YyTsG8Lb/iH0AYtCVL3ojR4nlJ9a+PpM9ybB6qto0UFEfAgmVJE
+	zf4YsgAuwr7xe/JYmBC97REasSbFtIW+QTjoJTAR15KyvnwFQurhJsEAgPD3i8o=
+X-Google-Smtp-Source: AGHT+IFnS4d09jD/qGHrGPrWD17ZCu9wTsrWHTSag1MKqk4Skur9NPeK+9B+7W3W/w/w6fcracqrVg==
+X-Received: by 2002:adf:f492:0:b0:33d:3f21:b9f3 with SMTP id l18-20020adff492000000b0033d3f21b9f3mr8317038wro.64.1708607698763;
+        Thu, 22 Feb 2024 05:14:58 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id bx14-20020a5d5b0e000000b0033d6bd4eab9sm9464935wrb.1.2024.02.22.05.14.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Feb 2024 05:14:58 -0800 (PST)
+Date: Thu, 22 Feb 2024 14:14:54 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, jacob.e.keller@intel.com,
+	swarupkotikalapudi@gmail.com, donald.hunter@gmail.com,
+	sdf@google.com, lorenzo@kernel.org, alessandromarcolini99@gmail.com
+Subject: Re: [patch net-next v2 3/3] tools: ynl: allow user to pass enum
+ string instead of scalar value
+Message-ID: <ZddIzlOHxYCrQibb@nanopsycho>
+References: <20240221155415.158174-1-jiri@resnulli.us>
+ <20240221155415.158174-4-jiri@resnulli.us>
+ <20240221104936.7c836f83@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,79 +86,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1116d80f808ea870f3f77fe927dbd6c622d062ae.1708515908.git.pabeni@redhat.com>
+In-Reply-To: <20240221104936.7c836f83@kernel.org>
 
-On Wed, Feb 22, 2024 at 12:46:59PM +0100, Paolo Abeni wrote:
->l The mptcp diag interface already experienced a few locking bugs
-> that lockdep and appropriate coverage have detected in advance.
-> 
-> Let's add a test-case triggering the relevant code path, to prevent
-> similar issues in the future.
-> 
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> ---
->  tools/testing/selftests/net/mptcp/diag.sh | 30 +++++++++++++++++++++++
->  1 file changed, 30 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/net/mptcp/diag.sh b/tools/testing/selftests/net/mptcp/diag.sh
-> index 60a7009ce1b5..3ab584b38566 100755
-> --- a/tools/testing/selftests/net/mptcp/diag.sh
-> +++ b/tools/testing/selftests/net/mptcp/diag.sh
-> @@ -81,6 +81,21 @@ chk_msk_nr()
->  	__chk_msk_nr "grep -c token:" "$@"
->  }
->  
-> +chk_listener_nr()
-> +{
-> +	local expected=$1
-> +	local msg="$2"
-> +
-> +	if [ $expected -gt 0 ] && \
-> +	   ! mptcp_lib_kallsyms_has "mptcp_diag_dump_listeners"; then
-> +		printf "%-50s%s\n" "$msg - mptcp" "[ skip ]"
-> +		mptcp_lib_result_skip "many listener sockets"
-> +	else
-> +		__chk_nr "ss -inmlHMON $ns | wc -l" "$expected" "$msg - mptcp"
-> +	fi
-> +	__chk_nr "ss -inmlHtON $ns | wc -l" "$expected" "$msg - subflows"
-> +}
-> +
->  wait_msk_nr()
->  {
->  	local condition="grep -c token:"
-> @@ -279,5 +294,20 @@ flush_pids
->  chk_msk_inuse 0 "many->0"
->  chk_msk_cestab 0 "many->0"
->  
-> +chk_listener_nr 0 "no listener sockets"
-> +NR_SERVERS=100
-> +for I in $(seq 1 $NR_SERVERS); do
-> +	ip netns exec $ns ./mptcp_connect -p $((I + 20001)) -l 0.0.0.0 2>&1 >/dev/null &
-> +	mptcp_lib_wait_local_port_listen $ns $((I + 20001))
-> +done
-> +
-> +chk_listener_nr $NR_SERVERS "many listener sockets"
-> +
-> +# gracefull termination
+Wed, Feb 21, 2024 at 07:49:36PM CET, kuba@kernel.org wrote:
+>On Wed, 21 Feb 2024 16:54:15 +0100 Jiri Pirko wrote:
+>> +    def _encode_enum(self, attr_spec, value):
+>> +        try:
+>> +            return int(value)
+>> +        except (ValueError, TypeError) as e:
+>> +            if 'enum' not in attr_spec:
+>> +                raise e
+>> +        enum = self.consts[attr_spec['enum']]
+>> +        if enum.type == 'flags' or attr_spec.get('enum-as-flags', False):
+>> +            scalar = 0
+>> +            if isinstance(value, str):
+>> +                value = [value]
+>> +            for single_value in value:
+>> +                scalar += enum.entries[single_value].user_value(as_flags = True)
+>> +            return scalar
+>> +        else:
+>> +            return enum.entries[value].user_value()
+>
+>That's not symmetric with _decode_enum(), I said:
+>
+>                     vvvvvvvvvvvvvvvvvvvvvv
+>  It'd be cleaner to make it more symmetric with _decode_enum(), and
+>  call it _encode_enum().
+>
+>How about you go back to your _get_scalar name and only factor out the
+>parts which encode the enum to be a _encode_enum() ?
 
-nit, as you plan to re-spin anyway: graceful
-
-> +for I in $(seq 1 $NR_SERVERS); do
-> +	echo a | ip netns exec $ns ./mptcp_connect -p $((I + 20001)) 127.0.0.1 2>&1 >/dev/null
-
-I'm not sure of the validity of this but shellcheck complains that:
-
-  SC2069 (warning): To redirect stdout+stderr, 2>&1 must be last (or use '{ cmd > file; } 2>&1' to clarify).
-
-Also for the same constriction slightly earlier in this patch.
-
-> +done
-> +flush_pids
-> +
->  mptcp_lib_result_print_all_tap
->  exit $ret
-> -- 
-> 2.43.0
-> 
-> 
+Okay.
 
