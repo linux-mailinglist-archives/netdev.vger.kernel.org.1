@@ -1,149 +1,88 @@
-Return-Path: <netdev+bounces-74097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C10D85FF02
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 18:16:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01C6C85FF49
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 18:28:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA4A12874EF
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 17:16:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 785E41F21B28
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 17:28:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9734615531C;
-	Thu, 22 Feb 2024 17:16:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 835F21552E7;
+	Thu, 22 Feb 2024 17:28:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="IMagX8Bh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mpYYfIEI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9866154C12;
-	Thu, 22 Feb 2024 17:16:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E1E2154C14
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 17:28:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708622167; cv=none; b=KddrKrR8Dl7ax09oyH2/QzUcme3pxfpmONRj2oRUS5zxBkfgU+jmaP5Z8BIagXAGB5fj2baog/TCCZMx02jtb3hDY+9tzHUlkqiCTkzUFcwxYtpyXpwg9i2dF5SNyv1SFe0XmmawqYfGWpr23II70bgogcIKPfO9bsNv5Rjkg90=
+	t=1708622910; cv=none; b=Z3+kQtMXKafECoJ77uubj3HEsBgFxLcdLbO8N1lfu9cdKI9GMgVd0kchFpfttiJ2+sZCnErz9QqihXXQGOd1O09Zpo449C3hP0fo2PfiaYt230Ord/zWDgG6pQB/otiLUug6HlCSuBzU/IvGEcKpSkVCYlniCENgMRIAZaqNssA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708622167; c=relaxed/simple;
-	bh=A84qU1m9BzTIx1AZLiz7uRz4hjvZ6jdO9TMJ0cHGnus=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=h7wqoJ8Rz7//7Br6mDlx5tXq8yrIrPsROvqCgd8CP3IlpjEdSgNmSG0JFJH5xv/tS0BrkR1x2Hr3FWsjYY32mBsOB9aUZruS5D0Ij4Fq3z+rLekr7+EmNlMQOwhaw+nwfsKkRMJWfE1N1BROZusHKTnFucuFl926+Js5+kwMdt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=IMagX8Bh; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41M9BLW6021854;
-	Thu, 22 Feb 2024 09:15:48 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	from:to:cc:subject:date:message-id:mime-version:content-type; s=
-	pfpt0220; bh=UDUvIki+z64+cnjRMxcgq65JHKEkA1p7m7rxVXwber4=; b=IMa
-	gX8BhksoxMzd7mAACLBi5vEmoNc2LNclA6cxn0rFrgifRT0/nNxdWMNZSQAfJrup
-	yiM3gESOzYR28BYR7fzFJwh3Ww9Ih/ruL+XjjB84jwN+pkV+h+FQRdS6FhuKSgnM
-	Z35MY2CV/zsyBehcBSdpby+GMdxfF8H6bLGV1BuZ9rDUPNxNF5xvvP57vmy0us9Q
-	epyYHvt1X8am15hGk8lG0Wb+EtwqI4lp4JKPZfJUhA2cCs8Qd3WkK7xzDDEfsPVD
-	+QrbxWFc1+fGWv2yqG4Tc15+i22IFM+Wba3aeLH7qY3fjH2+GonLDhR5tC0a90cR
-	OHf85Sf/WV+Vs6U4STg==
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3we3dw9ycv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Thu, 22 Feb 2024 09:15:47 -0800 (PST)
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 22 Feb
- 2024 09:15:46 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Thu, 22 Feb 2024 09:15:45 -0800
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id 35A5C3F7153;
-	Thu, 22 Feb 2024 09:15:42 -0800 (PST)
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
-        <davem@davemloft.net>, <sbhatta@marvell.com>, <gakula@marvell.com>,
-        <sgoutham@marvell.com>
-Subject: [net-next PatchV2] octeontx2-pf: Add support to read eeprom information
-Date: Thu, 22 Feb 2024 22:45:42 +0530
-Message-ID: <20240222171542.12995-1-hkelam@marvell.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1708622910; c=relaxed/simple;
+	bh=Ym0ZPLkadZ2F1bS0GhbTBsF8YtHX9N1INXsdxn0QyGg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Diq1Q0dj8Hjm8C4QtT/Y7uxIM0vqPvLA7Cu3DqaGh2njQF2iJknM5CrdLNQYd9Snfpw3/YYmZG5DJqZLR1dO1sZbclOb4ghJNanDl8xyoZQerBrHDn5sREuH2EL9FwZT2cgK7ycrytoCwtNvDN/RPu/rXJsyXHG9k6PonaT48co=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mpYYfIEI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76A78C433F1;
+	Thu, 22 Feb 2024 17:28:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708622910;
+	bh=Ym0ZPLkadZ2F1bS0GhbTBsF8YtHX9N1INXsdxn0QyGg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=mpYYfIEIycFVULkYi6hOX8l0b8JPB/rj66pZqH1H2ANu9l5ghoxb7YBfGd67xG0QI
+	 rLTWEIsTL1bg/yQPlt128rs3kcDwrFiOPHuMehsjYXZMuJCLco+vQPhddc6b4GroXR
+	 mGg5NJhPD1Hq3VTaS2zNl9n4Y5Vdl6gkvv6jnvW5SlHT4isPJCVKQBsQ99091DWhKG
+	 SzW2LZwvox+K3lWOE0HAIcTkIqGMhEj9d9d8Mrdm7VPq7M/LpfUy43mX8eVBh41BSs
+	 WgWmE9LPqACQcmLDn/u+bCUXjQyh2IlSN0Ib72Vn+XT/cdJUvhU4sXy5mCHNQm63k3
+	 FlBtOEx9xChdw==
+Message-ID: <b053dad4-5745-4b9a-af55-f5c04beb6584@kernel.org>
+Date: Thu, 22 Feb 2024 10:28:28 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-GUID: r_iJEr-Olns6htIDz4kBDq1c1mrmWaY7
-X-Proofpoint-ORIG-GUID: r_iJEr-Olns6htIDz4kBDq1c1mrmWaY7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-22_13,2024-02-22_01,2023-05-22_02
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 08/10] tcp: add dropreasons in
+ tcp_rcv_state_process()
+Content-Language: en-US
+To: Jason Xing <kerneljasonxing@gmail.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, kuniyu@amazon.com
+Cc: netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+References: <20240222113003.67558-1-kerneljasonxing@gmail.com>
+ <20240222113003.67558-9-kerneljasonxing@gmail.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240222113003.67558-9-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Add support to read/decode EEPROM module information using ethtool.
-Usage: ethtool -m <interface>
+On 2/22/24 4:30 AM, Jason Xing wrote:
+> @@ -6704,8 +6705,13 @@ int tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb)
+>  				  FLAG_NO_CHALLENGE_ACK);
+>  
+>  	if ((int)reason <= 0) {
+> -		if (sk->sk_state == TCP_SYN_RECV)
+> -			return 1;	/* send one RST */
+> +		if (sk->sk_state == TCP_SYN_RECV) {
+> +			/* send one RST */
+> +			if (!reason)
+> +				return SKB_DROP_REASON_TCP_OLD_ACK;
+> +			else
+> +				return -reason;
 
-Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
-Signed-off-by: Sunil Goutham <sgoutham@marvell.com>
----
-V2 * consider length and offset fields while copying
-     the eeprom data.
+checkpatch should be flagging this - the `else` is not needed.
 
- .../marvell/octeontx2/nic/otx2_ethtool.c      | 37 +++++++++++++++++++
- 1 file changed, 37 insertions(+)
+			if (!reason)
+				return SKB_DROP_REASON_TCP_OLD_ACK;
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-index 7f786de61014..7f66d18e8a4e 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-@@ -1184,6 +1184,41 @@ static void otx2_get_link_mode_info(u64 link_mode_bmap,
- 			      otx2_link_modes);
- }
+			return -reason;
 
-+static int otx2_get_module_info(struct net_device *netdev,
-+				struct ethtool_modinfo *modinfo)
-+{
-+	struct otx2_nic *pfvf = netdev_priv(netdev);
-+	struct cgx_fw_data *rsp;
-+
-+	rsp = otx2_get_fwdata(pfvf);
-+	if (IS_ERR(rsp))
-+		return PTR_ERR(rsp);
-+
-+	modinfo->type = rsp->fwdata.sfp_eeprom.sff_id;
-+	modinfo->eeprom_len = SFP_EEPROM_SIZE;
-+	return 0;
-+}
-+
-+static int otx2_get_module_eeprom(struct net_device *netdev,
-+				  struct ethtool_eeprom *ee,
-+				  u8 *data)
-+{
-+	struct otx2_nic *pfvf = netdev_priv(netdev);
-+	struct cgx_fw_data *rsp;
-+
-+	if (!ee->len || ((ee->len + ee->offset) > SFP_EEPROM_SIZE))
-+		return -EINVAL;
-+
-+	memset(data, 0, ee->len);
-+
-+	rsp = otx2_get_fwdata(pfvf);
-+	if (IS_ERR(rsp))
-+		return PTR_ERR(rsp);
-+
-+	memcpy(data, &rsp->fwdata.sfp_eeprom.buf + ee->offset, ee->len);
-+	return 0;
-+}
-+
- static int otx2_get_link_ksettings(struct net_device *netdev,
- 				   struct ethtool_link_ksettings *cmd)
- {
-@@ -1342,6 +1377,8 @@ static const struct ethtool_ops otx2_ethtool_ops = {
- 	.set_fecparam		= otx2_set_fecparam,
- 	.get_link_ksettings     = otx2_get_link_ksettings,
- 	.set_link_ksettings     = otx2_set_link_ksettings,
-+	.get_module_info	= otx2_get_module_info,
-+	.get_module_eeprom	= otx2_get_module_eeprom,
- };
 
- void otx2_set_ethtool_ops(struct net_device *netdev)
---
-2.17.1
 
