@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-74039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E48885FB76
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 15:41:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6815485FB87
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 15:48:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1A771F26BEF
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 14:41:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E7131F24D31
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 14:48:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43515148FF9;
-	Thu, 22 Feb 2024 14:41:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE90E148313;
+	Thu, 22 Feb 2024 14:48:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ePh/1mJx"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QXvIVA2V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C39AA146900;
-	Thu, 22 Feb 2024 14:41:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0025A14691D
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 14:48:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708612895; cv=none; b=ClFXCtEv62/UY/1alAmZyFIT+ag+chIl/5oTu53UlkL51lpaBjj667s5aYorI9H1+ezteohGnEvKIwTdqWODWx3r3nJ0IYMENdH2NnZuP4uTdclsESImd4SjkIUKeURUWN0vKvdbrV5ESytmL689+3xfGBU1+GtIhewkaVPprsg=
+	t=1708613304; cv=none; b=MvRm4+RbkLBldG4t5UL/Rq5fpddtaqoeb6Uoup73BfRLWE0TBvNdX8VjIweYAA2jztE4H9dX2xsOtZpbj9kMZ6sRu9kaNvCUYQZx+r03Zp+/VYG6b/NcFly2I7Rchp1bTchhgLz+h0qKs43a+UVi9Y5Do6mBuE8LWowZ9sOixio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708612895; c=relaxed/simple;
-	bh=q6fetJ0AExiWalMdmM6s8b4qYxZrhUDwrcBwekf6GGA=;
+	s=arc-20240116; t=1708613304; c=relaxed/simple;
+	bh=oTNiQOVa9UPc+CcXKg/4uP4XhIhH0XZw8JWypLjnUrk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cIA6Kts9V7uIJMtkmIic/wWEaaoh1aiBb1zDksYZjBy5v7PvnyPkEKDvgMaRA+20f5HT+Qs2tGf5lPo0H8LQjwXUacStDp7sOZqLdCkGed4SpTUQYQ4n3lUVXOPftxefgSQ9hnJ93QD/m3DXn/sXDsNIkkIk6gv0Ngr1PDIBB70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ePh/1mJx; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41MEMYUY029248;
-	Thu, 22 Feb 2024 14:41:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=2FbUmTkNvpatRSD/X0RigoKpImk5kATvJtmRf+tdtRU=;
- b=ePh/1mJxO7c72r0/zLT3rTGqCZN6U2716t+yr+6Qk2DRdDVdzObYZ0LbMZiKqVZv1JQq
- rx9sOQXo5tPxtQ8agTS3OzqQDYFDUniXZiY+Hhk3Y0/IYrc3WrL73EQa1rS+1u3+ABi8
- ajYDZ9SER0rGWqiLrlXr2N4SygaRRkEJJ6FAqWFBCrnk5qNgdQiO1cweIf7yOakQMKS7
- 4u7PKRJpThDzYBijKwQ1UWk/0FpdXU70fDosjZUqlMaXZNTriORx/l1pbzSbp0P2pCJD
- Xg4I4xDh/cKz7YYTBrV+GoJEHnRe2V8OLV+UlFNFesfl+g1JeoCm4cQCxSWTo1NO2ME+ OA== 
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3we7cxhwqx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 22 Feb 2024 14:41:30 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 41MDUL0Y014390;
-	Thu, 22 Feb 2024 14:41:29 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3wb9u2x82v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 22 Feb 2024 14:41:29 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 41MEfOAX6160996
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 22 Feb 2024 14:41:26 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 23CD42004E;
-	Thu, 22 Feb 2024 14:41:24 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EB5EA20040;
-	Thu, 22 Feb 2024 14:41:23 +0000 (GMT)
-Received: from [9.152.224.128] (unknown [9.152.224.128])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 22 Feb 2024 14:41:23 +0000 (GMT)
-Message-ID: <b96f27a5-53fa-495b-b1a4-cff574898083@linux.ibm.com>
-Date: Thu, 22 Feb 2024 15:41:23 +0100
+	 In-Reply-To:Content-Type; b=KdbHhszFT7xtiTit+zwpVNUGVqDrlYEbUkR6eGm6nsl+tq/B4NyyNSAxJuO7IFSN+WXfAi02Og+2LfKxZJyqLzH3YaP/o8wlw9AwodRkxgSwlQYM4swkwqVuUCYRSVvGpP2lEvyrb9z6hTGT9Nz4JhT7lPyVMoP0hPfME5fTAvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=QXvIVA2V; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5101cd91017so10363657e87.2
+        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 06:48:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1708613301; x=1709218101; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=peIj76sTqyfZMIrz7VgORO7dcy5u5KgAsi9Knmv8iBM=;
+        b=QXvIVA2Vmwewwfw9hfU6jg46jk+xCtAE6LgAIdZWdCQRkxBquR1ZoRpdNC2x6Vfs8x
+         lOC9dsb90JgiELVmwcyP0jEcvI1wFRaHLVTMc5w89JWh6ufQu1gaXtPYP95wVQqqfJoh
+         vcXnvc/BXlfpLO1c1SVOheXDRgS2ThIuPuXNAd/ogBWQZqEAp0ID/WnET1aJ/eUwhL8b
+         I9MVrT/nn2dj2G7CUDwOnIeNjFa//hIy9gLuo58VJnpyzfRYCGB988sS3hf1CupHiCXO
+         Cp+aaqymR+eZ+DcOBa1y8sjlGaHFtIGuGORJCz4jRaKr0j/q24DFHOGF/odka+uAjNrM
+         2v9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708613301; x=1709218101;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=peIj76sTqyfZMIrz7VgORO7dcy5u5KgAsi9Knmv8iBM=;
+        b=gTGd4NfWp2bdRVuhc2gGvHC38fPuOw/iHp/vLbHWeZFfPG7yj3528EWmH3MEy5DPbu
+         NYVwarhMaCE+hLMiFQECj7NDNJFMV9+TJfG8lcTCNPUViCEjBi347MzOH6h7WLeB2/Ga
+         p6dBpghJFkPBKEZUYUBtUDzkfwudf7eq4+PqjnXtBxv2Ouz7P7GRJp5h6GXJZYqnpU0z
+         gi+Ng4WbuM6qYse/RUDcoY3iAVFFoa1FAcPlJGPwYjsi6binJNm4qGg6edw6PA631DzI
+         0tEw9Oddtp9GQRzCQj8g6R/MsTdbHV1Wwp5YT/erDtYVtZieJeHMNc9x5IWK6rS3lcw/
+         UBTw==
+X-Forwarded-Encrypted: i=1; AJvYcCWKjZum6+0PaLuccx8RrO9x9cJuHKkRFHySraF5kSgFUB61E2sh0MmNRx1KXiqRvPGLlQnXN2YDTmg1ZMUDI7cV5GFRnvsi
+X-Gm-Message-State: AOJu0Yxsll7S4Qgbvwqk1A7SxRSgzfJxiqj0wPGxUP80nApkjdQd6mzI
+	73VCaazz/YFhd9r420o4TydWKpLxmR1NlN9vAlQrrjpqYZwKIhPtP7f3Ep1MP5I=
+X-Google-Smtp-Source: AGHT+IHjV4zsu+gepvm6hVV3ZEWYhg3xi0pO8rAfzf0Mj/Hk8VjjKzGsYl5EVyFm+i8ZMKbveXDTJQ==
+X-Received: by 2002:a05:6512:3b0b:b0:512:e240:c5af with SMTP id f11-20020a0565123b0b00b00512e240c5afmr463099lfv.1.1708613301172;
+        Thu, 22 Feb 2024 06:48:21 -0800 (PST)
+Received: from [192.168.10.46] (146725694.box.freepro.com. [130.180.211.218])
+        by smtp.googlemail.com with ESMTPSA id f19-20020a05600c155300b00411ff030f06sm22717689wmg.9.2024.02.22.06.48.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Feb 2024 06:48:20 -0800 (PST)
+Message-ID: <e9947180-a10e-4359-b015-096506c1e39f@linaro.org>
+Date: Thu, 22 Feb 2024 15:48:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,47 +76,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/af_iucv: fix virtual vs physical address confusion
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240215080500.2616848-1-agordeev@linux.ibm.com>
- <47789946-0ffe-462e-9e2e-43b03ea41fe0@linux.ibm.com>
- <20240221143115.6b04b62a@kernel.org>
+Subject: Re: [PATCH v2 3/9] thermal: core: Drop the .set_trip_hyst() thermal
+ zone operation
 Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <20240221143115.6b04b62a@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 57L79kqtnc2jyl8ajdmgwNGZtjAKrHkT
-X-Proofpoint-ORIG-GUID: 57L79kqtnc2jyl8ajdmgwNGZtjAKrHkT
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-22_11,2024-02-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
- priorityscore=1501 lowpriorityscore=0 suspectscore=0 malwarescore=0
- adultscore=0 impostorscore=0 mlxlogscore=618 phishscore=0 mlxscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402220116
+To: "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+ Linux PM <linux-pm@vger.kernel.org>
+Cc: Lukasz Luba <lukasz.luba@arm.com>, LKML <linux-kernel@vger.kernel.org>,
+ Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>,
+ Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+ Zhang Rui <rui.zhang@intel.com>, netdev@vger.kernel.org,
+ Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+ Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+ linux-wireless@vger.kernel.org, Shawn Guo <shawnguo@kernel.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Manaf Meethalavalappu Pallikunhi <quic_manafm@quicinc.com>
+References: <6017196.lOV4Wx5bFT@kreacher> <2923201.e9J7NaK4W3@kreacher>
+From: Daniel Lezcano <daniel.lezcano@linaro.org>
+In-Reply-To: <2923201.e9J7NaK4W3@kreacher>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-
-
-On 21.02.24 23:31, Jakub Kicinski wrote:
-> On Thu, 15 Feb 2024 14:36:57 +0100 Alexandra Winter wrote:
->> I would have preferred to do all the translations in __iucv_* functions in iucv.c,
->> but I understand that for __iucv_message_receive() this would mean significant changes. 
+On 12/02/2024 19:32, Rafael J. Wysocki wrote:
+> From: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
 > 
-> FWIW we're assuming this is going via the s390 tree.
-> Please let us know if you prefer networking to pick it up.
+> None of the users of the thermal core provides a .set_trip_hyst()
+> thermal zone operation, so drop that callback from struct
+> thermal_zone_device_ops and update trip_point_hyst_store()
+> accordingly.
 > 
+> No functional impact.
+> 
+> Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+> ---
 
-Hello Jakub and maintainers,
+Reviewed-by: Daniel Lezcano <daniel.lezcano@linaro.org>
 
-please take this patch via net-next, as it belongs to the net/iucv module.
-Please excuse that it was not flagged with [PATCH net-next]
+-- 
+<http://www.linaro.org/> Linaro.org │ Open source software for ARM SoCs
 
-Kind regards
-Alexandra
+Follow Linaro:  <http://www.facebook.com/pages/Linaro> Facebook |
+<http://twitter.com/#!/linaroorg> Twitter |
+<http://www.linaro.org/linaro-blog/> Blog
+
 
