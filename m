@@ -1,112 +1,158 @@
-Return-Path: <netdev+bounces-74007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EEEA85F9C4
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 14:27:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5B9785F9D6
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 14:31:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88C001C250E1
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 13:27:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84A301F27536
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 13:31:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 516CA12FF90;
-	Thu, 22 Feb 2024 13:27:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BEE9134CFA;
+	Thu, 22 Feb 2024 13:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1SNH+KaY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IBkYPdke"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98B3F12F5B5
-	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 13:27:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88F7F1350EA
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 13:31:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708608457; cv=none; b=pcoe+EgLNnjDDqf9s4maQxjr2tN2UAzepSR1GmuvGnesksIpacMPPQmG/ZDdIKFgpcikF5151slsl465HjkaejSjGp6n1CdQa2LxuG/mCPtOff1T85LL3GR9B12e5wmEN63OPUF8n0/3028FdobsoYUj2B3FUoEeWyE3i0sbOnQ=
+	t=1708608670; cv=none; b=M9vuMxPdR1AwMAjwsP1DblrPJwuQeUhXDY/u3O3+S7i3GBLiWMJhlRrhA+jfw2Bk7VsStkOlM4W/5tob0NFBIYkGWODyDDypwjM3OsAtzVn/8apMc+lqiGaNI6LR67UqGAKKTo3XiQC1ilh1NGub3KTh+F74QRAGSuTFgAPwZcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708608457; c=relaxed/simple;
-	bh=Yv01f3SU14zyK7JMwHNf68+qOoZzkeRjV2RwRMZwhIM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=My+x+weFambxErXFBFcbf2DPTP3RtSnfSKFCYBNFHYylFteP3r3VrK459iSjchdia53rnfjqQgbw/KpEV0BcKOYpIiRLNxcYu1LixTK0dM0+pU8Z7RIp31QkTRLJLwzxVhKkxXTaOEzE5pTTZYwCL8ZwqbvAPpPIQq7vMtjnXTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1SNH+KaY; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-564e4477b7cso10063a12.1
-        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 05:27:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708608454; x=1709213254; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uZ6eOr+atEO3HsCU6zkySvIsF2Yw194pNlnhirXBpW8=;
-        b=1SNH+KaYzXYGxcuZRI+V4r+O4l/vpvl09W9q+6EqLVqnsc+zcGswuH3jNOE9PhgJzk
-         3/ww0eqGyvzacVKpiCijeXGaBaBpvEzZYMTaXdrfb129FUfKC/dcvSj7VuAGSuo2eFia
-         WsO6xiQYNF0P/lN9dkQKIL9wTib/XWMW2UO5K99yhGPW/SqagcuiFayAvJrZx3FJCQgA
-         HSs8PBL44I/KMVZdY6rHf/mPuHvfqatoDHAeGBFeWntfzLVM5+3xJc3UIPuNG/OkXqZ5
-         w0cyelRA7lR3vL5kw51qDetESl3Wl4Yf8mSNW/QI+1YuHBnEM7pJ598tPQA5QB/2Sy2y
-         8bzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708608454; x=1709213254;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uZ6eOr+atEO3HsCU6zkySvIsF2Yw194pNlnhirXBpW8=;
-        b=UknvMwTxXRgmZQ/YhbtjL5IHgFDD/AWc2L83axdeyVJDsgqIEKg6dV+X1Ft9mZ5PKn
-         6QIw8feBkJ+Ft/M3BSRK4CrWOaYvXtskVsWvFs9lBAD+ybnQ+kge2C6kP1k32UnNbeoS
-         qQ+WKiNbrKuFXBC0qQaw4q8bLbOz5wsNvfTx4zcLDFJZH/szM6+oXyQra0E2eyGemsZ7
-         VLfyxGK6DNJ/odwwt8TyOgOkXM+vrZyrSHxbF/2QTOXNPEWqKKLslLtkeSdvvSPcrRbA
-         nW+m5HNUFVnWKxSWb1lqppONifIDLfYmY4loD5BfB3t8RIo9hvDWNi9KubsuSbA8cP+4
-         wfUg==
-X-Forwarded-Encrypted: i=1; AJvYcCVFzidAPM0Yvojns6FpGaLkcemZKtiRxv1Rq5L5Ml+YtNFkNscUUkY8WOaa6x+BqsSpZ/csH5tlusDA9kzG0tQx50ggxImg
-X-Gm-Message-State: AOJu0Yz6oT9Kx82SX6zpI85sNuz6hS7pBvQPQYH3Az/M0crMrcZ0ocby
-	+jlcpGUuqhX897GhpKc7CzgB7FZYlLOJS5Ald+937SaUkjPAxYVlhUDXjpy9R++SZVFlp30Ukdo
-	5OB25cOzSPi14kzvJuQ8KfUkNleyQinpjrz2y
-X-Google-Smtp-Source: AGHT+IF9XT3dxwl5KOU4qzGawHUEMNYBukWn5CBBjWpLuGiljfbxAt4H6SflE6Efg8FKXAd6gBrvGToH32uPBP3C7o0=
-X-Received: by 2002:aa7:c1c7:0:b0:565:4edb:7449 with SMTP id
- d7-20020aa7c1c7000000b005654edb7449mr35828edp.2.1708608453685; Thu, 22 Feb
- 2024 05:27:33 -0800 (PST)
+	s=arc-20240116; t=1708608670; c=relaxed/simple;
+	bh=aOcJtCmwKp2GuBFt7gwIwEmbmxIllUoOP4HuHQpHAjE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S8W6IkYLRZeKfOPKmizETDd7uAv3ue6ab9pqxTRXUevk5jUymk7bo6myAp0SsNssqjOCKFsGJ0a6yx+70umZzbFk/S9oADDXS9kN7D01jRFZyeid8HN0kJWGEa7yhRtNV+3D9fg0/ta9zmETgCfeVwTx+cmlQJIRK+9x8A7lrOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IBkYPdke; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B09CDC433C7;
+	Thu, 22 Feb 2024 13:31:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708608668;
+	bh=aOcJtCmwKp2GuBFt7gwIwEmbmxIllUoOP4HuHQpHAjE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IBkYPdke3iI1N//HBlZqUDekP6PITPEZ1gqufxPPOx7I8aVsg4jhGe1Sd+1V/6LrT
+	 h9ZyexhnlHPBqSGdvmiSB1K7iRJguanPbo7cqsW4+rgnYkYWDe3yIf2RkgqVO59XAP
+	 WXgTE2MeeJji0OvaVlR8vRm4+OgrhwKljD8qWt6BzNsDvCFaHGwwxbwozXh/b7gXLw
+	 56Bp2rDECET0TlUV+ARswXxjARFLlMfWJ9LusIfVc12yiZBsasuyllikTXYlUa/suJ
+	 UNi2sYf4VaJIbdRDmN+lo7MheIXMXWM/Dcf54XPiEwgirBvn+3de9Tx3JqU+yEs0rV
+	 tiPGxxdBn2hwg==
+Date: Thu, 22 Feb 2024 13:31:03 +0000
+From: Simon Horman <horms@kernel.org>
+To: Diogo Ivo <diogo.ivo@siemens.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, danishanwar@ti.com, rogerq@kernel.org,
+	vigneshr@ti.com, arnd@arndb.de, wsa+renesas@sang-engineering.com,
+	vladimir.oltean@nxp.com, andrew@lunn.ch, dan.carpenter@linaro.org,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	jan.kiszka@siemens.com
+Subject: Re: [PATCH net-next v3 10/10] net: ti: icssg-prueth: Add ICSSG
+ Ethernet driver for AM65x SR1.0 platforms
+Message-ID: <20240222133103.GB960874@kernel.org>
+References: <20240221152421.112324-1-diogo.ivo@siemens.com>
+ <20240221152421.112324-11-diogo.ivo@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <00000000000043b1310611e388aa@google.com> <20240221131546.GE15988@breakpoint.cc>
- <CANn89iK_D+v2J7Ftg1W6-zn7KSZajwWVzfetSdrBPM6f_Zg80A@mail.gmail.com>
- <20240222122324.GB28098@breakpoint.cc> <CANn89iJ6UxRPRJeat==LXQS7B7rYpUN3BvBJv3w1_v5y53cfSg@mail.gmail.com>
- <20240222125738.GC28098@breakpoint.cc>
-In-Reply-To: <20240222125738.GC28098@breakpoint.cc>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 22 Feb 2024 14:27:18 +0100
-Message-ID: <CANn89iJZnY_0iM8Ft9cAOA7twCb8iQ4jf5FJP8fubg9_Z0EZkg@mail.gmail.com>
-Subject: Re: [syzbot] [net?] WARNING in mpls_gso_segment
-To: Florian Westphal <fw@strlen.de>
-Cc: syzbot <syzbot+99d15fcdb0132a1e1a82@syzkaller.appspotmail.com>, 
-	davem@davemloft.net, dsahern@kernel.org, horms@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240221152421.112324-11-diogo.ivo@siemens.com>
 
-On Thu, Feb 22, 2024 at 1:57=E2=80=AFPM Florian Westphal <fw@strlen.de> wro=
-te:
->
-> Eric Dumazet <edumazet@google.com> wrote:
-> > I was thinking about adding a debug check in skb_inner_network_header(s=
-kb)
-> > if inner_network_header is zero (that would mean it is not 'set' yet),
-> > but this would trigger even after your patch.
->
-> What about adding:
->
-> static inline bool skb_inner_network_header_was_set(const struct sk_buff =
-*skb)
-> {
->         return skb->inner_network_header > 0;
-> }
->
-> ... and using that instead of checking for negative header length
-> post-subtraction?
+On Wed, Feb 21, 2024 at 03:24:16PM +0000, Diogo Ivo wrote:
+> Add the PRUeth driver for the ICSSG subsystem found in AM65x SR1.0 devices.
+> The main differences that set SR1.0 and SR2.0 apart are the missing TXPRU
+> core in SR1.0, two extra DMA channels for management purposes and different
+> firmware that needs to be configured accordingly.
+> 
+> Based on the work of Roger Quadros, Vignesh Raghavendra and
+> Grygorii Strashko in TI's 5.10 SDK [1].
+> 
+> [1]: https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/tree/?h=ti-linux-5.10.y
+> 
+> Co-developed-by: Jan Kiszka <jan.kiszka@siemens.com>
+> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+> Signed-off-by: Diogo Ivo <diogo.ivo@siemens.com>
 
-SGTM
+...
+
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c b/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
+
+...
+
+> +static void icssg_config_sr1(struct prueth *prueth, struct prueth_emac *emac,
+> +			     int slice)
+> +{
+> +	struct icssg_sr1_config config;
+> +	void __iomem *va;
+> +	int i, index;
+> +
+> +	memset(&config, 0, sizeof(config));
+> +	config.addr_lo = cpu_to_le32(lower_32_bits(prueth->msmcram.pa));
+> +	config.addr_hi = cpu_to_le32(upper_32_bits(prueth->msmcram.pa));
+> +	config.num_tx_threads = 0;
+> +	config.rx_flow_id = emac->rx_flow_id_base; /* flow id for host port */
+> +	config.rx_mgr_flow_id = emac->rx_mgm_flow_id_base; /* for mgm ch */
+> +	config.rand_seed = get_random_u32();
+
+Hi Diogo and Jan,
+
+The fields of config above are all __le32.
+However the last three lines above assign host byte-order values to these
+fields. This does not seem correct.
+
+This is flagged by Sparse along with some problems.
+Please ensure that new Sparse warnings are not introduced.
+
+
+> +
+> +	for (i = PRUETH_EMAC_BUF_POOL_START_SR1; i < PRUETH_NUM_BUF_POOLS_SR1; i++) {
+> +		index =  i - PRUETH_EMAC_BUF_POOL_START_SR1;
+> +		config.tx_buf_sz[i] = cpu_to_le32(emac_egress_buf_pool_size[index]);
+> +	}
+> +
+> +	va = prueth->shram.va + slice * ICSSG_CONFIG_OFFSET_SLICE1;
+> +	memcpy_toio(va, &config, sizeof(config));
+> +
+> +	emac->speed = SPEED_1000;
+> +	emac->duplex = DUPLEX_FULL;
+> +}
+> +
+> +static int emac_send_command_sr1(struct prueth_emac *emac, u32 cmd)
+> +{
+> +	dma_addr_t desc_dma, buf_dma;
+> +	struct prueth_tx_chn *tx_chn;
+> +	struct cppi5_host_desc_t *first_desc;
+> +	u32 *data = emac->cmd_data;
+> +	u32 pkt_len = sizeof(emac->cmd_data);
+> +	void **swdata;
+> +	int ret = 0;
+> +	u32 *epib;
+
+In new Networking code please express local variables in reverse xmas tree
+order - longest line to shortest.
+
+Something like this (completely untested!):
+
+	struct cppi5_host_desc_t *first_desc;
+	u32 pkt_len = sizeof(emac->cmd_data);
+	dma_addr_t desc_dma, buf_dma;
+	struct prueth_tx_chn *tx_chn;
+	u32 *data = emac->cmd_data;
+	void **swdata;
+	int ret = 0;
+	u32 *epib;
+
+There is also one such problem in Patch 06/10.
+These problems can be detected using:
+
+	https://github.com/ecree-solarflare/xmastree
+
+...
 
