@@ -1,137 +1,114 @@
-Return-Path: <netdev+bounces-74119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFF3F8601E9
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 19:52:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3179C86022D
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 20:05:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9ADAF28DF95
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 18:52:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 75CEAB2D8AE
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 18:54:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 037D914B814;
-	Thu, 22 Feb 2024 18:42:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86EB16E5EC;
+	Thu, 22 Feb 2024 18:47:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eVvoMzfD"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="jZnn94kL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7477C14B802;
-	Thu, 22 Feb 2024 18:42:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D74E06E5E5
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 18:47:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708627339; cv=none; b=TwotOEz0Q3xjV2UgyW4WIWNF1oMf1+J+rLk8/e1b1fnh6FA4/G4C1VIBJF9V/AWc9SZCRTo6sVUT34qPrRxoWMeJ+rJ1LU2Av0Gi8Na77AyKMz0qH5akq4X39f+dlG1oXLbyz3xKPcop4E0vWSQ9H36yubN/tAjiTA2ybcHMGxc=
+	t=1708627627; cv=none; b=OGrPo+LD+R2sft2nRWJDMKM7NNukU7XfECqJBCWPyvAvzUjNjR5JEfe/dr8agXWwdYBUl4dP3y9k5DQw7FUktq8A7kaXrIKN75GAN4h8gBAqMFHoLKX6Lr95NfRuH7DSylYD9rt0akk2bp/OZJIAPN/FqsdWTY/q4d3xLQ1QNUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708627339; c=relaxed/simple;
-	bh=X5DPbtUuo167CmhEQH4ZaCaXl2qW67O4l0eto/HRpMM=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=pa/8Dd5k+qS+H01vaK7R1txlCUiMxiSEaYqFdRdERbINr992dB4FgAHdjAUfNHh8T4vzEaXvSEGLI/LmPNftLm8oLBydwtZUugaykJW9NaaS4HPlZx1oOPFBCcr3Ozd8oXdrD0ZtFwYpxkWH6Cdjrh9I4wy8dZvnyVix8/Pjr90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eVvoMzfD; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-787990149edso62710885a.3;
-        Thu, 22 Feb 2024 10:42:18 -0800 (PST)
+	s=arc-20240116; t=1708627627; c=relaxed/simple;
+	bh=NwoZ/s/YB6zInacwyEad3YhKFkgtInk+ILfXRdyVvto=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lDIHlzLh2k0COtwKvozwR7MhfLC9AXjOtSzT2YXvdppYcnj6yD4YuLxA3cEZPAQSy6s4M2OhvW5EiMM/4cuknc+2lgxPs6zFV6bwo4idcOplwKhqz+uJfD/eT65n0zrC9SAAc0ijBDmkGYou9BHMIhQxi6FsxqmjxLBSL26D3dc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=jZnn94kL; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-6da202aa138so1385330b3a.2
+        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 10:47:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708627337; x=1709232137; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5JY57+eYxgeopbrNEfdOzDb+UHFYaRCQjxBHdb2jOZM=;
-        b=eVvoMzfD+7LYbL8H4o5jqWdYjHkAvtfxVTRCyg8rSdaixPYkxjkYIi5RyFvQ5NVUqB
-         WeHNzteCL9gPAXUDU8DHnXr6Z4uLRPY9Hgxxm6euEA8BBl6K9SW+jmjWIrTs2KSWAHeq
-         YSYWdAH/BaSKPGxq48Nx+G0la9ObPdrvGzGIVLUQtOP6ZHewOKFrNt0WgX4pJXiQkb+I
-         fDrZNJ7aRbSvbmup8HV0401V7WuEovgNmYrsw+xKOj8a6QIGdV7S80XWAAzzKJSwdKFj
-         1R6rKJK6atCK7+OHh0pQW2N3C3CXAFmdi+AgXYBBFJm7ctrZrP0bIPGYMFPt4D1sesmR
-         5EBg==
+        d=chromium.org; s=google; t=1708627625; x=1709232425; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=W4vpO/kuwhEAbu5lyhpp3cdM+wCLzEUK+hlVl6YVNB0=;
+        b=jZnn94kLXyYka+9eXc6AizHVEys8TFY2OiJFG7PIg2WwOoOPGz/WnjIUBC7K1XuDyA
+         N9WXbD4i43+FAb+UXraPUYghcAZtBZ9c/hsS++vfJPdXD4DWX6Tn2LFckfPHMQVQ39OA
+         b5jXaD5DSRAvbP8DPkBMeXcy0mMxLq472fvQY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708627337; x=1709232137;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=5JY57+eYxgeopbrNEfdOzDb+UHFYaRCQjxBHdb2jOZM=;
-        b=FfOs330LNQRUw3jj53TGORW6DAQbf0rR/NZ35Fa6VrFBu568/n17eKq6W0pf7hQIHR
-         Y4iKt2Q5haZbz0vUiQHE6B3hMUjeP//Q4SWzNLQfTSKE5E3cjyZFYktiPskOE7kme9aF
-         DKuo8/PFAY8fNsHCcatkJ63yn6nLxhLf+MkLkavEKvMPsgmYyf4fdO7moSQ5oUGxWjl9
-         8ezX6XnF57ImmJfh+SZZSBpH8NbojtgBYCq2cV8jPt6Gc4bTqnLmgtCUEaVLGLRKsOa7
-         WaDkg098GZeWRoA8g6cJnBB2Ccc+KmZsjO9JXf293XqLs8/0QAw7aec20ilenqIpilBX
-         I1Yw==
-X-Forwarded-Encrypted: i=1; AJvYcCXBBUDLOxE5IaMUJpf64UHMuFAYMHHfgoiIXhZRYtLi4fCeJzswTFtD7E6GiFDx3depjHAwGT5SPXCkNCfZ+JJmaWDWeBzEjpl5XFou
-X-Gm-Message-State: AOJu0YxPnajE1NY96zZ6wEZ+DHpJCDcBLHpvk+Bcyh5Uezf1Qo46s+H/
-	ccpfWb6NEIcGymV7eDrpmLGk4iHJ9N9/RHeyYQPs+T3Ey34XeEEOQR/QO3Nq
-X-Google-Smtp-Source: AGHT+IEei0q7Q4XqoOQZJBSxgNbHlzC2WpFyHXkKvYFhxKhCrg0y7NTK2ahXSWsHltPeKbWXsFrgAg==
-X-Received: by 2002:a05:620a:20d8:b0:787:34f6:a706 with SMTP id f24-20020a05620a20d800b0078734f6a706mr22687920qka.28.1708627337199;
-        Thu, 22 Feb 2024 10:42:17 -0800 (PST)
-Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
-        by smtp.gmail.com with ESMTPSA id vv14-20020a05620a562e00b00787acc6a3c7sm126403qkn.65.2024.02.22.10.42.16
+        d=1e100.net; s=20230601; t=1708627625; x=1709232425;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=W4vpO/kuwhEAbu5lyhpp3cdM+wCLzEUK+hlVl6YVNB0=;
+        b=eL43HcfKPeNfGQfiAqQfFnoYPXIOXM12+fULuvEFmih0kFCCIRn0NLIrWCyYF0CtnU
+         8zia4Ao2GlhIUhZLXFq3Ko221xSn9219AjHU1ZszU6cNoO06xua6aABYcSUsBYgD+bMB
+         7nWkz3nx/C6bydg39FPuJoejZHxm1s9BUspqcIKgf6wGjmfxKcKiL3uPLtoJWDZwLkFK
+         EeqKKZ72NHOWDdPZNdcYv2V3i6JbFrBkJVid0bWYJ6MWTN3rWx20+ne8Nv1KSNreeUUs
+         F++3epSLZX5FqA1GSWb/S2LbezKq3cRR4jpKqBzFQ/W5vna3R5Ql71zOmp9unb3d8xGZ
+         zrww==
+X-Forwarded-Encrypted: i=1; AJvYcCU1/v2wWbliyYcoZx7Pca6VcgCS2Z98x4vkp/xxewyQ057fRMgSx6ych1zLaGIkXZ/qcLvylAy6XPr3QSNqyQUbiF//ilan
+X-Gm-Message-State: AOJu0YzhIo2MY3N9x1vJIaaqaKqq+M8DRTNc1VmR5XHarma2UafIT6P1
+	P6u8WUsMrVDdcf9nwOIa5NoxQGtzixCIlrMr11TQSWuoXXwjaNOcb60QgpkZKQ==
+X-Google-Smtp-Source: AGHT+IHgy3WwdGAsnQPmK2m2JDsitnCNDlW/VOsDIP4yBtdVhbhIse0VsuYogkkxJuuqsoNLgdNNGw==
+X-Received: by 2002:a05:6a00:6c95:b0:6e4:6a3f:f065 with SMTP id jc21-20020a056a006c9500b006e46a3ff065mr12647864pfb.10.1708627625231;
+        Thu, 22 Feb 2024 10:47:05 -0800 (PST)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id s12-20020aa7828c000000b006e0651ec05csm11280323pfm.43.2024.02.22.10.47.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Feb 2024 10:42:16 -0800 (PST)
-Date: Thu, 22 Feb 2024 13:42:16 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Marcelo Tosatti <mtosatti@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Jakub Kicinski <kuba@kernel.org>, 
- Eric Dumazet <edumazet@google.com>, 
- Frederic Weisbecker <frederic@kernel.org>, 
- Valentin Schneider <vschneid@redhat.com>
-Message-ID: <65d795888e904_2c3076294d2@willemb.c.googlers.com.notmuch>
-In-Reply-To: <ZdeJyxiTSKtkpHMO@tpad>
-References: <ZdSAWAwUxc5R46NH@tpad>
- <65d7640c7983b_2bd671294c3@willemb.c.googlers.com.notmuch>
- <ZdeJyxiTSKtkpHMO@tpad>
-Subject: Re: [PATCH] net/core/dev.c: enable timestamp static key if CPU
- isolation is configured
+        Thu, 22 Feb 2024 10:47:04 -0800 (PST)
+Date: Thu, 22 Feb 2024 10:47:04 -0800
+From: Kees Cook <keescook@chromium.org>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+	"Gustavo A . R . Silva" <gustavoars@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yhs@fb.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
+	Haowen Bai <baihaowen@meizu.com>, bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Jonathan Corbet <corbet@lwn.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Joanne Koong <joannelkoong@gmail.com>,
+	Yafang Shao <laoar.shao@gmail.com>, Kui-Feng Lee <kuifeng@meta.com>,
+	Anton Protopopov <aspsk@isovalent.com>,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	netdev@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v6] bpf: Replace bpf_lpm_trie_key 0-length array with
+ flexible array
+Message-ID: <202402221046.020C94D@keescook>
+References: <20240222155612.it.533-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240222155612.it.533-kees@kernel.org>
 
-Marcelo Tosatti wrote:
-> On Thu, Feb 22, 2024 at 10:11:08AM -0500, Willem de Bruijn wrote:
-> > Marcelo Tosatti wrote:
-> > > For systems that use CPU isolation (via nohz_full), creating or destroying
-> > > a socket with  timestamping (SOF_TIMESTAMPING_OPT_TX_SWHW) might cause a
-> > > static key to be enabled/disabled. This in turn causes undesired 
-> > > IPIs to isolated CPUs.
-> > 
-> > This refers to SOF_TIMESTAMPING_RX_SOFTWARE, not SOF_TIMESTAMPING_OPT_TX_SWHW.
-> > See also sock_set_timestamping.
-> 
-> Willem,
-> 
-> This test program does trigger the static key change:
-> 
-> int main (void)
-> {
->         int option = SOF_TIMESTAMPING_OPT_TX_SWHW;
->         int sock_fd;
->         int ret;
->         int pid_fd;
->         pid_t pid;
->         char buf[50];
-> 
-> ...
-> 
->         /* set the timestamping option
->          * this is to trigger the IPIs that notify all cpus of the change
->          */
->         if (setsockopt(sock_fd, SOL_SOCKET, SO_TIMESTAMP, &option, sizeof (option)) < 0) {
->                 printf("Could not enable timestamping option %x", (unsigned int)option);
->                 close(sock_fd);
->                 return 0;
->         }
-> ...
-> 
+On Thu, Feb 22, 2024 at 07:56:15AM -0800, Kees Cook wrote:
+> Replace deprecated 0-length array in struct bpf_lpm_trie_key with
+> flexible array. Found with GCC 13:
 
-That is because you call SO_TIMESTAMP, which interprets option as a
-boolean. The SOF_ flags apply to setsockopt SO_TIMESTAMPING.
+Yay! This finally passes all of CI:
+https://patchwork.kernel.org/project/netdevbpf/patch/20240222155612.it.533-kees@kernel.org/
 
+-- 
+Kees Cook
 
