@@ -1,102 +1,144 @@
-Return-Path: <netdev+bounces-74105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 141A886002E
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 18:57:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B194A860033
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 18:59:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 452691C238E3
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 17:57:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 999971C23F69
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 17:59:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE3DB15696C;
-	Thu, 22 Feb 2024 17:57:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45060155A5C;
+	Thu, 22 Feb 2024 17:59:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TCnNDK7A"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lNz41QyK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4684155A5C;
-	Thu, 22 Feb 2024 17:57:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CBD2155A39;
+	Thu, 22 Feb 2024 17:58:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708624669; cv=none; b=Kb7Czhz508WCv7fWNnqm6i+BwtT0JPu0Zc99HuLFGmihw5kNPyI6Ju37ejgewZduWzdqasRuMZyE4vS+0PihWn4OXpCwG6/hRRGcIs3Mjou7G3D+wSG6eCnvhLPsHJGaGgziPcESH02tNFhAh07ZAjwFLIk6PyQvvskXXy+OJbg=
+	t=1708624740; cv=none; b=KwJ77qylUX/Fa7VnySA7RxIOXJp1irHUg+iRarXgr8uU49Guo0aqkPMiaYtKXKi+LFKad326GxReEKtxV5OX+mkTMnckgN3mZYzUkJn5J8AN/FBEE1eRch16OLX7WOrejmaGrb8mUv4W7qkhvdghrhJXW7UfDqzZY6Ugt12+eMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708624669; c=relaxed/simple;
-	bh=NlepLU1IkX5NFGOdm1Fp+waf/GdME+Xd7+O2IGTpcGc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rJXxen35T8Ha4sVz62iC/PTHasw1bCGG0e9KrmJeduN3rEJePVsOPkO5Y1Ca29aZEb30PT+oyDqavkMjCBKn5XENdPxJymqrJ2yQiQnShkq1Z56OsNocgqdvQAcIYn9ZMTr85qNslnm92Ap3AW0PpmDIBq7mwWNH8E+iiBkpQFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TCnNDK7A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77EE6C433C7;
-	Thu, 22 Feb 2024 17:57:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708624669;
-	bh=NlepLU1IkX5NFGOdm1Fp+waf/GdME+Xd7+O2IGTpcGc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TCnNDK7ANhJpdzwCBCRy2xDVk78UIk0xDNsQG2zwV6yjRwM2UlNBvVvGe+3DUUHdl
-	 C4ukqvrf/91XtmT3KU+wWhLliHWuM/xUepWZur7luVJH+U1OICS1zKqtfSPFlwPOCs
-	 +v9qY+41/qxcPFvemjPX4BKT16V26xlD0Sk3s+e+spBpv0ufFGWtYMeBX9yZSAQcjT
-	 uTYg+IfA9sVSWiL7FLGss9Bhv5gOn3xIz+5M8Pb841aWf/H8FoXBeosTJk8kBgFe2p
-	 PFiS2p6U36+D8my8LaUfQUwkTicx+qEjdAojqQnZmflgsfpb4xBXAMNEQXw181yXjz
-	 Pqlk0e4d7RQsg==
-Date: Thu, 22 Feb 2024 17:57:44 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Diogo Ivo <diogo.ivo@siemens.com>
-Cc: danishanwar@ti.com, rogerq@kernel.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	jan.kiszka@siemens.com
-Subject: Re: [PATCH net-next v3 01/10] dt-bindings: net: Add support for
- AM65x SR1.0 in ICSSG
-Message-ID: <20240222-rebate-squiggle-d6801d506994@spud>
-References: <20240221152421.112324-1-diogo.ivo@siemens.com>
- <20240221152421.112324-2-diogo.ivo@siemens.com>
+	s=arc-20240116; t=1708624740; c=relaxed/simple;
+	bh=dtBzsaFY2WAwF8areVe2KKs9tKw0qlKHLRdFyfRgo88=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LtXUBBOaIeGV1j04AtmWNUFO72UpmGW2AoVH+/hC0M72EPqIt/+HjFMcmLLQXkptXlF7d+HzHj4pCWUrmMdM172B0ugnXtbAmcAx6s9gbmn/tnPr/sgA/5GOrFEh8oMVFGB8se20Nr03JlznJsg4yIiBm+Dp0VqINQJQKsNi3ks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lNz41QyK; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-512d19e2cb8so79761e87.0;
+        Thu, 22 Feb 2024 09:58:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708624736; x=1709229536; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cz55Zzpfo/zk1u1UrDBK1WZgp/imaYiWSbF3hiJkto8=;
+        b=lNz41QyKM865/qW65ukfrWp19vTkOKB1S9XbqlRc03WFI6hfOE/5WfIus6LKBBpAsL
+         NffQr1psmxgIT02yYJw3nZ9W3zf6o6iI6pPlBKV/PVLrtMrCO39dtXT0nS1fY7LnymR9
+         /ZcneRIGn9A3qA6wm9Rx7oDBM24vUUUiPJ6g3YD4tmAiu5BSDzvW5PVEoWlVdF+/0OxO
+         SIidvCEEBI7XKFT+0qqhy3LSyT0TndC0QbI4OM9MkBxD+XvVzhKwt5yUTbQLefRWZrwu
+         ngvZDaDi19zkLlRMuSDP4ggA6sURHjr5SgoPNs0jmLjai9xpzJ79kFShGHzJdGOqhyAw
+         LhHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708624736; x=1709229536;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cz55Zzpfo/zk1u1UrDBK1WZgp/imaYiWSbF3hiJkto8=;
+        b=wKOYsSmmWOqcKz96TSf69N3utAFwaHKBxbhwq6u+GPhgvYDElEH77pyPD1QD8tBoeh
+         HSu2+VLQ/aS6tYPKXcgFHLwg1ualpK+qeiY+U+7VgGDRZVJjU6KjJxM6DWloxbQQu72K
+         4GkHflfboyf3Pko3hvMFhZU2BFf+kVLR6MGe9MC1y3roDvnIN3zZicxnkpvjsO141Kz9
+         DlsLod2bwUeh+e7rRCAD3fEGL2XEk9Yh5olshiuen78urZOHv4+p0CZRfw/BX1Fapji9
+         SFlHSmoVerBafTlJTDRrv7cDtfBdaXf5BduKiENZaaRIgzNOBcxgcKSVU4cX9aAsab/C
+         lRkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWsCYwT80ebkSvTkq7kgNk1ETO6ujSFVItkpB9I0IkJmXh/HzN/29hUbmqEzm4sAiThXX2FE+vLI69+sRKlHPpLUaH83ZOsKRHmAvQdNh2eGXkc7CpP/REOzV9jVsEfPPZGd2hP
+X-Gm-Message-State: AOJu0YziKGKP1orAYb/q8pJhm1kwiQkX6IBVgnVkrhqjh9I+/BRzqxhh
+	hhMSQJYZlfw79kmxLor+UGGW7HSFb3DuDD//iabyx6KPWqWMVJMgRCkvdGV7rA4=
+X-Google-Smtp-Source: AGHT+IE/1Dk0fjNMEbmuMP18Tm/K1SfZnMv41lhns0HjNNdVpdbheULkXP3yVIXQIWLc1QyRxeNXzg==
+X-Received: by 2002:a05:6512:2349:b0:511:6c63:f76a with SMTP id p9-20020a056512234900b005116c63f76amr17664673lfu.41.1708624736307;
+        Thu, 22 Feb 2024 09:58:56 -0800 (PST)
+Received: from localhost ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id q25-20020a05651232b900b00512a949a4d6sm1957987lfe.7.2024.02.22.09.58.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Feb 2024 09:58:55 -0800 (PST)
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Jose Abreu <joabreu@synopsys.com>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Serge Semin <fancer.lancer@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Tomer Maimon <tmaimon77@gmail.com>,
+	Jiawen Wu <jiawenwu@trustnetic.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	openbmc@lists.ozlabs.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2 0/4] net: pcs: xpcs: Cleanups before adding MMIO dev support
+Date: Thu, 22 Feb 2024 20:58:19 +0300
+Message-ID: <20240222175843.26919-1-fancer.lancer@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Hhfnaeilk2i9ejhd"
-Content-Disposition: inline
-In-Reply-To: <20240221152421.112324-2-diogo.ivo@siemens.com>
+Content-Transfer-Encoding: 8bit
 
+As stated in the subject this series is a short prequel before submitting
+the main patches adding the memory-mapped DW XPCS support to the DW XPCS
+and DW *MAC (STMMAC) drivers. Originally it was a part of the bigger
+patchset (see the changelog v2 link below) but was detached to a
+preparation set to shrink down the main series thus simplifying it'
+review.
 
---Hhfnaeilk2i9ejhd
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The patchset' content is straightforward: drop the redundant sentinel
+entry and the header files; return EINVAL errno from the soft-reset method
+and make sure that the interface validation method return EINVAL straight
+away if the requested interface isn't supported by the XPCS device
+instance. All of these changes are required to simplify the changes being
+introduced a bit later in the framework of the memory-mapped DW XPCS
+support patches.
 
-On Wed, Feb 21, 2024 at 03:24:07PM +0000, Diogo Ivo wrote:
-> Silicon Revision 1.0 of the AM65x came with a slightly different ICSSG
-> support: Only 2 PRUs per slice are available and instead 2 additional
-> DMA channels are used for management purposes. We have no restrictions
-> on specified PRUs, but the DMA channels need to be adjusted.
->=20
-> Co-developed-by: Jan Kiszka <jan.kiszka@siemens.com>
-> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
-> Signed-off-by: Diogo Ivo <diogo.ivo@siemens.com>
+Link: https://lore.kernel.org/netdev/20231205103559.9605-1-fancer.lancer@gmail.com
+Changelog v2:
+- Move the preparation patches to a separate series.
+- Simplify the commit messages (@Russell, @Vladimir).
 
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Mengyuan Lou <mengyuanlou@net-swift.com>
+Cc: Tomer Maimon <tmaimon77@gmail.com>
+Cc: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>
+Cc: openbmc@lists.ozlabs.org
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-Cheers,
-Conor.
+Serge Semin (4):
+  net: pcs: xpcs: Drop sentinel entry from 2500basex ifaces list
+  net: pcs: xpcs: Drop redundant workqueue.h include directive
+  net: pcs: xpcs: Return EINVAL in the internal methods
+  net: pcs: xpcs: Explicitly return error on caps validation
 
---Hhfnaeilk2i9ejhd
-Content-Type: application/pgp-signature; name="signature.asc"
+ drivers/net/pcs/pcs-xpcs.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
------BEGIN PGP SIGNATURE-----
+-- 
+2.43.0
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZdeLGAAKCRB4tDGHoIJi
-0h3SAPwIj1Tsf7UlvzD0iQym9nQVdjpmIASXKB1SDp7tg3Pn4QD+Jk8XT0oG4HMP
-rwBe4sL/qYwJsYrE5yqJgujYHCUC0wM=
-=Z4S5
------END PGP SIGNATURE-----
-
---Hhfnaeilk2i9ejhd--
 
