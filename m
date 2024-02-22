@@ -1,181 +1,309 @@
-Return-Path: <netdev+bounces-74018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9EDA85FA1B
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 14:44:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A79785FA2B
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 14:46:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 16E57B261E9
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 13:44:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ED4C9B254CE
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 13:46:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9072A1419A2;
-	Thu, 22 Feb 2024 13:44:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5181D137C2B;
+	Thu, 22 Feb 2024 13:46:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="AI1TcbPA"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kwNavLGi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B89A513B296
-	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 13:44:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1750E135A67
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 13:46:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708609449; cv=none; b=qGmKoSJrFWf+9gDhCxosYPgEfSVxJwvAEDRoUvjSZBKeR5QNzSDguHpnd+ZSpRIDtvdFIAgkHRKUveQ3Sc6SINF4NZii8ndrY6YCI0IVVIAXvh1CTKwOaqxw0qO37C+rinQSVO4/vLnTbB2rqqTJlBBa2n+SkaLvxNOyUEgjzBY=
+	t=1708609578; cv=none; b=hr66Rc/aLIYVWzTV9AMTCAl1hacb7PEYIrUiN/gPKxOaWPX1XZnZ5rFgoIj1w7QsCwmqoxsEY65AGQEYrlxVLbk8vZzvRn0j1OhyPWv7s0Chu/THnsSSVSemVNV3Ko6rnRsu93uGdzJdilMf8XRDDAhBfUfsWsjwsTE8QjzOAYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708609449; c=relaxed/simple;
-	bh=TEVRe+sUpzzN+HsUjVxeytZ+wm7epXxye4BPtOPzHLc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=udOMeQGJu6AWZr2wl1HM4WXzKnl52cZAPHABadO0fVLWsrpot44qsVlui1/gxeLxQB5WLS8sCVDO2+Qyc+XE6gyB09ITPxiyq2QRIFzOs2P+mWMnXc/DKQVcmg5r+e/6Mr+J7AJgqeDGht3kYYBTemIHlULBc4+MDh8eBnqoFtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=AI1TcbPA; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2d208be133bso87400261fa.2
-        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 05:44:07 -0800 (PST)
+	s=arc-20240116; t=1708609578; c=relaxed/simple;
+	bh=//BjmZqElisJvB87PrLkDfxz0MDSpq9JmNb7xW9SVRs=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Vh+C0AZrJ/rLFSYwoFF+0XrV26EDUXFFQlJ6XvGsdNfrZXduhu6pR6Bj47l/uavbbmdWxsXexX9TpZtepgXPyNmn5wrAq4Z0JQScsG8gDiSh2mwZuhHlxWKfpohzpDekrBs9m14e2cC9dnYHA2KtmABv70xOqXPAPu0LixJldGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=kwNavLGi; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2d220ad10b3so74418921fa.1
+        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 05:46:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708609446; x=1709214246; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iYXsYJGiQfqijxYyQOyyM1nVM3Rpld49x3qHPu0qp+M=;
-        b=AI1TcbPAODH9Xv8KIKRg9aAEu//ctFneyK3QlZaIriJ7oNdF/kb/IV930BRDEHzWdh
-         x45rMkghCdnGXPCvCfUytlqams/xaQoaxwheYHsSNwx2UWjzGEsEfs6zqoLkoBPJLgjx
-         6wQJvmx18YJFQmBxwyJdjvKIHiWnAiNstHDzVTzxU1f7D2FltXTLxUt++uqrA3CpmLCG
-         OOA4GsAJAnyyq5aKvpMWYc4jAtjlgLQh2ymcRe1fsGLwEzOn34WitU78igoPzciS5C7a
-         zilZelyDVwhP6QMflh0MaSwKzKF5Y6s+6o5KwOxudxJBBVTm51mowkvC29ugF8hVPORI
-         fgaw==
+        d=linaro.org; s=google; t=1708609574; x=1709214374; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :references:cc:to:content-language:subject:reply-to:from:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QxvZhJ0oC8b5xehzw1uduygrx17Uz2gfqPj007jbSmU=;
+        b=kwNavLGiD2zgvn+2yrMOwLvJoabDupAYWTm3DrddP74iK31WnDXzkz2iP/rwWl+ruI
+         wuGOIi5t5UTbQPF+dBCdTOXv72Aba7iEkqpmhldItXahgY8nSZT7YEkrV63BpnLb8HsW
+         uoViytRHuyUR9Il1osNFusF923mMLYtBVMPQYtj7DJ5xwwfbyXunuXs/3U/j23m0bTfd
+         2F70S7VHLAKmBGjL95xLBTmczuEzYGgIuTTGIeywS2BbG1+RR3cVgcXVxigRvpvQloJ1
+         UAL/aF8BNabuxDIfYHEa4vPdKasVVZKJwS+f6Fn9bgJs6XPyOfML7NjFtlznTnOckvPb
+         uVzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708609446; x=1709214246;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iYXsYJGiQfqijxYyQOyyM1nVM3Rpld49x3qHPu0qp+M=;
-        b=NROeE5xTCPPDPLFdzH1x+No8mMAOU4Qvxp5vG/xmGbHHVIkYJ+LXojGszv5s5ej3Eh
-         bmJLW2AXOZAjVi5Ryvi4p1sdlcA0SVRfCw171CleEIdFpMC4vDw2fSZLPhgPKs1Dr4t+
-         iP6R/sGZWrby5ZuXqyBeFkLCa6osKMXWsBBO0/24S9QRIDehW/82L70c/1lgkGEmZ4tC
-         uiPdTuIg0yXhliKGRhn17vFRa4RdcWVvcQVtLrlf2aeM4V8bmTS1wQBkpPTsLjzXvTWJ
-         KR2pzWz1Sr42pQO9lyjOoqLIyLb+5mbtrUImgC+L6xMZEahQA4baA2NOBMm6wT0WBtBW
-         HE0g==
-X-Gm-Message-State: AOJu0Yyuay6d9d/e0xfuEVllYMxfyII9ETJxx7bdVTbCNFiVu2P+m26P
-	2IxsWfiRPrc0lvsFPKxlQKVRBlV3oeFwKCSWtlh9Z731uVM3WDqF+MQ1dci+Am9zBkx6gLrsuPJ
-	Z
-X-Google-Smtp-Source: AGHT+IEuFGxllMTJf+x3UmOmWeMA85z9Gsk7lEv5E6LHdi6Ca9JQ1kWolxDfkYIoN6v5wEggogsQnw==
-X-Received: by 2002:a2e:3807:0:b0:2d2:6568:eb6c with SMTP id f7-20020a2e3807000000b002d26568eb6cmr595632lja.30.1708609445731;
-        Thu, 22 Feb 2024 05:44:05 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id m16-20020a05600c3b1000b0041262ec5f0esm15648264wms.1.2024.02.22.05.44.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Feb 2024 05:44:05 -0800 (PST)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	jacob.e.keller@intel.com,
-	swarupkotikalapudi@gmail.com,
-	donald.hunter@gmail.com,
-	sdf@google.com,
-	lorenzo@kernel.org,
-	alessandromarcolini99@gmail.com
-Subject: [patch net-next v3 3/3] tools: ynl: allow user to pass enum string instead of scalar value
-Date: Thu, 22 Feb 2024 14:43:51 +0100
-Message-ID: <20240222134351.224704-4-jiri@resnulli.us>
-X-Mailer: git-send-email 2.43.2
-In-Reply-To: <20240222134351.224704-1-jiri@resnulli.us>
-References: <20240222134351.224704-1-jiri@resnulli.us>
+        d=1e100.net; s=20230601; t=1708609574; x=1709214374;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :references:cc:to:content-language:subject:reply-to:from:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=QxvZhJ0oC8b5xehzw1uduygrx17Uz2gfqPj007jbSmU=;
+        b=H0HgMejF9bMhOlVANzgl361xiHBZU9ArOau161Ijbhb78kvwSyZnzB3HLo9jN2WsS3
+         JoIDqC+vns+rb3OvBelbwHhWuGmSleXrrFYPnybkxKZ2KNYANP0ZMPNxGZqdVCtr5p+r
+         CzaB46kUHMLaiIp/MoXQJc7xIQdfsEX0TyMTAn5pTpGUbFHmyRWf8hOOUF+wG3mZTfJb
+         w3QDxggvLqFf2gZDPCsJqIpd1vPYGOriAWsZnjQLs6qBcitKkuhNwNMrZR+gvkCPDlfN
+         1xodUu+8LtiaTukol10IaFe78II0xMHnqDoImq+Ey7dBKhtBv/mVd++kHdCzmTHcZLYF
+         N+Jw==
+X-Forwarded-Encrypted: i=1; AJvYcCViPkdg7rf/zJEREjnJFfGcO+NM7jHPl6u9GyX1E9nvEIOHVFmsXtUfORpOMvbzP5HJj6oT6g4QhL8o6sZv0Va46NinetIb
+X-Gm-Message-State: AOJu0Yyny+Ckhk52pYItT3ab4fzShqaOoYBC9BZec1gtIze9gyViVEQS
+	1ej6vscTx/fcMA5SAj+3VTpKndAhW6jW4KVIWWcf2Ez3DyD4QmIGBJJpV4gcO/E=
+X-Google-Smtp-Source: AGHT+IEYkHYJhyetOsTePLj9kqPi0h7qj4xA8GvixXba4W/vyi5pgAF10kX6npOiu+l/MuUIlY8NOQ==
+X-Received: by 2002:a2e:a9a2:0:b0:2d0:e35a:3bab with SMTP id x34-20020a2ea9a2000000b002d0e35a3babmr17094459ljq.48.1708609574044;
+        Thu, 22 Feb 2024 05:46:14 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:982:cbb0:c3d:c732:acf9:f53b? ([2a01:e0a:982:cbb0:c3d:c732:acf9:f53b])
+        by smtp.gmail.com with ESMTPSA id k3-20020a056000004300b0033b79d385f6sm20423663wrx.47.2024.02.22.05.46.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Feb 2024 05:46:13 -0800 (PST)
+Message-ID: <aaa20b12-6625-43ae-a07c-9d601e5da391@linaro.org>
+Date: Thu, 22 Feb 2024 14:46:11 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+From: neil.armstrong@linaro.org
+Reply-To: neil.armstrong@linaro.org
+Subject: Re: [PATCH v5 00/18] power: sequencing: implement the subsystem and
+ add first users
+Content-Language: en-US, fr
+To: Bartosz Golaszewski <brgl@bgdev.pl>,
+ Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Rob Herring <robh@kernel.org>, Conor Dooley <conor+dt@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Kalle Valo <kvalo@kernel.org>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konrad.dybcio@linaro.org>, Liam Girdwood
+ <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Bjorn Helgaas <bhelgaas@google.com>, Saravana Kannan <saravanak@google.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>,
+ Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>,
+ Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Abel Vesa <abel.vesa@linaro.org>, Manivannan Sadhasivam <mani@kernel.org>,
+ Lukas Wunner <lukas@wunner.de>, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-pci@vger.kernel.org, linux-pm@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+References: <20240216203215.40870-1-brgl@bgdev.pl>
+ <CAA8EJppt4-L1RyDeG=1SbbzkTDhLkGcmAbZQeY0S6wGnBbFbvw@mail.gmail.com>
+ <e4cddd9f-9d76-43b7-9091-413f923d27f2@linaro.org>
+ <CAA8EJpp6+2w65o2Bfcr44tE_ircMoON6hvGgyWfvFuh3HamoSQ@mail.gmail.com>
+ <4d2a6f16-bb48-4d4e-b8fd-7e4b14563ffa@linaro.org>
+ <CAA8EJpq=iyOfYzNATRbpqfBaYSdJV1Ao5t2ewLK+wY+vEaFYAQ@mail.gmail.com>
+ <CAMRc=Mfnpusf+mb-CB5S8_p7QwVW6owekC5KcQF0qrR=iOQ=oA@mail.gmail.com>
+ <CAA8EJppY7VTrDz3-FMZh2qHoU+JSGUjCVEi5x=OZgNVxQLm3eQ@mail.gmail.com>
+ <b9a31374-8ea9-407e-9ec3-008a95e2b18b@linaro.org>
+ <CAA8EJppWY8c-pF75WaMadWtEuaAyCc5A1VLEq=JmB2Ngzk-zyw@mail.gmail.com>
+ <CAMRc=Md6SoXukoGb4bW-CSYgjpO4RL+0Uu3tYrZzgSgVtFH6Sw@mail.gmail.com>
+ <CAA8EJprUM6=ZqTwWLB8rW8WRDqwncafa-szSsTvPQCOOSXUn_w@mail.gmail.com>
+ <CAMRc=Metemd=24t0RJw-O9Z0-cg4mESouOfvMVLs_rJDCwRBPQ@mail.gmail.com>
+ <CAA8EJprJTj7o0ATrQbF_38tW+kLspF1nBySg+_y_RWmadVnV9A@mail.gmail.com>
+ <CAMRc=MfkQuaJ3FnVwbVKQRQEgmJKbZh7SJoK3Kbmb5ebzE2rKA@mail.gmail.com>
+Autocrypt: addr=neil.armstrong@linaro.org; keydata=
+ xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
+ GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
+ BVF2WzvGyyeV1o4RTCYDnZ9VLLylJ9bneEaIs/7cjCEbipGGFlfIML3sfqnIvMAxIMZrvcl9
+ qPV2k+KQ7q+aXavU5W+yLNn7QtXUB530Zlk/d2ETgzQ5FLYYnUDAaRl+8JUTjc0CNOTpCeik
+ 80TZcE6f8M76Xa6yU8VcNko94Ck7iB4vj70q76P/J7kt98hklrr85/3NU3oti3nrIHmHABEB
+ AAHNKk5laWwgQXJtc3Ryb25nIDxuZWlsLmFybXN0cm9uZ0BsaW5hcm8ub3JnPsLAkQQTAQoA
+ OwIbIwULCQgHAwUVCgkICwUWAgMBAAIeAQIXgBYhBInsPQWERiF0UPIoSBaat7Gkz/iuBQJk
+ Q5wSAhkBAAoJEBaat7Gkz/iuyhMIANiD94qDtUTJRfEW6GwXmtKWwl/mvqQtaTtZID2dos04
+ YqBbshiJbejgVJjy+HODcNUIKBB3PSLaln4ltdsV73SBcwUNdzebfKspAQunCM22Mn6FBIxQ
+ GizsMLcP/0FX4en9NaKGfK6ZdKK6kN1GR9YffMJd2P08EO8mHowmSRe/ExAODhAs9W7XXExw
+ UNCY4pVJyRPpEhv373vvff60bHxc1k/FF9WaPscMt7hlkbFLUs85kHtQAmr8pV5Hy9ezsSRa
+ GzJmiVclkPc2BY592IGBXRDQ38urXeM4nfhhvqA50b/nAEXc6FzqgXqDkEIwR66/Gbp0t3+r
+ yQzpKRyQif3OwE0ETVkGzwEIALyKDN/OGURaHBVzwjgYq+ZtifvekdrSNl8TIDH8g1xicBYp
+ QTbPn6bbSZbdvfeQPNCcD4/EhXZuhQXMcoJsQQQnO4vwVULmPGgtGf8PVc7dxKOeta+qUh6+
+ SRh3vIcAUFHDT3f/Zdspz+e2E0hPV2hiSvICLk11qO6cyJE13zeNFoeY3ggrKY+IzbFomIZY
+ 4yG6xI99NIPEVE9lNBXBKIlewIyVlkOaYvJWSV+p5gdJXOvScNN1epm5YHmf9aE2ZjnqZGoM
+ Mtsyw18YoX9BqMFInxqYQQ3j/HpVgTSvmo5ea5qQDDUaCsaTf8UeDcwYOtgI8iL4oHcsGtUX
+ oUk33HEAEQEAAcLAXwQYAQIACQUCTVkGzwIbDAAKCRAWmrexpM/4rrXiB/sGbkQ6itMrAIfn
+ M7IbRuiSZS1unlySUVYu3SD6YBYnNi3G5EpbwfBNuT3H8//rVvtOFK4OD8cRYkxXRQmTvqa3
+ 3eDIHu/zr1HMKErm+2SD6PO9umRef8V82o2oaCLvf4WeIssFjwB0b6a12opuRP7yo3E3gTCS
+ KmbUuLv1CtxKQF+fUV1cVaTPMyT25Od+RC1K+iOR0F54oUJvJeq7fUzbn/KdlhA8XPGzwGRy
+ 4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
+ QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
+Organization: Linaro Developer Services
+In-Reply-To: <CAMRc=MfkQuaJ3FnVwbVKQRQEgmJKbZh7SJoK3Kbmb5ebzE2rKA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-From: Jiri Pirko <jiri@nvidia.com>
+On 22/02/2024 13:50, Bartosz Golaszewski wrote:
+> On Thu, Feb 22, 2024 at 1:47 PM Dmitry Baryshkov
+> <dmitry.baryshkov@linaro.org> wrote:
+>>
+>> On Thu, 22 Feb 2024 at 14:27, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
+>>>
+>>> On Thu, Feb 22, 2024 at 12:27 PM Dmitry Baryshkov
+>>> <dmitry.baryshkov@linaro.org> wrote:
+>>>>
+>>>> On Thu, 22 Feb 2024 at 13:00, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
+>>>>>
+>>>>> On Mon, Feb 19, 2024 at 11:21 PM Dmitry Baryshkov
+>>>>> <dmitry.baryshkov@linaro.org> wrote:
+>>>>>>
+>>>>>> On Mon, 19 Feb 2024 at 19:18, <neil.armstrong@linaro.org> wrote:
+>>>>>>>
+>>>>>>> On 19/02/2024 13:33, Dmitry Baryshkov wrote:
+>>>>>>>> On Mon, 19 Feb 2024 at 14:23, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
+>>>>>>>>>
+>>>>>>>>> On Mon, Feb 19, 2024 at 11:26 AM Dmitry Baryshkov
+>>>>>>>>> <dmitry.baryshkov@linaro.org> wrote:
+>>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> [snip]
+>>>>>>>>>
+>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>> For WCN7850 we hide the existence of the PMU as modeling it is simply not
+>>>>>>>>>>>>>>> necessary. The BT and WLAN devices on the device-tree are represented as
+>>>>>>>>>>>>>>> consuming the inputs (relevant to the functionality of each) of the PMU
+>>>>>>>>>>>>>>> directly.
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> We are describing the hardware. From the hardware point of view, there
+>>>>>>>>>>>>>> is a PMU. I think at some point we would really like to describe all
+>>>>>>>>>>>>>> Qualcomm/Atheros WiFI+BT units using this PMU approach, including the
+>>>>>>>>>>>>>> older ath10k units present on RB3 (WCN3990) and db820c (QCA6174).
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> While I agree with older WiFi+BT units, I don't think it's needed for
+>>>>>>>>>>>>> WCN7850 since BT+WiFi are now designed to be fully independent and PMU is
+>>>>>>>>>>>>> transparent.
+>>>>>>>>>>>>
+>>>>>>>>>>>> I don't see any significant difference between WCN6750/WCN6855 and
+>>>>>>>>>>>> WCN7850 from the PMU / power up point of view. Could you please point
+>>>>>>>>>>>> me to the difference?
+>>>>>>>>>>>>
+>>>>>>>>>>>
+>>>>>>>>>>> The WCN7850 datasheet clearly states there's not contraint on the WLAN_EN
+>>>>>>>>>>> and BT_EN ordering and the only requirement is to have all input regulators
+>>>>>>>>>>> up before pulling up WLAN_EN and/or BT_EN.
+>>>>>>>>>>>
+>>>>>>>>>>> This makes the PMU transparent and BT and WLAN can be described as independent.
+>>>>>>>>>>
+>>>>>>>>>>   From the hardware perspective, there is a PMU. It has several LDOs. So
+>>>>>>>>>> the device tree should have the same style as the previous
+>>>>>>>>>> generations.
+>>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> My thinking was this: yes, there is a PMU but describing it has no
+>>>>>>>>> benefit (unlike QCA6x90). If we do describe, then we'll end up having
+>>>>>>>>> to use pwrseq here despite it not being needed because now we won't be
+>>>>>>>>> able to just get regulators from WLAN/BT drivers directly.
+>>>>>>>>>
+>>>>>>>>> So I also vote for keeping it this way. Let's go into the package
+>>>>>>>>> detail only if it's required.
+>>>>>>>>
+>>>>>>>> The WiFi / BT parts are not powered up by the board regulators. They
+>>>>>>>> are powered up by the PSU. So we are not describing it in the accurate
+>>>>>>>> way.
+>>>>>>>
+>>>>>>> I disagree, the WCN7850 can also be used as a discrete PCIe M.2 card, and in
+>>>>>>> this situation the PCIe part is powered with the M.2 slot and the BT side
+>>>>>>> is powered separately as we currently do it now.
+>>>>>>
+>>>>>> QCA6390 can also be used as a discrete M.2 card.
+>>>>>>
+>>>>>>> So yes there's a PMU, but it's not an always visible hardware part, from the
+>>>>>>> SoC PoV, only the separate PCIe and BT subsystems are visible/controllable/powerable.
+>>>>>>
+>>>>>>  From the hardware point:
+>>>>>> - There is a PMU
+>>>>>> - The PMU is connected to the board supplies
+>>>>>> - Both WiFi and BT parts are connected to the PMU
+>>>>>> - The BT_EN / WLAN_EN pins are not connected to the PMU
+>>>>>>
+>>>>>> So, not representing the PMU in the device tree is a simplification.
+>>>>>>
+>>>>>
+>>>>> What about the existing WLAN and BT users of similar packages? We
+>>>>> would have to deprecate a lot of existing bindings. I don't think it's
+>>>>> worth it.
+>>>>
+>>>> We have bindings that are not reflecting the hardware. So yes, we
+>>>> should gradually update them once the powerseq is merged.
+>>>>
+>>>>> The WCN7850 is already described in bindings as consuming what is PMUs
+>>>>> inputs and not its outputs.
+>>>>
+>>>> So do WCN6855 and QCA6391 BlueTooth parts.
+>>>>
+>>>
+>>> That is not true for the latter, this series is adding regulators for it.
+>>
+>> But the bindings exist already, so you still have to extend it,
+>> deprecating regulator-less bindings.
+>>
+>> Bartosz, I really don't understand what is the issue there. There is a
+>> PMU. As such it should be represented in the DT and it can be handled
+>> by the same driver as you are adding for QCA6390.
+>>
+> 
+> The issue is that we'll pull in the pwrseq subsystem for WCN7850 which
+> clearly does not require it in practice.
+> 
+> I'd like to hear Krzysztof, Conor or Rob chime in here and make the
+> decision on how to proceed.
 
-During decoding of messages coming from kernel, attribute values are
-converted to enum names in case the attribute type is enum of bitfield32.
+For WCN7850 we'll be describing the PMU which is basically discrete, so we
+could also add dummy fixed regulators, and it would be the same.
 
-However, when user constructs json message, he has to pass plain scalar
-values. See "state" "selector" and "value" attributes in following
-examples:
+Neil
 
-$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/dpll.yaml --do pin-set --json '{"id": 0, "parent-device": {"parent-id": 0, "state": 1}}'
-$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/devlink.yaml --do port-set --json '{"bus-name": "pci", "dev-name": "0000:08:00.1", "port-index": 98304, "port-function": {"caps": {"selector": 1, "value": 1 }}}'
-
-Allow user to pass strings containing enum names, convert them to scalar
-values to be encoded into Netlink message:
-
-$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/dpll.yaml --do pin-set --json '{"id": 0, "parent-device": {"parent-id": 0, "state": "connected"}}'
-$ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/devlink.yaml --do port-set --json '{"bus-name": "pci", "dev-name": "0000:08:00.1", "port-index": 98304, "port-function": {"caps": {"selector": ["roce-bit"], "value": ["roce-bit"] }}}'
-
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
-v2->v3:
-- s/_encode_enum/_get_scalar/ back
-- push out enum related code from _get_scalar() to new _encode_enum()
-  function
-v1->v2:
-- s/_get_scalar/_encode_enum/
-- accept flat name not in a list
----
- tools/net/ynl/lib/ynl.py | 26 ++++++++++++++++++++++++--
- 1 file changed, 24 insertions(+), 2 deletions(-)
-
-diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-index e459a130170b..ac55aa5a3083 100644
---- a/tools/net/ynl/lib/ynl.py
-+++ b/tools/net/ynl/lib/ynl.py
-@@ -438,6 +438,26 @@ class YnlFamily(SpecFamily):
-         self.sock.setsockopt(Netlink.SOL_NETLINK, Netlink.NETLINK_ADD_MEMBERSHIP,
-                              mcast_id)
- 
-+    def _encode_enum(self, attr_spec, value):
-+        enum = self.consts[attr_spec['enum']]
-+        if enum.type == 'flags' or attr_spec.get('enum-as-flags', False):
-+            scalar = 0
-+            if isinstance(value, str):
-+                value = [value]
-+            for single_value in value:
-+                scalar += enum.entries[single_value].user_value(as_flags = True)
-+            return scalar
-+        else:
-+            return enum.entries[value].user_value()
-+
-+    def _get_scalar(self, attr_spec, value):
-+        try:
-+            return int(value)
-+        except (ValueError, TypeError) as e:
-+            if 'enum' not in attr_spec:
-+                raise e
-+        return self._encode_enum(attr_spec, value);
-+
-     def _add_attr(self, space, name, value, search_attrs):
-         try:
-             attr = self.attr_sets[space][name]
-@@ -475,7 +495,7 @@ class YnlFamily(SpecFamily):
-             else:
-                 raise Exception(f'Unknown type for binary attribute, value: {value}')
-         elif attr['type'] in NlAttr.type_formats or attr.is_auto_scalar:
--            scalar = int(value)
-+            scalar = self._get_scalar(attr, value)
-             if attr.is_auto_scalar:
-                 attr_type = attr["type"][0] + ('32' if scalar.bit_length() <= 32 else '64')
-             else:
-@@ -483,7 +503,9 @@ class YnlFamily(SpecFamily):
-             format = NlAttr.get_format(attr_type, attr.byte_order)
-             attr_payload = format.pack(scalar)
-         elif attr['type'] in "bitfield32":
--            attr_payload = struct.pack("II", int(value["value"]), int(value["selector"]))
-+            scalar_value = self._get_scalar(attr, value["value"])
-+            scalar_selector = self._get_scalar(attr, value["selector"])
-+            attr_payload = struct.pack("II", scalar_value, scalar_selector)
-         elif attr['type'] == 'sub-message':
-             msg_format = self._resolve_selector(attr, search_attrs)
-             attr_payload = b''
--- 
-2.43.2
+> 
+> Bart
+> 
+>>>
+>>> Bart
+>>>
+>>>>>
+>>>>> Bart
+>>>>>
+>>>>>>>
+>>>>>>> Neil
+>>>>>>>
+>>>>>>>>
+>>>>>>>> Moreover, I think we definitely want to move BT driver to use only the
+>>>>>>>> pwrseq power up method. Doing it in the other way results in the code
+>>>>>>>> duplication and possible issues because of the regulator / pwrseq
+>>>>>>>> taking different code paths.
+>>>>>>
+>>>>>> --
+>>>>>> With best wishes
+>>>>>> Dmitry
+>>>>
+>>>>
+>>>>
+>>>> --
+>>>> With best wishes
+>>>> Dmitry
+>>
+>>
+>>
+>> --
+>> With best wishes
+>> Dmitry
 
 
