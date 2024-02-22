@@ -1,239 +1,323 @@
-Return-Path: <netdev+bounces-74035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CC8685FB5D
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 15:35:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2193285FB61
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 15:36:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C3CEB27A5B
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 14:35:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 819651F251E3
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 14:36:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2562A1468F7;
-	Thu, 22 Feb 2024 14:35:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86DCC14691D;
+	Thu, 22 Feb 2024 14:36:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YKzQfbUO"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q72bJHz3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 175F93E498
-	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 14:35:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708612534; cv=fail; b=NY4My4YIUPUIiBzBWtMQ9VrE6q+1TWdHrdqNu6lpVuQFGPeJzpJWUDG0u9CHRGGBk2eSC9imSa3hDW7pJkqEb5KXOlKH45J+tuLMwuVM5vmEBpP1YavSPKtVCFXwlC8l24afEMpTSVV2Xu7NuHG9ImvSVJVT7kYdrGYphmXoGm4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708612534; c=relaxed/simple;
-	bh=Z4dIlPmnjDTEYV6Db24sKKQYkTtptjg7d/SO/6rjNo4=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=DCXrabGiswOrzrptKAesWrwMZ9MkOgz0DXPre947xWlznVaNPj+iELFhosgH5zTzsnq84uQHcpx1pr3HFA4JrvgAR4aooQ67qNbRMKOPfi2Ll3/lOKu2eNUlwT1M+Nsr7b7qKktJ52JytIuWoXLFbJ3qkvt/GmW55ZjytgNbOE8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YKzQfbUO; arc=fail smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708612532; x=1740148532;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Z4dIlPmnjDTEYV6Db24sKKQYkTtptjg7d/SO/6rjNo4=;
-  b=YKzQfbUOQgtiZZDdWGkE1iYPMXa3CfdFOGxhxm+dOK8ZMKSOsqj+5bB0
-   I+1jy/Ym52hHvbiAa5oWyshjFLLl1jGjeABLzri36Bn+o+PTjFkhiGHWz
-   huUgXx+05RgXa1OmrjUXlSkC9b/xS9a5KiT2vfbc3cdyLsFd0Z/KPI+60
-   B/DkFAsJLJI4dKamudEaoGWtwRmh44FPJ+l7ST3fP2aPwpQyaOCgcZKUM
-   bbq7Zx7VkeVSV1UI8StGHlkmfPs/wAvTA43u3o5p3muwJkIFGBD13QzWl
-   vRFwLokpviZEKSI+evAO4g6qG2B82arcUKyG2b84/T4SH1lzqBE3u1Y3r
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10991"; a="2712742"
-X-IronPort-AV: E=Sophos;i="6.06,179,1705392000"; 
-   d="scan'208";a="2712742"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2024 06:35:31 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,179,1705392000"; 
-   d="scan'208";a="5665223"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 22 Feb 2024 06:35:31 -0800
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 22 Feb 2024 06:35:30 -0800
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 22 Feb 2024 06:35:29 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 22 Feb 2024 06:35:29 -0800
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.101)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 22 Feb 2024 06:35:29 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ThVcgzo3NaB7I0P6cLb1IWOjmKVIC4z1K/DD9+tm2qFKzQ8PJyp46USIN/FscKttgB+KCeSNpQXdmCHqySO4el+/mpMPUf5JSXfLmF8mRsKLfu2ZWAFN3wdoxfJLC8ZtwpHsdEM2n2kvFCleJYryrPc1RqNezS8ldUDp+AyX8FRT+gy8lgv0zw3WJI1hVvUqDY60O//2Azh1EgXQRLAqnSJXsuyCQWktSsxDy44iFVFv6vuiSOKhhdH+uUNTMXCoJAcOe8Lh5pCL0Wxrzl2DUqDFUL3845MuMrXo0Zl1cd72Jv90uvgrgwopkFkToTMJ57BqGHf3WJXnaeX7+bGbWA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hLEwsYpMKzH7bj0D0xneWf3gul32QJ126a+N9EedmDg=;
- b=X9EoozEMpJO6+sZoHlEhDFEle1wckYKxE1SPk+bb4G+5nJBBjkioVJCGVzMl6rtN6BQYNaC0VO5zaeqgsN8pIbweLtt29AkvJMKfpy1l4PNKYg7ieZH3WwywUI+8K/t/M0dlnX3lsT552JYISzbgX4OYXq6rUW7pjKiSrsbz9nuiEDicVXxm5QjmPq5/v46rXyASlx16/chtx7Sw1h5qG4qg1zKvjwTjdvY10xJrj2EoV0Bg6NoaDCWHVVO27shbEM7KEgUZsLp6gQFojA2jM99KFfpWPBsArsZgYW+vX/BF3Y+WHlxmISi7e2IwMF/OamrUlAgKkUauy99KCxxQ4A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5186.namprd11.prod.outlook.com (2603:10b6:303:9b::24)
- by SA3PR11MB7609.namprd11.prod.outlook.com (2603:10b6:806:319::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.44; Thu, 22 Feb
- 2024 14:35:27 +0000
-Received: from CO1PR11MB5186.namprd11.prod.outlook.com
- ([fe80::a8a4:121e:2b2c:7037]) by CO1PR11MB5186.namprd11.prod.outlook.com
- ([fe80::a8a4:121e:2b2c:7037%4]) with mapi id 15.20.7316.018; Thu, 22 Feb 2024
- 14:35:27 +0000
-Message-ID: <39ab0807-468c-438a-bf56-7dd1298fecc4@intel.com>
-Date: Thu, 22 Feb 2024 06:35:26 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 01/10 iwl-next] idpf: implement virtchnl transaction
- manager
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>, "Przemek
- Kitszel" <przemyslaw.kitszel@intel.com>, Igor Bagnucki
-	<igor.bagnucki@intel.com>, Joshua Hay <joshua.a.hay@intel.com>
-References: <20240221004949.2561972-1-alan.brady@intel.com>
- <20240221004949.2561972-2-alan.brady@intel.com>
- <369a78cd-a8ed-49ea-9f89-20fea77cc922@intel.com>
- <52fa2a08-b39d-4ffe-80da-c9a71009a652@intel.com>
- <7baaefa1-cd27-4dc7-aa2d-946aa4d225e7@intel.com>
- <9f4d0449-9995-4bb0-bd95-f12d9bc0b234@intel.com>
-Content-Language: en-US
-From: Alan Brady <alan.brady@intel.com>
-In-Reply-To: <9f4d0449-9995-4bb0-bd95-f12d9bc0b234@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0133.namprd04.prod.outlook.com
- (2603:10b6:303:84::18) To CO1PR11MB5186.namprd11.prod.outlook.com
- (2603:10b6:303:9b::24)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 749FE8665B
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 14:36:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708612570; cv=none; b=NYGMxKCmNGAmRYE1hr0DZTsDFjH7zLsKttny2rpyNWiTBkXzFL7GY1J0IZJTj32raIcdsaKpl3uzaidubwyWdZKjaim+x+mYM8RjiYFLdHFHW/3T/VEiFz1cpS0iOGHuWH1JTGLkc4WKE9BIoFIehFFPn+6S+XRZ4XPxfuLXye0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708612570; c=relaxed/simple;
+	bh=HliuWGGmLq3LvWFnUzny9BGxNLmSfmBeFrSvnFUmeT0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gdikj9lELyj0D+y+BJ397N5/pm6Y2ApG51lsA5Lsh01XS2XqIgKzdV3jK0v+ZxwGEWZHQyvLXv4//u6PJTDyUZHN0rH0MmaXQXWVagMyXJAex5rfNVjSM/b8bNR/BqWFV+yKvtnu6i2GTSVXmhelJVTAFl91oBxCnpTE8EgjiwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=q72bJHz3; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-33d066f8239so883098f8f.1
+        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 06:36:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1708612567; x=1709217367; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=97R8kfjvE4ydiVE9xk3Hq8ViU+odGzafXCe6ly6SQak=;
+        b=q72bJHz3oZ5vkUpFZj9FecLT/Sx8TTW5RZRLvmol98Wb1rO7B0Ee8LsoZhYzv7Mtkk
+         t85bGRbSoP2If6hUCTect2IhLzzMdUJNLETTOHWUEZEXvl4nfj53Sl+cZTeAStltJAm5
+         7YvZ7fjNzgdmG2vmxvyRgT4C9rh5gJKfMo6xlmmts503a2RcOh44lmceBoJ56lOt4x+X
+         9ljhSdC8ZdZq50W25CrFxYpJyHqPZ6N+ENGr43BTWUqZUuhjogyhGTSJ9U1F7QPF6yuI
+         FN5FkMW1zTg0dy5pG3yqsreW/Yz4Bu+o7XHaP/IZxDuPkM0iy9K8nMsMiT+lJmLzfQFV
+         OYTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708612567; x=1709217367;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=97R8kfjvE4ydiVE9xk3Hq8ViU+odGzafXCe6ly6SQak=;
+        b=OWwfarBUtkqiq7esHtZdfu0G1BQjAwaNVw0jlpIwe4rQQM4xqcIN72PqvyB+7UKgvW
+         Q2+MM/r4iQlHWjn8YsIMT7bAp2wv/eS6WGb/BncBGRhIzuX2SkOvUCFVRG40UHXH6/3e
+         +jY/sgLU//6sZCDPiU7RBtUh+FuQ/dn6fqtoxgfcXjJJ06ZMlcSep3xVbiYFdt6pEYfH
+         45XYYIYbWQNIOVlcllV8h16lzFGOO738To11eLJOYKVGSpLOHynwfF7IUEXkPltQBuSC
+         jCqt4E9sTk2ShlQD9twi6m93RT0IDnO9Mh4vUWYo20YsyKpBN/TQJa1EqzRivp3/Lg8z
+         1I5A==
+X-Forwarded-Encrypted: i=1; AJvYcCX28V8GQHzlXTuhHOP120G579ecRisbgpQyeQafhHcL7F3RYY6D2U3T4nRB0rnAHKaTbn2tNILm6ZZRst2xGb8GbsfAsUCn
+X-Gm-Message-State: AOJu0YxYPhDUDUYceXQ1JjRF+Evk756P7xaw6tbp8HmXZ87xIOjIeI1E
+	ABs4jn9/ciBmahT7Ioj/ez/01ngry3aCriPJqlpdQOS38SpPlptJ68UpqBLa3w8=
+X-Google-Smtp-Source: AGHT+IHu5V8esi5kOiAWFJ9acLTrnNi8Fr4bd1xwp17ik98eNa3jMw23rdKPpaaB5oRlxd4fqlFbhw==
+X-Received: by 2002:adf:ff8a:0:b0:33d:30a4:d744 with SMTP id j10-20020adfff8a000000b0033d30a4d744mr10446253wrr.30.1708612566630;
+        Thu, 22 Feb 2024 06:36:06 -0800 (PST)
+Received: from [192.168.10.46] (146725694.box.freepro.com. [130.180.211.218])
+        by smtp.googlemail.com with ESMTPSA id jj2-20020a05600c6a0200b004126732390asm6198255wmb.37.2024.02.22.06.36.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Feb 2024 06:36:06 -0800 (PST)
+Message-ID: <59e8fd70-5ba6-4256-9127-bd5e76e6bc99@linaro.org>
+Date: Thu, 22 Feb 2024 15:36:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5186:EE_|SA3PR11MB7609:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9a5a1485-1013-4be6-e05a-08dc33b38357
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: PCt6NLWVaTYw4Gh+FKnYrTi2pytF3UeLAFOquwFCDjolaQAGEIM2U0Zj095X4qN6nzZovmBLGHgNUnxwuM5GaTwbeg6hvGOBukF/c1Lw+r6alAtq2t/rsAlgo7NHfkstn5T3Vgpf0JKFLtqEsAf5/lXlkPV0/QLftzaJPV+m2ND6SklW/jPfyexl6cr2k0gT+2MOVF1eoAWcnql62+3pbNhLsknqpq+4V/XbGg9W8w0opB9RXxPbjWm5G5zfwqKMnCwJJR3RmNGxRtRHQMoQuoVNP453SwneFqPp9n1e/a5LAq0lPUUWf+YDvEwLTazFqoGvVzhi8sf3OFazPCEovhkJbWuTqp2XPQoY3ZPSK3KTll5O43Raekd+ogKc/IrimIxD5umlZFIG2eZ8VWBKy5bUBnF0eidBJMPv4lyxzWiI1BIAt/eTwa1nstIBPvcfq/oR+0P2IOMHtK/q9IeWHOpE0LZlua92YsIvkl/c6z3G5roSZm6F4nWetWOhRZMMVfC9rF02DWXQO45cMQ91Ew==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5186.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QXZ3WCtpYmZITnpyVEhkTjREZjRPYzJmOWc4TGZhUDYrak1yWG93SkkrS2lG?=
- =?utf-8?B?VUlnRVZ2Q1hreE9mZUZBZldrVWpJOVpvRDZxUjJhVCs4R25uYzVOa1Q0R09H?=
- =?utf-8?B?WDAxb1U5dEQ1MGE3dEdXYXEydkxlQXpwaUhXd1JUWlZyTjZDQmswdUZIak41?=
- =?utf-8?B?ajNsWmJveFE3UGxMWFdtZ0JnalNjaEJBcmI5TU8yRytCSDFzckpVbXZvVlRu?=
- =?utf-8?B?SXRGYUEyK2FnVmFUK3ZLd1pqOHpNeFZPSVNjNkRSQzRBY2tGbVRkSXhtMHYz?=
- =?utf-8?B?VUNZUkZWYUdmeHdBMnQxSXpVQ0pUVGs1UjBwNFpocDNlTVY0T2NkVlRNZUp4?=
- =?utf-8?B?Zjcvc25TVDFobzE3VnpyRnZLcCtpdDFaeXFBSXBEQTRxYVJENm1QZ2FvQTYz?=
- =?utf-8?B?TW5TSWRBU2I3Y3diZDYzYjJXaGJtc0FpNlFGYUFvZ1lOZnp3L1Q2WDEzNGZ0?=
- =?utf-8?B?ZWlsaUhNdGpSOHZrTnhPam5lWm02dUdZK3JXQ3VhcUl1dE16cVV3R1dza0dQ?=
- =?utf-8?B?OTlGdEp5bllEK1QvMnhVN0s5eS8relFQdk9jL3RoLzE3TlU3eTJvblJ1dEk5?=
- =?utf-8?B?anllL2t5aTNZVTM4UFl6K2JRdXBPSk9xSGJzNllLQ3VCU2lHL1AxNzRKZktB?=
- =?utf-8?B?L2MzYUV5My9EanE3ZTRDOVVXdjNWVGo1cUQyUHpnV3FSb2ZXOUtWTmpoQjI4?=
- =?utf-8?B?VjVXOTVtQmd2RTVxYThiYzhyUUNzSkUyS2cxODBQaHJ1cEVuTXhLV1pJY3d2?=
- =?utf-8?B?b1ZPNVBLVmdXM0FjZ3V4YmxROS9waHNOKzBQK3BSTVBYUXFHemhlZC9OTm9M?=
- =?utf-8?B?TGtVb3RwSnpmZVJlYmFlWnhUeko1Q3crZEN5SGREMGdGZWxJQnppN29xMkVj?=
- =?utf-8?B?U3cvOGpQalVzdDdXWkw4YVByb0RHemJNMGNTdmozU3IzYXdrdlk1aHFCdjBL?=
- =?utf-8?B?NUVmSEZrVEUxd3psZWNSdkduQlZiWkFLV1lsd1Y1cXpjbGNMaDZBVmhEZ2pv?=
- =?utf-8?B?SlhQSjhJTjNkUU16YWlKTjhISFVCV21BS2RheElNOTVMb3dVSzh4eXFSbTl6?=
- =?utf-8?B?Sjh6ekNJY3c2UlRUSmNITHY3UWJDRStrTlZBTmJhT2JSVE9sQkJiMG9oQ0du?=
- =?utf-8?B?YTFpcno4aDlPZXgzUUxVc1FGaEdRWEcxaTIrVGl1NWNSamRMeWlqTHR6R28x?=
- =?utf-8?B?enJKejVta0hpNEVnNlg4blpvcGIweHNaU3YrTmpRR1UydXRVdFViNnh2cC9h?=
- =?utf-8?B?SmlodjR6Y2JObmFETkpHWVRUN0Jrcml1VVNKdHo0M1ppRW5ZQWNBQlVUclBq?=
- =?utf-8?B?QXlqZHJoOUZJeHFoSk5xcU5mcDRyb1hLeUIxWjZ4aml2RUc0YmpYR2JUQTdq?=
- =?utf-8?B?akdjaHF1ditObC9taUJmcFM0R093ajRpaEt0ems2QXd1N1dpOG5TYmhvNmRX?=
- =?utf-8?B?bjdsb3NoQkxpQjdVYzhwSDAwSnZDZ3RUVUF2MDBpOStwVDRtcXBFRFRhWUZU?=
- =?utf-8?B?Y281UUV1ZTlmbnpXcit6L0drb29mYVJ5YURhOVZyQVV3bHdrbnhuVVUya21E?=
- =?utf-8?B?WCtjRHRhTWNTTUptVnNDOWxjVEJEbS9tMDRpTG8yWmtrR09KTGg2d1BtMUdr?=
- =?utf-8?B?RlBRZVhKMU8wSTdLeS9BNGQyeGdmMk9ocXFGNURDcGgvSldYbEJLdjIxWjFQ?=
- =?utf-8?B?b00wYUozajdLV2IzcDBlV3Y1WlI3OGhHbW1NL1pqeEJvNlM3eDBNdTlSdk1n?=
- =?utf-8?B?K01yQXVMVy81QmxCMFgvK1pKWW4yNy9kcFB0NjFVa042d3JzQ2JNUnhUWmlP?=
- =?utf-8?B?UG9VVE9MZXRmUVAvNU54cWJyd05YR0dhODFySm1sN1VWYWM0TFU3TmxIZE9t?=
- =?utf-8?B?Z3lnZENSeEk1VDgySkxvYVF2dnM1UGJHdUtxTXc3cEUwNm85aWttUUpkVlk4?=
- =?utf-8?B?WUp1MjZhTDFVT04yRGkvTWJXbi9uRGZ4aWVLNzlTeThTcStERTFNdGdRQU1N?=
- =?utf-8?B?anRvdW1IOHBiMGRPOEtjQVlUZXMzU2ZmVDJvUm9CcUt0Q2VXKzA5YXY3a21P?=
- =?utf-8?B?b3RmaXB6S2NlbnF6VSs4dmVsWnZzQ1ZZK0FVODE3djhYZ3ArN3R5NWtxS29V?=
- =?utf-8?Q?A7Ou+Sq84kkDP/8gDYf1BrHlN?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9a5a1485-1013-4be6-e05a-08dc33b38357
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5186.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Feb 2024 14:35:27.6534
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: W2Z7TwFBAE62eeKdUyZKIYMBaMbzHO7ALRMgjKs09TtiXK4pRdPV3MPjLAL69D93B98QdKhmx4Qj6ZnIKp5iTw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR11MB7609
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/9] thermal: core: Add flags to struct thermal_trip
+Content-Language: en-US
+To: "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+ Linux PM <linux-pm@vger.kernel.org>
+Cc: Lukasz Luba <lukasz.luba@arm.com>, LKML <linux-kernel@vger.kernel.org>,
+ Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>,
+ Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+ Zhang Rui <rui.zhang@intel.com>, netdev@vger.kernel.org,
+ Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+ Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+ linux-wireless@vger.kernel.org, Shawn Guo <shawnguo@kernel.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Manaf Meethalavalappu Pallikunhi <quic_manafm@quicinc.com>
+References: <6017196.lOV4Wx5bFT@kreacher> <2173914.irdbgypaU6@kreacher>
+From: Daniel Lezcano <daniel.lezcano@linaro.org>
+In-Reply-To: <2173914.irdbgypaU6@kreacher>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 2/22/2024 5:04 AM, Alexander Lobakin wrote:
-> From: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Date: Thu, 22 Feb 2024 13:53:25 +0100
+On 12/02/2024 19:31, Rafael J. Wysocki wrote:
+> From: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
 > 
->> From: Alan Brady <alan.brady@intel.com>
->> Date: Wed, 21 Feb 2024 12:16:37 -0800
->>
->>> On 2/21/2024 4:15 AM, Alexander Lobakin wrote:
->>>> From: Alan Brady <alan.brady@intel.com>
->>>> Date: Tue, 20 Feb 2024 16:49:40 -0800
->>>>
->>>>> This starts refactoring how virtchnl messages are handled by adding a
->>>>> transaction manager (idpf_vc_xn_manager).
->>
->> [...]
->>
->>>>
->>>> Sorry for not noticing this before, but this struct can be local to
->>>> idpf_virtchnl.c.
->>>>
->>>
->>> Nice catch, I can definitely move this. I'm also considering though, all
->>> of these structs I'm adding here are better suited in idpf_virtchnl.c
->>> all together. I think the main thing preventing that is the
->>> idpf_vc_xn_manager field in idpf_adapter. Would it be overkill to make
->>> the field in idpf_adapter a pointer so I can forward declare and kalloc
->>> it? I think I can then move everything to idpf_virtchnl.c. Or do you see
->>> a better alternative? Or is it not worth the effort? Thanks!
->>
->> Since it's not hotpath, you can make it a pointer and move everything to
->> virtchnl.c, sounds nice.
+> In order to allow thermal zone creators to specify the writability of
+> trip point temperature and hysteresis on a per-trip basis, add a flags
+> field to struct thermal_trip and define flags to represent the desired
+> trip properties.
 > 
-> Since you're sending v6 anyway, could you maybe move virtchnl function
-> declarations to new idpf_virtchnl.h to make idpf.h a bit less heavy?
-> Something like I did in this commit[0].
->
+> Also make thermal_zone_device_register_with_trips() set the
+> THERMAL_TRIP_FLAG_RW_TEMP flag for all trips covered by the writable
+> trips mask passed to it and modify the thermal sysfs code to look at
+> the trip flags instead of using the writable trips mask directly or
+> checking the presence of the .set_trip_hyst() zone callback.
+> 
+> Additionally, make trip_point_temp_store() and trip_point_hyst_store()
+> fail with an error code if the trip passed to one of them has
+> THERMAL_TRIP_FLAG_RW_TEMP or THERMAL_TRIP_FLAG_RW_HYST,
+> respectively, clear in its flags.
+> 
+> No intentional functional impact.
+> 
+> Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+> ---
+> 
+> v1 -> v2:
+>     * Rename trip flags (Stanislaw).
+> 
+> ---
+>   drivers/thermal/thermal_core.c  |   12 +++++++++++-
+>   drivers/thermal/thermal_core.h  |    2 +-
+>   drivers/thermal/thermal_sysfs.c |   28 +++++++++++++++++++---------
+>   include/linux/thermal.h         |    7 +++++++
+>   4 files changed, 38 insertions(+), 11 deletions(-)
+> 
+> Index: linux-pm/include/linux/thermal.h
+> ===================================================================
+> --- linux-pm.orig/include/linux/thermal.h
+> +++ linux-pm/include/linux/thermal.h
+> @@ -64,15 +64,23 @@ enum thermal_notify_event {
+>    * @threshold: trip crossing notification threshold miliCelsius
+>    * @type: trip point type
+>    * @priv: pointer to driver data associated with this trip
+> + * @flags: flags representing binary properties of the trip
+>    */
+>   struct thermal_trip {
+>   	int temperature;
+>   	int hysteresis;
+>   	int threshold;
+>   	enum thermal_trip_type type;
+> +	u8 flags;
+>   	void *priv;
+>   };
+>   
+> +#define THERMAL_TRIP_FLAG_RW_TEMP	BIT(0)
+> +#define THERMAL_TRIP_FLAG_RW_HYST	BIT(1)
+> +
+> +#define THERMAL_TRIP_FLAG_MASK_RW	(THERMAL_TRIP_FLAG_RW_TEMP | \
+> +					 THERMAL_TRIP_FLAG_RW_HYST)
 
-I can certainly do that as well, makes sense to me. I agree idpf.h is 
-overloaded. Thanks!
+What about THERMAL_TRIP_FLAG_RW instead ?
 
->>
->>>
->>>>> +
->>>>> +/**
->>>>> + * struct idpf_vc_xn_manager - Manager for tracking transactions
->>>>> + * @ring: backing and lookup for transactions
->>>>> + * @free_xn_bm: bitmap for free transactions
->>>>> + * @xn_bm_lock: make bitmap access synchronous where necessary
->>>>> + * @salt: used to make cookie unique every message
->>>>> + */
->>>>
->>>> [...]
+>   struct thermal_zone_device_ops {
+>   	int (*bind) (struct thermal_zone_device *,
+>   		     struct thermal_cooling_device *);
+> Index: linux-pm/drivers/thermal/thermal_core.c
+> ===================================================================
+> --- linux-pm.orig/drivers/thermal/thermal_core.c
+> +++ linux-pm/drivers/thermal/thermal_core.c
+> @@ -1356,13 +1356,23 @@ thermal_zone_device_register_with_trips(
+>   	tz->devdata = devdata;
+>   	tz->trips = trips;
+>   	tz->num_trips = num_trips;
+> +	if (num_trips > 0) {
+
+Is this check really necessary? for_each_trip() should exit immediately 
+if there is no trip points.
+
+> +		struct thermal_trip *trip;
+> +
+> +		for_each_trip(tz, trip) {
+> +			if (mask & 1)
+> +				trip->flags |= THERMAL_TRIP_FLAG_RW_TEMP;
+> +
+> +			mask >>= 1;
+> +		}
+> +	}
+>   
+>   	thermal_set_delay_jiffies(&tz->passive_delay_jiffies, passive_delay);
+>   	thermal_set_delay_jiffies(&tz->polling_delay_jiffies, polling_delay);
+>   
+>   	/* sys I/F */
+>   	/* Add nodes that are always present via .groups */
+> -	result = thermal_zone_create_device_groups(tz, mask);
+> +	result = thermal_zone_create_device_groups(tz);
+>   	if (result)
+>   		goto remove_id;
+>   
+> Index: linux-pm/drivers/thermal/thermal_core.h
+> ===================================================================
+> --- linux-pm.orig/drivers/thermal/thermal_core.h
+> +++ linux-pm/drivers/thermal/thermal_core.h
+> @@ -131,7 +131,7 @@ void thermal_zone_trip_updated(struct th
+>   int __thermal_zone_get_temp(struct thermal_zone_device *tz, int *temp);
+>   
+>   /* sysfs I/F */
+> -int thermal_zone_create_device_groups(struct thermal_zone_device *, int);
+> +int thermal_zone_create_device_groups(struct thermal_zone_device *tz);
+>   void thermal_zone_destroy_device_groups(struct thermal_zone_device *);
+>   void thermal_cooling_device_setup_sysfs(struct thermal_cooling_device *);
+>   void thermal_cooling_device_destroy_sysfs(struct thermal_cooling_device *cdev);
+> Index: linux-pm/drivers/thermal/thermal_sysfs.c
+> ===================================================================
+> --- linux-pm.orig/drivers/thermal/thermal_sysfs.c
+> +++ linux-pm/drivers/thermal/thermal_sysfs.c
+> @@ -122,6 +122,11 @@ trip_point_temp_store(struct device *dev
+>   
+>   	trip = &tz->trips[trip_id];
+>   
+> +	if (!(trip->flags & THERMAL_TRIP_FLAG_RW_TEMP)) {
+> +		ret = -EPERM;
+> +		goto unlock;
+> +	}
+
+Does it really happen?
+
+If the sysfs file is created with the right permission regarding the 
+trip->flags then this condition can never be true.
+
+>   	if (temp != trip->temperature) {
+>   		if (tz->ops->set_trip_temp) {
+>   			ret = tz->ops->set_trip_temp(tz, trip_id, temp);
+> @@ -173,6 +178,11 @@ trip_point_hyst_store(struct device *dev
+>   
+>   	trip = &tz->trips[trip_id];
+>   
+> +	if (!(trip->flags & THERMAL_TRIP_FLAG_RW_HYST)) {
+> +		ret = -EPERM;
+> +		goto unlock;
+> +	}
+
+Ditto
+
+>   	if (hyst != trip->hysteresis) {
+>   		if (tz->ops->set_trip_hyst) {
+>   			ret = tz->ops->set_trip_hyst(tz, trip_id, hyst);
+> @@ -392,17 +402,16 @@ static const struct attribute_group *the
+>   /**
+>    * create_trip_attrs() - create attributes for trip points
+>    * @tz:		the thermal zone device
+> - * @mask:	Writeable trip point bitmap.
+>    *
+>    * helper function to instantiate sysfs entries for every trip
+>    * point and its properties of a struct thermal_zone_device.
+>    *
+>    * Return: 0 on success, the proper error value otherwise.
+>    */
+> -static int create_trip_attrs(struct thermal_zone_device *tz, int mask)
+> +static int create_trip_attrs(struct thermal_zone_device *tz)
+>   {
+> +	const struct thermal_trip *trip;
+>   	struct attribute **attrs;
+> -	int indx;
+>   
+>   	/* This function works only for zones with at least one trip */
+>   	if (tz->num_trips <= 0)
+> @@ -437,7 +446,9 @@ static int create_trip_attrs(struct ther
+>   		return -ENOMEM;
+>   	}
+>   
+> -	for (indx = 0; indx < tz->num_trips; indx++) {
+> +	for_each_trip(tz, trip) {
+> +		int indx = thermal_zone_trip_id(tz, trip);
+> +
+>   		/* create trip type attribute */
+>   		snprintf(tz->trip_type_attrs[indx].name, THERMAL_NAME_LENGTH,
+>   			 "trip_point_%d_type", indx);
+> @@ -458,7 +469,7 @@ static int create_trip_attrs(struct ther
+>   						tz->trip_temp_attrs[indx].name;
+>   		tz->trip_temp_attrs[indx].attr.attr.mode = S_IRUGO;
+>   		tz->trip_temp_attrs[indx].attr.show = trip_point_temp_show;
+> -		if (mask & (1 << indx)) {
+> +		if (trip->flags & THERMAL_TRIP_FLAG_RW_TEMP) {
+>   			tz->trip_temp_attrs[indx].attr.attr.mode |= S_IWUSR;
+>   			tz->trip_temp_attrs[indx].attr.store =
+>   							trip_point_temp_store;
+> @@ -473,7 +484,7 @@ static int create_trip_attrs(struct ther
+>   					tz->trip_hyst_attrs[indx].name;
+>   		tz->trip_hyst_attrs[indx].attr.attr.mode = S_IRUGO;
+>   		tz->trip_hyst_attrs[indx].attr.show = trip_point_hyst_show;
+> -		if (tz->ops->set_trip_hyst) {
+> +		if (trip->flags & THERMAL_TRIP_FLAG_RW_HYST) {
+>   			tz->trip_hyst_attrs[indx].attr.attr.mode |= S_IWUSR;
+>   			tz->trip_hyst_attrs[indx].attr.store =
+>   					trip_point_hyst_store;
+> @@ -505,8 +516,7 @@ static void destroy_trip_attrs(struct th
+>   	kfree(tz->trips_attribute_group.attrs);
+>   }
+>   
+> -int thermal_zone_create_device_groups(struct thermal_zone_device *tz,
+> -				      int mask)
+> +int thermal_zone_create_device_groups(struct thermal_zone_device *tz)
+>   {
+>   	const struct attribute_group **groups;
+>   	int i, size, result;
+> @@ -522,7 +532,7 @@ int thermal_zone_create_device_groups(st
+>   		groups[i] = thermal_zone_attribute_groups[i];
+>   
+>   	if (tz->num_trips) {
+> -		result = create_trip_attrs(tz, mask);
+> +		result = create_trip_attrs(tz);
+>   		if (result) {
+>   			kfree(groups);
+>   
 > 
-> [0]
-> https://github.com/alobakin/linux/commit/0c8fae557f4e6ec1ae4353a68c9c5c9c2b70c5e9
 > 
-> Thanks,
-> Olek
+> 
+
+-- 
+<http://www.linaro.org/> Linaro.org │ Open source software for ARM SoCs
+
+Follow Linaro:  <http://www.facebook.com/pages/Linaro> Facebook |
+<http://twitter.com/#!/linaroorg> Twitter |
+<http://www.linaro.org/linaro-blog/> Blog
 
 
