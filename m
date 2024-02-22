@@ -1,81 +1,122 @@
-Return-Path: <netdev+bounces-73867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BD7085EEA5
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 02:25:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A87785EECD
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 02:58:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00C7B1F226F4
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 01:25:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DAA91C21667
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 01:58:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5221711CBC;
-	Thu, 22 Feb 2024 01:25:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PZrrjN+s"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 507FA134D8;
+	Thu, 22 Feb 2024 01:58:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpbg156.qq.com (smtpbg156.qq.com [15.184.82.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C9E4F516;
-	Thu, 22 Feb 2024 01:25:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2327125D7
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 01:58:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.82.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708565123; cv=none; b=bfXuilnt6AqhpyNJcFz/bRVXax8kHMbn0sUbS8/rmSa7xzwDvmTkT42EwsnBexRDAFYpjZt1eOtGiym0ELuCuFFkzT/NgEhqxs31p35+CRlVOD+8TAWhDMFYi2+1/4MTGt3H0NZn+mPAe+qV8k6dEa2Xjwa47W8QPO83PxikByo=
+	t=1708567123; cv=none; b=HZM7f0uLf3H80TvJwWWG2/Rg3akLOKsJArxmZKzPQQhA2L09FEKavCLu7H3pmdEk6bMaCXNJllh7ybHnKQtczhNj2uTkqE+4r6JT6TA/xftZYOaH+Te9C2ZrArDo4K+qWOuulfJFIWnVF9dGfwPNxuvY0iEr/98/Z/6aexSET/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708565123; c=relaxed/simple;
-	bh=/dYw1HVm7aHLHegHx8OCnBmMHZnyiBRA074h1zbQSrY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hT08KcRc11zh2xOPB1hTkrE+9qm8gsLpFYTPKJA07Jr+t00jvTAkLH6wByin1NER40Qazc2Q9v4SFHqvLN1K5fZFxtA6YNckTnKYHWtAAcLawp5p/CpN9L0dtEUQR/NllfV2gYth7L2oCIhzPFFPcu4buSlCCc6GgsrEBH5SBqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PZrrjN+s; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A17BC433C7;
-	Thu, 22 Feb 2024 01:25:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708565122;
-	bh=/dYw1HVm7aHLHegHx8OCnBmMHZnyiBRA074h1zbQSrY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PZrrjN+sxWFAHZgS3sS1SVmQyXuyfwsT7Td1rUwz+nqAPnQ5+cIXFnzkczZCSUcrU
-	 nNwIfWCPkQA0IuV3xVO6zK3STmYAxPM06XlggWzvCHX2qJhUI2imJ3kmmZE9qMurzO
-	 Nr6skMMSRu8Z5pL2T3es93lxl5GGAm9tCSl6ccNjir0udL74pFuMo+oBvdiXeye5Om
-	 eYQf9O3/IKG6sKjS41DVLzvr44rNUShFsGsogXYgjHLSM8NJjgf+yBpsAzQo9WxlU1
-	 7DgMyMAp4Omt52mT1V7pZRZOvjpw1bw4nfYuIHFTkYCPvC6c9qpE10QkwvBlxuXGrO
-	 BnskCZ6LnQKqg==
-Date: Wed, 21 Feb 2024 17:25:21 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jeff Johnson <quic_jjohnson@quicinc.com>
-Cc: Kalle Valo <kvalo@kernel.org>, Karthikeyan Periyasamy
- <quic_periyasa@quicinc.com>, <netdev@vger.kernel.org>,
- <linux-wireless@vger.kernel.org>
-Subject: Re: pull-request: wireless-next-2024-02-20
-Message-ID: <20240221172521.4dcb382c@kernel.org>
-In-Reply-To: <b25a5783-a9ca-4356-ae17-bbda1340b522@quicinc.com>
-References: <20240220165842.917CDC433F1@smtp.kernel.org>
-	<20240221143531.56942c6e@kernel.org>
-	<2dbb3ca4-78fd-4125-b13f-4ad440923291@quicinc.com>
-	<b25a5783-a9ca-4356-ae17-bbda1340b522@quicinc.com>
+	s=arc-20240116; t=1708567123; c=relaxed/simple;
+	bh=2QIq1hCyoEqjIkfwgL8iMThWjKQKSaSwhoVboXa04jE=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=UgEJWq/xuyx9XEdAxijtgJuqrpjOmOqfk0OOmvIxAmkXeMvcYRSfpScJ4jGnHoQXNrSYw5oYzBbGVgTgrFf3MEvEBkgRls6GdAjdP7EV/7Awev5EXXrnK2ybTzezvzfmatnZ/J4Kxx7Q0VUXwK9Eza+tlZO8fA2AGRKMucx0sko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=15.184.82.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas1t1708567018t123t14999
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [115.192.112.158])
+X-QQ-SSF:00400000000000F0FTF000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 920514574638062572
+To: "'Andrew Lunn'" <andrew@lunn.ch>
+Cc: <davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<maciej.fijalkowski@intel.com>,
+	<netdev@vger.kernel.org>,
+	<mengyuanlou@net-swift.com>
+References: <20240206070824.17460-1-jiawenwu@trustnetic.com> <9259e4eb-8744-45cf-bdea-63bc376983a4@lunn.ch> <003801da6249$888e4210$99aac630$@trustnetic.com> <33eed490-7819-409e-8c79-b3c1e4c4fd66@lunn.ch> <00e301da63de$bd53db90$37fb92b0$@trustnetic.com> <96b3ed32-1115-46bf-ae07-9eea0c24e85a@lunn.ch>
+In-Reply-To: <96b3ed32-1115-46bf-ae07-9eea0c24e85a@lunn.ch>
+Subject: RE: [PATCH] net: txgbe: fix GPIO interrupt blocking
+Date: Thu, 22 Feb 2024 09:56:57 +0800
+Message-ID: <021e01da6532$6ab0e900$4012bb00$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain;
+	charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQKQWSrySMPq8PWl707TeSOritAirQH7bedeAP/Pp5gCVYvqAQHVv3hWAVoX6xevZapD8A==
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-On Wed, 21 Feb 2024 17:18:41 -0800 Jeff Johnson wrote:
-> > definitely a flaw in 6db6e70a17f6 ("wifi: ath12k: Introduce the
-> > container for mac80211 hw")
-> > 
-> > my setup is using gcc which isn't flagging this :(
-> > 
-> > Karthikeyan, can you submit a patch?
->
-> I see this was already fixed by:
-> 04edb5dc68f4 ("wifi: ath12k: Fix uninitialized use of ret in
-> ath12k_mac_allocate()")
+On Wed, Feb 21, 2024 10:36 PM, Andrew Lunn wrote:
+> On Tue, Feb 20, 2024 at 05:25:26PM +0800, Jiawen Wu wrote:
+> > On Mon, Feb 19, 2024 12:45 AM, Andrew Lunn wrote:
+> > > On Sun, Feb 18, 2024 at 05:04:52PM +0800, Jiawen Wu wrote:
+> > > > On Tue, Feb 6, 2024 11:29 PM, Andrew Lunn wrote:
+> > > > > On Tue, Feb 06, 2024 at 03:08:24PM +0800, Jiawen Wu wrote:
+> > > > > > GPIO interrupt is generated before MAC IRQ is enabled, it causes
+> > > > > > subsequent GPIO interrupts that can no longer be reported if it is
+> > > > > > not cleared in time. So clear GPIO interrupt status at the right
+> > > > > > time.
+> > > > >
+> > > > > This does not sound correct. Since this is an interrupt controller, it
+> > > > > is a level interrupt. If its not cleared, as soon as the parent
+> > > > > interrupt is re-enabled, is should cause another interrupt at the
+> > > > > parent level. Servicing that interrupt, should case a descent to the
+> > > > > child, which will service the interrupt, and atomically clear the
+> > > > > interrupt status.
+> > > > >
+> > > > > Is something wrong here, like you are using edge interrupts, not
+> > > > > level?
+> > > >
+> > > > Yes, it is edge interrupt.
+> > >
+> > > So fix this first, use level interrupts.
+> >
+> > I have a question here.
+> >
+> > I've been setting the interrupt type in chip->irq_set_type. The 'type' is
+> > passed as IRQ_TYPE_EDGE_BOTH. Then I config GPIO registers based on
+> > this type, and use edge interrupts. Who decides this type? Can I change
+> > it at will?
+> 
+> There are a few different mechanism. In DT you can specify it as part
+> of the phandle reference. You can also pass flags to
+> 
+> request_irq(unsigned int irq, irq_handler_t handler, unsigned long flags,
+> 	    const char *name, void *dev)
+> 
+> #define IRQF_TRIGGER_NONE	0x00000000
+> #define IRQF_TRIGGER_RISING	0x00000001
+> #define IRQF_TRIGGER_FALLING	0x00000002
+> #define IRQF_TRIGGER_HIGH	0x00000004
+> #define IRQF_TRIGGER_LOW	0x00000008
 
-In wireless-next? Could you do a quick follow up PR so that
-it gets into net-next before the warning propagates into more
-of the networking sub-trees?
+There are flags passed in sfp.c:
+
+err = devm_request_threaded_irq(sfp->dev, sfp->gpio_irq[i],
+				NULL, sfp_irq,
+				IRQF_ONESHOT |
+				IRQF_TRIGGER_RISING |
+				IRQF_TRIGGER_FALLING,
+				sfp_irq_name, sfp);
+
+So specific GPIO IRQs are request as edge interrupts. It looks like I can't
+change it.
+
+
 
