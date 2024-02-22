@@ -1,116 +1,152 @@
-Return-Path: <netdev+bounces-74077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7390385FD19
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 16:53:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7AC185FD4D
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 16:57:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2ECD4289F7D
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 15:53:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B33CB292FB
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 15:57:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77FA714E2F8;
-	Thu, 22 Feb 2024 15:52:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85FE81509B7;
+	Thu, 22 Feb 2024 15:55:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="bSXkMABR"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O3OjonsX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E02D114E2FC
-	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 15:52:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA9DB1509B4
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 15:55:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708617178; cv=none; b=Y87nFjzPZkBNlknGWQY0hp30NKual9Mxsn60aVwTEL6Dss8O0AN3nMt12R+f1kR4bE29Y/R7saRUdVXRBIEm5WjtMvJocagxW4NlPKDAka/UyVO0aMNqDmqrQo7NELPKRNYn34HHi9gNdFOp0+90H8JWNBJVEq72bDehbRAREnU=
+	t=1708617351; cv=none; b=grpkSdp0eXj95xbYQizyReulw74vWyHL9D0UnE+piwNNaZSkYGQZi8KugZkqjrm+O/bv7ckb+i1wwr9iTy2iOfTp+Matzk5+nDc5Dzh0CBNpqCqlwWWcJsHTe1uEzrW6trp7lN7N4tafATXmy4z6XpDa52Vnx2mYeDsduIwa8Hs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708617178; c=relaxed/simple;
-	bh=Vd3UzDgmX7Ao1DnE+nzyieBLFnftQ/B8sJIJRrxRpco=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ux/uMIoa/Bw3r10heIJV/f48T/XSu3siX/WEZxirgd4D+pe3wYP+eOg24JIiN8rqrV4rdDg37TVgTEDyVShN+1yWimr5u2++teYfEIwNdiwI5um8F7+CwIXi3CHm41eMu/Ga7X1vabsZI2xJ99g3Jy3QNp/IN6BLqBJnpoUuscc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=bSXkMABR; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6e47a104c2eso2177947b3a.2
-        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 07:52:56 -0800 (PST)
+	s=arc-20240116; t=1708617351; c=relaxed/simple;
+	bh=ijZPoz6pdkVhBIWUQ1Z7G31qdRzJQyymyc9vzcNoj4s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MJZ9LzUES7cyjnmzE75oOBappSTggPEmneKocodiEotjKXJ5FRyuu+Q7ZGOkyURuPo5EeNTUB2T2vARSvLjduzDqc2GthyzJ0mfuIG3ZbtxgWJsDSjNyCfg8seQjMVgMKwGkT32bcoZzmgwYhHjPLGd2Zb8NrQGfHg07kWwtiZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=O3OjonsX; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5648d92919dso2940610a12.1
+        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 07:55:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1708617176; x=1709221976; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1gfwnWmu63cYswR0b/u7RtSKFeQyr0VL4Kut1suu2n8=;
-        b=bSXkMABRd5Gy9iYQZn6+kg10M0jGKVqcKbqT6VPDcuAA7I4OwHLOV8WaS+y/iZyRAA
-         ZXkOoGHpESpLUfIhI9+kzg2G+h3GF+ylw44PN5ekhfb4B0mYFV+jnIr21/MZ8Ub7Wnw1
-         xJO9AxAD0f5W355FyYMKjxJ+6Hq2yKqAYPkWI=
+        d=linaro.org; s=google; t=1708617348; x=1709222148; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZeSilmFM4w0WXRaHhUUgxSElEXw+W+iS41h1tgRKpEM=;
+        b=O3OjonsXJxSCQ5CX7obrr+OLEVek+kGPDXejy8ta26Gn7+Nm0giffzix49GYEMdVD5
+         Ouc2bUzA4AVXnqNx1qMqTn5UahSL1p8AiN3DmzywhNIlk0xn5gKAzDIdYK6GcQIlSJBF
+         p4tl6x40EOTro+t2CqrtDB6EYEERLC2O21a3U/dThvJcaKP+SvkWF9KIYqPmusgXrRT+
+         1NNzPn3XfvOEcaMCcOU4Y5JF3KxZfya33clW0ceWwne2JQUfslq1icoIKoRsutlAjnj6
+         +AmAFx421EqVQqDAQinL/F6bjjxvBpqX3Bf/ByVoO34wGawX87fJ3xTkIo+uA7MAtqwJ
+         71Ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708617176; x=1709221976;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1gfwnWmu63cYswR0b/u7RtSKFeQyr0VL4Kut1suu2n8=;
-        b=fq9Yd+bra8jvw8bXiDQ/2gY5mLu8UsIodAV3V5Vhk8AbMMaSdw5hk0wh0thrTy55o5
-         FK6fJeiBCMNMOU6N4f7EhPcKlUMtWFPh/WMemEYiiCoN1azzyXL0k+qBC9lZ0k6/TA+1
-         5U3xJZtzbG97q0z3DrXYs7C3z3T1oCpUf34/ZN7tNqmEkolc4ghYM8Qv540J2no7wnCB
-         sk+K7TnzQYamP30iwqaOvgzSDVfSuJLZkCWBVyyq0dGzBcHiBdpyuutwa5KF3HwUzffC
-         9IOa0U/U+MSa5BCRpV3kuAPfHy80pHRDjs8puprZEOmqUXNRyNm6JeZLRDboSEzt+jcx
-         +ZLg==
-X-Forwarded-Encrypted: i=1; AJvYcCXWQoG+cPJcFEg3xsVBSKv4F2fqtGOY0oluHxVaK+KK00ouVwB+CGnNZE+2F/X3Rp5/7yi3YlU5Wie4yWuQNgzOnwV2itYL
-X-Gm-Message-State: AOJu0Yx/K1d4exy0noF8eR25l/W34o+d0uST5EopAqCDdV4N7knIwNwC
-	rBhlMBm+0wm2tv5sYrJtOOWyaMXZc43dv4UEoii/ecZUHrrbehzdJKZdJ6YIZw==
-X-Google-Smtp-Source: AGHT+IGrtsHGeHfg7xJD4IpKzMvkDmfLWoRjY3MrY0wjNmBdDYmkUNv35SM8aT2MKwO5Lko2A1nlBA==
-X-Received: by 2002:aa7:90c6:0:b0:6e1:44ec:8e9e with SMTP id k6-20020aa790c6000000b006e144ec8e9emr14895496pfk.21.1708617176218;
-        Thu, 22 Feb 2024 07:52:56 -0800 (PST)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id g19-20020a056a0023d300b006e469e8b634sm7589863pfc.3.2024.02.22.07.52.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Feb 2024 07:52:55 -0800 (PST)
-Date: Thu, 22 Feb 2024 07:52:54 -0800
-From: Kees Cook <keescook@chromium.org>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Mark Rutland <mark.rutland@arm.com>,
-	"Gustavo A . R . Silva" <gustavoars@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yhs@fb.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
-	Haowen Bai <baihaowen@meizu.com>, bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Jonathan Corbet <corbet@lwn.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Joanne Koong <joannelkoong@gmail.com>,
-	Yafang Shao <laoar.shao@gmail.com>, Kui-Feng Lee <kuifeng@meta.com>,
-	Anton Protopopov <aspsk@isovalent.com>,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	netdev@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v5] bpf: Replace bpf_lpm_trie_key 0-length array with
- flexible array
-Message-ID: <202402220751.2370A263AD@keescook>
-References: <20240221222613.do.428-kees@kernel.org>
+        d=1e100.net; s=20230601; t=1708617348; x=1709222148;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZeSilmFM4w0WXRaHhUUgxSElEXw+W+iS41h1tgRKpEM=;
+        b=vP8Rx7QEDmSQv7Uu4Jo7oYSWM1WAEiAQmNa/D2cDWQvVQxy8rSa/Sgh19cgntYzN0g
+         BfS5LQsJni8PBSZn3EVnKogPTaVErMIIoXxT7bIHHDJlgwgE311aFs/7T6zOoIqlyF2O
+         r61q81UdOU46Pva6syFWIRK9GZFqGPUz+TYY9ey5Szwr5VYYSMuyCAxiBq5qAyQoM/RT
+         bx7/OVmCzpLkGfHTf21J46MiAAVTOp0EZOUjpBvHDOwjO44UwI32jQTTUF93Jt6sSg9J
+         PoVxfvkpJjicu2FC2ayPaqI7dxdBM8LR0M1+bDHV6CP+lswJyXi054jc8RFFU8F9baOK
+         z8iQ==
+X-Gm-Message-State: AOJu0Yxig73kMlM2VsVVrL2QngBvx2ZaPpxHKTaplmIZgrI8S/GbMB/T
+	bHG49twrGO6ozn6rKkbgyiaF95jchSZZGUYlbSHYceJcTlGNE7KSO2ke++DXP8w=
+X-Google-Smtp-Source: AGHT+IEXxdb3RypXN2d9UU5riPU4UheBctxTq9a+zr1lCbmad4Gp1ZkM3sRQzXGw91hlqnxuZiPxfQ==
+X-Received: by 2002:aa7:d993:0:b0:564:7962:4545 with SMTP id u19-20020aa7d993000000b0056479624545mr7789865eds.15.1708617347978;
+        Thu, 22 Feb 2024 07:55:47 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.222.116])
+        by smtp.gmail.com with ESMTPSA id s1-20020a056402164100b00563f918c76asm5623671edx.52.2024.02.22.07.55.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Feb 2024 07:55:47 -0800 (PST)
+Message-ID: <80c03432-0814-4df9-ae6f-25e9f621a13f@linaro.org>
+Date: Thu, 22 Feb 2024 16:55:45 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240221222613.do.428-kees@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 4/4] dt-bindings: net: cdns,macb: Deprecate
+ magic-packet property
+Content-Language: en-US
+To: Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
+ nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+ linux@armlinux.org.uk, vadim.fedorenko@linux.dev, andrew@lunn.ch
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, git@amd.com
+References: <20240222153848.2374782-1-vineeth.karumanchi@amd.com>
+ <20240222153848.2374782-5-vineeth.karumanchi@amd.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20240222153848.2374782-5-vineeth.karumanchi@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Feb 21, 2024 at 02:26:20PM -0800, Kees Cook wrote:
-> Replace deprecated 0-length array in struct bpf_lpm_trie_key with
-> flexible array. Found with GCC 13:
+On 22/02/2024 16:38, Vineeth Karumanchi wrote:
+> WOL modes such as magic-packet should be an OS policy.
+> Leverage MACB_CAPS_WOL on supported devices to advertise
+> supported modes through ethtool. Use ethtool to activate
+> the required mode.
+> 
+> Suggested-by: Andrew Lunn <andrew@lunn.ch>
 
-Nope, still breaking CI. I will respin again...
-https://github.com/kernel-patches/bpf/actions/runs/7996482005/job/21839056683?pr=6451
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
--Kees
+Best regards,
+Krzysztof
 
--- 
-Kees Cook
 
