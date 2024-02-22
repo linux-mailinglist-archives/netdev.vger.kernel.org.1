@@ -1,143 +1,93 @@
-Return-Path: <netdev+bounces-73967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73968-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D08AA85F800
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 13:21:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D2AE85F807
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 13:23:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E2461C21CB3
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 12:21:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2466C28A366
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 12:23:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 877E260873;
-	Thu, 22 Feb 2024 12:21:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vais+w7d"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E68C255C28;
+	Thu, 22 Feb 2024 12:23:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4075355C28;
-	Thu, 22 Feb 2024 12:21:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A986C42078;
+	Thu, 22 Feb 2024 12:23:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708604507; cv=none; b=Z8xJ3xZsVFNTHO/YjKKJzrpI6I9tzF6C7tuoZDhAe6lzSZrXpsLN4nI+fVZWJlhR25OY08R6zTg0uhsjBKDZUY3U2aQ3JfqHhOmThqn3wqCXsYljwak89oYSqDoXk9Y/gh1e7iCC4+UpYUUMeYR9NEbyadX218spl5A9DgFtqNg=
+	t=1708604619; cv=none; b=Prbo7c2t6tcmSb5WVzmn71tS0NshT+DvYPcZDyzT0lYaZuqjj2SW/OH3q0MFp/qz7eus2kuOpC2B+O3GstTj0ycs/TKCdQM0ypWGzW4EDEVDiT7N9y531RPcXqrlgk1VnXRERnVJUNZGnlmGmyO/qGUOaq25hoZc2w4UMT4r3IM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708604507; c=relaxed/simple;
-	bh=EqZbzaH/qaB7a7IKc6JYTdatq4CHgvMWc4c4mJHW2hE=;
+	s=arc-20240116; t=1708604619; c=relaxed/simple;
+	bh=C0iGDiSKm0ByGpcZYHuUMuTk1uqfOg/gu4wVjipraFk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IVjtJUg6NUJ5CM35VO8VXbepV/5gVRPM799nC637htVLwp30Vkr29y/MxlWFwdiSyuCIcyUTmm5daNeBhwbSODwh+31ZU6djOzVTj1djWdL/445r0Pdcb6xfvt069m5WRnr/qTz2ihDF0JX0b434506R7vM0Iwz7SQsrMo9lsK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vais+w7d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81E0DC433C7;
-	Thu, 22 Feb 2024 12:21:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708604506;
-	bh=EqZbzaH/qaB7a7IKc6JYTdatq4CHgvMWc4c4mJHW2hE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Vais+w7dVBc+Xk4EvckzPmvM6a/2KjvGzm2VDrn7oZd6lT1sMCuOcX1qDb2PMDCEW
-	 IZALOUfq5R7czopyD6Q8n/kouh0W3vDg13fw2wPev+9aOxAzv5iSFTj01WlgeRtm8q
-	 rfrlSSvGHi8dMfB4nzhaZ81mQagcgNVTDsSzCfY3Yk76RiQvI4C+1mW9qVZN85sa5q
-	 Uz3u+hqODk6ps05MFS1CAhRh/TkO/5AAWb5UNCazW0O8MTp8aD1OJpRyMUiaGn3Rcm
-	 lv9vU3NJ1hmnoVZQ4RN+226xKHklRHGaTs1CBXAw5vmIXparkNzLdJs/W+pgHBWnYG
-	 hT7MEcGskAyYw==
-Date: Thu, 22 Feb 2024 12:21:36 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Alex Elder <elder@linaro.org>,
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Abel Vesa <abel.vesa@linaro.org>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Lukas Wunner <lukas@wunner.de>,
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
-	linux-pm@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH v5 14/18] PCI/pwrctl: add a power control driver for
- WCN7850
-Message-ID: <52fba837-989b-4213-8af7-f02cd8cb48c8@sirena.org.uk>
-References: <20240216203215.40870-1-brgl@bgdev.pl>
- <20240216203215.40870-15-brgl@bgdev.pl>
- <d5d603dc-ec66-4e21-aa41-3b25557f1fb7@sirena.org.uk>
- <CAMRc=MeUjKPS3ANE6=7WZ3kbbGAdyE8HeXFN=75Jp-pVyBaWrQ@mail.gmail.com>
- <ea08a286-ff53-4d58-ae41-38cca151508c@sirena.org.uk>
- <17bbd9ae-0282-430e-947b-e6fb08c53af7@linaro.org>
- <53f0956f-ee64-4bd6-b44f-cbebafd42e46@sirena.org.uk>
- <CAMRc=MedCX_TGGawMhr39oXtJPF4pOQF=Jh2z4uXkOxwhfJWRw@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZaDyQbcCCBJetycSbPalPMbC5GF9B3XgXaFagnTsDpOqSWE0rcUmbdQ3oFpAJED419MnZV9oLR/AfskJ74ucIJ3BeRy5l559XVA4afGq+U/s9DPOsm3wqNUXAX/JxUhPEZuXC+hjvNwam3sa6WxW/pOwJDjgGFCn8RRsSa5AXL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1rd86n-0004gm-0F; Thu, 22 Feb 2024 13:23:25 +0100
+Date: Thu, 22 Feb 2024 13:23:24 +0100
+From: Florian Westphal <fw@strlen.de>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Florian Westphal <fw@strlen.de>,
+	syzbot <syzbot+99d15fcdb0132a1e1a82@syzkaller.appspotmail.com>,
+	davem@davemloft.net, dsahern@kernel.org, horms@kernel.org,
+	kuba@kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [net?] WARNING in mpls_gso_segment
+Message-ID: <20240222122324.GB28098@breakpoint.cc>
+References: <00000000000043b1310611e388aa@google.com>
+ <20240221131546.GE15988@breakpoint.cc>
+ <CANn89iK_D+v2J7Ftg1W6-zn7KSZajwWVzfetSdrBPM6f_Zg80A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="M/jaeVyfzRnxNsGp"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAMRc=MedCX_TGGawMhr39oXtJPF4pOQF=Jh2z4uXkOxwhfJWRw@mail.gmail.com>
-X-Cookie: I have accepted Provolone into my life!
+In-Reply-To: <CANn89iK_D+v2J7Ftg1W6-zn7KSZajwWVzfetSdrBPM6f_Zg80A@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
+Eric Dumazet <edumazet@google.com> wrote:
+> I guess we should try this, or perhaps understand why
+> skb->encapsulation might not be set,
+> or why skb_inner_network_header(skb) is not set at this point.
 
---M/jaeVyfzRnxNsGp
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+syz repro injects data via packet socket, skb passed down stack
+has ->protocol set to NSH (0x894f), gso type is SKB_GSO_UDP | SKB_GSO_DODGY.
 
-On Thu, Feb 22, 2024 at 10:22:50AM +0100, Bartosz Golaszewski wrote:
-> On Wed, Feb 21, 2024 at 12:44=E2=80=AFAM Mark Brown <broonie@kernel.org> =
-wrote:
+This gets passed down to skb_mac_gso_segment(), which sees NSH as ptype
+callback.
 
-> > Yes, that's the theory - I just question if it actually does something
-> > useful in practice.  Between regulators getting more and more able to
-> > figure out mode switching autonomously based on load monitoring and them
-> > getting more efficient it's become very unclear if this actually
-> > accomplishes anything, the only usage is the Qualcomm stuff and that's
-> > all really unsophisticated and has an air of something that's being
-> > cut'n'pasted forwards rather than delivering practical results.  There
-> > is some value at ultra low loads, but that's more for suspend modes than
-> > for actual use.
+nsh_gso_segment() retrieves next type:
 
-> Removing it would be out of scope for this series and I don't really
-> want to introduce any undefined behavior when doing a big development
-> like that. I'll think about it separately.
+        proto = tun_p_to_eth_p(nsh_hdr(skb)->np);
 
-This is new code?
+... which is mpls (TUN_P_MPLS_UC), it then updates
+skb->protocol.  This calls back into skb_mac_gso_segment() which
+sees MPLS as ptype callback, we then end up in mpls_gso_segment()
+without any inner headers set (skb->encapsulation is not set,
+inner header offsets are 0) and mpls_gso_segment() attempts to pull
+negative header size off the skb.
 
---M/jaeVyfzRnxNsGp
-Content-Type: application/pgp-signature; name="signature.asc"
+I don't see anything that could be done earlier in the stack about this.
 
------BEGIN PGP SIGNATURE-----
+As far as I understand NSH assumes its only called from openvswitch
+and MPLS GSO code only via Openvswitch or mpls_iptunnel, but its
+reachable by other means.
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXXPE8ACgkQJNaLcl1U
-h9CIHwf/XP89jkt/tlGa4jICwu1iztzFqaiTJkTcvJjUXga/U61RNmUVRGfMlGTs
-NbXYJFbdHP6Rz6ClY+/Ws+p1AsrvAOj18ufykhqOSOf5OBAsi8Lzeex5WSN0LZKs
-iT7v2mfE45b+lM8yTNapT0z3KoAKh9QWJHmohYHG+cJadqgoYuv8zZfPVWIBJhFD
-I6jZ37EHzRJ5t9CgmJBA84tQojwDT3sie2EuZQ+wTGvaPloUU3LJuAv+ZF5LMsIi
-o+kwTHP7xgkb5VD9I6EcO70CHkzvwSKLXzuhvEB4jGlrWNXjL7ZYjPyoruUMbtrS
-LRRnFjVnLkvTL1/Jg1GArsnIQd7Xow==
-=UdGL
------END PGP SIGNATURE-----
+But skb_mac_gso_segment() doesn't have any info on the originator
+to know if it can call into nsh or mpls 'as intended'.
 
---M/jaeVyfzRnxNsGp--
+So I'd guess best solution is to explicitly check for negative
+header size, plus a comment that explains how this could happen.
 
