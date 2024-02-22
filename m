@@ -1,292 +1,221 @@
-Return-Path: <netdev+bounces-73988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9514D85F8A4
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 13:51:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A781185F8E1
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 13:54:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B11381C24301
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 12:51:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA92D1C24BDE
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 12:54:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35ADA12E1E9;
-	Thu, 22 Feb 2024 12:50:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76FBB133296;
+	Thu, 22 Feb 2024 12:53:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="LKLzS/CH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OucXf9rF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com [209.85.222.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2019F12DDAC
-	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 12:50:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708606255; cv=none; b=pDXck2uiKdooAx1IIpwj/LOfGZ2Dley5QjCwpFortJhLU1fadZenGYlOauBmmM6DSLcC7NNwp4iIVNcdMd3gAS9IGD5WwbPKvvQ2wgHdprxL5VYAnx6hFCTN/guliLeT3NX0B9RxSf31JNXHH5V0mAkNOcE1cy/Il/V5N3YZ1eI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708606255; c=relaxed/simple;
-	bh=D/Rv64Y5sXOy1hNvU3YRveE5JBFKjHlveZT/G/uvFqU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Pm22vzXk/qSZPYCCLMxdHVbE1XQobbxhHZz5eUS4C4NscsTOuXxZYXYdZgWtmMcDc+jfYtrnt6aZgwyNDtcU5Hu6j8rASMqxB1f3YwzfoQRVv+HHId2X5l61LGD3VZF7aQwQAjmKq6nxXHa25cUPmQRl1WQO5OWE/JhylgLyhx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=LKLzS/CH; arc=none smtp.client-ip=209.85.222.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-ua1-f47.google.com with SMTP id a1e0cc1a2514c-7d625a3ace6so461713241.0
-        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 04:50:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1708606252; x=1709211052; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W1FTSWWbKgvLwm17WUy3ABhI4j9ElVgmuDBNeAXwxPE=;
-        b=LKLzS/CHlY6j3aQfqyPsc5py+kJ8OsywTj+C1GxUa56NtwFEvXEZbAN73hjDfs1u61
-         rBd9Lm5HciyVN4GLjzgUzwv2yx8nxETNIrEgbi6MJDDaCFEdgYM4yNFAruQMLhWpbtar
-         zcGx76yKl/kZS2u3/qZinz5CsdOtwdvaAWSWpkn+2hfbSxSBLM4jGydIsoU8SOS+6agt
-         wBgmDNTBmDDU3Oi6mwWc9zccq4gRgGtrS9+JTkElLL2qudbn3RnC0EdvjUuChsV+k/CJ
-         PwLS9dPXcbkz/E6aBRNXbw4fuWFFA8nI/15r2IDMKUrvHRM6vPOabtIr66OoNtNL+5Of
-         bjvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708606252; x=1709211052;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=W1FTSWWbKgvLwm17WUy3ABhI4j9ElVgmuDBNeAXwxPE=;
-        b=X/dH3doB9oQjti4XAplSLPMTZGqGRg8kyvxtYpkWcu09FtoX+3V8UIBr6nxUtA2snO
-         xlmwSKn8NSopN2m3POGMToTJvg5khxM5CnvV+swY7B9pKJhBmEzSMRS7duXKBDzH/U1T
-         Hj7lyAxVry/ngZxO9Ead+Cl+qIw4kRCrvzQh64iBqtIFjMMFN002j0YYMVqfDmCCmV31
-         E2lAQfeFDAInIt7pvU3ccLgJ8DOnG02P5MubfYccofuU5gy9HI74V7PkzG7UGqZ9pi4p
-         H1f+ivrxTYDjtrF2VB4abSVJC8yYNioG9PLPgSDYYRiFfL41BRpJwGPGucVDuo19HkTY
-         JkyA==
-X-Forwarded-Encrypted: i=1; AJvYcCWuFy0EcIPuOQDDV6lUgK+ZeiKGW89p64+AlfI6Fypx+ApOU88ghySWQdeg42ijXWUy5dWDYWQdW3kQwHFaEjBf0QeotHvL
-X-Gm-Message-State: AOJu0YxJEIstG7vMGP2HQya9PuBFm3ejm/Qwc4DlogpHXpLhIC1awPFz
-	l86a5SI4iGosjboXwjHcxLZHHFkRuz5VDEkGgT5iNSwLXbYdD8z2YT8aKWkISMnvnSawgwOzLr4
-	ppJGyz9f3GDF+eRzcMRGvPf1aInP/Bjf8ZjchUw==
-X-Google-Smtp-Source: AGHT+IE1dv1EwDAd6TX1lQGq6n3XBsSY4vP2JhDCLl+t1UgliKtkx4suismK+MOv4dm7qGwschM/R4BLzbUnH1NzkV8=
-X-Received: by 2002:a05:6102:dc8:b0:470:4043:8f21 with SMTP id
- e8-20020a0561020dc800b0047040438f21mr1890402vst.11.1708606252028; Thu, 22 Feb
- 2024 04:50:52 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A3512FF60
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 12:53:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708606418; cv=fail; b=VnFc2avLF7BXuoHJBMDiV95/EGHolE8EGT7AB8kFbUIyPPXls6xaJ2YR0h8jaNisPafX2bNDx3qklkIQ7oqsquBV8iJn7uQrG3QzbT8GkWwn0zqFrtm15amUQCHVaDkxTq1cOiSKk067bCmJe35VHH68MqnnpiyB11S6M+udmuc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708606418; c=relaxed/simple;
+	bh=ZiqE9J1k535QUGU7WNMFbLuTblFnMmJ94tHHUbLTpK8=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=fKVqOJ47TtYWa4s5OHc6maWoKlT2mHgMrkPa75ZBvtkmSHO9B0d7am0dAyn+eotnhLL8FzULaGVoweVaoku3fvzsEAaoBjNrVIkEQH1h0RXD9R2qZ9pTOmY4qvnaHC7hoZWa6D8zl5x7vNkIrSSEbJI1H/veIlehzm/7n3HsGC8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OucXf9rF; arc=fail smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708606417; x=1740142417;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ZiqE9J1k535QUGU7WNMFbLuTblFnMmJ94tHHUbLTpK8=;
+  b=OucXf9rFVuSJG5gbt9E7Js0OMQQNTSgtRXeoUtOOrlnGPx95CwiVeMLD
+   DSO9TNIQMgEhcYlgLa/SIK3wXXJAiwQSbxQx+0zMyo05Xz+uHsAIxnmRd
+   1fWnNBUUP4LFkyZ+xWNyNXdgnx137kxRzQJjud/fr7JdDmVkkhUBO62zM
+   YYSkERDLIYs+5o1VLWolt8/b3rinBi1pjYvTGLcfA/qSouS7F60A6Vrfc
+   rcfR95zbaU+IilZj5yWN1XObgwbm+yQpLSHFIoQV4LyXqySkN8zYUTxac
+   ZzapOdzjGjeo9doSTXTR5vhY1sh6S3wYwTqdM7CGEPgebo4CZNzaScuW1
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10991"; a="13449231"
+X-IronPort-AV: E=Sophos;i="6.06,177,1705392000"; 
+   d="scan'208";a="13449231"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2024 04:53:36 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,177,1705392000"; 
+   d="scan'208";a="10176942"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 22 Feb 2024 04:53:35 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 22 Feb 2024 04:53:33 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 22 Feb 2024 04:53:32 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 22 Feb 2024 04:53:32 -0800
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.41) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 22 Feb 2024 04:53:32 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=U11eSki9XYvjqJZPDKyDokx7na/DFRR1blji4Tdo2VJHzgFtZ2rABPbD93jqNQxT7ovBnR/GOsmMuVusa+NPa5qTaTvgqHCExgHhwJHwS3HE2CLtTofMZbPkznY7m3g+jEXqQ475SGbmg9EPVQOEv8Qc2xoE7s2Xgi3AXev3dfcdvkNg/pNSATzAfSpsMh0/DuGs7T4ygJ/a4Ajzms369zPGVNIQAMQLoatZ8t0SVlUywSLlGxi0EVMPezrj57iiwPYeFUuHP381WuLlVvkq6rr771GfhjAuIBiLX2TVJke4fOeu3SEpxJdUVKBj4jSiaXevMyDMm621NUtEnXf+mQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=m3buo8J41DSx7ievSuuT1RmN/i738gRox/knXOZlAIc=;
+ b=HrUdcGUiI4aBB6FSBnx4FNZoV4Se4V2ipWG4RtSey0zUPn0ZgG78Kc1MYG6nK2z8UdiWbkIEXXR02OjMXHLGOfq0Ab8Rr/nvz6DW6Y8qvXkX4Nl6g9zGA2a6Ubykyn8B1tIV1hRoTbOGPUBLZl5DIeFnc0yPIrE5CveKSmJXYTm/cidTbqi7hKi6gPvHLTzgbnqxb9+GW1hgHMYfQ/m6Qa/b4io/e3Mn7x7L62MooKfws2VCo2bjQMwVEd9qSSfZ1LLt4Y3MD3UTf635JgV0wtDD7l/STubNFnnJ7EVMDvB9stfypO2gMZskNgwa78rkIJt6O52QuVrNGYnaVxSSWQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by DS0PR11MB6352.namprd11.prod.outlook.com (2603:10b6:8:cb::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7316.21; Thu, 22 Feb 2024 12:53:29 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::93d9:a6b2:cf4c:9dd2]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::93d9:a6b2:cf4c:9dd2%5]) with mapi id 15.20.7292.036; Thu, 22 Feb 2024
+ 12:53:29 +0000
+Message-ID: <7baaefa1-cd27-4dc7-aa2d-946aa4d225e7@intel.com>
+Date: Thu, 22 Feb 2024 13:53:25 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 01/10 iwl-next] idpf: implement virtchnl transaction
+ manager
+Content-Language: en-US
+To: Alan Brady <alan.brady@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>, "Przemek
+ Kitszel" <przemyslaw.kitszel@intel.com>, Igor Bagnucki
+	<igor.bagnucki@intel.com>, Joshua Hay <joshua.a.hay@intel.com>
+References: <20240221004949.2561972-1-alan.brady@intel.com>
+ <20240221004949.2561972-2-alan.brady@intel.com>
+ <369a78cd-a8ed-49ea-9f89-20fea77cc922@intel.com>
+ <52fa2a08-b39d-4ffe-80da-c9a71009a652@intel.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <52fa2a08-b39d-4ffe-80da-c9a71009a652@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR2P281CA0142.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:98::8) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240216203215.40870-1-brgl@bgdev.pl> <CAA8EJppt4-L1RyDeG=1SbbzkTDhLkGcmAbZQeY0S6wGnBbFbvw@mail.gmail.com>
- <e4cddd9f-9d76-43b7-9091-413f923d27f2@linaro.org> <CAA8EJpp6+2w65o2Bfcr44tE_ircMoON6hvGgyWfvFuh3HamoSQ@mail.gmail.com>
- <4d2a6f16-bb48-4d4e-b8fd-7e4b14563ffa@linaro.org> <CAA8EJpq=iyOfYzNATRbpqfBaYSdJV1Ao5t2ewLK+wY+vEaFYAQ@mail.gmail.com>
- <CAMRc=Mfnpusf+mb-CB5S8_p7QwVW6owekC5KcQF0qrR=iOQ=oA@mail.gmail.com>
- <CAA8EJppY7VTrDz3-FMZh2qHoU+JSGUjCVEi5x=OZgNVxQLm3eQ@mail.gmail.com>
- <b9a31374-8ea9-407e-9ec3-008a95e2b18b@linaro.org> <CAA8EJppWY8c-pF75WaMadWtEuaAyCc5A1VLEq=JmB2Ngzk-zyw@mail.gmail.com>
- <CAMRc=Md6SoXukoGb4bW-CSYgjpO4RL+0Uu3tYrZzgSgVtFH6Sw@mail.gmail.com>
- <CAA8EJprUM6=ZqTwWLB8rW8WRDqwncafa-szSsTvPQCOOSXUn_w@mail.gmail.com>
- <CAMRc=Metemd=24t0RJw-O9Z0-cg4mESouOfvMVLs_rJDCwRBPQ@mail.gmail.com> <CAA8EJprJTj7o0ATrQbF_38tW+kLspF1nBySg+_y_RWmadVnV9A@mail.gmail.com>
-In-Reply-To: <CAA8EJprJTj7o0ATrQbF_38tW+kLspF1nBySg+_y_RWmadVnV9A@mail.gmail.com>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Thu, 22 Feb 2024 13:50:40 +0100
-Message-ID: <CAMRc=MfkQuaJ3FnVwbVKQRQEgmJKbZh7SJoK3Kbmb5ebzE2rKA@mail.gmail.com>
-Subject: Re: [PATCH v5 00/18] power: sequencing: implement the subsystem and
- add first users
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Rob Herring <robh@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>
-Cc: neil.armstrong@linaro.org, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Kalle Valo <kvalo@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konrad.dybcio@linaro.org>, Liam Girdwood <lgirdwood@gmail.com>, 
-	Mark Brown <broonie@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Saravana Kannan <saravanak@google.com>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Arnd Bergmann <arnd@arndb.de>, Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>, 
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|DS0PR11MB6352:EE_
+X-MS-Office365-Filtering-Correlation-Id: 51cee4d6-5fd8-43e3-31ef-08dc33a54497
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: q6Yr39hYq2s1nfc/gGU18Qi4O9QKZiDJY/wHpOm5eubjZtO5ispt0RmDQfG0HiMe9g2qrAVve3tmq6vpTyLSPHrpSRbo2LW+DKWF5nM5uycOvfZSJ9NIIQeyGhwYJRP4V+rlSxct70LPHekaPz5k0VMhI4zota8rrOgqUAQ7X3dTMf/uPByzB5FEvebp53+UJC1vo59vnN2DBQFUuNq+3/SxFqewHcMlC1u6tH6x5HV1TN0oMde+ZPFDOUOvQ8HE98pBPrQ4Hb2oQr4Lb90reYQ3Wizayu226qEol4d/XdOjeXhvqUJ37PAob5axlx2Brq0cZEewNgVnB4PKToLPIMTp+EdAs6ydUXJS/MhbzwWvHXRKAhU6HjDY2851gtmRCLozMPfSdf6hP2Nuzae9EtbvmO399ydKDNUHGsbKyAajrFIIW2xwYZsjRk0eOe/GqIo276TDOTidc0OWsnZT7fQvLC+jI+2UmYwqiwbuo25igwOkY3fGekSxbfB2I61738u5mUyAzpTeC6ceTFTThGGN9N6/OQZTVBcB/QNjiSA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VUlsQ3QyaTJZYUZITzFHR1QyVXp2Vkl5dStBSyt2ZDRWYms5YlRLeTNzTnFs?=
+ =?utf-8?B?WUhkN3BQdXcwNHZwNVBmdDcxZkhjRGpMWDB0OVBCc3lYbFVUNUw2TVlwallN?=
+ =?utf-8?B?c2lENjJLZTBDd1dGbStuN1RoM3hDZDFGNW8wNXU1L1F0RGRlRUNkL0E1QjQ3?=
+ =?utf-8?B?YXd0dFd0ZGhTbVBhK08zVGpBVFpIc003V002M1htRUhDc05XSVYyTnZkdjdy?=
+ =?utf-8?B?V0ZWbDFsaGhiY1BuYzlSOTExZlVCQ1lISlBPOWRBdFA2c1pPYjdzRGcrTTJB?=
+ =?utf-8?B?WTJSMmg5NXc0a0gwd0JyVEFZdkVienN3Qkd2TENHVTZ1RE52WkpmdGlseGNN?=
+ =?utf-8?B?Uk01QjQ2SWlqT2U5VWdma0p5ZUhFajVUTG43UVpaZlkwNDZGUzB0TkxQdVV3?=
+ =?utf-8?B?REhGcC9MNW9UdzgzSWpLTTFiU21iZ0NyS1B5Skt4UnY4bXR3bkorRWx3OHdt?=
+ =?utf-8?B?SlVwNERhSXZXK2I2VFR6d05EOU9TSXpUeTZsTG8ybXRuOEVEeEtOSGNDTFQ0?=
+ =?utf-8?B?Y3ZRdXBnZXZaL0lwSytvMkRIOEpwVXNLTWQ5QlBVWFo4NHNGaENjM3hqNmVZ?=
+ =?utf-8?B?RWZ5bFhnNHMycGVvZXdYV0lCbnA0Qi9VSUNXVy81M21NNENrbm8wZGpKL0ZQ?=
+ =?utf-8?B?QzVveERuZzU4REN3MXVVUmpHR3FSVUlqazJKWlkvL3NqdHBWbGp0RnF5VkFt?=
+ =?utf-8?B?ajVFbDdWMW1CTWlwR0ZFU04wc2ZPUFAyaEJiME96Rk45Y2tPVk1SMWtEUkRQ?=
+ =?utf-8?B?U2x6aStJOXc5K1lHUTNURU9kWW05SDJnNWdQVWZkZVJYcS9lcm1OQXVrTVlF?=
+ =?utf-8?B?RGZ0V2JVN0J0cnpXVWtPQys4bDlYL3phRnp2NW5YZnZoM2lQQU5LalNUL3ov?=
+ =?utf-8?B?eUtDRkJGVzhrNzFDN0xLdit3bnFMR0o3YWczcFNSS25rNG1iTmEvcFpGdUlI?=
+ =?utf-8?B?amoza1MvREFRdmhpaXREZ3JpbXptNklnQTFMbEEraGgzTnIyU09CeWdHanUv?=
+ =?utf-8?B?YjZlVzNQQk9jWk5UWGhreFhmTlo1bVRMcjBvM0FkWWRQS0g0UDRFS0dQeXdj?=
+ =?utf-8?B?a2tIczc4Wno2WmdyKzMzMnk3QUEwZWVoNXJYSGJ3ZWhKWnB6bE82R0ZRdWha?=
+ =?utf-8?B?NSt2cUhZbWkwVmF2R1IzZitSL1RnWDNGRGl0d3ArM3VjK0JWR21YaWlZVG85?=
+ =?utf-8?B?MDJ5aTdFd2xBRUI4TXFyNUxQVUpKY1hnekV2b0dwM3ZaWkFnM0R0K2tvS3o2?=
+ =?utf-8?B?VUhBMFc2Rkp6Q1Z0ZTg5b042QkhuVmNpVCsyZ0hrcHdCY1N2czA0TkNIeC91?=
+ =?utf-8?B?eUFqWXB1Qy9DTm40RzJDY2dmWFpCS3FTWTNhY3FFR3pKVlNZN3VGdk91VjVH?=
+ =?utf-8?B?Z0hjd2MzVk8va3pCNVZzeUViNXdjeWV0OTR4eG9keUN5aEExdTJlaXFoc2Nn?=
+ =?utf-8?B?SmZtaDhaaWpXZHpsTnppSWdhSE5IMzZxUUdxdm9mUCtXYlpqTWVhb21wdzVh?=
+ =?utf-8?B?S0g4NWFMbHp1R0Y5Y2xtV0xaaDdYMW8rQ01MWTA2VHlMcFFwWlNUMXZ2TU5N?=
+ =?utf-8?B?ZHg2OVUwR2dGYkkzdWxoYkE5UXF1RjkrK1g1QXlMN2NHVlRJdW1UcFhIUmZP?=
+ =?utf-8?B?YVVkUlRmME5saEFZcWhDMHNKenpvOEprS1hRQ0NNZnVDNWxjSzF6NXM1MDRM?=
+ =?utf-8?B?UjdQeXJJUkVIYWxiaFFwYzRva2pMUVBkdm5aOGw2TVVneWJZaGRxWFVjK1Bo?=
+ =?utf-8?B?c0F6QS9jeFpxOTlQREg0NHRpbjFWNG9xNGIxaHFwOWVaWWVWMGpoMTE1UEFZ?=
+ =?utf-8?B?ZWVjaVFMZURQWjhtSEZMNnZRcEpnWUNjeUNsRHhqamhIanZsdzBjOE9Jdngw?=
+ =?utf-8?B?UkFLR2c0eDJaaG42NkFWeFFOSmtMMndDZFdkL0xLUzEzaUhqcVpFYVJnK3dp?=
+ =?utf-8?B?QnJqOHlUcFFzR2RMRURIWHpkWk9DWWk1d2tnTkdySTBMc2U3OE40aGwwV1ow?=
+ =?utf-8?B?Sk9ndzNVLy9UczA4Qkt6OVVORlYxajRLS3V2d1kyaGRzS0p2ZVc5UDFEaTBU?=
+ =?utf-8?B?S3RIU3J0V2lkcWdoemQrK3c0VFM1K0VzaUF1cTJ3YXh2OTJUMjhBUGU0Yzcv?=
+ =?utf-8?B?TUhuQTBhanFyeEhJN0xwNTM5Wmh3ZXNQYndYR083RGQ0NnJNSG42ZjNkQXJE?=
+ =?utf-8?B?RGc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 51cee4d6-5fd8-43e3-31ef-08dc33a54497
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Feb 2024 12:53:29.5524
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +KtxdIYvhFAUrAqHo5a8L4bIztUngfpeu05mbTY7hdH1ONU2Yv1FQ3PvGIV7TFyvXPhfnLxq//aFBzb+Ot3VyVbjuh+75QL4oVONipr/PkU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB6352
+X-OriginatorOrg: intel.com
 
-On Thu, Feb 22, 2024 at 1:47=E2=80=AFPM Dmitry Baryshkov
-<dmitry.baryshkov@linaro.org> wrote:
->
-> On Thu, 22 Feb 2024 at 14:27, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
-> >
-> > On Thu, Feb 22, 2024 at 12:27=E2=80=AFPM Dmitry Baryshkov
-> > <dmitry.baryshkov@linaro.org> wrote:
-> > >
-> > > On Thu, 22 Feb 2024 at 13:00, Bartosz Golaszewski <brgl@bgdev.pl> wro=
-te:
-> > > >
-> > > > On Mon, Feb 19, 2024 at 11:21=E2=80=AFPM Dmitry Baryshkov
-> > > > <dmitry.baryshkov@linaro.org> wrote:
-> > > > >
-> > > > > On Mon, 19 Feb 2024 at 19:18, <neil.armstrong@linaro.org> wrote:
-> > > > > >
-> > > > > > On 19/02/2024 13:33, Dmitry Baryshkov wrote:
-> > > > > > > On Mon, 19 Feb 2024 at 14:23, Bartosz Golaszewski <brgl@bgdev=
-.pl> wrote:
-> > > > > > >>
-> > > > > > >> On Mon, Feb 19, 2024 at 11:26=E2=80=AFAM Dmitry Baryshkov
-> > > > > > >> <dmitry.baryshkov@linaro.org> wrote:
-> > > > > > >>>
-> > > > > > >>
-> > > > > > >> [snip]
-> > > > > > >>
-> > > > > > >>>>>>>>
-> > > > > > >>>>>>>> For WCN7850 we hide the existence of the PMU as modeli=
-ng it is simply not
-> > > > > > >>>>>>>> necessary. The BT and WLAN devices on the device-tree =
-are represented as
-> > > > > > >>>>>>>> consuming the inputs (relevant to the functionality of=
- each) of the PMU
-> > > > > > >>>>>>>> directly.
-> > > > > > >>>>>>>
-> > > > > > >>>>>>> We are describing the hardware. From the hardware point=
- of view, there
-> > > > > > >>>>>>> is a PMU. I think at some point we would really like to=
- describe all
-> > > > > > >>>>>>> Qualcomm/Atheros WiFI+BT units using this PMU approach,=
- including the
-> > > > > > >>>>>>> older ath10k units present on RB3 (WCN3990) and db820c =
-(QCA6174).
-> > > > > > >>>>>>
-> > > > > > >>>>>> While I agree with older WiFi+BT units, I don't think it=
-'s needed for
-> > > > > > >>>>>> WCN7850 since BT+WiFi are now designed to be fully indep=
-endent and PMU is
-> > > > > > >>>>>> transparent.
-> > > > > > >>>>>
-> > > > > > >>>>> I don't see any significant difference between WCN6750/WC=
-N6855 and
-> > > > > > >>>>> WCN7850 from the PMU / power up point of view. Could you =
-please point
-> > > > > > >>>>> me to the difference?
-> > > > > > >>>>>
-> > > > > > >>>>
-> > > > > > >>>> The WCN7850 datasheet clearly states there's not contraint=
- on the WLAN_EN
-> > > > > > >>>> and BT_EN ordering and the only requirement is to have all=
- input regulators
-> > > > > > >>>> up before pulling up WLAN_EN and/or BT_EN.
-> > > > > > >>>>
-> > > > > > >>>> This makes the PMU transparent and BT and WLAN can be desc=
-ribed as independent.
-> > > > > > >>>
-> > > > > > >>>  From the hardware perspective, there is a PMU. It has seve=
-ral LDOs. So
-> > > > > > >>> the device tree should have the same style as the previous
-> > > > > > >>> generations.
-> > > > > > >>>
-> > > > > > >>
-> > > > > > >> My thinking was this: yes, there is a PMU but describing it =
-has no
-> > > > > > >> benefit (unlike QCA6x90). If we do describe, then we'll end =
-up having
-> > > > > > >> to use pwrseq here despite it not being needed because now w=
-e won't be
-> > > > > > >> able to just get regulators from WLAN/BT drivers directly.
-> > > > > > >>
-> > > > > > >> So I also vote for keeping it this way. Let's go into the pa=
-ckage
-> > > > > > >> detail only if it's required.
-> > > > > > >
-> > > > > > > The WiFi / BT parts are not powered up by the board regulator=
-s. They
-> > > > > > > are powered up by the PSU. So we are not describing it in the=
- accurate
-> > > > > > > way.
-> > > > > >
-> > > > > > I disagree, the WCN7850 can also be used as a discrete PCIe M.2=
- card, and in
-> > > > > > this situation the PCIe part is powered with the M.2 slot and t=
-he BT side
-> > > > > > is powered separately as we currently do it now.
-> > > > >
-> > > > > QCA6390 can also be used as a discrete M.2 card.
-> > > > >
-> > > > > > So yes there's a PMU, but it's not an always visible hardware p=
-art, from the
-> > > > > > SoC PoV, only the separate PCIe and BT subsystems are visible/c=
-ontrollable/powerable.
-> > > > >
-> > > > > From the hardware point:
-> > > > > - There is a PMU
-> > > > > - The PMU is connected to the board supplies
-> > > > > - Both WiFi and BT parts are connected to the PMU
-> > > > > - The BT_EN / WLAN_EN pins are not connected to the PMU
-> > > > >
-> > > > > So, not representing the PMU in the device tree is a simplificati=
-on.
-> > > > >
-> > > >
-> > > > What about the existing WLAN and BT users of similar packages? We
-> > > > would have to deprecate a lot of existing bindings. I don't think i=
-t's
-> > > > worth it.
-> > >
-> > > We have bindings that are not reflecting the hardware. So yes, we
-> > > should gradually update them once the powerseq is merged.
-> > >
-> > > > The WCN7850 is already described in bindings as consuming what is P=
-MUs
-> > > > inputs and not its outputs.
-> > >
-> > > So do WCN6855 and QCA6391 BlueTooth parts.
-> > >
-> >
-> > That is not true for the latter, this series is adding regulators for i=
-t.
->
-> But the bindings exist already, so you still have to extend it,
-> deprecating regulator-less bindings.
->
-> Bartosz, I really don't understand what is the issue there. There is a
-> PMU. As such it should be represented in the DT and it can be handled
-> by the same driver as you are adding for QCA6390.
->
+From: Alan Brady <alan.brady@intel.com>
+Date: Wed, 21 Feb 2024 12:16:37 -0800
 
-The issue is that we'll pull in the pwrseq subsystem for WCN7850 which
-clearly does not require it in practice.
+> On 2/21/2024 4:15 AM, Alexander Lobakin wrote:
+>> From: Alan Brady <alan.brady@intel.com>
+>> Date: Tue, 20 Feb 2024 16:49:40 -0800
+>>
+>>> This starts refactoring how virtchnl messages are handled by adding a
+>>> transaction manager (idpf_vc_xn_manager).
 
-I'd like to hear Krzysztof, Conor or Rob chime in here and make the
-decision on how to proceed.
+[...]
 
-Bart
+>>
+>> Sorry for not noticing this before, but this struct can be local to
+>> idpf_virtchnl.c.
+>>
+> 
+> Nice catch, I can definitely move this. I'm also considering though, all
+> of these structs I'm adding here are better suited in idpf_virtchnl.c
+> all together. I think the main thing preventing that is the
+> idpf_vc_xn_manager field in idpf_adapter. Would it be overkill to make
+> the field in idpf_adapter a pointer so I can forward declare and kalloc
+> it? I think I can then move everything to idpf_virtchnl.c. Or do you see
+> a better alternative? Or is it not worth the effort? Thanks!
 
-> >
-> > Bart
-> >
-> > > >
-> > > > Bart
-> > > >
-> > > > > >
-> > > > > > Neil
-> > > > > >
-> > > > > > >
-> > > > > > > Moreover, I think we definitely want to move BT driver to use=
- only the
-> > > > > > > pwrseq power up method. Doing it in the other way results in =
-the code
-> > > > > > > duplication and possible issues because of the regulator / pw=
-rseq
-> > > > > > > taking different code paths.
-> > > > >
-> > > > > --
-> > > > > With best wishes
-> > > > > Dmitry
-> > >
-> > >
-> > >
-> > > --
-> > > With best wishes
-> > > Dmitry
->
->
->
-> --
-> With best wishes
-> Dmitry
+Since it's not hotpath, you can make it a pointer and move everything to
+virtchnl.c, sounds nice.
+
+> 
+>>> +
+>>> +/**
+>>> + * struct idpf_vc_xn_manager - Manager for tracking transactions
+>>> + * @ring: backing and lookup for transactions
+>>> + * @free_xn_bm: bitmap for free transactions
+>>> + * @xn_bm_lock: make bitmap access synchronous where necessary
+>>> + * @salt: used to make cookie unique every message
+>>> + */
+>>
+>> [...]
+
+Thanks,
+Olek
+ 
 
