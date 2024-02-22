@@ -1,235 +1,116 @@
-Return-Path: <netdev+bounces-74076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAF4685FD0D
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 16:52:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7390385FD19
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 16:53:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C52FE1C22876
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 15:52:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2ECD4289F7D
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 15:53:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B87014E2DB;
-	Thu, 22 Feb 2024 15:52:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77FA714E2F8;
+	Thu, 22 Feb 2024 15:52:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="bSXkMABR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82DF414D44C;
-	Thu, 22 Feb 2024 15:52:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E02D114E2FC
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 15:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708617122; cv=none; b=HEsFlezRUoAGR96r5QSzdVPblD9JNA3f4X5j54bbo55G5RDHs6JElZlzUyDs1TweRLkVIOHSP2N2LJdZSTytBYEnwLMszf9r82KLdu2fJZLVEi5VDUgYGwAstiuKirg/wILq3lWIqYHVIVCmF1WwgiayxZIpakGwKv3kkhG7zPQ=
+	t=1708617178; cv=none; b=Y87nFjzPZkBNlknGWQY0hp30NKual9Mxsn60aVwTEL6Dss8O0AN3nMt12R+f1kR4bE29Y/R7saRUdVXRBIEm5WjtMvJocagxW4NlPKDAka/UyVO0aMNqDmqrQo7NELPKRNYn34HHi9gNdFOp0+90H8JWNBJVEq72bDehbRAREnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708617122; c=relaxed/simple;
-	bh=mkjHm/NVb9a2uWxajb0Ouni221Gr7rVjOELDkF29fVA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZE3xZLSFmtAHo6LCIscKbvt9kC+jCsigqxp0t/FeBWUcE4xLpTqYpfU1iMm0JP7bAahfNWQR7pPxUUIptSl/zD3jJqNdcYMjUm/68I7kkivJlz24GRUkmCWN3XtHbNio7TTUMDwRWjGGtI04Loj8Dpb5e/Kw9ASGLXIMFXrE8As=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.161.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-59fc31c57easo1527784eaf.1;
-        Thu, 22 Feb 2024 07:52:00 -0800 (PST)
+	s=arc-20240116; t=1708617178; c=relaxed/simple;
+	bh=Vd3UzDgmX7Ao1DnE+nzyieBLFnftQ/B8sJIJRrxRpco=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ux/uMIoa/Bw3r10heIJV/f48T/XSu3siX/WEZxirgd4D+pe3wYP+eOg24JIiN8rqrV4rdDg37TVgTEDyVShN+1yWimr5u2++teYfEIwNdiwI5um8F7+CwIXi3CHm41eMu/Ga7X1vabsZI2xJ99g3Jy3QNp/IN6BLqBJnpoUuscc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=bSXkMABR; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6e47a104c2eso2177947b3a.2
+        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 07:52:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1708617176; x=1709221976; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1gfwnWmu63cYswR0b/u7RtSKFeQyr0VL4Kut1suu2n8=;
+        b=bSXkMABRd5Gy9iYQZn6+kg10M0jGKVqcKbqT6VPDcuAA7I4OwHLOV8WaS+y/iZyRAA
+         ZXkOoGHpESpLUfIhI9+kzg2G+h3GF+ylw44PN5ekhfb4B0mYFV+jnIr21/MZ8Ub7Wnw1
+         xJO9AxAD0f5W355FyYMKjxJ+6Hq2yKqAYPkWI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708617119; x=1709221919;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EUugHfDLSgSDL3uT41o5vUaHZB8bMJCbk674TlEy4XU=;
-        b=Jlxa8s7xcT0sSWUi3ODwaDJnpLVOX+Bo5CY3s1G6yy0yPJ4tC7CAbC4hxAThUPUJ9k
-         efOBwGW+xw6xXLXDBGfbLWWfg2K/BUVrlwWmsUl/UmfeKNVc/1XHG+VtFwisCl/JT4XY
-         rHHce+hGgqqLh3JwR/cPesbk3kRRxkl2wRtwYuRnnEaSHl9VEuvm4M7m88ZY/lqZN4Hi
-         5xT6VpSdkthr9W6tdrAyheh/HiVeUqXTBD9GpHEf1v2ZJ0fmcnQz8eH1MzXE0c3n/IeE
-         3gGFRtJEtMqLKzr8qupyXb6YSfL4cQwxRevFpNhppJm8c7fyMnsVAy3406anOM0tDMIA
-         xr4w==
-X-Forwarded-Encrypted: i=1; AJvYcCVPC0G+SDbcijMirqbHeLZx0LH7fl25y6d8ZBoRZNve3KkS58q7gCd8GXywXeoIa7IAWTHKK37pyhrlavbIDdWH5hTcRZBBPciCOdDLASF+1oWJiw5jw7pc/ZxeE8oPsf2u15lwBYaxQqrGAjXylbToJ94yK+WNaLEiifR01sbezCspR4NujKFQsCazdFo88d6Xg7tQmbInEVuODg4WjQ==
-X-Gm-Message-State: AOJu0Yyp1OJu1XTFbsilRyw4S3Y/e5Zgh8YFuQaNO7a98Av4AkEs5CKi
-	byDeLFOtmVXlV3mVwI/3T/xc8iKBUKDoEZ9i7IbDNKVxRZpusPim+7ccQR5IK0vBCA+XhPyCyUZ
-	fFJFjNn/dVHJDAhPDfx1a5zrjcIw=
-X-Google-Smtp-Source: AGHT+IHyxSwW1kmoq+/lgG2oeRQLzRN0uhtfVW3o6WiFkJW1sEH+QD0jVJCqboDpe1GdciaHyQ4u2pOwGUSHa1V7YoM=
-X-Received: by 2002:a05:6820:2993:b0:5a0:3c8a:4940 with SMTP id
- dq19-20020a056820299300b005a03c8a4940mr162267oob.1.1708617119517; Thu, 22 Feb
- 2024 07:51:59 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708617176; x=1709221976;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1gfwnWmu63cYswR0b/u7RtSKFeQyr0VL4Kut1suu2n8=;
+        b=fq9Yd+bra8jvw8bXiDQ/2gY5mLu8UsIodAV3V5Vhk8AbMMaSdw5hk0wh0thrTy55o5
+         FK6fJeiBCMNMOU6N4f7EhPcKlUMtWFPh/WMemEYiiCoN1azzyXL0k+qBC9lZ0k6/TA+1
+         5U3xJZtzbG97q0z3DrXYs7C3z3T1oCpUf34/ZN7tNqmEkolc4ghYM8Qv540J2no7wnCB
+         sk+K7TnzQYamP30iwqaOvgzSDVfSuJLZkCWBVyyq0dGzBcHiBdpyuutwa5KF3HwUzffC
+         9IOa0U/U+MSa5BCRpV3kuAPfHy80pHRDjs8puprZEOmqUXNRyNm6JeZLRDboSEzt+jcx
+         +ZLg==
+X-Forwarded-Encrypted: i=1; AJvYcCXWQoG+cPJcFEg3xsVBSKv4F2fqtGOY0oluHxVaK+KK00ouVwB+CGnNZE+2F/X3Rp5/7yi3YlU5Wie4yWuQNgzOnwV2itYL
+X-Gm-Message-State: AOJu0Yx/K1d4exy0noF8eR25l/W34o+d0uST5EopAqCDdV4N7knIwNwC
+	rBhlMBm+0wm2tv5sYrJtOOWyaMXZc43dv4UEoii/ecZUHrrbehzdJKZdJ6YIZw==
+X-Google-Smtp-Source: AGHT+IGrtsHGeHfg7xJD4IpKzMvkDmfLWoRjY3MrY0wjNmBdDYmkUNv35SM8aT2MKwO5Lko2A1nlBA==
+X-Received: by 2002:aa7:90c6:0:b0:6e1:44ec:8e9e with SMTP id k6-20020aa790c6000000b006e144ec8e9emr14895496pfk.21.1708617176218;
+        Thu, 22 Feb 2024 07:52:56 -0800 (PST)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id g19-20020a056a0023d300b006e469e8b634sm7589863pfc.3.2024.02.22.07.52.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Feb 2024 07:52:55 -0800 (PST)
+Date: Thu, 22 Feb 2024 07:52:54 -0800
+From: Kees Cook <keescook@chromium.org>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+	"Gustavo A . R . Silva" <gustavoars@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yhs@fb.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
+	Haowen Bai <baihaowen@meizu.com>, bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Jonathan Corbet <corbet@lwn.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Joanne Koong <joannelkoong@gmail.com>,
+	Yafang Shao <laoar.shao@gmail.com>, Kui-Feng Lee <kuifeng@meta.com>,
+	Anton Protopopov <aspsk@isovalent.com>,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	netdev@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v5] bpf: Replace bpf_lpm_trie_key 0-length array with
+ flexible array
+Message-ID: <202402220751.2370A263AD@keescook>
+References: <20240221222613.do.428-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <6017196.lOV4Wx5bFT@kreacher> <2173914.irdbgypaU6@kreacher> <59e8fd70-5ba6-4256-9127-bd5e76e6bc99@linaro.org>
-In-Reply-To: <59e8fd70-5ba6-4256-9127-bd5e76e6bc99@linaro.org>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Thu, 22 Feb 2024 16:51:48 +0100
-Message-ID: <CAJZ5v0gcK7mQgDTHqo3PYT10sKqJJvu6JP0BLEHG6m0HzUKyCA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/9] thermal: core: Add flags to struct thermal_trip
-To: Daniel Lezcano <daniel.lezcano@linaro.org>
-Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>, Linux PM <linux-pm@vger.kernel.org>, 
-	Lukasz Luba <lukasz.luba@arm.com>, LKML <linux-kernel@vger.kernel.org>, 
-	Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>, 
-	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, Zhang Rui <rui.zhang@intel.com>, 
-	netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, 
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>, linux-wireless@vger.kernel.org, 
-	Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, 
-	Pengutronix Kernel Team <kernel@pengutronix.de>, 
-	Manaf Meethalavalappu Pallikunhi <quic_manafm@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240221222613.do.428-kees@kernel.org>
 
-On Thu, Feb 22, 2024 at 3:36=E2=80=AFPM Daniel Lezcano
-<daniel.lezcano@linaro.org> wrote:
->
-> On 12/02/2024 19:31, Rafael J. Wysocki wrote:
-> > From: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-> >
-> > In order to allow thermal zone creators to specify the writability of
-> > trip point temperature and hysteresis on a per-trip basis, add a flags
-> > field to struct thermal_trip and define flags to represent the desired
-> > trip properties.
-> >
-> > Also make thermal_zone_device_register_with_trips() set the
-> > THERMAL_TRIP_FLAG_RW_TEMP flag for all trips covered by the writable
-> > trips mask passed to it and modify the thermal sysfs code to look at
-> > the trip flags instead of using the writable trips mask directly or
-> > checking the presence of the .set_trip_hyst() zone callback.
-> >
-> > Additionally, make trip_point_temp_store() and trip_point_hyst_store()
-> > fail with an error code if the trip passed to one of them has
-> > THERMAL_TRIP_FLAG_RW_TEMP or THERMAL_TRIP_FLAG_RW_HYST,
-> > respectively, clear in its flags.
-> >
-> > No intentional functional impact.
-> >
-> > Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-> > ---
-> >
-> > v1 -> v2:
-> >     * Rename trip flags (Stanislaw).
-> >
-> > ---
-> >   drivers/thermal/thermal_core.c  |   12 +++++++++++-
-> >   drivers/thermal/thermal_core.h  |    2 +-
-> >   drivers/thermal/thermal_sysfs.c |   28 +++++++++++++++++++---------
-> >   include/linux/thermal.h         |    7 +++++++
-> >   4 files changed, 38 insertions(+), 11 deletions(-)
-> >
-> > Index: linux-pm/include/linux/thermal.h
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > --- linux-pm.orig/include/linux/thermal.h
-> > +++ linux-pm/include/linux/thermal.h
-> > @@ -64,15 +64,23 @@ enum thermal_notify_event {
-> >    * @threshold: trip crossing notification threshold miliCelsius
-> >    * @type: trip point type
-> >    * @priv: pointer to driver data associated with this trip
-> > + * @flags: flags representing binary properties of the trip
-> >    */
-> >   struct thermal_trip {
-> >       int temperature;
-> >       int hysteresis;
-> >       int threshold;
-> >       enum thermal_trip_type type;
-> > +     u8 flags;
-> >       void *priv;
-> >   };
-> >
-> > +#define THERMAL_TRIP_FLAG_RW_TEMP    BIT(0)
-> > +#define THERMAL_TRIP_FLAG_RW_HYST    BIT(1)
-> > +
-> > +#define THERMAL_TRIP_FLAG_MASK_RW    (THERMAL_TRIP_FLAG_RW_TEMP | \
-> > +                                      THERMAL_TRIP_FLAG_RW_HYST)
->
-> What about THERMAL_TRIP_FLAG_RW instead ?
+On Wed, Feb 21, 2024 at 02:26:20PM -0800, Kees Cook wrote:
+> Replace deprecated 0-length array in struct bpf_lpm_trie_key with
+> flexible array. Found with GCC 13:
 
-Fine with me.
+Nope, still breaking CI. I will respin again...
+https://github.com/kernel-patches/bpf/actions/runs/7996482005/job/21839056683?pr=6451
 
-> >   struct thermal_zone_device_ops {
-> >       int (*bind) (struct thermal_zone_device *,
-> >                    struct thermal_cooling_device *);
-> > Index: linux-pm/drivers/thermal/thermal_core.c
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > --- linux-pm.orig/drivers/thermal/thermal_core.c
-> > +++ linux-pm/drivers/thermal/thermal_core.c
-> > @@ -1356,13 +1356,23 @@ thermal_zone_device_register_with_trips(
-> >       tz->devdata =3D devdata;
-> >       tz->trips =3D trips;
-> >       tz->num_trips =3D num_trips;
-> > +     if (num_trips > 0) {
->
-> Is this check really necessary?
+-Kees
 
-No, it isn't.
-
-> for_each_trip() should exit immediately if there is no trip points.
-
-Right.
-
-> > +             struct thermal_trip *trip;
-> > +
-> > +             for_each_trip(tz, trip) {
-> > +                     if (mask & 1)
-> > +                             trip->flags |=3D THERMAL_TRIP_FLAG_RW_TEM=
-P;
-> > +
-> > +                     mask >>=3D 1;
-> > +             }
-> > +     }
-> >
-> >       thermal_set_delay_jiffies(&tz->passive_delay_jiffies, passive_del=
-ay);
-> >       thermal_set_delay_jiffies(&tz->polling_delay_jiffies, polling_del=
-ay);
-> >
-> >       /* sys I/F */
-> >       /* Add nodes that are always present via .groups */
-> > -     result =3D thermal_zone_create_device_groups(tz, mask);
-> > +     result =3D thermal_zone_create_device_groups(tz);
-> >       if (result)
-> >               goto remove_id;
-> >
-> > Index: linux-pm/drivers/thermal/thermal_core.h
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > --- linux-pm.orig/drivers/thermal/thermal_core.h
-> > +++ linux-pm/drivers/thermal/thermal_core.h
-> > @@ -131,7 +131,7 @@ void thermal_zone_trip_updated(struct th
-> >   int __thermal_zone_get_temp(struct thermal_zone_device *tz, int *temp=
-);
-> >
-> >   /* sysfs I/F */
-> > -int thermal_zone_create_device_groups(struct thermal_zone_device *, in=
-t);
-> > +int thermal_zone_create_device_groups(struct thermal_zone_device *tz);
-> >   void thermal_zone_destroy_device_groups(struct thermal_zone_device *)=
-;
-> >   void thermal_cooling_device_setup_sysfs(struct thermal_cooling_device=
- *);
-> >   void thermal_cooling_device_destroy_sysfs(struct thermal_cooling_devi=
-ce *cdev);
-> > Index: linux-pm/drivers/thermal/thermal_sysfs.c
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > --- linux-pm.orig/drivers/thermal/thermal_sysfs.c
-> > +++ linux-pm/drivers/thermal/thermal_sysfs.c
-> > @@ -122,6 +122,11 @@ trip_point_temp_store(struct device *dev
-> >
-> >       trip =3D &tz->trips[trip_id];
-> >
-> > +     if (!(trip->flags & THERMAL_TRIP_FLAG_RW_TEMP)) {
-> > +             ret =3D -EPERM;
-> > +             goto unlock;
-> > +     }
->
-> Does it really happen?
->
-> If the sysfs file is created with the right permission regarding the
-> trip->flags then this condition can never be true.
-
-But the permissions can be changed after the file has been created, can't t=
-hey?
+-- 
+Kees Cook
 
