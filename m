@@ -1,110 +1,136 @@
-Return-Path: <netdev+bounces-74002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB6C685F980
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 14:21:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F20F285F995
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 14:23:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 183D11C22FB7
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 13:21:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F0361C2362B
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 13:23:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16A9B1332AD;
-	Thu, 22 Feb 2024 13:21:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E718B12D752;
+	Thu, 22 Feb 2024 13:22:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PGAUTrbI"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Qq9S4MVu"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2D961332B3;
-	Thu, 22 Feb 2024 13:21:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DE563F9ED
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 13:22:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708608079; cv=none; b=DIoLC8J6NqUesgI1juVqhy/qy6jk+5EeqJ44avNQB8kEd0SYoh5uRhoh/UCNeFQ48eptqDMiF+qoVMdfcsDz9BMeGFYvUNgFI2aR9Kk8TpGhhqCuHQ1Ha8cilqLuvYOAk7fOfl1qi4gXgEbXiqYjdxmp/mQHlDJXivGHmUE+dNs=
+	t=1708608144; cv=none; b=VY2ijGdgU7CqAvyZU4arvQfBk1WQmn3842e6cB0e6+KVeR5xCIBbZLIqVwnP+rDZea+gx62UazoyIgu93gV3ZgVCgTzCUlPVRnBdbkozCXN+RM5zpGci6YPaoxmLsH5Xn2lDTE0CpOtQIAy1P9EYq/2+M619y6WMOe0BhSKzHtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708608079; c=relaxed/simple;
-	bh=+EMIKnrUGp8vSSsqfLUeU1CTP0eQxnSJ538uMv+9x5s=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GiswajQronvi5YqQttD2Xijus9as07Ip9i52Is9ogLGQpcRKX/2R0qqqO/injHNGAEmTzYWUgQeMn3Xc/HVooHKkLbZW4wT7ngQDkeEtnL880fU+4WHdUm3+JjkK3kf2sEzPjJxWy/QGyl4RL90OXTfM1c9rSXCHY1VYnhC4N4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PGAUTrbI; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 4F83EE000F;
-	Thu, 22 Feb 2024 13:21:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1708608069;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KIJQOiwsnPIHMQCuDyLqsDgu6VLT3hR2HUacNiT4rNQ=;
-	b=PGAUTrbI2eCYfRgeudmxg+COgy/tQuE6n14TZt2RLEpK77Qn6/l4pRGeVzsKhRCvSu0Hjo
-	zL3KLbt/+cwhZEit8wBneRi3vehint6IiHprNwGQARsvgWsYM4rqENtPGohGy89BC84pGJ
-	azWoL4sUK6aTyxhnnQUk6SaQYCaQscLAd65eBMko37g0lRn0QvuXr7fFzlM3X68ocaVFaj
-	ut6tv/vkqOhlVqKv132PEs1EGJibbSa+9AesvPwsSv0WJ4uFIzouV/jyLx67IRW9BasKWV
-	424JPQWzD8YHW7CwJT6alnw4PISPHnPm8oZ45x3LIvCSejBVOT7yw3QDBukCCg==
-Date: Thu, 22 Feb 2024 14:21:06 +0100
-From: Herve Codina <herve.codina@bootlin.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Yury Norov
- <yury.norov@gmail.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew@lunn.ch>, Mark Brown
- <broonie@kernel.org>, Christophe Leroy <christophe.leroy@csgroup.eu>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v3 RESEND 1/6] net: wan: Add support for QMC HDLC
-Message-ID: <20240222142106.35dfa03d@bootlin.com>
-In-Reply-To: <ZddJz9msz1ACmw_k@smile.fi.intel.com>
-References: <20240212075646.19114-1-herve.codina@bootlin.com>
-	<20240212075646.19114-2-herve.codina@bootlin.com>
-	<ZcoNoDRF6h2C7TQd@smile.fi.intel.com>
-	<20240222130516.5e139612@bootlin.com>
-	<ZddJz9msz1ACmw_k@smile.fi.intel.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1708608144; c=relaxed/simple;
+	bh=TySvDzYJXSdCZgcLlQxwcOAIILLG83oupUxyqRQSwdQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=itHUu7j9FCQ8IDKeB821L32oyYiCWZ+8yAvS5tDMX7TJV7an0BOuWIuNC/5XEzzDJCC5ttd3bNzqnO7gJlkHRf/K1uQIsTRfX0mDQEz2Lz0FBqp53l5bME8W/tuVDlpPV292nZ3CDu5n2/zYjv2QZkcety/15YK7xyWIyCmZVMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=Qq9S4MVu; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-33d146737e6so5218202f8f.0
+        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 05:22:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708608141; x=1709212941; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=U/Sr5FIkChTbkaU7EdiknVp8OIC36l2utmGmnGMVRPM=;
+        b=Qq9S4MVu7bSICKote1PWuHKERMNHyXE/FYkkUOgc2rz5E2Twc07uCFticDoZVraEM4
+         hBaYMD+ttv6BXfUAZr/K99c69jfEdgoHgRjgNY+SqiHMxYyhwnbzzpGqWKcsK+eiKxmt
+         M88y+3QnA3fIhZDxECjmpthUD1Z6j0IeGop//nHsqMihiEgJd2EdAa0tTTCVitBobuLS
+         jLb1TBXJosqpyoBem8HVHZss1Ke7TQQ89ZIxn41TH+VXQ1j9LQeOWWhhJ5LiJs2XUUBJ
+         KWj3iZfXHb1if2tiJJ7nZKd3bhlTNFp2tw2UeMe1lR7vBLNQPKAGz9x+t6fhXVehOC38
+         cUmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708608141; x=1709212941;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U/Sr5FIkChTbkaU7EdiknVp8OIC36l2utmGmnGMVRPM=;
+        b=VNXwuoujTVVVsGHCrY0pxB9ThlPiRCbv74JIDAcRHbvK/VoLFziBIJwXANaisTKcpU
+         wCPFMQbp8iD8vobqg4f4vQJuoevv13kDpXBC7aPvK0nphKfVFSfApPQI8BbzXWsz1Bto
+         WUiuekEuTDcZ3M50/xWA1yCXP35nemfnn+N4gCzR6gWdSquvtLTsr0ljhUzWfguNA34P
+         Q9nmCYDdTc6fZutKCpAwIHFLNxZRqs1YaZ+c4ft68RB8s+0wOTPWkV1gChY2qsIQuvVW
+         eDx1QNlceshnWPUQXQVlHs676hgoJktt3bjAZu53wqETORZPPZlOy9Z3jAF44vb9rtmB
+         98jA==
+X-Forwarded-Encrypted: i=1; AJvYcCWjQCEg2BRAU1p9owgCHF3otQE5vWWjlsAYz7J7M2wrKNwoCHcQp/xdE99C5x3Jgl0wD0QwxuLSiD3xt67E9EqvU3i07E0I
+X-Gm-Message-State: AOJu0Yyzr1cO/wfD/IPWAcEps2mDiwO51+KwEUeO+FBnsbpsKUgCDkEN
+	G3C8hmoJWuKuHDnsH5XLGlikie8WS1ooHW4YVFW7wsOMJ0pB5IpzhLq0nLDG6hY=
+X-Google-Smtp-Source: AGHT+IFra6ItDFXWxhNdhaD57+kPLzlPjfeuY93NA5sgFeczEf9BRhKowWEEfh0sRszy1RhYuvlL8A==
+X-Received: by 2002:a5d:522d:0:b0:33d:9c56:37f4 with SMTP id i13-20020a5d522d000000b0033d9c5637f4mr615379wra.46.1708608141361;
+        Thu, 22 Feb 2024 05:22:21 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id k4-20020a5d5184000000b0033b4f82b301sm20628726wrv.3.2024.02.22.05.22.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Feb 2024 05:22:20 -0800 (PST)
+Date: Thu, 22 Feb 2024 14:22:17 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+	netdev@vger.kernel.org, Yochai Hagvi <yochai.hagvi@intel.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Sunitha Mekala <sunithax.d.mekala@intel.com>
+Subject: Re: [PATCH net 1/6] ice: fix connection state of DPLL and out pin
+Message-ID: <ZddKiZt1-OSAX39M@nanopsycho>
+References: <20240220214444.1039759-1-anthony.l.nguyen@intel.com>
+ <20240220214444.1039759-2-anthony.l.nguyen@intel.com>
+ <2d4d91a0-5539-4cc0-850a-3ccd44fcc648@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2d4d91a0-5539-4cc0-850a-3ccd44fcc648@linux.dev>
 
-On Thu, 22 Feb 2024 15:19:11 +0200
-Andy Shevchenko <andriy.shevchenko@linux.intel.com> wrote:
+Thu, Feb 22, 2024 at 01:31:53PM CET, vadim.fedorenko@linux.dev wrote:
+>On 20/02/2024 21:44, Tony Nguyen wrote:
+>> From: Yochai Hagvi <yochai.hagvi@intel.com>
+>> 
+>> Fix the connection state between source DPLL and output pin, updating the
+>> attribute 'state' of 'parent_device'. Previously, the connection state
+>> was broken, and didn't reflect the correct state.
+>> 
+>> When 'state_on_dpll_set' is called with the value
+>> 'DPLL_PIN_STATE_CONNECTED' (1), the output pin will switch to the given
+>> DPLL, and the state of the given DPLL will be set to connected.
+>> E.g.:
+>> 	--do pin-set --json '{"id":2, "parent-device":{"parent-id":1,
+>> 						       "state": 1 }}'
+>> This command will connect DPLL device with id 1 to output pin with id 2.
+>> 
+>> When 'state_on_dpll_set' is called with the value
+>> 'DPLL_PIN_STATE_DISCONNECTED' (2) and the given DPLL is currently
+>> connected, then the output pin will be disabled.
+>> E.g:
+>> 	--do pin-set --json '{"id":2, "parent-device":{"parent-id":1,
+>> 						       "state": 2 }}'
+>> This command will disable output pin with id 2 if DPLL device with ID 1 is
+>> connected to it; otherwise, the command is ignored.
+>> 
+>> Fixes: d7999f5ea64b ("ice: implement dpll interface to control cgu")
+>> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+>> Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+>> Signed-off-by: Yochai Hagvi <yochai.hagvi@intel.com>
+>> Tested-by: Sunitha Mekala <sunithax.d.mekala@intel.com> (A Contingent worker at Intel)
+>> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+>> ---
+>>   drivers/net/ethernet/intel/ice/ice_dpll.c | 43 +++++++++++++++++------
+>>   1 file changed, 32 insertions(+), 11 deletions(-)
+>> 
+>
+>For the series:
+>
+>Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
-> On Thu, Feb 22, 2024 at 01:05:16PM +0100, Herve Codina wrote:
-> > On Mon, 12 Feb 2024 14:22:56 +0200
-> > Andy Shevchenko <andriy.shevchenko@linux.intel.com> wrote:  
-> 
-> ...
-> 
-> > > > +#include <linux/dma-mapping.h>
-> > > > +#include <linux/hdlc.h>
-> > > > +#include <linux/module.h>    
-> > >   
-> > > > +#include <linux/of.h>
-> > > > +#include <linux/of_platform.h>    
-> > > 
-> > > I do not see how these are being used, am I right?
-> > > What's is missing OTOH is the mod_devicetable.h.  
-> > 
-> > Agree for removing of.h and of_platform.h.
-> > 
-> > Why do I need mod_devicetable.h ?
-> > Isn't including module.h enough ?  
-> 
-> In that header the definitions of many of ID table data structures are located.
-> You are using that in the code.
-> 
+I also find this set okay. Feel free to add my rwb tag as well.
 
-Ok, thanks.
-
-Hervé
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
