@@ -1,114 +1,80 @@
-Return-Path: <netdev+bounces-74022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3295285FA5A
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 14:53:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B181085FA65
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 14:54:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0F4E289F12
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 13:53:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B0FC289F04
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 13:54:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80713148FFA;
-	Thu, 22 Feb 2024 13:52:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5409F135403;
+	Thu, 22 Feb 2024 13:54:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jicDaKEl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jhIh2Xhs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C52E1487E6
-	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 13:52:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25C21134CE5;
+	Thu, 22 Feb 2024 13:54:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708609952; cv=none; b=pMmylsjXSUgjGw/kEokRDBuxRdFYIxuDqsyIqr1U8rtVBXIDn8HTZ81kQR2G49VRPMq3+kV8ybP5XayGytorGF/a7kVFO5Ixq58/nS7mH+/J3SgSVjNe6t0eP2bJOFomL2BkoTRmKOuX0S6u+DtQpSKuKeCIiqS01O+AmSX2EpQ=
+	t=1708610056; cv=none; b=I1vVOlKsBijnfsEVJYwgz7eyq8QAmSdB5+96nNffW/VlG30tVs44nH8bSdNOrVj5QQ9CZZCZHBZz2GhAg0/WBntwdkOm7KdaJEVnYde7HRs7UW/UIlHt1Toqc+ANh9vBz8L2O+KnFnZQXgOlBBdMfB1daICYiPR71fFEWtLs+is=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708609952; c=relaxed/simple;
-	bh=okDN9skIyTEGp8a+Kir+3FckEcXNTLEnbwIFZOEO+K0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BYlzqoFfS1u+5iKR1uTXgGQ3rn2Zt2uFykaPvfol50OSKO+Uq9XpT7/SNQqKBlmg8GLa5nHqXEwaOsw6DV6/HqrDsQKfTpCK5igjawuldvQ3fxc5OvNOzvrS9DRuvOPshOTBSGmXrx8D7wq6/ySu1GaIu+L5CvXb791f3OGg/3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jicDaKEl; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708609950; x=1740145950;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=okDN9skIyTEGp8a+Kir+3FckEcXNTLEnbwIFZOEO+K0=;
-  b=jicDaKElSz4wkahVxzvIHhhTLMOVgemdzKTV04p7koryuyGUJVNG5Dhd
-   smKclRlQkURNjdn9fJAuMd4GVVU/qhzxn68ZtqUcpUAZFZNTd6z8L1Ccg
-   FEwkWRhyNiLaDRd5yb4H0Cjkurod6Luz+FVLRAy42kCKLdFlJAejNFx1G
-   VGmRaN6MzlRXmUYR20OixUat896kLMdDZELpMHuDRli1uzXBEF7HENf5a
-   PBkQTtvovqvVRtOazSG6Eh3C3VDtWwp1IVgnPzlo5MbQDFgpyKOUoCrES
-   4qV/JWA8gygdTngSxJ3D3ELUR0W07vDOlx1zQTv8HC2t8CDH5Zei9xey/
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10991"; a="13534156"
-X-IronPort-AV: E=Sophos;i="6.06,177,1705392000"; 
-   d="scan'208";a="13534156"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2024 05:52:30 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,177,1705392000"; 
-   d="scan'208";a="36331628"
-Received: from pglc0455.png.intel.com ([10.221.89.106])
-  by orviesa002.jf.intel.com with ESMTP; 22 Feb 2024 05:52:26 -0800
-From: Rohan G Thomas <rohan.g.thomas@intel.com>
-To: kurt@linutronix.de
-Cc: alexandre.torgue@foss.st.com,
-	andriy.shevchenko@linux.intel.com,
-	bigeasy@linutronix.de,
-	davem@davemloft.net,
-	edumazet@google.com,
-	joabreu@synopsys.com,
-	kuba@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	mcoquelin.stm32@gmail.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	rohan.g.thomas@intel.com
-Subject: [PATCH net] net: stmmac: Fix EST offset for dwmac 5.10
-Date: Thu, 22 Feb 2024 21:52:22 +0800
-Message-Id: <20240222135222.7332-1-rohan.g.thomas@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240220-stmmac_est-v1-1-c41f9ae2e7b7@linutronix.de>
-References: <20240220-stmmac_est-v1-1-c41f9ae2e7b7@linutronix.de>
+	s=arc-20240116; t=1708610056; c=relaxed/simple;
+	bh=TFqTDDc7hfgU+NmeSyhNhMWiSsAwWXo+2EEjwbhB9NM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=une7QYfL5SYFil4+D0JdkdfpLNrq/lI58tY3h2B1tHPleod0iEjeQ1YGo/JUkiKWv5GqenV2VuP6aNMTL8WKrBryB57kHtZxnm6Gc+61Nptde/X+IMz83OD+he2OPv3N5qyLFxip7i/bvb4bDk4xJMU+ThMS3NDutP0kJpkxd2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jhIh2Xhs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8E91C433F1;
+	Thu, 22 Feb 2024 13:54:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708610055;
+	bh=TFqTDDc7hfgU+NmeSyhNhMWiSsAwWXo+2EEjwbhB9NM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jhIh2XhskNnFDqhlshGY5CJ1ZjtI+yVVJithb8D4km1zc527YGA9k2xeIy0smnTYM
+	 gf/SvP1qQ6Mf+4EEFkLZF/qxVXIU+dcBrP6PXuR4RVBrUaFEMd6KAYrdv6HL4bSqrE
+	 GoRBiIio3VehM5XmfruHvU7hy5bK0cDC6steaagzObJVVt3oRAgyXGGTYSpPDT+6DK
+	 tojXe02djpvcHwk3JaPAmHEdeEeXARubluikQHLy0qVyDA2CGlTYvhWw/R7aaWkGQp
+	 t8hdxZGLiSZXsG4BPFN2OKiNGIEv2rh/r+G2sbmjch0FcgLFsPqALA7CFC5HA/vevY
+	 GkZHtNQZ0xnrQ==
+Date: Thu, 22 Feb 2024 13:54:11 +0000
+From: Simon Horman <horms@kernel.org>
+To: Colin Ian King <colin.i.king@gmail.com>
+Cc: Bryan Whitehead <bryan.whitehead@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH][next] net: microchip: lan743x: Fix spelling mistake
+ "erro" -> "error"
+Message-ID: <20240222135411.GA961545@kernel.org>
+References: <20240220091737.2676984-1-colin.i.king@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240220091737.2676984-1-colin.i.king@gmail.com>
 
-Hi Kurt,
-
-On Tue, Feb 20, 2024 at 09:22:46AM +0100, Kurt Kanzenbach wrote:
-> Fix EST offset for dwmac 5.10.
+On Tue, Feb 20, 2024 at 09:17:37AM +0000, Colin Ian King wrote:
+> There is a spelling mistake in a netif_err message. Fix it.
 > 
-> Currently configuring Qbv doesn't work as expected. The schedule is
-> configured, but never confirmed:
-> 
-> |[  128.250219] imx-dwmac 428a0000.ethernet eth1: configured EST
-> 
-> The reason seems to be the refactoring of the EST code which set the wrong
-> EST offset for the dwmac 5.10. After fixing this it works as before:
-> 
-> |[  106.359577] imx-dwmac 428a0000.ethernet eth1: configured EST [
-> |128.430715] imx-dwmac 428a0000.ethernet eth1: EST: SWOL has been
-> |switched
-> 
-> Tested on imx93.
-> 
-> Fixes: c3f3b97238f6 ("net: stmmac: Refactor EST implementation")
-> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
 > ---
+>  drivers/net/ethernet/microchip/lan743x_main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks for fixing this. Sorry for the typo.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Best Regards,
-Rohan
-
+FWIIW, confirm is mispelt twice in comments in the same file.
+But unlike the problem addressed here, it is not user visible.
 
