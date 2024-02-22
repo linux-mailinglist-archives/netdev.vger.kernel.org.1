@@ -1,161 +1,204 @@
-Return-Path: <netdev+bounces-74026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71AF085FAC7
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 15:08:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 369DD85FB0F
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 15:22:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C843289078
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 14:08:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A7951C2082F
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 14:22:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2BC314A08F;
-	Thu, 22 Feb 2024 14:06:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7EE313341F;
+	Thu, 22 Feb 2024 14:22:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="bkB7s9nP"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 940FD13341F
-	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 14:06:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E10F34776E;
+	Thu, 22 Feb 2024 14:22:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708610784; cv=none; b=sA1iM0ho8N3HL7FXTnXveUuc3GJtok8i/DCxTmpO4T0wFT8Ht/3MZ+1FlBRr1AYoEnOBVRYS9I1Cyatlx8x4yT5bBKvyYbMYzFvs+NNwdCnjof2Ebjh+NTzF9K7ufGaLQo0rGpc27167OAZmvLHLoKdNDWMRWGyOOUcFfiZNlm0=
+	t=1708611752; cv=none; b=GHPMES+Om3GG9bQHxfPTLMUu8a893UqyI10fwRC/uGIYG/XQgMK86hiK3WG4fCtrMbUTSCSCQ+NcXalqvkIloJ99GJCGd946K66sK0js0dK93U/QX/mcmWr0xzOuv2kp2Hd128I/4Y8ItaRpmi9sfR3AYY7/fgu3kmHzz28U6ss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708610784; c=relaxed/simple;
-	bh=lNMNrhSql6efyyvdH+prK/tqg80QuxRFYS1jbSRFxU4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lX7G0lEWo2VgY2/PBjitU9QgZTA/pSeOT5o7Qy7pmziUCIIBAaXZmn80x8Tf40EvcIXrbIUr3tAQ/BXsGJ+IjDTqsy9xdrCtdt0KwwCbEVmAe3unk3Y30qmUs2oYHb8TRA8jPaQJ9JoPJabBnHRp9DuoNbLUStucl29ARLeO8/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1rd9iN-0005Zi-B8; Thu, 22 Feb 2024 15:06:19 +0100
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Florian Westphal <fw@strlen.de>,
+	s=arc-20240116; t=1708611752; c=relaxed/simple;
+	bh=p82qsUSfQMPFZeZC4V1XmwrYEBaavEBVUzMfaOmykRM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Xcns5hYPzFM7lS4qifHnBz8Vlra9so3bFgs9EUad3AXHQJyJ++kVZhSjongrdHT2ryf8lRIVVhb0izW7oOHBHltqRcRBy20k+/hD09k50dsBIQackZ9uxSt7ciJQqapwWBv2IiUbIU0GxjNPgyGcUEMkcGyOp+2doZgqr9XlOMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=bkB7s9nP; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPA id 1F5181BF20A;
+	Thu, 22 Feb 2024 14:22:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1708611748;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Zhx1gNduZdrAxbKpizueNk61Hz1DSX29IWeNJrNnfCE=;
+	b=bkB7s9nPVSNwrpQTUYlLCMUPWFqLWWsOmeePeDdlyKL1je+UibdaL0z7bYSPHxJxdl5RWf
+	9HKteaQ8KZS6weJep/vs/4A5JPJhIcJ6YRJtyRXP3/5Dmpw0XS5ZkKm81dDPhRWrMGNP4Q
+	3cm7sHJowVnyykPmQCc9wtFWroiIlGO+oCAsaVIVJPVHcQNgHin9oTBasWEZJY+QptH+ym
+	7z/E6uw/fwdX3eN22cg9iiPhETsg9yaR0nhleF9Jzt0mLBhVvZ56qDejtBSlMinlJFPRUS
+	EZwZCd1PdTehxHeF837cN7DArKwOkzMOPC+XNiOr5kk/kOMBXHiSKjc8C0w2nw==
+From: Herve Codina <herve.codina@bootlin.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Simon Horman <horms@kernel.org>,
-	syzbot+99d15fcdb0132a1e1a82@syzkaller.appspotmail.com
-Subject: [PATCH net v2] net: mpls: error out if inner headers are not set
-Date: Thu, 22 Feb 2024 15:03:10 +0100
-Message-ID: <20240222140321.14080-1-fw@strlen.de>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	Andrew Lunn <andrew@lunn.ch>,
+	Mark Brown <broonie@kernel.org>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: [PATCH v4 0/5] Add support for QMC HDLC
+Date: Thu, 22 Feb 2024 15:22:13 +0100
+Message-ID: <20240222142219.441767-1-herve.codina@bootlin.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <CANn89iJZnY_0iM8Ft9cAOA7twCb8iQ4jf5FJP8fubg9_Z0EZkg@mail.gmail.com>
-References: <CANn89iJZnY_0iM8Ft9cAOA7twCb8iQ4jf5FJP8fubg9_Z0EZkg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
-mpls_gso_segment() assumes skb_inner_network_header() returns
-a valid result:
+Hi,
 
-  mpls_hlen = skb_inner_network_header(skb) - skb_network_header(skb);
-  if (unlikely(!mpls_hlen || mpls_hlen % MPLS_HLEN))
-        goto out;
-  if (unlikely(!pskb_may_pull(skb, mpls_hlen)))
+This series introduces the QMC HDLC support.
 
-With syzbot reproducer, skb_inner_network_header() yields 0,
-skb_network_header() returns 108, so this will
-"pskb_may_pull(skb, -108)))" which triggers a newly added
-DEBUG_NET_WARN_ON_ONCE() check:
+Patches were previously sent as part of a full feature series and were
+previously reviewed in that context:
+"Add support for QMC HDLC, framer infrastructure and PEF2256 framer" [1]
 
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5068 at include/linux/skbuff.h:2723 pskb_may_pull_reason include/linux/skbuff.h:2723 [inline]
-WARNING: CPU: 0 PID: 5068 at include/linux/skbuff.h:2723 pskb_may_pull include/linux/skbuff.h:2739 [inline]
-WARNING: CPU: 0 PID: 5068 at include/linux/skbuff.h:2723 mpls_gso_segment+0x773/0xaa0 net/mpls/mpls_gso.c:34
-[..]
- skb_mac_gso_segment+0x383/0x740 net/core/gso.c:53
- nsh_gso_segment+0x40a/0xad0 net/nsh/nsh.c:108
- skb_mac_gso_segment+0x383/0x740 net/core/gso.c:53
- __skb_gso_segment+0x324/0x4c0 net/core/gso.c:124
- skb_gso_segment include/net/gso.h:83 [inline]
- [..]
- sch_direct_xmit+0x11a/0x5f0 net/sched/sch_generic.c:327
- [..]
- packet_sendmsg+0x46a9/0x6130 net/packet/af_packet.c:3113
- [..]
+In order to ease the merge, the full feature series has been split and
+needed parts were merged in v6.8-rc1:
+ - "Prepare the PowerQUICC QMC and TSA for the HDLC QMC driver" [2]
+ - "Add support for framer infrastructure and PEF2256 framer" [3]
 
-First iteration of this patch made mpls_hlen signed and changed
-test to error out to "mpls_hlen <= 0 || ..".
+This series contains patches related to the QMC HDLC part (QMC HDLC
+driver):
+ - Introduce the QMC HDLC driver (patches 1 and 2)
+ - Add timeslots change support in QMC HDLC (patch 3)
+ - Add framer support as a framer consumer in QMC HDLC (patch 4)
 
-Eric Dumazet said:
- > I was thinking about adding a debug check in skb_inner_network_header()
- > if inner_network_header is zero (that would mean it is not 'set' yet),
- > but this would trigger even after your patch.
+Compare to the original full feature series, a modification was done on
+patch 3 in order to use a coherent prefix in the commit title.
 
-So add new skb_inner_network_header_was_set() helper and use that.
+I kept the patches unsquashed as they were previously sent and reviewed.
+Of course, I can squash them if needed.
 
-The syzbot reproducer injects data via packet socket. The skb that gets
-allocated and passed down the stack has ->protocol set to NSH (0x894f)
-and gso_type set to SKB_GSO_UDP | SKB_GSO_DODGY.
+Compared to the previous iteration:
+  https://lore.kernel.org/linux-kernel/20240212075646.19114-1-herve.codina@bootlin.com/
+this v4 series mainly:
+- Introduces and use bitmap_{scatter,gather}().
 
-This gets passed to skb_mac_gso_segment(), which sees NSH as ptype to
-find a callback for.  nsh_gso_segment() retrieves next type:
+Best regards,
+Hervé
 
-        proto = tun_p_to_eth_p(nsh_hdr(skb)->np);
+[1]: https://lore.kernel.org/linux-kernel/20231115144007.478111-1-herve.codina@bootlin.com/
+[2]: https://lore.kernel.org/linux-kernel/20231205152116.122512-1-herve.codina@bootlin.com/
+[3]: https://lore.kernel.org/linux-kernel/20231128132534.258459-1-herve.codina@bootlin.com/
 
-... which is MPLS (TUN_P_MPLS_UC). It updates skb->protocol and then
-calls mpls_gso_segment().  Inner offsets are all 0, so mpls_gso_segment()
-ends up with a negative header size.
+Changes v3 -> v4
+  - Patch 1
+    Remove of.h and of_platform.h includes, add mod_devicetable.h.
+    Add a blank line in the includes list.
 
-In case more callers rely on silent handling of such large may_pull values
-we could also 'legalize' this behaviour, either replacing the debug check
-with (len > INT_MAX) test or removing it and instead adding a comment
-before existing
+  - Path 2
+    No changes.
 
- if (unlikely(len > skb->len))
-    return SKB_DROP_REASON_PKT_TOO_SMALL;
+  - v3 patches 3 and 4 removed
 
-test in pskb_may_pull_reason(), saying that this check also implicitly
-takes care of callers that miscompute header sizes.
+  - Patch 3 (new patch in v4)
+    Introduce bitmap_{scatter,gather}() based on the original patch done
+    by Andy Shevchenko.
+    Address comments already done on the original patch:
+    https://lore.kernel.org/lkml/20230926052007.3917389-3-andriy.shevchenko@linux.intel.com/
+      - Removed the returned values.
+      - Used 'unsigned int' for all indexes.
+      - Added a 'visual' description of the operations in kernel-doc.
+      - Described the relationship between bitmap_scatter() and
+        bitmap_gather().
+      - Moved bitmap_{scatter,gather}() to the bitmap.h file.
+      - Improved bitmap_{scatter,gather}() test.
+      - Reworked the commit log.
 
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Simon Horman <horms@kernel.org>
-Fixes: 219eee9c0d16 ("net: skbuff: add overflow debug check to pull/push helpers")
-Reported-by: syzbot+99d15fcdb0132a1e1a82@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/00000000000043b1310611e388aa@google.com/raw
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- include/linux/skbuff.h | 5 +++++
- net/mpls/mpls_gso.c    | 3 +++
- 2 files changed, 8 insertions(+)
+  - Patch 4 (v3 patch 5)
+    Use bitmap_{scatter,gather}()
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 28c7cb7ce251..1470b74fb6d2 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -2894,6 +2894,11 @@ static inline void skb_set_inner_network_header(struct sk_buff *skb,
- 	skb->inner_network_header += offset;
- }
- 
-+static inline bool skb_inner_network_header_was_set(const struct sk_buff *skb)
-+{
-+	return skb->inner_network_header > 0;
-+}
-+
- static inline unsigned char *skb_inner_mac_header(const struct sk_buff *skb)
- {
- 	return skb->head + skb->inner_mac_header;
-diff --git a/net/mpls/mpls_gso.c b/net/mpls/mpls_gso.c
-index 533d082f0701..45d1e6a157fc 100644
---- a/net/mpls/mpls_gso.c
-+++ b/net/mpls/mpls_gso.c
-@@ -27,6 +27,9 @@ static struct sk_buff *mpls_gso_segment(struct sk_buff *skb,
- 	__be16 mpls_protocol;
- 	unsigned int mpls_hlen;
- 
-+	if (!skb_inner_network_header_was_set(skb))
-+		goto out;
-+
- 	skb_reset_network_header(skb);
- 	mpls_hlen = skb_inner_network_header(skb) - skb_network_header(skb);
- 	if (unlikely(!mpls_hlen || mpls_hlen % MPLS_HLEN))
+  - Patches 5 (v3 patch 6)
+    No changes.
+
+Changes v2 -> v3
+  - Patch 1
+    Remove 'inline' function specifier from .c file.
+    Fix a bug introduced when added WARN_ONCE(). The warn condition must
+    be desc->skb (descriptor used) instead of !desc->skb.
+    Remove a lock/unlock section locking the entire qmc_hdlc_xmit()
+    function.
+
+  - Patch 5
+    Use bitmap_from_u64() everywhere instead of bitmap_from_arr32() and
+    bitmap_from_arr64().
+
+Changes v1 -> v2
+  - Patch 1
+    Use the same qmc_hdlc initialisation in qmc_hcld_recv_complete()
+    than the one present in qmc_hcld_xmit_complete().
+    Use WARN_ONCE()
+
+  - Patch 3 (new patch in v2)
+    Make bitmap_onto() available to users
+
+  - Patch 4 (new patch in v2)
+    Introduce bitmap_off()
+
+  - Patch 5 (patch 3 in v1)
+    Use bitmap_*() functions
+
+  - Patch 6 (patch 4 in v1)
+    No changes
+
+Changes compare to the full feature series:
+  - Patch 3
+    Use 'net: wan: fsl_qmc_hdlc:' as commit title prefix
+
+Patches extracted:
+  - Patch 1 : full feature series patch 7
+  - Patch 2 : full feature series patch 8
+  - Patch 3 : full feature series patch 20
+  - Patch 4 : full feature series patch 27
+
+Andy Shevchenko (1):
+  lib/bitmap: Introduce bitmap_scatter() and bitmap_gather() helpers
+
+Herve Codina (4):
+  net: wan: Add support for QMC HDLC
+  MAINTAINERS: Add the Freescale QMC HDLC driver entry
+  net: wan: fsl_qmc_hdlc: Add runtime timeslots changes support
+  net: wan: fsl_qmc_hdlc: Add framer support
+
+ MAINTAINERS                    |   7 +
+ drivers/net/wan/Kconfig        |  12 +
+ drivers/net/wan/Makefile       |   1 +
+ drivers/net/wan/fsl_qmc_hdlc.c | 807 +++++++++++++++++++++++++++++++++
+ include/linux/bitmap.h         | 101 +++++
+ lib/test_bitmap.c              |  42 ++
+ 6 files changed, 970 insertions(+)
+ create mode 100644 drivers/net/wan/fsl_qmc_hdlc.c
+
 -- 
 2.43.0
 
