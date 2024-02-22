@@ -1,100 +1,107 @@
-Return-Path: <netdev+bounces-73891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07D4D85F1D9
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 08:23:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E370285F1EB
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 08:33:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96548B235A5
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 07:23:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 48182B23117
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 07:33:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F36F17743;
-	Thu, 22 Feb 2024 07:23:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sxFGqYjM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 629EE17981;
+	Thu, 22 Feb 2024 07:33:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D41BFBF2;
-	Thu, 22 Feb 2024 07:23:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F66D101C2
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 07:33:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708586617; cv=none; b=K91GfVlRvxD+lMV2GjQ6C2WRvSn5rwn1vQnnttXziWzQxhrKjbpUY5+posgOQP49WWEdRHIU1Ry4+opMCK3rdExZGp5cFuGps1jWm02sX8Z5fR+hkodwodUlcjNGvlSePeNKrWAVYBileb0CEluRezIFywBMCHryXZLD1HRxlKk=
+	t=1708587209; cv=none; b=KK+7K4IeqdexE9K4Nxs6uMqCp5uW0B2UdNOawCuPaZ1yg75MzmIjJri8AALaFUhROaNGZbVUkngAEq+AZzKWGHkmDwY1Zjs+iFGAgUWXuhzD+QragO4TOOahF5ZwYWrEm05EfJNzYMLXaVtNu8M4q6bTPy361yqYc8yDe4JemsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708586617; c=relaxed/simple;
-	bh=U48hwvgqhEIEdswwj03YABtvmBx7WhMiKcJ3GZXfkqM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IGaMVX4O95P67X3njdclgf7LrbE15bno8K8qfQGOakwbBnO4eh232kIlCkm3NBWRVqzHL4E52ZW7PNY95DlqbNzuU3ddWhGpuOuUDk6QisEQ2mi/5ERj9ryxCJ4RFJmDNCUgdnMpua6EzRLJ06wtUH3UHyMw+ofZEia1pG/ooNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=sxFGqYjM; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description;
-	bh=qK+2MaZFtcEDhEaWdoLRlOAD4pAHu2LPjRADBtfdHbU=; b=sxFGqYjMuCWZPr4RlDWt+cqv7f
-	qzljRBv4zqwhAg/LgXloVt35JBpbUBM3Rtahv5G3i9+Zi+qeBeFBqwkNmhAijpZvlq5pPs82BhBWv
-	RrRNvum3/SNH1UPNYEfgxLGt7TrSE/R0esLDOESLw8pA6MOjJ3nOrgaOdi0oBUfrBZ/Vi32jjPNJ1
-	Fh5jcvJ5UcjyU+MlAySGzd7raq+/v6nAZseaPg65SeBL6HBAz1/XL5PrTEFcKg+EdS40UApIZARu6
-	cMVhqlZgEmqRVnAYgM0kBX428ZNQ/sFXHHIvJpPDtE1It05ATljdM2tnLn2lySgRV/YG1ZYwEiKP8
-	qO3cgalA==;
-Received: from 124x35x135x198.ap124.ftth.ucom.ne.jp ([124.35.135.198] helo=[192.168.2.109])
-	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rd3QJ-00000002uXc-3NVq;
-	Thu, 22 Feb 2024 07:23:16 +0000
-Message-ID: <13059273-4b1c-4e8e-a929-25fcf01bb727@infradead.org>
-Date: Thu, 22 Feb 2024 16:23:08 +0900
+	s=arc-20240116; t=1708587209; c=relaxed/simple;
+	bh=gU6tfQ+cOAm8YbZZk/Hpe9xbq1OuIDBImVaJ5LnBC6o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BucHROfpLZUOaTBHnGvpI2sSL7T4IP+ZX39gWcWY31veLeSoUnbQezZGxlvTfxrNH5h/Srxxf9BumH3/QJQ9XHYqBsrxLpRJeDmT1ZlP+n86H0KdTK64dnMvN8hlpTgsHWpfPcGzzEA8Ajjl12nyoal2kYWInNO9EAajtdv4gvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rd3Zt-0005o6-Nw; Thu, 22 Feb 2024 08:33:09 +0100
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rd3Zr-002Bik-IP; Thu, 22 Feb 2024 08:33:07 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rd3Zr-002hqY-1V;
+	Thu, 22 Feb 2024 08:33:07 +0100
+Date: Thu, 22 Feb 2024 08:33:07 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Simon Horman <horms@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next v2 1/1] net: dsa: microchip: Add support for
+ bridge port isolation
+Message-ID: <Zdb4s-Qo-9PnPVtZ@pengutronix.de>
+References: <20240221093429.802077-1-o.rempel@pengutronix.de>
+ <20240221175357.GE722610@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC net] ps3/gelic: Fix possible NULL pointer dereference
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin
- <npiggin@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>,
- "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
- "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>, Jeff Garzik <jeff@garzik.org>,
- Dan Carpenter <dan.carpenter@linaro.org>, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
-References: <20240221-ps3-gelic-null-deref-v1-1-f4fe159c7cb0@kernel.org>
-From: Geoff Levand <geoff@infradead.org>
-In-Reply-To: <20240221-ps3-gelic-null-deref-v1-1-f4fe159c7cb0@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240221175357.GE722610@kernel.org>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hi Simon,
-
-On 2/22/24 01:56, Simon Horman wrote:
-> Fix possible NULL pointer dereference in gelic_card_release_tx_chain()
+On Wed, Feb 21, 2024 at 05:53:57PM +0000, Simon Horman wrote:
+> Hi Oleksij,
 > 
-> The cited commit introduced a netdev variable to
-> gelic_card_release_tx_chain() which is set unconditionally on each
-> iteration of a for loop.
+> I haven't looked over this patch closely.
+> But it does seem to have some Kernel doc problems.
 > 
-> It is set to the value of tx_chain->tail->skb->dev.  However, in some
-> cases it is assumed that tx_chain->tail->skb may be NULL. And if that
-> occurs, setting netdev will cause a NULl pointer dereference.
+>   .../ksz_common.c:1905: warning: bad line:
+>   .../ksz_common.c:1924: warning: expecting prototype for ksz_adjust_port_member(). Prototype was for ksz_update_port_member() instead
 > 
-> Given the age of this code I do wonder if this can occur in practice.
-> But to be on the safe side this patch assumes that it can and aims to
-> avoid the dereference in the case where tx_chain->tail->skb may be NULL.
+> You can observe these by running ./scripts/kernel-doc -none
+> 
+> I'm going to flag this as Changes Requested in patchwork
+> as typically this kind of problem gets flagged by bots sooner or later.
+> 
+> pw-bot: changes-requested
 
-After 17+ years I never hit this, and never heard of anyone hitting it...
+Thx!
 
-> Flagged by Smatch.
-> Compile tested only.
 
-Thanks for 'fixing' this.
-
-Acked-by: Geoff Levand <geoff@infradead.org>
-
+Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
