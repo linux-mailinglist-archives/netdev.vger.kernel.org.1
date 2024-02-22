@@ -1,118 +1,144 @@
-Return-Path: <netdev+bounces-74117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D59086019F
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 19:39:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8D4D86002A
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 18:57:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CFE05B23D9E
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 18:39:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 222881C237DF
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 17:57:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3FF5140362;
-	Thu, 22 Feb 2024 18:29:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 895E115697D;
+	Thu, 22 Feb 2024 17:57:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cdmojkst"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="LzI27tNp"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24B9A13BADC
-	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 18:29:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77FA215531B
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 17:57:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708626556; cv=none; b=VWO6stvFZoFg6PQWmTLs2ScfkA2ubaiKNiesJxu5Qfg1uetwETpWRAMA9pdd6boel9CpRP93bqmnCLhU13b952HsY0I4n4VnwSN+wBCgvLhnN/JmyTFzhVn6QwAgwxjovM8plV5tDrdHyUhqG68Ki285NuwJZCggfU0hnHbqB68=
+	t=1708624642; cv=none; b=ttTo5+dXZ3O/0B42Xa3Kl08ZBn1PFlLISXPlUBrNVJp4DQtuf2rGtBGaolqNMFk9Mfl/jEkzCSRyvlFVp0KxOJ0Dcr1mF/Qa/tw+dN6oslC38vRFCQmCzRCPZuphLxvUTgqjlsZ1pOaBW2a2OmMIjgm/rq81Zt2jpqkWvY7+DdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708626556; c=relaxed/simple;
-	bh=eLoDaQ5497vWFnwGoufOSzIwFNqonoZsFTnjZb28mwc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PY9N3Hr987/9BNLt4Ix63QE1RQitqNVXDWUdgf73xy8sDDU/hKm1HFYazSFrqElh6YE1NVehNOv/yTUn8H19yIaiOhxR84rvLmucIuyuFe2eDScgK6PLi3M2V8uXRFMDGQJbyzTZNAJUMhjtqcQFtcwcIHFcBRdXUJ2MBYUXL6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Cdmojkst; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708626553;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Vr8Yn1Cpu8PQZblyo7wqABSOEVcJb2+/02KvtI4t3EE=;
-	b=CdmojkstVg/uywpAHUQ9XRPu5HKmBFRHPOnTtNcUt+th1fG1gowoVipBF9F9sLvqlHM5DL
-	dFikLeft0L2dmvr8CZ2vkXjLyhdWWtJSCJDJsE6R4ft3Zfq6IZryd5ts8Yr0QaMilnqFez
-	C3Nw+swYV6LlTRzQwf/Fs6wtAFKom38=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-472-GzxCAY4_N0yjQ7_gGkJu6Q-1; Thu,
- 22 Feb 2024 13:29:09 -0500
-X-MC-Unique: GzxCAY4_N0yjQ7_gGkJu6Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 29FE828EA6F8;
-	Thu, 22 Feb 2024 18:29:09 +0000 (UTC)
-Received: from tpad.localdomain (unknown [10.96.133.3])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E5355200B436;
-	Thu, 22 Feb 2024 18:29:08 +0000 (UTC)
-Received: by tpad.localdomain (Postfix, from userid 1000)
-	id 2D740400E4EBE; Thu, 22 Feb 2024 14:52:11 -0300 (-03)
-Date: Thu, 22 Feb 2024 14:52:11 -0300
-From: Marcelo Tosatti <mtosatti@redhat.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Valentin Schneider <vschneid@redhat.com>
-Subject: Re: [PATCH] net/core/dev.c: enable timestamp static key if CPU
- isolation is configured
-Message-ID: <ZdeJyxiTSKtkpHMO@tpad>
-References: <ZdSAWAwUxc5R46NH@tpad>
- <65d7640c7983b_2bd671294c3@willemb.c.googlers.com.notmuch>
+	s=arc-20240116; t=1708624642; c=relaxed/simple;
+	bh=hlPKjlQSc0kMs/W05kmcLVH3IEjiTit6toh7GkaAPKU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=vE63tDdK2Vgnho4uoyQD+Go0w/n2TKwtoUohuMl8Wu90vE9L7iUg+PpiavEjP5klGgLdWtSFG1MGxEwx54w3qskE7onFIezg9ekk/aT2Hp0XqVjKyfB3k9tt3xNxPwxxG48ovjWMhWa3yXv9g++cd4ACJhk2SKSf2PGWfd6gj6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=LzI27tNp; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2d2533089f6so569521fa.1
+        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 09:57:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1708624638; x=1709229438; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=2n36AeyXiuh8a+bUOx1L+r2cwQosoX8vn/3R6qLfBBs=;
+        b=LzI27tNpWi75HOEGy25hCc71RgKcKAUGfxffz8GmDfam4I2V+MU41aKTFeKjd0zRzk
+         NO9CA1DlzFI8pXTLPThgTU1ewGfQPyTzC483xhm+c/bD7Cp92h4InhMb0KxAV9UsUAT7
+         IB3MAHjQi70V1je60+d29jj/L7PN+o+agOeHQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708624638; x=1709229438;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2n36AeyXiuh8a+bUOx1L+r2cwQosoX8vn/3R6qLfBBs=;
+        b=rgW/3Pg5ffO6F6v+TG/fiHQgq9cKqKj1OJtDHPRQUb+ZsGucXSt4SNv73sTxvo+ovz
+         CIVZn0RP3/8trXGXykILw32kcZIdt4I00hkwjBDhEtN3RZg3gsP+W1+ydxq9nRevuuBV
+         Jd/7Ka5agKVGDjFYMc1Zf+6plhIxGt+Oq39KAZFBRUeDFiP0eV/jQDgTmZTnWxe2xueX
+         /MQTceVru4y0LyxUzMUNA16pQnx7ONsQZuj4S4sw/fePvkZmaCYa/vSvxRufUszn+ehW
+         eNyo0CkZiHBNp61JVLYpRYIX+Yvgv3NsKKG7nGFTkuShBFMpNjmRIobetFn9L96K0fJ0
+         roUg==
+X-Forwarded-Encrypted: i=1; AJvYcCVtSbPkUxKM3BoZdp1Nm+isDWhemE7DRPlI4OkyXXi4s3aD+Bou0SA/2+nuGGEC8VRPCl8N5d2tG9x9bxXfEhDfB2B1CJou
+X-Gm-Message-State: AOJu0Yyex1SrUTKvNnZR+JqkCoYXahZmT/bMijydh5j4gZhPuQv2A8sY
+	kEzGeyzknJCGJ4ub06jGsA2v7t28VTyw2e3G8b9IpxxGCLWCAlhd+2P/4L6Ggv+/xSfkqrlRQrX
+	VHTJI5g==
+X-Google-Smtp-Source: AGHT+IEKpPGanP/Uj/h17MR0/44MObELr2UDIVqM6JlJWefGy/ogpaUTEaL8afu+CXlpHrg52x9PgQ==
+X-Received: by 2002:a2e:b2cf:0:b0:2d1:749:cbdf with SMTP id 15-20020a2eb2cf000000b002d10749cbdfmr15536654ljz.22.1708624638348;
+        Thu, 22 Feb 2024 09:57:18 -0800 (PST)
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com. [209.85.208.179])
+        by smtp.gmail.com with ESMTPSA id m10-20020a2e910a000000b002d11f907489sm2332853ljg.2.2024.02.22.09.57.17
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Feb 2024 09:57:18 -0800 (PST)
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2d2533089f6so569221fa.1
+        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 09:57:17 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCV/HnhEYqXE4TvO42C08JbvGOohI8H+b3XJnhiMRy4KP1Tvw1xACkJK1f11mH4RTSgWzG0xQbfHusjCUP9qdYOhRNG8iynu
+X-Received: by 2002:a05:6512:3089:b0:512:acf1:6970 with SMTP id
+ z9-20020a056512308900b00512acf16970mr11555378lfd.35.1708624617484; Thu, 22
+ Feb 2024 09:56:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <65d7640c7983b_2bd671294c3@willemb.c.googlers.com.notmuch>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+References: <20240221092728.1281499-1-davidgow@google.com> <20240221092728.1281499-3-davidgow@google.com>
+ <20240221201008.ez5tu7xvkedtln3o@google.com> <CABVgOSn+VxTb5TOmZd82HN04j_ZG9J2G-AoJmdxWG8QDh9xGxg@mail.gmail.com>
+ <CAGS_qxoW0v0eM646zLu=SWL1O5UUp5k08SZsQO51gCDx_LnhcQ@mail.gmail.com>
+In-Reply-To: <CAGS_qxoW0v0eM646zLu=SWL1O5UUp5k08SZsQO51gCDx_LnhcQ@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Thu, 22 Feb 2024 09:56:40 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wiODww51Kz-TTWn0ka5T8oMtt0AfbO9t0U3iJqfLZO+8w@mail.gmail.com>
+Message-ID: <CAHk-=wiODww51Kz-TTWn0ka5T8oMtt0AfbO9t0U3iJqfLZO+8w@mail.gmail.com>
+Subject: Re: [PATCH 2/9] lib/cmdline: Fix an invalid format specifier in an
+ assertion msg
+To: Daniel Latypov <dlatypov@google.com>
+Cc: David Gow <davidgow@google.com>, Justin Stitt <justinstitt@google.com>, 
+	Shuah Khan <skhan@linuxfoundation.org>, Guenter Roeck <linux@roeck-us.net>, 
+	Rae Moar <rmoar@google.com>, Matthew Auld <matthew.auld@intel.com>, 
+	Arunpravin Paneer Selvam <arunpravin.paneerselvam@amd.com>, 
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Kees Cook <keescook@chromium.org>, =?UTF-8?B?TWHDrXJhIENhbmFs?= <mcanal@igalia.com>, 
+	Rodrigo Vivi <rodrigo.vivi@intel.com>, Matthew Brost <matthew.brost@intel.com>, 
+	Willem de Bruijn <willemb@google.com>, Florian Westphal <fw@strlen.de>, Cassio Neri <cassio.neri@gmail.com>, 
+	Javier Martinez Canillas <javierm@redhat.com>, Arthur Grillo <arthur.grillo@usp.br>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, Stephen Boyd <sboyd@kernel.org>, 
+	David Airlie <airlied@gmail.com>, Maxime Ripard <mripard@kernel.org>, 
+	"David S . Miller" <davem@davemloft.net>, dri-devel@lists.freedesktop.org, 
+	linux-kernel@vger.kernel.org, intel-xe@lists.freedesktop.org, 
+	linux-rtc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	kunit-dev@googlegroups.com, linux-hardening@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Feb 22, 2024 at 10:11:08AM -0500, Willem de Bruijn wrote:
-> Marcelo Tosatti wrote:
-> > For systems that use CPU isolation (via nohz_full), creating or destroying
-> > a socket with  timestamping (SOF_TIMESTAMPING_OPT_TX_SWHW) might cause a
-> > static key to be enabled/disabled. This in turn causes undesired 
-> > IPIs to isolated CPUs.
-> 
-> This refers to SOF_TIMESTAMPING_RX_SOFTWARE, not SOF_TIMESTAMPING_OPT_TX_SWHW.
-> See also sock_set_timestamping.
+On Thu, 22 Feb 2024 at 09:36, Daniel Latypov <dlatypov@google.com> wrote:
+>
+> Copying the line for context, it's about `p-r` where
+>   p = memchr_inv(&r[1], 0, sizeof(r) - sizeof(r[0]));
+> `p-r` should never be negative unless something has gone horribly
+> horribly wrong.
 
-Willem,
+Sure it would - if 'p' is NULL.
 
-This test program does trigger the static key change:
+Of course, then a negative value wouldn't be helpful either, and in
+this case that's what the EXPECT_PTR_EQ checking is testing in the
+first place, so it's a non-issue.
 
-int main (void)
-{
-        int option = SOF_TIMESTAMPING_OPT_TX_SWHW;
-        int sock_fd;
-        int ret;
-        int pid_fd;
-        pid_t pid;
-        char buf[50];
+IOW, in practice clearly the sign should simply not matter here.
 
-...
+I do think that the default case for pointer differences should be
+that they are signed, because they *can* be.
 
-        /* set the timestamping option
-         * this is to trigger the IPIs that notify all cpus of the change
-         */
-        if (setsockopt(sock_fd, SOL_SOCKET, SO_TIMESTAMP, &option, sizeof (option)) < 0) {
-                printf("Could not enable timestamping option %x", (unsigned int)option);
-                close(sock_fd);
-                return 0;
-        }
-...
+Just because of that "default case", unless there's some actual reason
+to use '%tu', I think '%td' should be seen as the normal case to use.
 
+That said, just as a quick aside: be careful with pointer differences
+in the kernel.
+
+For this particular case, when we're talking about just 'char *', it's
+not a big deal, but we've had code where people didn't think about
+what it means to do a pointer difference in C, and how it can be often
+unnecessarily expensive due to the implied "divide by the size of the
+pointed object".
+
+Sometimes it's actually worth writing the code in ways that avoids
+pointer differences entirely (which might involve passing around
+indexes instead of pointers).
+
+                 Linus
 
