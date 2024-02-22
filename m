@@ -1,167 +1,238 @@
-Return-Path: <netdev+bounces-74171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7221860561
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 23:05:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CE0D860572
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 23:10:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C78011C2060E
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 22:05:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F033A1F24E83
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 22:10:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C801113BACA;
-	Thu, 22 Feb 2024 22:05:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36FFE12D210;
+	Thu, 22 Feb 2024 22:10:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h134/bPK"
 X-Original-To: netdev@vger.kernel.org
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 684FA12D206
-	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 22:05:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.86.151
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708639514; cv=none; b=lWqVZKF/kjcRYDjG1fXboIIoo9aZPxTt4xNo6Pw98vLvYZ0LYqg29toUnNdYkN9/vlLLphCSOzv+0SpxFSFRTsLPASpjlAQxAsUh7k0tvuycs7r4nEK21PZtf5kVP8UhQ/GmNBiT1ymltN51jEcnV7bJ2KWGWVHGthqNuK+74Lk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708639514; c=relaxed/simple;
-	bh=Ns8POw5Unk7S6TWI/lYpd3ryYdEastG5Bp71gPxYe3k=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=BaFoAKLO3wT2uE2liuj8NrKHnk/2Ckr/Uh1dm81bA94/QPKLDXJXZLMpY4yRy9+gdy2ZOLgyMRLX9RVQriVvArv2Qy8pdGIy2N70c+eI1awRM3v3Qv+eYCYNvlWOY13qvLJBAJwyDCRrOMnXTprDcJIc5e5o/xxget5/XjaQxHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.86.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-267-WbNjfvPePtanToAnPgxbaA-1; Thu, 22 Feb 2024 22:05:07 +0000
-X-MC-Unique: WbNjfvPePtanToAnPgxbaA-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 22 Feb
- 2024 22:05:05 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Thu, 22 Feb 2024 22:05:04 +0000
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Jason Gunthorpe' <jgg@nvidia.com>, Alexander Gordeev
-	<agordeev@linux.ibm.com>, Andrew Morton <akpm@linux-foundation.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Borislav Petkov
-	<bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Gerald Schaefer
-	<gerald.schaefer@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, "Heiko
- Carstens" <hca@linux.ibm.com>, "H. Peter Anvin" <hpa@zytor.com>, Justin Stitt
-	<justinstitt@google.com>, Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky
-	<leon@kernel.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-	"llvm@lists.linux.dev" <llvm@lists.linux.dev>, Ingo Molnar
-	<mingo@redhat.com>, Bill Wendling <morbo@google.com>, Nathan Chancellor
-	<nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Salil Mehta <salil.mehta@huawei.com>, Jijie Shao
-	<shaojijie@huawei.com>, Sven Schnelle <svens@linux.ibm.com>, Thomas Gleixner
-	<tglx@linutronix.de>, "x86@kernel.org" <x86@kernel.org>, Yisen Zhuang
-	<yisen.zhuang@huawei.com>
-CC: Arnd Bergmann <arnd@arndb.de>, Catalin Marinas <catalin.marinas@arm.com>,
-	Leon Romanovsky <leonro@mellanox.com>, "linux-arch@vger.kernel.org"
-	<linux-arch@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, Mark Rutland <mark.rutland@arm.com>,
-	Michael Guralnik <michaelgur@mellanox.com>, "patches@lists.linux.dev"
-	<patches@lists.linux.dev>, Niklas Schnelle <schnelle@linux.ibm.com>, "Will
- Deacon" <will@kernel.org>
-Subject: RE: [PATCH 4/6] arm64/io: Provide a WC friendly __iowriteXX_copy()
-Thread-Topic: [PATCH 4/6] arm64/io: Provide a WC friendly __iowriteXX_copy()
-Thread-Index: AQHaZGPOOI9/P4jwQk+N+/Phnt6M8bEW6Xcg
-Date: Thu, 22 Feb 2024 22:05:04 +0000
-Message-ID: <6d335e8701334a15b220b75d49b98d77@AcuMS.aculab.com>
-References: <0-v1-38290193eace+5-mlx5_arm_wc_jgg@nvidia.com>
- <4-v1-38290193eace+5-mlx5_arm_wc_jgg@nvidia.com>
-In-Reply-To: <4-v1-38290193eace+5-mlx5_arm_wc_jgg@nvidia.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52A7F14B81E
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 22:10:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708639840; cv=fail; b=dwc0Zf0zlL67UBCMgMlz9UYpvDjb6TP6X7pxvxJqufiaK0WgxOqRPtB/t2UG86ELew6ovokAzMBhE0sdu91kjACEaZAdMRzR9utcW2PTZfqYDP9ol4sS59uBOpLt5lgL3wPPhDGY9vL6EkRsuOQ3Lb/hiGrb/59gx91NOPbT0mE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708639840; c=relaxed/simple;
+	bh=I8at2lnLjP0x3HJLN7G9TSWr36DxLfhHfEiZQrKT/e0=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=tBAeuCS+bTRYhj9NTRjgs5T5aN+SIkpsj5PxaSwHGHP/k9yTLC6TDNN2VCdMtWcip/05OuS9Y+MMdScCDuTFyjAwHWtb8b7AUeBLgx92NlNUnJxUkm9DlvCryhsKLL07gVlFFnXVM01ueZJ7XKWCeNrF6X6ujyVXYjHerRsDX0o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h134/bPK; arc=fail smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708639839; x=1740175839;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=I8at2lnLjP0x3HJLN7G9TSWr36DxLfhHfEiZQrKT/e0=;
+  b=h134/bPKGTwCAbW0jhd3GE+uYdvgpfZwpN3sQMT7168BEcozH+LSy9Tx
+   yoEWFj9q3TrJM3jCgToLsP6DvGXBry7Np87e1ZcMiz3IyDWMsWmv5QkHp
+   54fxGZnbBnAN+o3zL7BT1+dtv7sTCCAFp1YoPoNR/CzxoviuPr6K1SFjB
+   43KU/0FWijgSI4XjkURKhnHa7jMpgz9qzyV6RR9qxzH1dbP9GMkps2Obo
+   mwWwMHQVLiWzCO6DJSa2H2Gs4/MHNQkuQPgsEOQGzAZYviFq8dCtQlqea
+   8Ct4Oqv9tv1v4jnfTcEzYximOefRu0wtKIqdRscmTJqJlsNDRCPfapceX
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10992"; a="6683806"
+X-IronPort-AV: E=Sophos;i="6.06,179,1705392000"; 
+   d="scan'208";a="6683806"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2024 14:10:26 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,179,1705392000"; 
+   d="scan'208";a="5947638"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 22 Feb 2024 14:10:25 -0800
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 22 Feb 2024 14:10:25 -0800
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 22 Feb 2024 14:10:24 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 22 Feb 2024 14:10:24 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 22 Feb 2024 14:10:24 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Cb/7UB6ZVgUOMFvpba4uF6EAKcEUmzpnDcAQpDzQJ5hFoGzDzVaUSUjS3NdSmsz4wtnXR5GyAV+4p0ARBxWJOC25njcoL2yG3WqnCzMDe+kDC6PltROmiWsOCXAtye68MPf/Ojdv6vz4w2DR89109In8tE8ROzQhrlOlgXy/6ylwkGcgD7MI1CFo/YRlkMQSiAdmYnSMCXFu/VDnpP45UDeZbqgOkhasbPR/bBz8CPkRMgfM6rkRj7R8cz0274EuyqszS6HYKbkPGjO0QzD+UmPL9WnWlMVgIetP1kQDzjCiz+/HxwmrUR4LkS5Awbq/mjO659HXWGPHZ+goqjie3A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RLvUkPS3pZGj+Hupn2yR5zKjAd2XJMAFxquJwejGqy8=;
+ b=X2O3XJnQmDfqEZfL0DWufnK1OMvqz4k6ueJ/58qEcMK3Ir+yP81V2JDpHkTF8oJgXh4ekIACezaY/CZS/PwbSn4xUYIgxtTB7VPcD4oEgWBuorIqSf7E3Zt/lq/+mclHx9oAIm4k5DLpcVSlsp9SdoVTaZXAkFxKYIjBM+dl/JGkdvMZ8Zt8d5ApKvYxD3Tyx4yH3tZiF4ZND7OWqEJhCHsPAvqXnO8O+u32xdXXrqJ4dMCoulZd6IoFAOY9ZXCpeA39xoVD1eIGzrbIjHBxzgJc+JatAp09TU9w+MluWBlCV3QHgCZVsfz5W2LOh/31CuEAyqFQYKJ2JRpT/kr66w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
+ by DS0PR11MB8667.namprd11.prod.outlook.com (2603:10b6:8:1b3::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.39; Thu, 22 Feb
+ 2024 22:10:21 +0000
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::9c80:a200:48a2:b308]) by BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::9c80:a200:48a2:b308%4]) with mapi id 15.20.7339.009; Thu, 22 Feb 2024
+ 22:10:21 +0000
+Message-ID: <481ea432-154a-b3c3-73ad-4a5ab6fe25ba@intel.com>
+Date: Thu, 22 Feb 2024 14:10:17 -0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH iwl-net v1] ice: fix NULL pointer access during resume
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>
+CC: <netdev@vger.kernel.org>, Robert Elliott <elliott@hpe.com>, Jacob Keller
+	<jacob.e.keller@intel.com>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+References: <20240220231720.14836-1-jesse.brandeburg@intel.com>
+Content-Language: en-US
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+In-Reply-To: <20240220231720.14836-1-jesse.brandeburg@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR04CA0176.namprd04.prod.outlook.com
+ (2603:10b6:303:85::31) To BL3PR11MB6435.namprd11.prod.outlook.com
+ (2603:10b6:208:3bb::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL3PR11MB6435:EE_|DS0PR11MB8667:EE_
+X-MS-Office365-Filtering-Correlation-Id: a69e81f9-4321-4f0d-35ab-08dc33f30fbb
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: /uSa7uvsOXrxMgxcOmm1n+0pHYkv0Vm9DCWgU82vJ/isHTYnTB16bQv8na11/MNcOpQ6j1CQ/iQqXIkHvc+MOq6AIZZ2B2txq4ECLQkGO3xkdSBN0uzEJVoWtP6Jz5HwrEkXfBKSsPD1I/OoVodlgfNLokZPHcKdd/5JTs0+iPqn//G3ovXA3tmE/m0a9RM+PbIfBEsjU+KMPejNZSlslrErIHWCN3g3tclSXx1HG5wgDSfwqSYVYVdytAjIpfnMuAqhDUZa42ZxQuvPooEl5TGRpgPM4qG2i9zZtc/WHCiptE4w8XJMOn0rEnajdvo9UGQ0N5LfxM182uVnfFyOkVMNPYbGS66yCP48yXrB4HucliEj/WX9vfFged1PgNbeeF4QY4yaqMcN6CNj2nlaD/MskD2Z2dYWbvMVdwHvUQcFxE7c99R/wL41VFBnqwMx7Md2arvIRfez8eAufYH0nW07m9wV47QXjQAi7jzcjXiOJJ9xA7MEavKWDLf4UmC1osgBccnIyBUqyRZUiuTmiQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aGdWTlZSdHg3d2lxZk5aVDVVejFpR2RLNlUrWmlydVFHL0V0M28zVjh6UDBp?=
+ =?utf-8?B?VEJXcTJZRjF2MG0rcFRuSWpOWmp4cXI4NDVyY2ZJdzFuZWlSM2NkL2VwZTR1?=
+ =?utf-8?B?aWdBOEFUaHZuVXZaN3NyeVRZdHF6ZWkwWlRjT1pQOVp6R0NINGVuRmRSQktn?=
+ =?utf-8?B?dGJCOTNwa3Q3czUybzhYdDB3cy9PT3hHNGh5Q2V1SzZ4TVpTYXBISmlML05s?=
+ =?utf-8?B?dWx1QkpyaE5aSC9PR0pWVXgvaDFzZHUyakJKM1VHd2M5NWlZKzhPbWRZYldm?=
+ =?utf-8?B?RkZHS2JTWEFwLytoT3Vtc0VpMjRZWU8xcFBrSHo5NWRyQWhwVStsUlJCcFJv?=
+ =?utf-8?B?cE51c2tRWlJOYXkxY3dpQU81ZGJPZkkzcytub3BmU0RmZ1ZsN043UjE0QVox?=
+ =?utf-8?B?QnF4NS9CdGk1NXFJd21CQ08xVDRLMzRWTE5nbjExbklGOTBrWThVTzFtckxH?=
+ =?utf-8?B?K1VwM2grUkdNbllrcGdOcGUwaXAzdTZpMXZGNkdaWGtjTGw4RDdUU1RQbEZw?=
+ =?utf-8?B?Wk9YVDJpOC8veDAxQjZjZ0R3WTg2YWJVYVR6QkJtM3VMZDRYVFFQa2IyaGpB?=
+ =?utf-8?B?L0JPaXRmSTVObmRNUThXSnUvT2FGQmwxc2ZQMEtyUW5FbzY3WnBSaHNBN2Vr?=
+ =?utf-8?B?dDJVSHBwTUNkTGN5eUtpdlVWek5yZkNmdFFidVpnd09BY1Q3aE8vNlVacG1H?=
+ =?utf-8?B?UkNLc0NTTXE2MHRSY2RHTmg0cCtLUXk5Wks4cU1PLzAyMHlrUWZrVGdOQ3Vl?=
+ =?utf-8?B?czFVaGxHU1FQcnFWQW56VmJ6RlU0cHpmK21VYlFkbWI3cERXNUd4bzZxdkNz?=
+ =?utf-8?B?VFNydlM2dEVwamE2Yk9PZHVpRDl1b3VSWEw5RklaMmJObzkyNERjckI1b3Bp?=
+ =?utf-8?B?a3FEZTV1bmxRcXQ1SXNRMkh2UWg1UTVnRnRZT1hCN3NVRXIvWWhWU3lhMjE4?=
+ =?utf-8?B?Y2xVY1AxMWN2T3NlNXU1dnlFNHd6UmhCWTlkajA0aEVxMmlYeHM1K0IvcXBK?=
+ =?utf-8?B?bGJac25rQi9Gc2txNEJySHZEcDV5dTdqdlJqbUNiRktBdGdEQ293RFpPWGdw?=
+ =?utf-8?B?NWdCQVFZdmo2dEw2Q2xnc1B2ZkhuRFNORk1XTFRMcXFwNmppZjBnWkRwZDFp?=
+ =?utf-8?B?VHdlTzdOYU9ZUFZwNjYyK042Y0dPV3lIbEdqRTlyNFFYTzIxYlFnaWdQekhi?=
+ =?utf-8?B?dzgzQ1J4QUxDY2hYbG9iVHM3NzVJRG9jNUVwNEVrT3pDYnpCN1VuemtReFVK?=
+ =?utf-8?B?K1pXSzdkNFhPVTkyT1RNTHJUQi9NWEwzNEt5ZkdXb2RMTU1INUFPYXh6YlVP?=
+ =?utf-8?B?eUQ2a2g0dmJsVzZoVmtOOTVMMzFIRDRpeXRFc1lwb3Yza3lCdWo4T2k1d2dV?=
+ =?utf-8?B?UC8xdEkyYXFjMThLaEF4Q0xqdUlXQWNXc3MyV0s3aUZuVU1QSUZxTWl0L25N?=
+ =?utf-8?B?Z0VpVHNYYXd2aWVQRHU1VmFWbmZXMHROT0M4OFNuKzRBYkkyS2ZNampzWDh4?=
+ =?utf-8?B?Rzd0N1JVNXB5TUltQldwVE5wRktCZS9Rb0ZJWnY4UytXeUluN3ozM3prKzlE?=
+ =?utf-8?B?MUFEWnBQVjVWNnpPU2o4cnlLRTh6N0FCMUIxbk42V3pRdENwQ012RDkzK2xG?=
+ =?utf-8?B?Yjk4dXFVS3VXLzNqQnRpRGpRYXcxcXhUdHNsM3Q2Z1FvU2RHcnBjdlA4TUNN?=
+ =?utf-8?B?S21wUEZxL244KzJlMVRrWXVQQllDa0FKa3pIVGRrUnhWdHhhTXdMNFlRNGpF?=
+ =?utf-8?B?QkF6NDYvcTJhUkIwWmNJRkpQd0RmbFpjZWx6SGVVbUVZR0srd0JzS3ZDNjlj?=
+ =?utf-8?B?endjSHE5NXozZWpzNEpHbG1XMDJoUFd1d2N0dktVQUs1MUkwNVcvdGtWVnQ0?=
+ =?utf-8?B?ZGxndkpsbDVlTkpJWDZYTzl2UmVxWFhrWnQyM3pGYlVFMUtVQUcxeGYvakVY?=
+ =?utf-8?B?U1VVWURHalVkbk1XcE95Unhhb0JTMWtWY0hiNUttZ3Q3a2V0d2djQnN5MVFV?=
+ =?utf-8?B?aDgwZ3ZybkI1czZHRUM5SGNMZkdqNnVkQWFPYzRLdGNnQ3U5bDhudlM3SXdM?=
+ =?utf-8?B?ZzNRdkNialNhQXlZaU9HVG9MR3g2SEE4endqUzNaMDN2b1RNbzlKNkdEWEFj?=
+ =?utf-8?B?KzBUYmNMZVBnTHpWWjhGWEpiSzM5SCtuSzV5K1VHYy9kakJZTzgvOW5JMXo0?=
+ =?utf-8?B?dWc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: a69e81f9-4321-4f0d-35ab-08dc33f30fbb
+X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Feb 2024 22:10:21.7795
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: JyCZpJG9ftJtUMEQq9Ga/8rmbzFgDpYDjB1tb9fmF61NYnUuJPviZXDRnMFiijO8XRoPF0tvqRe/q+JnV29tnzxhE7JmGlpychcgG/6+mY0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8667
+X-OriginatorOrg: intel.com
 
-From: Jason Gunthorpe
-> Sent: 21 February 2024 01:17
->=20
-> The kernel provides driver support for using write combining IO memory
-> through the __iowriteXX_copy() API which is commonly used as an optional
-> optimization to generate 16/32/64 byte MemWr TLPs in a PCIe environment.
->=20
+On 2/20/2024 3:17 PM, Jesse Brandeburg wrote:
+> The ice_suspend/ice_resume cycle was not updated when refactoring was
+> done to the init path and I suspect this allowed a bug to creep in where
+> the driver was not correctly reinitialized during resume.
+> 
+> I was able to test against 6.1.77 kernel and that ice driver works fine
+> for suspend/resume with no panic.
+> 
+> Instead of tearing down interrupts and freeing a bunch of memory during
+> suspend, just begin an internal reset event, which takes care of all the
+> correct steps during suspend.  Likewise during resume we'll just let the
+> reset complete and the driver comes right back to life. This mirrors the
+> behavior of other suspend/resume code in drivers like fm10k.
+> 
+> Older kernel commits were made to this driver and to the i40e driver to
+> try to fix "disk" or hibernate suspend events with many CPUs. The PM
+> subsystem was updated since then but the drivers kept the old flows.
+> Testing with rtcwake -m [disk | mem] -s 10 - passes but my system won't
+> hibernate due to too much RAM, not enough swap.
+> 
+> The code is slightly refactored during this change in order to share a
+> common "prep" path between suspend and the pci error handler functions
+> which all do the same thing, so introduce ice_quiesce_before_reset().
+> 
+> While doing all this and compile testing I ran across the pm.h changes
+> to get rid of compilation problems when CONFIG_PM=n etc, so those small
+> changes are included here as well.
+> 
+
 ...
-> Implement __iowrite32/64_copy() specifically for ARM64 and use inline
-> assembly to build consecutive blocks of STR instructions. Provide direct
-> support for 64/32/16 large TLP generation in this manner. Optimize for
-> common constant lengths so that the compiler can directly inline the stor=
-e
-> blocks.
-...
-> +/*
-> + * This generates a memcpy that works on a from/to address which is alig=
-ned to
-> + * bits. Count is in terms of the number of bits sized quantities to cop=
-y. It
-> + * optimizes to use the STR groupings when possible so that it is WC fri=
-endly.
-> + */
-> +#define memcpy_toio_aligned(to, from, count, bits)                      =
-  \
-> +=09({                                                                \
-> +=09=09volatile u##bits __iomem *_to =3D to;                       \
-> +=09=09const u##bits *_from =3D from;                              \
-> +=09=09size_t _count =3D count;                                    \
-> +=09=09const u##bits *_end_from =3D _from + ALIGN_DOWN(_count, 8); \
-> +                                                                        =
-  \
-> +=09=09for (; _from < _end_from; _from +=3D 8, _to +=3D 8)           \
-> +=09=09=09__const_memcpy_toio_aligned##bits(_to, _from, 8); \
-> +=09=09if ((_count % 8) >=3D 4) {   =20
 
-If (_count & 4) {
-                              \
-> +=09=09=09__const_memcpy_toio_aligned##bits(_to, _from, 4); \
-> +=09=09=09_from +=3D 4;                                       \
-> +=09=09=09_to +=3D 4;                                         \
-> +=09=09}                                                         \
-> +=09=09if ((_count % 4) >=3D 2) {                                  \
-Ditto
-> +=09=09=09__const_memcpy_toio_aligned##bits(_to, _from, 2); \
-> +=09=09=09_from +=3D 2;                                       \
-> +=09=09=09_to +=3D 2;                                         \
-> +=09=09}                                                         \
-> +=09=09if (_count % 2)                                           \
-and again
-> +=09=09=09__const_memcpy_toio_aligned##bits(_to, _from, 1); \
-> +=09})
+> 
+> Fixes: 5b246e533d01 ("ice: split probe into smaller functions")
+> Reported-by: Robert Elliott <elliott@hpe.com>
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+> ---
+> NOTE:
+> Requires Amritha's patch:
+> https://patchwork.ozlabs.org/project/intel-wired-lan/patch/170785373072.3325.9129916579186572531.stgit@anambiarhost.jf.intel.com/
+> to be applied before this will pass testing cleanly.
 
-But that looks bit a bit large to be inlined.
-Except, perhaps, for small constant lengths.
-I'd guess that even with write-combining and posted PCIe writes it
-doesn't take much for it to be PCIe limited rather than cpu limited?
+I think this may be the other way around? It looks to be clean for 
+netdev (doesn't have Amritha's patch), but it's not applying to 
+net-queue (has Amritha's patch).
 
-Is there a sane way to do the same for reads - they are far worse
-than writes.
+ > base-commit: 23f9c2c066e7e5052406fb8f04a115d3d0260b22
 
-I solved the problem a few years back on a little ppc by using an on-cpu
-DMA controller that could do PCIe master accesses and spinning until
-the transfer completed.
-But that sort of DMA controller seems uncommon.
-We now initiate most of the transfers from the slave (an fpga) - after
-writing a suitable/sane dma controller for that end.
+Base commit also seems to be a netdev commit.
 
-=09David
+Since Amritha's patch is pending to netdev [1], I think we need a 
+version that will apply with Amritha's changes.
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
+Thanks,
+Tony
 
+
+[1] 
+https://lore.kernel.org/netdev/20240220214444.1039759-7-anthony.l.nguyen@intel.com/
 
