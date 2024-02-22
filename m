@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-74193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22B2B86072B
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 00:56:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEE7286072C
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 00:56:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADEB91F21CBB
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 23:56:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 836B5283458
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 23:56:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD8D713BAE1;
-	Thu, 22 Feb 2024 23:56:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66AF913BAF8;
+	Thu, 22 Feb 2024 23:56:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qri91/87"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lVnnnIyW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A89C7433DF
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4373E13BAF0
 	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 23:56:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708646185; cv=none; b=L7+JDSEwJEjXnO50zDOukr/jqlM/NfP2AKfabgAGtVBgjwPWZEb/6cZ1j9Vlxx4NiMgNiaR3zevZ/Efo7AsdENw0dK6TtR1YEVtIEUp3TqpGExCREag4G95RA5CmJ5h7wTrEYYbB+3K2lstj2LnFbvnTW+5U/ZyJAbAMN6acqKk=
+	t=1708646186; cv=none; b=mOVJozfLQ21OcjkpuRl7KwgxFQSWXhe//pNFYXksBoRCf9Z2NW94V2bPmSoxGzrFKm7rlJHVc72+OhxRW5bq8GASltoUXzT3lXSzOe85zSOsQtEy2csiAqCXnzGK2cSBzcUa3Ss4lz/tLncQGUfqwPeqSI9/f+iSPf5BGJPtcYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708646185; c=relaxed/simple;
-	bh=yu/qMtteohJ+NIqUtLEuhIplI6YixEJ1RT6BseY3wiI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=vFTChJfvCy1ACtMTo/qmGMg4VnuHN6nadqEChlxMyfrqGjx2ViEp+onebXZ0miJQ1NUwvZL16/IZxELWBUGiLf0WTQ1RvoWOGhGSMxsQgEcb8mVHO1qQ3wEfEDR10cZmUgieaHjb+Q9G8LcSmWomy71XQGERtiqRD2tGs/On/js=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qri91/87; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2AD8C433F1;
-	Thu, 22 Feb 2024 23:56:24 +0000 (UTC)
+	s=arc-20240116; t=1708646186; c=relaxed/simple;
+	bh=uR7+64NP9C83YXVNPnR/RoeLOX/nd5XOHSbFdARgCgk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=siTcz0wnLUl+vaAz6cAdqphElV0ZZPgzLL7XwU300dJSK9C1Ox4PU+pPFfaLxtv4F04DwIHWZETSnoYeROiy7jvqZDTLHA7yEjzsJtFK+ueNF+eTeMLXIG/hQuuKeSAhgCiTeDTrVVoB4BFbqvwbWUdHUHUV0N4BsAuuZtdSsB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lVnnnIyW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B075C433C7;
+	Thu, 22 Feb 2024 23:56:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1708646185;
-	bh=yu/qMtteohJ+NIqUtLEuhIplI6YixEJ1RT6BseY3wiI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=qri91/87kQyjzjw5TPotU1SAT+fM+Wxfktv05HAwlLER2UhiJxsgKWjcjeetDR4ZL
-	 laNyIj4MQr7gwe6cQjUMELyIUiSkbGrYssnvr+m7hHmyNSae/Lpz6GxCwllZumQOBQ
-	 pAlxHNP6EykG2xea/p3xk0LEQ61CQhuJom+L/Owxw6L/9iDYldGgdhjnl0LJwItmjb
-	 b11rNIuzGlz1MBfVEzPMpM1I2kcJOAOrotznq+KzAqwrLqeuAgPmLCyAdo7N+4l6Fy
-	 hiyV98sdF/Cd/xoCxU/RFvjRVDSzAGNd52ugKeXdoHlfcWSSf08jrfJv6gY80TuBGG
-	 6/XoRpktr+2hQ==
+	bh=uR7+64NP9C83YXVNPnR/RoeLOX/nd5XOHSbFdARgCgk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=lVnnnIyWs7EZ51dZ5D8iVUGpfH0AZKl5sMn2wTm12oZFuVIdgQbpkBdMoWYWV85ji
+	 5sJLp78a6wx081CsWR7JQ30ErISwSSFODz8u1a/LlzKVchon3YJvaxUf5htWqRdVzz
+	 ZJSmiTtAvB5oYyPXArQUl+cw5A3IALNE1/t4p7IFldsUzlOWf4k0YDiK/Uce1WRuaS
+	 mjmQBRHUdR0gk3auolKqjNjuxUnoKaMrK8E9RiDy+HwojquSSTo0opsFEehcSr45xY
+	 8j2vvwVajmVo4MD+OBj+dr+Zy4dSSGASIUcSbhgrGf+x6sPCtET3SJEFvUcY/LhVQk
+	 SpzGRRavKxDGg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -50,10 +51,12 @@ Cc: netdev@vger.kernel.org,
 	nicolas.dichtel@6wind.com,
 	donald.hunter@gmail.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 00/15] tools: ynl: stop using libmnl
-Date: Thu, 22 Feb 2024 15:55:59 -0800
-Message-ID: <20240222235614.180876-1-kuba@kernel.org>
+Subject: [PATCH net-next 01/15] tools: ynl: give up on libmnl for auto-ints
+Date: Thu, 22 Feb 2024 15:56:00 -0800
+Message-ID: <20240222235614.180876-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.43.2
+In-Reply-To: <20240222235614.180876-1-kuba@kernel.org>
+References: <20240222235614.180876-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,53 +65,80 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-There is no strong reason to stop using libmnl in ynl but there
-are a few small ones which add up.
+The temporary auto-int helpers are not really correct.
+We can't treat signed and unsigned ints the same when
+determining whether we need full 8B. I realized this
+before sending the patch to add support in libmnl.
+Unfortunately, that patch has not been merged,
+so time to fix our local helpers. Use the mnl* name
+for now, subsequent patches will address that.
 
-First, we do much more advanced netlink level parsing than libmnl
-in ynl so it's hard to say that libmnl abstracts much from us.
-The fact that this series, removing the libmnl dependency, only
-adds <300 LoC shows that code savings aren't huge.
-OTOH when new types are added (e.g. auto-int) we need to add
-compatibility to deal with older version of libmnl (in fact,
-even tho patches have been sent months ago, auto-ints are still
-not supported in libmnl.git).
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ tools/net/ynl/lib/ynl-priv.h | 45 ++++++++++++++++++++++++++++--------
+ 1 file changed, 36 insertions(+), 9 deletions(-)
 
-Second, the dependency makes ynl less self contained, and harder
-to vendor in. Whether vendoring libraries into projects is a good
-idea is a separate discussion, nonetheless, people want to do it.
-
-Third, there are small annoyances with the libmnl APIs which
-are hard to fix in backward-compatible ways.
-
-All in all, libmnl is a great library, but with all the code
-generation and structured parsing, ynl is better served by going
-its own way.
-
-Jakub Kicinski (15):
-  tools: ynl: give up on libmnl for auto-ints
-  tools: ynl: create local attribute helpers
-  tools: ynl: create local for_each helpers
-  tools: ynl: create local nlmsg access helpers
-  tools: ynl: create local ARRAY_SIZE() helper
-  tools: ynl: make yarg the first member of struct ynl_dump_state
-  tools: ynl-gen: remove unused parse code
-  tools: ynl: wrap recv() + mnl_cb_run2() into a single helper
-  tools: ynl: use ynl_sock_read_msgs() for ACK handling
-  tools: ynl: stop using mnl_cb_run2()
-  tools: ynl: switch away from mnl_cb_t
-  tools: ynl: switch away from MNL_CB_*
-  tools: ynl: stop using mnl socket helpers
-  tools: ynl: remove the libmnl dependency
-  tools: ynl: use MSG_DONTWAIT for getting notifications
-
- tools/net/ynl/lib/ynl-priv.h   | 352 ++++++++++++++++++++++++++++---
- tools/net/ynl/lib/ynl.c        | 368 +++++++++++++++++----------------
- tools/net/ynl/lib/ynl.h        |   3 +-
- tools/net/ynl/samples/Makefile |   2 +-
- tools/net/ynl/ynl-gen-c.py     | 108 ++++------
- 5 files changed, 565 insertions(+), 268 deletions(-)
-
+diff --git a/tools/net/ynl/lib/ynl-priv.h b/tools/net/ynl/lib/ynl-priv.h
+index 7491da8e7555..eaa0d432366c 100644
+--- a/tools/net/ynl/lib/ynl-priv.h
++++ b/tools/net/ynl/lib/ynl-priv.h
+@@ -125,20 +125,47 @@ int ynl_exec_dump(struct ynl_sock *ys, struct nlmsghdr *req_nlh,
+ void ynl_error_unknown_notification(struct ynl_sock *ys, __u8 cmd);
+ int ynl_error_parse(struct ynl_parse_arg *yarg, const char *msg);
+ 
+-#ifndef MNL_HAS_AUTO_SCALARS
+-static inline uint64_t mnl_attr_get_uint(const struct nlattr *attr)
++/* Attribute helpers */
++
++static inline __u64 mnl_attr_get_uint(const struct nlattr *attr)
+ {
+-	if (mnl_attr_get_payload_len(attr) == 4)
++	switch (mnl_attr_get_payload_len(attr)) {
++	case 4:
+ 		return mnl_attr_get_u32(attr);
+-	return mnl_attr_get_u64(attr);
++	case 8:
++		return mnl_attr_get_u64(attr);
++	default:
++		return 0;
++	}
++}
++
++static inline __s64 mnl_attr_get_sint(const struct nlattr *attr)
++{
++	switch (mnl_attr_get_payload_len(attr)) {
++	case 4:
++		return mnl_attr_get_u32(attr);
++	case 8:
++		return mnl_attr_get_u64(attr);
++	default:
++		return 0;
++	}
+ }
+ 
+ static inline void
+-mnl_attr_put_uint(struct nlmsghdr *nlh, uint16_t type, uint64_t data)
++mnl_attr_put_uint(struct nlmsghdr *nlh, __u16 type, __u64 data)
+ {
+-	if ((uint32_t)data == (uint64_t)data)
+-		return mnl_attr_put_u32(nlh, type, data);
+-	return mnl_attr_put_u64(nlh, type, data);
++	if ((__u32)data == (__u64)data)
++		mnl_attr_put_u32(nlh, type, data);
++	else
++		mnl_attr_put_u64(nlh, type, data);
++}
++
++static inline void
++mnl_attr_put_sint(struct nlmsghdr *nlh, __u16 type, __s64 data)
++{
++	if ((__s32)data == (__s64)data)
++		mnl_attr_put_u32(nlh, type, data);
++	else
++		mnl_attr_put_u64(nlh, type, data);
+ }
+ #endif
+-#endif
 -- 
 2.43.2
 
