@@ -1,151 +1,97 @@
-Return-Path: <netdev+bounces-74033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8ABCB85FB20
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 15:24:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49BF685FB43
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 15:30:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADF191C2382E
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 14:24:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03AEC2828EA
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 14:30:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CC451474D9;
-	Thu, 22 Feb 2024 14:23:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3316133420;
+	Thu, 22 Feb 2024 14:30:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Tq6RPqfI"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="fiD/qEvG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E35E146911
-	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 14:23:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3C751419A4;
+	Thu, 22 Feb 2024 14:30:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708611806; cv=none; b=I2GPD5v1DAMgJm70i/MIuXYGi8aUsZLwBA0x9mZHSHB5nrrB6EgQ2XKN8MJBGSd4nO2Gpk1c+RnwxPUfufb/gJ5SgpknRALQbRAb8h019kx+HlPPEFHByq+kzdNP1nPZ9fAZCyj44K2mBa8wsJCs+bH7BDLs4oWHx/sMnXH67qo=
+	t=1708612245; cv=none; b=IOzC09oY5NFJ1NI31/CEH81jPRiTXYtDYSPHbPRBsNV0KqyTw3t0UrBgwdoHNIaYojQWoDHkQoZ2mbLpX6CXNLaw8A2BIS2KOcVHopvjme1CUfv3QtIL16l25kqxfXiNBCwFnxbBlvePp76Rx/GVY2PjgHHa0QgUcdIYnhY0/ck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708611806; c=relaxed/simple;
-	bh=Mp82jeP2ujByGkHzqK9TDgR5FlKS5q+5jbi8/ebGkm8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aelTd8Hk9cOHkui7QuNLU/MkJajpMml/4It9xVGOHrHsm4MMgt6U+gjIqBRq4ZsDL5R/2PR/XNGDkQqs3iUnZoXuGRqpoSQgVRlYK14MGr63bucBuzGnkK3QfYXncYCDT2lehGTXxsB4gaNO1Nbskrmrt2GnNWISBGYAzXUc/ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Tq6RPqfI; arc=none smtp.client-ip=209.85.166.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-7bf3283c18dso128575039f.0
-        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 06:23:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1708611804; x=1709216604; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VHaXxIxgBTJmgtue73WVl6b/Cy0dVFZjoWVjGUpCh3I=;
-        b=Tq6RPqfIaQmh5ZS+wBv4yfNUt1zEHRHki6eMjLz9R2NHLK0U3S8TLpjW25w/TFXaL6
-         87ayYSQ9hg/ZEdUTueKu3Ji3YscQfR7j7B+DmUoKwbFheK1USW28nHEVIWSoS0kXTZei
-         Y4bksQlbo9mCRcbLYTwWP60UkmU7/dP7UeWmo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708611804; x=1709216604;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VHaXxIxgBTJmgtue73WVl6b/Cy0dVFZjoWVjGUpCh3I=;
-        b=AmYnF8XR0psdwSRwA56BBI/XSzTf13vqnSfs1ZL4sbqd6JkHK/nrjdZOCqUxnToom7
-         fvaroFo7BXzl1sTXhE65uZNHB7vDhy2FEoNHTgcqqVVkShGheABIjG1hadUx05wOfI3l
-         Zm80SB9PoFJ47EAujWx5LsMjpz6+Sfvob8hS9ebhP35bGO5nZKpJuAHV22E6UZK8bWZ/
-         +rr+aDTSFcVTj80Zz84duZSxI36dlK3D3sJisgwJEO7uxYcaetZRiucS8QJM/Wxc1l+W
-         koGXrmI/o7WprdCy7C8I8yreOsw348bnM2bVaSUwFPiyR+THbncityJIuqMw31vJU5Je
-         UYjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVYgieImY8LkoYb5qP4lr0+/gM7Wv9GAmc8BHAvzxuJEm9XVE//XUyAUB8x6irqgbxHQ6cHIQWLk3wJIrb0j4EXIMOXujRE
-X-Gm-Message-State: AOJu0YwJ/xwWC8Jw82AIFcsP8tEv1jCURbH30N416xBT34bN1ZYq1mLk
-	ceP3lLaKf9crYevizT0AjRyuuHq2RDSDimWp7LcSl/OQtlVF5FbFlYMUMwlHeyY=
-X-Google-Smtp-Source: AGHT+IFae9GfHftZi8zK41FezlChjHIL0jhjWV8Bs/s6McEy9uQqRVDUnPsC8m/z1HG2Wc+9hRWIVA==
-X-Received: by 2002:a5e:970a:0:b0:7c4:9ed9:8e7c with SMTP id w10-20020a5e970a000000b007c49ed98e7cmr17459202ioj.0.1708611804205;
-        Thu, 22 Feb 2024 06:23:24 -0800 (PST)
-Received: from [192.168.1.128] ([38.175.170.29])
-        by smtp.gmail.com with ESMTPSA id w14-20020a5ed60e000000b007c75a3c0184sm1834078iom.9.2024.02.22.06.23.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Feb 2024 06:23:23 -0800 (PST)
-Message-ID: <d0c81ab8-b404-4710-9b27-71aede157b3b@linuxfoundation.org>
-Date: Thu, 22 Feb 2024 07:23:21 -0700
+	s=arc-20240116; t=1708612245; c=relaxed/simple;
+	bh=nxjQUdXk7S2lmsMK8aB4RVIkX7mSD1W9J2LYzAAH85c=;
+	h=Message-ID:Date:MIME-Version:In-Reply-To:To:Cc:From:Subject:
+	 Content-Type; b=Gkm1UwCruX243JD2OEPoxjdOEvlxJMfbzuGrXh0vvmEy6cTuUPvlEmpj3TH25+jv0mwtA3NLMtCphUqtbpwFQNfFFDFKvfDUHXoaT0jQQppRY8o/tiUbHZROp5BqhSWKz538gmRivxojWv8zv+yK3wJc6KDf7sIVybxugmIPUXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=fiD/qEvG; arc=none smtp.client-ip=213.97.179.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=Content-Transfer-Encoding:Content-Type:Subject:From:Cc:To:
+	In-Reply-To:MIME-Version:Date:Message-ID:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=nxjQUdXk7S2lmsMK8aB4RVIkX7mSD1W9J2LYzAAH85c=; b=fiD/qEvGeWB112sXG43dv1IwZZ
+	q1XYT5THH3N47FXCfYjhtvj3OmdIYvarK/F2ag/PTayABLw2gZ5zAErHOc9DvNj02C8ypaKI1Cn/2
+	Q6GROwK8E/twY0q+T/oJH8/+R8gKX3TVtGxnNKFwhjR2n6JBF5c3Z1AcA/IwVNcoO1KJq6WK38EJv
+	7AnvBprs6MA04srJ4+sD0Z9bnclWnDYfwMc/wTc3JdNNMgEIliq4o2X3Q0osYCYkc/gHKjQs1giUg
+	6uZM7UfXA+w+hjNtyZRL7myZke2XJwx9mN4P9eHBlbtWJi/gD2xCQTsCIqWlDdtgcGHa+++O0gxHn
+	iKR49bkw==;
+Received: from [179.232.147.2] (helo=[192.168.0.12])
+	by fanzine2.igalia.com with esmtpsa 
+	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128) (Exim)
+	id 1rdA59-002L0n-19; Thu, 22 Feb 2024 15:29:51 +0100
+Message-ID: <c4c422ac-d017-9944-7d03-76ad416b19a4@igalia.com>
+Date: Thu, 22 Feb 2024 11:29:43 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/9] kunit: Fix printf format specifier issues in KUnit
- assertions
-To: David Gow <davidgow@google.com>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- Guenter Roeck <linux@roeck-us.net>, Rae Moar <rmoar@google.com>,
- Matthew Auld <matthew.auld@intel.com>,
- Arunpravin Paneer Selvam <arunpravin.paneerselvam@amd.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Kees Cook <keescook@chromium.org>, =?UTF-8?Q?Ma=C3=ADra_Canal?=
- <mcanal@igalia.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Matthew Brost <matthew.brost@intel.com>,
- Willem de Bruijn <willemb@google.com>, Florian Westphal <fw@strlen.de>,
- Cassio Neri <cassio.neri@gmail.com>,
- Javier Martinez Canillas <javierm@redhat.com>,
- Arthur Grillo <arthur.grillo@usp.br>
-Cc: Brendan Higgins <brendan.higgins@linux.dev>,
- Daniel Latypov <dlatypov@google.com>, Stephen Boyd <sboyd@kernel.org>,
- David Airlie <airlied@gmail.com>, Maxime Ripard <mripard@kernel.org>,
- "David S . Miller" <davem@davemloft.net>, dri-devel@lists.freedesktop.org,
- linux-kernel@vger.kernel.org, intel-xe@lists.freedesktop.org,
- linux-rtc@vger.kernel.org, linux-kselftest@vger.kernel.org,
- kunit-dev@googlegroups.com, linux-hardening@vger.kernel.org,
- netdev@vger.kernel.org, Shuah Khan <skhan@linuxfoundation.org>
-References: <20240221092728.1281499-1-davidgow@google.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
 Content-Language: en-US
-From: Shuah Khan <skhan@linuxfoundation.org>
-In-Reply-To: <20240221092728.1281499-1-davidgow@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <87r0jwquhv.ffs@tglx>
+To: Thomas Gleixner <tglx@linutronix.de>, "x86@kernel.org" <x86@kernel.org>
+Cc: jannh@google.com, daniel@iogearbox.net, ast@kernel.org,
+ Peter Zijlstra <peterz@infradead.org>, Borislav Petkov <bp@alien8.de>,
+ john.fastabend@gmail.com, Andrew Morton <akpm@linux-foundation.org>,
+ bpf@vger.kernel.org, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "H. Peter Anvin" <hpa@zytor.com>,
+ "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+ linux-kernel <linux-kernel@vger.kernel.org>, linux-mm@kvack.org,
+ "luto@kernel.org" <luto@kernel.org>, Ingo Molnar <mingo@redhat.com>
+From: "Guilherme G. Piccoli" <gpiccoli@igalia.com>
+Subject: Re: [syzbot] [mm?] BUG: unable to handle kernel paging request in
+ copy_from_kernel_nofault
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 2/21/24 02:27, David Gow wrote:
-> KUnit has several macros which accept a log message, which can contain
-> printf format specifiers. Some of these (the explicit log macros)
-> already use the __printf() gcc attribute to ensure the format specifiers
-> are valid, but those which could fail the test, and hence used
-> __kunit_do_failed_assertion() behind the scenes, did not.
-> 
-> These include:
-> - KUNIT_EXPECT_*_MSG()
-> - KUNIT_ASSERT_*_MSG()
-> - KUNIT_FAIL()
-> 
-> This series adds the __printf() attribute, and fixes all of the issues
-> uncovered. (Or, at least, all of those I could find with an x86_64
-> allyesconfig, and the default KUnit config on a number of other
-> architectures. Please test!)
-> 
-> The issues in question basically take the following forms:
-> - int / long / long long confusion: typically a type being updated, but
->    the format string not.
-> - Use of integer format specifiers (%d/%u/%li/etc) for types like size_t
->    or pointer differences (technically ptrdiff_t), which would only work
->    on some architectures.
-> - Use of integer format specifiers in combination with PTR_ERR(), where
->    %pe would make more sense.
-> - Use of empty messages which, whilst technically not incorrect, are not
->    useful and trigger a gcc warning.
-> 
-> We'd like to get these (or equivalent) in for 6.9 if possible, so please
-> do take a look if possible.
-> 
-> Thanks,
-> -- David
-> 
-> Reported-by: Linus Torvalds <torvalds@linux-foundation.org>
-> Closes: https://lore.kernel.org/linux-kselftest/CAHk-=wgJMOquDO5f8ShH1f4rzZwzApNVCw643m5-Yj+BfsFstA@mail.gmail.com/
-> 
->
+Hi Thomas et.al,
 
-Thank you for a quick response David. I will apply the series to
-kunit next for Linux 6.9 as soon as the reviews are complete.
+I've been testing some syzkaller reports and found 2 other bugs that are
+fixed by this patch (see other report at [0]).
 
-thanks,
--- Shuah
+So, is there anything we could do in order to get it properly submitted
+/ merged? Lemme know if I can help in anything, I could submit it myself
+if you prefer, keeping you as author and adding the tested tags.
+BTW, feel free to add:
 
+Tested-by: Guilherme G. Piccoli <gpiccoli@igalia.com>
+
+
+Thanks,
+
+Guilherme
+
+
+[0] One is internal and the other I already mailed in:
+https://lore.kernel.org/lkml/66cb411b-557a-6a70-57c9-457c969fec24@igalia.com/
 
