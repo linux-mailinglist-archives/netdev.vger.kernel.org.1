@@ -1,119 +1,163 @@
-Return-Path: <netdev+bounces-74112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93DA5860081
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 19:12:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5187C8600FD
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 19:21:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C61D28450F
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 18:12:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD6361F2375C
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 18:21:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 816CE157E93;
-	Thu, 22 Feb 2024 18:11:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E911C6AF98;
+	Thu, 22 Feb 2024 18:14:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RRz7FWpZ"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AP2Euznr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C481A2BB01
-	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 18:11:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C91EA54916
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 18:14:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708625518; cv=none; b=cvYaiduF8W7+eHu8km0orU3HEt2kRXDHMs2vzzXUKB6/fi+KvbuGvCA0ZUjMqYpHskuwAuwHygnSgltcst912NpwpsE4qHWC0L7lfka6oMBA8JpGzLkZBaq4B3L+2Gg0gYGndPt437SwPe0baIu8UhP+AnLvzeFTsAi6k1DXvBA=
+	t=1708625697; cv=none; b=twJ6Q2AZSJaS+gFS395fB51PECwIARPLWRxRfYShluoM+0447v0HXy6fJ2Jb2kMxBsZWSs6RvjPf2EY5BJhdkYscDaxxbycYYuikrxPRPUZW6auTc1ojuS31XSnD1v+LBLv22XJQIB+cNtmFSrLETFpJemZeOUS9xBjCBogmrsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708625518; c=relaxed/simple;
-	bh=KPncTL4aBqujQSqk4XPknNbyLJ+auoEV8vje5Db3cnY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OwUSmkF+tH4ZoZwlj9VhnKfS2ijvsCJb79ODkqX+UsxlfKUae9OPg5YYlLoSE6UYHFk2KzSWKpsO9eGZet64HQ8MTv/PaTGXFpXJe7phbuIwg1tzaX4SsWLJzSwXOwP3ltrianUe3RRbmdeipuK6vYrITT6XWuDq1JnxVEwXSdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RRz7FWpZ; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5640fef9fa6so8384863a12.0
-        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 10:11:56 -0800 (PST)
+	s=arc-20240116; t=1708625697; c=relaxed/simple;
+	bh=BqZmvU8BOwVdELmPtCCfeCYk2qCbe5qFERDgheb+Ylk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fhFFfXRG9Ybi5lnlZnCyES+aYpkLwsrn+1P9+Tuhys4C9vsHOFyHlwN8v8SiMd/o1ExlnNSCnAxba9GAfCDSe3FgcbZIRoQFqWZ5+W0LDwAs/0leU/mBrU9s2h5OX5TdcdDlbjho0B91bK2N/Q0RP9EjOVSZ4JMY+6HzSjdh910=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=AP2Euznr; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-512c2e8c6cfso74882e87.1
+        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 10:14:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708625515; x=1709230315; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fFxxrq50tLjdwhxEbdurkslWEcG5/gPrItFAiPhGpPg=;
-        b=RRz7FWpZZeBWS/r8NUDz2PTXV1hIm7yErflvgYrshwda5XKs9IXL0PippGR3bli90s
-         TNdWorQMmUPi+o1JEUUBDsJ1gL+5OG9GkgZT0rgKIWiYBSrFA66/oNtAYl2fGu0hZOtB
-         j2mRPLc4VCHXJdVTnjwgz5Ndsek7L0+LYwSeMF8M7Vz50tdMcXNwr/OwyOcDsgkvSAm0
-         /dwD+HAPPX3cmCgM/yTld19CiBZMfJX1jH0W0u6shLl+wgdU9Boh3274nUbiltXAIZ6R
-         ovPIcMygoiMWpAxeE4/MkrQ4J8LWZa6g0N1Zs6ADgMy9UkX0qzXni3b/n2g6yLVG82p6
-         jPUA==
+        d=linaro.org; s=google; t=1708625694; x=1709230494; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mjNKbxM5Nnm2fZkUdL6IsffYJIQllY2Z5FDP4HC+nww=;
+        b=AP2EuznrDPVY4pOdeR+TjYTo/M714kjm9I3QEO7OfZ5/dTHZthRpE/ApXlxP6y2pYE
+         z1VU4hTW2vNN8FwQxsbYnf5NHsWjPAr22ImMvKOSeNEc0F6RPR0MbqE955B9W9N5T7jB
+         0qSX8m0zPheQ0niLr4wOb8Tlr7d48XR8FNV+Z0DLBzOzhy6BmrlYSkA2g5ZEM5TkHyfq
+         WKf6J+ul0GVn9BtrDqNf5PneDuqfKjTuWhlNjvW9QcxzgJSGVupQjSq1bnHY7w85krqu
+         f0PnTh3AG8VnUtcEVPCAhfzi4umWfwYXrus+MjZOq6oDntIt/zXTEYF+TD4AaMxVDgZ+
+         BJtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708625515; x=1709230315;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fFxxrq50tLjdwhxEbdurkslWEcG5/gPrItFAiPhGpPg=;
-        b=HAndpPHVv/v3Tc4+sdjxzyJDGXKBOwfRRnUTuxQeuRgMGid4Yy7E9CM5o8jeWOTaUv
-         urEW/RVDTr751Y49WIWtYaO5nBXgLyF4pgCvIfNyW2anaxM9LF3c28HsWkuTQyrTISbg
-         1rOsT7jv1HEv/TyP3F8FvI30wXYatugOwo6bDS2Ntt2FQQrLTnAivEG43mZu4jgMK22V
-         6gevlCwZNNZJXz21Hivaq6H5rsy2iAaEmTvw1WmCh8mQg2U888aG3WaLYqz/PFARrrig
-         hD+4OheECZH0Y0fwWKYc7ntMchDOEuXJ0od4qB9NdIDzTJqZgaUcDQXG+sPvGx+gd7Qx
-         /PPA==
-X-Forwarded-Encrypted: i=1; AJvYcCVs/AdtEeC2/qtXjQgipiuXHUTboCu4T6KQFcZZ5PTZu0P7qvlWgzjs46/gFoPrN2VpbBtWkPkejOHo8+Ola3aKMml9RA6+
-X-Gm-Message-State: AOJu0Yw3naF/kJHkXKHO6tDQaxQkYZSJBdCab7Eimmzq/o5HtAie1aQ1
-	YxNSKj0JuYhWeZ8Ik9d5Gte/q+bXXqZIZ+zwUWoDYfIfS/YMr8WjroXLmhxal8H9gO/a0JzRgwv
-	NulCN6qivxhnryjTrz2Meb2tXNyU=
-X-Google-Smtp-Source: AGHT+IFX3Hdm7vkq/sfyVBUqn3qEEqsAnRRt85tjLkb7PjZ71aZdG5BViXvfxb/TUCVr5OeQ198plCYyXaWy5XPBFX4=
-X-Received: by 2002:a05:6402:1b1b:b0:564:311d:9912 with SMTP id
- by27-20020a0564021b1b00b00564311d9912mr11403700edb.30.1708625514944; Thu, 22
- Feb 2024 10:11:54 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708625694; x=1709230494;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mjNKbxM5Nnm2fZkUdL6IsffYJIQllY2Z5FDP4HC+nww=;
+        b=HEFZj7vtmy8h1MkvcxhKyehkbUEAI9C9s0j2kQAwBY5dXqgGOvebRH07mfiqCG/X8C
+         5kHKbNkmjYwI0wuxSB4lDaA5GwIai4bQ9IouoHPhSKALNQNIZCmt+6SpKy297qdTFlwp
+         w1iitD1y53DoP8i+AIWlhRNtm6kcB3oaNSXYeDYJSsjh5Sg2J+VJQcfgKC2W9pdI69U0
+         JLJR7+8DzQ2jc1DkEq4k7inFyVgotv/Fj3MIMxiqkGMMtGZf9zOZG8HydC/s+X7+awfP
+         kZNU2Sl4f3tDmRmKC05VNnLj1xHVDpUyKzBbvlOTXTcgLN/PA+Q8fQ+2Yysi/15XW5/B
+         94nA==
+X-Gm-Message-State: AOJu0YxD6XVVvblXR3Jiiy7ycZEAEc1Abe+0XoheLMdNKihNsw1mQzCj
+	ZdhZzRqGt+mvmvsQz20dGgjDKoDtpkNwGLVD01EYFiA6RyWAurW0fvIXcT0CPwY=
+X-Google-Smtp-Source: AGHT+IFuXihglQKgVnvg96ctoMsff1iPiMAAbtCvPq0dIjo9Sm7rlM5jxqQvbEkVfsrcMjVIxh4fww==
+X-Received: by 2002:ac2:5dcc:0:b0:512:b420:1a92 with SMTP id x12-20020ac25dcc000000b00512b4201a92mr7465144lfq.63.1708625694014;
+        Thu, 22 Feb 2024 10:14:54 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.222.116])
+        by smtp.gmail.com with ESMTPSA id ps7-20020a170906bf4700b00a3f1cb81dcesm2266058ejb.116.2024.02.22.10.14.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Feb 2024 10:14:53 -0800 (PST)
+Message-ID: <e053448f-2b58-408a-af22-d7b464c52781@linaro.org>
+Date: Thu, 22 Feb 2024 19:14:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240222113003.67558-1-kerneljasonxing@gmail.com>
- <20240222113003.67558-9-kerneljasonxing@gmail.com> <b053dad4-5745-4b9a-af55-f5c04beb6584@kernel.org>
-In-Reply-To: <b053dad4-5745-4b9a-af55-f5c04beb6584@kernel.org>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 23 Feb 2024 02:11:18 +0800
-Message-ID: <CAL+tcoCbsbM=HyXRqs2+QVrY8FSKmqYC47m87Axiyk1wk4omwQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v8 08/10] tcp: add dropreasons in tcp_rcv_state_process()
-To: David Ahern <dsahern@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, kuniyu@amazon.com, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 1/6] dt-bindings: net: hisilicon-femac-mdio:
+ convert to YAML
+Content-Language: en-US
+To: forbidden405@outlook.com, Yisen Zhuang <yisen.zhuang@huawei.com>,
+ Salil Mehta <salil.mehta@huawei.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org
+References: <20240222-net-v4-0-eea68f93f090@outlook.com>
+ <20240222-net-v4-1-eea68f93f090@outlook.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzTRLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnp5c3p0b2Yua296bG93c2tpQGxpbmFyby5vcmc+wsGUBBMBCgA+FiEE
+ m9B+DgxR+NWWd7dUG5NDfTtBYpsFAmI+BxMCGwMFCRRfreEFCwkIBwIGFQoJCAsCBBYCAwEC
+ HgECF4AACgkQG5NDfTtBYptgbhAAjAGunRoOTduBeC7V6GGOQMYIT5n3OuDSzG1oZyM4kyvO
+ XeodvvYv49/ng473E8ZFhXfrre+c1olbr1A8pnz9vKVQs9JGVa6wwr/6ddH7/yvcaCQnHRPK
+ mnXyP2BViBlyDWQ71UC3N12YCoHE2cVmfrn4JeyK/gHCvcW3hUW4i5rMd5M5WZAeiJj3rvYh
+ v8WMKDJOtZFXxwaYGbvFJNDdvdTHc2x2fGaWwmXMJn2xs1ZyFAeHQvrp49mS6PBQZzcx0XL5
+ cU9ZjhzOZDn6Apv45/C/lUJvPc3lo/pr5cmlOvPq1AsP6/xRXsEFX/SdvdxJ8w9KtGaxdJuf
+ rpzLQ8Ht+H0lY2On1duYhmro8WglOypHy+TusYrDEry2qDNlc/bApQKtd9uqyDZ+rx8bGxyY
+ qBP6bvsQx5YACI4p8R0J43tSqWwJTP/R5oPRQW2O1Ye1DEcdeyzZfifrQz58aoZrVQq+innR
+ aDwu8qDB5UgmMQ7cjDSeAQABdghq7pqrA4P8lkA7qTG+aw8Z21OoAyZdUNm8NWJoQy8m4nUP
+ gmeeQPRc0vjp5JkYPgTqwf08cluqO6vQuYL2YmwVBIbO7cE7LNGkPDA3RYMu+zPY9UUi/ln5
+ dcKuEStFZ5eqVyqVoZ9eu3RTCGIXAHe1NcfcMT9HT0DPp3+ieTxFx6RjY3kYTGLOwU0EVUNc
+ NAEQAM2StBhJERQvgPcbCzjokShn0cRA4q2SvCOvOXD+0KapXMRFE+/PZeDyfv4dEKuCqeh0
+ hihSHlaxTzg3TcqUu54w2xYskG8Fq5tg3gm4kh1Gvh1LijIXX99ABA8eHxOGmLPRIBkXHqJY
+ oHtCvPc6sYKNM9xbp6I4yF56xVLmHGJ61KaWKf5KKWYgA9kfHufbja7qR0c6H79LIsiYqf92
+ H1HNq1WlQpu/fh4/XAAaV1axHFt/dY/2kU05tLMj8GjeQDz1fHas7augL4argt4e+jum3Nwt
+ yupodQBxncKAUbzwKcDrPqUFmfRbJ7ARw8491xQHZDsP82JRj4cOJX32sBg8nO2N5OsFJOcd
+ 5IE9v6qfllkZDAh1Rb1h6DFYq9dcdPAHl4zOj9EHq99/CpyccOh7SrtWDNFFknCmLpowhct9
+ 5ZnlavBrDbOV0W47gO33WkXMFI4il4y1+Bv89979rVYn8aBohEgET41SpyQz7fMkcaZU+ok/
+ +HYjC/qfDxT7tjKXqBQEscVODaFicsUkjheOD4BfWEcVUqa+XdUEciwG/SgNyxBZepj41oVq
+ FPSVE+Ni2tNrW/e16b8mgXNngHSnbsr6pAIXZH3qFW+4TKPMGZ2rZ6zITrMip+12jgw4mGjy
+ 5y06JZvA02rZT2k9aa7i9dUUFggaanI09jNGbRA/ABEBAAHCwXwEGAEKACYCGwwWIQSb0H4O
+ DFH41ZZ3t1Qbk0N9O0FimwUCYDzvagUJFF+UtgAKCRAbk0N9O0Fim9JzD/0auoGtUu4mgnna
+ oEEpQEOjgT7l9TVuO3Qa/SeH+E0m55y5Fjpp6ZToc481za3xAcxK/BtIX5Wn1mQ6+szfrJQ6
+ 59y2io437BeuWIRjQniSxHz1kgtFECiV30yHRgOoQlzUea7FgsnuWdstgfWi6LxstswEzxLZ
+ Sj1EqpXYZE4uLjh6dW292sO+j4LEqPYr53hyV4I2LPmptPE9Rb9yCTAbSUlzgjiyyjuXhcwM
+ qf3lzsm02y7Ooq+ERVKiJzlvLd9tSe4jRx6Z6LMXhB21fa5DGs/tHAcUF35hSJrvMJzPT/+u
+ /oVmYDFZkbLlqs2XpWaVCo2jv8+iHxZZ9FL7F6AHFzqEFdqGnJQqmEApiRqH6b4jRBOgJ+cY
+ qc+rJggwMQcJL9F+oDm3wX47nr6jIsEB5ZftdybIzpMZ5V9v45lUwmdnMrSzZVgC4jRGXzsU
+ EViBQt2CopXtHtYfPAO5nAkIvKSNp3jmGxZw4aTc5xoAZBLo0OV+Ezo71pg3AYvq0a3/oGRG
+ KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
+ fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20240222-net-v4-1-eea68f93f090@outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Feb 23, 2024 at 1:28=E2=80=AFAM David Ahern <dsahern@kernel.org> wr=
-ote:
->
-> On 2/22/24 4:30 AM, Jason Xing wrote:
-> > @@ -6704,8 +6705,13 @@ int tcp_rcv_state_process(struct sock *sk, struc=
-t sk_buff *skb)
-> >                                 FLAG_NO_CHALLENGE_ACK);
-> >
-> >       if ((int)reason <=3D 0) {
-> > -             if (sk->sk_state =3D=3D TCP_SYN_RECV)
-> > -                     return 1;       /* send one RST */
-> > +             if (sk->sk_state =3D=3D TCP_SYN_RECV) {
-> > +                     /* send one RST */
-> > +                     if (!reason)
-> > +                             return SKB_DROP_REASON_TCP_OLD_ACK;
-> > +                     else
-> > +                             return -reason;
->
-> checkpatch should be flagging this - the `else` is not needed.
+On 22/02/2024 13:43, Yang Xiwen via B4 Relay wrote:
+> From: Yang Xiwen <forbidden405@outlook.com>
+> 
+> For some FEMAC cores, MDIO bus is integrated to the MAC controller. So
+> We don't have a dedicated MDIO bus clock.
 
-Maybe the way I use the checkpatch script is not right...
+Hm, this means you miss compatibles for these different cores.
 
->
->                         if (!reason)
->                                 return SKB_DROP_REASON_TCP_OLD_ACK;
->
->                         return -reason;
->
->
+> 
+> Also due to the PHY reset procedure, it's required to manage all clocks
+> and resets in the MAC controller driver. MAC controller clock can not be
+> shared with MDIO bus node in dts.
+> 
+> Mark the clock optional to resolve this problem.
 
-Thanks, I will update it.
+I don't understand how making clock optional solves this problem. Clock
+is still there. Whether driver handles it, does not affect the binding.
+
+Best regards,
+Krzysztof
+
 
