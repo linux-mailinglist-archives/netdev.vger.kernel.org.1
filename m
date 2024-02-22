@@ -1,206 +1,87 @@
-Return-Path: <netdev+bounces-73894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 827CB85F227
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 08:51:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F41D285F229
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 08:51:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A62791C20BD0
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 07:51:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0537283E77
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 07:51:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CC8053AC;
-	Thu, 22 Feb 2024 07:51:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D56917998;
+	Thu, 22 Feb 2024 07:51:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="wa+DyDzQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F2617998
-	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 07:51:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 482ED179A8
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 07:51:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708588284; cv=none; b=ueoqyAD3VQt6AtjfEQwPxeBSV+Besf5X/meWV1W1d6hPsQlgQ0ctjDJU0parX7+fq0eX+GUhawk8xv078zokdVbOqhu8bGOUB8LYnWt4EhUJoLP6uiJR15Nqwmpm0KsQ4jsArtvE7GldJKJN+dutlLfR5MBQaPOAgQ5n5/YwMAc=
+	t=1708588300; cv=none; b=HpRafZ7Ff6GZoZE2Bs4HX64FGkZcUrOt8gh/JnNyagpxDniFoDtZFsvkpfxenBDK9ExDz6O4rnSOMxaHUz2hY/DypqMLGpPNugR9og4mt9cM4QuM3JTVaNAgkvjEx3Y8kADzXlGHRLx6FuCHbYBKc9cio9GNE1XEWFMzIk6Crv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708588284; c=relaxed/simple;
-	bh=YABI2wY90F4ti0YQ+FYf2izsdH0x6Nl4/AuuHydNCm8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RlTGNuVw0noz9OZ/1R2WGIwv8KYq2rdBu2pdl9UrBBz5FIUnByErgzeKwSz+go3A1/rhcU95VG9A6s0Max4YSI0sP14bQ4bQV8MoTK470nHCkSY03ixgMRVAdqH38IZ4PNBFtvL7f2MQQRUXgMsRErCpf5Ok2j7P1JwXadgX080=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rd3rP-0007Wg-9I; Thu, 22 Feb 2024 08:51:15 +0100
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rd3rO-002Bn0-D6; Thu, 22 Feb 2024 08:51:14 +0100
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rd3rO-00Al9r-16;
-	Thu, 22 Feb 2024 08:51:14 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: [PATCH net-next v3 1/1] net: dsa: microchip: Add support for bridge port isolation
-Date: Thu, 22 Feb 2024 08:51:13 +0100
-Message-Id: <20240222075113.2564540-1-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1708588300; c=relaxed/simple;
+	bh=Q0so5ndfFY7Gi2zVE26BMxMVaOGvf2BWHikTduPSUJ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bDtksicqOG/VFXaYYpBV73fzu6tOt2OJn/f91wAphqv5OF21M/ucsjePr9pqkhCbk0VcaIEfFHv45QvRsZJcUIAwvPhAqluB2pwkY5ODepGortdKZHnW1cn4c1q9TkQeOQ6UMg3rWSr1+kPPTL06NLqqYOU1t5DX05D2VD/ZMCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=wa+DyDzQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30D2BC433F1;
+	Thu, 22 Feb 2024 07:51:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1708588299;
+	bh=Q0so5ndfFY7Gi2zVE26BMxMVaOGvf2BWHikTduPSUJ0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=wa+DyDzQp++ecP/od6DnEgf0GAJeWr3gjld8Yt6tn2gn4b3z0kwpIzVDli6FdR1Ui
+	 roTlFFBzEDDJz3upHkgM/nqKwGwjoEa3LPj1aCaVpJY6uauO9Q2wnQJWqw7V0WAtXx
+	 yDjbDBJn/o+ooKtQ6/sWQ69tREQO9d9mDeHz7RTw=
+Date: Thu, 22 Feb 2024 08:51:36 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Tariq Toukan <ttoukan.linux@gmail.com>,
+	Saeed Mahameed <saeed@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>
+Subject: Re: [net-next V3 15/15] Documentation: networking: Add description
+ for multi-pf netdev
+Message-ID: <2024022214-alkalize-magnetize-dbbc@gregkh>
+References: <20240215030814.451812-1-saeed@kernel.org>
+ <20240215030814.451812-16-saeed@kernel.org>
+ <20240215212353.3d6d17c4@kernel.org>
+ <f3e1a1c2-f757-4150-a633-d4da63bacdcd@gmail.com>
+ <20240220173309.4abef5af@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240220173309.4abef5af@kernel.org>
 
-Implement bridge port isolation for KSZ switches. Enabling the isolation
-of switch ports from each other while maintaining connectivity with the
-CPU and other forwarding ports. For instance, to isolate swp1 and swp2
-from each other, use the following commands:
-- bridge link set dev swp1 isolated on
-- bridge link set dev swp2 isolated on
+On Tue, Feb 20, 2024 at 05:33:09PM -0800, Jakub Kicinski wrote:
+> Greg, we have a feature here where a single device of class net has
+> multiple "bus parents". We used to have one attr under class net
+> (device) which is a link to the bus parent. Now we either need to add
+> more or not bother with the linking of the whole device. Is there any
+> precedent / preference for solving this from the device model
+> perspective?
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-Acked-by: Arun Ramadoss <arun.ramadoss@microchip.com>
----
-changes v3:
-- fix documentation
+How, logically, can a netdevice be controlled properly from 2 parent
+devices on two different busses?  How is that even possible from a
+physical point-of-view?  What exact bus types are involved here?
 
-changes v2:
-- add comments and new lines
----
- drivers/net/dsa/microchip/ksz_common.c | 55 +++++++++++++++++++++++---
- drivers/net/dsa/microchip/ksz_common.h |  1 +
- 2 files changed, 51 insertions(+), 5 deletions(-)
+This "shouldn't" be possible as in the end, it's usually a PCI device
+handling this all, right?
 
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 7cd37133ec05..d58cc685478b 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -1898,6 +1898,29 @@ static void ksz_get_strings(struct dsa_switch *ds, int port,
- 	}
- }
- 
-+/**
-+ * ksz_update_port_member - Adjust port forwarding rules based on STP state and
-+ *			    isolation settings.
-+ * @dev: A pointer to the struct ksz_device representing the device.
-+ * @port: The port number to adjust.
-+ *
-+ * This function dynamically adjusts the port membership configuration for a
-+ * specified port and other device ports, based on Spanning Tree Protocol (STP)
-+ * states and port isolation settings. Each port, including the CPU port, has a
-+ * membership register, represented as a bitfield, where each bit corresponds
-+ * to a port number. A set bit indicates permission to forward frames to that
-+ * port. This function iterates over all ports, updating the membership register
-+ * to reflect current forwarding permissions:
-+ *
-+ * 1. Forwards frames only to ports that are part of the same bridge group and
-+ *    in the BR_STATE_FORWARDING state.
-+ * 2. Takes into account the isolation status of ports; ports in the
-+ *    BR_STATE_FORWARDING state with BR_ISOLATED configuration will not forward
-+ *    frames to each other, even if they are in the same bridge group.
-+ * 3. Ensures that the CPU port is included in the membership based on its
-+ *    upstream port configuration, allowing for management and control traffic
-+ *    to flow as required.
-+ */
- static void ksz_update_port_member(struct ksz_device *dev, int port)
- {
- 	struct ksz_port *p = &dev->ports[port];
-@@ -1926,7 +1949,14 @@ static void ksz_update_port_member(struct ksz_device *dev, int port)
- 		if (other_p->stp_state != BR_STATE_FORWARDING)
- 			continue;
- 
--		if (p->stp_state == BR_STATE_FORWARDING) {
-+		/* At this point we know that "port" and "other" port [i] are in
-+		 * the same bridge group and that "other" port [i] is in
-+		 * forwarding stp state. If "port" is also in forwarding stp
-+		 * state, we can allow forwarding from port [port] to port [i].
-+		 * Except if both ports are isolated.
-+		 */
-+		if (p->stp_state == BR_STATE_FORWARDING &&
-+		    !(p->isolated && other_p->isolated)) {
- 			val |= BIT(port);
- 			port_member |= BIT(i);
- 		}
-@@ -1945,8 +1975,19 @@ static void ksz_update_port_member(struct ksz_device *dev, int port)
- 			third_p = &dev->ports[j];
- 			if (third_p->stp_state != BR_STATE_FORWARDING)
- 				continue;
-+
- 			third_dp = dsa_to_port(ds, j);
--			if (dsa_port_bridge_same(other_dp, third_dp))
-+
-+			/* Now we updating relation of the "other" port [i] to
-+			 * the "third" port [j]. We already know that "other"
-+			 * port [i] is in forwarding stp state and that "third"
-+			 * port [j] is in forwarding stp state too.
-+			 * We need to check if "other" port [i] and "third" port
-+			 * [j] are in the same bridge group and not isolated
-+			 * before allowing forwarding from port [i] to port [j].
-+			 */
-+			if (dsa_port_bridge_same(other_dp, third_dp) &&
-+			    !(other_p->isolated && third_p->isolated))
- 				val |= BIT(j);
- 		}
- 
-@@ -2699,7 +2740,7 @@ static int ksz_port_pre_bridge_flags(struct dsa_switch *ds, int port,
- 				     struct switchdev_brport_flags flags,
- 				     struct netlink_ext_ack *extack)
- {
--	if (flags.mask & ~BR_LEARNING)
-+	if (flags.mask & ~(BR_LEARNING | BR_ISOLATED))
- 		return -EINVAL;
- 
- 	return 0;
-@@ -2712,8 +2753,12 @@ static int ksz_port_bridge_flags(struct dsa_switch *ds, int port,
- 	struct ksz_device *dev = ds->priv;
- 	struct ksz_port *p = &dev->ports[port];
- 
--	if (flags.mask & BR_LEARNING) {
--		p->learning = !!(flags.val & BR_LEARNING);
-+	if (flags.mask & (BR_LEARNING | BR_ISOLATED)) {
-+		if (flags.mask & BR_LEARNING)
-+			p->learning = !!(flags.val & BR_LEARNING);
-+
-+		if (flags.mask & BR_ISOLATED)
-+			p->isolated = !!(flags.val & BR_ISOLATED);
- 
- 		/* Make the change take effect immediately */
- 		ksz_port_stp_state_set(ds, port, p->stp_state);
-diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index a3f69a036fa9..fb76637596fc 100644
---- a/drivers/net/dsa/microchip/ksz_common.h
-+++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -111,6 +111,7 @@ struct ksz_switch_macaddr {
- struct ksz_port {
- 	bool remove_tag;		/* Remove Tag flag set, for ksz8795 only */
- 	bool learning;
-+	bool isolated;
- 	int stp_state;
- 	struct phy_device phydev;
- 
--- 
-2.39.2
+thanks,
 
+greg k-h
 
