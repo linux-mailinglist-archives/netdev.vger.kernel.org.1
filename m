@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-74130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA01586022F
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 20:05:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 30635860230
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 20:06:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F2DE1F2AA9C
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 19:05:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA5151F2AA7B
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 19:06:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63B326AF9C;
-	Thu, 22 Feb 2024 19:05:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 923CF6AFB2;
+	Thu, 22 Feb 2024 19:05:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DQrt32/e"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fecaTwyO"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1E936AF8E
-	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 19:05:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 031066AFA9
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 19:05:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708628710; cv=none; b=YX4XhIrMnZ3akzCIEtn8LM7djbXYDmuNoXRQukZbpk84XLMhDO+3vJWLiruAGZhU5xpKbu6/G6HpzuD8lFkZZQQW5M5gBLV8dU7AnrFgpes6mnXbmqEknchIUcW65fG7ainp06TJ3wosxRxs5vTzqUYpbknAPogxw/HBSDhd/qw=
+	t=1708628712; cv=none; b=oCt3OsKQic7fVFbOlfX1zuJjYASQOHMF9GS6TKO5XW9dy0/QoA7UNDv3r8ilBqP4JiIAB41MEi5eMkM9f3ngwTKWK+H0VluFu2Y6TgqsdLsVs212GmDazkGeiVLrUoz+ehUnXBJ3LzOMyGhnmZ22l0LKRP+0nr08Rp5HTz3MwLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708628710; c=relaxed/simple;
-	bh=cWJeW5MHlMpqXjOeEjoOrbFkjvB0IZ2p+tB7LA0Zb9Q=;
+	s=arc-20240116; t=1708628712; c=relaxed/simple;
+	bh=9eIBb6bWagUzQQoX287zEEWkvYERQxEq7punHXUjISE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KgGBAVJkwquQy4ON/ls8ZRT8GxtpjDwEiJNpANviwuko49hNJXYGr39r1tFjHz25uh/4nY4O3yFykqLxiDIs4a/p+S8H902Q++3m51RNr1SOc3JdR19HWQbeeiYZeOKgYdzRnej4qy3+ueGssEt5d9SDIO1dkvgNmTG4q9P7qWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DQrt32/e; arc=none smtp.client-ip=192.198.163.11
+	 MIME-Version; b=Jk0rfNG8YyQpvy8lgfSAPqqcctFERqJe61Wyo/xtYqjn1ImyM5+1qsdD411jGVvauwhVEguzKzPPooY/coMA7oaJd0kImobVt4XZ02Zbdguu48vUw2HT1b1ERypBx64XPABaJwUXhPkZGjK3Wf+HULQFhWmsjZp3zqrJ+PP/fsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fecaTwyO; arc=none smtp.client-ip=192.198.163.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708628709; x=1740164709;
+  t=1708628711; x=1740164711;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=cWJeW5MHlMpqXjOeEjoOrbFkjvB0IZ2p+tB7LA0Zb9Q=;
-  b=DQrt32/eivTLjE+s079C8hN1/YLXqi4QK75ZtG1bYeSJsBzzoL07E74c
-   NK6C+WizKLySThLFO0Wo1ZxyD+vxv8WZoFdPmyMV/L/tMZ15SYbDSX5Ak
-   cEi+A0Zwm7e0EpDpoOpvKRbpTurwleAPT4B63+apk6f1s3ViprdVsZbeZ
-   jqOwGgSBqQQqeWx4jbDa6aKfj4PXHg1xi9dAW24Xw4Nryz6TQ16QNluaL
-   kJyzfyXk8ExeGE0t71Gn8fVXbCOB0Qbkexb4V70Uat3+xt4nL6qau7W0U
-   19XOeO21Qu35ZK7amJ8hl9Q97uiRefSEB/bMNSzgfcbqJQtgWwMlub31Y
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10992"; a="13506396"
+  bh=9eIBb6bWagUzQQoX287zEEWkvYERQxEq7punHXUjISE=;
+  b=fecaTwyOyFCwfpo4Q+o8Z6d8+C+tgPndlTAB+/iG1CmcRLkgxL34O77t
+   oplfAEsj3m4dxFUIu4xr3BGo5VFfgq2njOl+HO1KiBortGRty/N/fSy6i
+   VeZEYIw2uX9gJ98NZ7MU7reN25ZNunHltBd1dyn5eW6JASebn/tN3sGWL
+   9Q3ca2XLsWtwVE0/314HTEu0P1re4NdAIWxkYRAe5MTulq38bvPIhCYIZ
+   RMVnPTHYwOrREiC9C0A1rb61Tz7OYnkFUwm+1RHUE7yrFcx3bjQ042/69
+   son8FkU5cwvq7omopCmpUfFkdHxi+0MsmR13P1A9+0Ku9nxbAoDgDM6H/
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10992"; a="13506400"
 X-IronPort-AV: E=Sophos;i="6.06,179,1705392000"; 
-   d="scan'208";a="13506396"
+   d="scan'208";a="13506400"
 Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2024 11:05:09 -0800
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2024 11:05:11 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.06,179,1705392000"; 
-   d="scan'208";a="10171393"
+   d="scan'208";a="10171422"
 Received: from dev1-atbrady.jf.intel.com ([10.166.241.35])
-  by fmviesa004.fm.intel.com with ESMTP; 22 Feb 2024 11:05:08 -0800
+  by fmviesa004.fm.intel.com with ESMTP; 22 Feb 2024 11:05:10 -0800
 From: Alan Brady <alan.brady@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
 	Alan Brady <alan.brady@intel.com>,
 	Alexander Lobakin <aleksander.lobakin@intel.com>
-Subject: [PATCH v6 09/11 iwl-next] idpf: prevent deinit uninitialized virtchnl core
-Date: Thu, 22 Feb 2024 11:04:39 -0800
-Message-ID: <20240222190441.2610930-10-alan.brady@intel.com>
+Subject: [PATCH v6 10/11 iwl-next] idpf: fix minor controlq issues
+Date: Thu, 22 Feb 2024 11:04:40 -0800
+Message-ID: <20240222190441.2610930-11-alan.brady@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240222190441.2610930-1-alan.brady@intel.com>
 References: <20240222190441.2610930-1-alan.brady@intel.com>
@@ -73,86 +73,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In idpf_remove we need to tear down the virtchnl core with
-idpf_vc_core_deinit so we can free up resources and leave things in a
-good state. However, in the case where we failed to establish VC
-communications we may not have ever actually successfully initialized
-the virtchnl core.
+While we're here improving virtchnl we can include two minor fixes for
+the lower level ctrlq flow.
 
-This fixes it by setting a bit once we successfully init the virtchnl
-core.  Then, in deinit, we'll check for it before going on further,
-otherwise we just return. Also clear the bit at the end of deinit so we
-know it's gone now.
+This adds a memory barrier to idpf_post_rx_buffs before we update tail
+on the controlq.  We should make sure our writes have had a chance to
+finish before we tell HW it can touch them.
+
+This also removes some defensive programming in idpf_ctrlq_recv. The
+caller should not be using a num_q_msg value of zero or more than the
+ring size and it's their responsibility to call functions sanely.
 
 Tested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 Signed-off-by: Alan Brady <alan.brady@intel.com>
 ---
- drivers/net/ethernet/intel/idpf/idpf.h          |  2 ++
- drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 10 ++++++++--
- 2 files changed, 10 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/intel/idpf/idpf_controlq.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
-index 5ed08be1dbc0..e7a036538246 100644
---- a/drivers/net/ethernet/intel/idpf/idpf.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf.h
-@@ -83,6 +83,7 @@ enum idpf_state {
-  * @IDPF_HR_RESET_IN_PROG: Reset in progress
-  * @IDPF_REMOVE_IN_PROG: Driver remove in progress
-  * @IDPF_MB_INTR_MODE: Mailbox in interrupt mode
-+ * @IDPF_VC_CORE_INIT: virtchnl core has been init
-  * @IDPF_FLAGS_NBITS: Must be last
-  */
- enum idpf_flags {
-@@ -91,6 +92,7 @@ enum idpf_flags {
- 	IDPF_HR_RESET_IN_PROG,
- 	IDPF_REMOVE_IN_PROG,
- 	IDPF_MB_INTR_MODE,
-+	IDPF_VC_CORE_INIT,
- 	IDPF_FLAGS_NBITS,
- };
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_controlq.c b/drivers/net/ethernet/intel/idpf/idpf_controlq.c
+index c7f43d2fcd13..4849590a5591 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_controlq.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_controlq.c
+@@ -516,6 +516,8 @@ int idpf_ctlq_post_rx_buffs(struct idpf_hw *hw, struct idpf_ctlq_info *cq,
+ 			/* Wrap to end of end ring since current ntp is 0 */
+ 			cq->next_to_post = cq->ring_size - 1;
  
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-index e89e2bad460d..a602ff8d74e0 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-@@ -2990,7 +2990,9 @@ int idpf_vc_core_init(struct idpf_adapter *adapter)
- 	queue_delayed_work(adapter->init_wq, &adapter->init_task,
- 			   msecs_to_jiffies(5 * (adapter->pdev->devfn & 0x07)));
- 
--	goto no_err;
-+	set_bit(IDPF_VC_CORE_INIT, adapter->flags);
++		dma_wmb();
 +
-+	return 0;
+ 		wr32(hw, cq->reg.tail, cq->next_to_post);
+ 	}
  
- err_intr_req:
- 	cancel_delayed_work_sync(&adapter->serv_task);
-@@ -2999,7 +3001,6 @@ int idpf_vc_core_init(struct idpf_adapter *adapter)
- err_netdev_alloc:
- 	kfree(adapter->vports);
- 	adapter->vports = NULL;
--no_err:
- 	return err;
+@@ -546,11 +548,6 @@ int idpf_ctlq_recv(struct idpf_ctlq_info *cq, u16 *num_q_msg,
+ 	int err = 0;
+ 	u16 i;
  
- init_failed:
-@@ -3034,6 +3035,9 @@ int idpf_vc_core_init(struct idpf_adapter *adapter)
-  */
- void idpf_vc_core_deinit(struct idpf_adapter *adapter)
- {
-+	if (!test_bit(IDPF_VC_CORE_INIT, adapter->flags))
-+		return;
-+
- 	idpf_vc_xn_shutdown(adapter->vcxn_mngr);
- 	idpf_deinit_task(adapter);
- 	idpf_intr_rel(adapter);
-@@ -3045,6 +3049,8 @@ void idpf_vc_core_deinit(struct idpf_adapter *adapter)
+-	if (*num_q_msg == 0)
+-		return 0;
+-	else if (*num_q_msg > cq->ring_size)
+-		return -EBADR;
+-
+ 	/* take the lock before we start messing with the ring */
+ 	mutex_lock(&cq->cq_lock);
  
- 	kfree(adapter->vports);
- 	adapter->vports = NULL;
-+
-+	clear_bit(IDPF_VC_CORE_INIT, adapter->flags);
- }
- 
- /**
 -- 
 2.43.0
 
