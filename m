@@ -1,102 +1,75 @@
-Return-Path: <netdev+bounces-74184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D96E6860643
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 00:10:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E12178606CE
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 00:25:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 62E7FB23BC5
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 23:10:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C63F5B206AD
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 23:25:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4A5C18059;
-	Thu, 22 Feb 2024 23:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28DDC22339;
+	Thu, 22 Feb 2024 23:17:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GY9Z65NT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G865VKLR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B738612E40;
-	Thu, 22 Feb 2024 23:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 004B420DDB;
+	Thu, 22 Feb 2024 23:17:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708643425; cv=none; b=Q/SHH3cL9RXngcArT5Nh3VmnICCLkdo+ZZb/HAzhlHNdiqgtcjbcnwWAoSImrsOC3VRz42HOXdir3/mq4GYtfChbv3/mUyp+ZriJtrGqnL8zAYKckjGYog0X9TRB/PjnuI/r211K2RYt8lh/NfLFbQ++3Bedj/ncjiKfovhRoig=
+	t=1708643864; cv=none; b=MImsTjeUgSAR4RrJ67en/UQBs2Km4UxxZ4SqIRrgfW/kS0tS0AFJSTZRfEXSELPcQPEUpLU3druyCwtLtvWC5qPnPPPVts1LRY7EXXFyCyveZXPpxAVBYM3yQC3gGmvDw1UNVcK1et4Tw83Ke7yKIRFtGZ5yG3K/iBPIpctDSVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708643425; c=relaxed/simple;
-	bh=6OzJegTSQdyWQrZYOG0vp/5VWZxH+EYUsQm/nWQ5X88=;
+	s=arc-20240116; t=1708643864; c=relaxed/simple;
+	bh=vMu6Og5kisyi6T/CxqeSkHyMDgfWC0eoG8WmTIHxmbw=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CD1RRtmsdAXPyv3LfEQ04qBp3WSaFHfFsi0hyes4oJ5rcK4pco6LPg4YrTdjNl2+WLG9r7My7KsbS4nTd2GnhqQUPQqBgyVhQmQdBQS2jivKyle9rhXMvYWJBGdwqs6kEUEO5aCZatf2TMcULtFKgVI+39oTPgCVmyH28GU0udw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GY9Z65NT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09C94C433F1;
-	Thu, 22 Feb 2024 23:10:23 +0000 (UTC)
+	 MIME-Version:Content-Type; b=DnzJ/2lWs4oR31p7Y48ksRZAh9MXZSRHT1ULEvXa7kasTO1q265i9UCB5nw2+YXuW7eON1/C86Wglb1XySoWQz3CJKlG3FKIo2E7XFLubMPkYNGKbr1RdM+SHQ7elhjIWQfS4Rm/1yPbQC+1JE++Y4M+Pfds67pnMLateQvpb9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G865VKLR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40865C43390;
+	Thu, 22 Feb 2024 23:17:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708643425;
-	bh=6OzJegTSQdyWQrZYOG0vp/5VWZxH+EYUsQm/nWQ5X88=;
+	s=k20201202; t=1708643863;
+	bh=vMu6Og5kisyi6T/CxqeSkHyMDgfWC0eoG8WmTIHxmbw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GY9Z65NTnMWV6jVdvd5S1Equ09fRRddum6/7PmWFA2J2wUoXc2XMyP6d981QGTyOb
-	 GXftQN5+7y5Zq67S35aNDlqPt4xsCF3GC3c+Z9atZkL/eChZ/A4oNR0d4ks7dK8Oqf
-	 LTo/ExczFqLColgZcEowH0sLbHt417t2ybnQu9xdfwpr3cDpUtYVi2L4NVWhGFDwBf
-	 3w8NzYCXNGVcLcckEx2gHZ6VZ95zvRG1PIqy33MDDBFRlVlVQ6BsHx2o84i/ImlhNJ
-	 OszGA6GFkfQzwlxCF64bVghnR806hp+e4akkjYQIgruREKEMXPcJW0aVGpmK4KVqGm
-	 s6qHK50fkhlxw==
-Date: Thu, 22 Feb 2024 15:10:23 -0800
+	b=G865VKLR6nTBQJu/TFvQKaaji8W5bYqjV2oAj/fKF++Mmehvfsk7XrK9CTVT6SnAO
+	 JdIGndPL43Ka40hUwT2+7tOoiFncVkbs7GoF65E/GjIfrIiDpChGtjy9xqabHeMSTU
+	 J04BwlDwBCK/tsD0QFbsw6ydPbs375Yn4cU/FRiOK838QAWcAZ3j775fATOFhRBOyO
+	 Q2S1+Ix4r6obQoCz/LlOr0b4CT3fGDEy/w/RMWTRvVCFKSbjDakyBcJ4z8q9+me+/K
+	 wfH0YlVABx8ZKH3gN9wmvxMOLbnFbgjsI4lg0oS2v6eGC0O52iya5OBi9YcmXJT3EJ
+	 Kif2nsEomOMEg==
+Date: Thu, 22 Feb 2024 15:17:42 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
- <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- linux-arm-kernel@lists.infradead.org, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg
- <jesse.brandeburg@intel.com>, Jonathan Corbet <corbet@lwn.net>, Marek
- =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Piergiorgio Beruto
- <piergiorgio.beruto@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- =?UTF-8?B?Tmljb2zDsg==?= Veronese <nicveronese@gmail.com>, Simon Horman
- <horms@kernel.org>, mwojtas@chromium.org
-Subject: Re: [PATCH net-next v8 08/13] netlink: specs: add ethnl PHY_GET
- command set
-Message-ID: <20240222151023.64abe662@kernel.org>
-In-Reply-To: <20240222084948.16f33760@device-28.home>
-References: <20240220184217.3689988-1-maxime.chevallier@bootlin.com>
-	<20240220184217.3689988-9-maxime.chevallier@bootlin.com>
-	<20240221170023.452a01ca@kernel.org>
-	<20240222084948.16f33760@device-28.home>
+To: Kalle Valo <kvalo@kernel.org>
+Cc: Jeff Johnson <quic_jjohnson@quicinc.com>, Karthikeyan Periyasamy
+ <quic_periyasa@quicinc.com>, <netdev@vger.kernel.org>,
+ <linux-wireless@vger.kernel.org>
+Subject: Re: pull-request: wireless-next-2024-02-20
+Message-ID: <20240222151742.2b41bf3d@kernel.org>
+In-Reply-To: <87wmqwahoj.fsf@kernel.org>
+References: <20240220165842.917CDC433F1@smtp.kernel.org>
+	<20240221143531.56942c6e@kernel.org>
+	<2dbb3ca4-78fd-4125-b13f-4ad440923291@quicinc.com>
+	<b25a5783-a9ca-4356-ae17-bbda1340b522@quicinc.com>
+	<20240221172521.4dcb382c@kernel.org>
+	<875xyhaxs2.fsf@kernel.org>
+	<87wmqwahoj.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, 22 Feb 2024 08:49:48 +0100 Maxime Chevallier wrote:
-> > ethtool-user.c:689:10: error: =E2=80=98ETHTOOL_A_PHY_UPSTREAM_PHY_INDEX=
-=E2=80=99 undeclared here (not in a function); did you mean =E2=80=98ETHTOO=
-L_A_PHY_UPSTREAM_INDEX=E2=80=99?
-> >   689 |         [ETHTOOL_A_PHY_UPSTREAM_PHY_INDEX] =3D { .name =3D "ups=
-tream-phy-index", .type =3D YNL_PT_U32, },
-> >       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >       |          ETHTOOL_A_PHY_UPSTREAM_INDEX
-> >=20
-> > Unfortunately ethtool in the in-between state where we can auto-gen
-> > user space code (or rather most of it) but the uAPI header is not
-> > auto-generated so we need to take extra care to keep things in sync :( =
-=20
->=20
-> Is there anything I run for testing, so that I can make sure this
-> doesn't happen again ?
+On Thu, 22 Feb 2024 12:59:08 +0200 Kalle Valo wrote:
+> The pull request is sent:
+> 
+> https://patchwork.kernel.org/project/netdevbpf/patch/20240222105205.CEC54C433F1@smtp.kernel.org/
 
-make -C tools/net/ynl
-
-will run the build. It needs some basic python libs, should be easy to
-figure out from stack traces if they are missing.=20
-
-I didn't mention it to you because.. it may not build for you on
-net-next until what I'm about to post gets merged.
+Thank you, much appreciated.
 
