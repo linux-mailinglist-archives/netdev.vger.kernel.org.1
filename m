@@ -1,109 +1,279 @@
-Return-Path: <netdev+bounces-74054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C8AB85FC24
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 16:19:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFF7585FC5D
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 16:29:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1E982896EE
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 15:19:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E5461F2236F
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 15:29:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 046A214A0BE;
-	Thu, 22 Feb 2024 15:19:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8E4614C5B4;
+	Thu, 22 Feb 2024 15:29:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FsozwwjO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cpUCkWx6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E7E7148FE3
-	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 15:19:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81D341474D4;
+	Thu, 22 Feb 2024 15:29:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708615166; cv=none; b=kqSzNFy3RqB6LHt3ehNisY4DaF51loacTzdOzOtmUM7U1z8fWBzVzL8XX9SSGX1XWLmlS/ddoSm+rogmkETECS7V5ZNnhRHVzwocDMDwnRl/S45MbtpyDm145y0t8AlrWpbLDXL8WWSUgBrceuGb/yA38BhOTqds6yCgz2Mk/tM=
+	t=1708615757; cv=none; b=i/MnibTJF+cOQByoYXTNoM/bDMqVtWqTR193YizoCvu2XVwwUkgLi5nc+921oRXUwbLjFNjXiY2zj5uAmGAA177+fUkYDaFCSU/sCzTvdDEMhDW+XoEg0eKPnHGwa+9WPU4BaF0DbBA3fWgqHsmt0GdbasE0dfh7xnsbdmli/jg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708615166; c=relaxed/simple;
-	bh=DD6c8TtHTmyYpir3UITEluWHtF86DiSjuQT7S5fR060=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZLLWykcqs02kczZ46OSy4m+DZK/BYakujG6hPWMyuqp6hu0xy5LTDyrhtx/gNGz8UtZbpH63m9O28gK/kgkq5O3JeNskhNiv2alikkgpt5Ja1bz29s8ByLC3ifQF7cqANXaSaIiw65Pu3MWkCqLz+uBnR2+UUkKjufUBf4m4jLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FsozwwjO; arc=none smtp.client-ip=209.85.160.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-21f5ab945e9so399177fac.0
-        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 07:19:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708615164; x=1709219964; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=DD6c8TtHTmyYpir3UITEluWHtF86DiSjuQT7S5fR060=;
-        b=FsozwwjOq5/giK/RzrOlZdTAjGzjjOKf3xJYQgua3tD0URHhRlAUs3gPegN/FAYjKR
-         AuCP3FNLdQ32Jz1GqT9dXmlPyFLCcOotq/JmjwETdDWjhnsSrZtnUC+qB0QxPMFEQWCD
-         GYtzU5a7k6WUNMYjqHyiYMl2cjVurFvwLxrngxCW1rZ/DDP0r739ofPgKlTHn10VZxTI
-         xDUv4gGpOh/BiHltVehucZZr6ervmf0Qekh+Cj402CXYD7HIDla9V1+aQOyjhShaJ/VD
-         ByRU8Mv3agqBr2VrlZZIZJxCOGCzDbsz06n55QvVTpdtcpPdbrI+9k0gGi758ZT+X1PT
-         SuYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708615164; x=1709219964;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DD6c8TtHTmyYpir3UITEluWHtF86DiSjuQT7S5fR060=;
-        b=iRViqZ78nh2cAqUze8vAhPcg82tn2hV80NT0N5nr4Y/NYtJ89m5474iq7UpEXgnCUS
-         l6xwc18yk22Ujh1YGEiaPx7CPkJTKsDbp6U8pBHKyqz+HW0AH5j8YTDV9rz2fMDfSKWU
-         sB3rlg1UvMXIeyfMZqhS76FUOUvEWd7vUsALkNPOZCosxr2/LwrHXnoOTetjef8ehR2g
-         dsx9feJCwwd3wiLedrCNotIMe3B0x18Afz7Z1UBg3Hl71PjJ/dY/2SU/HTs1sK68E3GN
-         OWO7VI/vcz0EBMqG/Onz+BaOxiwhNj948wkQp4GiK4GHYQPSGVBKw/z+yzj4yzPDK6t/
-         COHg==
-X-Gm-Message-State: AOJu0Yw+ZXYlxo6Fpb2djymlYnBEVMrXcTDDHSuejDG0Oy+cSs0LiJAM
-	A33B2aBW0dfB1UowdGTg7hBIzcKbcPZj03BdZJJ8SJDnG6s3MLTvcx7BQbKJFa7bj5Tx4aZ9GhY
-	PH850hn6yCthmTDhshzg6drYgYNg=
-X-Google-Smtp-Source: AGHT+IGsJLG49kJ2z9lIuDmSVZkjyNCzPd1SOgqPL/uJa3LfYsn+u1CKUpIkiIsZGkPgoML1jSXTQVWPhsJ9IVlkzVE=
-X-Received: by 2002:a05:6870:3289:b0:21e:a713:2af5 with SMTP id
- q9-20020a056870328900b0021ea7132af5mr1314701oac.9.1708615164452; Thu, 22 Feb
- 2024 07:19:24 -0800 (PST)
+	s=arc-20240116; t=1708615757; c=relaxed/simple;
+	bh=UMGrEK87Ud+pMVRA+mW3KlN70QQqpXNjVjwMAipmIVY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j0w8ZC5V0wKsjgGD6wRzaVmjBdTk4p7evtEpxrGStC4lRK0yHvCI50TXS7zE0vU/zTeSHwLqigCDBhPN5mMzn5cjdZ7wq87z5CB4J/9fg8qqDyS+b+31WrQzCAK2fHXRtZg1fB1aQ3zUx9CwLHBl163MxR3ZP5EfpSMq9y1uRlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cpUCkWx6; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708615756; x=1740151756;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=UMGrEK87Ud+pMVRA+mW3KlN70QQqpXNjVjwMAipmIVY=;
+  b=cpUCkWx6lg09KbQUaZ4Dg1BfaKowsCZszc3i5KAm4nHFdOPEack4EwXp
+   71AUQBxnnYaKRw9Oip8MhZfiD0eiaTY7BwrcXCUrS0tDpQ7qsv72MiPl8
+   lK3dQ3w4srdmbuCwrvaAB5xJGI8qHi+fPnOFfOdBENPDYYDF1ucMhql7q
+   Pcbbx4bdaQz1ZTD46mrXUCVVhsAU0QbDX2WNlydQNDWP7kLBu2JM7PzIC
+   Xjv8vc0O5pcQM6HPf1IN5E+4deZotFoM0QbL8VL5m8D8TCm78wHO/CpCr
+   nekXeBDveJHIS+8Uj0l/YsWx/rDFMbvu18oEJPVrWPS+ImZ3XuskE0pwE
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10992"; a="2984394"
+X-IronPort-AV: E=Sophos;i="6.06,179,1705392000"; 
+   d="scan'208";a="2984394"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2024 07:29:14 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10992"; a="913543141"
+X-IronPort-AV: E=Sophos;i="6.06,179,1705392000"; 
+   d="scan'208";a="913543141"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by fmsmga002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2024 07:29:09 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.97)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1rdB0U-00000006fE8-0mA7;
+	Thu, 22 Feb 2024 17:29:06 +0200
+Date: Thu, 22 Feb 2024 17:29:05 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew@lunn.ch>,
+	Mark Brown <broonie@kernel.org>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v4 1/5] net: wan: Add support for QMC HDLC
+Message-ID: <ZddoQTg32unJJ_qP@smile.fi.intel.com>
+References: <20240222142219.441767-1-herve.codina@bootlin.com>
+ <20240222142219.441767-2-herve.codina@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240222134351.224704-1-jiri@resnulli.us> <20240222134351.224704-4-jiri@resnulli.us>
-In-Reply-To: <20240222134351.224704-4-jiri@resnulli.us>
-From: Donald Hunter <donald.hunter@gmail.com>
-Date: Thu, 22 Feb 2024 15:19:13 +0000
-Message-ID: <CAD4GDZwCQGX3guJUi-WsegTw7-EyEjEiM0mCvNRtFwJaCLLaeg@mail.gmail.com>
-Subject: Re: [patch net-next v3 3/3] tools: ynl: allow user to pass enum
- string instead of scalar value
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com, 
-	davem@davemloft.net, edumazet@google.com, jacob.e.keller@intel.com, 
-	swarupkotikalapudi@gmail.com, sdf@google.com, lorenzo@kernel.org, 
-	alessandromarcolini99@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240222142219.441767-2-herve.codina@bootlin.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-On Thu, 22 Feb 2024 at 13:44, Jiri Pirko <jiri@resnulli.us> wrote:
->
-> From: Jiri Pirko <jiri@nvidia.com>
->
-> During decoding of messages coming from kernel, attribute values are
-> converted to enum names in case the attribute type is enum of bitfield32.
->
-> However, when user constructs json message, he has to pass plain scalar
-> values. See "state" "selector" and "value" attributes in following
-> examples:
->
-> $ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/dpll.yaml --do pin-set --json '{"id": 0, "parent-device": {"parent-id": 0, "state": 1}}'
-> $ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/devlink.yaml --do port-set --json '{"bus-name": "pci", "dev-name": "0000:08:00.1", "port-index": 98304, "port-function": {"caps": {"selector": 1, "value": 1 }}}'
->
-> Allow user to pass strings containing enum names, convert them to scalar
-> values to be encoded into Netlink message:
->
-> $ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/dpll.yaml --do pin-set --json '{"id": 0, "parent-device": {"parent-id": 0, "state": "connected"}}'
-> $ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/devlink.yaml --do port-set --json '{"bus-name": "pci", "dev-name": "0000:08:00.1", "port-index": 98304, "port-function": {"caps": {"selector": ["roce-bit"], "value": ["roce-bit"] }}}'
->
-> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+On Thu, Feb 22, 2024 at 03:22:14PM +0100, Herve Codina wrote:
+> The QMC HDLC driver provides support for HDLC using the QMC (QUICC
+> Multichannel Controller) to transfer the HDLC data.
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+...
+
+> +struct qmc_hdlc {
+> +	struct device *dev;
+> +	struct qmc_chan *qmc_chan;
+> +	struct net_device *netdev;
+> +	bool is_crc32;
+> +	spinlock_t tx_lock; /* Protect tx descriptors */
+
+Just wondering if above tx/rx descriptors should be aligned on a cacheline
+for DMA?
+
+> +	struct qmc_hdlc_desc tx_descs[8];
+> +	unsigned int tx_out;
+> +	struct qmc_hdlc_desc rx_descs[4];
+> +};
+
+...
+
+> +#define QMC_HDLC_RX_ERROR_FLAGS (QMC_RX_FLAG_HDLC_OVF | \
+> +				 QMC_RX_FLAG_HDLC_UNA | \
+> +				 QMC_RX_FLAG_HDLC_ABORT | \
+> +				 QMC_RX_FLAG_HDLC_CRC)
+
+Wouldn't be slightly better to have it as
+
+#define QMC_HDLC_RX_ERROR_FLAGS				\
+	(QMC_RX_FLAG_HDLC_OVF | QMC_RX_FLAG_HDLC_UNA |	\
+	 QMC_RX_FLAG_HDLC_CRC | QMC_RX_FLAG_HDLC_ABORT)
+
+?
+
+...
+
+> +	ret = qmc_chan_write_submit(qmc_hdlc->qmc_chan, desc->dma_addr, desc->dma_size,
+> +				    qmc_hdlc_xmit_complete, desc);
+> +	if (ret) {
+
+> +		dev_err(qmc_hdlc->dev, "qmc chan write returns %d\n", ret);
+> +		dma_unmap_single(qmc_hdlc->dev, desc->dma_addr, desc->dma_size, DMA_TO_DEVICE);
+> +		return ret;
+
+I would do other way around, i.e. release resource followed up by printing
+a message. Printing a message is a slow operation and may prevent the (soon
+freed) resources to be re-used earlier.
+
+> +	}
+
+...
+
+> +	spin_lock_irqsave(&qmc_hdlc->tx_lock, flags);
+
+Why not using cleanup.h from day 1?
+
+> +end:
+
+This label, in particular, will not be needed with above in place.
+
+> +	spin_unlock_irqrestore(&qmc_hdlc->tx_lock, flags);
+> +	return ret;
+> +}
+
+...
+
+> +	/* Queue as many recv descriptors as possible */
+> +	for (i = 0; i < ARRAY_SIZE(qmc_hdlc->rx_descs); i++) {
+> +		desc = &qmc_hdlc->rx_descs[i];
+> +
+> +		desc->netdev = netdev;
+> +		ret = qmc_hdlc_recv_queue(qmc_hdlc, desc, chan_param.hdlc.max_rx_buf_size);
+
+> +		if (ret) {
+> +			if (ret == -EBUSY && i != 0)
+> +				break; /* We use all the QMC chan capability */
+> +			goto free_desc;
+> +		}
+
+Can be unfolded to
+
+		if (ret == -EBUSY && i)
+			break; /* We use all the QMC chan capability */
+		if (ret)
+			goto free_desc;
+
+Easy to read and understand.
+
+> +	}
+
+...
+
+> +static int qmc_hdlc_probe(struct platform_device *pdev)
+> +{
+
+With
+
+	struct device *dev = &pdev->dev;
+
+the below code will be neater (see other comments for the examples).
+
+> +	struct device_node *np = pdev->dev.of_node;
+
+It is used only once, drop it (see below).
+
+> +	struct qmc_hdlc *qmc_hdlc;
+> +	struct qmc_chan_info info;
+> +	hdlc_device *hdlc;
+> +	int ret;
+> +
+> +	qmc_hdlc = devm_kzalloc(&pdev->dev, sizeof(*qmc_hdlc), GFP_KERNEL);
+> +	if (!qmc_hdlc)
+> +		return -ENOMEM;
+> +
+> +	qmc_hdlc->dev = &pdev->dev;
+> +	spin_lock_init(&qmc_hdlc->tx_lock);
+> +
+> +	qmc_hdlc->qmc_chan = devm_qmc_chan_get_bychild(qmc_hdlc->dev, np);
+
+	qmc_hdlc->qmc_chan = devm_qmc_chan_get_bychild(dev, dev->of_node);
+
+> +	if (IS_ERR(qmc_hdlc->qmc_chan)) {
+> +		ret = PTR_ERR(qmc_hdlc->qmc_chan);
+> +		return dev_err_probe(qmc_hdlc->dev, ret, "get QMC channel failed\n");
+
+		return dev_err_probe(dev, PTR_ERR(qmc_hdlc->qmc_chan), "get QMC channel failed\n");
+
+> +	}
+> +
+> +	ret = qmc_chan_get_info(qmc_hdlc->qmc_chan, &info);
+> +	if (ret) {
+
+> +		dev_err(qmc_hdlc->dev, "get QMC channel info failed %d\n", ret);
+> +		return ret;
+
+Why not using same message pattern everywhere, i.e. dev_err_probe()?
+
+		return dev_err_probe(dev, ret, "get QMC channel info failed\n");
+
+(and so on...)
+
+> +	}
+> +
+> +	if (info.mode != QMC_HDLC) {
+> +		dev_err(qmc_hdlc->dev, "QMC chan mode %d is not QMC_HDLC\n",
+> +			info.mode);
+> +		return -EINVAL;
+> +	}
+> +
+> +	qmc_hdlc->netdev = alloc_hdlcdev(qmc_hdlc);
+> +	if (!qmc_hdlc->netdev) {
+
+> +		dev_err(qmc_hdlc->dev, "failed to alloc hdlc dev\n");
+> +		return -ENOMEM;
+
+We do not issue a message for -ENOMEM.
+
+> +	}
+> +
+> +	hdlc = dev_to_hdlc(qmc_hdlc->netdev);
+> +	hdlc->attach = qmc_hdlc_attach;
+> +	hdlc->xmit = qmc_hdlc_xmit;
+> +	SET_NETDEV_DEV(qmc_hdlc->netdev, qmc_hdlc->dev);
+> +	qmc_hdlc->netdev->tx_queue_len = ARRAY_SIZE(qmc_hdlc->tx_descs);
+> +	qmc_hdlc->netdev->netdev_ops = &qmc_hdlc_netdev_ops;
+> +	ret = register_hdlc_device(qmc_hdlc->netdev);
+> +	if (ret) {
+> +		dev_err(qmc_hdlc->dev, "failed to register hdlc device (%d)\n", ret);
+> +		goto free_netdev;
+> +	}
+> +
+> +	platform_set_drvdata(pdev, qmc_hdlc);
+> +
+> +	return 0;
+> +
+> +free_netdev:
+> +	free_netdev(qmc_hdlc->netdev);
+> +	return ret;
+> +}
+
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
 
