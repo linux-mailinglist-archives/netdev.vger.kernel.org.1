@@ -1,216 +1,119 @@
-Return-Path: <netdev+bounces-73877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A84F985EF4D
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 03:53:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 809E385F04A
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 05:01:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4A761C21BC9
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 02:53:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B21BE1C22613
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 04:01:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B01A11C82;
-	Thu, 22 Feb 2024 02:53:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F31717564;
+	Thu, 22 Feb 2024 04:01:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RAZuxzdr"
+	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="UVIb7hVQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F29C8F77
-	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 02:53:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C53BFBF2;
+	Thu, 22 Feb 2024 04:01:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708570420; cv=none; b=uTpIauP2hdrR2uNW7RgpkGbFt5cLUy+v5IaSpW+86r8Y+9Ura1qDi8whIQKD8WPO+ug8Ht1dJ4HvhY9vFFGzQkLs6shv+k4ho2hsgKfhqfxzU9Xp2xAkv7810xVVY6l9QgW4eEBd5Vz1DQEYHosI0oR6KH7JZ0KlzHDxz7ew/zc=
+	t=1708574479; cv=none; b=VIr3kveVb1hmE9OlexbmrDspSQzoUluTvmmVfg7E3XdvSSkYXIb/MMZJvzdx2GF6q/FBAeVUKBNI8jcgGyM3B5r2MZ5+wNbLWTnADvfGbaFst1eR/acbBbMVK2Hu7JHgo/d8tvyxU4/HDZccABRH7mlaX29GSw0EJfULCwiLEgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708570420; c=relaxed/simple;
-	bh=YS+Sx/Y2pwDWebj62VOBl1EdCiVwfi/tSCFdmal0ziw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KPFDeW+MlQNyt4e3UEUXO1BYUeHzqT6yvU38UWC3LZO7fQb7hPpKsul+QFtpfHy5cucVRgy7V13sZCF2RXfmxhQvCa/wqGlLdvezPts5DzxcX5DiPKZIPNb71s8fjrY4EV84gh2JA4hyTxia/TmS0GF12kKB+fP3/h6bKE0PKsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RAZuxzdr; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-56454c695e6so780510a12.0
-        for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 18:53:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708570417; x=1709175217; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JtazvHGdwdKHNIB4t/LdU9mfvgU+Pomh/XFY6t1LiLY=;
-        b=RAZuxzdr65kLc1gTAXYXds/U1X3AexY6tfBLlWtxpgevir+2Kjj8of63DBsFmonU2t
-         eZWXMLPxU6snPqV7EfGJk0mMMhugN29KR4P6GmvvTh9CLyIsfC4emfzev8JGlF5Y/SoM
-         QW3Q9no6pgSD04fCQ1/ERwqtgvw3MKOtr3f2n/WTGjappU69axGgqhHGhcO3ZqdLKCMi
-         Mz26nRONqwWXsnf1ZCT8x7h3N8zDEKEHV+p03tNTao2gvviRDz3sCMsTGau8pNwNZ6me
-         4lHH3i2j3uioldlF5eFc9SsiGWv8BQgppa+0S2jHfJQFoWfeopQ6UGQkhl/Nb141F/8v
-         1Uqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708570417; x=1709175217;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JtazvHGdwdKHNIB4t/LdU9mfvgU+Pomh/XFY6t1LiLY=;
-        b=u3HZbHRxs8lXIKirD5i/RaHVy6cdCFnTI+A2QErdqvDt0c1wrFnM123yosNLf9gk8v
-         IwSxoAYLd2BCTljpd+u8QwsIjYUIKy5SXtd9g73HwRKgsVg1fb1sZb86xrPTVn1cZdZx
-         wC3B3rzKeJhv4lK5PMrxKE2DhfcdCPk2LHCkow++7kvtrJBbnjjoZYep2wKbdJ2U0U4W
-         FiAxcm+Z/oUG6J+hYXAK5KWsA75W7nLmmOrJQdQLkm8o9BpoqHluE+GidaK9dEcKUtYv
-         O/Vflt/G433sx7FwEAL79wtVRoK2+Iv0jGzlZpVGyn8mslqEc76Fli/XsCXbSt+GcQ31
-         ftmg==
-X-Forwarded-Encrypted: i=1; AJvYcCXZz2nOLbKiLnL76mNFQCkhrcFnGc472IE470mTvb97cjHsne16hLL+2bWAq0F87KhbGhoynHM+X1GQiSEr02VeGthlYn2C
-X-Gm-Message-State: AOJu0YylWGdaSPbaKIzLLRVgTN7E/2oEk0BSlOEaGjENk08vQ8Wg7fvy
-	a8uNrnRkb+AN7quWoHEuH1YDYdjoaPtt6HDhnaIUxI131IOnNS/5833f+oVehBY5D7Hk+fw+Qqg
-	geVlfuC1Z+OOSChoUxAlNRE5kFps=
-X-Google-Smtp-Source: AGHT+IFYcomr6KASIG3Drnx2DO5zCt2VdScK5lPSYSZn0G9+zMAJPSqAJXFhxF5oTVNXCTbWMSRZdaysu1KuA7ZrXsw=
-X-Received: by 2002:a05:6402:3783:b0:561:7832:d35 with SMTP id
- et3-20020a056402378300b0056178320d35mr934229edb.15.1708570416597; Wed, 21 Feb
- 2024 18:53:36 -0800 (PST)
+	s=arc-20240116; t=1708574479; c=relaxed/simple;
+	bh=OJZtJeG9oFC0CHpkLX/+q6CW2oV5Xm1b7Y/agkt23OU=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=V2ixyQBF3O18GxYOZDbO+MyaA0nip3psTNjSrso7GLqjdG/4ikjvDfnBcRejwmFIkaEEUC+TG+F/u0vrpLJQ7VONu83yJrQyWh6kPTkWT6YJRgBWKWKnoZ1rvhO2Id91WH4o7dL5Ih6OqJ6Eqmo+hpjm0EO73epZ9nEVmWW6bdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=UVIb7hVQ; arc=none smtp.client-ip=205.220.178.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250812.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41M2JpOs008937;
+	Thu, 22 Feb 2024 04:00:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
+	 h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding:content-type; s=
+	PPS06212021; bh=7MhjdBIzVbtJC+qrWqwmXmRz5gU4c1bPbqnR2zTbpeE=; b=
+	UVIb7hVQI1QU1gxPmSCLwsc1C1zChrc3VTuPstp5OAIdDxWofg4iV4BTbMeK1SDK
+	mweU9Q0EWco3IgGMecMXSIadmzwq5xUkkU6nG2KZvYVn9J9ne6/BA7I376RGFYds
+	Z0w+xk55+AHLQ9Y1D8evNwCzidBDersq4SyeGEdxM1OlxRjiZ4fJ/DbugC+mb1q+
+	SUpuHVX7Wqik0AZjSggAy0Qd5xnctCZpu6YLuyF8YD5fLckSqOfMHMGITIduno+Q
+	x5Jb/MQJdNmhodVGPJqgCr2VcVLMFuzLh+YnaQmlh1T00vp9o6cIBOXnjEznOpva
+	SqmI8Dk9uUm7BELKXRkHlQ==
+Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [147.11.82.254])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3wd218hjn1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Thu, 22 Feb 2024 04:00:51 +0000 (GMT)
+Received: from ala-exchng01.corp.ad.wrs.com (147.11.82.252) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 21 Feb 2024 20:00:50 -0800
+Received: from pek-lpd-ccm6.wrs.com (147.11.136.210) by
+ ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Wed, 21 Feb 2024 20:00:47 -0800
+From: Lizhi Xu <lizhi.xu@windriver.com>
+To: <syzbot+99d15fcdb0132a1e1a82@syzkaller.appspotmail.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+        <fw@strlen.de>, <horms@kernel.org>, <kuba@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <pabeni@redhat.com>, <syzkaller-bugs@googlegroups.com>
+Subject: [PATCH net-next] net/mpls: fix WARNING in mpls_gso_segment
+Date: Thu, 22 Feb 2024 12:00:45 +0800
+Message-ID: <20240222040046.2568269-1-lizhi.xu@windriver.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <00000000000043b1310611e388aa@google.com>
+References: <00000000000043b1310611e388aa@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240221025732.68157-1-kerneljasonxing@gmail.com>
- <20240221025732.68157-4-kerneljasonxing@gmail.com> <CANn89iL-FH6jzoxhyKSMioj-zdBsHqNpR7YTGz8ytM=FZSGrug@mail.gmail.com>
-In-Reply-To: <CANn89iL-FH6jzoxhyKSMioj-zdBsHqNpR7YTGz8ytM=FZSGrug@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 22 Feb 2024 10:52:59 +0800
-Message-ID: <CAL+tcoCe1jjXD7357w+3Z8P+jv+rBxwzcZnf0S2-2YMLv=3AYA@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 03/11] tcp: use drop reasons in cookie check
- for ipv4
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	dsahern@kernel.org, kuniyu@amazon.com, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: yxP3AvRov-tsgP_uT6gijPle0aFETzCU
+X-Proofpoint-ORIG-GUID: yxP3AvRov-tsgP_uT6gijPle0aFETzCU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-22_01,2024-02-21_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=922 mlxscore=0
+ priorityscore=1501 suspectscore=0 impostorscore=0 clxscore=1011
+ bulkscore=0 malwarescore=0 adultscore=0 spamscore=0 lowpriorityscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2402120000 definitions=main-2402220028
 
-On Wed, Feb 21, 2024 at 5:34=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Wed, Feb 21, 2024 at 3:57=E2=80=AFAM Jason Xing <kerneljasonxing@gmail=
-.com> wrote:
-> >
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > Now it's time to use the prepared definitions to refine this part.
-> > Four reasons used might enough for now, I think.
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > --
-> > v6:
-> > Link: https://lore.kernel.org/netdev/20240215210922.19969-1-kuniyu@amaz=
-on.com/
-> > 1. Not use NOMEM because of MPTCP (Kuniyuki). I chose to use NO_SOCKET =
-as
-> > an indicator which can be used as three kinds of cases to tell people t=
-hat we're
-> > unable to get a valid one. It's a relatively general reason like what w=
-e did
-> > to TCP_FLAGS.
-> > Any better ideas/suggestions are welcome :)
-> >
-> > v5:
-> > Link: https://lore.kernel.org/netdev/CANn89i+iELpsoea6+C-08m6+=3DJkneEE=
-M=3DnAj-28eNtcOCkwQjw@mail.gmail.com/
-> > Link: https://lore.kernel.org/netdev/632c6fd4-e060-4b8e-a80e-5d545a6c6b=
-6c@kernel.org/
-> > 1. Use SKB_DROP_REASON_IP_OUTNOROUTES instead of introducing a new one =
-(Eric, David)
-> > 2. Reuse SKB_DROP_REASON_NOMEM to handle failure of request socket allo=
-cation (Eric)
-> > 3. Reuse NO_SOCKET instead of introducing COOKIE_NOCHILD
-> > ---
-> >  net/ipv4/syncookies.c | 18 +++++++++++++-----
-> >  1 file changed, 13 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
-> > index 38f331da6677..1028429c78a5 100644
-> > --- a/net/ipv4/syncookies.c
-> > +++ b/net/ipv4/syncookies.c
-> > @@ -421,8 +421,10 @@ struct sock *cookie_v4_check(struct sock *sk, stru=
-ct sk_buff *skb)
-> >                 if (IS_ERR(req))
-> >                         goto out;
-> >         }
-> > -       if (!req)
-> > +       if (!req) {
-> > +               SKB_DR_SET(reason, NO_SOCKET);
-> >                 goto out_drop;
-> > +       }
-> >
-> >         ireq =3D inet_rsk(req);
-> >
-> > @@ -434,8 +436,10 @@ struct sock *cookie_v4_check(struct sock *sk, stru=
-ct sk_buff *skb)
-> >          */
-> >         RCU_INIT_POINTER(ireq->ireq_opt, tcp_v4_save_options(net, skb))=
-;
-> >
-> > -       if (security_inet_conn_request(sk, skb, req))
-> > +       if (security_inet_conn_request(sk, skb, req)) {
-> > +               SKB_DR_SET(reason, SECURITY_HOOK);
-> >                 goto out_free;
-> > +       }
-> >
-> >         tcp_ao_syncookie(sk, skb, req, AF_INET);
-> >
-> > @@ -452,8 +456,10 @@ struct sock *cookie_v4_check(struct sock *sk, stru=
-ct sk_buff *skb)
-> >                            ireq->ir_loc_addr, th->source, th->dest, sk-=
->sk_uid);
-> >         security_req_classify_flow(req, flowi4_to_flowi_common(&fl4));
-> >         rt =3D ip_route_output_key(net, &fl4);
-> > -       if (IS_ERR(rt))
-> > +       if (IS_ERR(rt)) {
-> > +               SKB_DR_SET(reason, IP_OUTNOROUTES);
-> >                 goto out_free;
-> > +       }
-> >
-> >         /* Try to redo what tcp_v4_send_synack did. */
-> >         req->rsk_window_clamp =3D tp->window_clamp ? :dst_metric(&rt->d=
-st, RTAX_WINDOW);
-> > @@ -476,10 +482,12 @@ struct sock *cookie_v4_check(struct sock *sk, str=
-uct sk_buff *skb)
-> >         /* ip_queue_xmit() depends on our flow being setup
-> >          * Normal sockets get it right from inet_csk_route_child_sock()
-> >          */
-> > -       if (ret)
-> > +       if (ret) {
-> >                 inet_sk(ret)->cork.fl.u.ip4 =3D fl4;
-> > -       else
-> > +       } else {
-> > +               SKB_DR_SET(reason, NO_SOCKET);
-> >                 goto out_drop;
-> > +       }
->
-> You can avoid the else here
->
-> diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
-> index be88bf586ff9ffba2190a1fd60a1ed3ce5f73d06..d56b0e309cfc0a58dcd277881=
-fe2b364ab3cc668
-> 100644
-> --- a/net/ipv4/syncookies.c
-> +++ b/net/ipv4/syncookies.c
-> @@ -475,8 +475,11 @@ struct sock *cookie_v4_check(struct sock *sk,
-> struct sk_buff *skb)
->         /* ip_queue_xmit() depends on our flow being setup
->          * Normal sockets get it right from inet_csk_route_child_sock()
->          */
-> -       if (ret)
-> -               inet_sk(ret)->cork.fl.u.ip4 =3D fl4;
-> +       if (!ret) {
-> +               SKB_DR_SET(reason, NO_SOCKET);
-> +               goto out_drop;
-> +       }
-> +       inet_sk(ret)->cork.fl.u.ip4 =3D fl4;
->  out:
->         return ret;
->  out_free:
+When the network header pointer is greater than the inner network header, the
+difference between the two can cause mpls_hlen overflow.
 
-Thanks for your suggestions. I will update it in the v8 patch.
+Reported-and-tested-by: syzbot+99d15fcdb0132a1e1a82@syzkaller.appspotmail.com
+Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
+---
+ net/mpls/mpls_gso.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thanks,
-Jason
+diff --git a/net/mpls/mpls_gso.c b/net/mpls/mpls_gso.c
+index 533d082f0701..2ab24b2fd90f 100644
+--- a/net/mpls/mpls_gso.c
++++ b/net/mpls/mpls_gso.c
+@@ -25,11 +25,11 @@ static struct sk_buff *mpls_gso_segment(struct sk_buff *skb,
+ 	netdev_features_t mpls_features;
+ 	u16 mac_len = skb->mac_len;
+ 	__be16 mpls_protocol;
+-	unsigned int mpls_hlen;
++	int mpls_hlen;
+ 
+ 	skb_reset_network_header(skb);
+ 	mpls_hlen = skb_inner_network_header(skb) - skb_network_header(skb);
+-	if (unlikely(!mpls_hlen || mpls_hlen % MPLS_HLEN))
++	if (unlikely(mpls_hlen <= 0 || mpls_hlen % MPLS_HLEN))
+ 		goto out;
+ 	if (unlikely(!pskb_may_pull(skb, mpls_hlen)))
+ 		goto out;
+-- 
+2.43.0
+
 
