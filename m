@@ -1,115 +1,165 @@
-Return-Path: <netdev+bounces-73992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C31485F90F
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 14:00:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F87B85F915
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 14:02:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2174B1F266A6
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 13:00:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D77F9286DA9
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 13:02:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F190D12E1D6;
-	Thu, 22 Feb 2024 13:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1007413248E;
+	Thu, 22 Feb 2024 13:01:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="frX56mCm"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mF8b9PpX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB61B3D54D
-	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 13:00:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27BE612EBD4
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 13:01:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708606830; cv=none; b=tXi2KGe6cEU7mZskPzBuikPaNuXG2neB3f/G48ZQJVcBTdCdVC+YHNLq0AiBYu6krmXgoD0oz9pflnf1KN1NJUcQnNcxosKk+FBCWQtNo/5wTBvDHf8p8EmVctypRhWvpanMEJ60Y9Ip/HggFYHR7fPpiq/uVLIwJs2yo+/f1Ls=
+	t=1708606914; cv=none; b=Ub+ZXvknpRu85YHlb3CfrHeXnekE06Cx8VUwxe8cQSxxxjMTK3ExtV29wR6bb0lnPHkJJBR4hRcrpfxecoXKQbRi/DIFtjGYCdjksWuuIg/8CMoMdk7AMpC6ABt7F7hvhJkyFWu75wva1Mfue5F7joTemuk9yS4aIn/xCGm2VlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708606830; c=relaxed/simple;
-	bh=E13gKrc+fiQeijV1YdvOne7wvP0pgHDo/wk3dR/ZpGQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=fylUVdq3Z1BT2IMDSuBVgCZnGut092+Vfw7mjunOst3lcoPLcDPJpHoMISynddjUfrRRQrm1f66NE4PHsALL+WhJO/xpPhu5Aa4wybCd3ugmOyV+2QdVIvJ9f9Nl9YHw1TcLB1drrALhNHTBMOvHlZEIULPuwjnfrU/Em0QT9ms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=frX56mCm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3B29EC433C7;
-	Thu, 22 Feb 2024 13:00:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708606830;
-	bh=E13gKrc+fiQeijV1YdvOne7wvP0pgHDo/wk3dR/ZpGQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=frX56mCmywjx9TXq1gxzuGvYfQYvYJPgYpLk8zOATCGqDHI/rtT9eqh8tPzfVhujM
-	 GVUbH0C7mo5Ln+PQmxEEv7H1nQNb3/F+5yXoYcdFABLCDaxXWI4N08BWVFejMgSJqT
-	 FelkXgUD4ki4yPvQaXUrv0wn04kstDHNtTNFbjv5sOakBZuOvoAwK4zmJDo0YN3mhb
-	 IP4cN98g03z8tBRW794n5oAapjk7VhcCoWqhDFbrl4CqFQ6AeMKWj0l116RnRskP9C
-	 Qf6jsEr6PCOcxF+m8US2sHrha+L20CzpfPxcvXaH1FqGbqu9ZIF67LyBOeTwKQarKo
-	 fEGIlqjd2Qeiw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1B012C59A4C;
-	Thu, 22 Feb 2024 13:00:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1708606914; c=relaxed/simple;
+	bh=9zC3a/lUBBoHG92n62uz1igUDeqMpK/0eJHMsRGQvwY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BdruGqQO3a5VzjSO5lp2krfMSfyEDtNmpEp/DXABWxGvW6sJJTAKtinskYyIhln1YFzXDlImtvoJOV/BTnqjDSaAqKm0Nt9HiYD3TMh1wOlpc1I17Sxw+XwJjSY63Pdn47N1ftD99cX9+sI780HrKgSUzjQ/jjJAByJRnRYWvII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=mF8b9PpX; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-512d19e2cb8so2280345e87.0
+        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 05:01:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1708606910; x=1709211710; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=m7Z26rH0nxtWAPBPvE/KxZ0NHjlwRm5O/7QOSN2/Ky0=;
+        b=mF8b9PpXDpthGYHQOPyBJgfTwj/UQtTrU1m0/EVniS7hxHKaKMMd9yw1W2eLqJoA6e
+         lTnhz0ZRyZVpjgUvKZ4N6a7BGC8Nz/vUP70MyR8KRkuceXY+cFe4DreBnws6hU5Jhy3C
+         QISH21uoUuRdR0bmZVQU5ogw9bwI3UtU/oYZvs5JtnT86jKNcnTRZpRF3XswhONGofq9
+         ZXXVZtsRvmFKWzPkZx+1/+a69Pqr2rdxtQxDrqJ5fsH2FBvW9FrDixqMlHEG+BQ1nd/B
+         LR0tLFnCDUESdUD3Tx+Wpy1gdOBwPmNbGd1bZE/XqreNyGAqQgroxBIMzoLmfVlmDiAu
+         AgFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708606910; x=1709211710;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=m7Z26rH0nxtWAPBPvE/KxZ0NHjlwRm5O/7QOSN2/Ky0=;
+        b=ZfH2yL/RF6M9Bv9qONyPLp0xVsDNHh4GmNpnN3xrNu0c97/Ug0pA+wUhx5Ha24inyM
+         uyDZSQ9t3pjMLpmSixFYiDjZBzPV8w0ggRg9UkM6q2dt0Z+FMCaZ33i4LJiFxoZPIeSK
+         as8Z7yw0PrW9G0flu9uTJtiGV52XoZOV0O3T7nr+2xZEe4MdxQC/UwTOxlRn3P1z5tJM
+         3zvAxmZZ5Ej+E2RXnABt2WhCIhO0GNY7begWARi+8S0VwuClAIUjHXAXqCZ2AEOARBGh
+         mvo7RLr90mm9uR86YaADZY8TK2Ico884O2YQqPt/V7r+7I/UgxmAU8jwJMUsvW+b4mR3
+         MF6A==
+X-Forwarded-Encrypted: i=1; AJvYcCVOyAbUF2F1oXfA+vURD6HBNde35QeUBMFlECXhZAesJLZ2HUj4EigP9v+HvPl+GlF4UGrIaW0NY8vGfcc7COekSYJDzKhf
+X-Gm-Message-State: AOJu0Yx9v3LqkwbRof8c+JsPvZPAuFn66XyqS8cxkJw4gsvVfYDrLJx5
+	cnrNNilftBZccC/hH8jEv6SWjYBLcqcoO6brY8o8bKb3F/Q/RCqm1RHHtgMQ6d0=
+X-Google-Smtp-Source: AGHT+IGkf5An0FRhTN8uAcXotjLH9vOh29NQ0tafltetUlELSWRNWwvu9X3GqAFXb4b17ycZtwCaOQ==
+X-Received: by 2002:a05:6512:3a88:b0:512:ba3a:5368 with SMTP id q8-20020a0565123a8800b00512ba3a5368mr9141098lfu.48.1708606910048;
+        Thu, 22 Feb 2024 05:01:50 -0800 (PST)
+Received: from [172.30.204.125] (UNUSED.212-182-62-129.lubman.net.pl. [212.182.62.129])
+        by smtp.gmail.com with ESMTPSA id o6-20020ac24e86000000b0051186931619sm2055814lfr.146.2024.02.22.05.01.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Feb 2024 05:01:49 -0800 (PST)
+Message-ID: <54b8c58a-6288-4ae6-9ed7-aa7b212e63da@linaro.org>
+Date: Thu, 22 Feb 2024 14:01:44 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 00/11] MCTP core protocol updates,
- minor fixes & tests
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170860683010.12924.11166470847067651109.git-patchwork-notify@kernel.org>
-Date: Thu, 22 Feb 2024 13:00:30 +0000
-References: <cover.1708335994.git.jk@codeconstruct.com.au>
-In-Reply-To: <cover.1708335994.git.jk@codeconstruct.com.au>
-To: Jeremy Kerr <jk@codeconstruct.com.au>
-Cc: netdev@vger.kernel.org, matt@codeconstruct.com.au, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- dhowells@redhat.com, aleksander.lobakin@intel.com, liangchen.linux@gmail.com,
- johannes.berg@intel.com, dan.carpenter@linaro.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: stmmac: dwmac-qcom-ethqos: Update link
+ clock rate only for RGMII
+Content-Language: en-US
+To: Sarosh Hasan <quic_sarohasa@quicinc.com>, Vinod Koul <vkoul@kernel.org>,
+ Bhupesh Sharma <bhupesh.sharma@linaro.org>, Andy Gross <agross@kernel.org>,
+ Bjorn Andersson <andersson@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ Prasad Sodagudi <psodagud@quicinc.com>, Andrew Halaney
+ <ahalaney@redhat.com>, Rob Herring <robh@kernel.org>
+Cc: kernel@quicinc.com, Sneh Shah <quic_snehshah@quicinc.com>,
+ Suraj Jaiswal <quic_jsuraj@quicinc.com>
+References: <20240222125517.3356-1-quic_sarohasa@quicinc.com>
+From: Konrad Dybcio <konrad.dybcio@linaro.org>
+In-Reply-To: <20240222125517.3356-1-quic_sarohasa@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
 
-On Mon, 19 Feb 2024 17:51:45 +0800 you wrote:
-> This series implements some procotol improvements for AF_MCTP,
-> particularly for systems with multiple MCTP networks defined. For those,
-> we need to add the network ID to the tag lookups, which then suggests an
-> updated version of the tag allocate / drop ioctl to allow the net ID to
-> be specified there too.
+On 2/22/24 13:55, Sarosh Hasan wrote:
+> Updating link clock rate for different speeds is only needed when
+> using RGMII, as that mode requires changing clock speed when the link
+> speed changes. Let's restrict updating the link clock speed in
+> ethqos_update_link_clk() to just RGMII. Other modes such as SGMII
+> only need to enable the link clock (which is already done in probe).
 > 
-> The ioctl change affects uabi, so might warrant some extra attention.
+> Signed-off-by: Sarosh Hasan <quic_sarohasa@quicinc.com>
+> ---
+>   .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 26 ++++++++++---------
+>   1 file changed, 14 insertions(+), 12 deletions(-)
 > 
-> [...]
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+> index 31631e3f89d0..9cd144fb3005 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+> @@ -169,21 +169,23 @@ static void rgmii_dump(void *priv)
+>   static void
+>   ethqos_update_link_clk(struct qcom_ethqos *ethqos, unsigned int speed)
+>   {
+> -	switch (speed) {
+> -	case SPEED_1000:
+> -		ethqos->link_clk_rate =  RGMII_1000_NOM_CLK_FREQ;
+> -		break;
+> +	if (phy_interface_mode_is_rgmii(ethqos->phy_mode)) {
+> +		switch (speed) {
+> +		case SPEED_1000:
+> +			ethqos->link_clk_rate =  RGMII_1000_NOM_CLK_FREQ;
+> +			break;
+>   
+> -	case SPEED_100:
+> -		ethqos->link_clk_rate =  RGMII_ID_MODE_100_LOW_SVS_CLK_FREQ;
+> -		break;
+> +		case SPEED_100:
+> +			ethqos->link_clk_rate =  RGMII_ID_MODE_100_LOW_SVS_CLK_FREQ;
+> +			break;
+>   
+> -	case SPEED_10:
+> -		ethqos->link_clk_rate =  RGMII_ID_MODE_10_LOW_SVS_CLK_FREQ;
+> -		break;
+> -	}
+> +		case SPEED_10:
+> +			ethqos->link_clk_rate =  RGMII_ID_MODE_10_LOW_SVS_CLK_FREQ;
+> +			break;
+> +		}
+>   
+> -	clk_set_rate(ethqos->link_clk, ethqos->link_clk_rate);
+> +		clk_set_rate(ethqos->link_clk, ethqos->link_clk_rate);
+> +	}
+>   }
 
-Here is the summary with links:
-  - [net-next,v2,01/11] net: mctp: avoid confusion over local/peer dest/source addresses
-    https://git.kernel.org/netdev/net-next/c/ee076b73e576
-  - [net-next,v2,02/11] net: mctp: Add some detail on the key allocation implementation
-    https://git.kernel.org/netdev/net-next/c/aee6479a458e
-  - [net-next,v2,03/11] net: mctp: make key lookups match the ANY address on either local or peer
-    https://git.kernel.org/netdev/net-next/c/fc944ecc4f1a
-  - [net-next,v2,04/11] net: mctp: tests: create test skbs with the correct net and device
-    https://git.kernel.org/netdev/net-next/c/a1f4cf5791e7
-  - [net-next,v2,05/11] net: mctp: separate key correlation across nets
-    https://git.kernel.org/netdev/net-next/c/43e6795574f5
-  - [net-next,v2,06/11] net: mctp: provide a more specific tag allocation ioctl
-    https://git.kernel.org/netdev/net-next/c/c16d2380e8fd
-  - [net-next,v2,07/11] net: mctp: tests: Add netid argument to __mctp_route_test_init
-    https://git.kernel.org/netdev/net-next/c/61b50531dc66
-  - [net-next,v2,08/11] net: mctp: tests: Add MCTP net isolation tests
-    https://git.kernel.org/netdev/net-next/c/9acdc089c088
-  - [net-next,v2,09/11] net: mctp: copy skb ext data when fragmenting
-    https://git.kernel.org/netdev/net-next/c/1394c1dec1c6
-  - [net-next,v2,10/11] net: mctp: tests: Test that outgoing skbs have flow data populated
-    https://git.kernel.org/netdev/net-next/c/109a5331143d
-  - [net-next,v2,11/11] net: mctp: tests: Add a test for proper tag creation on local output
-    https://git.kernel.org/netdev/net-next/c/d192eaf57f00
+if (!phy_interface_mode_is_rgmii(ethqos->phy_mode))
+	return 0;
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+[leave the rest unchanged]
 
+?
 
+Konrad
 
