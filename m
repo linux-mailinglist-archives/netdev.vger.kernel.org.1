@@ -1,246 +1,201 @@
-Return-Path: <netdev+bounces-73951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFE5185F6BE
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 12:27:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C601185F6D9
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 12:30:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F5631C22FCE
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 11:27:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FB7F1F224D7
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 11:30:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2222341212;
-	Thu, 22 Feb 2024 11:27:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28C1B3770E;
+	Thu, 22 Feb 2024 11:30:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zaq/4x0y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rh0uXjYg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D50FE41760
-	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 11:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7643FE4C
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 11:30:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708601234; cv=none; b=CAjG+4XaUjyDuKQu4AnFDxNlk4koAvw037RTbEo3FgkcrsCnNhXJ99izu4zi3OPTBwMACxtPjm7hx+oxES+yeq5nyerfcuBWuRCRmz2IIWU0ovFZhxkYLT5hr23GWJqSjFjBnIDP6UQzUcyNYkaRQ9MZQ5UboisQ+77IClr6O+Y=
+	t=1708601412; cv=none; b=vEfEqNCrmTqC14LJZJrTYnKKAicDi4Gb/Jx1xbU3aBstIIvb2+TkzcvPGU5QPL2DYIGtNRs6ff4W0rU546A0l5vhhvBm5/SEnfR8mHnTyeGll3D7VvAYME8K37vW6DZslAog1fO3DQB0XlJ2S3WIBSHoC8m+sL65+Z8oBPnompQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708601234; c=relaxed/simple;
-	bh=+rgLuw5oSwBFP4Ow0ptZ3qnTpUGqMbW5KK1t7j5QRoQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Pi8UgXCjdsfDdpWjCWGC5i1F7AgNWKgFfRyljGc+5/lwHOKk7z0FsA9wOuew+xEfRfgVPA/1+aY0f9oghtkEJPbkJwICwTqFBsFjwkLR+OGfVaKYB7IaGHSemWXlA+8Lql0N9JINTyrGuqgAlwSny7rq/ocCRgDrQhVav4PEiTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=zaq/4x0y; arc=none smtp.client-ip=209.85.219.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-dcbc6a6808fso8176695276.2
-        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 03:27:11 -0800 (PST)
+	s=arc-20240116; t=1708601412; c=relaxed/simple;
+	bh=v0rqxPxptnLQv5a/Jd0WX74CKbZ3Pi0Y50lCaDuymiE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PkMsmPRa0ivA1jU9DeIanDQiTvUyWhSA/MQ/URNwpAhuiWjBCKIhoT2aey4CRiTuHN+ompAqoe97rWjGAfJIRsrNbrwVPqu7yuaNS9azxm9La3BJZIhVxpviFZvYZXfYBmvJ59uOMlwzFHsN2nCAUZYfsmvX3Bt+ZsWW/J8Pf3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rh0uXjYg; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1dbb47852cdso15341715ad.1
+        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 03:30:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708601231; x=1709206031; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=R4xgDZb1P7EFUwoTHIn2hJ0tMWxsP/j125TvtkH/GhA=;
-        b=zaq/4x0ykWlKc5A8P5W1u0NUMpBUrOqgSSDgort8rcxCKF8F6BJjpUU9NipTLJJ/Yw
-         sN4+bQmEE9Jd2T1dpQ79bw8yCZK9uWufoIVtgOfneHwsXfZI0rZKB6uyevtxL3enTRiP
-         cZXan2Yb9KiNM/qu4zgWVlXssBsvuiYg/jbwy4wZh/iHayf7BPGAfBRcBoR7k3MHfuE0
-         Nh6gyzaff2GF8TqaaCgQ+yPoyQSpBeb3ynA+1wgSgagnxjT0LSy3ZvPo9F5kN4I8o2pa
-         IIwEuPa3ufDK+FeMnI9RSCZdpZy/iczYHYAbiZTeScFHqrtNwq8Te+yYBHwGAl/705aY
-         Dylg==
+        d=gmail.com; s=20230601; t=1708601410; x=1709206210; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YevT1qrGHzVuvuX4mpM5AnAm8C2dXeB7Wku9ydzEWCk=;
+        b=Rh0uXjYgE2gD/0pul6CHsZ3qxJEvaTqSBkwccj5/4puqQnS3X6Je7ZE+2S+iIU/tcK
+         jM3SkAfLHR9gnfdsLnTZP6EyDuRWECrGNDYQf06oZEIih4mvQRXjILfKdwUwA44N82n2
+         hVW3xpf0kI5vHk/oo0DNpOgP0BoSNVt57XxPyckVbTsuFNA+FAJ8X23tb8H7YgacMUKl
+         1qaLYBpHbpyFwm5rfJVHyND25HLZBItwIwPlwNtZLpop5VHFYGYJEvdhv0FBJN3/MxzC
+         dibozcse62T/KxVPKyR5rioojRoWdGByLtL8PF7lskVnYRh3nsPZVGYA1ZsdMRWVkk26
+         LCEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708601231; x=1709206031;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=R4xgDZb1P7EFUwoTHIn2hJ0tMWxsP/j125TvtkH/GhA=;
-        b=r9v9xeYxMGxzqW7OhA309WlvFIWZZRkjUHmwMQ+v1V2++YNZT+B7fpqxIEhEutxsKM
-         RCVoOxfnMgXo9bt0c93s0UEdVJf0d0keAHCHgfDW5FtKAQXAhpIDuDGpPHzu7MIg3YC7
-         6ILng925KezASuf5drP1oaPuf+hXFXt4tHIKMr98HC0NdveCFqh0MVVksI8Ao3PqUCv8
-         1GLkYFch7JTvip7Nvc1nizWtEfEFK3K3qlmeWNsTHGKtp+Qf3vfEvEY/mrX7rNGRwKCF
-         q8lzHAjh2YQfZZhoJwd/v5IVLQYNbvEd1OqmQ12i+XkuvKrc69wqvpnGnzTDsLHuWq2M
-         bAGg==
-X-Forwarded-Encrypted: i=1; AJvYcCVcEgBx8bqxXZeNmE6yvY7opl7yyQXRc25SXI/EPUPa/lcx15jNtjuXTrrlggyvwPEUaLZ0DLUfnGRvMsCtjYLvFcQaXgIX
-X-Gm-Message-State: AOJu0YzQMAIW3FCSCeYN/lmd+tJbtWVI2pJ3FkE4+h3GIAbka3pBxUFG
-	WOKtQXJLS9Rse64D/5ejDbssvgvi+/Id3TvZJLEONVAX4iggqLGOI8GLQcTqSi2lf5aVcH9AQqj
-	vqFQRFDdGRoDipKXGislf7xaxfma0iMA6jsddbw==
-X-Google-Smtp-Source: AGHT+IGAH9HKM2JNlJGtqlBg9xAVeOcNDcSSfQGB4O1issqL+64giDGxV3EK2ifXD1JwfWN2ZGYk5wlqfAYXwHW/w3g=
-X-Received: by 2002:a25:1184:0:b0:dc6:aed5:718a with SMTP id
- 126-20020a251184000000b00dc6aed5718amr1758467ybr.26.1708601230793; Thu, 22
- Feb 2024 03:27:10 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708601410; x=1709206210;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YevT1qrGHzVuvuX4mpM5AnAm8C2dXeB7Wku9ydzEWCk=;
+        b=c4EhLaVxV3mppFpHRDjIBn9W72wgpamG1J4+ftPpBL+kOmZOnzDm9nxmFdXMDD2rSH
+         syjVmLrryEd35l34vf+CPOHr8AbZ9wKTBVX1f5+63q2i2QpfqNKfi1oW/eHFa7+W1gp+
+         d0oeg+3Oe5Rdh/cB4cTpUmUIjHTmZCqnJCKxycCRFCjTQ8rs/05gX1flxcKmr/SznDVH
+         8vtUMA/qx3N/5FzAnjQTotChVohjIb6TXfz5UOxBET4nunGwD7Fq0q8+8KaiTM50sxZ8
+         FuruoCEFxi5fT5j/jDma1eQD52wzNsjVqv1TAy+7u1HojK84WxmuqeGEpC6FbGbpNvll
+         CmbQ==
+X-Gm-Message-State: AOJu0YwE2IpifRuk+dbzMaWQfcldLhWwA7PlHfrt5fYAog4U9cXGnKDm
+	icaTd441rttzPZ+cPCMARHWHXBrfxUZjG7TgRuecZRb/+lpKXMtj
+X-Google-Smtp-Source: AGHT+IFBZVrHYU5JX9tCwglegvmYSII0tFZsyL9blbQcZ/BA37QtDNjG2djhlz7+G9SmrPjoq9uQMA==
+X-Received: by 2002:a17:902:6e08:b0:1dc:aea:10f2 with SMTP id u8-20020a1709026e0800b001dc0aea10f2mr9219064plk.10.1708601409819;
+        Thu, 22 Feb 2024 03:30:09 -0800 (PST)
+Received: from KERNELXING-MB0.tencent.com ([43.132.141.23])
+        by smtp.gmail.com with ESMTPSA id b3-20020a170902a9c300b001dc0955c635sm5978637plr.244.2024.02.22.03.30.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Feb 2024 03:30:09 -0800 (PST)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	kuniyu@amazon.com
+Cc: netdev@vger.kernel.org,
+	kerneljasonxing@gmail.com,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next v8 00/10] introduce drop reasons for tcp receive path
+Date: Thu, 22 Feb 2024 19:29:53 +0800
+Message-Id: <20240222113003.67558-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240216203215.40870-1-brgl@bgdev.pl> <CAA8EJppt4-L1RyDeG=1SbbzkTDhLkGcmAbZQeY0S6wGnBbFbvw@mail.gmail.com>
- <e4cddd9f-9d76-43b7-9091-413f923d27f2@linaro.org> <CAA8EJpp6+2w65o2Bfcr44tE_ircMoON6hvGgyWfvFuh3HamoSQ@mail.gmail.com>
- <4d2a6f16-bb48-4d4e-b8fd-7e4b14563ffa@linaro.org> <CAA8EJpq=iyOfYzNATRbpqfBaYSdJV1Ao5t2ewLK+wY+vEaFYAQ@mail.gmail.com>
- <CAMRc=Mfnpusf+mb-CB5S8_p7QwVW6owekC5KcQF0qrR=iOQ=oA@mail.gmail.com>
- <CAA8EJppY7VTrDz3-FMZh2qHoU+JSGUjCVEi5x=OZgNVxQLm3eQ@mail.gmail.com>
- <b9a31374-8ea9-407e-9ec3-008a95e2b18b@linaro.org> <CAA8EJppWY8c-pF75WaMadWtEuaAyCc5A1VLEq=JmB2Ngzk-zyw@mail.gmail.com>
- <CAMRc=Md6SoXukoGb4bW-CSYgjpO4RL+0Uu3tYrZzgSgVtFH6Sw@mail.gmail.com>
-In-Reply-To: <CAMRc=Md6SoXukoGb4bW-CSYgjpO4RL+0Uu3tYrZzgSgVtFH6Sw@mail.gmail.com>
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Date: Thu, 22 Feb 2024 13:26:59 +0200
-Message-ID: <CAA8EJprUM6=ZqTwWLB8rW8WRDqwncafa-szSsTvPQCOOSXUn_w@mail.gmail.com>
-Subject: Re: [PATCH v5 00/18] power: sequencing: implement the subsystem and
- add first users
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: neil.armstrong@linaro.org, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
-	Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Saravana Kannan <saravanak@google.com>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>, 
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, 22 Feb 2024 at 13:00, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
->
-> On Mon, Feb 19, 2024 at 11:21=E2=80=AFPM Dmitry Baryshkov
-> <dmitry.baryshkov@linaro.org> wrote:
-> >
-> > On Mon, 19 Feb 2024 at 19:18, <neil.armstrong@linaro.org> wrote:
-> > >
-> > > On 19/02/2024 13:33, Dmitry Baryshkov wrote:
-> > > > On Mon, 19 Feb 2024 at 14:23, Bartosz Golaszewski <brgl@bgdev.pl> w=
-rote:
-> > > >>
-> > > >> On Mon, Feb 19, 2024 at 11:26=E2=80=AFAM Dmitry Baryshkov
-> > > >> <dmitry.baryshkov@linaro.org> wrote:
-> > > >>>
-> > > >>
-> > > >> [snip]
-> > > >>
-> > > >>>>>>>>
-> > > >>>>>>>> For WCN7850 we hide the existence of the PMU as modeling it =
-is simply not
-> > > >>>>>>>> necessary. The BT and WLAN devices on the device-tree are re=
-presented as
-> > > >>>>>>>> consuming the inputs (relevant to the functionality of each)=
- of the PMU
-> > > >>>>>>>> directly.
-> > > >>>>>>>
-> > > >>>>>>> We are describing the hardware. From the hardware point of vi=
-ew, there
-> > > >>>>>>> is a PMU. I think at some point we would really like to descr=
-ibe all
-> > > >>>>>>> Qualcomm/Atheros WiFI+BT units using this PMU approach, inclu=
-ding the
-> > > >>>>>>> older ath10k units present on RB3 (WCN3990) and db820c (QCA61=
-74).
-> > > >>>>>>
-> > > >>>>>> While I agree with older WiFi+BT units, I don't think it's nee=
-ded for
-> > > >>>>>> WCN7850 since BT+WiFi are now designed to be fully independent=
- and PMU is
-> > > >>>>>> transparent.
-> > > >>>>>
-> > > >>>>> I don't see any significant difference between WCN6750/WCN6855 =
-and
-> > > >>>>> WCN7850 from the PMU / power up point of view. Could you please=
- point
-> > > >>>>> me to the difference?
-> > > >>>>>
-> > > >>>>
-> > > >>>> The WCN7850 datasheet clearly states there's not contraint on th=
-e WLAN_EN
-> > > >>>> and BT_EN ordering and the only requirement is to have all input=
- regulators
-> > > >>>> up before pulling up WLAN_EN and/or BT_EN.
-> > > >>>>
-> > > >>>> This makes the PMU transparent and BT and WLAN can be described =
-as independent.
-> > > >>>
-> > > >>>  From the hardware perspective, there is a PMU. It has several LD=
-Os. So
-> > > >>> the device tree should have the same style as the previous
-> > > >>> generations.
-> > > >>>
-> > > >>
-> > > >> My thinking was this: yes, there is a PMU but describing it has no
-> > > >> benefit (unlike QCA6x90). If we do describe, then we'll end up hav=
-ing
-> > > >> to use pwrseq here despite it not being needed because now we won'=
-t be
-> > > >> able to just get regulators from WLAN/BT drivers directly.
-> > > >>
-> > > >> So I also vote for keeping it this way. Let's go into the package
-> > > >> detail only if it's required.
-> > > >
-> > > > The WiFi / BT parts are not powered up by the board regulators. The=
-y
-> > > > are powered up by the PSU. So we are not describing it in the accur=
-ate
-> > > > way.
-> > >
-> > > I disagree, the WCN7850 can also be used as a discrete PCIe M.2 card,=
- and in
-> > > this situation the PCIe part is powered with the M.2 slot and the BT =
-side
-> > > is powered separately as we currently do it now.
-> >
-> > QCA6390 can also be used as a discrete M.2 card.
-> >
-> > > So yes there's a PMU, but it's not an always visible hardware part, f=
-rom the
-> > > SoC PoV, only the separate PCIe and BT subsystems are visible/control=
-lable/powerable.
-> >
-> > From the hardware point:
-> > - There is a PMU
-> > - The PMU is connected to the board supplies
-> > - Both WiFi and BT parts are connected to the PMU
-> > - The BT_EN / WLAN_EN pins are not connected to the PMU
-> >
-> > So, not representing the PMU in the device tree is a simplification.
-> >
->
-> What about the existing WLAN and BT users of similar packages? We
-> would have to deprecate a lot of existing bindings. I don't think it's
-> worth it.
+From: Jason Xing <kernelxing@tencent.com>
 
-We have bindings that are not reflecting the hardware. So yes, we
-should gradually update them once the powerseq is merged.
+When I was debugging the reason about why the skb should be dropped in
+syn cookie mode, I found out that this NOT_SPECIFIED reason is too
+general. Thus I decided to refine it.
 
-> The WCN7850 is already described in bindings as consuming what is PMUs
-> inputs and not its outputs.
+v8
+Link: https://lore.kernel.org/netdev/20240221025732.68157-1-kerneljasonxing@gmail.com/
+1. refine part of codes in patch [03/10] and patch [10/10] (Eric)
+2. squash patch [11/11] in the last version into patch [10/11] (Eric)
+3. add reviewed-by tags (Eric)
 
-So do WCN6855 and QCA6391 BlueTooth parts.
+v7
+Link: https://lore.kernel.org/all/20240219032838.91723-1-kerneljasonxing@gmail.com/
+1. fix some misspelled problem (Kuniyuki)
+2. remove redundant codes in tcp_v6_do_rcv() (Kuniyuki)
+3. add reviewed-by tag in patch [02/11] (Kuniyuki)
 
->
-> Bart
->
-> > >
-> > > Neil
-> > >
-> > > >
-> > > > Moreover, I think we definitely want to move BT driver to use only =
-the
-> > > > pwrseq power up method. Doing it in the other way results in the co=
-de
-> > > > duplication and possible issues because of the regulator / pwrseq
-> > > > taking different code paths.
-> >
-> > --
-> > With best wishes
-> > Dmitry
+v6
+Link: https://lore.kernel.org/all/c987d2c79e4a4655166eb8eafef473384edb37fb.camel@redhat.com/
+Link: https://lore.kernel.org/all/CAL+tcoAgSjwsmFnDh_Gs9ZgMi-y5awtVx+4VhJPNRADjo7LLSA@mail.gmail.com/
+1. Take one case into consideration in tcp_v6_do_rcv(), behave like old
+days, or else it will trigger errors (Paolo).
+2. Extend NO_SOCKET reason to consider two more reasons for request
+socket and child socket.
+
+v5:
+Link: https://lore.kernel.org/netdev/20240213134205.8705-1-kerneljasonxing@gmail.com/
+Link: https://lore.kernel.org/netdev/20240213140508.10878-1-kerneljasonxing@gmail.com/
+1. Use SKB_DROP_REASON_IP_OUTNOROUTES instead of introducing a new
+   one (Eric, David)
+2. Reuse SKB_DROP_REASON_NOMEM to handle failure of request socket
+   allocation (Eric)
+3. Reuse NO_SOCKET instead of introducing COOKIE_NOCHILD
+4. avoid duplication of these opt_skb tests/actions (Eric)
+5. Use new name (TCP_ABORT_ON_DATA) for readability (David)
+6. Reuse IP_OUTNOROUTES instead of INVALID_DST (Eric)
 
 
+---
+HISTORY
+This series is combined with 2 series sent before suggested by Jakub. So
+I'm going to separately write changelogs for each of them.
 
---=20
-With best wishes
-Dmitry
+PATCH 1/11 - 5/11
+preivious Link: https://lore.kernel.org/netdev/20240213134205.8705-1-kerneljasonxing@gmail.com/
+Summary
+1. introduce all the dropreasons we need, [1/11] patch.
+2. use new dropreasons in ipv4 cookie check, [2/11],[3/11] patch.
+3. use new dropreasons ipv6 cookie check, [4/11],[5/11] patch.
+
+v4:
+Link: https://lore.kernel.org/netdev/20240212172302.3f95e454@kernel.org/
+1. Fix misspelled name in Kdoc as suggested by Jakub.
+
+v3:
+Link: https://lore.kernel.org/all/CANn89iK40SoyJ8fS2U5kp3pDruo=zfQNPL-ppOF+LYaS9z-MVA@mail.gmail.com/
+1. Split that patch into some smaller ones as suggested by Eric.
+
+v2:
+Link: https://lore.kernel.org/all/20240204104601.55760-1-kerneljasonxing@gmail.com/
+1. change the title of 2/2 patch.
+2. fix some warnings checkpatch tool showed before.
+3. use return value instead of adding more parameters suggested by Eric.
+
+
+PATCH 6/11 - 11/11
+previous Link: https://lore.kernel.org/netdev/20240213140508.10878-1-kerneljasonxing@gmail.com/
+v4:
+Link: https://lore.kernel.org/netdev/CANn89iJar+H3XkQ8HpsirH7b-_sbFe9NBUdAAO3pNJK3CKr_bg@mail.gmail.com/
+Link: https://lore.kernel.org/netdev/20240213131205.4309-1-kerneljasonxing@gmail.com/
+Already got rid of @acceptable in tcp_rcv_state_process(), so I need to
+remove *TCP_CONNREQNOTACCEPTABLE related codes which I wrote in the v3
+series.
+
+v3:
+Link: https://lore.kernel.org/all/CANn89iK40SoyJ8fS2U5kp3pDruo=zfQNPL-ppOF+LYaS9z-MVA@mail.gmail.com/
+1. Split that patch into some smaller ones as suggested by Eric.
+
+v2:
+Link: https://lore.kernel.org/all/20240204104601.55760-1-kerneljasonxing@gmail.com/
+1. change the title of 2/2 patch.
+2. fix some warnings checkpatch tool showed before.
+3. use return value instead of adding more parameters suggested by Eric.
+
+Jason Xing (10):
+  tcp: add a dropreason definitions and prepare for cookie check
+  tcp: directly drop skb in cookie check for ipv4
+  tcp: use drop reasons in cookie check for ipv4
+  tcp: directly drop skb in cookie check for ipv6
+  tcp: use drop reasons in cookie check for ipv6
+  tcp: introduce dropreasons in receive path
+  tcp: add more specific possible drop reasons in
+    tcp_rcv_synsent_state_process()
+  tcp: add dropreasons in tcp_rcv_state_process()
+  tcp: make the dropreason really work when calling
+    tcp_rcv_state_process()
+  tcp: make dropreason in tcp_child_process() work
+
+ include/net/dropreason-core.h | 26 ++++++++++++++++++++++++--
+ include/net/tcp.h             |  4 ++--
+ net/ipv4/syncookies.c         | 21 ++++++++++++++++-----
+ net/ipv4/tcp_input.c          | 25 +++++++++++++++++--------
+ net/ipv4/tcp_ipv4.c           | 17 ++++++++++-------
+ net/ipv4/tcp_minisocks.c      |  9 +++++----
+ net/ipv6/syncookies.c         | 18 +++++++++++++++---
+ net/ipv6/tcp_ipv6.c           | 22 ++++++++++++----------
+ 8 files changed, 101 insertions(+), 41 deletions(-)
+
+-- 
+2.37.3
+
 
