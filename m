@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-74205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F33CB860737
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 00:57:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6BD1860738
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 00:57:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 222EE1C21851
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 23:57:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C72241C21AF9
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 23:57:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 521C3142638;
-	Thu, 22 Feb 2024 23:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AD47140E59;
+	Thu, 22 Feb 2024 23:56:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qKUJhrf1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PDdV5cD8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E43C14262E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC86E14264E
 	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 23:56:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708646192; cv=none; b=Rnz9AYpkJrxhuFa3YavAzDHC5duN7E5oUAOBeEimWa3ZR2D/ZNgP6KG3KpDpTvDFmolWHbE6jKzxA8QBeat3FnPyF95Umu7QTxNzfnXcTjOn/yXkMbLtZ7WBpXPxh9CIv8E6TlkZpg9u0/BcJCbNQn5Uu8kzBoXnt5oRNwYjzVY=
+	t=1708646192; cv=none; b=hdCRhZT34VHS+UC8CSf6dmLOOBIDWsUBa8Iv4h1LpeRQdNB3+b8N7D9Zd4V+PjMYeweoYWdoS33FEGunKtwFgwmIwtkEbaUgADouuNFt+NAEou1vXuvklB489xyIw649qJWs++IL/bvaSKXMd30p43xISStUCz4nNvlwBk/5Q38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708646192; c=relaxed/simple;
-	bh=+TmMY1ax6x9AFyU+xwoSbmZiJKYTWFKqzk0BNFocV8E=;
+	bh=l9UhKq9VW/naxE9ZKPmH+nA58qw8r1Hmrhvrz1HMZFY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ova4Wm9vxAaFa/KK0QDXGXKbd0ZuqsspZ11Odwbr8CD8fh6fLq8tOqHw8LmGaJNzlu8gJd4Jn/mc0hiuLV7Mby2w0lqvdl6cJ7fviePngA9FB7jgRWuau9qakSkLS+VNzxF/COsf9lxf9HnRVy/BZnoK+0qYR/SAs7viO5Q+95M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qKUJhrf1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A48FCC433C7;
-	Thu, 22 Feb 2024 23:56:31 +0000 (UTC)
+	 MIME-Version; b=XL4mDUIipAP6ZWMFikTvDfcpkginWzYX3wd6znaog26w4FEbVBXMUokx0snSoOUz1zenXb9GXOy0yGbppBCnVUbjH6RCn4lC1Kdny0j69CYCGqr2eNI/S8QIvR02OMj7EKKgV/KSx6b8CaPR1VLXWa7H0FQipIBqJp7zpzueH2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PDdV5cD8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BE87C43390;
+	Thu, 22 Feb 2024 23:56:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1708646192;
-	bh=+TmMY1ax6x9AFyU+xwoSbmZiJKYTWFKqzk0BNFocV8E=;
+	bh=l9UhKq9VW/naxE9ZKPmH+nA58qw8r1Hmrhvrz1HMZFY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qKUJhrf1JJh/LHQT49RKuXQfpy/a5AavkWrL+7iOTSyDGDiXpKgKeUmOdai2YMe1V
-	 y6pivIaN6UoacsJgJPPdPcrVH08ovia7u/guHhH/lopRmPmvEZKsbO3juAGSpNTpNM
-	 xaum9cCCoOgGs2yfMYniTOgPzV3T8k/3IbDmK4y4tK1+CeG/RhxEM1dPBqZafqOs0l
-	 NfDUsWx1y38qUOCdQowciGdFcWMeFLiNE4Ijt3I3jVK48AO1jjm5iozshJ2wUU7X6W
-	 I9kDfwXB0WpdnPE+rsnS6vpyeCbqG11U2OzNp/WAIc3u04lIa9PissMZxbyCEvb30h
-	 pE9AsQLkbLv5A==
+	b=PDdV5cD8T/qtSZykF/n/t6R8G2EvHkvKQtKA5r2If+SdSeCjzNc/aDmbs1f0rwS0U
+	 j8aCODsCWQG9GdzXgAQAEehN1WHznAOQjCnIVhaOAZGj1GOKTkuhO/4F81bfwcQ6OT
+	 G5o5HunoC5lF6T2R9zK8pPMMZfdx/bInTW7N4C17Jkb3MhfPh2LZbHmt2wGDOUDT1w
+	 HImk8JyrupabBGq5Fk9dPswbsY3Rjr6MOeOqrvqNG4QWk37YyIw7psBsmObYDLlM8a
+	 Fu1RTl5PtbzNIilksaznpy/PJhscsBo+8GJBGrsjHxx1kUd76RiJXlb3EouJn69Dwb
+	 iPPhcXlsQOj8g==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -51,9 +51,9 @@ Cc: netdev@vger.kernel.org,
 	nicolas.dichtel@6wind.com,
 	donald.hunter@gmail.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 12/15] tools: ynl: switch away from MNL_CB_*
-Date: Thu, 22 Feb 2024 15:56:11 -0800
-Message-ID: <20240222235614.180876-13-kuba@kernel.org>
+Subject: [PATCH net-next 13/15] tools: ynl: stop using mnl socket helpers
+Date: Thu, 22 Feb 2024 15:56:12 -0800
+Message-ID: <20240222235614.180876-14-kuba@kernel.org>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20240222235614.180876-1-kuba@kernel.org>
 References: <20240222235614.180876-1-kuba@kernel.org>
@@ -65,310 +65,210 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Create a local version of the MNL_CB_* parser control values.
+Most libmnl socket helpers can be replaced by direct calls to
+the underlying libc API. We need portid, the netlink manpage
+suggests we bind() address of zero.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- tools/net/ynl/lib/ynl-priv.h |  6 ++++
- tools/net/ynl/lib/ynl.c      | 54 ++++++++++++++++++------------------
- tools/net/ynl/ynl-gen-c.py   | 14 +++++-----
- 3 files changed, 40 insertions(+), 34 deletions(-)
+ tools/net/ynl/lib/ynl-priv.h |  2 ++
+ tools/net/ynl/lib/ynl.c      | 60 +++++++++++++++++++++++-------------
+ tools/net/ynl/lib/ynl.h      |  2 +-
+ 3 files changed, 42 insertions(+), 22 deletions(-)
 
 diff --git a/tools/net/ynl/lib/ynl-priv.h b/tools/net/ynl/lib/ynl-priv.h
-index 36523f3115c0..658768243d2f 100644
+index 658768243d2f..37720e505a11 100644
 --- a/tools/net/ynl/lib/ynl-priv.h
 +++ b/tools/net/ynl/lib/ynl-priv.h
-@@ -29,6 +29,12 @@ enum ynl_policy_type {
- 	YNL_PT_BITFIELD32,
+@@ -35,6 +35,8 @@ enum ynl_parse_result {
+ 	YNL_PARSE_CB_OK = 1,
  };
  
-+enum ynl_parse_result {
-+	YNL_PARSE_CB_ERROR = -1,
-+	YNL_PARSE_CB_STOP = 0,
-+	YNL_PARSE_CB_OK = 1,
-+};
++#define YNL_SOCKET_BUFFER_SIZE		(1 << 17)
 +
  #define YNL_ARRAY_SIZE(array)	(sizeof(array) ?			\
  				 sizeof(array) / sizeof(array[0]) : 0)
  
 diff --git a/tools/net/ynl/lib/ynl.c b/tools/net/ynl/lib/ynl.c
-index 5548cdc775e5..cc0d9701b145 100644
+index cc0d9701b145..febb7581062d 100644
 --- a/tools/net/ynl/lib/ynl.c
 +++ b/tools/net/ynl/lib/ynl.c
-@@ -147,7 +147,7 @@ ynl_ext_ack_check(struct ynl_sock *ys, const struct nlmsghdr *nlh,
+@@ -3,10 +3,12 @@
+ #include <poll.h>
+ #include <string.h>
+ #include <stdlib.h>
++#include <stdio.h>
++#include <unistd.h>
+ #include <linux/types.h>
+-
+ #include <libmnl/libmnl.h>
+ #include <linux/genetlink.h>
++#include <sys/socket.h>
  
- 	if (!(nlh->nlmsg_flags & NLM_F_ACK_TLVS)) {
- 		yerr_msg(ys, "%s", strerror(ys->err.code));
--		return MNL_CB_OK;
-+		return YNL_PARSE_CB_OK;
- 	}
+ #include "ynl.h"
  
- 	ynl_attr_for_each(attr, nlh, hlen) {
-@@ -166,12 +166,12 @@ ynl_ext_ack_check(struct ynl_sock *ys, const struct nlmsghdr *nlh,
- 		case NLMSGERR_ATTR_MISS_TYPE:
- 		case NLMSGERR_ATTR_MISS_NEST:
- 			if (len != sizeof(__u32))
--				return MNL_CB_ERROR;
-+				return YNL_PARSE_CB_ERROR;
- 			break;
- 		case NLMSGERR_ATTR_MSG:
- 			str = ynl_attr_data(attr);
- 			if (str[len - 1])
--				return MNL_CB_ERROR;
-+				return YNL_PARSE_CB_ERROR;
- 			break;
- 		default:
- 			break;
-@@ -252,7 +252,7 @@ ynl_ext_ack_check(struct ynl_sock *ys, const struct nlmsghdr *nlh,
- 	else
- 		yerr_msg(ys, "%s", strerror(ys->err.code));
+@@ -463,7 +465,7 @@ static int ynl_sock_read_msgs(struct ynl_parse_arg *yarg, ynl_parse_cb_t cb)
+ 	ssize_t len, rem;
+ 	int ret;
  
--	return MNL_CB_OK;
-+	return YNL_PARSE_CB_OK;
- }
- 
- static int
-@@ -272,7 +272,7 @@ ynl_cb_error(const struct nlmsghdr *nlh, struct ynl_parse_arg *yarg)
- 
- 	ynl_ext_ack_check(yarg->ys, nlh, hlen);
- 
--	return code ? MNL_CB_ERROR : MNL_CB_STOP;
-+	return code ? YNL_PARSE_CB_ERROR : YNL_PARSE_CB_STOP;
- }
- 
- static int ynl_cb_done(const struct nlmsghdr *nlh, struct ynl_parse_arg *yarg)
-@@ -286,9 +286,9 @@ static int ynl_cb_done(const struct nlmsghdr *nlh, struct ynl_parse_arg *yarg)
- 
- 		ynl_ext_ack_check(yarg->ys, nlh, sizeof(int));
- 
--		return MNL_CB_ERROR;
-+		return YNL_PARSE_CB_ERROR;
- 	}
--	return MNL_CB_STOP;
-+	return YNL_PARSE_CB_STOP;
- }
- 
- /* Attribute validation */
-@@ -454,7 +454,7 @@ static int ynl_cb_null(const struct nlmsghdr *nlh, struct ynl_parse_arg *yarg)
- 	yerr(yarg->ys, YNL_ERROR_UNEXPECT_MSG,
- 	     "Received a message when none were expected");
- 
--	return MNL_CB_ERROR;
-+	return YNL_PARSE_CB_ERROR;
- }
- 
- static int ynl_sock_read_msgs(struct ynl_parse_arg *yarg, ynl_parse_cb_t cb)
-@@ -467,7 +467,7 @@ static int ynl_sock_read_msgs(struct ynl_parse_arg *yarg, ynl_parse_cb_t cb)
+-	len = mnl_socket_recvfrom(ys->sock, ys->rx_buf, MNL_SOCKET_BUFFER_SIZE);
++	len = recv(ys->socket, ys->rx_buf, YNL_SOCKET_BUFFER_SIZE, 0);
  	if (len < 0)
  		return len;
  
--	ret = MNL_CB_STOP;
-+	ret = YNL_PARSE_CB_STOP;
- 	for (rem = len; rem > 0;) {
- 		const struct nlmsghdr *nlh;
+@@ -599,7 +601,7 @@ static int ynl_sock_read_family(struct ynl_sock *ys, const char *family_name)
+ 	nlh = ynl_gemsg_start_req(ys, GENL_ID_CTRL, CTRL_CMD_GETFAMILY, 1);
+ 	ynl_attr_put_strz(nlh, CTRL_ATTR_FAMILY_NAME, family_name);
  
-@@ -475,24 +475,24 @@ static int ynl_sock_read_msgs(struct ynl_parse_arg *yarg, ynl_parse_cb_t cb)
- 		if (!NLMSG_OK(nlh, rem)) {
- 			yerr(yarg->ys, YNL_ERROR_INV_RESP,
- 			     "Invalid message or trailing data in the response.");
--			return MNL_CB_ERROR;
-+			return YNL_PARSE_CB_ERROR;
- 		}
- 
- 		if (nlh->nlmsg_flags & NLM_F_DUMP_INTR) {
- 			/* TODO: handle this better */
- 			yerr(yarg->ys, YNL_ERROR_DUMP_INTER,
- 			     "Dump interrupted / inconsistent, please retry.");
--			return MNL_CB_ERROR;
-+			return YNL_PARSE_CB_ERROR;
- 		}
- 
- 		switch (nlh->nlmsg_type) {
- 		case 0:
- 			yerr(yarg->ys, YNL_ERROR_INV_RESP,
- 			     "Invalid message type in the response.");
--			return MNL_CB_ERROR;
-+			return YNL_PARSE_CB_ERROR;
- 		case NLMSG_NOOP:
- 		case NLMSG_OVERRUN ... NLMSG_MIN_TYPE - 1:
--			ret = MNL_CB_OK;
-+			ret = YNL_PARSE_CB_OK;
- 			break;
- 		case NLMSG_ERROR:
- 			ret = ynl_cb_error(nlh, yarg);
-@@ -540,7 +540,7 @@ ynl_get_family_info_mcast(struct ynl_sock *ys, const struct nlattr *mcasts)
- 	ys->mcast_groups = calloc(ys->n_mcast_groups,
- 				  sizeof(*ys->mcast_groups));
- 	if (!ys->mcast_groups)
--		return MNL_CB_ERROR;
-+		return YNL_PARSE_CB_ERROR;
- 
- 	i = 0;
- 	ynl_attr_for_each_nested(entry, mcasts) {
-@@ -569,14 +569,14 @@ ynl_get_family_info_cb(const struct nlmsghdr *nlh, struct ynl_parse_arg *yarg)
- 	ynl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
- 		if (ynl_attr_type(attr) == CTRL_ATTR_MCAST_GROUPS)
- 			if (ynl_get_family_info_mcast(ys, attr))
--				return MNL_CB_ERROR;
-+				return YNL_PARSE_CB_ERROR;
- 
- 		if (ynl_attr_type(attr) != CTRL_ATTR_FAMILY_ID)
- 			continue;
- 
- 		if (ynl_attr_data_len(attr) != sizeof(__u16)) {
- 			yerr(ys, YNL_ERROR_ATTR_INVALID, "Invalid family ID");
--			return MNL_CB_ERROR;
-+			return YNL_PARSE_CB_ERROR;
- 		}
- 
- 		ys->family_id = ynl_attr_get_u16(attr);
-@@ -585,9 +585,9 @@ ynl_get_family_info_cb(const struct nlmsghdr *nlh, struct ynl_parse_arg *yarg)
- 
- 	if (!found_id) {
- 		yerr(ys, YNL_ERROR_ATTR_MISSING, "Family ID missing");
--		return MNL_CB_ERROR;
-+		return YNL_PARSE_CB_ERROR;
- 	}
--	return MNL_CB_OK;
-+	return YNL_PARSE_CB_OK;
- }
- 
- static int ynl_sock_read_family(struct ynl_sock *ys, const char *family_name)
-@@ -744,10 +744,10 @@ static int ynl_ntf_parse(struct ynl_sock *ys, const struct nlmsghdr *nlh)
- 
- 	gehdr = ynl_nlmsg_data(nlh);
- 	if (gehdr->cmd >= ys->family->ntf_info_size)
--		return MNL_CB_ERROR;
-+		return YNL_PARSE_CB_ERROR;
- 	info = &ys->family->ntf_info[gehdr->cmd];
- 	if (!info->cb)
--		return MNL_CB_ERROR;
-+		return YNL_PARSE_CB_ERROR;
- 
- 	rsp = calloc(1, info->alloc_sz);
- 	rsp->free = info->free;
-@@ -755,7 +755,7 @@ static int ynl_ntf_parse(struct ynl_sock *ys, const struct nlmsghdr *nlh)
- 	yarg.rsp_policy = info->policy;
- 
- 	ret = info->cb(nlh, &yarg);
--	if (ret <= MNL_CB_STOP)
-+	if (ret <= YNL_PARSE_CB_STOP)
- 		goto err_free;
- 
- 	rsp->family = nlh->nlmsg_type;
-@@ -764,11 +764,11 @@ static int ynl_ntf_parse(struct ynl_sock *ys, const struct nlmsghdr *nlh)
- 	*ys->ntf_last_next = rsp;
- 	ys->ntf_last_next = &rsp->next;
- 
--	return MNL_CB_OK;
-+	return YNL_PARSE_CB_OK;
- 
- err_free:
- 	info->free(rsp);
--	return MNL_CB_ERROR;
-+	return YNL_PARSE_CB_ERROR;
- }
- 
- static int
-@@ -815,7 +815,7 @@ void ynl_error_unknown_notification(struct ynl_sock *ys, __u8 cmd)
- int ynl_error_parse(struct ynl_parse_arg *yarg, const char *msg)
+-	err = mnl_socket_sendto(ys->sock, nlh, nlh->nlmsg_len);
++	err = send(ys->socket, nlh, nlh->nlmsg_len, 0);
+ 	if (err < 0) {
+ 		perr(ys, "failed to request socket family info");
+ 		return err;
+@@ -624,38 +626,54 @@ static int ynl_sock_read_family(struct ynl_sock *ys, const char *family_name)
+ struct ynl_sock *
+ ynl_sock_create(const struct ynl_family *yf, struct ynl_error *yse)
  {
- 	yerr(yarg->ys, YNL_ERROR_INV_RESP, "Error parsing response: %s", msg);
--	return MNL_CB_ERROR;
-+	return YNL_PARSE_CB_ERROR;
++	struct sockaddr_nl addr;
+ 	struct ynl_sock *ys;
++	socklen_t addrlen;
+ 	int one = 1;
+ 
+-	ys = malloc(sizeof(*ys) + 2 * MNL_SOCKET_BUFFER_SIZE);
++	ys = malloc(sizeof(*ys) + 2 * YNL_SOCKET_BUFFER_SIZE);
+ 	if (!ys)
+ 		return NULL;
+ 	memset(ys, 0, sizeof(*ys));
+ 
+ 	ys->family = yf;
+ 	ys->tx_buf = &ys->raw_buf[0];
+-	ys->rx_buf = &ys->raw_buf[MNL_SOCKET_BUFFER_SIZE];
++	ys->rx_buf = &ys->raw_buf[YNL_SOCKET_BUFFER_SIZE];
+ 	ys->ntf_last_next = &ys->ntf_first;
+ 
+-	ys->sock = mnl_socket_open(NETLINK_GENERIC);
+-	if (!ys->sock) {
++	ys->socket = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
++	if (ys->socket < 0) {
+ 		__perr(yse, "failed to create a netlink socket");
+ 		goto err_free_sock;
+ 	}
+ 
+-	if (mnl_socket_setsockopt(ys->sock, NETLINK_CAP_ACK,
+-				  &one, sizeof(one))) {
++	if (setsockopt(ys->socket, SOL_NETLINK, NETLINK_CAP_ACK,
++		       &one, sizeof(one))) {
+ 		__perr(yse, "failed to enable netlink ACK");
+ 		goto err_close_sock;
+ 	}
+-	if (mnl_socket_setsockopt(ys->sock, NETLINK_EXT_ACK,
+-				  &one, sizeof(one))) {
++	if (setsockopt(ys->socket, SOL_NETLINK, NETLINK_EXT_ACK,
++		       &one, sizeof(one))) {
+ 		__perr(yse, "failed to enable netlink ext ACK");
+ 		goto err_close_sock;
+ 	}
+ 
++	memset(&addr, 0, sizeof(addr));
++	addr.nl_family = AF_NETLINK;
++	if (bind(ys->socket, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
++		__perr(yse, "unable to bind to a socket address");
++		goto err_close_sock;;
++	}
++
++	memset(&addr, 0, sizeof(addr));
++	addrlen = sizeof(addr);
++	if (getsockname(ys->socket, (struct sockaddr *)&addr, &addrlen) < 0) {
++		__perr(yse, "unable to read socket address");
++		goto err_close_sock;;
++	}
++	ys->portid = addr.nl_pid;
+ 	ys->seq = random();
+-	ys->portid = mnl_socket_get_portid(ys->sock);
++
+ 
+ 	if (ynl_sock_read_family(ys, yf->name)) {
+ 		if (yse)
+@@ -666,7 +684,7 @@ ynl_sock_create(const struct ynl_family *yf, struct ynl_error *yse)
+ 	return ys;
+ 
+ err_close_sock:
+-	mnl_socket_close(ys->sock);
++	close(ys->socket);
+ err_free_sock:
+ 	free(ys);
+ 	return NULL;
+@@ -676,7 +694,7 @@ void ynl_sock_destroy(struct ynl_sock *ys)
+ {
+ 	struct ynl_ntf_base_type *ntf;
+ 
+-	mnl_socket_close(ys->sock);
++	close(ys->socket);
+ 	while ((ntf = ynl_ntf_dequeue(ys)))
+ 		ynl_ntf_free(ntf);
+ 	free(ys->mcast_groups);
+@@ -703,9 +721,9 @@ int ynl_subscribe(struct ynl_sock *ys, const char *grp_name)
+ 		return -1;
+ 	}
+ 
+-	err = mnl_socket_setsockopt(ys->sock, NETLINK_ADD_MEMBERSHIP,
+-				    &ys->mcast_groups[i].id,
+-				    sizeof(ys->mcast_groups[i].id));
++	err = setsockopt(ys->socket, SOL_NETLINK, NETLINK_ADD_MEMBERSHIP,
++			 &ys->mcast_groups[i].id,
++			 sizeof(ys->mcast_groups[i].id));
+ 	if (err < 0) {
+ 		perr(ys, "Subscribing to multicast group failed");
+ 		return -1;
+@@ -716,7 +734,7 @@ int ynl_subscribe(struct ynl_sock *ys, const char *grp_name)
+ 
+ int ynl_socket_get_fd(struct ynl_sock *ys)
+ {
+-	return mnl_socket_get_fd(ys->sock);
++	return ys->socket;
  }
  
- static int
-@@ -844,7 +844,7 @@ int ynl_req_trampoline(const struct nlmsghdr *nlh, struct ynl_parse_arg *yarg)
+ struct ynl_ntf_base_type *ynl_ntf_dequeue(struct ynl_sock *ys)
+@@ -788,7 +806,7 @@ int ynl_ntf_check(struct ynl_sock *ys)
+ 		 */
+ 		struct pollfd pfd = { };
  
- 	ret = ynl_check_alien(yrs->yarg.ys, nlh, yrs->rsp_cmd);
- 	if (ret)
--		return ret < 0 ? MNL_CB_ERROR : MNL_CB_OK;
-+		return ret < 0 ? YNL_PARSE_CB_ERROR : YNL_PARSE_CB_OK;
+-		pfd.fd = mnl_socket_get_fd(ys->sock);
++		pfd.fd = ys->socket;
+ 		pfd.events = POLLIN;
+ 		err = poll(&pfd, 1, 1);
+ 		if (err < 1)
+@@ -854,7 +872,7 @@ int ynl_exec(struct ynl_sock *ys, struct nlmsghdr *req_nlh,
+ {
+ 	int err;
  
- 	return yrs->cb(nlh, &yrs->yarg);
- }
-@@ -875,11 +875,11 @@ ynl_dump_trampoline(const struct nlmsghdr *nlh, struct ynl_parse_arg *data)
+-	err = mnl_socket_sendto(ys->sock, req_nlh, req_nlh->nlmsg_len);
++	err = send(ys->socket, req_nlh, req_nlh->nlmsg_len, 0);
+ 	if (err < 0)
+ 		return err;
  
- 	ret = ynl_check_alien(ds->yarg.ys, nlh, ds->rsp_cmd);
- 	if (ret)
--		return ret < 0 ? MNL_CB_ERROR : MNL_CB_OK;
-+		return ret < 0 ? YNL_PARSE_CB_ERROR : YNL_PARSE_CB_OK;
+@@ -907,7 +925,7 @@ int ynl_exec_dump(struct ynl_sock *ys, struct nlmsghdr *req_nlh,
+ {
+ 	int err;
  
- 	obj = calloc(1, ds->alloc_sz);
- 	if (!obj)
--		return MNL_CB_ERROR;
-+		return YNL_PARSE_CB_ERROR;
+-	err = mnl_socket_sendto(ys->sock, req_nlh, req_nlh->nlmsg_len);
++	err = send(ys->socket, req_nlh, req_nlh->nlmsg_len, 0);
+ 	if (err < 0)
+ 		return err;
  
- 	if (!ds->first)
- 		ds->first = obj;
-diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
-index 7cc2b859d8de..f12e03d8753f 100755
---- a/tools/net/ynl/ynl-gen-c.py
-+++ b/tools/net/ynl/ynl-gen-c.py
-@@ -200,7 +200,7 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
+diff --git a/tools/net/ynl/lib/ynl.h b/tools/net/ynl/lib/ynl.h
+index 4849c142fce0..dbeeef8ce91a 100644
+--- a/tools/net/ynl/lib/ynl.h
++++ b/tools/net/ynl/lib/ynl.h
+@@ -59,7 +59,7 @@ struct ynl_sock {
  
-         if not self.is_multi_val():
-             ri.cw.p("if (ynl_attr_validate(yarg, attr))")
--            ri.cw.p("return MNL_CB_ERROR;")
-+            ri.cw.p("return YNL_PARSE_CB_ERROR;")
-             if self.presence_type() == 'bit':
-                 ri.cw.p(f"{var}->_present.{self.c_name} = 1;")
- 
-@@ -247,7 +247,7 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-         return []
- 
-     def _attr_get(self, ri, var):
--        return ['return MNL_CB_ERROR;'], None, None
-+        return ['return YNL_PARSE_CB_ERROR;'], None, None
- 
-     def _attr_typol(self):
-         return '.type = YNL_PT_REJECT, '
-@@ -543,7 +543,7 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
- 
-     def _attr_get(self, ri, var):
-         get_lines = [f"if ({self.nested_render_name}_parse(&parg, attr))",
--                     "return MNL_CB_ERROR;"]
-+                     "return YNL_PARSE_CB_ERROR;"]
-         init_lines = [f"parg.rsp_policy = &{self.nested_render_name}_nest;",
-                       f"parg.data = &{var}->{self.c_name};"]
-         return get_lines, init_lines, None
-@@ -1674,7 +1674,7 @@ _C_KW = {
-         ri.cw.block_start(line=f"ynl_attr_for_each_nested(attr, attr_{aspec.c_name})")
-         ri.cw.p(f"parg.data = &dst->{aspec.c_name}[i];")
-         ri.cw.p(f"if ({aspec.nested_render_name}_parse(&parg, attr, ynl_attr_type(attr)))")
--        ri.cw.p('return MNL_CB_ERROR;')
-+        ri.cw.p('return YNL_PARSE_CB_ERROR;')
-         ri.cw.p('i++;')
-         ri.cw.block_end()
-         ri.cw.block_end()
-@@ -1693,7 +1693,7 @@ _C_KW = {
-         if 'nested-attributes' in aspec:
-             ri.cw.p(f"parg.data = &dst->{aspec.c_name}[i];")
-             ri.cw.p(f"if ({aspec.nested_render_name}_parse(&parg, attr))")
--            ri.cw.p('return MNL_CB_ERROR;')
-+            ri.cw.p('return YNL_PARSE_CB_ERROR;')
-         elif aspec.type in scalars:
-             ri.cw.p(f"dst->{aspec.c_name}[i] = ynl_attr_get_{aspec.type}(attr);")
-         else:
-@@ -1707,7 +1707,7 @@ _C_KW = {
-     if struct.nested:
-         ri.cw.p('return 0;')
-     else:
--        ri.cw.p('return MNL_CB_OK;')
-+        ri.cw.p('return YNL_PARSE_CB_OK;')
-     ri.cw.block_end()
-     ri.cw.nl()
- 
-@@ -1750,7 +1750,7 @@ _C_KW = {
-     else:
-         # Empty reply
-         ri.cw.block_start()
--        ri.cw.p('return MNL_CB_OK;')
-+        ri.cw.p('return YNL_PARSE_CB_OK;')
-         ri.cw.block_end()
-         ri.cw.nl()
- 
+ /* private: */
+ 	const struct ynl_family *family;
+-	struct mnl_socket *sock;
++	int socket;
+ 	__u32 seq;
+ 	__u32 portid;
+ 	__u16 family_id;
 -- 
 2.43.2
 
