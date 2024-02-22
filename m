@@ -1,67 +1,58 @@
-Return-Path: <netdev+bounces-74189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C993B860705
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 00:34:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22FC386071B
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 00:48:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E8E51F233B3
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 23:34:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ACF0DB20CFD
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 23:48:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04B651B819;
-	Thu, 22 Feb 2024 23:34:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D34D86E5E3;
+	Thu, 22 Feb 2024 23:48:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="eqCd71v0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XWYVbtbl"
 X-Original-To: netdev@vger.kernel.org
-Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D340C19452;
-	Thu, 22 Feb 2024 23:34:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE74518629
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 23:48:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708644842; cv=none; b=FSgtrYWbpfcXDw0wxdnJKsyra3RX02c2NimRmByOYPU0Spe3mJKXY+ftY4enfzA5VNywTVFRBP4g+fjSQDzD6aNnm7D0bpsq8zkBoD/8v0mexiLz0p5DG0pCMqqGv+GM0y+50XLRfELqEMPGIT709V92xvNcxrFmom2LAMhZ9eA=
+	t=1708645715; cv=none; b=nU/6hb6elgrtNtUofVb5tzH+H2SZD/EpIm5Xod5Rsfk0i0UuIJ9hb4f9vHtuU0xnsoOR9TAgbgpoxIxcZ5N8EDhODgK5iQjbqreTRO8Vksd8+/ogIIcDgbj1WQ7mQQPH0IXidcRuUk/oJaHm9SB7eCuzEzGNRgTr8+oWK9Vf0E4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708644842; c=relaxed/simple;
-	bh=w7q0OZpmbQ4iJGkY22z3KyxTMX1Cmy0aLTK8x/4EEWI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qosvjrD1K05Do/pDmGfpVzBb3NC8o2NHjpASN4k3eaqMD+zxL59TgnHHNS2zn3m9Unt0B8q1jA3KaASeC6zharuYKj/4rhK1G1ZpSw0q4/mke5OtTsm0g4JyghHAVD+oesyvx2v+TGmM1OZrQX7hT5FaVlIcJg8+4kwJZ1VwEY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=eqCd71v0; arc=none smtp.client-ip=139.165.32.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
-Received: from ubuntu.home (125.179-65-87.adsl-dyn.isp.belgacom.be [87.65.179.125])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 6F251200C980;
-	Fri, 23 Feb 2024 00:33:57 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 6F251200C980
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1708644837;
-	bh=ohnw1X5t6/nbcUS24rw3MYJUUJQ4h7ERcV3d3m5S1+E=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=eqCd71v0KKdVOC8riTFHBvRMBv6tbxQC3WUvppjDctj38oInNzBC66qEQDmXf5P0m
-	 x3UlcU5n7jNmY/djLkBOFA4hfgiQkXkPKKLuMl6u+Vde+KpBbtSMsZzu3it8O++kx9
-	 O9ofuM4pjQBQbuts3gcUELwiBVyWCB4mEp4Bn0Ojo4fkeqdx+pSXnJ6R6Se8qeJrA+
-	 Is3QnAQSVIl+4IjIGQnBjcDQ7fv9JpV6/WxAzYW8iLRLBS5884BqSxr5jRij0I286q
-	 NG8iIqCEdStXTZG5OyBd0gBzeegzWkZEOSmCxmtAfVXT7mMX+jC2kerwQG5CuNmBtl
-	 CjKufj49V8JnQ==
-From: Justin Iurman <justin.iurman@uliege.be>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
+	s=arc-20240116; t=1708645715; c=relaxed/simple;
+	bh=NBmCZ1M+lXYdDyWSdDp8arxz5JKsUGBq9ciZuCGSZnw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iQlR75as4MaftPbs8chP/1hKpzKXnEn85ePo+uwpAJqK93nDzAXKtJqjb8H1oMKM57uzbSQcCvNPCJJkXz1EGsUrSAqHa3EfmFkzKFRtwX4i/vaaRn/CbYiDI/JTV7i+9RtQ8UAx0NIn0jCMwqjNe93AgDf66DLnqaABg9L0jsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XWYVbtbl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B8B8C433F1;
+	Thu, 22 Feb 2024 23:48:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708645715;
+	bh=NBmCZ1M+lXYdDyWSdDp8arxz5JKsUGBq9ciZuCGSZnw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=XWYVbtbla6lf5tkbo8d4wRxHcVgSFgYagd5lL04ubgif4RoZ0U+GYXL2/UcLZkS4y
+	 n7LzF+T396oRYgYFgd9kk50lc35+dEjrEnl1rSc/lg0IGmPnOEBI4rnlyJA+Thke79
+	 wmDXbRGQ5w7BUcaKCMI8e8G9IjBM69WN9ucQZfv0xdGnl4Lkm+18HlotuMldKBzwvd
+	 cuJEpHBE494wbocxlMoSqe3oIZOqOjgjQPCeqiyzJy/6AkrKrzfiflablXaZOOHZtY
+	 MV7LiiJ+W2VbunvMGuvBkXnhmthjs3+bXOH+RDOjjT5cME/C/SfZJBnEzJG+zOpmoA
+	 +W9L0zFBABwwg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
-	kuba@kernel.org,
 	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org,
-	justin.iurman@uliege.be
-Subject: [PATCH net-next v3 3/3] net: exthdrs: ioam6: send trace event
-Date: Fri, 23 Feb 2024 00:33:37 +0100
-Message-Id: <20240222233337.5342-4-justin.iurman@uliege.be>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240222233337.5342-1-justin.iurman@uliege.be>
-References: <20240222233337.5342-1-justin.iurman@uliege.be>
+	Jakub Kicinski <kuba@kernel.org>,
+	Nicolas Dichtel <nicolas.dichtel@6wind.com>,
+	chuck.lever@oracle.com,
+	jiri@resnulli.us
+Subject: [PATCH net-next] tools: ynl: fix header guards
+Date: Thu, 22 Feb 2024 15:48:31 -0800
+Message-ID: <20240222234831.179181-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,42 +61,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If we're processing an IOAM Pre-allocated Trace Option-Type (the only
-one supported currently), and if we're the destination, then send the
-trace as an ioam6 event to the multicast group. This way, user space
-apps will be able to collect IOAM data (for a trace, it only makes sense
-to send events if we're the destination).
+devlink and ethtool have a trailing _ in the header guard. I must have
+copy/pasted it into new guards, assuming it's a headers_install artifact.
 
-Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
+This fixes build if system headers are old.
+
+Fixes: 8f109e91b852 ("tools: ynl: include dpll and mptcp_pm in C codegen")
+Acked-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- net/ipv6/exthdrs.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+CC: chuck.lever@oracle.com
+CC: jiri@resnulli.us
+---
+ tools/net/ynl/Makefile.deps | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
-index 4952ae792450..b26dcf4d0239 100644
---- a/net/ipv6/exthdrs.c
-+++ b/net/ipv6/exthdrs.c
-@@ -50,6 +50,7 @@
- #endif
- #include <net/rpl.h>
- #include <linux/ioam6.h>
-+#include <linux/ioam6_genl.h>
- #include <net/ioam6.h>
- #include <net/dst_metadata.h>
+diff --git a/tools/net/ynl/Makefile.deps b/tools/net/ynl/Makefile.deps
+index e6154a1255f8..7dcec16da509 100644
+--- a/tools/net/ynl/Makefile.deps
++++ b/tools/net/ynl/Makefile.deps
+@@ -15,9 +15,9 @@ UAPI_PATH:=../../../../include/uapi/
+ get_hdr_inc=-D$(1) -include $(UAPI_PATH)/linux/$(2)
  
-@@ -944,6 +945,11 @@ static bool ipv6_hop_ioam(struct sk_buff *skb, int optoff)
- 			ip6_route_input(skb);
- 
- 		ioam6_fill_trace_data(skb, ns, trace, true);
-+
-+		if (skb_dst(skb)->dev->flags & IFF_LOOPBACK)
-+			ioam6_event(IOAM6_EVENT_TRACE, dev_net(skb->dev),
-+				    GFP_ATOMIC, (void *)trace,
-+				    hdr->opt_len - 2);
- 		break;
- 	default:
- 		break;
+ CFLAGS_devlink:=$(call get_hdr_inc,_LINUX_DEVLINK_H_,devlink.h)
+-CFLAGS_dpll:=$(call get_hdr_inc,_LINUX_DPLL_H_,dpll.h)
++CFLAGS_dpll:=$(call get_hdr_inc,_LINUX_DPLL_H,dpll.h)
+ CFLAGS_ethtool:=$(call get_hdr_inc,_LINUX_ETHTOOL_NETLINK_H_,ethtool_netlink.h)
+ CFLAGS_handshake:=$(call get_hdr_inc,_LINUX_HANDSHAKE_H,handshake.h)
+-CFLAGS_mptcp_pm:=$(call get_hdr_inc,_LINUX_MPTCP_PM_H_,mptcp_pm.h)
++CFLAGS_mptcp_pm:=$(call get_hdr_inc,_LINUX_MPTCP_PM_H,mptcp_pm.h)
+ CFLAGS_netdev:=$(call get_hdr_inc,_LINUX_NETDEV_H,netdev.h)
+ CFLAGS_nfsd:=$(call get_hdr_inc,_LINUX_NFSD_NETLINK_H,nfsd_netlink.h)
 -- 
-2.34.1
+2.43.2
 
 
