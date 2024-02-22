@@ -1,191 +1,104 @@
-Return-Path: <netdev+bounces-73857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF58385EE8D
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 02:18:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D1E485EE93
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 02:20:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58EE71F22606
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 01:18:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DD921C211E1
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 01:20:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCFD5111A1;
-	Thu, 22 Feb 2024 01:18:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 548AF125D7;
+	Thu, 22 Feb 2024 01:20:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="hB2drU2D"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AGWWEz00"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3732E80C;
-	Thu, 22 Feb 2024 01:18:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BCC511C82;
+	Thu, 22 Feb 2024 01:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708564728; cv=none; b=o+mn/Vp5IcOYv1dW0h5LaEpuFcmQrYvS2Rf4c9gRD1UyPE3myTTU3DJ8JO/2OF159s7AIeG6D9GErIhLVDgEDkvuHay6RKXg0lNH2qsb84k/ihlGSLoppjeqV0cjcdKQccaxwNm4mcaxMWK6yNHTDE0y/GvMYD4S0iJqaVe3hek=
+	t=1708564829; cv=none; b=lvo9wWpflVP3s/yW8pTX7HmQbNOl9rJ5vBcbaDJiH4OaY4FF4ppV4s5XeAM38a7R/Z2ji4UjFW2l1J2i00x30rJZ1JUouyRkeIosdiBqmXwrxVKXLggBZh9vUeYvPdtK46jRJXWNC7rinQ8heiOQjaQvOBrDpRGoN829wWQhQTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708564728; c=relaxed/simple;
-	bh=kVKrnFzieRStppfHlCXNxSvGCGX67ifKx4/QTDXY2Kg=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=oNS0Ferh+ObX72R3HeZncWZ+KoMyZdyilS7glp9KT+qvQ4WIYiOZV7JZq5ttl+5s5U6pFNA30JHVESsUZhNDdipXlxZlBVRVhpkRIR9HV1KD3KwRuj850a4IAhJgGADgad8w1pij2q2ww+1VCQrM7uwV9A8Jqv1PxDFlqdej80A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=hB2drU2D; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41M0xmYU023733;
-	Thu, 22 Feb 2024 01:18:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:from:to:cc:references
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=ArWJqb9Tv0QfNj4ezCbit8uEkjVABn+N2jAT5zAb0QE=; b=hB
-	2drU2DpqmnBxYFg4BRbyNnr04Y0RR4kdNV71AHj85Gtmiuz6tV4BharDL8Y4Fa2l
-	xLidNkuTOK0Djr5IQLQx8PQHqlhbqCZYgxNix2exXc8NfeR3JI0QJyDpX57Jt9xI
-	d1BW+1o5KfR0sdICnXGqAEQhAdlLvuG0a2fKN2k5PKA/Tb6jHITW4oeMqIBlnjU4
-	Dt7ZZY80XtxvFlDcqxSXvDJN+l2UFYpST32MsWgf5rfE4tfGWXyXZrF//LGxs4+W
-	WBczvDtYKEStwQUX5ftsHFun8r6CPo1RUkFzc6ZHlmwBUECOOipKBt2Ix3z8Xlly
-	s9jeOUi5HUB2OGFg+EhQ==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wdpe6rrbh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 22 Feb 2024 01:18:43 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41M1IgPQ029064
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 22 Feb 2024 01:18:42 GMT
-Received: from [10.110.34.22] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 21 Feb
- 2024 17:18:41 -0800
-Message-ID: <b25a5783-a9ca-4356-ae17-bbda1340b522@quicinc.com>
-Date: Wed, 21 Feb 2024 17:18:41 -0800
+	s=arc-20240116; t=1708564829; c=relaxed/simple;
+	bh=oJice3h7lKvI03uvkbTvPLODbANJ+MXKqJ7PhH71xK0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ecePToxaxm0HLrESNVTQ0F/CmYz+21Kc+M6scV22olEdbIIMwt1JoaZe2L35Jcew98WNWHErJgSp5a/cu/dgG5G9cD9F/xwwcbtZ5vIJ+sWzP6O55C/tZw910fWPFO69gzo3PVwNnoFAYODpY4pxlFu1RJS62PJhDDlouRmRXQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AGWWEz00; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BC10EC433C7;
+	Thu, 22 Feb 2024 01:20:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708564828;
+	bh=oJice3h7lKvI03uvkbTvPLODbANJ+MXKqJ7PhH71xK0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=AGWWEz00aMhBewq+Bt7qKL9JI3DE9/lP2Goc95JrMkbweIgFPx5BHTF1uUe2BS8Sc
+	 cTDhIONgFOy2Gkci+gUXoATQ9Y9Vql9ZvVbrE+4gIUBeiWoqjYtUurDUeTQD8MdthA
+	 9ABP9mFou6EZaVKG/ue95rGG736mxc2ybaMCQvfx/km91NwBIlrAAP6ddRJJGYOqpT
+	 /xMZPnAo1+1LDbwuU1BKFuG6ks6udlgmneBEaYsoM/zGoH3nkIv4jDOJuSGVUeV8On
+	 I+lqeFSCMhFLyBUP4/ukzl/YIhdSjvRp/T5rPRJuebdZWo5wd3bUM4wZt+gI6B3RkA
+	 MHWxnpgphMwug==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 93739D84BCA;
+	Thu, 22 Feb 2024 01:20:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: pull-request: wireless-next-2024-02-20
-Content-Language: en-US
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-To: Jakub Kicinski <kuba@kernel.org>, Kalle Valo <kvalo@kernel.org>,
-        Karthikeyan Periyasamy <quic_periyasa@quicinc.com>
-CC: <netdev@vger.kernel.org>, <linux-wireless@vger.kernel.org>
-References: <20240220165842.917CDC433F1@smtp.kernel.org>
- <20240221143531.56942c6e@kernel.org>
- <2dbb3ca4-78fd-4125-b13f-4ad440923291@quicinc.com>
-In-Reply-To: <2dbb3ca4-78fd-4125-b13f-4ad440923291@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: z-qy4hOehcz3LBP_HelSaQANCMJj1-9T
-X-Proofpoint-ORIG-GUID: z-qy4hOehcz3LBP_HelSaQANCMJj1-9T
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-21_09,2024-02-21_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- adultscore=0 mlxlogscore=999 clxscore=1015 bulkscore=0 spamscore=0
- impostorscore=0 lowpriorityscore=0 phishscore=0 priorityscore=1501
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2402120000 definitions=main-2402220008
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3] net: sparx5: Add spinlock for frame transmission from
+ CPU
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170856482859.21333.7578746670670805119.git-patchwork-notify@kernel.org>
+Date: Thu, 22 Feb 2024 01:20:28 +0000
+References: <20240219080043.1561014-1-horatiu.vultur@microchip.com>
+In-Reply-To: <20240219080043.1561014-1-horatiu.vultur@microchip.com>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, lars.povlsen@microchip.com, Steen.Hegelund@microchip.com,
+ daniel.machon@microchip.com, UNGLinuxDriver@microchip.com,
+ rmk+kernel@armlinux.org.uk, u.kleine-koenig@pengutronix.de,
+ yuehaibing@huawei.com, vladimir.oltean@nxp.com,
+ bjarni.jonasson@microchip.com, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 
-On 2/21/2024 3:34 PM, Jeff Johnson wrote:
-> On 2/21/2024 2:35 PM, Jakub Kicinski wrote:
->> On Tue, 20 Feb 2024 16:58:42 +0000 (UTC) Kalle Valo wrote:
->>> Hi,
->>>
->>> here's a pull request to net-next tree, more info below. Please let me know if
->>> there are any problems.
->>>
->>> Kalle
->>>
->>> The following changes since commit b7198383ef2debe748118996f627452281cf27d7:
->>>
->>>   wifi: iwlwifi: mvm: fix a crash when we run out of stations (2024-02-08 14:55:39 +0100)
->>>
->>> are available in the Git repository at:
->>>
->>>   git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git tags/wireless-next-2024-02-20
->>>
->>> for you to fetch changes up to dd66185c23f71af36397bebfc99ede608dca07b6:
->>>
->>>   wifi: wilc1000: add missing read critical sections around vif list traversal (2024-02-19 18:21:36 +0200)
->>>
->>> ----------------------------------------------------------------
->>> wireless-next patches for v6.9
->>>
->>> The second "new features" pull request for v6.9.  Lots of iwlwifi and
->>> stack changes this time. And naturally smaller changes to other drivers.
->>>
->>> We also twice merged wireless into wireless-next to avoid conflicts
->>> between the trees.
->>>
->>> Major changes:
->>>
->>> stack
->>>
->>> * mac80211: negotiated TTLM request support
->>>
->>> * SPP A-MSDU support
->>>
->>> * mac80211: wider bandwidth OFDMA config support
->>>
->>> iwlwifi
->>>
->>> * kunit tests
->>>
->>> * bump FW API to 89 for AX/BZ/SC devices
->>>
->>> * enable SPP A-MSDUs
->>>
->>> * support for new devices
->>>
->>> ath12k
->>>
->>> * refactoring in preparation for Multi-Link Operation (MLO) support
->>>
->>> * 1024 Block Ack window size support
->>>
->>> * provide firmware wmi logs via a trace event
->>>
->>> ath11k
->>>
->>> * 36 bit DMA mask support
->>>
->>> * support 6 GHz station power modes: Low Power Indoor (LPI), Standard
->>>   Power) SP and Very Low Power (VLP)
->>>
->>> rtl8xxxu
->>>
->>> * TP-Link TL-WN823N V2 support
->>
->> I'm getting these on a normal (i.e. non-W=1) clang build today:
->>
->> ../drivers/net/wireless/ath/ath12k/mac.c:8000:9: warning: variable 'ret' is uninitialized when used here [-Wuninitialized]
->>  8000 |         return ret;
->>       |                ^~~
->> ../drivers/net/wireless/ath/ath12k/mac.c:7962:9: note: initialize the variable 'ret' to silence this warning
->>  7962 |         int ret, i, j;
->>       |                ^
->>       |                 = 0
->>
-> 
-> definitely a flaw in 6db6e70a17f6 ("wifi: ath12k: Introduce the
-> container for mac80211 hw")
-> 
-> my setup is using gcc which isn't flagging this :(
-> 
-> Karthikeyan, can you submit a patch?
-> 
-> /jeff
-> 
+Hello:
 
-I see this was already fixed by:
-04edb5dc68f4 ("wifi: ath12k: Fix uninitialized use of ret in
-ath12k_mac_allocate()")
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 19 Feb 2024 09:00:43 +0100 you wrote:
+> Both registers used when doing manual injection or fdma injection are
+> shared between all the net devices of the switch. It was noticed that
+> when having two process which each of them trying to inject frames on
+> different ethernet ports, that the HW started to behave strange, by
+> sending out more frames then expected. When doing fdma injection it is
+> required to set the frame in the DCB and then make sure that the next
+> pointer of the last DCB is invalid. But because there is no locks for
+> this, then easily this pointer between the DCB can be broken and then it
+> would create a loop of DCBs. And that means that the HW will
+> continuously transmit these frames in a loop. Until the SW will break
+> this loop.
+> Therefore to fix this issue, add a spin lock for when accessing the
+> registers for manual or fdma injection.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v3] net: sparx5: Add spinlock for frame transmission from CPU
+    https://git.kernel.org/netdev/net/c/603ead96582d
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
