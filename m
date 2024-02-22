@@ -1,144 +1,135 @@
-Return-Path: <netdev+bounces-73998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3BEA85F96A
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 14:16:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3811485F972
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 14:17:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D13681C219DB
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 13:16:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB5DF1F21D8A
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 13:17:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C6491468F5;
-	Thu, 22 Feb 2024 13:15:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6673812F381;
+	Thu, 22 Feb 2024 13:17:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VAXC9Rtr"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="YEnmWtse"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD9B3133983;
-	Thu, 22 Feb 2024 13:15:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E0644C87
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 13:17:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708607724; cv=none; b=Gs1aXxe6VauxSnUVCSWHS8S/lpKsyWOpHD1WK87suC9MkPq0aaa6ci/gqjLxmEehTmADGp5CJ0pD9lyNnFGwXOihyy8Q/+279auTzKxLA7b0/1uRiIx6dO500CqensJRKVMribzOlbV8u1T0B9fY8HBxNQou9k3tItx/5uuEavo=
+	t=1708607859; cv=none; b=EfZ6r96r8YHKGcmsO+6TfwScl1xZXLyHLhPCCnfVZGH0n7nb92qTA1xIIYA7yrgCJH8kgHS5g1QcMBueQCcRyOgGf+q8MRDpIs+EUCDzJ8AsowRqaEar3y6JzbGYGh5Zh4WJD6NIfWUCWoQzAlhr9/f+aoirU1gBLpB4EjhsSME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708607724; c=relaxed/simple;
-	bh=aB8RgiNf0b3kbIk2EGDRYvCms7pKp1j8q6BKO6yIq/s=;
+	s=arc-20240116; t=1708607859; c=relaxed/simple;
+	bh=KJ9wDekgYJ3rWp+KkJuwbssTigMt1QYaIyxiccwnmOk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qhP4qkfpFfozg0MqGrXYT/ZTvG2y3MsXjFM7fx0ciymRRhZieSPM5ideE/X+zs2BRCG2M0HFUFXva8cTYLALb4sE0HyU1pUbGWynTI37Rx2RAH1sy7NoArnC3oFClBryxRuxgtX00pvu3NAnzizegxEgt6Gbws6anSSGJdO1xWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VAXC9Rtr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72DB5C433F1;
-	Thu, 22 Feb 2024 13:15:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708607724;
-	bh=aB8RgiNf0b3kbIk2EGDRYvCms7pKp1j8q6BKO6yIq/s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VAXC9RtrQiqpyOnfoqyu0u+2vXpVzPFJ3ndzmwkc9guJrM2Z4wTrrVPKnVjsM8CRI
-	 W4AXe+DEgOQA9Whp7t1wsytVkVsTDh4uevn5WtQO0SOlFtn+qXuU7Tnssm7MJUxvAx
-	 TBWGMhti93fSfj0GuGbKuXNCf1rwM6aNChG+D1TEE7OKuiLkb0bdpYM49p/DIDMsey
-	 0toi475K7XKQVtSF8ochYNgc4oDv7EYcBoQKFVThZlJ/AQuQCJdpE2Bi23Kc4X3ka7
-	 TCj0PCTsIrg0DClyDT+zwBxfW42sT+Mj776Mq1THBjH1zfrM/7oujYr8Daus67dJD7
-	 +poFkuMnxjP5Q==
-Date: Thu, 22 Feb 2024 13:15:13 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Alex Elder <elder@linaro.org>,
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Abel Vesa <abel.vesa@linaro.org>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Lukas Wunner <lukas@wunner.de>,
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
-	linux-pm@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH v5 14/18] PCI/pwrctl: add a power control driver for
- WCN7850
-Message-ID: <68e401c6-6e59-4c35-8f05-40f6c5eb6849@sirena.org.uk>
-References: <20240216203215.40870-1-brgl@bgdev.pl>
- <20240216203215.40870-15-brgl@bgdev.pl>
- <d5d603dc-ec66-4e21-aa41-3b25557f1fb7@sirena.org.uk>
- <CAMRc=MeUjKPS3ANE6=7WZ3kbbGAdyE8HeXFN=75Jp-pVyBaWrQ@mail.gmail.com>
- <ea08a286-ff53-4d58-ae41-38cca151508c@sirena.org.uk>
- <17bbd9ae-0282-430e-947b-e6fb08c53af7@linaro.org>
- <53f0956f-ee64-4bd6-b44f-cbebafd42e46@sirena.org.uk>
- <CAMRc=MedCX_TGGawMhr39oXtJPF4pOQF=Jh2z4uXkOxwhfJWRw@mail.gmail.com>
- <52fba837-989b-4213-8af7-f02cd8cb48c8@sirena.org.uk>
- <CAMRc=MeF7xVjRKetg1A3MNO4yMasPA2GC7MLCBrOiwO5UBv6LA@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=lP/44htoyRcvL8HgtAj6GlL9lIpcDaigMxKh7MN4t/iljDfHP/zlWIXz4X+XU5shCC3iojdP2PYE/gf62BpYqNrRh0HL4QY9w/MbzpEDt2iXiZMK9WN5/YGKQLZn7nfUJtvX9Ist624+YjaLvE28V3JEVIyLXfPRdmRLMXkvH9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=YEnmWtse; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2d0e520362cso79159581fa.2
+        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 05:17:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708607856; x=1709212656; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kyRrraFN7IOnJ6e/togon1KMLq6ddA6cs+A4PIdPyhs=;
+        b=YEnmWtseIW57MMoVM2/wRJEZqfNCNa0DFzqYQc1w5Oj3saEzHMMtk2aXaD7YbqITBR
+         jQ4aQCj4gbtcgS1j1MygnhaZpWVlYa5biRAW2bKWyYUKF/yd7y6JKXItJuQUSdEAC/nT
+         AccwjjEHgXDxkaVsWPwFfx1MH1q8hHlGaGK0Kv2R8AhxKSjaaQX6Lw8re5w74r6ERgz+
+         ggUHztpNq0a5aNdZoKoQjLN6QbnrjB8LOzU7LyPhchIVvKP44Mqs5UjZagG/kqeCVp8w
+         rQbKTLfXbcXsGY7bolwSplxRc6TwQXt+MfOa5wKlbmLhpaE52w8bVzRNKKB4BaJvCfb2
+         VuZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708607856; x=1709212656;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kyRrraFN7IOnJ6e/togon1KMLq6ddA6cs+A4PIdPyhs=;
+        b=WYITSA5ze8i5535yyYThorNKNeS3lmVVKZKEAZtUs8npRv83866oDshZTbi7vFMiCV
+         y1TMjCUqJXjRRXPdxPm2KisYpX4r9QiquczjA6fY+fBboXE/GrTCgqD3QOQlAY7iXPRX
+         cEC6dFOLVG5A4ENZpEIklZstvbtE0bIT+q7BcK6TjbTrS5KLyKVa0278Rv/TAHFS3pc+
+         ZVGpiMqv/w+EcBKykJU5etIpex77i2u6DySfBZwJBZmHRoF/02phII9jkn76RKoIPKKf
+         Ztu+kjEBrDbkwHG6Jirjd4OhLG5i83zyEqajNjIrtSCzZunk7mOhztXOvFQx6fcOiQ9M
+         W9yg==
+X-Gm-Message-State: AOJu0Yy5QM30bdEogu2JsPsDi36XEkDL5vnxSyRDHDZcxBSBrfr6OfqR
+	+TSsqB/sWqZA01vnF8hu85BMBSaR2q4+BpE3YmRnmY4FxWJnim3m9JfBY4P6H8k=
+X-Google-Smtp-Source: AGHT+IGoAUv7lk/gEdMOGlvsrtsDOzrhwRNBg+C/Looof9t+cNnqCWmd2rVh7ny/yZKZPmOYLYtbFw==
+X-Received: by 2002:a2e:b6d4:0:b0:2d2:56d8:3dd4 with SMTP id m20-20020a2eb6d4000000b002d256d83dd4mr2959506ljo.23.1708607855629;
+        Thu, 22 Feb 2024 05:17:35 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id bd8-20020a05600c1f0800b00410b0ce91b1sm1131075wmb.25.2024.02.22.05.17.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Feb 2024 05:17:35 -0800 (PST)
+Date: Thu, 22 Feb 2024 14:17:32 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+	davem@davemloft.net, edumazet@google.com, jacob.e.keller@intel.com,
+	swarupkotikalapudi@gmail.com, sdf@google.com, lorenzo@kernel.org,
+	alessandromarcolini99@gmail.com
+Subject: Re: [patch net-next v2 1/3] tools: ynl: allow user to specify flag
+ attr with bool values
+Message-ID: <ZddJbO095_h-2bn9@nanopsycho>
+References: <20240221155415.158174-1-jiri@resnulli.us>
+ <20240221155415.158174-2-jiri@resnulli.us>
+ <CAD4GDZxn7bq0t59=V7AJ_aFsJNvkdK_CJmnaPV2W_7uiEUozKQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="s6adMmEGd2zLJf/T"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAMRc=MeF7xVjRKetg1A3MNO4yMasPA2GC7MLCBrOiwO5UBv6LA@mail.gmail.com>
-X-Cookie: I have accepted Provolone into my life!
+In-Reply-To: <CAD4GDZxn7bq0t59=V7AJ_aFsJNvkdK_CJmnaPV2W_7uiEUozKQ@mail.gmail.com>
 
+Wed, Feb 21, 2024 at 07:07:40PM CET, donald.hunter@gmail.com wrote:
+>On Wed, 21 Feb 2024 at 15:54, Jiri Pirko <jiri@resnulli.us> wrote:
+>>
+>> From: Jiri Pirko <jiri@nvidia.com>
+>>
+>> The flag attr presence in Netlink message indicates value "true",
+>> if it is missing in the message it means "false".
+>>
+>> Allow user to specify attrname with value "true"/"false"
+>> in json for flag attrs, treat "false" value properly.
+>>
+>> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+>> ---
+>> v1->v2:
+>> - accept other values than "False"
+>> ---
+>>  tools/net/ynl/lib/ynl.py | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+>> index f45ee5f29bed..4a44840bab68 100644
+>> --- a/tools/net/ynl/lib/ynl.py
+>> +++ b/tools/net/ynl/lib/ynl.py
+>> @@ -459,6 +459,8 @@ class YnlFamily(SpecFamily):
+>>                  attr_payload += self._add_attr(attr['nested-attributes'],
+>>                                                 subname, subvalue, sub_attrs)
+>>          elif attr["type"] == 'flag':
+>> +            if not value:
+>> +                return b''
+>
+>Minor nit: It took me a moment to realise that by returning here, this
+>skips attribute creation. A comment to this effect would be helpful:
+>
+># If value is absent or false then skip attribute creation.
 
---s6adMmEGd2zLJf/T
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Sure, will add.
 
-On Thu, Feb 22, 2024 at 01:26:59PM +0100, Bartosz Golaszewski wrote:
-> On Thu, Feb 22, 2024 at 1:21=E2=80=AFPM Mark Brown <broonie@kernel.org> w=
-rote:
-> > On Thu, Feb 22, 2024 at 10:22:50AM +0100, Bartosz Golaszewski wrote:
-
-> > > Removing it would be out of scope for this series and I don't really
-> > > want to introduce any undefined behavior when doing a big development
-> > > like that. I'll think about it separately.
-
-> > This is new code?
-
-> It's a new driver but Qualcomm standard has been to provide the load
-> values. If it's really unnecessary then maybe let's consider it
-> separately and possibly rework globally?
-
-That doesn't seem a great reason to add more instances of this - it's
-more instances that need to be removed later, and somewhere else people
-can cut'n'paste from to introduce new usage.
-
---s6adMmEGd2zLJf/T
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmXXSOAACgkQJNaLcl1U
-h9CO+Af/UBAXsJGE9NN3tPz9CpviI1Xv3S28cWiubEXVJ+NzA4+IAt4j+1Y5bKls
-HytSvkTYjWKuVt+/QPMjUDjahFueK0iMxyfNIv9YmcADzKx4NV4kqoV9vA2lSe3b
-EvLpCG3N8rmHABUkHyTNAsUYDzAmia49miT9t3G0KFNzsPvbNTYzRosMRndYzd4S
-dBlL/MthOmihCZmaRB4F+41mNCzmvz9FyDcwqzavI9CX2fM7oOviI1wmSla2dxrh
-kyAn7uj2Tve+uBidpIiVZb7QKxHC/JSQR88IkKjhjXnAVlzhPIeuuuXCWXCOzlEE
-nHjsO+Kzdq6sXue+dcbfP+GMhe7IEQ==
-=2jGd
------END PGP SIGNATURE-----
-
---s6adMmEGd2zLJf/T--
+>
+>>              attr_payload = b''
+>>          elif attr["type"] == 'string':
+>>              attr_payload = str(value).encode('ascii') + b'\x00'
+>> --
+>> 2.43.2
+>>
 
