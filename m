@@ -1,355 +1,215 @@
-Return-Path: <netdev+bounces-74176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EEC48605B3
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 23:31:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA6358605C3
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 23:36:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38A331C20DF5
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 22:31:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6214028604B
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 22:36:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9AA417BD5;
-	Thu, 22 Feb 2024 22:31:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5579217C67;
+	Thu, 22 Feb 2024 22:36:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ALccgJyS"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="qyswoUbm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f46.google.com (mail-ua1-f46.google.com [209.85.222.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2045.outbound.protection.outlook.com [40.107.94.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8A0C3210;
-	Thu, 22 Feb 2024 22:31:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708641076; cv=none; b=r/69RkuQagThRvou86bkBlQxVdfp+ux0aS31hHhg+ASktLCmSkIr21Bv5zi/Ips9q893T1BdBE6Nl1vY7a0hwDZPFfztusspUkkAzRIrbVpjatw124FwD4gw4jA9P2NHezzCbhtEhKFjU9g40yX6HuuRa9GLnZKAog4B6wfvM80=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708641076; c=relaxed/simple;
-	bh=jfEAu4u+DYkHDDPZ8LKbEu+DqNm0bzS7n/+/kqA4rhI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CNJ9TB/LscyhVQLCycoeM7tapZmjrASztQ9yqNw0i8lI/hgK3KM2TrknNp04wTSIxSlaXyWzL9yzGrmZ+bedngbq7PwGf9bA4J2rTkrCxdgHgkgmfUH7xxkARilBBNKNHEQ0TyKhm1QAVxsZBU308Bf7U2DbkjwWxIv0mPFxk9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ALccgJyS; arc=none smtp.client-ip=209.85.222.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f46.google.com with SMTP id a1e0cc1a2514c-7d2e15193bbso108433241.0;
-        Thu, 22 Feb 2024 14:31:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708641074; x=1709245874; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ab/IT6/MTQMwvIdmwcFZA4zrjfI72quSWHH2rUYlwu8=;
-        b=ALccgJySIsqj67q6Yu+Lni2fL+WgazScqpa34goul4qVHbKu2YvPmvXBF4nEUGSrqv
-         CFa+dkJyXf/GjWIZdXHb/i/ixuWoRfbGB8N1Q0WRhxL3ctYiaz9wo7ThTv+6pO7xKPD+
-         0omW3SFwPA3hpwLTbWxLCE5yMW/7+B8h18rbsuYCEQtRvSp0A12KX3FaLOEuisLRtk9h
-         ndhijdXoq3uAQOxnFGGvucw1cHp/272IkzPX0FNgMnv1EKeV7pZqcA9ucMETx6uWxeqF
-         2ZwgfIDBIo6y9HWYkvngRrsFIRFGT/QyQKfK7YmxhTla1tyH6nZZHJt5Ys8ClXKTa0SJ
-         /gkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708641074; x=1709245874;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ab/IT6/MTQMwvIdmwcFZA4zrjfI72quSWHH2rUYlwu8=;
-        b=MLQ7j0H4poZjQAO3lh3LhFnO4Hzt5K1TBW646htcPoduytmQ/bNlsGqsFq+ABxHCQl
-         iPiPl+brPGl/C9BJ28he8ulGkSjb1mbVBtwmDxUvhn1TiGItwRkk0jIOhApt3IW4SACO
-         TW+5LiooF6jSy6O6FLhQHMhA9zyjjw0xvGR58IK7cRvGuNovsJb6HrwLYoUHPhLTLntX
-         PiQzb6Q/w4GXcpZlpygwOYyp8O0MiOtnyhNdUEAi5WL6ruQP8DdtEiRt9l5vpyOVY3c/
-         Z7M63HsTa6uKyhUsq2is0EWkctuqKbYCeRVRlorJE0445G2gj/beZ6bHBxnHEOYMXmDl
-         VErA==
-X-Forwarded-Encrypted: i=1; AJvYcCW/NTwesQ2KY3TNB3VN4iHE9S13ax1/N/lwcJE0kmC2H7BL8jsty2UdP3ShQuxM6Ge+TXwpJJnEs4BIDTmPKVef3X5+B+i7pfmoebCNbBMMM/MCSUFJY+DTwjUvlUhQmNFB/ztx
-X-Gm-Message-State: AOJu0YxMnMtEdyD5YWqXttDYP83nVnTo3T0VCXi2T2mMr8Ffo24n0OkT
-	h5KzuJmKiB0k018kWBDK0uaJqp+bE0OlxN+xHFFRjnRZrkyROU6ld4/i6MjvM8D+2Q05HS5y/w7
-	XRVzgUq2ECGRgRG94+lYsjGbDsLg=
-X-Google-Smtp-Source: AGHT+IHxX4rGwPtr7rcccr5jt3glXidlbiYp/cZzSmtq7u0kH7YbVS5kUwMj83xG2QcuxiOwqjCkQ4vP3SmIulJD6SY=
-X-Received: by 2002:a67:fd43:0:b0:470:51ac:89a4 with SMTP id
- g3-20020a67fd43000000b0047051ac89a4mr244735vsr.34.1708641073362; Thu, 22 Feb
- 2024 14:31:13 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 822F412E40;
+	Thu, 22 Feb 2024 22:36:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708641383; cv=fail; b=mOEtbYVDeT/gwOM6NP+C2Zkw3oofRM3N+gdYlmhkuTTu3aEdPo5U9NWmJ6ANQI1SdXUCnW/+pdqY56ujDiAhAZvn1LRaidt8644Jg4fezR4bAI4oM3peLtNPiyn2VtRtRwO3liDsqEj8mrmllvedvbTpvtNg2V/dgBoqthpGD0M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708641383; c=relaxed/simple;
+	bh=m7ew78+X0oEwPWO7F05kjN3ykI9oPfgiw8q+tm1rQVs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=KhLYKqBuIznRGkV096QR9anp5V3Mi/fpFi+j2OEfCffMUWwsyEMpANTfetIef6XksBS7mFAACyOusZkWM4ZzgTKMkhxmWcs5xW+YL6HUuf/PCMWvq7BgZP/oGucDfk1OOF3Yq7jiBfKeR6DedPO3N2d448Gf2CtZkUHGQjP9/Us=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=qyswoUbm; arc=fail smtp.client-ip=40.107.94.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Hkx2/cQ5mlx6x0qTlzwIiCTPCo+w4bLke24zHv60dcfQX9eUtT3xM0BBGpOQJCnKpwttuNe/IZ7ciWKKmZXhob6ZBVTRYIWA5D0VnWSZ7JuVNkFESgHoiVF+GEvyjRj++F4Jnyla4iYrJe6x3CYoXJuxWUHL34EOG/w+uD/5HquGnMzad9P3ULSkftaEjXFIKl7U0fdHXtiqvhGDFMspFN1yRHcdqloWhEs/KEL7QWwhk0bVw6LnqxybuJDfYToLayai3ibdMUo/3ZcbUlFg5OKEFtZplOVxH+bRllSSnAlYzyH39vJ751O3r3xe4jEx6Enfw48TuVqdpHuo3rEM8g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=556nOXOlFNVOoVAIXOAp7n8Uzz6ZG5JnfbbRK+Fw5UI=;
+ b=i9v1iw8NrrM+cubHvnoolodE6YQGgYtGTHdPHe3EByqkmdBAE/yi7qTnERE++f4fdKvvCQ96DLZZ7XwkAwzn8UvVD/d3+mbpZ9xjj4HwdSvxgZJL5G/EXiY4tlCgewbV5ZH0vzHIVWK42iXUUS7h3cZeBU2K358nEfNVEaBw6hGVcRu/CaQ/V92xTv6j1TpU1S1HiMXglwoo/J0abKHljTcomApmuOt6+u8miikptK3yq3BjmnbJIAL5GermS0XOPYC3ROB9KbEcIOnZzHDvwIhCbtBWeiKnfYubHud79aTV0Fs82VfBkfRrHFw7lEUcbfNj00G7HWxUEEwiejHMhw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=556nOXOlFNVOoVAIXOAp7n8Uzz6ZG5JnfbbRK+Fw5UI=;
+ b=qyswoUbmNSnd6Qc2Yue3Y1YVzzEwqW+63BdEPsJr59xnaVtx9TgsGuhvbpbgk2rua1u1SDtbcYvSlJH23Lx7g8+9M4iWYM9OKZg7EoAlGOpahsBbbFnW4q05N22t33oXdoIktXasYmlaHQ99t6AJCpu5YDuetgJU7OvhpXfuTHqy7h+slk9HsYFMfQzMegOJjLFmtqlaaLiPnjnlCmrZdKf8sfN1J2aLGkrRj3uDPH9fziqwCZU5Bgd1KEsDZl0xVmlvlglFWeqT94M4MH3zoyQRb9PrlE1WOAqBOjiy8tQKObY6hvVCHd6Y5/SCMYkMsyuFtU0VqeRwrh10hMtUMw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by CH3PR12MB8710.namprd12.prod.outlook.com (2603:10b6:610:173::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.21; Thu, 22 Feb
+ 2024 22:36:19 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::96dd:1160:6472:9873]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::96dd:1160:6472:9873%6]) with mapi id 15.20.7316.023; Thu, 22 Feb 2024
+ 22:36:18 +0000
+Date: Thu, 22 Feb 2024 18:36:17 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: David Laight <David.Laight@aculab.com>
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+	"llvm@lists.linux.dev" <llvm@lists.linux.dev>,
+	Ingo Molnar <mingo@redhat.com>, Bill Wendling <morbo@google.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jijie Shao <shaojijie@huawei.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	"x86@kernel.org" <x86@kernel.org>,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Leon Romanovsky <leonro@mellanox.com>,
+	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Michael Guralnik <michaelgur@mellanox.com>,
+	"patches@lists.linux.dev" <patches@lists.linux.dev>,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 4/6] arm64/io: Provide a WC friendly __iowriteXX_copy()
+Message-ID: <20240222223617.GC13330@nvidia.com>
+References: <0-v1-38290193eace+5-mlx5_arm_wc_jgg@nvidia.com>
+ <4-v1-38290193eace+5-mlx5_arm_wc_jgg@nvidia.com>
+ <6d335e8701334a15b220b75d49b98d77@AcuMS.aculab.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6d335e8701334a15b220b75d49b98d77@AcuMS.aculab.com>
+X-ClientProxiedBy: BLAPR03CA0158.namprd03.prod.outlook.com
+ (2603:10b6:208:32f::24) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <df300a49-7811-4126-a56a-a77100c8841b@gmail.com> <79a8ba83-86bf-4c22-845c-8f285c2d1396@gmail.com>
-In-Reply-To: <79a8ba83-86bf-4c22-845c-8f285c2d1396@gmail.com>
-From: Eyal Birger <eyal.birger@gmail.com>
-Date: Thu, 22 Feb 2024 14:31:02 -0800
-Message-ID: <CAHsH6GvX7zYSoA7JVemRtunWWSaew1S11Y996WAGt6B9d8=cOA@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/2] net: geneve: enable local address bind for
- geneve sockets
-To: Richard Gobert <richardbgobert@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, idosch@nvidia.com, razor@blackwall.org, amcohen@nvidia.com, 
-	petrm@nvidia.com, jbenc@redhat.com, b.galvani@gmail.com, bpoirier@nvidia.com, 
-	gavinl@nvidia.com, martin.lau@kernel.org, daniel@iogearbox.net, 
-	herbert@gondor.apana.org.au, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH3PR12MB8710:EE_
+X-MS-Office365-Filtering-Correlation-Id: 902bc137-243b-4ef4-10a5-08dc33f6afd1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	MS4Y1HOvY27XSlfqfO37dCkdSVGZd+oZ4n3dGceQ+Ef2ux926E2KQnK1lFd3DdeKnv4Ro+bUFu86R3D1OzrXN0BQqv3QZOSJxKij33ffKl7gl853GjVYBs6Yrse9oEtT0zPNsHLADJa7J9CaQ+r9Zhi2WeY79pukxukq9Oi9zu7+mMxyoxV88bWomsAQC1mXmfBSZg9a/0tJBd5kSD+3HGMtJuhkC1b+r6yZtzMDcIiqPErSW4rXDx9AHSv5yjEui3vISE91Jzv6lda3no/nOYF5SN5+hKxBPW3UrNtoMsy6jZ8k2KT4lZ7iesQKTx5E/eYRqkEZ/o1wL17V7/CQLKAjKG9bjhJ3l9L3HP86hM3Hm9KSTMxNBeSdBmoQsr6J0yi9kHUc59wpL7exMoth14B2c/RqsjZbYP77yvZWubRrmRM6YKQhKaQQ4Pmh/x3vo+pwvPfhFkiwA/EpeEon9D4R7EUyGYihWBcSDzfW2S8aKJ5iRnt3IbsDl6d4+GBUMh+GA8Pd3uneDFZtje+HuDyZ+lVsLBiJOoiYLO6IUg4=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?PhS6U//mrXukSZsfeM4pUMuLcjK3Re1MxpSOKcWjs/hsAypONE7YGpzxB5FR?=
+ =?us-ascii?Q?4yO7f5nVftLb/bS3vgzzEh7t+UGyqG5Q9sWxMvWxoLaQG9piyj8QMohlnk6V?=
+ =?us-ascii?Q?h+QlMFRu/3KKmqvUSSXKl89X9Df0vj/encGmIMprZKiS7qJDZsrA7KXR7ix6?=
+ =?us-ascii?Q?1hQXtx1umNxyJ2/B9VoCzgP7oS1yHl1nAeJuZOJaf+0jBLTi9yEYbhw5dSSd?=
+ =?us-ascii?Q?6crdQoqxOVGwTyeMs6fTj8SdiM2fFI+uryqHtYelCJma6moAiNtXKJ/2pZ+T?=
+ =?us-ascii?Q?7C/Yk8ErK8wc52Mmk59UGjDIYFq9DrGU6mhsPU7yi7HSK/xMnhzUyBBkveR5?=
+ =?us-ascii?Q?jcWYqm7gcT8Cud30UpbGWdgSRqKjgodZabKcdJEasKd6mnR5wdSOWMhSO35m?=
+ =?us-ascii?Q?s4qsKkmAm3mHwHBzkNjSms0CF0hOYzjJR/5tuWnpFKuK33zINRkgMPwlbRHz?=
+ =?us-ascii?Q?J2ZbjTcdVErGWaKAwZ4d6PEYq5RstP8Nz9KDEtWacc+NlxKqcpejh7MeFMS5?=
+ =?us-ascii?Q?teYw9CReiDv/kF60n41C3ew0QxYMzCJ4kbfJU68z+g0i7wSOOpwtTC1h1xVK?=
+ =?us-ascii?Q?HuTG48vGYjEbAodpvfE0G42rW29du/s1rJbMQe0l7G35edLABrgau4Ash6B6?=
+ =?us-ascii?Q?svxd0PEyujilP1QqSvIMBj0xva9oCOSeN6QR7em+sdEOyHyDVt9orfkNn3c4?=
+ =?us-ascii?Q?6Bsm04+tfhISEhaVapFRUa4xqXafR7+jeVd+LgJHZd2R5PbpAEg5NTSgO58Q?=
+ =?us-ascii?Q?GnPBSXOpQxgxi1bi2BBSZk1B9tE7uM3YeTP4AuNdr2PqAmI2ZbbI9RxUo9ui?=
+ =?us-ascii?Q?FDA6SZtTAKBiDITbbk1SlgV+KtVrfB3efYuLsLrn6gmCsuQgoW0QLGz0Qc4R?=
+ =?us-ascii?Q?16NcQC43rRM0lYyM8tYTN762M4v6Wqi+ExG3pVZuIGnAuWW909K0IJgOtQuE?=
+ =?us-ascii?Q?7k87OJ1de6Hg4fB2YH6QggCer2l1qGuR0Y9d6JNjcdftSaq0hhTeUO3sEwiu?=
+ =?us-ascii?Q?AwMnNAODBf6rAw78pJYk0ZNpUANLE1c2uWrKW9GK2BRLaraD90qQQ/YGyq4Q?=
+ =?us-ascii?Q?ucZPJ3o0BscWjved+HEDxKrQXTpqefnaYg2kl3bum86Pl2+AcQVZ7Top0fqz?=
+ =?us-ascii?Q?P9IEeXGrGRzfrjgd2yh7LJh7gCgFO0ohP//sME1deISGnB5qL7KiWDhuf/iX?=
+ =?us-ascii?Q?Z92oRrloRhrOsK25W2h1lxjZ0EUL5zqqxOsem0jy2ieuU/YK6mz2XWg87baw?=
+ =?us-ascii?Q?FMgNd5XOX+huIXiuEVfeOTrDWYOTVkHGEc1cEty5P8Suq6EPm6KwRbTC5az/?=
+ =?us-ascii?Q?Nur2ePkRVEbkDR05V4kaUH+FdThq5gkrzBIWD+EB8H+gqIai2DZ2mpCiSLAl?=
+ =?us-ascii?Q?GwUxn0yGH0BTt97PxxD1z0JGyEOlqprjMVaxGD35lxtqG9z4vo0gZg+HSjbA?=
+ =?us-ascii?Q?Rzrar9V3QFFHecpo/BUYAXMMkIaQ025PlVdNRgfbqWYXdBrT5U414TdOze2y?=
+ =?us-ascii?Q?xZGL+aH3jucUByi29eL6mj38muPv0MtjSLu6HmlqofBk5Mfm2EPLYd4cgkip?=
+ =?us-ascii?Q?yDtmeY/JpIxvVpzB3rtSsMyEiEkInRp63/ro0quH?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 902bc137-243b-4ef4-10a5-08dc33f6afd1
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Feb 2024 22:36:18.7758
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /XXcBuZTvvvFV8v2i9IEP7kw+07zZtjvcXTkBYme+9zs28eLGhdmL1AJgJJpI0YN
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8710
 
-Hi,
+On Thu, Feb 22, 2024 at 10:05:04PM +0000, David Laight wrote:
+> From: Jason Gunthorpe
+> > Sent: 21 February 2024 01:17
+> > 
+> > The kernel provides driver support for using write combining IO memory
+> > through the __iowriteXX_copy() API which is commonly used as an optional
+> > optimization to generate 16/32/64 byte MemWr TLPs in a PCIe environment.
+> > 
+> ...
+> > Implement __iowrite32/64_copy() specifically for ARM64 and use inline
+> > assembly to build consecutive blocks of STR instructions. Provide direct
+> > support for 64/32/16 large TLP generation in this manner. Optimize for
+> > common constant lengths so that the compiler can directly inline the store
+> > blocks.
+> ...
+> > +/*
+> > + * This generates a memcpy that works on a from/to address which is aligned to
+> > + * bits. Count is in terms of the number of bits sized quantities to copy. It
+> > + * optimizes to use the STR groupings when possible so that it is WC friendly.
+> > + */
+> > +#define memcpy_toio_aligned(to, from, count, bits)                        \
+> > +	({                                                                \
+> > +		volatile u##bits __iomem *_to = to;                       \
+> > +		const u##bits *_from = from;                              \
+> > +		size_t _count = count;                                    \
+> > +		const u##bits *_end_from = _from + ALIGN_DOWN(_count, 8); \
+> > +                                                                          \
+> > +		for (; _from < _end_from; _from += 8, _to += 8)           \
+> > +			__const_memcpy_toio_aligned##bits(_to, _from, 8); \
+> > +		if ((_count % 8) >= 4) {    
+> 
+> If (_count & 4) {
 
-On Thu, Feb 22, 2024 at 12:54=E2=80=AFPM Richard Gobert
-<richardbgobert@gmail.com> wrote:
->
-> This patch adds support for binding to a local address in geneve sockets.
+That would be obfuscating, IMHO. The compiler doesn't need such things
+to generate optimal code.
 
-Thanks for adding this.
+> > +			__const_memcpy_toio_aligned##bits(_to, _from, 1); \
+> > +	})
+> 
+> But that looks bit a bit large to be inlined.
 
-> It achieves this by adding a geneve_addr union to represent local address
-> to bind to, and copying it to udp_port_cfg in geneve_create_sock.
+You trimmed alot, this #define is in a C file and it is a template to
+generate the 32 and 64 bit out of line functions. Things are done like
+this because the 32/64 version are exactly the same logic except just
+with different types and sizes.
 
-AFICT in geneve_sock_add(), geneve_socket_create() is only called if there'=
-s
-no existing open socket with the GENEVE destination port. As such, wouldn't
-this bind work only for the first socket in the namespace?
-
-If that is the case, then perhaps binding the socket isn't the right
-approach, and instead geneve_lookup() should search for the tunnel based on
-both the source and destination IPs.
-
-Am I missing something?
-
-Eyal.
->
-> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
-> ---
->  drivers/net/geneve.c               | 58 +++++++++++++++++++++++++++---
->  include/net/geneve.h               |  6 ++++
->  include/uapi/linux/if_link.h       |  2 ++
->  tools/include/uapi/linux/if_link.h |  2 ++
->  4 files changed, 63 insertions(+), 5 deletions(-)
->
-> diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
-> index 32c51c244153..d0b4cb0e7c51 100644
-> --- a/drivers/net/geneve.c
-> +++ b/drivers/net/geneve.c
-> @@ -57,6 +57,7 @@ struct geneve_config {
->         bool                    ttl_inherit;
->         enum ifla_geneve_df     df;
->         bool                    inner_proto_inherit;
-> +       union geneve_addr saddr;
->  };
->
->  /* Pseudo network device */
-> @@ -451,7 +452,8 @@ static int geneve_udp_encap_err_lookup(struct sock *s=
-k, struct sk_buff *skb)
->  }
->
->  static struct socket *geneve_create_sock(struct net *net, bool ipv6,
-> -                                        __be16 port, bool ipv6_rx_csum)
-> +                                        __be16 port, bool ipv6_rx_csum,
-> +                                        union geneve_addr *local_addr)
->  {
->         struct socket *sock;
->         struct udp_port_cfg udp_conf;
-> @@ -463,9 +465,15 @@ static struct socket *geneve_create_sock(struct net =
-*net, bool ipv6,
->                 udp_conf.family =3D AF_INET6;
->                 udp_conf.ipv6_v6only =3D 1;
->                 udp_conf.use_udp6_rx_checksums =3D ipv6_rx_csum;
-> +               memcpy(&udp_conf.local_ip6,
-> +                      &local_addr->sin6.sin6_addr,
-> +                      sizeof(local_addr->sin6.sin6_addr));
->         } else {
->                 udp_conf.family =3D AF_INET;
->                 udp_conf.local_ip.s_addr =3D htonl(INADDR_ANY);
-> +               memcpy(&udp_conf.local_ip,
-> +                      &local_addr->sin.sin_addr,
-> +                      sizeof(local_addr->sin.sin_addr));
->         }
->
->         udp_conf.local_udp_port =3D port;
-> @@ -572,7 +580,8 @@ static int geneve_gro_complete(struct sock *sk, struc=
-t sk_buff *skb,
->
->  /* Create new listen socket if needed */
->  static struct geneve_sock *geneve_socket_create(struct net *net, __be16 =
-port,
-> -                                               bool ipv6, bool ipv6_rx_c=
-sum)
-> +                                               bool ipv6, bool ipv6_rx_c=
-sum,
-> +                                               union geneve_addr *local_=
-addr)
->  {
->         struct geneve_net *gn =3D net_generic(net, geneve_net_id);
->         struct geneve_sock *gs;
-> @@ -584,7 +593,7 @@ static struct geneve_sock *geneve_socket_create(struc=
-t net *net, __be16 port,
->         if (!gs)
->                 return ERR_PTR(-ENOMEM);
->
-> -       sock =3D geneve_create_sock(net, ipv6, port, ipv6_rx_csum);
-> +       sock =3D geneve_create_sock(net, ipv6, port, ipv6_rx_csum, local_=
-addr);
->         if (IS_ERR(sock)) {
->                 kfree(gs);
->                 return ERR_CAST(sock);
-> @@ -672,7 +681,8 @@ static int geneve_sock_add(struct geneve_dev *geneve,=
- bool ipv6)
->         }
->
->         gs =3D geneve_socket_create(net, geneve->cfg.info.key.tp_dst, ipv=
-6,
-> -                                 geneve->cfg.use_udp6_rx_checksums);
-> +                                 geneve->cfg.use_udp6_rx_checksums,
-> +                                 &geneve->cfg.saddr);
->         if (IS_ERR(gs))
->                 return PTR_ERR(gs);
->
-> @@ -1203,7 +1213,7 @@ static void geneve_setup(struct net_device *dev)
->  }
->
->  static const struct nla_policy geneve_policy[IFLA_GENEVE_MAX + 1] =3D {
-> -       [IFLA_GENEVE_UNSPEC]            =3D { .strict_start_type =3D IFLA=
-_GENEVE_INNER_PROTO_INHERIT },
-> +       [IFLA_GENEVE_UNSPEC]            =3D { .strict_start_type =3D IFLA=
-_GENEVE_LOCAL6 },
->         [IFLA_GENEVE_ID]                =3D { .type =3D NLA_U32 },
->         [IFLA_GENEVE_REMOTE]            =3D { .len =3D sizeof_field(struc=
-t iphdr, daddr) },
->         [IFLA_GENEVE_REMOTE6]           =3D { .len =3D sizeof(struct in6_=
-addr) },
-> @@ -1218,6 +1228,8 @@ static const struct nla_policy geneve_policy[IFLA_G=
-ENEVE_MAX + 1] =3D {
->         [IFLA_GENEVE_TTL_INHERIT]       =3D { .type =3D NLA_U8 },
->         [IFLA_GENEVE_DF]                =3D { .type =3D NLA_U8 },
->         [IFLA_GENEVE_INNER_PROTO_INHERIT]       =3D { .type =3D NLA_FLAG =
-},
-> +       [IFLA_GENEVE_LOCAL]     =3D { .len =3D sizeof_field(struct iphdr,=
- saddr) },
-> +       [IFLA_GENEVE_LOCAL6]    =3D { .len =3D sizeof(struct in6_addr) },
->  };
->
->  static int geneve_validate(struct nlattr *tb[], struct nlattr *data[],
-> @@ -1544,6 +1556,31 @@ static int geneve_nl2info(struct nlattr *tb[], str=
-uct nlattr *data[],
->                 cfg->inner_proto_inherit =3D true;
->         }
->
-> +       if (data[IFLA_GENEVE_LOCAL]) {
-> +               if (changelink && cfg->saddr.sa.sa_family !=3D AF_INET) {
-> +                       NL_SET_ERR_MSG_ATTR(extack, tb[IFLA_GENEVE_LOCAL]=
-, "New local address family does not match old");
-> +                       return -EOPNOTSUPP;
-> +               }
-> +
-> +               cfg->saddr.sin.sin_addr.s_addr =3D nla_get_in_addr(data[I=
-FLA_GENEVE_LOCAL]);
-> +               cfg->saddr.sa.sa_family =3D AF_INET;
-> +       }
-> +
-> +       if (data[IFLA_GENEVE_LOCAL6]) {
-> +               if (!IS_ENABLED(CONFIG_IPV6)) {
-> +                       NL_SET_ERR_MSG_ATTR(extack, tb[IFLA_GENEVE_LOCAL6=
-], "IPv6 support not enabled in the kernel");
-> +                       return -EPFNOSUPPORT;
-> +               }
-> +
-> +               if (changelink && cfg->saddr.sa.sa_family !=3D AF_INET6) =
-{
-> +                       NL_SET_ERR_MSG_ATTR(extack, tb[IFLA_GENEVE_LOCAL6=
-], "New local address family does not match old");
-> +                       return -EOPNOTSUPP;
-> +               }
-> +
-> +               cfg->saddr.sin6.sin6_addr =3D nla_get_in6_addr(data[IFLA_=
-VXLAN_LOCAL6]);
-> +               cfg->saddr.sa.sa_family =3D AF_INET6;
-> +       }
-> +
->         return 0;
->  change_notsup:
->         NL_SET_ERR_MSG_ATTR(extack, data[attrtype],
-> @@ -1724,6 +1761,7 @@ static size_t geneve_get_size(const struct net_devi=
-ce *dev)
->                 nla_total_size(sizeof(__u8)) + /* IFLA_GENEVE_UDP_ZERO_CS=
-UM6_RX */
->                 nla_total_size(sizeof(__u8)) + /* IFLA_GENEVE_TTL_INHERIT=
- */
->                 nla_total_size(0) +      /* IFLA_GENEVE_INNER_PROTO_INHER=
-IT */
-> +               nla_total_size(sizeof(struct in6_addr)) + /* IFLA_GENEVE_=
-LOCAL{6} */
->                 0;
->  }
->
-> @@ -1745,6 +1783,11 @@ static int geneve_fill_info(struct sk_buff *skb, c=
-onst struct net_device *dev)
->                 if (nla_put_in_addr(skb, IFLA_GENEVE_REMOTE,
->                                     info->key.u.ipv4.dst))
->                         goto nla_put_failure;
-> +
-> +               if (nla_put_in_addr(skb, IFLA_GENEVE_LOCAL,
-> +                                   info->key.u.ipv4.src))
-> +                       goto nla_put_failure;
-> +
->                 if (nla_put_u8(skb, IFLA_GENEVE_UDP_CSUM,
->                                !!(info->key.tun_flags & TUNNEL_CSUM)))
->                         goto nla_put_failure;
-> @@ -1754,6 +1797,11 @@ static int geneve_fill_info(struct sk_buff *skb, c=
-onst struct net_device *dev)
->                 if (nla_put_in6_addr(skb, IFLA_GENEVE_REMOTE6,
->                                      &info->key.u.ipv6.dst))
->                         goto nla_put_failure;
-> +
-> +               if (nla_put_in6_addr(skb, IFLA_GENEVE_LOCAL6,
-> +                                    &info->key.u.ipv6.src))
-> +                       goto nla_put_failure;
-> +
->                 if (nla_put_u8(skb, IFLA_GENEVE_UDP_ZERO_CSUM6_TX,
->                                !(info->key.tun_flags & TUNNEL_CSUM)))
->                         goto nla_put_failure;
-> diff --git a/include/net/geneve.h b/include/net/geneve.h
-> index 5c96827a487e..8dcd7fff2c0f 100644
-> --- a/include/net/geneve.h
-> +++ b/include/net/geneve.h
-> @@ -68,6 +68,12 @@ static inline bool netif_is_geneve(const struct net_de=
-vice *dev)
->                !strcmp(dev->rtnl_link_ops->kind, "geneve");
->  }
->
-> +union geneve_addr {
-> +       struct sockaddr_in sin;
-> +       struct sockaddr_in6 sin6;
-> +       struct sockaddr sa;
-> +};
-> +
->  #ifdef CONFIG_INET
->  struct net_device *geneve_dev_create_fb(struct net *net, const char *nam=
-e,
->                                         u8 name_assign_type, u16 dst_port=
-);
-> diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-> index ab9bcff96e4d..e4a0cdea734b 100644
-> --- a/include/uapi/linux/if_link.h
-> +++ b/include/uapi/linux/if_link.h
-> @@ -1419,6 +1419,8 @@ enum {
->         IFLA_GENEVE_TTL_INHERIT,
->         IFLA_GENEVE_DF,
->         IFLA_GENEVE_INNER_PROTO_INHERIT,
-> +       IFLA_GENEVE_LOCAL,
-> +       IFLA_GENEVE_LOCAL6,
->         __IFLA_GENEVE_MAX
->  };
->  #define IFLA_GENEVE_MAX        (__IFLA_GENEVE_MAX - 1)
-> diff --git a/tools/include/uapi/linux/if_link.h b/tools/include/uapi/linu=
-x/if_link.h
-> index a0aa05a28cf2..438bd867ec38 100644
-> --- a/tools/include/uapi/linux/if_link.h
-> +++ b/tools/include/uapi/linux/if_link.h
-> @@ -888,6 +888,8 @@ enum {
->         IFLA_GENEVE_TTL_INHERIT,
->         IFLA_GENEVE_DF,
->         IFLA_GENEVE_INNER_PROTO_INHERIT,
-> +       IFLA_GENEVE_LOCAL,
-> +       IFLA_GENEVE_LOCAL6,
->         __IFLA_GENEVE_MAX
->  };
->  #define IFLA_GENEVE_MAX        (__IFLA_GENEVE_MAX - 1)
-> --
-> 2.36.1
->
+Jason
 
