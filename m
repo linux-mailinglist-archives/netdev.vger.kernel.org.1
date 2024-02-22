@@ -1,127 +1,119 @@
-Return-Path: <netdev+bounces-73922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64EEB85F554
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 11:10:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45C6785F57A
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 11:18:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C0601F20CA6
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 10:10:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 783D21C23D23
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 10:18:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBFD238F8F;
-	Thu, 22 Feb 2024 10:10:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60A8439FFC;
+	Thu, 22 Feb 2024 10:18:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XKWMaG1r"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="3qgITIen";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="TZ+jyXJp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C41793717C;
-	Thu, 22 Feb 2024 10:10:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0EC939FC7;
+	Thu, 22 Feb 2024 10:18:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708596647; cv=none; b=HrUTYb+UL+w5nZBrHvya59ZCj1/QxxjcZH82o0lctVhbPvC9bL0+wFjUmJDfjMwTe8NW5O+mboJV65cLXuRigw2jxBPWWb+JtUE56ZB5xrBN69tXKnveX6FwQM/JE6WHa4+hSC33945Cr1z17NV8shhf4K1rsGSfvH6I1+3o5Pc=
+	t=1708597118; cv=none; b=F4gj+ZXuwvsK3jJM8AHUgc+5uU0UGnMqL3NEXzdb4GBuJV2FqegKxk28ec5yNG5EPvm/zPHYaSEtmBRFM9clBG5KRWNVSztRwEhZfwDQdnyEirDPFwy89hq47vOETaoez+huxfDF523PfPb7l4JZMlPpGFD+toATBPyJQa5uQR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708596647; c=relaxed/simple;
-	bh=tSCey7ELn07ZU9G79jg+PQl0/S1XaKqMN+IGgH7so/g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZljmNY5oMDwjweFsrEJLivQHl/JibNCEhtje2NkKFdW198vuTGiNhsRSDB9Ooue0cu6gbfze2A2Oy+GesIvq6MUFoYJ0uU7c1zzBTwxMhe5CKb1DXTjNbcCSP3tg5fvmBAD7W2WiXNRs2+UEER/qAl8CMS3hukFQWp6N2nGxXdo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XKWMaG1r; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 776BCC433C7;
-	Thu, 22 Feb 2024 10:10:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708596647;
-	bh=tSCey7ELn07ZU9G79jg+PQl0/S1XaKqMN+IGgH7so/g=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=XKWMaG1rDE8S2F4Hq5jrogc5oGjI3onN35wJZU9oOP7BocfcdgMcBx3o1+7smOHy8
-	 WOJASqOCGIm/K8H+GcTqROYQV3NBqgDcVrYCWTnAJVW6ZSdRSMCDw21xeN/3xgGtnh
-	 /valzWQDyvWH2Vcmtzbb7yJqDnw7NYC0qBpu1bxl6+IRtovEbr28sYC5DK5MMRS1GY
-	 cBdXKplni5mq+8wwzS6wgVp6xthTIoo7iBqTHUrnUUFu7UCgsmo95cK6mfuekph9la
-	 IuFLgTMUKS98IDolsrr/nf9HNCaaqxqWTa9wkEsJ7hW3xT8TOWUEogaB5EbgP1lAnh
-	 8Zah+axbDNJ6A==
-Message-ID: <f782b460-38fc-4c2b-b886-870760a96ece@kernel.org>
-Date: Thu, 22 Feb 2024 11:10:44 +0100
+	s=arc-20240116; t=1708597118; c=relaxed/simple;
+	bh=af17vFA+XR0PLVSDztuSWa2TbDGEHKWUkQWkSMZboyo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=COSfg19d5f56X22UHCEGz9vyYSgMLygy7cGHP8sv9b5awDEgKdQ3fmIj4y5SAr7TPtugSluyBpc8+SiH5Rn0uLjF5OrvP4LNf6xa30HPKl0AorrKRwvgKqR2sZaqSy3yUEjA40KZUBMygqlbDbNrXHIjJqiaS9LHXJrr/VqBMlo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=3qgITIen; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=TZ+jyXJp; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1708597115;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=af17vFA+XR0PLVSDztuSWa2TbDGEHKWUkQWkSMZboyo=;
+	b=3qgITIenivVJDEfsgXlDnVaO8ihsP7cjE+l+89ikE3tZsXtzMFglAoQJ4XTCsjc3Bn+Ak3
+	I/8JSIqEkduAsTMgsUQDaaruPiTeA5V6xtlQ4d1XYecW01D8h8/QAqTFV13Cy0I25+yf0M
+	970TfJOdkHbzecg/VNYX8B/uC8skUg7ZlA/Mbf2fDKhOUyI3fdJCO58AqAPqk6+0gE5/0i
+	93Ju3DPLyN+j5y8TnC4xokeoJcTNULX/au6ZP0/yHD569EsxCi1QVWLpwzWn+BCe2akj7o
+	4Md8R2oyWVZXbg4LYDPNsjSGge9hAlJdAM3i4NVV8ynyta5HChClSOnegMZ5gg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1708597115;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=af17vFA+XR0PLVSDztuSWa2TbDGEHKWUkQWkSMZboyo=;
+	b=TZ+jyXJpIAX6ztCb0kRdlAbld1WAkSq07gQbwTdprN//TSEisBt28LHuNkZ4E5gbQUaYA+
+	GcIlL2DSCe3dZIBw==
+To: Arnd Bergmann <arnd@kernel.org>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] igc: fix LEDS_CLASS dependency
+In-Reply-To: <20240222100324.453272-1-arnd@kernel.org>
+References: <20240222100324.453272-1-arnd@kernel.org>
+Date: Thu, 22 Feb 2024 11:18:33 +0100
+Message-ID: <87y1bcajk6.fsf@kurt.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC net-next 1/2] net: Reference bpf_redirect_info via
- task_struct on PREEMPT_RT.
-Content-Language: en-US
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20240214163607.RjjT5bO_@linutronix.de> <87jzn5cw90.fsf@toke.dk>
- <20240216165737.oIFG5g-U@linutronix.de> <87ttm4b7mh.fsf@toke.dk>
- <04d72b93-a423-4574-a98e-f8915a949415@kernel.org>
- <20240220101741.PZwhANsA@linutronix.de>
- <0b1c8247-ccfb-4228-bd64-53583329aaa7@kernel.org>
- <20240220120821.1Tbz6IeI@linutronix.de>
- <07620deb-2b96-4bcc-a045-480568a27c58@kernel.org>
- <20240220153206.AUZ_zP24@linutronix.de>
- <20240222092228.4ACXUrvU@linutronix.de>
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20240222092228.4ACXUrvU@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
+--=-=-=
+Content-Type: text/plain
 
+On Thu Feb 22 2024, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+>
+> When IGC is built-in but LEDS_CLASS is a loadable module, there is
+> a link failure:
+>
+> x86_64-linux-ld: drivers/net/ethernet/intel/igc/igc_leds.o: in function `igc_led_setup':
+> igc_leds.c:(.text+0x75c): undefined reference to `devm_led_classdev_register_ext'
+>
+> Add another dependency that prevents this combination.
+>
+> Fixes: ea578703b03d ("igc: Add support for LEDs on i225/i226")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-On 22/02/2024 10.22, Sebastian Andrzej Siewior wrote:
-> On 2024-02-20 16:32:08 [+0100], To Jesper Dangaard Brouer wrote:
->>>
->>>   Ethtool(i40e2) stat:     15028585 (  15,028,585) <= tx-0.packets /sec
->>>   Ethtool(i40e2) stat:     15028589 (  15,028,589) <= tx_packets /sec
->>
->> -t1 in ixgbe
->> Show adapter(s) (eth1) statistics (ONLY that changed!)
->> Ethtool(eth1    ) stat:    107857263 (    107,857,263) <= tx_bytes /sec
->> Ethtool(eth1    ) stat:    115047684 (    115,047,684) <= tx_bytes_nic /sec
->> Ethtool(eth1    ) stat:      1797621 (      1,797,621) <= tx_packets /sec
->> Ethtool(eth1    ) stat:      1797636 (      1,797,636) <= tx_pkts_nic /sec
->> Ethtool(eth1    ) stat:    107857263 (    107,857,263) <= tx_queue_0_bytes /sec
->> Ethtool(eth1    ) stat:      1797621 (      1,797,621) <= tx_queue_0_packets /sec
-> …
->> while sending with ixgbe while running perf top on the box:
->> | Samples: 621K of event 'cycles', 4000 Hz, Event count (approx.): 49979376685 lost: 0/0 drop: 0/0
->> | Overhead  CPU  Command          Shared Object             Symbol
->> |   31.98%  000  kpktgend_0       [kernel]                  [k] xas_find
->> |    6.72%  000  kpktgend_0       [kernel]                  [k] pfn_to_dma_pte
->> |    5.63%  000  kpktgend_0       [kernel]                  [k] ixgbe_xmit_frame_ring
->> |    4.78%  000  kpktgend_0       [kernel]                  [k] dma_pte_clear_level
->> |    3.16%  000  kpktgend_0       [kernel]                  [k] __iommu_dma_unmap
-> 
-> I disabled the iommu and I get to
+Ops, sorry. I tried to build all different combinations, but obviously
+failed. Thanks for fixing this.
 
-Yes, clearly IOMMU code that cause the performance issue for you.
+Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
 
-This driver doesn't use page_pool, so I want to point out (for people
-finding this post in the future) that page_pool keeps DMA mappings for
-recycled frame, which should address the IOMMU overhead issue here.
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> 
-> Ethtool(eth1    ) stat:     14158562 (     14,158,562) <= tx_packets /sec
-> Ethtool(eth1    ) stat:     14158685 (     14,158,685) <= tx_pkts_nic /sec
-> 
-> looks like a small improvement… It is not your 15 but close. -t2 does
-> improve the situation. 
+-----BEGIN PGP SIGNATURE-----
 
-You cannot reach 15Mpps on 10Gbit/s as wirespeed for 10G is 14.88Mpps.
-
-Congratulations, I think this 14.15 Mpps is as close to wirespeed as it
-possible on your hardware.
-
-BTW what CPU are you using?
-
-> There is a warning from DMA mapping code but ;)
-
-It is a warning from IOMMU code?
-It usually means there is a real DMA unmap bug (which we should fix).
-
---Jesper
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmXXH3kTHGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgpgsD/wL4ALVODXchFjqCM3M42Q/Cc903SsI
+C1OkwJfeXL9PHV3NRF/st5Xb9C4ijdRlvOqKe9uoGFv2Hj0vV4cXMXqeOzgHIHLp
+Ka0GPGR2yYJF2l1rzXepkLVKAKkUP/UDq97rOtV8q5Z4dLcvxLOCx+HPnKV3Eo+Q
+eumqHTx9BUmgrXq0ji/Z9t2AqvUoYOgJpw7BO/mQpyUCm55rwYKwJ0FCuD+7Fjfv
+wTW3RhkKOSSCK3AAIXporCITQr07ZxYaNEnOfPPI/xYoNgCkBIvjovPq4ghTPWm1
+Rja3kmLUOmMG0nq2mvJeUzJSuaJWL6hnngk3FaJH9QbDN5fIBdTbGY9Mr5VmoCqO
+JRYcdPym5xI57ahcCtZXK9YFtUpO8FWCUAVW7pXYL+owkNtBmo2odVrhgW2fozAi
+EhO3X9/5AUOjBb9WonmnOe5o3pWWT3vO/ez3f5GaWuDZ74n6u34XIC9enlrI4Z4Z
+zixs1ElctrE8fll+TNraf8SQ7o3V71HTadXKgjB0tszDqn/a8Q2jxxLfP9rMTwP6
+UDUrpgbHBlw2SjbINMDOkRvTbEX1wgYc2Gw7z5svwGwkeyWHDy9lHz82NGaPafxF
+qlannbnjglAp6LO+A6iy8KQEkeSN/8fZpJr2rW4yjTW+WmDkHMPxbNHpLcNeth28
+g38yKoe48d7Ldw==
+=yN6/
+-----END PGP SIGNATURE-----
+--=-=-=--
 
