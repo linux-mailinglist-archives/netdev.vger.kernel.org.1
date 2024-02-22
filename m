@@ -1,84 +1,106 @@
-Return-Path: <netdev+bounces-73846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A07B85ED68
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 00:51:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 860AB85ED96
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 01:08:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C68E91F21699
-	for <lists+netdev@lfdr.de>; Wed, 21 Feb 2024 23:51:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4142F28479E
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 00:08:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F291012D765;
-	Wed, 21 Feb 2024 23:50:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="ImwxpPA5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C493980C;
+	Thu, 22 Feb 2024 00:08:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0487333062
-	for <netdev@vger.kernel.org>; Wed, 21 Feb 2024 23:50:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60EA5EC3;
+	Thu, 22 Feb 2024 00:08:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708559425; cv=none; b=NxDEiD6yrko3blH6peu4TtfAzasktA5JcJsVmEKHSb38WxvSJis3L1D46KHD6NZtm4tS3taS5QbCQyHpcwcaCnJLH8pVcwsmf337SqSAqBI78M7PpheBwGaeKkuvqa7/+qVKEJREpBUtPTgPbkfn34306XEwVYZy/VxFGSpaaeE=
+	t=1708560533; cv=none; b=VmwhpIKYWurgnVyHDFTsI1E5WuaLZEL9mkHyRWSC7OPhXmJkvbaIfq/7qTwTJW0Moplix1bAE9qRrR0PyHY+r4L2qG4jHORFYw2Jg/E9nrdupibmrYvpU+1zYzeNLzqRq5RVTofJVQXV8Ry6HQ2XvqflA53rWDl30MZ6LDSccvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708559425; c=relaxed/simple;
-	bh=GhBPuCw5qrqcglNtr0ExmKn9i7WbFG7QvnOWWLkVxkU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=QR2AlfjIRVxopHc8QAmjT+BPK/14j97HOvwujAz3XeUMjiJpIpnvseYa0OidpwPmPIFwhfgUVpXktGyAdpGdJOMAIppRU7UtHOuQk0zFeSHrlVCfmUF3ujarnGQMfTe9VaLZqBvYCgnajpm8AGqhr+XNV2FSLZFnUtN4UeHB3Tg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=ImwxpPA5; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-Received: from [192.168.2.60] (210-10-213-150.per.static-ipl.aapt.com.au [210.10.213.150])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id E544520075;
-	Thu, 22 Feb 2024 07:50:15 +0800 (AWST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1708559416;
-	bh=GhBPuCw5qrqcglNtr0ExmKn9i7WbFG7QvnOWWLkVxkU=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=ImwxpPA5LvZmoY2oyUTGbdZ3Apa7FmOXSYhw6XIHxwfSDEusAKkelE9hS/Ui6f64i
-	 k7xY17hvC5bDza/D4AIVRRJn7i4/cFBfqLAMkehPyORpE6Cvq2GvVTNDfefl9+3HgN
-	 9ypP5auqS9FQDJlyEDPA4e8/u0QdN0cGiZqEM1A64IwsA49E9qiFSgln6uD2Wv1Tc8
-	 JCY5XirZdBN6/KprWlnKoC2yOXzOj59Er0VVQn+T8VxLB5KogrFIRNxfgDvoUd05Cr
-	 Q3lr7ucyTer6CpDPgSHJBfG//yw9emqGn4E+jE9xPbJb//qe1euaofY+jZbZBnaszp
-	 0bMaSqqu4kdag==
-Message-ID: <53c8a1bcb404045bdf8eb471349e06b52ed13c13.camel@codeconstruct.com.au>
-Subject: Re: [PATCH net] net: mctp: put sock on tag allocation failure
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Matt Johnston <matt@codeconstruct.com.au>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Date: Thu, 22 Feb 2024 07:50:15 +0800
-In-Reply-To: <20240221143300.0ddec4a4@kernel.org>
-References: 
-	<ce9b61e44d1cdae7797be0c5e3141baf582d23a0.1707983487.git.jk@codeconstruct.com.au>
-	 <20240221143300.0ddec4a4@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+	s=arc-20240116; t=1708560533; c=relaxed/simple;
+	bh=EGPFsgSaeo0ypk5Yg0SlooiamS5Q8KQO5RFHuVMz4PI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uEW8rUoikonz2d200YJFiYXTx8PZUOddsIdB91qx4hPUuisd05DPK6eZT0PBa0/QcJp/uJ38BQn4xdnf1cPVtSc1xVTYfGeEQDAddoyzRcAY6z04mwl6srQj6oLZ/ncB0WEcOVzPRXC/o1RDWjknEF9jywjS4awJz7gdsbZBBWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de
+Subject: [PATCH net 0/5] Netfilter fixes for net
+Date: Thu, 22 Feb 2024 01:08:38 +0100
+Message-Id: <20240222000843.146665-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hi Jakub,
+Hi,
 
-> This patch is good to be applied, right?
+The following patchset contains Netfilter fixes for net:
 
-Yep, all good on my side!
+1) If user requests to wake up a table and hook fails, restore the
+   dormant flag from the error path, from Florian Westphal.
 
-> It got marked Not Applicable in patchwork, not sure why.
+2) Reset dst after transferring it to the flow object, otherwise dst
+   gets released twice from the error path.
 
-Also not sure what happened there - I hadn't set that myself, at least!
+3) Release dst in case the flowtable selects a direct xmit path, eg.
+   transmission to bridge port. Otherwise, dst is memleaked.
 
-Cheers,
+4) Register basechain and flowtable hooks at the end of the command.
+   Error path releases these datastructure without waiting for the
+   rcu grace period.
 
+5) Use kzalloc() to initialize struct nft_hook to fix a KMSAN report
+   on access to hook type, also from Florian Westphal.
 
-Jeremy
+Please, pull these changes from:
 
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-24-02-22
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit 40b9385dd8e6a0515e1c9cd06a277483556b7286:
+
+  enic: Avoid false positive under FORTIFY_SOURCE (2024-02-19 10:57:27 +0000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-24-02-22
+
+for you to fetch changes up to 195e5f88c2e48330ba5483e0bad2de3b3fad484f:
+
+  netfilter: nf_tables: use kzalloc for hook allocation (2024-02-22 00:15:58 +0100)
+
+----------------------------------------------------------------
+netfilter pull request 24-02-22
+
+----------------------------------------------------------------
+Florian Westphal (2):
+      netfilter: nf_tables: set dormant flag on hook register failure
+      netfilter: nf_tables: use kzalloc for hook allocation
+
+Pablo Neira Ayuso (3):
+      netfilter: nft_flow_offload: reset dst in route object after setting up flow
+      netfilter: nft_flow_offload: release dst in case direct xmit path is used
+      netfilter: nf_tables: register hooks last when adding new chain/flowtable
+
+ include/net/netfilter/nf_flow_table.h |  2 +-
+ net/netfilter/nf_flow_table_core.c    | 17 ++++++--
+ net/netfilter/nf_tables_api.c         | 81 ++++++++++++++++++-----------------
+ 3 files changed, 57 insertions(+), 43 deletions(-)
 
