@@ -1,69 +1,71 @@
-Return-Path: <netdev+bounces-73952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C601185F6D9
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 12:30:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF7CA85F6DA
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 12:30:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FB7F1F224D7
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 11:30:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF679B21539
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 11:30:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28C1B3770E;
-	Thu, 22 Feb 2024 11:30:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12DE4446D5;
+	Thu, 22 Feb 2024 11:30:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rh0uXjYg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mVj5RdF1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7643FE4C
-	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 11:30:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9948A3FE4C
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 11:30:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708601412; cv=none; b=vEfEqNCrmTqC14LJZJrTYnKKAicDi4Gb/Jx1xbU3aBstIIvb2+TkzcvPGU5QPL2DYIGtNRs6ff4W0rU546A0l5vhhvBm5/SEnfR8mHnTyeGll3D7VvAYME8K37vW6DZslAog1fO3DQB0XlJ2S3WIBSHoC8m+sL65+Z8oBPnompQ=
+	t=1708601415; cv=none; b=pMEMsq90zddEtEIImFRfr1LSHQFUNRc64pPd4QECOCUlbSUCZcik9mVmGs3TtO6nw5d1FN8PqTXqwBoB52Gw1/X8nrkXCiWKskIVrazHqa61YA8Qdf1mrLePmcr8RPlvCF1lGKVI9PRfpcuxhDdEvlvveMW8EeveA7FL/wx01sU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708601412; c=relaxed/simple;
-	bh=v0rqxPxptnLQv5a/Jd0WX74CKbZ3Pi0Y50lCaDuymiE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PkMsmPRa0ivA1jU9DeIanDQiTvUyWhSA/MQ/URNwpAhuiWjBCKIhoT2aey4CRiTuHN+ompAqoe97rWjGAfJIRsrNbrwVPqu7yuaNS9azxm9La3BJZIhVxpviFZvYZXfYBmvJ59uOMlwzFHsN2nCAUZYfsmvX3Bt+ZsWW/J8Pf3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rh0uXjYg; arc=none smtp.client-ip=209.85.214.169
+	s=arc-20240116; t=1708601415; c=relaxed/simple;
+	bh=9P3/dqf/SCbDCM/INxxXwECtGJLis5ZXi3z5fbwHBRk=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=D16l5YwEwrH7gSYKy85zaDfwug+E5snyS3+If0Yxj+87j4z1iPbslzFJqwUdzqZkRBqqBgaq7EY0vMOM36xFd2+vMxCekhTaxhm01mCGalvUALdDuC9uTOPBlEIs9xqB5ZsJvBbqAsHXuzChTNh3hNk7u6UsYUeofUHnUJRa918=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mVj5RdF1; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1dbb47852cdso15341715ad.1
-        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 03:30:10 -0800 (PST)
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1dba177c596so4953915ad.0
+        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 03:30:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708601410; x=1709206210; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YevT1qrGHzVuvuX4mpM5AnAm8C2dXeB7Wku9ydzEWCk=;
-        b=Rh0uXjYgE2gD/0pul6CHsZ3qxJEvaTqSBkwccj5/4puqQnS3X6Je7ZE+2S+iIU/tcK
-         jM3SkAfLHR9gnfdsLnTZP6EyDuRWECrGNDYQf06oZEIih4mvQRXjILfKdwUwA44N82n2
-         hVW3xpf0kI5vHk/oo0DNpOgP0BoSNVt57XxPyckVbTsuFNA+FAJ8X23tb8H7YgacMUKl
-         1qaLYBpHbpyFwm5rfJVHyND25HLZBItwIwPlwNtZLpop5VHFYGYJEvdhv0FBJN3/MxzC
-         dibozcse62T/KxVPKyR5rioojRoWdGByLtL8PF7lskVnYRh3nsPZVGYA1ZsdMRWVkk26
-         LCEQ==
+        d=gmail.com; s=20230601; t=1708601413; x=1709206213; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OErMr2/tFbMgm5lFiZzZbH6qllUlMl9rYlHOVu/pd28=;
+        b=mVj5RdF1c6GoD9/Ls26Qt7NpRkmzAuvWruZxG6Wdi+D4dsyG7JUVYwwSMh12833Gwt
+         depCuKP7xTjFvKcnej4jMQt39TS6dm2mESTDe0RsQJvk7WOF3PoZUmQ+Yv3TTsbZAvbE
+         hBLPtoWp0Fa5gJ+hKtqzvXTMDIVpfbuZvVFCVeFPzA+wWPKqm7pUI0TCzqpdtxz66I02
+         Bo7GLqF60c9jzIulVYuhSceZExeH9TmJBHqRO0KNLEx+TkSFRYv/Xgfah3zywfGBkkmR
+         FuI565rTxqsiupaoxoTCWMx1cAkgmU7rgNcAYaZXGNhmmfccdr6O5MUCzUVbAkWtlhZo
+         0MVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708601410; x=1709206210;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YevT1qrGHzVuvuX4mpM5AnAm8C2dXeB7Wku9ydzEWCk=;
-        b=c4EhLaVxV3mppFpHRDjIBn9W72wgpamG1J4+ftPpBL+kOmZOnzDm9nxmFdXMDD2rSH
-         syjVmLrryEd35l34vf+CPOHr8AbZ9wKTBVX1f5+63q2i2QpfqNKfi1oW/eHFa7+W1gp+
-         d0oeg+3Oe5Rdh/cB4cTpUmUIjHTmZCqnJCKxycCRFCjTQ8rs/05gX1flxcKmr/SznDVH
-         8vtUMA/qx3N/5FzAnjQTotChVohjIb6TXfz5UOxBET4nunGwD7Fq0q8+8KaiTM50sxZ8
-         FuruoCEFxi5fT5j/jDma1eQD52wzNsjVqv1TAy+7u1HojK84WxmuqeGEpC6FbGbpNvll
-         CmbQ==
-X-Gm-Message-State: AOJu0YwE2IpifRuk+dbzMaWQfcldLhWwA7PlHfrt5fYAog4U9cXGnKDm
-	icaTd441rttzPZ+cPCMARHWHXBrfxUZjG7TgRuecZRb/+lpKXMtj
-X-Google-Smtp-Source: AGHT+IFBZVrHYU5JX9tCwglegvmYSII0tFZsyL9blbQcZ/BA37QtDNjG2djhlz7+G9SmrPjoq9uQMA==
-X-Received: by 2002:a17:902:6e08:b0:1dc:aea:10f2 with SMTP id u8-20020a1709026e0800b001dc0aea10f2mr9219064plk.10.1708601409819;
-        Thu, 22 Feb 2024 03:30:09 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708601413; x=1709206213;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OErMr2/tFbMgm5lFiZzZbH6qllUlMl9rYlHOVu/pd28=;
+        b=gBQ327mn2XBH6uHwD2hhhC3u5pt/vxnIg8Z77QOGhvoWj20jmTnFJC8ONcljBt5lh7
+         m+qinN1cCJ6DmpTf9H7w5CN/I5l7xxSdAG5zocwCKPKCwtn79G9Ryg+BB3jUFjUfw1BJ
+         D0KgJbX9mOHKDXfy816SZhqSM1SQqYc0qbDI2cf0Fnn/4EM9O0+BRr/D8ecPTx16LDvA
+         yKylFTKVWfFdsUA1hworVBG+yLJvyeSBuseE5KZmnJBdMj9QwKYbqzK/7kYR9TLeSw9t
+         Kw7Mce7XGiDIoqnVS4YADyBHPwLJEUqImhVjySFVwC3DTZzxQSwSpkfpBJBnyNKc/zGb
+         AmgQ==
+X-Gm-Message-State: AOJu0YzT0OoSAvc5WEweC15yf2EM/pj4u5CR5SrOQCbKw9ZexWTVKETI
+	CXdlrUdpnuKu+Vk53pYOX7eJWLZr3WS/pmktc8lVgpXMcS6jcce5
+X-Google-Smtp-Source: AGHT+IECP1yLa5iIqsT22OMG79LxS7NCwI5hSbT9Px9pR0BWpLJXZ2P0wDHzpliHOsGADVxTzR9MZw==
+X-Received: by 2002:a17:902:d484:b0:1d8:ff72:eef8 with SMTP id c4-20020a170902d48400b001d8ff72eef8mr3032789plg.18.1708601412794;
+        Thu, 22 Feb 2024 03:30:12 -0800 (PST)
 Received: from KERNELXING-MB0.tencent.com ([43.132.141.23])
-        by smtp.gmail.com with ESMTPSA id b3-20020a170902a9c300b001dc0955c635sm5978637plr.244.2024.02.22.03.30.07
+        by smtp.gmail.com with ESMTPSA id b3-20020a170902a9c300b001dc0955c635sm5978637plr.244.2024.02.22.03.30.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Feb 2024 03:30:09 -0800 (PST)
+        Thu, 22 Feb 2024 03:30:12 -0800 (PST)
 From: Jason Xing <kerneljasonxing@gmail.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -74,10 +76,12 @@ To: davem@davemloft.net,
 Cc: netdev@vger.kernel.org,
 	kerneljasonxing@gmail.com,
 	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next v8 00/10] introduce drop reasons for tcp receive path
-Date: Thu, 22 Feb 2024 19:29:53 +0800
-Message-Id: <20240222113003.67558-1-kerneljasonxing@gmail.com>
+Subject: [PATCH net-next v8 01/10] tcp: add a dropreason definitions and prepare for cookie check
+Date: Thu, 22 Feb 2024 19:29:54 +0800
+Message-Id: <20240222113003.67558-2-kerneljasonxing@gmail.com>
 X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20240222113003.67558-1-kerneljasonxing@gmail.com>
+References: <20240222113003.67558-1-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,113 +92,82 @@ Content-Transfer-Encoding: 8bit
 
 From: Jason Xing <kernelxing@tencent.com>
 
-When I was debugging the reason about why the skb should be dropped in
-syn cookie mode, I found out that this NOT_SPECIFIED reason is too
-general. Thus I decided to refine it.
+Adding one drop reason to detect the condition of skb dropped
+because of hook points in cookie check and extending NO_SOCKET
+to consider another two cases can be used later.
 
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+--
 v8
-Link: https://lore.kernel.org/netdev/20240221025732.68157-1-kerneljasonxing@gmail.com/
-1. refine part of codes in patch [03/10] and patch [10/10] (Eric)
-2. squash patch [11/11] in the last version into patch [10/11] (Eric)
-3. add reviewed-by tags (Eric)
+Link: https://lore.kernel.org/netdev/CANn89iJ3gLMn5psbzfVCOo2=v4nMn4m41wpr6svxyAmO4R1m6g@mail.gmail.com/
+1. add reviewed-by tag (Eric)
 
 v7
-Link: https://lore.kernel.org/all/20240219032838.91723-1-kerneljasonxing@gmail.com/
-1. fix some misspelled problem (Kuniyuki)
-2. remove redundant codes in tcp_v6_do_rcv() (Kuniyuki)
-3. add reviewed-by tag in patch [02/11] (Kuniyuki)
+Link: https://lore.kernel.org/all/20240219040630.94637-1-kuniyu@amazon.com/
+1. nit: change "invalid" to "valid" (Kuniyuki)
+2. add more description.
 
 v6
-Link: https://lore.kernel.org/all/c987d2c79e4a4655166eb8eafef473384edb37fb.camel@redhat.com/
-Link: https://lore.kernel.org/all/CAL+tcoAgSjwsmFnDh_Gs9ZgMi-y5awtVx+4VhJPNRADjo7LLSA@mail.gmail.com/
-1. Take one case into consideration in tcp_v6_do_rcv(), behave like old
-days, or else it will trigger errors (Paolo).
-2. Extend NO_SOCKET reason to consider two more reasons for request
-socket and child socket.
+Link: https://lore.kernel.org/netdev/20240215210922.19969-1-kuniyu@amazon.com/
+1. Modify the description NO_SOCKET to extend other two kinds of invalid
+socket cases.
+What I think about it is we can use it as a general indicator for three kinds of
+sockets which are invalid/NULL, like what we did to TCP_FLAGS.
+Any better ideas/suggestions are welcome :)
 
-v5:
-Link: https://lore.kernel.org/netdev/20240213134205.8705-1-kerneljasonxing@gmail.com/
-Link: https://lore.kernel.org/netdev/20240213140508.10878-1-kerneljasonxing@gmail.com/
-1. Use SKB_DROP_REASON_IP_OUTNOROUTES instead of introducing a new
-   one (Eric, David)
-2. Reuse SKB_DROP_REASON_NOMEM to handle failure of request socket
-   allocation (Eric)
+v5
+Link: https://lore.kernel.org/netdev/CANn89i+iELpsoea6+C-08m6+=JkneEEM=nAj-28eNtcOCkwQjw@mail.gmail.com/
+Link: https://lore.kernel.org/netdev/632c6fd4-e060-4b8e-a80e-5d545a6c6b6c@kernel.org/
+1. Use SKB_DROP_REASON_IP_OUTNOROUTES instead of introducing a new one (Eric, David)
+2. Reuse SKB_DROP_REASON_NOMEM to handle failure of request socket allocation (Eric)
 3. Reuse NO_SOCKET instead of introducing COOKIE_NOCHILD
-4. avoid duplication of these opt_skb tests/actions (Eric)
-5. Use new name (TCP_ABORT_ON_DATA) for readability (David)
-6. Reuse IP_OUTNOROUTES instead of INVALID_DST (Eric)
+4. Reuse IP_OUTNOROUTES instead of INVALID_DST (Eric)
+5. adjust the title and description.
 
-
----
-HISTORY
-This series is combined with 2 series sent before suggested by Jakub. So
-I'm going to separately write changelogs for each of them.
-
-PATCH 1/11 - 5/11
-preivious Link: https://lore.kernel.org/netdev/20240213134205.8705-1-kerneljasonxing@gmail.com/
-Summary
-1. introduce all the dropreasons we need, [1/11] patch.
-2. use new dropreasons in ipv4 cookie check, [2/11],[3/11] patch.
-3. use new dropreasons ipv6 cookie check, [4/11],[5/11] patch.
-
-v4:
+v4
 Link: https://lore.kernel.org/netdev/20240212172302.3f95e454@kernel.org/
-1. Fix misspelled name in Kdoc as suggested by Jakub.
+1. fix misspelled name in kdoc as Jakub said
+---
+ include/net/dropreason-core.h | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-v3:
-Link: https://lore.kernel.org/all/CANn89iK40SoyJ8fS2U5kp3pDruo=zfQNPL-ppOF+LYaS9z-MVA@mail.gmail.com/
-1. Split that patch into some smaller ones as suggested by Eric.
-
-v2:
-Link: https://lore.kernel.org/all/20240204104601.55760-1-kerneljasonxing@gmail.com/
-1. change the title of 2/2 patch.
-2. fix some warnings checkpatch tool showed before.
-3. use return value instead of adding more parameters suggested by Eric.
-
-
-PATCH 6/11 - 11/11
-previous Link: https://lore.kernel.org/netdev/20240213140508.10878-1-kerneljasonxing@gmail.com/
-v4:
-Link: https://lore.kernel.org/netdev/CANn89iJar+H3XkQ8HpsirH7b-_sbFe9NBUdAAO3pNJK3CKr_bg@mail.gmail.com/
-Link: https://lore.kernel.org/netdev/20240213131205.4309-1-kerneljasonxing@gmail.com/
-Already got rid of @acceptable in tcp_rcv_state_process(), so I need to
-remove *TCP_CONNREQNOTACCEPTABLE related codes which I wrote in the v3
-series.
-
-v3:
-Link: https://lore.kernel.org/all/CANn89iK40SoyJ8fS2U5kp3pDruo=zfQNPL-ppOF+LYaS9z-MVA@mail.gmail.com/
-1. Split that patch into some smaller ones as suggested by Eric.
-
-v2:
-Link: https://lore.kernel.org/all/20240204104601.55760-1-kerneljasonxing@gmail.com/
-1. change the title of 2/2 patch.
-2. fix some warnings checkpatch tool showed before.
-3. use return value instead of adding more parameters suggested by Eric.
-
-Jason Xing (10):
-  tcp: add a dropreason definitions and prepare for cookie check
-  tcp: directly drop skb in cookie check for ipv4
-  tcp: use drop reasons in cookie check for ipv4
-  tcp: directly drop skb in cookie check for ipv6
-  tcp: use drop reasons in cookie check for ipv6
-  tcp: introduce dropreasons in receive path
-  tcp: add more specific possible drop reasons in
-    tcp_rcv_synsent_state_process()
-  tcp: add dropreasons in tcp_rcv_state_process()
-  tcp: make the dropreason really work when calling
-    tcp_rcv_state_process()
-  tcp: make dropreason in tcp_child_process() work
-
- include/net/dropreason-core.h | 26 ++++++++++++++++++++++++--
- include/net/tcp.h             |  4 ++--
- net/ipv4/syncookies.c         | 21 ++++++++++++++++-----
- net/ipv4/tcp_input.c          | 25 +++++++++++++++++--------
- net/ipv4/tcp_ipv4.c           | 17 ++++++++++-------
- net/ipv4/tcp_minisocks.c      |  9 +++++----
- net/ipv6/syncookies.c         | 18 +++++++++++++++---
- net/ipv6/tcp_ipv6.c           | 22 ++++++++++++----------
- 8 files changed, 101 insertions(+), 41 deletions(-)
-
+diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
+index 6d3a20163260..a871f061558d 100644
+--- a/include/net/dropreason-core.h
++++ b/include/net/dropreason-core.h
+@@ -54,6 +54,7 @@
+ 	FN(NEIGH_QUEUEFULL)		\
+ 	FN(NEIGH_DEAD)			\
+ 	FN(TC_EGRESS)			\
++	FN(SECURITY_HOOK)		\
+ 	FN(QDISC_DROP)			\
+ 	FN(CPU_BACKLOG)			\
+ 	FN(XDP)				\
+@@ -105,7 +106,13 @@ enum skb_drop_reason {
+ 	SKB_CONSUMED,
+ 	/** @SKB_DROP_REASON_NOT_SPECIFIED: drop reason is not specified */
+ 	SKB_DROP_REASON_NOT_SPECIFIED,
+-	/** @SKB_DROP_REASON_NO_SOCKET: socket not found */
++	/**
++	 * @SKB_DROP_REASON_NO_SOCKET: no valid socket that can be used.
++	 * Reason could be one of three cases:
++	 * 1) no established/listening socket found during lookup process
++	 * 2) no valid request socket during 3WHS process
++	 * 3) no valid child socket during 3WHS process
++	 */
+ 	SKB_DROP_REASON_NO_SOCKET,
+ 	/** @SKB_DROP_REASON_PKT_TOO_SMALL: packet size is too small */
+ 	SKB_DROP_REASON_PKT_TOO_SMALL,
+@@ -271,6 +278,8 @@ enum skb_drop_reason {
+ 	SKB_DROP_REASON_NEIGH_DEAD,
+ 	/** @SKB_DROP_REASON_TC_EGRESS: dropped in TC egress HOOK */
+ 	SKB_DROP_REASON_TC_EGRESS,
++	/** @SKB_DROP_REASON_SECURITY_HOOK: dropped due to security HOOK */
++	SKB_DROP_REASON_SECURITY_HOOK,
+ 	/**
+ 	 * @SKB_DROP_REASON_QDISC_DROP: dropped by qdisc when packet outputting (
+ 	 * failed to enqueue to current qdisc)
 -- 
 2.37.3
 
