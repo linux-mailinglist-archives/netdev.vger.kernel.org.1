@@ -1,140 +1,162 @@
-Return-Path: <netdev+bounces-74025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 776B485FA94
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 15:00:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71AF085FAC7
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 15:08:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 164211F25D10
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 14:00:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C843289078
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 14:08:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87F08135A67;
-	Thu, 22 Feb 2024 14:00:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2BC314A08F;
+	Thu, 22 Feb 2024 14:06:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09308135403;
-	Thu, 22 Feb 2024 14:00:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 940FD13341F
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 14:06:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708610407; cv=none; b=cECg+DKR/paMp6nBEBMemt7suyMtsGODO9lvkuw8mgs16VB32PX5OpUsqx4CIZc5+hxzFCQyVf9gZkIYntTcLR9UR9C1SCrIENK7zO0WOUZHeqdt1Q9DICnIJhR16Y0DqGx/SBx2AFlA3a4y3xQPXPdLXhuMutIURqOf/x9wkfM=
+	t=1708610784; cv=none; b=sA1iM0ho8N3HL7FXTnXveUuc3GJtok8i/DCxTmpO4T0wFT8Ht/3MZ+1FlBRr1AYoEnOBVRYS9I1Cyatlx8x4yT5bBKvyYbMYzFvs+NNwdCnjof2Ebjh+NTzF9K7ufGaLQo0rGpc27167OAZmvLHLoKdNDWMRWGyOOUcFfiZNlm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708610407; c=relaxed/simple;
-	bh=faC93JEXJFCufNC5dOS6ApNeW8gKvRR+kMj0RPtYFkQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SF7tB6DRQ1XgTvMipaTQlB1vulN5vxcLOCYtwrJNXSdJGTUxn1tKysc17kXMpDyj4tSPRcW/DndCAgFzDqwS5j0HFrG/1FTy+xJU8vrdqqoZt9oRexi7sQXWkn9vD8p1DsjVGPEwOtAz25wSZ3+ENx0qEcBh+C11avOhM2FIEL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.161.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-5a0333a9779so134114eaf.0;
-        Thu, 22 Feb 2024 06:00:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708610405; x=1709215205;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2wGnYwIfq9nup3u9bw55avJLf6TS9fj3kCr0bhf4Ym8=;
-        b=cnUzz2lmsOqJs3jlzy8yNVZGDcTSNHIrKHCGqoldcWIucfjqCBve+f1miGMHg+qy+h
-         Kkget2JI5pw50dSUH3WS9urkcWCBbtIqFqDQSr7KG0qFhgfbmIoSWS+CDHBmRhdcRi1s
-         00l9cKtRN+HebfPFQvKdZ82gJdnCopKb0y3rW4jKEEk7bvlNYUePPhbMmuu3Q6fVpeQV
-         cXd7NEVjYVbiGYXgSbuUUSb5j/ur3rJCzbroiOJyUoSgzvdXCZiBuXGrajfri/KJ82hq
-         3F0ecUHM6ZDaSDQDb5fN9fou/oPvbG4o74JFPWHk7+8NeGHv0Yj5+1bK7cxN4cJNaWwe
-         2FCg==
-X-Forwarded-Encrypted: i=1; AJvYcCWEPAyK6h/JXcQk/dQ3VZShRs8K9Z1xlcvAHMymYDP9etpzQaKOo/IIqp+6wah1EcPgND0CFs/lgiMSjx8UFqIHjkDlKkmpVOLT5SbmUt0wGkqaPRmkFXK0WIGMJHnncRJBMirrd/DS9m2oRmKPJ/uctlhPXZcXYvIiGv3j1abB9+BbCYsIim+NTS+xgeU7oBlJW5ge+Xn81mQLA9i5qQ==
-X-Gm-Message-State: AOJu0Yza3Z7YAwUB1O1YIKSlQq6BuffQc85zMGP8wdX8yugE7eJnZ15e
-	sBTB+Ivvvsu6Pa3PPIURT1UWcQ+sNHcPtIr8St+6+cQkeINNUTkzveAWSpD5gL6dAuo0PxT7R7j
-	etT6rUfeFvzldzzvKnDDIhwXzfuc=
-X-Google-Smtp-Source: AGHT+IFk/cRrA9w3h6K7wqQ/CveV9XXnLmyjBHYg13D8CnoEJk666aXdvpwHpLKnzNNGD1cS009+cnPg4rM90X+uxuM=
-X-Received: by 2002:a05:6820:134d:b0:59f:881f:9318 with SMTP id
- b13-20020a056820134d00b0059f881f9318mr26243164oow.0.1708610404960; Thu, 22
- Feb 2024 06:00:04 -0800 (PST)
+	s=arc-20240116; t=1708610784; c=relaxed/simple;
+	bh=lNMNrhSql6efyyvdH+prK/tqg80QuxRFYS1jbSRFxU4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=lX7G0lEWo2VgY2/PBjitU9QgZTA/pSeOT5o7Qy7pmziUCIIBAaXZmn80x8Tf40EvcIXrbIUr3tAQ/BXsGJ+IjDTqsy9xdrCtdt0KwwCbEVmAe3unk3Y30qmUs2oYHb8TRA8jPaQJ9JoPJabBnHRp9DuoNbLUStucl29ARLeO8/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@breakpoint.cc>)
+	id 1rd9iN-0005Zi-B8; Thu, 22 Feb 2024 15:06:19 +0100
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Florian Westphal <fw@strlen.de>,
+	Eric Dumazet <edumazet@google.com>,
+	Simon Horman <horms@kernel.org>,
+	syzbot+99d15fcdb0132a1e1a82@syzkaller.appspotmail.com
+Subject: [PATCH net v2] net: mpls: error out if inner headers are not set
+Date: Thu, 22 Feb 2024 15:03:10 +0100
+Message-ID: <20240222140321.14080-1-fw@strlen.de>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <CANn89iJZnY_0iM8Ft9cAOA7twCb8iQ4jf5FJP8fubg9_Z0EZkg@mail.gmail.com>
+References: <CANn89iJZnY_0iM8Ft9cAOA7twCb8iQ4jf5FJP8fubg9_Z0EZkg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <6017196.lOV4Wx5bFT@kreacher> <9235101.CDJkKcVGEf@kreacher> <cd710cd4-c723-48e0-80d2-72d9d95f9e0c@linaro.org>
-In-Reply-To: <cd710cd4-c723-48e0-80d2-72d9d95f9e0c@linaro.org>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Thu, 22 Feb 2024 14:59:53 +0100
-Message-ID: <CAJZ5v0jD=AmR0w49wDhDJ2Bq1KewUmGApe_Gc=v7SNb-jtqNPA@mail.gmail.com>
-Subject: Re: [PATCH v2 8/9] thermal: of: Set THERMAL_TRIP_FLAG_RW_TEMP directly
-To: Daniel Lezcano <daniel.lezcano@linaro.org>
-Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>, Linux PM <linux-pm@vger.kernel.org>, 
-	Lukasz Luba <lukasz.luba@arm.com>, LKML <linux-kernel@vger.kernel.org>, 
-	Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>, 
-	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, Zhang Rui <rui.zhang@intel.com>, 
-	netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, 
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>, linux-wireless@vger.kernel.org, 
-	Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, 
-	Pengutronix Kernel Team <kernel@pengutronix.de>, 
-	Manaf Meethalavalappu Pallikunhi <quic_manafm@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Feb 22, 2024 at 2:48=E2=80=AFPM Daniel Lezcano
-<daniel.lezcano@linaro.org> wrote:
->
-> On 12/02/2024 19:40, Rafael J. Wysocki wrote:
-> > From: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-> >
-> > It is now possible to flag trip points with THERMAL_TRIP_FLAG_RW_TEMP
-> > to allow their temperature to be set from user space via sysfs instead
-> > of using a nonzero writable trips mask during thermal zone registration=
-,
-> > so make the OF thermal code do that.
-> >
-> > No intentional functional impact.
-> >
-> > Note that this change is requisite for dropping the mask argument from
-> > thermal_zone_device_register_with_trips() going forward.
-> >
-> > Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-> > ---
-> >
-> > v1 -> v2: Rename trip flag (Stanislaw).
-> >
-> > ---
-> >   drivers/thermal/thermal_of.c |    8 ++++----
-> >   1 file changed, 4 insertions(+), 4 deletions(-)
-> >
-> > Index: linux-pm/drivers/thermal/thermal_of.c
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > --- linux-pm.orig/drivers/thermal/thermal_of.c
-> > +++ linux-pm/drivers/thermal/thermal_of.c
-> > @@ -117,6 +117,8 @@ static int thermal_of_populate_trip(stru
-> >               return ret;
-> >       }
-> >
-> > +     trip->flags =3D THERMAL_TRIP_FLAG_RW_TEMP;
-> > +
-> >       return 0;
-> >   }
->
-> Even if you are not at the origin of this default behavior. I'm
-> wondering if we should be more protective against changes from userspace
-> when the firmware is telling us to protect the silicon at a specific
-> temperature.
->
-> What do you think if we set the THERMAL_TRIP_FLAG_RW_TEMP only if the
-> trip point is not bound to a cooling device?
->
-> So trip points without associated cooling device can be writable but
-> others can be considered as managed by the kernel and no modifiable.
+mpls_gso_segment() assumes skb_inner_network_header() returns
+a valid result:
 
-This sounds reasonable to me.
+  mpls_hlen = skb_inner_network_header(skb) - skb_network_header(skb);
+  if (unlikely(!mpls_hlen || mpls_hlen % MPLS_HLEN))
+        goto out;
+  if (unlikely(!pskb_may_pull(skb, mpls_hlen)))
 
-This is mostly relevant to thermal_of anyway, because the other
-drivers asking for writable trip temperature seem to want it
-regardless.
+With syzbot reproducer, skb_inner_network_header() yields 0,
+skb_network_header() returns 108, so this will
+"pskb_may_pull(skb, -108)))" which triggers a newly added
+DEBUG_NET_WARN_ON_ONCE() check:
 
-> (This comment does not put in question this patch BTW)
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 5068 at include/linux/skbuff.h:2723 pskb_may_pull_reason include/linux/skbuff.h:2723 [inline]
+WARNING: CPU: 0 PID: 5068 at include/linux/skbuff.h:2723 pskb_may_pull include/linux/skbuff.h:2739 [inline]
+WARNING: CPU: 0 PID: 5068 at include/linux/skbuff.h:2723 mpls_gso_segment+0x773/0xaa0 net/mpls/mpls_gso.c:34
+[..]
+ skb_mac_gso_segment+0x383/0x740 net/core/gso.c:53
+ nsh_gso_segment+0x40a/0xad0 net/nsh/nsh.c:108
+ skb_mac_gso_segment+0x383/0x740 net/core/gso.c:53
+ __skb_gso_segment+0x324/0x4c0 net/core/gso.c:124
+ skb_gso_segment include/net/gso.h:83 [inline]
+ [..]
+ sch_direct_xmit+0x11a/0x5f0 net/sched/sch_generic.c:327
+ [..]
+ packet_sendmsg+0x46a9/0x6130 net/packet/af_packet.c:3113
+ [..]
 
-OK
+First iteration of this patch made mpls_hlen signed and changed
+test to error out to "mpls_hlen <= 0 || ..".
+
+Eric Dumazet said:
+ > I was thinking about adding a debug check in skb_inner_network_header()
+ > if inner_network_header is zero (that would mean it is not 'set' yet),
+ > but this would trigger even after your patch.
+
+So add new skb_inner_network_header_was_set() helper and use that.
+
+The syzbot reproducer injects data via packet socket. The skb that gets
+allocated and passed down the stack has ->protocol set to NSH (0x894f)
+and gso_type set to SKB_GSO_UDP | SKB_GSO_DODGY.
+
+This gets passed to skb_mac_gso_segment(), which sees NSH as ptype to
+find a callback for.  nsh_gso_segment() retrieves next type:
+
+        proto = tun_p_to_eth_p(nsh_hdr(skb)->np);
+
+... which is MPLS (TUN_P_MPLS_UC). It updates skb->protocol and then
+calls mpls_gso_segment().  Inner offsets are all 0, so mpls_gso_segment()
+ends up with a negative header size.
+
+In case more callers rely on silent handling of such large may_pull values
+we could also 'legalize' this behaviour, either replacing the debug check
+with (len > INT_MAX) test or removing it and instead adding a comment
+before existing
+
+ if (unlikely(len > skb->len))
+    return SKB_DROP_REASON_PKT_TOO_SMALL;
+
+test in pskb_may_pull_reason(), saying that this check also implicitly
+takes care of callers that miscompute header sizes.
+
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Simon Horman <horms@kernel.org>
+Fixes: 219eee9c0d16 ("net: skbuff: add overflow debug check to pull/push helpers")
+Reported-by: syzbot+99d15fcdb0132a1e1a82@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/00000000000043b1310611e388aa@google.com/raw
+Signed-off-by: Florian Westphal <fw@strlen.de>
+---
+ include/linux/skbuff.h | 5 +++++
+ net/mpls/mpls_gso.c    | 3 +++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index 28c7cb7ce251..1470b74fb6d2 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -2894,6 +2894,11 @@ static inline void skb_set_inner_network_header(struct sk_buff *skb,
+ 	skb->inner_network_header += offset;
+ }
+ 
++static inline bool skb_inner_network_header_was_set(const struct sk_buff *skb)
++{
++	return skb->inner_network_header > 0;
++}
++
+ static inline unsigned char *skb_inner_mac_header(const struct sk_buff *skb)
+ {
+ 	return skb->head + skb->inner_mac_header;
+diff --git a/net/mpls/mpls_gso.c b/net/mpls/mpls_gso.c
+index 533d082f0701..45d1e6a157fc 100644
+--- a/net/mpls/mpls_gso.c
++++ b/net/mpls/mpls_gso.c
+@@ -27,6 +27,9 @@ static struct sk_buff *mpls_gso_segment(struct sk_buff *skb,
+ 	__be16 mpls_protocol;
+ 	unsigned int mpls_hlen;
+ 
++	if (!skb_inner_network_header_was_set(skb))
++		goto out;
++
+ 	skb_reset_network_header(skb);
+ 	mpls_hlen = skb_inner_network_header(skb) - skb_network_header(skb);
+ 	if (unlikely(!mpls_hlen || mpls_hlen % MPLS_HLEN))
+-- 
+2.43.0
+
 
