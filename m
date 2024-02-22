@@ -1,98 +1,104 @@
-Return-Path: <netdev+bounces-73975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15CD485F842
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 13:33:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 739F885F85D
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 13:39:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 861D91F24219
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 12:33:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2237F1F2656E
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 12:39:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F2E512C809;
-	Thu, 22 Feb 2024 12:32:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="muRW72nl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54E8F12DD96;
+	Thu, 22 Feb 2024 12:38:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A70E17CF32
-	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 12:32:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFE3312DDA3
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 12:38:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708605178; cv=none; b=cO8kj6OKkqtzarZuTVv3+Uh8eddRdvYDQOw2yPWzqPesZyho20Q5HXdUlhqYq7k507xCHWLhS0Pbs5KodKR6F+Ne+lane/zCSFIq44WOde8ZoPAgLjYqFaLbSrCyadSeGxzVq+7qhHsfVO6Y1783WPRtGx5BaPeNxwoO55keEow=
+	t=1708605538; cv=none; b=t3za1AJR0chaCi2gzTXLdVQ+5EE4VxgfqRDgyVSkT39lAOy+4ono3IsnPFBjwj+5Gq57bXlBwzCv2edqw8FzGhg8mkn0TxVBrsrgj+UmJaoopvmVSegLZpTKDqlBqhYswKv0NWZH4ndQeNOlRunt8oJ+45KeLFUBGMcZ++nEHVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708605178; c=relaxed/simple;
-	bh=9d6nEfXhwvNHm2s27Bi+eNFBLAEPHACv1E1hBdvbTdA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qLBmledWLJbkHm0T8sDso6EihVxAb/y15MnAF9busmU76RkG0Tys6LBM1ohGUcE4Roaxj53tdUbvDeRgyo8CJF6RU3d/Ebp2kqRm0q6WEBcVVhMS+6TLshmN1bKnujRoWGVtfuquS5THjQyqelivf+WHymV/efPox0RjBpZiXZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=muRW72nl; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-564e4477b7cso9221a12.1
-        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 04:32:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708605175; x=1709209975; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9d6nEfXhwvNHm2s27Bi+eNFBLAEPHACv1E1hBdvbTdA=;
-        b=muRW72nl/5LJw94MgKr7gEHSMtUN15P8yM4zaV68fgjjTTHvxIZuEPZNCv9/e7vboO
-         cPyKAD7imdgVSrFBc0VSKrbZ5JNvSL2wGlEE2JPYAzDQLmYpzHCvVBkhyl6k+Vs0KrEo
-         AHJNsn0VK6b7xlSKzrXcLHI1OVLOQmSxyDxus6VR61J1TDy35PzZFjDhp59OPVTcJ/eX
-         IgzmEFxPi3OSvyBuutRoclvTGMhZ5iP4HevevJVyo6Aq5oxUR2I+5NE24sPATk+hXFUu
-         cd+0rk+gtIJUquPc1l1h2Oo0aAoNCiNdEL1gsSDTbnsY6m90Ze8IZ6K6y+CF/NXAtgT1
-         S50w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708605175; x=1709209975;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9d6nEfXhwvNHm2s27Bi+eNFBLAEPHACv1E1hBdvbTdA=;
-        b=mZpG5R9ZlxK0ttAcxJvT7Z7UFeC5fzXkBu60ZXAOCI1YYDymj0cwKV1oZBUpITxBQU
-         urHL/x0U2IJxgRVhQQwsguB/iwyhkdDFBZRL6YnSnAObyYfNzglPtX4ThvWNGLn5Dog4
-         TM2DGkMZdM2ve/8uChpbKbdR9tm5/I5fP4MXmxBl3D54mGN/jEWW+u827+D+x/9mw36m
-         /x+3c2f7672yLysUP4NAzAqM36mIS2GkUduRCM3BOTMhy8wla2Cm6uUuNupaVQR48/GN
-         u1dc85rxun39pDUp71nTQe4Ua6gkTIHjzQVpESbE5IlwVB7xvpWvT6x4/WOJc8Sm9xxB
-         +zig==
-X-Forwarded-Encrypted: i=1; AJvYcCX4pQ8l7bDQ9+Gfo/ChauoeeEcsKyz5/kQcoZMXobJpu5u3G+MRSN4FrOAIbfA7XmzLQkSiYsYAY0kvwCsBrn9rQ8jkfo4u
-X-Gm-Message-State: AOJu0Ywe3HQ1pZuEcVlJZdnv3Pdffmp/+//fxTb5qbafw+bZFV+sASrc
-	2KM7gkEk8M9KhCPCaqIM/nJ1hzECemclgky1namd/0+QQrN1BrU/ZRZDI1bQKe9/I98po+UyEOj
-	R5o1DJBtKswc3kTd91NcU79g776qOCnm3Ayhx2qfxdvpmKRsW54KE
-X-Google-Smtp-Source: AGHT+IGTR0z1t+0DSx38+hY9b5dtlC68tLgGv0GNBx9YIZRMspFA6FplV17ihbPs+cHDolCNQF/foggsHxGJCAhCoM4=
-X-Received: by 2002:a50:8a8c:0:b0:565:4c2a:c9b6 with SMTP id
- j12-20020a508a8c000000b005654c2ac9b6mr41729edj.0.1708605174684; Thu, 22 Feb
- 2024 04:32:54 -0800 (PST)
+	s=arc-20240116; t=1708605538; c=relaxed/simple;
+	bh=BgXSG/gCEdxQcMxhZfn7pF1ZUmFlN4Q+NRemkxs/KxU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nrS0qPUS5/IAbLFjOvGnFJ94yrUfH/CVje7nWDtxNqHQl2BmgA2BMmPy2YdTiX+i+KkRrR7M2IoCxIU0sjZQllXgUUnlG7rFpdbbJMBz2xsh5pyqRYmnQzntZK0QJcId7qBXWWMBKvu1xH3ZKU3HOEXz8NWPQgjeJq8c7lh7TuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rd8La-0004bQ-6E; Thu, 22 Feb 2024 13:38:42 +0100
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rd8LY-002EZ4-8G; Thu, 22 Feb 2024 13:38:40 +0100
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rd8LY-00Boin-0b;
+	Thu, 22 Feb 2024 13:38:40 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com
+Subject: [PATCH net v1 1/1] lan78xx: enable auto speed configuration for LAN7850 if no EEPROM is detected
+Date: Thu, 22 Feb 2024 13:38:38 +0100
+Message-Id: <20240222123839.2816561-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240222113003.67558-1-kerneljasonxing@gmail.com> <20240222113003.67558-11-kerneljasonxing@gmail.com>
-In-Reply-To: <20240222113003.67558-11-kerneljasonxing@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 22 Feb 2024 13:32:43 +0100
-Message-ID: <CANn89iKE2vYz_6sYd=u3HbqdgiU0BWhdMY9-ivs0Rcht+X+Rfg@mail.gmail.com>
-Subject: Re: [PATCH net-next v8 10/10] tcp: make dropreason in
- tcp_child_process() work
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	dsahern@kernel.org, kuniyu@amazon.com, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Thu, Feb 22, 2024 at 12:30=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.=
-com> wrote:
->
-> From: Jason Xing <kernelxing@tencent.com>
->
-> It's time to let it work right now. We've already prepared for this:)
->
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+Same as LAN7800, LAN7850 can be used without EEPROM. If EEPROM is not
+present or not flashed, LAN7850 will fail to sync the speed detected by the PHY
+with the MAC. In case link speed is 100Mbit, it will accidentally work,
+otherwise no data can be transferred.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Better way would be to implement link_up callback, or set auto speed
+configuration unconditionally. But this changes would be more intrusive.
+So, for now, set it only if no EEPROM is found.
+
+Fixes: e69647a19c87 ("lan78xx: Set ASD in MAC_CR when EEE is enabled.")
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+---
+ drivers/net/usb/lan78xx.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
+index 106282612bc2..7d7e185d7fae 100644
+--- a/drivers/net/usb/lan78xx.c
++++ b/drivers/net/usb/lan78xx.c
+@@ -3033,7 +3033,8 @@ static int lan78xx_reset(struct lan78xx_net *dev)
+ 	if (dev->chipid == ID_REV_CHIP_ID_7801_)
+ 		buf &= ~MAC_CR_GMII_EN_;
+ 
+-	if (dev->chipid == ID_REV_CHIP_ID_7800_) {
++	if (dev->chipid == ID_REV_CHIP_ID_7800_ ||
++	    dev->chipid == ID_REV_CHIP_ID_7850_) {
+ 		ret = lan78xx_read_raw_eeprom(dev, 0, 1, &sig);
+ 		if (!ret && sig != EEPROM_INDICATOR) {
+ 			/* Implies there is no external eeprom. Set mac speed */
+-- 
+2.39.2
+
 
