@@ -1,116 +1,99 @@
-Return-Path: <netdev+bounces-73855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D913B85EE57
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 01:57:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 00DE685EE63
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 02:00:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 780B61F22D95
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 00:57:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28ACC1F22C65
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 01:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C215D10A3D;
-	Thu, 22 Feb 2024 00:57:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B900310A23;
+	Thu, 22 Feb 2024 01:00:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ogw8MftI"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2EF10F1;
-	Thu, 22 Feb 2024 00:57:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F8CA28EF;
+	Thu, 22 Feb 2024 01:00:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708563446; cv=none; b=MlgcdaYSOtXIk6P+WPJLKcbZwMy13+rA/o/8aOOlJpXUyCrEnAZKbnZAgNjFnlX2gAX6KDvUZ/ieraJsqy1LPM3Gsk81Jx9IlQCzJC9CYm+GZgZ88zzb4hyC1F4hnZSZaL6xoM7SCD2/3TLyBcLYkqk7xscKZlbD2RNfz1JmNLY=
+	t=1708563625; cv=none; b=rk0wrZGw5sgMLM0GwwIcLeyuUGIxzSw6L5ZxJASl5rZsRA1TY5uZwC9dfOz0BIixmPs+ykw7dFS8iyNG4kdlANCvo92x7ipzE/IQbwv8iARBKcUUM7D01F+0DUPAmdJMujfpyKaXRfPBoO+UlC99enQL66znMRS7R+WXOTG7GKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708563446; c=relaxed/simple;
-	bh=TpNLIT6IBsmqizqpSoGO/6QU3PYKUcfmgj/xzzcRj2E=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=H3aUBe/Nw+U8Cb5vYCbTAA+RGDzRfNhXpkaiIc/e3nzOct2CrKSOA1W9mbjpxEiBLDNBWgbsgnF4PJg0VfcOaPG7LKs8dA+TEqcvfheBkNJ5O3GTS6z2+Yq/CzRf7oN+NHxWtbHGslBGXp/f60W6nCG6sDmhCvfO1Jy5azB4mSY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4TgF6d26ZSz2Bd3b;
-	Thu, 22 Feb 2024 08:55:05 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id A555D140383;
-	Thu, 22 Feb 2024 08:57:14 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 22 Feb 2024 08:57:13 +0800
-Message-ID: <45ac5429-df48-489e-928f-8444aea127cd@huawei.com>
-Date: Thu, 22 Feb 2024 08:57:12 +0800
+	s=arc-20240116; t=1708563625; c=relaxed/simple;
+	bh=ggpfbAk/8v/uRbo53fh+Pe5sfNyqrpSgwKHDrVgb8PQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qgs1x/ig8oAq5TtvTv2CV9dll5kvw13n+/V0Svb2HBKVauPr9g4bYOh98wxUBwgqRmD+foIlB9rj0Jq0HRuZrgKf4ldoUK2gOGSf6723R0+FunUTRvNkdKktBb8SPehdkE511G1STjJyfABVInHGoVqoctrhs+RdF+xFJOhhkHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ogw8MftI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02E85C433C7;
+	Thu, 22 Feb 2024 01:00:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708563625;
+	bh=ggpfbAk/8v/uRbo53fh+Pe5sfNyqrpSgwKHDrVgb8PQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Ogw8MftII1she2XJ/vthGAOx21yXJm/UADxrQwTaBYHTGurb4Bl5WhdgC01NEjlMW
+	 uPEh4cxfQg7LdyNMO9p5RAFgIlMyDeK7naLh2PZHJPKiv8Nvovbrai68h9555iGAu+
+	 6mNBcfnYDF8p1SJgyfNqJjOba3k8AKAPse70Psxx5vwjYx5XVtVdQ5l6j5ppSe9zq8
+	 8x+MZWjstN3ehwaqktbqT07NythCCrcMTzbsl/BtagtPF0a7tA1CrbjUe9BAeSMs0O
+	 4UAj+ly3OU6rAhOZ3nH6A+/LxGb7QRSq70tk9JKZRKjmbUlCuxyjwlmhjEF49fp0+M
+	 qCC/X222RBsQg==
+Date: Wed, 21 Feb 2024 17:00:23 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
+ <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ linux-arm-kernel@lists.infradead.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>, Jonathan Corbet <corbet@lwn.net>, Marek
+ =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Piergiorgio Beruto
+ <piergiorgio.beruto@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?B?Tmljb2zDsg==?= Veronese <nicveronese@gmail.com>, Simon Horman
+ <horms@kernel.org>, mwojtas@chromium.org
+Subject: Re: [PATCH net-next v8 08/13] netlink: specs: add ethnl PHY_GET
+ command set
+Message-ID: <20240221170023.452a01ca@kernel.org>
+In-Reply-To: <20240220184217.3689988-9-maxime.chevallier@bootlin.com>
+References: <20240220184217.3689988-1-maxime.chevallier@bootlin.com>
+	<20240220184217.3689988-9-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, Arnd Bergmann <arnd@arndb.de>, Catalin Marinas
-	<catalin.marinas@arm.com>, Leon Romanovsky <leonro@mellanox.com>,
-	<linux-arch@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>, Mark
- Rutland <mark.rutland@arm.com>, Michael Guralnik <michaelgur@mellanox.com>,
-	<patches@lists.linux.dev>, Niklas Schnelle <schnelle@linux.ibm.com>, Will
- Deacon <will@kernel.org>
-Subject: Re: [PATCH 5/6] net: hns3: Remove io_stop_wc() calls after
- __iowrite64_copy()
-To: Jason Gunthorpe <jgg@nvidia.com>, Alexander Gordeev
-	<agordeev@linux.ibm.com>, Andrew Morton <akpm@linux-foundation.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Borislav Petkov
-	<bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Gerald Schaefer
-	<gerald.schaefer@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Heiko
- Carstens <hca@linux.ibm.com>, "H. Peter Anvin" <hpa@zytor.com>, Justin Stitt
-	<justinstitt@google.com>, Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky
-	<leon@kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-s390@vger.kernel.org>, <llvm@lists.linux.dev>, Ingo Molnar
-	<mingo@redhat.com>, Bill Wendling <morbo@google.com>, Nathan Chancellor
-	<nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>,
-	<netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, Salil Mehta
-	<salil.mehta@huawei.com>, Sven Schnelle <svens@linux.ibm.com>, Thomas
- Gleixner <tglx@linutronix.de>, <x86@kernel.org>, Yisen Zhuang
-	<yisen.zhuang@huawei.com>
-References: <5-v1-38290193eace+5-mlx5_arm_wc_jgg@nvidia.com>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <5-v1-38290193eace+5-mlx5_arm_wc_jgg@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Jijie Shao<shaojijie@huawei.com>
+On Tue, 20 Feb 2024 19:42:11 +0100 Maxime Chevallier wrote:
+> +      -
+> +        name: upstream-phy-index
+> +        type: u32
 
-on 2024/2/21 9:17, Jason Gunthorpe wrote:
-> Now that the ARM64 arch implementation does the DGH as part of
-> __iowrite64_copy() there is no reason to open code this in drivers.
->
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->   drivers/net/ethernet/hisilicon/hns3/hns3_enet.c | 4 ----
->   1 file changed, 4 deletions(-)
->
-> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-> index f1695c889d3a07..ff556c2b5bacb4 100644
-> --- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-> @@ -2068,8 +2068,6 @@ static void hns3_tx_push_bd(struct hns3_enet_ring *ring, int num)
->   	__iowrite64_copy(ring->tqp->mem_base, desc,
->   			 (sizeof(struct hns3_desc) * HNS3_MAX_PUSH_BD_NUM) /
->   			 HNS3_BYTES_PER_64BIT);
-> -
-> -	io_stop_wc();
->   }
->   
->   static void hns3_tx_mem_doorbell(struct hns3_enet_ring *ring)
-> @@ -2088,8 +2086,6 @@ static void hns3_tx_mem_doorbell(struct hns3_enet_ring *ring)
->   	u64_stats_update_begin(&ring->syncp);
->   	ring->stats.tx_mem_doorbell += ring->pending_buf;
->   	u64_stats_update_end(&ring->syncp);
-> -
-> -	io_stop_wc();
->   }
->   
->   static void hns3_tx_doorbell(struct hns3_enet_ring *ring, int num,
+The C define appears to be called:
+
+	ETHTOOL_A_PHY_UPSTREAM_INDEX,		/* u32 */
+
+either it needs to gain the PHY_ or the spec needs to lose the phy-,
+otherwise C code gen gets upset:
+
+ethtool-user.c:689:10: error: =E2=80=98ETHTOOL_A_PHY_UPSTREAM_PHY_INDEX=E2=
+=80=99 undeclared here (not in a function); did you mean =E2=80=98ETHTOOL_A=
+_PHY_UPSTREAM_INDEX=E2=80=99?
+  689 |         [ETHTOOL_A_PHY_UPSTREAM_PHY_INDEX] =3D { .name =3D "upstrea=
+m-phy-index", .type =3D YNL_PT_U32, },
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |          ETHTOOL_A_PHY_UPSTREAM_INDEX
+
+Unfortunately ethtool in the in-between state where we can auto-gen
+user space code (or rather most of it) but the uAPI header is not
+auto-generated so we need to take extra care to keep things in sync :(
 
