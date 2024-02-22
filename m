@@ -1,107 +1,123 @@
-Return-Path: <netdev+bounces-73892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E370285F1EB
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 08:33:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 672D485F225
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 08:50:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 48182B23117
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 07:33:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20E24281831
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 07:50:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 629EE17981;
-	Thu, 22 Feb 2024 07:33:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33E231799B;
+	Thu, 22 Feb 2024 07:50:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="BLCxIX+X"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F66D101C2
-	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 07:33:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6EE17BA1;
+	Thu, 22 Feb 2024 07:50:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708587209; cv=none; b=KK+7K4IeqdexE9K4Nxs6uMqCp5uW0B2UdNOawCuPaZ1yg75MzmIjJri8AALaFUhROaNGZbVUkngAEq+AZzKWGHkmDwY1Zjs+iFGAgUWXuhzD+QragO4TOOahF5ZwYWrEm05EfJNzYMLXaVtNu8M4q6bTPy361yqYc8yDe4JemsA=
+	t=1708588206; cv=none; b=jFEGT8NhNLlzlpS/mzVTwuVhcX2GkYmmHD43w2vUeNh1syfk8BI5x1nmQWp+xQXwR6E7Xxxp4RGc0vkJ/lXD3TgujujmKXSlrjpcirE99Esq1G3FbPOoZ76/8jbrLHeqQCJsSYu+chxgU3+ITUAjLkpFS5n8r4j2tOgfOeZfOEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708587209; c=relaxed/simple;
-	bh=gU6tfQ+cOAm8YbZZk/Hpe9xbq1OuIDBImVaJ5LnBC6o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BucHROfpLZUOaTBHnGvpI2sSL7T4IP+ZX39gWcWY31veLeSoUnbQezZGxlvTfxrNH5h/Srxxf9BumH3/QJQ9XHYqBsrxLpRJeDmT1ZlP+n86H0KdTK64dnMvN8hlpTgsHWpfPcGzzEA8Ajjl12nyoal2kYWInNO9EAajtdv4gvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rd3Zt-0005o6-Nw; Thu, 22 Feb 2024 08:33:09 +0100
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rd3Zr-002Bik-IP; Thu, 22 Feb 2024 08:33:07 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rd3Zr-002hqY-1V;
-	Thu, 22 Feb 2024 08:33:07 +0100
-Date: Thu, 22 Feb 2024 08:33:07 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Simon Horman <horms@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next v2 1/1] net: dsa: microchip: Add support for
- bridge port isolation
-Message-ID: <Zdb4s-Qo-9PnPVtZ@pengutronix.de>
-References: <20240221093429.802077-1-o.rempel@pengutronix.de>
- <20240221175357.GE722610@kernel.org>
+	s=arc-20240116; t=1708588206; c=relaxed/simple;
+	bh=BqYEx4+PAF1FIXKlUO2VJyByU6HT6YoYRVz0HmIAOpY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DEVgEvOK0/zyWSc3UhQgK5ziBy2Ke00rXwLGkCN1lqfH3Ms3enruDG86eRjMFmx+sh+yv86JNY2Xouw9/g/19Y3j0h/1TDOOlWa//N26IVxetc0bR3IpCGKEE1+aaDAongaVKcW9pQBECNYhCwHBOfa2s49mX5dweMZCPkhcHa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=BLCxIX+X; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id C130F20003;
+	Thu, 22 Feb 2024 07:49:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1708588195;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cSLLCAcqZ7/cxOMZwrSaXrhe6GA62RvNVFkADGqZ++w=;
+	b=BLCxIX+X5angxkQeWAztWV9x6zzwuU3z/7oG1Ge5YsBPp2+4OSkNerlYOabq63gMHkKkKW
+	Q0CP9Dd2fy44RFsMG4FWuW1OQH2kamUIT+BZQZoUT9Ab+6P1AWXTi2+PCTSYlWTyN8lu7t
+	BzWzlLs4KpugsZZDkydR5nVTIcQxj7NcXWJgtkbv1kVkFtbFq7x8Dp3wR/4U9CPYIX5par
+	yqMvicTBjF24H4n6rkbL8LAymCMxJ5QAOyKP2cyylshSQ/tPa8x1tMV6d9oNGliBK59R72
+	s4fP5EL9w1goFIzDtfZDWGVH+4zM1duNTaJFS7g2WfdxOgrec6LLY+w6CnCRrQ==
+Date: Thu, 22 Feb 2024 08:49:48 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
+ <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ linux-arm-kernel@lists.infradead.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>, Jonathan Corbet <corbet@lwn.net>, Marek
+ =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Piergiorgio Beruto
+ <piergiorgio.beruto@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?B?Tmljb2zDsg==?= Veronese <nicveronese@gmail.com>, Simon Horman
+ <horms@kernel.org>, mwojtas@chromium.org
+Subject: Re: [PATCH net-next v8 08/13] netlink: specs: add ethnl PHY_GET
+ command set
+Message-ID: <20240222084948.16f33760@device-28.home>
+In-Reply-To: <20240221170023.452a01ca@kernel.org>
+References: <20240220184217.3689988-1-maxime.chevallier@bootlin.com>
+	<20240220184217.3689988-9-maxime.chevallier@bootlin.com>
+	<20240221170023.452a01ca@kernel.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240221175357.GE722610@kernel.org>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Wed, Feb 21, 2024 at 05:53:57PM +0000, Simon Horman wrote:
-> Hi Oleksij,
-> 
-> I haven't looked over this patch closely.
-> But it does seem to have some Kernel doc problems.
-> 
->   .../ksz_common.c:1905: warning: bad line:
->   .../ksz_common.c:1924: warning: expecting prototype for ksz_adjust_port_member(). Prototype was for ksz_update_port_member() instead
-> 
-> You can observe these by running ./scripts/kernel-doc -none
-> 
-> I'm going to flag this as Changes Requested in patchwork
-> as typically this kind of problem gets flagged by bots sooner or later.
-> 
-> pw-bot: changes-requested
+Hello Jakub,
 
-Thx!
+On Wed, 21 Feb 2024 17:00:23 -0800
+Jakub Kicinski <kuba@kernel.org> wrote:
 
+> On Tue, 20 Feb 2024 19:42:11 +0100 Maxime Chevallier wrote:
+> > +      -
+> > +        name: upstream-phy-index
+> > +        type: u32 =20
+>=20
+> The C define appears to be called:
+>=20
+> 	ETHTOOL_A_PHY_UPSTREAM_INDEX,		/* u32 */
+>=20
+> either it needs to gain the PHY_ or the spec needs to lose the phy-,
+> otherwise C code gen gets upset:
 
-Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+I'll do it, sorry about that.
+
+>=20
+> ethtool-user.c:689:10: error: =E2=80=98ETHTOOL_A_PHY_UPSTREAM_PHY_INDEX=
+=E2=80=99 undeclared here (not in a function); did you mean =E2=80=98ETHTOO=
+L_A_PHY_UPSTREAM_INDEX=E2=80=99?
+>   689 |         [ETHTOOL_A_PHY_UPSTREAM_PHY_INDEX] =3D { .name =3D "upstr=
+eam-phy-index", .type =3D YNL_PT_U32, },
+>       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>       |          ETHTOOL_A_PHY_UPSTREAM_INDEX
+>=20
+> Unfortunately ethtool in the in-between state where we can auto-gen
+> user space code (or rather most of it) but the uAPI header is not
+> auto-generated so we need to take extra care to keep things in sync :(
+
+Is there anything I run for testing, so that I can make sure this
+doesn't happen again ?
+
+Thanks,
+
+Maxime
+
 
