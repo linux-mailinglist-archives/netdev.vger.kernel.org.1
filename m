@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-74113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5187C8600FD
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 19:21:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17F1A860157
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 19:30:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD6361F2375C
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 18:21:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B3381C24463
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 18:30:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E911C6AF98;
-	Thu, 22 Feb 2024 18:14:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C95814DFCB;
+	Thu, 22 Feb 2024 18:16:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AP2Euznr"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tLJVan84"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C91EA54916
-	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 18:14:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4405D14CADF
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 18:15:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708625697; cv=none; b=twJ6Q2AZSJaS+gFS395fB51PECwIARPLWRxRfYShluoM+0447v0HXy6fJ2Jb2kMxBsZWSs6RvjPf2EY5BJhdkYscDaxxbycYYuikrxPRPUZW6auTc1ojuS31XSnD1v+LBLv22XJQIB+cNtmFSrLETFpJemZeOUS9xBjCBogmrsE=
+	t=1708625761; cv=none; b=b42FgviNiQRJflUMAK4J+cCtsVR7vGgAvLlhgIAhh/8Qm1QB60WP/Y4wx9asKfjzjYSa/LlnR4/H7TG3HN/SN2p4vFuS6V0yVwshTfwfRwhhIv7WCMqvY5OJS9di5XOda5OVJQg/55rHqU9SflzloNyYCp4XQK9Ya7Jtof1JBCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708625697; c=relaxed/simple;
-	bh=BqZmvU8BOwVdELmPtCCfeCYk2qCbe5qFERDgheb+Ylk=;
+	s=arc-20240116; t=1708625761; c=relaxed/simple;
+	bh=nidAHpTLCFluFSzOd2Un+/NJklcEHVtV4Y59kw7EDPI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fhFFfXRG9Ybi5lnlZnCyES+aYpkLwsrn+1P9+Tuhys4C9vsHOFyHlwN8v8SiMd/o1ExlnNSCnAxba9GAfCDSe3FgcbZIRoQFqWZ5+W0LDwAs/0leU/mBrU9s2h5OX5TdcdDlbjho0B91bK2N/Q0RP9EjOVSZ4JMY+6HzSjdh910=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=AP2Euznr; arc=none smtp.client-ip=209.85.167.52
+	 In-Reply-To:Content-Type; b=I+XrskEHXLVeKLl1gh74EABFNbfEtlEwnMJvJB5yfL59B4B1CywZmXDjfIwh/9xxv8OzmEaVdJUD02Zy2i/6zJZTDaE8U9GicWxReVYRttX1P6+Cy4HnGU+wxHu8BCtUHOtiF9gWRGFdKLA5xXXvaOZ5FJlmR31cVJEgKAmrOCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=tLJVan84; arc=none smtp.client-ip=209.85.218.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-512c2e8c6cfso74882e87.1
-        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 10:14:55 -0800 (PST)
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a3e82664d53so1007466b.3
+        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 10:15:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1708625694; x=1709230494; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1708625757; x=1709230557; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=mjNKbxM5Nnm2fZkUdL6IsffYJIQllY2Z5FDP4HC+nww=;
-        b=AP2EuznrDPVY4pOdeR+TjYTo/M714kjm9I3QEO7OfZ5/dTHZthRpE/ApXlxP6y2pYE
-         z1VU4hTW2vNN8FwQxsbYnf5NHsWjPAr22ImMvKOSeNEc0F6RPR0MbqE955B9W9N5T7jB
-         0qSX8m0zPheQ0niLr4wOb8Tlr7d48XR8FNV+Z0DLBzOzhy6BmrlYSkA2g5ZEM5TkHyfq
-         WKf6J+ul0GVn9BtrDqNf5PneDuqfKjTuWhlNjvW9QcxzgJSGVupQjSq1bnHY7w85krqu
-         f0PnTh3AG8VnUtcEVPCAhfzi4umWfwYXrus+MjZOq6oDntIt/zXTEYF+TD4AaMxVDgZ+
-         BJtg==
+        bh=1WhusjzVdfYQ4ZWgXhFcfd9BJCjtU5eHYsInagp5fds=;
+        b=tLJVan846vnAN7Oi3LiTKjWfQFhBk3zTuJe7S8nPsHmU2l6ldczMNqFfVX+/3UFG+L
+         S1NGFlDt6+yKhBAUv4NfLJ0rPvUBlYapbnJpEsE7i0Id7AhaV6urMOFAp5Lhf5hM3aG3
+         L4MiMWlhMaI55XMF1YbJXtqyo7V5+9smx4puESrBX1hhxTt6og+65Oog5HpK7NMte30y
+         Ezv+uWu/lxI/kgAbvm39Mty2VJvRw8+cLKfkcSafYRB532Odb+UTlHTsLiuZqrfqzsxz
+         grwoa9/iwxnH9IWfkzTsEOwTI5g7MEdG5B3fuh+6ejo2ORVzujaU37WODrh5HHMPKEBh
+         gtIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708625694; x=1709230494;
+        d=1e100.net; s=20230601; t=1708625757; x=1709230557;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mjNKbxM5Nnm2fZkUdL6IsffYJIQllY2Z5FDP4HC+nww=;
-        b=HEFZj7vtmy8h1MkvcxhKyehkbUEAI9C9s0j2kQAwBY5dXqgGOvebRH07mfiqCG/X8C
-         5kHKbNkmjYwI0wuxSB4lDaA5GwIai4bQ9IouoHPhSKALNQNIZCmt+6SpKy297qdTFlwp
-         w1iitD1y53DoP8i+AIWlhRNtm6kcB3oaNSXYeDYJSsjh5Sg2J+VJQcfgKC2W9pdI69U0
-         JLJR7+8DzQ2jc1DkEq4k7inFyVgotv/Fj3MIMxiqkGMMtGZf9zOZG8HydC/s+X7+awfP
-         kZNU2Sl4f3tDmRmKC05VNnLj1xHVDpUyKzBbvlOTXTcgLN/PA+Q8fQ+2Yysi/15XW5/B
-         94nA==
-X-Gm-Message-State: AOJu0YxD6XVVvblXR3Jiiy7ycZEAEc1Abe+0XoheLMdNKihNsw1mQzCj
-	ZdhZzRqGt+mvmvsQz20dGgjDKoDtpkNwGLVD01EYFiA6RyWAurW0fvIXcT0CPwY=
-X-Google-Smtp-Source: AGHT+IFuXihglQKgVnvg96ctoMsff1iPiMAAbtCvPq0dIjo9Sm7rlM5jxqQvbEkVfsrcMjVIxh4fww==
-X-Received: by 2002:ac2:5dcc:0:b0:512:b420:1a92 with SMTP id x12-20020ac25dcc000000b00512b4201a92mr7465144lfq.63.1708625694014;
-        Thu, 22 Feb 2024 10:14:54 -0800 (PST)
+        bh=1WhusjzVdfYQ4ZWgXhFcfd9BJCjtU5eHYsInagp5fds=;
+        b=BC6xu5WftVIbmyQENtlcKZtyUTnjGecdHfqpnSuWUWcJJhi2rhLsAyfcQbslIMqDjJ
+         DjnDVIHWIYxZBaIh671U2L77DSj4KWtXe/lw7d4xl/UcJSGyZz32DZl2ymC6gEpgR8Sp
+         fUkGFhZn5exDlnKWUo/xt7ONOXbDKxuZSD9Od3oLwgln7/EG4DTXiZOB+VvQzsz5M42X
+         AYO1+ldkBXyNphyc+JIriIPWQ9f5pR5XSYZna82l7zwpubyCppDE84xJ0OXtH64oV6fy
+         3eTeFPvKrwBqMFRe+3cDtBosRQFvz2fThL6Cz/f8p80kHHVLqOGliBj6k7mEY2iL761/
+         Uchw==
+X-Gm-Message-State: AOJu0Yx5iVruXBxX0BDOzi/JOD2trLC1B2/6o77sI8V1dp47z6Ed2CKo
+	7E9VW4N2u1IU/SJhWKL7/dpEEsIdwX5ZNByLWdvbgYs9RRwrmgllZaeGksVbunI=
+X-Google-Smtp-Source: AGHT+IGmi4bJq/XE3zLMdllGkAlfctdaXnTsW36rdgjSPC1niyHKTQpV8I8NT7ExWyrxYp4oVMbhnw==
+X-Received: by 2002:a17:906:6bc5:b0:a3f:baa:b52b with SMTP id t5-20020a1709066bc500b00a3f0baab52bmr6445882ejs.26.1708625757607;
+        Thu, 22 Feb 2024 10:15:57 -0800 (PST)
 Received: from [192.168.1.20] ([178.197.222.116])
-        by smtp.gmail.com with ESMTPSA id ps7-20020a170906bf4700b00a3f1cb81dcesm2266058ejb.116.2024.02.22.10.14.52
+        by smtp.gmail.com with ESMTPSA id ps7-20020a170906bf4700b00a3f1cb81dcesm2266058ejb.116.2024.02.22.10.15.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Feb 2024 10:14:53 -0800 (PST)
-Message-ID: <e053448f-2b58-408a-af22-d7b464c52781@linaro.org>
-Date: Thu, 22 Feb 2024 19:14:51 +0100
+        Thu, 22 Feb 2024 10:15:57 -0800 (PST)
+Message-ID: <c1931bd6-1a9f-4de5-ab0a-d940e2cd062b@linaro.org>
+Date: Thu, 22 Feb 2024 19:15:55 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,21 +75,23 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 1/6] dt-bindings: net: hisilicon-femac-mdio:
+Subject: Re: [PATCH net-next v3 2/6] dt-bindings: net: hisilicon-femac-mdio:
  convert to YAML
 Content-Language: en-US
-To: forbidden405@outlook.com, Yisen Zhuang <yisen.zhuang@huawei.com>,
- Salil Mehta <salil.mehta@huawei.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
+To: Yang Xiwen <forbidden405@outlook.com>,
+ Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
+ <salil.mehta@huawei.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
  Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
  Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
  Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  devicetree@vger.kernel.org
-References: <20240222-net-v4-0-eea68f93f090@outlook.com>
- <20240222-net-v4-1-eea68f93f090@outlook.com>
+References: <20240220-net-v3-0-b68e5b75e765@outlook.com>
+ <20240220-net-v3-2-b68e5b75e765@outlook.com>
+ <174b9bf7-fcdb-48e3-a6d6-5d2ea96fce58@linaro.org>
+ <SEZPR06MB69593804E2F62586EF6841B096572@SEZPR06MB6959.apcprd06.prod.outlook.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -135,27 +137,36 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240222-net-v4-1-eea68f93f090@outlook.com>
+In-Reply-To: <SEZPR06MB69593804E2F62586EF6841B096572@SEZPR06MB6959.apcprd06.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 22/02/2024 13:43, Yang Xiwen via B4 Relay wrote:
-> From: Yang Xiwen <forbidden405@outlook.com>
+On 21/02/2024 12:24, Yang Xiwen wrote:
+> On 2/21/2024 4:12 PM, Krzysztof Kozlowski wrote:
+>> On 19/02/2024 20:57, Yang Xiwen via B4 Relay wrote:
+>>> From: Yang Xiwen <forbidden405@outlook.com>
+>>>
+>>> Also mark the clock optional
+>> Why? Your commit msg must provide rationale. Clocks are rarely optional
+>> signals, so this looks wrong.
 > 
-> For some FEMAC cores, MDIO bus is integrated to the MAC controller. So
-> We don't have a dedicated MDIO bus clock.
-
-Hm, this means you miss compatibles for these different cores.
-
 > 
-> Also due to the PHY reset procedure, it's required to manage all clocks
-> and resets in the MAC controller driver. MAC controller clock can not be
-> shared with MDIO bus node in dts.
+> Well. I don't know too much about the hardware either. I think the clock 
+> can be either shared with MAC controller or completely non-existent in 
+> hardware.
 > 
-> Mark the clock optional to resolve this problem.
+> 
+> But from the driver side, the clock must be stripped from MDIO bus node. 
+> The clocks must be controlled entirely within MAC controller driver. Do 
+> I need to mention it in this commit too?
+> 
+> 
+> Actually I've never seen anything like "MDIO bus clock" in the 
+> datasheet. The MDIO bus and MAC controller are activated simultaneously. 
+> So I think removing this clock entirely is also acceptable.
 
-I don't understand how making clock optional solves this problem. Clock
-is still there. Whether driver handles it, does not affect the binding.
+None of these are arguments to make the clock optional. The last one is
+an argument to drop clock entirely.
 
 Best regards,
 Krzysztof
