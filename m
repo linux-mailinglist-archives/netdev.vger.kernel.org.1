@@ -1,102 +1,132 @@
-Return-Path: <netdev+bounces-74049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1415385FBE9
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 16:11:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 17E9F85FBF8
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 16:12:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3858283A44
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 15:11:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6EF12894B5
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 15:12:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F9AD14A08E;
-	Thu, 22 Feb 2024 15:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1C1314A4C0;
+	Thu, 22 Feb 2024 15:11:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PlwPp4qs"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VeZNiHxt"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64BDB149005;
-	Thu, 22 Feb 2024 15:11:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD76C14C5A3
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 15:11:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708614668; cv=none; b=mkupuWPuek6P2Avw7SO5R6kSthRd0gtMTqOmIKEHWp2Fy10vX+sza+3vDeu2V4d9jwP8MRQByGDRMGLWPuAYTcGD300tkb733qPgojRDoeEm/8c+953Mw7tv/6Jz0/6ygT2eWsM37acToJLhSfvaCCOwQVzOFG6eW/B2INAy0so=
+	t=1708614717; cv=none; b=KgGgFdumPpLE7XWTRQnfT2Bu7rBd44aXRw/qwHhbvdAmzgMjll4xeQQ8WI9CQ4HZEcFz3oxCfTI3T+9iRxqfhy05QfISEOybaH2+fONIam4g+myPqgC1u1PGMHtuvCYrBE8sicNbqacU48/4hfWGkNtEZtqLVGknRhri4Um66DI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708614668; c=relaxed/simple;
-	bh=N4DqxkrUO+39GL6l6n4cDeOPvtBE1QaBpCHDr4rRhKE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DWpXAAibRz2krhzyaE6XDhr1/lerxY8LGmAe7QoyuK9q2BSy2yrluh8JSkLBG3tSR26Wm3vLywu1NHyua3DkcrlFwQWG3tpHfHeI43lmLUX6x88rKyguu96D85RYA0jes5Hlv7bmgndueGe/el3Xe5Cntz3jLTI3UZTpPGWPcKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PlwPp4qs; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=wMH/YxCjPZ+y9HsN5oGyh1S5l+4RS/ggKj3jV/RYk0o=; b=PlwPp4qsKfFwbW6SZDrR5NPnMQ
-	bR7XdWqPB+3yentT0+DlCP3iWQUbcAbX468on34w/o/3vMxOcbjXYYQWet4npgIE2qKzq8kE44oHM
-	JT5IhGFCO0YIF5P7A3+uL6bdTE3C3jSwdtnPLreSxTDspO8QL54S9WVu7na1/VEbCscc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rdAj7-008S6N-L3; Thu, 22 Feb 2024 16:11:09 +0100
-Date: Thu, 22 Feb 2024 16:11:09 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Simon Horman <horms@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ariel Elior <aelior@marvell.com>,
-	Manish Chopra <manishc@marvell.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>, linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org
-Subject: Re: [PATCH net-next v4 3/9] net: qlogic: qede: Use linkmode helpers
- for EEE
-Message-ID: <68088998-4486-4930-90a4-96a32f08c490@lunn.ch>
-References: <20240218-keee-u32-cleanup-v4-0-71f13b7c3e60@lunn.ch>
- <20240218-keee-u32-cleanup-v4-3-71f13b7c3e60@lunn.ch>
- <20240220124405.GB40273@kernel.org>
- <a52361ef-66ab-41bd-b245-ccd26fcbd957@lunn.ch>
- <20240221102851.GA352018@kernel.org>
+	s=arc-20240116; t=1708614717; c=relaxed/simple;
+	bh=2nHeGSw/Y0bu/0rFODKaGA3bo8+cj6tJuf8IA1hGEH8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XcS3v0ilgG4nv867/VozBcAtqAQGnWLvzz+r234PXKEQa5hHtC7bj9xoKS9ZvrWrN1d2pk+HHhhrWE59LsrmW14lSe6VpOSCZDiMVZ/l1EGpZGh7Go6pZKQAWA4Y7UMQwfgZC3QDUg7r+A1wBgvj+6OxBeHmnhNComPzGTT4jIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=VeZNiHxt; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-412730e5b95so18720615e9.3
+        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 07:11:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1708614714; x=1709219514; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UZdeavs8ARZ4Wp8jVIIq5rYX8CQepVWYtNx7IdtKagA=;
+        b=VeZNiHxtvtZwKy/iwYUtH6ubigGXm4t/ZNRSfgRtK3OZMuYCQwPvzTbMuIUamhdduY
+         N+nOlR4+VsstAAJUxg6kRM/BQ9a19WZ95EAgO9xbOY6XXCc38dEUEEMQ1sHsYudUCYcz
+         sOaXg57w0KMBZr3tuM457coSnaQnP+c08o8KaXdxir0eLieYLRAQBbyFJMzx6PQAFqlk
+         X2Ng/f9JJR0MtXqLKzWLbECZBCpCyOtnWlYGiR0/3jb9KgkuxFSxlWdOEkBrv41yvNca
+         DbNDZmuODTjp6NcpMj8U2MDsNr/sdN0eDbBHaqJwKRoH2+u2CReT5YdSy8Z2NYw9p262
+         VxXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708614714; x=1709219514;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UZdeavs8ARZ4Wp8jVIIq5rYX8CQepVWYtNx7IdtKagA=;
+        b=QHULtSsEX8L+uyirdS7iDYUBexSkdG0Ijrx7DHrsbpKyCVs/ZZzRdr1Az8FyWPrrV9
+         x2mTE0qu3+AJtVkMAuRvw4vzu5Bl8NzOYohsDsR2WCzkla8KEqCVPKFxjEiQzWdJuQkT
+         Fdtn8Yp+wFRxWNhNuRvmYMIEd6BPwzPN3z0rb9d5/YoT672S1fpkaeptkvp6fDiigIeK
+         tOQgci4K4ltBwDNTEpaxli1Cw8yV2STEnBNVbShhwcjtbhW76RMBB7llWD6ChfJtXo+j
+         hXkBXxDlvojDSU9fsBcwyuA/fhXi9RAsJZos55Deaununk7fTsq0ltrfqRSo7yZw08dX
+         sifw==
+X-Forwarded-Encrypted: i=1; AJvYcCVZOFdxAV7zgPp6Dz8pW9pWrHEgxsXqGk8pq3U6kS9fSE0tAcSU9iadVgUv+D8EAAws6wHJGT3gndSmhJDr7tZDw2OI0z6F
+X-Gm-Message-State: AOJu0YxVuJJscD5d3HUxhThLG5KsBnGP+49RMHclSn4UCdgIYClx4mDR
+	j1uRymjrMI10XcwAM557s69w0ul8JW08YN6BP+2USYh9frcEdyYQ3gfWkR54wgg=
+X-Google-Smtp-Source: AGHT+IH5VhU9UCTY6WCZTJEB3gZr9zWbimtj+EBEQnbqM+B6oMV2+MqMrPueMl04ish8T7F7PfrFzw==
+X-Received: by 2002:a05:600c:190f:b0:412:8560:1baf with SMTP id j15-20020a05600c190f00b0041285601bafmr1129700wmq.26.1708614714030;
+        Thu, 22 Feb 2024 07:11:54 -0800 (PST)
+Received: from [192.168.10.46] (146725694.box.freepro.com. [130.180.211.218])
+        by smtp.googlemail.com with ESMTPSA id b15-20020a05600c4e0f00b004128f41a13fsm369363wmq.38.2024.02.22.07.11.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Feb 2024 07:11:53 -0800 (PST)
+Message-ID: <e0a65f94-73b8-4a27-87d8-8fa3d8e88e7c@linaro.org>
+Date: Thu, 22 Feb 2024 16:11:52 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240221102851.GA352018@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 4/9] thermal: intel: Set THERMAL_TRIP_FLAG_RW_TEMP
+ directly
+Content-Language: en-US
+To: "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+ Linux PM <linux-pm@vger.kernel.org>
+Cc: Lukasz Luba <lukasz.luba@arm.com>, LKML <linux-kernel@vger.kernel.org>,
+ Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>,
+ Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+ Zhang Rui <rui.zhang@intel.com>, netdev@vger.kernel.org,
+ Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+ Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+ linux-wireless@vger.kernel.org, Shawn Guo <shawnguo@kernel.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Manaf Meethalavalappu Pallikunhi <quic_manafm@quicinc.com>
+References: <6017196.lOV4Wx5bFT@kreacher> <3281804.44csPzL39Z@kreacher>
+From: Daniel Lezcano <daniel.lezcano@linaro.org>
+In-Reply-To: <3281804.44csPzL39Z@kreacher>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Feb 21, 2024 at 10:28:51AM +0000, Simon Horman wrote:
-> On Tue, Feb 20, 2024 at 03:45:28PM +0100, Andrew Lunn wrote:
-> > > > +	unsupp = linkmode_andnot(tmp, edata->advertised, supported);
-> > > 
-> > > nit: Given the types involved, I might have written this as:
-> > > 
-> > > 	unsupp = !!linkmode_andnot(tmp, edata->advertised, supported);
-> > 
-> > linkmode_andnot() calls bitmap_andnot():
-> > 
-> > static inline bool bitmap_andnot(unsigned long *dst, const unsigned long *src1,
-> > 			const unsigned long *src2, unsigned int nbits)
-> > 
-> > It already returns a bool, so there is no need to force an int to bool
-> > conversion using !!.
+On 12/02/2024 19:34, Rafael J. Wysocki wrote:
+> From: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
 > 
-> Good point, sorry for missing that.
+> Some Intel thermal drivers need/want the temperature of their trip
+> points to be set by user space via sysfs and so they pass nonzero
+> writable trip masks during thermal zone registration for this purpose.
+> 
+> It is now possible to achieve the same result by setting the
+> THERMAL_TRIP_FLAG_RW_TEMP trip flag directly, so modify the drivers
+> in question to do that instead of using a nonzero writable trips mask.
+> 
+> No intentional functional impact.
+> 
+> Note that this change is requisite for dropping the mask argument from
+> thermal_zone_device_register_with_trips() going forward.
+> 
+> Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+> ---
 
-> I assume there is a reason that the return type of
-> linkmode_andnot is not bool.
+I've reviewed the changes. Some changes in the DTS are opaque for me, so 
+I can not give my reviewed-by tag but the acked-by
 
-Either i got it wrong when i added the wrapper, or bitmap_andnot() has
-changed since then?
 
-It probably can be changed to a bool.
+Acked-by: Daniel Lezcano <daniel.lezcano@linaro.org>
 
-	Andrew
+-- 
+<http://www.linaro.org/> Linaro.org │ Open source software for ARM SoCs
+
+Follow Linaro:  <http://www.facebook.com/pages/Linaro> Facebook |
+<http://twitter.com/#!/linaroorg> Twitter |
+<http://www.linaro.org/linaro-blog/> Blog
+
 
