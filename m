@@ -1,108 +1,260 @@
-Return-Path: <netdev+bounces-74138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9812786031E
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 20:45:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2183C860327
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 20:48:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9B061C22512
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 19:45:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DF7B1F25E2B
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 19:48:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EDE214B838;
-	Thu, 22 Feb 2024 19:45:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V4CrXYmC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3378C548FD;
+	Thu, 22 Feb 2024 19:48:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from cloudserver094114.home.pl (cloudserver094114.home.pl [79.96.170.134])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DAEB14B815
-	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 19:45:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E79014B804;
+	Thu, 22 Feb 2024 19:48:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.96.170.134
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708631122; cv=none; b=ekRs7WqWTtjtJ7EM4KUdGmrDWA5ynhvK4gxrcYnWh2Gw3YoigTzXvKa8gbX2KFoD0BLYZCPKnrcEPZAfZr1Kv2eITg/exnQgXFnLS9E+ZdDwVYr/L8krC3rAstMYX4NLCHHPC14h/xB4QhH+a+n/4ywKK8ppijvXzRp4TjA8Yss=
+	t=1708631324; cv=none; b=TftfSk42prLJ3HAn8zhfvnR0W7BYWgg7hlmZ/KE/4ya1vLPIUIzjIQmYnvljvkb1RqpO0AQaH/0ASJkrTeF2mEZSylpbOuQ9x7lskLBDRVEmN0HAKqqwVA6ZoiT8dk3gvpIskczNglCNDXpSGp+WfO9wqW3101qohsNkrXAnNuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708631122; c=relaxed/simple;
-	bh=oLWpUQzEDg1YWW4cOetAqNAPnhZ9oahsEaWv5ozR+LU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K4ON1ac9wuDl2Rg/I6/JPhviJ2/IYOBoV/wTlCR1/n73/ujuzUalg+06W4dANj8xAtBkejLXCJAjb4DsuB+7oQ78NKQnhdBSscmA9Beh/q+jlrZdGWBg4wL//1Z5H/ysx9LYUeD63nSWFXIuMOY3bhrwKg3nqBHY+p57XxWxc0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V4CrXYmC; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708631119;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HtS3rO3/k4CHxBCems7dZZwyABPFlcoiWlBHvKoMPuE=;
-	b=V4CrXYmCbdezUwQ6+xb1iM+ZAgTpx4jjOsn6qqoCuPjgtBHV5V7KwMAF4h2etdMimDp8vC
-	Nk/69QGO+3sKv0JB+kXMpnSsYxEQULZAt/MIajyRn7pwdMhoAE7AaSaoQGvPla2lMgAM6k
-	40PxGDTGTiVOxH8eelMqLlksr0mv42I=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-613-0omo4EjUO0eEY7KZGIg62w-1; Thu, 22 Feb 2024 14:45:18 -0500
-X-MC-Unique: 0omo4EjUO0eEY7KZGIg62w-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-412557adc00so945495e9.2
-        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 11:45:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708631117; x=1709235917;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HtS3rO3/k4CHxBCems7dZZwyABPFlcoiWlBHvKoMPuE=;
-        b=HUqja4uy92M1u8XNLDOLVIek8U2cYOgLPP2nFpN6GczY7ZPSEUzSMvaFFl+ADMSXXM
-         kUXYn4fRGlHoVGoxgMADjc1uDdrPYEPvzLaHI87wSUMvcmL+6mrhzfGNNcPaoK6EUO2z
-         qZM5oDZgqqRZL6ulwkyfa1ZAafzysHEl1yIA7ETFwJ8yYbCU/UvhKKGoHKB3J013wKl+
-         s+nUtgkD7ZCY9ICtH02UZzH2ETDR8jm624bHwCdlimOUauaRgC9zZcd56mmmc+8iP4pN
-         L0KMZ+9yi/17RVDyW9s/DKPW5PJfMB3iYOuKB8vm0kjAcES3HbKo9C0Dj4zj8mbKtRVX
-         /AtQ==
-X-Gm-Message-State: AOJu0YwwD4cx3mjgMkPD6AGxzQXgUwTkZMEZxRaZJ2vDe2OHmXOLEBze
-	RvjGcUEESYNXl6wseEzRSWqkRQaFw/dWzmmXLLB3uNXxk0AJNML+iRYxWiFuwefeIZG60UA3e25
-	7k2ZzW5qq+eSuB6Z0kVueePwmVbmrrTe8QtKkXtnV6xSuK87kPEDfoBYPakIqD5UA
-X-Received: by 2002:a05:600c:502b:b0:412:9064:fd12 with SMTP id n43-20020a05600c502b00b004129064fd12mr133436wmr.26.1708631117015;
-        Thu, 22 Feb 2024 11:45:17 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGIRLu3qZVKJ5FnK2wvIF3qslAVzVoLbk3KPH5Qa9qhUzWeKOnysKrycrAsYRbxrz39i8PjAQ==
-X-Received: by 2002:a05:600c:502b:b0:412:9064:fd12 with SMTP id n43-20020a05600c502b00b004129064fd12mr133422wmr.26.1708631116744;
-        Thu, 22 Feb 2024 11:45:16 -0800 (PST)
-Received: from redhat.com ([172.93.237.99])
-        by smtp.gmail.com with ESMTPSA id 11-20020a05600c228b00b0041290cd9483sm137666wmf.28.2024.02.22.11.45.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Feb 2024 11:45:16 -0800 (PST)
-Date: Thu, 22 Feb 2024 14:45:08 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	virtualization@lists.linux.dev, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next 0/5] virtio-net: sq support premapped mode
-Message-ID: <20240222144420-mutt-send-email-mst@kernel.org>
-References: <20240116075924.42798-1-xuanzhuo@linux.alibaba.com>
+	s=arc-20240116; t=1708631324; c=relaxed/simple;
+	bh=K6ZhDsjg26wxOF4OuGGhaoGc3f+IOSHvEX5Qn0bnJyY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qO4V5oCM1zaxH2YrG2LnRSwaifu4Z/6N6c2CnZYi1AiAiS0dBWPLUTUtBsQ4BKhd9JcouDn5V31q8fCuelrE2Dl84BTuaMNaVkybEvh+IwXekzEVlEpZb/kpip7hnI/oHRIRxtv3BA55pfzWaEnovqBdCGE2nQOxTQAlju+G5PM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rjwysocki.net; spf=pass smtp.mailfrom=rjwysocki.net; arc=none smtp.client-ip=79.96.170.134
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rjwysocki.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rjwysocki.net
+Received: from localhost (127.0.0.1) (HELO v370.home.net.pl)
+ by /usr/run/smtp (/usr/run/postfix/private/idea_relay_lmtp) via UNIX with SMTP (IdeaSmtpServer 5.4.0)
+ id c622cf5beeaaccf8; Thu, 22 Feb 2024 20:48:38 +0100
+Received: from kreacher.localnet (unknown [195.136.19.94])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by cloudserver094114.home.pl (Postfix) with ESMTPSA id EEAC466A2D9;
+	Thu, 22 Feb 2024 20:48:37 +0100 (CET)
+From: "Rafael J. Wysocki" <rjw@rjwysocki.net>
+To: Linux PM <linux-pm@vger.kernel.org>,
+ Daniel Lezcano <daniel.lezcano@linaro.org>
+Cc: Lukasz Luba <lukasz.luba@arm.com>, LKML <linux-kernel@vger.kernel.org>,
+ Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>,
+ Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+ Zhang Rui <rui.zhang@intel.com>, netdev@vger.kernel.org,
+ Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+ Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+ linux-wireless@vger.kernel.org, Shawn Guo <shawnguo@kernel.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Manaf Meethalavalappu Pallikunhi <quic_manafm@quicinc.com>
+Subject: [PATCH v2.1 2/9] thermal: core: Add flags to struct thermal_trip
+Date: Thu, 22 Feb 2024 20:48:37 +0100
+Message-ID: <5779195.DvuYhMxLoT@kreacher>
+In-Reply-To: <2173914.irdbgypaU6@kreacher>
+References: <6017196.lOV4Wx5bFT@kreacher> <2173914.irdbgypaU6@kreacher>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240116075924.42798-1-xuanzhuo@linux.alibaba.com>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="UTF-8"
+X-CLIENT-IP: 195.136.19.94
+X-CLIENT-HOSTNAME: 195.136.19.94
+X-VADE-SPAMSTATE: clean
+X-VADE-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvledrfeeggdduvdeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecujffqoffgrffnpdggtffipffknecuuegrihhlohhuthemucduhedtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkfgjfhgggfgtsehtufertddttdejnecuhfhrohhmpedftfgrfhgrvghlucflrdcuhgihshhotghkihdfuceorhhjfiesrhhjfiihshhotghkihdrnhgvtheqnecuggftrfgrthhtvghrnhepvdffueeitdfgvddtudegueejtdffteetgeefkeffvdeftddttdeuhfegfedvjefhnecukfhppeduleehrddufeeirdduledrleegnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepudelhedrudefiedrudelrdelgedphhgvlhhopehkrhgvrggthhgvrhdrlhhotggrlhhnvghtpdhmrghilhhfrhhomhepfdftrghfrggvlhculfdrucghhihsohgtkhhifdcuoehrjhifsehrjhifhihsohgtkhhirdhnvghtqedpnhgspghrtghpthhtohepudeipdhrtghpthhtoheplhhinhhugidqphhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrnhhivghlrdhlvgiitggrnhhosehlihhnrghrohdrohhrghdprhgtphhtthhopehluhhkrghsiidrlhhusggrsegrrhhmrdgtohhmpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshht
+ rghnihhslhgrfidrghhruhhsiihkrgeslhhinhhugidrihhnthgvlhdrtghomhdprhgtphhtthhopehsrhhinhhivhgrshdrphgrnhgurhhuvhgruggrsehlihhnuhigrdhinhhtvghlrdgtohhm
+X-DCC--Metrics: v370.home.net.pl 1024; Body=16 Fuz1=16 Fuz2=16
 
-On Tue, Jan 16, 2024 at 03:59:19PM +0800, Xuan Zhuo wrote:
-> This is the second part of virtio-net support AF_XDP zero copy.
+From: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
 
-My understanding is, there's going to be another version of all
-this work?
+In order to allow thermal zone creators to specify the writability of
+trip point temperature and hysteresis on a per-trip basis, add a flags
+field to struct thermal_trip and define flags to represent the desired
+trip properties.
 
--- 
-MST
+Also make thermal_zone_device_register_with_trips() set the
+THERMAL_TRIP_FLAG_RW_TEMP flag for all trips covered by the writable
+trips mask passed to it and modify the thermal sysfs code to look at
+the trip flags instead of using the writable trips mask directly or
+checking the presence of the .set_trip_hyst() zone callback.
+
+Additionally, make trip_point_temp_store() and trip_point_hyst_store()
+fail with an error code if the trip passed to one of them has
+THERMAL_TRIP_FLAG_RW_TEMP or THERMAL_TRIP_FLAG_RW_HYST,
+respectively, clear in its flags.
+
+No intentional functional impact.
+
+Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+---
+
+v2 -> v2.1:
+   * Don't add redundant checks in 3 places (Daniel).
+   * Define THERMAL_TRIP_FLAG_RW as the combination of the _RW_ trip flags (Daniel).
+
+v1 -> v2:
+   * Rename trip flags (Stanislaw).
+
+---
+ drivers/thermal/thermal_core.c  |    9 ++++++++-
+ drivers/thermal/thermal_core.h  |    2 +-
+ drivers/thermal/thermal_sysfs.c |   18 +++++++++---------
+ include/linux/thermal.h         |    8 ++++++++
+ 4 files changed, 26 insertions(+), 11 deletions(-)
+
+Index: linux-pm/include/linux/thermal.h
+===================================================================
+--- linux-pm.orig/include/linux/thermal.h
++++ linux-pm/include/linux/thermal.h
+@@ -64,15 +64,23 @@ enum thermal_notify_event {
+  * @threshold: trip crossing notification threshold miliCelsius
+  * @type: trip point type
+  * @priv: pointer to driver data associated with this trip
++ * @flags: flags representing binary properties of the trip
+  */
+ struct thermal_trip {
+ 	int temperature;
+ 	int hysteresis;
+ 	int threshold;
+ 	enum thermal_trip_type type;
++	u8 flags;
+ 	void *priv;
+ };
+ 
++#define THERMAL_TRIP_FLAG_RW_TEMP	BIT(0)
++#define THERMAL_TRIP_FLAG_RW_HYST	BIT(1)
++
++#define THERMAL_TRIP_FLAG_RW	(THERMAL_TRIP_FLAG_RW_TEMP | \
++				 THERMAL_TRIP_FLAG_RW_HYST)
++
+ struct thermal_zone_device_ops {
+ 	int (*bind) (struct thermal_zone_device *,
+ 		     struct thermal_cooling_device *);
+Index: linux-pm/drivers/thermal/thermal_core.c
+===================================================================
+--- linux-pm.orig/drivers/thermal/thermal_core.c
++++ linux-pm/drivers/thermal/thermal_core.c
+@@ -1278,6 +1278,7 @@ thermal_zone_device_register_with_trips(
+ 					int passive_delay, int polling_delay)
+ {
+ 	struct thermal_zone_device *tz;
++	struct thermal_trip *trip;
+ 	int id;
+ 	int result;
+ 	struct thermal_governor *governor;
+@@ -1356,13 +1357,19 @@ thermal_zone_device_register_with_trips(
+ 	tz->devdata = devdata;
+ 	memcpy(tz->trips, trips, num_trips * sizeof(*trips));
+ 	tz->num_trips = num_trips;
++	for_each_trip(tz, trip) {
++		if (mask & 1)
++			trip->flags |= THERMAL_TRIP_FLAG_RW_TEMP;
++
++		mask >>= 1;
++	}
+ 
+ 	thermal_set_delay_jiffies(&tz->passive_delay_jiffies, passive_delay);
+ 	thermal_set_delay_jiffies(&tz->polling_delay_jiffies, polling_delay);
+ 
+ 	/* sys I/F */
+ 	/* Add nodes that are always present via .groups */
+-	result = thermal_zone_create_device_groups(tz, mask);
++	result = thermal_zone_create_device_groups(tz);
+ 	if (result)
+ 		goto remove_id;
+ 
+Index: linux-pm/drivers/thermal/thermal_core.h
+===================================================================
+--- linux-pm.orig/drivers/thermal/thermal_core.h
++++ linux-pm/drivers/thermal/thermal_core.h
+@@ -131,7 +131,7 @@ void thermal_zone_trip_updated(struct th
+ int __thermal_zone_get_temp(struct thermal_zone_device *tz, int *temp);
+ 
+ /* sysfs I/F */
+-int thermal_zone_create_device_groups(struct thermal_zone_device *, int);
++int thermal_zone_create_device_groups(struct thermal_zone_device *tz);
+ void thermal_zone_destroy_device_groups(struct thermal_zone_device *);
+ void thermal_cooling_device_setup_sysfs(struct thermal_cooling_device *);
+ void thermal_cooling_device_destroy_sysfs(struct thermal_cooling_device *cdev);
+Index: linux-pm/drivers/thermal/thermal_sysfs.c
+===================================================================
+--- linux-pm.orig/drivers/thermal/thermal_sysfs.c
++++ linux-pm/drivers/thermal/thermal_sysfs.c
+@@ -392,17 +392,16 @@ static const struct attribute_group *the
+ /**
+  * create_trip_attrs() - create attributes for trip points
+  * @tz:		the thermal zone device
+- * @mask:	Writeable trip point bitmap.
+  *
+  * helper function to instantiate sysfs entries for every trip
+  * point and its properties of a struct thermal_zone_device.
+  *
+  * Return: 0 on success, the proper error value otherwise.
+  */
+-static int create_trip_attrs(struct thermal_zone_device *tz, int mask)
++static int create_trip_attrs(struct thermal_zone_device *tz)
+ {
++	const struct thermal_trip *trip;
+ 	struct attribute **attrs;
+-	int indx;
+ 
+ 	/* This function works only for zones with at least one trip */
+ 	if (tz->num_trips <= 0)
+@@ -437,7 +436,9 @@ static int create_trip_attrs(struct ther
+ 		return -ENOMEM;
+ 	}
+ 
+-	for (indx = 0; indx < tz->num_trips; indx++) {
++	for_each_trip(tz, trip) {
++		int indx = thermal_zone_trip_id(tz, trip);
++
+ 		/* create trip type attribute */
+ 		snprintf(tz->trip_type_attrs[indx].name, THERMAL_NAME_LENGTH,
+ 			 "trip_point_%d_type", indx);
+@@ -458,7 +459,7 @@ static int create_trip_attrs(struct ther
+ 						tz->trip_temp_attrs[indx].name;
+ 		tz->trip_temp_attrs[indx].attr.attr.mode = S_IRUGO;
+ 		tz->trip_temp_attrs[indx].attr.show = trip_point_temp_show;
+-		if (mask & (1 << indx)) {
++		if (trip->flags & THERMAL_TRIP_FLAG_RW_TEMP) {
+ 			tz->trip_temp_attrs[indx].attr.attr.mode |= S_IWUSR;
+ 			tz->trip_temp_attrs[indx].attr.store =
+ 							trip_point_temp_store;
+@@ -473,7 +474,7 @@ static int create_trip_attrs(struct ther
+ 					tz->trip_hyst_attrs[indx].name;
+ 		tz->trip_hyst_attrs[indx].attr.attr.mode = S_IRUGO;
+ 		tz->trip_hyst_attrs[indx].attr.show = trip_point_hyst_show;
+-		if (tz->ops.set_trip_hyst) {
++		if (trip->flags & THERMAL_TRIP_FLAG_RW_HYST) {
+ 			tz->trip_hyst_attrs[indx].attr.attr.mode |= S_IWUSR;
+ 			tz->trip_hyst_attrs[indx].attr.store =
+ 					trip_point_hyst_store;
+@@ -505,8 +506,7 @@ static void destroy_trip_attrs(struct th
+ 	kfree(tz->trips_attribute_group.attrs);
+ }
+ 
+-int thermal_zone_create_device_groups(struct thermal_zone_device *tz,
+-				      int mask)
++int thermal_zone_create_device_groups(struct thermal_zone_device *tz)
+ {
+ 	const struct attribute_group **groups;
+ 	int i, size, result;
+@@ -522,7 +522,7 @@ int thermal_zone_create_device_groups(st
+ 		groups[i] = thermal_zone_attribute_groups[i];
+ 
+ 	if (tz->num_trips) {
+-		result = create_trip_attrs(tz, mask);
++		result = create_trip_attrs(tz);
+ 		if (result) {
+ 			kfree(groups);
+ 
+
+
 
 
