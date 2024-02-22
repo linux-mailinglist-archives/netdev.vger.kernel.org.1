@@ -1,90 +1,91 @@
-Return-Path: <netdev+bounces-73915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-73916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4AF285F470
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 10:34:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 81D3485F49B
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 10:39:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C82911C21DEF
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 09:34:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD64A1C220D8
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 09:39:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 109692BD1C;
-	Thu, 22 Feb 2024 09:34:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C27A238380;
+	Thu, 22 Feb 2024 09:39:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WBIqfH02"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yg+NzL1i"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24BB53717C
-	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 09:34:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 325873717D
+	for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 09:39:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708594466; cv=none; b=esLozJl7+zbJrkGRGGxsRQMa+MXv9BHBbkduqrfi7Bg9XE95gHYaRv8E3JbwcFNzxDX/RPlk0rrurbKBjgJ+g/2/1ArED0KnQPfoSBF0dL4P+OneOjcSuP0ezTaTtrFtd+688gOuboCNKPXXpgnSmeqqFwzcNZmy2NFlTT1sLCQ=
+	t=1708594743; cv=none; b=rmRuJH+sp8pF88BPzTnkZb6J8BFjyJrEDEBO7GPz+ZPhj+okvX7l2gs0PyCSwonT/RXDWelhQ9TzuNJQQrRErwZmVByisUblPGnOkTcJlvicvf1HKnEOHpjPEuMOE++fr6dw01+xQz/fC2CFyx43iWdeSH2IzJZ2law0UDZiZqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708594466; c=relaxed/simple;
-	bh=jsymz0ZV3wQosB1mc7TrX/RgyOGB8OgHkdfOjJ/GU7E=;
+	s=arc-20240116; t=1708594743; c=relaxed/simple;
+	bh=PkSJy8SMxG40Y7D597XKNCZ85h9qerEH1l5wf9lzQ/0=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=uRACuSVnOD6C7FkIdWqThZDF/7JTuFnZl5+uir8im9BhmzV+gC2lYOOs0UO4MGIiRblKYvNYPC0+EUfVryUUJbhw5c1fZLZ4FrNUxAWsO0fch80IezC9SEtg29Fr6l9KhIR6exW+xkkxYhGhmw6ekSF9oqUxHr6oij5BDgnDbVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WBIqfH02; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:MIME-Version; b=dMdIU9DCrIFLJ5hluCsZl6w/ZbrNxe7RUJBoZGcQn1l7vANMsFy6z2MA/hDDZpEkP9P/jnJOhznVRseUkyVUzFiuc/xfXYxyVkRv/ROgtH+iFua/UY9ed1IV5+1llxNVVra9MaKznnIXNyO/tFsar8ZU+ofl60AHpn+hwotUZ0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Yg+NzL1i; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708594463;
+	s=mimecast20190719; t=1708594741;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=FvjULRwSsFiCewjz9HeM0ecz107mFZQPYxRhheoHiRQ=;
-	b=WBIqfH02LJd0eyDGenVH9+gzFgJ7jFk+9LQ8Ylh3uGODyVt6NwrSPAHmBPYZ62NBRrBGPd
-	kUA9Zg/k+qY7iZnS25io0NH8Px2n2fjG33YaPz1p9bR1oLdAv6lQVHPnhhsadm/nrItUiO
-	7Ot4mEAujc4WiImXPIUBRy0meRZr7so=
+	bh=PkSJy8SMxG40Y7D597XKNCZ85h9qerEH1l5wf9lzQ/0=;
+	b=Yg+NzL1iWh21Ef7yH1jcM/H3SLxsH42Rp3mJZPsQ18SlQzBVW/U6DwLkZrd2j1N/B8LlCg
+	XUA1PnxOfQqfEaFB4+1vF3opNYtukNCcpGTIMr0DUHujUJHIegntLQ9+VV/PQZeJy7D6G0
+	yFqgNNWroNVDHAJn4feVirvo3mBcDKk=
 Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
  [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-540-lDklNNdYN06WwiZ_kDkMVA-1; Thu, 22 Feb 2024 04:34:21 -0500
-X-MC-Unique: lDklNNdYN06WwiZ_kDkMVA-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4125f4468a2so8700545e9.0
-        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 01:34:20 -0800 (PST)
+ us-mta-520-FFybP9mcNMqga2HzfXi8Fg-1; Thu, 22 Feb 2024 04:38:56 -0500
+X-MC-Unique: FFybP9mcNMqga2HzfXi8Fg-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-40e354aaf56so16167585e9.1
+        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 01:38:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708594460; x=1709199260;
+        d=1e100.net; s=20230601; t=1708594735; x=1709199535;
         h=mime-version:user-agent:content-transfer-encoding:autocrypt
          :references:in-reply-to:date:cc:to:from:subject:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FvjULRwSsFiCewjz9HeM0ecz107mFZQPYxRhheoHiRQ=;
-        b=r5f7JWZZ+GL0xcfJpMhGvs2QDdeiy9pyBckIion2OTOn8GcMwyhcmOaPtXIiR2hFQT
-         8sBNc3xUVti1lEQJ1/uuKRQwwE438uj2fXXKDb8yhyXTIlJlCPUH2IUf0CKmzh7AS/CJ
-         BUHERt8ZCpEb6M1BeRDQbBIwkInFFedD1rP7gPJZBJYSpo95OwsyOO69nvd9qvquaCMp
-         c2aWB7xXCAQEjzpcPbEaDX2fECS7COyNPBv9bCPrER1zUXgYtMOBdv1b353AZBRN+cme
-         hCglIUudDYn5tF7K751oKlny4ouJwPQ8C2sGyTo5apBA88qOOZIlloBZnAV06IemlvDT
-         wOxw==
-X-Forwarded-Encrypted: i=1; AJvYcCVcXqN/DMyZLJ64poaX++8zHGpw7CJD8p8+kdQKfmhPsiSfC/6RSW5umcTwhvgpNp+O/be9CYdJ5CFycGNHmcCRkYwOCJYO
-X-Gm-Message-State: AOJu0YxxhiaPa6uCELFJ97Mq821UQ0uxnI9B5I2+vKuwXC6RLRRjXp0q
-	FpGwvTP7ZqIUay7U41JBa99QkrUMYCvycRAoiqOU+AdtwA5n17twWruoSdMV3iNNgYuYtbZgMe6
-	0B4Qmril2UcH1HB8UgChW9euB7K8cHDwDjt/Huw8Xu94SVJ/10VkV9w==
-X-Received: by 2002:a05:600c:3b94:b0:412:5f44:65b0 with SMTP id n20-20020a05600c3b9400b004125f4465b0mr9416740wms.4.1708594459949;
-        Thu, 22 Feb 2024 01:34:19 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFBkknNINCo8PnnlTgxopzPomoqyRPK5E97Pf6S7enUCC1L4kHnSRCcWla8GPghp0VDTO3qYg==
-X-Received: by 2002:a05:600c:3b94:b0:412:5f44:65b0 with SMTP id n20-20020a05600c3b9400b004125f4465b0mr9416726wms.4.1708594459603;
-        Thu, 22 Feb 2024 01:34:19 -0800 (PST)
+        bh=PkSJy8SMxG40Y7D597XKNCZ85h9qerEH1l5wf9lzQ/0=;
+        b=vAAgjtEhhuI58BESzHpCJk41f/qJqXTJKKOYAMb+RVXdKQ2q3TrlDqUlhtAlb55Kfa
+         6kKsTL4/bnGYdYu5F1yH7KO5L4F90y1HU+iUWlvjlzCFrFPDZ9r0mz5Zp1V0XqMQEqcI
+         Q00wwpkHNfcAvzv5/CHJkxqMbAX3rJ5Y7gTVGmgmMPPDxDjR1UzdHm5p7iPJNgWnh3Ev
+         3AP86vhIaZz2+avzyb/f3D3/HRUJDqPvXK0IMU0FJ+MiYvUIxCZMqwfMdLNDCLMrx2Z1
+         kZWeMQeFj5UJfY27q4g2xa1bvpfIoUuAcGIJlH5NH7QdkHNJAbQIaZimae7SBaSIgTGK
+         xLfg==
+X-Gm-Message-State: AOJu0Yw5UtwH5+YOHUnCScUqAu5kf0RLZLrjkMqkEnHeDH/2Z81jeEAT
+	AtkqL92N/5g8BNA6tyfLdls63DfRSh9uClC2V2oYiAptdkDKrAnfd5hvUMEATKJl9L4MPmS8UE/
+	iXTLu1BBM9CWVztRT9XMAWM+bYM5SFwXtZBu3qoaPbhv1LpKQd/qFLg==
+X-Received: by 2002:a05:600c:1ca8:b0:412:52a2:bd4e with SMTP id k40-20020a05600c1ca800b0041252a2bd4emr11689178wms.3.1708594735310;
+        Thu, 22 Feb 2024 01:38:55 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHMnKjbckCWhczRwAG585M6C2mhZOHxTNTdSk4rMneElz89fYAs3onf90whOGWwLN1Vun6v2g==
+X-Received: by 2002:a05:600c:1ca8:b0:412:52a2:bd4e with SMTP id k40-20020a05600c1ca800b0041252a2bd4emr11689170wms.3.1708594734960;
+        Thu, 22 Feb 2024 01:38:54 -0800 (PST)
 Received: from gerbillo.redhat.com (146-241-224-236.dyn.eolo.it. [146.241.224.236])
-        by smtp.gmail.com with ESMTPSA id f19-20020a05600c155300b00411ff030f06sm21781711wmg.9.2024.02.22.01.34.18
+        by smtp.gmail.com with ESMTPSA id p9-20020a7bcc89000000b00412393ddac2sm5426873wma.6.2024.02.22.01.38.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Feb 2024 01:34:19 -0800 (PST)
-Message-ID: <2e3cf929a1aad9017cf57871c58675186f6d7939.camel@redhat.com>
-Subject: Re: [PATCH] net/core/dev.c: enable timestamp static key if CPU
- isolation is configured
+        Thu, 22 Feb 2024 01:38:54 -0800 (PST)
+Message-ID: <55c1527f778ada6458dfc3d626d36e5367886dbb.camel@redhat.com>
+Subject: Re: [PATCH v2] net: stmmac: mmc_core: Drop interrupt registers from
+ stats
 From: Paolo Abeni <pabeni@redhat.com>
-To: Marcelo Tosatti <mtosatti@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Frederic Weisbecker
-	 <frederic@kernel.org>, Valentin Schneider <vschneid@redhat.com>
-Date: Thu, 22 Feb 2024 10:34:17 +0100
-In-Reply-To: <ZdSAWAwUxc5R46NH@tpad>
-References: <ZdSAWAwUxc5R46NH@tpad>
+To: Jesper Nilsson <jesper.nilsson@axis.com>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,  Maxime Coquelin <mcoquelin.stm32@gmail.com>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	kernel@axis.com
+Date: Thu, 22 Feb 2024 10:38:53 +0100
+In-Reply-To: <20240220-stmmac_stats-v2-1-0a78863bec70@axis.com>
+References: <20240220-stmmac_stats-v2-1-0a78863bec70@axis.com>
 Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
@@ -99,21 +100,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-On Tue, 2024-02-20 at 07:35 -0300, Marcelo Tosatti wrote:
-> For systems that use CPU isolation (via nohz_full), creating or destroyin=
-g
-> a socket with  timestamping (SOF_TIMESTAMPING_OPT_TX_SWHW) might cause a
-> static key to be enabled/disabled. This in turn causes undesired=20
-> IPIs to isolated CPUs.
+On Tue, 2024-02-20 at 13:00 +0100, Jesper Nilsson wrote:
+> The MMC IPC interrupt status and interrupt mask registers are
+> of little use as Ethernet statistics, but incrementing counters
+> based on the current interrupt and interrupt mask registers
+> makes them actively misleading.
 >=20
-> So enable the static key unconditionally, if CPU isolation is enabled,
-> thus avoiding the IPIs.
+> For example, if the interrupt mask is set to 0x08420842,
+> the current code will increment by that amount each iteration,
+> leading to the following sequence of nonsense:
 >=20
-> Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
+> mmc_rx_ipc_intr_mask: 969816526
+> mmc_rx_ipc_intr_mask: 1108361744
+>=20
+> These registers have been included in the Ethernet statistics
+> since the first version of MMC back in 2011 (commit 1c901a46d57).
+> That commit also mentions the MMC interrupts as
+> "something to add later (if actually useful)".
+>=20
+> If the registers are actually useful, they should probably
+> be part of the Ethernet register dump instead of statistics,
+> but for now, drop the counters for mmc_rx_ipc_intr and
+> mmc_rx_ipc_intr_mask completely.
+>=20
+> Signed-off-by: Jesper Nilsson <jesper.nilsson@axis.com>
 
-This looks like net-next material, but it does not apply cleanly to the
-net-next tree. Could you please rebase and repost including the 'net-
-next' tag into the patch prefix?
+It looks like this could target the 'net' tree. Anyway it does not
+apply cleanly to 'net' nor 'net-next'. Could you please rebase &&
+repost, including Serge's tags and explicitly setting the target tree
+into the subj prefix?
 
 Thanks!
 
