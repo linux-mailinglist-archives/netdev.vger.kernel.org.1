@@ -1,188 +1,165 @@
-Return-Path: <netdev+bounces-74071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74072-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8EDA85FCEE
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 16:47:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21AB385FCF2
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 16:48:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4096D1F23B43
-	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 15:47:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4FC11F23F12
+	for <lists+netdev@lfdr.de>; Thu, 22 Feb 2024 15:48:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA17E1487E8;
-	Thu, 22 Feb 2024 15:47:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73ADD14E2EC;
+	Thu, 22 Feb 2024 15:47:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O7v7TkIZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I5F/XIpi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BF3914AD30;
-	Thu, 22 Feb 2024 15:47:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D71914F9CF;
+	Thu, 22 Feb 2024 15:47:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708616846; cv=none; b=cw26SAU7ODgwyGz9xk13zB0I9AoPPzfFXI6xaTGd9tvlFqN50WVJTVVRnycx+WqoZxPh6GmaPgDrEO53cRMHkeZdMG6o4qNCtIZ1+HX2XOccfKHUZ6zA+5wFswxWWxCYKo+g43sC4k9XudyhBU7GamQoc1njYxDxWoPJrTACiMo=
+	t=1708616865; cv=none; b=QFl+DAcOKcG+/qVYIR6VTlP5NVrjva0tivBaezTv6oUdEvlPc/mTY3OIJT6vb0bhCEqrvSczV/5uVLHh4nKTPKp4IAxRaFr/dD1y3la/nErqkE6qbKLmbw8N5cBE8G/raxYlf9SGVnAGYNRtIxZo+DRFfjinXlBn6i+Fwffx6Do=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708616846; c=relaxed/simple;
-	bh=Md4in/HQ6lUKnOOyLDQIjm6+ZUBjqPPwCh2NiQF13q8=;
+	s=arc-20240116; t=1708616865; c=relaxed/simple;
+	bh=qNO63zIkGbx+1iQfTUn4yfr86/RWZAYZ7RtIlx0aB0A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=owDHaVpqeb62iC384CwacLTYkxg1BwS5xGYP91zflCRkvty/+tQQYkmdhrev+KLQIJcWgs2Ekpu2mKRzGC51DAmst2Ihaya9C2Cv3irYWOslMrdzBvYa1XXHv9gDEiVRtYOOTxKmuiG1VhR2Mmh1Jo0wC7g17uVf/WGJukJb8dg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O7v7TkIZ; arc=none smtp.client-ip=198.175.65.21
+	 Content-Type:Content-Disposition:In-Reply-To; b=XRpkuqOc8puvUYzPW4ImP1PNT0vpEMb2yPQtF4my47NmHWANJAAA3b0HlJUO+waWJwIZ2uc1i/c4CFBlooAE0rJTPu4alDJCPYhqzVltDHQ0PzvFRMOFbkde11xifZxGitUPY6IeFuDx9pnHHyXznxFCqjAGg0GTO0zCUgB70CI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I5F/XIpi; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708616846; x=1740152846;
+  t=1708616863; x=1740152863;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=Md4in/HQ6lUKnOOyLDQIjm6+ZUBjqPPwCh2NiQF13q8=;
-  b=O7v7TkIZ21lvkzrOOydJaVXbb0xOmd3EeYe+Jom9CwxQ8WkcJTgxjv7g
-   aaSFvxf4rYGuvOx6pxRA4IC2BCxncMHiAhGsMxFK4RfK9IS18ve3kx4Yw
-   KvTAXlDEdliEHxv/sc5QbqLY6maRna6MXkiMF09sq5MI2RYlDiTcPS/qO
-   jm+/GjzDXvnl446GhvdW9vSHF13oLD70GQ3v6Fd1/+XoyBwyW88gxY+oE
-   BzOuqIEuEfL5XsjeALXF585mULSI1GYcbji8h0mfEyfOZ/Y+vPtg3Xulv
-   CZOEY6H1tKY3R4vYNPhbB4auL9N/CiIIZleXTewU8GYKKH5TfLh2w+0QV
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10992"; a="2764323"
+   mime-version:in-reply-to;
+  bh=qNO63zIkGbx+1iQfTUn4yfr86/RWZAYZ7RtIlx0aB0A=;
+  b=I5F/XIpiFZaWge5uEF4T6e5YwleZuX3hmtUyiMnn35h+h+WMCrdg704h
+   b0tj9IFNEiQ4Ab0eqIQI3CZTomamEuyqGzrXb52/244S4KufmRA6YwfCm
+   LQ++olQqQMh5XSUd/jYJDHztUBa0h4I97UBBhQVjdPx8pevzplKlx1CNX
+   x1wZpagItgybI8NCxC2tgGdktw9REDGcwbVFFcpv/1CEpI3EU23XY4RDc
+   a5LNhhIxwgMy8zJGNpoyNVDascT0aQZ/+aMB9A9AznyafRNCmY5CqJE8q
+   zWf0oxQyLDceMj9xAAzgIY6BenYVpUFYegsVnVkINeFH5h7jeKzt2O+Lw
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10992"; a="2986570"
 X-IronPort-AV: E=Sophos;i="6.06,179,1705392000"; 
-   d="scan'208";a="2764323"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2024 07:47:25 -0800
+   d="scan'208";a="2986570"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2024 07:47:42 -0800
 X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10992"; a="913545306"
 X-IronPort-AV: E=Sophos;i="6.06,179,1705392000"; 
-   d="scan'208";a="5908495"
-Received: from sgruszka-mobl.ger.corp.intel.com (HELO localhost) ([10.252.46.166])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2024 07:47:21 -0800
-Date: Thu, 22 Feb 2024 16:47:18 +0100
-From: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
-To: "Rafael J. Wysocki" <rafael@kernel.org>
-Cc: linux-pm@vger.kernel.org,
-	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-	Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
+   d="scan'208";a="913545306"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by fmsmga002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2024 07:47:38 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.97)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1rdBIN-00000006fSw-0zPE;
+	Thu, 22 Feb 2024 17:47:35 +0200
+Date: Thu, 22 Feb 2024 17:47:34 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org
-Subject: Re: [PATCH v4 2/3] thermal: netlink: Add genetlink bind/unbind
- notifications
-Message-ID: <ZddshlCHwsDTFSYL@linux.intel.com>
-References: <20240212161615.161935-1-stanislaw.gruszka@linux.intel.com>
- <20240212161615.161935-3-stanislaw.gruszka@linux.intel.com>
- <CAJZ5v0hTsXjre_StGizrmUx1JUkzKr9K9KLiHrsvicivMO2Odw@mail.gmail.com>
+	Yury Norov <yury.norov@gmail.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew@lunn.ch>,
+	Mark Brown <broonie@kernel.org>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v4 4/5] net: wan: fsl_qmc_hdlc: Add runtime timeslots
+ changes support
+Message-ID: <Zddslpw398MJ49SS@smile.fi.intel.com>
+References: <20240222142219.441767-1-herve.codina@bootlin.com>
+ <20240222142219.441767-5-herve.codina@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJZ5v0hTsXjre_StGizrmUx1JUkzKr9K9KLiHrsvicivMO2Odw@mail.gmail.com>
+In-Reply-To: <20240222142219.441767-5-herve.codina@bootlin.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-On Tue, Feb 13, 2024 at 02:24:56PM +0100, Rafael J. Wysocki wrote:
-> On Mon, Feb 12, 2024 at 5:16 PM Stanislaw Gruszka
-> <stanislaw.gruszka@linux.intel.com> wrote:
-> >
-> > Introduce a new feature to the thermal netlink framework, enabling the
-> > registration of sub drivers to receive events via a notifier mechanism.
-> > Specifically, implement genetlink family bind and unbind callbacks to send
-> > BIND and UNBIND events.
-> >
-> > The primary purpose of this enhancement is to facilitate the tracking of
-> > user-space consumers by the intel_hif driver.
+On Thu, Feb 22, 2024 at 03:22:17PM +0100, Herve Codina wrote:
+> QMC channels support runtime timeslots changes but nothing is done at
+> the QMC HDLC driver to handle these changes.
 > 
-> This should be intel_hfi.  Or better, Intel HFI.
+> Use existing IFACE ioctl in order to configure the timeslots to use.
 
-Will change in next revision.
+...
 
-> > By leveraging these
-> > notifications, the driver can determine when consumers are present
-> > or absent.
-> >
-> > Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> > Signed-off-by: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
-> > ---
-> >  drivers/thermal/thermal_netlink.c | 40 +++++++++++++++++++++++++++----
-> >  drivers/thermal/thermal_netlink.h | 26 ++++++++++++++++++++
-> >  2 files changed, 61 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/drivers/thermal/thermal_netlink.c b/drivers/thermal/thermal_netlink.c
-> > index 76a231a29654..86c7653a9530 100644
-> > --- a/drivers/thermal/thermal_netlink.c
-> > +++ b/drivers/thermal/thermal_netlink.c
-> > @@ -7,17 +7,13 @@
-> >   * Generic netlink for thermal management framework
-> >   */
-> >  #include <linux/module.h>
-> > +#include <linux/notifier.h>
-> >  #include <linux/kernel.h>
-> >  #include <net/genetlink.h>
-> >  #include <uapi/linux/thermal.h>
-> >
-> >  #include "thermal_core.h"
-> >
-> > -enum thermal_genl_multicast_groups {
-> > -       THERMAL_GENL_SAMPLING_GROUP = 0,
-> > -       THERMAL_GENL_EVENT_GROUP = 1,
-> > -};
-> > -
-> >  static const struct genl_multicast_group thermal_genl_mcgrps[] = {
-> 
-> There are enough characters per code line to spell "multicast_groups"
-> here (and analogously below).
+> +static int qmc_hdlc_xlate_slot_map(struct qmc_hdlc *qmc_hdlc,
+> +				   u32 slot_map, struct qmc_chan_ts_info *ts_info)
+> +{
+> +	DECLARE_BITMAP(ts_mask_avail, 64);
+> +	DECLARE_BITMAP(ts_mask, 64);
+> +	DECLARE_BITMAP(map, 64);
 
-Not sure what you mean, change thermal_genl_mcgrps to thermal_genl_multicast_groups ?
+Perhaps more 1:1 naming?
 
-I could change that, but it's not really related to the changes in this patch,
-so perhaps in separate patch.
+	DECLARE_BITMAP(rx_ts_mask_avail, 64);
+	DECLARE_BITMAP(tx_ts_mask, 64);
+	DECLARE_BITMAP(slot_map, 64);
 
-Additionally "mcgrps" are more consistent with genl_family fields i.e:
+> +	/* Tx and Rx available masks must be identical */
+> +	if (ts_info->rx_ts_mask_avail != ts_info->tx_ts_mask_avail) {
+> +		dev_err(qmc_hdlc->dev, "tx and rx available timeslots mismatch (0x%llx, 0x%llx)\n",
+> +			ts_info->rx_ts_mask_avail, ts_info->tx_ts_mask_avail);
+> +		return -EINVAL;
+> +	}
+> +
+> +	bitmap_from_u64(ts_mask_avail, ts_info->rx_ts_mask_avail);
+> +	bitmap_from_u64(map, slot_map);
+> +	bitmap_scatter(ts_mask, map, ts_mask_avail, 64);
+> +
+> +	if (bitmap_weight(ts_mask, 64) != bitmap_weight(map, 64)) {
+> +		dev_err(qmc_hdlc->dev, "Cannot translate timeslots %*pb -> (%*pb, %*pb)\n",
+> +			64, map, 64, ts_mask_avail, 64, ts_mask);
 
-      .mcgrps         = thermal_genl_mcgrps,
-      .n_mcgrps       = ARRAY_SIZE(thermal_genl_mcgrps), 
 
-> >         [THERMAL_GENL_SAMPLING_GROUP] = { .name = THERMAL_GENL_SAMPLING_GROUP_NAME, },
-> >         [THERMAL_GENL_EVENT_GROUP]  = { .name = THERMAL_GENL_EVENT_GROUP_NAME,  },
-> > @@ -75,6 +71,7 @@ struct param {
-> >  typedef int (*cb_t)(struct param *);
-> >
-> >  static struct genl_family thermal_gnl_family;
-> > +static BLOCKING_NOTIFIER_HEAD(thermal_gnl_chain);
-> 
-> thermal_genl_chain ?
-> 
-> It would be more consistent with the rest of the naming.
+You can save a bit of code and stack:
 
-Ok, will change. Additionally in separate patch thermal_gnl_family for consistency.
+		dev_err(qmc_hdlc->dev, "Cannot translate timeslots %64pb -> (%64pb, %64pb)\n",
+			slot_map, rx_ts_mask_avail, tx_ts_mask);
 
-> >  static int thermal_group_has_listeners(enum thermal_genl_multicast_groups group)
-> >  {
-> > @@ -645,6 +642,27 @@ static int thermal_genl_cmd_doit(struct sk_buff *skb,
-> >         return ret;
-> >  }
-> >
-> > +static int thermal_genl_bind(int mcgrp)
-> > +{
-> > +       struct thermal_genl_notify n = { .mcgrp = mcgrp };
-> > +
-> > +       if (WARN_ON_ONCE(mcgrp > THERMAL_GENL_MAX_GROUP))
-> > +               return -EINVAL;
-> 
-> pr_warn_once() would be better IMO.  At least it would not crash the
-> kernel configured with "panic on warn".
+> +		return -EINVAL;
+> +	}
+> +
+> +	bitmap_to_arr64(&ts_info->tx_ts_mask, ts_mask, 64);
+> +	ts_info->rx_ts_mask = ts_info->tx_ts_mask;
+> +	return 0;
+> +}
 
-"panic on warn" is generic WARN_* issue at any place where WARN_* are used.
-And I would say, crash is desired behaviour for those who use the option
-to catch bugs. And mcgrp bigger than THERMAL_GENL_MAX_GROUP is definitely
-a bug. Additionally pr_warn_once() does not print call trace, so I think
-WARN_ON_ONCE() is more proper. But if really you prefer pr_warn_once()
-I can change.
+...
 
-Regards
-Stanislaw
+> +static int qmc_hdlc_xlate_ts_info(struct qmc_hdlc *qmc_hdlc,
+> +				  const struct qmc_chan_ts_info *ts_info, u32 *slot_map)
+
+Similar comments apply as per above function.
+
+...
+
+> +	ret = qmc_chan_get_ts_info(qmc_hdlc->qmc_chan, &ts_info);
+> +	if (ret) {
+> +		dev_err(qmc_hdlc->dev, "get QMC channel ts info failed %d\n", ret);
+> +		return ret;
+
+		return dev_err_probe(...);
+
+> +	}
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
 
