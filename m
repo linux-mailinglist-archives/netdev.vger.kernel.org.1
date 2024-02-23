@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-74541-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74542-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E018861C92
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 20:34:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C2F5861C9E
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 20:36:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D8091C23870
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 19:34:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DA5F1C21942
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 19:36:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B608143C74;
-	Fri, 23 Feb 2024 19:33:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5255B143C59;
+	Fri, 23 Feb 2024 19:36:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="A+B27v9v"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="hvXMvbcr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 633BC1448FF
-	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 19:33:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A517F12AAE0
+	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 19:36:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708716833; cv=none; b=qg1uoAVeCA2P2BrL8rl3iFxVM4oERbP2f83mRBmWSoYxyPASL+2Q4UORRlzhRaou50j2e3GC/hEIXHfhwRJ346NgjiGYvXOR8/16c0+2BOm3iYwcVv/5+7DA0h+5BDiBt6iIk2UDkNcNujbxOTWWCbGyo2yYJFZisA8IlAWZ65E=
+	t=1708716976; cv=none; b=YzLikjtCtbDiS9mxJvWTLtEP8nPLIyMhPlHR1L4Zp+So5t8C5JfkM9XFj13MOhQKPn7e77aZ818fIRnLrAF70H5dViOmYVKJeTwZUMYv1WyMx1SdMW0NQVU+j9gglMBgRrVO044Kw9Vig55YfKqNQ+PoHuzU1xRGPnxh+CyB3Tc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708716833; c=relaxed/simple;
-	bh=ieiOOssPRnTNyOj5qVOyQ1tQq6c9ccB5zNXAiIYbbiY=;
+	s=arc-20240116; t=1708716976; c=relaxed/simple;
+	bh=ZJdF6fcQB/D3aoRjfCMbD/BqXfb6AMtd/RTSAogPfEs=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=p7ydyjZNIthgk5yEQCCeMDBx3reUqnV7CJMLBN52Q0Y8FC4irW6jQDV/hIHMhTkadIgunu5Lq4shFB58cb3P/DS281ksrnLH/uSWVn0RHwlDgLVhl/9tgclNDoj8xaXkvUQlwxO9/ebeZzmk04VwSOANWh/MaDYKLQ8F60C0hFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=A+B27v9v; arc=none smtp.client-ip=99.78.197.220
+	 MIME-Version:Content-Type; b=tj3LHilVAxIovF7T3NjheIf2U/re8UJHuWdCx25CXpB6Iw/eDNdXLW7Q/abcJzTkgmMoY9J5cERzXMdE4Gi4UK+hzDe/ZETMhG4NNUf+NnqPOh95P2BsypFZdeRx+45LJ/k76NsiHAvbDyk0DiLDbw5pXHMnIkSAbAwxGZFNq24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=hvXMvbcr; arc=none smtp.client-ip=207.171.184.29
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1708716831; x=1740252831;
+  t=1708716974; x=1740252974;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=sHFPE3W6cT7LIWsh5zUoToSe53KJMr19jJJVFR9f4/s=;
-  b=A+B27v9vGno8rx+SwNxplS6e3uLR/adc7HyQpdBMjB9TVjSiKxw7x2+p
-   H8S9pCWcylBb+lD7Sp8DS6yxpMVG1yanmdoTk71VsTF5srDqdOR1sZ8Jx
-   SZL6uf11qdKGXnCyzgXynyKVa3VkrR1YgGHzewZfR78iHlSdx2G6B28DQ
-   A=;
+  bh=A6T4drezmuoL9SVXRMxMcYqu0oOraEwUDkwszdNQlyQ=;
+  b=hvXMvbcrP+F/58pl8Yc1RF/RijFv5VpxZA6ZMbCxXAfsSjsnPdI1U8PE
+   VMO5nWn5n3ljS3jY/+UJpbnqrn405xr2Iq+SJxSdbS11Lm/aL7oVEM7Ov
+   RgMXREfLQaGZgc0QeodlTY+pdH3WOyK0spsAn0roiIsSzuJ4bU0AUHvdg
+   4=;
 X-IronPort-AV: E=Sophos;i="6.06,180,1705363200"; 
-   d="scan'208";a="68344361"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2024 19:33:50 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:42288]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.20.171:2525] with esmtp (Farcaster)
- id 843c66d7-5fc5-4b15-a26d-42375dd2b35b; Fri, 23 Feb 2024 19:33:50 +0000 (UTC)
-X-Farcaster-Flow-ID: 843c66d7-5fc5-4b15-a26d-42375dd2b35b
+   d="scan'208";a="399286967"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2024 19:36:07 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:39423]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.16.177:2525] with esmtp (Farcaster)
+ id 511f3b7c-cde8-4199-b8f7-5f37c9e27105; Fri, 23 Feb 2024 19:36:07 +0000 (UTC)
+X-Farcaster-Flow-ID: 511f3b7c-cde8-4199-b8f7-5f37c9e27105
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 23 Feb 2024 19:33:46 +0000
+ 15.2.1118.40; Fri, 23 Feb 2024 19:36:06 +0000
 Received: from 88665a182662.ant.amazon.com (10.106.100.9) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 23 Feb 2024 19:33:43 +0000
+ 15.2.1118.40; Fri, 23 Feb 2024 19:36:04 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: <kerneljasonxing@gmail.com>
 CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
 	<kernelxing@tencent.com>, <kuba@kernel.org>, <kuniyu@amazon.com>,
 	<netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v9 06/10] tcp: introduce dropreasons in receive path
-Date: Fri, 23 Feb 2024 11:33:22 -0800
-Message-ID: <20240223193321.6549-1-kuniyu@amazon.com>
+Subject: Re: [PATCH net-next v9 07/10] tcp: add more specific possible drop reasons in tcp_rcv_synsent_state_process()
+Date: Fri, 23 Feb 2024 11:35:54 -0800
+Message-ID: <20240223193554.6960-1-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240223102851.83749-7-kerneljasonxing@gmail.com>
-References: <20240223102851.83749-7-kerneljasonxing@gmail.com>
+In-Reply-To: <20240223102851.83749-8-kerneljasonxing@gmail.com>
+References: <20240223102851.83749-8-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,15 +76,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D044UWB003.ant.amazon.com (10.13.139.168) To
+X-ClientProxiedBy: EX19D033UWC003.ant.amazon.com (10.13.139.217) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
 From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 23 Feb 2024 18:28:47 +0800
+Date: Fri, 23 Feb 2024 18:28:48 +0800
 > From: Jason Xing <kernelxing@tencent.com>
 > 
-> Soon later patches can use these relatively more accurate
-> reasons to recognise and find out the cause.
+> This patch does two things:
+> 1) add two more new reasons
+> 2) only change the return value(1) to various drop reason values
+> for the future use
+> 
+> For now, we still cannot trace those two reasons. We'll implement the full
+> function in the subsequent patch in this series.
 > 
 > Signed-off-by: Jason Xing <kernelxing@tencent.com>
 > Reviewed-by: Eric Dumazet <edumazet@google.com>
@@ -92,84 +97,49 @@ Date: Fri, 23 Feb 2024 18:28:47 +0800
 
 Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-one nit below.
 
 > --
 > v9
 > Link: https://lore.kernel.org/netdev/c5640fc4-16dc-4058-97c6-bd84bae4fda1@kernel.org/
-> Link: https://lore.kernel.org/netdev/CANn89i+j55o_1B2SV56n=u=NHukmN_CoRib4VBzpUBVcKRjAMw@mail.gmail.com/
 > 1. add reviewed-by tag (David)
-> 2. add reviewed-by tag (Eric)
 > 
-> v7
-> Link: https://lore.kernel.org/all/20240219044744.99367-1-kuniyu@amazon.com/
-> 1. nit: nit: s/. because of/ because/ (Kuniyuki)
-> 
-> v5:
-> Link: https://lore.kernel.org/netdev/3a495358-4c47-4a9f-b116-5f9c8b44e5ab@kernel.org/
-> 1. Use new name (TCP_ABORT_ON_DATA) for readability (David)
-> 2. change the title of this patch
+> v8
+> Link: https://lore.kernel.org/netdev/CANn89i+EF77F5ZJbbkiDQgwgAqSKWtD3djUF807zQ=AswGvosQ@mail.gmail.com/
+> 1. add reviewed-by tag (Eric)
 > ---
->  include/net/dropreason-core.h | 15 ++++++++++++++-
->  1 file changed, 14 insertions(+), 1 deletion(-)
+>  net/ipv4/tcp_input.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 > 
-> diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-> index a871f061558d..af7c7146219d 100644
-> --- a/include/net/dropreason-core.h
-> +++ b/include/net/dropreason-core.h
-> @@ -30,6 +30,7 @@
->  	FN(TCP_AOFAILURE)		\
->  	FN(SOCKET_BACKLOG)		\
->  	FN(TCP_FLAGS)			\
-> +	FN(TCP_ABORT_ON_DATA)	\
-
-One more trailing tab ?
-
-
->  	FN(TCP_ZEROWINDOW)		\
->  	FN(TCP_OLD_DATA)		\
->  	FN(TCP_OVERWINDOW)		\
-> @@ -37,6 +38,7 @@
->  	FN(TCP_RFC7323_PAWS)		\
->  	FN(TCP_OLD_SEQUENCE)		\
->  	FN(TCP_INVALID_SEQUENCE)	\
-> +	FN(TCP_INVALID_ACK_SEQUENCE)	\
->  	FN(TCP_RESET)			\
->  	FN(TCP_INVALID_SYN)		\
->  	FN(TCP_CLOSE)			\
-> @@ -204,6 +206,11 @@ enum skb_drop_reason {
->  	SKB_DROP_REASON_SOCKET_BACKLOG,
->  	/** @SKB_DROP_REASON_TCP_FLAGS: TCP flags invalid */
->  	SKB_DROP_REASON_TCP_FLAGS,
-> +	/**
-> +	 * @SKB_DROP_REASON_TCP_ABORT_ON_DATA: abort on data, corresponding to
-> +	 * LINUX_MIB_TCPABORTONDATA
-> +	 */
-> +	SKB_DROP_REASON_TCP_ABORT_ON_DATA,
->  	/**
->  	 * @SKB_DROP_REASON_TCP_ZEROWINDOW: TCP receive window size is zero,
->  	 * see LINUX_MIB_TCPZEROWINDOWDROP
-> @@ -228,13 +235,19 @@ enum skb_drop_reason {
->  	SKB_DROP_REASON_TCP_OFOMERGE,
->  	/**
->  	 * @SKB_DROP_REASON_TCP_RFC7323_PAWS: PAWS check, corresponding to
-> -	 * LINUX_MIB_PAWSESTABREJECTED
-> +	 * LINUX_MIB_PAWSESTABREJECTED, LINUX_MIB_PAWSACTIVEREJECTED
->  	 */
->  	SKB_DROP_REASON_TCP_RFC7323_PAWS,
->  	/** @SKB_DROP_REASON_TCP_OLD_SEQUENCE: Old SEQ field (duplicate packet) */
->  	SKB_DROP_REASON_TCP_OLD_SEQUENCE,
->  	/** @SKB_DROP_REASON_TCP_INVALID_SEQUENCE: Not acceptable SEQ field */
->  	SKB_DROP_REASON_TCP_INVALID_SEQUENCE,
-> +	/**
-> +	 * @SKB_DROP_REASON_TCP_INVALID_ACK_SEQUENCE: Not acceptable ACK SEQ
-> +	 * field because ack sequence is not in the window between snd_una
-> +	 * and snd_nxt
-> +	 */
-> +	SKB_DROP_REASON_TCP_INVALID_ACK_SEQUENCE,
->  	/** @SKB_DROP_REASON_TCP_RESET: Invalid RST packet */
->  	SKB_DROP_REASON_TCP_RESET,
->  	/**
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index 74c03f0a6c0c..83308cca1610 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+> @@ -6361,6 +6361,7 @@ static int tcp_rcv_synsent_state_process(struct sock *sk, struct sk_buff *skb,
+>  				inet_csk_reset_xmit_timer(sk,
+>  						ICSK_TIME_RETRANS,
+>  						TCP_TIMEOUT_MIN, TCP_RTO_MAX);
+> +			SKB_DR_SET(reason, TCP_INVALID_ACK_SEQUENCE);
+>  			goto reset_and_undo;
+>  		}
+>  
+> @@ -6369,6 +6370,7 @@ static int tcp_rcv_synsent_state_process(struct sock *sk, struct sk_buff *skb,
+>  			     tcp_time_stamp_ts(tp))) {
+>  			NET_INC_STATS(sock_net(sk),
+>  					LINUX_MIB_PAWSACTIVEREJECTED);
+> +			SKB_DR_SET(reason, TCP_RFC7323_PAWS);
+>  			goto reset_and_undo;
+>  		}
+>  
+> @@ -6572,7 +6574,8 @@ static int tcp_rcv_synsent_state_process(struct sock *sk, struct sk_buff *skb,
+>  reset_and_undo:
+>  	tcp_clear_options(&tp->rx_opt);
+>  	tp->rx_opt.mss_clamp = saved_clamp;
+> -	return 1;
+> +	/* we can reuse/return @reason to its caller to handle the exception */
+> +	return reason;
+>  }
+>  
+>  static void tcp_rcv_synrecv_state_fastopen(struct sock *sk)
 > -- 
 > 2.37.3
 
