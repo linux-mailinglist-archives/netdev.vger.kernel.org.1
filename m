@@ -1,69 +1,59 @@
-Return-Path: <netdev+bounces-74227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 894B88608D5
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 03:26:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79E788608D9
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 03:30:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2320B22FDB
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 02:26:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABB672828AA
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 02:30:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B6FDBE5A;
-	Fri, 23 Feb 2024 02:26:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46E1FD29B;
+	Fri, 23 Feb 2024 02:29:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p3RQ5BCe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n7xMF9bZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42678B65F;
-	Fri, 23 Feb 2024 02:26:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B99FD26B;
+	Fri, 23 Feb 2024 02:29:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708655208; cv=none; b=U+mooghm/tZcHQtT7TjuFYOWaux94rTycIEogW9FwHfcdWWx4RVIB3L5ywmqAyPNwEPL6BZwxogP9oFNqM+jWwQljAfzMlphtgV6g7LDZHQm4L1nZYGGHXqZEJeU8zTvXzXxAS/5QUYGH1gT5osC9BEXbtVlr4DyQD4CFC+hI1k=
+	t=1708655389; cv=none; b=Q4SG7eFafqGLeBvBRP1Swk8c8rDKlPpFpQV9CNz37DmjZVAu831/LZCIkGJtFnVJtseix7DhgPTu3zQfkx4EpdmnapxeS0zuRZaXaC7vecgfnIgkzSjiYe9Bv7LJdATc7HcK+AEyDUSSvM70TH/xRtLQQSNDOU2P/HvZMQbkbq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708655208; c=relaxed/simple;
-	bh=FfB3YRREbFuYqSFz36Fp0dGvfYiKsiNrIfqiet9iU+U=;
+	s=arc-20240116; t=1708655389; c=relaxed/simple;
+	bh=8HMeF1hMpyAh7aZAuXf/OPNCGHNNAMlUhcBpRVamXEc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rxoPExRQRBU4LnDaSITkgsOlYMqxPN1gimmhOQbTYurCeFMudAf9p28mywc9axfQa4FIxXrRVWZ53e/YeIoN1EbkxJPiUR8CB6FDF8HFF09eWvIsXXsAxJ6ApBkZtfEd5nBRrBBXm5M9vY3LqIpqpOMqwyidwq3LFGUPUUlHNW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p3RQ5BCe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C065C433C7;
-	Fri, 23 Feb 2024 02:26:46 +0000 (UTC)
+	 MIME-Version:Content-Type; b=rw+fXp2vDlA0AuT3y+tjePbQ1OujHmWnmgwMG0lctTu8+BdPOITDf+Hl38IYdaZQNKtRlleW3YfVyYduY6Q+CnolGQDZKHN8FwhaUXXqoBseZFRqZ5yZCCHwvS881lFow9VMUojcYjr1fAy/3QoaHrQbZ7tcGQyOjXln5n6UtDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n7xMF9bZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 652D4C433C7;
+	Fri, 23 Feb 2024 02:29:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708655207;
-	bh=FfB3YRREbFuYqSFz36Fp0dGvfYiKsiNrIfqiet9iU+U=;
+	s=k20201202; t=1708655388;
+	bh=8HMeF1hMpyAh7aZAuXf/OPNCGHNNAMlUhcBpRVamXEc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=p3RQ5BCe5Ho1ikWdoNCRqn19P3mVWBp7VBT0sPAzzXjjjUgXJsEnKLcGFN6jz1pAI
-	 +eVKg1hpxo8px6qEyx5jYH9qGQw83FxJeeL8WCVqVabWr1v30n/1hQZ1AAvy8vmo6W
-	 BZKkrm4GxoWxg18xongmk9Q7wVB1ivBnrjdSZ8lkkwbMTbZd0YyFCuUa6HzRYM1TSY
-	 FCAW5AjE+9M2KQTbHuUCw+RW3OfoIKINhTGdiRHFLIgz2Dd1sd6VpeSp7WXelzmzi/
-	 8gRnO5Xs7EpBkMtVS1w+sYcTBSjqoHh7TF9qGE3fBFA+U6hBOWJHPUozkid9mCzKA8
-	 Aeqx8QwggE/Uw==
-Date: Thu, 22 Feb 2024 18:26:45 -0800
+	b=n7xMF9bZF8ImnNy6zHCUZnb/z+k1v6lUaki+V9YIxL7m2UoI33w4EdZWJPyEC3YPp
+	 k8gxbP1+iOV/cYxaCn/ZDdJnR/LA2Bi2iUQGnpDR6Tal6DHc2e0y3+EQ4qF4AEKOCv
+	 8IzUgWv9w1J0EmUcdXJFj9O8YLPSVGSQFKAEVq11FUTKBYWNNOdk7aHKQT/pULvVPz
+	 Q4jksCan/lo6MhWtgvWp8y3ZnhR+BuAN220tEkgl3E+NpYdKIBnLhqMlg92s8ME4QX
+	 H7p+aEGRaG+1t/sh2cQPylv79c4AAgJQ0VePtCe3m/zPDOm1Baqa7+3v4DWpQoXAE9
+	 8Ais1QiYsq+FQ==
+Date: Thu, 22 Feb 2024 18:29:47 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Shawn Guo <shawnguo2@yeah.net>
-Cc: Frank Li <Frank.Li@nxp.com>, Ulf Hansson <ulf.hansson@linaro.org>, Rob
- Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>,
- Pengutronix Kernel Team <kernel@pengutronix.de>, Fabio Estevam
- <festevam@gmail.com>, NXP Linux Team <linux-imx@nxp.com>, Wei Fang
- <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
- <xiaoning.wang@nxp.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, imx@lists.linux.dev
-Subject: Re: [PATCH v2 0/4] Add 8qm SMMU information
-Message-ID: <20240222182645.16f0d3bf@kernel.org>
-In-Reply-To: <Zdf96y7q4298dkmG@dragon>
-References: <20240201-8qm_smmu-v2-0-3d12a80201a3@nxp.com>
-	<20240202110511.135d26b7@kernel.org>
-	<ZcIPCxgO3Gxc/aXh@dragon>
-	<20240206074151.577d33f1@kernel.org>
-	<Zdf96y7q4298dkmG@dragon>
+To: Alexandra Winter <wintera@linux.ibm.com>
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>, Thorsten Winkler
+ <twinkler@linux.ibm.com>, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net/af_iucv: fix virtual vs physical address confusion
+Message-ID: <20240222182947.0379e7a3@kernel.org>
+In-Reply-To: <b96f27a5-53fa-495b-b1a4-cff574898083@linux.ibm.com>
+References: <20240215080500.2616848-1-agordeev@linux.ibm.com>
+	<47789946-0ffe-462e-9e2e-43b03ea41fe0@linux.ibm.com>
+	<20240221143115.6b04b62a@kernel.org>
+	<b96f27a5-53fa-495b-b1a4-cff574898083@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,14 +63,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 23 Feb 2024 10:07:39 +0800 Shawn Guo wrote:
-> On Tue, Feb 06, 2024 at 07:41:51AM -0800, Jakub Kicinski wrote:
-> > I said DTB.  
+On Thu, 22 Feb 2024 15:41:23 +0100 Alexandra Winter wrote:
+> > FWIW we're assuming this is going via the s390 tree.
+> > Please let us know if you prefer networking to pick it up.
 > 
-> If the DTB here means Device Tree Blob which is generated by DTC (Device
-> Tree Compiler) taking DTS (Device Tree Source) as input, it's a build
-> result and so neither of us could take.
+> Hello Jakub and maintainers,
+> 
+> please take this patch via net-next, as it belongs to the net/iucv module.
+> Please excuse that it was not flagged with [PATCH net-next]
 
-I see, thanks for the explainer, I was referring to DeviceTree/Bindings.
-I'll say binding next time.
+Done! Hopefully nobody screams at us for the use of virt_to_phys() :)
 
