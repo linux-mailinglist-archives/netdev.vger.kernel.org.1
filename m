@@ -1,99 +1,88 @@
-Return-Path: <netdev+bounces-74241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7E6C86094E
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 04:21:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 37132860959
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 04:25:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77EFAB2401F
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 03:20:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A1CFB20D00
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 03:25:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 794E810A1B;
-	Fri, 23 Feb 2024 03:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C4F4C2FD;
+	Fri, 23 Feb 2024 03:25:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HkTK6xpy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="apDnzXIZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52EBF10A10;
-	Fri, 23 Feb 2024 03:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52CEAC2C4;
+	Fri, 23 Feb 2024 03:25:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708658430; cv=none; b=Iv88CI7yCg/jzeToxKwsSQ9O3j6063MCbLSAv9l1js24bOcYr1RMurYqZ7G5MNaJbYpZeEag6MBsGYi2gU05/UjGveNO1EuiyV5SIZPdSI69YbRVETmnreeGs81VoS8h08t/wcqTbq+YIz6aJERohFrOw8Zx7niibhUVHeDrpFY=
+	t=1708658750; cv=none; b=lIvBZ6/RM379Qu8TCe7cJnbnBhVuRWMWujLL8XeG7YOTIlexSr8+hbLd/oZLNid/ePIKXZQg/d0WvZXQQcjXXMJVy4WxzvueWG57LD4iiBNb6awu9fxYff1x2okLxVUhic50C0NmzZCs+6NzSM5GXL3k+XoWgcLBrkRy9z3cpJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708658430; c=relaxed/simple;
-	bh=DA/Qri4FRnR82K28V8ne3NOgfpa2H6l2LDbTqoIcsW8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=UgntLharD/6VbccpqujGEcIEl9ZtCsYBQLCny3fsaPlgdJS27tyZnDbPCAr934Vqkmuz3SkcNyOzjcNctja8m32UX0ygPthLA4mHvQHlmThFMKc2Pj4rN/Ha5cX7CyxyrPZtQMXf3kNUIzhu24Eo5VgBWzWEdXk3tjjgYwdTGrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HkTK6xpy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0845FC43390;
-	Fri, 23 Feb 2024 03:20:30 +0000 (UTC)
+	s=arc-20240116; t=1708658750; c=relaxed/simple;
+	bh=01pAmEZPrVE/mN+21C6E5KceZu5TkFsxE7fPYMyk7NQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MjgBemZ1qdtKWJEpnIm6RHaRfq/zf98TBAensetXX8093IQyU09c0Dk8HhORwfy5jiKpZ/mwZ34pTcZIiNVnAmDBMkFaI4nTLQJa6VqZs9oacncnMTxYgSwX9eAdZ6tlIASKqyn4xlpEL+1OUQmOMMdc0z1e/gFE36AO/rz6vAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=apDnzXIZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 192F2C433C7;
+	Fri, 23 Feb 2024 03:25:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708658430;
-	bh=DA/Qri4FRnR82K28V8ne3NOgfpa2H6l2LDbTqoIcsW8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=HkTK6xpyvf6axWJHdW0nri31MtNqaEqP4mzRWDXZxesYhCouSbuKjeyGDHVTFQlQe
-	 vAgWzw0m1PmOFzyfeH3/GKMW6bg/XZmUsvlfyxpXNTfeePpy7ZyfM1or1j6knLvFo6
-	 5X9RQpxjt67Wj+NL7kcHlvyoKWTMJqF9bk24s7KITFd01zQgAd72dLtwjU95iZYuFh
-	 0hrk+XQUA8GRPR3diA2DAgONwVg6z72Gnx4PyqUTO8ZJNzP/SIwWr+vhDpy7smcOgb
-	 qE++jldPp3DKEGEYN6byhdjZlNX8kTdSZtXX7rLdzMlpH9IHTO3r6LTCCKwgFVGa10
-	 FNSYyUITE0BQQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E9C62C395F1;
-	Fri, 23 Feb 2024 03:20:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1708658749;
+	bh=01pAmEZPrVE/mN+21C6E5KceZu5TkFsxE7fPYMyk7NQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=apDnzXIZc6bm1rrH2Q3WZ0w/IlnAVCb1gjhZ3jy7lkYIlyCvBWwrp66MLggDA2efQ
+	 bnGxZfG6CVP1yx4981jqWLEyF0M/OBKMZgl8urDL4q+1Uu5EqenYlouyVQMj1jBujc
+	 ZLzj7MhbL3QdAJc+PywD7Bap4hICK45nBpbD5RiGyzWZacbzvT4aKr+bN/sTyz8Nki
+	 stgJCA3UWcX7MJhhM5sxFcTRdjBNq1p+PGtlXBzoBuaW3Q6hglQEdHKAVpkkUtT5wN
+	 2Xvk2OCmd2mokD4rrpkuYICmlT+2EZ0xlKxqAPw+LfLXF6yP6b1QJ7rDTxG2E9R0Ze
+	 uv+5w0vSTFNXQ==
+Date: Thu, 22 Feb 2024 19:25:48 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Wei Fang <wei.fang@nxp.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew
+ Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Russell King <rmk+kernel@armlinux.org.uk>,
+ kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
+ <xiaoning.wang@nxp.com>, NXP Linux Team <linux-imx@nxp.com>
+Subject: Re: [PATCH net-next v5 4/8] net: phy: Keep track of EEE
+ configuration
+Message-ID: <20240222192548.2e9a501e@kernel.org>
+In-Reply-To: <20240221062107.778661-5-o.rempel@pengutronix.de>
+References: <20240221062107.778661-1-o.rempel@pengutronix.de>
+	<20240221062107.778661-5-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v6] bonding: rate-limit bonding driver inspect
- messages
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170865842995.21611.9707338053394073057.git-patchwork-notify@kernel.org>
-Date: Fri, 23 Feb 2024 03:20:29 +0000
-References: <20240221082752.4660-1-praveen.kannoju@oracle.com>
-In-Reply-To: <20240221082752.4660-1-praveen.kannoju@oracle.com>
-To: Praveen Kannoju <praveen.kannoju@oracle.com>
-Cc: j.vosburgh@gmail.com, andy@greyhouse.net, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- rajesh.sivaramasubramaniom@oracle.com, rama.nichanamatlu@oracle.com,
- manjunath.b.patil@oracle.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Wed, 21 Feb 2024 07:21:03 +0100 Oleksij Rempel wrote:
+> @@ -595,6 +596,7 @@ struct macsec_ops;
+>   * @advertising_eee: Currently advertised EEE linkmodes
+>   * @eee_enabled: Flag indicating whether the EEE feature is enabled
+>   * @enable_tx_lpi: When True, MAC should transmit LPI to PHY
+> + * eee_cfg: User configuration of EEE
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+missing @ in front of the name here
 
-On Wed, 21 Feb 2024 13:57:52 +0530 you wrote:
-> Through the routine bond_mii_monitor(), bonding driver inspects and commits
-> the slave state changes. During the times when slave state change and
-> failure in aqcuiring rtnl lock happen at the same time, the routine
-> bond_mii_monitor() reschedules itself to come around after 1 msec to commit
-> the new state.
-> 
-> During this, it executes the routine bond_miimon_inspect() to re-inspect
-> the state chane and prints the corresponding slave state on to the console.
-> Hence we do see a message at every 1 msec till the rtnl lock is acquired
-> and state chage is committed.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v6] bonding: rate-limit bonding driver inspect messages
-    https://git.kernel.org/netdev/net-next/c/a4634aa71fee
-
-You are awesome, thank you!
+>   * @lp_advertising: Current link partner advertised linkmodes
+>   * @host_interfaces: PHY interface modes supported by host
+>   * @eee_broken_modes: Energy efficient ethernet modes which should be prohibited
+> @@ -715,6 +717,7 @@ struct phy_device {
+>  	/* Energy efficient ethernet modes which should be prohibited */
+>  	u32 eee_broken_modes;
+>  	bool enable_tx_lpi;
+> +	struct eee_config eee_cfg;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
