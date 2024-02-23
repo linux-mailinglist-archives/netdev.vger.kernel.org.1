@@ -1,169 +1,186 @@
-Return-Path: <netdev+bounces-74362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B43FF861082
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 12:37:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 23961861087
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 12:37:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 180CFB22EAB
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 11:37:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 76429B24CA8
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 11:37:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96C3F78697;
-	Fri, 23 Feb 2024 11:37:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11CFD7A718;
+	Fri, 23 Feb 2024 11:37:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="eSAhnN4a"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="eh4GeMbs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05AFB5C617;
-	Fri, 23 Feb 2024 11:37:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B7FA78697
+	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 11:37:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708688249; cv=none; b=GgQalgYN1Ibqrkav4GKcNJQR0km+/DW09YbS7y+M4gJUctCnhCbxGhI9kAbDs6MCuhZgJhjp8sN50IfeW+F2S6rIo5n+4h3GgilWJP/AY3Cy4CP5+4WJJaGoIDTibEIcW/HWWSUcamh960p6meiPi+UpPHbp/ydQbcXxWujRGvI=
+	t=1708688263; cv=none; b=r5MfzLGXMMrb8wDixmUfdWhOfmWfiOrp70YrSq2NrTPHLLhOawK7Mm18zrBhdgBKTw3C0AdCtvegU1phXuWJYV2eXA+L0KmxsCjP/rKmIsOGhCv2MIfgUN/DxP2o/W6KQce4Uf6Xy6GUVfolx0HwDsNpHW6MVaDwieXoeVVDvxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708688249; c=relaxed/simple;
-	bh=ruxxOsZUCWD8LWHhoOKiqm+o9AotKoVhW0IiONdJ+zw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ExFyzMLJkXZOVh0GsvAfWpOt7ZMYGVtLO7Qi7KFIEOxGAVVqIQyZZ1FZEd3RcvNqmwhSljxvwxMivjV5F6cAtBDFnLSc2NN4qA7YVphqps3v+dJv540c0nzo31lphzmK3W7kHoRBiazDJSNlBmBj+GehCREd5JmlFMEYNw4EoEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=eSAhnN4a; arc=none smtp.client-ip=80.241.56.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4Th7K92jZGz9ssc;
-	Fri, 23 Feb 2024 12:37:17 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1708688237;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=G/cnYUO4t1KnFyWBtPESWQ1mYGZ8vow6mQdKLDyR1pc=;
-	b=eSAhnN4ahg6PeXaRexhK/avhwA+IWYb3jKCemeJYcLlzdezH8LgnibRcp4AkSVTxE8v8ZA
-	gTyXWYgq8lX9Yj4FcUi4uMow0ZZwnqiqs+f3HJC2SAki1v/iE/dcTtPl/mf1J7Ek18mt1w
-	9s0H+i8+WEpqYepKcDTk4XsQ0cYF39gLnlUOKUrkyymJ99o8jWgmTfXhKgYz0rQlq/V6kj
-	dNzyLuSWsQj5sHhm6Q8P3OxxsEvuQXQZPy36uFkeZd1hTRNXLn14SH/gh2rcIt8KqaGopS
-	/uxiB5/Hoyv/IwhjYU9SRJSYEywY6k9uLXkir1Yv109X1K7tp0a9fm9V0hvGAA==
-Date: Fri, 23 Feb 2024 12:37:13 +0100
-From: Erhard Furtner <erhard_f@mailbox.org>
-To: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: Charlie Jenkins <charlie@rivosinc.com>, "linuxppc-dev@lists.ozlabs.org"
- <linuxppc-dev@lists.ozlabs.org>, Palmer Dabbelt <palmer@rivosinc.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: "test_ip_fast_csum: ASSERTION FAILED at
- lib/checksum_kunit.c:589" at boot with CONFIG_CHECKSUM_KUNIT=y enabled on a
- Talos II, kernel 6.8-rc5
-Message-ID: <20240223123713.2e49b981@yea>
-In-Reply-To: <b2a7b678-fc59-4d12-acc3-696866cfd7c2@csgroup.eu>
-References: <20240223022654.625bef62@yea>
-	<528c6abf-e5ef-42cd-a5d7-6ede3254523d@csgroup.eu>
-	<Zdg3X4A1eJsJ+ACh@ghost>
-	<6c37ffa2-8642-46c0-89ba-1f1e29b094d9@csgroup.eu>
-	<ZdhCnoRu3i1Cnwks@ghost>
-	<b2a7b678-fc59-4d12-acc3-696866cfd7c2@csgroup.eu>
+	s=arc-20240116; t=1708688263; c=relaxed/simple;
+	bh=98rPOvnAYsubAtz6pjV4Z2L0dBtqB5ZBkhj2CgpLC/E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HsEjrt4hs188SvrxDGIcWhkmNQAuRRWEh/NmO3HSInrAitrWPDPoPBbcs/N8UYpbfrWOQi/pNlP9W7IWUKRzMoNJHCoC9qYKJ1JTTxf31Uso9RmiV8GlZtYNuOjEg6pwUA/V3S3gDCqIJwM/oi/MEik1vcQ6Er577BkgsqGn7gI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=eh4GeMbs; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1d95d67ff45so4226485ad.2
+        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 03:37:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1708688260; x=1709293060; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AYojV14l/EO4ziKOz/Cae0jSZMr1ZjtiyuI8QAd/KG4=;
+        b=eh4GeMbsIaGgjLeTa4Vqzd9K9SLf0p2eoZn5nWWOxYAi+Axfl7QpegIhr0bnrLGJJ/
+         EyZq8s/uzVjsTBJLl9NPQmfav691GsagVTgkmVeVMhkHFax74HpT+hdFYktdVf96bPAI
+         fBbweadNe3ASS/ng+pZBioH6otZbA/4AZFnYXSNHVuqAXwrlyJSL+GIS1Ntafoj7fjbF
+         LS0a4HPeRmNPSSE7a1NUcu2wYaPv+wETywHuqbqY193WI6c6+kb0ipfCw21g8NHNKOGt
+         dkZzx0t1cHgXQC/YQfSvsLh2G6UdSGqBEFV8aBboTUuGbUL35KWJBnYI2CGVC/BjMoh+
+         3qnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708688260; x=1709293060;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=AYojV14l/EO4ziKOz/Cae0jSZMr1ZjtiyuI8QAd/KG4=;
+        b=eFXtxQpdURigKSml4YrHHeYy2HQVdXf2SYcyePN3vPAuXuP9MX02PlkKI3aWvvCx5F
+         OsHTA4QA4qekWMSp4NXPPGGhViools13TTCdB/kCqgBXfsW6Aic+m0sPBc3W46eWRbwV
+         wNosVdm4EQucuSK+4zBQRB3P9YAqyfAQJxpLq8dUwwLgnWkG/RXYbDCscjir7KQOwLTj
+         vKEL4Wg1d52Son9cLgB5mL75fcoPT4JbFMYipVtVW+pjej6LcJOXWa5BQ9dEY54X0uN0
+         QBZlE+nVE2eqf6EDJ/V7ScMYJ2Ne8gVtnT+tud6QcX2+fU4JjyB7Ro/5gom7nXOYHiBz
+         fKFg==
+X-Forwarded-Encrypted: i=1; AJvYcCUAUQ4IRy5AuVcT6v68TZUR9Pjc/kF1EmDXZ1V+ppSARDwj7dxXpQWqfrb1evUmKqrlyUD+uZWhb4U/zRHD5HVecn1K5oXI
+X-Gm-Message-State: AOJu0Yy8GfLP28DpyS4AR6OGg/o/UN38NFGv/BWSHXWZf2ra1yWgxDXn
+	6WtrMm3pDweM2Rm3PiFDoqTI4yjMefjNfO9nDlt4Tl43N7B9DkP23hBVgu5aPrI=
+X-Google-Smtp-Source: AGHT+IGs7KQxlDPJ6rVKmuuRL5lhG2zXTibsWX9m7dKXUX5N8EczSlq2CLx5XxM8WOJk61IbtRHvjw==
+X-Received: by 2002:a17:903:1111:b0:1dc:156c:a864 with SMTP id n17-20020a170903111100b001dc156ca864mr1471837plh.4.1708688246918;
+        Fri, 23 Feb 2024 03:37:26 -0800 (PST)
+Received: from [10.255.179.232] ([139.177.225.236])
+        by smtp.gmail.com with ESMTPSA id m20-20020a170902f21400b001d8f6ae51aasm11471937plc.64.2024.02.23.03.37.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Feb 2024 03:37:26 -0800 (PST)
+Message-ID: <9c0aad2c-548a-4287-b3d5-c7932f40c96f@bytedance.com>
+Date: Fri, 23 Feb 2024 19:37:20 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-MBO-RS-META: 8gai3cka79z68h461yeewwdpd8k1qg58
-X-MBO-RS-ID: 26b6a50f4d4151b2f26
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/1] Rosebush, a new hash table
+To: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+Cc: Thomas Graf <tgraf@suug.ch>, Herbert Xu <herbert@gondor.apana.org.au>,
+ netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ maple-tree@lists.infradead.org, rcu@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240222203726.1101861-1-willy@infradead.org>
+From: Peng Zhang <zhangpeng.00@bytedance.com>
+In-Reply-To: <20240222203726.1101861-1-willy@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, 23 Feb 2024 09:06:56 +0000
-Christophe Leroy <christophe.leroy@csgroup.eu> wrote:
 
-> Yes, with second patch is magically works, meaning the patch description 
-> is not correct because the problem for powerpc it not at all related to 
-> memory alignment but to endianness. And endianness should have been 
-> fixed by patch 1, but instead of it, patch 1 just hides the problem by 
-> forcing casts.
-> 
-> The real fix for endianness which should be your patch 1 is the 
-> following change. With that change it works perfectly well without any 
-> forced cast:
-> 
-> diff --git a/lib/checksum_kunit.c b/lib/checksum_kunit.c
-> index 225bb7701460..bf70850035c7 100644
-> --- a/lib/checksum_kunit.c
-> +++ b/lib/checksum_kunit.c
-> @@ -215,7 +215,7 @@ static const u32 init_sums_no_overflow[] = {
->   	0xffff0000, 0xfffffffb,
->   };
-> 
-> -static const __sum16 expected_csum_ipv6_magic[] = {
-> +static const u16 expected_csum_ipv6_magic[] = {
->   	0x18d4, 0x3085, 0x2e4b, 0xd9f4, 0xbdc8, 0x78f,	0x1034, 0x8422, 0x6fc0,
->   	0xd2f6, 0xbeb5, 0x9d3,	0x7e2a, 0x312e, 0x778e, 0xc1bb, 0x7cf2, 0x9d1e,
->   	0xca21, 0xf3ff, 0x7569, 0xb02e, 0xca86, 0x7e76, 0x4539, 0x45e3, 0xf28d,
-> @@ -241,7 +241,7 @@ static const __sum16 expected_csum_ipv6_magic[] = {
->   	0x3845, 0x1014
->   };
-> 
-> -static const __sum16 expected_fast_csum[] = {
-> +static const u16 expected_fast_csum[] = {
->   	0xda83, 0x45da, 0x4f46, 0x4e4f, 0x34e,	0xe902, 0xa5e9, 0x87a5, 0x7187,
->   	0x5671, 0xf556, 0x6df5, 0x816d, 0x8f81, 0xbb8f, 0xfbba, 0x5afb, 0xbe5a,
->   	0xedbe, 0xabee, 0x6aac, 0xe6b,	0xea0d, 0x67ea, 0x7e68, 0x8a7e, 0x6f8a,
-> @@ -577,7 +577,8 @@ static void test_csum_no_carry_inputs(struct kunit 
-> *test)
-> 
->   static void test_ip_fast_csum(struct kunit *test)
->   {
-> -	__sum16 csum_result, expected;
-> +	__sum16 csum_result;
-> +	u16 expected;
-> 
->   	for (int len = IPv4_MIN_WORDS; len < IPv4_MAX_WORDS; len++) {
->   		for (int index = 0; index < NUM_IP_FAST_CSUM_TESTS; index++) {
-> @@ -586,7 +587,7 @@ static void test_ip_fast_csum(struct kunit *test)
->   				expected_fast_csum[(len - IPv4_MIN_WORDS) *
->   						   NUM_IP_FAST_CSUM_TESTS +
->   						   index];
-> -			CHECK_EQ(expected, csum_result);
-> +			CHECK_EQ(to_sum16(expected), csum_result);
->   		}
->   	}
->   }
-> @@ -598,7 +599,7 @@ static void test_csum_ipv6_magic(struct kunit *test)
->   	const struct in6_addr *daddr;
->   	unsigned int len;
->   	unsigned char proto;
-> -	unsigned int csum;
-> +	__wsum csum;
-> 
->   	const int daddr_offset = sizeof(struct in6_addr);
->   	const int len_offset = sizeof(struct in6_addr) + sizeof(struct in6_addr);
-> @@ -611,10 +612,10 @@ static void test_csum_ipv6_magic(struct kunit *test)
->   		saddr = (const struct in6_addr *)(random_buf + i);
->   		daddr = (const struct in6_addr *)(random_buf + i +
->   						  daddr_offset);
-> -		len = *(unsigned int *)(random_buf + i + len_offset);
-> +		len = le32_to_cpu(*(__le32 *)(random_buf + i + len_offset));
->   		proto = *(random_buf + i + proto_offset);
-> -		csum = *(unsigned int *)(random_buf + i + csum_offset);
-> -		CHECK_EQ(expected_csum_ipv6_magic[i],
-> +		csum = *(__wsum *)(random_buf + i + csum_offset);
-> +		CHECK_EQ(to_sum16(expected_csum_ipv6_magic[i]),
->   			 csum_ipv6_magic(saddr, daddr, len, proto, csum));
->   	}
->   #endif /* !CONFIG_NET */
-> ---
-> 
-> Christophe
 
-Your patch applied on top of 6.8-rc5 fixes the issue. Thanks!
+在 2024/2/23 04:37, Matthew Wilcox (Oracle) 写道:
+> Rosebush is a resizing, scalable, cache-aware, RCU optimised hash table.
+> I've written a load of documentation about how it works, mostly in
+> Documentation/core-api/rosebush.rst but some is dotted through the
+> rosebush.c file too.
+> 
+> You can see this code as a further exploration of the "Linked lists are
+> evil" design space.  For the workloads which a hashtable is suited to,
+> it has lower overhead than either the maple tree or the rhashtable.
+> It cannot support ranges (so is not a replacement for the maple tree),
+> but it does have per-bucket locks so is more scalable for write-heavy
+> workloads.  I suspect one could reimplement the rhashtable API on top
+> of the rosebush, but I am not interested in doing that work myself.
+> 
+> The per-object overhead is 12 bytes, as opposed to 16 bytes for the
+> rhashtable and 32 bytes for the maple tree.  The constant overhead is also
+> small, being just 16 bytes for the struct rosebush.  The exact amount
+> of memory consumed for a given number of objects is going to depend on
+> the distribution of hashes; here are some estimated consumptions for
+> power-of-ten entries distributed evenly over a 32-bit hash space in the
+> various data structures:
+> 
+> number	xarray	maple	rhash	rosebush
+> 1	3472	272	280	256
+> 10	32272	784	424	256
+> 100	262kB	3600	1864	2080
+> 1000	[1]	34576	17224	16432
+> 10k	[1]	343k	168392	131344
+> 100k	[1]	3.4M	1731272	2101264
+> 
+> As you can see, rosebush and rhashtable are close the whole way.
+> Rosebush moves in larger chunks because it doubles each time; there's
+> no actual need to double the bucket size, but that works well with
+> the slab allocator's existing slabs.  As noted in the documentation,
+> we could create our own slabs and get closer to the 12 bytes per object
+> minimum consumption. [2]
+> 
+> Where I expect rosebush to shine is on dependent cache misses.
+> I've assumed an average chain length of 10 for rhashtable in the above
+> memory calculations.  That means on average a lookup would take five cache
+> misses that can't be speculated.  Rosebush does a linear walk of 4-byte
+> hashes looking for matches, so the CPU can usefully speculate the entire
+> array of hash values (indeed, we tell it exactly how many we're going to
+> look at) and then take a single cache miss fetching the correct pointer.
+> Add that to the cache miss to fetch the bucket and that's just two cache
+> misses rather than five.
+> 
+> I have not yet converted any code to use the rosebush.  The API is
+> designed for use by the dcache, and I expect it will evolve as it actually
+Hello,
 
-And I take your remarks here as a hint for the other "drm_test_fb_xrgb8888_to_xrgb2101010 on Big Endian machines" issue I posted. ;) Let's see what I can do.
+It seems that the advantage of this hash table is that it does not need to
+traverse the linked list and has fewer cache misses. I want to know how
+much performance improvement is expected if it is applied to dcache?
 
-Regards,
-Erhard
+Thanks,
+Peng
+> gets used.  I think there's probably some more refactoring to be done.
+> I am not aware of any bugs, but the test suite is pitifully small.
+> The current algorithm grows the buckets more aggressively than the table;
+> that's probably exactly the wrong thing to do for good performance.
+> 
+> This version is full of debugging printks.  You should probably take
+> them out if you're going to try to benchmark it.  The regex '^print'
+> should find them all.  Contributions welcome; I really want to get back
+> to working on folios, but this felt like an urgent problem to be fixed.
+> 
+> [1] I stopped trying to estimate the memory costs for xarray; I couldn't
+> be bothered to as it's not a serious competitor for this use case.
+> 
+> [2] We have ideas for improving the maple tree memory consumption for
+> this kind of workload; a new node type for pivots that fit in 4 bytes and
+> sparse nodes to avoid putting a NULL entry after each occupied entry.
+> The maple tree really is optimised for densely packed ranges at the
+> moment.
+> 
+> Matthew Wilcox (Oracle) (1):
+>    rosebush: Add new data structure
+> 
+>   Documentation/core-api/index.rst    |   1 +
+>   Documentation/core-api/rosebush.rst | 135 ++++++
+>   MAINTAINERS                         |   8 +
+>   include/linux/rosebush.h            |  41 ++
+>   lib/Kconfig.debug                   |   3 +
+>   lib/Makefile                        |   3 +-
+>   lib/rosebush.c                      | 707 ++++++++++++++++++++++++++++
+>   lib/test_rosebush.c                 | 135 ++++++
+>   8 files changed, 1032 insertions(+), 1 deletion(-)
+>   create mode 100644 Documentation/core-api/rosebush.rst
+>   create mode 100644 include/linux/rosebush.h
+>   create mode 100644 lib/rosebush.c
+>   create mode 100644 lib/test_rosebush.c
+> 
 
