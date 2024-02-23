@@ -1,125 +1,96 @@
-Return-Path: <netdev+bounces-74360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D6D586103F
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 12:22:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 59F47861065
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 12:30:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F2502867D4
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 11:22:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14D18282647
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 11:30:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71A6F651BD;
-	Fri, 23 Feb 2024 11:21:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 194AD77A05;
+	Fri, 23 Feb 2024 11:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="guQOBZjs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="raAYZhMG"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF1BD604D0;
-	Fri, 23 Feb 2024 11:21:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6A0C76C62;
+	Fri, 23 Feb 2024 11:30:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708687310; cv=none; b=h2UMyXpQ/eVE6Ok1E1/P4hQKYI89K83FZSzd/A1vxe6s219vu+Qb40SEoZAoHCTydMDNdFwPJ7NTNIHrFooIYrFYuY2ToTlgfM1I4RPT08fpP3JMCjE34dqQKbJ7nC7ydD6SbpSX99r+AVknbgCvjzRLrEBQ2Ipc8absopVBLxU=
+	t=1708687827; cv=none; b=RDLbmUJfkNfnHh/fTLbrmaIw9RrUHgnPQzpd9ZsDONHx3rv4cjXTyfc03HNoIjw4fYrXil+WtVwOVa8ht1mpImnlsdofDyLYP3UH4BFrL7skdsicffagnx8w9euKOBSrEE2r39LDmISkKROwOzIoWiMApue+3YQrvTtqhJMWvTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708687310; c=relaxed/simple;
-	bh=peReEDJGy04XpZdGr/L1b7dThSp0Y81LgLaHw20Wg6E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ek9UHVAD4I1HizDiHgdghtZFvczxCITMI+BTcwF+9ORyrm7WzGKsFWCn17rI0UcmRktbz2UQeIwHj/LuVWZWlsqJhU3xQnTojYMc6zQiaBEamzLl3WK9s33fsz1qetOHr7Fny36jQCz2u9Ohz+no6EZx4ei5/p3xgMNoMz1pto0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=guQOBZjs; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=eOoP1B49M2U+RuY8cj+gGulW+f80SLlRYJjbhFcwxtU=; b=guQOBZjsMDgz0rR25wfeUMMD0Q
-	oIWDKOtbyY9hY0VpWCFzndeMPwNC68VJ3dIRDuErL4jWsyltBrDmfgPSkl5CeQ8SjJ6dIAj0UXE8j
-	ZLQLEOWecfcIabJYcDuw6IzzL9g12yG61NBEA3VLhEvkn75TOiGRJBChDetpMwURtsFmW0MckMge6
-	Xq4mi8i38/XQ28lSLxjq64H16PnpAtdErD+Pe85WRdiMKDsgPLTpbo/ia839+z6IPc7+Ym+RuCa4/
-	aAd8AjFqBH8+lnF1IBr+gjnovXnuiAEmMep/hFRWMoCjIUzr0fRBrd9KNCiBwKYzY+++8yKxapygk
-	oXtE8Zbw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57004)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rdTcZ-0007cn-0A;
-	Fri, 23 Feb 2024 11:21:39 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rdTcW-0003a8-PX; Fri, 23 Feb 2024 11:21:36 +0000
-Date: Fri, 23 Feb 2024 11:21:36 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Florian Fainelli <f.fainelli@gmail.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Wei Fang <wei.fang@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	NXP Linux Team <linux-imx@nxp.com>
-Subject: Re: [PATCH net-next v5 6/8] net: phy: Add phy_support_eee()
- indicating MAC support EEE
-Message-ID: <Zdh/wGsR96cQ0xsQ@shell.armlinux.org.uk>
-References: <20240221062107.778661-1-o.rempel@pengutronix.de>
- <20240221062107.778661-7-o.rempel@pengutronix.de>
- <9e37a9e9-7722-407c-a2a5-b8c04b68f594@gmail.com>
+	s=arc-20240116; t=1708687827; c=relaxed/simple;
+	bh=Yvx8lu1+d4HmVl7q4rrTdL/ZqSrATFnVqJR1xZ1ppww=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=IcD57r3SJZM+83QtWzK07pDrrK4evVqfgz28MOXkZIYL/bKWsY7u9kZ3hVpB6XvAEW4pFbyKrAygfSR6dx831H7zBkPoWMlgHgfiivQWj59gJHvmLe31X0HIeb8qNLielorDxrmMp/jTLjbTY/KXce4LQFhezzQf8xoXbfyJBOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=raAYZhMG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5A504C43390;
+	Fri, 23 Feb 2024 11:30:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708687826;
+	bh=Yvx8lu1+d4HmVl7q4rrTdL/ZqSrATFnVqJR1xZ1ppww=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=raAYZhMGUdK/JjKCrmjG5kUpRADBoY3ZmuPKXrpAwSXtMilnROssvsZAh2IOqmdeg
+	 K5ODg78Z4C3rCgLO32k6nCIQsIGFpnboIQDoXVO6gFFCKny0I5G8Jna96issNSPTWl
+	 ol5hrOojec5a4P8rHA/Zy9yOD70iXTMmnNJzidCy0YuREpoPao9YMI8db8iXyMWvg6
+	 u/9KrLdCOf0ECE6ebJCkC2C5gFKuj0McXwqdAzxFRQVP25h33PZDYQx3yyiH6g2C8N
+	 0Prsa42WPmEnkUzkDmNmPdlcuHU0Ed/ver8hTC8bl1EsUl66tjNWvuglMcvsYF08dE
+	 KxQV4oG0xxVqA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3F32FD990CB;
+	Fri, 23 Feb 2024 11:30:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9e37a9e9-7722-407c-a2a5-b8c04b68f594@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: dpaa: fman_memac: accept phy-interface-type =
+ "10gbase-r" in the device tree
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170868782625.1391.6089450916134255111.git-patchwork-notify@kernel.org>
+Date: Fri, 23 Feb 2024 11:30:26 +0000
+References: <20240220223442.1275946-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20240220223442.1275946-1-vladimir.oltean@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, madalin.bucur@nxp.com,
+ sean.anderson@seco.com, linux@armlinux.org.uk,
+ zachary.goldstein@concurrent-rt.com, linux-kernel@vger.kernel.org
 
-On Thu, Feb 22, 2024 at 08:52:25PM -0800, Florian Fainelli wrote:
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Wed, 21 Feb 2024 00:34:42 +0200 you wrote:
+> Since commit 5d93cfcf7360 ("net: dpaa: Convert to phylink"), we support
+> the "10gbase-r" phy-mode through a driver-based conversion of "xgmii",
+> but we still don't actually support it when the device tree specifies
+> "10gbase-r" proper.
 > 
+> This is because boards such as LS1046A-RDB do not define pcs-handle-names
+> (for whatever reason) in the ethernet@f0000 device tree node, and the
+> code enters through this code path:
 > 
-> On 2/20/2024 10:21 PM, Oleksij Rempel wrote:
-> > From: Andrew Lunn <andrew@lunn.ch>
-> > 
-> > In order for EEE to operate, both the MAC and the PHY need to support
-> > it, similar to how pause works.
-> 
-> Kinda, a number of PHYs have added support for SmartEEE or AutoGrEEEn in
-> order to provide some EEE-like power savings with non-EEE capable MACs.
-> 
-> Oleksij  did not you have a patch series at some point that introduced a
-> smarteee field in the phy_device structure to reflect that? I thought that
-> had been accepted, but maybe not.
+> [...]
 
-I have some similar hacks for the Atheros SmartEEE in my tree that I've
-never published.
+Here is the summary with links:
+  - [net] net: dpaa: fman_memac: accept phy-interface-type = "10gbase-r" in the device tree
+    https://git.kernel.org/netdev/net/c/734f06db599f
 
-For SmartEEE, we need two things to happen:
-
-1) MAC drivers must not fail set_eee()/get_eee() just because they
-themselves do not support EEE.
-2) MAC drivers must not attempt to modify the EEE parameters passed
-to phylib.
-
-Whether a MAC driver should be configuring the hardware in set_eee()
-at all is another question - because in the case of using SmartEEE
-the MAC side is irrelevant. So maybe phylib should have a callback to
-set the EEE TX LPI parameters? In phylink, my model was to add two
-new functions (one to enable and another to disable TX LPI) and the
-enable function always gets passed the TX LPI timeout.
-
-If we did the same in phylib, we would eliminate the need for MAC
-drivers to conditionalise based on SmartEEE - that could be handled
-entirely within phylib.
-
+You are awesome, thank you!
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
