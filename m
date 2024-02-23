@@ -1,189 +1,202 @@
-Return-Path: <netdev+bounces-74625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C329861FE5
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 23:37:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67AF9861FF3
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 23:42:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E91B1F2349A
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 22:37:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9BFE2843BB
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 22:42:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDAEC22071;
-	Fri, 23 Feb 2024 22:37:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DF4014CAD1;
+	Fri, 23 Feb 2024 22:42:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AIrJGs6j"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="cBEV+Rt1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2077.outbound.protection.outlook.com [40.107.223.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BCC410A33
-	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 22:37:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708727856; cv=none; b=Yq/uCDgm6Ta7JbwqMYHaNhh+GPYYQ5ox9oHbkjk+rQ2R4unrSK80vC1dIrEn73Rd7fblUbCxhneJfJtLHX3D+rDoEZNLzw/boZeDwRf2SQSiXeMawFn84TWIMkc+1H7D1C81kIzUNUvO3uFamAD5tMmDRS8i/3Elg4kL5eDIK0Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708727856; c=relaxed/simple;
-	bh=T8zseAlUyedDzBkBQp/PAJcc5BpLsmCCWlmysKCfFng=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=lCFQNNzv9E9QBFrHmuWusezsFDYveUt9yj3p1bhrSYrD/emtUG/LpcD63g8amw3F3oLtkeGGCsuEthxgTv2m/OGMNgXn0fiB3on8YdU9fh16ARr8o0QRdBTLM/Oaff2nAd2hAp2+pTu0L2SG+Az8+m2TIa+u8lXZNEwj4deDeyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AIrJGs6j; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6da9c834646so1217072b3a.3
-        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 14:37:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708727854; x=1709332654; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Zbjtl8MSI5cpIvVbKottlrM7NLh5VQOkXgx+nlXVyCg=;
-        b=AIrJGs6jS3d+GvWjg2p0HQ98ftSfMDqEgJUrbbDuva005hL0iPzrk5VjfSiUMzl+N1
-         BIpnKC4eB/1AxVRHUpOjaItdQBqkFglljL4Stikx3Wu8709T2WbH3SoWio6JpuQ7aB3J
-         klkpBDLBa9GCH1CxJ65PelC4e9uvtrjbkWyLAuhgp4gcMATdyUGS1d9bMYU3PfjaulC7
-         jDWoQHgbuNQB2Yz8QqxyhVF7rNoqeiB/9icBgAIkX7p1+bJcovpOMgcKu3NtH4DET+nl
-         mK6EJbc7G4nxjDWc8AJPyjmfshYtvG599e6YfvFadxEHxHbg3AaN3hSlkafqYQvidvuy
-         iWfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708727854; x=1709332654;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Zbjtl8MSI5cpIvVbKottlrM7NLh5VQOkXgx+nlXVyCg=;
-        b=J0sRtq+aA80aT2sFS2WfXP+Y//hKyEIDCB2R8/9W6yH2JAXoOBck71r8+2g5XFfAiI
-         /dSRV8SVVJxcGXVN5zv8pxGRIDHWvpm3I9r1DYLfKxiV79XtWuL2rhNXqtw+nlYXPnFL
-         n95rv/wCA5sjl2In4JhD8UOVTM5d0prujSc8cWrB90LMOXyBKx39Zx5vhoj+HEjHjGvl
-         2smhJXO8wN78wcIVnfww+qIdtrJCIJdOhUtZBJbclVRPJrZKLLTA29hwyiBLYkFgceMR
-         9QguHJtz1XDse8LXgN0mFUYJgXlzWA3yjBkmMJRCMDzhkM9/A+9fzZPvvg1xnyPwacpC
-         HgmA==
-X-Gm-Message-State: AOJu0Yx5fuk2ByJkSrH2zgumEbNkbwyDoqzQtoCuv9T8WAqittYbIn6b
-	6vxuv7qKwxICdwbIH169ICok32YO/Su9hV8sDe6IuAHljiYxNOaim+04BcLcxsZ3a+jt
-X-Google-Smtp-Source: AGHT+IGXuM6eXEMIiGF+bZa2ybTRbH4PSJw63NNIqOfAikkmxv5ViSjZx2j/1KHsbBQ7J1izO9ibMg==
-X-Received: by 2002:aa7:9edd:0:b0:6e4:e65f:b0cd with SMTP id r29-20020aa79edd000000b006e4e65fb0cdmr1101464pfq.10.1708727854355;
-        Fri, 23 Feb 2024 14:37:34 -0800 (PST)
-Received: from smtpclient.apple (va133-130-115-230-f.a04e.g.tyo1.static.cnode.io. [2400:8500:1301:747:a133:130:115:230f])
-        by smtp.gmail.com with ESMTPSA id j18-20020a62e912000000b006da96503d9fsm13334818pfh.109.2024.02.23.14.37.31
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 23 Feb 2024 14:37:33 -0800 (PST)
-Content-Type: text/plain;
-	charset=utf-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6745F3D6C;
+	Fri, 23 Feb 2024 22:41:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.77
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708728133; cv=fail; b=rmv/PzS2ZMDZavgNLKdJMO/Ml6R0k+seEM7wPdy/QT5NzKbylhhUR/oGPemfy9LiBGS3UmPLLi7ZUZ/cUJw2ZeAq+ldIjUJdcocYxc10mAQtY+87qSYtpHUnEz/TAYc0pCjaggcTYAKeHQTylN77TExpAcVXxO4qYKSvMK/7rGk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708728133; c=relaxed/simple;
+	bh=gYthuSO+gjabyP0W+NTh+yhcZjesqY4QObU5H3VH4ns=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 Content-Type:MIME-Version; b=NqJEB3KaFx/lY29qaySr9kvoRaWOhzOKoyFUfdGEU3Tz6dBCS7s1M19dsKJvZGE4TOOA/7SrG05YkCoPA+QorCTm6HEbWPLAkigAKaTyABLF1U1y+MUKTlxjU3e0LV199op+s95fqXo60jPub18UR1eiDKIWWMH20MpxfnM/VPQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=cBEV+Rt1; arc=fail smtp.client-ip=40.107.223.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VmD+ymQBNDD+z1s50tplsT528chnZz4OseyB1oBmhL+NLIROWxJU3u6QE/P4n+phOgEVKLwQXiqFMZ24EPgDzBsSi0PVC/vggDVFeHiLmL5knUL3GVHR0oJfOoBdlR21v8MeROO1D9Hikc+unM3pW/VI2DqKW82Cy1lkGSTL1sihpUSbw4MlUHv8EIdd3u5wJGPJqlyALWmgilCQm9rgQFDSompAFUvFbmfwbUgP3JafMo1kBf1JNqnirO4p319yHpLfvt1d1H4ZXm3UmtrL53JZV0GFeR9YrhZny+G9xLS+YlQAhtfPyYgZ8wGsvcH4eMiCvSxanwNmG9TCCQ1F+Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=H/Atow9ZHyedikTQcpANYUjM9E5prjHylIXWIHEGs5A=;
+ b=YaC9R3ybQq5FGB3EVOkpm5bm+8uvMQfwAPaGtYupAvW5Sygh0yTP/gQ6Z0s78eOAjJAHgsrFRuzMW56ORb+lNjAyfq5+g5yVYYWws7RQn+c4/u59sOesuVICRkGiddDOfI3yO9oUEBSQWXkWzSRRSAsaDGGNX6EZO0fkTuwAslP8qVMXd8R3ncNasB3BnKBK4rSLNSxHQOUBeUB8ozo/IG+T35z32YtEdOM/oxRs8sGEmuHbwMCs3upYuySmVhTuEDgqAF7f9ykGKNgBZd3GtlJ6TtCYh1Z9nNAwOHU7VZHCRedD2iGYBhiLm55Y+IsOLJ/HTCZa405sYLxmHyyAPQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H/Atow9ZHyedikTQcpANYUjM9E5prjHylIXWIHEGs5A=;
+ b=cBEV+Rt134Av+Ds+Vm3JUbpBhyGhDr9sotI5KzMHuFUrPqoNKZoSdCB4vgfkY8ATcU1MxuuV6oIUnZ7dfJc0h35eLyZkI5tPOw8/WO/hLuuVtisj+rv6bV0FRLO2wkoO+Jhz52eBF9KqPfxQ5od4JYjcu9kb1gkK3W3+XIZx5tcYvFB3XcOdBjIlZs/yeNff7NC91u/gvt4udo2PnlRuw+iaP9j4jvEUGyLmW0mpCzaFsvzgXjg5LfeNnSmzsUE3KXSlyPkMzT2Nku+in/+XjPXAuEjFc2yyYvHhWJs6MzlrDtDp9HrHmMOJD/pmIOrZQMb89vUPBWKs3IyStYJKcA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
+ by DM4PR12MB6010.namprd12.prod.outlook.com (2603:10b6:8:6a::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7316.24; Fri, 23 Feb 2024 22:41:49 +0000
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::459b:b6fe:a74c:5fbf]) by BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::459b:b6fe:a74c:5fbf%6]) with mapi id 15.20.7316.023; Fri, 23 Feb 2024
+ 22:41:49 +0000
+References: <20240223192658.45893-1-rrameshbabu@nvidia.com>
+ <20240223192658.45893-6-rrameshbabu@nvidia.com>
+ <6e0a725f-3bd8-4e14-afda-860f1e4c1dc5@intel.com>
+User-agent: mu4e 1.10.8; emacs 28.2
+From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Saeed Mahameed <saeed@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Richard Cochran
+ <richardcochran@gmail.com>, Tariq Toukan <tariqt@nvidia.com>, Gal Pressman
+ <gal@nvidia.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Ahmed  Zaki <ahmed.zaki@intel.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>, Hangbin Liu
+ <liuhangbin@gmail.com>, Paul  Greenwalt <paul.greenwalt@intel.com>, Justin
+ Stitt <justinstitt@google.com>, Randy Dunlap <rdunlap@infradead.org>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, Kory Maincent
+ <kory.maincent@bootlin.com>, Wojciech Drewek <wojciech.drewek@intel.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, Jiri Pirko <jiri@resnulli.us>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, Dragos  Tatulea <dtatulea@nvidia.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org
+Subject: Re: [PATCH RFC net-next v1 5/6] tools: ynl: ethtool.py: Make tool
+ invokable from any CWD
+Date: Fri, 23 Feb 2024 14:39:07 -0800
+In-reply-to: <6e0a725f-3bd8-4e14-afda-860f1e4c1dc5@intel.com>
+Message-ID: <87y1bavm50.fsf@nvidia.com>
+Content-Type: text/plain
+X-ClientProxiedBy: BY3PR05CA0021.namprd05.prod.outlook.com
+ (2603:10b6:a03:254::26) To BYAPR12MB2743.namprd12.prod.outlook.com
+ (2603:10b6:a03:61::28)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.400.31\))
-Subject: Re: [Bug report] veth cannot be created, reporting page allocation
- failure
-From: Miao Wang <shankerwangmiao@gmail.com>
-In-Reply-To: <36F1F1E8-6BD7-44ED-95EB-F0F47E78EC9B@gmail.com>
-Date: Sat, 24 Feb 2024 06:37:18 +0800
-Cc: netdev@vger.kernel.org,
- pabeni@redhat.com,
- "David S. Miller" <davem@davemloft.net>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <78C6CA8F-3634-418A-8A50-71753B5DB0C8@gmail.com>
-References: <5F52CAE2-2FB7-4712-95F1-3312FBBFA8DD@gmail.com>
- <20240221164942.5af086c5@kernel.org>
- <36F1F1E8-6BD7-44ED-95EB-F0F47E78EC9B@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-X-Mailer: Apple Mail (2.3774.400.31)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|DM4PR12MB6010:EE_
+X-MS-Office365-Filtering-Correlation-Id: 124c3f4d-259e-4e04-8907-08dc34c09f12
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	lKMESuvTzENIbWRlf5/Au9qT8YtN4A9B2v8usu7Agyu+VFhlwb4hfREMtO2f0l1VMCRTRIgshR7gWmr2oUIWM51OIvncfto6svaZVLpsoDbggwlROWU1CAKLXA1Xp0toX9wF/ocsHJ9bDvn+jqj00dtftPU/JEdnf5P4OWTzOcp4H6wfz/RGpr574t/ivb91uM5900UHuG8pPeCm4uH3oqtz/cVj0RNGqDeUA41Ar2ueO3U5ij5IOZbm01HhRx0RjtD4opjrgTCWRujvhPCKUOJXhQq2RNc8w2WkVfM/2u9ksP35hye3M4bdFEiYJhCNh4RFQPO/0QGxX0e/D7aILSKN99Ih42s8QSuK3y0Hb3wJyMgL4Png2FFYqRGD0Fx1PkFrvMrR+cAGNCn+ps13YvVchYZQ5i2EhXUn1iFOaR1K245dk1iPuDs9B+XZScDLPSfvPBASchQPRzAnOZgp3RaCjHtNmHOqEdpTkHvoPt2yJ7dGodITfayesd0sSmub4t58FRw4wbkSU0wLEKcoHgAAFJv8ZkvgchHASq0N0z4=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?WB9Y+/BFhuYlwblQgGOTZ5xfc+8jFpkqWcv/oQbndYVoEh8CJE8pFd8vmCv/?=
+ =?us-ascii?Q?maFWxpJPR9TupRX7QJjY2uvRkB+tQGhJjftkMc+LiyJzXYRY+oM3XcDKe2cb?=
+ =?us-ascii?Q?DrfGK0b/4MMw0x58UyDkGL8OOa+pCqkluZG8ToTPmHex9FLIRKpwEVMA0rIT?=
+ =?us-ascii?Q?62hTjoz8lyOJFOQkMaMylgZunUP6tKu+OovYufj7z1j+la835hGrZcTXSA57?=
+ =?us-ascii?Q?EJZMSKhkzW88ZuIycImJr23cNrpnQejvugqp2xsPWXJJtQhDRSWtrYO9BIav?=
+ =?us-ascii?Q?4Wlkgd6AmR9NI+XknzO3utR0Mz+1gOdLf0xH+oM7zkNZs4Bgq/cq3m5t8lew?=
+ =?us-ascii?Q?7tgO0EyF37TJCK8zH8lBzL82KNey/kP+2dgWdNuREwohuj8uqDrXflk/LvGz?=
+ =?us-ascii?Q?zwOgczrZjXJTDe0MYUbV0RwVyVmgIAc59GKXB5HcMdBaP/MMP+4hfDyhlVtH?=
+ =?us-ascii?Q?9/OHb2B98bQwar2dCILgAlYjiq3nGnhbeadXqZOGSguB2wcJnX9kY00ZCoDi?=
+ =?us-ascii?Q?rAfmEu6W7U0+eDMjrn2bhMPTKhGAMI48N9LQFBwSyMfCx8jnJwT3mShcNVtu?=
+ =?us-ascii?Q?uDMY2GI4dyE0O9VUfposE+VW9A0NXg/Lg0xmirlfhEIEn7ZMNbraVSJtdIEm?=
+ =?us-ascii?Q?JU6utLH3JNRZk9RlVd3rrJ3V6eRKxPHdOvL2+TS6lHXs7PVHyaRR5UEKQ2rv?=
+ =?us-ascii?Q?NNeW7gqiHh0qeGPTxZsXA+bl2iuQaDLX9oIS9F1MH6lAAVG431+b+nSrNCD0?=
+ =?us-ascii?Q?rJVqupvIw+yojrFh3Ad8L1D1BiUVUK6keUgQYqdFwtqVuBPh72oXoVT0BZAj?=
+ =?us-ascii?Q?D9FoBFABmpz3VE2XD2987ODQxOic/nSFQS5aH548w11+68b2dxXR/MRiumkx?=
+ =?us-ascii?Q?vHrKislAO7jD60pvOsoXwcpmlNSy/ASA50oPJuJBnL6ZY8i1y1oNo5DadJKS?=
+ =?us-ascii?Q?QG0Bazq/gTWNM8sUvbgizUW1YUUECZetjNE0CIyGqt3etDXEyb8+RJnQmUW1?=
+ =?us-ascii?Q?o5Cho2mBYBLhiWSLpX3yUgZBn3dzpOaBWS1TQeql1jc9PU6Y4IOHtExT7uer?=
+ =?us-ascii?Q?pKu6LcsfZdWJnQopEVmbUX4sQT3+yrZDTHhLd5bgwvCNdB/5kktaSRH+/Dda?=
+ =?us-ascii?Q?874s29RN4lydrtSdMQJap8Te8qmSE60w9yEW+ta/7Lo/Vm+9sY6OP80kV1VU?=
+ =?us-ascii?Q?XmBv8zGuer/5M0NLuy35VDwnOR3mrgLUKyRhociBU4DPqj9lbChwp29lxGZT?=
+ =?us-ascii?Q?JeFmCmbcW025kCLUC6bA1IL3Hhy3l/lKmxb+dy8w82ZFp21VjZ5jlRFp6eWE?=
+ =?us-ascii?Q?Et0E8xAa/EtYKZ/aUMGO8nODtwpgz93W/4y+jHMA1pVLWfRZaKuWWqicoJzz?=
+ =?us-ascii?Q?n614cNGihXBBajHKGR458LO3EKjS7/WeVA3bUM4mT0qkF0IueZmohoBHqs/y?=
+ =?us-ascii?Q?AziWuLE9LQX1Vg+ErLqFAO7CbMA/IFW18M2Rlop+U/z5UixotKlRGcnsMCfy?=
+ =?us-ascii?Q?v4uPRUP+GV1q3l+t+2z7JUFluMhT+SyI1N4qkr5A9Z+8XpAWNJunEcr2k7g5?=
+ =?us-ascii?Q?goWPpVwOnjq8tEiqACqMnzRlsnylkLNkunHhmI2Jo+GUfz9KUCz+ZYJ1/nnJ?=
+ =?us-ascii?Q?Jw=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 124c3f4d-259e-4e04-8907-08dc34c09f12
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Feb 2024 22:41:48.8967
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: hWcI/UU7JlXx5nhzQT/NQAWssDf7PUPDzWOOBKDPROXCCBZkJbJVn605rmlDcsAx6vwkHIoyu+DU5XATvHmlHg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6010
 
+On Fri, 23 Feb, 2024 13:08:34 -0800 Jacob Keller <jacob.e.keller@intel.com> wrote:
+> On 2/23/2024 11:24 AM, Rahul Rameshbabu wrote:
+>> ethtool.py depends on yml files in a specific location of the linux kernel
+>> tree. Using relative lookup for those files means that ethtool.py would
+>> need to be run under tools/net/ynl/. Lookup needed yml files without
+>> depending on the current working directory that ethtool.py is invoked from.
+>> 
+>> Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+>> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+>> ---
+>>  tools/net/ynl/ethtool.py | 8 ++++++--
+>>  1 file changed, 6 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/tools/net/ynl/ethtool.py b/tools/net/ynl/ethtool.py
+>> index 6c9f7e31250c..44ba3ba58ed9 100755
+>> --- a/tools/net/ynl/ethtool.py
+>> +++ b/tools/net/ynl/ethtool.py
+>> @@ -6,6 +6,7 @@ import json
+>>  import pprint
+>>  import sys
+>>  import re
+>> +import os
+>>  
+>>  from lib import YnlFamily
+>>  
+>> @@ -152,8 +153,11 @@ def main():
+>>      global args
+>>      args = parser.parse_args()
+>>  
+>> -    spec = '../../../Documentation/netlink/specs/ethtool.yaml'
+>> -    schema = '../../../Documentation/netlink/genetlink-legacy.yaml'
+>> +    script_abs_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
+>> +    spec = os.path.join(script_abs_dir,
+>> +                        '../../../Documentation/netlink/specs/ethtool.yaml')
+>> +    schema = os.path.join(script_abs_dir,
+>> +                          '../../../Documentation/netlink/genetlink-legacy.yaml')
+>>  
+>
+> This seems like a worthwhile improvement to make the tool more usable.
+>
 
-> 2024=E5=B9=B42=E6=9C=8822=E6=97=A5 23:47=EF=BC=8CMiao Wang =
-<shankerwangmiao@gmail.com> =E5=86=99=E9=81=93=EF=BC=9A
->=20
->=20
->=20
->> 2024=E5=B9=B42=E6=9C=8822=E6=97=A5 08:49=EF=BC=8CJakub Kicinski =
-<kuba@kernel.org> =E5=86=99=E9=81=93=EF=BC=9A
->>=20
->> On Tue, 20 Feb 2024 22:38:52 +0800 Miao Wang wrote:
->>> I tried to bisect the kernel to find the commit that introduced the =
-problem, but
->>> it would take too long to carry out the tests. However, after 4 =
-rounds of
->>> bisecting, by examining the remaining commits, I'm convinced that =
-the problem is
->>> caused by the following commit:
->>>=20
->>> 9d3684c24a5232 ("veth: create by default nr_possible_cpus queues")
->>>=20
->>> where changes are made to the veth module to create queues for all =
-possbile
->>> cpus when not providing expected number of queues by the userland. =
-The previous
->>> behavior was to create only one queue in the same condition. The =
-memory in need
->>> will be large when the number of cpus is large, which is 96 * 768 =3D =
-72KB or 18
->>> continuous 4K pages in total, no wonder causing the allocation =
-failure. I guess
->>> on certain platforms, the number of possbile cpus might be even =
-larger, and
->>> larger than actual cpu cores physically installed, for several =
-people in the
->>> above discussion mentioned that manually specifing nr_cpus in the =
-boot command
->>> line can work around the problem.
->>>=20
->>> I've carried out a cross check by applying the commit on the working =
-5.10
->>> kernel, and the problem occurs. Then I reverted the commit on the =
-6.1 kernel,=20
->>> the problem has not occured for 27 hours.
->>=20
->> Thank you for the very detailed report! Would you be willing to give
->> this patch a try and report back if it fixes the problem for you?
->>=20
->> It won't help with the memory waste but should make the allocation
->> failures less likely:
->>=20
->> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
->> index a786be805709..cd4a6fe458f9 100644
->> --- a/drivers/net/veth.c
->> +++ b/drivers/net/veth.c
->> @@ -1461,7 +1461,8 @@ static int veth_alloc_queues(struct net_device =
-*dev)
->> struct veth_priv *priv =3D netdev_priv(dev);
->> int i;
->>=20
->> - priv->rq =3D kcalloc(dev->num_rx_queues, sizeof(*priv->rq), =
-GFP_KERNEL_ACCOUNT);
->> + priv->rq =3D kvcalloc(dev->num_rx_queues, sizeof(*priv->rq),
->> +    GFP_KERNEL_ACCOUNT | __GFP_RETRY_MAYFAIL);
->> if (!priv->rq)
->> return -ENOMEM;
->>=20
->> @@ -1477,7 +1478,7 @@ static void veth_free_queues(struct net_device =
-*dev)
->> {
->> struct veth_priv *priv =3D netdev_priv(dev);
->>=20
->> - kfree(priv->rq);
->> + kvfree(priv->rq);
->> }
->>=20
->> static int veth_dev_init(struct net_device *dev)
->=20
-> I directly applied this patch to the veth module on 6.1.0 stable =
-kernel since no
-> reboot would be required. No problem had occurred in the previous try =
-on
-> reverting the patch in question, which lasted for about 76 hours =
-before I replaced
-> the veth module with this patch applied. I'll monitor and report after =
-24 hours if
-> the problem does not occur.
->=20
+Unfortunately, even though in the next patch after this one where I add
+the ts stats group as a comment, the tool seems to fail at rendering the
+actual counters of the stats group, so I had to use the ethtool tree to
+test. I should look into that, so that way other contributors such as
+Intel can simply use this script to test that they hooked into the
+ethtool ts stats interface correctly.
 
-It's now about 30 hours since the patch is applied, and the problem has =
-not occurred.=20
+--
+Thanks,
 
-Cheers,
-
-Miao Wang
-
-
+Rahul Rameshbabu
 
