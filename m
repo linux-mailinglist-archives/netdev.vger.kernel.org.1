@@ -1,301 +1,131 @@
-Return-Path: <netdev+bounces-74618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AE9E861FB7
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 23:27:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0255861FC2
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 23:28:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9ECD3286F82
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 22:27:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B52C51C23804
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 22:28:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D290914F98D;
-	Fri, 23 Feb 2024 22:25:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DB8414DFDF;
+	Fri, 23 Feb 2024 22:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KKnKW1NQ"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="w/WmY0wu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2075.outbound.protection.outlook.com [40.107.244.75])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FF7414DFE8;
-	Fri, 23 Feb 2024 22:24:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708727101; cv=none; b=qi7IApZLSAfDc6ohXHPVMHmFqsuqbC1cWVBlaoV1jwhev8S30yo7GfM34aiEODdLiZXcxDRQ5OPW+yeil6uB4IjOYE6SR43Kv8drp2qkazrBmsD5vMp9g5pP0axV/ZiGU4eQKEg2quDsFFEvPp3tJWlR4ll4PoGqmEwmgxmtMsY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708727101; c=relaxed/simple;
-	bh=MQxlYd+pjzVvfwlAGAaWuqcrm9SliaxLj/ICvA7THrI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fuA6x/XlqkpkthmjnkJiSrWjg4F5nPjik9bKbEDWRrk2JFm3h93sSK3q+OTiJ9jzxg3qRbMjE5ACDHPwn1JUozPJyIY/ZFu4hNlgdMvqxNrJrdHMIKghL8pbrqjs5q5+2+IVG2+k3RNwQbJaaEWYiN3LaZdhpa88pqj5AIR1dmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KKnKW1NQ; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2d23d301452so17517671fa.1;
-        Fri, 23 Feb 2024 14:24:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708727098; x=1709331898; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OOl1lY0a6/dohk1NliPsKFcgM+2fz/8FAtk2Q5fDb1Y=;
-        b=KKnKW1NQZeP0ME2pOM6a8kHjEdS6YFk8tz1220oFv6t5zN5+pgsPACZq5GXE+RyRU1
-         4mEnSRN0iBtdU5uYZb0CjcmIxzsKOuZddPaNeNylrAJAfWEFoLPZfkZ20LggIyOAbDE7
-         DW/qSP9Fs0GgyddHUq5oH7mQp1A0Aaf9QO1rQy1ZJIwrvxQU6MRYD32r2HXSPdVRz1Rd
-         xLhOCbWCdvtO5OBXATsbXWfb/2xmeqqk1E0iyHNi6MPNT+4GvaaNOUNSGknJln9gwCXS
-         kzPZrABomAyKw6CCUwn5AVFzK/eHTW9Wepj32S/omkfH81O/7FXGRlr6egd+PLlSLT4W
-         /Sbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708727098; x=1709331898;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OOl1lY0a6/dohk1NliPsKFcgM+2fz/8FAtk2Q5fDb1Y=;
-        b=k1UcPu24Httqthmw7dn9+hERIGvaTO4kssyHIYpxC9lXicunBfU4+ah6L6ZtU18SxM
-         PzHC1Wmm7aq9CcNvS/jBvmFPcICehdQypU2ryJfW41wZA2xOyXypcK9qKVPO6mPFCj0y
-         ZU55JFn+0hHdGrm6s9HCaC8DIk5cXRbcomdki9Bzd9S+9zre5ujAwE4jh3q0Le+BfokF
-         1u2GRjQW1EPLwFnQt6e8SwprQYIiNoLAtSR7wCLX4Lc8MkVS2Opq/iPr856MCEgk3w5r
-         RCIe1tkPwxZhagMldmz4U6lWudUH5oPc5ZCTnRHfeUEG07q0PqaPbDoZBM7xWNIBmILj
-         WBxg==
-X-Forwarded-Encrypted: i=1; AJvYcCXoMDsI6GQAGTHtz+B9c8T5wVlBpNjnl2i7sefFj9nF5i6zicn8WYLR6Uec7v+7c9BgE4LhSjcyAszSuyKQcYxXdB3nmo7RSzTsswszQuzo3LeGsfP9fbvZe3AxrxSe587SoMM89Qyh24orlKEt0u/kFHQtaFRi3AhDcgZ+GFttNUg=
-X-Gm-Message-State: AOJu0Yzr0z+bPSwny32OLq5Zi2Mq72VOmxhYwQpki+3GctRaMBzk4+C9
-	tvK/NyKRF61fB538MmpQ552UGl4xEw9OcWtTN+v1hWR/mMJeBZYm
-X-Google-Smtp-Source: AGHT+IEXKLqTCm3Drz6eJFU6W2jRa+bGqgbnfHWqsjRN8it0sQzJZAQ9bhgdCfAAqOYjVLeFlMIwOQ==
-X-Received: by 2002:ac2:5e9b:0:b0:512:db76:4e16 with SMTP id b27-20020ac25e9b000000b00512db764e16mr642503lfq.4.1708727097314;
-        Fri, 23 Feb 2024 14:24:57 -0800 (PST)
-Received: from mobilestation ([95.79.226.168])
-        by smtp.gmail.com with ESMTPSA id j9-20020a056512398900b00512e14d1218sm610819lfu.261.2024.02.23.14.24.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Feb 2024 14:24:56 -0800 (PST)
-Date: Sat, 24 Feb 2024 01:24:54 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Thierry Reding <thierry.reding@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-tegra@vger.kernel.org, 
-	Thierry Reding <treding@nvidia.com>
-Subject: Re: [PATCH net-next v3 3/3] net: stmmac: Configure AXI on Tegra234
- MGBE
-Message-ID: <kns2u6o4nhz4vda74r2mscyyp6yjgo2p62vryeenucm4o3ngzb@j6ch3sl6xha2>
-References: <20240219-stmmac-axi-config-v3-0-fca7f046e6ee@nvidia.com>
- <20240219-stmmac-axi-config-v3-3-fca7f046e6ee@nvidia.com>
- <xne2i6jwqaptsrd2hjdahxbscysgtj7iabqendyjb75fnrjc5z@js7n7qngtzym>
- <CZ9Z70HO2C7J.398BRNM8NBIG1@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9C5614DFE5
+	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 22:27:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.75
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708727281; cv=fail; b=RBOFjOToU9FAcHoMmM5Xb7VUlPbsA8yFVI5E72qi2VF9/3GeLr/oiM1Nv5vgtYVNGE9XwMRcbQFE81hhOA3VUoOeSmwQQiCcQmqb0Pd3nDDs9xx97nQcADQoSEmj3UC8tpliuINVPsLKOG4z60BBuK+KkjCH35bz+gdvfketGME=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708727281; c=relaxed/simple;
+	bh=9TyuwoidErGLvgR/JSdJsSFKOigdsCDQQDmc75z2Ftk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=owciIALM/+dErXlvrCe6SsY36c4iBYSZwSk8Gbck2cpIWmJsYXs5uH7HQfL2+WheInaeUqT98eU93GHhqJ/MTY6n3Aa5/TKTVQvw53Yqs2eiwQ9pvGrV58N+7pbsxI0+mVfPNmevDo2bqj/tj83pCP1td/+F1MjGgqPwe8iWz1M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=w/WmY0wu; arc=fail smtp.client-ip=40.107.244.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=V4q5nhqLBphJH9Z8CfVjdUQ020Nu+km2rgG/EF8yvO/ZGQ3tGl85JyT3zE3kzX5H684h7T6F1Jyo2yVVVfz/Mkxjn4dhm67kyMUR+a1rwTXOQHcJSZp5ElDt/YuI7yn43x/jJFc09PEhOrR7dyYM6PvCA5HsShPKH7PJa2IfoJ+6Id0i8uFMTsiHNHAs416WneXNmkABODqJq2H0jXn2R5xGikjw8WWSUby3GiAoeYzQaeryy3D6LgJXwYrzX28/0/WE2BFEZpyfUkA/Pz5UqWKFzrheb2ktr+6BT0EcrdgZ1duI5RP3nRtAiYyrnva7kU/EJ06Vo1qrA/vkNXiKbg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=oLzGF54wOYymuWMKQwg32XWTJbC+8YNayMBvYQ9MmIA=;
+ b=CHJcqdQDGS25sPLwv5WEuXFSedlJSCNltZ6NYaCwyiFBhrFYLZfDLU9fuii8ki4lHaVnczA2R1HmaPuGRfzeqK033axzwW56PkPaKr/RG10nQnCvNIMYmoGfPKo1eltagpryJJbB76Z8Jm1STSoO4zrGTxE0bRMAeb6d0EBqQP8BDQ1Z64ZuCfYLaZjpcB/hMyUBIQyO/mlozsgfYOE93KrWHbsPY2FRTU8bNFWbpte0isiXCBvmD/ls8+Y9jZsbHVqhmxWbSiZnzQHZdBe9/2alfoxMqEywNsJSulEHo7m6LQU5RTyLHbC2BxNSyEEzDs1nDyZouc1oqMZpWSbGsA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oLzGF54wOYymuWMKQwg32XWTJbC+8YNayMBvYQ9MmIA=;
+ b=w/WmY0wusQTWtvmpuijgC3APGCPZ1tmzh+tbJyUeGZ1/mua0xD86w2Fi3kjIp2ug5aeSPUDpyWcXFWFBRwZO9BHwT+KB1GLJM/aUqhITx22hisuI+2sfTtwFD4HhnTq/hUEdWmwemvnHJW26F6mflJJF5JYchCzG0IbsrfYuYyE=
+Received: from SA9PR03CA0026.namprd03.prod.outlook.com (2603:10b6:806:20::31)
+ by PH7PR12MB9175.namprd12.prod.outlook.com (2603:10b6:510:2e6::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.24; Fri, 23 Feb
+ 2024 22:27:57 +0000
+Received: from SA2PEPF000015C8.namprd03.prod.outlook.com
+ (2603:10b6:806:20:cafe::9e) by SA9PR03CA0026.outlook.office365.com
+ (2603:10b6:806:20::31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.45 via Frontend
+ Transport; Fri, 23 Feb 2024 22:27:57 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ SA2PEPF000015C8.mail.protection.outlook.com (10.167.241.198) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7292.25 via Frontend Transport; Fri, 23 Feb 2024 22:27:57 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 23 Feb
+ 2024 16:27:56 -0600
+From: Shannon Nelson <shannon.nelson@amd.com>
+To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<edumazet@google.com>, <pabeni@redhat.com>
+CC: <brett.creeley@amd.com>, <drivers@pensando.io>, Shannon Nelson
+	<shannon.nelson@amd.com>
+Subject: [PATCH net 0/3] ionic: PCI error handling fixes
+Date: Fri, 23 Feb 2024 14:27:39 -0800
+Message-ID: <20240223222742.13923-1-shannon.nelson@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CZ9Z70HO2C7J.398BRNM8NBIG1@gmail.com>
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PEPF000015C8:EE_|PH7PR12MB9175:EE_
+X-MS-Office365-Filtering-Correlation-Id: f07505d4-bdd4-428b-b5a1-08dc34beafdf
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	lUpWW/rEeh7thG8pDihR0upebGjvTB5e53lWaed4WISW5Zzx88vFd19UNKt0esTMAi+MQEMTTi6L6uRsTOUNnpHMNMqK+AcAKgyAOMkaocvX73f10U0eiHiBY7rxrBh9t3mh3rW8GeZqTp/R4U78GPS29+0wIO0joQe7c04HaUDygzwEYQg9jo6oOoq04Fn/YYZalbB0o0t9gop44jnVOv+QeyC5kHximNuvcsQeQiEn4B8qSBUcS+lkdmuGeh+4dJgwowbQynfOs9n97Ryk3pvwX8ANBYpSfqA0T01kdIi2w+ptA8sjAizOCEti7NO27urdNZIMKWK4r5ybOQhfgIi2Iqgi/tsiGYS2AD01V6yn7kRsZ0BZp5Q450ZzHuIMNBjYrBSrSxs8V6hJgmPDmCkn1wV8PlQFnlkuEQRiHG2MORZzJGr1W1u/SC3uHzf2wffIX+MsokOVHU4rksgBci66y7ZYib4vDk8+dNajYH7aGWc0aXc+0f5YAiyVyv/OkbkVAvd6+DaiXC4zEX2o++1MHbgG8Np/GPOWOM1UlviCauQJry3MAjJf8QGPCzEr0qRNLeMImlZKjipUyBh4oThJZkybXfU8iptOu4hGWW1bbhhVFtUxo1x/h14E+GK+egDomFuB28rhDMsvgUIZLoED0H0QmafWuneHbpKZRFM=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(46966006)(40470700004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Feb 2024 22:27:57.8091
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f07505d4-bdd4-428b-b5a1-08dc34beafdf
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SA2PEPF000015C8.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB9175
 
-On Tue, Feb 20, 2024 at 03:28:39PM +0100, Thierry Reding wrote:
-> On Mon Feb 19, 2024 at 7:32 PM CET, Serge Semin wrote:
-> > On Mon, Feb 19, 2024 at 05:46:06PM +0100, Thierry Reding wrote:
-> > > From: Thierry Reding <treding@nvidia.com>
-> > > 
-> > > Allow the device to use bursts and increase the maximum number of
-> > > outstanding requests to improve performance. Measurements show an
-> > > increase in throughput of around 5x on a 1 Gbps link.
-> > > 
-> > > Signed-off-by: Thierry Reding <treding@nvidia.com>
-> > > ---
-> > >  drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c | 9 +++++++++
-> > >  1 file changed, 9 insertions(+)
-> > > 
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
-> > > index bab57d1675df..b6bfa48f279d 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
-> > > @@ -199,6 +199,12 @@ static void mgbe_uphy_lane_bringup_serdes_down(struct net_device *ndev, void *mg
-> > >  	writel(value, mgbe->xpcs + XPCS_WRAP_UPHY_RX_CONTROL);
-> > >  }
-> > >  
-> > > +static const struct stmmac_axi tegra234_mgbe_axi = {
-> > > +	.axi_wr_osr_lmt = 63,
-> > > +	.axi_rd_osr_lmt = 63,
-> > > +	.axi_blen = { 256, },
-> > > +};
-> > > +
-> > >  static int tegra_mgbe_probe(struct platform_device *pdev)
-> > >  {
-> > >  	struct plat_stmmacenet_data *plat;
-> > > @@ -284,6 +290,9 @@ static int tegra_mgbe_probe(struct platform_device *pdev)
-> > >  	if (err < 0)
-> > >  		goto disable_clks;
-> > >  
-> > > +	/* setup default AXI configuration */
-> > > +	res.axi = &tegra234_mgbe_axi;
-> > > +
-> > >  	plat = devm_stmmac_probe_config_dt(pdev, &res);
-> > >  	if (IS_ERR(plat)) {
-> > >  		err = PTR_ERR(plat);
-> >
-> > Let's get back to the v2 discussion:
-> >
-> > On Mon Feb 5, 2024 at 1:44 AM CET, Serge Semin wrote:
-> > > The entire series can be converted to just a few lines of change:
-> > >     plat = devm_stmmac_probe_config_dt(pdev, res.mac);
-> > >     if (IS_ERR(plat)) {
-> > >             err = PTR_ERR(plat);
-> > >             goto disable_clks;
-> > >     }
-> > > +
-> > > +   if (IS_ERR_OR_NULL(plat->axi)) {
-> > > +           plat->axi = devm_kzalloc(&pdev->dev, sizeof(*axi), GFP_KERNEL);
-> > > +           if (!plat->axi) {
-> > > +                   ret = -ENOMEM;
-> > > +                   goto disable_clks;
-> > > +           }
-> > > +   } /* else memset plat->axi with zeros if you wish */
-> > > +
-> > > +   plat->axi->axi_wr_osr_lmt = 63;
-> > > +   plat->axi->axi_rd_osr_lmt = 63;
-> > > +   plat->axi->axi_blen[0] = 256;
-> > >  
-> > >     plat->has_xgmac = 1;
-> > >     plat->flags |= STMMAC_FLAG_TSO_EN;
-> > >     plat->pmt = 1;
-> > >
-> > > Please don't overcomplicate the already overcomplicated driver with a
-> > > functionality which can be reached by the default one. In this case
-> > > the easiest way is to let the generic code work and then
-> > > override/replace/fix/etc the retrieved values. Thus there won't be
-> > > need in adding the redundant functionality and keep the generic
-> > > DT-platform code a bit simpler to read.
-> >
-> > You responded with:
-> >
-> > On Tue, Feb 13, 2024 at 04:51:34PM +0100, Thierry Reding wrote:
-> > > I'm not sure I understand how this is overcomplicating things. The code
-> > > is pretty much unchanged, except that the AXI configuration can now have
-> > > driver-specified defaults before the DT is parsed. Perhaps I need to add
-> > > comments to make that a bit clearer?
-> > > 
-> > > While your version is certainly simpler it has the drawback that it no
-> > > longer allows the platform defaults to be overridden in device tree. I
-> > > would prefer if the defaults can be derived from the compatible string
-> > > but if need be for those defaults to still be overridable from device
-> > > tree.
-> >
-> > Currently available functionality is easier to read and understand: by
-> > default the data is retrieved from the DT, if no AXI DT-node found you
-> > can allocate/create your own AXI-configs, if there is AXI DT-node you
-> > can fix it up in whatever way your wish. Thus the default behavior is
-> > straightforward. You on the contrary suggest to add an additional
-> > field to the resources structure which would need to be merged in with
-> > the data retrieved from DT. It makes the stmmac_axi_setup() method and
-> > the entire logic more complex and thus harder to comprehend.
-> 
-> I suppose that's subjective. Being able to let the driver provide
-> defaults that can then be overridden by values from DT doesn't seem like
-> a very exotic (or complicated) feature to me. We do that elsewhere all
-> the time. Do the comments that I added in this version not sufficiently
-> explain what's going on?
+These are a few things to make our PCI reset handling better.
 
-I have perfectly understood what was going on since v1. My concern is
-the implementation. Here is the way the platform-specific setup
-currently works.
+Shannon Nelson (3):
+  ionic: check before releasing pci regions
+  ionic: check cmd_regs before copying in or out
+  ionic: restore netdev feature bits after reset
 
-There are two structures: stmmac_resources and plat_stmmacenet_data.
-The former one contains the generic platform resources like CSRs
-mapping, IRQs and MAC-address. The later one mainly has the DW
-MAC-specific settings. Yes, plat_stmmacenet_data has been evolved to
-an ugly monster with many redundant flags (fixing code and data here
-and there in the driver) and with some generic platform resources
-(which should have been added to the stmmac_resources structure in the
-first place, like clocks and resets). But still it's purpose is
-more-or-less defined. Both of these structures can be filled in with
-data either directly by the glue drivers or by calling the
-ready-to-use DW MAC platform data getters (stmmac_probe_config_dt()
-and stmmac_get_platform_resources()). Most importantly is that
-currently these structures have independent init semantics: no common
-data, no fields used in both contexts. There are tons of problematic
-places or questionable implementations in the driver, but at least
-this one is more-or-less defined: coherency is minimal, logic is
-linear.
+ .../net/ethernet/pensando/ionic/ionic_bus_pci.c | 17 ++++++++++-------
+ drivers/net/ethernet/pensando/ionic/ionic_dev.c | 10 ++++++++++
+ .../net/ethernet/pensando/ionic/ionic_ethtool.c |  7 ++++++-
+ drivers/net/ethernet/pensando/ionic/ionic_fw.c  |  5 +++++
+ drivers/net/ethernet/pensando/ionic/ionic_lif.c |  5 ++++-
+ .../net/ethernet/pensando/ionic/ionic_main.c    |  3 +++
+ 6 files changed, 38 insertions(+), 9 deletions(-)
 
-You suggest to break that logic by introducing a new stmmac_resources
-field which doesn't represent a generic resource data, but which
-purpose is to tweak the AXI-settings in the plat_stmmacenet_data
-structure. The pointer won't be even ever initialized in the
-stmmac_get_platform_resources() method because it's done in the
-stmmac_probe_config_dt() function. Based on all of that the change you
-suggest look more like a fixup of the problem with your particular
-device/platform.
-
-Let's assume you patches are accepted. In sometime an another
-developer comes with a need to pre-define say MTL Tx/Rx queue configs,
-then another one with DMA configs, MDIO-bus settings, and so on. Thus
-the stmmac_resources structure will eventually turn in a set of the
-tweaks and the plat_stmmacenet_data pre-defines. That's how the
-plat_stmmacenet_data structure has turned in what it is now. This
-doesn't look like a right path to take again.
-
-> 
-> > The driver is already overwhelmed with flags and private/platform data
-> > fixing the code here and there (see plat_stmmacenet_data, it's a
-> > madness). So please justify in more details why do you need one more
-> > complexity added instead of:
-> > 1. overriding the AXI-configs retrieved from DT,
-> 
-> Again, overriding the AXI configs read from DT doesn't keep the current
-> default behaviour of DT being the final authority. That's a policy that
-> should remain intact. This patch (series) is about allowing the driver
-> to override the AXI defaults with something that's sensible based on
-> the compatible string. The current defaults, for example, cause the GBE
-> on Tegra devices to run at around 100 Mbps even on a 1 Gbps link.
-> 
-> > 2. updating DT on your platform
-> 
-
-> That's one possibility and was in fact the first variant I used, but it
-> has a few drawbacks. For example, it means that I need to create the AXI
-> node just to make the device functional, but if possible it's better to
-> derive all necessary information from the compatible string. Having this
-> in a separate AXI configuration node is duplicating information that's
-> already implied by the compatible string.
-> 
-> Also, on Tegra we have a few instances of this device that are all
-> configured the same way. Since the AXI configuration node is supposed to
-> be a child of the Ethernet controller node, we end up having to
-> duplicate even more information.
-
-None of that sounds like big problems. The default behavior doesn't
-make your devices not-working. Yes, the performance is poor, but they
-still work. Regarding the AXI-config DT-nodes it's not a problem at
-all. A lot of the DW *MAC instances currently have the AXI-config
-DT-subnodes. It's absolutely fine to have them setting up the same
-configs.
-
-Once again having the pre-defined configs is fine. All I am worried
-about is the implementation you suggest especially in using the
-stmmac_resources structure to tweak up the plat_stmmacenet_data data.
-So the easiest solutions in your case are:
-1. Initialize the plat_stmmacenet_data->axi pointer if no AXI
-DT-subnode was detected by the stmmac_probe_config_dt() method, after
-the method is called. This will provide almost the same semantics as
-you suggest. The only difference is that it would work not on the
-property level but on the node-level one. (Note the implementation
-suggested by you doesn't provide the AXI-configs pre-definition for
-the boolean properties. So it doesn't provide a complete AXI-config
-default pre-definition.)
-2. Add the proper AXI-config DT-subnodes to the respective device tree
-sources.
-
-If despite of all my reasoning you still insist on having a
-pre-defined setting pattern, then we'll need to come up with some
-better solution. On the top of my mind it might be for example a
-pre-definition of the entire plat_stmmacenet_data structure instance
-or using the software nodes.
-
--Serge(y)
-
-> 
-> Thierry
-
+-- 
+2.17.1
 
 
