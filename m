@@ -1,82 +1,86 @@
-Return-Path: <netdev+bounces-74222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 540ED860871
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 02:44:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52CF5860881
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 02:51:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85A421C21F7B
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 01:44:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3080283AD3
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 01:51:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5553B641;
-	Fri, 23 Feb 2024 01:44:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 688C8B64C;
+	Fri, 23 Feb 2024 01:50:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VFM7xF/J"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="nLtbP1dv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0C518BF3
-	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 01:44:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00095C14F;
+	Fri, 23 Feb 2024 01:50:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708652648; cv=none; b=Np5EsaByiSOIa5Z8vh/P/r3MF+oifI0hQnSEy/qLql2d5cAsKmBSzAKF4D6LXd4SsJeDhyCMK+t6vaILKV/gS7J1qNo6m87HljNKaZzOExMLFw+QYm7h6IOw4wC8TWqp2pnvZmjXlHf+4rS7QrKrZ7rEQ9m8Kg22xZeoUFmdoyA=
+	t=1708653048; cv=none; b=S9cOo8TjJWehCkO2EF/ptPZnBWY6yTlINr0LgEH7/mUyby6/Tg8aOvVZGPYARAESJtCs7htIzyuntp8u+2iQVBPzuzxPkjssEyTFl2TeqS2u5qMpWKCWQVQfdU6DVkTFjCvy8b2omzVjCiG1lAkW4wigFAE6citn1tbucyCYer4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708652648; c=relaxed/simple;
-	bh=CC8AyI6GfWrPXof+A9oFujmN88ev3sQidLKvz7uYVg8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XE9o2oaZpAq+j9N9oy/GT/S1vcnIPZWVA2HpQATJZiEp5K87hrdy3kdflpmTthFsTe8jYHYuvHtwtrbFXGToR8XFiqfQrKaXJGmc76Un0qXZ9kUczIzr9HRIyReHMcx3VkCrrcsgFpWqQ09N01u3PgrrM/rwLASyIMZ2lNfWYlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VFM7xF/J; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E22EFC433C7;
-	Fri, 23 Feb 2024 01:44:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708652648;
-	bh=CC8AyI6GfWrPXof+A9oFujmN88ev3sQidLKvz7uYVg8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VFM7xF/JeOwVcjW3I63gfsxRZSPa9BvPgZUKGChD4JP9S3FCq/uA6HfvzS2iLmnVy
-	 sNQ7r8wdxcEt/Ags/F3wReblpZQudbsYFG/AM7Q5vx+Sv3rp7EZLmN3d35/TU8FuMJ
-	 zUB0HvP16zK2KJXueRgzq8m6lkvhwQvoZ1dZC4XQdF/sAEvouF6QdlpQOCxkA0BYyq
-	 zOk2MpHbLlppfVBDhSK7YKgTpO03eiK3WmfSB+4lkxGdpCApOzNwU7JTe4cYTyuzDx
-	 sMzL0HH1pPkuxd4LE6mMkquf/MoYqkWsmL/E8JXNtLFpzl/wMN8A/yRq2ObF3TNTgq
-	 M2RKXjK41jeQg==
-Date: Thu, 22 Feb 2024 17:44:07 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Nambiar, Amritha" <amritha.nambiar@intel.com>
-Cc: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
- <pabeni@redhat.com>, <danielj@nvidia.com>, <mst@redhat.com>,
- <michael.chan@broadcom.com>
-Subject: Re: [RFC net-next 1/3] netdev: add per-queue statistics
-Message-ID: <20240222174407.5949cf90@kernel.org>
-In-Reply-To: <e6699bcd-e550-4282-85b4-ecf030ccdc2e@intel.com>
-References: <20240222223629.158254-1-kuba@kernel.org>
-	<20240222223629.158254-2-kuba@kernel.org>
-	<e6699bcd-e550-4282-85b4-ecf030ccdc2e@intel.com>
+	s=arc-20240116; t=1708653048; c=relaxed/simple;
+	bh=WUvQfUI7lKeFwecJH+4aBo8NAOgyOfNRfH06TTR6lCs=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=LlwZv1CnbfWT6GZ1Gjx3NqxOiASUWaGfctAEXx8gWOPQCYKG/kAqMmP9Ftux8oKsOM2wgJ3KbTh/6NfZJfb9Fs6VXmC1Q/pJY8FloYGZhvhMhCImmrRNC5URHdsN9+9nzsgi7FaiJdsvSdCjkSee9O6lXCHu0NyrhBDNevAvVWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=nLtbP1dv; arc=none smtp.client-ip=115.124.30.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1708653037; h=Message-ID:Subject:Date:From:To;
+	bh=WUvQfUI7lKeFwecJH+4aBo8NAOgyOfNRfH06TTR6lCs=;
+	b=nLtbP1dvuyWJmUWNFyqHPUZ2g4bH2hqkvYThnTRdimeZXFWUsOppoHZ364dtfvIDXTMKnGWnmPyTA6q6lX8LS0Om4IXFixUu7k6jLRi3MCsoKmEsoHhQV5XgibktPkIsW5ZuT+mOqK9L/O/ZFPtkWKxAb6Xe8wKua6Q4mZKdGyc=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W12WM7U_1708653036;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W12WM7U_1708653036)
+          by smtp.aliyun-inc.com;
+          Fri, 23 Feb 2024 09:50:37 +0800
+Message-ID: <1708653008.6983442-2-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next 0/5] virtio-net: sq support premapped mode
+Date: Fri, 23 Feb 2024 09:50:08 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: netdev@vger.kernel.org,
+ Jason Wang <jasowang@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ virtualization@lists.linux.dev,
+ bpf@vger.kernel.org
+References: <20240116075924.42798-1-xuanzhuo@linux.alibaba.com>
+ <20240222144420-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240222144420-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 
-On Thu, 22 Feb 2024 16:29:08 -0800 Nambiar, Amritha wrote:
-> Thanks, this almost has all the bits to also lookup stats for a single 
-> queue with --do stats-get with a queue id and type.
+On Thu, 22 Feb 2024 14:45:08 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> On Tue, Jan 16, 2024 at 03:59:19PM +0800, Xuan Zhuo wrote:
+> > This is the second part of virtio-net support AF_XDP zero copy.
+>
+> My understanding is, there's going to be another version of all
+> this work?
 
-We could without the projection. The projection (BTW not a great name,
-couldn't come up with a better one.. split? dis-aggregation? view?
-un-grouping?) "splits" a single object (netdev stats) across components
-(queues). I was wondering if at some point we may add another
-projection, splitting a queue. And then a queue+id+projection would
-actually have to return multiple objects. So maybe it's more consistent
-to just not support do at all for this op, and only support dump?
+YES.
 
-We can support filtered dump on ifindex + queue id + type, and expect
-it to return one object for now.
+http://lore.kernel.org/all/20240202093951.120283-1-xuanzhuo@linux.alibaba.com
 
-Not 100% sure so I went with the "keep it simple, we can add more later"
-approach.
+Thanks
+
+
+>
+> --
+> MST
+>
 
