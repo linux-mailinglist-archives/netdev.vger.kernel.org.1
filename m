@@ -1,118 +1,104 @@
-Return-Path: <netdev+bounces-74635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FEE08620D6
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 00:57:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA9DD8620DD
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 00:59:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A5D7B23732
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 23:57:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5C8E287FAF
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 23:59:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E79DC14DFE3;
-	Fri, 23 Feb 2024 23:57:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B81B14DFD6;
+	Fri, 23 Feb 2024 23:59:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="jglTGBrB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oo6x50kw"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow7-smtp.messagingengine.com (flow7-smtp.messagingengine.com [103.168.172.142])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ABDD14CAD0;
-	Fri, 23 Feb 2024 23:57:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA6B72208E
+	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 23:59:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708732651; cv=none; b=RjrzTcrArL4g7s5MUJ5h4pkbn6vMSIs09t7IMOa4P9/izsL/X32TU/uO33rlppe+WSV/zP3Fc5pJPu/jv4edqIDR4+d+usSQgqdCok6KHkzKYqQjy1mM93myIIBJKt1zY7blwokQt2OeZWsmDbIQ7td26dBGfXTXsa6FrVIe9KM=
+	t=1708732751; cv=none; b=mDQ4y6ud4INEHNkErFmng2Gq5bHkEPbY8N6UCTwVbk7sQNLrbLBZsuVhQrUKkrwXzz+bHP3iHrYYvw+ZmtipKjM6eXEru21Z/RnZnYwi60eW3KaSuEJlgCMvLDHLgZYH65tnK29d9U00sKVQ3p+js7AkbddUcFg9O0bPAxGM8us=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708732651; c=relaxed/simple;
-	bh=Mx11YUHiPniIQ7XaRG9QZQ+TYZuZMGMF5iEeDvUY/ng=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=K6ZYSb6JaQR5wiPs8wccLn6YOuXeXgKGaAiNR8NOprG7dV7GtAkToCMyyrnDioVv0LnneeqBUtS/5DGoN8txAsAA5i1T9MK17Zk5wg3SrMh/6R+T3dN6xAHNFNppFRg2lHql+2mIsgncZtboeuB+GTf1FOTn9KEZMHTod0Dq0hM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=jglTGBrB; arc=none smtp.client-ip=103.168.172.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
-Received: from compute7.internal (compute7.nyi.internal [10.202.2.48])
-	by mailflow.nyi.internal (Postfix) with ESMTP id 0C30C200087;
-	Fri, 23 Feb 2024 18:57:29 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute7.internal (MEProxy); Fri, 23 Feb 2024 18:57:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm1; t=1708732649; x=1708739849; bh=Vk5kCKlCgJ1haPDDrVmCMA1V3Pov
-	TZFbWmjHD81lc5g=; b=jglTGBrBnIN7wWXQoHPP6k1vKcyDNRH8UzlfaP9t7hMP
-	XKPoldxdahZ/Wtg+u3+NyHyS5yvuziNR9tHtADbelg5NIZFJOAC64SeTMiJD/5H1
-	ZOWRfyCKTiCbGR1XWuBIovu0qZHGj+3jr/oShYXkmLDJaQQgeclyz1I9rfrXxpf1
-	J6renLhWmUUDWU+eFENoHS5QuoUaJsr8OYCZndbLtVpZBXGlHsnEZWCxkIdBXTbo
-	YWiLy3TT/6xAzHGyqiPz2dog6axt0g9tx/sI+TFmeDM292uE0bUarWH8oYNu5FIg
-	t3OYMtYrXbcHBFI2CMxopehqBpTPA/FENmoDwlY98w==
-X-ME-Sender: <xms:6DDZZUw3W47kX-_r7YLKwW8hMU53QvK9kvRL4sq6QhfsxABodVbbmQ>
-    <xme:6DDZZYTvirqK7I-g8WiQmdJE5eJKiO7MpqzVMGv0kFYyuba94NLsswNQhKV-KgeBR
-    2efi5jNGEvRof1i8Og>
-X-ME-Received: <xmr:6DDZZWXraH0Ou-H7K70OpNnu5RmOxYGFcouRNjJGW3WWj4LZnXZzil9B_gHLMTrb3k-glocO4I7XuoEbdZGNRnP8aDAfUtMy-CQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrfeejgdduiecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvvefujgfkfhggtgesthdtredttddtvdenucfhrhhomhephfhinhhnucfv
-    hhgrihhnuceofhhthhgrihhnsehlihhnuhigqdhmieekkhdrohhrgheqnecuggftrfgrth
-    htvghrnhepleeuheelheekgfeuvedtveetjeekhfffkeeffffftdfgjeevkeegfedvueeh
-    ueelnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepfh
-    hthhgrihhnsehlihhnuhigqdhmieekkhdrohhrgh
-X-ME-Proxy: <xmx:6DDZZShkKIUw_l5b6DGcCn9ZdnQNoKW2TKbfLBhu4DUfaXs6bhIwDA>
-    <xmx:6DDZZWBZUj1ZEkB9BVWaXRf2VnPQ9vgX3AnFlJzhzyWofkvjO8RpUA>
-    <xmx:6DDZZTLqwj1V8fNUKW6OWBYLI-f0x8trEXMBb4Ot9X8-mLsH2qDvxA>
-    <xmx:6TDZZRXtyWQx27tIeSA_wiSoJcjGKquSvIXm1x_BJRDphHwEXOLeQDn8dEM>
-Feedback-ID: i58a146ae:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 23 Feb 2024 18:57:25 -0500 (EST)
-Date: Sat, 24 Feb 2024 10:58:07 +1100 (AEDT)
-From: Finn Thain <fthain@linux-m68k.org>
-To: Justin Stitt <justinstitt@google.com>
-cc: Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
-     Kashyap Desai <kashyap.desai@broadcom.com>,
-     Sumit Saxena <sumit.saxena@broadcom.com>,
-     Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
-     "James E.J. Bottomley" <jejb@linux.ibm.com>,
-     "Martin K. Petersen" <martin.petersen@oracle.com>,
-     Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
-     Ariel Elior <aelior@marvell.com>,
- Manish Chopra <manishc@marvell.com>,
-     "David S. Miller" <davem@davemloft.net>,
-     Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-     Paolo Abeni <pabeni@redhat.com>,
- Saurav Kashyap <skashyap@marvell.com>,
-     Javed Hasan <jhasan@marvell.com>,
- GR-QLogic-Storage-Upstream@marvell.com,
-     Nilesh Javali <njavali@marvell.com>,
-     Manish Rangankar <mrangankar@marvell.com>,
-     Don Brace <don.brace@microchip.com>,
- mpi3mr-linuxdrv.pdl@broadcom.com,     linux-scsi@vger.kernel.org,
- linux-hardening@vger.kernel.org,     linux-kernel@vger.kernel.org,
- Kees Cook <keescook@chromium.org>,     MPT-FusionLinux.pdl@broadcom.com,
- netdev@vger.kernel.org,     storagedev@microchip.com
-Subject: Re: [PATCH 1/7] scsi: mpi3mr: replace deprecated strncpy with
- strscpy
-In-Reply-To: <20240223-strncpy-drivers-scsi-mpi3mr-mpi3mr_fw-c-v1-1-9cd3882f0700@google.com>
-Message-ID: <512c1700-b333-8aea-f19b-707523ac3a6e@linux-m68k.org>
-References: <20240223-strncpy-drivers-scsi-mpi3mr-mpi3mr_fw-c-v1-0-9cd3882f0700@google.com> <20240223-strncpy-drivers-scsi-mpi3mr-mpi3mr_fw-c-v1-1-9cd3882f0700@google.com>
+	s=arc-20240116; t=1708732751; c=relaxed/simple;
+	bh=1H19K4cgiITQLNUwjH9ZH/MAgkCfdnFVOkGKSpXALhY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KXOfiUAgmWJXrvr28J0T4lC5aZ0TmFpO7ZNF03UtwESLOXWuhhSC8dKXVPuGkXO9IAeQZP8QKnU15PCN8evs6DQ2r9rpFAqwi3f8C9kD+8RmFWoiT45QSAzb+F4NbPMXirjWroclqDS1hJpoj8bEjFCBdnYM4UnreKKM/L9ZJrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oo6x50kw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BA25C433C7;
+	Fri, 23 Feb 2024 23:59:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708732751;
+	bh=1H19K4cgiITQLNUwjH9ZH/MAgkCfdnFVOkGKSpXALhY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=oo6x50kwR8vZib8aOMgKc+X0Mrv1tIEUmdjSI+ao4qugGdBdfY/XhvWo2A1NSiAJF
+	 VVGEZCgKYEqv/Dqx8UGulN0odjethWmNPI+eXuxDrltqrC1e/+KQHeYAlzuooEZnBA
+	 dKGRouKnUn+m+JSmMuKj6FPDn72G0ACvRKMD+Xneq8JLRkhEDfMNjbX0yrhuOqAhWG
+	 0L8/suAi2eH2jQe0Kz8xCneaVwOl0LEzwezXHGoxpjaaK02ZKVTUfIXKvPDwpQiAZB
+	 qKL0D9akrkeXxSaL7my8m+0PeUiEWO5SW7RygATMiL40PUckoNPKZnmGamWPXbJk/D
+	 TPCtG+EHVAj6g==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	Miao Wang <shankerwangmiao@gmail.com>
+Subject: [PATCH net] veth: try harder when allocating queue memory
+Date: Fri, 23 Feb 2024 15:59:08 -0800
+Message-ID: <20240223235908.693010-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
 
+struct veth_rq is pretty large, 832B total without debug
+options enabled. Since commit under Fixes we try to pre-allocate
+enough queues for every possible CPU. Miao Wang reports that
+this may lead to order-5 allocations which will fail in production.
 
-On Fri, 23 Feb 2024, Justin Stitt wrote:
+Let the allocation fallback to vmalloc() and try harder.
+These are the same flags we pass to netdev queue allocation.
 
-> Really, there's no bug with the current code. 
+Reported-and-tested-by: Miao Wang <shankerwangmiao@gmail.com>
+Fixes: 9d3684c24a52 ("veth: create by default nr_possible_cpus queues")
+Link: https://lore.kernel.org/all/5F52CAE2-2FB7-4712-95F1-3312FBBFA8DD@gmail.com/
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ drivers/net/veth.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-If (hypothetically) you needed to reduce stack size, just copy the char 
-pointer instead of copying the chars onto the stack.
+diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+index a786be805709..cd4a6fe458f9 100644
+--- a/drivers/net/veth.c
++++ b/drivers/net/veth.c
+@@ -1461,7 +1461,8 @@ static int veth_alloc_queues(struct net_device *dev)
+ 	struct veth_priv *priv = netdev_priv(dev);
+ 	int i;
+ 
+-	priv->rq = kcalloc(dev->num_rx_queues, sizeof(*priv->rq), GFP_KERNEL_ACCOUNT);
++	priv->rq = kvcalloc(dev->num_rx_queues, sizeof(*priv->rq),
++			    GFP_KERNEL_ACCOUNT | __GFP_RETRY_MAYFAIL);
+ 	if (!priv->rq)
+ 		return -ENOMEM;
+ 
+@@ -1477,7 +1478,7 @@ static void veth_free_queues(struct net_device *dev)
+ {
+ 	struct veth_priv *priv = netdev_priv(dev);
+ 
+-	kfree(priv->rq);
++	kvfree(priv->rq);
+ }
+ 
+ static int veth_dev_init(struct net_device *dev)
+-- 
+2.43.2
 
-If (hypothetically) strncpy() was banned altogether (rather than merely 
-deprecated) I would do the same -- but I'm not the maintainer.
 
