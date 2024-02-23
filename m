@@ -1,164 +1,232 @@
-Return-Path: <netdev+bounces-74560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50392861D84
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 21:23:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B78E3861DB4
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 21:37:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDF231F22882
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 20:23:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C0121F248E8
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 20:37:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B7581474B1;
-	Fri, 23 Feb 2024 20:21:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C2601448DE;
+	Fri, 23 Feb 2024 20:37:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="NCQEjgzq"
+	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="jgALnP+O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2058.outbound.protection.outlook.com [40.107.20.58])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB36312883B
-	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 20:21:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708719717; cv=none; b=onRT55gSQ1Opt1PFOqlMqgKFVIdhZChSM3PlHIvHTEk1l5Yk9z44JXOptUGm32X257towsGkUimlEIbNcN8/9vGW0fnwFA7s0igzlHK5tqqR7lM+KmaGkwqTBevvqxFCWBfC/XUS61GrXO2G3RJde4Nj+56oeXft16J5fMK5TgY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708719717; c=relaxed/simple;
-	bh=VLH2Mi4OrInm+33OQhSlzdebE3jFUI1zn/3KcepgOvU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=svY64OFpG9uWnxlmKqq6mSrDHumbbOpBxNFk/vViAYpC14DKPSvy3/W/B62N9m4tp/81FxxfQNAzbFExz/5v6Xf3mRDrrnoAZkdmqri0FHaHHHwAOkOZrsOywufa56ZcKQc4mOkjEq++pGg2InHu+7CByWqnb0jdJRAL1JQhViI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=NCQEjgzq; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a3e8c1e4aa7so123865266b.2
-        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 12:21:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ragnatech.se; s=google; t=1708719712; x=1709324512; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=tBho47Re0b/xThgmy+t3YEba2JQw5AvsTOKzKCpCvk8=;
-        b=NCQEjgzqGzN7Hw9GHBo3t5dOKNLtoByfdMISyziQxmEDCrhOI//7nnjdU/5iE/9gcv
-         6UXDaCfxcudqVEyuX/kuXsmfhEybfjtYu82/GyYJ9FDVei8NNLS5KggtJn+KbYwqJmCI
-         7CjJFXsXYKLK6bqHrmP0AWE++YNuhesVLbwR/zIm1XiEemuttGgFQFh/i679L8l+9jH1
-         XVseoDgbcp40ODLcPhq9vrelxATioGjZJxtSoz7kv7Eoq7bEGsAWiYeP8k6IgcqW/7rb
-         rR30ZDJo4ixjNEkGHJs/Npo9N4EVEbCku51zg46pBVTXI9SiDPvNSSuczsfVaBQzKAiJ
-         iCoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708719712; x=1709324512;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tBho47Re0b/xThgmy+t3YEba2JQw5AvsTOKzKCpCvk8=;
-        b=ui0LvIYTeOPcPqRV2AVtKcVnwrthPtEYhoU6bHFiSoptKgQL7rD1kC54JhzuYaDQ1u
-         fOMY9xup7jZWCYDJn1dx6GQIEt0AXcBGGa1IIN30hwcoVDB+xOdcutHfoDc13euNKSH1
-         mysr6BwSWld2U3OX/BaZy6pSls8FbXKgdrbA0/r/k7g2XP14mJIW4JNNp6IKMItZBvuh
-         aq0a5d5Br7rHVfunFGqE3bnAUlJIh2EAlUHAi5zWNC2PSWXDz0aeQ1UGceG7h0pv8eE1
-         2VSkD/5O5ZWkzY2FKQBInxuSluqN6qUVSO0BQNbCskZkPBgkOM6p4aHCKBmzaOy2Pzxt
-         BUXw==
-X-Forwarded-Encrypted: i=1; AJvYcCXD35ymdSbzk/9ojJWvNPVplm/YtwNkVh80QELJ0paQQWaO6d0KRNe0E4KrrlYhtCOpzFHalKdzXX0TcBJtJ6SP5Zlp1Ifh
-X-Gm-Message-State: AOJu0YzgfHBkGdX2oEaDQDIwPUFeDYZsDoG1O0QUogCV/cqE/9OLuHdu
-	HZKDfrSEXQxCj203IPUemsNRB/bDtrzD03D+1PV/MVGCiSAhWnaDcIGPyZa7zz8=
-X-Google-Smtp-Source: AGHT+IHtWJagw673y+UMwer0QBUhU1HY4utHp5hJqo4P/vdLpAdLDdu+EQOh9utcOn95Uw0C/hTS8A==
-X-Received: by 2002:a17:906:3709:b0:a3e:8223:289a with SMTP id d9-20020a170906370900b00a3e8223289amr593062ejc.31.1708719712213;
-        Fri, 23 Feb 2024 12:21:52 -0800 (PST)
-Received: from localhost (p4fcc8c6a.dip0.t-ipconnect.de. [79.204.140.106])
-        by smtp.gmail.com with ESMTPSA id vh9-20020a170907d38900b00a3f1ea776a1sm3225743ejc.94.2024.02.23.12.21.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Feb 2024 12:21:51 -0800 (PST)
-Date: Fri, 23 Feb 2024 21:21:50 +0100
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH v2] dt-bindings: net: renesas,ethertsn: Add Ethernet TSN
-Message-ID: <20240223202150.GA1176528@ragnatech.se>
-References: <20231121183738.656192-1-niklas.soderlund+renesas@ragnatech.se>
- <CAMuHMdU_CxNu-BF66POeqKv1_=ujBp8Z=cT=08crFxhgQ+gZ=g@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B13D3D2E6;
+	Fri, 23 Feb 2024 20:37:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708720658; cv=fail; b=OKmRlG93b5eyQ8TfNnZgr/oI7U0G/MET6ao4jKkROAqHDOYieOOR4i5sLthaZkhhHzNzi5ZlTfERO5cR/QY7DKK6OGZB7Jd+G7vcPbbTooG1bxWuNTmoLqCQWmYQjVdLR83tm2xcqd5AnZoQcdmhkgaKecgYa0tRf6uTcbw6etY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708720658; c=relaxed/simple;
+	bh=aBWSrG5PTHNDYbjhu6vhwaGZci5zg9VS2o4mtJiReCk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=tcSBSLczgkFkQpyKvkpWPRAxM8NwEeUOpMbwnYZvnHm2txiBa8hLMhhQ2y7vLimencChTvjWyv/LXWpep3EptgwYGRoQxEJYs+fbCBbOvyAjaMljmqeOtth3F1f8G4mU9RGdfnIuQURkjg1qVIwkg+NAOQomP1OJ2mgaVomjJaQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=axis.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=jgALnP+O; arc=fail smtp.client-ip=40.107.20.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=axis.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JkO2qNFNy/+9xNvcQku4DU1PCG2R48NzWgQunCmQNtu5f2A7F68kjZHmkKMxCe5UqYhUBi8KLnXP/BkROmvPYGWUvzpmIf+si6Jys9b+xoR/YHIIaP0T2z9/u4HLxk1jziHIiS6ynPtvyV9u/ZO+esY/73I5GSgYxYyCCkuQFeYF52fl/jphW6hxyykgH3qrcTDq4uqtDjPOJIAcb4xBEOkmvjioLoMN58pqdeG6rloiaiC+2LeHOg7wCm4MWFX7ZiLsVnByWJ7cTKWoWFy+jZ4ThAirQmIJw9jbUbwFBCoTMcuZed0SyEjaNrocIYKaxK1Cobxknxo/CzRdXUZydw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=KX2vTzEsii4NViW4fXjvR0QwyG1i8Hhyblb5tLywzXo=;
+ b=UffD1wngdNVa0kcd++RDIZ+lAnKW509e4i0lgfcoMY8EU0TeCYS2hVmQu5aGE8e+YKudikKYv6D/iNVZzPNOFZfw+7eUiZ4qEIjMkso0vc9cyyfxTXTPLpF+w9CIEXbpqNGyAy5eH5eu3KQNHLeHNCnpWr88A0fI+zyHSsO73l5j9juv4kMpMQstgkw8L0/VlbTk5At4hVb/37tfez9P5i3cymnb3OCvZmlN9jROaad9LK4VtrhOm1E2pZy9LkKETmEXqEm+5+hUkzV5HCVbQRGfPqQK78CHLnefu3wvj6V24eUTr2GMG82ycG+G8BFRpAIUGbMymWhm0otomDShCg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
+ 195.60.68.100) smtp.rcpttodomain=davemloft.net smtp.mailfrom=axis.com;
+ dmarc=fail (p=none sp=none pct=100) action=none header.from=axis.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KX2vTzEsii4NViW4fXjvR0QwyG1i8Hhyblb5tLywzXo=;
+ b=jgALnP+OTN74HjcmT8zsKQYAAkI+bbqBIOVbx+XpCaNFNO+o2cT93VtiWyzYqjeloXGAOx5cWcaXkASt2TfvhABV2NFNqQoaZsNP4wVpenDDb9IDrDJIVSE0w/Jm0HCqhpeOPpGN9FOeFJaEqam3SRm92KOazWkYKiVCArY0lLU=
+Received: from AM6P194CA0062.EURP194.PROD.OUTLOOK.COM (2603:10a6:209:84::39)
+ by DB4PR02MB8462.eurprd02.prod.outlook.com (2603:10a6:10:379::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.24; Fri, 23 Feb
+ 2024 20:37:33 +0000
+Received: from AMS0EPF000001A5.eurprd05.prod.outlook.com
+ (2603:10a6:209:84:cafe::45) by AM6P194CA0062.outlook.office365.com
+ (2603:10a6:209:84::39) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7292.43 via Frontend
+ Transport; Fri, 23 Feb 2024 20:37:32 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 195.60.68.100)
+ smtp.mailfrom=axis.com; dkim=none (message not signed)
+ header.d=none;dmarc=fail action=none header.from=axis.com;
+Received-SPF: Fail (protection.outlook.com: domain of axis.com does not
+ designate 195.60.68.100 as permitted sender) receiver=protection.outlook.com;
+ client-ip=195.60.68.100; helo=mail.axis.com;
+Received: from mail.axis.com (195.60.68.100) by
+ AMS0EPF000001A5.mail.protection.outlook.com (10.167.16.232) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7292.25 via Frontend Transport; Fri, 23 Feb 2024 20:37:32 +0000
+Received: from SE-MAILARCH01W.axis.com (10.20.40.15) by se-mail02w.axis.com
+ (10.20.40.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Fri, 23 Feb
+ 2024 21:37:31 +0100
+Received: from se-mail01w.axis.com (10.20.40.7) by SE-MAILARCH01W.axis.com
+ (10.20.40.15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Fri, 23 Feb
+ 2024 21:37:31 +0100
+Received: from se-intmail01x.se.axis.com (10.0.5.60) by se-mail01w.axis.com
+ (10.20.40.7) with Microsoft SMTP Server id 15.1.2375.34 via Frontend
+ Transport; Fri, 23 Feb 2024 21:37:31 +0100
+Received: from pc55637-2337.se.axis.com (pc55637-2337.se.axis.com [10.88.4.11])
+	by se-intmail01x.se.axis.com (Postfix) with ESMTP id 075D214EA7;
+	Fri, 23 Feb 2024 21:37:31 +0100 (CET)
+Received: by pc55637-2337.se.axis.com (Postfix, from userid 363)
+	id 3BDE12369AF7; Fri, 23 Feb 2024 21:37:31 +0100 (CET)
+From: Jesper Nilsson <jesper.nilsson@axis.com>
+Date: Fri, 23 Feb 2024 21:37:01 +0100
+Subject: [PATCH net-next v3] net: stmmac: mmc_core: Drop interrupt
+ registers from stats
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMuHMdU_CxNu-BF66POeqKv1_=ujBp8Z=cT=08crFxhgQ+gZ=g@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-ID: <20240223-stmmac_stats-v3-1-5d483c2a071a@axis.com>
+X-B4-Tracking: v=1; b=H4sIAOwB2WUC/22NQQqDMBBFryKzbsok0Shd9R6llDSONQu1ZEKwi
+ HdvyEpKl4/Pe38DpuCJ4VJtECh59sucQZ8qcKOdXyR8nxkUqhqVNILjNFn34GgjC9KNkX1tsEe
+ CrLwDDX4tuRvMFMVMa4R7XkbPcQmf8pNk2f8nkxRStGiawdZG6qG72tXz2S1T6SR1cBX+uCq7a
+ NuuM/pJrsWDu+/7Fwfma0ztAAAA
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+	<joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>
+CC: <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<kernel@axis.com>, Serge Semin <fancer.lancer@gmail.com>, Jesper Nilsson
+	<jesper.nilsson@axis.com>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1708720651; l=3843;
+ i=jesper.nilsson@axis.com; s=20240216; h=from:subject:message-id;
+ bh=aBWSrG5PTHNDYbjhu6vhwaGZci5zg9VS2o4mtJiReCk=;
+ b=Bh+Rxs7daVj8594P6YNp7rM9ZzWAJfr4ixMYoRXeDBlqt0tXkJQRqncG/xWdtkhMSHYeXGn6X
+ FRXqcrU6FBEDU7r5dMVLXT9zZSq20ZVl4QXVqoxwx5jow0QHDz45ZE+
+X-Developer-Key: i=jesper.nilsson@axis.com; a=ed25519;
+ pk=RDobTFVrTaE8iMP112Wk0CDiLdcV7I+OkaCECzhr/bI=
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AMS0EPF000001A5:EE_|DB4PR02MB8462:EE_
+X-MS-Office365-Filtering-Correlation-Id: fafa762f-109b-490f-1e30-08dc34af42a1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	LY4TkECqaYmAd3wTqlcI1DlcZjkfRZ9SmaPssjt6pB6WSflhBXRq/ShyNkAUETBnMdsd0JEV0a5QZEt+/nIWXyqEQM97mUf1PlEEVLUIxONFMbQxP9mG+dghRcaKqasZ6/xnwI684tK6QAjrJJYPYqO7T90e0DTs2GAppzDCKGCQNfeIPVk7iAqXHNuiR9HP/g5QVlwM//GcG5pQDVr2uj1H+MbzvWK+alR3ZCYzDHxHj1lbwsbt+iJJxHk+y7/9wej9MW/ew4ivE1eXOp/u8Goa6buPXqNoJCMsv+cHi9UM9A2OMtJ3Nl143C0MzcXXtCv9Cae1SjyWRTJTkDyIp+iGE3o7c6Yj3zrvXCjqebE3bzVltrrAItin24IUKehrQ3Wc4wb+Me5LArRUf6S3j3nEe9icFk8/E1tAaQuMLpfdN2/Y8v3ksIKn/Z04AKvq1vnCdELvUfKIFEKjnypZ64gaeljqo8cB/hAkMMymM7jOdgVAMRAMUcrdRnlfhMtdbqpFC9x3KXwJztyDuZRq30iIERbEQG0wlnAiNy9kyRPLzsxDNFIi0cleLi/xvzdqAF9pwiJ0QS7z+I0B62amFDTqtv4x/yj6VvgwaXDfC8nyNb430PG5UQoD3oJf5mQv1whhSOE6ezITZxc1mAplXg==
+X-Forefront-Antispam-Report:
+	CIP:195.60.68.100;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.axis.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(46966006)(40470700004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: axis.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Feb 2024 20:37:32.1231
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: fafa762f-109b-490f-1e30-08dc34af42a1
+X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=78703d3c-b907-432f-b066-88f7af9ca3af;Ip=[195.60.68.100];Helo=[mail.axis.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AMS0EPF000001A5.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB4PR02MB8462
 
-Hi Geert,
+The MMC IPC interrupt status and interrupt mask registers are
+of little use as Ethernet statistics, but incrementing counters
+based on the current interrupt and interrupt mask registers
+makes them actively misleading.
 
-Thanks for your feedback.
+For example, if the interrupt mask is set to 0x08420842,
+the current code will increment by that amount each iteration,
+leading to the following sequence of nonsense:
 
-On 2024-02-15 17:03:33 +0100, Geert Uytterhoeven wrote:
-> Hi Niklas,
-> 
-> On Tue, Nov 21, 2023 at 7:38 PM Niklas Söderlund
-> <niklas.soderlund+renesas@ragnatech.se> wrote:
-> > Add bindings for Renesas R-Car Ethernet TSN End-station IP. The RTSN
-> > device provides Ethernet network.
-> >
-> > Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
-> 
-> Thanks for your patch, which is now commit c5b9f4792ea6b9ab
-> ("dt-bindings: net: renesas,ethertsn: Add Ethernet TSN") in v6.8-rc1.
-> 
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
-> 
-> > +  interrupts:
-> > +    items:
-> > +      - description: TX data interrupt
-> > +      - description: RX data interrupt
-> > +
-> > +  interrupt-names:
-> > +    items:
-> > +      - const: tx
-> > +      - const: rx
-> 
-> What about the (17!) other interrupts?
+mmc_rx_ipc_intr_mask: 969816526
+mmc_rx_ipc_intr_mask: 1108361744
 
-I did consider them but compared to say ravb each rtsn interrupt have a 
-rather lose description and no easy to define name. So I reasoned it was 
-better to only name the ones we use as we can give them sane names and 
-then as the driver grows with features we can extend the binding.
+These registers have been included in the Ethernet statistics
+since the first version of MMC back in 2011 (commit 1c901a46d57).
+That commit also mentions the MMC interrupts as
+"something to add later (if actually useful)".
 
-As each interrupt have a name this would not cause any backward 
-compatibility issues right?
+If the registers are actually useful, they should probably
+be part of the Ethernet register dump instead of statistics,
+but for now, drop the counters for mmc_rx_ipc_intr and
+mmc_rx_ipc_intr_mask completely.
 
-> 
-> > +  rx-internal-delay-ps:
-> > +    enum: [0, 1800]
-> > +
-> > +  tx-internal-delay-ps:
-> > +    enum: [0, 2000]
-> 
-> These two should either have a default, or be required (like on
-> EtherAVB, where we couldn't have a default because the absence of
->  these properties is used to enable a legacy fallback).
+Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+Signed-off-by: Jesper Nilsson <jesper.nilsson@axis.com>
+---
+Changes in v3:
+- Rebase to be against net-next
+- Link to v2: https://lore.kernel.org/r/20240220-stmmac_stats-v2-1-0a78863bec70@axis.com
 
-This is a good point, I have sent a patch to address this by adding a 
-default value.
+Changes in v2:
+- Drop the misleading registers completely
+- Link to v1: https://lore.kernel.org/r/20240216-stmmac_stats-v1-1-7065fa4613f8@axis.com
+---
+ drivers/net/ethernet/stmicro/stmmac/mmc.h            | 4 ----
+ drivers/net/ethernet/stmicro/stmmac/mmc_core.c       | 3 ---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c | 2 --
+ 3 files changed, 9 deletions(-)
 
-> 
-> Gr{oetje,eeting}s,
-> 
->                         Geert
-> 
-> -- 
-> Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-> 
-> In personal conversations with technical people, I call myself a hacker. But
-> when I'm talking to journalists I just say "programmer" or something like that.
->                                 -- Linus Torvalds
+diff --git a/drivers/net/ethernet/stmicro/stmmac/mmc.h b/drivers/net/ethernet/stmicro/stmmac/mmc.h
+index 14c9d2637dfe..dff02d75d519 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/mmc.h
++++ b/drivers/net/ethernet/stmicro/stmmac/mmc.h
+@@ -86,10 +86,6 @@ struct stmmac_counters {
+ 	unsigned int mmc_rx_discard_octets_gb;
+ 	unsigned int mmc_rx_align_err_frames;
+ 
+-	/* IPC */
+-	unsigned int mmc_rx_ipc_intr_mask;
+-	unsigned int mmc_rx_ipc_intr;
+-
+ 	/* IPv4 */
+ 	unsigned int mmc_rx_ipv4_gd;
+ 	unsigned int mmc_rx_ipv4_hderr;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/mmc_core.c b/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
+index 8597c6abae8d..7eb477faa75a 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
++++ b/drivers/net/ethernet/stmicro/stmmac/mmc_core.c
+@@ -316,9 +316,6 @@ static void dwmac_mmc_read(void __iomem *mmcaddr, struct stmmac_counters *mmc)
+ 	mmc->mmc_rx_fifo_overflow += readl(mmcaddr + MMC_RX_FIFO_OVERFLOW);
+ 	mmc->mmc_rx_vlan_frames_gb += readl(mmcaddr + MMC_RX_VLAN_FRAMES_GB);
+ 	mmc->mmc_rx_watchdog_error += readl(mmcaddr + MMC_RX_WATCHDOG_ERROR);
+-	/* IPC */
+-	mmc->mmc_rx_ipc_intr_mask += readl(mmcaddr + MMC_RX_IPC_INTR_MASK);
+-	mmc->mmc_rx_ipc_intr += readl(mmcaddr + MMC_RX_IPC_INTR);
+ 	/* IPv4 */
+ 	mmc->mmc_rx_ipv4_gd += readl(mmcaddr + MMC_RX_IPV4_GD);
+ 	mmc->mmc_rx_ipv4_hderr += readl(mmcaddr + MMC_RX_IPV4_HDERR);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+index 0e44b84fb7e7..e1537a57815f 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+@@ -243,8 +243,6 @@ static const struct stmmac_stats stmmac_mmc[] = {
+ 	STMMAC_MMC_STAT(mmc_rx_discard_frames_gb),
+ 	STMMAC_MMC_STAT(mmc_rx_discard_octets_gb),
+ 	STMMAC_MMC_STAT(mmc_rx_align_err_frames),
+-	STMMAC_MMC_STAT(mmc_rx_ipc_intr_mask),
+-	STMMAC_MMC_STAT(mmc_rx_ipc_intr),
+ 	STMMAC_MMC_STAT(mmc_rx_ipv4_gd),
+ 	STMMAC_MMC_STAT(mmc_rx_ipv4_hderr),
+ 	STMMAC_MMC_STAT(mmc_rx_ipv4_nopay),
 
+---
+base-commit: a08689109c5989acdc5c320de8e45324f6cfa791
+change-id: 20240216-stmmac_stats-e3561d460d0e
+
+Best regards,
 -- 
-Kind Regards,
-Niklas Söderlund
+
+/^JN - Jesper Nilsson
+-- 
+               Jesper Nilsson -- jesper.nilsson@axis.com
+
 
