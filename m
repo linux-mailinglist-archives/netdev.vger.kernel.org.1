@@ -1,231 +1,299 @@
-Return-Path: <netdev+bounces-74511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0451C8619A3
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 18:31:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 47A9B861A01
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 18:38:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD207283160
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 17:31:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE53C2886B2
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 17:38:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2A4813A860;
-	Fri, 23 Feb 2024 17:26:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5D57128388;
+	Fri, 23 Feb 2024 17:35:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="BABycqrm"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="qScQXBs5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F14720DF8;
-	Fri, 23 Feb 2024 17:26:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D13638DC9
+	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 17:35:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708709167; cv=none; b=oaL1lKv+cHdLtCZr6cYSE9LkVWVSV+6pncK3cRkMlkcIcqOwsKWOgIo/hlNJ2FyVguFMAF4tQ0tZ7yyOELIJ8koxSSkDQaCh1hQv24Rcg8jSeKwECSxpyL8d7YhhARHETsvPFERbo7EoWEIb/AQmojkzdW4vVE4O/3L8tuQg2is=
+	t=1708709742; cv=none; b=ojmrnHzznnVNQY1dAQmaou0pDN1p7bPPPcoGrO0HvVWWJfxo0XQuSQbkzCFhrEj6xYMnqgMpyb92KgPXzkWGaHo3P4osDR4vIeAoWDV2CcYQcvz8L8aXUbUW+8hGnBsSYhBcTtnE8QrMtJ+bc2vtiwmo08sl0SfsS9LMyAs+7yg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708709167; c=relaxed/simple;
-	bh=7fed7ePXHCkzI4CFJ5+VUwNztvIdR0Yb/YSif4y8Ddw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tO99U7Z1wBgcRnl2ijCm1unbgqSpE5gUeRx07A34NLUT49dyv/dobowiR+GVmNLMTLHcaq5FTjDzTdyqBGIKsNvhbckjvk34njFOl6CqaKHXzRCOv7WY3bcAEapXtM1a3nO9bIay9K4gjATw5iVbu6xO2s1P/pT1afQzlN7tYb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=BABycqrm; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1708709742; c=relaxed/simple;
+	bh=uP196vhNcAl/lNIHrFt6S43MIT/4vtIwLl32+2wSd5w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ftdgTaIjZ07RgLi3ZUTittsFydIQMxkT6Dc29LKkhRY+NUW/Y0lnXrLGdGTiTbs1w358kS+s8zVcUXi6MyqGQrBX1/Sb0j4Je8/D2dV8O3lbqXoJaQ8KCmsLo0hI2ikqS5YyqLMdZO560/uta8KgKgJowMLskMtDrcqxR2XMIpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=qScQXBs5; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-6da4a923b1bso924234b3a.2
+        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 09:35:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1708709165; x=1740245165;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Hu0uLmoy54JYHokYsSpP8/4WedLN2zGC+4CnLikdlrY=;
-  b=BABycqrmlmM8jFQjKPvaKEeK1vg6gvetF6G5atdTmcssOzMHEQjHoAgF
-   VDYsRkKu8A4PLIIl1HXpZ/kJBbMsMndB1VhvZ7WrH/k7FRt5GBJj8MQyE
-   iB6cF3fDzWVB6PfdojuzOc1pL+mcPyV6lesiGwAJzvrZS8HVXKzKw/6e2
-   k=;
-X-IronPort-AV: E=Sophos;i="6.06,180,1705363200"; 
-   d="scan'208";a="636375394"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2024 17:26:02 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:29814]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.23.221:2525] with esmtp (Farcaster)
- id 77113ec9-ab22-4ea5-8b69-a3a0fea2ef69; Fri, 23 Feb 2024 17:26:00 +0000 (UTC)
-X-Farcaster-Flow-ID: 77113ec9-ab22-4ea5-8b69-a3a0fea2ef69
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 23 Feb 2024 17:25:59 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.100.9) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 23 Feb 2024 17:25:56 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Allison Henderson <allison.henderson@oracle.com>
-CC: Sowmini Varadhan <sowmini.varadhan@oracle.com>, Kuniyuki Iwashima
-	<kuniyu@amazon.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
-	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<rds-devel@oss.oracle.com>, syzkaller <syzkaller@googlegroups.com>
-Subject: [PATCH v1 net 2/2] rds: tcp: Fix use-after-free of net in reqsk_timer_handler().
-Date: Fri, 23 Feb 2024 09:24:48 -0800
-Message-ID: <20240223172448.94084-3-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240223172448.94084-1-kuniyu@amazon.com>
-References: <20240223172448.94084-1-kuniyu@amazon.com>
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1708709740; x=1709314540; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=TALnjDZ5EDzF1r03NOUytXvsy5VPlkVBfZq9r4Y1MmM=;
+        b=qScQXBs519jypteznjP+yTX/RS3nPUV9V7LFc6EAqN8/mQIpCCuBnehXY3RteI5LWu
+         vNuwEPwYqw+E3H6RVq3uPo4j0lV6iqZY2gtzFosOvH4QjX+eMqZ8h2QTTMidls96XkyB
+         kx1vd5cWgieeD+q+SZSlR0kASDkG0owR+/1C/1aUjAA/TOcE/v0xMcWxYrsYimp6+mHT
+         ydTrkT2yDsbfsfsdSWm9OTha/FZ2+PpZkeqReSBEPVABgloV+ObwUhci0UOAoOe8Yn+q
+         4alGIzax+vds4VQKrgJs0CIEUyDvAygX+EjsT8SauweFLWk7YWtGtyC8bSwY14OeZq84
+         E8EA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708709740; x=1709314540;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TALnjDZ5EDzF1r03NOUytXvsy5VPlkVBfZq9r4Y1MmM=;
+        b=tWGlELaFTKplvE/hn3kilxhno9awxVktYodKUf6uJiUkn4wTCNDfB3GvvH+efXVVlp
+         dHAVJwDYEW9ZIlLLccEqDs9DsVQWFV2zqsSl1+ZssJ3Okfy81qvgFhAG7SU/e+lVVFP5
+         r26kit8k1dUj2eKdSyg8RuIg2JD/IYMAa0DPqFCB7RB0yIsormT7Q+Tb92BsC4sb3uc1
+         VLa9RpPkDU80IGCsO1BGgO2l8jLTooZ/aKArozIfYjWwGMPz3zSz/rwPcrKjW1uFtej6
+         p+FniD9d/6Y69aTV/dbYmQVGrF1eLWh9p4/4YJOw07bPEw2NgWSYCcLSjzPO/CUe/t4m
+         16TQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXGyMqr0xy2wKk0VGJRbSTF8CcNC5QctoTE3ktH/mHHz0O1HKcwIvOT3A2/NGJ7Bv2ta4onnuL/07lW8881rS/dzlHtw3Iu
+X-Gm-Message-State: AOJu0Yxa+haRcJsN+wkJEjEG6DWSvJEZwNF/+gqrMF6Vj64AB0mt3A41
+	da3raFvXru/7Onr06d+yYDYkUeaRtp8pUMvJGmUIDeDjm6Fp3l9AOjW/OvdKMrc=
+X-Google-Smtp-Source: AGHT+IG2NUpChUqHFDo+6qytjnOzmiC/aIOk+8cwdfaAm9BENlvzXbtxorpixDlr754ZsSfWzxNrDw==
+X-Received: by 2002:a05:6a20:b715:b0:1a0:e5af:b240 with SMTP id fg21-20020a056a20b71500b001a0e5afb240mr430800pzb.45.1708709739814;
+        Fri, 23 Feb 2024 09:35:39 -0800 (PST)
+Received: from ghost ([2601:647:5700:6860:a351:1ab0:98d6:3d53])
+        by smtp.gmail.com with ESMTPSA id nb12-20020a17090b35cc00b00296fd5e0de1sm1771118pjb.34.2024.02.23.09.35.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Feb 2024 09:35:39 -0800 (PST)
+Date: Fri, 23 Feb 2024 09:35:37 -0800
+From: Charlie Jenkins <charlie@rivosinc.com>
+To: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: Erhard Furtner <erhard_f@mailbox.org>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	Palmer Dabbelt <palmer@rivosinc.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: "test_ip_fast_csum: ASSERTION FAILED at
+ lib/checksum_kunit.c:589" at boot with CONFIG_CHECKSUM_KUNIT=y enabled on a
+ Talos II, kernel 6.8-rc5
+Message-ID: <ZdjXaUit6r7uvq3N@ghost>
+References: <20240223022654.625bef62@yea>
+ <528c6abf-e5ef-42cd-a5d7-6ede3254523d@csgroup.eu>
+ <Zdg3X4A1eJsJ+ACh@ghost>
+ <6c37ffa2-8642-46c0-89ba-1f1e29b094d9@csgroup.eu>
+ <ZdhCnoRu3i1Cnwks@ghost>
+ <b2a7b678-fc59-4d12-acc3-696866cfd7c2@csgroup.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D039UWA002.ant.amazon.com (10.13.139.32) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+In-Reply-To: <b2a7b678-fc59-4d12-acc3-696866cfd7c2@csgroup.eu>
 
-syzkaller reported a warning of netns tracker [0] followed by KASAN
-splat [1] and another ref tracker warning [1].
+On Fri, Feb 23, 2024 at 09:06:56AM +0000, Christophe Leroy wrote:
+> 
+> 
+> Le 23/02/2024 à 08:00, Charlie Jenkins a écrit :
+> > On Fri, Feb 23, 2024 at 06:58:14AM +0000, Christophe Leroy wrote:
+> >>
+> >>
+> >> Le 23/02/2024 à 07:12, Charlie Jenkins a écrit :
+> >>> On Fri, Feb 23, 2024 at 05:59:07AM +0000, Christophe Leroy wrote:
+> >>>> Hi Erhard, hi Charlie,
+> >>>>
+> >>>> Le 23/02/2024 à 02:26, Erhard Furtner a écrit :
+> >>>>> Greetings!
+> >>>>>
+> >>>>> Looks like my Talos II (running a BE kernel+system) fails some of the kernels internal unit tests. One of the failing tests is checksum_kunit, enabled via CONFIG_CHECKSUM_KUNIT=y:
+> >>>>>
+> >>>>> [...]
+> >>>>>       KTAP version 1
+> >>>>>        # Subtest: checksum
+> >>>>>        # module: checksum_kunit
+> >>>>>        1..5
+> >>>>> entry-flush: disabled on command line.
+> >>>>>        ok 1 test_csum_fixed_random_inputs
+> >>>>>        ok 2 test_csum_all_carry_inputs
+> >>>>>        ok 3 test_csum_no_carry_inputs
+> >>>>>        # test_ip_fast_csum: ASSERTION FAILED at lib/checksum_kunit.c:589
+> >>>>>        Expected ( u64)expected == ( u64)csum_result, but
+> >>>>>            ( u64)expected == 55939 (0xda83)
+> >>>>>            ( u64)csum_result == 33754 (0x83da)
+> >>>>>        not ok 4 test_ip_fast_csum
+> >>>>>        # test_csum_ipv6_magic: ASSERTION FAILED at lib/checksum_kunit.c:617
+> >>>>>        Expected ( u64)expected_csum_ipv6_magic[i] == ( u64)csum_ipv6_magic(saddr, daddr, len, proto, csum), but
+> >>>>>            ( u64)expected_csum_ipv6_magic[i] == 6356 (0x18d4)
+> >>>>>            ( u64)csum_ipv6_magic(saddr, daddr, len, proto, csum) == 43586 (0xaa42)
+> >>>>>        not ok 5 test_csum_ipv6_magic
+> >>>>> # checksum: pass:3 fail:2 skip:0 total:5
+> >>>>> # Totals: pass:3 fail:2 skip:0 total:5
+> >>>>> not ok 4 checksum
+> >>>>> [...]
+> >>>>>
+> >>>>> Full dmesg + kernel .config attached.
+> >>>>
+> >>>> Looks like the same problem as the one I fixed with commit b38460bc463c
+> >>>> ("kunit: Fix checksum tests on big endian CPUs")
+> >>>>
+> >>>> The new tests implemented through commit 6f4c45cbcb00 ("kunit: Add tests
+> >>>> for csum_ipv6_magic and ip_fast_csum") create a lot of type issues as
+> >>>> reported by sparse when built with C=2 (see below).
+> >>>>
+> >>>> Once those issues are fixed, it should work.
+> >>>>
+> >>>> Charlie, can you provide a fix ?
+> >>>>
+> >>>> Thanks,
+> >>>> Christophe
+> >>>
+> >>> The "lib: checksum: Fix issues with checksum tests" patch should fix all of these issues [1].
+> >>>
+> >>> [1] https://lore.kernel.org/all/20240221-fix_sparse_errors_checksum_tests-v9-1-bff4d73ab9d1@rivosinc.com/T/#m189783a9b2a7d12e3c34c4a412e65408658db2c9
+> >>
+> >> It doesn't fix the issues, I still get the following with your patch 1/2
+> >> applied:
+> >>
+> >> [    6.893141] KTAP version 1
+> >> [    6.896118] 1..1
+> >> [    6.897764]     KTAP version 1
+> >> [    6.900800]     # Subtest: checksum
+> >> [    6.904518]     # module: checksum_kunit
+> >> [    6.904601]     1..5
+> >> [    7.139784]     ok 1 test_csum_fixed_random_inputs
+> >> [    7.590056]     ok 2 test_csum_all_carry_inputs
+> >> [    8.064415]     ok 3 test_csum_no_carry_inputs
+> >> [    8.070065]     # test_ip_fast_csum: ASSERTION FAILED at
+> >> lib/checksum_kunit.c:589
+> >> [    8.070065]     Expected ( u64)expected == ( u64)csum_result, but
+> >> [    8.070065]         ( u64)expected == 55939 (0xda83)
+> >> [    8.070065]         ( u64)csum_result == 33754 (0x83da)
+> >> [    8.075836]     not ok 4 test_ip_fast_csum
+> >> [    8.101039]     # test_csum_ipv6_magic: ASSERTION FAILED at
+> >> lib/checksum_kunit.c:617
+> >> [    8.101039]     Expected ( u64)( __sum16)expected_csum_ipv6_magic[i]
+> >> == ( u64)csum_ipv6_magic(saddr, daddr, len, proto, ( __wsum)csum), but
+> >> [    8.101039]         ( u64)( __sum16)expected_csum_ipv6_magic[i] ==
+> >> 6356 (0x18d4)
+> >> [    8.101039]         ( u64)csum_ipv6_magic(saddr, daddr, len, proto, (
+> >> __wsum)csum) == 43586 (0xaa42)
+> >> [    8.106446]     not ok 5 test_csum_ipv6_magic
+> >> [    8.143829] # checksum: pass:3 fail:2 skip:0 total:5
+> >> [    8.148334] # Totals: pass:3 fail:2 skip:0 total:5
+> >> [    8.153173] not ok 1 checksum
+> >>
+> >> All your patch does is to hide the sparse warnings. But forcing a cast
+> >> doesn't fix byte orders.
+> >>
+> >> Please have a look at commit b38460bc463c ("kunit: Fix checksum tests on
+> >> big endian CPUs"), there are helpers to put checksums in the correct
+> >> byte order.
+> >>
+> >> Christophe
+> > 
+> > Well that's what the second patch is for. Is it failing with the second
+> > patch applied?
+> > 
+> 
+> Yes, with second patch is magically works, meaning the patch description 
+> is not correct because the problem for powerpc it not at all related to 
+> memory alignment but to endianness. And endianness should have been 
+> fixed by patch 1, but instead of it, patch 1 just hides the problem by 
+> forcing casts.
+> 
+> The real fix for endianness which should be your patch 1 is the 
+> following change. With that change it works perfectly well without any 
+> forced cast:
 
-syzkaller could not find a repro, but in the log, the only suspicious
-sequence was as follows:
+Saying without "any forced casted" is misleading. You are just hiding
+the forced cast behind a function call. to_sum16 is defined as (__force
+__sum16)le16_to_cpu((__force __le16)x) which does two forced casts.
+Since this is networking code, htons makes more logical sense here and
+it is the same result.
 
-  18:26:22 executing program 1:
-  r0 = socket$inet6_mptcp(0xa, 0x1, 0x106)
-  ...
-  connect$inet6(r0, &(0x7f0000000080)={0xa, 0x4001, 0x0, @loopback}, 0x1c) (async)
+Sparse simply requires forced casts, as the networking types uses
+restricted types. I can rearrange the patches so that the first patch is
+not solely fixing the sparse forced casts and include the endianness
+fixes from the second patch.
 
-The notable thing here is 0x4001 in connect(), which is RDS_TCP_PORT.
+I see how the title of the second patch is confusing since it only says
+alignment, but I included endianness in the description which I assumed
+would sufficiently convey the point.
 
-So, the scenario would be:
+- Charlie
 
-  1. unshare(CLONE_NEWNET) creates a per netns tcp listener in
-      rds_tcp_listen_init().
-  2. syz-executor connect()s to it and creates a reqsk.
-  3. syz-executor exit()s immediately.
-  4. netns is dismantled.  [0]
-  5. reqsk timer is fired, and UAF happens while freeing reqsk.  [1]
-  6. listener is freed after RCU grace period.  [2]
-
-Basically, reqsk assumes that the listener guarantees netns safety
-until all reqsk timers are expired by holding the listener's refcount.
-However, this was not the case for kernel sockets.
-
-Commit 740ea3c4a0b2 ("tcp: Clean up kernel listener's reqsk in
-inet_twsk_purge()") fixed this issue only for per-netns ehash, but
-the issue still exists for the global ehash.
-
-We can apply the same fix, but this issue is specific to RDS.
-
-Instead of iterating potentially large ehash and purging reqsk during
-netns dismantle, let's hold netns refcount for the kernel TCP listener.
-
-[0]:
-ref_tracker: net notrefcnt@0000000065449cc3 has 1/1 users at
-     sk_alloc (./include/net/net_namespace.h:337 net/core/sock.c:2146)
-     inet6_create (net/ipv6/af_inet6.c:192 net/ipv6/af_inet6.c:119)
-     __sock_create (net/socket.c:1572)
-     rds_tcp_listen_init (net/rds/tcp_listen.c:279)
-     rds_tcp_init_net (net/rds/tcp.c:577)
-     ops_init (net/core/net_namespace.c:137)
-     setup_net (net/core/net_namespace.c:340)
-     copy_net_ns (net/core/net_namespace.c:497)
-     create_new_namespaces (kernel/nsproxy.c:110)
-     unshare_nsproxy_namespaces (kernel/nsproxy.c:228 (discriminator 4))
-     ksys_unshare (kernel/fork.c:3429)
-     __x64_sys_unshare (kernel/fork.c:3496)
-     do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
-     entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:129)
-...
-WARNING: CPU: 0 PID: 27 at lib/ref_tracker.c:179 ref_tracker_dir_exit (lib/ref_tracker.c:179)
-
-[1]:
-BUG: KASAN: slab-use-after-free in inet_csk_reqsk_queue_drop (./include/net/inet_hashtables.h:180 net/ipv4/inet_connection_sock.c:952 net/ipv4/inet_connection_sock.c:966)
-Read of size 8 at addr ffff88801b370400 by task swapper/0/0
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-Call Trace:
- <IRQ>
- dump_stack_lvl (lib/dump_stack.c:107 (discriminator 1))
- print_report (mm/kasan/report.c:378 mm/kasan/report.c:488)
- kasan_report (mm/kasan/report.c:603)
- inet_csk_reqsk_queue_drop (./include/net/inet_hashtables.h:180 net/ipv4/inet_connection_sock.c:952 net/ipv4/inet_connection_sock.c:966)
- reqsk_timer_handler (net/ipv4/inet_connection_sock.c:979 net/ipv4/inet_connection_sock.c:1092)
- call_timer_fn (./arch/x86/include/asm/jump_label.h:27 ./include/linux/jump_label.h:207 ./include/trace/events/timer.h:127 kernel/time/timer.c:1701)
- __run_timers.part.0 (kernel/time/timer.c:1752 kernel/time/timer.c:2038)
- run_timer_softirq (kernel/time/timer.c:2053)
- __do_softirq (./arch/x86/include/asm/jump_label.h:27 ./include/linux/jump_label.h:207 ./include/trace/events/irq.h:142 kernel/softirq.c:554)
- irq_exit_rcu (kernel/softirq.c:427 kernel/softirq.c:632 kernel/softirq.c:644)
- sysvec_apic_timer_interrupt (arch/x86/kernel/apic/apic.c:1076 (discriminator 14))
- </IRQ>
-
-Allocated by task 258 on cpu 0 at 83.612050s:
- kasan_save_stack (mm/kasan/common.c:48)
- kasan_save_track (mm/kasan/common.c:68)
- __kasan_slab_alloc (mm/kasan/common.c:343)
- kmem_cache_alloc (mm/slub.c:3813 mm/slub.c:3860 mm/slub.c:3867)
- copy_net_ns (./include/linux/slab.h:701 net/core/net_namespace.c:421 net/core/net_namespace.c:480)
- create_new_namespaces (kernel/nsproxy.c:110)
- unshare_nsproxy_namespaces (kernel/nsproxy.c:228 (discriminator 4))
- ksys_unshare (kernel/fork.c:3429)
- __x64_sys_unshare (kernel/fork.c:3496)
- do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
- entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:129)
-
-Freed by task 27 on cpu 0 at 329.158864s:
- kasan_save_stack (mm/kasan/common.c:48)
- kasan_save_track (mm/kasan/common.c:68)
- kasan_save_free_info (mm/kasan/generic.c:643)
- __kasan_slab_free (mm/kasan/common.c:265)
- kmem_cache_free (mm/slub.c:4299 mm/slub.c:4363)
- cleanup_net (net/core/net_namespace.c:456 net/core/net_namespace.c:446 net/core/net_namespace.c:639)
- process_one_work (kernel/workqueue.c:2638)
- worker_thread (kernel/workqueue.c:2700 kernel/workqueue.c:2787)
- kthread (kernel/kthread.c:388)
- ret_from_fork (arch/x86/kernel/process.c:153)
- ret_from_fork_asm (arch/x86/entry/entry_64.S:250)
-
-The buggy address belongs to the object at ffff88801b370000
- which belongs to the cache net_namespace of size 4352
-The buggy address is located 1024 bytes inside of
- freed 4352-byte region [ffff88801b370000, ffff88801b371100)
-
-[2]:
-WARNING: CPU: 0 PID: 95 at lib/ref_tracker.c:228 ref_tracker_free (lib/ref_tracker.c:228 (discriminator 1))
-Modules linked in:
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-RIP: 0010:ref_tracker_free (lib/ref_tracker.c:228 (discriminator 1))
-...
-Call Trace:
-<IRQ>
- __sk_destruct (./include/net/net_namespace.h:353 net/core/sock.c:2204)
- rcu_core (./arch/x86/include/asm/preempt.h:26 kernel/rcu/tree.c:2165 kernel/rcu/tree.c:2433)
- __do_softirq (./arch/x86/include/asm/jump_label.h:27 ./include/linux/jump_label.h:207 ./include/trace/events/irq.h:142 kernel/softirq.c:554)
- irq_exit_rcu (kernel/softirq.c:427 kernel/softirq.c:632 kernel/softirq.c:644)
- sysvec_apic_timer_interrupt (arch/x86/kernel/apic/apic.c:1076 (discriminator 14))
-</IRQ>
-
-Reported-by: syzkaller <syzkaller@googlegroups.com>
-Fixes: 467fa15356ac ("RDS-TCP: Support multiple RDS-TCP listen endpoints, one per netns.")
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/rds/tcp_listen.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
-index 05008ce5c421..4f7863932df7 100644
---- a/net/rds/tcp_listen.c
-+++ b/net/rds/tcp_listen.c
-@@ -282,6 +282,11 @@ struct socket *rds_tcp_listen_init(struct net *net, bool isv6)
- 		goto out;
- 	}
- 
-+	__netns_tracker_free(net, &sock->sk->ns_tracker, false);
-+	sock->sk->sk_net_refcnt = 1;
-+	get_net_track(net, &sock->sk->ns_tracker, GFP_KERNEL);
-+	sock_inuse_add(net, 1);
-+
- 	sock->sk->sk_reuse = SK_CAN_REUSE;
- 	tcp_sock_set_nodelay(sock->sk);
- 
--- 
-2.30.2
-
+> 
+> diff --git a/lib/checksum_kunit.c b/lib/checksum_kunit.c
+> index 225bb7701460..bf70850035c7 100644
+> --- a/lib/checksum_kunit.c
+> +++ b/lib/checksum_kunit.c
+> @@ -215,7 +215,7 @@ static const u32 init_sums_no_overflow[] = {
+>   	0xffff0000, 0xfffffffb,
+>   };
+> 
+> -static const __sum16 expected_csum_ipv6_magic[] = {
+> +static const u16 expected_csum_ipv6_magic[] = {
+>   	0x18d4, 0x3085, 0x2e4b, 0xd9f4, 0xbdc8, 0x78f,	0x1034, 0x8422, 0x6fc0,
+>   	0xd2f6, 0xbeb5, 0x9d3,	0x7e2a, 0x312e, 0x778e, 0xc1bb, 0x7cf2, 0x9d1e,
+>   	0xca21, 0xf3ff, 0x7569, 0xb02e, 0xca86, 0x7e76, 0x4539, 0x45e3, 0xf28d,
+> @@ -241,7 +241,7 @@ static const __sum16 expected_csum_ipv6_magic[] = {
+>   	0x3845, 0x1014
+>   };
+> 
+> -static const __sum16 expected_fast_csum[] = {
+> +static const u16 expected_fast_csum[] = {
+>   	0xda83, 0x45da, 0x4f46, 0x4e4f, 0x34e,	0xe902, 0xa5e9, 0x87a5, 0x7187,
+>   	0x5671, 0xf556, 0x6df5, 0x816d, 0x8f81, 0xbb8f, 0xfbba, 0x5afb, 0xbe5a,
+>   	0xedbe, 0xabee, 0x6aac, 0xe6b,	0xea0d, 0x67ea, 0x7e68, 0x8a7e, 0x6f8a,
+> @@ -577,7 +577,8 @@ static void test_csum_no_carry_inputs(struct kunit 
+> *test)
+> 
+>   static void test_ip_fast_csum(struct kunit *test)
+>   {
+> -	__sum16 csum_result, expected;
+> +	__sum16 csum_result;
+> +	u16 expected;
+> 
+>   	for (int len = IPv4_MIN_WORDS; len < IPv4_MAX_WORDS; len++) {
+>   		for (int index = 0; index < NUM_IP_FAST_CSUM_TESTS; index++) {
+> @@ -586,7 +587,7 @@ static void test_ip_fast_csum(struct kunit *test)
+>   				expected_fast_csum[(len - IPv4_MIN_WORDS) *
+>   						   NUM_IP_FAST_CSUM_TESTS +
+>   						   index];
+> -			CHECK_EQ(expected, csum_result);
+> +			CHECK_EQ(to_sum16(expected), csum_result);
+>   		}
+>   	}
+>   }
+> @@ -598,7 +599,7 @@ static void test_csum_ipv6_magic(struct kunit *test)
+>   	const struct in6_addr *daddr;
+>   	unsigned int len;
+>   	unsigned char proto;
+> -	unsigned int csum;
+> +	__wsum csum;
+> 
+>   	const int daddr_offset = sizeof(struct in6_addr);
+>   	const int len_offset = sizeof(struct in6_addr) + sizeof(struct in6_addr);
+> @@ -611,10 +612,10 @@ static void test_csum_ipv6_magic(struct kunit *test)
+>   		saddr = (const struct in6_addr *)(random_buf + i);
+>   		daddr = (const struct in6_addr *)(random_buf + i +
+>   						  daddr_offset);
+> -		len = *(unsigned int *)(random_buf + i + len_offset);
+> +		len = le32_to_cpu(*(__le32 *)(random_buf + i + len_offset));
+>   		proto = *(random_buf + i + proto_offset);
+> -		csum = *(unsigned int *)(random_buf + i + csum_offset);
+> -		CHECK_EQ(expected_csum_ipv6_magic[i],
+> +		csum = *(__wsum *)(random_buf + i + csum_offset);
+> +		CHECK_EQ(to_sum16(expected_csum_ipv6_magic[i]),
+>   			 csum_ipv6_magic(saddr, daddr, len, proto, csum));
+>   	}
+>   #endif /* !CONFIG_NET */
+> ---
+> 
+> Christophe
 
