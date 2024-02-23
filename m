@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-74601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 353C3861F3D
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 22:45:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE724861F3E
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 22:46:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B48121F28B2D
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 21:45:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F256285412
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 21:46:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76DC6146E81;
-	Fri, 23 Feb 2024 21:45:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 361E014C5AA;
+	Fri, 23 Feb 2024 21:46:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="A3HUxkKe"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="p6acRRlL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95B7114A0A9
-	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 21:45:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A65814CAA3
+	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 21:46:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708724752; cv=none; b=QYazamWD+Duia4YrUP7GFGXiMmaTTiovl8pBd5cuiGheEsU4sKpoygA3gGVjgNMPLk9W57CDCAiHwiWTukmc8iJ9Aj633Q4RTm0zLiL0MHeyEVOSAs/vlybkt3IRkO6HABFlL2mPMoEf7LgYbYw/UnbJUYQeutOv2rGKSJdC5+8=
+	t=1708724777; cv=none; b=p1JjT5270j+K4JLVtR6Vbjfkvl/g+5DZbtjiInb8q1rWp1BS11Xal9hIqHOVWfZe3w3pTDQ4HwfmXpGL8eaiaxDe1Pjei1fpzt9rGZ2JzhPa4ciTsLo1J6c1Xud9d2Pzqs8L0a4M8EiZjtGQEroTZfn1WdSK/u+KYdEbMDPiBVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708724752; c=relaxed/simple;
-	bh=uy0/FFFEQzwTFA8z8PMrnWayGANgDIO8CCXsWOysVPM=;
+	s=arc-20240116; t=1708724777; c=relaxed/simple;
+	bh=ZuRdZHLz50uFNXbgNZaAm/C6KqlpRhYt39V0cu7ic4E=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J6B9yCMPowf6JKjhGxBW4Kflf+Ws8WU+NMkaXbAMharibHxB/EiQPxjor9EuZOygfRhPwv04EV+e+WcPmOy5cX/ib54hximKO2sGjzXje5hX451OZHth3y42Fr8zcdbJZrHD/AS04Zf9DastJ5JyexxgWEO3XAoUjXisll2R/Tk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=A3HUxkKe; arc=none smtp.client-ip=99.78.197.219
+	 MIME-Version:Content-Type; b=GUyqPtxqcaYAvQEoUYwE+MUYAPxCwX+6i8BSnGjKFDq+kBmCQZWPsQGDfMG2YLMv9Ta6MyL2UtmDq6VtDDxP8ci2aial4D/nU0HvSv1+tg7v4XFlS0eXTbRojN+564kDTzImPSvW+O/MxPrheny4KHZOIBFVIFRDqnq7AoqCZcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=p6acRRlL; arc=none smtp.client-ip=207.171.188.206
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1708724750; x=1740260750;
+  t=1708724775; x=1740260775;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=/ZmP9nsj0p1GJ+z2/6UT2ETzuYRlnl6j7Hx3rNliUKg=;
-  b=A3HUxkKe0aF04lVqlCiBQaWQFak/l407S33xmtr/1hlKoeXv7tJQyo4x
-   Hv9Gg7mtbsJP/UhInWyCp2Wbt0THilAPIh4c2FN6gijCcgBr0NNQlDUpa
-   x1O/MDF84FfLGnElPLOpKMC+NYT9xOvbkDWjCkdCYNPlT5mgFyv+nmDtv
-   M=;
+  bh=Iq/zFFFJ8V14KK9QW8av9KdokGOaG8yduusDkCXibtE=;
+  b=p6acRRlLx/6Z3UdThJW2xivPSth3nIMNkVsC+GYJyEnqTBsyOIGdyx/w
+   MbYKm98SesVtVchBgfKe9Tv86574GDPPgyhpAb5aEQwTqKbFO5cn+isRv
+   atg1muGimfgxwis54Op0vhVrfm0lKg+AHColLP+/e7b3qYpGvnEogLdFA
+   4=;
 X-IronPort-AV: E=Sophos;i="6.06,180,1705363200"; 
-   d="scan'208";a="68377732"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2024 21:45:48 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:34506]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.16.229:2525] with esmtp (Farcaster)
- id 1029e676-b185-45d5-891b-c8a063a35d51; Fri, 23 Feb 2024 21:45:47 +0000 (UTC)
-X-Farcaster-Flow-ID: 1029e676-b185-45d5-891b-c8a063a35d51
+   d="scan'208";a="706492111"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2024 21:46:14 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:14694]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.16.177:2525] with esmtp (Farcaster)
+ id 406e1a1f-ab32-4d66-8afd-3f91cc4e97a5; Fri, 23 Feb 2024 21:46:13 +0000 (UTC)
+X-Farcaster-Flow-ID: 406e1a1f-ab32-4d66-8afd-3f91cc4e97a5
 Received: from EX19D004ANA003.ant.amazon.com (10.37.240.184) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 23 Feb 2024 21:45:47 +0000
+ 15.2.1118.40; Fri, 23 Feb 2024 21:46:12 +0000
 Received: from 88665a182662.ant.amazon.com.com (10.106.100.9) by
  EX19D004ANA003.ant.amazon.com (10.37.240.184) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 23 Feb 2024 21:45:44 +0000
+ 15.2.1118.40; Fri, 23 Feb 2024 21:46:09 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v3 net-next 13/14] af_unix: Replace garbage collection algorithm.
-Date: Fri, 23 Feb 2024 13:40:02 -0800
-Message-ID: <20240223214003.17369-14-kuniyu@amazon.com>
+Subject: [PATCH v3 net-next 14/14] selftest: af_unix: Test GC for SCM_RIGHTS.
+Date: Fri, 23 Feb 2024 13:40:03 -0800
+Message-ID: <20240223214003.17369-15-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20240223214003.17369-1-kuniyu@amazon.com>
 References: <20240223214003.17369-1-kuniyu@amazon.com>
@@ -77,436 +77,358 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D042UWA003.ant.amazon.com (10.13.139.44) To
+X-ClientProxiedBy: EX19D032UWB001.ant.amazon.com (10.13.139.152) To
  EX19D004ANA003.ant.amazon.com (10.37.240.184)
 
-If we find a dead SCC during iteration, we call unix_collect_skb()
-to splice all skb in the SCC to the global sk_buff_head, hitlist.
+This patch adds test cases to verify the new GC.
 
-After iterating all SCC, we unlock unix_gc_lock and purge the queue.
+We run each test for the following cases:
+
+  * SOCK_DGRAM
+  * SOCK_STREAM without embryo socket
+  * SOCK_STREAM without embryo socket + MSG_OOB
+  * SOCK_STREAM with embryo sockets
+  * SOCK_STREAM with embryo sockets + MSG_OOB
+
+Before and after running each test case, we ensure that there is
+no AF_UNIX socket left in the netns by reading /proc/net/protocols.
+
+We cannot use /proc/net/unix and UNIX_DIAG because the embryo socket
+does not show up there.
+
+Each test creates multiple sockets in an array.  We pass sockets in
+the even index using the peer sockets in the odd index.
+
+So, send_fd(0, 1) actually sends fd[0] to fd[2] via fd[0 + 1].
+
+  Test 1 : A <-> A
+  Test 2 : A <-> B
+  Test 3 : A -> B -> C <- D
+           ^.___|___.'    ^
+                `---------'
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- include/net/af_unix.h |   8 --
- net/unix/af_unix.c    |  12 --
- net/unix/garbage.c    | 287 ++++++++----------------------------------
- 3 files changed, 53 insertions(+), 254 deletions(-)
+ tools/testing/selftests/net/.gitignore        |   1 +
+ tools/testing/selftests/net/af_unix/Makefile  |   2 +-
+ .../selftests/net/af_unix/scm_rights.c        | 286 ++++++++++++++++++
+ 3 files changed, 288 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/net/af_unix/scm_rights.c
 
-diff --git a/include/net/af_unix.h b/include/net/af_unix.h
-index 696d997a5ac9..226a8da2cbe3 100644
---- a/include/net/af_unix.h
-+++ b/include/net/af_unix.h
-@@ -19,9 +19,6 @@ static inline struct unix_sock *unix_get_socket(struct file *filp)
+diff --git a/tools/testing/selftests/net/.gitignore b/tools/testing/selftests/net/.gitignore
+index 2f9d378edec3..d996a0ab0765 100644
+--- a/tools/testing/selftests/net/.gitignore
++++ b/tools/testing/selftests/net/.gitignore
+@@ -31,6 +31,7 @@ reuseport_dualstack
+ rxtimestamp
+ sctp_hello
+ scm_pidfd
++scm_rights
+ sk_bind_sendto_listen
+ sk_connect_zero_addr
+ socket
+diff --git a/tools/testing/selftests/net/af_unix/Makefile b/tools/testing/selftests/net/af_unix/Makefile
+index 221c387a7d7f..3b83c797650d 100644
+--- a/tools/testing/selftests/net/af_unix/Makefile
++++ b/tools/testing/selftests/net/af_unix/Makefile
+@@ -1,4 +1,4 @@
+ CFLAGS += $(KHDR_INCLUDES)
+-TEST_GEN_PROGS := diag_uid test_unix_oob unix_connect scm_pidfd
++TEST_GEN_PROGS := diag_uid test_unix_oob unix_connect scm_pidfd scm_rights
  
- extern spinlock_t unix_gc_lock;
- extern unsigned int unix_tot_inflight;
--
--void unix_inflight(struct user_struct *user, struct file *fp);
--void unix_notinflight(struct user_struct *user, struct file *fp);
- void unix_add_edges(struct scm_fp_list *fpl, struct unix_sock *receiver);
- void unix_del_edges(struct scm_fp_list *fpl);
- void unix_update_edges(struct unix_sock *receiver);
-@@ -85,12 +82,7 @@ struct unix_sock {
- 	struct sock		*peer;
- 	struct sock		*listener;
- 	struct unix_vertex	*vertex;
--	struct list_head	link;
--	unsigned long		inflight;
- 	spinlock_t		lock;
--	unsigned long		gc_flags;
--#define UNIX_GC_CANDIDATE	0
--#define UNIX_GC_MAYBE_CYCLE	1
- 	struct socket_wq	peer_wq;
- 	wait_queue_entry_t	peer_wake;
- 	struct scm_stat		scm_stat;
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index ae77e2dc0dae..27ca50ab1cd1 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -980,12 +980,10 @@ static struct sock *unix_create1(struct net *net, struct socket *sock, int kern,
- 	sk->sk_destruct		= unix_sock_destructor;
- 	u = unix_sk(sk);
- 	u->listener = NULL;
--	u->inflight = 0;
- 	u->vertex = NULL;
- 	u->path.dentry = NULL;
- 	u->path.mnt = NULL;
- 	spin_lock_init(&u->lock);
--	INIT_LIST_HEAD(&u->link);
- 	mutex_init(&u->iolock); /* single task reading lock */
- 	mutex_init(&u->bindlock); /* single task binding lock */
- 	init_waitqueue_head(&u->peer_wait);
-@@ -1793,8 +1791,6 @@ static inline bool too_many_unix_fds(struct task_struct *p)
- 
- static int unix_attach_fds(struct scm_cookie *scm, struct sk_buff *skb)
- {
--	int i;
--
- 	if (too_many_unix_fds(current))
- 		return -ETOOMANYREFS;
- 
-@@ -1806,9 +1802,6 @@ static int unix_attach_fds(struct scm_cookie *scm, struct sk_buff *skb)
- 	if (!UNIXCB(skb).fp)
- 		return -ENOMEM;
- 
--	for (i = scm->fp->count - 1; i >= 0; i--)
--		unix_inflight(scm->fp->user, scm->fp->fp[i]);
--
- 	if (unix_prepare_fpl(UNIXCB(skb).fp))
- 		return -ENOMEM;
- 
-@@ -1817,15 +1810,10 @@ static int unix_attach_fds(struct scm_cookie *scm, struct sk_buff *skb)
- 
- static void unix_detach_fds(struct scm_cookie *scm, struct sk_buff *skb)
- {
--	int i;
--
- 	scm->fp = UNIXCB(skb).fp;
- 	UNIXCB(skb).fp = NULL;
- 
- 	unix_destroy_fpl(scm->fp);
--
--	for (i = scm->fp->count - 1; i >= 0; i--)
--		unix_notinflight(scm->fp->user, scm->fp->fp[i]);
- }
- 
- static void unix_peek_fds(struct scm_cookie *scm, struct sk_buff *skb)
-diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-index 060e81be3614..59a87a997a4d 100644
---- a/net/unix/garbage.c
-+++ b/net/unix/garbage.c
-@@ -314,6 +314,48 @@ static bool unix_vertex_dead(struct unix_vertex *vertex)
- 	return true;
- }
- 
-+static struct sk_buff_head hitlist;
+ include ../../lib.mk
+diff --git a/tools/testing/selftests/net/af_unix/scm_rights.c b/tools/testing/selftests/net/af_unix/scm_rights.c
+new file mode 100644
+index 000000000000..bab606c9f1eb
+--- /dev/null
++++ b/tools/testing/selftests/net/af_unix/scm_rights.c
+@@ -0,0 +1,286 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright Amazon.com Inc. or its affiliates. */
++#define _GNU_SOURCE
++#include <sched.h>
 +
-+static void unix_collect_skb(struct list_head *scc)
++#include <stdio.h>
++#include <string.h>
++#include <unistd.h>
++#include <sys/types.h>
++#include <sys/socket.h>
++#include <sys/un.h>
++
++#include "../../kselftest_harness.h"
++
++FIXTURE(scm_rights)
 +{
-+	struct unix_vertex *vertex;
++	int fd[16];
++};
 +
-+	list_for_each_entry_reverse(vertex, scc, scc_entry) {
-+		struct sk_buff_head *queue;
-+		struct unix_edge *edge;
-+		struct unix_sock *u;
++FIXTURE_VARIANT(scm_rights)
++{
++	char name[16];
++	int type;
++	int flags;
++	bool test_listener;
++};
 +
-+		edge = list_first_entry(&vertex->edges, typeof(*edge), vertex_entry);
-+		u = edge->predecessor;
-+		queue = &u->sk.sk_receive_queue;
++FIXTURE_VARIANT_ADD(scm_rights, dgram)
++{
++	.name = "UNIX ",
++	.type = SOCK_DGRAM,
++	.flags = 0,
++	.test_listener = false,
++};
 +
-+		spin_lock(&queue->lock);
++FIXTURE_VARIANT_ADD(scm_rights, stream)
++{
++	.name = "UNIX-STREAM ",
++	.type = SOCK_STREAM,
++	.flags = 0,
++	.test_listener = false,
++};
 +
-+		if (u->sk.sk_state == TCP_LISTEN) {
-+			struct sk_buff *skb;
++FIXTURE_VARIANT_ADD(scm_rights, stream_oob)
++{
++	.name = "UNIX-STREAM ",
++	.type = SOCK_STREAM,
++	.flags = MSG_OOB,
++	.test_listener = false,
++};
 +
-+			skb_queue_walk(queue, skb) {
-+				struct sk_buff_head *embryo_queue = &skb->sk->sk_receive_queue;
++FIXTURE_VARIANT_ADD(scm_rights, stream_listener)
++{
++	.name = "UNIX-STREAM ",
++	.type = SOCK_STREAM,
++	.flags = 0,
++	.test_listener = true,
++};
 +
-+				spin_lock(&embryo_queue->lock);
-+				skb_queue_splice_init(embryo_queue, &hitlist);
-+				spin_unlock(&embryo_queue->lock);
-+			}
-+		} else {
-+			skb_queue_splice_init(queue, &hitlist);
++FIXTURE_VARIANT_ADD(scm_rights, stream_listener_oob)
++{
++	.name = "UNIX-STREAM ",
++	.type = SOCK_STREAM,
++	.flags = MSG_OOB,
++	.test_listener = true,
++};
 +
-+#if IS_ENABLED(CONFIG_AF_UNIX_OOB)
-+			if (u->oob_skb) {
-+				kfree_skb(u->oob_skb);
-+				u->oob_skb = NULL;
-+			}
-+#endif
-+		}
++static int count_sockets(struct __test_metadata *_metadata,
++			 const FIXTURE_VARIANT(scm_rights) *variant)
++{
++	int sockets = -1, len, ret;
++	char *line = NULL;
++	size_t unused;
++	FILE *f;
 +
-+		spin_unlock(&queue->lock);
++	f = fopen("/proc/net/protocols", "r");
++	ASSERT_NE(NULL, f);
++
++	len = strlen(variant->name);
++
++	while (getline(&line, &unused, f) != -1) {
++		int unused2;
++
++		if (strncmp(line, variant->name, len))
++			continue;
++
++		ret = sscanf(line + len, "%d %d", &unused2, &sockets);
++		ASSERT_EQ(2, ret);
++
++		break;
++	}
++
++	free(line);
++
++	ret = fclose(f);
++	ASSERT_EQ(0, ret);
++
++	return sockets;
++}
++
++FIXTURE_SETUP(scm_rights)
++{
++	int ret;
++
++	ret = unshare(CLONE_NEWNET);
++	ASSERT_EQ(0, ret);
++
++	ret = count_sockets(_metadata, variant);
++	ASSERT_EQ(0, ret);
++}
++
++FIXTURE_TEARDOWN(scm_rights)
++{
++	int ret;
++
++	sleep(1);
++
++	ret = count_sockets(_metadata, variant);
++	ASSERT_EQ(0, ret);
++}
++
++static void create_listeners(struct __test_metadata *_metadata,
++			     FIXTURE_DATA(scm_rights) *self,
++			     int n)
++{
++	struct sockaddr_un addr = {
++		.sun_family = AF_UNIX,
++	};
++	socklen_t addrlen;
++	int i, ret;
++
++	for (i = 0; i < n * 2; i += 2) {
++		self->fd[i] = socket(AF_UNIX, SOCK_STREAM, 0);
++		ASSERT_LE(0, self->fd[i]);
++
++		addrlen = sizeof(addr.sun_family);
++		ret = bind(self->fd[i], (struct sockaddr *)&addr, addrlen);
++		ASSERT_EQ(0, ret);
++
++		ret = listen(self->fd[i], -1);
++		ASSERT_EQ(0, ret);
++
++		addrlen = sizeof(addr);
++		ret = getsockname(self->fd[i], (struct sockaddr *)&addr, &addrlen);
++		ASSERT_EQ(0, ret);
++
++		self->fd[i + 1] = socket(AF_UNIX, SOCK_STREAM, 0);
++		ASSERT_LE(0, self->fd[i + 1]);
++
++		ret = connect(self->fd[i + 1], (struct sockaddr *)&addr, addrlen);
++		ASSERT_EQ(0, ret);
 +	}
 +}
 +
- static bool unix_scc_cyclic(struct list_head *scc)
- {
- 	struct unix_vertex *vertex;
-@@ -389,7 +431,9 @@ static void __unix_walk_scc(struct unix_vertex *vertex)
- 				dead = unix_vertex_dead(vertex);
- 		}
- 
--		if (!unix_graph_maybe_cyclic)
-+		if (dead)
-+			unix_collect_skb(&scc);
-+		else if (!unix_graph_maybe_cyclic)
- 			unix_graph_maybe_cyclic = unix_scc_cyclic(&scc);
- 
- 		list_del(&scc);
-@@ -434,263 +478,38 @@ static void unix_walk_scc_fast(void)
- 				dead = unix_vertex_dead(vertex);
- 		}
- 
-+		if (dead)
-+			unix_collect_skb(&scc);
++static void create_socketpairs(struct __test_metadata *_metadata,
++			       FIXTURE_DATA(scm_rights) *self,
++			       const FIXTURE_VARIANT(scm_rights) *variant,
++			       int n)
++{
++	int i, ret;
 +
- 		list_del(&scc);
- 	}
- 
- 	list_replace_init(&unix_visited_vertices, &unix_unvisited_vertices);
- }
- 
--static LIST_HEAD(gc_candidates);
--static LIST_HEAD(gc_inflight_list);
--
--/* Keep the number of times in flight count for the file
-- * descriptor if it is for an AF_UNIX socket.
-- */
--void unix_inflight(struct user_struct *user, struct file *filp)
--{
--	struct unix_sock *u = unix_get_socket(filp);
--
--	spin_lock(&unix_gc_lock);
--
--	if (u) {
--		if (!u->inflight) {
--			WARN_ON_ONCE(!list_empty(&u->link));
--			list_add_tail(&u->link, &gc_inflight_list);
--		} else {
--			WARN_ON_ONCE(list_empty(&u->link));
--		}
--		u->inflight++;
--	}
--
--	spin_unlock(&unix_gc_lock);
--}
--
--void unix_notinflight(struct user_struct *user, struct file *filp)
--{
--	struct unix_sock *u = unix_get_socket(filp);
--
--	spin_lock(&unix_gc_lock);
--
--	if (u) {
--		WARN_ON_ONCE(!u->inflight);
--		WARN_ON_ONCE(list_empty(&u->link));
--
--		u->inflight--;
--		if (!u->inflight)
--			list_del_init(&u->link);
--	}
--
--	spin_unlock(&unix_gc_lock);
--}
--
--static void scan_inflight(struct sock *x, void (*func)(struct unix_sock *),
--			  struct sk_buff_head *hitlist)
--{
--	struct sk_buff *skb;
--	struct sk_buff *next;
--
--	spin_lock(&x->sk_receive_queue.lock);
--	skb_queue_walk_safe(&x->sk_receive_queue, skb, next) {
--		/* Do we have file descriptors ? */
--		if (UNIXCB(skb).fp) {
--			bool hit = false;
--			/* Process the descriptors of this socket */
--			int nfd = UNIXCB(skb).fp->count;
--			struct file **fp = UNIXCB(skb).fp->fp;
--
--			while (nfd--) {
--				/* Get the socket the fd matches if it indeed does so */
--				struct unix_sock *u = unix_get_socket(*fp++);
--
--				/* Ignore non-candidates, they could have been added
--				 * to the queues after starting the garbage collection
--				 */
--				if (u && test_bit(UNIX_GC_CANDIDATE, &u->gc_flags)) {
--					hit = true;
--
--					func(u);
--				}
--			}
--			if (hit && hitlist != NULL) {
--				__skb_unlink(skb, &x->sk_receive_queue);
--				__skb_queue_tail(hitlist, skb);
--			}
--		}
--	}
--	spin_unlock(&x->sk_receive_queue.lock);
--}
--
--static void scan_children(struct sock *x, void (*func)(struct unix_sock *),
--			  struct sk_buff_head *hitlist)
--{
--	if (x->sk_state != TCP_LISTEN) {
--		scan_inflight(x, func, hitlist);
--	} else {
--		struct sk_buff *skb;
--		struct sk_buff *next;
--		struct unix_sock *u;
--		LIST_HEAD(embryos);
--
--		/* For a listening socket collect the queued embryos
--		 * and perform a scan on them as well.
--		 */
--		spin_lock(&x->sk_receive_queue.lock);
--		skb_queue_walk_safe(&x->sk_receive_queue, skb, next) {
--			u = unix_sk(skb->sk);
--
--			/* An embryo cannot be in-flight, so it's safe
--			 * to use the list link.
--			 */
--			WARN_ON_ONCE(!list_empty(&u->link));
--			list_add_tail(&u->link, &embryos);
--		}
--		spin_unlock(&x->sk_receive_queue.lock);
--
--		while (!list_empty(&embryos)) {
--			u = list_entry(embryos.next, struct unix_sock, link);
--			scan_inflight(&u->sk, func, hitlist);
--			list_del_init(&u->link);
--		}
--	}
--}
--
--static void dec_inflight(struct unix_sock *usk)
--{
--	usk->inflight--;
--}
--
--static void inc_inflight(struct unix_sock *usk)
--{
--	usk->inflight++;
--}
--
--static void inc_inflight_move_tail(struct unix_sock *u)
--{
--	u->inflight++;
--
--	/* If this still might be part of a cycle, move it to the end
--	 * of the list, so that it's checked even if it was already
--	 * passed over
--	 */
--	if (test_bit(UNIX_GC_MAYBE_CYCLE, &u->gc_flags))
--		list_move_tail(&u->link, &gc_candidates);
--}
--
- static bool gc_in_progress;
- 
- static void __unix_gc(struct work_struct *work)
- {
--	struct sk_buff_head hitlist;
--	struct unix_sock *u, *next;
--	LIST_HEAD(not_cycle_list);
--	struct list_head cursor;
--
- 	spin_lock(&unix_gc_lock);
- 
--	if (!unix_graph_maybe_cyclic)
-+	if (!unix_graph_maybe_cyclic) {
-+		spin_unlock(&unix_gc_lock);
- 		goto skip_gc;
++	ASSERT_GE(sizeof(self->fd) / sizeof(int), n);
++
++	for (i = 0; i < n * 2; i += 2) {
++		ret = socketpair(AF_UNIX, variant->type, 0, self->fd + i);
++		ASSERT_EQ(0, ret);
 +	}
++}
 +
-+	__skb_queue_head_init(&hitlist);
- 
- 	if (unix_graph_grouped)
- 		unix_walk_scc_fast();
- 	else
- 		unix_walk_scc();
- 
--	/* First, select candidates for garbage collection.  Only
--	 * in-flight sockets are considered, and from those only ones
--	 * which don't have any external reference.
--	 *
--	 * Holding unix_gc_lock will protect these candidates from
--	 * being detached, and hence from gaining an external
--	 * reference.  Since there are no possible receivers, all
--	 * buffers currently on the candidates' queues stay there
--	 * during the garbage collection.
--	 *
--	 * We also know that no new candidate can be added onto the
--	 * receive queues.  Other, non candidate sockets _can_ be
--	 * added to queue, so we must make sure only to touch
--	 * candidates.
--	 */
--	list_for_each_entry_safe(u, next, &gc_inflight_list, link) {
--		long total_refs;
--
--		total_refs = file_count(u->sk.sk_socket->file);
--
--		WARN_ON_ONCE(!u->inflight);
--		WARN_ON_ONCE(total_refs < u->inflight);
--		if (total_refs == u->inflight) {
--			list_move_tail(&u->link, &gc_candidates);
--			__set_bit(UNIX_GC_CANDIDATE, &u->gc_flags);
--			__set_bit(UNIX_GC_MAYBE_CYCLE, &u->gc_flags);
--		}
--	}
--
--	/* Now remove all internal in-flight reference to children of
--	 * the candidates.
--	 */
--	list_for_each_entry(u, &gc_candidates, link)
--		scan_children(&u->sk, dec_inflight, NULL);
--
--	/* Restore the references for children of all candidates,
--	 * which have remaining references.  Do this recursively, so
--	 * only those remain, which form cyclic references.
--	 *
--	 * Use a "cursor" link, to make the list traversal safe, even
--	 * though elements might be moved about.
--	 */
--	list_add(&cursor, &gc_candidates);
--	while (cursor.next != &gc_candidates) {
--		u = list_entry(cursor.next, struct unix_sock, link);
--
--		/* Move cursor to after the current position. */
--		list_move(&cursor, &u->link);
--
--		if (u->inflight) {
--			list_move_tail(&u->link, &not_cycle_list);
--			__clear_bit(UNIX_GC_MAYBE_CYCLE, &u->gc_flags);
--			scan_children(&u->sk, inc_inflight_move_tail, NULL);
--		}
--	}
--	list_del(&cursor);
--
--	/* Now gc_candidates contains only garbage.  Restore original
--	 * inflight counters for these as well, and remove the skbuffs
--	 * which are creating the cycle(s).
--	 */
--	skb_queue_head_init(&hitlist);
--	list_for_each_entry(u, &gc_candidates, link) {
--		scan_children(&u->sk, inc_inflight, &hitlist);
--
--#if IS_ENABLED(CONFIG_AF_UNIX_OOB)
--		if (u->oob_skb) {
--			kfree_skb(u->oob_skb);
--			u->oob_skb = NULL;
--		}
--#endif
--	}
--
--	/* not_cycle_list contains those sockets which do not make up a
--	 * cycle.  Restore these to the inflight list.
--	 */
--	while (!list_empty(&not_cycle_list)) {
--		u = list_entry(not_cycle_list.next, struct unix_sock, link);
--		__clear_bit(UNIX_GC_CANDIDATE, &u->gc_flags);
--		list_move_tail(&u->link, &gc_inflight_list);
--	}
--
- 	spin_unlock(&unix_gc_lock);
- 
--	/* Here we are. Hitlist is filled. Die. */
- 	__skb_queue_purge(&hitlist);
--
--	spin_lock(&unix_gc_lock);
--
--	/* All candidates should have been detached by now. */
--	WARN_ON_ONCE(!list_empty(&gc_candidates));
- skip_gc:
--	/* Paired with READ_ONCE() in wait_for_unix_gc(). */
- 	WRITE_ONCE(gc_in_progress, false);
--
--	spin_unlock(&unix_gc_lock);
- }
- 
- static DECLARE_WORK(unix_gc_work, __unix_gc);
++static void __create_sockets(struct __test_metadata *_metadata,
++			     FIXTURE_DATA(scm_rights) *self,
++			     const FIXTURE_VARIANT(scm_rights) *variant,
++			     int n)
++{
++	if (variant->test_listener)
++		create_listeners(_metadata, self, n);
++	else
++		create_socketpairs(_metadata, self, variant, n);
++}
++
++static void __close_sockets(struct __test_metadata *_metadata,
++			    FIXTURE_DATA(scm_rights) *self,
++			    int n)
++{
++	int i, ret;
++
++	ASSERT_GE(sizeof(self->fd) / sizeof(int), n);
++
++	for (i = 0; i < n * 2; i++) {
++		ret = close(self->fd[i]);
++		ASSERT_EQ(0, ret);
++	}
++}
++
++void __send_fd(struct __test_metadata *_metadata,
++	       const FIXTURE_DATA(scm_rights) *self,
++	       const FIXTURE_VARIANT(scm_rights) *variant,
++	       int inflight, int receiver)
++{
++#define MSG "nop"
++#define MSGLEN 3
++	struct {
++		struct cmsghdr cmsghdr;
++		int fd[2];
++	} cmsg = {
++		.cmsghdr = {
++			.cmsg_len = CMSG_LEN(sizeof(cmsg.fd)),
++			.cmsg_level = SOL_SOCKET,
++			.cmsg_type = SCM_RIGHTS,
++		},
++		.fd = {
++			self->fd[inflight * 2],
++			self->fd[inflight * 2],
++		},
++	};
++	struct iovec iov = {
++		.iov_base = MSG,
++		.iov_len = MSGLEN,
++	};
++	struct msghdr msg = {
++		.msg_name = NULL,
++		.msg_namelen = 0,
++		.msg_iov = &iov,
++		.msg_iovlen = 1,
++		.msg_control = &cmsg,
++		.msg_controllen = CMSG_SPACE(sizeof(cmsg.fd)),
++	};
++	int ret;
++
++	ret = sendmsg(self->fd[receiver * 2 + 1], &msg, variant->flags);
++	ASSERT_EQ(MSGLEN, ret);
++}
++
++#define create_sockets(n)					\
++	__create_sockets(_metadata, self, variant, n)
++#define close_sockets(n)					\
++	__close_sockets(_metadata, self, n)
++#define send_fd(inflight, receiver)				\
++	__send_fd(_metadata, self, variant, inflight, receiver)
++
++TEST_F(scm_rights, self_ref)
++{
++	create_sockets(2);
++
++	send_fd(0, 0);
++
++	send_fd(1, 1);
++
++	close_sockets(2);
++}
++
++TEST_F(scm_rights, triangle)
++{
++	create_sockets(6);
++
++	send_fd(0, 1);
++	send_fd(1, 2);
++	send_fd(2, 0);
++
++	send_fd(3, 4);
++	send_fd(4, 5);
++	send_fd(5, 3);
++
++	close_sockets(6);
++}
++
++TEST_F(scm_rights, cross_edge)
++{
++	create_sockets(8);
++
++	send_fd(0, 1);
++	send_fd(1, 2);
++	send_fd(2, 0);
++	send_fd(1, 3);
++	send_fd(3, 2);
++
++	send_fd(4, 5);
++	send_fd(5, 6);
++	send_fd(6, 4);
++	send_fd(5, 7);
++	send_fd(7, 6);
++
++	close_sockets(8);
++}
++
++TEST_HARNESS_MAIN
 -- 
 2.30.2
 
