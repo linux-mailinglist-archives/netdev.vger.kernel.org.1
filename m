@@ -1,103 +1,121 @@
-Return-Path: <netdev+bounces-74525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A72D4861BE9
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 19:41:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3031A861C12
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 19:46:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 479A31F29131
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 18:41:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA1F51F26F99
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 18:46:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D659B1EB52;
-	Fri, 23 Feb 2024 18:41:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JVl01BxN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A216145332;
+	Fri, 23 Feb 2024 18:45:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DC23142624
-	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 18:41:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C4F143C7F;
+	Fri, 23 Feb 2024 18:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708713667; cv=none; b=oocsjXrfxOWt+g44iWOpgGp/cl38S/Cz0rhKZ8+GbtR0Qk/psHcU70jFG+oFYY1yuZQXnmNGqUiq+w2OkbMJ4Mfd/nQaTWRA/w6VhLwxahdBIX3dcO0jgbvIiNa2BUF4q9bpMWE+wHKIHhbyVM75Bx0KGEyX/kURoOvof96PoQo=
+	t=1708713908; cv=none; b=ORTvMd3ACEcf13KXOpCUTkzInyjX3JMog5Y6o3gk0NtvoCD8VAXTimEYAR3rYCrSsibTxh++P2TjKTWhF2lrZQ3JOVfs6VDDjeia5Up6yd5IgKwvG0zUWb4HNLx3TCTYTeZMIzmk+4eJsEryVq5UNfI1mHdo8M9Kb8vCWz9G5/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708713667; c=relaxed/simple;
-	bh=BKmU1ottIKZg7mi7mY2yCA6PoDkcs/iUSw4v0HQkrS8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AjNQ+ySfepPHG/yFVqjlo+RRgS9TTKQ6WFuvPl9w78sL9uvyboAfe0BUK6u+VDsDV6zlbEJw+viEOAxAJJxXlD8hR2Hc9bFPU2J0OOGksZ8gQcdNDZW6AxqatSE3V3i1TL1XkitXZDnluyz0QxpspzS2lMhwXAfELZAhGnPEzGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JVl01BxN; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 23 Feb 2024 13:40:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1708713660;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TtVW+3bSqdUyNHjHnisMJsaNnmBRav1E+zZ0KWEbo8k=;
-	b=JVl01BxN5WobZivCOUkRPMMLHVzo7x8aYNQ5FNsgndbGS+8V1ajGL4xF/JGkyBhLNcv+1J
-	A5HfAOu0GBXMAxAYhb6QderZu9l4gHgrz+KouVyM8vhplGKqmvbOJdld9YfMqiw4z25mfc
-	8MqWXIEpMqAooqsXLIPsEMOaOiWKlJo=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: "Matthew Wilcox (Oracle)" <willy@infradead.org>
-Cc: linux-kernel@vger.kernel.org, Thomas Graf <tgraf@suug.ch>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	maple-tree@lists.infradead.org, rcu@vger.kernel.org
-Subject: Re: [PATCH 0/1] Rosebush, a new hash table
-Message-ID: <jqvbwntesw7rftdw5mibgy37k3lslgn77pul6kbawbvvpt5uck@dpuhhm33vdzy>
-References: <20240222203726.1101861-1-willy@infradead.org>
+	s=arc-20240116; t=1708713908; c=relaxed/simple;
+	bh=HNxDQrAqfHomkkBAL+GsWJU+Nkbn4bLBCPF0LWecwlI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mH8XCKDle3MAUNNmPjBhTAoJf8lgWMqqOLY/1IwskOvfca79pAs0qZuk2PuwroASSBLtVEASVc4GEm+gPccW/cTRU4/KsGBsxuHoONvRWQiKYbckgjgSWIfTFSZdmDXKmLMVL7vnDSd8oo4QUUv8u/SljNoZDDP/KBLdJowgpIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C3ACC433C7;
+	Fri, 23 Feb 2024 18:45:01 +0000 (UTC)
+Date: Fri, 23 Feb 2024 13:46:53 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Jeff Johnson <quic_jjohnson@quicinc.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, Linux Trace Kernel
+ <linux-trace-kernel@vger.kernel.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ <linuxppc-dev@lists.ozlabs.org>, <kvm@vger.kernel.org>,
+ <linux-block@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
+ <linux-media@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+ <amd-gfx@lists.freedesktop.org>, <intel-gfx@lists.freedesktop.org>,
+ <intel-xe@lists.freedesktop.org>, <linux-arm-msm@vger.kernel.org>,
+ <freedreno@lists.freedesktop.org>, <virtualization@lists.linux.dev>,
+ <linux-rdma@vger.kernel.org>, <linux-pm@vger.kernel.org>,
+ <iommu@lists.linux.dev>, <linux-tegra@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <linux-hyperv@vger.kernel.org>,
+ <ath10k@lists.infradead.org>, <linux-wireless@vger.kernel.org>,
+ <ath11k@lists.infradead.org>, <ath12k@lists.infradead.org>,
+ <brcm80211@lists.linux.dev>, <brcm80211-dev-list.pdl@broadcom.com>,
+ <linux-usb@vger.kernel.org>, <linux-bcachefs@vger.kernel.org>,
+ <linux-nfs@vger.kernel.org>, <ocfs2-devel@lists.linux.dev>,
+ <linux-cifs@vger.kernel.org>, <linux-xfs@vger.kernel.org>,
+ <linux-edac@vger.kernel.org>, <selinux@vger.kernel.org>,
+ <linux-btrfs@vger.kernel.org>, <linux-erofs@lists.ozlabs.org>,
+ <linux-f2fs-devel@lists.sourceforge.net>, <linux-hwmon@vger.kernel.org>,
+ <io-uring@vger.kernel.org>, <linux-sound@vger.kernel.org>,
+ <bpf@vger.kernel.org>, <linux-wpan@vger.kernel.org>, <dev@openvswitch.org>,
+ <linux-s390@vger.kernel.org>, <tipc-discussion@lists.sourceforge.net>,
+ Julia Lawall <Julia.Lawall@inria.fr>
+Subject: Re: [FYI][PATCH] tracing/treewide: Remove second parameter of
+ __assign_str()
+Message-ID: <20240223134653.524a5c9e@gandalf.local.home>
+In-Reply-To: <0aed6cf2-17ae-45aa-b7ff-03da932ea4e0@quicinc.com>
+References: <20240223125634.2888c973@gandalf.local.home>
+	<0aed6cf2-17ae-45aa-b7ff-03da932ea4e0@quicinc.com>
+X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240222203726.1101861-1-willy@infradead.org>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 22, 2024 at 08:37:23PM +0000, Matthew Wilcox (Oracle) wrote:
-> Rosebush is a resizing, scalable, cache-aware, RCU optimised hash table.
-> I've written a load of documentation about how it works, mostly in
-> Documentation/core-api/rosebush.rst but some is dotted through the
-> rosebush.c file too.
+On Fri, 23 Feb 2024 10:30:45 -0800
+Jeff Johnson <quic_jjohnson@quicinc.com> wrote:
+
+> On 2/23/2024 9:56 AM, Steven Rostedt wrote:
+> > From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
+> > 
+> > [
+> >    This is a treewide change. I will likely re-create this patch again in
+> >    the second week of the merge window of v6.9 and submit it then. Hoping
+> >    to keep the conflicts that it will cause to a minimum.
+> > ]
+> > 
+> > With the rework of how the __string() handles dynamic strings where it
+> > saves off the source string in field in the helper structure[1], the
+> > assignment of that value to the trace event field is stored in the helper
+> > value and does not need to be passed in again.  
 > 
-> You can see this code as a further exploration of the "Linked lists are
-> evil" design space.  For the workloads which a hashtable is suited to,
-> it has lower overhead than either the maple tree or the rhashtable.
-> It cannot support ranges (so is not a replacement for the maple tree),
-> but it does have per-bucket locks so is more scalable for write-heavy
-> workloads.  I suspect one could reimplement the rhashtable API on top
-> of the rosebush, but I am not interested in doing that work myself.
-> 
-> The per-object overhead is 12 bytes, as opposed to 16 bytes for the
-> rhashtable and 32 bytes for the maple tree.  The constant overhead is also
-> small, being just 16 bytes for the struct rosebush.  The exact amount
-> of memory consumed for a given number of objects is going to depend on
-> the distribution of hashes; here are some estimated consumptions for
-> power-of-ten entries distributed evenly over a 32-bit hash space in the
-> various data structures:
-> 
-> number	xarray	maple	rhash	rosebush
-> 1	3472	272	280	256
-> 10	32272	784	424	256
-> 100	262kB	3600	1864	2080
-> 1000	[1]	34576	17224	16432
-> 10k	[1]	343k	168392	131344
-> 100k	[1]	3.4M	1731272	2101264
+> Just curious if this could be done piecemeal by first changing the
+> macros to be variadic macros which allows you to ignore the extra
+> argument. The callers could then be modified in their separate trees.
+> And then once all the callers have be merged, the macros could be
+> changed to no longer be variadic.
 
-So I think the interesting numbers to see (besides performance numbers)
-are going to be the fill factor numbers under real world use.
+I weighed doing that, but I think ripping off the band-aid is a better
+approach. One thing I found is that leaving unused parameters in the macros
+can cause bugs itself. I found one case doing my clean up, where an unused
+parameter in one of the macros was bogus, and when I made it a used
+parameter, it broke the build.
 
-It's an interesting technique, I've played around with it a bit
-(actually using it in bcachefs for the nocow locks hash table), but no
-idea if it makes sense as a general purpose thing yet...
+I think for tree-wide changes, the preferred approach is to do one big
+patch at once. And since this only affects TRACE_EVENT() macros, it
+hopefully would not be too much of a burden (although out of tree users may
+suffer from this, but do we care?)
 
-you also mentioned that a motivation was API mismatch between rhashtable
-and dcache - could you elaborate on that?
+Now one thing I could do is to not remove the parameter, but just add:
+
+	WARN_ON_ONCE((src) != __data_offsets->item##_ptr_);
+
+in the __assign_str() macro to make sure that it's still the same that is
+assigned. But I'm not sure how useful that is, and still causes burden to
+have it. I never really liked the passing of the string in two places to
+begin with.
+
+-- Steve
 
