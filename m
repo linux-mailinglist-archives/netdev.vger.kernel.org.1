@@ -1,122 +1,157 @@
-Return-Path: <netdev+bounces-74494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 021F08617B3
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 17:23:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E13C88617C4
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 17:25:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29A29B29F83
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 16:22:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EA6F1C24D30
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 16:25:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4906884A4E;
-	Fri, 23 Feb 2024 16:21:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DBAB84FA5;
+	Fri, 23 Feb 2024 16:22:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="bY3wAw5C"
+	dkim=pass (2048-bit key) header.d=analog.com header.i=@analog.com header.b="IwexxEu3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00128a01.pphosted.com (mx0a-00128a01.pphosted.com [148.163.135.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C0A783A01
-	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 16:21:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 880AE84A43;
+	Fri, 23 Feb 2024 16:22:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708705288; cv=none; b=IgQQKFe2GF39jp9qRnBOfr5t+btkWLlIwloEVHmKm15fYtU4v9omQQbsjLycxocQJ8ahcDBPsNbIhDI9BhRmSOU5MaYlPsyU9sIPpkeKDnWqS74tM9XUNBtqFpBTILy6Gjzrun6TUonaDncFmOBUUeRXtzlwAiMW8gj65CUqx0E=
+	t=1708705354; cv=none; b=athxGLLFAGL79F7NxS4Tb2Tsvj3cJu/Xmf92DzHdNAM5BwLmBUXYWp1lbD9BB+p6jEFSJHhIglodkZ0niG/COCKqW/oDETOfT8AySsRZ+ivivDeylRMSWnZQ8OgBqiPkEINsVtbSHGYYG1Vrvr4870pEQUAjM95oWKIAwbGDshc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708705288; c=relaxed/simple;
-	bh=I5QFyxdVzWASuFrJaWSyJOfTumcmKNivw74+YM7+w4U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ICsOG2c6Lb+ZLSDOt17f2T1cjZWWQAfMjNvtmy1B60aZdv5S0ju/TZId1fMFJv970eZpAJ2DtmIA9qOnHiVa5nnEaAzY0I+vOQ1U45FodIye2SNS5i9yaqfylvX83zT21bMzEEPeL+7YrsUJA7Z3DF19AlY+xsOzj2sNTS4X6hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=bY3wAw5C; arc=none smtp.client-ip=209.85.219.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-dc74e33fe1bso525189276.0
-        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 08:21:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1708705285; x=1709310085; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=531p65ZfbJ3tCm0in//zgzyoYtsDn2UJBD0qfAVVOaI=;
-        b=bY3wAw5CywfIZWtYS/ttvkZuwMfm8zGaqmO0OYsezaUOs0D7AkBMWDNmeqvy0SWMzs
-         7lzXzP7L8turbXca64iRA7WEAkHluZG3dcCm3v+wUFqN33tOCfyJ6WCHEeB4ksuMB2OE
-         Ny2LQoz1hTLK0WDAzVEHL4V7/ipZ+DBPzJ5SZWchvfSZqV0xFJLprjvJpZkG799yLjCb
-         C9bPkdaoe46LT81afsTH2gm7t0xQbvJ5PClSflv01cctaZPymnbv0uwj9BL5AUcEG+ug
-         9ZX4gO3TvSsFOTQj6wlbTFkQJog/mhQTNutZ2HtvTFZ6lbu4cWUFyqLJcYKvz5C9gIOP
-         IrUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708705285; x=1709310085;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=531p65ZfbJ3tCm0in//zgzyoYtsDn2UJBD0qfAVVOaI=;
-        b=nF36aOlEZyl4zyHq1ozRcw8FdgxS5xSx3R1kvB/p9uuC2Uv8npRmuDYPXGBW2mUF3q
-         bKbV6d/fP/ncsIyrqSdUmi5IM88mZ4h7sGh9u0wzIOWDIAS/V1eGtrJ2xb/XTx3fb+xt
-         Wrd/16QDap/EaudQ2+c55ZaJF39lHE5/bSxCQTcOHBiYiR11yM/zBCoTRxf1yygBs06p
-         EbNpsNnk9G4QNF/QsQprmuixIzwXswWtgY54nOz1I6HGUTIejt/sd2r3gDN0jpl1axCd
-         8wQgO3Ozf00R3XsK0mByXBk793LRK1cM1yLJ1y/Q/2E76+4H0dX3BkmrFDQf/+1ivMVF
-         jr6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUtjCo5CqMJf5miRtcfT3MoGHgrRqMyraosC+YDOlY1UO3nJShSNaBR7PDmuiBmz0DsQd1Yqosg0V2twZ0STsHzM4rU7RJ8
-X-Gm-Message-State: AOJu0YxhLj/8uaX60GhREOQCCFR1fP1gNtpCB7aXuJq5eNlK+NV5sE2v
-	7xu/g5s2iJ9eBvByTiYqWBPMj/KxQf8I70igsu38V9jxp2MDWUOzbHet5bUNEGO3xoS6tplJNk4
-	WUtWcsZjlMYl8vOoGuAq0S9u5Pgsqg8iguISC
-X-Google-Smtp-Source: AGHT+IE4FvTSxbuO+ftuRzsiGCOPBSf8+pLd8oVyNiCVjjjdg7HtSUr/AB6gZpwpMPigIzKnGNoZrdrwimEyPJkfzXo=
-X-Received: by 2002:a25:6a86:0:b0:dcf:309d:cc2b with SMTP id
- f128-20020a256a86000000b00dcf309dcc2bmr245419ybc.18.1708705285629; Fri, 23
- Feb 2024 08:21:25 -0800 (PST)
+	s=arc-20240116; t=1708705354; c=relaxed/simple;
+	bh=/vLgQrFwJEPLauOCnRVsxD4IFLYVgo2gFjfrUtYt3oY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WGiugGguFtZ233GDUOas1OVvMiQ4vgRS7obPPIK9QfxI8SzktuhzI1T5YA5Pm74+N3hwTGRvNxyc2+k2otaJNVzsJnE4PjxFli8UXHAbe4LvaVEOHjKY2pgYt/71jMv54LCFBqS7kVi4V1a+z9fZx5kO8OF16sSVsCkHP6qKBXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=analog.com; spf=pass smtp.mailfrom=analog.com; dkim=pass (2048-bit key) header.d=analog.com header.i=@analog.com header.b=IwexxEu3; arc=none smtp.client-ip=148.163.135.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=analog.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=analog.com
+Received: from pps.filterd (m0167089.ppops.net [127.0.0.1])
+	by mx0a-00128a01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41NEqwng014764;
+	Fri, 23 Feb 2024 11:22:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=analog.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=DKIM; bh=oFUn0e6fWFYT
+	CZbbrqZsUmODUYxqH0R9/qbP33pHpJw=; b=IwexxEu3LRbgWPzY0f3yxng1DYCy
+	y1Wk1NANUQjyyc9op0L9aQEXkH5jSdkxQqy1rhgASuvUuBsR22vEsXH+Yxoh7KY0
+	ShjKpwPT2oX99DjbiXxp+IROvEaZMqOYvDSU+1bGZAYCpvWHvqOU+m+gfTPifu/x
+	DKCmQTWPWY42XtpPg+TMBLdLHY+MOaWuSog4cpQ4AryAWZPkj47ceAD6NAUvrnXg
+	/i1FIpjrkr51VTS7zr6gtpSVQij8QDgSYB0Y7svAxzFL8OPQ9rcppBHaBNWwFj2i
+	DF1FOgXX7nMkRry763uv55jU9h1I/9+umsKJmefcD6dScPnncLCznzCbBg==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-00128a01.pphosted.com (PPS) with ESMTPS id 3wd21pf9xk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 23 Feb 2024 11:22:10 -0500 (EST)
+Received: from m0167089.ppops.net (m0167089.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.24/8.17.1.24) with ESMTP id 41NGKI3f017473;
+	Fri, 23 Feb 2024 11:22:09 -0500
+Received: from nwd2mta3.analog.com ([137.71.173.56])
+	by mx0a-00128a01.pphosted.com (PPS) with ESMTPS id 3wd21pf9xf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 23 Feb 2024 11:22:09 -0500 (EST)
+Received: from ASHBMBX8.ad.analog.com (ASHBMBX8.ad.analog.com [10.64.17.5])
+	by nwd2mta3.analog.com (8.14.7/8.14.7) with ESMTP id 41NGM80a054843
+	(version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Fri, 23 Feb 2024 11:22:08 -0500
+Received: from ASHBCASHYB4.ad.analog.com (10.64.17.132) by
+ ASHBMBX8.ad.analog.com (10.64.17.5) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.14; Fri, 23 Feb 2024 11:22:07 -0500
+Received: from ASHBMBX8.ad.analog.com (10.64.17.5) by
+ ASHBCASHYB4.ad.analog.com (10.64.17.132) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.14; Fri, 23 Feb 2024 11:22:07 -0500
+Received: from zeus.spd.analog.com (10.66.68.11) by ashbmbx8.ad.analog.com
+ (10.64.17.5) with Microsoft SMTP Server id 15.2.986.14 via Frontend
+ Transport; Fri, 23 Feb 2024 11:22:07 -0500
+Received: from debian.ad.analog.com ([10.48.65.188])
+	by zeus.spd.analog.com (8.15.1/8.15.1) with ESMTP id 41NGLkd8017870;
+	Fri, 23 Feb 2024 11:21:50 -0500
+From: Ciprian Regus <ciprian.regus@analog.com>
+To: <linux-kernel@vger.kernel.org>
+CC: Ciprian Regus <ciprian.regus@analog.com>, Nuno Sa <nuno.sa@analog.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, "Simon
+ Horman" <horms@kernel.org>,
+        Michal Simek <michal.simek@amd.com>, Mark Brown
+	<broonie@kernel.org>,
+        Yang Yingliang <yangyingliang@huawei.com>,
+        "Amit Kumar
+ Mahapatra" <amit.kumar-mahapatra@amd.com>,
+        Dell Jin
+	<dell.jin.code@outlook.com>, <netdev@vger.kernel.org>
+Subject: [net-next v2] net: ethernet: adi: adin1110: Reduce the MDIO_TRDONE poll interval
+Date: Fri, 23 Feb 2024 18:21:27 +0200
+Message-ID: <20240223162129.154114-1-ciprian.regus@analog.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240223125027.1c9f4f07@canb.auug.org.au>
-In-Reply-To: <20240223125027.1c9f4f07@canb.auug.org.au>
-From: Paul Moore <paul@paul-moore.com>
-Date: Fri, 23 Feb 2024 11:21:14 -0500
-Message-ID: <CAHC9VhRP4bKeBYcEe-xkdsXKa9XJLPxObkorTSbmE85WxT0AoA@mail.gmail.com>
-Subject: Re: linux-next: manual merge of the security tree with the net-next tree
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Networking <netdev@vger.kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Next Mailing List <linux-next@vger.kernel.org>, Ondrej Mosnacek <omosnace@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ADIRuleOP-NewSCL: Rule Triggered
+X-Proofpoint-GUID: 63px5bI0bZY2T_lLrSo_BQ0u28-f8xiP
+X-Proofpoint-ORIG-GUID: 5Y42PkLbr5XPh30Fp7Yl_JyYdeiND7n0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-23_02,2024-02-23_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
+ suspectscore=0 malwarescore=0 mlxlogscore=791 priorityscore=1501
+ impostorscore=0 clxscore=1011 lowpriorityscore=0 bulkscore=0 adultscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2402120000 definitions=main-2402230119
 
-On Thu, Feb 22, 2024 at 8:50=E2=80=AFPM Stephen Rothwell <sfr@canb.auug.org=
-.au> wrote:
->
-> Hi all,
->
-> Today's linux-next merge of the security tree got a conflict in:
->
->   security/security.c
->
-> between commits:
->
->   1b67772e4e3f ("bpf,lsm: Refactor bpf_prog_alloc/bpf_prog_free LSM hooks=
-")
->   a2431c7eabcf ("bpf,lsm: Refactor bpf_map_alloc/bpf_map_free LSM hooks")
->   f568a3d49af9 ("bpf,lsm: Add BPF token LSM hooks")
->
-> from the net-next tree and commit:
->
->   260017f31a8c ("lsm: use default hook return value in call_int_hook()")
->
-> from the security tree.
->
-> I fixed it up (I think, see below) and can carry the fix as
-> necessary. This is now fixed as far as linux-next is concerned, but any
-> non trivial conflicts should be mentioned to your upstream maintainer
-> when your tree is submitted for merging.  You may also want to consider
-> cooperating with the maintainer of the conflicting tree to minimise any
-> particularly complex conflicts.
+In order to do a clause 22 access to the PHY registers of the ADIN1110,
+we have to write the MDIO frame to the ADIN1110_MDIOACC register, and
+then poll the MDIO_TRDONE bit (for a 1) in the same register. The
+device will set this bit to 1 once the internal MDIO transaction is
+done. In practice, this bit takes ~50 - 60 us to be set.
 
-Thanks Stephen, this looks correct.
+The first attempt to poll the bit is right after the ADIN1110_MDIOACC
+register is written, so it will always be read as 0. The next check will
+only be done after 10 ms, which will result in the MDIO transactions
+taking a long time to complete. Reduce this polling interval to 100 us.
+Since this interval is short enough, switch the poll function to
+readx_poll_timeout_atomic() instead.
 
---=20
-paul-moore.com
+Reviewed-by: Nuno Sa <nuno.sa@analog.com>
+Signed-off-by: Ciprian Regus <ciprian.regus@analog.com>
+---
+Changelog v1 -> v2:
+- switch readx_poll_timeout() to readx_poll_timeout_atomic()
+
+ drivers/net/ethernet/adi/adin1110.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/adi/adin1110.c b/drivers/net/ethernet/adi/adin1110.c
+index d7c274af6d4d..8b4ef5121308 100644
+--- a/drivers/net/ethernet/adi/adin1110.c
++++ b/drivers/net/ethernet/adi/adin1110.c
+@@ -466,4 +466,5 @@ static int adin1110_mdio_read(struct mii_bus *bus, int phy_id, int reg)
+ 	 */
+-	ret = readx_poll_timeout(adin1110_read_mdio_acc, priv, val,
+-				 (val & ADIN1110_MDIO_TRDONE), 10000, 30000);
++	ret = readx_poll_timeout_atomic(adin1110_read_mdio_acc, priv, val,
++					(val & ADIN1110_MDIO_TRDONE),
++					100, 30000);
+ 	if (ret < 0)
+@@ -497,4 +498,5 @@ static int adin1110_mdio_write(struct mii_bus *bus, int phy_id,
+ 
+-	return readx_poll_timeout(adin1110_read_mdio_acc, priv, val,
+-				  (val & ADIN1110_MDIO_TRDONE), 10000, 30000);
++	return readx_poll_timeout_atomic(adin1110_read_mdio_acc, priv, val,
++					 (val & ADIN1110_MDIO_TRDONE),
++					 100, 30000);
+ }
+-- 
+2.39.2
+
 
