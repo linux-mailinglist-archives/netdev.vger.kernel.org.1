@@ -1,105 +1,99 @@
-Return-Path: <netdev+bounces-74439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF343861548
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 16:11:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A43D586155A
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 16:17:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E2311F25392
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 15:11:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CED631C2373B
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 15:17:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09AE98061C;
-	Fri, 23 Feb 2024 15:11:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6F3A81AD3;
+	Fri, 23 Feb 2024 15:16:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="h0rWbaEf"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="PZ4LQJRz"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF19F7175E;
-	Fri, 23 Feb 2024 15:11:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38574823C5
+	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 15:16:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708701070; cv=none; b=o4WmQx/McrKB0gUfwRVrSTuVTWHQippwqQHhkrf15cK3snkpp1zK6AeYCgp57m6h7yiszJtUvDyyGX5c9Q7DEZYylexklwiquUrYE83OcgVtZOXNyo0yF7OegOu+TJs2vHh6aR54YFwkhdzsMN0fBT1VfoIaVXaC//nKppN3ycI=
+	t=1708701416; cv=none; b=CXayQuy6150SpdOPqg0uFaOTKbCmBUIdn2ZvwAlDwEcP8YPVIZInp524c6PKzRcrgHais7UbQI/3irpfCSUQaIz2qQ7vPvzTKnoO3HQ4mudzDimPNwh+Bqpr7qLpilY1VVjNOzkv8po8EKzYQ/BvQY5kJoQl26a9S+8VpZ6Tl8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708701070; c=relaxed/simple;
-	bh=PxYjF1RutTsLPmE3OJ6tcrJ1xcdHiw4brWhvRfjFA9w=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RZl44I9q+ULpCJt+r3fM+RWowJGY0hWjCNiaLqPWccOeYA10zjC+2QTrj20LViW6Rh1V5woZTEeW5YP2Ar8tERsotNUHzyOXyEe5Rv9Qiceg9VlCZXqTsSaqP7FSp7+T+xYEizy4eXiY9qfLyTPnop4JDo2EBI7AAbPZdEzxd5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=h0rWbaEf; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 521E66000F;
-	Fri, 23 Feb 2024 15:10:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1708701060;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ydUaesQ0OVtKhYP+EhluA0cNkJa752d4qIXveokF4Ws=;
-	b=h0rWbaEfcT+buqVA4TnEgUUD0EqapemsxttQSTkXQ6OUyOpLbKRlZXN4rlvZehSOdjNM2s
-	aZ66FTmRsPx2ZxzDsA/+oo/8P36SoTYhFZBPDBDcaju++FI7SXuuwNuwCo8joKOtDwy9kk
-	uLk9Zt54c9ZuqWydu6sYstr/ViV88dwYHSBzkU1ODNgZ/6OolZXLMYf60shZb7fzJCq1cH
-	m6u/Zl57MpZzMkxAKXfBjBuXjNXELDhUV7QUmfZvNss+KkcJUQ+EgcsnnpGmMABEHNcZ5h
-	G06t+0lWrWOmPrehhKUG+8m53b6YPxA3zGrnglio20vWJnnl5RYKrTPnStaouQ==
-Date: Fri, 23 Feb 2024 16:10:57 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Conor Dooley <conor@kernel.org>, Rob Herring <robh@kernel.org>, Bastien
- Curutchet <bastien.curutchet@bootlin.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Richard Cochran <richardcochran@gmail.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, Herve Codina <herve.codina@bootlin.com>
-Subject: Re: [PATCH 1/2] dt-bindings: net: Add TI DP83640
-Message-ID: <20240223161057.07b7aa5c@device-28.home>
-In-Reply-To: <20240223160704.4018cac2@device-28.home>
-References: <20240130085935.33722-1-bastien.curutchet@bootlin.com>
-	<20240130085935.33722-2-bastien.curutchet@bootlin.com>
-	<20240130-impulsive-widow-9142a069b7fd@spud>
-	<20240131210521.GA2289883-robh@kernel.org>
-	<20240131-tummy-imperfect-e6d6f0e245e9@spud>
-	<a1e54836-51d2-4990-9444-56d9414eb28c@lunn.ch>
-	<20240223160704.4018cac2@device-28.home>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1708701416; c=relaxed/simple;
+	bh=V+eF6GOBmq4QtLwkfh53wsCcqUIk0FL763GG15CsJTg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=k3jZDDIbqSVe4cvvgQMI7LwANnh7ZLfVTceoHAf/+EwtouZm4QzjIiSDxTGO9RIh+MTyymvh7oq7G7QFM0rg3alcOC0MXenKFOWCB0MDrZ+KXFEtbQK7/rB5TD+9qcf/an4a8A28FOXX4Pb3sVDxC/EHylO3/vNBWaJL8qenvzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=PZ4LQJRz; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-41274cada64so3357505e9.1
+        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 07:16:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1708701413; x=1709306213; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=XqhdxtASeJ8dx3m7DNevXocAbantg3tsvCX+1KNjwW0=;
+        b=PZ4LQJRzd4t58SzzzR4PTWjCYgANXM2MC1EQQaykjBR88irgivjRmJZ2RTWWEZMlD5
+         eBGhe1nMQpjmZdAkZ40g/UisOs9UFZvNTut9F3i0Ar7z44xNL2HmRxKPdOJ6SvXMpC5Y
+         gpWoUcpljMmh1L5WXtCuZWq4j6amS67YII2vcIEUm4G0ddp5PTABKKVaoDIa5qikQWS/
+         eAcjYBNCgXxuyCx2Kt8fC0cMmPkf7g6syyBkH9JvkNe3Nvls6nuUMD0U8YwZwiyD7dVj
+         2cuaeXa5Z9RFZ8CNrr7wbdeOoNNfF57d1D0gz377A+VFXgaYLE8XPSEh8+dEh8tOu44p
+         7TyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708701413; x=1709306213;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XqhdxtASeJ8dx3m7DNevXocAbantg3tsvCX+1KNjwW0=;
+        b=uHYSWYly5PV0XDk/baFXVA5hcW6DIDNRyHK6ip2IDH7qHTFS5ax9tOz+ZmkTjOhufp
+         TDWLeJ3ylKkYyxt78+SK0lzNLxWu7bymIklM4tT3bvjd9ptKK19qvH44Yf/mXIAfYEAf
+         /yUZsivOvCreKiaQvDCKA7LIdptcb2Wrp5MAusKXoDzKG6Qr5vl7fVaCift0RKz3Mq9K
+         BWnycjtGBQ9BNPuu7T9Fbd04mCp2QFMFiPBi7FtapJqclfujpsPQ3LNN4j5G/IqJCzEW
+         A3hA5ovQ5d+Cnqck4GimZiBvtZGH0XHVbnTXSoh7tb6GMsyFNQODoe6mnfUwKBaC6rni
+         MZXQ==
+X-Gm-Message-State: AOJu0YzYLVLXa3+JIwZi/kd7dsAByz/MY05mGR7R2Y0yGePO3LjRsGYc
+	vLQ2O0TVRWROlFxslviZS7NDws/UjgD2P3IZuqfpyjBtZ6I3gjjtRieJlsHDoaU=
+X-Google-Smtp-Source: AGHT+IFoFRNAeU9WAqAR3cj9V65NwpGHgsoexPBtK0VBEmdMpM8a2WMjzOndswhPgHetm1BzB1hYMA==
+X-Received: by 2002:a5d:584a:0:b0:33d:7d85:9cf0 with SMTP id i10-20020a5d584a000000b0033d7d859cf0mr47260wrf.60.1708701413657;
+        Fri, 23 Feb 2024 07:16:53 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:b41:c160:25c8:f7d3:953d:aca4? ([2a01:e0a:b41:c160:25c8:f7d3:953d:aca4])
+        by smtp.gmail.com with ESMTPSA id bj26-20020a0560001e1a00b0033d97bd5ddasm3261585wrb.85.2024.02.23.07.16.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Feb 2024 07:16:53 -0800 (PST)
+Message-ID: <70a69107-565c-431e-93cc-bd9ce1f010f8@6wind.com>
+Date: Fri, 23 Feb 2024 16:16:52 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+User-Agent: Mozilla Thunderbird
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net-next 03/15] tools: ynl: create local for_each helpers
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ jiri@resnulli.us, sdf@google.com, donald.hunter@gmail.com
+References: <20240222235614.180876-1-kuba@kernel.org>
+ <20240222235614.180876-4-kuba@kernel.org>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Organization: 6WIND
+In-Reply-To: <20240222235614.180876-4-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-
+Le 23/02/2024 à 00:56, Jakub Kicinski a écrit :
+> Create ynl_attr_for_each*() iteration helpers.
+> Use them instead of the mnl ones.
 > 
-> I've missed that thread initially. I guess that if Fiber is to be used,
-> this would be done through sfp, then we have all the regular interfaces
-> to configure the phy_interface_mode, in that case that would be
-> 100BaseX.
-> 
-> So, a sane behaviour could simply be to configure the PHY in copper
-> mode by default, without relying on any DT property ? If anyone wants to
-> use fiber mode, then they would have to implement the
-> sfp_upstreamp_ops, which would take care of reconfiguring the MDI
-> interface of the PHY in the correct mode.
-
-I missed the fact that this isn't a new driver... So this would indeed
-break existing setups who would have fiber-mode strapped-in but don't
-use SFP for some reason :(
-
-Maxime
-
-> Maxime
-> 
-
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Acked-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 
