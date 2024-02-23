@@ -1,86 +1,212 @@
-Return-Path: <netdev+bounces-74224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52CF5860881
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 02:51:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B73CC86087E
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 02:50:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3080283AD3
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 01:51:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD7451C21BA6
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 01:50:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 688C8B64C;
-	Fri, 23 Feb 2024 01:50:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7B84B64C;
+	Fri, 23 Feb 2024 01:50:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="nLtbP1dv"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="mxoq4V5j"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00095C14F;
-	Fri, 23 Feb 2024 01:50:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 847C9AD53;
+	Fri, 23 Feb 2024 01:50:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708653048; cv=none; b=S9cOo8TjJWehCkO2EF/ptPZnBWY6yTlINr0LgEH7/mUyby6/Tg8aOvVZGPYARAESJtCs7htIzyuntp8u+2iQVBPzuzxPkjssEyTFl2TeqS2u5qMpWKCWQVQfdU6DVkTFjCvy8b2omzVjCiG1lAkW4wigFAE6citn1tbucyCYer4=
+	t=1708653035; cv=none; b=mzLXK4+1+0REivRmVXwgPGcLQt9MbG7G9zk/yNe0wyv2yzihbLIpFDVtTJdcuVxN5005UqVQ+Qn+A6lo3tv2X09c4EqwWy+QyItstMWlTf+8p/btE8KiI5vp9krmPO8oOCpXspy/EKWT7kahzU/7uAcWKcu1Tdj4t4A05PLRUBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708653048; c=relaxed/simple;
-	bh=WUvQfUI7lKeFwecJH+4aBo8NAOgyOfNRfH06TTR6lCs=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=LlwZv1CnbfWT6GZ1Gjx3NqxOiASUWaGfctAEXx8gWOPQCYKG/kAqMmP9Ftux8oKsOM2wgJ3KbTh/6NfZJfb9Fs6VXmC1Q/pJY8FloYGZhvhMhCImmrRNC5URHdsN9+9nzsgi7FaiJdsvSdCjkSee9O6lXCHu0NyrhBDNevAvVWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=nLtbP1dv; arc=none smtp.client-ip=115.124.30.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1708653037; h=Message-ID:Subject:Date:From:To;
-	bh=WUvQfUI7lKeFwecJH+4aBo8NAOgyOfNRfH06TTR6lCs=;
-	b=nLtbP1dvuyWJmUWNFyqHPUZ2g4bH2hqkvYThnTRdimeZXFWUsOppoHZ364dtfvIDXTMKnGWnmPyTA6q6lX8LS0Om4IXFixUu7k6jLRi3MCsoKmEsoHhQV5XgibktPkIsW5ZuT+mOqK9L/O/ZFPtkWKxAb6Xe8wKua6Q4mZKdGyc=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W12WM7U_1708653036;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W12WM7U_1708653036)
-          by smtp.aliyun-inc.com;
-          Fri, 23 Feb 2024 09:50:37 +0800
-Message-ID: <1708653008.6983442-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next 0/5] virtio-net: sq support premapped mode
-Date: Fri, 23 Feb 2024 09:50:08 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: netdev@vger.kernel.org,
- Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- virtualization@lists.linux.dev,
- bpf@vger.kernel.org
-References: <20240116075924.42798-1-xuanzhuo@linux.alibaba.com>
- <20240222144420-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20240222144420-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1708653035; c=relaxed/simple;
+	bh=TO9aSmC1qF+2Vi3+58lvCecuRJcGdfmPoYzFPgBvLh4=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=q1t8CyXQ50BldY2evLRmo3v5Bt5OK9GnLTwIppo3wED/LCSq7l2vcMHxmLmXHZ9r0JEE4k+hmlceWXlwB1X9xQOno/hvCVXo7Oi8H8gvRyFnovRgFiLPp9Nrk6O5Kz+mdnloc5ZcgEPvTbFXxXsWH/4JyKD8O0E5Pq5t6D1dRLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=mxoq4V5j; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1708653030;
+	bh=uuyXxSqtakaPAQV/y8aASUxaDXqmMJlArJZheVqoNb8=;
+	h=Date:From:To:Cc:Subject:From;
+	b=mxoq4V5jTdP6nBNw+E4kSJ9rHS3+MpHGdPnIoFB9bD6agKfzDCui49GfiwtRTagus
+	 xEZrYpNlIhH8r/t5pNDB5ShAuvWQUC7dn/qtY1u+zmaIpLRMly1FW4i0VCLNwU2ViU
+	 m1rYKh9CPNfXaIxgxfFyeP00jG/mb13xNHmID+1mcfflgQwbadZbl0attRpicaG7JG
+	 6GD/T9lTESKCQziAoqY79SHDWf9lj3nZPJdPmhGydMFwy0KWUjW/kYeQujwnX4X7VD
+	 JD8F0v60VWPqxV/97wk/DDVsnU7reF3VXKAh6PDwYmdK1aF5z1b7SA9DbbAk2n3hjr
+	 r/aROdV2W1FIA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4TgtJ55hQbz4wcR;
+	Fri, 23 Feb 2024 12:50:29 +1100 (AEDT)
+Date: Fri, 23 Feb 2024 12:50:27 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Paul Moore <paul@paul-moore.com>, David Miller <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Alexei Starovoitov
+ <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Linux Kernel Mailing
+ List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Ondrej Mosnacek <omosnace@redhat.com>
+Subject: linux-next: manual merge of the security tree with the net-next
+ tree
+Message-ID: <20240223125027.1c9f4f07@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_//dCjoofoYCR0aUn90YdCSxX";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Thu, 22 Feb 2024 14:45:08 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Tue, Jan 16, 2024 at 03:59:19PM +0800, Xuan Zhuo wrote:
-> > This is the second part of virtio-net support AF_XDP zero copy.
->
-> My understanding is, there's going to be another version of all
-> this work?
+--Sig_//dCjoofoYCR0aUn90YdCSxX
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-YES.
+Hi all,
 
-http://lore.kernel.org/all/20240202093951.120283-1-xuanzhuo@linux.alibaba.com
+Today's linux-next merge of the security tree got a conflict in:
 
-Thanks
+  security/security.c
 
+between commits:
 
->
-> --
-> MST
->
+  1b67772e4e3f ("bpf,lsm: Refactor bpf_prog_alloc/bpf_prog_free LSM hooks")
+  a2431c7eabcf ("bpf,lsm: Refactor bpf_map_alloc/bpf_map_free LSM hooks")
+  f568a3d49af9 ("bpf,lsm: Add BPF token LSM hooks")
+
+from the net-next tree and commit:
+
+  260017f31a8c ("lsm: use default hook return value in call_int_hook()")
+
+from the security tree.
+
+I fixed it up (I think, see below) and can carry the fix as
+necessary. This is now fixed as far as linux-next is concerned, but any
+non trivial conflicts should be mentioned to your upstream maintainer
+when your tree is submitted for merging.  You may also want to consider
+cooperating with the maintainer of the conflicting tree to minimise any
+particularly complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc security/security.c
+index aef69632d0a9,b95772333d05..000000000000
+--- a/security/security.c
++++ b/security/security.c
+@@@ -5458,10 -5436,9 +5439,10 @@@ int security_bpf_prog(struct bpf_prog *
+   *
+   * Return: Returns 0 on success, error on failure.
+   */
+ -int security_bpf_map_alloc(struct bpf_map *map)
+ +int security_bpf_map_create(struct bpf_map *map, union bpf_attr *attr,
+ +			    struct bpf_token *token)
+  {
+- 	return call_int_hook(bpf_map_create, 0, map, attr, token);
+ -	return call_int_hook(bpf_map_alloc_security, map);
+++	return call_int_hook(bpf_map_create, map, attr, token);
+  }
+ =20
+  /**
+@@@ -5476,59 -5449,9 +5457,59 @@@
+   *
+   * Return: Returns 0 on success, error on failure.
+   */
+ -int security_bpf_prog_alloc(struct bpf_prog_aux *aux)
+ +int security_bpf_prog_load(struct bpf_prog *prog, union bpf_attr *attr,
+ +			   struct bpf_token *token)
+  {
+- 	return call_int_hook(bpf_prog_load, 0, prog, attr, token);
+ -	return call_int_hook(bpf_prog_alloc_security, aux);
+++	return call_int_hook(bpf_prog_load, prog, attr, token);
+ +}
+ +
+ +/**
+ + * security_bpf_token_create() - Check if creating of BPF token is allowed
+ + * @token: BPF token object
+ + * @attr: BPF syscall attributes used to create BPF token
+ + * @path: path pointing to BPF FS mount point from which BPF token is cre=
+ated
+ + *
+ + * Do a check when the kernel instantiates a new BPF token object from BP=
+F FS
+ + * instance. This is also the point where LSM blob can be allocated for L=
+SMs.
+ + *
+ + * Return: Returns 0 on success, error on failure.
+ + */
+ +int security_bpf_token_create(struct bpf_token *token, union bpf_attr *at=
+tr,
+ +			      struct path *path)
+ +{
+- 	return call_int_hook(bpf_token_create, 0, token, attr, path);
+++	return call_int_hook(bpf_token_create, token, attr, path);
+ +}
+ +
+ +/**
+ + * security_bpf_token_cmd() - Check if BPF token is allowed to delegate
+ + * requested BPF syscall command
+ + * @token: BPF token object
+ + * @cmd: BPF syscall command requested to be delegated by BPF token
+ + *
+ + * Do a check when the kernel decides whether provided BPF token should a=
+llow
+ + * delegation of requested BPF syscall command.
+ + *
+ + * Return: Returns 0 on success, error on failure.
+ + */
+ +int security_bpf_token_cmd(const struct bpf_token *token, enum bpf_cmd cm=
+d)
+ +{
+- 	return call_int_hook(bpf_token_cmd, 0, token, cmd);
+++	return call_int_hook(bpf_token_cmd, token, cmd);
+ +}
+ +
+ +/**
+ + * security_bpf_token_capable() - Check if BPF token is allowed to delega=
+te
+ + * requested BPF-related capability
+ + * @token: BPF token object
+ + * @cap: capabilities requested to be delegated by BPF token
+ + *
+ + * Do a check when the kernel decides whether provided BPF token should a=
+llow
+ + * delegation of requested BPF-related capabilities.
+ + *
+ + * Return: Returns 0 on success, error on failure.
+ + */
+ +int security_bpf_token_capable(const struct bpf_token *token, int cap)
+ +{
+- 	return call_int_hook(bpf_token_capable, 0, token, cap);
+++	return call_int_hook(bpf_token_capable, token, cap);
+  }
+ =20
+  /**
+
+--Sig_//dCjoofoYCR0aUn90YdCSxX
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmXX+eMACgkQAVBC80lX
+0GyEuQf/fzW8pQqhRLV/LNjkPuQR42gLeAwWk3S5MB02eF0x5Rtjob5uUAFyZZRs
+j8d9rWhqoi5yQLzGEbcpIfZfUKjQOzzXRqCWj0q6r6HtsF9hDcLGrHoDoWBiyHjf
+/tASthmG100GLPol1xgbiWAIKV+tFIJOWZ6+j0WaUwYM2WsmeeCYtt3uuYfKD2GG
+RRJkPjrr7JnHfKrD57uosARQKHTal5JHdo0wiZsS/vX76YXCzqtvqubFBw0YalDf
+lQthV7SnrXux7wxglMjEQfKvJQyRntjsjRRRt2mfx6scfn2WKmFLG+HlkmXEcGrb
+lqF7Hfhr4oGHpXaAxACKYTMsZ4ojQg==
+=yQjI
+-----END PGP SIGNATURE-----
+
+--Sig_//dCjoofoYCR0aUn90YdCSxX--
 
