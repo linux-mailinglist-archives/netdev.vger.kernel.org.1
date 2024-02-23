@@ -1,125 +1,122 @@
-Return-Path: <netdev+bounces-74493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B43748617AD
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 17:22:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 021F08617B3
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 17:23:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 20D06B27FF5
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 16:22:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29A29B29F83
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 16:22:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4B788562E;
-	Fri, 23 Feb 2024 16:20:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4906884A4E;
+	Fri, 23 Feb 2024 16:21:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="PZYe39Xr"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="bY3wAw5C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF958562C;
-	Fri, 23 Feb 2024 16:20:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C0A783A01
+	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 16:21:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708705257; cv=none; b=jHnE/aRhMcYmGQtHsfPcxmvlyoyyU1tYxAl7rAhsooH/PH796tl8lsJWn3zGpe1PfUb7uJgXKMbE+XnrrHqyEChQPBgBWpUmwqCAJnfrmqb7DW4M8kg3efVZ3psvssnR7Bj8ppLZeayqNNxlsrjhq6thH1u6JSboqRDlVxeZ82w=
+	t=1708705288; cv=none; b=IgQQKFe2GF39jp9qRnBOfr5t+btkWLlIwloEVHmKm15fYtU4v9omQQbsjLycxocQJ8ahcDBPsNbIhDI9BhRmSOU5MaYlPsyU9sIPpkeKDnWqS74tM9XUNBtqFpBTILy6Gjzrun6TUonaDncFmOBUUeRXtzlwAiMW8gj65CUqx0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708705257; c=relaxed/simple;
-	bh=dwWIJwGoMU5ew25YXI00QoYBkJKwcHEWsLFpy7KUq64=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mDKODfkd4eECESzu0xm0OJQLQjeK6n91SY+qjTYxmbY6k7kiVMSmjArCdRftjwPTBshiwOJ9WNiH3WQx39nOs33hfQ8CVAuWdaYCG+pUwL7M7l1V9SgrnWzpgr0JliV/kpJd29e8+A/z7bTzI/kuiHSTwsKDN6yaCuuERspxTiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=PZYe39Xr; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41NFLW01003973;
-	Fri, 23 Feb 2024 16:20:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding:content-type; s=qcppdkim1; bh=7+lZgdm
-	7GSt8ghIDF5MfQ2k86lh0IjM0BRTq/0qelZU=; b=PZYe39XrSEQYwkWXOFGd3UE
-	8Ua//3vqeHRy18OVCZdf1URKWLeQC1f6NpKsKFvWOvvtxcFt2jWZwaNmh8AOtspu
-	x/ifnEvLmSe1U3mU09G0Cb9z8aq/f5Qtah0uDzLLLxX9u7E2wlSuWBSEYwi0m09P
-	2gLO4bOcyUoqVOKfVwvYmSW4z68028tYqSaJL/6csFlboPOmcsmOszRxhtzkOeL0
-	BjI1DRUdbgTLG4j9H+4THOBcVRk4E1kiKi0kqbUgFXakR07k/MgmrKw9x41zF5vB
-	OpAQdBrbSvSxj8v/fVYwWLvB/YbjZvmMkHAHdyN6T5eb5t7TXDRoBXb7cBLHSFg=
-	=
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wen0qhfrg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 23 Feb 2024 16:20:44 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41NGKhhb007434
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 23 Feb 2024 16:20:43 GMT
-Received: from jhugo-lnx.qualcomm.com (10.80.80.8) by
- nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 23 Feb 2024 08:20:41 -0800
-From: Jeffrey Hugo <quic_jhugo@quicinc.com>
-To: <quic_bjorande@quicinc.com>, <marcel@holtmann.org>, <luiz.dentz@gmail.com>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <robh@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <quic_bgodavar@quicinc.com>, <quic_rjliao@quicinc.com>
-CC: <linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Jeffrey Hugo <quic_jhugo@quicinc.com>
-Subject: [PATCH RESEND] dt-bindings: net: bluetooth: qualcomm: Fix bouncing @codeaurora
-Date: Fri, 23 Feb 2024 09:20:27 -0700
-Message-ID: <20240223162027.4016065-1-quic_jhugo@quicinc.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1708705288; c=relaxed/simple;
+	bh=I5QFyxdVzWASuFrJaWSyJOfTumcmKNivw74+YM7+w4U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ICsOG2c6Lb+ZLSDOt17f2T1cjZWWQAfMjNvtmy1B60aZdv5S0ju/TZId1fMFJv970eZpAJ2DtmIA9qOnHiVa5nnEaAzY0I+vOQ1U45FodIye2SNS5i9yaqfylvX83zT21bMzEEPeL+7YrsUJA7Z3DF19AlY+xsOzj2sNTS4X6hs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=bY3wAw5C; arc=none smtp.client-ip=209.85.219.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-dc74e33fe1bso525189276.0
+        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 08:21:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1708705285; x=1709310085; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=531p65ZfbJ3tCm0in//zgzyoYtsDn2UJBD0qfAVVOaI=;
+        b=bY3wAw5CywfIZWtYS/ttvkZuwMfm8zGaqmO0OYsezaUOs0D7AkBMWDNmeqvy0SWMzs
+         7lzXzP7L8turbXca64iRA7WEAkHluZG3dcCm3v+wUFqN33tOCfyJ6WCHEeB4ksuMB2OE
+         Ny2LQoz1hTLK0WDAzVEHL4V7/ipZ+DBPzJ5SZWchvfSZqV0xFJLprjvJpZkG799yLjCb
+         C9bPkdaoe46LT81afsTH2gm7t0xQbvJ5PClSflv01cctaZPymnbv0uwj9BL5AUcEG+ug
+         9ZX4gO3TvSsFOTQj6wlbTFkQJog/mhQTNutZ2HtvTFZ6lbu4cWUFyqLJcYKvz5C9gIOP
+         IrUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708705285; x=1709310085;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=531p65ZfbJ3tCm0in//zgzyoYtsDn2UJBD0qfAVVOaI=;
+        b=nF36aOlEZyl4zyHq1ozRcw8FdgxS5xSx3R1kvB/p9uuC2Uv8npRmuDYPXGBW2mUF3q
+         bKbV6d/fP/ncsIyrqSdUmi5IM88mZ4h7sGh9u0wzIOWDIAS/V1eGtrJ2xb/XTx3fb+xt
+         Wrd/16QDap/EaudQ2+c55ZaJF39lHE5/bSxCQTcOHBiYiR11yM/zBCoTRxf1yygBs06p
+         EbNpsNnk9G4QNF/QsQprmuixIzwXswWtgY54nOz1I6HGUTIejt/sd2r3gDN0jpl1axCd
+         8wQgO3Ozf00R3XsK0mByXBk793LRK1cM1yLJ1y/Q/2E76+4H0dX3BkmrFDQf/+1ivMVF
+         jr6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUtjCo5CqMJf5miRtcfT3MoGHgrRqMyraosC+YDOlY1UO3nJShSNaBR7PDmuiBmz0DsQd1Yqosg0V2twZ0STsHzM4rU7RJ8
+X-Gm-Message-State: AOJu0YxhLj/8uaX60GhREOQCCFR1fP1gNtpCB7aXuJq5eNlK+NV5sE2v
+	7xu/g5s2iJ9eBvByTiYqWBPMj/KxQf8I70igsu38V9jxp2MDWUOzbHet5bUNEGO3xoS6tplJNk4
+	WUtWcsZjlMYl8vOoGuAq0S9u5Pgsqg8iguISC
+X-Google-Smtp-Source: AGHT+IE4FvTSxbuO+ftuRzsiGCOPBSf8+pLd8oVyNiCVjjjdg7HtSUr/AB6gZpwpMPigIzKnGNoZrdrwimEyPJkfzXo=
+X-Received: by 2002:a25:6a86:0:b0:dcf:309d:cc2b with SMTP id
+ f128-20020a256a86000000b00dcf309dcc2bmr245419ybc.18.1708705285629; Fri, 23
+ Feb 2024 08:21:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: yrDevGGHGLEf47oOTWOapKsT_ZsKJ8B3
-X-Proofpoint-GUID: yrDevGGHGLEf47oOTWOapKsT_ZsKJ8B3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-23_02,2024-02-23_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=748 clxscore=1015
- adultscore=0 malwarescore=0 bulkscore=0 spamscore=0 suspectscore=0
- lowpriorityscore=0 priorityscore=1501 mlxscore=0 impostorscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2402120000 definitions=main-2402230118
+References: <20240223125027.1c9f4f07@canb.auug.org.au>
+In-Reply-To: <20240223125027.1c9f4f07@canb.auug.org.au>
+From: Paul Moore <paul@paul-moore.com>
+Date: Fri, 23 Feb 2024 11:21:14 -0500
+Message-ID: <CAHC9VhRP4bKeBYcEe-xkdsXKa9XJLPxObkorTSbmE85WxT0AoA@mail.gmail.com>
+Subject: Re: linux-next: manual merge of the security tree with the net-next tree
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Networking <netdev@vger.kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Linux Next Mailing List <linux-next@vger.kernel.org>, Ondrej Mosnacek <omosnace@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The servers for the @codeaurora domain are long retired and any messages
-sent there will bounce.  Update the maintainer addresses for this
-binding to match the entries in .mailmap so that anyone looking in the
-file for a contact will see a correct address.
+On Thu, Feb 22, 2024 at 8:50=E2=80=AFPM Stephen Rothwell <sfr@canb.auug.org=
+.au> wrote:
+>
+> Hi all,
+>
+> Today's linux-next merge of the security tree got a conflict in:
+>
+>   security/security.c
+>
+> between commits:
+>
+>   1b67772e4e3f ("bpf,lsm: Refactor bpf_prog_alloc/bpf_prog_free LSM hooks=
+")
+>   a2431c7eabcf ("bpf,lsm: Refactor bpf_map_alloc/bpf_map_free LSM hooks")
+>   f568a3d49af9 ("bpf,lsm: Add BPF token LSM hooks")
+>
+> from the net-next tree and commit:
+>
+>   260017f31a8c ("lsm: use default hook return value in call_int_hook()")
+>
+> from the security tree.
+>
+> I fixed it up (I think, see below) and can carry the fix as
+> necessary. This is now fixed as far as linux-next is concerned, but any
+> non trivial conflicts should be mentioned to your upstream maintainer
+> when your tree is submitted for merging.  You may also want to consider
+> cooperating with the maintainer of the conflicting tree to minimise any
+> particularly complex conflicts.
 
-Signed-off-by: Jeffrey Hugo <quic_jhugo@quicinc.com>
----
+Thanks Stephen, this looks correct.
 
-Rob, will you take this patch into your tree for 6.9?
-
- .../devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-index eba2f3026ab0..528ef3572b62 100644
---- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-+++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-@@ -7,8 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
- title: Qualcomm Bluetooth Chips
- 
- maintainers:
--  - Balakrishna Godavarthi <bgodavar@codeaurora.org>
--  - Rocky Liao <rjliao@codeaurora.org>
-+  - Balakrishna Godavarthi <quic_bgodavar@quicinc.com>
-+  - Rocky Liao <quic_rjliao@quicinc.com>
- 
- description:
-   This binding describes Qualcomm UART-attached bluetooth chips.
--- 
-2.34.1
-
+--=20
+paul-moore.com
 
