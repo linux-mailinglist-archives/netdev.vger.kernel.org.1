@@ -1,198 +1,268 @@
-Return-Path: <netdev+bounces-74505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFFAA8618D2
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 18:05:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 433D486191D
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 18:15:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C33CB26475
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 17:05:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE03F2868E7
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 17:15:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8475812C536;
-	Fri, 23 Feb 2024 17:05:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BAF6132483;
+	Fri, 23 Feb 2024 17:14:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="rLNx5YIH"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Q+LreEMK"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2082.outbound.protection.outlook.com [40.107.244.82])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE67242A99;
-	Fri, 23 Feb 2024 17:05:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.82
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708707941; cv=fail; b=TdDhJIAiSmCf6AIk4i31zzjb3X2wdE7G3ZMf8+o2zwRboD+wUMsBaEYZQFNGm5b4Hg5Qo7t/sxgykjjCyucwdvPqDbt64KQTDHu8387P5RaN34ed7ka4rkAZWA+lN8ZyGLOY2T8Gpr/CRaTecggtyPkD8ajXhxfGk8n2wQQHhuA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708707941; c=relaxed/simple;
-	bh=AlOHL9cdOj24Y01UBT7oCTED7IaqYrmOMmXVAlMiZBc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=P86X+cZV2qZqUDnav33j+SOFMPyE97LID6SU09iavHp4uiy7p1daYZFnnnGPyuNPpRW9l4M8kdySU/gV7abq1vIJPgWLiuHpzzhgxDud+YTThcobj70FFE5ATnMI7321MO9Y1vRUUTzXr19kZnnamCD0icVcSRoP9mKhvCQnqzw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=rLNx5YIH; arc=fail smtp.client-ip=40.107.244.82
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Z93LBw28Khsh+QINXJDI6oeWHJlTW7bzOQr0r8Uhp3heng10CrkkbNf6Lio9fgcjGnKnWShrtY0UF2JgZemMgQOlIGhIkoH+yevaiiyi/p+BjwUMGz57Yjy/bD4pva6ENnB+2Q7PGQfLf1WwYYNQrNXhrN9iAnRIfRRguOGXLN4gJ41ACCnvFn1oJXEbD7TAOTYwJJZzF1SjvFHcWi9wYqho68vNqOiwF6vcjf1nZ4gKgR3i5WG6LHYpAz4PoIT+5Qza44MdZXKRKxJXI96m4woqkR4OUB1u5dgkOYX2gRXTCgLDAlQA9Hekpz/VkbY7oEJ1lpYA/ecFef69Qh6MDg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Pa+y4GE7nCNexwBdjHtm88gM1SVFBc7A4bfDCX1jv0g=;
- b=nZLpcf0FBrv87iJyy8788TVMmiRfuGtbaguMdQ66mIe2cLDgI8YmSfbOwdTWQg0qacanWKNhqlaEoIYdYl7bo4jslzF7lQGXjmL1VcurP+TpBkijMhi5snYDt5/AEyuBOPbdWYUzik3ITJgm9aipxr1ktzrOgGE4f3UGFCcHEeHe/epBD/3O9GQM3qCtxFbLTNiZ4S5DIOfURq53pL1xNAWQjPVwAVcLpPmNBTCqUzhWlQxdFKCnAhj5L7fGOkRiweSry+9fxX5uAHVbP54QoOYWdeRCAkTB6VP5TwzHvdB3FiVWF5MwQkEpmJtVzOkXOAJ2Qo+YYiBtXnla5MPuBw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Pa+y4GE7nCNexwBdjHtm88gM1SVFBc7A4bfDCX1jv0g=;
- b=rLNx5YIHxbiyPcj5LH7gtBqiRR5kHCKD0hF0rgHmCSIeb4Dc8KNSitJiGJivlg0xCWB7A7wHIX280kZdtJUfGV9SW4FHuQgzU4DTY1uAlzbolQVz7zblSS8NHf3bv5gn9Zow2vHy/VL+W6ABfZ76Frvul0fKMyJgNUugH7jOjkxNWzqrGknlt5cKt1118R7Bb7+lWdtJY89P4unrtBeK38653Di1bxg/tKscjLjfEFR1c1MvGLtSi2NVH07wXJzgYzeSz3RU9HFOBuY5G5XWrguvBTKrDw0/BTMr5STV+0fKPZHzsGC2OJXAQybeQLves8VgxEqgHMSPD6eF/qYTWQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by MN6PR12MB8471.namprd12.prod.outlook.com (2603:10b6:208:473::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.21; Fri, 23 Feb
- 2024 17:05:35 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::96dd:1160:6472:9873]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::96dd:1160:6472:9873%6]) with mapi id 15.20.7316.023; Fri, 23 Feb 2024
- 17:05:35 +0000
-Date: Fri, 23 Feb 2024 13:05:34 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Niklas Schnelle <schnelle@linux.ibm.com>
-Cc: David Laight <David.Laight@aculab.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-	"llvm@lists.linux.dev" <llvm@lists.linux.dev>,
-	Ingo Molnar <mingo@redhat.com>, Bill Wendling <morbo@google.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Jijie Shao <shaojijie@huawei.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	"x86@kernel.org" <x86@kernel.org>,
-	Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Leon Romanovsky <leonro@mellanox.com>,
-	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Michael Guralnik <michaelgur@mellanox.com>,
-	"patches@lists.linux.dev" <patches@lists.linux.dev>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 4/6] arm64/io: Provide a WC friendly __iowriteXX_copy()
-Message-ID: <20240223170534.GI13330@nvidia.com>
-References: <0-v1-38290193eace+5-mlx5_arm_wc_jgg@nvidia.com>
- <4-v1-38290193eace+5-mlx5_arm_wc_jgg@nvidia.com>
- <6d335e8701334a15b220b75d49b98d77@AcuMS.aculab.com>
- <20240222223617.GC13330@nvidia.com>
- <efc727fbb8de45c8b669b6ec174f95ce@AcuMS.aculab.com>
- <e78f6e6294c31d889ace4de3a3c3cebad04f4213.camel@linux.ibm.com>
- <20240223125852.GE13330@nvidia.com>
- <eea8b03c20fc49cd88b159959a589f78521ff53b.camel@linux.ibm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <eea8b03c20fc49cd88b159959a589f78521ff53b.camel@linux.ibm.com>
-X-ClientProxiedBy: BLAPR03CA0001.namprd03.prod.outlook.com
- (2603:10b6:208:32b::6) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CE8112838F;
+	Fri, 23 Feb 2024 17:14:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708708474; cv=none; b=HYJdtJ4H5zxt7bwobf+rtuJhqlB9SqPgNxHrzHcBERHXezI5uubFa7ci6Z0wyhSstj3ejtHf+KxpsHJxuhTOARTKcI3H/8XO7ZbsZ1g6vUdhCCURzc7818fOSLUyiGA+CEWPag+kw1mnm5FEapILnklZEij9SHdf1C5eYm1IyaU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708708474; c=relaxed/simple;
+	bh=Ya7emYjSkiHqP5u67XOaZtVnw0nOswnxuhZgIQ4BbMo=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BA60Lh1hoVd5EDi+CkzfZtCk18vy/EIjT3ZCFSP3eaJkpD/5VgsdiDDkNOQFq+oT5pkce8SfeNViR0t7rw/LcqJBVSWZsYHNSNI1wWL+cDlVApnbeeV5N1tP+5fRzwwddd2vkNNUfs/Q2tv9XxO5YSY0sitxUwmx+CQm6XzG8+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Q+LreEMK; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1708708472; x=1740244472;
+  h=from:to:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Ya7emYjSkiHqP5u67XOaZtVnw0nOswnxuhZgIQ4BbMo=;
+  b=Q+LreEMKqMC3g4Tfs4ABkCP+WsyIzbo3xPjj/dsddz4MNPt+41wTKLYc
+   ARmGggZ28DFFuxDjd78wyQU8gdYqckPj7mpB9B/0zk0uwqO6bnHjnQKFm
+   joC5BMbY/6OKAXKuKJdTqs6UaPwuhqkvnVrH9wrbhpJEXkdD7TzVeQ5RV
+   PUhpt75SKl0m729SyxAd+VG7eMUtXpO26ten40P3/1AD5lMW0q2Lv8K1J
+   okTilQG8JmA215J0LdS3FUqf2Hj32A/g+fz44mhHyb4OUB4dDEncnZPqS
+   /x8a4bK0cfMWCulMvmY2UKL+lwrTqDaNb1ufGUHhKNdATlvp4718V6Zej
+   g==;
+X-CSE-ConnectionGUID: Zg+uYWIwR/67x/qNBiMJxA==
+X-CSE-MsgGUID: Zq+OrxYDQK6ZvTWv4XI1Vw==
+X-IronPort-AV: E=Sophos;i="6.06,180,1705388400"; 
+   d="scan'208";a="184008857"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Feb 2024 10:14:28 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 23 Feb 2024 10:14:20 -0700
+Received: from che-lt-i67070.microchip.com (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Fri, 23 Feb 2024 10:13:59 -0700
+From: Varshini Rajendran <varshini.rajendran@microchip.com>
+To: <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+	<conor+dt@kernel.org>, <nicolas.ferre@microchip.com>,
+	<alexandre.belloni@bootlin.com>, <claudiu.beznea@tuxon.dev>,
+	<mturquette@baylibre.com>, <sboyd@kernel.org>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>, <andi.shyti@kernel.org>, <tglx@linutronix.de>,
+	<tudor.ambarus@linaro.org>, <miquel.raynal@bootlin.com>, <richard@nod.at>,
+	<vigneshr@ti.com>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <linus.walleij@linaro.org>, <sre@kernel.org>,
+	<u.kleine-koenig@pengutronix.de>, <p.zabel@pengutronix.de>,
+	<olivia@selenic.com>, <radu_nicolae.pirea@upb.ro>,
+	<richard.genoud@gmail.com>, <gregkh@linuxfoundation.org>,
+	<jirislaby@kernel.org>, <lgirdwood@gmail.com>, <broonie@kernel.org>,
+	<wim@linux-watchdog.org>, <linux@roeck-us.net>, <linux@armlinux.org.uk>,
+	<andrei.simion@microchip.com>, <mihai.sain@microchip.com>,
+	<varshini.rajendran@microchip.com>, <andre.przywara@arm.com>,
+	<neil.armstrong@linaro.org>, <tony@atomide.com>,
+	<durai.manickamkr@microchip.com>, <geert+renesas@glider.be>, <arnd@arndb.de>,
+	<Jason@zx2c4.com>, <rdunlap@infradead.org>, <rientjes@google.com>,
+	<vbabka@suse.cz>, <mripard@kernel.org>, <codrin.ciubotariu@microchip.com>,
+	<eugen.hristev@collabora.com>, <devicetree@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<linux-clk@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<linux-i2c@vger.kernel.org>, <linux-mtd@lists.infradead.org>,
+	<netdev@vger.kernel.org>, <linux-gpio@vger.kernel.org>,
+	<linux-pm@vger.kernel.org>, <linux-pwm@vger.kernel.org>,
+	<linux-rtc@vger.kernel.org>, <linux-spi@vger.kernel.org>,
+	<linux-serial@vger.kernel.org>, <alsa-devel@alsa-project.org>,
+	<linux-sound@vger.kernel.org>, <linux-watchdog@vger.kernel.org>
+Subject: [PATCH v4 00/39] Add support for sam9x7 SoC family
+Date: Fri, 23 Feb 2024 22:43:42 +0530
+Message-ID: <20240223171342.669133-1-varshini.rajendran@microchip.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MN6PR12MB8471:EE_
-X-MS-Office365-Filtering-Correlation-Id: 852a33f2-6eb1-4e1f-7ac1-08dc3491a699
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	wTamJUy7Nnl/T60ivfU8YpouDL8b6CGvSEGpB+APoCV33C67fQRsf2bDiyDK9SLbcGdtDfG1+MWVT6rPzSEOrg8DomTlIPgQjkmx5hQZz9EyTtSRSm6S+W9s2u5KjVPVt5BfsrtXrVlVzKEmiu0FUzLScvKjMFmIbBNT341dJj4RyWJF6TBxEvG1f3uyXQQxO33Ld6tUQmawd1f51KzTMwjbUp6D1puBk7jXh7ri4lobvhnLsV75bnmdankDk+H5/H5yjItd8dSxYdrUWshqU7lwH1kpLjaQ3dCe7dxfISQ0M4oN6QOc4gJjqkSzqvexKdjM5QyUZcLQr6ZbbwTD/vW9YymT1jtFD5+H6PmsjR1FKEOeM3VpYGnMETe4smuyzu7KPCpc9XsQlT6e05wtmZ6Dzw3BOy1endEIKDNLU/2RbpBKrLeGWufviGnqSUXAga9k96VxiGjJrsbq9t4UY69USzRvjsJ65KW4ePRoKYCnbleFCbfTRsMSP/+AtigNL+4p6trqJr8G0iTyiJv4iPI6eFNtT05cfSBVvk24uCw=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?2wyUD2ldt12elJi4EiLooqNScdlyaE27re82/CoNDSJQkAs35tqpFjiXU9Oz?=
- =?us-ascii?Q?UpqkUvubD60LiGFBUdkJw8fMEsWhWj7wTTLyxr3waB2aTJ8PgWmvyOLd4f/w?=
- =?us-ascii?Q?fwiXsfLXMS5YjYJDnb6AIeWscOolbIGODywn7k9MvuiauZCWKSFNg0PM2AuX?=
- =?us-ascii?Q?+L5/HmxovK5CQ2mQrB2O6e9zknBEf9FbvOo4X3Yiuy3Y9HdTmTFfFf0D3VN0?=
- =?us-ascii?Q?XvoM3gSBIcJPppk+FIV4A08BGipYjF9ezBqL4dQ5y5JkEawEdx0YKcJdthuF?=
- =?us-ascii?Q?aRloZiyJ/nP75bCgg4il1NcarxmLNRXLkTeU6onRFPzxpG2Dcb3YUyYh9+AY?=
- =?us-ascii?Q?EWOrZ3dfI4ACOab1kuTwFS8t+EwUfzzflzYB7nfHrLQPwRJ0pRWXDsjvZc/R?=
- =?us-ascii?Q?g+UXjKivsYh/Kp8/XqQ+gSu5P107l9jSSzxRfAzRIJ9DTcbQmdG9PUSYbZis?=
- =?us-ascii?Q?/xir82pGCKFQsYvLfJAVUZu+TADdJKUWcadOzH6TyCKwaIJg/Qg7+8V2LFbD?=
- =?us-ascii?Q?vB8SNBdu5iG6OAFaTXbbfID3Dh0Ooqbt+/Oof6C7NWDd+AKvpCnmUcv96ydj?=
- =?us-ascii?Q?zzLDWnCn3DPf/VmNezxRsizxQdztCn0RH2if3HgzecbzSW4oYQT7ndEB6RdY?=
- =?us-ascii?Q?4brMkEcqnqfl2qikvZHD4YwH9ZY+/DHMjOwrX8eUiSRbb/SP0u0OlWx+t+3I?=
- =?us-ascii?Q?3A8G2YzRS49fENkSHo4sMSiAFD7gSHAchHBd03nL+2du7TyNbp5Zf8JTKLQZ?=
- =?us-ascii?Q?dzloi+c4kbiUWAWChluMH/2f9rjegp9vz+3ORN1KO6MdnvxlDa5T0VltvbMK?=
- =?us-ascii?Q?xEw6JlTW8xIy6xtycTAsGcBx14rfvdx437NbkYh8v51jDlCKF6OIhtP6Bi6+?=
- =?us-ascii?Q?OG3qKMHx6Iv0JAMo48FvSw0+c+KyDsDaQYsUml1EwiqGo9dpgNSdfVN3BqCD?=
- =?us-ascii?Q?8ridgBWquTQy525sYtmbyfbC5jzCwRAp8H7PWirgI+hbAsNW3ERwrlRTmym8?=
- =?us-ascii?Q?y2negh513LB8W9csq3zqFl5DYSKiWEHdezu0lHY4sA8vYgYiSKz5ViDBX19q?=
- =?us-ascii?Q?q/NbWC85UV2bumAuYMVnoyUsYJkbC5wwOzTeUCgbnCArGUG9Ja0u6Xr+HP0+?=
- =?us-ascii?Q?CPZ6WHo5AGd8qqafrCee3cKxfM/403oegGz1rt0pu5Z76AWBVAAgEAuAL0+T?=
- =?us-ascii?Q?eiAS4QulRBHtD20iWTEVI1ndEuc/HMBdH0u4BsyH77bCy7iR0s/f4V2I16ez?=
- =?us-ascii?Q?IEDmcPYDp+CURwf032ylbXvQlfhnFbk8ApUVPWKCvRy6LY5EDuM+BlgcvSgu?=
- =?us-ascii?Q?U4XZP5/949C225odOAo0uD82h6H/XLvMDQyli2f1T20iOodxMe2B8/XMvWNn?=
- =?us-ascii?Q?97ONJKJjzwfKxM8ruN4sbyphvulSNIYLv6fBPlzqBB6Ll1XjxSMa8D+gISz9?=
- =?us-ascii?Q?RqtVg/lXkjppgNNHBc3s6SotG3PsTdsvyPWfriyoZQ20kHB+Vy/axiZHcCj1?=
- =?us-ascii?Q?RQKfrzpN0pjVYmoYYzxAmKkMnJ3CgC9URAczqTqfACtSwlQfhOtQ+CnL3VNn?=
- =?us-ascii?Q?ASgrLE1tdn0BAroBSvQ5QRXvKFc+6T4rVXSu+/YG?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 852a33f2-6eb1-4e1f-7ac1-08dc3491a699
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Feb 2024 17:05:35.1120
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: w8pur2So67LET0MDrSuI5KGGq4b15i6plur92OMfdhGpN3P1SPOLZT7uuv2blepd
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR12MB8471
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Fri, Feb 23, 2024 at 05:35:42PM +0100, Niklas Schnelle wrote:
-> On Fri, 2024-02-23 at 08:58 -0400, Jason Gunthorpe wrote:
-> > On Fri, Feb 23, 2024 at 12:38:18PM +0100, Niklas Schnelle wrote:
-> > > > Although I doubt that generating long TLP from byte writes is
-> > > > really necessary.
-> > > 
-> > > I might have gotten confused but I think these are not byte writes.
-> > > Remember that the count is in terms of the number of bits sized
-> > > quantities to copy so "count == 1" is 4/8 bytes here.
-> > 
-> > Right.
-> > 
-> > There seem to be two callers of this API in the kernel, one is calling
-> > with a constant size and wants a large TLP
-> > 
-> > Another seems to want memcpy_to_io with a guarenteed 32/64 bit store.
-> 
-> I don't really understand how that works together with the order not
-> being guaranteed. Do they use normal ioremap() and then require 32/64
-> bit TLPs and don't care about the order?
+This patch series adds support for the new SoC family - sam9x7.
+ - The device tree, configs and drivers are added
+ - Clock driver for sam9x7 is added
+ - Support for basic peripherals is added
+ - Target board SAM9X75 Curiosity is added
 
-Yes, I assume so. From my impression the cases looked like they were
-copying to MMIO memory so order probably doesn't matter.
+ Changes in v4:
+ --------------
 
-Jason
+ - Addressed all the review comments in the patches
+ - Picked up all Acked-by and Reviewed-by tags
+ - Dropped applied patches from the series
+ - Added pwm node and related dt binding documentation
+ - Added support for exporting some clocks to DT
+ - Dropped USB related patches and changes. See NOTE.
+ - All the specific changes are captured in the corresponding patches
+
+ NOTE: Owing to the discussion here
+ https://lore.kernel.org/linux-devicetree/CAL_JsqJ9PrX6fj-EbffeJce09MXs=B7t+KS_kOinxaRx38=WxA@mail.gmail.com/
+ the USB related changes are dropped from this series in order to enable
+ us to work on the mentioned issues before adding new compatibles as
+ said. The issues/warnings will be addressed in subsequent patches.
+ After which the USB related support for sam9x7 SoCs will be added. Hope
+ this works out fine.
+
+ Changes in v3:
+ --------------
+
+ - Fixed the DT documentation errors pointed out in v2.
+ - Dropped Acked-by tag in tcb DT doc patch as it had to be adapted
+   according to sam9x7 correctly.
+ - Picked by the previously missed tags.
+ - Dropped this patch "dt-bindings: usb: generic-ehci: Document clock-names
+   property" as the warning was not found while validating DT-schema for
+   at91-sam9x75_curiosity.dtb.
+ - Dropped redundant words in the commit message.
+ - Fixed the CHECK_DTBS warnings validated against
+   at91-sam9x75_curiosity.dtb.
+ - Renamed dt nodes according to naming convention.
+ - Dropped unwanted status property in dts.
+ - Removed nodes that are not in use from the board dts.
+ - Removed spi DT doc patch from the series as it was already applied
+   and a fix patch was applied subsequently. Added a patch to remove the
+   compatible to adapt sam9x7.
+ - Added sam9x7 compatibles in usb dt documentation.
+
+
+ Changes in v2:
+ --------------
+
+ - Added sam9x7 specific compatibles in DT with fallbacks
+ - Documented all the newly added DT compatible strings
+ - Added device tree for the target board sam9x75 curiosity and
+   documented the same in the DT bindings documentation
+ - Removed the dt nodes that are not supported at the moment
+ - Removed the configs added by previous version that are not supported
+   at the moment
+ - Fixed all the corrections in the commit message
+ - Changed all the instances of copyright year to 2023
+ - Added sam9x7 flag in PIT64B configuration
+ - Moved macro definitions to header file
+ - Added another divider in mck characteristics in the pmc driver
+ - Fixed the memory leak in the pmc driver
+ - Dropped patches that are no longer needed
+ - Picked up Acked-by and Reviewed-by tags
+
+
+Varshini Rajendran (39):
+  dt-bindings: net: cdns,macb: add sam9x7 ethernet interface
+  dt-bindings: atmel-sysreg: add sam9x7
+  dt-bindings: crypto: add sam9x7 in Atmel AES
+  dt-bindings: crypto: add sam9x7 in Atmel SHA
+  dt-bindings: crypto: add sam9x7 in Atmel TDES
+  dt-bindings: i2c: at91: Add sam9x7 compatible string
+  dt-bindings: atmel-ssc: add microchip,sam9x7-ssc
+  dt-bindings: atmel-nand: add microchip,sam9x7-pmecc
+  dt-bindings: pinctrl: at91: add sam9x7
+  dt-bindings: rng: atmel,at91-trng: add sam9x7 TRNG
+  dt-bindings: rtt: at91rm9260: add sam9x7 compatible
+  dt-bindings: serial: atmel,at91-usart: add compatible for sam9x7.
+  ASoC: dt-bindings: atmel-classd: add sam9x7 compatible
+  dt-bindings: pwm: at91: Add sam9x7 compatible strings list
+  dt-bindings: watchdog: sama5d4-wdt: add compatible for sam9x7-wdt
+  spi: dt-bindings: atmel,at91rm9200-spi: remove 9x60 compatible from
+    list
+  ASoC: dt-bindings: microchip: add sam9x7
+  ARM: at91: pm: add support for sam9x7 SoC family
+  ARM: at91: pm: add sam9x7 SoC init config
+  ARM: at91: add support in SoC driver for new sam9x7
+  dt-bindings: clk: at91: add sam9x7
+  dt-bindings: clk: at91: add sam9x7 clock controller
+  clk: at91: clk-sam9x60-pll: re-factor to support individual core freq
+    outputs
+  clk: at91: sam9x7: add support for HW PLL freq dividers
+  clk: at91: sama7g5: move mux table macros to header file
+  dt-bindings: clock: at91: Allow PLLs to be exported and referenced in
+    DT
+  clk: at91: sam9x7: add sam9x7 pmc driver
+  dt-bindings: irqchip/atmel-aic5: Add support for sam9x7 aic
+  irqchip/atmel-aic5: Add support to get nirqs from DT for sam9x60 &
+    sam9x7
+  power: reset: at91-poweroff: lookup for proper pmc dt node for sam9x7
+  power: reset: at91-reset: add reset support for sam9x7 SoC
+  power: reset: at91-reset: add sdhwc support for sam9x7 SoC
+  dt-bindings: reset: atmel,at91sam9260-reset: add sam9x7
+  dt-bindings: power: reset: atmel,sama5d2-shdwc: add sam9x7
+  ARM: at91: Kconfig: add config flag for SAM9X7 SoC
+  ARM: configs: at91: enable config flags for sam9x7 SoC family
+  ARM: dts: at91: sam9x7: add device tree for SoC
+  dt-bindings: arm: add sam9x75 curiosity board
+  ARM: dts: at91: sam9x75_curiosity: add sam9x75 curiosity board
+
+ .../devicetree/bindings/arm/atmel-at91.yaml   |    6 +
+ .../devicetree/bindings/arm/atmel-sysregs.txt |    7 +-
+ .../bindings/clock/atmel,at91rm9200-pmc.yaml  |    2 +
+ .../bindings/clock/atmel,at91sam9x5-sckc.yaml |    4 +-
+ .../crypto/atmel,at91sam9g46-aes.yaml         |    6 +-
+ .../crypto/atmel,at91sam9g46-sha.yaml         |    6 +-
+ .../crypto/atmel,at91sam9g46-tdes.yaml        |    6 +-
+ .../bindings/i2c/atmel,at91sam-i2c.yaml       |    4 +-
+ .../interrupt-controller/atmel,aic.txt        |    2 +-
+ .../devicetree/bindings/misc/atmel-ssc.txt    |    1 +
+ .../devicetree/bindings/mtd/atmel-nand.txt    |    1 +
+ .../devicetree/bindings/net/cdns,macb.yaml    |    5 +
+ .../bindings/pinctrl/atmel,at91-pinctrl.txt   |    2 +
+ .../power/reset/atmel,sama5d2-shdwc.yaml      |    3 +
+ .../bindings/pwm/atmel,at91sam-pwm.yaml       |    3 +
+ .../reset/atmel,at91sam9260-reset.yaml        |    4 +
+ .../bindings/rng/atmel,at91-trng.yaml         |    4 +
+ .../bindings/rtc/atmel,at91sam9260-rtt.yaml   |    4 +-
+ .../bindings/serial/atmel,at91-usart.yaml     |   12 +-
+ .../bindings/sound/atmel,sama5d2-classd.yaml  |    7 +-
+ .../sound/microchip,sama7g5-i2smcc.yaml       |   11 +-
+ .../bindings/spi/atmel,at91rm9200-spi.yaml    |    1 -
+ .../bindings/watchdog/atmel,sama5d4-wdt.yaml  |   12 +-
+ arch/arm/boot/dts/microchip/Makefile          |    3 +
+ .../dts/microchip/at91-sam9x75_curiosity.dts  |  309 +++++
+ arch/arm/boot/dts/microchip/sam9x60.dtsi      |    1 +
+ arch/arm/boot/dts/microchip/sam9x7.dtsi       | 1214 +++++++++++++++++
+ arch/arm/configs/at91_dt_defconfig            |    1 +
+ arch/arm/mach-at91/Kconfig                    |   23 +-
+ arch/arm/mach-at91/Makefile                   |    1 +
+ arch/arm/mach-at91/generic.h                  |    2 +
+ arch/arm/mach-at91/pm.c                       |   35 +
+ arch/arm/mach-at91/sam9x7.c                   |   34 +
+ drivers/clk/at91/Makefile                     |    1 +
+ drivers/clk/at91/clk-sam9x60-pll.c            |   50 +-
+ drivers/clk/at91/pmc.h                        |   18 +
+ drivers/clk/at91/sam9x60.c                    |    7 +
+ drivers/clk/at91/sam9x7.c                     |  946 +++++++++++++
+ drivers/clk/at91/sama7g5.c                    |   42 +-
+ drivers/irqchip/irq-atmel-aic5.c              |   12 +-
+ drivers/power/reset/Kconfig                   |    4 +-
+ drivers/power/reset/at91-sama5d2_shdwc.c      |    1 +
+ drivers/soc/atmel/soc.c                       |   23 +
+ drivers/soc/atmel/soc.h                       |    9 +
+ include/dt-bindings/clock/at91.h              |    4 +
+ 45 files changed, 2788 insertions(+), 65 deletions(-)
+ create mode 100644 arch/arm/boot/dts/microchip/at91-sam9x75_curiosity.dts
+ create mode 100644 arch/arm/boot/dts/microchip/sam9x7.dtsi
+ create mode 100644 arch/arm/mach-at91/sam9x7.c
+ create mode 100644 drivers/clk/at91/sam9x7.c
+
+-- 
+2.25.1
+
 
