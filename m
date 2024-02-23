@@ -1,150 +1,98 @@
-Return-Path: <netdev+bounces-74501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48FB386185E
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 17:47:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 449AE861875
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 17:50:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A2301C2373B
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 16:47:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0DE51F23EBC
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 16:50:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 479BA12839B;
-	Fri, 23 Feb 2024 16:46:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 144CD84FAF;
+	Fri, 23 Feb 2024 16:50:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="dZhYmf3q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m90r8sf8"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AABFA12AAE0;
-	Fri, 23 Feb 2024 16:46:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1049186A;
+	Fri, 23 Feb 2024 16:50:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708706809; cv=none; b=BMgoeA0NYaKU5BigD/l3+TOcZQBNV2Es0hzEND6kx6w5VFGRW3LRCy17aP2OMDpxPKwjb6TWs4z0EIZi51JBdPcWMwXIVcHdTIVvesOAnyGopGrIqZ+rd1IG1lr4NkFaBgjLADt77UvQ0DzS0gRNUcnsoBH+W8sXrVdCuDMW4zI=
+	t=1708707041; cv=none; b=H1+fD0MUyVhP44hR3lQrgXWUWMeTkFTh3CHxc7EQL88TXpsY5wvCC9iyD9hWP/XeEb1UVHdzUc7DEMkj1NbXKWBVVJAQK/MFRcWzzWHx/P0XbOEKptFMjk+mVVyVUQgYPC9awVdZt/jeSWlYYVT1lgg4dgbp2g75TNz/rke+fTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708706809; c=relaxed/simple;
-	bh=9BlhONqywkcwYW5vl14RcOcxmIdAOs5MkwAlCl+6WqU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bPTKrjwGXMC8kxvbxIV+NoguZl+pX9fSLElfbqmTIJBtY5tAaTotxE5QA4lvFFvOhlfwbZKKayVE0q3CXn9s3zT58i3nbbfftf/2BwpQIcexQHveiwWM4bci/cJSZENnp9Fy/j9DJ3ZoyEm06iuq4iae6Aejw7pfwOJkYycFnxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=dZhYmf3q; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 962AC1BF204;
-	Fri, 23 Feb 2024 16:46:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1708706799;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bWQmwnP9Sycw3m4V6z0MFA7V8AKD1xj5qu/ok9h5gIc=;
-	b=dZhYmf3qGRdNefjbopqjT2IeJHh7On4e+7vPoNcsu5o6flHpounET/Oh975AJrV1/QNgBA
-	YiBy8tCWnPWxrGfGbcNoRVh7v+TrK2u/6No7VTbUHkimgvOaYVBXOZHPPpBx+TP6Jzu86u
-	V2KaxQCmsHTYlNeU0kGxxOdOBUlae/VdMECBwUd9nJqvrvjj9Fp7U3t/HWgvzBCJn8vJtY
-	RPuJRHnQ6wEBWQu/uOhsjl/2Kr2eTw+WhMV7bHsNA25GgrCu4ftus3JslQlcDf7kqZC+y/
-	29jgpITfZcChdDJ2mPGDfpgYfK2RIrqakAXe1E2DabQqKJ5p+nLAy0I76vx1Tw==
-Date: Fri, 23 Feb 2024 17:46:35 +0100
-From: Herve Codina <herve.codina@bootlin.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Yury Norov
- <yury.norov@gmail.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew@lunn.ch>, Mark Brown
- <broonie@kernel.org>, Christophe Leroy <christophe.leroy@csgroup.eu>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v4 4/5] net: wan: fsl_qmc_hdlc: Add runtime timeslots
- changes support
-Message-ID: <20240223174635.43e8b2f4@bootlin.com>
-In-Reply-To: <Zddslpw398MJ49SS@smile.fi.intel.com>
-References: <20240222142219.441767-1-herve.codina@bootlin.com>
-	<20240222142219.441767-5-herve.codina@bootlin.com>
-	<Zddslpw398MJ49SS@smile.fi.intel.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1708707041; c=relaxed/simple;
+	bh=FcFKkcD+KedUPd0nKCzo9Sr+131bk/+fxgGpLieoX10=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hX4e9S9PDYLU5neVthA2XvaPqcM0gKjWvS7e5UGQnRKMliBrRkkBkaVhW2TS/jhz8pZjgXtwQ1s3iw2oHrxD5cNeJJkZV5GlakT5X+WzPatKxLKEJj4eVOeHa+BFYt4oNwPnD+GISAnbvv7SFvavmWfcBDSPmQbruqfX9pdoAt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m90r8sf8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 214D9C433F1;
+	Fri, 23 Feb 2024 16:50:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708707040;
+	bh=FcFKkcD+KedUPd0nKCzo9Sr+131bk/+fxgGpLieoX10=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=m90r8sf8rpAUhp0YsZ+A4WeQny1295+J2EUWd2WI/7ORXn6afHm6UHyrbjezOSHvA
+	 ltphprEqUjuiWq6LwNJ8tX8+Y2qYnUqxMnSAIUnk1a03aM/J8bH+NAbbEruroyOzQH
+	 +KJf7/Dl9SreMNRV1pdtFKwvNaHBcMK4zNDEf680YBpybMhgX8v3CFaZiYDtNMFRwe
+	 Zzf/HVbCW4OubxUvFJYH8uHaxNdBKZycj2ZJhmgdIlf0x5I72W99GLsJsl3SjLBnR1
+	 cFdLKpZt2bIV4eJSzXUok5jdgbKK66czDsVgWsP+TGtNPk3udTNlzsuFF/94dcbp2c
+	 lYlxRG7IYpbbQ==
+Message-ID: <fd7b788a-2e12-4828-8f5f-d17536ed5a10@kernel.org>
+Date: Fri, 23 Feb 2024 09:50:38 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 0/3] ioam6: netlink multicast event
+Content-Language: en-US
+To: Justin Iurman <justin.iurman@uliege.be>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, linux-kernel@vger.kernel.org
+References: <20240223144135.12826-1-justin.iurman@uliege.be>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240223144135.12826-1-justin.iurman@uliege.be>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+Content-Transfer-Encoding: 7bit
 
-Hi Andy,
-
-On Thu, 22 Feb 2024 17:47:34 +0200
-Andy Shevchenko <andriy.shevchenko@linux.intel.com> wrote:
-
-...
-
-> > +static int qmc_hdlc_xlate_slot_map(struct qmc_hdlc *qmc_hdlc,
-> > +				   u32 slot_map, struct qmc_chan_ts_info *ts_info)
-> > +{
-> > +	DECLARE_BITMAP(ts_mask_avail, 64);
-> > +	DECLARE_BITMAP(ts_mask, 64);
-> > +	DECLARE_BITMAP(map, 64);  
+On 2/23/24 7:41 AM, Justin Iurman wrote:
+> v4:
+>  - rebase on top of net merge
+> v3:
+>  - patchset was mistakenly superseded due to same cover title used for
+>    iproute2-next equivalent patch -> resend (renamed)
+> v2:
+>  - fix warnings
 > 
-> Perhaps more 1:1 naming?
+> Add generic netlink multicast event support to ioam6 as another solution
+> to share IOAM data with user space. The other one being via IPv6 raw
+> sockets combined with ancillary data. This patchset focuses on the IOAM
+> Pre-allocated Trace (the only Option-Type currently supported), and so
+> on IOAM "trace" events. See an example of a consumer here [1].
 > 
-> 	DECLARE_BITMAP(rx_ts_mask_avail, 64);
-> 	DECLARE_BITMAP(tx_ts_mask, 64);
-> 	DECLARE_BITMAP(slot_map, 64);
-
-I disagree.
-
-I first check that ts_info->rx_ts_mask_avail and ts_info->tx_ts_mask_avail are
-identical then I use one of them to create the ts_mask_avail.
-Then I compute the ts_mask and update both ts_info->tx_ts_mask and
-ts_info->rx_ts_mask.
-
-ts_mask_avail and ts_mask bitmaps are used for tx and rx.
-I could name them txrx_ts_mask* but that doesn't do much.
-
-For DECLARE_BITMAP(slot_map, 64), slot_map is the name of the function
-parameter...
-I think we can keep 'map' for the bitmap here.
-
+>   [1] https://github.com/Advanced-Observability/ioam-agent-python/blob/netlink_event/ioam-agent.py
 > 
-> > +	/* Tx and Rx available masks must be identical */
-> > +	if (ts_info->rx_ts_mask_avail != ts_info->tx_ts_mask_avail) {
-> > +		dev_err(qmc_hdlc->dev, "tx and rx available timeslots mismatch (0x%llx, 0x%llx)\n",
-> > +			ts_info->rx_ts_mask_avail, ts_info->tx_ts_mask_avail);
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	bitmap_from_u64(ts_mask_avail, ts_info->rx_ts_mask_avail);
-> > +	bitmap_from_u64(map, slot_map);
-> > +	bitmap_scatter(ts_mask, map, ts_mask_avail, 64);
-> > +
-> > +	if (bitmap_weight(ts_mask, 64) != bitmap_weight(map, 64)) {
-> > +		dev_err(qmc_hdlc->dev, "Cannot translate timeslots %*pb -> (%*pb, %*pb)\n",
-> > +			64, map, 64, ts_mask_avail, 64, ts_mask);  
+> Justin Iurman (3):
+>   uapi: ioam6: API for netlink multicast events
+>   net: ioam6: multicast event
+>   net: exthdrs: ioam6: send trace event
+> 
+>  include/net/ioam6.h             |  4 +++
+>  include/uapi/linux/ioam6_genl.h | 20 +++++++++++
+>  net/ipv6/exthdrs.c              |  6 ++++
+>  net/ipv6/ioam6.c                | 64 +++++++++++++++++++++++++++++++++
+>  4 files changed, 94 insertions(+)
 > 
 > 
-> You can save a bit of code and stack:
+> base-commit: a818bd12538c1408c7480de31573cdb3c3c0926f
 
-Will be updated in the next iteration.
+For the set:
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-...
- 
-> > +	ret = qmc_chan_get_ts_info(qmc_hdlc->qmc_chan, &ts_info);
-> > +	if (ret) {
-> > +		dev_err(qmc_hdlc->dev, "get QMC channel ts info failed %d\n", ret);
-> > +		return ret;  
-> 
-> 		return dev_err_probe(...);
-
-Will be updated too :)
-
-> 
-> > +	}  
-> 
-
-Thanks for the review,
-Hervé
 
