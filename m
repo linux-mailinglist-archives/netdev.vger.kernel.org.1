@@ -1,93 +1,126 @@
-Return-Path: <netdev+bounces-74627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B092A861FFE
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 23:48:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8978A862002
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 23:49:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3BCCA1F23AC4
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 22:48:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34FD4285D3E
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 22:49:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1D4C24B2B;
-	Fri, 23 Feb 2024 22:48:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E46641419B3;
+	Fri, 23 Feb 2024 22:48:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="BoZVTEil"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Y5X2nqjj"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2042.outbound.protection.outlook.com [40.107.223.42])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6728D249F1;
-	Fri, 23 Feb 2024 22:48:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAD13249F1;
+	Fri, 23 Feb 2024 22:48:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708728532; cv=fail; b=ofsWuAIWSMNfTuCt4uaHY93qRy36qElk2NDh4sCZuGjFLmmYnq8GS1W7w9Ohl0OfC60x2DdXWfiIjuEtQFykGq28ZvwSKbbtAJSMq2WRqkPKH0iSWitD5ND2PPmMjGyl7Kl7IjqZLDQaDLgLgAdsvY4fKajB8FFRm0u2BuG9kbw=
+	t=1708728539; cv=fail; b=VXrFMNzPolh+5S7QTTuNdaIRUIMwR8EXHJifKrUmk1L+Jf0e2GaWH0UISIGNISEKn62X4vh7cJjzUr3L2ndSfs3MGXvh61YhLSKBPZ590D2EDj39j1/WpTifLsjxHlWZLwF/vk3avIT6LZiG3Z5P9YITVrvejEY3G2V++nME8Dw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708728532; c=relaxed/simple;
-	bh=8qhB3LbPwVv9HJcBP6KOT+CxOVqMX34xkG40ql9JWmI=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 Content-Type:MIME-Version; b=rnWVMHMPpQezKBvs+U6f0eST2HxBdj9l262mfRL2MakcELtTKekINDRjyNtAXG9u2pVHuJYcwUN3DlOk9Al4ha7fZrNM2yVEZ1hKP/Y3/C0x+ZvlmQMNwQAHNpz1QBSe7H6tb5uJWgIW6DpBYfkQB1DSELXCz9EdprZNrg6CjtQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=BoZVTEil; arc=fail smtp.client-ip=40.107.223.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1708728539; c=relaxed/simple;
+	bh=WEb4pLclwP7b8e2QT8j5/roGXCyuN+PZEaiZngBkkBc=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=LR8h5sgezmihkYfGBfS29eskZoNVl1l3zQWJX1bZ3h9X8iYCi9qAsIZkhpVRlVlwTpJKTOqiwHKI7U7TOWbMJUsD2/GmvgDnsVnUFTO9i8Z+7T9RV8hsHudgvVt8Dfn1IVaVr7O92kzzWiSf5yESim4POLZuAhLry1w/PdbQzsI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Y5X2nqjj; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708728538; x=1740264538;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=WEb4pLclwP7b8e2QT8j5/roGXCyuN+PZEaiZngBkkBc=;
+  b=Y5X2nqjjhLJk2TYel6JW/0mbs7iCkaCsaeV1vREfHPaRJF7Ex13lbG5O
+   juZ2Ge94J0nTj4FFhDZdLrQQ5Og7X4hkx1LW7FohN9QL6w1KjW52MPY73
+   4PcBk7IL/YDT/eejuHSQL9DRJQKp125zB63uZp2yAyvx6uqOxvWyBjUTC
+   X/en0MBl/P92GMHogy/2WQwHHXYBXRPSjomJQFLw+/ipoL86ZbFMpTG7/
+   LMN4TcZBy9U13GsjUrQVPLllAXO5bV5p0PgQ/35l7pGMu6eew64WFQocz
+   qff94dlVei6SPT/eFsEkkEUx2M0I38nnjH1ES7sUOVyo7httk+FtzMdbl
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10993"; a="13630658"
+X-IronPort-AV: E=Sophos;i="6.06,180,1705392000"; 
+   d="scan'208";a="13630658"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2024 14:48:57 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,180,1705392000"; 
+   d="scan'208";a="10821866"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 23 Feb 2024 14:48:58 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 23 Feb 2024 14:48:56 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Fri, 23 Feb 2024 14:48:56 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 23 Feb 2024 14:48:56 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GndvDIjQZLlf94kZfIOoQVY7pgJsAXFq76qy7k2yJAKdxwAa09l6tcDyYzS3Dc7t4PdcjP+oma7U6g6u/2gOAvfNRfbuaLfc53AsStbX8CAP5e6XFQlvWn8cyQVtB7VxmMVrq0JPSOA1K/4s/LvoI+Zq0nKnnWbiei6J20Ai+Oz+Z7aR58pm8cwcH+U7KNIyQoqUVA45xuotvvEOssk8cf/U0e+O3orF1RlP4H5TOhntwnJkh18KQd24YECRzHw4qEPDUU9XrhK4JJwRrxDzwkvSr86oeXANsVXGMsanufigFbM2PhEbWc7KrojJGj858/8L/PW6sWV8qRPSDPG2SA==
+ b=HX8nTGPYZM5BPQ0C+a40oRLEAR+wElvgP5wD+69KB04zy1NCDlI8TDV9gxOW1xs9DUnGETWcdDzz5+ao+JxcOryErbkh3Vbf9F9akN+UeY7qfCgyVEC1aU+EWlb5Vec/f3O91XRZXHxiP+44t8oW2GiIg0Oj+oQfe2yznSMQLdvcTAQrH1L35DL7dZGRxYe8U/5Uag5LYYT/FnqjSlxufL7CTEPkzo4uVW1iIJBMwjjUGuMPUa0vYtw36l464QfqgyFaVummR6S3IfnMhgbdtE7xrD+WvHyvZzIMY715Khx8lM2Rqn7iDtJaxWYtkoS43Q+WYdT6HGC61etdD4cwcQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jXv8dqCAof1zQ6M6qceAya8i8P1FzNPdGa8niwoy/Ik=;
- b=eU6cgorOL4IWOGMxK3xCDpYT7JDCQJZvXqs0qYi9c8cJPTzA91NB8ej5JBThx0TXNfpGBb0Dy559VVxhn9wH56O7c94WlOdxa0lwMYphvQnxPGYki1m1YFz84Wl5WjSeLD5BodUXK6nG6Va8nRWogtE18E++fER+UYYVBgRwt7UKM7sGcq3rreYr/BN/wbJyz+UX1VID8KLE0cwVt2A9+7G8Frzw3HxBYTM2sZz9g7qWKxdYQgVug5X7j2k4aN2Q5GqtQ6lK0nCDut1317y9aO5iWsvDlRDoMZWIUpqUjne6harwl5EVO3BCOGq9cmqJ+Uaf7YhVTsjER50n3G0Dhw==
+ bh=6Zpchy2n3xScIOTPuLY9mjhHuQ7Vbnu1cjzPxFkSN3c=;
+ b=iq+ZK9rqgQ+aJJ72wCS2OD1HP5JL/bd4odgq7bTagEqTB9KLDgwCxLL7sg3PIGuD0LOADHnQIcnqfdXA0hWRCO+PuYwntP++IYTW7xZTQJDrWtztSmfCpAeLTEWRKbyIOaBarwZz8Er8qlw1xbtGeSTYMZIEI1ejGrDFrGyqgY93DxN8rhX57ugsxdU9sZjE6dvQnlAbEYzeqUV+ScoU6BkSjHaoIJmwnomB7XyVvPo5tdQ6gtI/RzpbSfF6PazOvNJXIZMhb6RI9IMlkVaKz1d1cSotAlwTdxmDoOysL73wU/CAKirAYx819utXsckXoaieaxjUBTZgrx+Kwsu9XA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jXv8dqCAof1zQ6M6qceAya8i8P1FzNPdGa8niwoy/Ik=;
- b=BoZVTEiliOaI3ky32hQ56b7w+I1XgNpImqjpecKP8e39p9L0r3W46SqxXKiCkcc5D7SnS6Nc9mS+8jPkKHVKzzef93XXCjDvg8kDbbU6lnJrg1bsArvxvQdR5oAbB85Du2Q1LzwA76D1gz2uioymQw/ATB39R5T1YQHrv9LjnOoBwiAp2Z997jEQd2NA/19uCVFjbUjdMOSDEZNUA2LAqpv4QWcv8XUMxt6Uw3ncA0/nTY7iyVeKWsVMdy9ZRPEhjJ6RJy7au2L91w8dac8AkYIPo/WfyeeoFen2B42bNQJBvo+osl+ELqUHdArUeZ4yFbpUPfL6fGeON1Sa6zSTyw==
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
- by BN9PR12MB5276.namprd12.prod.outlook.com (2603:10b6:408:101::22) with
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by MW4PR11MB6762.namprd11.prod.outlook.com (2603:10b6:303:20c::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.24; Fri, 23 Feb
- 2024 22:48:45 +0000
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::459b:b6fe:a74c:5fbf]) by BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::459b:b6fe:a74c:5fbf%6]) with mapi id 15.20.7316.023; Fri, 23 Feb 2024
- 22:48:44 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.10; Fri, 23 Feb
+ 2024 22:48:54 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::b383:e86d:874:245a]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::b383:e86d:874:245a%5]) with mapi id 15.20.7339.007; Fri, 23 Feb 2024
+ 22:48:54 +0000
+Message-ID: <a84df9ec-475d-4ffc-a975-a0911a57901e@intel.com>
+Date: Fri, 23 Feb 2024 14:48:51 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net-next v1 1/6] ethtool: add interface to read Tx
+ hardware timestamping statistics
+Content-Language: en-US
+To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+CC: Saeed Mahameed <saeed@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Jonathan
+ Corbet" <corbet@lwn.net>, Richard Cochran <richardcochran@gmail.com>, "Tariq
+ Toukan" <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, Vadim Fedorenko
+	<vadim.fedorenko@linux.dev>, Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit
+	<hkallweit1@gmail.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	"Ahmed Zaki" <ahmed.zaki@intel.com>, Alexander Lobakin
+	<aleksander.lobakin@intel.com>, Hangbin Liu <liuhangbin@gmail.com>, "Paul
+ Greenwalt" <paul.greenwalt@intel.com>, Justin Stitt <justinstitt@google.com>,
+	Randy Dunlap <rdunlap@infradead.org>, Maxime Chevallier
+	<maxime.chevallier@bootlin.com>, Kory Maincent <kory.maincent@bootlin.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>, Vladimir Oltean
+	<vladimir.oltean@nxp.com>, Jiri Pirko <jiri@resnulli.us>, Alexandre Torgue
+	<alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, "Dragos
+ Tatulea" <dtatulea@nvidia.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>
 References: <20240223192658.45893-1-rrameshbabu@nvidia.com>
- <4c94d725-a903-4979-bcc6-9353e0869cd7@intel.com>
-User-agent: mu4e 1.10.8; emacs 28.2
-From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Saeed Mahameed <saeed@kernel.org>, Leon Romanovsky <leon@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Richard Cochran
- <richardcochran@gmail.com>, Tariq Toukan <tariqt@nvidia.com>, Gal Pressman
- <gal@nvidia.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, Andrew Lunn
- <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Ahmed  Zaki <ahmed.zaki@intel.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>, Hangbin Liu
- <liuhangbin@gmail.com>, Paul  Greenwalt <paul.greenwalt@intel.com>, Justin
- Stitt <justinstitt@google.com>, Randy Dunlap <rdunlap@infradead.org>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>, Kory Maincent
- <kory.maincent@bootlin.com>, Wojciech Drewek <wojciech.drewek@intel.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, Jiri Pirko <jiri@resnulli.us>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
- <joabreu@synopsys.com>, Dragos  Tatulea <dtatulea@nvidia.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org
-Subject: Re: [PATCH RFC net-next v1 0/6] ethtool HW timestamping statistics
-Date: Fri, 23 Feb 2024 14:47:37 -0800
-In-reply-to: <4c94d725-a903-4979-bcc6-9353e0869cd7@intel.com>
-Message-ID: <87ttlyvltg.fsf@nvidia.com>
-Content-Type: text/plain
-X-ClientProxiedBy: BY5PR16CA0013.namprd16.prod.outlook.com
- (2603:10b6:a03:1a0::26) To BYAPR12MB2743.namprd12.prod.outlook.com
- (2603:10b6:a03:61::28)
+ <20240223192658.45893-2-rrameshbabu@nvidia.com>
+ <abbff26c-c626-42ce-82a9-4dc983372de3@intel.com> <875xyex10q.fsf@nvidia.com>
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <875xyex10q.fsf@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4P222CA0004.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:303:114::9) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,83 +128,173 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|BN9PR12MB5276:EE_
-X-MS-Office365-Filtering-Correlation-Id: 01c89f25-43a0-4db6-7923-08dc34c196c1
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|MW4PR11MB6762:EE_
+X-MS-Office365-Filtering-Correlation-Id: 05bbd331-1a00-410c-7fc8-08dc34c19c76
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	qHK8w0JJoC6+Ky5ZWstRaFu6PuKiTK5vJm9OhE2C/PCV1NxoyDSJOZsJJNCAOvE6VMp3P0XJUl7+na/X7lu0HsBgQ8rGwIp/ZRzrAqKXFjY+RckJzF1giH+LETY/NBrAE/t+EfxEftaiticPLWiaFB1I5V2U9YNW1Bpx2lXwyYZVPo0mUkbZBDPEGl6YltYgka6G2tApf21Aq/YcKQU6kBCC+DMG4v+pmb8h6Q/9HslnT+yNPa4Nf1OO6kD4nI+uVZKyJxP6FnthXqKD1mCMKTgWsFQGrHh7ghqJJJWPEnJ+0poHBQsA39N1YCxyPsld1xiZix6bkeoCtQOgFjuoBJk9s4AXuupcoKr30v57aLn3PVp/Vy/wodJbBECWdR2BFw8uQZsqB1LgZYG1WzVDVBaGPZ4cPIqS//1R3WnuZWukKCnZ4ROjZjNhpt9Okbi0Gq82Q0EngNMrX5AU6t7tdoc4ncm36YKOOIU6li40X+WrlUE/dqzSAwrubN1iGU6PhbLkVLaoF/Lz0dfSRGkkqEqFGFDC3oglx1IuVbkE/9hRMQhEHPwqfYMEHI3wEfst
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: QCmM6OntOi8gI/4AG3ZyBHqnu2w9UOdbxIlcY2Cbt8GoFKt2qcfoPShP77Ae1UBY+Jj1Q4c7qW/b/qNzVt/93WXgObwnxrcm3+wRQzM+rh2qkX3Hv+zcfRX+/WwFbu1YabTeywS4NdLqsm1pHTmbP9/KlNRgDF7Z5gFNl3HfiQ1Gq/mXNROBFm6LTBB40e4JKANUqrqQYnflX278HZf+GIQq6Xp41+NqUpbKcPcy2AFWwsccbavxAwoLNw6DTZDnObsWAcRnMUPY9Ys7odMvJxJkYneUd6oU5D8S6JUbybB/FgRVzg4zhz1w0rH8yAMg/taew3EnKbz2hukTLjx8SlhcFM+BDNMHpkWyKEglfddk36GduJmJfQjjO0IkdmNB5Hhv6GtcHy+aJ0AyHBJG8XK13+kGDRLjC3M4GUOE+Z31Z01BqFjaODpyMsXmVjv73fwCTrXkC5vg3CBRz5KLw5K4FFRuIu/SJ9Czoo/rW5gKVQh3ILtDBR0jswM4U6MVYYrXR13NJkScnSTZNI/wL0ccZFIrz9xkFCTq6Y0CTa0=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?TH+Bz4uu/VnlIFnr+nGjtqK9j9XDShNxga9Xka3ozg2teE0MeC+epyTJzj2i?=
- =?us-ascii?Q?ev/jNz1zW2410bkiWp5tr2gQ2dad0q7R50pOX4Q4yDI7dXiZQBZyxvtZyTNG?=
- =?us-ascii?Q?V8hg2+LiwdmKGJfUKBMgMYUK12yBYz2A4LVdBPHj1JgEaN2ZW5dwkhhMvVKY?=
- =?us-ascii?Q?fhEjW7XxvXQBCAiGtDq3RdJDn7m74fQK664yeJfCni3ipJHYPYSiZpuM+Lk5?=
- =?us-ascii?Q?Nzpo+5+6vzChe0NG0ps9SOPcn4+ydklx+aSRLEoPip8A9QE4wjf80HKYpQZz?=
- =?us-ascii?Q?3JMp4mB8qyoOclMz3tVK1EHrcdwjz7JSch1/Xwjc5qtWAXJczoLxzW5tl+Ga?=
- =?us-ascii?Q?RY2/dpPJjRqStjg3My6VKJwHaZekhz1ZaQlYU0w1yhCNJUFeGEcUznEs5uRT?=
- =?us-ascii?Q?sirwuOqOMv0/Vs13ZiloiZKt5MxvzmD49sgbWuwGWFggmt8eO4OMnRo2Vk2U?=
- =?us-ascii?Q?+K4qsO64ZB8xc9xVWzY9dq2A0V47AbxiBrC892jUngsdump1TWr5IzEDq5g9?=
- =?us-ascii?Q?gs6j74oIOFf1p4tsLlpFTsglxcQm75bRa3fzRSdr0Rq451YrbROs+UfB6eF2?=
- =?us-ascii?Q?aRZraBdHfPf89266PLZP4hqBXcwJPslP7wQJz1EPrCDXfhHvMbA0nVpUKtyv?=
- =?us-ascii?Q?OKYsH2X+KcS33fnM+h3orDAx0tXw46JaNth/ZqizKkMMpDqZCP2uZLiNIrkk?=
- =?us-ascii?Q?yuOrDGF3n4JLrOnsbl5F6MW320yauER62WYJ1biPat92ElPhzQMTqM8rJHYV?=
- =?us-ascii?Q?O9ueP4Q8Qq5uHPIlFDvMCEFnj/pb/byjBqAD28FFAMFe0nm0VsY/W+ixYOVe?=
- =?us-ascii?Q?RGja74TmqnOl4uKeGjpd421T71/H88zHMg2O6/FgcAEcMx/i97SxsAo9V3ip?=
- =?us-ascii?Q?5qBv6uJeVBdxta70urHKk5jm0c6iW6Ivl4auItOk2xlt33iwbqD/PVuekkyh?=
- =?us-ascii?Q?yX+TrJY9F7xE+pQ2FMV6QWX63EF5AJGO0xCoawArMNKgJRWtso9RmBpqDda3?=
- =?us-ascii?Q?zvDv0NbCjFMWqaapNlU1eZzR9DMTLZy5MGel2U4hf4UIuiTQBbptrj+9WwaJ?=
- =?us-ascii?Q?noHObl1YuQXpAD16l8Q2MlPphhihPGwx5vzFGnAR6pKEUf+uL/6DmxXvYwZD?=
- =?us-ascii?Q?+f23ALY4ECA/x3VpXyepRVuyJQdlg/B8HI5TXRX8uQr6wxgrWR0yMFclmw8W?=
- =?us-ascii?Q?KQj6miJ7lhG/6ZaZqusRX4K0L1DPmzT+AFHKykyool+y3jME1N9qw+/zs68x?=
- =?us-ascii?Q?U5VaxEVnyerzkdbrN0faWqaFjNRNstLEzPTKBSAorAnMsphyJlO6YuHJNvjf?=
- =?us-ascii?Q?iwkG89JXGsZCwpL1CD1fw8WL4GxsSUARjoKRcEfSJS4A3OGc9eSkxRO1GB8s?=
- =?us-ascii?Q?7mNNU73evTr0mhWZqMyWkDeQCAFeL4KpMZetLnS/OQVd2BgnL3v/KR+T+aFd?=
- =?us-ascii?Q?ujJ/f7zLsQfw3xoY8y8PI4JrOxhoVHlSMikGuS/Y6dicoELpwtSZ0PO8MSwd?=
- =?us-ascii?Q?F8MC+jHXQVZqLnWn8iaH8w2dMQaRR3ZDp5w3D2sWW/LMg56MqTvxZvn/839B?=
- =?us-ascii?Q?wWAwTe09wN543CYpicArCR7YitI0uOBlnPaGepHzHBAk4yVHh7+WjpP1Ma2A?=
- =?us-ascii?Q?Jw=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 01c89f25-43a0-4db6-7923-08dc34c196c1
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?azJHZyswaThOeDZNTlBXenpTbFBmKytjN2ZnWkVOdmhwREZuRXJZcFNHOHdW?=
+ =?utf-8?B?bGVtTnMzTUxvajdHNWZKSjFVc2lyOThBeUJ3OExDM3A3aUs2eEhlK3J0cEJG?=
+ =?utf-8?B?bmN4VzMxcVBmakR2ajRyVk92eEdQaHFNL2dPWGRrYXlxL0hpc0RacGxVUDlI?=
+ =?utf-8?B?WlVueHNzMXhWcUpYWWFDN215OFRhOElwR21sY3pxejVMUHZMYngyU3lpM0lU?=
+ =?utf-8?B?QnoveE85UTFEOHhlOWgrcFE3K1ZUN0JoRUYrNXA4NGNjZTdVaXpIY0FjYlo3?=
+ =?utf-8?B?VzNha0l3bHl3aVM1TW5KT05saHErNkxJUkRTOVR3S0pLSVNQL24vUEU1anNN?=
+ =?utf-8?B?a2picnRYRWozaDNqczVZLzRGL0RJSVZYM05ZVkd4Z09ENk10Wlo3UUY0SGgv?=
+ =?utf-8?B?UjNrQ1BhMGYxbHNGTnRHbzd5bjAraUorREdadmFwRjZwSWlSdEdMTXIxYkdI?=
+ =?utf-8?B?SXBJd2JTaUp4UFB4TS9adzl0bmJXM2plcXJobWpuQ0MvQUhHS1pVZFNtODl0?=
+ =?utf-8?B?VTZIdEllUnhFSXhDZ09iaGI0NVZ6LzllSXhzSXZZSmR0cXpPamFjTDBoU081?=
+ =?utf-8?B?Z2EybXNLOXladHo5THBBMmVhUXFOUUswK0lpenkrcmxWU3ZGS0tUTkkxNldC?=
+ =?utf-8?B?bWRVYXZEck1rMEtrK0UxVXp5cHJGdlpEamxsb1h1VndVMjJqWkRCWEtUQ3h0?=
+ =?utf-8?B?SWZyQnpUUzkzQkJ0L2FPZ1VoWllNVVorbUpNVmZ2RlpVTVhRR1RBU0J2QzNa?=
+ =?utf-8?B?NE91M2s2UnBnZ0loc294eHRQZXJ2c0dMaWZ1S3NqbU9ockNjWGRSenRLZDY5?=
+ =?utf-8?B?eUszdFp3MEc5aDdUT3kwdUEyd0pWRDBrWlFhazR6VC92Tkx4dXEvaExJWnBo?=
+ =?utf-8?B?N2NET1grMEFGc0EzNzhNZnpLV1U3MDZJY2pVRFR1SDRPRzBqUFY0SFZPS2Qx?=
+ =?utf-8?B?TVpLL2J3b1ZkcFdzVFRyWnRsMThoelVXVnFOV0dONFFzelZLMW5aejMxc2RF?=
+ =?utf-8?B?TkxBeWIyN1NqME9tKzkrbzJBSXBlZXo1M2NpS3ZGR1BBS0lxNGc3MENuQXFy?=
+ =?utf-8?B?ajZ0T2g1dk44YmZkVDFhVUtuVERoVUpxRUovaWFhUUJkR3BZSDlaMUV0VGE5?=
+ =?utf-8?B?MUp2ODhLd1VYRzNmRVJKRml0bSt3VjZkM1VPYWpZc1BydklENzhyaXRRZ0Yv?=
+ =?utf-8?B?cGdJK0JtNis2MjNib1dXNlhuNm1MN2h5Z01XNU52TEgraW92d0xSbzNIc2ZF?=
+ =?utf-8?B?OUZKT2dtUTdQclh6UUE0YmJTbmVOeGhyWWVRWkx6T0Zkay9OU0tkMWR3eUZZ?=
+ =?utf-8?B?WlBCUi91R1UyVjNzc1JkbGh1RDRnVVlKd0lrdWQyV2VSUU9RNnRVSTRXNXM1?=
+ =?utf-8?B?RElIYXRhV3ZXWC9ycFU2b1RvcExsWGlEc1NtS1ZOSHRCVTB6dXlaWFlra1pR?=
+ =?utf-8?B?S2d6WEkrUjU2alJYZ0lqaFBLR09zUXl0WVpYaENVemNwdHVsdENsNndpNnlI?=
+ =?utf-8?B?dWUxSUZJeE0ybS9PUHFCampqSUxSQXdMc21VRTlKSERPUTdxaEpjWVRGWEl2?=
+ =?utf-8?B?NU40V3dLdExMQm1BMUtDM0N1NDByMTlLbU5CMnJZV3Z5Mkw2RElHdlZTWTlO?=
+ =?utf-8?B?eHEra29rTnVNUnFJandMQnR3YzdjZ09UR3p1QzVQR0dyM1Z5L09qdGZROGVR?=
+ =?utf-8?B?MGFqcnh6a0hIckZFNW9PbmN1ZkdJTk5sWENHd2tDZmNqZ3g3RUNuOGFWTmJx?=
+ =?utf-8?B?bXg1a1hoa3ZETWFIZEY5WmU3a2F3ZTNXOWN5dHY2NmMyUlNnQlJielRUdmZP?=
+ =?utf-8?B?cjk5ZzA1YXB5V2xTK2dKQ3A5ckdEaFpQWHVMMnFFQnB1QWNyQUxLbTF0clNt?=
+ =?utf-8?B?WE1ycnMvRExtSU82QjUxR3dEZFM3QzZVZHhBUk9tK1NhUS9iNlRvcmlRbjBR?=
+ =?utf-8?B?dkIzUUkzRW5rQ2plQzI3YldjQytQQWpDYzN4MG1nd0pNbnFLUE5LQVYrYVQv?=
+ =?utf-8?B?dWZEV1NBT0dsd09UY20wT2JoN0JadDBQVkV6NFVoSFRoa1R3alE0MzVNVXFV?=
+ =?utf-8?B?ck54ZERzM3dGSFlXVXIzR1UvL2YzUU1JK2RHS1kyOXlrWlM3UGEyS2lXMDBz?=
+ =?utf-8?B?U3AvUG9jSW01a0JiWGd0TWlVaWlPZlV3cGlhSTY3RW1kSnJjWkllTUovWlB5?=
+ =?utf-8?B?RUE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 05bbd331-1a00-410c-7fc8-08dc34c19c76
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Feb 2024 22:48:44.3701
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Feb 2024 22:48:53.9634
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bsAgWbmzXi/MAJitROw2ynIk151hni7k4zeWYbGA/iJypzQKy7JS7saaGnYNpYXsdW9g99KOi86eNuTJOAkaNg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5276
+X-MS-Exchange-CrossTenant-UserPrincipalName: SY45Ols9vFHM+fHq5Njivauz1UKpoU6cUeUv6NqwZkrbzSIhbikqZH84RiLsk4gw1g+F0Xr2rRKdT2pcgXssc+kYYiG40LRkb7xDn443YRY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB6762
+X-OriginatorOrg: intel.com
 
-On Fri, 23 Feb, 2024 13:00:10 -0800 Jacob Keller <jacob.e.keller@intel.com> wrote:
-> On 2/23/2024 11:24 AM, Rahul Rameshbabu wrote:
->> The goal of this patch series is to introduce a common set of ethtool statistics
->> for hardware timestamping that a driver implementer can hook into. The
->> statistics counters added are based on what I believe are common
->> patterns/behaviors found across various hardware timestamping implementations
->> seen in the kernel tree today. The mlx5 family of devices is used as the PoC for
->> this patch series. Other vendors are more than welcome to chim in on this
->> series.
->> 
->> Statistics can be queried from either the DMA or PHY layers. I think this
->> concept of layer-based statistics selection and the general timestamping layer
->> selection work Kory Maincent is working on can be converged together [1].
->> 
->> [1] https://lore.kernel.org/netdev/20240216-feature_ptp_netnext-v8-0-510f42f444fb@bootlin.com/
->> 
->
-> Makes sense! I like this direction, I had meant to work on this for the
-> Intel parts, but got sidetracked by other tasks.
 
-I still have a back burner task for a cyclecounter API change you
-suggested a while back.... Hoping to get to that after getting some
-large features out of the way in the next two months.
 
---
-Thanks,
+On 2/23/2024 2:21 PM, Rahul Rameshbabu wrote:
+>> The Intel ice drivers has the following Tx timestamp statistics:
+>>
+>> tx_hwtstamp_skipped - indicates when we get a Tx timestamp request but
+>> are unable to fulfill it.
+>> tx_hwtstamp_timeouts - indicates we had a Tx timestamp skb waiting for a
+>> timestamp from hardware but it didn't get received within some internal
+>> time limit.
+> 
+> This is interesting. In mlx5 land, the only case where we are unable to
+> fulfill a hwtstamp is when the timestamp information is lost or late.
+> 
 
-Rahul Rameshbabu
+For ice, the timestamps are captured in the PHY and stored in a block of
+registers with limited slots. The driver tracks the available slots and
+uses one when a Tx timestamp request comes in.
+
+So we have "skipped" because its possible to request too many timestamps
+at once and fill up all the slots before the first timestamp is reported
+back.
+
+> lost for us means that the timestamp never arrived within some internal
+> time limit that our device will supposedly never be able to deliver
+> timestamp information after that point.
+> 
+
+That is more or less the equivalent we have for timeout.
+
+> late for us is that we got hardware timestamp information delivered
+> after that internal time limit. We are able to track this by using
+> identifiers in our completion events and we only release references to
+> these identifiers upon delivery (never delivering leaks the references.
+> Enough build up leads to a recovery flow). The theory for us is that
+> late timestamp information arrival after that period of time should not
+> happen. However the truth is that it does happen and we want our driver
+> implementation to be resilient to this case rather than trusting the
+> time interval.
+> 
+
+In our case, because of how the slots work, once we "timeout" a slot, it
+could get re-used. We set the timeout to be pretty ridiculous (1 second)
+to ensure that if we do timeout its almost certainly because hardware
+never timestamped the packet.
+
+> Do you have any example of a case of skipping timestamp information that
+> is not related to lack of delivery over time? I am wondering if this
+> case is more like a hardware error or not. Or is it more like something
+> along the lines of being busy/would impact line rate of timestamp
+> information must be recorded?
+> 
+
+The main example for skipped is the event where all our slots are full
+at point of timestamp request.
+
+There have been a few rare cases where things like a link event or
+issues with the MAC dropping a packet where the PHY simply never gets
+the packet and thus never timestamps it. This is typically the result of
+a lost timestamp.
+
+Flushed, for us, is when we reset the timestamp block while it has
+timestamps oustanding. This can happen for example due to link changes,
+where we ultimately
+
+>> tx_hwtstamp_flushed - indicates that we flushed an outstanding timestamp
+>> before it completed, such as if the link resets or similar.
+>> tx_hwtstamp_discarded - indicates that we obtained a timestamp from
+>> hardware but were unable to complete it due to invalid cached data used
+>> for timestamp extension.
+>>
+>> I think these could be translated roughly to one of the lost, late, or
+>> err stats. I am a bit confused as to how drivers could distinguish
+>> between lost and late, but I guess that depends on the specific hardware
+>> design.
+>>
+>> In theory we could keep some of these more detailed stats but I don't
+>> think we strictly need to be as detailed as the ice driver is.
+> 
+> We also converged a statistic in the mlx5 driver to the simple error
+> counter here. I think what makes sense is design specific counters
+> should be exposed as driver specific counters and more common counters
+> should be converged into the ethtool_ts_stats struct.
+> 
+
+Sure that seems reasonable.
+
+>>
+>> The only major addition I think is the skipped stat, which I would
+>> prefer to have. Perhaps that could be tracked in the netdev layer by
+>> checking whether the skb flags to see whether or not the driver actually
+>> set the appropriate flag?
+> 
+> I guess the problem is how would the core stack know at what layer this
+> was skipped at (I think Kory's patch series can be used to help with
+> this since it's adding a common interface in ethtool to select the
+> timestamping layer). As of today, mlx5 is the only driver I know of that
+> supports selecting between the DMA and PHY layers for timestamp
+> information.
+> 
+
+Well, the way the interface worked in my understanding was that the core
+sets the SKBTX_HW_TSTAMP flag. The driver is supposed to then prepare
+the packet for timestamp and set the SKBTX_IN_PROGRESS flag. I just
+looked though, and it looks like ice doesn't actually set this flag...
+
+If we fixed this, in theory the stack should be able to check after the
+packet gets sent with SKBTX_HW_TSTAMP, if SKBTX_IN_PROGRESS isn't set
+then it would be a skipped timestamp?
+
+Its not really a huge deal, and this could just be lumped into either
+lost or err.
 
