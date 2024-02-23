@@ -1,123 +1,126 @@
-Return-Path: <netdev+bounces-74547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74548-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 449DC861D0E
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 20:57:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF3D0861D2D
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 21:02:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7344A1C24C21
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 19:57:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C0D4289FDE
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 20:02:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F175C14535D;
-	Fri, 23 Feb 2024 19:56:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="P/5a1fmc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18649146E84;
+	Fri, 23 Feb 2024 20:01:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E4CE1448DD
-	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 19:56:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5927984FA7;
+	Fri, 23 Feb 2024 20:01:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708718217; cv=none; b=Ds9RtkBv4c/LQ0BY+yBvpiqp/ethY8FKbsgghaLCxYTgyQCfFBvHSLtgLnz8Cf6Jbf0HV/FcIFldYSICF9xPHbe14QOP9yuXzF6vZRmCNqC1U7eZVx/5fJnu0jjPLPsX0r6gV7X2DektVSFaxcX+04e0o0dKcI7zEFdK+kHsAvg=
+	t=1708718512; cv=none; b=nhXg+lbnARdtFay6Xa3PAsWCXHb7JSheGP1aoQV6Q0o9xAm7z8lFaSkixJbp3DCbxcc09t4Q00dgbwInVq187tPsbIYwMLC8/m7L7b2w0pEEmvaEssjB2tzWJt8ITbo8So/tJJ+41N6fLefdYdfJL9GzNlNTMtcscTu/Ct0m6IU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708718217; c=relaxed/simple;
-	bh=2Er/E/YWR4ziMDKsjtcUbOnth7XzrgxHccJF7NTGcdE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LBiwUYmpbQdehfBI/JA1YQVsQug4RTJR7A6HSvX/C1G/Ooh7oTmUkC8B+MK/+9GgWGprpqgzbJv5MKMTQXz3kIEeCi3+IkmcoG9GuTeCfzXHnLTjoME+yTvqX5c2Rfjnd1PsrcjoF3Ouwj2vLQDHo1bYBgOb8zZWpr3aG69F2xc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=P/5a1fmc; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2d26227d508so9016721fa.2
-        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 11:56:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ragnatech.se; s=google; t=1708718213; x=1709323013; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=pnKaa7U6yo34FD6yjr/0ko1wRd4z14aSOMgBBceVmWE=;
-        b=P/5a1fmcCxe5wyHwutsdiUG9UZcP/ZwRjF2b9ewOuy/awYBjVn1gRNaiA6gZNaHtqJ
-         Xg+fQcNPwx2rzs8xtcSHFOFjuSRnWRdzZwKSZ/MZL21h3wl+br2crCXZ++5TsvvZ3i7H
-         olu4yLHYL6/qkyS36Xps5T7aHVVMWXmGP0pEbAt1EjlpOwebF0ts2Mk4sIp1RfiqW7En
-         7i7E+6VqpSJnHVoaQ3yGzpSU8Mpuueu1oIo6pl52BCpW6sq29C9vJQXbbVuKqx8QW07w
-         o+FcD+JaA2z+6QPeOky88C/P6pYNqR7uHhPY5VsEsk+tHFh4c9E4hEFn9fbgnDco/yyE
-         kzWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708718213; x=1709323013;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pnKaa7U6yo34FD6yjr/0ko1wRd4z14aSOMgBBceVmWE=;
-        b=xOCUhGXweqFsCbcMMVcJwLn+VApLMpIzIa2ZK3Gr/188Ty/PPaz8f8NC1zSqP/OIsU
-         d2GB5mVUJBiEhZHiFn9Ob3M8cuKEyNgtqbMFqpr5C4tULlh3ovIcyzeZDW8omO5jihV6
-         4V0whIx3SLvyxdq+G3kMvOS1nOhLCRNdoaPHL9v1pxl5Dv93FUMGzf5ctVXsKh8diGwm
-         QYL449eqpvtaXMdilZdEtSj/WGgPlZMqOY+KvZmvHHl7tTFvIHxgZe+E2zdV9rCargqQ
-         XC49ngVZsO69RNHyThzQybEOwqVVTGWNDNI92drwck5PWjeV4qhQwN14fmxZiwA4zk9X
-         ankA==
-X-Forwarded-Encrypted: i=1; AJvYcCUje49wBtaICHMNrWNFM9jGnz8aP+JCn8ZbL0qpOdbraXgMeGlbG73dp9VCTs2O9OqNVYfto8vp11v4ziKUIMa3lBsqQ2Qw
-X-Gm-Message-State: AOJu0YwbXjgq1CboJo3i1M92uqCauJFOOq7sMnIJXtEXl26kfcjFzmve
-	2TSQMsaapA3mhO6Huwp9zjK6I9D2Lpq/4WTe64tB+ZqFfprpwO/NBnvl7VKQwl4=
-X-Google-Smtp-Source: AGHT+IEszpjkvVii9Ofn9U98ZBWGg1toQDRx9xo+HuBlNaQdnBY246B7GBYO8EHTSbTKFXUCPiDO8w==
-X-Received: by 2002:a2e:9c8a:0:b0:2d2:31e2:ec00 with SMTP id x10-20020a2e9c8a000000b002d231e2ec00mr82847lji.30.1708718212975;
-        Fri, 23 Feb 2024 11:56:52 -0800 (PST)
-Received: from sleipner.berto.se (p4fcc8c6a.dip0.t-ipconnect.de. [79.204.140.106])
-        by smtp.googlemail.com with ESMTPSA id bf2-20020a0564021a4200b00562149c7bf4sm6658334edb.48.2024.02.23.11.56.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Feb 2024 11:56:52 -0800 (PST)
-From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	devicetree@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Subject: [PATCH] dt-bindings: net: renesas,ethertsn: Document default for delays
-Date: Fri, 23 Feb 2024 20:55:26 +0100
-Message-ID: <20240223195526.1161232-1-niklas.soderlund+renesas@ragnatech.se>
-X-Mailer: git-send-email 2.43.2
+	s=arc-20240116; t=1708718512; c=relaxed/simple;
+	bh=qKShU0yRSF7Qai1aRFfijNm4QP3IVl+XveltCGlIK9M=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=u4SblV6STNVFKFHJnI4BdZ+gPsBpTKcvzBKj+lFhT5knxP4Jth6uDgUfy6ItaZTqxVN0TQLSYNf9uZl4SE8tLhr1XdrbB8zXvHE4jN3oSVIivELMoqPdZcGC7yOK83NmQ5IubAAnKiOAXT8gGpLm61MYf3+RNVkDxDlczDS1nJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84C71C433F1;
+	Fri, 23 Feb 2024 20:01:46 +0000 (UTC)
+Date: Fri, 23 Feb 2024 15:03:39 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Kent Overstreet <kent.overstreet@linux.dev>
+Cc: Jeff Johnson <quic_jjohnson@quicinc.com>, LKML
+ <linux-kernel@vger.kernel.org>, Linux Trace Kernel
+ <linux-trace-kernel@vger.kernel.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-cxl@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ amd-gfx@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+ intel-xe@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+ freedreno@lists.freedesktop.org, virtualization@lists.linux.dev,
+ linux-rdma@vger.kernel.org, linux-pm@vger.kernel.org,
+ iommu@lists.linux.dev, linux-tegra@vger.kernel.org, netdev@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, ath10k@lists.infradead.org,
+ linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
+ ath12k@lists.infradead.org, brcm80211@lists.linux.dev,
+ brcm80211-dev-list.pdl@broadcom.com, linux-usb@vger.kernel.org,
+ linux-bcachefs@vger.kernel.org, linux-nfs@vger.kernel.org,
+ ocfs2-devel@lists.linux.dev, linux-cifs@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-edac@vger.kernel.org,
+ selinux@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
+ linux-hwmon@vger.kernel.org, io-uring@vger.kernel.org,
+ linux-sound@vger.kernel.org, bpf@vger.kernel.org,
+ linux-wpan@vger.kernel.org, dev@openvswitch.org,
+ linux-s390@vger.kernel.org, tipc-discussion@lists.sourceforge.net, Julia
+ Lawall <Julia.Lawall@inria.fr>
+Subject: Re: [FYI][PATCH] tracing/treewide: Remove second parameter of
+ __assign_str()
+Message-ID: <20240223150339.2249bc95@gandalf.local.home>
+In-Reply-To: <qsksxrdinia3cxr52tfe4p3pafsy4biktnodlfn4vyzud73p2j@6ycnhrhzwsv6>
+References: <20240223125634.2888c973@gandalf.local.home>
+	<0aed6cf2-17ae-45aa-b7ff-03da932ea4e0@quicinc.com>
+	<20240223134653.524a5c9e@gandalf.local.home>
+	<qsksxrdinia3cxr52tfe4p3pafsy4biktnodlfn4vyzud73p2j@6ycnhrhzwsv6>
+X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-The internal delay properties are not mandatory and should have a
-documented default value. The device only supports either no delay or a
-fixed delay and the device reset default is no delay, document the
-default as no delay.
+On Fri, 23 Feb 2024 14:50:49 -0500
+Kent Overstreet <kent.overstreet@linux.dev> wrote:
 
-Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
----
- Documentation/devicetree/bindings/net/renesas,ethertsn.yaml | 2 ++
- 1 file changed, 2 insertions(+)
+> Tangentially related though, what would make me really happy is if we
+> could create the string with in the TP__fast_assign() section. I have to
+> have a bunch of annoying wrappers right now because the string length
+> has to be known when we invoke the tracepoint.
 
-diff --git a/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml b/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
-index 475aff7714d6..ea35d19be829 100644
---- a/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
-+++ b/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
-@@ -65,9 +65,11 @@ properties:
- 
-   rx-internal-delay-ps:
-     enum: [0, 1800]
-+    default: 0
- 
-   tx-internal-delay-ps:
-     enum: [0, 2000]
-+    default: 0
- 
-   '#address-cells':
-     const: 1
--- 
-2.43.2
+You can use __string_len() to determine the string length in the tracepoint
+(which is executed in the TP_fast_assign() section).
 
+My clean up patches will make __assign_str_len() obsolete too (I'm working
+on them now), and you can just use __assign_str().
+
+I noticed that I don't have a string_len example in the sample code and I'm
+actually writing it now.
+
+// cutting out everything else:
+
+TRACE_EVENT(foo_bar,
+
+	TP_PROTO(const char *foo, int bar),
+
+	TP_ARGS(foo, bar),
+
+	TP_STRUCT__entry(
+		__string_len(	lstr,	foo,	bar < strlen(foo) ? bar : strlen(foo) )
+	),
+
+	TP_fast_assign(
+		__assign_str(lstr, foo);
+
+// Note, the above is with my updates, without them, you need to duplicate the logic
+
+//		__assign_str_len(lstr, foo, bar < strlen(foo) ? bar : strlen(foo));
+	),
+
+	TP_printk("%s", __get_str(lstr))
+);
+
+
+The above will allocate "bar < strlen(foo) ? bar : strlen(foo)" size on the
+ring buffer. As the size is already stored, my clean up code uses that
+instead of requiring duplicating the logic again.
+
+-- Steve
 
