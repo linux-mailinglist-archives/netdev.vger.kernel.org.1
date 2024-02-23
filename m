@@ -1,92 +1,104 @@
-Return-Path: <netdev+bounces-74338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 287EC860F3A
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 11:29:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CB828860F9A
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 11:40:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D341E1F22616
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 10:29:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 825741F286F2
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 10:40:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B05445CDF0;
-	Fri, 23 Feb 2024 10:29:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84B517E792;
+	Fri, 23 Feb 2024 10:38:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="I+Y0fxKd"
 X-Original-To: netdev@vger.kernel.org
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D115C5CDD5
-	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 10:29:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E862D7E772;
+	Fri, 23 Feb 2024 10:38:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708684144; cv=none; b=a/ET1MuR+xTUy3Owz5T621i8ByyObD2v1Mm7c34VNs7gFWTlQGfkAR0PUeIXYXvx656dOzPq/8HYsQWjxMngOiFHgHRvoZhYnzdzAfozzoUnYC1o7kAEr9cC2yNcLTsV1peUZ812JEGW2rBs4nHB55+LaKsmogVR4/SdWjMnMS4=
+	t=1708684722; cv=none; b=EzJ22EYaiWhTMPOCzsvWlu4EzJP/W9gFrXnh3b1uG5OOqCVntNFPtJGvH5Pv92yUzSJ9ZAXZkRbCuTBP54LG3lnhSOodYkl6NAh63tVwpCdgpiTxGW5dVJsSAWQE/DWAHTOM/4tFH76h+XIZKNUbsNk6Qv6EJS3Xij+9WWuNon8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708684144; c=relaxed/simple;
-	bh=K3nvk8fe4h7wcPdQeLuw6kV6OrMqvS/Dl7BHL8+zH1k=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=sjke9LGKPTC34b5bPNsO1JdPFfGau8HTU/ovByDnb935xOhzK8gVnBGdH9OiyH4VFlTuxfi320PJbUmkOZT6q8eXbxkjSOMyIbQ89e/Wdgaqi8YbEoMmla0RkZl1M5TZ1QsmmP7vkHLaoVC3YssdoZvoP9O7OTWfZrLxl97+fBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-304-rbwHhyTYOouvcHjWUdr7sQ-1; Fri, 23 Feb 2024 10:28:59 +0000
-X-MC-Unique: rbwHhyTYOouvcHjWUdr7sQ-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 23 Feb
- 2024 10:28:57 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Fri, 23 Feb 2024 10:28:57 +0000
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Christophe Leroy' <christophe.leroy@csgroup.eu>, Charlie Jenkins
-	<charlie@rivosinc.com>, Guenter Roeck <linux@roeck-us.net>, Palmer Dabbelt
-	<palmer@dabbelt.com>, Andrew Morton <akpm@linux-foundation.org>, Helge Deller
-	<deller@gmx.de>, "James E.J. Bottomley"
-	<James.Bottomley@hansenpartnership.com>, Parisc List
-	<linux-parisc@vger.kernel.org>, Al Viro <viro@zeniv.linux.org.uk>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-Subject: RE: [PATCH v9 2/2] lib: checksum: Use aligned accesses for
- ip_fast_csum and csum_ipv6_magic tests
-Thread-Topic: [PATCH v9 2/2] lib: checksum: Use aligned accesses for
- ip_fast_csum and csum_ipv6_magic tests
-Thread-Index: AQHaZkAGLgdm0wM7/EyWAeS1+R0G6rEXuK8g
-Date: Fri, 23 Feb 2024 10:28:57 +0000
-Message-ID: <fa37be6a8c014d39ab75978e10995ca8@AcuMS.aculab.com>
-References: <20240221-fix_sparse_errors_checksum_tests-v9-0-bff4d73ab9d1@rivosinc.com>
- <20240221-fix_sparse_errors_checksum_tests-v9-2-bff4d73ab9d1@rivosinc.com>
- <30e4f267-86c2-4df6-9f33-d6f5fc77c4db@csgroup.eu>
-In-Reply-To: <30e4f267-86c2-4df6-9f33-d6f5fc77c4db@csgroup.eu>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+	s=arc-20240116; t=1708684722; c=relaxed/simple;
+	bh=O3IrUyblnuX/5xQB5jaQ38QXY1p+GizHIVBUKzOy3jo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YcvG7LRJ8f11pm8aUWcuQUh5L+Y2MxatdINadMAXyQxPvROsQ4e3QVgOV/UGAPVhDMfMRnmaujlghxl6eW6RWkiNjihwngIxs3aT9y4xgZE+KvWCcHMbS4x6bemd7ycFrgJhNH+P8Lc9c3GVU5xEJ6lSkZrd2l1s/ykr7k1NbIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=I+Y0fxKd; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=STbccEumsUwS1x3Lag48jXHMfPCnA9k9jkVStMkjKiE=; b=I+Y0fxKdZ0Sd2vE+QThwFWzwIQ
+	GIC3VHV/kqid/e+7zPewniD1+fDQYmK7Kto6z2uVk+91xhO+qLhJ8hLLJGjbseZ4/hrzWeJne84Wn
+	RJR0NE2jiV1YANZNlnIF3uaNRWttSvCl6XFm77qKYuiuD519Y2CY7dqGANuet0/qD7Nk8wyNDlwJd
+	p0dPUqB5NtWAnOmjAB9rcDkxn64ALbRU5GnA5vgxVHGnLp2RVAVFTVuz9JpSDeTxGVMfF1Vj2MTQK
+	fJ4m2QbZ+0XnePYFaHkrrb4nErWbbfogTtSDUrugzQAG7tJG914q0SEJImRSbmk3YYJ2TwaAP6COC
+	LhkXiVYw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46402)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rdSwi-0007Tj-0G;
+	Fri, 23 Feb 2024 10:38:24 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rdSwe-0003Y7-Lq; Fri, 23 Feb 2024 10:38:20 +0000
+Date: Fri, 23 Feb 2024 10:38:20 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Wei Fang <wei.fang@nxp.com>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	NXP Linux Team <linux-imx@nxp.com>
+Subject: Re: [PATCH net-next v6 5/8] net: phy: Immediately call adjust_link
+ if only tx_lpi_enabled changes
+Message-ID: <Zdh1nMWZDynP/AMc@shell.armlinux.org.uk>
+References: <20240223094425.691209-1-o.rempel@pengutronix.de>
+ <20240223094425.691209-6-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240223094425.691209-6-o.rempel@pengutronix.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-RnJvbTogQ2hyaXN0b3BoZSBMZXJveQ0KPiBTZW50OiAyMyBGZWJydWFyeSAyMDI0IDEwOjA3DQou
-Li4NCj4gPiArLyogRXRoZXJuZXQgaGVhZGVycyBhcmUgMTQgYnl0ZXMgYW5kIE5FVF9JUF9BTElH
-TiBpcyB1c2VkIHRvIGFsaWduIHRoZW0gKi8NCj4gPiArI2RlZmluZSBJUF9BTElHTk1FTlQgKDE0
-ICsgTkVUX0lQX0FMSUdOKQ0KPiANCj4gT25seSBpZiBubyBWTEFOLg0KPiANCj4gV2hlbiB1c2lu
-ZyBWTEFOcyBpdCBpcyA0IGJ5dGVzIG1vcmUuIEJ1dCB3aHkgZG8geW91IG1pbmQgdGhhdCBhdCBh
-bGwgPw0KDQpXYXNuJ3Qgb25lIGFyY2hpdGVjdHVyZSBmYXVsdGluZyBvbiBhIGRvdWJsZS1yZWdp
-c3RlciByZWFkPw0KV2hlcmUgdGhhdCBoYWQgdG8gYmUgYWxpZ25lZCAocHJvYmFibHkgOCBieXRl
-cykgYnV0IGEgbm9ybWFsDQptZW1vcnkgcmVhZCBjb3VsZCBiZSBtaXNhbGlnbmVkPw0KDQpJIGRv
-dWJ0IGl0IGlzIHZhbGlkIHRvIGFzc3VtZSB0aGF0IHRoZSBJUCBoZWFkZXJzIGlzIDggYnl0ZQ0K
-YWxpZ25lZCB3aGVuIE5FVF9JUF9BTElHTiBpcyAyLg0KDQoJRGF2aWQNCg0KLQ0KUmVnaXN0ZXJl
-ZCBBZGRyZXNzIExha2VzaWRlLCBCcmFtbGV5IFJvYWQsIE1vdW50IEZhcm0sIE1pbHRvbiBLZXlu
-ZXMsIE1LMSAxUFQsIFVLDQpSZWdpc3RyYXRpb24gTm86IDEzOTczODYgKFdhbGVzKQ0K
+On Fri, Feb 23, 2024 at 10:44:22AM +0100, Oleksij Rempel wrote:
+> +static void phy_ethtool_set_eee_noneg(struct phy_device *phydev,
+> +				      struct ethtool_keee *data)
+> +{
+> +	if (phydev->eee_cfg.tx_lpi_enabled !=
+> +	    data->tx_lpi_enabled) {
+> +		eee_to_eeecfg(data, &phydev->eee_cfg);
+> +		phydev->enable_tx_lpi = eeecfg_mac_can_tx_lpi(&phydev->eee_cfg);
+> +		if (phydev->link)
+> +			phy_link_up(phydev);
 
+I'm not convinced this is a good idea. Hasn't phylib previously had
+the guarantee that the link will go down between two link-up events?
+So calling phy_link_up() may result in either the MAC driver ignoring
+it, or modifying registers that are only supposed to be modified while
+the MAC side is down.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
