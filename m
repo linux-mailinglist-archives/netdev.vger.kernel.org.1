@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-74239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F29B86094A
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 04:20:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E94586094F
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 04:21:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9726C1F22E07
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 03:20:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1870B24035
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 03:20:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D270C2FE;
-	Fri, 23 Feb 2024 03:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A2EB10A24;
+	Fri, 23 Feb 2024 03:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pYAB1ECm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gGtEbHf3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49CA0C2FD
-	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 03:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52EED10A11;
+	Fri, 23 Feb 2024 03:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708658428; cv=none; b=J6Cm0BZ2lrWenx1mVUI1Sg+bux+REOAhkzIzqOQpHxtwzNPYBwzwaxKn6Mb+3zSqr1XznP7qa3LmmE0Alqfg9ChBexeXUeX1xi8PW/u8yEIctdGAgwt9QN9PN3U9/fkZFbvLdsjOtZkg8HHvQHRYGzkOM8ztljdsSQq+m0Tgrlc=
+	t=1708658430; cv=none; b=NvUqpabJ8x5Q9Zhwkg/PxcL7R5rNrkQCAQT1cbckIocRUOWwKF8Z0hIfH1vhUkX/OdFbk9571pz5NW9Lylnp2aOhQOnMpOvzRCx5nIXIIxt4WQse/3QQW4vDWpGNPj9Lu441QwxCJF/m9ei9EM6plVNl/sxcIu3ygiDUxYd3Lp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708658428; c=relaxed/simple;
-	bh=rO3cjebc0ntnvxbvKsKm4qEoVXr3c9ThT6SSLdifWRI=;
+	s=arc-20240116; t=1708658430; c=relaxed/simple;
+	bh=2vw8GtchVLrQXFFGhj/djRC7fV0hkU+GsPf/yB/3Nno=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mKHgQE5ich/B1CzYteMJsZ4ZQrYWewMKcNBOPrDhZr6A0bwyu5X9s4BJVFag6bKZ4Kn/Q0fU0hxZK4lMU9PlQGDncCKxRgAFELyRKo0iOzAF1EJkI9fJAkaKCsm2k5BqnaMTYc62/htVSJ+sm3mTiosQs4j1kZz4N8r1Cerb2x8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pYAB1ECm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D50D5C43394;
-	Fri, 23 Feb 2024 03:20:27 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=BP7qZhKMCkhST1WontQ5Hdo4K/j+b2s4D5Fa5OSe1NwW8/g4vXTOkRewnH6dJz2mR5OPIG4O//XqofaHOKgs+xTwyaRbrUURuQRENKxnzfueBSX34mcYyo2vC1bgCmAbKvR/2P43BQhBX204pFuTjN22V+Yu28p6tr/+6yufPNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gGtEbHf3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 011DBC43399;
+	Fri, 23 Feb 2024 03:20:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708658427;
-	bh=rO3cjebc0ntnvxbvKsKm4qEoVXr3c9ThT6SSLdifWRI=;
+	s=k20201202; t=1708658430;
+	bh=2vw8GtchVLrQXFFGhj/djRC7fV0hkU+GsPf/yB/3Nno=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pYAB1ECm5zRVrSZbfRoet3zLxjrM9Y0xS0QtQYoI2oEpTL5pWZi3eFqPaA9pYpljr
-	 ZvhQP8DaqfNniwWxYDeE7KRqM58o5ATnJeOqkozhgPW5S7RR9n1mB/qyzk1HpLCuqK
-	 ImfODopqA2gv2ilxTa3fyR1fQHi3J2mjb9zbtH4/cyksb4C3Hf/swL3KodZDPNP9lR
-	 0UytQ7aN6dx3qvoO4KfPt8dZ2OwAaN63Tn0P5s7t7G7QpcSQOFdwlOoapP4ll8gvKS
-	 NdMEXGNv07hGhr/CMVJhRxYJPECSNffnR23N/9KyVloM0aRsBjk2JQd3aSPTSPHoZb
-	 oMG/rgnldniAQ==
+	b=gGtEbHf3pcWJTRGBOVS2D5lY0a4JTf+lpTW3cQ7Z/XdXkjn/6nH1JXkOf0R01fIqn
+	 +CUHB2NiEevxCgiQVdesMVFJn7/Q4WWtjGM1RDUu4w3crpium0tzE+j4peorYYEP1W
+	 FOaeKJlAZPmruErj+QrxW21WexMGfntv9dZ9IqcrMSBPeNFTbtrfumdpot5xjF87RO
+	 55Cu7FfK4ABy967SxRJR3mW/nkg96m0c5X4Dz3sqcaljj/rd/vm5ITHionFzzLf/Gn
+	 ByZLgrnq3YxXzXT+VimfvmCwqPTJLQ02Rdj3fbSIfLowGIF5QnQWYmVjgvM2wMe0Wq
+	 SjeEJ8witEL8Q==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B6B67D84BBF;
-	Fri, 23 Feb 2024 03:20:27 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E1F3CD84BB8;
+	Fri, 23 Feb 2024 03:20:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,60 +52,60 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: ip_tunnel: prevent perpetual headroom growth
+Subject: Re: [PATCH net-next 01/12] netfilter: expect: Simplify the allocation of
+ slab caches in nf_conntrack_expect_init
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170865842774.21611.8573890440312099883.git-patchwork-notify@kernel.org>
-Date: Fri, 23 Feb 2024 03:20:27 +0000
-References: <20240220135606.4939-1-fw@strlen.de>
-In-Reply-To: <20240220135606.4939-1-fw@strlen.de>
+ <170865842992.21611.7211914750245168540.git-patchwork-notify@kernel.org>
+Date: Fri, 23 Feb 2024 03:20:29 +0000
+References: <20240221112637.5396-2-fw@strlen.de>
+In-Reply-To: <20240221112637.5396-2-fw@strlen.de>
 To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org,
- syzbot+bfde3bef047a81b8fde6@syzkaller.appspotmail.com
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org,
+ chentao@kylinos.cn
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This series was applied to netdev/net-next.git (main)
+by Florian Westphal <fw@strlen.de>:
 
-On Tue, 20 Feb 2024 14:56:02 +0100 you wrote:
-> syzkaller triggered following kasan splat:
-> BUG: KASAN: use-after-free in __skb_flow_dissect+0x19d1/0x7a50 net/core/flow_dissector.c:1170
-> Read of size 1 at addr ffff88812fb4000e by task syz-executor183/5191
-> [..]
->  kasan_report+0xda/0x110 mm/kasan/report.c:588
->  __skb_flow_dissect+0x19d1/0x7a50 net/core/flow_dissector.c:1170
->  skb_flow_dissect_flow_keys include/linux/skbuff.h:1514 [inline]
->  ___skb_get_hash net/core/flow_dissector.c:1791 [inline]
->  __skb_get_hash+0xc7/0x540 net/core/flow_dissector.c:1856
->  skb_get_hash include/linux/skbuff.h:1556 [inline]
->  ip_tunnel_xmit+0x1855/0x33c0 net/ipv4/ip_tunnel.c:748
->  ipip_tunnel_xmit+0x3cc/0x4e0 net/ipv4/ipip.c:308
->  __netdev_start_xmit include/linux/netdevice.h:4940 [inline]
->  netdev_start_xmit include/linux/netdevice.h:4954 [inline]
->  xmit_one net/core/dev.c:3548 [inline]
->  dev_hard_start_xmit+0x13d/0x6d0 net/core/dev.c:3564
->  __dev_queue_xmit+0x7c1/0x3d60 net/core/dev.c:4349
->  dev_queue_xmit include/linux/netdevice.h:3134 [inline]
->  neigh_connected_output+0x42c/0x5d0 net/core/neighbour.c:1592
->  ...
->  ip_finish_output2+0x833/0x2550 net/ipv4/ip_output.c:235
->  ip_finish_output+0x31/0x310 net/ipv4/ip_output.c:323
->  ..
->  iptunnel_xmit+0x5b4/0x9b0 net/ipv4/ip_tunnel_core.c:82
->  ip_tunnel_xmit+0x1dbc/0x33c0 net/ipv4/ip_tunnel.c:831
->  ipgre_xmit+0x4a1/0x980 net/ipv4/ip_gre.c:665
->  __netdev_start_xmit include/linux/netdevice.h:4940 [inline]
->  netdev_start_xmit include/linux/netdevice.h:4954 [inline]
->  xmit_one net/core/dev.c:3548 [inline]
->  dev_hard_start_xmit+0x13d/0x6d0 net/core/dev.c:3564
->  ...
+On Wed, 21 Feb 2024 12:26:03 +0100 you wrote:
+> From: Kunwu Chan <chentao@kylinos.cn>
+> 
+> Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
+> to simplify the creation of SLAB caches.
+> 
+> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+> Signed-off-by: Florian Westphal <fw@strlen.de>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] net: ip_tunnel: prevent perpetual headroom growth
-    https://git.kernel.org/netdev/net/c/5ae1e9922bbd
+  - [net-next,01/12] netfilter: expect: Simplify the allocation of slab caches in nf_conntrack_expect_init
+    https://git.kernel.org/netdev/net-next/c/aa23cfe6ab50
+  - [net-next,02/12] netfilter: nf_log: consolidate check for NULL logger in lookup function
+    https://git.kernel.org/netdev/net-next/c/79578be4d35c
+  - [net-next,03/12] netfilter: nf_log: validate nf_logger_find_get()
+    https://git.kernel.org/netdev/net-next/c/c47ec2b120b4
+  - [net-next,04/12] netfilter: nft_osf: simplify init path
+    https://git.kernel.org/netdev/net-next/c/29a280025580
+  - [net-next,05/12] netfilter: xtables: fix up kconfig dependencies
+    https://git.kernel.org/netdev/net-next/c/749d4ef0868c
+  - [net-next,06/12] netfilter: nft_set_pipapo: constify lookup fn args where possible
+    https://git.kernel.org/netdev/net-next/c/f04df573faf9
+  - [net-next,07/12] netfilter: nft_set_pipapo: do not rely on ZERO_SIZE_PTR
+    https://git.kernel.org/netdev/net-next/c/07ace0bbe03b
+  - [net-next,08/12] netfilter: nft_set_pipapo: shrink data structures
+    https://git.kernel.org/netdev/net-next/c/aac14d516c2b
+  - [net-next,09/12] netfilter: nft_set_pipapo: speed up bulk element insertions
+    https://git.kernel.org/netdev/net-next/c/9f439bd6ef4f
+  - [net-next,10/12] netfilter: nft_set_pipapo: use GFP_KERNEL for insertions
+    https://git.kernel.org/netdev/net-next/c/5b651783d80b
+  - [net-next,11/12] netfilter: move nf_reinject into nfnetlink_queue modules
+    https://git.kernel.org/netdev/net-next/c/3f8019688894
+  - [net-next,12/12] netfilter: x_tables: Use unsafe_memcpy() for 0-sized destination
+    https://git.kernel.org/netdev/net-next/c/26f4dac11775
 
 You are awesome, thank you!
 -- 
