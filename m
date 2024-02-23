@@ -1,130 +1,141 @@
-Return-Path: <netdev+bounces-74407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 613388612C3
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 14:33:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0B6E8612E5
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 14:40:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2C90B21277
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 13:33:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D299D1C22686
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 13:40:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CBBD7EEF6;
-	Fri, 23 Feb 2024 13:33:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1DBF7F46E;
+	Fri, 23 Feb 2024 13:39:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="TMYvSRZY"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O1pfL0Nj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04A2F7C0B7
-	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 13:32:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 418127E773
+	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 13:39:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708695181; cv=none; b=ZLGc/uvo26QQ3vm52nX61esJkKz9Nav+vBor+itxmk3l+lGPtPdSSATyRUxZUtrTorEgBDe7jx1AYbFUH3szymHrHHlbvRQnde4CUraw5bd90+0NdzHPWE1zQsEwuO0ImNxfTRu3NMtc4TUr5yCuqDGS55honpMiGNov9GxKL30=
+	t=1708695577; cv=none; b=sE+As9pFyn34JhM3K2Xp2C3URQralNRoeu7QBtw3EcQbotnRNOYxTVgmuO0l7qPuLj26yCZ9OpwLJYxZWAYIrmkrhQSsPJOY1kKCYEMWu67U7DWM5gqO56mABps2gm0fEBofxCTtH5MPMAbNFKdVKTCNq2FwIf3yuv6gUuVDVYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708695181; c=relaxed/simple;
-	bh=TYj0vsS8kOQ9VkVUUuvlQ3YC0KNiHKxLnrWWeRg9H64=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=K++b9yf5L8gRiCZtizq7m9fQru/KeHRUP9c7hX0MOMOlQwRktJFjahwyaZSix9be86MIjsDFzIUUJimGCyOt5YnH8LI8KoNvngMx7aP/45kBzdqaM76NVFz+pUJXETVtB75tS+FvUWDOGLavr4PHtnbxnnyQj6x9IlS/kJPNfUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=TMYvSRZY; arc=none smtp.client-ip=209.85.128.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-607bfa4c913so9015677b3.3
-        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 05:32:59 -0800 (PST)
+	s=arc-20240116; t=1708695577; c=relaxed/simple;
+	bh=Twp7tfSTw0JcrYxColLY4Ax9TG/pkPRhM7VLYkZRS4A=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XXpapI9Fnh4tbeQjd7dTDs6yhOOBap+CzSCbVO9EMNyxH03eYJvyyYCxsHF4rVESEptK6RX4SkvZYqe7eqSN2wBSCgZXFVqJulcQSTq3G3x+qpmxSltmxh4BB67NwpeG0Hr86AvsVzuI0QOZq2XnQvE5vx7XJCzPfAquMqZJG+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=O1pfL0Nj; arc=none smtp.client-ip=209.85.166.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-7c40863de70so44332139f.0
+        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 05:39:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1708695179; x=1709299979; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mEPvYmBor7byGESiLhAdXBTErHJXqPd+arW5WsPf8DA=;
-        b=TMYvSRZY6dW+6IJ3kLk8Qrqp+trps+k2F8lloQ/h3bLLc80d5rOm1WhY3pT2xqqkW6
-         YZo+Z/ljx5Ei6g53/3qKThgKVbZECHf2ePD6AlLHtqFRnzKrJOApO6S5WH0Wa3eARcU6
-         /DxBdr8INZYDW/5UgY65bqJowjlITfDwWhSgYQJq2OTSxraJpv+r7VoQdSOITTjmT+qM
-         GV0Pe8DWyfhDW7w51WUMIiVADVMz4j1VAEdJcQWArTMuPbVqhrMfH39OC25y30mRLPRi
-         n/c9DbQUTvKpsg/Lx0AlizRBX3ev4rPfFDluhlTRhsi+cy36kOksU49pZjhVIWevHMrY
-         T/cQ==
+        d=linaro.org; s=google; t=1708695575; x=1709300375; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=d4x2sMmK8Ljy9DYC/W73ZknuhG0GdB53Q7DPx/D50TQ=;
+        b=O1pfL0NjKwcPNi6v4TRbX29zYKLHT9rMUoyBA4x2AZuL0ZSjaepb9uKDoEpUo3cMzk
+         pJ9Imwnzko2bF3xyF4oqRTx3yD+bDoWAtWke12lKiK1u8FVmMYJGv8J2C24svYf45wow
+         xTp4qQ7ZXEjU1BbrXn5OZ5+fmmRd7M2ERjJrtmT00sj5N8j1m7DmsgMNOtWy11a1fKPo
+         hcJpWg8Baju6GSUd/gPvjBVW95iGZhqW/sUnGZfMc8y420mj4lABxgkkREtMgbtuiX7t
+         x5sulLg0C39I3Dyt0Tk4ZZ6wxXAdpSwCzpD1TyKtIhVYM2/ckv/0/PlqMbrtc+tbvB9/
+         pxLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708695179; x=1709299979;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mEPvYmBor7byGESiLhAdXBTErHJXqPd+arW5WsPf8DA=;
-        b=XktC0WCFmLrwMQ6tUqluFMZZtVk3/yWoeYK9cnLLd9dwv4nTQM6VX3qeseMS09JwLk
-         pLRn1p4RvbKvkml0lZBIdlb8Vh05Dm7c+0nwINmzo/CB7Q77lklyERtj1BLrkaYaA6DC
-         OKhVkPff9LVc1mIzdhQInltt+RZmhYcv70wS9eRZVJCLYje0zV+I7RAHAx1kCvUFC5f1
-         reoNpK3XQeTxyknRq/PG5htj0QXmAGVPJ1C52x7iY5gPohYIcdbhsXqJ8GN/TjS6BP9v
-         x6w/aAPI4W7fJ0/ipYj7AWKkiwmINx/YfmyNJUXQjEQZfBjKVhOJuJd2zTGjK8VKkmrn
-         9tfw==
-X-Forwarded-Encrypted: i=1; AJvYcCX45QsIXrrX3yvzdzBXsFo7D9GlbWC6glaeSmYgUYGvAxRaKsNoIB5ghkdp2RfR9G2r3TPKrgG97DniHCgie1emLVbq4JWj
-X-Gm-Message-State: AOJu0YwdR3Qgd9/qhU06cdBJIgoqOYeEwV40ANYXq1PCchDxtUbv6Nel
-	uE7NLv7m27pRJPd8NH//iMDddSgWaTdiPdteV90YpE0TEem3xxs/Q9DpQl9nG2Me0Y2IUZ7tBNJ
-	Vr/e0x1IevAvx7tT/XWrheEG6UOLwvwNXDSjC
-X-Google-Smtp-Source: AGHT+IFItDOZckGBT5oG5831PeGU0D8YWbuGaeqZwC680eoJ2FbXg7JKWd2Rugkh46Mynyke4KvooxJ5O3OWn4WfBds=
-X-Received: by 2002:a0d:d68e:0:b0:607:a0ab:c238 with SMTP id
- y136-20020a0dd68e000000b00607a0abc238mr2174482ywd.8.1708695178933; Fri, 23
- Feb 2024 05:32:58 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708695575; x=1709300375;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=d4x2sMmK8Ljy9DYC/W73ZknuhG0GdB53Q7DPx/D50TQ=;
+        b=eKCc5Q/PbLnvo+hhRkb42e2ieSzxpWzByjFQaeVAEtW+NefQuT6r3WYXxNIV25THHD
+         Fru7Cb0ByAtK2awKLlfg50CGc3bsi7aBAojTu/UfHPcDBkRoU/97MMVtmXIqBUE7mCLU
+         DzBSgPil81IAhylXjcOuI/8kR+QYUKinYXQz1FoGUlBckV2YgfjIM86s5kb64gFPN7Ij
+         HwXh8k0TKaLKgZIj05fGqPvKE7GoIy2D0pLqXKjm4Kb69QU9RlRLqt3UD2P1zSKp36Gv
+         zZS6asD29aigppfH1lJKa7/HP/KrLkcadMXS6x47jUpKqmCbv855N+XQuN43uJ4xBk0w
+         hljg==
+X-Forwarded-Encrypted: i=1; AJvYcCX2obJ1gkrI0kxvdISyScgfpYzRZEXz1MwtxO5slU1mq7GzNvOluI+b/+DpnCX4l/bpQeOwjWkLzWkU4XybLCOvy4FsWF8T
+X-Gm-Message-State: AOJu0YxeZyJKnWt1z8jG6RGRcU9+UE/8RaiYSW7dMERJc5E/gsHstZHy
+	ZX2/6fpJljXXrDq2ohrpxx78Gsp+md2TGkWSNkR4H7m+KKTuMqLlHIFLJ8RwfF8=
+X-Google-Smtp-Source: AGHT+IFrz5R0BlotlFi4jZ+FPrD+nKWN+cqkiTi9yfrUfHfyDhCGmqbGauLW7N/Kb+gQyn8NGnS1AQ==
+X-Received: by 2002:a6b:c90e:0:b0:7c7:9185:e58e with SMTP id z14-20020a6bc90e000000b007c79185e58emr1936714iof.12.1708695575154;
+        Fri, 23 Feb 2024 05:39:35 -0800 (PST)
+Received: from localhost.localdomain (c-73-228-159-35.hsd1.mn.comcast.net. [73.228.159.35])
+        by smtp.gmail.com with ESMTPSA id p11-20020a6b630b000000b007c76a2d6a98sm1836838iog.53.2024.02.23.05.39.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Feb 2024 05:39:34 -0800 (PST)
+From: Alex Elder <elder@linaro.org>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: mka@chromium.org,
+	andersson@kernel.org,
+	quic_cpratapa@quicinc.com,
+	quic_avuyyuru@quicinc.com,
+	quic_jponduru@quicinc.com,
+	quic_subashab@quicinc.com,
+	elder@kernel.org,
+	netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 0/6] net: ipa: don't abort system suspend
+Date: Fri, 23 Feb 2024 07:39:24 -0600
+Message-Id: <20240223133930.582041-1-elder@linaro.org>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <5be479fb-8fc6-4fa1-8a18-25be4c7b06f6@intel.com>
- <20240222184045.478a8986@kernel.org> <ZdhqhKbly60La_4h@nanopsycho>
- <b4ed432e-6e76-8f1b-c5ea-8f19ba610ef3@gmail.com> <ZdiOHpbYB3Ebwub5@nanopsycho>
- <375ff6ca-4155-bfd9-24f2-bd6a2171f6bf@gmail.com>
-In-Reply-To: <375ff6ca-4155-bfd9-24f2-bd6a2171f6bf@gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Fri, 23 Feb 2024 08:32:47 -0500
-Message-ID: <CAM0EoMkdsFTuJ-mfqBUKZbvpAzex8ws9jcrPEzTO1iUnaWOPZQ@mail.gmail.com>
-Subject: Re: [RFC]: raw packet filtering via tc-flower
-To: Edward Cree <ecree.xilinx@gmail.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, Ahmed Zaki <ahmed.zaki@intel.com>, stephen@networkplumber.org, 
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, corbet@lwn.net, 
-	xiyou.wangcong@gmail.com, netdev@vger.kernel.org, 
-	"Chittim, Madhu" <madhu.chittim@intel.com>, 
-	"Samudrala, Sridhar" <sridhar.samudrala@intel.com>, amritha.nambiar@intel.com, 
-	Jan Sokolowski <jan.sokolowski@intel.com>, Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Feb 23, 2024 at 7:36=E2=80=AFAM Edward Cree <ecree.xilinx@gmail.com=
-> wrote:
->
-> On 23/02/2024 12:22, Jiri Pirko wrote:
-> > Nope, the extension of dissector would be clean, one timer. Just add
-> > support for offset+len based dissection.
->
-> ... until someone else comes along with another kind of filtering and
->  wants _that_ in flower for the same reasons.
->
-> >> How about a new classifier that just does this raw matching?
-> >
-> > That's u32 basically, isn't it?
->
-> Well, u32 has all the extra complications around hashtables, links,
->  permoff... I guess you could have helpers in the kernel to stitch
->  'const' u32 filters into raw matches for drivers that only offload
->  that and reject anything else; and tc userspace could have syntactic
->  sugar to transform Ahmed's offset/pattern/mask into the appropriate
->  u32 matches under the hood.
+Currently the IPA code aborts an in-progress system suspend if an
+IPA interrupt arrives before the suspend completes.  There is no
+need to do that though, because the IPA driver handles a forced
+suspend correctly, quiescing any hardware activity before finally 
+turning off clocks and interconnects.
 
-u32 has a DSL that deals with parsing as well, which includes dealing
-with variable packet offsets etc. That is a necessary ingredient if
-you want to do pragmatic parsing (example how do you point to TCP
-ports if the IP header has options etc).
-This flower extension, if it wants to do something equivalent, would
-have to adopt some of that language.
-For the record, I am not against this being part of flower i just dont
-think it's a simple offset/value/mask. u32 for example decided that it
-will work with fixed 4 byte lengths to simplify, etc..
-I wouldnt trust user space to do the right thing either otherwise
-syzkaller will be feasting on this ... I empathise that using flower
-will impose an operational challenge of having to use two classifiers
-(but I want to point out that it already does offloads).
+This series drops the call to pm_wakeup_dev_event() if an IPA
+SUSPEND interrupt arrives during system suspend.  Doing this
+makes the two remaining IPA power flags unnecessary, and allows
+some additional code to be cleaned up--and best of all, removed.
+The result is much simpler (and I'm really glad not to be using
+these flags any more).
 
-cheers,
-jamal
+The first patch implements the main change.  The second and
+third remove the flags that were used to determine whether to
+call pm_wakeup_dev_event().  The next two remove a function that
+becomes a trivial wrapper, and the last one just avoids writing
+a register unnecessarily.
+
+Note that the first two patches will have checkpatch warnings,
+because checkpatch disagrees with my compiler on what to do when
+a block contains only a semicolon.  I went with what the compiler
+recommends.
+
+clang says: warning: suggest braces around empty body
+checkpatch: WARNING: braces {} are not necessary for single statement blocks
+
+					-Alex
+
+Alex Elder (6):
+  net: ipa: don't bother aborting system resume
+  net: ipa: kill IPA_POWER_FLAG_SYSTEM
+  net: ipa: kill the IPA_POWER_FLAG_RESUMED flag
+  net: ipa: move ipa_interrupt_suspend_clear_all() up
+  net: ipa: kill ipa_power_suspend_handler()
+  net: ipa: don't bother zeroing an already zero register
+
+ drivers/net/ipa/ipa_interrupt.c | 50 ++++++++++++++++-----------------
+ drivers/net/ipa/ipa_interrupt.h |  8 ------
+ drivers/net/ipa/ipa_power.c     | 33 ----------------------
+ drivers/net/ipa/ipa_power.h     | 11 --------
+ 4 files changed, 25 insertions(+), 77 deletions(-)
+
+-- 
+2.40.1
+
 
