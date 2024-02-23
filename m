@@ -1,185 +1,95 @@
-Return-Path: <netdev+bounces-74518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95D70861AFC
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 18:57:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AE2F2861B20
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 19:05:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BA09289793
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 17:57:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68F8A2897ED
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 18:05:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9E24140E53;
-	Fri, 23 Feb 2024 17:57:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="rQrI5Vaw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 216AC1448CE;
+	Fri, 23 Feb 2024 18:05:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE3E140386
-	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 17:57:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54FA414263E;
+	Fri, 23 Feb 2024 18:05:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708711074; cv=none; b=Jw7oINKOnA4J18UNqM4l1738OdO/WaAaiKVgFdADDFxdkHrVkAxuttM4MyxjPwUkboJS9rRYA2KXodMn2KNYGhv+AwkNR41elqXCgA/rIbLuAgW+KPhqMbP6CFiPny00eIWBOzeFVXz3wnBTJXod82qzFgAsFkh52Tk5OkrkOwc=
+	t=1708711506; cv=none; b=dqsRPXUhBgflnNQnAJg8h2CQcKaCCgoGoTAKoQs48//AYlFjz7Qs2O+6lhHNnhCBYxuyThH4Hq5hr8rcInzvTo0BpWeiK1uii8wIKsYJ0OaI16TSkUpibTSFXVv2r3hKW5mhUMIuLnkB52NWyI9eE3yR25DZXiLP3NqqFin1TxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708711074; c=relaxed/simple;
-	bh=b+yufhC34xQ35SDeLFqFIpmUWOKldYMLTKMcXV3g074=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SKmOW4gpf9NbLN2mGMuFt8ed0Xcu7z0U/Vw7I8f9KuJcYJZ/ms0FJnNaukykszpkCOJ9peTmEnjmIboeBEdMGVWPKih0uUq7xtyKgtoNFXZTwc/Xd1rv1bRu0hlmvgdhaP4NhcUODsFuvBdfyZCzmSL6EUP9/1vOyFiH8CvaWmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=rQrI5Vaw; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-5ce07cf1e5dso561745a12.2
-        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 09:57:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1708711072; x=1709315872; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=L2d7MqCCUNGyccXxnRLDxznuYvUmklbFpLMdiF5+0EI=;
-        b=rQrI5VawVWHX7pxzDXs74PIRB0oTYzvdpX0JGnbklq2S3pfwmH7sNllxR5znmN/Dkv
-         bWtd7AdWyD6HJXpGZBVBa/neqCXc4LtrcbSObMjdyK5ql3310v226UWGrNJGYANvkz1D
-         Cd1XgQqmt6ZENsCNe1rrviC1dGjpmoaLtvMMV1LCTcHEnyqMkOxNXDb/nFHTxruoCLnX
-         QwTbx3v4DwdliEPjVpBIyoNTsA67lVkVC85Xe6eKv5K22TBFwp7T2tdfcRCu2n6uF71y
-         b2RVEtPo/hFoemb9zrL5dIyXBXk5697XuVgh0VPN7jzyA3bbF4y8zLEo0IjxCfD5NyNt
-         FTpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708711072; x=1709315872;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L2d7MqCCUNGyccXxnRLDxznuYvUmklbFpLMdiF5+0EI=;
-        b=Kj440btyyFliEvVcPfWlzCRsP+EYcrOAyAB9touQpgkbr7EMDMxX/qVPqGAApecLQZ
-         pwX6C5vIRP8OcEtNTnCdNNK8Wlr1TCX8VarZ8BwbPorHUYromMlHuYGSKaDeAQDkoXEb
-         e/NQ4cIRdOjgCxfKNWhfv2Stpjjiw1w+wswZlYSlfXqvSKV9JCgtA2fsxpse1BZ9FTAI
-         jYf0EAixW+CReZfH5UJc0K8w3Hr+vV6Hm+Nbirz6wScBrkjrQFiBK9n/oQl8QOsebeGm
-         8bw6rsIfR9SZOaCj35H+S9QXpCfVKOzNgAd/zA79vLXZGu5IieUqVsElOZGQttJAnvU2
-         j0Uw==
-X-Forwarded-Encrypted: i=1; AJvYcCWZDZSP0IwwMBbZIXVU/hopXguJTgnYBgZ72D2NPoTevzl6b/ubkSUJXY13DxnQ9dBSC3vQ5nmJOQKgvzlUAZCLw5jF2l4u
-X-Gm-Message-State: AOJu0YxpYZi+NwQPy8Os9Gcx+wnFjsZF1DbU/QGMM38VcDWXCSKnkEeP
-	3Z+zL6P1J65AuexA0KU/5FOr1QWchol2cPsaP5VrnjWuhaUVT3pbeVk0EY8+CPcMzgdaYrZJDNl
-	AEiQ=
-X-Google-Smtp-Source: AGHT+IF0+6Y4Pgd4go7sI4Z0IOF+LMyiDGTQM0YJE3ww/aECUoEVYO3T+NNUVzSVJcC2IvqzDwfZpw==
-X-Received: by 2002:a05:6a20:2d29:b0:1a0:e4a3:582c with SMTP id g41-20020a056a202d2900b001a0e4a3582cmr844566pzl.2.1708711072543;
-        Fri, 23 Feb 2024 09:57:52 -0800 (PST)
-Received: from ghost ([2601:647:5700:6860:a351:1ab0:98d6:3d53])
-        by smtp.gmail.com with ESMTPSA id mn3-20020a1709030a4300b001dc38eaa5d1sm4677690plb.181.2024.02.23.09.57.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Feb 2024 09:57:52 -0800 (PST)
-Date: Fri, 23 Feb 2024 09:57:50 -0800
-From: Charlie Jenkins <charlie@rivosinc.com>
-To: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Erhard Furtner <erhard_f@mailbox.org>
-Subject: Re: [PATCH net] kunit: Fix again checksum tests on big endian CPUs
-Message-ID: <Zdjcnp324nIRuyUI@ghost>
-References: <73df3a9e95c2179119398ad1b4c84cdacbd8dfb6.1708684443.git.christophe.leroy@csgroup.eu>
+	s=arc-20240116; t=1708711506; c=relaxed/simple;
+	bh=LnhjvqUeq0CK0kIwGNY2StqDTPb27nbR7qd6jVWv0QA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WMSzBA10+2Z3T90xbs5EiUSeTqNg7jmyGmiZQOxZXuOFM1nATIvRraeF0YyclHdUwGpK8Ggz0K5mWr53bADO5hQ6lcWXK8E/ZBr/Z92x1oO9dVw+5KByebqUx5GQNBVnqbc3fBCHbRlfBDigxw9Ro+tFUroYHpKhqigrVFFAMPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 370BEC433C7;
+	Fri, 23 Feb 2024 18:05:01 +0000 (UTC)
+Date: Fri, 23 Feb 2024 13:06:53 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+To: LKML <linux-kernel@vger.kernel.org>, Linux Trace Kernel
+ <linux-trace-kernel@vger.kernel.org>
+Cc: Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers
+ <mathieu.desnoyers@efficios.com>, Linus Torvalds
+ <torvalds@linux-foundation.org>, linuxppc-dev@lists.ozlabs.org,
+ kvm@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-cxl@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, amd-gfx@lists.freedesktop.org,
+ intel-gfx@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
+ linux-arm-msm@vger.kernel.org, freedreno@lists.freedesktop.org,
+ virtualization@lists.linux.dev, linux-rdma@vger.kernel.org,
+ linux-pm@vger.kernel.org, iommu@lists.linux.dev,
+ linux-tegra@vger.kernel.org, netdev@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, ath10k@lists.infradead.org,
+ linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
+ ath12k@lists.infradead.org, brcm80211@lists.linux.dev,
+ brcm80211-dev-list.pdl@broadcom.com, linux-usb@vger.kernel.org,
+ linux-bcachefs@vger.kernel.org, linux-nfs@vger.kernel.org,
+ ocfs2-devel@lists.linux.dev, linux-cifs@vger.kernel.org,
+ linux-xfs@vger.kernel.org, linux-edac@vger.kernel.org,
+ selinux@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
+ linux-hwmon@vger.kernel.org, io-uring@vger.kernel.org,
+ linux-sound@vger.kernel.org, bpf@vger.kernel.org,
+ linux-wpan@vger.kernel.org, dev@openvswitch.org,
+ linux-s390@vger.kernel.org, tipc-discussion@lists.sourceforge.net, Julia
+ Lawall <Julia.Lawall@inria.fr>
+Subject: Re: [FYI][PATCH] tracing/treewide: Remove second parameter of
+ __assign_str()
+Message-ID: <20240223130653.2cc317a8@gandalf.local.home>
+In-Reply-To: <20240223125634.2888c973@gandalf.local.home>
+References: <20240223125634.2888c973@gandalf.local.home>
+X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <73df3a9e95c2179119398ad1b4c84cdacbd8dfb6.1708684443.git.christophe.leroy@csgroup.eu>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Feb 23, 2024 at 11:41:52AM +0100, Christophe Leroy wrote:
-> Commit b38460bc463c ("kunit: Fix checksum tests on big endian CPUs")
-> fixed endianness issues with kunit checksum tests, but then
-> commit 6f4c45cbcb00 ("kunit: Add tests for csum_ipv6_magic and
-> ip_fast_csum") introduced new issues on big endian CPUs. Those issues
-> are once again reflected by the warnings reported by sparse.
-> 
-> So, fix them with the same approach, perform proper conversion in
-> order to support both little and big endian CPUs. Once the conversions
-> are properly done and the right types used, the sparse warnings are
-> cleared as well.
-> 
-> Reported-by: Erhard Furtner <erhard_f@mailbox.org>
-> Fixes: 6f4c45cbcb00 ("kunit: Add tests for csum_ipv6_magic and ip_fast_csum")
-> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-> ---
->  lib/checksum_kunit.c | 17 +++++++++--------
->  1 file changed, 9 insertions(+), 8 deletions(-)
-> 
-> diff --git a/lib/checksum_kunit.c b/lib/checksum_kunit.c
-> index 225bb7701460..bf70850035c7 100644
-> --- a/lib/checksum_kunit.c
-> +++ b/lib/checksum_kunit.c
-> @@ -215,7 +215,7 @@ static const u32 init_sums_no_overflow[] = {
->  	0xffff0000, 0xfffffffb,
->  };
->  
-> -static const __sum16 expected_csum_ipv6_magic[] = {
-> +static const u16 expected_csum_ipv6_magic[] = {
->  	0x18d4, 0x3085, 0x2e4b, 0xd9f4, 0xbdc8, 0x78f,	0x1034, 0x8422, 0x6fc0,
->  	0xd2f6, 0xbeb5, 0x9d3,	0x7e2a, 0x312e, 0x778e, 0xc1bb, 0x7cf2, 0x9d1e,
->  	0xca21, 0xf3ff, 0x7569, 0xb02e, 0xca86, 0x7e76, 0x4539, 0x45e3, 0xf28d,
-> @@ -241,7 +241,7 @@ static const __sum16 expected_csum_ipv6_magic[] = {
->  	0x3845, 0x1014
->  };
->  
-> -static const __sum16 expected_fast_csum[] = {
-> +static const u16 expected_fast_csum[] = {
->  	0xda83, 0x45da, 0x4f46, 0x4e4f, 0x34e,	0xe902, 0xa5e9, 0x87a5, 0x7187,
->  	0x5671, 0xf556, 0x6df5, 0x816d, 0x8f81, 0xbb8f, 0xfbba, 0x5afb, 0xbe5a,
->  	0xedbe, 0xabee, 0x6aac, 0xe6b,	0xea0d, 0x67ea, 0x7e68, 0x8a7e, 0x6f8a,
-> @@ -577,7 +577,8 @@ static void test_csum_no_carry_inputs(struct kunit *test)
->  
->  static void test_ip_fast_csum(struct kunit *test)
->  {
-> -	__sum16 csum_result, expected;
-> +	__sum16 csum_result;
-> +	u16 expected;
->  
->  	for (int len = IPv4_MIN_WORDS; len < IPv4_MAX_WORDS; len++) {
->  		for (int index = 0; index < NUM_IP_FAST_CSUM_TESTS; index++) {
-> @@ -586,7 +587,7 @@ static void test_ip_fast_csum(struct kunit *test)
->  				expected_fast_csum[(len - IPv4_MIN_WORDS) *
->  						   NUM_IP_FAST_CSUM_TESTS +
->  						   index];
-> -			CHECK_EQ(expected, csum_result);
-> +			CHECK_EQ(to_sum16(expected), csum_result);
->  		}
->  	}
->  }
-> @@ -598,7 +599,7 @@ static void test_csum_ipv6_magic(struct kunit *test)
->  	const struct in6_addr *daddr;
->  	unsigned int len;
->  	unsigned char proto;
-> -	unsigned int csum;
-> +	__wsum csum;
->  
->  	const int daddr_offset = sizeof(struct in6_addr);
->  	const int len_offset = sizeof(struct in6_addr) + sizeof(struct in6_addr);
-> @@ -611,10 +612,10 @@ static void test_csum_ipv6_magic(struct kunit *test)
->  		saddr = (const struct in6_addr *)(random_buf + i);
->  		daddr = (const struct in6_addr *)(random_buf + i +
->  						  daddr_offset);
-> -		len = *(unsigned int *)(random_buf + i + len_offset);
-> +		len = le32_to_cpu(*(__le32 *)(random_buf + i + len_offset));
->  		proto = *(random_buf + i + proto_offset);
-> -		csum = *(unsigned int *)(random_buf + i + csum_offset);
-> -		CHECK_EQ(expected_csum_ipv6_magic[i],
-> +		csum = *(__wsum *)(random_buf + i + csum_offset);
-> +		CHECK_EQ(to_sum16(expected_csum_ipv6_magic[i]),
->  			 csum_ipv6_magic(saddr, daddr, len, proto, csum));
->  	}
->  #endif /* !CONFIG_NET */
-> -- 
-> 2.43.0
-> 
+On Fri, 23 Feb 2024 12:56:34 -0500
+Steven Rostedt <rostedt@goodmis.org> wrote:
 
-There is no need to duplicate efforts here. This has already been
-resolved by
-https://lore.kernel.org/lkml/20240221-fix_sparse_errors_checksum_tests-v9-2-bff4d73ab9d1@rivosinc.com/.
+> Note, the same updates will need to be done for:
+> 
+>   __assign_str_len()
+>   __assign_rel_str()
+>   __assign_rel_str_len()
 
-- Charlie
+Correction: The below macros do not pass in their source to the entry
+macros, so they will not need to be updated.
+
+-- Steve
+
+>   __assign_bitmask()
+>   __assign_rel_bitmask()
+>   __assign_cpumask()
+>   __assign_rel_cpumask()
 
 
