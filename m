@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-74605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14C56861F91
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 23:23:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CED60861F93
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 23:23:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CFA71F22D38
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 22:23:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F1211C2311A
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 22:23:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EB0C14DFF8;
-	Fri, 23 Feb 2024 22:23:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AC1914EFCD;
+	Fri, 23 Feb 2024 22:23:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HMnXYrza"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KWxIKhT0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f73.google.com (mail-io1-f73.google.com [209.85.166.73])
+Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B0D814AD04
-	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 22:23:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 660C3142649
+	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 22:23:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708726997; cv=none; b=BwAwROTEEHrtBV8yTuaCZ9fSVJfiWqREZkINsIjc5CcMx2gZs7DBA36KXwrx4LqjsutgRedYtg15OCTn02cck11DzN530Lx7lmwne0kuFJYrK04hCpwd6N6Ay0M128jjV4RBOxzwN7t7pSjbF5l5AdFumelmooaH5/o/UiQBoBk=
+	t=1708726998; cv=none; b=iTVWqif7sIQskvffjsLvyjsLYlWe66u9gch4n3M12p23Lsd9ccHp/wlMzlYDvIeKy2ovafjq96MiiFudPNVmFEDQe1R+40LadjVSDQgwyFCHZ+AdyKHxjmLFcPLGnP5GVHDfpT8kGPwVTRGeJp5SNo+n4dOtgnu3Bl4g+Dd9GV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708726997; c=relaxed/simple;
-	bh=atw28RqPC1GSaqT/dfgmT16ohbY/e8gGhibx8N7VvH8=;
+	s=arc-20240116; t=1708726998; c=relaxed/simple;
+	bh=gjMkG4A6VKeg8L3wOX72tlhUgkPYbTyo8rC5lCzc/xc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lmDre2L+xah/87yySf93qvhqKFkrCdo+Uzwep5m5I4dPi0aNMl5aMhcRznGaF2GH/Wn/A4tqQwY+TAd/gPFq8Au3WvZMt59J6PxgybDQGZ0THo+GTuTRyFGqpF1k1O7/7P+lj0Zl1OlxkJD12z1t8a61195PFoafruKPdPS8vD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--justinstitt.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HMnXYrza; arc=none smtp.client-ip=209.85.166.73
+	 To:Cc:Content-Type; b=Gbvn+Rp1S2i2YSPaQs86XQOfKUz8Qpml4tTs+M9PocONcCM4PvcxZKYHQqMd/5Du4hjp+7v3Zrg+fLqZPe14etxa9y3ph7Fs9UmoOfKl5Uy171lZkjLbMTiGZH7Ex3vK96wpBPVz7BkKfH0ARcJvb+fD3OKb/hVPQccdK87ohdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--justinstitt.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KWxIKhT0; arc=none smtp.client-ip=209.85.166.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--justinstitt.bounces.google.com
-Received: by mail-io1-f73.google.com with SMTP id ca18e2360f4ac-7bc2b7bef65so125920439f.0
-        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 14:23:14 -0800 (PST)
+Received: by mail-io1-f74.google.com with SMTP id ca18e2360f4ac-7c78e7044b7so73538439f.2
+        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 14:23:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708726993; x=1709331793; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1708726995; x=1709331795; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DSqA4FNr+Yd3pWgWiaXUbZeiapBDt2cwHD2dL9aqpno=;
-        b=HMnXYrza7hdCWxoOUTuuhQ+EPJPfVtOKayFMEwzRR40+hkAuDlXWsoanL+cn5rHElq
-         OV+ASA600QgY0omymT9XI0naiPL5pNBFZSQM3Ml0Dzyj71nO7KNGdnGzGIp9QysVNRcE
-         eGWyvdT5H3Gf/L+vNF1saHfFz4Oaf+HIoA/dIRa3ahkiB9RXssiJ2s+2A+jqz2w89DQk
-         GeB2jXyZUKHE9nreDRGx69RrCYiY8rxffm8E94ZR0LhvkE81Z2FEHLeLAytZUKCe61ZR
-         Dj1aR/aCTKrlmJgVj3Qs647fh+I22DMifW16LbP41UlTxsXBy+Oubp8kavxPNb3FYDwt
-         e9Rg==
+        bh=UGEZep2bi/abyYM1QXV/FReUH/n6RMxu5K38G5FIyYk=;
+        b=KWxIKhT0fRhVF8s2zQFumrUTDw6tJAlMeyzj7ataVDkALYx00Ltdi7nKB/UXHkniV3
+         yJct18O7sZdpxFYYqEGNT1zbF0wI8K9HHP8u0ODnqhzBBKHn962jVMAbbZ/uaPTAE7wX
+         eiJO2QdqEPy3SgDbw67qvSThjQPnRxFMkm31XXWnPYiMuce+9+m6OjikUp7H9FZ+nYHC
+         aGu4FpdadUvXYoPanfkSUjqNGaXCOShSkYvuKBevbJuwZeYp/lk+x7tn5gdvr3TJ3CMp
+         Hfd40zmNp2AJGeg8xN+eVmqwq0hxUdqDuw8g93NBMKHV71uEsgn3PwS5vLJ4oWGi2BQ/
+         wcLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708726993; x=1709331793;
+        d=1e100.net; s=20230601; t=1708726995; x=1709331795;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DSqA4FNr+Yd3pWgWiaXUbZeiapBDt2cwHD2dL9aqpno=;
-        b=tO/2v9l5upqh8ZgoO95epZUu7t1tjiL9xxiFZY6iw7itQds5M+2lrDgpDpVYlgQPDA
-         ZmCfgjBafL2jkzfNE2V5zbyEl8DP4wlTYUFrW8a3TfbMPkonBz9ODUHPwg0guTLtDAXq
-         nna/IGvjYrjI3z6RlzR3dbxf/iRO95njOl0sNwnVFKgU+YDyKTlJoO2ru30+KRd8mNga
-         xnKSCwmoKBtx4rJClxqwqTMkmhifP5uxXPF37c4qKAqxIMW31nirQM3B9+ny1b4Pq7Ue
-         4gA0Kg85dbG2ho7XYMlmNETzhpswIKmsVqP2O34OXwjYZvJo4RDYgIfuKsS8mZh6h5ut
-         AfiA==
-X-Forwarded-Encrypted: i=1; AJvYcCVYmG15Y8O6bYTmIV8ijE7UhGO9vtXNvjqXpQyx0HJAvpGJJvZ8r9Mr+lgYqItbxqiXGDZu2VAmppfRndMR8KH+LeSuItxV
-X-Gm-Message-State: AOJu0Yz/bM/cyzzwwpv2ECRz/HStMbfoxHzICNRxSHseQVUGiQjy9aWh
-	cit+VIbwRWH5TL6ledeoNQjn7TKRg5kgoVGZP+PodjQA6yOD+muu0zeyEzqyz7hnosvEwBe16Rx
-	GEtj1wfreNSV3UewCygETXA==
-X-Google-Smtp-Source: AGHT+IE9+d0DRwTaeVewC0YykYc/HcpVSbDdP6/Eix18NC4jUXTr9YGVPfn/8i6i1Pk/1PXYSNhu/wipCxOavTAnOA==
+        bh=UGEZep2bi/abyYM1QXV/FReUH/n6RMxu5K38G5FIyYk=;
+        b=QHhpv/CeVKcL3lGl1k/EKTHfWzknQILdKDauVp+7OQ5pypMO0qlZBICYBfqGls2fNJ
+         cp1QlAArO8sTWTWiiUM4RTVnCECuwR0+WK9bdfBsMuD/Dkv5ckwp1062FCUlDRKGQEcS
+         9uws4R7LpXLfnHPTRMjHviWS7YhX7ecZMw+n515PNJ4WvvKVB/Q14mUF7ZmNawVpCCMI
+         8cPtiDDN1w0rALr1XKTJ9xXJBeEe5ikwlSl61qi3ISY7NMKw7HO2QxAsUarN38HFIpTn
+         U/RyysaYJsOkOMG8DWWOYEAqdLJypHcOK5n1xtGLT/INJwWQJ7jmYkpE0wvpbSVpa3PW
+         HhSw==
+X-Forwarded-Encrypted: i=1; AJvYcCV2AfqnjvWFW1RiWAD7b8N05e233m/XCb3pm3dtx2h8RONRUjMCY7ip7vE/ZDWlCMqyHLK1svEZbNjjubX7jxviWExW+nU0
+X-Gm-Message-State: AOJu0YxKMLRccY1g3M7ZQ3Fun7BNSy+arTd0+aCVAe5Pl3fzGX3yEJKa
+	Z+k9KNybct+hN76cH3h34Msi7xA0qUrTi9EjQWa0N6VUWivc+ulXRkjdvsdQ4UFfw904limr9X9
+	wEVUXsgXD+DfoYeyTTemHPw==
+X-Google-Smtp-Source: AGHT+IHUDax96YW/dLQiH58KiosXlAxUWeNSSadMNJlcVuoMXhds3TkQYERhSbm/Z7tGEYtmbj9kMFVEdJ9Dtwm14A==
 X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
- (user=justinstitt job=sendgmr) by 2002:a05:6638:13d5:b0:474:64f0:7943 with
- SMTP id i21-20020a05663813d500b0047464f07943mr49078jaj.4.1708726993338; Fri,
- 23 Feb 2024 14:23:13 -0800 (PST)
-Date: Fri, 23 Feb 2024 22:23:06 +0000
+ (user=justinstitt job=sendgmr) by 2002:a05:6602:21c4:b0:7c4:9c05:d8a5 with
+ SMTP id c4-20020a05660221c400b007c49c05d8a5mr6265ioc.4.1708726994675; Fri, 23
+ Feb 2024 14:23:14 -0800 (PST)
+Date: Fri, 23 Feb 2024 22:23:07 +0000
 In-Reply-To: <20240223-strncpy-drivers-scsi-mpi3mr-mpi3mr_fw-c-v1-0-9cd3882f0700@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,13 +74,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240223-strncpy-drivers-scsi-mpi3mr-mpi3mr_fw-c-v1-0-9cd3882f0700@google.com>
 X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1708726990; l=1723;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1708726991; l=2731;
  i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
- bh=atw28RqPC1GSaqT/dfgmT16ohbY/e8gGhibx8N7VvH8=; b=Zvl4/th/GfAIwNdwiIACuAJKgQj0NY3dOqOorRPnpe6UqpqYi8UI5Uf+3a555kNtR3f7/JOik
- kCs0S6g0ulQBscaFHM5dfq7WwUlqC7LU6SbX2NPjr4u4+A/pWw2bD8G
+ bh=gjMkG4A6VKeg8L3wOX72tlhUgkPYbTyo8rC5lCzc/xc=; b=UYPkwNW+u+IG5SwHWneAt8sx4dhS9pOJJjUiYB6pIM632xEy5Mt4vk9TihIz2H7sRZimP1ovB
+ tx+x7hymDZZDPtOQ4DR6ay7OO4oqFJb8qN+s1l2MwvjpwgxBOLQGrBE
 X-Mailer: b4 0.12.3
-Message-ID: <20240223-strncpy-drivers-scsi-mpi3mr-mpi3mr_fw-c-v1-1-9cd3882f0700@google.com>
-Subject: [PATCH 1/7] scsi: mpi3mr: replace deprecated strncpy with strscpy
+Message-ID: <20240223-strncpy-drivers-scsi-mpi3mr-mpi3mr_fw-c-v1-2-9cd3882f0700@google.com>
+Subject: [PATCH 2/7] scsi: mpt3sas: replace deprecated strncpy with strscpy
 From: Justin Stitt <justinstitt@google.com>
 To: Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>, Kashyap Desai <kashyap.desai@broadcom.com>, 
 	Sumit Saxena <sumit.saxena@broadcom.com>, Sreekanth Reddy <sreekanth.reddy@broadcom.com>, 
@@ -98,50 +98,66 @@ Cc: mpi3mr-linuxdrv.pdl@broadcom.com, linux-scsi@vger.kernel.org,
 	Justin Stitt <justinstitt@google.com>
 Content-Type: text/plain; charset="utf-8"
 
-Really, there's no bug with the current code. Let's just ditch strncpy()
-all together.
+The replacement in mpt3sas_base.c is a trivial one because desc is
+already zero-initialized meaning there is no functional change here.
 
-Since strscpy() will not NUL-pad the destination buffer let's
-NUL-initialize @personality; just like the others.
+For mpt3sas_transport.c, we know edev is zero-initialized as well while
+manufacture_reply comes from dma_alloc_coherent(). No functional change
+here either.
 
-Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
-Link: https://github.com/KSPP/linux/issues/90
-Cc: linux-hardening@vger.kernel.org
+For all cases, use the more idiomatic strscpy() usage of:
+strscpy(dest, src, sizeof(dest))
+
 Signed-off-by: Justin Stitt <justinstitt@google.com>
 ---
- drivers/scsi/mpi3mr/mpi3mr_fw.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/scsi/mpt3sas/mpt3sas_base.c      |  2 +-
+ drivers/scsi/mpt3sas/mpt3sas_transport.c | 18 +++++++++---------
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/scsi/mpi3mr/mpi3mr_fw.c b/drivers/scsi/mpi3mr/mpi3mr_fw.c
-index 528f19f782f2..c3e55eedfa5e 100644
---- a/drivers/scsi/mpi3mr/mpi3mr_fw.c
-+++ b/drivers/scsi/mpi3mr/mpi3mr_fw.c
-@@ -3685,20 +3685,20 @@ static void
- mpi3mr_print_ioc_info(struct mpi3mr_ioc *mrioc)
- {
- 	int i = 0, bytes_written = 0;
--	char personality[16];
-+	char personality[16] = {0};
- 	char protocol[50] = {0};
- 	char capabilities[100] = {0};
- 	struct mpi3mr_compimg_ver *fwver = &mrioc->facts.fw_ver;
+diff --git a/drivers/scsi/mpt3sas/mpt3sas_base.c b/drivers/scsi/mpt3sas/mpt3sas_base.c
+index 8761bc58d965..c1e421cb8533 100644
+--- a/drivers/scsi/mpt3sas/mpt3sas_base.c
++++ b/drivers/scsi/mpt3sas/mpt3sas_base.c
+@@ -4774,7 +4774,7 @@ _base_display_ioc_capabilities(struct MPT3SAS_ADAPTER *ioc)
+ 	char desc[17] = {0};
+ 	u32 iounit_pg1_flags;
  
- 	switch (mrioc->facts.personality) {
- 	case MPI3_IOCFACTS_FLAGS_PERSONALITY_EHBA:
--		strncpy(personality, "Enhanced HBA", sizeof(personality));
-+		strscpy(personality, "Enhanced HBA", sizeof(personality));
- 		break;
- 	case MPI3_IOCFACTS_FLAGS_PERSONALITY_RAID_DDR:
--		strncpy(personality, "RAID", sizeof(personality));
-+		strscpy(personality, "RAID", sizeof(personality));
- 		break;
- 	default:
--		strncpy(personality, "Unknown", sizeof(personality));
-+		strscpy(personality, "Unknown", sizeof(personality));
- 		break;
- 	}
+-	strncpy(desc, ioc->manu_pg0.ChipName, 16);
++	strscpy(desc, ioc->manu_pg0.ChipName, sizeof(desc));
+ 	ioc_info(ioc, "%s: FWVersion(%02d.%02d.%02d.%02d), ChipRevision(0x%02x)\n",
+ 		 desc,
+ 		 (ioc->facts.FWVersion.Word & 0xFF000000) >> 24,
+diff --git a/drivers/scsi/mpt3sas/mpt3sas_transport.c b/drivers/scsi/mpt3sas/mpt3sas_transport.c
+index 421ea511b664..76f9a9177198 100644
+--- a/drivers/scsi/mpt3sas/mpt3sas_transport.c
++++ b/drivers/scsi/mpt3sas/mpt3sas_transport.c
+@@ -458,17 +458,17 @@ _transport_expander_report_manufacture(struct MPT3SAS_ADAPTER *ioc,
+ 			goto out;
  
+ 		manufacture_reply = data_out + sizeof(struct rep_manu_request);
+-		strncpy(edev->vendor_id, manufacture_reply->vendor_id,
+-		     SAS_EXPANDER_VENDOR_ID_LEN);
+-		strncpy(edev->product_id, manufacture_reply->product_id,
+-		     SAS_EXPANDER_PRODUCT_ID_LEN);
+-		strncpy(edev->product_rev, manufacture_reply->product_rev,
+-		     SAS_EXPANDER_PRODUCT_REV_LEN);
++		strscpy(edev->vendor_id, manufacture_reply->vendor_id,
++			sizeof(edev->vendor_id));
++		strscpy(edev->product_id, manufacture_reply->product_id,
++			sizeof(edev->product_id));
++		strscpy(edev->product_rev, manufacture_reply->product_rev,
++			sizeof(edev->product_rev));
+ 		edev->level = manufacture_reply->sas_format & 1;
+ 		if (edev->level) {
+-			strncpy(edev->component_vendor_id,
+-			    manufacture_reply->component_vendor_id,
+-			     SAS_EXPANDER_COMPONENT_VENDOR_ID_LEN);
++			strscpy(edev->component_vendor_id,
++				manufacture_reply->component_vendor_id,
++				sizeof(edev->component_vendor_id));
+ 			tmp = (u8 *)&manufacture_reply->component_id;
+ 			edev->component_id = tmp[0] << 8 | tmp[1];
+ 			edev->component_revision_id =
 
 -- 
 2.44.0.rc0.258.g7320e95886-goog
