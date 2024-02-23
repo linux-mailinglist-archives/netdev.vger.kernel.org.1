@@ -1,157 +1,111 @@
-Return-Path: <netdev+bounces-74495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E13C88617C4
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 17:25:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8AAF8617D6
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 17:26:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EA6F1C24D30
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 16:25:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73CA3285FC5
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 16:26:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DBAB84FA5;
-	Fri, 23 Feb 2024 16:22:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7A6283CA6;
+	Fri, 23 Feb 2024 16:26:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=analog.com header.i=@analog.com header.b="IwexxEu3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KAv8Tfxl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00128a01.pphosted.com (mx0a-00128a01.pphosted.com [148.163.135.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 880AE84A43;
-	Fri, 23 Feb 2024 16:22:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B72B28EB
+	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 16:26:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708705354; cv=none; b=athxGLLFAGL79F7NxS4Tb2Tsvj3cJu/Xmf92DzHdNAM5BwLmBUXYWp1lbD9BB+p6jEFSJHhIglodkZ0niG/COCKqW/oDETOfT8AySsRZ+ivivDeylRMSWnZQ8OgBqiPkEINsVtbSHGYYG1Vrvr4870pEQUAjM95oWKIAwbGDshc=
+	t=1708705606; cv=none; b=vCXHbJVihHEA149zedd3VyPvRdrw+SJEbChxV8w0447q8dtabXsixVmKRz05zd7mvzBI3c6YrE3t8oZKbuCT3o3MjfemE9wtBOKZiTFwcc4+XyRlKWuODzF6mFpU61hJlIBIQE4QozbbnQOnMmVKEPbt/dqCReVzkp7iV2GN1cE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708705354; c=relaxed/simple;
-	bh=/vLgQrFwJEPLauOCnRVsxD4IFLYVgo2gFjfrUtYt3oY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WGiugGguFtZ233GDUOas1OVvMiQ4vgRS7obPPIK9QfxI8SzktuhzI1T5YA5Pm74+N3hwTGRvNxyc2+k2otaJNVzsJnE4PjxFli8UXHAbe4LvaVEOHjKY2pgYt/71jMv54LCFBqS7kVi4V1a+z9fZx5kO8OF16sSVsCkHP6qKBXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=analog.com; spf=pass smtp.mailfrom=analog.com; dkim=pass (2048-bit key) header.d=analog.com header.i=@analog.com header.b=IwexxEu3; arc=none smtp.client-ip=148.163.135.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=analog.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=analog.com
-Received: from pps.filterd (m0167089.ppops.net [127.0.0.1])
-	by mx0a-00128a01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41NEqwng014764;
-	Fri, 23 Feb 2024 11:22:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=analog.com; h=
-	from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding:content-type; s=DKIM; bh=oFUn0e6fWFYT
-	CZbbrqZsUmODUYxqH0R9/qbP33pHpJw=; b=IwexxEu3LRbgWPzY0f3yxng1DYCy
-	y1Wk1NANUQjyyc9op0L9aQEXkH5jSdkxQqy1rhgASuvUuBsR22vEsXH+Yxoh7KY0
-	ShjKpwPT2oX99DjbiXxp+IROvEaZMqOYvDSU+1bGZAYCpvWHvqOU+m+gfTPifu/x
-	DKCmQTWPWY42XtpPg+TMBLdLHY+MOaWuSog4cpQ4AryAWZPkj47ceAD6NAUvrnXg
-	/i1FIpjrkr51VTS7zr6gtpSVQij8QDgSYB0Y7svAxzFL8OPQ9rcppBHaBNWwFj2i
-	DF1FOgXX7nMkRry763uv55jU9h1I/9+umsKJmefcD6dScPnncLCznzCbBg==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-00128a01.pphosted.com (PPS) with ESMTPS id 3wd21pf9xk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 23 Feb 2024 11:22:10 -0500 (EST)
-Received: from m0167089.ppops.net (m0167089.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.24/8.17.1.24) with ESMTP id 41NGKI3f017473;
-	Fri, 23 Feb 2024 11:22:09 -0500
-Received: from nwd2mta3.analog.com ([137.71.173.56])
-	by mx0a-00128a01.pphosted.com (PPS) with ESMTPS id 3wd21pf9xf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 23 Feb 2024 11:22:09 -0500 (EST)
-Received: from ASHBMBX8.ad.analog.com (ASHBMBX8.ad.analog.com [10.64.17.5])
-	by nwd2mta3.analog.com (8.14.7/8.14.7) with ESMTP id 41NGM80a054843
-	(version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 23 Feb 2024 11:22:08 -0500
-Received: from ASHBCASHYB4.ad.analog.com (10.64.17.132) by
- ASHBMBX8.ad.analog.com (10.64.17.5) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.14; Fri, 23 Feb 2024 11:22:07 -0500
-Received: from ASHBMBX8.ad.analog.com (10.64.17.5) by
- ASHBCASHYB4.ad.analog.com (10.64.17.132) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.14; Fri, 23 Feb 2024 11:22:07 -0500
-Received: from zeus.spd.analog.com (10.66.68.11) by ashbmbx8.ad.analog.com
- (10.64.17.5) with Microsoft SMTP Server id 15.2.986.14 via Frontend
- Transport; Fri, 23 Feb 2024 11:22:07 -0500
-Received: from debian.ad.analog.com ([10.48.65.188])
-	by zeus.spd.analog.com (8.15.1/8.15.1) with ESMTP id 41NGLkd8017870;
-	Fri, 23 Feb 2024 11:21:50 -0500
-From: Ciprian Regus <ciprian.regus@analog.com>
-To: <linux-kernel@vger.kernel.org>
-CC: Ciprian Regus <ciprian.regus@analog.com>, Nuno Sa <nuno.sa@analog.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, "Simon
- Horman" <horms@kernel.org>,
-        Michal Simek <michal.simek@amd.com>, Mark Brown
-	<broonie@kernel.org>,
-        Yang Yingliang <yangyingliang@huawei.com>,
-        "Amit Kumar
- Mahapatra" <amit.kumar-mahapatra@amd.com>,
-        Dell Jin
-	<dell.jin.code@outlook.com>, <netdev@vger.kernel.org>
-Subject: [net-next v2] net: ethernet: adi: adin1110: Reduce the MDIO_TRDONE poll interval
-Date: Fri, 23 Feb 2024 18:21:27 +0200
-Message-ID: <20240223162129.154114-1-ciprian.regus@analog.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1708705606; c=relaxed/simple;
+	bh=rBtmPjbDeLN3QT4AYhriELnXgXk0WWDDcWsB3SY+reY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nBva6gOHX8InufzhdGnVDr6UHn5ZJ904Cm+Yb54UhKGhuo3fTvFMA/eKy6l5xaydXwhI38hhp8VynikK4urrH2aCJ00aygaxr8beGRDHMC08TptRB/HY6/T4530fEiOTelICOGmp3rWCxtpPWDbs7l9mKhfbosPvXlFu8S0UPC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KAv8Tfxl; arc=none smtp.client-ip=209.85.160.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-21f2f813e3bso215447fac.0
+        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 08:26:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708705604; x=1709310404; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=rBtmPjbDeLN3QT4AYhriELnXgXk0WWDDcWsB3SY+reY=;
+        b=KAv8TfxlNoTsv4rh8RlEGLtyyE98nMlv6Iin1B10WZFxHHK9mWf8k13yMFAXlFvCzE
+         EcRAIXnr4MI8A250Jj+QuWN+tDzrQw2cS60s24BPC2X90djjpCPgR6qjvSRgEBzcAsto
+         kZHQfPCzqr4LopAU1oSZXhAa2rfpz9SToIDya9hgVzD+DVtASuBOfnbpzE7ZMmZiLakz
+         Ta0n1jvdceFklHyxSVeS66X8COmCBgUi9kmvjHNIZx6Juzt0NJn3OvvIX+jPpOZ+D3Js
+         EqfzwXjobp3Yz/egUafP82a367K6JMJo+2mMud9HG7rOUCgO9Olr8XNpiimRVHqyaSq7
+         FlHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708705604; x=1709310404;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rBtmPjbDeLN3QT4AYhriELnXgXk0WWDDcWsB3SY+reY=;
+        b=npGt/WaI6OlF0MDrSZrMp5Cd1OPebULAngawb5N6d0s98BIGINmpQ6vJopGnV/7aNr
+         1wKnxJj6DvvtIaw/5KknA3Zf/lTXvBoF9RtnZZd229Sk2GkPRkYQ0fGwq5A8poOShYMx
+         MkZqRMXNrEV+n6KmqrgBKZIgT9oYXxP9qsoqO4IivMgiXp/O+EpgSCGEx0zcRJbXxWSK
+         sXyaH2fuawbclHi5gPjcsRut/yl3wune8btSpdSrv3sAXVRb+WV7gmIdF41cGOyaxXcN
+         PUAgNvF97rzrz05zO8L0+ptus3HRT1zeKsKoM7nNYn3TUHXsm7FNVRJjHHPhPKgiWJDO
+         BHyA==
+X-Forwarded-Encrypted: i=1; AJvYcCUrZyw36ocoGaiHZFUWZX1VSh6QgyfqePImkzOXVuJAxDmioybZ8jdx68xNxzBqrTAYyuEdugTwdLDajwYOZofJ/fu62Jha
+X-Gm-Message-State: AOJu0YwH6bs0mk4iMM/yDpB7EPcF79/HBd67hdh5Xt3Q/G18efKa/ELu
+	3VCX//Bk3JCU/mENrq6xDmDEWRAbd8JxeYWyhNJJCEbJVnIYbxcWBa45XF5QOwrj9TA5BOpAnM3
+	i+PjOhAH0Mf4qWStchM9X3bKWr3g=
+X-Google-Smtp-Source: AGHT+IF9kxdDF0dUx9B6rGX+sxkKJSFh5DxOXRyooJHMbsylOcFY/0kN56yQvruq9f28zJUqSdHz+re6m3an6AO95Q8=
+X-Received: by 2002:a05:6870:e2cb:b0:21e:7d4a:aa67 with SMTP id
+ w11-20020a056870e2cb00b0021e7d4aaa67mr131547oad.21.1708705604387; Fri, 23 Feb
+ 2024 08:26:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ADIRuleOP-NewSCL: Rule Triggered
-X-Proofpoint-GUID: 63px5bI0bZY2T_lLrSo_BQ0u28-f8xiP
-X-Proofpoint-ORIG-GUID: 5Y42PkLbr5XPh30Fp7Yl_JyYdeiND7n0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-23_02,2024-02-23_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
- suspectscore=0 malwarescore=0 mlxlogscore=791 priorityscore=1501
- impostorscore=0 clxscore=1011 lowpriorityscore=0 bulkscore=0 adultscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2402120000 definitions=main-2402230119
+References: <20240222235614.180876-1-kuba@kernel.org>
+In-Reply-To: <20240222235614.180876-1-kuba@kernel.org>
+From: Donald Hunter <donald.hunter@gmail.com>
+Date: Fri, 23 Feb 2024 16:26:33 +0000
+Message-ID: <CAD4GDZzF55bkoZ_o0S784PmfW4+L_QrG2ofWg6CeQk4FCWTUiw@mail.gmail.com>
+Subject: Re: [PATCH net-next 00/15] tools: ynl: stop using libmnl
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, jiri@resnulli.us, sdf@google.com, 
+	nicolas.dichtel@6wind.com
+Content-Type: text/plain; charset="UTF-8"
 
-In order to do a clause 22 access to the PHY registers of the ADIN1110,
-we have to write the MDIO frame to the ADIN1110_MDIOACC register, and
-then poll the MDIO_TRDONE bit (for a 1) in the same register. The
-device will set this bit to 1 once the internal MDIO transaction is
-done. In practice, this bit takes ~50 - 60 us to be set.
+On Thu, 22 Feb 2024 at 23:56, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> There is no strong reason to stop using libmnl in ynl but there
+> are a few small ones which add up.
+>
+> First, we do much more advanced netlink level parsing than libmnl
+> in ynl so it's hard to say that libmnl abstracts much from us.
+> The fact that this series, removing the libmnl dependency, only
+> adds <300 LoC shows that code savings aren't huge.
+> OTOH when new types are added (e.g. auto-int) we need to add
+> compatibility to deal with older version of libmnl (in fact,
+> even tho patches have been sent months ago, auto-ints are still
+> not supported in libmnl.git).
+>
+> Second, the dependency makes ynl less self contained, and harder
+> to vendor in. Whether vendoring libraries into projects is a good
+> idea is a separate discussion, nonetheless, people want to do it.
+>
+> Third, there are small annoyances with the libmnl APIs which
+> are hard to fix in backward-compatible ways.
+>
+> All in all, libmnl is a great library, but with all the code
+> generation and structured parsing, ynl is better served by going
+> its own way.
 
-The first attempt to poll the bit is right after the ADIN1110_MDIOACC
-register is written, so it will always be read as 0. The next check will
-only be done after 10 ms, which will result in the MDIO transactions
-taking a long time to complete. Reduce this polling interval to 100 us.
-Since this interval is short enough, switch the poll function to
-readx_poll_timeout_atomic() instead.
-
-Reviewed-by: Nuno Sa <nuno.sa@analog.com>
-Signed-off-by: Ciprian Regus <ciprian.regus@analog.com>
----
-Changelog v1 -> v2:
-- switch readx_poll_timeout() to readx_poll_timeout_atomic()
-
- drivers/net/ethernet/adi/adin1110.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/adi/adin1110.c b/drivers/net/ethernet/adi/adin1110.c
-index d7c274af6d4d..8b4ef5121308 100644
---- a/drivers/net/ethernet/adi/adin1110.c
-+++ b/drivers/net/ethernet/adi/adin1110.c
-@@ -466,4 +466,5 @@ static int adin1110_mdio_read(struct mii_bus *bus, int phy_id, int reg)
- 	 */
--	ret = readx_poll_timeout(adin1110_read_mdio_acc, priv, val,
--				 (val & ADIN1110_MDIO_TRDONE), 10000, 30000);
-+	ret = readx_poll_timeout_atomic(adin1110_read_mdio_acc, priv, val,
-+					(val & ADIN1110_MDIO_TRDONE),
-+					100, 30000);
- 	if (ret < 0)
-@@ -497,4 +498,5 @@ static int adin1110_mdio_write(struct mii_bus *bus, int phy_id,
- 
--	return readx_poll_timeout(adin1110_read_mdio_acc, priv, val,
--				  (val & ADIN1110_MDIO_TRDONE), 10000, 30000);
-+	return readx_poll_timeout_atomic(adin1110_read_mdio_acc, priv, val,
-+					 (val & ADIN1110_MDIO_TRDONE),
-+					 100, 30000);
- }
--- 
-2.39.2
-
+Is the absence of buffer bounds checking intentional, i.e. relying on libasan?
 
