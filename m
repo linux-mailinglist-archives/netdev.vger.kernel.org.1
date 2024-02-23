@@ -1,126 +1,206 @@
-Return-Path: <netdev+bounces-74548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF3D0861D2D
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 21:02:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0A1A861D45
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 21:05:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C0D4289FDE
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 20:02:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75FE3286B86
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 20:05:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18649146E84;
-	Fri, 23 Feb 2024 20:01:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91B66146E67;
+	Fri, 23 Feb 2024 20:05:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="s5VlEGkR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5927984FA7;
-	Fri, 23 Feb 2024 20:01:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D17C1448F3
+	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 20:05:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708718512; cv=none; b=nhXg+lbnARdtFay6Xa3PAsWCXHb7JSheGP1aoQV6Q0o9xAm7z8lFaSkixJbp3DCbxcc09t4Q00dgbwInVq187tPsbIYwMLC8/m7L7b2w0pEEmvaEssjB2tzWJt8ITbo8So/tJJ+41N6fLefdYdfJL9GzNlNTMtcscTu/Ct0m6IU=
+	t=1708718752; cv=none; b=neqNkmBpH4vknnMdLanI85/ciHPVjYZ/sh7CydWp/bpyt6wxLZDfSEeUo9ylR1qW1m0Ihf8iUXfd6pzsPGxS8SzE34LePcx78sqxMC6GDZ4YxDm943SDnT4ZY5rVeCGFCGNFiYvNFF55s07ACET0bJ1yPrJjbxwxEfkGGs4hJXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708718512; c=relaxed/simple;
-	bh=qKShU0yRSF7Qai1aRFfijNm4QP3IVl+XveltCGlIK9M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=u4SblV6STNVFKFHJnI4BdZ+gPsBpTKcvzBKj+lFhT5knxP4Jth6uDgUfy6ItaZTqxVN0TQLSYNf9uZl4SE8tLhr1XdrbB8zXvHE4jN3oSVIivELMoqPdZcGC7yOK83NmQ5IubAAnKiOAXT8gGpLm61MYf3+RNVkDxDlczDS1nJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84C71C433F1;
-	Fri, 23 Feb 2024 20:01:46 +0000 (UTC)
-Date: Fri, 23 Feb 2024 15:03:39 -0500
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Kent Overstreet <kent.overstreet@linux.dev>
-Cc: Jeff Johnson <quic_jjohnson@quicinc.com>, LKML
- <linux-kernel@vger.kernel.org>, Linux Trace Kernel
- <linux-trace-kernel@vger.kernel.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
- linux-block@vger.kernel.org, linux-cxl@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- amd-gfx@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
- intel-xe@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
- freedreno@lists.freedesktop.org, virtualization@lists.linux.dev,
- linux-rdma@vger.kernel.org, linux-pm@vger.kernel.org,
- iommu@lists.linux.dev, linux-tegra@vger.kernel.org, netdev@vger.kernel.org,
- linux-hyperv@vger.kernel.org, ath10k@lists.infradead.org,
- linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
- ath12k@lists.infradead.org, brcm80211@lists.linux.dev,
- brcm80211-dev-list.pdl@broadcom.com, linux-usb@vger.kernel.org,
- linux-bcachefs@vger.kernel.org, linux-nfs@vger.kernel.org,
- ocfs2-devel@lists.linux.dev, linux-cifs@vger.kernel.org,
- linux-xfs@vger.kernel.org, linux-edac@vger.kernel.org,
- selinux@vger.kernel.org, linux-btrfs@vger.kernel.org,
- linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net,
- linux-hwmon@vger.kernel.org, io-uring@vger.kernel.org,
- linux-sound@vger.kernel.org, bpf@vger.kernel.org,
- linux-wpan@vger.kernel.org, dev@openvswitch.org,
- linux-s390@vger.kernel.org, tipc-discussion@lists.sourceforge.net, Julia
- Lawall <Julia.Lawall@inria.fr>
-Subject: Re: [FYI][PATCH] tracing/treewide: Remove second parameter of
- __assign_str()
-Message-ID: <20240223150339.2249bc95@gandalf.local.home>
-In-Reply-To: <qsksxrdinia3cxr52tfe4p3pafsy4biktnodlfn4vyzud73p2j@6ycnhrhzwsv6>
-References: <20240223125634.2888c973@gandalf.local.home>
-	<0aed6cf2-17ae-45aa-b7ff-03da932ea4e0@quicinc.com>
-	<20240223134653.524a5c9e@gandalf.local.home>
-	<qsksxrdinia3cxr52tfe4p3pafsy4biktnodlfn4vyzud73p2j@6ycnhrhzwsv6>
-X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1708718752; c=relaxed/simple;
+	bh=c93H0T4Zb2kqV8VXSrK+QwhYIgK7q9e3GVpJjBwlDPQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bhxdEZU/SCBHNUE5y7sMyZXQQXXzkX6WwKP/YjuxOUBiOBnghMDORX5yoUxdt7dKVYOo70brP55KL7ci9iWI0+/nvVEEJ/zi3zPijlnOcKZkSxg1+KlcLJwf0YIXMji0fLcm/fXIjWVC82pPFHYsrEb5fgrZQPBQnmcrAcQAqj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=s5VlEGkR; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6de3141f041so849751b3a.0
+        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 12:05:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1708718749; x=1709323549; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=77MYyBjrrun3U8EBRolVJQ+jLb+xOKAgdqcuRAFvrrQ=;
+        b=s5VlEGkRy62fS5jPKo7jImCWldlFM7HGNErXd+RSWVzSfUYFWhLt0RSTzSk2sIWxPV
+         FRj3aRnoDIja1NOryhm6YkAuQZwNY74a06qiK8tF9yFC0LYtlsnH4YnY6Njme2d87xNw
+         QlVTvPgq4sae3FRIDi1tTQEe1PDgr/0Pq7WEFafuct5yb11wDFSZp079QDdhokLQD3Oc
+         xlPp4tYBKp7mBfYHi0pIqOHNCn0z+gEMDifJF52UksaQYf/f94uVDBBvCcmgljwAXdsv
+         W/GO6uaGHTNsHBwm0VuHmTNJlCnUkDXEp5pomWMSFw+OoDBSmtnN/DWR5yhfl7hM0ggh
+         ihfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708718749; x=1709323549;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=77MYyBjrrun3U8EBRolVJQ+jLb+xOKAgdqcuRAFvrrQ=;
+        b=CA7riLEfoIzeXiCxBC8MqToUDde7wfPpib2S0Z/64+24oScGK6EQchDEWhnRW0QtZg
+         428cjhelao4vVZaKOAe2C3CvOvzs56gKld6MHE+FVl5s09wN9SNU3oaq5vselcvwQX+1
+         aJH2zzL+RwJXkdsxfJ1xqCJVQYFK3rl1Wz6gDlUDAM/WV1J2Z6/ZJNfRlJCZcar6of5F
+         1eNpezQIkLGCx68lcM5utd31trgYh5pk9vWopaSe97RsBECCbRjEp5l+hJ75eZh9lVCk
+         QLbrAr17L6wf0srn0ciM+kH/qLCAM2062zEDCsWmBymE4wq3BFLh/MJ/m1vUl7M9SejP
+         G28w==
+X-Forwarded-Encrypted: i=1; AJvYcCVEE0zzKx3ZLl7C/GSqF4nKSoQhU6L39go2p2yR1a3cg+yQmDY+dGIi2wU0nbAHJYk/IBV5F675hs8boUAa6VvxHhW8x0Jx
+X-Gm-Message-State: AOJu0YxHZooARvv3c2gnf8ln9mx12VCCLDb18k/evWTvbfSr8PzLAHim
+	Pl34XIJSdi8HDEb9uvLsW37pUabOAezNVjRJyvdoQkaIBLzcu5gSkMa3K6TXW3c=
+X-Google-Smtp-Source: AGHT+IEgmr0ZdwTYDwiLLCSnGGUBIxZ7Xut9Byi5mIRf8j8f1dL0+6Kee4jWo8g8/WX/ooPqwOMn1w==
+X-Received: by 2002:a62:c186:0:b0:6e4:d0ed:d2b8 with SMTP id i128-20020a62c186000000b006e4d0edd2b8mr693710pfg.16.1708718748675;
+        Fri, 23 Feb 2024 12:05:48 -0800 (PST)
+Received: from ghost ([50.213.54.97])
+        by smtp.gmail.com with ESMTPSA id a18-20020a056a000c9200b006e48e64ef54sm6019116pfv.173.2024.02.23.12.05.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Feb 2024 12:05:48 -0800 (PST)
+Date: Fri, 23 Feb 2024 12:05:45 -0800
+From: Charlie Jenkins <charlie@rivosinc.com>
+To: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Guenter Roeck <linux@roeck-us.net>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Erhard Furtner <erhard_f@mailbox.org>
+Subject: Re: [PATCH net] kunit: Fix again checksum tests on big endian CPUs
+Message-ID: <Zdj6mebHlbIq8u2o@ghost>
+References: <73df3a9e95c2179119398ad1b4c84cdacbd8dfb6.1708684443.git.christophe.leroy@csgroup.eu>
+ <Zdjcnp324nIRuyUI@ghost>
+ <66402663-98dd-42a2-aa04-5f04cb76b147@csgroup.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <66402663-98dd-42a2-aa04-5f04cb76b147@csgroup.eu>
 
-On Fri, 23 Feb 2024 14:50:49 -0500
-Kent Overstreet <kent.overstreet@linux.dev> wrote:
+On Fri, Feb 23, 2024 at 06:15:16PM +0000, Christophe Leroy wrote:
+> 
+> 
+> Le 23/02/2024 à 18:57, Charlie Jenkins a écrit :
+> > On Fri, Feb 23, 2024 at 11:41:52AM +0100, Christophe Leroy wrote:
+> >> Commit b38460bc463c ("kunit: Fix checksum tests on big endian CPUs")
+> >> fixed endianness issues with kunit checksum tests, but then
+> >> commit 6f4c45cbcb00 ("kunit: Add tests for csum_ipv6_magic and
+> >> ip_fast_csum") introduced new issues on big endian CPUs. Those issues
+> >> are once again reflected by the warnings reported by sparse.
+> >>
+> >> So, fix them with the same approach, perform proper conversion in
+> >> order to support both little and big endian CPUs. Once the conversions
+> >> are properly done and the right types used, the sparse warnings are
+> >> cleared as well.
+> >>
+> >> Reported-by: Erhard Furtner <erhard_f@mailbox.org>
+> >> Fixes: 6f4c45cbcb00 ("kunit: Add tests for csum_ipv6_magic and ip_fast_csum")
+> >> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+> >> ---
+> >>   lib/checksum_kunit.c | 17 +++++++++--------
+> >>   1 file changed, 9 insertions(+), 8 deletions(-)
+> >>
+> >> diff --git a/lib/checksum_kunit.c b/lib/checksum_kunit.c
+> >> index 225bb7701460..bf70850035c7 100644
+> >> --- a/lib/checksum_kunit.c
+> >> +++ b/lib/checksum_kunit.c
+> >> @@ -215,7 +215,7 @@ static const u32 init_sums_no_overflow[] = {
+> >>   	0xffff0000, 0xfffffffb,
+> >>   };
+> >>   
+> >> -static const __sum16 expected_csum_ipv6_magic[] = {
+> >> +static const u16 expected_csum_ipv6_magic[] = {
+> >>   	0x18d4, 0x3085, 0x2e4b, 0xd9f4, 0xbdc8, 0x78f,	0x1034, 0x8422, 0x6fc0,
+> >>   	0xd2f6, 0xbeb5, 0x9d3,	0x7e2a, 0x312e, 0x778e, 0xc1bb, 0x7cf2, 0x9d1e,
+> >>   	0xca21, 0xf3ff, 0x7569, 0xb02e, 0xca86, 0x7e76, 0x4539, 0x45e3, 0xf28d,
+> >> @@ -241,7 +241,7 @@ static const __sum16 expected_csum_ipv6_magic[] = {
+> >>   	0x3845, 0x1014
+> >>   };
+> >>   
+> >> -static const __sum16 expected_fast_csum[] = {
+> >> +static const u16 expected_fast_csum[] = {
+> >>   	0xda83, 0x45da, 0x4f46, 0x4e4f, 0x34e,	0xe902, 0xa5e9, 0x87a5, 0x7187,
+> >>   	0x5671, 0xf556, 0x6df5, 0x816d, 0x8f81, 0xbb8f, 0xfbba, 0x5afb, 0xbe5a,
+> >>   	0xedbe, 0xabee, 0x6aac, 0xe6b,	0xea0d, 0x67ea, 0x7e68, 0x8a7e, 0x6f8a,
+> >> @@ -577,7 +577,8 @@ static void test_csum_no_carry_inputs(struct kunit *test)
+> >>   
+> >>   static void test_ip_fast_csum(struct kunit *test)
+> >>   {
+> >> -	__sum16 csum_result, expected;
+> >> +	__sum16 csum_result;
+> >> +	u16 expected;
+> >>   
+> >>   	for (int len = IPv4_MIN_WORDS; len < IPv4_MAX_WORDS; len++) {
+> >>   		for (int index = 0; index < NUM_IP_FAST_CSUM_TESTS; index++) {
+> >> @@ -586,7 +587,7 @@ static void test_ip_fast_csum(struct kunit *test)
+> >>   				expected_fast_csum[(len - IPv4_MIN_WORDS) *
+> >>   						   NUM_IP_FAST_CSUM_TESTS +
+> >>   						   index];
+> >> -			CHECK_EQ(expected, csum_result);
+> >> +			CHECK_EQ(to_sum16(expected), csum_result);
+> >>   		}
+> >>   	}
+> >>   }
+> >> @@ -598,7 +599,7 @@ static void test_csum_ipv6_magic(struct kunit *test)
+> >>   	const struct in6_addr *daddr;
+> >>   	unsigned int len;
+> >>   	unsigned char proto;
+> >> -	unsigned int csum;
+> >> +	__wsum csum;
+> >>   
+> >>   	const int daddr_offset = sizeof(struct in6_addr);
+> >>   	const int len_offset = sizeof(struct in6_addr) + sizeof(struct in6_addr);
+> >> @@ -611,10 +612,10 @@ static void test_csum_ipv6_magic(struct kunit *test)
+> >>   		saddr = (const struct in6_addr *)(random_buf + i);
+> >>   		daddr = (const struct in6_addr *)(random_buf + i +
+> >>   						  daddr_offset);
+> >> -		len = *(unsigned int *)(random_buf + i + len_offset);
+> >> +		len = le32_to_cpu(*(__le32 *)(random_buf + i + len_offset));
+> >>   		proto = *(random_buf + i + proto_offset);
+> >> -		csum = *(unsigned int *)(random_buf + i + csum_offset);
+> >> -		CHECK_EQ(expected_csum_ipv6_magic[i],
+> >> +		csum = *(__wsum *)(random_buf + i + csum_offset);
+> >> +		CHECK_EQ(to_sum16(expected_csum_ipv6_magic[i]),
+> >>   			 csum_ipv6_magic(saddr, daddr, len, proto, csum));
+> >>   	}
+> >>   #endif /* !CONFIG_NET */
+> >> -- 
+> >> 2.43.0
+> >>
+> > 
+> > There is no need to duplicate efforts here. This has already been
+> > resolved by
+> > https://lore.kernel.org/lkml/20240221-fix_sparse_errors_checksum_tests-v9-2-bff4d73ab9d1@rivosinc.com/.
+> > 
+> 
+> The idea here is to provide a fix which is similar to the one done 
+> previously and that uses the same approach and reuses the same helpers.
+> 
+> This is to keep the code homogeneous.
+> 
+> Christophe
 
-> Tangentially related though, what would make me really happy is if we
-> could create the string with in the TP__fast_assign() section. I have to
-> have a bunch of annoying wrappers right now because the string length
-> has to be known when we invoke the tracepoint.
+htons makes more sense here since this is networking code, but I don't
+care enough to argue the point. I tested it on big endian SPARC and on
+riscv. I'll base my alignment patch on this.
 
-You can use __string_len() to determine the string length in the tracepoint
-(which is executed in the TP_fast_assign() section).
+Tested-by: Charlie Jenkins <charlie@rivosinc.com>
 
-My clean up patches will make __assign_str_len() obsolete too (I'm working
-on them now), and you can just use __assign_str().
-
-I noticed that I don't have a string_len example in the sample code and I'm
-actually writing it now.
-
-// cutting out everything else:
-
-TRACE_EVENT(foo_bar,
-
-	TP_PROTO(const char *foo, int bar),
-
-	TP_ARGS(foo, bar),
-
-	TP_STRUCT__entry(
-		__string_len(	lstr,	foo,	bar < strlen(foo) ? bar : strlen(foo) )
-	),
-
-	TP_fast_assign(
-		__assign_str(lstr, foo);
-
-// Note, the above is with my updates, without them, you need to duplicate the logic
-
-//		__assign_str_len(lstr, foo, bar < strlen(foo) ? bar : strlen(foo));
-	),
-
-	TP_printk("%s", __get_str(lstr))
-);
-
-
-The above will allocate "bar < strlen(foo) ? bar : strlen(foo)" size on the
-ring buffer. As the size is already stored, my clean up code uses that
-instead of requiring duplicating the logic again.
-
--- Steve
 
