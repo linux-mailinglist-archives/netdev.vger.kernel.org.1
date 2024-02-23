@@ -1,174 +1,142 @@
-Return-Path: <netdev+bounces-74416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92E6786134A
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 14:51:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA9A6861364
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 14:53:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 200921F24564
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 13:51:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08CAA1C216AB
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 13:53:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8734F7F7C5;
-	Fri, 23 Feb 2024 13:51:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="XW3y4eUF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6001180627;
+	Fri, 23 Feb 2024 13:52:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 570A822EF5
-	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 13:51:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 048297F466
+	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 13:52:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708696277; cv=none; b=Tq7sCLHxDZ7PkacJCJ7t22R5m8A3raf3S88dkibfbcxyHn0UTyewbjIixtiFetxAw2OCdd84HsX73y1xP2gN/PSTpNU3EWkDxhcxnigZNRIvP8Ml+z01L9Z0LdR5foqWaQ3T32ViE0SuVKPGKPBAYYuyqoIxvoDF80XJ46V29G8=
+	t=1708696365; cv=none; b=nFCU8Wt4NuqYRwPFrgFSgw99P/sALvNlJpVhG79tjS6RtO82POn4EeKJRkF8sdJcpOXekPsygiGKy53MSyadjuvmTnYhfeCGZMX1o4lkT1L/99JGgPcZjMwgrVrZ7KQxINoKysVLioh0cdnVwBMo81MBk4V0gAyvsKh+tMJsGsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708696277; c=relaxed/simple;
-	bh=z5TGGrjN4MAuMZNQnPuUQ9zY3sa+KXraw5MLFoXxZlc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mp74W24UCL2WmMkeDSnHv4IZV1hZr2perH8nzq/2lP+bOvKX06kZbMaNY3Wxfi9YTaF04DeY7AGug95CfmSYdtBhoqqbypvbdO6ym7qT76dctXZ7/4zn//7euFzD8KYMuhP+kxUJfMRMR8cWixSMc2/6D7j60f6uTFBDEvZdegA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=XW3y4eUF; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-412934b98b8so4466805e9.3
-        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 05:51:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1708696273; x=1709301073; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=iZwGg30Qhe3RHP/o4rUKd+UtwwoSLo/P5Q4i2I0lgOA=;
-        b=XW3y4eUFqVqjA33wy9ACKbsgYlz3Fx8+e9Qz9NTnygBtBMZaw0wErK2watW0jC2Ry6
-         uKvAVV1bGB8ZMklWGWFjBQskEx786SuXXdcdVzLSOObhgskorqsJRglUQuEi2jxVwTKk
-         9DgDF5PgHUrereu+0jr19L7JN+s3FYMACuEnXzqWK+2Va8M+Et3jLEtc8jLq4usckGuR
-         AkLhdjgeVCaKk3WjzWxQ8zDF9bWzFf6u4SCuZs2kzJqn072eI4/qBAVA1TS1p+Pg676J
-         A07D2zOuepDYJ2I+J7p15XFay+q4h0UuN9kX/SpjgPxR6oIgdE7rIu2ZsWDTP0kIoHY3
-         t01w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708696273; x=1709301073;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iZwGg30Qhe3RHP/o4rUKd+UtwwoSLo/P5Q4i2I0lgOA=;
-        b=DiYXjm25cKlgLu4ZRudYPT+Cl7c4TCFXChKkwCKZxhBUu2FjOR0z+Jh857ZaVm206c
-         e2ZXFyU9fQt8/Oh9jZXrOH3RujchkQsXiW+FS3GWB3Q9UE00uLvkegjYCkTQFRN5eTBc
-         MzXFR8s72vYC9I7p24FQUE/8Xprom8itlVf/gYIsuDOv5AzA9EWZGvcCPb/E2OLSs8+2
-         2wGNW8stMGAg4cIPTl5evlijsTcseoEklaBWende+jnUZTyE/iJWj8RLLiVoDhOK4Cv6
-         l8EXmpfG75MxL8ot/q10h9Nd/ADxuJRdatoS0nhmteAbKObbhObhmMAp/DERg7mCpjyw
-         naMA==
-X-Gm-Message-State: AOJu0Yxzz8vUlaz2PfGrvx3x2DYZdPqPI8syZSMKLQjVroJ4dY9rCmde
-	UGAwib8zifkBmeBO+73pimfvDiTD6guc++QXuuO0aUb5+1KzY2jlL4gjQA/UGR4=
-X-Google-Smtp-Source: AGHT+IHiw99S4qG6gWIeegnW/TakczwiFNVeqM6daVwBWYbQnt7HaHILBSrH0wkxFwtezWAmWEVtsA==
-X-Received: by 2002:a05:6000:910:b0:33d:6ca1:3058 with SMTP id cw16-20020a056000091000b0033d6ca13058mr1521453wrb.56.1708696273535;
-        Fri, 23 Feb 2024 05:51:13 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:b41:c160:25c8:f7d3:953d:aca4? ([2a01:e0a:b41:c160:25c8:f7d3:953d:aca4])
-        by smtp.gmail.com with ESMTPSA id bk28-20020a0560001d9c00b0033b406bc689sm2894162wrb.75.2024.02.23.05.51.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Feb 2024 05:51:13 -0800 (PST)
-Message-ID: <5ec74f4d-5dbd-4c2d-ab11-d00b0208b138@6wind.com>
-Date: Fri, 23 Feb 2024 14:51:12 +0100
+	s=arc-20240116; t=1708696365; c=relaxed/simple;
+	bh=F+dE5PSi2nh33bOrlLn9Liq7cqW9uBp/B7QQSXRWOZ0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=XaNm4zFTQ0lDKHPGM06Ex2XyahTrBEWkoPCTwKHUr5MEbfrohkX/osNexjsgKUP/orObqUSrqs6ciND4+wg4xh+be47z1GU83yOMnEpRungCyYGEf8TdyBr7bnunKL4I5OFUKdWNZ6ueiqiuowYuRffCGNS8Y3FQ/kSMXSOAj0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-220-N0YvSLKYPYycpbumIvGJWw-1; Fri, 23 Feb 2024 13:52:39 +0000
+X-MC-Unique: N0YvSLKYPYycpbumIvGJWw-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 23 Feb
+ 2024 13:52:38 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Fri, 23 Feb 2024 13:52:38 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Jason Gunthorpe' <jgg@nvidia.com>
+CC: 'Niklas Schnelle' <schnelle@linux.ibm.com>, Alexander Gordeev
+	<agordeev@linux.ibm.com>, Andrew Morton <akpm@linux-foundation.org>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Borislav Petkov
+	<bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Gerald Schaefer
+	<gerald.schaefer@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, "Heiko
+ Carstens" <hca@linux.ibm.com>, "H. Peter Anvin" <hpa@zytor.com>, Justin Stitt
+	<justinstitt@google.com>, Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky
+	<leon@kernel.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+	"llvm@lists.linux.dev" <llvm@lists.linux.dev>, Ingo Molnar
+	<mingo@redhat.com>, Bill Wendling <morbo@google.com>, Nathan Chancellor
+	<nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Salil Mehta <salil.mehta@huawei.com>, Jijie Shao
+	<shaojijie@huawei.com>, Sven Schnelle <svens@linux.ibm.com>, Thomas Gleixner
+	<tglx@linutronix.de>, "x86@kernel.org" <x86@kernel.org>, Yisen Zhuang
+	<yisen.zhuang@huawei.com>, Arnd Bergmann <arnd@arndb.de>, Catalin Marinas
+	<catalin.marinas@arm.com>, Leon Romanovsky <leonro@mellanox.com>,
+	"linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, Mark Rutland <mark.rutland@arm.com>,
+	Michael Guralnik <michaelgur@mellanox.com>, "patches@lists.linux.dev"
+	<patches@lists.linux.dev>, Will Deacon <will@kernel.org>
+Subject: RE: [PATCH 4/6] arm64/io: Provide a WC friendly __iowriteXX_copy()
+Thread-Topic: [PATCH 4/6] arm64/io: Provide a WC friendly __iowriteXX_copy()
+Thread-Index: AQHaZGPOOI9/P4jwQk+N+/Phnt6M8bEW6XcggAAM2oCAAKwjYIAALlsAgAACWrCAABVaAIAABEPg
+Date: Fri, 23 Feb 2024 13:52:37 +0000
+Message-ID: <18248cc6f411441c8a68a55f68416150@AcuMS.aculab.com>
+References: <0-v1-38290193eace+5-mlx5_arm_wc_jgg@nvidia.com>
+ <4-v1-38290193eace+5-mlx5_arm_wc_jgg@nvidia.com>
+ <6d335e8701334a15b220b75d49b98d77@AcuMS.aculab.com>
+ <20240222223617.GC13330@nvidia.com>
+ <efc727fbb8de45c8b669b6ec174f95ce@AcuMS.aculab.com>
+ <e78f6e6294c31d889ace4de3a3c3cebad04f4213.camel@linux.ibm.com>
+ <d4150af74d7c45b79c770cd1c5d8eed7@AcuMS.aculab.com>
+ <20240223130308.GF13330@nvidia.com>
+In-Reply-To: <20240223130308.GF13330@nvidia.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH net-next 01/15] tools: ynl: give up on libmnl for
- auto-ints
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
 Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- jiri@resnulli.us, sdf@google.com, donald.hunter@gmail.com
-References: <20240222235614.180876-1-kuba@kernel.org>
- <20240222235614.180876-2-kuba@kernel.org>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Organization: 6WIND
-In-Reply-To: <20240222235614.180876-2-kuba@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 
-Le 23/02/2024 à 00:56, Jakub Kicinski a écrit :
-> The temporary auto-int helpers are not really correct.
-> We can't treat signed and unsigned ints the same when
-> determining whether we need full 8B. I realized this
-> before sending the patch to add support in libmnl.
-> Unfortunately, that patch has not been merged,
-> so time to fix our local helpers. Use the mnl* name
-> for now, subsequent patches will address that.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>> ---
->  tools/net/ynl/lib/ynl-priv.h | 45 ++++++++++++++++++++++++++++--------
->  1 file changed, 36 insertions(+), 9 deletions(-)
-> 
-> diff --git a/tools/net/ynl/lib/ynl-priv.h b/tools/net/ynl/lib/ynl-priv.h
-> index 7491da8e7555..eaa0d432366c 100644
-> --- a/tools/net/ynl/lib/ynl-priv.h
-> +++ b/tools/net/ynl/lib/ynl-priv.h
-> @@ -125,20 +125,47 @@ int ynl_exec_dump(struct ynl_sock *ys, struct nlmsghdr *req_nlh,
->  void ynl_error_unknown_notification(struct ynl_sock *ys, __u8 cmd);
->  int ynl_error_parse(struct ynl_parse_arg *yarg, const char *msg);
->  
-> -#ifndef MNL_HAS_AUTO_SCALARS
-> -static inline uint64_t mnl_attr_get_uint(const struct nlattr *attr)
-> +/* Attribute helpers */
-> +
-> +static inline __u64 mnl_attr_get_uint(const struct nlattr *attr)
->  {
-> -	if (mnl_attr_get_payload_len(attr) == 4)
-> +	switch (mnl_attr_get_payload_len(attr)) {
-> +	case 4:
->  		return mnl_attr_get_u32(attr);
-> -	return mnl_attr_get_u64(attr);
-> +	case 8:
-> +		return mnl_attr_get_u64(attr);
-> +	default:
-> +		return 0;
-> +	}
-> +}
-> +
-> +static inline __s64 mnl_attr_get_sint(const struct nlattr *attr)
-> +{
-> +	switch (mnl_attr_get_payload_len(attr)) {
-> +	case 4:
-> +		return mnl_attr_get_u32(attr);
-> +	case 8:
-> +		return mnl_attr_get_u64(attr);
-> +	default:
-> +		return 0;
-> +	}
->  }
-mnl_attr_get_uint() and mnl_attr_get_sint() are identical. What about
-#define mnl_attr_get_sint mnl_attr_get_uint
-?
+From: Jason Gunthorpe
+> Sent: 23 February 2024 13:03
+>=20
+> On Fri, Feb 23, 2024 at 12:19:24PM +0000, David Laight wrote:
+>=20
+> > Since writes get 'posted' all over the place.
+> > How many writes do you need to do before write-combining makes a
+> > difference?
+>=20
+> The issue is that the HW can optimize if the entire transaction is
+> presented in one TLP, if it has to reassemble the transaction it takes
+> a big slow path hit.
 
->  
->  static inline void
-> -mnl_attr_put_uint(struct nlmsghdr *nlh, uint16_t type, uint64_t data)
-> +mnl_attr_put_uint(struct nlmsghdr *nlh, __u16 type, __u64 data)
-Is there a reason to switch from uint*_t to __u* types?
+Ah, so you aren't optimising to reduce the number of TLP for
+(effectively) a write to a memory buffer, but have a pcie slave
+that really want to see (for example) the writes for a ring buffer
+entry in a single TLP?
 
->  {
-> -	if ((uint32_t)data == (uint64_t)data)
-> -		return mnl_attr_put_u32(nlh, type, data);
-> -	return mnl_attr_put_u64(nlh, type, data);
-> +	if ((__u32)data == (__u64)data)
-> +		mnl_attr_put_u32(nlh, type, data);
-> +	else
-> +		mnl_attr_put_u64(nlh, type, data);
-> +}
-> +
-> +static inline void
-> +mnl_attr_put_sint(struct nlmsghdr *nlh, __u16 type, __s64 data)
-> +{
-> +	if ((__s32)data == (__s64)data)
-> +		mnl_attr_put_u32(nlh, type, data);
-> +	else
-> +		mnl_attr_put_u64(nlh, type, data);
->  }
->  #endif
-> -#endif
+So you really want something that (should) generate a 16 (or 32)
+byte TLP? Rather than abusing the function that is expected to
+generate multiple 8 byte TLP to generate larger TLP.
+
+I'm guessing that on arm64 the ldp/stp instructions will generate
+a single 16 byte TLP regardless of write combining?
+They would definitely help memcpy_fromio().
+
+Are they enough for arm64?
+Getting but TLP on x86 is probably harder.
+(Unless you use AVX512 registers and aligned accesses.)
+
+It is rather a shame that there isn't an efficient way to get
+access to a couple of large SIMD registers.
+(eg save on stack and have the fpu code where they are for
+a lazy fpu switch.)
+There is quite a bit of code that would benefit, but kernel_fpu_begin()
+is just too expensive.
+
+=09David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
+
 
