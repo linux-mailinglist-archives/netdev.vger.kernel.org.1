@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-74596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8843861F37
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 22:44:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CB895861F38
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 22:44:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08B5D1C23C23
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 21:44:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F05591C23932
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 21:44:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BC6814CAA7;
-	Fri, 23 Feb 2024 21:43:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 736E41493AC;
+	Fri, 23 Feb 2024 21:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="HJ8IBVN9"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="vnDikkAs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BD1A149388
-	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 21:43:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0A6C1493A5
+	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 21:44:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708724630; cv=none; b=G2wE/dcCqzCzULUCUCsHjOtwoHYbKAUClbA1Bqu+PGYyGpO3tUfmAICoScHK+vCiHu0xSZTs0jXvRcWAadOKK7IgSlRk29Cuhwl+0eZpx/4ipk6AauwIV2g5Jmy2lFBksGcieafUpHzqZnNIVpgdsd8/KK6WsQispTD6eTzTi84=
+	t=1708724652; cv=none; b=MDoBz8IXLdqH0E4IxMud3YpVkkPjZ5HkQFtCwHNa6pl8mW3jmYyKAcc2yxGMwepCXmJ/bqvcMIbOH/oTKfDF1nfo1WeG14T5mFI3SaQF0OFHXRLxlgwsPpBDrdrKQGe6k/WCvmH+fVFqwlv/J+iEXP5gj/68yf8+k57NgzIBEu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708724630; c=relaxed/simple;
-	bh=foGhaZ4RKL53QyewcUle6fezrl8/29cd9NXAJpMITjw=;
+	s=arc-20240116; t=1708724652; c=relaxed/simple;
+	bh=vyPHFsYy+8ltNjBmfIne5QhgppWWdroRFbjJhO4zyo4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ErUuYmFcG4yNmqqCEGsaP/xZaaovpdzUWGIaOc4uNMWRB4cmRjF9JZR+epYvwMMeDzxrcowl9Lx0kU+lgyMDYppwtZLNHKGooRFCcd6eZZT46nQ10SXTjtwVtH/BE4OuYUzxHaxTfKMleFmsxm8nwuOAVcxnHWAor5obeBwN4mk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=HJ8IBVN9; arc=none smtp.client-ip=52.119.213.152
+	 MIME-Version:Content-Type; b=iuQpdVG1gWGK3W8S0OKGb+O1VHJZCBGiDYMADVpcwj7kTxCNkpRVzcK8dGVkFpXkuRPKVnQT1Yabe3bXXClTBmNSOVy1Kt8pMYlCd5jMye5IIX+7wEaDDSWfd06oeATaDJIavOgsfssmezfIQTiyWec4qRbAE5ocIBjb9mxoXLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=vnDikkAs; arc=none smtp.client-ip=99.78.197.217
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1708724628; x=1740260628;
+  t=1708724651; x=1740260651;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=oMudsZ6SlzLVP8C3qThUZJlSPRoeY/TNX/CcDjR/xVc=;
-  b=HJ8IBVN9nFBo/DS6ikG2khHnHZSp6GdanDQx0xXCgGbJwHzH/3r/lHTR
-   nMXF32v3rpOT+Xf3q+MwLVNINLDXmujcCrNl4BKFk+Pt3+XjUjwIP8Fd0
-   OXvKLVyClwmlZd2NVOMcp1yzwZeHPz85qdQ/c18As/QDvhNG7rjaq4nml
-   w=;
+  bh=vRTgDQ9UOFexuvV8bRclfeaMJUgz63h5oJNEuEp8ya8=;
+  b=vnDikkAsh/G4J9SKek5jn8LHkdDXN0QGxAyxNI1mRG8zdpHoxa59rBuO
+   l90VM1pYUuMmRL6WJY/X7GczEB9OHeDeWmJVKdV4f27PtpxHnJKYJf/Ax
+   pAFC/xkp9/LPMtVWsnOHlErC8YS4VAJddBEA/l9rR7ok3mp7kpM/n1hu/
+   U=;
 X-IronPort-AV: E=Sophos;i="6.06,180,1705363200"; 
-   d="scan'208";a="640117864"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2024 21:43:45 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:2576]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.6.154:2525] with esmtp (Farcaster)
- id ddfabf47-698e-48c7-be88-ebc2a3bbdafe; Fri, 23 Feb 2024 21:43:44 +0000 (UTC)
-X-Farcaster-Flow-ID: ddfabf47-698e-48c7-be88-ebc2a3bbdafe
+   d="scan'208";a="275499484"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2024 21:44:08 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:34406]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.52.236:2525] with esmtp (Farcaster)
+ id f3b6900e-48ff-4edd-bc34-558666b41b11; Fri, 23 Feb 2024 21:44:07 +0000 (UTC)
+X-Farcaster-Flow-ID: f3b6900e-48ff-4edd-bc34-558666b41b11
 Received: from EX19D004ANA003.ant.amazon.com (10.37.240.184) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 23 Feb 2024 21:43:42 +0000
+ 15.2.1118.40; Fri, 23 Feb 2024 21:44:07 +0000
 Received: from 88665a182662.ant.amazon.com.com (10.106.100.9) by
  EX19D004ANA003.ant.amazon.com (10.37.240.184) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.40;
- Fri, 23 Feb 2024 21:43:39 +0000
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Fri, 23 Feb 2024 21:44:04 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v3 net-next 08/14] af_unix: Save O(n) setup of Tarjan's algo.
-Date: Fri, 23 Feb 2024 13:39:57 -0800
-Message-ID: <20240223214003.17369-9-kuniyu@amazon.com>
+Subject: [PATCH v3 net-next 09/14] af_unix: Skip GC if no cycle exists.
+Date: Fri, 23 Feb 2024 13:39:58 -0800
+Message-ID: <20240223214003.17369-10-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20240223214003.17369-1-kuniyu@amazon.com>
 References: <20240223214003.17369-1-kuniyu@amazon.com>
@@ -77,145 +77,147 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWA002.ant.amazon.com (10.13.139.12) To
+X-ClientProxiedBy: EX19D038UWC003.ant.amazon.com (10.13.139.209) To
  EX19D004ANA003.ant.amazon.com (10.37.240.184)
 
-Before starting Tarjan's algorithm, we need to mark all vertices
-as unvisited.  We can save this O(n) setup by reserving two special
-indices (0, 1) and using two variables.
+We do not need to run GC if there is no possible cyclic reference.
+We use unix_graph_maybe_cyclic to decide if we should run GC.
 
-The first time we link a vertex to unix_unvisited_vertices, we set
-unix_vertex_unvisited_index to index.
+If a fd of an AF_UNIX socket is passed to an already inflight AF_UNIX
+socket, they could form a cyclic reference.  Then, we set true to
+unix_graph_maybe_cyclic and later run Tarjan's algorithm to group
+them into SCC.
 
-During DFS, we can see that the index of unvisited vertices is the
-same as unix_vertex_unvisited_index.
+Once we run Tarjan's algorithm, we are 100% sure whether cyclic
+references exist or not.  If there is no cycle, we set false to
+unix_graph_maybe_cyclic and can skip the entire garbage collection
+next time.
 
-When we finalise SCC later, we set unix_vertex_grouped_index to each
-vertex's index.
+When finalising SCC, we set true to unix_graph_maybe_cyclic if SCC
+consists of multiple vertices.
 
-Then, we can know (i) that the vertex is on the stack if the index
-of a visited vertex is >= 2 and (ii) that it is not on the stack and
-belongs to a different SCC if the index is unix_vertex_grouped_index.
+Even if SCC is a single vertex, a cycle might exist as self-fd passing.
+Given the corner case is rare, we detect it by checking all edges of
+the vertex and set true to unix_graph_maybe_cyclic.
 
-After the whole algorithm, all indices of vertices are set as
-unix_vertex_grouped_index.
-
-Next time we start DFS, we know that all unvisited vertices have
-unix_vertex_grouped_index, and we can use unix_vertex_unvisited_index
-as the not-on-stack marker.
-
-To use the same variable in __unix_walk_scc(), we can swap
-unix_vertex_(grouped|unvisited)_index at the end of Tarjan's
-algorithm.
+With this change, __unix_gc() is just a spin_lock() dance in the normal
+usage.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- include/net/af_unix.h |  1 -
- net/unix/garbage.c    | 22 ++++++++++++----------
- 2 files changed, 12 insertions(+), 11 deletions(-)
+ net/unix/garbage.c | 44 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 43 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/af_unix.h b/include/net/af_unix.h
-index 414463803b7e..ec040caaa4b5 100644
---- a/include/net/af_unix.h
-+++ b/include/net/af_unix.h
-@@ -37,7 +37,6 @@ struct unix_vertex {
- 	unsigned long out_degree;
- 	unsigned long index;
- 	unsigned long lowlink;
--	bool on_stack;
- };
- 
- struct unix_edge {
 diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-index a21dbbbd9bc7..a2cd24ee953b 100644
+index a2cd24ee953b..28506b32dcb2 100644
 --- a/net/unix/garbage.c
 +++ b/net/unix/garbage.c
-@@ -112,16 +112,20 @@ static struct unix_vertex *unix_edge_successor(struct unix_edge *edge)
+@@ -109,6 +109,19 @@ static struct unix_vertex *unix_edge_successor(struct unix_edge *edge)
+ 	return edge->successor->vertex;
+ }
+ 
++static bool unix_graph_maybe_cyclic;
++
++static void unix_graph_update(struct unix_vertex *vertex)
++{
++	if (unix_graph_maybe_cyclic)
++		return;
++
++	if (!vertex)
++		return;
++
++	unix_graph_maybe_cyclic = true;
++}
++
  static LIST_HEAD(unix_unvisited_vertices);
  
  enum unix_vertex_index {
--	UNIX_VERTEX_INDEX_UNVISITED,
-+	UNIX_VERTEX_INDEX_MARK1,
-+	UNIX_VERTEX_INDEX_MARK2,
- 	UNIX_VERTEX_INDEX_START,
- };
+@@ -137,12 +150,14 @@ static void unix_add_edge(struct scm_fp_list *fpl, struct unix_edge *edge)
+ 	vertex->out_degree++;
  
-+static unsigned long unix_vertex_unvisited_index = UNIX_VERTEX_INDEX_MARK1;
-+
- static void unix_add_edge(struct scm_fp_list *fpl, struct unix_edge *edge)
+ 	list_add_tail(&edge->vertex_entry, &vertex->edges);
++	unix_graph_update(unix_edge_successor(edge));
+ }
+ 
+ static void unix_del_edge(struct scm_fp_list *fpl, struct unix_edge *edge)
  {
  	struct unix_vertex *vertex = edge->predecessor->vertex;
  
- 	if (!vertex) {
- 		vertex = list_first_entry(&fpl->vertices, typeof(*vertex), entry);
-+		vertex->index = unix_vertex_unvisited_index;
- 		vertex->out_degree = 0;
- 		INIT_LIST_HEAD(&vertex->edges);
++	unix_graph_update(unix_edge_successor(edge));
+ 	list_del(&edge->vertex_entry);
  
-@@ -266,6 +270,7 @@ void unix_destroy_fpl(struct scm_fp_list *fpl)
+ 	vertex->out_degree--;
+@@ -228,6 +243,7 @@ void unix_del_edges(struct scm_fp_list *fpl)
+ void unix_update_edges(struct unix_sock *receiver)
+ {
+ 	spin_lock(&unix_gc_lock);
++	unix_graph_update(unix_sk(receiver->listener)->vertex);
+ 	receiver->listener = NULL;
+ 	spin_unlock(&unix_gc_lock);
+ }
+@@ -269,6 +285,24 @@ void unix_destroy_fpl(struct scm_fp_list *fpl)
+ 	unix_free_vertices(fpl);
  }
  
++static bool unix_scc_cyclic(struct list_head *scc)
++{
++	struct unix_vertex *vertex;
++	struct unix_edge *edge;
++
++	if (!list_is_singular(scc))
++		return true;
++
++	vertex = list_first_entry(scc, typeof(*vertex), scc_entry);
++
++	list_for_each_entry(edge, &vertex->edges, vertex_entry) {
++		if (unix_edge_successor(edge) == vertex)
++			return true;
++	}
++
++	return false;
++}
++
  static LIST_HEAD(unix_visited_vertices);
-+static unsigned long unix_vertex_grouped_index = UNIX_VERTEX_INDEX_MARK2;
+ static unsigned long unix_vertex_grouped_index = UNIX_VERTEX_INDEX_MARK2;
  
- static void __unix_walk_scc(struct unix_vertex *vertex)
- {
-@@ -279,7 +284,6 @@ static void __unix_walk_scc(struct unix_vertex *vertex)
- 	vertex->lowlink = index;
- 	index++;
- 
--	vertex->on_stack = true;
- 	list_add(&vertex->scc_entry, &vertex_stack);
- 
- 	list_for_each_entry(edge, &vertex->edges, vertex_entry) {
-@@ -288,7 +292,7 @@ static void __unix_walk_scc(struct unix_vertex *vertex)
- 		if (!next_vertex)
- 			continue;
- 
--		if (next_vertex->index == UNIX_VERTEX_INDEX_UNVISITED) {
-+		if (next_vertex->index == unix_vertex_unvisited_index) {
- 			list_add(&edge->stack_entry, &edge_stack);
- 
- 			vertex = next_vertex;
-@@ -302,7 +306,7 @@ static void __unix_walk_scc(struct unix_vertex *vertex)
- 			vertex = edge->predecessor->vertex;
- 
- 			vertex->lowlink = min(vertex->lowlink, next_vertex->lowlink);
--		} else if (edge->successor->vertex->on_stack) {
-+		} else if (next_vertex->index != unix_vertex_grouped_index) {
- 			vertex->lowlink = min(vertex->lowlink, next_vertex->index);
- 		}
- 	}
-@@ -315,7 +319,7 @@ static void __unix_walk_scc(struct unix_vertex *vertex)
- 		list_for_each_entry_reverse(vertex, &scc, scc_entry) {
- 			list_move_tail(&vertex->entry, &unix_visited_vertices);
- 
--			vertex->on_stack = false;
-+			vertex->index = unix_vertex_grouped_index;
+@@ -322,6 +356,9 @@ static void __unix_walk_scc(struct unix_vertex *vertex)
+ 			vertex->index = unix_vertex_grouped_index;
  		}
  
++		if (!unix_graph_maybe_cyclic)
++			unix_graph_maybe_cyclic = unix_scc_cyclic(&scc);
++
  		list_del(&scc);
-@@ -327,17 +331,15 @@ static void __unix_walk_scc(struct unix_vertex *vertex)
+ 	}
+ 
+@@ -331,6 +368,8 @@ static void __unix_walk_scc(struct unix_vertex *vertex)
  
  static void unix_walk_scc(void)
  {
--	struct unix_vertex *vertex;
--
--	list_for_each_entry(vertex, &unix_unvisited_vertices, entry)
--		vertex->index = UNIX_VERTEX_INDEX_UNVISITED;
--
- 	while (!list_empty(&unix_unvisited_vertices)) {
-+		struct unix_vertex *vertex;
++	unix_graph_maybe_cyclic = false;
 +
- 		vertex = list_first_entry(&unix_unvisited_vertices, typeof(*vertex), entry);
- 		__unix_walk_scc(vertex);
- 	}
+ 	while (!list_empty(&unix_unvisited_vertices)) {
+ 		struct unix_vertex *vertex;
  
- 	list_replace_init(&unix_visited_vertices, &unix_unvisited_vertices);
-+	swap(unix_vertex_unvisited_index, unix_vertex_grouped_index);
- }
+@@ -489,6 +528,9 @@ static void __unix_gc(struct work_struct *work)
  
- static LIST_HEAD(gc_candidates);
+ 	spin_lock(&unix_gc_lock);
+ 
++	if (!unix_graph_maybe_cyclic)
++		goto skip_gc;
++
+ 	unix_walk_scc();
+ 
+ 	/* First, select candidates for garbage collection.  Only
+@@ -582,7 +624,7 @@ static void __unix_gc(struct work_struct *work)
+ 
+ 	/* All candidates should have been detached by now. */
+ 	WARN_ON_ONCE(!list_empty(&gc_candidates));
+-
++skip_gc:
+ 	/* Paired with READ_ONCE() in wait_for_unix_gc(). */
+ 	WRITE_ONCE(gc_in_progress, false);
+ 
 -- 
 2.30.2
 
