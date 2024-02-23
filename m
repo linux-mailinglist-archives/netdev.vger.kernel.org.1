@@ -1,194 +1,87 @@
-Return-Path: <netdev+bounces-74464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C89C86165A
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 16:53:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B2E7861668
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 16:54:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD583B23F53
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 15:52:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE3EEB256B2
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 15:54:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A537F84047;
-	Fri, 23 Feb 2024 15:52:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 207F684A24;
+	Fri, 23 Feb 2024 15:53:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="fybScMnw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X3uZmWyM"
 X-Original-To: netdev@vger.kernel.org
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 765E683CD3;
-	Fri, 23 Feb 2024 15:52:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E367B84047;
+	Fri, 23 Feb 2024 15:53:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708703548; cv=none; b=MclbmsEylJ/+elSSdEVIs8LeZqRzamsdONGrL3BqtF17JXtYURZ0P5XotmHt9YrAq0q0fV2aUkOYv4CEZqX3pU3GET3LqHFDq9Qx1v0bIsmh4ByRKV1uhkzcKGK4HBuvfvGP1/sVeEoQCDX1HXeuwR5q0AoVgADVMGoei5Pxq9c=
+	t=1708703582; cv=none; b=SjOL+iK4tAG9mZOr0niIMtHOBOd7O2KtpI2F6gq/QOlLuXKMsIb80H1zjNZknvoU1NEwp7t1Z3edm0gYZz46PB5D1hD22RbO8eJ0aofWMoxmnNjKaOgZl4JZtr5WoCMLRQ8mzV+um0tn3zn2EStIwNVIHDrwXYa7lp0znbh64Ik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708703548; c=relaxed/simple;
-	bh=AJVRV4R3xLDBDFjd+6gY0ZeJlPma3kEonzIkr6fkN2A=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=M7E1kSEFYX7h+5BbeJ8UMZ7FM4E9mABG7vMMCEqowC5iXNVAY8bci+gaAt8rjPWcqvtVK3vQ0AVACec1Gc0yWGyqXECitoXuLov5GN9eP33PoO38RIJ1hnPU8P7Q8y2wec08NiyoG/VU2tx6DCy+rMgcivJKLfwhXgC9sqdR+aM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=fybScMnw; arc=none smtp.client-ip=159.69.126.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1708703543;
-	bh=AJVRV4R3xLDBDFjd+6gY0ZeJlPma3kEonzIkr6fkN2A=;
-	h=From:Date:Subject:To:Cc:From;
-	b=fybScMnw6ztjnhJh6//od/yfT0jaQwnJ+PQPrEguV5qVD9RWyBY79psyKosZq0JXO
-	 tdebnnV6k3r7NkArILvrTJ/AENRrjGSxtDSp8jzxOi6S452vJk666G4ScMV2OOF/JG
-	 y34OmWML47curHhdHlh4EoVN3sun1gi6jf2hexns=
-From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Date: Fri, 23 Feb 2024 16:52:16 +0100
-Subject: [PATCH v2] sysctl: treewide: constify ctl_table_root::permissions
+	s=arc-20240116; t=1708703582; c=relaxed/simple;
+	bh=9dJjw/4ASVXyYXTHVJ8CtjzaR84BLmXeR7uCeqpDAVk=;
+	h=Content-Type:MIME-Version:Subject:From:In-Reply-To:References:To:
+	 Cc:Message-ID:Date; b=CGDwFWvFr68CGQ13byBy4EOweqqSUzdB9PcVgJPIvyIM/3OXM3/5D1H4B1nAyFPU8GR8pzd1v6b2yBerbgg2lLLcOy8MA/M9qoKDwS7W6ZMzojRKJH+b4OPNGmLhUyQg5GrooN+/tPFiqDg2VWcksjsxws1jSPQbXVCajPjFFS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X3uZmWyM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED244C433C7;
+	Fri, 23 Feb 2024 15:52:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708703581;
+	bh=9dJjw/4ASVXyYXTHVJ8CtjzaR84BLmXeR7uCeqpDAVk=;
+	h=Subject:From:In-Reply-To:References:To:Cc:Date:From;
+	b=X3uZmWyMABZem3n0ZFvetZzC/ay7OAqtKsH83kW+KJ2wSe+YelPo5SiGBNARf2tDE
+	 6hC9bbVjtSYHbZhZcck+T5R57fRIruTbI1kRXVr549bxvldma7QyaFhjoxd1wTp49+
+	 NIjojNO1V9CU+RkPrSrlpkf9dCCtqucmFYVRhsm55NXdFRPkcTUDYo7Si9nxy0zLVn
+	 13JTfiE12k0HoPCVr7ZwASAoqgFqBVzgzpxp94zC//hbtz7r6b0+XIVj9fR/IUhsmQ
+	 +c1xp9lnW8lYJRhJEBGp8EX+uH7VGhz+y9kVfpHZ6g4FQgvt6uCGd+ud51fVwr49bI
+	 BNW6BMLyCbKDg==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20240223-sysctl-const-permissions-v2-1-0f988d0a6548@weissschuh.net>
-X-B4-Tracking: v=1; b=H4sIAC+/2GUC/42NQQ6CMBBFr0Jm7Rg6RAiuvIdhQdrBTqKFdCpKC
- He3cAKX7/+8/1dQjsIK12KFyLOojCEDnQqwvg8PRnGZgUqqDFGNuqhNT7Rj0IQTx5fo7ii6xg6
- upL6pqwayPkUe5HtM37vMXjSNcTmeZrOnf4zOBg1erKtsa4aa2vb24dyp9W9/Dpyg27btB1/ys
- zbFAAAA
-To: Luis Chamberlain <mcgrof@kernel.org>, Kees Cook <keescook@chromium.org>, 
- Joel Granados <j.granados@samsung.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
- netdev@vger.kernel.org, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1708703543; l=4225;
- i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
- bh=AJVRV4R3xLDBDFjd+6gY0ZeJlPma3kEonzIkr6fkN2A=;
- b=/fsXRVOZ9LM7U+KZGO0nQmlO8w3CxxklZ9vh2LP8Xz/l1wGHkXNysy0c25wf2b8XLO/onp9DA
- y3GpYbstrrqABs+tZ9Xxl5TjMASUtr/rOwQ19cJCQvnYd9ecEmRyHOX
-X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
- pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH] dt-bindings: net: wireless: qcom: Update maintainers
+From: Kalle Valo <kvalo@kernel.org>
+In-Reply-To: <20240217-ath1xk-maintainer-v1-1-9f7ff5fb6bf4@quicinc.com>
+References: <20240217-ath1xk-maintainer-v1-1-9f7ff5fb6bf4@quicinc.com>
+To: Jeff Johnson <quic_jjohnson@quicinc.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, "Krzysztof
+ Kozlowski" <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley
+	<conor+dt@kernel.org>, Jeff Johnson <jjohnson@kernel.org>,
+ <ath10k@lists.infradead.org>, <linux-wireless@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <ath11k@lists.infradead.org>,
+ Jeff Johnson <quic_jjohnson@quicinc.com>
+User-Agent: pwcli/0.1.1-git (https://github.com/kvalo/pwcli/) Python/3.11.2
+Message-ID: <170870357604.2702005.6563808747303592523.kvalo@kernel.org>
+Date: Fri, 23 Feb 2024 15:52:57 +0000 (UTC)
 
-The permissions callback is not supposed to modify the ctl_table.
-Enforce this expectation via the typesystem.
+Jeff Johnson <quic_jjohnson@quicinc.com> wrote:
 
-The patch was created with the following coccinelle script:
+> Add Jeff Johnson as a maintainer of the qcom,ath1*k.yaml files.
+> 
+> Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
+> Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> Signed-off-by: Kalle Valo <quic_kvalo@quicinc.com>
 
-  @@
-  identifier func, head, ctl;
-  @@
+Patch applied to ath-next branch of ath.git, thanks.
 
-  int func(
-    struct ctl_table_header *head,
-  - struct ctl_table *ctl)
-  + const struct ctl_table *ctl)
-  { ... }
+1098eb62433c dt-bindings: net: wireless: qcom: Update maintainers
 
-(insert_entry() from fs/proc/proc_sysctl.c is a false-positive)
-
-The three changed locations were validated through manually inspection
-and compilation.
-
-In addition a search for '.permissions =' was done over the full tree to
-look for places that were missed by coccinelle.
-None were found.
-
-This change also is a step to put "struct ctl_table" into .rodata
-throughout the kernel.
-
-Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
----
-To: Luis Chamberlain <mcgrof@kernel.org>
-To: Kees Cook <keescook@chromium.org>
-To: Joel Granados <j.granados@samsung.com>
-To: David S. Miller <davem@davemloft.net>
-Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
-
-Changes in v2:
-- flesh out commit messages
-- Integrate changes to set_ownership and ctl_table_args into a single
-  series
-- Link to v1: https://lore.kernel.org/r/20231226-sysctl-const-permissions-v1-1-5cd3c91f6299@weissschuh.net
----
-The patch is meant to be merged via the sysctl tree.
-
-There is an upcoming series that will introduce a new implementation of
-.permission which would need to be adapted [0].
-The adaption would be trivial as the 'table' parameter also not modified
-there.
-
-This change was originally part of the sysctl-const series [1].
-To slim down that series and reduce the message load on other
-maintainers to a minimumble, submit this patch on its own.
-
-[0] https://lore.kernel.org/lkml/20240222160915.315255-1-aleksandr.mikhalitsyn@canonical.com/
-[1] https://lore.kernel.org/lkml/20231204-const-sysctl-v2-2-7a5060b11447@weissschuh.net/
----
- include/linux/sysctl.h | 2 +-
- ipc/ipc_sysctl.c       | 2 +-
- kernel/ucount.c        | 2 +-
- net/sysctl_net.c       | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/include/linux/sysctl.h b/include/linux/sysctl.h
-index ee7d33b89e9e..0a55b5aade16 100644
---- a/include/linux/sysctl.h
-+++ b/include/linux/sysctl.h
-@@ -207,7 +207,7 @@ struct ctl_table_root {
- 	void (*set_ownership)(struct ctl_table_header *head,
- 			      struct ctl_table *table,
- 			      kuid_t *uid, kgid_t *gid);
--	int (*permissions)(struct ctl_table_header *head, struct ctl_table *table);
-+	int (*permissions)(struct ctl_table_header *head, const struct ctl_table *table);
- };
- 
- #define register_sysctl(path, table)	\
-diff --git a/ipc/ipc_sysctl.c b/ipc/ipc_sysctl.c
-index 8c62e443f78b..b087787f608f 100644
---- a/ipc/ipc_sysctl.c
-+++ b/ipc/ipc_sysctl.c
-@@ -190,7 +190,7 @@ static int set_is_seen(struct ctl_table_set *set)
- 	return &current->nsproxy->ipc_ns->ipc_set == set;
- }
- 
--static int ipc_permissions(struct ctl_table_header *head, struct ctl_table *table)
-+static int ipc_permissions(struct ctl_table_header *head, const struct ctl_table *table)
- {
- 	int mode = table->mode;
- 
-diff --git a/kernel/ucount.c b/kernel/ucount.c
-index 4aa6166cb856..90300840256b 100644
---- a/kernel/ucount.c
-+++ b/kernel/ucount.c
-@@ -38,7 +38,7 @@ static int set_is_seen(struct ctl_table_set *set)
- }
- 
- static int set_permissions(struct ctl_table_header *head,
--				  struct ctl_table *table)
-+			   const struct ctl_table *table)
- {
- 	struct user_namespace *user_ns =
- 		container_of(head->set, struct user_namespace, set);
-diff --git a/net/sysctl_net.c b/net/sysctl_net.c
-index 051ed5f6fc93..ba9a49de9600 100644
---- a/net/sysctl_net.c
-+++ b/net/sysctl_net.c
-@@ -40,7 +40,7 @@ static int is_seen(struct ctl_table_set *set)
- 
- /* Return standard mode bits for table entry. */
- static int net_ctl_permissions(struct ctl_table_header *head,
--			       struct ctl_table *table)
-+			       const struct ctl_table *table)
- {
- 	struct net *net = container_of(head->set, struct net, sysctls);
- 
-
----
-base-commit: ffd2cb6b718e189e7e2d5d0c19c25611f92e061a
-change-id: 20231226-sysctl-const-permissions-d7cfd02a7637
-
-Best regards,
 -- 
-Thomas Weißschuh <linux@weissschuh.net>
+https://patchwork.kernel.org/project/linux-wireless/patch/20240217-ath1xk-maintainer-v1-1-9f7ff5fb6bf4@quicinc.com/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
 
