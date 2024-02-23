@@ -1,105 +1,126 @@
-Return-Path: <netdev+bounces-74456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C716A8615C1
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 16:28:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E56B58615E5
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 16:34:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 775B528346D
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 15:28:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05E811C236B4
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 15:34:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC1B78663C;
-	Fri, 23 Feb 2024 15:25:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D34A80615;
+	Fri, 23 Feb 2024 15:34:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KMfGM/r1"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="MAP6s0Gz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39A8D86130
-	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 15:25:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AAEB823A8
+	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 15:34:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708701959; cv=none; b=bJrg59NNLAn5/I8ldP8Z/f819Wk1r0DdB3vagmqSwONgPIoIhcSlqavmjbNHidfMPAZoSgGaj/tMNpW/HxAcWm71SoBPL14cLKQRoFzppeS/a31xnVEflrob6H5wxs8/vxoB44m23FVN0N1A78RoWvwqIQrR6AvOCn/3Lc53eG0=
+	t=1708702442; cv=none; b=mgYcnw9wb82hC698QYiEm/08xjMVp4KYVRlj4IK0NkHLGTZeuybMu7jaxRsgEe3btgKl1PYcV85twB5aKll0F8xM4d+Jy17jKNqc3eUshpik/tjna3CTYKY7bRaAUE3QlqoMTOQczna5ntJSAjzteFYJxhbEXVZCwBnhUmsrgh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708701959; c=relaxed/simple;
-	bh=5gMYHWz4my9RONLjo8Fhy+cYbHUo9UWwB6eUpjGiY/s=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=Mn5iZrF0kJZDIVxBceQ45pkORBJNs4zALMnyfcKbMt2+bnOWLn8j2+TzA1uoSX5h5kWVKHepqIWOZ4GhcBbv8tw5NVude6HsnFpH/b5njmMVfSOYJsTKSWyD4MtLWmAs49lpi7kkxbCdLvOrW85JUTEj3w5BCCwMynhXQYJA8Ts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KMfGM/r1; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-41294af9ad7so3413925e9.3
-        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 07:25:58 -0800 (PST)
+	s=arc-20240116; t=1708702442; c=relaxed/simple;
+	bh=vdBr99p6bAykkT5Kv2wcJizRaXadoVKw3jqFLaUR+I8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Z0dBluA2e1MkYIs5gnIWh+x/NIHelGomPb49odvCk1mPMs4gEawH4SRosV3FyZgeMvEH5QFjOs3JZLF7hLRe+uDVk6qmIwEKge20y+Wgr4n9MP8QEx9hTg2zt0hfI6vEuWkymYD+E1i3G6GzxhYf6y1cyOcupT8AUW2rfdhTsi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=MAP6s0Gz; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-33ce8cbf465so657836f8f.3
+        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 07:34:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708701956; x=1709306756; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5gMYHWz4my9RONLjo8Fhy+cYbHUo9UWwB6eUpjGiY/s=;
-        b=KMfGM/r1aHbnYYWRwxL2oF+W1+J2chQZO05SNNQQZwTBIBdeR2rlk6sJzt6CfYRVAY
-         TckrD/9cpan5ne8j4z9+luTZOA0cE6LLNMbZyZ+j0pA5H6bh0qCrjiUSkiMl71niyGHi
-         izjIdnYu/nsnVKWV6K6Q3BC6jkg92oKIDkIgq/PT89O8vzyjFuyWGZzIbIZ4MN1Y1uy6
-         vGSo0SdpY29QjMnIARdP3qa7rDcYDwE4LdCNYmHk49K/dQQeZ3cAm9YWu+ZWR4UAdHiD
-         6IfXilxjpPntPWTAIhL8DZ6X8vs57TnFA53fT7fKiqZjFSf5h0VigwOcx65Drxe4PAPn
-         bVxQ==
+        d=6wind.com; s=google; t=1708702438; x=1709307238; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=+wFU3fXlGWoAaxXFF2EEILrI6It2RtvGw94MDuZQGiM=;
+        b=MAP6s0GzV3W6P4czzKPtbbDTxOoEydDTRdZqMgXDBwYBJ5jeo3QbHfXviF6Yiys8ri
+         xyIeZW1Ra9yLnoHUbOwsXx8NJwpNn9bRckAGUOGSq0JJz/6GdVF5JGWql8cyJAeBGkpD
+         hwcIATtMAY9kvOCqhfcCxXW4M5TZ2gCrnzKAqLSrqPghUh6/tFzwrKqshbY8VBPLHt8U
+         QYWfpGIx5chM/3QTkSXk0DS5e3HF1m/h53G51qOm6jmn05uEr2RuV/ZZ6sL8g7KKnh6X
+         tELjOmof2UCsNWqW0R5liyy3uxkNdoIb+CveTw4mamfOSejPM0xOw0sI/HPCsee3sfEq
+         GAAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708701956; x=1709306756;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1708702438; x=1709307238;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5gMYHWz4my9RONLjo8Fhy+cYbHUo9UWwB6eUpjGiY/s=;
-        b=nFuqX1N2ftJ7uCSMIyGALFh2vTau+jK8dQRsWJnOq0fzV1JUp28BAkvvkQXlRySivM
-         GkBST+AEBhnJpAncFsPZBwEKNmimil1+YvCyplmLPPTGva3dWaGN8y9AYG6XdGkUtD66
-         AedSZgx4Yq+/V7VRHd++vjYGuPYXVteBEttPV4Y17L8G/golK5aS//V8C+e7eyB9YtqO
-         hs+kA2upFGgigRD1zRK7PQ/Ta53XT0xBmw6rhpU3UZmIAKAGDrjztd/eQAL5/2xgV1JA
-         x7FN+3uFcFDUTXuw2ROD9AkmliQHFYaLOwJIs2VKr91LmSUT0Z8IERQKTP+Df0T8j+GY
-         ldmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW4+F80CH+6wmSe06FNRePDKbaQDPQWUSu9OZ5Lm00yHr685sSuWUGH0Hk4eff6/q7EjRaV+dSAJJU3+d1TNxzfyM0d+kDI
-X-Gm-Message-State: AOJu0YxQuOsTBNwQz3hchJk/m2YT4cp3JKlCo+TJvf7tFQZH8BeyJ2o/
-	18DJcsTWtCpUnTmJ1AD15J03Dv5szwxgP6hOjlaU3l/vZhZQQlO1
-X-Google-Smtp-Source: AGHT+IHCdlzw4sIF5r4VqqllAjjEhWwW7+yJMoWR7cgh5djzKaX3/Qd3iTok/xCTwJCjnkwL98SGxw==
-X-Received: by 2002:a05:600c:35d1:b0:412:16d8:d565 with SMTP id r17-20020a05600c35d100b0041216d8d565mr111854wmq.15.1708701956619;
-        Fri, 23 Feb 2024 07:25:56 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:e821:660f:9482:881c])
-        by smtp.gmail.com with ESMTPSA id o8-20020a05600c510800b004128f41a13fsm2910369wms.38.2024.02.23.07.25.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Feb 2024 07:25:56 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,  Jakub Kicinski
- <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
-  netdev@vger.kernel.org,  Ido Schimmel <idosch@nvidia.com>,  Jiri Pirko
- <jiri@nvidia.com>,  eric.dumazet@gmail.com
-Subject: Re: [PATCH v2 net-next 12/14] inet: switch inet_dump_fib() to RCU
- protection
-In-Reply-To: <20240222105021.1943116-13-edumazet@google.com> (Eric Dumazet's
-	message of "Thu, 22 Feb 2024 10:50:19 +0000")
-Date: Fri, 23 Feb 2024 15:25:22 +0000
-Message-ID: <m2zfvrp5i5.fsf@gmail.com>
-References: <20240222105021.1943116-1-edumazet@google.com>
-	<20240222105021.1943116-13-edumazet@google.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        bh=+wFU3fXlGWoAaxXFF2EEILrI6It2RtvGw94MDuZQGiM=;
+        b=Xqpqc/lnF0y+cB/go/Kzm4/yhRXZw0JeBU7P8shDCP/PomWgfeAtj67Qvs4dhnAVTu
+         y8JtMGq4cpba1k84XTDf8I8dTZgmTyZlLNseH3O8T7E3yzUuasaxeAEu02xttnWeAThz
+         cxBYUn830p9JdoiYHtrI3KraGpUEVcy0/fBx1ciznPlrl/w/S4FMrDEVCzx0GFjl9FAL
+         TRIv5LY3G3WBD1qXFF+Uxrng2gqgyDbPklW3SYC8s7f4nCbHKIEwgTLCYz3UqJJs4dvl
+         vNXexkIfJN7OHooUgbsh+s08qS3EBee5D9Le4X9/6LeV0qmXfWREHvQgLK9NG/KBdY+0
+         36Cg==
+X-Gm-Message-State: AOJu0YxnL/zImXpT6L+njSDTbSfUDNZeXCA7deT+DzF0JpGVQ85lirOs
+	tF4OUwFIXq4aawlRGCUZKSSplEP4iPwULsmsU0mfDSDAgYMwvpf9BsHnP9q72vU=
+X-Google-Smtp-Source: AGHT+IGoWeHpzbIA8rTb0cgWJiiW7pQ13fjBovXmfBpQez7uRXGAFfxe8XLp2xHzUq8U8GVbPtDFuw==
+X-Received: by 2002:a05:6000:1757:b0:33d:9eda:c817 with SMTP id m23-20020a056000175700b0033d9edac817mr70692wrf.44.1708702438375;
+        Fri, 23 Feb 2024 07:33:58 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:b41:c160:25c8:f7d3:953d:aca4? ([2a01:e0a:b41:c160:25c8:f7d3:953d:aca4])
+        by smtp.gmail.com with ESMTPSA id ck7-20020a5d5e87000000b0033d7003eed4sm3395460wrb.73.2024.02.23.07.33.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Feb 2024 07:33:57 -0800 (PST)
+Message-ID: <e481d437-f55a-4895-ba1e-ccfac5dd0d9c@6wind.com>
+Date: Fri, 23 Feb 2024 16:33:56 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net-next 08/15] tools: ynl: wrap recv() + mnl_cb_run2()
+ into a single helper
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ jiri@resnulli.us, sdf@google.com, donald.hunter@gmail.com
+References: <20240222235614.180876-1-kuba@kernel.org>
+ <20240222235614.180876-9-kuba@kernel.org>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Organization: 6WIND
+In-Reply-To: <20240222235614.180876-9-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Eric Dumazet <edumazet@google.com> writes:
+Le 23/02/2024 à 00:56, Jakub Kicinski a écrit :
+> All callers to mnl_cb_run2() call mnl_socket_recvfrom() right before.
+> Wrap the two in a helper, take typed arguments (struct ynl_parse_arg),
+> instead of hoping that all callers remember that parser error handling
+> requires yarg.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  tools/net/ynl/lib/ynl.c | 56 +++++++++++++----------------------------
+>  1 file changed, 18 insertions(+), 38 deletions(-)
+> 
+> diff --git a/tools/net/ynl/lib/ynl.c b/tools/net/ynl/lib/ynl.c
+> index c9790257189c..96a209773ace 100644
+> --- a/tools/net/ynl/lib/ynl.c
+> +++ b/tools/net/ynl/lib/ynl.c
+> @@ -491,6 +491,19 @@ int ynl_cb_null(const struct nlmsghdr *nlh, void *data)
+>  	return MNL_CB_ERROR;
+>  }
+>  
+> +static int ynl_sock_read_msgs(struct ynl_parse_arg *yarg, mnl_cb_t cb)
+> +{
+> +	struct ynl_sock *ys = yarg->ys;
+> +	ssize_t len;
+> +
+> +	len = mnl_socket_recvfrom(ys->sock, ys->rx_buf, MNL_SOCKET_BUFFER_SIZE);
+> +	if (len < 0)
+It was '<=' before your patch. Not sure it's worth running mnl_cb_run2() with no
+data, but this doesn't seem wrong.
+Maybe a sentence in the commit description will be good to tell it's done on
+purpose?
 
-> No longer hold RTNL while calling inet_dump_fib().
->
-> Also change return value for a completed dump:
->
-> Returning 0 instead of skb->len allows NLMSG_DONE
-> to be appended to the skb. User space does not have
-> to call us again to get a standalone NLMSG_DONE marker.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+Acked-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 
