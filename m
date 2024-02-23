@@ -1,73 +1,94 @@
-Return-Path: <netdev+bounces-74317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A2BD860E11
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 10:36:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37019860E17
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 10:36:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05FAE286435
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 09:36:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A189B1F21A98
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 09:36:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8CF25C8F1;
-	Fri, 23 Feb 2024 09:36:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE9795C5F5;
+	Fri, 23 Feb 2024 09:36:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YX/q6T4D"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="xNFIFZyJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0177D1A731
-	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 09:35:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82E7E18B04
+	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 09:36:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708680961; cv=none; b=EiO1ncg11vKfLqnSt0BFgNFFkiV90XGKmShMKvVtVbANeuTFOGWzbDxUxrEkxpA0s6hE7aOgTOouU9qa1h7ufCIM6pvVeWRhu7vGTsf3VcitsuqkIiWCgXdMMHirwlcuouYZf6O4EQoaJUSc3E6FC072zBEnM5rxApLIU+KkiNo=
+	t=1708680991; cv=none; b=CQ9xDOZUXxYA1jqWopGBgoh+KYFXWO/mgDA3liO4xlv+es91JE/4SdSo2jK1KjBfbDuyJZGrMAxt8GBnvdiCaTNZ6ohIjApxglfXdJ1vV9q75CV8dX77AxFD3WIyTdNhgb8IrSZ1GBkYDfpMOTbLTAOEcRWWk4T9Y86U+yI7P+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708680961; c=relaxed/simple;
-	bh=P62c/gW3qUy4OC1LLVXVfdGjVFXf5PvIZI0YSta30b4=;
+	s=arc-20240116; t=1708680991; c=relaxed/simple;
+	bh=PFchzZvpAgoHyUnjpLFnydPsiu6lM2OMHrampsFXiRc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KOdHw7jFi0fsHmSahvFlB9kc62E6dr6zwxEViTsd7WGTMyqMylVy0xPVewh69/rskDv8PcFIBw8GrlKUkTqHtVg6lnlRSGGoow8jwCbkUu80xnW2cYfaDopiEapMUzm4St+xummROtshEWfXhEc65jUR9fU+0JdsU/kUkKoRRl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YX/q6T4D; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708680960; x=1740216960;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=P62c/gW3qUy4OC1LLVXVfdGjVFXf5PvIZI0YSta30b4=;
-  b=YX/q6T4DhEakC9ULfFPKRLUfmBdlCsIZJR+wCCK6R2lXKSiOUWlzSh5o
-   5JfIbLa9Tx5R94Bgy8bjMFeOxRXHDEx7NpcFsbw/OFcuxETCptKH0INOG
-   PtTKlEoWficinYsfwZ8/a7fJ7MMq/g6ID8136NWttn8UxTByDSi2HGMNK
-   WajAfIkpOmvRmC2Ku23JQ5o6X9YVtqtiBRCVX6zc0g6uwAvDT3+6cf7SQ
-   Vm2BAgr/dFnxp3fU5G6++XXVifvu1FC0YpY9jSc9h/NbZsP0J7VU32usM
-   gEwwwvvjoOjIT3BwU5zDTs9P/NHWrdRixjkUG57fXdcVhiAdX4mLqViCf
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10992"; a="6799479"
-X-IronPort-AV: E=Sophos;i="6.06,179,1705392000"; 
-   d="scan'208";a="6799479"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2024 01:35:59 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,179,1705392000"; 
-   d="scan'208";a="29019500"
-Received: from lkp-server02.sh.intel.com (HELO 3c78fa4d504c) ([10.239.97.151])
-  by fmviesa002.fm.intel.com with ESMTP; 23 Feb 2024 01:35:57 -0800
-Received: from kbuild by 3c78fa4d504c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rdRxh-0007Hc-1J;
-	Fri, 23 Feb 2024 09:35:33 +0000
-Date: Fri, 23 Feb 2024 17:35:12 +0800
-From: kernel test robot <lkp@intel.com>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	intel-wired-lan@lists.osuosl.org
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com, magnus.karlsson@intel.com,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Subject: Re: [PATCH iwl-next 2/3] ice: avoid unnecessary devm_ usage
-Message-ID: <202402231718.8mWcBppj-lkp@intel.com>
-References: <20240222145025.722515-3-maciej.fijalkowski@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=rDznT831IRlTtMuPi+oIY5YobUi6TRYzUlMzvie8M8J08Kbh2hg/6aIOH+IdAEnWqrQ78LH1ycNL6VdPIroQOnXXEh44dfHWVxmf1q36ghqxXmqjoA1hb6SXojpbuDcFSrmkXAvCLNYlzVXC2ZA7f8Xnb+Ac/7w19cduKe3UoNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=xNFIFZyJ; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2d09cf00214so9513161fa.0
+        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 01:36:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708680987; x=1709285787; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=D8zK+OM1/XuJg6fUnsgLvsvr2bwhxswfrHrN5zNfO2Q=;
+        b=xNFIFZyJKJ+h+Nvpk1/+k9KZyZa6ti1kBi7TIJkfwqNZJnML5GaRhJCz7X7SONKYO+
+         5Q/cIv+ZUOuHD44Zz+nrB28POFaSByrOCCP0p2XzfI9RCibnn+XHNu6u6RPCPOW6JaKT
+         6OrCJlkgPA2SfanFuG9YJGJ/EU1D3/Z9EIRWW8Do9A3s877svUtM9a0gZkalB4W1Uhmb
+         Epye1wsNOddsa2FlZnwbHv4APiCwEAUM9MEEZ/0+axG0oLkTcnyQxO3j1W8KXzQ6Mnnc
+         vUVrjfXUXrXGnKMbJbcYB/IQ4IgXRkBVh9w2AWVu+2feZY0+3CJAHSCwR1lmVX6sGFRz
+         kjJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708680987; x=1709285787;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D8zK+OM1/XuJg6fUnsgLvsvr2bwhxswfrHrN5zNfO2Q=;
+        b=r7xcX2FPIdsyMM8aVWjtFGO598SPn2Z1s4QZWkvAqyXXgIadfKqLc0uzP405c4WZZz
+         DDa896g1B3tmInGjYTfNHjrR0aP/c6/+CGOD+qutIoyT4o4GH0D1jXsGm6U/o1r5kXvn
+         ui+XWw6iZgev9D81H92Rnnh1QjsKCO3JUYpG5jJFH3sLfQeX8uP/Xnn3CfhugUI5mGcL
+         0MPX1z4ajhlJLOsZ5ygywRNdTrZBJ0GRtd2MIgSXi59fX/qYls/YSu/FLhA+x8LwLqvc
+         kB92m7hkPImR6MN1Dhe/Qy0boOjItd/QbW1ZU//9rNjchLCSPQtziWgnBqaonXXKHOYj
+         tNMA==
+X-Forwarded-Encrypted: i=1; AJvYcCXuxXSMBNrIUnHbUrtJK5pDiF5jiGmoPL2YKjcZnL+ZLQZQ7WguriFW0arTMDhgC9OVs12ksK0Xw40HpetN5OT0t5xLIUX6
+X-Gm-Message-State: AOJu0YxXCd1xlkhVGEhc3LQ1K3s/VUMMeeXSwY+a/CuuJQqITvORF5ty
+	/mPbu2c/ef321i/e9l3cqzYQscr4Fb9q5RJYfe68tVvL7u+e+mKe1DRGGBHUNjM=
+X-Google-Smtp-Source: AGHT+IEcWWqywAADMsE00eGfYYvqbkM8cZo9QvfC4B7fvRV+BVu/5IjW5Dg9G55iQLbf6Wx1CAZJQQ==
+X-Received: by 2002:a2e:a1cd:0:b0:2d2:3998:adaf with SMTP id c13-20020a2ea1cd000000b002d23998adafmr974056ljm.32.1708680987349;
+        Fri, 23 Feb 2024 01:36:27 -0800 (PST)
+Received: from localhost ([86.61.181.4])
+        by smtp.gmail.com with ESMTPSA id bk28-20020a0560001d9c00b0033b406bc689sm2118801wrb.75.2024.02.23.01.36.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Feb 2024 01:36:26 -0800 (PST)
+Date: Fri, 23 Feb 2024 10:36:25 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Tariq Toukan <ttoukan.linux@gmail.com>,
+	Saeed Mahameed <saeed@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, jay.vosburgh@canonical.com
+Subject: Re: [net-next V3 15/15] Documentation: networking: Add description
+ for multi-pf netdev
+Message-ID: <ZdhnGeYVB00pLIhO@nanopsycho>
+References: <20240215030814.451812-1-saeed@kernel.org>
+ <20240215030814.451812-16-saeed@kernel.org>
+ <20240215212353.3d6d17c4@kernel.org>
+ <f3e1a1c2-f757-4150-a633-d4da63bacdcd@gmail.com>
+ <20240220173309.4abef5af@kernel.org>
+ <2024022214-alkalize-magnetize-dbbc@gregkh>
+ <20240222150030.68879f04@kernel.org>
+ <de852162-faad-40fa-9a73-c7cf2e710105@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,86 +97,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240222145025.722515-3-maciej.fijalkowski@intel.com>
+In-Reply-To: <de852162-faad-40fa-9a73-c7cf2e710105@intel.com>
 
-Hi Maciej,
+Fri, Feb 23, 2024 at 02:23:32AM CET, sridhar.samudrala@intel.com wrote:
+>
+>
+>On 2/22/2024 5:00 PM, Jakub Kicinski wrote:
+>> On Thu, 22 Feb 2024 08:51:36 +0100 Greg Kroah-Hartman wrote:
+>> > On Tue, Feb 20, 2024 at 05:33:09PM -0800, Jakub Kicinski wrote:
+>> > > Greg, we have a feature here where a single device of class net has
+>> > > multiple "bus parents". We used to have one attr under class net
+>> > > (device) which is a link to the bus parent. Now we either need to add
+>> > > more or not bother with the linking of the whole device. Is there any
+>> > > precedent / preference for solving this from the device model
+>> > > perspective?
+>> > 
+>> > How, logically, can a netdevice be controlled properly from 2 parent
+>> > devices on two different busses?  How is that even possible from a
+>> > physical point-of-view?  What exact bus types are involved here?
+>> 
+>> Two PCIe buses, two endpoints, two networking ports. It's one piece
+>
+>Isn't it only 1 networking port with multiple PFs?
 
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on v6.8-rc5]
-[also build test WARNING on linus/master next-20240223]
-[cannot apply to tnguy-next-queue/dev-queue tnguy-net-queue/dev-queue horms-ipvs/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Maciej-Fijalkowski/ice-do-not-disable-Tx-queues-twice-in-ice_down/20240222-225134
-base:   v6.8-rc5
-patch link:    https://lore.kernel.org/r/20240222145025.722515-3-maciej.fijalkowski%40intel.com
-patch subject: [PATCH iwl-next 2/3] ice: avoid unnecessary devm_ usage
-config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20240223/202402231718.8mWcBppj-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240223/202402231718.8mWcBppj-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202402231718.8mWcBppj-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   drivers/net/ethernet/intel/ice/ice_common.c: In function 'ice_update_link_info':
->> drivers/net/ethernet/intel/ice/ice_common.c:3242:32: warning: variable 'hw' set but not used [-Wunused-but-set-variable]
-    3242 |                 struct ice_hw *hw;
-         |                                ^~
---
-   drivers/net/ethernet/intel/ice/ice_ethtool.c: In function 'ice_loopback_test':
->> drivers/net/ethernet/intel/ice/ice_ethtool.c:947:24: warning: variable 'dev' set but not used [-Wunused-but-set-variable]
-     947 |         struct device *dev;
-         |                        ^~~
+AFAIK, yes. I have one device in hands like this. One physical port,
+2 PCI slots, 2 PFs on PCI bus.
 
 
-vim +/hw +3242 drivers/net/ethernet/intel/ice/ice_common.c
+>
+>> of silicon, tho, so the "slices" can talk to each other internally.
+>> The NVRAM configuration tells both endpoints that the user wants
+>> them "bonded", when the PCI drivers probe they "find each other"
+>> using some cookie or DSN or whatnot. And once they did, they spawn
+>> a single netdev.
+>> 
+>> > This "shouldn't" be possible as in the end, it's usually a PCI device
+>> > handling this all, right?
+>> 
+>> It's really a special type of bonding of two netdevs. Like you'd bond
+>> two ports to get twice the bandwidth. With the twist that the balancing
+>> is done on NUMA proximity, rather than traffic hash.
+>> 
+>> Well, plus, the major twist that it's all done magically "for you"
+>> in the vendor driver, and the two "lower" devices are not visible.
+>> You only see the resulting bond.
+>> 
+>> I personally think that the magic hides as many problems as it
+>> introduces and we'd be better off creating two separate netdevs.
+>> And then a new type of "device bond" on top. Small win that
+>> the "new device bond on top" can be shared code across vendors.
+>
+>Yes. We have been exploring a small extension to bonding driver to enable a
+>single numa-aware multi-threaded application to efficiently utilize multiple
+>NICs across numa nodes.
 
-fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3221  
-fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3222  /**
-fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3223   * ice_update_link_info - update status of the HW network link
-fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3224   * @pi: port info structure of the interested logical port
-fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3225   */
-5e24d5984c805c Tony Nguyen            2021-10-07  3226  int ice_update_link_info(struct ice_port_info *pi)
-fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3227  {
-092a33d4031205 Bruce Allan            2019-04-16  3228  	struct ice_link_status *li;
-5e24d5984c805c Tony Nguyen            2021-10-07  3229  	int status;
-fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3230  
-fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3231  	if (!pi)
-d54699e27d506f Tony Nguyen            2021-10-07  3232  		return -EINVAL;
-fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3233  
-092a33d4031205 Bruce Allan            2019-04-16  3234  	li = &pi->phy.link_info;
-fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3235  
-fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3236  	status = ice_aq_get_link_info(pi, true, NULL, NULL);
-fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3237  	if (status)
-092a33d4031205 Bruce Allan            2019-04-16  3238  		return status;
-092a33d4031205 Bruce Allan            2019-04-16  3239  
-092a33d4031205 Bruce Allan            2019-04-16  3240  	if (li->link_info & ICE_AQ_MEDIA_AVAILABLE) {
-092a33d4031205 Bruce Allan            2019-04-16  3241  		struct ice_aqc_get_phy_caps_data *pcaps;
-092a33d4031205 Bruce Allan            2019-04-16 @3242  		struct ice_hw *hw;
-092a33d4031205 Bruce Allan            2019-04-16  3243  
-092a33d4031205 Bruce Allan            2019-04-16  3244  		hw = pi->hw;
-f8543c3af0dcb2 Maciej Fijalkowski     2024-02-22  3245  		pcaps = kzalloc(sizeof(*pcaps), GFP_KERNEL);
-092a33d4031205 Bruce Allan            2019-04-16  3246  		if (!pcaps)
-d54699e27d506f Tony Nguyen            2021-10-07  3247  			return -ENOMEM;
-fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3248  
-d6730a871e68f1 Anirudh Venkataramanan 2021-03-25  3249  		status = ice_aq_get_phy_caps(pi, false, ICE_AQC_REPORT_TOPO_CAP_MEDIA,
-fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3250  					     pcaps, NULL);
-fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3251  
-f8543c3af0dcb2 Maciej Fijalkowski     2024-02-22  3252  		kfree(pcaps);
-092a33d4031205 Bruce Allan            2019-04-16  3253  	}
-092a33d4031205 Bruce Allan            2019-04-16  3254  
-fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3255  	return status;
-fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3256  }
-fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3257  
+Bonding was my immediate response when we discussed this internally for
+the first time. But I had to eventually admit it is probably not that
+suitable in this case, here's why:
+1) there are no 2 physical ports, only one.
+2) it is basically a matter of device layout/provisioning that this
+   feature should be enabled, not user configuration.
+3) other subsystems like RDMA would benefit the same feature, so this
+   int not netdev specific in general.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
