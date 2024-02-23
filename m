@@ -1,216 +1,171 @@
-Return-Path: <netdev+bounces-74313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B449B860DB7
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 10:14:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75178860DC3
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 10:16:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6BA11C20CB1
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 09:14:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C3CF28297F
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 09:16:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43C1E381B8;
-	Fri, 23 Feb 2024 09:13:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=csgroup.eu header.i=@csgroup.eu header.b="H9tviWW+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46EA159B47;
+	Fri, 23 Feb 2024 09:16:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from FRA01-PR2-obe.outbound.protection.outlook.com (mail-pr2fra01on2125.outbound.protection.outlook.com [40.107.12.125])
+Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB40218E1F;
-	Fri, 23 Feb 2024 09:13:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.12.125
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708679639; cv=fail; b=aEo/dJ3lTYKxXR3p5kESZxn5zqWQpZmjoeP+B8QGA3w1OpTSrtBn39d2HfXgPep6cvZU6PBz5rekw8wELQsUA6N4IB+e932cRAbq/8eMB/ZBJmmm6tla6fz+FhGIZi2fANdw7pv0vssJnc0pSQ2LjB2J/JAEEMoREwFh5F/7/o4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708679639; c=relaxed/simple;
-	bh=Lcmr0Dz0jxYtJE1r+fc7IFZZK+eosowwli0Vkf5JYPA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=tSozjI0c4bLCH6CXd228YjIQVXfOv1kinObS+VjJaPs/lW2Rtnj9ZTEdFn7h0JhvbxxBLkzmveV5wUQutbXGZV/ZnK05Bnhplwlc/1qvqQBp18UZVs9Goh0Od13XVgS5DgdchLaOBuHHqWYRA1xbZu1kk3IGc4WttmyfOj5JwtY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; dkim=pass (2048-bit key) header.d=csgroup.eu header.i=@csgroup.eu header.b=H9tviWW+; arc=fail smtp.client-ip=40.107.12.125
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=h3B6+WOCG93CuxXB84nBR/MljNIwN2L279u/xwIPftYzmJPvNoLr5jQuFDTMjmVyU5q91feB+gKpGWuPMt3nOG9/S7p2payTUzpBZTp4fIF/983RRwG0ENTmimpI8JxtcOGxwQ41O9QNQeJ5t93D4UcBQF7ZhfaZnrqCH8zAQfY4jwhDYhHjFP3wfwUqHvGLhZUENhQlN/Wc2biZv5S0HYj0063LMbmTcG2wYqTekPg4Cu4S2A3+5BDqfBg5wgH/Oay8mqxWsyHFEegnyvIAa0/qYs63HedwHCzXAtR6ZrT5XUDR0CuByPBQ74M+BkrGmcAS4/FwQ40hmD9nWiL1Bg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Lcmr0Dz0jxYtJE1r+fc7IFZZK+eosowwli0Vkf5JYPA=;
- b=Nu68MTRiDeiPdeWAF++4i0Nul59B2mdmHXlTq4Kl0lEDFip3Ne0gV6DwRhy5KJMcHt7dVmq9KyhP8PiRXOYMwxNTV+O4OxOaEGwGLIb07nDw/2nxkYW7Q7/t/iC1kK4TE3X79k5MLFDSSzd1D7idx2T4OhjMjtKsQDJKn4z4V2dN83ToMsnFXdw+E/URt+0+W1JtHK6niv230ozoXZthLY9GgyyrncVY3SywCnI0AFokQ5ib7gntldpmJXfW3/2+FCrda0kmU0vU1eVEu0meJoK53Dy5QWVmESuMiamyviWRweY0nRjxbdSSOz/sYmPV0V91ktjlaL7q3bDnbQE2Hw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=csgroup.eu; dmarc=pass action=none header.from=csgroup.eu;
- dkim=pass header.d=csgroup.eu; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=csgroup.eu;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Lcmr0Dz0jxYtJE1r+fc7IFZZK+eosowwli0Vkf5JYPA=;
- b=H9tviWW+vNeW/CSS+NpmoHQodFg0X8lY+UTonyn/96shFCpT9aTcYo585FK6raHnmjIon0Xhjs+2IvkxmspRv3DgQrGIEAmQoL7/5T3NwggBS2VanpBlHCMu/rz1bZfKOG2pd84OIIOSZVkEKndf8jqs3ZJvrCs36My/KIXLCMWc0qAoFEAfSREiMaDwqvwJ69ZO9d6kqHXPJKvVUSHFIbgpX5hk8wzePtt4SyjaDTtiS+GTVEyb3FXEW0XsrpMHBl58l77ELEv+7nd4E2aoxlHkyOh1PlxWmPdyZ5NgyCRXS5CnQ/2yOB76PLmrss4EwqK9BNKk6wuJ/p/vkPCMiQ==
-Received: from MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM (2603:10a6:501:31::15)
- by MR1P264MB2196.FRAP264.PROD.OUTLOOK.COM (2603:10a6:501:3::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.24; Fri, 23 Feb
- 2024 09:13:53 +0000
-Received: from MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM
- ([fe80::46af:917d:3bb2:167e]) by MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM
- ([fe80::46af:917d:3bb2:167e%6]) with mapi id 15.20.7316.023; Fri, 23 Feb 2024
- 09:13:53 +0000
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-To: Charlie Jenkins <charlie@rivosinc.com>, Guenter Roeck
-	<linux@roeck-us.net>, David Laight <David.Laight@aculab.com>, Palmer Dabbelt
-	<palmer@dabbelt.com>, Andrew Morton <akpm@linux-foundation.org>, Helge Deller
-	<deller@gmx.de>, "James E.J. Bottomley"
-	<James.Bottomley@hansenpartnership.com>, Parisc List
-	<linux-parisc@vger.kernel.org>, Al Viro <viro@zeniv.linux.org.uk>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, kernel test
- robot <lkp@intel.com>, "linuxppc-dev@lists.ozlabs.org"
-	<linuxppc-dev@lists.ozlabs.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: Re: [PATCH v9 1/2] lib: checksum: Fix type casting in checksum kunits
-Thread-Topic: [PATCH v9 1/2] lib: checksum: Fix type casting in checksum
- kunits
-Thread-Index: AQHaZjiesic2zyGAl0+U9oCZDv/tcA==
-Date: Fri, 23 Feb 2024 09:13:53 +0000
-Message-ID: <cd631754-86fc-4f82-a9f3-560a60515302@csgroup.eu>
-References:
- <20240221-fix_sparse_errors_checksum_tests-v9-0-bff4d73ab9d1@rivosinc.com>
- <20240221-fix_sparse_errors_checksum_tests-v9-1-bff4d73ab9d1@rivosinc.com>
-In-Reply-To:
- <20240221-fix_sparse_errors_checksum_tests-v9-1-bff4d73ab9d1@rivosinc.com>
-Accept-Language: fr-FR, en-US
-Content-Language: fr-FR
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=csgroup.eu;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MRZP264MB2988:EE_|MR1P264MB2196:EE_
-x-ms-office365-filtering-correlation-id: 834ec6a4-28ea-46eb-c4f4-08dc344fc1c0
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- hNEB76QgBsdXKPtgsZF5Gh/ntISgjCmMX4icVthWiwfsbiEymfHSUNMC4AIlf46ljKVzxNC7WCervJtI5WpG1Z9r6Fwhqs4nvoiUjYaj1oNP/tLnCmQK0iE6xui81FRp1WBq7vKefaf5Fb7PBVTv/9Av8xxxMM2TzMFeShZ6bVq9IUnACdcHxFIAMrlR6qS+vzxBumFGq+hLIzpVL4Q+jtW9zPGJ8vrBi8KfcWg4lgAWnlna1Ex9u6m94l6DuWdTgNHnbwQtavaDMfglTD9z36V9Fg0+vUNQgLL6OnXFdmr/8nrI+DV/XRYly57If4f4mtlI29hVwENlNHa0kY5aeCEp59dIsz3Ll3StmJMZPERU96i125F9Sh7NzklETjsnx/a/VlTO1frgs0F01QYjQ/65fngU3sEhD85JnKKvkb+wMbPjCZAxSnErciChGO3Ct9JcMIJLhNj8hfY5ass9/KeJv3otgNNLnesaEzW//6Auejh3gFKQuyGeBP8XOsqpSPpQ/c6XUAepFbFBx9UdW7mt32Vas6WfzDZl7oWeElPpjkEkDN9Rswhn48Hi+z7368hO3j20BcLjC2C78o+ma45SlwdF85H6dYsZ4q6vM/akg2m7f+UGGMqOMcwj2fgR
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(230273577357003)(38070700009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?Nml2VUhjVmlkeDNieTBuZUxjeVdjT3k2RUxoOTl1dWlnUUlrVi9td2ZyUXpS?=
- =?utf-8?B?N09sRTF2TzFzQTZMRUM2TnI2YXBpNlBlMnlKN1pLQXMrZExRMFVJYWNzUEQz?=
- =?utf-8?B?MTNxRmxVYktiVk9sTm02bHRRTWdVZjN0SzNtTTZCcWpuSEp2SExIUTFnKzRr?=
- =?utf-8?B?V2FrZnJvSW14QitiYXhLNFlhRzB2c1VNV3MzaTF2TFpkTlpxMnY4U2gzL29i?=
- =?utf-8?B?ZExFUDNqYW5LZDF2aGNhYnRQdDRuZnB1M1NzamV0RTMycW9LQno4ZWxibklR?=
- =?utf-8?B?M1llbUR5REI0NjZpM0RUZ0RpVG5xdVVZUGF4WEtWTlZzSk1jMWZyNjVaUFNt?=
- =?utf-8?B?SFMvNXZ2MmwralIyQlZBYlVIQ3FFWWd3aytpRlk0UkMyL1JuUGFXcTZhV1RW?=
- =?utf-8?B?a3c1bllKSnJ5MWxOcEhVWlZRb3JCdGpEekZNdS9kYzBCN3o1MVVZTHlDVzFB?=
- =?utf-8?B?RGRqcWgxQUNyajdTMzdvRzFQMjZTKzdyVWNyTmcrNnMzTzBNanhTNzg3Z1p5?=
- =?utf-8?B?MlNHN0xxMFVjZWFHZktwY1l6NElIL0s2eWt4UmYzdHpMeUFUZDFTeCtGYmRp?=
- =?utf-8?B?RkpSNURQRTJNS0w2cnRsdkdHM3FzOTBKYUFNTkVucFV5NWVkdTNYRHQzWjAx?=
- =?utf-8?B?TkhDaWY2UEF6WElJQUV4SE5HZTlJM1JDRlNSa0FYMnRJdjVtVDhCNkxpeDdU?=
- =?utf-8?B?QmNXNVBqbzYzMTlqSUZQdExTNmFDeFJ1ME9abWFnNXR3MTR1cUlidDJ6RHFM?=
- =?utf-8?B?dURCcjRraFRXVExsY2JUd2tmYlQrcnlnTmY4MnVRRWJVbUFtZzk1NTNpU0Ju?=
- =?utf-8?B?ZXlIMjAyZEJId3RRZEtSUjdaWUxTUHVMNmtrcnVjalN3QkpSRUpuOUIrQXBz?=
- =?utf-8?B?aFpnN1N6ZUFyWllHcjZBc1U5L1JUMDZneUJOdGdzZ3pIZ0Fud2lESVNIK3BL?=
- =?utf-8?B?dGg3SGZENnRPK0RpTmRWUWpLOHBmWWs4azR6TkM3R0dRQ2srNnhoMkxoWEt0?=
- =?utf-8?B?M0I4MlBweFJFNWFaRzBqanhud2FHdS9TQ3JweDF5TENmM1Iways0TFFJWEIw?=
- =?utf-8?B?M2pGSlFpOHR6ZW5aaTlQeHdtbmlrK29tQkwwemNoZitoa0VIWE5QVDFXV1dw?=
- =?utf-8?B?YzNTN1ZKSEZBeFoyd2kvR0FsMTAyNVVQbzRtdjBaalBPKzdKS3V6bVNwZzZq?=
- =?utf-8?B?NlR3dk1ZWkMrWXRPYzJnRzAvYkI1NnlqWlZlUlJIZEhIS0hYeGxmT1ZwVkYx?=
- =?utf-8?B?S0Y1UHc0RmxLNE9NZS9EUkVjbFByUS9YYUxMK0N0VURPc3FtMVMxRTI2cjJV?=
- =?utf-8?B?OG10ZG9qc2hodm9XV0svZklnZEhiL3llOTZMZndvMlVOSFBZZHBYYjg0M3Zw?=
- =?utf-8?B?YlJOdFM1enhnM1FWSmg3dmZFUEpSaDFBVFFZWjJERElYemxxaGRsOGp0QzYv?=
- =?utf-8?B?a2lMRTRnNjh0V1BpSUVpc0dtVkUrNmZtVnlVZ2JhaFFzMTVpUG9tWmJ0Vkhj?=
- =?utf-8?B?QkZUclVzaG1CTVVGa2xOdUtDMWFFRnZGZlMyem1JYzN0OGtsNDFNWGxJdTdT?=
- =?utf-8?B?c3NnRjdqOEdYV0s2RWtFN0xLYWd0QnlySHpCMGYydGwwbFV1c0NoUVFzVXMz?=
- =?utf-8?B?R2lSc25wMkZuU1V6bFQvQXNLUHJDZTRqeEN4dThsZ3kwRFB2MERtcGRNMFU1?=
- =?utf-8?B?dHFIeE5ybDVHQ0d0SVk0N0JaTlZOZDhLY1lzc0gvVUJwRmwyMXlYZlo1N0hC?=
- =?utf-8?B?VzdxUG5GTDNpeUdoSy9pSkUxY0ZvaWRJZnJ2QzdlZlZ3RGVyUVZuZDlWeVdx?=
- =?utf-8?B?cEVOUStacUE4VFdvNDB2S05uc2ZoaFZnNzRQMHNQRE9oL28valorb05PNE1P?=
- =?utf-8?B?K09Lb0hPUldoUGhrcVpGMUdJZjZXeXh6ai9oNm9VejIycnI0L00wZ2NyY2tq?=
- =?utf-8?B?eEdIVHdqVzhJanI2Zk1nRGxRUEdxZFZLUmlFUy9td1V0czUyWDIyOTZSSEY4?=
- =?utf-8?B?UEVzb0Vjb3FUVUpmRW93NjN1bEtCRGdDbm4xdnorRUkrR1BEYXNvUEMrRWRF?=
- =?utf-8?B?dGR0UVRMSjU5WnlxVERTK2E5RlR0T3dGSnBpa1FhYU1ucVZoSndVTjRySUlL?=
- =?utf-8?B?Q0QzWmkyUTZVb2EzT0NGckcwRkRZQk45VDN6dFJuVk5BSGYxSFNHaWNiQUJz?=
- =?utf-8?B?d1E9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <CA2468BE52BAB043AF2A99A255ECB095@FRAP264.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8EDB1AAD8
+	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 09:16:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708679801; cv=none; b=GIRd2Xk8A8AOJpOsldZschOExEtBcQPL4asZBdK/VPJ0/KkBqttpg4batNRop2ki2zxIj/UCfP1+G5qQRV0STkVvKS/L9O6LZxGIlztgeaysD5SCrhL+MPfeCIv3WktQ9GlBXAYkx6vFD1EkgsYTZga6XG+Knxdp67dmAUg67mA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708679801; c=relaxed/simple;
+	bh=o6Ne5XFFprkYaeU+uml6UMhNIQVh3Ne9sXXMIEoRgm4=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=NwkCsM7jEPevOWaJvmCO+mZa4eC6S80M/fe1lDAwTvjbQ+Lf6PlsJJRII1cGIwY3dBVZxPPSL9+BE6U3Jz780a5zM0RvYXxPiK1KHGDuW4yPntHdJO6On3UaUtI5d3pP+NyxMyihbPdrFczdJY+NIZZcxHSXndUgjwPK02JUwJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.207.22.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas7t1708679688t631t13971
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [220.184.149.201])
+X-QQ-SSF:00400000000000F0FTF000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 17674526621027131931
+To: "'Andrew Lunn'" <andrew@lunn.ch>
+Cc: <davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<maciej.fijalkowski@intel.com>,
+	<netdev@vger.kernel.org>,
+	<mengyuanlou@net-swift.com>
+References: <20240206070824.17460-1-jiawenwu@trustnetic.com> <9259e4eb-8744-45cf-bdea-63bc376983a4@lunn.ch> <003801da6249$888e4210$99aac630$@trustnetic.com> <33eed490-7819-409e-8c79-b3c1e4c4fd66@lunn.ch> <00e301da63de$bd53db90$37fb92b0$@trustnetic.com> <96b3ed32-1115-46bf-ae07-9eea0c24e85a@lunn.ch> <021e01da6532$6ab0e900$4012bb00$@trustnetic.com> <91d182fe-179b-4fad-9d67-3b62230dcb86@lunn.ch>
+In-Reply-To: <91d182fe-179b-4fad-9d67-3b62230dcb86@lunn.ch>
+Subject: RE: [PATCH] net: txgbe: fix GPIO interrupt blocking
+Date: Fri, 23 Feb 2024 17:14:47 +0800
+Message-ID: <038101da6638$bf8cd310$3ea67930$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: csgroup.eu
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 834ec6a4-28ea-46eb-c4f4-08dc344fc1c0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Feb 2024 09:13:53.7327
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 9914def7-b676-4fda-8815-5d49fb3b45c8
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: L2X+J2nu5ahgAuxaL/p1KJKZ5UDIVFzSDcQ6jhikznuMuhqPSjMmRQAYGufhBt38nxF2/TW/22wm3gdMLlvjkI/Vcdj2gTSR78gU/3WHmsY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MR1P264MB2196
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQKQWSrySMPq8PWl707TeSOritAirQH7bedeAP/Pp5gCVYvqAQHVv3hWAVoX6xcBxXLXCgH1FNMLr0nOXVA=
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-DQoNCkxlIDIyLzAyLzIwMjQgw6AgMDM6NTUsIENoYXJsaWUgSmVua2lucyBhIMOpY3JpdMKgOg0K
-PiBUaGUgY2hlY2tzdW0gZnVuY3Rpb25zIHVzZSB0aGUgdHlwZXMgX193c3VtIGFuZCBfX3N1bTE2
-LiBUaGVzZSBuZWVkIHRvDQo+IGJlIGV4cGxpY2l0bHkgY2FzdGVkIHRvLCBiZWNhdXNlIHdpbGwg
-Y2F1c2Ugc3BhcnNlIGVycm9ycyBvdGhlcndpc2UuDQoNClRoaXMgaXMgbm90IHRoZSBjb3JyZWN0
-IGZpeC4gV2hlbiB5b3UgZm9yY2libHkgY2FzdCwgeW91IHNodXQgdXAgc3BhcnNlIA0KYW5kIGhp
-ZGUgd2FybmluZ3MgYnV0IHlvdSBkb24ndCBmaXggdGhlIHByb2JsZW0gb24gYmlnIGVuZGlhbiAN
-CmFyY2hpdGVjdHVyZXMgd2hpY2ggaXMgd2hhdCBzcGFyc2UgcmVwb3J0cyB0byB5b3UuDQoNCklu
-IG9yZGVyIHRvIGZpeCBib3RoIHRoZSBzcGFyc2Ugd2FybmluZ3MgYW5kIHRoZSByZWxhdGVkIGlz
-c3VlcywgeW91IA0KaGF2ZSB0byBwZXJmb3JtIHByb3BlciBlbmRpYW4gY29udmVyc2lvbiwgc2lt
-aWxhciB0byB3aGF0IHdhcyBkb25lIHdpdGggDQpjb21taXQgYjM4NDYwYmM0NjNjICgia3VuaXQ6
-IEZpeCBjaGVja3N1bSB0ZXN0cyBvbiBiaWcgZW5kaWFuIENQVXMiKQ0KDQpUaGUgZm9sbG93aW5n
-IGNoYW5nZSBpcyB3aGF0IHlvdXIgcGF0Y2ggc2hvdWxkIGRvOg0KDQpkaWZmIC0tZ2l0IGEvbGli
-L2NoZWNrc3VtX2t1bml0LmMgYi9saWIvY2hlY2tzdW1fa3VuaXQuYw0KaW5kZXggMjI1YmI3NzAx
-NDYwLi5iZjcwODUwMDM1YzcgMTAwNjQ0DQotLS0gYS9saWIvY2hlY2tzdW1fa3VuaXQuYw0KKysr
-IGIvbGliL2NoZWNrc3VtX2t1bml0LmMNCkBAIC0yMTUsNyArMjE1LDcgQEAgc3RhdGljIGNvbnN0
-IHUzMiBpbml0X3N1bXNfbm9fb3ZlcmZsb3dbXSA9IHsNCiAgCTB4ZmZmZjAwMDAsIDB4ZmZmZmZm
-ZmIsDQogIH07DQoNCi1zdGF0aWMgY29uc3QgX19zdW0xNiBleHBlY3RlZF9jc3VtX2lwdjZfbWFn
-aWNbXSA9IHsNCitzdGF0aWMgY29uc3QgdTE2IGV4cGVjdGVkX2NzdW1faXB2Nl9tYWdpY1tdID0g
-ew0KICAJMHgxOGQ0LCAweDMwODUsIDB4MmU0YiwgMHhkOWY0LCAweGJkYzgsIDB4NzhmLAkweDEw
-MzQsIDB4ODQyMiwgMHg2ZmMwLA0KICAJMHhkMmY2LCAweGJlYjUsIDB4OWQzLAkweDdlMmEsIDB4
-MzEyZSwgMHg3NzhlLCAweGMxYmIsIDB4N2NmMiwgMHg5ZDFlLA0KICAJMHhjYTIxLCAweGYzZmYs
-IDB4NzU2OSwgMHhiMDJlLCAweGNhODYsIDB4N2U3NiwgMHg0NTM5LCAweDQ1ZTMsIDB4ZjI4ZCwN
-CkBAIC0yNDEsNyArMjQxLDcgQEAgc3RhdGljIGNvbnN0IF9fc3VtMTYgZXhwZWN0ZWRfY3N1bV9p
-cHY2X21hZ2ljW10gPSB7DQogIAkweDM4NDUsIDB4MTAxNA0KICB9Ow0KDQotc3RhdGljIGNvbnN0
-IF9fc3VtMTYgZXhwZWN0ZWRfZmFzdF9jc3VtW10gPSB7DQorc3RhdGljIGNvbnN0IHUxNiBleHBl
-Y3RlZF9mYXN0X2NzdW1bXSA9IHsNCiAgCTB4ZGE4MywgMHg0NWRhLCAweDRmNDYsIDB4NGU0Ziwg
-MHgzNGUsCTB4ZTkwMiwgMHhhNWU5LCAweDg3YTUsIDB4NzE4NywNCiAgCTB4NTY3MSwgMHhmNTU2
-LCAweDZkZjUsIDB4ODE2ZCwgMHg4ZjgxLCAweGJiOGYsIDB4ZmJiYSwgMHg1YWZiLCAweGJlNWEs
-DQogIAkweGVkYmUsIDB4YWJlZSwgMHg2YWFjLCAweGU2YiwJMHhlYTBkLCAweDY3ZWEsIDB4N2U2
-OCwgMHg4YTdlLCAweDZmOGEsDQpAQCAtNTc3LDcgKzU3Nyw4IEBAIHN0YXRpYyB2b2lkIHRlc3Rf
-Y3N1bV9ub19jYXJyeV9pbnB1dHMoc3RydWN0IGt1bml0IA0KKnRlc3QpDQoNCiAgc3RhdGljIHZv
-aWQgdGVzdF9pcF9mYXN0X2NzdW0oc3RydWN0IGt1bml0ICp0ZXN0KQ0KICB7DQotCV9fc3VtMTYg
-Y3N1bV9yZXN1bHQsIGV4cGVjdGVkOw0KKwlfX3N1bTE2IGNzdW1fcmVzdWx0Ow0KKwl1MTYgZXhw
-ZWN0ZWQ7DQoNCiAgCWZvciAoaW50IGxlbiA9IElQdjRfTUlOX1dPUkRTOyBsZW4gPCBJUHY0X01B
-WF9XT1JEUzsgbGVuKyspIHsNCiAgCQlmb3IgKGludCBpbmRleCA9IDA7IGluZGV4IDwgTlVNX0lQ
-X0ZBU1RfQ1NVTV9URVNUUzsgaW5kZXgrKykgew0KQEAgLTU4Niw3ICs1ODcsNyBAQCBzdGF0aWMg
-dm9pZCB0ZXN0X2lwX2Zhc3RfY3N1bShzdHJ1Y3Qga3VuaXQgKnRlc3QpDQogIAkJCQlleHBlY3Rl
-ZF9mYXN0X2NzdW1bKGxlbiAtIElQdjRfTUlOX1dPUkRTKSAqDQogIAkJCQkJCSAgIE5VTV9JUF9G
-QVNUX0NTVU1fVEVTVFMgKw0KICAJCQkJCQkgICBpbmRleF07DQotCQkJQ0hFQ0tfRVEoZXhwZWN0
-ZWQsIGNzdW1fcmVzdWx0KTsNCisJCQlDSEVDS19FUSh0b19zdW0xNihleHBlY3RlZCksIGNzdW1f
-cmVzdWx0KTsNCiAgCQl9DQogIAl9DQogIH0NCkBAIC01OTgsNyArNTk5LDcgQEAgc3RhdGljIHZv
-aWQgdGVzdF9jc3VtX2lwdjZfbWFnaWMoc3RydWN0IGt1bml0ICp0ZXN0KQ0KICAJY29uc3Qgc3Ry
-dWN0IGluNl9hZGRyICpkYWRkcjsNCiAgCXVuc2lnbmVkIGludCBsZW47DQogIAl1bnNpZ25lZCBj
-aGFyIHByb3RvOw0KLQl1bnNpZ25lZCBpbnQgY3N1bTsNCisJX193c3VtIGNzdW07DQoNCiAgCWNv
-bnN0IGludCBkYWRkcl9vZmZzZXQgPSBzaXplb2Yoc3RydWN0IGluNl9hZGRyKTsNCiAgCWNvbnN0
-IGludCBsZW5fb2Zmc2V0ID0gc2l6ZW9mKHN0cnVjdCBpbjZfYWRkcikgKyBzaXplb2Yoc3RydWN0
-IGluNl9hZGRyKTsNCkBAIC02MTEsMTAgKzYxMiwxMCBAQCBzdGF0aWMgdm9pZCB0ZXN0X2NzdW1f
-aXB2Nl9tYWdpYyhzdHJ1Y3Qga3VuaXQgKnRlc3QpDQogIAkJc2FkZHIgPSAoY29uc3Qgc3RydWN0
-IGluNl9hZGRyICopKHJhbmRvbV9idWYgKyBpKTsNCiAgCQlkYWRkciA9IChjb25zdCBzdHJ1Y3Qg
-aW42X2FkZHIgKikocmFuZG9tX2J1ZiArIGkgKw0KICAJCQkJCQkgIGRhZGRyX29mZnNldCk7DQot
-CQlsZW4gPSAqKHVuc2lnbmVkIGludCAqKShyYW5kb21fYnVmICsgaSArIGxlbl9vZmZzZXQpOw0K
-KwkJbGVuID0gbGUzMl90b19jcHUoKihfX2xlMzIgKikocmFuZG9tX2J1ZiArIGkgKyBsZW5fb2Zm
-c2V0KSk7DQogIAkJcHJvdG8gPSAqKHJhbmRvbV9idWYgKyBpICsgcHJvdG9fb2Zmc2V0KTsNCi0J
-CWNzdW0gPSAqKHVuc2lnbmVkIGludCAqKShyYW5kb21fYnVmICsgaSArIGNzdW1fb2Zmc2V0KTsN
-Ci0JCUNIRUNLX0VRKGV4cGVjdGVkX2NzdW1faXB2Nl9tYWdpY1tpXSwNCisJCWNzdW0gPSAqKF9f
-d3N1bSAqKShyYW5kb21fYnVmICsgaSArIGNzdW1fb2Zmc2V0KTsNCisJCUNIRUNLX0VRKHRvX3N1
-bTE2KGV4cGVjdGVkX2NzdW1faXB2Nl9tYWdpY1tpXSksDQogIAkJCSBjc3VtX2lwdjZfbWFnaWMo
-c2FkZHIsIGRhZGRyLCBsZW4sIHByb3RvLCBjc3VtKSk7DQogIAl9DQogICNlbmRpZiAvKiAhQ09O
-RklHX05FVCAqLw0KLS0tDQoNCkNocmlzdG9waGUNCg==
+On Thu, Feb 22, 2024 11:08 PM, Andrew Lunn wrote:
+> > There are flags passed in sfp.c:
+> >
+> > err = devm_request_threaded_irq(sfp->dev, sfp->gpio_irq[i],
+> > 				NULL, sfp_irq,
+> > 				IRQF_ONESHOT |
+> > 				IRQF_TRIGGER_RISING |
+> > 				IRQF_TRIGGER_FALLING,
+> > 				sfp_irq_name, sfp);
+> 
+> Does you hardware support edges for GPIOs? And by that, i mean the
+> whole chain of interrupt controllers? So your GPIO controller notices
+> an edge in the GPIO. It then passed a notification to the interrupt
+> controller within the GPIO controller. It then sets a bit to indicate
+> an interrupt has happened. At that point you have a level
+> interrupt. That bit causes a level interrupt to the interrupt
+> controller above in the chain. And it needs to be level all way up.
+
+My hardware is required to configure GPIOs as edge-sensitive.
+But I think I got something wrong. There were two problems to be solved
+in this patch:
+
+1) The register of GPIO interrupt status is masked before MAC IRQ enabled.
+
+This is because of hardware deficiency. I need to manually clear the interrupt
+status before using them. Otherwise, GPIO interrupts will never be reported
+again. So there is a workaround for clearing interrupts to set GPIOs EOI in
+txgbe_up_complete().
+
+2) GPIO EOI is not set to clear interrupt status after handling the interrupt,
+it  should be done in chip->irq_ack, but this ops is not called.
+
+This is because I used handle_nested_irq() in txgbe_gpio_irq_handler() to
+handle the IRQ of specific GPIO line. Since the IRQ is requested as threaded
+IRQ and only action->thread_fn is created in sfp.c, the highlevel irq-events
+handler (handle_level_irq() or handle_edge_irq() set in gpio irq chip) is not
+called. Both level and edge type will call chip->irq_ack, but they are not called.
+
+So I should use generic_handle_domain_irq() instead of handle_nested_irq()
+to handle GPIO IRQ. But there is call trace when I do it,
+
+[   86.784113] ------------[ cut here ]------------
+[   86.784114] irq 154 handler irq_default_primary_handler+0x0/0x10 enabled interrupts
+[   86.784122] WARNING: CPU: 0 PID: 3383 at kernel/irq/handle.c:161 __handle_irq_event_percpu+0x150/0x1a0
+[   86.784125] Modules linked in: i2c_designware_platform sfp i2c_designware_core txgbe libwx fuse vfat fat nouveau
+snd_hda_codec_realtek snd_hda_codec_generic snd_hda_codec_hdmi snd_hda_intel intel_rapl_msr snd_intel_dspcfg intel_rapl_common
+snd_hda_codec snd_hda_core edac_mce_amd snd_hwdep eeepc_wmi crc32_pclmul asus_wmi snd_pcm ledtrig_audio platform_profile
+ghash_clmulni_intel sparse_keymap snd_seq_dummy sha512_ssse3 rfkill wmi_bmof drm_gpuvm snd_seq_oss mxm_wmi drm_exec snd_seq_midi
+binfmt_misc snd_seq_midi_event gpu_sched snd_rawmidi aesni_intel i2c_algo_bit crypto_simd bridge cryptd snd_seq drm_display_helper
+snd_seq_device drm_ttm_helper snd_timer ttm stp drm_kms_helper snd llc acpi_cpufreq k10temp ccp video soundcore wmi squashfs loop
+sch_fq_codel drm parport_pc ppdev lp parport ramoops reed_solomon ip_tables ext4 mbcache jbd2 mdio_i2c nvme ahci nvme_core libahci
+t10_pi i2c_piix4 libata pcs_xpcs crc32c_intel crc64_rocksoft i2c_core crc64 crc_t10dif r8169 crct10dif_generic crct10dif_pclmul
+phylink
+[   86.784200]  crct10dif_common realtek [last unloaded: i2c_designware_core]
+[   86.784204] CPU: 0 PID: 3383 Comm: irq/126-eth%d Not tainted 6.8.0-rc1+ #147
+[   86.784206] Hardware name: System manufacturer System Product Name/PRIME X570-P, BIOS 4403 04/28/2022
+[   86.784207] RIP: 0010:__handle_irq_event_percpu+0x150/0x1a0
+[   86.784210] Code: 44 00 00 e9 09 ff ff ff 80 3d 17 15 7e 01 00 75 1b 48 8b 13 44 89 ee 48 c7 c7 f8 e7 82 a8 c6 05 01 15 7e 01 01
+e8 00 d8 f6 ff <0f> 0b fa 0f 1f 44 00 00 e9 fc fe ff ff f0 48 0f ba 6b 40 01 0f 82
+[   86.784211] RSP: 0018:ffffa04300d6bd68 EFLAGS: 00010282
+[   86.784213] RAX: 0000000000000000 RBX: ffff8defda7bc000 RCX: 0000000000000000
+[   86.784214] RDX: 0000000000000002 RSI: ffffffffa88644c3 RDI: 00000000ffffffff
+[   86.784215] RBP: 0000000000000002 R08: 0000000000000000 R09: ffffa04300d6bc00
+[   86.784216] R10: 0000000000000001 R11: 0000000000000001 R12: 0000000000000000
+[   86.784217] R13: 000000000000009a R14: ffff8def8ff50a00 R15: ffff8defda7bc300
+[   86.784219] FS:  0000000000000000(0000) GS:ffff8df68ea00000(0000) knlGS:0000000000000000
+[   86.784220] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   86.784221] CR2: 000000c00081f000 CR3: 00000001821b6000 CR4: 0000000000750ef0
+[   86.784222] PKRU: 55555554
+[   86.784223] Call Trace:
+[   86.784225]  <TASK>
+[   86.784227]  ? __warn+0x80/0x130
+[   86.784231]  ? __handle_irq_event_percpu+0x150/0x1a0
+[   86.784233]  ? report_bug+0x1f4/0x200
+[   86.784236]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   86.784240]  ? handle_bug+0x42/0x70
+[   86.784243]  ? exc_invalid_op+0x14/0x70
+[   86.784245]  ? asm_exc_invalid_op+0x16/0x20
+[   86.784249]  ? __handle_irq_event_percpu+0x150/0x1a0
+[   86.784251]  ? __handle_irq_event_percpu+0x150/0x1a0
+[   86.784253]  ? __pfx_irq_thread_fn+0x10/0x10
+[   86.784255]  handle_irq_event_percpu+0x10/0x50
+[   86.784257]  handle_irq_event+0x34/0x60
+[   86.784260]  handle_level_irq+0xa5/0x120
+[   86.784263]  handle_irq_desc+0x3a/0x50
+[   86.784266]  txgbe_gpio_irq_handler+0x82/0x140 [txgbe]
+[   86.784271]  ? __pfx_irq_thread_fn+0x10/0x10
+[   86.784273]  handle_nested_irq+0xaf/0x100
+[   86.784275]  txgbe_misc_irq_handle+0x60/0x80 [txgbe]
+[   86.784279]  irq_thread_fn+0x20/0x60
+[   86.784282]  irq_thread+0xe2/0x190
+[   86.784284]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   86.784286]  ? __pfx_irq_thread_dtor+0x10/0x10
+[   86.784288]  ? __pfx_irq_thread+0x10/0x10
+[   86.784290]  kthread+0xf0/0x120
+[   86.784294]  ? __pfx_kthread+0x10/0x10
+[   86.784296]  ret_from_fork+0x30/0x50
+[   86.784299]  ? __pfx_kthread+0x10/0x10
+[   86.784301]  ret_from_fork_asm+0x1b/0x30
+[   86.784306]  </TASK>
+[   86.784307] ---[ end trace 0000000000000000 ]---
+
+This is due to default primary handler in the irq action chain.
+I'm not quite sure what I dig here, am I missing any flags?
+
+
 
