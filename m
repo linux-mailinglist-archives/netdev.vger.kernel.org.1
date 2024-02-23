@@ -1,251 +1,161 @@
-Return-Path: <netdev+bounces-74316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78CC6860DFB
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 10:29:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A2BD860E11
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 10:36:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C57F1C21680
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 09:29:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05FAE286435
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 09:36:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E8575C8F1;
-	Fri, 23 Feb 2024 09:29:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8CF25C8F1;
+	Fri, 23 Feb 2024 09:36:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YX/q6T4D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 407281A731
-	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 09:29:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0177D1A731
+	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 09:35:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708680560; cv=none; b=ZNd4gW08w1JsdvXvVVIxzjAYRfFovu7vv2uQy5+5kkrg8AG27nh0bwDCLvE0LTjd2etO5HsMNN294VPBYsCuhmrsViMxFIeSdKPc2w15Ruh2nlrgT31TW1oqzApwgtR0mxQ40cJ/bvzJ6Q/zxgWlhlw+2kZrqMq+t/A4KH2zDrA=
+	t=1708680961; cv=none; b=EiO1ncg11vKfLqnSt0BFgNFFkiV90XGKmShMKvVtVbANeuTFOGWzbDxUxrEkxpA0s6hE7aOgTOouU9qa1h7ufCIM6pvVeWRhu7vGTsf3VcitsuqkIiWCgXdMMHirwlcuouYZf6O4EQoaJUSc3E6FC072zBEnM5rxApLIU+KkiNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708680560; c=relaxed/simple;
-	bh=XBlO+prX+BVwr6GjAnBwa/wZVwpBnk+2ogglTH5kX/4=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=fNToZcNKm/R05SEzRvTq6gizJM7ljtIWPucq2iUOWeaPNDlx5GDlyK1hlHLWhJ+Bj3+37iBanl+ekNsorrVRHh50JEBHNo/3jxDXVx1tUWBYik7CqL809KmMOKVkF6hCtviro1nnCkpZaGMiemQRzQ2wsMzrsy8M4vLmNCcXMJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7c78573f2d0so4890139f.1
-        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 01:29:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708680557; x=1709285357;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XrMKjAtGdZ4VbbjBnNhK2wcFEC5IGVt631N4784tKfE=;
-        b=uY3mkrjhSJR983DCk1nWu7BSqkynajdy5fg0+wV+RLRIsn/Q6zllMG48u6+PahS1KF
-         0t2BZxb/VlVS5gIP9GRib2YL1the5IHuB4OEtBlqCK6iR31IRDtZ7gmYnWGP3n5jIpi3
-         prX6ol6/QJBmFGWlW3TuvEOrCyAcU3RS+MZ2RYpi5f7KTAq2FxFSykl0lcIRlh55zXjV
-         jZZy28UfoZu61bPaTAGKyBEGLKFYBYGTI7EZGV2ZZQxlF4EOwfrLEiN+X/CBxiw5B6zS
-         sicLvJ+Ky1arxzR+8eJKDaI2essXwWpdWx59lq5ug7mptbaEV+YVzWFdnlf57bkglfci
-         +/CQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUyguI/L0qL3jqsTl5tcTHzYE9JlHY+9AarVIQp67IQHkgl4qMnEXNacOLIuPIk4WBjwdO2CP5NC6BGj7/KdDCfY/Uc+3fS
-X-Gm-Message-State: AOJu0Yzz/Ot9BXDCCSE+drbcO0+bBFYswq+5pvAoR84lYFm5t/QvewcK
-	V4kbjHKqxyRFem6o+M66CqErzUPOurwMS1oZjhBtViDkrcVMZKH9Qqy+4QpFSgAoTWlm9eShZc1
-	PXYzk8Uy4SQOgoVR4q/ALDcsftjaEK8PXuIVOiTvhcdRmZzO6v1se31Y=
-X-Google-Smtp-Source: AGHT+IGdcZEYKTCVa6hsnVv9C5POed1dF6gao3PbHhn1Pd0LaCbg3mKKNDrsOa20ek3hj8B37IxKPS1o2dR5d+t1WXXGSoZCBU6l
+	s=arc-20240116; t=1708680961; c=relaxed/simple;
+	bh=P62c/gW3qUy4OC1LLVXVfdGjVFXf5PvIZI0YSta30b4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KOdHw7jFi0fsHmSahvFlB9kc62E6dr6zwxEViTsd7WGTMyqMylVy0xPVewh69/rskDv8PcFIBw8GrlKUkTqHtVg6lnlRSGGoow8jwCbkUu80xnW2cYfaDopiEapMUzm4St+xummROtshEWfXhEc65jUR9fU+0JdsU/kUkKoRRl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YX/q6T4D; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708680960; x=1740216960;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=P62c/gW3qUy4OC1LLVXVfdGjVFXf5PvIZI0YSta30b4=;
+  b=YX/q6T4DhEakC9ULfFPKRLUfmBdlCsIZJR+wCCK6R2lXKSiOUWlzSh5o
+   5JfIbLa9Tx5R94Bgy8bjMFeOxRXHDEx7NpcFsbw/OFcuxETCptKH0INOG
+   PtTKlEoWficinYsfwZ8/a7fJ7MMq/g6ID8136NWttn8UxTByDSi2HGMNK
+   WajAfIkpOmvRmC2Ku23JQ5o6X9YVtqtiBRCVX6zc0g6uwAvDT3+6cf7SQ
+   Vm2BAgr/dFnxp3fU5G6++XXVifvu1FC0YpY9jSc9h/NbZsP0J7VU32usM
+   gEwwwvvjoOjIT3BwU5zDTs9P/NHWrdRixjkUG57fXdcVhiAdX4mLqViCf
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10992"; a="6799479"
+X-IronPort-AV: E=Sophos;i="6.06,179,1705392000"; 
+   d="scan'208";a="6799479"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2024 01:35:59 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,179,1705392000"; 
+   d="scan'208";a="29019500"
+Received: from lkp-server02.sh.intel.com (HELO 3c78fa4d504c) ([10.239.97.151])
+  by fmviesa002.fm.intel.com with ESMTP; 23 Feb 2024 01:35:57 -0800
+Received: from kbuild by 3c78fa4d504c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rdRxh-0007Hc-1J;
+	Fri, 23 Feb 2024 09:35:33 +0000
+Date: Fri, 23 Feb 2024 17:35:12 +0800
+From: kernel test robot <lkp@intel.com>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	intel-wired-lan@lists.osuosl.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com, magnus.karlsson@intel.com,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Subject: Re: [PATCH iwl-next 2/3] ice: avoid unnecessary devm_ usage
+Message-ID: <202402231718.8mWcBppj-lkp@intel.com>
+References: <20240222145025.722515-3-maciej.fijalkowski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a5e:8d0b:0:b0:7c7:8e70:39ec with SMTP id
- m11-20020a5e8d0b000000b007c78e7039ecmr9925ioj.1.1708680557440; Fri, 23 Feb
- 2024 01:29:17 -0800 (PST)
-Date: Fri, 23 Feb 2024 01:29:17 -0800
-In-Reply-To: <000000000000c848d3060cd1d16a@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000a9373b0612093168@google.com>
-Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Read in advance_sched
-From: syzbot <syzbot+b65e0af58423fc8a73aa@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, jhs@mojatatu.com, 
-	jiri@resnulli.us, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	vinicius.gomes@intel.com, xiyou.wangcong@gmail.com, xrivendell7@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240222145025.722515-3-maciej.fijalkowski@intel.com>
 
-syzbot has found a reproducer for the following issue on:
+Hi Maciej,
 
-HEAD commit:    9abbc24128bc Merge branch 'for-next/core' into for-kernelci
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=14334f1a180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=af5c6c699e57bbb3
-dashboard link: https://syzkaller.appspot.com/bug?extid=b65e0af58423fc8a73aa
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: arm64
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16d85b34180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10a70158180000
+kernel test robot noticed the following build warnings:
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/ce13ec3ed5ad/disk-9abbc241.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/256cbd314121/vmlinux-9abbc241.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/0af86fb52109/Image-9abbc241.gz.xz
+[auto build test WARNING on v6.8-rc5]
+[also build test WARNING on linus/master next-20240223]
+[cannot apply to tnguy-next-queue/dev-queue tnguy-net-queue/dev-queue horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b65e0af58423fc8a73aa@syzkaller.appspotmail.com
+url:    https://github.com/intel-lab-lkp/linux/commits/Maciej-Fijalkowski/ice-do-not-disable-Tx-queues-twice-in-ice_down/20240222-225134
+base:   v6.8-rc5
+patch link:    https://lore.kernel.org/r/20240222145025.722515-3-maciej.fijalkowski%40intel.com
+patch subject: [PATCH iwl-next 2/3] ice: avoid unnecessary devm_ usage
+config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20240223/202402231718.8mWcBppj-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240223/202402231718.8mWcBppj-lkp@intel.com/reproduce)
 
-==================================================================
-BUG: KASAN: slab-use-after-free in advance_sched+0xa70/0xac0 net/sched/sch_taprio.c:953
-Read of size 8 at addr ffff0000d31b4110 by task syz-executor440/31519
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202402231718.8mWcBppj-lkp@intel.com/
 
-CPU: 0 PID: 31519 Comm: syz-executor440 Tainted: G    B              6.8.0-rc5-syzkaller-g9abbc24128bc #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
-Call trace:
- dump_backtrace+0x1b8/0x1e4 arch/arm64/kernel/stacktrace.c:291
- show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:298
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xd0/0x124 lib/dump_stack.c:106
- print_address_description mm/kasan/report.c:377 [inline]
- print_report+0x178/0x518 mm/kasan/report.c:488
- kasan_report+0xd8/0x138 mm/kasan/report.c:601
- __asan_report_load8_noabort+0x20/0x2c mm/kasan/report_generic.c:381
- advance_sched+0xa70/0xac0 net/sched/sch_taprio.c:953
- __run_hrtimer kernel/time/hrtimer.c:1689 [inline]
- __hrtimer_run_queues+0x484/0xca0 kernel/time/hrtimer.c:1753
- hrtimer_interrupt+0x4e0/0xb64 kernel/time/hrtimer.c:1815
- timer_handler drivers/clocksource/arm_arch_timer.c:674 [inline]
- arch_timer_handler_virt+0x74/0x88 drivers/clocksource/arm_arch_timer.c:685
- handle_percpu_devid_irq+0x2a4/0x804 kernel/irq/chip.c:942
- generic_handle_irq_desc include/linux/irqdesc.h:161 [inline]
- handle_irq_desc kernel/irq/irqdesc.c:672 [inline]
- generic_handle_domain_irq+0x7c/0xc4 kernel/irq/irqdesc.c:728
- __gic_handle_irq drivers/irqchip/irq-gic-v3.c:782 [inline]
- __gic_handle_irq_from_irqson drivers/irqchip/irq-gic-v3.c:833 [inline]
- gic_handle_irq+0x6c/0x190 drivers/irqchip/irq-gic-v3.c:877
- call_on_irq_stack+0x24/0x4c arch/arm64/kernel/entry.S:889
- do_interrupt_handler+0xd4/0x138 arch/arm64/kernel/entry-common.c:310
- __el1_irq arch/arm64/kernel/entry-common.c:536 [inline]
- el1_interrupt+0x34/0x68 arch/arm64/kernel/entry-common.c:551
- el1h_64_irq_handler+0x18/0x24 arch/arm64/kernel/entry-common.c:556
- el1h_64_irq+0x64/0x68 arch/arm64/kernel/entry.S:594
- __ext4_new_inode+0xc40/0x39a0 fs/ext4/ialloc.c:1030
- ext4_symlink+0x328/0x9bc fs/ext4/namei.c:3396
- vfs_symlink+0x138/0x260 fs/namei.c:4480
- do_symlinkat+0x1bc/0x45c fs/namei.c:4506
- __do_sys_symlinkat fs/namei.c:4522 [inline]
- __se_sys_symlinkat fs/namei.c:4519 [inline]
- __arm64_sys_symlinkat+0xa4/0xbc fs/namei.c:4519
- __invoke_syscall arch/arm64/kernel/syscall.c:37 [inline]
- invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:51
- el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:136
- do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:155
- el0_svc+0x54/0x168 arch/arm64/kernel/entry-common.c:712
- el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
- el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
+All warnings (new ones prefixed by >>):
 
-Allocated by task 31501:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x40/0x78 mm/kasan/common.c:68
- kasan_save_alloc_info+0x70/0x84 mm/kasan/generic.c:626
- poison_kmalloc_redzone mm/kasan/common.c:372 [inline]
- __kasan_kmalloc+0xac/0xc4 mm/kasan/common.c:389
- kasan_kmalloc include/linux/kasan.h:211 [inline]
- kmalloc_trace+0x26c/0x49c mm/slub.c:4012
- kmalloc include/linux/slab.h:590 [inline]
- kzalloc include/linux/slab.h:711 [inline]
- taprio_change+0xd14/0x3bf0 net/sched/sch_taprio.c:1881
- qdisc_change net/sched/sch_api.c:1416 [inline]
- tc_modify_qdisc+0x1474/0x1870 net/sched/sch_api.c:1746
- rtnetlink_rcv_msg+0x748/0xdbc net/core/rtnetlink.c:6618
- netlink_rcv_skb+0x214/0x3c4 net/netlink/af_netlink.c:2543
- rtnetlink_rcv+0x28/0x38 net/core/rtnetlink.c:6636
- netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
- netlink_unicast+0x65c/0x898 net/netlink/af_netlink.c:1367
- netlink_sendmsg+0x83c/0xb20 net/netlink/af_netlink.c:1908
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- ____sys_sendmsg+0x56c/0x840 net/socket.c:2584
- ___sys_sendmsg net/socket.c:2638 [inline]
- __sys_sendmsg+0x26c/0x33c net/socket.c:2667
- __do_sys_sendmsg net/socket.c:2676 [inline]
- __se_sys_sendmsg net/socket.c:2674 [inline]
- __arm64_sys_sendmsg+0x80/0x94 net/socket.c:2674
- __invoke_syscall arch/arm64/kernel/syscall.c:37 [inline]
- invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:51
- el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:136
- do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:155
- el0_svc+0x54/0x168 arch/arm64/kernel/entry-common.c:712
- el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
- el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
-
-Freed by task 16:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x40/0x78 mm/kasan/common.c:68
- kasan_save_free_info+0x5c/0x74 mm/kasan/generic.c:640
- poison_slab_object+0x124/0x18c mm/kasan/common.c:241
- __kasan_slab_free+0x3c/0x78 mm/kasan/common.c:257
- kasan_slab_free include/linux/kasan.h:184 [inline]
- slab_free_hook mm/slub.c:2121 [inline]
- slab_free mm/slub.c:4299 [inline]
- kfree+0x144/0x3cc mm/slub.c:4409
- taprio_free_sched_cb+0x158/0x178 net/sched/sch_taprio.c:199
- rcu_do_batch kernel/rcu/tree.c:2190 [inline]
- rcu_core+0x890/0x1b34 kernel/rcu/tree.c:2465
- rcu_core_si+0x10/0x1c kernel/rcu/tree.c:2482
- __do_softirq+0x2d8/0xce4 kernel/softirq.c:553
-
-Last potentially related work creation:
- kasan_save_stack+0x40/0x6c mm/kasan/common.c:47
- __kasan_record_aux_stack+0xc4/0x110 mm/kasan/generic.c:586
- kasan_record_aux_stack_noalloc+0x14/0x20 mm/kasan/generic.c:612
- __call_rcu_common kernel/rcu/tree.c:2715 [inline]
- call_rcu+0x104/0xaf4 kernel/rcu/tree.c:2829
- taprio_change+0x3288/0x3bf0 net/sched/sch_taprio.c:1991
- qdisc_change net/sched/sch_api.c:1416 [inline]
- tc_modify_qdisc+0x1474/0x1870 net/sched/sch_api.c:1746
- rtnetlink_rcv_msg+0x748/0xdbc net/core/rtnetlink.c:6618
- netlink_rcv_skb+0x214/0x3c4 net/netlink/af_netlink.c:2543
- rtnetlink_rcv+0x28/0x38 net/core/rtnetlink.c:6636
- netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
- netlink_unicast+0x65c/0x898 net/netlink/af_netlink.c:1367
- netlink_sendmsg+0x83c/0xb20 net/netlink/af_netlink.c:1908
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- ____sys_sendmsg+0x56c/0x840 net/socket.c:2584
- ___sys_sendmsg net/socket.c:2638 [inline]
- __sys_sendmsg+0x26c/0x33c net/socket.c:2667
- __do_sys_sendmsg net/socket.c:2676 [inline]
- __se_sys_sendmsg net/socket.c:2674 [inline]
- __arm64_sys_sendmsg+0x80/0x94 net/socket.c:2674
- __invoke_syscall arch/arm64/kernel/syscall.c:37 [inline]
- invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:51
- el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:136
- do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:155
- el0_svc+0x54/0x168 arch/arm64/kernel/entry-common.c:712
- el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
- el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
-
-The buggy address belongs to the object at ffff0000d31b4000
- which belongs to the cache kmalloc-512 of size 512
-The buggy address is located 272 bytes inside of
- freed 512-byte region [ffff0000d31b4000, ffff0000d31b4200)
-
-The buggy address belongs to the physical page:
-page:000000004df8a1f0 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1131b4
-head:000000004df8a1f0 order:2 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-anon flags: 0x5ffc00000000840(slab|head|node=0|zone=2|lastcpupid=0x7ff)
-page_type: 0xffffffff()
-raw: 05ffc00000000840 ffff0000c0001c80 0000000000000000 dead000000000001
-raw: 0000000000000000 0000000000100010 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
- ffff0000d31b4000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff0000d31b4080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff0000d31b4100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                         ^
- ffff0000d31b4180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff0000d31b4200: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-==================================================================
+   drivers/net/ethernet/intel/ice/ice_common.c: In function 'ice_update_link_info':
+>> drivers/net/ethernet/intel/ice/ice_common.c:3242:32: warning: variable 'hw' set but not used [-Wunused-but-set-variable]
+    3242 |                 struct ice_hw *hw;
+         |                                ^~
+--
+   drivers/net/ethernet/intel/ice/ice_ethtool.c: In function 'ice_loopback_test':
+>> drivers/net/ethernet/intel/ice/ice_ethtool.c:947:24: warning: variable 'dev' set but not used [-Wunused-but-set-variable]
+     947 |         struct device *dev;
+         |                        ^~~
 
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+vim +/hw +3242 drivers/net/ethernet/intel/ice/ice_common.c
+
+fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3221  
+fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3222  /**
+fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3223   * ice_update_link_info - update status of the HW network link
+fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3224   * @pi: port info structure of the interested logical port
+fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3225   */
+5e24d5984c805c Tony Nguyen            2021-10-07  3226  int ice_update_link_info(struct ice_port_info *pi)
+fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3227  {
+092a33d4031205 Bruce Allan            2019-04-16  3228  	struct ice_link_status *li;
+5e24d5984c805c Tony Nguyen            2021-10-07  3229  	int status;
+fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3230  
+fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3231  	if (!pi)
+d54699e27d506f Tony Nguyen            2021-10-07  3232  		return -EINVAL;
+fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3233  
+092a33d4031205 Bruce Allan            2019-04-16  3234  	li = &pi->phy.link_info;
+fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3235  
+fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3236  	status = ice_aq_get_link_info(pi, true, NULL, NULL);
+fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3237  	if (status)
+092a33d4031205 Bruce Allan            2019-04-16  3238  		return status;
+092a33d4031205 Bruce Allan            2019-04-16  3239  
+092a33d4031205 Bruce Allan            2019-04-16  3240  	if (li->link_info & ICE_AQ_MEDIA_AVAILABLE) {
+092a33d4031205 Bruce Allan            2019-04-16  3241  		struct ice_aqc_get_phy_caps_data *pcaps;
+092a33d4031205 Bruce Allan            2019-04-16 @3242  		struct ice_hw *hw;
+092a33d4031205 Bruce Allan            2019-04-16  3243  
+092a33d4031205 Bruce Allan            2019-04-16  3244  		hw = pi->hw;
+f8543c3af0dcb2 Maciej Fijalkowski     2024-02-22  3245  		pcaps = kzalloc(sizeof(*pcaps), GFP_KERNEL);
+092a33d4031205 Bruce Allan            2019-04-16  3246  		if (!pcaps)
+d54699e27d506f Tony Nguyen            2021-10-07  3247  			return -ENOMEM;
+fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3248  
+d6730a871e68f1 Anirudh Venkataramanan 2021-03-25  3249  		status = ice_aq_get_phy_caps(pi, false, ICE_AQC_REPORT_TOPO_CAP_MEDIA,
+fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3250  					     pcaps, NULL);
+fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3251  
+f8543c3af0dcb2 Maciej Fijalkowski     2024-02-22  3252  		kfree(pcaps);
+092a33d4031205 Bruce Allan            2019-04-16  3253  	}
+092a33d4031205 Bruce Allan            2019-04-16  3254  
+fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3255  	return status;
+fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3256  }
+fcea6f3da546b9 Anirudh Venkataramanan 2018-03-20  3257  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
