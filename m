@@ -1,300 +1,132 @@
-Return-Path: <netdev+bounces-74550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0949861D4C
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 21:11:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 07BAC861D5B
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 21:19:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 336B7B237B0
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 20:11:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D5B6DB21B3A
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 20:19:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6B58146019;
-	Fri, 23 Feb 2024 20:10:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92659146915;
+	Fri, 23 Feb 2024 20:18:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V7MIt7a3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cv8xDIxo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0449513DBA8
-	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 20:10:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EC97823CD;
+	Fri, 23 Feb 2024 20:18:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708719058; cv=none; b=jurfGUllvgHOCzs8aLrFFGvcumz0yRWy3jswF/sckC6fTYc5jlf71qY3UI3A6+2Ij+QmeXGhJk6PEKyoIVQkWylaGMpaP48cPtxQrA7sJSdSq8JfpsIJFW9C2ijc4Rv2vuDfnRM5ljKF9d9nmroedXSTakDnGPPLzORdYQ61nL0=
+	t=1708719537; cv=none; b=nWoq1XCobAnsBnQ5j9G/62QT6iZDarcq6FAYWYT5egkXitvC/1Qb4HbUC2+9CKXA3U0JusLf2/45omB9FRtGpxL4NO3VSZV/vhlJlf/sFSAzru9Ehe3b1BPEx4Oh4fLH5JjZuktg7Q/+YUaOpQYtVgL5OhmxlMaxhaQRNDVfMPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708719058; c=relaxed/simple;
-	bh=8Y2RTzagFiVJPrNEofLS7qdXzTwILaNFYPnkh/0C+7c=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=sImHdc0q21s4Y9NHLmntIHkfJkB8QUJ5tAjmmOZDGcj2FF5phVMgx7WsnPH04eyphLEaxlbxBMrJ3wQC4rbiW59EI0A/D09JOg1zJ0UJ931KT6BKkZ4hy7LBrNijIGiQ7p9zYOAv6Zpu0QqBuvoDgZUaI964IQhCSee0el+bmlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V7MIt7a3; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5f38d676cecso8448207b3.0
-        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 12:10:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708719056; x=1709323856; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=7DYYs4PX75D+/fg0ev/CvQmnGgTYkWYrfZ0x11AwITk=;
-        b=V7MIt7a3VdDtzBduFRSSNB8HNxvaTcmbQymzw4fmxPYJPKxFZM2JzuBIcXeRnwYs5k
-         IgaMSiHj0zvAjOG34LWfm2eRcV5agpPa8BX8E/t93+q/LNREAppSfzzB1ADDowt3RL2/
-         fHTrQM3BSgJqFN1iSUW8IuNTHLghVVDY3+wZ6qu0my1ab3dsm2J2bt2AMIB7x4Zfs1lN
-         xlgh3vsENfrERamjYmlJ+wKJctPIRx9uGI50Krwz004i76vhn2dGbpxIeklclAQ/R9sf
-         YpBhvgudEy6YL19qU2yotXsAEQx7iXI6R78dBXXx3LJpP3VE6a1ImukkIja5Pf+OezGx
-         8L7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708719056; x=1709323856;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7DYYs4PX75D+/fg0ev/CvQmnGgTYkWYrfZ0x11AwITk=;
-        b=NJZuVxA7SfyhZGYlsYGDm4b8txXzG2f1E7atVKwfJ92zdknqfTISSAmj7/zPCyh7GW
-         zxu0BquQxEuy7wUGHV57Z8cNqpwNjrfJ1CIJS15XViiPmnN1JoQCv59EYohhNoJlGWDo
-         ufRGn9usGm846ABZgebehgWvVhzt6sYqBwsW2wMr+501a8+0jcQ+G8btOUqi9Okvalry
-         uYznj3S11K0iz6Jc/YGS1c+iyKOfKbVcPuVLzHrnVEu36SFsmI1mPG29xAGvY6XMd5QY
-         wZUUYjPLw7Kt7IyZJ8Zt9Osk9pl53Lq4C5EzLDB51p74K7I0M/JVjlohkpktBIysymFw
-         e8xA==
-X-Forwarded-Encrypted: i=1; AJvYcCUGkfTFN7tSfCIEfZTk8uDxgiDBKVSFbJrJLbiwQbrK7IQS4XPzXPyV/KlDPkWijRVPbqJVMe81ypgVRMudA6FijdftrBg4
-X-Gm-Message-State: AOJu0YxRtnkNVmowIkGqbZgcUizbacwmYDvHcpi1EQTSHxYXOuQ5F88o
-	JArweKqUHyAanF804Pcg+L62/qwPbICPs9cMhGZI4Yil3GSUEnZD8u2+EvNFK/YhjZdt5RKykLo
-	8PwM7UWdoVg==
-X-Google-Smtp-Source: AGHT+IHuCWLtonqR+DUHB/n+M5AlgweBEGr9s1IFQRExcgVDiVF01h/8eK5j+UZNYqBoPm0ugOBKT6yUcHc8Xw==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:8003:0:b0:dc6:deca:8122 with SMTP id
- m3-20020a258003000000b00dc6deca8122mr194512ybk.5.1708719055994; Fri, 23 Feb
- 2024 12:10:55 -0800 (PST)
-Date: Fri, 23 Feb 2024 20:10:54 +0000
+	s=arc-20240116; t=1708719537; c=relaxed/simple;
+	bh=OSjpPRzTqbZ3a9okUwWjddq7mgz7QRjbWWThZ88G4m4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=eNEPTk/8CGtT0zEpffmRaCmb5D1sEu2oFOowNNMEJwp/F4uizm66NJ/H6o+DY9pcJYoRtCjAeit/8swWmxZz7t4zzD9AOJa1DJiJuL3dpvNAdL2PNGHjJA9h8W4K5CslZhVJGp8xuu/RQYmiwLJola4bXDRY1ArefQ0Wmlg9JGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cv8xDIxo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92795C433C7;
+	Fri, 23 Feb 2024 20:18:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1708719536;
+	bh=OSjpPRzTqbZ3a9okUwWjddq7mgz7QRjbWWThZ88G4m4=;
+	h=From:Subject:Date:To:Cc:From;
+	b=cv8xDIxotWY2cM/hqHvIaYn77e/DGw8ySKKlu/Z5ILxjJHCyodGw8ClgUTfzRt4Al
+	 MtRfN3y802Gb7EAPdsQP3jIVpHRdHlX3p1d41hUdWLcZa2QZTSlv3QN2/pu3YFQHij
+	 XaCBIk8MK4nSxUTAX+bqTr+N7z/Jort4dRnfWUstIiJnbbuVnrIxBVJbpPtpzNbsM0
+	 IVDPfo8fjB5KHPZKJ4ru2KZw80IyBIUBmyT/z01eZh8uPMjxQXgLTV7H5e+ybpA2Mj
+	 meyZFS+mwvPXyJ9l80tOpw+4xljkOjcanaNI+YWHZTWlImBZGSnLIsJ0y2cKncDTAK
+	 QmpBUw/Bz8jIw==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net-next 0/8] mptcp: various small improvements
+Date: Fri, 23 Feb 2024 21:17:52 +0100
+Message-Id: <20240223-upstream-net-next-20240223-misc-improvements-v1-0-b6c8a10396bd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.rc1.240.g4c46232300-goog
-Message-ID: <20240223201054.220534-1-edumazet@google.com>
-Subject: [PATCH net-next] ipv6: anycast: complete RCU handling of struct ifacaddr6
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHD92GUC/z2NQQrCMBBFr1Jm7UCMpRWvIi5i+tVZJA0zsRRK7
+ 24QdPEXjw/vbWRQgdGl20ixiMmcGxwPHcVXyE+wTI3JO98770/8LlYVIXFGbVsr/68kFllS0Xl
+ BQq7G4zT0wY3DPYYzNWVRPGT95q70E9Bt3z+zbD2kiAAAAA==
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ Geliang Tang <tanggeliang@kylinos.cn>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2147; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=OSjpPRzTqbZ3a9okUwWjddq7mgz7QRjbWWThZ88G4m4=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBl2P2qwaPOdQQ/ylED+kPthFbTEqIOTcOjIPWCe
+ irt0BPH0KiJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZdj9qgAKCRD2t4JPQmmg
+ c/xFEACx+Gxmlr4U5auuWXNK8BBoLvsFJuEVn5L4B3J9+M+NhC1rmRgNvAraqMhT79FQVmIYiqp
+ pIUdIMaw2L2ojMr7vkmyza+iouo0EnfhQqfKgfpL1rA8ckH5+iDBQeNovKhUSbE9NdF3VAMvV3i
+ tr4aYwV4/T151azt4hprJyaq+d95LBXHyuTGIYtMcqm1QUbPzMn6w+rYLaUaS8Kg9+vjU344yeI
+ r7Rbj5FrJxo0O6AUEI5sr8gTV+khwo9568DZj/NCo75Vh5O6m7N199XcLHjbUFaA3JwSZMPRT+7
+ PwVJMIksjqiAJ4cWjjQRNylEK2bwHJTPZ2HkWUFkWqDmJihHMnKQr2xMUTNjMCzA+3CCTHSiyPq
+ QGV+agGZrfZAE3gN0FZJ8b0Ul04fIvAkh6qNWhObKO3wiiUFvLqkflCXlGYL59Dk0boYyMYCwaP
+ dMoch3oDaAx4oPMlxii+cO5t4ieLSojoaif+KzF+1/xW2x+YBQm2kql+NDQbUaQuJL554EHPmDt
+ UzSGcBfn0/twZ2wkdFV7AyygG+hygKtGXtJJP2N+ZisPxVIyXOJgu2B0/KA/tEZszdy/2mCtQa+
+ yjf49N9ajceGg2y5QazQLt9xpbadGkvtEGUlxVdUCg+JzUBYkZa9Sk9Y4jSmPzWZircQ+N0dz3I
+ 85J5lv46eB29Bdg==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-struct ifacaddr6 are already freed after RCU grace period.
+This series brings various small improvements to MPTCP and its
+selftests:
 
-Add __rcu qualifier to aca_next pointer, and idev->ac_list
+Patch 1 prints an error if there are duplicated subtests names. It is
+important to have unique (sub)tests names in TAP, because some CI
+environments drop (sub)tests with duplicated names.
 
-Add relevant rcu_assign_pointer() and dereference accessors.
+Patch 2 is a preparation for patches 3 and 4, which check the protocol
+in tcp_sk() and mptcp_sk() with DEBUG_NET, only in code from net/mptcp/.
+We recently had the case where an MPTCP socket was wrongly treated as a
+TCP one, and fuzzers and static checkers never spot the issue. This
+would prevent such issues in the future.
 
-ipv6_chk_acast_dev() no longer needs to acquire idev->lock.
+Patches 5 to 7 are some cleanup for the MPTCP selftests. These patches
+are not supposed to change the behaviour.
 
-/proc/net/anycast6 is now purely RCU protected, it no
-longer acquires idev->lock.
+Patch 8 sets the poll timeout in diag selftest to the same value as the
+one used in the other selftests.
 
-Similarly in6_dump_addrs() can use RCU protection to iterate
-through anycast addresses. It was relying on a mixture of RCU
-and RTNL but next patches will get rid of RTNL there.
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
- include/net/if_inet6.h |  4 +--
- net/ipv6/addrconf.c    |  4 +--
- net/ipv6/anycast.c     | 61 ++++++++++++++++--------------------------
- 3 files changed, 27 insertions(+), 42 deletions(-)
+Geliang Tang (4):
+      selftests: mptcp: netlink: drop duplicate var ret
+      selftests: mptcp: simult flows: define missing vars
+      selftests: mptcp: join: change capture/checksum as bool
+      selftests: mptcp: diag: change timeout_poll to 30
 
-diff --git a/include/net/if_inet6.h b/include/net/if_inet6.h
-index f07642264c1eb622e57b9ce0715e296360a4db6e..238ad3349456a3afeab6c02172a9e2d681d2ec9c 100644
---- a/include/net/if_inet6.h
-+++ b/include/net/if_inet6.h
-@@ -144,7 +144,7 @@ struct ipv6_ac_socklist {
- struct ifacaddr6 {
- 	struct in6_addr		aca_addr;
- 	struct fib6_info	*aca_rt;
--	struct ifacaddr6	*aca_next;
-+	struct ifacaddr6 __rcu	*aca_next;
- 	struct hlist_node	aca_addr_lst;
- 	int			aca_users;
- 	refcount_t		aca_refcnt;
-@@ -196,7 +196,7 @@ struct inet6_dev {
- 	spinlock_t		mc_report_lock;	/* mld query report lock */
- 	struct mutex		mc_lock;	/* mld global lock */
- 
--	struct ifacaddr6	*ac_list;
-+	struct ifacaddr6 __rcu	*ac_list;
- 	rwlock_t		lock;
- 	refcount_t		refcnt;
- 	__u32			if_flags;
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index c669ea266ab717a9cbe6081d62a1f5b3c6e301f5..479c5777210acd0e3827241cb72025c4f66c38d0 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -5313,8 +5313,8 @@ static int in6_dump_addrs(struct inet6_dev *idev, struct sk_buff *skb,
- 	case ANYCAST_ADDR:
- 		fillargs->event = RTM_GETANYCAST;
- 		/* anycast address */
--		for (ifaca = idev->ac_list; ifaca;
--		     ifaca = ifaca->aca_next, ip_idx++) {
-+		for (ifaca = rcu_dereference(idev->ac_list); ifaca;
-+		     ifaca = rcu_dereference(ifaca->aca_next), ip_idx++) {
- 			if (ip_idx < s_ip_idx)
- 				continue;
- 			err = inet6_fill_ifacaddr(skb, ifaca, fillargs);
-diff --git a/net/ipv6/anycast.c b/net/ipv6/anycast.c
-index bb17f484ee2cde62632f95fc3b3370618b116049..0f2506e3535925468dcc5fa6cc30ae0952a67ea7 100644
---- a/net/ipv6/anycast.c
-+++ b/net/ipv6/anycast.c
-@@ -296,7 +296,8 @@ int __ipv6_dev_ac_inc(struct inet6_dev *idev, const struct in6_addr *addr)
- 		goto out;
- 	}
- 
--	for (aca = idev->ac_list; aca; aca = aca->aca_next) {
-+	for (aca = rtnl_dereference(idev->ac_list); aca;
-+	     aca = rtnl_dereference(aca->aca_next)) {
- 		if (ipv6_addr_equal(&aca->aca_addr, addr)) {
- 			aca->aca_users++;
- 			err = 0;
-@@ -317,13 +318,13 @@ int __ipv6_dev_ac_inc(struct inet6_dev *idev, const struct in6_addr *addr)
- 		goto out;
- 	}
- 
--	aca->aca_next = idev->ac_list;
--	idev->ac_list = aca;
--
- 	/* Hold this for addrconf_join_solict() below before we unlock,
- 	 * it is already exposed via idev->ac_list.
- 	 */
- 	aca_get(aca);
-+	aca->aca_next = idev->ac_list;
-+	rcu_assign_pointer(idev->ac_list, aca);
-+
- 	write_unlock_bh(&idev->lock);
- 
- 	ipv6_add_acaddr_hash(net, aca);
-@@ -350,7 +351,8 @@ int __ipv6_dev_ac_dec(struct inet6_dev *idev, const struct in6_addr *addr)
- 
- 	write_lock_bh(&idev->lock);
- 	prev_aca = NULL;
--	for (aca = idev->ac_list; aca; aca = aca->aca_next) {
-+	for (aca = rtnl_dereference(idev->ac_list); aca;
-+	     aca = rtnl_dereference(aca->aca_next)) {
- 		if (ipv6_addr_equal(&aca->aca_addr, addr))
- 			break;
- 		prev_aca = aca;
-@@ -364,9 +366,9 @@ int __ipv6_dev_ac_dec(struct inet6_dev *idev, const struct in6_addr *addr)
- 		return 0;
- 	}
- 	if (prev_aca)
--		prev_aca->aca_next = aca->aca_next;
-+		rcu_assign_pointer(prev_aca->aca_next, aca->aca_next);
- 	else
--		idev->ac_list = aca->aca_next;
-+		rcu_assign_pointer(idev->ac_list, aca->aca_next);
- 	write_unlock_bh(&idev->lock);
- 	ipv6_del_acaddr_hash(aca);
- 	addrconf_leave_solict(idev, &aca->aca_addr);
-@@ -392,8 +394,8 @@ void ipv6_ac_destroy_dev(struct inet6_dev *idev)
- 	struct ifacaddr6 *aca;
- 
- 	write_lock_bh(&idev->lock);
--	while ((aca = idev->ac_list) != NULL) {
--		idev->ac_list = aca->aca_next;
-+	while ((aca = rtnl_dereference(idev->ac_list)) != NULL) {
-+		rcu_assign_pointer(idev->ac_list, aca->aca_next);
- 		write_unlock_bh(&idev->lock);
- 
- 		ipv6_del_acaddr_hash(aca);
-@@ -420,11 +422,10 @@ static bool ipv6_chk_acast_dev(struct net_device *dev, const struct in6_addr *ad
- 
- 	idev = __in6_dev_get(dev);
- 	if (idev) {
--		read_lock_bh(&idev->lock);
--		for (aca = idev->ac_list; aca; aca = aca->aca_next)
-+		for (aca = rcu_dereference(idev->ac_list); aca;
-+		     aca = rcu_dereference(aca->aca_next))
- 			if (ipv6_addr_equal(&aca->aca_addr, addr))
- 				break;
--		read_unlock_bh(&idev->lock);
- 		return aca != NULL;
- 	}
- 	return false;
-@@ -477,30 +478,25 @@ bool ipv6_chk_acast_addr_src(struct net *net, struct net_device *dev,
- struct ac6_iter_state {
- 	struct seq_net_private p;
- 	struct net_device *dev;
--	struct inet6_dev *idev;
- };
- 
- #define ac6_seq_private(seq)	((struct ac6_iter_state *)(seq)->private)
- 
- static inline struct ifacaddr6 *ac6_get_first(struct seq_file *seq)
- {
--	struct ifacaddr6 *im = NULL;
- 	struct ac6_iter_state *state = ac6_seq_private(seq);
- 	struct net *net = seq_file_net(seq);
-+	struct ifacaddr6 *im = NULL;
- 
--	state->idev = NULL;
- 	for_each_netdev_rcu(net, state->dev) {
- 		struct inet6_dev *idev;
-+
- 		idev = __in6_dev_get(state->dev);
- 		if (!idev)
- 			continue;
--		read_lock_bh(&idev->lock);
--		im = idev->ac_list;
--		if (im) {
--			state->idev = idev;
-+		im = rcu_dereference(idev->ac_list);
-+		if (im)
- 			break;
--		}
--		read_unlock_bh(&idev->lock);
- 	}
- 	return im;
- }
-@@ -508,22 +504,17 @@ static inline struct ifacaddr6 *ac6_get_first(struct seq_file *seq)
- static struct ifacaddr6 *ac6_get_next(struct seq_file *seq, struct ifacaddr6 *im)
- {
- 	struct ac6_iter_state *state = ac6_seq_private(seq);
-+	struct inet6_dev *idev;
- 
--	im = im->aca_next;
-+	im = rcu_dereference(im->aca_next);
- 	while (!im) {
--		if (likely(state->idev != NULL))
--			read_unlock_bh(&state->idev->lock);
--
- 		state->dev = next_net_device_rcu(state->dev);
--		if (!state->dev) {
--			state->idev = NULL;
-+		if (!state->dev)
- 			break;
--		}
--		state->idev = __in6_dev_get(state->dev);
--		if (!state->idev)
-+		idev = __in6_dev_get(state->dev);
-+		if (!idev)
- 			continue;
--		read_lock_bh(&state->idev->lock);
--		im = state->idev->ac_list;
-+		im = rcu_dereference(idev->ac_list);
- 	}
- 	return im;
- }
-@@ -555,12 +546,6 @@ static void *ac6_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- static void ac6_seq_stop(struct seq_file *seq, void *v)
- 	__releases(RCU)
- {
--	struct ac6_iter_state *state = ac6_seq_private(seq);
--
--	if (likely(state->idev != NULL)) {
--		read_unlock_bh(&state->idev->lock);
--		state->idev = NULL;
--	}
- 	rcu_read_unlock();
- }
- 
+Matthieu Baerts (NGI0) (4):
+      selftests: mptcp: lib: catch duplicated subtest entries
+      mptcp: token kunit: set protocol
+      mptcp: check the protocol in tcp_sk() with DEBUG_NET
+      mptcp: check the protocol in mptcp_sk() with DEBUG_NET
+
+ net/mptcp/protocol.h                              | 16 ++++++++++++++++
+ net/mptcp/token_test.c                            |  7 ++++++-
+ tools/testing/selftests/net/mptcp/diag.sh         |  2 +-
+ tools/testing/selftests/net/mptcp/mptcp_join.sh   | 22 +++++++++++-----------
+ tools/testing/selftests/net/mptcp/mptcp_lib.sh    | 21 +++++++++++++++++++++
+ tools/testing/selftests/net/mptcp/pm_netlink.sh   |  1 -
+ tools/testing/selftests/net/mptcp/simult_flows.sh |  6 ++++++
+ 7 files changed, 61 insertions(+), 14 deletions(-)
+---
+base-commit: a818bd12538c1408c7480de31573cdb3c3c0926f
+change-id: 20240223-upstream-net-next-20240223-misc-improvements-7d64a076bca8
+
+Best regards,
 -- 
-2.44.0.rc1.240.g4c46232300-goog
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
