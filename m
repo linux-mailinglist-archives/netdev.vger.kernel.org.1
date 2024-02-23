@@ -1,96 +1,125 @@
-Return-Path: <netdev+bounces-74492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DF0F86179D
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 17:20:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B43748617AD
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 17:22:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E91D41F22389
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 16:20:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 20D06B27FF5
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 16:22:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A01F1292DF;
-	Fri, 23 Feb 2024 16:19:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4B788562E;
+	Fri, 23 Feb 2024 16:20:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Mx9yZqOo"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="PZYe39Xr"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB487126F18;
-	Fri, 23 Feb 2024 16:19:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF958562C;
+	Fri, 23 Feb 2024 16:20:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708705169; cv=none; b=SG3gXirCibveFGtMK7exyNRKHk+SvnISTBE8m/PtGagAqGf6WhVvnGWoO6UkDA1HxsfM1VZRPDlgx5QSNxY8kZWhZiowSaeDGzhOc97eC7NiOsDpxTBN/EMrxhxSkoEtclXbrVfxhdIaZfFp9FfyxAyim/3awQysoxAc9MfFnrY=
+	t=1708705257; cv=none; b=jHnE/aRhMcYmGQtHsfPcxmvlyoyyU1tYxAl7rAhsooH/PH796tl8lsJWn3zGpe1PfUb7uJgXKMbE+XnrrHqyEChQPBgBWpUmwqCAJnfrmqb7DW4M8kg3efVZ3psvssnR7Bj8ppLZeayqNNxlsrjhq6thH1u6JSboqRDlVxeZ82w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708705169; c=relaxed/simple;
-	bh=joPzG+++ezLaON59rVXad40IOG8lQR6Z/NTYgQe0+1c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rjpiHHO9CXF5n4SzlJbM6YQbtVQPr2qwggTU4UKIzZlEiW0GuAg7dZKAGumKlGHfWnQNGQTvUDOOJ7wTgN2tcK97zwmujAtZRBQCC6x30i6CfY1YtWugov3R8A3LVuEOrXioc0I+/KA78HzZ5UMab9sXLcylGG/pvddiOFRZ6sM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Mx9yZqOo; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=OEEu+Q+qWiDYEjhlF6uweUjaZhpoREuloxHpZyOQEjg=; b=Mx9yZqOo0DdCDnT5R6zSlsy58r
-	IF4clhpSA1fM7tinhRx+lZHvNdkip/ih+F/m8QYC5tRiwnWCz0ZSlZ9I1JI8Mwfmp8mCTCA/ZwYVc
-	JQr510o5AyWBBjathdb2eiLgAHqQ0+rT539FAjg2c6fnOHPKpLyKsH9B1q0RRg0CsPSyf4XCWVDFI
-	4BzI1pPQLkBD0PNZoi/RBPNxAS9ogu5Jhbb5qf8mGrKuYKbhCY6qcZCS3zE53280vRb4Ax15lQocC
-	wb8RDktmUljlsrBbi1JubvVqgH6tyN6sM5PmO/rAq1907FdqHdb4CkL2DssSauClhT+ztAQCE9ye8
-	fz5NNZBA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60606)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rdYGV-0000Af-0X;
-	Fri, 23 Feb 2024 16:19:11 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rdYGU-0003kX-DS; Fri, 23 Feb 2024 16:19:10 +0000
-Date: Fri, 23 Feb 2024 16:19:10 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Johan Hovold <johan@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: phy: phy_device: free the phy_device on the
- phy_device_create error path
-Message-ID: <ZdjFfh/HGj6BZCXC@shell.armlinux.org.uk>
-References: <20240223160155.861528-1-maxime.chevallier@bootlin.com>
- <20240223170607.0d2aa8b1@device-28.home>
+	s=arc-20240116; t=1708705257; c=relaxed/simple;
+	bh=dwWIJwGoMU5ew25YXI00QoYBkJKwcHEWsLFpy7KUq64=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mDKODfkd4eECESzu0xm0OJQLQjeK6n91SY+qjTYxmbY6k7kiVMSmjArCdRftjwPTBshiwOJ9WNiH3WQx39nOs33hfQ8CVAuWdaYCG+pUwL7M7l1V9SgrnWzpgr0JliV/kpJd29e8+A/z7bTzI/kuiHSTwsKDN6yaCuuERspxTiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=PZYe39Xr; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41NFLW01003973;
+	Fri, 23 Feb 2024 16:20:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=qcppdkim1; bh=7+lZgdm
+	7GSt8ghIDF5MfQ2k86lh0IjM0BRTq/0qelZU=; b=PZYe39XrSEQYwkWXOFGd3UE
+	8Ua//3vqeHRy18OVCZdf1URKWLeQC1f6NpKsKFvWOvvtxcFt2jWZwaNmh8AOtspu
+	x/ifnEvLmSe1U3mU09G0Cb9z8aq/f5Qtah0uDzLLLxX9u7E2wlSuWBSEYwi0m09P
+	2gLO4bOcyUoqVOKfVwvYmSW4z68028tYqSaJL/6csFlboPOmcsmOszRxhtzkOeL0
+	BjI1DRUdbgTLG4j9H+4THOBcVRk4E1kiKi0kqbUgFXakR07k/MgmrKw9x41zF5vB
+	OpAQdBrbSvSxj8v/fVYwWLvB/YbjZvmMkHAHdyN6T5eb5t7TXDRoBXb7cBLHSFg=
+	=
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wen0qhfrg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 23 Feb 2024 16:20:44 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41NGKhhb007434
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 23 Feb 2024 16:20:43 GMT
+Received: from jhugo-lnx.qualcomm.com (10.80.80.8) by
+ nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Fri, 23 Feb 2024 08:20:41 -0800
+From: Jeffrey Hugo <quic_jhugo@quicinc.com>
+To: <quic_bjorande@quicinc.com>, <marcel@holtmann.org>, <luiz.dentz@gmail.com>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <robh@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <quic_bgodavar@quicinc.com>, <quic_rjliao@quicinc.com>
+CC: <linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Jeffrey Hugo <quic_jhugo@quicinc.com>
+Subject: [PATCH RESEND] dt-bindings: net: bluetooth: qualcomm: Fix bouncing @codeaurora
+Date: Fri, 23 Feb 2024 09:20:27 -0700
+Message-ID: <20240223162027.4016065-1-quic_jhugo@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240223170607.0d2aa8b1@device-28.home>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: yrDevGGHGLEf47oOTWOapKsT_ZsKJ8B3
+X-Proofpoint-GUID: yrDevGGHGLEf47oOTWOapKsT_ZsKJ8B3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-23_02,2024-02-23_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=748 clxscore=1015
+ adultscore=0 malwarescore=0 bulkscore=0 spamscore=0 suspectscore=0
+ lowpriorityscore=0 priorityscore=1501 mlxscore=0 impostorscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2402120000 definitions=main-2402230118
 
-On Fri, Feb 23, 2024 at 05:06:07PM +0100, Maxime Chevallier wrote:
-> On Fri, 23 Feb 2024 17:01:54 +0100
-> Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
-> 
-> > When error'ing out from phy_device_create(), the previously kzalloc'd "dev"
-> > pointer gets overwritten with an error pointer, without freeing it
-> > beforehand, thus leaking the allocated phy_device. Add the missing kfree
-> > back.
-> 
-> Disregard , I immediatly realised that this was freed in
-> phy_device_release in our case. Sorry about the noise.
+The servers for the @codeaurora domain are long retired and any messages
+sent there will bounce.  Update the maintainer addresses for this
+binding to match the entries in .mailmap so that anyone looking in the
+file for a contact will see a correct address.
 
-Sorry your emails came in in reverse order.
+Signed-off-by: Jeffrey Hugo <quic_jhugo@quicinc.com>
+---
 
+Rob, will you take this patch into your tree for 6.9?
+
+ .../devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+index eba2f3026ab0..528ef3572b62 100644
+--- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
++++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+@@ -7,8 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
+ title: Qualcomm Bluetooth Chips
+ 
+ maintainers:
+-  - Balakrishna Godavarthi <bgodavar@codeaurora.org>
+-  - Rocky Liao <rjliao@codeaurora.org>
++  - Balakrishna Godavarthi <quic_bgodavar@quicinc.com>
++  - Rocky Liao <quic_rjliao@quicinc.com>
+ 
+ description:
+   This binding describes Qualcomm UART-attached bluetooth chips.
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.34.1
+
 
