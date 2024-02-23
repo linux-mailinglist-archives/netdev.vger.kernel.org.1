@@ -1,206 +1,300 @@
-Return-Path: <netdev+bounces-74549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0A1A861D45
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 21:05:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0949861D4C
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 21:11:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75FE3286B86
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 20:05:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 336B7B237B0
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 20:11:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91B66146E67;
-	Fri, 23 Feb 2024 20:05:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6B58146019;
+	Fri, 23 Feb 2024 20:10:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="s5VlEGkR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V7MIt7a3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D17C1448F3
-	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 20:05:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0449513DBA8
+	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 20:10:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708718752; cv=none; b=neqNkmBpH4vknnMdLanI85/ciHPVjYZ/sh7CydWp/bpyt6wxLZDfSEeUo9ylR1qW1m0Ihf8iUXfd6pzsPGxS8SzE34LePcx78sqxMC6GDZ4YxDm943SDnT4ZY5rVeCGFCGNFiYvNFF55s07ACET0bJ1yPrJjbxwxEfkGGs4hJXk=
+	t=1708719058; cv=none; b=jurfGUllvgHOCzs8aLrFFGvcumz0yRWy3jswF/sckC6fTYc5jlf71qY3UI3A6+2Ij+QmeXGhJk6PEKyoIVQkWylaGMpaP48cPtxQrA7sJSdSq8JfpsIJFW9C2ijc4Rv2vuDfnRM5ljKF9d9nmroedXSTakDnGPPLzORdYQ61nL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708718752; c=relaxed/simple;
-	bh=c93H0T4Zb2kqV8VXSrK+QwhYIgK7q9e3GVpJjBwlDPQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bhxdEZU/SCBHNUE5y7sMyZXQQXXzkX6WwKP/YjuxOUBiOBnghMDORX5yoUxdt7dKVYOo70brP55KL7ci9iWI0+/nvVEEJ/zi3zPijlnOcKZkSxg1+KlcLJwf0YIXMji0fLcm/fXIjWVC82pPFHYsrEb5fgrZQPBQnmcrAcQAqj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=s5VlEGkR; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6de3141f041so849751b3a.0
-        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 12:05:49 -0800 (PST)
+	s=arc-20240116; t=1708719058; c=relaxed/simple;
+	bh=8Y2RTzagFiVJPrNEofLS7qdXzTwILaNFYPnkh/0C+7c=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=sImHdc0q21s4Y9NHLmntIHkfJkB8QUJ5tAjmmOZDGcj2FF5phVMgx7WsnPH04eyphLEaxlbxBMrJ3wQC4rbiW59EI0A/D09JOg1zJ0UJ931KT6BKkZ4hy7LBrNijIGiQ7p9zYOAv6Zpu0QqBuvoDgZUaI964IQhCSee0el+bmlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V7MIt7a3; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5f38d676cecso8448207b3.0
+        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 12:10:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1708718749; x=1709323549; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=77MYyBjrrun3U8EBRolVJQ+jLb+xOKAgdqcuRAFvrrQ=;
-        b=s5VlEGkRy62fS5jPKo7jImCWldlFM7HGNErXd+RSWVzSfUYFWhLt0RSTzSk2sIWxPV
-         FRj3aRnoDIja1NOryhm6YkAuQZwNY74a06qiK8tF9yFC0LYtlsnH4YnY6Njme2d87xNw
-         QlVTvPgq4sae3FRIDi1tTQEe1PDgr/0Pq7WEFafuct5yb11wDFSZp079QDdhokLQD3Oc
-         xlPp4tYBKp7mBfYHi0pIqOHNCn0z+gEMDifJF52UksaQYf/f94uVDBBvCcmgljwAXdsv
-         W/GO6uaGHTNsHBwm0VuHmTNJlCnUkDXEp5pomWMSFw+OoDBSmtnN/DWR5yhfl7hM0ggh
-         ihfA==
+        d=google.com; s=20230601; t=1708719056; x=1709323856; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=7DYYs4PX75D+/fg0ev/CvQmnGgTYkWYrfZ0x11AwITk=;
+        b=V7MIt7a3VdDtzBduFRSSNB8HNxvaTcmbQymzw4fmxPYJPKxFZM2JzuBIcXeRnwYs5k
+         IgaMSiHj0zvAjOG34LWfm2eRcV5agpPa8BX8E/t93+q/LNREAppSfzzB1ADDowt3RL2/
+         fHTrQM3BSgJqFN1iSUW8IuNTHLghVVDY3+wZ6qu0my1ab3dsm2J2bt2AMIB7x4Zfs1lN
+         xlgh3vsENfrERamjYmlJ+wKJctPIRx9uGI50Krwz004i76vhn2dGbpxIeklclAQ/R9sf
+         YpBhvgudEy6YL19qU2yotXsAEQx7iXI6R78dBXXx3LJpP3VE6a1ImukkIja5Pf+OezGx
+         8L7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708718749; x=1709323549;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=77MYyBjrrun3U8EBRolVJQ+jLb+xOKAgdqcuRAFvrrQ=;
-        b=CA7riLEfoIzeXiCxBC8MqToUDde7wfPpib2S0Z/64+24oScGK6EQchDEWhnRW0QtZg
-         428cjhelao4vVZaKOAe2C3CvOvzs56gKld6MHE+FVl5s09wN9SNU3oaq5vselcvwQX+1
-         aJH2zzL+RwJXkdsxfJ1xqCJVQYFK3rl1Wz6gDlUDAM/WV1J2Z6/ZJNfRlJCZcar6of5F
-         1eNpezQIkLGCx68lcM5utd31trgYh5pk9vWopaSe97RsBECCbRjEp5l+hJ75eZh9lVCk
-         QLbrAr17L6wf0srn0ciM+kH/qLCAM2062zEDCsWmBymE4wq3BFLh/MJ/m1vUl7M9SejP
-         G28w==
-X-Forwarded-Encrypted: i=1; AJvYcCVEE0zzKx3ZLl7C/GSqF4nKSoQhU6L39go2p2yR1a3cg+yQmDY+dGIi2wU0nbAHJYk/IBV5F675hs8boUAa6VvxHhW8x0Jx
-X-Gm-Message-State: AOJu0YxHZooARvv3c2gnf8ln9mx12VCCLDb18k/evWTvbfSr8PzLAHim
-	Pl34XIJSdi8HDEb9uvLsW37pUabOAezNVjRJyvdoQkaIBLzcu5gSkMa3K6TXW3c=
-X-Google-Smtp-Source: AGHT+IEgmr0ZdwTYDwiLLCSnGGUBIxZ7Xut9Byi5mIRf8j8f1dL0+6Kee4jWo8g8/WX/ooPqwOMn1w==
-X-Received: by 2002:a62:c186:0:b0:6e4:d0ed:d2b8 with SMTP id i128-20020a62c186000000b006e4d0edd2b8mr693710pfg.16.1708718748675;
-        Fri, 23 Feb 2024 12:05:48 -0800 (PST)
-Received: from ghost ([50.213.54.97])
-        by smtp.gmail.com with ESMTPSA id a18-20020a056a000c9200b006e48e64ef54sm6019116pfv.173.2024.02.23.12.05.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Feb 2024 12:05:48 -0800 (PST)
-Date: Fri, 23 Feb 2024 12:05:45 -0800
-From: Charlie Jenkins <charlie@rivosinc.com>
-To: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Guenter Roeck <linux@roeck-us.net>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Erhard Furtner <erhard_f@mailbox.org>
-Subject: Re: [PATCH net] kunit: Fix again checksum tests on big endian CPUs
-Message-ID: <Zdj6mebHlbIq8u2o@ghost>
-References: <73df3a9e95c2179119398ad1b4c84cdacbd8dfb6.1708684443.git.christophe.leroy@csgroup.eu>
- <Zdjcnp324nIRuyUI@ghost>
- <66402663-98dd-42a2-aa04-5f04cb76b147@csgroup.eu>
+        d=1e100.net; s=20230601; t=1708719056; x=1709323856;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7DYYs4PX75D+/fg0ev/CvQmnGgTYkWYrfZ0x11AwITk=;
+        b=NJZuVxA7SfyhZGYlsYGDm4b8txXzG2f1E7atVKwfJ92zdknqfTISSAmj7/zPCyh7GW
+         zxu0BquQxEuy7wUGHV57Z8cNqpwNjrfJ1CIJS15XViiPmnN1JoQCv59EYohhNoJlGWDo
+         ufRGn9usGm846ABZgebehgWvVhzt6sYqBwsW2wMr+501a8+0jcQ+G8btOUqi9Okvalry
+         uYznj3S11K0iz6Jc/YGS1c+iyKOfKbVcPuVLzHrnVEu36SFsmI1mPG29xAGvY6XMd5QY
+         wZUUYjPLw7Kt7IyZJ8Zt9Osk9pl53Lq4C5EzLDB51p74K7I0M/JVjlohkpktBIysymFw
+         e8xA==
+X-Forwarded-Encrypted: i=1; AJvYcCUGkfTFN7tSfCIEfZTk8uDxgiDBKVSFbJrJLbiwQbrK7IQS4XPzXPyV/KlDPkWijRVPbqJVMe81ypgVRMudA6FijdftrBg4
+X-Gm-Message-State: AOJu0YxRtnkNVmowIkGqbZgcUizbacwmYDvHcpi1EQTSHxYXOuQ5F88o
+	JArweKqUHyAanF804Pcg+L62/qwPbICPs9cMhGZI4Yil3GSUEnZD8u2+EvNFK/YhjZdt5RKykLo
+	8PwM7UWdoVg==
+X-Google-Smtp-Source: AGHT+IHuCWLtonqR+DUHB/n+M5AlgweBEGr9s1IFQRExcgVDiVF01h/8eK5j+UZNYqBoPm0ugOBKT6yUcHc8Xw==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a25:8003:0:b0:dc6:deca:8122 with SMTP id
+ m3-20020a258003000000b00dc6deca8122mr194512ybk.5.1708719055994; Fri, 23 Feb
+ 2024 12:10:55 -0800 (PST)
+Date: Fri, 23 Feb 2024 20:10:54 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <66402663-98dd-42a2-aa04-5f04cb76b147@csgroup.eu>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.rc1.240.g4c46232300-goog
+Message-ID: <20240223201054.220534-1-edumazet@google.com>
+Subject: [PATCH net-next] ipv6: anycast: complete RCU handling of struct ifacaddr6
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Feb 23, 2024 at 06:15:16PM +0000, Christophe Leroy wrote:
-> 
-> 
-> Le 23/02/2024 à 18:57, Charlie Jenkins a écrit :
-> > On Fri, Feb 23, 2024 at 11:41:52AM +0100, Christophe Leroy wrote:
-> >> Commit b38460bc463c ("kunit: Fix checksum tests on big endian CPUs")
-> >> fixed endianness issues with kunit checksum tests, but then
-> >> commit 6f4c45cbcb00 ("kunit: Add tests for csum_ipv6_magic and
-> >> ip_fast_csum") introduced new issues on big endian CPUs. Those issues
-> >> are once again reflected by the warnings reported by sparse.
-> >>
-> >> So, fix them with the same approach, perform proper conversion in
-> >> order to support both little and big endian CPUs. Once the conversions
-> >> are properly done and the right types used, the sparse warnings are
-> >> cleared as well.
-> >>
-> >> Reported-by: Erhard Furtner <erhard_f@mailbox.org>
-> >> Fixes: 6f4c45cbcb00 ("kunit: Add tests for csum_ipv6_magic and ip_fast_csum")
-> >> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-> >> ---
-> >>   lib/checksum_kunit.c | 17 +++++++++--------
-> >>   1 file changed, 9 insertions(+), 8 deletions(-)
-> >>
-> >> diff --git a/lib/checksum_kunit.c b/lib/checksum_kunit.c
-> >> index 225bb7701460..bf70850035c7 100644
-> >> --- a/lib/checksum_kunit.c
-> >> +++ b/lib/checksum_kunit.c
-> >> @@ -215,7 +215,7 @@ static const u32 init_sums_no_overflow[] = {
-> >>   	0xffff0000, 0xfffffffb,
-> >>   };
-> >>   
-> >> -static const __sum16 expected_csum_ipv6_magic[] = {
-> >> +static const u16 expected_csum_ipv6_magic[] = {
-> >>   	0x18d4, 0x3085, 0x2e4b, 0xd9f4, 0xbdc8, 0x78f,	0x1034, 0x8422, 0x6fc0,
-> >>   	0xd2f6, 0xbeb5, 0x9d3,	0x7e2a, 0x312e, 0x778e, 0xc1bb, 0x7cf2, 0x9d1e,
-> >>   	0xca21, 0xf3ff, 0x7569, 0xb02e, 0xca86, 0x7e76, 0x4539, 0x45e3, 0xf28d,
-> >> @@ -241,7 +241,7 @@ static const __sum16 expected_csum_ipv6_magic[] = {
-> >>   	0x3845, 0x1014
-> >>   };
-> >>   
-> >> -static const __sum16 expected_fast_csum[] = {
-> >> +static const u16 expected_fast_csum[] = {
-> >>   	0xda83, 0x45da, 0x4f46, 0x4e4f, 0x34e,	0xe902, 0xa5e9, 0x87a5, 0x7187,
-> >>   	0x5671, 0xf556, 0x6df5, 0x816d, 0x8f81, 0xbb8f, 0xfbba, 0x5afb, 0xbe5a,
-> >>   	0xedbe, 0xabee, 0x6aac, 0xe6b,	0xea0d, 0x67ea, 0x7e68, 0x8a7e, 0x6f8a,
-> >> @@ -577,7 +577,8 @@ static void test_csum_no_carry_inputs(struct kunit *test)
-> >>   
-> >>   static void test_ip_fast_csum(struct kunit *test)
-> >>   {
-> >> -	__sum16 csum_result, expected;
-> >> +	__sum16 csum_result;
-> >> +	u16 expected;
-> >>   
-> >>   	for (int len = IPv4_MIN_WORDS; len < IPv4_MAX_WORDS; len++) {
-> >>   		for (int index = 0; index < NUM_IP_FAST_CSUM_TESTS; index++) {
-> >> @@ -586,7 +587,7 @@ static void test_ip_fast_csum(struct kunit *test)
-> >>   				expected_fast_csum[(len - IPv4_MIN_WORDS) *
-> >>   						   NUM_IP_FAST_CSUM_TESTS +
-> >>   						   index];
-> >> -			CHECK_EQ(expected, csum_result);
-> >> +			CHECK_EQ(to_sum16(expected), csum_result);
-> >>   		}
-> >>   	}
-> >>   }
-> >> @@ -598,7 +599,7 @@ static void test_csum_ipv6_magic(struct kunit *test)
-> >>   	const struct in6_addr *daddr;
-> >>   	unsigned int len;
-> >>   	unsigned char proto;
-> >> -	unsigned int csum;
-> >> +	__wsum csum;
-> >>   
-> >>   	const int daddr_offset = sizeof(struct in6_addr);
-> >>   	const int len_offset = sizeof(struct in6_addr) + sizeof(struct in6_addr);
-> >> @@ -611,10 +612,10 @@ static void test_csum_ipv6_magic(struct kunit *test)
-> >>   		saddr = (const struct in6_addr *)(random_buf + i);
-> >>   		daddr = (const struct in6_addr *)(random_buf + i +
-> >>   						  daddr_offset);
-> >> -		len = *(unsigned int *)(random_buf + i + len_offset);
-> >> +		len = le32_to_cpu(*(__le32 *)(random_buf + i + len_offset));
-> >>   		proto = *(random_buf + i + proto_offset);
-> >> -		csum = *(unsigned int *)(random_buf + i + csum_offset);
-> >> -		CHECK_EQ(expected_csum_ipv6_magic[i],
-> >> +		csum = *(__wsum *)(random_buf + i + csum_offset);
-> >> +		CHECK_EQ(to_sum16(expected_csum_ipv6_magic[i]),
-> >>   			 csum_ipv6_magic(saddr, daddr, len, proto, csum));
-> >>   	}
-> >>   #endif /* !CONFIG_NET */
-> >> -- 
-> >> 2.43.0
-> >>
-> > 
-> > There is no need to duplicate efforts here. This has already been
-> > resolved by
-> > https://lore.kernel.org/lkml/20240221-fix_sparse_errors_checksum_tests-v9-2-bff4d73ab9d1@rivosinc.com/.
-> > 
-> 
-> The idea here is to provide a fix which is similar to the one done 
-> previously and that uses the same approach and reuses the same helpers.
-> 
-> This is to keep the code homogeneous.
-> 
-> Christophe
+struct ifacaddr6 are already freed after RCU grace period.
 
-htons makes more sense here since this is networking code, but I don't
-care enough to argue the point. I tested it on big endian SPARC and on
-riscv. I'll base my alignment patch on this.
+Add __rcu qualifier to aca_next pointer, and idev->ac_list
 
-Tested-by: Charlie Jenkins <charlie@rivosinc.com>
+Add relevant rcu_assign_pointer() and dereference accessors.
+
+ipv6_chk_acast_dev() no longer needs to acquire idev->lock.
+
+/proc/net/anycast6 is now purely RCU protected, it no
+longer acquires idev->lock.
+
+Similarly in6_dump_addrs() can use RCU protection to iterate
+through anycast addresses. It was relying on a mixture of RCU
+and RTNL but next patches will get rid of RTNL there.
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ include/net/if_inet6.h |  4 +--
+ net/ipv6/addrconf.c    |  4 +--
+ net/ipv6/anycast.c     | 61 ++++++++++++++++--------------------------
+ 3 files changed, 27 insertions(+), 42 deletions(-)
+
+diff --git a/include/net/if_inet6.h b/include/net/if_inet6.h
+index f07642264c1eb622e57b9ce0715e296360a4db6e..238ad3349456a3afeab6c02172a9e2d681d2ec9c 100644
+--- a/include/net/if_inet6.h
++++ b/include/net/if_inet6.h
+@@ -144,7 +144,7 @@ struct ipv6_ac_socklist {
+ struct ifacaddr6 {
+ 	struct in6_addr		aca_addr;
+ 	struct fib6_info	*aca_rt;
+-	struct ifacaddr6	*aca_next;
++	struct ifacaddr6 __rcu	*aca_next;
+ 	struct hlist_node	aca_addr_lst;
+ 	int			aca_users;
+ 	refcount_t		aca_refcnt;
+@@ -196,7 +196,7 @@ struct inet6_dev {
+ 	spinlock_t		mc_report_lock;	/* mld query report lock */
+ 	struct mutex		mc_lock;	/* mld global lock */
+ 
+-	struct ifacaddr6	*ac_list;
++	struct ifacaddr6 __rcu	*ac_list;
+ 	rwlock_t		lock;
+ 	refcount_t		refcnt;
+ 	__u32			if_flags;
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index c669ea266ab717a9cbe6081d62a1f5b3c6e301f5..479c5777210acd0e3827241cb72025c4f66c38d0 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -5313,8 +5313,8 @@ static int in6_dump_addrs(struct inet6_dev *idev, struct sk_buff *skb,
+ 	case ANYCAST_ADDR:
+ 		fillargs->event = RTM_GETANYCAST;
+ 		/* anycast address */
+-		for (ifaca = idev->ac_list; ifaca;
+-		     ifaca = ifaca->aca_next, ip_idx++) {
++		for (ifaca = rcu_dereference(idev->ac_list); ifaca;
++		     ifaca = rcu_dereference(ifaca->aca_next), ip_idx++) {
+ 			if (ip_idx < s_ip_idx)
+ 				continue;
+ 			err = inet6_fill_ifacaddr(skb, ifaca, fillargs);
+diff --git a/net/ipv6/anycast.c b/net/ipv6/anycast.c
+index bb17f484ee2cde62632f95fc3b3370618b116049..0f2506e3535925468dcc5fa6cc30ae0952a67ea7 100644
+--- a/net/ipv6/anycast.c
++++ b/net/ipv6/anycast.c
+@@ -296,7 +296,8 @@ int __ipv6_dev_ac_inc(struct inet6_dev *idev, const struct in6_addr *addr)
+ 		goto out;
+ 	}
+ 
+-	for (aca = idev->ac_list; aca; aca = aca->aca_next) {
++	for (aca = rtnl_dereference(idev->ac_list); aca;
++	     aca = rtnl_dereference(aca->aca_next)) {
+ 		if (ipv6_addr_equal(&aca->aca_addr, addr)) {
+ 			aca->aca_users++;
+ 			err = 0;
+@@ -317,13 +318,13 @@ int __ipv6_dev_ac_inc(struct inet6_dev *idev, const struct in6_addr *addr)
+ 		goto out;
+ 	}
+ 
+-	aca->aca_next = idev->ac_list;
+-	idev->ac_list = aca;
+-
+ 	/* Hold this for addrconf_join_solict() below before we unlock,
+ 	 * it is already exposed via idev->ac_list.
+ 	 */
+ 	aca_get(aca);
++	aca->aca_next = idev->ac_list;
++	rcu_assign_pointer(idev->ac_list, aca);
++
+ 	write_unlock_bh(&idev->lock);
+ 
+ 	ipv6_add_acaddr_hash(net, aca);
+@@ -350,7 +351,8 @@ int __ipv6_dev_ac_dec(struct inet6_dev *idev, const struct in6_addr *addr)
+ 
+ 	write_lock_bh(&idev->lock);
+ 	prev_aca = NULL;
+-	for (aca = idev->ac_list; aca; aca = aca->aca_next) {
++	for (aca = rtnl_dereference(idev->ac_list); aca;
++	     aca = rtnl_dereference(aca->aca_next)) {
+ 		if (ipv6_addr_equal(&aca->aca_addr, addr))
+ 			break;
+ 		prev_aca = aca;
+@@ -364,9 +366,9 @@ int __ipv6_dev_ac_dec(struct inet6_dev *idev, const struct in6_addr *addr)
+ 		return 0;
+ 	}
+ 	if (prev_aca)
+-		prev_aca->aca_next = aca->aca_next;
++		rcu_assign_pointer(prev_aca->aca_next, aca->aca_next);
+ 	else
+-		idev->ac_list = aca->aca_next;
++		rcu_assign_pointer(idev->ac_list, aca->aca_next);
+ 	write_unlock_bh(&idev->lock);
+ 	ipv6_del_acaddr_hash(aca);
+ 	addrconf_leave_solict(idev, &aca->aca_addr);
+@@ -392,8 +394,8 @@ void ipv6_ac_destroy_dev(struct inet6_dev *idev)
+ 	struct ifacaddr6 *aca;
+ 
+ 	write_lock_bh(&idev->lock);
+-	while ((aca = idev->ac_list) != NULL) {
+-		idev->ac_list = aca->aca_next;
++	while ((aca = rtnl_dereference(idev->ac_list)) != NULL) {
++		rcu_assign_pointer(idev->ac_list, aca->aca_next);
+ 		write_unlock_bh(&idev->lock);
+ 
+ 		ipv6_del_acaddr_hash(aca);
+@@ -420,11 +422,10 @@ static bool ipv6_chk_acast_dev(struct net_device *dev, const struct in6_addr *ad
+ 
+ 	idev = __in6_dev_get(dev);
+ 	if (idev) {
+-		read_lock_bh(&idev->lock);
+-		for (aca = idev->ac_list; aca; aca = aca->aca_next)
++		for (aca = rcu_dereference(idev->ac_list); aca;
++		     aca = rcu_dereference(aca->aca_next))
+ 			if (ipv6_addr_equal(&aca->aca_addr, addr))
+ 				break;
+-		read_unlock_bh(&idev->lock);
+ 		return aca != NULL;
+ 	}
+ 	return false;
+@@ -477,30 +478,25 @@ bool ipv6_chk_acast_addr_src(struct net *net, struct net_device *dev,
+ struct ac6_iter_state {
+ 	struct seq_net_private p;
+ 	struct net_device *dev;
+-	struct inet6_dev *idev;
+ };
+ 
+ #define ac6_seq_private(seq)	((struct ac6_iter_state *)(seq)->private)
+ 
+ static inline struct ifacaddr6 *ac6_get_first(struct seq_file *seq)
+ {
+-	struct ifacaddr6 *im = NULL;
+ 	struct ac6_iter_state *state = ac6_seq_private(seq);
+ 	struct net *net = seq_file_net(seq);
++	struct ifacaddr6 *im = NULL;
+ 
+-	state->idev = NULL;
+ 	for_each_netdev_rcu(net, state->dev) {
+ 		struct inet6_dev *idev;
++
+ 		idev = __in6_dev_get(state->dev);
+ 		if (!idev)
+ 			continue;
+-		read_lock_bh(&idev->lock);
+-		im = idev->ac_list;
+-		if (im) {
+-			state->idev = idev;
++		im = rcu_dereference(idev->ac_list);
++		if (im)
+ 			break;
+-		}
+-		read_unlock_bh(&idev->lock);
+ 	}
+ 	return im;
+ }
+@@ -508,22 +504,17 @@ static inline struct ifacaddr6 *ac6_get_first(struct seq_file *seq)
+ static struct ifacaddr6 *ac6_get_next(struct seq_file *seq, struct ifacaddr6 *im)
+ {
+ 	struct ac6_iter_state *state = ac6_seq_private(seq);
++	struct inet6_dev *idev;
+ 
+-	im = im->aca_next;
++	im = rcu_dereference(im->aca_next);
+ 	while (!im) {
+-		if (likely(state->idev != NULL))
+-			read_unlock_bh(&state->idev->lock);
+-
+ 		state->dev = next_net_device_rcu(state->dev);
+-		if (!state->dev) {
+-			state->idev = NULL;
++		if (!state->dev)
+ 			break;
+-		}
+-		state->idev = __in6_dev_get(state->dev);
+-		if (!state->idev)
++		idev = __in6_dev_get(state->dev);
++		if (!idev)
+ 			continue;
+-		read_lock_bh(&state->idev->lock);
+-		im = state->idev->ac_list;
++		im = rcu_dereference(idev->ac_list);
+ 	}
+ 	return im;
+ }
+@@ -555,12 +546,6 @@ static void *ac6_seq_next(struct seq_file *seq, void *v, loff_t *pos)
+ static void ac6_seq_stop(struct seq_file *seq, void *v)
+ 	__releases(RCU)
+ {
+-	struct ac6_iter_state *state = ac6_seq_private(seq);
+-
+-	if (likely(state->idev != NULL)) {
+-		read_unlock_bh(&state->idev->lock);
+-		state->idev = NULL;
+-	}
+ 	rcu_read_unlock();
+ }
+ 
+-- 
+2.44.0.rc1.240.g4c46232300-goog
 
 
