@@ -1,129 +1,163 @@
-Return-Path: <netdev+bounces-74336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA5A2860EE8
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 11:08:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14D54860F11
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 11:19:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8510C2858F5
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 10:08:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE2841F25111
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 10:19:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54CCD5C915;
-	Fri, 23 Feb 2024 10:08:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B2E55CDEC;
+	Fri, 23 Feb 2024 10:18:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="lesdaC3A"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="GeCoMpt8"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB17F29D08;
-	Fri, 23 Feb 2024 10:08:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C3741642A;
+	Fri, 23 Feb 2024 10:18:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708682887; cv=none; b=U/eS3UFA54HSlWOxEHEXr0T0ERgqbFwHgB94xoJoCM1YbT5+nE8kCUhUrqZ+kfTr1DNGiJYfKy5LmL/Wb6yNVyORkaUoJFvc71/PSRwbcEXpYXR+wrrt1i4gbTTNkvBMR+pG2MNIe/buV4RZ+B9ZhvhdsR2AW2xKS+x63SZX3E4=
+	t=1708683531; cv=none; b=h318X2qX+B+cPMKDdy6yaqIZM7IcAPOdxgi5as0f9NvVOGY4jXuZHpHScNsaem/DvevXWbPRHtNoc2VIqZTWb42Iu74pLwMxQdyFlLOduZQZkXQZiSm+cw1nF/TdncqrZd94A9xaTyAsLTzKt67GTqZlLM8Dy4zcZI9vBpuSk2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708682887; c=relaxed/simple;
-	bh=Zin8l2qPLCAOlaxlh9w1w0UDrji5ob34On52/vcAqkA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=X3T363u6SW8ublAlniunN5PCeqlT2rZCcFN6o5JUEJAGvyV5XegnV9O4LcTbz2IuCGxrYDsNKH3UX66i3qQdnqn77+eTe1+CTBwFb/yXqT77JhNmO0ktgQTRcWXzhYZeZhpYRZDVn2f5e4h5cVnuRHlmym4QOl+BKzpvk4UYaQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=lesdaC3A; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 9A3A524000A;
-	Fri, 23 Feb 2024 10:07:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1708682876;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5c3jkfiwWBVIVcLpQtxgvJnB9TnAlyKeMM5FmscF5j8=;
-	b=lesdaC3AUqO4IhojWmi1I7Z8Y86vi8R00ZOyKv++IK4CwhLPLOgn5XY5k4oR3MF9KxG5bP
-	FHh8Vwvv8ZqVP7QC7gAed27JRdYn4HIB7z1pIItzXg4YYNTrETeym5e/QwVk9lB36wh9tm
-	JxbCR6BLtTMDJO9AvkEoN32a3DNz4gcCTqKL8Tr4ZDnrsyAQx7L0BHAgfYciUrRKAtWAd6
-	TbBK9YZKs7K2AT92OvKym9dtZqqCJBhxy0zzQxhyw1V+Tke2vFi33vAh1YiWLCw5Dgt4Bl
-	LyPfMMvW0GnXiDCqRuf8EqRFC3wBpgyr9kKf/gl7Wy0DYjAFj74/A+0yraffPA==
-Date: Fri, 23 Feb 2024 11:07:52 +0100
-From: Herve Codina <herve.codina@bootlin.com>
-To: Yury Norov <yury.norov@gmail.com>, Andy Shevchenko
- <andriy.shevchenko@linux.intel.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rasmus Villemoes
- <linux@rasmusvillemoes.dk>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, Andrew Lunn
- <andrew@lunn.ch>, Mark Brown <broonie@kernel.org>, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v4 3/5] lib/bitmap: Introduce bitmap_scatter() and
- bitmap_gather() helpers
-Message-ID: <20240223110752.2329d3f0@bootlin.com>
-In-Reply-To: <ZdfBuFZ7tf4b+3n8@yury-ThinkPad>
-References: <20240222142219.441767-1-herve.codina@bootlin.com>
-	<20240222142219.441767-4-herve.codina@bootlin.com>
-	<Zddqr3aN4rU-upai@smile.fi.intel.com>
-	<20240222174959.7097c29b@bootlin.com>
-	<ZdfBuFZ7tf4b+3n8@yury-ThinkPad>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1708683531; c=relaxed/simple;
+	bh=0kvbSqosJ5PV6gzc4ndMjbUoqfFey9a9gTa/COfANw4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=J6Rq2jg8rSVE+BquwIoRtRP9+TbCVfH04MqNCwwslgJrctnYt3ZC7G/mNkWcAVdDZyiDyZ0NmkKHN3oqvzOaCJdv8ASBOb64SrFbEqYltY7XpVaGdCH/GuFkvW4P3Yv5scrA+rimGPMxyrYXFSYeVLm877RIQ87AYyQnpNTHAm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=GeCoMpt8; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 41N7u7iV027179;
+	Fri, 23 Feb 2024 10:18:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=C2pBHnwMTIW0Lt1mPFv3jlV9ek01TT1xsSVaoZixcdw=; b=Ge
+	CoMpt80TaowAfNcB52WBhNG2Qp5pRwVIrZN3AM07+OT/cE8Ow8ntwJmiwpcypCI1
+	cTEupLNU6uIx0hAWB2iqyhgcNs0MrAGW/xV3H8ln4K+drhSrFSnYsyRIdPRCExrI
+	KJJ/93TprC6jh0Iep74FG9YlxY7mqCKBFVSuL96zIR23DglI+YrZ8CDFg88o1wOd
+	hB6YG+YirQFNjkgildBu57OiYBUq+zFOKzsgW752yr56VVnro0B9rw1iLZFfKwf9
+	12vATnB3ZtXCZ1/KAAzRcw1MTuagAG57twMjIjpf/fiKJbX/GgF90G0rz5rRny6y
+	i2nqO457aZmFrFjlqgwg==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3weqcf88xp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 23 Feb 2024 10:18:34 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41NAIXm2010206
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 23 Feb 2024 10:18:33 GMT
+Received: from [10.201.2.96] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Fri, 23 Feb
+ 2024 02:18:27 -0800
+Message-ID: <3a6d301d-16f6-4a11-8be5-6bbb6eb501f4@quicinc.com>
+Date: Fri, 23 Feb 2024 15:48:27 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 2/8] clk: qcom: ipq5332: enable few nssnoc clocks in
+ driver probe
+Content-Language: en-US
+To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+CC: Andrew Lunn <andrew@lunn.ch>, Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Michael Turquette
+	<mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>, Rob Herring
+	<robh+dt@kernel.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Catalin Marinas
+	<catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <linux-clk@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>
+References: <20240122-ipq5332-nsscc-v4-0-19fa30019770@quicinc.com>
+ <20240122-ipq5332-nsscc-v4-2-19fa30019770@quicinc.com>
+ <7a69a68d-44c2-4589-b286-466d2f2a0809@lunn.ch>
+ <11fda059-3d8d-4030-922a-8fef16349a65@quicinc.com>
+ <17e2400e-6881-4e9e-90c2-9c4f77a0d41d@lunn.ch>
+ <8c9ee34c-a97b-4acf-a093-9ac2afc28d0e@quicinc.com>
+ <CAA8EJppe6aNf2WJ5BvaX8SPTbuaEwzRm74F8QKyFtbmnGQt=1w@mail.gmail.com>
+ <74f585c2-d220-4324-96eb-1a945fef9608@quicinc.com>
+ <CAA8EJppuNRB9fhjimg4SUR2PydX7-KLWSb9H-nC-oSMYVOME-Q@mail.gmail.com>
+ <d518dbc1-41aa-46f9-b549-c95a33b06ee0@quicinc.com>
+ <CAA8EJppP_bAPRH7Upnq8dO7__xQPOJ6F_Lc-fpRAcutKKzk0eA@mail.gmail.com>
+From: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
+In-Reply-To: <CAA8EJppP_bAPRH7Upnq8dO7__xQPOJ6F_Lc-fpRAcutKKzk0eA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: TBM5zPBMFRANid5D1Kx_kZprPk2Mx-1T
+X-Proofpoint-GUID: TBM5zPBMFRANid5D1Kx_kZprPk2Mx-1T
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-22_15,2024-02-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=865
+ impostorscore=0 clxscore=1015 priorityscore=1501 suspectscore=0
+ spamscore=0 phishscore=0 lowpriorityscore=0 mlxscore=0 adultscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2402120000 definitions=main-2402230073
 
-Andy, Yury,
 
-On Thu, 22 Feb 2024 13:50:48 -0800
-Yury Norov <yury.norov@gmail.com> wrote:
 
-> On Thu, Feb 22, 2024 at 05:49:59PM +0100, Herve Codina wrote:
-> > Hi Andy, Yury,
-> > 
-> > On Thu, 22 Feb 2024 17:39:27 +0200
-> > Andy Shevchenko <andriy.shevchenko@linux.intel.com> wrote:
-> > 
-> > ...  
-> > > > + * bitmap_scatter() for the bitmap scatter detailed operations).    
-> > >   
-> > > > + * Suppose scattered computed using bitmap_scatter(scattered, src, mask, n).
-> > > > + * The operation bitmap_gather(result, scattered, mask, n) leads to a result
-> > > > + * equal or equivalent to src.    
-> > > 
-> > > This paragraph...
-> > >   
-> > > > + * The result can be 'equivalent' because bitmap_scatter() and bitmap_gather()
-> > > > + * are not bijective.    
-> > > 
-> > >   
-> > > > + * The result and src values are equivalent in that sense that a call to
-> > > > + * bitmap_scatter(res, src, mask, n) and a call to bitmap_scatter(res, result,
-> > > > + * mask, n) will lead to the same res value.    
-> > > 
-> > > ...seems duplicating this one.
-> > > 
-> > > I would drop the latter one.  
-> > 
-> > I would like to give details about the 'equivalent' in this scatter/gather case.  
+On 2/19/2024 3:53 PM, Dmitry Baryshkov wrote:
+> On Sun, 18 Feb 2024 at 06:29, Kathiravan Thirumoorthy
+> <quic_kathirav@quicinc.com> wrote:
+>>
+>>
+>>
+>> On 2/17/2024 10:15 PM, Dmitry Baryshkov wrote:
+>>> On Sat, 17 Feb 2024 at 17:45, Kathiravan Thirumoorthy
+>>> <quic_kathirav@quicinc.com> wrote:
+>>>>
+>>>>
+>>>> <snip>
+>>>>
+>>>>>> Reason being, to access the NSSCC clocks, these GCC clocks
+>>>>>> (gcc_snoc_nssnoc_clk, gcc_snoc_nssnoc_1_clk, gcc_nssnoc_nsscc_clk)
+>>>>>> should be turned ON. But CCF disables these clocks as well due to the
+>>>>>> lack of consumer.
+>>>>>
+>>>>> This means that NSSCC is also a consumer of those clocks. Please fix
+>>>>> both DT and nsscc driver to handle NSSNOC clocks.
+>>>>
+>>>>
+>>>> Thanks Dmitry. I shall include these clocks in the NSSCC DT node and
+>>>> enable the same in the NSSCC driver probe.
+>>>
+>>> Or use them through pm_clk. This might be better, as the system
+>>> doesn't need these clocks if NSSCC is suspended.
+>>
+>>
+>> IPQ53XX SoC doesn't support the PM(suspend / resume) functionality, so
+>> that, can I enable these clocks in NSSCC driver probe itself?
 > 
-> If you would like - please do! :)
->  
-> > If Yury is ok, I can drop this last paragraph.  
+> There is a difference between PM (suspend/resume) and runtime PM.
 > 
-> The original bitmap_onto() description is 3 times longer, and barely
-> that descriptive. I'm OK with your working and especially pictures.
 > 
 
-Right, I will keep my last paragraph in the next iteration.
+Thanks Dmitry. IIUC your question correctly, runtime PM for the 
+peripherals are not supported (except CPU cores which supports DVFS). 
+Since these are router based products, once system is powered on, all 
+the peripherals are configured to the required frequency and it will be 
+never go into low power modes.
 
-Regards,
-Hervé
-
-
+Please let me know if this answers your questions.
 
