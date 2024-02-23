@@ -1,106 +1,178 @@
-Return-Path: <netdev+bounces-74254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 743E68609E4
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 05:32:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43DE18609FA
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 05:46:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F00AB26AA9
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 04:32:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B3E491F22590
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 04:46:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE83DCA73;
-	Fri, 23 Feb 2024 04:32:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2F361119B;
+	Fri, 23 Feb 2024 04:46:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YEEEZ/+x"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="EFItMfhh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2057.outbound.protection.outlook.com [40.107.220.57])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 412C9B653
-	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 04:32:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708662763; cv=none; b=aEkPuQmVuKLImzcc/oFjoBZRVtkNM0S4o8xC7J6UY75kJ9m5NN3CwOL8hSbuJ+r8YQUtsAiv8SxINAigx1rXEeR9aqLhPg2NdpyGuP0AwWMQbLnbuSCmrg4oQyfE66ViTkdlFQQOp8ycQ39ozi2PgPsUij0bU6LJDVHUrC+6PNs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708662763; c=relaxed/simple;
-	bh=8BZbnY9jI009PGgVvz1Tocb24akIgTaDD/fuXWwhv9s=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=IXwGiVtmqe34RYC8wWcoFTP9X7zxhykAeRfQCiQlgw9CHBhEjr2h12w8mPSDJFi6bK6WZB5au4lR0Y1mzX7vOV8B1ROvsYEryDkcafD2tuAZCudGa/peC7f0EgQWX4dpF08hidVAQQq0qt30zKFTWnMDKQqWcI9uRiTWAxwTezc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sdf.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YEEEZ/+x; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sdf.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-608ab197437so8364357b3.1
-        for <netdev@vger.kernel.org>; Thu, 22 Feb 2024 20:32:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708662761; x=1709267561; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=L0Uk3bycxvUA/77qIVLpgAVW1f2vnY0th/QlZtNBt50=;
-        b=YEEEZ/+xRiSxmkFwnpwoUBLUDq5AEs7C+UBCRaCUmS0sJeZ9SVeGgIJIfh0A3edjdQ
-         qhyeD26L/WHd8+TPeCHa+K03Ep36cnWDH7fZffcO1raNjRF8xFR+04STQ1z2QYo/nFu+
-         QiURJ7KjEh6F9q1TswdGoOKF/x2yTyz7Y8J6u1ygrpk34coO3JdjWa3u/iXNNK0uN+QS
-         1rlFT6pwUGRYAPD2EkYQqip9PSpJBmQDYMoZepV92k2/pEr4FAy0unmWB1BWcq8x5uuM
-         /OB0akEmAnTssuGwe5L+1uJmQumNHbdHU2OgR2/cAJ8mCkA/aMd039FLhGS663xmLEzm
-         nS9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708662761; x=1709267561;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=L0Uk3bycxvUA/77qIVLpgAVW1f2vnY0th/QlZtNBt50=;
-        b=cG3vWnyGIOYnRup/8LfcjdaZYKV4PUni+8OGzbd7F/BoPnH0dU2t83aeU6Ngnefy0d
-         2tlRCjDDJo4HSi1jsdNWyW4Qhy4S4DmZn7ITFUFTvkgj5qM3r+DT9HQ+3zVQKsplwHaX
-         Ed/FwB9El3sdR1M8lVtnxp55nzJZCW/5liTFI4rLXkzcCZSBSrwReNxPtwzk8tk7Vhow
-         wS8VmqY0B9XMtTVtiRoQ9GMsmcudBpUASNQXFRh99zDx+JjAUstpodinnfX+94XYUIhV
-         5hFMvUS2TobkNfGcEqvfahv9HdYFzEQVZCVohaMgAvh0f37jmXy9y5ZP5xSrOFHS2FPa
-         nd2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWy4tHmru9XqfInl5U1AB4XaS4Z/pV6PXyFwMVfvviam1VHsPi7kBbCVWXIuQgb0x8gm0azyhxUHBGDK/M9dDyhsqlFHTYe
-X-Gm-Message-State: AOJu0YxwDvIqQoJ1SFmbNiTkXeyq4EeSHeHRrUnnEpz4X0iJS2MFC7/J
-	8TiItzsuwnA2aUUseatgpCdzGyMbkLRhwZ34Qz9CCzNPf0755JWfBNW+ZJAnW/gsoA==
-X-Google-Smtp-Source: AGHT+IH2A95OICnjSKeqiYFDzsIlvT6yo3YQAvN/ckMIuuKIGx5hV1gcqvZ3AUiVBh65C8Zxq31UsHw=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a81:9a48:0:b0:608:a8da:1caf with SMTP id
- r69-20020a819a48000000b00608a8da1cafmr317117ywg.6.1708662761200; Thu, 22 Feb
- 2024 20:32:41 -0800 (PST)
-Date: Thu, 22 Feb 2024 20:32:39 -0800
-In-Reply-To: <20240222174407.5949cf90@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E9DBC8DE;
+	Fri, 23 Feb 2024 04:46:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.57
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708663601; cv=fail; b=ryQ3bGAYN3bXUY359C0Xj2zT6S6Q5+k41Re3i9sttxWU+FDVM72AalG2skltK4BQyqDUBSMC9sTRkW3JDL0fV13F3BP8czhKD3kA3D0tp9oeAzVWxm4pkPmSoulsAsOcXYjM2umAYayebFWuTTzNywmxSfx+GVw/LCjBn6q8Zzo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708663601; c=relaxed/simple;
+	bh=qG7rCtXi/+BQB0iReAaib26C3PyLofDDMIm8TC2A90o=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=GykEhGi/HNESks1+gH5frt2hMsgSm9Z5uHaztQrc/P/ik18V5FHpC4JxygD7OqM+OOiWsXxJlNvKB8INqETRIX08h1ue8SlZNEIN/fr+yabDobVcnj2jf/GV2IPMqWqT6WFsGZ2DVHq+zqcLavn7JwXQejgxN/IQctJbPZQxqAY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=EFItMfhh; arc=fail smtp.client-ip=40.107.220.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RaZNeUZlQK//1GxxiT1s59vXDj1Lm6uAeACt6Y82TWIzlZSL1aycyxY93NKnQYxCB1o63oaICib9CXvVtMJmypoWQQOVTGuHwcjgsijrQ5easC/kRXRsV1ePBFEbg1hChBBj7zFVF9NDvznTBs0MsORKTMxJIastqUoQg2xFQU/A0bOFLJC87lzYrvnDhSnGPUTns6t1Ev6u8fskM1nmAMbU80adimH5Fqqmu+TQv9SQvg1Au0NAtsW6XROkzxwOfSnnJATduvUr7ZxqntfL1B9gegFiRlUFKVBOA1VX+6kOkLgVTksFkjuTbyGSS1bJFYdPjzF6ZTofbNDppAEbpQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rTs/X7DF7INX2lrmO7jk6w+fOYc7EzQnxXGddJH9Il0=;
+ b=HZoer5HguMFzNTgSZ5+XEGT6Jxn3dyfR7HsFCnPnKGKlPti6V2DsBAfJ0vjfCb76gBGopFBCXPQaH73sjfT8xvokALyoGwp0opWXjVxyN4uaF0DJEv5DINjBa2HXTkdQSEOugzTYIVNG6iKpIipdhWvBY3pQ2WGqCrvawQYUhFLDhGbcQBXWSx9Xu/ue/84/vin73dMO+jniOA7DvKI08oPGVNa8T/0/SfM42k1jX7ZZXvoSgxiTMlZ6UGabSM1x4JeO8VVgxW8RpnKiTEdqDkpJ+JYm9TLriMN0i7+GShKo29jf96IhUfOf345q4WsdGpsD5f+eYW/yBzO9wPJv1A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rTs/X7DF7INX2lrmO7jk6w+fOYc7EzQnxXGddJH9Il0=;
+ b=EFItMfhhl2Ny4G0/xDVOS1pAGyHrAcUZ4U4BmehO48FsXCiT0fvamOWCEodG+SPN8eKgk6eUiHBVxXdFpZxE1So58quLEDScVrnBarg0hssjVz6d9re8CS3ftj7xnkv1zDoBPx5Dh0Yrkq6V7c0awMaEZXsdjhOByvjGpHrSd8M=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL1PR12MB5946.namprd12.prod.outlook.com (2603:10b6:208:399::8)
+ by DS7PR12MB8290.namprd12.prod.outlook.com (2603:10b6:8:d8::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.24; Fri, 23 Feb
+ 2024 04:46:36 +0000
+Received: from BL1PR12MB5946.namprd12.prod.outlook.com
+ ([fe80::b440:9a95:dbfa:ae67]) by BL1PR12MB5946.namprd12.prod.outlook.com
+ ([fe80::b440:9a95:dbfa:ae67%2]) with mapi id 15.20.7316.018; Fri, 23 Feb 2024
+ 04:46:35 +0000
+Message-ID: <03499bd0-323d-4f57-99a8-d47c5ae680ae@amd.com>
+Date: Fri, 23 Feb 2024 10:16:26 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 2/4] net: macb: Add ARP support to WOL
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+ conor+dt@kernel.org, linux@armlinux.org.uk, vadim.fedorenko@linux.dev,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, git@amd.com
+References: <20240222153848.2374782-1-vineeth.karumanchi@amd.com>
+ <20240222153848.2374782-3-vineeth.karumanchi@amd.com>
+ <8e4a779a-22e7-4db2-b65e-69cca5e6fac5@lunn.ch>
+Content-Language: en-GB
+From: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
+In-Reply-To: <8e4a779a-22e7-4db2-b65e-69cca5e6fac5@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: PN2PR01CA0030.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:25::35) To BL1PR12MB5946.namprd12.prod.outlook.com
+ (2603:10b6:208:399::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240222223629.158254-1-kuba@kernel.org> <20240222223629.158254-2-kuba@kernel.org>
- <e6699bcd-e550-4282-85b4-ecf030ccdc2e@intel.com> <20240222174407.5949cf90@kernel.org>
-Message-ID: <Zdgf3EkGEWRfOjq5@google.com>
-Subject: Re: [RFC net-next 1/3] netdev: add per-queue statistics
-From: Stanislav Fomichev <sdf@google.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: amritha.nambiar@intel.com, davem@davemloft.net, netdev@vger.kernel.org, 
-	edumazet@google.com, pabeni@redhat.com, danielj@nvidia.com, mst@redhat.com, 
-	michael.chan@broadcom.com
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5946:EE_|DS7PR12MB8290:EE_
+X-MS-Office365-Filtering-Correlation-Id: 59e6d274-8fc8-46ac-6f66-08dc342a6a37
+X-LD-Processed: 3dd8961f-e488-4e60-8e11-a82d994e183d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	vwHPx13eNCHwJ6BP1BlOTy8sAnfuwaYmooLhegUhowrb+dy+aKnDuYTKFZwYPp6H1LdF3/Dwiy98giYRS/PdmzTu8H8FmbAyPs9XONsulIwzwMjTypfIPtKQx9hxIDrgzGmN+AVovobSSVIv4W9x2u7mEWMjFaw31eSjxYIR6HJ8dfN/JeGbvlzTj6oX+hlFjaFPnOva0w3gZX5ae7Sd9jQp2ooN/9tz5BqCOHcjOW9p/5/NTQSMt2CHDJp7PntQXUsKhOCPnC7z7T1qmCrggpCPKb2geoG9LcDuAMXvgUuXRwRCTywUXFl/49y1q8oVuPRNzLxDptXwlgAm2CdzI4MmrZ3DEZ0rwkNuttwDLzUQdGoYig7U4haMRgOGJqs01PAQL9bgXXELAGlhQhYcMyZCxrA3vECLXoTtPkKaKVXIC54iyzUHknRnSrLRuQ4hO/6PwJxyg5zGuBvvCM8ALolO0lZBLYM0Hg2lQCUofX8Cv+lYCOIj0/clc8xupoOVT86JOt/IMqAPi6DBnah/CpKYa4vUO+pAgWOEyGX9J3I=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5946.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?QUR3NzVGVmVaZWR2TDZnTlNyeU5KVm90c0p5azBZUGhpR0R3bitmYkd4RXBQ?=
+ =?utf-8?B?UERSZXZpalRpWWJuWmxuNGsyaG1UeElWczJiQlBvZEVyNG5OYm5Vc3o2TlVW?=
+ =?utf-8?B?MnA4TUl2K2xwU2JMbjNRUDkvbDFoVWZSS0Nsb084eDZIRS9BVU41RitMOG5W?=
+ =?utf-8?B?NTdzc0hKYldGdlNJSEkzdWVwZXNXdmdpWHQ1UERSU1FQN1ZuR2VwQ0dYWjMw?=
+ =?utf-8?B?ZjlEdGZQdXowUFBzWHBZNFV1dHk3emYxeGRNVk5LRkN6c0FtMFZPeDB6UmdZ?=
+ =?utf-8?B?dEd0Y2cxa2xCbHhZV3kzQkNaS1FIaGRrbE1nTHBQeHdaaWFadzJjY2dENVRL?=
+ =?utf-8?B?SEtRMjgvTUVpdTVySHcrVUVnSlJFekM2K3p1QTZvNENleDBEVHhVNzZDcHZo?=
+ =?utf-8?B?cytNcEFsa3NnQ21HWmVMZnM1RnNHTnl5YWhPTkdLZGprbEVybmNPalM4OXFN?=
+ =?utf-8?B?cHlBV0xSTmYxbUU0YnB1SWloZ29mSnhvOG9NclFYZWZwRTIvV2FYaXlUeEpU?=
+ =?utf-8?B?cWdLd0lnMHJnanZqTkx3K0JwaHFiMEhCZmNBR3FrbVdzcE9ZNnAxMUgxVVlX?=
+ =?utf-8?B?M3pOa2dsUUZjSzk0TWVkSjUzTmd6Y2pacDFyNFRaeDFLM3R0aW1OQlhuN1FP?=
+ =?utf-8?B?SUFmQmI5ak5hZ09CUitrVUh5MjJxaXozSS95ZkxRcVBOekFiSDdiTzlhZ1RG?=
+ =?utf-8?B?L2M2SlA1TndNMjl0R1ZHcEEyRFNiaHJmMUVzY1laWmF4LzRISGdPN2RYajJn?=
+ =?utf-8?B?Rmh4V0x0SnFGU1c2Myt3Z1JHSE93czc1dTczTDdQZVBCWktsREZvdU9PVDh6?=
+ =?utf-8?B?UGViQXJvaENybkd3cnRXUWlVVGo0TmhmZXpFaEt5ZGI2NW0xWFk3VWltQjBY?=
+ =?utf-8?B?MGpUWExYL0I1N0c3aXpKV1M1THRILytheHBzL3J0VnMyTy9OY2NmeFM4cTVY?=
+ =?utf-8?B?ZjdQa0xBUVNkMW43MW1kM0pqZXVFZVoyaXV3d2NZaS8rMkhsOTZLS0F2L0E5?=
+ =?utf-8?B?QjE2RFlVYmJyM0FJRFZmaGdOWUtFcW93ckZlYkJJRlBsNUNITXIxM0xGNGpi?=
+ =?utf-8?B?bUR4M3kvQklDWEJISi9oRHlPRjhZQmIwSnQrejRyT0NWc1B1ZDYyUGFkTGZW?=
+ =?utf-8?B?SkNUM0prOHQ1WXRPWjZmbDA0VFBrdzYxYkpWRFZQUzRXTUZ5SExWeGhrZEYx?=
+ =?utf-8?B?Ti9jSVNMSkM0ZUQxRXRzSVgyVjdiYUVYd2J6N0hJMEZNbCtPWmxVRVkxMXBm?=
+ =?utf-8?B?c0UzRWpoV3lOS1hyNlVHcENEYWVLNCtKY2JvWHpTeWRSNkVVdko5ZHlReUpT?=
+ =?utf-8?B?cGFCSVAzcFRwYnVZVGU3c1NzTmtjMnYwUGhndU1iTi9NelhSZ01MbVRYT1A0?=
+ =?utf-8?B?RklTTHZiNmpCeGFlYVNQb0RLTndpT2RaUnNFeDlMWUx1cm9OTEpaNUdSRGVQ?=
+ =?utf-8?B?TFhMN0lGRVRBejUxQlp5STNyK3FKZi9nSUR3KzVmVUlwVG9rbVRjcnY2THBH?=
+ =?utf-8?B?WXR3RVBWN3VxL3doSWlVYnVscEw0dU5QM0hCdEE2dVdZcURBeVJOKzZBY0s2?=
+ =?utf-8?B?eTlZL2l1Y1pNZVlXMXFsdHROSkpDOUs3dnFmejQ2d0lVQW5iVUcvNjR4T01y?=
+ =?utf-8?B?aEZqWmp3TGZBakNvWFJKNG41WE44elhuTmF3Y0o2NXZXZW41RGJlU244eWF5?=
+ =?utf-8?B?YWZIMGp0cDBDRWJIMzhTRFFLR2duMGJPeTB5WXlSYjlMNTdGTWkvWDlqenNk?=
+ =?utf-8?B?bkdBVkRzLzFIQzVJTHE5TDk4T1lwcm9HMDRZdFBydEJoRHphelh2cStuVUNi?=
+ =?utf-8?B?Qkl0SDZaRjNvSXRDUjdqOStlQ3RVeDFBc3VSS2NCOWhrdkMxUVhzSjBjeWZx?=
+ =?utf-8?B?bDZoNFB5SFlOR0lCMndteUkxYldhTUNnSExBSlBVWDVnSWhqVksyU1diRWNs?=
+ =?utf-8?B?VnFDazlMcXRqaEFmVFp3NWw1RkZwcmtlOVI4RHlveXN3RDZqakVxcVV0NUxk?=
+ =?utf-8?B?akh5VTR2OW0wRmFSbWl6NGhJVnRRanFRSTNIZ2VZaUw5enVaaVJYSU9vYzA0?=
+ =?utf-8?B?N29TcnJFWUtYaEt6S1JuQXcwWTllLzhzRzlSa1l1WHFvcHNnWlYyaGZkUzlB?=
+ =?utf-8?Q?XKQVD6cg4FMXCm0GGfxMfzG9F?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 59e6d274-8fc8-46ac-6f66-08dc342a6a37
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5946.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Feb 2024 04:46:35.8212
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 15krgvatj8d7U5GSybKqwV09sCF7r1ahwG/Gl5HM5WK77B5OwKt9dXAfD/jdJdRd
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8290
 
-On 02/22, Jakub Kicinski wrote:
-> On Thu, 22 Feb 2024 16:29:08 -0800 Nambiar, Amritha wrote:
-> > Thanks, this almost has all the bits to also lookup stats for a single 
-> > queue with --do stats-get with a queue id and type.
-> 
-> We could without the projection. The projection (BTW not a great name,
-> couldn't come up with a better one.. split? dis-aggregation? view?
-> un-grouping?) "splits" a single object (netdev stats) across components
+Hi Andrew,
 
-How about "scope" ? Device scope. Queue scope.
+On 23/02/24 1:02 am, Andrew Lunn wrote:
+>>   	u32			wol;
+>> +	u32			wolopts;
+> 
+>> +	wol->supported |= (bp->wol & MACB_WOL_HAS_MAGIC_PACKET) ? WAKE_MAGIC : 0;
+>> +	wol->supported |= (bp->wol & MACB_WOL_HAS_ARP_PACKET) ? WAKE_ARP : 0;
+> 
+>> +	if (bp->caps & MACB_CAPS_WOL)
+>> +		bp->wol |= (MACB_WOL_HAS_ARP_PACKET | MACB_WOL_HAS_MAGIC_PACKET);
+> 
+> So bp->wol is the capabilities of the hardware?
+> 
 
-> (queues). I was wondering if at some point we may add another
-> projection, splitting a queue. And then a queue+id+projection would
-> actually have to return multiple objects. So maybe it's more consistent
-> to just not support do at all for this op, and only support dump?
+Yes, it holds the supported capabilities.
+
+> And bp->wolopts is what has been enabled via ethtool?
 > 
-> We can support filtered dump on ifindex + queue id + type, and expect
-> it to return one object for now.
+
+Yes, it holds the selected options through ethtool.
+
+> I just wounder if it would be easier to understand is bp->wol was
+> renamed wol_caps, similar to bp->caps?
 > 
-> Not 100% sure so I went with the "keep it simple, we can add more later"
-> approach.
+> 	Andrew
+
+Sure, I will make the change.
+
+🙏 vineeth
 
