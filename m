@@ -1,158 +1,254 @@
-Return-Path: <netdev+bounces-74514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C19D7861A9B
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 18:51:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B35C2861AAE
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 18:53:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 605051F24DD2
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 17:51:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6F591C25C02
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 17:53:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68AFD13A87A;
-	Fri, 23 Feb 2024 17:50:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08D4B140E5C;
+	Fri, 23 Feb 2024 17:53:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Eu0rUko+"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KVoIDwqc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC6CB12D758;
-	Fri, 23 Feb 2024 17:50:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 562F6141982
+	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 17:53:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708710635; cv=none; b=rk1dOl9OOmk5UAQ6bGkooNaHz1Va8vMlVLS4rrzViqLe1AQWGGwOpSAG9XWuwIv4ZmFGkdpJyvihTOpcoHuM6I+8YgdDfbOM+uZVJLOCp1n8+SP8r2q1ZwZubcgye6CeTBmsNqNfvFJr6d0eS8BoMZCdngCaspb9ff9DTpPSQd0=
+	t=1708710793; cv=none; b=dFI8u9FiN3Ne9XGn8v7aMj0ZOhRBKIcuzIjHOYboTwRUtfys/1iVaS4E8nxl0uPeUBLQRoqNiWudoNouVPSz4fyAUHthWMhlU77tF1NNEqKeY6PFSpNquzfoL99k7cvVCLxyzyLee00rKFJ3xTc8hnSqtiCidCRxFcn/QMUby1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708710635; c=relaxed/simple;
-	bh=B6DmhEttlW8Mu2glpPfxHo63S9rUwJ+jcUzzSCLsRmg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VI8w7fwI4CtMRT38r0URoppsrEMp29U3AlAU0R5tbwtWcIcbrl/e8XuBGMMnpBMCd67ejUwGwrv95n8gcwrCpbRVQnmDuP/nkNJAzVN7Y6pydIP3O9lyUiHk+NyBH1dRStC2yrmJ8t9DQKIQMhU69Im1b393KCrHAq9lJhiemnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Eu0rUko+; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708710632; x=1740246632;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=B6DmhEttlW8Mu2glpPfxHo63S9rUwJ+jcUzzSCLsRmg=;
-  b=Eu0rUko+nImkEm/asxct11KJmADnNSLX1TVr98AtOPvW5DoW27dg7/xC
-   iovCDlc2qxak1JT/TquMQCH5WjZF+M9AU4qehHVslkI0hN+qILdxd0MV6
-   zO8uJIanKsmhqmW71psrLSxFAfI6zK7xE6SOUIwJoYpgYAtBDgawRXJXb
-   r9dYoeQH5gKf0t+tg9uBcQYl5nRybdD4EuUdEhGQc90LAPXl8inoFcBR7
-   az1LJM9A9zxaRtzgyUC3PXNiVHw8Ig95F7Z3dm8XJpFwiADckOHJKDAXd
-   9LNrtBz7S2vJC+K69mRUZE+usAKQDx8u03zI6PeCzgpHEaSndqMrPr00D
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10993"; a="2925139"
-X-IronPort-AV: E=Sophos;i="6.06,180,1705392000"; 
-   d="scan'208";a="2925139"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2024 09:50:32 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,180,1705392000"; 
-   d="scan'208";a="6454681"
-Received: from lkp-server02.sh.intel.com (HELO 3c78fa4d504c) ([10.239.97.151])
-  by orviesa008.jf.intel.com with ESMTP; 23 Feb 2024 09:50:27 -0800
-Received: from kbuild by 3c78fa4d504c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rdZgm-0007jH-1L;
-	Fri, 23 Feb 2024 17:50:24 +0000
-Date: Sat, 24 Feb 2024 01:49:40 +0800
-From: kernel test robot <lkp@intel.com>
-To: Richard Gobert <richardbgobert@gmail.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	idosch@nvidia.com, razor@blackwall.org, amcohen@nvidia.com,
-	petrm@nvidia.com, jbenc@redhat.com, b.galvani@gmail.com,
-	bpoirier@nvidia.com, gavinl@nvidia.com, martin.lau@kernel.org,
-	daniel@iogearbox.net, herbert@gondor.apana.org.au,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev
-Subject: Re: [PATCH net-next 1/2] net: vxlan: enable local address bind for
- vxlan sockets
-Message-ID: <202402240119.AR4eT8mt-lkp@intel.com>
-References: <a4cd1adb-74d4-4eea-9f74-0d0ac3d79e44@gmail.com>
+	s=arc-20240116; t=1708710793; c=relaxed/simple;
+	bh=K/Qa450UxwEpzK/bd7Vmha4teGVBS4ddVrrPU1jvvdM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XW4rjlrti05gfFo+VsCXfRzBX1CO6gNY1jJx1xYdvaaIfEQUxwmIVI6abPY9cCC1RYLkO98WaAzhT6aVt9dbZF4cJSgAP0YM061134WpyPR6WR/gB+9TQBK2f/QZgZ5J+bvZc3GcIZSdIdf7x3lfzFxP1mTkWA7uVBSFINhbuO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=KVoIDwqc; arc=none smtp.client-ip=209.85.221.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-4ccce61a0e8so248777e0c.0
+        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 09:53:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1708710791; x=1709315591; darn=vger.kernel.org;
+        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=S9/Yz+HBneG9SkRVmfbdOMo2YpYQpNHUw0B+w1bYII0=;
+        b=KVoIDwqcAJA0svV6BZJffgFDSrnxysBBvk3GdlDArvLEhmafeOWsKY/gOIrXs3YeVs
+         cxl7oLn5JLCvdMmDTaqHVpFFPDmbbXw106qcM98Ytf3GNkKzNDneWim+0SJmXace9KwI
+         vR43d0VCG8PKG2beKAYTmMGhI48Qht6E2o3Z8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708710791; x=1709315591;
+        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=S9/Yz+HBneG9SkRVmfbdOMo2YpYQpNHUw0B+w1bYII0=;
+        b=r2PvX7Bh9njzvMAdRpY+kkKduEa4RWhIm6HL16mVsU8dbyd625E9jgRzLeucLCuA+o
+         nUyXVGNPm1fSwc7MxXarT4U8WXqirLTHOlQH1MdIIS7jXqFx9dEX4mBspl2BLPXifwRY
+         HKz22L5TxAC5qGok5oQfW5FO87FkETfOjUcuNi92dYKiVOeTv7XHAQELcUtODM4aq4DI
+         mVkWUEnAlW2yaPOa0WKOdgwJrc8uEBeEMeimlPatqU4WzEj7QVvrBVWq3lZTx3kHmJmR
+         bMD8xGWmmfDMy2fA3ZZEwNEtsmlsAIpjPMMr7qi3GVsWuPkTIvaDpYBNVwGSk+FWVdYJ
+         90Dg==
+X-Forwarded-Encrypted: i=1; AJvYcCWinR4w8U36lMoBgvasujjwuAimTLgc+Bb+Bw0axbwgIqw2IfRllLsW+n4ZM1Il1+M0zz8Qo2KiGXM3F60bcY6Bl1W8k1Iu
+X-Gm-Message-State: AOJu0YxVXs6ZmiB7yCgpEcpBNesUAtjIUYvtjbSPBEIQujQSOqSMceTc
+	kyZQS3f2TrRO10uzwNmqLu9GrAtE72av7JoKQ5oE6uSyJFHJl0r1Qebx/HdlgQ==
+X-Google-Smtp-Source: AGHT+IHZdj7LKYSB/rY3fwA7E3H6JJvCiSsfiyosamucTfXEBJOOnVHBCbWFC9wvhaLeqrV7oYZDAA==
+X-Received: by 2002:a1f:6dc1:0:b0:4c8:cb19:f6a1 with SMTP id i184-20020a1f6dc1000000b004c8cb19f6a1mr534933vkc.16.1708710791239;
+        Fri, 23 Feb 2024 09:53:11 -0800 (PST)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id g1-20020ad45141000000b0068f8a00f581sm5243702qvq.106.2024.02.23.09.53.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Feb 2024 09:53:10 -0800 (PST)
+Message-ID: <6af3406a-7968-41e5-bf6e-71d020d8b28a@broadcom.com>
+Date: Fri, 23 Feb 2024 09:53:06 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a4cd1adb-74d4-4eea-9f74-0d0ac3d79e44@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 5/8] net: phy: Immediately call adjust_link if
+ only tx_lpi_enabled changes
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Wei Fang <wei.fang@nxp.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, kernel@pengutronix.de,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+ NXP Linux Team <linux-imx@nxp.com>
+References: <20240223094425.691209-1-o.rempel@pengutronix.de>
+ <20240223094425.691209-6-o.rempel@pengutronix.de>
+ <Zdh1nMWZDynP/AMc@shell.armlinux.org.uk>
+ <84e1368d-ec6a-48af-945b-509528c45dff@lunn.ch>
+ <Zdic+ua5LnWxjLPn@shell.armlinux.org.uk>
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ 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
+In-Reply-To: <Zdic+ua5LnWxjLPn@shell.armlinux.org.uk>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000c14a890612103b40"
 
-Hi Richard,
+--000000000000c14a890612103b40
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-kernel test robot noticed the following build errors:
+On 2/23/24 05:26, Russell King (Oracle) wrote:
+> On Fri, Feb 23, 2024 at 02:17:59PM +0100, Andrew Lunn wrote:
+>> On Fri, Feb 23, 2024 at 10:38:20AM +0000, Russell King (Oracle) wrote:
+>>> On Fri, Feb 23, 2024 at 10:44:22AM +0100, Oleksij Rempel wrote:
+>>>> +static void phy_ethtool_set_eee_noneg(struct phy_device *phydev,
+>>>> +				      struct ethtool_keee *data)
+>>>> +{
+>>>> +	if (phydev->eee_cfg.tx_lpi_enabled !=
+>>>> +	    data->tx_lpi_enabled) {
+>>>> +		eee_to_eeecfg(data, &phydev->eee_cfg);
+>>>> +		phydev->enable_tx_lpi = eeecfg_mac_can_tx_lpi(&phydev->eee_cfg);
+>>>> +		if (phydev->link)
+>>>> +			phy_link_up(phydev);
+>>>
+>>> I'm not convinced this is a good idea. Hasn't phylib previously had
+>>> the guarantee that the link will go down between two link-up events?
+>>> So calling phy_link_up() may result in either the MAC driver ignoring
+>>> it, or modifying registers that are only supposed to be modified while
+>>> the MAC side is down.
+>>
+>> When auto-neg is used, we expect the link to go down and come back up
+>> again.
+>>
+>> Here we are dealing with the case that autoneg is not used. The MAC
+>> needs informing somehow. If we want to preserve the down/up, we could
+>> call phy_link_down() and then phy_link_up() back to back.
+> 
+> Would it be better to have a separate callback for EEE state (as I
+> mentioned in another comment on this series?) That would be better
+> for future SmartEEE support.
 
-[auto build test ERROR on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Richard-Gobert/net-vxlan-enable-local-address-bind-for-vxlan-sockets/20240223-045600
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/a4cd1adb-74d4-4eea-9f74-0d0ac3d79e44%40gmail.com
-patch subject: [PATCH net-next 1/2] net: vxlan: enable local address bind for vxlan sockets
-config: arc-randconfig-r133-20240223 (https://download.01.org/0day-ci/archive/20240224/202402240119.AR4eT8mt-lkp@intel.com/config)
-compiler: arc-elf-gcc (GCC) 13.2.0
-reproduce: (https://download.01.org/0day-ci/archive/20240224/202402240119.AR4eT8mt-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202402240119.AR4eT8mt-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   drivers/net/vxlan/vxlan_core.c: In function 'vxlan_create_sock':
->> drivers/net/vxlan/vxlan_core.c:3498:34: error: 'struct udp_port_cfg' has no member named 'local_ip6'; did you mean 'local_ip'?
-    3498 |                 memcpy(&udp_conf.local_ip6.s6_addr32,
-         |                                  ^~~~~~~~~
-         |                                  local_ip
-
-
-vim +3498 drivers/net/vxlan/vxlan_core.c
-
-  3482	
-  3483	static struct socket *vxlan_create_sock(struct net *net, bool ipv6, __be16 port,
-  3484						u32 flags, int ifindex,
-  3485						union vxlan_addr addr)
-  3486	{
-  3487		struct socket *sock;
-  3488		struct udp_port_cfg udp_conf;
-  3489		int err;
-  3490	
-  3491		memset(&udp_conf, 0, sizeof(udp_conf));
-  3492	
-  3493		if (ipv6) {
-  3494			udp_conf.family = AF_INET6;
-  3495			udp_conf.use_udp6_rx_checksums =
-  3496			    !(flags & VXLAN_F_UDP_ZERO_CSUM6_RX);
-  3497			udp_conf.ipv6_v6only = 1;
-> 3498			memcpy(&udp_conf.local_ip6.s6_addr32,
-  3499			       &addr.sin6.sin6_addr.s6_addr32,
-  3500			       sizeof(addr.sin6.sin6_addr.s6_addr32));
-  3501		} else {
-  3502			udp_conf.family = AF_INET;
-  3503			udp_conf.local_ip.s_addr = addr.sin.sin_addr.s_addr;
-  3504			memcpy(&udp_conf.local_ip.s_addr,
-  3505			       &addr.sin.sin_addr.s_addr,
-  3506			       sizeof(addr.sin.sin_addr.s_addr));
-  3507		}
-  3508	
-  3509		udp_conf.local_udp_port = port;
-  3510		udp_conf.bind_ifindex = ifindex;
-  3511	
-  3512		/* Open UDP socket */
-  3513		err = udp_sock_create(net, &udp_conf, &sock);
-  3514		if (err < 0)
-  3515			return ERR_PTR(err);
-  3516	
-  3517		udp_allow_gso(sock->sk);
-  3518		return sock;
-  3519	}
-  3520	
-
+That sounds like a good approach to me. The additional callback also 
+helps figure out which drivers use the API and it should be simpler to 
+audit for changes in the future, too.
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Florian
+
+
+--000000000000c14a890612103b40
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBVgwggRAoAMCAQICDBP8P9hKRVySg3Qv5DANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMjE4MTFaFw0yNTA5MTAxMjE4MTFaMIGW
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEZsb3JpYW4gRmFpbmVsbGkxLDAqBgkqhkiG
+9w0BCQEWHWZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
+AQ8AMIIBCgKCAQEA+oi3jMmHltY4LMUy8Up5+1zjd1iSgUBXhwCJLj1GJQF+GwP8InemBbk5rjlC
+UwbQDeIlOfb8xGqHoQFGSW8p9V1XUw+cthISLkycex0AJ09ufePshLZygRLREU0H4ecNPMejxCte
+KdtB4COST4uhBkUCo9BSy1gkl8DJ8j/BQ1KNUx6oYe0CntRag+EnHv9TM9BeXBBLfmMRnWNhvOSk
+nSmRX0J3d9/G2A3FIC6WY2XnLW7eAZCQPa1Tz3n2B5BGOxwqhwKLGLNu2SRCPHwOdD6e0drURF7/
+Vax85/EqkVnFNlfxtZhS0ugx5gn2pta7bTdBm1IG4TX+A3B1G57rVwIDAQABo4IB3jCCAdowDgYD
+VR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3Vy
+ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEG
+CCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
+MmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93
+d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6
+hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNy
+bDAoBgNVHREEITAfgR1mbG9yaWFuLmZhaW5lbGxpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
+BgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUwwfJ6/F
+KL0fRdVROal/Lp4lAF0wDQYJKoZIhvcNAQELBQADggEBAKBgfteDc1mChZjKBY4xAplC6uXGyBrZ
+kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
+2s1RH00JOkO5SkYdwCHj4DB9B7KEnLatJtD8MBorvt+QxTuSh4ze96Jz3kEIoHMvwGFkgObWblsc
+3/YcLBmCgaWpZ3Ksev1vJPr5n8riG3/N4on8gO5qinmmr9Y7vGeuf5dmZrYMbnb+yCBalkUmZQwY
+NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
+AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
+LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
+/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIE9ZYoZxkFaeb/bb
+eDJIqZ1tX1BaN1D5WQYkJFYresFPMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
+AQkFMQ8XDTI0MDIyMzE3NTMxMVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBTkaGCgUDipSVtmu2KC/ddlQtWgfd9WYn/
+NQNGUCHacmQZxA92f8SQ526SE5uzNsXIGoka0aOHUs3rn5A51HnafWvdkR+t5AETiHL/LbRBiSh7
+YVQf7SbsNCekrUdD2rRTbNkk1g8QSedlyKHlWIBTxDJSTGNL0arlnCTXSCB5S8+/Qrsk0EUvRwJb
+z2GhFh9cdL/CdzbYd8W3pxximYd8lghefC+1MtYFM5SxMOdEgdcMXBqbVgqUFn8yCf7JG9jqHn2M
+x4YWcrPa88f7RUBh9LbEQfIlzMShUnWac6MKn0UIPp+H0Xxyu1C/YjimWLR2JDZktJ8e7h1Nf0Cr
+PUH8
+--000000000000c14a890612103b40--
 
