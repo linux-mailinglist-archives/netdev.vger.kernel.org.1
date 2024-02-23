@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-74257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 302BD860A00
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 05:51:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 12B91860A08
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 05:52:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1862A1F228DC
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 04:51:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FE971F23083
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 04:52:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9390AF9EB;
-	Fri, 23 Feb 2024 04:51:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E053411714;
+	Fri, 23 Feb 2024 04:52:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HVLc+QRb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XKIKhdKO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8FC91119E;
-	Fri, 23 Feb 2024 04:51:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E956F9EB;
+	Fri, 23 Feb 2024 04:52:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708663898; cv=none; b=Wx3ePlly8YxYZ9hd6MDVX8tPeA2Vt3JIx2FwLRbc6cRlTvw2zGNyq5naPLX/7NQCwHEFgf+GlwRgObHrYUD/sEUiiNbiDEh/fx8y1nbfweNhKAgFeGTzyKc/BW04/rG6IMNRvd6oE00hUUBZzEYVwnZuF8hSfdHR+e89ChxO92I=
+	t=1708663950; cv=none; b=bJnM5AfU271YLYjWOczCIixYuQf1iYDS4UYIFGwxCqL7aYH0nhpHw/wgxjVu7azhUM2VMnZleh402OLC71w8UW0ZSRopTz1AMVvJ6n/X0PG7nQU7UUO/bSDhlIKIm38lnlKFeoNycCqDrhD9ven2OnVnoTcN09LFXdoe4ui+5iU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708663898; c=relaxed/simple;
-	bh=WpZgxRWc3wAmq+d6+4bjJvvI0kreM0RJjYmJMz355nY=;
+	s=arc-20240116; t=1708663950; c=relaxed/simple;
+	bh=5PTfX80/bQ1o87H5HPd7AEsLTksxYx9rev4SH2GT2+8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kjlypb/yKA05I7NjI9MHy+e9SQ9q1kQ1RQ4p/hGfw9HXe9h1hbhyPA+uz5LOc8TJbTbOXYlMCcin6wNzWUYxH1e4ap94J86BMAr3sDTSzjHmdGFUHQm/OpjvN7bVJXM/p6SjL5EfiLZ3U4S1whNlvkC+tj1jJt358CyISNfrv3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HVLc+QRb; arc=none smtp.client-ip=209.85.219.51
+	 In-Reply-To:Content-Type; b=i3fN8sJ4aTPZaDiSmvBKVp/KRkUDvJ8NdE5EVllt4/miTo9zWspkyVIlYQhXoONO/DdMRwc0kg4mmI6+SLJu4MiYLc2UAwXtgqR4TE/8ud6129BOznLIDd9p2DBBZ3ZfYQvICLTH9yxGHxhA+z+TVRHrVn3fYHNw/+v92EzuBY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XKIKhdKO; arc=none smtp.client-ip=209.85.222.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-68facd7ea4bso2248326d6.0;
-        Thu, 22 Feb 2024 20:51:36 -0800 (PST)
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-781753f52afso24644585a.2;
+        Thu, 22 Feb 2024 20:52:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708663895; x=1709268695; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1708663948; x=1709268748; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=lwS5WBBcqvq1/ZN9IhwTyGP1bYKqILTox2fPA4BOLCY=;
-        b=HVLc+QRblmZe7dRrvOj4noaTKxJRmGF6x/Ho9JF8FOes4RLfUl+/J6a2xLZZPa5+pt
-         3ZX0lwDJloZEUxL0HrXI7RTWjkjAMOfr49FHRUQkp2nn2yXcPNqaYeNM+OmRzkcDZQ1y
-         ddDMcVyZQJG1XMGrqni//bMcsl0DhSTRgKI45B0OF9mRrRXa4iG8r9kddpOB5QqIWpqU
-         KYHGymrcYbFd6NaTdWj/vzas1/EthncvXHDQs81Fm+EMXQWAi+QVOjYCF4uJo6hoVx/n
-         gAwUQezB+Vh53z4KdGhXX/lNsPl9iCTdp7BmRGbBv53/ji4puTqTKM/slUFaSCtosq+G
-         b/sQ==
+        bh=nUKdQ1p1yvY+Jb/hV5EdO0oqfUVhz8NS/UAthKwPm/A=;
+        b=XKIKhdKOSRAWp/AIrG2Ne6xW5+yjuF+wgYdnT6dwNqG6jZD9tyZQDOCeFvPV4bbfv2
+         u3XB2+rOpjQUt8NCqCI8YKjkkY9WDtqtIqFGchvNwI6hQVbc83VTHcqB9ATAKPI2CySc
+         6kMR+35DLzS4GVLRy0GFlFkm9h+1cN/RA+7bY20jMTZrSayCzl3zSTAXVsYEpcp48xZx
+         F7jN8/g/ScHvy8NU9c+53dWJgJCT3RA8YUnfWmxMR501s19eDhUdE1WquC+abOIs5aFr
+         8oUMD5Vs8Sla1yP0cEB97zg7t/3UQCV69pkYXrpILKWfPmAYRegOxvCFqlqHjJ6mr3ej
+         xWBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708663895; x=1709268695;
+        d=1e100.net; s=20230601; t=1708663948; x=1709268748;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lwS5WBBcqvq1/ZN9IhwTyGP1bYKqILTox2fPA4BOLCY=;
-        b=KUjy109Ids1L+R4DK+XN3Bb+9wp28F34gKZCebdbtPXxosuOyqiR1jotu2bA2TlMio
-         RrX5zFw8e0Sa2KIAb3C+EekT3qnohYPUPdapy1K8RLks3sJ7ofB95J1en14KErc9ugri
-         QkASf8RJSupSwFluAQduN5tg135CJ6AvMc7UouCGXXw2Y9zwARL5+4wllJOK3eqgWuAR
-         ZalJAbZpfqLvr4jDFdcLPtdz5ZpF1dXzVyEoi63zuSUGYA8C2lq4qWitdDDDTHR4gYjI
-         w20z1rF7TR1+gEnCrUif/0ZrbVvm+5ZPptGykfXqQoIO/bIh06WVU9KTI3Z/gEb75kxO
-         NBNA==
-X-Forwarded-Encrypted: i=1; AJvYcCXFeyk6rrc5Y2ZVEvbB2fcaaTzqzTK4M6aJhPdzroUhlFY5QGX2E7+aRyKf556wbKM3qv/gOxQR9+hxH/rLxJmI1gCXR/n+uZR16TLJBtcKb3iV2ey4Wvx0PQc1XuS9rIF0L579
-X-Gm-Message-State: AOJu0YyTKpafMScLya/u9GS3N8Q4PQ1YpsjbFF3f1cJbMeEqxDEJUmvp
-	iGaykZtZpcYoONeKcg33WgDuGtNfewXDhbQ7CQc6y3AcXsLsb0HhiQ/jBi+rjcQ=
-X-Google-Smtp-Source: AGHT+IG1HIJ/NS4X2wQ0yHBPhBW+VdZBn5osbJJmTuG8cgPIHFDPqgh5d7a368g2oNwDjTgLReXhmQ==
-X-Received: by 2002:a05:6214:e65:b0:68f:1bd9:f6d5 with SMTP id jz5-20020a0562140e6500b0068f1bd9f6d5mr1239079qvb.16.1708663895568;
-        Thu, 22 Feb 2024 20:51:35 -0800 (PST)
+        bh=nUKdQ1p1yvY+Jb/hV5EdO0oqfUVhz8NS/UAthKwPm/A=;
+        b=IhVaqr8FgGpmxPFtzuuE5+srGqXsE/pukyMaj7+ERl+Wyh7w+H9Zst83b/aiFY2NvZ
+         4D/kBjX4OUqqW0cFVghQz2MsRoM7+PHHIKdjxYY4m2+1R9dDBrjIEtvbH/Vdhklywe9i
+         VrX7NC7PhWleVGzPIvh9Sp5TAymGKcxfSAdSMQSUYeB6YbHlf47xBA5/n+b0usQMWvJP
+         vU2poZYbhUYlVmdH9CZtg29WnxbGKxj4PP6eEcAjS57vzOsrOqnUmEdjW8j62phkgQ7s
+         LbMXp0Fl35a6D0Vdf25Poem8x+uMF/Ywuywu/s3pGGAz+QSoeVvfBzyF9aii+IkpjyHm
+         5BcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWvPwCfPCZOEfjxyrEYJqZRimuY7/swO9m/HSuifNXpUXs+MzFDi6S6uyyaP5Uqo94jM7+DWJBw+qRov3SzidVkazPiY9IIYNkmYhe1g7E7WG1igqwv+jZRqLWpWjYkazxV/EbY
+X-Gm-Message-State: AOJu0YwqEghe29If5hAcpdVrY78HGyUXl0TpSVbac67jQelI70C+ZYGw
+	yS5oCuUIdy/1nNFZhRBZLVbSSLu+kZzBJrH+u8MvU6+hu8mFmTKe
+X-Google-Smtp-Source: AGHT+IHlWn2dqlCP3+h14mX94600M8M1iwUcc9ZOlRJsHZJO6u1Ko1VK9KuKsZnAklTUVWE2Tl+xqA==
+X-Received: by 2002:a0c:ca8e:0:b0:68e:facf:fe4 with SMTP id a14-20020a0cca8e000000b0068efacf0fe4mr1185067qvk.22.1708663948096;
+        Thu, 22 Feb 2024 20:52:28 -0800 (PST)
 Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
-        by smtp.gmail.com with ESMTPSA id ol10-20020a0562143d0a00b0068f0ff36defsm3192165qvb.47.2024.02.22.20.51.33
+        by smtp.gmail.com with ESMTPSA id ol10-20020a0562143d0a00b0068f0ff36defsm3192165qvb.47.2024.02.22.20.52.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Feb 2024 20:51:35 -0800 (PST)
-Message-ID: <693c8801-498d-42e0-bb4e-8a5bc07d9131@gmail.com>
-Date: Thu, 22 Feb 2024 20:51:31 -0800
+        Thu, 22 Feb 2024 20:52:27 -0800 (PST)
+Message-ID: <9e37a9e9-7722-407c-a2a5-b8c04b68f594@gmail.com>
+Date: Thu, 22 Feb 2024 20:52:25 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,8 +76,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 5/8] net: phy: Immediately call adjust_link if
- only tx_lpi_enabled changes
+Subject: Re: [PATCH net-next v5 6/8] net: phy: Add phy_support_eee()
+ indicating MAC support EEE
 Content-Language: en-US
 To: Oleksij Rempel <o.rempel@pengutronix.de>, Wei Fang <wei.fang@nxp.com>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
@@ -88,7 +88,7 @@ Cc: kernel@pengutronix.de, linux-kernel@vger.kernel.org,
  netdev@vger.kernel.org, Shenwei Wang <shenwei.wang@nxp.com>,
  Clark Wang <xiaoning.wang@nxp.com>, NXP Linux Team <linux-imx@nxp.com>
 References: <20240221062107.778661-1-o.rempel@pengutronix.de>
- <20240221062107.778661-6-o.rempel@pengutronix.de>
+ <20240221062107.778661-7-o.rempel@pengutronix.de>
 From: Florian Fainelli <f.fainelli@gmail.com>
 Autocrypt: addr=f.fainelli@gmail.com; keydata=
  xsDiBEjPuBIRBACW9MxSJU9fvEOCTnRNqG/13rAGsj+vJqontvoDSNxRgmafP8d3nesnqPyR
@@ -123,7 +123,7 @@ Autocrypt: addr=f.fainelli@gmail.com; keydata=
  y5arMQorqTFWlEOgRA8OP47L9knl9i4xuR0euV6DChDrguup2aJVU8JPBBgRAgAPAhsMBQJU
  X9LxBQkeXB3fAAoJEGFXmRW1Y3YOj4UAn3nrFLPZekMeqX5aD/aq/dsbXSfyAKC45Go0YyxV
  HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20240221062107.778661-6-o.rempel@pengutronix.de>
+In-Reply-To: <20240221062107.778661-7-o.rempel@pengutronix.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
@@ -132,119 +132,48 @@ Content-Transfer-Encoding: 7bit
 On 2/20/2024 10:21 PM, Oleksij Rempel wrote:
 > From: Andrew Lunn <andrew@lunn.ch>
 > 
-> The MAC driver changes its EEE hardware configuration in its
-> adjust_link callback. This is called when auto-neg
-> completes. Disabling EEE via eee_enabled false will trigger an
-> autoneg, and as a result the adjust_link callback will be called with
-> phydev->enable_tx_lpi set to false. Similarly, eee_enabled set to true
-> and with a change of advertised link modes will result in a new
-> autoneg, and a call the adjust_link call.
-> 
-> If set_eee is called with only a change to tx_lpi_enabled which does
-> not trigger an auto-neg, it is necessary to call the adjust_link
-> callback so that the MAC is reconfigured to take this change into
-> account.
-> 
-> When setting phydev->enable_tx_lpi, take both eee_enabled and
-> tx_lpi_enabled into account, so the MAC drivers just needs to act on
-> phydev->enable_tx_lpi and not the whole EEE configuration.
+> In order for EEE to operate, both the MAC and the PHY need to support
+> it, similar to how pause works. 
+
+Kinda, a number of PHYs have added support for SmartEEE or AutoGrEEEn in 
+order to provide some EEE-like power savings with non-EEE capable MACs.
+
+Oleksij  did not you have a patch series at some point that introduced a 
+smarteee field in the phy_device structure to reflect that? I thought 
+that had been accepted, but maybe not.
+
+> Copy the pause concept and add the
+> call phy_support_eee() which the MAC makes after connecting the PHY to
+> indicate it supports EEE. phylib will then advertise EEE when auto-neg
+> is performed.
 > 
 > Signed-off-by: Andrew Lunn <andrew@lunn.ch>
 > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
-
-Definitively an improvement! Minor nits below
-
 > ---
->   drivers/net/phy/phy-c45.c | 11 ++++++++---
->   drivers/net/phy/phy.c     | 25 ++++++++++++++++++++++---
->   2 files changed, 30 insertions(+), 6 deletions(-)
+>   drivers/net/phy/phy_device.c | 18 ++++++++++++++++++
+>   include/linux/phy.h          |  3 ++-
+>   2 files changed, 20 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/net/phy/phy-c45.c b/drivers/net/phy/phy-c45.c
-> index c69568e7695e..217d4df59eb6 100644
-> --- a/drivers/net/phy/phy-c45.c
-> +++ b/drivers/net/phy/phy-c45.c
-> @@ -1549,6 +1549,8 @@ EXPORT_SYMBOL(genphy_c45_ethtool_get_eee);
->    * advertised, but the previously advertised link modes are
->    * retained. This allows EEE to be enabled/disabled in a
->    * non-destructive way.
-> + * Returns either error code, 0 if there was no change, or positive
-> + * value if there was a change which triggered auto-neg.
->    */
->   int genphy_c45_ethtool_set_eee(struct phy_device *phydev,
->   			       struct ethtool_keee *data)
-> @@ -1580,9 +1582,12 @@ int genphy_c45_ethtool_set_eee(struct phy_device *phydev,
->   	ret = genphy_c45_an_config_eee_aneg(phydev);
->   	if (ret < 0)
->   		return ret;
-> -	if (ret > 0)
-> -		return phy_restart_aneg(phydev);
-> -
-> +	if (ret > 0) {
-> +		ret = phy_restart_aneg(phydev);
-> +		if (ret < 0)
-> +			return ret;
-> +		return 1;
-> +	}
->   	return 0;
+> diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+> index 2eefee970851..269d3c7f0849 100644
+> --- a/drivers/net/phy/phy_device.c
+> +++ b/drivers/net/phy/phy_device.c
+> @@ -2910,6 +2910,24 @@ void phy_advertise_eee_all(struct phy_device *phydev)
 >   }
->   EXPORT_SYMBOL(genphy_c45_ethtool_set_eee);
-> diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-> index 7f3629d56503..dad827717ad9 100644
-> --- a/drivers/net/phy/phy.c
-> +++ b/drivers/net/phy/phy.c
-> @@ -988,7 +988,8 @@ static int phy_check_link_status(struct phy_device *phydev)
->   		if (err < 0)
->   			phydev->enable_tx_lpi = false;
->   		else
-> -			phydev->enable_tx_lpi = err;
-> +			phydev->enable_tx_lpi = (err & phydev->eee_cfg.tx_lpi_enabled);
-> +
->   		phy_link_up(phydev);
->   	} else if (!phydev->link && phydev->state != PHY_NOLINK) {
->   		phydev->state = PHY_NOLINK;
-> @@ -1679,6 +1680,21 @@ int phy_ethtool_get_eee(struct phy_device *phydev, struct ethtool_keee *data)
->   }
->   EXPORT_SYMBOL(phy_ethtool_get_eee);
+>   EXPORT_SYMBOL_GPL(phy_advertise_eee_all);
 >   
-> +/* auto-neg not triggered, directly inform the MAC if something
-> + * changed'
+> +/**
+> + * phy_support_eee - Enable support of EEE
+> + * @phydev: target phy_device struct
+> + *
+> + * Description: Called by the MAC to indicate is supports Energy
+> + * Efficient Ethernet. This should be called before phy_start() in
+> + * order that EEE is negotiated when the link comes up as part of
+> + * phy_start(). EEE is enabled by default when the hardware supports
+> + * it.
 
-Stray ' character at the end here.
-
-> + */
-> +static void phy_ethtool_set_eee_noneg(struct phy_device *phydev,
-> +				      struct ethtool_keee *data)
-> +{
-> +	if (phydev->eee_cfg.tx_lpi_enabled !=
-> +	    data->tx_lpi_enabled) {
-> +		eee_to_eeecfg(data, &phydev->eee_cfg);
-> +		phydev->enable_tx_lpi = eeecfg_mac_can_tx_lpi(&phydev->eee_cfg);
-> +		if (phydev->link)
-> +			phy_link_up(phydev);
-> +	}
-> +}
-> +
->   /**
->    * phy_ethtool_set_eee - set EEE supported and status
->    * @phydev: target phy_device struct
-> @@ -1695,11 +1711,14 @@ int phy_ethtool_set_eee(struct phy_device *phydev, struct ethtool_keee *data)
->   
->   	mutex_lock(&phydev->lock);
->   	ret = genphy_c45_ethtool_set_eee(phydev, data);
-> -	if (!ret)
-> +	if (ret >= 0) {
-> +		if (ret == 0)
-> +			phy_ethtool_set_eee_noneg(phydev, data);
->   		eee_to_eeecfg(data, &phydev->eee_cfg);
-> +	}
->   	mutex_unlock(&phydev->lock);
->   
-> -	return ret;
-> +	return (ret < 0 ? ret : 0);
-
-Don't think the parenthesis are needed but does not hurt.
+That comment is a bit confusing without mentioning how the hardware 
+default state wrt. EEE is being factored in, can we have some details here?
 -- 
 Florian
 
