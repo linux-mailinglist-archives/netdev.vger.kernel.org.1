@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-74347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 063F5860F4C
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 11:30:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A700F860F4E
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 11:30:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86C161F21725
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 10:30:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BAB06B23101
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 10:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 283785D467;
-	Fri, 23 Feb 2024 10:29:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4785D728;
+	Fri, 23 Feb 2024 10:29:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bdMNLaBY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FQyz6nk1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AD38D533
-	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 10:29:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F930D533
+	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 10:29:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708684191; cv=none; b=ZfMF6N5bIuWgRzw29s9M9c3QNeaWoe0xQf/Q2pMuPVHypi8+d2RxTEN5WLKBNt3o16jXQoi7Z8kyKPJTXxZA/Kurqtfb0vOtQ70lIBl2BmKujLwVX7kGBCROcVSerh3GrHLdLBjtxhNWaeu9O8gHP0joyr/Yr7zJOq7CtFFjlT0=
+	t=1708684193; cv=none; b=ttLKbOeHdHfmzdbZI40QlfA7ntJ/hVXrG7X/wcjnlZ3gJJ2ehRHhmCuONhxls6XHuEzhrqSWwhNXpBS4lK+LIb09lwWB/KBI7+o4jTbe9RwHFq0fUcO21CwALc49jKFvBWrt7DmAYeZvhI5eTFhEWVsHkoHr6DfhGT0rBewa1AQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708684191; c=relaxed/simple;
-	bh=OJyNQxskch6r8J2NCNPPhHcPQoogBWOJ2DdPpHf1mHc=;
+	s=arc-20240116; t=1708684193; c=relaxed/simple;
+	bh=wEHuE1rauwop6W079PH7gANF6oPZtTcaf6JWO+EgyiA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pgUYtszpNWIUk09QsOhx9zn798u6rRY5+gRMn4z28w5dOsA0acABkoOAereRct158T2h+NOJIyBxLh+4PsIPnOe+Kj6Wnfd8dqaU5jkpaNld57iFEZ63VpnzOGQchRPH2dSxHXgszXhZwT/iRCnJSK1HmmU1Hp0yXl4aWTST6Q4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bdMNLaBY; arc=none smtp.client-ip=209.85.214.174
+	 MIME-Version; b=qQVY78qY9yV94vYrx+nqB4gHDsuOlWmTxLVBQniWtW+AHpp3VZ1dGPp6frwR1mPoPA7JSzHWBvtZhF3ZSbsxHBY9Dkl0H2CejGYRFqirJsC9eFDxEIvas47EVFSIsMgXrIy/PEgyM3+3svfLHFyBZTTHBSvDR5Y1bSi1BZ3dN4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FQyz6nk1; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1d7431e702dso966815ad.1
-        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 02:29:49 -0800 (PST)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1d71cb97937so7761845ad.3
+        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 02:29:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708684189; x=1709288989; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1708684192; x=1709288992; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FwLzJvWqpVHxOpW3RD1ZVO8+ZftdgYXF0aN1hMOMMss=;
-        b=bdMNLaBYeyRGZFF2rv55ZqWVANrkUgle930OJiXKHoB2+Sv0U1i0sSDtZd50sd06VD
-         hs3jEMpOMwQoRClkZPT7c53HDPIyQy4XqBGS6j+TwTWE8nUH9DIkmQMldP02M6CX7xE1
-         Bj1KcHoZdHQG431HLEdpeJ6g4bYOQAa9qOXpCHCOHcx6LUPSWSOkifzo2nE0uR5X33+8
-         O0Xv7Ud7RavTYipWOALl27bEYe8MFamvtSthfb2Xzyqq5J9Yu4f2ufE9o9PD/b9Ahchi
-         sNcHorP0d+EucVueRcPfELmmTBVUd/PpiJXB6cDXFfTqu5wTv5cu+CEeb6jAXeRAfFOd
-         Clqg==
+        bh=N16M0/5IG3v1j3LIKq8uEOTY7VMyNxn3foEajFTtlQU=;
+        b=FQyz6nk1qZ0mhlsk6s6yPbq1pQEl03JVF097n820/KI3MbsCOqIFVDHHQTKiIGG2oh
+         kwoj9Utgw3gwlA2/yoAAf7T9gaZeJW9nB1pAvkxwj7QlTZpNzmqg/pSdOjX7oRQ7Nno6
+         J2VqjjnjVY6oNd7yCKzqBHUmghoxtRio+44CKmq5EK5aK/D96ViMwR2myuhbb6q474qC
+         I1iHx2KtqarmlEAfI68ooV9bGCd4EQ0Uk0uNS9a25LrjqqzUBDY31EPpLMhacEktjKJ1
+         DJhX+v++ZqLtXIkzfSwmNi04xoq9NtKWR+4Ng6B6Fu5/83FlosVub4y2nNxdUuD7M7xe
+         98Sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708684189; x=1709288989;
+        d=1e100.net; s=20230601; t=1708684192; x=1709288992;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FwLzJvWqpVHxOpW3RD1ZVO8+ZftdgYXF0aN1hMOMMss=;
-        b=Xp7sSg64DVyaqi75h8fx4X8saZdj3eE1Yjrif/yHKzodX3WcDpDntRVV0Xme1VBG+1
-         c2H+Nt5oredTY/41FBM8cbwjHYfyJpwe4SU1c7HIqOTJFBMCi5sGzkXjqpm8WhMazBs6
-         fhhMQPhMGdL3+3dEoGgC5V/rzUQSFd1qi9u2GAGeP9Wa6J5ZFtK/Mf8GLIm+R/l/T0Lb
-         1g1WYWHdgJvErbOcvXxqvR935mI8DojJFd0UK6c4emyEZFX/mpiLAo4OOR+Qz3KmT8fA
-         4T6jfLe+6bRHTEw2KRYxT6hLlVt6tdogpqf+RhPX/oBJIU1vjo5pkxmI0azHZ/pHqHzc
-         TNbA==
-X-Gm-Message-State: AOJu0Yw5bg7kYVdSerchxLjVGApsV5AY/6tuU9sSm71DOJek+ajQU6Zh
-	qin+Cf2ZPTDIgLCX8OyU0LLcCkXoABbRXQnb9xzje/BzkqIKeWEU
-X-Google-Smtp-Source: AGHT+IGK/csm5/OhlKcxGDH55wTwTp97XKBCIsLPRaCK/Dj1oLfSbiiVqTBo2XCQvMaH10+njENX5g==
-X-Received: by 2002:a17:902:d2cf:b0:1dc:4b04:13d4 with SMTP id n15-20020a170902d2cf00b001dc4b0413d4mr1835427plc.8.1708684188906;
-        Fri, 23 Feb 2024 02:29:48 -0800 (PST)
+        bh=N16M0/5IG3v1j3LIKq8uEOTY7VMyNxn3foEajFTtlQU=;
+        b=K0b02eyZlm70MX732237ScMGXMxSojR4xFgXUnRCd8nbrCzQBnL6w9KEkdRHlW3e/U
+         KzO6V3wxMkH1llTFtsSHrvri4qyZytBnIZh4aEPAVWnWFvNtm+d/OmzBYAWpytC1gJIA
+         YRVig9o9xnfpXJbmgyJ0y9iU2eEksADPOSlQFCa0F99AHlGELk9gLd/Gq51MDeSuvrUa
+         OVVZQSdgN0O860N01Ktq3EbEgm35T6LuGvtynIpurCRgvbCH2wUv5DLvy3j895tWX6qR
+         RYB+HXIo8NS1EbXpxspNTQChjQuoFUW/oe4fuLJzvZEo/CdZ0jUd4sUzLMa/jnqVIZGp
+         d3YQ==
+X-Gm-Message-State: AOJu0YyP1+Qg/hirDBv3mh73GI8r9L5Ixr0ktNb4BeffGqf2xO5fQfuj
+	Jp+rh+HO2IMq2lZhAC8eI1uFtGmhoWWwdcdN0CqXVEQARTAzwr8r
+X-Google-Smtp-Source: AGHT+IH5PdhrpEYxhkK2nz4xD1q0DHP+ktmzMTIO5KI8mjl5qJYM1uj1PsyzcR8gkvEZNvDjJEv0uQ==
+X-Received: by 2002:a17:902:8649:b0:1dc:4d63:7a0d with SMTP id y9-20020a170902864900b001dc4d637a0dmr1047915plt.41.1708684191830;
+        Fri, 23 Feb 2024 02:29:51 -0800 (PST)
 Received: from KERNELXING-MB0.tencent.com ([43.132.141.23])
-        by smtp.gmail.com with ESMTPSA id jz8-20020a170903430800b001db717d2dbbsm11380543plb.210.2024.02.23.02.29.46
+        by smtp.gmail.com with ESMTPSA id jz8-20020a170903430800b001db717d2dbbsm11380543plb.210.2024.02.23.02.29.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Feb 2024 02:29:48 -0800 (PST)
+        Fri, 23 Feb 2024 02:29:51 -0800 (PST)
 From: Jason Xing <kerneljasonxing@gmail.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -76,9 +76,9 @@ To: davem@davemloft.net,
 Cc: netdev@vger.kernel.org,
 	kerneljasonxing@gmail.com,
 	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next v9 08/10] tcp: add dropreasons in tcp_rcv_state_process()
-Date: Fri, 23 Feb 2024 18:28:49 +0800
-Message-Id: <20240223102851.83749-9-kerneljasonxing@gmail.com>
+Subject: [PATCH net-next v9 09/10] tcp: make the dropreason really work when calling tcp_rcv_state_process()
+Date: Fri, 23 Feb 2024 18:28:50 +0800
+Message-Id: <20240223102851.83749-10-kerneljasonxing@gmail.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20240223102851.83749-1-kerneljasonxing@gmail.com>
 References: <20240223102851.83749-1-kerneljasonxing@gmail.com>
@@ -92,109 +92,104 @@ Content-Transfer-Encoding: 8bit
 
 From: Jason Xing <kernelxing@tencent.com>
 
-In this patch, I equipped this function with more dropreasons, but
-it still doesn't work yet, which I will do later.
+Update three callers including both ipv4 and ipv6 and let the dropreason
+mechanism work in reality.
 
 Signed-off-by: Jason Xing <kernelxing@tencent.com>
 Reviewed-by: Eric Dumazet <edumazet@google.com>
 Reviewed-by: David Ahern <dsahern@kernel.org>
 --
 v9
-Link: https://lore.kernel.org/netdev/CAL+tcoCbsbM=HyXRqs2+QVrY8FSKmqYC47m87Axiyk1wk4omwQ@mail.gmail.com/
 Link: https://lore.kernel.org/netdev/c5640fc4-16dc-4058-97c6-bd84bae4fda1@kernel.org/
-1. nit: remove unnecessary else (David)
-2. add reviewed-by tag (David)
+1. add reviewed-by tag (David)
 
 v8
-Link: https://lore.kernel.org/netdev/CANn89iJJ9XTVeC=qbSNUnOhQMAsfBfouc9qUJY7MxgQtYGmB3Q@mail.gmail.com/
+Link: https://lore.kernel.org/netdev/CANn89i+Uikp=NvB7SVQpYnX-2FqJrH3hWw3sV0XpVcC55MiNUg@mail.gmail.com/
 1. add reviewed-by tag (Eric)
-
-v5:
-Link: https://lore.kernel.org/netdev/3a495358-4c47-4a9f-b116-5f9c8b44e5ab@kernel.org/
-1. Use new name (TCP_ABORT_ON_DATA) for readability (David)
 ---
- include/net/tcp.h    |  2 +-
- net/ipv4/tcp_input.c | 19 ++++++++++++-------
- 2 files changed, 13 insertions(+), 8 deletions(-)
+ include/net/tcp.h        | 2 +-
+ net/ipv4/tcp_ipv4.c      | 3 ++-
+ net/ipv4/tcp_minisocks.c | 9 +++++----
+ net/ipv6/tcp_ipv6.c      | 3 ++-
+ 4 files changed, 10 insertions(+), 7 deletions(-)
 
 diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 58e65af74ad1..e5af9a5b411b 100644
+index e5af9a5b411b..1d9b2a766b5e 100644
 --- a/include/net/tcp.h
 +++ b/include/net/tcp.h
-@@ -348,7 +348,7 @@ void tcp_wfree(struct sk_buff *skb);
- void tcp_write_timer_handler(struct sock *sk);
- void tcp_delack_timer_handler(struct sock *sk);
- int tcp_ioctl(struct sock *sk, int cmd, int *karg);
--int tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb);
-+enum skb_drop_reason tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb);
- void tcp_rcv_established(struct sock *sk, struct sk_buff *skb);
- void tcp_rcv_space_adjust(struct sock *sk);
- int tcp_twsk_unique(struct sock *sk, struct sock *sktw, void *twp);
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 83308cca1610..5d874817a78d 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -6619,7 +6619,8 @@ static void tcp_rcv_synrecv_state_fastopen(struct sock *sk)
-  *	address independent.
+@@ -396,7 +396,7 @@ enum tcp_tw_status tcp_timewait_state_process(struct inet_timewait_sock *tw,
+ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+ 			   struct request_sock *req, bool fastopen,
+ 			   bool *lost_race);
+-int tcp_child_process(struct sock *parent, struct sock *child,
++enum skb_drop_reason tcp_child_process(struct sock *parent, struct sock *child,
+ 		      struct sk_buff *skb);
+ void tcp_enter_loss(struct sock *sk);
+ void tcp_cwnd_reduction(struct sock *sk, int newly_acked_sacked, int newly_lost, int flag);
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index 0a944e109088..c79e25549972 100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -1926,7 +1926,8 @@ int tcp_v4_do_rcv(struct sock *sk, struct sk_buff *skb)
+ 	} else
+ 		sock_rps_save_rxhash(sk, skb);
+ 
+-	if (tcp_rcv_state_process(sk, skb)) {
++	reason = tcp_rcv_state_process(sk, skb);
++	if (reason) {
+ 		rsk = sk;
+ 		goto reset;
+ 	}
+diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+index 9e85f2a0bddd..08d5b48540ea 100644
+--- a/net/ipv4/tcp_minisocks.c
++++ b/net/ipv4/tcp_minisocks.c
+@@ -911,11 +911,12 @@ EXPORT_SYMBOL(tcp_check_req);
+  * be created.
   */
  
--int tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb)
+-int tcp_child_process(struct sock *parent, struct sock *child,
 +enum skb_drop_reason
-+tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb)
++tcp_child_process(struct sock *parent, struct sock *child,
+ 		      struct sk_buff *skb)
+ 	__releases(&((child)->sk_lock.slock))
  {
- 	struct tcp_sock *tp = tcp_sk(sk);
- 	struct inet_connection_sock *icsk = inet_csk(sk);
-@@ -6635,7 +6636,7 @@ int tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb)
+-	int ret = 0;
++	enum skb_drop_reason reason = SKB_NOT_DROPPED_YET;
+ 	int state = child->sk_state;
  
- 	case TCP_LISTEN:
- 		if (th->ack)
--			return 1;
-+			return SKB_DROP_REASON_TCP_FLAGS;
+ 	/* record sk_napi_id and sk_rx_queue_mapping of child. */
+@@ -923,7 +924,7 @@ int tcp_child_process(struct sock *parent, struct sock *child,
  
- 		if (th->rst) {
- 			SKB_DR_SET(reason, TCP_RESET);
-@@ -6704,8 +6705,12 @@ int tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb)
- 				  FLAG_NO_CHALLENGE_ACK);
+ 	tcp_segs_in(tcp_sk(child), skb);
+ 	if (!sock_owned_by_user(child)) {
+-		ret = tcp_rcv_state_process(child, skb);
++		reason = tcp_rcv_state_process(child, skb);
+ 		/* Wakeup parent, send SIGIO */
+ 		if (state == TCP_SYN_RECV && child->sk_state != state)
+ 			parent->sk_data_ready(parent);
+@@ -937,6 +938,6 @@ int tcp_child_process(struct sock *parent, struct sock *child,
  
- 	if ((int)reason <= 0) {
--		if (sk->sk_state == TCP_SYN_RECV)
--			return 1;	/* send one RST */
-+		if (sk->sk_state == TCP_SYN_RECV) {
-+			/* send one RST */
-+			if (!reason)
-+				return SKB_DROP_REASON_TCP_OLD_ACK;
-+			return -reason;
-+		}
- 		/* accept old ack during closing */
- 		if ((int)reason < 0) {
- 			tcp_send_challenge_ack(sk);
-@@ -6781,7 +6786,7 @@ int tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb)
- 		if (READ_ONCE(tp->linger2) < 0) {
- 			tcp_done(sk);
- 			NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPABORTONDATA);
--			return 1;
-+			return SKB_DROP_REASON_TCP_ABORT_ON_DATA;
- 		}
- 		if (TCP_SKB_CB(skb)->end_seq != TCP_SKB_CB(skb)->seq &&
- 		    after(TCP_SKB_CB(skb)->end_seq - th->fin, tp->rcv_nxt)) {
-@@ -6790,7 +6795,7 @@ int tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb)
- 				tcp_fastopen_active_disable(sk);
- 			tcp_done(sk);
- 			NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPABORTONDATA);
--			return 1;
-+			return SKB_DROP_REASON_TCP_ABORT_ON_DATA;
- 		}
+ 	bh_unlock_sock(child);
+ 	sock_put(child);
+-	return ret;
++	return reason;
+ }
+ EXPORT_SYMBOL(tcp_child_process);
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index 0c180bb8187f..4f8464e04b7f 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -1663,7 +1663,8 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff *skb)
+ 	} else
+ 		sock_rps_save_rxhash(sk, skb);
  
- 		tmo = tcp_fin_time(sk);
-@@ -6855,7 +6860,7 @@ int tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb)
- 			    after(TCP_SKB_CB(skb)->end_seq - th->fin, tp->rcv_nxt)) {
- 				NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPABORTONDATA);
- 				tcp_reset(sk, skb);
--				return 1;
-+				return SKB_DROP_REASON_TCP_ABORT_ON_DATA;
- 			}
- 		}
- 		fallthrough;
+-	if (tcp_rcv_state_process(sk, skb))
++	reason = tcp_rcv_state_process(sk, skb);
++	if (reason)
+ 		goto reset;
+ 	if (opt_skb)
+ 		goto ipv6_pktoptions;
 -- 
 2.37.3
 
