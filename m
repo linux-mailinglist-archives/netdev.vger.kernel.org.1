@@ -1,284 +1,301 @@
-Return-Path: <netdev+bounces-74619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6461861FBB
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 23:27:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AE9E861FB7
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 23:27:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 155821C23992
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 22:27:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9ECD3286F82
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 22:27:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 484051509A6;
-	Fri, 23 Feb 2024 22:25:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D290914F98D;
+	Fri, 23 Feb 2024 22:25:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="GwubpKuf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KKnKW1NQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E4A714F987
-	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 22:25:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FF7414DFE8;
+	Fri, 23 Feb 2024 22:24:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708727103; cv=none; b=Eva+sOaIwc5kINvArfMeKUd+P6zYd8RL/RLL3ngZXEWLA8eoiw93fZPd/f9o3bfiiKiRa7Aj7nOropAXgCFfT6ts/f++Tf9D4r/qzeZxZP5VrfzLtC+yH+RzXy3C4t+J9Nu4eQQtEGWkTN9VZa8f6w20I3nJ4YuAD1NLDX/Fv8M=
+	t=1708727101; cv=none; b=qi7IApZLSAfDc6ohXHPVMHmFqsuqbC1cWVBlaoV1jwhev8S30yo7GfM34aiEODdLiZXcxDRQ5OPW+yeil6uB4IjOYE6SR43Kv8drp2qkazrBmsD5vMp9g5pP0axV/ZiGU4eQKEg2quDsFFEvPp3tJWlR4ll4PoGqmEwmgxmtMsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708727103; c=relaxed/simple;
-	bh=UEDTp9LEia7qit/Upz4U/OEBEotuEJBidfZMhpGrxVg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iSKoDAMaaOW1XvQBnGlCOEhlNq0IzjKyCEYdho0l0oJWbGZAMrPGUPwgwGd3L0/YVBGhZTShH+5NjGWZYJLv/xqsL17dPV7deg2ofgE0XkdoaTzLr2xmUUXfeNyBKw4VhRBbYOFdd4WQyvNJiogyj4GdPAM5RSOG/XlEz6qWShY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=GwubpKuf; arc=none smtp.client-ip=209.85.219.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-dcd94fb9e4dso1457686276.2
-        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 14:25:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1708727100; x=1709331900; darn=vger.kernel.org;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=U9KfxosW74kZG5yZSh7j2R31MCQmiAO1oDrY4bBWb/o=;
-        b=GwubpKufx+e7gVMiqQKgx3PfsHCXa3VqaYhF3MbBRAKBAxuOmVtBa/5ncgaDbcEit8
-         Exg/n9KRbWao9OA9lIAHM4peylXS+hcwZyDV4rPJWZnriWbAsiVM7QGtRs6e396HT4Oe
-         T+P9WDQjW9BRTSK6ifhAlHUAp4Hhl7DXhgdhY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708727100; x=1709331900;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=U9KfxosW74kZG5yZSh7j2R31MCQmiAO1oDrY4bBWb/o=;
-        b=jHvMzHlDrsK36NTM35JhslngwXHawbU/7vR8nKa9Pyp277y+fDwmARdzlj6iJStldI
-         LbUfFfqEClNA6keB7/qdaHOmEpr+hOfC1FuBIaPb31oXmRICdOLKTwbqXGs5hTGm9FHo
-         ocb9A8Ke0FTDStBXWzwTxZ6r2XIPuyKTTICCUQKYrp8yrppkthhhJiJ6Jq1qO7XXLmEq
-         KJiLbnzh7lyhr0U6lmdh6b4oCCMAGKbPYbLqO2TU3t74hsNRhiDIphrbaHyDxvDS6HvK
-         PSnvZxHsK+PNy2nFIjZfe3PywD6qJr7XuvUjvsc9STZ1sIQwic32f/9KG3uQHHeVe28O
-         tW5Q==
-X-Gm-Message-State: AOJu0YyfQW+2tAcD9//IDUwxhRwknc39h4FuYWQWf2larW7bDsGbCAp7
-	8L+DRs+fmB7M86L3qSw76Dq/IWjC49JgmP0T9DeJVBWr+USrdGYGe9NiC58k1f4f8NzCo6fIwbw
-	Raj5l9ChKjTe6JhaXBAPwIoRU69I3TI7M9jEARr7Evh5jnvkxzIdZVcOG9ZSbYyt2gfCqAHl8WN
-	Coh2OX38KugQfpc/U9Q4CQ1RPZiTLiKQfQrhfeHNsjNw==
-X-Google-Smtp-Source: AGHT+IH8fUZKBc4ZAsfPhK0UHjuGLSL8NYePxeShNo9nTTQkd3czfXf38dMHz7cX0vuTYOAPJsDwtg==
-X-Received: by 2002:a25:8a11:0:b0:dc7:5157:d43d with SMTP id g17-20020a258a11000000b00dc75157d43dmr1153868ybl.42.1708727100152;
-        Fri, 23 Feb 2024 14:25:00 -0800 (PST)
-Received: from stbirv-lnx-1.igp.broadcom.net ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id n19-20020ac86753000000b0042e6198372dsm1036403qtp.97.2024.02.23.14.24.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+	s=arc-20240116; t=1708727101; c=relaxed/simple;
+	bh=MQxlYd+pjzVvfwlAGAaWuqcrm9SliaxLj/ICvA7THrI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fuA6x/XlqkpkthmjnkJiSrWjg4F5nPjik9bKbEDWRrk2JFm3h93sSK3q+OTiJ9jzxg3qRbMjE5ACDHPwn1JUozPJyIY/ZFu4hNlgdMvqxNrJrdHMIKghL8pbrqjs5q5+2+IVG2+k3RNwQbJaaEWYiN3LaZdhpa88pqj5AIR1dmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KKnKW1NQ; arc=none smtp.client-ip=209.85.208.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2d23d301452so17517671fa.1;
         Fri, 23 Feb 2024 14:24:59 -0800 (PST)
-From: Justin Chen <justin.chen@broadcom.com>
-To: netdev@vger.kernel.org
-Cc: bcm-kernel-feedback-list@broadcom.com,
-	florian.fainelli@broadcom.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org,
-	opendmb@gmail.com,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	rafal@milecki.pl,
-	devicetree@vger.kernel.org,
-	Justin Chen <justin.chen@broadcom.com>
-Subject: [PATCH net-next resend 6/6] net: bcmasp: Add support for PHY interrupts
-Date: Fri, 23 Feb 2024 14:24:34 -0800
-Message-Id: <20240223222434.590191-7-justin.chen@broadcom.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240223222434.590191-1-justin.chen@broadcom.com>
-References: <20240223222434.590191-1-justin.chen@broadcom.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1708727098; x=1709331898; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OOl1lY0a6/dohk1NliPsKFcgM+2fz/8FAtk2Q5fDb1Y=;
+        b=KKnKW1NQZeP0ME2pOM6a8kHjEdS6YFk8tz1220oFv6t5zN5+pgsPACZq5GXE+RyRU1
+         4mEnSRN0iBtdU5uYZb0CjcmIxzsKOuZddPaNeNylrAJAfWEFoLPZfkZ20LggIyOAbDE7
+         DW/qSP9Fs0GgyddHUq5oH7mQp1A0Aaf9QO1rQy1ZJIwrvxQU6MRYD32r2HXSPdVRz1Rd
+         xLhOCbWCdvtO5OBXATsbXWfb/2xmeqqk1E0iyHNi6MPNT+4GvaaNOUNSGknJln9gwCXS
+         kzPZrABomAyKw6CCUwn5AVFzK/eHTW9Wepj32S/omkfH81O/7FXGRlr6egd+PLlSLT4W
+         /Sbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708727098; x=1709331898;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OOl1lY0a6/dohk1NliPsKFcgM+2fz/8FAtk2Q5fDb1Y=;
+        b=k1UcPu24Httqthmw7dn9+hERIGvaTO4kssyHIYpxC9lXicunBfU4+ah6L6ZtU18SxM
+         PzHC1Wmm7aq9CcNvS/jBvmFPcICehdQypU2ryJfW41wZA2xOyXypcK9qKVPO6mPFCj0y
+         ZU55JFn+0hHdGrm6s9HCaC8DIk5cXRbcomdki9Bzd9S+9zre5ujAwE4jh3q0Le+BfokF
+         1u2GRjQW1EPLwFnQt6e8SwprQYIiNoLAtSR7wCLX4Lc8MkVS2Opq/iPr856MCEgk3w5r
+         RCIe1tkPwxZhagMldmz4U6lWudUH5oPc5ZCTnRHfeUEG07q0PqaPbDoZBM7xWNIBmILj
+         WBxg==
+X-Forwarded-Encrypted: i=1; AJvYcCXoMDsI6GQAGTHtz+B9c8T5wVlBpNjnl2i7sefFj9nF5i6zicn8WYLR6Uec7v+7c9BgE4LhSjcyAszSuyKQcYxXdB3nmo7RSzTsswszQuzo3LeGsfP9fbvZe3AxrxSe587SoMM89Qyh24orlKEt0u/kFHQtaFRi3AhDcgZ+GFttNUg=
+X-Gm-Message-State: AOJu0Yzr0z+bPSwny32OLq5Zi2Mq72VOmxhYwQpki+3GctRaMBzk4+C9
+	tvK/NyKRF61fB538MmpQ552UGl4xEw9OcWtTN+v1hWR/mMJeBZYm
+X-Google-Smtp-Source: AGHT+IEXKLqTCm3Drz6eJFU6W2jRa+bGqgbnfHWqsjRN8it0sQzJZAQ9bhgdCfAAqOYjVLeFlMIwOQ==
+X-Received: by 2002:ac2:5e9b:0:b0:512:db76:4e16 with SMTP id b27-20020ac25e9b000000b00512db764e16mr642503lfq.4.1708727097314;
+        Fri, 23 Feb 2024 14:24:57 -0800 (PST)
+Received: from mobilestation ([95.79.226.168])
+        by smtp.gmail.com with ESMTPSA id j9-20020a056512398900b00512e14d1218sm610819lfu.261.2024.02.23.14.24.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Feb 2024 14:24:56 -0800 (PST)
+Date: Sat, 24 Feb 2024 01:24:54 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Thierry Reding <thierry.reding@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-tegra@vger.kernel.org, 
+	Thierry Reding <treding@nvidia.com>
+Subject: Re: [PATCH net-next v3 3/3] net: stmmac: Configure AXI on Tegra234
+ MGBE
+Message-ID: <kns2u6o4nhz4vda74r2mscyyp6yjgo2p62vryeenucm4o3ngzb@j6ch3sl6xha2>
+References: <20240219-stmmac-axi-config-v3-0-fca7f046e6ee@nvidia.com>
+ <20240219-stmmac-axi-config-v3-3-fca7f046e6ee@nvidia.com>
+ <xne2i6jwqaptsrd2hjdahxbscysgtj7iabqendyjb75fnrjc5z@js7n7qngtzym>
+ <CZ9Z70HO2C7J.398BRNM8NBIG1@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000d922b20612140772"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CZ9Z70HO2C7J.398BRNM8NBIG1@gmail.com>
 
---000000000000d922b20612140772
-Content-Transfer-Encoding: 8bit
+On Tue, Feb 20, 2024 at 03:28:39PM +0100, Thierry Reding wrote:
+> On Mon Feb 19, 2024 at 7:32 PM CET, Serge Semin wrote:
+> > On Mon, Feb 19, 2024 at 05:46:06PM +0100, Thierry Reding wrote:
+> > > From: Thierry Reding <treding@nvidia.com>
+> > > 
+> > > Allow the device to use bursts and increase the maximum number of
+> > > outstanding requests to improve performance. Measurements show an
+> > > increase in throughput of around 5x on a 1 Gbps link.
+> > > 
+> > > Signed-off-by: Thierry Reding <treding@nvidia.com>
+> > > ---
+> > >  drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c | 9 +++++++++
+> > >  1 file changed, 9 insertions(+)
+> > > 
+> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
+> > > index bab57d1675df..b6bfa48f279d 100644
+> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
+> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
+> > > @@ -199,6 +199,12 @@ static void mgbe_uphy_lane_bringup_serdes_down(struct net_device *ndev, void *mg
+> > >  	writel(value, mgbe->xpcs + XPCS_WRAP_UPHY_RX_CONTROL);
+> > >  }
+> > >  
+> > > +static const struct stmmac_axi tegra234_mgbe_axi = {
+> > > +	.axi_wr_osr_lmt = 63,
+> > > +	.axi_rd_osr_lmt = 63,
+> > > +	.axi_blen = { 256, },
+> > > +};
+> > > +
+> > >  static int tegra_mgbe_probe(struct platform_device *pdev)
+> > >  {
+> > >  	struct plat_stmmacenet_data *plat;
+> > > @@ -284,6 +290,9 @@ static int tegra_mgbe_probe(struct platform_device *pdev)
+> > >  	if (err < 0)
+> > >  		goto disable_clks;
+> > >  
+> > > +	/* setup default AXI configuration */
+> > > +	res.axi = &tegra234_mgbe_axi;
+> > > +
+> > >  	plat = devm_stmmac_probe_config_dt(pdev, &res);
+> > >  	if (IS_ERR(plat)) {
+> > >  		err = PTR_ERR(plat);
+> >
+> > Let's get back to the v2 discussion:
+> >
+> > On Mon Feb 5, 2024 at 1:44 AM CET, Serge Semin wrote:
+> > > The entire series can be converted to just a few lines of change:
+> > >     plat = devm_stmmac_probe_config_dt(pdev, res.mac);
+> > >     if (IS_ERR(plat)) {
+> > >             err = PTR_ERR(plat);
+> > >             goto disable_clks;
+> > >     }
+> > > +
+> > > +   if (IS_ERR_OR_NULL(plat->axi)) {
+> > > +           plat->axi = devm_kzalloc(&pdev->dev, sizeof(*axi), GFP_KERNEL);
+> > > +           if (!plat->axi) {
+> > > +                   ret = -ENOMEM;
+> > > +                   goto disable_clks;
+> > > +           }
+> > > +   } /* else memset plat->axi with zeros if you wish */
+> > > +
+> > > +   plat->axi->axi_wr_osr_lmt = 63;
+> > > +   plat->axi->axi_rd_osr_lmt = 63;
+> > > +   plat->axi->axi_blen[0] = 256;
+> > >  
+> > >     plat->has_xgmac = 1;
+> > >     plat->flags |= STMMAC_FLAG_TSO_EN;
+> > >     plat->pmt = 1;
+> > >
+> > > Please don't overcomplicate the already overcomplicated driver with a
+> > > functionality which can be reached by the default one. In this case
+> > > the easiest way is to let the generic code work and then
+> > > override/replace/fix/etc the retrieved values. Thus there won't be
+> > > need in adding the redundant functionality and keep the generic
+> > > DT-platform code a bit simpler to read.
+> >
+> > You responded with:
+> >
+> > On Tue, Feb 13, 2024 at 04:51:34PM +0100, Thierry Reding wrote:
+> > > I'm not sure I understand how this is overcomplicating things. The code
+> > > is pretty much unchanged, except that the AXI configuration can now have
+> > > driver-specified defaults before the DT is parsed. Perhaps I need to add
+> > > comments to make that a bit clearer?
+> > > 
+> > > While your version is certainly simpler it has the drawback that it no
+> > > longer allows the platform defaults to be overridden in device tree. I
+> > > would prefer if the defaults can be derived from the compatible string
+> > > but if need be for those defaults to still be overridable from device
+> > > tree.
+> >
+> > Currently available functionality is easier to read and understand: by
+> > default the data is retrieved from the DT, if no AXI DT-node found you
+> > can allocate/create your own AXI-configs, if there is AXI DT-node you
+> > can fix it up in whatever way your wish. Thus the default behavior is
+> > straightforward. You on the contrary suggest to add an additional
+> > field to the resources structure which would need to be merged in with
+> > the data retrieved from DT. It makes the stmmac_axi_setup() method and
+> > the entire logic more complex and thus harder to comprehend.
+> 
+> I suppose that's subjective. Being able to let the driver provide
+> defaults that can then be overridden by values from DT doesn't seem like
+> a very exotic (or complicated) feature to me. We do that elsewhere all
+> the time. Do the comments that I added in this version not sufficiently
+> explain what's going on?
 
-Hook up the phy interrupts for internal phys to reduce mdio traffic
-and improve responsiveness of link changes.
+I have perfectly understood what was going on since v1. My concern is
+the implementation. Here is the way the platform-specific setup
+currently works.
 
-Signed-off-by: Justin Chen <justin.chen@broadcom.com>
----
- drivers/net/ethernet/broadcom/asp2/bcmasp.c     | 17 +++++++++++++++++
- drivers/net/ethernet/broadcom/asp2/bcmasp.h     |  4 ++++
- .../net/ethernet/broadcom/asp2/bcmasp_intf.c    |  5 +++++
- 3 files changed, 26 insertions(+)
+There are two structures: stmmac_resources and plat_stmmacenet_data.
+The former one contains the generic platform resources like CSRs
+mapping, IRQs and MAC-address. The later one mainly has the DW
+MAC-specific settings. Yes, plat_stmmacenet_data has been evolved to
+an ugly monster with many redundant flags (fixing code and data here
+and there in the driver) and with some generic platform resources
+(which should have been added to the stmmac_resources structure in the
+first place, like clocks and resets). But still it's purpose is
+more-or-less defined. Both of these structures can be filled in with
+data either directly by the glue drivers or by calling the
+ready-to-use DW MAC platform data getters (stmmac_probe_config_dt()
+and stmmac_get_platform_resources()). Most importantly is that
+currently these structures have independent init semantics: no common
+data, no fields used in both contexts. There are tons of problematic
+places or questionable implementations in the driver, but at least
+this one is more-or-less defined: coherency is minimal, logic is
+linear.
 
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.c b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-index 100c69f3307a..a806dadc4196 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-@@ -31,6 +31,20 @@ static void _intr2_mask_set(struct bcmasp_priv *priv, u32 mask)
- 	priv->irq_mask |= mask;
- }
- 
-+void bcmasp_enable_phy_irq(struct bcmasp_intf *intf, int en)
-+{
-+	struct bcmasp_priv *priv = intf->parent;
-+
-+	/* Only supported with internal phys */
-+	if (!intf->internal_phy)
-+		return;
-+
-+	if (en)
-+		_intr2_mask_clear(priv, ASP_INTR2_PHY_EVENT(intf->channel));
-+	else
-+		_intr2_mask_set(priv, ASP_INTR2_PHY_EVENT(intf->channel));
-+}
-+
- void bcmasp_enable_tx_irq(struct bcmasp_intf *intf, int en)
- {
- 	struct bcmasp_priv *priv = intf->parent;
-@@ -79,6 +93,9 @@ static void bcmasp_intr2_handling(struct bcmasp_intf *intf, u32 status)
- 			__napi_schedule_irqoff(&intf->tx_napi);
- 		}
- 	}
-+
-+	if (status & ASP_INTR2_PHY_EVENT(intf->channel))
-+		phy_mac_interrupt(intf->ndev->phydev);
- }
- 
- static irqreturn_t bcmasp_isr(int irq, void *data)
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.h b/drivers/net/ethernet/broadcom/asp2/bcmasp.h
-index 127a5340625e..f93cb3da44b0 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp.h
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.h
-@@ -19,6 +19,8 @@
- #define ASP_INTR2_TX_DESC(intr)			BIT((intr) + 14)
- #define ASP_INTR2_UMC0_WAKE			BIT(22)
- #define ASP_INTR2_UMC1_WAKE			BIT(28)
-+#define ASP_INTR2_PHY_EVENT(intr)		((intr) ? BIT(30) | BIT(31) : \
-+						BIT(24) | BIT(25))
- 
- #define ASP_WAKEUP_INTR2_OFFSET			0x1200
- #define  ASP_WAKEUP_INTR2_STATUS		0x0
-@@ -556,6 +558,8 @@ void bcmasp_enable_tx_irq(struct bcmasp_intf *intf, int en);
- 
- void bcmasp_enable_rx_irq(struct bcmasp_intf *intf, int en);
- 
-+void bcmasp_enable_phy_irq(struct bcmasp_intf *intf, int en);
-+
- void bcmasp_flush_rx_port(struct bcmasp_intf *intf);
- 
- extern const struct ethtool_ops bcmasp_ethtool_ops;
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-index 0b378a6d43e7..8fbeb506abb9 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-@@ -382,6 +382,7 @@ static void bcmasp_netif_start(struct net_device *dev)
- 
- 	bcmasp_enable_rx_irq(intf, 1);
- 	bcmasp_enable_tx_irq(intf, 1);
-+	bcmasp_enable_phy_irq(intf, 1);
- 
- 	phy_start(dev->phydev);
- }
-@@ -890,6 +891,7 @@ static void bcmasp_netif_deinit(struct net_device *dev)
- 	/* Disable interrupts */
- 	bcmasp_enable_tx_irq(intf, 0);
- 	bcmasp_enable_rx_irq(intf, 0);
-+	bcmasp_enable_phy_irq(intf, 0);
- 
- 	netif_napi_del(&intf->tx_napi);
- 	netif_napi_del(&intf->rx_napi);
-@@ -1028,6 +1030,9 @@ static int bcmasp_netif_init(struct net_device *dev, bool phy_connect)
- 			goto err_phy_disable;
- 		}
- 
-+		if (intf->internal_phy)
-+			dev->phydev->irq = PHY_MAC_INTERRUPT;
-+
- 		/* Indicate that the MAC is responsible for PHY PM */
- 		phydev->mac_managed_pm = true;
- 	} else if (!intf->wolopts) {
--- 
-2.34.1
+You suggest to break that logic by introducing a new stmmac_resources
+field which doesn't represent a generic resource data, but which
+purpose is to tweak the AXI-settings in the plat_stmmacenet_data
+structure. The pointer won't be even ever initialized in the
+stmmac_get_platform_resources() method because it's done in the
+stmmac_probe_config_dt() function. Based on all of that the change you
+suggest look more like a fixup of the problem with your particular
+device/platform.
+
+Let's assume you patches are accepted. In sometime an another
+developer comes with a need to pre-define say MTL Tx/Rx queue configs,
+then another one with DMA configs, MDIO-bus settings, and so on. Thus
+the stmmac_resources structure will eventually turn in a set of the
+tweaks and the plat_stmmacenet_data pre-defines. That's how the
+plat_stmmacenet_data structure has turned in what it is now. This
+doesn't look like a right path to take again.
+
+> 
+> > The driver is already overwhelmed with flags and private/platform data
+> > fixing the code here and there (see plat_stmmacenet_data, it's a
+> > madness). So please justify in more details why do you need one more
+> > complexity added instead of:
+> > 1. overriding the AXI-configs retrieved from DT,
+> 
+> Again, overriding the AXI configs read from DT doesn't keep the current
+> default behaviour of DT being the final authority. That's a policy that
+> should remain intact. This patch (series) is about allowing the driver
+> to override the AXI defaults with something that's sensible based on
+> the compatible string. The current defaults, for example, cause the GBE
+> on Tegra devices to run at around 100 Mbps even on a 1 Gbps link.
+> 
+> > 2. updating DT on your platform
+> 
+
+> That's one possibility and was in fact the first variant I used, but it
+> has a few drawbacks. For example, it means that I need to create the AXI
+> node just to make the device functional, but if possible it's better to
+> derive all necessary information from the compatible string. Having this
+> in a separate AXI configuration node is duplicating information that's
+> already implied by the compatible string.
+> 
+> Also, on Tegra we have a few instances of this device that are all
+> configured the same way. Since the AXI configuration node is supposed to
+> be a child of the Ethernet controller node, we end up having to
+> duplicate even more information.
+
+None of that sounds like big problems. The default behavior doesn't
+make your devices not-working. Yes, the performance is poor, but they
+still work. Regarding the AXI-config DT-nodes it's not a problem at
+all. A lot of the DW *MAC instances currently have the AXI-config
+DT-subnodes. It's absolutely fine to have them setting up the same
+configs.
+
+Once again having the pre-defined configs is fine. All I am worried
+about is the implementation you suggest especially in using the
+stmmac_resources structure to tweak up the plat_stmmacenet_data data.
+So the easiest solutions in your case are:
+1. Initialize the plat_stmmacenet_data->axi pointer if no AXI
+DT-subnode was detected by the stmmac_probe_config_dt() method, after
+the method is called. This will provide almost the same semantics as
+you suggest. The only difference is that it would work not on the
+property level but on the node-level one. (Note the implementation
+suggested by you doesn't provide the AXI-configs pre-definition for
+the boolean properties. So it doesn't provide a complete AXI-config
+default pre-definition.)
+2. Add the proper AXI-config DT-subnodes to the respective device tree
+sources.
+
+If despite of all my reasoning you still insist on having a
+pre-defined setting pattern, then we'll need to come up with some
+better solution. On the top of my mind it might be for example a
+pre-definition of the entire plat_stmmacenet_data structure instance
+or using the software nodes.
+
+-Serge(y)
+
+> 
+> Thierry
 
 
---000000000000d922b20612140772
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-NhTY3E+cXCB11wty89QStajwXdhGJTYEvUgvsq1h8CwJj9w/38ldAQf5WjhPmApYeJR2ewFrBMCM
-4lHkdRJ6TDc9nXoEkypUfjJkJHe7Eal06tosh6JpAgMBAAGjggHZMIIB1TAOBgNVHQ8BAf8EBAMC
-BaAwgaMGCCsGAQUFBwEBBIGWMIGTME4GCCsGAQUFBzAChkJodHRwOi8vc2VjdXJlLmdsb2JhbHNp
-Z24uY29tL2NhY2VydC9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcnQwQQYIKwYBBQUHMAGG
-NWh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwME0G
-A1UdIARGMEQwQgYKKwYBBAGgMgEoCjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxz
-aWduLmNvbS9yZXBvc2l0b3J5LzAJBgNVHRMEAjAAMEkGA1UdHwRCMEAwPqA8oDqGOGh0dHA6Ly9j
-cmwuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3JsMCMGA1UdEQQc
-MBqBGGp1c3Rpbi5jaGVuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSME
-GDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUIWGeYuaTsnIada5Xx8TR3cheUbgw
-DQYJKoZIhvcNAQELBQADggEBAHNQlMqQOFYPYFO71A+8t+qWMmtOdd2iGswSOvpSZ/pmGlfw8ZvY
-dRTkl27m37la84AxRkiVMes14JyOZJoMh/g7fbgPlU14eBc6WQWkIA6AmNkduFWTr1pRezkjpeo6
-xVmdBLM4VY1TFDYj7S8H2adPuypd62uHMY/MZi+BIUys4uAFA+N3NuUBNjcVZXYPplYxxKEuIFq6
-sDL+OV16G+F9CkNMN3txsym8Nnx5WAYZb6+rBUIhMGz70V05xsHQfzvo2s7f0J1tJ5BoRlPPhL0h
-VOnWA3h71u9TfSsv+PXVm3P21TfOS2uc1hbzEqyENCP4i5XQ0rv0TmPW42GZ0o4xggJtMIICaQIB
-ATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhH
-bG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwj8BKLXNpALfemdRAwDQYJ
-YIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIPD8osO5HLPo51WfVTjiWTyVZ7+4DQ7LbSmp
-c8o5zL0yMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDIyMzIy
-MjUwMFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFl
-AwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATAN
-BgkqhkiG9w0BAQEFAASCAQAqylvRIAc1BhWBPiTFJi1Llkbv3EJOTqSf5BgaCU8wUOEcSH4vJ7tB
-KrdvWcMSiATmFoZcc+2m/K14tMTK98w4ejxWRTfzDRAwNGG/oZpMTnty/DSf66QRC7DkdggUiNKZ
-EauikhHdMcqOqpZMb2l9hncDUUrmXlRD7tpL9bzVhHALUEY82kX4Uk7hKuuBdnAJKgKtSMvWzSfd
-CyvIaniz76jyQBOmS+dFHe3EOp/es8mnY3Q98SKXLn9w7HOtmuWQBexEoP8d+pWAhlwygaF4Uidy
-3wkFu+DooVFHWR3JYUxgRo5YE/Qxt8B9mWpzJZ+maZUAuQ3zge3q13mFKGd/
---000000000000d922b20612140772--
 
