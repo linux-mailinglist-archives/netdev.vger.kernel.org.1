@@ -1,79 +1,77 @@
-Return-Path: <netdev+bounces-74513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16989861A94
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 18:51:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C19D7861A9B
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 18:51:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFAC7284D80
-	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 17:51:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 605051F24DD2
+	for <lists+netdev@lfdr.de>; Fri, 23 Feb 2024 17:51:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EAAB143C50;
-	Fri, 23 Feb 2024 17:48:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68AFD13A87A;
+	Fri, 23 Feb 2024 17:50:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="PaqJkDVN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Eu0rUko+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 963CD143C40
-	for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 17:48:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC6CB12D758;
+	Fri, 23 Feb 2024 17:50:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708710539; cv=none; b=XhXSQmI6QVlekldaFTaLaVFWGB//19Z1Cqo6n38LuiqOdYnx0CiNiAdE6Cs8oZOnufav2U37qwAyUskk6wePsUN4A10taV4a/P9Mz687jdHrgVWYkzFKZS+UgbxWBA+bxCOTd3IQ3c9vMBYNqFx2VJ6V827FSGUtoY1BVXbHBTE=
+	t=1708710635; cv=none; b=rk1dOl9OOmk5UAQ6bGkooNaHz1Va8vMlVLS4rrzViqLe1AQWGGwOpSAG9XWuwIv4ZmFGkdpJyvihTOpcoHuM6I+8YgdDfbOM+uZVJLOCp1n8+SP8r2q1ZwZubcgye6CeTBmsNqNfvFJr6d0eS8BoMZCdngCaspb9ff9DTpPSQd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708710539; c=relaxed/simple;
-	bh=J9CJg+f2XESx0EE8EOWgy7TWOEQmNvNe7CTVEAvMpdQ=;
+	s=arc-20240116; t=1708710635; c=relaxed/simple;
+	bh=B6DmhEttlW8Mu2glpPfxHo63S9rUwJ+jcUzzSCLsRmg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rPCddVq3GEh5DYPeAQOmZ8I2sKaIiSElqQhlpPLIOhm4FQhKHTtERojsBm/PURR8R0Nr8Hr3QN5jtcYjprBGbSWSpIs4zhmjIfRgHJBkL9L1MT3yWJBnhxMATdTm3+5NEp7F3SKUOqV3/gWLZf+geD9Hsa2hAM1Xeg9e8l13nqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=PaqJkDVN; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-299354e5f01so444354a91.1
-        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 09:48:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1708710537; x=1709315337; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0xniysJokrJSL4kA+7xMXMFdpfM5voHW8xKXFN/4z3Q=;
-        b=PaqJkDVNUvhAcZHYjyaXXhlR47txCPW5nwh7UvN501VLusznbTi0vhhkvcVwVUe96y
-         hF9onaV6DcaczNiwnv7KhPHQPymZZRCFIjHroVVHqbkLd0KJRfiRo+86fPpFhLQrtQZE
-         gLAV3WtKX9IYx4fP7TZjdHyZMZ5ZsVGOH12c8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708710537; x=1709315337;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0xniysJokrJSL4kA+7xMXMFdpfM5voHW8xKXFN/4z3Q=;
-        b=JFY0zGZ3rY80MErRw7RTe+ZnnJVZlI0jZWIMVezaPffEubi66ElGcnqAP0irJ1RiFl
-         Q9dtTkS10K/QVBQ9gtg6KUOg6EnFahqBHsS7REk5v3SZi/tMDp7RctoC+HM5/0Oj37dP
-         IFMfWUEB6ug/nZWtW2fhRFrdOqrKYKLZQf8M8+gDYVksB8GkDOolJ70WFCu6+dMSSXC1
-         YMpzNXJodD78bj+4RxHIxhusHZFCNaJUfxPZ9RhNU/JPODtXINrmyYOZRNMTnr6+XGLZ
-         qUUf9heDnnbBCXY4H9RqwrkeuNsBgDkst9QLQ2FRZG5g8qAhN5WeqF8dzv3Ajzk90umO
-         W3lQ==
-X-Gm-Message-State: AOJu0YwtHtjxpu9n5P8Yp5ZFdEfdwkkJ8WSvhA5+cnVUVmmys26lX4ox
-	oQMkPkMBEz8VQGGajH/XgKw2JZPk+Wu8+UZ7lU7HlHLiScyIqz49fFK46qW4Fw==
-X-Google-Smtp-Source: AGHT+IHPn7Lo2ZZEfv0egVA1U0588A9KlqO0T0qP4pZBiF5v6f+M7qkLa0yUFIE4yhmkeXZ+FjLDCg==
-X-Received: by 2002:a17:90a:ad97:b0:299:41dd:95c0 with SMTP id s23-20020a17090aad9700b0029941dd95c0mr619373pjq.16.1708710536866;
-        Fri, 23 Feb 2024 09:48:56 -0800 (PST)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id l14-20020a17090a72ce00b002961a383303sm1742861pjk.14.2024.02.23.09.48.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Feb 2024 09:48:56 -0800 (PST)
-Date: Fri, 23 Feb 2024 09:48:55 -0800
-From: Kees Cook <keescook@chromium.org>
-To: shuah@kernel.org, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, edumazet@google.com,
-	linux-kselftest@vger.kernel.org, mic@digikod.net,
-	linux-security-module@vger.kernel.org, jakub@cloudflare.com,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Subject: Re: [PATCH net-next v3 00/11] selftests: kselftest_harness: support
- using xfail
-Message-ID: <202402230947.614061ABBB@keescook>
-References: <20240220192235.2953484-1-kuba@kernel.org>
- <e0ce5ab05a0fc956ccde61686d7c6c90026e3909.camel@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=VI8w7fwI4CtMRT38r0URoppsrEMp29U3AlAU0R5tbwtWcIcbrl/e8XuBGMMnpBMCd67ejUwGwrv95n8gcwrCpbRVQnmDuP/nkNJAzVN7Y6pydIP3O9lyUiHk+NyBH1dRStC2yrmJ8t9DQKIQMhU69Im1b393KCrHAq9lJhiemnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Eu0rUko+; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1708710632; x=1740246632;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=B6DmhEttlW8Mu2glpPfxHo63S9rUwJ+jcUzzSCLsRmg=;
+  b=Eu0rUko+nImkEm/asxct11KJmADnNSLX1TVr98AtOPvW5DoW27dg7/xC
+   iovCDlc2qxak1JT/TquMQCH5WjZF+M9AU4qehHVslkI0hN+qILdxd0MV6
+   zO8uJIanKsmhqmW71psrLSxFAfI6zK7xE6SOUIwJoYpgYAtBDgawRXJXb
+   r9dYoeQH5gKf0t+tg9uBcQYl5nRybdD4EuUdEhGQc90LAPXl8inoFcBR7
+   az1LJM9A9zxaRtzgyUC3PXNiVHw8Ig95F7Z3dm8XJpFwiADckOHJKDAXd
+   9LNrtBz7S2vJC+K69mRUZE+usAKQDx8u03zI6PeCzgpHEaSndqMrPr00D
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10993"; a="2925139"
+X-IronPort-AV: E=Sophos;i="6.06,180,1705392000"; 
+   d="scan'208";a="2925139"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2024 09:50:32 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.06,180,1705392000"; 
+   d="scan'208";a="6454681"
+Received: from lkp-server02.sh.intel.com (HELO 3c78fa4d504c) ([10.239.97.151])
+  by orviesa008.jf.intel.com with ESMTP; 23 Feb 2024 09:50:27 -0800
+Received: from kbuild by 3c78fa4d504c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rdZgm-0007jH-1L;
+	Fri, 23 Feb 2024 17:50:24 +0000
+Date: Sat, 24 Feb 2024 01:49:40 +0800
+From: kernel test robot <lkp@intel.com>
+To: Richard Gobert <richardbgobert@gmail.com>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	idosch@nvidia.com, razor@blackwall.org, amcohen@nvidia.com,
+	petrm@nvidia.com, jbenc@redhat.com, b.galvani@gmail.com,
+	bpoirier@nvidia.com, gavinl@nvidia.com, martin.lau@kernel.org,
+	daniel@iogearbox.net, herbert@gondor.apana.org.au,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev
+Subject: Re: [PATCH net-next 1/2] net: vxlan: enable local address bind for
+ vxlan sockets
+Message-ID: <202402240119.AR4eT8mt-lkp@intel.com>
+References: <a4cd1adb-74d4-4eea-9f74-0d0ac3d79e44@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,46 +80,79 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e0ce5ab05a0fc956ccde61686d7c6c90026e3909.camel@redhat.com>
+In-Reply-To: <a4cd1adb-74d4-4eea-9f74-0d0ac3d79e44@gmail.com>
 
-On Wed, Feb 21, 2024 at 01:03:26PM +0100, Paolo Abeni wrote:
-> On Tue, 2024-02-20 at 11:22 -0800, Jakub Kicinski wrote:
-> > When running selftests for our subsystem in our CI we'd like all
-> > tests to pass. Currently some tests use SKIP for cases they
-> > expect to fail, because the kselftest_harness limits the return
-> > codes to pass/fail/skip.
-> > 
-> > Clean up and support the use of the full range of ksft exit codes
-> > under kselftest_harness.
-> > 
-> > Merge plan is to put it on top of -rc4 and merge into net-next.
-> > That way others should be able to pull the patches without
-> > any networking changes.
-> > 
-> > v2: https://lore.kernel.org/all/20240216002619.1999225-1-kuba@kernel.org/
-> >  - fix alignment
-> > follow up RFC: https://lore.kernel.org/all/20240216004122.2004689-1-kuba@kernel.org/
-> > v1: https://lore.kernel.org/all/20240213154416.422739-1-kuba@kernel.org/
-> 
-> @Shuah: it's not clear to me if you prefer to take this series via the
-> kselftests tree or we can take it via the net-next tree. Could you
-> please advise?
-> 
-> thanks!
-> 
-> Paolo
-> 
-> p.s. if this was already clarified in the past, I'm sorry: I lost track
-> of it.
+Hi Richard,
 
-Given the urgency for net-dev and the lack of conflicts with other
-kselftest changes (AFAICT), I would assume it would be fine to carry
-this in net-dev (especially since the merge window fast approaches).
+kernel test robot noticed the following build errors:
 
-Shuah, any objection?
+[auto build test ERROR on net-next/main]
 
--Kees
+url:    https://github.com/intel-lab-lkp/linux/commits/Richard-Gobert/net-vxlan-enable-local-address-bind-for-vxlan-sockets/20240223-045600
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/a4cd1adb-74d4-4eea-9f74-0d0ac3d79e44%40gmail.com
+patch subject: [PATCH net-next 1/2] net: vxlan: enable local address bind for vxlan sockets
+config: arc-randconfig-r133-20240223 (https://download.01.org/0day-ci/archive/20240224/202402240119.AR4eT8mt-lkp@intel.com/config)
+compiler: arc-elf-gcc (GCC) 13.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20240224/202402240119.AR4eT8mt-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202402240119.AR4eT8mt-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   drivers/net/vxlan/vxlan_core.c: In function 'vxlan_create_sock':
+>> drivers/net/vxlan/vxlan_core.c:3498:34: error: 'struct udp_port_cfg' has no member named 'local_ip6'; did you mean 'local_ip'?
+    3498 |                 memcpy(&udp_conf.local_ip6.s6_addr32,
+         |                                  ^~~~~~~~~
+         |                                  local_ip
+
+
+vim +3498 drivers/net/vxlan/vxlan_core.c
+
+  3482	
+  3483	static struct socket *vxlan_create_sock(struct net *net, bool ipv6, __be16 port,
+  3484						u32 flags, int ifindex,
+  3485						union vxlan_addr addr)
+  3486	{
+  3487		struct socket *sock;
+  3488		struct udp_port_cfg udp_conf;
+  3489		int err;
+  3490	
+  3491		memset(&udp_conf, 0, sizeof(udp_conf));
+  3492	
+  3493		if (ipv6) {
+  3494			udp_conf.family = AF_INET6;
+  3495			udp_conf.use_udp6_rx_checksums =
+  3496			    !(flags & VXLAN_F_UDP_ZERO_CSUM6_RX);
+  3497			udp_conf.ipv6_v6only = 1;
+> 3498			memcpy(&udp_conf.local_ip6.s6_addr32,
+  3499			       &addr.sin6.sin6_addr.s6_addr32,
+  3500			       sizeof(addr.sin6.sin6_addr.s6_addr32));
+  3501		} else {
+  3502			udp_conf.family = AF_INET;
+  3503			udp_conf.local_ip.s_addr = addr.sin.sin_addr.s_addr;
+  3504			memcpy(&udp_conf.local_ip.s_addr,
+  3505			       &addr.sin.sin_addr.s_addr,
+  3506			       sizeof(addr.sin.sin_addr.s_addr));
+  3507		}
+  3508	
+  3509		udp_conf.local_udp_port = port;
+  3510		udp_conf.bind_ifindex = ifindex;
+  3511	
+  3512		/* Open UDP socket */
+  3513		err = udp_sock_create(net, &udp_conf, &sock);
+  3514		if (err < 0)
+  3515			return ERR_PTR(err);
+  3516	
+  3517		udp_allow_gso(sock->sk);
+  3518		return sock;
+  3519	}
+  3520	
 
 -- 
-Kees Cook
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
