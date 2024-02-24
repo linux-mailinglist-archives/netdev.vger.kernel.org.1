@@ -1,103 +1,137 @@
-Return-Path: <netdev+bounces-74711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8155D862564
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 14:54:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B2BA86265D
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 18:33:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B64628307B
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 13:54:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 368CF1C20B03
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 17:33:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9FD647F69;
-	Sat, 24 Feb 2024 13:52:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6019146544;
+	Sat, 24 Feb 2024 17:33:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="c4wEiAfu"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="uSJ5ZFK2"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B7574502B
-	for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 13:51:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 031771EF1E
+	for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 17:33:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708782720; cv=none; b=pDK1kcfzew1kwaFqCUaZz7DjXkHTm1tLu4pgrkrHyLedGuDg0Gu7/veVGRoSZAyhJno0IM83Dw8jWntwm0Z3qP0X7Oi0xw0aDkDSiJRx3D6iC1clfet93HM9Q333tefeFkpjNLThcO4Q+T1sjp4Pqi1GHSwxr+6xTz5dnQyvBGk=
+	t=1708795985; cv=none; b=u8WhNCiQpwUNyY/t9KvyzlX2s+dnf0CAxIaJ+YQf48hXV83kRtm7eHOtgzHUEjg1Jgc4wna1ayviMEbpsSXcpTgNzPiGqETVm4JpQkQrLYpjJGIA6DEtjyAWcBLNGgLPFj+/CFuY0R0kAXLY52AGLrinCZHeZSzi6bwwKiqob+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708782720; c=relaxed/simple;
-	bh=RAwLP4FL7g3YG90XVDrkOyp/C+5D0yHVeVpnj4F3HQM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=asV5WiGt+99zfx8n43A0FkiTgDopQIG8tVgHFlfa5Hug86Sc7fQE0CnOIRC/4UBEr+ndT98UUtTxMGjqRsd94u6KL5QKPhcbQDZ/SzJKFsbRbVSsizx0BfAkAmSsTiZnAoHsAW2kLlbuWQts02SQI78CRXCeyrOgczXNqpdcfms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=c4wEiAfu; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1708782717;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Nhld/q3SVJCpH9JDcDmQlpv68zE8XG9Vxq5MWHA58E0=;
-	b=c4wEiAfuICV4Ka7yndl74dHwvO52WstZyEmaGai/CFGu8iC8PxlSUwq8Le+tmi08MSVfc1
-	ql11aP8R3IhUZaYdevWSbV8b4f13M8gtAXz4KjpIOf8BMOmwr5mcKGxEdoTPVn+0KS7GOv
-	XmKw7zrNub/1CXwxqJudUaybpNSWMZc=
-From: chengming.zhou@linux.dev
-To: trond.myklebust@hammerspace.com,
-	anna@kernel.org,
-	chuck.lever@oracle.com,
-	jlayton@kernel.org,
-	neilb@suse.de,
-	kolga@netapp.com
-Cc: Dai.Ngo@oracle.com,
-	tom@talpey.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	vbabka@suse.cz,
-	roman.gushchin@linux.dev,
-	Xiongwei.Song@windriver.com,
-	chengming.zhou@linux.dev,
-	Chengming Zhou <zhouchengming@bytedance.com>
-Subject: [PATCH] sunrpc: remove SLAB_MEM_SPREAD flag usage
-Date: Sat, 24 Feb 2024 13:51:49 +0000
-Message-Id: <20240224135149.830234-1-chengming.zhou@linux.dev>
+	s=arc-20240116; t=1708795985; c=relaxed/simple;
+	bh=vfIQPbYeuoD6yyQgCZjp/iz+rtIu5/SLXQw9G6hsSGc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EcRInM0/1nuMSImYm/4IFsq4Xc9Y1BqU4uPHxflMSGaJjLC5RlT04mmuu4UbmwFyuz8pzUD/AC2HcorxdlqztsWGpiPdKOXDmscGN4hpADxwMJgGeaCKl0fX/NxXApLDYLNSoV39H6bi/zOIQpJaOYB7LvdIkAKbVZ6yWEb47/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=uSJ5ZFK2; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1d7881b1843so14833785ad.3
+        for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 09:33:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1708795983; x=1709400783; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nQbcRqwCExGFnHTjnEPzslm+cF7EmshGQPBez0z65D0=;
+        b=uSJ5ZFK2qQUGaIRiyvtdVT+38HnE1ufwhUuKDxqPLkbZkjcB/B+DUkNgPLjGVnxeXM
+         1OkD9lhA70y6PQgotvdtNgMEb6SVJo9KlhlXL5qi59d/1ajlkIMzAuic8aqMqN5YEFyR
+         n72m5wKXEVNbpIGys9ex2pWAlzM7mWzy+gk++4IqoxzjE6/2wKQWpRSbeTXKVsXPFI4G
+         AicpFa59jqs/5mE+RHSrMHV5BtMCE2ECPqUR+gcca2r5tIFVwSJRhalpo3fbAJbih74D
+         ZI6hzdGdR26cAwqqLyGdWINSp3IS5v7xY6UQ0vCVApvLf4S9cK6pfRPGZWP7VgS9qq43
+         AACA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708795983; x=1709400783;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nQbcRqwCExGFnHTjnEPzslm+cF7EmshGQPBez0z65D0=;
+        b=KDNrDyeRZmOCUXlY0qH/yEUSncLor95huM2uFDRxYXxqrRp0nXjrsCTM+c/5K0D+V1
+         DektzfXADY9nyJu3Ms2Jg/WtcReRDgbTOD9yjy+vIFgATTJcETpvla9udiuUB1i5gnMy
+         BZ4/hSBFkWcFGWJshDbHrtJUPLfJzTQr75AQ+rdRpfbTvfasivof0NwrGFvkUG3+8iVY
+         BwUerzaXYq/wM+qf3Cy+b4PlzsixsgVPEOD5htwnnNnZg7XuWIoQaxSGa0e36wnrVjFT
+         Oyt3MBG+8TrLTohLYdufmKthzkw2WgAG4/3i3Rk3mSIp86VVJoWTcVrUDyogxD+j+7tL
+         58jg==
+X-Forwarded-Encrypted: i=1; AJvYcCX+u/WGhBdZnRWzFsquFdZVG2Hv54WkaNsuIaG3xbolHf4hE1WJsV9R36fxnUX+xMmZ5voQxT67BNOmhAbjREnnAxQkFJaA
+X-Gm-Message-State: AOJu0YzNxZDxzC5Hbj5ZGu/r5piPLXkBw8yL/Nb/wNaD1gkt2Q+5GlHS
+	v+MlxNXEz2osv3ufB8DJtDEFF/o9FB7cZbMXj7YfbHMW+k8GsraA26BNPTbiWjk=
+X-Google-Smtp-Source: AGHT+IHwuKKOLMy5jtt4KplYTZWN2fhEXz9dn+cYU4iwxy9LzlkrsHaiVV3sGBGwt9P58JsPamRPQw==
+X-Received: by 2002:a17:902:f682:b0:1dc:26a1:d1da with SMTP id l2-20020a170902f68200b001dc26a1d1damr4315957plg.13.1708795983349;
+        Sat, 24 Feb 2024 09:33:03 -0800 (PST)
+Received: from [192.168.1.24] (71-212-1-72.tukw.qwest.net. [71.212.1.72])
+        by smtp.gmail.com with ESMTPSA id ja3-20020a170902efc300b001db47423bdfsm1251131plb.97.2024.02.24.09.33.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 24 Feb 2024 09:33:03 -0800 (PST)
+Message-ID: <c51765ec-b072-4c01-8dce-c2fa51f1941c@davidwei.uk>
+Date: Sat, 24 Feb 2024 09:33:02 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v13 1/4] netdevsim: allow two netdevsim ports to
+ be connected
+Content-Language: en-GB
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jiri Pirko <jiri@resnulli.us>, Sabrina Dubroca <sd@queasysnail.net>,
+ maciek@machnikowski.net, horms@kernel.org, netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>
+References: <20240222050840.362799-1-dw@davidwei.uk>
+ <20240222050840.362799-2-dw@davidwei.uk> <20240223164423.6b77cf09@kernel.org>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <20240223164423.6b77cf09@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Chengming Zhou <zhouchengming@bytedance.com>
+On 2024-02-23 16:44, Jakub Kicinski wrote:
+> On Wed, 21 Feb 2024 21:08:37 -0800 David Wei wrote:
+>> +	if (!netdev_is_nsim(dev_b)) {
+>> +		pr_err("Device with ifindex %u in netnsfd %d is not a netdevsim\n", ifidx_b, netnsfd_b);
+> 
+> nit: the string format can overflow the 80 char limit, but if there 
+> are arguments and they don't fit in the limit, please put them on 
+> the next line.
 
-The SLAB_MEM_SPREAD flag is already a no-op as of 6.8-rc1, remove
-its usage so we can delete it from slab. No functional change.
+Yep I'll fix that.
 
-Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
----
- net/sunrpc/rpc_pipe.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+>> +		goto out_err;
+>> +	}
+>> +
+>> +	if (dev_a == dev_b) {
+>> +		pr_err("Cannot link a netdevsim to itself\n");
+>> +		goto out_err;
+>> +	}
+>> +
+>> +	err = 0;
+> 
+> Why zero.. 
 
-diff --git a/net/sunrpc/rpc_pipe.c b/net/sunrpc/rpc_pipe.c
-index dcc2b4f49e77..910a5d850d04 100644
---- a/net/sunrpc/rpc_pipe.c
-+++ b/net/sunrpc/rpc_pipe.c
-@@ -1490,7 +1490,7 @@ int register_rpc_pipefs(void)
- 	rpc_inode_cachep = kmem_cache_create("rpc_inode_cache",
- 				sizeof(struct rpc_inode),
- 				0, (SLAB_HWCACHE_ALIGN|SLAB_RECLAIM_ACCOUNT|
--						SLAB_MEM_SPREAD|SLAB_ACCOUNT),
-+						SLAB_ACCOUNT),
- 				init_once);
- 	if (!rpc_inode_cachep)
- 		return -ENOMEM;
--- 
-2.40.1
+Sorry left over from a previous iteration.
 
+> 
+>> +	nsim_a = netdev_priv(dev_a);
+>> +	peer = rtnl_dereference(nsim_a->peer);
+>> +	if (peer) {
+>> +		pr_err("Netdevsim %d:%u is already linked\n", netnsfd_a, ifidx_a);
+>> +		goto out_err;
+> 
+> I'd think if we hit this we should return -EBUSY?
+> Unless peer == dev_b, but that may be splitting hair.
+
+What would returning -EBUSY do?
+
+> 
+> You should also implement .ndo_get_iflink, so that ip link can display
+> the peer information.
+
+(Y)
 
