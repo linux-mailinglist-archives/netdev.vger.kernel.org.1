@@ -1,76 +1,70 @@
-Return-Path: <netdev+bounces-74646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5596A862115
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 01:14:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB88886211D
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 01:21:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 678471C226E7
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 00:14:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6105E2862D5
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 00:21:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8786645;
-	Sat, 24 Feb 2024 00:13:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l2nvya46"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D93438D;
+	Sat, 24 Feb 2024 00:21:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9614E639
-	for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 00:13:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBCE919A;
+	Sat, 24 Feb 2024 00:20:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708733603; cv=none; b=dgEsMN/vm9WWJaWXGVH8r9otvBxb9BJoUr+FqGpLUlyLaTQWL5N48LtVHDYnxoXD5KlaBElqAO31uR2O5/ZiiYKXEGz3KUR8adnD/h6VBWOPOptIOevQ00APOlQb+2V/ATqOrNKZEpvPRAKDotc8ZiPiwjwHqs+BCSiU54BW8/A=
+	t=1708734064; cv=none; b=c/PG1GJMUFFBNLT5yHCA6Pn4L6MkaUM3Q+bIvT4k5Are2611LPkr+zFrX9QR8CzS8gMdpOo0RvGdqmSvNet/aHD9vJsvrxf1qC+kI+xjThejZkAH8Rne6H5r3rXvrtMetQH8BQ8dVt6URLvoOiT5M2b4AG1AxIdk9s1bPNNmDX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708733603; c=relaxed/simple;
-	bh=txwqgqlKhx3BI9LEfqWegedjwXCUsBBp96rmLgTk4Sw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hPQNF8GsAqWoGbAvAhThPqJdu5Ay8xdqq2XPeGW0ChuF9/JSeT0bRtoLuZvBlGzaAAwGmlRZKh4ETsk7fMR6DfEwsNO/6ErySyNpQb1Fr+AD2CttSI/wZBMGlrcysppd3fVWMRUX3lIbjAKNSjYZj1odhY/kZvaAlrgWZQtOfeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l2nvya46; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3512C433C7;
-	Sat, 24 Feb 2024 00:13:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708733603;
-	bh=txwqgqlKhx3BI9LEfqWegedjwXCUsBBp96rmLgTk4Sw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=l2nvya46FwkJ1sCRTwbI+Ql3nsftYmpmacccy3JAG+4aZcwLNGmaxOlSbC4XPiWbA
-	 UxoQvmKN6OiWwo61doynI9SiFTBpWhsQvu8pt7ox8M+nytxn2urRxOL74d8KZF7Q7F
-	 EIQgu+ctyy6aCzchLPwUNkHhdqTAKnhk4IPpVghGdr3kZH8UILK4uMNpn+Ifi1t0GR
-	 oTNdwS2OywSdS8beHPZ7J1f155hj9bKXtxF3LAdIqDzfCzg/6GUoQZGGskO8rC8PSd
-	 eKstUT6MocTvKuwH4IFmlgEXWTik4cw/0YoY3H5pvyY7pu2yH5puHq8b75bqcArGN7
-	 +nWqLtz5Mojww==
-Date: Fri, 23 Feb 2024 16:13:22 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Nambiar, Amritha" <amritha.nambiar@intel.com>
-Cc: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
- <pabeni@redhat.com>, <danielj@nvidia.com>, <mst@redhat.com>,
- <michael.chan@broadcom.com>
-Subject: Re: [RFC net-next 1/3] netdev: add per-queue statistics
-Message-ID: <20240223161322.32c645e9@kernel.org>
-In-Reply-To: <de03710a-8409-49c6-bc62-c49e8291cb73@intel.com>
-References: <20240222223629.158254-1-kuba@kernel.org>
-	<20240222223629.158254-2-kuba@kernel.org>
-	<e6699bcd-e550-4282-85b4-ecf030ccdc2e@intel.com>
-	<20240222174407.5949cf90@kernel.org>
-	<de03710a-8409-49c6-bc62-c49e8291cb73@intel.com>
+	s=arc-20240116; t=1708734064; c=relaxed/simple;
+	bh=aKvxed/I9m8KBzl5cPZ2gMhHmhpX6/QrLsQZfD2oYvU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pyS3dK95W3kTG2AoGJu79+vciX66TgPkPMiGxxjYcXK66m7AmkaAEU3MJyb8gVkSbqXY5a981rcRopdfF7Bzk9gO0F6J6DhKBx7N8mRIevh37UX0yOwb/wMxdRoR18XO6zILamwUY3Zx9SjEBXP9iV8/WhBnC3J/+FeZ3KwRaL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+	id 1rdfmO-00HDXA-9c; Sat, 24 Feb 2024 08:20:37 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 24 Feb 2024 08:20:50 +0800
+Date: Sat, 24 Feb 2024 08:20:50 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+Cc: linux-kernel@vger.kernel.org, Thomas Graf <tgraf@suug.ch>,
+	netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	maple-tree@lists.infradead.org, rcu@vger.kernel.org
+Subject: Re: [PATCH 0/1] Rosebush, a new hash table
+Message-ID: <Zdk2YgIoAGOEvcJi@gondor.apana.org.au>
+References: <20240222203726.1101861-1-willy@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240222203726.1101861-1-willy@infradead.org>
 
-On Fri, 23 Feb 2024 12:51:51 -0800 Nambiar, Amritha wrote:
-> So I understand splitting a netdev object into component queues, but do 
-> you have anything in mind WRT to splitting a queue, what could be the 
-> components for a queue object?
+On Thu, Feb 22, 2024 at 08:37:23PM +0000, Matthew Wilcox (Oracle) wrote:
+>
+> Where I expect rosebush to shine is on dependent cache misses.
+> I've assumed an average chain length of 10 for rhashtable in the above
+> memory calculations.  That means on average a lookup would take five cache
+> misses that can't be speculated.  Rosebush does a linear walk of 4-byte
 
-HW vs SW stats was something that come to mind when I was writing 
-the code. More speculatively speaking - there could also be queues
-fed from multiple buffer pool, so split per buffer pool could maybe
-one day make some sense?
+Normally an rhashtable gets resized when it reaches 75% capacity
+so the average chain length should always be one.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
