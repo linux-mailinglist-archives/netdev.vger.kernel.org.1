@@ -1,238 +1,186 @@
-Return-Path: <netdev+bounces-74703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 066D68624C3
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 12:52:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D7FC8624C6
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 13:01:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 294C21C21A23
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 11:52:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE7A928364E
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 12:01:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FDEE36AF3;
-	Sat, 24 Feb 2024 11:52:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A79E39FE1;
+	Sat, 24 Feb 2024 12:01:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h+GVFbGo"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="Mn2aiat4"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01olkn2081.outbound.protection.outlook.com [40.92.52.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C1C2575E
-	for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 11:52:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708775571; cv=none; b=ZtYHltqNXbOyEGVThLJnYQsyfsYB99cu/0w+fXeERAVgUy1Ti7JuTBkEHCxU4rCA1CvTcBuUldkIX70I9/INRo1DXivVANGMTcr9RLl2J/isWehaGn6HMgDWX2VELOOCetz9eMqNKl3pLsG5yiyMMzmUL+ESuXuUgEcU3ELQYOw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708775571; c=relaxed/simple;
-	bh=uY0E/RBEKApxcCM2847zoCCtWaxMibeDudfsn3XcWA8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=vE5dJbkjRbltyPosNS7mEJdHCYWVUQQHYcPaKSsMnFVjCKHR8HH5Y+jTobb3LRl/XHBTWDzfLxMx4dQaDcYJ3TXUa7Zdcf7qli2I4nCYKAxD3Kmj2I1bVOlG7yNoLgaefqKz0uh0FBDejUdor+uCMQ2bmDsKvhQerWOHuGNKONA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h+GVFbGo; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708775568;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SVWQffDK/ZUjAh++ittTy+1YShatNEsUrXGS8707I/s=;
-	b=h+GVFbGois68P0WrqvjqPze2RFSPLymwBrC+WyfWMDSrhEvZDwVGD/rZFluhhkcGt1OUsz
-	JLa+1YI1YBLJeBWOUEl8o7Pl0QwQVNV7OZ3gKKOh+LddFg+YsROlbSUvOZ8eMXdtsRLZJp
-	0PWWlGhdcAl0QZOpu8fw427Q/7BNuIs=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-688-XaXf5UUEPdOyvsloKadnaQ-1; Sat, 24 Feb 2024 06:52:46 -0500
-X-MC-Unique: XaXf5UUEPdOyvsloKadnaQ-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-68f447d1d6bso12239346d6.1
-        for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 03:52:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708775566; x=1709380366;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SVWQffDK/ZUjAh++ittTy+1YShatNEsUrXGS8707I/s=;
-        b=cPEvsFSpB8T+tSmH1INEo2Ycx/YBkD0S21QQQzcFhyTxyzW2jabRJMqrdeliGpMsFk
-         mAmQuMyGlbdv38XEEXGDR72gSjIjmTFFu2RLEMWiZoFduxc7Tc8+GRuMY9prCX/RDih7
-         ds0T+rhbHkeOHvR2bj7QDVQjXQaiT1HJ4ozCr3MvtLHBEFjqzJA+149vg4XE2rN1Qo4J
-         MuxgWFZJUmt6RkASheQt/61Kp4tI0aG+APcHVY0wmcH5RxY3GcoY8sRHOoLvIFl1aMHI
-         2RykdyhZa2XKAVi5yXyv5/mZKMQSrD9wPK/XfmdX2iBzi+IzfhjctPlZIm4UMaB1s/+Z
-         Zu4w==
-X-Forwarded-Encrypted: i=1; AJvYcCWTjFAgaU+2LMTQwsxeBKHd9Pv9AvEr9OcVBqhQ1T6SZs9kguoXYK9WKsa0nkS5v9VcRKpkAKez3fG9iCIfSJM1mtBYMngE
-X-Gm-Message-State: AOJu0Yxb8bIOMTg+xIwdrjDwICl528HMKmp0A8kSG0rd+9nduaroUstd
-	bq5jQlWQmRHS+tGEtcoPBWCC51bewW64IBNnqbDuzS3ZiJ9HTKU7e45qD4acDbxdo91dz9teIKj
-	pIRa3c6T+ASspMFToZ2XSHklS8MKFKADZdzhxuDvnmx7l7pOq1LBOGdO4HkNyAumdIQ6bgS8Mbg
-	vkQEQa8uL/xV9vkAR2VMawqr91zS2G
-X-Received: by 2002:a0c:f051:0:b0:68f:d23c:9c40 with SMTP id b17-20020a0cf051000000b0068fd23c9c40mr2163229qvl.30.1708775566329;
-        Sat, 24 Feb 2024 03:52:46 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFqFfJNn3YyEHSZdbCj5QSsTY41zQB8+5mJC0GreQRD8BADwcjsJXHeMW2gR+qhAamQCfaMVGW3tSUYdKdsc/E=
-X-Received: by 2002:a0c:f051:0:b0:68f:d23c:9c40 with SMTP id
- b17-20020a0cf051000000b0068fd23c9c40mr2163211qvl.30.1708775566058; Sat, 24
- Feb 2024 03:52:46 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5763E18E2A;
+	Sat, 24 Feb 2024 12:01:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.52.81
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1708776103; cv=fail; b=U9Bxsffk3kU4ydqIs+U8Qs5p3dnaYX3FaRB+EuFnD9g0pXY0ZNt0Do+xmpj5jQdNVngBnI1UZkDm0Umch3d+VA5shoHYw30revtq5xqUpSwA0vW0CeNgd3sft0gHOK3ZZ2ehgjWLAL+ajGbkCelcz799RIEuHCfEb65/GRk0YIo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1708776103; c=relaxed/simple;
+	bh=Ee88mkDWMHfbx2frl3TPj/ECIEMpO6zFM9sId///5CA=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=EkLR+mj/8rU7FY2wqhK3PcEqceUoBGv7LaUPQfRbpnP7fx5V95hIJ8op8DxlUMusa1aRAz9kg3bSAtf0luDI5AKKQcp6rIPi1ISbhk1FepMy57SdV4i9weUFtcEdTXzPYbuSHAxf0EHeK3uhfyw/NTc/qwG76CmqAm2HO+Qgibs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=Mn2aiat4; arc=fail smtp.client-ip=40.92.52.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JHuw928pPM/h5oyi3rSZwG62JUbZy8oysiDzL6wwynl2IpAnwnyyRuhyJoccQ1q2ueYKbbtCKjKJAdzjESbIFe/87crOn3jEom2gWoFy16aRIhtwhdUZIc+za6/j/uG/DWVgUATQdujN/gYk6Fi/MtUorJW9XVYHP1KbCBoiuGSjEK7YAu2t3AULVS+kR6YlEUWUgg9fUjrfaZXX8ONbe7MmL1FQ7XAxmca5ZAhHGh7k7QNbse+zv1/vNfItehjw6kMCMXKRkskltIKfXPxbSvj5zcesEWBcdeAh/4lABdHhHs9OEsszDa+HFFtndL11Wj74lCVFUFSpzOcfVE9c6A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=G6qXhS6V6YBC5FVzXEC2gnWAJ4XVga7wwsPZYNDyLlM=;
+ b=KLRTpJzv4SCzbo4+FBpoW7yalNSrvMb3qzchTUfQ1wymwjK6yCOEUSc2g/Rurj8XTYQ56vffZBbTOFpyRmG5D01ctloEZ02B6OSj6a6jiHvImZbipkHgY4tjV0yA84wS52G98QwAUH+NXmjUzAiuqyscKdi/LF8yt9xXuCyjhE/0Wm5pnkjPnhBb1HFJ6SaTkUxRqtBSZM56zcVpi8/dsmT6WNrpRppoxbOcUd1f66d//XKOCYJT7UvEvbaH99YdXQpAIlwybmItaGLFuptumZxi88lhf6WvDMi5DWKKOYs8RvoZrPBflya7//Tj06ycoV13QTDaghXotSQi3EObCg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=G6qXhS6V6YBC5FVzXEC2gnWAJ4XVga7wwsPZYNDyLlM=;
+ b=Mn2aiat4+coTI8Mu1Z2812Hra7cV0yhF0SFCZtARYuBXy2tE1Ac369pr3EtpcxyfAi3WhsidaR0EjRa7sj69AGdqmpB29/LJuVYzh0ljZufI6W1fY7YzP+0DTqqAAWT65E4n5UPdwMCeo4D6LFnKA75LhfSE97HXfSjbzGJurCxVkReehJOiOdvOyKH06ELFTY9Ku76XG4pGHm4qKpzDAD8MUa4m2exDLgpEKlMGeDtd5qkn551SGOcKCtmfkQLsubRnPRzweWgPlxr6P1vHlUveKb3HpwNQ8mioRNiUSm4w07U4Z7KB4sfUCzjteD2m+rQ36C5q8VbyshJkXsWa9g==
+Received: from SEZPR06MB6959.apcprd06.prod.outlook.com (2603:1096:101:1ed::14)
+ by JH0PR06MB6631.apcprd06.prod.outlook.com (2603:1096:990:2f::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7316.27; Sat, 24 Feb
+ 2024 12:01:34 +0000
+Received: from SEZPR06MB6959.apcprd06.prod.outlook.com
+ ([fe80::53da:a8a:83cb:b9ad]) by SEZPR06MB6959.apcprd06.prod.outlook.com
+ ([fe80::53da:a8a:83cb:b9ad%4]) with mapi id 15.20.7316.023; Sat, 24 Feb 2024
+ 12:01:32 +0000
+Message-ID:
+ <SEZPR06MB69592DF3646F66B3153E16E296542@SEZPR06MB6959.apcprd06.prod.outlook.com>
+Date: Sat, 24 Feb 2024 20:01:30 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 1/6] dt-bindings: net: hisilicon-femac-mdio:
+ convert to YAML
+Content-Language: en-US
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+ Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
+ <salil.mehta@huawei.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org
+References: <20240222-net-v4-0-eea68f93f090@outlook.com>
+ <20240222-net-v4-1-eea68f93f090@outlook.com>
+ <e053448f-2b58-408a-af22-d7b464c52781@linaro.org>
+ <SEZPR06MB6959B0A21A1B601644E2836496562@SEZPR06MB6959.apcprd06.prod.outlook.com>
+ <eb772e32-7ecb-433a-a449-0aaae067963a@linaro.org>
+From: Yang Xiwen <forbidden405@outlook.com>
+In-Reply-To: <eb772e32-7ecb-433a-a449-0aaae067963a@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TMN:
+ [LnELuGYmV2gZNJlPEF/nrXGV6/gvDBNADdl3QshZc7+C7ynKB92BrnYgbG2Ik4WJOaYITrKvqn4=]
+X-ClientProxiedBy: TYCP286CA0223.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:400:3c5::11) To SEZPR06MB6959.apcprd06.prod.outlook.com
+ (2603:1096:101:1ed::14)
+X-Microsoft-Original-Message-ID:
+ <c10404c7-9cce-4dbb-9752-ae78fdd7e435@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240209100912.82473-1-ksundara@redhat.com> <ZctlswYbV1RHU2ip@mev-dev>
-In-Reply-To: <ZctlswYbV1RHU2ip@mev-dev>
-From: Karthik Sundaravel <ksundara@redhat.com>
-Date: Sat, 24 Feb 2024 17:22:35 +0530
-Message-ID: <CAPh+B4KrsKiN=QOU4HntCQh4OrJR=NpxJcOzvB05yxnc1WgKzw@mail.gmail.com>
-Subject: Re: [PATCH v3] ice: Add get/set hw address for VFs using devlink commands
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, pmenzel@molgen.mpg.de, jiri@resnulli.us, 
-	rjarry@redhat.com, aharivel@redhat.com, vchundur@redhat.com, 
-	cfontain@redhat.com, jacob.e.keller@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SEZPR06MB6959:EE_|JH0PR06MB6631:EE_
+X-MS-Office365-Filtering-Correlation-Id: d1e1f523-d3f4-42e5-c9e2-08dc3530577b
+X-MS-Exchange-SLBlob-MailProps:
+	dx7TrgQSB6fptDIq1MKF35LdOG0vGEYFXnbkbsBMi2Qxr/u6AEP/BPil8ApDpaQ+A2JRodt4Mgdeijbx//d4YiTe/IaE6rcUFgap2LFWlHo2ODAh54Sr80fuFI/zPhhad4mVrclu9T4IzXH19tXboAKS6rIDgHBKTUL287vzqHR3w7LKuEWqAtDc1QXK2tSDYpO+T0puVj3xoNNu0iSvuI4ATIjVG+2AHif2bW/y8+l8yk1Ei/pjBUyVOiyHYj3QhDs8TESxIBpPJ5n/d053Cs7PPhgArS1Gf5dW90Ow5w0H8NTetxyaZ6Bt0ZtyFTeD2FMXYt9Nx444yCcLAWeXikGK8dJpFZ/2JRrh31mm1Q/0F77UoM3cuaQ1bDIhjTpRbMN0DOgXnUW/hp6Cqg/lWCILyOnWvw9qoE2SK0GhlWFqh3MXBEpeEi9fqWc+Z4qLi9mrhFrEJxpkQ50QKbkvGbis+MKNLpufUdC9sIQy7wfN9kz7kyFfVlzCVJQpHSXSqDnM2qsvhTlTk0NIVZzR0D5/pyMR+Hlv/6ahJGVP2Px5yJhzVXWYWG68i98qpXcCoQSZlzEd6GlswXnhhIIDdFNrO/8uDQySrY5WqF9KDg4wySIYwoGyuUGuDD/0WVtAlfNkeIw7Ga687+JFftlKVY4a0wz1NliLxGD3nhTcplytFa5cH0f44q9u9ns3Yn7BQMS717maRmhg5zMN2zp3lPcOahVPgp+zDJKL5E/rzxsucq/H0Cr108aWl1L9jkMTBktjW/51EME=
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	pwdVYkglQMUKqAzOHThjY3AVAut6GFhOxR2nDdck50anRayhPprw9sPDRCgIzu1ld3f7xZt/zioyIXVzTUg0IOh+tyNCvPP+3ekIW14ZBkcLfbvx2t7s3hHZ9U8NAilKJvP8nyO+F0Kb9z115i2oBVq91sWAjMSfm9TMdN5qfRndONYeYQLhwBp9mg9pkL+geBoyP/PKf8X1Tyvljub2X24E1zWPBoNJPbpetpbrd1IpDWe1wNbujTyh/0IexTKmucHncPJVuf1eQCT5p+C0khaD4olH4Ga3CykSu3IcNwV0w69l5gnFCLTI7eTSigE/29371UCKGULQJHtl2Uq+7IPrglv623TxQONlPdMGOiZvToBBEWD8jADkohryS4ChG/baoQ2TTQS+vVYiSKmbhBnC8/smEyz8eEh2Jih0L/8GI0tG3SX8Pf7LKPjLFjMHZ0xpdpQ8q5vDdhT1BDqXKTVV24gjdXVDoTiNEAnpBWOKyiaORbpu9rUkym+Vdnb6Otqd5d2WXoZBnTmrYoYHyXBD3F2uWi2IP76NtrJNjJ4YNvIeemNU3fDIH5Z8FY1+
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?OUJRQkhWK25aNU5QWDdRK1FzUXhJTmlRb2NsbnZFRVYvUDkyWlEwRW9tWE1v?=
+ =?utf-8?B?OFY0RFdQNWdjaEV3U2d2YTh5OVZmZjhGZkpnK0piR0txcXBsZHlVTFo3TkR3?=
+ =?utf-8?B?TXhTeThOeWp6WTB6OTFoWitiMCtCSUpoTHNSdkxpUytPdTR3N09ZbXJlaWZZ?=
+ =?utf-8?B?NC9VTUFjc3EzdklTZ3hMNkdQeXRNK2xzand3dWlyNTZJZFhYVlUwTzgwQ2tw?=
+ =?utf-8?B?RlRPeWdxamlQU2tpemx1eldZQk5xd3hxSkhZWnV0aUY4eE9DY0VKZ1ZrSkJi?=
+ =?utf-8?B?N0t2NkhDaTg0MWJ6cGxzMlpqL3FBWUk0cTlKd0d5MThkbGpUMWtoTVJLU1Vy?=
+ =?utf-8?B?eDAzRUZqME45Q0VCRHNya2NZL2h5VEkyNnFRU1pGaEM2NDdsUFpwdzljNlpL?=
+ =?utf-8?B?Q2ZIU1M4Z1hyWGhldEsraVlINmFXZFA1WUpPNGZCVTdJbGQwSE1aaEJZQUdz?=
+ =?utf-8?B?TVp1UU5LeDE0VUhZcFF6SHBEeS80VGFScU9oa0lUVHlDdW80RjcvdDVnUlEz?=
+ =?utf-8?B?VTZKaEpZK1hZZllhZExvNURvcnp4QW1DU1Q3SnpyTlNHRGZmVDY5UzZhbGhr?=
+ =?utf-8?B?SEtRcGN3TlliaFdrQzlWOU9IRTI4eVZSa0ExRmNRWlUvUC9wTGZyS0w0aGZk?=
+ =?utf-8?B?S2pzVDdPM3hUZTFjbVppaFNqa0lOT2htNWFXeWlncERjcy9UUmRTOE5McEY4?=
+ =?utf-8?B?QTlLS2tEWkNZSzNSY2RlNVE5QkQ5aVpnT0pkcUlaazlkaEZwYXU1UUlGYUJJ?=
+ =?utf-8?B?cmduZmo0emp0WlppUWhoQ0RsMFpqZ1NFZ1huMjZ5VUVMUXJlQU0xc1Y1N3hY?=
+ =?utf-8?B?UDNwaEdOQ3UzNE1DcGlHOEJjVkQzYmw1MitLOXBUNG9wQ0FmS3N3TWNGcVVF?=
+ =?utf-8?B?MjBpb3lrVUVWWEQzR05LWXduVGFtMVlkM1VvWEViV1RVd3pCaWpGUk15dzlr?=
+ =?utf-8?B?aUdyMHQza2M5c25VenlPb0xEZ29NeFlaaXhCVllpMkRRNlNwOHJVQjVuTVVV?=
+ =?utf-8?B?bUhkUksxY05BRnBIZkRLbGVxbzh3d0Y5QlkvVEpvbUZwUzdsUDIxYWpXUDc5?=
+ =?utf-8?B?dEFFSlhLY3FnSU1BRGd4VW1GVENkSSt6aXVZTzJMTmZKL2VhQU81d0pQdzdF?=
+ =?utf-8?B?eWZRdTZidUlYcjRMKytsZEh6b3lmanBtbGpUd1krWWh5OGVaNGNDV1ZpNER1?=
+ =?utf-8?B?M01iMCtGZFlUMm9hZVZobDlBSGFPbzVWdTQvQ3lHL2JZQ1pvNktnWnBGb0Nv?=
+ =?utf-8?B?ZEtyaWZ3TzJKTmk0dWV6THNkb2pBbVh2MDI1V25EbTl4MnVaNlhpZWNzV08w?=
+ =?utf-8?B?MzM0RjVPdStpbUo4eExvTEk3NG1Uak5aM2VEZ1RJOUlod3l6Z2U3Q1NZL2RS?=
+ =?utf-8?B?NHBFRk11RE5OaUtaZ3AwTCtCM00wVWpYQVFDVWx0Rmh0WEdYa2N4Z0NIeC9L?=
+ =?utf-8?B?UkdYRDk4QmpJNkNDQUJ4Z29mUXRueGdhV01PdVRhbC92QUxkWFl0OHcxUG5n?=
+ =?utf-8?B?dkFrR1ZUWEhZSGFOQ29LMDNZMlh3WklIbVJxWUoyOUFsZ0JDVTVxNVlxQlBh?=
+ =?utf-8?B?c21nazhXQ0lFcTg4RFlVMGwvQU1TbzFpNkc0SG1GTHE3M2s4SGgydlUzSFhO?=
+ =?utf-8?B?b09MSWkxeWlBRmlCYWlLc2J4SktxeHZNb0V2RTJFSTVpREhaYXJoaFRtZW41?=
+ =?utf-8?B?cExBRmowTEMxcWZ2dm42RDFYcUthakNweGp2Z3pGaG0wMllISzRYazltditm?=
+ =?utf-8?Q?F9TYCLPmMBkCER3Ip/CqvLVplRJVpjQHPJ3cgDY?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d1e1f523-d3f4-42e5-c9e2-08dc3530577b
+X-MS-Exchange-CrossTenant-AuthSource: SEZPR06MB6959.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2024 12:01:32.3686
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: JH0PR06MB6631
 
-On Tue, Feb 13, 2024 at 6:21=E2=80=AFPM Michal Swiatkowski
-<michal.swiatkowski@linux.intel.com> wrote:
+On 2/24/2024 6:01 PM, Krzysztof Kozlowski wrote:
+> On 22/02/2024 19:19, Yang Xiwen wrote:
+>> On 2/23/2024 2:14 AM, Krzysztof Kozlowski wrote:
+>>> On 22/02/2024 13:43, Yang Xiwen via B4 Relay wrote:
+>>>> From: Yang Xiwen <forbidden405@outlook.com>
+>>>>
+>>>> For some FEMAC cores, MDIO bus is integrated to the MAC controller. So
+>>>> We don't have a dedicated MDIO bus clock.
+>>> Hm, this means you miss compatibles for these different cores.
+>>
+>> So you mean adding a new compatible like
+>> "hisilicon,hisi-femac-mdio-integrated" for these ones without dedicated
+>> clocks?
+> This is a part of a SoC, right? So compatibles should be SoC specific,
+> thus I expect some hisilicon,SoC-femac-mdio.
+
+
+Now i'm very sure the old binding is incorrect. I've downloaded TRM for 
+Hi3516DV300. And found that it is, in fact, very similar to Hi3798MV200. 
+There is no dedicated MDIO bus clock. the MDIO bus clock is always 
+provided by the MAC controller. So here i can say MDIO bus is always 
+integrated into the FEMAC Ethernet controller, not the SoC.
+
+
+Maybe someday we can merge these two drivers together later. We don't 
+need a MDIO bus node at all!
+
+
 >
-> On Fri, Feb 09, 2024 at 03:39:12PM +0530, Karthik Sundaravel wrote:
-> > Changing the MAC address of the VFs are not available
-> > via devlink. Add the function handlers to set and get
-> > the HW address for the VFs.
-> >
-> > Signed-off-by: Karthik Sundaravel <ksundara@redhat.com>
-> > ---
-> >  drivers/net/ethernet/intel/ice/ice_devlink.c | 86 +++++++++++++++++++-
-> >  1 file changed, 85 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net=
-/ethernet/intel/ice/ice_devlink.c
-> > index 80dc5445b50d..7ed61b10312c 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice_devlink.c
-> > +++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
-> > @@ -1576,6 +1576,89 @@ void ice_devlink_destroy_pf_port(struct ice_pf *=
-pf)
-> >       devlink_port_unregister(&pf->devlink_port);
-> >  }
-> >
-> > +/**
-> > + * ice_devlink_port_get_vf_mac_address - .port_fn_hw_addr_get devlink =
-handler
-> > + * @port: devlink port structure
-> > + * @hw_addr: MAC address of the port
-> > + * @hw_addr_len: length of MAC address
-> > + * @extack: extended netdev ack structure
-> > + *
-> > + * Callback for the devlink .port_fn_hw_addr_get operation
-> > + * Return: zero on success or an error code on failure.
-> > + */
-> > +
-> > +static int ice_devlink_port_get_vf_mac_address(struct devlink_port *po=
-rt,
-> > +                                            u8 *hw_addr, int *hw_addr_=
-len,
-> > +                                            struct netlink_ext_ack *ex=
-tack)
-> > +{
-> > +     struct devlink_port_attrs *attrs =3D &port->attrs;
-> > +     struct devlink_port_pci_vf_attrs *pci_vf;
-> > +     struct devlink *devlink =3D port->devlink;
-> > +     struct ice_pf *pf;
-> > +     struct ice_vf *vf;
-> > +     int vf_id;
-> > +
-> > +     pf =3D devlink_priv(devlink);
-> > +     if (attrs->flavour =3D=3D DEVLINK_PORT_FLAVOUR_PCI_VF) {
-> > +             pci_vf =3D &attrs->pci_vf;
-> > +             vf_id =3D pci_vf->vf;
-> > +     } else {
-> > +             NL_SET_ERR_MSG_MOD(extack, "Unable to get the vf id");
-> > +             return -EADDRNOTAVAIL;
-> > +     }
-> > +     vf =3D ice_get_vf_by_id(pf, vf_id);
-> You need to call ice_put_vf(vf); when you finish with vf.
+> Best regards,
+> Krzysztof
 >
-> This way to get vf pointer is fine, I wonder if it can be done using
-> container_of on port variable. Jake, what do you think?
-> CC: Jacob Keller
->
-> > +     if (!vf) {
-> > +             NL_SET_ERR_MSG_MOD(extack, "Unable to get the vf");
-> > +             return -EINVAL;
-> > +     }
-> > +     ether_addr_copy(hw_addr, vf->dev_lan_addr);
-> > +     *hw_addr_len =3D ETH_ALEN;
-> > +     return 0;
-> > +}
-> > +
-> > +/**
-> > + * ice_devlink_port_set_vf_mac_address - .port_fn_hw_addr_set devlink =
-handler
-> > + * @port: devlink port structure
-> > + * @hw_addr: MAC address of the port
-> > + * @hw_addr_len: length of MAC address
-> > + * @extack: extended netdev ack structure
-> > + *
-> > + * Callback for the devlink .port_fn_hw_addr_set operation
-> > + * Return: zero on success or an error code on failure.
-> > + */
-> > +static int ice_devlink_port_set_vf_mac_address(struct devlink_port *po=
-rt,
-> > +                                            const u8 *hw_addr,
-> > +                                            int hw_addr_len,
-> > +                                            struct netlink_ext_ack *ex=
-tack)
-> > +{
-> > +     struct net_device *netdev =3D port->type_eth.netdev;
-> Is it PF netdev?
-Its VF netdev
->
-> > +     struct devlink_port_attrs *attrs =3D &port->attrs;
-> > +     struct devlink_port_pci_vf_attrs *pci_vf;
-> > +     u8 mac[ETH_ALEN];
-> > +     int vf_id;
-> > +
-> > +     if (attrs->flavour =3D=3D DEVLINK_PORT_FLAVOUR_PCI_VF) {
-> > +             pci_vf =3D &attrs->pci_vf;
-> > +             vf_id =3D pci_vf->vf;
-> > +     } else {
-> > +             NL_SET_ERR_MSG_MOD(extack, "Unable to get the vf id");
-> > +             return -EADDRNOTAVAIL;
-> > +     }
-> > +
-> > +     if (!netdev) {
-> > +             NL_SET_ERR_MSG_MOD(extack, "Unable to get the netdev");
-> > +             return -EADDRNOTAVAIL;
-> > +     }
-> > +     ether_addr_copy(mac, hw_addr);
-> > +
-> > +     return ice_set_vf_mac(netdev, vf_id, mac);
-> > +}
-> > +
-> > +static const struct devlink_port_ops ice_devlink_vf_port_ops =3D {
-> > +     .port_fn_hw_addr_get =3D ice_devlink_port_get_vf_mac_address,
-> > +     .port_fn_hw_addr_set =3D ice_devlink_port_set_vf_mac_address,
-> > +};
-> > +
-> >  /**
-> >   * ice_devlink_create_vf_port - Create a devlink port for this VF
-> >   * @vf: the VF to create a port for
-> > @@ -1611,7 +1694,8 @@ int ice_devlink_create_vf_port(struct ice_vf *vf)
-> >       devlink_port_attrs_set(devlink_port, &attrs);
-> >       devlink =3D priv_to_devlink(pf);
-> >
-> > -     err =3D devlink_port_register(devlink, devlink_port, vsi->idx);
-> > +     err =3D devlink_port_register_with_ops(devlink, devlink_port,
-> > +                                          vsi->idx, &ice_devlink_vf_po=
-rt_ops);
-> >       if (err) {
-> >               dev_err(dev, "Failed to create devlink port for VF %d, er=
-ror %d\n",
-> >                       vf->vf_id, err);
-> > --
-> > 2.39.3 (Apple Git-145)
-> >
->
+
+-- 
+Regards,
+Yang Xiwen
 
 
