@@ -1,103 +1,118 @@
-Return-Path: <netdev+bounces-74694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 923278623EC
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 10:31:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 737778623F7
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 10:41:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 542B71C21A27
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 09:31:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFB05283B13
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 09:41:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7E371B59B;
-	Sat, 24 Feb 2024 09:31:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B38A1B59F;
+	Sat, 24 Feb 2024 09:41:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="y/e4ofWD"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="HmdkCEdD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C9C818037
-	for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 09:31:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86C8318E2A
+	for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 09:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708767077; cv=none; b=eqdkT2Gy7zrpCUQlXGuS6rbwegjhxxSKmq8Dr+WAPo+rt05BwxmJWUD57e3h+A85Ui2fAa6gDxAkYY5y7qGkUG6Dw0MNG96czDuyXE6DnHzR6GvBiJFEDFb+cuiyYUnjvZuOvoce3Fw48AG2cvtoJqY23i7yop1D+ZNEtlK7AZQ=
+	t=1708767666; cv=none; b=karhNgCHPcYXVCMxvu/E4L1Umg/CRNIm6BSVubBPfiYSG60RDoqzg7UyFFU6+74mTy6thlTxkDkdat4fxf/dHwar+hkJfUatVFeMGm1Zz7g7AC/MrwIYhHr63jJkX6MT5LUB2qrWoq3sAhN4tCTxl65L942ldGZhSFMe2ieM0LQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708767077; c=relaxed/simple;
-	bh=y2+xsbNA7nJA5AJAIiiYtBIFp5DHt0sr/WcAwRB23LY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oGTuyUboF26OXZgvmf/9REO5VOv5qKIFH4hlJDZ6G5GC06E2coA3q59ZHTQW8AFuTUCnY/03CaF8m7PKdZsK0m4jH5shvnp1fyD6UgyLin0OXjGGknbwGD0avywZoGJnJz/vv7qhzM9KhLkt04jTE6FzFh4J7zFHwT7GDiQ5KSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=y/e4ofWD; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-564e4477b7cso3757a12.1
-        for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 01:31:15 -0800 (PST)
+	s=arc-20240116; t=1708767666; c=relaxed/simple;
+	bh=UEFxROxE6KP7hbsHlQuKhYmjvKut4tKaZLEG/90dHnY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TzhE1J/4V3KaISA7na3Zi9XObkqRvjZJSI0QrI+HvC3TsFsCyIBcYLV1KY1JnEgqgwR7C5041/VPsefLfDKbN8b8pS9f5ENfU/J2JBYQB7yJDGdMrDlkmM1tfcX3EFb9kVMWWL6zG3tz74Ekbwmantt860VSBSATjXebI5qb5Qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=HmdkCEdD; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4129e8bc7c2so839845e9.3
+        for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 01:41:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708767073; x=1709371873; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YmY5NkPyqyDzoEieFjYp7SW5hjVc2+Nb3/NQOzb8Ges=;
-        b=y/e4ofWD20vd3a1URnY4gVNi+xSV3qazdgGof9LdTOzGjqTop0P6aPamki0ZqSqYfB
-         8jzkcCaMNaIpmJ0G14woHpNmbJvu/21hSAOyxvWzlfcTyg1WSUuQxHDXvDvmN3lpxB02
-         ej0DLMEvAf8S1YVFIb61w0mDWMR793YdZ3YIHn9a7t7ZxU/4A0DVieYSU4KYgccZtO8C
-         W0d5MnLT7+WrmnZ9cJ135R76IUHgL2rqZSQ/h4LASdB8h2e0+uax9yjGIw31p4tuTRf1
-         OxfMDNLFpY3POZ0yl9X2ouDzGJLcC0KIZ1CnYoVGT2/hTwVoeF9ZgNt8JRMldLkqinZc
-         LK5Q==
+        d=arista.com; s=google; t=1708767663; x=1709372463; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9v4R1LcjkjY5cWdbqRcV+KS7qfSyvUTSBFeDxDIrljY=;
+        b=HmdkCEdDBEb0hUoPXbEx8PLuzMUGEp+YK5OOFbuDLvD4AuJz56an7hZApsCef3o7hH
+         XR4Q0+Hwt+ARkoS65145mXVm8QpemZUbVvdFURaLbm8KbK4CW+gE+M/gZab8REYL4kWI
+         Ja/EGOjPaXDjavbcZDaS310vFcCAUjUlu7Qc9HBYdvzy7eZEmLYu2hKHYiLNeNqsAM/R
+         FBq2NY7nNa3OS38RipInsdZ3xPVyY7op8qo+X4ssGXp/URVRWtuOAtM2p+XXDNN44KFo
+         lMKq6QdwffH31Wdsof+9MZRO/81LwWE3jNAWPSCcMQ7o1q5xSCKL8aA/0U0WyI22G54o
+         RxJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708767073; x=1709371873;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YmY5NkPyqyDzoEieFjYp7SW5hjVc2+Nb3/NQOzb8Ges=;
-        b=r5RN0lkM6ZW96GkxMIY7FvyRVV2b+bxBKA4YWlKIcGl+YyjsWnsET4GWRy56EPSk+w
-         sFWlICv46VL3FjoXcOqZ4dfYBB6c4x4SeTjKRJxBIB5MdAE08k7nhluA0qDZRSkOn5SR
-         +Ly9ymkgJbBbtEpX59teNWdl5qWQBdpZRiO0cP/NzU/FX7qOmc0yz0SoZ8GWDsXTDwk5
-         xRIIYLVNbl8lAAXS8BI828R50Yols4MnxZpXfbFUqgvYwoUVGXhXhNrI2rmrK0nRp63g
-         HbIV1pCTnV7EjiEw5r4TQHJODQLaZGV4pNITR50Mz5b52+VEyeF3kCDB7+BeussRsoI7
-         lisw==
-X-Forwarded-Encrypted: i=1; AJvYcCVppUIt1ry2uAdTnkobZmAqppXfFK1vDbBq+NlAXftRfTcfxsMznbyVsHuQEW+5yFQGypP2Oy8OtusJY2o3cSWBwBgmG86k
-X-Gm-Message-State: AOJu0YyJKqR71qu8HCPopQOkMTnbLOZ0/dKZJegWg/i5xrlBpVXsoaFy
-	+bQTv8HGnxMewVeZIxyCIXqDYTQQd727TQJPGgYST7s7Ay/SgScvAsqT/Gp4eXZ08tFqE4x4qKx
-	Xf5jGF27rUzWmA8jV6ahiUxJ5bsJLdk754WJC5YN3UBxWl66XlJ94
-X-Google-Smtp-Source: AGHT+IGOZl/nBisuhQ6zD6jxD83U4XFWrPSRI4XTF0ONfj1DyW3nznVrpeMbXo6M+AY0O65iMMFktnvrm6rpep/W1WI=
-X-Received: by 2002:a50:a6d7:0:b0:565:733d:2b30 with SMTP id
- f23-20020a50a6d7000000b00565733d2b30mr114515edc.4.1708767073364; Sat, 24 Feb
- 2024 01:31:13 -0800 (PST)
+        d=1e100.net; s=20230601; t=1708767663; x=1709372463;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9v4R1LcjkjY5cWdbqRcV+KS7qfSyvUTSBFeDxDIrljY=;
+        b=kCDzHX1OC5YLIMoCRHLggpAqagFJl6vALmnw9LohzU6PV1doPfPep3hZoy1+VuAtGY
+         MxKXjPbGvFmM5KPxsYl+v3Zm/R1jWgbeNwHBirUju5UQ+41Ckkh7UjYtsY2VxKjxcbqF
+         1s2KSsIFtoU2QFgVd2GV6nRcoI9M4FUTZbT2sD7A9zImz/ygRqNo6I2og5MQb3jkxPZh
+         uFPssmMWgS9WKxuokTr/zSt1ivZL8l+uh8AXeNsyqlTFqp7VfS8Xw1bc3mKiiWZV1J7O
+         oXkZfL5x/ASaZI+jG7bjkc4HgCFeTYN/HldrIVjhMn/sUVTe/iWOc99jCUegGARpjPWF
+         pj9A==
+X-Forwarded-Encrypted: i=1; AJvYcCXToxrqttK43NKHRsPnsgH/PLZEHMBG6fNK+XJ0CdzYXr0MUjaCd3/F/8qC1AGlRbZbRb2Ei5pCda5eQW1vAjCSz07YzjBS
+X-Gm-Message-State: AOJu0YyCh8XF02FNeM3u8odGO/rFALRGKFRSoKEmYkDd2J3b8PGDV1h6
+	H9DOlMnebYdaFnUqLNhOGtO/U/rZo+pMDbCImWD2XZ7VGi8EY5bUhCFX3IWlUw==
+X-Google-Smtp-Source: AGHT+IEyK9H6qTd17qmPlYqNBSh17XoUaXYRRxKBzbl5Zs/nMraTHjuqZ5EBJfQ2dbtVFWQsGALWug==
+X-Received: by 2002:a05:600c:1d07:b0:412:6015:3dc5 with SMTP id l7-20020a05600c1d0700b0041260153dc5mr1121291wms.14.1708767662930;
+        Sat, 24 Feb 2024 01:41:02 -0800 (PST)
+Received: from [10.83.37.178] ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id f14-20020adff98e000000b0033cf60e268fsm1509225wrr.116.2024.02.24.01.41.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 24 Feb 2024 01:41:02 -0800 (PST)
+Message-ID: <ff642d38-17b8-4b12-b2ff-a819b193b2e6@arista.com>
+Date: Sat, 24 Feb 2024 09:40:55 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240224-tcp-ao-tracepoints-v1-0-15f31b7f30a7@arista.com> <20240224-tcp-ao-tracepoints-v1-3-15f31b7f30a7@arista.com>
-In-Reply-To: <20240224-tcp-ao-tracepoints-v1-3-15f31b7f30a7@arista.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sat, 24 Feb 2024 10:30:59 +0100
-Message-ID: <CANn89iKB3ov_rthyscWn=h4yxmhReXAJzHu9+dOdpzPA8F=C-w@mail.gmail.com>
-Subject: Re: [PATCH net-next 03/10] net/tcp: Move tcp_inbound_hash() from headers
-To: Dmitry Safonov <dima@arista.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>, 
-	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, Dmitry Safonov <0x7f454c46@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 03/10] net/tcp: Move tcp_inbound_hash() from
+ headers
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ Dmitry Safonov <0x7f454c46@gmail.com>
+References: <20240224-tcp-ao-tracepoints-v1-0-15f31b7f30a7@arista.com>
+ <20240224-tcp-ao-tracepoints-v1-3-15f31b7f30a7@arista.com>
+ <CANn89iKB3ov_rthyscWn=h4yxmhReXAJzHu9+dOdpzPA8F=C-w@mail.gmail.com>
+Content-Language: en-US
+From: Dmitry Safonov <dima@arista.com>
+In-Reply-To: <CANn89iKB3ov_rthyscWn=h4yxmhReXAJzHu9+dOdpzPA8F=C-w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sat, Feb 24, 2024 at 10:04=E2=80=AFAM Dmitry Safonov <dima@arista.com> w=
-rote:
->
-> Two reasons:
-> 1. It's grown up enough
-> 2. In order to not do header spaghetti by including
->    <trace/events/tcp.h>, which is necessary for TCP tracepoints.
->
-> Signed-off-by: Dmitry Safonov <dima@arista.com>
+On 2/24/24 09:30, Eric Dumazet wrote:
+> On Sat, Feb 24, 2024 at 10:04 AM Dmitry Safonov <dima@arista.com> wrote:
+>>
+>> Two reasons:
+>> 1. It's grown up enough
+>> 2. In order to not do header spaghetti by including
+>>    <trace/events/tcp.h>, which is necessary for TCP tracepoints.
+>>
+>> Signed-off-by: Dmitry Safonov <dima@arista.com>
+> 
+> Okay, but what about CONFIG_IPV6=m ?
+> 
+> I do not see any EXPORT_SYMBOL() in this patch.
 
-Okay, but what about CONFIG_IPV6=3Dm ?
+Ouch. I keep forgetting about that case, will fix in v2.
 
-I do not see any EXPORT_SYMBOL() in this patch.
+Thanks,
+             Dmitry
+
 
