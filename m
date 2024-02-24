@@ -1,139 +1,143 @@
-Return-Path: <netdev+bounces-74713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63649862685
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 18:58:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3039F8626BA
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 19:21:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 854E81C209AE
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 17:58:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B477F1F22515
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 18:21:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24E4A487BE;
-	Sat, 24 Feb 2024 17:57:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A901487A9;
+	Sat, 24 Feb 2024 18:20:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmx.com header.i=erick.archer@gmx.com header.b="IEP426xT"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B0EF487BC
-	for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 17:57:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84D514CE04;
+	Sat, 24 Feb 2024 18:20:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708797476; cv=none; b=uXYjW4JU51BcxTUhq+YI6tCy5JXgmVecte/ZVvvtqjE64wiGFRSXUZm1T5rW2yU0X8PH5xqgb5S/JxxmYN8iq6iYLqtTSwnLj19aueAAb4Rrhao7wn9Ci1KbZ+UdtP40IqUKPVQtDsHyYip4N+XknVkv/AgSvSw0qz5qcDZdc0s=
+	t=1708798834; cv=none; b=C7HClWI68Q3JcL/XUcialeue4YpSNBWPjgAY6xWHcGshDW3w3pBguPe9SCAYyJah5aGDf1JzAcGQE+Tv0ZdPalhfF1lMsvoaHEuIYsaDCfktLoZI1wEu0Y+h1LplV+bTXVP+PrrS1SnecstMXeNjTgbsI+x/MRDmtEd0h7dSCzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708797476; c=relaxed/simple;
-	bh=tR5PRCTus2EF210gXUkGX6tXvo6hwHDBhRUrqzTaugI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WlC6OerXReDFJiKJLamFkVbEq1oNMw7VEA+88AibdHRWhX35VYrWBHS9ldyqxIOXahIfpiI5D+s0aJp4MLkmcVsxxhh6zJHnk0Eq3P/xQD5neylpjLoXt+ciEs3wDcOneiuP/yqHQtoqdn4Z03QOzIxTUm5sAzdPv80QYnrINfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rdwH0-0001uP-7w; Sat, 24 Feb 2024 18:57:18 +0100
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rdwGu-002ef9-Po; Sat, 24 Feb 2024 18:57:12 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rdwGu-005pID-2F;
-	Sat, 24 Feb 2024 18:57:12 +0100
-Date: Sat, 24 Feb 2024 18:57:12 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Andrew Lunn <andrew@lunn.ch>, Wei Fang <wei.fang@nxp.com>,
+	s=arc-20240116; t=1708798834; c=relaxed/simple;
+	bh=HLdtFuwBDRNLRQYjgEwBZfjetsumFZP9EINs5eu8Ui0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qxlRoVwAQO1HoEPqf/rH3aJKbNOxAmj7EAljzJyMQJa+hURysmf8qNvEauIrfeQqN4DRp0ntlUGSS/9JgDU9urwUPwwAr0KtMm9BJScMeOGOJLePt+EVERfaTp1W5/EmXlDz1JxHZmOWJI3lWWuacyPRxE6tNv5VNjA25v+yvlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.com; spf=pass smtp.mailfrom=gmx.com; dkim=pass (2048-bit key) header.d=gmx.com header.i=erick.archer@gmx.com header.b=IEP426xT; arc=none smtp.client-ip=212.227.17.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.com;
+	s=s31663417; t=1708798805; x=1709403605; i=erick.archer@gmx.com;
+	bh=HLdtFuwBDRNLRQYjgEwBZfjetsumFZP9EINs5eu8Ui0=;
+	h=X-UI-Sender-Class:From:To:Cc:Subject:Date;
+	b=IEP426xTmej+7wKw+cfrPlRcwHyTD2bo6IKM9j8f4FRW9IH91ACv+ZZ1oR3ljs8/
+	 jzGmx3XrzB5p21J2sX+RFH2XbY99Ji8EnAMnX+wVs7fNLy25JjsA09DAIoYOx2ge0
+	 z67MXv0gRBZhaq2tJjVTIeA3YNcACLUjmpnuKNAQpGAvQ0IYwBm+fW/Dt395Th5M2
+	 0vl+c565fUx5qBgLxOpU3glRVvsS7UrIVxOSqfufnbf1fwBqcJhgMz1dltAmbKJbr
+	 k4NAwiyp5iAXL/cFjXQzEXIcbeWD/8QO9NKBkqOTooOHrwh0FoI+6XPTtC5LfkmcE
+	 4OKqJ3OJdITMBpYLNw==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from localhost.localdomain ([79.157.194.183]) by mail.gmx.net
+ (mrgmx104 [212.227.17.174]) with ESMTPSA (Nemesis) id
+ 1Mzyuc-1qjUQ638qs-00wzVL; Sat, 24 Feb 2024 19:20:05 +0100
+From: Erick Archer <erick.archer@gmx.com>
+To: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
+	Chiranjeevi Rapolu <chiranjeevi.rapolu@linux.intel.com>,
+	Liu Haijun <haijun.liu@mediatek.com>,
+	M Chetan Kumar <m.chetan.kumar@linux.intel.com>,
+	Ricardo Martinez <ricardo.martinez@linux.intel.com>,
+	Loic Poulain <loic.poulain@linaro.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	NXP Linux Team <linux-imx@nxp.com>
-Subject: Re: [PATCH net-next v6 5/8] net: phy: Immediately call adjust_link
- if only tx_lpi_enabled changes
-Message-ID: <Zdot-Mqw1z4ZEo8v@pengutronix.de>
-References: <20240223094425.691209-1-o.rempel@pengutronix.de>
- <20240223094425.691209-6-o.rempel@pengutronix.de>
- <Zdh1nMWZDynP/AMc@shell.armlinux.org.uk>
- <84e1368d-ec6a-48af-945b-509528c45dff@lunn.ch>
- <Zdic+ua5LnWxjLPn@shell.armlinux.org.uk>
- <6af3406a-7968-41e5-bf6e-71d020d8b28a@broadcom.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Kees Cook <keescook@chromium.org>
+Cc: Erick Archer <erick.archer@gmx.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH] net: wwan: t7xx: Prefer struct_size over open coded arithmetic
+Date: Sat, 24 Feb 2024 19:19:32 +0100
+Message-Id: <20240224181932.2720-1-erick.archer@gmx.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <6af3406a-7968-41e5-bf6e-71d020d8b28a@broadcom.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Provags-ID: V03:K1:Zqwqz6nr2f2W88YDtxj5s173lC+WL8Q3S4fkpDNb1BxCayF7w1B
+ hiCsPIspmSeo9iD2LNzgyOJJHCXzOZK9RUcL/lcMGu3szbUEieZxyCk7aITHWPn7rAqhg5T
+ XMbRQYVfUl73uwaX3hZiEp9ssE/TFiYTLsCvjHa9X7FnAK3/MR5hXC2FrIpTIL7SH9uIvZX
+ x6DXFyrAcH//mveWSeAMQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:H68dJOmZMmY=;ChL+qRCgvBIQRtWHzfugkT2SI+x
+ +Oi5d92008y1yW13c9DyKvLTBUnq8BrfHQxxe4JNI3mdQv3/A6xOPpkdibF5VA3UzCusMrVKp
+ zyCD9mgiwg9b6J5nntqh2zG0U3qvfWGehEFhfpKb6KR106FlFfFh/QOtolxgv44VOD5amdtFU
+ DxoEEqDnC9rhmLI+BblRg+ndf/8KF8NCvlmuSpRYlGiB/4towQTW4cBmMzf1iCmMOenzkClIo
+ +xcZEnxGcaN/kcYqYu7sQXHjBiPqVYXFGlst2TbuX4tN16RIoufpiuEb6O6OvgMAYEj8IfqtA
+ SIVdkuLcsw/MMIsO6LRS6SPprEGJ/XBzWmjnhBrYrJ9sfhrvlvuUUWik3Ez/hvNdb1IUKrda8
+ FdPQ3Ll0jS3MgCiehwqX+7URUqirCX27rHv2447iD4gV7WIeie6PUo2H8aqNs5ccV0XErA700
+ I0NFCSCKj3E8MKQSmKv/ahbtjjFLcn3nwMi+vDPW4Cwrxdk3chqIv37pWsqeHl9sffEm2diZ3
+ 3zI26HBTz/i8jWm/V2us69meMXliDX7s6yDSU3vPOR2xtxxAlR3GM0Nvt0x8XU08ezOEmBuN4
+ sYVAySeTgDD+DpHh8vjTff84tfABOXYogOLfFsPBSOnh6jmV3owJCScKfndCeatsurWkRloW4
+ kuvWTlMi6LxB1wJGnFlD4GstSHVaiYFYbGyChZ46yV6N+CYFs/Q8AXnnOCkdAoO5Vkfrb7/+E
+ wrBaV2fyfF2Z+r+zf3k3kY34l8bp+RcU6wrxQOOttNoJ/upP38pvBe3BNXNQyVGWlD19YO7N/
+ qsK5qexm6Y6XWfZcqex7o4fysVoq7JLhrF63tUdBRLxcY=
 
-On Fri, Feb 23, 2024 at 09:53:06AM -0800, Florian Fainelli wrote:
-> On 2/23/24 05:26, Russell King (Oracle) wrote:
-> > On Fri, Feb 23, 2024 at 02:17:59PM +0100, Andrew Lunn wrote:
-> > > On Fri, Feb 23, 2024 at 10:38:20AM +0000, Russell King (Oracle) wrote:
-> > > > On Fri, Feb 23, 2024 at 10:44:22AM +0100, Oleksij Rempel wrote:
-> > > > > +static void phy_ethtool_set_eee_noneg(struct phy_device *phydev,
-> > > > > +				      struct ethtool_keee *data)
-> > > > > +{
-> > > > > +	if (phydev->eee_cfg.tx_lpi_enabled !=3D
-> > > > > +	    data->tx_lpi_enabled) {
-> > > > > +		eee_to_eeecfg(data, &phydev->eee_cfg);
-> > > > > +		phydev->enable_tx_lpi =3D eeecfg_mac_can_tx_lpi(&phydev->eee_c=
-fg);
-> > > > > +		if (phydev->link)
-> > > > > +			phy_link_up(phydev);
-> > > >=20
-> > > > I'm not convinced this is a good idea. Hasn't phylib previously had
-> > > > the guarantee that the link will go down between two link-up events?
-> > > > So calling phy_link_up() may result in either the MAC driver ignori=
-ng
-> > > > it, or modifying registers that are only supposed to be modified wh=
-ile
-> > > > the MAC side is down.
-> > >=20
-> > > When auto-neg is used, we expect the link to go down and come back up
-> > > again.
-> > >=20
-> > > Here we are dealing with the case that autoneg is not used. The MAC
-> > > needs informing somehow. If we want to preserve the down/up, we could
-> > > call phy_link_down() and then phy_link_up() back to back.
-> >=20
-> > Would it be better to have a separate callback for EEE state (as I
-> > mentioned in another comment on this series?) That would be better
-> > for future SmartEEE support.
->=20
-> That sounds like a good approach to me. The additional callback also helps
-> figure out which drivers use the API and it should be simpler to audit for
-> changes in the future, too.
+This is an effort to get rid of all multiplications from allocation
+functions in order to prevent integer overflows [1][2].
 
-At this point I need help to understand how to proceed.
-What exactly do you have in mind? Some description like following would
-be helpful:
-Add callback with name phy_link_set_eee(), which should be executed in
-function bla/blup..
+As the "port_prox" variable is a pointer to "struct port_proxy" and
+this structure ends in a flexible array:
 
-Regards,
-Oleksij
---=20
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+struct port_proxy {
+	[...]
+	struct t7xx_port ports[];
+};
+
+the preferred way in the kernel is to use the struct_size() helper to
+do the arithmetic instead of the argument "size + size * count" in the
+devm_kzalloc() function.
+
+This way, the code is more readable and safer.
+
+Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#open-=
+coded-arithmetic-in-allocator-arguments [1]
+Link: https://github.com/KSPP/linux/issues/160 [2]
+
+Signed-off-by: Erick Archer <erick.archer@gmx.com>
+=2D--
+ drivers/net/wwan/t7xx/t7xx_port_proxy.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/wwan/t7xx/t7xx_port_proxy.c b/drivers/net/wwan/t7=
+xx/t7xx_port_proxy.c
+index 8f5e01705af2..7d6388bf1d7c 100644
+=2D-- a/drivers/net/wwan/t7xx/t7xx_port_proxy.c
++++ b/drivers/net/wwan/t7xx/t7xx_port_proxy.c
+@@ -543,8 +543,10 @@ static int t7xx_proxy_alloc(struct t7xx_modem *md)
+ 	struct device *dev =3D &md->t7xx_dev->pdev->dev;
+ 	struct port_proxy *port_prox;
+
+-	port_prox =3D devm_kzalloc(dev, sizeof(*port_prox) +
+-				 sizeof(struct t7xx_port) * T7XX_MAX_POSSIBLE_PORTS_NUM,
++	port_prox =3D devm_kzalloc(dev,
++				 struct_size(port_prox,
++					     ports,
++					     T7XX_MAX_POSSIBLE_PORTS_NUM),
+ 				 GFP_KERNEL);
+ 	if (!port_prox)
+ 		return -ENOMEM;
+=2D-
+2.25.1
+
 
