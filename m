@@ -1,137 +1,139 @@
-Return-Path: <netdev+bounces-74712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B2BA86265D
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 18:33:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 63649862685
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 18:58:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 368CF1C20B03
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 17:33:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 854E81C209AE
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 17:58:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6019146544;
-	Sat, 24 Feb 2024 17:33:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="uSJ5ZFK2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24E4A487BE;
+	Sat, 24 Feb 2024 17:57:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 031771EF1E
-	for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 17:33:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B0EF487BC
+	for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 17:57:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708795985; cv=none; b=u8WhNCiQpwUNyY/t9KvyzlX2s+dnf0CAxIaJ+YQf48hXV83kRtm7eHOtgzHUEjg1Jgc4wna1ayviMEbpsSXcpTgNzPiGqETVm4JpQkQrLYpjJGIA6DEtjyAWcBLNGgLPFj+/CFuY0R0kAXLY52AGLrinCZHeZSzi6bwwKiqob+Y=
+	t=1708797476; cv=none; b=uXYjW4JU51BcxTUhq+YI6tCy5JXgmVecte/ZVvvtqjE64wiGFRSXUZm1T5rW2yU0X8PH5xqgb5S/JxxmYN8iq6iYLqtTSwnLj19aueAAb4Rrhao7wn9Ci1KbZ+UdtP40IqUKPVQtDsHyYip4N+XknVkv/AgSvSw0qz5qcDZdc0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708795985; c=relaxed/simple;
-	bh=vfIQPbYeuoD6yyQgCZjp/iz+rtIu5/SLXQw9G6hsSGc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EcRInM0/1nuMSImYm/4IFsq4Xc9Y1BqU4uPHxflMSGaJjLC5RlT04mmuu4UbmwFyuz8pzUD/AC2HcorxdlqztsWGpiPdKOXDmscGN4hpADxwMJgGeaCKl0fX/NxXApLDYLNSoV39H6bi/zOIQpJaOYB7LvdIkAKbVZ6yWEb47/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=uSJ5ZFK2; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1d7881b1843so14833785ad.3
-        for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 09:33:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1708795983; x=1709400783; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nQbcRqwCExGFnHTjnEPzslm+cF7EmshGQPBez0z65D0=;
-        b=uSJ5ZFK2qQUGaIRiyvtdVT+38HnE1ufwhUuKDxqPLkbZkjcB/B+DUkNgPLjGVnxeXM
-         1OkD9lhA70y6PQgotvdtNgMEb6SVJo9KlhlXL5qi59d/1ajlkIMzAuic8aqMqN5YEFyR
-         n72m5wKXEVNbpIGys9ex2pWAlzM7mWzy+gk++4IqoxzjE6/2wKQWpRSbeTXKVsXPFI4G
-         AicpFa59jqs/5mE+RHSrMHV5BtMCE2ECPqUR+gcca2r5tIFVwSJRhalpo3fbAJbih74D
-         ZI6hzdGdR26cAwqqLyGdWINSp3IS5v7xY6UQ0vCVApvLf4S9cK6pfRPGZWP7VgS9qq43
-         AACA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708795983; x=1709400783;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nQbcRqwCExGFnHTjnEPzslm+cF7EmshGQPBez0z65D0=;
-        b=KDNrDyeRZmOCUXlY0qH/yEUSncLor95huM2uFDRxYXxqrRp0nXjrsCTM+c/5K0D+V1
-         DektzfXADY9nyJu3Ms2Jg/WtcReRDgbTOD9yjy+vIFgATTJcETpvla9udiuUB1i5gnMy
-         BZ4/hSBFkWcFGWJshDbHrtJUPLfJzTQr75AQ+rdRpfbTvfasivof0NwrGFvkUG3+8iVY
-         BwUerzaXYq/wM+qf3Cy+b4PlzsixsgVPEOD5htwnnNnZg7XuWIoQaxSGa0e36wnrVjFT
-         Oyt3MBG+8TrLTohLYdufmKthzkw2WgAG4/3i3Rk3mSIp86VVJoWTcVrUDyogxD+j+7tL
-         58jg==
-X-Forwarded-Encrypted: i=1; AJvYcCX+u/WGhBdZnRWzFsquFdZVG2Hv54WkaNsuIaG3xbolHf4hE1WJsV9R36fxnUX+xMmZ5voQxT67BNOmhAbjREnnAxQkFJaA
-X-Gm-Message-State: AOJu0YzNxZDxzC5Hbj5ZGu/r5piPLXkBw8yL/Nb/wNaD1gkt2Q+5GlHS
-	v+MlxNXEz2osv3ufB8DJtDEFF/o9FB7cZbMXj7YfbHMW+k8GsraA26BNPTbiWjk=
-X-Google-Smtp-Source: AGHT+IHwuKKOLMy5jtt4KplYTZWN2fhEXz9dn+cYU4iwxy9LzlkrsHaiVV3sGBGwt9P58JsPamRPQw==
-X-Received: by 2002:a17:902:f682:b0:1dc:26a1:d1da with SMTP id l2-20020a170902f68200b001dc26a1d1damr4315957plg.13.1708795983349;
-        Sat, 24 Feb 2024 09:33:03 -0800 (PST)
-Received: from [192.168.1.24] (71-212-1-72.tukw.qwest.net. [71.212.1.72])
-        by smtp.gmail.com with ESMTPSA id ja3-20020a170902efc300b001db47423bdfsm1251131plb.97.2024.02.24.09.33.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 24 Feb 2024 09:33:03 -0800 (PST)
-Message-ID: <c51765ec-b072-4c01-8dce-c2fa51f1941c@davidwei.uk>
-Date: Sat, 24 Feb 2024 09:33:02 -0800
+	s=arc-20240116; t=1708797476; c=relaxed/simple;
+	bh=tR5PRCTus2EF210gXUkGX6tXvo6hwHDBhRUrqzTaugI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WlC6OerXReDFJiKJLamFkVbEq1oNMw7VEA+88AibdHRWhX35VYrWBHS9ldyqxIOXahIfpiI5D+s0aJp4MLkmcVsxxhh6zJHnk0Eq3P/xQD5neylpjLoXt+ciEs3wDcOneiuP/yqHQtoqdn4Z03QOzIxTUm5sAzdPv80QYnrINfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rdwH0-0001uP-7w; Sat, 24 Feb 2024 18:57:18 +0100
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rdwGu-002ef9-Po; Sat, 24 Feb 2024 18:57:12 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rdwGu-005pID-2F;
+	Sat, 24 Feb 2024 18:57:12 +0100
+Date: Sat, 24 Feb 2024 18:57:12 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Andrew Lunn <andrew@lunn.ch>, Wei Fang <wei.fang@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	NXP Linux Team <linux-imx@nxp.com>
+Subject: Re: [PATCH net-next v6 5/8] net: phy: Immediately call adjust_link
+ if only tx_lpi_enabled changes
+Message-ID: <Zdot-Mqw1z4ZEo8v@pengutronix.de>
+References: <20240223094425.691209-1-o.rempel@pengutronix.de>
+ <20240223094425.691209-6-o.rempel@pengutronix.de>
+ <Zdh1nMWZDynP/AMc@shell.armlinux.org.uk>
+ <84e1368d-ec6a-48af-945b-509528c45dff@lunn.ch>
+ <Zdic+ua5LnWxjLPn@shell.armlinux.org.uk>
+ <6af3406a-7968-41e5-bf6e-71d020d8b28a@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v13 1/4] netdevsim: allow two netdevsim ports to
- be connected
-Content-Language: en-GB
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jiri Pirko <jiri@resnulli.us>, Sabrina Dubroca <sd@queasysnail.net>,
- maciek@machnikowski.net, horms@kernel.org, netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>
-References: <20240222050840.362799-1-dw@davidwei.uk>
- <20240222050840.362799-2-dw@davidwei.uk> <20240223164423.6b77cf09@kernel.org>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20240223164423.6b77cf09@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <6af3406a-7968-41e5-bf6e-71d020d8b28a@broadcom.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 2024-02-23 16:44, Jakub Kicinski wrote:
-> On Wed, 21 Feb 2024 21:08:37 -0800 David Wei wrote:
->> +	if (!netdev_is_nsim(dev_b)) {
->> +		pr_err("Device with ifindex %u in netnsfd %d is not a netdevsim\n", ifidx_b, netnsfd_b);
-> 
-> nit: the string format can overflow the 80 char limit, but if there 
-> are arguments and they don't fit in the limit, please put them on 
-> the next line.
+On Fri, Feb 23, 2024 at 09:53:06AM -0800, Florian Fainelli wrote:
+> On 2/23/24 05:26, Russell King (Oracle) wrote:
+> > On Fri, Feb 23, 2024 at 02:17:59PM +0100, Andrew Lunn wrote:
+> > > On Fri, Feb 23, 2024 at 10:38:20AM +0000, Russell King (Oracle) wrote:
+> > > > On Fri, Feb 23, 2024 at 10:44:22AM +0100, Oleksij Rempel wrote:
+> > > > > +static void phy_ethtool_set_eee_noneg(struct phy_device *phydev,
+> > > > > +				      struct ethtool_keee *data)
+> > > > > +{
+> > > > > +	if (phydev->eee_cfg.tx_lpi_enabled !=3D
+> > > > > +	    data->tx_lpi_enabled) {
+> > > > > +		eee_to_eeecfg(data, &phydev->eee_cfg);
+> > > > > +		phydev->enable_tx_lpi =3D eeecfg_mac_can_tx_lpi(&phydev->eee_c=
+fg);
+> > > > > +		if (phydev->link)
+> > > > > +			phy_link_up(phydev);
+> > > >=20
+> > > > I'm not convinced this is a good idea. Hasn't phylib previously had
+> > > > the guarantee that the link will go down between two link-up events?
+> > > > So calling phy_link_up() may result in either the MAC driver ignori=
+ng
+> > > > it, or modifying registers that are only supposed to be modified wh=
+ile
+> > > > the MAC side is down.
+> > >=20
+> > > When auto-neg is used, we expect the link to go down and come back up
+> > > again.
+> > >=20
+> > > Here we are dealing with the case that autoneg is not used. The MAC
+> > > needs informing somehow. If we want to preserve the down/up, we could
+> > > call phy_link_down() and then phy_link_up() back to back.
+> >=20
+> > Would it be better to have a separate callback for EEE state (as I
+> > mentioned in another comment on this series?) That would be better
+> > for future SmartEEE support.
+>=20
+> That sounds like a good approach to me. The additional callback also helps
+> figure out which drivers use the API and it should be simpler to audit for
+> changes in the future, too.
 
-Yep I'll fix that.
+At this point I need help to understand how to proceed.
+What exactly do you have in mind? Some description like following would
+be helpful:
+Add callback with name phy_link_set_eee(), which should be executed in
+function bla/blup..
 
-> 
->> +		goto out_err;
->> +	}
->> +
->> +	if (dev_a == dev_b) {
->> +		pr_err("Cannot link a netdevsim to itself\n");
->> +		goto out_err;
->> +	}
->> +
->> +	err = 0;
-> 
-> Why zero.. 
-
-Sorry left over from a previous iteration.
-
-> 
->> +	nsim_a = netdev_priv(dev_a);
->> +	peer = rtnl_dereference(nsim_a->peer);
->> +	if (peer) {
->> +		pr_err("Netdevsim %d:%u is already linked\n", netnsfd_a, ifidx_a);
->> +		goto out_err;
-> 
-> I'd think if we hit this we should return -EBUSY?
-> Unless peer == dev_b, but that may be splitting hair.
-
-What would returning -EBUSY do?
-
-> 
-> You should also implement .ndo_get_iflink, so that ip link can display
-> the peer information.
-
-(Y)
+Regards,
+Oleksij
+--=20
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
