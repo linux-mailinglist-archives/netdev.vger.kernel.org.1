@@ -1,133 +1,111 @@
-Return-Path: <netdev+bounces-74674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6983986235D
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 08:51:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20120862369
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 09:21:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05EF01F2401E
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 07:51:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7DAF1F21EDA
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 08:21:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C80C214017;
-	Sat, 24 Feb 2024 07:51:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CCFD168CD;
+	Sat, 24 Feb 2024 08:21:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="pf2Sl/sI";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="QIdGf64Y"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="y7sRPJHJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout3-smtp.messagingengine.com (fout3-smtp.messagingengine.com [103.168.172.146])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 740E479E4;
-	Sat, 24 Feb 2024 07:51:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B064217580
+	for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 08:21:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708761075; cv=none; b=Lm3LztM83Rg3lxh8TneaRlr9bKu7+NJIVwGd8IiIpjiHWYsIsrejn8jzQM3wdBZ27vpNw5uPUi8Hios4s+KGPcmd/Lvd4q10QI/CjdkEtrRL78y5QnBe9GHZ0FnZXeSp9RBaKtCOosviTnucjgLCayu3wqEsY2z8sSDzisUMMDg=
+	t=1708762902; cv=none; b=Zd0bfoxuVqK+B4aC4gQJROJwbyq7osvxyghtyojQ8rloEyH7wqsfORp1GBSZqWEaMQvViEHzS/vHkvs8btvTJJqkVNyX3OY8hO0xPo/aQ1CGzik/fmQZ17JZS4rV1K/3P9etssB+1EjxVdPduPpg28jSdc53PzqZYJLHHpOBZ0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708761075; c=relaxed/simple;
-	bh=NZu7884jbQxKplISr4kCwPVejLQR3NxfjCa2+s5T2ao=;
-	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
-	 Subject:Content-Type; b=BdSIF0H3KBiFyLwhMLLdqBb5SG5GYJ4jikPgL8HzbGAV9RcVug71dN4sWqxpUs+clQ4bycmpp4JKQDrJEUc0F1E4QermHH3Okgkvie4udEBXj4zVZltEqR7TPWF7WEO9eL+lyFfFqMV0w/8zVIDVBNipWf+kuc+AtB2Reuz9F4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=pf2Sl/sI; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=QIdGf64Y; arc=none smtp.client-ip=103.168.172.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailfout.nyi.internal (Postfix) with ESMTP id 57BF213800DE;
-	Sat, 24 Feb 2024 02:51:12 -0500 (EST)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Sat, 24 Feb 2024 02:51:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm3; t=1708761072; x=1708847472; bh=fehBFjztNU
-	sChvE2N/ZKvwmwJZ1JLOdBn2mZWlKng5M=; b=pf2Sl/sIdgyNEtDcoo7s95d9t3
-	m4SbadgaJdotfy2GXDIvxYX3ERANddTW1m7TR4xNGMAMynvZcrRnyFarpsz47gEx
-	HHy01NP8tDjLP8x3aVhMxA1cQKOxr7ROzvqQrkN4+I9c5Bz1ciWJ8sVrzH24icHQ
-	JH8lTdlnn3xWtChnlh88qmhJrOxzYBa6tGxv/NNuPsMfSiw04eYa6kOGmuat9d7C
-	yKR1Dbxfh4m3HpB+3K9k6z5sKJBBhrSrDBtsbTTTDy8p2k0e7XqMmvXAiCEZgQn4
-	7ldpfTAvJcEfvbgQnSqUeRIAHDNxNPAcyB00/owIQy/yBlI2UCC5s8hGW44g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm1; t=1708761072; x=1708847472; bh=fehBFjztNUsChvE2N/ZKvwmwJZ1J
-	LOdBn2mZWlKng5M=; b=QIdGf64YY9dA3KtYtQLOrenYvtC4NZKb0B1JnSnnnX+m
-	3Xs/RhQAzyKtSGSHpUFSrSvdv/AjMNIwc6JbukNoFbbUN26uivtj9J1DyzLIzrZ8
-	iajt3weYOuFXFWwBkLS/NumBJBBwvaJPGub6tbCyD1XJryIn5qdo7iJUfGcu7NTn
-	ZD83UXdj7sXepZL/v40pvI5IxotDdR7CTYcDk3Rj9I5XXs/ydu8D0Onc2D5oXiHb
-	xOeARbKhRAuQu1hm7gzN1absYZStB8SpM4GQ8UJSkV0sQvVBVPZ4RErgGZu6QQNk
-	WusRpeaa36GpAlbesiAuqXz3cXRLIi5ye7HQbCuvkw==
-X-ME-Sender: <xms:75_ZZbn6m3uq7icLq8Kub9shZYXw4F0y9WDCEHcmu610YdGpfWu9mA>
-    <xme:75_ZZe0SLp1A3g3heVl7pOco74n3P4qAjjfTSMImEh_wkEHaN2W2szfnXFBCB4flj
-    eneX9cnxg7INTlH0y4>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrfeejgdduudduucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
-    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
-    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
-    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
-    hrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:75_ZZRpVe0HBboGshmpTmRSo-B3BS5y7d6KK9ZTcxr32wGJuqmpIzg>
-    <xmx:75_ZZTkE1PRv0z3WGozAD806ZJgtDIs0HO744T-4tQJslceQTuQSYQ>
-    <xmx:75_ZZZ3G4EiPyriI2LfNjEJH2PFFnS0BiuHRQ70sRLk5uScVMxzIXg>
-    <xmx:8J_ZZSs6KrIrv2W7FzUcjn_LgN2qqJjl0x6Vuc515K0toMDYU-2dQQ>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id D3CD4B6008D; Sat, 24 Feb 2024 02:51:11 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.11.0-alpha0-153-g7e3bb84806-fm-20240215.007-g7e3bb848
+	s=arc-20240116; t=1708762902; c=relaxed/simple;
+	bh=dKuGj/QziNZozZkFuT6fsdiBuu7xEQHb7gDy6tS7AhE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eKsRvFiJtu3E5wQ5qkRTgilXoKD63w+WWmQ/1aA3BGQFMfvR9SUwnfZoA5qPWxTLawk91xllF2v2IJ5tXXW1EBwaa+zwEpNVHg5ChHIqrVpEZX86iw+KLgIdDK7hJaMMIyOOZxroqUBrynWeRieKs1LinV3K/cz7vtwXPEMXaYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=y7sRPJHJ; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-564e4477b7cso3656a12.1
+        for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 00:21:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1708762899; x=1709367699; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dKuGj/QziNZozZkFuT6fsdiBuu7xEQHb7gDy6tS7AhE=;
+        b=y7sRPJHJeHIAel6VN+M2k2FLkJqt8IrV5X5aPTOoZvhrfpX35bQXz0fnGI0J/mTgvH
+         8ratkr2hh1KotAG8e+6JgP7mcge1+CqvC9wdfyQ2eAvIAoUXS+IlZT6qNTkV3q7TMZnE
+         9KK6PLtxwKHF8o32X3RFCDbiS4EzNRbkdmfjnFBOFJGEXwtNjg5bnxC2Of7Q8WfzB4Iv
+         PGrxOCoeogBg5XQv2ZG5rm9muWKOjZfPTpM1hXd76JT9Yd4bM1OluobIAQ3n0W60+PUU
+         k3CNA0Mzocm3u3q2fmTurIm55nlXGnwTabod61Yxno1TOu6iF2LSM/jWfvOpovoZAd3A
+         lLBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708762899; x=1709367699;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dKuGj/QziNZozZkFuT6fsdiBuu7xEQHb7gDy6tS7AhE=;
+        b=Fkx/cpZ0iSSFAA2LbqTV0iS5GWgwdM9LiPjL7Fz/5eeuKcu1SCfMSYTnbUf3zlLSiE
+         1Lryh5jYKHN+W+7RJqFbB/z6eacCi7XuFxWEKvtqUgB9EpKjFlvU3AXH6sfi+D6ZpR+I
+         +vwSe4L19vDdMIcSjIvYZ7wgtZdeEsExEcxS2gAMRZnhOJFpMbZjZ9Yim7vlHfUoPPdV
+         HQ6OsBbIXF8MVSdw3OcDqTOpZMsdFdymzxJHNGyPkq+SGd60ncjZzz9JdhfH+icbe0GN
+         FI4ZYbSsvsyI7Nq3OV2QhuFEnOSghe8t325S95tN7rHi3k+y+oXzi2mE6NsPCttQ1HZE
+         6yLg==
+X-Forwarded-Encrypted: i=1; AJvYcCUIBL9R8suwLuhPn/IRP8GiI42zbSMSqNkjDFZe5/8Vd1e98ro+mijjt2w58nR67XdtCOAZbkybGoBvKyF1WUcs3SI6x/h1
+X-Gm-Message-State: AOJu0YwOMqWdDQbI9e9a6BOTxqbKFzTt7PxKVQRbWWGcbOW7Qo2Xxbq1
+	e0jF2cdO1QeuoK034aio5iqXdItsGSwXHHcVzs2HKPXSO8y03/OEn83WevfWTgrxcj62XhBu9zl
+	E0wfOOYEr5Eyi0ikvsYdPpcJiM7NIkl1841fNUVbcMktHWDcd7A==
+X-Google-Smtp-Source: AGHT+IF4oa5fjnkSUgWIVhvFLIpLZFVp41vFYgYTcACeYJrTtv7HObfGAffp+t0Dta56g2yll+IHq/XQOqF0+yEI+ys=
+X-Received: by 2002:a50:a6d7:0:b0:565:733d:2b30 with SMTP id
+ f23-20020a50a6d7000000b00565733d2b30mr111245edc.4.1708762898603; Sat, 24 Feb
+ 2024 00:21:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <8e1a3753-4707-44e7-b746-48437cac8e70@app.fastmail.com>
-In-Reply-To: <95e8cc82-2e7e-bca9-16ab-3148c3183f32@intel.com>
-References: <20240222100324.453272-1-arnd@kernel.org>
- <95e8cc82-2e7e-bca9-16ab-3148c3183f32@intel.com>
-Date: Sat, 24 Feb 2024 08:50:49 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Anthony L Nguyen" <anthony.l.nguyen@intel.com>,
- "Arnd Bergmann" <arnd@kernel.org>,
- "Jesse Brandeburg" <jesse.brandeburg@intel.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Andrew Lunn" <andrew@lunn.ch>,
- "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
- Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] igc: fix LEDS_CLASS dependency
-Content-Type: text/plain
+References: <20240222105021.1943116-1-edumazet@google.com> <20240222105021.1943116-2-edumazet@google.com>
+ <m2wmqvqpex.fsf@gmail.com>
+In-Reply-To: <m2wmqvqpex.fsf@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sat, 24 Feb 2024 09:21:24 +0100
+Message-ID: <CANn89i+UXeRoG4yMF+xYVDDNv-j2iZYTwUogQWsHk_OiDwoukA@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 01/14] rtnetlink: prepare nla_put_iflink() to
+ run under RCU
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Ido Schimmel <idosch@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Feb 24, 2024, at 00:15, Tony Nguyen wrote:
-> On 2/22/2024 2:02 AM, Arnd Bergmann wrote:
->> 
->> diff --git a/drivers/net/ethernet/intel/Kconfig b/drivers/net/ethernet/intel/Kconfig
->> index af7fa6856707..6e7901e12699 100644
->> --- a/drivers/net/ethernet/intel/Kconfig
->> +++ b/drivers/net/ethernet/intel/Kconfig
->> @@ -372,6 +372,7 @@ config IGC
->>   config IGC_LEDS
->>   	def_bool LEDS_TRIGGER_NETDEV
->>   	depends on IGC && LEDS_CLASS
->> +	depends on LEDS_CLASS=y || IGC=m
+On Fri, Feb 23, 2024 at 4:25=E2=80=AFPM Donald Hunter <donald.hunter@gmail.=
+com> wrote:
 >
-> I don't know kbuild that well, but would this cover LEDS_CLASS=n with IGC=m?
-
-The 'depends on LEDS_CLASS' take care of that.
-
-> There are Similar checks in the file [1][2] that would transpose to
->   depends on IGC && LEDS_CLASS && !(IGC=y && LEDS_CLASS=m)
+> Eric Dumazet <edumazet@google.com> writes:
 >
-> which should cover that and keep the checks in the file consistent. IMO 
-> a little more readable as well.
+> > We want to be able to run rtnl_fill_ifinfo() under RCU protection
+> > instead of RTNL in the future.
+> >
+> > This patch prepares dev_get_iflink() and nla_put_iflink()
+> > to run either with RTNL or RCU held.
+> >
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+>
+> I notice that several of the *_get_iflink() implementations are wrapped
+> with rcu_read_lock()/unlock() and many are not. Shouldn't this be done
+> consistently for all?
 
-Right, that works as well. I find the negative dependencies
-slightly more confusing, they should do the same thing here.
-Please apply whichever version makes most sense to you then.
+I do not understand the question, could you give one example of what
+you saw so that I can comment ?
 
-     Arnd
+We do not need an rcu_read_lock() only to fetch dev->ifindex, if this
+is what concerns you.
 
