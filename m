@@ -1,138 +1,103 @@
-Return-Path: <netdev+bounces-74693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DE2C8623B1
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 10:08:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 923278623EC
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 10:31:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E25C5B2305D
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 09:08:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 542B71C21A27
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 09:31:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7349C1400B;
-	Sat, 24 Feb 2024 09:06:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7E371B59B;
+	Sat, 24 Feb 2024 09:31:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ld5RTbL9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="y/e4ofWD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7BE31B7EF
-	for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 09:06:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C9C818037
+	for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 09:31:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708765594; cv=none; b=OoNsiiEFyf+pkCwCaDzL+RXxQTXuuMFmGtj8W5KNCeobETljsZlj16FWS2as/orog6X+slLRDcbOXKpQSZxAFAsUUrwLKXqRuwqAkZVhzq17AVsFyTb24mmzyxQztngRjQNqOJaZV91SQ6TjKG4d3JtErstL5x68hCuNFLS0Zx0=
+	t=1708767077; cv=none; b=eqdkT2Gy7zrpCUQlXGuS6rbwegjhxxSKmq8Dr+WAPo+rt05BwxmJWUD57e3h+A85Ui2fAa6gDxAkYY5y7qGkUG6Dw0MNG96czDuyXE6DnHzR6GvBiJFEDFb+cuiyYUnjvZuOvoce3Fw48AG2cvtoJqY23i7yop1D+ZNEtlK7AZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708765594; c=relaxed/simple;
-	bh=iD50daugB74s/+w+Lq8Lb/RiziCJ9Vz19AzGZrZwkA4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=DJ+hddkfu9C+TpsCLyqzXGcvYm3ti3lcg+fAD0Lz6DFPbW5Jjhgz+7/qO06mBloSn6rGUnTGY92EXMD8b8QCRALTGQoB+i7Y5JcW3lc0AzZbNcPd2me1i1Sg3ISEk6+nP1pd7QvzfaFatxheAyjRna6UAv4XUtAVrPU5qy058fg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ld5RTbL9; arc=none smtp.client-ip=209.85.219.201
+	s=arc-20240116; t=1708767077; c=relaxed/simple;
+	bh=y2+xsbNA7nJA5AJAIiiYtBIFp5DHt0sr/WcAwRB23LY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oGTuyUboF26OXZgvmf/9REO5VOv5qKIFH4hlJDZ6G5GC06E2coA3q59ZHTQW8AFuTUCnY/03CaF8m7PKdZsK0m4jH5shvnp1fyD6UgyLin0OXjGGknbwGD0avywZoGJnJz/vv7qhzM9KhLkt04jTE6FzFh4J7zFHwT7GDiQ5KSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=y/e4ofWD; arc=none smtp.client-ip=209.85.208.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dce775fa8adso3077656276.1
-        for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 01:06:32 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-564e4477b7cso3757a12.1
+        for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 01:31:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1708765592; x=1709370392; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=x5vXPgtRlLZWq2ENSppXDg70t7OcaA1Q4JPwPsN1gcU=;
-        b=Ld5RTbL9O9AaUb5qVZsVTOZ2x2XgFe0SpNzJCDxW7zSH0rMMvhsBHW0gVCk6In2Lmz
-         OzAEZzDSeG+BHCvkSG+lvwitrlTcfzqTrzrvYzcxzeQ+EMWw3oyZ1yvEM/x7XGdecYZl
-         DPJxNGf+vNZq3r7HJx93vjVGpccCb6hi4Mh9gCsl2X/fY/HFjMFrmJz2TXGX7ePxIo54
-         fD9Fjy29rSIRkYGCHENeMFsrym7RohNtPwy88tX3fL9x8Nmrw6VOwSDHe3Bag4hNg3Z4
-         5d5B62GgZFJKQW3NEDpQb0di5Xeh2xoTQiNvUW26zdWfQ/JK0+acHNogPwI07KT/kKQs
-         xw+w==
+        d=google.com; s=20230601; t=1708767073; x=1709371873; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YmY5NkPyqyDzoEieFjYp7SW5hjVc2+Nb3/NQOzb8Ges=;
+        b=y/e4ofWD20vd3a1URnY4gVNi+xSV3qazdgGof9LdTOzGjqTop0P6aPamki0ZqSqYfB
+         8jzkcCaMNaIpmJ0G14woHpNmbJvu/21hSAOyxvWzlfcTyg1WSUuQxHDXvDvmN3lpxB02
+         ej0DLMEvAf8S1YVFIb61w0mDWMR793YdZ3YIHn9a7t7ZxU/4A0DVieYSU4KYgccZtO8C
+         W0d5MnLT7+WrmnZ9cJ135R76IUHgL2rqZSQ/h4LASdB8h2e0+uax9yjGIw31p4tuTRf1
+         OxfMDNLFpY3POZ0yl9X2ouDzGJLcC0KIZ1CnYoVGT2/hTwVoeF9ZgNt8JRMldLkqinZc
+         LK5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708765592; x=1709370392;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=x5vXPgtRlLZWq2ENSppXDg70t7OcaA1Q4JPwPsN1gcU=;
-        b=Fa4SraLwPeDfo7zuklnkDQ5d+lLPAZsHPyrTK22pV8RdktSFIYNicMOj4FCh4NInCA
-         zc6Lt3cODF42BEiGJOf2S1ODZlL8dQj3zy5qJDfDp1roo8fbJ+sYWliyRp0O9gPYwqoM
-         MwEcVsFMv67xJpH6ByY43/NVXAI+q/WqKf3qpwiaDiTTqFd2q5wjrXIBF8MkJol6wHbJ
-         4FT1MmwIm6ZUVZKFXXFm/pSbUBmK1swPQRhNKXML66P8+ez0LuI9qwZr9bl7fAa1wVnO
-         qbAFCRWP+M1EwiQDibJyIgNgmEsrw/42kNEpEbju8oh4VcKU591Fh5McWeKFwKdKOv93
-         Ze4A==
-X-Gm-Message-State: AOJu0Yz15mep+Ry85GfqqGcYdZ5HKjjUtHzAT5oa6iR0/DyKuZY6GZKO
-	WkE5SL+a83OhrTOQkGo8bLszGXUuWAuWxr7QhVvHAucabwY8rGyyaTJsNvPjPa++6P7OFYnWrK9
-	PqM5+ujN9dw==
-X-Google-Smtp-Source: AGHT+IEo+FXpDfV6ayBLWOA9yzzpJbfyhzKwS6a8/37v6cHxjd5BJAnQx3nFD53/x+mLQjAihEZKse9EsuLmsA==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:2602:b0:dc6:519b:5425 with SMTP
- id dw2-20020a056902260200b00dc6519b5425mr598651ybb.11.1708765591820; Sat, 24
- Feb 2024 01:06:31 -0800 (PST)
-Date: Sat, 24 Feb 2024 09:06:30 +0000
+        d=1e100.net; s=20230601; t=1708767073; x=1709371873;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YmY5NkPyqyDzoEieFjYp7SW5hjVc2+Nb3/NQOzb8Ges=;
+        b=r5RN0lkM6ZW96GkxMIY7FvyRVV2b+bxBKA4YWlKIcGl+YyjsWnsET4GWRy56EPSk+w
+         sFWlICv46VL3FjoXcOqZ4dfYBB6c4x4SeTjKRJxBIB5MdAE08k7nhluA0qDZRSkOn5SR
+         +Ly9ymkgJbBbtEpX59teNWdl5qWQBdpZRiO0cP/NzU/FX7qOmc0yz0SoZ8GWDsXTDwk5
+         xRIIYLVNbl8lAAXS8BI828R50Yols4MnxZpXfbFUqgvYwoUVGXhXhNrI2rmrK0nRp63g
+         HbIV1pCTnV7EjiEw5r4TQHJODQLaZGV4pNITR50Mz5b52+VEyeF3kCDB7+BeussRsoI7
+         lisw==
+X-Forwarded-Encrypted: i=1; AJvYcCVppUIt1ry2uAdTnkobZmAqppXfFK1vDbBq+NlAXftRfTcfxsMznbyVsHuQEW+5yFQGypP2Oy8OtusJY2o3cSWBwBgmG86k
+X-Gm-Message-State: AOJu0YyJKqR71qu8HCPopQOkMTnbLOZ0/dKZJegWg/i5xrlBpVXsoaFy
+	+bQTv8HGnxMewVeZIxyCIXqDYTQQd727TQJPGgYST7s7Ay/SgScvAsqT/Gp4eXZ08tFqE4x4qKx
+	Xf5jGF27rUzWmA8jV6ahiUxJ5bsJLdk754WJC5YN3UBxWl66XlJ94
+X-Google-Smtp-Source: AGHT+IGOZl/nBisuhQ6zD6jxD83U4XFWrPSRI4XTF0ONfj1DyW3nznVrpeMbXo6M+AY0O65iMMFktnvrm6rpep/W1WI=
+X-Received: by 2002:a50:a6d7:0:b0:565:733d:2b30 with SMTP id
+ f23-20020a50a6d7000000b00565733d2b30mr114515edc.4.1708767073364; Sat, 24 Feb
+ 2024 01:31:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.rc1.240.g4c46232300-goog
-Message-ID: <20240224090630.605917-1-edumazet@google.com>
-Subject: [PATCH net-next] netlink: use kvmalloc() in netlink_alloc_large_skb()
+MIME-Version: 1.0
+References: <20240224-tcp-ao-tracepoints-v1-0-15f31b7f30a7@arista.com> <20240224-tcp-ao-tracepoints-v1-3-15f31b7f30a7@arista.com>
+In-Reply-To: <20240224-tcp-ao-tracepoints-v1-3-15f31b7f30a7@arista.com>
 From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Zhengchao Shao <shaozhengchao@huawei.com>
+Date: Sat, 24 Feb 2024 10:30:59 +0100
+Message-ID: <CANn89iKB3ov_rthyscWn=h4yxmhReXAJzHu9+dOdpzPA8F=C-w@mail.gmail.com>
+Subject: Re: [PATCH net-next 03/10] net/tcp: Move tcp_inbound_hash() from headers
+To: Dmitry Safonov <dima@arista.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>, 
+	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, Dmitry Safonov <0x7f454c46@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This is a followup of commit 234ec0b6034b ("netlink: fix potential
-sleeping issue in mqueue_flush_file"), because vfree_atomic()
-overhead is unfortunate for medium sized allocations.
+On Sat, Feb 24, 2024 at 10:04=E2=80=AFAM Dmitry Safonov <dima@arista.com> w=
+rote:
+>
+> Two reasons:
+> 1. It's grown up enough
+> 2. In order to not do header spaghetti by including
+>    <trace/events/tcp.h>, which is necessary for TCP tracepoints.
+>
+> Signed-off-by: Dmitry Safonov <dima@arista.com>
 
-1) If the allocation is smaller than PAGE_SIZE, do not bother
-   with vmalloc() at all. Some arches have 64KB PAGE_SIZE,
-   while NLMSG_GOODSIZE is smaller than 8KB.
+Okay, but what about CONFIG_IPV6=3Dm ?
 
-2) Use kvmalloc(), which might allocate one high order page
-   instead of vmalloc if memory is not too fragmented.
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Zhengchao Shao <shaozhengchao@huawei.com>
----
- net/netlink/af_netlink.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
-
-diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-index 9c962347cf859f16fc76e4d8a2fd22cdb3d142d6..90ca4e0ed9b3632bf223bf29fd864dbb76f3c89c 100644
---- a/net/netlink/af_netlink.c
-+++ b/net/netlink/af_netlink.c
-@@ -1206,23 +1206,21 @@ struct sock *netlink_getsockbyfilp(struct file *filp)
- 
- struct sk_buff *netlink_alloc_large_skb(unsigned int size, int broadcast)
- {
-+	size_t head_size = SKB_HEAD_ALIGN(size);
- 	struct sk_buff *skb;
- 	void *data;
- 
--	if (size <= NLMSG_GOODSIZE || broadcast)
-+	if (head_size <= PAGE_SIZE || broadcast)
- 		return alloc_skb(size, GFP_KERNEL);
- 
--	size = SKB_DATA_ALIGN(size) +
--	       SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
--
--	data = vmalloc(size);
--	if (data == NULL)
-+	data = kvmalloc(head_size, GFP_KERNEL);
-+	if (!data)
- 		return NULL;
- 
--	skb = __build_skb(data, size);
--	if (skb == NULL)
--		vfree(data);
--	else
-+	skb = __build_skb(data, head_size);
-+	if (!skb)
-+		kvfree(data);
-+	else if (is_vmalloc_addr(data))
- 		skb->destructor = netlink_skb_destructor;
- 
- 	return skb;
--- 
-2.44.0.rc1.240.g4c46232300-goog
-
+I do not see any EXPORT_SYMBOL() in this patch.
 
