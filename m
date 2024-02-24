@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-74657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2ED72862236
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0948862237
 	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 03:10:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6ED41F242F9
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 02:10:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02F5F1C21386
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 02:10:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30B04DF67;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32362DF6C;
 	Sat, 24 Feb 2024 02:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lhp21QS+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qsAWgHMx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CBEFDF56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CC21DF5A
 	for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 02:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708740630; cv=none; b=StJOxvh6qb6t3xVV0GNGt1BBfPtJq2HvHG/Oe5QqZFy6UFPs+NE2N9GG6Mw+L4XNpwAfxCXg7lcm3TXbadZPcsUc9BkwtyklH9miRzXAd+Vfe66YsT4341zqsqB8MuUFgMLygDzy5Aa5DIpKZ/8rooxAikhjwfqMmSoe+aF87yA=
+	t=1708740630; cv=none; b=SnbLocKwvHVLo+malQfDCEPVNXeGMrjeNJWInUw/szbmTRWYjOZqym2t/GqK+i2kPzYDKfkmsCrpQS70MR0YeQzF+0ReLPJveDKgzT9ETh0/uiEAzs4xYGcNlQWq93UOjVlhuhzQ8AoMcBYWBmF2oi1smBIL1j8Vtwt8c0dZq+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708740630; c=relaxed/simple;
-	bh=e3awmqg9DuvQucPvgIH+uPzPjXjLUPXMLUcPP7URmYg=;
+	bh=mNd6LiJc+gWKzbkETPpDWP7u+nyxQA6O2vnjJxwqMug=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pS1NzrU80opstcL15f+/WcaAoEIAIS7k2LUeISN33xeLzsUuawVUgv2slGeORzfDSnOX6X6FGDw61ITe33q1KfiIFgWLkAK4HtWod4W3plcevUd5/vzgr7dHzMUUZCazqW1XsRZfbsg6MBuWKQLhBUFIo+TwsdpPdcpUwTCk1U4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lhp21QS+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 981C7C433B1;
+	 In-Reply-To:To:Cc; b=snew+NJrZr1LkjiENE0nrihLMhTUPbKOk51y3WP+/uq2xuwfHFL+vHaFOsBBTyrhs79a9lbLs+T8hTZQj2YevEQ6BwHNMYiTDRZ7qF3g1w2hm8YTp1Qs6n6FXu98WexRoym3CrKUOzgScmNJrQOWGUc3udClGKFa5fqGf2u7ysY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qsAWgHMx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7E589C433F1;
 	Sat, 24 Feb 2024 02:10:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1708740629;
-	bh=e3awmqg9DuvQucPvgIH+uPzPjXjLUPXMLUcPP7URmYg=;
+	bh=mNd6LiJc+gWKzbkETPpDWP7u+nyxQA6O2vnjJxwqMug=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=lhp21QS+4BnuICE7ZhAiXzVD7eNcy3Pn9GzyE1nC+PEBrbKOX6WF7vIiTwORgjBBs
-	 tKV9PgJNJv5IbKvn2T4MHkrfIqwhAt6Kdgi0aimFXwOk/daPfaXJv1bg/Cimhbo2JT
-	 wVD4PBNg06HRejU07WYitoedfe09/QQ+s9EqC8s5XxxYRk69QGvL/FMjhZRNF2uowb
-	 8kngcfSgcbZq//M+HvpQ08LVkTH7o0P8xOL2r44D7g5yLmmL7S2zh17/5vbhd2cc+2
-	 DuLQxcL4rqgL+0BRiKnrlZfjtTh2Sk4KyMkr11t+WjcTR0n/aeHXF+xBAi93mW5kwl
-	 3Je2Ttjz5aDhw==
+	b=qsAWgHMxxTKDU12hvIYREgxlitAuSq1yDzklrhHCpEXm6WMBG6JC3RE1N6B/4tydy
+	 vyTzocVjrL3ezIRa0XT8iM9uiJxVIaJYWLFu5Oq4XLMi7ox5kb/uYyKy6at+ez4TKf
+	 fHSrMojcvthrQaUaK8aIP50gqOgZKW5WLbmrA7MzOpbSpYOBgWNn/penvrKLJFPFht
+	 tOD8DduJhAv1WvN8CZtJKR0Q4xJeL1978E7stIP68AVx9yDun9Lc5nOy5qQ6LYAqMb
+	 dtpR+3KTqEix6nFb/BtMHU8jqlok1bkPl4RXJsE371hv0C6pygi6ugRPLFAks5YDXm
+	 3JraAxYcQBiVA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 74E20C59A4C;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5A7C0C39563;
 	Sat, 24 Feb 2024 02:10:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,38 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] ps3/gelic: minor Kernel Doc corrections
+Subject: Re: [PATCH net v2] net: mpls: error out if inner headers are not set
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170874062946.5601.16694725773526396855.git-patchwork-notify@kernel.org>
+ <170874062935.5601.1311290697565705511.git-patchwork-notify@kernel.org>
 Date: Sat, 24 Feb 2024 02:10:29 +0000
-References: <20240221-ps3-gelic-kdoc-v1-1-7629216d1340@kernel.org>
-In-Reply-To: <20240221-ps3-gelic-kdoc-v1-1-7629216d1340@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: geoff@infradead.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, mpe@ellerman.id.au, npiggin@gmail.com,
- christophe.leroy@csgroup.eu, aneesh.kumar@kernel.org,
- naveen.n.rao@linux.ibm.com, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org
+References: <20240222140321.14080-1-fw@strlen.de>
+In-Reply-To: <20240222140321.14080-1-fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, edumazet@google.com, horms@kernel.org,
+ syzbot+99d15fcdb0132a1e1a82@syzkaller.appspotmail.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 21 Feb 2024 17:46:21 +0000 you wrote:
-> * Update the Kernel Doc for gelic_descr_set_tx_cmdstat()
->   and gelic_net_setup_netdev() so that documented name
->   and the actual name of the function match.
+On Thu, 22 Feb 2024 15:03:10 +0100 you wrote:
+> mpls_gso_segment() assumes skb_inner_network_header() returns
+> a valid result:
 > 
-> * Move define of GELIC_ALIGN() so that it is no longer
->   between gelic_alloc_card_net() and it's Kernel Doc.
+>   mpls_hlen = skb_inner_network_header(skb) - skb_network_header(skb);
+>   if (unlikely(!mpls_hlen || mpls_hlen % MPLS_HLEN))
+>         goto out;
+>   if (unlikely(!pskb_may_pull(skb, mpls_hlen)))
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] ps3/gelic: minor Kernel Doc corrections
-    https://git.kernel.org/netdev/net-next/c/3e596599372e
+  - [net,v2] net: mpls: error out if inner headers are not set
+    https://git.kernel.org/netdev/net-next/c/025f8ad20f2e
 
 You are awesome, thank you!
 -- 
