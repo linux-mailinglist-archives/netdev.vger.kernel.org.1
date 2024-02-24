@@ -1,189 +1,167 @@
-Return-Path: <netdev+bounces-74681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D780A86238C
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 10:01:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 054C4862390
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 10:04:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 30C0F1F233AF
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 09:01:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E70F1C2189A
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 09:04:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60E2317748;
-	Sat, 24 Feb 2024 09:01:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34B441802B;
+	Sat, 24 Feb 2024 09:04:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NKP+G4j1"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="Y548vkAX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8753417580;
-	Sat, 24 Feb 2024 09:01:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B876717731
+	for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 09:04:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708765299; cv=none; b=KvdAO6rwXFE+dTYcbeJaO+HgwzIOhQwsjlRdhSHqZyjx8OmhMZ4wGijUhY1DyBa2Y0M9Uata7AI+YbBLpbg+aPt7AKMdD0XD9j2bS+nh3+IHfny1mHk/4nq01E6+5ueEf8cRr+T0l9gMcRI1EU8x8zwhUYKJcQr8pa7ODIpTsuA=
+	t=1708765486; cv=none; b=q5dSY93zDz701IG5uNf1PJRYzLm628wkrmdBFE7LXt778zJ3eIUOhPmBHaYqPzxJAwxMNQf0QvUu3HkjpQrugRdukmsOsTH0DxdlE/Owtn0EP3fU1LIov31EFVjhkinCchffIxKjFOrZm+gUEYOzAUWrwl/6x2Q0rZjXQ6xkulY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708765299; c=relaxed/simple;
-	bh=g2+qcJdjdBYbAjdVnawnYr/RLAK7tREUpoNEq3hL37M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZX2ELvkdS3uflC01MpmzzXmEwS7SKeYMkyFFhKjIJ6Wu6U01lhmrW2APbFuepL/QWZ3QoK4ZEt2pIzMlLIosTr0pHExn63/qk0jku7PS6kpyDLtQVaH4oeYRugXoLQo+dFxywojSWTOGJKr6TANOqGgCRTa8GUXBO5k8iXgJTC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NKP+G4j1; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1708765297; x=1740301297;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=g2+qcJdjdBYbAjdVnawnYr/RLAK7tREUpoNEq3hL37M=;
-  b=NKP+G4j1MA7A5Y7cD+xJYeLzBoeVfeMTxeOzGH28kfUmSXSRAe05kpBj
-   +21Cy8HVVZ0HLA1YdwccWOfVUac5EMvVviX+ailbb6Zdck0ZdTwoqmJmT
-   WSxy0B9jzRLxQHaNkI8i2kOHfsKxTLqsinzRHn0ja68pUYDu741pmdLfg
-   lseALuxOVt03iVjh62jX+TIs58hN2xByFRS7PGm+DBcmsTgmdHAUMK2tJ
-   Jy9GQx9dTtExIV/4HUi8yWv4t6D0RDEdZeTkzx6yyn9lDvABazrJxpLym
-   sbJdzS+GEuOiQft4fRPBLcE/LRFFW+6oAIPxsfvHg2/KKK0AA47ReTgBG
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10993"; a="2960931"
-X-IronPort-AV: E=Sophos;i="6.06,181,1705392000"; 
-   d="scan'208";a="2960931"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2024 01:01:37 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.06,181,1705392000"; 
-   d="scan'208";a="6581036"
-Received: from lkp-server02.sh.intel.com (HELO 3c78fa4d504c) ([10.239.97.151])
-  by orviesa006.jf.intel.com with ESMTP; 24 Feb 2024 01:01:31 -0800
-Received: from kbuild by 3c78fa4d504c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rdnuT-0008Oe-19;
-	Sat, 24 Feb 2024 09:01:29 +0000
-Date: Sat, 24 Feb 2024 17:01:14 +0800
-From: kernel test robot <lkp@intel.com>
-To: Richard Gobert <richardbgobert@gmail.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	idosch@nvidia.com, razor@blackwall.org, amcohen@nvidia.com,
-	petrm@nvidia.com, jbenc@redhat.com, b.galvani@gmail.com,
-	bpoirier@nvidia.com, gavinl@nvidia.com, martin.lau@kernel.org,
-	daniel@iogearbox.net, herbert@gondor.apana.org.au,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev
-Subject: Re: [PATCH net-next 2/2] net: geneve: enable local address bind for
- geneve sockets
-Message-ID: <202402241629.S6oEesWO-lkp@intel.com>
-References: <79a8ba83-86bf-4c22-845c-8f285c2d1396@gmail.com>
+	s=arc-20240116; t=1708765486; c=relaxed/simple;
+	bh=2bvz0RaABemvB2mAnUI+y9KXZ+nJBiW2+3XKY5GafdE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ajregrXzLOoE6bmPhokuDvo5Wa8VB8S2Ykl/b1nu6uQA1Q/52icaUUwiS5p9zzqXGK0oCF4n4LiiQfrdZEMoZZoD+Jw7LSfKY8ypuihnwuyj8ySPBOYaN8vs97d4UxUeD65FTmW+0XDVcn/ywUGwaeUHVFBB54nr5FxrBkCsiZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=Y548vkAX; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4129e978a5fso773515e9.0
+        for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 01:04:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google; t=1708765482; x=1709370282; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y9oap1u4maFj8x6QB6Yv5BBkUdae4vegOH6+ONA60ss=;
+        b=Y548vkAXhubs8Z/ze6bQEzkKASCNo93gyEsT+0s9GIxzq/KL1q9hMtmWnHCPzXIP28
+         kqQ+u3RMfxCkJXsOF9zF87r+VDTCSz+K56ZxMS3IunmHfct0Aa1npsrWdDFi1TCZbHC2
+         /KIJHrohkamm9HdpalxaX5NwdG+Y7nrhwcMxtaJRseYm99++aX34Lo75QNYa4qaWyJRH
+         j1bkoYHUWYxT6R2rpBhWhue1jAf02CP4Q2O448rP0dCwuHMIv3aVJDeQOvhphJOgDMVZ
+         wRhmGGgYfEV/ICw9Q0rFEjhQdeEXG7D01IFTENx++zW42bWU+95s4S3JUG0PSqc2AeQg
+         hlzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708765482; x=1709370282;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Y9oap1u4maFj8x6QB6Yv5BBkUdae4vegOH6+ONA60ss=;
+        b=brdyKNu26DPxDqowvhEwm8AwCHcVbcq1LjCqHmGRR8W4pzv139tmUOAX0BBppJ2cyb
+         lZKE9ywa3gl5BVjzhciS3SWUAOmKDBS0PYzfH80ggtm8W55tGtz6Bdja22dkDyM8gJnu
+         62kKEttv0Cwa0LYZcMjD7psJ5/hVUr4M0+QCXK9K7ry7A0keb7iaynnMj+FuHSdQ+Tuu
+         zopYnVCUHhh3UxA7MFzPwr2Yx/tAv9dflyKWLk7AQyZ3uSFq+REz9HzmPiVwXo3H+YlR
+         mMAIPM7fx3JjeQRDoxzeys41Jf9e89TWw0fTgLLEERhw9ODhhtI2nxQ98CAhZ9hAPZ2s
+         U/MA==
+X-Forwarded-Encrypted: i=1; AJvYcCWN29pXyF+klGRC4tJTe/+B0uLat4l9mvflZmzLC6R5wjNHjeGIqU+Cp+scdfMT4nNkqMvpOsiWy0Pa5bviYyq1uNNwT6xN
+X-Gm-Message-State: AOJu0YwTbYjVVvupdF5MCd5FiUz7v36UvlpcDvcKzI97L0GJKVf1oaf0
+	vXOmTxsF9TBCLrqwvDUzo6aVo1KyBUucWSkqZTrt1zPadVc4RvI6gGaY38zNJw==
+X-Google-Smtp-Source: AGHT+IEcyO8NJxp+wsPVPxwvDnVNJrMpXXH3Qo40PN1JaIPl7oWt3xo4EP5Ts6f9gNiSH8Hq5NdeBw==
+X-Received: by 2002:a05:600c:5023:b0:411:eb73:243b with SMTP id n35-20020a05600c502300b00411eb73243bmr1255421wmr.5.1708765482074;
+        Sat, 24 Feb 2024 01:04:42 -0800 (PST)
+Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id m6-20020a7bce06000000b00410bca333b7sm5320593wmc.27.2024.02.24.01.04.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 24 Feb 2024 01:04:41 -0800 (PST)
+From: Dmitry Safonov <dima@arista.com>
+To: Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Cc: Dmitry Safonov <dima@arista.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	Dmitry Safonov <0x7f454c46@gmail.com>
+Subject: [PATCH net-next 00/10] net/tcp: TCP-AO and TCP-MD5 tracepoints
+Date: Sat, 24 Feb 2024 09:04:08 +0000
+Message-ID: <20240224-tcp-ao-tracepoints-v1-0-15f31b7f30a7@arista.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <79a8ba83-86bf-4c22-845c-8f285c2d1396@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+X-Mailer: b4 0.13-dev-b6b4b
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1708765347; l=2977;
+ i=dima@arista.com; s=20231212; h=from:subject:message-id;
+ bh=lLZCReK3ZzYvXtLqDF+R0iwQ1yaEauus+KvH0+vWic8=;
+ b=NugEbW75fCKkDgfn3+AcpEDu+0iEc0KVHGPrv1p3Os/iJMBhc+JXO8gFuW0FLA47yz2UET5GM
+ WFA4lYfgHGlAbGlH144UecbPi9h9XBX2QkDHrzHPXMwxBJOvBO8pKkn
+X-Developer-Key: i=dima@arista.com; a=ed25519;
+ pk=hXINUhX25b0D/zWBKvd6zkvH7W2rcwh/CH6cjEa3OTk=
+Content-Transfer-Encoding: quoted-printable
 
-Hi Richard,
-
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Richard-Gobert/net-vxlan-enable-local-address-bind-for-vxlan-sockets/20240223-045600
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/79a8ba83-86bf-4c22-845c-8f285c2d1396%40gmail.com
-patch subject: [PATCH net-next 2/2] net: geneve: enable local address bind for geneve sockets
-config: x86_64-randconfig-012-20240224 (https://download.01.org/0day-ci/archive/20240224/202402241629.S6oEesWO-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240224/202402241629.S6oEesWO-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202402241629.S6oEesWO-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from include/linux/string.h:292,
-                    from include/linux/bitmap.h:12,
-                    from include/linux/ethtool.h:16,
-                    from drivers/net/geneve.c:10:
-   drivers/net/geneve.c: In function 'geneve_create_sock':
->> drivers/net/geneve.c:469:34: error: 'struct udp_port_cfg' has no member named 'local_ip6'; did you mean 'local_ip'?
-     469 |                 memcpy(&udp_conf.local_ip6,
-         |                                  ^~~~~~~~~
-   include/linux/fortify-string.h:582:34: note: in definition of macro '__fortify_memcpy_chk'
-     582 |         const size_t __p_size = (p_size);                               \
-         |                                  ^~~~~~
-   include/linux/fortify-string.h:639:17: note: in expansion of macro '__struct_size'
-     639 |                 __struct_size(p), __struct_size(q),                     \
-         |                 ^~~~~~~~~~~~~
-   drivers/net/geneve.c:469:17: note: in expansion of macro 'memcpy'
-     469 |                 memcpy(&udp_conf.local_ip6,
-         |                 ^~~~~~
->> drivers/net/geneve.c:469:34: error: 'struct udp_port_cfg' has no member named 'local_ip6'; did you mean 'local_ip'?
-     469 |                 memcpy(&udp_conf.local_ip6,
-         |                                  ^~~~~~~~~
-   include/linux/fortify-string.h:584:40: note: in definition of macro '__fortify_memcpy_chk'
-     584 |         const size_t __p_size_field = (p_size_field);                   \
-         |                                        ^~~~~~~~~~~~
-   include/linux/fortify-string.h:640:17: note: in expansion of macro '__member_size'
-     640 |                 __member_size(p), __member_size(q),                     \
-         |                 ^~~~~~~~~~~~~
-   drivers/net/geneve.c:469:17: note: in expansion of macro 'memcpy'
-     469 |                 memcpy(&udp_conf.local_ip6,
-         |                 ^~~~~~
->> drivers/net/geneve.c:469:34: error: 'struct udp_port_cfg' has no member named 'local_ip6'; did you mean 'local_ip'?
-     469 |                 memcpy(&udp_conf.local_ip6,
-         |                                  ^~~~~~~~~
-   include/linux/fortify-string.h:593:27: note: in definition of macro '__fortify_memcpy_chk'
-     593 |         __underlying_##op(p, q, __fortify_size);                        \
-         |                           ^
-   drivers/net/geneve.c:469:17: note: in expansion of macro 'memcpy'
-     469 |                 memcpy(&udp_conf.local_ip6,
-         |                 ^~~~~~
-
-
-vim +469 drivers/net/geneve.c
-
-   454	
-   455	static struct socket *geneve_create_sock(struct net *net, bool ipv6,
-   456						 __be16 port, bool ipv6_rx_csum,
-   457						 union geneve_addr *local_addr)
-   458	{
-   459		struct socket *sock;
-   460		struct udp_port_cfg udp_conf;
-   461		int err;
-   462	
-   463		memset(&udp_conf, 0, sizeof(udp_conf));
-   464	
-   465		if (ipv6) {
-   466			udp_conf.family = AF_INET6;
-   467			udp_conf.ipv6_v6only = 1;
-   468			udp_conf.use_udp6_rx_checksums = ipv6_rx_csum;
- > 469			memcpy(&udp_conf.local_ip6,
-   470			       &local_addr->sin6.sin6_addr,
-   471			       sizeof(local_addr->sin6.sin6_addr));
-   472		} else {
-   473			udp_conf.family = AF_INET;
-   474			udp_conf.local_ip.s_addr = htonl(INADDR_ANY);
-   475			memcpy(&udp_conf.local_ip,
-   476			       &local_addr->sin.sin_addr,
-   477			       sizeof(local_addr->sin.sin_addr));
-   478		}
-   479	
-   480		udp_conf.local_udp_port = port;
-   481	
-   482		/* Open UDP socket */
-   483		err = udp_sock_create(net, &udp_conf, &sock);
-   484		if (err < 0)
-   485			return ERR_PTR(err);
-   486	
-   487		udp_allow_gso(sock->sk);
-   488		return sock;
-   489	}
-   490	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+I tried to split it a bit, maybe I could even go further and split by=0D
+TRACE_EVENT_CLASS() changes, but not sure if it adds any value.=0D
+But at least all preparation patches are separate.=0D
+=0D
+I wasn't sure if I should just remove tcp_hash_fail() as I did in this=0D
+version, or rather put it under CONFIG_TCP_..., making it disabled by=0D
+default and with a warning of deprecated, scheduled for removal.=0D
+Maybe this won't cause any problems for anybody and I'm just too=0D
+cautious of breaking others.=0D
+=0D
+Anyways, version 1, thanks for any reviews!=0D
+=0D
+Signed-off-by: Dmitry Safonov <dima@arista.com>=0D
+---=0D
+Dmitry Safonov (10):=0D
+      net/tcp: Use static_branch_tcp_{md5,ao} to drop ifdefs=0D
+      net/tcp: Add a helper tcp_ao_hdr_maclen()=0D
+      net/tcp: Move tcp_inbound_hash() from headers=0D
+      net/tcp: Add tcp-md5 and tcp-ao tracepoints=0D
+      net/tcp: Remove tcp_hash_fail()=0D
+      selftests/net: Clean-up double assignment=0D
+      selftests/net: Provide test_snprintf() helper=0D
+      selftests/net: Be consistnat in kconfig checks=0D
+      selftests/net: Don't forget to close nsfd after switch_save_ns()=0D
+      selftest/net: Add trace events matching to tcp_ao=0D
+=0D
+ include/net/tcp.h                                  |  79 +-=0D
+ include/net/tcp_ao.h                               |  42 +-=0D
+ include/trace/events/tcp.h                         | 317 ++++++++=0D
+ net/ipv4/tcp.c                                     |  86 ++-=0D
+ net/ipv4/tcp_ao.c                                  |  24 +-=0D
+ net/ipv4/tcp_input.c                               |   8 +-=0D
+ net/ipv4/tcp_ipv4.c                                |   8 +-=0D
+ net/ipv4/tcp_output.c                              |   2 +=0D
+ tools/testing/selftests/net/tcp_ao/Makefile        |   2 +-=0D
+ tools/testing/selftests/net/tcp_ao/bench-lookups.c |   2 +-=0D
+ tools/testing/selftests/net/tcp_ao/connect-deny.c  |  18 +-=0D
+ tools/testing/selftests/net/tcp_ao/connect.c       |   2 +-=0D
+ tools/testing/selftests/net/tcp_ao/icmps-discard.c |   2 +-=0D
+ .../testing/selftests/net/tcp_ao/key-management.c  |  18 +-=0D
+ tools/testing/selftests/net/tcp_ao/lib/aolib.h     | 150 +++-=0D
+ tools/testing/selftests/net/tcp_ao/lib/ftrace.c    | 846 +++++++++++++++++=
+++++=0D
+ tools/testing/selftests/net/tcp_ao/lib/kconfig.c   |  31 +-=0D
+ tools/testing/selftests/net/tcp_ao/lib/setup.c     |  15 +-=0D
+ tools/testing/selftests/net/tcp_ao/lib/sock.c      |   1 -=0D
+ tools/testing/selftests/net/tcp_ao/lib/utils.c     |  26 +=0D
+ tools/testing/selftests/net/tcp_ao/restore.c       |  18 +-=0D
+ tools/testing/selftests/net/tcp_ao/rst.c           |   2 +-=0D
+ tools/testing/selftests/net/tcp_ao/self-connect.c  |  19 +-=0D
+ tools/testing/selftests/net/tcp_ao/seq-ext.c       |  10 +-=0D
+ .../selftests/net/tcp_ao/setsockopt-closed.c       |   2 +-=0D
+ tools/testing/selftests/net/tcp_ao/unsigned-md5.c  |  28 +-=0D
+ 26 files changed, 1576 insertions(+), 182 deletions(-)=0D
+---=0D
+base-commit: d662c5b3ce6dbed9d0991bc83001bbcc4a9bc2f8=0D
+change-id: 20240224-tcp-ao-tracepoints-0ea8ba11467a=0D
+=0D
+Best regards,=0D
+-- =0D
+Dmitry Safonov <dima@arista.com>=0D
+=0D
 
