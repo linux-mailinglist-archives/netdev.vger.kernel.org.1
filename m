@@ -1,84 +1,129 @@
-Return-Path: <netdev+bounces-74641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D681D8620EC
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 01:03:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E72A28620F0
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 01:04:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F79528357E
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 00:03:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 242BD1C20F1F
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 00:04:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00DE3A55;
-	Sat, 24 Feb 2024 00:03:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B77D1391;
+	Sat, 24 Feb 2024 00:04:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s+P3uORr"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="RyjJkMUy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C772464A;
-	Sat, 24 Feb 2024 00:03:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AC92383
+	for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 00:04:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708732980; cv=none; b=kDjM32wcEVGQYrqAaq+rVbsPABqUznuaeW06aDEjf2rdiLt2eYmayeTaFOtOZW1ecBPxj3jZA216nVpkyHh6kY6vZGweDJUrSmiWVGS7m9uEb4sY3kgjhZqno0CFHc7Ypd/FYR/xiQEo1kQMFd9khX6SEVm2DZJPXI1GjjiKmBw=
+	t=1708733064; cv=none; b=kW5F9hK9Fdwzbo1OnGvApfsxefA5YAbxYMckxwlN9X3K+BVmjj7Zxpi1HmQpVLNXRpGhXzv0Bnu1fpWDWY0qK6txRvh0XkTBMD+0UyQnAlqOYprmD2zrOCMwKpAY/N/u+YqnaD5bds3946Tapdze/yjBYb5KSixrDxXj2xn9E7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708732980; c=relaxed/simple;
-	bh=E1uy0ZF05Atmh5fp16Nfgz89BZCFPu4kh33ZjkboSKE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UyxlFrCcyp+qgX5vefNfihbNkd+g1LB7GcAHHuL4gDfQD645ARAW8VwGeQ1ktH6QRDBUr/WWu1YhV1H2mmTBPVTXIyPe1g+0wJsGZVJLyD75UJEJHWZFA2DMrqfgoVhapAY2X7qfAn6tcucpKTCZhkdbInW6pNDjxvKlTUnCzV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s+P3uORr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42869C433C7;
-	Sat, 24 Feb 2024 00:03:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708732980;
-	bh=E1uy0ZF05Atmh5fp16Nfgz89BZCFPu4kh33ZjkboSKE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=s+P3uORrRjLKyypCblsp3pTaVGTXwPDPYAlzHcXvJrMYeHhRkSmcPr7mbij/EqxUB
-	 T6gMs5c9GdnCkgRXsqf43n+6dez0qMV5JRqq9TZHTIJBlbYqSW9dTlePvpNzB9psCj
-	 3XvkZN+LxtByOqMb1hORzh0yJ3Ae9ihSwhWdaU7TH5Qg8a3VQnYyFeujswipWkMXFY
-	 L4U7Ihlt7/n83EoG3KDxRsKBGJYbFPP3bR1S+MW4h+/m+vNrw/8vfxNMWVFgiTsyc+
-	 Lai3ADRfmUAd4DMkJLiwZ4JvTbcXm+FwcAACxj1l40IEhtZbJJIcxpEVpHDJhTUo7a
-	 mswj3I/Mhrphw==
-Date: Fri, 23 Feb 2024 16:02:59 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: mic@digikod.net
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, shuah@kernel.org, linux-kselftest@vger.kernel.org,
- linux-security-module@vger.kernel.org, keescook@chromium.org,
- jakub@cloudflare.com
-Subject: Re: [PATCH net-next v3 00/11] selftests: kselftest_harness: support
- using xfail
-Message-ID: <20240223160259.22c61d1e@kernel.org>
-In-Reply-To: <20240220192235.2953484-1-kuba@kernel.org>
-References: <20240220192235.2953484-1-kuba@kernel.org>
+	s=arc-20240116; t=1708733064; c=relaxed/simple;
+	bh=0ds54stYRJYXdcupiGXNSBbXhWKSZRXX9xz6jkYlvbE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wg1IPLaKeG75FD5k1hQ+qeJ/5NPyQV7sD7HPjVIV+b5RNlCSslPM1WEhZia58FaSZmCkiG2drI6aBWIZ49PE/qjE55QpBIpSeJcF4jHCtej8mhK4tPwsijrUNnDJrvFbLMFCF3rfN7rlYL/eAOejoq4vWsCrzSRF5imokxBNy+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=RyjJkMUy; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-6e4d48a5823so1247862b3a.1
+        for <netdev@vger.kernel.org>; Fri, 23 Feb 2024 16:04:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1708733063; x=1709337863; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5zKbRfawyxNOTLG6sLvZY1qVECMzEB4oUCp6oCLj67s=;
+        b=RyjJkMUyBvWNJHKolip2EkDAn92pF2xO7O7uTFhIE1+BbOVWinvPSfWRTBeTP01+Nl
+         8rNWJYATufI/XWMRuMPEMgof5lNy1LMWB5gGyZ6eWFEFgOzwxWe9B6xeo+Rukwx2PPtq
+         Mh+etN7MVMG0RAhY4Ur4Gt2vmPrXu26JGQ9vA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708733063; x=1709337863;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5zKbRfawyxNOTLG6sLvZY1qVECMzEB4oUCp6oCLj67s=;
+        b=iuSJOnh9BR8KM2N8tz3wl24F5Z3qo2pbMXhiRH5n4j0pkq7x8XV+iszcAaSibfay58
+         JRQ+ia7nkGdKbpEC+kIyV9Hm2ZQQrR8bE7ofgzW8FmJTAUyMf0C3Xb8HXrwYY6AHD4aw
+         FXLhXnwIoOmb0s7tC6BlyJgJP0j8DBFHvprqxGVtgdVLn+UP+yf4JCps/4Y5aaT3jyN+
+         QUWS/DVOCb4tTQiCjxOc7ct/jYFC9dFi1lTfZgM3uQ9edVpqMluumaOhLj8mZXYq+WOK
+         xCf8NEX8TT4XJT48XJuSWM8PoqmyTwO9LNlWzqjUDNA4zko18WdsiiwWjFiZCmL/pZgJ
+         TMPw==
+X-Forwarded-Encrypted: i=1; AJvYcCUVMh0crQAIGVWyYJOEPsMH6uanbGlGrAU/QplsKKj+dge+oeaI6KGtP5GNS/hhInAq1yDagK/FKrc9KZqPkZPi8ewcl/O0
+X-Gm-Message-State: AOJu0YwSc29eGaOS0pygS8GM5+owqndzCm+x3iU0JL/X52hqbhrWn3/j
+	pxyKZfMgV+oa5WuHCC2d4DEoqZDjEytHSYcsD3ttjv5JjLnCpH1g0vn6WXrAbw==
+X-Google-Smtp-Source: AGHT+IHo5R8UEkP5waaUA9rFjuVosSU5ZEjKaimTg1nvTAlM5UVPe02qZg/kFBCfFuPu/PquVW6dIA==
+X-Received: by 2002:a05:6a20:d393:b0:1a0:a43b:cbdb with SMTP id iq19-20020a056a20d39300b001a0a43bcbdbmr1502973pzb.27.1708733062756;
+        Fri, 23 Feb 2024 16:04:22 -0800 (PST)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id f19-20020a056a00229300b006e3a9bdeb99sm46910pfe.40.2024.02.23.16.04.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Feb 2024 16:04:22 -0800 (PST)
+Date: Fri, 23 Feb 2024 16:04:21 -0800
+From: Kees Cook <keescook@chromium.org>
+To: Finn Thain <fthain@linux-m68k.org>
+Cc: Justin Stitt <justinstitt@google.com>,
+	Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
+	Kashyap Desai <kashyap.desai@broadcom.com>,
+	Sumit Saxena <sumit.saxena@broadcom.com>,
+	Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+	"James E.J. Bottomley" <jejb@linux.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
+	Ariel Elior <aelior@marvell.com>,
+	Manish Chopra <manishc@marvell.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saurav Kashyap <skashyap@marvell.com>,
+	Javed Hasan <jhasan@marvell.com>,
+	GR-QLogic-Storage-Upstream@marvell.com,
+	Nilesh Javali <njavali@marvell.com>,
+	Manish Rangankar <mrangankar@marvell.com>,
+	Don Brace <don.brace@microchip.com>,
+	mpi3mr-linuxdrv.pdl@broadcom.com, linux-scsi@vger.kernel.org,
+	linux-hardening@vger.kernel.org, linux-kernel@vger.kernel.org,
+	MPT-FusionLinux.pdl@broadcom.com, netdev@vger.kernel.org,
+	storagedev@microchip.com
+Subject: Re: [PATCH 1/7] scsi: mpi3mr: replace deprecated strncpy with strscpy
+Message-ID: <202402231603.152B165@keescook>
+References: <20240223-strncpy-drivers-scsi-mpi3mr-mpi3mr_fw-c-v1-0-9cd3882f0700@google.com>
+ <20240223-strncpy-drivers-scsi-mpi3mr-mpi3mr_fw-c-v1-1-9cd3882f0700@google.com>
+ <512c1700-b333-8aea-f19b-707523ac3a6e@linux-m68k.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <512c1700-b333-8aea-f19b-707523ac3a6e@linux-m68k.org>
 
-On Tue, 20 Feb 2024 11:22:24 -0800 Jakub Kicinski wrote:
-> When running selftests for our subsystem in our CI we'd like all
-> tests to pass. Currently some tests use SKIP for cases they
-> expect to fail, because the kselftest_harness limits the return
-> codes to pass/fail/skip.
->=20
-> Clean up and support the use of the full range of ksft exit codes
-> under kselftest_harness.
->=20
-> Merge plan is to put it on top of -rc4 and merge into net-next.
-> That way others should be able to pull the patches without
-> any networking changes.
+On Sat, Feb 24, 2024 at 10:58:07AM +1100, Finn Thain wrote:
+> 
+> On Fri, 23 Feb 2024, Justin Stitt wrote:
+> 
+> > Really, there's no bug with the current code. 
+> 
+> If (hypothetically) you needed to reduce stack size, just copy the char 
+> pointer instead of copying the chars onto the stack.
+> 
+> If (hypothetically) strncpy() was banned altogether (rather than merely 
+> deprecated) I would do the same -- but I'm not the maintainer.
 
-Hi Micka=C3=ABl,
+I'd agree. This can just be using:
 
-would you be able to take a look at those changes? landlock seems to be
-the sole user of the "no_print" functionality in the selftest harness.
-If the patches look good I'll create a branch based on Linus's tree
-so that anyone interested can pull the changes in..
+const char *personality;
+...
+	personality = "RAID";
+
+etc
+
+-- 
+Kees Cook
 
