@@ -1,91 +1,75 @@
-Return-Path: <netdev+bounces-74665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10119862274
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 04:10:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E491E862278
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 04:15:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 70766B22D53
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 03:10:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79E0B286A24
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 03:15:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86A7912B87;
-	Sat, 24 Feb 2024 03:10:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC097DF5A;
+	Sat, 24 Feb 2024 03:15:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pk0agqNV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PZYIP4B6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61661DF60
-	for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 03:10:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 884D84416
+	for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 03:15:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708744233; cv=none; b=VzhIdO0ppEPzax5jp8W4x+OaQWgLwLOGVKUCP3PRujE8XCslWDxUtcdl8OtHMLPDsd13cVBEDQ91lMQswLI94WtFa+0TeHwT225LDcueQARBXEe7Z/IFMxkOx54dtNvQaasIn/uuLuFzU7YjtfAfIeBbOeEJhUhiOj4WUliVIsk=
+	t=1708744541; cv=none; b=AEVF7A+WYRooNFt8dQ2aCeNReG12pzv+SrfR/G0c67oiEssWyRf9mx6+5k8Q3GAvOyKA7HXkbgeU0AlYxKmgdWIeTeEitxKpnfiaqT+etyNXN0+Mkyr8HTWYbEZSbGt5EeCv6SmJVOglZWwOVJ8DoqCCmXylGbN9Q05tkR0IEJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708744233; c=relaxed/simple;
-	bh=O8s7eSfFNhANSRMaZuZbx+8RJMO35WW2wzocMEKDtxs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=MeRva6RLx/k71lqogBgXqcCu5446u2VjJFpJmeELiigDlkA/4VDwoU5Ui/gMupdFXeCPPJi7GymJj7XptXh4vGgmaZOJX4+WgehqI4mqcJVMMa0+Tye7uYDIIrAVyfZ6o3CnGsxEkORhwf+gQzQRYO5qDhJrZV1U3SbKki6EIQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pk0agqNV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E9409C43399;
-	Sat, 24 Feb 2024 03:10:32 +0000 (UTC)
+	s=arc-20240116; t=1708744541; c=relaxed/simple;
+	bh=idRYJaJU1XaL8ananFgmur5YCWITMrqAzXgL0e/+MfE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jmLCD2EyU4RD/lq1cbIEAfRWXqZzwUzTFXigYQrk78lhRY6DRlKRO2raNr4I/9YtPoNrSQEJZ8Ym502DzbDfKtZckXDvAsqOXTAriz/TdQiLiBt3C3eYEAUg/VjV+5E52fA1NYkRnJiNHbLp3/i+qpzJpR6Vknk2GACzAGJxxog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PZYIP4B6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C220C433F1;
+	Sat, 24 Feb 2024 03:15:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1708744233;
-	bh=O8s7eSfFNhANSRMaZuZbx+8RJMO35WW2wzocMEKDtxs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Pk0agqNVlwby/SZW1O8MjUXcyso+qGPiEey+uHmsGEV7xL8WUoB/Q2zfHbLfWw2om
-	 M2JCz6RMW1306IUJtZHSoAiCGp/A2Smky5gKZn4fJlJP9am5TzyDAxnesrl0qb6VF+
-	 eP+5HY8iWCSWQ+YXCCjUcPDEkGRyqpU0ql2mOJO1IGiY5+2Oe/Xp0UjsV9idM0DpqS
-	 vCIDsksjNIHGnTjZGtnFbVfdkZ+xCqgRPrHtS1b4SZiwXapyU2mPd+49ExDHHFnvii
-	 MioFXBF8V9U/dJ/5b4J2SQ9zU8kKg2zzzDzyVXsvqIsMCA1U12bzPoG8sGvzq9kNy4
-	 yPpF07bMqdFHQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D32F0D84BC2;
-	Sat, 24 Feb 2024 03:10:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1708744541;
+	bh=idRYJaJU1XaL8ananFgmur5YCWITMrqAzXgL0e/+MfE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=PZYIP4B6kLlcKXl++666L9htJm8HH3C4fWHpzC8YWOTK1jvb093iWip4WC4q0yORJ
+	 LZxr/4gAgYV3Hx5PaltmKxnCKtZPrFHmwfm/h9XOq09XhVVDArYAhgoW1ou01IB1NB
+	 OAVpmQ18c5OYGKjERTcGzYAGYDkBL5hLb96bSHDCMZk/RvvsjUe1BSt+ZpQ/nFQ3Po
+	 58a/G8/GFWMhLa78ZANtzqngC0ZFaBLI/eMayQYpet/8SV27wW2PVPtDKmlOFz7Ye6
+	 WE8QWQZiH2r1ZC9EkBUTMGMOQ0EF0mVl5WJkCypV/w6PXxfOyFMCHO2rln7cDCGF0A
+	 6Y8VcM87VLKkg==
+Message-ID: <b1386790-905f-4bc4-8e60-c0c86030b60c@kernel.org>
+Date: Fri, 23 Feb 2024 20:15:39 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] genetlink: make info in GENL_REQ_ATTR_CHECK() const
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170874423286.898.6247241029437215733.git-patchwork-notify@kernel.org>
-Date: Sat, 24 Feb 2024 03:10:32 +0000
-References: <20240222222819.156320-1-kuba@kernel.org>
-In-Reply-To: <20240222222819.156320-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] selftests/net: force synchronized GC for a test.
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>, Kui-Feng Lee <thinker.li@gmail.com>
+Cc: netdev@vger.kernel.org, ast@kernel.org, martin.lau@linux.dev,
+ kernel-team@meta.com, davem@davemloft.net, sinquersw@gmail.com,
+ kuifeng@meta.com
+References: <20240223081346.2052267-1-thinker.li@gmail.com>
+ <20240223182109.3cb573a2@kernel.org>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240223182109.3cb573a2@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 22 Feb 2024 14:28:19 -0800 you wrote:
-> Make the local variable in GENL_REQ_ATTR_CHECK() const.
-> genl_info_dump() returns a const pointer, so the macro
-> is currently hard to use in genl dumps.
+On 2/23/24 7:21 PM, Jakub Kicinski wrote:
+> On Fri, 23 Feb 2024 00:13:46 -0800 Kui-Feng Lee wrote:
+>> Due to the slowness of the test environment
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> 
-> [...]
+> Would be interesting if it's slowness, because it failed 2 times
+> on the debug runner but 5 times on the non-debug one. We'll see.
 
-Here is the summary with links:
-  - [net-next] genetlink: make info in GENL_REQ_ATTR_CHECK() const
-    https://git.kernel.org/netdev/net-next/c/5fd5403964ec
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+hmmm... that should be debugged. waiting 2*N + 1 and then requesting GC
+and still failing suggests something else is at play
 
