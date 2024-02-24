@@ -1,151 +1,140 @@
-Return-Path: <netdev+bounces-74720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22A378627F5
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 23:34:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D5A8862872
+	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 00:20:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 95D1D1F219C1
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 22:34:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F6C4B212CF
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 23:20:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CA3C4DA09;
-	Sat, 24 Feb 2024 22:34:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F33354D9F6;
+	Sat, 24 Feb 2024 23:20:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k4h8e1uV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gr4Dx+q3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9D861E506;
-	Sat, 24 Feb 2024 22:34:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37D691B59A;
+	Sat, 24 Feb 2024 23:20:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708814065; cv=none; b=DoyYN49rr5dVePM4OAJJuyrxyW+OrmMPTVex9H6E8EptA16PmR+QusKsf1lUSauKYRDEtnM+AdACkL3xrimrTsO1ki07ToEs+xE0Ll7RhRagkqjG1/eRAa5+lfnuknb+HE7AnO2Z0iqONqtkY4V6DshRfNLZxcUxyEJK41yzeHI=
+	t=1708816817; cv=none; b=ZWK2BAO0Tw+yFUNS5Pi7ZP7Qq1c2WGe/t2Q4FrzVYKlSoammQLLo3NxdeLBmeBdBOG8mJYJUc6v6hVOw2S/C7tbRco5x6yoX2h/ZW+NNEyEYXo+ANqmn0yzjHbER2IoHrCHLg/KLudu8u+iZRKHxmY9I5RiraqYbHaG6MZ/2t9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708814065; c=relaxed/simple;
-	bh=jXerfatU1CwpvAHcMsYW6bl9Jwfiynfb9mgqJKQr9DU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=X1XbO+0J8dxkJCZasO9KkNwYYKh7KKrIEzZs8FzBeqt2/BRVaj3RxSbEmm3A65CkErzXWa4WU91x/AeCRpGHahtGEH3K/4gtO2QuyoeHVx3ZN1f5h2CPgJbiBnjs0gJZvm9rwI0oFiNk9Vy8B0mDmapctrTwhr0ZAMRhoQzpD7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k4h8e1uV; arc=none smtp.client-ip=209.85.128.176
+	s=arc-20240116; t=1708816817; c=relaxed/simple;
+	bh=ddpbApfXPnRAvt72tIRg9a0nGvs0psYM9aIpXQBkLgY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=uicnWJpbdTiGb8txOMUuOA7GuJpR72ksIiXajfMwjr3YhU7yUoq5i0VWqzTxNSAP2uKdrzhCzfgzG0eB8vim0k9bO+uupxEJJc4MQT/kBcwMXXw6jY7Rsvh8DW/RrNC/rN9+b8xho7/grHt+9Cfyes40M2izhBLMCvxDXGw/Xc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gr4Dx+q3; arc=none smtp.client-ip=209.85.167.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-6087192b092so22493487b3.0;
-        Sat, 24 Feb 2024 14:34:23 -0800 (PST)
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-512a65cd2c7so2797387e87.0;
+        Sat, 24 Feb 2024 15:20:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708814062; x=1709418862; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d+FzNhVAX6d9zH/SLJZqcPC5xjwLaY0Izc8sijWP4CQ=;
-        b=k4h8e1uVsQNnAl2NWB/F1ZdPoOrS34lwV57Qo1mIqNjjGCTonGCId1WC3NTNhKotS1
-         phDraH4qA6pJ0pz/mcJ64VP7IdY9IcvDTo39aMVxw4J7KxsGO8Fs2NBjtbtJmti6vqWt
-         p+1EtwM0r6LYp9RcvbDrssA/fZrz72J0cTclOp2ISuZ/mZFipBr8DvUx0RdxrQkATNCE
-         wX1DCnTlrTJkSATaHykSzpciArHJxU8A4K1BSCZU4PSZ67E67M6lrc3Fv1mzMkf+VeZb
-         fHitzaxEeNQLxKycRvUFnDVxEvwkbYangv4zNOTun9FCRAZzXE1BJpQbRSEFUUZEEl/w
-         ZyMQ==
+        d=gmail.com; s=20230601; t=1708816814; x=1709421614; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ewC5em/L4cp2/EK3EgWgLTwF3e1USIQQRxwh9lx3yRY=;
+        b=Gr4Dx+q3AHyF/zawHHmeTctgVUQTrk8BYWmbxihnweavCClSAmaIUafRBAIFrzh7f1
+         ifRmPL/VVpMLz2AKX/H0Mpp9Sp9IR5GOyeZHk7xsuVKZgZ+09w3ihEDPE4bwpc2ffdbQ
+         q3A2jrHVDF7BtJx4PGWII4SQ9j6c6iHqSLfuHxEeRaTjrTohs9lVKD0yuoNzrBotIS12
+         UGl1v3ZnWzlIK6/HZltGedFpI9UFUuqLsF6VuXVbt47vNIcf1eOjwpiUYttHZxDOUuZc
+         OmmLWRMfXeNjBN8IdEo1jB/gvq2bzHYaMqizro37BPDxBXDW+axujjMwyFwKA7wKoSg+
+         JjLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708814062; x=1709418862;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=d+FzNhVAX6d9zH/SLJZqcPC5xjwLaY0Izc8sijWP4CQ=;
-        b=BCBbWxw2TVogndT3XaE0xwEddhJ8QQdOr4bWVfSTnTNy4F+IJoOj87hzuNMXuEBfD6
-         Px6Wo13qxMLP1PEp1pJm2lmShxbZ3siz4JwGlr4QM5rbAJRzN8D34GLOIUnzM0qq8vTt
-         pj+hjlmLeu/xrf5MV6LjX7jskFKIYHrAjz0skS6uK8nG+o7s9JIBaTT4QUjrxCyiejON
-         OdrfpMymh20DpqfDBu25l5RRIghBoNq7P8Ge0BrPXZaTGnYo6BGidopY9j4oQtEwjsYT
-         QlKh5p8953LkC4ZZqg6ZWguvHGv/NHhbr3XxeDRafKURIfIlRU6pH6WpdyTo00Psw9Yu
-         02og==
-X-Forwarded-Encrypted: i=1; AJvYcCWwPwkJqdCw9IFQFq6qXexENMbUL3hmGxawSpeHujH4NMMhKuhShDUKKAek2hs46whqzHNvXFuRoBZ+xc8RJysuhq6w+EXS
-X-Gm-Message-State: AOJu0YwEh5jeDfFcd6mAxVl1wvhIDUW2FUd4v8dw1dCSnfGiai9t68x2
-	RX5+j2zeJJ8wc3Y4v9lOdd4ja2ZSJ0CcBi+yqhHzqBUFV/KzfYFcWAyu7KY7
-X-Google-Smtp-Source: AGHT+IGm4ZpMqVb3y5ZIHakdGdUawkksLkQislQtMiFOxIXXIctRVMFX6u0s1yBZC2vV4gxWBHD09w==
-X-Received: by 2002:a81:48ce:0:b0:608:b59a:6292 with SMTP id v197-20020a8148ce000000b00608b59a6292mr3071912ywa.9.1708814062275;
-        Sat, 24 Feb 2024 14:34:22 -0800 (PST)
-Received: from kickker.attlocal.net ([2600:1700:6cf8:1240:9221:84d5:342c:9ac4])
-        by smtp.gmail.com with ESMTPSA id i184-20020a0dc6c1000000b00607e72b478csm474010ywd.133.2024.02.24.14.34.21
+        d=1e100.net; s=20230601; t=1708816814; x=1709421614;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ewC5em/L4cp2/EK3EgWgLTwF3e1USIQQRxwh9lx3yRY=;
+        b=MFB4jJnbPAFr7e37oYdcT5hbEQXjXw0FVS9D/NKVmx8ubIE3RVZyb3wCgyidBYW84A
+         e9uq2YLfEVD8MVijHYIDtMuVUx/m8bBWCfD3twfGQMNRTROHEqm/yIS6WsuWdqamh1yY
+         wiXsfFKIlkBxSrY+qyZqggOPo15HRcRDPg1mg/fmrr54uad0drx6ih67p2vGYESaTSby
+         /8pEjZg4ccDqHtdbucvQgE+gKnuex5SFHlurlai8A7dHgLfh3yEltuIX2XlBuawWATXG
+         v8Y4DrjSjfEqusRqTrJ0BqB2tr30LBpvUR50UB82sdJTmQRr3NVfRWHrpvidGgxujlkv
+         SIVg==
+X-Forwarded-Encrypted: i=1; AJvYcCUBnivK1dfv3vlccC2MqLBfiZ4D+VnG3hNzKAm0L3PVIX999SQbJXvJUE+ieI6kMR9Hznf6flFllybLgz0P2RY7rQmzPG0kYAiamAGSxCPjNdjm/ZwGvFX7/rWYhNCPJCVSPJUXQGk5
+X-Gm-Message-State: AOJu0Ywxk46lcchqEqnW2EKuGSDxALLF8jtAStqQ+c6Qpd/Hu7uXh2sV
+	c4jWlCDFHd7zeg/SvQrS82B/Dru/E30kkty4LdVjXk0qNBCzT8wQ
+X-Google-Smtp-Source: AGHT+IFZ3ISb+iAdCSF6RROWczKAp5Me66N/c0/Abte9/kVtdGpQs7KuFb8Ryxa+5C3vL+a+Xlxvyw==
+X-Received: by 2002:ac2:4c36:0:b0:512:ae9b:559 with SMTP id u22-20020ac24c36000000b00512ae9b0559mr1705374lfq.34.1708816814128;
+        Sat, 24 Feb 2024 15:20:14 -0800 (PST)
+Received: from [127.0.1.1] (2a02-8389-41cf-e200-75bf-ebcd-fec9-7873.cable.dynamic.v6.surfer.at. [2a02:8389:41cf:e200:75bf:ebcd:fec9:7873])
+        by smtp.gmail.com with ESMTPSA id vh9-20020a170907d38900b00a4323d1b18fsm75344ejc.34.2024.02.24.15.20.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 24 Feb 2024 14:34:21 -0800 (PST)
-From: Kui-Feng Lee <thinker.li@gmail.com>
-To: bpf@vger.kernel.org,
-	ast@kernel.org,
-	martin.lau@linux.dev,
-	song@kernel.org,
-	kernel-team@meta.com,
-	andrii@kernel.org
-Cc: sinquersw@gmail.com,
-	kuifeng@meta.com,
-	Kui-Feng Lee <thinker.li@gmail.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH bpf-next v4 1/3] bpf, net: validate struct_ops when updating value.
-Date: Sat, 24 Feb 2024 14:34:16 -0800
-Message-Id: <20240224223418.526631-2-thinker.li@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240224223418.526631-1-thinker.li@gmail.com>
-References: <20240224223418.526631-1-thinker.li@gmail.com>
+        Sat, 24 Feb 2024 15:20:13 -0800 (PST)
+From: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+Date: Sun, 25 Feb 2024 00:20:06 +0100
+Subject: [PATCH] net: usb: dm9601: fix wrong return value in
+ dm9601_mdio_read
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240225-dm9601_ret_err-v1-1-02c1d959ea59@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAKV52mUC/x3MSwqAMAwA0atI1hbSoEK9ikiRNmoWfkhFBOndL
+ S7fYuaFxCqcoK9eUL4lybEX2LqCsE77wkZiMRBSg0SNiZvr0Hrly7OqwckFF10bokUo0ak8y/M
+ PhzHnD/syCglgAAAA
+To: Peter Korsgaard <peter@korsgaard.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Javier Carrasco <javier.carrasco.cruz@gmail.com>
+X-Mailer: b4 0.14-dev
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1708816813; l=1563;
+ i=javier.carrasco.cruz@gmail.com; s=20230509; h=from:subject:message-id;
+ bh=ddpbApfXPnRAvt72tIRg9a0nGvs0psYM9aIpXQBkLgY=;
+ b=LQY/Y23hWUYaQe2RKybVLCRW+6QDIdyppqxDWZ0SdXIX5gWkG7IdeMab+0+8M5Cm2Up+roC8c
+ 4KcWpnmHFr+CusG+Qvae0a1tmKeSIdMyytGYCZpMAv9MZlsav6wiDUn
+X-Developer-Key: i=javier.carrasco.cruz@gmail.com; a=ed25519;
+ pk=tIGJV7M+tCizagNijF0eGMBGcOsPD+0cWGfKjl4h6K8=
 
-Perform all validations when updating values of struct_ops maps. Doing
-validation in st_ops->reg() and st_ops->update() is not necessary anymore.
-However, tcp_register_congestion_control() has been called in various
-places. It still needs to do validations.
+The MII code does not check the return value of mdio_read (among
+others), and therefore no error code should be sent. A previous fix to
+the use of an uninitialized variable propagates negative error codes,
+that might lead to wrong operations by the MII library.
 
-Cc: netdev@vger.kernel.org
-Signed-off-by: Kui-Feng Lee <thinker.li@gmail.com>
+An example of such issues is the use of mii_nway_restart by the dm9601
+driver. The mii_nway_restart function does not check the value returned
+by mdio_read, which in this case might be a negative number which could
+contain the exact bit the function checks (BMCR_ANENABLE = 0x1000).
+
+Return zero in case of error, as it is common practice in users of
+mdio_read to avoid wrong uses of the return value.
+
+Fixes: 8f8abb863fa5 ("net: usb: dm9601: fix uninitialized variable use in dm9601_mdio_read")
+Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
 ---
- kernel/bpf/bpf_struct_ops.c | 11 ++++++-----
- net/ipv4/tcp_cong.c         |  6 +-----
- 2 files changed, 7 insertions(+), 10 deletions(-)
+ drivers/net/usb/dm9601.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
-index a6019087b467..07e554c191d1 100644
---- a/kernel/bpf/bpf_struct_ops.c
-+++ b/kernel/bpf/bpf_struct_ops.c
-@@ -672,13 +672,14 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
- 		*(unsigned long *)(udata + moff) = prog->aux->id;
+diff --git a/drivers/net/usb/dm9601.c b/drivers/net/usb/dm9601.c
+index 99ec1d4a972d..8b6d6a1b3c2e 100644
+--- a/drivers/net/usb/dm9601.c
++++ b/drivers/net/usb/dm9601.c
+@@ -232,7 +232,7 @@ static int dm9601_mdio_read(struct net_device *netdev, int phy_id, int loc)
+ 	err = dm_read_shared_word(dev, 1, loc, &res);
+ 	if (err < 0) {
+ 		netdev_err(dev->net, "MDIO read error: %d\n", err);
+-		return err;
++		return 0;
  	}
  
-+	if (st_ops->validate) {
-+		err = st_ops->validate(kdata);
-+		if (err)
-+			goto reset_unlock;
-+	}
-+
- 	if (st_map->map.map_flags & BPF_F_LINK) {
- 		err = 0;
--		if (st_ops->validate) {
--			err = st_ops->validate(kdata);
--			if (err)
--				goto reset_unlock;
--		}
- 		arch_protect_bpf_trampoline(st_map->image, PAGE_SIZE);
- 		/* Let bpf_link handle registration & unregistration.
- 		 *
-diff --git a/net/ipv4/tcp_cong.c b/net/ipv4/tcp_cong.c
-index 1b34050a7538..28ffcfbeef14 100644
---- a/net/ipv4/tcp_cong.c
-+++ b/net/ipv4/tcp_cong.c
-@@ -146,11 +146,7 @@ EXPORT_SYMBOL_GPL(tcp_unregister_congestion_control);
- int tcp_update_congestion_control(struct tcp_congestion_ops *ca, struct tcp_congestion_ops *old_ca)
- {
- 	struct tcp_congestion_ops *existing;
--	int ret;
--
--	ret = tcp_validate_congestion_control(ca);
--	if (ret)
--		return ret;
-+	int ret = 0;
- 
- 	ca->key = jhash(ca->name, sizeof(ca->name), strlen(ca->name));
- 
+ 	netdev_dbg(dev->net,
+
+---
+base-commit: 6613476e225e090cc9aad49be7fa504e290dd33d
+change-id: 20240224-dm9601_ret_err-0a9c9d95cd10
+
+Best regards,
 -- 
-2.34.1
+Javier Carrasco <javier.carrasco.cruz@gmail.com>
 
 
