@@ -1,204 +1,236 @@
-Return-Path: <netdev+bounces-74707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74708-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A3CE862501
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 13:44:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A612D862510
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 13:49:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0320A28340A
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 12:44:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22E321F22351
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 12:49:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 051A63F9C6;
-	Sat, 24 Feb 2024 12:44:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82621249F8;
+	Sat, 24 Feb 2024 12:48:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cmaiKI81"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="jCV2pOBp"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3608F3EA86
-	for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 12:44:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80CA110A3C
+	for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 12:48:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708778665; cv=none; b=SgRUlcTj3AY+31W5Hhtjqzcc2K9gLrBkRvKFIGh0FogqBBH/KdZtAOTQH96i6yRIhQduuaH3LY/JHRDFLo3IskatpahVee1UyeC24YhFdoJhHil297kc16MEXH5RFl+8ny8tOnLFUlqmvmjbBxZty6V3yPuVA3M7PAwTWt6jle0=
+	t=1708778939; cv=none; b=klrEF8VN38Wj5iR4wsbVsnt1QVMzNt0+1U2+3otsPf5NbaYx7AfXwGm2obQ15iEYPITseTXzoXx3JuEX7wkOiSQbZY/BCmI8fwjWe23fM7qwtJ4IHkaqYhxmxDPJNxQ9KZvNS1LwEceI1pvQojLTyucTUOkAk28gv7iWD7EVxv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708778665; c=relaxed/simple;
-	bh=OmOCpzykCGpZfmK48YnLPvj1ug65eRzDoYKAnvWOBBM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oIt3cj9zc9PJg/AI4ScnIOwKzeny8dwlPT4cUYE+XX9/To/HqqI6650VrciQhZ+Bj5BUAMcJu1pLVix/PUIjigy8gPORqs055ZKYWEnui9BZ171DI9eplRCFRwvGWQmEyJGeC/bOY4VxElG3AImwV75AxIGQ8huLKqMXxiGrnLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cmaiKI81; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708778663;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=/8cJq6gJYr9fItMmms3ESiKT1OC7cypwGkdjoZcf+Rc=;
-	b=cmaiKI81yrD/PY/AHk9v/26u+o6ADka/c6KoKGSt2tX/fS+ArwLk4p4+YPN9MXoMgdrx+D
-	7zbcD/LYArkcG+zWJaqA1FMmiez4DtuioqUP1uqhCfN5S1yFDvfP4ESCWI1MTFSJZU4o5P
-	8m/kp8yv4sW1dPDoira+LajREuCcs1U=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-627-dqKOwW8dOVeR3GCN4KkXGg-1; Sat, 24 Feb 2024 07:44:17 -0500
-X-MC-Unique: dqKOwW8dOVeR3GCN4KkXGg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7E9E9800074;
-	Sat, 24 Feb 2024 12:44:16 +0000 (UTC)
-Received: from ksundara-mac.redhat.com (unknown [10.74.16.76])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 3C9AB492BC6;
-	Sat, 24 Feb 2024 12:44:09 +0000 (UTC)
-From: Karthik Sundaravel <ksundara@redhat.com>
-To: jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: pmenzel@molgen.mpg.de,
-	jiri@resnulli.us,
-	michal.swiatkowski@linux.intel.com,
-	rjarry@redhat.com,
-	aharivel@redhat.com,
-	vchundur@redhat.com,
-	ksundara@redhat.com,
-	cfontain@redhat.com
-Subject: [PATCH v4] ice: Add get/set hw address for VFs using devlink commands
-Date: Sat, 24 Feb 2024 18:14:06 +0530
-Message-Id: <20240224124406.11369-1-ksundara@redhat.com>
+	s=arc-20240116; t=1708778939; c=relaxed/simple;
+	bh=XAJuSDpYR+Drw8fH2nYQwEQ870V2Xf/OvZkWZXiT49s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JLAecr3Aug1idFeofWkszgngr4RDKOrfR5uA1tY64QvLWEwtgU4yzw+bai43Cpi6fQZ2ZpvuTTlx+igQ8rG4+aPQZjkbPZsP9EBbq0SwDXDvTsBp/r3F6k15Z5rgc2LLtzyYeLxR5wAoxonz9swHsSIXgqkiqhP022D7z5dUFzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=jCV2pOBp; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-412985a51ecso6424205e9.0
+        for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 04:48:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708778936; x=1709383736; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dp8SoobgRxaDY+uQRtQyavQk2+ctkN4l6AReeSoVED8=;
+        b=jCV2pOBproCXsXJARZ5pdboOnUBrLd9+pZlNrtUqO5/wXI/f0OSj0B6uRFkeQ906Ky
+         z9IVDC8r7xhU5ySyYfY31e80DcLDh44qIuy6YHJ6f+JG7f3gxa8TPgbxEGP4qtrImHgj
+         sIhDxW+oZORj07Jl60wqvEXjSnZo6wGOEgxa5Jh6mbsPVOXo5uIjj8JXBGMGvA2Mf20L
+         V8hE10wwBD57FQBOxwZJh1sodCo88igZ10V5t3TTR64JvRIo6V1hKR8VIpOaOBboXaFd
+         NJ50dFsUANpk1TGZAH+i3hxkn3WvME9w2eLoJiuV5k4Tf70iK2PzOta1cMPeKrzpu11y
+         nqQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1708778936; x=1709383736;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Dp8SoobgRxaDY+uQRtQyavQk2+ctkN4l6AReeSoVED8=;
+        b=JRnz/mmcfagP2e5VR3xlEKwbbLVPu6/yRZ9ZYjuUFcPAl9aB0E8Wu3i3ZL59zPllhc
+         i+IQkEGEJhgHI7atTo8lw5mpaEmljNUh+i/wtovt+1V5V4UiDF/rfulZ6sC1i+Vsj/G0
+         bW9khNChq5/ZW2wtaRS28+37RtqYYuecN0nXaUPlx8Ta32v+hEs9q+0JteyHpF7NzaM5
+         imSJDzaB7o4OY3t4RWZ5UvtaAZETb77RWj1+2v2cleg8tdWbzBta7Sp+km1YqHGDutri
+         UMrDgdSBDq3bs/VfjZD1kpd4g/N+kiR6lZiTv4YvcOCXnoCi+f5ryIYRjQq4G80Uhcs+
+         1ztg==
+X-Forwarded-Encrypted: i=1; AJvYcCVXPMqsPGe3NVjcTg+/r89B5aBufIE5XX2PZB1c4/9sNhD7OgLo3SWfS8GdYRs1QgtdWWdEiSwjVOqHU6seo7YAj/RYU7LZ
+X-Gm-Message-State: AOJu0Yzz2zx5y+OAMEMhcvmJ6/O9/tLXstgBp6+lknNijDgtUHbO+OSe
+	DcORB5+dHmilXu1a5GhXF9SodFgVXbHZfV8iALKK24fllpCP4/YATM+XT0cpjNU=
+X-Google-Smtp-Source: AGHT+IEWEKR4LhybAH/6UyAi3XuYXeVhHHiws4zVGfKr/jRqRlZs0GptbmZktM1lqHFUX6P731OcTA==
+X-Received: by 2002:a05:600c:5592:b0:412:6de0:69a9 with SMTP id jp18-20020a05600c559200b004126de069a9mr1531863wmb.39.1708778935620;
+        Sat, 24 Feb 2024 04:48:55 -0800 (PST)
+Received: from localhost ([86.61.181.4])
+        by smtp.gmail.com with ESMTPSA id i10-20020a05600c290a00b0040fccf7e8easm5943504wmd.36.2024.02.24.04.48.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 24 Feb 2024 04:48:50 -0800 (PST)
+Date: Sat, 24 Feb 2024 13:48:48 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>
+Cc: Jay Vosburgh <jay.vosburgh@canonical.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Tariq Toukan <ttoukan.linux@gmail.com>,
+	Saeed Mahameed <saeed@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>
+Subject: Re: [net-next V3 15/15] Documentation: networking: Add description
+ for multi-pf netdev
+Message-ID: <ZdnlsMgqsyOPaeyC@nanopsycho>
+References: <20240215212353.3d6d17c4@kernel.org>
+ <f3e1a1c2-f757-4150-a633-d4da63bacdcd@gmail.com>
+ <20240220173309.4abef5af@kernel.org>
+ <2024022214-alkalize-magnetize-dbbc@gregkh>
+ <20240222150030.68879f04@kernel.org>
+ <de852162-faad-40fa-9a73-c7cf2e710105@intel.com>
+ <16217.1708653901@famine>
+ <b7b89300-8065-4421-9935-3adf70ac47bc@intel.com>
+ <ZdhoBOKc40DeVCfG@nanopsycho>
+ <ef0270c5-3128-40d8-933e-f9dbeddf5961@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ef0270c5-3128-40d8-933e-f9dbeddf5961@intel.com>
 
-Changing the MAC address of the VFs are not available
-via devlink. Add the function handlers to set and get
-the HW address for the VFs.
+Sat, Feb 24, 2024 at 12:56:52AM CET, sridhar.samudrala@intel.com wrote:
+>
+>
+>On 2/23/2024 3:40 AM, Jiri Pirko wrote:
+>> Fri, Feb 23, 2024 at 06:00:40AM CET, sridhar.samudrala@intel.com wrote:
+>> > 
+>> > 
+>> > On 2/22/2024 8:05 PM, Jay Vosburgh wrote:
+>> > > Samudrala, Sridhar <sridhar.samudrala@intel.com> wrote:
+>> > > > On 2/22/2024 5:00 PM, Jakub Kicinski wrote:
+>> > > > > On Thu, 22 Feb 2024 08:51:36 +0100 Greg Kroah-Hartman wrote:
+>> > > > > > On Tue, Feb 20, 2024 at 05:33:09PM -0800, Jakub Kicinski wrote:
+>> > > > > > > Greg, we have a feature here where a single device of class net has
+>> > > > > > > multiple "bus parents". We used to have one attr under class net
+>> > > > > > > (device) which is a link to the bus parent. Now we either need to add
+>> > > > > > > more or not bother with the linking of the whole device. Is there any
+>> > > > > > > precedent / preference for solving this from the device model
+>> > > > > > > perspective?
+>> > > > > > 
+>> > > > > > How, logically, can a netdevice be controlled properly from 2 parent
+>> > > > > > devices on two different busses?  How is that even possible from a
+>> > > > > > physical point-of-view?  What exact bus types are involved here?
+>> > > > > Two PCIe buses, two endpoints, two networking ports. It's one piece
+>> > > > 
+>> > > > Isn't it only 1 networking port with multiple PFs?
+>> > > > 
+>> > > > > of silicon, tho, so the "slices" can talk to each other internally.
+>> > > > > The NVRAM configuration tells both endpoints that the user wants
+>> > > > > them "bonded", when the PCI drivers probe they "find each other"
+>> > > > > using some cookie or DSN or whatnot. And once they did, they spawn
+>> > > > > a single netdev.
+>> > > > > 
+>> > > > > > This "shouldn't" be possible as in the end, it's usually a PCI device
+>> > > > > > handling this all, right?
+>> > > > > It's really a special type of bonding of two netdevs. Like you'd bond
+>> > > > > two ports to get twice the bandwidth. With the twist that the balancing
+>> > > > > is done on NUMA proximity, rather than traffic hash.
+>> > > > > Well, plus, the major twist that it's all done magically "for you"
+>> > > > > in the vendor driver, and the two "lower" devices are not visible.
+>> > > > > You only see the resulting bond.
+>> > > > > I personally think that the magic hides as many problems as it
+>> > > > > introduces and we'd be better off creating two separate netdevs.
+>> > > > > And then a new type of "device bond" on top. Small win that
+>> > > > > the "new device bond on top" can be shared code across vendors.
+>> > > > 
+>> > > > Yes. We have been exploring a small extension to bonding driver to enable
+>> > > > a single numa-aware multi-threaded application to efficiently utilize
+>> > > > multiple NICs across numa nodes.
+>> > > 
+>> > > 	Is this referring to something like the multi-pf under
+>> > > discussion, or just generically with two arbitrary network devices
+>> > > installed one each per NUMA node?
+>> > 
+>> > Normal network devices one per NUMA node
+>> > 
+>> > > 
+>> > > > Here is an early version of a patch we have been trying and seems to be
+>> > > > working well.
+>> > > > 
+>> > > > =========================================================================
+>> > > > bonding: select tx device based on rx device of a flow
+>> > > > 
+>> > > > If napi_id is cached in the sk associated with skb, use the
+>> > > > device associated with napi_id as the transmit device.
+>> > > > 
+>> > > > Signed-off-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
+>> > > > 
+>> > > > diff --git a/drivers/net/bonding/bond_main.c
+>> > > > b/drivers/net/bonding/bond_main.c
+>> > > > index 7a7d584f378a..77e3bf6c4502 100644
+>> > > > --- a/drivers/net/bonding/bond_main.c
+>> > > > +++ b/drivers/net/bonding/bond_main.c
+>> > > > @@ -5146,6 +5146,30 @@ static struct slave
+>> > > > *bond_xmit_3ad_xor_slave_get(struct bonding *bond,
+>> > > >          unsigned int count;
+>> > > >          u32 hash;
+>> > > > 
+>> > > > +       if (skb->sk) {
+>> > > > +               int napi_id = skb->sk->sk_napi_id;
+>> > > > +               struct net_device *dev;
+>> > > > +               int idx;
+>> > > > +
+>> > > > +               rcu_read_lock();
+>> > > > +               dev = dev_get_by_napi_id(napi_id);
+>> > > > +               rcu_read_unlock();
+>> > > > +
+>> > > > +               if (!dev)
+>> > > > +                       goto hash;
+>> > > > +
+>> > > > +               count = slaves ? READ_ONCE(slaves->count) : 0;
+>> > > > +               if (unlikely(!count))
+>> > > > +                       return NULL;
+>> > > > +
+>> > > > +               for (idx = 0; idx < count; idx++) {
+>> > > > +                       slave = slaves->arr[idx];
+>> > > > +                       if (slave->dev->ifindex == dev->ifindex)
+>> > > > +                               return slave;
+>> > > > +               }
+>> > > > +       }
+>> > > > +
+>> > > > +hash:
+>> > > >          hash = bond_xmit_hash(bond, skb);
+>> > > >          count = slaves ? READ_ONCE(slaves->count) : 0;
+>> > > >          if (unlikely(!count))
+>> > > > =========================================================================
+>> > > > 
+>> > > > If we make this as a configurable bonding option, would this be an
+>> > > > acceptable solution to accelerate numa-aware apps?
+>> > > 
+>> > > 	Assuming for the moment this is for "regular" network devices
+>> > > installed one per NUMA node, why do this in bonding instead of at a
+>> > > higher layer (multiple subnets or ECMP, for example)?
+>> > > 
+>> > > 	Is the intent here that the bond would aggregate its interfaces
+>> > > via LACP with the peer being some kind of cross-chassis link aggregation
+>> > > (MLAG, et al)?
+>> 
+>> No.
+>> 
+>> > 
+>> > Yes. basic LACP bonding setup. There could be multiple peers connecting to
+>> > the server via switch providing LACP based link aggregation. No cross-chassis
+>> > MLAG.
+>> 
+>> LACP does not make any sense, when you have only a single physical port.
+>> That applies to ECMP mentioned above too I believe.
+>
+>I meant for the 2 regular NICs on 2 numa node setup, not for multi-PF 1 port
+>setup.
 
-Signed-off-by: Karthik Sundaravel <ksundara@redhat.com>
----
- drivers/net/ethernet/intel/ice/ice_devlink.c | 88 +++++++++++++++++++-
- 1 file changed, 87 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/ice_devlink.c
-index 80dc5445b50d..c3813edd6a76 100644
---- a/drivers/net/ethernet/intel/ice/ice_devlink.c
-+++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
-@@ -1576,6 +1576,91 @@ void ice_devlink_destroy_pf_port(struct ice_pf *pf)
- 	devlink_port_unregister(&pf->devlink_port);
- }
- 
-+/**
-+ * ice_devlink_port_get_vf_mac_address - .port_fn_hw_addr_get devlink handler
-+ * @port: devlink port structure
-+ * @hw_addr: MAC address of the port
-+ * @hw_addr_len: length of MAC address
-+ * @extack: extended netdev ack structure
-+ *
-+ * Callback for the devlink .port_fn_hw_addr_get operation
-+ * Return: zero on success or an error code on failure.
-+ */
-+
-+static int ice_devlink_port_get_vf_mac_address(struct devlink_port *port,
-+					       u8 *hw_addr, int *hw_addr_len,
-+					       struct netlink_ext_ack *extack)
-+{
-+	struct devlink_port_attrs *attrs = &port->attrs;
-+	struct devlink_port_pci_vf_attrs *pci_vf;
-+	struct devlink *devlink = port->devlink;
-+	struct ice_pf *pf;
-+	struct ice_vf *vf;
-+	int vf_id;
-+
-+	pf = devlink_priv(devlink);
-+	if (attrs->flavour == DEVLINK_PORT_FLAVOUR_PCI_VF) {
-+		pci_vf = &attrs->pci_vf;
-+		vf_id = pci_vf->vf;
-+	} else {
-+		NL_SET_ERR_MSG_MOD(extack, "Unable to get the vf id");
-+		return -EADDRNOTAVAIL;
-+	}
-+	vf = ice_get_vf_by_id(pf, vf_id);
-+	if (!vf) {
-+		NL_SET_ERR_MSG_MOD(extack, "Unable to get the vf");
-+		return -EINVAL;
-+	}
-+	ether_addr_copy(hw_addr, vf->dev_lan_addr);
-+	*hw_addr_len = ETH_ALEN;
-+
-+	ice_put_vf(vf);
-+	return 0;
-+}
-+
-+/**
-+ * ice_devlink_port_set_vf_mac_address - .port_fn_hw_addr_set devlink handler
-+ * @port: devlink port structure
-+ * @hw_addr: MAC address of the port
-+ * @hw_addr_len: length of MAC address
-+ * @extack: extended netdev ack structure
-+ *
-+ * Callback for the devlink .port_fn_hw_addr_set operation
-+ * Return: zero on success or an error code on failure.
-+ */
-+static int ice_devlink_port_set_vf_mac_address(struct devlink_port *port,
-+					       const u8 *hw_addr,
-+					       int hw_addr_len,
-+					       struct netlink_ext_ack *extack)
-+{
-+	struct net_device *netdev = port->type_eth.netdev;
-+	struct devlink_port_attrs *attrs = &port->attrs;
-+	struct devlink_port_pci_vf_attrs *pci_vf;
-+	u8 mac[ETH_ALEN];
-+	int vf_id;
-+
-+	if (attrs->flavour == DEVLINK_PORT_FLAVOUR_PCI_VF) {
-+		pci_vf = &attrs->pci_vf;
-+		vf_id = pci_vf->vf;
-+	} else {
-+		NL_SET_ERR_MSG_MOD(extack, "Unable to get the vf id");
-+		return -EADDRNOTAVAIL;
-+	}
-+
-+	if (!netdev) {
-+		NL_SET_ERR_MSG_MOD(extack, "Unable to get the netdev");
-+		return -EADDRNOTAVAIL;
-+	}
-+	ether_addr_copy(mac, hw_addr);
-+
-+	return ice_set_vf_mac(netdev, vf_id, mac);
-+}
-+
-+static const struct devlink_port_ops ice_devlink_vf_port_ops = {
-+	.port_fn_hw_addr_get = ice_devlink_port_get_vf_mac_address,
-+	.port_fn_hw_addr_set = ice_devlink_port_set_vf_mac_address,
-+};
-+
- /**
-  * ice_devlink_create_vf_port - Create a devlink port for this VF
-  * @vf: the VF to create a port for
-@@ -1611,7 +1696,8 @@ int ice_devlink_create_vf_port(struct ice_vf *vf)
- 	devlink_port_attrs_set(devlink_port, &attrs);
- 	devlink = priv_to_devlink(pf);
- 
--	err = devlink_port_register(devlink, devlink_port, vsi->idx);
-+	err = devlink_port_register_with_ops(devlink, devlink_port,
-+					     vsi->idx, &ice_devlink_vf_port_ops);
- 	if (err) {
- 		dev_err(dev, "Failed to create devlink port for VF %d, error %d\n",
- 			vf->vf_id, err);
--- 
-2.39.3 (Apple Git-145)
-
+Okay, not sure how it is related to this thread then :)
 
