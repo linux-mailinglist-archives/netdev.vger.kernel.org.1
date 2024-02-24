@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-74659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F01B7862238
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 03:10:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2ED72862236
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 03:10:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A89D82850EC
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 02:10:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6ED41F242F9
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 02:10:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 358DBE565;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30B04DF67;
 	Sat, 24 Feb 2024 02:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g3FNWpNV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lhp21QS+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CC53DF60;
-	Sat, 24 Feb 2024 02:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CBEFDF56
+	for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 02:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708740630; cv=none; b=KfD5VS01UIdfo772JpsYIEOzsDsoB+EMh2vlPJcrmo4t/XAUB4mt+7CHU3QagOykfl8o6rljsCi41iup2wDVWWcKApXFwGiiYiVyZincQB6fHZbT/r/zrCTJ5sUS+pQbHYiozMXDOxrTGMjKZ/Asb7WnzqZHQMfuUXJRbnWkkBI=
+	t=1708740630; cv=none; b=StJOxvh6qb6t3xVV0GNGt1BBfPtJq2HvHG/Oe5QqZFy6UFPs+NE2N9GG6Mw+L4XNpwAfxCXg7lcm3TXbadZPcsUc9BkwtyklH9miRzXAd+Vfe66YsT4341zqsqB8MuUFgMLygDzy5Aa5DIpKZ/8rooxAikhjwfqMmSoe+aF87yA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1708740630; c=relaxed/simple;
-	bh=e77GtYEPxxvfVtkM1NVQt52Lm19idRQhnyPDhiQsnnI=;
+	bh=e3awmqg9DuvQucPvgIH+uPzPjXjLUPXMLUcPP7URmYg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nckmCaquNU8VjZdZwXuWHEkVserGqNfmy/nWLN4rd//tHnkz4wFHynKIXzmTVfgQI8LjjFnWVyfGjJs+3JZSIXbXEUb46G7S6B5+Nh7QfmXYSV6qdi5aFEzHtJKcsMR3Mcoc0QGdBv+DumiNa9tRr/dgKGIYJGwEsy5bk/H20nI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g3FNWpNV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8BAC5C43390;
+	 In-Reply-To:To:Cc; b=pS1NzrU80opstcL15f+/WcaAoEIAIS7k2LUeISN33xeLzsUuawVUgv2slGeORzfDSnOX6X6FGDw61ITe33q1KfiIFgWLkAK4HtWod4W3plcevUd5/vzgr7dHzMUUZCazqW1XsRZfbsg6MBuWKQLhBUFIo+TwsdpPdcpUwTCk1U4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lhp21QS+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 981C7C433B1;
 	Sat, 24 Feb 2024 02:10:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1708740629;
-	bh=e77GtYEPxxvfVtkM1NVQt52Lm19idRQhnyPDhiQsnnI=;
+	bh=e3awmqg9DuvQucPvgIH+uPzPjXjLUPXMLUcPP7URmYg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=g3FNWpNV68TN9j78N4t2DRVZPojFmvGfWExKLiB3OhgRnUtc6/m0F1IubxSVWB7g/
-	 CvH5j4zAj3KQzS0nyBomJvjxlOmyMpwAi+Hs5trtbN83YAlmm2us+Jufxo04kV5MRc
-	 dYncc0gxQlN2ZwGbe2DXx/4eGjIw7OL1/U5oTGSW3QEHU7tnf+KiTFFmFZzUic2+OY
-	 THfR/pH3HlMPduHclsF5yCoKMBCLK8QgBX4au84k8nSYzmKoA3YWYsbqfaQkJ+YQnE
-	 OAEQ3oi5YC2vFWA8lf3UE4UUEFW8BVD7s8vk70xoYegZ1m7XXk+xXcsvzBJXH7xgcj
-	 tjJm8Dkn0ipjA==
+	b=lhp21QS+4BnuICE7ZhAiXzVD7eNcy3Pn9GzyE1nC+PEBrbKOX6WF7vIiTwORgjBBs
+	 tKV9PgJNJv5IbKvn2T4MHkrfIqwhAt6Kdgi0aimFXwOk/daPfaXJv1bg/Cimhbo2JT
+	 wVD4PBNg06HRejU07WYitoedfe09/QQ+s9EqC8s5XxxYRk69QGvL/FMjhZRNF2uowb
+	 8kngcfSgcbZq//M+HvpQ08LVkTH7o0P8xOL2r44D7g5yLmmL7S2zh17/5vbhd2cc+2
+	 DuLQxcL4rqgL+0BRiKnrlZfjtTh2Sk4KyMkr11t+WjcTR0n/aeHXF+xBAi93mW5kwl
+	 3Je2Ttjz5aDhw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6AF99D84BBB;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 74E20C59A4C;
 	Sat, 24 Feb 2024 02:10:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,35 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: ethtool: avoid rebuilds on UTS_RELEASE change
+Subject: Re: [PATCH net-next] ps3/gelic: minor Kernel Doc corrections
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170874062943.5601.303733296768979294.git-patchwork-notify@kernel.org>
+ <170874062946.5601.16694725773526396855.git-patchwork-notify@kernel.org>
 Date: Sat, 24 Feb 2024 02:10:29 +0000
-References: <20240220194244.2056384-1-jannh@google.com>
-In-Reply-To: <20240220194244.2056384-1-jannh@google.com>
-To: Jann Horn <jannh@google.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240221-ps3-gelic-kdoc-v1-1-7629216d1340@kernel.org>
+In-Reply-To: <20240221-ps3-gelic-kdoc-v1-1-7629216d1340@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: geoff@infradead.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, mpe@ellerman.id.au, npiggin@gmail.com,
+ christophe.leroy@csgroup.eu, aneesh.kumar@kernel.org,
+ naveen.n.rao@linux.ibm.com, netdev@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 20 Feb 2024 20:42:44 +0100 you wrote:
-> Currently, when you switch between branches or something like that and
-> rebuild, net/ethtool/ioctl.c has to be built again because it depends
-> on UTS_RELEASE.
+On Wed, 21 Feb 2024 17:46:21 +0000 you wrote:
+> * Update the Kernel Doc for gelic_descr_set_tx_cmdstat()
+>   and gelic_net_setup_netdev() so that documented name
+>   and the actual name of the function match.
 > 
-> By instead referencing a string variable stored in another object file,
-> this can be avoided.
+> * Move define of GELIC_ALIGN() so that it is no longer
+>   between gelic_alloc_card_net() and it's Kernel Doc.
 > 
 > [...]
 
 Here is the summary with links:
-  - net: ethtool: avoid rebuilds on UTS_RELEASE change
-    https://git.kernel.org/netdev/net-next/c/d2efeb52c344
+  - [net-next] ps3/gelic: minor Kernel Doc corrections
+    https://git.kernel.org/netdev/net-next/c/3e596599372e
 
 You are awesome, thank you!
 -- 
