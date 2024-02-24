@@ -1,111 +1,204 @@
-Return-Path: <netdev+bounces-74706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE45A8624FF
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 13:43:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A3CE862501
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 13:44:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5BA31F222BB
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 12:43:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0320A28340A
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 12:44:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 861213EA86;
-	Sat, 24 Feb 2024 12:43:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 051A63F9C6;
+	Sat, 24 Feb 2024 12:44:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="qu8jJCux"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cmaiKI81"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B047523CE
-	for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 12:43:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3608F3EA86
+	for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 12:44:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708778632; cv=none; b=eEj3FWsjsHAYBSqmUpVMiiQH9pLhEB887ktGTwQ7oHDBpHabqfIM13ZHZ0juEOLRUqM1NGyktmoQIursGu7YRjWOAIbSyd4cNJuAM2rI7sAUBUPlX25OszI7LuiYEICMbFQ8pLe4epYx4mzWqrIm29m9+3Hv/20hXfNhgAlhlWI=
+	t=1708778665; cv=none; b=SgRUlcTj3AY+31W5Hhtjqzcc2K9gLrBkRvKFIGh0FogqBBH/KdZtAOTQH96i6yRIhQduuaH3LY/JHRDFLo3IskatpahVee1UyeC24YhFdoJhHil297kc16MEXH5RFl+8ny8tOnLFUlqmvmjbBxZty6V3yPuVA3M7PAwTWt6jle0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708778632; c=relaxed/simple;
-	bh=8uoHp4cPtslag23AL7LccV7ZPuOol9x3dXQ2dAd6Gzc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lqcFbzhADaJfFIgrYW+g4iVR9lFhdCVgm2t7rAAFoST6xcMMqUxAgthhCXAmInkVgztWFDlDRuBRgwpqH/V+KwO3kOTFUS1xEmUDMK/nuLTnGuoUB7CLA7XBonZKPNIsH1bZAIKwJqVcpeWO3eW8XX84qwy/2sDJPhxFIcit4iQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=qu8jJCux; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4129e842463so1543945e9.3
-        for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 04:43:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1708778628; x=1709383428; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8uoHp4cPtslag23AL7LccV7ZPuOol9x3dXQ2dAd6Gzc=;
-        b=qu8jJCuxD5q1IH/aqBRHKWL3ki8TK8KhO8HjNlURs4ITnOEgPrJqV8CW3UGmc55hDf
-         STURzWQE30qiEnVC0VUJ33IqEHN436bIuCjkKKtZD1QApnz7pzglL+f726Qn6h0fKKHA
-         FKvTt6xWQotN6/g8w7WVr+bezkb8XvJU4A2Jlk9O3s8YyRLrFDm0rKe1Ig9AiZyfgno+
-         A1EHf4ShSG/0q16BM9jRB75uTMpvTS9aPfZFgPr+ujas0qnxYVDeTtjKAHb0L3DbkUZ4
-         f3Bu0DHRxn8Vz9Z7ZVYymmpMEBVNbxTa2JXW9RhjAtEKkA2FdUrhz4i5I4WFjt/4TV1W
-         TrLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708778628; x=1709383428;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8uoHp4cPtslag23AL7LccV7ZPuOol9x3dXQ2dAd6Gzc=;
-        b=iVsZx08ysrJOi97MM6J644jgnHl2bX0dHWPJbv0LMHSb+L2fAk3NjW+iBGbavt3NHF
-         GD0wxgsVssY6PaUwDfdc/8mOArGgYuJUjClZp01g4d2jHpJuyASha0oI0EIQ1jtRRbDC
-         8ZyZfJWcR1T59IR9cu5HPXznN5P3P/O3dCOWrfS9ECyF3GdL+cH8ZTekKUu4V1YG0BVo
-         cfVVzQrJYOvApl3S9FmVGCm2jBT5YcPAz4IT/ZpOZ4B9tRV1isSX/2BuzT06eqwp8W8A
-         WpJsqGBebIdAkE2Ukl36ZbZQEtCyuUprHcXdC4YtMUdoCgDxeN5D/to1GjwuuJ2M+1Pj
-         toMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVjr0JUrdJXPkh12JO1NlE48QoSI4EcAvYVtS/wtw6/nsFjU+ZGSyg+HymauJ/8yaEHcOU2y4ji9U9UIYUdCCdp+SCTCwmV
-X-Gm-Message-State: AOJu0YxwT3vQyN4szBQiUJAKt5FVmFtafISb3dyJP4MhGr5YduWVWbi+
-	MK7lRFm6b+W/jw1ShQ2o2W6/OzutkdRswUxZ0LZbSP6dyepPkT2D/Dv3L1VV1HM=
-X-Google-Smtp-Source: AGHT+IEAKHGJBJDYRuQmsLurrYTpKTVew5RLnBTrf3wkeDw5Wd5w82xiFj4z3U+zUGAEBJa6+8VqsA==
-X-Received: by 2002:a05:600c:1c26:b0:412:9008:b252 with SMTP id j38-20020a05600c1c2600b004129008b252mr1506272wms.40.1708778627764;
-        Sat, 24 Feb 2024 04:43:47 -0800 (PST)
-Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id bv15-20020a0560001f0f00b0033d47c6073esm2053757wrb.12.2024.02.24.04.43.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 24 Feb 2024 04:43:46 -0800 (PST)
-Date: Sat, 24 Feb 2024 13:43:45 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com,
-	Jiri Pirko <jiri@nvidia.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Subject: Re: [PATCH v2 net] dpll: rely on rcu for netdev_dpll_pin()
-Message-ID: <ZdnkgctN0wQrQCLR@nanopsycho>
-References: <20240223123208.3543319-1-edumazet@google.com>
+	s=arc-20240116; t=1708778665; c=relaxed/simple;
+	bh=OmOCpzykCGpZfmK48YnLPvj1ug65eRzDoYKAnvWOBBM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oIt3cj9zc9PJg/AI4ScnIOwKzeny8dwlPT4cUYE+XX9/To/HqqI6650VrciQhZ+Bj5BUAMcJu1pLVix/PUIjigy8gPORqs055ZKYWEnui9BZ171DI9eplRCFRwvGWQmEyJGeC/bOY4VxElG3AImwV75AxIGQ8huLKqMXxiGrnLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cmaiKI81; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1708778663;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=/8cJq6gJYr9fItMmms3ESiKT1OC7cypwGkdjoZcf+Rc=;
+	b=cmaiKI81yrD/PY/AHk9v/26u+o6ADka/c6KoKGSt2tX/fS+ArwLk4p4+YPN9MXoMgdrx+D
+	7zbcD/LYArkcG+zWJaqA1FMmiez4DtuioqUP1uqhCfN5S1yFDvfP4ESCWI1MTFSJZU4o5P
+	8m/kp8yv4sW1dPDoira+LajREuCcs1U=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-627-dqKOwW8dOVeR3GCN4KkXGg-1; Sat, 24 Feb 2024 07:44:17 -0500
+X-MC-Unique: dqKOwW8dOVeR3GCN4KkXGg-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7E9E9800074;
+	Sat, 24 Feb 2024 12:44:16 +0000 (UTC)
+Received: from ksundara-mac.redhat.com (unknown [10.74.16.76])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 3C9AB492BC6;
+	Sat, 24 Feb 2024 12:44:09 +0000 (UTC)
+From: Karthik Sundaravel <ksundara@redhat.com>
+To: jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: pmenzel@molgen.mpg.de,
+	jiri@resnulli.us,
+	michal.swiatkowski@linux.intel.com,
+	rjarry@redhat.com,
+	aharivel@redhat.com,
+	vchundur@redhat.com,
+	ksundara@redhat.com,
+	cfontain@redhat.com
+Subject: [PATCH v4] ice: Add get/set hw address for VFs using devlink commands
+Date: Sat, 24 Feb 2024 18:14:06 +0530
+Message-Id: <20240224124406.11369-1-ksundara@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240223123208.3543319-1-edumazet@google.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-Fri, Feb 23, 2024 at 01:32:08PM CET, edumazet@google.com wrote:
->This fixes a possible UAF in if_nlmsg_size(),
->which can run without RTNL.
->
->Add rcu protection to "struct dpll_pin"
->
->Move netdev_dpll_pin() from netdevice.h to dpll.h to
->decrease name pollution.
->
->Note: This looks possible to no longer acquire RTNL in
->netdev_dpll_pin_assign() later in net-next.
->
->v2: do not force rcu_read_lock() in rtnl_dpll_pin_size() (Jiri Pirko)
->
->Fixes: 5f1842692880 ("netdev: expose DPLL pin handle for netdevice")
->Signed-off-by: Eric Dumazet <edumazet@google.com>
+Changing the MAC address of the VFs are not available
+via devlink. Add the function handlers to set and get
+the HW address for the VFs.
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+Signed-off-by: Karthik Sundaravel <ksundara@redhat.com>
+---
+ drivers/net/ethernet/intel/ice/ice_devlink.c | 88 +++++++++++++++++++-
+ 1 file changed, 87 insertions(+), 1 deletion(-)
 
-Thanks!
+diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/ice_devlink.c
+index 80dc5445b50d..c3813edd6a76 100644
+--- a/drivers/net/ethernet/intel/ice/ice_devlink.c
++++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
+@@ -1576,6 +1576,91 @@ void ice_devlink_destroy_pf_port(struct ice_pf *pf)
+ 	devlink_port_unregister(&pf->devlink_port);
+ }
+ 
++/**
++ * ice_devlink_port_get_vf_mac_address - .port_fn_hw_addr_get devlink handler
++ * @port: devlink port structure
++ * @hw_addr: MAC address of the port
++ * @hw_addr_len: length of MAC address
++ * @extack: extended netdev ack structure
++ *
++ * Callback for the devlink .port_fn_hw_addr_get operation
++ * Return: zero on success or an error code on failure.
++ */
++
++static int ice_devlink_port_get_vf_mac_address(struct devlink_port *port,
++					       u8 *hw_addr, int *hw_addr_len,
++					       struct netlink_ext_ack *extack)
++{
++	struct devlink_port_attrs *attrs = &port->attrs;
++	struct devlink_port_pci_vf_attrs *pci_vf;
++	struct devlink *devlink = port->devlink;
++	struct ice_pf *pf;
++	struct ice_vf *vf;
++	int vf_id;
++
++	pf = devlink_priv(devlink);
++	if (attrs->flavour == DEVLINK_PORT_FLAVOUR_PCI_VF) {
++		pci_vf = &attrs->pci_vf;
++		vf_id = pci_vf->vf;
++	} else {
++		NL_SET_ERR_MSG_MOD(extack, "Unable to get the vf id");
++		return -EADDRNOTAVAIL;
++	}
++	vf = ice_get_vf_by_id(pf, vf_id);
++	if (!vf) {
++		NL_SET_ERR_MSG_MOD(extack, "Unable to get the vf");
++		return -EINVAL;
++	}
++	ether_addr_copy(hw_addr, vf->dev_lan_addr);
++	*hw_addr_len = ETH_ALEN;
++
++	ice_put_vf(vf);
++	return 0;
++}
++
++/**
++ * ice_devlink_port_set_vf_mac_address - .port_fn_hw_addr_set devlink handler
++ * @port: devlink port structure
++ * @hw_addr: MAC address of the port
++ * @hw_addr_len: length of MAC address
++ * @extack: extended netdev ack structure
++ *
++ * Callback for the devlink .port_fn_hw_addr_set operation
++ * Return: zero on success or an error code on failure.
++ */
++static int ice_devlink_port_set_vf_mac_address(struct devlink_port *port,
++					       const u8 *hw_addr,
++					       int hw_addr_len,
++					       struct netlink_ext_ack *extack)
++{
++	struct net_device *netdev = port->type_eth.netdev;
++	struct devlink_port_attrs *attrs = &port->attrs;
++	struct devlink_port_pci_vf_attrs *pci_vf;
++	u8 mac[ETH_ALEN];
++	int vf_id;
++
++	if (attrs->flavour == DEVLINK_PORT_FLAVOUR_PCI_VF) {
++		pci_vf = &attrs->pci_vf;
++		vf_id = pci_vf->vf;
++	} else {
++		NL_SET_ERR_MSG_MOD(extack, "Unable to get the vf id");
++		return -EADDRNOTAVAIL;
++	}
++
++	if (!netdev) {
++		NL_SET_ERR_MSG_MOD(extack, "Unable to get the netdev");
++		return -EADDRNOTAVAIL;
++	}
++	ether_addr_copy(mac, hw_addr);
++
++	return ice_set_vf_mac(netdev, vf_id, mac);
++}
++
++static const struct devlink_port_ops ice_devlink_vf_port_ops = {
++	.port_fn_hw_addr_get = ice_devlink_port_get_vf_mac_address,
++	.port_fn_hw_addr_set = ice_devlink_port_set_vf_mac_address,
++};
++
+ /**
+  * ice_devlink_create_vf_port - Create a devlink port for this VF
+  * @vf: the VF to create a port for
+@@ -1611,7 +1696,8 @@ int ice_devlink_create_vf_port(struct ice_vf *vf)
+ 	devlink_port_attrs_set(devlink_port, &attrs);
+ 	devlink = priv_to_devlink(pf);
+ 
+-	err = devlink_port_register(devlink, devlink_port, vsi->idx);
++	err = devlink_port_register_with_ops(devlink, devlink_port,
++					     vsi->idx, &ice_devlink_vf_port_ops);
+ 	if (err) {
+ 		dev_err(dev, "Failed to create devlink port for VF %d, error %d\n",
+ 			vf->vf_id, err);
+-- 
+2.39.3 (Apple Git-145)
+
 
