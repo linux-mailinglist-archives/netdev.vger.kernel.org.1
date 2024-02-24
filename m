@@ -1,74 +1,73 @@
-Return-Path: <netdev+bounces-74695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 737778623F7
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 10:41:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BE1F58623FE
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 11:01:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFB05283B13
-	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 09:41:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70A8928235C
+	for <lists+netdev@lfdr.de>; Sat, 24 Feb 2024 10:01:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B38A1B59F;
-	Sat, 24 Feb 2024 09:41:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EC8E1B7EF;
+	Sat, 24 Feb 2024 10:01:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="HmdkCEdD"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RhpoUe8V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86C8318E2A
-	for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 09:41:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 644D31B96E
+	for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 10:01:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708767666; cv=none; b=karhNgCHPcYXVCMxvu/E4L1Umg/CRNIm6BSVubBPfiYSG60RDoqzg7UyFFU6+74mTy6thlTxkDkdat4fxf/dHwar+hkJfUatVFeMGm1Zz7g7AC/MrwIYhHr63jJkX6MT5LUB2qrWoq3sAhN4tCTxl65L942ldGZhSFMe2ieM0LQ=
+	t=1708768903; cv=none; b=H9rqm3hOjCVk6ztAGRM1wAS+6Lqhh64a44rb8Vnepg/RKzlTKMARDwTSIzo5yZW4v+d0Ckreb9EX7lmSqhgV1JQ/WN3XlUxxSdUXEx6XDLrJWat6WkRZVOXBwnUpwBn0Sem0rvXRxXqQJvh6u3RVX9Y66QCRpylBXgbd5jAZve0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708767666; c=relaxed/simple;
-	bh=UEFxROxE6KP7hbsHlQuKhYmjvKut4tKaZLEG/90dHnY=;
+	s=arc-20240116; t=1708768903; c=relaxed/simple;
+	bh=3nMkR5dJcVD2Urhl5MgrFW+pMF7H/cPlbsNlgABcQQ8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TzhE1J/4V3KaISA7na3Zi9XObkqRvjZJSI0QrI+HvC3TsFsCyIBcYLV1KY1JnEgqgwR7C5041/VPsefLfDKbN8b8pS9f5ENfU/J2JBYQB7yJDGdMrDlkmM1tfcX3EFb9kVMWWL6zG3tz74Ekbwmantt860VSBSATjXebI5qb5Qc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=HmdkCEdD; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4129e8bc7c2so839845e9.3
-        for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 01:41:04 -0800 (PST)
+	 In-Reply-To:Content-Type; b=Z/MEsoesnoP/sjqhgMSj2PV+/goPINKc8wgZAgrtolRMW07pOajmneuqd6ZmPk7muOp/FBjjWLd6XtS8tfo8J7endge5OkJY3WQgJrVzT8Py0nLxOZeSlwPm6KaztunRkvYAo4tM/FlYLphyhcCkd5g9IEMMexgInD8vCPCKweY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=RhpoUe8V; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-564a53b8133so1223248a12.0
+        for <netdev@vger.kernel.org>; Sat, 24 Feb 2024 02:01:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1708767663; x=1709372463; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=linaro.org; s=google; t=1708768901; x=1709373701; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=9v4R1LcjkjY5cWdbqRcV+KS7qfSyvUTSBFeDxDIrljY=;
-        b=HmdkCEdDBEb0hUoPXbEx8PLuzMUGEp+YK5OOFbuDLvD4AuJz56an7hZApsCef3o7hH
-         XR4Q0+Hwt+ARkoS65145mXVm8QpemZUbVvdFURaLbm8KbK4CW+gE+M/gZab8REYL4kWI
-         Ja/EGOjPaXDjavbcZDaS310vFcCAUjUlu7Qc9HBYdvzy7eZEmLYu2hKHYiLNeNqsAM/R
-         FBq2NY7nNa3OS38RipInsdZ3xPVyY7op8qo+X4ssGXp/URVRWtuOAtM2p+XXDNN44KFo
-         lMKq6QdwffH31Wdsof+9MZRO/81LwWE3jNAWPSCcMQ7o1q5xSCKL8aA/0U0WyI22G54o
-         RxJg==
+        bh=TLrO/bnxkuSUgm8muCOM3+Hdg03aFgJjfgi0takGu6U=;
+        b=RhpoUe8VCKDovq3UWRDNEtaiBUTL5MeDKcoxXtf4cGANgZekV0pHBGsDvigm+XhXve
+         ZWeOaco4L2sWPvYVuTod9JiBYk0BSYPPs8xFc7+sQxmM1pZDdK0P0cwAmsb2zC37bnX4
+         8M2Y7yf6Rk9hmXExWh7MedljEEn+WhM7yNShZ2DTudMfv7MKYjJyKNm2WYeMr5lB5xPm
+         AoubEw5cOXLnozOyjrEirxASZEdbk42q9NTsf222yzRrez7gqnCVNzJWithMOOJgcTwL
+         tnvWCbs4kWgW9yKLx0YH7of4R/VvN7j3+/M/xXFs+Uf5Ogn1/Jths4xGg4QPHl3ENZ7Q
+         hSEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708767663; x=1709372463;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1708768901; x=1709373701;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9v4R1LcjkjY5cWdbqRcV+KS7qfSyvUTSBFeDxDIrljY=;
-        b=kCDzHX1OC5YLIMoCRHLggpAqagFJl6vALmnw9LohzU6PV1doPfPep3hZoy1+VuAtGY
-         MxKXjPbGvFmM5KPxsYl+v3Zm/R1jWgbeNwHBirUju5UQ+41Ckkh7UjYtsY2VxKjxcbqF
-         1s2KSsIFtoU2QFgVd2GV6nRcoI9M4FUTZbT2sD7A9zImz/ygRqNo6I2og5MQb3jkxPZh
-         uFPssmMWgS9WKxuokTr/zSt1ivZL8l+uh8AXeNsyqlTFqp7VfS8Xw1bc3mKiiWZV1J7O
-         oXkZfL5x/ASaZI+jG7bjkc4HgCFeTYN/HldrIVjhMn/sUVTe/iWOc99jCUegGARpjPWF
-         pj9A==
-X-Forwarded-Encrypted: i=1; AJvYcCXToxrqttK43NKHRsPnsgH/PLZEHMBG6fNK+XJ0CdzYXr0MUjaCd3/F/8qC1AGlRbZbRb2Ei5pCda5eQW1vAjCSz07YzjBS
-X-Gm-Message-State: AOJu0YyCh8XF02FNeM3u8odGO/rFALRGKFRSoKEmYkDd2J3b8PGDV1h6
-	H9DOlMnebYdaFnUqLNhOGtO/U/rZo+pMDbCImWD2XZ7VGi8EY5bUhCFX3IWlUw==
-X-Google-Smtp-Source: AGHT+IEyK9H6qTd17qmPlYqNBSh17XoUaXYRRxKBzbl5Zs/nMraTHjuqZ5EBJfQ2dbtVFWQsGALWug==
-X-Received: by 2002:a05:600c:1d07:b0:412:6015:3dc5 with SMTP id l7-20020a05600c1d0700b0041260153dc5mr1121291wms.14.1708767662930;
-        Sat, 24 Feb 2024 01:41:02 -0800 (PST)
-Received: from [10.83.37.178] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id f14-20020adff98e000000b0033cf60e268fsm1509225wrr.116.2024.02.24.01.41.01
+        bh=TLrO/bnxkuSUgm8muCOM3+Hdg03aFgJjfgi0takGu6U=;
+        b=wYyp46PBBhBQ9rYeHwfWSDaSeFQI4MktOJA3fDQ4eeMGkG9Hawj8ntWQptwLieitCg
+         JhaUur+/1FcNKUgWzZQ7UqB4lPHBQOaTWoOHVxp6BmF1TrKnDhz6sZXrf9qIaa9ophEQ
+         uqqaKSjAgELNxGrVC4UK20bmDMSS0rqmCHubZj06XFDCjn+HbiPio1wHLZBLcFA5zDw1
+         wGUSSL5lSntlIUiJIb3ENEi/e2GoTPSmCht/50FDXJuZROk+MFK8WuicAHHGFuVmKiY2
+         XJHjTbflqJrtM4sevIjYyN+XmFOlwAB8YnxgNcBXzsfv8v+ftjYn3dF7Zyy3KzUHIUQ0
+         9sEQ==
+X-Gm-Message-State: AOJu0YwEN/zFAwB+4AjYpiDu1bWFeEBdaLwrkvkQ40Dj2tymii3yW7OY
+	diDVkCG+MERg7PURPNwQqJ4F7hNaKMSRSiSs0gfVo5QO+KRoVODi1LdXq7tnQ54=
+X-Google-Smtp-Source: AGHT+IEOaVGuf4rEyUWIa2XD5k/ZOel8kCOB1hnm9mITwxBIcyi1g42hF1s5jQIqTrbTzeBHuoZU3g==
+X-Received: by 2002:a50:ef15:0:b0:565:6e46:2c9e with SMTP id m21-20020a50ef15000000b005656e462c9emr1425700eds.5.1708768900694;
+        Sat, 24 Feb 2024 02:01:40 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.222.116])
+        by smtp.gmail.com with ESMTPSA id q32-20020a05640224a000b00564fa936b2bsm398120eda.94.2024.02.24.02.01.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 24 Feb 2024 01:41:02 -0800 (PST)
-Message-ID: <ff642d38-17b8-4b12-b2ff-a819b193b2e6@arista.com>
-Date: Sat, 24 Feb 2024 09:40:55 +0000
+        Sat, 24 Feb 2024 02:01:39 -0800 (PST)
+Message-ID: <eb772e32-7ecb-433a-a449-0aaae067963a@linaro.org>
+Date: Sat, 24 Feb 2024 11:01:35 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,43 +75,90 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 03/10] net/tcp: Move tcp_inbound_hash() from
- headers
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>,
- Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- Dmitry Safonov <0x7f454c46@gmail.com>
-References: <20240224-tcp-ao-tracepoints-v1-0-15f31b7f30a7@arista.com>
- <20240224-tcp-ao-tracepoints-v1-3-15f31b7f30a7@arista.com>
- <CANn89iKB3ov_rthyscWn=h4yxmhReXAJzHu9+dOdpzPA8F=C-w@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 1/6] dt-bindings: net: hisilicon-femac-mdio:
+ convert to YAML
 Content-Language: en-US
-From: Dmitry Safonov <dima@arista.com>
-In-Reply-To: <CANn89iKB3ov_rthyscWn=h4yxmhReXAJzHu9+dOdpzPA8F=C-w@mail.gmail.com>
+To: Yang Xiwen <forbidden405@outlook.com>,
+ Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
+ <salil.mehta@huawei.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org
+References: <20240222-net-v4-0-eea68f93f090@outlook.com>
+ <20240222-net-v4-1-eea68f93f090@outlook.com>
+ <e053448f-2b58-408a-af22-d7b464c52781@linaro.org>
+ <SEZPR06MB6959B0A21A1B601644E2836496562@SEZPR06MB6959.apcprd06.prod.outlook.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <SEZPR06MB6959B0A21A1B601644E2836496562@SEZPR06MB6959.apcprd06.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 2/24/24 09:30, Eric Dumazet wrote:
-> On Sat, Feb 24, 2024 at 10:04 AM Dmitry Safonov <dima@arista.com> wrote:
->>
->> Two reasons:
->> 1. It's grown up enough
->> 2. In order to not do header spaghetti by including
->>    <trace/events/tcp.h>, which is necessary for TCP tracepoints.
->>
->> Signed-off-by: Dmitry Safonov <dima@arista.com>
+On 22/02/2024 19:19, Yang Xiwen wrote:
+> On 2/23/2024 2:14 AM, Krzysztof Kozlowski wrote:
+>> On 22/02/2024 13:43, Yang Xiwen via B4 Relay wrote:
+>>> From: Yang Xiwen <forbidden405@outlook.com>
+>>>
+>>> For some FEMAC cores, MDIO bus is integrated to the MAC controller. So
+>>> We don't have a dedicated MDIO bus clock.
+>> Hm, this means you miss compatibles for these different cores.
 > 
-> Okay, but what about CONFIG_IPV6=m ?
 > 
-> I do not see any EXPORT_SYMBOL() in this patch.
+> So you mean adding a new compatible like 
+> "hisilicon,hisi-femac-mdio-integrated" for these ones without dedicated 
+> clocks?
 
-Ouch. I keep forgetting about that case, will fix in v2.
+This is a part of a SoC, right? So compatibles should be SoC specific,
+thus I expect some hisilicon,SoC-femac-mdio.
 
-Thanks,
-             Dmitry
+Best regards,
+Krzysztof
 
 
