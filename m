@@ -1,212 +1,109 @@
-Return-Path: <netdev+bounces-74790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1163F862CD4
-	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 21:26:26 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EBEB862D10
+	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 22:09:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E7D11C210FB
-	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 20:26:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18F6CB21052
+	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 21:09:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2B1EEADD;
-	Sun, 25 Feb 2024 20:26:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H7YStHhZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 279581B947;
+	Sun, 25 Feb 2024 21:09:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6B171B807
-	for <netdev@vger.kernel.org>; Sun, 25 Feb 2024 20:26:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119621B80A
+	for <netdev@vger.kernel.org>; Sun, 25 Feb 2024 21:09:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.86.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708892781; cv=none; b=MjPsCf98ETdCfodUuvHQAUrweV9lTxOsVOoEI0523o6iuAn3uGIZUj2rGx29OKWl81KgCwAcpwks/diu98/HU8OPBPsy+lj7QHCOYPpEfQWUzEwPfDHWMV3n6GtQMo0x4ijErqu+pXtWSP+XbdJoFIINiaqKuHkTJaK/j8CCvQY=
+	t=1708895377; cv=none; b=MIB/sXOzvupPxOFkER+cMfyzubr0PMKOwgO2QiaFpp12QYm7ci5axaKu1Tg6iiFD1R6Oe/KWy6c9F+dRSYCHOWrwFbsDE2ztth17Bub00Ku++1hto02YPkpGZlolXlB31XnB5Srz35xq91vVSGGzOrRO4aAMX5r4SfI4CdbAXaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708892781; c=relaxed/simple;
-	bh=uia9Xpa1Ux/c4AXYRfNZbxYrdciWIwDldX5aSUd5yRo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lJvPbhvmGAdae+/2WoCI6iGgAEHIYnLQitYdYjzHngSmsqOPdCut5ZEKcYPWfHhYwn2SsKeN7uXcAmVZT8nx9+AkHTxbyzCN5UgUW9nj1hlenUJe7hHlyVanodsOLcKtyPX9KIwC+bp53+WhVR7BHyG3frUMwfhiR8S+Qm4JHn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H7YStHhZ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1708892778;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=J3ytopfXqBqOL1Vu/I3rG4YfjxYxF7yRKyhbp2kFyno=;
-	b=H7YStHhZux5RCNFJE2zK/JyJ5Yy/3fneHCrNsdg/JHtRP7QWMbYXNR1UvD9w62U97Cm0Oa
-	Vor7lagXx/XqxNHZX4IByIpMjyus7d++jWbXxUoUEiDWOlB2AgfByl9Kwd8919kxvTaeBY
-	YW1z3ziTm5UZhdz8Pv+Mmi15W9ukK4M=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-628-2s-ALWGuMZWQlNrcJnYhLw-1; Sun, 25 Feb 2024 15:26:17 -0500
-X-MC-Unique: 2s-ALWGuMZWQlNrcJnYhLw-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-41296d7c800so12072735e9.1
-        for <netdev@vger.kernel.org>; Sun, 25 Feb 2024 12:26:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708892775; x=1709497575;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=J3ytopfXqBqOL1Vu/I3rG4YfjxYxF7yRKyhbp2kFyno=;
-        b=KvOxxsjuSEyzrJCn7qLsKSOc3mxZXXN1UqUhjjJAgYeuuwkj1nBMpqjAp0CgaXXs8s
-         uRK1A0vkM8Tp7gfs3sNFNv8MTtzNpIWS/EaDbCzhgGjHpmA9H/qson2i3FzrPw2og+We
-         v3rmQKe7aGXvcDOpYD6UnlM02IYbGI7si+HhTFhmU0467Q8J/O+Ml+rQXSqBEUmOUjGE
-         pAz6YeUcvFutankVZvjPHrlhSG98alrS3VoQS1t9cezDmzKjl0qybck41Ln4+6jJhHEe
-         +bxCOUnZBRjZa0b80Nqj/rxa3a4g05ULYmQjoqHcn+MyFU5mQD3Z0mUzllQcYN7o4sdT
-         IM5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX6hsRz2HzCXv+9q4Uc3U/rf3NhhZ9IzmLIB0jqiar5na/XrGrfK+BdIt5IECIHY66C7T83yBI+JXDW5f8fRUk4UkKSCMWV
-X-Gm-Message-State: AOJu0YznF1Hr1dwcD7hZCeYk4YhrQ6mHn6g/M0634n8A7R0RwSUkcXqT
-	lhfTksChTFZ+6fBw/HLXT0ecwlwA/xVnIzufA7D+zt+pDYj0WffxNr/ut2w4mDabtfEHCorqn8i
-	6CGOKozBBXbawLgsgMIHMt7gxorInn1WuO/Tc6sx+aDD0H2idFoBXoA==
-X-Received: by 2002:a05:600c:4885:b0:410:f5d2:cbe5 with SMTP id j5-20020a05600c488500b00410f5d2cbe5mr3903022wmp.37.1708892774878;
-        Sun, 25 Feb 2024 12:26:14 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHM/Hc5aKEKDw17cQ7DrumqyLC5t7v2MRdRvGOBVg16+X6zFVBJiqvGL5wqhJhU7eoliAdjow==
-X-Received: by 2002:a05:600c:4885:b0:410:f5d2:cbe5 with SMTP id j5-20020a05600c488500b00410f5d2cbe5mr3903019wmp.37.1708892774498;
-        Sun, 25 Feb 2024 12:26:14 -0800 (PST)
-Received: from redhat.com ([109.253.193.52])
-        by smtp.gmail.com with ESMTPSA id s7-20020a05600c45c700b0040fd1629443sm5967317wmo.18.2024.02.25.12.26.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Feb 2024 12:26:13 -0800 (PST)
-Date: Sun, 25 Feb 2024 15:26:09 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Dave Taht <dave.taht@gmail.com>
-Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Jason Wang <jasowang@redhat.com>, hengqi@linux.alibaba.com,
-	netdev@vger.kernel.org
-Subject: Re: virtio-net + BQL
-Message-ID: <20240225145946-mutt-send-email-mst@kernel.org>
-References: <1708678175.1740165-3-xuanzhuo@linux.alibaba.com>
- <CAA93jw7G5ukKv2fM3D3YQKUcAPs7A8cW46gRt6gJnYLYaRnNWg@mail.gmail.com>
- <20240225133416-mutt-send-email-mst@kernel.org>
- <CAA93jw4DMnDMzzggDzBczvppgWWwu5tzcA=hOKOobVxJ7Se5xw@mail.gmail.com>
+	s=arc-20240116; t=1708895377; c=relaxed/simple;
+	bh=5MF9bougW33Z1HHpQQco5/NgIxFQQq3pUp/4ChKgQ3s=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=ljAo7f8U8r/rRRsb6DuaIlKUXPfvXyHbhc8oz15JekgSgQZ6/KHvmOFzfTGSMgrrIAD7trUSr9Zi63ibsz6eQZmRzHzuuouSZ6tDMa5IFdji9QQL7Q15DTB5XvBsp7I37XPxIUsYfxecZTlxMBMpDPW3HY0sTEu7QrulVwSaI9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.86.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-25-AJDdc1O7Pimm9mrvmQ8LqA-1; Sun, 25 Feb 2024 21:09:30 +0000
+X-MC-Unique: AJDdc1O7Pimm9mrvmQ8LqA-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sun, 25 Feb
+ 2024 21:09:29 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Sun, 25 Feb 2024 21:09:29 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Linus Torvalds' <torvalds@linux-foundation.org>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Netdev
+	<netdev@vger.kernel.org>, "dri-devel@lists.freedesktop.org"
+	<dri-devel@lists.freedesktop.org>, Jens Axboe <axboe@kernel.dk>, "Matthew
+ Wilcox (Oracle)" <willy@infradead.org>, Christoph Hellwig
+	<hch@infradead.org>, "linux-btrfs@vger.kernel.org"
+	<linux-btrfs@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, "David S . Miller"
+	<davem@davemloft.net>, Dan Carpenter <dan.carpenter@linaro.org>, Jani Nikula
+	<jani.nikula@linux.intel.com>
+Subject: RE: [PATCH next v2 08/11] minmax: Add min_const() and max_const()
+Thread-Topic: [PATCH next v2 08/11] minmax: Add min_const() and max_const()
+Thread-Index: AdpoCy246SYrYUdtTu+AtQRSWe90RAAAtXgAAAgCCqA=
+Date: Sun, 25 Feb 2024 21:09:29 +0000
+Message-ID: <056cfcf737e344acb47d612f642d58b3@AcuMS.aculab.com>
+References: <0fff52305e584036a777f440b5f474da@AcuMS.aculab.com>
+ <c6924533f157497b836bff24073934a6@AcuMS.aculab.com>
+ <CAHk-=wgNh5Gw7RTuaRe7mvf3WrSGDRKzdA55KKdTzKt3xPCnLg@mail.gmail.com>
+In-Reply-To: <CAHk-=wgNh5Gw7RTuaRe7mvf3WrSGDRKzdA55KKdTzKt3xPCnLg@mail.gmail.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAA93jw4DMnDMzzggDzBczvppgWWwu5tzcA=hOKOobVxJ7Se5xw@mail.gmail.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 
-On Sun, Feb 25, 2024 at 01:58:53PM -0500, Dave Taht wrote:
-> On Sun, Feb 25, 2024 at 1:36 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Fri, Feb 23, 2024 at 07:58:34AM -0500, Dave Taht wrote:
-> > > On Fri, Feb 23, 2024 at 3:59 AM Xuan Zhuo <xuanzhuo@linux.alibaba.com> wrote:
-> > > >
-> > > > Hi Dave,
-> > > >
-> > > > We study the BQL recently.
-> > > >
-> > > > For virtio-net, the skb orphan mode is the problem for the BQL. But now, we have
-> > > > netdim, maybe it is time for a change. @Heng is working for the netdim.
-> > > >
-> > > > But the performance number from https://lwn.net/Articles/469652/ has not appeal
-> > > > to me.
-> > > >
-> > > > The below number is good, but that just work when the nic is busy.
-> > > >
-> > > >         No BQL, tso on: 3000-3200K bytes in queue: 36 tps
-> > > >         BQL, tso on: 156-194K bytes in queue, 535 tps
-> > >
-> > > That is data from 2011 against a gbit interface. Each of those BQL
-> > > queues is additive.
-> > >
-> > > > Or I miss something.
-> > >
-> > > What I see nowadays is 16+Mbytes vanishing into ring buffers and
-> > > affecting packet pacing, and fair queue and QoS behaviors. Certainly
-> > > my own efforts with eBPF and LibreQos are helping observability here,
-> > > but it seems to me that the virtualized stack is not getting enough
-> > > pushback from the underlying cloudy driver - be it this one, or nitro.
-> > > Most of the time the packet shaping seems to take place in the cloud
-> > > network or driver on a per-vm basis.
-> > >
-> > > I know that adding BQL to virtio has been tried before, and I keep
-> > > hoping it gets tried again,
-> > > measuring latency under load.
-> > >
-> > > BQL has sprouted some new latency issues since 2011 given the enormous
-> > > number of hardware queues exposed which I talked about a bit in my
-> > > netdevconf talk here:
-> > >
-> > > https://www.youtube.com/watch?v=rWnb543Sdk8&t=2603s
-> > >
-> > > I am also interested in how similar AI workloads are to the infamous
-> > > rrul test in a virtualized environment also.
-> > >
-> > > There is also AFAP thinking mis-understood-  with a really
-> > > mind-bogglingly-wrong application of it documented over here, where
-> > > 15ms of delay in the stack is considered good.
-> > >
-> > > https://github.com/cilium/cilium/issues/29083#issuecomment-1824756141
-> > >
-> > > So my overall concern is a bit broader than "just add bql", but in
-> > > other drivers, it was only 6 lines of code....
-> > >
-> > > > Thanks.
-> > > >
-> > >
-> > >
-> >
-> > It is less BQL it is more TCP small queues which do not
-> > seem to work well when your kernel isn't running part of the
-> > time because hypervisor scheduled it out. wireless has some
-> > of the same problem with huge variance in latency unrelated
-> > to load and IIRC worked around that by
-> > tuning socket queue size slightly differently.
-> 
-> Add that to the problems-with-virtualization list, then. :/
-
-yep
-
-for example, attempts to drop packets to fight bufferbloat do
-not work well because as you start dropping packets you have less
-work to do on host and so VM starts going even faster
-flooding you with even more packets.
-
-virtualization has to be treated more like userspace than like
-a physical machine.
-
-
-> I was
-> aghast at a fix jakub put in to kick things at 7ms that went by
-> recently.
-
-which one is it?
-
-> Wireless is kind of an overly broad topic. I was (6 years ago) pretty
-> happy with all the fixes we put in there for WiFi softmac devices, the
-> mt76 and the new mt79 seem to be performing rather well. Ath9k is
-> still good, ath10k not horrible, I have no data about ath11k, and
-> let's not talk about the Broadcom nightmare.
-> 
-> This was still a pretty good day, in my memory:
-> https://forum.openwrt.org/t/aql-and-the-ath10k-is-lovely/59002
-> 
-> Is something else in wif igoing to hell? There are still, oh, 200
-> drivers left to fix. ENOFUNDING.
-> 
-> And so far as I know the 3GPP (5g) work is entirely out of tree and
-> almost entirely dpdk or ebpf?
-> 
-> >
-> >
-> > --
-> > MST
-> >
-> 
-> 
-> -- 
-> https://blog.cerowrt.org/post/2024_predictions/
-> Dave Täht CSO, LibreQos
+RnJvbTogTGludXMgVG9ydmFsZHMNCj4gU2VudDogMjUgRmVicnVhcnkgMjAyNCAxNzoxNA0KPiAN
+Cj4gT24gU3VuLCAyNSBGZWIgMjAyNCBhdCAwODo1MywgRGF2aWQgTGFpZ2h0IDxEYXZpZC5MYWln
+aHRAYWN1bGFiLmNvbT4gd3JvdGU6DQo+ID4NCj4gPiBUaGUgZXhwYW5zaW9ucyBvZiBtaW4oKSBh
+bmQgbWF4KCkgY29udGFpbiBzdGF0ZW1lbnQgZXhwcmVzc2lvbnMgc28gYXJlDQo+ID4gbm90IHZh
+bGlkIGZvciBzdGF0aWMgaW50aWFsaXNlcnMuDQo+ID4gbWluX2NvbnN0KCkgYW5kIG1heF9jb25z
+dCgpIGFyZSBleHByZXNzaW9ucyBzbyBjYW4gYmUgdXNlZCBmb3Igc3RhdGljDQo+ID4gaW5pdGlh
+bGlzZXJzLg0KPiANCj4gSSBoYXRlIHRoZSBuYW1lLg0KDQpQaWNraW5nIG5hbWUgaXMgYWx3YXlz
+IGhhcmQuLi4NCg0KPiBOYW1pbmcgc2hvdWxkbid0IGJlIGFib3V0IGFuIGltcGxlbWVudGF0aW9u
+IGRldGFpbCwgcGFydGljdWxhcmx5IG5vdA0KPiBhbiBlc290ZXJpYyBvbmUgbGlrZSB0aGUgIkMg
+Y29uc3RhbnQgZXhwcmVzc2lvbiIgcnVsZS4gVGhhdCBjYW4gYmUNCj4gdXNlZnVsIGZvciBzb21l
+IGludGVybmFsIGhlbHBlciBmdW5jdGlvbnMgb3IgbWFjcm9zLCBidXQgbm90IGZvcg0KPiBzb21l
+dGhpbmcgdGhhdCByYW5kb20gcGVvcGxlIGFyZSBzdXBwb3NlZCB0byBVU0UuDQo+IA0KPiBUZWxs
+aW5nIHNvbWUgcmFuZG9tIGRldmVsb3BlciB0aGF0IGluc2lkZSBhbiBhcnJheSBzaXplIGRlY2xh
+cmF0aW9uIG9yDQo+IGEgc3RhdGljIGluaXRpYWxpemVyIHlvdSBuZWVkIHRvIHVzZSAibWF4X2Nv
+bnN0KCkiIGJlY2F1c2UgaXQgbmVlZHMgdG8NCj4gc3ludGFjdGljYWxseSBiZSBhIGNvbnN0YW50
+IGV4cHJlc3Npb24sIGFuZCBvdXIgcmVndWxhciAibWF4KCkiDQo+IGZ1bmN0aW9uIGlzbid0IHRo
+YXQsIGlzIGp1c3QgKmhvcnJpZCouDQo+IA0KPiBObywgcGxlYXNlIGp1c3QgdXNlIHRoZSB0cmFk
+aXRpb25hbCBDIG1vZGVsIG9mIGp1c3QgdXNpbmcgQUxMIENBUFMgZm9yDQo+IG1hY3JvIG5hbWVz
+IHRoYXQgZG9uJ3QgYWN0IGxpa2UgYSBmdW5jdGlvbi4NCj4gDQo+IFllcywgeWVzLCB0aGF0IG1h
+eSBlbmQgdXAgcmVxdWlyaW5nIGdldHRpbmcgcmlkIG9mIHNvbWUgY3VycmVudCB1c2VycyBvZg0K
+PiANCj4gICAjZGVmaW5lIE1JTihhLGIpICgoYSk8KGIpID8gKGEpOihiKSkNCj4gDQo+IGJ1dCBk
+YW1taXQsIHdlIGRvbid0IGFjdHVhbGx5IGhhdmUgX3RoYXRfIG1hbnkgb2YgdGhlbSwgYW5kIHdo
+eSBzaG91bGQNCj4gd2UgaGF2ZSByYW5kb20gZHJpdmVycyBkb2luZyB0aGF0IGFueXdheT8NCg0K
+SSdsbCBoYXZlIGEgbG9vayBhdCB3aGF0IGlzIHRoZXJlLg0KSXQgbWlnaHQgdGFrZSBhIHRocmVl
+IHBhcnQgcGF0Y2ggdGhvdWdoLg0KVW5sZXNzIHlvdSBhcHBseSBpdCBhcyBhIHRyZWUtd2lkZSBw
+YXRjaD8NCg0KT25lIG9wdGlvbiBpcyB0byBhZGQgYXMgbWF4X2NvbnN0KCksIHRoZW4gY2hhbmdl
+IGFueSBleGlzdGluZyBNQVgoKQ0KdG8gYmUgbWF4KCkgb3IgbWF4X2NvbnN0KCkgYW5kIHRoZW4g
+ZmluYWxseSByZW5hbWUgdG8gTUFYKCk/DQoNCglEYXZpZA0KDQotDQpSZWdpc3RlcmVkIEFkZHJl
+c3MgTGFrZXNpZGUsIEJyYW1sZXkgUm9hZCwgTW91bnQgRmFybSwgTWlsdG9uIEtleW5lcywgTUsx
+IDFQVCwgVUsNClJlZ2lzdHJhdGlvbiBObzogMTM5NzM4NiAoV2FsZXMpDQo=
 
 
