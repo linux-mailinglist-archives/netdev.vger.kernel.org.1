@@ -1,100 +1,133 @@
-Return-Path: <netdev+bounces-74725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 724708628F7
-	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 04:21:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 121D3862917
+	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 05:24:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A25D91C20A1F
-	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 03:21:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29527281DA9
+	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 04:24:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59E8046A0;
-	Sun, 25 Feb 2024 03:20:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16E3A63A5;
+	Sun, 25 Feb 2024 04:24:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uiZtspxh"
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="AKG1pC5J"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from out203-205-221-191.mail.qq.com (out203-205-221-191.mail.qq.com [203.205.221.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AAFB53AA
-	for <netdev@vger.kernel.org>; Sun, 25 Feb 2024 03:20:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C0A77476
+	for <netdev@vger.kernel.org>; Sun, 25 Feb 2024 04:24:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708831257; cv=none; b=AlKPKG12eLf87mnxV/XsG98Zgbjni9LSbyFtRjEwzrGO/H52fj2KlF5rsbtw5BpacQu1NG+KjsgIanTiMZfEX+zrq7tUY3IW2r0pZbvv8UyVf206Orp/p+EWN12vR1g62b6+k1PG58AYUtOEbvOg8w3GVmaNK1UdieEhZCcT/sc=
+	t=1708835072; cv=none; b=pTvOyp/hKlqti2YF4PAHt7MBd7mOiXFjdzhiyoefDoVLTe9FyOgsgnvQida6BM7z4pMTWjXoQV/6tsON045qZsxyckqkYnMigQRjCNr4ba2X0mpCeNwrhBIbMluDic1KpLxLHdnNZLxjn/Q7A84pEwEoAWkeHpmaayyGaXQL6N8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708831257; c=relaxed/simple;
-	bh=xFKowyoMhCu8KoyOJwEQdR7hyiU/GR4QHk9WLiDY8Oc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cagExXOJIUnbGvMPUhhHNcNf1L2pdh9zVKUNNR1gxXhtQwUjVhMp2twh1J5r1gwx7yZ8gyauFHdLjFOEdL9MWPFjG1zDEwbbQBCvNdB3DhcNmgplXIwBZ02k/uk2iCF64TgO+bnIWCp+y9pt6xloDqk+ChZ7juFEVkWXaIZKOUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uiZtspxh; arc=none smtp.client-ip=91.218.175.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Sat, 24 Feb 2024 22:20:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1708831252;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=U9J1yKDnvDl6KolyPgEXqei4kWuchDlY2Ell6cdvMf0=;
-	b=uiZtspxhcPDcD+TaJbQ3sUa9gdhY/699uXROpsOvonTdLCBd6xwRAtAIfpFDJpZJlIwG8Y
-	FNR5P5cW1RZsVfmHpllBXBwqQ81G+JIQ9iClq1Lfrsp7bZOgnemR8gaWE8t/Jk6/jhzgLU
-	bFuDazUhBfHkR5ZlMvpRf0swK0kzhHo=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: David Laight <David.Laight@aculab.com>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	Thomas Graf <tgraf@suug.ch>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, 
-	"maple-tree@lists.infradead.org" <maple-tree@lists.infradead.org>, "rcu@vger.kernel.org" <rcu@vger.kernel.org>
-Subject: Re: [PATCH 0/1] Rosebush, a new hash table
-Message-ID: <bm5xgk5vr5g7m35x4pzbxencbv57fjceowrchrxkuy4q5ri3sb@k4lj34hpvstb>
-References: <20240222203726.1101861-1-willy@infradead.org>
- <Zdk2YgIoAGOEvcJi@gondor.apana.org.au>
- <4a1416fcb3c547eb9612ce07da6a77ed@AcuMS.aculab.com>
- <ZdqO3G6Fb4wYhVEj@gondor.apana.org.au>
+	s=arc-20240116; t=1708835072; c=relaxed/simple;
+	bh=HLF+O/C3VXa6M8BYuuzaqawu+wmmS18aerFyo1QYTbY=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=NU/+lR0ry2aFNm9lqQaDovsoVlXWLDabRAR+iH4cMKoGdv10z8Gvma0H/rUNdvf9qbvvj8ccWaA8/PDaRBuRYTQl53eQTrkybZ5/ctDu35nxn1qiYof4OgAH+fIxsSLRm3hKluHCcbpoNxrwteTMeIBbIUkwfGzunLnGj15xtqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=AKG1pC5J; arc=none smtp.client-ip=203.205.221.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1708834768;
+	bh=59IuGjIu0z5/HQW09u+ZVejbVCT8iRknbhvMeWWNcGk=;
+	h=From:To:Cc:Subject:Date;
+	b=AKG1pC5J1EIvtUFPq5EXqe6epNEPCPL6y/2XKnfQGTw/zA+rJCZUsjJpJOEJOk/dg
+	 tBw5BisUfMDRalHIOIU1A7kH+hiegQyV3QTLQV+s46ulVvv5SvJ/vVSszLQ+a0Gw+Q
+	 J4IsOzF3t/DU2k/cZh87K4L8gDxacguRni1lsSuA=
+Received: from localhost.localdomain ([2409:8a60:2a61:ef40:480f:5c56:cca3:1b20])
+	by newxmesmtplogicsvrszb6-0.qq.com (NewEsmtp) with SMTP
+	id 18993038; Sun, 25 Feb 2024 12:06:09 +0800
+X-QQ-mid: xmsmtpt1708833969tfxhuw8jo
+Message-ID: <tencent_275FF7F351D515B570D0F82447BA30F3AA06@qq.com>
+X-QQ-XMAILINFO: NQR8mRxMnur95qgJaW4jYhCw4+afUk5zIXLMnvgSORBekwDI69L4NNvN9DlZKL
+	 RvT+AtAYo+eEa42vzUaptpzPuB2eDvGX0bFVLQwyjj3vldnOH0YMXpDhaCQIuaHw9a8fCGzT/Gp+
+	 QwILmQjPD4Nk/V2lUI5Rv5dofkFf1f7ttuIUj+PZdAuSbEMxrnlbcFyi6YIqOh4qF6V4hR8xsjPt
+	 WR6jIJdjXPeeT7EQsEA/PR+b9UPfGI4mi6mMKDfWyTLhNd3l2GCB/74n8Tz+2VzUhccm5O3q+djC
+	 iXWBhnN15Q6+rqEynmJseiinsi9TU6msoF1sHRyH5KA1IyUcNmkTEsj3paJ6V1Z3Uz14Nnte7E4V
+	 sF6xi8xQsC2aQuufCy+aH27XjeYbcMFzFlD3ytb9ruEIf8jO0JKcnEd0MVBnNCtTi3GtFvEfHfL4
+	 x1RPdS4a0SKNXd+UCZ5CygdvmZB1f/6C8kz3/AyDJjPsX+mJan1aFROMnpHNLUqIt4PLE/swKu1W
+	 /Y9YfghDJ9solljQlVYcGR5ZRNaBZnnKV/EMoDn/q3l/rlmy+5pKBAD2I/RBKX+Tts9IzQAg+mHR
+	 oJS367V+KFTAs9f7Pzpf7pP88uCVi0VWuGD7vFplL+Fb6LEgHJTMpLNVPC6hpfLucoGA4mHKjomL
+	 /cI/+kl9JSJdRP96D+PK+2+4W0wsAxHtnT8ZrDD0+wfqmQ9d3CkyU7R3ubfDwxQ6A73XGAW+MRQ+
+	 ZfiumXMBgnr8BkrU0tJr7kSOYJVzHgHsLq6nQG0DTab6O+oLeZn5T/mMO39KlUPj/XJrByuecxvl
+	 2oYpTTGTPJh3IMp6ixUDwUEL0tgSWrsZsg2+/b2ljqe1Zh8qGqXzB/wYiFQI/xUqAeZvUWjwfaQ4
+	 53t6NtS2KG6NKQjfGJjm6UXxy8NZRxYhxa6/hDxBMYJFb1jbLcqaCswer2fNy6O5No2SbbLwQNRM
+	 P55V5R3wEFF1Mk5/zxBFIdDGHjMASnYpaSV/u2fkWyQTJBoJX98eNMPLBTDdhX86reYMrfzDhHci
+	 JCxy9bnUSo3A4OznzGc8OOPDKqVh0=
+X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
+From: wenyang.linux@foxmail.com
+To: Luis Chamberlain <mcgrof@kernel.org>,
+	Kees Cook <keescook@chromium.org>,
+	Joel Granados <j.granados@samsung.com>,
+	Christian Brauner <brauner@kernel.org>,
+	davem@davemloft.net,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Wen Yang <wenyang.linux@foxmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/8] introduce sysctl SYSCTL_U8_MAX and SYSCTL_LONG_S32_MAX
+Date: Sun, 25 Feb 2024 12:05:30 +0800
+X-OQ-MSGID: <20240225040538.845899-1-wenyang.linux@foxmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZdqO3G6Fb4wYhVEj@gondor.apana.org.au>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On Sun, Feb 25, 2024 at 08:50:36AM +0800, Herbert Xu wrote:
-> On Sat, Feb 24, 2024 at 10:10:27PM +0000, David Laight wrote:
-> >
-> > > Normally an rhashtable gets resized when it reaches 75% capacity
-> > > so the average chain length should always be one.
-> > 
-> > The average length of non-empty hash chains is more interesting.
-> > You don't usually search for items in empty chains.
-> > The only way you'll get all the chains of length one is if you've
-> > carefully picked the data so that it hashed that way.
-> 
-> Sure.  But given the 75% capacity, you'd need a really bad hash
-> function to get an *average* (not worst-case) chain length of
-> 10.
-> 
-> > I remember playing around with the elf symbol table for a browser
-> > and all its shared libraries.
-> > While the hash function is pretty trivial, it really didn't matter
-> > whether you divided 2^n, 2^n-1 or 'the prime below 2^n' some hash
-> > chains were always long.
-> 
-> Even in the unlikely event of bad luck and everything bunches up
-> together, we change theh hash function (through hash_rnd) every
-> time we resize so you would expect things to even out after the
-> resize event.
-> 
-> A rehash is also automatically triggered if the worst-case chain
-> length exceeds 16.
+From: Wen Yang <wenyang.linux@foxmail.com>
 
-16!? that's crap, use a decent hash function and 3-5 should be your
-worst upper bound.
+The boundary check of multiple modules uses these static variables (such as
+two_five_five, n_65535, ue_int_max, etc), and they are also not changed.
+Therefore, add them to the shared sysctl_vals and sysctl_long_vals to avoid
+duplication. This also reduce the size a bit 
+
+Wen Yang (8):
+  sysctl: introduce sysctl SYSCTL_U8_MAX and SYSCTL_LONG_S32_MAX
+  rxrpc: delete these duplicate static variables n_65535 and four
+  net: ipv6: delete these duplicate static variables two_five_five and
+    minus_one
+  svcrdma: delete the duplicate static variables zero
+  sysctl: delete these duplicate static variables i_zero and
+    i_one_hundred
+  epoll: delete these duplicate static variables long_zero and long_max
+  fs: inotify: delete these duplicate static variables it_zero and
+    it_int_max
+  ucounts: delete these duplicate static variables ue_zero and
+    ue_int_max
+
+ fs/eventpoll.c                   |  7 ++-----
+ fs/notify/inotify/inotify_user.c | 11 ++++-------
+ include/linux/sysctl.h           | 15 +++++++++------
+ kernel/sysctl.c                  |  4 ++--
+ kernel/ucount.c                  |  7 ++-----
+ lib/test_sysctl.c                |  6 ++----
+ net/ipv6/addrconf.c              | 12 +++++-------
+ net/rxrpc/sysctl.c               | 16 +++++++---------
+ net/sunrpc/xprtrdma/svc_rdma.c   | 21 ++++++++++-----------
+ 9 files changed, 43 insertions(+), 56 deletions(-)
+
+Cc: Luis Chamberlain <mcgrof@kernel.org>
+Cc: Kees Cook <keescook@chromium.org>
+Cc: Joel Granados <j.granados@samsung.com>
+Cc: Christian Brauner <brauner@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: David Ahern <dsahern@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+
+-- 
+2.25.1
+
 
