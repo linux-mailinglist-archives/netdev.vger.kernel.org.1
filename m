@@ -1,111 +1,174 @@
-Return-Path: <netdev+bounces-74746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CD4F862B5C
-	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 16:58:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96FE7862BBA
+	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 17:30:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 128511F21146
-	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 15:58:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA6F91C20DD3
+	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 16:30:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B6321643A;
-	Sun, 25 Feb 2024 15:58:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2510517BB3;
+	Sun, 25 Feb 2024 16:30:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WymMGjSi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nhwlnri6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
+Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A387414280;
-	Sun, 25 Feb 2024 15:58:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3B0175B1;
+	Sun, 25 Feb 2024 16:30:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708876727; cv=none; b=GnQSYtE6i2rledHEgxkq8u4D6pQZaER4ufhLBWodAIxDJowFJjbxGMAIo9Xi2Ar3asduNAhC+mb6ZOfoLK2PTcYpnjmL1DVIHMZJi1Uc8nhvva3RldawmoRnhGK8gSnJJ/LnCQ27yuF+EECtxAC6mcKG69qXiQsUQ6tpLyjUSYo=
+	t=1708878605; cv=none; b=CRY3kGuPko5Vk6ItDCsa4QNhbPAfnBRRa15E8v6xT1fWp1xzgcFqLd+5tY/RRrdWo3cTbIMOXCYBZdP5eULmnuZbfvKRR2elwUfYUcMBxBJj2bgKlfRG5nuS3xm/AluDRL8XvpC9iPC16uyjYLFOuySQu0aqGQTlRVMV1mbVOqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708876727; c=relaxed/simple;
-	bh=oWPwKUfFaUKDvLe8z6kb5kll3d3LDHDHamj9jCZzWf4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k4Rhj6/jINreWFGDbt3Q8Q8+Ca1ukwRjzAxihFUvrguJ/we28dOjE2EXkFpOsKYNCAA+KBJms/4cJfoCR7777yf5cezChCRkd4NDbACFShgH7IkIpi1bbzEzgfmYro3GvEYJ1KV9xcpJP2wvcgwqOcVzH1z/4IN/Gs4CLcAv4Is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WymMGjSi; arc=none smtp.client-ip=209.85.160.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	s=arc-20240116; t=1708878605; c=relaxed/simple;
+	bh=4guceXm7JqD7FE8mAp8QWs5E4MPeZjZ52K4eeMVUmQ0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=mQEn+GGzlsbbjM2eBEDAaDhhjzKU4TdSqU0aiP99qO4IdfrHNcsoWMfzSvAdycsVQlOFnYBmV179Thr8GNgZU3d5FaDNCPiPMi272xu04xDErTu2Pla+TIn0wzc0fiBiL3b/hFqz78H6OCa8COX13dqqKRNt86xUG1Op5DNweh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nhwlnri6; arc=none smtp.client-ip=209.85.167.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-21fdf31a154so651032fac.3;
-        Sun, 25 Feb 2024 07:58:45 -0800 (PST)
+Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3bd72353d9fso1525473b6e.3;
+        Sun, 25 Feb 2024 08:30:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1708876725; x=1709481525; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=idPAAJ96XdV4kQvBDm67FrrO1sdpsDxXupC8T/KxzXY=;
-        b=WymMGjSiwOyYc+W8UEWbRf8Ty0TWjteLlRsUIq6AAe/tXyOwEtJcKjnBXxflsvhpXq
-         L4s0qdQqHxGywzUPcTgOLwEFMJ2faf2Gw73JqqYeNvObQnR8t65kucYEclIiqNbsU3WB
-         10ptyMwY3h3SrgTkEbkSNAbXnMj4kv25P9zu7CU1xa2jXz5WlEl8OBIGev74dqXMxBRy
-         L7Moh3BTxjVoKrpR5GLOYBBBZvMDsiTqyrZAygXrMDyKPjGMhMkG6rxH9ov3uYK85T8J
-         Fl9JyNywpOf4aQRBJpSxSqOh1rqvBer6ymy/vqQJUpi10THB136t6jv8/yUyypXyqejh
-         vl3w==
+        d=gmail.com; s=20230601; t=1708878602; x=1709483402; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=uNJEXFGpk4yAstmGFnAIGxSja9Jjo+7NQAHRaWjDtYY=;
+        b=Nhwlnri6R4Pyanw54mJmsQFnwttONHnVef2jgjfNyvFwUD/opwRGAxBo33++ExvHev
+         L+vWP4VD2yAvxsQ9wOYs1Q5GmVkB9XXUJMn+OBW8tu/eTLxJhzMQjPhFeQUjD5aiLDV3
+         pyFkgRWtmSieOwLXQ5uiO9IfAe16DhActLDCT1vxFJbOByMc6SLc76khWu2rVm9a6cbD
+         PKGkNYfVGHatIZjQqCTRfwficV265whbM2E8alXmfACn4TP5w/eskdqowwYAKnfHbiCm
+         IBvMubeSZXOgNTQQLRPOBukkIY/zWBKqqYMSwb3+p1JOItuHtOSSZFBHv+hbkWxbdieD
+         dntA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1708876725; x=1709481525;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=idPAAJ96XdV4kQvBDm67FrrO1sdpsDxXupC8T/KxzXY=;
-        b=r/x3mHRsdkym390h01i1xUa1xWQheJtGS8V8m0PSyZezyKA1SNa+PZ2t4lHSbVRI8L
-         nyanO9G1JbCNLQNzhy7BX9FCJgPR5/0u1WyuVNcXpE7txCZ0k/F7odpGtk2TeUcsSg/V
-         yof3s2FaCludF6Keusz+tXZmJ9HdDMaLqg1ybXzzt4JLkVxXv0umPZw5GrjvnJOqFAx6
-         MVcmt3qYBY+an9WLdn5dpg+aDK3vuYPnUsYBN6rAnxCP16RExrOe5tNIdZNVov3yG4Wn
-         DlHYts/OgUbjzf+d2IbLok6Bl16xUiO3Mg+ChGXCyjWgw1/jvTR5qgxYsMcz1pyauitv
-         g58g==
-X-Forwarded-Encrypted: i=1; AJvYcCWzSbr0J7a0BNgir15jnjayTXLBYEL219DUqsvzRCQcEqi9U+YNrmeqDNSqSAkf/niej1SXlCqI/cpxVqwClN7uzt0etc9cBvj+mPhUCXDx549gr8mr3BXgJaSGCXyyIau1JNn3
-X-Gm-Message-State: AOJu0YynTrsttKIFt0pWEF/TK0VaJHXm9VuWCUVHB5WKz953AFk3MbkL
-	VuxvdqU/+K3WHUgeSVpQsr0oQ3KyLx+z5gaYjzITdX0dV4Jv8I6hWeoUP9yy
-X-Google-Smtp-Source: AGHT+IHG6YNLTj/YF9EppSR8plKWQXM3ymd76N7wy9J7i7mq3+f6Ljk9ryZxtjo1bfNt3q9zrvVCYw==
-X-Received: by 2002:a05:6870:c6aa:b0:21e:e583:25e1 with SMTP id cv42-20020a056870c6aa00b0021ee58325e1mr6105925oab.32.1708876724618;
-        Sun, 25 Feb 2024 07:58:44 -0800 (PST)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id z2-20020aa78882000000b006e47ab9b2e5sm2445339pfe.215.2024.02.25.07.58.43
+        d=1e100.net; s=20230601; t=1708878602; x=1709483402;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uNJEXFGpk4yAstmGFnAIGxSja9Jjo+7NQAHRaWjDtYY=;
+        b=SQpQslZA/8cCxFv0inIo7VHwoUxWb9lqqkUfoO403aBeL1vQGYLcZJrf4C3U0i834t
+         a9KydBpEqQd94WWf7BvIIwaC53uCBiWn6In0vVLct+pB1WF34kpbirQW8eP2xZ9wcEiP
+         wL2lvf4lrjq+J3cVR2x5ovrCKtfMsrc70QoonjwcO42WmPI01HXXUat88hpQoCh92s1i
+         UpUQH3f76o/9tzBVyThcMh7yD6gVYWy4pjDivmY1vhBKXG7xBrLXzEfDKZIZhTiADrhu
+         /5eJb0oSSgYDKVP2GQyeT7zIXJUIh+EZjltm1Yf6am+uDG7gDT3om9zWC4ZkrXj8zLRh
+         T9+A==
+X-Forwarded-Encrypted: i=1; AJvYcCXgF/XdR4pgReQxD5FUgRuRMiHAZnmCZNX9EGJ9DHVDdZMv41FWYGfWxalPyHkVrkTx6zqBk6bsCH+rbwjLDgJPjVcP/Ug57uxNLzejqj049GVyDdcnTa0RAfjl2RUX7I6CX1UxulkO2A==
+X-Gm-Message-State: AOJu0Yz5o6Vtk2y9ewBQvejcKZmHHFpD6XpaGvADcA/Go6/AjBNOuVJW
+	A5hN03q+Wh5851my1YyRnaR0HGsgJAgcexmx6JP+gZJUaC0nbxpN
+X-Google-Smtp-Source: AGHT+IHk+3H4yp2i3YGNHYDsa7ESXAzOfg+dWFU4CWmnooE/172tuzn1xUaI+ABtA8UvJS2CXLTADQ==
+X-Received: by 2002:a05:6358:5713:b0:17b:759:65c2 with SMTP id a19-20020a056358571300b0017b075965c2mr6448644rwf.10.1708878602442;
+        Sun, 25 Feb 2024 08:30:02 -0800 (PST)
+Received: from tresc054937.tre-sc.gov.br (177-131-126-82.acessoline.net.br. [177.131.126.82])
+        by smtp.gmail.com with ESMTPSA id a12-20020a17090acb8c00b0029a4089fbf0sm2838367pju.16.2024.02.25.08.29.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Feb 2024 07:58:44 -0800 (PST)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date: Sun, 25 Feb 2024 07:58:43 -0800
-From: Guenter Roeck <linux@roeck-us.net>
-To: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Charlie Jenkins <charlie@rivosinc.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Erhard Furtner <erhard_f@mailbox.org>
-Subject: Re: [PATCH net] kunit: Fix again checksum tests on big endian CPUs
-Message-ID: <56565259-906b-490c-8543-5009e0a555d8@roeck-us.net>
-References: <73df3a9e95c2179119398ad1b4c84cdacbd8dfb6.1708684443.git.christophe.leroy@csgroup.eu>
+        Sun, 25 Feb 2024 08:30:01 -0800 (PST)
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Subject: [PATCH net-next v5 0/3] net: dsa: realtek: support reset
+ controller and update docs
+Date: Sun, 25 Feb 2024 13:29:52 -0300
+Message-Id: <20240225-realtek-reset-v5-0-5a4dc0879dfb@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <73df3a9e95c2179119398ad1b4c84cdacbd8dfb6.1708684443.git.christophe.leroy@csgroup.eu>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAABr22UC/12NywrDIBBFfyW4rsWMiqar/kfpQtNJIs2jqEhKy
+ L9XpIs2q+Fy7zmzkYDeYSCXaiMekwtumXOQp4q0g5l7pO6RMwEGgkEN1KMZIz7zDRip1obZDqS
+ 1ACQzL4+dW4vvRuY8mHGN5J6bwYW4+Hd5lHjpv05+cCZOGeVKc4VSCVXzaz8ZN57bZSqmJH7p5
+ kiLTGuprQYDjWR/9L7vH30e59HyAAAA
+To: Linus Walleij <linus.walleij@linaro.org>, 
+ =?utf-8?q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+ Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
+ Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh+dt@kernel.org>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Philipp Zabel <p.zabel@pengutronix.de>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Luiz Angelo Daros de Luca <luizluca@gmail.com>, 
+ =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>, 
+ Rob Herring <robh@kernel.org>
+X-Mailer: b4 0.12.4
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2610; i=luizluca@gmail.com;
+ h=from:subject:message-id; bh=4guceXm7JqD7FE8mAp8QWs5E4MPeZjZ52K4eeMVUmQ0=;
+ b=owEBbQGS/pANAwAIAbsR27rRBztWAcsmYgBl22sE78pocRCNweliEnVncfNS6DISWyKDWIhEn
+ NpOVNKpPCKJATMEAAEIAB0WIQQRByhHhc1bOhL6L/i7Edu60Qc7VgUCZdtrBAAKCRC7Edu60Qc7
+ VpX+B/9isBfrtbMraz1QW795IvYv/0LY+myNfCe/ITKCi9fu+0tgKQTsmF+gn2xPbkRKOlUyaCK
+ I7K8XRszVfHJwTSiCBlfJ+jhhehbD5BFGMnDIB489/80pmc0xpfjyXTxhh3v26FDvPohdvI8AHA
+ K6w8Z+eOoztp3+pnHerQhsUrEQgt5qZ/9EKFyjh+bMnA0BGlUM3uk/jgFzPLOV6MulpdRFjGU8q
+ V28TQOREZ5uWUEZGZzJDmGuXYe2MgfsVRQIwDGpBjjyXIl4u5+byJ3IEt8YGrq4iSmFQEhaUKka
+ XTxRfQSiyrOrOyMdkOOV4bBH+2gFnbgnL/OBAabL7bb/5IMU
+X-Developer-Key: i=luizluca@gmail.com; a=openpgp;
+ fpr=1107284785CD5B3A12FA2FF8BB11DBBAD1073B56
 
-On Fri, Feb 23, 2024 at 11:41:52AM +0100, Christophe Leroy wrote:
-> Commit b38460bc463c ("kunit: Fix checksum tests on big endian CPUs")
-> fixed endianness issues with kunit checksum tests, but then
-> commit 6f4c45cbcb00 ("kunit: Add tests for csum_ipv6_magic and
-> ip_fast_csum") introduced new issues on big endian CPUs. Those issues
-> are once again reflected by the warnings reported by sparse.
-> 
-> So, fix them with the same approach, perform proper conversion in
-> order to support both little and big endian CPUs. Once the conversions
-> are properly done and the right types used, the sparse warnings are
-> cleared as well.
-> 
-> Reported-by: Erhard Furtner <erhard_f@mailbox.org>
-> Fixes: 6f4c45cbcb00 ("kunit: Add tests for csum_ipv6_magic and ip_fast_csum")
-> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+The driver previously supported reset pins using GPIO, but it lacked
+support for reset controllers. Although a reset method is generally not
+required, the driver fails to detect the switch if the reset was kept
+asserted by a previous driver.
 
-Tested-by: Guenter Roeck <linux@roeck-us.net>
+This series adds support to reset a Realtek switch using a reset
+controller. It also updates the binding documentation to remove the
+requirement of a reset method and to add the new reset controller
+property.
+
+It was tested on a TL-WR1043ND v1 router (rtl8366rb via SMI).
+
+Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+---
+Changes in v5:
+- Fixed error checking logic when reset controller (de)assert fails
+- Link to v4: https://lore.kernel.org/r/20240219-realtek-reset-v4-0-858b82a29503@gmail.com
+
+Changes in v4:
+- do not test for priv->reset,priv->reset_ctl
+- updated commit message
+- Link to v3: https://lore.kernel.org/r/20240213-realtek-reset-v3-0-37837e574713@gmail.com
+
+Changes in v3:
+- Rebased on the Realtek DSA driver refactoring (08f627164126)
+- Dropped the reset controller example in bindings
+- Used %pe in error printing
+- Linked to v2: https://lore.kernel.org/r/20231027190910.27044-1-luizluca@gmail.com/
+
+Changes in v2:
+- Introduced a dedicated commit for removing the reset-gpios requirement
+- Placed binding patches before code changes
+- Removed the 'reset-names' property
+- Moved the example from the commit message to realtek.yaml
+- Split the reset function into _assert/_deassert variants
+- Modified reset functions to return a warning instead of a value
+- Utilized devm_reset_control_get_optional to prevent failure when the
+  reset control is missing
+- Used 'true' and 'false' for boolean values
+- Removed the CONFIG_RESET_CONTROLLER check as stub methods are
+  sufficient when undefined
+- Linked to v1: https://lore.kernel.org/r/20231024205805.19314-1-luizluca@gmail.com/
+
+---
+Luiz Angelo Daros de Luca (3):
+      dt-bindings: net: dsa: realtek: reset-gpios is not required
+      dt-bindings: net: dsa: realtek: add reset controller
+      net: dsa: realtek: support reset controller
+
+ .../devicetree/bindings/net/dsa/realtek.yaml       |  4 ++-
+ drivers/net/dsa/realtek/realtek.h                  |  2 ++
+ drivers/net/dsa/realtek/rtl83xx.c                  | 42 +++++++++++++++++++---
+ drivers/net/dsa/realtek/rtl83xx.h                  |  2 ++
+ 4 files changed, 44 insertions(+), 6 deletions(-)
+---
+base-commit: d1d77120bc2867b3e449e07ee656a26b2fb03d1e
+change-id: 20240212-realtek-reset-88a0bf25bb22
+
+Best regards,
+-- 
+Luiz Angelo Daros de Luca <luizluca@gmail.com>
+
 
