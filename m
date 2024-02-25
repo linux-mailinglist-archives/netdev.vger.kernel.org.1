@@ -1,116 +1,144 @@
-Return-Path: <netdev+bounces-74793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-74794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62815862D45
-	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 22:48:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B048D862D8A
+	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 23:59:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C279B20D2D
-	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 21:48:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A8AD28164C
+	for <lists+netdev@lfdr.de>; Sun, 25 Feb 2024 22:59:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68E91B962;
-	Sun, 25 Feb 2024 21:48:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Mjt0ivCt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A29C51B949;
+	Sun, 25 Feb 2024 22:59:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D51041B957
-	for <netdev@vger.kernel.org>; Sun, 25 Feb 2024 21:48:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9C191BC27;
+	Sun, 25 Feb 2024 22:58:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708897713; cv=none; b=twuhPvJtNIInDbjYsG21VeWjT3U2QjLiqAeNrXnqmmHc9gUgIFqVZdW/I5Vu4VSsxeN+JUN0dPa5wt+VV23tMImgBwlAL9oUyB25iHOutrDoo65CdSELkjLF+fcAI6etCLjlw3921M4uuuNBvAoxzyQA6BXMIsx8C2mow036dh0=
+	t=1708901940; cv=none; b=m2+8ib/yXNn45fHjp8D8UhqMP6zWggXyaVF5pDslVhNPW6xZ/xHct0xdqLGU74LIGaqXFm9JBaVnrcF8HNZnm0qjSMw6YqmQLIHi+Hn1FI+JCiofodXHCSTxxpvQSCaworoyoCO0txBr1LBKo4aBdfdvulqYcMLzzffVeLhglTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708897713; c=relaxed/simple;
-	bh=dvUDecwBMflNx4CehdCSDahY5V9l4jB2UPQiq5FVREc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PrGO3lKtdX8cNFIsxe3qkcJpl2fAp1yoZey4wcbRZpsCZb9YsekUILfwa8Ku/zyHxMKtJz02+jKGgURr9rF6K5YR5q0ZUj9A0FY+qkaHztyAXw3X8Rky9V8nnMljwYVejAAM4KC9+u8NTHK3Z8o61sD3yJ/qouZpX33gSEa8sto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Mjt0ivCt; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Sun, 25 Feb 2024 16:48:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1708897709;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hZLPGWILyQb0uie5XWZz0sri12gIiwEuygESDSHUCVk=;
-	b=Mjt0ivCt7EdkAJ/tpZ4vBCFUaqud0EetWM2nBfj0PDARbuDEYfLiwPCmO+8FQyUf1FXdfK
-	FVg/OoP8xi3mQ8sb+oDtygwMJ6YTysy3H6B6s8jKttLHwjCDctJ7K1/6COxMO8MIW170zO
-	y1pGGRjGU3Mg12gJagPvuo4QwPQgzCU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: David Laight <David.Laight@aculab.com>
-Cc: 'Herbert Xu' <herbert@gondor.apana.org.au>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	Thomas Graf <tgraf@suug.ch>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, 
-	"maple-tree@lists.infradead.org" <maple-tree@lists.infradead.org>, "rcu@vger.kernel.org" <rcu@vger.kernel.org>
-Subject: Re: [PATCH 0/1] Rosebush, a new hash table
-Message-ID: <22nvcwzzfq3ae2eva6m43wolfo3b3pit7xsauuux267hxciigi@52zuwg5yorg5>
-References: <20240222203726.1101861-1-willy@infradead.org>
- <Zdk2YgIoAGOEvcJi@gondor.apana.org.au>
- <4a1416fcb3c547eb9612ce07da6a77ed@AcuMS.aculab.com>
- <2s73sed5n6kxg42xqceenjtcwxys4j2r5dc5x4fdtwkmhkw3go@7viy7qli43wd>
- <2a6001442b354c2fb5b881c2a9d75895@AcuMS.aculab.com>
+	s=arc-20240116; t=1708901940; c=relaxed/simple;
+	bh=DpAFu1e0ATBu7V0f5PNmDqZLD8jKe1zkpOETPU8QAKA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=X/jomdQIqXCnYGSk/p3bXwOEsLp8u2GcglHZqrUnYtax4j++Z7C20sZAp0qpoS7o/aIv/5CwTicC/6/iSUziyHEmTLFlIu0NGm7bo2Wkb3LLAutA7+gxbqg2FvHmKD2TKaGTtNS/EzH/beIcJRn8TNxzRoKpJSsSO7LHVKambAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netdev@vger.kernel.org
+Cc: netfilter-devel@vger.kernel.org,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de
+Subject: [PATCH net] netlink: validate length of NLA_{BE16,BE32} types
+Date: Sun, 25 Feb 2024 23:58:45 +0100
+Message-Id: <20240225225845.45555-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2a6001442b354c2fb5b881c2a9d75895@AcuMS.aculab.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On Sun, Feb 25, 2024 at 02:47:45PM +0000, David Laight wrote:
-> From: Kent Overstreet
-> > Sent: 25 February 2024 03:19
-> ..
-> > when I implemented cuckoo (which is more obviously sensitive to a weak
-> > hash function), I had to go with siphash, even jhash wasn't giving me
-> > great reslts. and looking at the code it's not hard to see why, it's all
-> > adds, and the rotates are byte aligned... you want mixed adds and xors
-> > and the rotates to be more prime-ish.
-> > 
-> > right idea, just old...
-> > 
-> > what would be ideal is something more like siphash, but with fewer
-> > rounds, so same number of instructions as jhash. xxhash might fit the
-> > bill, I haven't looked at the code yet...
-> 
-> There is likely to be a point where scanning a list of values
-> for the right hash value is faster than executing a hash function
-> that is good enough to separate them to separate buckets.
+syzbot reports:
 
-Executing a bunch of alu ops that parallelize nicely is _fast_
-(it's all xors/adds/rotates, chacha20 is a good example of how
-the modern stuff works).
+=====================================================
+BUG: KMSAN: uninit-value in nla_validate_range_unsigned lib/nlattr.c:222 [inline]
+BUG: KMSAN: uninit-value in nla_validate_int_range lib/nlattr.c:336 [inline]
+BUG: KMSAN: uninit-value in validate_nla lib/nlattr.c:575 [inline]
+BUG: KMSAN: uninit-value in __nla_validate_parse+0x2e20/0x45c0 lib/nlattr.c:631
+ nla_validate_range_unsigned lib/nlattr.c:222 [inline]
+ nla_validate_int_range lib/nlattr.c:336 [inline]
+ validate_nla lib/nlattr.c:575 [inline]
+ __nla_validate_parse+0x2e20/0x45c0 lib/nlattr.c:631
+ __nla_parse+0x5f/0x70 lib/nlattr.c:728
+ nla_parse_deprecated include/net/netlink.h:703 [inline]
+ nfnetlink_rcv_msg+0x723/0xde0 net/netfilter/nfnetlink.c:275
+ netlink_rcv_skb+0x371/0x650 net/netlink/af_netlink.c:2543
+ nfnetlink_rcv+0x372/0x4950 net/netfilter/nfnetlink.c:659
+ netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
+ netlink_unicast+0xf49/0x1250 net/netlink/af_netlink.c:1367
+ netlink_sendmsg+0x1238/0x13d0 net/netlink/af_netlink.c:1908
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
+ __sys_sendmsg net/socket.c:2667 [inline]
+ __do_sys_sendmsg net/socket.c:2676 [inline]
+ __se_sys_sendmsg net/socket.c:2674 [inline]
+ __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
-Also, for 2-way cuckoo there's an xor trick so you don't need to compute
-a second hash.
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:3819 [inline]
+ slab_alloc_node mm/slub.c:3860 [inline]
+ kmem_cache_alloc_node+0x5cb/0xbc0 mm/slub.c:3903
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:560
+ __alloc_skb+0x352/0x790 net/core/skbuff.c:651
+ alloc_skb include/linux/skbuff.h:1296 [inline]
+ netlink_alloc_large_skb net/netlink/af_netlink.c:1213 [inline]
+ netlink_sendmsg+0xb34/0x13d0 net/netlink/af_netlink.c:1883
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
+ __sys_sendmsg net/socket.c:2667 [inline]
+ __do_sys_sendmsg net/socket.c:2676 [inline]
+ __se_sys_sendmsg net/socket.c:2674 [inline]
+ __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
-But the key thing about cuckoo is that the loads on lookup _aren't
-dependent_ - they can run in parallel. Every cache miss that goes all
-the way to DRAM is stupidly expensive, remember - hundreds of
-instructions, had you been able to keep the pipeline fed.
+NLA_BE16 and NLA_BE32 minimum attribute length is not validated, update
+nla_attr_len and nla_attr_minlen accordingly.
 
-> You don't want to scan a linked list because they have horrid
-> cache footprints.
-> The locking is equally horrid - especially for remove.
-> Arrays of pointers ar ethe way forward :-)
+After this update, kernel displays:
 
-Well, maybe; I'm waiting to see fill factor numbers and benchmarks. Fill
-factor was my concern when I was playing around with the concept; I used
-it in a place where the hash table didn't need to be that big, and the
-point was to avoid having to separately allocate the entries (and it
-avoids the hassle of tombstone entries with linear/quadratic probing).
+  netlink: 'x': attribute type 2 has an invalid length.
 
-The fact that it requires a second dependent load, because buckets are
-separately allocated, also looks like a big negative to me. I still
-think a good lockless cuckoo hashing implementation ought to beat it.
+in case that the attribute payload is too small and it reports -ERANGE
+to userspace.
+
+Fixes: ecaf75ffd5f5 ("netlink: introduce bigendian integer types")
+Reported-by: syzbot+3f497b07aa3baf2fb4d0@syzkaller.appspotmail.com
+Reported-by: xingwei lee <xrivendell7@gmail.com>
+Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+---
+ lib/nlattr.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/lib/nlattr.c b/lib/nlattr.c
+index ed2ab43e1b22..be9c576b6e2d 100644
+--- a/lib/nlattr.c
++++ b/lib/nlattr.c
+@@ -30,6 +30,8 @@ static const u8 nla_attr_len[NLA_TYPE_MAX+1] = {
+ 	[NLA_S16]	= sizeof(s16),
+ 	[NLA_S32]	= sizeof(s32),
+ 	[NLA_S64]	= sizeof(s64),
++	[NLA_BE16]	= sizeof(__be16),
++	[NLA_BE32]	= sizeof(__be32),
+ };
+ 
+ static const u8 nla_attr_minlen[NLA_TYPE_MAX+1] = {
+@@ -43,6 +45,8 @@ static const u8 nla_attr_minlen[NLA_TYPE_MAX+1] = {
+ 	[NLA_S16]	= sizeof(s16),
+ 	[NLA_S32]	= sizeof(s32),
+ 	[NLA_S64]	= sizeof(s64),
++	[NLA_BE16]	= sizeof(__be16),
++	[NLA_BE32]	= sizeof(__be32),
+ };
+ 
+ /*
+-- 
+2.30.2
+
 
